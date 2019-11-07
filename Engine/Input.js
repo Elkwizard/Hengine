@@ -39,9 +39,9 @@ let M = {
 	onRight: new Listener,
 	onScroll: new Listener,
 	onMove: new Listener,
-	engineClick: new Listener,
-	engineRightClick: new Listener,
-	engineMove: new Listener
+	engineClick: e => e,
+	engineRightClick: e => e,
+	engineMove: e => e
 }
 onkeydown = function(e){
 	K.keys[e.key] = true;

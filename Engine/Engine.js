@@ -49,6 +49,11 @@ Object.prototype.toString = function(depth = 0){
 		return "[object " + this.constructor.name + "]";
 	}
 }
+Object.prototype[Symbol.iterator] = function*() {
+	for (let x in this) {
+		yield [x, this[x]]; 
+	}
+}
 class Engine {
     constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
         this.fps = 0;
@@ -66,12 +71,7 @@ class Engine {
 		this.output = function(m){
 			alert(m);
 		}
-		try {
-			if(DevConsole){
-				this.console = new DevConsole();
-				this.output = this.console.log.bind(this.console);
-			}
-		} catch(e) {}
+		this.console = new Console();
         this.update = function(){};
         this.beforeUpdate = function(){};
         this.afterUpdate = function(){};

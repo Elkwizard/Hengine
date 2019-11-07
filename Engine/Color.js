@@ -132,6 +132,11 @@ class Color{
 		mixer.div(2);
 		return mixer;
 	}
+	invert(){
+		let n = (new Color(255, 255, 255, 1)).sub(this);
+		n.alpha = this.alpha;
+		return n;
+	}
 	static rangeAround(color, dist){
 		let colorAry = [];
 		for(let i = -dist; i < dist+1; i++){
@@ -157,6 +162,9 @@ class Color{
 	}
 	get_HEX(){
 		return "#" + Color.numToHex(this.red) + Color.numToHex(this.green) + Color.numToHex(this.blue);
+	}
+	toString() {
+		return this.get_RGBA();
 	}
 	equals(color){
 		if(this.red == color.red && this.green == color.green && this.blue == color.blue && this.alpha == color.alpha){

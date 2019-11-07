@@ -1,20 +1,92 @@
-class Vertex{
-	constructor(x, y){
+class Vertex {
+	constructor(x, y) {
 		this.x = x;
 		this.y = y;
 	}
-	toString(){
+	toString() {
 		return "(" + this.x + ", " + this.y + ")";
 	}
 }
-class Triangle{
-	constructor(p1, p2, p3){
+class Frame {
+	constructor(width, height){
+		this.width = width;
+		this.height = height;
+		this.img = new OffscreenCanvas(width, height);
+		this.c = new Artist(this.img);
+	}
+}
+class Texture {
+	constructor(width, height) {
+		this.width = width;
+		this.height = height;
+		this.pixels = [];
+		for (let i = 0; i < width; i++) {
+			this.pixels.push([]);
+			for (let j = 0; j < height; j++) {
+				this.pixels[i].push(new Color(0, 0, 0, 0));
+			}
+		}
+		this[Symbol.iterator] = function*() {
+			for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
+				yield [i, j];
+			}
+		}
+		this.updateImageData();
+	}
+	setPixel(x, y, clr) {
+		this.pixels[x][y] = clr;
+	}
+	updateImageData() {
+		let array = new Uint8ClampedArray(4 * this.width * this.height);
+		let cntr = 0;
+		for (let i = 0; i < this.width; i++) {
+			for (let j = 0; j < this.height; j++) {
+				let color = this.pixels[j][i];
+				array[cntr] = Math.floor(color.red);
+				array[cntr + 1] = Math.floor(color.green);
+				array[cntr + 2] = Math.floor(color.blue);
+				array[cntr + 3] = Math.floor(color.alpha * 255);
+				cntr += 4;
+			}
+		}
+		let img = new ImageData(array, this.width, this.height);
+		this.imageData = img;
+	}
+	/*static fromImage(img, width, height) {
+		let n = new Texture(width, height);
+		let f = new Frame(width, height);
+		f.c.drawImage(img, 0, 0, width, height);
+		let ID = f.c.c.getImageData(0, 0, width, height).data;
+		f.c.canvas.style.border = "2px green solid";
+		for (let i = 0; i < n.width * n.height * 4; i += 4) {
+			let x = Math.floor((i / 4) / height);
+			let y = (i / 4) % height;
+			let r = ID[i];
+			let g = ID[i + 1];
+			let b = ID[i + 2];
+			let a = ID[i + 3] / 255;
+			let col = new Color(r, g, b, a);
+			n.pixels[y][x] = col;
+		}
+		alert(n.pixels)
+		n.updateImageData();
+		return n;
+	}*/
+	toImage() {
+		let x = new Frame(this.width, this.height);
+		this.updateImageData();
+		x.c.c.putImageData(this.imageData, 0, 0);
+		return x;
+	}
+}
+class Triangle {
+	constructor(p1, p2, p3) {
 		this.vertices = [p1, p2, p3];
 	}
 	middle(){
-		function average(ary){
+		function average(ary) {
 			let sum = 0;
-			for(let num of ary){
+			for (let num of ary) {
 				sum += num;
 			}
 			sum /= ary.length;
@@ -23,7 +95,7 @@ class Triangle{
 		let res = new Vertex();
 		let xs = [];
 		let ys = [];
-		for(let x of this.vertices){
+		for (let x of this.vertices) {
 			xs.push(x.x);
 			ys.push(x.y);
 		}
@@ -37,6 +109,32 @@ class Circle {
 		this.x = x;
 		this.y = y;
 		this.radius = radius;
+	}
+}
+class Line {
+	constructor(x, y, x2, y2) {
+		if (typeof x === "object") {
+			this.x2 = y.x;
+			this.y2 = y.y;
+			this.y1 = x.y;
+			this.x1 = x.x;
+		} else {
+			this.x1 = x;
+			this.y1 = y;
+			this.x2 = x2;
+			this.y2 = y2;
+		}
+	}
+	get p1() {
+		return new Vertex(this.x1, this.y1);
+	}
+	get p2() {
+		return new Vertex(this.x2, this.y2);
+	}
+	get midPoint() {
+		let ax = (this.x1 + this.x2) / 2;
+		let ay = (this.y1 + this.y2) / 2;
+		return new Vertex(ax, ay);
 	}
 }
 class Rect {
@@ -93,7 +191,7 @@ class Rect {
 		];
 	}
 }
-class Animation{
+class Animation {
     constructor(src, frames, delay, loop, finResponse){
 		this.stopped = false;
 		if(!Array.isArray(frames)){
@@ -102,7 +200,7 @@ class Animation{
 			this.img = new Image
 			for(let i = 0; i < frames; i++){
 				this.frames.push(new Image);
-				this.frames[i].src = (src + "/" + (i+1) + ".png");
+				this.frames[i].src = ("../Art/Animations/" + src + "/" + (i+1) + ".png");
 			}
 			this.loop = loop;
 			this.finResponse = (finResponse !== undefined)? finResponse:function(){};
@@ -138,14 +236,6 @@ class Animation{
 		this.advance();
 	}
 }
-class Frame {
-	constructor(width, height){
-		this.width = width;
-		this.height = height;
-		this.img = new OffscreenCanvas(width, height);
-		this.c = new Artist(this.img);
-	}
-}
 class Artist {
 	constructor(canvasID, width, height){
 		this.canvas = document.getElementById(canvasID);
@@ -160,10 +250,22 @@ class Artist {
 		this.custom = {};
 		this.c = this.canvas.getContext('2d');
         this.animations = [];
+		this._background = new Color(0, 0, 0, 0);
+	}
+	get background() {
+		return this._background;
+	}
+	set background(a) {
+		this._background = a;
+		this.setBackground(a);
 	}
     get middle(){
         return {x:this.canvas.width / 2, y:this.canvas.height / 2};
     }
+	getPixel(x, y) {
+		let d = this.c.getImageData(x, y, 1, 1).data;
+		return new Color(d[0], d[1], d[2], d[3])
+	}
 	contentToFrame(){
 		let n = new Frame(this.canvas.width, this.canvas.height);
 		n.c.drawImage(this.canvas, 0, 0);
@@ -381,6 +483,12 @@ class Artist {
 			this.noiseAry.push(val);
 		}
 		return this.noiseAry[Math.floor(x)] * freq;
+	}
+	drawTexture(txr = new Texture(0, 0), x = 0, y = 0, width = txr.width, height = txr.height) {
+		let imagedata = txr.imageData;
+		let f = new OffscreenCanvas(txr.width, txr.height);
+		f.getContext('2d').putImageData(imagedata, 0, 0);
+		this.c.drawImage(f, x, y, width, height);
 	}
 	drawImage(img, x, y, width, height){
 		if(img instanceof Frame) img = img.img;
