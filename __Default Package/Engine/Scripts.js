@@ -38,34 +38,47 @@ class Script {
 		local.scriptCollideRight = e => e;
 		local.scriptCollideBottom = e => e;
 		local.scriptCollideGeneral = e => e;
+		local.scriptClick = e => e;
+		local.scriptRightClick = e => e;
+		local.scriptHover = e => e;
 		for(let x in this.methods){
-			if (this.methods[x].flag === "init") {
+			let flag = this.methods[x].flag.toLowerCase();
+			if (flag === "init") {
 				this.methods[x].bind(bindTo)(...args);
 			}
-			else if (this.methods[x].flag === "update") {
+			else if (flag === "update") {
 				local.scriptUpdate = local.scriptUpdate.add(this.methods[x].bind(bindTo));
 			}
-			else if (this.methods[x].flag === "draw") {
+			else if (flag === "draw") {
 				local.scriptDraw = local.scriptDraw.add(this.methods[x].bind(bindTo));
 			}
-			else if (this.methods[x].flag === "collide-general") {
+			else if (flag === "collide-general" || flag === "collide_general") {
 				local.scriptCollideGeneral = local.scriptCollideGeneral.add(this.methods[x].bind(bindTo));
 			}
-			else if (this.methods[x].flag === "collide-top") {
+			else if (flag === "collide-top" || flag === "collide_top") {
 				local.scriptCollideTop = local.scriptCollideTop.add(this.methods[x].bind(bindTo));
 			}
-			else if (this.methods[x].flag === "collide-bottom") {
+			else if (flag === "collide-bottom" || flag === "collide_bottom") {
 				local.scriptCollideBottom = local.scriptCollideBottom.add(this.methods[x].bind(bindTo));
 			}
-			else if (this.methods[x].flag === "collide-left") {
+			else if (flag === "collide-left" || flag === "collide_left") {
 				local.scriptCollideLeft = local.scriptCollideLeft.add(this.methods[x].bind(bindTo));
 			}
-			else if (this.methods[x].flag === "collide-right") {
+			else if (flag === "collide-right" || flag === "collide_right") {
 				local.scriptCollideRight = local.scriptCollideRight.add(this.methods[x].bind(bindTo));
+			}
+			else if (flag === "onrightclick" || flag === "on_right_click" || flag === "right_click") {
+				local.scriptRightClick = local.scriptRightClick.add(this.methods[x].bind(bindTo));
+			}
+			else if (flag === "onclick" || flag === "on_click" || flag === "click") {
+				local.scriptClick = local.scriptClick.add(this.methods[x].bind(bindTo));
+			}
+			else if (flag === "onhover" || flag === "on_hover" || flag === "hover") {
+				local.scriptHover = local.scriptHover.add(this.methods[x].bind(bindTo));
 			}
 			else {
 				local[x] = this.methods[x].bind(bindTo);
-				local[x].flag = this.methods[x].flag;
+				local[x].flag = flag;
 			}
 		}
 		return this;

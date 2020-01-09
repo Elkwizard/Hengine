@@ -28,6 +28,8 @@ let M = {
 	x: 0,
 	y: 0,
 	button: 0,
+	dragStart: new Vector2(0, 0),
+	dragEnd: new Vector2(0, 0),
 	custom: {},
 	updatePosition: function(e){
 		this.x = e.clientX;
@@ -39,15 +41,16 @@ let M = {
 	onRight: new Listener,
 	onScroll: new Listener,
 	onMove: new Listener,
-	engineClick: new Listener,
-	engineRightClick: new Listener,
-	engineMove: new Listener
+	engine: null,
+	engineClick: e => e,
+	engineRightClick: e => e,
+	engineMove: e => e
 }
-onkeydown = function(e){
+onkeydown = function(e) {
 	K.keys[e.key] = true;
 	for (let ev of K.onDown) ev(e);
 }
-onkeyup = function(e){
+onkeyup = function(e) {
 	if (e.key.toUpperCase() === e.key) {
 		K.keys[e.key.toLowerCase()] = false;
 	}
@@ -61,20 +64,23 @@ onclick = function(e){
 }
 onmousedown = function(e){
 	M.button = e.button;
+	if (M.engine) M.dragStart = M.engine.scene.adjustPointForDisplay(new Vector2(e.x, e.y));
 	M.updatePosition(e);
 	M.down = true;
 	for (let ev of M.onDown) ev(e);
 }
+onmousemove = function(e){
+	M.updatePosition(e);
+	if (M.engine) M.dragEnd = M.engine.scene.adjustPointForDisplay(new Vector2(e.x, e.y));
+	M.engineMove(e);
+	for (let ev of M.onMove) ev(e);
+}
 onmouseup = function(e){
 	M.button = e.button;
 	M.updatePosition(e);
+	if (M.engine) M.dragEnd = M.engine.scene.adjustPointForDisplay(new Vector2(e.x, e.y));
 	M.down = false;
 	for (let ev of M.onUp) ev(e);
-}
-onmousemove = function(e){
-	M.updatePosition(e);
-	M.engineMove(e);
-	for (let ev of M.onMove) ev(e);
 }
 oncontextmenu = function(e){
 	M.button = e.button;
@@ -84,7 +90,7 @@ oncontextmenu = function(e){
 	for (let ev of M.onRight) ev(e);
 	M.engineRightClick(e);
 }
-onwheel = function(e){
+onwheel = function(e) {
 	M.button = e.button;
 	for (let ev of M.onScroll) ev(e.deltaY);
 }

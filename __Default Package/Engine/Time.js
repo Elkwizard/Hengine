@@ -23,10 +23,14 @@ class Time{
 	}
 	static getFormattedTime(){
 		let t = Time.getTime();
-		let ex = "AM"
+		let ex = "AM";
+		if (t.days > 30 && t.days < 330) t.hours--;
 		if(t.hours > 12){
+			t.hours -= 12;
 			ex = "PM";
 		}
+		if (t.minutes.toString().length < 2) t.minutes = "0" + t.minutes.toString();
+		if (t.seconds.toString().length < 2) t.seconds = "0" + t.seconds.toString();
 		return t.hours + ":" + t.minutes + ":" + t.seconds + " " + ex;
 	}
 }

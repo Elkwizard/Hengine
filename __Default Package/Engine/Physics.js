@@ -41,12 +41,12 @@ class PhysicsObject extends SceneObject{
 		this.slows = undefined;
         this.instantStop = false;
         this.stopTimer = 0;
-		this.canCollide = true
+		this.canCollide = true;
 		this.direction = new Vector2(0, 0);
 		this.shown = false;
 		this.hasPhysics = true;
-		this.maxSpeedX = this.width;
-		this.maxSpeedY = this.height;
+		this.maxSpeedX = width / 3;
+		this.maxSpeedY = height / 3;
 		this.static = false;
         this.collideBasedOnRule = e => true;
 		this.response.collide = {
@@ -326,8 +326,6 @@ class CirclePhysicsObject extends PhysicsObject {
 	constructor(name, x, y, radius, gravity, controls, tag, home){
 		super(name, x, y, radius * 2, radius * 2, gravity, controls, tag, home);
 		this.collider = new CircleCollider(x, y, radius);
-		this.maxSpeedX = this.radius * 2;
-		this.maxSpeedY = this.radius * 2;
 	}
 	get middle() {
 		return {x:this.x,y:this.y};
@@ -370,6 +368,7 @@ class CirclePhysicsObject extends PhysicsObject {
 					for (let a of el) {
 						let ove = 0;
 						let dir = new Vector2(0, 0);
+						let usesTobinMath = false;
 						if (a instanceof CirclePhysicsObject) {
 							//colliding with circle: get overlap
 							let dist = gDist(this.collider, a.collider);
@@ -383,18 +382,33 @@ class CirclePhysicsObject extends PhysicsObject {
 							let cP = P(closestPX, closestPY);
 							let v = new Vector2();
 							if (Physics.pointInsideRectangle(this.collider, a)) {
-								let radius = 0;
-								if (this.speed.x > this.speed.y) {
-									cP.x = (this.x < a.middle.x)? a.x : a.x + a.width;
-									v = new Vector2(a.middle.x - this.x, 0);
-									radius = a.width / 2;
+								if (false) {
+									let d = Physics.distToRect(this.collider, a);
+									let r = this.radius;
+									let theta = Math.PI / 2 - this.direction.getAngle();
+									let dx = this.direction.x;
+									let dy = this.direction.y;
+									let cos = Math.cos(theta);
+									let offs = (r + d) / cos;
+									let ox = offs * dx;
+									let oy = offs * dy;
+									this.x -= ox;
+									this.y -= oy;
+									usesTobinMath = true;
 								} else {
-									cP.y = (this.y < a.middle.y)? a.y : a.y + a.height;
-									radius = a.height / 2;
-									v = new Vector2(0, a.middle.y - this.y);
+									let radius = 0;
+									if (this.speed.x > this.speed.y) {
+										cP.x = (this.x < a.middle.x)? a.x : a.x + a.width;
+										v = new Vector2(a.middle.x - this.x, 0);
+										radius = a.width / 2;
+									} else {
+										cP.y = (this.y < a.middle.y)? a.y : a.y + a.height;
+										radius = a.height / 2;
+										v = new Vector2(0, a.middle.y - this.y);
+									}
+									let dist = gDist(this.collider, cP);
+									ove = dist + this.radius;
 								}
-								let dist = gDist(this.collider, cP);
-								ove = dist + this.radius;
 							} else {
 								let dist = gDist(this.collider, cP);
 								ove = this.collider.radius - dist;
@@ -404,14 +418,16 @@ class CirclePhysicsObject extends PhysicsObject {
 						}
 						//adjust position
 						dir.normalize();
-						if (a.applyGravity && a instanceof CirclePhysicsObject) {
-							a.x += dir.x * ove * .5;
-							a.y += dir.y * ove * .5;
-							this.x -= dir.x * ove * .5;
-							this.y -= dir.y * ove * .5;
-						} else {
-							this.x -= dir.x * ove;
-							this.y -= dir.y * ove;
+						if (!usesTobinMath) {
+							if (a.applyGravity && a instanceof CirclePhysicsObject) {
+								a.x += dir.x * ove * .5;
+								a.y += dir.y * ove * .5;
+								this.x -= dir.x * ove * .5;
+								this.y -= dir.y * ove * .5;
+							} else {
+								this.x -= dir.x * ove;
+								this.y -= dir.y * ove;
+							}
 						}
 						let r = Math.max(0.01, this.rebound);
 						if (a.applyGravity) {

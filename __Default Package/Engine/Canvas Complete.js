@@ -1,20 +1,72 @@
-class Vertex{
-	constructor(x, y){
+class Vertex {
+	constructor(x, y) {
 		this.x = x;
 		this.y = y;
 	}
-	toString(){
+	toString() {
 		return "(" + this.x + ", " + this.y + ")";
 	}
 }
-class Triangle{
-	constructor(p1, p2, p3){
+class Frame {
+	constructor(width, height){
+		this.width = width;
+		this.height = height;
+		this.img = new OffscreenCanvas(width, height);
+		this.c = new Artist(this.img);
+	}
+}
+class Texture {
+	constructor(width, height) {
+		this.width = width;
+		this.height = height;
+		this.pixels = [];
+		for (let i = 0; i < width; i++) {
+			this.pixels.push([]);
+			for (let j = 0; j < height; j++) {
+				this.pixels[i].push(new Color(0, 0, 0, 0));
+			}
+		}
+		this[Symbol.iterator] = function*() {
+			for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
+				yield [i, j];
+			}
+		}
+		this.updateImageData();
+	}
+	setPixel(x, y, clr) {
+		this.pixels[x][y] = clr;
+	}
+	updateImageData() {
+		let array = new Uint8ClampedArray(4 * this.width * this.height);
+		let cntr = 0;
+		for (let i = 0; i < this.height; i++) {
+			for (let j = 0; j < this.width; j++) {
+				let color = this.pixels[j][i];
+				array[cntr] = Math.floor(color.red);
+				array[cntr + 1] = Math.floor(color.green);
+				array[cntr + 2] = Math.floor(color.blue);
+				array[cntr + 3] = Math.floor(color.alpha * 255);
+				cntr += 4;
+			}
+		}
+		let img = new ImageData(array, this.width, this.height);
+		this.imageData = img;
+	}
+	toImage() {
+		let x = new Frame(this.width, this.height);
+		this.updateImageData();
+		x.c.c.putImageData(this.imageData, 0, 0);
+		return x;
+	}
+}
+class Triangle {
+	constructor(p1, p2, p3) {
 		this.vertices = [p1, p2, p3];
 	}
 	middle(){
-		function average(ary){
+		function average(ary) {
 			let sum = 0;
-			for(let num of ary){
+			for (let num of ary) {
 				sum += num;
 			}
 			sum /= ary.length;
@@ -23,7 +75,7 @@ class Triangle{
 		let res = new Vertex();
 		let xs = [];
 		let ys = [];
-		for(let x of this.vertices){
+		for (let x of this.vertices) {
 			xs.push(x.x);
 			ys.push(x.y);
 		}
@@ -37,6 +89,47 @@ class Circle {
 		this.x = x;
 		this.y = y;
 		this.radius = radius;
+		this.collider = new CircleCollider(x, y, radius);
+	}
+	get x() {
+		return this.collider.x;
+	}
+	get y() {
+		return this.collider.y;
+	}
+	get radius () {
+		return this.collider.radius
+	}
+	set x(a) {
+		this.collider.x = a;
+	}
+	set y(a) {
+		this.collider.y = a;
+	}
+	set radius(a) {
+		this.collider.radius = a;
+	}
+}
+class Line {
+	constructor(x, y, x2, y2) {
+		this.collider = new LineCollider(x, y, x2, y2);
+	}
+	get a() {
+		return this.collider.a;
+	}
+	get b() {
+		return this.collider.b;
+	}
+	set a(a) {
+		this.collider.a = new Vector2(a.x, a.y);
+	}
+	set b(a) {
+		this.collider.b = new Vector2(a.x, a.y);
+	}
+	get midPoint() {
+		let ax = (this.a.x + this.b.x) / 2;
+		let ay = (this.a.y + this.b.y) / 2;
+		return new Vector2(ax, ay);
 	}
 }
 class Rect {
@@ -93,7 +186,7 @@ class Rect {
 		];
 	}
 }
-class Animation{
+class Animation {
     constructor(src, frames, delay, loop, finResponse){
 		this.stopped = false;
 		if(!Array.isArray(frames)){
@@ -102,7 +195,7 @@ class Animation{
 			this.img = new Image
 			for(let i = 0; i < frames; i++){
 				this.frames.push(new Image);
-				this.frames[i].src = (src + "/" + (i+1) + ".png");
+				this.frames[i].src = ("../Art/Animations/" + src + "/" + (i+1) + ".png");
 			}
 			this.loop = loop;
 			this.finResponse = (finResponse !== undefined)? finResponse:function(){};
@@ -138,14 +231,6 @@ class Animation{
 		this.advance();
 	}
 }
-class Frame {
-	constructor(width, height){
-		this.width = width;
-		this.height = height;
-		this.img = new OffscreenCanvas(width, height);
-		this.c = new Artist(this.img);
-	}
-}
 class Artist {
 	constructor(canvasID, width, height){
 		this.canvas = document.getElementById(canvasID);
@@ -160,10 +245,23 @@ class Artist {
 		this.custom = {};
 		this.c = this.canvas.getContext('2d');
         this.animations = [];
+		this._background = new Color(0, 0, 0, 0);
+		this.textMode = "left";
+	}
+	get background() {
+		return this._background;
+	}
+	set background(a) {
+		this._background = a;
+		this.setBackground(a);
 	}
     get middle(){
         return {x:this.canvas.width / 2, y:this.canvas.height / 2};
     }
+	getPixel(x, y) {
+		let d = this.c.getImageData(x, y, 1, 1).data;
+		return new Color(d[0], d[1], d[2], d[3])
+	}
 	contentToFrame(){
 		let n = new Frame(this.canvas.width, this.canvas.height);
 		n.c.drawImage(this.canvas, 0, 0);
@@ -235,6 +333,13 @@ class Artist {
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);
 				this.c.fill();
 			},
+			ellipse: function(x, y, rx, ry) {
+				rx = Math.abs(rx);
+				ry = Math.abs(ry);
+				this.c.beginPath();
+				this.c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+				this.c.fill();
+			},
 			rect: function(x, y, width, height){
 				if(typeof x === "object"){
 					this.c.fillRect(x.x, x.y, x.width, x.height);
@@ -257,13 +362,21 @@ class Artist {
 				this.c.closePath();
 			},
 			text: function(font, text, x, y){
-				if(typeof text == "object") text = text.toString();
-				if(typeof text == "number") text = String(text);
+				text = text + "";
 				this.c.font = font;
 				let fs = parseInt(font);
 				let blocks = text.split("\n");
 				for(let i = 0; i < blocks.length; i++){
-					this.c.fillText(blocks[i], x, y + ((i+1) * fs));	
+					let ax = x;
+					let tmb = this.c.measureText(blocks[i]);
+					if (this.textMode == "left") {
+						
+					} else if (this.textMode == "center") {
+						ax -= tmb.width / 2;
+					} else if (this.textMode == "right") {
+						ax -= tmb.width;
+					}
+					this.c.fillText(blocks[i], ax, y + ((i+1) * fs));
 				}
 			},
 			shape: function(...v) {
@@ -282,7 +395,7 @@ class Artist {
 		}
 		return obj
 	}
-	stroke(color, lineWidth, endStyle){
+	stroke(color, lineWidth = 1, endStyle = "flat"){
 		let c = color;
 		if (endStyle === "flat") endStyle = "butt";
 		if(typeof color == "object" && color.get_RGBA) c = color.get_RGBA();
@@ -302,6 +415,13 @@ class Artist {
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);
 				this.c.stroke();
 				this.c.closePath();
+			},
+			ellipse: function(x, y, rx, ry) {
+				rx = Math.abs(rx);
+				ry = Math.abs(ry);
+				this.c.beginPath();
+				this.c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+				this.c.stroke();
 			},
 			rect: function(x, y, width, height){
 				if(x instanceof Rect){
@@ -325,13 +445,21 @@ class Artist {
 				this.c.closePath();
 			},
 			text: function(font, text, x, y){
-				if(typeof text == "object") text = text.toString();
-				if(typeof text == "number") text = String(text);
+				text = text + "";
 				this.c.font = font;
 				let fs = parseInt(font);
 				let blocks = text.split("\n");
 				for(let i = 0; i < blocks.length; i++){
-					this.c.strokeText(blocks[i], x, y + ((i+1) * fs));	
+					let ax = x;
+					let tmb = this.c.measureText(blocks[i]);
+					if (this.textMode == "left") {
+						
+					} else if (this.textMode == "center") {
+						ax -= tmb.width / 2;
+					} else if (this.textMode == "right") {
+						ax -= tmb.width;
+					}
+					this.c.strokeText(blocks[i], ax, y + ((i+1) * fs));
 				}
 			},
 			line: function(x, y, x1, y1){
@@ -381,6 +509,17 @@ class Artist {
 			this.noiseAry.push(val);
 		}
 		return this.noiseAry[Math.floor(x)] * freq;
+	}
+	rotateAround(x, y, r) {
+		this.c.translate(x, y);
+		this.c.rotate(r);
+		this.c.translate(-x, -y);
+	}
+	drawTexture(txr = new Texture(0, 0), x = 0, y = 0, width = txr.width, height = txr.height) {
+		let imagedata = txr.imageData;
+		let f = new OffscreenCanvas(txr.width, txr.height);
+		f.getContext('2d').putImageData(imagedata, 0, 0);
+		this.c.drawImage(f, x, y, width, height);
 	}
 	drawImage(img, x, y, width, height){
 		if(img instanceof Frame) img = img.img;

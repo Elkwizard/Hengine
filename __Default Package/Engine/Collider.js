@@ -21,7 +21,37 @@ class Physics {
 		let dy = Math.max(Math.abs(ay) - (r.height / 2), 0);
 		return (dx ** 2) + (dy ** 2);
 	}
+	static projectPointOntoLine(p, d) {
+		let x1 = p.x;
+		let y1 = p.y;
+		let dx = d.x;
+		let dy = d.y;
+		let xv = ((dx**2) * x1 + (dx * dy * y1)) / (dx**2 + dy**2);
+		let yv = (dy / dx) * xv;
+		let xrs = Math.sign(xv);
+		let xr = Math.sqrt(xv ** 2 + yv ** 2);
+		let xfv = xrs * xr;
+		return xfv;
+	}
+	static overlapLineLine(l1, l2) {
+		let pol = Physics.projectPointOntoLine;
+		let dirs = [
+			Vector2.fromAngle(l1.b.minus(l1.a).getAngle() + Math.PI / 2),
+			Vector2.fromAngle(l2.b.minus(l2.a).getAngle() + Math.PI / 2),
+		];
+		for (let dir of dirs) {
+			let a = pol(l1.a, dir);
+			let b = pol(l1.b, dir);
+			let a2 = pol(l2.a, dir);
+			let b2 = pol(l2.b, dir);
+			if (b < a) [a, b] = [b, a];
+			if (b2 < a2) [a2, b2] = [b2, a2];
+			if (!(b > a2 && a < b2)) return false;
+		}
+		return true;
+	}
 	static isOverlapping(r1, r2) {
+		if (r1.a) return Physics.overlapLineLine(r1, r2);
 		if (r1.radius === undefined) {
 			if (r2.radius === undefined) {
 				return Physics.overlapRectRect(r1, r2)
@@ -49,6 +79,28 @@ class Physics {
 	}
 	static overlapCircleCircle(c, c2) {
 		return Physics.distToPoint2(c, c2) < (c.radius + c2.radius) ** 2;
+	}
+}
+class LineCollider {
+	constructor(x, y, x2, y2) {
+		if (typeof x === "object") {
+			this.a = new Vector2(x.x, x.y);
+			this.b = new Vector2(y.x, y.y);
+		} else {
+			this.a = new Vector2(x, y);
+			this.b = new Vector2(x2, y2);
+		}
+	}
+	evaluate(x) {
+		return this.slope * x + this.a.y;
+	}
+	get slope() {
+		let dx = this.b.x - this.a.x;
+		let dy = this.b.y - this.a.y;
+		return dy / dx;
+	}
+	collidePoint(x, y) {
+		return this.evaluate(x) == y;
 	}
 }
 class RectCollider {
