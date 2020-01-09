@@ -86,10 +86,10 @@ class Triangle {
 }
 class Circle {
 	constructor(x, y, radius) {
+		this.collider = new CircleCollider(x, y, radius);
 		this.x = x;
 		this.y = y;
 		this.radius = radius;
-		this.collider = new CircleCollider(x, y, radius);
 	}
 	get x() {
 		return this.collider.x;
@@ -332,6 +332,22 @@ class Artist {
 				this.c.beginPath();
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);
 				this.c.fill();
+				this.c.closePath();
+			},
+			arc: function(x, y, radius, startAngle, endAngle){
+				radius = Math.abs(radius);
+				this.c.beginPath();
+				this.c.arc(x, y, radius, startAngle, endAngle);
+				this.c.fill();
+			},
+			sector: function(x, y, radius, startAngle, endAngle){
+				radius = Math.abs(radius);
+				this.c.beginPath();
+				this.c.moveTo(x, y);
+				this.c.lineTo(x + radius * Math.cos(startAngle), y + radius * Math.sin(startAngle));
+				this.c.arc(x, y, radius, startAngle, endAngle);
+				this.c.lineTo(x, y);
+				this.c.fill();
 			},
 			ellipse: function(x, y, rx, ry) {
 				rx = Math.abs(rx);
@@ -415,6 +431,22 @@ class Artist {
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);
 				this.c.stroke();
 				this.c.closePath();
+			},
+			arc: function(x, y, radius, startAngle, endAngle){
+				radius = Math.abs(radius);
+				this.c.beginPath();
+				this.c.arc(x, y, radius, startAngle, endAngle);
+				this.c.stroke();
+				this.c.closePath();
+			},
+			sector: function(x, y, radius, startAngle, endAngle){
+				radius = Math.abs(radius);
+				this.c.beginPath();
+				this.c.moveTo(x, y);
+				this.c.lineTo(x + radius * Math.cos(startAngle), y + radius * Math.sin(startAngle));
+				this.c.arc(x, y, radius, startAngle, endAngle);
+				this.c.lineTo(x, y);
+				this.c.stroke();
 			},
 			ellipse: function(x, y, rx, ry) {
 				rx = Math.abs(rx);

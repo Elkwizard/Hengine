@@ -6,6 +6,8 @@ class Project{
 		this.C = this.c.c;
 		this.custom = {};
 		this.cl = new ColorLibrary();
+		this.K = K;
+		this.M = M;
 		window.g = this.g;
 		window.s = this.s;
 		window.c = this.c;

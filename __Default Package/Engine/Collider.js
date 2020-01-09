@@ -1,4 +1,19 @@
 class Physics {
+	static distToLine(p, l) {
+		if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
+		let min = Math.min(l.a.x, l.b.x);
+		let max = Math.max(l.a.x, l.b.x);
+		let dx = l.b.x - l.a.x;
+		let dy = l.b.y - l.a.y;
+		let b = l.a.y - l.a.x * (dy / dx);
+		let x1 = p.x;
+		let y1 = p.y;
+		let pX = ((dx / dy) * x1 - b + y1) / ((dy * dy + dx * dx) / (dx * dy));
+		if (pX < min) pX = min;
+		if (pX > max) pX = max;
+		let pY = (dy / dx) * pX + b;
+		return Physics.distToPoint(p, new Vector2(pX, pY));
+	}
 	static distToCircle(p, c) {
 		return Math.sqrt(Physics.distToPoint2(p, c)) - c.radius;
 	}
@@ -12,7 +27,8 @@ class Physics {
 		return Math.sqrt(Physics.distToPoint2(p, p2));
 	}
 	static distToRect(p, r) {
-		return Math.sqrt(Physics.distToRect2(p, r));
+		let d = Math.sqrt(Physics.distToRect2(p, r));
+		return d;
 	}
 	static distToRect2(p, r) {
 		let ax = p.x - (r.x + r.width / 2);
@@ -32,6 +48,57 @@ class Physics {
 		let xr = Math.sqrt(xv ** 2 + yv ** 2);
 		let xfv = xrs * xr;
 		return xfv;
+	}
+	static rayCast(ray, rs, threshold = 100000) {
+		let o = ray.a;
+		let origin = new Vector2(ray.a.x, ray.a.y);
+		let slope = new Vector2(ray.b.x - ray.a.x, ray.b.y - ray.a.y).normalize();
+		if (!slope.x && !slope.y) return {error: "no direction"};
+		let minDist = Infinity;
+		let steps = 0;
+		let maxSteps = 50;
+		let collided = null;
+		for (let r of rs) {
+			let d;
+			if (r.collider instanceof RectCollider) {
+				d = Physics.distToRect(o, r);
+			} else if (r.collider instanceof CircleCollider) {
+				d = Physics.distToCircle(o, r);
+			} else {
+				d = Physics.distToLine(o, r);
+			}
+			if (d <= 0) return {error: "inside shape", collidedShape: r, collisionPoint: o};
+		}
+		while (minDist > 0.1 && steps < maxSteps) {
+			minDist = Infinity;
+			steps++;
+			for (let r of rs) {
+				let d;
+				if (r.collider instanceof RectCollider) {
+					d = Physics.distToRect(o, r);
+				} else if (r.collider instanceof CircleCollider) {
+					d = Physics.distToCircle(o, r);
+				} else {
+					d = Physics.distToLine(o, r);
+				}
+				if (d < minDist) {
+					minDist = d;
+					collided = r;
+				}
+			}
+			if (g.f.getDistance(o, origin) > threshold) {
+				o = origin.add((new Vector2(threshold, threshold)).mul(slope));
+				steps = maxSteps;
+				break;
+			}
+			if (Physics.displayRaymarch) c.draw(new Color(255, 255, 255, 0.2)).circle(o.x, o.y, minDist);
+			o.x += slope.x * minDist;
+			o.y += slope.y * minDist;
+		}
+		if (steps >= maxSteps) {
+			return {collisionPoint: o, collidedShape: collided, error: "no collision"};
+		}
+		return {collisionPoint: o, collidedShape: collided};
 	}
 	static overlapLineLine(l1, l2) {
 		let pol = Physics.projectPointOntoLine;
@@ -81,6 +148,7 @@ class Physics {
 		return Physics.distToPoint2(c, c2) < (c.radius + c2.radius) ** 2;
 	}
 }
+Physics.displayRaymarch = false;
 class LineCollider {
 	constructor(x, y, x2, y2) {
 		if (typeof x === "object") {

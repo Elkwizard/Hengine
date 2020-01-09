@@ -58,13 +58,13 @@ class Vector {
 		vn.sub(v);
 		return vn;
 	}
-	divBy(v) {
+	over(v) {
 		let vn = new this.constructor(0, 0, 0, 0);
 		vn.add(this);
 		vn.div(v);
 		return vn;
 	}
-	mulBy(v) {
+	times(v) {
 		let vn = new this.constructor(0, 0, 0, 0);
 		vn.add(this);
 		vn.mul(v);
@@ -96,7 +96,7 @@ class Vector1 extends Vector {
 		this.x = x;
 	}
 	static random(){
-		return new Vector1(Math.random());
+		return new Vector1((Math.random() * 2) - 1);
 	}
 }
 class Vector2 extends Vector {
@@ -113,7 +113,7 @@ class Vector2 extends Vector {
 		return Math.atan2(this.y, this.x);
 	}
 	static random(){
-		return new Vector2(Math.random(), Math.random());
+		return new Vector2((Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 	static fromAngle(a) {
 		let x = Math.cos(a);
@@ -134,7 +134,7 @@ class Vector3 extends Vector {
 		}
 	}
 	static random(){
-		return new Vector3(Math.random(), Math.random(), Math.random());
+		return new Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 }
 class Vector4 extends Vector {
@@ -152,6 +152,6 @@ class Vector4 extends Vector {
 		}
 	}
 	static random(){
-		return new Vector4(Math.random(), Math.random(), Math.random(), Math.random());
+		return new Vector4((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 }

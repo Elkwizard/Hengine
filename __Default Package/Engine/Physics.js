@@ -57,11 +57,11 @@ class PhysicsObject extends SceneObject{
 			right: function(){}
 		}
         this.colliding = {
-            general: false,
-			top: false,
-			bottom: false,
-			left: false,
-			right: false
+            general: null,
+			top: null,
+			bottom: null,
+			left: null,
+			right: null
         }
 		for (let x in this.response.collide) {
 			let cap = x[0].toUpperCase() + x.slice(1);
@@ -249,17 +249,21 @@ class PhysicsObject extends SceneObject{
 		let pos2 = (dir === "x")? "Right":"Top";
 		let neg2 = (dir === "x")? "Left":"Bottom";
 		this.escape(e, dir, hitboxes);
-		this.colliding.general = true;
+		if (!this.colliding.general) this.colliding.general = [];
 		for (let a of e) {
-			a.colliding.general = true;
+			this.colliding.general.push(a);
+			if (!a.colliding.general) a.colliding.general = [];
+			a.colliding.general.push(this);
 			a.response.collide.general(this);
 			this.scriptCollideGeneral(a);
 			a.scriptCollideGeneral(this);
 		}
 		if (this.speed[dir] > 0) {
-			this.colliding[pos] = true;
+			if (!this.colliding[pos]) this.colliding[pos] = [];
 			for (let a of e) {
-				a.colliding[neg] = true;
+				this.colliding[pos].push(a);
+				if (!a.colliding[neg]) a.colliding[neg] = [];
+				a.colliding[neg].push(this);
 				this.response.collide[pos](a);
 				a.response.collide[neg](this);
 				this["scriptCollide" + pos2](a);
@@ -267,9 +271,11 @@ class PhysicsObject extends SceneObject{
 			}
 		}
 		if (this.speed[dir] < 0) {
-			this.colliding[neg] = true;
+			if (!this.colliding[neg]) this.colliding[neg] = [];
 			for (let a of e) {
-				a.colliding[pos] = true;
+				this.colliding[neg].push(a);
+				if (!a.colliding[pos]) a.colliding[pos] = [];
+				a.colliding[pos].push(this);
 				this.response.collide[neg](a);
 				a.response.collide[pos](this);
 				this["scriptCollide" + neg2](a);
@@ -442,27 +448,39 @@ class CirclePhysicsObject extends PhysicsObject {
 						let top = -dir.y > 0.3;
 						let bottom = -dir.y < -0.3;
 						this.colliding.general = true;
-						if (right) this.colliding.right = true;
-						else if (left) this.colliding.left = true; 
-						if (bottom) this.colliding.bottom = true;
-						else if (top) this.colliding.top = true; 
+						if (!this.colliding.general) this.colliding.general = [];
+						if (!a.colliding.general) a.colliding.general = [];
+						if (!this.colliding.right && right) this.colliding.right = [];
+						else if (!this.colliding.left && left) this.colliding.left = []; 
+						if (!this.colliding.bottom && bottom) this.colliding.bottom = [];
+						else if (!this.colliding.top && top) this.colliding.top = [];
+						this.colliding.general.push(a); 
+						a.colliding.general.push(this);
 						if (right) {
+							if (!a.colliding.left) a.colliding.left = [];
+							a.colliding.left.push(this);
 							this.scriptCollideRight(a);
 							a.scriptCollideLeft(this);
 							this.response.collide.right(a);
 							a.response.collide.left(this);
 						} else if (left) {
+							if (!a.colliding.right) a.colliding.right = [];
+							a.colliding.right.push(this);
 							this.scriptCollideLeft(a);
 							a.scriptCollideRight(this);
 							this.response.collide.left(a);
 							a.response.collide.right(this);
 						}
 						if (top) {
+							if (!a.colliding.bottom) a.colliding.bottom = [];
+							a.colliding.bottom.push(this);
 							this.scriptCollideTop(a);
 							a.scriptCollideBottom(this);
 							this.response.collide.top(a);
 							a.response.collide.bottom(this);
 						} else if (bottom) {
+							if (!a.colliding.top) a.colliding.top = [];
+							a.colliding.top.push(this);
 							this.scriptCollideBottom(a);
 							a.scriptCollideTop(this);
 							this.response.collide.bottom(a);

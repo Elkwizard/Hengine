@@ -10,6 +10,7 @@ class SceneObject extends Rect{
 		this.draw = function(){};
 		this.custom = {};
 		this.hasPhysics = false;
+		this.isRectangle = true;
 		this.hovered = false;
 		this.layer = 0;
 		this.scripts = {};
@@ -94,8 +95,11 @@ class SceneObject extends Rect{
 		}
 		this.scriptUpdate();
 	}
+	pushToRemoveQueue(x) {
+		return null;
+	}
 	remove(){
-		this.home.removeElement(this.name);
+		this.pushToRemoveQueue(this);
 	}
 	move(){
 		if(K.P(this.controls.up)){

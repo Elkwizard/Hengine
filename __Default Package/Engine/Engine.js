@@ -199,8 +199,10 @@ class Engine {
 		this.resize = true;
 		window.addEventListener("resize", function(){
 			if (this.resize) {
+				let pixelate = this.renderer.c.imageSmoothingEnabled;
 				this.renderer.canvas.width = innerWidth;
 				this.renderer.canvas.height = innerHeight;
+				this.renderer.c.imageSmoothingEnabled = pixelate;
 			}
 		}.bind(this));
     }

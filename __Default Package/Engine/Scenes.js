@@ -641,7 +641,7 @@ class InactiveScene {
 	collideBox(box){
         let collideAry = [];
 		for(let hitbox of this.updateArray()){
-			if(hitbox.collider.collideBox(box)){
+			if(hitbox.collider.collideBox(box.collider)){
 				collideAry.push(hitbox);
 			}
 		}
@@ -798,11 +798,19 @@ class Scene extends InactiveScene {
 	enginePhysicsUpdate(){
         this.updateArray();
 		this.clearAllCollisions();
+		let q = [];
+		function p(x) {
+			q.push(x);
+		}
+		for (let rect of this.contains_array) rect.pushToRemoveQueue = p;
 		for(let rect of this.contains_array){
 			rect.engineUpdate(this.contains_array);
 		}
+		for (let rect of q) rect.home.removeElement(rect.name);
 	}
 	engineDrawUpdate(){
+		this.display.width = this.c.canvas.width;
+		this.display.height = this.c.canvas.height;
 		this.home.beforeScript.run();
 		this.adjustedDisplay = this.repairDisplay();
         this.c.c.translate(this.c.middle.x, this.c.middle.y);
@@ -814,6 +822,11 @@ class Scene extends InactiveScene {
 			this.lightsB[x].draw();
         }
 		this.updateArray();
+		let q = [];
+		function p(x) {
+			q.push(x);
+		}
+		for (let rect of this.contains_array) rect.pushToRemoveQueue = p;
 		this.contains_array.sort(function(a, b){
 			return a.layer - b.layer;
 		});
@@ -829,6 +842,7 @@ class Scene extends InactiveScene {
         this.c.c.scale(1/this.zoom, 1/this.zoom);
         this.c.c.translate(-this.c.middle.x, -this.c.middle.y);
 		this.home.afterScript.run();
+		for (let rect of q) rect.home.removeElement(rect.name);
 	}
 	loadScene(sc){
 		sc.updateArray();
@@ -872,7 +886,7 @@ class Scene extends InactiveScene {
 		return new Vertex(newX, newY); //return the result
     }
     updateDisplayAt(x, y, width, height){
-        this.display = new Rect(x, y, width, height)
+        this.display = new Rect(x, y, width, height);
     }
     centerDisplayAt(point){
         this.display.x = point.x - this.c.canvas.width/2;
