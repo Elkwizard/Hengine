@@ -489,7 +489,6 @@ class CirclePhysicsObject extends PhysicsObject {
 						a.scriptCollideGeneral(this);
 						this.response.collide.general(a);
 						a.response.collide.general(this);
-						a.colliding.general = true;
 					}
 					//end direction
 				}
