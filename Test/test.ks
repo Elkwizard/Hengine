@@ -1,2 +1,0 @@
-HERE:"start"
-goto "start"

@@ -154,10 +154,6 @@ class InactiveScene {
 			n = this.addElement(el.name + " - copy", el.x, el.y, el.width, el.height, {...el.controls}, el.tag);
 		}
 		el.runLog(n);
-		for (let ch in el.children) {
-			let child = el.children[ch];
-			let x = n.addChild(this.copy(child));
-		}
 		return n;
 	}
 	hideElement(name){
@@ -272,6 +268,97 @@ class InactiveScene {
 		this.contains[name] = x;
 		return x;
 	}
+	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1)){
+		let ns = this.addRectElement(name, x, y, 0, 0, false, false, "Particle-Spawner");
+		ns.active = true;
+		ns.removeCollisions();
+		ns.fades = true;
+		ns.slows = true;
+		ns.falls = false;
+		ns.particleDelay = delay;
+		ns.particleInitSpeed = spd;
+		ns.particleLifeSpan = timer;
+		ns.spawns = {};
+		ns.particleSize = size;
+		ns.particleDraw = draw;
+		let script = draw instanceof ElementScript;
+		ns.particleSizeVariance = sizeVariance;
+		ns.dirs = dirs;
+		ns.isSpawner = true;
+		ns.particleSpeedVariance = speedVariance;
+		ns.particleNumber = 0;
+		this.changeElementDraw(ns, e=>e);
+		let spawner = new ElementScript("spawning");
+		spawner.addMethod("update", function(){
+			if(this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0){
+				//spawn
+				let len = 1;
+				if (this.particleDelay < 1) len = 1 / this.particleDelay;
+				for (let i = 0; i < len; i++) {
+					let pSize = this.particleSize + ((Math.random() - Math.random()) * this.particleSizeVariance);
+					let sX = (Math.random() * this.width) + this.x - pSize / 2;
+					let sY = (Math.random() * this.height) + this.y - pSize / 2;
+					let n = this.home.addRectElement("Particle #" + (this.particleNumber++) + " from " + this.name, sX, sY, pSize, pSize, false, false, "Engine-Particle");
+					let x1 = Math.random() - Math.random();
+					let y1 = ((Math.random() > 0.5)? -1 : 1) * (1 - Math.abs(x1));
+					let speed = (new Vector2(x1, y1)).normalize();
+					speed.y = this.dirs.fixV(y1);
+					speed.x = this.dirs.fixH(speed.x);
+					n.speed.x = (this.particleInitSpeed * speed.x) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
+					n.speed.y = (this.particleInitSpeed * speed.y) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
+					n.timer = 0;
+					n.layer = this.layer;
+					this.spawns[n.name] = n;
+					n.spawner = this;
+					n.engineUpdate = function(){
+						this.lastX = this.x;
+						this.lastY = this.y;
+						if(ns.falls) this.accel.y = this.home.gravity.y;
+						this.speed.add(this.accel);
+						if(ns.slows){
+							this.slowDown();
+						}
+						this.x += this.speed.x * 2;
+						this.y += this.speed.y * 2;
+						if(this.lifeSpan > ns.particleLifeSpan) {
+							delete this.spawner.spawns[this.name];
+							this.remove();
+						}
+						this.direction.x = this.x - this.lastX;
+						this.direction.y = this.y - this.lastY;
+						this.direction.normalize();
+						this.scriptUpdate();
+					}.bind(n);
+					function drawRect() {
+						this.draw();
+					}
+					if (script) drawRect = function() {
+						this.scriptDraw();
+					}
+					drawRect = drawRect.bind(n);
+					if(this.fades){
+						n.engineDraw = function(){
+							this.home.c.c.globalAlpha = Math.max(0, 1 - (this.lifeSpan / ns.particleLifeSpan));
+							drawRect();
+							this.home.c.c.globalAlpha = 1;
+						}.bind(n);
+					} else {
+						n.engineDraw = function(){
+							drawRect();
+						}.bind(n);
+					}
+					if (draw) {
+						if (!script) this.home.changeElementDraw(n, this.particleDraw);
+					} else {
+						this.home.changeElementDraw(n, this.home.defaultParticleDraw);
+					}
+					if (script) draw.addTo(n);
+				}
+			}
+		}, "update");
+		spawner.addTo(ns);
+		return ns;
+	}
 	parse(str) {
 		let ary = str.split("#");
 		let sc = this.addContainer(ary[0], true);
@@ -371,95 +458,13 @@ class InactiveScene {
 		window[name] = new ElementScript(name, opts);
 		return window[name];
 	}
-	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1)){
-		let ns = this.addRectElement(name, x, y, 0, 0, false, false, "Particle-Spawner");
-		ns.active = true;
-		ns.removeCollisions();
-		ns.fades = true;
-		ns.slows = true;
-		ns.falls = false;
-		ns.delay = delay;
-		ns.particleInitSpeed = spd;
-		ns.timer = timer;
-		ns.spawns = {};
-		ns.particleSize = size;
-		ns.particleDraw = draw;
-		ns.particleSizeVariance = sizeVariance;
-		ns.dirs = dirs;
-		ns.isSpawner = true;
-		ns.particleSpeedVariance = speedVariance;
-		ns.particleNumber = 0;
-		this.changeElementDraw(ns, e=>e);
-		let spawner = new ElementScript("spawning");
-		spawner.addMethod("spawn", function(){
-			if(this.active && this.lifeSpan % Math.ceil(this.delay) === 0){
-				//spawn
-				let len = 1;
-				if (this.delay < 1) len = 1 / this.delay;
-				for (let i = 0; i < len; i++) {
-					let pSize = this.particleSize + ((Math.random() - Math.random()) * this.particleSizeVariance);
-					let sX = (Math.random() * this.width) + this.x - pSize / 2;
-					let sY = (Math.random() * this.height) + this.y - pSize / 2;
-					let n = this.home.addRectElement("Particle #" + (this.particleNumber++) + " from " + this.name, sX, sY, pSize, pSize, false, false, "Engine-Particle");
-					let x1 = Math.random() - Math.random();
-					let y1 = ((Math.random() > 0.5)? -1 : 1) * (1 - Math.abs(x1));
-					let speed = new Vertex(x1, y1);
-					speed.y = this.dirs.fixV(y1);
-					speed.x = this.dirs.fixH(speed.x);
-					n.speed.x = (this.particleInitSpeed * speed.x) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
-					n.speed.y = (this.particleInitSpeed * speed.y) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
-					n.timer = 0;
-					n.layer = this.layer;
-					this.spawns[n.name] = n;
-					n.spawner = this;
-					n.engineUpdate = function(){
-						this.lastX = this.x;
-						this.lastY = this.y;
-						if(ns.falls) this.accel.y = this.home.gravity.y;
-						this.speed.x += this.accel.x;
-						this.speed.y += this.accel.y;
-						if(ns.slows){
-							this.slowDown();
-						}
-						this.x += this.speed.x * 2;
-						this.y += this.speed.y * 2;
-						if(this.timer++ > ns.timer) {
-							delete this.spawner[this.name];
-							this.remove();
-						}
-						this.direction.x = this.x - this.lastX;
-						this.direction.y = this.y - this.lastY;
-						this.direction.normalize();
-					}.bind(n);
-					if(this.fades){
-						n.engineDraw = function(){
-							this.home.c.c.globalAlpha = Math.max(0, 1 - (this.timer / ns.timer));
-							this.draw();
-							this.home.c.c.globalAlpha = 1;
-						}.bind(n);
-					} else {
-						n.engineDraw = function(){
-							this.draw();
-						}.bind(n);
-					}
-					if (this.particleDraw) {
-						this.home.changeElementDraw(n, this.particleDraw);
-					} else {
-						this.home.changeElementDraw(n, this.home.defaultParticleDraw);
-					}
-				}
-			}
-		}, "update");
-		spawner.addTo(ns);
-		return ns;
-	}
 	removeElement(name){
 		this.performFunctionBasedOnType_PRIVATE(name, function(e){
 			let x = this.contains[e.name];
 			if (x) {
 				x.isDead = true;
 				delete this.contains[e.name];
-			} else {
+			} else if (e.home.contains[e.name]) {
 				e.home.removeElement(e);
 			}
 		}.bind(this));
@@ -742,6 +747,7 @@ class Scene extends InactiveScene {
 				if(o) o.hovered = false;
 			}
 		}.bind(this);
+		this.removeQueue = [];
 		this.S = {
 			US: this.useScript.bind(this),
 			UA: this.updateArray.bind(this),
@@ -796,9 +802,10 @@ class Scene extends InactiveScene {
 		return new Rect(nMin, nMax);
 	}
 	enginePhysicsUpdate(){
+		for (let rect of this.contains_array) rect.isBeingUpdated = true;
         this.updateArray();
 		this.clearAllCollisions();
-		let q = [];
+		let q = this.removeQueue;
 		function p(x) {
 			q.push(x);
 		}
@@ -806,9 +813,13 @@ class Scene extends InactiveScene {
 		for(let rect of this.contains_array){
 			rect.engineUpdate(this.contains_array);
 		}
-		for (let rect of q) rect.home.removeElement(rect.name);
+		for (let rect of q) rect.home.removeElement(rect);
+		this.removeQueue = [];
+		for (let rect of this.contains_array) rect.isBeingUpdated = false;
 	}
-	engineDrawUpdate(){
+	engineDrawUpdate() {
+		this.updateArray();
+		for (let rect of this.contains_array) rect.isBeingUpdated = true;
 		this.display.width = this.c.canvas.width;
 		this.display.height = this.c.canvas.height;
 		this.home.beforeScript.run();
@@ -821,8 +832,7 @@ class Scene extends InactiveScene {
         for(let x in this.lightsB){
 			this.lightsB[x].draw();
         }
-		this.updateArray();
-		let q = [];
+		let q = this.removeQueue;
 		function p(x) {
 			q.push(x);
 		}
@@ -842,7 +852,9 @@ class Scene extends InactiveScene {
         this.c.c.scale(1/this.zoom, 1/this.zoom);
         this.c.c.translate(-this.c.middle.x, -this.c.middle.y);
 		this.home.afterScript.run();
-		for (let rect of q) rect.home.removeElement(rect.name);
+		for (let rect of q) rect.home.removeElement(rect);
+		this.removeQueue = [];
+		for (let rect of this.contains_array) rect.isBeingUpdated = false;
 	}
 	loadScene(sc){
 		sc.updateArray();

@@ -31,6 +31,7 @@ class SceneObject extends Rect{
 			interact1: function(){},
 			interact2: function(){}
 		};
+		this.isBeingUpdated = false;
 	}
 	rename(name){
 		delete this.home.contains[this.name];
@@ -99,7 +100,8 @@ class SceneObject extends Rect{
 		return null;
 	}
 	remove(){
-		this.pushToRemoveQueue(this);
+		if (this.isBeingUpdated) this.pushToRemoveQueue(this);
+		else this.home.removeElement(this);
 	}
 	move(){
 		if(K.P(this.controls.up)){
