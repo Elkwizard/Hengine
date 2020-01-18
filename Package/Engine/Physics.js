@@ -447,7 +447,6 @@ class CirclePhysicsObject extends PhysicsObject {
 						let right = -dir.x < -0.3;
 						let top = -dir.y > 0.3;
 						let bottom = -dir.y < -0.3;
-						this.colliding.general = true;
 						if (!this.colliding.general) this.colliding.general = [];
 						if (!a.colliding.general) a.colliding.general = [];
 						if (!this.colliding.right && right) this.colliding.right = [];
