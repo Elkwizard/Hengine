@@ -1,0 +1,108 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Packages
+		</div>
+	</header>
+	<!-- helper └ ─ ├ │ ┌ ┬ -->
+	<div class="description">
+		<h3>Purpose</h3>
+		<p>
+			When using the Hengine, different projects are separated into folder structures called Packages. 
+			Packages contain the Environment required to properly use the Hengine. 
+			The Package is where your sprites, animations, sounds, and source code are stored.
+			The Hengine itself is not stored inside the Package.
+		</p>
+		<br>
+		<h3>Structure</h3>
+		<p>
+			Packages only work if they have the correct structure.
+			For <a href="../Project/home.html">Project</a>.loadImage and Project.loadSound to work, the Package's files have to be the correct locations.
+			<br>Anatomy of a Hengine Package:
+			<br><br><pre class="mono">
+				packageName*─┬──Source─┬──Source.js
+				             │         ├──Set List.js
+				             │         ├──Scripts.js
+				             │         ├──Project.html
+				             │         └──Offline Project.html
+				             │
+				             ├──Sound─┬──SoundFile.mp3**
+				             │        └──SoundFile2.mp3**
+				             │
+				             ├──Art─┬──Sprites─┬──ImageFile.png***
+				             │      │          └──ImageFile2.png***
+				             │      │
+				             │      └──Animations──animation1****─┬──1.png*****
+				             │                                    └──2.png*****
+				             │
+				             ├──Launch.html
+				             │
+				             ├──Offline Launch.html
+				             │
+				             └──favicon.ico
+			</pre><br>
+			<span class="method">
+				<p>
+					* This can be whatever you like. If you never use <a href="../Engine/home.html">Engine</a>.setTitle, then this will be the title of the page.<br>
+					** These can be any sound files with any names and extensions.<br>
+					*** These can be any image files with any names and extensions.<br>
+					**** This folder represents your animations. You can have any number of these and they can have any names.<br>
+					***** These are the frames in your animation. They have to be named according to their frame number and the must be .pngs.<br>
+				</p>
+			</span>
+			<p>
+				The Default Package starts with 'Chicken.png' in the Sprites folder and a 'Chicken Flap' animation in the Animations folder.
+				All of your Hengine Packages should be stored inside of a 'Packages' Folder.
+			</p>
+		</p>
+		<br>
+		<h3>Project.html &amp; OfflineProject.html</h3>
+		<p>
+			Project.html and OfflineProject.html are the HTML files can be opened to actually run your project.
+			These files can be found in the Source folder of your Package.
+			Project.html needs an internet connection to run, because it needs to access the Engine.
+			OfflineProject.html does not need an internet connection but it will only run with the version of Hengine available when you first downloaded the package.
+			Now, you can use OfflineProject.html to run your game on your computer. <br>
+			Project.html and OfflineProject.html have a similar structure:
+			<ul>
+				<li class="method">
+					<h2>Rendering</h2>
+					<p>
+						This section contains the two scripts used for rendering, 'Canvas Complete.js' and 'Color.js'
+					</p>
+				</li>
+				<li class="method">
+					<h2>Optional</h2>
+					<p>
+						This contains the optional scripts:
+						<ul>
+							<li class="method2">
+								<h2>Helper Functions.js</h2>
+								<p>
+									Enables the <a href="../Function Library/home.html">FunctionLibrary</a> class.
+								</p>
+							</li>
+						</ul>
+					</p>
+				</li>
+				<li class="method">
+					<h2>Required</h2>
+					<p>
+						The rest of the required pieces of the Engine.
+					</p>
+				</li>
+			</ul>
+			<p>
+				You can comment out the scripts in the optional section to make load times faster, and you can enable them again to get the additional classes.
+				For offline and online, the Launch.html files are mostly blank html files that have the game embedded in them. 
+				These can be used for making webpages with the Game inside.
+			</p>
+		</p>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

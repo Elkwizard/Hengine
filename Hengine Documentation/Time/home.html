@@ -1,0 +1,36 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Time
+		</div>
+	</header>
+	<div class="description">
+		<p>Time is a global class in the Hengine as long as the 'Time.js' script is enabled. The time class is used for getting the current time and date, as well as formatting it.</p>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>static getTime()</h2>
+				<p>
+					Returns an object with seconds, minutes, hours, days, and years properties. Each of these properties contain the associated value as an integer.
+					<small>Note: the years property of the return value is AD.</small>
+					Example:<code>g.console.log(Time.getTime()); // [object Object]
+					g.console.log(Time.getTime().seconds); // 53</code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>static getFormattedTime()</h2>
+				<p>
+					Returns a string containing the current time formatted as "hh:mm:ss" with "AM" or "PM" appended appropriately.
+					Example:<code>g.console.log(Time.getFormattedTime()); // "9:02:53 AM"</code>
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

@@ -1,0 +1,59 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Texture
+		</div>
+	</header>
+	<div class="description">
+		<p>The Texture class is used for storing pixel data and modifying pixels in an optimized way. Textures are often used for shaders.</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>pixels</h2>
+				<p>
+					A 2D array of <a href="../Color/home.html">Colors</a>, representing the pixels in the Texture.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(int width, int height)</h2>
+				<p>
+					Creates a new Texture with dimensions of <i>width</i> by <i>height</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>setPixel(int x, int y, Color color)</h2>
+				<p>
+					Sets the pixel at (<i>x</i>, <i>y</i>) to the color <i>color</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>updateImageData()</h2>
+				<p>
+					Updates the underlying API data, allowing changes made with setPixel to be shown to the screen.
+				</p>
+			</li>
+			<li class="method">
+				<h2>[Symbol.iterator]*()</h2>
+				<p>
+					You can iterate through a Texture, where each item is an array of x and y. You can use object destructuring to make simple shaders with this.
+					Example:
+<pre><code>const TEX = new Texture();
+for (let [x, y] of TEX) {
+    let col = Color.random();
+    TEX.setPixel(x, y, col);
+}</code></pre>
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

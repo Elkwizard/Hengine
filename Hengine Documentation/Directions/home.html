@@ -1,0 +1,72 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Directions
+		</div>
+	</header>
+	<div class="description">
+		<p>The Directions class is used to indicate the directions in which things can travel.
+		</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>up</h2>
+				<p>
+					A boolean indicating whether or not things can travel up.
+				</p>
+			</li>
+			<li class="method">
+				<h2>down</h2>
+				<p>
+					A boolean indicating whether or not things can travel down.
+				</p>
+			</li>
+			<li class="method">
+				<h2>left</h2>
+				<p>
+					A boolean indicating whether or not things can travel left.
+				</p>
+			</li>
+			<li class="method">
+				<h2>right</h2>
+				<p>
+					A boolean indicating whether or not things can travel right.
+				</p>
+			</li>
+			<li class="method">
+				<h2>prec</h2>
+				<p>
+					A float between 0 and 1 representing how much things should move in the directions specified, where 1 is not at all and 0 is completely.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(boolean up, boolean down, boolean left, boolean right, float prec)</h2>
+				<p>
+					Sets the corresponding properties to the parameters.
+				</p>
+			</li>
+			<li class="method">
+				<h2>fixV(float verticalSpeed)</h2>
+				<p>
+					Returns <i>verticalSpeed</i> adjusted to go in the directions specified by the object.
+				</p>
+			</li>
+			<li class="method">
+				<h2>fixH(float horizontalSpeed)</h2>
+				<p>
+					Returns <i>horizontalSpeed</i> adjusted to go in the directions specified by the object.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

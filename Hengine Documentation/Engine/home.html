@@ -1,0 +1,191 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Engine
+		</div>
+	</header>
+	<div class="description">
+		<p>The Engine class is used to create the Engine Instance used in the project. The engine is the 'g' or 'Game' property of the Project. The engine manages timing and management of update loops and Scenes.</p>
+		<br>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>fps</h2>
+				<p>
+					A float representing the current frames per second that the game is running at.
+				</p>
+			</li>
+			<li class="method">
+				<h2>frameCount</h2>
+				<p>
+					An integer showing how many frames have passed since the page loaded.
+				</p>
+			</li>
+			<li class="method">
+				<h2>console</h2>
+				<p>
+					A <a href="../Console/home.html">Console</a> object. This property will only be available if the 'Console.js' script is enabled.
+				</p>
+			</li>
+			<li class="method">
+				<h2>paused</h2>
+				<p>
+					A boolean indicating whether or not the engine is fully paused.
+				</p>
+			</li>
+			<li class="method">
+				<h2>renderer</h2>
+				<p>
+					A reference to the <a href="../Artist/home.html">Artist</a> instance used by the Project. This acts just the normal "c" or "Renderer" object.
+					<br>Example:<code>g.renderer.draw('black').rect(50, 50, 100, 50); // black rectangle is drawn</code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>scene</h2>
+				<p>
+					A <a href="../Scene/home.html">Scene</a> object representing the Scene instance used by the Project. This can be used to run standard management methods. 
+					<br>Example:<code>let player = g.scene.addRectElement("player", 50, 50, 50, 50); // 50 by 50 physics element is created</code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>beforeScript</h2>
+				<p>
+					A <a href="../Script/home.html">Script</a> object. Script.run will be called on the script every frame before the Scene is updated.
+				</p>
+			</li>
+			<li class="method">
+				<h2>updateScript</h2>
+				<p>
+					A Script object.  Script.run will be called on the script every frame just before the frame is drawn.
+				</p>
+			</li>
+			<li class="method">
+				<h2>afterScript</h2>
+				<p>
+					A Script object. Script.run will be called on the script every frame after the Scene has completed updating.
+				</p>
+			</li>
+			<li class="method">
+				<h2>f</h2>
+				<p>
+					This property will only exist if the 'Helper Functions.js' script is enabled. Engine.f is a <a href="../Function Library/home.html">FunctionLibrary</a> object containing helpful functions.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(String wrapperID, int width, int height, float airResistance, float gravity, String canvasID)</h2>
+				<p>
+					Creates an Artist object with a width of <i>width</i>, a height of <i>height</i>, both measured in CSS 'px'. 
+					The Artist object's canvas is either the element associated with <i>canvasID</i>, 
+					if provided, and otherwise, a HTMLCanvasElement is created to be used. 
+					If <i>wrapperID</i> is provided, 
+					then the instantiated canvas will be appended to the inside of the element associated with <i>wrapperID</i>, 
+					otherwise, the canvas will be appended to the document.body.
+					The Artist will then be stored in Engine.renderer.
+					A Scene object is then instantiated with parameters ('Engine Scene',  Engine.renderer, <i>gravity</i>, <i>airResistance</i>, Engine).
+					The Scene object is stored in Engine.scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>beforeUpdate()<sup>[1]</sup></h2>
+				<p>
+					This method is called before the Engine has started updating.
+				</p>
+			</li>
+			<li class="method">
+				<h2>update()<sup>[1]</sup></h2>
+				<p>
+					This method is called before the Scene instance is updated.
+					<br>Example:<code>g.update = () => {alert(g.frameCount)}; //alerts the number of frames that have passed once per frame</code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>afterUpdate()<sup>[1]</sup></h2>
+				<p>
+					This method is called after the entire Engine has finished updating after a frame.
+				</p>
+			</li>
+			<li class="method">
+				<h2>fixedUpdate()<sup>[1]</sup></h2>
+				<p>
+					This method is called every time physics calculations take place, This is usually about every 16ms. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>clear()</h2>
+				<p>
+					This method is called every frame to clear the display before the frame is drawn.
+					<br>Example:<code>g.afterUpdate = g.clear; //nothing will ever appear onscreen</code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>animate()</h2>
+				<p>
+					This method is called every frame and calls Engine.beforeUpdate, Engine.update, and Engine.afterUpdate. It also handles rendering.
+				</p>
+			</li>
+			<li class="method">
+				<h2>engineUpdate()</h2>
+				<p>
+					This method is called in a loop every 16ms. It manages physics and calls Engine.fixedUpdate.
+				</p>
+			</li>
+			<li class="method">
+				<h2>pause()</h2>
+				<p>
+					Prevents the Engine.animate and Engine.engineUpdate being called.
+				</p>
+			</li>
+			<li class="method">
+				<h2>play()</h2>
+				<p>
+					Undoes Engine.pause.
+				</p>
+			</li>
+			<li class="method">
+				<h2>setTitle(String title)</h2>
+				<p>
+					Sets the name of the tab to <i>title</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>getDistance(float x1, float y1, float x2, float y2)</h2>
+				<p>
+					returns the distance in 2D space between the points (<i>x1</i>, <i>y1</i>) and (<i>x2</i>, <i>y2</i>).
+				</p>
+			</li>
+			<li class="method">
+				<h2>getDistanceWithPoints(Vertex p1, Vertex p2)</h2>
+				<p>
+					returns the distance in 2D space between the points <i>p1</i> and <i>p2</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>extend(float a, float b)</h2>
+				<p>
+					returns the <i>a</i> extended away from zero by <i>b</i>.
+					<br>Example:<code>g.console.log(g.extend(-5, 6)); // -11</code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>contract(float a, float b)</h2>
+				<p>
+					returns the <i>a</i> moved towards zero by <i>b</i>.
+					<br>Example:<code>g.console.log(g.contract(-5, 6)); // 1</code>
+				</p>
+			</li>
+			<li class="method">
+				<p><span id="[1]">[1]</span>: this method starts empty. its purpose is to be set by the user.</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

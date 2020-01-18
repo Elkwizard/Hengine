@@ -1,0 +1,62 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			ElementScript
+		</div>
+	</header>
+	<div class="description">
+		<p>
+			ElementScript inherits from <a href="../Script/home.html">Script</a>.
+			ElementScripts store a collection of custom methods that can be applied to <a href="../Scene Object/home.html">SceneObjects</a>.
+		</p>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor()</h2>
+				<p>
+					Inherited from Script.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addTo(SceneObject el, ANY ...args)</h2>
+				<p>
+					Attaches the ElementScript to <i>el</i>.scripts and binds it to <i>el</i>. 'init' functions will be called with arguments <i>args</i>.
+				</p>
+			</li>
+		</ul>
+		<h3>Tags:</h3>
+		<p>These are things that can be passed as the tag parameter to addMethod</p>
+		<ul>
+			<li class="method">
+				<h2>"init"</h2>
+				<p>
+					Is called when ElementScript.prototype.addTo is called. Called with the arguments passed as the arguments after the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>"update"</h2>
+				<p>
+					Is called every physics update (every 16ms) and is used for checking and updating values.
+				</p>
+			</li>
+			<li class="method">
+				<h2>"draw"</h2>
+				<p>
+					Is called after SceneObject.prototype.draw and can be used to draw the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>"collide-"</h2>
+				<p>
+					This tag followed by a direction ex) "collide-right", "collide-general" will be called when the element collides on that side.
+				</p>
+			</li>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

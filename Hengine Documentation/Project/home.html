@@ -1,0 +1,96 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Project
+		</div>
+	</header>
+	<div class="description">
+		<p>The Project class is used for setting up the Hengine in a Package. When a Hengine 'Project.html' file is opened, an Project instance is created and stored inside of 'PROJECT'.</p>
+		<br>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>g<sup>[1]</sup></h2>
+				<p>
+					An <a href="javascript:location = '../Engine/home.html'">Engine object</a>. This is the Engine instance referenced throughout the Documentation.
+				</p>
+			</li>
+			<li class="method">
+				<h2>s<sup>[1]</sup></h2>
+				<p>
+					A <a href="javascript:location = '../Scene/home.html'">Scene</a> object. This is the same as Project.g.scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>c<sup>[1]</sup></h2>
+				<p>
+					An <a href="javascript:location = '../Artist/home.html'">Artist</a> object. The same as Project.g.renderer.
+				</p>
+			</li>
+			<li class="method">
+				<h2>C<sup>[1]</sup></h2>
+				<p>
+					A link to Project.c.c.
+				</p>
+			</li>
+			<li class="method">
+				<h2>cl<sup>[1]</sup></h2>
+				<p>
+					A <a href="javascript:location = '../Color Library/home.html'">ColorLibrary</a> object. Contains common colors as properties.
+					<br>Example:<code>g.console.log(cl.BLACK.get_RGBA()); //"rgba(0, 0, 0, 1)"</code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>custom<sup>[1]</sup></h2>
+				<p>
+					An empty object used for storing any custom values associated with the project.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor([String wrapperID, int width, int height, float airResistance, float gravity, String canvasID])</h2>
+				<p>
+					Creates an Engine with parameters (<i>wrapperID</i>, <i>width</i>, <i>height</i>, <i>airResistance</i>, <i>gravity</i>, <i>canvasID</i>). 
+				</p>
+			</li>
+			<li class="method">
+				<h2>loadImage(String source)<sup>[1]</sup></h2>
+				<p>
+					returns a HTMLImageElement object with a source of <i>source</i>, where source is a position relative to Package/Art/Sprites. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>loadSound(String source)<sup>[1]</sup></h2>
+				<p>
+					returns a HTMLAudioElement object with a source of <i>source</i>, where source is a position relative to Package/Sound. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>rand()<sup>[1]</sup></h2>
+				<p>
+					returns Math.random().
+				</p>
+			</li>
+			<li class="method">
+				<h2>middle()<sup>[1]</sup></h2>
+				<p>
+					returns a <a href="javascript:location = '../Vector/home.html'">Vertex</a> object containing the middle of the display/canvas.
+				</p>
+			</li>
+			<li class="method">
+				<p>
+					<span id="[1]">[1]</span>: This property is also available in the global scope. eg: Project.c = Window.c.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

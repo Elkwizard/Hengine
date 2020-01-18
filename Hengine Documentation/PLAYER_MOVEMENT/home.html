@@ -1,0 +1,41 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			PLAYER_MOVEMENT
+		</div>
+	</header>
+	<div class="description">
+		<p>The PLAYER_MOVEMENT constant is used as an alternative to <a href="../Scene/home.html">Scene</a>.prototype.giveElementSubjectiveMovement.
+		Although it has the same functionality, it allows for more flexibility in terms of customizing the Object it is attached to.
+		<br>Implementation: 
+<pre style="tab-size: 30px;"><code>const PLAYER_MOVEMENT = new ElementScript("movement");
+PLAYER_MOVEMENT.addMethod("init", function(){
+	if(!this.controls.up){
+		this.controls = new Controls("w", "s", "a", "d");
+	}
+	this.applyGravity = true;
+}, "init");
+PLAYER_MOVEMENT.addMethod("update", function(){
+	if (K.P(this.controls.down)) this.speed.y += this.accel.y;
+	if (K.P(this.controls.left)) this.accel.x = -0.1;
+	else if (K.P(this.controls.right)) this.accel.x = 0.1;
+	else this.accel.x = 0;
+	if (K.P(this.controls.up)) {
+		if (this.colliding.bottom) {
+			this.speed.y = -5;
+		}
+	}
+}, "update");</code></pre></p>
+	<br>
+		<h3>Methods:</h3>
+		<p>
+			PLAYER_MOVEMENT is an <a href="../Element Script/home.html">ElementScript</a> object. It can be applied to a <a href="../Physics Object/home.html">PhysicsObject</a> by calling PLAYER_MOVEMENT.addTo.
+		</p>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

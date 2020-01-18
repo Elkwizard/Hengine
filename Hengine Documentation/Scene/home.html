@@ -1,0 +1,113 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Scene
+		</div>
+	</header>
+	<div class="description">
+		<p>The Scene class is used to manage and modify <a href="../Scene Object/home.html">SceneObjects</a>. Scene inherits from <a href="../Inactive Scene/home.html">InactiveScene</a>.</p>
+		<br>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>c</h2>
+				<p>
+					Scene.c is an <a href="../Artist/home.html">Artist</a> object. This is the same Artist instance used in the <a href="../Project/home.html">Project</a>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>home</h2>
+				<p>
+					Scene.home is an Engine object. This is the same <a href="../Engine/home.html">Engine</a> instance used in the Project. This is also the engine that created the Scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>display</h2>
+				<p>
+					Scene.display is a <a href="../Shapes/Rect.html">Rect</a> object containing the x, y, width, and height of the part of the Scene that is displayed on the canvas.
+				</p>
+			</li>
+			<li class="method">
+				<h2>cullGraphics</h2>
+				<p>
+					A boolean indicating whether or not PhysicsObjects should check if they are onscreen before being drawn. Default is true.
+				</p>
+			</li>
+			<li class="method">
+				<h2>zoom</h2>
+				<p>
+					A float indicating the level of zoom used when displaying the Scene.
+					<br>Example:<code>g.console.log(s.zoom); // 1
+					s.zoomOut(0.1);
+					g.console.log(s.zoom); // 0.9090909090</code>
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(String name, Artist context, float gravity, float airResistance, Engine home)</h2>
+				<p>
+					Calls InactiveScene.prototype.constructor(<i>gravity</i>, <i>gravity</i>, <i>airResistance</i>).
+					Scene.home is initialized to <i>home</i>. Scene.c is initialized to <i>context</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>drawWithTransformations(Function draw)</h2>
+				<p>
+					Adjusts and translates the canvas to fit the current display location and then calls <i>draw</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>adjustPointForDisplay(Vertex p)</h2>
+				<p>
+					Adjusts the coordinates of <i><a href="../Vector/home.html">p</a></i> from a point on the screen to a point in the Scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>updateDisplayAt(float x, float y, float width, float height)</h2>
+				<p>
+					Moves the display to show the part of the Scene at (<i>x</i>, <i>y</i>) at the upper left corner. 
+					The display has a width of <i>width</i> and a height of <i>height</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>restoreZoom()</h2>
+				<p>
+					Resets the zoom level to 1.
+				</p>
+			</li>
+			<li class="method">
+				<h2>zoomIn(float amount)</h2>
+				<p>
+					Zooms the display in on the Scene by a factor of <i>amount</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>zoomOut(float amount)</h2>
+				<p>
+					Zooms the display away from the Scene by a factor of <i>amount</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>restoreZoom()</h2>
+				<p>
+					Resets the zoom level to 1.
+				</p>
+			</li>
+			<li class="method">
+				<h2>loadScene(InactiveScene sc)</h2>
+				<p>
+					Loads all of the elements from <i>sc</i> into the Scene.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>
