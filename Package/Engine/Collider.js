@@ -139,13 +139,13 @@ class Physics {
 	static overlapCircleRect(c, r) {
 		let dist = Physics.distToRect2(c, r);
 		let inside = Physics.pointInsideRectangle(c, r);
-		return (dist < c.radius ** 2) || inside;
+		return (dist <= c.radius ** 2) || inside;
 	}
 	static overlapRectRect(r, r2) {
-		return r.x < r2.x + r2.width && r.x + r.width > r2.x && r.y < r2.y + r2.height && r.y + r.height > r2.y;
+		return r.x <= r2.x + r2.width && r.x + r.width >= r2.x && r.y <= r2.y + r2.height && r.y + r.height >= r2.y;
 	}
 	static overlapCircleCircle(c, c2) {
-		return Physics.distToPoint2(c, c2) < (c.radius + c2.radius) ** 2;
+		return Physics.distToPoint2(c, c2) <= (c.radius + c2.radius) ** 2;
 	}
 }
 Physics.displayRaymarch = false;
