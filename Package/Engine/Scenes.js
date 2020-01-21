@@ -310,6 +310,11 @@ class InactiveScene {
 					n.layer = this.layer;
 					this.spawns[n.name] = n;
 					n.spawner = this;
+					let r = n.remove.bind(n);
+					n.remove = function() {
+						r();
+						delete this.spawner.spawns[this.name];
+					}.bind(n);
 					n.engineUpdate = function(){
 						this.lastX = this.x;
 						this.lastY = this.y;
@@ -321,7 +326,6 @@ class InactiveScene {
 						this.x += this.speed.x * 2;
 						this.y += this.speed.y * 2;
 						if(this.lifeSpan > ns.particleLifeSpan) {
-							delete this.spawner.spawns[this.name];
 							this.remove();
 						}
 						this.direction.x = this.x - this.lastX;
