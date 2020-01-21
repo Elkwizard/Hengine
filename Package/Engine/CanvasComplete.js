@@ -334,10 +334,10 @@ class Artist {
 				this.c.fill();
 				this.c.closePath();
 			},
-			arc: function(x, y, radius, startAngle, endAngle){
+			arc: function(x, y, radius, startAngle, endAngle, counterClockwise){
 				radius = Math.abs(radius);
 				this.c.beginPath();
-				this.c.arc(x, y, radius, startAngle, endAngle);
+				this.c.arc(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.fill();
 			},
 			sector: function(x, y, radius, startAngle, endAngle){
@@ -432,10 +432,10 @@ class Artist {
 				this.c.stroke();
 				this.c.closePath();
 			},
-			arc: function(x, y, radius, startAngle, endAngle){
+			arc: function(x, y, radius, startAngle, endAngle, counterClockwise){
 				radius = Math.abs(radius);
 				this.c.beginPath();
-				this.c.arc(x, y, radius, startAngle, endAngle);
+				this.c.arc(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.stroke();
 				this.c.closePath();
 			},
