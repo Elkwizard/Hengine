@@ -42,12 +42,23 @@ class Physics {
 		let y1 = p.y;
 		let dx = d.x;
 		let dy = d.y;
+		if (!dx) dx = 0.000000001;
 		let xv = ((dx**2) * x1 + (dx * dy * y1)) / (dx**2 + dy**2);
 		let yv = (dy / dx) * xv;
 		let xrs = Math.sign(xv);
 		let xr = Math.sqrt(xv ** 2 + yv ** 2);
 		let xfv = xrs * xr;
 		return xfv;
+	}
+	static closestPointOnLine(p, d) {
+		let x1 = p.x;
+		let y1 = p.y;
+		let dx = d.x;
+		let dy = d.y;
+		if (!dx) dx = 0.000000001;
+		let xv = ((dx**2) * x1 + (dx * dy * y1)) / (dx**2 + dy**2);
+		let yv = (dy / dx) * xv;
+		return new Vector2(xv, yv);
 	}
 	static rayCast(ray, rs, threshold = 100000) {
 		let o = ray.a;
