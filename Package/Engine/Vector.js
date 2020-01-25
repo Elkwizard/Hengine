@@ -2,7 +2,7 @@ class Vector {
 	constructor(){
 		
 	}
-	setMagnitude(m) {
+	set mag(m) {
 		this.normalize();
 		this.mul(m);
 		return this;

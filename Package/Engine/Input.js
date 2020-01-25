@@ -64,7 +64,7 @@ onclick = function(e){
 }
 onmousedown = function(e){
 	M.button = e.button;
-	if (M.engine) M.dragStart = M.engine.scene.adjustPointForDisplay(new Vector2(e.x, e.y));
+	if (M.engine) M.dragStart = M.dragEnd = M.engine.scene.adjustPointForDisplay(new Vector2(e.x, e.y));
 	M.updatePosition(e);
 	M.down = true;
 	for (let ev of M.onDown) ev(e);
