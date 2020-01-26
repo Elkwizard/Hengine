@@ -1,0 +1,65 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Light
+		</div>
+	</header>
+	<div class="description">
+		<p>The Light class is used to represent lights in the Scene. Lights can be used for things like the sun or lava.</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>home</h2>
+				<p>
+					A link to the <a href="../Scene/home.html">Scene</a> that created the Light.
+				</p>
+			</li>
+			<li class="method">
+				<h2>x</h2>
+				<p>
+					The x coordinate of the center of the Light.
+				</p>
+			</li>
+			<li class="method">
+				<h2>y</h2>
+				<p>
+					The y coordinate of the center of the Light.
+				</p>
+			</li>
+			<li class="method">
+				<h2>intensity</h2>
+				<p>
+					The inner radius of the Light.
+				</p>
+			</li>
+			<li class="method">
+				<h2>radius</h2>
+				<p>
+					The outer radius of the Light.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(String name, String color, float x, float y, float innerRadius, float outerRadius, Scene home)</h2>
+				<p>
+					Sets the corresponding properties to the parameters.
+				</p>
+			</li>
+			<li class="method">
+				<h2>centerAt(Vertex p)</h2>
+				<p>
+					Moves the light to <i>p</i>.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

@@ -1,0 +1,353 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+	<script>
+		function highlightEl(el){
+			el.innerHTML = highlight(el.innerHTML);
+		}
+	</script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			InactiveScene
+		</div>
+	</header>
+	<div class="description">
+		<p>The InactiveScene class is used for the same thing as a <a href="../Scene/home.html">Scene</a>, but the SceneObjects will not be updated or rendered until Scene.loadScene is called.</p>
+		<br>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>gravity</h2>
+				<p>
+					The speed at which PhysicsObjects accelerate downwards. Same as gravity. 
+					This value is a <a href="../Vector/home.html">Vector2</a>. Default is (0, 0.1).
+				</p>
+			</li>
+			<li class="method">
+				<h2>airResistance</h2>
+				<p>
+					The amount of speed lost by <a href="../Physics Object/home.html">PhysicsObjects</a> with the 'slows' property set to true. 
+					This speed is lost every physics update (16ms).
+					Default is 0.025.
+				</p>
+			</li>
+			<li class="method">
+				<h2>name</h2>
+				<p>
+					The name of the Scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>rebound</h2>
+				<p>
+					A float between 0 and 1 indicating the amount of speed retained when PhysicsObjects collide. Default is 0.
+				</p>
+			</li>
+			<li class="method">
+				<h2>lights<sup>[4]</sup></h2>
+				<p>
+					An Object containing properties for every <a href="../Light/home.html">light</a> in the Scene. Scene.lights[the light's name] is the light.
+				</p>
+			</li>
+			<li class="method">
+				<h2>contains</h2>
+				<p>
+					An Object containing properties for every <a href="../Scene Object/home.html">SceneObject</a> and PhysicsObject in the Scene. Scene.contains[the object's name] is the object.
+				</p>
+			</li>
+			<li class="method">
+				<h2>templates</h2>
+				<p>
+					An Object containing properties for every template in the Scene. Scene.template[the template's name] is the template.
+				</p>
+			</li>
+			<li class="method">
+				<h2>S</h2>
+				<p>
+					An Object containing properties for every method of the Scene. The keys are acronyms of the method name and the values are the methods.
+					<br>Example: <code>let test = s.addElement("test", 5, 5, 5, 5);
+					s.changeElementDraw(test, function(){
+					
+					}); //sets draw method to nothing
+					s.S.CED(test, function(){
+					
+					}); //same thing</code>
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(String name, float gravity, float airResistance)</h2>
+				<p>
+					The amount of gravity and air resistance applied to PhysicsObjects in the Scene is set to 
+					<i>gravity</i> and <i>airResistance</i>.
+					The name of the Scene is set to <i>name</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>defaultDraw()</h2>
+				<p>
+					This method bound to SceneObjects when they are created and is used to draw them to the screen. defaultDraw draws a black box with a cyan outline.
+				</p>
+			</li>
+			<li class="method">
+				<h2>defaultPhysDraw()</h2>
+				<p>
+					This method bound to PhysicsObjects when they are created and is used to draw them to the screen. 
+					defaultPhysDraw draws a black box with a red outline.
+				</p>
+			</li>
+			<li class="method">
+				<h2>defaultUpdate()</h2>
+				<p>
+					This method bound to SceneObjects when they are created and is used as their frame update function.
+					Default is an empty method.
+				</p>
+			</li>
+			<li class="method">
+				<h2>copy(SceneObject el)</h2>
+				<p>
+					Creates a copy of <i>el</i> in Scene.contains with the name of <i>el</i>.name + " - copy".
+				</p>
+			</li>
+			<li class="method">
+				<h2>addElement(String name, float x, float y, float width, float height, [Controls controls, String tag, String url])<sup>[3]</sup></h2>
+				<p>
+					Adds a new SceneObject to the Scene created with the parameters 
+					(<i>name</i>, <i>x</i>, <i>y</i>, <i>width</i>, <i>height</i>, <i><a href="../Controls/home.html">controls</a></i>, <i>tag</i>, Scene).
+					If <i>url</i> is provided, then the image at that source will be used to draw the SceneObject.
+					Returns the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addRectElement(String name, float x, float y, float width, float height, [boolean applyGravity, Controls controls, String tag, String url])<sup>[3]</sup></h2>
+				<p>
+					Adds a new PhysicsObject to the Scene created with the parameters 
+					(<i>name</i>, <i>x</i>, <i>y</i>, <i>width</i>, <i>height</i>, <i>applyGravity</i>, <i>controls</i>, <i>tag</i>, Scene).
+					If <i>url</i> is provided, then the image at that source will be used to draw the PhysicsObject.
+					Returns the PhysicsObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addCircleElement(String name, float x, float y, float radius, [boolean applyGravity, Controls controls, String tag, String url])<sup>[3]</sup></h2>
+				<p>
+					Adds a new CirclePhysicsObject to the Scene created with the parameters 
+					(<i>name</i>, <i>x</i>, <i>y</i>, <i>radius</i>, <i>applyGravity</i>, <i>controls</i>, <i>tag</i>, Scene).
+					If <i>url</i> is provided, then the image at that source will be used to draw the CirclePhysicsObject.
+					Returns the CirclePhysicsObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addUI(String name, float x, float y, float width, float height[, Function draw])<sup>[3]</sup></h2>
+				<p>
+					Adds a new SceneObject to the Scene created with the parameters 
+					(<i>name</i>, <i>x</i>, <i>y</i>, <i>width</i>, <i>height</i>, new Controls(), "UI", Scene).
+					The SceneObject's position will be adjusted every frame to be in the same position on the screen even when the display changes. 
+					This behavior is handled in a Script object in Scene.home.beforeScripts.
+					If <i>draw</i> is provided, then it will be bound to the new UI element and used for drawing. Same as calling InactiveScene.prototype.changeElementDraw.
+					Returns the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addParticleSpawner(String name, float x, float y, float size, float speed[, int delay, int timer, Function or ElementScript draw, float speedVariance, float sizeVariance, Directions dirs])<sup>[3]</sup></h2>
+				<p>
+					Adds a new PhysicsObject to the Scene with the parameters 
+					(<i>name</i>, <i>x</i>, <i>y</i>, 0, 0, new Controls(), "particle-spawner", Scene).
+					Every <i>delay</i> frames, the PhysicsObject will create particles with a radius of <i>size</i> and a speed of <i>speed</i>. 
+					<i>size</i> and <i>speed</i> will be varied by a random amount up to <i>sizeVariance</i> and <i>speedVariance</i> every time a particle is spawned.
+					The particles will be drawn by <i>draw</i>, or if draw is not provided, as black circles. The particles are PhysicsObject(s). 
+					The particles will be emmitted only in the directions specified by <i><a href="../Directions/home.html">dirs</a></i>. 
+					These values can accessed via the (particleSize, particleInitSpeed, particleDelay, particleLifeSpan, particleDraw, particleSpeedVariance, particleSizeVariance, dirs) properties of the returned PhysicsObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addContainer(String name, boolean active)<sup>[3]</sup></h2>
+				<p>
+					Adds a new InactiveScene to the Scene created with the name of <i>name</i> with active property <i>active</i>.
+					If the InactiveScene's active property is true then the elements within the InactiveScene will be added to the Scene for that frame. 
+					Otherwise, the InactiveScene will not appear anywhere.
+					Returns the SceneInactiveScene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addScript(String name[, Object opts])</h2>
+				<p>
+					Returns a <a href="../Element Script/home.html">ElementScript</a> with a name of <i>name</i> and if provided, the methods in <i>opts</i>. Defines window[<i>name</i>] as the newly created ElementScript.
+				</p>
+			</li>
+			<li class="method">
+				<h2>get(SceneObject or String name)</h2>
+				<p>
+					Returns the SceneObject corresponding to <i>name</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addLight(String name, String color, float x, float y, float innerRadius, float outerRadius)<sup>[4]</sup></h2>
+				<p>
+					Adds a Light to the Scene with the parameters (<i>name</i>, <i>color</i>, <i>x</i>, <i>y</i>, <i>innerRadius</i>, <i>outerRadius</i>). Returns the Light.
+				</p>
+			</li>
+			<li class="method">
+				<h2>getLight(String name)<sup>[4]</sup></h2>
+				<p>
+					Returns the Light corresponding to <i>name</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>removeLight(String name)<sup>[4]</sup></h2>
+				<p>
+					Removes the Light corresponding to <i>name</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>getAllElements()</h2>
+				<p>
+					Returns an Array of all SceneObjects in the Scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>removeElement()<sup>[2]</sup></h2>
+				<p>
+					Removes the specified elements from the Scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>removeAllElements()</h2>
+				<p>
+					Removes all elements from the Scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>getAllElementsWithTag(String tag)</h2>
+				<p>
+					Returns an Array of all SceneObjects with the tag <i>tag</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>makeTemp(String name, SceneObject el)</h2>
+				<p>
+					Makes a template with the name <i>name</i>. The template has all the characteristics of <i>el</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>instantiate(String name, Vertex p)</h2>
+				<p>
+					Copies the template with the name <i>name</i> into the Scene at <i>p</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>isElementColliding(String or PhysicsObject name)</h2>
+				<p>
+					Returns a boolean indicating whether or not the specified element is colliding with anything.
+				</p>
+			</li>
+			<li class="method">
+				<h2>hide()<sup>[2]</sup></h2>
+				<p>
+					Hides all specified elements.
+				</p>
+			</li>
+			<li class="method">
+				<h2>show()<sup>[2]</sup></h2>
+				<p>
+					Makes all specified elements visible.
+				</p>
+			</li>
+			<li class="method">
+				<h2>changeElementDraw(Function newDraw)<sup>[2]</sup></h2>
+				<p>
+					Changes the specified elements' draw method to <i>newDraw</i>. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>changeElementMethod(String method, Function newMethod)<sup>[2]</sup></h2>
+				<p>
+					Changes the specified elements' <i>method</i> method to <i>newMethod</i>. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>changeElementResponse(String input, Function newResponse)<sup>[2]</sup></h2>
+				<p>
+					Changes the specified elements' response to its controls <i>input</i> property being pressed.
+					The method is changed to <i>newResponse</i>
+				</p>
+			</li>
+			<li class="method">
+				<h2>changeElementCollideResponse(String dir, Function newResponse)<sup>[2]</sup></h2>
+				<p>
+					Changes the specified elements' response to colliding in direction <i>dir</i> to the method <i>newResponse</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>changeElementCollideRule(Function newRule)<sup>[2]</sup><sup>[5]</sup></h2>
+				<p>
+					Changes the specified elements' rule used after a collision has been detected to determine if it should stop moving to <i>newRule</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>changeElementCollideOptimize(Function newRule)<sup>[2]</sup><sup>[5]</sup></h2>
+				<p>
+					Changes the specified elements' preliminary optimization algorithm to <i>newRule</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>changeElementUpdate(Function newUpdate)<sup>[2]</sup></h2>
+				<p>
+					Changes the specified elements' update method to <i>newUpdate</i>. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>changeAllElementUpdate(Function newUpdate)</h2>
+				<p>
+					Changes all future element's update methods to <i>newUpdate</i>. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>changeAllElementDraw(Function newDraw)</h2>
+				<p>
+					Changes all future element's draw methods to <i>newDraw</i>. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>collidePoint(Vertex p)</h2>
+				<p>
+					Returns an Array of all the SceneObjects that overlap <i>p</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>collidePointBoth(Vertex p)</h2>
+				<p>
+					Returns an Array containing an Array of all the SceneObjects that overlap <i>p</i> and an Array of all the others.
+				</p>
+			</li>
+			<li class="method">
+				<h2>collideBox(Rect r)</h2>
+				<p>
+					Returns an Array of all the SceneObjects that overlap <i>r</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>giveElementSubjectiveMovement(String or PhysicsObject name)<sup>[6]</sup></h2>
+				<p>
+					Gives subjective movement to <i>name</i>.
+				</p>
+			</li>
+			<li class="method">
+				<p>
+					<span id="[1]">[1]</span>: This method is deprecated, use Scene.prototype.loadScene instead.<br>
+					<span id="[2]">[2]</span>: This methods first parameter is either a SceneObject's name, a SceneObject, or an Array of any of these three.<br>
+					<span id="[3]">[3]</span>: If name is already the name of another SceneObject, then a number in parentheses will be added to the name to indicate which element with that name it is.<br>
+					<span id="[4]">[4]</span>: This method does not exist. A version of this method exists with 'B' or 'F' at the end of the name indicating background or foreground.<br>
+					<span id="[5]">[5]</span>: This method's 'newRule' should take one SceneObject parameter representing the thing that is being considered for a collision.<br>
+					<span id="[6]">[6]</span>: This method is deprecated. Use PLAYER_MOVEMENT.addTo instead.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

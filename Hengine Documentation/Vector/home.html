@@ -1,0 +1,128 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Vector
+		</div>
+	</header>
+	<div class="description">
+		<p>
+			The Vector class is used for storing positions in space.
+			The Vector classes are only available if the 'Vector.js' script is enabled.
+			There is no actual Vector class, but there are Vector1, Vector2, Vector3, and Vector4 for storing positions in 1, 2, 3, and 4 dimensions.
+			A Vertex is the same as a Vector2.
+			<br>Example:<code>let pos1 = new Vertex(5, 10);
+			let pos2 = new Vector2(5, 50);
+			g.console.log(pos1.x) // 5
+			g.console.log(pos2.x) // 5
+			</code>
+			<small>Note: all methods that a Vertex as an argument can also take any Object with 'x' and 'y' properties. 
+				These could be things such as SceneObjects, M, or a Vector4.</small>
+		</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>x</h2>
+				<p>
+					Stores a value. Available in all Vectors.
+				</p>
+			</li>
+			<li class="method">
+				<h2>y</h2>
+				<p>
+					Stores a value. Available in Vectors 2 and up.
+				</p>
+			</li>
+			<li class="method">
+				<h2>z</h2>
+				<p>
+					Stores a value. Available in Vectors 3 and up.
+				</p>
+			</li>
+			<li class="method">
+				<h2>w</h2>
+				<p>
+					Stores a value. Available only for Vector4.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(x[, y[, z[, w]]])</h2>
+				<p>
+					Sets the corresponding property to each parameter.
+					<br>Example:<code>let pos = new Vector2(25, 20); // creates new Vector2
+					g.console.log(pos.x); // 25</code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>add(float or Vector v)</h2>
+				<p>
+					If <i>v</i> is a number, it adds <i>v</i> to each property of the Vector. If <i>v</i> is a Vector, then it adds the corresponding element to each element of the Vector.
+					Returns the Vector.
+				</p>
+			</li>
+			<li class="method">
+				<h2>sub(float or Vector v)</h2>
+				<p>
+					If <i>v</i> is a number, it subtracts <i>v</i> from each property of the Vector. If <i>v</i> is a Vector, then it subtracts the corresponding element from each property of the Vector.
+					Returns the Vector.
+				</p>
+			</li>
+			<li class="method">
+				<h2>mul(float or Vector v)</h2>
+				<p>
+					If <i>v</i> is a number, it multiplies <i>v</i> by each property of the Vector. If <i>v</i> is a Vector, then it multiplies the corresponding element by each of the Vector.
+					Returns the Vector.
+				</p>
+			</li>
+			<li class="method">
+				<h2>div(float or Vector v)</h2>
+				<p>
+					If <i>v</i> is a number, it divides <i>v</i> by each property of the Vector. If <i>v</i> is a Vector, then it divides each of element the Vector by the corresponding element of <i>v</i>.
+					Returns the Vector.
+				</p>
+			</li>
+			<li class="method">
+				<h2>normalize()</h2>
+				<p>
+					Normalizes the vector.
+					<br>Example:<pre><code>
+let pos = new Vector2(4, 6); // creates new Vector2
+g.console.log(pos); // "(4, 6)"
+pos.normalize();
+g.console.log(pos); // "(0.4, 0.6)"</code></pre>
+				</p>
+			</li>
+			<li class="method">
+				<h2>Other Methods</h2>
+				<p>
+					The Vector2 class specifically has two additional methods:
+					<ul>
+						<li class="method">
+							<h2>static fromAngle(float angle)</h2>
+							<p>
+								Returns a new Vector2 created with a direction equal to the angle <i>angle</i> provided in radians.
+							</p>
+						</li>
+					</ul>
+					<ul>
+						<li class="method">
+							<h2>getAngle()</h2>
+							<p>
+								Returns the direction that the Vector2 is facing as an angle in radians.
+							</p>
+						</li>
+					</ul>
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

@@ -1,0 +1,198 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Artist
+		</div>
+	</header>
+	<div class="description">
+		<p>The Artist class is used for drawing <a href="javascript:location = '../Scene Object/home.html'">SceneObjects</a> and dealing with images and <a href="javascript:location = '../Animation/home.html'">Animations.</a></p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>canvas</h2>
+				<p>
+					The HTMLCanvasElement object that the Artist is drawing on.
+				</p>
+			</li>
+			<li class="method">
+				<h2>c</h2>
+				<p>
+					The CanvasRenderingContext2D that the Artist uses for drawing.
+				</p>
+			</li>
+			<li class="method">
+				<h2>animations</h2>
+				<p>
+					An array of all Animations created by the Artist.
+				</p>
+			</li>
+			<li class="method">
+				<h2>custom</h2>
+				<p>
+					An empty Object for use as you please.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(String canvasID, int width, int height)</h2>
+				<p>
+					Attaches the new Artist to the canvas with ID of <i>canvasID</i>. 
+					The canvas' dimensions will be set to <i>height</i> by <i>height</i>, if they are provided.
+					Otherwise, the canvas' dimensions will be preserved.
+				</p>
+			</li>
+			<li class="method">
+				<h2>middle()</h2>
+				<p>
+					Returns a Vertex representing the middle of the canvas.
+				</p>
+			</li>
+			<li class="method">
+				<h2>sigmoid(float x)</h2>
+				<p>
+					Returns the sigmoid of <i>x</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>simpleCircle(Color fill, Color border)</h2>
+				<p>
+					Returns a function that when bound to a Rect object draws the Rect as a circle with a background of <i>fill</i> and a border of <i>border</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>simpleRect(Color fill, Color border)</h2>
+				<p>
+					Returns a function that when bound to a Rect object draws the Rect as a rectangle with a background of <i>fill</i> and a border of <i>border</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>createAnimation(String source, int frameCount, int delay, boolean loop, Function finResponse)</h2>
+				<p>
+					Pushes a new Animation object with parameters (<i>source</i>, <i>frameCount</i>, <i>delay</i>, <i>loop</i>, <i>finResponse</i>)
+					to Artist.animations. Returns the Animation.
+				</p>
+			</li>
+			<li class="method">
+				<h2>drawAnimation(Animation anim, float x, float y, float width, float height)</h2>
+				<p>
+					Draws the current frame of <i>anim</i> at (<i>x</i>, <i>y</i>) with dimensions of <i>width</i> by <i>height</i>.
+					Calls <i>anim</i>.advance.
+				</p>
+			</li>
+			<li class="method">
+				<h2>drawImage(Image img, float x, float y, float width, float height)</h2>
+				<p>
+					Draws <i>img</i> at (<i>x</i>, <i>y</i>) with dimensions of <i>width</i> by <i>height</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>drawTexture(<a href="../Texture/home.html">Texture</a> tex, float x, float y, float width, float height)</h2>
+				<p>
+					Draws <i>tex</i> at (<i>x</i>, <i>y</i>) with dimensions of <i>width</i> by <i>height</i>. The data in the texture that has been changed since the last updateImageData call will not be shown.
+				</p>
+			</li>
+			<li class="method">
+				<h2>draw(Color fill)</h2>
+				<p>
+					Sets the fill color to <i>fill</i>.
+					Returns an Object with methods: 
+					<ul>
+						<li class="method2">
+							<h2>circle([float x, float y, float radius] or [<a href="../Shapes/Circle.html">Circle</a> c])</h2>
+							<p>
+								Fills a circle with a center at (<i>x</i>, <i>y</i>) with a radius of <i>radius</i>, or if provided, the coordinates and radius of <i>c</i>.
+							</p>
+						</li>
+						<li class="method2">
+							<h2>sector(float x, float y, float radius, float startAngle, float endAngle)</h2>
+							<p>
+								Fills a sector with a center at (<i>x</i>, <i>y</i>) with a radius of <i>radius</i>, the sector goes from <i>startAngle</i> to <i>endAngle</i> (in radians).
+							</p>
+						</li>
+						<li class="method2">
+							<h2>rect([float x, float y, float width, float height] or [Rect rect])</h2>
+							<p>
+								Fills a rectangle with a upper left corner at (<i>x</i>, <i>y</i>) with dimensions of <i>width</i> by <i>height</i>,
+								or, if provided the position and dimensions of <i>rect</i>.
+							</p>
+						</li>
+						<li class="method2">
+							<h2>triangle([Vertex v1, Vertex v2, Vertex v3] or [Triangle tri])</h2>
+							<p>
+								Fills a triangle with vertices <i>v1</i>, <i>v2</i>, and <i>v3</i>, or, if provided, with the vertices of <i>tri</i>.
+							</p>
+						</li>
+						<li class="method2">
+							<h2>text(String font, String text, float x, float y)</h2>
+							<p>
+								Draws Text <i>text</i> in font <i>font</i> with an upper left corner at (<i>x</i>, <i>y</i>).
+							</p>
+						</li>
+					</ul>
+				</p>
+			</li>
+			<li class="method">
+				<h2>stroke(Color outline, float lineWidth)</h2>
+				<p>
+					Sets the outline color to <i>outline</i>.
+					Sets the line width to <i>lineWidth</i>.
+					Returns an Object with methods: 
+					<ul>
+						<li class="method2">
+							<h2>circle(float x, float y, float radius)</h2>
+							<p>
+								Outlines a circle with a center at (<i>x</i>, <i>y</i>) with a radius of <i>radius</i>.
+							</p>
+						</li>
+						<li class="method2">
+							<h2>sector(float x, float y, float radius, float startAngle, float endAngle)</h2>
+							<p>
+								Outlines a sector with a center at (<i>x</i>, <i>y</i>) with a radius of <i>radius</i>, the sector goes from <i>startAngle</i> to <i>endAngle</i> (in radians).
+							</p>
+						</li>
+						<li class="method2">
+							<h2>rect(float x, float y, float width, float height)</h2>
+							<p>
+								Outlines a rectangle with a upper left corner at (<i>x</i>, <i>y</i>) with dimensions of <i>width</i> by <i>height</i>,
+								or, if provided the position and dimensions of <i>rect</i>.
+							</p>
+						</li>
+						<li class="method2">
+							<h2>triangle(Vertex v1, Vertex v2, Vertex v3)</h2>
+							<p>
+								Outlines a triangle with vertices <i>v1</i>, <i>v2</i>, and <i>v3</i>, or, if provided, with the vertices of <i>tri</i>.
+							</p>
+						</li>
+						<li class="method2">
+							<h2>line([float x1, float y1, float x2, float y2] of [Vertex p1, Vertex p2])</h2>
+							<p>
+								Draws a line from (<i>x1</i>, <i>y1</i>) to (<i>x2</i>, <i>y2</i>). If provided, it will draw the line from <i>p1</i> to <i>p2</i>.
+							</p>
+						</li>
+					</ul>
+				</p>
+			</li>
+			<li class="method">
+				<h2>clear()</h2>
+				<p>
+					Clears the entirety of the canvas.
+				</p>
+			</li>
+			<li class="method">
+				<h2>setBackground(Color background)</h2>
+				<p>
+					Makes the canvas background <i>background</i>.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

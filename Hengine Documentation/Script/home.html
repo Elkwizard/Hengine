@@ -1,0 +1,64 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Script
+		</div>
+	</header>
+	<div class="description">
+		<p>
+			The Script class is used for storing a collection of custom methods that can be applied to objects to make them act like the Script.
+		</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>methods</h2>
+				<p>
+					An Object containing all of the methods in the Script.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(String name[, Object fns])</h2>
+				<p>
+					Initializes the Script with the name <i>name</i>.
+					If <i>fns</i> is provided, Script.addMethod will be called for each methods of the object with the name of the method as the first and last arguments and the function as the middle argument.
+				</p>
+			</li>
+			<li class="method">
+				<h2>run()</h2>
+				<p>
+					Calls every function in Script.methods. Not especially useful.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addTo(Object obj, ANY ...args)</h2>
+				<p>
+					Adds each method in Script.methods to an object stored in <i>obj</i>[Script.name]. 
+					The methods will be bound to <i>obj</i>.
+					Any methods with the flag 'init' will be called with the arguments <i>args</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>addMethod(String name, Function method, String flag)</h2>
+				<p>
+					Adds a <i>method</i> to Script.methods with the name of <i>name</i>, with a flag of <i>flag</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>removeMethod(String name)</h2>
+				<p>
+					Deletes method <i>name</i> from Script.methods.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

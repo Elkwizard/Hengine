@@ -1,0 +1,74 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Animation
+		</div>
+	</header>
+	<div class="description">
+		<p>The Animation class is used by the <a href="../Artist/home.html">Artist</a> class for creating animations.</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>frameCount</h2>
+				<p>
+					The number of frames in the Animation.
+				</p>
+			</li>
+			<li class="method">
+				<h2>frames</h2>
+				<p>
+					An Array of Image objects representing the frames.
+				</p>
+			</li>
+			<li class="method">
+				<h2>img</h2>
+				<p>
+					An Image object representing the current frame.
+				</p>
+			</li>
+			<li class="method">
+				<h2>loop</h2>
+				<p>
+					A boolean indicating whether or not the Animation loops.
+				</p>
+			</li>
+			<li class="method">
+				<h2>finResponse</h2>
+				<p>
+					A function that will be called whenever the Animation loops.
+				</p>
+			</li>
+			<li class="method">
+				<h2>delay</h2>
+				<p>
+					The number of frames between frame advances in the Animation.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(String src, int frameCount, int delay, boolean loops, Function finResponse)</h2>
+				<p>
+					Locates the source folder and looks for files named 1.png, 2.png, 3.png and so on. 
+					These are used as frames for the Animation which will advance a frame every <i>delay</i> frames.
+					If <i>loops</i> is true, then the Animation will start over when it gets to the end.
+					At the end of each loop, <i>finResponse</i> is called.
+				</p>
+			</li>
+			<li class="method">
+				<h2>advance()</h2>
+				<p>
+					Moves the perceived time of the Animation forward by 1 frame.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

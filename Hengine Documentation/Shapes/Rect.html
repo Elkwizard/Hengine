@@ -1,0 +1,69 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Rect
+		</div>
+	</header>
+	<div class="description">
+		<p>
+			Stores information about rectangles. 
+			The Rectangle class can be passed to <a href="../Artist/home.html">Artist</a>.draw().rect to draw it to the screen.
+		</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>x</h2>
+				<p>
+					The x coordinate of the Rect.
+				</p>
+			</li>
+			<li class="method">
+				<h2>y</h2>
+				<p>
+					The y coordinate of the Rect.
+				</p>
+			</li>
+			<li class="method">
+				<h2>width</h2>
+				<p>
+					The width of the Rect.
+				</p>
+			</li>
+			<li class="method">
+				<h2>height</h2>
+				<p>
+					The height of the Rect.
+				</p>
+			</li>
+			<li class="method">
+				<h2>middle</h2>
+				<p>
+					The coordinates of the middle of the Rect as a Vertex.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor([float x, float y, float width, float height] or [Vertex min, Vertex max])</h2>
+				<p>
+					Creates a Rect at (<i>x</i>, <i>y</i>) with dimensions of <i>width</i> by <i>height</i>, 
+					or ranging from <i><a href="../Vector/home.html">min</a></i> to <i>max</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>corners()</h2>
+				<p>
+					Returns the coordinates of the corners of the Rect as an Array.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

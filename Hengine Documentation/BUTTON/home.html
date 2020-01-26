@@ -1,0 +1,43 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			BUTTON
+		</div>
+	</header>
+	<div class="description">
+		<p>A script that can be used for adding button functionality to <a href="../Scene Object/home.html">SceneObjects</a> by allowing them to easily display text are monitor clicks. What a button does when clicked can be modified by setting the 'onclick' property of the SceneObject to a function to be run. The function should take no parameters</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>Property</h2>
+				<p>
+					Description sample text.
+					Example:<code>g.console.log(expr); // "expr"</code>
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>addTo(SceneObject elements, Object options)</h2>
+				<p>
+					Creates a new textbox with an empty onclick with the options provided.
+					<br>Example:<pre><code>let button = s.addUI("input", 50, 50, 200, 40);
+BUTTON.addTo(button, {
+    fontColor: cl.BLUE,       // sets text color to blue
+    fontSize: 15,             // sets font size to 15 css pixels
+    backgroundColor: cl.RED,  // sets the background color to red
+    borderColor: cl.BLUE      // sets the border color to blue
+});                           // all of these are optional </code></pre>
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

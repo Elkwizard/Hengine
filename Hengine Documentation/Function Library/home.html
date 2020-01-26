@@ -1,0 +1,113 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			FunctionLibrary
+		</div>
+	</header>
+	<div class="description">
+		<p>
+			The FunctionLibrary class is mainly used by the <a href="../Engine/home.html">Engine</a> class to give the user helpful functions. 
+			FunctionLibrary is a global class in the Hengine as long as the 'Helper Functions.js' script is enabled.
+		</p>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor()</h2>
+				<p>
+					Instantiates the FunctionLibrary.
+				</p>
+			</li>
+			<li class="method">
+				<h2>countProperties(Object obj)</h2>
+				<p>
+					Returns the number of properties in <i>obj</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>objToAry(Object obj)</h2>
+				<p>
+					Returns an array of the values of properties in <i>obj</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>getDistance([float x1, float y1, float x2, float y2] or [Vertex p1, Vertex p2])</h2>
+				<p>
+					Returns the distance between (<i>x1</i>, <i>y1</i>) and (<i>x2</i>, <i>y2</i>) or <i><a href="../Vector/home.html">p1</a></i> and <i>p2</i>, if provided. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>getDistance3D(Vector3 p1, Vector3 p2)</h2>
+				<p>
+					Returns the distance between <i>p1</i> and <i>p2</i> in 3D space. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>getDistance4D(Vector4 p1, Vector4 p2)</h2>
+				<p>
+					Returns the distance between <i>p1</i> and <i>p2</i> in 4D space. 
+				</p>
+			</li>
+			<li class="method">
+				<h2>extend(float a, float b)</h2>
+				<p>
+					Returns <i>a</i> extended away from zero by <i>b</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>contract(float a, float b)</h2>
+				<p>
+					Returns <i>a</i> moved towards zero by <i>b</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>randIntVal(int min, int max)</h2>
+				<p>
+					Returns a psuedo-random integer between <i>min</i> and <i>max</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>randFloatVal(int min, int max)</h2>
+				<p>
+					Returns a psuedo-random float between <i>min</i> and <i>max</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>randBool()</h2>
+				<p>
+					Returns a psuedo-random boolean value.
+				</p>
+			</li>
+			<li class="method">
+				<h2>randString(int length)</h2>
+				<p>
+					Returns a psuedo-random String with a length of <i>length</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>parseBool(String str)</h2>
+				<p>
+					Returns a boolean parsed from <i>str</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>parseArray(String str)</h2>
+				<p>
+					Returns an Array parsed from <i>str</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>round(float x, int places)</h2>
+				<p>
+					Returns <i>x</i>, rounded to the nearest <i>places</i>th.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

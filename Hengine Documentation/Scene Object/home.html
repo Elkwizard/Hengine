@@ -1,0 +1,214 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			SceneObject
+		</div>
+	</header>
+	<div class="description">
+		<p>
+			SceneObject inherits from <a href="../Shapes/home.html">Rect</a>. 
+			The SceneObject class is really only meant to be used by the Scene and Inactive Scene classes. 
+			SceneObjects are what make up the actual game and would be used for things like health bars and trees.
+			SceneObjects do not collide with other SceneObjects or <a href="../Physics Object/home.html">PhysicsObjects</a>.
+		</p>
+		<br>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>name</h2>
+				<p>
+					The name of SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>tag</h2>
+				<p>
+					The tag of SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>home</h2>
+				<p>
+					A link to the Scene or <a href="../Inactive Scene/home.html">InactiveScene</a> that created the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>controls</h2>
+				<p>
+					The <a href="../Controls/home.html">Controls</a> object that contains the keys that influence the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>hidden</h2>
+				<p>
+					A boolean indicating whether or not the SceneObject is drawn each frame.
+				</p>
+			</li>
+			<li class="method">
+				<h2>log</h2>
+				<p>
+					An Array of functions representing all the changes that have occured on this SceneObject since it was created.
+				</p>
+			</li>
+			<li class="method">
+				<h2>isDead</h2>
+				<p>
+					A boolean indicating whether or not the SceneObject has been removed from its home scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>response.input</h2>
+				<p>
+					An Object containing an 'up', 'down', 'left', and 'right' properties, where each value is a function. 
+					These functions will be called whenever the corresponding key in the ScenObject.controls Object is pressed.
+				</p>
+			</li>
+			<li class="method">
+				<h2>hovered</h2>
+				<p>
+					A boolean indicating whether or not the mouse is hovering over the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>custom</h2>
+				<p>
+					An empty Object for use as you please.
+				</p>
+			</li>
+			<li class="method">
+				<h2>scripts</h2>
+				<p>
+					An Object containing all of the scripts attached to the SceneObject with the keys being the scripts' name.
+				</p>
+			</li>
+			<li class="method">
+				<h2>collider</h2>
+				<p>
+					A <a href="../Rect Collider/home.html">RectCollider</a> object containing the hitbox of the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>lifeSpan</h2>
+				<p>
+					An integer indicating how many frames the SceneObject has existed for.
+				</p>
+			</li>
+			<li class="method">
+				<h2>layer</h2>
+				<p>
+					A number respresenting the layer the SceneObject is on. A higher layer will be renderered later.
+				</p>
+			</li>
+			<li class="method">
+				<h2>hasPhysics</h2>
+				<p>
+					A boolean indicating whether or not the SceneObject is also a PhysicsObject
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(String name, float x, float y, float width, float height, Controls controls, String tag)</h2>
+				<p>
+					Calls Rect.prototype.constructor with parameters (<i>x</i>, <i>y</i>, <i>width</i>, <i>height</i>).
+					A new SceneObject is initialized with a name of <i>name</i>.
+					The SceneObject has controls of <i>controls</i> and a tag of <i>tag</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>response.click(Vertex e)<sup>[1]</sup></h2>
+				<p>
+					<i>e</i> represents the position of the mouse adjusted for the display.
+					This method is called when the mouse clicks on the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>response.rightClick(Vertex e)<sup>[1]</sup></h2>
+				<p>
+					<i>e</i> represents the position of the mouse adjusted for the display.
+					This method is called when the mouse right clicks on the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>response.hover(Vertex e)<sup>[1]</sup></h2>
+				<p>
+					<i>e</i> represents the position of the mouse adjusted for the display.
+					This method is called when the mouse enters the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>draw()<sup>[1]</sup></h2>
+				<p>
+					This method is called every frame.
+				</p>
+			</li>
+			<li class="method">
+				<h2>update()<sup>[1]</sup></h2>
+				<p>
+					This method is called every physics update.
+				</p>
+			</li>
+			<li class="method">
+				<h2>hide()</h2>
+				<p>
+					Hides the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>show()</h2>
+				<p>
+					undoes SceneObject.prototype.hide.
+				</p>
+			</li>
+			<li class="method">
+				<h2>collidePoint(Vertex p)</h2>
+				<p>
+					Returns a boolean indicating whether or not <i><a href="location = '../Vector/home.html'">p</a></i> is inside of the SceneObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>remove()</h2>
+				<p>
+					Removes the SceneObject from the Scene.
+				</p>
+			</li>
+			<li class="method">
+				<h2>position(Vertex p)</h2>
+				<p>
+					Sets the position of the SceneObject to <i>p</i> and then calls SceneObject.updateHitbox.
+				</p>
+			</li>
+			<li class="method">
+				<h2>mod(Function func)</h2>
+				<p>
+					Calls <i>func</i> and then adds <i>func</i> to the log.
+				</p>
+			</li>
+			<li class="method">
+				<h2>logMod(Function func)</h2>
+				<p>
+					Adds <i>func</i> to the log.
+				</p>
+			</li>
+			<li class="method">
+				<h2>runLog(SceneObject el)</h2>
+				<p>
+					Binds and runs each method in the log on <i>el</i>.
+				</p>
+			</li>
+			<li class="method">
+				<p>
+					<span id="[1]">[1]</span>: This method starts empty. It is meant to be set by the user.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

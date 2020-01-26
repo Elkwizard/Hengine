@@ -1,0 +1,153 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			Color
+		</div>
+	</header>
+	<div class="description">
+		<p>The Color class is used to parse and store colors. It can be used as a color argument for the <a href="../Artist/home.html">Artist</a>'s drawing methods.</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>red</h2>
+				<p>
+					The amount of red in the Color, between 0 and 255.
+				</p>
+			</li>
+			<li class="method">
+				<h2>green</h2>
+				<p>
+					The amount of green in the Color, between 0 and 255.
+				</p>
+			</li>
+			<li class="method">
+				<h2>blue</h2>
+				<p>
+					The amount of blue in the Color, between 0 and 255.
+				</p>
+			</li>
+			<li class="method">
+				<h2>alpha</h2>
+				<p>
+					The opacity in the Color, between 0 and 1.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor([int r, int g, int b[, int a]] or [String rgbaRep] or [String hexRep])</h2>
+				<p>
+					Will use the parameters provided to initialize the color. If <i>a</i> is not provided, then it will count as 1.
+					<br>Example:<code>let color = new Color("#40e");
+					g.console.log(color.get_RGBA()); // "rgba(68, 0, 238, 1)"</code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>get_RGBA()</h2>
+				<p>
+					Returns the rgba representation of the Color as a String.
+				</p>
+			</li>
+			<li class="method">
+				<h2>get_HEX()</h2>
+				<p>
+					Returns the hexidecimal representation of the Color as a String.
+				</p>
+			</li>
+			<li class="method">
+				<h2>add(Color or number op)<sup>[1]</sup></h2>
+				<p>
+					Adds <i>op</i>
+				</p>
+			</li>
+			<li class="method">
+				<h2>sub(Color or number op)<sup>[1]</sup></h2>
+				<p>
+					Subtracts <i>op</i>
+				</p>
+			</li>
+			<li class="method">
+				<h2>mul(Color or number op)<sup>[1]</sup></h2>
+				<p>
+					Multiplies by <i>op</i>
+				</p>
+			</li>
+			<li class="method">
+				<h2>div(Color or number op)<sup>[1]</sup></h2>
+				<p>
+					Divides by <i>op</i>
+				</p>
+			</li>
+			<li class="method">
+				<h2>mod(Color or number op)<sup>[1]</sup></h2>
+				<p>
+					Performs modulus with the Color and <i>op</i>, where each channel is set to the result.
+				</p>
+			</li>
+			<li class="method">
+				<h2>static add(Color or number op, Color or number op2)<sup>[1]</sup></h2>
+				<p>
+					Returns the sum of <i>op</i> and <i>op2</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>static sub(Color or number op, Color or number op2)<sup>[1]</sup></h2>
+				<p>
+					Returns the difference between <i>op</i> and <i>op2</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>static mul(Color or number op, Color or number op2)<sup>[1]</sup></h2>
+				<p>
+					Returns the product of <i>op</i> and <i>op2</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>static div(Color or number op, Color or number op2)<sup>[1]</sup></h2>
+				<p>
+					Returns the quotient of <i>op</i> and <i>op2</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>static mod(Color or number op, Color or number op2)<sup>[1]</sup></h2>
+				<p>
+					Performs modulus with <i>op</i> and <i>op2</i>, and returns a Color where each channel is set to the result.
+				</p>
+			</li>
+			<li class="method">
+				<h2>static grayScale(float per)</h2>
+				<p>
+					Returns a Color with a grayScale value that is <i>per</i> of the way between black and white. 
+					<br>Example: <code>g.console.log(Color.grayScale(0).get_RGBA()); // rgba(0, 0, 0, 1)
+					g.console.log(Color.grayScale(1).get_RGBA()); // rgba(255, 255, 255, 1) </code>
+				</p>
+			</li>
+			<li class="method">
+				<h2>static lerp(Color op, Color op2, float per)</h2>
+				<p>
+					Returns a Color with a grayScale value that is <i>per</i> of the way between <i>op</i> and <i>op2</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>static random()</h2>
+				<p>
+					Returns a psuedo-random Color.
+				</p>
+			</li>
+			<li class="method">
+				<p>
+					<span id="[1]">[1]</span>: does the indicated operation with the Color and <i>op</i> for each channel. 
+					If <i>op</i> is a number, then <i>op</i> is added to every channel.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>

@@ -1,0 +1,195 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../Resources/Styles.css" type="text/css">
+	<script src="../Resources/Highlighter.js"></script>
+</head>
+<body>
+	<header>
+		<div class="property">
+			PhysicsObject &amp; CirclePhysicsObject
+		</div>
+	</header>
+	<div class="description">
+		<p>PhysicsObject inherits from <a href="javascript:location = '../Scene Object/home.html'">SceneObject</a>. 
+			PhysicsObjects are used in the <a href="javascript:location = '../Scene/home.html'">Scene</a> to represent colliding gameplay elements. 
+			PhysicsObjects would be things like players or the ground.
+			The circle varient of this class (CirclePhysicsObject) is the same except x and y represent the center coordinates and there is a radius property that stores the radius of the CirclePhysicsObject.</p>
+		<h3>Properties:</h3>
+		<ul>
+			<li class="method">
+				<h2>cullGraphics</h2>
+				<p>
+					A boolean indicating whether or not the PhysicsObject should be graphics culled if Scene.cullGraphics is true.
+				</p>
+			</li>
+			<li class="method">
+				<h2>applyGravity</h2>
+				<p>
+					A boolean indicating whether or not the PhysicsObject can fall.
+				</p>
+			</li>
+			<li class="method">
+				<h2>slows</h2>
+				<p>
+					A boolean indicating whether or not the PhysicsObject slows down over time.
+				</p>
+			</li>
+			<li class="method">
+				<h2>canCollide</h2>
+				<p>
+					A boolean indicating whether or not the PhysicsObject can collide.
+				</p>
+			</li>
+			<li class="method">
+				<h2>shown</h2>
+				<p>
+					A boolean indicating whether or not the PhysicsObject is in the part of the Scene that is onscreen.
+				</p>
+			</li>
+			<li class="method">
+				<h2>maxSpeedX</h2>
+				<p>
+					The maximum speed at which the PhysicsObject can travel horizontally.
+				</p>
+			</li>
+			<li class="method">
+				<h2>maxSpeedY</h2>
+				<p>
+					The maximum speed at which the PhysicsObject can travel vertically.
+				</p>
+			</li>
+			<li class="method">
+				<h2>response.collide</h2>
+				<p>
+					An Object containing 'top', 'bottom', 'left', 'right', and 'general' properties 
+					containing functions which will be called when the PhysicsObject collides in the corresponding directions.
+				</p>
+			</li>
+			<li class="method">
+				<h2>colliding</h2>
+				<p>
+					An Object containing 'top', 'bottom', 'left', 'right', and 'general' properties 
+					with values that are either null/false or an array of colliding objects, indicating whether or not the PhysicsObject is currently colliding with something on that side.
+				</p>
+			</li>
+			<li class="method">
+				<h2>allCollidingWith</h2>
+				<p>
+					An Object with two methods:
+					<ul>
+						<li class="method2">
+							<h2>includes(String name)</h2>
+							<p>
+								Returns false if the PhysicsObject is not colliding with the element with a name of <i>name</i>. Otherwise, returns the element.
+							</p>
+						</li>
+						<li class="method2">
+							<h2>includesTag(String tag)</h2>
+							<p>
+								Returns false if the PhysicsObject is not colliding with the element with a tag of <i>tag</i>. Otherwise, returns the element.
+							</p>
+						</li>
+					</ul>
+				</p>
+			</li>
+			<li class="method">
+				<h2>speed</h2>
+				<p>
+					A <a href="../Vector/home.html">Vector2</a> representing the speed of the PhysicsObject.
+				</p>
+			</li>
+			<li class="method">
+				<h2>accel</h2>
+				<p>
+					A Vector2 representing the acceleration of the PhysicsObject.
+				</p>
+			</li>
+		</ul>
+		<br>
+		<h3>Methods:</h3>
+		<ul>
+			<li class="method">
+				<h2>constructor(String name, float x, float y, float width, float height, boolean applyGravity, Controls controls, String tag, Scene home)</h2>
+				<p>
+					Calls SceneObject.prototype.constructor with parameters (<i>name</i>, <i>x</i>, <i>y</i>, <i>width</i>, <i>height</i>, <i>applyGravity</i>, <i>controls</i>, <i>tag</i>, <i>home</i>).
+					Whether or not the PhysicsObject has gravity applied is determined by <i>applyGravity</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>collideBasedOnRule(PhysicsObject el)</h2>
+				<p>
+					Is called to determine whether the PhysicsObject and <i>el</i> should collide. This method is meant to be set by the user. 
+					It is only called after it is determined that the two PhysicsObjects are overlapping.
+				</p>
+			</li>
+			<li class="method">
+				<h2>optimize(PhysicsObject el)</h2>
+				<p>
+					This method is called as a preliminary check before collisions detection where <i>el</i> is the PhysicsObject being checked. 
+					This method is meant to be set by the user but it starts as a distance check. PhysicsObject.optimize should return a boolean.
+				</p>
+			</li>
+			<li class="method">
+				<h2>stop()</h2>
+				<p>
+					causes the PhysicsObject to stop moving entirely.
+				</p>
+			</li>
+			<li class="method">
+				<h2>moveTowards(Vertex target, float ferocity)</h2>
+				<p>
+					causes the PhysicsObject move towards <i><a href="../Vector/home.html">target</a></i> at a speed of <i>ferocity</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>moveAwayFrome(Vertex target, float ferocity)</h2>
+				<p>
+					causes the PhysicsObject away from <i>target</i> at a speed of <i>ferocity</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>removeCollisions()</h2>
+				<p>
+					Prevents the PhysicsObject from colliding.
+				</p>
+			</li>
+			<li class="method">
+				<h2>allowCollisions()</h2>
+				<p>
+					Allows the PhysicsObject to collide with other PhysicsObjects.
+				</p>
+			</li>
+			<li class="method">
+				<h2>removeGravity()</h2>
+				<p>
+					Prevents the PhysicsObject from falling.
+				</p>
+			</li>
+			<li class="method">
+				<h2>allowGravity()</h2>
+				<p>
+					Allows the PhysicsObject to fall.
+				</p>
+			</li>
+			<li class="method">
+				<h2>applyForce(String dir, float amount)</h2>
+				<p>
+					Adds <i>amount</i> force in the <i>dir</i> direction.
+				</p>
+			</li>
+			<li class="method">
+				<h2>setForce(String dir, float amount)</h2>
+				<p>
+					Sets the speed in direction <i>dir</i> to <i>amount</i>.
+				</p>
+			</li>
+			<li class="method">
+				<h2>collide(PhysicsObject el)</h2>
+				<p>
+					returns true if <i>el</i> and the PhysicsObject are overlapping, false, otherwise.
+				</p>
+			</li>
+		</ul>
+	</div>
+	<script src="../Resources/Load.js"></script>
+</body>
