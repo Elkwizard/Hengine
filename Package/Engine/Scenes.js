@@ -799,15 +799,36 @@ class InactiveScene {
 				this.canCollide = false;
 			}
 			align(angle, f) {
+				let reversed = 1;
+				let a = angle;
+				let p2 = Math.PI / 2;
+				let possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3]; 
+				let best = possibleDirections[0];
+				let dif = Math.abs(possibleDirections[0] - this.rotation);
+				for (let dir of possibleDirections) {
+					let d = Math.abs(dir - this.rotation);
+					let d2 = Math.abs(dir - this.rotation - Math.PI * 2);
+					if (d < dif) {
+						dif = d;
+						best = dir;
+						reversed = 1;
+					}
+					if (d2 < dif) {
+						dif = d2;
+						best = dir;
+						reversed = -1;
+					}
+				}
+				f *= reversed;
 				let a1 = this.rotation;
 				let a2 = this.rotation + Math.PI * 2;
-				let d1 = Math.abs(angle - a1);
-				let d2 = Math.abs(angle - a2);
+				let d1 = Math.abs(best - a1);
+				let d2 = Math.abs(best - a2);
 				let actA = a1;
 				if (d2 < d1) actA = a2;
-				let dif = angle - actA;
-				if (d2 < d1) dif *= -1;
-				this.angularAcceleration = 0.01 * f * Math.sign(dif);
+				let difference = best - actA;
+				if (d2 < d1) difference *= -1;
+				this.angularAcceleration = 0.01 * f * Math.sign(difference);
 			}
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
@@ -867,27 +888,8 @@ class InactiveScene {
 				this.angularVelocity += this.angularAcceleration;
 				this.rotation += this.angularVelocity;
 				if (this.applyGravity) {
-					let reversed = 1;
-					let a = this.velocity.getAngle();
-					let p2 = Math.PI / 2;
-					let possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3]; 
-					let best = possibleDirections[0];
-					let dif = Math.abs(possibleDirections[0] - this.rotation);
-					for (let dir of possibleDirections) {
-						let d = Math.abs(dir - this.rotation);
-						let d2 = Math.abs(dir - this.rotation - Math.PI * 2);
-						if (d < dif) {
-							dif = d;
-							best = dir;
-							reversed = 1;
-						}
-						if (d2 < dif) {
-							dif = d2;
-							best = dir;
-							reversed = -1;
-						}
-					}
-					this.align(best, reversed * 0.01);
+					
+					this.align(this.velocity.getAngle(), 0.01);
 				}
 				this.rotation %= Math.PI * 2;
 	
