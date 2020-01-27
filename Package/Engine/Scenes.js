@@ -744,6 +744,9 @@ class InactiveScene {
 				this.collideBasedOnRule = e => true;
 				this.optimize = (a, b) => true;
 			}
+			get mass() {
+				return this.width * this.height;
+			}
 			set rotation(a) {
 				this.collider.rotation = a;
 				if (a === 0) this.collider.rotation = 0.000001;
@@ -914,6 +917,8 @@ class InactiveScene {
 				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
 				this.lastX = this.x;
 				this.lastY = this.y;
+				let m = Math.max(this.width, this.height);
+				if (this.velocity.mag > m) this.velocity.mag = m;
 			} 
 			moveTowards(point, ferocity){
 				if(ferocity === undefined) ferocity = 1;
@@ -1105,14 +1110,14 @@ class InactiveScene {
 					a.y -= aDir.y;
 					b.x -= bDir.x;
 					b.y -= bDir.y;
-					a.velocity.add(col.Bdir.times(a.velocity.mag / 40));
-					b.velocity.add(col.Adir.times(b.velocity.mag / 40));
+					a.velocity.add(col.Bdir.times((a.velocity.mag / 40)));
+					b.velocity.add(col.Adir.times((b.velocity.mag / 40)));
 					b.cannotMove.push(a);
 				} else {
 					let dir = col.Adir.times(col.penetration);
 					a.x -= dir.x;
 					a.y -= dir.y;
-					a.velocity.add(col.Bdir.times(a.velocity.mag / 40));
+					col.a.velocity.sub(col.Adir.times(.1));
 				}
 				if (b.applyGravity && !a.cannotMove.includes(b)) {
 					a.align(clamp(col.Bdir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
