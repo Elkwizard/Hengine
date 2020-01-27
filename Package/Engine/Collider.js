@@ -248,7 +248,31 @@ class RectCollider {
 			y = x.y
 			x = x.x;
 		}
-		return (x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height);
+		if (this.rotation) {
+			let hypotA = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
+			let r1 = new Rect(this.middle.x - hypotA, this.middle.y - hypotA, hypotA * 2, hypotA * 2);
+			if (!(r1.x < x && x < r1.x + r1.width && r1.y < y && y < r1.y + r1.height)) return false;
+			let aEdges = PhysicsObject.getEdges(this);
+			let edges = aEdges;
+			let aCorners = PhysicsObject.getCorners(this);
+			let colliding = true;
+			for (let i = 0; i < edges.length; i++) {
+				let edge = edges[i];
+				let aRange = new Range();
+				for (let point of aCorners) {
+					let projection = Physics.projectPointOntoLine(point, edge);
+					aRange.include(projection);
+				}
+				let projection = Physics.projectPointOntoLine(new Vector2(x, y), edge);
+				if (projection < aRange.min || projection > aRange.max) {
+					colliding = false;
+					break;
+				}
+			}
+			return colliding;
+		} else {
+			return (x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height);
+		}
 	}
 }
 class CircleCollider{

@@ -719,6 +719,7 @@ class InactiveScene {
 					right: null,
 					general: null
 				};
+				this.cannotMove = [];
 				this.response.collide = {
 					general: function(){},
 					top: function(){},
@@ -810,6 +811,7 @@ class InactiveScene {
 			}
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
+				this.cannotMove = [];
 			}
 			engineDraw() {
 				let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
@@ -833,6 +835,7 @@ class InactiveScene {
 			engineUpdate(others) {
 				this.physicsUpdate(others);
 				this.scriptUpdate();
+				this.update();
 			}
 			slowDown() {
 				if (this.slows) {
@@ -861,10 +864,9 @@ class InactiveScene {
 				this.y += this.velocity.y;
 	
 				//angular
+				this.angularVelocity += this.angularAcceleration;
+				this.rotation += this.angularVelocity;
 				if (this.applyGravity) {
-					this.angularVelocity += this.angularAcceleration;
-					this.rotation += this.angularVelocity;
-
 					let a = this.velocity.getAngle();
 					let p2 = Math.PI / 2;
 					let possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3]; 
@@ -1034,8 +1036,14 @@ class InactiveScene {
 					}
 				}
 				let col;
-				if (colliding) col = new Collision(colliding, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection);
-				else col = new Collision(false);
+				if (colliding) {
+					if (collisionAxis) col = new Collision(colliding, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection);
+					else {
+						col = new Collision(false);
+						a.rotation += 0.00001;
+						b.rotation += 0.00001;
+					}
+				} else col = new Collision(false);
 				return col;
 			}
 			static resolve(col) {
@@ -1080,7 +1088,7 @@ class InactiveScene {
 					else b.colliding.top.push(a);
 					b.scriptCollideTop(a);
 				}
-				if (b.applyGravity) {
+				if (b.applyGravity && !a.cannotMove.includes(b)) {
 					let aDir = col.Adir.times(col.penetration / 2);
 					let bDir = col.Bdir.times(col.penetration / 2);
 					a.x -= aDir.x;
@@ -1089,13 +1097,14 @@ class InactiveScene {
 					b.y -= bDir.y;
 					a.velocity.add(col.Bdir.times(a.velocity.mag / 40));
 					b.velocity.add(col.Adir.times(b.velocity.mag / 40));
+					b.cannotMove.push(a);
 				} else {
 					let dir = col.Adir.times(col.penetration);
 					a.x -= dir.x;
 					a.y -= dir.y;
 					a.velocity.add(col.Bdir.times(a.velocity.mag / 40));
 				}
-				if (b.applyGravity) {
+				if (b.applyGravity && !a.cannotMove.includes(b)) {
 					a.align(clamp(col.Bdir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
 					b.align(clamp(col.Adir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
 				} else {
