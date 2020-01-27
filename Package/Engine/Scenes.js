@@ -867,6 +867,7 @@ class InactiveScene {
 				this.angularVelocity += this.angularAcceleration;
 				this.rotation += this.angularVelocity;
 				if (this.applyGravity) {
+					let reversed = 1;
 					let a = this.velocity.getAngle();
 					let p2 = Math.PI / 2;
 					let possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3]; 
@@ -874,12 +875,19 @@ class InactiveScene {
 					let dif = Math.abs(possibleDirections[0] - this.rotation);
 					for (let dir of possibleDirections) {
 						let d = Math.abs(dir - this.rotation);
+						let d2 = Math.abs(dir - this.rotation - Math.PI * 2);
 						if (d < dif) {
 							dif = d;
 							best = dir;
+							reversed = 1;
+						}
+						if (d2 < dif) {
+							dif = d2;
+							best = dir;
+							reversed = -1;
 						}
 					}
-					this.align(best, 0.01);
+					this.align(best, reversed * 0.01);
 				}
 				this.rotation %= Math.PI * 2;
 	
