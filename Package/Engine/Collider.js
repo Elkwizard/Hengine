@@ -197,18 +197,47 @@ class LineCollider {
 	}
 }
 class RectCollider {
-	constructor(x, y, width, height) {
+	constructor(x, y, width, height, rotation = 0) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		this.rotation = rotation;
 	}
-	collideBox(hitbox, exp){
+	collideBox(hitbox){
         if(hitbox.width !== void 0){
 			return this.x < hitbox.x + hitbox.width && hitbox.x < this.x+this.width && this.y < hitbox.y + hitbox.height && hitbox.y < this.y + this.height
         }
-        else{
-            return hitbox.collideBox(this)
+        else {
+			if (this.rotation) {
+				let hypotA = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
+				let r1 = new Rect(this.middle.x - hypotA, this.middle.y - hypotA, hypotA * 2, hypotA * 2);
+				let r2 = new Rect(hitbox.middle.x - hitbox.radius, hitbox.middle.y - hitbox.radius, hitbox.radius * 2, hitbox.radius * 2);
+				if (!(r1.x < r2.x + r2.width && r2.x < r1.x + r1.width && r1.y < r2.y + r2.height && r2.y < r1.y + r1.height)) return false;
+				let aEdges = PhysicsObject.getEdges(this);
+				let edges = aEdges;
+				let aCorners = PhysicsObject.getCorners(this);
+				let colliding = true;
+				for (let i = 0; i < edges.length; i++) {
+					let edge = edges[i];
+					let aRange = new Range();
+					let bRange = new Range();
+					for (let point of aCorners) {
+						let projection = Physics.projectPointOntoLine(point, edge);
+						aRange.include(projection);
+					}
+					let projection = Physics.projectPointOntoLine(hitbox.middle, edge);
+					bRange.min = projection - hitbox.radius;
+					bRange.max = projection + hitbox.radius;
+					if (!Range.intersect(aRange, bRange)) {
+						colliding = false;
+						break;
+					}
+				}
+				return colliding;
+			} else {
+				return hitbox.collideBox(this);
+			}
         }
 	}
 	get middle(){

@@ -677,32 +677,414 @@ class InactiveScene {
 		}
         return [collideAry, notCollideAry]
 	}
-	giveElementSubjectiveMovement(name){
-		this.get(name).custom.jumps = 0;
-		this.get(name).custom.jumping = false;
-		this.changeElementResponse(name, "right", function(){
-			this.accel.x = 0.1;
-		})
-		this.changeElementResponse(name, "left", function(){
-			this.accel.x = -0.1;
-		})
-		this.changeElementResponse(name, "up", function(){
-			if(!this.custom.jumping && this.custom.jumps < 1){
-				this.speed.y = -Math.sign(this.accel.y) * (10*(this.accel.y*5))
-				this.custom.jumping = true;
-				this.custom.jumps++;
-			}			
-		})
-		this.changeElementResponse(name, "down", function(){
-			this.speed.y += this.accel.y;
-		})
-		this.changeElementUpdate(name, function(){
-			if(!K.P(this.controls.up)) this.custom.jumping = false
-            if(!K.P(this.controls.left) && !K.P(this.controls.right)) this.accel.x = 0
-		})
-		this.changeElementCollideResponse(name, "bottom", function(){
-			this.custom.jumps = 0
-		})
+	allowRotatedRectangles() {
+		const LOSS = .99;
+		window.Collision = class {
+			constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0) {
+				this.colliding = collides;
+				this.Adir = Adir;
+				this.Bdir = Bdir;
+				this.a = a;
+				this.b = b;
+				this.penetration = penetration;
+			}
+		}
+		window.Range = class {
+			constructor(min = Infinity, max = -Infinity) {
+				this.min = min;
+				this.max = max;
+			}
+			include(a) {
+				if (a < this.min) this.min = a;
+				if (a > this.max) this.max = a;
+			}
+			static intersect(a, b) {
+				return a.min < b.max && b.min < a.max;
+			}
+		}
+		PhysicsObject = class extends SceneObject {
+			constructor(name, x, y, width, height, gravity, controls, tag, home) {
+				super(name, x, y, width, height, controls, tag, home);
+				this.velocity = new Vector2(0, 0);
+				this.acceleration = new Vector2(0, 0);
+				this._rotation = 0.0001;
+				this.angularVelocity = 0;
+				this.angularAcceleration = 0;
+				this.applyGravity = gravity;
+				this.slows = gravity;
+				this.colliding = {
+					top: null,
+					bottom: null,
+					left: null,
+					right: null,
+					general: null
+				};
+				this.response.collide = {
+					general: function(){},
+					top: function(){},
+					bottom: function(){},
+					left: function(){},
+					right: function(){}
+				}
+				this.canCollide = true;
+				for (let x in this.response.collide) {
+					let cap = x[0].toUpperCase() + x.slice(1);
+					this["scriptCollide" + cap] = function(e){
+						for (let m in this.scripts) {
+							let script = this.scripts[m];
+							script["scriptCollide" + cap](e);
+						}
+					}
+				}
+				this.direction = new Vector2(0, 0);
+				this.lastX = this.x;
+				this.lastY = this.y;
+				this.hasPhysics = true;
+				this.collideBasedOnRule = e => true;
+				this.optimize = (a, b) => true;
+			}
+			set rotation(a) {
+				this.collider.rotation = a;
+				if (a === 0) this.collider.rotation = 0.000001;
+			}
+			get rotation() {
+				return this.collider.rotation;
+			}
+			set middle(a) {
+				this.x = a.x - this.width / 2;
+				this.y = a.y - this.height / 2;
+			}
+			get middle() {
+				return {
+					x: this.x + this.width / 2,
+					y: this.y + this.height / 2
+				};
+			}
+			set speed(a) {
+				this.velocity = a;
+			}
+			get speed() {
+				return this.velocity;
+			}
+			set accel(a) {
+				this.acceleration = a;
+			}
+			get accel() {
+				return this.acceleration;
+			}
+			set applyGravity(a) {
+				this._applyGravity = a;
+				this.slows = a;
+			}
+			get applyGravity() {
+				return this._applyGravity;
+			}
+			stop() {
+				this.velocity = new Vector2(0, 0);
+				this.acceleration = new Vector2(0, 0);
+				this.angularVelocity = 0;
+				this.angularAcceleration = 0;
+			}
+			allowGravity() {
+				this.applyGravity = true;
+			}
+			removeGravity() {
+				this.applyGravity = false;
+			}
+			align(angle, f) {
+				let a1 = this.rotation;
+				let a2 = this.rotation + Math.PI * 2;
+				let d1 = Math.abs(angle - a1);
+				let d2 = Math.abs(angle - a2);
+				let actA = a1;
+				if (d2 < d1) actA = a2;
+				let dif = angle - actA;
+				if (d2 < d1) dif *= -1;
+				this.angularAcceleration = 0.01 * f * Math.sign(dif);
+			}
+			clearCollisions() {
+				for (let [key, value] of this.colliding) this.colliding[key] = null;
+			}
+			engineDraw() {
+				let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
+				let r = new Rect(this.middle.x - hypot, this.middle.y - hypot, hypot * 2, hypot * 2);
+				if (!this.hidden && (!this.cullGraphics || Physics.overlapRectRect(r, s.adjustedDisplay))) {
+					c.translate(this.middle.x, this.middle.y);
+					c.rotate(this.rotation);
+					c.translate(-this.middle.x, -this.middle.y);
+					this.draw();
+					this.scriptDraw();
+					c.translate(this.middle.x, this.middle.y);
+					c.rotate(-this.rotation);
+					c.translate(-this.middle.x, -this.middle.y);
+					if (1) {
+						let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
+						let r = new Rect(this.middle.x - hypot, this.middle.y - hypot, hypot * 2, hypot * 2);
+						c.stroke(cl.RED, .5).rect(r);
+					}
+				}
+			}
+			engineUpdate(others) {
+				this.physicsUpdate(others);
+				this.scriptUpdate();
+			}
+			slowDown() {
+				if (this.slows) {
+					this.acceleration.mul(LOSS);
+					this.velocity.mul(LOSS);
+					this.angularAcceleration *= LOSS ** 4;
+					this.angularVelocity *= LOSS;
+					if (this.rotation % (Math.PI / 2) < 0.05) {
+						this.angularVelocity *= 0.999; 
+						this.angularAcceleration *= 0.999;
+					} 
+					if (Math.abs(this.velocity.x) < 0.01) this.velocity.x = 0;
+					if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
+					if (Math.abs(this.angularVelocity) < 0.0001) this.angularVelocity = 0;
+				}
+			}
+			physicsUpdate(others) {
+				if (this.applyGravity) {
+					this.velocity.add(this.home.gravity);
+				}
+	
+				this.slowDown();
+				//linear
+				this.velocity.add(this.acceleration);
+				this.x += this.velocity.x;
+				this.y += this.velocity.y;
+	
+				//angular
+				if (this.applyGravity) {
+					this.angularVelocity += this.angularAcceleration;
+					this.rotation += this.angularVelocity;
+					this.align(this.velocity.getAngle(), 0.01);
+				}
+				this.rotation %= Math.PI * 2;
+	
+				let collisions = [];
+				if (this.applyGravity && this.canCollide) {
+					for (let other of others) {
+						if (other !== this) {
+							if (other.hasPhysics && other.tag !== "Engine-Particle") {
+								if(this.optimize(this, other)){
+									if(this.collideBasedOnRule(other) && other.collideBasedOnRule(this)){
+										let col = PhysicsObject.collide(this, other);
+										if (col.colliding) collisions.push(col);
+									}
+								}
+							}
+						}
+					}
+					for (let collision of collisions) {
+						if (collision.colliding) PhysicsObject.resolve(collision);
+					}
+				}
+				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
+				this.lastX = this.x;
+				this.lastY = this.y;
+			} 
+			moveTowards(point, ferocity){
+				if(ferocity === undefined) ferocity = 1;
+				let dirX = Math.sign(point.x - this.middle.x);
+				let dirY = Math.sign(point.y - this.middle.y);
+				let dir = new Vector2(dirX, dirY);
+				dir.mul(ferocity * 0.1);
+				this.speed.add(dir);
+				this.logMod(function(){
+					this.moveTowards(point, ferocity);
+				});
+			}
+			moveAwayFrom(point, ferocity){
+				if(ferocity === undefined) ferocity = 1;
+				let dirX = -Math.sign(point.x - this.middle.x);
+				let dirY = -Math.sign(point.y - this.middle.y);
+				let dir = new Vector2(dirX, dirY);
+				dir.mul(ferocity * 0.1);
+				this.speed.add(dir);
+				this.logMod(function(){
+					this.moveAwayFrom(point, ferocity);
+				});
+			}
+			static rotatePointAround(o, p, r) {
+				let dif = new Vector2(p.x - o.x, p.y - o.y);
+				let a = dif.getAngle();
+				a += r;
+				let nDif = Vector2.fromAngle(a);
+				nDif.mag = dif.mag;
+				return new Vector2(o.x + nDif.x, o.y + nDif.y);
+			}
+			static getCorners(r) {
+				let corners = [
+					new Vector2(r.x, r.y), 
+					new Vector2(r.x + r.width, r.y), 
+					new Vector2(r.x + r.width, r.y + r.height), 
+					new Vector2(r.x, r.y + r.height)
+				];
+				for (let i = 0; i < corners.length; i++) corners[i] = PhysicsObject.rotatePointAround(r.middle, corners[i], r.rotation);
+				return corners;
+			}
+			static getEdges(r) {
+				let corners = PhysicsObject.getCorners(r);
+				let edges = [];
+				for (let i = 0; i < corners.length; i++) {
+					if (i == 0) edges.push(corners[corners.length - 1].minus(corners[0]).normalize());
+					else edges.push(corners[i - 1].minus(corners[i]).normalize());
+				}
+				return edges;
+			}
+			static farthestInDirection(r, dir) {
+				let corners = PhysicsObject.getCorners(r);
+				let farthest = corners[0];
+				let farthestDist = -Infinity;
+				for (let corner of corners) {
+					let dist = corner.x * dir.x + corner.y * dir.y;
+					if (dist > farthestDist) {
+						farthest = corner;
+						farthestDist = dist;
+					}
+				}
+				return farthest;
+			}
+			static collide(a, b) {
+				if (!b.canCollide) return new Collision(false);
+				let hypotA = Math.sqrt((a.width / 2) ** 2 + (a.height / 2) ** 2);
+				let hypotB = Math.sqrt((b.width / 2) ** 2 + (b.height / 2) ** 2);
+				let r1 = new Rect(a.middle.x - hypotA, a.middle.y - hypotA, hypotA * 2, hypotA * 2);
+				let r2 = new Rect(b.middle.x - hypotB, b.middle.y - hypotB, hypotB * 2, hypotB * 2);
+				if (!(r1.x < r2.x + r2.width && r2.x < r1.x + r1.width && r1.y < r2.y + r2.height && r2.y < r1.y + r1.height)) return new Collision(false);
+				let aEdges = PhysicsObject.getEdges(a);
+				let bEdges = PhysicsObject.getEdges(b);
+				let edges = [
+					...aEdges,
+					...bEdges
+				];
+				let aCorners = PhysicsObject.getCorners(a);
+				let bCorners = PhysicsObject.getCorners(b);
+				let allCorners = [...aCorners, ...bCorners];
+				let colliding = true;
+				let collisionAxis = null;
+				let leastIntersection = Infinity;
+				for (let i = 0; i < edges.length; i++) {
+					let edge = edges[i];
+					let aRange = new Range();
+					let bRange = new Range();
+					for (let point of aCorners) {
+						let projection = Physics.projectPointOntoLine(point, edge);
+						aRange.include(projection);
+					}
+					for (let point of bCorners) {
+						let projection = Physics.projectPointOntoLine(point, edge);
+						bRange.include(projection);
+					}
+					if (!Range.intersect(aRange, bRange)) {
+						colliding = false;
+						break;
+					}
+				}
+				if (colliding) {
+					for (let i = 0; i < bEdges.length; i++) {
+						let edge = bEdges[i - 1];
+						if (!i) edge = bEdges[bEdges.length - 1];
+						let normal = Vector2.fromAngle(edge.getAngle() + Math.PI / 2);
+						let penetratingCorner = PhysicsObject.farthestInDirection(a, normal);
+						let edgeStart = bCorners[i];
+						let edgeEnd = bCorners[i + 1];
+						if (!edgeEnd) edgeEnd = bCorners[0];
+						let closestPointOnEdge = Physics.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
+						let overlap = a.home.home.f.getDistance(penetratingCorner, closestPointOnEdge);
+						let axis = closestPointOnEdge.minus(penetratingCorner).normalize();
+						if (overlap < leastIntersection) {
+							leastIntersection = overlap;
+							collisionAxis = axis;
+						}
+					}
+					for (let i = 0; i < aEdges.length; i++) {
+						let edge = i? aEdges[i - 1]:aEdges[aEdges.length - 1];
+						let normal = Vector2.fromAngle(edge.getAngle() + Math.PI / 2);
+						let penetratingCorner = PhysicsObject.farthestInDirection(b, normal);
+						let edgeStart = aCorners[i];
+						let edgeEnd = (i !== aEdges.length - 1)? aCorners[i + 1]:aCorners[0];
+						let closestPointOnEdge = Physics.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
+						let overlap = a.home.home.f.getDistance(penetratingCorner, closestPointOnEdge);
+						[closestPointOnEdge, penetratingCorner] = [penetratingCorner, closestPointOnEdge];
+						let axis = closestPointOnEdge.minus(penetratingCorner).normalize();
+						if (overlap < leastIntersection) {
+							leastIntersection = overlap;
+							collisionAxis = axis;
+						}
+					}
+				}
+				let col;
+				if (colliding) col = new Collision(colliding, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection);
+				else col = new Collision(false);
+				return col;
+			}
+			static resolve(col) {
+				let d = col.Bdir;
+				let a = col.a;
+				let b = col.b;
+				if (!a.colliding.general) a.colliding.general = [b];
+				else a.colliding.general.push(b);
+				let top = d.y > 0.2;
+				let bottom = d.y < -0.2;
+				let right = d.x < -0.2;
+				let left = d.x > 0.2;
+				if (left) {
+					if (!a.colliding.left) a.colliding.left = [b];
+					else a.colliding.left.push(b);
+					a.scriptCollideLeft(b);
+					if (!b.colliding.right) b.colliding.right = [a];
+					else b.colliding.right.push(a);
+					b.scriptCollideRight(a);
+				}
+				if (right) {
+					if (!a.colliding.right) a.colliding.right = [b];
+					else a.colliding.right.push(b);
+					a.scriptCollideRight(b);
+					if (!b.colliding.left) b.colliding.left = [a];
+					else b.colliding.left.push(a);
+					b.scriptCollideLeft(a);
+				}
+				if (top) {
+					if (!a.colliding.top) a.colliding.top = [b];
+					else a.colliding.top.push(b);
+					a.scriptCollideTop(b);
+					if (!b.colliding.bottom) b.colliding.top = [a];
+					else b.colliding.bottom.push(a);
+					b.scriptCollideBottom(a);
+				}
+				if (bottom) {
+					if (!a.colliding.bottom) a.colliding.bottom = [b];
+					else a.colliding.bottom.push(b);
+					a.scriptCollideBottom(b);
+					if (!b.colliding.top) b.colliding.top = [a];
+					else b.colliding.top.push(a);
+					b.scriptCollideTop(a);
+				}
+				if (b.applyGravity) {
+					let aDir = col.Adir.times(col.penetration / 2);
+					let bDir = col.Bdir.times(col.penetration / 2);
+					a.x -= aDir.x;
+					a.y -= aDir.y;
+					b.x -= bDir.x;
+					b.y -= bDir.y;
+					a.velocity.add(col.Bdir.times(a.velocity.mag / 40));
+					b.velocity.add(col.Adir.times(b.velocity.mag / 40));
+				} else {
+					let dir = col.Adir.times(col.penetration);
+					a.x -= dir.x;
+					a.y -= dir.y;
+					a.velocity.add(col.Bdir.times(a.velocity.mag / 40));
+				}
+				if (b.applyGravity) {
+					a.align(clamp(col.Bdir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
+					b.align(clamp(col.Adir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
+				} else {
+					a.align((col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI), 0.04);
+				}
+			}
+		}
 	}
 }
 class Scene extends InactiveScene {
@@ -783,8 +1165,7 @@ class Scene extends InactiveScene {
 			CAED: this.changeAllElementDraw.bind(this),
 			CAEU: this.changeAllElementUpdate.bind(this),
 			APFD: this.adjustPointForDisplay.bind(this),
-			CP: this.collidePoint.bind(this),
-			GESM: this.giveElementSubjectiveMovement.bind(this)
+			CP: this.collidePoint.bind(this)
 		}
 	}
 	drawWithTransformations(artist){

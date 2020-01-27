@@ -34,7 +34,7 @@ class Controls{
 function clamp(n, a, b) {
 	return Math.max(a, Math.min(b, n));
 }
-class PhysicsObject extends SceneObject{
+class PhysicsObject extends SceneObject {
 	constructor(name, x, y, width, height, gravity, controls, tag, home){
 		super(name, x, y, width, height, controls, tag, home);
 		this.applyGravity = gravity;
