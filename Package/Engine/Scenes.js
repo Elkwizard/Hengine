@@ -791,6 +791,12 @@ class InactiveScene {
 			removeGravity() {
 				this.applyGravity = false;
 			}
+			allowCollisions() {
+				this.canCollide = true;
+			}
+			removeCollisions() {
+				this.canCollide = false;
+			}
 			align(angle, f) {
 				let a1 = this.rotation;
 				let a2 = this.rotation + Math.PI * 2;
@@ -817,7 +823,7 @@ class InactiveScene {
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(-this.rotation);
 					c.translate(-this.middle.x, -this.middle.y);
-					if (1) {
+					if (false) {
 						let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
 						let r = new Rect(this.middle.x - hypot, this.middle.y - hypot, hypot * 2, hypot * 2);
 						c.stroke(cl.RED, .5).rect(r);
@@ -858,7 +864,20 @@ class InactiveScene {
 				if (this.applyGravity) {
 					this.angularVelocity += this.angularAcceleration;
 					this.rotation += this.angularVelocity;
-					this.align(this.velocity.getAngle(), 0.01);
+
+					let a = this.velocity.getAngle();
+					let p2 = Math.PI / 2;
+					let possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3]; 
+					let best = possibleDirections[0];
+					let dif = Math.abs(possibleDirections[0] - this.rotation);
+					for (let dir of possibleDirections) {
+						let d = Math.abs(dir - this.rotation);
+						if (d < dif) {
+							dif = d;
+							best = dir;
+						}
+					}
+					this.align(best, 0.01);
 				}
 				this.rotation %= Math.PI * 2;
 	
@@ -867,8 +886,8 @@ class InactiveScene {
 					for (let other of others) {
 						if (other !== this) {
 							if (other.hasPhysics && other.tag !== "Engine-Particle") {
-								if(this.optimize(this, other)){
-									if(this.collideBasedOnRule(other) && other.collideBasedOnRule(this)){
+								if(this.optimize(this, other)) {
+									if(this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
 										let col = PhysicsObject.collide(this, other);
 										if (col.colliding) collisions.push(col);
 									}
@@ -961,7 +980,6 @@ class InactiveScene {
 				];
 				let aCorners = PhysicsObject.getCorners(a);
 				let bCorners = PhysicsObject.getCorners(b);
-				let allCorners = [...aCorners, ...bCorners];
 				let colliding = true;
 				let collisionAxis = null;
 				let leastIntersection = Infinity;
