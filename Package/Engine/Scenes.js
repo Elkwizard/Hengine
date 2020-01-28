@@ -742,6 +742,7 @@ class InactiveScene {
 				this.hasPhysics = true;
 				this.collideBasedOnRule = e => true;
 				this.optimize = (a, b) => true;
+				this.canMoveThisFrame = true;
 			}
 			get mass() {
 				return this.width * this.height;
@@ -834,7 +835,7 @@ class InactiveScene {
 			}
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
-				
+				this.canMoveThisFrame = true;
 			}
 			engineDraw() {
 				let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
@@ -1105,7 +1106,7 @@ class InactiveScene {
 					else b.colliding.top.push(a);
 					b.scriptCollideTop(a);
 				}
-				if (b.applyGravity) {
+				if (b.applyGravity && b.canMoveThisFrame) {
 					let aDir = col.Adir.times(col.penetration / 2);
 					let bDir = col.Bdir.times(col.penetration / 2);
 					a.x -= aDir.x;
@@ -1119,8 +1120,9 @@ class InactiveScene {
 					a.x -= dir.x;
 					a.y -= dir.y;
 					col.a.velocity.sub(col.Adir.times(.1));
+					a.canMoveThisFrame = false;
 				}
-				if (b.applyGravity) {
+				if (b.applyGravity && b.canMoveThisFrame) {
 					a.align(clamp(col.Bdir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
 					b.align(clamp(col.Adir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
 				} else {
