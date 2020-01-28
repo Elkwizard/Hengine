@@ -847,7 +847,7 @@ class InactiveScene {
 					this.scriptDraw();
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(-this.rotation);
-					c.stroke(cl.BLUE, 3).line(0, 0, this.velocity.x, this.velocity.y);
+					//c.stroke(cl.BLUE, 3).line(0, 0, this.velocity.x, this.velocity.y);
 					c.translate(-this.middle.x, -this.middle.y);
 					if (false) {
 						let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
