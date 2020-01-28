@@ -847,6 +847,7 @@ class InactiveScene {
 					this.scriptDraw();
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(-this.rotation);
+					c.stroke(cl.BLUE, 3).line(0, 0, this.velocity.x, this.velocity.y);
 					c.translate(-this.middle.x, -this.middle.y);
 					if (false) {
 						let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
@@ -883,6 +884,8 @@ class InactiveScene {
 				this.slowDown();
 				//linear
 				this.velocity.add(this.acceleration);
+				let m = Math.min(this.width, this.height) / 3;
+				if (this.velocity.mag > m) this.velocity.mag = m;
 				this.x += this.velocity.x;
 				this.y += this.velocity.y;
 	
@@ -916,8 +919,6 @@ class InactiveScene {
 				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
 				this.lastX = this.x;
 				this.lastY = this.y;
-				let m = Math.max(this.width, this.height);
-				if (this.velocity.mag > m) this.velocity.mag = m;
 			} 
 			moveTowards(point, ferocity){
 				if(ferocity === undefined) ferocity = 1;
