@@ -1240,8 +1240,17 @@ class Scene extends InactiveScene {
 			q.push(x);
 		}
 		for (let rect of this.contains_array) rect.pushToRemoveQueue = p;
-		for(let rect of this.contains_array){
+		let sortedArray = this.contains_array.filter(e => e instanceof PhysicsObject).sort(function(a, b) {
+			let aWall = !a.applyGravity || !a.canMoveThisFrame;
+			let bWall = !b.applyGravity || !b.canMoveThisFrame;
+			if (aWall == bWall) return 0;
+			else if (aWall && !bWall) return 1;
+			else return -1;
+		});
+		for(let rect of this.contains_array) {
+			let array = (rect instanceof PhysicsObject)? sortedArray:this.contains_array;
 			rect.engineUpdate(this.contains_array);
+			
 		}
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
