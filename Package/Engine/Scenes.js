@@ -1067,6 +1067,8 @@ class InactiveScene {
 				let b = col.b;
 				if (!a.colliding.general) a.colliding.general = [b];
 				else a.colliding.general.push(b);
+				if (!b.colliding.general) b.colliding.general = [a];
+				else b.colliding.general.push(a);
 				let top = d.y > 0.2;
 				let bottom = d.y < -0.2;
 				let right = d.x < -0.2;
