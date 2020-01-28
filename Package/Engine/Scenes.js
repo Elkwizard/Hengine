@@ -719,7 +719,6 @@ class InactiveScene {
 					right: null,
 					general: null
 				};
-				this.cannotMove = [];
 				this.response.collide = {
 					general: function(){},
 					top: function(){},
@@ -835,7 +834,7 @@ class InactiveScene {
 			}
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
-				this.cannotMove = [];
+				
 			}
 			engineDraw() {
 				let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
@@ -1105,7 +1104,7 @@ class InactiveScene {
 					else b.colliding.top.push(a);
 					b.scriptCollideTop(a);
 				}
-				if (b.applyGravity && !a.cannotMove.includes(b)) {
+				if (b.applyGravity) {
 					let aDir = col.Adir.times(col.penetration / 2);
 					let bDir = col.Bdir.times(col.penetration / 2);
 					a.x -= aDir.x;
@@ -1114,14 +1113,13 @@ class InactiveScene {
 					b.y -= bDir.y;
 					a.velocity.add(col.Bdir.times((a.velocity.mag / 40)));
 					b.velocity.add(col.Adir.times((b.velocity.mag / 40)));
-					b.cannotMove.push(a);
 				} else {
 					let dir = col.Adir.times(col.penetration);
 					a.x -= dir.x;
 					a.y -= dir.y;
 					col.a.velocity.sub(col.Adir.times(.1));
 				}
-				if (b.applyGravity && !a.cannotMove.includes(b)) {
+				if (b.applyGravity) {
 					a.align(clamp(col.Bdir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
 					b.align(clamp(col.Adir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
 				} else {
