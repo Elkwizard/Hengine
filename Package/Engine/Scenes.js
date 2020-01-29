@@ -808,7 +808,7 @@ class InactiveScene {
 				let possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3]; 
 				let best = possibleDirections[0];
 				let dif = Math.abs(possibleDirections[0] - this.rotation);
-				if (false) for (let dir of possibleDirections) {
+				for (let dir of possibleDirections) {
 					let d = Math.abs(dir - this.rotation);
 					let d2 = Math.abs(dir - this.rotation - Math.PI * 2);
 					if (d < dif) {
