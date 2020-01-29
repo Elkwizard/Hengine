@@ -215,7 +215,10 @@ class RectCollider {
 				let r2 = new Rect(hitbox.middle.x - hitbox.radius, hitbox.middle.y - hitbox.radius, hitbox.radius * 2, hitbox.radius * 2);
 				if (!(r1.x < r2.x + r2.width && r2.x < r1.x + r1.width && r1.y < r2.y + r2.height && r2.y < r1.y + r1.height)) return false;
 				let aEdges = PhysicsObject.getEdges(this);
-				let edges = aEdges;
+				let edges = [aEdges[0], aEdges[1]];
+				let normal = new Vector2(hitbox.x - this.x, hitbox.y - this.y);
+				normal.normalize();
+				edges.push(normal);
 				let aCorners = PhysicsObject.getCorners(this);
 				let colliding = true;
 				for (let i = 0; i < edges.length; i++) {
@@ -276,10 +279,11 @@ class RectCollider {
 	}
 }
 class CircleCollider{
-    constructor(x, y, radius){
+    constructor(x, y, radius, rotation = 0){
         this.x = x;
         this.y = y;
-        this.radius = radius;
+		this.radius = radius;
+		this.rotation = rotation;
     }
 	get middle(){
 		return {x:this.x,y:this.y};

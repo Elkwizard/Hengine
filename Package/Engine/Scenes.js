@@ -848,7 +848,6 @@ class InactiveScene {
 					this.scriptDraw();
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(-this.rotation);
-					//c.stroke(cl.BLUE, 3).line(0, 0, this.velocity.x, this.velocity.y);
 					c.translate(-this.middle.x, -this.middle.y);
 					if (false) {
 						let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
@@ -894,7 +893,6 @@ class InactiveScene {
 				this.angularVelocity += this.angularAcceleration;
 				this.rotation += this.angularVelocity;
 				if (this.applyGravity) {
-					
 					this.align(this.velocity.getAngle(), 0.01);
 				}
 				this.rotation %= Math.PI * 2;
@@ -906,7 +904,26 @@ class InactiveScene {
 							if (other.hasPhysics && other.tag !== "Engine-Particle") {
 								if(this.optimize(this, other)) {
 									if(this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
-										let col = PhysicsObject.collide(this, other);
+										let col;
+										let thisCircle = this instanceof CirclePhysicsObject;
+										let otherCircle = other instanceof CirclePhysicsObject;
+										if (thisCircle) {
+											if (otherCircle) {
+												col = PhysicsObject.collideCircleCircle(this, other);
+											} else {
+												col = PhysicsObject.collideCircleRect(this, other);
+											}
+										} else {
+											if (otherCircle) {
+												col = PhysicsObject.collideCircleRect(other, this);
+												if (col.colliding) {
+													[col.a, col.b] = [col.b, col.a];
+													[col.Adir, col.Bdir] = [col.Bdir, col.Adir];
+												}
+											} else {
+												col = PhysicsObject.collideRectRect(this, other);
+											}
+										}
 										if (col.colliding) collisions.push(col);
 									}
 								}
@@ -983,7 +1000,48 @@ class InactiveScene {
 				}
 				return farthest;
 			}
-			static collide(a, b) {
+			static collideCircleCircle(a, b) {
+				let colliding = (b.x - a.x) ** 2 + (b.y - a.y) ** 2 < (a.radius + b.radius) ** 2;
+				let col;
+				if (colliding) {
+					let collisionAxis = (new Vector2(b.x - a.x, b.y - a.y)).normalize();
+					let penetration = a.radius + b.radius - g.f.getDistance(a, b);
+					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration);
+				} else col = new Collision(false);
+				return col;
+			}
+			static collideCircleRect(a, b) {
+				let edges = PhysicsObject.getEdges(b);
+				let corners = PhysicsObject.getCorners(b);
+				let colliding = b.collider.collideBox(a.collider);
+
+				//getting resolution data
+				let col;
+				if (colliding) {
+					let bestDist = Infinity;
+					let bestPoint = null;
+					for (let i = 0; i < corners.length; i++) {
+						let l = new Line(corners[i], corners[(i + 1) % (corners.length - 1)]);
+						let p = Physics.closestPointOnLineObject(a.middle, l);
+						let d = g.f.getDistance(p, a);
+						if (d < bestDist) {
+							bestDist = d;
+							bestPoint = p;
+						}
+					}
+					if (!bestPoint) return new Collision(false);
+					let collisionAxis = bestPoint.minus(a.middle).normalize();
+					let penetration = a.radius;
+					if (b.collider.collidePoint(a)) {
+						penetration += bestDist;
+						collisionAxis.mul(-1);
+					}
+					else penetration -= bestDist;
+					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration / 2);
+				} else col = new Collision(false);
+				return col;
+			}
+			static collideRectRect(a, b) {
 				if (!b.canCollide) return new Collision(false);
 				let hypotA = Math.sqrt((a.width / 2) ** 2 + (a.height / 2) ** 2);
 				let hypotB = Math.sqrt((b.width / 2) ** 2 + (b.height / 2) ** 2);
@@ -993,8 +1051,8 @@ class InactiveScene {
 				let aEdges = PhysicsObject.getEdges(a);
 				let bEdges = PhysicsObject.getEdges(b);
 				let edges = [
-					...aEdges,
-					...bEdges
+					aEdges[0], aEdges[1],
+					bEdges[0], bEdges[1]
 				];
 				let aCorners = PhysicsObject.getCorners(a);
 				let bCorners = PhysicsObject.getCorners(b);
@@ -1138,6 +1196,37 @@ class InactiveScene {
 				} else {
 					a.align((col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI), 0.04);
 				}
+			}
+		}
+		CirclePhysicsObject = class extends PhysicsObject {
+			constructor(name, x, y, radius, gravity, controls, tag, home) {
+				super(name, x, y, 0, 0, gravity, controls, tag, home);
+				this.collider = new CircleCollider(x, y, radius, this.rotation);
+			}
+			set middle(a) {
+				this.x = a.x;
+				this.y = a.y;
+			}
+			get middle() {
+				return P(this.x, this.y);
+			}
+			set radius(a) {
+				this.collider.radius = a;
+			}
+			get radius() {
+				return this.collider.radius;
+			}
+			set width(a) {
+				this.radius = a / 2;
+			}
+			get width() {
+				return this.radius * 2;
+			}
+			set height(a) {
+				this.radius = a / 2;
+			}
+			get height() {
+				return this.radius * 2;
 			}
 		}
 	}
