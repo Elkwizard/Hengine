@@ -1078,33 +1078,41 @@ class InactiveScene {
 					if (!a.colliding.left) a.colliding.left = [b];
 					else a.colliding.left.push(b);
 					a.scriptCollideLeft(b);
+					a.response.collide.left(b);
 					if (!b.colliding.right) b.colliding.right = [a];
 					else b.colliding.right.push(a);
 					b.scriptCollideRight(a);
+					b.response.collide.right(a);
 				}
 				if (right) {
 					if (!a.colliding.right) a.colliding.right = [b];
 					else a.colliding.right.push(b);
 					a.scriptCollideRight(b);
+					a.response.collide.right(b);
 					if (!b.colliding.left) b.colliding.left = [a];
 					else b.colliding.left.push(a);
 					b.scriptCollideLeft(a);
+					b.response.collide.left(a);
 				}
 				if (top) {
 					if (!a.colliding.top) a.colliding.top = [b];
 					else a.colliding.top.push(b);
 					a.scriptCollideTop(b);
+					a.response.collide.top(b);
 					if (!b.colliding.bottom) b.colliding.top = [a];
 					else b.colliding.bottom.push(a);
 					b.scriptCollideBottom(a);
+					b.response.collide.bottom(a);
 				}
 				if (bottom) {
 					if (!a.colliding.bottom) a.colliding.bottom = [b];
 					else a.colliding.bottom.push(b);
 					a.scriptCollideBottom(b);
+					a.response.collide.bottom(b);
 					if (!b.colliding.top) b.colliding.top = [a];
 					else b.colliding.top.push(a);
 					b.scriptCollideTop(a);
+					b.response.collide.top(a);
 				}
 				if (b.applyGravity && b.canMoveThisFrame) {
 					let aDir = col.Adir.times(col.penetration / 2);
