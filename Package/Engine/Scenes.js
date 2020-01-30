@@ -908,8 +908,8 @@ class InactiveScene {
 				this.velocity.add(this.acceleration);
 				let m = Math.min(this.width, this.height) / 3;
 				if (this.velocity.mag > m) this.velocity.mag = m;
-				this.x += this.velocity.x;
-				this.y += this.velocity.y;
+				this.x += this.velocity.x * 2;
+				this.y += this.velocity.y * 2;
 	
 				//angular
 				this.angularVelocity += this.angularAcceleration;
