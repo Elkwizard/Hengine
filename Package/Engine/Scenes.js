@@ -956,6 +956,7 @@ class InactiveScene {
 						if (collision.colliding) {
 							PhysicsObject.resolve(collision);
 							this.allCollidingWith["Rect - " + collision.b.name];
+							collision.b.allCollidingWith["Rect - " + this.name];
 						}
 					}
 				}
