@@ -946,18 +946,21 @@ class InactiveScene {
 												col = PhysicsObject.collideRectRect(this, other);
 											}
 										}
-										if (col.colliding) collisions.push(col);
+										if (col.colliding) {
+											this.allCollidingWith["Rect - " + col.b.name] = col.b;
+											col.b.allCollidingWith["Rect - " + this.name] = this;
+											if (col.b.canCollide) collisions.push(col);
+											if (col.b.name == "win from 1") {
+												console.log(col.b.allCollidingWith);
+											}
+										}
 									}
 								}
 							}
 						}
 					}
 					for (let collision of collisions) {
-						if (collision.colliding) {
-							PhysicsObject.resolve(collision);
-							this.allCollidingWith["Rect - " + collision.b.name] = collision.b;
-							collision.b.allCollidingWith["Rect - " + this.name] = this;
-						}
+						if (collision.colliding) PhysicsObject.resolve(collision);
 					}
 				}
 				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
@@ -1033,7 +1036,7 @@ class InactiveScene {
 					let collisionAxis = (new Vector2(b.x - a.x, b.y - a.y)).normalize();
 					let penetration = a.radius + b.radius - g.f.getDistance(a, b);
 					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration);
-				} else col = new Collision(false);
+				} else col = new Collision(false, a, b);
 				return col;
 			}
 			static collideCircleRect(a, b) {
@@ -1055,7 +1058,7 @@ class InactiveScene {
 							bestPoint = p;
 						}
 					}
-					if (!bestPoint) return new Collision(false);
+					if (!bestPoint) return new Collision(false, a, b);
 					let collisionAxis = bestPoint.minus(a.middle).normalize();
 					let penetration = a.radius;
 					if (b.collider.collidePoint(a)) {
@@ -1064,16 +1067,15 @@ class InactiveScene {
 					}
 					else penetration -= bestDist;
 					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration / 2);
-				} else col = new Collision(false);
+				} else col = new Collision(false, a, b);
 				return col;
 			}
 			static collideRectRect(a, b) {
-				if (!b.canCollide) return new Collision(false);
 				let hypotA = Math.sqrt((a.width / 2) ** 2 + (a.height / 2) ** 2);
 				let hypotB = Math.sqrt((b.width / 2) ** 2 + (b.height / 2) ** 2);
 				let r1 = new Rect(a.middle.x - hypotA, a.middle.y - hypotA, hypotA * 2, hypotA * 2);
 				let r2 = new Rect(b.middle.x - hypotB, b.middle.y - hypotB, hypotB * 2, hypotB * 2);
-				if (!(r1.x < r2.x + r2.width && r2.x < r1.x + r1.width && r1.y < r2.y + r2.height && r2.y < r1.y + r1.height)) return new Collision(false);
+				if (!(r1.x < r2.x + r2.width && r2.x < r1.x + r1.width && r1.y < r2.y + r2.height && r2.y < r1.y + r1.height)) return new Collision(false, a, b);
 				let aEdges = PhysicsObject.getEdges(a);
 				let bEdges = PhysicsObject.getEdges(b);
 				let edges = [
@@ -1139,11 +1141,11 @@ class InactiveScene {
 				if (colliding) {
 					if (collisionAxis) col = new Collision(colliding, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection);
 					else {
-						col = new Collision(false);
+						col = new Collision(false, a, b);
 						a.rotation += 0.00001;
 						b.rotation += 0.00001;
 					}
-				} else col = new Collision(false);
+				} else col = new Collision(false, a, b);
 				return col;
 			}
 			static resolve(col) {
