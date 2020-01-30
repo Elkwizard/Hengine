@@ -955,8 +955,8 @@ class InactiveScene {
 					for (let collision of collisions) {
 						if (collision.colliding) {
 							PhysicsObject.resolve(collision);
-							this.allCollidingWith["Rect - " + collision.b.name];
-							collision.b.allCollidingWith["Rect - " + this.name];
+							this.allCollidingWith["Rect - " + collision.b.name] = collision.b;
+							collision.b.allCollidingWith["Rect - " + this.name] = this;
 						}
 					}
 				}
