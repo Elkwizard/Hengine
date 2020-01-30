@@ -736,6 +736,27 @@ class InactiveScene {
 						}
 					}
 				}
+				this.allCollidingWith = {
+					includes: function(name){
+						for(let x in this){
+							if(typeof this[x] !== "function" && this[x] === name) return this[x];
+						}
+						return false;
+					},   
+					includesTag: function(tag){
+						for(let x in this){
+							if(typeof this[x] !== "function" && this[x].tag === tag) return this[x];
+						};
+						return false;
+					},
+					clear: function(){
+						for(let x in this){
+							if(typeof this[x] !== "function"){
+								delete this[x];
+							}
+						}
+					}
+				};
 				this.direction = new Vector2(0, 0);
 				this.lastX = this.x;
 				this.lastY = this.y;
@@ -836,6 +857,7 @@ class InactiveScene {
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
 				this.canMoveThisFrame = true;
+				this.allCollidingWith.clear();
 			}
 			engineDraw() {
 				let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
@@ -931,7 +953,10 @@ class InactiveScene {
 						}
 					}
 					for (let collision of collisions) {
-						if (collision.colliding) PhysicsObject.resolve(collision);
+						if (collision.colliding) {
+							PhysicsObject.resolve(collision);
+							this.allCollidingWith["Rect - " + collision.b.name];
+						}
 					}
 				}
 				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
