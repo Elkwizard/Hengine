@@ -109,9 +109,6 @@ class Vector2 extends Vector {
 			this.y = x;
 		}
 	}
-	getAngle(){
-		return Math.atan2(this.y, this.x);
-	}
 	static random(){
 		return new Vector2((Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
@@ -119,6 +116,19 @@ class Vector2 extends Vector {
 		let x = Math.cos(a);
 		let y = Math.sin(a);
 		return new Vector2(x, y);
+	}
+	getAngle(){
+		return Math.atan2(this.y, this.x);
+	}
+	set normal(a) {
+		let normNorm = new Vector2(-a.y, a.x);
+		normNorm.mag = this.mag;
+		this.x = normNorm.x;
+		this.y = normNorm.y;
+		return this;
+	}
+	get normal() {
+		return new Vector2(-this.y, this.x);
 	}
 }
 class Vector3 extends Vector {

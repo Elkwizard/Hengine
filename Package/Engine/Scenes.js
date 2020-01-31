@@ -678,7 +678,7 @@ class InactiveScene {
         return [collideAry, notCollideAry]
 	}
 	allowRotatedRectangles() {
-		const LOSS = .99;
+		const LOSS = .985;
 		window.Collision = class {
 			constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0) {
 				this.colliding = collides;
@@ -774,16 +774,6 @@ class InactiveScene {
 			}
 			get rotation() {
 				return this.collider.rotation;
-			}
-			set middle(a) {
-				this.x = a.x - this.width / 2;
-				this.y = a.y - this.height / 2;
-			}
-			get middle() {
-				return {
-					x: this.x + this.width / 2,
-					y: this.y + this.height / 2
-				};
 			}
 			set speed(a) {
 				this.velocity = a;
@@ -898,29 +888,9 @@ class InactiveScene {
 					if (Math.abs(this.angularVelocity) < 0.0001) this.angularVelocity = 0;
 				}
 			}
-			physicsUpdate(others) {
-				if (this.applyGravity) {
-					this.velocity.add(this.home.gravity);
-				}
-	
-				this.slowDown();
-				//linear
-				this.velocity.add(this.acceleration);
-				let m = Math.min(this.width, this.height) / 3;
-				if (this.velocity.mag > m) this.velocity.mag = m;
-				this.x += this.velocity.x * 2;
-				this.y += this.velocity.y * 2;
-	
-				//angular
-				this.angularVelocity += this.angularAcceleration;
-				this.rotation += this.angularVelocity;
-				if (this.applyGravity) {
-					this.align(this.velocity.getAngle(), 0.01);
-				}
-				this.rotation %= Math.PI * 2;
-	
+			detectCollisions(others) {
 				let collisions = [];
-				if (this.applyGravity && this.canCollide) {
+				if (this.applyGravity) {
 					for (let other of others) {
 						if (other !== this) {
 							if (other.hasPhysics && other.tag !== "Engine-Particle") {
@@ -940,25 +910,49 @@ class InactiveScene {
 												col = PhysicsObject.collideCircleRect(other, this);
 												if (col.colliding) {
 													[col.a, col.b] = [col.b, col.a];
-													[col.Adir, col.Bdir] = [col.Bdir, col.Adir];
+													col.Adir.mul(-1);
+													col.Bdir.mul(-1);
 												}
 											} else {
 												col = PhysicsObject.collideRectRect(this, other);
 											}
 										}
 										if (col.colliding) {
-											this.allCollidingWith["Rect - " + col.b.name] = col.b;
-											col.b.allCollidingWith["Rect - " + this.name] = this;
-											if (col.b.canCollide) collisions.push(col);
-											if (col.b.name == "win from 1") {
-												console.log(col.b.allCollidingWith);
-											}
+											this.allCollidingWith["Rect - " + other.name] = other;
+											other.allCollidingWith["Rect - " + this.name] = this;
+											if (this.canCollide && other.canCollide) collisions.push(col);
 										}
 									}
 								}
 							}
 						}
 					}
+				}
+				return collisions;
+			}
+			physicsUpdate(others) {
+				if (this.applyGravity) {
+					this.velocity.add(this.home.gravity);
+				}
+	
+				if (this.slows) this.slowDown();
+				//linear
+				this.velocity.add(this.acceleration);
+				let m = Math.min(this.width, this.height) / 3;
+				if (this.velocity.mag > m) this.velocity.mag = m;
+				this.x += this.velocity.x * 2;
+				this.y += this.velocity.y * 2;
+	
+				//angular
+				this.angularVelocity += this.angularAcceleration;
+				this.rotation += this.angularVelocity;
+				if (this.applyGravity) {
+					this.align(this.velocity.getAngle(), 0.01);
+				}
+				this.rotation %= Math.PI * 2;
+	
+				let collisions = this.detectCollisions(others);
+				if (this.applyGravity) {
 					for (let collision of collisions) {
 						if (collision.colliding) PhysicsObject.resolve(collision);
 					}
@@ -1052,7 +1046,7 @@ class InactiveScene {
 					for (let i = 0; i < corners.length; i++) {
 						let l = new Line(corners[i], corners[(i + 1) % (corners.length - 1)]);
 						let p = Physics.closestPointOnLineObject(a.middle, l);
-						let d = g.f.getDistance(p, a);
+						let d = (p.x - a.x) ** 2 + (p.y - a.y) ** 2;
 						if (d < bestDist) {
 							bestDist = d;
 							bestPoint = p;
@@ -1061,11 +1055,11 @@ class InactiveScene {
 					if (!bestPoint) return new Collision(false, a, b);
 					let collisionAxis = bestPoint.minus(a.middle).normalize();
 					let penetration = a.radius;
+					bestDist = Math.sqrt(bestDist);
 					if (b.collider.collidePoint(a)) {
 						penetration += bestDist;
 						collisionAxis.mul(-1);
-					}
-					else penetration -= bestDist;
+					} else penetration -= bestDist;
 					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration / 2);
 				} else col = new Collision(false, a, b);
 				return col;
