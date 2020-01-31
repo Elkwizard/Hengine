@@ -888,27 +888,7 @@ class InactiveScene {
 					if (Math.abs(this.angularVelocity) < 0.0001) this.angularVelocity = 0;
 				}
 			}
-			physicsUpdate(others) {
-				if (this.applyGravity) {
-					this.velocity.add(this.home.gravity);
-				}
-	
-				this.slowDown();
-				//linear
-				this.velocity.add(this.acceleration);
-				let m = Math.min(this.width, this.height) / 3;
-				if (this.velocity.mag > m) this.velocity.mag = m;
-				this.x += this.velocity.x * 2;
-				this.y += this.velocity.y * 2;
-	
-				//angular
-				this.angularVelocity += this.angularAcceleration;
-				this.rotation += this.angularVelocity;
-				if (this.applyGravity) {
-					this.align(this.velocity.getAngle(), 0.01);
-				}
-				this.rotation %= Math.PI * 2;
-	
+			detectCollisions(others) {
 				let collisions = [];
 				if (this.applyGravity) {
 					for (let other of others) {
@@ -947,6 +927,32 @@ class InactiveScene {
 							}
 						}
 					}
+				}
+				return collisions;
+			}
+			physicsUpdate(others) {
+				if (this.applyGravity) {
+					this.velocity.add(this.home.gravity);
+				}
+	
+				if (this.slows) this.slowDown();
+				//linear
+				this.velocity.add(this.acceleration);
+				let m = Math.min(this.width, this.height) / 3;
+				if (this.velocity.mag > m) this.velocity.mag = m;
+				this.x += this.velocity.x * 2;
+				this.y += this.velocity.y * 2;
+	
+				//angular
+				this.angularVelocity += this.angularAcceleration;
+				this.rotation += this.angularVelocity;
+				if (this.applyGravity) {
+					this.align(this.velocity.getAngle(), 0.01);
+				}
+				this.rotation %= Math.PI * 2;
+	
+				let collisions = this.detectCollisions(others);
+				if (this.applyGravity) {
 					for (let collision of collisions) {
 						if (collision.colliding) PhysicsObject.resolve(collision);
 					}
