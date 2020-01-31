@@ -775,16 +775,6 @@ class InactiveScene {
 			get rotation() {
 				return this.collider.rotation;
 			}
-			set middle(a) {
-				this.x = a.x - this.width / 2;
-				this.y = a.y - this.height / 2;
-			}
-			get middle() {
-				return {
-					x: this.x + this.width / 2,
-					y: this.y + this.height / 2
-				};
-			}
 			set speed(a) {
 				this.velocity = a;
 			}
@@ -948,9 +938,10 @@ class InactiveScene {
 											}
 										}
 										if (col.colliding) {
-											this.allCollidingWith["Rect - " + col.b.name] = col.b;
-											col.b.allCollidingWith["Rect - " + this.name] = this;
-											if (col.b.canCollide) collisions.push(col);
+											this.allCollidingWith["Rect - " + other.name] = other;
+											other.allCollidingWith["Rect - " + this.name] = this;
+											alert(1);
+											if (other.canCollide) collisions.push(col);
 										}
 									}
 								}

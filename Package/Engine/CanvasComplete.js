@@ -174,6 +174,10 @@ class Rect {
 	set height(e){
 		this.collider.height = e;
 	}
+	set middle(a) {
+		this.x = a.x - this.width / 2;
+		this.y = a.y - this.height / 2;
+	}
 	get middle(){
 		return {x: this.x + (this.width/2), y: this.y + (this.height/2)}
 	}
