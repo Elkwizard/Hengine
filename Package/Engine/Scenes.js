@@ -918,7 +918,8 @@ class InactiveScene {
 												col = PhysicsObject.collideCircleRect(other, this);
 												if (col.colliding) {
 													[col.a, col.b] = [col.b, col.a];
-													[col.Adir, col.Bdir] = [col.Bdir, col.Adir];
+													col.Adir.mul(-1);
+													col.Bdir.mul(-1);
 												}
 											} else {
 												col = PhysicsObject.collideRectRect(this, other);
@@ -1023,7 +1024,7 @@ class InactiveScene {
 					for (let i = 0; i < corners.length; i++) {
 						let l = new Line(corners[i], corners[(i + 1) % (corners.length - 1)]);
 						let p = Physics.closestPointOnLineObject(a.middle, l);
-						let d = g.f.getDistance(p, a);
+						let d = (p.x - a.x) ** 2 + (p.y - a.y) ** 2;
 						if (d < bestDist) {
 							bestDist = d;
 							bestPoint = p;
@@ -1032,11 +1033,11 @@ class InactiveScene {
 					if (!bestPoint) return new Collision(false);
 					let collisionAxis = bestPoint.minus(a.middle).normalize();
 					let penetration = a.radius;
+					bestDist = Math.sqrt(bestDist);
 					if (b.collider.collidePoint(a)) {
 						penetration += bestDist;
 						collisionAxis.mul(-1);
-					}
-					else penetration -= bestDist;
+					} else penetration -= bestDist;
 					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration / 2);
 				} else col = new Collision(false);
 				return col;
