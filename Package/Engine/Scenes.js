@@ -678,7 +678,7 @@ class InactiveScene {
         return [collideAry, notCollideAry]
 	}
 	allowRotatedRectangles() {
-		const LOSS = .99;
+		const LOSS = .985;
 		window.Collision = class {
 			constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0) {
 				this.colliding = collides;
