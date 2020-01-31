@@ -951,9 +951,6 @@ class InactiveScene {
 											this.allCollidingWith["Rect - " + col.b.name] = col.b;
 											col.b.allCollidingWith["Rect - " + this.name] = this;
 											if (col.b.canCollide) collisions.push(col);
-											if (col.b.name == "win from 1") {
-												console.log(col.b.allCollidingWith);
-											}
 										}
 									}
 								}
