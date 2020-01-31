@@ -910,7 +910,7 @@ class InactiveScene {
 				this.rotation %= Math.PI * 2;
 	
 				let collisions = [];
-				if (this.applyGravity && this.canCollide) {
+				if (this.applyGravity) {
 					for (let other of others) {
 						if (other !== this) {
 							if (other.hasPhysics && other.tag !== "Engine-Particle") {
@@ -940,7 +940,7 @@ class InactiveScene {
 										if (col.colliding) {
 											this.allCollidingWith["Rect - " + other.name] = other;
 											other.allCollidingWith["Rect - " + this.name] = this;
-											if (other.canCollide) collisions.push(col);
+											if (this.canCollide && other.canCollide) collisions.push(col);
 										}
 									}
 								}
