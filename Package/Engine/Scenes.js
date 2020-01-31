@@ -764,6 +764,7 @@ class InactiveScene {
 				this.collideBasedOnRule = e => true;
 				this.optimize = (a, b) => true;
 				this.canMoveThisFrame = true;
+				this.optimalRotation = (this.width > this.height)? 0:(this.height > this.width)? Math.PI / 2:0;
 			}
 			get mass() {
 				return this.width * this.height;
@@ -879,7 +880,7 @@ class InactiveScene {
 					this.velocity.mul(LOSS);
 					this.angularAcceleration *= LOSS ** 4;
 					this.angularVelocity *= LOSS;
-					if (this.rotation % (Math.PI / 2) < 0.05) {
+					if ((this.rotation - this.optimalRotation) % Math.PI < 0.05) {
 						this.angularVelocity *= 0.999; 
 						this.angularAcceleration *= 0.999;
 					} 
