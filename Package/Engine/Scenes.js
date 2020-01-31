@@ -940,7 +940,6 @@ class InactiveScene {
 										if (col.colliding) {
 											this.allCollidingWith["Rect - " + other.name] = other;
 											other.allCollidingWith["Rect - " + this.name] = this;
-											alert(1);
 											if (other.canCollide) collisions.push(col);
 										}
 									}
