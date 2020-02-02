@@ -1196,26 +1196,24 @@ class InactiveScene {
 					b.scriptCollideTop(a);
 					b.response.collide.top(a);
 				}
-				if (b.applyGravity && b.canMoveThisFrame) {
-					let aDir = col.Adir.times(col.penetration / 2);
-					let bDir = col.Bdir.times(col.penetration / 2);
-					a.x -= aDir.x;
-					a.y -= aDir.y;
-					b.x -= bDir.x;
-					b.y -= bDir.y;
+				let wall = b.applyGravity && b.canMoveThisFrame && false;
+				let dir = col.Adir.times(col.penetration);
+				a.x -= dir.x;
+				a.y -= dir.y;
+				if (wall) {
+					//calculate relative percentages;
+					let aPercent = a.mass / (a.mass + b.mass);
+					let bPercent = 1 - aPercent;
+					//velocity
 					a.velocity.add(col.Bdir.times((a.velocity.mag / 40)));
 					b.velocity.add(col.Adir.times((b.velocity.mag / 40)));
+					//angle
+					let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
+					a.align(angleToAlign, 0.05 * aPercent);
+					b.align(angleToAlign, 0.05 * bPercent);
 				} else {
-					let dir = col.Adir.times(col.penetration);
-					a.x -= dir.x;
-					a.y -= dir.y;
 					col.a.velocity.sub(col.Adir.times(.1));
 					a.canMoveThisFrame = false;
-				}
-				if (b.applyGravity && b.canMoveThisFrame) {
-					a.align(clamp(col.Bdir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
-					b.align(clamp(col.Adir.getAngle() + Math.PI / 2, 0, Math.PI * 2), 0.02);
-				} else {
 					a.align((col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI), 0.04);
 				}
 			}
