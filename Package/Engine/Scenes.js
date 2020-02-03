@@ -909,7 +909,6 @@ class InactiveScene {
 											if (otherCircle) {
 												col = PhysicsObject.collideCircleRect(other, this);
 												if (col.colliding) {
-													[col.a, col.b] = [col.b, col.a];
 													col.Adir.mul(-1);
 													col.Bdir.mul(-1);
 												}
