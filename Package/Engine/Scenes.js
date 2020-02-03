@@ -1196,23 +1196,21 @@ class InactiveScene {
 					b.scriptCollideTop(a);
 					b.response.collide.top(a);
 				}
-				let wall = b.applyGravity && b.canMoveThisFrame && false;
+				let wall = b.applyGravity && b.canMoveThisFrame;
 				let dir = col.Adir.times(col.penetration);
 				a.x -= dir.x;
 				a.y -= dir.y;
+				//velocity
+				a.velocity.sub(col.Adir.times(.1));
 				if (wall) {
 					//calculate relative percentages;
 					let aPercent = a.mass / (a.mass + b.mass);
 					let bPercent = 1 - aPercent;
-					//velocity
-					a.velocity.add(col.Bdir.times((a.velocity.mag / 40)));
-					b.velocity.add(col.Adir.times((b.velocity.mag / 40)));
 					//angle
 					let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
 					a.align(angleToAlign, 0.05 * aPercent);
 					b.align(angleToAlign, 0.05 * bPercent);
 				} else {
-					col.a.velocity.sub(col.Adir.times(.1));
 					a.canMoveThisFrame = false;
 					a.align((col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI), 0.04);
 				}
