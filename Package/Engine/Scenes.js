@@ -513,6 +513,16 @@ class InactiveScene {
 		}
 		return ary;
 	}
+	getElementsWithScript(script){
+		let ary = [];
+		let oAry = this.updateArray();
+		for(let rect of oAry) {
+			if(rect.scripts[script]) {
+				ary.push(rect);
+			}
+		}
+		return ary;
+	}
     addLightB(name, color, x, y, radius, intensity){
 		name = this.genName_PRIVATE(this.lightsB, name);
         this.lightsB[name] = new Light(name, color, x, y, radius, intensity, this)
