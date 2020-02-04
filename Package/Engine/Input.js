@@ -47,8 +47,8 @@ let M = {
 	engineMove: e => e
 }
 onkeydown = function(e) {
-	K.keys[e.key] = true;
 	for (let ev of K.onDown) ev(e);
+	K.keys[e.key] = true;
 }
 onkeyup = function(e) {
 	if (e.key.toUpperCase() === e.key) {
