@@ -1204,8 +1204,12 @@ class InactiveScene {
 				a.velocity.sub(col.Adir.times(.1));
 				if (wall) {
 					//calculate relative percentages;
-					let aPercent = a.mass / (a.mass + b.mass);
-					let bPercent = 1 - aPercent;
+					let aPercentSize = a.mass / (a.mass + b.mass);
+					let bPercentSize = 1 - aPercentSize;
+					let aPercentSpeed = Math.abs(a.velocity.dot(col.Adir)) / (Math.abs(b.velocity.dot(col.Adir)) + Math.abs(a.velocity.dot(col.Adir)));
+					let bPercentSpeed = 1 - aPercentSpeed;
+					let aPercent = aPercentSize * aPercentSpeed;
+					let bPercent = bPercentSize * bPercentSpeed;
 					//angle
 					let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
 					a.align(angleToAlign, 0.05 * aPercent);

@@ -48,7 +48,8 @@ class Physics {
 		let xrs = Math.sign(xv);
 		let xr = Math.sqrt(xv ** 2 + yv ** 2);
 		let xfv = xrs * xr;
-		return xfv;
+		//return xfv;
+		return p.x * d.x + p.y * d.y;
 	}
 	static closestPointOnLineObject(p, l) {if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
 		let min = Math.min(l.a.x, l.b.x);

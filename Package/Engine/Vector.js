@@ -89,6 +89,14 @@ class Vector {
 		}
 		return this;
 	}
+	dot(v) {
+		let result = 0;
+		for (let x in this) result += this[x] * v[x];
+		return result;
+	}
+	projectOnto(v) {
+		return v.times(this.dot(v) / (v.mag ** 2));
+	}
 }
 class Vector1 extends Vector {
 	constructor(x){
