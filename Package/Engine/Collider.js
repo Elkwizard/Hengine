@@ -76,6 +76,22 @@ class Physics {
 		return new Vector2(xv, yv);
 	}
 	static rayCast(ray, rs, threshold = 100000) {
+		let result = [];
+		for (let i = 0; i < rs.length; i++) {
+			let r = rs[i];
+			if (r instanceof PhysicsObject && !(r instanceof CirclePhysicsObject) && r.rotation) {
+				let cs = PhysicsObject.getCorners(r);
+				let edges = [
+					new Line(cs[0], cs[1]),
+					new Line(cs[1], cs[2]),
+					new Line(cs[2], cs[3]),
+					new Line(cs[3], cs[0]),
+				];
+				for (let edge of edges) edge.shape = r;
+				result.push(...edges);
+			} else result.push(r);
+		}
+		rs = result;
 		let o = ray.a;
 		let origin = new Vector2(ray.a.x, ray.a.y);
 		let slope = new Vector2(ray.b.x - ray.a.x, ray.b.y - ray.a.y).normalize();
@@ -124,6 +140,7 @@ class Physics {
 		if (steps >= maxSteps) {
 			return {collisionPoint: o, collidedShape: collided, error: "no collision"};
 		}
+		if (collided instanceof Line && collided.shape) collided = collided.shape;
 		return {collisionPoint: o, collidedShape: collided};
 	}
 	static overlapLineLine(l1, l2) {
