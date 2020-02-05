@@ -83,6 +83,7 @@ class Engine {
         this.beforeUpdate = function(){};
         this.afterUpdate = function(){};
 		this.fixedUpdate = function(){};
+		this.catchErrors = true;
 		try{ 
 			if (FunctionLibrary) {
 				this.f = new FunctionLibrary();
@@ -134,7 +135,8 @@ class Engine {
 					this.scene.enginePhysicsUpdate();
 				}
 			} catch(e) {
-				this.output("Fixed Update Error: " + e);		  
+				if (this.catchErrors) this.output("Fixed Update Error: " + e);
+				else throw e;		  
 			}
 		}.bind(this);
 		setInterval(this.engineUpdate, 16);
@@ -153,7 +155,8 @@ class Engine {
 					this.afterUpdate();
 				}
 			} catch(e) {
-				this.output("Draw Error: " + e);		  
+				if (this.catchErrors) this.output("Draw Error: " + e);	
+				else throw e;	  
 			}
         }.bind(this);
         this.animate();

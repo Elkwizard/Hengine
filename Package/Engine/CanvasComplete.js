@@ -400,6 +400,7 @@ class Artist {
 				}
 			},
 			shape: function(...v) {
+				if (!v.length) return;
 				this.c.beginPath();
 				this.c.moveTo(v[0].x, v[0].y);
 				for (let i = 0; i <= v.length; i++) {
