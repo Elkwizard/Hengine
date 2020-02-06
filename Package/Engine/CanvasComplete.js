@@ -313,6 +313,10 @@ class Artist {
 		this.c.fill();
 	}
 	translate(x, y) {
+		if (typeof x == "object") {
+			y = x.y;
+			x = x.x;
+		}
 		this.c.translate(x, y);
 	}
 	rotate(a) {

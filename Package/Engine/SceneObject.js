@@ -105,22 +105,22 @@ class SceneObject extends Rect {
 	}
 	move() {
 		if (K.P(this.controls.up)) {
-			this.response.input.up()
+			this.response.input.up();
 		}
 		if (K.P(this.controls.down)) {
-			this.response.input.down()
+			this.response.input.down();
 		}
 		if (K.P(this.controls.left)) {
-			this.response.input.left()
+			this.response.input.left();
 		}
 		if (K.P(this.controls.right)) {
-			this.response.input.right()
+			this.response.input.right();
 		}
 		if (K.P(this.controls.interact1)) {
-			this.response.input.interact1()
+			this.response.input.interact1();
 		}
 		if (K.P(this.controls.interact2)) {
-			this.response.input.interact2()
+			this.response.input.interact2();
 		}
 	}
 }

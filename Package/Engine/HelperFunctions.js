@@ -1,7 +1,4 @@
 class FunctionLibrary {
-	constructor() {
-
-	}
 	countProperties(obj) {
 		let n = 0;
 		for (let x in obj) {
