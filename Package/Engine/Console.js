@@ -20,8 +20,8 @@ class Console {
                 }
                 this.str = str;
             }
-            toString(){
-                let ph = (this.type === "error")? `<span class="error-x">x</span>`:"";
+            toString() {
+                let ph = (this.type === "error") ? `<span class="error-x">x</span>` : "";
                 let p = `<div class="log ${this.type}"><span class="caret">[${Time.getFormattedTime()}]&gt;</span>${ph}${this.str}</div>`;
                 return p;
             }
@@ -91,16 +91,16 @@ class Console {
         this.enabled = true;
         //create html panel
         let html = document.createElement("div");
-		html.className = "console";
-		let header = document.createElement("div");
-		header.className = "console-header";
-		header.innerHTML = "Console";
-		let closeButton = document.createElement("button");
-		closeButton.innerHTML = "close";
-		closeButton.className = "console-header-button";
-		closeButton.onclick = this.disable.bind(this);
-		header.appendChild(closeButton);
-		html.appendChild(header);
+        html.className = "console";
+        let header = document.createElement("div");
+        header.className = "console-header";
+        header.innerHTML = "Console";
+        let closeButton = document.createElement("button");
+        closeButton.innerHTML = "close";
+        closeButton.className = "console-header-button";
+        closeButton.onclick = this.disable.bind(this);
+        header.appendChild(closeButton);
+        html.appendChild(header);
 
         document.body.appendChild(html);
         this.HTMLPanel = document.getElementsByClassName("console")[0];

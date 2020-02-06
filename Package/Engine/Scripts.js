@@ -1,5 +1,5 @@
 class Script {
-	constructor(name, opts){
+	constructor(name, opts) {
 		this.name = name;
 		this.methods = {};
 		for (let op in opts) {
@@ -8,28 +8,28 @@ class Script {
 			this.methods[op] = fn;
 		}
 	}
-	addMethod(name, callback, flag){
+	addMethod(name, callback, flag) {
 		this.methods[name] = callback;
 		this.methods[name].flag = flag;
 	}
-	removeMethod(name){
+	removeMethod(name) {
 		delete this.methods[name];
 	}
-	run(){
-		for(let x in this.methods){
+	run() {
+		for (let x in this.methods) {
 			this.methods[x]();
 		}
 	}
-	attachTo(obj, bindTo, ...args){
+	attachTo(obj, bindTo, ...args) {
 		obj[this.name] = {
-			run: function(){
-				for(let x in this){
+			run: function () {
+				for (let x in this) {
 					let m = this[x];
-					if(x !== "run") m();
+					if (x !== "run") m();
 				}
 			}
 		};
-		if(bindTo === undefined) bindTo = obj;
+		if (bindTo === undefined) bindTo = obj;
 		let local = obj[this.name];
 		local.scriptUpdate = e => e;
 		local.scriptDraw = e => e;
@@ -41,7 +41,7 @@ class Script {
 		local.scriptClick = e => e;
 		local.scriptRightClick = e => e;
 		local.scriptHover = e => e;
-		for(let x in this.methods){
+		for (let x in this.methods) {
 			let flag = this.methods[x].flag.toLowerCase();
 			if (flag === "init") {
 				this.methods[x].bind(bindTo)(...args);
@@ -83,7 +83,7 @@ class Script {
 		}
 		return this;
 	}
-	addTo(obj, ...args){
+	addTo(obj, ...args) {
 		this.attachTo(obj, obj, ...args);
 		return this;
 	}
@@ -92,36 +92,37 @@ class ElementScript extends Script {
 	constructor(name, opts) {
 		super(name, opts);
 	}
-	addMethod(name, callback, flag){
+	addMethod(name, callback, flag) {
 		this.methods[name] = callback;
 		this.methods[name].flag = flag;
 	}
-	addTo(el, ...args){
+	addTo(el, ...args) {
 		this.attachTo(el.scripts, el, ...args);
 		let self = this;
-		el.logMod(function(){
-			let correct = args.map(e => (e instanceof SceneObject)? this.home.copy(e):e);
+		el.logMod(function () {
+			let correct = args.map(e => (e instanceof SceneObject) ? this.home.copy(e) : e);
 			self.addTo(this, ...correct);
 		});
 		return this;
 	}
 }
 //presets
-const PLAYER_MOVEMENT = new ElementScript("movement");
-PLAYER_MOVEMENT.addMethod("init", function(){
-	if(!this.controls.up){
-		this.controls = new Controls("w", "s", "a", "d");
-	}
-	this.applyGravity = true;
-}, "init");
-PLAYER_MOVEMENT.addMethod("update", function(){
-	if (K.P(this.controls.down)) this.speed.y += 0.2;
-	if (K.P(this.controls.left)) this.accel.x = -0.1;
-	else if (K.P(this.controls.right)) this.accel.x = 0.1;
-	else this.accel.x = 0;
-	if (K.P(this.controls.up)) {
-		if (this.colliding.bottom) {
-			this.speed.y = -5;
+const PLAYER_MOVEMENT = new ElementScript("movement", {
+	init() {
+		if (!this.controls.up) {
+			this.controls = new Controls("w", "s", "a", "d");
+		}
+		this.applyGravity = true;
+	},
+	update() {
+		if (K.P(this.controls.down)) this.speed.y += 0.2;
+		if (K.P(this.controls.left)) this.accel.x = -0.1;
+		else if (K.P(this.controls.right)) this.accel.x = 0.1;
+		else this.accel.x = 0;
+		if (K.P(this.controls.up)) {
+			if (this.colliding.bottom) {
+				this.speed.y = -5;
+			}
 		}
 	}
-}, "update");
+});

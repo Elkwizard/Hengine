@@ -1,13 +1,13 @@
-class SceneObject extends Rect{
-	constructor(name, x, y, width, height, controls, tag, home){
+class SceneObject extends Rect {
+	constructor(name, x, y, width, height, controls, tag, home) {
 		super(x, y, width, height);
 		this.name = name;
 		this.home = home;
 		this.tag = tag;
 		this.controls = controls;
 		this.hidden = false;
-		this.update = function(){};
-		this.draw = function(){};
+		this.update = function () { };
+		this.draw = function () { };
 		this.custom = {};
 		this.hasPhysics = false;
 		this.isRectangle = true;
@@ -24,74 +24,74 @@ class SceneObject extends Rect{
 			hover: e => e
 		}
 		this.response.input = {
-			up: function(){},
-			down: function(){},
-			left: function(){},
-			right: function(){},
-			interact1: function(){},
-			interact2: function(){}
+			up: function () { },
+			down: function () { },
+			left: function () { },
+			right: function () { },
+			interact1: function () { },
+			interact2: function () { }
 		};
 		this.isBeingUpdated = false;
 	}
-	rename(name){
+	rename(name) {
 		delete this.home.contains[this.name];
 		this.home.contains[name] = this;
 		this.name = name;
-		this.logMod(function(){
+		this.logMod(function () {
 			this.rename(name);
 		});
 	}
-	hide(){
+	hide() {
 		this.hidden = true;
-		this.logMod(function(){
+		this.logMod(function () {
 			this.hide();
 		});
 	}
-	show(){
+	show() {
 		this.hidden = false;
-		this.logMod(function(){
+		this.logMod(function () {
 			this.show();
 		});
 	}
-	position(p){
+	position(p) {
 		this.x = p.x;
 		this.y = p.y;
 	}
-	scriptUpdate(){
-		for(let m in this.scripts){
+	scriptUpdate() {
+		for (let m in this.scripts) {
 			let script = this.scripts[m];
 			script.scriptUpdate();
 		}
 	}
-	scriptDraw(){
+	scriptDraw() {
 		for (let m in this.scripts) {
 			let scripts = this.scripts[m];
 			scripts.scriptDraw();
 		}
 	}
-	logMod(func){
+	logMod(func) {
 		this.log.push(func);
 	}
-	mod(func){
+	mod(func) {
 		func.bind(this)();
 		this.logMod(func);
 	}
-	runLog(el){
-		for(let x of this.log) x.bind(el)();
+	runLog(el) {
+		for (let x of this.log) x.bind(el)();
 		return el;
 	}
-	collidePoint(x, y){
+	collidePoint(x, y) {
 		return this.collider.collidePoint(x, y);
 	}
-	engineDraw(){
+	engineDraw() {
 		this.update();
-		if(!this.hidden){
+		if (!this.hidden) {
 			this.draw();
 			this.scriptDraw();
 		}
 	}
-	engineUpdate(hitboxes){
-		if(this.controls){
+	engineUpdate(hitboxes) {
+		if (this.controls) {
 			this.move();
 		}
 		this.scriptUpdate();
@@ -99,27 +99,27 @@ class SceneObject extends Rect{
 	pushToRemoveQueue(x) {
 		return null;
 	}
-	remove(){
+	remove() {
 		if (this.isBeingUpdated) this.pushToRemoveQueue(this);
 		else this.home.removeElement(this);
 	}
-	move(){
-		if(K.P(this.controls.up)){
+	move() {
+		if (K.P(this.controls.up)) {
 			this.response.input.up()
 		}
-		if(K.P(this.controls.down)){
+		if (K.P(this.controls.down)) {
 			this.response.input.down()
 		}
-		if(K.P(this.controls.left)){
+		if (K.P(this.controls.left)) {
 			this.response.input.left()
 		}
-		if(K.P(this.controls.right)){
+		if (K.P(this.controls.right)) {
 			this.response.input.right()
 		}
-		if(K.P(this.controls.interact1)){
+		if (K.P(this.controls.interact1)) {
 			this.response.input.interact1()
 		}
-		if(K.P(this.controls.interact2)){
+		if (K.P(this.controls.interact2)) {
 			this.response.input.interact2()
 		}
 	}

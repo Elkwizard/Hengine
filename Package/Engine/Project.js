@@ -1,5 +1,5 @@
-class Project{
-	constructor(wrapperID, width, height, airResistance, gravity, canvasID){
+class Project {
+	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
 		this.g = new Engine(wrapperID, width, height, airResistance, gravity, canvasID);
 		this.s = this.g.scene;
 		this.c = this.g.renderer;
@@ -16,19 +16,19 @@ class Project{
 		const c = this.c;
 		delete window.width;
 		delete window.height;
-		Object.defineProperty(window, "width", { 
-			get: function() {
+		Object.defineProperty(window, "width", {
+			get: function () {
 				return c.canvas.width;
 			},
-			set: function(a) {
+			set: function (a) {
 				c.canvas.width = a;
 			}
 		});
 		Object.defineProperty(window, "height", {
-			get: function() {
+			get: function () {
 				return c.canvas.height;
 			},
-			set: function(a) {
+			set: function (a) {
 				c.canvas.height = a;
 			}
 		});
@@ -40,28 +40,28 @@ class Project{
 		this.SPRITE_PATH = "../Art/Sprites/";
 		this.ANIMATION_PATH = "../Art/Animations/";
 		this.SOUND_PATH = "../Sound/";
-		
-		
+
+
 		//define additional scripts
-		
+
 		s.addScript("TEXT_BOX", {
 			init(options, fontSize = 20, fontColor = cl.BLACK, backgroundColor = new Color("#ccc"), borderColor = new Color("#222")) {
 				this.scripts.TEXT_BOX.text = "";
 				this.scripts.TEXT_BOX.selected = false;
-				this.scripts.TEXT_BOX.fontColor = options.fontColor? options.fontColor:cl.BLACK;
-				this.scripts.TEXT_BOX.fontSize = options.fontSize? options.fontSize:20;
+				this.scripts.TEXT_BOX.fontColor = options.fontColor ? options.fontColor : cl.BLACK;
+				this.scripts.TEXT_BOX.fontSize = options.fontSize ? options.fontSize : 20;
 				this.scripts.TEXT_BOX.selection = {
 					start: 0,
 					end: 0
 				}
-				fontSize = options.fontSize? options.fontSize:20;
+				fontSize = options.fontSize ? options.fontSize : 20;
 				if (!options.drawBackground) {
-					this.scripts.TEXT_BOX.drawBackground = function() {
-						c.draw(options.backgroundColor? options.backgroundColor:"#ccc").rect(this);
-						c.stroke(options.borderColor? options.borderColor:"#222", 3).rect(this);
+					this.scripts.TEXT_BOX.drawBackground = function () {
+						c.draw(options.backgroundColor ? options.backgroundColor : "#ccc").rect(this);
+						c.stroke(options.borderColor ? options.borderColor : "#222", 3).rect(this);
 					}.bind(this);
 				} else if (options.drawBackground) {
-					this.scripts.TEXT_BOX.drawBackground = function() {
+					this.scripts.TEXT_BOX.drawBackground = function () {
 						options.drawBackground.bind(this)();
 					}.bind(this);
 				}
@@ -70,7 +70,7 @@ class Project{
 				this.scripts.TEXT_BOX.fontWidth = c.c.measureText("w").width;
 				c.c.font = previous;
 				this.scripts.TEXT_BOX.maxChars = g.f.round((this.width - 10) / this.scripts.TEXT_BOX.fontWidth, 0);
-				K.onDown.listen(function(e) {
+				K.onDown.listen(function (e) {
 					if (this.scripts.TEXT_BOX.selected && !K.P("Control")) {
 						function deleteSelected() {
 							if (this.scripts.TEXT_BOX.selection.end > 0 || this.scripts.TEXT_BOX.selection.start > 0) {
@@ -116,7 +116,7 @@ class Project{
 						}
 					}
 				}.bind(this));
-				M.onDown.listen(function(e) {
+				M.onDown.listen(function (e) {
 					this.scripts.TEXT_BOX.selected = this.hovered;
 					if (this.hovered) {
 						let x = this.x;
@@ -126,7 +126,7 @@ class Project{
 						this.scripts.TEXT_BOX.selection.start = this.scripts.TEXT_BOX.selection.end;
 					}
 				}.bind(this));
-				M.onMove.listen(function(e) {
+				M.onMove.listen(function (e) {
 					if (M.down) {
 						this.scripts.TEXT_BOX.selected = this.hovered;
 						if (this.hovered) {
@@ -146,7 +146,7 @@ class Project{
 					}
 				})
 			},
-			draw(){
+			draw() {
 				function getCursorX(pos) {
 					return (pos * this.scripts.TEXT_BOX.fontWidth) + 5 + this.x;
 				}
@@ -171,15 +171,15 @@ class Project{
 		s.addScript("BUTTON", {
 			init(text, options) {
 				this.scripts.BUTTON.text = text;
-				this.scripts.BUTTON.fontColor = options.fontColor? options.fontColor:cl.BLACK;
-				this.scripts.BUTTON.fontSize = options.fontSize? options.fontSize:20;
+				this.scripts.BUTTON.fontColor = options.fontColor ? options.fontColor : cl.BLACK;
+				this.scripts.BUTTON.fontSize = options.fontSize ? options.fontSize : 20;
 				if (!options.drawBackground) {
-					this.scripts.BUTTON.drawBackground = function() {
-						c.draw(options.backgroundColor? options.backgroundColor:"#ccc").rect(this);
-						c.stroke(options.borderColor? options.borderColor:"#222", 3).rect(this);
+					this.scripts.BUTTON.drawBackground = function () {
+						c.draw(options.backgroundColor ? options.backgroundColor : "#ccc").rect(this);
+						c.stroke(options.borderColor ? options.borderColor : "#222", 3).rect(this);
 					}.bind(this);
 				} else if (options.drawBackground) {
-					this.scripts.BUTTON.drawBackground = function() {
+					this.scripts.BUTTON.drawBackground = function () {
 						options.drawBackground.bind(this)();
 					}.bind(this);
 				}
@@ -202,25 +202,25 @@ class Project{
 			}
 		});
 	}
-	get width () {
+	get width() {
 		return this.s.display.width;
 	}
-	get height () {
+	get height() {
 		return this.s.display.height;
 	}
-	loadImage(src){
+	loadImage(src) {
 		let x = new Image;
 		x.src = this.SPRITE_PATH + src;
 		return x;
 	}
-	loadSound(src){
+	loadSound(src) {
 		let x = new Audio(this.SOUND_PATH + src);
 		return x;
 	}
-	rand(){
+	rand() {
 		return Math.random();
 	}
-	middle(){
+	middle() {
 		return this.c.middle();
 	}
 }

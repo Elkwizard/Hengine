@@ -1,6 +1,6 @@
 class Vector {
-	constructor(){
-		
+	constructor() {
+
 	}
 	set mag(m) {
 		this.normalize();
@@ -31,19 +31,19 @@ class Vector {
 		}
 		return this;
 	}
-	add(v){
+	add(v) {
 		return this.op((a, b) => a + b, v);
 	}
-	sub(v){
+	sub(v) {
 		return this.op((a, b) => a - b, v);
 	}
-	mul(v){
+	mul(v) {
 		return this.op((a, b) => a * b, v);
 	}
-	div(v){
+	div(v) {
 		return this.op((a, b) => a / b, v);
 	}
-	mod(v){
+	mod(v) {
 		return this.op((a, b) => a % b, v);
 	}
 	plus(v) {
@@ -70,7 +70,7 @@ class Vector {
 		vn.mul(v);
 		return vn;
 	}
-	normalize(){
+	normalize() {
 		let sum = 0;
 		for (let x in this) {
 			if (typeof this[x] !== "number") continue;
@@ -99,16 +99,16 @@ class Vector {
 	}
 }
 class Vector1 extends Vector {
-	constructor(x){
+	constructor(x) {
 		super();
 		this.x = x;
 	}
-	static random(){
+	static random() {
 		return new Vector1((Math.random() * 2) - 1);
 	}
 }
 class Vector2 extends Vector {
-	constructor(x, y){
+	constructor(x, y) {
 		super();
 		this.x = x;
 		if (y !== undefined) {
@@ -117,7 +117,7 @@ class Vector2 extends Vector {
 			this.y = x;
 		}
 	}
-	static random(){
+	static random() {
 		return new Vector2((Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 	static fromAngle(a) {
@@ -125,7 +125,7 @@ class Vector2 extends Vector {
 		let y = Math.sin(a);
 		return new Vector2(x, y);
 	}
-	getAngle(){
+	getAngle() {
 		return Math.atan2(this.y, this.x);
 	}
 	set normal(a) {
@@ -140,7 +140,7 @@ class Vector2 extends Vector {
 	}
 }
 class Vector3 extends Vector {
-	constructor(x, y, z){
+	constructor(x, y, z) {
 		super();
 		this.x = x;
 		if (y !== undefined) {
@@ -151,12 +151,12 @@ class Vector3 extends Vector {
 			this.z = x;
 		}
 	}
-	static random(){
+	static random() {
 		return new Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 }
 class Vector4 extends Vector {
-	constructor(x, y, z, w){
+	constructor(x, y, z, w) {
 		super();
 		this.x = x;
 		if (y !== undefined) {
@@ -169,7 +169,7 @@ class Vector4 extends Vector {
 			this.w = x;
 		}
 	}
-	static random(){
+	static random() {
 		return new Vector4((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 }

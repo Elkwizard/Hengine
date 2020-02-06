@@ -1,31 +1,31 @@
-function P(x, y){
-	return {x:x,y:y};
+function P(x, y) {
+	return { x: x, y: y };
 }
-Function.prototype.add = function(fn = function(){}) {
+Function.prototype.add = function (fn = function () { }) {
 	let self = this;
 	return function (...a) {
 		self(...a);
 		fn(...a);
 	}
 }
-Number.prototype.toDegrees = function() {
+Number.prototype.toDegrees = function () {
 	return this * (180 / Math.PI);
 }
-Number.prototype.toRadians = function() {
+Number.prototype.toRadians = function () {
 	return this * (Math.PI / 180);
 }
-Object.prototype.toString = function(depth = 0){
+Object.prototype.toString = function (depth = 0) {
 	if (depth < 1) {
 		let ary = [];
 		let ary2 = [];
-		for(let x in this){
+		for (let x in this) {
 			ary2.push(x);
 		}
 		let thisName = this.constructor.name;
-		function getString(item){
+		function getString(item) {
 			let toStr = "";
 			if (typeof item !== "object") {
-				if(typeof item === "string") toStr = `"${item}"`;
+				if (typeof item === "string") toStr = `"${item}"`;
 				else toStr = (item + "").replace("[native code]", "C++");
 			} else {
 				if (Array.isArray(item)) {
@@ -43,7 +43,7 @@ Object.prototype.toString = function(depth = 0){
 			}
 			return toStr;
 		}
-		for(let i = 0; i < ary2.length; i++) {
+		for (let i = 0; i < ary2.length; i++) {
 			let x = ary2[i];
 			let toStr = "";
 			toStr = getString(this[x]);
@@ -55,44 +55,44 @@ Object.prototype.toString = function(depth = 0){
 		return "[object " + this.constructor.name + "]";
 	}
 }
-Object.prototype[Symbol.iterator] = function*() {
+Object.prototype[Symbol.iterator] = function* () {
 	for (let x in this) {
-		yield [x, this[x]]; 
+		yield [x, this[x]];
 	}
 }
 class Engine {
-    constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
+	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
 		setupAlerts();
-        this.fps = 0;
+		this.fps = 0;
 		this.fpsContinuous = 0;
-        this.frameCount = 0;
+		this.frameCount = 0;
 		//fallbacks
-        function f(a, b){
-            return (a === undefined)? b:a
-        }
-        let W = f(width, innerWidth);
-        let H = f(height, innerHeight);
-        let AR = f(airResistance, 0.025);
-        let G = f(gravity, P(0, 0.1));
-        this.paused = false;
-		this.output = function(m){
+		function f(a, b) {
+			return (a === undefined) ? b : a
+		}
+		let W = f(width, innerWidth);
+		let H = f(height, innerHeight);
+		let AR = f(airResistance, 0.025);
+		let G = f(gravity, P(0, 0.1));
+		this.paused = false;
+		this.output = function (m) {
 			alert(m);
 		}
 		this.console = new Console();
-        this.update = function(){};
-        this.beforeUpdate = function(){};
-        this.afterUpdate = function(){};
-		this.fixedUpdate = function(){};
+		this.update = function () { };
+		this.beforeUpdate = function () { };
+		this.afterUpdate = function () { };
+		this.fixedUpdate = function () { };
 		this.catchErrors = true;
-		try{ 
+		try {
 			if (FunctionLibrary) {
 				this.f = new FunctionLibrary();
 			}
-		} catch(e) {}
+		} catch (e) { }
 		this.custom = {};
 		//windows
 		this.window = class {
-			constructor(x, y, width, height, title, contents){
+			constructor(x, y, width, height, title, contents) {
 				let win = document.createElement("div");
 				win.className = "engine-window";
 				win.style.width = width;
@@ -112,58 +112,58 @@ class Engine {
 		};
 		this.fpsOldTime = performance.now();
 		//setup canvas and scene
-        let canvas = document.getElementById(canvasID);
-        if(!document.getElementById(canvasID)){
-            canvas = document.createElement('canvas');
-            canvas.id = "Engine Canvas";
-            if (!wrapperID) document.body.appendChild(canvas);
+		let canvas = document.getElementById(canvasID);
+		if (!document.getElementById(canvasID)) {
+			canvas = document.createElement('canvas');
+			canvas.id = "Engine Canvas";
+			if (!wrapperID) document.body.appendChild(canvas);
 			else document.getElementById(wrapperID).appendChild(canvas);
-        }
-        this.renderer = new Artist(canvas.id, W, H);
-        this.scene = new Scene("Engine Scene", this.renderer, G, AR, this);
+		}
+		this.renderer = new Artist(canvas.id, W, H);
+		this.scene = new Scene("Engine Scene", this.renderer, G, AR, this);
 		//update loops
 		this.afterScript = new Script("after");
 		this.beforeScript = new Script("before");
 		this.updateScript = new Script("update");
-		
+
 		M.engine = this;
 		//for real this time
-		this.engineUpdate = function(){
+		this.engineUpdate = function () {
 			try {
-				if(!this.paused){
+				if (!this.paused) {
 					this.fixedUpdate();
 					this.scene.enginePhysicsUpdate();
 				}
-			} catch(e) {
+			} catch (e) {
 				if (this.catchErrors) this.output("Fixed Update Error: " + e);
-				else throw e;		  
+				else throw e;
 			}
 		}.bind(this);
 		setInterval(this.engineUpdate, 16);
-        this.animate = function(){
-            try {
+		this.animate = function () {
+			try {
 				requestAnimationFrame(this.animate);
 				this.frameCount++;
 				let oldTime = this.fpsOldTime
 				if (this.frameCount % 30 === 0) this.fps = Math.floor(this.fpsContinuous);
-				this.fpsContinuous = 1000 / ((this.fpsOldTime = performance.now())-oldTime);
-				if(!this.paused){
+				this.fpsContinuous = 1000 / ((this.fpsOldTime = performance.now()) - oldTime);
+				if (!this.paused) {
 					this.beforeUpdate();
 					this.clear();
 					this.update();
 					this.scene.engineDrawUpdate();
 					this.afterUpdate();
 				}
-			} catch(e) {
-				if (this.catchErrors) this.output("Draw Error: " + e);	
-				else throw e;	  
+			} catch (e) {
+				if (this.catchErrors) this.output("Draw Error: " + e);
+				else throw e;
 			}
-        }.bind(this);
-        this.animate();
+		}.bind(this);
+		this.animate();
 		//append text
 		this.styling = document.createElement("style");
-		this.styling.innerHTML = 
-		`
+		this.styling.innerHTML =
+			`
 		body{
 			margin: 0px;
 		}
@@ -198,9 +198,9 @@ class Engine {
 		let t = script.src;
 		let st = t.split("/");
 		let ti = st[st.length - 3];
-		if(!wrapperID) this.setTitle(ti.replace(/%20/g, " "));
+		if (!wrapperID) this.setTitle(ti.replace(/%20/g, " "));
 		this.resize = true;
-		window.addEventListener("resize", function(){
+		window.addEventListener("resize", function () {
 			if (this.resize) {
 				let pixelate = this.renderer.c.imageSmoothingEnabled;
 				this.renderer.canvas.width = innerWidth;
@@ -208,44 +208,44 @@ class Engine {
 				this.renderer.c.imageSmoothingEnabled = pixelate;
 			}
 		}.bind(this));
-    }
-	openWindow(width, height, title, contents){
+	}
+	openWindow(width, height, title, contents) {
 		let x = (this.renderer.canvas.width / 2) - (width / 2);
 		let y = (this.renderer.canvas.height / 2) - (height / 2);
 		let window = new this.window(x, y, width, height, title, contents);
 	}
-	end(){
+	end() {
 		this.pause();
-		this.animate=a=>a;
-		this.engineUpdate=a=>a;
+		this.animate = a => a;
+		this.engineUpdate = a => a;
 		this.renderer.canvas.outerHTML = "";
 	}
-    pause(){
-        this.paused = true
-    }
-    play(){
-        this.paused = false
-    }
-	clear(){
+	pause() {
+		this.paused = true
+	}
+	play() {
+		this.paused = false
+	}
+	clear() {
 		this.renderer.clear();
 	}
-	setTitle(title){
+	setTitle(title) {
 		document.querySelector("title").innerHTML = title;
 		return title;
 	}
-	getDistance(x1, y1, x2, y2){
-		let distance1 = (x2-x1)**2
-		let distance2 = (y2-y1)**2
-		return Math.sqrt(distance1+distance2)
+	getDistance(x1, y1, x2, y2) {
+		let distance1 = (x2 - x1) ** 2
+		let distance2 = (y2 - y1) ** 2
+		return Math.sqrt(distance1 + distance2)
 	}
-	getDistanceWithPoints(point, point2){
+	getDistanceWithPoints(point, point2) {
 		return this.getDistance(point.x, point.y, point2.x, point2.y);
 	}
-	extend(a, b){
-		return a + (b*Math.sign(a));
+	extend(a, b) {
+		return a + (b * Math.sign(a));
 	}
-	contract(a, b){
-		return a - (b*Math.sign(a));
+	contract(a, b) {
+		return a - (b * Math.sign(a));
 	}
 }
 
@@ -315,15 +315,15 @@ function setupAlerts() {
 			alerts.pop();
 		}
 	}
-	clb.onclick = function() {
+	clb.onclick = function () {
 		closeAlert();
 	};
-	window.alert = function(m, isSequence = false) {
+	window.alert = function (m, isSequence = false) {
 		if (alertClosed) {
 			m = m + "";
 			m = m.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
 			al.style.transition = "all 0s";
-			let style = {top: "-5%", opacity: "0"};
+			let style = { top: "-5%", opacity: "0" };
 			if (isSequence) {
 				style.top = "-1%";
 				style.opacity = "1";
@@ -338,7 +338,7 @@ function setupAlerts() {
 				else al.style.paddingBottom = "15px";
 			}
 			cont.innerHTML = m;
-			window.setTimeout(function(){
+			window.setTimeout(function () {
 				al.style.transition = "all .15s";
 				al.style.top = "5px";
 				al.style.opacity = "1";
@@ -347,7 +347,7 @@ function setupAlerts() {
 			alerts.unshift(m);
 		}
 	}
-	window.addEventListener("keydown", function(e) {
+	window.addEventListener("keydown", function (e) {
 		if (e.key == "Enter" || e.key == " ") {
 			closeAlert();
 		}

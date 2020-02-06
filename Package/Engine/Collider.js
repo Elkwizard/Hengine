@@ -72,7 +72,8 @@ class Physics {
 		}
 		return bestPoint;
 	}
-	static closestPointOnLineObject(p, l) {if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
+	static closestPointOnLineObject(p, l) {
+		if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
 		let min = Math.min(l.a.x, l.b.x);
 		let max = Math.max(l.a.x, l.b.x);
 		let dx = l.b.x - l.a.x;
@@ -92,7 +93,7 @@ class Physics {
 		let dx = d.x;
 		let dy = d.y;
 		if (!dx) dx = 0.000000001;
-		let xv = ((dx**2) * x1 + (dx * dy * y1)) / (dx**2 + dy**2);
+		let xv = ((dx ** 2) * x1 + (dx * dy * y1)) / (dx ** 2 + dy ** 2);
 		let yv = (dy / dx) * xv;
 		return new Vector2(xv, yv);
 	}
@@ -116,7 +117,7 @@ class Physics {
 		let o = ray.a;
 		let origin = new Vector2(ray.a.x, ray.a.y);
 		let slope = new Vector2(ray.b.x - ray.a.x, ray.b.y - ray.a.y).normalize();
-		if (!slope.x && !slope.y) return {error: "no direction"};
+		if (!slope.x && !slope.y) return { error: "no direction" };
 		let minDist = Infinity;
 		let steps = 0;
 		let maxSteps = 50;
@@ -130,7 +131,7 @@ class Physics {
 			} else {
 				d = Physics.distToLine(o, r);
 			}
-			if (d <= 0) return {error: "inside shape", collidedShape: r, collisionPoint: o};
+			if (d <= 0) return { error: "inside shape", collidedShape: r, collisionPoint: o };
 		}
 		while (minDist > 0.1 && steps < maxSteps) {
 			minDist = Infinity;
@@ -159,10 +160,10 @@ class Physics {
 			o.y += slope.y * minDist;
 		}
 		if (steps >= maxSteps) {
-			return {collisionPoint: o, collidedShape: collided, error: "no collision"};
+			return { collisionPoint: o, collidedShape: collided, error: "no collision" };
 		}
 		if (collided instanceof Line && collided.shape) collided = collided.shape;
-		return {collisionPoint: o, collidedShape: collided};
+		return { collisionPoint: o, collidedShape: collided };
 	}
 	static overlapLineLine(l1, l2) {
 		let pol = Physics.projectPointOntoLine;
@@ -243,11 +244,11 @@ class RectCollider {
 		this.height = height;
 		this.rotation = rotation;
 	}
-	collideBox(hitbox){
-        if(hitbox.width !== void 0){
-			return this.x < hitbox.x + hitbox.width && hitbox.x < this.x+this.width && this.y < hitbox.y + hitbox.height && hitbox.y < this.y + this.height
-        }
-        else {
+	collideBox(hitbox) {
+		if (hitbox.width !== void 0) {
+			return this.x < hitbox.x + hitbox.width && hitbox.x < this.x + this.width && this.y < hitbox.y + hitbox.height && hitbox.y < this.y + this.height
+		}
+		else {
 			if (this.rotation) {
 				let hypotA = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
 				let r1 = new Rect(this.middle.x - hypotA, this.middle.y - hypotA, hypotA * 2, hypotA * 2);
@@ -280,13 +281,13 @@ class RectCollider {
 			} else {
 				return hitbox.collideBox(this);
 			}
-        }
+		}
 	}
-	get middle(){
-		return {x:this.x + this.width / 2,y: this.y + this.height / 2};
+	get middle() {
+		return { x: this.x + this.width / 2, y: this.y + this.height / 2 };
 	}
-	collidePoint(x, y){
-		if(typeof x == "object"){
+	collidePoint(x, y) {
+		if (typeof x == "object") {
 			y = x.y
 			x = x.x;
 		}
@@ -317,30 +318,26 @@ class RectCollider {
 		}
 	}
 }
-class CircleCollider{
-    constructor(x, y, radius, rotation = 0){
-        this.x = x;
-        this.y = y;
+class CircleCollider {
+	constructor(x, y, radius, rotation = 0) {
+		this.x = x;
+		this.y = y;
 		this.radius = radius;
 		this.rotation = rotation;
-    }
-	get middle(){
-		return {x:this.x,y:this.y};
 	}
-	collideBox(hitbox){
-        if(hitbox.width !== void 0){
-			let ax = this.x - (hitbox.x + hitbox.width / 2);
-			let ay = this.y - (hitbox.y + hitbox.height / 2);
-			let dx = Math.max(Math.abs(ax) - (hitbox.width / 2), 0);
-			let dy = Math.max(Math.abs(ay) - (hitbox.height / 2), 0);
-			return (dx ** 2) + (dy ** 2) < (this.radius ** 2);
-        }
-        else{
+	get middle() {
+		return { x: this.x, y: this.y };
+	}
+	collideBox(hitbox) {
+		if (hitbox.width !== void 0) {
+			return hitbox.collideBox(this);
+		}
+		else {
 			return ((this.x - hitbox.x) ** 2) + ((this.y - hitbox.y) ** 2) < (this.radius + hitbox.radius) ** 2;
-        }
+		}
 	}
-	collidePoint(x, y){
-		if(typeof x == "object"){
+	collidePoint(x, y) {
+		if (typeof x == "object") {
 			y = x.y
 			x = x.x;
 		}

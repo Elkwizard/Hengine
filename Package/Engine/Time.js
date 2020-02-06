@@ -1,5 +1,5 @@
-class Time{
-	static getTime(){
+class Time {
+	static getTime() {
 		let d = new Date();
 		let t = d.getTime();
 		t -= (7 * 60 * 60 * 1000);
@@ -21,11 +21,11 @@ class Time{
 			years: years
 		};
 	}
-	static getFormattedTime(){
+	static getFormattedTime() {
 		let t = Time.getTime();
 		let ex = "AM";
 		if (t.days > 30 && t.days < 330) t.hours--;
-		if(t.hours > 12){
+		if (t.hours > 12) {
 			t.hours -= 12;
 			ex = "PM";
 		}
