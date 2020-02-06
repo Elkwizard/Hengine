@@ -877,9 +877,9 @@ class InactiveScene {
 						c.stroke(cl.RED, .5).rect(r);
 					}
 				}
+				this.physicsUpdate(this.home.contains_array);
 			}
 			engineUpdate(others) {
-				this.physicsUpdate(others);
 				this.scriptUpdate();
 				this.update();
 			}
@@ -1049,22 +1049,15 @@ class InactiveScene {
 						edges.push(new Line(a, b));
 					}
 					let inside = a.collider.collidePoint(b.middle);
-					let bestPoint = null;
-					let bestDist = Infinity;
-					for (let i = 0; i < edges.length; i++) {
-						let edge = edges[i];
-						let p = Physics.closestPointOnLineObject(b.middle, edge);
-						let dist = (p.x - a.x) ** 2 + (p.y - a.y) ** 2;
-						if (dist < bestDist || (!bestPoint && i == edges.length - 1)) {
-							bestDist = dist;
-							bestPoint = p;
-						}
-					}
-					bestDist = Math.sqrt(bestDist);
+					let bestPoint = Physics.closestPointOnRectangle(b.middle, a.collider);
+					let bestDist = Math.sqrt((bestPoint.x - b.middle.x) ** 2 + (bestPoint.y - b.middle.y) ** 2);
 					let penetration = b.radius + (inside ? bestDist : -bestDist);
 					let collisionAxis = new Vector2(b.middle.x - bestPoint.x, b.middle.y - bestPoint.y);
+					collisionAxis.normalize();
 					if (inside) collisionAxis.mul(-1);
-					return new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration);
+					let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration);
+					//console.log(col);
+					return col;
 				} else return new Collision(false, a, b);
 			}
 			static collideCircleRect(a, b) {

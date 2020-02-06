@@ -51,6 +51,27 @@ class Physics {
 		//return xfv;*/
 		return p.x * d.x + p.y * d.y;
 	}
+	static closestPointOnRectangle(point, r) {
+		if (!r.rotation) r.rotation = 0.001;
+		let edges = [];
+		let corners = PhysicsObject.getCorners(r);
+		let bestPoint = null;
+		let bestDist = Infinity;
+		for (let i = 0; i < corners.length; i++) {
+			let a = corners[i];
+			let b = corners[(i + 1) % corners.length];
+			edges.push(new Line(a, b));
+		}
+		for (let edge of edges) {
+			let p = Physics.closestPointOnLineObject(point, edge);
+			let dist = g.f.getDistance(p, point);
+			if (dist < bestDist) {
+				bestDist = dist;
+				bestPoint = p;
+			}
+		}
+		return bestPoint;
+	}
 	static closestPointOnLineObject(p, l) {if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
 		let min = Math.min(l.a.x, l.b.x);
 		let max = Math.max(l.a.x, l.b.x);
