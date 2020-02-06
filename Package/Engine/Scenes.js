@@ -1038,6 +1038,35 @@ class InactiveScene {
 				} else col = new Collision(false, a, b);
 				return col;
 			}
+			static collideRectCircle(a, b) {
+				let colliding = a.collider.collideBox(b.collider);
+				if (colliding) {
+					let edges = [];
+					let corners = PhysicsObject.getCorners(a);
+					for (let i = 0; i < corners.length; i++) {
+						let a = corners[i];
+						let b = corners[(i + 1) % corners.length];
+						edges.push(new Line(a, b));
+					}
+					let inside = a.collider.collidePoint(b.middle);
+					let bestPoint = null;
+					let bestDist = Infinity;
+					for (let i = 0; i < edges.length; i++) {
+						let edge = edges[i];
+						let p = Physics.closestPointOnLineObject(b.middle, edge);
+						let dist = (p.x - a.x) ** 2 + (p.y - a.y) ** 2;
+						if (dist < bestDist || (!bestPoint && i == edges.length - 1)) {
+							bestDist = dist;
+							bestPoint = p;
+						}
+					}
+					bestDist = Math.sqrt(bestDist);
+					let penetration = b.radius + (inside ? bestDist : -bestDist);
+					let collisionAxis = new Vector2(b.middle.x - bestPoint.x, b.middle.y - bestPoint.y);
+					if (inside) collisionAxis.mul(-1);
+					return new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration);
+				} else return new Collision(false, a, b);
+			}
 			static collideCircleRect(a, b) {
 				let edges = PhysicsObject.getEdges(b);
 				let corners = PhysicsObject.getCorners(b);
