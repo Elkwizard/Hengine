@@ -6,6 +6,27 @@ class Directions {
 		this.right = right;
 		if (prec === undefined) prec = 0.3;
 		this.prec = prec;
+		this.angle = 0;
+	}
+	fromAngle(a) {
+		let dir = new this.constructor(0, 0, 0, 0);
+		dir.angle = a;
+		return dir;
+	}
+	fix(v) {
+		if (this.angle) {
+			let va = this.angle;
+			let min = va - this.prec;
+			let max = va + this.prec;
+			let a = v.getAngle();
+			if (a < min) a = min;
+			if (a > max) a = max;
+			let result = Vector2.fromAngle(a);
+			result.mag = v.mag;
+			return result;
+		} else {
+			return new Vector2(this.fixH(v.x), this.fixV(v.y));
+		}
 	}
 	fixH(val) {
 		if (this.left && this.right) return val;
@@ -234,8 +255,7 @@ class InactiveScene {
 					let x1 = Math.random() - Math.random();
 					let y1 = ((Math.random() > 0.5) ? -1 : 1) * (1 - Math.abs(x1));
 					let speed = (new Vector2(x1, y1)).normalize();
-					speed.y = this.dirs.fixV(y1);
-					speed.x = this.dirs.fixH(speed.x);
+					speed = this.dirs.fix(new Vector2(speed.x, y1));
 					n.speed.x = (this.particleInitSpeed * speed.x) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
 					n.speed.y = (this.particleInitSpeed * speed.y) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
 					n.timer = 0;
