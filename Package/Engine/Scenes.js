@@ -1,30 +1,3 @@
-class Light {
-	constructor(name, color, x, y, intensity, radius, home) {
-		if (color instanceof Color) this.color = color.get_RGBA();
-		else this.color = color;
-		this.name = name;
-		this.x = x;
-		this.y = y;
-		this.home = home;
-		this.radius = radius;
-		this.intensity = intensity;
-		this.custom = {};
-		this.fill = this.home.c.c.createRadialGradient(0, 0, this.intensity, 0, 0, this.radius);
-		this.fill.addColorStop(0, this.color);
-		this.fill.addColorStop(1, "transparent");
-	}
-	draw() {
-		if (this.home.home.getDistanceWithPoints(this.home.display.middle, this) < this.radius + Math.max(this.home.display.width, this.home.display.height)) {
-			this.home.c.c.translate(this.x, this.y);
-			this.home.c.draw(this.fill).circle(0, 0, this.radius);
-			this.home.c.c.translate(-this.x, -this.y);
-		}
-	}
-	centerAt(point) {
-		this.x = point.x;
-		this.y = point.y;
-	}
-}
 class Directions {
 	constructor(up, down, left, right, prec) {
 		this.up = up;
@@ -56,8 +29,6 @@ class InactiveScene {
 		this.name = name;
 		this.rebound = 0;
 		this.contains_array = [];
-		this.lightsF = {};
-		this.lightsB = {};
 		this.custom = {};
 		this.templates = {};
 		this.defaultDraw = function () {
@@ -83,45 +54,6 @@ class InactiveScene {
 		}
 		this.defaultUpdate = function () { }
 		this.contains = {};
-	}
-	useScript(script) {
-		let lines = script.split(",");
-		let SCENE_P = false;
-		let other_P = false;
-		for (let line of lines) {
-			line = line.trim();
-			if (line == "SCENE:SCENE") {
-				SCENE_P = true;
-			}
-			else if (SCENE_P) {
-				if (line == "END") {
-					SCENE_P = false;
-				} else {
-					let prop = line.split("=")[0].trim();
-					let value = line.split("=")[1].trim();
-					value = eval(value);
-					this[prop] = value;
-				}
-			}
-			else if (line.search(/SCENE\:/g) > -1) {
-				let str = "";
-				for (let i = 6; i < line.length; i++) {
-					str += line[i];
-				}
-				other_P = this.get(str);
-			}
-			else if (other_P !== false) {
-				if (line == "END") {
-					other_P = false;
-				} else {
-					let prop = line.split("=")[0].trim();
-					let value = line.split("=")[1].trim();
-					value[value.length - 1] = "";
-					value = eval(value);
-					other_P[prop] = value;
-				}
-			}
-		}
 	}
 	updateArray() {
 		this.contains_array = [];
@@ -363,101 +295,6 @@ class InactiveScene {
 		spawner.addTo(ns);
 		return ns;
 	}
-	parse(str) {
-		let ary = str.split("#");
-		let sc = this.addContainer(ary[0], true);
-		for (let i = 1; i < ary.length;) {
-			let type = ary[i++];
-			let name = ary[i++];
-			let tag = ary[i++];
-			let x = parseFloat(ary[i++]);
-			let y = parseFloat(ary[i++]);
-			let width = parseFloat(ary[i++]);
-			let height = parseFloat(ary[i++]);
-			let n;
-			let controls;
-			function getControls() {
-				controls = ary[i++];
-				controls = controls.slice(1, controls.length - 1);
-				controls = controls.split("%");
-				controls = new Controls(controls[0], controls[1], controls[2], controls[3], controls[4], controls[5]);
-			}
-			function getScripts() {
-				let scr = ary[i++];
-				if (scr !== "[]") {
-					scr = scr.slice(1, scr.length - 1);
-					scr = scr.split("%");
-					for (let x of scr) {
-						let r = window[x];
-						r.addTo(n);
-					}
-				}
-			}
-			switch (type) {
-				case "p":
-					getControls();
-					let gravity = (ary[i++] === "true");
-					n = sc.addRectElement(name, x, y, width, height, gravity, controls, tag);
-					getScripts();
-					break;
-				case "s":
-					getControls();
-					n = sc.addParticleSpawner(name, x, y, ary[i++], ary[i++], ary[i++], ary[i++], eval(ary[i++]), ary[i++], ary[i++]);
-					let dirs = ary[i++];
-					dirs = dirs.slice(1, dirs.length - 1);
-					dirs = dirs.split("%");
-					n.dirs = new Directions(parseFloat(dirs[0]), parseFloat(dirs[1]), parseFloat(dirs[2]), parseFloat(dirs[3]), parseFloat(dirs[4]));
-					n.slows = ary[i++];
-					n.fades = ary[i++];
-					n.falls = ary[i++];
-					n.controls = controls;
-					n.width = width;
-					n.height = height;
-					n.tag = tag;
-					break;
-				case "u":
-					n = sc.addUI(name, x, y, width, height);
-					getScripts();
-					break;
-				case "e":
-					getControls();
-					n = sc.addElement(name, x, y, width, height, controls, tag);
-					getScripts();
-					break;
-			}
-		}
-		return sc;
-	}
-	encode(...ary) {
-		let resAry = ["Encoded-Scene"];
-		for (let x of ary) {
-			let l = "";
-			if (x.hasPhysics) l = "p";
-			else if (x.isUI) l = "u";
-			else if (x.isSpawner) l = "s";
-			else l = "e";
-			resAry.push(l, x.name, x.tag, x.x, x.y, x.width, x.height);
-			function f(e) {
-				let r = x.controls[e];
-				if (!r) r = "";
-				return r;
-			}
-			let cont = `[${f("up")}%${f("down")}%${f("left")}%${f("right")}%${f("interact1")}%${f("interact2")}]`;
-			if (l !== "u") resAry.push(cont);
-			if (l === "p") resAry.push(x.applyGravity);
-			if (l === "s") {
-				let dirs = `[${x.dirs.up}%${x.dirs.down}%${x.dirs.left}%${x.dirs.right}%${x.dirs.prec}]`;
-				resAry.push(x.particleSize, x.initSpeed, x.delay, x.timer, x.particleDraw, x.pSizeVariance, x.pSpeedVariance, dirs, x.slows, x.fades, x.falls);
-			} else {
-				let scripts = [];
-				for (let m in x.scripts) {
-					scripts.push(m);
-				}
-				resAry.push("[" + scripts.join("%") + "]");
-			}
-		}
-		return resAry.join("#");
-	}
 	addScript(name, opts) {
 		window[name] = new ElementScript(name, opts);
 		return window[name];
@@ -485,20 +322,6 @@ class InactiveScene {
 			return this.contains[name];
 		}
 	}
-	makeTemp(name, el) {
-		this.templates[name] = { ...el };
-		return this.templates[name];
-	}
-	instantiate(name, p) {
-		let n;
-		if (typeof name === "string") {
-			n = this.copy(this.templates[name]);
-		} else {
-			n = this.copy(name);
-		}
-		n.position(p);
-		return n;
-	}
 	getAllElements() {
 		this.updateArray();
 		return this.contains_array;
@@ -522,33 +345,6 @@ class InactiveScene {
 			}
 		}
 		return ary;
-	}
-	addLightB(name, color, x, y, radius, intensity) {
-		name = this.genName_PRIVATE(this.lightsB, name);
-		this.lightsB[name] = new Light(name, color, x, y, radius, intensity, this)
-		return this.lightsB[name]
-	}
-	getLightB(name) {
-		return this.lightsB[name]
-	}
-	addLightF(name, color, x, y, radius, intensity) {
-		name = this.genName_PRIVATE(this.lightsF, name);
-		this.lightsF[name] = new Light(name, color, x, y, radius, intensity, this)
-		return this.lightsF[name]
-	}
-	getLightF(name) {
-		return this.lightsF[name]
-	}
-	removeLightB(name) {
-		delete this.lightsB[name];
-	}
-	removeLightF(name) {
-		delete this.lightsF[name];
-	}
-	isElementColliding(name) {
-		this.updateArray();
-		let isCol = this.get(name).collideAll(this.contains_array, true);
-		return isCol !== false;
 	}
 	performFunctionBasedOnType_PRIVATE(name, func) {
 		if (typeof name === "object") {
@@ -1344,12 +1140,6 @@ class Scene extends InactiveScene {
 			G: this.get.bind(this),
 			GAE: this.getAllElements.bind(this),
 			GEWT: this.getElementsWithTag.bind(this),
-			ALB: this.addLightB.bind(this),
-			GLB: this.getLightB.bind(this),
-			RLB: this.removeLightB.bind(this),
-			ALF: this.addLightF.bind(this),
-			GLF: this.getLightF.bind(this),
-			RLF: this.removeLightF.bind(this),
 			IEC: this.isElementColliding.bind(this),
 			CED: this.changeElementDraw.bind(this),
 			CEU: this.changeElementUpdate.bind(this),
@@ -1416,9 +1206,6 @@ class Scene extends InactiveScene {
 		this.c.c.translate(-this.c.middle.x, -this.c.middle.y);
 		this.c.c.translate(-this.display.x, -this.display.y);
 		this.home.updateScript.run();
-		for (let x in this.lightsB) {
-			this.lightsB[x].draw();
-		}
 		let q = this.removeQueue;
 		function p(x) {
 			q.push(x);
@@ -1430,9 +1217,6 @@ class Scene extends InactiveScene {
 		for (let rect of this.contains_array) {
 			rect.engineDraw();
 			rect.lifeSpan++;
-		}
-		for (let x in this.lightsF) {
-			this.lightsF[x].draw();
 		}
 		this.c.c.translate(this.display.x, this.display.y);
 		this.c.c.translate(this.c.middle.x, this.c.middle.y);
