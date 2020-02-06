@@ -1144,7 +1144,6 @@ class Scene extends InactiveScene {
 		}.bind(this);
 		this.removeQueue = [];
 		this.S = {
-			US: this.useScript.bind(this),
 			UA: this.updateArray.bind(this),
 			DWT: this.drawWithTransformations.bind(this),
 			UDA: this.updateDisplayAt.bind(this),
@@ -1160,7 +1159,6 @@ class Scene extends InactiveScene {
 			G: this.get.bind(this),
 			GAE: this.getAllElements.bind(this),
 			GEWT: this.getElementsWithTag.bind(this),
-			IEC: this.isElementColliding.bind(this),
 			CED: this.changeElementDraw.bind(this),
 			CEU: this.changeElementUpdate.bind(this),
 			CER: this.changeElementResponse.bind(this),
