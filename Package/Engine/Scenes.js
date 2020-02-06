@@ -8,7 +8,7 @@ class Directions {
 		this.prec = prec;
 		this.angle = 0;
 	}
-	fromAngle(a) {
+	static fromAngle(a) {
 		let dir = new this.constructor(0, 0, 0, 0);
 		dir.angle = a;
 		return dir;
