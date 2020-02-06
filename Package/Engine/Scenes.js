@@ -15,7 +15,7 @@ class Directions {
 	}
 	fix(v) {
 		if (this.angle) {
-			let va = this.angle;
+			let va = -this.angle;
 			let min = va - this.prec;
 			let max = va + this.prec;
 			let a = v.getAngle();
