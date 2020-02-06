@@ -877,9 +877,9 @@ class InactiveScene {
 						c.stroke(cl.RED, .5).rect(r);
 					}
 				}
-				this.physicsUpdate(this.home.contains_array);
 			}
 			engineUpdate(others) {
+				this.physicsUpdate(others);
 				this.scriptUpdate();
 				this.update();
 			}
