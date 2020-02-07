@@ -330,7 +330,7 @@ class CircleCollider {
 	}
 	collideBox(hitbox) {
 		if (hitbox.width !== void 0) {
-			return hitbox.collideBox(this);
+			return Physics.overlapCircleRect(this, hitbox);
 		}
 		else {
 			return ((this.x - hitbox.x) ** 2) + ((this.y - hitbox.y) ** 2) < (this.radius + hitbox.radius) ** 2;
