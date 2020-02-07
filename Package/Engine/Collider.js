@@ -199,7 +199,12 @@ class Physics {
 		}
 	}
 	static pointInsideRectangle(p, r) {
-		return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
+		if (!r.rotation) {
+			return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
+		} else {
+			let col = new RectCollider(r.x, r.y, r.width, r.height, r.rotation);
+			return col.collidePoint(p.x, p.y);
+		}
 	}
 	static overlapCircleRect(c, r) {
 		let dist = Physics.distToRect2(c, r);
