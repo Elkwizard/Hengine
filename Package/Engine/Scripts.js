@@ -31,6 +31,7 @@ class Script {
 		};
 		if (bindTo === undefined) bindTo = obj;
 		let local = obj[this.name];
+		local.scriptNumber = 1;
 		local.scriptUpdate = e => e;
 		local.scriptDraw = e => e;
 		local.scriptCollideTop = e => e;

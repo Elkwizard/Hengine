@@ -66,9 +66,8 @@ class PhysicsObject extends SceneObject {
 		for (let x in this.response.collide) {
 			let cap = x[0].toUpperCase() + x.slice(1);
 			this["scriptCollide" + cap] = function (e) {
-				for (let m in this.scripts) {
-					let script = this.scripts[m];
-					script["scriptCollide" + cap](e);
+				for (let m of this.scripts) {
+					m["scriptCollide" + cap](e);
 				}
 			}
 		}

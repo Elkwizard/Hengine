@@ -567,9 +567,8 @@ class InactiveScene {
 				for (let x in this.response.collide) {
 					let cap = x[0].toUpperCase() + x.slice(1);
 					this["scriptCollide" + cap] = function (e) {
-						for (let m in this.scripts) {
-							let script = this.scripts[m];
-							script["scriptCollide" + cap](e);
+						for (let m of this.scripts) {
+							m["scriptCollide" + cap](e);
 						}
 					}
 				}
@@ -984,9 +983,34 @@ class InactiveScene {
 				return col;
 			}
 			static resolve(col) {
+				//resolve collisions
 				let d = col.Bdir;
 				let a = col.a;
 				let b = col.b;
+				let wall = b.applyGravity && b.canMoveThisFrame;
+				let dir = col.Adir.times(col.penetration);
+				a.x -= dir.x;
+				a.y -= dir.y;
+				//velocity
+				a.velocity.sub(col.Adir.times(.1));
+				if (wall) {
+					//calculate relative percentages;
+					let aPercentSize = a.mass / (a.mass + b.mass);
+					let bPercentSize = 1 - aPercentSize;
+					let aPercentSpeed = Math.abs(a.velocity.dot(col.Adir)) / (Math.abs(b.velocity.dot(col.Adir)) + Math.abs(a.velocity.dot(col.Adir)));
+					let bPercentSpeed = 1 - aPercentSpeed;
+					let aPercent = aPercentSize * aPercentSpeed;
+					let bPercent = bPercentSize * bPercentSpeed;
+					//angle
+					let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
+					a.align(angleToAlign, 0.05 * aPercent);
+					b.align(angleToAlign, 0.05 * bPercent);
+				} else {
+					a.canMoveThisFrame = false;
+					a.align((col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI), 0.04);
+				}
+				
+				//do custom collision response
 				if (!a.colliding.general) a.colliding.general = [b];
 				else a.colliding.general.push(b);
 				if (!b.colliding.general) b.colliding.general = [a];
@@ -1037,28 +1061,6 @@ class InactiveScene {
 					b.scriptCollideTop(a);
 					b.response.collide.top(a);
 				}
-				let wall = b.applyGravity && b.canMoveThisFrame;
-				let dir = col.Adir.times(col.penetration);
-				a.x -= dir.x;
-				a.y -= dir.y;
-				//velocity
-				a.velocity.sub(col.Adir.times(.1));
-				if (wall) {
-					//calculate relative percentages;
-					let aPercentSize = a.mass / (a.mass + b.mass);
-					let bPercentSize = 1 - aPercentSize;
-					let aPercentSpeed = Math.abs(a.velocity.dot(col.Adir)) / (Math.abs(b.velocity.dot(col.Adir)) + Math.abs(a.velocity.dot(col.Adir)));
-					let bPercentSpeed = 1 - aPercentSpeed;
-					let aPercent = aPercentSize * aPercentSpeed;
-					let bPercent = bPercentSize * bPercentSpeed;
-					//angle
-					let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
-					a.align(angleToAlign, 0.05 * aPercent);
-					b.align(angleToAlign, 0.05 * bPercent);
-				} else {
-					a.canMoveThisFrame = false;
-					a.align((col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI), 0.04);
-				}
 			}
 		}
 		CirclePhysicsObject = class extends PhysicsObject {
@@ -1108,8 +1110,8 @@ class Scene extends InactiveScene {
 			for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.click(adjusted);
 				let m = this.get(o);
-				for (let script in m.scripts) {
-					m.scripts[script].scriptClick(adjusted);
+				for (let script of m.scripts) {
+					script.scriptClick(adjusted);
 				}
 			}
 		}.bind(this);
@@ -1118,8 +1120,8 @@ class Scene extends InactiveScene {
 			for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.rightClick(adjusted);
 				let m = this.get(o);
-				for (let script in m.scripts) {
-					m.scripts[script].scriptRightClick(adjusted);
+				for (let script of m.scripts) {
+					script.scriptRightClick(adjusted);
 				}
 			}
 		}.bind(this);
@@ -1130,8 +1132,8 @@ class Scene extends InactiveScene {
 				if (!o.hovered) {
 					o.response.hover(adjusted);
 					let m = this.get(o);
-					for (let script in m.scripts) {
-						m.scripts[script].scriptHover(adjusted);
+					for (let script of m.scripts) {
+						script.scriptHover(adjusted);
 					}
 				}
 				o.hovered = true;

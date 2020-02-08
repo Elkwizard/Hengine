@@ -13,7 +13,19 @@ class SceneObject extends Rect {
 		this.isRectangle = true;
 		this.hovered = false;
 		this.layer = 0;
-		this.scripts = {};
+		this.scripts = {
+			[Symbol.iterator]: function*() {
+				let ary = [];
+				for (let m in this) {
+					let a = this[m];
+					if (typeof a !== "function") ary.push(a);
+				}
+				ary = ary.sort((a, b) => b.scriptNumber - a.scriptNumber);
+				for (let a of ary) {
+					yield a;
+				}
+			}
+		};
 		this.lifeSpan = 0;
 		this.log = [];
 		this.isDead = false;
@@ -58,15 +70,13 @@ class SceneObject extends Rect {
 		this.y = p.y;
 	}
 	scriptUpdate() {
-		for (let m in this.scripts) {
-			let script = this.scripts[m];
-			script.scriptUpdate();
+		for (let m of this.scripts) {
+			m.scriptUpdate();
 		}
 	}
 	scriptDraw() {
-		for (let m in this.scripts) {
-			let scripts = this.scripts[m];
-			scripts.scriptDraw();
+		for (let m of this.scripts) {
+			m.scriptDraw();
 		}
 	}
 	logMod(func) {
