@@ -678,7 +678,7 @@ class InactiveScene {
 				if (d2 < d1) actA = a2;
 				let difference = best - actA;
 				if (d2 < d1) difference *= -1;
-				this.angularAcceleration = 0.01 * f * Math.sign(difference);
+				this.angularVelocity += 0.01 * f * Math.sign(difference);
 			}
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
@@ -987,29 +987,25 @@ class InactiveScene {
 				let d = col.Bdir;
 				let a = col.a;
 				let b = col.b;
-				let wall = b.applyGravity && b.canMoveThisFrame;
+				let mobile = b.applyGravity && b.canMoveThisFrame;
 				let dir = col.Adir.times(col.penetration);
 				a.x -= dir.x;
 				a.y -= dir.y;
 				//velocity
 				a.velocity.sub(col.Adir.times(.1));
-				if (wall) {
-					//calculate relative percentages;
-					let aPercentSize = a.mass / (a.mass + b.mass);
-					let bPercentSize = 1 - aPercentSize;
-					let aPercentSpeed = Math.abs(a.velocity.dot(col.Adir)) / (Math.abs(b.velocity.dot(col.Adir)) + Math.abs(a.velocity.dot(col.Adir)));
-					let bPercentSpeed = 1 - aPercentSpeed;
-					let aPercent = aPercentSize * aPercentSpeed;
-					let bPercent = bPercentSize * bPercentSpeed;
-					//angle
-					let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
-					a.align(angleToAlign, 0.05 * aPercent);
-					b.align(angleToAlign, 0.05 * bPercent);
-				} else {
-					a.canMoveThisFrame = false;
-					a.align((col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI), 0.04);
-				}
-				
+				//calculate relative percentages;
+				let aPercentSize = a.mass / (a.mass + b.mass);
+				let bPercentSize = 1 - aPercentSize;
+				let aPercentSpeed = Math.abs(a.velocity.dot(col.Adir)) / (Math.abs(b.velocity.dot(col.Adir)) + Math.abs(a.velocity.dot(col.Adir)));
+				let bPercentSpeed = 1 - aPercentSpeed;
+				let aPercent = 1 - (aPercentSize * aPercentSpeed);
+				let bPercent = 1 - (bPercentSize * bPercentSpeed);
+				//angle
+				let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
+				a.align(angleToAlign, 0.05 * aPercent);
+				if (mobile) b.align(angleToAlign, 0.05 * bPercent);
+				a.canMoveThisFrame = false;
+
 				//do custom collision response
 				if (!a.colliding.general) a.colliding.general = [b];
 				else a.colliding.general.push(b);
