@@ -264,7 +264,7 @@ class InactiveScene {
 					let sX = (Math.random() * this.width) + this.x - pSize / 2;
 					let sY = (Math.random() * this.height) + this.y - pSize / 2;
 					let n = this.home.addRectElement("Particle #" + (this.particleNumber++) + " from " + this.name, sX, sY, pSize, pSize, false, false, "Engine-Particle");
-					
+
 					let speed = this.dirs.getRandomSpeed();
 					speed.x = (this.particleInitSpeed * speed.x) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
 					speed.y = (this.particleInitSpeed * speed.y) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
@@ -888,32 +888,19 @@ class InactiveScene {
 				} else return new Collision(false, a, b);
 			}
 			static collideCircleRect(a, b) {
-				let edges = PhysicsObject.getEdges(b);
-				let corners = PhysicsObject.getCorners(b);
 				let colliding = b.collider.collideBox(a.collider);
 
 				//getting resolution data
 				let col;
 				if (colliding) {
 					let bestDist = Infinity;
-					let bestPoint = null;
-					for (let i = 0; i < corners.length; i++) {
-						let l = new Line(corners[i], corners[(i + 1) % (corners.length - 1)]);
-						let p = Physics.closestPointOnLineObject(a.middle, l);
-						let d = (p.x - a.x) ** 2 + (p.y - a.y) ** 2;
-						if (d < bestDist) {
-							bestDist = d;
-							bestPoint = p;
-						}
-					}
+					let bestPoint = Physics.closestPointOnRectangle(a.middle, b.collider);
 					if (!bestPoint) return new Collision(false, a, b);
+					bestDist = Physics.distToPoint(bestPoint, a.middle);
 					let collisionAxis = bestPoint.minus(a.middle).normalize();
-					let penetration = a.radius;
-					bestDist = Math.sqrt(bestDist);
-					if (b.collider.collidePoint(a)) {
-						penetration += bestDist;
-						collisionAxis.mul(-1);
-					} else penetration -= bestDist;
+					const inside = b.collider.collidePoint(a.middle);
+					let penetration = a.radius + (inside ? bestDist : -bestDist);
+					if (inside) collisionAxis.mul(-1);
 					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration / 2);
 				} else col = new Collision(false, a, b);
 				return col;
