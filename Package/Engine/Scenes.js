@@ -13,6 +13,18 @@ class Directions {
 		dir.angle = a;
 		return dir;
 	}
+	getRandomSpeed() {
+		if (this.angle) {
+			let min = -this.angle - this.prec;
+			let max = -this.angle + this.prec;
+			let angle = Math.random() * (max - min) + min;
+			let result = Vector2.fromAngle(angle);
+			return result;
+		} else {
+			let result = Vector2.fromAngle(Math.random() * 2 * Math.PI);
+			return this.fix(result);
+		}
+	}
 	fix(v) {
 		if (this.angle) {
 			let va = -this.angle;
@@ -252,12 +264,11 @@ class InactiveScene {
 					let sX = (Math.random() * this.width) + this.x - pSize / 2;
 					let sY = (Math.random() * this.height) + this.y - pSize / 2;
 					let n = this.home.addRectElement("Particle #" + (this.particleNumber++) + " from " + this.name, sX, sY, pSize, pSize, false, false, "Engine-Particle");
-					let x1 = Math.random() - Math.random();
-					let y1 = ((Math.random() > 0.5) ? -1 : 1) * (1 - Math.abs(x1));
-					let speed = (new Vector2(x1, y1)).normalize();
-					speed = this.dirs.fix(new Vector2(speed.x, y1));
-					n.speed.x = (this.particleInitSpeed * speed.x) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
-					n.speed.y = (this.particleInitSpeed * speed.y) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
+					
+					let speed = this.dirs.getRandomSpeed();
+					speed.x = (this.particleInitSpeed * speed.x) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
+					speed.y = (this.particleInitSpeed * speed.y) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
+					n.speed = speed;
 					n.timer = 0;
 					n.layer = this.layer;
 					this.spawns[n.name] = n;
