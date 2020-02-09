@@ -606,7 +606,7 @@ class InactiveScene {
 			}
 			set rotation(a) {
 				this.collider.rotation = a;
-				if (a === 0) this.collider.rotation = 0.000001;
+				if (!a) this.collider.rotation = 0.000001;
 			}
 			get rotation() {
 				return this.collider.rotation;

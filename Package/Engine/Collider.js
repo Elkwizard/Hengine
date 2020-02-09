@@ -38,7 +38,8 @@ class Physics {
 		return (dx ** 2) + (dy ** 2);
 	}
 	static projectPointOntoLine(p, d) {
-		/*let x1 = p.x;
+		/* --My Own Personal Derivation--
+		let x1 = p.x;
 		let y1 = p.y;
 		let dx = d.x;
 		let dy = d.y;
@@ -49,6 +50,7 @@ class Physics {
 		let xr = Math.sqrt(xv ** 2 + yv ** 2);
 		let xfv = xrs * xr;
 		//return xfv;*/
+		// --Dot Product--
 		return p.x * d.x + p.y * d.y;
 	}
 	static closestPointOnRectangle(point, r) {
@@ -78,6 +80,8 @@ class Physics {
 		let max = Math.max(l.a.x, l.b.x);
 		let dx = l.b.x - l.a.x;
 		let dy = l.b.y - l.a.y;
+		if (!dx) dx = 0.0000001;
+		if (!dy) dy = 0.0000001;
 		let b = l.a.y - l.a.x * (dy / dx);
 		let x1 = p.x;
 		let y1 = p.y;
