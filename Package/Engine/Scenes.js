@@ -678,7 +678,7 @@ class InactiveScene {
 				if (d2 < d1) actA = a2;
 				let difference = best - actA;
 				if (d2 < d1) difference *= -1;
-				this.angularVelocity += 0.01 * f * Math.sign(difference);
+				this.angularVelocity += 0.015 * f * Math.sign(difference);
 			}
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
