@@ -715,7 +715,8 @@ class InactiveScene {
 					this.velocity.mul(LOSS);
 					this.angularAcceleration *= LOSS ** 4;
 					this.angularVelocity *= LOSS;
-					if (this.rotation % (Math.PI / 2) < 0.05) {
+					let sideSize = Math.PI / 2;
+					if (this.rotation % sideSize < 0.05) {
 						this.angularVelocity *= 0.999;
 						this.angularAcceleration *= 0.999;
 					}
@@ -823,6 +824,7 @@ class InactiveScene {
 				return new Vector2(o.x + nDif.x, o.y + nDif.y);
 			}
 			static getCorners(r) {
+				if (r.getCorners) return r.getCorners();
 				let corners = [
 					new Vector2(r.x, r.y),
 					new Vector2(r.x + r.width, r.y),
