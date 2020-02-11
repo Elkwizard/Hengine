@@ -67,6 +67,7 @@ class Engine {
 		this.fpsContinuous = 0;
 		this.lastTime = performance.now();
 		this.currentTime = performance.now();
+		this.frameLengths = [];
 		this.frameLength = 0;
 		this.frameCount = 0;
 		//fallbacks
@@ -150,10 +151,13 @@ class Engine {
 				this.frameCount++;
 				this.currentTime = performance.now();
 				//fps
-				if (this.frameCount % this.FPS_FRAMES_TO_COUNT == 0) {
-					this.frameLength = (this.currentTime - this.lastTime) / this.FPS_FRAMES_TO_COUNT;
-					this.fpsContinuous = this.FPS_FRAMES_TO_COUNT * 1000 / (this.currentTime - this.lastTime);
-					this.lastTime = this.currentTime;
+				this.frameLength = this.currentTime - this.lastTime;
+				this.lastTime = this.currentTime;
+				this.frameLengths.push(this.frameLength);
+				if (this.frameLengths.length > this.FPS_FRAMES_TO_COUNT) {
+					this.frameLengths.shift();
+					let val = this.frameLengths.reduce((p, c) => p + c) / this.FPS_FRAMES_TO_COUNT;
+					this.fpsContinuous = 1000 / val;
 				}
 				if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
 				//update

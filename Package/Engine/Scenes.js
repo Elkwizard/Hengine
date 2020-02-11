@@ -680,7 +680,9 @@ class InactiveScene {
 				if (d2 < d1) actA = a2;
 				let difference = best - actA;
 				if (d2 < d1) difference *= -1;
-				this.angularVelocity += 0.015 * f * Math.sign(difference);
+				let val = 0.015 * f * Math.sign(difference);
+				if (!val) val = 0;
+				this.angularVelocity += val;
 			}
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
@@ -867,9 +869,12 @@ class InactiveScene {
 						let dir = edges[i];
 						let originX = crn1.x / cellsize;
 						let originY = crn1.y / cellsize;
-						for (let j = 0; j <= Math.ceil(d / cellsize); j++) {
-							let x = originX + dir.x * j;
-							let y = originY + dir.y * j;
+						let steps = 3;
+						for (let j = 0; j <= Math.ceil(d / cellsize) * steps; j++) {
+							let x = originX + dir.x * j / steps;
+							let y = originY + dir.y * j / steps;
+							if (x % 1 > 0.5) cells.push(P(Math.floor(x + 1), Math.floor(y)));
+							if (y % 1 > 0.5) cells.push(P(Math.floor(x), Math.floor(y + 1)));
 							cells.push(P(Math.floor(x), Math.floor(y)));
 						}
 					}
@@ -1290,8 +1295,9 @@ class Scene extends InactiveScene {
 				for (let [key, cell] of cells) {
 					let x = parseInt(key.split(",")[0]) * this.cellSize;
 					let y = parseInt(key.split(",")[1]) * this.cellSize;
-					c.stroke(cl.RED, 3).rect(x, y, this.cellSize, this.cellSize);
-					c.draw(new Color(255, 0, 0, 0.02)).rect(x, y, this.cellSize, this.cellSize);
+					let r = new Rect(x, y, this.cellSize, this.cellSize);
+					c.stroke(cl.RED, 3).rect(r);
+					c.draw(new Color(255, 0, 0, 0.15)).rect(r);
 				}
 			});
 		}
