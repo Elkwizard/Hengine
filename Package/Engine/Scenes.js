@@ -64,6 +64,7 @@ class InactiveScene {
 		this.contains_array = [];
 		this.custom = {};
 		this.templates = {};
+		this.hasRotatedRectangles = false;
 		this.defaultDraw = function () {
 			if (this.radius === undefined) {
 				c.draw("#000").rect(this.x, this.y, this.width, this.height);
@@ -278,7 +279,7 @@ class InactiveScene {
 						r();
 						delete this.spawner.spawns[this.name];
 					}.bind(n);
-					n.engineUpdate = function () {
+					n.enginePhysicsUpdate = function () {
 						this.lastX = this.x;
 						this.lastY = this.y;
 						if (ns.falls) this.accel.y = this.home.gravity.y;
@@ -304,13 +305,13 @@ class InactiveScene {
 					}
 					drawRect = drawRect.bind(n);
 					if (this.fades) {
-						n.engineDraw = function () {
+						n.engineDrawUpdate = function () {
 							this.home.c.c.globalAlpha = Math.max(0, 1 - (this.lifeSpan / ns.particleLifeSpan));
 							drawRect();
 							this.home.c.c.globalAlpha = 1;
 						}.bind(n);
 					} else {
-						n.engineDraw = function () {
+						n.engineDrawUpdate = function () {
 							drawRect();
 						}.bind(n);
 					}
@@ -515,6 +516,7 @@ class InactiveScene {
 		return [collideAry, notCollideAry]
 	}
 	allowRotatedRectangles() {
+		this.hasRotatedRectangles = true;
 		const LOSS = .985;
 		window.Collision = class {
 			constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0) {
@@ -685,7 +687,7 @@ class InactiveScene {
 				this.canMoveThisFrame = true;
 				this.allCollidingWith.clear();
 			}
-			engineDraw() {
+			engineDrawUpdate() {
 				let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
 				let r = new Rect(this.middle.x - hypot, this.middle.y - hypot, hypot * 2, hypot * 2);
 				if (!this.hidden && (!this.cullGraphics || Physics.overlapRectRect(r, s.adjustedDisplay))) {
@@ -704,7 +706,7 @@ class InactiveScene {
 					}
 				}
 			}
-			engineUpdate(others) {
+			enginePhysicsUpdate(others) {
 				this.physicsUpdate(others);
 				this.scriptUpdate();
 				this.update();
@@ -814,6 +816,28 @@ class InactiveScene {
 					this.moveAwayFrom(point, ferocity);
 				});
 			}
+			static getBoundingBox(r) {
+				let rect;
+				if (r.radius) {
+					rect = new Rect(r.middle.x - r.radius, r.middle.y - r.radius, r.radius * 2, r.radius * 2);
+				} else {
+					let hypot = Math.sqrt((r.width / 2) ** 2 + (r.height / 2) ** 2);
+					rect = new Rect(r.middle.x - hypot, r.middle.y - hypot, hypot * 2, hypot * 2);
+				}
+				return rect;
+			}
+			static getCells(r, cellsize) {
+				let bound = PhysicsObject.getBoundingBox(r);
+				let cells = [];
+				for (let i = 0; i <= Math.ceil(bound.width / cellsize); i++) {
+					for (let j = 0; j <= Math.ceil(bound.height / cellsize); j++) {
+						let x = i + Math.floor(bound.x / cellsize);
+						let y = j + Math.floor(bound.y / cellsize);
+						cells.push(P(x, y));
+					}
+				}
+				return cells;
+			}
 			static rotatePointAround(o, p, r) {
 				let dif = new Vector2(p.x - o.x, p.y - o.y);
 				let a = dif.getAngle();
@@ -905,11 +929,7 @@ class InactiveScene {
 				return col;
 			}
 			static collideRectRect(a, b) {
-				let hypotA = Math.sqrt((a.width / 2) ** 2 + (a.height / 2) ** 2);
-				let hypotB = Math.sqrt((b.width / 2) ** 2 + (b.height / 2) ** 2);
-				let r1 = new Rect(a.middle.x - hypotA, a.middle.y - hypotA, hypotA * 2, hypotA * 2);
-				let r2 = new Rect(b.middle.x - hypotB, b.middle.y - hypotB, hypotB * 2, hypotB * 2);
-				if (!(r1.x < r2.x + r2.width && r2.x < r1.x + r1.width && r1.y < r2.y + r2.height && r2.y < r1.y + r1.height)) return new Collision(false, a, b);
+				if (!Physics.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
 				let aEdges = PhysicsObject.getEdges(a);
 				let bEdges = PhysicsObject.getEdges(b);
 				let edges = [
@@ -1138,6 +1158,7 @@ class Scene extends InactiveScene {
 				if (o) o.hovered = false;
 			}
 		}.bind(this);
+		this.cellSize = 100;
 		this.removeQueue = [];
 		this.S = {
 			UA: this.updateArray.bind(this),
@@ -1192,9 +1213,33 @@ class Scene extends InactiveScene {
 			q.push(x);
 		}
 		for (let rect of this.contains_array) rect.pushToRemoveQueue = p;
-		for (let rect of this.contains_array) {
-			rect.engineUpdate(this.contains_array);
-
+		if (!this.hasRotatedRectangles) for (let rect of this.contains_array) rect.enginePhysicsUpdate(this.contains_array);
+		else {
+			let cells = {};
+			let cells2 = [[]];
+			for (let rect of this.contains_array) {
+				if (!(rect instanceof PhysicsObject)) continue;
+				let cls = PhysicsObject.getCells(rect, this.cellSize);
+				for (let cl of cls) {
+					let key = cl.x + "," + cl.y;
+					if (cells[key]) cells[key].push(rect);
+					else cells[key] = [rect];
+					cells2[cells2.length - 1].push(cells[key]);
+				}
+				cells2.push([]);
+			}
+			for (let i = 0; i < this.contains_array.length; i++) {
+				let rect = this.contains_array[i];
+				if (!(rect instanceof PhysicsObject)) continue;
+				let updater = [];
+				let updateCells = cells2[i];
+				for (let cell of updateCells) {
+					for (let r of cell) {
+						if (r !== rect && !updater.includes(r)) updater.push(r);
+					}
+				}
+				rect.enginePhysicsUpdate(updater);
+			}
 		}
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
@@ -1221,7 +1266,7 @@ class Scene extends InactiveScene {
 			return a.layer - b.layer;
 		});
 		for (let rect of this.contains_array) {
-			rect.engineDraw();
+			rect.engineDrawUpdate();
 			rect.lifeSpan++;
 		}
 		this.c.c.translate(this.display.x, this.display.y);

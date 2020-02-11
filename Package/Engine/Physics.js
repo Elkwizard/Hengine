@@ -169,7 +169,7 @@ class PhysicsObject extends SceneObject {
 			this.allowCollisions();
 		});
 	}
-	engineDraw() {
+	engineDrawUpdate() {
 		if (!this.hidden && (!this.cullGraphics || !this.home.cullGraphics || this.collide(this.home.adjustedDisplay))) {
 			this.draw();
 			this.scriptDraw();
@@ -178,7 +178,7 @@ class PhysicsObject extends SceneObject {
 			this.shown = false;
 		}
 	}
-	engineUpdate(hitboxes) {
+	enginePhysicsUpdate(hitboxes) {
 		if (!this.static) {
 			this.oldX = this.x;
 			this.oldY = this.y;

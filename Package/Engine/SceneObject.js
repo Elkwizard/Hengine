@@ -93,14 +93,14 @@ class SceneObject extends Rect {
 	collidePoint(x, y) {
 		return this.collider.collidePoint(x, y);
 	}
-	engineDraw() {
+	engineDrawUpdate() {
 		this.update();
 		if (!this.hidden) {
 			this.draw();
 			this.scriptDraw();
 		}
 	}
-	engineUpdate(hitboxes) {
+	enginePhysicsUpdate(hitboxes) {
 		if (this.controls) {
 			this.move();
 		}
