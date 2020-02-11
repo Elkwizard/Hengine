@@ -1160,7 +1160,7 @@ class Scene extends InactiveScene {
 				if (o) o.hovered = false;
 			}
 		}.bind(this);
-		this.cellSize = 100;
+		this.cellSize = 150;
 		this.removeQueue = [];
 		this.S = {
 			UA: this.updateArray.bind(this),
@@ -1217,10 +1217,17 @@ class Scene extends InactiveScene {
 		for (let rect of this.contains_array) rect.pushToRemoveQueue = p;
 		if (!this.hasRotatedRectangles) for (let rect of this.contains_array) rect.enginePhysicsUpdate(this.contains_array);
 		else {
+			//grid
 			let cells = {};
 			let cells2 = [[]];
+			let isUseless = (a) => !(a instanceof PhysicsObject) || !a.canCollide || (a.tag === "Engine-Particle");
+			let useful = []
+			let useless = [];
 			for (let rect of this.contains_array) {
-				if (!(rect instanceof PhysicsObject)) continue;
+				if (isUseless(rect)) {
+					useless.push(rect);
+					continue;
+				} else useful.push(rect);
 				let cls = PhysicsObject.getCells(rect, this.cellSize);
 				for (let cl of cls) {
 					let key = cl.x + "," + cl.y;
@@ -1230,9 +1237,8 @@ class Scene extends InactiveScene {
 				}
 				cells2.push([]);
 			}
-			for (let i = 0; i < this.contains_array.length; i++) {
-				let rect = this.contains_array[i];
-				if (!(rect instanceof PhysicsObject)) continue;
+			for (let i = 0; i < useful.length; i++) {
+				let rect = useful[i];
 				let updater = [];
 				let updateCells = cells2[i];
 				for (let cell of updateCells) {
@@ -1241,6 +1247,13 @@ class Scene extends InactiveScene {
 					}
 				}
 				rect.enginePhysicsUpdate(updater);
+			}
+			for (let rect of useless) rect.enginePhysicsUpdate([]);
+			if (0) for (let [key, cell] of cells) {
+				let x = parseInt(key.split(",")[0]) * this.cellSize;
+				let y = parseInt(key.split(",")[1]) * this.cellSize;
+				c.stroke(cl.RED, 3).rect(x, y, this.cellSize, this.cellSize);
+				c.draw(new Color(255, 0, 0, 0.2)).rect(x, y, this.cellSize, this.cellSize);
 			}
 		}
 		for (let rect of q) rect.home.removeElement(rect);
