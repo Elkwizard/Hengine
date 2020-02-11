@@ -829,15 +829,35 @@ class InactiveScene {
 			}
 			static getCells(r, cellsize) {
 				let bound = PhysicsObject.getBoundingBox(r);
-				let cells = [];
-				for (let i = 0; i <= Math.ceil(bound.width / cellsize); i++) {
-					for (let j = 0; j <= Math.ceil(bound.height / cellsize); j++) {
-						let x = i + Math.floor(bound.x / cellsize);
-						let y = j + Math.floor(bound.y / cellsize);
-						cells.push(P(x, y));
+				if (r.radius || (bound.width * bound.height) / (cellsize ** 2) < 30) {
+					let cells = [];
+					for (let i = 0; i <= Math.ceil(bound.width / cellsize); i++) {
+						for (let j = 0; j <= Math.ceil(bound.height / cellsize); j++) {
+							let x = i + Math.floor(bound.x / cellsize);
+							let y = j + Math.floor(bound.y / cellsize);
+							cells.push(P(x, y));
+						}
 					}
+					return cells;
+				} else {
+					let cells = [];
+					let edges = PhysicsObject.getEdges(r);
+					let corners = PhysicsObject.getCorners(r);
+					for (let i = 0; i < corners.length; i++) {
+						let crn1 = corners[i];
+						let crn2 = corners[i - 1] ? corners[i - 1] : corners[corners.length - 1];
+						let d = Physics.distToPoint(crn1, crn2);
+						let dir = edges[i];
+						let originX = crn1.x / cellsize;
+						let originY = crn1.y / cellsize;
+						for (let j = 0; j <= Math.ceil(d / cellsize); j++) {
+							let x = originX + dir.x * j;
+							let y = originY + dir.y * j;
+							cells.push(P(Math.floor(x), Math.floor(y)));
+						}
+					}
+					return cells;
 				}
-				return cells;
 			}
 			static rotatePointAround(o, p, r) {
 				let dif = new Vector2(p.x - o.x, p.y - o.y);
@@ -1249,12 +1269,14 @@ class Scene extends InactiveScene {
 				rect.enginePhysicsUpdate(updater);
 			}
 			for (let rect of useless) rect.enginePhysicsUpdate([]);
-			if (0) for (let [key, cell] of cells) {
-				let x = parseInt(key.split(",")[0]) * this.cellSize;
-				let y = parseInt(key.split(",")[1]) * this.cellSize;
-				c.stroke(cl.RED, 3).rect(x, y, this.cellSize, this.cellSize);
-				c.draw(new Color(255, 0, 0, 0.2)).rect(x, y, this.cellSize, this.cellSize);
-			}
+			if (1) s.drawWithTransformations(e => {
+				for (let [key, cell] of cells) {
+					let x = parseInt(key.split(",")[0]) * this.cellSize;
+					let y = parseInt(key.split(",")[1]) * this.cellSize;
+					c.stroke(cl.RED, 3).rect(x, y, this.cellSize, this.cellSize);
+					c.draw(new Color(255, 0, 0, 0.2)).rect(x, y, this.cellSize, this.cellSize);
+				}
+			});
 		}
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];

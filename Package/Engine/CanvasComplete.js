@@ -521,6 +521,35 @@ class Artist {
 				this.c.lineTo(x1, y1)
 				this.c.stroke()
 			},
+			arrow(x, y, x1, y1) {
+				if (typeof x == "object") {
+					if (x instanceof Line) {
+						x1 = x.b.x;
+						y1 = x.b.y;
+						y = x.a.y;
+						x = x.a.x;
+					} else {
+						x1 = y.x;
+						y1 = y.y;
+						y = x.y;
+						x = x.x;
+					}
+				}
+				let angle = Math.atan2(y1 - y, x1 - x);
+				let mag = Math.sqrt((x1 - x) ** 2 + (y1 - y) ** 2);
+				this.c.translate(x, y);
+				this.c.rotate(angle);
+				this.c.moveTo(0, 0);
+				this.c.lineTo(mag - this.c.lineWidth * 4 + 0.5, 0);
+				this.c.stroke();
+				this.draw(this.c.strokeStyle).triangle(
+					P(mag - this.c.lineWidth * 4, -this.c.lineWidth * 2), 
+					P(mag - this.c.lineWidth * 4, this.c.lineWidth * 2), 
+					P(mag, 0)
+				);
+				this.c.rotate(-angle);
+				this.c.translate(-x, -y);
+			},
 			shape: function (...v) {
 				this.c.beginPath();
 				this.c.moveTo(v[0].x, v[0].y);
