@@ -63,8 +63,11 @@ Object.prototype[Symbol.iterator] = function* () {
 class Engine {
 	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
 		setupAlerts();
-		this.fps = 0;
+		this.fps = 60;
 		this.fpsContinuous = 0;
+		this.lastTime = performance.now();
+		this.currentTime = performance.now();
+		this.frameLength = 0;
 		this.frameCount = 0;
 		//fallbacks
 		function f(a, b) {
@@ -84,12 +87,12 @@ class Engine {
 		this.afterUpdate = function () { };
 		this.fixedUpdate = function () { };
 		this.catchErrors = true;
+		this.hasFixedPhysicsUpdateCycle = true;
 		try {
 			if (FunctionLibrary) {
 				this.f = new FunctionLibrary();
 			}
 		} catch (e) { }
-		this.custom = {};
 		//windows
 		this.window = class {
 			constructor(x, y, width, height, title, contents) {
@@ -130,7 +133,7 @@ class Engine {
 		//for real this time
 		this.engineUpdate = function () {
 			try {
-				if (!this.paused) {
+				if (this.hasFixedPhysicsUpdateCycle) if (!this.paused) {
 					this.fixedUpdate();
 					this.scene.enginePhysicsUpdate();
 				}
@@ -140,18 +143,29 @@ class Engine {
 			}
 		}.bind(this);
 		setInterval(this.engineUpdate, 16);
+		this.FPS_FRAMES_TO_COUNT = 10;
 		this.animate = function () {
 			try {
 				requestAnimationFrame(this.animate);
 				this.frameCount++;
-				let oldTime = this.fpsOldTime
-				if (this.frameCount % 30 === 0) this.fps = Math.floor(this.fpsContinuous);
-				this.fpsContinuous = 1000 / ((this.fpsOldTime = performance.now()) - oldTime);
+				this.currentTime = performance.now();
+				//fps
+				if (this.frameCount % this.FPS_FRAMES_TO_COUNT == 0) {
+					this.frameLength = (this.currentTime - this.lastTime) / this.FPS_FRAMES_TO_COUNT;
+					this.fpsContinuous = this.FPS_FRAMES_TO_COUNT * 1000 / (this.currentTime - this.lastTime);
+					this.lastTime = this.currentTime;
+				}
+				if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
+				//update
 				if (!this.paused) {
 					this.beforeUpdate();
 					this.clear();
 					this.update();
 					this.scene.engineDrawUpdate();
+					if (!this.hasFixedPhysicsUpdateCycle) {
+						this.fixedUpdate();
+						this.scene.enginePhysicsUpdate();
+					}
 					this.afterUpdate();
 				}
 			} catch (e) {
