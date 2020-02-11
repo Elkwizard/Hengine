@@ -843,7 +843,24 @@ class InactiveScene {
 					let cells = [];
 					let edges = PhysicsObject.getEdges(r);
 					let corners = PhysicsObject.getCorners(r);
-					for (let i = 0; i < corners.length; i++) {
+					let nums = [0, 1, 2, 3];
+					if (r.width < cellsize) {
+						nums = [0];
+						let x = (corners[0].x + corners[1].x) / 2;
+						let y = (corners[0].y + corners[1].y) / 2;
+						let x2 = (corners[2].x + corners[3].x) / 2;
+						let y2 = (corners[2].y + corners[3].y) / 2;
+						cells.push(P(x, y), P(x2, y2));
+					}
+					if (r.height < cellsize) {
+						nums = [1];
+						let x = (corners[1].x + corners[2].x) / 2;
+						let y = (corners[1].y + corners[2].y) / 2;
+						let x2 = (corners[3].x + corners[0].x) / 2;
+						let y2 = (corners[3].y + corners[0].y) / 2;
+						cells.push(P(x, y), P(x2, y2));
+					}
+					for (let i of nums) {
 						let crn1 = corners[i];
 						let crn2 = corners[i - 1] ? corners[i - 1] : corners[corners.length - 1];
 						let d = Physics.distToPoint(crn1, crn2);
@@ -1261,7 +1278,7 @@ class Scene extends InactiveScene {
 				let rect = useful[i];
 				let updater = [];
 				let updateCells = cells2[i];
-				for (let cell of updateCells) {
+				if (rect.applyGravity) for (let cell of updateCells) {
 					for (let r of cell) {
 						if (r !== rect && !updater.includes(r)) updater.push(r);
 					}
@@ -1269,12 +1286,12 @@ class Scene extends InactiveScene {
 				rect.enginePhysicsUpdate(updater);
 			}
 			for (let rect of useless) rect.enginePhysicsUpdate([]);
-			if (1) s.drawWithTransformations(e => {
+			if (0) s.drawWithTransformations(e => {
 				for (let [key, cell] of cells) {
 					let x = parseInt(key.split(",")[0]) * this.cellSize;
 					let y = parseInt(key.split(",")[1]) * this.cellSize;
 					c.stroke(cl.RED, 3).rect(x, y, this.cellSize, this.cellSize);
-					c.draw(new Color(255, 0, 0, 0.2)).rect(x, y, this.cellSize, this.cellSize);
+					c.draw(new Color(255, 0, 0, 0.02)).rect(x, y, this.cellSize, this.cellSize);
 				}
 			});
 		}
