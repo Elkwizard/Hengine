@@ -35,6 +35,7 @@ class Project {
 		window.custom = this.custom;
 		window.loadImage = this.loadImage.bind(this);
 		window.loadSound = this.loadSound.bind(this);
+		this.randomSeed = 1;
 		window.rand = this.rand.bind(this);
 		window.middle = this.middle.bind(this);
 		this.SPRITE_PATH = "../Art/Sprites/";
@@ -218,7 +219,10 @@ class Project {
 		return x;
 	}
 	rand() {
-		return Math.random();
+		let seed = this.randomSeed++;
+		let a = (seed * 6.12849) % 8.7890975
+		let b = (a * 256783945.4758903) % 22.567890;
+		return (Math.cos(a * b) + 1) / 2;
 	}
 	middle() {
 		return this.c.middle();
