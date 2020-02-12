@@ -792,7 +792,8 @@ class InactiveScene {
 				this.angularVelocity += this.angularAcceleration;
 				this.rotation += this.angularVelocity;
 				if (this.applyGravity) {
-					this.align(this.velocity.getAngle(), 0.01, true);
+					//if (this.colliding.general) this.align(this.velocity.getAngle(), 0.005, true);
+					this.align(this.velocity.getAngle(), 0.01);
 				}
 				this.rotation %= Math.PI * 2;
 
@@ -1136,6 +1137,7 @@ class InactiveScene {
 			constructor(name, x, y, radius, gravity, controls, tag, home) {
 				super(name, x, y, 0, 0, gravity, controls, tag, home);
 				this.collider = new CircleCollider(x, y, radius, this.rotation);
+				this.optimalRotation = null;
 			}
 			set middle(a) {
 				this.x = a.x;
