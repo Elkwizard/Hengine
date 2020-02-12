@@ -707,10 +707,8 @@ class InactiveScene {
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(-this.rotation);
 					c.translate(-this.middle.x, -this.middle.y);
-					if (false) {
-						let hypot = Math.sqrt((this.width / 2) ** 2 + (this.height / 2) ** 2);
-						let r = new Rect(this.middle.x - hypot, this.middle.y - hypot, hypot * 2, hypot * 2);
-						c.stroke(cl.RED, .5).rect(r);
+					if (0) {
+						c.stroke(cl.RED, 1).rect(PhysicsObject.getBoundingBox(this));
 					}
 				}
 			}
@@ -775,8 +773,7 @@ class InactiveScene {
 			physicsUpdate(others) {
 				if (this.applyGravity) {
 					let lessMass = (this.mass ** .5);
-					//console.log(lessMass, lessMass ** .5, (lessMass ** .5) / 7.0710678118654755,  (lessMass ** .5) / 70.710678118654755);
-					let factor = Math.min((lessMass ** .5) / 7.0710678118654755, 15);
+					let factor = Math.min((lessMass ** .5) / 7.0710678118654755, 1.1);
 					this.velocity.add(new Vector2(this.home.gravity.x * factor, this.home.gravity.y * factor));
 				}
 
@@ -792,8 +789,8 @@ class InactiveScene {
 				this.angularVelocity += this.angularAcceleration;
 				this.rotation += this.angularVelocity;
 				if (this.applyGravity) {
-					//if (this.colliding.general) this.align(this.velocity.getAngle(), 0.005, true);
-					this.align(this.velocity.getAngle(), 0.01);
+					if (this.colliding.general) this.align(this.velocity.getAngle(), 0.005, true);
+					//this.align(this.velocity.getAngle(), 0.01);
 				}
 				this.rotation %= Math.PI * 2;
 
