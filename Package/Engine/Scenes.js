@@ -602,6 +602,7 @@ class InactiveScene {
 				this.collideBasedOnRule = e => true;
 				this.optimize = (a, b) => true;
 				this.canMoveThisFrame = true;
+				this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
 			}
 			get mass() {
 				return this.width * this.height;
@@ -650,11 +651,15 @@ class InactiveScene {
 			removeCollisions() {
 				this.canCollide = false;
 			}
-			align(angle, f) {
+			align(angle, f, aerodynamic) {
 				let reversed = 1;
-				let a = angle;
+				let a = angle + this.optimalRotation ? this.optimalRotation : 0;
 				let p2 = Math.PI / 2;
-				let possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3];
+				let possibleDirections = [a, a + Math.PI];
+				if (this.optimalRotation == null || !aerodynamic) {
+					a = angle;
+					possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3];
+				}
 				let best = possibleDirections[0];
 				let dif = Math.abs(possibleDirections[0] - this.rotation);
 				for (let dir of possibleDirections) {
@@ -662,6 +667,7 @@ class InactiveScene {
 					let d2 = Math.abs(dir - this.rotation - Math.PI * 2);
 					if (d < dif) {
 						dif = d;
+						//demons
 						best = dir;
 						reversed = 1;
 					}
@@ -768,7 +774,10 @@ class InactiveScene {
 			}
 			physicsUpdate(others) {
 				if (this.applyGravity) {
-					this.velocity.add(this.home.gravity);
+					let lessMass = (this.mass ** .5);
+					//console.log(lessMass, lessMass ** .5, (lessMass ** .5) / 7.0710678118654755,  (lessMass ** .5) / 70.710678118654755);
+					let factor = Math.min((lessMass ** .5) / 7.0710678118654755, 15);
+					this.velocity.add(new Vector2(this.home.gravity.x * factor, this.home.gravity.y * factor));
 				}
 
 				if (this.slows) this.slowDown();
@@ -783,7 +792,7 @@ class InactiveScene {
 				this.angularVelocity += this.angularAcceleration;
 				this.rotation += this.angularVelocity;
 				if (this.applyGravity) {
-					this.align(this.velocity.getAngle(), 0.01);
+					this.align(this.velocity.getAngle(), 0.01, true);
 				}
 				this.rotation %= Math.PI * 2;
 
