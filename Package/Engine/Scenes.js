@@ -1074,6 +1074,10 @@ class InactiveScene {
 				
 				let aPercent = (1 - (aPercentSize * aPercentSpeed));
 				let bPercent = (1 - (bPercentSize * bPercentSpeed));
+				if (mobile) {
+					aPercent *= aVelocityCoefficient;
+					bPercent *= bVelocityCoefficient;	
+				}
 				//angle
 				let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
 				a.align(angleToAlign, 0.05 * aPercent);
