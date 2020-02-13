@@ -807,11 +807,11 @@ class InactiveScene {
 
 				if (this.slows) this.slowDown();
 				//linear
-				this.velocity.add(this.acceleration);
+				this.velocity.add(this.acceleration.times(this.home.speedModulation));
 				let m = Math.min(this.width, this.height) / 3;
 				if (this.velocity.mag > m) this.velocity.mag = m;
-				this.x += this.velocity.x * 2;
-				this.y += this.velocity.y * 2;
+				this.x += this.velocity.x * 2 * this.home.speedModulation;
+				this.y += this.velocity.y * 2 * this.home.speedModulation;
 
 				//angular
 				this.angularVelocity += this.angularAcceleration;
@@ -1207,6 +1207,7 @@ class Scene extends InactiveScene {
 		this.home = home;
 		this.zoom = 1;
 		this.cullGraphics = true;
+		this.speedModulation = 1;
 		this.display = new Rect(0, 0, this.c.canvas.width, this.c.canvas.height)
 		this.adjustedDisplay = new Rect(this.display.x, this.display.y, this.display.width, this.display.height);
 		M.engineClick = function (e) {
