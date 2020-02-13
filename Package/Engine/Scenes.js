@@ -1067,10 +1067,10 @@ class InactiveScene {
 				//calculate relative percentages;
 				let aPercentSize = a.mass / (a.mass + b.mass);
 				let bPercentSize = 1 - aPercentSize;
-				let aPercentSpeed = Math.abs(a.velocity.dot(col.Adir)) / (Math.abs(b.velocity.dot(col.Adir)) + Math.abs(a.velocity.dot(col.Adir)));
+				let aPercentSpeed = Math.abs(a.velocity.dot(col.Adir)) / (Math.abs(b.velocity.dot(col.Bdir)) + Math.abs(a.velocity.dot(col.Adir)));
 				let bPercentSpeed = 1 - aPercentSpeed;
-				let aPercent = 1 - (aPercentSize * aPercentSpeed);
-				let bPercent = 1 - (bPercentSize * bPercentSpeed);
+				let aPercent = (1 - (aPercentSize * aPercentSpeed)) * Math.min(Math.abs(a.velocity.mag), 1);
+				let bPercent = (1 - (bPercentSize * bPercentSpeed)) * Math.min(Math.abs(b.velocity.mag), 1);
 				//angle
 				let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
 				a.align(angleToAlign, 0.05 * aPercent);
