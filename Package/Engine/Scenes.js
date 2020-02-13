@@ -1069,8 +1069,11 @@ class InactiveScene {
 				let bPercentSize = 1 - aPercentSize;
 				let aPercentSpeed = Math.abs(a.velocity.dot(col.Adir)) / (Math.abs(b.velocity.dot(col.Bdir)) + Math.abs(a.velocity.dot(col.Adir)));
 				let bPercentSpeed = 1 - aPercentSpeed;
-				let aPercent = (1 - (aPercentSize * aPercentSpeed)) * Math.min(Math.abs(a.velocity.mag), 1);
-				let bPercent = (1 - (bPercentSize * bPercentSpeed)) * Math.min(Math.abs(b.velocity.mag), 1);
+				let aVelocityCoefficient = Math.min(Math.abs(a.velocity.mag), 1);
+				let bVelocityCoefficient = Math.min(Math.abs(b.velocity.mag), 1);
+				
+				let aPercent = (1 - (aPercentSize * aPercentSpeed));
+				let bPercent = (1 - (bPercentSize * bPercentSpeed));
 				//angle
 				let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
 				a.align(angleToAlign, 0.05 * aPercent);
