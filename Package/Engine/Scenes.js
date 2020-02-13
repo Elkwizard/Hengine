@@ -541,6 +541,22 @@ class InactiveScene {
 				return a.min < b.max && b.min < a.max;
 			}
 		}
+		window.Link = class {
+			constructor(start, end, fer) {
+				this.start = start;
+				this.end = end;
+				this.ferocity = fer;
+			}
+			fix() {
+				let l = new Line(this.start.middle, this.end.middle);
+				let d = g.f.getDistance(l.a, l.b);
+				d = clamp(d / 10, 0, 40);
+				d *= this.ferocity;
+				let dir = new Vector2(this.end.middle.x - this.start.middle.x, this.end.middle.y - this.start.middle.y);
+				dir.normalize();
+				this.start.linkMovement.add(dir.times(d));
+			}
+		}
 		PhysicsObject = class extends SceneObject {
 			constructor(name, x, y, width, height, gravity, controls, tag, home) {
 				super(name, x, y, width, height, controls, tag, home);
@@ -551,6 +567,8 @@ class InactiveScene {
 				this.angularAcceleration = 0;
 				this.applyGravity = gravity;
 				this.slows = gravity;
+				this.links = [];
+				this.linkMovement = new Vector2(0, 0);
 				this.colliding = {
 					top: null,
 					bottom: null,
@@ -632,6 +650,9 @@ class InactiveScene {
 			}
 			get applyGravity() {
 				return this._applyGravity;
+			}
+			linkTo(el, fer = 1) {
+				this.links.push(new Link(this, el, fer));
 			}
 			stop() {
 				this.velocity = new Vector2(0, 0);
@@ -772,6 +793,13 @@ class InactiveScene {
 			}
 			physicsUpdate(others) {
 				if (this.applyGravity) {
+					//links
+					this.linkMovement.mul(0);
+					for (let link of this.links) link.fix();
+					this.x += this.linkMovement.x;
+					this.y += this.linkMovement.y;
+
+					//gravity
 					let lessMass = (this.mass ** .5);
 					let factor = Math.min((lessMass ** .5) / 7.0710678118654755, 1.1);
 					this.velocity.add(new Vector2(this.home.gravity.x * factor, this.home.gravity.y * factor));
@@ -1063,14 +1091,15 @@ class InactiveScene {
 				a.x -= dir.x;
 				a.y -= dir.y;
 				//velocity
-				a.velocity.sub(col.Adir.times(.1));
+				let aVelocityCoefficient = clamp(Math.abs(a.velocity.mag) - 0.1, 0, 1);
+				let bVelocityCoefficient = clamp(Math.abs(b.velocity.mag) - 0.1, 0, 1);
+
+				if (a.velocity.mag) a.velocity.sub(col.Adir.times(.1));
 				//calculate relative percentages;
 				let aPercentSize = a.mass / (a.mass + b.mass);
 				let bPercentSize = 1 - aPercentSize;
 				let aPercentSpeed = Math.abs(a.velocity.dot(col.Adir)) / (Math.abs(b.velocity.dot(col.Bdir)) + Math.abs(a.velocity.dot(col.Adir)));
 				let bPercentSpeed = 1 - aPercentSpeed;
-				let aVelocityCoefficient = clamp(Math.abs(a.velocity.mag) - 0.1, 0, 1);
-				let bVelocityCoefficient = clamp(Math.abs(b.velocity.mag) - 0.1, 0, 1);
 				
 				let aPercent = (1 - (aPercentSize * aPercentSpeed));
 				let bPercent = (1 - (bPercentSize * bPercentSpeed));
