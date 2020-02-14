@@ -550,7 +550,7 @@ class InactiveScene {
 			fix() {
 				let l = new Line(this.start.middle, this.end.middle);
 				let d = g.f.getDistance(l.a, l.b);
-				d = clamp(d / 10, 0, 40);
+				d = clamp(d / 10, 0, 20);
 				d *= this.ferocity;
 				let dir = new Vector2(this.end.middle.x - this.start.middle.x, this.end.middle.y - this.start.middle.y);
 				dir.normalize();
@@ -752,6 +752,8 @@ class InactiveScene {
 					if (Math.abs(this.velocity.x) < 0.01) this.velocity.x = 0;
 					if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
 					if (Math.abs(this.angularVelocity) < 0.0001) this.angularVelocity = 0;
+					let m = Math.min(this.width, this.height) / 3;
+					if (this.velocity.mag > m) this.velocity.mag = m;
 				}
 			}
 			detectCollisions(others) {
@@ -805,17 +807,16 @@ class InactiveScene {
 					this.velocity.add(new Vector2(this.home.gravity.x * factor, this.home.gravity.y * factor));
 				}
 
-				if (this.slows) this.slowDown();
 				//linear
 				this.velocity.add(this.acceleration.times(this.home.speedModulation));
-				let m = Math.min(this.width, this.height) / 3;
-				if (this.velocity.mag > m) this.velocity.mag = m;
+				//slow
+				if (this.slows) this.slowDown();
 				this.x += this.velocity.x * 2 * this.home.speedModulation;
 				this.y += this.velocity.y * 2 * this.home.speedModulation;
 
 				//angular
-				this.angularVelocity += this.angularAcceleration;
-				this.rotation += this.angularVelocity;
+				this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
+				this.rotation += this.angularVelocity * this.home.speedModulation;
 				if (this.applyGravity) {
 					if (this.colliding.general) this.align(this.velocity.getAngle(), 0.005, true);
 					//this.align(this.velocity.getAngle(), 0.01);
@@ -1094,7 +1095,10 @@ class InactiveScene {
 				let aVelocityCoefficient = clamp(Math.abs(a.velocity.mag) - 0.1, 0, 1);
 				let bVelocityCoefficient = clamp(Math.abs(b.velocity.mag) - 0.1, 0, 1);
 
-				if (a.velocity.mag) a.velocity.sub(col.Adir.times(.1));
+				if (a.velocity.mag) {
+					let velocityMagnitude = clamp(a.velocity.dot(col.Adir), 0, 1) * 0.1;
+					a.velocity.sub(col.Adir.times(velocityMagnitude));
+				}
 				//calculate relative percentages;
 				let aPercentSize = a.mass / (a.mass + b.mass);
 				let bPercentSize = 1 - aPercentSize;
