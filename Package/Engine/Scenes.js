@@ -1289,6 +1289,17 @@ class Scene extends InactiveScene {
 		this.c.c.scale(1 / this.zoom, 1 / this.zoom)
 		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
 	}
+	drawWithoutTransformations(artist) {
+		this.c.c.translate(this.display.x, this.display.y)
+		this.c.c.translate(this.c.middle.x, this.c.middle.y)
+		this.c.c.scale(1 / this.zoom, 1 / this.zoom)
+		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
+		artist();
+		this.c.c.translate(this.c.middle.x, this.c.middle.y)
+		this.c.c.scale(this.zoom, this.zoom)
+		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
+		this.c.c.translate(-this.display.x, -this.display.y)
+	}
 	repairDisplay() {
 		let nMin = new Vertex(this.display.x, this.display.y);
 		let nMax = new Vertex(this.display.x + this.display.width, this.display.y + this.display.height);
