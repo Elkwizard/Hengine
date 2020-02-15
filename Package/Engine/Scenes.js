@@ -563,7 +563,6 @@ class InactiveScene {
 				this.velocity = new Vector2(0, 0);
 				this.acceleration = new Vector2(0, 0);
 				this._rotation = 0.0001;
-				this.nessesaryAlignment = 0;
 				this.angularVelocity = 0;
 				this.angularAcceleration = 0;
 				this.applyGravity = gravity;
@@ -673,7 +672,7 @@ class InactiveScene {
 			removeCollisions() {
 				this.canCollide = false;
 			}
-			align(angle, f, aerodynamic) {
+			align(angle, f, aerodynamic, par = "rotation") {
 				let reversed = 1;
 				let a = angle + this.optimalRotation ? this.optimalRotation : 0;
 				let p2 = Math.PI / 2;
@@ -698,15 +697,15 @@ class InactiveScene {
 						reversed = -1;
 					}
 				}
-				if (false) this.home.drawInWorldSpace(e => {
-					let v1 = Vector2.fromAngle(this.rotation);
-					let v2 = Vector2.fromAngle(best);
-					const len = 50;
-					for (let a of possibleDirections) c.stroke(cl.GREEN, 3).arrow(this.middle, Vector2.fromAngle(a).times(len).add(this.middle));
-					c.stroke(cl.LIME, 5).arrow(this.middle, v2.times(len).add(this.middle));
-					c.stroke(cl.BLUE, 3).arrow(this.middle, v1.times(len).add(this.middle));
-					c.draw(cl.BLACK).circle(this.middle.x, this.middle.y, 5);
-				});
+				// this.home.drawInWorldSpace(e => {
+				// 	let v1 = Vector2.fromAngle(this.rotation);
+				// 	let v2 = Vector2.fromAngle(best);
+				// 	const len = 50;
+				// 	for (let a of possibleDirections) c.stroke(cl.GREEN, 3).arrow(this.middle, Vector2.fromAngle(a).times(len).add(this.middle));
+				// 	c.stroke(cl.LIME, 5).arrow(this.middle, v2.times(len).add(this.middle));
+				// 	c.stroke(cl.BLUE, 3).arrow(this.middle, v1.times(len).add(this.middle));
+				// 	c.draw(cl.BLACK).circle(this.middle.x, this.middle.y, 5);
+				// });
 				f *= reversed;
 				let a1 = this.rotation;
 				let a2 = this.rotation + Math.PI * 2;
@@ -716,9 +715,9 @@ class InactiveScene {
 				if (d2 < d1) actA = a2;
 				let difference = best - actA;
 				if (d2 < d1) difference *= -1;
-				let val = 0.015 * f * Math.sign(difference);
+				let val = 0.3 * f * Math.sign(difference);
 				if (!val) val = 0;
-				this.nessesaryAlignment += val;
+				this[par] += val;
 			}
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
@@ -737,9 +736,6 @@ class InactiveScene {
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(-this.rotation);
 					c.translate(-this.middle.x, -this.middle.y);
-					if (0) {
-						c.stroke(cl.RED, 1).rect(PhysicsObject.getBoundingBox(this));
-					}
 				}
 			}
 			enginePhysicsUpdate(others) {
@@ -751,7 +747,7 @@ class InactiveScene {
 				if (this.slows) {
 					this.acceleration.mul(LOSS);
 					this.velocity.mul(LOSS);
-					this.angularAcceleration *= LOSS ** 4;
+					this.angularAcceleration *= LOSS ** 8;
 					this.angularVelocity *= LOSS;
 					let sideSize = Math.PI / 2;
 					if (this.rotation % sideSize < 0.05) {
@@ -828,17 +824,11 @@ class InactiveScene {
 				this.rotation += this.angularVelocity * this.home.speedModulation;
 
 				let collisions = this.detectCollisions(others);
-				this.nessesaryAlignment = this.angularVelocity;
 				if (this.applyGravity) {
 					for (let collision of collisions) {
 						if (collision.colliding) PhysicsObject.resolve(collision);
 					}
 				}
-				this.angularVelocity = this.nessesaryAlignment;
-				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
-				this.lastX = this.x;
-				this.lastY = this.y;
-
 				//align with direction
 				if (this.applyGravity) {
 					if (!this.colliding.general) {
@@ -846,6 +836,10 @@ class InactiveScene {
 					}
 				}
 				this.rotation %= Math.PI * 2;
+
+				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
+				this.lastX = this.x;
+				this.lastY = this.y;
 			}
 			moveTowards(point, ferocity) {
 				if (ferocity === undefined) ferocity = 1;
@@ -923,13 +917,16 @@ class InactiveScene {
 						for (let j = 0; j <= Math.ceil(d / cellsize) * steps; j++) {
 							let x = originX + dir.x * j / steps;
 							let y = originY + dir.y * j / steps;
-							if (x % 1 > 0.5) cells.push(P(Math.floor(x + 1), Math.floor(y)));
-							if (y % 1 > 0.5) cells.push(P(Math.floor(x), Math.floor(y + 1)));
+							if (x % 1 > 0.3) cells.push(P(Math.floor(x + 1), Math.floor(y)));
+							if (y % 1 > 0.3) cells.push(P(Math.floor(x), Math.floor(y + 1)));
 							cells.push(P(Math.floor(x), Math.floor(y)));
 						}
 					}
 					return cells;
 				}
+			}
+			static isWall(r) {
+				return !(r.applyGravity && r.canMoveThisFrame);
 			}
 			static rotatePointAround(o, p, r) {
 				let dif = new Vector2(p.x - o.x, p.y - o.y);
@@ -959,18 +956,21 @@ class InactiveScene {
 				}
 				return edges;
 			}
-			static farthestInDirection(r, dir) {
-				let corners = PhysicsObject.getCorners(r);
+			static farthestInDirection(corners, dir) {
 				let farthest = corners[0];
 				let farthestDist = -Infinity;
-				for (let corner of corners) {
+				let result = {index:0,corner:farthest}
+				for (let i = 0; i < corners.length; i++) {
+					let corner = corners[i];
 					let dist = corner.x * dir.x + corner.y * dir.y;
 					if (dist > farthestDist) {
 						farthest = corner;
 						farthestDist = dist;
+						result.index = i;
 					}
 				}
-				return farthest;
+				result.corner = farthest;
+				return result;
 			}
 			static collideCircleCircle(a, b) {
 				let colliding = (b.x - a.x) ** 2 + (b.y - a.y) ** 2 < (a.radius + b.radius) ** 2;
@@ -1052,12 +1052,15 @@ class InactiveScene {
 						break;
 					}
 				}
+				let collidedEdge = null;
+				let penetratingCornerFinal = null;
+				let penetratingCornerIndex = 0;
 				if (colliding) {
 					for (let i = 0; i < bEdges.length; i++) {
 						let edge = bEdges[i - 1];
 						if (!i) edge = bEdges[bEdges.length - 1];
 						let normal = Vector2.fromAngle(edge.getAngle() + Math.PI / 2);
-						let penetratingCorner = PhysicsObject.farthestInDirection(a, normal);
+						let penetratingCorner = PhysicsObject.farthestInDirection(aCorners, normal).corner;
 						let edgeStart = bCorners[i];
 						let edgeEnd = bCorners[i + 1];
 						if (!edgeEnd) edgeEnd = bCorners[0];
@@ -1067,12 +1070,14 @@ class InactiveScene {
 						if (overlap < leastIntersection) {
 							leastIntersection = overlap;
 							collisionAxis = axis;
+							penetratingCornerFinal = penetratingCorner;
 						}
 					}
 					for (let i = 0; i < aEdges.length; i++) {
 						let edge = i ? aEdges[i - 1] : aEdges[aEdges.length - 1];
 						let normal = Vector2.fromAngle(edge.getAngle() + Math.PI / 2);
-						let penetratingCorner = PhysicsObject.farthestInDirection(b, normal);
+						let far = PhysicsObject.farthestInDirection(bCorners, normal);
+						let penetratingCorner = far.corner;
 						let edgeStart = aCorners[i];
 						let edgeEnd = (i !== aEdges.length - 1) ? aCorners[i + 1] : aCorners[0];
 						let closestPointOnEdge = Physics.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
@@ -1082,13 +1087,47 @@ class InactiveScene {
 						if (overlap < leastIntersection) {
 							leastIntersection = overlap;
 							collisionAxis = axis;
+							collidedEdge = new Line(edgeStart, edgeEnd);
+							penetratingCornerFinal = penetratingCorner;
+							penetratingCornerIndex = far.index;
 						}
 					}
 				}
 				let col;
 				if (colliding) {
-					if (collisionAxis) col = new Collision(colliding, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection);
-					else {
+					if (collisionAxis) {
+						if (collidedEdge) {
+							let pc = bCorners[penetratingCornerIndex];
+							let pc2 = bCorners[(penetratingCornerIndex + 1) % bCorners.length];
+							let pc3 = bCorners[(bCorners.length + penetratingCornerIndex - 1) % bCorners.length];
+							let dir1 = pc2.minus(pc).normal.normalize();
+							let dir2 = pc3.minus(pc).normal.normalize();
+							let correctEdge = new Line(pc, pc2);
+							if (Math.abs(dir2.dot(collisionAxis)) > Math.abs(dir1.dot(collisionAxis))) {
+								correctEdge = new Line(pc, pc3);
+							}
+							let toCorner = new Vector2(pc.x - a.middle.x, pc.y - a.middle.y);
+							let proj = collidedEdge.midPoint;
+							let d1 = Physics.distToPoint2(proj, correctEdge.b);
+							let d2 = Physics.distToPoint2(pc, correctEdge.b);
+							let dot = a.velocity.dot(toCorner.plus(0).normalize());
+							dot = clamp(Math.abs(dot) - 0.2, 0, 1);
+							if (d1 > d2) {
+								if (!b.applyGravity) {
+									collisionAxis = toCorner.normalize().times(-1);
+									a.align(collisionAxis.getAngle() + Math.PI / 2, 0.001, false, "angularAcceleration");
+								}
+							}
+						}
+						// s.drawInWorldSpace(e => {	
+						// 	c.stroke(cl.BLUE, 1).line(
+						// 		collisionAxis.normal.times(-7).plus(penetratingCornerFinal), 
+						// 		collisionAxis.normal.times(7).plus(penetratingCornerFinal)
+						// 	);
+						// 	c.draw(cl.RED).circle(penetratingCornerFinal.x, penetratingCornerFinal.y, 3);
+						// });
+						col = new Collision(colliding, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection);
+					} else {
 						col = new Collision(false, a, b);
 						a.rotation += 0.00001;
 						b.rotation += 0.00001;
@@ -1101,17 +1140,22 @@ class InactiveScene {
 				let d = col.Bdir;
 				let a = col.a;
 				let b = col.b;
-				let mobile = b.applyGravity && b.canMoveThisFrame;
+				let mobile = !PhysicsObject.isWall(b)
+				//position
 				let dir = col.Adir.times(col.penetration);
-				a.x -= dir.x;
-				a.y -= dir.y;
+				if (col.penetration > 0.005) {
+					a.x -= dir.x;
+					a.y -= dir.y;
+				}
+
 				//velocity
-				let aVelocityCoefficient = clamp(Math.abs(a.velocity.mag) - 0.7, 0, 1);
-				let bVelocityCoefficient = clamp(Math.abs(b.velocity.mag) - 0.7, 0, 1);
+				let aVelocityCoefficient = clamp((Math.abs(a.velocity.mag) - 0.2) ** 2, 0, 1);
+				let bVelocityCoefficient = clamp((Math.abs(b.velocity.mag) - 0.2) ** 2, 0, 1);
 
 				if (a.velocity.mag) {
 					let velocityMagnitude = clamp(a.velocity.dot(col.Adir), 0, 1) * 0.1;
-					a.velocity.sub(col.Adir.times(velocityMagnitude));
+					let removal = col.Adir.times(velocityMagnitude);
+					a.velocity.sub(removal);
 				}
 				//calculate relative percentages;
 				let aPercentSize = a.mass / (a.mass + b.mass);
@@ -1126,9 +1170,10 @@ class InactiveScene {
 				let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
 				let aFerocity = 0.05 * aPercent;
 				let bFerocity = 0.05 * bPercent;
-				//console.log({aFerocity, bFerocity});
 				a.align(angleToAlign, aFerocity);
 				if (mobile) b.align(angleToAlign, bFerocity);
+
+				//immobilize
 				a.canMoveThisFrame = false;
 
 				//do custom collision response
@@ -1363,15 +1408,15 @@ class Scene extends InactiveScene {
 				rect.enginePhysicsUpdate(updater);
 			}
 			for (let rect of useless) rect.enginePhysicsUpdate([]);
-			if (0) s.drawWithTransformations(e => {
-				for (let [key, cell] of cells) {
-					let x = parseInt(key.split(",")[0]) * this.cellSize;
-					let y = parseInt(key.split(",")[1]) * this.cellSize;
-					let r = new Rect(x, y, this.cellSize, this.cellSize);
-					c.stroke(cl.RED, 3).rect(r);
-					c.draw(new Color(255, 0, 0, 0.15)).rect(r);
-				}
-			});
+			// s.drawInWorldSpace(e => {
+			// 	for (let [key, cell] of cells) {
+			// 		let x = parseInt(key.split(",")[0]) * this.cellSize;
+			// 		let y = parseInt(key.split(",")[1]) * this.cellSize;
+			// 		let r = new Rect(x, y, this.cellSize, this.cellSize);
+			// 		c.stroke(cl.RED, 3).rect(r);
+			// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
+			// 	}
+			// });
 		}
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];

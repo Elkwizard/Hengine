@@ -541,6 +541,7 @@ class Artist {
 			},
 			line: function (x, y, x1, y1) {
 				if (typeof x == "object") {
+					if (!x) return;
 					if (x instanceof Line) {
 						x1 = x.b.x;
 						y1 = x.b.y;
