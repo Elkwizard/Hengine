@@ -1254,7 +1254,6 @@ class Scene extends InactiveScene {
 		this.removeQueue = [];
 		this.S = {
 			UA: this.updateArray.bind(this),
-			DWT: this.drawWithTransformations.bind(this),
 			UDA: this.updateDisplayAt.bind(this),
 			CDA: this.centerDisplayAt.bind(this),
 			ZI: this.zoomIn.bind(this),
@@ -1274,11 +1273,10 @@ class Scene extends InactiveScene {
 			CECR: this.changeElementCollideResponse.bind(this),
 			CAED: this.changeAllElementDraw.bind(this),
 			CAEU: this.changeAllElementUpdate.bind(this),
-			APFD: this.adjustPointForDisplay.bind(this),
 			CP: this.collidePoint.bind(this)
 		}
 	}
-	drawWithTransformations(artist) {
+	drawInWorldSpace(artist) {
 		this.c.c.translate(this.c.middle.x, this.c.middle.y)
 		this.c.c.scale(this.zoom, this.zoom)
 		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
@@ -1289,7 +1287,7 @@ class Scene extends InactiveScene {
 		this.c.c.scale(1 / this.zoom, 1 / this.zoom)
 		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
 	}
-	drawWithoutTransformations(artist) {
+	drawInScreenSpace(artist) {
 		this.c.c.translate(this.display.x, this.display.y)
 		this.c.c.translate(this.c.middle.x, this.c.middle.y)
 		this.c.c.scale(1 / this.zoom, 1 / this.zoom)
@@ -1424,7 +1422,7 @@ class Scene extends InactiveScene {
 		newY += displayM.y; //re-center y
 		return new Vertex(newX, newY); //return the result
 	}
-	adjustPointForDisplay(point) {
+	screenSpaceToWorldSpace(point) {
 		let displayM = this.display.middle; //optimize .middle() calls
 		let newX = point.x + this.display.x //move points to have accurate x with display movement
 		let newY = point.y + this.display.y //move points to have accurate y with display movement
