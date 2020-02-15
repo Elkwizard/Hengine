@@ -393,15 +393,15 @@ class InactiveScene {
 	}
 	UI(name) {
 		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			let el = e;
-			el.offset = new Vertex(el.x, el.y);
-			this.home.updateScript.addMethod(e + "__AdjustPosition__", function () {
-				if (this.get(e)) {
-					el.x = el.home.display.x + el.offset.x;
-					el.y = el.home.display.y + el.offset.y;
-				}
-			}.bind(this));
-			el.isUI = true;
+			// let el = e;
+			// el.offset = new Vertex(el.x, el.y);
+			// this.home.updateScript.addMethod(e + "__AdjustPosition__", function () {
+			// 	if (this.get(e)) {
+			// 		el.x = el.home.display.x + el.offset.x;
+			// 		el.y = el.home.display.y + el.offset.y;
+			// 	}
+			// }.bind(this));
+			e.isUI = true;
 			e.logMod(function UI() {
 				this.home.UI(this);
 			});
@@ -563,6 +563,7 @@ class InactiveScene {
 				this.velocity = new Vector2(0, 0);
 				this.acceleration = new Vector2(0, 0);
 				this._rotation = 0.0001;
+				this.nessesaryAlignment = 0;
 				this.angularVelocity = 0;
 				this.angularAcceleration = 0;
 				this.applyGravity = gravity;
@@ -681,14 +682,13 @@ class InactiveScene {
 					a = angle;
 					possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3];
 				}
-				let best = possibleDirections[0];
-				let dif = Math.abs(possibleDirections[0] - this.rotation);
+				let best = null;
+				let dif = Infinity;
 				for (let dir of possibleDirections) {
 					let d = Math.abs(dir - this.rotation);
 					let d2 = Math.abs(dir - this.rotation - Math.PI * 2);
 					if (d < dif) {
 						dif = d;
-						//demons
 						best = dir;
 						reversed = 1;
 					}
@@ -698,6 +698,15 @@ class InactiveScene {
 						reversed = -1;
 					}
 				}
+				if (false) this.home.drawInWorldSpace(e => {
+					let v1 = Vector2.fromAngle(this.rotation);
+					let v2 = Vector2.fromAngle(best);
+					const len = 50;
+					for (let a of possibleDirections) c.stroke(cl.GREEN, 3).arrow(this.middle, Vector2.fromAngle(a).times(len).add(this.middle));
+					c.stroke(cl.LIME, 5).arrow(this.middle, v2.times(len).add(this.middle));
+					c.stroke(cl.BLUE, 3).arrow(this.middle, v1.times(len).add(this.middle));
+					c.draw(cl.BLACK).circle(this.middle.x, this.middle.y, 5);
+				});
 				f *= reversed;
 				let a1 = this.rotation;
 				let a2 = this.rotation + Math.PI * 2;
@@ -709,7 +718,7 @@ class InactiveScene {
 				if (d2 < d1) difference *= -1;
 				let val = 0.015 * f * Math.sign(difference);
 				if (!val) val = 0;
-				this.angularVelocity += val;
+				this.nessesaryAlignment += val;
 			}
 			clearCollisions() {
 				for (let [key, value] of this.colliding) this.colliding[key] = null;
@@ -817,21 +826,26 @@ class InactiveScene {
 				//angular
 				this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
 				this.rotation += this.angularVelocity * this.home.speedModulation;
-				if (this.applyGravity) {
-					if (this.colliding.general) this.align(this.velocity.getAngle(), 0.005, true);
-					//this.align(this.velocity.getAngle(), 0.01);
-				}
-				this.rotation %= Math.PI * 2;
 
 				let collisions = this.detectCollisions(others);
+				this.nessesaryAlignment = this.angularVelocity;
 				if (this.applyGravity) {
 					for (let collision of collisions) {
 						if (collision.colliding) PhysicsObject.resolve(collision);
 					}
 				}
+				this.angularVelocity = this.nessesaryAlignment;
 				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
 				this.lastX = this.x;
 				this.lastY = this.y;
+
+				//align with direction
+				if (this.applyGravity) {
+					if (!this.colliding.general) {
+						this.align(this.velocity.getAngle(), 0.005, true);
+					}
+				}
+				this.rotation %= Math.PI * 2;
 			}
 			moveTowards(point, ferocity) {
 				if (ferocity === undefined) ferocity = 1;
@@ -1092,8 +1106,8 @@ class InactiveScene {
 				a.x -= dir.x;
 				a.y -= dir.y;
 				//velocity
-				let aVelocityCoefficient = clamp(Math.abs(a.velocity.mag) - 0.1, 0, 1);
-				let bVelocityCoefficient = clamp(Math.abs(b.velocity.mag) - 0.1, 0, 1);
+				let aVelocityCoefficient = clamp(Math.abs(a.velocity.mag) - 0.7, 0, 1);
+				let bVelocityCoefficient = clamp(Math.abs(b.velocity.mag) - 0.7, 0, 1);
 
 				if (a.velocity.mag) {
 					let velocityMagnitude = clamp(a.velocity.dot(col.Adir), 0, 1) * 0.1;
@@ -1106,14 +1120,15 @@ class InactiveScene {
 				let bPercentSpeed = 1 - aPercentSpeed;
 				let aPercent = (1 - (aPercentSize * aPercentSpeed));
 				let bPercent = (1 - (bPercentSize * bPercentSpeed));
-				if (mobile) {
-					aPercent *= aVelocityCoefficient;
-					bPercent *= bVelocityCoefficient;	
-				}
+				aPercent *= aVelocityCoefficient;
+				bPercent *= bVelocityCoefficient;
 				//angle
 				let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
-				a.align(angleToAlign, 0.05 * aPercent);
-				if (mobile) b.align(angleToAlign, 0.05 * bPercent);
+				let aFerocity = 0.05 * aPercent;
+				let bFerocity = 0.05 * bPercent;
+				//console.log({aFerocity, bFerocity});
+				a.align(angleToAlign, aFerocity);
+				if (mobile) b.align(angleToAlign, bFerocity);
 				a.canMoveThisFrame = false;
 
 				//do custom collision response
@@ -1214,7 +1229,7 @@ class Scene extends InactiveScene {
 		this.display = new Rect(0, 0, this.c.canvas.width, this.c.canvas.height)
 		this.adjustedDisplay = new Rect(this.display.x, this.display.y, this.display.width, this.display.height);
 		M.engineClick = function (e) {
-			let adjusted = this.adjustPointForDisplay(e);
+			let adjusted = this.screenSpaceToWorldSpace(e);
 			for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.click(adjusted);
 				let m = this.get(o);
@@ -1224,7 +1239,7 @@ class Scene extends InactiveScene {
 			}
 		}.bind(this);
 		M.engineRightClick = function (e) {
-			let adjusted = this.adjustPointForDisplay(e);
+			let adjusted = this.screenSpaceToWorldSpace(e);
 			for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.rightClick(adjusted);
 				let m = this.get(o);
@@ -1234,7 +1249,7 @@ class Scene extends InactiveScene {
 			}
 		}.bind(this);
 		M.engineMove = function (e) {
-			let adjusted = this.adjustPointForDisplay(e);
+			let adjusted = this.screenSpaceToWorldSpace(e);
 			let collided = this.collidePointBoth(adjusted)
 			for (let o of collided[0]) {
 				if (!o.hovered) {
@@ -1383,7 +1398,11 @@ class Scene extends InactiveScene {
 			return a.layer - b.layer;
 		});
 		for (let rect of this.contains_array) {
-			rect.engineDrawUpdate();
+			function doElementDraw() {
+				rect.engineDrawUpdate();
+			}
+			if (rect.isUI) this.drawInScreenSpace(doElementDraw);
+			else doElementDraw();
 			rect.lifeSpan++;
 		}
 		this.c.c.translate(this.display.x, this.display.y);

@@ -121,7 +121,7 @@ class Project {
 					this.scripts.TEXT_BOX.selected = this.hovered;
 					if (this.hovered) {
 						let x = this.x;
-						let m = s.adjustPointForDisplay(M);
+						let m = s.screenSpaceToWorldSpace(M);
 						let xPos = (m.x - x) - 5;
 						this.scripts.TEXT_BOX.selection.end = Math.max(0, Math.min(Math.ceil((xPos - 5) / this.scripts.TEXT_BOX.fontWidth), this.scripts.TEXT_BOX.text.split("").length));
 						this.scripts.TEXT_BOX.selection.start = this.scripts.TEXT_BOX.selection.end;
@@ -132,7 +132,7 @@ class Project {
 						this.scripts.TEXT_BOX.selected = this.hovered;
 						if (this.hovered) {
 							let x = this.x;
-							let m = s.adjustPointForDisplay(M);
+							let m = s.screenSpaceToWorldSpace(M);
 							let xPos = (m.x - x) - 5;
 							this.scripts.TEXT_BOX.selection.end = Math.max(0, Math.min(Math.ceil((xPos - 5) / this.scripts.TEXT_BOX.fontWidth), this.scripts.TEXT_BOX.text.split("").length));
 						}

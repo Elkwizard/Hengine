@@ -22,7 +22,7 @@ let K = {
 	custom: {},
 	onDown: new Listener,
 	onUp: new Listener
-}
+};
 let M = {
 	down: false,
 	x: 0,
@@ -45,52 +45,52 @@ let M = {
 	engineClick: e => e,
 	engineRightClick: e => e,
 	engineMove: e => e
-}
-onkeydown = function (e) {
+};
+document.addEventListener("keydown", function (e) {
 	for (let ev of K.onDown) ev(e);
 	K.keys[e.key] = true;
-}
-onkeyup = function (e) {
+});
+document.addEventListener("keyup", function (e) {
 	if (e.key.toUpperCase() === e.key) {
 		K.keys[e.key.toLowerCase()] = false;
 	}
 	K.keys[e.key] = false;
 	for (let ev of K.onUp) ev(e);
-}
-onclick = function (e) {
+});
+document.addEventListener("click", function (e) {
 	M.button = e.button;
 	M.engineClick(e);
 	for (let ev of M.onClick) ev(e);
-}
-onmousedown = function (e) {
+});
+document.addEventListener("mousedown", function (e) {
 	M.button = e.button;
-	if (M.engine) M.dragStart = M.dragEnd = M.engine.scene.adjustPointForDisplay(new Vector2(e.x, e.y));
+	if (M.engine) M.dragStart = M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(new Vector2(e.x, e.y));
 	M.updatePosition(e);
 	M.down = true;
 	for (let ev of M.onDown) ev(e);
-}
-onmousemove = function (e) {
+});
+document.addEventListener("mousemove", function (e) {
 	M.updatePosition(e);
-	if (M.engine) M.dragEnd = M.engine.scene.adjustPointForDisplay(new Vector2(e.x, e.y));
+	if (M.engine) M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(new Vector2(e.x, e.y));
 	M.engineMove(e);
 	for (let ev of M.onMove) ev(e);
-}
-onmouseup = function (e) {
+});
+document.addEventListener("mouseup", function (e) {
 	M.button = e.button;
 	M.updatePosition(e);
-	if (M.engine) M.dragEnd = M.engine.scene.adjustPointForDisplay(new Vector2(e.x, e.y));
+	if (M.engine) M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(new Vector2(e.x, e.y));
 	M.down = false;
 	for (let ev of M.onUp) ev(e);
-}
-oncontextmenu = function (e) {
+});
+document.addEventListener("contextmenu", function (e) {
 	M.button = e.button;
 	e.preventDefault();
 	M.updatePosition(e);
 	M.down = false;
 	for (let ev of M.onRight) ev(e);
 	M.engineRightClick(e);
-}
-onwheel = function (e) {
+});
+document.addEventListener("wheel", function (e) {
 	M.button = e.button;
 	for (let ev of M.onScroll) ev(e.deltaY);
-}
+});

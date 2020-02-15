@@ -10,6 +10,7 @@ class SceneObject extends Rect {
 		this.draw = function () { };
 		this.custom = {};
 		this.hasPhysics = false;
+		this.isUI = false;
 		this.isRectangle = true;
 		this.hovered = false;
 		this.layer = 0;

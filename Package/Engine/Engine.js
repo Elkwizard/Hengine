@@ -14,6 +14,10 @@ Number.prototype.toDegrees = function () {
 Number.prototype.toRadians = function () {
 	return this * (Math.PI / 180);
 }
+Number.prototype.movedTowards = function(value, ferocity) {
+	let dir = ferocity * (value - this) * 2;
+	return this + dir;
+}
 Object.prototype.toString = function (depth = 0) {
 	if (depth < 1) {
 		let ary = [];
