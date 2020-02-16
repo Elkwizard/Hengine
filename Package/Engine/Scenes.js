@@ -1110,14 +1110,23 @@ class InactiveScene {
 							let proj = collidedEdge.midPoint;
 							let d1 = Physics.distToPoint2(proj, correctEdge.b);
 							let d2 = Physics.distToPoint2(pc, correctEdge.b);
-							let dot = a.velocity.dot(toCorner.plus(0).normalize());
+							let dot = Math.max(
+								a.velocity.times(a.velocity).dot(toCorner.normalize().normal), 
+								a.velocity.times(a.velocity).dot(toCorner.normalize())
+							);
 							dot = clamp(Math.abs(dot) - 0.2, 0, 1);
 							if (d1 > d2) {
-								if (!b.applyGravity) {
-									collisionAxis = toCorner.normalize().times(-1);
-									a.align(collisionAxis.getAngle() + Math.PI / 2, 0.001, false, "angularAcceleration");
+								//past edge
+								if (!b.applyGravity || dot > 0.9) {
+									collisionAxis = toCorner.times(-1);
+									a.align(collisionAxis.getAngle() + Math.PI / 2, 0.001 * dot, false, "angularAcceleration");
 								}
 							}
+							// s.drawInWorldSpace(e => {
+							// // 	c.stroke(cl.LIME, 2).arrow(a.middle, a.velocity.times(10).plus(a.middle));
+							// // 	c.stroke(cl.LIME, 2).arrow(a.middle, toCorner.normal.times(10).plus(a.middle));
+							// 	c.draw(cl.WHITE).text("20px monospace", dot.toFixed(1), a.middle.x, a.middle.y)
+							// });
 						}
 						// s.drawInWorldSpace(e => {	
 						// 	c.stroke(cl.BLUE, 1).line(
@@ -1152,10 +1161,16 @@ class InactiveScene {
 				let aVelocityCoefficient = clamp((Math.abs(a.velocity.mag) - 0.2) ** 2, 0, 1);
 				let bVelocityCoefficient = clamp((Math.abs(b.velocity.mag) - 0.2) ** 2, 0, 1);
 
+				const PORTION_OF_VELOCITY_LOST = 0.8;
 				if (a.velocity.mag) {
-					let velocityMagnitude = clamp(a.velocity.dot(col.Adir), 0, 1) * 0.1;
+					let velocityMagnitude = clamp(a.velocity.dot(col.Adir), 0, 1) * PORTION_OF_VELOCITY_LOST;
 					let removal = col.Adir.times(velocityMagnitude);
 					a.velocity.sub(removal);
+				}
+				if (b.applyGravity && b.velocity.mag) {
+					let velocityMagnitude = clamp(b.velocity.dot(col.Bdir), 0, 1) * PORTION_OF_VELOCITY_LOST;
+					let removal = col.Bdir.times(velocityMagnitude);
+					b.velocity.sub(removal);
 				}
 				//calculate relative percentages;
 				let aPercentSize = a.mass / (a.mass + b.mass);
@@ -1166,6 +1181,8 @@ class InactiveScene {
 				let bPercent = (1 - (bPercentSize * bPercentSpeed));
 				aPercent *= aVelocityCoefficient;
 				bPercent *= bVelocityCoefficient;
+				if (!aPercent) aPercent = 0.001;
+				if (!bPercent) bPercent = 0.001;
 				//angle
 				let angleToAlign = (col.Bdir.getAngle() + Math.PI / 2) % (2 * Math.PI);
 				let aFerocity = 0.05 * aPercent;
