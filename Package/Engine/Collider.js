@@ -53,6 +53,21 @@ class Physics {
 		// --Dot Product--
 		return p.x * d.x + p.y * d.y;
 	}
+	static closestPointOnLineObjectInDirection(p, d, l) {
+		let x1 = p.x;
+		let y1 = p.y;
+		let dx1 = d.x;
+		let dy1 = d.y;
+		let x2 = l.a.x;
+		let y2 = l.a.y;
+		let dx2 = l.b.x - l.a.x;
+		let dy2 = l.b.y - l.a.y;
+		let rightSide = (y1 - (dy1 / dx1) * x1) - (y2 - (dy2 / dx2) * x2);
+		let leftCof = (dy2 / dx2) - (dy1 / dx1);
+		let x = rightSide / leftCof;
+		let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
+		return new Vector2(x, y); 
+	}
 	static closestPointOnRectangle(point, r) {
 		if (!r.rotation) r.rotation = 0.001;
 		let edges = [];
