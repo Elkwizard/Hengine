@@ -1208,8 +1208,8 @@ class InactiveScene {
 
 				//impulse resolution
 				if (col.force && col.source) {
-					c.stroke(cl.RED, 2).circle(col.source.x, col.source.y, 5)
-					c.stroke(cl.RED, 2).arrow(col.source, col.force.times(50).plus(col.source));
+					// c.stroke(cl.RED, 2).circle(col.source.x, col.source.y, 5)
+					// c.stroke(cl.RED, 2).arrow(col.source, col.force.times(50).plus(col.source));
 					if (col.forceOwner.applyGravity) {
 						col.forceOwner.applyForce(col.force, col.source);
 					} else {
