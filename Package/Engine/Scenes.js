@@ -624,6 +624,8 @@ class InactiveScene {
 				this.optimize = (a, b) => true;
 				this.canMoveThisFrame = true;
 				this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
+				this.positionStatic = false;
+				this.rotationStatic = false;
 			}
 			get mass() {
 				return this.width * this.height;
@@ -829,16 +831,20 @@ class InactiveScene {
 						this.velocity.add(new Vector2(this.home.gravity.x * factor, this.home.gravity.y * factor));
 					}
 
-					//linear
-					this.velocity.add(this.acceleration.times(this.home.speedModulation));
+					if (!this.positionStatic) {
+						//linear
+						this.velocity.add(this.acceleration.times(this.home.speedModulation));
+						this.x += this.velocity.x * 2 * this.home.speedModulation;
+						this.y += this.velocity.y * 2 * this.home.speedModulation;
+
+						if (!this.rotationStatic) {
+							//angular
+							this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
+							this.rotation += this.angularVelocity * this.home.speedModulation;
+						}
+					}
 					//slow
 					if (this.slows) this.slowDown();
-					this.x += this.velocity.x * 2 * this.home.speedModulation;
-					this.y += this.velocity.y * 2 * this.home.speedModulation;
-
-					//angular
-					this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
-					this.rotation += this.angularVelocity * this.home.speedModulation;
 
 					let collisions = this.detectCollisions(others);
 					if (this.applyGravity) {
@@ -881,11 +887,15 @@ class InactiveScene {
 					this.moveAwayFrom(point, ferocity);
 				});
 			}
-			applyForce(dir, point) {
-				let startVector = point.minus(this.middle);
-				let endVector = point.plus(dir).minus(this.middle);
+			applyForce(dir, point, mass1 = 1, mass2 = 1) {
+				// c.stroke(cl.RED, 1).circle(point.x, point.y, 2)
+				// c.stroke(cl.RED, 1).arrow(point, dir.times(50).plus(point));
+				let centerOfMass = this.middle;
+				let startVector = point.minus(centerOfMass);
+				let endVector = point.plus(dir).minus(centerOfMass);
 				let difAngle = endVector.getAngle() - startVector.getAngle();
-				this.angularVelocity += Math.sign(difAngle) * clamp(Math.abs(difAngle / 10), 0, 0.05) * clamp(this.velocity.mag, 0.1, 1);
+				let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle / 10), 0, 0.1) * Math.sqrt(mass2 / mass1);
+				this.angularVelocity += angularForce;
 				this.velocity.add(dir.times(0.01));
 			}
 			static getBoundingBox(r) {
@@ -1019,7 +1029,7 @@ class InactiveScene {
 
 					//impulse resolution
 					let corners = PhysicsObject.getCorners(a);
-					corners.filter(e => Math.abs(e.x - bestPoint.x) < 3 && Math.abs(e.y - bestPoint.y) < 3);
+					corners = corners.filter(e => Math.abs(e.x - bestPoint.x) < 1 && Math.abs(e.y - bestPoint.y) < 1);
 					let owner = corners.length ? a : b;
 					let closest = bestPoint;
 					let impulseVector = closest.minus(a.middle).normalize();
@@ -1050,7 +1060,7 @@ class InactiveScene {
 					//impulse resolution
 					let closest = bestPoint;
 					let corners = PhysicsObject.getCorners(b);
-					corners.filter(e => Math.abs(e.x - bestPoint.x) < 3 && Math.abs(e.y - bestPoint.y) < 3);
+					corners = corners.filter(e => Math.abs(e.x - bestPoint.x) < 1 && Math.abs(e.y - bestPoint.y) < 1);
 					let owner = corners.length ? b : a;
 					let impulseVector = closest.minus(a.middle).normalize();
 					let impulseForce = penetration;
@@ -1208,12 +1218,16 @@ class InactiveScene {
 
 				//impulse resolution
 				if (col.force && col.source) {
-					// c.stroke(cl.RED, 2).circle(col.source.x, col.source.y, 5)
-					// c.stroke(cl.RED, 2).arrow(col.source, col.force.times(50).plus(col.source));
 					if (col.forceOwner.applyGravity) {
-						col.forceOwner.applyForce(col.force, col.source);
+						let notOwner = (col.forceOwner === a) ? b : a;
+						let mass1 = col.forceOwner.mass;
+						let mass2 = notOwner.mass;
+						if (!notOwner.applyGravity) mass2 = mass1;
+						col.forceOwner.applyForce(col.force, col.source, mass1, mass2);
 					} else {
-						a.applyForce(col.force, col.source);
+						let mass1 = a.mass;
+						let mass2 = b.mass;
+						a.applyForce(col.force, col.source, mass1, mass2);
 					}
 				}
 
