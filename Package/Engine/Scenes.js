@@ -519,16 +519,21 @@ class InactiveScene {
 		this.hasRotatedRectangles = true;
 		const LOSS = .985;
 		window.Collision = class {
-			constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, owner = null, force = null, source = null) {
+			constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, impulseA, impulseB) {
 				this.colliding = collides;
 				this.Adir = Adir;
 				this.Bdir = Bdir;
 				this.a = a;
 				this.b = b;
 				this.penetration = penetration;
+				this.impulseA = impulseA;
+				this.impulseB = impulseB;
+			}
+		}
+		window.Impulse = class {
+			constructor(force = new Vector2(0, 0), source = new Vector2(0, 0)) {
 				this.force = force;
 				this.source = source;
-				this.forceOwner = owner;
 			}
 		}
 		window.Range = class {
@@ -887,16 +892,16 @@ class InactiveScene {
 					this.moveAwayFrom(point, ferocity);
 				});
 			}
-			applyForce(dir, point, mass1 = 1, mass2 = 1) {
-				// c.stroke(cl.RED, 1).circle(point.x, point.y, 2)
-				// c.stroke(cl.RED, 1).arrow(point, dir.times(50).plus(point));
+			applyImpulse(impulse) {
+				if (!impulse) return;
+				// c.stroke(cl.RED, 1).circle(impulse.source.x, impulse.source.y, 2)
+				// c.stroke(cl.RED, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
 				let centerOfMass = this.middle;
-				let startVector = point.minus(centerOfMass);
-				let endVector = point.plus(dir).minus(centerOfMass);
+				let startVector = impulse.source.minus(centerOfMass);
+				let endVector = impulse.source.plus(impulse.force).minus(centerOfMass);
 				let difAngle = endVector.getAngle() - startVector.getAngle();
-				let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle / 10), 0, 0.1) * Math.sqrt(mass2 / mass1);
+				let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle / 10), 0, 0.01);
 				this.angularVelocity += angularForce;
-				this.velocity.add(dir.times(0.01));
 			}
 			static getBoundingBox(r) {
 				let rect;
@@ -1007,13 +1012,65 @@ class InactiveScene {
 				result.corner = farthest;
 				return result;
 			}
+			static getCircleCircleImpulses(a, b) {
+				let impulseA, impulseB;
+				return { impulseA, impulseB };
+			}
+			static getCircleRectImpulses(a, b, closestPoint) {
+				let impulseA, impulseB;
+				let dir = closestPoint.minus(a.middle);
+				dir.mag = a.radius - dir.mag;
+				impulseB = new Impulse(dir, closestPoint);
+				impulseA = null;
+				return { impulseA, impulseB };
+			}
+			static getRectRectImpulses(a, b, collidedEdge, penetratingCornerIndex, penetratingCornerOwner) {
+
+				let impulseA, impulseB;
+
+				let owner = penetratingCornerOwner;
+				let corners = PhysicsObject.getCorners(owner);
+				let edg = collidedEdge;
+				let edgV = edg.b.minus(edg.a).normalize();
+				let pc = corners[penetratingCornerIndex];
+				let pc2 = corners[(penetratingCornerIndex + 1) % corners.length];
+				let pc3 = corners[(penetratingCornerIndex - 1 + corners.length) % corners.length];
+				let edge1 = new Line(pc, pc2);
+				let edge2 = new Line(pc, pc3);
+				let edge1V = edge1.b.minus(edge1.a).normalize();
+				let edge2V = edge2.b.minus(edge2.a).normalize();
+				let correctEdge = edge1;
+				let correctDir = edge1V;
+				let dot1 = Math.abs(edge1V.dot(edgV));
+				let dot2 = Math.abs(edge2V.dot(edgV));
+				if (dot2 < dot1) {
+					correctEdge = edge2;
+					correctDir = edge2V;
+				}
+				let closestPoint = Physics.closestPointOnLineObjectInDirection(pc, correctDir, edg);
+				let dir = closestPoint.minus(pc);
+				let ownerImpulse = new Impulse(dir, pc);
+				let otherImpulse = new Impulse(dir.times(-1), pc);
+				if (owner == a) {
+					impulseA = ownerImpulse;
+				} else {
+					impulseA = otherImpulse;
+				}
+
+				impulseB = null;
+				return { impulseA, impulseB };
+			}
 			static collideCircleCircle(a, b) {
 				let colliding = (b.x - a.x) ** 2 + (b.y - a.y) ** 2 < (a.radius + b.radius) ** 2;
 				let col;
 				if (colliding) {
 					let collisionAxis = (new Vector2(b.x - a.x, b.y - a.y)).normalize();
 					let penetration = a.radius + b.radius - g.f.getDistance(a, b);
-					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration);
+
+					//impulse resolution
+					let impulses = PhysicsObject.getCircleCircleImpulses(a, b);
+
+					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB);
 				} else col = new Collision(false, a, b);
 				return col;
 			}
@@ -1028,18 +1085,11 @@ class InactiveScene {
 					let collisionAxis = new Vector2(b.middle.x - bestPoint.x, b.middle.y - bestPoint.y);
 
 					//impulse resolution
-					let corners = PhysicsObject.getCorners(a);
-					corners = corners.filter(e => Math.abs(e.x - bestPoint.x) < 1 && Math.abs(e.y - bestPoint.y) < 1);
-					let owner = corners.length ? a : b;
-					let closest = bestPoint;
-					let impulseVector = closest.minus(a.middle).normalize();
-					let impulseForce = penetration;
-					let pc = closest;
-					let impulseVectorWithMag = impulseVector.times(impulseForce);
+					let impulses = PhysicsObject.getCircleRectImpulses(b, a, bestPoint);
 
 					collisionAxis.normalize();
 					if (inside) collisionAxis.mul(-1);
-					let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, owner, impulseVectorWithMag, pc);
+					let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseB, impulses.impulseA);
 					return col;
 				} else return new Collision(false, a, b);
 			}
@@ -1058,17 +1108,9 @@ class InactiveScene {
 					if (inside) collisionAxis.mul(-1);
 
 					//impulse resolution
-					let closest = bestPoint;
-					let corners = PhysicsObject.getCorners(b);
-					corners = corners.filter(e => Math.abs(e.x - bestPoint.x) < 1 && Math.abs(e.y - bestPoint.y) < 1);
-					let owner = corners.length ? b : a;
-					let impulseVector = closest.minus(a.middle).normalize();
-					let impulseForce = penetration;
-					let pc = closest;
-					//rotate
-					let impulseVectorWithMag = impulseVector.times(impulseForce);
+					let impulses = PhysicsObject.getCircleRectImpulses(a, b, bestPoint);
 
-					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, owner, impulseVectorWithMag, pc);
+					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB);
 				} else col = new Collision(false, a, b);
 				return col;
 			}
@@ -1150,34 +1192,9 @@ class InactiveScene {
 				if (colliding) {
 					if (collisionAxis) {
 						//figure out impulses
-						let impulseVector = null;
-						let impulseForce = 0;
-						let owner = finalPenetratingCornerOwner;
-						let corners = (owner === a) ? aCorners : bCorners;
-						let pc = corners[finalPenetratingCornerIndex];
-						let edg = finalPenetratedEdge;
-						if (finalPenetratingCornerOwner === a) {
-							let pc2 = aCorners[(finalPenetratingCornerIndex + 1) % aCorners.length];
-							let pc3 = aCorners[(finalPenetratingCornerIndex - 1 + aCorners.length) % aCorners.length];
-							let normalizedEdg = edg.b.minus(edg.a).normalize();
-							let dotForPc2 = pc2.minus(pc).normalize().dot(normalizedEdg);
-							let dotForPc3 = pc3.minus(pc).normalize().dot(normalizedEdg);
-							let correctB = pc2;
-							if (Math.abs(dotForPc3) < Math.abs(dotForPc2)) correctB = pc3;
-							let impulseEdge = new Line(pc, correctB);
-							impulseVector = impulseEdge.b.minus(impulseEdge.a).normalize();
-							let closestPoint = Physics.closestPointOnLineObjectInDirection(pc, impulseVector, edg);
-							impulseForce = Physics.distToPoint(pc, closestPoint);
-						} else {
-							let closestPoint = Physics.closestPointOnLineObject(pc, edg);
-							impulseVector = closestPoint.minus(pc).normalize();
-							impulseForce = Physics.distToPoint(pc, closestPoint);
-						}
+						let impulses = PhysicsObject.getRectRectImpulses(a, b, finalPenetratedEdge, finalPenetratingCornerIndex, finalPenetratingCornerOwner);
 
-						//impulse resolution
-						let impulseVectorWithMag = impulseVector.times(impulseForce);
-
-						col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, owner, impulseVectorWithMag, pc);
+						col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, impulses.impulseA, impulses.impulseB);
 					} else {
 						col = new Collision(false, a, b);
 						a.rotation += 0.00001;
@@ -1217,19 +1234,10 @@ class InactiveScene {
 				}
 
 				//impulse resolution
-				if (col.force && col.source) {
-					if (col.forceOwner.applyGravity) {
-						let notOwner = (col.forceOwner === a) ? b : a;
-						let mass1 = col.forceOwner.mass;
-						let mass2 = notOwner.mass;
-						if (!notOwner.applyGravity) mass2 = mass1;
-						col.forceOwner.applyForce(col.force, col.source, mass1, mass2);
-					} else {
-						let mass1 = a.mass;
-						let mass2 = b.mass;
-						a.applyForce(col.force, col.source, mass1, mass2);
-					}
-				}
+				let iA = col.impulseA;
+				let iB = col.impulseB;
+				a.applyImpulse(iA);
+				if (b.applyGravity) b.applyImpulse(iB);
 
 				//immobilize
 				a.canMoveThisFrame = false;
