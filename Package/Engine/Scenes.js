@@ -1516,10 +1516,7 @@ class Scene extends InactiveScene {
 			else doElementDraw();
 			rect.lifeSpan++;
 		}
-		this.c.c.translate(this.display.x, this.display.y);
-		this.c.c.translate(this.c.middle.x, this.c.middle.y);
-		this.c.c.scale(1 / this.zoom, 1 / this.zoom);
-		this.c.c.translate(-this.c.middle.x, -this.c.middle.y);
+		this.c.clearTransformations();
 		this.home.afterScript.run();
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];

@@ -356,6 +356,9 @@ class Artist {
 	rotate(a) {
 		this.c.rotate(a);
 	}
+	clearTransformations() {
+		this.c.resetTransform();
+	}
 	scale(x, y) {
 		this.c.scale(x, y);
 	}
