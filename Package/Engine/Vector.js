@@ -125,6 +125,9 @@ class Vector2 extends Vector {
 		let y = Math.sin(a);
 		return new Vector2(x, y);
 	}
+	static fromPoint(p) {
+		return new Vector2(p.x, p.y);
+	}
 	getAngle() {
 		return Math.atan2(this.y, this.x);
 	}
