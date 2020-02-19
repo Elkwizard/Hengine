@@ -984,7 +984,7 @@ class InactiveScene {
 				}
 			}
 			static isWall(r) {
-				return !(r.applyGravity && r.canMoveThisFrame);
+				return (!r.applyGravity && !r.velocity.mag) || !r.canMoveThisFrame;
 			}
 			static rotatePointAround(o, p, r) {
 				let dif = new Vector2(p.x - o.x, p.y - o.y);
