@@ -757,7 +757,7 @@ class InactiveScene {
 					this.scriptDraw();
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(-this.rotation);
-					c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
+					// c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
 					c.translate(-this.middle.x, -this.middle.y);
 				}
 			}
@@ -903,8 +903,8 @@ class InactiveScene {
 			}
 			applyAngularImpulse(impulse) {
 				if (!impulse) return;
-				c.stroke(cl.CREAM, 1).circle(impulse.source.x, impulse.source.y, 2);
-				c.stroke(cl.CREAM, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
+				// c.stroke(cl.CREAM, 1).circle(impulse.source.x, impulse.source.y, 2);
+				// c.stroke(cl.CREAM, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
 				let centerOfMass = this.middle;
 				let startVector = impulse.source.minus(centerOfMass);
 				let endVector = impulse.source.plus(impulse.force).minus(centerOfMass);
