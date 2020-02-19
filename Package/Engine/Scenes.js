@@ -757,7 +757,7 @@ class InactiveScene {
 					this.scriptDraw();
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(-this.rotation);
-					// c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
+					c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
 					c.translate(-this.middle.x, -this.middle.y);
 				}
 			}
@@ -894,9 +894,17 @@ class InactiveScene {
 				});
 			}
 			applyImpulse(impulse) {
+				this.applyLinearImpulse(impulse);
+				this.applyAngularImpulse(impulse);
+			}
+			applyLinearImpulse(impulse) {
 				if (!impulse) return;
-				c.stroke(cl.RED, 1).circle(impulse.source.x, impulse.source.y, 2);
-				c.stroke(cl.RED, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
+				this.velocity.add(impulse.force.over(5));
+			}
+			applyAngularImpulse(impulse) {
+				if (!impulse) return;
+				c.stroke(cl.CREAM, 1).circle(impulse.source.x, impulse.source.y, 2);
+				c.stroke(cl.CREAM, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
 				let centerOfMass = this.middle;
 				let startVector = impulse.source.minus(centerOfMass);
 				let endVector = impulse.source.plus(impulse.force).minus(centerOfMass);
@@ -1013,8 +1021,16 @@ class InactiveScene {
 				result.corner = farthest;
 				return result;
 			}
-			static getCircleCircleImpulses(a, b) {
+			static getCircleCircleImpulses(a, b, collisionAxis, penetration) {
 				let impulseA, impulseB;
+				impulseA = new Impulse(
+					collisionAxis.times(-penetration),
+					Vector2.fromPoint(a.middle).plus(collisionAxis.times(a.radius))
+				);
+				impulseB = new Impulse(
+					collisionAxis.times(penetration),
+					Vector2.fromPoint(b.middle).plus(collisionAxis.times(-b.radius))
+				);
 				return { impulseA, impulseB };
 			}
 			static getCircleRectImpulses(a, b, closestPoint) {
@@ -1022,7 +1038,7 @@ class InactiveScene {
 				let dir = closestPoint.minus(a.middle);
 				dir.mag = a.radius - dir.mag;
 				impulseB = new Impulse(dir, closestPoint);
-				impulseA = null;
+				impulseA = new Impulse(dir.times(-1), closestPoint);
 				return { impulseA, impulseB };
 			}
 			static getRectRectImpulses(a, b, penetratingCorner, collisionAxis, penetration) {
@@ -1043,7 +1059,7 @@ class InactiveScene {
 					let penetration = a.radius + b.radius - g.f.getDistance(a, b);
 
 					//impulse resolution
-					let impulses = PhysicsObject.getCircleCircleImpulses(a, b);
+					let impulses = PhysicsObject.getCircleCircleImpulses(a, b, collisionAxis, penetration);
 
 					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB);
 				} else col = new Collision(false, a, b);
@@ -1183,7 +1199,8 @@ class InactiveScene {
 				const d = col.Bdir;
 				const a = col.a;
 				const b = col.b;
-				let mobile = !PhysicsObject.isWall(b)
+				let mobileA = !PhysicsObject.isWall(a)
+				let mobileB = !PhysicsObject.isWall(b)
 				//position
 				let dir = col.Adir.times(col.penetration);
 				if (col.penetration > 0.005) {
@@ -1197,23 +1214,13 @@ class InactiveScene {
 				const A_VEL_AT_COLLISION = a.velocity.dot(col.Adir);
 				const B_VEL_AT_COLLISION = b.velocity.dot(col.Bdir);
 				if (A_VEL_AT_COLLISION < 0 && B_VEL_AT_COLLISION < 0) return;
-				if (a.velocity.mag) {
-					let velocityMagnitude = clamp(A_VEL_AT_COLLISION, 0, 1) * PORTION_OF_VELOCITY_LOST;
-					let removal = col.Adir.times(velocityMagnitude);
-					a.velocity.sub(removal);
-				}
-				if (b.applyGravity && b.velocity.mag) {
-					let velocityMagnitude = clamp(B_VEL_AT_COLLISION, 0, 1) * PORTION_OF_VELOCITY_LOST;
-					let removal = col.Bdir.times(velocityMagnitude);
-					b.velocity.sub(removal);
-				}
 
 				//impulse resolution
 				let iA = col.impulseA;
 				let iB = col.impulseB;
-				if (!PhysicsObject.isWall(b) && B_VEL_AT_COLLISION > A_VEL_AT_COLLISION) {
-					b.applyImpulse(iB);
-				} else if (!PhysicsObject.isWall(a)) a.applyImpulse(iA);
+				if (mobileB && B_VEL_AT_COLLISION > A_VEL_AT_COLLISION) b.applyImpulse(iB);
+				else if (mobileA) a.applyImpulse(iA);
+				else a.applyLinearImpulse(iA);
 
 				//immobilize
 				a.canMoveThisFrame = false;
