@@ -65,6 +65,13 @@ class InactiveScene {
 		this.custom = {};
 		this.templates = {};
 		this.hasRotatedRectangles = false;
+		this.SAT = {
+			possibleChecks: 0,
+			gridChecks: 0,
+			boxChecks: 0,
+			SATChecks: 0,
+			collisions: 0
+		}
 		this.defaultDraw = function () {
 			if (this.radius === undefined) {
 				c.draw("#000").rect(this.x, this.y, this.width, this.height);
@@ -795,7 +802,7 @@ class InactiveScene {
 			}
 			detectCollisions(others) {
 				let collisions = [];
-				if (this.applyGravity) {
+				if (this.applyGravity || this.velocity.mag) {
 					for (let other of others) {
 						if (other !== this) {
 							if (other.hasPhysics && other.tag !== "Engine-Particle") {
@@ -832,53 +839,54 @@ class InactiveScene {
 			}
 			checkAndResolveCollisions(others) {
 				let collisions = this.detectCollisions(others);
-				if (this.applyGravity) {
+				if (!PhysicsObject.isWall(this)) {
+					if (this.name == "Walls&Right Wall") console.log(collisions);
 					for (let collision of collisions) {
 						if (collision.colliding) PhysicsObject.resolve(collision);
 					}
 				}
 			}
 			physicsUpdate(others) {
-				s.drawInWorldSpace(e => {
-					if (this.applyGravity) {
-						//links
-						this.linkMovement.mul(0);
-						for (let link of this.links) link.fix();
-						this.x += this.linkMovement.x;
-						this.y += this.linkMovement.y;
+				// s.drawInWorldSpace(e => {
+				if (this.applyGravity) {
+					//links
+					this.linkMovement.mul(0);
+					for (let link of this.links) link.fix();
+					this.x += this.linkMovement.x;
+					this.y += this.linkMovement.y;
 
-						//gravity
-						this.velocity.add(new Vector2(this.home.gravity.x, this.home.gravity.y));
+					//gravity
+					this.velocity.add(new Vector2(this.home.gravity.x, this.home.gravity.y));
+				}
+
+				if (!this.positionStatic) {
+					//linear
+					this.velocity.add(this.acceleration.times(this.home.speedModulation));
+					this.x += this.velocity.x * 2 * this.home.speedModulation;
+					this.y += this.velocity.y * 2 * this.home.speedModulation;
+
+					if (!this.rotationStatic) {
+						//angular
+						this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
+						this.rotation += this.angularVelocity * this.home.speedModulation;
 					}
+				}
+				//slow
+				if (this.slows) this.slowDown();
+				this.checkAndResolveCollisions(others);
 
-					if (!this.positionStatic) {
-						//linear
-						this.velocity.add(this.acceleration.times(this.home.speedModulation));
-						this.x += this.velocity.x * 2 * this.home.speedModulation;
-						this.y += this.velocity.y * 2 * this.home.speedModulation;
-
-						if (!this.rotationStatic) {
-							//angular
-							this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
-							this.rotation += this.angularVelocity * this.home.speedModulation;
-						}
+				//align with direction
+				if (this.applyGravity) {
+					if (!this.colliding.general) {
+						this.align(this.velocity.getAngle(), 0.005, true);
 					}
-					//slow
-					if (this.slows) this.slowDown();
-					this.checkAndResolveCollisions(others);
-					
-					//align with direction
-					if (this.applyGravity) {
-						if (!this.colliding.general) {
-							this.align(this.velocity.getAngle(), 0.005, true);
-						}
-					}
-					this.rotation %= Math.PI * 2;
+				}
+				this.rotation %= Math.PI * 2;
 
-					this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
-					this.lastX = this.x;
-					this.lastY = this.y;
-				});
+				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
+				this.lastX = this.x;
+				this.lastY = this.y;
+				// });
 			}
 			moveTowards(point, ferocity) {
 				if (ferocity === undefined) ferocity = 1;
@@ -1061,9 +1069,12 @@ class InactiveScene {
 				return { impulseA, impulseB };
 			}
 			static collideCircleCircle(a, b) {
+				a.home.SAT.boxChecks++;
+				a.home.SAT.SATChecks++;
 				let colliding = (b.x - a.x) ** 2 + (b.y - a.y) ** 2 < (a.radius + b.radius) ** 2;
 				let col;
 				if (colliding) {
+					a.home.SAT.collisions++;
 					let collisionAxis = (new Vector2(b.x - a.x, b.y - a.y)).normalize();
 					let penetration = a.radius + b.radius - g.f.getDistance(a, b);
 
@@ -1075,8 +1086,12 @@ class InactiveScene {
 				return col;
 			}
 			static collideRectCircle(a, b) {
+				a.home.SAT.boxChecks++;
+				if (!Physics.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
+				a.home.SAT.SATChecks++;
 				let colliding = a.collider.collideBox(b.collider);
 				if (colliding) {
+					a.home.SAT.collisions++;
 					let inside = a.collider.collidePoint(b.middle);
 					let bestPoint = Physics.closestPointOnRectangle(b.middle, a.collider);
 					if (!bestPoint) return new Collision(false, a, b);
@@ -1094,11 +1109,14 @@ class InactiveScene {
 				} else return new Collision(false, a, b);
 			}
 			static collideCircleRect(a, b) {
+				a.home.SAT.boxChecks++;
+				if (!Physics.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
 				let colliding = b.collider.collideBox(a.collider);
-
+				a.home.SAT.SATChecks++;
 				//getting resolution data
 				let col;
 				if (colliding) {
+					a.home.SAT.collisions++;
 					let bestPoint = Physics.closestPointOnRectangle(a.middle, b.collider);
 					if (!bestPoint) return new Collision(false, a, b);
 					let bestDist = Physics.distToPoint(bestPoint, a.middle);
@@ -1115,7 +1133,9 @@ class InactiveScene {
 				return col;
 			}
 			static collideRectRect(a, b) {
+				a.home.SAT.boxChecks++;
 				if (!Physics.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
+				a.home.SAT.SATChecks++;
 				let aEdges = PhysicsObject.getEdges(a);
 				let bEdges = PhysicsObject.getEdges(b);
 				let edges = [
@@ -1148,6 +1168,7 @@ class InactiveScene {
 				let finalPenetratingCornerIndex = null;
 				let finalPenetratedEdge = null;
 				if (colliding) {
+					a.home.SAT.collisions++;
 					for (let i = 0; i < bEdges.length; i++) {
 						let edge = bEdges[i - 1];
 						if (!i) edge = bEdges[bEdges.length - 1];
@@ -1218,8 +1239,6 @@ class InactiveScene {
 				}
 
 				//velocity
-
-				const PORTION_OF_VELOCITY_LOST = 0.8;
 				const A_VEL_AT_COLLISION = a.velocity.dot(col.Adir);
 				const B_VEL_AT_COLLISION = b.velocity.dot(col.Bdir);
 				if (A_VEL_AT_COLLISION < 0 && B_VEL_AT_COLLISION < 0) return;
@@ -1424,6 +1443,13 @@ class Scene extends InactiveScene {
 		return new Rect(nMin, nMax);
 	}
 	enginePhysicsUpdate() {
+		this.SAT = {
+			possibleChecks: 0,
+			gridChecks: 0,
+			boxChecks: 0,
+			SATChecks: 0,
+			collisions: 0
+		}
 		for (let rect of this.contains_array) rect.isBeingUpdated = true;
 		this.updateArray();
 		this.clearAllCollisions();
@@ -1458,11 +1484,13 @@ class Scene extends InactiveScene {
 				let rect = useful[i];
 				let updater = [];
 				let updateCells = cells2[i];
-				if (rect.applyGravity) for (let cell of updateCells) {
+				if (rect.velocity.mag) for (let cell of updateCells) {
 					for (let r of cell) {
 						if (r !== rect && !updater.includes(r)) updater.push(r);
 					}
 				}
+				this.SAT.gridChecks += updater.length;
+				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
 				rect.enginePhysicsUpdate(updater);
 			}
 			for (let rect of useless) rect.enginePhysicsUpdate([]);
