@@ -821,6 +821,14 @@ class InactiveScene {
 				}
 				return collisions;
 			}
+			checkAndResolveCollisions(others) {
+				let collisions = this.detectCollisions(others);
+				if (this.applyGravity) {
+					for (let collision of collisions) {
+						if (collision.colliding) PhysicsObject.resolve(collision);
+					}
+				}
+			}
 			physicsUpdate(others) {
 				s.drawInWorldSpace(e => {
 					if (this.applyGravity) {
@@ -831,9 +839,7 @@ class InactiveScene {
 						this.y += this.linkMovement.y;
 
 						//gravity
-						let lessMass = (this.mass ** .5);
-						let factor = Math.min((lessMass ** .5) / 7.0710678118654755, 1.1);
-						this.velocity.add(new Vector2(this.home.gravity.x * factor, this.home.gravity.y * factor));
+						this.velocity.add(new Vector2(this.home.gravity.x, this.home.gravity.y));
 					}
 
 					if (!this.positionStatic) {
@@ -850,13 +856,8 @@ class InactiveScene {
 					}
 					//slow
 					if (this.slows) this.slowDown();
-
-					let collisions = this.detectCollisions(others);
-					if (this.applyGravity) {
-						for (let collision of collisions) {
-							if (collision.colliding) PhysicsObject.resolve(collision);
-						}
-					}
+					this.checkAndResolveCollisions(others);
+					
 					//align with direction
 					if (this.applyGravity) {
 						if (!this.colliding.general) {
@@ -894,8 +895,8 @@ class InactiveScene {
 			}
 			applyImpulse(impulse) {
 				if (!impulse) return;
-				// c.stroke(cl.RED, 1).circle(impulse.source.x, impulse.source.y, 2)
-				// c.stroke(cl.RED, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
+				c.stroke(cl.RED, 1).circle(impulse.source.x, impulse.source.y, 2);
+				c.stroke(cl.RED, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
 				let centerOfMass = this.middle;
 				let startVector = impulse.source.minus(centerOfMass);
 				let endVector = impulse.source.plus(impulse.force).minus(centerOfMass);
@@ -1024,40 +1025,14 @@ class InactiveScene {
 				impulseA = null;
 				return { impulseA, impulseB };
 			}
-			static getRectRectImpulses(a, b, collidedEdge, penetratingCornerIndex, penetratingCornerOwner) {
+			static getRectRectImpulses(a, b, penetratingCorner, collisionAxis, penetration) {
 
 				let impulseA, impulseB;
+				let pc = penetratingCorner;
+				let dir = collisionAxis;
+				impulseA = new Impulse(dir.times(penetration), pc);
+				impulseB = new Impulse(dir.times(-penetration), pc);
 
-				let owner = penetratingCornerOwner;
-				let corners = PhysicsObject.getCorners(owner);
-				let edg = collidedEdge;
-				let edgV = edg.b.minus(edg.a).normalize();
-				let pc = corners[penetratingCornerIndex];
-				let pc2 = corners[(penetratingCornerIndex + 1) % corners.length];
-				let pc3 = corners[(penetratingCornerIndex - 1 + corners.length) % corners.length];
-				let edge1 = new Line(pc, pc2);
-				let edge2 = new Line(pc, pc3);
-				let edge1V = edge1.b.minus(edge1.a).normalize();
-				let edge2V = edge2.b.minus(edge2.a).normalize();
-				let correctEdge = edge1;
-				let correctDir = edge1V;
-				let dot1 = Math.abs(edge1V.dot(edgV));
-				let dot2 = Math.abs(edge2V.dot(edgV));
-				if (dot2 < dot1) {
-					correctEdge = edge2;
-					correctDir = edge2V;
-				}
-				let closestPoint = Physics.closestPointOnLineObjectInDirection(pc, correctDir, edg);
-				let dir = closestPoint.minus(pc);
-				let ownerImpulse = new Impulse(dir, pc);
-				let otherImpulse = new Impulse(dir.times(-1), pc);
-				if (owner == a) {
-					impulseA = ownerImpulse;
-				} else {
-					impulseA = otherImpulse;
-				}
-
-				impulseB = null;
 				return { impulseA, impulseB };
 			}
 			static collideCircleCircle(a, b) {
@@ -1108,7 +1083,7 @@ class InactiveScene {
 					if (inside) collisionAxis.mul(-1);
 
 					//impulse resolution
-					let impulses = PhysicsObject.getCircleRectImpulses(a, b, bestPoint);
+					let impulses = PhysicsObject.getCircleRectImpulses(a, b, bestPoint, collisionAxis.times(-1), penetration);
 
 					col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB);
 				} else col = new Collision(false, a, b);
@@ -1192,7 +1167,7 @@ class InactiveScene {
 				if (colliding) {
 					if (collisionAxis) {
 						//figure out impulses
-						let impulses = PhysicsObject.getRectRectImpulses(a, b, finalPenetratedEdge, finalPenetratingCornerIndex, finalPenetratingCornerOwner);
+						let impulses = PhysicsObject.getRectRectImpulses(a, b, PhysicsObject.getCorners(finalPenetratingCornerOwner)[finalPenetratingCornerIndex], collisionAxis, leastIntersection);
 
 						col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, impulses.impulseA, impulses.impulseB);
 					} else {
@@ -1236,8 +1211,9 @@ class InactiveScene {
 				//impulse resolution
 				let iA = col.impulseA;
 				let iB = col.impulseB;
-				a.applyImpulse(iA);
-				if (b.applyGravity) b.applyImpulse(iB);
+				if (!PhysicsObject.isWall(b) && B_VEL_AT_COLLISION > A_VEL_AT_COLLISION) {
+					b.applyImpulse(iB);
+				} else if (!PhysicsObject.isWall(a)) a.applyImpulse(iA);
 
 				//immobilize
 				a.canMoveThisFrame = false;
