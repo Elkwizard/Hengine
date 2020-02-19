@@ -840,7 +840,6 @@ class InactiveScene {
 			checkAndResolveCollisions(others) {
 				let collisions = this.detectCollisions(others);
 				if (!PhysicsObject.isWall(this)) {
-					if (this.name == "Walls&Right Wall") console.log(collisions);
 					for (let collision of collisions) {
 						if (collision.colliding) PhysicsObject.resolve(collision);
 					}
