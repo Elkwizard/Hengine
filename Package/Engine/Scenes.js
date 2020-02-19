@@ -747,6 +747,15 @@ class InactiveScene {
 				this.canMoveThisFrame = true;
 				this.allCollidingWith.clear();
 			}
+			drawWithoutRotation(artist) {
+				c.translate(this.middle.x, this.middle.y);
+				c.rotate(-this.rotation);
+				c.translate(-this.middle.x, -this.middle.y);
+				artist();
+				c.translate(this.middle.x, this.middle.y);
+				c.rotate(this.rotation);
+				c.translate(-this.middle.x, -this.middle.y);
+			}
 			engineDrawUpdate() {
 				let r = PhysicsObject.getBoundingBox(this);
 				if (!this.hidden && (!this.cullGraphics || Physics.overlapRectRect(r, s.adjustedDisplay))) {
