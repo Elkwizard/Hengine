@@ -774,7 +774,7 @@ class InactiveScene {
 					this.scriptDraw();
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(-this.rotation);
-					// c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
+					c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
 					c.translate(-this.middle.x, -this.middle.y);
 				}
 			}
@@ -847,46 +847,49 @@ class InactiveScene {
 				}
 			}
 			physicsUpdate(others) {
-				// s.drawInWorldSpace(e => {
-				if (this.applyGravity) {
-					//links
-					this.linkMovement.mul(0);
-					for (let link of this.links) link.fix();
-					this.x += this.linkMovement.x;
-					this.y += this.linkMovement.y;
+				s.drawInWorldSpace(e => {
+					if (this.applyGravity) {
+						//links
+						this.linkMovement.mul(0);
+						for (let link of this.links) link.fix();
+						this.x += this.linkMovement.x;
+						this.y += this.linkMovement.y;
 
-					//gravity
-					this.velocity.add(new Vector2(this.home.gravity.x, this.home.gravity.y));
-				}
-
-				if (!this.positionStatic) {
-					//linear
-					this.velocity.add(this.acceleration.times(this.home.speedModulation));
-					this.x += this.velocity.x * 2 * this.home.speedModulation;
-					this.y += this.velocity.y * 2 * this.home.speedModulation;
-
-					if (!this.rotationStatic) {
-						//angular
-						this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
-						this.rotation += this.angularVelocity * this.home.speedModulation;
+						//gravity
+						let factor = 4;
+						let massFactor = Math.pow(this.mass, 1 / factor) / Math.pow(2500, 1 / factor);
+						// console.log(massFactor);
+						this.velocity.add(new Vector2(this.home.gravity.x * massFactor, this.home.gravity.y * massFactor));
 					}
-				}
-				//slow
-				if (this.slows) this.slowDown();
-				for (let i = 0; i < this.home.physicsRealism; i++) this.checkAndResolveCollisions(others);
 
-				//align with direction
-				if (this.applyGravity) {
-					if (!this.colliding.general) {
-						this.align(this.velocity.getAngle(), 0.005, true);
+					if (!this.positionStatic) {
+						//linear
+						this.velocity.add(this.acceleration.times(this.home.speedModulation));
+						this.x += this.velocity.x * 2 * this.home.speedModulation;
+						this.y += this.velocity.y * 2 * this.home.speedModulation;
+
+						if (!this.rotationStatic) {
+							//angular
+							this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
+							this.rotation += this.angularVelocity * this.home.speedModulation;
+						}
 					}
-				}
-				this.rotation %= Math.PI * 2;
+					//slow
+					if (this.slows) this.slowDown();
+					for (let i = 0; i < this.home.physicsRealism; i++) this.checkAndResolveCollisions(others);
 
-				this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
-				this.lastX = this.x;
-				this.lastY = this.y;
-				// });
+					//align with direction
+					// if (this.applyGravity) {
+					// 	if (!this.colliding.general) {
+					// 		this.align(this.velocity.getAngle(), 0.005, true);
+					// 	}
+					// }
+					this.rotation %= Math.PI * 2;
+
+					this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
+					this.lastX = this.x;
+					this.lastY = this.y;
+				});
 			}
 			moveTowards(point, ferocity) {
 				if (ferocity === undefined) ferocity = 1;
@@ -916,12 +919,14 @@ class InactiveScene {
 			}
 			applyLinearImpulse(impulse) {
 				if (!impulse) return;
+				c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
+				c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
 				this.velocity.add(impulse.force.over(5));
 			}
 			applyAngularImpulse(impulse) {
 				if (!impulse) return;
-				// c.stroke(cl.CREAM, 1).circle(impulse.source.x, impulse.source.y, 2);
-				// c.stroke(cl.CREAM, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
+				c.stroke(cl.CREAM, 1).circle(impulse.source.x, impulse.source.y, 2);
+				c.stroke(cl.CREAM, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
 				let centerOfMass = this.middle;
 				let startVector = impulse.source.minus(centerOfMass);
 				let endVector = impulse.source.plus(impulse.force).minus(centerOfMass);
@@ -1065,7 +1070,6 @@ class InactiveScene {
 				let dir = collisionAxis;
 				impulseA = new Impulse(dir.times(penetration), pc);
 				impulseB = new Impulse(dir.times(-penetration), pc);
-
 				return { impulseA, impulseB };
 			}
 			static collideCircleCircle(a, b) {
@@ -1246,9 +1250,14 @@ class InactiveScene {
 				//impulse resolution
 				let iA = col.impulseA;
 				let iB = col.impulseB;
-				if (mobileB && B_VEL_AT_COLLISION > A_VEL_AT_COLLISION) b.applyImpulse(iB);
-				else if (mobileA) a.applyImpulse(iA);
-				else a.applyLinearImpulse(iA);
+				if (mobileB && B_VEL_AT_COLLISION > A_VEL_AT_COLLISION) {
+					b.applyImpulse(iB);
+				} else if (mobileA || !mobileB) {
+					a.applyImpulse(iA);
+				} else {
+					a.applyLinearImpulse(iA);
+					if (b.applyGravity) b.applyLinearImpulse(iB);
+				}
 
 				//immobilize
 				a.canMoveThisFrame = false;
