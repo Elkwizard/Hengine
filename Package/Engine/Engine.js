@@ -75,6 +75,7 @@ class Engine {
 		this.frameLength = 0;
 		this.frameCount = 0;
 		this.fpsGraph = new Frame(440, 220);
+		this.fpsGraph.c.draw("black").rect(0, 0, 440, 220);
 		this.fpsGraph.c.stroke("white", 2).rect(20, -2, 422, 200);
 		this.fpsGraph.c.draw("white").text("10px Arial", "60\n\n\n\n\n\n\n\nF\nP\nS", 4, 2);
 		this.fpsGraph.c.textMode = "center";
@@ -254,7 +255,7 @@ class Engine {
 		if (performance.now() > this.fpsGraph.msLimit) this.fpsGraph.timeOffset = performance.now() - this.fpsGraph.msLimit;
 	}
 	getFPSGraph() {
-		this.fpsGraph.c.c.clearRect(22, 0, 420, 198);
+		this.fpsGraph.c.draw("black").rect(22, 0, 420, 198);
 		let last = null;
 		for (let data of this.fpsGraph.data) {
 			if (last) {
@@ -272,13 +273,18 @@ class Engine {
 			}
 			last = data;
 		}
-		c.draw("white").text("10px monospace", last.y, clamp(400 * ((last.x - this.fpsGraph.timeOffset) / this.fpsGraph.msLimit), 2, 400) + 20, 200 - (last.y / 60) * 200 + 2);
-		this.fpsGraph.c.c.clearRect(390, 200, 200, 200);
-		this.fpsGraph.c.c.clearRect(0, 200, 200, 200);
+		this.fpsGraph.c.draw("white").text(
+			"10px monospace", 
+			last.y, 
+			clamp(400 * ((last.x - this.fpsGraph.timeOffset) / this.fpsGraph.msLimit), 2, 400) + 20, 
+			200 - (last.y / 60) * 200 + 2
+		);
+		this.fpsGraph.c.draw("black").rect(390, 200, 200, 200);
+		this.fpsGraph.c.draw("black").rect(0, 200, 200, 200);
 		this.fpsGraph.c.textMode = "right";
-		this.fpsGraph.c.draw(cl.WHITE).text("10px Arial", Math.floor(this.fpsGraph.timeOffset) + 5000, 420, 200);
+		this.fpsGraph.c.draw("black").text("10px Arial", Math.floor(this.fpsGraph.timeOffset) + this.fpsGraph.msLimit, 420, 200);
 		this.fpsGraph.c.textMode = "left";
-		this.fpsGraph.c.draw(cl.WHITE).text("10px Arial", Math.floor(this.fpsGraph.timeOffset), 20, 200);
+		this.fpsGraph.c.draw("black").text("10px Arial", Math.floor(this.fpsGraph.timeOffset), 20, 200);
 		
 		return this.fpsGraph;
 	}
