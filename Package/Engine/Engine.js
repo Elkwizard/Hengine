@@ -74,6 +74,17 @@ class Engine {
 		this.frameLengths = [];
 		this.frameLength = 0;
 		this.frameCount = 0;
+		this.fpsGraph = new Frame(440, 220);
+		this.fpsGraph.c.stroke("white", 2).rect(20, -2, 422, 200);
+		this.fpsGraph.c.draw("white").text("10px Arial", "60\n\n\n\n\n\n\n\nF\nP\nS", 4, 2);
+		this.fpsGraph.c.textMode = "center";
+		this.fpsGraph.c.draw("white").text("10px Arial", "Time (ms)", 220, 200);
+		this.fpsGraph.c.textMode = "left";
+		this.fpsGraph.c.draw("white").text("10px Arial", "5000", 390, 200);
+		this.fpsGraph.c.draw("white").text("10px Arial", "0", 20, 200);
+		this.fpsGraph.timeOffset = 0;
+		this.fpsGraph.data = [];
+		this.fpsGraph.msLimit = 5000;
 		//fallbacks
 		function f(a, b) {
 			return (a === undefined) ? b : a
@@ -163,6 +174,7 @@ class Engine {
 					let val = this.frameLengths.reduce((p, c) => p + c) / this.FPS_FRAMES_TO_COUNT;
 					this.fpsContinuous = 1000 / val;
 				}
+				this.updateFPSGraph();
 				if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
 				//update
 				if (!this.paused) {
@@ -235,6 +247,40 @@ class Engine {
 		let x = (this.renderer.canvas.width / 2) - (width / 2);
 		let y = (this.renderer.canvas.height / 2) - (height / 2);
 		let window = new this.window(x, y, width, height, title, contents);
+	}
+	updateFPSGraph() {
+		this.fpsGraph.data.push(P(performance.now(), this.fps));
+		if (this.fpsGraph.data.length > this.fpsGraph.msLimit / 16) this.fpsGraph.data.shift();
+		if (performance.now() > this.fpsGraph.msLimit) this.fpsGraph.timeOffset = performance.now() - this.fpsGraph.msLimit;
+	}
+	getFPSGraph() {
+		this.fpsGraph.c.c.clearRect(22, 0, 420, 198);
+		let last = null;
+		for (let data of this.fpsGraph.data) {
+			if (last) {
+				let x1 = clamp(400 * ((last.x - this.fpsGraph.timeOffset) / this.fpsGraph.msLimit), 4, 400) + 20;
+				let y1 = 200 - (last.y / 60) * 200 + 2;
+				let x2 = clamp(400 * ((data.x - this.fpsGraph.timeOffset) / this.fpsGraph.msLimit), 4, 400) + 20;
+				let y2 = 200 - (data.y / 60) * 200 + 2;
+				let col;
+				let fps = data.y;
+				if (fps > 50) col = "lime";
+				else if (fps > 30) col = "yellow";
+				else if (fps > 15) col = "orange";
+				else col = "red";
+				this.fpsGraph.c.stroke(col, 1, "round").line(x1, y1, x2, y2);
+			}
+			last = data;
+		}
+		c.draw("white").text("10px monospace", last.y, clamp(400 * ((last.x - this.fpsGraph.timeOffset) / this.fpsGraph.msLimit), 2, 400) + 20, 200 - (last.y / 60) * 200 + 2);
+		this.fpsGraph.c.c.clearRect(390, 200, 200, 200);
+		this.fpsGraph.c.c.clearRect(0, 200, 200, 200);
+		this.fpsGraph.c.textMode = "right";
+		this.fpsGraph.c.draw(cl.WHITE).text("10px Arial", Math.floor(this.fpsGraph.timeOffset) + 5000, 420, 200);
+		this.fpsGraph.c.textMode = "left";
+		this.fpsGraph.c.draw(cl.WHITE).text("10px Arial", Math.floor(this.fpsGraph.timeOffset), 20, 200);
+		
+		return this.fpsGraph;
 	}
 	end() {
 		this.pause();

@@ -570,7 +570,11 @@ class InactiveScene {
 				d *= this.ferocity;
 				let dir = new Vector2(this.end.middle.x - this.start.middle.x, this.end.middle.y - this.start.middle.y);
 				dir.normalize();
-				this.start.linkMovement.add(dir.times(d));
+				let p = l.midPoint;
+				let cps = Physics.closestPointOnRectangle(p, this.start);
+				let cpe = Physics.closestPointOnRectangle(p, this.end);
+				this.start.applyImpulse(new Impulse(dir.over(100), cps));
+				this.end.applyImpulse(new Impulse(dir.over(100), cpe));
 			}
 		}
 		PhysicsObject = class extends SceneObject {
@@ -584,7 +588,6 @@ class InactiveScene {
 				this.applyGravity = gravity;
 				this.slows = gravity;
 				this.links = [];
-				this.linkMovement = new Vector2(0, 0);
 				this.colliding = {
 					top: null,
 					bottom: null,
@@ -850,10 +853,7 @@ class InactiveScene {
 				s.drawInWorldSpace(e => {
 					if (this.applyGravity) {
 						//links
-						this.linkMovement.mul(0);
 						for (let link of this.links) link.fix();
-						this.x += this.linkMovement.x;
-						this.y += this.linkMovement.y;
 
 						//gravity
 						let factor = 4;
