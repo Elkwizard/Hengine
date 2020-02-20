@@ -289,7 +289,10 @@ class Engine {
 			}
 			f2.c.c.globalAlpha = 1;
 			f2.c.c.setLineDash([]);
-			for (let data of f.data) {
+			let step = 1;
+			if (f.data.length > 300) step = Math.ceil(f.data.length / 300);
+			for (let i = 0; i - step < f.data.length; i += step) {
+				let data = f.data[Math.min(i, f.data.length - 1)];
 				if (last) {
 					let x1 = getXValue(last.x);
 					let y1 = getYValue(last.y);
@@ -323,14 +326,20 @@ class Engine {
 		this.graphs.push(f);
 		return f;
 	}
+	parseGraphData(data) {
+		let result = data.split(" ").map(e => {
+			let split = e.split(",");
+			return P(parseFloat(split[0]), parseFloat(split[1]));
+		});
+		result.pop();
+		return result;
+	}
 	updateGraphs() {
 		for (let graph of this.graphs) {
-			graph.data.push(P(performance.now(), graph.getY(performance.now())));
-			if (graph.data.length > graph.msLimit / 16) {
-				let lastData = graph.data[0];
-				graph.permanentData += "(" + lastData.x + ", " + lastData.y + ") ";
-				graph.data.shift();
-			}
+			let data = P(performance.now(), graph.getY(performance.now()));
+			graph.permanentData += data.x + "," + data.y + " ";
+			graph.data.push(data);
+			if (graph.data.length > graph.msLimit / 16) graph.data.shift();
 			if (performance.now() > graph.msLimit) graph.timeOffset = performance.now() - graph.msLimit;
 		}
 	}
