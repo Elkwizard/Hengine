@@ -14,7 +14,7 @@ Number.prototype.toDegrees = function () {
 Number.prototype.toRadians = function () {
 	return this * (Math.PI / 180);
 }
-Number.prototype.movedTowards = function(value, ferocity) {
+Number.prototype.movedTowards = function (value, ferocity) {
 	let dir = ferocity * (value - this) * 2;
 	return this + dir;
 }
@@ -74,18 +74,24 @@ class Engine {
 		this.frameLengths = [];
 		this.frameLength = 0;
 		this.frameCount = 0;
-		this.fpsGraph = new Frame(440, 220);
-		this.fpsGraph.c.draw("black").rect(0, 0, 440, 220);
-		this.fpsGraph.c.stroke("white", 2).rect(20, -2, 422, 200);
-		this.fpsGraph.c.draw("white").text("10px Arial", "60\n\n\n\n\n\n\n\nF\nP\nS", 4, 2);
-		this.fpsGraph.c.textMode = "center";
-		this.fpsGraph.c.draw("white").text("10px Arial", "Time (ms)", 220, 200);
-		this.fpsGraph.c.textMode = "left";
-		this.fpsGraph.c.draw("white").text("10px Arial", "5000", 390, 200);
-		this.fpsGraph.c.draw("white").text("10px Arial", "0", 20, 200);
-		this.fpsGraph.timeOffset = 0;
-		this.fpsGraph.data = [];
-		this.fpsGraph.msLimit = 5000;
+		this.graphs = [];
+		this.fpsGraph = this.makeGraph("FPS", 0, 60, e => this.fps, 2000, [
+			{
+				limit: 50,
+				color: "lime"
+			},
+			{
+				limit: 30,
+				color: "yellow"
+			},
+			{
+				limit: 15,
+				color: "orange"
+			},
+			{
+				color: "red"
+			}
+		]);
 		//fallbacks
 		function f(a, b) {
 			return (a === undefined) ? b : a
@@ -110,27 +116,6 @@ class Engine {
 				this.f = new FunctionLibrary();
 			}
 		} catch (e) { }
-		//windows
-		this.window = class {
-			constructor(x, y, width, height, title, contents) {
-				let win = document.createElement("div");
-				win.className = "engine-window";
-				win.style.width = width;
-				win.style.height = height;
-				win.style.position = "absolute";
-				win.style.left = x;
-				win.style.top = y;
-				win.style.background = "#123456";
-				win.style.color = "white";
-				win.style.border = "2px black solid";
-				win.style.borderRadius = "5px";
-				win.innerHTML += "<div class='engine-window-options'>MESSAGE<button class='engine-window-header-button' onclick='this.parentNode.parentNode.outerHTML = '';'>X</button></div>";
-				win.innerHTML += "<h1 class='engine-window-header'>" + title + "</h1>";
-				win.innerHTML += "<div class='engine-window-wrapper'>" + contents + "</div>";
-				document.body.appendChild(win);
-			}
-		};
-		this.fpsOldTime = performance.now();
 		//setup canvas and scene
 		let canvas = document.getElementById(canvasID);
 		if (!document.getElementById(canvasID)) {
@@ -175,7 +160,7 @@ class Engine {
 					let val = this.frameLengths.reduce((p, c) => p + c) / this.FPS_FRAMES_TO_COUNT;
 					this.fpsContinuous = 1000 / val;
 				}
-				this.updateFPSGraph();
+				this.updateGraphs();
 				if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
 				//update
 				if (!this.paused) {
@@ -244,49 +229,112 @@ class Engine {
 			}
 		}.bind(this));
 	}
-	openWindow(width, height, title, contents) {
-		let x = (this.renderer.canvas.width / 2) - (width / 2);
-		let y = (this.renderer.canvas.height / 2) - (height / 2);
-		let window = new this.window(x, y, width, height, title, contents);
+	makeGraph(yName, minValue, maxValue, getY, msLimit = 5000, colors) {
+		if (!colors) colors = [{color:"white"}];
+		let c = new Frame(1, 1).c;
+		let leftOffset = Math.max(c.c.measureText(maxValue.toString()).width, c.c.measureText(minValue.toString()).width) + 10;
+		let bottomTextOffset = 5;
+		let f = new Frame(400 + leftOffset, 200 + bottomTextOffset * 3 + 10);
+		f.c.draw("black").rect(0, 0, f.width, f.height);
+		f.c.stroke("white", 2).rect(leftOffset, -2, 422, 200);
+		let height = c.c.measureText(yName).width;
+		f.c.c.font = "10px Arial";
+		f.c.textMode = "center";
+		f.c.draw("white").text("10px Arial", maxValue, leftOffset / 2, 2);
+		f.c.draw("white").text("10px Arial", minValue, leftOffset / 2, 190);
+		let tx = leftOffset / 2;
+		let ty = 100;
+		f.c.translate(tx, ty);
+		f.c.rotate(-Math.PI / 2);
+		f.c.draw("white").text("10px Arial", yName.split("").join(" "), 0, -5);
+		f.c.rotate(Math.PI / 2);
+		f.c.translate(-tx, -ty);
+		f.c.draw("white").text("10px Arial", "Time (ms)", 220, 200 + bottomTextOffset);
+		f.c.textMode = "left";
+		f.c.draw("white").text("10px Arial", "5000", leftOffset + 370, 200 + bottomTextOffset);
+		f.c.draw("white").text("10px Arial", "0", leftOffset, 200 + bottomTextOffset);
+		f.timeOffset = 0;
+		f.data = [];
+		f.msLimit = msLimit;
+		f.getY = getY;
+		f.permanentData = "";
+		function getColor(n) {
+			for (let color of colors) {
+				if (n >= color.limit) return color.color;
+			}
+			return "black";
+		}
+		let graphFrame = new Frame(400, 198);
+		let f2 = graphFrame;
+		const getYValue = (fV) => clamp(200 - ((fV - minValue) / (maxValue - minValue)) * 200, 0, 200);
+		const getXValue = (fV) => 400 * ((fV - f.timeOffset) / f.msLimit);
+		f.get = function () {
+			f.c.textMode = "left";
+			f.c.draw("black").rect(leftOffset + 2, 0, 420, 198);
+			let last = null;
+			f2.c.clear();
+			f2.c.c.setLineDash([4, 2]);
+			let lastCol = {
+				limit: maxValue
+			};
+			for (let i = 0; i < colors.length; i++) {
+				f2.c.c.globalAlpha = 0.1;
+				let col = colors[i];
+				let dif = lastCol.limit - col.limit;
+				if (!col.limit) col.limit = minValue;
+				f2.c.draw(col.color).rect(0, getYValue(lastCol.limit), 400, getYValue(col.limit) - getYValue(lastCol.limit));
+				f2.c.c.globalAlpha = .5;
+				f2.c.stroke(col.color, 2).line(0, getYValue(lastCol.limit), 400, getYValue(lastCol.limit));
+				lastCol = col;
+			}
+			f2.c.c.globalAlpha = 1;
+			f2.c.c.setLineDash([]);
+			for (let data of f.data) {
+				if (last) {
+					let x1 = getXValue(last.x);
+					let y1 = getYValue(last.y);
+					let x2 = getXValue(data.x);
+					let y2 = getYValue(data.y);
+					let col = getColor(data.y);
+					f2.c.stroke(col, 3).line(x1, y1, x2, y2);
+				}
+				last = data;
+			}
+			f2.c.textMode = "right";
+			let y = getYValue(last.y);
+			if (y > 185) y -= 15;
+			f2.c.draw("white").text(
+				"10px Arial",
+				last.y,
+				getXValue(last.x) - 5,
+				y
+			);
+			f.c.drawImage(f2, leftOffset + 2, 0);
+			let timeStart = Math.floor(f.timeOffset);
+			let timeEnd = Math.floor(f.timeOffset) + f.msLimit;
+			f.c.draw("black").rect(leftOffset, 200 + bottomTextOffset, f.c.c.measureText(timeStart).width, 200);
+			f.c.draw("white").text("10px Arial", timeStart, leftOffset, 200 + bottomTextOffset);
+			f.c.draw("black").rect(leftOffset + 390 - f.c.c.measureText(timeEnd).width, 200 + bottomTextOffset, 200, 200);
+			f.c.textMode = "right";
+			f.c.draw("white").text("10px Arial", timeEnd, 390 + leftOffset, 200 + bottomTextOffset);
+
+			return f;
+		}
+		this.graphs.push(f);
+		return f;
 	}
-	updateFPSGraph() {
-		this.fpsGraph.data.push(P(performance.now(), this.fps));
-		if (this.fpsGraph.data.length > this.fpsGraph.msLimit / 16) this.fpsGraph.data.shift();
-		if (performance.now() > this.fpsGraph.msLimit) this.fpsGraph.timeOffset = performance.now() - this.fpsGraph.msLimit;
+	updateGraphs() {
+		for (let graph of this.graphs) {
+			graph.data.push(P(performance.now(), graph.getY(performance.now())));
+			if (graph.data.length > graph.msLimit / (1000 / this.fps)) {
+				graph.permanentData += "(" + graph.data.x + ", " + graph.data.y + ") ";
+				graph.data.shift();
+			}
+			if (performance.now() > graph.msLimit) graph.timeOffset = performance.now() - graph.msLimit;
+		}
 	}
 	getFPSGraph() {
-		this.fpsGraph.c.draw("black").rect(22, 0, 420, 198);
-		let last = null;
-		for (let data of this.fpsGraph.data) {
-			if (last) {
-				let x1 = clamp(400 * ((last.x - this.fpsGraph.timeOffset) / this.fpsGraph.msLimit), 4, 400) + 20;
-				let y1 = 200 - (last.y / 60) * 200 + 2;
-				let x2 = clamp(400 * ((data.x - this.fpsGraph.timeOffset) / this.fpsGraph.msLimit), 4, 400) + 20;
-				let y2 = 200 - (data.y / 60) * 200 + 2;
-				let col;
-				let fps = data.y;
-				if (fps > 50) col = "lime";
-				else if (fps > 30) col = "yellow";
-				else if (fps > 15) col = "orange";
-				else col = "red";
-				this.fpsGraph.c.stroke(col, 1, "round").line(x1, y1, x2, y2);
-			}
-			last = data;
-		}
-		this.fpsGraph.c.draw("white").text(
-			"10px monospace", 
-			last.y, 
-			clamp(400 * ((last.x - this.fpsGraph.timeOffset) / this.fpsGraph.msLimit), 2, 400) + 20, 
-			200 - (last.y / 60) * 200 + 2
-		);
-		this.fpsGraph.c.draw("black").rect(390, 200, 200, 200);
-		this.fpsGraph.c.draw("black").rect(0, 200, 200, 200);
-		this.fpsGraph.c.textMode = "right";
-		this.fpsGraph.c.draw("black").text("10px Arial", Math.floor(this.fpsGraph.timeOffset) + this.fpsGraph.msLimit, 420, 200);
-		this.fpsGraph.c.textMode = "left";
-		this.fpsGraph.c.draw("black").text("10px Arial", Math.floor(this.fpsGraph.timeOffset), 20, 200);
-		
-		return this.fpsGraph;
+		return this.fpsGraph.get();
 	}
 	end() {
 		this.pause();
