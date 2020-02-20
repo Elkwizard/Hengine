@@ -71,7 +71,8 @@ class InactiveScene {
 			boxChecks: 0,
 			SATChecks: 0,
 			collisions: 0
-		}
+		};
+		this.physicsRealism = 1;
 		this.defaultDraw = function () {
 			if (this.radius === undefined) {
 				c.draw("#000").rect(this.x, this.y, this.width, this.height);
@@ -872,7 +873,7 @@ class InactiveScene {
 				}
 				//slow
 				if (this.slows) this.slowDown();
-				this.checkAndResolveCollisions(others);
+				for (let i = 0; i < this.home.physicsRealism; i++) this.checkAndResolveCollisions(others);
 
 				//align with direction
 				if (this.applyGravity) {
