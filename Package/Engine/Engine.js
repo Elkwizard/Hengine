@@ -266,7 +266,7 @@ class Engine {
 		}
 		let graphFrame = new Frame(400, 198);
 		let f2 = graphFrame;
-		const getYValue = (fV) => clamp(200 - ((fV - minValue) / (maxValue - minValue)) * 200, 0, 200);
+		const getYValue = (fV) => clamp(200 - ((fV - minValue) / (maxValue - minValue)) * 200, 0, 198);
 		const getXValue = (fV) => 400 * ((fV - f.timeOffset) / f.msLimit);
 		f.get = function () {
 			f.c.textMode = "left";
@@ -326,8 +326,9 @@ class Engine {
 	updateGraphs() {
 		for (let graph of this.graphs) {
 			graph.data.push(P(performance.now(), graph.getY(performance.now())));
-			if (graph.data.length > graph.msLimit / (1000 / this.fps)) {
-				graph.permanentData += "(" + graph.data.x + ", " + graph.data.y + ") ";
+			if (graph.data.length > graph.msLimit / 16) {
+				let lastData = graph.data[0];
+				graph.permanentData += "(" + lastData.x + ", " + lastData.y + ") ";
 				graph.data.shift();
 			}
 			if (performance.now() > graph.msLimit) graph.timeOffset = performance.now() - graph.msLimit;
