@@ -3,8 +3,14 @@ class Time {
 		let d = new Date();
 		let t = d.getTime();
 		t -= (7 * 60 * 60 * 1000);
+		return Time.millisecondsToStandard(t, 1970);
+	}
+	static sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+	static millisecondsToStandard(t, yearsSinceCounterStarted = 0) {
 		let uy = Math.floor(t / (365 * 24 * 60 * 60 * 1000));
-		let years = Math.floor(uy) + 1970;
+		let years = uy + yearsSinceCounterStarted;
 		let days = t - (uy * (365 * 24 * 60 * 60 * 1000));
 		days = Math.floor(days / (24 * 60 * 60 * 1000));
 		let hours = t - ((days + (uy * 365)) * 24 * 60 * 60 * 1000);
@@ -12,7 +18,7 @@ class Time {
 		let minutes = t - ((hours + (days * 24) + (uy * 365 * 24)) * 60 * 60 * 1000);
 		minutes = Math.floor(minutes / (60 * 1000));
 		let seconds = t - ((minutes + ((hours + ((days + (uy * 365)) * 24)) * 60)) * 60 * 1000);
-		seconds = Math.floor(seconds / 1000);
+		seconds = Math.floor(seconds / 1000 * 1000) / 1000;
 		return {
 			seconds: seconds,
 			minutes: minutes,
@@ -20,6 +26,25 @@ class Time {
 			days: days,
 			years: years
 		};
+
+	}
+	static formatTime(t) {
+		let ary = [];
+		let shorthand = {
+			"years": "yr",
+			"days": "d",
+			"minutes": "m",
+			"seconds": "s"
+		}
+		for (let key of ["years", "days", "minutes", "seconds"]) {
+			let start = t[key];
+			if (start % 1) start = t[key].toFixed(2); 
+			if (t[key] || key == "seconds") ary.push(start + shorthand[key]);
+		}
+		return ary.join(" ");
+	}
+	static formatMS(ms) {
+		return Time.formatTime(Time.millisecondsToStandard(ms, 0));
 	}
 	static getFormattedTime() {
 		let t = Time.getTime();
