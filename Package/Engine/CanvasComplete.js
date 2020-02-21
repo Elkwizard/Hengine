@@ -285,89 +285,7 @@ class Artist {
 		this.animations = [];
 		this._background = new Color(0, 0, 0, 0);
 		this.textMode = "left";
-	}
-	get background() {
-		return this._background;
-	}
-	set background(a) {
-		this._background = a;
-		this.setBackground(a);
-	}
-	get middle() {
-		return { x: this.canvas.width / 2, y: this.canvas.height / 2 };
-	}
-	getPixel(x, y) {
-		let d = this.c.getImageData(x, y, 1, 1).data;
-		return new Color(d[0], d[1], d[2], d[3])
-	}
-	contentToFrame() {
-		let n = new Frame(this.canvas.width, this.canvas.height);
-		n.c.drawImage(this.canvas, 0, 0);
-		return n;
-	}
-	sigmoid(x) {
-		return 1 / (1 + (Math.E ** -x));
-	}
-	invertX() {
-		this.c.translate(this.canvas.width, 0);
-		this.c.scale(-1, 1);
-	}
-	invertY() {
-		this.c.translate(0, this.canvas.height);
-		this.c.scale(1, -1);
-	}
-	simpleCircle(color, border) {
-		return function () {
-			this.home.c.draw(color).circle(this.middle.x, this.middle.y, this.width / 2);
-			this.home.c.stroke(border, 2).circle(this.middle.x, this.middle.y, this.width / 2);
-		}
-	}
-	simpleRect(color, border) {
-		return function () {
-			this.home.c.draw(color).rect(this.x, this.y, this.width, this.height);
-			this.home.c.stroke(border, 2).rect(this.x, this.y, this.width, this.height);
-		}
-	}
-	createAnimation(src, frames, delay, loop, response) {
-		this.animations.push(new Animation(src, frames, delay, loop, response))
-		return this.animations[this.animations.length - 1]
-	}
-	drawAnimation(animation, x, y, width, height) {
-		animation.advance();
-		let img = animation.img;
-		if (img instanceof Frame) img = img.img;
-		if (width === undefined) width = img.width;
-		if (height === undefined) height = img.height;
-		this.c.drawImage(img, x, y, width, height)
-	}
-	drawCircle(color, x, y, radius) {
-		this.c.fillStyle = color;
-		this.c.beginPath();
-		this.c.arc(x, y, radius, 0, 2 * Math.PI);
-		this.c.fill();
-	}
-	translate(x, y) {
-		if (typeof x == "object") {
-			y = x.y;
-			x = x.x;
-		}
-		this.c.translate(x, y);
-	}
-	rotate(a) {
-		this.c.rotate(a);
-	}
-	clearTransformations() {
-		this.c.resetTransform();
-	}
-	scale(x, y) {
-		this.c.scale(x, y);
-	}
-	draw(color) {
-		let c = color;
-		if (color instanceof Color) c = color.get_RGBA();
-		if (color instanceof Fade) c = color.getColor();
-		this.c.fillStyle = c;
-		let obj = {
+		this.drawObj = {
 			circle: function (x, y, radius) {
 				radius = Math.abs(radius);
 				if (typeof x === "object") {
@@ -453,22 +371,10 @@ class Artist {
 				this.c.closePath();
 			}
 		}
-		for (let func in obj) {
-			obj[func] = obj[func].bind(this);
+		for (let func in this.drawObj) {
+			this.drawObj[func] = this.drawObj[func].bind(this);
 		}
-		return obj
-	}
-	stroke(color, lineWidth = 1, endStyle = "flat") {
-		let c = color;
-		if (endStyle === "flat") endStyle = "butt";
-		if (color instanceof Color) c = color.get_RGBA();
-		if (color instanceof Fade) c = color.getColor();
-		this.c.strokeStyle = c;
-		this.c.lineCap = endStyle;
-		this.c.lineWidth = lineWidth;
-		this.c.beginPath();
-		this.c.fillStyle = "transparent";
-		let obj = {
+		this.strokeObj = {
 			circle: function (x, y, radius) {
 				radius = Math.abs(radius);
 				if (typeof x === "object") {
@@ -577,8 +483,8 @@ class Artist {
 				}
 				let angle = Math.atan2(y1 - y, x1 - x);
 				let mag = Math.sqrt((x1 - x) ** 2 + (y1 - y) ** 2);
-				this.c.translate(x, y);
-				this.c.rotate(angle);
+				this.translate(x, y);
+				this.rotate(angle);
 				this.c.moveTo(0, 0);
 				this.c.lineTo(mag - this.c.lineWidth * 4 + 0.5, 0);
 				this.c.stroke();
@@ -587,8 +493,8 @@ class Artist {
 					P(mag - this.c.lineWidth * 4, this.c.lineWidth * 2), 
 					P(mag, 0)
 				);
-				this.c.rotate(-angle);
-				this.c.translate(-x, -y);
+				this.rotate(-angle);
+				this.translate(-x, -y);
 			},
 			shape: function (...v) {
 				this.c.beginPath();
@@ -601,10 +507,206 @@ class Artist {
 				this.c.closePath();
 			}
 		}
-		for (let func in obj) {
-			obj[func] = obj[func].bind(this);
+		for (let func in this.strokeObj) {
+			this.strokeObj[func] = this.strokeObj[func].bind(this);
 		}
-		return obj
+		this.clipObj = {
+			rect(x, y, width, height) {
+				this.c.beginPath();
+				this.c.rect(x, y, width, height);
+				this.c.closePath();
+				this.c.clip();
+			},
+			circle(x, y, radius) {
+				this.c.beginPath();
+				this.c.arc(x, y, radius, 0, 2 * Math.PI);
+				this.c.closePath();
+				this.c.clip();
+			},
+			shape: function (...v) {
+				this.c.beginPath();
+				this.c.moveTo(v[0].x, v[0].y);
+				for (let i = 0; i <= v.length; i++) {
+					let index = i % v.length;
+					this.c.lineTo(v[index].x, v[index].y);
+				}
+				this.c.closePath();
+				this.c.clip();
+			},
+			text: function (font, text, x, y) {
+				text = text + "";
+				this.c.font = font;
+				let fs = parseInt(font);
+				this.c.beginPath();
+				let blocks = text.split("\n");
+				for (let i = 0; i < blocks.length; i++) {
+					let ax = x;
+					let tmb = this.c.measureText(blocks[i]);
+					if (this.textMode == "left") {
+
+					} else if (this.textMode == "center") {
+						ax -= tmb.width / 2;
+					} else if (this.textMode == "right") {
+						ax -= tmb.width;
+					}
+					this.c.text(blocks[i], ax, y + ((i + 1) * fs));
+				}
+				this.c.clip();
+			},
+			arc: function (x, y, radius, startAngle, endAngle, counterClockwise) {
+				radius = Math.abs(radius);
+				this.c.beginPath();
+				this.c.arc(x, y, radius, startAngle, endAngle, counterClockwise);
+				this.c.closePath();
+				this.c.clip();
+			},
+			sector: function (x, y, radius, startAngle, endAngle) {
+				radius = Math.abs(radius);
+				this.c.beginPath();
+				this.c.moveTo(x, y);
+				this.c.lineTo(x + radius * Math.cos(startAngle), y + radius * Math.sin(startAngle));
+				this.c.arc(x, y, radius, startAngle, endAngle);
+				this.c.lineTo(x, y);
+				this.c.closePath();
+				this.c.clip();
+			},
+			ellipse: function (x, y, rx, ry) {
+				rx = Math.abs(rx);
+				ry = Math.abs(ry);
+				this.c.beginPath();
+				this.c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+				this.c.closePath();
+				this.c.clip();
+			}
+		};
+		for (let func in this.clipObj) {
+			this.clipObj[func] = this.clipObj[func].bind(this);
+		}
+		this.state = {
+			rotation: 0,
+			translation: {
+				x: 0,
+				y: 0
+			},
+			scale: {
+				x: 0,
+				y: 0
+			}
+		}
+	}
+	get background() {
+		return this._background;
+	}
+	set background(a) {
+		this._background = a;
+		this.setBackground(a);
+	}
+	get middle() {
+		return { x: this.canvas.width / 2, y: this.canvas.height / 2 };
+	}
+	getPixel(x, y) {
+		let d = this.c.getImageData(x, y, 1, 1).data;
+		return new Color(d[0], d[1], d[2], d[3])
+	}
+	contentToFrame() {
+		let n = new Frame(this.canvas.width, this.canvas.height);
+		n.c.drawImage(this.canvas, 0, 0);
+		return n;
+	}
+	sigmoid(x) {
+		return 1 / (1 + (Math.E ** -x));
+	}
+	invertX() {
+		this.translate(this.canvas.width, 0);
+		this.scale(-1, 1);
+	}
+	invertY() {
+		this.translate(0, this.canvas.height);
+		this.scale(1, -1);
+	}
+	simpleCircle(color, border) {
+		return function () {
+			this.home.c.draw(color).circle(this.middle.x, this.middle.y, this.width / 2);
+			this.home.c.stroke(border, 2).circle(this.middle.x, this.middle.y, this.width / 2);
+		}
+	}
+	simpleRect(color, border) {
+		return function () {
+			this.home.c.draw(color).rect(this.x, this.y, this.width, this.height);
+			this.home.c.stroke(border, 2).rect(this.x, this.y, this.width, this.height);
+		}
+	}
+	createAnimation(src, frames, delay, loop, response) {
+		this.animations.push(new Animation(src, frames, delay, loop, response))
+		return this.animations[this.animations.length - 1]
+	}
+	drawAnimation(animation, x, y, width, height) {
+		animation.advance();
+		let img = animation.img;
+		if (img instanceof Frame) img = img.img;
+		if (width === undefined) width = img.width;
+		if (height === undefined) height = img.height;
+		this.c.drawImage(img, x, y, width, height)
+	}
+	drawCircle(color, x, y, radius) {
+		this.c.fillStyle = color;
+		this.c.beginPath();
+		this.c.arc(x, y, radius, 0, 2 * Math.PI);
+		this.c.fill();
+	}
+	translate(x, y) {
+		if (typeof x == "object") {
+			y = x.y;
+			x = x.x;
+		}
+		this.state.translation.x += x;
+		this.state.translation.x += y;
+		this.c.translate(x, y);
+	}
+	scale(x, y) {
+		if (typeof x == "object") {
+			y = x.y;
+			x = x.x;
+		}
+		this.state.scale.x *= x;
+		this.state.scale.x *= y;
+		this.c.scale(x, y);
+	}
+	rotate(a) {
+		this.c.rotate(a);
+		this.state.rotation += a;
+	}
+	clearTransformations() {
+		this.c.resetTransform();
+	}
+	scale(x, y) {
+		this.c.scale(x, y);
+	}
+	draw(color) {
+		let c = color;
+		if (color instanceof Color) c = color.get_RGBA();
+		if (color instanceof Fade) c = color.getColor();
+		this.c.fillStyle = c;
+		return this.drawObj;
+	}
+	stroke(color, lineWidth = 1, endStyle = "flat") {
+		let c = color;
+		if (endStyle === "flat") endStyle = "butt";
+		if (color instanceof Color) c = color.get_RGBA();
+		if (color instanceof Fade) c = color.getColor();
+		this.c.strokeStyle = c;
+		this.c.lineCap = endStyle;
+		this.c.lineWidth = lineWidth;
+		this.c.beginPath();
+		this.c.fillStyle = "transparent";
+		return this.strokeObj;
+	}
+	clip() {
+		this.c.save();
+		return this.clipObj; 
+	}
+	unclip() {
+		this.c.restore();
 	}
 	clear() {
 		this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -628,9 +730,9 @@ class Artist {
 		return this.noiseAry[Math.floor(x)] * freq;
 	}
 	rotateAround(x, y, r) {
-		this.c.translate(x, y);
-		this.c.rotate(r);
-		this.c.translate(-x, -y);
+		this.translate(x, y)
+		this.rotate(r);
+		this.translate(-x, -y);
 	}
 	drawTexture(txr = new Texture(0, 0), x = 0, y = 0, width = txr.width, height = txr.height) {
 		let imagedata = txr.imageData;
