@@ -988,8 +988,8 @@ class InactiveScene {
 						for (let j = 0; j <= Math.ceil(d / cellsize) * steps; j++) {
 							let x = originX + dir.x * j / steps;
 							let y = originY + dir.y * j / steps;
-							if (x % 1 > 0.3) cells.push(P(Math.floor(x + 1), Math.floor(y)));
-							if (y % 1 > 0.3) cells.push(P(Math.floor(x), Math.floor(y + 1)));
+							cells.push(P(Math.floor(x + 1), Math.floor(y)));
+							cells.push(P(Math.floor(x), Math.floor(y + 1)));
 							cells.push(P(Math.floor(x), Math.floor(y)));
 						}
 					}
