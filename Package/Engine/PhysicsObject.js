@@ -238,7 +238,7 @@ class PhysicsObject extends SceneObject {
 		}
 	}
 	collide(hitbox) {
-		let x = Physics.isOverlapping(hitbox.collider, this.collider);
+		let x = Geometry.isOverlapping(hitbox.collider, this.collider);
 		return x;
 	}
 	resolve(e, dir, hitboxes) {
@@ -386,9 +386,9 @@ class CirclePhysicsObject extends PhysicsObject {
 							let closestPY = Math.max(a.y, Math.min(a.y + a.height, this.y));
 							let cP = P(closestPX, closestPY);
 							let v = new Vector2();
-							if (Physics.pointInsideRectangle(this.collider, a)) {
+							if (Geometry.pointInsideRectangle(this.collider, a)) {
 								if (false) {
-									let d = Physics.distToRect(this.collider, a);
+									let d = Geometry.distToRect(this.collider, a);
 									let r = this.radius;
 									let theta = Math.PI / 2 - this.direction.getAngle();
 									let dx = this.direction.x;

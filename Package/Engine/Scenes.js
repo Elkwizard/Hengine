@@ -571,8 +571,8 @@ class InactiveScene {
 				let dir = new Vector2(this.end.middle.x - this.start.middle.x, this.end.middle.y - this.start.middle.y);
 				dir.normalize();
 				let p = l.midPoint;
-				let cps = Physics.closestPointOnRectangle(p, this.start);
-				let cpe = Physics.closestPointOnRectangle(p, this.end);
+				let cps = Geometry.closestPointOnRectangle(p, this.start);
+				let cpe = Geometry.closestPointOnRectangle(p, this.end);
 				this.start.applyImpulse(new Impulse(dir.over(100), cps));
 				this.end.applyImpulse(new Impulse(dir.over(100), cpe));
 			}
@@ -769,7 +769,7 @@ class InactiveScene {
 			}
 			engineDrawUpdate() {
 				let r = PhysicsObject.getBoundingBox(this);
-				if (!this.hidden && (!this.cullGraphics || Physics.overlapRectRect(r, s.adjustedDisplay))) {
+				if (!this.hidden && (!this.cullGraphics || Geometry.overlapRectRect(r, s.adjustedDisplay))) {
 					c.translate(this.middle.x, this.middle.y);
 					c.rotate(this.rotation);
 					c.translate(-this.middle.x, -this.middle.y);
@@ -980,7 +980,7 @@ class InactiveScene {
 					for (let i of nums) {
 						let crn1 = corners[i];
 						let crn2 = corners[i - 1] ? corners[i - 1] : corners[corners.length - 1];
-						let d = Physics.distToPoint(crn1, crn2);
+						let d = Geometry.distToPoint(crn1, crn2);
 						let dir = edges[i];
 						let originX = crn1.x / cellsize;
 						let originY = crn1.y / cellsize;
@@ -1091,13 +1091,13 @@ class InactiveScene {
 			}
 			static collideRectCircle(a, b) {
 				a.home.SAT.boxChecks++;
-				if (!Physics.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
+				if (!Geometry.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
 				a.home.SAT.SATChecks++;
 				let colliding = a.collider.collideBox(b.collider);
 				if (colliding) {
 					a.home.SAT.collisions++;
 					let inside = a.collider.collidePoint(b.middle);
-					let bestPoint = Physics.closestPointOnRectangle(b.middle, a.collider);
+					let bestPoint = Geometry.closestPointOnRectangle(b.middle, a.collider);
 					if (!bestPoint) return new Collision(false, a, b);
 					let bestDist = Math.sqrt((bestPoint.x - b.middle.x) ** 2 + (bestPoint.y - b.middle.y) ** 2);
 					let penetration = b.radius + (inside ? bestDist : -bestDist);
@@ -1114,16 +1114,16 @@ class InactiveScene {
 			}
 			static collideCircleRect(a, b) {
 				a.home.SAT.boxChecks++;
-				if (!Physics.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
+				if (!Geometry.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
 				let colliding = b.collider.collideBox(a.collider);
 				a.home.SAT.SATChecks++;
 				//getting resolution data
 				let col;
 				if (colliding) {
 					a.home.SAT.collisions++;
-					let bestPoint = Physics.closestPointOnRectangle(a.middle, b.collider);
+					let bestPoint = Geometry.closestPointOnRectangle(a.middle, b.collider);
 					if (!bestPoint) return new Collision(false, a, b);
-					let bestDist = Physics.distToPoint(bestPoint, a.middle);
+					let bestDist = Geometry.distToPoint(bestPoint, a.middle);
 					let collisionAxis = bestPoint.minus(a.middle).normalize();
 					const inside = b.collider.collidePoint(a.middle);
 					let penetration = a.radius + (inside ? bestDist : -bestDist);
@@ -1138,7 +1138,7 @@ class InactiveScene {
 			}
 			static collideRectRect(a, b) {
 				a.home.SAT.boxChecks++;
-				if (!Physics.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
+				if (!Geometry.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
 				a.home.SAT.SATChecks++;
 				let aEdges = PhysicsObject.getEdges(a);
 				let bEdges = PhysicsObject.getEdges(b);
@@ -1156,11 +1156,11 @@ class InactiveScene {
 					let aRange = new Range();
 					let bRange = new Range();
 					for (let point of aCorners) {
-						let projection = Physics.projectPointOntoLine(point, edge);
+						let projection = Geometry.projectPointOntoLine(point, edge);
 						aRange.include(projection);
 					}
 					for (let point of bCorners) {
-						let projection = Physics.projectPointOntoLine(point, edge);
+						let projection = Geometry.projectPointOntoLine(point, edge);
 						bRange.include(projection);
 					}
 					if (!Range.intersect(aRange, bRange)) {
@@ -1182,7 +1182,7 @@ class InactiveScene {
 						let edgeStart = bCorners[i];
 						let edgeEnd = bCorners[i + 1];
 						if (!edgeEnd) edgeEnd = bCorners[0];
-						let closestPointOnEdge = Physics.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
+						let closestPointOnEdge = Geometry.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
 						let overlap = a.home.home.f.getDistance(penetratingCorner, closestPointOnEdge);
 						let axis = closestPointOnEdge.minus(penetratingCorner).normalize();
 						if (overlap < leastIntersection) {
@@ -1200,7 +1200,7 @@ class InactiveScene {
 						let penetratingCorner = far.corner;
 						let edgeStart = aCorners[i];
 						let edgeEnd = (i !== aEdges.length - 1) ? aCorners[i + 1] : aCorners[0];
-						let closestPointOnEdge = Physics.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
+						let closestPointOnEdge = Geometry.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
 						let overlap = a.home.home.f.getDistance(penetratingCorner, closestPointOnEdge);
 						[closestPointOnEdge, penetratingCorner] = [penetratingCorner, closestPointOnEdge];
 						let axis = closestPointOnEdge.minus(penetratingCorner).normalize();
