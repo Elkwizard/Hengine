@@ -1,6 +1,6 @@
 const LOSS = .985;
 class Collision {
-    constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, impulseA, impulseB) {
+    constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, impulseA, impulseB, collisionPoint) {
         this.colliding = collides;
         this.Adir = Adir;
         this.Bdir = Bdir;
@@ -9,6 +9,7 @@ class Collision {
         this.penetration = penetration;
         this.impulseA = impulseA;
         this.impulseB = impulseB;
+        this.collisionPoint = collisionPoint;
     }
 }
 class Impulse {
@@ -518,14 +519,8 @@ class PhysicsObject extends SceneObject {
     }
     static getCircleCircleImpulses(a, b, collisionAxis, penetration) {
         let impulseA, impulseB;
-        impulseA = new Impulse(
-            collisionAxis.times(-penetration),
-            Vector2.fromPoint(a.middle).plus(collisionAxis.times(a.radius))
-        );
-        impulseB = new Impulse(
-            collisionAxis.times(penetration),
-            Vector2.fromPoint(b.middle).plus(collisionAxis.times(-b.radius))
-        );
+        impulseA = null;
+        impulseB = null;
         return { impulseA, impulseB };
     }
     static getCircleRectImpulses(a, b, closestPoint) {
@@ -533,7 +528,7 @@ class PhysicsObject extends SceneObject {
         let dir = closestPoint.minus(a.middle);
         dir.mag = a.radius - dir.mag;
         impulseB = new Impulse(dir, closestPoint);
-        impulseA = new Impulse(dir.times(-1), closestPoint);
+        impulseA = null;//new Impulse(dir.times(-1), closestPoint);
         return { impulseA, impulseB };
     }
     static getRectRectImpulses(a, b, penetratingCorner, collisionAxis, penetration) {
@@ -554,11 +549,14 @@ class PhysicsObject extends SceneObject {
             a.home.SAT.collisions++;
             let collisionAxis = (new Vector2(b.x - a.x, b.y - a.y)).normalize();
             let penetration = a.radius + b.radius - g.f.getDistance(a, b);
+            let aPoint = collisionAxis.times(a.radius).plus(a.middle);
+            let bPoint = collisionAxis.times(-b.radius).plus(b.middle);
+            let collisionPoint = aPoint.plus(bPoint).over(2);
 
             //impulse resolution
             let impulses = PhysicsObject.getCircleCircleImpulses(a, b, collisionAxis, penetration);
 
-            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB);
+            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB, collisionPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -581,7 +579,7 @@ class PhysicsObject extends SceneObject {
 
             collisionAxis.normalize();
             if (inside) collisionAxis.mul(-1);
-            let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseB, impulses.impulseA);
+            let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseB, impulses.impulseA, bestPoint);
             return col;
         } else return new Collision(false, a, b);
     }
@@ -605,7 +603,7 @@ class PhysicsObject extends SceneObject {
             //impulse resolution
             let impulses = PhysicsObject.getCircleRectImpulses(a, b, bestPoint, collisionAxis.times(-1), penetration);
 
-            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB);
+            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB, bestPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -692,7 +690,7 @@ class PhysicsObject extends SceneObject {
                 //figure out impulses
                 let impulses = PhysicsObject.getRectRectImpulses(a, b, PhysicsObject.getCorners(finalPenetratingCornerOwner)[finalPenetratingCornerIndex], collisionAxis, leastIntersection);
 
-                col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, impulses.impulseA, impulses.impulseB);
+                col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, impulses.impulseA, impulses.impulseB, PhysicsObject.getCorners(finalPenetratingCornerOwner)[finalPenetratingCornerIndex]);
             } else {
                 col = new Collision(false, a, b);
                 a.rotation += 0.00001;
@@ -719,6 +717,20 @@ class PhysicsObject extends SceneObject {
         const A_VEL_AT_COLLISION = a.velocity.dot(col.Adir);
         const B_VEL_AT_COLLISION = b.velocity.dot(col.Bdir);
         if (A_VEL_AT_COLLISION < 0 && B_VEL_AT_COLLISION < 0) return;
+        
+        //friction
+        // let frictionDir = d.normal.normalize();
+        // let velDot1 = frictionDir.dot(a.velocity);
+        // let velDot2 = frictionDir.times(-1).dot(a.velocity);
+        // if (velDot2 < velDot1) frictionDir.mul(-1);
+        // let friction = frictionDir.plus(0);
+        // friction.mag = -frictionDir.dot(a.velocity) / 10;
+        // let cp = col.collisionPoint;
+        // c.draw(cl.RED).circle(cp.x, cp.y, 3);
+        // c.stroke(cl.RED).arrow(cp, friction.times(100).plus(cp));
+        // if (a instanceof CirclePhysicsObject) {
+        //     a.applyImpulse(new Impulse(friction, cp));
+        // } else a.applyLinearImpulse(new Impulse(friction, cp));
 
         //impulse resolution
         let iA = col.impulseA;
