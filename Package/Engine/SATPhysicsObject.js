@@ -61,7 +61,6 @@ class PhysicsObject extends SceneObject {
         this.applyGravity = gravity;
         this.slows = gravity;
         this.home.hasRotatedRectangles = true;
-        console.log(this.home);
         this.links = [];
         this.colliding = {
             top: null,
@@ -333,7 +332,6 @@ class PhysicsObject extends SceneObject {
                 //gravity
                 let factor = 4;
                 let massFactor = Math.pow(this.mass, 1 / factor) / Math.pow(2500, 1 / factor);
-                // console.log(massFactor);
                 this.velocity.add(new Vector2(this.home.gravity.x * massFactor, this.home.gravity.y * massFactor));
             }
 
