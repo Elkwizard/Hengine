@@ -1,39 +1,3 @@
-class Controls {
-	constructor(up, down, left, right, interact1, interact2) {
-		this.up = up;
-		this.down = down;
-		this.left = left;
-		this.right = right;
-		this.interact1 = interact1;
-		this.interact2 = interact2;
-	}
-	toString2() {
-		return this.up + ", " + this.down + ", " + this.left + ", " + this.right + ", " + this.interact1 + ", " + this.interact2
-	}
-	toString() {
-		let res = [];
-		function j(cont) {
-			if (this[cont]) {
-				if (typeof this[cont] == "string") {
-					res.push('"' + this[cont] + '"');
-				} else {
-					res.push(this[cont]);
-				}
-			}
-		}
-		j = j.bind(this);
-		j("up");
-		j("down");
-		j("left");
-		j("right");
-		j("interact1");
-		j("interact2");
-		return res.join(", ");
-	}
-}
-function clamp(n, a, b) {
-	return Math.max(a, Math.min(b, n));
-}
 class PhysicsObject extends SceneObject {
 	constructor(name, x, y, width, height, gravity, controls, tag, home) {
 		super(name, x, y, width, height, controls, tag, home);

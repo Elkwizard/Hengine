@@ -1,4 +1,4 @@
-class Project {
+class Hengine {
 	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
 		this.g = new Engine(wrapperID, width, height, airResistance, gravity, canvasID);
 		this.s = this.g.scene;

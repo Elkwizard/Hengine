@@ -66,41 +66,7 @@ class FunctionLibrary {
 		return undefined;
 	}
 	parseArray(str) {
-		let aryStr = "";
-		let state = 0;
-		let objState = 0;
-		for (let char of str) {
-			if (char == "[") state++;
-			if (char == "]") state--;
-			if (char == "{") objState++;
-			if (char == "}") objState--;
-			if (state >= 1) {
-				if (objState > 0 && char == ",") {
-					aryStr += "__C_O_M_M_A__";
-				} else {
-					aryStr += char;
-				}
-			}
-		}
-		let ary2 = aryStr.slice(1, aryStr.length);
-		ary2 = ary2.split(",");
-		for (let i = 0; i < ary2.length; i++) {
-			let x = ary2[i];
-			x = x.trim();
-			if (x[0] == "\"" || x[0] == "'") {
-				ary2[i] = x.slice(1, x.length - 1);
-			} else if (x[0] == "[") {
-				ary2[i] = this.parseArray(x);
-			} else if (x[0] == "{") {
-				let newX = x.replace(/__C_O_M_M_A__/g, ",");
-				ary2[i] = JSON.parse(newX);
-			} else if (this.parseBool(x) != undefined) {
-				ary2[i] = this.parseBool(x);
-			} else {
-				ary2[i] = parseFloat(x);
-			}
-		}
-		return ary2;
+		return JSON.parse(str);
 	}
 	round(x, y) {
 		return Math.floor(x * (10 ** y)) / (10 ** y);

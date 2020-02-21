@@ -1,8 +1,8 @@
-let PROJECT;
+let HENGINE;
 
 try {
 	//load engine
-	PROJECT = new Project();
+	HENGINE = new Hengine();
 } catch (e) {
 	alert("LoadError: " + e);
 }
