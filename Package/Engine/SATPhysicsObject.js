@@ -583,7 +583,7 @@ class PhysicsObject extends SceneObject {
 
             //impulse resolution
             let impulses = PhysicsObject.getCircleRectImpulses(b, a, bestPoint);
-            c.draw(cl.RED).circle(b.middle.x, b.middle.y, 1 / s.zoom);
+            // c.draw(cl.RED).circle(b.middle.x, b.middle.y, 1 / s.zoom);
 
             collisionAxis.normalize();
             if (inside) collisionAxis.mul(-1);
@@ -741,14 +741,6 @@ class PhysicsObject extends SceneObject {
         //impulse resolution
         let iA = col.impulseA;
         let iB = col.impulseB;
-        // if (mobileB && B_VEL_AT_COLLISION > A_VEL_AT_COLLISION) {
-        //     b.applyImpulse(iB);
-        // } else if (mobileA || !mobileB) {
-        //     a.applyImpulse(iA);
-        // } else {
-        //     a.applyLinearImpulse(iA);
-        //     if (b.applyGravity) b.applyLinearImpulse(iB);
-        // }
         a.applyImpulse(iA);
         if (b.canMoveThisFrame) if (b.applyGravity || b.velocity.mag) b.applyImpulse(iB);
         //immobilize
