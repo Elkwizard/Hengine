@@ -117,13 +117,21 @@ class PhysicsObject extends SceneObject {
         this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
         this.positionStatic = false;
         this.rotationStatic = false;
+        this._gravity = null;
+    }
+    get gravity() {
+        if (this._gravity === null) return this.home.gravity;
+        else return this._gravity;
+    }
+    set gravity(a) {
+        this._gravity = a;
     }
     get mass() {
         return this.width * this.height;
     }
     set rotation(a) {
         this.collider.rotation = a;
-        if (!a) this.collider.rotation = 0.000001;
+        if (!a) this.collider.rotation = 0.0001;
     }
     get rotation() {
         return this.collider.rotation;
@@ -333,7 +341,7 @@ class PhysicsObject extends SceneObject {
                 //gravity
                 let factor = 4;
                 let massFactor = Math.pow(this.mass, 1 / factor) / Math.pow(2500, 1 / factor);
-                this.velocity.add(new Vector2(this.home.gravity.x * massFactor, this.home.gravity.y * massFactor));
+                this.velocity.add(new Vector2(this.gravity.x * massFactor, this.gravity.y * massFactor));
             }
 
             if (!this.positionStatic) {
@@ -583,7 +591,10 @@ class PhysicsObject extends SceneObject {
 
             //impulse resolution
             let impulses = PhysicsObject.getCircleRectImpulses(b, a, bestPoint);
-            if (inside) impulses.impulseB.force.mul(-1);
+            if (inside) {
+                impulses.impulseA.force.mul(-1);
+                impulses.impulseB.force.mul(-1);
+            }
 
             collisionAxis.normalize();
             if (inside) collisionAxis.mul(-1);
@@ -610,7 +621,10 @@ class PhysicsObject extends SceneObject {
 
             //impulse resolution
             let impulses = PhysicsObject.getCircleRectImpulses(a, b, bestPoint);
-            if (inside) impulses.impulseA.force.mul(-1);
+            if (inside) {
+                impulses.impulseA.force.mul(-1);
+                impulses.impulseB.force.mul(-1);
+            }
 
             col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB, bestPoint);
         } else col = new Collision(false, a, b);
@@ -736,7 +750,7 @@ class PhysicsObject extends SceneObject {
         // friction.mag = -frictionDir.dot(a.velocity) / 10;
         // let cp = col.collisionPoint;
         // c.draw(cl.RED).circle(cp.x, cp.y, 3);
-        // c.stroke(cl.RED).arrow(cp, frictionDir.times(100).plus(cp));
+        // c.stroke(cl.RED, 2 / s.zoom).arrow(cp, frictionDir.times(100).plus(cp));
         // a.applyImpulse(new Impulse(friction, cp));
 
         //impulse resolution
