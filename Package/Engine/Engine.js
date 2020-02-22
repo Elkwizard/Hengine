@@ -391,14 +391,15 @@ class Engine {
 		return result;
 	}
 	updateGraphs() {
+		let t = performance.now();
 		for (let graph of this.graphs) {
 			for (let key in graph.vars) {
-				let data = P(performance.now(), graph.vars[key].getY(performance.now()));
+				let data = P(t, graph.vars[key].getY(t));
 				graph.vars[key].permanentData += data.x + "," + data.y + " ";
 				graph.vars[key].data.push(data);
 				if (graph.vars[key].data.length > graph.msLimit / 16) graph.vars[key].data.shift();
 			}
-			if (performance.now() > graph.msLimit) graph.timeOffset = performance.now() - graph.msLimit;
+			if (t > graph.msLimit) graph.timeOffset = t - graph.msLimit;
 		}
 	}
 	getFPSGraph() {

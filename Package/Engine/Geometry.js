@@ -68,6 +68,12 @@ class Geometry {
         let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
         return new Vector2(x, y);
     }
+    static closestPointOnCircle(p, cr) {
+        let dif = new Vector2(p.x - cr.x, p.y - cr.y);
+        dif.mag = cr.radius;
+        dif.add(cr);
+        return dif;
+    }
     static closestPointOnRectangle(point, r) {
         if (!r.rotation) r.rotation = 0.001;
         let edges = [];

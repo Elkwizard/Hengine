@@ -218,8 +218,9 @@ class Hengine {
 		let x = new Audio(this.SOUND_PATH + src);
 		return x;
 	}
-	rand() {
+	rand(sd) {
 		let seed = this.randomSeed++;
+		if (sd !== undefined) seed = sd;
 		let a = (seed * 6.12849) % 8.7890975
 		let b = (a * 256783945.4758903) % 22.567890;
 		return (Math.cos(a * b) + 1) / 2;
