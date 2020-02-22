@@ -64,6 +64,24 @@ Object.prototype[Symbol.iterator] = function* () {
 		yield [x, this[x]];
 	}
 }
+class ScreenRecording {
+	constructor(name, past) {
+		this.name = name;
+		this.frames = [];
+		if (past) this.frames = ScreenRecording.parse(past).frames;
+		this.isRecording = false;
+	}
+	start() {
+		this.isRecording = true;
+	}
+	stop() {
+		this.isRecording = false;
+	}
+	getAnimation() {
+		if (!this.frames.length) return null;
+		return window.c.createAnimation(this.frames, 1, true);
+	}
+}
 class Engine {
 	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
 		setupAlerts();
@@ -174,6 +192,7 @@ class Engine {
 						this.scene.enginePhysicsUpdate();
 					}
 					this.afterUpdate();
+					this.updateScreenRecordings();
 				}
 			} catch (e) {
 				if (this.catchErrors) this.output("Draw Error: " + e);
@@ -229,6 +248,19 @@ class Engine {
 				this.renderer.c.imageSmoothingEnabled = pixelate;
 			}
 		}.bind(this));
+		this.recordings = {}
+	}
+	createScreenRecording(name, past) {
+		this.recordings[name] = new ScreenRecording(name, past);
+		return this.recordings[name];
+	}
+	updateScreenRecordings() {
+		let f;
+		for (let key in this.recordings) {
+			if (!f) f = this.renderer.contentToFrame();
+			let r = this.recordings[key];
+			if (r.isRecording) r.frames.push(f);
+		}
 	}
 	makeGraph(yName, minValue, maxValue, getY, msLimit = 5000, colors) {
 		if (!colors) colors = [];
