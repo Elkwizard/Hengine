@@ -225,9 +225,9 @@ class Rect {
 	}
 }
 class Animation {
-	constructor(src, frames, delay, loop, finResponse) {
+	constructor(src = "", frames = 1, delay = 0, loop = false, finResponse = e => e) {
 		this.stopped = false;
-		if (!Array.isArray(frames)) {
+		if (!Array.isArray(src)) {
 			this.frameCount = frames;
 			this.frames = [];
 			this.img = new Image
@@ -236,7 +236,7 @@ class Animation {
 				this.frames[i].src = ("../Art/Animations/" + src + "/" + (i + 1) + ".png");
 			}
 			this.loop = loop;
-			this.finResponse = (finResponse !== undefined) ? finResponse : function () { };
+			this.finResponse = finResponse;
 			this.delay = delay;
 		} else {
 			this.frames = src;

@@ -742,7 +742,7 @@ class PhysicsObject extends SceneObject {
         let iA = col.impulseA;
         let iB = col.impulseB;
         a.applyImpulse(iA);
-        if (b.canMoveThisFrame) if (b.applyGravity || b.velocity.mag) b.applyImpulse(iB);
+        if (b.applyGravity || b.velocity.mag) b.applyImpulse(iB);
         //immobilize
         a.canMoveThisFrame = false;
 
