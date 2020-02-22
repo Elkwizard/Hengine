@@ -97,6 +97,9 @@ class Vector {
 	projectOnto(v) {
 		return v.times(this.dot(v) / (v.mag ** 2));
 	}
+	get() {
+		return new this.constructor(this.x, this.y, this.z, this.w);
+	}
 }
 class Vector1 extends Vector {
 	constructor(x) {
