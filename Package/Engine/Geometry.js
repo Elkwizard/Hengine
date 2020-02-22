@@ -139,7 +139,7 @@ class Geometry {
         if (!slope.x && !slope.y) return { error: "no direction" };
         let minDist = Infinity;
         let steps = 0;
-        let maxSteps = 50;
+        let maxSteps = Geometry.maxRayMarchSteps;
         let collided = null;
         for (let r of rs) {
             let d;
@@ -296,3 +296,4 @@ class Geometry {
     }
 }
 Geometry.displayRaymarch = false;
+Geometry.maxRayMarchSteps = 50;

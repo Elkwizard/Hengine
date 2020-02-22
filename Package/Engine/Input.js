@@ -13,11 +13,19 @@ class Listener {
 }
 let K = {
 	P: function (key) {
-		if (this.keys[key] == undefined) {
-			this.keys[key] = false;
-		}
-		return this.keys[key];
+		return !!this.keys[key];
 	},
+	JP: function(key) {
+		return this.keyCounts[key] == 1;
+	},
+	update: function() {
+		for (let key in this.keys) {
+			if (!this.keyCounts[key]) this.keyCounts[key] = 0;
+			if (this.P(key)) this.keyCounts[key]++;
+			else this.keyCounts[key] = 0;
+		}
+	},
+	keyCounts: {},
 	keys: {},
 	custom: {},
 	onDown: new Listener,

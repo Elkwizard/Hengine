@@ -250,97 +250,6 @@ class InactiveScene {
 		return ns;
 	}
 	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1)) {
-		// let ns = this.addRectElement(name, x, y, 0, 0, false, false, "Particle-Spawner");
-		// ns.active = true;
-		// ns.removeCollisions();
-		// ns.fades = true;
-		// ns.slows = true;
-		// ns.falls = false;
-		// ns.particleDelay = delay;
-		// ns.particleInitSpeed = spd;
-		// ns.particleLifeSpan = timer;
-		// ns.spawns = {};
-		// ns.particleSize = size;
-		// ns.particleDraw = draw;
-		// let script = draw instanceof ElementScript;
-		// ns.particleSizeVariance = sizeVariance;
-		// ns.dirs = dirs;
-		// ns.isSpawner = true;
-		// ns.particleSpeedVariance = speedVariance;
-		// ns.particleNumber = 0;
-		// this.changeElementDraw(ns, e => e);
-		// let spawner = new ElementScript("spawning");
-		// spawner.addMethod("update", function () {
-		// 	if (this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
-		// 		//spawn
-		// 		let len = 1;
-		// 		if (this.particleDelay < 1) len = 1 / this.particleDelay;
-		// 		for (let i = 0; i < len; i++) {
-		// 			let pSize = this.particleSize + ((Math.random() - Math.random()) * this.particleSizeVariance);
-		// 			let sX = (Math.random() * this.width) + this.x - pSize / 2;
-		// 			let sY = (Math.random() * this.height) + this.y - pSize / 2;
-		// 			let n = this.home.addRectElement("Particle #" + (this.particleNumber++) + " from " + this.name, sX, sY, pSize, pSize, false, false, "Engine-Particle");
-
-		// 			let speed = this.dirs.getRandomSpeed();
-		// 			speed.x = (this.particleInitSpeed * speed.x) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
-		// 			speed.y = (this.particleInitSpeed * speed.y) + ((Math.random() - Math.random()) * this.particleSpeedVariance);
-		// 			n.speed = speed;
-		// 			n.timer = 0;
-		// 			n.layer = this.layer;
-		// 			this.spawns[n.name] = n;
-		// 			n.spawner = this;
-		// 			let r = n.remove.bind(n);
-		// 			n.remove = function () {
-		// 				r();
-		// 				delete this.spawner.spawns[this.name];
-		// 			}.bind(n);
-		// 			n.enginePhysicsUpdate = function () {
-		// 				this.lastX = this.x;
-		// 				this.lastY = this.y;
-		// 				if (ns.falls) this.accel.y = this.home.gravity.y;
-		// 				this.speed.add(this.accel);
-		// 				if (ns.slows) {
-		// 					this.slowDown();
-		// 				}
-		// 				this.x += this.speed.x * 2;
-		// 				this.y += this.speed.y * 2;
-		// 				if (this.lifeSpan > ns.particleLifeSpan) {
-		// 					this.remove();
-		// 				}
-		// 				this.direction.x = this.x - this.lastX;
-		// 				this.direction.y = this.y - this.lastY;
-		// 				this.direction.normalize();
-		// 				this.scriptUpdate();
-		// 			}.bind(n);
-		// 			function drawRect() {
-		// 				this.draw();
-		// 			}
-		// 			if (script) drawRect = function () {
-		// 				this.scriptDraw();
-		// 			}
-		// 			drawRect = drawRect.bind(n);
-		// 			if (this.fades) {
-		// 				n.engineDrawUpdate = function () {
-		// 					this.home.c.c.globalAlpha = Math.max(0, 1 - (this.lifeSpan / ns.particleLifeSpan));
-		// 					drawRect();
-		// 					this.home.c.c.globalAlpha = 1;
-		// 				}.bind(n);
-		// 			} else {
-		// 				n.engineDrawUpdate = function () {
-		// 					drawRect();
-		// 				}.bind(n);
-		// 			}
-		// 			if (draw) {
-		// 				if (!script) this.home.changeElementDraw(n, this.particleDraw);
-		// 			} else {
-		// 				this.home.changeElementDraw(n, this.home.defaultParticleDraw);
-		// 			}
-		// 			if (script) draw.addTo(n);
-		// 		}
-		// 	}
-		// }, "update");
-		// spawner.addTo(ns);
-		// return ns;
 		name = this.genName_PRIVATE(this.contains, name);
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
 		this.contains[name] = ns;
@@ -412,14 +321,6 @@ class InactiveScene {
 	}
 	UI(name) {
 		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			// let el = e;
-			// el.offset = new Vertex(el.x, el.y);
-			// this.home.updateScript.addMethod(e + "__AdjustPosition__", function () {
-			// 	if (this.get(e)) {
-			// 		el.x = el.home.display.x + el.offset.x;
-			// 		el.y = el.home.display.y + el.offset.y;
-			// 	}
-			// }.bind(this));
 			e.isUI = true;
 			e.logMod(function UI() {
 				this.home.UI(this);

@@ -164,6 +164,7 @@ class Engine {
 				if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
 				//update
 				if (!this.paused) {
+					K.update();
 					this.beforeUpdate();
 					this.clear();
 					this.update();
