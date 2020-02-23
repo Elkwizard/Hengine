@@ -2,7 +2,7 @@ class ParticleSpawnerObject extends PhysicsObject {
     constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), home) {
         super(name, x, y, 0, 0, false, false, "Particle-Spawner", home);
         this.active = true;
-        this.removeCollisions();
+        this.canCollide = false;
         this.fades = true;
         this.slows = true;
         this.falls = false;
