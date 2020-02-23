@@ -274,7 +274,7 @@ class PhysicsObject extends SceneObject {
     }
     detectCollisions(others) {
         let collisions = [];
-        if (this.applyGravity || this.velocity.mag) {
+        if (!this.completelyStatic) {
             for (let other of others) {
                 if (other !== this) {
                     if (other.hasPhysics && other.tag !== "Engine-Particle") {
@@ -310,13 +310,19 @@ class PhysicsObject extends SceneObject {
         return collisions;
     }
     privateSetX(x) {
-        if (!this.positionStatic) this.x = x;
+        if (!this.positionStatic) {
+            this.x = x;
+        }
     }
     privateSetY(y) {
-        if (!this.positionStatic) this.y = y;
+        if (!this.positionStatic) {
+            this.y = y;
+        }
     }
     privateSetRotation(a) {
-        if (!this.rotationStatic) this.rotation = a;
+        if (!this.rotationStatic) {
+            this.rotation = a;
+        }
     }
     checkAndResolveCollisions(others) {
         let collisions = this.detectCollisions(others);
@@ -389,7 +395,7 @@ class PhysicsObject extends SceneObject {
     applyLinearImpulse(impulse) {
         if (!impulse) return;
         // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
+        // c.stroke(cl.LIME, 4).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
         this.velocity.add(impulse.force.over(5));
     }
     applyAngularImpulse(impulse) {
@@ -466,7 +472,7 @@ class PhysicsObject extends SceneObject {
         }
     }
     static isWall(r) {
-        return (!r.applyGravity && !r.velocity.mag) || !r.canMoveThisFrame;
+        return this.completelyStatic || !r.canMoveThisFrame;
     }
     static farthestInDirection(corners, dir) {
         let farthest = corners[0];
@@ -694,6 +700,7 @@ class PhysicsObject extends SceneObject {
             a.privateSetX(a.x - dir.x);
             a.privateSetY(a.y - dir.y);
         }
+        // c.stroke(cl.RED, 2).arrow(a.centerOfMass, b.centerOfMass);
 
         //velocity
         const A_VEL_AT_COLLISION = a.velocity.dot(col.Adir);
@@ -781,11 +788,11 @@ class CirclePhysicsObject extends PhysicsObject {
         this.radius = radius;
         this.optimalRotation = null;
     }
-    set middle(a) {
+    set unrotatedMiddle(a) {
         this.x = a.x;
         this.y = a.y;
     }
-    get middle() {
+    get unrotatedMiddle() {
         return P(this.x, this.y);
     }
     set width(a) {

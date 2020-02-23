@@ -115,13 +115,26 @@ class Rect {
     get rotation() {
         return this.collider.rotation;
     }
-	set middle(a) {
+	set unrotatedMiddle(a) {
 		this.x = a.x - this.width / 2;
 		this.y = a.y - this.height / 2;
 	}
-	get middle() {
+	get unrotatedMiddle() {
 		return { x: this.x + (this.width / 2), y: this.y + (this.height / 2) }
-	}
+    }
+    get middle() {
+        return Geometry.rotatePointAround(this.centerOfMass, this.unrotatedMiddle, this.rotation);
+    }
+    set middle(a) {
+        let dif = this.centerOfMassOffset;
+        let difXa = Math.cos(this.rotation) * dif.x;
+        let difYa = Math.sin(this.rotation) * dif.x;
+        let difXb = Math.cos(this.rotation + Math.PI / 2) * dif.y;
+        let difYb = Math.sin(this.rotation + Math.PI / 2) * dif.y;
+        let difX = difXa + difXb;
+        let difY = difYa + difYb;
+        this.centerOfMass = new Vector2(difX + a.x, difY + a.y);
+    }
 	getCorners() {
 		let r = this;
 		let corners = [
@@ -145,9 +158,9 @@ class Rect {
 		return edges;
     }
 	set centerOfMass(a) {
-		this.centerOfMassOffset = Geometry.rotatePointAround(this.middle, a, -this.rotation).minus(this.middle);
+        this.unrotatedMiddle = this.centerOfMassOffset.times(-1).plus(a);
 	}
 	get centerOfMass() {
-		return this.centerOfMassOffset.plus(this.middle);
+		return this.centerOfMassOffset.plus(this.unrotatedMiddle);
 	}
 }

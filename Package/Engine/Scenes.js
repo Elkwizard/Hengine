@@ -122,7 +122,7 @@ class InactiveScene {
 				n.active = el.active;
 				n.falls = el.falls;
 			} else {
-				n = this.addRectElement(el.name + " - copy", el.x, el.y, el.width, el.height, el.applyGravity, { ...el.controls }, el.tag);
+				n = this.addRectElement(el.name + " - copy", el.x, el.y, el.width, el.height, !el.completelyStatic, { ...el.controls }, el.tag);
 			}
 		} else {
 			n = this.addElement(el.name + " - copy", el.x, el.y, el.width, el.height, { ...el.controls }, el.tag);
@@ -562,7 +562,15 @@ class Scene extends InactiveScene {
 			let isUseless = (a) => !(a instanceof PhysicsObject) || !a.canCollide || (a.tag === "Engine-Particle");
 			let useful = []
 			let useless = [];
-			for (let rect of this.contains_array) {
+			let sortedEls = this.contains_array.sort(function (a, b) {
+				let aVel = a.angularVelocity;
+				let bVel = a.angularVelocity;
+				if (!(aVel || bVel)) return 0;
+				else if (aVel && !bVel) return 1;
+				else if (!aVel && bVel) return -1;
+				else return aVel - bVel;
+			});
+			for (let rect of sortedEls) {
 				if (isUseless(rect)) {
 					useless.push(rect);
 					continue;
