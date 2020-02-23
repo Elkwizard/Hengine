@@ -258,6 +258,7 @@ class ColorLibrary {
 		this.WHITE = new Color(255, 255, 255, 1);
 		this.CYAN = new Color(0, 255, 255, 1);
 		this.GRAY = new Color(128, 128, 128, 1);
+		this.LIGHT_GRAY = new Color("#ccc");
 		this.RAZZMATAZZ = new Color("#e3256b");
 		this.CREAM = new Color("#fff185");
 		this.LIME = new Color(0, 255, 0, 1);

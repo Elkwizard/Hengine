@@ -59,8 +59,8 @@ class PhysicsObject extends SceneObject {
         this._rotation = 0.0001;
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
-        this.applyGravity = gravity;
-        this.slows = gravity;
+        this.applyGravity = true;
+        this.slows = true;
         this.home.hasRotatedRectangles = true;
         this.links = [];
         this.colliding = {
@@ -115,8 +115,8 @@ class PhysicsObject extends SceneObject {
         this.optimize = (a, b) => true;
         this.canMoveThisFrame = true;
         this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
-        this.positionStatic = false;
-        this.rotationStatic = false;
+        this.positionStatic = !gravity;
+        this.rotationStatic = !gravity;
         this._gravity = null;
     }
     get gravity() {
@@ -155,6 +155,13 @@ class PhysicsObject extends SceneObject {
     get applyGravity() {
         return this._applyGravity;
     }
+    set completelyStatic(a) {
+        this.positionStatic = a;
+        this.rotationStatic = a;
+    }
+    get completelyStatic() {
+        return this.positionStatic && this.rotationStatic;
+    }
     linkTo(el, fer = 1) {
         this.links.push(new Link(this, el, fer));
     }
@@ -163,18 +170,6 @@ class PhysicsObject extends SceneObject {
         this.acceleration = new Vector2(0, 0);
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
-    }
-    allowGravity() {
-        this.applyGravity = true;
-    }
-    removeGravity() {
-        this.applyGravity = false;
-    }
-    allowCollisions() {
-        this.canCollide = true;
-    }
-    removeCollisions() {
-        this.canCollide = false;
     }
     static getRotationDifference(r, rotation) {
         let p2 = Math.PI / 2;
@@ -214,15 +209,6 @@ class PhysicsObject extends SceneObject {
                 reversed = -1;
             }
         }
-        // this.home.drawInWorldSpace(e => {
-        // 	let v1 = Vector2.fromAngle(this.rotation);
-        // 	let v2 = Vector2.fromAngle(best);
-        // 	const len = 50;
-        // 	for (let a of possibleDirections) c.stroke(cl.GREEN, 3).arrow(this.middle, Vector2.fromAngle(a).times(len).add(this.middle));
-        // 	c.stroke(cl.LIME, 5).arrow(this.middle, v2.times(len).add(this.middle));
-        // 	c.stroke(cl.BLUE, 3).arrow(this.middle, v1.times(len).add(this.middle));
-        // 	c.draw(cl.BLACK).circle(this.middle.x, this.middle.y, 5);
-        // });
         f *= reversed;
         let a1 = this.rotation;
         let a2 = this.rotation + Math.PI * 2;
@@ -324,6 +310,15 @@ class PhysicsObject extends SceneObject {
         }
         return collisions;
     }
+    privateSetX(x) {
+        if (!this.positionStatic) this.x = x;
+    }
+    privateSetY(y) {
+        if (!this.positionStatic) this.y = y;
+    }
+    privateSetRotation(a) {
+        if (!this.rotationStatic) this.rotation = a;
+    }
     checkAndResolveCollisions(others) {
         let collisions = this.detectCollisions(others);
         if (!PhysicsObject.isWall(this)) {
@@ -343,29 +338,22 @@ class PhysicsObject extends SceneObject {
                 let massFactor = Math.pow(this.mass, 1 / factor) / Math.pow(2500, 1 / factor);
                 this.velocity.add(new Vector2(this.gravity.x * massFactor, this.gravity.y * massFactor));
             }
+            //linear
+            this.velocity.add(this.acceleration.times(this.home.speedModulation));
+            let newX = this.x + this.velocity.x * 2 * this.home.speedModulation;
+            let newY = this.y + this.velocity.y * 2 * this.home.speedModulation;
+            this.privateSetX(newX);
+            this.privateSetY(newY);
 
-            if (!this.positionStatic) {
-                //linear
-                this.velocity.add(this.acceleration.times(this.home.speedModulation));
-                this.x += this.velocity.x * 2 * this.home.speedModulation;
-                this.y += this.velocity.y * 2 * this.home.speedModulation;
+            //angular
+            this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
+            let newRotation = this.rotation + this.angularVelocity * this.home.speedModulation;
+            this.privateSetRotation(newRotation);
 
-                if (!this.rotationStatic) {
-                    //angular
-                    this.angularVelocity += this.angularAcceleration * this.home.speedModulation;
-                    this.rotation += this.angularVelocity * this.home.speedModulation;
-                }
-            }
             //slow
             if (this.slows) this.slowDown();
             for (let i = 0; i < this.home.physicsRealism; i++) this.checkAndResolveCollisions(others);
 
-            //align with direction
-            // if (this.applyGravity) {
-            // 	if (!this.colliding.general) {
-            // 		this.align(this.velocity.getAngle(), 0.005, true);
-            // 	}
-            // }
             this.rotation %= Math.PI * 2;
 
             this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
@@ -732,8 +720,8 @@ class PhysicsObject extends SceneObject {
         //position
         let dir = col.Adir.times(col.penetration);
         if (col.penetration > 0.005) {
-            a.x -= dir.x;
-            a.y -= dir.y;
+            a.privateSetX(a.x - dir.x);
+            a.privateSetY(a.y - dir.y);
         }
 
         //velocity
@@ -757,7 +745,8 @@ class PhysicsObject extends SceneObject {
         let iA = col.impulseA;
         let iB = col.impulseB;
         a.applyImpulse(iA);
-        if (b.applyGravity || b.velocity.mag) b.applyImpulse(iB);
+        b.applyImpulse(iB);
+
         //immobilize
         a.canMoveThisFrame = false;
 

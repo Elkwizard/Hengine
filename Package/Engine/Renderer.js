@@ -271,8 +271,14 @@ class Animation {
 }
 class Artist {
 	constructor(canvasID, width, height) {
-		this.canvas = document.getElementById(canvasID);
 		if (typeof canvasID === "object") this.canvas = canvasID;
+		else this.canvas = document.getElementById(canvasID);
+		if (this.canvas.style) {
+			this.canvas.style.position = "absolute";
+			this.canvas.style.left = "50%";
+			this.canvas.style.top = "50%";
+			this.canvas.style.transform = "translate(-50%, -50%)";
+		}
 		if (width) {
 			this.canvas.width = width;
 		}
