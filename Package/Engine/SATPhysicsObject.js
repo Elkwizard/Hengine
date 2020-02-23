@@ -129,13 +129,6 @@ class PhysicsObject extends SceneObject {
     get mass() {
         return this.width * this.height;
     }
-    set rotation(a) {
-        this.collider.rotation = a;
-        if (!a) this.collider.rotation = 0.0001;
-    }
-    get rotation() {
-        return this.collider.rotation;
-    }
     set speed(a) {
         this.velocity = a;
     }
@@ -161,18 +154,6 @@ class PhysicsObject extends SceneObject {
     }
     get completelyStatic() {
         return this.positionStatic && this.rotationStatic;
-    }
-    set centerOfMassOffset(a) {
-        this.collider.centerOfMassOffset = a;
-    }
-    get centerOfMassOffset() {
-        return this.collider.centerOfMassOffset;
-    }
-    set centerOfMass(a) {
-        this.collider.centerOfMass = a;
-    }
-    get centerOfMass() {
-        return this.collider.centerOfMass;
     }
     linkTo(el, fer = 1) {
         this.links.push(new Link(this, el, fer));
@@ -240,21 +221,20 @@ class PhysicsObject extends SceneObject {
         this.allCollidingWith.clear();
     }
     drawWithoutRotation(artist) {
-        c.translate(this.middle.x, this.middle.y);
+        let com = this.centerOfMass;
+        c.translate(com);
         c.rotate(-this.rotation);
-        c.translate(-this.middle.x, -this.middle.y);
+        c.translate(com.times(-1));
         artist();
-        c.translate(this.middle.x, this.middle.y);
+        c.translate(com);
         c.rotate(this.rotation);
-        c.translate(-this.middle.x, -this.middle.y);
+        c.translate(com.times(-1));
     }
     engineDrawUpdate() {
         let r = PhysicsObject.getBoundingBox(this);
+        // c.draw(new Color(255, 0, 0,0.2)).rect(s.adjustedDisplay);
         if (!this.hidden && (!this.cullGraphics || Geometry.overlapRectRect(r, s.adjustedDisplay))) {
             let com = this.centerOfMass;
-            let m = this.middle;
-            let mx = m.x;
-            let my = m.y;
             let mcx = com.x;
             let mcy = com.y;
             let r = this.rotation;
@@ -447,8 +427,8 @@ class PhysicsObject extends SceneObject {
             return cells;
         } else {
             let cells = [];
-            let edges = PhysicsObject.getEdges(r);
-            let corners = PhysicsObject.getCorners(r);
+            let edges = r.getEdges();
+            let corners = r.getCorners();
             let nums = [0, 1, 2, 3];
             if (r.width < cellsize) {
                 nums = [0];
@@ -487,35 +467,6 @@ class PhysicsObject extends SceneObject {
     }
     static isWall(r) {
         return (!r.applyGravity && !r.velocity.mag) || !r.canMoveThisFrame;
-    }
-    static rotatePointAround(o, p, r) {
-        let dif = new Vector2(p.x - o.x, p.y - o.y);
-        let a = dif.getAngle();
-        a += r;
-        let nDif = Vector2.fromAngle(a);
-        nDif.mag = dif.mag;
-        return new Vector2(o.x + nDif.x, o.y + nDif.y);
-    }
-    static getCorners(r) {
-        if (r.getCorners) return r.getCorners();
-        let corners = [
-            new Vector2(r.x, r.y),
-            new Vector2(r.x + r.width, r.y),
-            new Vector2(r.x + r.width, r.y + r.height),
-            new Vector2(r.x, r.y + r.height)
-        ];
-        let com = r.centerOfMass;
-        for (let i = 0; i < corners.length; i++) corners[i] = PhysicsObject.rotatePointAround(com, corners[i], r.rotation);
-        return corners;
-    }
-    static getEdges(r) {
-        let corners = PhysicsObject.getCorners(r);
-        let edges = [];
-        for (let i = 0; i < corners.length; i++) {
-            if (i == 0) edges.push(corners[corners.length - 1].minus(corners[0]).normalize());
-            else edges.push(corners[i - 1].minus(corners[i]).normalize());
-        }
-        return edges;
     }
     static farthestInDirection(corners, dir) {
         let farthest = corners[0];
@@ -587,11 +538,11 @@ class PhysicsObject extends SceneObject {
         a.home.SAT.boxChecks++;
         if (!Geometry.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
         a.home.SAT.SATChecks++;
-        let colliding = a.collider.collideBox(b.collider);
+        let colliding = a.collider.collideBox(b);
         if (colliding) {
             a.home.SAT.collisions++;
             let inside = a.collider.collidePoint(b.middle);
-            let bestPoint = Geometry.closestPointOnRectangle(b.middle, a.collider);
+            let bestPoint = Geometry.closestPointOnRectangle(b.middle, a);
             if (!bestPoint) return new Collision(false, a, b);
             let bestDist = Math.sqrt((bestPoint.x - b.middle.x) ** 2 + (bestPoint.y - b.middle.y) ** 2);
             let penetration = b.radius + (inside ? bestDist : -bestDist);
@@ -613,13 +564,13 @@ class PhysicsObject extends SceneObject {
     static collideCircleRect(a, b) {
         a.home.SAT.boxChecks++;
         if (!Geometry.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
-        let colliding = b.collider.collideBox(a.collider);
+        let colliding = b.collider.collideBox(a);
         a.home.SAT.SATChecks++;
         //getting resolution data
         let col;
         if (colliding) {
             a.home.SAT.collisions++;
-            let bestPoint = Geometry.closestPointOnRectangle(a.middle, b.collider);
+            let bestPoint = Geometry.closestPointOnRectangle(a.middle, b);
             if (!bestPoint) return new Collision(false, a, b);
             let bestDist = Geometry.distToPoint(bestPoint, a.middle);
             let collisionAxis = bestPoint.minus(a.middle).normalize();
@@ -642,14 +593,14 @@ class PhysicsObject extends SceneObject {
         a.home.SAT.boxChecks++;
         if (!Geometry.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
         a.home.SAT.SATChecks++;
-        let aEdges = PhysicsObject.getEdges(a);
-        let bEdges = PhysicsObject.getEdges(b);
+        let aEdges = a.getEdges();
+        let bEdges = b.getEdges();
         let edges = [
             aEdges[0], aEdges[1],
             bEdges[0], bEdges[1]
         ];
-        let aCorners = PhysicsObject.getCorners(a);
-        let bCorners = PhysicsObject.getCorners(b);
+        let aCorners = a.getCorners();
+        let bCorners = b.getCorners();
         let colliding = true;
         let collisionAxis = null;
         let leastIntersection = Infinity;
@@ -719,9 +670,9 @@ class PhysicsObject extends SceneObject {
         if (colliding) {
             if (collisionAxis) {
                 //figure out impulses
-                let impulses = PhysicsObject.getRectRectImpulses(a, b, PhysicsObject.getCorners(finalPenetratingCornerOwner)[finalPenetratingCornerIndex], collisionAxis, leastIntersection);
+                let impulses = PhysicsObject.getRectRectImpulses(a, b, finalPenetratingCornerOwner.getCorners()[finalPenetratingCornerIndex], collisionAxis, leastIntersection);
 
-                col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, impulses.impulseA, impulses.impulseB, PhysicsObject.getCorners(finalPenetratingCornerOwner)[finalPenetratingCornerIndex]);
+                col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, impulses.impulseA, impulses.impulseB, finalPenetratingCornerOwner.getCorners()[finalPenetratingCornerIndex]);
             } else {
                 col = new Collision(false, a, b);
                 a.rotation += 0.00001;
@@ -826,7 +777,8 @@ class PhysicsObject extends SceneObject {
 class CirclePhysicsObject extends PhysicsObject {
     constructor(name, x, y, radius, gravity, controls, tag, home) {
         super(name, x, y, 0, 0, gravity, controls, tag, home);
-        this.collider = new CircleCollider(x, y, radius, this.rotation);
+        this.collider = new CircleCollider(this);
+        this.radius = radius;
         this.optimalRotation = null;
     }
     set middle(a) {
@@ -835,12 +787,6 @@ class CirclePhysicsObject extends PhysicsObject {
     }
     get middle() {
         return P(this.x, this.y);
-    }
-    set radius(a) {
-        this.collider.radius = a;
-    }
-    get radius() {
-        return this.collider.radius;
     }
     set width(a) {
         this.radius = a / 2;

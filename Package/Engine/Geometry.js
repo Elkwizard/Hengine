@@ -27,7 +27,7 @@ class Geometry {
         return Math.sqrt(Geometry.distToPoint2(p, p2));
     }
     static distToRect(p, r) {
-        let d = Math.sqrt(Geometry.distToRect2(p, r));
+        let d = Geometry.distToPoint(p, Geometry.closestPointOnRectangle(p, r));//Math.sqrt(Geometry.distToRect2(p, r));
         return d;
     }
     static distToRect2(p, r) {
@@ -77,7 +77,7 @@ class Geometry {
     static closestPointOnRectangle(point, r) {
         if (!r.rotation) r.rotation = 0.001;
         let edges = [];
-        let corners = PhysicsObject.getCorners(r);
+        let corners = r.getCorners();
         let bestPoint = null;
         let bestDist = Infinity;
         for (let i = 0; i < corners.length; i++) {
@@ -127,7 +127,7 @@ class Geometry {
         for (let i = 0; i < rs.length; i++) {
             let r = rs[i];
             if (r instanceof PhysicsObject && !(r instanceof CirclePhysicsObject) && r.rotation) {
-                let cs = PhysicsObject.getCorners(r);
+                let cs = r.getCorners();
                 let edges = [
                     new Line(cs[0], cs[1]),
                     new Line(cs[1], cs[2]),
@@ -248,6 +248,14 @@ class Geometry {
         }
         return getResult();
     }
+    static rotatePointAround(origin, point, angle) {
+        let dif = new Vector2(point.x - origin.x, point.y - origin.y);
+        let a = dif.getAngle();
+        a += angle;
+        let nDif = Vector2.fromAngle(a);
+        nDif.mag = dif.mag;
+        return new Vector2(origin.x + nDif.x, origin.y + nDif.y);
+    }
     static overlapLineLine(l1, l2) {
         let pol = Geometry.projectPointOntoLine;
         let dirs = [
@@ -285,7 +293,7 @@ class Geometry {
         if (!r.rotation) {
             return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
         } else {
-            let col = new RectCollider(r.x, r.y, r.width, r.height, r.rotation);
+            let col = new RectCollider(r);
             return col.collidePoint(p.x, p.y);
         }
     }

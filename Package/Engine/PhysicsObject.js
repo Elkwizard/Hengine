@@ -294,7 +294,7 @@ class PhysicsObject extends SceneObject {
 class CirclePhysicsObject extends PhysicsObject {
 	constructor(name, x, y, radius, gravity, controls, tag, home) {
 		super(name, x, y, radius * 2, radius * 2, gravity, controls, tag, home);
-		this.collider = new CircleCollider(x, y, radius);
+		this.collider = new CircleCollider(this);
 	}
 	get middle() {
 		return { x: this.x, y: this.y };

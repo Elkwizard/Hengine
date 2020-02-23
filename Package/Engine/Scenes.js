@@ -408,7 +408,7 @@ class InactiveScene {
 	collideBox(box) {
 		let collideAry = [];
 		for (let hitbox of this.updateArray()) {
-			if (hitbox.collider.collideBox(box.collider)) {
+			if (hitbox.collider.collideBox(box)) {
 				collideAry.push(hitbox);
 			}
 		}
