@@ -193,6 +193,7 @@ class Engine {
 					}
 					this.afterUpdate();
 					this.updateScreenRecordings();
+					M.last = { x: M.x, y: M.y };
 				}
 			} catch (e) {
 				if (this.catchErrors) this.output("Draw Error: " + e);
@@ -269,7 +270,7 @@ class Engine {
 		let bottomTextOffset = 5;
 		let mainGraphWidth = 400 - leftOffset;
 		let f = new Frame(400, 200 + bottomTextOffset * 3 + 10);
-		function drawBasics(black, white) { 
+		function drawBasics(black, white) {
 			f.c.draw(black).rect(0, 0, f.width, f.height);
 			f.c.stroke(white, 2).rect(leftOffset, -2, 422, 200);
 			f.c.c.font = "10px Arial";
@@ -309,19 +310,19 @@ class Engine {
 		f.msLimit = msLimit;
 		let colorScheme = "dark";
 		Object.defineProperty(f, "colorScheme", {
-			get: function() {
+			get: function () {
 				return colorScheme;
 			},
 			set(a) {
 				colorScheme = a;
-				let black = (colorScheme.toLowerCase() == "dark")? "black":"white";
-				let white = (colorScheme.toLowerCase() == "dark")? "white":"black";
+				let black = (colorScheme.toLowerCase() == "dark") ? "black" : "white";
+				let white = (colorScheme.toLowerCase() == "dark") ? "white" : "black";
 				drawBasics(black, white);
 			}
 		})
 		f.colorScheme = "dark";
-		let black = (f.colorScheme.toLowerCase() == "dark")? "black":"white";
-		let white = (f.colorScheme.toLowerCase() == "dark")? "white":"black";
+		let black = (f.colorScheme.toLowerCase() == "dark") ? "black" : "white";
+		let white = (f.colorScheme.toLowerCase() == "dark") ? "white" : "black";
 		drawBasics(black, white);
 		function getColor(n) {
 			for (let color of colors) {
@@ -334,8 +335,8 @@ class Engine {
 		const getYValue = (fV) => clamp(200 - ((fV - minValue) / (maxValue - minValue)) * 200, 0, 198);
 		const getXValue = (fV) => mainGraphWidth * ((fV - f.timeOffset) / f.msLimit);
 		f.get = function () {
-			let black = (f.colorScheme.toLowerCase() == "dark")? "black":"white";
-			let white = (f.colorScheme.toLowerCase() == "dark")? "white":"black";
+			let black = (f.colorScheme.toLowerCase() == "dark") ? "black" : "white";
+			let white = (f.colorScheme.toLowerCase() == "dark") ? "white" : "black";
 			f.c.textMode = "left";
 			f.c.draw(black).rect(leftOffset + 2, 0, 420, 198);
 			f2.c.clear();

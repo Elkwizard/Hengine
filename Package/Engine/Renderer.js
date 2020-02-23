@@ -496,6 +496,21 @@ class Artist {
 				this.rotate(-angle);
 				this.translate(-x, -y);
 			},
+			connector(...points) {
+				for (let i = 0; i < points.length; i++) {
+					let p1 = points[i];
+					let p2 = points[i + 1];
+					if (p2) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).line(p1, p2);
+				}
+			},
+			arrowConnector(...points) {
+				for (let i = 0; i < points.length; i++) {
+					let p1 = points[i];
+					let p2 = points[i + 1];
+					if (p2 && i < points.length - 2) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).line(p1, p2);
+					else if (i == points.length - 2) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).arrow(p1, p2);
+				}
+			},
 			shape: function (...v) {
 				this.c.beginPath();
 				this.c.moveTo(v[0].x, v[0].y);

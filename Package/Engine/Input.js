@@ -35,6 +35,10 @@ let M = {
 	down: false,
 	x: 0,
 	y: 0,
+	last: {
+		x: 0,
+		y: 0
+	},
 	button: 0,
 	dragStart: new Vector2(0, 0),
 	dragEnd: new Vector2(0, 0),
