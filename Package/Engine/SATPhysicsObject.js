@@ -1,56 +1,4 @@
 const LOSS = .985;
-class Collision {
-    constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, impulseA, impulseB, collisionPoint) {
-        this.colliding = collides;
-        this.Adir = Adir;
-        this.Bdir = Bdir;
-        this.a = a;
-        this.b = b;
-        this.penetration = penetration;
-        this.impulseA = impulseA;
-        this.impulseB = impulseB;
-        this.collisionPoint = collisionPoint;
-    }
-}
-class Impulse {
-    constructor(force = new Vector2(0, 0), source = new Vector2(0, 0)) {
-        this.force = force;
-        this.source = source;
-    }
-}
-class Range {
-    constructor(min = Infinity, max = -Infinity) {
-        this.min = min;
-        this.max = max;
-    }
-    include(a) {
-        if (a < this.min) this.min = a;
-        if (a > this.max) this.max = a;
-    }
-    static intersect(a, b) {
-        return a.min < b.max && b.min < a.max;
-    }
-}
-class Link {
-    constructor(start, end, fer) {
-        this.start = start;
-        this.end = end;
-        this.ferocity = fer;
-    }
-    fix() {
-        let l = new Line(this.start.middle, this.end.middle);
-        let d = g.f.getDistance(l.a, l.b);
-        d = clamp(d / 10, 0, 20);
-        d *= this.ferocity;
-        let dir = new Vector2(this.end.middle.x - this.start.middle.x, this.end.middle.y - this.start.middle.y);
-        dir.normalize();
-        let p = l.midPoint;
-        let cps = Geometry.closestPointOnRectangle(p, this.start);
-        let cpe = Geometry.closestPointOnRectangle(p, this.end);
-        // this.start.applyImpulse(new Impulse(dir.over(100), cps));
-        // this.end.applyImpulse(new Impulse(dir.over(100), cpe));
-    }
-}
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, width, height, gravity, controls, tag, home) {
         super(name, x, y, width, height, controls, tag, home);
@@ -59,8 +7,8 @@ class PhysicsObject extends SceneObject {
         this._rotation = 0.0001;
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
-        this.applyGravity = true;
-        this.slows = true;
+        this.applyGravity = gravity;
+        this.slows = gravity;
         this.home.hasRotatedRectangles = true;
         this.links = [];
         this.colliding = {
@@ -127,7 +75,7 @@ class PhysicsObject extends SceneObject {
         this._gravity = a;
     }
     get mass() {
-        return this.width * this.height;
+        return 1//this.width * this.height;
     }
     set speed(a) {
         this.velocity = a;
@@ -255,22 +203,23 @@ class PhysicsObject extends SceneObject {
         this.update();
     }
     slowDown() {
-        if (this.slows) {
-            this.acceleration.mul(LOSS);
-            this.velocity.mul(LOSS);
-            this.angularAcceleration *= LOSS ** 8;
-            this.angularVelocity *= LOSS;
-            let sideSize = Math.PI / 2;
-            if (this.rotation % sideSize < 0.05) {
-                this.angularVelocity *= 0.999;
-                this.angularAcceleration *= 0.999;
-            }
-            if (Math.abs(this.velocity.x) < 0.01) this.velocity.x = 0;
-            if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
-            if (Math.abs(this.angularVelocity) < 0.0001) this.angularVelocity = 0;
-            let m = Math.min(this.width, this.height) / 3;
-            if (this.velocity.mag > m) this.velocity.mag = m;
+        this.acceleration.mul(LOSS);
+        this.velocity.mul(LOSS);
+        this.angularAcceleration *= LOSS ** 8;
+        this.angularVelocity *= LOSS;
+        let sideSize = Math.PI / 2;
+        if (this.rotation % sideSize < 0.05) {
+            this.angularVelocity *= 0.999;
+            this.angularAcceleration *= 0.999;
         }
+        if (Math.abs(this.velocity.x) < 0.01) this.velocity.x = 0;
+        if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
+        if (Math.abs(this.angularVelocity) < 0.0001) this.angularVelocity = 0;
+        let m = Math.min(this.width, this.height) / 3;
+        if (this.velocity.mag > m) this.velocity.mag = m;
+        // let furthestPoint = PhysicsObject.farthestInDirection(this.getCorners(), this.velocity).corner;
+        // let force = this.velocity.get().mul(-(1 - LOSS));
+        // this.applyImpulse(new Impulse(force, furthestPoint));
     }
     detectCollisions(others) {
         let collisions = [];
@@ -334,14 +283,13 @@ class PhysicsObject extends SceneObject {
     }
     physicsUpdate(others) {
         s.drawInWorldSpace(e => {
-            if (this.applyGravity) {
+            //slow
+            if (this.slows) this.slowDown();
+            if (this.applyGravity && !this.positionStatic) {
                 //links
                 for (let link of this.links) link.fix();
 
                 //gravity
-                let factor = 4;
-                let massFactor = Math.pow(this.mass, 1 / factor) / Math.pow(2500, 1 / factor);
-                this.velocity.add(new Vector2(this.gravity.x * massFactor, this.gravity.y * massFactor));
             }
             //linear
             this.velocity.add(this.acceleration.times(this.home.speedModulation));
@@ -355,8 +303,6 @@ class PhysicsObject extends SceneObject {
             let newRotation = this.rotation + this.angularVelocity * this.home.speedModulation;
             this.privateSetRotation(newRotation);
 
-            //slow
-            if (this.slows) this.slowDown();
             for (let i = 0; i < this.home.physicsRealism; i++) this.checkAndResolveCollisions(others);
 
             this.rotation %= Math.PI * 2;
@@ -391,6 +337,8 @@ class PhysicsObject extends SceneObject {
     applyImpulse(impulse) {
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
+        c.stroke(cl.RED, 1).circle(impulse.source.x, impulse.source.y, 2);
+        c.stroke(cl.RED, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;

@@ -202,7 +202,7 @@ class PhysicsObject extends SceneObject {
 		}
 	}
 	collide(hitbox) {
-		let x = Geometry.isOverlapping(hitbox.collider, this.collider);
+		let x = Geometry.isOverlapping(this, hitbox);
 		return x;
 	}
 	resolve(e, dir, hitboxes) {
@@ -295,6 +295,7 @@ class CirclePhysicsObject extends PhysicsObject {
 	constructor(name, x, y, radius, gravity, controls, tag, home) {
 		super(name, x, y, radius * 2, radius * 2, gravity, controls, tag, home);
 		this.collider = new CircleCollider(this);
+		this.radius = radius;
 	}
 	get middle() {
 		return { x: this.x, y: this.y };
@@ -310,12 +311,6 @@ class CirclePhysicsObject extends PhysicsObject {
 	}
 	set height(a) {
 		this.width = a;
-	}
-	get radius() {
-		return this.collider.radius;
-	}
-	set radius(a) {
-		this.collider.radius = a;
 	}
 	moveAndRespond(hitboxes) {
 		this.x += this.speed.x * 2;
@@ -340,8 +335,8 @@ class CirclePhysicsObject extends PhysicsObject {
 						let usesTobinMath = false;
 						if (a instanceof CirclePhysicsObject) {
 							//colliding with circle: get overlap
-							let dist = gDist(this.collider, a.collider);
-							ove = (this.collider.radius + a.collider.radius) - dist;
+							let dist = gDist(this, a);
+							ove = (this.radius + a.radius) - dist;
 							let v = new Vector2(a.x - this.x, a.y - this.y);
 							dir.add(v);
 						} else {
@@ -350,9 +345,9 @@ class CirclePhysicsObject extends PhysicsObject {
 							let closestPY = Math.max(a.y, Math.min(a.y + a.height, this.y));
 							let cP = P(closestPX, closestPY);
 							let v = new Vector2();
-							if (Geometry.pointInsideRectangle(this.collider, a)) {
+							if (Geometry.pointInsideRectangle(this, a)) {
 								if (false) {
-									let d = Geometry.distToRect(this.collider, a);
+									let d = Geometry.distToRect(this, a);
 									let r = this.radius;
 									let theta = Math.PI / 2 - this.direction.getAngle();
 									let dx = this.direction.x;
@@ -375,12 +370,12 @@ class CirclePhysicsObject extends PhysicsObject {
 										radius = a.height / 2;
 										v = new Vector2(0, a.middle.y - this.y);
 									}
-									let dist = gDist(this.collider, cP);
+									let dist = gDist(this, cP);
 									ove = dist + this.radius;
 								}
 							} else {
-								let dist = gDist(this.collider, cP);
-								ove = this.collider.radius - dist;
+								let dist = gDist(this, cP);
+								ove = this.radius - dist;
 								v = new Vector2(cP.x - this.x, cP.y - this.y);
 							}
 							dir.add(v);

@@ -44,8 +44,8 @@ let M = {
 	dragEnd: new Vector2(0, 0),
 	custom: {},
 	updatePosition: function (e) {
-		this.x = e.clientX;
-		this.y = e.clientY;
+		this.x = e.clientX - (innerWidth - width) / 2;
+		this.y = e.clientY - (innerHeight - height) / 2;
 	},
 	onDown: new Listener,
 	onUp: new Listener,

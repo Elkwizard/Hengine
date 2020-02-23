@@ -37,24 +37,6 @@ class Circle {
         this.x = a.x;
         this.y = a.y;
     }
-	get x() {
-		return this.collider.x;
-	}
-	get y() {
-		return this.collider.y;
-	}
-	get radius() {
-		return this.collider.radius
-	}
-	set x(a) {
-		this.collider.x = a;
-	}
-	set y(a) {
-		this.collider.y = a;
-	}
-	set radius(a) {
-		this.collider.radius = a;
-	}
 }
 class Line {
 	constructor(x, y, x2, y2) {
