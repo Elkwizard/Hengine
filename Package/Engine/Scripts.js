@@ -113,6 +113,7 @@ const PLAYER_MOVEMENT = new ElementScript("movement", {
 		if (!this.controls.up) {
 			this.controls = new Controls("w", "s", "a", "d");
 		}
+		this.completelyStatic = false;
 		this.applyGravity = true;
 	},
 	update() {

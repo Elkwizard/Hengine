@@ -29,7 +29,14 @@ class Circle {
 		this.x = x;
 		this.y = y;
 		this.radius = radius;
-	}
+    }
+    get middle() {
+        return { x: this.x, y: this.y }
+    }
+    set middle(a) {
+        this.x = a.x;
+        this.y = a.y;
+    }
 	get x() {
 		return this.collider.x;
 	}

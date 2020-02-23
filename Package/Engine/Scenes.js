@@ -563,12 +563,13 @@ class Scene extends InactiveScene {
 			let useful = []
 			let useless = [];
 			let sortedEls = this.contains_array.sort(function (a, b) {
-				let aVel = a.angularVelocity;
-				let bVel = a.angularVelocity;
-				if (!(aVel || bVel)) return 0;
-				else if (aVel && !bVel) return 1;
-				else if (!aVel && bVel) return -1;
-				else return aVel - bVel;
+				// let aVel = a.angularVelocity;
+				// let bVel = a.angularVelocity;
+				// if (!(aVel || bVel)) return 0;
+				// else if (aVel && !bVel) return 1;
+				// else if (!aVel && bVel) return -1;
+				// else return aVel - bVel;
+				return 0;
 			});
 			for (let rect of sortedEls) {
 				if (isUseless(rect)) {

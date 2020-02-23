@@ -47,8 +47,8 @@ class Link {
         let p = l.midPoint;
         let cps = Geometry.closestPointOnRectangle(p, this.start);
         let cpe = Geometry.closestPointOnRectangle(p, this.end);
-        this.start.applyImpulse(new Impulse(dir.over(100), cps));
-        this.end.applyImpulse(new Impulse(dir.over(100), cpe));
+        // this.start.applyImpulse(new Impulse(dir.over(100), cps));
+        // this.end.applyImpulse(new Impulse(dir.over(100), cpe));
     }
 }
 class PhysicsObject extends SceneObject {
@@ -395,17 +395,18 @@ class PhysicsObject extends SceneObject {
     applyLinearImpulse(impulse) {
         if (!impulse) return;
         // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.LIME, 4).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
         this.velocity.add(impulse.force.over(5));
     }
     applyAngularImpulse(impulse) {
         if (!impulse) return;
         // c.stroke(cl.CREAM, 1).circle(impulse.source.x, impulse.source.y, 2);
         // c.stroke(cl.CREAM, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
-        let com = this.centerOfMassOffset;
+        let com = this.centerOfMass;
         let startVector = impulse.source.minus(com);
         let endVector = impulse.source.plus(impulse.force).minus(com);
         let difAngle = endVector.getAngle() - startVector.getAngle();
+
         let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle / 10), 0, 0.01);
         this.angularVelocity += angularForce;
     }
