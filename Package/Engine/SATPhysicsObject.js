@@ -162,6 +162,18 @@ class PhysicsObject extends SceneObject {
     get completelyStatic() {
         return this.positionStatic && this.rotationStatic;
     }
+    set centerOfMassOffset(a) {
+        this.collider.centerOfMassOffset = a;
+    }
+    get centerOfMassOffset() {
+        return this.collider.centerOfMassOffset;
+    }
+    set centerOfMass(a) {
+        this.collider.centerOfMass = a;
+    }
+    get centerOfMass() {
+        return this.collider.centerOfMass;
+    }
     linkTo(el, fer = 1) {
         this.links.push(new Link(this, el, fer));
     }
@@ -239,15 +251,22 @@ class PhysicsObject extends SceneObject {
     engineDrawUpdate() {
         let r = PhysicsObject.getBoundingBox(this);
         if (!this.hidden && (!this.cullGraphics || Geometry.overlapRectRect(r, s.adjustedDisplay))) {
-            c.translate(this.middle.x, this.middle.y);
-            c.rotate(this.rotation);
-            c.translate(-this.middle.x, -this.middle.y);
+            let com = this.centerOfMass;
+            let m = this.middle;
+            let mx = m.x;
+            let my = m.y;
+            let mcx = com.x;
+            let mcy = com.y;
+            let r = this.rotation;
+            c.translate(mcx, mcy);
+            c.rotate(r);
+            c.translate(-mcx, -mcy);
             this.draw();
             this.scriptDraw();
-            c.translate(this.middle.x, this.middle.y);
-            c.rotate(-this.rotation);
+            c.translate(mcx, mcy);
+            c.rotate(-r);
             // c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
-            c.translate(-this.middle.x, -this.middle.y);
+            c.translate(-mcx, -mcy);
         }
     }
     enginePhysicsUpdate(others) {
@@ -397,9 +416,9 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         // c.stroke(cl.CREAM, 1).circle(impulse.source.x, impulse.source.y, 2);
         // c.stroke(cl.CREAM, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
-        let centerOfMass = this.middle;
-        let startVector = impulse.source.minus(centerOfMass);
-        let endVector = impulse.source.plus(impulse.force).minus(centerOfMass);
+        let com = this.centerOfMassOffset;
+        let startVector = impulse.source.minus(com);
+        let endVector = impulse.source.plus(impulse.force).minus(com);
         let difAngle = endVector.getAngle() - startVector.getAngle();
         let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle / 10), 0, 0.01);
         this.angularVelocity += angularForce;
@@ -485,7 +504,8 @@ class PhysicsObject extends SceneObject {
             new Vector2(r.x + r.width, r.y + r.height),
             new Vector2(r.x, r.y + r.height)
         ];
-        for (let i = 0; i < corners.length; i++) corners[i] = PhysicsObject.rotatePointAround(r.middle, corners[i], r.rotation);
+        let com = r.centerOfMass;
+        for (let i = 0; i < corners.length; i++) corners[i] = PhysicsObject.rotatePointAround(com, corners[i], r.rotation);
         return corners;
     }
     static getEdges(r) {

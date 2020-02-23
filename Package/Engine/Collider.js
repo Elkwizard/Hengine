@@ -20,10 +20,22 @@ class LineCollider {
 		return this.evaluate(x) == y;
 	}
 }
-class RectCollider {
-	constructor(x, y, width, height, rotation = 0) {
+class Collider {
+	constructor(x, y) {
 		this.x = x;
 		this.y = y;
+		this.centerOfMassOffset = new Vector2(0, 0);
+	}
+    set centerOfMass(a) {
+        this.centerOfMassOffset = PhysicsObject.rotatePointAround(this.middle, a, -this.rotation).minus(this.middle);
+    }
+    get centerOfMass() {
+        return this.centerOfMassOffset.plus(this.middle);
+    }
+}
+class RectCollider extends Collider {
+	constructor(x, y, width, height, rotation = 0) {
+		super(x, y);
 		this.width = width;
 		this.height = height;
 		this.rotation = rotation;
@@ -102,10 +114,9 @@ class RectCollider {
 		}
 	}
 }
-class CircleCollider {
+class CircleCollider extends Collider {
 	constructor(x, y, radius, rotation = 0) {
-		this.x = x;
-		this.y = y;
+		super(x, y);
 		this.radius = radius;
 		this.rotation = rotation;
 	}
