@@ -55,7 +55,7 @@ class Directions {
 }
 class InactiveScene {
 	constructor(name, gravity, airResistance) {
-		if (!gravity) gravity = 0.1;
+		if (!gravity) gravity = new Vector2(0, 0.1);
 		if (!airResistance) airResistance = 0.025;
 		this.gravity = gravity;
 		this.airResistance = airResistance

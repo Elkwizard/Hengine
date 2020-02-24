@@ -117,7 +117,7 @@ class Engine {
 		let W = f(width, innerWidth);
 		let H = f(height, innerHeight);
 		let AR = f(airResistance, 0.025);
-		let G = f(gravity, P(0, 0.1));
+		let G = f(gravity, new Vector2(0, 0.1));
 		this.paused = false;
 		this.output = function (m) {
 			alert(m);

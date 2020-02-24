@@ -66,6 +66,7 @@ class PhysicsObject extends SceneObject {
         this.positionStatic = !gravity;
         this.rotationStatic = !gravity;
         this._gravity = null;
+        this._mass = null;
     }
     get gravity() {
         if (this._gravity === null) return this.home.gravity;
@@ -74,8 +75,13 @@ class PhysicsObject extends SceneObject {
     set gravity(a) {
         this._gravity = a;
     }
+    set mass(a) {
+        this._mass = a;
+    }
     get mass() {
-        return 1//this.width * this.height;
+        if (this._mass !== null) return this._mass;
+        let apparentMass = this.width * this.height;
+        return Math.sqrt(apparentMass) / 10 //apparentMass / 100;
     }
     set speed(a) {
         this.velocity = a;
@@ -194,6 +200,7 @@ class PhysicsObject extends SceneObject {
             c.translate(mcx, mcy);
             c.rotate(-r);
             // c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
+            // c.draw(cl.WHITE).text("15px monospace", "MASS: " + Math.floor(this.mass / 1000) + "kg, " + (this.mass % 1000) + "g", 0, 0);
             c.translate(-mcx, -mcy);
         }
     }
@@ -290,6 +297,12 @@ class PhysicsObject extends SceneObject {
                 for (let link of this.links) link.fix();
 
                 //gravity
+                let gv = this.gravity.times(this.mass);
+                let gvInverse = gv.times(-1);
+                let highestPoint = PhysicsObject.farthestInDirection(this.getCorners(), gvInverse).corner;
+                let gravitationalForce = gv;
+                let gravity = new Impulse(gravitationalForce, highestPoint);
+                this.applyImpulse(gravity);
             }
             //linear
             this.velocity.add(this.acceleration.times(this.home.speedModulation));
@@ -335,6 +348,11 @@ class PhysicsObject extends SceneObject {
         });
     }
     applyImpulse(impulse) {
+        let startForce = impulse.force.get();
+        //F = ma
+        //F/m = a
+        let endForce = startForce.over(this.mass);
+        impulse.force = endForce;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
         c.stroke(cl.RED, 1).circle(impulse.source.x, impulse.source.y, 2);
@@ -342,20 +360,16 @@ class PhysicsObject extends SceneObject {
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
-        // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
-        this.velocity.add(impulse.force.over(5));
+        this.velocity.add(impulse.force);
     }
     applyAngularImpulse(impulse) {
         if (!impulse) return;
-        // c.stroke(cl.CREAM, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.CREAM, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
         let com = this.centerOfMass;
         let startVector = impulse.source.minus(com);
         let endVector = impulse.source.plus(impulse.force).minus(com);
         let difAngle = endVector.getAngle() - startVector.getAngle();
 
-        let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle / 10), 0, 0.01);
+        let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle), 0, 0.01);
         this.angularVelocity += angularForce;
     }
     static getBoundingBox(r) {
