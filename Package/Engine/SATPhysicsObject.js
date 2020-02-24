@@ -65,6 +65,7 @@ class PhysicsObject extends SceneObject {
         this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
         this.positionStatic = !gravity;
         this.rotationStatic = !gravity;
+        this.snuzzlement = 1;
         this._gravity = null;
         this._mass = null;
     }
@@ -348,24 +349,23 @@ class PhysicsObject extends SceneObject {
         });
     }
     applyImpulse(impulse) {
+        if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
         c.stroke(cl.RED, 1).circle(impulse.source.x, impulse.source.y, 2);
         c.stroke(cl.RED, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
-        if (!impulse) return;
         this.velocity.add(impulse.force);
     }
     applyAngularImpulse(impulse) {
-        if (!impulse) return;
         let com = this.centerOfMass;
         let startVector = impulse.source.minus(com);
         if (startVector.mag < 0.01) return; 
         let endVector = impulse.source.plus(impulse.force).minus(com);
         let difAngle = endVector.getAngle() - startVector.getAngle();
 
-        let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle), 0, 0.01);
+        let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle / 2), 0, 0.01);
         this.angularVelocity += angularForce;
     }
     getSpine() {
@@ -507,11 +507,9 @@ class PhysicsObject extends SceneObject {
         let source = collisionPoint;
 
         //for impulse A
-        // let dirFromB = collisionPoint.minus(middleB).normalize();
         let forceFromB = clamp(dirFromB.dot(b.velocity), 0, Infinity);
 
         //for impulse B
-        // let dirFromA = collisionPoint.minus(middleA).normalize();
         let forceFromA = clamp(dirFromA.dot(a.velocity), 0, Infinity);
 
         
@@ -524,8 +522,8 @@ class PhysicsObject extends SceneObject {
         impulseA = new Impulse(dirFromB.times(forceFromB), source);
         impulseB = new Impulse(dirFromA.times(forceFromA), source);
 
-        let forceA = impulseA.force.minus(impulseB.force).times(bPercentMass);
-        let forceB = impulseB.force.minus(impulseA.force).times(aPercentMass);
+        let forceA = impulseA.force.minus(impulseB.force.times(1 - a.snuzzlement)).times(bPercentMass);
+        let forceB = impulseB.force.minus(impulseA.force.times(1 - b.snuzzlement)).times(aPercentMass);
 
 
         impulseA.force = forceA;
@@ -550,7 +548,7 @@ class PhysicsObject extends SceneObject {
             let collisionPoint = aPoint.plus(bPoint).over(2);
 
             //impulse resolution
-            let impulses = PhysicsObject.getImpulses(a, b, collisionPoint.minus(a.middle).normalize(), collisionPoint.minus(b.middle), collisionPoint);
+            let impulses = PhysicsObject.getImpulses(a, b, collisionPoint.minus(a.middle).normalize(), collisionPoint.minus(b.middle).normalize(), collisionPoint);
 
             col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB, collisionPoint);
         } else col = new Collision(false, a, b);
@@ -678,7 +676,7 @@ class PhysicsObject extends SceneObject {
                 let closestPointOnEdge = Geometry.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
                 let overlap = a.home.home.f.getDistance(penetratingCorner, closestPointOnEdge);
                 [closestPointOnEdge, penetratingCorner] = [penetratingCorner, closestPointOnEdge];
-                let axis = closestPointOnEdge.minus(penetratingCorner).normalize();
+                let axis = closestPointOnEdge.minus(penetratingCorner);
                 if (overlap < leastIntersection) {
                     leastIntersection = overlap;
                     collisionAxis = axis;
@@ -691,9 +689,10 @@ class PhysicsObject extends SceneObject {
         let col;
         if (colliding) {
             if (collisionAxis) {
+                collisionAxis.normalize();
                 //figure out impulses
                 let collisionPoint =  finalPenetratingCornerOwner.getCorners()[finalPenetratingCornerIndex];
-                let impulses = PhysicsObject.getImpulses(a, b, collisionPoint);
+                let impulses = PhysicsObject.getImpulses(a, b, collisionAxis.times(-1), collisionAxis.get(), collisionPoint);
 
                 col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, impulses.impulseA, impulses.impulseB, collisionPoint);
             } else {
