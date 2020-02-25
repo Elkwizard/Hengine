@@ -514,8 +514,8 @@ class PhysicsObject extends SceneObject {
         impulseB.force = forceB;
 
         if (b.positionStatic) impulseB = null;
-        impulseA = null;
-        impulseB = null;
+        // impulseA = null;
+        // impulseB = null;
 
 
         return { impulseA, impulseB };
