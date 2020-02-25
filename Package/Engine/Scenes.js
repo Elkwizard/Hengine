@@ -672,7 +672,7 @@ class Scene extends InactiveScene {
 		newY = this.home.extend(DY, (distY) * ((1 / this.zoom) - 1)); //extend y according to it's distance from the center
 		newX += displayM.x; //re-center x
 		newY += displayM.y; //re-center y
-		return new Vertex(newX, newY); //return the result
+		return new Vector2(newX, newY); //return the result
 	}
 	screenSpaceToWorldSpace(point) {
 		let displayM = this.display.middle; //optimize .middle() calls
@@ -686,7 +686,7 @@ class Scene extends InactiveScene {
 		newY = this.home.extend(DY, (distY) * ((1 / this.zoom) - 1)); //extend y according to it's distance from the center
 		newX += displayM.x; //re-center x
 		newY += displayM.y; //re-center y
-		return new Vertex(newX, newY); //return the result
+		return new Vector2(newX, newY); //return the result
 	}
 	updateDisplayAt(x, y, width, height) {
 		this.display = new Rect(x, y, width, height);

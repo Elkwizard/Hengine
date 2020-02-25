@@ -97,6 +97,12 @@ class Rect {
     get height() {
         return this._height;
     }
+    set angle(a) {
+        this.rotation = a;
+    }
+    get angle() {
+        return this.rotation;
+    }
     set rotation(a) {
         this.collider.rotation = a;
         if (!a) this.collider.rotation = 0.0001;
