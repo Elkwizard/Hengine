@@ -104,11 +104,13 @@ class Rect {
         return this.rotation;
     }
     set rotation(a) {
-        this.collider.rotation = a;
-        if (!a) this.collider.rotation = 0.0001;
+		if (!a) a = 0.0001;
+		if (Math.abs(a % (Math.PI / 2)) < 0.0001) a += 0.001;
+		this.collider.rotation = a;
+		this._rotation = a;
     }
     get rotation() {
-        return this.collider.rotation;
+        return this._rotation;
     }
 	set unrotatedMiddle(a) {
 		this.x = a.x - this.width / 2;
