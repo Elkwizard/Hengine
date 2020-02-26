@@ -15,10 +15,10 @@ let K = {
 	P: function (key) {
 		return !!this.keys[key];
 	},
-	JP: function(key) {
+	JP: function (key) {
 		return this.keyCounts[key] == 1;
 	},
-	update: function() {
+	update: function () {
 		for (let key in this.keys) {
 			if (!this.keyCounts[key]) this.keyCounts[key] = 0;
 			if (this.P(key)) this.keyCounts[key]++;
@@ -44,8 +44,13 @@ let M = {
 	dragEnd: new Vector2(0, 0),
 	custom: {},
 	updatePosition: function (e) {
-		this.x = e.clientX - (innerWidth - width) / 2;
-		this.y = e.clientY - (innerHeight - height) / 2;
+		try {
+			this.x = e.clientX - (innerWidth - width) / 2;
+			this.y = e.clientY - (innerHeight - height) / 2;
+		} catch (e) {
+			this.x = e.clientX;
+			this.y = e.clientY;
+		}
 	},
 	onDown: new Listener,
 	onUp: new Listener,

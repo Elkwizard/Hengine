@@ -204,7 +204,7 @@ class PhysicsObject extends SceneObject {
             this.scriptDraw();
             c.translate(mcx, mcy);
             c.rotate(-r);
-            c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
+            // c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
             // c.stroke(cl.LIME, 2).arrow(P(0, 0), this.acceleration.times(10));
             // c.draw(cl.WHITE).text("15px monospace", "MASS: " + Math.floor(this.mass / 1000) + "kg, " + (this.mass % 1000) + "g", 0, 0);
             c.translate(-mcx, -mcy);
@@ -354,8 +354,8 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
-        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
+        // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
+        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         this.velocity.add(impulse.force);
@@ -690,7 +690,7 @@ class PhysicsObject extends SceneObject {
         //position
         let dir = col.Adir.times(col.penetration);
         if (col.penetration > 0.005) {
-            if (mobileB) {
+            if (!mobileB) {
                 a.privateSetX(a.x - dir.x);
                 a.privateSetY(a.y - dir.y);
             } else {
