@@ -93,23 +93,6 @@ class Engine {
 		this.frameLength = 0;
 		this.frameCount = 0;
 		this.graphs = [];
-		this.fpsGraph = this.makeGraph("FPS", 0, 60, e => this.fps, 2000, [
-			{
-				limit: 50,
-				color: "lime"
-			},
-			{
-				limit: 30,
-				color: "yellow"
-			},
-			{
-				limit: 15,
-				color: "orange"
-			},
-			{
-				color: "red"
-			}
-		]);
 		//fallbacks
 		function f(a, b) {
 			return (a === undefined) ? b : a
@@ -143,6 +126,7 @@ class Engine {
 			else document.getElementById(wrapperID).appendChild(canvas);
 		}
 		this.renderer = new Artist(canvas.id, W, H);
+		window.g = this;
 		this.scene = new Scene("Engine Scene", this.renderer, G, AR, this);
 		//update loops
 		this.afterScript = new Script("after");
@@ -249,7 +233,31 @@ class Engine {
 				this.renderer.c.imageSmoothingEnabled = pixelate;
 			}
 		}.bind(this));
-		this.recordings = {}
+		this.recordings = {};
+		
+		this.fpsGraph = this.makeGraph("FPS", 0, 60, e => this.fps, 2000, [
+			{
+				limit: 50,
+				color: "lime"
+			},
+			{
+				limit: 30,
+				color: "yellow"
+			},
+			{
+				limit: 15,
+				color: "orange"
+			},
+			{
+				color: "red"
+			}
+		]);
+	}
+	get preservePixelart() {
+		return !this.renderer.c.imageSmoothingEnabled;
+	}
+	set preservePixelart(a) {
+		this.renderer.c.imageSmoothingEnabled = !a;
 	}
 	createScreenRecording(name, past) {
 		this.recordings[name] = new ScreenRecording(name, past);

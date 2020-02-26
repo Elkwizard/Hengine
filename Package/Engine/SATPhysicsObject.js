@@ -64,12 +64,12 @@ class PhysicsObject extends SceneObject {
         this.optimize = (a, b) => true;
         this.canMoveThisFrame = true;
         this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
-        this.positionStatic = !gravity;
-        this.rotationStatic = !gravity;
         this.snuzzlement = 1;
         this.linearDragForce = LINEAR_LOSS;
         this.angularDragForce = ANGULAR_LOSS;
         this.density = 0.1;
+        this._positionStatic = !gravity;
+        this._rotationStatic = !gravity;
         this._gravity = null;
         this._mass = null;
     }
@@ -106,6 +106,19 @@ class PhysicsObject extends SceneObject {
     }
     get applyGravity() {
         return this._applyGravity;
+    }
+    set rotationStatic(a) {
+        console.log(this.name, a);
+        this._rotationStatic = a;
+    }
+    get rotationStatic() {
+        return this._rotationStatic;
+    }
+    set positionStatic(a) {
+        this._positionStatic = a;
+    }
+    get positionStatic() {
+        return this._positionStatic;
     }
     set completelyStatic(a) {
         this.positionStatic = a;
@@ -281,7 +294,7 @@ class PhysicsObject extends SceneObject {
     }
     checkAndResolveCollisions(others) {
         let collisions = this.detectCollisions(others);
-        if (!PhysicsObject.isWall(this)) {
+        if (!this.completelyStatic) {
             for (let collision of collisions) {
                 if (collision.colliding) PhysicsObject.resolve(collision);
             }

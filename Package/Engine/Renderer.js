@@ -13,6 +13,7 @@ class Frame {
 		this.height = height;
 		this.img = new OffscreenCanvas(width, height);
 		this.c = new Artist(this.img);
+		this.c.c.imageSmoothingEnabled = !g.preservePixelart;
 	}
 }
 class Fade {
@@ -479,8 +480,8 @@ class Artist {
 				y: 0
 			},
 			scale: {
-				x: 0,
-				y: 0
+				x: 1,
+				y: 1
 			}
 		}
 	}
