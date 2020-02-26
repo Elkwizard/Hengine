@@ -123,6 +123,10 @@ class InactiveScene {
 				n.falls = el.falls;
 			} else {
 				n = this.addRectElement(el.name + " - copy", el.x, el.y, el.width, el.height, !el.completelyStatic, { ...el.controls }, el.tag);
+				n.positionStatic = el.positionStatic;
+				n.rotationStatic = el.rotationStatic;
+				n.applyGravity = el.applyGravity;
+				n.slows = el.slows;
 			}
 		} else {
 			n = this.addElement(el.name + " - copy", el.x, el.y, el.width, el.height, { ...el.controls }, el.tag);
@@ -229,9 +233,17 @@ class InactiveScene {
 		return n;
 	}
 	addUI(name, x, y, width, height, draw = function () { }) {
-		let n = this.addElement(name, x, y, width, height, new Controls(), "UI");
-		this.UI(n);
-		n.draw = draw.bind(n);
+		name = this.genName_PRIVATE(this.contains, name);
+		if (width < 0) {
+			width = -width;
+			x -= width;
+		}
+		if (height < 0) {
+			height = -height;
+			y -= height;
+		}
+		this.contains[name] = new UIObject(name, x, y, width, height, draw, this);
+		let n = this.contains[name];
 		return n;
 	}
 	addContainer(name, active) {

@@ -690,15 +690,8 @@ class PhysicsObject extends SceneObject {
         //position
         let dir = col.Adir.times(col.penetration);
         if (col.penetration > 0.005) {
-            if (!mobileB) {
-                a.privateSetX(a.x - dir.x);
-                a.privateSetY(a.y - dir.y);
-            } else {
-                a.privateSetX(a.x - dir.x / 2);
-                a.privateSetY(a.y - dir.y / 2);
-                b.privateSetX(b.x + dir.x / 2);
-                b.privateSetY(b.y + dir.y / 2);
-            }
+            a.privateSetX(a.x - dir.x);
+            a.privateSetY(a.y - dir.y);
         }
         // c.stroke(cl.RED, 2).arrow(a.centerOfMass, b.centerOfMass);
 
