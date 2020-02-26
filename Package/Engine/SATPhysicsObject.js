@@ -68,8 +68,8 @@ class PhysicsObject extends SceneObject {
         this.linearDragForce = LINEAR_LOSS;
         this.angularDragForce = ANGULAR_LOSS;
         this.density = 0.1;
-        this._positionStatic = !gravity;
-        this._rotationStatic = !gravity;
+        this.positionStatic = !gravity;
+        this.rotationStatic = !gravity;
         this._gravity = null;
         this._mass = null;
     }
@@ -106,19 +106,6 @@ class PhysicsObject extends SceneObject {
     }
     get applyGravity() {
         return this._applyGravity;
-    }
-    set rotationStatic(a) {
-        console.log(this.name, a);
-        this._rotationStatic = a;
-    }
-    get rotationStatic() {
-        return this._rotationStatic;
-    }
-    set positionStatic(a) {
-        this._positionStatic = a;
-    }
-    get positionStatic() {
-        return this._positionStatic;
     }
     set completelyStatic(a) {
         this.positionStatic = a;
