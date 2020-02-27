@@ -646,11 +646,7 @@ class Scene extends InactiveScene {
 			return a.layer - b.layer;
 		});
 		for (let rect of this.contains_array) {
-			function doElementDraw() {
-				rect.engineDrawUpdate();
-			}
-			if (rect.isUI) this.drawInScreenSpace(doElementDraw);
-			else doElementDraw();
+			rect.engineDrawUpdate();
 			rect.lifeSpan++;
 		}
 		this.c.clearTransformations();

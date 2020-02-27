@@ -92,7 +92,6 @@ class Engine {
 		this.frameLengths = [];
 		this.frameLength = 0;
 		this.frameCount = 0;
-		this.graphs = [];
 		//fallbacks
 		function f(a, b) {
 			return (a === undefined) ? b : a
@@ -234,24 +233,30 @@ class Engine {
 			}
 		}.bind(this));
 		this.recordings = {};
-		
-		this.fpsGraph = this.makeGraph("FPS", 0, 60, e => this.fps, 2000, [
-			{
-				limit: 50,
-				color: "lime"
-			},
-			{
-				limit: 30,
-				color: "yellow"
-			},
-			{
-				limit: 15,
-				color: "orange"
-			},
-			{
-				color: "red"
-			}
-		]);
+
+		let grh = true;
+		try { Graph; } catch (e) { grh = false };
+		this.hasGraphs = grh;
+		if (this.hasGraphs) {
+			this.graphs = [];
+			this.fpsGraph = this.makeGraph("FPS", 0, 60, e => this.fps, 2000, [
+				{
+					limit: 50,
+					color: "lime"
+				},
+				{
+					limit: 30,
+					color: "yellow"
+				},
+				{
+					limit: 15,
+					color: "orange"
+				},
+				{
+					color: "red"
+				}
+			]);
+		}
 	}
 	get preservePixelart() {
 		return !this.renderer.c.imageSmoothingEnabled;
@@ -272,156 +277,10 @@ class Engine {
 		}
 	}
 	makeGraph(yName, minValue, maxValue, getY, msLimit = 5000, colors) {
-		if (!colors) colors = [];
-		let c = new Frame(1, 1).c;
-		let leftOffset = Math.max(c.c.measureText(maxValue.toString()).width, c.c.measureText(minValue.toString()).width) + 10;
-		let bottomTextOffset = 5;
-		let mainGraphWidth = 400 - leftOffset;
-		let f = new Frame(400, 200 + bottomTextOffset * 3 + 10);
-		function drawBasics(black, white) {
-			f.c.draw(black).rect(0, 0, f.width, f.height);
-			f.c.stroke(white, 2).rect(leftOffset, -2, 422, 200);
-			f.c.c.font = "10px Arial";
-			f.c.textMode = "center";
-			f.c.draw(white).text("10px Arial", maxValue, leftOffset / 2, 2);
-			f.c.draw(white).text("10px Arial", minValue, leftOffset / 2, 190);
-			let tx = leftOffset / 2;
-			let ty = 100;
-			if (!Array.isArray(yName)) {
-				f.c.translate(tx, ty);
-				f.c.rotate(-Math.PI / 2);
-				f.c.draw(white).text("10px Arial", yName.split("").join(" "), 0, -5);
-				f.c.rotate(Math.PI / 2);
-				f.c.translate(-tx, -ty);
-			}
-			f.c.draw(white).text("10px Arial", "Time", 220, 200 + bottomTextOffset);
-			f.c.textMode = "left";
-			f.c.draw(white).text("10px Arial", "5000", leftOffset + 370, 200 + bottomTextOffset);
-			f.c.draw(white).text("10px Arial", "0", leftOffset, 200 + bottomTextOffset);
-		}
-		class EQN {
-			constructor(getY) {
-				this.getY = getY;
-				this.data = [];
-				this.permanentData = "";
-			}
-		}
-		if (!Array.isArray(yName)) {
-			f.vars = {
-				[yName]: new EQN(getY)
-			};
-		} else {
-			f.vars = {};
-			for (let i = 0; i < yName.length; i++) f.vars[yName[i]] = new EQN(getY[i]);
-		}
-		f.timeOffset = 0;
-		f.msLimit = msLimit;
-		let colorScheme = "dark";
-		Object.defineProperty(f, "colorScheme", {
-			get: function () {
-				return colorScheme;
-			},
-			set(a) {
-				colorScheme = a;
-				let black = (colorScheme.toLowerCase() == "dark") ? "black" : "white";
-				let white = (colorScheme.toLowerCase() == "dark") ? "white" : "black";
-				drawBasics(black, white);
-			}
-		})
-		f.colorScheme = "dark";
-		let black = (f.colorScheme.toLowerCase() == "dark") ? "black" : "white";
-		let white = (f.colorScheme.toLowerCase() == "dark") ? "white" : "black";
-		drawBasics(black, white);
-		function getColor(n) {
-			for (let color of colors) {
-				if (n >= color.limit) return color.color;
-			}
-			return black;
-		}
-		let graphFrame = new Frame(400, 198);
-		let f2 = graphFrame;
-		const getYValue = (fV) => clamp(200 - ((fV - minValue) / (maxValue - minValue)) * 200, 0, 198);
-		const getXValue = (fV) => mainGraphWidth * ((fV - f.timeOffset) / f.msLimit);
-		f.get = function () {
-			let black = (f.colorScheme.toLowerCase() == "dark") ? "black" : "white";
-			let white = (f.colorScheme.toLowerCase() == "dark") ? "white" : "black";
-			f.c.textMode = "left";
-			f.c.draw(black).rect(leftOffset + 2, 0, 420, 198);
-			f2.c.clear();
-			f2.c.c.setLineDash([4, 2]);
-			let lastCol = {
-				limit: maxValue
-			};
-			for (let i = 0; i < colors.length; i++) {
-				f2.c.c.globalAlpha = 0.1;
-				let col = colors[i];
-				let dif = lastCol.limit - col.limit;
-				if (!col.limit) col.limit = minValue;
-				f2.c.draw(col.color).rect(0, getYValue(lastCol.limit), mainGraphWidth, getYValue(col.limit) - getYValue(lastCol.limit));
-				f2.c.c.globalAlpha = .5;
-				f2.c.stroke(col.color, 2).line(0, getYValue(lastCol.limit), mainGraphWidth, getYValue(lastCol.limit));
-				lastCol = col;
-			}
-			f2.c.c.globalAlpha = 1;
-			f2.c.c.setLineDash([]);
-			let len = 0;
-			for (let key in f.vars) len++;
-			for (let key in f.vars) {
-				let last = null;
-				let fData = f.vars[key].data;
-				let step = 1;
-				if (fData.length > 300) step = Math.ceil(fData.length / 300);
-				for (let i = 0; i - step < fData.length; i += step) {
-					let data = fData[Math.min(i, fData.length - 1)];
-					if (last) {
-						let x1 = getXValue(last.x);
-						let y1 = getYValue(last.y);
-						let x2 = getXValue(data.x);
-						let y2 = getYValue(data.y);
-						let col = getColor(data.y);
-						f2.c.stroke(col, 3).line(x1, y1, x2, y2);
-					}
-					last = data;
-				}
-				f2.c.textMode = "right";
-				let y = getYValue(last.y);
-				if (y > 185) y -= 15;
-				let prefix = key + ": ";
-				if (len == 1) prefix = "";
-				let text = prefix + last.y;
-				let w = f.c.c.measureText(text).width;
-				f2.c.draw(black).rect(
-					getXValue(last.x) - 10 - w,
-					y + 1,
-					w + 6,
-					16
-				);
-				f2.c.stroke(white, 1).rect(
-					getXValue(last.x) - 10 - w,
-					y + 1,
-					w + 6,
-					16
-				);
-				f2.c.draw(white).text(
-					"10px Arial",
-					text,
-					getXValue(last.x) - 8,
-					y + 3
-				);
-			}
-			f.c.drawImage(f2, leftOffset + 2, 0);
-			let timeStart = Time.formatMS(Math.floor(f.timeOffset));
-			let timeEnd = Time.formatMS(Math.floor(f.timeOffset) + f.msLimit);
-			f.c.draw(black).rect(leftOffset, 200 + bottomTextOffset, f.c.c.measureText(timeStart).width, 200);
-			f.c.draw(white).text("10px Arial", timeStart, leftOffset, 200 + bottomTextOffset);
-			f.c.draw(black).rect(leftOffset + mainGraphWidth - 10 - f.c.c.measureText(timeEnd).width, 200 + bottomTextOffset, 200, 200);
-			f.c.textMode = "right";
-			f.c.draw(white).text("10px Arial", timeEnd, mainGraphWidth - 10 + leftOffset, 200 + bottomTextOffset);
-
+		if (this.hasGraphs) {
+			let f = new Graph(yName, minValue, maxValue, getY, msLimit, colors, this);
 			return f;
 		}
-		this.graphs.push(f);
-		return f;
 	}
 	parseGraphData(data) {
 		let result = data.split(" ").map(e => {
@@ -432,6 +291,7 @@ class Engine {
 		return result;
 	}
 	updateGraphs() {
+		if (!this.hasGraphs) return;
 		let t = performance.now();
 		for (let graph of this.graphs) {
 			for (let key in graph.vars) {
@@ -444,6 +304,7 @@ class Engine {
 		}
 	}
 	getFPSGraph() {
+		if (!this.hasGraphs) return;
 		return this.fpsGraph.get();
 	}
 	end() {
