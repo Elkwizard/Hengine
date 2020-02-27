@@ -218,7 +218,8 @@ class PhysicsObject extends SceneObject {
     slowDown() {
         //apply linear drag;
         let drag = this.velocity.get().mul(-(1 - this.linearDragForce));
-        this.applyImpulse(new Impulse(drag, this.centerOfMass));
+        let iD = new Impulse(drag, this.centerOfMass);
+        this.applyImpulse(iD);
     }
     capSpeed() {
         let m = Math.min(this.width, this.height) / 2;
@@ -282,7 +283,8 @@ class PhysicsObject extends SceneObject {
     checkAndResolveCollisions(others) {
         let collisions = this.detectCollisions(others);
         if (!this.completelyStatic) {
-            for (let collision of collisions) {
+            for (let i = 0; i < collisions.length; i++) {
+                let collision = collisions[i];
                 if (collision.colliding) PhysicsObject.resolve(collision);
             }
         }
@@ -298,8 +300,8 @@ class PhysicsObject extends SceneObject {
                 //gravity
                 let gv = this.gravity;
                 let gravitationalForce = gv;
-                let gravity = new Impulse(gravitationalForce, this.centerOfMass);
-                this.applyImpulse(gravity);
+                let iG = new Impulse(gravitationalForce, this.centerOfMass);
+                this.applyImpulse(iG);
             }
             let spdMod = this.home.speedModulation / this.home.physicsRealism;
             for (let i = 0; i < this.home.physicsRealism; i++) {
@@ -355,12 +357,14 @@ class PhysicsObject extends SceneObject {
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
         // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.plus(impulse.source));
+        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
+        if (!impulse) return;
         this.velocity.add(impulse.force);
     }
     applyAngularImpulse(impulse) {
+        if (!impulse) return;
         let com = this.centerOfMass;
         let startVector = impulse.source.minus(com);
         if (startVector.mag < 0.01) return;
@@ -470,7 +474,7 @@ class PhysicsObject extends SceneObject {
         result.corner = farthest;
         return result;
     }
-    static getImpulses(a, b, dirFromA, dirFromB, collisionPoint, penetration) {
+    static getImpulses(a, b, dirFromA, dirFromB, collisionPoint) {
         let impulseA, impulseB;
 
         let aPercentMass = 1 * (a.mass / (a.mass + b.mass));
@@ -492,14 +496,13 @@ class PhysicsObject extends SceneObject {
                 forceFromB = forceFromA * (1 - a.snuzzlement);
             } else {
                 forceFromB = 0;
-                aPercentMass = 0.5;
-                bPercentMass = 0.5;
             }
         }
 
-
-        impulseA = new Impulse(dirFromB.times(forceFromB), source);
-        impulseB = new Impulse(dirFromA.times(forceFromA), source);
+        let rotationB = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
+        let rotationA = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
+        impulseA = new Impulse(rotationB.plus(dirFromB.times(forceFromB)), source);
+        impulseB = new Impulse(rotationA.plus(dirFromA.times(forceFromA)), source);
 
         let forceA = impulseA.force.minus(impulseB.force).times(bPercentMass);
         let forceB = impulseB.force.minus(impulseA.force).times(aPercentMass);
@@ -509,10 +512,6 @@ class PhysicsObject extends SceneObject {
         impulseB.force = forceB;
 
         if (b.positionStatic) impulseB = null;
-
-        // if (impulseA && !impulseA.force.mag && impulseB && !impulseB.force.mag) return { impulseA: null, impulseB: null };
-        // impulseA = null;
-        // impulseB = null;
 
         return { impulseA, impulseB };
     }
@@ -529,10 +528,8 @@ class PhysicsObject extends SceneObject {
             let bPoint = collisionAxis.times(-b.radius).plus(b.middle);
             let collisionPoint = aPoint.plus(bPoint).over(2);
 
-            //impulse resolution
-            let impulses = PhysicsObject.getImpulses(a, b, collisionPoint.minus(a.middle).normalize(), collisionPoint.minus(b.middle).normalize(), collisionPoint, penetration);
 
-            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB, collisionPoint);
+            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, collisionPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -553,10 +550,7 @@ class PhysicsObject extends SceneObject {
             collisionAxis.normalize();
             if (inside) collisionAxis.mul(-1);
 
-            //impulse resolution
-            let impulses = PhysicsObject.getImpulses(b, a, collisionAxis.times(-1), collisionAxis, bestPoint, penetration);
-
-            let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseB, impulses.impulseA, bestPoint);
+            let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint);
             return col;
         } else return new Collision(false, a, b);
     }
@@ -578,10 +572,8 @@ class PhysicsObject extends SceneObject {
             let penetration = a.radius + (inside ? bestDist : -bestDist);
             if (inside) collisionAxis.mul(-1);
 
-            //impulse resolution
-            let impulses = PhysicsObject.getImpulses(a, b, collisionAxis, collisionAxis.times(-1), bestPoint, penetration);
 
-            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, impulses.impulseA, impulses.impulseB, bestPoint);
+            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -668,9 +660,8 @@ class PhysicsObject extends SceneObject {
                 collisionAxis.normalize();
                 //figure out impulses
                 let collisionPoint = finalPenetratingCornerOwner.getCorners()[finalPenetratingCornerIndex];
-                let impulses = PhysicsObject.getImpulses(a, b, collisionAxis.times(-1), collisionAxis.get(), collisionPoint, leastIntersection);
 
-                col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, impulses.impulseA, impulses.impulseB, collisionPoint);
+                col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, collisionPoint);
             } else {
                 col = new Collision(false, a, b);
                 a.rotation += 0.00001;
@@ -680,10 +671,15 @@ class PhysicsObject extends SceneObject {
         return col;
     }
     static resolve(col) {
+        //get new collision
+        let a = col.a;
+        let b = col.b;
+
+
         //resolve collisions
         const d = col.Bdir;
-        const a = col.a;
-        const b = col.b;
+        a = col.a;
+        b = col.b;
         let collisionPoint = col.collisionPoint;
         let mobileA = !PhysicsObject.isWall(a)
         let mobileB = !PhysicsObject.isWall(b)
@@ -709,14 +705,14 @@ class PhysicsObject extends SceneObject {
         let friction = frictionDir.plus(0);
         friction.mag = -frictionDir.dot(aPointVel) / 100;
         let cp = col.collisionPoint;
-        // c.draw(cl.RED).circle(cp.x, cp.y, 3);
-        // c.stroke(cl.RED, 2 / s.zoom).arrow(cp, frictionDir.times(100).plus(cp));
         a.angularVelocity *= a.angularDragForce;
-        a.applyImpulse(new Impulse(friction, cp));
+        let iF = new Impulse(friction, cp);
+        a.applyImpulse(iF);
 
         //impulse resolution
-        let iA = col.impulseA;
-        let iB = col.impulseB;
+        let impulses = PhysicsObject.getImpulses(a, b, col.Adir, col.Bdir, collisionPoint, col.penetration);
+        let iA = impulses.impulseA;
+        let iB = impulses.impulseB;
         a.applyImpulse(iA);
         b.applyImpulse(iB);
 

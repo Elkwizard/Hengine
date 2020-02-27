@@ -1,13 +1,11 @@
 class Collision {
-    constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, impulseA, impulseB, collisionPoint) {
+    constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, collisionPoint) {
         this.colliding = collides;
         this.Adir = Adir;
         this.Bdir = Bdir;
         this.a = a;
         this.b = b;
         this.penetration = penetration;
-        this.impulseA = impulseA;
-        this.impulseB = impulseB;
         this.collisionPoint = collisionPoint;
     }
 }

@@ -574,15 +574,7 @@ class Scene extends InactiveScene {
 			let isUseless = (a) => !(a instanceof PhysicsObject) || !a.canCollide || (a.tag === "Engine-Particle");
 			let useful = []
 			let useless = [];
-			let sortedEls = this.contains_array.sort(function (a, b) {
-				// let aVel = a.angularVelocity;
-				// let bVel = a.angularVelocity;
-				// if (!(aVel || bVel)) return 0;
-				// else if (aVel && !bVel) return 1;
-				// else if (!aVel && bVel) return -1;
-				// else return aVel - bVel;
-				return 0;
-			});
+			let sortedEls = this.contains_array;
 			for (let rect of sortedEls) {
 				if (isUseless(rect)) {
 					useless.push(rect);
@@ -601,7 +593,7 @@ class Scene extends InactiveScene {
 				let rect = useful[i];
 				let updater = [];
 				let updateCells = cells2[i];
-				if (rect.velocity.mag) for (let cell of updateCells) {
+				if (!rect.completelyStatic) for (let cell of updateCells) {
 					for (let r of cell) {
 						if (r !== rect && !updater.includes(r)) updater.push(r);
 					}
