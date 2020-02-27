@@ -110,12 +110,12 @@ class SceneObject extends Rect {
 	}
 	scriptUpdate() {
 		for (let m of this.scripts) {
-			m.scriptUpdate();
+			m.scriptUpdate(m);
 		}
 	}
 	scriptDraw() {
 		for (let m of this.scripts) {
-			m.scriptDraw();
+			m.scriptDraw(m);
 		}
 	}
 	logMod(func) {

@@ -464,7 +464,7 @@ class Scene extends InactiveScene {
 				this.get(o).response.click(adjusted);
 				let m = this.get(o);
 				for (let script of m.scripts) {
-					script.scriptClick(adjusted);
+					script.scriptClick(script, adjusted);
 				}
 			}
 		}.bind(this);
@@ -474,7 +474,7 @@ class Scene extends InactiveScene {
 				this.get(o).response.rightClick(adjusted);
 				let m = this.get(o);
 				for (let script of m.scripts) {
-					script.scriptRightClick(adjusted);
+					script.scriptRightClick(script, adjusted);
 				}
 			}
 		}.bind(this);
@@ -486,7 +486,7 @@ class Scene extends InactiveScene {
 					o.response.hover(adjusted);
 					let m = this.get(o);
 					for (let script of m.scripts) {
-						script.scriptHover(adjusted);
+						script.scriptHover(script, adjusted);
 					}
 				}
 				o.hovered = true;
