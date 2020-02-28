@@ -1,5 +1,5 @@
 const LINEAR_LOSS = .985;
-const ANGULAR_LOSS = 1//.995;
+const ANGULAR_LOSS = .985;
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, width, height, gravity, controls, tag, home) {
         super(name, x, y, width, height, controls, tag, home);
@@ -200,8 +200,7 @@ class PhysicsObject extends SceneObject {
             c.translate(mcx, mcy);
             c.rotate(r);
             c.translate(-mcx, -mcy);
-            this.draw();
-            this.scriptDraw();
+            this.runDraw();
             c.translate(mcx, mcy);
             c.rotate(-r);
             // c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
@@ -356,8 +355,8 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
-        // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
+        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
@@ -496,6 +495,8 @@ class PhysicsObject extends SceneObject {
                 forceFromB = forceFromA * (1 - a.snuzzlement);
             } else {
                 forceFromB = 0;
+                aPercentMass = 0.5;
+                bPercentMass = 0.5;
             }
         }
 
@@ -511,7 +512,7 @@ class PhysicsObject extends SceneObject {
         impulseA.force = forceA;
         impulseB.force = forceB;
 
-        if (b.positionStatic) impulseB = null;
+        if (b.completelyStatic) impulseB = null;
 
         return { impulseA, impulseB };
     }
@@ -693,6 +694,7 @@ class PhysicsObject extends SceneObject {
 
         //friction
         let frictionDir = d.normal.normalize();
+        let angleVel = collisionPoint.minus(Geometry.rotatePointAround(a.centerOfMass, collisionPoint, a.angularVelocity));
         let aPointVel = a.velocity;
         let velDot1 = frictionDir.dot(a.velocity);
         let velDot2 = frictionDir.times(-1).dot(aPointVel);

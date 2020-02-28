@@ -53,7 +53,7 @@ class SceneObject extends Rect {
 		this.hovered = false;
 		this.layer = 0;
 		this.scripts = {
-			[Symbol.iterator]: function*() {
+			[Symbol.iterator]: function* () {
 				let ary = [];
 				for (let m in this) {
 					let a = this[m];
@@ -132,11 +132,14 @@ class SceneObject extends Rect {
 	collidePoint(x, y) {
 		return this.collider.collidePoint(x, y);
 	}
+	runDraw() {
+		this.draw();
+		this.scriptDraw();
+	}
 	engineDrawUpdate() {
-		this.update();
 		if (!this.hidden) {
-			this.draw();
-			this.scriptDraw();
+			this.runDraw();
+			this.update();
 		}
 	}
 	enginePhysicsUpdate(hitboxes) {

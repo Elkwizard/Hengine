@@ -135,8 +135,7 @@ class PhysicsObject extends SceneObject {
 	}
 	engineDrawUpdate() {
 		if (!this.hidden && (!this.cullGraphics || !this.home.cullGraphics || this.collide(this.home.adjustedDisplay))) {
-			this.draw();
-			this.scriptDraw();
+			this.runDraw();
 			this.shown = true;
 		} else {
 			this.shown = false;
