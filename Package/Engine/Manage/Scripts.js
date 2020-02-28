@@ -32,20 +32,20 @@ class Script {
 		if (bindTo === undefined) bindTo = obj;
 		let local = obj[this.name];
 		local.scriptNumber = 1;
-		local.scriptUpdate = e => e;
-		local.scriptDraw = e => e;
-		local.scriptCollideTop = e => e;
-		local.scriptCollideLeft = e => e;
-		local.scriptCollideRight = e => e;
-		local.scriptCollideBottom = e => e;
-		local.scriptCollideGeneral = e => e;
-		local.scriptClick = e => e;
-		local.scriptRightClick = e => e;
-		local.scriptHover = e => e;
+		local.scriptUpdate = (l, e) => e;
+		local.scriptDraw = (l, e) => e;
+		local.scriptCollideTop = (l, e) => e;
+		local.scriptCollideLeft = (l, e) => e;
+		local.scriptCollideRight = (l, e) => e;
+		local.scriptCollideBottom = (l, e) => e;
+		local.scriptCollideGeneral = (l, e) => e;
+		local.scriptClick = (l, e) => e;
+		local.scriptRightClick = (l, e) => e;
+		local.scriptHover = (l, e) => e;
 		for (let x in this.methods) {
 			let flag = this.methods[x].flag.toLowerCase();
 			if (flag === "init") {
-				this.methods[x].bind(bindTo)(...args);
+				this.methods[x].bind(bindTo)(local, ...args);
 			}
 			else if (flag === "update") {
 				local.scriptUpdate = local.scriptUpdate.add(this.methods[x].bind(bindTo));
@@ -99,11 +99,6 @@ class ElementScript extends Script {
 	}
 	addTo(el, ...args) {
 		this.attachTo(el.scripts, el, ...args);
-		let self = this;
-		el.logMod(function () {
-			let correct = args.map(e => (e instanceof SceneObject) ? this.home.copy(e) : e);
-			self.addTo(this, ...correct);
-		});
 		return this;
 	}
 }
