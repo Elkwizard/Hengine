@@ -416,13 +416,15 @@ function setupAlerts() {
 			m = m + "";
 			m = m.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
 			al.style.transition = "all 0s";
-			let style = { top: "-5%", opacity: "0" };
+			let style = { top: "-5%", opacity: "0", display: "none" };
 			if (isSequence) {
 				style.top = "-1%";
 				style.opacity = "1";
+				style.display = "block";
 			}
 			al.style.top = style.top;
 			al.style.opacity = style.opacity;
+			al.style.display = display;
 			alertClosed = false;
 
 			let breaks = m.match(/<br>/g);
