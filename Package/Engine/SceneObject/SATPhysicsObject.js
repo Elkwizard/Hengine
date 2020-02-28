@@ -671,28 +671,10 @@ class PhysicsObject extends SceneObject {
         return col;
     }
     static resolve(col) {
-        //get new collision
-        let a = col.a;
-        let b = col.b;
-
-
         //resolve collisions
-
         let a = col.a;
         let b = col.b;
-        let aC = a instanceof CirclePhysicsObject;
-        let bC = b instanceof CirclePhysicsObject;
-        if (aC && !bC) col = PhysicsObject.collideCircleRect(a, b);
-        if (!aC && bC) col = PhysicsObject.collideRectCircle(a, b);
-        if (aC && bC) col = PhysicsObject.collideCircleCircle(a, b);
-        if (!aC && !bC) col = PhysicsObject.collideRectRect(a, b);
-        if (!col.colliding) return;
-
-        a = col.a;
-        b = col.b;
         const d = col.Bdir;
-        a = col.a;
-        b = col.b;
         let collisionPoint = col.collisionPoint;
         let mobileA = !PhysicsObject.isWall(a)
         let mobileB = !PhysicsObject.isWall(b)
