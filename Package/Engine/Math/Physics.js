@@ -241,6 +241,9 @@ class Physics {
     }
     static resolve(col) {
         //resolve collisions
+
+
+
         let a = col.a;
         let b = col.b;
         const d = col.Bdir;
@@ -250,8 +253,15 @@ class Physics {
         //position
         let dir = col.Adir.times(col.penetration);
         if (col.penetration > 0.005) {
-            a.privateSetX(a.x - dir.x);
-            a.privateSetY(a.y - dir.y);
+            let aPer = 1 - a.mass / (a.mass + b.mass);
+            if (!mobileB) aPer = 1;
+            let bPer = 1 - aPer;
+            let aMove = dir.times(aPer);
+            let bMove = dir.times(-bPer);
+            a.privateSetX(a.x - aMove.x);
+            a.privateSetY(a.y - aMove.y);
+            b.privateSetX(b.x - bMove.x);
+            b.privateSetY(b.y - bMove.y);
         }
         // c.stroke(cl.RED, 2).arrow(a.centerOfMass, b.centerOfMass);
 
