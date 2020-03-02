@@ -417,10 +417,21 @@ class InactiveScene {
 			}
 		}
 	}
-	collideBox(box) {
+	collideRect(box) {
 		let collideAry = [];
 		for (let hitbox of this.updateArray()) {
-			if (hitbox.collider.collideBox(box)) {
+			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Rect") + "Rect";
+			if (Physics[name](hitbox, box).colliding) {
+				collideAry.push(hitbox);
+			}
+		}
+		return collideAry;
+	}
+	collideCircle(cir) {
+		let collideAry = [];
+		for (let hitbox of this.updateArray()) {
+			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Rect") + "Circle";
+			if (Physics[name](hitbox, cir).colliding) {
 				collideAry.push(hitbox);
 			}
 		}
@@ -429,7 +440,8 @@ class InactiveScene {
 	collidePoint(point) {
 		let collideAry = [];
 		for (let hitbox of this.updateArray()) {
-			if (hitbox.collider.collidePoint(point.x, point.y)) {
+			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Rect") + "Point";
+			if (Physics[name](hitbox, point).colliding) {
 				collideAry.push(hitbox);
 			}
 		}
@@ -439,7 +451,8 @@ class InactiveScene {
 		let collideAry = [];
 		let notCollideAry = [];
 		for (let hitbox of this.contains_array) {
-			if (hitbox.collider.collidePoint(point.x, point.y)) {
+			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Rect") + "Point";
+			if (Physics[name](hitbox, point).colliding) {
 				collideAry.push(hitbox);
 			} else {
 				notCollideAry.push(hitbox);
@@ -480,7 +493,7 @@ class Scene extends InactiveScene {
 		}.bind(this);
 		M.engineMove = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
-			let collided = this.collidePointBoth(adjusted)
+			let collided = this.collidePointBoth(adjusted);
 			for (let o of collided[0]) {
 				if (!o.hovered) {
 					o.response.hover(adjusted);
@@ -580,7 +593,7 @@ class Scene extends InactiveScene {
 					useless.push(rect);
 					continue;
 				} else useful.push(rect);
-				let cls = PhysicsObject.getCells(rect, this.cellSize);
+				let cls = Physics.getCells(rect, this.cellSize);
 				for (let cl of cls) {
 					let key = cl.x + "," + cl.y;
 					if (cells[key]) cells[key].push(rect);

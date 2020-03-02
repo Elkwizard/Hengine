@@ -129,9 +129,6 @@ class SceneObject extends Rect {
 		for (let x of this.log) x.bind(el)();
 		return el;
 	}
-	collidePoint(x, y) {
-		return this.collider.collidePoint(x, y);
-	}
 	runDraw() {
 		this.draw();
 		this.scriptDraw();

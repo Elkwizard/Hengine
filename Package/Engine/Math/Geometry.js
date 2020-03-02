@@ -26,16 +26,21 @@ class Geometry {
     static distToPoint(p, p2) {
         return Math.sqrt(Geometry.distToPoint2(p, p2));
     }
+    static signedAngularDist(r1, r2) {
+        r1 %= Math.PI * 2;
+        r2 % Math.PI * 2;
+        let dif = r2 - r1;
+        if (r2 < r1) dif *= -1;
+        if (Math.abs(dif - Math.PI * 2) < Math.abs(dif)) dif -= Math.PI * 2;
+        if (r2 < r1) dif *= -1;
+        return dif;
+    }
     static distToRect(p, r) {
-        let d = Geometry.distToPoint(p, Geometry.closestPointOnRectangle(p, r));//Math.sqrt(Geometry.distToRect2(p, r));
+        let d = Math.sqrt(Geometry.distToRect2);
         return d;
     }
     static distToRect2(p, r) {
-        let ax = p.x - (r.x + r.width / 2);
-        let ay = p.y - (r.y + r.height / 2);
-        let dx = Math.max(Math.abs(ax) - (r.width / 2), 0);
-        let dy = Math.max(Math.abs(ay) - (r.height / 2), 0);
-        return (dx ** 2) + (dy ** 2);
+        return Geometry.distToPoint2(p, Geometry.closestPointOnRectangle(p, r));
     }
     static farthestInDirection(corners, dir) {
         let farthest = corners[0];
@@ -309,8 +314,7 @@ class Geometry {
         if (!r.rotation) {
             return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
         } else {
-            let col = new RectCollider(r);
-            return col.collidePoint(p.x, p.y);
+            return Physics.collideRectPoint(r, p).colliding;
         }
     }
     static overlapCircleRect(c, r) {
