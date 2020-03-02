@@ -96,7 +96,6 @@ class Geometry {
         return dif;
     }
     static closestPointOnRectangle(point, r) {
-        if (!r.rotation) r.rotation = 0.001;
         let edges = [];
         let corners = r.getCorners();
         let bestPoint = null;
@@ -108,7 +107,7 @@ class Geometry {
         }
         for (let edge of edges) {
             let p = Geometry.closestPointOnLineObject(point, edge);
-            let dist = g.f.getDistance(p, point);
+            let dist = Geometry.distToPoint2(p, point);
             if (dist < bestDist) {
                 bestDist = dist;
                 bestPoint = p;
@@ -122,8 +121,8 @@ class Geometry {
         let max = Math.max(l.a.x, l.b.x);
         let dx = l.b.x - l.a.x;
         let dy = l.b.y - l.a.y;
-        if (!dx) dx = 0.0000001;
-        if (!dy) dy = 0.0000001;
+        if (!dx) dx = 0.00000000000000001;
+        if (!dy) dy = 0.00000000000000001;
         let b = l.a.y - l.a.x * (dy / dx);
         let x1 = p.x;
         let y1 = p.y;
@@ -138,7 +137,6 @@ class Geometry {
         let y1 = p.y;
         let dx = d.x;
         let dy = d.y;
-        if (!dx) dx = 0.000000001;
         let xv = ((dx ** 2) * x1 + (dx * dy * y1)) / (dx ** 2 + dy ** 2);
         let yv = (dy / dx) * xv;
         return new Vector2(xv, yv);

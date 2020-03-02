@@ -627,15 +627,27 @@ class Artist {
 	}
 	drawTexture(txr = new Texture(0, 0), x = 0, y = 0, width = txr.width, height = txr.height) {
 		let imagedata = txr.imageData;
+		if (typeof x === "object") {
+			width = x.width;
+			height = x.height;
+			y = x.y;
+			x = x.x;
+		}
 		let f = new OffscreenCanvas(txr.width, txr.height);
 		f.getContext('2d').putImageData(imagedata, 0, 0);
 		this.c.drawImage(f, x, y, width, height);
 	}
 	drawImage(img, x, y, width, height) {
+		if (typeof x === "object") {
+			width = x.width;
+			height = x.height;
+			y = x.y;
+			x = x.x;
+		}
 		if (img instanceof Frame) img = img.img;
 		if (width === undefined) width = img.width;
 		if (height === undefined) height = img.height;
-		this.c.drawImage(img, x, y, width, height)
+		this.c.drawImage(img, x, y, width, height);
 	}
 	drawWithAlpha(a, shape) {
 		this.c.globalAlpha = a;

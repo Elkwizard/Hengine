@@ -616,6 +616,8 @@ class Scene extends InactiveScene {
 				rect.enginePhysicsUpdate(updater);
 			}
 			for (let rect of useless) rect.enginePhysicsUpdate([]);
+			for (let rect of useful) rect.resolveImpulses();
+			// // show cells
 			// s.drawInWorldSpace(e => {
 			// 	for (let [key, cell] of cells) {
 			// 		let x = parseInt(key.split(",")[0]) * this.cellSize;

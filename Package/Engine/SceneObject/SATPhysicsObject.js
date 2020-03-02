@@ -14,6 +14,26 @@ class PhysicsObject extends SceneObject {
         this.slows = gravity;
         this.home.hasRotatedRectangles = true;
         this.links = [];
+        this.direction = new Vector2(0, 0);
+        this.lastX = this.x;
+        this.lastY = this.y;
+        this.hasPhysics = true;
+        this.collideBasedOnRule = e => true;
+        this.optimize = (a, b) => true;
+        this.canMoveThisFrame = true;
+        this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
+        this.snuzzlement = 1;
+        this.linearDragForce = LINEAR_LOSS;
+        this.angularDragForce = ANGULAR_LOSS;
+        this.friction = FRICTION_LOSS;
+        this.density = 0.1;
+        this.positionStatic = !gravity;
+        this.rotationStatic = !gravity;
+        this.contactPoints = [];
+        this.impulses = [];
+        this.canCollide = true;
+        this._gravity = null;
+        this._mass = null;
         this.colliding = {
             top: null,
             bottom: null,
@@ -28,7 +48,6 @@ class PhysicsObject extends SceneObject {
             left: function () { },
             right: function () { }
         }
-        this.canCollide = true;
         for (let x in this.response.collide) {
             let cap = x[0].toUpperCase() + x.slice(1);
             this["scriptCollide" + cap] = function (e) {
@@ -58,23 +77,6 @@ class PhysicsObject extends SceneObject {
                 }
             }
         };
-        this.direction = new Vector2(0, 0);
-        this.lastX = this.x;
-        this.lastY = this.y;
-        this.hasPhysics = true;
-        this.collideBasedOnRule = e => true;
-        this.optimize = (a, b) => true;
-        this.canMoveThisFrame = true;
-        this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
-        this.snuzzlement = 1;
-        this.linearDragForce = LINEAR_LOSS;
-        this.angularDragForce = ANGULAR_LOSS;
-        this.friction = FRICTION_LOSS;
-        this.density = 0.1;
-        this.positionStatic = !gravity;
-        this.rotationStatic = !gravity;
-        this._gravity = null;
-        this._mass = null;
     }
     get gravity() {
         if (this._gravity === null) return this.home.gravity;
@@ -130,6 +132,7 @@ class PhysicsObject extends SceneObject {
         for (let [key, value] of this.colliding) this.colliding[key] = null;
         this.canMoveThisFrame = true;
         this.allCollidingWith.clear();
+        this.contactPoints = [];
     }
     drawWithoutRotation(artist) {
         let com = this.centerOfMass;
@@ -199,22 +202,10 @@ class PhysicsObject extends SceneObject {
                     if (other.hasPhysics && other.tag !== "Engine-Particle") {
                         if (this.optimize(this, other)) {
                             if (this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
-                                let col;
-                                let thisCircle = this instanceof CirclePhysicsObject;
-                                let otherCircle = other instanceof CirclePhysicsObject;
-                                if (thisCircle) {
-                                    if (otherCircle) {
-                                        col = Physics.collideCircleCircle(this, other);
-                                    } else {
-                                        col = Physics.collideCircleRect(this, other);
-                                    }
-                                } else {
-                                    if (otherCircle) {
-                                        col = Physics.collideRectCircle(this, other);
-                                    } else {
-                                        col = Physics.collideRectRect(this, other);
-                                    }
-                                }
+                                let nameA = (this instanceof CirclePhysicsObject)? "Circle":"Rect";
+                                let nameB = (other instanceof CirclePhysicsObject)? "Circle":"Rect";
+                                let col = Physics["collide" + nameA + nameB](this, other);
+                                
                                 if (col.colliding) {
                                     this.allCollidingWith["Rect - " + other.name] = other;
                                     other.allCollidingWith["Rect - " + this.name] = this;
@@ -239,6 +230,15 @@ class PhysicsObject extends SceneObject {
                 if (collision.colliding) Physics.resolve(collision);
             }
         }
+    }
+    resolveImpulses() {
+        for (let impulse of this.impulses) {
+            if (!impulse) continue;
+            this.applyLinearImpulse(impulse);
+            this.applyAngularImpulse(impulse);
+        }
+        // c.draw(cl.RED).text("10px Monospace", this.contactPoints.length, this.middle.x, this.middle.y);
+        this.impulses = [];
     }
     physicsUpdate(others) {
         s.drawInWorldSpace(e => {
@@ -305,8 +305,9 @@ class PhysicsObject extends SceneObject {
     }
     applyImpulse(impulse, name = "no name") {
         if (!impulse) return;
-        this.applyLinearImpulse(impulse);
-        this.applyAngularImpulse(impulse);
+        impulse.force = impulse.force.over(Math.max(1, this.contactPoints.length));
+        this.impulses.push(impulse);
+        this.resolveImpulses();
         c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
         c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }

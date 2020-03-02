@@ -44,8 +44,6 @@ class Link {
         let p = l.midPoint;
         let cps = Geometry.closestPointOnRectangle(p, this.start);
         let cpe = Geometry.closestPointOnRectangle(p, this.end);
-        this.start.applyImpulse(new Impulse(dir.over(100), cps));
-        this.end.applyImpulse(new Impulse(dir.over(100), cpe));
     }
 }
 class Physics {
@@ -87,6 +85,10 @@ class Physics {
             let bPoint = collisionAxis.times(-b.radius).plus(b.middle);
             let collisionPoint = aPoint.plus(bPoint).over(2);
 
+            //contacts
+            a.contactPoints.push(collisionPoint);
+            b.contactPoints.push(collisionPoint);
+
 
             col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, collisionPoint);
         } else col = new Collision(false, a, b);
@@ -109,6 +111,11 @@ class Physics {
             let collisionAxis = new Vector2(b.middle.x - bestPoint.x, b.middle.y - bestPoint.y);
             collisionAxis.normalize();
             if (inside) collisionAxis.mul(-1);
+            
+
+            //contacts
+            a.contactPoints.push(bestPoint);
+            b.contactPoints.push(bestPoint);
 
             let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint);
             return col;
@@ -131,7 +138,10 @@ class Physics {
             let collisionAxis = bestPoint.minus(a.middle).normalize();
             let penetration = a.radius + (inside ? bestDist : -bestDist);
             if (inside) collisionAxis.mul(-1);
-
+            
+            //contacts
+            a.contactPoints.push(bestPoint);
+            b.contactPoints.push(bestPoint);
 
             col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint);
         } else col = new Collision(false, a, b);
@@ -218,7 +228,7 @@ class Physics {
                 //figure out impulses
                 let corners = finalPenetratingCornerOwner.getCorners();
                 let ownerDir = (finalPenetratingCornerOwner === a) ? collisionAxis.times(-1) : collisionAxis;
-                let collisionPoint = Physics.getCollisionPoint(corners, finalPenetratedEdge, ownerDir);
+                let collisionPoint = Physics.getCollisionPoint(a, b, corners, finalPenetratedEdge, ownerDir);
 
                 col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, collisionPoint);
             } else {
@@ -315,7 +325,7 @@ class Physics {
             b.response.collide.top(a);
         }
     }
-    static getCollisionPoint(corners, edge, dir) {
+    static getCollisionPoint(a, b, corners, edge, dir) {
         let result3D = []; //<x, y, d>
         for (let corner of corners) {
             let closest = Geometry.closestPointOnLineObject(corner, edge);
@@ -333,6 +343,12 @@ class Physics {
         }); // <x, y>
         let sumDist = 0;
         for (let v3 of result3D) sumDist += v3.z;
+        let contacts = result3D.map(v3 => new Vector2(v3.x, v3.y));
+
+        //contacts
+        a.contactPoints.push(...contacts);
+        b.contactPoints.push(...contacts);
+
         average = (new Vector2(0, 0)).plus(...result2D).over(sumDist);
         return average;
     }
