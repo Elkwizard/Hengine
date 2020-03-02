@@ -31,43 +31,48 @@ class Vector {
 		}
 		return this;
 	}
-	add(v) {
-		return this.op((a, b) => a + b, v);
+	add(...vl) {
+		for (let v of vl) this.op((a, b) => a + b, v);
+		return this;
 	}
-	sub(v) {
-		return this.op((a, b) => a - b, v);
+	sub(...vl) {
+		for (let v of vl) this.op((a, b) => a - b, v);
+		return this;
 	}
-	mul(v) {
-		return this.op((a, b) => a * b, v);
+	mul(...vl) {
+		for (let v of vl) this.op((a, b) => a * b, v);
+		return this;
 	}
-	div(v) {
-		return this.op((a, b) => a / b, v);
+	div(...vl) {
+		for (let v of vl) this.op((a, b) => a / b, v);
+		return this;
 	}
-	mod(v) {
-		return this.op((a, b) => a % b, v);
+	mod(...vl) {
+		for (let v of vl) this.op((a, b) => a % b, v);
+		return this;
 	}
-	plus(v) {
+	plus(...v) {
 		let vn = new this.constructor(0, 0, 0, 0);
 		vn.add(this);
-		vn.add(v);
+		vn.add(...v);
 		return vn;
 	}
-	minus(v) {
+	minus(...v) {
 		let vn = new this.constructor(0, 0, 0, 0);
 		vn.add(this);
-		vn.sub(v);
+		vn.sub(...v);
 		return vn;
 	}
-	over(v) {
+	over(...v) {
 		let vn = new this.constructor(0, 0, 0, 0);
 		vn.add(this);
-		vn.div(v);
+		vn.div(...v);
 		return vn;
 	}
-	times(v) {
+	times(...v) {
 		let vn = new this.constructor(0, 0, 0, 0);
 		vn.add(this);
-		vn.mul(v);
+		vn.mul(...v);
 		return vn;
 	}
 	normalize() {
@@ -96,6 +101,12 @@ class Vector {
 	}
 	projectOnto(v) {
 		return v.times(this.dot(v) / (v.mag ** 2));
+	}
+	bestFit(v) {
+		let d1 = this.dot(v);
+		let d2 = this.times(-1).dot(v);
+		if (Math.abs(d2) < Math.abs(d1)) return this.times(-1);
+		else return this.get();
 	}
 	get() {
 		return new this.constructor(this.x, this.y, this.z, this.w);

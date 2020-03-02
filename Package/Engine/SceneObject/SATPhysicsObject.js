@@ -1,5 +1,7 @@
 const LINEAR_LOSS = .985;
 const ANGULAR_LOSS = .985;
+const CLIPPING_THRESHOLD = 3;
+const FRICTION_LOSS = 0.2;
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, width, height, gravity, controls, tag, home) {
         super(name, x, y, width, height, controls, tag, home);
@@ -67,6 +69,7 @@ class PhysicsObject extends SceneObject {
         this.snuzzlement = 1;
         this.linearDragForce = LINEAR_LOSS;
         this.angularDragForce = ANGULAR_LOSS;
+        this.friction = FRICTION_LOSS;
         this.density = 0.1;
         this.positionStatic = !gravity;
         this.rotationStatic = !gravity;
@@ -135,44 +138,6 @@ class PhysicsObject extends SceneObject {
             if (d2 < dif) dif = d2;
         }
         return dif;
-    }
-    align(angle, f, aerodynamic, par = "rotation") {
-        let reversed = 1;
-        let a = angle + this.optimalRotation ? this.optimalRotation : 0;
-        let p2 = Math.PI / 2;
-        let possibleDirections = [a, a + Math.PI];
-        if (this.optimalRotation == null || !aerodynamic) {
-            a = angle;
-            possibleDirections = [a, a + p2, a + p2 * 2, a + p2 * 3];
-        }
-        let best = null;
-        let dif = Infinity;
-        for (let dir of possibleDirections) {
-            let d = Math.abs(dir - this.rotation);
-            let d2 = Math.abs(dir - this.rotation - Math.PI * 2);
-            if (d < dif) {
-                dif = d;
-                best = dir;
-                reversed = 1;
-            }
-            if (d2 < dif) {
-                dif = d2;
-                best = dir;
-                reversed = -1;
-            }
-        }
-        f *= reversed;
-        let a1 = this.rotation;
-        let a2 = this.rotation + Math.PI * 2;
-        let d1 = Math.abs(best - a1);
-        let d2 = Math.abs(best - a2);
-        let actA = a1;
-        if (d2 < d1) actA = a2;
-        let difference = best - actA;
-        if (d2 < d1) difference *= -1;
-        let val = 0.3 * f * Math.sign(difference);
-        if (!val) val = 0;
-        this[par] += val;
     }
     clearCollisions() {
         for (let [key, value] of this.colliding) this.colliding[key] = null;
@@ -292,7 +257,7 @@ class PhysicsObject extends SceneObject {
         s.drawInWorldSpace(e => {
             //slow
             if (this.slows) this.slowDown();
-            if (this.applyGravity && !this.positionStatic) {
+            if (this.applyGravity) {
                 //links
                 for (let link of this.links) link.fix();
 
@@ -368,10 +333,42 @@ class PhysicsObject extends SceneObject {
         let startVector = impulse.source.minus(com);
         if (startVector.mag < 0.01) return;
         let endVector = impulse.source.plus(impulse.force).minus(com);
-        let difAngle = endVector.getAngle() - startVector.getAngle();
+        let startAngle = startVector.getAngle();
+        let endAngle = endVector.getAngle();
+        if (Math.abs(endAngle - startAngle - Math.PI * 2) < Math.abs(endAngle - startAngle)) startAngle += Math.PI * 2;
+        let difAngle = endAngle - startAngle;
+        if (difAngle > 0.01) {
+            //to big, don't know what's wrong
+            return;
+        }
+        let shortest = (startVector.mag < endVector.mag) ? startVector : endVector;
 
-        let angularForce = Math.sign(difAngle) * clamp(Math.abs(difAngle / 2), 0, 0.01);
-        this.angularVelocity += angularForce;
+        let maxR = this.radius;
+        if (maxR === undefined) {
+            let uS = Geometry.rotatePointAround(com, impulse.source, -this.rotation);
+            let xDif = (uS.x < com.x) ? com.x - this.x : this.x + this.width - com.x;
+            let yDif = (uS.y < com.y) ? com.y - this.y : this.y + this.height - com.y;
+            maxR = Math.sqrt(xDif ** 2 + yDif ** 2);
+        }
+
+        let minR = shortest.mag;
+        let dadForce = difAngle * (minR / maxR);
+        this.angularVelocity += dadForce;
+    }
+    applyFriction(tangent, collisionPoint, otherFriction) {
+        let pointVel = this.velocity;
+        let friction = pointVel.times(-1).projectOnto(tangent.bestFit(pointVel));
+        let mag = friction.mag;
+        friction.mag = Math.min(mag, mag * this.friction * otherFriction);
+        let iFL = new Impulse(friction, collisionPoint);
+        this.applyImpulse(iFL);
+
+        pointVel = collisionPoint.minus(Geometry.rotatePointAround(this.centerOfMass, collisionPoint, this.angularVelocity)).times(-1);
+        friction = pointVel.times(-1).projectOnto(tangent.bestFit(pointVel));
+        mag = friction.mag;
+        friction.mag = Math.min(mag, mag * this.friction * otherFriction);
+        let iFA = new Impulse(friction, collisionPoint);
+        this.applyAngularImpulse(iFA);
     }
     getSpine() {
         let spine;
@@ -391,6 +388,27 @@ class PhysicsObject extends SceneObject {
             spine = new Line(this.middle, this.middle);
         }
         return spine;
+    }
+    static getCollisionPoint(corners, edge, dir) {
+        let result3D = []; //<x, y, d>
+        for (let corner of corners) {
+            let closest = Geometry.closestPointOnLineObject(corner, edge);
+            let dirToCorner = closest.minus(corner);
+            let dot = dirToCorner.dot(dir);
+            let valid = dot < CLIPPING_THRESHOLD;
+            if (valid) {
+                let weight = Math.max(-(dot - CLIPPING_THRESHOLD), 0);
+                result3D.push(new Vector3(corner.x, corner.y, weight));
+            } 
+        }
+        let average = new Vector2(0, 0);
+        let result2D = result3D.map(v3 => {
+            return new Vector2(v3.x * v3.z, v3.y * v3.z);
+        }); // <x, y>
+        let sumDist = 0;
+        for (let v3 of result3D) sumDist += v3.z;
+        average = (new Vector2(0, 0)).plus(...result2D).over(sumDist);
+        return average;
     }
     static getBoundingBox(r) {
         let rect;
@@ -457,22 +475,6 @@ class PhysicsObject extends SceneObject {
     static isWall(r) {
         return r.positionStatic || r.rotationStatic || !r.canMoveThisFrame;
     }
-    static farthestInDirection(corners, dir) {
-        let farthest = corners[0];
-        let farthestDist = -Infinity;
-        let result = { index: 0, corner: farthest }
-        for (let i = 0; i < corners.length; i++) {
-            let corner = corners[i];
-            let dist = corner.x * dir.x + corner.y * dir.y;
-            if (dist > farthestDist) {
-                farthest = corner;
-                farthestDist = dist;
-                result.index = i;
-            }
-        }
-        result.corner = farthest;
-        return result;
-    }
     static getImpulses(a, b, dirFromA, dirFromB, collisionPoint) {
         let impulseA, impulseB;
 
@@ -538,11 +540,12 @@ class PhysicsObject extends SceneObject {
         a.home.SAT.boxChecks++;
         if (!Geometry.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
         a.home.SAT.SATChecks++;
-        let colliding = a.collider.collideBox(b);
+        let bestPoint = Geometry.closestPointOnRectangle(b.middle, a);
+        let colliding = Geometry.distToPoint2(bestPoint, b.middle) < b.radius ** 2;
+
         if (colliding) {
             a.home.SAT.collisions++;
             let inside = a.collider.collidePoint(b.middle);
-            let bestPoint = Geometry.closestPointOnRectangle(b.middle, a);
             if (!bestPoint) return new Collision(false, a, b);
             let bestDist = Math.sqrt((bestPoint.x - b.middle.x) ** 2 + (bestPoint.y - b.middle.y) ** 2);
             let penetration = b.radius + (inside ? bestDist : -bestDist);
@@ -558,13 +561,13 @@ class PhysicsObject extends SceneObject {
     static collideCircleRect(a, b) {
         a.home.SAT.boxChecks++;
         if (!Geometry.overlapRectRect(PhysicsObject.getBoundingBox(a), PhysicsObject.getBoundingBox(b))) return new Collision(false, a, b);
-        let colliding = b.collider.collideBox(a);
+        let bestPoint = Geometry.closestPointOnRectangle(a.middle, b);
+        let colliding = Geometry.distToPoint2(bestPoint, a.middle) < a.radius ** 2;
         a.home.SAT.SATChecks++;
         //getting resolution data
         let col;
         if (colliding) {
             a.home.SAT.collisions++;
-            let bestPoint = Geometry.closestPointOnRectangle(a.middle, b);
             if (!bestPoint) return new Collision(false, a, b);
             let bestDist = Geometry.distToPoint(bestPoint, a.middle);
             //towards collision, from a
@@ -619,7 +622,7 @@ class PhysicsObject extends SceneObject {
                 let edge = bEdges[i - 1];
                 if (!i) edge = bEdges[bEdges.length - 1];
                 let normal = Vector2.fromAngle(edge.getAngle() + Math.PI / 2);
-                let far = PhysicsObject.farthestInDirection(aCorners, normal);
+                let far = Geometry.farthestInDirection(aCorners, normal);
                 let penetratingCorner = far.corner;
                 let edgeStart = bCorners[i];
                 let edgeEnd = bCorners[i + 1];
@@ -638,7 +641,7 @@ class PhysicsObject extends SceneObject {
             for (let i = 0; i < aEdges.length; i++) {
                 let edge = i ? aEdges[i - 1] : aEdges[aEdges.length - 1];
                 let normal = Vector2.fromAngle(edge.getAngle() + Math.PI / 2);
-                let far = PhysicsObject.farthestInDirection(bCorners, normal);
+                let far = Geometry.farthestInDirection(bCorners, normal);
                 let penetratingCorner = far.corner;
                 let edgeStart = aCorners[i];
                 let edgeEnd = (i !== aEdges.length - 1) ? aCorners[i + 1] : aCorners[0];
@@ -660,7 +663,9 @@ class PhysicsObject extends SceneObject {
             if (collisionAxis) {
                 collisionAxis.normalize();
                 //figure out impulses
-                let collisionPoint = finalPenetratingCornerOwner.getCorners()[finalPenetratingCornerIndex];
+                let corners = finalPenetratingCornerOwner.getCorners();
+                let ownerDir = (finalPenetratingCornerOwner === a) ? collisionAxis.times(-1) : collisionAxis;
+                let collisionPoint = PhysicsObject.getCollisionPoint(corners, finalPenetratedEdge, ownerDir);
 
                 col = new Collision(true, a, b, collisionAxis.times(-1), collisionAxis, leastIntersection, collisionPoint);
             } else {
@@ -693,18 +698,7 @@ class PhysicsObject extends SceneObject {
         if (A_VEL_AT_COLLISION < 0 && B_VEL_AT_COLLISION < 0) return;
 
         //friction
-        let frictionDir = d.normal.normalize();
-        let angleVel = collisionPoint.minus(Geometry.rotatePointAround(a.centerOfMass, collisionPoint, a.angularVelocity));
-        let aPointVel = a.velocity;
-        let velDot1 = frictionDir.dot(a.velocity);
-        let velDot2 = frictionDir.times(-1).dot(aPointVel);
-        if (velDot2 < velDot1) frictionDir.mul(-1);
-        let friction = frictionDir.plus(0);
-        friction.mag = -frictionDir.dot(aPointVel) / 100;
-        let cp = col.collisionPoint;
-        a.angularVelocity *= a.angularDragForce;
-        let iF = new Impulse(friction, cp);
-        a.applyImpulse(iF);
+        a.applyFriction(d.normal.normalize(), collisionPoint, b.friction);
 
         //impulse resolution
         let impulses = PhysicsObject.getImpulses(a, b, col.Adir, col.Bdir, collisionPoint, col.penetration);

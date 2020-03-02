@@ -37,6 +37,22 @@ class Geometry {
         let dy = Math.max(Math.abs(ay) - (r.height / 2), 0);
         return (dx ** 2) + (dy ** 2);
     }
+    static farthestInDirection(corners, dir) {
+        let farthest = corners[0];
+        let farthestDist = -Infinity;
+        let result = { index: 0, corner: farthest }
+        for (let i = 0; i < corners.length; i++) {
+            let corner = corners[i];
+            let dist = corner.x * dir.x + corner.y * dir.y;
+            if (dist > farthestDist) {
+                farthest = corner;
+                farthestDist = dist;
+                result.index = i;
+            }
+        }
+        result.corner = farthest;
+        return result;
+    }
     static projectPointOntoLine(p, d) {
 		/* --My Own Personal Derivation--
 		let x1 = p.x;

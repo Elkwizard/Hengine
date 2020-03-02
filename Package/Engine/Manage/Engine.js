@@ -162,6 +162,7 @@ class Engine {
 					this.fpsContinuous = 1000 / val;
 				}
 				this.updateGraphs();
+				this.checkAlerts();
 				if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
 				//update
 				if (!this.paused) {
@@ -307,6 +308,9 @@ class Engine {
 		if (!this.hasGraphs) return;
 		return this.fpsGraph.get();
 	}
+	checkAlerts() {
+		if (parseFloat(getComputedStyle(document.querySelector(".alert")).opacity) < 0.02) document.querySelector(".alert").style.display = "none";
+	}
 	end() {
 		this.pause();
 		this.animate = a => a;
@@ -359,15 +363,16 @@ function setupAlerts() {
 		box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.4);
 		position: absolute;
 		left: 50%;
-		padding: 15px;
+		top: -5%;
+ 		padding: 15px;
 		width: 27%;
 		min-height: 13%;
-		top: -5%;
 		transform: translate(-50%, 0);
 		opacity: 0;
 		padding-bottom: 15px;
 		transition: all .15s;
 		font-family: sans-serif;
+		z-index: 10000000;
 	}
 	.alert-default-text {
 		color: black;
@@ -413,18 +418,17 @@ function setupAlerts() {
 	};
 	window.alert = function (m, isSequence = false) {
 		if (alertClosed) {
+			al.style.display = "block";
 			m = m + "";
 			m = m.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
 			al.style.transition = "all 0s";
-			let style = { top: "-5%", opacity: "0", display: "none" };
+			let style = { top: "-5%", opacity: "0" };
 			if (isSequence) {
 				style.top = "-1%";
 				style.opacity = "1";
-				style.display = "block";
 			}
 			al.style.top = style.top;
 			al.style.opacity = style.opacity;
-			al.style.display = display;
 			alertClosed = false;
 
 			let breaks = m.match(/<br>/g);
