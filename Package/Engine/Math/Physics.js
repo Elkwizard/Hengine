@@ -472,8 +472,10 @@ class Physics {
         let rotationA = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
         impulseA = new Impulse(rotationB.plus(dirFromB.times(forceFromB)), source);
         impulseB = new Impulse(rotationA.plus(dirFromA.times(forceFromA)), source);
-        impulseA.force = impulseA.force.minus(impulseB.force).times(bPercentMass);
-        impulseB.force = impulseB.force.minus(impulseA.force).times(aPercentMass);
+        let forceA = impulseA.force.minus(impulseB.force).times(bPercentMass);
+        let forceB = impulseB.force.minus(impulseA.force).times(aPercentMass);
+        impulseA.force = forceA;
+        impulseB.force = forceB;
 
         if (b.completelyStatic) impulseB = null;
         return { impulseA, impulseB };

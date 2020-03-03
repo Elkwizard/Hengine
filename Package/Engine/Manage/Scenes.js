@@ -603,7 +603,7 @@ class Scene extends InactiveScene {
 				}
 			}
 			useful = [...(new Set(useful))];
-			useful = useful.sort((a, b) => a[0].mass - b[0].mass);
+			useful = useful.sort((a, b) => b[0].mass - a[0].mass);
 			for (let i = 0; i < useful.length; i++) {
 				let [rect, ...updateCells] = useful[i];
 				let updater = [];

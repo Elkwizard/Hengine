@@ -299,11 +299,10 @@ class PhysicsObject extends SceneObject {
     }
     applyImpulse(impulse, name = "no name") {
         if (!impulse) return;
-        impulse.force = impulse.force.over(Math.max(1, this.contactPoints.length));
         this.impulses.push(impulse);
         this.resolveImpulses();
-        // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
+        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
