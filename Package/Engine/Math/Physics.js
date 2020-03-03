@@ -258,6 +258,8 @@ class Physics {
             let bPer = 1 - aPer;
             let aMove = dir.times(aPer);
             let bMove = dir.times(-bPer);
+            c.stroke(cl.RED, 2).arrow(collisionPoint, aMove.plus(collisionPoint));
+            c.stroke(cl.BLUE, 2).arrow(collisionPoint, bMove.plus(collisionPoint));
             a.privateSetX(a.x - aMove.x);
             a.privateSetY(a.y - aMove.y);
             b.privateSetX(b.x - bMove.x);
@@ -430,7 +432,7 @@ class Physics {
     static getImpulses(a, b, dirFromA, dirFromB, collisionPoint) {
         let impulseA, impulseB;
 
-        let aPercentMass = 1 * (a.mass / (a.mass + b.mass));
+        let aPercentMass = a.mass / (a.mass + b.mass);
         let bPercentMass = 1 - aPercentMass;
 
         let source = collisionPoint;

@@ -592,20 +592,21 @@ class Scene extends InactiveScene {
 				if (isUseless(rect)) {
 					useless.push(rect);
 					continue;
-				} else useful.push(rect);
+				} else useful.push([rect]);
 				let cls = Physics.getCells(rect, this.cellSize);
 				for (let cl of cls) {
 					let key = cl.x + "," + cl.y;
 					if (cells[key]) cells[key].push(rect);
 					else cells[key] = [rect];
-					cells2[cells2.length - 1].push(cells[key]);
+					let use = useful[useful.length - 1];
+					use.push(cells[key]);
 				}
-				cells2.push([]);
 			}
+			useful = [...(new Set(useful))];
+			useful = useful.sort((a, b) => a[0].mass - b[0].mass);
 			for (let i = 0; i < useful.length; i++) {
-				let rect = useful[i];
+				let [rect, ...updateCells] = useful[i];
 				let updater = [];
-				let updateCells = cells2[i];
 				if (!rect.completelyStatic) for (let cell of updateCells) {
 					for (let r of cell) {
 						if (r !== rect && !updater.includes(r)) updater.push(r);
@@ -616,7 +617,7 @@ class Scene extends InactiveScene {
 				rect.enginePhysicsUpdate(updater);
 			}
 			for (let rect of useless) rect.enginePhysicsUpdate([]);
-			for (let rect of useful) rect.resolveImpulses();
+			for (let rect of useful) rect[0].resolveImpulses();
 			// // show cells
 			// s.drawInWorldSpace(e => {
 			// 	for (let [key, cell] of cells) {
