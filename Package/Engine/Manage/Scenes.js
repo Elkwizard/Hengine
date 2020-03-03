@@ -601,22 +601,46 @@ class Scene extends InactiveScene {
 					let use = useful[useful.length - 1];
 					use.push(cells[key]);
 				}
+
 			}
-			useful = [...(new Set(useful))];
-			useful = useful.sort((a, b) => b[0].mass - a[0].mass);
-			for (let i = 0; i < useful.length; i++) {
-				let [rect, ...updateCells] = useful[i];
+			for (let usef of useful) {
+				//get rectangles
+				let [rect, ...updateCells] = usef;
 				let updater = [];
 				if (!rect.completelyStatic) for (let cell of updateCells) {
 					for (let r of cell) {
 						if (r !== rect && !updater.includes(r)) updater.push(r);
 					}
 				}
+				usef.push(updater.sort((a, b) => {
+					if (b.completelyStatic && !a.completelyStatic) return -1;	
+					if (a.completelyStatic && !b.completelyStatic) return 1;
+					return 0;
+				}));
+			}
+			useful = [...(new Set(useful))];
+			useful = useful.sort((a, b) => b[0].mass - a[0].mass);
+			for (let i = 0; i < useful.length; i++) {
+				let [rect, ...updateCells] = useful[i];
+				let updater = useful[i][useful[i].length - 1];
+				
 				this.SAT.gridChecks += updater.length;
 				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
-				rect.enginePhysicsUpdate(updater);
+				rect.physicsUpdate(updater);
 			}
-			for (let rect of useless) rect.enginePhysicsUpdate([]);
+			for (let i = useful.length - 1; i >= 0; i--) {
+				let [rect, ...updateCells] = useful[i];
+				let updater = useful[i][useful[i].length - 1];
+				
+				this.SAT.gridChecks += updater.length;
+				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
+				rect.physicsUpdate(updater);
+				rect.enginePhysicsUpdate();
+			}
+			for (let rect of useless) {
+				for (let i = 0; i < 2; i++) rect.phyiscsUpdate([]);
+				rect.enginePhysicsUpdate();
+			}
 			for (let rect of useful) rect[0].resolveImpulses();
 			// // show cells
 			// s.drawInWorldSpace(e => {

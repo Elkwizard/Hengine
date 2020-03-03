@@ -156,10 +156,11 @@ class PhysicsObject extends SceneObject {
             // c.stroke(cl.LIME, 2).arrow(P(0, 0), this.acceleration.times(10));
             // c.draw(cl.WHITE).text("15px monospace", "MASS: " + Math.floor(this.mass / 1000) + "kg, " + (this.mass % 1000) + "g", 0, 0);
             c.translate(-mcx, -mcy);
+            // c.draw(cl.RED).rect(this.middle.x - this.width / 2, this.middle.y - this.height / 2, Math.sqrt(this.mass), Math.sqrt(this.mass));
+            // c.draw(cl.BLACK).text("10px Monospace", Math.floor(this.mass) + "kg", this.middle.x - this.width / 2, this.middle.y - this.height / 2);
         }
     }
-    enginePhysicsUpdate(others) {
-        this.physicsUpdate(others);
+    enginePhysicsUpdate() {
         this.scriptUpdate();
         this.update();
     }
@@ -234,6 +235,9 @@ class PhysicsObject extends SceneObject {
         // c.draw(cl.RED).text("10px Monospace", this.contactPoints.length, this.middle.x, this.middle.y);
         this.impulses = [];
     }
+    getSpeedModulation() {
+        return .5 * this.home.speedModulation / this.home.physicsRealism;
+    }
     physicsUpdate(others) {
         s.drawInWorldSpace(e => {
             //slow
@@ -248,7 +252,7 @@ class PhysicsObject extends SceneObject {
                 let iG = new Impulse(gravitationalForce, this.centerOfMass);
                 this.applyImpulse(iG);
             }
-            let spdMod = this.home.speedModulation / this.home.physicsRealism;
+            let spdMod = this.getSpeedModulation();
             for (let i = 0; i < this.home.physicsRealism; i++) {
                 //linear
                 this.velocity.add(this.acceleration.times(spdMod));
@@ -301,12 +305,12 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.impulses.push(impulse);
         this.resolveImpulses();
-        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
+        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
-        this.velocity.add(impulse.force);
+        this.velocity.add(impulse.force.times(this.getSpeedModulation()));
     }
     applyAngularImpulse(impulse) {
         if (!impulse) return;
@@ -329,7 +333,7 @@ class PhysicsObject extends SceneObject {
 
         let minR = shortest.mag;
         let dadForce = difAngle * (minR / maxR);
-        this.angularVelocity += dadForce;
+        this.angularVelocity += this.getSpeedModulation() * dadForce;
     }
     applyFriction(tangent, collisionPoint, otherFriction) {
         let pointVel = this.velocity;
