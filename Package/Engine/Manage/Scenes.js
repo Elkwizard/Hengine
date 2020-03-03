@@ -612,11 +612,7 @@ class Scene extends InactiveScene {
 						if (r !== rect && !updater.includes(r)) updater.push(r);
 					}
 				}
-				usef.push(updater.sort((a, b) => {
-					if (b.completelyStatic && !a.completelyStatic) return -1;	
-					if (a.completelyStatic && !b.completelyStatic) return 1;
-					return 0;
-				}));
+				usef.push(updater.sort((a, b) => a.completelyStatic - b.completelyStatic));
 			}
 			useful = [...(new Set(useful))];
 			useful = useful.sort((a, b) => b[0].mass - a[0].mass);
