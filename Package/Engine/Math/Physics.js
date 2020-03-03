@@ -9,6 +9,18 @@ class Collision {
         this.collisionPoint = collisionPoint;
     }
 }
+class CollisionMoniter {
+    constructor() {
+        this.top = null;
+        this.bottom = null;
+        this.left = null;
+        this.right = null;
+        this.general = null;
+    }
+    has(el) {
+        return this.general && this.general.filter(e => e === el).length > 0;
+    }
+}
 class Impulse {
     constructor(force = new Vector2(0, 0), source = new Vector2(0, 0)) {
         this.force = force;
@@ -241,25 +253,26 @@ class Physics {
     }
     static resolve(col) {
         //resolve collisions
-
-
-
         let a = col.a;
         let b = col.b;
         const d = col.Bdir;
         let collisionPoint = col.collisionPoint;
-        let mobileA = !Physics.isWall(a)
-        let mobileB = !Physics.isWall(b)
+        let mobileA = !Physics.isWall(a);
+        let mobileB = !Physics.isWall(b);
+
         //position
         let dir = col.Adir.times(col.penetration);
         if (col.penetration > 0.005) {
+            //mass percents
             let aPer = 1 - a.mass / (a.mass + b.mass);
             if (!mobileB) aPer = 1;
             let bPer = 1 - aPer;
+
+            //escape dirs
             let aMove = dir.times(aPer);
             let bMove = dir.times(-bPer);
-            c.stroke(cl.RED, 2).arrow(collisionPoint, aMove.plus(collisionPoint));
-            c.stroke(cl.BLUE, 2).arrow(collisionPoint, bMove.plus(collisionPoint));
+
+            //like, the escaping
             a.privateSetX(a.x - aMove.x);
             a.privateSetY(a.y - aMove.y);
             b.privateSetX(b.x - bMove.x);
@@ -431,20 +444,18 @@ class Physics {
     }
     static getImpulses(a, b, dirFromA, dirFromB, collisionPoint) {
         let impulseA, impulseB;
+        let source = collisionPoint;
 
+        //mass percents
         let aPercentMass = a.mass / (a.mass + b.mass);
         let bPercentMass = 1 - aPercentMass;
 
-        let source = collisionPoint;
-
         //for impulse A
         let forceFromB = clamp(dirFromB.dot(b.velocity), 0, Infinity);
-
         //for impulse B
         let forceFromA = clamp(dirFromA.dot(a.velocity), 0, Infinity);
 
-
-
+        //walls
         if (b.positionStatic) {
             if (a instanceof CirclePhysicsObject) {
                 dirFromB = dirFromA.times(-1);
@@ -456,20 +467,15 @@ class Physics {
             }
         }
 
+        //like, the actual impulse stuff, DUH!
         let rotationB = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
         let rotationA = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
         impulseA = new Impulse(rotationB.plus(dirFromB.times(forceFromB)), source);
         impulseB = new Impulse(rotationA.plus(dirFromA.times(forceFromA)), source);
-
-        let forceA = impulseA.force.minus(impulseB.force).times(bPercentMass);
-        let forceB = impulseB.force.minus(impulseA.force).times(aPercentMass);
-
-
-        impulseA.force = forceA;
-        impulseB.force = forceB;
+        impulseA.force = impulseA.force.minus(impulseB.force).times(bPercentMass);
+        impulseB.force = impulseB.force.minus(impulseA.force).times(aPercentMass);
 
         if (b.completelyStatic) impulseB = null;
-
         return { impulseA, impulseB };
     }
 }

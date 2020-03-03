@@ -34,13 +34,7 @@ class PhysicsObject extends SceneObject {
         this.canCollide = true;
         this._gravity = null;
         this._mass = null;
-        this.colliding = {
-            top: null,
-            bottom: null,
-            left: null,
-            right: null,
-            general: null
-        };
+        this.colliding = new CollisionMoniter();
         this.response.collide = {
             general: function () { },
             top: function () { },
