@@ -263,6 +263,10 @@ class Physics {
         //position
         let dir = col.Adir.times(col.penetration);
         if (col.penetration > 0.005) {
+            let tomMath;
+            let aCircle = (a instanceof CirclePhysicsObject)? "Circle":"Rect";
+            let bCircle = (b instanceof CirclePhysicsObject)? "Circle":"Rect";
+            tomMath = Physics["collide" + aCircle + bCircle](a, b);
             //mass percents
             let aPer = 1 - a.mass / (a.mass + b.mass);
             if (!mobileB) aPer = 1;
