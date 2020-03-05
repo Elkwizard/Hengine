@@ -268,10 +268,7 @@ class Physics {
             let bCircle = (b instanceof CirclePhysicsObject) ? "Circle" : "Rect";
             tomMath = Physics["collide" + aCircle + bCircle](a, b);
             if (tomMath.colliding) {
-                if (a.name == "block") {
-                    c.draw(cl.RED).rect(a);
-                    console.log(b);
-                }
+                col = tomMath;
                 //mass percents
                 let aPer = 1 - a.mass / (a.mass + b.mass);
                 if (!mobileB) aPer = 1;
@@ -280,6 +277,8 @@ class Physics {
                 //escape dirs
                 let aMove = dir.times(aPer);
                 let bMove = dir.times(-bPer);
+
+                
 
                 //like, the escaping
                 a.privateSetX(a.x - aMove.x);
@@ -290,7 +289,7 @@ class Physics {
                 // c.stroke(cl.RED, 2).arrow(collisionPoint, collisionPoint.plus(aMove));
                 // c.stroke(cl.BLUE, 2).arrow(collisionPoint, collisionPoint.plus(bMove));
             }
-        }
+        } else return;
         //velocity
         const A_VEL_AT_COLLISION = a.velocity.dot(col.Adir);
         const B_VEL_AT_COLLISION = b.velocity.dot(col.Bdir);

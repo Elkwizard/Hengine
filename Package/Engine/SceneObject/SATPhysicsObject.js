@@ -160,10 +160,6 @@ class PhysicsObject extends SceneObject {
             // c.draw(cl.BLACK).text("10px Monospace", Math.floor(this.mass) + "kg", this.middle.x - this.width / 2, this.middle.y - this.height / 2);
         }
     }
-    enginePhysicsUpdate() {
-        this.scriptUpdate();
-        this.update();
-    }
     slowDown() {
         //apply linear drag;
         let drag = this.velocity.get().mul(-(1 - this.linearDragForce));
@@ -189,7 +185,7 @@ class PhysicsObject extends SceneObject {
             this.rotation = a;
         }
     }
-    detectCollisions(others, f = () => { ; }) {
+    detectCollisions(others) {
         let collisions = [];
         if (!this.completelyStatic) {
             for (let other of others) {
@@ -206,7 +202,6 @@ class PhysicsObject extends SceneObject {
                                     other.allCollidingWith["Rect - " + this.name] = this;
                                     if (this.canCollide && other.canCollide) {
                                         collisions.push(col);
-                                        f(col);
                                     }
                                 }
                             }
@@ -219,12 +214,10 @@ class PhysicsObject extends SceneObject {
     }
     checkAndResolveCollisions(others) {
         let collisions = this.detectCollisions(others);
-        if (!this.completelyStatic) {
-            for (let i = 0; i < collisions.length; i++) {
-                let collision = collisions[i];
-                if (collision.colliding) Physics.resolve(collision);
-            }
-        }
+        if (!this.completelyStatic) for (let col of collisions) Physics.resolve(col);
+        let st = others.filter(e => e.completelyStatic);
+        collisions = this.detectCollisions(st);
+        if (!this.completelyStatic) for (let col of collisions) Physics.resolve(col);
     }
     resolveImpulses() {
         for (let impulse of this.impulses) {
@@ -237,6 +230,10 @@ class PhysicsObject extends SceneObject {
     }
     getSpeedModulation() {
         return .5 * this.home.speedModulation / this.home.physicsRealism;
+    }
+    enginePhysicsUpdate() {
+        this.scriptUpdate();
+        this.update();
     }
     physicsUpdate(others) {
         s.drawInWorldSpace(e => {
