@@ -123,7 +123,7 @@ class Physics {
             let collisionAxis = new Vector2(b.middle.x - bestPoint.x, b.middle.y - bestPoint.y);
             collisionAxis.normalize();
             if (inside) collisionAxis.mul(-1);
-            
+
 
             //contacts
             a.contactPoints.push(bestPoint);
@@ -150,7 +150,7 @@ class Physics {
             let collisionAxis = bestPoint.minus(a.middle).normalize();
             let penetration = a.radius + (inside ? bestDist : -bestDist);
             if (inside) collisionAxis.mul(-1);
-            
+
             //contacts
             a.contactPoints.push(bestPoint);
             b.contactPoints.push(bestPoint);
@@ -264,26 +264,33 @@ class Physics {
         let dir = col.Adir.times(col.penetration);
         if (col.penetration > 0.005) {
             let tomMath;
-            let aCircle = (a instanceof CirclePhysicsObject)? "Circle":"Rect";
-            let bCircle = (b instanceof CirclePhysicsObject)? "Circle":"Rect";
+            let aCircle = (a instanceof CirclePhysicsObject) ? "Circle" : "Rect";
+            let bCircle = (b instanceof CirclePhysicsObject) ? "Circle" : "Rect";
             tomMath = Physics["collide" + aCircle + bCircle](a, b);
-            //mass percents
-            let aPer = 1 - a.mass / (a.mass + b.mass);
-            if (!mobileB) aPer = 1;
-            let bPer = 1 - aPer;
+            if (tomMath.colliding) {
+                if (a.name == "block") {
+                    c.draw(cl.RED).rect(a);
+                    console.log(b);
+                }
+                //mass percents
+                let aPer = 1 - a.mass / (a.mass + b.mass);
+                if (!mobileB) aPer = 1;
+                let bPer = 1 - aPer;
 
-            //escape dirs
-            let aMove = dir.times(aPer);
-            let bMove = dir.times(-bPer);
+                //escape dirs
+                let aMove = dir.times(aPer);
+                let bMove = dir.times(-bPer);
 
-            //like, the escaping
-            a.privateSetX(a.x - aMove.x);
-            a.privateSetY(a.y - aMove.y);
-            b.privateSetX(b.x - bMove.x);
-            b.privateSetY(b.y - bMove.y);
+                //like, the escaping
+                a.privateSetX(a.x - aMove.x);
+                a.privateSetY(a.y - aMove.y);
+                b.privateSetX(b.x - bMove.x);
+                b.privateSetY(b.y - bMove.y);
+                // c.stroke(cl.RED, 2).arrow(a.centerOfMass, b.centerOfMass);
+                // c.stroke(cl.RED, 2).arrow(collisionPoint, collisionPoint.plus(aMove));
+                // c.stroke(cl.BLUE, 2).arrow(collisionPoint, collisionPoint.plus(bMove));
+            }
         }
-        // c.stroke(cl.RED, 2).arrow(a.centerOfMass, b.centerOfMass);
-
         //velocity
         const A_VEL_AT_COLLISION = a.velocity.dot(col.Adir);
         const B_VEL_AT_COLLISION = b.velocity.dot(col.Bdir);
@@ -364,7 +371,7 @@ class Physics {
             if (valid) {
                 let weight = Math.max(-(dot - CLIPPING_THRESHOLD), 0);
                 result3D.push(new Vector3(corner.x, corner.y, weight));
-            } 
+            }
         }
         let average = new Vector2(0, 0);
         let result2D = result3D.map(v3 => {

@@ -315,6 +315,9 @@ class Geometry {
             return Physics.collideRectPoint(r, p).colliding;
         }
     }
+    static pointInsideCircle(p, c) {
+        return Geometry.distToPoint(p, c) ** 2 < c.radius ** 2;
+    }
     static overlapCircleRect(c, r) {
         let dist = Geometry.distToRect2(c, r);
         let inside = Geometry.pointInsideRectangle(c, r);
