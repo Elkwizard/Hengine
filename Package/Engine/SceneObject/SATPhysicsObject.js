@@ -215,7 +215,7 @@ class PhysicsObject extends SceneObject {
     checkAndResolveCollisions(others) {
         let collisions = this.detectCollisions(others);
         if (!this.completelyStatic) for (let col of collisions) Physics.resolve(col);
-        let st = others.filter(e => e.completelyStatic);
+        let st = collisions.map(e => e.b).filter(e => e.completelyStatic);
         collisions = this.detectCollisions(st);
         if (!this.completelyStatic) for (let col of collisions) Physics.resolve(col);
     }
