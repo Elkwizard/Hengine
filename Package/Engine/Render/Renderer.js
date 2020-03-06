@@ -52,6 +52,8 @@ class Fade {
 }
 class Texture {
 	constructor(width, height) {
+		width = Math.floor(width);
+		height = Math.floor(height);
 		this.width = width;
 		this.height = height;
 		this.pixels = [];
