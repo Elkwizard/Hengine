@@ -584,9 +584,8 @@ class Scene extends InactiveScene {
 		else {
 			//grid
 			let cells = {};
-			let cells2 = [[]];
-			let isUseless = (a) => !(a instanceof PhysicsObject) || !a.canCollide || (a.tag === "Engine-Particle");
-			let useful = []
+			let isUseless = a => !(a instanceof PhysicsObject) || !a.canCollide || (a.tag === "Engine-Particle");
+			let useful = [];
 			let useless = [];
 			let sortedEls = this.contains_array;
 			for (let rect of sortedEls) {
@@ -602,7 +601,6 @@ class Scene extends InactiveScene {
 					let use = useful[useful.length - 1];
 					use.push(cells[key]);
 				}
-
 			}
 			for (let usef of useful) {
 				//get rectangles
