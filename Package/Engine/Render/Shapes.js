@@ -104,7 +104,8 @@ class Rect {
         return this.rotation;
     }
     set rotation(a) {
-		if (!a) a = 0;
+		if (!a) a = 0.0001;
+		if (Math.abs(a % Math.PI / 2) < 0.0001) a += 0.01;
 		this.collider.rotation = a;
 		this._rotation = a;
     }

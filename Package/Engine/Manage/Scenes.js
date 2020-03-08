@@ -112,8 +112,8 @@ class InactiveScene {
 	}
 	copy(el) {
 		let n;
-		if (el.hasPhysics) {
-			if (el.isSpawner) {
+		if (el instanceof PhysicsObject) {
+			if (el instanceof ParticleSpawnerObject) {
 				n = this.addParticleSpawner(el.name + " - copy", el.x, el.y, el.particleSize, el.particleInitSpeed, el.delay, el.timer, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
 				n.width = el.width;
 				n.height = el.height;
@@ -122,7 +122,8 @@ class InactiveScene {
 				n.active = el.active;
 				n.falls = el.falls;
 			} else {
-				n = this.addRectElement(el.name + " - copy", el.x, el.y, el.width, el.height, !el.completelyStatic, { ...el.controls }, el.tag);
+				if (el instanceof CirclePhysicsObject) n = this.addCircleElement(el.name + " - copy", el.x, el.y, el.radius, !el.completelyStatic, { ...el.controls }, el.tag);
+				else n = this.addRectElement(el.name + " - copy", el.x, el.y, el.width, el.height, !el.completelyStatic, { ...el.controls }, el.tag);
 				n.positionStatic = el.positionStatic;
 				n.rotationStatic = el.rotationStatic;
 				n.applyGravity = el.applyGravity;

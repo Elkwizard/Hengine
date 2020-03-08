@@ -298,6 +298,28 @@ class PhysicsObject extends SceneObject {
             this.moveAwayFrom(point, ferocity);
         });
     }
+    getImpulseRatio(impulse) {
+        let com = this.centerOfMass;
+        let startVector = impulse.source.minus(com);
+        let endVector = impulse.source.plus(impulse.force).minus(com);
+        let sMag = startVector.mag;
+        if (sMag < 0.01) return 1;
+        let eMag = endVector.mag;
+        let shortest = (sMag < eMag) ? startVector : endVector;
+
+        let maxR = this.radius;
+        if (maxR === undefined) {
+            let uS = Geometry.rotatePointAround(com, impulse.source, -this.rotation);
+            let xDif = (uS.x < com.x) ? com.x - this.x : this.x + this.width - com.x;
+            let yDif = (uS.y < com.y) ? com.y - this.y : this.y + this.height - com.y;
+            maxR = Math.sqrt(xDif ** 2 + yDif ** 2);
+        }
+        let minR = shortest.mag;
+        c.stroke(cl.LIME, 1).circle(com.x, com.y, maxR);
+        c.stroke(cl.RED, 1).circle(com.x, com.y, minR);
+
+        return minR / maxR;
+    }
     applyImpulse(impulse, name = "no name") {
         if (!impulse) return;
         this.impulses.push(impulse);
@@ -307,7 +329,9 @@ class PhysicsObject extends SceneObject {
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
-        this.velocity.add(impulse.force.times(this.getSpeedModulation()));
+        let ratio = this.getImpulseRatio(impulse);
+        let rat = clamp(1 / ratio, 0, 1);
+        this.velocity.add(impulse.force.times(this.getSpeedModulation() * rat));
     }
     applyAngularImpulse(impulse) {
         if (!impulse) return;
@@ -318,18 +342,8 @@ class PhysicsObject extends SceneObject {
         let startAngle = startVector.getAngle();
         let endAngle = endVector.getAngle();
         let difAngle = Geometry.signedAngularDist(startAngle, endAngle);
-        let shortest = (startVector.mag < endVector.mag) ? startVector : endVector;
-
-        let maxR = this.radius;
-        if (maxR === undefined) {
-            let uS = Geometry.rotatePointAround(com, impulse.source, -this.rotation);
-            let xDif = (uS.x < com.x) ? com.x - this.x : this.x + this.width - com.x;
-            let yDif = (uS.y < com.y) ? com.y - this.y : this.y + this.height - com.y;
-            maxR = Math.sqrt(xDif ** 2 + yDif ** 2);
-        }
-
-        let minR = shortest.mag;
-        let dadForce = difAngle * (minR / maxR);
+        
+        let dadForce = difAngle * this.getImpulseRatio(impulse);
         this.angularVelocity += this.getSpeedModulation() * dadForce;
     }
     applyFriction(tangent, collisionPoint, otherFriction) {
