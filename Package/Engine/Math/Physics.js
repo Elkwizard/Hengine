@@ -20,6 +20,12 @@ class CollisionMoniter {
     has(el) {
         return this.general && this.general.filter(e => e === el).length > 0;
     }
+    test(test) {
+        if (this.general) return null;
+        let result = this.general.filter(test);
+        if (result.length > 0) return result;
+        else return null;
+    }
 }
 class Impulse {
     constructor(force = new Vector2(0, 0), source = new Vector2(0, 0)) {
