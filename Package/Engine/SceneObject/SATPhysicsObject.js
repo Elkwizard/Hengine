@@ -315,8 +315,8 @@ class PhysicsObject extends SceneObject {
             maxR = Math.sqrt(xDif ** 2 + yDif ** 2);
         }
         let minR = shortest.mag;
-        c.stroke(cl.LIME, 1).circle(com.x, com.y, maxR);
-        c.stroke(cl.RED, 1).circle(com.x, com.y, minR);
+        // c.stroke(cl.LIME, 1).circle(com.x, com.y, maxR);
+        // c.stroke(cl.RED, 1).circle(com.x, com.y, minR);
 
         return minR / maxR;
     }
