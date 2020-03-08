@@ -133,7 +133,7 @@ class PhysicsObject extends SceneObject {
         c.translate(com);
         c.rotate(-this.rotation);
         c.translate(com.times(-1));
-        artist();
+        artist.bind(this)();
         c.translate(com);
         c.rotate(this.rotation);
         c.translate(com.times(-1));
