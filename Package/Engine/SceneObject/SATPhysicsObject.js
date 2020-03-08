@@ -190,16 +190,19 @@ class PhysicsObject extends SceneObject {
         if (!this.completelyStatic) {
             for (let other of others) {
                 if (other !== this) {
-                    if (other.hasPhysics && other.tag !== "Engine-Particle") {
+                    if (other instanceof PhysicsObject && other.tag !== "Engine-Particle") {
                         if (this.optimize(this, other)) {
                             if (this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
                                 let nameA = (this instanceof CirclePhysicsObject)? "Circle":"Rect";
                                 let nameB = (other instanceof CirclePhysicsObject)? "Circle":"Rect";
-                                let col = Physics["collide" + nameA + nameB](this, other);
-                                
+                                let col = Physics["collide" + nameA + nameB](this, other);              
                                 if (col.colliding) {
                                     this.allCollidingWith["Rect - " + other.name] = other;
                                     other.allCollidingWith["Rect - " + this.name] = this;
+                                    if (!this.colliding.general) this.colliding.general = [];
+                                    if (!other.colliding.general) other.colliding.general = [];
+                                    this.colliding.general.push(other);
+                                    other.colliding.general.push(this);
                                     if (this.canCollide && other.canCollide) {
                                         collisions.push(col);
                                     }

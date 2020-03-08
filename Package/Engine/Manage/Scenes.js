@@ -584,7 +584,7 @@ class Scene extends InactiveScene {
 		else {
 			//grid
 			let cells = {};
-			let isUseless = a => !(a instanceof PhysicsObject) || !a.canCollide || (a.tag === "Engine-Particle");
+			let isUseless = a => !(a instanceof PhysicsObject) || (a.tag instanceof ParticleObject);
 			let useful = [];
 			let useless = [];
 			let sortedEls = this.contains_array;
@@ -633,7 +633,7 @@ class Scene extends InactiveScene {
 				rect.enginePhysicsUpdate();
 			}
 			for (let rect of useless) {
-				for (let i = 0; i < 2; i++) rect.phyiscsUpdate([]);
+				for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
 				rect.enginePhysicsUpdate();
 			}
 			for (let rect of useful) rect[0].resolveImpulses();
