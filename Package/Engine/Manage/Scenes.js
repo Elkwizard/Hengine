@@ -584,7 +584,7 @@ class Scene extends InactiveScene {
 		else {
 			//grid
 			let cells = {};
-			let isUseless = a => !(a instanceof PhysicsObject) || (a.tag instanceof ParticleObject);
+			let isUseless = a => !(a instanceof PhysicsObject) || (a instanceof ParticleObject);
 			let useful = [];
 			let useless = [];
 			let sortedEls = this.contains_array;

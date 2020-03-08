@@ -165,6 +165,7 @@ class PhysicsObject extends SceneObject {
         let drag = this.velocity.get().mul(-(1 - this.linearDragForce));
         let iD = new Impulse(drag, this.centerOfMass);
         this.applyImpulse(iD);
+        this.angularVelocity *= this.angularDragForce;
     }
     capSpeed() {
         let m = Math.min(this.width, this.height) / 2;
