@@ -247,6 +247,10 @@ class Artist {
 				}
 				this.c.fill();
 				this.c.closePath();
+			},
+			infer: function(obj) {
+				if (obj.radius) this.draw(this.c.fillStyle).circle(obj);
+				else this.draw(this.c.fillStyle).rect(obj);
 			}
 		}
 		for (let func in this.drawObj) {
@@ -374,14 +378,14 @@ class Artist {
 				this.rotate(-angle);
 				this.translate(-x, -y);
 			},
-			connector(...points) {
+			connector: function(...points) {
 				for (let i = 0; i < points.length; i++) {
 					let p1 = points[i];
 					let p2 = points[i + 1];
 					if (p2) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).line(p1, p2);
 				}
 			},
-			arrowConnector(...points) {
+			arrowConnector: function(...points) {
 				for (let i = 0; i < points.length; i++) {
 					let p1 = points[i];
 					let p2 = points[i + 1];
@@ -398,6 +402,10 @@ class Artist {
 				}
 				this.c.stroke();
 				this.c.closePath();
+			},
+			infer: function(obj) {
+				if (obj.radius) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).circle(obj);
+				else this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).rect(obj);
 			}
 		}
 		for (let func in this.strokeObj) {
@@ -405,12 +413,24 @@ class Artist {
 		}
 		this.clipObj = {
 			rect(x, y, width, height) {
+				if (typeof x === "object") {
+					width = x.width;
+					height = x.height;
+					y = x.y;
+					x = x.x;
+				}
 				this.c.beginPath();
 				this.c.rect(x, y, width, height);
 				this.c.closePath();
 				this.c.clip();
 			},
 			circle(x, y, radius) {
+				radius = Math.abs(radius);
+				if (typeof x === "object") {
+					radius = x.radius;
+					y = x.y;
+					x = x.x;
+				}
 				this.c.beginPath();
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);
 				this.c.closePath();
@@ -470,6 +490,10 @@ class Artist {
 				this.c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
 				this.c.closePath();
 				this.c.clip();
+			},
+			infer: function(obj) {
+				if (obj.radius) this.clip().circle(obj);
+				else this.clip().rect(obj);
 			}
 		};
 		for (let func in this.clipObj) {

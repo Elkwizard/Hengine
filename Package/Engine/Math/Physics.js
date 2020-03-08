@@ -303,6 +303,7 @@ class Physics {
 
         //friction
         a.applyFriction(d.normal.normalize(), collisionPoint, b.friction);
+        b.applyFriction(d.normal.normalize(), collisionPoint, a.friction);
 
         //impulse resolution
         let impulses = Physics.getImpulses(a, b, col.Adir, col.Bdir, collisionPoint, col.penetration);
@@ -463,35 +464,33 @@ class Physics {
         let source = collisionPoint;
 
         //mass percents
-        let aPercentMass = a.mass / (a.mass + b.mass);
-        let bPercentMass = 1 - aPercentMass;
+        // let aPercentMass = a.mass / (a.mass + b.mass);
+        // let bPercentMass = 1 - aPercentMass;
+        let aPer = a.mass / (a.mass + b.mass);
+        let bPer = b.mass / (a.mass + b.mass);
 
         //for impulse A
-        let forceFromB = clamp(dirFromB.dot(b.velocity), 0, Infinity);
+        let rotationB = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
+        const B_VEL = b.velocity.plus(rotationB);
+        let forceFromB = dirFromB.dot(B_VEL);
         //for impulse B
-        let forceFromA = clamp(dirFromA.dot(a.velocity), 0, Infinity);
+        let rotationA = Geometry.rotatePointAround(a.centerOfMass, collisionPoint, a.angularVelocity).minus(collisionPoint);
+        const A_VEL = a.velocity.plus(rotationA);
+        let forceFromA = dirFromA.dot(A_VEL);
 
         //walls
         if (b.positionStatic) {
-            if (a instanceof CirclePhysicsObject) {
-                dirFromB = dirFromA.times(-1);
-                forceFromB = forceFromA * (1 - a.snuzzlement);
-            } else {
-                forceFromB = 0;
-                aPercentMass = 0.5;
-                bPercentMass = 0.5;
-            }
+            aPer = 0.5;
+            bPer = 0.5;
+            dirFromB = dirFromA.times(-1);
+            forceFromB = forceFromA * (1 - a.snuzzlement);
         }
 
-        //like, the actual impulse stuff, DUH!
-        let rotationB = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
-        let rotationA = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
-        impulseA = new Impulse(rotationB.plus(dirFromB.times(forceFromB)), source);
-        impulseB = new Impulse(rotationA.plus(dirFromA.times(forceFromA)), source);
-        let forceA = impulseA.force.minus(impulseB.force).times(bPercentMass);
-        let forceB = impulseB.force.minus(impulseA.force).times(aPercentMass);
-        impulseA.force = forceA;
-        impulseB.force = forceB;
+        //like, the actual impulse stuff, duh.
+        let forceA = dirFromA.times(forceFromA);
+        let forceB = dirFromB.times(forceFromB);
+        impulseA = new Impulse(forceB.minus(forceA), source);
+        impulseB = new Impulse(forceA.minus(forceB), source);
 
         if (b.completelyStatic) impulseB = null;
         return { impulseA, impulseB };

@@ -28,8 +28,8 @@ let K = {
 	keyCounts: {},
 	keys: {},
 	custom: {},
-	onDown: new Listener,
-	onUp: new Listener
+	onDown: new Listener(),
+	onUp: new Listener()
 };
 let M = {
 	down: false,
@@ -52,12 +52,12 @@ let M = {
 			this.y = e.clientY;
 		}
 	},
-	onDown: new Listener,
-	onUp: new Listener,
-	onClick: new Listener,
-	onRight: new Listener,
-	onScroll: new Listener,
-	onMove: new Listener,
+	onDown: new Listener(),
+	onUp: new Listener(),
+	onClick: new Listener(),
+	onRight: new Listener(),
+	onScroll: new Listener(),
+	onMove: new Listener(),
 	engine: null,
 	engineClick: e => e,
 	engineRightClick: e => e,

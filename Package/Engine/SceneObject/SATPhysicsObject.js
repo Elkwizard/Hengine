@@ -166,6 +166,9 @@ class PhysicsObject extends SceneObject {
         let iD = new Impulse(drag, this.centerOfMass);
         this.applyImpulse(iD);
         this.angularVelocity *= this.angularDragForce;
+
+        if (this.velocity.mag < 0.01) this.velocity.mag = 0;
+        if (this.angularVelocity < 0.001) this.angularVelocity = 0;
     }
     capSpeed() {
         let m = Math.min(this.width, this.height) / 2;
@@ -233,7 +236,7 @@ class PhysicsObject extends SceneObject {
         this.impulses = [];
     }
     getSpeedModulation() {
-        return .5 * this.home.speedModulation / this.home.physicsRealism;
+        return this.home.speedModulation / this.home.physicsRealism;
     }
     enginePhysicsUpdate() {
         this.scriptUpdate();
