@@ -461,36 +461,56 @@ class Physics {
     }
     static getImpulses(a, b, dirFromA, dirFromB, collisionPoint) {
         let impulseA, impulseB;
-        let source = collisionPoint;
+        // let source = collisionPoint;
 
         //mass percents
         // let aPercentMass = a.mass / (a.mass + b.mass);
         // let bPercentMass = 1 - aPercentMass;
-        let aPer = a.mass / (a.mass + b.mass);
-        let bPer = b.mass / (a.mass + b.mass);
+        // let aPer = a.mass / (a.mass + b.mass);
+        // let bPer = b.mass / (a.mass + b.mass);
 
-        //for impulse A
-        let rotationB = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
-        const B_VEL = b.velocity.plus(rotationB);
-        let forceFromB = dirFromB.dot(B_VEL);
-        //for impulse B
-        let rotationA = Geometry.rotatePointAround(a.centerOfMass, collisionPoint, a.angularVelocity).minus(collisionPoint);
-        const A_VEL = a.velocity.plus(rotationA);
-        let forceFromA = dirFromA.dot(A_VEL);
+        // //for impulse A
+        // let rotationB = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
+        // const B_VEL = b.velocity.plus(rotationB);
+        // let forceFromB = dirFromB.dot(B_VEL);
+        // //for impulse B
+        // let rotationA = Geometry.rotatePointAround(a.centerOfMass, collisionPoint, a.angularVelocity).minus(collisionPoint);
+        // const A_VEL = a.velocity.plus(rotationA);
+        // let forceFromA = dirFromA.dot(A_VEL);
 
-        //walls
-        if (b.positionStatic) {
-            aPer = 0.5;
-            bPer = 0.5;
-            dirFromB = dirFromA.times(-1);
-            forceFromB = forceFromA * (1 - a.snuzzlement);
-        }
+        // //walls
+        // if (b.positionStatic) {
+        //     aPer = 0.5;
+        //     bPer = 0.5;
+        //     dirFromB = dirFromA.times(-1);
+        //     forceFromB = forceFromA * (1 - a.snuzzlement);
+        // }
 
-        //like, the actual impulse stuff, duh.
-        let forceA = dirFromA.times(forceFromA);
-        let forceB = dirFromB.times(forceFromB);
-        impulseA = new Impulse(forceB.minus(forceA), source);
-        impulseB = new Impulse(forceA.minus(forceB), source);
+        // //like, the actual impulse stuff, duh.
+        // let forceA = dirFromA.times(forceFromA);
+        // let forceB = dirFromB.times(forceFromB);
+        // impulseA = new Impulse(forceB.minus(forceA), source);
+        // impulseB = new Impulse(forceA.minus(forceB), source);
+
+        const c_C = collisionPoint;
+        const m_A = a.mass;
+        const m_B = b.mass;
+        const v_A = a.velocity;
+        const v_B = b.velocity;
+        const d_A = dirFromA.get();
+        const d_B = dirFromB.get();
+        const vc_A = Math.max(0, d_A.dot(v_A));
+        const vc_B = Math.max(0, d_B.dot(v_B));
+        const f_A = d_A.times(vc_A);
+        const f_B = d_B.times(vc_B);
+        const i_A = f_B.minus(f_A).times(m_B / m_A);
+        const i_B = f_A.minus(f_B).times(m_A / m_B);
+        console.log({i_A, i_B});
+        
+        
+        impulseA = new Impulse(i_A, c_C);
+        impulseB = new Impulse(i_B, c_C);
+
 
         if (b.completelyStatic) impulseB = null;
         return { impulseA, impulseB };
