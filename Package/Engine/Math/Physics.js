@@ -461,6 +461,7 @@ class Physics {
     }
     static getImpulses(a, b, dirFromA, dirFromB, collisionPoint) {
         let impulseA, impulseB;
+<<<<<<< HEAD
         // let source = collisionPoint;
 
         //mass percents
@@ -511,6 +512,33 @@ class Physics {
         impulseA = new Impulse(i_A, c_C);
         impulseB = new Impulse(i_B, c_C);
 
+=======
+        
+        const c_C = collisionPoint;
+        const sn_A = a.snuzzlement;
+        const sn_B = b.snuzzlement;
+        const s_A = a.positionStatic;
+        const s_B = b.positionStatic;
+        const m_A = a.mass;
+        const m_B = s_B ? m_A : b.mass;
+        const mi_A = 1 / m_A;
+        const mi_B = 1 / m_B;
+        const d_A = dirFromA.get();
+        const d_B = dirFromB.get();
+        const v_A = a.velocity.get();
+        const v_B = b.velocity.get();
+        const vc_A = Math.max(0, d_A.dot(v_A));
+        const vc_B = s_B ? -vc_A * (1 - sn_A)  : Math.max(0, d_B.dot(v_B));
+        const F_A = d_A.times(vc_A);
+        const F_B = d_B.times(vc_B);
+        const I_A = F_B.minus(F_A).times(m_B * mi_A);
+        const I_B = F_A.minus(F_B).times(m_A * mi_B);
+
+
+        impulseA = new Impulse(I_A, c_C);
+        impulseB = new Impulse(I_B, c_C);
+        
+>>>>>>> a02eb21bc912c5dca9c3c8e3f348feadd630896b
 
         if (b.completelyStatic) impulseB = null;
         return { impulseA, impulseB };
