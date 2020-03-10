@@ -52,6 +52,9 @@ let M = {
 			this.y = e.clientY;
 		}
 	},
+	allowSave: function() {
+		document.removeEventListener("contextmenu", __right__);
+	},
 	onDown: new Listener(),
 	onUp: new Listener(),
 	onClick: new Listener(),
@@ -81,32 +84,33 @@ document.addEventListener("click", function (e) {
 });
 document.addEventListener("mousedown", function (e) {
 	M.button = e.button;
-	if (M.engine) M.dragStart = M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(new Vector2(e.x, e.y));
+	if (M.engine) M.dragStart = M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(M);
 	M.updatePosition(e);
 	M.down = true;
 	for (let ev of M.onDown) ev(e);
 });
 document.addEventListener("mousemove", function (e) {
 	M.updatePosition(e);
-	if (M.engine) M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(new Vector2(e.x, e.y));
+	if (M.engine) M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(M);
 	M.engineMove(e);
 	for (let ev of M.onMove) ev(e);
 });
 document.addEventListener("mouseup", function (e) {
 	M.button = e.button;
 	M.updatePosition(e);
-	if (M.engine) M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(new Vector2(e.x, e.y));
+	if (M.engine) M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(M);
 	M.down = false;
 	for (let ev of M.onUp) ev(e);
 });
-document.addEventListener("contextmenu", function (e) {
+function __right__(e) {
 	M.button = e.button;
 	e.preventDefault();
 	M.updatePosition(e);
 	M.down = false;
 	for (let ev of M.onRight) ev(e);
 	M.engineRightClick(e);
-});
+}
+document.addEventListener("contextmenu", __right__);
 document.addEventListener("wheel", function (e) {
 	M.button = e.button;
 	for (let ev of M.onScroll) ev(e.deltaY);
