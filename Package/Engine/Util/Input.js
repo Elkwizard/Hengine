@@ -11,39 +11,114 @@ class Listener {
 		this.methods.push(fn);
 	}
 }
-let K = {
-	P: function (key) {
+class KeyboardHandler {
+	constructor() {
+		this.keyCounts = {};
+		this.keys = {};
+		this.custom = {};
+		this.onDown = new Listener();
+		this.onUp = new Listener();
+		let k = this;
+		document.addEventListener("keydown", function (e) {
+			for (let ev of k.onDown) ev(e);
+			k.keys[e.key] = true;
+		});
+		document.addEventListener("keyup", function (e) {
+			if (e.key.toUpperCase() === e.key) {
+				k.keys[e.key.toLowerCase()] = false;
+			}
+			k.keys[e.key] = false;
+			for (let ev of k.onUp) ev(e);
+		});
+	}
+	P(key) {
 		return !!this.keys[key];
-	},
-	JP: function (key) {
+	}
+	JP(key) {
 		return this.keyCounts[key] == 1;
-	},
-	update: function () {
+	}
+	update() {
 		for (let key in this.keys) {
 			if (!this.keyCounts[key]) this.keyCounts[key] = 0;
 			if (this.P(key)) this.keyCounts[key]++;
 			else this.keyCounts[key] = 0;
 		}
-	},
-	keyCounts: {},
-	keys: {},
-	custom: {},
-	onDown: new Listener(),
-	onUp: new Listener()
-};
-let M = {
-	down: false,
-	x: 0,
-	y: 0,
-	last: {
-		x: 0,
-		y: 0
-	},
-	button: 0,
-	dragStart: new Vector2(0, 0),
-	dragEnd: new Vector2(0, 0),
-	custom: {},
-	updatePosition: function (e) {
+	}
+}
+class MouseHandler {
+	constructor() {
+		this.down = false
+		this.x = 0
+		this.y = 0
+		this.last = {
+			x: 0,
+			y: 0
+		}
+		this.button = 0
+		this.dragStart = new Vector2(0, 0)
+		this.dragEnd = new Vector2(0, 0)
+		this.custom = {}
+		this.onDown = new Listener();
+		this.onUp = new Listener();
+		this.onClick = new Listener();
+		this.onRight = new Listener();
+		this.onScroll = new Listener();
+		this.onmove = new Listener();
+		this.engine = null;
+		this.engineClick = e => e;
+		this.engineRightClick = e => e;
+		this.enginemove = e => e;
+		let m = this;
+		document.addEventListener("click", function (e) {
+			m.button = e.button;
+			m.updatePosition(e, "click");
+			m.engineClick(e);
+			for (let ev of m.onClick) ev(e);
+		});
+		document.addEventListener("mousedown", function (e) {
+			m.button = e.button;
+			m.updatePosition(e, "down");
+			if (m.engine) {
+				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m)
+				m.dragStart = m.dragEnd = adjusted;
+			}
+			m.down = true;
+			for (let ev of m.onDown) ev(e);
+		});
+		document.addEventListener("mousemove", function (e) {
+			m.updatePosition(e, "move");
+			if (m.engine && m.down) {
+				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
+				m.dragEnd = adjusted;
+			}
+			m.enginemove(e);
+			for (let ev of m.onmove) ev(e);
+		});
+		document.addEventListener("mouseup", function (e) {
+			m.button = e.button;
+			m.updatePosition(e, "up");
+			if (m.engine) {
+				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
+				m.dragEnd = adjusted;
+			}
+			m.down = false;
+			for (let ev of m.onUp) ev(e);
+		});
+		this.__right__ = function (e) {
+			m.button = e.button;
+			e.preventDefault();
+			m.updatePosition(e, "right");
+			m.down = false;
+			for (let ev of m.onRight) ev(e);
+			m.engineRightClick(e);
+		}
+		document.addEventListener("contextmenu", this.__right__);
+		document.addEventListener("wheel", function (e) {
+			m.button = e.button;
+			for (let ev of m.onScroll) ev(e.deltaY);
+		});
+	}
+	updatePosition(e, name) {
 		try {
 			this.x = e.clientX - (innerWidth - width) / 2;
 			this.y = e.clientY - (innerHeight - height) / 2;
@@ -51,68 +126,10 @@ let M = {
 			this.x = e.clientX;
 			this.y = e.clientY;
 		}
-	},
-	allowSave: function() {
-		document.removeEventListener("contextmenu", __right__);
-	},
-	onDown: new Listener(),
-	onUp: new Listener(),
-	onClick: new Listener(),
-	onRight: new Listener(),
-	onScroll: new Listener(),
-	onMove: new Listener(),
-	engine: null,
-	engineClick: e => e,
-	engineRightClick: e => e,
-	engineMove: e => e
-};
-document.addEventListener("keydown", function (e) {
-	for (let ev of K.onDown) ev(e);
-	K.keys[e.key] = true;
-});
-document.addEventListener("keyup", function (e) {
-	if (e.key.toUpperCase() === e.key) {
-		K.keys[e.key.toLowerCase()] = false;
 	}
-	K.keys[e.key] = false;
-	for (let ev of K.onUp) ev(e);
-});
-document.addEventListener("click", function (e) {
-	M.button = e.button;
-	M.engineClick(e);
-	M.updatePosition(e);
-	for (let ev of M.onClick) ev(e);
-});
-document.addEventListener("mousedown", function (e) {
-	M.button = e.button;
-	M.updatePosition(e);
-	if (M.engine) M.dragStart = M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(M);
-	M.down = true;
-	for (let ev of M.onDown) ev(e);
-});
-document.addEventListener("mousemove", function (e) {
-	M.updatePosition(e);
-	if (M.engine) M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(M);
-	M.engineMove(e);
-	for (let ev of M.onMove) ev(e);
-});
-document.addEventListener("mouseup", function (e) {
-	M.button = e.button;
-	M.updatePosition(e);
-	if (M.engine) M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(M);
-	M.down = false;
-	for (let ev of M.onUp) ev(e);
-});
-function __right__(e) {
-	M.button = e.button;
-	e.preventDefault();
-	M.updatePosition(e);
-	M.down = false;
-	for (let ev of M.onRight) ev(e);
-	M.engineRightClick(e);
+	allowSave() {
+		document.removeEventListener("contextmenu", this.__right__);
+	}
 }
-document.addEventListener("contextmenu", __right__);
-document.addEventListener("wheel", function (e) {
-	M.button = e.button;
-	for (let ev of M.onScroll) ev(e.deltaY);
-});
+const K = new KeyboardHandler();
+const M = new MouseHandler();

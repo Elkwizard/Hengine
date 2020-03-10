@@ -18,7 +18,7 @@ class Graph extends Frame {
             constructor(getY) {
                 this.getY = getY;
                 this.data = [];
-                this.permanentData = "";
+                // this.permanentData = "";
             }
         }
         if (!Array.isArray(yName)) {
