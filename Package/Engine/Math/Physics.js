@@ -321,8 +321,6 @@ class Physics {
         else a.colliding.general.push(b);
         if (!b.colliding.general) b.colliding.general = [a];
         else b.colliding.general.push(a);
-        a.scriptCollideGeneral(b);
-        b.scriptCollideGeneral(a);
         let top = d.y > 0.2;
         let bottom = d.y < -0.2;
         let right = d.x < -0.2;
@@ -330,43 +328,44 @@ class Physics {
         if (left) {
             if (!a.colliding.left) a.colliding.left = [b];
             else a.colliding.left.push(b);
-            a.scriptCollideLeft(b);
-            a.response.collide.left(b);
             if (!b.colliding.right) b.colliding.right = [a];
             else b.colliding.right.push(a);
-            b.scriptCollideRight(a);
-            b.response.collide.right(a);
         }
         if (right) {
             if (!a.colliding.right) a.colliding.right = [b];
             else a.colliding.right.push(b);
-            a.scriptCollideRight(b);
-            a.response.collide.right(b);
             if (!b.colliding.left) b.colliding.left = [a];
             else b.colliding.left.push(a);
-            b.scriptCollideLeft(a);
-            b.response.collide.left(a);
         }
         if (top) {
             if (!a.colliding.top) a.colliding.top = [b];
             else a.colliding.top.push(b);
-            a.scriptCollideTop(b);
-            a.response.collide.top(b);
             if (!b.colliding.bottom) b.colliding.top = [a];
             else b.colliding.bottom.push(a);
-            b.scriptCollideBottom(a);
-            b.response.collide.bottom(a);
         }
         if (bottom) {
             if (!a.colliding.bottom) a.colliding.bottom = [b];
             else a.colliding.bottom.push(b);
-            a.scriptCollideBottom(b);
-            a.response.collide.bottom(b);
             if (!b.colliding.top) b.colliding.top = [a];
             else b.colliding.top.push(a);
-            b.scriptCollideTop(a);
-            b.response.collide.top(a);
         }
+        Physics.runEventListeners(a);
+        Physics.runEventListeners(b);
+    }
+    static runEventListeners(a) {
+        const gNow = str => a.colliding[str] ? a.colliding[str] : [];
+        const gLast = str => a.lastColliding[str] ? a.lastColliding[str] : [];
+        
+        function runEvents(name) {
+            let now = gNow(name);
+            let last = gLast(name);
+            for (let el of now) if (!last.includes(el)) {
+                a.response.collide[name](el);
+                a["scriptCollide" + name.capitalize()](el);
+            }
+        }
+
+        for (let dir of ["general", "top", "bottom", "left", "right"]) runEvents(dir);
     }
     static getCollisionPoint(a, b, corners, edge, dir) {
         let result3D = []; //<x, y, d>
