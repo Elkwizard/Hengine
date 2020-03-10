@@ -52,26 +52,22 @@ class Vector {
 		return this;
 	}
 	plus(...v) {
-		let vn = new this.constructor(0, 0, 0, 0);
-		vn.add(this);
+		let vn = this.get();
 		vn.add(...v);
 		return vn;
 	}
 	minus(...v) {
-		let vn = new this.constructor(0, 0, 0, 0);
-		vn.add(this);
+		let vn = this.get();
 		vn.sub(...v);
 		return vn;
 	}
 	over(...v) {
-		let vn = new this.constructor(0, 0, 0, 0);
-		vn.add(this);
+		let vn = this.get();
 		vn.div(...v);
 		return vn;
 	}
 	times(...v) {
-		let vn = new this.constructor(0, 0, 0, 0);
-		vn.add(this);
+		let vn = this.get();
 		vn.mul(...v);
 		return vn;
 	}
@@ -105,7 +101,7 @@ class Vector {
 	bestFit(v) {
 		let d1 = this.dot(v);
 		let d2 = this.times(-1).dot(v);
-		if (Math.abs(d2) < Math.abs(d1)) return this.times(-1);
+		if (d2 < d1) return this.times(-1);
 		else return this.get();
 	}
 	get() {

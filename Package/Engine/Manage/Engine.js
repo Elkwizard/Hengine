@@ -18,6 +18,9 @@ Number.prototype.movedTowards = function (value, ferocity) {
 	let dir = ferocity * (value - this) * 2;
 	return this + dir;
 }
+String.prototype.capitalize = function() {
+	return this[0].toUpperCase() + this.slice(1).toLowerCase();
+}
 Object.prototype.toString = function (depth = 0) {
 	if (depth < 1) {
 		let ary = [];

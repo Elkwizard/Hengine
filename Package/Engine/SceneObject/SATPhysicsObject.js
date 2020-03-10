@@ -35,6 +35,8 @@ class PhysicsObject extends SceneObject {
         this._gravity = null;
         this._mass = null;
         this.colliding = new CollisionMoniter();
+        this.lastColliding = new CollisionMoniter();
+        this.newColliding = new CollisionMoniter();
         this.response.collide = {
             general: function () { },
             top: function () { },
@@ -168,7 +170,7 @@ class PhysicsObject extends SceneObject {
         this.angularVelocity *= this.angularDragForce;
 
         if (this.velocity.mag < 0.01) this.velocity.mag = 0;
-        if (this.angularVelocity < 0.001) this.angularVelocity = 0;
+        if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
     }
     capSpeed() {
         let m = Math.min(this.width, this.height) / 2;
@@ -345,17 +347,21 @@ class PhysicsObject extends SceneObject {
         let com = this.centerOfMass;
         let startVector = impulse.source.minus(com);
         if (startVector.mag < 0.01) return;
+        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
+        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
         let endVector = impulse.source.plus(impulse.force).minus(com);
         let startAngle = startVector.getAngle();
         let endAngle = endVector.getAngle();
         let difAngle = Geometry.signedAngularDist(startAngle, endAngle);
         
-        let dadForce = difAngle * this.getImpulseRatio(impulse);
-        this.angularVelocity += this.getSpeedModulation() * dadForce;
+        let dadForce = difAngle * this.getImpulseRatio(impulse) * this.getSpeedModulation();
+
+        this.angularVelocity += dadForce;
     }
     applyFriction(tangent, collisionPoint, otherFriction) {
         let pointVel = this.velocity;
-        let friction = pointVel.times(-1).projectOnto(tangent.bestFit(pointVel));
+        let best = tangent.bestFit(pointVel);
+        let friction = pointVel.times(-1).projectOnto(best);
         let mag = friction.mag;
         friction.mag = Math.min(mag, mag * this.friction * otherFriction);
         let iFL = new Impulse(friction, collisionPoint);

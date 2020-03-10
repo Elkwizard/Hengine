@@ -249,8 +249,12 @@ class Artist {
 				this.c.closePath();
 			},
 			infer: function(obj) {
-				if (obj.radius) this.draw(this.c.fillStyle).circle(obj);
-				else this.draw(this.c.fillStyle).rect(obj);
+				if (obj.radius) {
+					this.draw(this.c.fillStyle).circle(obj);
+				}
+				else {
+					this.draw(this.c.fillStyle).rect(obj);
+				}
 			}
 		}
 		for (let func in this.drawObj) {

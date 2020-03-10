@@ -284,7 +284,7 @@ class Physics {
                 let aMove = dir.times(aPer);
                 let bMove = dir.times(-bPer);
 
-                
+
 
                 //like, the escaping
                 a.privateSetX(a.x - aMove.x);
@@ -294,7 +294,7 @@ class Physics {
                 // c.stroke(cl.RED, 2).arrow(a.centerOfMass, b.centerOfMass);
                 // c.stroke(cl.RED, 2).arrow(collisionPoint, collisionPoint.plus(aMove));
                 // c.stroke(cl.BLUE, 2).arrow(collisionPoint, collisionPoint.plus(bMove));
-            }
+            } else return;
         } else return;
         //velocity
         const A_VEL_AT_COLLISION = a.velocity.dot(col.Adir);
@@ -302,8 +302,9 @@ class Physics {
         if (A_VEL_AT_COLLISION < 0 && B_VEL_AT_COLLISION < 0) return;
 
         //friction
-        a.applyFriction(d.normal.normalize(), collisionPoint, b.friction);
-        b.applyFriction(d.normal.normalize(), collisionPoint, a.friction);
+        const normal = d.normal.normalize();
+        a.applyFriction(normal, collisionPoint, b.friction);
+        b.applyFriction(normal, collisionPoint, a.friction);
 
         //impulse resolution
         let impulses = Physics.getImpulses(a, b, col.Adir, col.Bdir, collisionPoint, col.penetration);
@@ -461,84 +462,45 @@ class Physics {
     }
     static getImpulses(a, b, dirFromA, dirFromB, collisionPoint) {
         let impulseA, impulseB;
-<<<<<<< HEAD
-        // let source = collisionPoint;
 
-        //mass percents
-        // let aPercentMass = a.mass / (a.mass + b.mass);
-        // let bPercentMass = 1 - aPercentMass;
-        // let aPer = a.mass / (a.mass + b.mass);
-        // let bPer = b.mass / (a.mass + b.mass);
-
-        // //for impulse A
-        // let rotationB = Geometry.rotatePointAround(b.centerOfMass, collisionPoint, b.angularVelocity).minus(collisionPoint);
-        // const B_VEL = b.velocity.plus(rotationB);
-        // let forceFromB = dirFromB.dot(B_VEL);
-        // //for impulse B
-        // let rotationA = Geometry.rotatePointAround(a.centerOfMass, collisionPoint, a.angularVelocity).minus(collisionPoint);
-        // const A_VEL = a.velocity.plus(rotationA);
-        // let forceFromA = dirFromA.dot(A_VEL);
-
-        // //walls
-        // if (b.positionStatic) {
-        //     aPer = 0.5;
-        //     bPer = 0.5;
-        //     dirFromB = dirFromA.times(-1);
-        //     forceFromB = forceFromA * (1 - a.snuzzlement);
-        // }
-
-        // //like, the actual impulse stuff, duh.
-        // let forceA = dirFromA.times(forceFromA);
-        // let forceB = dirFromB.times(forceFromB);
-        // impulseA = new Impulse(forceB.minus(forceA), source);
-        // impulseB = new Impulse(forceA.minus(forceB), source);
-
-        const c_C = collisionPoint;
-        const m_A = a.mass;
-        const m_B = b.mass;
-        const v_A = a.velocity;
-        const v_B = b.velocity;
-        const d_A = dirFromA.get();
-        const d_B = dirFromB.get();
-        const vc_A = Math.max(0, d_A.dot(v_A));
-        const vc_B = Math.max(0, d_B.dot(v_B));
-        const f_A = d_A.times(vc_A);
-        const f_B = d_B.times(vc_B);
-        const i_A = f_B.minus(f_A).times(m_B / m_A);
-        const i_B = f_A.minus(f_B).times(m_A / m_B);
-        console.log({i_A, i_B});
-        
-        
-        impulseA = new Impulse(i_A, c_C);
-        impulseB = new Impulse(i_B, c_C);
-
-=======
-        
         const c_C = collisionPoint;
         const sn_A = a.snuzzlement;
         const sn_B = b.snuzzlement;
         const s_A = a.positionStatic;
         const s_B = b.positionStatic;
+        const com_A = a.centerOfMass;
+        const com_B = b.centerOfMass;
         const m_A = a.mass;
         const m_B = s_B ? m_A : b.mass;
         const mi_A = 1 / m_A;
         const mi_B = 1 / m_B;
         const d_A = dirFromA.get();
-        const d_B = dirFromB.get();
-        const v_A = a.velocity.get();
-        const v_B = b.velocity.get();
-        const vc_A = Math.max(0, d_A.dot(v_A));
-        const vc_B = s_B ? -vc_A * (1 - sn_A)  : Math.max(0, d_B.dot(v_B));
+        const d_B = s_B ? d_A.times(-1) : dirFromB.get();
+        const vl_A = a.velocity.get();
+        const vl_B = b.velocity.get();
+        // const va_A = a.angularVelocity;
+        // const va_B = b.angularVelocity;
+        // const vla_A = c_C.minus(Geometry.rotatePointAround(com_A, c_C, va_A));
+        // const vla_B = c_C.minus(Geometry.rotatePointAround(com_B, c_C, va_B));
+        const v_A = vl_A//.plus(vla_A);
+        const v_B = vl_B//.plus(vla_B);
+        const vc_A = d_A.dot(v_A);
+        const vc_B = s_B ? vc_A * (1 - sn_A) : d_B.dot(v_B);
         const F_A = d_A.times(vc_A);
         const F_B = d_B.times(vc_B);
-        const I_A = F_B.minus(F_A).times(m_B * mi_A);
-        const I_B = F_A.minus(F_B).times(m_A * mi_B);
+        const I_A = F_B.minus(F_A).times(Math.min(1, m_B * mi_A));
+        const I_B = F_A.minus(F_B).times(Math.min(1, m_A * mi_B));
 
 
         impulseA = new Impulse(I_A, c_C);
         impulseB = new Impulse(I_B, c_C);
-        
->>>>>>> a02eb21bc912c5dca9c3c8e3f348feadd630896b
+        const awayBoth = vc_A < 0 && vc_B < 0;
+        const awayA = -vc_A > vc_B;
+        const awayB = -vc_B > vc_A;
+        if (awayBoth || awayA || awayB) {
+            impulseA = null;
+            impulseB = null;
+        }
 
         if (b.completelyStatic) impulseB = null;
         return { impulseA, impulseB };
