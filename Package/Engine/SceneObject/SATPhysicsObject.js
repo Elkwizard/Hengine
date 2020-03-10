@@ -23,9 +23,6 @@ class PhysicsObject extends SceneObject {
         this.canMoveThisFrame = true;
         this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
         this.snuzzlement = 1;
-        this.linearDragForce = LINEAR_LOSS;
-        this.angularDragForce = ANGULAR_LOSS;
-        this.friction = FRICTION_LOSS;
         this.density = 0.1;
         this.positionStatic = !gravity;
         this.rotationStatic = !gravity;
@@ -34,6 +31,9 @@ class PhysicsObject extends SceneObject {
         this.canCollide = true;
         this._gravity = null;
         this._mass = null;
+        this._linearDragForce = null;
+        this._angularDragForce = null;
+        this._friction = null;
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
         this.newColliding = new CollisionMoniter();
@@ -80,6 +80,27 @@ class PhysicsObject extends SceneObject {
     }
     set gravity(a) {
         this._gravity = a;
+    }
+    set friction(a) {
+        this._friction = a;
+    }
+    get friction() {
+        if (this._friction !== null) return this._friction;
+        return FRICTION_LOSS;
+    }
+    set linearDragForce(a) {
+        this._linearDragForce = a;
+    }
+    get linearDragForce() {
+        if (this._angularDragForce !== null) return this._linearDragForce;
+        return LINEAR_LOSS;
+    }
+    set angularDragForce(a) {
+        this._angularDragForce = a;
+    }
+    get angularDragForce() {
+        if (this._angularDragForce !== null) return this._angularDragForce;
+        return ANGULAR_LOSS;
     }
     set mass(a) {
         this._mass = a;

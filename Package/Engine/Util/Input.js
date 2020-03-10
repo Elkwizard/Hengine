@@ -80,6 +80,7 @@ document.addEventListener("keyup", function (e) {
 document.addEventListener("click", function (e) {
 	M.button = e.button;
 	M.engineClick(e);
+	M.updatePosition(e);
 	for (let ev of M.onClick) ev(e);
 });
 document.addEventListener("mousedown", function (e) {
