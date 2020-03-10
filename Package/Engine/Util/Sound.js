@@ -14,9 +14,11 @@ class Sound {
                 break;
             }
         }
-        let aud = new Audio(this.src);
-        if (!found) this.sounds.push(aud);
-        aud.volume = volume;
-        aud.play();
+        if (!found) {
+            let aud = new Audio(this.src);
+            this.sounds.push(aud);
+            aud.volume = volume;
+            aud.play();
+        }
     }
 }
