@@ -84,8 +84,8 @@ document.addEventListener("click", function (e) {
 });
 document.addEventListener("mousedown", function (e) {
 	M.button = e.button;
-	if (M.engine) M.dragStart = M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(M);
 	M.updatePosition(e);
+	if (M.engine) M.dragStart = M.dragEnd = M.engine.scene.screenSpaceToWorldSpace(M);
 	M.down = true;
 	for (let ev of M.onDown) ev(e);
 });
