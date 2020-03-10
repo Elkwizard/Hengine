@@ -2,10 +2,9 @@ class ParticleSpawnerObject extends PhysicsObject {
     constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), home) {
         super(name, x, y, 0, 0, false, false, "Particle-Spawner", home);
         this.active = true;
-        this.canCollide = false;
-        this.fades = true;
-        this.slows = true;
-        this.falls = false;
+        this.particleFades = true;
+        this.particleSlows = true;
+        this.particleFalls = false;
         this.particleDelay = delay;
         this.particleInitSpeed = spd;
         this.particleLifeSpan = timer;
@@ -17,6 +16,10 @@ class ParticleSpawnerObject extends PhysicsObject {
         this.isSpawner = true;
         this.particleSpeedVariance = speedVariance;
         this.particleNumber = 0;
+        this.canCollide = false;
+        this.positionStatic = false;
+        this.rotationStatic = true;
+        this.slows = false;
     }
     engineDrawUpdate() {
 
@@ -36,12 +39,12 @@ class ParticleSpawnerObject extends PhysicsObject {
 }
 class ParticleObject extends PhysicsObject {
     constructor(spawner, home, name) {
-        super(name, 0, 0, 0, 0, spawner.falls, false, "Engine-Particle", home);
+        super(name, 0, 0, 0, 0, spawner.particleFalls, false, "Engine-Particle", home);
         this.spawner = spawner;
         this.draw = e => e;
         this.drawPrefix = e => e;
         this.drawSuffix = e => e;
-        if (this.spawner.fades) {
+        if (this.spawner.particleFades) {
             this.drawPrefix = e => {
                 this.home.c.c.globalAlpha = Math.max(0, 1 - (this.lifeSpan / this.spawner.particleLifeSpan));
             }
@@ -65,6 +68,8 @@ class ParticleObject extends PhysicsObject {
         let n = this;
         this.x = sX;
         this.y = sY;
+        this.lastX = sX;
+        this.lastY = sY;
         this.width = pSize;
         this.height = pSize;
 
@@ -91,7 +96,7 @@ class ParticleObject extends PhysicsObject {
         this.lastY = this.y;
         if (this.spawner.falls) this.accel.y = this.home.gravity.y;
         this.speed.add(this.accel);
-        if (this.spawner.slows) {
+        if (this.spawner.particleSlows) {
             this.slowDown();
         }
         this.x += this.speed.x * 2;

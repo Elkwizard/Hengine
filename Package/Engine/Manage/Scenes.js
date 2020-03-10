@@ -117,18 +117,18 @@ class InactiveScene {
 				n = this.addParticleSpawner(el.name + " - copy", el.x, el.y, el.particleSize, el.particleInitSpeed, el.delay, el.timer, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
 				n.width = el.width;
 				n.height = el.height;
-				n.slows = el.slows;
-				n.fades = el.fades;
+				n.particleSlows = el.particleSlows;
+				n.particleFades = el.particleFades;
+				n.particleFalls = el.particleFalls;
 				n.active = el.active;
-				n.falls = el.falls;
 			} else {
 				if (el instanceof CirclePhysicsObject) n = this.addCircleElement(el.name + " - copy", el.x, el.y, el.radius, !el.completelyStatic, { ...el.controls }, el.tag);
 				else n = this.addRectElement(el.name + " - copy", el.x, el.y, el.width, el.height, !el.completelyStatic, { ...el.controls }, el.tag);
-				n.positionStatic = el.positionStatic;
-				n.rotationStatic = el.rotationStatic;
-				n.applyGravity = el.applyGravity;
-				n.slows = el.slows;
 			}
+			n.positionStatic = el.positionStatic;
+			n.rotationStatic = el.rotationStatic;
+			n.applyGravity = el.applyGravity;
+			n.slows = el.slows;
 		} else {
 			n = this.addElement(el.name + " - copy", el.x, el.y, el.width, el.height, { ...el.controls }, el.tag);
 		}
@@ -618,7 +618,7 @@ class Scene extends InactiveScene {
 			for (let i = 0; i < useful.length; i++) {
 				let [rect, ...updateCells] = useful[i];
 				let updater = useful[i][useful[i].length - 1];
-				
+
 				this.SAT.gridChecks += updater.length;
 				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
 				rect.physicsUpdate(updater);
@@ -626,7 +626,7 @@ class Scene extends InactiveScene {
 			for (let i = useful.length - 1; i >= 0; i--) {
 				let [rect, ...updateCells] = useful[i];
 				let updater = useful[i][useful[i].length - 1];
-				
+
 				this.SAT.gridChecks += updater.length;
 				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
 				rect.physicsUpdate(updater);

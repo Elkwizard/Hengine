@@ -199,9 +199,9 @@ class PhysicsObject extends SceneObject {
                     if (other instanceof PhysicsObject && other.tag !== "Engine-Particle") {
                         if (this.optimize(this, other)) {
                             if (this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
-                                let nameA = (this instanceof CirclePhysicsObject)? "Circle":"Rect";
-                                let nameB = (other instanceof CirclePhysicsObject)? "Circle":"Rect";
-                                let col = Physics["collide" + nameA + nameB](this, other);              
+                                let nameA = (this instanceof CirclePhysicsObject) ? "Circle" : "Rect";
+                                let nameB = (other instanceof CirclePhysicsObject) ? "Circle" : "Rect";
+                                let col = Physics["collide" + nameA + nameB](this, other);
                                 if (col.colliding) {
                                     this.allCollidingWith["Rect - " + other.name] = other;
                                     other.allCollidingWith["Rect - " + this.name] = this;
@@ -245,45 +245,46 @@ class PhysicsObject extends SceneObject {
         this.update();
     }
     physicsUpdate(others) {
-        s.drawInWorldSpace(e => {
-            //slow
-            if (this.slows) this.slowDown();
-            if (this.applyGravity) {
-                //links
-                for (let link of this.links) link.fix();
+        // s.drawInWorldSpace(e => {
+        //slow
+        if (this.slows) this.slowDown();
+        if (this.applyGravity) {
+            //links
+            for (let link of this.links) link.fix();
 
-                //gravity
-                let gv = this.gravity;
-                let gravitationalForce = gv;
-                let iG = new Impulse(gravitationalForce, this.centerOfMass);
-                this.applyImpulse(iG);
-            }
-            let spdMod = this.getSpeedModulation();
-            for (let i = 0; i < this.home.physicsRealism; i++) {
-                //linear
-                this.velocity.add(this.acceleration.times(spdMod));
-                this.capSpeed;
+            //gravity
+            let gv = this.gravity;
+            let gravitationalForce = gv;
+            let iG = new Impulse(gravitationalForce, this.centerOfMass);
+            this.applyImpulse(iG);
+        }
+        let spdMod = this.getSpeedModulation();
+        for (let i = 0; i < this.home.physicsRealism; i++) {
+            //linear
+            this.velocity.add(this.acceleration.times(spdMod));
+            this.capSpeed;
 
 
-                let newX = this.x + this.velocity.x * 2 * spdMod;
-                let newY = this.y + this.velocity.y * 2 * spdMod;
-                this.privateSetX(newX);
-                this.privateSetY(newY);
+            let newX = this.x + this.velocity.x * 2 * spdMod;
+            let newY = this.y + this.velocity.y * 2 * spdMod;
+            this.privateSetX(newX);
+            this.privateSetY(newY);
 
-                //angular
-                this.angularVelocity += this.angularAcceleration * spdMod;
-                let newRotation = this.rotation + this.angularVelocity * spdMod;
-                this.privateSetRotation(newRotation);
+            //angular
+            this.angularVelocity += this.angularAcceleration * spdMod;
+            let newRotation = this.rotation + this.angularVelocity * spdMod;
+            this.privateSetRotation(newRotation);
 
-                this.checkAndResolveCollisions(others);
-            }
+            this.checkAndResolveCollisions(others);
+        }
 
-            this.rotation %= Math.PI * 2;
+        this.rotation %= Math.PI * 2;
 
-            this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
-            this.lastX = this.x;
-            this.lastY = this.y;
-        });
+        this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
+        this.lastX = this.x;
+        this.lastY = this.y;
+
+        // });
     }
     moveTowards(point, ferocity) {
         if (ferocity === undefined) ferocity = 1;
@@ -347,13 +348,11 @@ class PhysicsObject extends SceneObject {
         let com = this.centerOfMass;
         let startVector = impulse.source.minus(com);
         if (startVector.mag < 0.01) return;
-        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
         let endVector = impulse.source.plus(impulse.force).minus(com);
         let startAngle = startVector.getAngle();
         let endAngle = endVector.getAngle();
         let difAngle = Geometry.signedAngularDist(startAngle, endAngle);
-        
+
         let dadForce = difAngle * this.getImpulseRatio(impulse) * this.getSpeedModulation();
 
         this.angularVelocity += dadForce;
