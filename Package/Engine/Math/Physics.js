@@ -355,7 +355,7 @@ class Physics {
     static runEventListeners(a) {
         const gNow = str => a.colliding[str] ? a.colliding[str] : [];
         const gLast = str => a.lastColliding[str] ? a.lastColliding[str] : [];
-        
+
         function runEvents(name) {
             let now = gNow(name);
             let last = gLast(name);
@@ -365,7 +365,10 @@ class Physics {
             }
         }
 
-        for (let dir of ["general", "top", "bottom", "left", "right"]) runEvents(dir);
+        for (let dir of ["general", "top", "bottom", "left", "right"]) {
+            runEvents(dir);
+            a.lastColliding[dir] = gNow(dir).length ? gNow(dir) : null;
+        }
     }
     static getCollisionPoint(a, b, corners, edge, dir) {
         let result3D = []; //<x, y, d>

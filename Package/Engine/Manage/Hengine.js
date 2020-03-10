@@ -215,7 +215,7 @@ class Hengine {
 		return x;
 	}
 	loadSound(src) {
-		let x = new Audio(this.SOUND_PATH + src);
+		let x = new Sound(this.SOUND_PATH + src);
 		return x;
 	}
 	rand(sd) {
