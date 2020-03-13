@@ -590,6 +590,7 @@ class Scene extends InactiveScene {
 			let isUseless = a => !(a instanceof PhysicsObject) || (a instanceof ParticleObject);
 			let useful = [];
 			let useless = [];
+
 			let sortedEls = this.contains_array;
 			for (let rect of sortedEls) {
 				if (isUseless(rect)) {
@@ -619,9 +620,9 @@ class Scene extends InactiveScene {
 			useful = [...(new Set(useful))];
 			// useful = useful.sort((a, b) => a[0].mass - b[0].mass);
 			const dir = this.gravity.get().normalize();
-			useful = useful.sort((a, b) => function () {
-				let mA = Vector2.fromPoint(a.unrotatedMiddle);
-				let mB = Vector2.fromPoint(b.unrotatedMiddle);
+			useful = useful.sort(function (a, b) {
+				let mA = Vector2.fromPoint(a[0].unrotatedMiddle);
+				let mB = Vector2.fromPoint(b[0].unrotatedMiddle);
 				let dA = mA.dot(dir);
 				let dB = mB.dot(dir);
 				return dB - dA;
@@ -656,6 +657,17 @@ class Scene extends InactiveScene {
 				rect.physicsUpdate(updater);
 				rect.enginePhysicsUpdate();
 			}
+			// // show update order
+			// this.drawInWorldSpace(e => {
+			// 	for (let i = 0; i < useful.length; i++) {
+			// 		let usef = useful[i];
+			// 		let r = usef[0];
+			// 		let x = r.middle.x;
+			// 		let y = r.middle.y;
+			// 		c.draw(Color.grayScale(i / useful.length)).circle(x, y, 10);
+			// 		c.stroke(cl.RED, 1).circle(x, y, 10);
+			// 	}
+			// });
 			//non collision fixed update
 			for (let rect of useless) {
 				for (let i = 0; i < 2; i++) rect.physicsUpdate([]);

@@ -490,7 +490,7 @@ class Physics {
         const F_B = d_B.times(vc_B);
         const I_A = F_B.minus(F_A).times(Math.min(1, m_B * mi_A));
         const I_B = F_A.minus(F_B).times(Math.min(1, m_A * mi_B));
-        if (a.name.match(/block/) && b.name.match(/block/)) console.log({ m_A, m_B, F_A, F_B, I_A, I_B });
+        // if (a.name.match(/block/) && b.name.match(/block/)) console.log({ m_A, m_B, F_A, F_B, I_A, I_B });
 
         impulseA = new Impulse(I_A, c_C);
         impulseB = new Impulse(I_B, c_C);
