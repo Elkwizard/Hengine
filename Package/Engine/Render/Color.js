@@ -101,6 +101,7 @@ class Color {
 	static random() {
 		return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random());
 	}
+	
 	static add(c1, c2) {
 		let mixer = new Color(0, 0, 0, 0);
 		mixer.add(c1);
@@ -155,7 +156,7 @@ class Color {
 	static lerp(color1, color2, per) {
 		let c1 = Color.copy(color1);
 		let c2 = Color.copy(color2);
-		return c1.mul(1 - per).add(c2.mul(per));
+		return c1.times(1 - per).plus(c2.times(per));
 	}
 	get_RGBA() {
 		return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
@@ -237,6 +238,30 @@ class Color {
 		this.alpha %= col.alpha;
 		this.constrain();
 		return this;
+	}
+	get() {
+		// console.log(this.red,this.green,this.blue,this.alpha);
+		return new Color(this.red, this.green, this.blue, this.alpha);
+	}
+	plus(col) {
+		let x = this.get();
+		x.add(col);
+		return x;
+	}
+	minus(col) {
+		let x = this.get();
+		x.sub(col);
+		return x;
+	}
+	times(col) {
+		let x = this.get();
+		x.mul(col);
+		return x;
+	}
+	over(col) {
+		let x = this.get();
+		x.div(col);
+		return x;
 	}
 	static grayScale(per) {
 		let r = 255 * per;

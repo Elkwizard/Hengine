@@ -635,7 +635,7 @@ class Scene extends InactiveScene {
 			}
 			//ascending mass phase
 			for (let i = 0; i < useful.length; i++) {
-				let [rect, ...updateCells] = useful[i];
+				let rect = useful[i][0];
 				let updater = useful[i][useful[i].length - 1];
 
 				this.SAT.gridChecks += updater.length;
@@ -649,12 +649,15 @@ class Scene extends InactiveScene {
 			}
 			//descending mass phase
 			for (let i = useful.length - 1; i >= 0; i--) {
-				let [rect, ...updateCells] = useful[i];
+				let rect = useful[i][0];
 				let updater = useful[i][useful[i].length - 1];
 
 				this.SAT.gridChecks += updater.length;
 				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
 				rect.physicsUpdate(updater);
+			}
+			for (let usef of useful) {
+				let rect = usef[0];
 				rect.enginePhysicsUpdate();
 			}
 			// // show update order
@@ -670,7 +673,7 @@ class Scene extends InactiveScene {
 			// });
 			//non collision fixed update
 			for (let rect of useless) {
-				for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
+				if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
 				rect.enginePhysicsUpdate();
 			}
 			// // show cells
