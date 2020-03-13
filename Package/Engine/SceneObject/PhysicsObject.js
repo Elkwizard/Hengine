@@ -1,7 +1,7 @@
 class PhysicsObject extends SceneObject {
 	constructor(name, x, y, width, height, gravity, controls, tag, home) {
 		super(name, x, y, width, height, controls, tag, home);
-		this.applyGravity = gravity;
+		this.hasGravity = gravity;
 		this.slows = undefined;
 		this.instantStop = false;
 		this.stopTimer = 0;
@@ -121,14 +121,14 @@ class PhysicsObject extends SceneObject {
 		});
 	}
 	removeGravity() {
-		this.applyGravity = false;
+		this.hasGravity = false;
 		this.accel.y = 0;
 		this.logMod(function () {
 			this.removeGravity();
 		});
 	}
 	allowGravity() {
-		this.applyGravity = true;
+		this.hasGravity = true;
 		this.logMod(function () {
 			this.allowCollisions();
 		});
@@ -145,7 +145,7 @@ class PhysicsObject extends SceneObject {
 		if (!this.static) {
 			this.oldX = this.x;
 			this.oldY = this.y;
-			if (this.applyGravity) {
+			if (this.hasGravity) {
 				this.speed.add(this.home.gravity);
 			}
 			if (this.controls) {
@@ -153,7 +153,7 @@ class PhysicsObject extends SceneObject {
 			}
 			this.speed.add(this.accel);
 			if (this.slows === undefined) {
-				if (this.applyGravity) {
+				if (this.hasGravity) {
 					this.slowDown();
 				}
 			} else if (this.slows) {
@@ -244,7 +244,7 @@ class PhysicsObject extends SceneObject {
 				a["scriptCollide" + pos2](this);
 			}
 		}
-		for (let a of e) if (!a.applyGravity) {
+		for (let a of e) if (!a.hasGravity) {
 			this.speed[dir] = -spd / 2 * this.rebound;
 		} else {
 			a.speed[dir] += spd / 4 * a.rebound;
@@ -382,7 +382,7 @@ class CirclePhysicsObject extends PhysicsObject {
 						//adjust position
 						dir.normalize();
 						if (!usesTobinMath) {
-							if (a.applyGravity && a instanceof CirclePhysicsObject) {
+							if (a.hasGravity && a instanceof CirclePhysicsObject) {
 								a.x += dir.x * ove * .5;
 								a.y += dir.y * ove * .5;
 								this.x -= dir.x * ove * .5;
@@ -393,7 +393,7 @@ class CirclePhysicsObject extends PhysicsObject {
 							}
 						}
 						let r = Math.max(0.01, this.rebound);
-						if (a.applyGravity) {
+						if (a.hasGravity) {
 							a.speed.x += -r * speedMag * -dir.x;
 							a.speed.y += -r * speedMag * -dir.y;
 						}

@@ -63,7 +63,7 @@ class MouseHandler {
 		this.onClick = new Listener();
 		this.onRight = new Listener();
 		this.onScroll = new Listener();
-		this.onmove = new Listener();
+		this.onMove = new Listener();
 		this.engine = null;
 		this.engineClick = e => e;
 		this.engineRightClick = e => e;
@@ -92,7 +92,7 @@ class MouseHandler {
 				m.dragEnd = adjusted;
 			}
 			m.enginemove(e);
-			for (let ev of m.onmove) ev(e);
+			for (let ev of m.onMove) ev(e);
 		});
 		document.addEventListener("mouseup", function (e) {
 			m.button = e.button;

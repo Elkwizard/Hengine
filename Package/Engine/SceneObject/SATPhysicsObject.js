@@ -1,7 +1,4 @@
-const LINEAR_LOSS = .985;
-const ANGULAR_LOSS = .985;
 const CLIPPING_THRESHOLD = 3;
-const FRICTION_LOSS = 0.2;
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, width, height, gravity, controls, tag, home) {
         super(name, x, y, width, height, controls, tag, home);
@@ -10,7 +7,7 @@ class PhysicsObject extends SceneObject {
         this._rotation = 0.0001;
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
-        this.applyGravity = gravity;
+        this.hasGravity = gravity;
         this.slows = gravity;
         this.home.hasRotatedRectangles = true;
         this.links = [];
@@ -27,7 +24,6 @@ class PhysicsObject extends SceneObject {
         this.positionStatic = !gravity;
         this.rotationStatic = !gravity;
         this.contactPoints = [];
-        this.impulses = [];
         this.canCollide = true;
         this._gravity = null;
         this._mass = null;
@@ -86,21 +82,21 @@ class PhysicsObject extends SceneObject {
     }
     get friction() {
         if (this._friction !== null) return this._friction;
-        return FRICTION_LOSS;
+        return this.home.frictionDragForce;
     }
     set linearDragForce(a) {
         this._linearDragForce = a;
     }
     get linearDragForce() {
         if (this._angularDragForce !== null) return this._linearDragForce;
-        return LINEAR_LOSS;
+        return this.home.linearDragForce;
     }
     set angularDragForce(a) {
         this._angularDragForce = a;
     }
     get angularDragForce() {
         if (this._angularDragForce !== null) return this._angularDragForce;
-        return ANGULAR_LOSS;
+        return this.home.angularDragForce;
     }
     set mass(a) {
         this._mass = a;
@@ -122,12 +118,12 @@ class PhysicsObject extends SceneObject {
     get accel() {
         return this.acceleration;
     }
-    set applyGravity(a) {
-        this._applyGravity = a;
+    set hasGravity(a) {
+        this._hasGravity = a;
         this.slows = a;
     }
-    get applyGravity() {
-        return this._applyGravity;
+    get hasGravity() {
+        return this._hasGravity;
     }
     set completelyStatic(a) {
         this.positionStatic = a;
@@ -243,69 +239,68 @@ class PhysicsObject extends SceneObject {
         return collisions;
     }
     checkAndResolveCollisions(others) {
+        const dir = this.velocity.get().normalize();
+        others = others.sort((a, b) => function () {
+            let mA = Vector2.fromPoint(a.unrotatedMiddle);
+            let mB = Vector2.fromPoint(b.unrotatedMiddle);
+            let dA = mA.dot(dir);
+            let dB = mB.dot(dir);
+            return dB - dA;
+        });
         let collisions = this.detectCollisions(others);
         if (!this.completelyStatic) for (let col of collisions) Physics.resolve(col);
         let st = collisions.map(e => e.b).filter(e => e.completelyStatic);
         collisions = this.detectCollisions(st);
         if (!this.completelyStatic) for (let col of collisions) Physics.resolve(col);
     }
-    resolveImpulses() {
-        for (let impulse of this.impulses) {
-            if (!impulse) continue;
-            this.applyLinearImpulse(impulse);
-            this.applyAngularImpulse(impulse);
-        }
-        // c.draw(cl.RED).text("10px Monospace", this.contactPoints.length, this.middle.x, this.middle.y);
-        this.impulses = [];
-    }
     getSpeedModulation() {
-        return this.home.speedModulation / this.home.physicsRealism;
+        return .5 * this.home.speedModulation / this.home.physicsRealism;
     }
     enginePhysicsUpdate() {
         this.scriptUpdate();
         this.update();
     }
-    physicsUpdate(others) {
-        // s.drawInWorldSpace(e => {
-        //slow
-        if (this.slows) this.slowDown();
-        if (this.applyGravity) {
-            //links
-            for (let link of this.links) link.fix();
-
+    applyGravity(coef = 1) {
+        if (this.hasGravity) {
             //gravity
             let gv = this.gravity;
-            let gravitationalForce = gv;
+            let gravitationalForce = gv.times(coef);
             let iG = new Impulse(gravitationalForce, this.centerOfMass);
             this.applyImpulse(iG);
         }
-        let spdMod = this.getSpeedModulation();
-        for (let i = 0; i < this.home.physicsRealism; i++) {
-            //linear
-            this.velocity.add(this.acceleration.times(spdMod));
-            this.capSpeed;
+    }
+    physicsUpdate(others) {
+        s.drawInWorldSpace(e => {
+            //slow
+            if (this.slows) this.slowDown();
+
+            let spdMod = this.getSpeedModulation();
+            for (let i = 0; i < this.home.physicsRealism; i++) {
+                //linear
+                this.velocity.add(this.acceleration.times(spdMod));
+                this.capSpeed;
 
 
-            let newX = this.x + this.velocity.x * 2 * spdMod;
-            let newY = this.y + this.velocity.y * 2 * spdMod;
-            this.privateSetX(newX);
-            this.privateSetY(newY);
+                let newX = this.x + this.velocity.x * 2 * spdMod;
+                let newY = this.y + this.velocity.y * 2 * spdMod;
+                this.privateSetX(newX);
+                this.privateSetY(newY);
 
-            //angular
-            this.angularVelocity += this.angularAcceleration * spdMod;
-            let newRotation = this.rotation + this.angularVelocity * spdMod;
-            this.privateSetRotation(newRotation);
+                //angular
+                this.angularVelocity += this.angularAcceleration * spdMod;
+                let newRotation = this.rotation + this.angularVelocity * spdMod;
+                this.privateSetRotation(newRotation);
 
-            this.checkAndResolveCollisions(others);
-        }
+                this.checkAndResolveCollisions(others);
+            }
 
-        this.rotation %= Math.PI * 2;
+            this.rotation %= Math.PI * 2;
 
-        this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
-        this.lastX = this.x;
-        this.lastY = this.y;
+            this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
+            this.lastX = this.x;
+            this.lastY = this.y;
 
-        // });
+        });
     }
     moveTowards(point, ferocity) {
         if (ferocity === undefined) ferocity = 1;
@@ -353,8 +348,8 @@ class PhysicsObject extends SceneObject {
     }
     applyImpulse(impulse, name = "no name") {
         if (!impulse) return;
-        this.impulses.push(impulse);
-        this.resolveImpulses();
+        this.applyLinearImpulse(impulse);
+        this.applyAngularImpulse(impulse);
         // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
         // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
@@ -362,7 +357,7 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         let ratio = this.getImpulseRatio(impulse);
         let rat = clamp(1 / ratio, 0, 1);
-        this.velocity.add(impulse.force.times(this.getSpeedModulation() * rat));
+        this.velocity.add(impulse.force.times(rat));
     }
     applyAngularImpulse(impulse) {
         if (!impulse) return;
@@ -374,14 +369,15 @@ class PhysicsObject extends SceneObject {
         let endAngle = endVector.getAngle();
         let difAngle = Geometry.signedAngularDist(startAngle, endAngle);
 
-        let dadForce = difAngle * this.getImpulseRatio(impulse) * this.getSpeedModulation();
+        let dadForce = difAngle * this.getImpulseRatio(impulse);
 
         this.angularVelocity += dadForce;
     }
     applyFriction(tangent, collisionPoint, otherFriction) {
         let pointVel = this.velocity;
         let best = tangent.bestFit(pointVel);
-        let friction = pointVel.times(-1).projectOnto(best);
+        let push = -tangent.normal.bestFit(pointVel).dot(pointVel);
+        let friction = pointVel.times(-1).projectOnto(best).times(clamp(Math.ceil(push), 0, 1));
         let mag = friction.mag;
         friction.mag = Math.min(mag, mag * this.friction * otherFriction);
         let iFL = new Impulse(friction, collisionPoint);

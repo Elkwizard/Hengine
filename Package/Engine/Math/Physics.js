@@ -177,6 +177,7 @@ class Physics {
         ];
         let aCorners = a.getCorners();
         let bCorners = b.getCorners();
+        let totalCorners = [...aCorners, ...bCorners];
         let colliding = true;
         let collisionAxis = null;
         let leastIntersection = Infinity;
@@ -267,7 +268,6 @@ class Physics {
         let mobileB = !Physics.isWall(b);
 
         //position
-        let dir = col.Adir.times(col.penetration);
         if (col.penetration > 0.005) {
             let tomMath;
             let aCircle = (a instanceof CirclePhysicsObject) ? "Circle" : "Rect";
@@ -275,6 +275,8 @@ class Physics {
             tomMath = Physics["collide" + aCircle + bCircle](a, b);
             if (tomMath.colliding) {
                 col = tomMath;
+                let dir = col.Adir.times(col.penetration);
+                collisionPoint = col.collisionPoint;
                 //mass percents
                 let aPer = 1 - a.mass / (a.mass + b.mass);
                 if (!mobileB) aPer = 1;
@@ -284,16 +286,12 @@ class Physics {
                 let aMove = dir.times(aPer);
                 let bMove = dir.times(-bPer);
 
-
-
                 //like, the escaping
                 a.privateSetX(a.x - aMove.x);
                 a.privateSetY(a.y - aMove.y);
                 b.privateSetX(b.x - bMove.x);
                 b.privateSetY(b.y - bMove.y);
-                // c.stroke(cl.RED, 2).arrow(a.centerOfMass, b.centerOfMass);
-                // c.stroke(cl.RED, 2).arrow(collisionPoint, collisionPoint.plus(aMove));
-                // c.stroke(cl.BLUE, 2).arrow(collisionPoint, collisionPoint.plus(bMove));
+
             } else return;
         } else return;
         //velocity
@@ -307,7 +305,7 @@ class Physics {
         b.applyFriction(normal, collisionPoint, a.friction);
 
         //impulse resolution
-        let impulses = Physics.getImpulses(a, b, col.Adir, col.Bdir, collisionPoint, col.penetration);
+        let impulses = Physics.getImpulses(a, b, col.Adir, col.Bdir, collisionPoint);
         let iA = impulses.impulseA;
         let iB = impulses.impulseB;
         a.applyImpulse(iA);
@@ -484,15 +482,15 @@ class Physics {
         // const va_B = b.angularVelocity;
         // const vla_A = c_C.minus(Geometry.rotatePointAround(com_A, c_C, va_A));
         // const vla_B = c_C.minus(Geometry.rotatePointAround(com_B, c_C, va_B));
-        const v_A = vl_A//.plus(vla_A);
-        const v_B = vl_B//.plus(vla_B);
+        const v_A = vl_A; // .plus(vla_A);
+        const v_B = vl_B; // .plus(vla_B);
         const vc_A = d_A.dot(v_A);
         const vc_B = s_B ? vc_A * (1 - sn_A) : d_B.dot(v_B);
-        const F_A = d_A.times(vc_A);
+        const F_A = (vc_A >= 0) ? d_A.times(vc_A) : d_A.times(0);
         const F_B = d_B.times(vc_B);
         const I_A = F_B.minus(F_A).times(Math.min(1, m_B * mi_A));
         const I_B = F_A.minus(F_B).times(Math.min(1, m_A * mi_B));
-
+        if (a.name.match(/block/) && b.name.match(/block/)) console.log({ m_A, m_B, F_A, F_B, I_A, I_B });
 
         impulseA = new Impulse(I_A, c_C);
         impulseB = new Impulse(I_B, c_C);

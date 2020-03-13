@@ -65,6 +65,9 @@ class InactiveScene {
 		this.custom = {};
 		this.templates = {};
 		this.hasRotatedRectangles = false;
+		this.angularDragForce = .995;
+		this.linearDragForce = .995;
+		this.frictionDragForce = 0.2;
 		this.SAT = {
 			possibleChecks: 0,
 			gridChecks: 0,
@@ -127,7 +130,7 @@ class InactiveScene {
 			}
 			n.positionStatic = el.positionStatic;
 			n.rotationStatic = el.rotationStatic;
-			n.applyGravity = el.applyGravity;
+			n.hasGravity = el.hasGravity;
 			n.slows = el.slows;
 		} else {
 			n = this.addElement(el.name + " - copy", el.x, el.y, el.width, el.height, { ...el.controls }, el.tag);
@@ -611,10 +614,25 @@ class Scene extends InactiveScene {
 						if (r !== rect && !updater.includes(r)) updater.push(r);
 					}
 				}
-				usef.push(updater.sort((a, b) => b.completelyStatic - a.completelyStatic));
+				usef.push(updater);
 			}
 			useful = [...(new Set(useful))];
-			useful = useful.sort((a, b) => b[0].mass - a[0].mass);
+			// useful = useful.sort((a, b) => a[0].mass - b[0].mass);
+			const dir = this.gravity.get().normalize();
+			useful = useful.sort((a, b) => function () {
+				let mA = Vector2.fromPoint(a.unrotatedMiddle);
+				let mB = Vector2.fromPoint(b.unrotatedMiddle);
+				let dA = mA.dot(dir);
+				let dB = mB.dot(dir);
+				return dB - dA;
+			});
+
+			//gravity phase #1
+			for (let el of useful) {
+				let rect = el[0];
+				rect.applyGravity(0.5);
+			}
+			//ascending mass phase
 			for (let i = 0; i < useful.length; i++) {
 				let [rect, ...updateCells] = useful[i];
 				let updater = useful[i][useful[i].length - 1];
@@ -623,6 +641,12 @@ class Scene extends InactiveScene {
 				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
 				rect.physicsUpdate(updater);
 			}
+			//gravity phase #2
+			for (let el of useful) {
+				let rect = el[0];
+				rect.applyGravity(0.5);
+			}
+			//descending mass phase
 			for (let i = useful.length - 1; i >= 0; i--) {
 				let [rect, ...updateCells] = useful[i];
 				let updater = useful[i][useful[i].length - 1];
@@ -632,11 +656,11 @@ class Scene extends InactiveScene {
 				rect.physicsUpdate(updater);
 				rect.enginePhysicsUpdate();
 			}
+			//non collision fixed update
 			for (let rect of useless) {
 				for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
 				rect.enginePhysicsUpdate();
 			}
-			for (let rect of useful) rect[0].resolveImpulses();
 			// // show cells
 			// s.drawInWorldSpace(e => {
 			// 	for (let [key, cell] of cells) {

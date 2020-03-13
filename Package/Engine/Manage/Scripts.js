@@ -112,7 +112,7 @@ const PLAYER_MOVEMENT = new ElementScript("movement", {
 			this.controls = new Controls("w", "s", "a", "d");
 		}
 		this.completelyStatic = false;
-		this.applyGravity = true;
+		this.hasGravity = true;
 	},
 	update() {
 		if (K.P(this.controls.down)) this.speed.y += 0.2;

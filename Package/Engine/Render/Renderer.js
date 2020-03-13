@@ -687,6 +687,7 @@ class Artist {
 	setBackground(color) {
 		let c = color;
 		if (color instanceof Color) c = color.get_RGBA();
+		if (color instanceof Image) c = "url(" + color.src + ")"; 
 		this.canvas.style.background = c;
 	}
 }

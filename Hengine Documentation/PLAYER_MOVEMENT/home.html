@@ -18,7 +18,7 @@ PLAYER_MOVEMENT.addMethod("init", function(){
 	if(!this.controls.up){
 		this.controls = new Controls("w", "s", "a", "d");
 	}
-	this.applyGravity = true;
+	this.hasGravity = true;
 }, "init");
 PLAYER_MOVEMENT.addMethod("update", function(){
 	if (K.P(this.controls.down)) this.speed.y += this.accel.y;
