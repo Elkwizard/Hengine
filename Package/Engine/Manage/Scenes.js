@@ -631,9 +631,18 @@ class Scene extends InactiveScene {
 			//gravity phase #1
 			for (let el of useful) {
 				let rect = el[0];
-				rect.applyGravity(0.5);
+				rect.applyGravity(1);
 			}
 			//ascending mass phase
+			// //against walls
+			// for (let i = 0; i < useful.length; i++) {
+			// 	let rect = useful[i][0];
+			// 	let updater = useful[i][useful[i].length - 1];
+
+			// 	this.SAT.gridChecks += updater.length;
+			// 	this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
+			// 	rect.physicsUpdate(updater.filter(e => e.completelyStatic));
+			// }
 			for (let i = 0; i < useful.length; i++) {
 				let rect = useful[i][0];
 				let updater = useful[i][useful[i].length - 1];
@@ -642,35 +651,38 @@ class Scene extends InactiveScene {
 				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
 				rect.physicsUpdate(updater);
 			}
+			this.drawInWorldSpace(e => {
+				for (let i = 0; i < useful.length; i++) {
+					let rect = useful[i][0];
+					for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
+				}
+			});
 			//gravity phase #2
 			for (let el of useful) {
 				let rect = el[0];
-				rect.applyGravity(0.5);
+				rect.applyGravity(1);
 			}
-			//descending mass phase
-			for (let i = useful.length - 1; i >= 0; i--) {
-				let rect = useful[i][0];
-				let updater = useful[i][useful[i].length - 1];
+			// //descending mass phase
+			// for (let i = useful.length - 1; i >= 0; i--) {
+			// 	let rect = useful[i][0];
+			// 	let updater = useful[i][useful[i].length - 1];
 
-				this.SAT.gridChecks += updater.length;
-				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
-				rect.physicsUpdate(updater);
-			}
+			// 	this.SAT.gridChecks += updater.length;
+			// 	this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
+			// 	rect.physicsUpdate(updater);
+			// }
 			for (let usef of useful) {
 				let rect = usef[0];
 				rect.enginePhysicsUpdate();
 			}
-			// // show update order
-			// this.drawInWorldSpace(e => {
-			// 	for (let i = 0; i < useful.length; i++) {
-			// 		let usef = useful[i];
-			// 		let r = usef[0];
-			// 		let x = r.middle.x;
-			// 		let y = r.middle.y;
-			// 		c.draw(Color.grayScale(i / useful.length)).circle(x, y, 10);
-			// 		c.stroke(cl.RED, 1).circle(x, y, 10);
-			// 	}
-			// });
+			this.drawInWorldSpace(e => {
+				for (let i = 0; i < useful.length; i++) {
+					let other = useful[i][0];
+					let x = other.middle.x;
+					let y = other.middle.y;
+					c.draw(cl.RED).text("10px Arial", "#" + (i + 1), x, y);
+				}
+			});
 			//non collision fixed update
 			for (let rect of useless) {
 				if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);

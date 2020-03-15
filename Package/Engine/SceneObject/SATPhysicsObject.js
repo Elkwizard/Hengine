@@ -24,6 +24,7 @@ class PhysicsObject extends SceneObject {
         this.positionStatic = !gravity;
         this.rotationStatic = !gravity;
         this.contactPoints = [];
+        this.prohibited = [];
         this.canCollide = true;
         this._gravity = null;
         this._mass = null;
@@ -146,6 +147,7 @@ class PhysicsObject extends SceneObject {
         this.canMoveThisFrame = true;
         this.allCollidingWith.clear();
         this.contactPoints = [];
+        this.prohibited = [];
     }
     drawWithoutRotation(artist) {
         let com = this.centerOfMass;
@@ -171,7 +173,7 @@ class PhysicsObject extends SceneObject {
             this.runDraw();
             c.translate(mcx, mcy);
             c.rotate(-r);
-            // c.stroke(cl.RED, 2).arrow(P(0, 0), this.velocity.times(10));
+            c.stroke(cl.PURPLE, 2).arrow(P(0, 0), this.velocity.times(10));
             // c.stroke(cl.LIME, 2).arrow(P(0, 0), this.acceleration.times(10));
             // c.draw(cl.WHITE).text("15px monospace", "MASS: " + Math.floor(this.mass / 1000) + "kg, " + (this.mass % 1000) + "g", 0, 0);
             c.translate(-mcx, -mcy);
@@ -240,18 +242,22 @@ class PhysicsObject extends SceneObject {
     }
     checkAndResolveCollisions(others) {
         const dir = this.velocity.get().normalize();
-        others = others.sort((a, b) => function () {
+        // c.stroke(cl.RED, 3).arrow(this.middle, this.middle.plus(dir.times(10)));
+        others = others.sort(function (a, b) {
             let mA = Vector2.fromPoint(a.unrotatedMiddle);
             let mB = Vector2.fromPoint(b.unrotatedMiddle);
             let dA = mA.dot(dir);
             let dB = mB.dot(dir);
-            return dB - dA;
+            let dif = dB - dA;
+            return -dif;
         });
         let collisions = this.detectCollisions(others);
-        if (!this.completelyStatic) for (let col of collisions) Physics.resolve(col);
-        let st = collisions.map(e => e.b).filter(e => e.completelyStatic);
-        collisions = this.detectCollisions(st);
-        if (!this.completelyStatic) for (let col of collisions) Physics.resolve(col);
+        if (!this.completelyStatic) {
+            for (let col of collisions) Physics.resolve(col);
+            // let st = collisions.map(e => e.b).filter(e => e.completelyStatic);
+            // collisions = this.detectCollisions(st);
+            // for (let col of collisions) Physics.resolve(col);
+        }
     }
     getSpeedModulation() {
         return .5 * this.home.speedModulation / this.home.physicsRealism;
@@ -264,7 +270,7 @@ class PhysicsObject extends SceneObject {
         if (this.hasGravity) {
             //gravity
             let gv = this.gravity;
-            let gravitationalForce = gv.times(coef);
+            let gravitationalForce = gv.times(coef * this.getSpeedModulation());
             let iG = new Impulse(gravitationalForce, this.centerOfMass);
             this.applyImpulse(iG);
         }
@@ -350,8 +356,8 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
-        // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
+        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;

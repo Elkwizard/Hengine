@@ -71,6 +71,20 @@ class Vector {
 		vn.mul(...v);
 		return vn;
 	}
+	static sum(...v) {
+		return (new v[0].constructor(0, 0, 0, 0)).plus(...v);
+	}
+    static prohibitDirections(proDirs, dir) {
+        let remove = [];
+        for (let proDir of proDirs) {
+            let proj = proDir.projectOnto(dir);
+			if (proj.dot(dir) < 0) proj.mul(0);
+			else proj.mul(dir.mag);
+            remove.push(proj);
+        }
+		let wrong = remove.length? Vector.sum(...remove).over(remove.length) : new dir.constructor(0, 0, 0, 0);
+        return dir.minus(wrong);
+    }
 	normalize() {
 		let sum = 0;
 		for (let x in this) {
