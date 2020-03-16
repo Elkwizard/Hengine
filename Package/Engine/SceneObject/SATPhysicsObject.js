@@ -173,7 +173,7 @@ class PhysicsObject extends SceneObject {
             this.runDraw();
             c.translate(mcx, mcy);
             c.rotate(-r);
-            c.stroke(cl.PURPLE, 2).arrow(P(0, 0), this.velocity.times(10));
+            // c.stroke(cl.PURPLE, 2).arrow(P(0, 0), this.velocity.times(10));
             // c.stroke(cl.LIME, 2).arrow(P(0, 0), this.acceleration.times(10));
             // c.draw(cl.WHITE).text("15px monospace", "MASS: " + Math.floor(this.mass / 1000) + "kg, " + (this.mass % 1000) + "g", 0, 0);
             c.translate(-mcx, -mcy);
@@ -260,7 +260,7 @@ class PhysicsObject extends SceneObject {
         }
     }
     getSpeedModulation() {
-        return .5 * this.home.speedModulation / this.home.physicsRealism;
+        return this.home.speedModulation / this.home.physicsRealism;
     }
     enginePhysicsUpdate() {
         this.scriptUpdate();
@@ -356,8 +356,8 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
-        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
+        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;

@@ -470,7 +470,7 @@ class Physics {
     static getImpulses(a, b, dirFromA, dirFromB, collisionPoint) {
         let impulseA, impulseB;
 
-        const c_C = collisionPoint;
+        const c_C = collisionPoint; //Point of Collision
         const sn_A = a.snuzzlement; //Velocity lost by A
         const sn_B = b.snuzzlement; //Velocity lost by B
         const s_A = a.positionStatic; //Is A static
@@ -495,12 +495,14 @@ class Physics {
         const F_B = d_B.times(vc_B); //Force applied by B in the direction of the collision
         const mr_A = Math.min(1, m_B * mi_A); //Ratio used for calculating how much force should be applied
         const mr_B = Math.min(1, m_A * mi_B); //Ratio used for calculating how much force should be applied
-        const app_A = F_A.times(mr_B); //Actual applied force from A
-        const app_B = F_B.times(mr_A); //Actual applied force from B
-        const Phb_A = app_B.minus(P_A(app_B)) //Force from B that A cannot accept
-        const Phb_B = app_A.minus(P_B(app_A)) //Force from A that B cannot accept
-        const I_A = F_B.minus(F_A).times(mr_A).minus(Phb_B); //Impulse applied to A
-        const I_B = F_A.minus(F_B).times(mr_B).minus(Phb_A); //Impulse applied to B
+        const app_A = F_A; //Actual applied force from A
+        const app_B = F_B; //Actual applied force from B
+        const Phb_A = app_B.minus(P_A(app_B)); //Force from B that A cannot accept
+        const Phb_B = app_A.minus(P_B(app_A)); //Force from A that B cannot accept
+        const u_A = d_A.compare(F_A, Phb_B.over(mr_A)); //Which undoing force is greater
+        const u_B = d_B.compare(F_B, Phb_A.over(mr_B)); //Which undoing force is greater
+        const I_A = P_A(F_B.minus(u_A).times(mr_A)); //Impulse applied to A
+        const I_B = P_B(F_A.minus(u_B).times(mr_B)); //Impulse applied to B
 
         impulseA = new Impulse(I_A, c_C);
         impulseB = new Impulse(I_B, c_C);

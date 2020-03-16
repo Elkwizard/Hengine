@@ -84,7 +84,11 @@ class Vector {
         }
 		let wrong = remove.length? Vector.sum(...remove).over(remove.length) : new dir.constructor(0, 0, 0, 0);
         return dir.minus(wrong);
-    }
+	}
+	compare(v1, v2) {
+		if (v1.dot(this) > v2.dot(this)) return v1;
+		return v2;
+	}
 	normalize() {
 		let sum = 0;
 		for (let x in this) {

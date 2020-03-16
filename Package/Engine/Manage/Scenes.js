@@ -618,7 +618,6 @@ class Scene extends InactiveScene {
 				usef.push(updater);
 			}
 			useful = [...(new Set(useful))];
-			// useful = useful.sort((a, b) => a[0].mass - b[0].mass);
 			const dir = this.gravity.get().normalize();
 			useful = useful.sort(function (a, b) {
 				let mA = Vector2.fromPoint(a[0].unrotatedMiddle);
@@ -628,21 +627,12 @@ class Scene extends InactiveScene {
 				return dB - dA;
 			});
 
-			//gravity phase #1
+			//gravity phase
 			for (let el of useful) {
 				let rect = el[0];
 				rect.applyGravity(1);
 			}
-			//ascending mass phase
-			// //against walls
-			// for (let i = 0; i < useful.length; i++) {
-			// 	let rect = useful[i][0];
-			// 	let updater = useful[i][useful[i].length - 1];
-
-			// 	this.SAT.gridChecks += updater.length;
-			// 	this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
-			// 	rect.physicsUpdate(updater.filter(e => e.completelyStatic));
-			// }
+			//collision phase
 			for (let i = 0; i < useful.length; i++) {
 				let rect = useful[i][0];
 				let updater = useful[i][useful[i].length - 1];
@@ -651,38 +641,30 @@ class Scene extends InactiveScene {
 				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
 				rect.physicsUpdate(updater);
 			}
-			this.drawInWorldSpace(e => {
-				for (let i = 0; i < useful.length; i++) {
-					let rect = useful[i][0];
-					for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
-				}
-			});
-			//gravity phase #2
-			for (let el of useful) {
-				let rect = el[0];
-				rect.applyGravity(1);
-			}
-			// //descending mass phase
-			// for (let i = useful.length - 1; i >= 0; i--) {
-			// 	let rect = useful[i][0];
-			// 	let updater = useful[i][useful[i].length - 1];
+			//prohibited direction render
+			// this.drawInWorldSpace(e => {
+			// 	for (let i = 0; i < useful.length; i++) {
+			// 		let rect = useful[i][0];
+			// 		for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
+			// 	}
+			// });
 
-			// 	this.SAT.gridChecks += updater.length;
-			// 	this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
-			// 	rect.physicsUpdate(updater);
-			// }
+			//custom updates run
 			for (let usef of useful) {
 				let rect = usef[0];
 				rect.enginePhysicsUpdate();
 			}
-			this.drawInWorldSpace(e => {
-				for (let i = 0; i < useful.length; i++) {
-					let other = useful[i][0];
-					let x = other.middle.x;
-					let y = other.middle.y;
-					c.draw(cl.RED).text("10px Arial", "#" + (i + 1), x, y);
-				}
-			});
+			//update order render
+			// this.drawInWorldSpace(e => {
+			// 	for (let i = 0; i < useful.length; i++) {
+			// 		let other = useful[i][0];
+			// 		let x = other.middle.x;
+			// 		let y = other.middle.y;
+			// 		c.draw(cl.RED).text("10px Arial", "#" + (i + 1), x, y);
+			// 	}
+			// });
+
+
 			//non collision fixed update
 			for (let rect of useless) {
 				if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
