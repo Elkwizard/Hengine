@@ -318,8 +318,18 @@ class Physics {
 
         //immobilize
         a.canMoveThisFrame = false;
-        a.prohibited.push(col.Adir);
-        b.prohibited.push(col.Bdir);
+        if (b.positionStatic) {
+            a.prohibited.push(col.Adir);
+        }
+        for (let pro of b.prohibited) {
+            let proj = pro.projectOnto(col.Adir);
+            if (proj.dot(col.Adir) > 0) {
+                a.prohibited.push(proj);
+            }
+        }
+        if (a.positionStatic) {
+            b.prohibited.push(col.Bdir);
+        }
 
         //do custom collision response
         if (!a.colliding.general) a.colliding.general = [b];

@@ -642,12 +642,12 @@ class Scene extends InactiveScene {
 				rect.physicsUpdate(updater);
 			}
 			//prohibited direction render
-			// this.drawInWorldSpace(e => {
-			// 	for (let i = 0; i < useful.length; i++) {
-			// 		let rect = useful[i][0];
-			// 		for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
-			// 	}
-			// });
+			this.drawInWorldSpace(e => {
+				for (let i = 0; i < useful.length; i++) {
+					let rect = useful[i][0];
+					for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
+				}
+			});
 
 			//custom updates run
 			for (let usef of useful) {

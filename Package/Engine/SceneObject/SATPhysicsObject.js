@@ -284,7 +284,8 @@ class PhysicsObject extends SceneObject {
             for (let i = 0; i < this.home.physicsRealism; i++) {
                 //linear
                 this.velocity.add(this.acceleration.times(spdMod));
-                this.capSpeed;
+                this.capSpeed();
+                if (this.positionStatic) this.velocity.mul(0);
 
 
                 let newX = this.x + this.velocity.x * 2 * spdMod;
@@ -294,6 +295,7 @@ class PhysicsObject extends SceneObject {
 
                 //angular
                 this.angularVelocity += this.angularAcceleration * spdMod;
+                if (this.rotationStatic) this.angularVelocity = 0;
                 let newRotation = this.rotation + this.angularVelocity * spdMod;
                 this.privateSetRotation(newRotation);
 
@@ -308,24 +310,16 @@ class PhysicsObject extends SceneObject {
 
         });
     }
-    moveTowards(point, ferocity) {
-        if (ferocity === undefined) ferocity = 1;
-        let dirX = Math.sign(point.x - this.middle.x);
-        let dirY = Math.sign(point.y - this.middle.y);
-        let dir = new Vector2(dirX, dirY);
-        dir.mul(ferocity * 0.1);
-        this.speed.add(dir);
+    moveTowards(point, ferocity = 1) {
+        let dif = Vector2.fromPoint(point).minus(this.middle);
+        this.velocity.add(dif.times(ferocity / 100));
         this.logMod(function () {
             this.moveTowards(point, ferocity);
         });
     }
-    moveAwayFrom(point, ferocity) {
-        if (ferocity === undefined) ferocity = 1;
-        let dirX = -Math.sign(point.x - this.middle.x);
-        let dirY = -Math.sign(point.y - this.middle.y);
-        let dir = new Vector2(dirX, dirY);
-        dir.mul(ferocity * 0.1);
-        this.speed.add(dir);
+    moveAwayFrom(point, ferocity = 1) {
+        let dif = Vector2.fromPoint(point).minus(this.middle).times(-1);
+        this.velocity.add(dif.times(ferocity / 100));
         this.logMod(function () {
             this.moveAwayFrom(point, ferocity);
         });
