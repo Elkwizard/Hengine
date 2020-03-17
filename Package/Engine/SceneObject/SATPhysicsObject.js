@@ -15,7 +15,6 @@ class PhysicsObject extends SceneObject {
         this.lastX = this.x;
         this.lastY = this.y;
         this.hasPhysics = true;
-        this.collideBasedOnRule = e => true;
         this.optimize = (a, b) => true;
         this.canMoveThisFrame = true;
         this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
@@ -132,6 +131,13 @@ class PhysicsObject extends SceneObject {
     }
     get completelyStatic() {
         return this.positionStatic && this.rotationStatic;
+    }
+    collideBasedOnRule(e) {
+        let judgement = [];
+        for (let m of this.scripts) {
+            judgement.push(m.scriptCollideRule(m, e));
+        }
+        return !judgement.includes(false);
     }
     linkTo(el, fer = 1) {
         this.links.push(new Link(this, el, fer));

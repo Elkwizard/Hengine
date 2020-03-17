@@ -1,11 +1,11 @@
-function P(x, y) {
+function P(x = 0, y = 0) {
 	return { x: x, y: y };
 }
 Function.prototype.add = function (fn = function () { }) {
 	let self = this;
 	return function (...a) {
 		self(...a);
-		fn(...a);
+		return fn(...a);
 	}
 }
 Number.prototype.toDegrees = function () {

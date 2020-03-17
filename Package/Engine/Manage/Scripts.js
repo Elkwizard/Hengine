@@ -42,6 +42,7 @@ class Script {
 		local.scriptClick = (l, e) => e;
 		local.scriptRightClick = (l, e) => e;
 		local.scriptHover = (l, e) => e;
+		local.scriptCollideRule = (l, e) => e;
 		for (let x in this.methods) {
 			let flag = this.methods[x].flag.toLowerCase();
 			if (flag === "init") {
@@ -53,19 +54,19 @@ class Script {
 			else if (flag === "draw") {
 				local.scriptDraw = local.scriptDraw.add(this.methods[x].bind(bindTo));
 			}
-			else if (flag === "collide-general" || flag === "collide_general") {
+			else if (flag === "collide-general" || flag === "collide_general" || flag === "collidegeneral") {
 				local.scriptCollideGeneral = local.scriptCollideGeneral.add(this.methods[x].bind(bindTo));
 			}
-			else if (flag === "collide-top" || flag === "collide_top") {
+			else if (flag === "collide-top" || flag === "collide_top" || flag === "collidetop") {
 				local.scriptCollideTop = local.scriptCollideTop.add(this.methods[x].bind(bindTo));
 			}
-			else if (flag === "collide-bottom" || flag === "collide_bottom") {
+			else if (flag === "collide-bottom" || flag === "collide_bottom" || flag === "collidebottom") {
 				local.scriptCollideBottom = local.scriptCollideBottom.add(this.methods[x].bind(bindTo));
 			}
-			else if (flag === "collide-left" || flag === "collide_left") {
+			else if (flag === "collide-left" || flag === "collide_left" || flag === "collideleft") {
 				local.scriptCollideLeft = local.scriptCollideLeft.add(this.methods[x].bind(bindTo));
 			}
-			else if (flag === "collide-right" || flag === "collide_right") {
+			else if (flag === "collide-right" || flag === "collide_right" || flag === "collideright") {
 				local.scriptCollideRight = local.scriptCollideRight.add(this.methods[x].bind(bindTo));
 			}
 			else if (flag === "onrightclick" || flag === "on_right_click" || flag === "right_click") {
@@ -76,6 +77,9 @@ class Script {
 			}
 			else if (flag === "onhover" || flag === "on_hover" || flag === "hover") {
 				local.scriptHover = local.scriptHover.add(this.methods[x].bind(bindTo));
+			}
+			else if (flag === "collide-rule" || flag === "collide_rule" || flag === "colliderule") {
+				local.scriptCollideRule = local.scriptCollideRule.add(this.methods[x].bind(bindTo));
 			}
 			else {
 				local[x] = this.methods[x].bind(bindTo);
@@ -99,7 +103,7 @@ class ElementScript extends Script {
 	}
 	addTo(el, ...args) {
 		let sc = this;
-		el.mod(function() {
+		el.mod(function () {
 			sc.attachTo(this.scripts, this, ...args);
 		});
 		return this;
