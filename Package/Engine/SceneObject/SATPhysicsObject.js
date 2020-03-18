@@ -4,7 +4,7 @@ class PhysicsObject extends SceneObject {
         super(name, x, y, width, height, controls, tag, home);
         this.velocity = new Vector2(0, 0);
         this.acceleration = new Vector2(0, 0);
-        this._rotation = 0.001;
+        this._rotation = 0;
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
         this.hasGravity = gravity;
@@ -264,7 +264,8 @@ class PhysicsObject extends SceneObject {
             let dif = dB - dA;
             return -dif;
         });
-        let collisions = this.detectCollisions(others);
+        let collisions;
+        if (!this.completelyStatic) collisions = this.detectCollisions(others);
         if (!this.completelyStatic) {
             for (let col of collisions) Physics.resolve(col);
         }
@@ -360,8 +361,8 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
-        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
+        c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(100).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;

@@ -1,12 +1,13 @@
 class Collision {
-    constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, collisionPoint) {
+    constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, collisionPointA, collisionPointB) {
         this.colliding = collides;
         this.Adir = Adir;
         this.Bdir = Bdir;
         this.a = a;
         this.b = b;
         this.penetration = penetration;
-        this.collisionPoint = collisionPoint;
+        this.collisionPointA = collisionPointA;
+        this.collisionPointB = collisionPointB;
     }
 }
 class CollisionOption {
@@ -119,7 +120,7 @@ class Physics {
             b.contactPoints.push(collisionPoint);
 
 
-            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, collisionPoint);
+            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, collisionPoint, collisionPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -146,7 +147,7 @@ class Physics {
             a.contactPoints.push(bestPoint);
             b.contactPoints.push(bestPoint);
 
-            let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint);
+            let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint, bestPoint);
             return col;
         } else return new Collision(false, a, b);
     }
@@ -172,7 +173,7 @@ class Physics {
             a.contactPoints.push(bestPoint);
             b.contactPoints.push(bestPoint);
 
-            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint);
+            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint, bestPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -211,50 +212,8 @@ class Physics {
         let finalPenetratingCornerOwner = null;
         let finalPenetratedEdge = null;
         let finalPenetratingCorner = null;
-        C.setLineDash([1, 2]);
         if (colliding) {
-            // a.home.SAT.collisions++;
-            // for (let i = 0; i < bEdges.length; i++) {
-            //     let edge = bEdges[i - 1];
-            //     if (!i) edge = bEdges[bEdges.length - 1];
-            //     let normal = Vector2.fromAngle(edge.getAngle() + Math.PI / 2);
-            //     let far = Geometry.farthestInDirection(aCorners, normal);
-            //     let penetratingCorner = far.corner;
-            //     let edgeStart = bCorners[i];
-            //     let edgeEnd = bCorners[i + 1];
-            //     if (!edgeEnd) edgeEnd = bCorners[0];
-            //     let closestPointOnEdge = Geometry.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
-            //     let overlap = a.home.home.f.getDistance(penetratingCorner, closestPointOnEdge);
-            //     let axis = closestPointOnEdge.minus(penetratingCorner).normalize();
-            //     if (overlap < leastIntersection && Physics.collideRectPoint(b, penetratingCorner)) {
-            //         leastIntersection = overlap;
-            //         collisionAxis = axis;
-            //         finalPenetratedEdge = new Line(edgeStart, edgeEnd);
-            //         finalPenetratingCornerOwner = a;
-            //         finalPenetratingCorner = penetratingCorner;
-            //     }
-            // }
-            // for (let i = 0; i < aEdges.length; i++) {
-            //     let edge = i ? aEdges[i - 1] : aEdges[aEdges.length - 1];
-            //     let normal = Vector2.fromAngle(edge.getAngle() + Math.PI / 2);
-            //     let far = Geometry.farthestInDirection(bCorners, normal);
-            //     let penetratingCorner = far.corner;
-            //     let edgeStart = aCorners[i];
-            //     let edgeEnd = (i !== aEdges.length - 1) ? aCorners[i + 1] : aCorners[0];
-            //     let closestPointOnEdge = Geometry.closestPointOnLineObject(penetratingCorner, new Line(edgeStart, edgeEnd));
-            //     let overlap = a.home.home.f.getDistance(penetratingCorner, closestPointOnEdge);
-            //     [closestPointOnEdge, penetratingCorner] = [penetratingCorner, closestPointOnEdge];
-            //     let axis = closestPointOnEdge.minus(penetratingCorner);
-            //     if (overlap < leastIntersection && Physics.collideRectPoint(a, penetratingCorner)) {
-            //         leastIntersection = overlap;
-            //         collisionAxis = axis;
-            //         finalPenetratedEdge = new Line(edgeStart, edgeEnd);
-            //         finalPenetratingCornerOwner = b;
-            //         finalPenetratingCorner = penetratingCorner;
-            //     }
-            // }
-
-
+            let iter = 0;
             const A_C = aCorners;
             const A_EL = a.getLineEdges();
             const A_E = A_EL.map(e => e.b.minus(e.a).normalize());
@@ -271,7 +230,8 @@ class Physics {
                 B_C: B_C,
                 B_EL: B_EL,
                 B_E: B_E,
-                coef: 1
+                coef: 1,
+                m: a.middle
             }, {
                 a: b,
                 b: a,
@@ -281,7 +241,8 @@ class Physics {
                 B_C: A_C,
                 B_EL: A_EL,
                 B_E: A_E,
-                coef: -1
+                coef: -1,
+                m: b.middle
             }]) {
                 for (let i = 0; i < me.A_EL.length; i++) {
                     let edge = me.A_EL[i];
@@ -289,17 +250,29 @@ class Physics {
                     let normal = v.normal.times(-1);
                     let sorted = me.B_C
                         .sort((a, b) => b.dot(normal) - a.dot(normal))
-                        .map(e => e)
-                        .filter(e => Physics.collideRectPoint(me.a, e).colliding)
                         .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
-                        .filter(e => Physics.collideRectPoint(me.b, e[1]).colliding);
+                        .filter(e => {
+                            let v1 = e[1].minus(e[0]);
+                            let v2 = e[1].minus(me.m);
+                            let dot = v1.dot(v2) / (v1.mag * v2.mag)
+                            if (me.a === b) {
+                                c.stroke(cl.ORANGE).arrow(e[0], e[1]);
+                                c.stroke(cl.ORANGE).arrow(me.m, e[1]);
+                                c.draw(cl.BLACK).text("20px Arial", dot.toFixed(2), e[1].x, e[1].y);
+                            } 
+                            return dot > 0;
+                        });
+                        // .filter(e => Physics.collideRectPoint(me.a, e).colliding)
+                        // .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
+                        // .filter(e => Physics.collideRectPoint(me.b, e[1]).colliding);
                     if (sorted.length) {
                         let p = sorted[0];
-                        PROSPECT.push(new CollisionOption(p[0], edge, p[1], me.coef));
+
+                        let cp = p[1]//Geometry.closestPointOnLineObject(p, edge);
+                        PROSPECT.push(new CollisionOption(p[0], edge, cp, me.coef));
                     }
                 }
             }
-            C.setLineDash([]);
             let best = PROSPECT
                 .sort(function (a, b) {
                     return a.dist - b.dist;
@@ -322,18 +295,29 @@ class Physics {
                 c.draw(cl.ORANGE).circle(finalPenetratingCornerOwner.x, finalPenetratingCornerOwner.y, 5);
             } else colliding = false;
         }
-        // colliding = false;
+
         let col;
         if (colliding) {
             if (collisionAxis) {
                 collisionAxis.normalize();
                 //figure out impulses
                 let corners = finalPenetratingCornerOwner.getCorners();
+                let otherCorners = (finalPenetratingCornerOwner === a) ? b.getCorners() : a.getCorners();
+                otherCorners.push(finalPenetratingCorner);
                 let ownerDir = (finalPenetratingCornerOwner === a) ? collisionAxis : collisionAxis.times(-1);
-                let collisionPoint = Physics.getCollisionPoint(a, b, corners, finalPenetratedEdge, ownerDir);
+                let collisionPointOwner = Physics.getCollisionPoint(a, b, corners, finalPenetratedEdge, ownerDir);
+                // let collisionPointNotOwner = Physics.getCollisionPoint(b, a, otherCorners, )
+                let pointA, pointB;
+                if (finalPenetratingCornerOwner === a) {
+                    pointA = collisionPointOwner;
+                    pointB = finalPenetratingCorner;
+                } else {
+                    pointB = collisionPointOwner;
+                    pointA = finalPenetratingCorner;
+                }
                 c.draw(cl.RED).circle(finalPenetratingCorner.x, finalPenetratingCorner.y, 5);
 
-                col = new Collision(true, a, b, collisionAxis, collisionAxis, leastIntersection, collisionPoint);
+                col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), leastIntersection, pointA, pointB);
             } else {
                 col = new Collision(false, a, b);
                 a.rotation += 0.00001;
@@ -346,8 +330,6 @@ class Physics {
         //resolve collisions
         let a = col.a;
         let b = col.b;
-        const d = col.Bdir;
-        let collisionPoint = col.collisionPoint;
         let mobileA = !Physics.isWall(a);
         let mobileB = !Physics.isWall(b);
 
@@ -356,11 +338,10 @@ class Physics {
             let tomMath;
             let aCircle = (a instanceof CirclePhysicsObject) ? "Circle" : "Rect";
             let bCircle = (b instanceof CirclePhysicsObject) ? "Circle" : "Rect";
-            tomMath = Physics["collide" + aCircle + bCircle](a, b);
+            tomMath = col//Physics["collide" + aCircle + bCircle](a, b);
             if (tomMath.colliding) {
                 col = tomMath;
                 let dir = col.Adir.times(col.penetration);
-                collisionPoint = col.collisionPoint;
                 //mass percents
                 let aPer = 1 - a.mass / (a.mass + b.mass);
                 if (!mobileB) aPer = 1;
@@ -370,11 +351,6 @@ class Physics {
                 let aMove = dir.times(1 * aPer);
                 let bMove = dir.times(-1 * bPer);
 
-                //correct based on prohibited directions
-
-
-                c.stroke(cl.PURPLE, 1).arrow(a.centerOfMass, a.centerOfMass.minus(aMove));
-                c.stroke(cl.PURPLE, 1).arrow(b.centerOfMass, b.centerOfMass.minus(bMove));
 
                 //like, the escaping
                 a.privateSetX(a.x - aMove.x);
@@ -384,6 +360,15 @@ class Physics {
 
             } else return;
         } else return;
+
+        
+        const d = col.Bdir;
+
+        //collision points
+
+        let collisionPointA = col.collisionPointA;
+        let collisionPointB = col.collisionPointB;
+
         //velocity
         const A_VEL_AT_COLLISION = a.velocity.dot(col.Adir);
         const B_VEL_AT_COLLISION = b.velocity.dot(col.Bdir);
@@ -391,11 +376,11 @@ class Physics {
 
         //friction
         const normal = d.normal.normalize();
-        a.applyFriction(normal, collisionPoint, b.friction);
-        b.applyFriction(normal, collisionPoint, a.friction);
+        a.applyFriction(normal, collisionPointA, b.friction);
+        b.applyFriction(normal, collisionPointB, a.friction);
 
         //impulse resolution
-        let impulses = Physics.getImpulses(a, b, col.Adir, col.Bdir, collisionPoint);
+        let impulses = Physics.getImpulses(a, b, col.Adir, col.Bdir, collisionPointA, collisionPointB);
         let iA = impulses.impulseA;
         let iB = impulses.impulseB;
         a.applyImpulse(iA);
@@ -429,8 +414,8 @@ class Physics {
         else b.colliding.general.push(a);
         let top = d.y > 0.2;
         let bottom = d.y < -0.2;
-        let right = d.x < -0.2;
-        let left = d.x > 0.2;
+        let right = d.x > -0.2;
+        let left = d.x < 0.2;
         if (left) {
             if (!a.colliding.left) a.colliding.left = [b];
             else a.colliding.left.push(b);
@@ -527,7 +512,7 @@ class Physics {
             return cells;
         } else {
             let cells = [];
-            let edges = r.getAxes();
+            let edges = r.getLineEdges().map(e => e.a.minus(e.b).normalize());
             let corners = r.getCorners();
             let nums = [0, 1, 2, 3];
             if (r.width < cellsize) {
@@ -568,10 +553,11 @@ class Physics {
     static isWall(r) {
         return r.positionStatic || r.rotationStatic || !r.canMoveThisFrame;
     }
-    static getImpulses(a, b, dirFromA, dirFromB, collisionPoint) {
+    static getImpulses(a, b, dirFromA, dirFromB, collisionPointA, collisionPointB) {
         let impulseA, impulseB;
 
-        const c_C = collisionPoint; //Point of Collision
+        const cC_A = collisionPointA; //Point of Collision for A
+        const cC_B = collisionPointB; //Point of Collision for B
         const sn_A = a.snuzzlement; //Velocity lost by A
         const sn_B = b.snuzzlement; //Velocity lost by B
         const s_A = a.positionStatic; //Is A static
@@ -605,8 +591,8 @@ class Physics {
         const I_A = P_A(F_B.minus(u_A).times(mr_A)); //Impulse applied to A
         const I_B = P_B(F_A.minus(u_B).times(mr_B)); //Impulse applied to B
 
-        impulseA = new Impulse(I_A, c_C);
-        impulseB = new Impulse(I_B, c_C);
+        impulseA = new Impulse(I_A, cC_A);
+        impulseB = new Impulse(I_B, cC_B);
         const awayBoth = vc_A < 0 && vc_B < 0;
         const awayA = -vc_A > vc_B;
         const awayB = -vc_B > vc_A;

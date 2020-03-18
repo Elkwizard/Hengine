@@ -391,7 +391,7 @@ class InactiveScene {
 	}
 	changeElementCollideRule(name, newRule) {
 		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			(new ElementScript("collide_rule #" + performance.now(), {
+			(new ElementScript("auto_generated_collide_rule #" + performance.now(), {
 				collide_rule(l, e) {
 					return newRule.bind(this)(e);
 				}
@@ -572,6 +572,7 @@ class Scene extends InactiveScene {
 		return new Rect(nMin, nMax);
 	}
 	enginePhysicsUpdate() {
+        let startTime = performance.now();
 		this.SAT = {
 			possibleChecks: 0,
 			gridChecks: 0,
@@ -645,13 +646,13 @@ class Scene extends InactiveScene {
 				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
 				rect.physicsUpdate(updater);
 			}
-			//prohibited direction render
-			this.drawInWorldSpace(e => {
-				for (let i = 0; i < useful.length; i++) {
-					let rect = useful[i][0];
-					for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
-				}
-			});
+			// //prohibited direction render
+			// this.drawInWorldSpace(e => {
+			// 	for (let i = 0; i < useful.length; i++) {
+			// 		let rect = useful[i][0];
+			// 		for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
+			// 	}
+			// });
 
 			//custom updates run
 			for (let usef of useful) {
@@ -675,7 +676,7 @@ class Scene extends InactiveScene {
 				rect.enginePhysicsUpdate();
 			}
 			// // show cells
-			// s.drawInWorldSpace(e => {
+			// this.drawInWorldSpace(e => {
 			// 	for (let [key, cell] of cells) {
 			// 		let x = parseInt(key.split(",")[0]) * this.cellSize;
 			// 		let y = parseInt(key.split(",")[1]) * this.cellSize;
@@ -688,6 +689,7 @@ class Scene extends InactiveScene {
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
 		for (let rect of this.contains_array) rect.isBeingUpdated = false;
+		// console.log(performance.now() - startTime);
 	}
 	engineDrawUpdate() {
 		this.updateArray();
