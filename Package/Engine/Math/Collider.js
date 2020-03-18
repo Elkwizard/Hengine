@@ -32,7 +32,7 @@ class RectCollider {
 				let r1 = PhysicsObject.getBoundingBox(this.home);
 				let r2 = PhysicsObject.getBoundingBox(hitbox);
 				if (!Geometry.overlapRectRect(r1, r2)) return false;
-				let aEdges = this.home.getEdges();
+				let aEdges = this.home.getAxes();
 				let edges = [aEdges[0], aEdges[1]];
 				let normal = new Vector2(hitbox.x - this.home.x, hitbox.y - this.home.y);
 				normal.normalize();
@@ -70,7 +70,7 @@ class RectCollider {
 			let hypotA = Math.sqrt((this.home.width / 2) ** 2 + (this.home.height / 2) ** 2);
 			let r1 = new Rect(this.home.middle.x - hypotA, this.home.middle.y - hypotA, hypotA * 2, hypotA * 2);
 			if (!(r1.x < x && x < r1.x + r1.width && r1.y < y && y < r1.y + r1.height)) return false;
-			let aEdges = this.home.getEdges();
+			let aEdges = this.home.getAxes();
 			let edges = aEdges;
 			let aCorners = this.home.getCorners();
 			let colliding = true;

@@ -391,7 +391,11 @@ class InactiveScene {
 	}
 	changeElementCollideRule(name, newRule) {
 		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			e.collideBasedOnRule = newRule.bind(e);
+			(new ElementScript("collide_rule #" + performance.now(), {
+				collide_rule(l, e) {
+					return newRule.bind(this)(e);
+				}
+			})).addTo(e);
 			e.logMod(function CHANGE_COLLIDE_RULE() {
 				this.home.changeElementCollideRule(this, newRule);
 			});

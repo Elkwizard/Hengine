@@ -117,20 +117,31 @@ class Geometry {
     }
     static closestPointOnLineObject(p, l) {
         if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
-        let min = Math.min(l.a.x, l.b.x);
-        let max = Math.max(l.a.x, l.b.x);
-        let dx = l.b.x - l.a.x;
-        let dy = l.b.y - l.a.y;
-        if (!dx) dx = 0.00000000000000001;
-        if (!dy) dy = 0.00000000000000001;
-        let b = l.a.y - l.a.x * (dy / dx);
-        let x1 = p.x;
-        let y1 = p.y;
-        let pX = ((dx / dy) * x1 - b + y1) / ((dy * dy + dx * dx) / (dx * dy));
-        if (pX < min) pX = min;
-        if (pX > max) pX = max;
-        let pY = (dy / dx) * pX + b;
-        return new Vector2(pX, pY);
+        // let dx = l.b.x - l.a.x;
+        // let dy = l.b.y - l.a.y;
+        // if (!dx) dx = 0.00000000000000001;
+        // if (!dy) dy = 0.00000000000000001;
+        // let b = l.a.y - l.a.x * (dy / dx);
+        // let x1 = p.x;
+        // let y1 = p.y;
+        // let pX = ((dx / dy) * x1 - b + y1) / ((dy * dy + dx * dx) / (dx * dy));
+        // if (pX < min) pX = min;
+        // if (pX > max) pX = max;
+        // let pY = (dy / dx) * pX + b;
+        // return new Vector2(pX, pY);
+        const A = l.a;
+        const B = l.b;
+        const SIGN_X = (A.x < B.x)? -1:1;
+        const SIGN_Y = (A.y < B.y)? -1:1;
+        if (Math.abs(A.x - B.x) < 0.001) A.x += SIGN_X * 0.0001;
+        if (Math.abs(A.y - B.y) < 0.001) A.y += SIGN_Y * 0.0001;
+        const MIN = Math.min(A.x, B.x);
+        const MAX = Math.max(A.x, B.x);
+        const m_1 = (B.y - A.y) / (B.x - A.x);
+        const m_2 = (B.x - A.x) / (B.y - A.y);
+        const X = clamp((p.y + m_2 * p.x + m_1 * A.x - A.y) / (m_1 + m_2), MIN, MAX); 
+        const Y = m_1 * X + A.y - m_1 * A.x;
+        return new Vector2(X, Y);
     }
     static closestPointOnLine(p, d) {
         let x1 = p.x;

@@ -288,6 +288,11 @@ class ColorLibrary {
 		this.CREAM = new Color("#fff185");
 		this.LIME = new Color(0, 255, 0, 1);
 		this.BROWN = new Color("#7d5314");
+		this.DARK_BROWN = new Color("#5a2000");
+		this.SKY_BLUE = new Color("#87ceeb");
+		this.TOBIN = new Color("#20a02a");
+		this.ZOE = new Color("#261550");
+		this.MAX = new Color("#161616");
 	}
 	add(name, color) {
 		this[name.toUpperCase()] = color;

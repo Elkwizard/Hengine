@@ -4,7 +4,7 @@ class PhysicsObject extends SceneObject {
         super(name, x, y, width, height, controls, tag, home);
         this.velocity = new Vector2(0, 0);
         this.acceleration = new Vector2(0, 0);
-        this._rotation = 0.0001;
+        this._rotation = 0.001;
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
         this.hasGravity = gravity;
@@ -15,6 +15,7 @@ class PhysicsObject extends SceneObject {
         this.lastX = this.x;
         this.lastY = this.y;
         this.hasPhysics = true;
+        this.limitsVelocity = true;
         this.optimize = (a, b) => true;
         this.canMoveThisFrame = true;
         this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
@@ -69,6 +70,12 @@ class PhysicsObject extends SceneObject {
                 }
             }
         };
+
+        //downscale
+        const m = this.middle;
+        this.width -= 0.25;
+        this.height -= 0.25;
+        this.middle = m;
     }
     get gravity() {
         if (this._gravity === null) return this.home.gravity;
@@ -260,9 +267,6 @@ class PhysicsObject extends SceneObject {
         let collisions = this.detectCollisions(others);
         if (!this.completelyStatic) {
             for (let col of collisions) Physics.resolve(col);
-            // let st = collisions.map(e => e.b).filter(e => e.completelyStatic);
-            // collisions = this.detectCollisions(st);
-            // for (let col of collisions) Physics.resolve(col);
         }
     }
     getSpeedModulation() {
@@ -290,7 +294,7 @@ class PhysicsObject extends SceneObject {
             for (let i = 0; i < this.home.physicsRealism; i++) {
                 //linear
                 this.velocity.add(this.acceleration.times(spdMod));
-                this.capSpeed();
+                if (this.limitsVelocity) this.capSpeed();
                 if (this.positionStatic) this.velocity.mul(0);
 
 
@@ -356,8 +360,8 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
-        // c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        c.stroke(cl.LIME, 1).circle(impulse.source.x, impulse.source.y, 2);
+        c.stroke(cl.LIME, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;

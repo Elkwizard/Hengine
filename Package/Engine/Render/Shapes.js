@@ -144,16 +144,25 @@ class Rect {
 		for (let i = 0; i < corners.length; i++) corners[i] = Geometry.rotatePointAround(com, corners[i], r.rotation);
 		return corners;
 	}
-	getEdges() {
+	getAxes() {
+		let r = this;
+		let corners = r.getCorners();
+		let edges = [
+			corners[1].minus(corners[0]).normalize(),
+			corners[2].minus(corners[1]).normalize()
+		];
+		return edges;
+	}
+	getLineEdges() {
 		let r = this;
 		let corners = r.getCorners();
 		let edges = [];
 		for (let i = 0; i < corners.length; i++) {
-			if (i == 0) edges.push(corners[corners.length - 1].minus(corners[0]).normalize());
-			else edges.push(corners[i - 1].minus(corners[i]).normalize());
+			if (i == 0) edges.push(new Line(corners[corners.length - 1], corners[0]));
+			else edges.push(new Line(corners[i - 1], corners[i]));
 		}
 		return edges;
-    }
+	}
 	set centerOfMass(a) {
         this.unrotatedMiddle = this.centerOfMassOffset.times(-1).plus(a);
 	}
