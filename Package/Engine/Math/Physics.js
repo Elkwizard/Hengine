@@ -213,7 +213,6 @@ class Physics {
         let finalPenetratedEdge = null;
         let finalPenetratingCorner = null;
         if (colliding) {
-            let iter = 0;
             const A_C = aCorners;
             const A_EL = a.getLineEdges();
             const A_E = A_EL.map(e => e.b.minus(e.a).normalize());
@@ -221,12 +220,12 @@ class Physics {
             const B_EL = b.getLineEdges();
             const B_E = B_EL.map(e => e.b.minus(e.a).normalize());
             const PROSPECT = [];
-            for (let me of [{
+            let objs = [{
                 a: a,
                 b: b,
                 A_C: A_C,
                 A_EL: A_EL,
-                A_E, A_E,
+                A_E: A_E,
                 B_C: B_C,
                 B_EL: B_EL,
                 B_E: B_E,
@@ -237,34 +236,44 @@ class Physics {
                 b: a,
                 A_C: B_C,
                 A_EL: B_EL,
-                A_E, B_E,
+                A_E: B_E,
                 B_C: A_C,
                 B_EL: A_EL,
                 B_E: A_E,
                 coef: -1,
                 m: b.middle
-            }]) {
+            }];
+            for (let me of objs) {
+
                 for (let i = 0; i < me.A_EL.length; i++) {
                     let edge = me.A_EL[i];
                     let v = me.A_E[i];
-                    let normal = v.normal.times(-1);
+                    let normal = v.normal;
+                    c.stroke(cl.RED).arrow(edge.midPoint, edge.midPoint.plus(normal.times(20)));
                     let sorted = me.B_C
-                        .sort((a, b) => b.dot(normal) - a.dot(normal))
-                        .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
-                        .filter(e => {
-                            let v1 = e[1].minus(e[0]);
-                            let v2 = e[1].minus(me.m);
-                            let dot = v1.dot(v2) / (v1.mag * v2.mag)
-                            if (me.a === b) {
-                                c.stroke(cl.ORANGE).arrow(e[0], e[1]);
-                                c.stroke(cl.ORANGE).arrow(me.m, e[1]);
-                                c.draw(cl.BLACK).text("20px Arial", dot.toFixed(2), e[1].x, e[1].y);
-                            } 
-                            return dot > 0;
-                        });
+                        // .sort((a, b) => b.dot(normal) - a.dot(normal))
+                        // .filter((e, i) => i <= 1)
                         // .filter(e => Physics.collideRectPoint(me.a, e).colliding)
                         // .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
-                        // .filter(e => Physics.collideRectPoint(me.b, e[1]).colliding);
+                        // .filter(e => {
+                        //     let v1 = e[1].minus(e[0]);
+                        //     let v2 = e[1].minus(me.m);
+                        //     let dot = v1.dot(v2) / (v1.mag * v2.mag)
+                        //     if (me.a === b) {
+                        //         c.stroke(cl.ORANGE).arrow(e[0], e[1]);
+                        //         c.stroke(cl.ORANGE).arrow(me.m, e[1]);
+                        //         c.draw(cl.BLACK).text("20px Arial", dot.toFixed(2), e[1].x, e[1].y);
+                        //     } 
+                        //     return dot > 0;
+                        // });
+
+                        .filter(e => Physics.collideRectPoint(me.a, e).colliding)
+                        .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
+                        .filter(e => Physics.collideRectPoint(me.b, e[1]).colliding);
+                        
+                        // .filter((e, i) => !i)
+                        // .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
+                        // .filter(e => Physics.collideRectPoint(me.a, e[0]).colliding);
                     if (sorted.length) {
                         let p = sorted[0];
 
