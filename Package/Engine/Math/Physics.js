@@ -251,33 +251,13 @@ class Physics {
                     let normal = v.normal;
                     c.stroke(cl.RED).arrow(edge.midPoint, edge.midPoint.plus(normal.times(20)));
                     let sorted = me.B_C
-                        // .sort((a, b) => b.dot(normal) - a.dot(normal))
-                        // .filter((e, i) => i <= 1)
-                        // .filter(e => Physics.collideRectPoint(me.a, e).colliding)
-                        // .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
-                        // .filter(e => {
-                        //     let v1 = e[1].minus(e[0]);
-                        //     let v2 = e[1].minus(me.m);
-                        //     let dot = v1.dot(v2) / (v1.mag * v2.mag)
-                        //     if (me.a === b) {
-                        //         c.stroke(cl.ORANGE).arrow(e[0], e[1]);
-                        //         c.stroke(cl.ORANGE).arrow(me.m, e[1]);
-                        //         c.draw(cl.BLACK).text("20px Arial", dot.toFixed(2), e[1].x, e[1].y);
-                        //     } 
-                        //     return dot > 0;
-                        // });
-
                         .filter(e => Physics.collideRectPoint(me.a, e).colliding)
                         .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
                         .filter(e => Physics.collideRectPoint(me.b, e[1]).colliding);
-                        
-                        // .filter((e, i) => !i)
-                        // .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
-                        // .filter(e => Physics.collideRectPoint(me.a, e[0]).colliding);
                     if (sorted.length) {
                         let p = sorted[0];
 
-                        let cp = p[1]//Geometry.closestPointOnLineObject(p, edge);
+                        let cp = p[1];
                         PROSPECT.push(new CollisionOption(p[0], edge, cp, me.coef));
                     }
                 }
