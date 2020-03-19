@@ -80,26 +80,8 @@ class Physics {
         return new Collision((b.x - a.middle.x) ** 2 + (b.y - a.middle.y) ** 2 < a.radius ** 2, a, b);
     }
     static collideRectPoint(a, b) {
-        let r1 = Physics.getBoundingBox(a);
-        if (!(r1.x < b.x && b.x < r1.x + r1.width && r1.y < b.y && b.y < r1.y + r1.height)) return false;
-        let aEdges = a.getAxes();
-        let edges = aEdges;
-        let aCorners = a.getCorners();
-        let colliding = true;
-        const TOLERANCE = 0.0001;
-        for (let i = 0; i < edges.length; i++) {
-            let edge = edges[i];
-            let aRange = new Range();
-            for (let point of aCorners) {
-                let projection = Geometry.projectPointOntoLine(point, edge);
-                aRange.include(projection);
-            }
-            let projection = Geometry.projectPointOntoLine(b, edge);
-            if (projection < aRange.min - TOLERANCE || projection > aRange.max + TOLERANCE) {
-                colliding = false;
-                break;
-            }
-        }
+        let nP = Geometry.rotatePointAround(a.centerOfMass, b, -a.rotation);
+        let colliding = a.x < nP.x && a.x + a.width > nP.x && a.y < nP.y && a.y + a.height > nP.y;
         return new Collision(colliding, a, b);
     }
     static collideCircleCircle(a, b) {
