@@ -4,7 +4,6 @@ class PhysicsObject extends SceneObject {
         super(name, x, y, width, height, controls, tag, home);
         this.velocity = new Vector2(0, 0);
         this.acceleration = new Vector2(0, 0);
-        this._rotation = 0;
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
         this.hasGravity = gravity;
@@ -31,6 +30,7 @@ class PhysicsObject extends SceneObject {
         this._linearDragForce = null;
         this._angularDragForce = null;
         this._friction = null;
+        this._rotation = 0;
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
         this.newColliding = new CollisionMoniter();

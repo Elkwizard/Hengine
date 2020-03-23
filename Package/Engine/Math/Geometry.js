@@ -117,18 +117,6 @@ class Geometry {
     }
     static closestPointOnLineObject(p, l) {
         if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
-        // let dx = l.b.x - l.a.x;
-        // let dy = l.b.y - l.a.y;
-        // if (!dx) dx = 0.00000000000000001;
-        // if (!dy) dy = 0.00000000000000001;
-        // let b = l.a.y - l.a.x * (dy / dx);
-        // let x1 = p.x;
-        // let y1 = p.y;
-        // let pX = ((dx / dy) * x1 - b + y1) / ((dy * dy + dx * dx) / (dx * dy));
-        // if (pX < min) pX = min;
-        // if (pX > max) pX = max;
-        // let pY = (dy / dx) * pX + b;
-        // return new Vector2(pX, pY);
         const A = l.a;
         const B = l.b;
         const SIGN_X = (A.x < B.x)? -1:1;
@@ -283,7 +271,7 @@ class Geometry {
         let a = dif.getAngle();
         a += angle;
         let nDif = Vector2.fromAngle(a);
-        nDif.mag = dif.mag;
+        nDif.mul(dif.mag);
         return new Vector2(origin.x + nDif.x, origin.y + nDif.y);
     }
     static overlapLineLine(l1, l2) {

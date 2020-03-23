@@ -81,7 +81,7 @@ class Physics {
     }
     static collideRectPoint(a, b) {
         let nP = Geometry.rotatePointAround(a.centerOfMass, b, -a.rotation);
-        let colliding = a.x < nP.x && a.x + a.width > nP.x && a.y < nP.y && a.y + a.height > nP.y;
+        let colliding = a.x <= nP.x && a.x + a.width >= nP.x && a.y <= nP.y && a.y + a.height >= nP.y;
         return new Collision(colliding, a, b);
     }
     static collideCircleCircle(a, b) {
@@ -212,7 +212,7 @@ class Physics {
                 B_EL: B_EL,
                 B_E: B_E,
                 coef: 1,
-                m: a.middle
+                m: b.middle
             }, {
                 a: b,
                 b: a,
@@ -223,22 +223,29 @@ class Physics {
                 B_EL: A_EL,
                 B_E: A_E,
                 coef: -1,
-                m: b.middle
+                m: a.middle
             }];
             for (let me of objs) {
-
                 for (let i = 0; i < me.A_EL.length; i++) {
                     let edge = me.A_EL[i];
                     let v = me.A_E[i];
                     let normal = v.normal;
                     c.stroke(cl.RED).arrow(edge.midPoint, edge.midPoint.plus(normal.times(20)));
                     let sorted = me.B_C
+                        .sort((a, b) => b.dot(normal) - a.dot(normal))
+                        // .filter((e, i) => i !== me.A_EL.length - 1)
                         .filter(e => Physics.collideRectPoint(me.a, e).colliding)
                         .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
-                        .filter(e => Physics.collideRectPoint(me.b, e[1]).colliding);
+                        .filter(e => {
+                            let dir = e[1].minus(e[0]);
+                            let dir2 = me.m.minus(e[0]);
+                            // c.stroke(cl.PURPLE, 1).arrow(e[0], e[0].plus(dir));
+                            // c.stroke(cl.PURPLE, 1).arrow(e[0], e[0].plus(dir2));
+                            
+                            return dir.dot(dir2) > 0;
+                        });
                     if (sorted.length) {
                         let p = sorted[0];
-
                         let cp = p[1];
                         PROSPECT.push(new CollisionOption(p[0], edge, cp, me.coef));
                     }
@@ -263,7 +270,7 @@ class Physics {
                 finalPenetratingCornerOwner = (final.coef > 0) ? b : a;
                 finalPenetratedEdge = final.edge;
                 finalPenetratingCorner = final.p1;
-                c.draw(cl.ORANGE).circle(finalPenetratingCornerOwner.x, finalPenetratingCornerOwner.y, 5);
+                // c.draw(cl.ORANGE).circle(finalPenetratingCornerOwner.x, finalPenetratingCornerOwner.y, 5);
             } else colliding = false;
         }
 
@@ -286,7 +293,7 @@ class Physics {
                     pointB = collisionPointOwner;
                     pointA = finalPenetratingCorner;
                 }
-                c.draw(cl.RED).circle(finalPenetratingCorner.x, finalPenetratingCorner.y, 5);
+                // c.draw(cl.RED).circle(finalPenetratingCorner.x, finalPenetratingCorner.y, 5);
 
                 col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), leastIntersection, pointA, pointB);
             } else {
