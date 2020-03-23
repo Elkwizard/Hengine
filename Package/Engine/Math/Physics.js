@@ -201,7 +201,7 @@ class Physics {
             const B_C = bCorners;
             const B_EL = b.getLineEdges();
             const B_E = B_EL.map(e => e.b.minus(e.a).normalize());
-            const PROSPECT = [];
+            let prospect = [];
             let objs = [{
                 a: a,
                 b: b,
@@ -230,7 +230,7 @@ class Physics {
                     let edge = me.A_EL[i];
                     let v = me.A_E[i];
                     let normal = v.normal;
-                    c.stroke(cl.RED).arrow(edge.midPoint, edge.midPoint.plus(normal.times(20)));
+                    // c.stroke(cl.RED).arrow(edge.midPoint, edge.midPoint.plus(normal.times(20)));
                     let sorted = me.B_C
                         .sort((a, b) => b.dot(normal) - a.dot(normal))
                         // .filter((e, i) => i !== me.A_EL.length - 1)
@@ -244,14 +244,42 @@ class Physics {
                             
                             return dir.dot(dir2) > 0;
                         });
-                    if (sorted.length) {
-                        let p = sorted[0];
+
+                    for (let sort of sorted) {
+                        let p = sort;
                         let cp = p[1];
-                        PROSPECT.push(new CollisionOption(p[0], edge, cp, me.coef));
+                        prospect.push(new CollisionOption(p[0], edge, cp, me.coef));
                     }
                 }
             }
-            let best = PROSPECT
+            let groups = [];
+            let found = [];
+            for (let el of prospect) {
+                let index = found.indexOf(el.p1);
+                if (index === -1) {
+                    found.push(el.p1);
+                    groups.push([el]);
+                } else {
+                    groups[index].push(el);
+                }
+            }
+            groups = groups
+                .map(e => {
+                    let smallest = e.sort((a, b) => a.dist - b.dist)[0].dist;
+                    // for (let el of e) {
+                    //     c.stroke(cl.RED, 2).arrow(el.p1, el.p2);
+                    // }
+                    return [smallest, ...e];
+                })
+                .sort(function(a, b) {
+                    return b[0] - a[0];
+                });
+            let [sm, ...bestOptions] = groups[0];
+            let best = bestOptions
+                .map(function(e) {
+                    // c.stroke(cl.GREEN, 2).arrow(e.p1, e.p2);
+                    return e;
+                })
                 .sort(function (a, b) {
                     return a.dist - b.dist;
                 })
@@ -262,9 +290,9 @@ class Physics {
                 let final = best[0];
                 let finalP = final.p1;
                 let finalDir = final.dir;
-                c.stroke(cl.RED).circle(finalP.x, finalP.y, 5);
-                c.stroke(cl.RED).arrow(finalP, final.p2);
-                c.stroke(cl.GREEN).arrow(finalP, final.p1.plus(finalDir.times(20)));
+                // c.stroke(cl.RED).circle(finalP.x, finalP.y, 5);
+                // c.stroke(cl.RED).arrow(finalP, final.p2);
+                // c.stroke(cl.GREEN).arrow(finalP, final.p1.plus(finalDir.times(20)));
                 leastIntersection = Math.sqrt(final.dist);
                 collisionAxis = finalDir;
                 finalPenetratingCornerOwner = (final.coef > 0) ? b : a;
@@ -355,7 +383,7 @@ class Physics {
         //friction
         const normal = d.normal.normalize();
         a.applyFriction(normal, collisionPointA, b.friction);
-        b.applyFriction(normal, collisionPointB, a.friction);
+        
 
         //impulse resolution
         let impulses = Physics.getImpulses(a, b, col.Adir, col.Bdir, collisionPointA, collisionPointB);
