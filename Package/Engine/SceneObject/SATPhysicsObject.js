@@ -344,13 +344,7 @@ class PhysicsObject extends SceneObject {
         let eMag = endVector.mag;
         let shortest = (sMag < eMag) ? startVector : endVector;
 
-        let maxR = this.radius;
-        if (maxR === undefined) {
-            let uS = Geometry.rotatePointAround(com, impulse.source, -this.rotation);
-            let xDif = (uS.x < com.x) ? com.x - this.x : this.x + this.width - com.x;
-            let yDif = (uS.y < com.y) ? com.y - this.y : this.y + this.height - com.y;
-            maxR = Math.sqrt(xDif ** 2 + yDif ** 2);
-        }
+        let maxR = this.radius ? this.radius : Math.sqrt((this.width / 2) ** 2, (this.height / 2) ** 2);
         let minR = shortest.mag;
         // c.stroke(cl.LIME, 1).circle(com.x, com.y, maxR);
         // c.stroke(cl.RED, 1).circle(com.x, com.y, minR);
@@ -361,8 +355,8 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
-        c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
-        c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(100).plus(impulse.source));
+        // c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
+        // c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(100).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;

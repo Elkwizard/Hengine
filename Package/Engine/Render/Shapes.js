@@ -120,6 +120,7 @@ class Rect {
 		return { x: this.x + (this.width / 2), y: this.y + (this.height / 2) }
     }
     get middle() {
+		if (!this.centerOfMassOffset.x && !this.centerOfMassOffset.y) return Vector2.fromPoint(this.unrotatedMiddle);
         return Geometry.rotatePointAround(this.centerOfMass, this.unrotatedMiddle, this.rotation);
     }
     set middle(a) {

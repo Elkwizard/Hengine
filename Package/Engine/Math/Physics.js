@@ -233,7 +233,7 @@ class Physics {
                     // c.stroke(cl.RED).arrow(edge.midPoint, edge.midPoint.plus(normal.times(20)));
                     let sorted = me.B_C
                         .sort((a, b) => b.dot(normal) - a.dot(normal))
-                        // .filter((e, i) => i !== me.A_EL.length - 1)
+                        .filter((e, i) => i !== me.A_EL.length - 1)
                         .filter(e => Physics.collideRectPoint(me.a, e).colliding)
                         .map(e => [e, Geometry.closestPointOnLineObject(e, edge)])
                         .filter(e => {
@@ -241,7 +241,6 @@ class Physics {
                             let dir2 = me.m.minus(e[0]);
                             // c.stroke(cl.PURPLE, 1).arrow(e[0], e[0].plus(dir));
                             // c.stroke(cl.PURPLE, 1).arrow(e[0], e[0].plus(dir2));
-                            
                             return dir.dot(dir2) > 0;
                         });
 
@@ -265,29 +264,17 @@ class Physics {
             }
             groups = groups
                 .map(e => {
-                    let smallest = e.sort((a, b) => a.dist - b.dist)[0].dist;
+                    let smallest = e.sort((a, b) => a.dist - b.dist)[0];
                     // for (let el of e) {
                     //     c.stroke(cl.RED, 2).arrow(el.p1, el.p2);
                     // }
                     return [smallest, ...e];
                 })
                 .sort(function(a, b) {
-                    return b[0] - a[0];
+                    return b[0].dist - a[0].dist;
                 });
-            let [sm, ...bestOptions] = groups[0];
-            let best = bestOptions
-                .map(function(e) {
-                    // c.stroke(cl.GREEN, 2).arrow(e.p1, e.p2);
-                    return e;
-                })
-                .sort(function (a, b) {
-                    return a.dist - b.dist;
-                })
-                .filter(function (e) {
-                    return true
-                });
-            if (best.length) {
-                let final = best[0];
+            if (groups.length && groups[0].length) {
+                let final = groups[0][0];
                 let finalP = final.p1;
                 let finalDir = final.dir;
                 // c.stroke(cl.RED).circle(finalP.x, finalP.y, 5);
@@ -307,19 +294,19 @@ class Physics {
             if (collisionAxis) {
                 collisionAxis.normalize();
                 //figure out impulses
-                let corners = finalPenetratingCornerOwner.getCorners();
-                let otherCorners = (finalPenetratingCornerOwner === a) ? b.getCorners() : a.getCorners();
+                let corners = (finalPenetratingCornerOwner === a) ? aCorners : bCorners;
+                let otherCorners = (finalPenetratingCornerOwner === a) ? bCorners : aCorners;
                 otherCorners.push(finalPenetratingCorner);
                 let ownerDir = (finalPenetratingCornerOwner === a) ? collisionAxis : collisionAxis.times(-1);
                 let collisionPointOwner = Physics.getCollisionPoint(a, b, corners, finalPenetratedEdge, ownerDir);
-                // let collisionPointNotOwner = Physics.getCollisionPoint(b, a, otherCorners, )
+                let collisionPointNotOwner = finalPenetratingCorner;//Physics.getCollisionPoint(b, a, [finalPenetratingCorner, otherCorners], finalPenetratedEdge, ownerDir.times(-1));
                 let pointA, pointB;
                 if (finalPenetratingCornerOwner === a) {
                     pointA = collisionPointOwner;
-                    pointB = finalPenetratingCorner;
+                    pointB = collisionPointNotOwner;
                 } else {
                     pointB = collisionPointOwner;
-                    pointA = finalPenetratingCorner;
+                    pointA = collisionPointNotOwner;
                 }
                 // c.draw(cl.RED).circle(finalPenetratingCorner.x, finalPenetratingCorner.y, 5);
 
