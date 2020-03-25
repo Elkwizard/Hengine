@@ -59,6 +59,7 @@ class ParticleObject extends PhysicsObject {
             this.draw = this.spawner.particleDraw.bind(this);
         }
         this.particleInit();
+        this.completelyStatic = false;
     }
     particleInit() {
         let sp = this.spawner;
@@ -94,7 +95,7 @@ class ParticleObject extends PhysicsObject {
     enginePhysicsUpdate() {
         this.lastX = this.x;
         this.lastY = this.y;
-        if (this.spawner.falls) this.accel.y = this.home.gravity.y;
+        if (this.spawner.falls) this.accel.y = this.home.gravity.y / 4;
         this.speed.add(this.accel);
         if (this.spawner.particleSlows) {
             this.slowDown();
