@@ -155,6 +155,11 @@ class PhysicsObject extends SceneObject {
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
     }
+    mobilize() {
+        this.completelyStatic = false;
+        this.hasGravity = true;
+        this.slows = true;
+    }
     clearCollisions() {
         for (let [key, value] of this.colliding) this.colliding[key] = null;
         this.canMoveThisFrame = true;
@@ -355,8 +360,8 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
-        // c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(100).plus(impulse.source));
+        c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
+        c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;

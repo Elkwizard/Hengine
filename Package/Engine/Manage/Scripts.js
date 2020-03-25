@@ -82,7 +82,9 @@ class Script {
 				local.scriptCollideRule = local.scriptCollideRule.add(this.methods[x].bind(bindTo));
 			}
 			else {
-				local[x] = this.methods[x].bind(bindTo);
+				local[x] = function(...params) {
+					return this.methods[x].bind(bindTo)(local, ...params);
+				}.bind(this);
 				local[x].flag = flag;
 			}
 		}

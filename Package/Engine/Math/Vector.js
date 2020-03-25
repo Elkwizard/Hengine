@@ -71,19 +71,15 @@ class Vector {
 		vn.mul(...v);
 		return vn;
 	}
-	static sum(...v) {
-		return (new v[0].constructor(0, 0, 0, 0)).plus(...v);
+	total() {
+		let result = 0;
+		for (let n in this) result += this[n];
+		return result;
 	}
-    static prohibitDirections(proDirs, dir) {
-        let remove = [];
-        for (let proDir of proDirs) {
-            let proj = proDir.projectOnto(dir);
-			if (proj.dot(dir) < 0) proj.mul(0);
-			else proj.mul(dir.mag);
-            remove.push(proj);
-        }
-		let wrong = remove.length? Vector.sum(...remove).over(remove.length) : new dir.constructor(0, 0, 0, 0);
-        return dir.minus(wrong);
+	equals(v) {
+		let result = Vector.abs(this.minus(v)).total() < 0.00001;
+		// console.log(v.toString() + " == " + this + " --> " + result);
+		return result;
 	}
 	compare(v1, v2) {
 		if (v1.dot(this) > v2.dot(this)) return v1;
@@ -124,6 +120,28 @@ class Vector {
 	}
 	get() {
 		return new this.constructor(this.x, this.y, this.z, this.w);
+	}
+	toString() {
+		let ary = [];
+		for (let n in this) ary.push(this[n]);
+		return "\u27e8" + ary.join(", ") + "\u27e9"; 
+	}
+	static abs(v) {
+		return v.op(Math.abs.bind(Math), 0);
+	}
+	static sum(...v) {
+		return (new v[0].constructor(0, 0, 0, 0)).plus(...v);
+	}
+    static prohibitDirections(proDirs, dir) {
+        let remove = [];
+        for (let proDir of proDirs) {
+            let proj = proDir.projectOnto(dir);
+			if (proj.dot(dir) < 0) proj.mul(0);
+			else proj.mul(dir.mag);
+            remove.push(proj);
+        }
+		let wrong = remove.length? Vector.sum(...remove).over(remove.length) : new dir.constructor(0, 0, 0, 0);
+        return dir.minus(wrong);
 	}
 }
 class Vector1 extends Vector {

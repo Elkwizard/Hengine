@@ -59,6 +59,14 @@ class Line {
 		let ay = (this.a.y + this.b.y) / 2;
 		return new Vector2(ax, ay);
 	}
+	get vector() {
+		return this.b.minus(this.a).normalize();
+	}
+	set vector(v) {
+		let mag = this.b.minus(this.a).mag;
+		let nB = this.a.plus(v.get().normalize().times(mag));
+		this.b = nB;
+	}
 }
 class Rect {
 	constructor(x, y, width, height, rotation = 0) {

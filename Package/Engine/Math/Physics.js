@@ -194,11 +194,12 @@ class Physics {
         let finalPenetratingCornerOwner = null;
         let finalPenetratedEdge = null;
         let finalPenetratingCorner = null;
+        let otherEdge = null;
         if (colliding) {
-            const A_C = aCorners;
+            const A_C = aCorners.map(e => e.get());
             const A_EL = a.getLineEdges();
             const A_E = A_EL.map(e => e.b.minus(e.a).normalize());
-            const B_C = bCorners;
+            const B_C = bCorners.map(e => e.get());
             const B_EL = b.getLineEdges();
             const B_E = B_EL.map(e => e.b.minus(e.a).normalize());
             let prospect = [];
@@ -265,27 +266,40 @@ class Physics {
             groups = groups
                 .map(e => {
                     let smallest = e.sort((a, b) => a.dist - b.dist)[0];
-                    // for (let el of e) {
-                    //     c.stroke(cl.RED, 2).arrow(el.p1, el.p2);
-                    // }
                     return [smallest, ...e];
                 })
-                .sort(function(a, b) {
+                .sort(function (a, b) {
                     return b[0].dist - a[0].dist;
                 });
             if (groups.length && groups[0].length) {
                 let final = groups[0][0];
-                let finalP = final.p1;
                 let finalDir = final.dir;
-                // c.stroke(cl.RED).circle(finalP.x, finalP.y, 5);
-                // c.stroke(cl.RED).arrow(finalP, final.p2);
-                // c.stroke(cl.GREEN).arrow(finalP, final.p1.plus(finalDir.times(20)));
                 leastIntersection = Math.sqrt(final.dist);
                 collisionAxis = finalDir;
                 finalPenetratingCornerOwner = (final.coef > 0) ? b : a;
                 finalPenetratedEdge = final.edge;
+                let otherEdges = (final.coef > 0) ? B_EL : A_EL;
+                let otherCorners = (final.coef > 0) ? bCorners : aCorners;
+                let finalIndex = 0;
+                for (let i = 0; i < otherCorners.length; i++) {
+                    let cnr = otherCorners[i];
+                    if (cnr.equals(final.p1)) {
+                        finalIndex = i;
+                        break;
+                    }
+                }
+                
+                let edge1 = otherEdges[finalIndex];
+                let edge2 = otherEdges[(finalIndex + 1) % otherCorners.length];
+                let ev = final.edge.vector;
+                let d1 = Math.abs(edge1.vector.dot(ev));
+                let d2 = Math.abs(edge2.vector.dot(ev));
+                let best = edge1;
+                if (d2 > d1) best = edge2;
+                // c.stroke(cl.ORANGE, 2).line(best);
+                // c.stroke(cl.ORANGE, 2).line(final.edge);
+                otherEdge = best;
                 finalPenetratingCorner = final.p1;
-                // c.draw(cl.ORANGE).circle(finalPenetratingCornerOwner.x, finalPenetratingCornerOwner.y, 5);
             } else colliding = false;
         }
 
@@ -299,7 +313,7 @@ class Physics {
                 otherCorners.push(finalPenetratingCorner);
                 let ownerDir = (finalPenetratingCornerOwner === a) ? collisionAxis : collisionAxis.times(-1);
                 let collisionPointOwner = Physics.getCollisionPoint(a, b, corners, finalPenetratedEdge, ownerDir);
-                let collisionPointNotOwner = finalPenetratingCorner;//Physics.getCollisionPoint(b, a, [finalPenetratingCorner, otherCorners], finalPenetratedEdge, ownerDir.times(-1));
+                let collisionPointNotOwner = finalPenetratingCorner;//Physics.getCollisionPoint(b, a, otherCorners, otherEdge, ownerDir.times(-1));
                 let pointA, pointB;
                 if (finalPenetratingCornerOwner === a) {
                     pointA = collisionPointOwner;
@@ -308,7 +322,6 @@ class Physics {
                     pointB = collisionPointOwner;
                     pointA = collisionPointNotOwner;
                 }
-                // c.draw(cl.RED).circle(finalPenetratingCorner.x, finalPenetratingCorner.y, 5);
 
                 col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), leastIntersection, pointA, pointB);
             } else {
@@ -331,7 +344,7 @@ class Physics {
             let tomMath;
             let aCircle = (a instanceof CirclePhysicsObject) ? "Circle" : "Rect";
             let bCircle = (b instanceof CirclePhysicsObject) ? "Circle" : "Rect";
-            tomMath = col//Physics["collide" + aCircle + bCircle](a, b);
+            tomMath = Physics["collide" + aCircle + bCircle](a, b);
             if (tomMath.colliding) {
                 col = tomMath;
                 let dir = col.Adir.times(col.penetration);
@@ -354,7 +367,7 @@ class Physics {
             } else return;
         } else return;
 
-        
+
         const d = col.Bdir;
 
         //collision points
@@ -370,7 +383,8 @@ class Physics {
         //friction
         const normal = d.normal.normalize();
         a.applyFriction(normal, collisionPointA, b.friction);
-        
+        b.applyFriction(normal, collisionPointB, a.friction);
+
 
         //impulse resolution
         let impulses = Physics.getImpulses(a, b, col.Adir, col.Bdir, collisionPointA, collisionPointB);
@@ -457,13 +471,16 @@ class Physics {
     static getCollisionPoint(a, b, corners, edge, dir) {
         let result3D = []; //<x, y, d>
         for (let corner of corners) {
-            let closest = Geometry.closestPointOnLineObject(corner, edge);
-            let dirToCorner = closest.minus(corner);
-            let dot = dirToCorner.dot(dir);
-            let valid = dot < CLIPPING_THRESHOLD;
-            if (valid) {
-                let weight = Math.max(-(dot - CLIPPING_THRESHOLD), 0);
-                result3D.push(new Vector3(corner.x, corner.y, weight));
+            let closest = Geometry.closestPointOnLineObjectLimited(corner, edge);
+            if (closest) {
+                // c.draw(cl.RED).circle(corner.x, corner.y, 9);
+                let dirToCorner = closest.minus(corner);
+                let dot = dirToCorner.dot(dir);
+                let valid = dot < CLIPPING_THRESHOLD;
+                if (valid) {
+                    let weight = Math.max(-(dot - CLIPPING_THRESHOLD), 0);
+                    result3D.push(new Vector3(corner.x, corner.y, weight));
+                }
             }
         }
         let average = new Vector2(0, 0);
