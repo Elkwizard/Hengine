@@ -34,6 +34,7 @@ class PhysicsObject extends SceneObject {
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
         this.newColliding = new CollisionMoniter();
+        this.collisionLog = [];
         this.response.collide = {
             general: function () { },
             top: function () { },
@@ -360,8 +361,8 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
-        c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
-        c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        // c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
+        // c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
@@ -393,12 +394,13 @@ class PhysicsObject extends SceneObject {
         let iFL = new Impulse(friction, collisionPoint);
         this.applyImpulse(iFL);
 
-        pointVel = collisionPoint.minus(Geometry.rotatePointAround(this.centerOfMass, collisionPoint, this.angularVelocity)).times(-1);
-        friction = pointVel.times(-1).projectOnto(tangent.bestFit(pointVel));
+        pointVel = collisionPoint.minus(Geometry.rotatePointAround(this.centerOfMass, collisionPoint, this.angularVelocity));
+        friction = pointVel.projectOnto(tangent.bestFit(pointVel));
         mag = friction.mag;
         friction.mag = Math.min(mag, mag * this.friction * otherFriction);
         let iFA = new Impulse(friction, collisionPoint);
         this.applyAngularImpulse(iFA);
+        // c.stroke(cl.LIME, 2).arrow(collisionPoint, collisionPoint.plus(pointVel.times(1000)));
     }
 }
 class CirclePhysicsObject extends PhysicsObject {

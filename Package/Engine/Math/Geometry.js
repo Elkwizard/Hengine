@@ -85,7 +85,9 @@ class Geometry {
         let dy2 = l.b.y - l.a.y;
         let rightSide = (y1 - (dy1 / dx1) * x1) - (y2 - (dy2 / dx2) * x2);
         let leftCof = (dy2 / dx2) - (dy1 / dx1);
-        let x = rightSide / leftCof;
+        const MIN = Math.min(l.a.x, l.b.x);
+        const MAX = Math.max(l.a.x, l.b.x);
+        let x = clamp(rightSide / leftCof, MIN, MAX);
         let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
         return new Vector2(x, y);
     }
@@ -132,6 +134,7 @@ class Geometry {
         return new Vector2(X, Y);
     }
     static closestPointOnLineObjectLimited(p, l) {
+        let outOfBounds = false;
         if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
         const A = l.a;
         const B = l.b;
@@ -143,10 +146,13 @@ class Geometry {
         const MAX = Math.max(A.x, B.x);
         const m_1 = (B.y - A.y) / (B.x - A.x);
         const m_2 = (B.x - A.x) / (B.y - A.y);
-        const X = (p.y + m_2 * p.x + m_1 * A.x - A.y) / (m_1 + m_2);
-        if (X < MIN || X > MAX) return null;
+        let X = (p.y + m_2 * p.x + m_1 * A.x - A.y) / (m_1 + m_2);
+        if (X < MIN || X > MAX) {
+            outOfBounds = true;
+            X = clamp(X, MIN, MAX);
+        }
         const Y = m_1 * X + A.y - m_1 * A.x;
-        return new Vector2(X, Y);
+        return {result: new Vector2(X, Y), outOfBounds};
     }
     static closestPointOnLine(p, d) {
         let x1 = p.x;

@@ -1,13 +1,14 @@
 class Collision {
-    constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, collisionPointA, collisionPointB) {
+    constructor(collides = false, a = null, b = null, Adir = new Vector2(0, 0), Bdir = new Vector2(0, 0), penetration = 0, collisionPointA, collisionPointB, frictionPoint) {
         this.colliding = collides;
         this.Adir = Adir;
         this.Bdir = Bdir;
         this.a = a;
         this.b = b;
         this.penetration = penetration;
-        this.collisionPointA = collisionPointA;
-        this.collisionPointB = collisionPointB;
+        this.impulsePointA = collisionPointA;
+        this.impulsePointB = collisionPointB;
+        this.frictionPoint = frictionPoint;
     }
 }
 class CollisionOption {
@@ -102,7 +103,7 @@ class Physics {
             b.contactPoints.push(collisionPoint);
 
 
-            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, collisionPoint, collisionPoint);
+            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, collisionPoint, collisionPoint, collisionPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -129,7 +130,7 @@ class Physics {
             a.contactPoints.push(bestPoint);
             b.contactPoints.push(bestPoint);
 
-            let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint, bestPoint);
+            let col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint, bestPoint, bestPoint);
             return col;
         } else return new Collision(false, a, b);
     }
@@ -155,7 +156,7 @@ class Physics {
             a.contactPoints.push(bestPoint);
             b.contactPoints.push(bestPoint);
 
-            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint, bestPoint);
+            col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), penetration, bestPoint, bestPoint, bestPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -288,7 +289,7 @@ class Physics {
                         break;
                     }
                 }
-                
+
                 let edge1 = otherEdges[finalIndex];
                 let edge2 = otherEdges[(finalIndex + 1) % otherCorners.length];
                 let ev = final.edge.vector;
@@ -308,12 +309,20 @@ class Physics {
             if (collisionAxis) {
                 collisionAxis.normalize();
                 //figure out impulses
-                let corners = (finalPenetratingCornerOwner === a) ? aCorners : bCorners;
-                let otherCorners = (finalPenetratingCornerOwner === a) ? bCorners : aCorners;
-                otherCorners.push(finalPenetratingCorner);
-                let ownerDir = (finalPenetratingCornerOwner === a) ? collisionAxis : collisionAxis.times(-1);
-                let collisionPointOwner = Physics.getCollisionPoint(a, b, corners, finalPenetratedEdge, ownerDir);
-                let collisionPointNotOwner = finalPenetratingCorner;//Physics.getCollisionPoint(b, a, otherCorners, otherEdge, ownerDir.times(-1));
+                let owner = finalPenetratingCornerOwner;
+                let edge = finalPenetratedEdge;
+                let notOwner = (owner === a) ? b : a;
+                let corners = (owner === a) ? aCorners : bCorners;
+                let otherCorners = (owner === a) ? bCorners : aCorners;
+                let ownerDir = (owner === a) ? collisionAxis : collisionAxis.times(-1);
+                let collisionPointOwner = Physics.getClippedCollisionPoint(owner, corners, edge, ownerDir);
+                let collisionPointNotOwner = finalPenetratingCorner;
+                // let collisionPointOwner = Physics.getCastCollisionPoint(owner, edge, otherEdge);
+                // let collisionPointNotOwner = Physics.getCastCollisionPoint(notOwner, otherEdge, edge);
+                // let collisionPointOwner = Physics.getCompositeCollisionPoint(owner, corners, edge, otherEdge, finalPenetratingCorner, ownerDir);
+                // let collisionPointNotOwner = finalPenetratingCorner; //Physics.getCompositeCollisionPoint(notOwner, otherCorners, otherEdge, edge, finalPenetratingCorner, ownerDir.times(-1));
+                c.draw(cl.RED).circle(collisionPointOwner.x, collisionPointOwner.y, 4);
+                c.draw(cl.BLUE).circle(collisionPointNotOwner.x, collisionPointNotOwner.y, 4);
                 let pointA, pointB;
                 if (finalPenetratingCornerOwner === a) {
                     pointA = collisionPointOwner;
@@ -323,7 +332,7 @@ class Physics {
                     pointA = collisionPointNotOwner;
                 }
 
-                col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), leastIntersection, pointA, pointB);
+                col = new Collision(true, a, b, collisionAxis, collisionAxis.times(-1), leastIntersection, pointA, pointB, finalPenetratingCorner);
             } else {
                 col = new Collision(false, a, b);
                 a.rotation += 0.00001;
@@ -372,8 +381,8 @@ class Physics {
 
         //collision points
 
-        let collisionPointA = col.collisionPointA;
-        let collisionPointB = col.collisionPointB;
+        let collisionPointA = col.impulsePointA;
+        let collisionPointB = col.impulsePointB;
 
         //velocity
         const A_VEL_AT_COLLISION = a.velocity.dot(col.Adir);
@@ -382,8 +391,8 @@ class Physics {
 
         //friction
         const normal = d.normal.normalize();
-        a.applyFriction(normal, collisionPointA, b.friction);
-        b.applyFriction(normal, collisionPointB, a.friction);
+        // a.applyFriction(normal, a.centerOfMass, b.friction);
+        // b.applyFriction(normal, b.centerOfMass, a.friction);
 
 
         //impulse resolution
@@ -468,12 +477,11 @@ class Physics {
             a.lastColliding[dir] = gNow(dir).length ? gNow(dir) : null;
         }
     }
-    static getCollisionPoint(a, b, corners, edge, dir) {
+    static getClippedCollisionPoint(a, corners, edge, dir) {
         let result3D = []; //<x, y, d>
         for (let corner of corners) {
-            let closest = Geometry.closestPointOnLineObjectLimited(corner, edge);
+            let closest = Geometry.closestPointOnLineObject(corner, edge);
             if (closest) {
-                // c.draw(cl.RED).circle(corner.x, corner.y, 9);
                 let dirToCorner = closest.minus(corner);
                 let dot = dirToCorner.dot(dir);
                 let valid = dot < CLIPPING_THRESHOLD;
@@ -493,10 +501,39 @@ class Physics {
 
         //contacts
         a.contactPoints.push(...contacts);
-        b.contactPoints.push(...contacts);
 
         average = (new Vector2(0, 0)).plus(...result2D).over(sumDist);
         return average;
+    }
+    static getCastCollisionPoint(object, edge, otherEdge) {
+        let closest = Geometry.closestPointOnLineObjectLimited(object.centerOfMass, edge);
+        c.draw(cl.RED).circle(closest.result.x, closest.result.y, 4);
+        if (closest.outOfBounds) return closest.result;
+        let nClosest = Geometry.closestPointOnLineObject(closest.result, otherEdge)//edge.vector.normal.times(-1), otherEdge);
+        c.draw(cl.GREEN).circle(nClosest.x, nClosest.y, 4);
+        c.stroke(cl.ORANGE, 2).arrowConnector(object.centerOfMass, closest.result, nClosest);
+        return nClosest;
+    }
+    static getCompositeCollisionPoint(object, corners, edge1, edge2, penetratingCorner, dir) {
+        let points = [];
+        for (let corner of corners) {
+            let closest = Geometry.closestPointOnLineObject(corner, edge1);
+            if (closest) {
+                let dirToCorner = closest.minus(corner);
+                let dot = dirToCorner.dot(dir);
+                let valid = dot < CLIPPING_THRESHOLD;
+                if (valid && valid > 0) points.push(corner);
+            }
+        }
+        for (let point of points) {
+            c.draw(cl.LIME).circle(point.x, point.y, 3);
+        }
+        c.stroke(cl.GREEN, 2).connector(...points);
+        let result = points[0];
+        if (points.length) {
+            result = points[0];
+        }
+        return Physics.getClippedCollisionPoint(object, corners, edge1, dir);
     }
     static getBoundingBox(r) {
         let rect;

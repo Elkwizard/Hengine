@@ -1,23 +1,6 @@
 class LineCollider {
 	constructor(x, y, x2, y2) {
-		if (typeof x === "object") {
-			this.a = new Vector2(x.x, x.y);
-			this.b = new Vector2(y.x, y.y);
-		} else {
-			this.a = new Vector2(x, y);
-			this.b = new Vector2(x2, y2);
-		}
-	}
-	evaluate(x) {
-		return this.slope * x + this.a.y;
-	}
-	get slope() {
-		let dx = this.b.x - this.a.x;
-		let dy = this.b.y - this.a.y;
-		return dy / dx;
-	}
-	collidePoint(x, y) {
-		return this.evaluate(x) == y;
+		
 	}
 }
 class RectCollider {

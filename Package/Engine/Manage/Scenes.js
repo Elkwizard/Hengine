@@ -602,12 +602,20 @@ class Scene extends InactiveScene {
 					useless.push(rect);
 					continue;
 				} else useful.push([rect]);
+			}
+			this.cellSize = 0;
+			for (let usef of useful) {
+				this.cellSize += usef[0].width + usef[0].height;
+			}
+			this.cellSize /= useful.length;
+			for (let usef of useful) {
+				let rect = usef[0];
 				let cls = Physics.getCells(rect, this.cellSize);
 				for (let cl of cls) {
 					let key = cl.x + "," + cl.y;
 					if (cells[key]) cells[key].push(rect);
 					else cells[key] = [rect];
-					let use = useful[useful.length - 1];
+					let use = usef;
 					use.push(cells[key]);
 				}
 			}
@@ -683,6 +691,8 @@ class Scene extends InactiveScene {
 			// 		let r = new Rect(x, y, this.cellSize, this.cellSize);
 			// 		c.stroke(cl.RED, 3).rect(r);
 			// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
+			// 		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
+			// 		c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
 			// 	}
 			// });
 		}

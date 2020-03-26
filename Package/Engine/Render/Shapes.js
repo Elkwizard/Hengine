@@ -40,19 +40,13 @@ class Circle {
 }
 class Line {
 	constructor(x, y, x2, y2) {
-		this.collider = new LineCollider(x, y, x2, y2);
-	}
-	get a() {
-		return this.collider.a;
-	}
-	get b() {
-		return this.collider.b;
-	}
-	set a(a) {
-		this.collider.a = new Vector2(a.x, a.y);
-	}
-	set b(a) {
-		this.collider.b = new Vector2(a.x, a.y);
+		if (typeof x === "object") {
+			this.a = new Vector2(x.x, x.y);
+			this.b = new Vector2(y.x, y.y);
+		} else {
+			this.a = new Vector2(x, y);
+			this.b = new Vector2(x2, y2);
+		}
 	}
 	get midPoint() {
 		let ax = (this.a.x + this.b.x) / 2;
@@ -66,6 +60,14 @@ class Line {
 		let mag = this.b.minus(this.a).mag;
 		let nB = this.a.plus(v.get().normalize().times(mag));
 		this.b = nB;
+	}
+	get slope() {
+		let dx = this.b.x - this.a.x;
+		let dy = this.b.y - this.a.y;
+		return dy / dx;
+	}
+	evaluate(x) {
+		return this.slope * x + this.a.y;
 	}
 }
 class Rect {
