@@ -604,11 +604,6 @@ class Scene extends InactiveScene {
 					continue;
 				} else useful.push([rect]);
 			}
-			this.cellSize = 0;
-			for (let usef of useful) {
-				this.cellSize += usef[0].width + usef[0].height;
-			}
-			this.cellSize /= useful.length;
 			for (let usef of useful) {
 				let rect = usef[0];
 				let cls = Physics.getCells(rect, this.cellSize);
@@ -701,6 +696,14 @@ class Scene extends InactiveScene {
 		this.removeQueue = [];
 		for (let rect of this.contains_array) rect.isBeingUpdated = false;
 		// console.log(performance.now() - startTime);
+	}
+	recalculateAverageCellSize(newEl) {
+		let oldAvg = this.cellSize;
+		let mul = this.contains_array.filter(e => e instanceof PhysicsObject && !(e instanceof ParticleObject)).length;
+		oldAvg *= mul;
+		let newSize = newEl.width + newEl.height;
+		let newAverageMax = (oldAvg + newSize) / (mul + 1);
+		this.cellSize = newAverageMax;
 	}
 	engineDrawUpdate() {
 		this.updateArray();

@@ -50,6 +50,7 @@ class PhysicsObject extends SceneObject {
                 }
             }
         }
+        this.home.recalculateAverageCellSize(this);
         this.allCollidingWith = {
             includes: function (name) {
                 for (let x in this) {

@@ -69,23 +69,23 @@ class MouseHandler {
 		this.engineRightClick = e => e;
 		this.engineMove = e => e;
 		let m = this;
-		document.addEventListener("touchstart", function (e) {
-			m.button = 0;
-			let evt = e.changedTouches[0];
-			m.updatePosition(evt, "touch");
-			m.down = true;
-		});
-		document.addEventListener("touchmove", function (e) {
-			let evt = e.changedTouches[0];
-			m.updatePosition(evt, "touch");
-			m.engineMove(evt);
-		});
-		document.addEventListener("touchend", function (e) {
-			let evt = e.changedTouches[0];
-			m.updatePosition(evt, "touch");
-			m.engineClick(evt);
-			m.down = false;
-		});
+		// document.addEventListener("touchstart", function (e) {
+		// 	m.button = 0;
+		// 	let evt = e.changedTouches[0];
+		// 	m.updatePosition(evt, "touch");
+		// 	m.down = true;
+		// });
+		// document.addEventListener("touchmove", function (e) {
+		// 	let evt = e.changedTouches[0];
+		// 	m.updatePosition(evt, "touch");
+		// 	m.engineMove(evt);
+		// });
+		// document.addEventListener("touchend", function (e) {
+		// 	let evt = e.changedTouches[0];
+		// 	m.updatePosition(evt, "touch");
+		// 	m.engineClick(evt);
+		// 	m.down = false;
+		// });
 		// document.addEventListener("touchcancel", function (e) {
 		// 	m.updatePosition("touch");
 		// });
