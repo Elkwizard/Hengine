@@ -67,8 +67,28 @@ class MouseHandler {
 		this.engine = null;
 		this.engineClick = e => e;
 		this.engineRightClick = e => e;
-		this.enginemove = e => e;
+		this.engineMove = e => e;
 		let m = this;
+		document.addEventListener("touchstart", function (e) {
+			m.button = 0;
+			let evt = e.changedTouches[0];
+			m.updatePosition(evt, "touch");
+			m.down = true;
+		});
+		document.addEventListener("touchmove", function (e) {
+			let evt = e.changedTouches[0];
+			m.updatePosition(evt, "touch");
+			m.engineMove(evt);
+		});
+		document.addEventListener("touchend", function (e) {
+			let evt = e.changedTouches[0];
+			m.updatePosition(evt, "touch");
+			m.engineClick(evt);
+			m.down = false;
+		});
+		// document.addEventListener("touchcancel", function (e) {
+		// 	m.updatePosition("touch");
+		// });
 		document.addEventListener("click", function (e) {
 			m.button = e.button;
 			m.updatePosition(e, "click");
@@ -91,7 +111,7 @@ class MouseHandler {
 				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
 				m.dragEnd = adjusted;
 			}
-			m.enginemove(e);
+			m.engineMove(e);
 			for (let ev of m.onMove) ev(e);
 		});
 		document.addEventListener("mouseup", function (e) {
