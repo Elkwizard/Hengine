@@ -477,6 +477,7 @@ class Scene extends InactiveScene {
 		this.zoom = 1;
 		this.cullGraphics = true;
 		this.speedModulation = 1;
+		this.collisionEvents = false;
 		this.display = new Rect(0, 0, this.c.canvas.width, this.c.canvas.height)
 		this.adjustedDisplay = new Rect(this.display.x, this.display.y, this.display.width, this.display.height);
 		M.engineClick = function (e) {

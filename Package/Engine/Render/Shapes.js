@@ -99,13 +99,25 @@ class Rect {
         this._width = a;
     }
     get width() {
-        return this._width;
+		if (!this.getCustomCorners) return this._width;
+		else {
+			let sorted = this.getCustomCorners()
+				.map(e => e.x)
+				.sort((a, b) => b - a);
+			return sorted[0] - sorted[sorted.length - 1];
+		}
     }
     set height(a) {
         this._height = a;
     }
     get height() {
-        return this._height;
+		if (!this.getCustomCorners) return this._height;
+		else {
+			let sorted = this.getCustomCorners()
+				.map(e => e.y)
+				.sort((a, b) => b - a);
+			return sorted[0] - sorted[sorted.length - 1];
+		}
     }
     set angle(a) {
         this.rotation = a;
@@ -123,11 +135,22 @@ class Rect {
         return this._rotation;
     }
 	set unrotatedMiddle(a) {
-		this.x = a.x - this.width / 2;
-		this.y = a.y - this.height / 2;
+		if (!this.getCustomCorners) {
+			this.x = a.x - this.width / 2;
+			this.y = a.y - this.height / 2;
+		} else {
+			let corners = this.getCustomCorners();
+			let offset = Vector.sum(...corners).over(corners.length).minus(new Vector2(this.x, this.y));
+			this.x = a.x - offset.x;
+			this.y = a.y - offset.y;
+		}
 	}
 	get unrotatedMiddle() {
-		return { x: this.x + (this.width / 2), y: this.y + (this.height / 2) }
+		if (!this.getCustomCorners) return { x: this.x + (this.width / 2), y: this.y + (this.height / 2) }
+		else {
+			let corners = this.getCustomCorners();
+			return Vector.sum(...corners).over(corners.length);
+		}
     }
     get middle() {
 		if (!this.centerOfMassOffset.x && !this.centerOfMassOffset.y) return Vector2.fromPoint(this.unrotatedMiddle);
@@ -145,7 +168,9 @@ class Rect {
     }
 	getCorners() {
 		let r = this;
-		let corners = [
+		let corners;
+		if (r.getCustomCorners) corners = r.getCustomCorners();
+		else corners = [
 			new Vector2(r.x, r.y),
 			new Vector2(r.x + r.width, r.y),
 			new Vector2(r.x + r.width, r.y + r.height),
@@ -158,6 +183,13 @@ class Rect {
 	getAxes() {
 		let r = this;
 		let corners = r.getCorners();
+		if (this.getCustomCorners) {
+			let edges = [];
+			for (let i = 0; i < corners.length; i++) {
+				edges.push(corners[(i + 1) % corners.length].minus(corners[i]).normalize().normal);
+			}
+			return edges;
+		}
 		let edges = [
 			corners[1].minus(corners[0]).normalize(),
 			corners[2].minus(corners[1]).normalize()

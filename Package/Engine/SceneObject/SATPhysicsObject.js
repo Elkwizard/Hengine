@@ -1,4 +1,4 @@
-const CLIPPING_THRESHOLD = 3;
+const CLIPPING_THRESHOLD = 2;
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, width, height, gravity, controls, tag, home) {
         super(name, x, y, width, height, controls, tag, home);
@@ -397,7 +397,7 @@ class PhysicsObject extends SceneObject {
         pointVel = collisionPoint.minus(Geometry.rotatePointAround(this.centerOfMass, collisionPoint, this.angularVelocity));
         friction = pointVel.projectOnto(tangent.bestFit(pointVel));
         mag = friction.mag;
-        friction.mag = Math.min(mag, mag * this.friction * otherFriction);
+        friction.mag = Math.min(mag, mag * this.friction * otherFriction * 3);
         let iFA = new Impulse(friction, collisionPoint);
         this.applyAngularImpulse(iFA);
         // c.stroke(cl.LIME, 2).arrow(collisionPoint, collisionPoint.plus(pointVel.times(1000)));
