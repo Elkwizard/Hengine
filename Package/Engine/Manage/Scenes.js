@@ -635,7 +635,6 @@ class Scene extends InactiveScene {
 				let dB = mB.dot(dir);
 				return dB - dA;
 			});
-
 			//gravity phase
 			for (let el of useful) {
 				let rect = el[0];
@@ -648,8 +647,10 @@ class Scene extends InactiveScene {
 
 				this.SAT.gridChecks += updater.length;
 				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
+				if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
 				rect.physicsUpdate(updater);
 			}
+
 			// //prohibited direction render
 			// this.drawInWorldSpace(e => {
 			// 	for (let i = 0; i < useful.length; i++) {
@@ -663,6 +664,7 @@ class Scene extends InactiveScene {
 				let rect = usef[0];
 				rect.enginePhysicsUpdate();
 			}
+
 			//update order render
 			// this.drawInWorldSpace(e => {
 			// 	for (let i = 0; i < useful.length; i++) {
@@ -679,6 +681,7 @@ class Scene extends InactiveScene {
 				if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
 				rect.enginePhysicsUpdate();
 			}
+
 			// // show cells
 			// this.drawInWorldSpace(e => {
 			// 	for (let [key, cell] of cells) {
@@ -704,6 +707,7 @@ class Scene extends InactiveScene {
 		let newSize = newEl.width + newEl.height;
 		let newAverageMax = (oldAvg + newSize) / (mul + 1);
 		this.cellSize = newAverageMax;
+		newEl.usedForCellSize = true;
 	}
 	engineDrawUpdate() {
 		this.updateArray();

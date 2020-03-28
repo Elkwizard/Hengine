@@ -35,6 +35,7 @@ class PhysicsObject extends SceneObject {
         this.lastColliding = new CollisionMoniter();
         this.newColliding = new CollisionMoniter();
         this.collisionLog = [];
+        this.usedForCellSize = false;
         this.response.collide = {
             general: function () { },
             top: function () { },
@@ -42,7 +43,6 @@ class PhysicsObject extends SceneObject {
             left: function () { },
             right: function () { }
         };
-        if (this.home.recalculateAverageCellSize) this.home.recalculateAverageCellSize(this);
         for (let x in this.response.collide) {
             let cap = x[0].toUpperCase() + x.slice(1);
             this["scriptCollide" + cap] = function (e) {

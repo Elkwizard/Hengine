@@ -129,9 +129,6 @@ class Physics {
             let bPoint = collisionAxis.times(-b.radius).plus(b.middle);
             let collisionPoint = aPoint.plus(bPoint).over(2);
 
-            //contacts
-            a.contactPoints.push(collisionPoint);
-            b.contactPoints.push(collisionPoint);
 
 
             col = new Collision(true, a, b, collisionAxis, penetration, collisionPoint);
@@ -154,15 +151,9 @@ class Physics {
             //towards b, from collision
             let collisionAxis = new Vector2(b.middle.x - bestPoint.x, b.middle.y - bestPoint.y);
             collisionAxis.normalize();
-            if (inside) {
-                collisionAxis.mul(-1);
-                // c.draw(cl.BLUE).circle(b.middle.x, b.middle.y, 5);
-            }
+            if (inside) collisionAxis.mul(-1);
 
 
-            //contacts
-            a.contactPoints.push(bestPoint);
-            b.contactPoints.push(bestPoint);
 
             // c.draw(cl.LIME).circle(bestPoint.x, bestPoint.y, 4);
 
@@ -188,9 +179,6 @@ class Physics {
             let penetration = a.radius + (inside ? bestDist : -bestDist);
             if (inside) collisionAxis.mul(-1);
 
-            //contacts
-            a.contactPoints.push(bestPoint);
-            b.contactPoints.push(bestPoint);
 
             col = new Collision(true, a, b, collisionAxis, penetration, bestPoint);
         } else col = new Collision(false, a, b);

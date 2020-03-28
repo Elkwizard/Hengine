@@ -293,6 +293,7 @@ class ColorLibrary {
 		this.TOBIN = new Color("#20a02a");
 		this.ZOE = new Color("#261550");
 		this.MAX = new Color("#161616");
+		this.MOLLY = new Color("#8b8");
 	}
 	add(name, color) {
 		this[name.toUpperCase()] = color;
