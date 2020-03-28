@@ -238,17 +238,18 @@ class Artist {
 				}
 			},
 			shape: function (...v) {
-				if (!v.length) return;
-				this.c.beginPath();
-				this.c.moveTo(v[0].x, v[0].y);
-				for (let i = 0; i <= v.length; i++) {
-					let index = i % v.length;
-					this.c.lineTo(v[index].x, v[index].y);
+				if (v.length) {
+					this.c.beginPath();
+					this.c.moveTo(v[0].x, v[0].y);
+					for (let i = 0; i <= v.length; i++) {
+						let index = i % v.length;
+						this.c.lineTo(v[index].x, v[index].y);
+					}
+					this.c.fill();
+					this.c.closePath();
 				}
-				this.c.fill();
-				this.c.closePath();
 			},
-			infer: function(obj) {
+			infer: function (obj) {
 				if (obj.radius) {
 					this.draw(this.c.fillStyle).circle(obj);
 				}
@@ -375,21 +376,21 @@ class Artist {
 				this.c.lineTo(mag - this.c.lineWidth * 4 + 0.5, 0);
 				this.c.stroke();
 				this.draw(this.c.strokeStyle).triangle(
-					P(mag - this.c.lineWidth * 4, -this.c.lineWidth * 2), 
-					P(mag - this.c.lineWidth * 4, this.c.lineWidth * 2), 
+					P(mag - this.c.lineWidth * 4, -this.c.lineWidth * 2),
+					P(mag - this.c.lineWidth * 4, this.c.lineWidth * 2),
 					P(mag, 0)
 				);
 				this.rotate(-angle);
 				this.translate(-x, -y);
 			},
-			connector: function(...points) {
+			connector: function (...points) {
 				for (let i = 0; i < points.length; i++) {
 					let p1 = points[i];
 					let p2 = points[i + 1];
 					if (p2) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).line(p1, p2);
 				}
 			},
-			arrowConnector: function(...points) {
+			arrowConnector: function (...points) {
 				for (let i = 0; i < points.length; i++) {
 					let p1 = points[i];
 					let p2 = points[i + 1];
@@ -398,16 +399,18 @@ class Artist {
 				}
 			},
 			shape: function (...v) {
-				this.c.beginPath();
-				this.c.moveTo(v[0].x, v[0].y);
-				for (let i = 0; i <= v.length; i++) {
-					let index = i % v.length;
-					this.c.lineTo(v[index].x, v[index].y);
+				if (v.length) {
+					this.c.beginPath();
+					this.c.moveTo(v[0].x, v[0].y);
+					for (let i = 0; i <= v.length; i++) {
+						let index = i % v.length;
+						this.c.lineTo(v[index].x, v[index].y);
+					}
+					this.c.stroke();
+					this.c.closePath();
 				}
-				this.c.stroke();
-				this.c.closePath();
 			},
-			infer: function(obj) {
+			infer: function (obj) {
 				if (obj.radius) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).circle(obj);
 				else this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).rect(obj);
 			}
@@ -441,14 +444,16 @@ class Artist {
 				this.c.clip();
 			},
 			shape: function (...v) {
-				this.c.beginPath();
-				this.c.moveTo(v[0].x, v[0].y);
-				for (let i = 0; i <= v.length; i++) {
-					let index = i % v.length;
-					this.c.lineTo(v[index].x, v[index].y);
+				if (v.length) {
+					this.c.beginPath();
+					this.c.moveTo(v[0].x, v[0].y);
+					for (let i = 0; i <= v.length; i++) {
+						let index = i % v.length;
+						this.c.lineTo(v[index].x, v[index].y);
+					}
+					this.c.closePath();
+					this.c.clip();
 				}
-				this.c.closePath();
-				this.c.clip();
 			},
 			text: function (font, text, x, y) {
 				text = text + "";
@@ -495,7 +500,7 @@ class Artist {
 				this.c.closePath();
 				this.c.clip();
 			},
-			infer: function(obj) {
+			infer: function (obj) {
 				if (obj.radius) this.clip().circle(obj);
 				else this.clip().rect(obj);
 			}
@@ -624,7 +629,7 @@ class Artist {
 	}
 	clip() {
 		this.c.save();
-		return this.clipObj; 
+		return this.clipObj;
 	}
 	unclip() {
 		this.c.restore();
@@ -687,7 +692,7 @@ class Artist {
 	setBackground(color) {
 		let c = color;
 		if (color instanceof Color) c = color.get_RGBA();
-		if (color instanceof Image) c = "url(" + color.src + ")"; 
+		if (color instanceof Image) c = "url(" + color.src + ")";
 		this.canvas.style.background = c;
 	}
 }

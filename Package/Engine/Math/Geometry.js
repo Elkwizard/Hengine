@@ -91,6 +91,28 @@ class Geometry {
         let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
         return new Vector2(x, y);
     }
+    static closestPointOnLineObjectInDirectionLimited(p, d, l) {
+        let x1 = p.x;
+        let y1 = p.y;
+        let dx1 = d.x;
+        let dy1 = d.y;
+        let x2 = l.a.x;
+        let y2 = l.a.y;
+        let dx2 = l.b.x - l.a.x;
+        let dy2 = l.b.y - l.a.y;
+        let rightSide = (y1 - (dy1 / dx1) * x1) - (y2 - (dy2 / dx2) * x2);
+        let leftCof = (dy2 / dx2) - (dy1 / dx1);
+        const MIN = Math.min(l.a.x, l.b.x);
+        const MAX = Math.max(l.a.x, l.b.x);
+        let x = rightSide / leftCof;
+        let outOfBounds = false;
+        if (x < MIN || x > MAX) {
+            outOfBounds = true;
+            x = clamp(x, MIN, MAX);
+        }
+        let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
+        return {result: new Vector2(x, y), outOfBounds};
+    }
     static closestPointOnCircle(p, cr) {
         let dif = new Vector2(p.x - cr.x, p.y - cr.y);
         dif.mag = cr.radius;

@@ -41,7 +41,8 @@ class PhysicsObject extends SceneObject {
             bottom: function () { },
             left: function () { },
             right: function () { }
-        }
+        };
+        if (this.home.recalculateAverageCellSize) this.home.recalculateAverageCellSize(this);
         for (let x in this.response.collide) {
             let cap = x[0].toUpperCase() + x.slice(1);
             this["scriptCollide" + cap] = function (e) {
@@ -50,7 +51,6 @@ class PhysicsObject extends SceneObject {
                 }
             }
         }
-        this.home.recalculateAverageCellSize(this);
         this.allCollidingWith = {
             includes: function (name) {
                 for (let x in this) {
@@ -398,7 +398,7 @@ class PhysicsObject extends SceneObject {
         pointVel = collisionPoint.minus(Geometry.rotatePointAround(this.centerOfMass, collisionPoint, this.angularVelocity));
         friction = pointVel.projectOnto(tangent.bestFit(pointVel));
         mag = friction.mag;
-        friction.mag = Math.min(mag, mag * this.friction * otherFriction * 3);
+        friction.mag = Math.min(mag, mag * this.friction * otherFriction * 2);
         let iFA = new Impulse(friction, collisionPoint);
         this.applyAngularImpulse(iFA);
         // c.stroke(cl.LIME, 2).arrow(collisionPoint, collisionPoint.plus(pointVel.times(1000)));
