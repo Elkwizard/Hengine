@@ -123,10 +123,11 @@ class InactiveScene {
 				n.particleSlows = el.particleSlows;
 				n.particleFades = el.particleFades;
 				n.particleFalls = el.particleFalls;
-				n.active = el.active;
+				n.active = el.active; 
 			} else {
 				if (el instanceof CirclePhysicsObject) n = this.addCircleElement(el.name + " - copy", el.x, el.y, el.radius, !el.completelyStatic, { ...el.controls }, el.tag);
 				else n = this.addRectElement(el.name + " - copy", el.x, el.y, el.width, el.height, !el.completelyStatic, { ...el.controls }, el.tag);
+				if (el.getCustomCorners) n.getCustomCorners = el.getCustomCorners;
 			}
 			n.positionStatic = el.positionStatic;
 			n.rotationStatic = el.rotationStatic;
@@ -448,8 +449,10 @@ class InactiveScene {
 	collidePoint(point) {
 		let collideAry = [];
 		for (let hitbox of this.updateArray()) {
-			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Rect") + "Point";
-			if (Physics[name](hitbox, point).colliding) {
+			let shapes = hitbox.getShapes();
+			let colliding = false;
+			for (let shape of shapes) if (Physics.collidePoint(shape, point).colliding) colliding = true;
+			if (colliding) {
 				collideAry.push(hitbox);
 			}
 		}
@@ -459,8 +462,10 @@ class InactiveScene {
 		let collideAry = [];
 		let notCollideAry = [];
 		for (let hitbox of this.contains_array) {
-			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Rect") + "Point";
-			if (Physics[name](hitbox, point).colliding) {
+			let shapes = hitbox.getShapes();
+			let colliding = false;
+			for (let shape of shapes) if (Physics.collidePoint(shape, point).colliding) colliding = true;
+			if (colliding) {
 				collideAry.push(hitbox);
 			} else {
 				notCollideAry.push(hitbox);
@@ -478,6 +483,7 @@ class Scene extends InactiveScene {
 		this.cullGraphics = true;
 		this.speedModulation = 1;
 		this.collisionEvents = false;
+		this.viewRotation = 0;
 		this.display = new Rect(0, 0, this.c.canvas.width, this.c.canvas.height)
 		this.adjustedDisplay = new Rect(this.display.x, this.display.y, this.display.width, this.display.height);
 		M.engineClick = function (e) {
@@ -545,23 +551,27 @@ class Scene extends InactiveScene {
 	}
 	drawInWorldSpace(artist) {
 		this.c.c.translate(this.c.middle.x, this.c.middle.y)
-		this.c.c.scale(this.zoom, this.zoom)
+		this.c.c.scale(this.zoom, this.zoom);
+		this.c.c.rotate(this.viewRotation);
 		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
 		this.c.c.translate(-this.display.x, -this.display.y)
 		artist();
 		this.c.c.translate(this.display.x, this.display.y)
 		this.c.c.translate(this.c.middle.x, this.c.middle.y)
 		this.c.c.scale(1 / this.zoom, 1 / this.zoom)
+		this.c.c.rotate(-this.viewRotation);
 		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
 	}
 	drawInScreenSpace(artist) {
 		this.c.c.translate(this.display.x, this.display.y)
 		this.c.c.translate(this.c.middle.x, this.c.middle.y)
 		this.c.c.scale(1 / this.zoom, 1 / this.zoom)
+		this.c.c.rotate(-this.viewRotation);
 		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
 		artist();
 		this.c.c.translate(this.c.middle.x, this.c.middle.y)
 		this.c.c.scale(this.zoom, this.zoom)
+		this.c.c.rotate(this.viewRotation);
 		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
 		this.c.c.translate(-this.display.x, -this.display.y)
 	}
@@ -718,6 +728,7 @@ class Scene extends InactiveScene {
 		this.adjustedDisplay = this.repairDisplay();
 		this.c.c.translate(this.c.middle.x, this.c.middle.y);
 		this.c.c.scale(this.zoom, this.zoom);
+		this.c.c.rotate(this.viewRotation);
 		this.c.c.translate(-this.c.middle.x, -this.c.middle.y);
 		this.c.c.translate(-this.display.x, -this.display.y);
 		this.home.updateScript.run();
@@ -778,7 +789,7 @@ class Scene extends InactiveScene {
 		newY = this.home.extend(DY, (distY) * ((1 / this.zoom) - 1)); //extend y according to it's distance from the center
 		newX += displayM.x; //re-center x
 		newY += displayM.y; //re-center y
-		return new Vector2(newX, newY); //return the result
+		return Geometry.rotatePointAround(displayM, new Vector2(newX, newY), -this.viewRotation); //return the result
 	}
 	updateDisplayAt(x, y, width, height) {
 		this.display = new Rect(x, y, width, height);

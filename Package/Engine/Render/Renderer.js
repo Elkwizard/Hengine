@@ -252,8 +252,7 @@ class Artist {
 			infer: function (obj) {
 				if (obj.radius) {
 					this.draw(this.c.fillStyle).circle(obj);
-				}
-				else {
+				} else {
 					this.draw(this.c.fillStyle).rect(obj);
 				}
 			}

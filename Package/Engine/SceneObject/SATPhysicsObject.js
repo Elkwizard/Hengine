@@ -78,6 +78,10 @@ class PhysicsObject extends SceneObject {
         this.width -= 0.25;
         this.height -= 0.25;
         this.middle = m;
+
+        //overridable
+        //getCustomCorners -> single polygon
+        //getShapes -> multiple shapes
     }
     get gravity() {
         if (this._gravity === null) return this.home.gravity;
@@ -111,9 +115,15 @@ class PhysicsObject extends SceneObject {
         this._mass = a;
     }
     get mass() {
-        if (this._mass !== null) return this._mass;
-        let apparentMass = (this.radius === undefined) ? (this.width * this.height) : (Math.PI * this.radius * this.radius);
-        return apparentMass * this.density;
+        let totalMass = 0;
+        for (let shape of this.shapes) {
+            if (shape._mass !== null) totalMass += shape._mass;
+            else {
+                let apparentMass = (shape.radius === undefined) ? (shape.width * shape.height) : (Math.PI * shape.radius * shape.radius);
+                totalMass += apparentMass * shape.density;
+            }
+        }
+        return totalMass;
     }
     set speed(a) {
         this.velocity = a;
@@ -171,12 +181,13 @@ class PhysicsObject extends SceneObject {
     }
     drawWithoutRotation(artist) {
         let com = this.centerOfMass;
+		let rot = this.parent ? this.parent.rotation : this.rotation;
         c.translate(com);
-        c.rotate(-this.rotation);
+        c.rotate(-rot);
         c.translate(com.times(-1));
         artist.bind(this)();
         c.translate(com);
-        c.rotate(this.rotation);
+        c.rotate(rot);
         c.translate(com.times(-1));
     }
     engineDrawUpdate() {
@@ -190,7 +201,9 @@ class PhysicsObject extends SceneObject {
             c.translate(mcx, mcy);
             c.rotate(r);
             c.translate(-mcx, -mcy);
-            this.runDraw();
+            for (let shape of this.shapes) {
+                shape.runDraw();
+            }
             c.translate(mcx, mcy);
             c.rotate(-r);
             // c.stroke(cl.PURPLE, 2).arrow(P(0, 0), this.velocity.times(10));
@@ -238,10 +251,8 @@ class PhysicsObject extends SceneObject {
                     if (other instanceof PhysicsObject && other.tag !== "Engine-Particle") {
                         if (this.optimize(this, other)) {
                             if (this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
-                                let nameA = (this instanceof CirclePhysicsObject) ? "Circle" : "Rect";
-                                let nameB = (other instanceof CirclePhysicsObject) ? "Circle" : "Rect";
-                                let col = Physics["collide" + nameA + nameB](this, other);
-                                if (col.colliding) {
+                                let col = Physics.fullCollide(this, other);
+                                if (col.length) {
                                     this.allCollidingWith["Rect - " + other.name] = other;
                                     other.allCollidingWith["Rect - " + this.name] = this;
                                     if (!this.colliding.general) this.colliding.general = [];
@@ -249,7 +260,7 @@ class PhysicsObject extends SceneObject {
                                     this.colliding.general.push(other);
                                     other.colliding.general.push(this);
                                     if (this.canCollide && other.canCollide) {
-                                        collisions.push(col);
+                                        collisions.push(...col);
                                     }
                                 }
                             }
@@ -274,7 +285,9 @@ class PhysicsObject extends SceneObject {
         let collisions;
         if (!this.completelyStatic) collisions = this.detectCollisions(others);
         if (!this.completelyStatic) {
-            for (let col of collisions) Physics.resolve(col);
+            for (let col of collisions) {
+                Physics.resolve(col);
+            }
         }
     }
     getSpeedModulation() {

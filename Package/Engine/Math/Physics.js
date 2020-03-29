@@ -92,6 +92,15 @@ class Link {
     }
 }
 class Physics {
+    static collide(a, b) {
+        let nameA = (a instanceof CirclePhysicsObject) ? "Circle" : "Rect";
+        let nameB = (b instanceof CirclePhysicsObject) ? "Circle" : "Rect";
+        return Physics["collide" + nameA + nameB](a, b);
+    }
+    static collidePoint(a, b) {
+        let nameA = (a instanceof CirclePhysicsObject) ? "Circle" : "Rect";
+        return Physics["collide" + nameA + "Point"](a, b);
+    }
     static collideCirclePoint(a, b) {
         return new Collision((b.x - a.middle.x) ** 2 + (b.y - a.middle.y) ** 2 < a.radius ** 2, a, b);
     }
@@ -186,8 +195,6 @@ class Physics {
     }
     static collideRectRect(a, b) {
         if (a.home) a.home.SAT.boxChecks++;
-        // c.stroke(cl.RED, 1).rect(Physics.getBoundingBox(a));
-        // c.stroke(cl.BLUE, 1).rect(Physics.getBoundingBox(b));
         if (!Geometry.overlapRectRect(Physics.getBoundingBox(a), Physics.getBoundingBox(b))) return new Collision(false, a, b);
 
         if (a.home) a.home.SAT.SATChecks++;
@@ -199,7 +206,7 @@ class Physics {
         ];
         let aCorners = a.getCorners();
         let bCorners = b.getCorners();
-        // for (let corner of aCorners) {
+        // for (let corner of [...aCorners, ...bCorners]) {
         //     c.draw(cl.RED).circle(corner.x, corner.y, 3);
         // }
         // let le = a.getLineEdges();
@@ -301,6 +308,36 @@ class Physics {
         } else col = new Collision(false, a, b);
         return col;
     }
+    static fullCollide(a, b) {
+        let tempCollisions = [];
+        let shapes = a.getShapes();
+        let otherShapes = b.getShapes();
+        for (let shape of shapes) {
+            for (let otherShape of otherShapes) {
+                tempCollisions.push(Physics.collide(shape, otherShape));
+            }
+        }
+        let cols = tempCollisions.filter(e => e.colliding);
+        let col = new Collision(false, a, b);
+        // if (cols.length) {
+        //     let point = Vector.sum(...cols.map(e => e.collisionPoint)).over(cols.length);
+        //     let direction = Vector.sum(...cols.map(e => e.dir)).over(cols.length);
+        //     let penetration = 0;
+        //     let pens = cols.map(e => e.penetration);
+        //     for (let pen of pens) penetration += pen;
+        //     penetration /= pens.length;
+        //     col = new Collision(true, a, b, direction, penetration, point);
+        // }
+        return cols.map(e => {
+            let n = e;
+            n.a = a;
+            n.b = b;
+            return n;
+        });
+    }
+    static fullCollideBool(a, b) {
+        return !!Physics.fullCollide(a, b).length;
+    }
     static resolve(col) {
         //resolve collisions
         let a = col.a;
@@ -311,11 +348,8 @@ class Physics {
         //position
         if (col.penetration > 0.005) {
             let tomMath;
-            let aCircle = (a instanceof CirclePhysicsObject) ? "Circle" : "Rect";
-            let bCircle = (b instanceof CirclePhysicsObject) ? "Circle" : "Rect";
-            tomMath = Physics["collide" + aCircle + bCircle](a, b);
-            if (tomMath.colliding) {
-                col = tomMath;
+            tomMath = Physics.fullCollideBool(a, b);
+            if (tomMath) {
                 let dir = col.dir.times(col.penetration);
                 //mass percents
                 let aPer = 1 - a.mass / (a.mass + b.mass);
@@ -445,62 +479,71 @@ class Physics {
             let maxY = sortedY[0];
             rect = new Rect(minX, minY, maxX - minX, maxY - minY);
         } else {
-            let hypot = Math.sqrt((r.width / 2) ** 2 + (r.height / 2) ** 2);
+            let hypot = r.radius ? r.radius : Math.sqrt((r.width / 2) ** 2 + (r.height / 2) ** 2);
+            // c.draw(cl.RED).circle(r.centerOfMass.x, r.centerOfMass.y, 5);
+            // c.stroke(cl.RED, 2).arrow(r.middle, r.centerOfMass);
+            // c.stroke(cl.RED, 2).arrow(r.centerOfMass, r);
             rect = new Rect(r.middle.x - hypot, r.middle.y - hypot, hypot * 2, hypot * 2);
         }
+        
+        // c.stroke(cl.RED, 1).rect(rect);
         return rect;
     }
-    static getCells(r, cellsize) {
-        let bound = Physics.getBoundingBox(r);
-        if (r.radius || (bound.width * bound.height) / (cellsize ** 2) < 30 || r.getCustomCorners) {
-            let cells = [];
-            for (let i = 0; i <= Math.ceil(bound.width / cellsize); i++) {
-                for (let j = 0; j <= Math.ceil(bound.height / cellsize); j++) {
-                    let x = i + Math.floor(bound.x / cellsize);
-                    let y = j + Math.floor(bound.y / cellsize);
-                    cells.push(P(x, y));
+    static getCells(rect, cellsize) {
+        let finalCells = [];
+        for (let r of rect.getShapes()) {
+            let bound = Physics.getBoundingBox(r);
+            if (r.radius || (bound.width * bound.height) / (cellsize ** 2) < 30 || r.getCustomCorners) {
+                let cells = [];
+                for (let i = 0; i <= Math.ceil(bound.width / cellsize); i++) {
+                    for (let j = 0; j <= Math.ceil(bound.height / cellsize); j++) {
+                        let x = i + Math.floor(bound.x / cellsize);
+                        let y = j + Math.floor(bound.y / cellsize);
+                        cells.push(P(x, y));
+                    }
                 }
-            }
-            return cells;
-        } else {
-            let cells = [];
-            let edges = r.getLineEdges().map(e => e.a.minus(e.b).normalize());
-            let corners = r.getCorners();
-            let nums = [0, 1, 2, 3];
-            if (r.width < cellsize) {
-                nums = [0];
-                let x = (corners[0].x + corners[1].x) / 2;
-                let y = (corners[0].y + corners[1].y) / 2;
-                let x2 = (corners[2].x + corners[3].x) / 2;
-                let y2 = (corners[2].y + corners[3].y) / 2;
-                cells.push(P(x, y), P(x2, y2));
-            }
-            if (r.height < cellsize) {
-                nums = [1];
-                let x = (corners[1].x + corners[2].x) / 2;
-                let y = (corners[1].y + corners[2].y) / 2;
-                let x2 = (corners[3].x + corners[0].x) / 2;
-                let y2 = (corners[3].y + corners[0].y) / 2;
-                cells.push(P(x, y), P(x2, y2));
-            }
-            for (let i of nums) {
-                let crn1 = corners[i];
-                let crn2 = corners[i - 1] ? corners[i - 1] : corners[corners.length - 1];
-                let d = Geometry.distToPoint(crn1, crn2);
-                let dir = edges[i];
-                let originX = crn1.x / cellsize;
-                let originY = crn1.y / cellsize;
-                let steps = 3;
-                for (let j = 0; j <= Math.ceil(d / cellsize) * steps; j++) {
-                    let x = originX + dir.x * j / steps;
-                    let y = originY + dir.y * j / steps;
-                    cells.push(P(Math.floor(x + 1), Math.floor(y)));
-                    cells.push(P(Math.floor(x), Math.floor(y + 1)));
-                    cells.push(P(Math.floor(x), Math.floor(y)));
+                finalCells.push(...cells);
+            } else {
+                let cells = [];
+                let edges = r.getLineEdges().map(e => e.a.minus(e.b).normalize());
+                let corners = r.getCorners();
+                let nums = [0, 1, 2, 3];
+                if (r.width < cellsize) {
+                    nums = [0];
+                    let x = (corners[0].x + corners[1].x) / 2;
+                    let y = (corners[0].y + corners[1].y) / 2;
+                    let x2 = (corners[2].x + corners[3].x) / 2;
+                    let y2 = (corners[2].y + corners[3].y) / 2;
+                    cells.push(P(x, y), P(x2, y2));
                 }
+                if (r.height < cellsize) {
+                    nums = [1];
+                    let x = (corners[1].x + corners[2].x) / 2;
+                    let y = (corners[1].y + corners[2].y) / 2;
+                    let x2 = (corners[3].x + corners[0].x) / 2;
+                    let y2 = (corners[3].y + corners[0].y) / 2;
+                    cells.push(P(x, y), P(x2, y2));
+                }
+                for (let i of nums) {
+                    let crn1 = corners[i];
+                    let crn2 = corners[i - 1] ? corners[i - 1] : corners[corners.length - 1];
+                    let d = Geometry.distToPoint(crn1, crn2);
+                    let dir = edges[i];
+                    let originX = crn1.x / cellsize;
+                    let originY = crn1.y / cellsize;
+                    let steps = 3;
+                    for (let j = 0; j <= Math.ceil(d / cellsize) * steps; j++) {
+                        let x = originX + dir.x * j / steps;
+                        let y = originY + dir.y * j / steps;
+                        cells.push(P(Math.floor(x + 1), Math.floor(y)));
+                        cells.push(P(Math.floor(x), Math.floor(y + 1)));
+                        cells.push(P(Math.floor(x), Math.floor(y)));
+                    }
+                }
+                finalCells.push(...cells);
             }
-            return cells;
         }
+        return finalCells;
     }
     static isWall(r) {
         return r.positionStatic || r.rotationStatic || !r.canMoveThisFrame;
