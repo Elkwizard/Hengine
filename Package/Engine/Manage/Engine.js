@@ -132,6 +132,7 @@ class Engine {
 		this.scene = new Scene("Engine Scene", this.renderer, G, AR, this);
 		//update loops
 		this.afterScript = new Script("after");
+		this.fixedScript = new Script("fixed");
 		this.beforeScript = new Script("before");
 		this.updateScript = new Script("update");
 
@@ -141,6 +142,7 @@ class Engine {
 			try {
 				if (this.hasFixedPhysicsUpdateCycle) if (!this.paused) {
 					this.fixedUpdate();
+					this.fixedScript.run();
 					this.scene.enginePhysicsUpdate();
 				}
 			} catch (e) {
@@ -176,6 +178,7 @@ class Engine {
 					this.scene.engineDrawUpdate();
 					if (!this.hasFixedPhysicsUpdateCycle) {
 						this.fixedUpdate();
+						this.fixedScript.run();
 						this.scene.enginePhysicsUpdate();
 					}
 					this.afterUpdate();

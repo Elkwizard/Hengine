@@ -92,6 +92,9 @@ class ParticleObject extends PhysicsObject {
         this.scriptDraw();
         this.drawSuffix();
     }
+    physicsUpdate() {
+        
+    }
     enginePhysicsUpdate() {
         this.lastX = this.x;
         this.lastY = this.y;

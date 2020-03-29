@@ -48,6 +48,9 @@ class Line {
 			this.b = new Vector2(x2, y2);
 		}
 	}
+	get length() {
+		return this.b.minus(this.a).mag;
+	}
 	get midPoint() {
 		let ax = (this.a.x + this.b.x) / 2;
 		let ay = (this.a.y + this.b.y) / 2;
@@ -57,7 +60,7 @@ class Line {
 		return this.b.minus(this.a).normalize();
 	}
 	set vector(v) {
-		let mag = this.b.minus(this.a).mag;
+		let mag = this.length;
 		let nB = this.a.plus(v.get().normalize().times(mag));
 		this.b = nB;
 	}
@@ -97,7 +100,6 @@ class Rect {
 		}
 		this._rotation = 0;
 		this.rotation = rotation;
-		this.inherentRotation = 0;
 		this.parent = null;
 		this.centerOfMassOffset = new Vector2(0, 0);
 	}
@@ -198,6 +200,16 @@ class Rect {
 		let difY = difYa + difYb;
 		this.centerOfMass = new Vector2(difX + a.x, difY + a.y);
 	}
+	removeShape(shape) {
+		let index = 0;
+		for (let i = 0; i < this.shapes.length; i++) {
+			if (this.shapes[i].name === shape.name) {
+				index = i;
+				break;
+			}
+		}
+		this.shapes.splice(index, 1);
+	}
 	addShape(...shapes) {
 		for (let shape of shapes) {
 			shape.remove();
@@ -210,6 +222,7 @@ class Rect {
 			this.centerOfMassOffset = offset;
 			shape.parent = this;
 			shape.shapes = [shape];
+			if (this.layer !== undefined) shape.layer = this.layer;
 		}
 		for (let shape of this.shapes) {
 			shape.centerOfMassOffset = shape.centerOfMass.minus(this.centerOfMass).times(-1);

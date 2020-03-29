@@ -467,6 +467,7 @@ class Physics {
     }
     static getBoundingBox(r) {
         let rect;
+        if (!r.width || !r.height) return new Rect(NaN, NaN, NaN, NaN);
         if (r.radius) {
             rect = new Rect(r.middle.x - r.radius, r.middle.y - r.radius, r.radius * 2, r.radius * 2);
         } else if (r.getCustomCorners) {

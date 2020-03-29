@@ -113,6 +113,11 @@ class SceneObject extends Rect {
 			m.scriptUpdate(m);
 		}
 	}
+	scriptBeforeUpdate() {
+		for (let m of this.scripts) {
+			m.scriptBeforeUpdate(m);
+		}
+	}
 	scriptDraw() {
 		for (let m of this.scripts) {
 			m.scriptDraw(m);
@@ -130,8 +135,11 @@ class SceneObject extends Rect {
 		return el;
 	}
 	runDraw() {
-		this.draw();
-		this.scriptDraw();
+		let sorted = [...this.shapes].sort((a, b) => a.layer - b.layer);
+		for (let shape of sorted) {
+			shape.draw();
+			shape.scriptDraw();
+		}
 	}
 	engineDrawUpdate() {
 		if (!this.hidden) {

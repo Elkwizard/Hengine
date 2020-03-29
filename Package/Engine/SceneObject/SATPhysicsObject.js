@@ -191,9 +191,11 @@ class PhysicsObject extends SceneObject {
         c.translate(com.times(-1));
     }
     engineDrawUpdate() {
-        let r = Physics.getBoundingBox(this);
-        // c.draw(new Color(255, 0, 0,0.2)).rect(s.adjustedDisplay);
-        if (!this.hidden && (!this.cullGraphics || Geometry.overlapRectRect(r, s.adjustedDisplay))) {
+        let sD = s.adjustedDisplay;
+        // let r = Physics.getBoundingBox(this);
+        let r1 = new Rect(sD.x, sD.y, sD.width, sD.height, -s.viewRotation);
+        let inFrame =  !this.cullGraphics || Physics.fullCollideBool(this, r1);
+        if (!this.hidden && inFrame) {
             let com = this.centerOfMass;
             let mcx = com.x;
             let mcy = com.y;
@@ -201,9 +203,7 @@ class PhysicsObject extends SceneObject {
             c.translate(mcx, mcy);
             c.rotate(r);
             c.translate(-mcx, -mcy);
-            for (let shape of this.shapes) {
-                shape.runDraw();
-            }
+            this.runDraw();
             c.translate(mcx, mcy);
             c.rotate(-r);
             // c.stroke(cl.PURPLE, 2).arrow(P(0, 0), this.velocity.times(10));

@@ -303,6 +303,16 @@ class InactiveScene {
 		this.updateArray();
 		return this.contains_array;
 	}
+	getElementsMatch(fn) {
+		let ary = [];
+		let oAry = this.updateArray();
+		for (let rect of oAry) {
+			if (fn(rect)) {
+				ary.push(rect);
+			}
+		}
+		return ary;
+	}
 	getElementsWithTag(tag) {
 		let ary = [];
 		let oAry = this.updateArray();
@@ -606,6 +616,11 @@ class Scene extends InactiveScene {
 			let isUseless = a => !(a instanceof PhysicsObject) || (a instanceof ParticleObject);
 			let useful = [];
 			let useless = [];
+			
+			//custom before updates run
+			for (let el of this.contains_array) {
+				el.scriptBeforeUpdate();
+			}
 
 			let sortedEls = this.contains_array;
 			for (let rect of sortedEls) {

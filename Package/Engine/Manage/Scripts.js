@@ -33,6 +33,7 @@ class Script {
 		let local = obj[this.name];
 		local.scriptNumber = 1;
 		local.scriptUpdate = (l, e) => e;
+		local.scriptBeforeUpdate = (l, e) => e;
 		local.scriptDraw = (l, e) => e;
 		local.scriptCollideTop = (l, e) => e;
 		local.scriptCollideLeft = (l, e) => e;
@@ -50,6 +51,9 @@ class Script {
 			}
 			else if (flag === "update") {
 				local.scriptUpdate = local.scriptUpdate.add(this.methods[x].bind(bindTo));
+			}
+			else if (flag === "before_update" || flag === "beforeupdate" || flag === "before-update") {
+				local.scriptBeforeUpdate = local.scriptBeforeUpdate.add(this.methods[x].bind(bindTo));
 			}
 			else if (flag === "draw") {
 				local.scriptDraw = local.scriptDraw.add(this.methods[x].bind(bindTo));
@@ -82,7 +86,7 @@ class Script {
 				local.scriptCollideRule = local.scriptCollideRule.add(this.methods[x].bind(bindTo));
 			}
 			else {
-				local[x] = function(...params) {
+				local[x] = function (...params) {
 					return this.methods[x].bind(bindTo)(local, ...params);
 				}.bind(this);
 				local[x].flag = flag;
