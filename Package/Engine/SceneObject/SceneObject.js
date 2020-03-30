@@ -100,6 +100,44 @@ class SceneObject {
 	get height() {
 		return this.getBoundingBox().height;
 	}
+	serializeShapes() {
+		let shapes = this.getShapes();
+		let result = [];
+		for (let shape of shapes) {
+			let term = "";
+			if (shape instanceof Circle) {
+				term = "C " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.radius.toFixed(0);
+			}
+			
+			if (shape instanceof Rect) {
+				term = "R " + shape.rotation.toFixed(0) + " " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.width.toFixed(0) + " " + shape.height.toFixed(2);
+			} else if (shape instanceof Polygon) {
+				term = "P " + shape.rotation.toFixed(0) + " " + shape.vertices.map(e => e.x.toFixed(0) + "|" + e.y.toFixed(0)).join(" ");
+			}
+			result.push(term);
+		}
+		return result.join(", ");
+	}
+	parseShapes(str) {
+		let shapes = str.split(", ");
+		let result = [];
+		for (let shape of shapes) {
+			let args = shape.split(" ").slice(1).map(e => parseFloat(e));
+			switch(shape[0]) {
+				case "C":
+					result.push(new Circle(args[0], args[1], args[2]));
+					break;
+				case "R":
+					result.push(new Rect(args[1], args[2], args[3], args[4], args[0]));
+				case "P":
+					result.push(new Polygon(shape.split(" ").slice(2).map(e => new Vector2(parseFloat(e.split("|")[0]), parseFloat(e.split("|")[1]))), args[0]))
+					break;
+			}
+		}
+		let num = 0;
+		for (let shape of result) this.addShape(num++, shape);
+		return result;
+	}
 	getBoundingBox() {
 		let shapes = this.getModels();
 		let boxes = shapes.map(e => e.getBoundingBox());
@@ -126,6 +164,10 @@ class SceneObject {
 		let ary = [];
 		for (let [name, shape] of this.shapes) ary.push(shape);
 		return ary;
+	}
+	scale(factor) {
+		let middle = Vector2.origin;
+		for (let shape of this.getShapes()) shape.scaleAbout(middle, factor);
 	}
 	getModels() {
 		let ary = this.getShapes();

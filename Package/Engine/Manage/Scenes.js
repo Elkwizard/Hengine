@@ -61,7 +61,7 @@ class InactiveScene {
 		this.airResistance = airResistance
 		this.name = name;
 		this.rebound = 0;
-		this.contains_array = [];
+		this.containsArray = [];
 		this.custom = {};
 		this.templates = {};
 		this.hasRotatedRectangles = false;
@@ -91,17 +91,17 @@ class InactiveScene {
 		this.contains = {};
 	}
 	updateArray() {
-		this.contains_array = [];
+		this.containsArray = [];
 		for (let rect in this.contains) {
 			let cont = this.contains[rect];
 			if (cont instanceof InactiveScene) {
 				if (cont.active) {
 					let ary = cont.updateArray();
-					this.contains_array.push(...ary);
+					this.containsArray.push(...ary);
 				}
-			} else this.contains_array.push(cont);
+			} else this.containsArray.push(cont);
 		}
-		return this.contains_array;
+		return this.containsArray;
 	}
 	copy(el) {
 		let n;
@@ -334,7 +334,7 @@ class InactiveScene {
 	}
 	getAllElements() {
 		this.updateArray();
-		return this.contains_array;
+		return this.containsArray;
 	}
 	getElementsMatch(fn) {
 		let ary = [];
@@ -611,15 +611,15 @@ class Scene extends InactiveScene {
 			SATChecks: 0,
 			collisions: 0
 		}
-		for (let rect of this.contains_array) rect.isBeingUpdated = true;
+		for (let rect of this.containsArray) rect.isBeingUpdated = true;
 		this.updateArray();
 		this.clearAllCollisions();
 		let q = this.removeQueue;
 		function p(x) {
 			q.push(x);
 		}
-		for (let rect of this.contains_array) rect.pushToRemoveQueue = p;
-		if (!this.hasRotatedRectangles) for (let rect of this.contains_array) rect.enginePhysicsUpdate(this.contains_array);
+		for (let rect of this.containsArray) rect.pushToRemoveQueue = p;
+		if (!this.hasRotatedRectangles) for (let rect of this.containsArray) rect.enginePhysicsUpdate(this.containsArray);
 		else {
 			//grid
 			let cells = {};
@@ -628,11 +628,11 @@ class Scene extends InactiveScene {
 			let useless = [];
 
 			//custom before updates run
-			for (let el of this.contains_array) {
+			for (let el of this.containsArray) {
 				el.scriptBeforeUpdate();
 			}
 
-			let sortedEls = this.contains_array;
+			let sortedEls = this.containsArray;
 			for (let rect of sortedEls) {
 				if (isUseless(rect)) {
 					useless.push(rect);
@@ -681,7 +681,7 @@ class Scene extends InactiveScene {
 				let updater = useful[i][useful[i].length - 1];
 
 				this.SAT.gridChecks += updater.length;
-				this.SAT.possibleChecks += updater.length ? s.contains_array.length : 0;
+				this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
 				if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
 				rect.physicsUpdate(updater);
 			}
@@ -732,12 +732,12 @@ class Scene extends InactiveScene {
 		}
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
-		for (let rect of this.contains_array) rect.isBeingUpdated = false;
+		for (let rect of this.containsArray) rect.isBeingUpdated = false;
 		// console.log(performance.now() - startTime);
 	}
 	recalculateAverageCellSize(newEl) {
 		let oldAvg = this.cellSize;
-		let mul = this.contains_array.filter(e => e instanceof PhysicsObject && !(e instanceof ParticleObject)).length;
+		let mul = this.containsArray.filter(e => e instanceof PhysicsObject && !(e instanceof ParticleObject)).length;
 		oldAvg *= mul;
 		let newSize = newEl.width + newEl.height;
 		let newAverageMax = (oldAvg + newSize) / (mul + 1);
@@ -746,7 +746,7 @@ class Scene extends InactiveScene {
 	}
 	engineDrawUpdate() {
 		this.updateArray();
-		for (let rect of this.contains_array) rect.isBeingUpdated = true;
+		for (let rect of this.containsArray) rect.isBeingUpdated = true;
 		this.display.width = this.c.canvas.width;
 		this.display.height = this.c.canvas.height;
 		this.home.beforeScript.run();
@@ -761,11 +761,11 @@ class Scene extends InactiveScene {
 		function p(x) {
 			q.push(x);
 		}
-		for (let rect of this.contains_array) rect.pushToRemoveQueue = p;
-		this.contains_array.sort(function (a, b) {
+		for (let rect of this.containsArray) rect.pushToRemoveQueue = p;
+		this.containsArray.sort(function (a, b) {
 			return a.layer - b.layer;
 		});
-		for (let rect of this.contains_array) {
+		for (let rect of this.containsArray) {
 			rect.engineDrawUpdate();
 			rect.lifeSpan++;
 		}
@@ -773,12 +773,12 @@ class Scene extends InactiveScene {
 		this.home.afterScript.run();
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
-		for (let rect of this.contains_array) rect.isBeingUpdated = false;
+		for (let rect of this.containsArray) rect.isBeingUpdated = false;
 	}
 	loadScene(sc) {
 		sc.updateArray();
 		let els = [];
-		for (let el of sc.contains_array) {
+		for (let el of sc.containsArray) {
 			let n = this.copy(el);
 			n.rename(sc.name + "&" + el.name);
 			els.push(n);

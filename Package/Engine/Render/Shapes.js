@@ -80,6 +80,9 @@ class Shape {
 	scale(factor) {
 		//scale the shape about its center by _factor_
 	}
+	scaleAbout(pos, factor) {
+		//scale shape relative to _pos_ by _factor_
+	}
 	get() {
 		//return a copy of the shape
 		return new Shape(this.rotation);
@@ -141,7 +144,10 @@ class Polygon extends Shape {
 	}
 	scale(factor) {
 		let middle = this.middle;
-		this.vertices = this.vertices.map(e => e.plus(e.minus(middle).times(factor)));
+		this.vertices = this.vertices.map(e => middle.plus(e.minus(middle).times(factor)));
+	}
+	scaleAbout(pos, factor) {
+		this.vertices = this.vertices.map(e => pos.plus(e.minus(pos).times(factor)));
 	}
 	get() {
 		return new Polygon([...this.vertices], this.rotation);
@@ -229,6 +235,13 @@ class Circle extends Shape {
 		this.y = pos.y;
 	}
 	scale(factor) {
+		this.radius *= factor;
+	}
+	scaleAbout(pos, factor) {
+		let dist = Geometry.distToPoint(this, pos) + this.radius;
+		let nPos = pos.plus((new Vector2(this.x, this.y)).minus(pos).times(factor));
+		this.x = nPos.x;
+		this.y = nPos.y;
 		this.radius *= factor;
 	}
 	getBoundingBox() {
