@@ -253,7 +253,7 @@ class Artist {
 				if (obj.radius) {
 					this.draw(this.c.fillStyle).circle(obj);
 				} else {
-					this.draw(this.c.fillStyle).rect(obj);
+					this.draw(this.c.fillStyle).shape(...obj.getCorners());
 				}
 			}
 		}
@@ -411,7 +411,7 @@ class Artist {
 			},
 			infer: function (obj) {
 				if (obj.radius) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).circle(obj);
-				else this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).rect(obj);
+				else this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).shape(...obj.getCorners());
 			}
 		}
 		for (let func in this.strokeObj) {
@@ -501,7 +501,7 @@ class Artist {
 			},
 			infer: function (obj) {
 				if (obj.radius) this.clip().circle(obj);
-				else this.clip().rect(obj);
+				else this.clip().shape(...obj.getCorners());
 			}
 		};
 		for (let func in this.clipObj) {
@@ -625,6 +625,12 @@ class Artist {
 		this.c.beginPath();
 		this.c.fillStyle = "transparent";
 		return this.strokeObj;
+	}
+	save() {
+		this.c.save();
+	}
+	restore() {
+		this.c.restore();
 	}
 	clip() {
 		this.c.save();

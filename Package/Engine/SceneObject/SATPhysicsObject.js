@@ -1,16 +1,16 @@
 const CLIPPING_THRESHOLD = 2;
 class PhysicsObject extends SceneObject {
-    constructor(name, x, y, width, height, gravity, controls, tag, home) {
-        super(name, x, y, width, height, controls, tag, home);
-        this.velocity = new Vector2(0, 0);
-        this.acceleration = new Vector2(0, 0);
+    constructor(name, x, y, gravity, controls, tag, home) {
+        super(name, x, y, controls, tag, home);
+        this.velocity = Vector2.origin;
+        this.acceleration = Vector2.origin;
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
         this.hasGravity = gravity;
         this.slows = gravity;
         this.home.hasRotatedRectangles = true;
         this.links = [];
-        this.direction = new Vector2(0, 0);
+        this.direction = Vector2.origin;
         this.lastX = this.x;
         this.lastY = this.y;
         this.hasPhysics = true;
@@ -73,15 +73,9 @@ class PhysicsObject extends SceneObject {
             }
         };
 
-        //downscale
-        const m = this.middle;
-        this.width -= 0.25;
-        this.height -= 0.25;
-        this.middle = m;
-
         //overridable
         //getCustomCorners -> single polygon
-        //getShapes -> multiple shapes
+        //getModels -> multiple shapes
     }
     get gravity() {
         if (this._gravity === null) return this.home.gravity;
@@ -115,14 +109,9 @@ class PhysicsObject extends SceneObject {
         this._mass = a;
     }
     get mass() {
+        if (this._mass !== null) return this._mass;
         let totalMass = 0;
-        for (let shape of this.shapes) {
-            if (shape._mass !== null) totalMass += shape._mass;
-            else {
-                let apparentMass = (shape.radius === undefined) ? (shape.width * shape.height) : (Math.PI * shape.radius * shape.radius);
-                totalMass += apparentMass * shape.density;
-            }
-        }
+        for (let [name, shape] of this.shapes) totalMass += shape.area;
         return totalMass;
     }
     set speed(a) {
@@ -151,6 +140,12 @@ class PhysicsObject extends SceneObject {
     get completelyStatic() {
         return this.positionStatic && this.rotationStatic;
     }
+    set centerOfMass(a) {
+        this.middle = a;
+    }
+    get centerOfMass() {
+        return this.middle;
+    }
     collideBasedOnRule(e) {
         let judgement = [];
         for (let m of this.scripts) {
@@ -162,8 +157,8 @@ class PhysicsObject extends SceneObject {
         this.links.push(new Link(this, el, fer));
     }
     stop() {
-        this.velocity = new Vector2(0, 0);
-        this.acceleration = new Vector2(0, 0);
+        this.velocity = Vector2.origin;
+        this.acceleration = Vector2.origin;
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
     }
@@ -189,30 +184,6 @@ class PhysicsObject extends SceneObject {
         c.translate(com);
         c.rotate(rot);
         c.translate(com.times(-1));
-    }
-    engineDrawUpdate() {
-        let sD = s.adjustedDisplay;
-        // let r = Physics.getBoundingBox(this);
-        let r1 = new Shape(sD.x, sD.y, sD.width, sD.height, -s.viewRotation);
-        let inFrame =  !this.cullGraphics || Physics.fullCollideBool(this, r1);
-        if (!this.hidden && inFrame) {
-            let com = this.centerOfMass;
-            let mcx = com.x;
-            let mcy = com.y;
-            let r = this.rotation;
-            c.translate(mcx, mcy);
-            c.rotate(r);
-            c.translate(-mcx, -mcy);
-            this.runDraw();
-            c.translate(mcx, mcy);
-            c.rotate(-r);
-            // c.stroke(cl.PURPLE, 2).arrow(P(0, 0), this.velocity.times(10));
-            // c.stroke(cl.LIME, 2).arrow(P(0, 0), this.acceleration.times(10));
-            // c.draw(cl.WHITE).text("15px monospace", "MASS: " + Math.floor(this.mass / 1000) + "kg, " + (this.mass % 1000) + "g", 0, 0);
-            c.translate(-mcx, -mcy);
-            // c.draw(cl.RED).rect(this.middle.x - this.width / 2, this.middle.y - this.height / 2, Math.sqrt(this.mass), Math.sqrt(this.mass));
-            // c.draw(cl.BLACK).text("10px Monospace", Math.floor(this.mass) + "kg", this.middle.x - this.width / 2, this.middle.y - this.height / 2);
-        }
     }
     slowDown() {
         //apply linear drag;
@@ -275,8 +246,8 @@ class PhysicsObject extends SceneObject {
         const dir = this.velocity.get().normalize();
         // c.stroke(cl.RED, 3).arrow(this.middle, this.middle.plus(dir.times(10)));
         others = others.sort(function (a, b) {
-            let mA = Vector2.fromPoint(a.unrotatedMiddle);
-            let mB = Vector2.fromPoint(b.unrotatedMiddle);
+            let mA = Vector2.fromPoint(a);
+            let mB = Vector2.fromPoint(b);
             let dA = mA.dot(dir);
             let dB = mB.dot(dir);
             let dif = dB - dA;
@@ -415,32 +386,5 @@ class PhysicsObject extends SceneObject {
         let iFA = new Impulse(friction, collisionPoint);
         this.applyAngularImpulse(iFA);
         // c.stroke(cl.LIME, 2).arrow(collisionPoint, collisionPoint.plus(pointVel.times(1000)));
-    }
-}
-class CirclePhysicsObject extends PhysicsObject {
-    constructor(name, x, y, radius, gravity, controls, tag, home) {
-        super(name, x, y, 0, 0, gravity, controls, tag, home);
-        this.collider = new CircleCollider(this);
-        this.radius = radius;
-        this.optimalRotation = null;
-    }
-    set unrotatedMiddle(a) {
-        this.x = a.x;
-        this.y = a.y;
-    }
-    get unrotatedMiddle() {
-        return P(this.x, this.y);
-    }
-    set width(a) {
-        this.radius = a / 2;
-    }
-    get width() {
-        return this.radius * 2;
-    }
-    set height(a) {
-        this.radius = a / 2;
-    }
-    get height() {
-        return this.radius * 2;
     }
 }

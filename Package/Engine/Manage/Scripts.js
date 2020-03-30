@@ -115,6 +115,21 @@ class ElementScript extends Script {
 		return this;
 	}
 }
+class ScriptContainer {
+	constructor() {
+		this[Symbol.iterator] = function* () {
+			let ary = [];
+			for (let m in this) {
+				let a = this[m];
+				if (typeof a !== "function") ary.push(a);
+			}
+			ary = ary.sort((a, b) => b.scriptNumber - a.scriptNumber);
+			for (let a of ary) {
+				yield a;
+			}
+		};
+	}
+}
 //presets
 const PLAYER_MOVEMENT = new ElementScript("movement", {
 	init() {

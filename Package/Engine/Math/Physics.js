@@ -27,7 +27,7 @@ class CollisionMoniter {
     }
 }
 class Impulse {
-    constructor(force = new Vector2(0, 0), source = new Vector2(0, 0)) {
+    constructor(force = Vector2.origin, source = Vector2.origin) {
         this.force = force;
         this.source = source;
     }
@@ -87,25 +87,25 @@ class Link {
         let dir = new Vector2(this.end.middle.x - this.start.middle.x, this.end.middle.y - this.start.middle.y);
         dir.normalize();
         let p = l.midPoint;
-        let cps = Geometry.closestPointOnRectangle(p, this.start);
-        let cpe = Geometry.closestPointOnRectangle(p, this.end);
+        let cps = Geometry.closestPointOnPolygon(p, this.start);
+        let cpe = Geometry.closestPointOnPolygon(p, this.end);
     }
 }
 class Physics {
     static collide(a, b) {
-        let nameA = (a instanceof CirclePhysicsObject) ? "Circle" : "Rect";
-        let nameB = (b instanceof CirclePhysicsObject) ? "Circle" : "Rect";
+        let nameA = (a instanceof Circle) ? "Circle" : "Polygon";
+        let nameB = (b instanceof Circle) ? "Circle" : "Polygon";
         return Physics["collide" + nameA + nameB](a, b);
     }
     static collidePoint(a, b) {
-        let nameA = (a instanceof CirclePhysicsObject) ? "Circle" : "Rect";
+        let nameA = (a instanceof Circle) ? "Circle" : "Polygon";
         return Physics["collide" + nameA + "Point"](a, b);
     }
     static collideCirclePoint(a, b) {
-        return new Collision((b.x - a.middle.x) ** 2 + (b.y - a.middle.y) ** 2 < a.radius ** 2, a, b);
+        return new Collision((b.x - a.x) ** 2 + (b.y - a.y) ** 2 < a.radius ** 2, a, b);
     }
-    static collideRectPoint(a, b) {
-        if (a.getCustomCorners) {
+    static collidePolygonPoint(a, b) {
+        if (!(a instanceof Rect)) {
             let axes = a.getAxes();
             let aCorners = a.getCorners();
             let colliding = true;
@@ -126,12 +126,12 @@ class Physics {
         }
     }
     static collideCircleCircle(a, b) {
-        a.home.SAT.boxChecks++;
-        a.home.SAT.SATChecks++;
+        s.SAT.boxChecks++;
+        s.SAT.SATChecks++;
         let colliding = (b.x - a.x) ** 2 + (b.y - a.y) ** 2 < (a.radius + b.radius) ** 2;
         let col;
         if (colliding) {
-            a.home.SAT.collisions++;
+            s.SAT.collisions++;
             let collisionAxis = (new Vector2(b.x - a.x, b.y - a.y)).normalize();
             let penetration = a.radius + b.radius - g.f.getDistance(a, b);
             let aPoint = collisionAxis.times(a.radius).plus(a.middle);
@@ -144,16 +144,16 @@ class Physics {
         } else col = new Collision(false, a, b);
         return col;
     }
-    static collideRectCircle(a, b) {
-        a.home.SAT.boxChecks++;
-        if (!Geometry.overlapRectRect(Physics.getBoundingBox(a), Physics.getBoundingBox(b))) return new Collision(false, a, b);
-        a.home.SAT.SATChecks++;
-        let bestPoint = Geometry.closestPointOnRectangle(b.middle, a);
-        const inside = Physics.collideRectPoint(a, b.middle).colliding;
+    static collidePolygonCircle(a, b) {
+        s.SAT.boxChecks++;
+        if (!Geometry.overlapRectRect(a.getBoundingBox(), b.getBoundingBox())) return new Collision(false, a, b);
+        s.SAT.SATChecks++;
+        let bestPoint = Geometry.closestPointOnPolygon(b.middle, a);
+        const inside = Physics.collidePolygonPoint(a, b.middle).colliding;
         let colliding = Geometry.distToPoint2(bestPoint, b.middle) < b.radius ** 2 || inside;
 
         if (colliding) {
-            a.home.SAT.collisions++;
+            s.SAT.collisions++;
             if (!bestPoint) return new Collision(false, a, b);
             let bestDist = Math.sqrt((bestPoint.x - b.middle.x) ** 2 + (bestPoint.y - b.middle.y) ** 2);
             let penetration = b.radius + (inside ? bestDist : -bestDist);
@@ -170,17 +170,17 @@ class Physics {
             return col;
         } else return new Collision(false, a, b);
     }
-    static collideCircleRect(a, b) {
-        a.home.SAT.boxChecks++;
-        if (!Geometry.overlapRectRect(Physics.getBoundingBox(a), Physics.getBoundingBox(b))) return new Collision(false, a, b);
-        let bestPoint = Geometry.closestPointOnRectangle(a.middle, b);
-        const inside = Physics.collideRectPoint(b, a.middle).colliding;
+    static collideCirclePolygon(a, b) {
+        s.SAT.boxChecks++;
+        if (!Geometry.overlapRectRect(a.getBoundingBox(), b.getBoundingBox())) return new Collision(false, a, b);
+        let bestPoint = Geometry.closestPointOnPolygon(a.middle, b);
+        const inside = Physics.collidePolygonPoint(b, a.middle).colliding;
         let colliding = Geometry.distToPoint2(bestPoint, a.middle) < a.radius ** 2 || inside;
-        a.home.SAT.SATChecks++;
+        s.SAT.SATChecks++;
         //getting resolution data
         let col;
         if (colliding) {
-            a.home.SAT.collisions++;
+            s.SAT.collisions++;
             if (!bestPoint) return new Collision(false, a, b);
             let bestDist = Geometry.distToPoint(bestPoint, a.middle);
             //towards collision, from a
@@ -193,11 +193,11 @@ class Physics {
         } else col = new Collision(false, a, b);
         return col;
     }
-    static collideRectRect(a, b) {
-        if (a.home) a.home.SAT.boxChecks++;
-        if (!Geometry.overlapRectRect(Physics.getBoundingBox(a), Physics.getBoundingBox(b))) return new Collision(false, a, b);
+    static collidePolygonPolygon(a, b) {
+        if (a.home) s.SAT.boxChecks++;
+        if (!Geometry.overlapRectRect(a.getBoundingBox(), b.getBoundingBox())) return new Collision(false, a, b);
 
-        if (a.home) a.home.SAT.SATChecks++;
+        if (a.home) s.SAT.SATChecks++;
         let aEdges = a.getAxes();
         let bEdges = b.getAxes();
         let edges = [
@@ -209,7 +209,7 @@ class Physics {
         // for (let corner of [...aCorners, ...bCorners]) {
         //     c.draw(cl.RED).circle(corner.x, corner.y, 3);
         // }
-        // let le = a.getLineEdges();
+        // let le = a.getEdges();
         // for (let i = 0; i < le.length; i++) {
         //     c.stroke(cl.LIME, 2).line(le[i]);
         //     let normal = aEdges[(i - 1 + 4) % 4];
@@ -310,8 +310,8 @@ class Physics {
     }
     static fullCollide(a, b) {
         let tempCollisions = [];
-        let shapes = a.getShapes();
-        let otherShapes = b.getShapes();
+        let shapes = a.getModels();
+        let otherShapes = b.getModels();
         for (let shape of shapes) {
             for (let otherShape of otherShapes) {
                 tempCollisions.push(Physics.collide(shape, otherShape));
@@ -435,7 +435,7 @@ class Physics {
             if (!b.colliding.top) b.colliding.top = [a];
             else b.colliding.top.push(a);
         }
-        if (a.home.collisionEvents) {
+        if (s.collisionEvents) {
             Physics.runEventListeners(a);
             Physics.runEventListeners(b);
         }
@@ -455,36 +455,11 @@ class Physics {
             a.lastColliding[dir] = a.colliding[dir];
         }
     }
-    static getBoundingBox(r) {
-        let rect;
-        if (!r.width || !r.height) return new Shape(NaN, NaN, NaN, NaN);
-        if (r.radius) {
-            rect = new Shape(r.middle.x - r.radius, r.middle.y - r.radius, r.radius * 2, r.radius * 2);
-        } else if (r.getCustomCorners) {
-            let corners = r.getCorners();
-            let sortedX = corners.map(e => e.x).sort((a, b) => b - a);
-            let sortedY = corners.map(e => e.y).sort((a, b) => b - a);
-            let minX = sortedX[sortedX.length - 1];
-            let maxX = sortedX[0];
-            let minY = sortedY[sortedY.length - 1];
-            let maxY = sortedY[0];
-            rect = new Shape(minX, minY, maxX - minX, maxY - minY);
-        } else {
-            let hypot = r.radius ? r.radius : Math.sqrt((r.width / 2) ** 2 + (r.height / 2) ** 2);
-            // c.draw(cl.RED).circle(r.centerOfMass.x, r.centerOfMass.y, 5);
-            // c.stroke(cl.RED, 2).arrow(r.middle, r.centerOfMass);
-            // c.stroke(cl.RED, 2).arrow(r.centerOfMass, r);
-            rect = new Shape(r.middle.x - hypot, r.middle.y - hypot, hypot * 2, hypot * 2);
-        }
-        
-        // c.stroke(cl.RED, 1).rect(rect);
-        return rect;
-    }
     static getCells(rect, cellsize) {
         let finalCells = [];
-        for (let r of rect.getShapes()) {
-            let bound = Physics.getBoundingBox(r);
-            if (r.radius || (bound.width * bound.height) / (cellsize ** 2) < 30 || r.getCustomCorners) {
+        for (let r of rect.getModels()) {
+            let bound = r.getBoundingBox();
+            if (!(r instanceof Rect) || (bound.width * bound.height) / (cellsize ** 2) < 30) {
                 let cells = [];
                 for (let i = 0; i <= Math.ceil(bound.width / cellsize); i++) {
                     for (let j = 0; j <= Math.ceil(bound.height / cellsize); j++) {
@@ -496,7 +471,7 @@ class Physics {
                 finalCells.push(...cells);
             } else {
                 let cells = [];
-                let edges = r.getLineEdges().map(e => e.a.minus(e.b).normalize());
+                let edges = r.getEdges().map(e => e.a.minus(e.b).normalize());
                 let corners = r.getCorners();
                 let nums = [0, 1, 2, 3];
                 if (r.width < cellsize) {

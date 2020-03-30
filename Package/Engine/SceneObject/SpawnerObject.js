@@ -1,6 +1,6 @@
-class ParticleSpawnerObject extends PhysicsObject {
+class ParticleSpawnerObject extends SceneObject {
     constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), home) {
-        super(name, x, y, 0, 0, false, false, "Particle-Spawner", home);
+        super(name, x, y, false, "Particle-Spawner", home);
         this.active = true;
         this.particleFades = true;
         this.particleSlows = true;
@@ -12,6 +12,7 @@ class ParticleSpawnerObject extends PhysicsObject {
         this.particleSize = size;
         this.particleDraw = draw;
         this.particleSizeVariance = sizeVariance;
+        this.particleShape = new Rect(-0.5, -0.5, 1, 1);
         this.dirs = dirs;
         this.isSpawner = true;
         this.particleSpeedVariance = speedVariance;
@@ -22,95 +23,100 @@ class ParticleSpawnerObject extends PhysicsObject {
         this.slows = false;
     }
     engineDrawUpdate() {
-
+        for (let [name, particle] of this.spawns) {
+            particle.engineDrawUpdate();
+        }
     }
     spawnParticle() {
         //spawn
         let len = 1;
         if (this.particleDelay < 1) len = 1 / this.particleDelay;
-        for (let i = 0; i < len; i++) this.home.addParticle(this);
+        for (let i = 0; i < len; i++) {
+            this.home.addParticle(this);
+        }
 
     }
     enginePhysicsUpdate() {
         if (this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
             this.spawnParticle();
         }
+        for (let [name, particle] of this.spawns) {
+            particle.enginePhysicsUpdate();
+            particle.lifeSpan++;
+        }
     }
 }
-class ParticleObject extends PhysicsObject {
+class ParticleObject extends SceneObject {
     constructor(spawner, home, name) {
-        super(name, 0, 0, 0, 0, spawner.particleFalls, false, "Engine-Particle", home);
+        super(name, 0, 0, false, "Engine-Particle", home);
+        this.cullGraphics = false;
+        this.lastX = 0;
+        this.lastY = 0;
+        this.velocity = Vector2.origin;
         this.spawner = spawner;
         this.draw = e => e;
         this.drawPrefix = e => e;
         this.drawSuffix = e => e;
-        if (this.spawner.particleFades) {
-            this.drawPrefix = e => {
-                this.home.c.c.globalAlpha = Math.max(0, 1 - (this.lifeSpan / this.spawner.particleLifeSpan));
-            }
-            this.drawSuffix = e => {
-                this.home.c.c.globalAlpha = 1;
-            }
-        }
-        if (this.spawner.particleDraw instanceof Script) {
-            this.draw = function () { };
-            this.spawner.particleDraw.addTo(this);
-        } else {
-            this.draw = this.spawner.particleDraw.bind(this);
-        }
         this.particleInit();
         this.completelyStatic = false;
     }
     particleInit() {
         let sp = this.spawner;
         let pSize = sp.particleSize + ((Math.random() - Math.random()) * sp.particleSizeVariance);
-        let sX = (Math.random() * sp.width) + sp.x - pSize / 2;
-        let sY = (Math.random() * sp.height) + sp.y - pSize / 2;
+        let sX = sp.x;
+        let sY = sp.y;
         let n = this;
         this.x = sX;
         this.y = sY;
+        let shape = this.spawner.particleShape.get();
+        shape.scale(pSize);
+        this.addShape("geo", shape);
         this.lastX = sX;
         this.lastY = sY;
-        this.width = pSize;
-        this.height = pSize;
 
-        let speed = sp.dirs.getRandomSpeed();
-        speed.x = (sp.particleInitSpeed * speed.x) + ((Math.random() - Math.random()) * sp.particleSpeedVariance);
-        speed.y = (sp.particleInitSpeed * speed.y) + ((Math.random() - Math.random()) * sp.particleSpeedVariance);
-        this.speed = speed;
+        let vel = sp.dirs.getRandomSpeed();
+        vel.x = (sp.particleInitSpeed * vel.x) + ((Math.random() - Math.random()) * sp.particleSpeedVariance);
+        vel.y = (sp.particleInitSpeed * vel.y) + ((Math.random() - Math.random()) * sp.particleSpeedVariance);
+        this.velocity = vel;
         this.layer = sp.layer;
+        
+        //art
+        if (sp.particleFades) {
+            this.drawPrefix = e => {
+                this.home.c.c.globalAlpha = Math.max(0, 1 - (this.lifeSpan / sp.particleLifeSpan));
+            }
+            this.drawSuffix = e => {
+                this.home.c.c.globalAlpha = 1;
+            }
+        }
+        if (sp.particleDraw instanceof Script) {
+            this.draw = function () { };
+            sp.particleDraw.addTo(this);
+        } else {
+            this.draw = sp.particleDraw.bind(this);
+        }
         sp.spawns[n.name] = this;
-        let r = this.remove.bind(this);
-        this.remove = function () {
-            r();
-            delete sp.spawns[this.name];
-        }.bind(this);
+    }
+    remove() {
+        delete this.spawner.spawns[this.name];
     }
     engineDrawUpdate() {
         this.drawPrefix();
-        this.draw();
-        this.scriptDraw();
+        this.runDraw();
         this.drawSuffix();
-    }
-    physicsUpdate() {
-        
     }
     enginePhysicsUpdate() {
         this.lastX = this.x;
         this.lastY = this.y;
-        if (this.spawner.falls) this.accel.y = this.home.gravity.y / 4;
-        this.speed.add(this.accel);
+        if (this.spawner.falls) this.velocity.y += this.home.gravity.y / 4;
         if (this.spawner.particleSlows) {
-            this.slowDown();
+            this.velocity.mul(this.home.linearDragForce)
         }
-        this.x += this.speed.x * 2;
-        this.y += this.speed.y * 2;
+        this.x += this.velocity.x * 2;
+        this.y += this.velocity.y * 2;
         if (this.lifeSpan > this.spawner.particleLifeSpan) {
             this.remove();
         }
-        this.direction.x = this.x - this.lastX;
-        this.direction.y = this.y - this.lastY;
-        this.direction.normalize();
         this.scriptUpdate();
     }
 }

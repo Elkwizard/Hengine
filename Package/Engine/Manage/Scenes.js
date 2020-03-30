@@ -76,25 +76,13 @@ class InactiveScene {
 			collisions: 0
 		};
 		this.physicsRealism = 1;
-		this.defaultDraw = function () {
-			if (this.radius === undefined) {
-				c.draw("#000").shape(...this.getCorners());
-				c.stroke("cyan", 1).shape(...this.getCorners());
-			} else {
-				c.draw("#000").circle(this.x, this.y, this.radius);
-				c.stroke("cyan", 1).circle(this.x, this.y, this.radius - 1);
-			}
+		this.defaultDraw = function (name, shape) {
+			c.draw("#000").infer(shape);
+			c.stroke("cyan", 1).infer(shape);
 		}
-		this.defaultPhysDraw = function () {
-			if (this.radius === undefined) {
-				this.drawWithoutRotation(e => {
-					c.draw("#000").shape(...this.getCorners());
-					c.stroke("red", 1).shape(...this.getCorners());
-				});
-			} else {
-				c.draw("#000").circle(this.x, this.y, this.radius);
-				c.stroke("red", 1).circle(this.x, this.y, this.radius - 1);
-			}
+		this.defaultPhysDraw = function (name, shape) {
+			c.draw("#000").infer(shape);
+			c.stroke("red", 1).infer(shape);
 		}
 		this.defaultParticleDraw = function () {
 			this.home.c.draw("Black").circle(this.middle.x, this.middle.y, this.width / 2);
@@ -118,26 +106,24 @@ class InactiveScene {
 	copy(el) {
 		let n;
 		if (el instanceof PhysicsObject) {
+			//TODO: rewrite particle spawners
 			if (el instanceof ParticleSpawnerObject) {
 				n = this.addParticleSpawner(el.name + " - copy", el.x, el.y, el.particleSize, el.particleInitSpeed, el.delay, el.timer, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
-				n.width = el.width;
-				n.height = el.height;
 				n.particleSlows = el.particleSlows;
 				n.particleFades = el.particleFades;
 				n.particleFalls = el.particleFalls;
 				n.active = el.active;
 			} else {
-				if (el instanceof CirclePhysicsObject) n = this.addCircleElement(el.name + " - copy", el.x, el.y, el.radius, !el.completelyStatic, { ...el.controls }, el.tag);
-				else n = this.addRectElement(el.name + " - copy", el.x, el.y, el.width, el.height, !el.completelyStatic, { ...el.controls }, el.tag);
-				if (el.getCustomCorners) n.getCustomCorners = el.getCustomCorners;
+				n = this.addPhysicsElement(el.name + " - copy", el.x, el.y, !el.completelyStatic, { ...el.controls }, el.tag);
 			}
 			n.positionStatic = el.positionStatic;
 			n.rotationStatic = el.rotationStatic;
 			n.hasGravity = el.hasGravity;
 			n.slows = el.slows;
 		} else {
-			n = this.addElement(el.name + " - copy", el.x, el.y, el.width, el.height, { ...el.controls }, el.tag);
+			n = this.addElement(el.name + " - copy", el.x, el.y, { ...el.controls }, el.tag);
 		}
+		n.shapes = { ...el.shapes };
 		el.runLog(n);
 		return n;
 	}
@@ -170,75 +156,121 @@ class InactiveScene {
 		while (database[check()] !== undefined) num++;
 		return n;
 	}
-	addElement(name, x, y, width, height, controls = new Controls(), tag = "", src = "") {
+	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
 		name = this.genName_PRIVATE(this.contains, name);
-		if (width < 0) {
-			width = -width;
-			x -= width;
-		}
-		if (height < 0) {
-			height = -height;
-			y -= height;
-		}
-		this.contains[name] = new SceneObject(name, x, y, width, height, controls, tag, this);
-		let n = this.contains[name];
-		let self = this;
-		if (src) {
-			let img = loadImage(src);
-			this.changeElementDraw(n, function () {
-				c.drawImage(img, this.x, this.y, this.width, this.height);
-			});
-		} else n.mod(function () {
-			this.draw = self.defaultDraw.bind(this);
-			this.update = self.defaultUpdate.bind(this);
-		});
+		let n = new SceneObject(name, x, y, controls, tag, this);
+		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
+		this.changeElementDraw(n, this.defaultDraw);
+		this.contains[name] = n;
 		return n;
 	}
-	addRectElement(name, x = 0, y = 0, width = 0, height = 0, gravity = false, controls = new Controls(), tag = "", src = "") {
+	addCircleElement(name, x, y, radius, controls = new Controls(), tag = "") {
 		name = this.genName_PRIVATE(this.contains, name);
-		if (width < 0) {
-			width = -width;
-			x -= width;
-		}
-		if (height < 0) {
-			height = -height;
-			y -= height;
-		}
-		this.contains[name] = new PhysicsObject(name, x, y, width, height, gravity, controls, tag, this);
-		let n = this.contains[name];
-		let self = this;
-		if (src) {
-			let img = loadImage(src);
-			this.changeElementDraw(n, function () {
-				c.drawImage(img, this.x, this.y, this.width, this.height);
-			});
-		} else n.mod(function () {
-			this.draw = self.defaultPhysDraw.bind(this);
-			this.update = self.defaultUpdate.bind(this);
-		});
+		let n = new SceneObject(name, x, y, controls, tag, this);
+		n.addShape("default", new Circle(0, 0, radius));
+		this.changeElementDraw(n, this.defaultDraw);
+		this.contains[name] = n;
 		return n;
 	}
-	addCircleElement(name, x = 0, y = 0, radius = 0, gravity = false, controls = new Controls(), tag = "", src = "") {
+	addElement(name, x, y, controls = new Controls(), tag = "") {
 		name = this.genName_PRIVATE(this.contains, name);
-		if (radius < 0) {
-			radius *= -1;
-			x -= radius * 2;
-			y -= radius * 2;
-		}
-		this.contains[name] = new CirclePhysicsObject(name, x, y, radius, gravity, controls, tag, this);
-		let n = this.contains[name];
-		let self = this;
-		if (src) {
-			let img = loadImage(src);
-			this.changeElementDraw(n, function () {
-				c.drawImage(img, this.x - this.radius, this.y - this.radius, this.width, this.height);
-			});
-		} else n.mod(function () {
-			this.draw = self.defaultPhysDraw.bind(this);
-			this.update = self.defaultUpdate.bind(this);
-		});
+		let n = new SceneObject(name, x, y, controls, tag, this);
+		this.changeElementDraw(n, this.defaultDraw);
+		this.contains[name] = n;
 		return n;
 	}
+	addPhysicsElement(name, x, y, gravity, controls = new Controls(), tag = "") {
+		name = this.genName_PRIVATE(this.contains, name);
+		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
+		this.changeElementDraw(n, this.defaultPhysDraw);
+		this.contains[name] = n;
+		return n;
+	}
+	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls(), tag = "") {
+		name = this.genName_PRIVATE(this.contains, name);
+		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
+		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
+		this.changeElementDraw(n, this.defaultPhysDraw);
+		this.contains[name] = n;
+		return n;
+	}
+	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls(), tag = "") {
+		name = this.genName_PRIVATE(this.contains, name);
+		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
+		n.addShape("default", new Circle(0, 0, radius));
+		this.changeElementDraw(n, this.defaultPhysDraw);
+		this.contains[name] = n;
+		return n;
+	}
+	// addRectElement(name, x, y, width, height, controls = new Controls(), tag = "", src = "") {
+	// 	name = this.genName_PRIVATE(this.contains, name);
+	// 	if (width < 0) {
+	// 		width = -width;
+	// 		x -= width;
+	// 	}
+	// 	if (height < 0) {
+	// 		height = -height;
+	// 		y -= height;
+	// 	}
+	// 	this.contains[name] = new SceneObject(name, x, y, width, height, controls, tag, this);
+	// 	let n = this.contains[name];
+	// 	let self = this;
+	// 	if (src) {
+	// 		let img = loadImage(src);
+	// 		this.changeElementDraw(n, function () {
+	// 			c.drawImage(img, this.x, this.y, this.width, this.height);
+	// 		});
+	// 	} else n.mod(function () {
+	// 		this.draw = self.defaultDraw.bind(this);
+	// 		this.update = self.defaultUpdate.bind(this);
+	// 	});
+	// 	return n;
+	// }
+	// addRectElement(name, x = 0, y = 0, width = 0, height = 0, gravity = false, controls = new Controls(), tag = "", src = "") {
+	// 	name = this.genName_PRIVATE(this.contains, name);
+	// 	if (width < 0) {
+	// 		width = -width;
+	// 		x -= width;
+	// 	}
+	// 	if (height < 0) {
+	// 		height = -height;
+	// 		y -= height;
+	// 	}
+	// 	this.contains[name] = new PhysicsObject(name, x, y, width, height, gravity, controls, tag, this);
+	// 	let n = this.contains[name];
+	// 	let self = this;
+	// 	if (src) {
+	// 		let img = loadImage(src);
+	// 		this.changeElementDraw(n, function () {
+	// 			c.drawImage(img, this.x, this.y, this.width, this.height);
+	// 		});
+	// 	} else n.mod(function () {
+	// 		this.draw = self.defaultPhysDraw.bind(this);
+	// 		this.update = self.defaultUpdate.bind(this);
+	// 	});
+	// 	return n;
+	// }
+	// addCircleElement(name, x = 0, y = 0, radius = 0, gravity = false, controls = new Controls(), tag = "", src = "") {
+	// 	name = this.genName_PRIVATE(this.contains, name);
+	// 	if (radius < 0) {
+	// 		radius *= -1;
+	// 		x -= radius * 2;
+	// 		y -= radius * 2;
+	// 	}
+	// 	this.contains[name] = new CirclePhysicsObject(name, x, y, radius, gravity, controls, tag, this);
+	// 	let n = this.contains[name];
+	// 	let self = this;
+	// 	if (src) {
+	// 		let img = loadImage(src);
+	// 		this.changeElementDraw(n, function () {
+	// 			c.drawImage(img, this.x - this.radius, this.y - this.radius, this.width, this.height);
+	// 		});
+	// 	} else n.mod(function () {
+	// 		this.draw = self.defaultPhysDraw.bind(this);
+	// 		this.update = self.defaultUpdate.bind(this);
+	// 	});
+	// 	return n;
+	// }
 	addUI(name, x, y, width, height, draw = function () { }) {
 		name = this.genName_PRIVATE(this.contains, name);
 		if (width < 0) {
@@ -265,7 +297,6 @@ class InactiveScene {
 		let name = "Particle #" + spawner.particleNumber++ + " from " + spawner.name;
 		name = this.genName_PRIVATE(this.contains, name);
 		let ns = new ParticleObject(spawner, this, name);
-		this.contains[name] = ns;
 		return ns;
 	}
 	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1)) {
@@ -460,8 +491,8 @@ class InactiveScene {
 	}
 	collidePoint(point) {
 		let collideAry = [];
-		for (let hitbox of this.updateArray()) {
-			let shapes = hitbox.getShapes();
+		for (let hitbox of this.updateArray().filter(e => !(e instanceof ParticleObject))) {
+			let shapes = hitbox.getModels();
 			let colliding = false;
 			for (let shape of shapes) if (Physics.collidePoint(shape, point).colliding) colliding = true;
 			if (colliding) {
@@ -473,8 +504,8 @@ class InactiveScene {
 	collidePointBoth(point) {
 		let collideAry = [];
 		let notCollideAry = [];
-		for (let hitbox of this.contains_array) {
-			let shapes = hitbox.getShapes();
+		for (let hitbox of this.updateArray().filter(e => !(e instanceof ParticleObject))) {
+			let shapes = hitbox.getModels();
 			let colliding = false;
 			for (let shape of shapes) if (Physics.collidePoint(shape, point).colliding) colliding = true;
 			if (colliding) {
@@ -496,8 +527,8 @@ class Scene extends InactiveScene {
 		this.speedModulation = 1;
 		this.collisionEvents = false;
 		this.viewRotation = 0;
-		this.display = new Shape(0, 0, this.c.canvas.width, this.c.canvas.height)
-		this.adjustedDisplay = new Shape(this.display.x, this.display.y, this.display.width, this.display.height);
+		this.display = new Rect(0, 0, this.c.canvas.width, this.c.canvas.height)
+		this.adjustedDisplay = new Rect(this.display.x, this.display.y, this.display.width, this.display.height);
 		M.engineClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			for (let o of this.collidePoint(adjusted)) {
@@ -537,29 +568,6 @@ class Scene extends InactiveScene {
 		}.bind(this);
 		this.cellSize = 150;
 		this.removeQueue = [];
-		this.S = {
-			UA: this.updateArray.bind(this),
-			UDA: this.updateDisplayAt.bind(this),
-			CDA: this.centerDisplayAt.bind(this),
-			ZI: this.zoomIn.bind(this),
-			ZO: this.zoomOut.bind(this),
-			RZ: this.restoreZoom.bind(this),
-			ARE: this.addRectElement.bind(this),
-			AE: this.addElement.bind(this),
-			APS: this.addParticleSpawner.bind(this),
-			RE: this.removeElement.bind(this),
-			RAE: this.removeAllElements.bind(this),
-			G: this.get.bind(this),
-			GAE: this.getAllElements.bind(this),
-			GEWT: this.getElementsWithTag.bind(this),
-			CED: this.changeElementDraw.bind(this),
-			CEU: this.changeElementUpdate.bind(this),
-			CER: this.changeElementResponse.bind(this),
-			CECR: this.changeElementCollideResponse.bind(this),
-			CAED: this.changeAllElementDraw.bind(this),
-			CAEU: this.changeAllElementUpdate.bind(this),
-			CP: this.collidePoint.bind(this)
-		}
 	}
 	drawInWorldSpace(artist) {
 		this.c.c.translate(this.c.middle.x, this.c.middle.y)
@@ -592,7 +600,7 @@ class Scene extends InactiveScene {
 		let nMax = new Vertex(this.display.x + this.display.width, this.display.y + this.display.height);
 		nMin = this.adjustPointForZoom(nMin);
 		nMax = this.adjustPointForZoom(nMax);
-		return new Shape(nMin, nMax);
+		return new Rect(nMin, nMax);
 	}
 	enginePhysicsUpdate() {
 		let startTime = performance.now();
@@ -656,8 +664,8 @@ class Scene extends InactiveScene {
 			useful = [...(new Set(useful))];
 			const dir = this.gravity.get().normalize();
 			useful = useful.sort(function (a, b) {
-				let mA = Vector2.fromPoint(a[0].unrotatedMiddle);
-				let mB = Vector2.fromPoint(b[0].unrotatedMiddle);
+				let mA = Vector2.fromPoint(a[0]);
+				let mB = Vector2.fromPoint(b[0]);
 				let dA = mA.dot(dir);
 				let dB = mB.dot(dir);
 				return dB - dA;
@@ -714,7 +722,7 @@ class Scene extends InactiveScene {
 			// 	for (let [key, cell] of cells) {
 			// 		let x = parseInt(key.split(",")[0]) * this.cellSize;
 			// 		let y = parseInt(key.split(",")[1]) * this.cellSize;
-			// 		let r = new Shape(x, y, this.cellSize, this.cellSize);
+			// 		let r = new Rect(x, y, this.cellSize, this.cellSize);
 			// 		c.stroke(cl.RED, 3).rect(r);
 			// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
 			// 		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
@@ -809,7 +817,7 @@ class Scene extends InactiveScene {
 		return Geometry.rotatePointAround(displayM, new Vector2(newX, newY), -this.viewRotation); //return the result
 	}
 	updateDisplayAt(x, y, width, height) {
-		this.display = new Shape(x, y, width, height);
+		this.display = new Rect(x, y, width, height);
 	}
 	centerDisplayAt(point) {
 		this.display.x = point.x - this.c.canvas.width / 2;

@@ -6,7 +6,7 @@ class PhysicsObject extends SceneObject {
 		this.instantStop = false;
 		this.stopTimer = 0;
 		this.canCollide = true;
-		this.direction = new Vector2(0, 0);
+		this.direction = Vector2.origin;
 		this.shown = false;
 		this.hasPhysics = true;
 		this.maxSpeedX = width / 3;
@@ -56,8 +56,8 @@ class PhysicsObject extends SceneObject {
 				}
 			}
 		};
-		this.accel = new Vector2(0, 0);
-		this.speed = new Vector2(0, 0);
+		this.accel = Vector2.origin;
+		this.speed = Vector2.origin;
 	}
 	optimize(a, b) {
 		return (a.middle.x - b.middle.x) ** 2 + (a.middle.y - b.middle.y) ** 2 < a.mass + b.mass ** 2;
@@ -330,7 +330,7 @@ class CirclePhysicsObject extends PhysicsObject {
 					//get direction
 					for (let a of el) {
 						let ove = 0;
-						let dir = new Vector2(0, 0);
+						let dir = Vector2.origin;
 						let usesTobinMath = false;
 						if (a instanceof CirclePhysicsObject) {
 							//colliding with circle: get overlap

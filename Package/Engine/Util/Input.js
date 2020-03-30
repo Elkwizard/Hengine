@@ -55,8 +55,8 @@ class MouseHandler {
 			y: 0
 		}
 		this.button = 0
-		this.dragStart = new Vector2(0, 0)
-		this.dragEnd = new Vector2(0, 0)
+		this.dragStart = Vector2.origin
+		this.dragEnd = Vector2.origin
 		this.custom = {}
 		this.onDown = new Listener();
 		this.onUp = new Listener();

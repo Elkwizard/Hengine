@@ -36,35 +36,24 @@ function clamp(n, a, b) {
 }
 
 //Actual SceneObject
-class SceneObject extends Shape {
-	constructor(name, x, y, width, height, controls, tag, home) {
-		super(x, y, width, height);
+class SceneObject {
+	constructor(name, x, y, controls, tag, home) {
+		this.x = x;
+		this.y = y;
 		this.name = name;
 		this.home = home;
 		this.tag = tag;
 		this.controls = controls;
 		this.hidden = false;
 		this.update = function () { };
-		this.draw = function () { };
+		this.draw = function (shape) { };
 		this.custom = {};
 		this.hasPhysics = false;
 		this.isUI = false;
 		this.isRectangle = true;
 		this.hovered = false;
 		this.layer = 0;
-		this.scripts = {
-			[Symbol.iterator]: function* () {
-				let ary = [];
-				for (let m in this) {
-					let a = this[m];
-					if (typeof a !== "function") ary.push(a);
-				}
-				ary = ary.sort((a, b) => b.scriptNumber - a.scriptNumber);
-				for (let a of ary) {
-					yield a;
-				}
-			}
-		};
+		this.scripts = new ScriptContainer();
 		this.lifeSpan = 0;
 		this.log = [];
 		this.isDead = false;
@@ -83,6 +72,68 @@ class SceneObject extends Shape {
 			interact2: function () { }
 		};
 		this.isBeingUpdated = false;
+		this.shapes = {};
+		this.rotation = 0;
+	}
+	get middle() {
+		// let middle = Vector2.origin;
+		// let totalArea = 0;
+		// for (let [name, shape] of this.shapes) {
+		// 	let area = shape.area;
+		// 	let sMiddle = shape.middle;
+		// 	middle.add(sMiddle);
+		// 	totalArea += area;
+		// }
+		// middle.div(totalArea);
+		// middle = Geometry.rotatePointAround(Vector2.origin, middle, this.rotation).plus(new Vector2(this.x, this.y));
+		// return middle;
+		return new Vector2(this.x, this.y);
+	}
+	set middle(a) {
+		let dif = a.minus(this.middle);
+		this.x += dif.x;
+		this.y += dif.y;
+	}
+	get width() {
+		return this.getBoundingBox().width;
+	}
+	get height() {
+		return this.getBoundingBox().height;
+	}
+	getBoundingBox() {
+		let shapes = this.getModels();
+		let boxes = shapes.map(e => e.getBoundingBox());
+		let mins = boxes.map(e => e.vertices[0]);
+		let maxs = boxes.map(e => e.vertices[2]);
+		let minX = Math.min(...mins.map(e => e.x));
+		let minY = Math.min(...mins.map(e => e.y));
+		let maxX = Math.max(...maxs.map(e => e.x));
+		let maxY = Math.max(...maxs.map(e => e.y));
+		return new Rect(new Vector2(minX, minY), new Vector2(maxX, maxY));
+	}
+	addShape(name, shape) {
+		this.shapes[name] = shape;
+	}
+	removeShape(name) {
+		let shape = this.shapes[name];
+		delete this.shapes[name];
+		return shape;
+	}
+	getShape(name) {
+		return this.shapes[name];
+	}
+	getShapes() {
+		let ary = [];
+		for (let [name, shape] of this.shapes) ary.push(shape);
+		return ary;
+	}
+	getModels() {
+		let ary = this.getShapes();
+		let middle = this.middle;
+		let pos = middle;
+		let rot = this.rotation;
+		ary = ary.map(e => e.getModel(pos, rot));
+		return ary;
 	}
 	rename(name) {
 		delete this.home.contains[this.name];
@@ -118,9 +169,9 @@ class SceneObject extends Shape {
 			m.scriptBeforeUpdate(m);
 		}
 	}
-	scriptDraw() {
+	scriptDraw(name, shape) {
 		for (let m of this.scripts) {
-			m.scriptDraw(m);
+			m.scriptDraw(m, name, shape);
 		}
 	}
 	logMod(func) {
@@ -135,14 +186,26 @@ class SceneObject extends Shape {
 		return el;
 	}
 	runDraw() {
-		let sorted = [...this.shapes].sort((a, b) => a.layer - b.layer);
-		for (let shape of sorted) {
-			shape.draw();
-			shape.scriptDraw();
+		let middle = this.middle;
+		c.save();
+		c.translate(middle);
+		c.rotate(this.rotation);
+		for (let [name, shape] of this.shapes) {
+			c.save();
+			let sMiddle = shape.middle;
+			c.translate(sMiddle);
+			c.rotate(shape.rotation);
+			c.translate(sMiddle.times(-1));
+			this.scriptDraw(name, shape);
+			this.draw(name, shape);
+			c.restore();
 		}
+		c.restore();
 	}
 	engineDrawUpdate() {
-		if (!this.hidden) {
+		let d = s.adjustedDisplay;
+		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.getBoundingBox(), (new Rect(d.x, d.y, d.width, d.height, s.viewRotation)).getBoundingBox());
+		if (!this.hidden && onScreen) {
 			this.runDraw();
 			this.update();
 		}

@@ -23,21 +23,6 @@ class Triangle {
 		return res;
 	}
 }
-class Circle {
-	constructor(x, y, radius) {
-		this.collider = new CircleCollider(this);
-		this.x = x;
-		this.y = y;
-		this.radius = radius;
-	}
-	get middle() {
-		return { x: this.x, y: this.y }
-	}
-	set middle(a) {
-		this.x = a.x;
-		this.y = a.y;
-	}
-}
 class Line {
 	constructor(x, y, x2, y2) {
 		if (typeof x === "object") {
@@ -74,232 +59,182 @@ class Line {
 	}
 }
 class Shape {
-	constructor(x, y, width, height, rotation = 0) {
-		this._x = 0;
-		this._y = 0;
-		this.shapes = [this];
-		this.shapeOffsets = [new Vector2(0, 0)];
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		if (typeof x == "object") {
-			this.x = x.x;
-			this.y = x.y;
-			this.width = y.x - x.x;
-			this.height = y.y - x.y;
-		}
-		if (this.width < 0) {
-			this.width = -this.width;
-			this.x -= this.width;
-		}
-		if (this.height < 0) {
-			this.height = -this.height;
-			this.y -= this.height;
-		}
-		this._rotation = 0;
+	constructor(rotation = 0) {
 		this.rotation = rotation;
-		this.parent = null;
-		this.centerOfMassOffset = new Vector2(0, 0);
 	}
-	set x(a) {
-		let th = this.shapes[0];
-		let shapes = this.shapes.slice(1);
-		for (let i = 0; i < shapes.length; i++) {
-			let nX = a + this.shapeOffsets[i + 1].x;
-			shapes[i]._x = nX;
-		}
-		let dx = a - th._x;
-		th._x = a;
-		if (this.parent) {
-			this.parent.shapeOffsets[this.parent.getShapeIndex(this)].x += dx;
-			this.parent.updateShapeCentersOfMass();
-		}
+	get area() {
+		//return the area of the shape
+		return 0;
 	}
-	get x() {
-		return this._x;
+	getBoundingBox() {
+		//return the smallest rectangle that contains the shape
+		return new Rect(0, 0, 0, 0, 0);
 	}
-	set y(a) {
-		let th = this.shapes[0];
-		let shapes = this.shapes.slice(1);
-		for (let i = 0; i < shapes.length; i++) {
-			let nY = a + this.shapeOffsets[i + 1].y;
-			shapes[i]._y = nY;
-		}
-		let dy = a - th._y;
-		th._y = a;
-		if (this.parent) {
-			this.parent.shapeOffsets[this.parent.getShapeIndex(this)].y += dy;
-			this.parent.updateShapeCentersOfMass();
-		}
+	getModel(pos, rot) {
+		//return the world space model of the relative shape
+		return new Shape(0);
 	}
-	get y() {
-		return this._y;
+	center(pos) {
+		//center the polygon at _pos_
 	}
-	set width(a) {
-		this._width = a;
+	scale(factor) {
+		//scale the shape about its center by _factor_
 	}
-	get width() {
-		if (!this.getCustomCorners) return this._width;
-		else {
-			let sorted = this.getCustomCorners.bind(this)()
-				.map(e => e.x)
-				.sort((a, b) => b - a);
-			return sorted[0] - sorted[sorted.length - 1];
-		}
+	get() {
+		//return a copy of the shape
+		return new Shape(this.rotation);
 	}
-	set height(a) {
-		this._height = a;
-	}
-	get height() {
-		if (!this.getCustomCorners) return this._height;
-		else {
-			let sorted = this.getCustomCorners.bind(this)()
-				.map(e => e.y)
-				.sort((a, b) => b - a);
-			return sorted[0] - sorted[sorted.length - 1];
-		}
-	}
-	set angle(a) {
-		this.rotation = a;
-	}
-	get angle() {
-		return this.rotation;
-	}
-	set rotation(a) {
-		if (!a) a = 0.0001;
-		if (Math.abs(a % Math.PI / 2) < 0.0001) a += 0.0001;
-		this._rotation = a;
-	}
-	get rotation() {
-		return this._rotation;
-	}
-	set unrotatedMiddle(a) {
-		if (!this.getCustomCorners) {
-			this.x = a.x - this.width / 2;
-			this.y = a.y - this.height / 2;
-		} else {
-			let corners = this.getCustomCorners.bind(this)();
-			let offset = Vector.sum(...corners).over(corners.length).minus(new Vector2(this.x, this.y));
-			this.x = a.x - offset.x;
-			this.y = a.y - offset.y;
-		}
-	}
-	get unrotatedMiddle() {
-		if (!this.getCustomCorners) return { x: this.x + (this.width / 2), y: this.y + (this.height / 2) }
-		else {
-			let corners = this.getCustomCorners.bind(this)();
-			return Vector.sum(...corners).over(corners.length);
-		}
+}
+class Polygon extends Shape {
+	constructor(vertices, rotation = 0) {
+		super(rotation);
+		this.vertices = vertices;
 	}
 	get middle() {
-		if (!this.centerOfMassOffset.x && !this.centerOfMassOffset.y) return Vector2.fromPoint(this.unrotatedMiddle);
-		let rot = this.parent ? this.parent.rotation : this.rotation;
-		// if (this.parent) console.log(this.centerOfMass, this.unrotatedMiddle, rot);
-		return Geometry.rotatePointAround(this.centerOfMass, this.unrotatedMiddle, rot);
+		return Vector.sum(...this.vertices).over(this.vertices.length);
 	}
-	set middle(a) {
-		let dif = this.centerOfMassOffset;
-		let rot = this.parent ? this.parent.rotation : this.rotation;
-		let difXa = Math.cos(rot) * dif.x;
-		let difYa = Math.sin(rot) * dif.x;
-		let difXb = Math.cos(rot + Math.PI / 2) * dif.y;
-		let difYb = Math.sin(rot + Math.PI / 2) * dif.y;
-		let difX = difXa + difXb;
-		let difY = difYa + difYb;
-		this.centerOfMass = new Vector2(difX + a.x, difY + a.y);
+	get area() {
+		let bound = this.getBoundingBox();
+		return bound.width * bound.height;
 	}
-	removeShape(shape) {
-		let index = this.getShapeIndex(shape);
-		this.shapes.splice(index, 1);
-		this.shapeOffsets.splice(index, 1);
-		this.updateShapeCentersOfMass();
+	getBoundingBox() {
+		let sortedX = this.vertices.map(e => e.x).sort((a, b) => b - a);
+		let sortedY = this.vertices.map(e => e.y).sort((a, b) => b - a);
+		let minX = sortedX[sortedX.length - 1];
+		let maxX = sortedX[0];
+		let minY = sortedY[sortedY.length - 1];
+		let maxY = sortedY[0];
+		return new Rect(new Vector2(minX, minY), new Vector2(maxX, maxY));
 	}
-	addShape(...shapes) {
-		for (let shape of shapes) {
-			shape.remove();
-			let dif = new Vector2(shape.x - this.x, shape.y - this.y);
-			this.shapes.push(shape);
-			this.shapeOffsets.push(dif);
-			let centers = this.shapes.map(e => e.centerOfMass);
-			let center = Vector.sum(...centers).over(this.shapes.length);
-			let offset = center.minus(this.unrotatedMiddle);
-			this.centerOfMassOffset = offset;
-			shape.parent = this;
-			shape.shapes = [shape];
-			if (this.layer !== undefined) shape.layer = this.layer;
-		}
-		this.updateShapeCentersOfMass();
-	}
-	updateShapeCentersOfMass() {
-		for (let shape of this.shapes) {
-			shape.centerOfMassOffset = shape.centerOfMass.minus(this.centerOfMass).times(-1);
-		}
-	}
-	getShapeIndex(shape) {
-		let index = 0;
-		for (let i = 0; i < this.shapes.length; i++) {
-			if (this.shapes[i].name === shape.name) {
-				index = i;
-				break;
-			}
-		}
-		return index;
-	}
-	getShapes() {
-		return this.shapes;
+	getModel(pos, rot) {
+		let middle = this.middle;
+		let verts = this.getCorners()
+			.map(e => Geometry.rotatePointAround(middle, e, this.rotation))
+			.map(e => Geometry.rotatePointAround(pos, e.plus(pos), rot));
+		return new Polygon(verts);
 	}
 	getCorners() {
-		let r = this;
-		let corners;
-		if (r.getCustomCorners) corners = r.getCustomCorners.bind(this)();
-		else corners = [
-			new Vector2(r.x, r.y),
-			new Vector2(r.x + r.width, r.y),
-			new Vector2(r.x + r.width, r.y + r.height),
-			new Vector2(r.x, r.y + r.height)
-		];
-		let com = r.centerOfMass;
-		let middle = r.middle;
-		let rot1 = this.parent ? this.parent.rotation : this.rotation;
-		let rot2 = this.parent ? this.rotation : 0;
-		// c.draw(cl.ORANGE).circle(com.x, com.y, 5);
-		for (let i = 0; i < corners.length; i++) corners[i] = Geometry.rotatePointAround(com, corners[i], rot1);
-		if (rot2) {
-			for (let i = 0; i < corners.length; i++) corners[i] = Geometry.rotatePointAround(middle, corners[i], rot2);
-		}
-		return corners;
+		return this.vertices;
 	}
 	getAxes() {
-		let r = this;
-		let corners = r.getCorners();
-		if (this.getCustomCorners) {
-			let edges = [];
-			for (let i = 0; i < corners.length; i++) {
-				edges.push(corners[(i + 1) % corners.length].minus(corners[i]).normalize().normal);
-			}
-			return edges;
+		let axes = [];
+		for (let i = 0; i < this.vertices.length; i++) {
+			let inx1 = i;
+			let inx2 = (i + 1) % this.vertices.length;
+			let slope = this.vertices[inx2].minus(this.vertices[inx1]).normal.normalize();
+			axes.push(slope);
 		}
-		let edges = [
-			corners[1].minus(corners[0]).normalize(),
-			corners[2].minus(corners[1]).normalize()
+		return axes;
+	}
+	getEdges() {
+		let axes = [];
+		for (let i = 0; i < this.vertices.length; i++) {
+			let inx1 = this.vertices[i];
+			let inx2 = this.vertices[(i + 1) % this.vertices.length];
+			axes.push(new Line(this.vertices[inx1], this.vertices[inx2]));
+		}
+		return axes;
+	}
+	center(pos) {
+		let offset = pos.minus(this.middle);
+		this.vertices = this.vertices.map(e => e.plus(offset));
+	}
+	scale(factor) {
+		let middle = this.middle;
+		this.vertices = this.vertices.map(e => e.plus(e.minus(middle).times(factor)));
+	}
+	get() {
+		return new Polygon([...this.vertices], this.rotation);
+	}
+}
+class Rect extends Polygon {
+	constructor(x, y, w, h, rotation = 0) {
+		super([], rotation);
+		if (typeof x === "object") {
+			w = y.x - x.x;
+			h = y.y - x.y;
+			y = x.y;
+			x = x.x;
+		}
+		if (w < 0) {
+			w *= -1;
+			x -= w;
+		}
+		if (h < 0) {
+			h *= -1;
+			y -= h;
+		}
+		this.x = x;
+		this.y = y;
+		this.width = w;
+		this.height = h;
+	}
+	get middle() {
+		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
+	}
+	get area() {
+		return this.width * this.height;
+	}
+	get vertices() {
+		return [
+			new Vector2(this.x, this.y),
+			new Vector2(this.x + this.width, this.y),
+			new Vector2(this.x + this.width, this.y + this.height),
+			new Vector2(this.x, this.y + this.height)
 		];
-		return edges;
 	}
-	getLineEdges() {
-		let r = this;
-		let corners = r.getCorners();
-		let edges = [];
-		for (let i = 0; i < corners.length; i++) {
-			if (i == 0) edges.push(new Line(corners[corners.length - 1], corners[0]));
-			else edges.push(new Line(corners[i - 1], corners[i]));
+	set vertices(a) {
+		if (a.length === 4) {
+			let min = a[0];
+			let max = a[2];
+			this.x = min.x;
+			this.y = min.y;
+			this.width = max.x - min.x;
+			this.height = max.y - min.y;
 		}
-		return edges;
 	}
-	set centerOfMass(a) {
-		this.unrotatedMiddle = this.centerOfMassOffset.times(-1).plus(a);
+	center(pos) {
+		this.x = pos.x - this.width / 2;
+		this.y = pos.y - this.height / 2;
 	}
-	get centerOfMass() {
-		return this.centerOfMassOffset.plus(this.unrotatedMiddle);
+	scale(factor) {
+		let middle = this.middle;
+		this.width *= factor;
+		this.height *= factor;
+		this.center(middle);	
+	}
+	get() {
+		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
+	}
+}
+class Circle extends Shape {
+	constructor(x, y, radius) {
+		super(0);
+		this.x = x;
+		this.y = y;
+		this.radius = Math.abs(radius);
+	}
+	get area() {
+		return Math.PI * this.radius ** 2;
+	}
+	get middle() {
+		return new Vector2(this.x, this.y);
+	}
+	getModel(pos, rot) {
+		let p = Geometry.rotatePointAround(pos, pos.plus(new Vector2(this.x, this.y)), rot);
+		return new Circle(p.x, p.y, this.radius);
+	}
+	center(pos) {
+		this.x = pos.x;
+		this.y = pos.y;
+	}
+	scale(factor) {
+		this.radius *= factor;
+	}
+	getBoundingBox() {
+		return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+	}
+	get() {
+		return new Circle(this.x, this.y, this.radius);
 	}
 }

@@ -149,6 +149,9 @@ class Vector1 extends Vector {
 		super();
 		this.x = x;
 	}
+	static get origin() {
+		return new Vector1(0);
+	}
 	static random() {
 		return new Vector1((Math.random() * 2) - 1);
 	}
@@ -162,6 +165,9 @@ class Vector2 extends Vector {
 		} else {
 			this.y = x;
 		}
+	}
+	static get origin() {
+		return new Vector2(0, 0);
 	}
 	static random() {
 		return new Vector2((Math.random() * 2) - 1, (Math.random() * 2) - 1);
@@ -200,6 +206,9 @@ class Vector3 extends Vector {
 			this.z = x;
 		}
 	}
+	static get origin() {
+		return new Vector3(0, 0, 0);
+	}
 	static random() {
 		return new Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
@@ -217,6 +226,9 @@ class Vector4 extends Vector {
 			this.z = x;
 			this.w = x;
 		}
+	}
+	static get origin() {
+		return new Vector4(0, 0, 0, 0);
 	}
 	static random() {
 		return new Vector4((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
