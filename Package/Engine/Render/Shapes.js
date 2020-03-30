@@ -73,9 +73,8 @@ class Line {
 		return this.slope * x + this.a.y;
 	}
 }
-class Rect {
+class Shape {
 	constructor(x, y, width, height, rotation = 0) {
-		this.collider = new RectCollider(this);
 		this._x = 0;
 		this._y = 0;
 		this.shapes = [this];
@@ -110,7 +109,12 @@ class Rect {
 			let nX = a + this.shapeOffsets[i + 1].x;
 			shapes[i]._x = nX;
 		}
+		let dx = a - th._x;
 		th._x = a;
+		if (this.parent) {
+			this.parent.shapeOffsets[this.parent.getShapeIndex(this)].x += dx;
+			this.parent.updateShapeCentersOfMass();
+		}
 	}
 	get x() {
 		return this._x;
@@ -122,7 +126,12 @@ class Rect {
 			let nY = a + this.shapeOffsets[i + 1].y;
 			shapes[i]._y = nY;
 		}
+		let dy = a - th._y;
 		th._y = a;
+		if (this.parent) {
+			this.parent.shapeOffsets[this.parent.getShapeIndex(this)].y += dy;
+			this.parent.updateShapeCentersOfMass();
+		}
 	}
 	get y() {
 		return this._y;
@@ -201,14 +210,10 @@ class Rect {
 		this.centerOfMass = new Vector2(difX + a.x, difY + a.y);
 	}
 	removeShape(shape) {
-		let index = 0;
-		for (let i = 0; i < this.shapes.length; i++) {
-			if (this.shapes[i].name === shape.name) {
-				index = i;
-				break;
-			}
-		}
+		let index = this.getShapeIndex(shape);
 		this.shapes.splice(index, 1);
+		this.shapeOffsets.splice(index, 1);
+		this.updateShapeCentersOfMass();
 	}
 	addShape(...shapes) {
 		for (let shape of shapes) {
@@ -224,9 +229,22 @@ class Rect {
 			shape.shapes = [shape];
 			if (this.layer !== undefined) shape.layer = this.layer;
 		}
+		this.updateShapeCentersOfMass();
+	}
+	updateShapeCentersOfMass() {
 		for (let shape of this.shapes) {
 			shape.centerOfMassOffset = shape.centerOfMass.minus(this.centerOfMass).times(-1);
 		}
+	}
+	getShapeIndex(shape) {
+		let index = 0;
+		for (let i = 0; i < this.shapes.length; i++) {
+			if (this.shapes[i].name === shape.name) {
+				index = i;
+				break;
+			}
+		}
+		return index;
 	}
 	getShapes() {
 		return this.shapes;

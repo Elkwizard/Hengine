@@ -11,7 +11,7 @@
 	</header>
 	<div class="description">
 		<p>
-			SceneObject inherits from <a href="../Shapes/home.html">Rect</a>. 
+			SceneObject inherits from <a href="../Shapes/home.html">Shape</a>. 
 			The SceneObject class is really only meant to be used by the Scene and Inactive Scene classes. 
 			SceneObjects are what make up the actual game and would be used for things like health bars and trees.
 			SceneObjects do not collide with other SceneObjects or <a href="../Physics Object/home.html">PhysicsObjects</a>.
@@ -89,7 +89,7 @@
 			<li class="method">
 				<h2>collider</h2>
 				<p>
-					A <a href="../Rect Collider/home.html">RectCollider</a> object containing the hitbox of the SceneObject.
+					A <a href="../Shape Collider/home.html">RectCollider</a> object containing the hitbox of the SceneObject.
 				</p>
 			</li>
 			<li class="method">
@@ -117,7 +117,7 @@
 			<li class="method">
 				<h2>constructor(String name, float x, float y, float width, float height, Controls controls, String tag)</h2>
 				<p>
-					Calls Rect.prototype.constructor with parameters (<i>x</i>, <i>y</i>, <i>width</i>, <i>height</i>).
+					Calls Shape.prototype.constructor with parameters (<i>x</i>, <i>y</i>, <i>width</i>, <i>height</i>).
 					A new SceneObject is initialized with a name of <i>name</i>.
 					The SceneObject has controls of <i>controls</i> and a tag of <i>tag</i>.
 				</p>

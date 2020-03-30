@@ -36,7 +36,7 @@ function clamp(n, a, b) {
 }
 
 //Actual SceneObject
-class SceneObject extends Rect {
+class SceneObject extends Shape {
 	constructor(name, x, y, width, height, controls, tag, home) {
 		super(x, y, width, height);
 		this.name = name;

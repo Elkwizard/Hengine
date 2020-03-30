@@ -296,7 +296,7 @@ class Artist {
 				this.c.stroke();
 			},
 			rect: function (x, y, width, height) {
-				if (x instanceof Rect) {
+				if (x instanceof Shape) {
 					this.c.strokeRect(x.x, x.y, x.width, x.height);
 				} else {
 					this.c.strokeRect(x, y, width, height);

@@ -1,6 +1,6 @@
 function toTokens (s) {
 	let keywords = "let,for,while,of,in,if,this,class,var,const,new,return,function,try,catch,else,script,elementscript,do,finally,set,get,extends,static,switch,case,typeof,instanceof".split(",");
-	let engine = "Game,Scene,Renderer,Colors,g,s,c,cl,Vertex,Vector2,Vector1,Vector3,Vector4,Artist,Engine,Rect,Triangle,PLAYER_MOVEMENT,WALLS,Time,Controls,Script,ElementScript,K,M,P,TEXT_BOX,BUTTON,clamp,Light,FunctionLibrary,Color,Circle,ColorLibrary".split(",");
+	let engine = "Game,Scene,Renderer,Colors,g,s,c,cl,Vertex,Vector2,Vector1,Vector3,Vector4,Artist,Engine,Shape,Triangle,PLAYER_MOVEMENT,WALLS,Time,Controls,Script,ElementScript,K,M,P,TEXT_BOX,BUTTON,clamp,Light,FunctionLibrary,Color,Circle,ColorLibrary".split(",");
 	class Token {
 		constructor(x, y){
 			this.value = x;

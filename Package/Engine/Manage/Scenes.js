@@ -78,8 +78,8 @@ class InactiveScene {
 		this.physicsRealism = 1;
 		this.defaultDraw = function () {
 			if (this.radius === undefined) {
-				c.draw("#000").rect(this.x, this.y, this.width, this.height);
-				c.stroke("cyan", 1).rect(this.x + 0.5, this.y + 0.5, this.width - 1, this.height - 1);
+				c.draw("#000").shape(...this.getCorners());
+				c.stroke("cyan", 1).shape(...this.getCorners());
 			} else {
 				c.draw("#000").circle(this.x, this.y, this.radius);
 				c.stroke("cyan", 1).circle(this.x, this.y, this.radius - 1);
@@ -87,8 +87,10 @@ class InactiveScene {
 		}
 		this.defaultPhysDraw = function () {
 			if (this.radius === undefined) {
-				c.draw("#000").rect(this.x, this.y, this.width, this.height);
-				c.stroke("red", 1).rect(this.x + 0.5, this.y + 0.5, this.width - 1, this.height - 1);
+				this.drawWithoutRotation(e => {
+					c.draw("#000").shape(...this.getCorners());
+					c.stroke("red", 1).shape(...this.getCorners());
+				});
 			} else {
 				c.draw("#000").circle(this.x, this.y, this.radius);
 				c.stroke("red", 1).circle(this.x, this.y, this.radius - 1);
@@ -123,7 +125,7 @@ class InactiveScene {
 				n.particleSlows = el.particleSlows;
 				n.particleFades = el.particleFades;
 				n.particleFalls = el.particleFalls;
-				n.active = el.active; 
+				n.active = el.active;
 			} else {
 				if (el instanceof CirclePhysicsObject) n = this.addCircleElement(el.name + " - copy", el.x, el.y, el.radius, !el.completelyStatic, { ...el.controls }, el.tag);
 				else n = this.addRectElement(el.name + " - copy", el.x, el.y, el.width, el.height, !el.completelyStatic, { ...el.controls }, el.tag);
@@ -439,7 +441,7 @@ class InactiveScene {
 	collideRect(box) {
 		let collideAry = [];
 		for (let hitbox of this.updateArray()) {
-			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Rect") + "Rect";
+			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Shape") + "Shape";
 			if (Physics[name](hitbox, box).colliding) {
 				collideAry.push(hitbox);
 			}
@@ -449,7 +451,7 @@ class InactiveScene {
 	collideCircle(cir) {
 		let collideAry = [];
 		for (let hitbox of this.updateArray()) {
-			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Rect") + "Circle";
+			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Shape") + "Circle";
 			if (Physics[name](hitbox, cir).colliding) {
 				collideAry.push(hitbox);
 			}
@@ -494,8 +496,8 @@ class Scene extends InactiveScene {
 		this.speedModulation = 1;
 		this.collisionEvents = false;
 		this.viewRotation = 0;
-		this.display = new Rect(0, 0, this.c.canvas.width, this.c.canvas.height)
-		this.adjustedDisplay = new Rect(this.display.x, this.display.y, this.display.width, this.display.height);
+		this.display = new Shape(0, 0, this.c.canvas.width, this.c.canvas.height)
+		this.adjustedDisplay = new Shape(this.display.x, this.display.y, this.display.width, this.display.height);
 		M.engineClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			for (let o of this.collidePoint(adjusted)) {
@@ -590,10 +592,10 @@ class Scene extends InactiveScene {
 		let nMax = new Vertex(this.display.x + this.display.width, this.display.y + this.display.height);
 		nMin = this.adjustPointForZoom(nMin);
 		nMax = this.adjustPointForZoom(nMax);
-		return new Rect(nMin, nMax);
+		return new Shape(nMin, nMax);
 	}
 	enginePhysicsUpdate() {
-        let startTime = performance.now();
+		let startTime = performance.now();
 		this.SAT = {
 			possibleChecks: 0,
 			gridChecks: 0,
@@ -616,7 +618,7 @@ class Scene extends InactiveScene {
 			let isUseless = a => !(a instanceof PhysicsObject) || (a instanceof ParticleObject);
 			let useful = [];
 			let useless = [];
-			
+
 			//custom before updates run
 			for (let el of this.contains_array) {
 				el.scriptBeforeUpdate();
@@ -712,7 +714,7 @@ class Scene extends InactiveScene {
 			// 	for (let [key, cell] of cells) {
 			// 		let x = parseInt(key.split(",")[0]) * this.cellSize;
 			// 		let y = parseInt(key.split(",")[1]) * this.cellSize;
-			// 		let r = new Rect(x, y, this.cellSize, this.cellSize);
+			// 		let r = new Shape(x, y, this.cellSize, this.cellSize);
 			// 		c.stroke(cl.RED, 3).rect(r);
 			// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
 			// 		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
@@ -807,7 +809,7 @@ class Scene extends InactiveScene {
 		return Geometry.rotatePointAround(displayM, new Vector2(newX, newY), -this.viewRotation); //return the result
 	}
 	updateDisplayAt(x, y, width, height) {
-		this.display = new Rect(x, y, width, height);
+		this.display = new Shape(x, y, width, height);
 	}
 	centerDisplayAt(point) {
 		this.display.x = point.x - this.c.canvas.width / 2;

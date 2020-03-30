@@ -27,11 +27,12 @@ class Geometry {
         return Math.sqrt(Geometry.distToPoint2(p, p2));
     }
     static signedAngularDist(r1, r2) {
-        r1 %= Math.PI * 2;
-        r2 % Math.PI * 2;
+        const pi2 = 2 * Math.PI;
+        r1 = (r1 % pi2 + pi2) % pi2;
+        r2 = (r2 % pi2 + pi2) % pi2;
         let dif = r2 - r1;
         if (r2 < r1) dif *= -1;
-        if (Math.abs(dif - Math.PI * 2) < Math.abs(dif)) dif -= Math.PI * 2;
+        if (Math.abs(dif - pi2) < Math.abs(dif)) dif -= pi2;
         if (r2 < r1) dif *= -1;
         return dif;
     }
@@ -317,6 +318,8 @@ class Geometry {
         a += angle;
         let nDif = Vector2.fromAngle(a);
         nDif.mul(dif.mag);
+        // c.stroke(cl.ORANGE).arrow(origin, point);
+        // c.stroke(cl.ORANGE).arrow(origin, new Vector2(origin.x + nDif.x, origin.y + nDif.y));
         return new Vector2(origin.x + nDif.x, origin.y + nDif.y);
     }
     static overlapLineLine(l1, l2) {

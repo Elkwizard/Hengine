@@ -318,16 +318,6 @@ class Physics {
             }
         }
         let cols = tempCollisions.filter(e => e.colliding);
-        let col = new Collision(false, a, b);
-        // if (cols.length) {
-        //     let point = Vector.sum(...cols.map(e => e.collisionPoint)).over(cols.length);
-        //     let direction = Vector.sum(...cols.map(e => e.dir)).over(cols.length);
-        //     let penetration = 0;
-        //     let pens = cols.map(e => e.penetration);
-        //     for (let pen of pens) penetration += pen;
-        //     penetration /= pens.length;
-        //     col = new Collision(true, a, b, direction, penetration, point);
-        // }
         return cols.map(e => {
             let n = e;
             n.a = a;
@@ -467,9 +457,9 @@ class Physics {
     }
     static getBoundingBox(r) {
         let rect;
-        if (!r.width || !r.height) return new Rect(NaN, NaN, NaN, NaN);
+        if (!r.width || !r.height) return new Shape(NaN, NaN, NaN, NaN);
         if (r.radius) {
-            rect = new Rect(r.middle.x - r.radius, r.middle.y - r.radius, r.radius * 2, r.radius * 2);
+            rect = new Shape(r.middle.x - r.radius, r.middle.y - r.radius, r.radius * 2, r.radius * 2);
         } else if (r.getCustomCorners) {
             let corners = r.getCorners();
             let sortedX = corners.map(e => e.x).sort((a, b) => b - a);
@@ -478,13 +468,13 @@ class Physics {
             let maxX = sortedX[0];
             let minY = sortedY[sortedY.length - 1];
             let maxY = sortedY[0];
-            rect = new Rect(minX, minY, maxX - minX, maxY - minY);
+            rect = new Shape(minX, minY, maxX - minX, maxY - minY);
         } else {
             let hypot = r.radius ? r.radius : Math.sqrt((r.width / 2) ** 2 + (r.height / 2) ** 2);
             // c.draw(cl.RED).circle(r.centerOfMass.x, r.centerOfMass.y, 5);
             // c.stroke(cl.RED, 2).arrow(r.middle, r.centerOfMass);
             // c.stroke(cl.RED, 2).arrow(r.centerOfMass, r);
-            rect = new Rect(r.middle.x - hypot, r.middle.y - hypot, hypot * 2, hypot * 2);
+            rect = new Shape(r.middle.x - hypot, r.middle.y - hypot, hypot * 2, hypot * 2);
         }
         
         // c.stroke(cl.RED, 1).rect(rect);

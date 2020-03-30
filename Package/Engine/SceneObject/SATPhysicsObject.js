@@ -193,7 +193,7 @@ class PhysicsObject extends SceneObject {
     engineDrawUpdate() {
         let sD = s.adjustedDisplay;
         // let r = Physics.getBoundingBox(this);
-        let r1 = new Rect(sD.x, sD.y, sD.width, sD.height, -s.viewRotation);
+        let r1 = new Shape(sD.x, sD.y, sD.width, sD.height, -s.viewRotation);
         let inFrame =  !this.cullGraphics || Physics.fullCollideBool(this, r1);
         if (!this.hidden && inFrame) {
             let com = this.centerOfMass;
@@ -225,7 +225,7 @@ class PhysicsObject extends SceneObject {
         if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
     }
     capSpeed() {
-        let m = Math.min(this.width, this.height) / 2;
+        let m = Math.sqrt(this.mass) / 2;
         if (this.velocity.mag > m) this.velocity.mag = m;
     }
     privateSetX(x) {
@@ -253,8 +253,8 @@ class PhysicsObject extends SceneObject {
                             if (this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
                                 let col = Physics.fullCollide(this, other);
                                 if (col.length) {
-                                    this.allCollidingWith["Rect - " + other.name] = other;
-                                    other.allCollidingWith["Rect - " + this.name] = this;
+                                    this.allCollidingWith["Shape - " + other.name] = other;
+                                    other.allCollidingWith["Shape - " + this.name] = this;
                                     if (!this.colliding.general) this.colliding.general = [];
                                     if (!other.colliding.general) other.colliding.general = [];
                                     this.colliding.general.push(other);
