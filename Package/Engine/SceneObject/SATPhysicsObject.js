@@ -404,6 +404,6 @@ class PhysicsObject extends SceneObject {
         this.applyAngularImpulse(iFA);
         iFA.force.div(5);
         this.applyLinearImpulse(iFA);
-        // c.stroke(cl.LIME, 2).arrow(collisionPoint, collisionPoint.plus(pointVel.times(1000)));
+        // c.stroke(cl.LIME, 2).arrow(collisionPoint, collisionPoint.plus(pointVel.times(100)));
     }
 }

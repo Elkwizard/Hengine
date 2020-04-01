@@ -364,6 +364,8 @@ class Physics {
                 a.privateSetY(a.y - aMove.y);
                 b.privateSetX(b.x - bMove.x);
                 b.privateSetY(b.y - bMove.y);
+                a.cacheBoundingBoxes();
+                b.cacheBoundingBoxes();
 
             } else return;
         } else return;
@@ -541,8 +543,20 @@ class Physics {
         const d_B = s_B ? d_A.times(-1) : dir.times(-1); //Direction B escapes the collision
         const vl_A = a.velocity.get(); //A's Linear Velocity
         const vl_B = b.velocity.get(); //B's Linear Velocity
-        const v_A = vl_A; //A's Velocity
-        const v_B = vl_B; //B's Velocity
+        const va_A = a.getLinearAngularVelocity(collisionPoint).over(5);
+        const va_B = b.getLinearAngularVelocity(collisionPoint).over(5);
+        const v_A = vl_A.plus(va_A); //A's Velocity
+        const v_B = vl_B.plus(va_B); //B's Velocity
+        let sh_X = 0; //shared x velocity
+        let sh_Y = 0; //shared y velocity
+        if (Math.abs(v_A.x) < Math.abs(v_B.x)) sh_X = v_A.x * Math.max(Math.sign(v_A.x * v_B.x), 0);
+        else sh_X = v_B.x * Math.max(Math.sign(v_A.x * v_B.x), 0);
+        if (Math.abs(v_A.y) < Math.abs(v_B.y)) sh_Y = v_A.y * Math.max(Math.sign(v_A.y * v_B.y), 0);
+        else sh_Y = v_B.y * Math.max(Math.sign(v_A.y * v_B.y), 0);
+        v_A.x -= sh_X;
+        v_B.x -= sh_X;
+        v_A.y -= sh_Y;
+        v_B.y -= sh_Y;
         const vc_A = Math.max(d_A.dot(v_A), 0); //A's velocity towards collision (scalar)
         const vc_B = Math.max(s_B ? vc_A * (1 - sn_A) : d_B.dot(v_B), 0); //B's velocity towards collision (scalar)
         const P_A = (v) => Vector.prohibitDirections(a.prohibited, v); //Takes a vector, returns whether A can move that direction

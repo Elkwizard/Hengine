@@ -223,7 +223,8 @@ class Hengine {
 		if (sd !== undefined) seed = sd;
 		let a = (seed * 6.12849) % 8.7890975
 		let b = (a * 256783945.4758903) % 22.567890;
-		return (Math.cos(a * b) + 1) / 2;
+		let r = (a * b) % 1;
+		return r;
 	}
 	middle() {
 		return this.c.middle();

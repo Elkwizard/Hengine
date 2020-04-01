@@ -120,6 +120,26 @@ class Geometry {
         dif.add(cr);
         return dif;
     }
+    static closestPointOnPolygonInDirection(point, dir, r) {
+        let edges = [];
+        let corners = r.getCorners();
+        let bestPoint = null;
+        let bestDist = Infinity;
+        for (let i = 0; i < corners.length; i++) {
+            let a = corners[i];
+            let b = corners[(i + 1) % corners.length];
+            edges.push(new Line(a, b));
+        }
+        for (let edge of edges) {
+            let p = Geometry.closestPointOnLineObjectInDirection(point, dir, edge);
+            let dist = Geometry.distToPoint2(p, point);
+            if (dist < bestDist) {
+                bestDist = dist;
+                bestPoint = p;
+            }
+        }
+        return bestPoint;
+    }
     static closestPointOnPolygon(point, r) {
         let edges = [];
         let corners = r.getCorners();

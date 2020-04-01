@@ -105,17 +105,16 @@ class InactiveScene {
 	}
 	copy(el) {
 		let n;
-		if (el instanceof PhysicsObject) {
-			//TODO: rewrite particle spawners
-			if (el instanceof ParticleSpawnerObject) {
-				n = this.addParticleSpawner(el.name + " - copy", el.x, el.y, el.particleSize, el.particleInitSpeed, el.delay, el.timer, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
-				n.particleSlows = el.particleSlows;
-				n.particleFades = el.particleFades;
-				n.particleFalls = el.particleFalls;
-				n.active = el.active;
-			} else {
-				n = this.addPhysicsElement(el.name + " - copy", el.x, el.y, !el.completelyStatic, { ...el.controls }, el.tag);
-			}
+		if (el instanceof ParticleSpawnerObject) {
+			n = this.addParticleSpawner(el.name + " - copy", el.x, el.y, el.particleSize, el.particleInitSpeed, el.delay, el.timer, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
+			n.particleSlows = el.particleSlows;
+			n.particleFades = el.particleFades;
+			n.particleFalls = el.particleFalls;
+			n.active = el.active;
+		} else if (el instanceof UIObject) {
+			n = this.addUI(el.name + " - copy", el.x, el.y, el.width, el.height);
+		} else if (el instanceof PhysicsObject) {
+			n = this.addPhysicsElement(el.name + " - copy", el.x, el.y, !el.completelyStatic, { ...el.controls }, el.tag);
 			n.positionStatic = el.positionStatic;
 			n.rotationStatic = el.rotationStatic;
 			n.hasGravity = el.hasGravity;
@@ -281,8 +280,9 @@ class InactiveScene {
 			height = -height;
 			y -= height;
 		}
-		this.contains[name] = new UIObject(name, x, y, width, height, draw, this);
+		this.contains[name] = new UIObject(name, x, y, draw, this);
 		let n = this.contains[name];
+		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		return n;
 	}
 	addContainer(name, active) {
