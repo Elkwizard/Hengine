@@ -180,6 +180,18 @@ class SceneObject {
 	getShape(name) {
 		return this.shapes[name];
 	}
+	getModel(name) {
+		return this.shapes[name].getModel(this.middle, this.rotation);
+	}
+	reorderShapes(order) {
+		let shapes = this.getShapes();
+		let nShapes = new Array(shapes.length);
+		this.shapes = {};
+		for (let i = 0; i < order.length; i++) {
+			nShapes[i] = shapes[order[i]];
+		}
+		for (let i = 0; i < nShapes.length; i++) this.shapes[i + 1] = nShapes[i];
+	}
 	getShapes() {
 		let ary = [];
 		for (let [name, shape] of this.shapes) ary.push(shape);

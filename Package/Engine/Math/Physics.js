@@ -105,7 +105,7 @@ class Physics {
         return new Collision((b.x - a.x) ** 2 + (b.y - a.y) ** 2 < a.radius ** 2, a, b);
     }
     static collidePolygonPoint(a, b) {
-        if (!Geometry.pointInsideRectangle(b, a)) return new Collision(false, a, b);
+        if (!Geometry.pointInsideRectangle(b, a.__boundingBox)) return new Collision(false, a, b);
         if (!(a instanceof Rect)) {
             let axes = a.getAxes();
             let aCorners = a.getCorners();
