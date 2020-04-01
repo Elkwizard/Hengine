@@ -40,6 +40,8 @@ class SceneObject {
 	constructor(name, x, y, controls, tag, home) {
 		this.x = x;
 		this.y = y;
+		this.shapes = {};
+		this.rotation = 0;
 		this.name = name;
 		this.home = home;
 		this.tag = tag;
@@ -58,6 +60,7 @@ class SceneObject {
 		this.log = [];
 		this.isDead = false;
 		this.cullGraphics = true;
+		this.cacheBoundingBoxes();
 		this.response = {
 			click: e => e,
 			rightClick: e => e,
@@ -72,8 +75,6 @@ class SceneObject {
 			interact2: function () { }
 		};
 		this.isBeingUpdated = false;
-		this.shapes = {};
-		this.rotation = 0;
 	}
 	get middle() {
 		return new Vector2(this.x, this.y);
@@ -87,14 +88,14 @@ class SceneObject {
 		this.scale(factor);
 	}
 	get width() {
-		return this.getBoundingBox().width;
+		return this.__boundingBox.width;
 	}
 	set height(a) {
 		let factor = a / this.height;
 		this.scale(factor);
 	}
 	get height() {
-		return this.getBoundingBox().height;
+		return this.__boundingBox.height;
 	}
 	serializeShapes() {
 		let shapes = this.getShapes();
@@ -134,19 +135,27 @@ class SceneObject {
 		for (let shape of result) this.addShape(num++, shape);
 		return result;
 	}
+	cacheBoundingBoxes() {
+		let shapes = this.getShapes();
+		let models = this.getModels();
+		for (let i = 0; i < shapes.length; i++) shapes[i].cacheBoundingBox(models[i].getBoundingBox()); //transfer from model to root shape
+		this.__boundingBox = this.getBoundingBox();
+	}
 	getBoundingBox() {
 		let shapes = this.getModels();
-		let boxes = shapes.map(e => e.getBoundingBox());
+		let boxes = shapes.map(e => e.__boundingBox);
+		if (boxes.length === 1) return boxes[0];
 		let mins = boxes.map(e => e.vertices[0]);
 		let maxs = boxes.map(e => e.vertices[2]);
 		let minX = Math.min(...mins.map(e => e.x));
 		let minY = Math.min(...mins.map(e => e.y));
 		let maxX = Math.max(...maxs.map(e => e.x));
 		let maxY = Math.max(...maxs.map(e => e.y));
-		return new Rect(new Vector2(minX, minY), new Vector2(maxX, maxY));
+		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
 	addShape(name, shape) {
 		this.shapes[name] = shape;
+		this.cacheBoundingBoxes();
 	}
 	centerModels() {
 		let center = Vector2.origin;
@@ -179,13 +188,18 @@ class SceneObject {
 	scale(factor) {
 		let middle = Vector2.origin;
 		for (let shape of this.getShapes()) shape.scaleAbout(middle, factor);
+		this.cacheBoundingBoxes();
 	}
 	getModels() {
 		let ary = this.getShapes();
 		let middle = this.middle;
 		let pos = middle;
 		let rot = this.rotation;
-		ary = ary.map(e => e.getModel(pos, rot));
+		ary = ary.map(function(e,i){
+			let r = e.getModel(pos, rot);
+			r.__boundingBox = ary[i].__boundingBox; //transfer from root shape to model
+			return r;
+		});
 		return ary;
 	}
 	rename(name) {
@@ -259,21 +273,25 @@ class SceneObject {
 			c.restore();
 		}
 		c.restore();
-		this.scriptEscapeDraw();
 	}
 	engineDrawUpdate() {
 		let d = s.adjustedDisplay;
-		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.getBoundingBox(), (new Rect(d.x, d.y, d.width, d.height, s.viewRotation)).getBoundingBox());
+		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, (new Rect(d.x, d.y, d.width, d.height, s.viewRotation)).getBoundingBox());
 		if (!this.hidden && onScreen) {
 			this.runDraw();
-			this.update();
 		}
+		//bound visual
+		// c.stroke(cl.GREEN, 1).rect(this.__boundingBox);
+		// for (let shape of this.getShapes()) c.stroke(cl.GREEN, 1).rect(shape.__boundingBox);
+		this.scriptEscapeDraw();
 	}
 	enginePhysicsUpdate(hitboxes) {
 		if (this.controls) {
 			this.move();
 		}
+		this.update();
 		this.scriptUpdate();
+		this.cacheBoundingBoxes();
 	}
 	pushToRemoveQueue(x) {
 		return null;

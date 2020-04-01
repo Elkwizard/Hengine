@@ -61,10 +61,15 @@ class Line {
 class Shape {
 	constructor(rotation = 0) {
 		this.rotation = rotation;
+        this.__boundingBox = null; //bounding box cache
 	}
 	get area() {
 		//return the area of the shape
 		return 0;
+	}
+	cacheBoundingBox(box) {
+		//store bounding box for later use
+		this.__boundingBox = box;
 	}
 	getBoundingBox() {
 		//return the smallest rectangle that contains the shape
@@ -104,13 +109,13 @@ class Polygon extends Shape {
 		return bound.width * bound.height;
 	}
 	getBoundingBox() {
-		let sortedX = this.vertices.map(e => e.x).sort((a, b) => b - a);
-		let sortedY = this.vertices.map(e => e.y).sort((a, b) => b - a);
-		let minX = sortedX[sortedX.length - 1];
-		let maxX = sortedX[0];
-		let minY = sortedY[sortedY.length - 1];
-		let maxY = sortedY[0];
-		return new Rect(new Vector2(minX, minY), new Vector2(maxX, maxY));
+		let x = this.vertices.map(e => e.x);
+		let y = this.vertices.map(e => e.y);
+		let minX = Math.min(...x);
+		let maxX = Math.max(...x);
+		let minY = Math.min(...y);
+		let maxY = Math.max(...y);
+		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
 	getModel(pos, rot) {
 		let middle = this.middle;
@@ -248,7 +253,6 @@ class Circle extends Shape {
 		this.radius *= factor;
 	}
 	scaleAbout(pos, factor) {
-		let dist = Geometry.distToPoint(this, pos) + this.radius;
 		let nPos = pos.plus((new Vector2(this.x, this.y)).minus(pos).times(factor));
 		this.x = nPos.x;
 		this.y = nPos.y;

@@ -105,6 +105,7 @@ class Physics {
         return new Collision((b.x - a.x) ** 2 + (b.y - a.y) ** 2 < a.radius ** 2, a, b);
     }
     static collidePolygonPoint(a, b) {
+        if (!Geometry.pointInsideRectangle(b, a)) return new Collision(false, a, b);
         if (!(a instanceof Rect)) {
             let axes = a.getAxes();
             let aCorners = a.getCorners();
@@ -146,7 +147,7 @@ class Physics {
     }
     static collidePolygonCircle(a, b) {
         s.SAT.boxChecks++;
-        if (!Geometry.overlapRectRect(a.getBoundingBox(), b.getBoundingBox())) return new Collision(false, a, b);
+        if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return new Collision(false, a, b);
         s.SAT.SATChecks++;
         let bestPoint = Geometry.closestPointOnPolygon(b.middle, a);
         const inside = Physics.collidePolygonPoint(a, b.middle).colliding;
@@ -172,7 +173,7 @@ class Physics {
     }
     static collideCirclePolygon(a, b) {
         s.SAT.boxChecks++;
-        if (!Geometry.overlapRectRect(a.getBoundingBox(), b.getBoundingBox())) return new Collision(false, a, b);
+        if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return new Collision(false, a, b);
         let bestPoint = Geometry.closestPointOnPolygon(a.middle, b);
         const inside = Physics.collidePolygonPoint(b, a.middle).colliding;
         let colliding = Geometry.distToPoint2(bestPoint, a.middle) < a.radius ** 2 || inside;
@@ -195,7 +196,7 @@ class Physics {
     }
     static collidePolygonPolygon(a, b) {
         if (a.home) s.SAT.boxChecks++;
-        if (!Geometry.overlapRectRect(a.getBoundingBox(), b.getBoundingBox())) return new Collision(false, a, b);
+        if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return new Collision(false, a, b);
 
         if (a.home) s.SAT.SATChecks++;
         let aEdges = a.getAxes();
@@ -348,7 +349,7 @@ class Physics {
             if (tomMath) {
                 let dir = col.dir.times(col.penetration);
                 //mass percents
-                let aPer = 1 - a.mass / (a.mass + b.mass);
+                let aPer = 1 - a.__mass / (a.__mass + b.__mass);
                 if (!mobileB) aPer = 1;
                 let bPer = 1 - aPer;
 
@@ -372,7 +373,7 @@ class Physics {
 
         //velocity
         const A_VEL_AT_COLLISION = a.velocity.dot(col.dir);
-        const B_VEL_AT_COLLISION = b.velocity.dot(col.dir.times(-1));
+        const B_VEL_AT_COLLISION = -b.velocity.dot(col.dir);
         if (A_VEL_AT_COLLISION < 0 && B_VEL_AT_COLLISION < 0) return;
 
         //friction

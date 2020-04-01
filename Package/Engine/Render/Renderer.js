@@ -250,7 +250,7 @@ class Artist {
 				}
 			},
 			infer: function (obj) {
-				if (obj.radius) {
+				if (obj.radius !== undefined) {
 					this.draw(this.c.fillStyle).circle(obj);
 				} else {
 					this.draw(this.c.fillStyle).shape(...obj.getCorners());
@@ -410,7 +410,7 @@ class Artist {
 				}
 			},
 			infer: function (obj) {
-				if (obj.radius) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).circle(obj);
+				if (obj.radius !== undefined) this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).circle(obj);
 				else this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).shape(...obj.getCorners());
 			}
 		}
@@ -500,7 +500,7 @@ class Artist {
 				this.c.clip();
 			},
 			infer: function (obj) {
-				if (obj.radius) this.clip().circle(obj);
+				if (obj.radius !== undefined) this.clip().circle(obj);
 				else this.clip().shape(...obj.getCorners());
 			}
 		};

@@ -135,7 +135,7 @@ class Vector {
 		return v.op(Math.abs.bind(Math), 0);
 	}
 	static sum(...v) {
-		return (new v[0].constructor(0, 0, 0, 0)).plus(...v);
+		return (new v[0].constructor(0, 0, 0, 0)).add(...v);
 	}
     static prohibitDirections(proDirs, dir) {
         let remove = [];

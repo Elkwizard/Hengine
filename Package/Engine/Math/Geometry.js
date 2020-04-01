@@ -315,12 +315,13 @@ class Geometry {
     // }
     static rotatePointAround(origin, point, angle) {
         let dif = new Vector2(point.x - origin.x, point.y - origin.y);
-        let a = dif.getAngle();
-        a += angle;
-        let nDif = Vector2.fromAngle(a);
-        nDif.mul(dif.mag);
-        // c.stroke(cl.ORANGE).arrow(origin, point);
-        // c.stroke(cl.ORANGE).arrow(origin, new Vector2(origin.x + nDif.x, origin.y + nDif.y));
+        // let a = dif.getAngle();
+        // a += angle;
+        // let nDif = Vector2.fromAngle(a);
+        // nDif.mul(dif.mag);
+        let sin = Math.sin(angle);
+        let cos = Math.cos(angle);
+        let nDif = new Vector2(cos * dif.x - sin * dif.y, sin * dif.x + cos * dif.y);
         return new Vector2(origin.x + nDif.x, origin.y + nDif.y);
     }
     static overlapLineLine(l1, l2) {
@@ -372,6 +373,7 @@ class Geometry {
         return (dist < c.radius ** 2) || inside;
     }
     static overlapRectRect(r, r2) {
+        if (!r || !r2) return false;
         return r.x < r2.x + r2.width && r.x + r.width > r2.x && r.y < r2.y + r2.height && r.y + r.height > r2.y;
     }
     static overlapCircleCircle(c, c2) {

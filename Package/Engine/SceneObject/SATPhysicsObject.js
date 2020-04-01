@@ -31,6 +31,7 @@ class PhysicsObject extends SceneObject {
         this._angularDragForce = null;
         this._friction = null;
         this._rotation = 0;
+        this.__mass = 0; //mass cache
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
         this.newColliding = new CollisionMoniter();
@@ -311,10 +312,14 @@ class PhysicsObject extends SceneObject {
                 let newRotation = this.rotation + this.angularVelocity * spdMod;
                 this.privateSetRotation(newRotation);
 
+                this.cacheBoundingBoxes();
+                this.__mass = this.mass;
+
                 this.checkAndResolveCollisions(others);
             }
 
-            this.rotation = Math.atan2(Math.sin(this.rotation), Math.cos(this.rotation));
+            let pi2 = Math.PI * 2;
+            this.rotation = ((this.rotation % pi2) + pi2) % pi2;
 
             this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
             this.lastX = this.x;
