@@ -185,6 +185,16 @@ class PhysicsObject extends SceneObject {
         c.rotate(rot);
         c.translate(com.times(-1));
     }
+    getLinearAngularVelocity(p) {
+        let dif = p.minus(this.middle);
+        let difL = this.angularVelocity * dif.mag;
+        let angle = Math.sign(this.angularVelocity) * 0.0001;
+        let difV = Geometry.rotatePointAround(Vector2.origin, dif, angle).minus(dif).normalize();
+        difV.x = Math.abs(difV.x);
+        difV.y = Math.abs(difV.y);
+        let result = difV.times(difL);
+        return result;
+    }
     slowDown() {
         //apply linear drag;
         let drag = this.velocity.get().mul(-(1 - this.linearDragForce));
@@ -304,7 +314,7 @@ class PhysicsObject extends SceneObject {
                 this.checkAndResolveCollisions(others);
             }
 
-            this.rotation %= Math.PI * 2;
+            this.rotation = Math.atan2(Math.sin(this.rotation), Math.cos(this.rotation));
 
             this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
             this.lastX = this.x;
@@ -313,14 +323,14 @@ class PhysicsObject extends SceneObject {
         });
     }
     moveTowards(point, ferocity = 1) {
-        let dif = Vector2.fromPoint(point).minus(this.middle);
-        this.velocity.add(dif.times(ferocity / 100));
+        let dif = point.minus(this.middle);
+        this.velocity.add(dif.mul(ferocity / 100));
         this.logMod(function () {
             this.moveTowards(point, ferocity);
         });
     }
     moveAwayFrom(point, ferocity = 1) {
-        let dif = Vector2.fromPoint(point).minus(this.middle).times(-1);
+        let dif = this.middle.minus(point);
         this.velocity.add(dif.times(ferocity / 100));
         this.logMod(function () {
             this.moveAwayFrom(point, ferocity);
@@ -335,7 +345,8 @@ class PhysicsObject extends SceneObject {
         let eMag = endVector.mag;
         let shortest = (sMag < eMag) ? startVector : endVector;
 
-        let maxR = this.radius ? this.radius : Math.sqrt((this.width / 2) ** 2, (this.height / 2) ** 2);
+        let bound = this.getBoundingBox();
+        let maxR = Math.max(bound.width, bound.height) / 2;
         let minR = shortest.mag;
         // c.stroke(cl.LIME, 1).circle(com.x, com.y, maxR);
         // c.stroke(cl.RED, 1).circle(com.x, com.y, minR);
@@ -379,12 +390,15 @@ class PhysicsObject extends SceneObject {
         let iFL = new Impulse(friction, collisionPoint);
         this.applyImpulse(iFL);
 
-        pointVel = collisionPoint.minus(Geometry.rotatePointAround(this.centerOfMass, collisionPoint, this.angularVelocity));
-        friction = pointVel.projectOnto(tangent.bestFit(pointVel));
+        // pointVel = Geometry.rotatePointAround(this.centerOfMass, collisionPoint, this.angularVelocity).minus(collisionPoint);
+        pointVel = this.getLinearAngularVelocity(collisionPoint);
+        friction = tangent.bestFit(pointVel).times(-pointVel.mag);
         mag = friction.mag;
         friction.mag = Math.min(mag, mag * this.friction * otherFriction * 2);
         let iFA = new Impulse(friction, collisionPoint);
         this.applyAngularImpulse(iFA);
+        iFA.force.div(5);
+        this.applyLinearImpulse(iFA);
         // c.stroke(cl.LIME, 2).arrow(collisionPoint, collisionPoint.plus(pointVel.times(1000)));
     }
 }

@@ -76,26 +76,22 @@ class SceneObject {
 		this.rotation = 0;
 	}
 	get middle() {
-		// let middle = Vector2.origin;
-		// let totalArea = 0;
-		// for (let [name, shape] of this.shapes) {
-		// 	let area = shape.area;
-		// 	let sMiddle = shape.middle;
-		// 	middle.add(sMiddle);
-		// 	totalArea += area;
-		// }
-		// middle.div(totalArea);
-		// middle = Geometry.rotatePointAround(Vector2.origin, middle, this.rotation).plus(new Vector2(this.x, this.y));
-		// return middle;
 		return new Vector2(this.x, this.y);
 	}
 	set middle(a) {
-		let dif = a.minus(this.middle);
-		this.x += dif.x;
-		this.y += dif.y;
+		this.x = a.x;
+		this.y = a.y;
+	}
+	set width(a) {
+		let factor = a / this.width;
+		this.scale(factor);
 	}
 	get width() {
 		return this.getBoundingBox().width;
+	}
+	set height(a) {
+		let factor = a / this.height;
+		this.scale(factor);
 	}
 	get height() {
 		return this.getBoundingBox().height;
@@ -151,6 +147,21 @@ class SceneObject {
 	}
 	addShape(name, shape) {
 		this.shapes[name] = shape;
+	}
+	centerModels() {
+		let center = Vector2.origin;
+		let shapes = this.getShapes();
+		let totalArea = 0;
+		for (let shape of shapes) {
+			let area = shape.area;
+			totalArea += area;
+			center.add(shape.middle.times(area));
+		}
+		center.div(totalArea);
+		let dif = center.times(-1);
+		for (let shape of shapes) {
+			shape.move(dif);
+		}
 	}
 	removeShape(name) {
 		let shape = this.shapes[name];
@@ -216,6 +227,11 @@ class SceneObject {
 			m.scriptDraw(m, name, shape);
 		}
 	}
+	scriptEscapeDraw(name, shape) {
+		for (let m of this.scripts) {
+			m.scriptEscapeDraw(m, name, shape);
+		}
+	}
 	logMod(func) {
 		this.log.push(func);
 	}
@@ -243,6 +259,7 @@ class SceneObject {
 			c.restore();
 		}
 		c.restore();
+		this.scriptEscapeDraw();
 	}
 	engineDrawUpdate() {
 		let d = s.adjustedDisplay;

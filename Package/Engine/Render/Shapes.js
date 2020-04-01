@@ -83,6 +83,9 @@ class Shape {
 	scaleAbout(pos, factor) {
 		//scale shape relative to _pos_ by _factor_
 	}
+	move(dir) {
+		//move by _dir_
+	}
 	get() {
 		//return a copy of the shape
 		return new Shape(this.rotation);
@@ -149,6 +152,9 @@ class Polygon extends Shape {
 	scaleAbout(pos, factor) {
 		this.vertices = this.vertices.map(e => pos.plus(e.minus(pos).times(factor)));
 	}
+	move(dir) {
+		for (let vert of this.vertices) vert.add(dir);
+	}
 	get() {
 		return new Polygon([...this.vertices], this.rotation);
 	}
@@ -209,6 +215,10 @@ class Rect extends Polygon {
 		this.height *= factor;
 		this.center(middle);	
 	}
+	move(dir) {
+		this.x += dir.x;
+		this.y += dir.y;
+	}
 	get() {
 		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
 	}
@@ -246,6 +256,10 @@ class Circle extends Shape {
 	}
 	getBoundingBox() {
 		return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+	}
+	move(dir) {
+		this.x += dir.x;
+		this.y += dir.y;
 	}
 	get() {
 		return new Circle(this.x, this.y, this.radius);

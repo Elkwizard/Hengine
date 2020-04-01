@@ -35,6 +35,7 @@ class Script {
 		local.scriptUpdate = (l, e) => e;
 		local.scriptBeforeUpdate = (l, e) => e;
 		local.scriptDraw = (l, e) => e;
+		local.scriptEscapeDraw = (l, e) => e;
 		local.scriptCollideTop = (l, e) => e;
 		local.scriptCollideLeft = (l, e) => e;
 		local.scriptCollideRight = (l, e) => e;
@@ -57,6 +58,9 @@ class Script {
 			}
 			else if (flag === "draw") {
 				local.scriptDraw = local.scriptDraw.add(this.methods[x].bind(bindTo));
+			}
+			else if (flag === "escapedraw" || flag === "escape-drag" || flag === "escape_draw") {
+				local.scriptEscapeDraw = local.scriptEscapeDraw.add(this.methods[x].bind(bindTo));
 			}
 			else if (flag === "collide-general" || flag === "collide_general" || flag === "collidegeneral") {
 				local.scriptCollideGeneral = local.scriptCollideGeneral.add(this.methods[x].bind(bindTo));

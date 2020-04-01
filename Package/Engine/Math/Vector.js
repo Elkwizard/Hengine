@@ -126,6 +126,11 @@ class Vector {
 		for (let n in this) ary.push(this[n]);
 		return "\u27e8" + ary.join(", ") + "\u27e9"; 
 	}
+	toFixed(n) {
+		let ary = [];
+		for (let n in this) ary.push(this[n].toFixed(n));
+		return "\u27e8" + ary.join(", ") + "\u27e9"; 
+	}
 	static abs(v) {
 		return v.op(Math.abs.bind(Math), 0);
 	}

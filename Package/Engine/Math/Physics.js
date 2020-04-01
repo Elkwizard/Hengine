@@ -318,12 +318,18 @@ class Physics {
             }
         }
         let cols = tempCollisions.filter(e => e.colliding);
-        return cols.map(e => {
-            let n = e;
-            n.a = a;
-            n.b = b;
-            return n;
-        });
+        cols = cols
+            .map(e => {
+                let n = e;
+                n.a = a;
+                n.b = b;
+                return n;
+            })
+            .sort((a, b) => b.penetration - a.penetration);
+        // let best = cols
+        // if (best) return [best];
+        // return [];
+        return cols;
     }
     static fullCollideBool(a, b) {
         return !!Physics.fullCollide(a, b).length;
@@ -350,6 +356,7 @@ class Physics {
                 let aMove = dir.times(1 * aPer);
                 let bMove = dir.times(-1 * bPer);
 
+                // c.stroke(cl.BLUE, 2).arrow(col.collisionPoint, col.collisionPoint.minus(col.dir.times(col.penetration)));
 
                 //like, the escaping
                 a.privateSetX(a.x - aMove.x);
