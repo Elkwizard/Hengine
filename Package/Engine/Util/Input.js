@@ -69,33 +69,13 @@ class MouseHandler {
 		this.engineRightClick = e => e;
 		this.engineMove = e => e;
 		let m = this;
-		// document.addEventListener("touchstart", function (e) {
-		// 	m.button = 0;
-		// 	let evt = e.changedTouches[0];
-		// 	m.updatePosition(evt, "touch");
-		// 	m.down = true;
-		// });
-		// document.addEventListener("touchmove", function (e) {
-		// 	let evt = e.changedTouches[0];
-		// 	m.updatePosition(evt, "touch");
-		// 	m.engineMove(evt);
-		// });
-		// document.addEventListener("touchend", function (e) {
-		// 	let evt = e.changedTouches[0];
-		// 	m.updatePosition(evt, "touch");
-		// 	m.engineClick(evt);
-		// 	m.down = false;
-		// });
-		// document.addEventListener("touchcancel", function (e) {
-		// 	m.updatePosition("touch");
-		// });
 		document.addEventListener("click", function (e) {
 			m.button = e.button;
 			m.updatePosition(e, "click");
 			m.engineClick(e);
 			for (let ev of m.onClick) ev(e);
 		});
-		document.addEventListener("mousedown", function (e) {
+		document.addEventListener("pointerdown", function (e) {
 			m.button = e.button;
 			m.updatePosition(e, "down");
 			if (m.engine) {
@@ -105,7 +85,7 @@ class MouseHandler {
 			m.down = true;
 			for (let ev of m.onDown) ev(e);
 		});
-		document.addEventListener("mousemove", function (e) {
+		document.addEventListener("pointermove", function (e) {
 			m.updatePosition(e, "move");
 			if (m.engine && m.down) {
 				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
@@ -114,7 +94,7 @@ class MouseHandler {
 			m.engineMove(e);
 			for (let ev of m.onMove) ev(e);
 		});
-		document.addEventListener("mouseup", function (e) {
+		document.addEventListener("pointerup", function (e) {
 			m.button = e.button;
 			m.updatePosition(e, "up");
 			if (m.engine) {

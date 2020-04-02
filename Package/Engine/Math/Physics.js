@@ -320,17 +320,34 @@ class Physics {
         }
         let cols = tempCollisions.filter(e => e.colliding);
         cols = cols
-            .map(e => {
+            // .map(e => {
+            //     let n = e;
+            //     n.a = a;
+            //     n.b = b;
+            //     return n;
+            // })
+        if (cols.length) {
+            // let dir = Vector2.origin;
+            // let collisionPoint = Vector2.origin;
+            // let penetration = 0;
+            // let totalPen = 0;
+            // for (let col of cols) {
+            //     let curPen = 1;
+            //     totalPen += curPen;
+            //     dir.add(col.dir.mul(curPen));
+            //     collisionPoint.add(col.collisionPoint.mul(curPen));
+            //     penetration += col.penetration * curPen;
+            // }
+            // let l = cols.length * totalPen;
+            // return [new Collision(true, a, b, dir.div(l), penetration / l, collisionPoint.div(l))];
+            return cols.map(e => {
                 let n = e;
                 n.a = a;
                 n.b = b;
                 return n;
-            })
-            .sort((a, b) => b.penetration - a.penetration);
-        // let best = cols
-        // if (best) return [best];
-        // return [];
-        return cols;
+            });
+        }
+        return [];
     }
     static fullCollideBool(a, b) {
         return !!Physics.fullCollide(a, b).length;
@@ -357,7 +374,7 @@ class Physics {
                 let aMove = dir.times(1 * aPer);
                 let bMove = dir.times(-1 * bPer);
 
-                // c.stroke(cl.BLUE, 2).arrow(col.collisionPoint, col.collisionPoint.minus(col.dir.times(col.penetration)));
+                c.stroke(cl.BLUE, 2).arrow(col.collisionPoint, col.collisionPoint.minus(col.dir.times(col.penetration)));
 
                 //like, the escaping
                 a.privateSetX(a.x - aMove.x);
@@ -380,8 +397,8 @@ class Physics {
 
         //friction
         const normal = d.normal.normalize();
-        a.applyFriction(normal, col.collisionPoint, b.friction);
-        b.applyFriction(normal, col.collisionPoint, a.friction);
+        // a.applyFriction(normal, col.collisionPoint, b.friction);
+        // b.applyFriction(normal, col.collisionPoint, a.friction);
 
 
         //impulse resolution
@@ -543,10 +560,10 @@ class Physics {
         const d_B = s_B ? d_A.times(-1) : dir.times(-1); //Direction B escapes the collision
         const vl_A = a.velocity.get(); //A's Linear Velocity
         const vl_B = b.velocity.get(); //B's Linear Velocity
-        const va_A = a.getLinearAngularVelocity(collisionPoint).over(5);
-        const va_B = b.getLinearAngularVelocity(collisionPoint).over(5);
-        const v_A = vl_A.plus(va_A); //A's Velocity
-        const v_B = vl_B.plus(va_B); //B's Velocity
+        const va_A = a.getLinearAngularVelocity(collisionPoint).over(5); //angular velocity of A
+        const va_B = b.getLinearAngularVelocity(collisionPoint).over(5); //angular velocity of B
+        const v_A = vl_A//.plus(va_A); //A's Velocity
+        const v_B = vl_B//.plus(va_B); //B's Velocity
         let sh_X = 0; //shared x velocity
         let sh_Y = 0; //shared y velocity
         if (Math.abs(v_A.x) < Math.abs(v_B.x)) sh_X = v_A.x * Math.max(Math.sign(v_A.x * v_B.x), 0);

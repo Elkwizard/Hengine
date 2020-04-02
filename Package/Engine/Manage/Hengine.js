@@ -222,8 +222,9 @@ class Hengine {
 		let seed = this.randomSeed++;
 		if (sd !== undefined) seed = sd;
 		let a = (seed * 6.12849) % 8.7890975
-		let b = (a * 256783945.4758903) % 22.567890;
+		let b = (a * 256783945.4758903) % 238462.567890;
 		let r = (a * b) % 1;
+		this.randomSeed += r;
 		return r;
 	}
 	middle() {
