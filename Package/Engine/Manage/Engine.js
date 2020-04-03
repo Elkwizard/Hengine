@@ -174,13 +174,13 @@ class Engine {
 					K.update();
 					this.beforeUpdate();
 					this.clear();
+					this.update();
+					this.scene.engineDrawUpdate();
 					if (!this.hasFixedPhysicsUpdateCycle) {
 						this.fixedUpdate();
 						this.fixedScript.run();
 						this.scene.enginePhysicsUpdate();
 					}
-					this.update();
-					this.scene.engineDrawUpdate();
 					this.afterUpdate();
 					this.updateScreenRecordings();
 					M.last = { x: M.x, y: M.y };

@@ -177,7 +177,7 @@ class PhysicsObject extends SceneObject {
     }
     drawWithoutRotation(artist) {
         let com = this.centerOfMass;
-		let rot = this.parent ? this.parent.rotation : this.rotation;
+        let rot = this.parent ? this.parent.rotation : this.rotation;
         c.translate(com);
         c.rotate(-rot);
         c.translate(com.times(-1));
@@ -186,22 +186,17 @@ class PhysicsObject extends SceneObject {
         c.rotate(rot);
         c.translate(com.times(-1));
     }
-    getLinearAngularVelocity(p) {
-        let dif = p.minus(this.middle);
-        let difL = this.angularVelocity * dif.mag;
-        let angle = Math.sign(this.angularVelocity) * 0.0001;
-        let difV = Geometry.rotatePointAround(Vector2.origin, dif, angle).minus(dif).normalize();
-        difV.x = Math.abs(difV.x);
-        difV.y = Math.abs(difV.y);
-        let result = difV.times(difL);
-        return result;
+    getLinearAngularVelocity(point) {
+        let r_A = point.minus(this.centerOfMass);
+        let v_A = this.angularVelocity;
+        return r_A.normal.times(v_A);
     }
     slowDown() {
         //apply linear drag;
         let drag = this.velocity.get().mul(-(1 - this.linearDragForce));
         let iD = new Impulse(drag, this.centerOfMass);
-        // this.applyImpulse(iD);
-        this.angularVelocity *= this.angularDragForce;
+         this.applyImpulse(iD);
+         this.angularVelocity *= this.angularDragForce;
 
         if (this.velocity.mag < 0.01) this.velocity.mag = 0;
         if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
@@ -341,25 +336,69 @@ class PhysicsObject extends SceneObject {
             this.moveAwayFrom(point, ferocity);
         });
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //it's barkin' *bark* *bark*
     getImpulseRatio(point, axis) {
-        // let com = this.centerOfMass;
-        // let startVector = impulse.source.minus(com);
-        // let endVector = impulse.source.plus(impulse.force).minus(com);
-        // let sMag = startVector.mag;
-        // if (sMag < 0.01) return 1;
-        // let eMag = endVector.mag;
-        // let shortest = (sMag < eMag) ? startVector : endVector;
-
-        // let bound = this.getBoundingBox();
-        // let maxR = Math.max(bound.width, bound.height) / 2;
-        // let minR = shortest.mag;
-        // c.stroke(cl.LIME, 1).circle(com.x, com.y, maxR);
-        // c.stroke(cl.RED, 1).circle(com.x, com.y, minR);
-
-        return minR / maxR;
+        //one
+//        return 1;
+        
+        
+        //average
+//        return 0.5;
+        
+        
+        //to center similarity
+        let toCenter = this.centerOfMass.minus(point);
+        let mag = toCenter.mag;
+        let comp = axis.dot(toCenter) / mag;
+        if (mag) return Math.abs(comp);
+        else return 1;
+        
+        
+        //radius comparison
+//        let bound = this.__boundingBox;
+//        let maxRadius = Math.sqrt(bound.width**2+bound.height**2);
+//        let radius = point.minus(this.centerOfMass).mag;
+////        c.draw(cl.WHITE).text("20px Arial",maxRadius+","+radius,point.x,point.y);
+//        return 1 - radius / maxRadius;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     applyImpulse(impulse, name = "no name") {
-        if (!impulse) return;
+        if (!impulse || !impulse.force.mag) return;
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
         // c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
@@ -367,9 +406,8 @@ class PhysicsObject extends SceneObject {
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
-        let ratio = this.getImpulseRatio(impulse);
-        let rat = clamp(1 / ratio, 0, 1);
-        this.velocity.add(impulse.force.times(rat));
+        let ratio = this.getImpulseRatio(impulse.source, impulse.force.get().normalize());
+        this.velocity.add(impulse.force.times(ratio));
     }
     applyAngularImpulse(impulse) {
         if (!impulse) return;
@@ -377,33 +415,24 @@ class PhysicsObject extends SceneObject {
         let startVector = impulse.source.minus(com);
         let endVector = impulse.source.plus(impulse.force).minus(com);
         if (startVector.mag < 0.01) return;
+        let ratio = 1 - this.getImpulseRatio(impulse.source, impulse.force.get().normalize());
         let startAngle = startVector.getAngle();
         let endAngle = endVector.getAngle();
         let difAngle = Geometry.signedAngularDist(startAngle, endAngle);
+        let start = com;
+//        c.stroke(cl.ORANGE).arrow(com, com.plus(startVector.times(100)));
+//        c.stroke(cl.RED).arrow(com, com.plus(endVector.times(100)));
 
-        let dadForce = difAngle * this.getImpulseRatio(impulse);
+        let dadForce = difAngle * ratio;
+//        c.draw(cl.WHITE).text("20px Arial", ratio.toFixed(3), com.x, com.y);
 
         this.angularVelocity += dadForce;
     }
     applyFriction(tangent, collisionPoint, otherFriction) {
-        let pointVel = this.velocity;
-        // let best = tangent.bestFit(pointVel);
-        let push = -tangent.normal.bestFit(pointVel).dot(pointVel);
-        let friction = pointVel.projectOnto(tangent).times(-1).times(clamp(Math.ceil(push), 0, 1));
-        let mag = friction.mag;
-        friction.mag = Math.min(mag, mag * this.friction * otherFriction);
-        let iFL = new Impulse(friction, collisionPoint);
-        this.applyImpulse(iFL);
-
-        // pointVel = Geometry.rotatePointAround(this.centerOfMass, collisionPoint, this.angularVelocity).minus(collisionPoint);
-        pointVel = this.getLinearAngularVelocity(collisionPoint);
-        friction = pointVel.projectOnto(tangent);
-        mag = friction.mag;
-        friction.mag = Math.min(mag, mag * this.friction * otherFriction * 2);
-        let iFA = new Impulse(friction, collisionPoint);
-        this.applyAngularImpulse(iFA);
-        iFA.force.div(5);
-        this.applyLinearImpulse(iFA);
-        // c.stroke(cl.LIME, 2).arrow(collisionPoint, collisionPoint.plus(pointVel.times(100)));
+        let per = this.getImpulseRatio(collisionPoint, tangent);
+        let angular = this.getLinearAngularVelocity(collisionPoint).times(1 - per);
+        let linear = this.velocity.times(per);
+        let friction = linear.plus(angular).projectOnto(tangent).times(-this.friction * otherFriction);
+        this.applyImpulse(new Impulse(friction, collisionPoint));
     }
 }

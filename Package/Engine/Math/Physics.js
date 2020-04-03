@@ -252,6 +252,7 @@ class Physics {
             let [aRange, bRange, edge, intersect] = pairs[0];
             // c.stroke(cl.RED, 4).arrow(a.centerOfMass, a.centerOfMass.plus(edge.times(intersect)));
             leastIntersection = Math.abs(intersect);
+            if (leastIntersection <= 0) return new Collision(false, a, b); //fake collision?
             collisionAxis = edge.times(-Math.sign(intersect));
             if (collisionAxis) {
                 let aPC = [];
@@ -374,7 +375,7 @@ class Physics {
                 let aMove = dir.times(1 * aPer);
                 let bMove = dir.times(-1 * bPer);
 
-                c.stroke(cl.BLUE, 2).arrow(col.collisionPoint, col.collisionPoint.minus(col.dir.times(col.penetration)));
+                // c.stroke(cl.BLUE, 2).arrow(col.collisionPoint, col.collisionPoint.minus(col.dir.times(col.penetration)));
 
                 //like, the escaping
                 a.privateSetX(a.x - aMove.x);
@@ -397,8 +398,8 @@ class Physics {
 
         //friction
         const normal = d.normal.normalize();
-        // a.applyFriction(normal, col.collisionPoint, b.friction);
-        // b.applyFriction(normal, col.collisionPoint, a.friction);
+         a.applyFriction(normal, col.collisionPoint, b.friction);
+         b.applyFriction(normal, col.collisionPoint, a.friction);
 
 
         //impulse resolution
@@ -415,7 +416,7 @@ class Physics {
         }
         for (let pro of b.prohibited) {
             let proj = pro.projectOnto(col.dir);
-            if (proj.dot(col.dir) > 0) {
+            if (proj.dot(col.dir) > 0) { //are these prohibitions relevant to the collision (should they be inherited)
                 a.prohibited.push(proj);
             }
         }
@@ -556,14 +557,25 @@ class Physics {
         const m_B = s_B ? m_A : b.mass; //Mass of B
         const mi_A = 1 / m_A; //Inverse mass of A
         const mi_B = 1 / m_B; //Inverse mass of B
-        const d_A = dir.get(); //Direction A escapes the collision
-        const d_B = s_B ? d_A.times(-1) : dir.times(-1); //Direction B escapes the collision
+        const N = dir.get(); //Collision Axis
+        const d_A = N; //Direction A escapes the collision
+        const d_B = N.times(-1); //Direction B escapes the Collision
+        const p_A = a.getImpulseRatio(collisionPoint, d_A.times(-1));
+        const p_B = b.getImpulseRatio(collisionPoint, d_B.times(-1));
+        
+        // console.log(p_A,p_B);
         const vl_A = a.velocity.get(); //A's Linear Velocity
         const vl_B = b.velocity.get(); //B's Linear Velocity
-        const va_A = a.getLinearAngularVelocity(collisionPoint).over(5); //angular velocity of A
-        const va_B = b.getLinearAngularVelocity(collisionPoint).over(5); //angular velocity of B
-        const v_A = vl_A//.plus(va_A); //A's Velocity
-        const v_B = vl_B//.plus(va_B); //B's Velocity
+        const w_A = a.getLinearAngularVelocity(collisionPoint); //Angular Velocity of A
+        const w_B = b.getLinearAngularVelocity(collisionPoint); //Angular Velocity of B
+        const v_A = vl_A.times(p_A).plus(w_A.times(1 - p_A)) //A's Velocity
+        const v_B = vl_B.times(p_B).plus(w_B.times(1 - p_B)) //B's Velocity
+
+        // console.log(p_A);
+        
+        c.stroke(cl.BLUE, 2).arrow(collisionPoint, collisionPoint.plus(v_A.times(100)));
+        
+        //calculate relative velocities
         let sh_X = 0; //shared x velocity
         let sh_Y = 0; //shared y velocity
         if (Math.abs(v_A.x) < Math.abs(v_B.x)) sh_X = v_A.x * Math.max(Math.sign(v_A.x * v_B.x), 0);
@@ -574,23 +586,23 @@ class Physics {
         v_B.x -= sh_X;
         v_A.y -= sh_Y;
         v_B.y -= sh_Y;
+
+        //impulses
         const vc_A = Math.max(d_A.dot(v_A), 0); //A's velocity towards collision (scalar)
-        const vc_B = Math.max(s_B ? vc_A * (1 - sn_A) : d_B.dot(v_B), 0); //B's velocity towards collision (scalar)
-        const P_A = (v) => Vector.prohibitDirections(a.prohibited, v); //Takes a vector, returns whether A can move that direction
-        const P_B = (v) => Vector.prohibitDirections(b.prohibited, v); //Takes a vector, returns whether B can move that direction
+        
+//        c.stroke(cl.RED, 2).arrow(collisionPoint, collisionPoint.plus(d_A.times(vc_A * 100)));
+        
+        const vc_B = s_B ? vc_A * (1 - sn_A) : d_B.dot(v_B); //B's velocity towards collision (scalar)
         const F_A = d_A.times(vc_A); //Force applied by A in the direction of the collision
         const F_B = d_B.times(vc_B); //Force applied by B in the direction of the collision
         const mr_A = Math.min(1, m_B * mi_A); //Ratio used for calculating how much force should be applied
         const mr_B = Math.min(1, m_A * mi_B); //Ratio used for calculating how much force should be applied
-        const app_A = F_A; //Actual applied force from A
-        const app_B = F_B; //Actual applied force from B
-        const Phb_A = app_B.minus(P_A(app_B)); //Force from B that A cannot accept
-        const Phb_B = app_A.minus(P_B(app_A)); //Force from A that B cannot accept
-        const u_A = d_A.compare(F_A, Phb_B.over(mr_A)); //Which undoing force is greater
-        const u_B = d_B.compare(F_B, Phb_A.over(mr_B)); //Which undoing force is greater
-        const I_A = P_A(F_B.minus(u_A).times(mr_A)); //Impulse applied to A
-        const I_B = P_B(F_A.minus(u_B).times(mr_B)); //Impulse applied to B
-
+        const I_A = F_B.minus(F_A).times(mr_A); //Impulse applied to A
+        const I_B = F_A.minus(F_B).times(mr_B); //Impulse applied to B
+        
+//        c.stroke(cl.GREEN, 2).arrow(collisionPoint, collisionPoint.plus(I_A.times(100)));
+        
+        // console.log(I_A,I_B);
         impulseA = new Impulse(I_A, cC_A);
         impulseB = new Impulse(I_B, cC_B);
         const awayBoth = vc_A < 0 && vc_B < 0;
