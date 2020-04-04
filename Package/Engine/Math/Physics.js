@@ -398,8 +398,8 @@ class Physics {
 
         //friction
         const normal = d.normal.normalize();
-         a.applyFriction(normal, col.collisionPoint, b.friction);
-         b.applyFriction(normal, col.collisionPoint, a.friction);
+        a.applyFriction(normal, col.collisionPoint, b.friction);
+        if (!b.completelyStatic) b.applyFriction(normal, col.collisionPoint, a.friction);
 
 
         //impulse resolution
@@ -543,79 +543,148 @@ class Physics {
         return r.positionStatic || r.rotationStatic || !r.canMoveThisFrame;
     }
     static getImpulses(a, b, dir, collisionPoint) {
+//        let impulseA, impulseB;
+//
+//        const cC_A = collisionPoint; //Point of Collision for A
+//        const cC_B = collisionPoint; //Point of Collision for B
+//        const sn_A = a.snuzzlement; //Velocity lost by A
+//        const sn_B = b.snuzzlement; //Velocity lost by B
+//        const s_A = a.positionStatic; //Is A static
+//        const s_B = b.positionStatic; //Is B static
+//        const com_A = a.centerOfMass; //A's Center of Mass
+//        const com_B = b.centerOfMass; //B's Center of Mass
+//        const m_A = a.mass; //Mass of A
+//        const m_B = s_B ? m_A : b.mass; //Mass of B
+//        const mi_A = 1 / m_A; //Inverse mass of A
+//        const mi_B = 1 / m_B; //Inverse mass of B
+//        const N = dir.get(); //Collision Axis
+//        const d_A = N; //Direction A escapes the collision
+//        const d_B = N.times(-1); //Direction B escapes the Collision
+//        const p_A = a.getImpulseRatio(collisionPoint, d_A.times(-1));
+//        const p_B = b.getImpulseRatio(collisionPoint, d_B.times(-1));
+//        
+//        // console.log(p_A,p_B);
+//        const vl_A = a.velocity.get(); //A's Linear Velocity
+//        const vl_B = b.velocity.get(); //B's Linear Velocity
+//        const w_A = Vector2.origin//a.getLinearAngularVelocity(collisionPoint); //Angular Velocity of A
+//        const w_B = Vector2.origin//b.getLinearAngularVelocity(collisionPoint); //Angular Velocity of B
+//        const v_A = vl_A.plus(w_A); //A's Velocity
+//        const v_B = vl_B.plus(w_B); //B's Velocity
+//
+//        // console.log(p_A);
+//        
+//        c.stroke(cl.BLUE, 2).arrow(collisionPoint, collisionPoint.plus(v_A.times(10)));
+//        
+//        //calculate relative velocities
+//        let sh_X = 0; //shared x velocity
+//        let sh_Y = 0; //shared y velocity
+//        if (Math.abs(v_A.x) < Math.abs(v_B.x)) sh_X = v_A.x * Math.max(Math.sign(v_A.x * v_B.x), 0);
+//        else sh_X = v_B.x * Math.max(Math.sign(v_A.x * v_B.x), 0);
+//        if (Math.abs(v_A.y) < Math.abs(v_B.y)) sh_Y = v_A.y * Math.max(Math.sign(v_A.y * v_B.y), 0);
+//        else sh_Y = v_B.y * Math.max(Math.sign(v_A.y * v_B.y), 0);
+//        v_A.x -= sh_X;
+//        v_B.x -= sh_X;
+//        v_A.y -= sh_Y;
+//        v_B.y -= sh_Y;
+//
+//        //impulses
+//        const vc_A = Math.max(d_A.dot(v_A), 0); //A's velocity towards collision (scalar)
+//        
+//        //percentage of A velocity that will eventually hit a wall.
+//        const prevented = Vector.prohibitDirections(b.prohibited, v_A).dot(d_A) / vc_A;
+////        if (prevented) c.stroke(cl.RED, 2).arrow(collisionPoint, collisionPoint.plus(d_A.times(10 * vc_A * (1 - prevented))));
+//        const vc_B = s_B ? vc_A * (1 - sn_A) : prevented * d_B.dot(v_B) + vc_A * (1 - sn_A) * (1 - prevented); //B's velocity towards collision (scalar)
+//        const F_A = d_A.times(vc_A); //Force applied by A in the direction of the collision
+//        const F_B = d_B.times(vc_B); //Force applied by B in the direction of the collision
+////        console.log(vc_A, vc_B);
+//        const mr_A = Math.min(1, m_B * mi_A) * prevented + (1 - prevented); //Ratio used for calculating how much force should be applied
+//        const mr_B = Math.min(1, m_A * mi_B); //Ratio used for calculating how much force should be applied
+//        const I_A = Vector.prohibitDirections(a.prohibited, F_B.minus(F_A).times(mr_A)); //Impulse applied to A
+//        const I_B = Vector.prohibitDirections(b.prohibited, F_A.minus(F_B).times(mr_B)); //Impulse applied to B
+//        c.draw(cl.RED).text("20px Arial", I_A.mag, collisionPoint.x, collisionPoint.y);
+//        
+////        c.stroke(cl.GREEN, 2).arrow(collisionPoint, collisionPoint.plus(I_A.times(100)));
+//        
+//        // console.log(I_A,I_B);
+//        impulseA = new Impulse(I_A, cC_A);
+//        impulseB = new Impulse(I_B, cC_B);
+//        const awayBoth = vc_A < 0 && vc_B < 0;
+//        const awayA = -vc_A > vc_B;
+//        const awayB = -vc_B > vc_A;
+//        if (awayBoth || awayA || awayB) {
+//            impulseA = null;
+//            impulseB = null;
+//        }
+//        if (I_B.dot(d_B) > 0) impulseB = null;
+//        if (I_A.dot(d_A) > 0) impulseA = null;
+//
+//        if (b.completelyStatic) impulseB = null;
+//        return { impulseA, impulseB };
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+//        a.rotationStatic = true;
+//        b.rotationStatic = true;
+        //cheating
         let impulseA, impulseB;
-
-        const cC_A = collisionPoint; //Point of Collision for A
-        const cC_B = collisionPoint; //Point of Collision for B
-        const sn_A = a.snuzzlement; //Velocity lost by A
-        const sn_B = b.snuzzlement; //Velocity lost by B
-        const s_A = a.positionStatic; //Is A static
-        const s_B = b.positionStatic; //Is B static
-        const com_A = a.centerOfMass; //A's Center of Mass
-        const com_B = b.centerOfMass; //B's Center of Mass
-        const m_A = a.mass; //Mass of A
-        const m_B = s_B ? m_A : b.mass; //Mass of B
-        const mi_A = 1 / m_A; //Inverse mass of A
-        const mi_B = 1 / m_B; //Inverse mass of B
-        const N = dir.get(); //Collision Axis
-        const d_A = N; //Direction A escapes the collision
-        const d_B = N.times(-1); //Direction B escapes the Collision
-        const p_A = a.getImpulseRatio(collisionPoint, d_A.times(-1));
-        const p_B = b.getImpulseRatio(collisionPoint, d_B.times(-1));
         
-        // console.log(p_A,p_B);
-        const vl_A = a.velocity.get(); //A's Linear Velocity
-        const vl_B = b.velocity.get(); //B's Linear Velocity
-        const w_A = a.getLinearAngularVelocity(collisionPoint); //Angular Velocity of A
-        const w_B = b.getLinearAngularVelocity(collisionPoint); //Angular Velocity of B
-        const v_A = vl_A.times(p_A).plus(w_A.times(1 - p_A)) //A's Velocity
-        const v_B = vl_B.times(p_B).plus(w_B.times(1 - p_B)) //B's Velocity
-
-        // console.log(p_A);
+        const m_A = a.__mass;
+        const m_B = b.__mass;
+        const v_A = a.getPointVelocity(collisionPoint);
+        const v_B = b.getPointVelocity(collisionPoint);
+        const v_AB = v_B.minus(v_A);
+        const n = dir;
+        if (v_AB.dot(n) > 0) return { impulseA: null, impulseB: null }; //going away
+        const e = Math.max(1 - a.snuzzlement, 1 - b.snuzzlement);
+        //v_AB dot n = (v_B - v_A) dot n;
         
-        c.stroke(cl.BLUE, 2).arrow(collisionPoint, collisionPoint.plus(v_A.times(100)));
+        const j_DYNAMIC = v_AB.times(-(1 + e)).dot(n) / (1 / m_A + 1 / m_B);
+        const j_STATIC_A = v_A.dot(n) * m_A; //just for walls
+        const j_STATIC_B = v_B.dot(n) * m_B;  //just for walls
+        const PER_A = b.positionStatic ? 0 : Vector.prohibitDirections(b.prohibited, v_A).dot(n) / v_A.dot(n);  //just for walls (measures how wall it is on a scale of 0 - 1)
+        const PER_B = a.positionStatic ? 0 : Vector.prohibitDirections(a.prohibited, v_B).dot(n) / v_B.dot(n);  //just for walls
+        const j_A = j_DYNAMIC * PER_A + j_STATIC_A * (1 - PER_A);
+        const j_B = j_DYNAMIC * PER_B + j_STATIC_B * (1 - PER_B);
+//        c.stroke(cl.RED, 4).arrow(collisionPoint, collisionPoint.plus(n.times(j_A)));
+//        c.stroke(cl.BLUE, 4).arrow(collisionPoint, collisionPoint.plus(n.times(-j_B)));
+        const I_A = n.times(-j_A).over(m_A);
+        const I_B = n.times(j_B).over(m_B);
         
-        //calculate relative velocities
-        let sh_X = 0; //shared x velocity
-        let sh_Y = 0; //shared y velocity
-        if (Math.abs(v_A.x) < Math.abs(v_B.x)) sh_X = v_A.x * Math.max(Math.sign(v_A.x * v_B.x), 0);
-        else sh_X = v_B.x * Math.max(Math.sign(v_A.x * v_B.x), 0);
-        if (Math.abs(v_A.y) < Math.abs(v_B.y)) sh_Y = v_A.y * Math.max(Math.sign(v_A.y * v_B.y), 0);
-        else sh_Y = v_B.y * Math.max(Math.sign(v_A.y * v_B.y), 0);
-        v_A.x -= sh_X;
-        v_B.x -= sh_X;
-        v_A.y -= sh_Y;
-        v_B.y -= sh_Y;
-
-        //impulses
-        const vc_A = Math.max(d_A.dot(v_A), 0); //A's velocity towards collision (scalar)
+        impulseA = new Impulse(I_A, collisionPoint);
+        impulseB = new Impulse(I_B, collisionPoint);
         
-//        c.stroke(cl.RED, 2).arrow(collisionPoint, collisionPoint.plus(d_A.times(vc_A * 100)));
         
-        const vc_B = s_B ? vc_A * (1 - sn_A) : d_B.dot(v_B); //B's velocity towards collision (scalar)
-        const F_A = d_A.times(vc_A); //Force applied by A in the direction of the collision
-        const F_B = d_B.times(vc_B); //Force applied by B in the direction of the collision
-        const mr_A = Math.min(1, m_B * mi_A); //Ratio used for calculating how much force should be applied
-        const mr_B = Math.min(1, m_A * mi_B); //Ratio used for calculating how much force should be applied
-        const I_A = F_B.minus(F_A).times(mr_A); //Impulse applied to A
-        const I_B = F_A.minus(F_B).times(mr_B); //Impulse applied to B
         
-//        c.stroke(cl.GREEN, 2).arrow(collisionPoint, collisionPoint.plus(I_A.times(100)));
-        
-        // console.log(I_A,I_B);
-        impulseA = new Impulse(I_A, cC_A);
-        impulseB = new Impulse(I_B, cC_B);
-        const awayBoth = vc_A < 0 && vc_B < 0;
-        const awayA = -vc_A > vc_B;
-        const awayB = -vc_B > vc_A;
-        if (awayBoth || awayA || awayB) {
-            impulseA = null;
-            impulseB = null;
-        }
-        if (I_B.dot(d_B) > 0) impulseB = null;
-        if (I_A.dot(d_A) > 0) impulseA = null;
-
-        if (b.completelyStatic) impulseB = null;
         return { impulseA, impulseB };
     }
 }

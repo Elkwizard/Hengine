@@ -186,10 +186,10 @@ class PhysicsObject extends SceneObject {
         c.rotate(rot);
         c.translate(com.times(-1));
     }
-    getLinearAngularVelocity(point) {
+    getPointVelocity(point) {
         let r_A = point.minus(this.centerOfMass);
         let v_A = this.angularVelocity;
-        return r_A.normal.times(v_A);
+        return r_A.normal.times(v_A).plus(this.velocity);
     }
     slowDown() {
         //apply linear drag;
@@ -336,67 +336,14 @@ class PhysicsObject extends SceneObject {
             this.moveAwayFrom(point, ferocity);
         });
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    //it's barkin' *bark* *bark*
     getImpulseRatio(point, axis) {
-        //one
-//        return 1;
-        
-        
-        //average
-//        return 0.5;
-        
-        
-        //to center similarity
-        let toCenter = this.centerOfMass.minus(point);
-        let mag = toCenter.mag;
-        let comp = axis.dot(toCenter) / mag;
-        if (mag) return Math.abs(comp);
-        else return 1;
-        
-        
-        //radius comparison
-//        let bound = this.__boundingBox;
-//        let maxRadius = Math.sqrt(bound.width**2+bound.height**2);
-//        let radius = point.minus(this.centerOfMass).mag;
-////        c.draw(cl.WHITE).text("20px Arial",maxRadius+","+radius,point.x,point.y);
-//        return 1 - radius / maxRadius;
+        let r_N = point.minus(this.centerOfMass).normal;
+        let r = r_N.mag;
+        if (r < 0.01) return 1;
+        let I = axis;
+        let proj = I.projectOnto(r_N);
+        return 1 - proj.mag / I.mag;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     applyImpulse(impulse, name = "no name") {
         if (!impulse || !impulse.force.mag) return;
         this.applyLinearImpulse(impulse);
@@ -406,33 +353,24 @@ class PhysicsObject extends SceneObject {
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
-        let ratio = this.getImpulseRatio(impulse.source, impulse.force.get().normalize());
+        let ratio = this.getImpulseRatio(impulse.source, impulse.force);
         this.velocity.add(impulse.force.times(ratio));
     }
     applyAngularImpulse(impulse) {
         if (!impulse) return;
-        let com = this.centerOfMass;
-        let startVector = impulse.source.minus(com);
-        let endVector = impulse.source.plus(impulse.force).minus(com);
-        if (startVector.mag < 0.01) return;
-        let ratio = 1 - this.getImpulseRatio(impulse.source, impulse.force.get().normalize());
-        let startAngle = startVector.getAngle();
-        let endAngle = endVector.getAngle();
-        let difAngle = Geometry.signedAngularDist(startAngle, endAngle);
-        let start = com;
-//        c.stroke(cl.ORANGE).arrow(com, com.plus(startVector.times(100)));
-//        c.stroke(cl.RED).arrow(com, com.plus(endVector.times(100)));
-
-        let dadForce = difAngle * ratio;
-//        c.draw(cl.WHITE).text("20px Arial", ratio.toFixed(3), com.x, com.y);
-
-        this.angularVelocity += dadForce;
+        let r_N = impulse.source.minus(this.centerOfMass).normal;
+        let r = r_N.mag;
+        if (r < 0.01) return;
+        let I = impulse.force;
+        let proj = I.projectOnto(r_N);
+        let sign = Math.sign(proj.dot(r_N));
+        let v_theta = r ? sign * (proj.mag / r) : 0;
+        this.angularVelocity += v_theta;
     }
     applyFriction(tangent, collisionPoint, otherFriction) {
-        let per = this.getImpulseRatio(collisionPoint, tangent);
-        let angular = this.getLinearAngularVelocity(collisionPoint).times(1 - per);
-        let linear = this.velocity.times(per);
-        let friction = linear.plus(angular).projectOnto(tangent).times(-this.friction * otherFriction);
-        this.applyImpulse(new Impulse(friction, collisionPoint));
+        let friction = this.getPointVelocity(collisionPoint).projectOnto(tangent).times(-0.05);//.times(-this.friction * otherFriction * 2);
+        c.stroke(cl.LIME, 1).arrow(collisionPoint, collisionPoint.plus(friction));
+        this.applyLinearImpulse(new Impulse(friction.over(2), collisionPoint));
+        this.applyAngularImpulse(new Impulse(friction.over(2), collisionPoint));
     }
 }

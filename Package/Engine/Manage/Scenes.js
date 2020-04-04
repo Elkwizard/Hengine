@@ -687,12 +687,12 @@ class Scene extends InactiveScene {
 			}
 
 			// //prohibited direction render
-			// this.drawInWorldSpace(e => {
-			// 	for (let i = 0; i < useful.length; i++) {
-			// 		let rect = useful[i][0];
-			// 		for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
-			// 	}
-			// });
+//			 this.drawInWorldSpace(e => {
+//			 	for (let i = 0; i < useful.length; i++) {
+//			 		let rect = useful[i][0];
+//			 		for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
+//			 	}
+//			 });
 
 			//custom updates run
 			for (let usef of useful) {
@@ -700,15 +700,15 @@ class Scene extends InactiveScene {
 				rect.enginePhysicsUpdate();
 			}
 
-			//update order render
-			// this.drawInWorldSpace(e => {
-			// 	for (let i = 0; i < useful.length; i++) {
-			// 		let other = useful[i][0];
-			// 		let x = other.middle.x;
-			// 		let y = other.middle.y;
-			// 		c.draw(cl.RED).text("10px Arial", "#" + (i + 1), x, y);
-			// 	}
-			// });
+//			update order render
+//			 this.drawInWorldSpace(e => {
+//			 	for (let i = 0; i < useful.length; i++) {
+//			 		let other = useful[i][0];
+//			 		let x = other.middle.x;
+//			 		let y = other.middle.y;
+//			 		c.draw(cl.RED).text("10px Arial", "#" + (i + 1), x, y);
+//			 	}
+//			 });
 
 
 			//non collision fixed update

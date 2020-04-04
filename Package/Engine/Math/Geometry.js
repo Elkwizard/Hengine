@@ -402,4 +402,3 @@ class Geometry {
 }
 Geometry.displayRaymarch = false;
 Geometry.maxRayMarchSteps = 50;
-const π = Math.PI;
