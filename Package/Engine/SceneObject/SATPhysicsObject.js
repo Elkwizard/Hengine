@@ -44,14 +44,6 @@ class PhysicsObject extends SceneObject {
             left: function () { },
             right: function () { }
         };
-        for (let x in this.response.collide) {
-            let cap = x[0].toUpperCase() + x.slice(1);
-            this["scriptCollide" + cap] = function (e) {
-                for (let m of this.scripts) {
-                    m["scriptCollide" + cap](m, e);
-                }
-            }
-        }
         this.allCollidingWith = {
             includes: function (name) {
                 for (let x in this) {
@@ -189,14 +181,14 @@ class PhysicsObject extends SceneObject {
     getPointVelocity(point) {
         let r_A = point.minus(this.centerOfMass);
         let v_A = this.angularVelocity;
-        return r_A.normal.times(v_A).plus(this.velocity);
+        let sum = r_A.normal.times(v_A).plus(this.velocity);
+        return sum;
     }
     slowDown() {
         //apply linear drag;
         let drag = this.velocity.get().mul(-(1 - this.linearDragForce));
         let iD = new Impulse(drag, this.centerOfMass);
-         this.applyImpulse(iD);
-         this.angularVelocity *= this.angularDragForce;
+        this.applyImpulse(iD);
 
         if (this.velocity.mag < 0.01) this.velocity.mag = 0;
         if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
@@ -213,6 +205,12 @@ class PhysicsObject extends SceneObject {
     privateSetY(y) {
         if (!this.positionStatic) {
             this.y = y;
+        }
+    }
+    privateMove(v) {
+        if (!this.positionStatic) {
+            this.x += v.x;
+            this.y += v.y;
         }
     }
     privateSetRotation(a) {
@@ -237,7 +235,10 @@ class PhysicsObject extends SceneObject {
                                     this.colliding.general.push(other);
                                     other.colliding.general.push(this);
                                     if (this.canCollide && other.canCollide) {
-                                        for (let collision of col) Physics.resolve(collision);
+                                        for (let collision of col) {
+                                            let resolution = Physics.resolve(collision);
+                                            if (resolution.a.position.move) Physics.resolveResults(resolution);
+                                        }
                                     }
                                 }
                             }
@@ -261,17 +262,18 @@ class PhysicsObject extends SceneObject {
         });
         let collisions;
         if (!this.completelyStatic) collisions = this.detectCollisions(others);
-        if (!this.completelyStatic) {
-            for (let col of collisions) {
-                Physics.resolve(col);
-            }
-        }
+//        if (!this.completelyStatic) {
+//                console.log(collisions);
+//            for (let col of collisions) {
+//                Physics.resolveResults(Physics.resolve(col));
+//            }
+//        }
     }
     getSpeedModulation() {
         return this.home.speedModulation / this.home.physicsRealism;
     }
     enginePhysicsUpdate() {
-        this.scriptUpdate();
+        this.scripts.run("update");
         this.update();
     }
     applyGravity(coef = 1) {
@@ -342,7 +344,9 @@ class PhysicsObject extends SceneObject {
         if (r < 0.01) return 1;
         let I = axis;
         let proj = I.projectOnto(r_N);
-        return 1 - proj.mag / I.mag;
+        let pMag = proj.mag;
+        if (!pMag) return 1;
+        return 1 - pMag / I.mag;
     }
     applyImpulse(impulse, name = "no name") {
         if (!impulse || !impulse.force.mag) return;
@@ -358,19 +362,13 @@ class PhysicsObject extends SceneObject {
     }
     applyAngularImpulse(impulse) {
         if (!impulse) return;
-        let r_N = impulse.source.minus(this.centerOfMass).normal;
-        let r = r_N.mag;
-        if (r < 0.01) return;
+        let r = impulse.source.minus(this.centerOfMass);
+        if (!r.x && !r.y && r.x + r.y < 0.01) return;
+        let r_N = r.normal;
         let I = impulse.force;
         let proj = I.projectOnto(r_N);
         let sign = Math.sign(proj.dot(r_N));
-        let v_theta = r ? sign * (proj.mag / r) : 0;
+        let v_theta = sign * Math.sqrt((proj.x ** 2 + proj.y ** 2) / (r.x ** 2 + r.y ** 2));
         this.angularVelocity += v_theta;
-    }
-    applyFriction(tangent, collisionPoint, otherFriction) {
-        let friction = this.getPointVelocity(collisionPoint).projectOnto(tangent).times(-0.05);//.times(-this.friction * otherFriction * 2);
-        c.stroke(cl.LIME, 1).arrow(collisionPoint, collisionPoint.plus(friction));
-        this.applyLinearImpulse(new Impulse(friction.over(2), collisionPoint));
-        this.applyAngularImpulse(new Impulse(friction.over(2), collisionPoint));
     }
 }

@@ -64,7 +64,6 @@ class InactiveScene {
 		this.containsArray = [];
 		this.custom = {};
 		this.templates = {};
-		this.hasRotatedRectangles = false;
 		this.angularDragForce = .995;
 		this.linearDragForce = .995;
 		this.frictionDragForce = 0.2;
@@ -534,9 +533,7 @@ class Scene extends InactiveScene {
 			for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.click(adjusted);
 				let m = this.get(o);
-				for (let script of m.scripts) {
-					script.scriptClick(script, adjusted);
-				}
+				m.scripts.run("click", adjusted);
 			}
 		}.bind(this);
 		M.engineRightClick = function (e) {
@@ -544,9 +541,7 @@ class Scene extends InactiveScene {
 			for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.rightClick(adjusted);
 				let m = this.get(o);
-				for (let script of m.scripts) {
-					script.scriptRightClick(script, adjusted);
-				}
+				m.scripts.run("rightClick", adjusted);
 			}
 		}.bind(this);
 		M.engineMove = function (e) {
@@ -556,9 +551,7 @@ class Scene extends InactiveScene {
 				if (!o.hovered) {
 					o.response.hover(adjusted);
 					let m = this.get(o);
-					for (let script of m.scripts) {
-						script.scriptHover(script, adjusted);
-					}
+					m.scripts.run("hover", adjusted);
 				}
 				o.hovered = true;
 			}
@@ -619,86 +612,94 @@ class Scene extends InactiveScene {
 			q.push(x);
 		}
 		for (let rect of this.containsArray) rect.pushToRemoveQueue = p;
-		if (!this.hasRotatedRectangles) for (let rect of this.containsArray) rect.enginePhysicsUpdate(this.containsArray);
-		else {
-			//grid
-			let cells = {};
-			let isUseless = a => !(a instanceof PhysicsObject) || (a instanceof ParticleObject);
-			let useful = [];
-			let useless = [];
+        //grid
+        let cells = {};
+        let isUseless = a => !(a instanceof PhysicsObject) || (a instanceof ParticleObject);
+        let useful = [];
+        let useless = [];
 
-			//custom before updates run
-			for (let el of this.containsArray) {
-				el.scriptBeforeUpdate();
-			}
+        
+        //custom before updates run
+        for (let el of this.containsArray) {
+            el.scripts.run("beforeUpdate");
+        }
 
-			let sortedEls = this.containsArray;
-			for (let rect of sortedEls) {
-				if (isUseless(rect)) {
-					useless.push(rect);
-					continue;
-				} else useful.push([rect]);
-			}
-			for (let usef of useful) {
-				let rect = usef[0];
-				let cls = Physics.getCells(rect, this.cellSize);
-				for (let cl of cls) {
-					let key = cl.x + "," + cl.y;
-					if (cells[key]) cells[key].push(rect);
-					else cells[key] = [rect];
-					let use = usef;
-					use.push(cells[key]);
-				}
-			}
-			for (let usef of useful) {
-				//get rectangles
-				let [rect, ...updateCells] = usef;
-				let updater = [];
-				if (!rect.completelyStatic) for (let cell of updateCells) {
-					for (let r of cell) {
-						if (r !== rect && !updater.includes(r)) updater.push(r);
-					}
-				}
-				usef.push(updater);
-			}
-			useful = [...(new Set(useful))];
-			const dir = this.gravity.get().normalize();
-			useful = useful.sort(function (a, b) {
-				let mA = Vector2.fromPoint(a[0]);
-				let mB = Vector2.fromPoint(b[0]);
-				let dA = mA.dot(dir);
-				let dB = mB.dot(dir);
-				return dB - dA;
-			});
-			//gravity phase
-			for (let el of useful) {
-				let rect = el[0];
-				rect.applyGravity(1);
-			}
-			//collision phase
-			for (let i = 0; i < useful.length; i++) {
-				let rect = useful[i][0];
-				let updater = useful[i][useful[i].length - 1];
+        let sortedEls = this.containsArray;
+        for (let rect of sortedEls) {
+            if (isUseless(rect)) {
+                useless.push(rect);
+                continue;
+            } else useful.push([rect]);
+        }
+        for (let usef of useful) {
+            let rect = usef[0];
+            let cls = Physics.getCells(rect, this.cellSize);
+            for (let cl of cls) {
+                let key = cl.x + "," + cl.y;
+                if (cells[key]) cells[key].push(rect);
+                else cells[key] = [rect];
+                let use = usef;
+                use.push(cells[key]);
+            }
+        }
+        for (let usef of useful) {
+            //get rectangles
+            let [rect, ...updateCells] = usef;
+            let updater = [];
+            if (!rect.completelyStatic) for (let cell of updateCells) {
+                for (let r of cell) {
+                    if (r !== rect && !updater.includes(r)) updater.push(r);
+                }
+            }
+            usef.push(updater);
+        }
+        useful = [...(new Set(useful))];
+        const dir = this.gravity.get().normalize();
+        useful = useful.sort(function (a, b) {
+            let mA = Vector2.fromPoint(a[0]);
+            let mB = Vector2.fromPoint(b[0]);
+            let dA = mA.dot(dir);
+            let dB = mB.dot(dir);
+            return dB - dA;
+        });
+        //gravity phase
+        for (let el of useful) {
+            let rect = el[0];
+            rect.applyGravity(1);
+        }
+        //collision phase
+        for (let i = 0; i < useful.length; i++) {
+            let rect = useful[i][0];
+            let updater = useful[i][useful[i].length - 1];
 
-				this.SAT.gridChecks += updater.length;
-				this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
-				if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
-				rect.physicsUpdate(updater);
-			}
+            this.SAT.gridChecks += updater.length;
+            this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
+            if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
+            rect.physicsUpdate(updater);
+        }
+        //collision phase
+        for (let i = useful.length - 1; i > 0; i--) {
+            let rect = useful[i][0];
+            let updater = useful[i][useful[i].length - 1];
 
-			// //prohibited direction render
-//			 this.drawInWorldSpace(e => {
-//			 	for (let i = 0; i < useful.length; i++) {
-//			 		let rect = useful[i][0];
-//			 		for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
-//			 	}
-//			 });
+            this.SAT.gridChecks += updater.length;
+            this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
+            rect.physicsUpdate(updater);
+        }
 
-			//custom updates run
-			for (let usef of useful) {
-				let rect = usef[0];
-				rect.enginePhysicsUpdate();
-			}
+        //prohibited direction render
+        this.drawInWorldSpace(e => {
+            for (let i = 0; i < useful.length; i++) {
+                let rect = useful[i][0];
+                for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
+            }
+        });
+
+        //custom updates run
+        for (let usef of useful) {
+            let rect = usef[0];
+            rect.enginePhysicsUpdate();
+        }
 
 //			update order render
 //			 this.drawInWorldSpace(e => {
@@ -711,25 +712,24 @@ class Scene extends InactiveScene {
 //			 });
 
 
-			//non collision fixed update
-			for (let rect of useless) {
-				if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
-				rect.enginePhysicsUpdate();
-			}
+        //non collision fixed update
+        for (let rect of useless) {
+            if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
+            rect.enginePhysicsUpdate();
+        }
 
-			// // show cells
-			// this.drawInWorldSpace(e => {
-			// 	for (let [key, cell] of cells) {
-			// 		let x = parseInt(key.split(",")[0]) * this.cellSize;
-			// 		let y = parseInt(key.split(",")[1]) * this.cellSize;
-			// 		let r = new Rect(x, y, this.cellSize, this.cellSize);
-			// 		c.stroke(cl.RED, 3).rect(r);
-			// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
-			// 		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
-			// 		c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
-			// 	}
-			// });
-		}
+//         // show cells
+//         this.drawInWorldSpace(e => {
+//         	for (let [key, cell] of cells) {
+//         		let x = parseInt(key.split(",")[0]) * this.cellSize;
+//         		let y = parseInt(key.split(",")[1]) * this.cellSize;
+//         		let r = new Rect(x, y, this.cellSize, this.cellSize);
+//         		c.stroke(cl.RED, 3).rect(r);
+//         		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
+//         		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
+//         		c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
+//         	}
+//         });
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
 		for (let rect of this.containsArray) rect.isBeingUpdated = false;

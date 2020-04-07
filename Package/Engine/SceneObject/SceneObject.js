@@ -238,26 +238,6 @@ class SceneObject {
 		this.x = p.x;
 		this.y = p.y;
 	}
-	scriptUpdate() {
-		for (let m of this.scripts) {
-			m.scriptUpdate(m);
-		}
-	}
-	scriptBeforeUpdate() {
-		for (let m of this.scripts) {
-			m.scriptBeforeUpdate(m);
-		}
-	}
-	scriptDraw(name, shape) {
-		for (let m of this.scripts) {
-			m.scriptDraw(m, name, shape);
-		}
-	}
-	scriptEscapeDraw(name, shape) {
-		for (let m of this.scripts) {
-			m.scriptEscapeDraw(m, name, shape);
-		}
-	}
 	logMod(func) {
 		this.log.push(func);
 	}
@@ -280,7 +260,7 @@ class SceneObject {
 			c.translate(sMiddle);
 			c.rotate(shape.rotation);
 			c.translate(sMiddle.times(-1));
-			this.scriptDraw(name, shape);
+			this.scripts.run("draw", name, shape);
 			this.draw(name, shape);
 			c.restore();
 		}
@@ -295,14 +275,14 @@ class SceneObject {
 		//bound visual
 		// c.stroke(cl.GREEN, 1).rect(this.__boundingBox);
 		// for (let shape of this.getShapes()) c.stroke(cl.GREEN, 1).rect(shape.__boundingBox);
-		this.scriptEscapeDraw();
+		this.scripts.run("escapeDraw");
 	}
 	enginePhysicsUpdate(hitboxes) {
 		if (this.controls) {
 			this.move();
 		}
 		this.update();
-		this.scriptUpdate();
+		this.scripts.run("update");
 		this.cacheBoundingBoxes();
 	}
 	pushToRemoveQueue(x) {

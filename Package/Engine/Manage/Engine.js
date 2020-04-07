@@ -19,7 +19,7 @@ Number.prototype.movedTowards = function (value, ferocity) {
 	return this + dir;
 }
 String.prototype.capitalize = function() {
-	return this[0].toUpperCase() + this.slice(1).toLowerCase();
+	return this[0].toUpperCase() + this.slice(1);
 }
 Object.prototype.toString = function (depth = 0) {
 	if (depth < 1) {

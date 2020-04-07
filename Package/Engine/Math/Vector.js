@@ -139,11 +139,13 @@ class Vector {
 	}
     static prohibitDirections(proDirs, dir) {
         let remove = [];
+        let mag = dir.mag;
         for (let proDir of proDirs) {
-            let proj = proDir.projectOnto(dir);
-			if (proj.dot(dir) < 0) proj.mul(0);
-			else proj.mul(dir.mag);
-            remove.push(proj);
+            let dot = proDir.dot(dir);
+            if (dot > 0) {
+                let bad = dir.times(dot / mag);
+                remove.push(bad);
+            }
         }
 		let wrong = remove.length? Vector.sum(...remove).over(remove.length) : new dir.constructor(0, 0, 0, 0);
         return dir.minus(wrong);
@@ -165,11 +167,7 @@ class Vector2 extends Vector {
 	constructor(x, y) {
 		super();
 		this.x = x;
-		if (y !== undefined) {
-			this.y = y;
-		} else {
-			this.y = x;
-		}
+		this.y = y;
 	}
 	static get origin() {
 		return new Vector2(0, 0);
@@ -185,6 +183,26 @@ class Vector2 extends Vector {
 	static fromPoint(p) {
 		return new Vector2(p.x, p.y);
 	}
+    op(e, v) {
+		if (typeof v === "number") {
+			this.x = e(this.x, v);
+            this.y = e(this.y, v);
+		} else {
+			this.x = e(this.x, v.x);
+            this.y = e(this.y, v.y);
+		}
+		return this;
+	}
+    dot(v) {
+        return this.x * v.x + this.y * v.y;
+    }
+    projectOnto(v) {
+        let u = this;
+        let dot = u.x * v.x + u.y * v.y;
+        let mag2 = v.x ** 2 + v.y ** 2;
+        let k = dot / mag2;
+        return new Vector2(v.x * k, v.y * k);
+    }
 	getAngle() {
 		return Math.atan2(this.y, this.x);
 	}

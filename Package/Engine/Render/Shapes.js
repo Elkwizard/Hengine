@@ -119,9 +119,13 @@ class Polygon extends Shape {
 	}
 	getModel(pos, rot) {
 		let middle = this.middle;
-		let verts = this.getCorners()
-			.map(e => Geometry.rotatePointAround(middle, e, this.rotation))
-			.map(e => Geometry.rotatePointAround(pos, e.plus(pos), rot));
+        let rotation = this.rotation;
+		let verts;
+        if (rotation) verts = this.getCorners()
+			.map(e => Geometry.rotatePointAround(middle, e, rotation));
+        else verts = this.getCorners();
+        verts = verts
+            .map(e => Geometry.rotatePointAround(pos, e.plus(pos), rot));
 		return new Polygon(verts);
 	}
 	getCorners() {

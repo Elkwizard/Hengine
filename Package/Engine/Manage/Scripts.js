@@ -30,72 +30,49 @@ class Script {
 			}
 		};
 		if (bindTo === undefined) bindTo = obj;
+        let flags = [
+            ["update"],
+            ["draw"],
+            ["escape", "draw"],
+            ["before", "update"],
+            ["collide", "rule"],
+            ["collide", "general"],
+            ["collide", "top"],
+            ["collide", "bottom"],
+            ["collide", "left"],
+            ["collide", "right"],
+            ["click"],
+            ["right", "click"],
+            ["hover"],
+        ]
 		let local = obj[this.name];
-		local.scriptNumber = 1;
-		local.scriptUpdate = (l, e) => e;
-		local.scriptBeforeUpdate = (l, e) => e;
-		local.scriptDraw = (l, e) => e;
-		local.scriptEscapeDraw = (l, e) => e;
-		local.scriptCollideTop = (l, e) => e;
-		local.scriptCollideLeft = (l, e) => e;
-		local.scriptCollideRight = (l, e) => e;
-		local.scriptCollideBottom = (l, e) => e;
-		local.scriptCollideGeneral = (l, e) => e;
-		local.scriptClick = (l, e) => e;
-		local.scriptRightClick = (l, e) => e;
-		local.scriptHover = (l, e) => e;
-		local.scriptCollideRule = (l, e) => e;
-		for (let x in this.methods) {
-			let flag = this.methods[x].flag.toLowerCase();
-			if (flag === "init") {
-				this.methods[x].bind(bindTo)(local, ...args);
-			}
-			else if (flag === "update") {
-				local.scriptUpdate = local.scriptUpdate.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "before_update" || flag === "beforeupdate" || flag === "before-update") {
-				local.scriptBeforeUpdate = local.scriptBeforeUpdate.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "draw") {
-				local.scriptDraw = local.scriptDraw.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "escapedraw" || flag === "escape-drag" || flag === "escape_draw") {
-				local.scriptEscapeDraw = local.scriptEscapeDraw.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "collide-general" || flag === "collide_general" || flag === "collidegeneral") {
-				local.scriptCollideGeneral = local.scriptCollideGeneral.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "collide-top" || flag === "collide_top" || flag === "collidetop") {
-				local.scriptCollideTop = local.scriptCollideTop.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "collide-bottom" || flag === "collide_bottom" || flag === "collidebottom") {
-				local.scriptCollideBottom = local.scriptCollideBottom.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "collide-left" || flag === "collide_left" || flag === "collideleft") {
-				local.scriptCollideLeft = local.scriptCollideLeft.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "collide-right" || flag === "collide_right" || flag === "collideright") {
-				local.scriptCollideRight = local.scriptCollideRight.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "onrightclick" || flag === "on_right_click" || flag === "right_click") {
-				local.scriptRightClick = local.scriptRightClick.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "onclick" || flag === "on_click" || flag === "click") {
-				local.scriptClick = local.scriptClick.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "onhover" || flag === "on_hover" || flag === "hover") {
-				local.scriptHover = local.scriptHover.add(this.methods[x].bind(bindTo));
-			}
-			else if (flag === "collide-rule" || flag === "collide_rule" || flag === "colliderule") {
-				local.scriptCollideRule = local.scriptCollideRule.add(this.methods[x].bind(bindTo));
-			}
-			else {
-				local[x] = function (...params) {
-					return this.methods[x].bind(bindTo)(local, ...params);
-				}.bind(this);
-				local[x].flag = flag;
-			}
-		}
+        local.scriptNumber = 0;
+        for (let flag of flags) {
+            let result = "script" + flag.map(e => e.capitalize()).join("");
+            local[result] = function (l, e) {  };
+        }
+        for (let m in this.methods) {
+            let name = m.toLowerCase();
+            let fn = this.methods[m].bind(bindTo);
+            let found = false;
+            for (let flag of flags) {
+                if (name === flag.join("") || name === flag.join("_") || name === flag.join("-")) {
+                    let key = "script" + flag.map(e => e.capitalize()).join("");
+                    local[key] = local[key].add(fn);
+                    found = true;
+                }
+            }
+            if (!found) {
+                if (name === "init" || name === "start") {
+                    fn(local, ...args);
+                } else {
+                    local[m] = function (...params) {
+                        return fn(local, ...params);
+                    };
+                    local[m].flag = flag;
+                }
+            }
+        }
 		return this;
 	}
 	addTo(obj, ...args) {
@@ -133,6 +110,15 @@ class ScriptContainer {
 			}
 		};
 	}
+    run(str, ...args) {
+        try {
+            for (let m of this) {
+                m["script" + str.capitalize()](m, ...args);
+            }
+        } catch (e) {
+            console.warn("script method not found: " + str);
+        }
+    }
 }
 //presets
 const PLAYER_MOVEMENT = new ElementScript("movement", {
