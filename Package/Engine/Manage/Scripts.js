@@ -116,7 +116,7 @@ class ScriptContainer {
                 m["script" + str.capitalize()](m, ...args);
             }
         } catch (e) {
-            console.warn("script method not found: " + str);
+            console.warn("script method not found: " + str + " on [" +  args.join(", ") + "]");
         }
     }
 }

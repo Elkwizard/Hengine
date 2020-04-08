@@ -653,8 +653,8 @@ class Physics {
         //v_AB dot n = (v_B - v_A) dot n;
         
         const j_DYNAMIC = v_AB.times(-(1 + e)).dot(n) / (1 / m_A + 1 / m_B);
-        const j_STATIC_A = v_A.dot(n) * m_A; //just for walls
-        const j_STATIC_B = v_B.dot(n) * m_B;  //just for walls
+        const j_STATIC_A = v_A.dot(n) * (1 + e) * m_A; //just for walls
+        const j_STATIC_B = v_B.dot(n) * (1 + e) * m_B;  //just for walls
         const V_A_DOT_N = v_A.dot(n);
         const V_B_DOT_N = v_B.dot(n);
         let PER_A = b.completelyStatic ? 0 : Vector.prohibitDirections(b.prohibited, v_A).dot(n) / V_A_DOT_N;  //just for walls (measures how wall it is on a scale of 0 - 1)
