@@ -8,6 +8,16 @@ class Collision {
         this.collisionPoint = collisionPoint;
     }
 }
+class Resolution {
+    constructor(a, b, dir, movement, impulses, friction) {
+        this.a = a;
+        this.b = b;
+        this.dir = dir;
+        this.movement = movement;
+        this.impulses = impulses;
+        this.friction = friction;
+    }
+}
 class CollisionMoniter {
     constructor() {
         this.top = null;
@@ -360,50 +370,61 @@ class Physics {
     static fullCollideBool(a, b) {
         return !!Physics.fullCollide(a, b).length;
     }
-    static MultiResolutionDummy(...b) {
-//        let positionStatic = true;
-//        let rotationStatic = true;
-//        let __mass = 0;
-//        let velocity = Vector2.origin;
-//        let prohibited = [];
-//        for (let el of b) {
-//            if (!b.positionStatic) positionStatic = false;
-//            if (!b.rotationStatic) rotationStatic = false;
-//            __mass += el.__mass;
-//            velocity.add(el.velocity);
-//            prohibited.push(...el.prohibited);
-//        }
-//        return {
-//            positionStatic,
-//            rotationStatic,
-//            completelyStatic: positionStatic && rotationStatic,
-//            __mass,
-//            prohibited,
-//            velocity,
-//            friction: friction
-//            privateMove(v) {
-//                for (let el of b) b.privateMove(v);
-//            },
-//            applyImpulse(impulse) {
-//                let iI = impulse;
-//                for (let el of b) el.applyImpulse(iI);
-//            },
-//            applyFriction(tangent, collisionPoint, otherFriction) {
-//                for (let el of b) el.applyImpulse(iI);
-//            }
-//        };
-    }
-    static resolveResults(resolution) {
-        const a = resolution.a.object;
-        const b = resolution.b.object;
-//        a.privateMove(resolution.a.position.move);
-//        b.privateMove(resolution.b.position.move);
-        a.applyImpulse(resolution.a.velocity.impulse);
-        b.applyImpulse(resolution.b.velocity.impulse);
-        a.applyAngularImpulse(resolution.a.friction.angular);
-        a.applyLinearImpulse(resolution.a.friction.linear);
-        b.applyAngularImpulse(resolution.b.friction.angular);
-        b.applyLinearImpulse(resolution.b.friction.linear);
+    static compileResolutions(collisions) {
+        //causes absolute chaos
+        if (collisions.length === 1) return collisions[0];
+        else {
+            let a = collisions[0].a;
+            let aMove = Vector2.origin;
+            let bMove = Vector2.origin;
+            let collisionPoint = Vector2.origin;
+            let aImpulse = Vector2.origin;
+            let bImpulse = Vector2.origin;
+            let angularA = Vector2.origin;
+            let angularB = Vector2.origin;
+            let linearA = Vector2.origin;
+            let linearB = Vector2.origin;
+            let totalPen = 0;
+            let found = false;
+            for (let res of collisions) {
+                let pen = res.movement.aMove.mag * 2;
+                totalPen += pen;
+                aMove.add(res.movement.aMove.times(pen));
+                bMove.add(res.movement.bMove.times(pen));
+                if (res.impulses.impulseA) aImpulse.add(res.impulses.impulseA.force.times(pen));
+                if (res.impulses.impulseB) bImpulse.add(res.impulses.impulseB.force.times(pen));
+                linearA.add(res.friction.impulseLinearA.force.times(pen));
+                linearB.add(res.friction.impulseLinearB.force.times(pen));
+                angularA.add(res.friction.impulseAngularA.force.times(pen));
+                angularB.add(res.friction.impulseAngularB.force.times(pen));
+                if (res.impulses.impulseA) {
+                    found = true;
+                    collisionPoint.add(res.impulses.impulseA.source.times(pen));
+                }
+            }
+            if (!found) totalPen = Infinity;
+            aMove.div(totalPen);
+            bMove.div(totalPen);
+            aImpulse.div(totalPen);
+            bImpulse.div(totalPen);
+            linearA.div(totalPen);
+            linearB.div(totalPen);
+            angularA.div(totalPen);
+            angularB.div(totalPen);
+            collisionPoint.div(totalPen);
+            return new Resolution(a, collisions[0].b, aMove.get().normalize(), {
+                aMove,
+                bMove
+            }, {
+                impulseA: new Impulse(aImpulse, collisionPoint),
+                impulseB: new Impulse(bImpulse, collisionPoint)
+            }, {
+                angularA: new Impulse(angularA, collisionPoint),
+                angularB: new Impulse(angularB, collisionPoint),
+                linearA: new Impulse(linearA, collisionPoint),
+                linearB: new Impulse(linearB, collisionPoint)
+            })
+        }
     }
     static resolve(col) {
         //resolve collisions
@@ -412,34 +433,7 @@ class Physics {
         let mobileA = !Physics.isWall(a);
         let mobileB = !Physics.isWall(b);
         
-        let result = {
-            a: {
-                object: a,
-                position: {
-                    move: null
-                },
-                velocity: {
-                    impulse: null
-                },
-                friction: {
-                    angular: null,
-                    linear: null
-                }
-            },
-            b: {
-                object: b,
-                position: {
-                    move: null
-                },
-                velocity: {
-                    impulse: null
-                },
-                friction: {
-                    angular: null,
-                    linear: null
-                }
-            }
-        }
+        let result = new Resolution(a, b);
 
         //position
         if (col.penetration > 0.005) {
@@ -459,14 +453,11 @@ class Physics {
                 // c.stroke(cl.BLUE, 2).arrow(col.collisionPoint, col.collisionPoint.minus(col.dir.times(col.penetration)));
 
                 //like, the escaping
-                a.privateMove(aMove);
-                b.privateMove(bMove);
-                result.a.position.move = aMove;
-                result.b.position.move = bMove;
-                
+                result.dir = dir;
+                result.movement = { aMove, bMove };
 
-            } else return result;
-        } else return result;
+            } else return false;
+        } else return false;
 
 
         const d = col.dir.times(-1);
@@ -474,47 +465,35 @@ class Physics {
         //velocity
         const A_VEL_AT_COLLISION = a.velocity.dot(col.dir);
         const B_VEL_AT_COLLISION = -b.velocity.dot(col.dir);
-        if (A_VEL_AT_COLLISION < 0 && B_VEL_AT_COLLISION < 0) return result;
+        if (A_VEL_AT_COLLISION < 0 && B_VEL_AT_COLLISION < 0) return false;
 
         //friction
         const normal = d.normal.normalize();
         let friction = Physics.getFrictionImpulses(a, b, col.collisionPoint, normal);
-//        result.a.friction.angular = friction.impulseAngularA;
-//        result.a.friction.linear = friction.impulseLinearA;
-//        result.b.friction.angular = friction.impulseAngularB;
-//        result.b.friction.linear = friction.impulseLinearB;
+        result.friction = friction;
 
 
         //impulse resolution
         let impulses = Physics.getImpulses(a, b, col.dir, col.collisionPoint);
         let iA = impulses.impulseA;
         let iB = impulses.impulseB;
-//        result.a.velocity.impulse = iA;
-//        result.b.velocity.impulse = iB;
-        a.applyImpulse(iA);
-        b.applyImpulse(iB);
+        result.impulses = impulses;
 
         //immobilize
-        let dir = col.dir;
-        let inv_dir = dir.times(-1);
         a.canMoveThisFrame = false;
+        const dir = col.dir;
+        const inv_dir = dir.times(-1);
         if (b.positionStatic) {
             a.prohibited.push(dir);
         }
         for (let pro of b.prohibited) {
             let dot = pro.dot(dir);
-            if (dot > 0) { //are these prohibitions relevant to the collision (should they be inherited)
-                a.prohibited.push(pro);
+            if (dot > 0.5) { //are these prohibitions relevant to the collision (should they be inherited)
+                a.prohibited.push(dir);
             }
         }
         if (a.positionStatic) {
             b.prohibited.push(inv_dir);
-        }
-        for (let pro of a.prohibited) {
-            let dot = pro.dot(inv_dir);
-            if (dot > 0) {
-                b.prohibited.push(pro);
-            }
         }
 
         //do custom collision response
@@ -555,6 +534,26 @@ class Physics {
             Physics.runEventListeners(b);
         }
         return result;
+    }
+    static resolveResults(resolution) {
+        const a = resolution.a;
+        const b = resolution.b;
+        
+        //prevent interpenetration
+        a.privateMove(resolution.movement.aMove);
+        b.privateMove(resolution.movement.bMove);
+        a.cacheBoundingBoxes();
+        b.cacheBoundingBoxes();
+        
+        //impulses
+        a.applyImpulse(resolution.impulses.impulseA);
+        b.applyImpulse(resolution.impulses.impulseB);
+        
+        //friction
+        a.applyAngularImpulse(resolution.friction.impulseAngularA);
+        a.applyLinearImpulse(resolution.friction.impulseLinearA);
+        b.applyAngularImpulse(resolution.friction.impulseAngularB);
+        b.applyLinearImpulse(resolution.friction.impulseLinearB);
     }
     static runEventListeners(a) {
         function runEvents(name) {

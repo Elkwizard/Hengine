@@ -237,7 +237,7 @@ class PhysicsObject extends SceneObject {
                                     if (this.canCollide && other.canCollide) {
                                         for (let collision of col) {
                                             let resolution = Physics.resolve(collision);
-                                            if (resolution.a.position.move) Physics.resolveResults(resolution);
+                                            if (resolution) collisions.push(resolution);
                                         }
                                     }
                                 }
@@ -247,7 +247,24 @@ class PhysicsObject extends SceneObject {
                 }
             }
         }
-        return collisions;
+        let currentGroup = [];
+        let o = new Vector2(1, 0);
+        collisions.sort((a, b) => b.dir.dot(o) - a.dir.dot(o));
+        let final = [];
+        for (let collision of collisions) {
+            if (currentGroup.length) {
+                if (collision.dir.dot(currentGroup[0].dir) > 0.8) {
+                    currentGroup.push(collision);
+                } else {
+                    final.push(Physics.compileResolutions(currentGroup));
+                    currentGroup = [collision];
+                }
+            } else {
+                currentGroup = [collision];
+            }
+        }
+        if (currentGroup.length) final.push(Physics.compileResolutions(currentGroup));
+        return final;
     }
     checkAndResolveCollisions(others) {
         const dir = this.velocity.get().normalize();
@@ -262,12 +279,11 @@ class PhysicsObject extends SceneObject {
         });
         let collisions;
         if (!this.completelyStatic) collisions = this.detectCollisions(others);
-//        if (!this.completelyStatic) {
-//                console.log(collisions);
-//            for (let col of collisions) {
-//                Physics.resolveResults(Physics.resolve(col));
-//            }
-//        }
+        if (!this.completelyStatic) {
+            for (let col of collisions) {
+                Physics.resolveResults(col);
+            }
+        }
     }
     getSpeedModulation() {
         return this.home.speedModulation / this.home.physicsRealism;
