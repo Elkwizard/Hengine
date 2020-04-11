@@ -7,6 +7,9 @@ class Listener {
 			}
 		}
 	}
+	clear() {
+		this.methods = [];
+	}
 	listen(fn) {
 		this.methods.push(fn);
 	}
@@ -30,6 +33,10 @@ class KeyboardHandler {
 			k.keys[e.key] = false;
 			for (let ev of k.onUp) ev(e);
 		});
+	}
+	clearListeners() {
+		this.onDown.clear();
+		this.onUp.clear();
 	}
 	P(key) {
 		return !!this.keys[key];
@@ -65,17 +72,21 @@ class MouseHandler {
 		this.onScroll = new Listener();
 		this.onMove = new Listener();
 		this.engine = null;
+		this.listenerRoot = null;
 		this.engineClick = e => e;
 		this.engineRightClick = e => e;
 		this.engineMove = e => e;
+	}
+	addListenersTo(el) {
 		let m = this;
-		document.addEventListener("click", function (e) {
+		this.listenerRoot = el;
+		el.addEventListener("click", function (e) {
 			m.button = e.button;
 			m.updatePosition(e, "click");
 			m.engineClick(e);
 			for (let ev of m.onClick) ev(e);
 		});
-		document.addEventListener("pointerdown", function (e) {
+		el.addEventListener("pointerdown", function (e) {
 			m.button = e.button;
 			m.updatePosition(e, "down");
 			if (m.engine) {
@@ -85,7 +96,7 @@ class MouseHandler {
 			m.down = true;
 			for (let ev of m.onDown) ev(e);
 		});
-		document.addEventListener("pointermove", function (e) {
+		el.addEventListener("pointermove", function (e) {
 			m.updatePosition(e, "move");
 			if (m.engine && m.down) {
 				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
@@ -94,7 +105,7 @@ class MouseHandler {
 			m.engineMove(e);
 			for (let ev of m.onMove) ev(e);
 		});
-		document.addEventListener("pointerup", function (e) {
+		el.addEventListener("pointerup", function (e) {
 			m.button = e.button;
 			m.updatePosition(e, "up");
 			if (m.engine) {
@@ -112,11 +123,19 @@ class MouseHandler {
 			for (let ev of m.onRight) ev(e);
 			m.engineRightClick(e);
 		}
-		document.addEventListener("contextmenu", this.__right__);
-		document.addEventListener("wheel", function (e) {
+		el.addEventListener("contextmenu", this.__right__);
+		el.addEventListener("wheel", function (e) {
 			m.button = e.button;
 			for (let ev of m.onScroll) ev(e.deltaY);
 		});
+	}
+	clearListeners() {
+		this.onDown.clear();
+		this.onUp.clear();
+		this.onMove.clear();
+		this.onRight.clear();
+		this.onScroll.clear();
+		this.onClick.clear();
 	}
 	updatePosition(e, name) {
 		try {
@@ -128,7 +147,7 @@ class MouseHandler {
 		}
 	}
 	allowSave() {
-		document.removeEventListener("contextmenu", this.__right__);
+		if (this.listenerRoot) this.listenerRoot.removeEventListener("contextmenu", this.__right__);
 	}
 }
 const K = new KeyboardHandler();

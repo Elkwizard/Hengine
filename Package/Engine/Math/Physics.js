@@ -5,17 +5,12 @@ class Collision {
         this.a = a;
         this.b = b;
         this.penetration = penetration;
-        this.collisionPoint = collisionPoint;
-    }
-}
-class Resolution {
-    constructor(a, b, dir, movement, impulses, friction) {
-        this.a = a;
-        this.b = b;
-        this.dir = dir;
-        this.movement = movement;
-        this.impulses = impulses;
-        this.friction = friction;
+        if (collisionPoint) {
+            this.collisionPoints = collisionPoint.length ? collisionPoint : [{
+                point: collisionPoint,
+                penetration
+            }]; 
+        }
     }
 }
 class CollisionMoniter {
@@ -83,22 +78,16 @@ class Range {
         return a.min < b.max && b.min < a.max;
     }
 }
-class Link {
-    constructor(start, end, fer) {
-        this.start = start;
-        this.end = end;
-        this.ferocity = fer;
+class Constraint {
+    constructor(a, b, aOffset, bOffset, length) {
+        this.a = a;
+        this.b = b;
+        this.aOffset = aOffset;
+        this.bOffset = bOffset;
+        this.length = length;
     }
-    fix() {
-        let l = new Line(this.start.middle, this.end.middle);
-        let d = g.f.getDistance(l.a, l.b);
-        d = clamp(d / 10, 0, 20);
-        d *= this.ferocity;
-        let dir = new Vector2(this.end.middle.x - this.start.middle.x, this.end.middle.y - this.start.middle.y);
-        dir.normalize();
-        let p = l.midPoint;
-        let cps = Geometry.closestPointOnPolygon(p, this.start);
-        let cpe = Geometry.closestPointOnPolygon(p, this.end);
+    solve() {
+        Physics.solveLengthConstraint(this.a, this.b, this.aOffset, this.bOffset, this.length);
     }
 }
 class Physics {
@@ -229,7 +218,7 @@ class Physics {
 //         }
         let colliding = true;
         let collisionAxis = null;
-        let collisionPoint = null;
+        let collisionPoints = null;
         let leastIntersection = Infinity;
         let pairs = [];
         for (let i = 0; i < edges.length; i++) for (let edge of edges[i]) {
@@ -278,8 +267,6 @@ class Physics {
                 let bPC2 = [];
                 let aTP = 0;
                 let bTP = 0;
-                aRange.extend(CLIPPING_THRESHOLD);
-                bRange.extend(CLIPPING_THRESHOLD);
                 for (let corner of aCorners) {
                     let proj = corner.dot(edge);
                     if (bRange.contains(proj)) {
@@ -303,22 +290,29 @@ class Physics {
                 let collisionPointB = bPC.length ? Vector.sum(...bPC).over(bTP) : null;
                 // if (aPC.length) c.draw(cl.GREEN).circle(collisionPointA.x, collisionPointA.y, 6);
                 // if (bPC.length) c.draw(cl.ORANGE).circle(collisionPointB.x, collisionPointB.y, 6);
+                const TRANSFORM_TO_LINKED_PENETRATION = (range) => e => ({
+                    point: e,
+                    penetration: range.getPenetration(e.dot(collisionAxis))
+                });
 
-                if (collisionPointA && !collisionPointB) collisionPoint = collisionPointA;
-                else if (!collisionPointA && collisionPointB) collisionPoint = collisionPointB;
+                if (collisionPointA && !collisionPointB) collisionPoints = [TRANSFORM_TO_LINKED_PENETRATION(bRange)(collisionPointA)];
+                else if (!collisionPointA && collisionPointB) collisionPoints = [TRANSFORM_TO_LINKED_PENETRATION(aRange)(collisionPointB)];
                 else {
                     let sumDistA = 0;
                     let sumDistB = 0;
                     for (let corner of aPC2) sumDistA += Geometry.distToPoint2(corner, collisionPointA);
                     for (let corner of bPC2) sumDistB += Geometry.distToPoint2(corner, collisionPointB);
-                    collisionPoint = (sumDistA < sumDistB) ? collisionPointA : collisionPointB;
+                    collisionPoints = (sumDistA < sumDistB) ? aPC2.map(TRANSFORM_TO_LINKED_PENETRATION(bRange)) : bPC2.map(TRANSFORM_TO_LINKED_PENETRATION(aRange));
+//                    for (let p of collisionPoints) {
+//                        c.draw(cl.GREEN).circle(p.point.x, p.point.y, 4);
+//                    }
                 }
                 // for (let corner of aPC2) c.draw(cl.ORANGE).circle(corner.x, corner.y, 3);
                 // for (let corner of bPC2) c.draw(cl.PURPLE).circle(corner.x, corner.y, 3);
                 // c.draw(cl.BLUE).circle(collisionPoint.x, collisionPoint.y, 2);
 
                 // c.stroke(cl.GREEN, 2).arrow(a.centerOfMass, a.centerOfMass.plus(collisionAxis.times(leastIntersection)));
-                col = new Collision(true, a, b, collisionAxis, leastIntersection, collisionPoint);
+                col = new Collision(true, a, b, collisionAxis, leastIntersection, collisionPoints);
             } else {
                 col = new Collision(false, a, b);
                 a.rotation += 0.00001;
@@ -370,62 +364,6 @@ class Physics {
     static fullCollideBool(a, b) {
         return !!Physics.fullCollide(a, b).length;
     }
-    static compileResolutions(collisions) {
-        //causes absolute chaos
-        if (collisions.length === 1) return collisions[0];
-        else {
-            let a = collisions[0].a;
-            let aMove = Vector2.origin;
-            let bMove = Vector2.origin;
-            let collisionPoint = Vector2.origin;
-            let aImpulse = Vector2.origin;
-            let bImpulse = Vector2.origin;
-            let angularA = Vector2.origin;
-            let angularB = Vector2.origin;
-            let linearA = Vector2.origin;
-            let linearB = Vector2.origin;
-            let totalPen = 0;
-            let found = false;
-            for (let res of collisions) {
-                let pen = res.movement.aMove.mag * 2;
-                totalPen += pen;
-                aMove.add(res.movement.aMove.times(pen));
-                bMove.add(res.movement.bMove.times(pen));
-                if (res.impulses.impulseA) aImpulse.add(res.impulses.impulseA.force.times(pen));
-                if (res.impulses.impulseB) bImpulse.add(res.impulses.impulseB.force.times(pen));
-                linearA.add(res.friction.impulseLinearA.force.times(pen));
-                linearB.add(res.friction.impulseLinearB.force.times(pen));
-                angularA.add(res.friction.impulseAngularA.force.times(pen));
-                angularB.add(res.friction.impulseAngularB.force.times(pen));
-                if (res.impulses.impulseA) {
-                    found = true;
-                    collisionPoint.add(res.impulses.impulseA.source.times(pen));
-                }
-            }
-            if (!found) totalPen = Infinity;
-            aMove.div(totalPen);
-            bMove.div(totalPen);
-            aImpulse.div(totalPen);
-            bImpulse.div(totalPen);
-            linearA.div(totalPen);
-            linearB.div(totalPen);
-            angularA.div(totalPen);
-            angularB.div(totalPen);
-            collisionPoint.div(totalPen);
-            return new Resolution(a, collisions[0].b, aMove.get().normalize(), {
-                aMove,
-                bMove
-            }, {
-                impulseA: new Impulse(aImpulse, collisionPoint),
-                impulseB: new Impulse(bImpulse, collisionPoint)
-            }, {
-                angularA: new Impulse(angularA, collisionPoint),
-                angularB: new Impulse(angularB, collisionPoint),
-                linearA: new Impulse(linearA, collisionPoint),
-                linearB: new Impulse(linearB, collisionPoint)
-            })
-        }
-    }
     static resolve(col) {
         //resolve collisions
         let a = col.a;
@@ -433,7 +371,6 @@ class Physics {
         let mobileA = !Physics.isWall(a);
         let mobileB = !Physics.isWall(b);
         
-        let result = new Resolution(a, b);
 
         //position
         if (col.penetration > 0.005) {
@@ -453,8 +390,10 @@ class Physics {
                 // c.stroke(cl.BLUE, 2).arrow(col.collisionPoint, col.collisionPoint.minus(col.dir.times(col.penetration)));
 
                 //like, the escaping
-                result.dir = dir;
-                result.movement = { aMove, bMove };
+                a.privateMove(aMove);
+                b.privateMove(bMove);
+                a.cacheBoundingBoxes();
+                b.cacheBoundingBoxes();
 
             } else return false;
         } else return false;
@@ -469,15 +408,41 @@ class Physics {
 
         //friction
         const normal = d.normal.normalize();
-        let friction = Physics.getFrictionImpulses(a, b, col.collisionPoint, normal);
-        result.friction = friction;
 
 
         //impulse resolution
-        let impulses = Physics.getImpulses(a, b, col.dir, col.collisionPoint);
-        let iA = impulses.impulseA;
-        let iB = impulses.impulseB;
-        result.impulses = impulses;
+        let impulsesA = [];
+        let impulsesB = [];
+        let pen = 0;
+        for (let collisionPoint of col.collisionPoints) pen += collisionPoint.penetration;
+        for (let collisionPoint of col.collisionPoints) {
+            let p = collisionPoint.point;
+            let impulses = Physics.getImpulses(a, b, col.dir, p);
+            let iA = impulses.impulseA;
+            let iB = impulses.impulseB;
+            let ratio = collisionPoint.penetration / pen;
+            if (iA) {
+                iA.force.mul(ratio);
+                impulsesA.push(iA);
+            }
+            if (iB) {
+                iB.force.mul(ratio);
+                impulsesB.push(iB);
+            }
+            
+            //I don't care enough to distribute these
+            let friction = Physics.getFrictionImpulses(a, b, p, normal);
+            a.applyLinearImpulse(friction.impulseLinearA);
+            a.applyAngularImpulse(friction.impulseAngularA);
+            b.applyLinearImpulse(friction.impulseLinearB);
+            b.applyAngularImpulse(friction.impulseAngularB);
+        }
+        for (let iA of impulsesA) {
+            a.applyImpulse(iA);
+        }
+        for (let iB of impulsesB) {
+            b.applyImpulse(iB);
+        }
 
         //immobilize
         a.canMoveThisFrame = false;
@@ -488,7 +453,7 @@ class Physics {
         }
         for (let pro of b.prohibited) {
             let dot = pro.dot(dir);
-            if (dot > 0.5) { //are these prohibitions relevant to the collision (should they be inherited)
+            if (dot > 0.5 && !a.prohibited.includes(dir)) { //are these prohibitions relevant to the collision (should they be inherited)
                 a.prohibited.push(dir);
             }
         }
@@ -533,7 +498,7 @@ class Physics {
             Physics.runEventListeners(a);
             Physics.runEventListeners(b);
         }
-        return result;
+        return true;
     }
     static resolveResults(resolution) {
         const a = resolution.a;
@@ -673,5 +638,38 @@ class Physics {
         if (b.completelyStatic) impulseB = null;
         
         return { impulseA, impulseB };
+    }
+    
+    
+    //constraints
+    static solveLengthConstraint(a, b, aOffset, bOffset, len) {
+        let aM = a.middle;
+        let bM = b.middle;
+        let pA = Geometry.rotatePointAround(aM, aM.plus(aOffset), a.rotation);
+        let pB = Geometry.rotatePointAround(bM, bM.plus(bOffset), b.rotation);
+        let dx = pA.x - pB.x;
+        let dy = pA.y - pB.y;
+        let dist = dx ** 2 + dy ** 2;
+        if (dist !== len ** 2 && dist) {
+            let act_dist = Math.sqrt(dist);
+            let dif = act_dist - len;
+            let dx_N = dx / act_dist;
+            let dy_N = dy / act_dist;
+            let mDif = (!a.completelyStatic && !b.completelyStatic) ? dif / 2 : dif;
+            let dx_N0 = -dx_N * mDif;
+            let dy_N0 = -dy_N * mDif;
+            let dx_N1 = dx_N * mDif;
+            let dy_N1 = dy_N * mDif;
+            a.privateSetX(a.x + dx_N0);
+            a.privateSetY(a.y + dy_N0);
+            b.privateSetX(b.x + dx_N1);
+            b.privateSetY(b.y + dy_N1);
+            a.velocity.x += dx_N0 / 10;
+            a.velocity.y += dy_N0 / 10;
+            b.velocity.x += dx_N1 / 10;
+            b.velocity.y += dy_N1 / 10;
+            return dif;
+        }
+        return 0;
     }
 }

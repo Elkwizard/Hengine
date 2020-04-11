@@ -153,6 +153,13 @@ class SceneObject {
 		let maxY = Math.max(...maxs.map(e => e.y));
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
+	rotateAround(point, rotation) {
+		let middle = this.middle;
+		let dif = point.minus(middle);
+		let nDif = Geometry.rotatePointAround(Vector2.origin, dif, rotation);
+		this.middle = middle.add(nDif.minus(dif));
+		this.rotation += rotation;
+	}
 	addShape(name, shape) {
 		this.shapes[name] = shape;
 		this.cacheBoundingBoxes();
@@ -176,6 +183,13 @@ class SceneObject {
 		let shape = this.shapes[name];
 		delete this.shapes[name];
 		return shape;
+	}
+	removeAllShapes() {
+		let names = [];
+		for (let [name, shape] of this.shapes) names.push(name);
+		for (let name of names) {
+			delete this.shapes[name];
+		}
 	}
 	getShape(name) {
 		return this.shapes[name];
@@ -260,8 +274,8 @@ class SceneObject {
 			c.translate(sMiddle);
 			c.rotate(shape.rotation);
 			c.translate(sMiddle.times(-1));
-			this.scripts.run("draw", name, shape);
 			this.draw(name, shape);
+			this.scripts.run("draw", name, shape);
 			c.restore();
 		}
 		c.restore();

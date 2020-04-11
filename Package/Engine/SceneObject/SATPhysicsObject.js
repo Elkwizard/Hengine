@@ -1,4 +1,3 @@
-const CLIPPING_THRESHOLD = 2;
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, gravity, controls, tag, home) {
         super(name, x, y, controls, tag, home);
@@ -8,8 +7,6 @@ class PhysicsObject extends SceneObject {
         this.angularAcceleration = 0;
         this.hasGravity = gravity;
         this.slows = gravity;
-        this.home.hasRotatedRectangles = true;
-        this.links = [];
         this.direction = Vector2.origin;
         this.lastX = this.x;
         this.lastY = this.y;
@@ -146,9 +143,6 @@ class PhysicsObject extends SceneObject {
         }
         return !judgement.includes(false);
     }
-    linkTo(el, fer = 1) {
-        this.links.push(new Link(this, el, fer));
-    }
     stop() {
         this.velocity = Vector2.origin;
         this.acceleration = Vector2.origin;
@@ -237,7 +231,6 @@ class PhysicsObject extends SceneObject {
                                     if (this.canCollide && other.canCollide) {
                                         for (let collision of col) {
                                             let resolution = Physics.resolve(collision);
-                                            if (resolution) collisions.push(resolution);
                                         }
                                     }
                                 }
@@ -247,24 +240,7 @@ class PhysicsObject extends SceneObject {
                 }
             }
         }
-        let currentGroup = [];
-        let o = new Vector2(1, 0);
-        collisions.sort((a, b) => b.dir.dot(o) - a.dir.dot(o));
-        let final = [];
-        for (let collision of collisions) {
-            if (currentGroup.length) {
-                if (collision.dir.dot(currentGroup[0].dir) > 0.8) {
-                    currentGroup.push(collision);
-                } else {
-                    final.push(Physics.compileResolutions(currentGroup));
-                    currentGroup = [collision];
-                }
-            } else {
-                currentGroup = [collision];
-            }
-        }
-        if (currentGroup.length) final.push(Physics.compileResolutions(currentGroup));
-        return final;
+        return [];
     }
     checkAndResolveCollisions(others) {
         const dir = this.velocity.get().normalize();

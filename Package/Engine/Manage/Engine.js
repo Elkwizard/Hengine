@@ -87,7 +87,7 @@ class ScreenRecording {
 }
 class Engine {
 	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
-		setupAlerts();
+		M.addListenersTo(setupAlerts());
 		this.fps = 60;
 		this.fpsContinuous = 0;
 		this.lastTime = performance.now();
@@ -112,6 +112,7 @@ class Engine {
 		this.beforeUpdate = function () { };
 		this.afterUpdate = function () { };
 		this.fixedUpdate = function () { };
+        this.afterFixedUpdate = function () { };
 		this.catchErrors = true;
 		this.hasFixedPhysicsUpdateCycle = true;
 		try {
@@ -121,9 +122,10 @@ class Engine {
 		} catch (e) { }
 		//setup canvas and scene
 		let canvas = document.getElementById(canvasID);
-		if (!document.getElementById(canvasID)) {
+		if (!canvas) {
 			canvas = document.createElement('canvas');
 			canvas.id = "Engine Canvas";
+			M.addListenersTo(canvas);
 			if (!wrapperID) document.body.appendChild(canvas);
 			else document.getElementById(wrapperID).appendChild(canvas);
 		}
@@ -144,6 +146,7 @@ class Engine {
 					this.fixedUpdate();
 					this.fixedScript.run();
 					this.scene.enginePhysicsUpdate();
+                    this.afterFixedUpdate();
 				}
 			} catch (e) {
 				if (this.catchErrors) this.output("Fixed Update Error: " + e);
@@ -180,6 +183,7 @@ class Engine {
 						this.fixedUpdate();
 						this.fixedScript.run();
 						this.scene.enginePhysicsUpdate();
+						this.afterFixedUpdate();
 					}
 					this.afterUpdate();
 					this.updateScreenRecordings();
@@ -242,7 +246,7 @@ class Engine {
 		this.recordings = {};
 
 		let grh = true;
-		try { Graph; } catch (e) { grh = false };
+		try { Graph; } catch (e) { grh = false; };
 		this.hasGraphs = grh;
 		if (this.hasGraphs) {
 			this.graphs = [];
@@ -315,13 +319,19 @@ class Engine {
 		return this.fpsGraph.get();
 	}
 	checkAlerts() {
-		if (parseFloat(getComputedStyle(document.querySelector(".alert")).opacity) < 0.02) document.querySelector(".alert").style.display = "none";
+		let alert = document.querySelector(".alert");
+		if (alert) if (parseFloat(getComputedStyle(alert).opacity) < 0.02) alert.style.display = "none";
 	}
 	end() {
 		this.pause();
 		this.animate = a => a;
 		this.engineUpdate = a => a;
-		this.renderer.canvas.outerHTML = "";
+		M.clearListeners();
+		K.clearListeners();
+		let canvas = document.getElementById(this.renderer.canvas.id);
+		if (canvas) canvas.outerHTML = "";
+		let alert = document.getElementsByClassName("alert")[0];
+		if (alert) alert.outerHTML = "";
 	}
 	pause() {
 		this.paused = true
@@ -456,5 +466,6 @@ function setupAlerts() {
 		if (e.key == "Enter" || e.key == " ") {
 			closeAlert();
 		}
-	})
+	});
+	return al;
 }

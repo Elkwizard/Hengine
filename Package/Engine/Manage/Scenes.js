@@ -524,6 +524,7 @@ class Scene extends InactiveScene {
 		this.zoom = 1;
 		this.cullGraphics = true;
 		this.speedModulation = 1;
+        this.constraints = [];
 		this.collisionEvents = false;
 		this.viewRotation = 0;
 		this.display = new Rect(0, 0, this.c.canvas.width, this.c.canvas.height)
@@ -667,6 +668,12 @@ class Scene extends InactiveScene {
             let rect = el[0];
             rect.applyGravity(1);
         }
+        //solve constraints #1
+        for (let constraint of this.constraints) {
+            constraint.solve();
+        }
+        
+        
         //collision phase
         for (let i = 0; i < useful.length; i++) {
             let rect = useful[i][0];
@@ -686,14 +693,20 @@ class Scene extends InactiveScene {
             this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
             rect.physicsUpdate(updater);
         }
+        
+        
+        //solve constraints #2
+        for (let constraint of this.constraints) {
+            constraint.solve();
+        }
 
-        //prohibited direction render
-        this.drawInWorldSpace(e => {
-            for (let i = 0; i < useful.length; i++) {
-                let rect = useful[i][0];
-                for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
-            }
-        });
+//        prohibited direction render
+//        this.drawInWorldSpace(e => {
+//            for (let i = 0; i < useful.length; i++) {
+//                let rect = useful[i][0];
+//                for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
+//            }
+//        });
 
         //custom updates run
         for (let usef of useful) {
@@ -735,6 +748,9 @@ class Scene extends InactiveScene {
 		for (let rect of this.containsArray) rect.isBeingUpdated = false;
 		// console.log(performance.now() - startTime);
 	}
+    constrain(a, b, aOffset, bOffset, length) {
+        this.constraints.push(new Constraint(a, b, aOffset, bOffset, length));
+    }
 	recalculateAverageCellSize(newEl) {
 		let oldAvg = this.cellSize;
 		let mul = this.containsArray.filter(e => e instanceof PhysicsObject && !(e instanceof ParticleObject)).length;

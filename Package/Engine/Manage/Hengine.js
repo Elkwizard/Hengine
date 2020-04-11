@@ -14,24 +14,24 @@ class Hengine {
 		window.C = this.C;
 		window.cl = this.cl;
 		const c = this.c;
-		delete window.width;
-		delete window.height;
-		Object.defineProperty(window, "width", {
-			get: function () {
-				return c.canvas.width;
-			},
-			set: function (a) {
-				c.canvas.width = a;
-			}
-		});
-		Object.defineProperty(window, "height", {
-			get: function () {
-				return c.canvas.height;
-			},
-			set: function (a) {
-				c.canvas.height = a;
-			}
-		});
+        if (!(window.width || window.height)) {
+            Object.defineProperty(window, "width", {
+                get: function () {
+                    return window.c.canvas.width;
+                },
+                set: function (a) {
+                    window.c.canvas.width = a;
+                }
+            });
+            Object.defineProperty(window, "height", {
+                get: function () {
+                    return window.c.canvas.height;
+                },
+                set: function (a) {
+                    window.c.canvas.height = a;
+                }
+            });
+        }
 		window.custom = this.custom;
 		window.loadImage = this.loadImage.bind(this);
 		window.loadSound = this.loadSound.bind(this);
