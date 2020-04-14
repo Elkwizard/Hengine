@@ -1,7 +1,11 @@
 class Sound {
     constructor(src) {
-        this.sounds = [];
+        let aud = new Audio(this.src);
+        this.sounds = [aud];
         this.src = src;
+    }
+    set onload(fn) {
+        fn();
     }
     play(volume = 1) {
         volume = Math.max(0, Math.min(1, volume));

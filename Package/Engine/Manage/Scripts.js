@@ -50,7 +50,8 @@ class Script {
         for (let flag of flags) {
             let result = "script" + flag.map(e => e.capitalize()).join("");
             local[result] = function (l, e) {  };
-        }
+		}
+		let inits = [];
         for (let m in this.methods) {
             let name = m.toLowerCase();
             let fn = this.methods[m].bind(bindTo);
@@ -64,15 +65,16 @@ class Script {
             }
             if (!found) {
                 if (name === "init" || name === "start") {
-                    fn(local, ...args);
+					inits.push(() => fn(local, ...args));
                 } else {
                     local[m] = function (...params) {
                         return fn(local, ...params);
-                    };
-                    local[m].flag = flag;
+                    }.bind(bindTo);
+                    local[m].flag = m;
                 }
-            }
-        }
+			}
+		}
+		for (let init of inits) init();
 		return this;
 	}
 	addTo(obj, ...args) {
@@ -104,24 +106,20 @@ class ScriptContainer {
 				let a = this[m];
 				if (typeof a !== "function") ary.push(a);
 			}
-			ary = ary.sort((a, b) => b.scriptNumber - a.scriptNumber);
+			ary = ary.sort((a, b) => a.scriptNumber - b.scriptNumber);
 			for (let a of ary) {
 				yield a;
 			}
 		};
 	}
     run(str, ...args) {
-        try {
-            for (let m of this) {
-                m["script" + str.capitalize()](m, ...args);
-            }
-        } catch (e) {
-            console.warn("script method not found: " + str + " on [" +  args.join(", ") + "]");
-        }
+		for (let m of this) {
+			m["script" + str.capitalize()](m, ...args);
+		}
     }
 }
 //presets
-const PLAYER_MOVEMENT = new ElementScript("movement", {
+const PLAYER_MOVEMENT = new ElementScript("PLAYER_MOVEMENT", {
 	init() {
 		if (!this.controls.up) {
 			this.controls = new Controls("w", "s", "a", "d");

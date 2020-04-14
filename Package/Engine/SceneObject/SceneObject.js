@@ -157,7 +157,7 @@ class SceneObject {
 		let middle = this.middle;
 		let dif = point.minus(middle);
 		let nDif = Geometry.rotatePointAround(Vector2.origin, dif, rotation);
-		this.middle = middle.add(nDif.minus(dif));
+		this.middle = middle.add(nDif.minus(dif).times(-1));
 		this.rotation += rotation;
 	}
 	addShape(name, shape) {

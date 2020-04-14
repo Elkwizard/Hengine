@@ -133,7 +133,7 @@ class Physics {
         if (colliding) {
             s.SAT.collisions++;
             let collisionAxis = (new Vector2(b.x - a.x, b.y - a.y)).normalize();
-            let penetration = a.radius + b.radius - g.f.getDistance(a, b);
+            let penetration = a.radius + b.radius - Geometry.distToPoint(a, b);
             let aPoint = collisionAxis.times(a.radius).plus(a.middle);
             let bPoint = collisionAxis.times(-b.radius).plus(b.middle);
             let collisionPoint = aPoint.plus(bPoint).over(2);
@@ -664,10 +664,10 @@ class Physics {
             a.privateSetY(a.y + dy_N0);
             b.privateSetX(b.x + dx_N1);
             b.privateSetY(b.y + dy_N1);
-            a.velocity.x += dx_N0 / 10;
-            a.velocity.y += dy_N0 / 10;
-            b.velocity.x += dx_N1 / 10;
-            b.velocity.y += dy_N1 / 10;
+            let iA = new Impulse(new Vector2(dx_N0 / 10, dy_N0 / 10), pA);
+            let iB = new Impulse(new Vector2(dx_N1 / 10, dy_N1 / 10), pB);
+            a.applyImpulse(iA);
+            b.applyImpulse(iB);
             return dif;
         }
         return 0;

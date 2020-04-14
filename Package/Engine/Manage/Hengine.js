@@ -14,26 +14,27 @@ class Hengine {
 		window.C = this.C;
 		window.cl = this.cl;
 		const c = this.c;
-        if (!(window.width || window.height)) {
-            Object.defineProperty(window, "width", {
-                get: function () {
-                    return window.c.canvas.width;
-                },
-                set: function (a) {
-                    window.c.canvas.width = a;
-                }
-            });
-            Object.defineProperty(window, "height", {
-                get: function () {
-                    return window.c.canvas.height;
-                },
-                set: function (a) {
-                    window.c.canvas.height = a;
-                }
-            });
-        }
+		if (!(window.width || window.height)) {
+			Object.defineProperty(window, "width", {
+				get: function () {
+					return window.c.canvas.width;
+				},
+				set: function (a) {
+					window.c.canvas.width = a;
+				}
+			});
+			Object.defineProperty(window, "height", {
+				get: function () {
+					return window.c.canvas.height;
+				},
+				set: function (a) {
+					window.c.canvas.height = a;
+				}
+			});
+		}
 		window.custom = this.custom;
 		window.loadImage = this.loadImage.bind(this);
+		window.loadAnimation = this.loadAnimation.bind(this);
 		window.loadSound = this.loadSound.bind(this);
 		this.randomSeed = 1;
 		window.rand = this.rand.bind(this);
@@ -41,6 +42,9 @@ class Hengine {
 		this.SPRITE_PATH = "../Art/Sprites/";
 		this.ANIMATION_PATH = "../Art/Animations/";
 		this.SOUND_PATH = "../Sound/";
+		this.animations = {};
+		this.images = {};
+		this.sounds = {};
 
 
 		//define additional scripts
@@ -209,14 +213,83 @@ class Hengine {
 	get height() {
 		return this.s.display.height;
 	}
-	loadImage(src) {
+	initImage(src) {
 		let x = new Image;
 		x.src = this.SPRITE_PATH + src;
 		return x;
 	}
-	loadSound(src) {
+	initSound(src) {
 		let x = new Sound(this.SOUND_PATH + src);
 		return x;
+	}
+	initAnimation(src, frames, delay, loop, response) {
+		return new Animation(src, frames, delay, loop, response);
+	}
+	loadSound(src) {
+		return this.sounds[src];
+	}
+	loadImage(src) {
+		return this.images[src];
+	}
+	loadAnimation(src) {
+		return this.animations[src];
+	}
+	static async load(scripts) {
+		for (let element in scripts) {
+			let path;
+			if (element === "Engine") {
+				let script = document.createElement("script");
+				script.src = "./Hengine.js";
+				let pathSRC = script.src.split("/");
+				pathSRC.pop();
+				pathSRC.pop();
+				let src = pathSRC.join("/") + "/Engine";
+				path = scripts[element]["Path"] ? scripts[element]["Path"] : src;
+			} else if (element === "Sprites") {
+				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Art/Sprites";
+			} else if (element === "Animations") {
+				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Art/Animations";
+			} else if (element === "Sounds") {
+				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Sounds";
+			} else if (element === "Code") {
+				path = scripts[element]["Path"] ? scripts[element]["Path"] : ".";
+			}
+			for (let folder in scripts[element].Files) {
+				for (let file of scripts[element].Files[folder]) {
+					let src = path + "/" + folder + "/" + file;
+					let resource = null;
+					if (element === "Sprites" || element === "Animations" || element === "Sounds") {
+						if (window.HENGINE) {
+							if (element === "Animations") {
+								resource = window.HENGINE.initAnimation(file.Folder, file.Frames, file.Delay, file.Loop || false);
+								window.HENGINE.animations[file.Folder] = resource;
+							} else if (element === "Sprites") {
+								resource = window.HENGINE.initImage(file);
+								window.HENGINE.images[file] = resource;
+							} else if (element === "Sounds") {
+								resource = window.HENGINE.initSound(file);
+								window.HENGINE.sounds[file] = resource;
+							}
+						}
+					} else {
+						if (file === "Hengine") {
+							window.HENGINE = new Hengine();
+						} else {
+							let script = document.createElement("script");
+							script.src = src + ".js";
+							document.body.appendChild(script);
+							resource = script;
+						}
+					}
+					if (resource) await new Promise(function (resolve, reject) {
+						resource.onload = function () {
+							resolve();
+							console.info("LOADED: " + file + " FROM: " + path);
+						}
+					});
+				}
+			}
+		}
 	}
 	rand(sd) {
 		let seed = this.randomSeed++;

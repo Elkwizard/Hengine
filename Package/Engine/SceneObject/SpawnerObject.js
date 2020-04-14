@@ -1,3 +1,58 @@
+class Directions {
+	constructor(up, down, left, right, prec) {
+		this.up = up;
+		this.down = down;
+		this.left = left;
+		this.right = right;
+		if (prec === undefined) prec = 0.3;
+		this.prec = prec;
+		this.angle = 0;
+	}
+	static fromAngle(a) {
+		let dir = new Directions(0, 0, 0, 0);
+		dir.angle = a;
+		return dir;
+	}
+	getRandomSpeed() {
+		if (this.angle) {
+			let min = -this.angle - this.prec;
+			let max = -this.angle + this.prec;
+			let angle = Math.random() * (max - min) + min;
+			let result = Vector2.fromAngle(angle);
+			return result;
+		} else {
+			let result = Vector2.fromAngle(Math.random() * 2 * Math.PI);
+			return this.fix(result);
+		}
+	}
+	fix(v) {
+		if (this.angle) {
+			let va = -this.angle;
+			let min = va - this.prec;
+			let max = va + this.prec;
+			let a = v.getAngle();
+			if (a < min) a = min;
+			if (a > max) a = max;
+			let result = Vector2.fromAngle(a);
+			result.mag = v.mag;
+			return result;
+		} else {
+			return new Vector2(this.fixH(v.x), this.fixV(v.y));
+		}
+	}
+	fixH(val) {
+		if (this.left && this.right) return val;
+		if (this.left) return -Math.abs(val);
+		if (this.right) return Math.abs(val);
+		else return val * this.prec;
+	}
+	fixV(val) {
+		if (this.up && this.down) return val;
+		if (this.up) return -Math.abs(val);
+		if (this.down) return Math.abs(val);
+		else return val * this.prec;
+	}
+}
 class ParticleSpawnerObject extends SceneObject {
     constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), home) {
         super(name, x, y, false, "Particle-Spawner", home);
@@ -117,6 +172,6 @@ class ParticleObject extends SceneObject {
         if (this.lifeSpan > this.spawner.particleLifeSpan) {
             this.remove();
         }
-        this.scriptUpdate();
+        this.scripts.run("update");
     }
 }

@@ -109,6 +109,11 @@ class Vector {
 		for (let x in this) result += this[x] * v[x];
 		return result;
 	}
+	cross(V) {
+		let u = new Vector3(this.x, this.y || 0, this.z || 0);
+		let v = new Vector3(V.x, V.y || 0, V.z || 0);
+		return new Vector3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
+	}
 	projectOnto(v) {
 		return v.times(this.dot(v) / (v.mag ** 2));
 	}
@@ -124,12 +129,12 @@ class Vector {
 	toString() {
 		let ary = [];
 		for (let n in this) ary.push(this[n]);
-		return "\u27e8" + ary.join(", ") + "\u27e9"; 
+		return "\u27e8 " + ary.join(", ") + " \u27e9"; 
 	}
 	toFixed(n) {
 		let ary = [];
 		for (let n in this) ary.push(this[n].toFixed(n));
-		return "\u27e8" + ary.join(", ") + "\u27e9"; 
+		return "\u27e8 " + ary.join(", ") + " \u27e9"; 
 	}
 	static abs(v) {
 		return v.op(Math.abs.bind(Math), 0);

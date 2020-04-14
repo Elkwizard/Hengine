@@ -1,58 +1,3 @@
-class Directions {
-	constructor(up, down, left, right, prec) {
-		this.up = up;
-		this.down = down;
-		this.left = left;
-		this.right = right;
-		if (prec === undefined) prec = 0.3;
-		this.prec = prec;
-		this.angle = 0;
-	}
-	static fromAngle(a) {
-		let dir = new Directions(0, 0, 0, 0);
-		dir.angle = a;
-		return dir;
-	}
-	getRandomSpeed() {
-		if (this.angle) {
-			let min = -this.angle - this.prec;
-			let max = -this.angle + this.prec;
-			let angle = Math.random() * (max - min) + min;
-			let result = Vector2.fromAngle(angle);
-			return result;
-		} else {
-			let result = Vector2.fromAngle(Math.random() * 2 * Math.PI);
-			return this.fix(result);
-		}
-	}
-	fix(v) {
-		if (this.angle) {
-			let va = -this.angle;
-			let min = va - this.prec;
-			let max = va + this.prec;
-			let a = v.getAngle();
-			if (a < min) a = min;
-			if (a > max) a = max;
-			let result = Vector2.fromAngle(a);
-			result.mag = v.mag;
-			return result;
-		} else {
-			return new Vector2(this.fixH(v.x), this.fixV(v.y));
-		}
-	}
-	fixH(val) {
-		if (this.left && this.right) return val;
-		if (this.left) return -Math.abs(val);
-		if (this.right) return Math.abs(val);
-		else return val * this.prec;
-	}
-	fixV(val) {
-		if (this.up && this.down) return val;
-		if (this.up) return -Math.abs(val);
-		if (this.down) return Math.abs(val);
-		else return val * this.prec;
-	}
-}
 class InactiveScene {
 	constructor(name, gravity, airResistance) {
 		if (!gravity) gravity = new Vector2(0, 0.1);
@@ -105,7 +50,7 @@ class InactiveScene {
 	copy(el) {
 		let n;
 		if (el instanceof ParticleSpawnerObject) {
-			n = this.addParticleSpawner(el.name + " - copy", el.x, el.y, el.particleSize, el.particleInitSpeed, el.delay, el.timer, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
+			n = this.addParticleSpawner(el.name + " - copy", el.x, el.y, el.particleSize, el.particleInitSpeed, el.particleDelay, el.particleLifeSpan, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
 			n.particleSlows = el.particleSlows;
 			n.particleFades = el.particleFades;
 			n.particleFalls = el.particleFalls;

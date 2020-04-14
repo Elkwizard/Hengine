@@ -272,18 +272,19 @@ class PhysicsObject extends SceneObject {
         if (this.hasGravity) {
             //gravity
             let gv = this.gravity;
-            let gravitationalForce = gv.times(coef * this.getSpeedModulation());
+            let gravitationalForce = gv.times(coef / this.getSpeedModulation());
             let iG = new Impulse(gravitationalForce, this.centerOfMass);
             this.applyImpulse(iG);
         }
     }
     physicsUpdate(others) {
         s.drawInWorldSpace(e => {
-            //slow
-            if (this.slows) this.slowDown();
 
             let spdMod = this.getSpeedModulation();
             for (let i = 0; i < this.home.physicsRealism; i++) {
+                //slow
+                if (this.slows) this.slowDown();
+                
                 //linear
                 this.velocity.add(this.acceleration.times(spdMod));
                 if (this.limitsVelocity) this.capSpeed();
@@ -349,7 +350,7 @@ class PhysicsObject extends SceneObject {
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
-        let ratio = this.getImpulseRatio(impulse.source, impulse.force);
+        let ratio = this.getImpulseRatio(impulse.source, impulse.force) * this.getSpeedModulation();
         this.velocity.add(impulse.force.times(ratio));
     }
     applyAngularImpulse(impulse) {
@@ -361,6 +362,6 @@ class PhysicsObject extends SceneObject {
         let proj = I.projectOnto(r_N);
         let sign = Math.sign(proj.dot(r_N));
         let v_theta = sign * Math.sqrt((proj.x ** 2 + proj.y ** 2) / (r.x ** 2 + r.y ** 2));
-        this.angularVelocity += v_theta;
+        this.angularVelocity += v_theta * this.getSpeedModulation();
     }
 }

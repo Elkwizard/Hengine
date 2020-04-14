@@ -7,140 +7,6 @@ class Vertex {
 		return "(" + this.x + ", " + this.y + ")";
 	}
 }
-class Frame {
-	constructor(width, height) {
-		this.width = width;
-		this.height = height;
-		this.img = new OffscreenCanvas(width, height);
-		this.c = new Artist(this.img);
-		this.c.c.imageSmoothingEnabled = !g.preservePixelart;
-	}
-}
-class Fade {
-	constructor(color, length, fadeLengthStart, fadeLengthEnd = null) {
-		this.color = color;
-		this.startTime = performance.now();
-		this.length = length;
-		this.fadeLengthStart = fadeLengthStart;
-		if (fadeLengthEnd == null) fadeLengthEnd = fadeLengthStart;
-		this.fadeLengthEnd = fadeLengthEnd;
-	}
-	get endTime() {
-		return this.startTime + this.length;
-	}
-	set endTime(a) {
-		this.length = a - this.startTime;
-	}
-	stopIn(ms) {
-		if (performance.now() <= this.endTime) this.length = performance.now() + ms - this.startTime;
-	}
-	getColor() {
-		let relStart = 0;
-		let relEnd = 1;
-		let relTime = (performance.now() - this.startTime) / this.length;
-		let relOffsetS = this.fadeLengthStart / this.length;
-		let relOffsetE = this.fadeLengthEnd / this.length;
-		let op;
-		if (relTime < 0 || relTime > 1) op = 0;
-		else if (relTime < relOffsetS + relStart) {
-			op = relTime / relOffsetS;
-		} else if (relTime > relEnd - relOffsetE) {
-			op = 1 - (relTime - (relEnd - relOffsetE)) / relOffsetE;
-		} else op = 1;
-		return new Color(this.color.red, this.color.green, this.color.blue, this.color.alpha * op);
-	}
-}
-class Texture {
-	constructor(width, height) {
-		width = Math.floor(width);
-		height = Math.floor(height);
-		this.width = width;
-		this.height = height;
-		this.pixels = [];
-		for (let i = 0; i < width; i++) {
-			this.pixels.push([]);
-			for (let j = 0; j < height; j++) {
-				this.pixels[i].push(new Color(0, 0, 0, 0));
-			}
-		}
-		this[Symbol.iterator] = function* () {
-			for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
-				yield [i, j];
-			}
-		}
-		this.updateImageData();
-	}
-	setPixel(x, y, clr) {
-		this.pixels[x][y] = clr;
-	}
-	updateImageData() {
-		let array = new Uint8ClampedArray(4 * this.width * this.height);
-		let cntr = 0;
-		for (let i = 0; i < this.height; i++) {
-			for (let j = 0; j < this.width; j++) {
-				let color = this.pixels[j][i];
-				array[cntr] = Math.floor(color.red);
-				array[cntr + 1] = Math.floor(color.green);
-				array[cntr + 2] = Math.floor(color.blue);
-				array[cntr + 3] = Math.floor(color.alpha * 255);
-				cntr += 4;
-			}
-		}
-		let img = new ImageData(array, this.width, this.height);
-		this.imageData = img;
-	}
-	toImage() {
-		let x = new Frame(this.width, this.height);
-		this.updateImageData();
-		x.c.c.putImageData(this.imageData, 0, 0);
-		return x;
-	}
-}
-class Animation {
-	constructor(src = "", frames = 1, delay = 0, loop = false, finResponse = e => e) {
-		this.stopped = false;
-		if (!Array.isArray(src)) {
-			this.frameCount = frames;
-			this.frames = [];
-			this.img = new Image
-			for (let i = 0; i < frames; i++) {
-				this.frames.push(new Image);
-				this.frames[i].src = ("../Art/Animations/" + src + "/" + (i + 1) + ".png");
-			}
-			this.loop = loop;
-			this.finResponse = finResponse;
-			this.delay = delay;
-		} else {
-			this.frames = src;
-			this.frameCount = this.frames.length;
-			this.delay = frames;
-			this.loop = delay;
-			this.finResponse = loop || function () { }
-		}
-		this.timer = 0;
-		this.maxTime = this.frames.length * this.delay
-	}
-	advance() {
-		if (!this.stopped) {
-			this.timer++
-			if (this.timer >= this.maxTime - 1) {
-				this.timer = this.loop ? 0 : this.maxTime;
-				this.finResponse();
-			}
-			this.img = this.frames[Math.floor(this.timer / this.delay)];
-		}
-	}
-	stop() {
-		this.stoppped = true;
-	}
-	start() {
-		this.stopped = false;
-	}
-	reset() {
-		this.timer = -1;
-		this.advance();
-	}
-}
 class Artist {
 	constructor(canvasID, width, height) {
 		if (typeof canvasID === "object") this.canvas = canvasID;
@@ -160,9 +26,9 @@ class Artist {
 		this.noiseAry = [];
 		this.custom = {};
 		this.c = this.canvas.getContext('2d');
-		this.animations = [];
 		this._background = new Color(0, 0, 0, 0);
 		this.textMode = "left";
+		this.currentlyClipped = false;
 		this.drawObj = {
 			circle: function (x, y, radius) {
 				radius = Math.abs(radius);
@@ -561,10 +427,6 @@ class Artist {
 			this.home.c.stroke(border, 2).rect(this.x, this.y, this.width, this.height);
 		}
 	}
-	createAnimation(src, frames, delay, loop, response) {
-		this.animations.push(new Animation(src, frames, delay, loop, response))
-		return this.animations[this.animations.length - 1]
-	}
 	drawAnimation(animation, x, y, width, height) {
 		animation.advance();
 		let img = animation.img;
@@ -633,11 +495,15 @@ class Artist {
 		this.c.restore();
 	}
 	clip() {
-		this.c.save();
+		if (!this.currentlyClipped) {
+			this.currentlyClipped = true;
+			this.c.save();
+		}
 		return this.clipObj;
 	}
 	unclip() {
 		this.c.restore();
+		this.currentlyClipped = false;
 	}
 	clear() {
 		this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -687,6 +553,7 @@ class Artist {
 		if (img instanceof Frame) img = img.img;
 		if (width === undefined) width = img.width;
 		if (height === undefined) height = img.height;
+		// console.log(img);
 		this.c.drawImage(img, x, y, width, height);
 	}
 	drawWithAlpha(a, shape) {
