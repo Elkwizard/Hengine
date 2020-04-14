@@ -240,6 +240,7 @@ class Hengine {
 		console.log(pathSRC);
 		pathSRC.pop();
 		pathSRC.pop();
+		pathSRC.pop();
 		let rootSrc = pathSRC.join("/") + "/Engine";
 		for (let element in scripts) {
 			let path;
