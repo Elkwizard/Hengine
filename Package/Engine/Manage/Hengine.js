@@ -235,16 +235,16 @@ class Hengine {
 		return this.animations[src];
 	}
 	static async load(scripts) {
+		let scriptHome = document.createElement("script");
+		scriptHome.src = "./Hengine.js";
+		let pathSRC = scriptHome.src.split("/");
+		pathSRC.pop();
+		pathSRC.pop();
+		let rootSrc = pathSRC.join("/") + "/Engine";
 		for (let element in scripts) {
 			let path;
 			if (element === "Engine") {
-				let script = document.createElement("script");
-				script.src = "./Hengine.js";
-				let pathSRC = script.src.split("/");
-				pathSRC.pop();
-				pathSRC.pop();
-				let src = pathSRC.join("/") + "/Engine";
-				path = scripts[element]["Path"] ? scripts[element]["Path"] : src;
+				path = scripts[element]["Path"] ? scripts[element]["Path"] : rootSrc;
 			} else if (element === "Sprites") {
 				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Art/Sprites";
 			} else if (element === "Animations") {
@@ -258,15 +258,19 @@ class Hengine {
 				for (let file of scripts[element].Files[folder]) {
 					let src = path + "/" + folder + "/" + file;
 					let resource = null;
+					let type = "SCRIPT";
 					if (element === "Sprites" || element === "Animations" || element === "Sounds") {
 						if (window.HENGINE) {
 							if (element === "Animations") {
+								type = "ANIMATION"
 								resource = window.HENGINE.initAnimation(file.Folder, file.Frames, file.Delay, file.Loop || false);
 								window.HENGINE.animations[file.Folder] = resource;
 							} else if (element === "Sprites") {
+								type = "IMAGE";
 								resource = window.HENGINE.initImage(file);
 								window.HENGINE.images[file] = resource;
 							} else if (element === "Sounds") {
+								type = "SOUND";
 								resource = window.HENGINE.initSound(file);
 								window.HENGINE.sounds[file] = resource;
 							}
@@ -288,7 +292,7 @@ class Hengine {
 					if (resource) await new Promise(function (resolve, reject) {
 						resource.onload = function () {
 							resolve();
-							console.info("LOADED: " + file + " FROM: " + path);
+							console.info("LOADED " + type + " [" + file + "] FROM [" + path + "]");
 						}
 					});
 				}
