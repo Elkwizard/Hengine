@@ -1,7 +1,7 @@
 // Specify path for any component (Sounds, Sprites, Code, etc...) to get it from somewhere else.
 Hengine.load({
-	"Engine": {
-		"Files": {
+	"engine": {
+		"files": {
 			"Render": ["Color", "Shapes", "Animation", "Frame", "Fade", "Texture", "Renderer", "Graph"],
 			"Math": ["Vector", "Geometry", "Physics"],
 			"Util": ["Input", "Sound", "Time", "Console"],
@@ -9,30 +9,30 @@ Hengine.load({
 			"Manage": ["PrototypeOverload", "Scripts", "Scenes", "Engine", "Hengine"]
 		}
 	},
-	"Sounds": {
-		"Files": {
+	"sounds": {
+		"files": {
 			".": ["Ding.mp3"]
 		}
 	},
-	"Sprites": {
-		"Files": {
+	"sprites": {
+		"files": {
 			".": ["Chicken.png"]
 		}
 	},
-	"Animations": {
-		"Files": {
+	"animations": {
+		"files": {
 			".": [
 				{
-					"Folder": "Chicken Flap",
-					"Frames": 4,
-					"Delay": 3,
-					"Loop": true
+					"folder": "Chicken Flap",
+					"frames": 4,
+					"delay": 3,
+					"loop": true
 				}
 			]
 		}
 	},
-	"Code": {
-		"Files": {
+	"code": {
+		"files": {
 			".": ["Script List", "Set List", "Source"]
 		}
 	}

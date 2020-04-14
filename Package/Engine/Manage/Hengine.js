@@ -243,33 +243,33 @@ class Hengine {
 		let rootSrc = pathSRC.join("/") + "/Engine";
 		for (let element in scripts) {
 			let path;
-			if (element === "Engine") {
+			if (element === "engine") {
 				path = scripts[element]["Path"] ? scripts[element]["Path"] : rootSrc;
-			} else if (element === "Sprites") {
+			} else if (element === "sprites") {
 				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Art/Sprites";
-			} else if (element === "Animations") {
+			} else if (element === "animations") {
 				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Art/Animations";
-			} else if (element === "Sounds") {
+			} else if (element === "sounds") {
 				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Sounds";
-			} else if (element === "Code") {
+			} else if (element === "code") {
 				path = scripts[element]["Path"] ? scripts[element]["Path"] : ".";
 			}
-			for (let folder in scripts[element].Files) {
-				for (let file of scripts[element].Files[folder]) {
+			for (let folder in scripts[element].files) {
+				for (let file of scripts[element].files[folder]) {
 					let src = path + "/" + folder + "/" + file;
 					let resource = null;
 					let type = "SCRIPT";
-					if (element === "Sprites" || element === "Animations" || element === "Sounds") {
+					if (element === "sprites" || element === "animations" || element === "sounds") {
 						if (window.HENGINE) {
-							if (element === "Animations") {
+							if (element === "animations") {
 								type = "ANIMATION"
-								resource = window.HENGINE.initAnimation(file.Folder, file.Frames, file.Delay, file.Loop || false);
-								window.HENGINE.animations[file.Folder] = resource;
-							} else if (element === "Sprites") {
+								resource = window.HENGINE.initAnimation(file.folder, file.frames, file.delay, file.loop || false);
+								window.HENGINE.animations[file.folder] = resource;
+							} else if (element === "sprites") {
 								type = "IMAGE";
 								resource = window.HENGINE.initImage(file);
 								window.HENGINE.images[file] = resource;
-							} else if (element === "Sounds") {
+							} else if (element === "sounds") {
 								type = "SOUND";
 								resource = window.HENGINE.initSound(file);
 								window.HENGINE.sounds[file] = resource;
