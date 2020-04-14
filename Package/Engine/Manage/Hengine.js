@@ -275,10 +275,14 @@ class Hengine {
 						if (file === "Hengine") {
 							window.HENGINE = new Hengine();
 						} else {
-							let script = document.createElement("script");
-							script.src = src + ".js";
-							document.body.appendChild(script);
-							resource = script;
+							if (file.match(/DATA/g)) {
+								eval(file.slice(5));
+							} else {
+								let script = document.createElement("script");
+								script.src = src + ".js";
+								document.body.appendChild(script);
+								resource = script;
+							}
 						}
 					}
 					if (resource) await new Promise(function (resolve, reject) {
