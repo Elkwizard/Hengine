@@ -235,9 +235,9 @@ class Hengine {
 		return this.animations[src];
 	}
 	static async load(scripts) {
-		let scriptHome = document.createElement("script");
-		scriptHome.src = "./Hengine.js";
+		let scriptHome = document.querySelector("script"); //find yourself
 		let pathSRC = scriptHome.src.split("/");
+		console.log(pathSRC);
 		pathSRC.pop();
 		pathSRC.pop();
 		let rootSrc = pathSRC.join("/") + "/Engine";
