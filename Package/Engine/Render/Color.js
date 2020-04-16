@@ -275,6 +275,7 @@ class ColorLibrary {
 		this.RED = new Color("#f00");
 		this.BLUE = new Color("#00f");
 		this.YELLOW = new Color("#ff0");
+		this.GOLD = new Color("#d4af37");
 		this.GREEN = new Color("#090");
 		this.ORANGE = new Color("#f90");
 		this.PURPLE = new Color("#909");

@@ -693,7 +693,7 @@ class Scene extends InactiveScene {
 		for (let rect of this.containsArray) rect.isBeingUpdated = false;
 		// console.log(performance.now() - startTime);
 	}
-    constrain(a, b, aOffset, bOffset, length) {
+    constrain(a, b, aOffset = Vector2.origin, bOffset = Vector2.origin, length = "CURRENT_DIST") {
         this.constraints.push(new Constraint(a, b, aOffset, bOffset, length));
     }
 	recalculateAverageCellSize(newEl) {

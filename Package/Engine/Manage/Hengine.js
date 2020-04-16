@@ -237,11 +237,11 @@ class Hengine {
 	static async load(scripts) {
 		let scriptHome = document.querySelector("script"); //find yourself
 		let pathSRC = scriptHome.src.split("/");
-		console.log(pathSRC);
 		pathSRC.pop();
 		pathSRC.pop();
 		pathSRC.pop();
 		let rootSrc = pathSRC.join("/") + "/Engine";
+		console.log("EXTRACTING FROM ROOT [" + rootSrc + "]");
 		for (let element in scripts) {
 			let path;
 			if (element === "engine") {
@@ -283,10 +283,12 @@ class Hengine {
 							if (file.match(/DATA/g)) {
 								eval(file.slice(5));
 							} else {
-								let script = document.createElement("script");
-								script.src = src + ".js";
-								document.body.appendChild(script);
-								resource = script;
+								if (!document.querySelector(`script[src="${src}.js"]`)) {
+									let script = document.createElement("script");
+									script.src = src + ".js";
+									document.body.appendChild(script);
+									resource = script;
+								}
 							}
 						}
 					}

@@ -9,7 +9,7 @@ class Collision {
             this.collisionPoints = collisionPoint.length ? collisionPoint : [{
                 point: collisionPoint,
                 penetration
-            }]; 
+            }];
         }
     }
 }
@@ -84,10 +84,21 @@ class Constraint {
         this.b = b;
         this.aOffset = aOffset;
         this.bOffset = bOffset;
+        if (length === "CURRENT_DIST") {
+            let ends = this.getEnds();
+            length = Geometry.distToPoint(ends.a, ends.b);
+        }
         this.length = length;
     }
+    getEnds() {
+        let aM = this.a.middle;
+        let bM = this.b.middle;
+        let pA = Geometry.rotatePointAround(aM, aM.plus(this.aOffset), this.a.rotation);
+        let pB = Geometry.rotatePointAround(bM, bM.plus(this.bOffset), this.b.rotation);
+        return new Line(pA, pB);
+    }
     solve() {
-        Physics.solveLengthConstraint(this.a, this.b, this.aOffset, this.bOffset, this.length);
+        Physics.solveLengthConstraint(this);
     }
 }
 class Physics {
@@ -198,7 +209,7 @@ class Physics {
         if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return new Collision(false, a, b);
 
         s.SAT.SATChecks++;
-        
+
         let aEdges = a.getAxes();
         let bEdges = b.getAxes();
         let edges = [
@@ -207,15 +218,15 @@ class Physics {
         ];
         let aCorners = a.getCorners();
         let bCorners = b.getCorners();
-//         for (let corner of [...aCorners, ...bCorners]) {
-//             c.draw(cl.RED).circle(corner.x, corner.y, 3);
-//         }
-//         let le = a.getEdges();
-//         for (let i = 0; i < le.length; i++) {
-//             c.stroke(cl.LIME, 2).line(le[i]);
-//             let normal = aEdges[(i - 1 + 4) % 4];
-//             if (normal) c.stroke(cl.ORANGE, 1).arrow(le[i].midPoint, le[i].midPoint.plus(normal.times(20)));
-//         }
+        //         for (let corner of [...aCorners, ...bCorners]) {
+        //             c.draw(cl.RED).circle(corner.x, corner.y, 3);
+        //         }
+        //         let le = a.getEdges();
+        //         for (let i = 0; i < le.length; i++) {
+        //             c.stroke(cl.LIME, 2).line(le[i]);
+        //             let normal = aEdges[(i - 1 + 4) % 4];
+        //             if (normal) c.stroke(cl.ORANGE, 1).arrow(le[i].midPoint, le[i].midPoint.plus(normal.times(20)));
+        //         }
         let colliding = true;
         let collisionAxis = null;
         let collisionPoints = null;
@@ -303,9 +314,9 @@ class Physics {
                     for (let corner of aPC2) sumDistA += Geometry.distToPoint2(corner, collisionPointA);
                     for (let corner of bPC2) sumDistB += Geometry.distToPoint2(corner, collisionPointB);
                     collisionPoints = (sumDistA < sumDistB) ? aPC2.map(TRANSFORM_TO_LINKED_PENETRATION(bRange)) : bPC2.map(TRANSFORM_TO_LINKED_PENETRATION(aRange));
-//                    for (let p of collisionPoints) {
-//                        c.draw(cl.GREEN).circle(p.point.x, p.point.y, 4);
-//                    }
+                    //                    for (let p of collisionPoints) {
+                    //                        c.draw(cl.GREEN).circle(p.point.x, p.point.y, 4);
+                    //                    }
                 }
                 // for (let corner of aPC2) c.draw(cl.ORANGE).circle(corner.x, corner.y, 3);
                 // for (let corner of bPC2) c.draw(cl.PURPLE).circle(corner.x, corner.y, 3);
@@ -332,12 +343,12 @@ class Physics {
         }
         let cols = tempCollisions.filter(e => e.colliding);
         cols = cols
-            // .map(e => {
-            //     let n = e;
-            //     n.a = a;
-            //     n.b = b;
-            //     return n;
-            // })
+        // .map(e => {
+        //     let n = e;
+        //     n.a = a;
+        //     n.b = b;
+        //     return n;
+        // })
         if (cols.length) {
             // let dir = Vector2.origin;
             // let collisionPoint = Vector2.origin;
@@ -370,7 +381,7 @@ class Physics {
         let b = col.b;
         let mobileA = !Physics.isWall(a);
         let mobileB = !Physics.isWall(b);
-        
+
 
         //position
         if (col.penetration > 0.005) {
@@ -394,7 +405,6 @@ class Physics {
                 b.privateMove(bMove);
                 a.cacheBoundingBoxes();
                 b.cacheBoundingBoxes();
-
             } else return false;
         } else return false;
 
@@ -429,13 +439,11 @@ class Physics {
                 iB.force.mul(ratio);
                 impulsesB.push(iB);
             }
-            
+
             //I don't care enough to distribute these
             let friction = Physics.getFrictionImpulses(a, b, p, normal);
-            a.applyLinearImpulse(friction.impulseLinearA);
-            a.applyAngularImpulse(friction.impulseAngularA);
-            b.applyLinearImpulse(friction.impulseLinearB);
-            b.applyAngularImpulse(friction.impulseAngularB);
+            a.applyImpulse(friction.impulseA);
+            b.applyImpulse(friction.impulseB);
         }
         for (let iA of impulsesA) {
             a.applyImpulse(iA);
@@ -503,17 +511,17 @@ class Physics {
     static resolveResults(resolution) {
         const a = resolution.a;
         const b = resolution.b;
-        
+
         //prevent interpenetration
         a.privateMove(resolution.movement.aMove);
         b.privateMove(resolution.movement.bMove);
         a.cacheBoundingBoxes();
         b.cacheBoundingBoxes();
-        
+
         //impulses
         a.applyImpulse(resolution.impulses.impulseA);
         b.applyImpulse(resolution.impulses.impulseB);
-        
+
         //friction
         a.applyAngularImpulse(resolution.friction.impulseAngularA);
         a.applyLinearImpulse(resolution.friction.impulseLinearA);
@@ -595,18 +603,16 @@ class Physics {
         return r.positionStatic || r.rotationStatic || !r.canMoveThisFrame;
     }
     static getFrictionImpulses(a, b, collisionPoint, tangent) {
-        let impulseAngularA, impulseLinearA, impulseAngularB, impulseLinearB;
+        let impulseA, impulseB;
         let frictionA = a.getPointVelocity(collisionPoint).projectOnto(tangent).times(-0.05);//.times(-this.friction * otherFriction * 2);
         let frictionB = b.getPointVelocity(collisionPoint).projectOnto(tangent).times(-0.05);//.times(-this.friction * otherFriction * 2);
-        impulseAngularA = new Impulse(frictionA.over(2), collisionPoint);
-        impulseLinearA = impulseAngularA;
-        impulseAngularB = new Impulse(frictionB.over(2), collisionPoint);
-        impulseLinearB = impulseAngularB;
-        return { impulseAngularA, impulseLinearA, impulseAngularB, impulseLinearB };
+        impulseA = new Impulse(frictionA.over(2), collisionPoint);
+        impulseB = new Impulse(frictionB.over(2), collisionPoint);
+        return { impulseA, impulseB };
     }
     static getImpulses(a, b, dir, collisionPoint) {
         let impulseA, impulseB;
-        
+
         const m_A = a.__mass;
         const m_B = b.__mass;
         const v_A = a.getPointVelocity(collisionPoint);
@@ -616,7 +622,7 @@ class Physics {
         if (v_AB.dot(n) > 0) return { impulseA: null, impulseB: null }; //going away
         const e = Math.max(1 - a.snuzzlement, 1 - b.snuzzlement);
         //v_AB dot n = (v_B - v_A) dot n;
-        
+
         const j_DYNAMIC = v_AB.times(-(1 + e)).dot(n) / (1 / m_A + 1 / m_B);
         const j_STATIC_A = v_A.dot(n) * (1 + e) * m_A; //just for walls
         const j_STATIC_B = v_B.dot(n) * (1 + e) * m_B;  //just for walls
@@ -630,23 +636,25 @@ class Physics {
         const j_B = j_DYNAMIC * PER_B + j_STATIC_B * (1 - PER_B);
         const I_A = n.times(-j_A).over(m_A);
         const I_B = n.times(j_B).over(m_B);
-        
-        
+
+
         impulseA = new Impulse(I_A, collisionPoint);
         impulseB = new Impulse(I_B, collisionPoint);
-        
+
         if (b.completelyStatic) impulseB = null;
-        
+
         return { impulseA, impulseB };
     }
-    
-    
+
+
     //constraints
-    static solveLengthConstraint(a, b, aOffset, bOffset, len) {
-        let aM = a.middle;
-        let bM = b.middle;
-        let pA = Geometry.rotatePointAround(aM, aM.plus(aOffset), a.rotation);
-        let pB = Geometry.rotatePointAround(bM, bM.plus(bOffset), b.rotation);
+    static solveLengthConstraint(constraint) {
+        let a = constraint.a;
+        let b = constraint.b;
+        let len = constraint.length;
+        let ends = constraint.getEnds();
+        let pA = ends.a;
+        let pB = ends.b;
         let dx = pA.x - pB.x;
         let dy = pA.y - pB.y;
         let dist = dx ** 2 + dy ** 2;
@@ -655,19 +663,23 @@ class Physics {
             let dif = act_dist - len;
             let dx_N = dx / act_dist;
             let dy_N = dy / act_dist;
-            let mDif = (!a.completelyStatic && !b.completelyStatic) ? dif / 2 : dif;
+            let mDif = (!a.constraintLeader && !b.constraintLeader) ? dif / 2 : dif;
             let dx_N0 = -dx_N * mDif;
             let dy_N0 = -dy_N * mDif;
             let dx_N1 = dx_N * mDif;
             let dy_N1 = dy_N * mDif;
-            a.privateSetX(a.x + dx_N0);
-            a.privateSetY(a.y + dy_N0);
-            b.privateSetX(b.x + dx_N1);
-            b.privateSetY(b.y + dy_N1);
             let iA = new Impulse(new Vector2(dx_N0 / 10, dy_N0 / 10), pA);
             let iB = new Impulse(new Vector2(dx_N1 / 10, dy_N1 / 10), pB);
-            a.applyImpulse(iA);
-            b.applyImpulse(iB);
+            if (!a.constraintLeader) {
+                a.privateSetX(a.x + dx_N0);
+                a.privateSetY(a.y + dy_N0);
+                a.applyImpulse(iA);
+            }
+            if (!b.constraintLeader) {
+                b.privateSetX(b.x + dx_N1);
+                b.privateSetY(b.y + dy_N1);
+                b.applyImpulse(iB);
+            }
             return dif;
         }
         return 0;

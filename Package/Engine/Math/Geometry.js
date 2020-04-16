@@ -1,18 +1,7 @@
 class Geometry {
-    static distToLine(p, l) {
-        if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
-        let min = Math.min(l.a.x, l.b.x);
-        let max = Math.max(l.a.x, l.b.x);
-        let dx = l.b.x - l.a.x;
-        let dy = l.b.y - l.a.y;
-        let b = l.a.y - l.a.x * (dy / dx);
-        let x1 = p.x;
-        let y1 = p.y;
-        let pX = ((dx / dy) * x1 - b + y1) / ((dy * dy + dx * dx) / (dx * dy));
-        if (pX < min) pX = min;
-        if (pX > max) pX = max;
-        let pY = (dy / dx) * pX + b;
-        return Geometry.distToPoint(p, new Vector2(pX, pY));
+    static distToLineObject(p, l) {
+        let cp = Geometry.closestPointOnLineObject(p, l);
+        return Geometry.distToPoint(p, cp);
     }
     static distToCircle(p, c) {
         return Math.sqrt(Geometry.distToPoint2(p, c)) - c.radius;

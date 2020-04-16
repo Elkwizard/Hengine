@@ -19,6 +19,7 @@ class PhysicsObject extends SceneObject {
         this.density = 0.1;
         this.positionStatic = !gravity;
         this.rotationStatic = !gravity;
+        this.constraintLeader = false;
         this.contactPoints = [];
         this.prohibited = [];
         this.canCollide = true;
@@ -230,7 +231,7 @@ class PhysicsObject extends SceneObject {
                                     other.colliding.general.push(this);
                                     if (this.canCollide && other.canCollide) {
                                         for (let collision of col) {
-                                            let resolution = Physics.resolve(collision);
+                                            Physics.resolve(collision);
                                         }
                                     }
                                 }
@@ -350,7 +351,7 @@ class PhysicsObject extends SceneObject {
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
-        let ratio = this.getImpulseRatio(impulse.source, impulse.force) * this.getSpeedModulation();
+        let ratio = this.getSpeedModulation();
         this.velocity.add(impulse.force.times(ratio));
     }
     applyAngularImpulse(impulse) {
