@@ -8,7 +8,6 @@ class Animation {
 				this.frames.push(new Image);
 				this.frames[i].src = "../Art/Animations/" + src + "/" + (i + 1) + ".png";
 			}
-			this.img = this.frames[0];
 			this.loop = loop;
 			this.finResponse = finResponse;
 			this.delay = delay;
@@ -19,8 +18,13 @@ class Animation {
 			this.loop = delay;
 			this.finResponse = loop || function () { }
 		}
+		this.img = this.frames[0];
 		this.timer = 0;
-		this.maxTime = this.frames.length * this.delay;
+		this.totalTime = this.frames.length * this.delay;
+	}
+	static copy(anim) {
+		let a = new Animation(anim.frames, anim.delay, anim.loop, anim.finResponse);
+		return a;
 	}
 	set onload(fn) {
 		fn();
@@ -28,8 +32,8 @@ class Animation {
 	advance() {
 		if (!this.stopped) {
 			this.timer++;
-			if (this.timer >= this.maxTime - 1) {
-				this.timer = this.loop ? 0 : this.maxTime - 1;
+			if (this.timer >= this.totalTime - 1) {
+				this.timer = this.loop ? 0 : this.totalTime - 1;
 				this.finResponse();
 			}
 			let index = Math.floor(this.timer / this.delay);

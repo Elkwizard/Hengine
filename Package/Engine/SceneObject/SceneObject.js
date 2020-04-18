@@ -31,10 +31,6 @@ class Controls {
 		return res.join(", ");
 	}
 }
-function clamp(n, a, b) {
-	return Math.max(a, Math.min(b, n));
-}
-
 //Actual SceneObject
 class SceneObject {
 	constructor(name, x, y, controls, tag, home) {
@@ -105,7 +101,7 @@ class SceneObject {
 			if (shape instanceof Circle) {
 				term = "C " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.radius.toFixed(0);
 			}
-			
+
 			if (shape instanceof Rect) {
 				term = "R " + shape.rotation.toFixed(0) + " " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.width.toFixed(0) + " " + shape.height.toFixed(2);
 			} else if (shape instanceof Polygon) {
@@ -120,7 +116,7 @@ class SceneObject {
 		let result = [];
 		for (let shape of shapes) {
 			let args = shape.split(" ").slice(1).map(e => parseFloat(e));
-			switch(shape[0]) {
+			switch (shape[0]) {
 				case "C":
 					result.push(new Circle(args[0], args[1], args[2]));
 					break;
@@ -137,8 +133,9 @@ class SceneObject {
 	}
 	cacheBoundingBoxes() {
 		let shapes = this.getShapes();
-		let models = this.getModels();
-		for (let i = 0; i < shapes.length; i++) shapes[i].cacheBoundingBox(models[i].getBoundingBox()); //transfer from model to root shape
+		let pos = this.middle;
+		let rot = this.rotation;
+		for (let i = 0; i < shapes.length; i++) shapes[i].cacheBoundingBox(shapes[i].getModel(pos, rot).getBoundingBox()); //transfer from model to root shape
 		this.__boundingBox = this.getBoundingBox();
 	}
 	getBoundingBox() {
@@ -162,6 +159,7 @@ class SceneObject {
 	}
 	addShape(name, shape) {
 		this.shapes[name] = shape;
+		if (shape instanceof Polygon && !(shape instanceof Rect)) shape.subdivideForCollisions();
 		this.cacheBoundingBoxes();
 	}
 	centerModels() {
@@ -221,12 +219,19 @@ class SceneObject {
 		let middle = this.middle;
 		let pos = middle;
 		let rot = this.rotation;
-		ary = ary.map(function(e,i){
-			let r = e.getModel(pos, rot);
-			r.__boundingBox = ary[i].__boundingBox; //transfer from root shape to model
-			return r;
+		let result = [];
+		for (let i = 0; i < ary.length; i++) {
+			result.push(...ary[i].collisionShapes.map(e => {
+				e.__boundingBox = ary[i].__boundingBox;
+				return e;
+			}));
+		}
+		result = result.map(e => {
+			let el = e.getModel(pos, rot);
+			el.__boundingBox = e.__boundingBox;
+			return el;
 		});
-		return ary;
+		return result;
 	}
 	rename(name) {
 		delete this.home.contains[this.name];

@@ -61,7 +61,8 @@ class Line {
 class Shape {
 	constructor(rotation = 0) {
 		this.rotation = rotation;
-        this.__boundingBox = null; //bounding box cache
+		this.__boundingBox = null; //bounding box cache
+		this.collisionShapes = [this]; //a list of the shapes that make up the shape
 	}
 	get area() {
 		//return the area of the shape
@@ -108,6 +109,9 @@ class Polygon extends Shape {
 		let bound = this.getBoundingBox();
 		return bound.width * bound.height;
 	}
+	subdivideForCollisions() {
+		this.collisionShapes = Geometry.subdividePolygon(this);
+	}
 	getBoundingBox() {
 		let x = this.vertices.map(e => e.x);
 		let y = this.vertices.map(e => e.y);
@@ -119,13 +123,31 @@ class Polygon extends Shape {
 	}
 	getModel(pos, rot) {
 		let middle = this.middle;
-        let rotation = this.rotation;
+		let rotation = this.rotation;
 		let verts;
-        if (rotation) verts = this.getCorners()
-			.map(e => Geometry.rotatePointAround(middle, e, rotation));
-        else verts = this.getCorners();
-        verts = verts
-            .map(e => Geometry.rotatePointAround(pos, e.plus(pos), rot));
+		if (rotation) {
+			let t_sin = Math.sin(rotation);
+			let t_cos = Math.cos(rotation);
+			verts = this.getCorners()
+				.map(e => {
+					let difX = e.x - middle.x;
+					let difY = e.y - middle.y;
+					let nX = t_cos * difX - t_sin * difY;
+					let nY = t_sin * difX + t_cos * difY;
+					return new Vector2(middle.x + nX, middle.y + nY);
+				});
+		} else verts = this.getCorners();
+		let m_sin = Math.sin(rot);
+		let m_cos = Math.cos(rot);
+		verts = verts
+			.map(e => {
+				let difX = e.x;
+				let difY = e.y;
+				let nX = m_cos * difX - m_sin * difY;
+				let nY = m_sin * difX + m_cos * difY;
+				return new Vector2(nX + pos.x, nY + pos.y);
+				
+			});
 		return new Polygon(verts);
 	}
 	getCorners() {
@@ -157,9 +179,11 @@ class Polygon extends Shape {
 	scale(factor) {
 		let middle = this.middle;
 		this.vertices = this.vertices.map(e => middle.plus(e.minus(middle).times(factor)));
+		this.subdivideForCollisions();
 	}
 	scaleAbout(pos, factor) {
 		this.vertices = this.vertices.map(e => pos.plus(e.minus(pos).times(factor)));
+		this.subdivideForCollisions();
 	}
 	move(dir) {
 		for (let vert of this.vertices) vert.add(dir);
@@ -222,7 +246,7 @@ class Rect extends Polygon {
 		let middle = this.middle;
 		this.width *= factor;
 		this.height *= factor;
-		this.center(middle);	
+		this.center(middle);
 	}
 	move(dir) {
 		this.x += dir.x;

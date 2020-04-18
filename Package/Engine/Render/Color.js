@@ -5,6 +5,7 @@ class Color {
 		let blue = 0;
 		let alpha = 0;
 		this.custom = {};
+		this.limited = true;
 		if (b === undefined && g === undefined && typeof r == "string") {
 			function parseRGBA(str) {
 				let rgba = "";
@@ -153,10 +154,24 @@ class Color {
 	static copy(color) {
 		return new Color(color.red, color.green, color.blue, color.alpha);
 	}
+	static sum(...colors) {
+		let result = new Color(0, 0, 0, 0);
+		for (let color of colors) result.add(color);
+		return result;
+	}
 	static lerp(color1, color2, per) {
 		let c1 = Color.copy(color1);
 		let c2 = Color.copy(color2);
 		return c1.times(1 - per).plus(c2.times(per));
+	}
+	static quadLerp(a, b, c, d, tx, ty) {
+		let mDist = 1;
+		let distA = mDist - Math.sqrt(tx ** 2 + ty ** 2);
+		let distB = mDist - Math.sqrt((1 - tx) ** 2 + ty ** 2);
+		let distC = mDist - Math.sqrt(tx ** 2 + (1 - ty) ** 2);
+		let distD = mDist - Math.sqrt((tx - 1) ** 2 + (1 - ty) ** 2);
+		let result = Color.sum(a.times(distA), b.times(distB), c.times(distC), d.times(distD)).over(distA + distB + distC + distD);
+		return result;
 	}
 	get_RGBA() {
 		return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
@@ -175,15 +190,17 @@ class Color {
 		}
 	}
 	constrain() {
-		function con(min, max, val) {
-			if (val < min) return min;
-			else if (val > max) return max;
-			else return val;
+		if (this.limited) {
+			function con(min, max, val) {
+				if (val < min) return min;
+				else if (val > max) return max;
+				else return val;
+			}
+			this.red = con(0, 255, this.red);
+			this.green = con(0, 255, this.green);
+			this.blue = con(0, 255, this.blue);
+			this.alpha = con(0, 1, this.alpha);
 		}
-		this.red = con(0, 255, this.red);
-		this.green = con(0, 255, this.green);
-		this.blue = con(0, 255, this.blue);
-		this.alpha = con(0, 1, this.alpha);
 	}
 	static isColorOrNumber(color) {
 		let col = color;

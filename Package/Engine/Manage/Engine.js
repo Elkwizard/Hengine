@@ -19,6 +19,21 @@ class ScreenRecording {
 		return window.c.createAnimation(this.frames, 1, true);
 	}
 }
+class DelayedFunction {
+	constructor(fn, wait) {
+		this.fn = fn;
+		this.limit = wait;
+		this.timer = 0;
+		this.done = false;
+	}
+	increment() {
+		this.timer++;
+		if (this.timer > this.limit) {
+			this.fn();
+			this.done = true;
+		}
+	}
+}
 class Engine {
 	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
 		M.addListenersTo(setupAlerts());
@@ -71,6 +86,7 @@ class Engine {
 		this.fixedScript = new Script("fixed");
 		this.beforeScript = new Script("before");
 		this.updateScript = new Script("update");
+		this.delayed = [];
 
 		M.engine = this;
 		//for real this time
@@ -109,6 +125,7 @@ class Engine {
 				//update
 				if (!this.paused) {
 					K.update();
+					this.updateDelayedCalls();
 					this.beforeUpdate();
 					this.clear();
 					this.update();
@@ -220,6 +237,17 @@ class Engine {
 			let r = this.recordings[key];
 			if (r.isRecording) r.frames.push(f);
 		}
+	}
+	delay(fn, frames) {
+		this.delayed.push(new DelayedFunction(fn, frames));
+	}
+	updateDelayedCalls() {
+		let remaining = [];
+		for (let i = 0; i < this.delayed.length; i++) {
+			this.delayed[i].increment();
+			if (!this.delayed[i].done) remaining.push(this.delayed[i]);
+		}
+		this.delayed = remaining;
 	}
 	makeGraph(yName, minValue, maxValue, getY, msLimit = 5000, colors) {
 		if (this.hasGraphs) {

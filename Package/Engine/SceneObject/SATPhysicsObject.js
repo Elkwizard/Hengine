@@ -174,10 +174,12 @@ class PhysicsObject extends SceneObject {
         c.translate(com.times(-1));
     }
     getPointVelocity(point) {
-        let r_A = point.minus(this.centerOfMass);
-        let v_A = this.angularVelocity;
-        let sum = r_A.normal.times(v_A).plus(this.velocity);
-        return sum;
+        if (!this.rotationStatic) {
+            let r_A = point.minus(this.centerOfMass);
+            let v_A = this.angularVelocity;
+            let sum = r_A.normal.times(v_A).plus(this.velocity);
+            return sum;
+        } else return this.velocity;
     }
     slowDown() {
         //apply linear drag;

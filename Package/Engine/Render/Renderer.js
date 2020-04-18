@@ -1,3 +1,22 @@
+function clamp(n, a, b) {
+	return Math.max(a, Math.min(b, n));
+}
+function lerp(a, b, t) {
+	return a * (1 - t) + b * t;
+}
+function quadLerp(a, b, c, d, tx, ty) {
+	let mDist = 1;
+	let distA = Math.max(0, mDist - Math.sqrt(tx ** 2 + ty ** 2));
+	let distB = Math.max(0, mDist - Math.sqrt((1 - tx) ** 2 + ty ** 2));
+	let distC = Math.max(0, mDist - Math.sqrt(tx ** 2 + (1 - ty) ** 2));
+	let distD = Math.max(0, mDist - Math.sqrt((tx - 1) ** 2 + (1 - ty) ** 2));
+	let A_T = a * distA;
+	let B_T = b * distB;
+	let C_T = c * distC;
+	let D_T = d * distD;
+	let result = (A_T + B_T + C_T + D_T) / (distA + distB + distC + distD);
+	return result;
+}
 class Vertex {
 	constructor(x, y) {
 		this.x = x;
@@ -23,7 +42,7 @@ class Artist {
 		if (height) {
 			this.canvas.height = height;
 		}
-		this.noiseAry = [];
+
 		this.custom = {};
 		this.c = this.canvas.getContext('2d');
 		this._background = new Color(0, 0, 0, 0);
@@ -427,14 +446,6 @@ class Artist {
 			this.home.c.stroke(border, 2).rect(this.x, this.y, this.width, this.height);
 		}
 	}
-	drawAnimation(animation, x, y, width, height) {
-		animation.advance();
-		let img = animation.img;
-		if (img instanceof Frame) img = img.img;
-		if (width === undefined) width = img.width;
-		if (height === undefined) height = img.height;
-		this.c.drawImage(img, x, y, width, height)
-	}
 	drawCircle(color, x, y, radius) {
 		this.c.fillStyle = color;
 		this.c.beginPath();
@@ -511,20 +522,18 @@ class Artist {
 	color(color) {
 		this.c.fillStyle = (this.c.strokeStyle = color);
 	}
-	noise(x, freq, min, max) {
-		if (!freq) freq = 1;
-		if (min === undefined) min = -1;
-		if (max === undefined) max = 1;
-		let last;
-		while (this.noiseAry.length - 1 < x) {
-			last = this.noiseAry[this.noiseAry.length - 1];
-			if (last === undefined) last = 0;
-			let val = last + ((Math.random() - Math.random()));
-			if (val > max) val = max;
-			if (val < min) val = min;
-			this.noiseAry.push(val);
-		}
-		return this.noiseAry[Math.floor(x)] * freq;
+	noise(x, f = 1, seed = 0) {
+		x *= f;
+		const s_0 = n => rand(seed + Math.floor(n));
+		const n = x => lerp(s_0(x), s_0(x + 1), x % 1);
+		return n(x);
+	}
+	noise2D(x, y, f = 1, seed = 0) {
+		x *= f;
+		y *= f;
+		const s_p = (x, y) => rand(rand(Math.floor(x)) + rand(Math.floor(y) * 2000));
+		const n = (x, y) => quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), x % 1, y % 1);
+		return n(x, y);
 	}
 	rotateAround(x, y, r) {
 		this.translate(x, y)
@@ -532,15 +541,13 @@ class Artist {
 		this.translate(-x, -y);
 	}
 	drawTexture(txr = new Texture(0, 0), x = 0, y = 0, width = txr.width, height = txr.height) {
-		let imagedata = txr.imageData;
 		if (typeof x === "object") {
 			width = x.width;
 			height = x.height;
 			y = x.y;
 			x = x.x;
 		}
-		let f = new OffscreenCanvas(txr.width, txr.height);
-		f.getContext('2d').putImageData(imagedata, 0, 0);
+		let f = txr.requestImage(width, height);
 		this.c.drawImage(f, x, y, width, height);
 	}
 	drawImage(img, x, y, width, height) {
@@ -554,6 +561,20 @@ class Artist {
 		if (width === undefined) width = img.width;
 		if (height === undefined) height = img.height;
 		// console.log(img);
+		this.c.drawImage(img, x, y, width, height);
+	}
+	drawAnimation(animation, x, y, width, height, advance = true) {
+		if (typeof x === "object") {
+			width = x.width;
+			height = x.height;
+			y = x.y;
+			x = x.x;
+			if (y !== undefined && y) animation.advance();
+		} else if (advance) animation.advance();
+		let img = animation.img;
+		if (img instanceof Frame) img = img.img;
+		if (width === undefined) width = img.width;
+		if (height === undefined) height = img.height;
 		this.c.drawImage(img, x, y, width, height);
 	}
 	drawWithAlpha(a, shape) {

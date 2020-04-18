@@ -1,9 +1,11 @@
 class Collision {
-    constructor(collides = false, a = null, b = null, dir, penetration, collisionPoint) {
+    constructor(collides = false, a = null, b = null, shapeA, shapeB, dir, penetration, collisionPoint) {
         this.colliding = collides;
         this.dir = dir;
         this.a = a;
         this.b = b;
+        this.shapeA = shapeA;
+        this.shapeB = shapeB;
         this.penetration = penetration;
         if (collisionPoint) {
             this.collisionPoints = collisionPoint.length ? collisionPoint : [{
@@ -151,7 +153,7 @@ class Physics {
 
 
 
-            col = new Collision(true, a, b, collisionAxis, penetration, collisionPoint);
+            col = new Collision(true, a, b, a, b, collisionAxis, penetration, collisionPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -177,7 +179,7 @@ class Physics {
 
             // c.draw(cl.LIME).circle(bestPoint.x, bestPoint.y, 4);
 
-            let col = new Collision(true, a, b, collisionAxis, penetration, bestPoint);
+            let col = new Collision(true, a, b, a, b, collisionAxis, penetration, bestPoint);
             return col;
         } else return new Collision(false, a, b);
     }
@@ -200,12 +202,13 @@ class Physics {
             if (inside) collisionAxis.mul(-1);
 
 
-            col = new Collision(true, a, b, collisionAxis, penetration, bestPoint);
+            col = new Collision(true, a, b, a, b, collisionAxis, penetration, bestPoint);
         } else col = new Collision(false, a, b);
         return col;
     }
     static collidePolygonPolygon(a, b) {
         s.SAT.boxChecks++;
+        // c.stroke(cl.LIME, 2).rect(a.__boundingBox);
         if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return new Collision(false, a, b);
 
         s.SAT.SATChecks++;
@@ -323,7 +326,7 @@ class Physics {
                 // c.draw(cl.BLUE).circle(collisionPoint.x, collisionPoint.y, 2);
 
                 // c.stroke(cl.GREEN, 2).arrow(a.centerOfMass, a.centerOfMass.plus(collisionAxis.times(leastIntersection)));
-                col = new Collision(true, a, b, collisionAxis, leastIntersection, collisionPoints);
+                col = new Collision(true, a, b, a, b, collisionAxis, leastIntersection, collisionPoints);
             } else {
                 col = new Collision(false, a, b);
                 a.rotation += 0.00001;
@@ -386,8 +389,9 @@ class Physics {
         //position
         if (col.penetration > 0.005) {
             let tomMath;
-            tomMath = Physics.fullCollideBool(a, b);
-            if (tomMath) {
+            tomMath = Physics.collide(col.shapeA, col.shapeB);
+            if (tomMath.colliding) {
+                col = tomMath;
                 let dir = col.dir.times(col.penetration);
                 //mass percents
                 let aPer = 1 - a.__mass / (a.__mass + b.__mass);
@@ -663,7 +667,7 @@ class Physics {
             let dif = act_dist - len;
             let dx_N = dx / act_dist;
             let dy_N = dy / act_dist;
-            let mDif = (!a.constraintLeader && !b.constraintLeader) ? dif / 2 : dif;
+            let mDif = (!(a.constraintLeader || a.completelyStatic) && !(b.constraintLeader || b.completelyStatic)) ? dif / 2 : dif;
             let dx_N0 = -dx_N * mDif;
             let dy_N0 = -dy_N * mDif;
             let dx_N1 = dx_N * mDif;
