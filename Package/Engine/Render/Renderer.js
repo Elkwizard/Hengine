@@ -100,6 +100,19 @@ class Artist {
 			text: function (font, text, x, y, pack = false) {
 				text = text + "";
 				this.c.font = font;
+				if (pack) {
+					let words = text.split(" ");
+					let lines = [""];
+					for (let word of words) {
+						let prevLen = lines[lines.length - 1].length;
+						lines[lines.length - 1] += " " + word;
+						if (this.c.measureText(lines[lines.length - 1]).width > pack) {
+							lines[lines.length - 1] = lines[lines.length - 1].substr(0, prevLen);
+							lines.push(word);
+						}
+					}
+					text = lines.join("\n").slice(1);
+				}
 				let fs = parseInt(font);
 				let blocks = text.split("\n");
 				let textRequests = [];
