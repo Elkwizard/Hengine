@@ -33,6 +33,14 @@ class CollisionMoniter {
         else return null;
     }
 }
+class Contact {
+    constructor(a, b, point, penetration) {
+        this.a = a;
+        this.b = b;
+        this.point = point;
+        this.penetration = penetration;
+    }
+}
 class Impulse {
     constructor(force = Vector2.origin, source = Vector2.origin) {
         this.force = force;
@@ -675,14 +683,14 @@ class Physics {
             let iA = new Impulse(new Vector2(dx_N0 / 10, dy_N0 / 10), pA);
             let iB = new Impulse(new Vector2(dx_N1 / 10, dy_N1 / 10), pB);
             if (!a.constraintLeader) {
+                a.applyImpulse(iA);
                 a.privateSetX(a.x + dx_N0);
                 a.privateSetY(a.y + dy_N0);
-                a.applyImpulse(iA);
             }
             if (!b.constraintLeader) {
+                b.applyImpulse(iB);
                 b.privateSetX(b.x + dx_N1);
                 b.privateSetY(b.y + dy_N1);
-                b.applyImpulse(iB);
             }
             return dif;
         }

@@ -164,13 +164,13 @@ class Polygon extends Shape {
 		return axes;
 	}
 	getEdges() {
-		let axes = [];
+		let edges = [];
 		for (let i = 0; i < this.vertices.length; i++) {
-			let inx1 = this.vertices[i];
-			let inx2 = this.vertices[(i + 1) % this.vertices.length];
-			axes.push(new Line(this.vertices[inx1], this.vertices[inx2]));
+			let inx1 = i;
+			let inx2 = (i + 1) % this.vertices.length;
+			edges.push(new Line(this.vertices[inx1], this.vertices[inx2]));
 		}
-		return axes;
+		return edges;
 	}
 	center(pos) {
 		let offset = pos.minus(this.middle);

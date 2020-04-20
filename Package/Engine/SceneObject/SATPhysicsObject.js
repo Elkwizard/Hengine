@@ -189,6 +189,39 @@ class PhysicsObject extends SceneObject {
 
         if (this.velocity.mag < 0.01) this.velocity.mag = 0;
         if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
+        
+        //wacky air
+        // let removals = [];
+
+        // //find surface area against wind
+        // let totalSize = 0;
+        // for (let name in this.shapes) {
+        //     let model = this.getModel(name);
+        //     let edges = model.getEdges();
+        //     for (let edge of edges) {
+        //         c.stroke(cl.LIME, 2).line(edge);
+        //         let a = edge.a;
+        //         let b = edge.b;
+        //         let v = b.minus(a).normal;
+        //         v = v.projectOnto(this.velocity);
+        //         totalSize += v.mag;
+        //         removals.push(v);
+        //     }
+        // }
+        // let rmI = 0;
+        // for (let name in this.shapes) {
+        //     let model = this.getModel(name);
+        //     let edges = model.getEdges();
+        //     for (let edge of edges) {
+        //         c.stroke(cl.LIME, 2).line(edge);
+        //         let v = removals[rmI++].over(totalSize);
+        //         if (v.dot(this.velocity) < 0) {
+        //             let mid = edge.midPoint;
+        //             let r = v.times(this.velocity);
+        //             c.stroke(cl.RED, 2).arrow(mid.minus(v.times(200)), mid);
+        //         }
+        //     }
+        // }
     }
     capSpeed() {
         let m = Math.sqrt(this.mass) / 2;
