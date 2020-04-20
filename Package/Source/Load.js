@@ -2,7 +2,7 @@
 Hengine.load({
 	"engine": {
 		"files": {
-			"Render": ["Color", "Shapes", "Animation", "Frame", "Fade", "Texture", "Renderer", "Graph"],
+			"Render": ["Color", "Shapes", "Animation", "Frame", "Texture", "Renderer", "Graph"],
 			"Math": ["Vector", "Geometry", "Physics"],
 			"Util": ["Input", "Sound", "Time", "Console"],
 			"SceneObject": ["SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"],
