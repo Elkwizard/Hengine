@@ -20,6 +20,66 @@ class Texture {
 		this.loops = false;
 		this.updateImageData();
 	}
+	static fromString(str) {
+		function inv_channel(str) {
+			return str.charCodeAt(0);
+		}
+		function inv_color(str) {
+			let tok = str.split("");
+			return new Color(inv_channel(tok[0]), inv_channel(tok[1]), inv_channel(tok[2]), inv_channel(tok[3]) / 255);
+		}
+		function inv_column(str) {
+			let result = [];
+			let acc = "";
+			for (let i = 0; i < str.length; i++) {
+				acc += str[i];
+				if ((i + 1) % 4 === 0) {
+					result.push(inv_color(acc));
+					acc = "";
+				}
+			}
+			return result;
+		}
+		function inv_toString(str) {
+			let inx = str.indexOf(":");
+			let data = str.slice(inx + 1);
+			let header = str.slice(0, inx);
+			let sp = header.split(",");
+			let w = parseFloat(sp[0]);
+			let h = parseFloat(sp[1]);
+			let tex = new Texture(w, h);
+			let acc = "";
+			let result = [];
+			for (let i = 0; i < data.length; i++) {
+				acc += data[i];        
+				if ((i + 1) % (h * 4) === 0) {
+					result.push(inv_column(acc));
+					acc = "";    
+				}
+			}
+			tex.pixels = result;
+			tex.updateImageData();
+			return tex;
+		}
+		return inv_toString(str);
+	}
+	toString() {
+		function channel(v) {
+			return String.fromCharCode(Math.floor(v))
+		}
+		function color(col) {
+			return channel(col.red) + channel(col.green) + channel(col.blue) + channel(col.alpha * 255);
+		}
+		function column(col) {
+			return col.map(e => color(e)).join("");
+		}
+		function toString(tex) {
+			let result = tex.width + "," + tex.height + ":";
+			for (let col of tex.pixels) result += column(col);
+			return result;
+		}
+		return toString(this);
+	}
 	getPixel(x, y) {
 		if (this.pixels[x] && this.pixels[x][y]) return this.pixels[x][y];
 		else if (!this.loops) return new Color(0, 0, 0, 0);

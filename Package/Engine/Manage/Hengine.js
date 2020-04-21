@@ -43,6 +43,8 @@ class Hengine {
 		window.middle = this.middle.bind(this);
 		window.save = this.save.bind(this);
 		window.get = this.get.bind(this);
+		window.fileSize = this.fileSize.bind(this);
+		window.getRaw = this.getRaw.bind(this);
 		this.SPRITE_PATH = "../Art/Sprites/";
 		this.ANIMATION_PATH = "../Art/Animations/";
 		this.SOUND_PATH = "../Sound/";
@@ -56,18 +58,20 @@ class Hengine {
 			NUMBER_ARRAY: str => str.split(",").map(e => parseInt(e)),
 			STRING_ARRAY: str => str.split(","),
 			OBJECT: str => JSON.parse(str),
-			BOOLEAN: str => str === "true"
+			BOOLEAN: str => str === "true",
+			IMAGE: str => Texture.fromString(str)
 		};
-		let aliases = {
+		this.fileAliases = {
 			NUMBER: ["num", "int", "float", "double"],
 			STRING: ["txt", "str", "file", "char"],
 			NUMBER_ARRAY: ["num_ary", "num_array"],
 			STRING_ARRAY: ["str_ary", "str_array"],
 			OBJECT: ["obj", "col"],
-			BOOLEAN: ["bln", "bool"]
+			BOOLEAN: ["bln", "bool"],
+			IMAGE: ["img", "png", "bmp", "txr"]
 		};
-		for (let type in aliases) {
-			for (let alt of aliases[type]) {
+		for (let type in this.fileAliases) {
+			for (let alt of this.fileAliases[type]) {
 				this.fileTypes[alt.toUpperCase()] = this.fileTypes[type];
 			}
 		}
@@ -95,17 +99,30 @@ class Hengine {
 		return title;
 	}
 	save(file, data) {
-		let actData = data;
-		if (typeof data === "object") data = JSON.stringify(data);
-		data += "";
+		
 		let type = file.split(".")[1];
 		if (!this.fileTypes[type.toUpperCase()]) {
 			type = "STRING";
 		}
+
+		let actData = data;
+		if (this.fileAliases.OBJECT.includes(type.toLowerCase())) data = JSON.stringify(data);
+		data += "";
 		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
 		localStorage["HengineLocalSaves/" + this.getProjectName() + "/" + name] = data;
 		return actData;
 	}
+	fileSize(file) {
+		let data = this.getRaw(file);
+		if (data) {
+			return data.length * 8;
+		}
+	}
+	getRaw(file) {
+		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
+		let dat = localStorage["HengineLocalSaves/" + this.getProjectName() + "/" + name];
+		return dat;
+	} 
 	get(file) {
 		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
 		let dat = localStorage["HengineLocalSaves/" + this.getProjectName() + "/" + name];
