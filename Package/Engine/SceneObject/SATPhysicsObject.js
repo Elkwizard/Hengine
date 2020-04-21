@@ -183,7 +183,7 @@ class PhysicsObject extends SceneObject {
     }
     slowDown() {
         //apply linear drag;
-        let drag = this.velocity.get().mul(-(1 - this.linearDragForce));
+        let drag = this.velocity.get().mul(-(1 - this.linearDragForce) * this.__mass);
         let iD = new Impulse(drag, this.centerOfMass);
         this.applyImpulse(iD);
 
@@ -308,7 +308,7 @@ class PhysicsObject extends SceneObject {
         if (this.hasGravity) {
             //gravity
             let gv = this.gravity;
-            let gravitationalForce = gv.times(coef / this.getSpeedModulation());
+            let gravitationalForce = gv.times(coef / this.getSpeedModulation() * this.__mass);
             let iG = new Impulse(gravitationalForce, this.centerOfMass);
             this.applyImpulse(iG);
         }
@@ -379,6 +379,7 @@ class PhysicsObject extends SceneObject {
     }
     applyImpulse(impulse, name = "no name") {
         if (!impulse || !impulse.force.mag) return;
+        impulse.force.div(this.__mass);
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
         // c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);

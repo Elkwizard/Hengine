@@ -618,8 +618,8 @@ class Physics {
         let impulseA, impulseB;
         let frictionA = a.getPointVelocity(collisionPoint).projectOnto(tangent).times(-0.05);//.times(-this.friction * otherFriction * 2);
         let frictionB = b.getPointVelocity(collisionPoint).projectOnto(tangent).times(-0.05);//.times(-this.friction * otherFriction * 2);
-        impulseA = new Impulse(frictionA.over(2), collisionPoint);
-        impulseB = new Impulse(frictionB.over(2), collisionPoint);
+        impulseA = new Impulse(frictionA.over(2 / a.__mass), collisionPoint);
+        impulseB = new Impulse(frictionB.over(2 / b.__mass), collisionPoint);
         return { impulseA, impulseB };
     }
     static getImpulses(a, b, dir, collisionPoint) {
@@ -646,8 +646,8 @@ class Physics {
         if (!V_B_DOT_N) PER_B = 1;
         const j_A = j_DYNAMIC * PER_A + j_STATIC_A * (1 - PER_A);
         const j_B = j_DYNAMIC * PER_B + j_STATIC_B * (1 - PER_B);
-        const I_A = n.times(-j_A).over(m_A);
-        const I_B = n.times(j_B).over(m_B);
+        const I_A = n.times(-j_A);
+        const I_B = n.times(j_B);
 
 
         impulseA = new Impulse(I_A, collisionPoint);
