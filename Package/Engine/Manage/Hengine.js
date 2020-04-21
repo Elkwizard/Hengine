@@ -18,7 +18,6 @@ class Hengine {
 		window.c = this.c;
 		window.C = this.C;
 		window.cl = this.cl;
-		const c = this.c;
 		if (!(window.width || window.height)) {
 			Object.defineProperty(window, "width", {
 				get: function () {
@@ -42,18 +41,79 @@ class Hengine {
 		window.loadAnimation = this.loadAnimation.bind(this);
 		window.loadSound = this.loadSound.bind(this);
 		window.middle = this.middle.bind(this);
+		window.save = this.save.bind(this);
+		window.get = this.get.bind(this);
 		this.SPRITE_PATH = "../Art/Sprites/";
 		this.ANIMATION_PATH = "../Art/Animations/";
 		this.SOUND_PATH = "../Sound/";
 		this.animations = {};
 		this.images = {};
 		this.sounds = {};
+
+		this.fileTypes = {
+			NUMBER: str => parseFloat(str),
+			STRING: str => str,
+			NUMBER_ARRAY: str => str.split(",").map(e => parseInt(e)),
+			STRING_ARRAY: str => str.split(","),
+			OBJECT: str => JSON.parse(str),
+			BOOLEAN: str => str === "true"
+		};
+		let aliases = {
+			NUMBER: ["num", "int", "float", "double"],
+			STRING: ["txt", "str", "file", "char"],
+			NUMBER_ARRAY: ["num_ary", "num_array"],
+			STRING_ARRAY: ["str_ary", "str_array"],
+			OBJECT: ["obj", "col"],
+			BOOLEAN: ["bln", "bool"]
+		};
+		for (let type in aliases) {
+			for (let alt of aliases[type]) {
+				this.fileTypes[alt.toUpperCase()] = this.fileTypes[type];
+			}
+		}
+
+		//title
+		this.setTitle(this.getProjectName());
 	}
 	get width() {
 		return this.s.display.width;
 	}
 	get height() {
 		return this.s.display.height;
+	}
+	getProjectName() {
+		let script = document.createElement("script");
+		script.src = "./Source.js";
+		let t = script.src;
+		let st = t.split("/");
+		let ti = st[st.length - 3];
+		ti.replace(/%20/g, " ");
+		return ti;
+	}
+	setTitle(title) {
+		document.querySelector("title").innerHTML = title;
+		return title;
+	}
+	save(file, data) {
+		let actData = data;
+		if (typeof data === "object") data = JSON.stringify(data);
+		data += "";
+		let type = file.split(".")[1];
+		if (!this.fileTypes[type.toUpperCase()]) {
+			type = "STRING";
+		}
+		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
+		localStorage["HengineLocalSaves/" + this.getProjectName() + "/" + name] = data;
+		return actData;
+	}
+	get(file) {
+		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
+		let dat = localStorage["HengineLocalSaves/" + this.getProjectName() + "/" + name];
+		if (dat) {
+			let type = file.split(".")[1].toUpperCase();
+			if (!this.fileTypes[type]) type = "STRING";
+			return this.fileTypes[type](dat);
+		}
 	}
 	initImage(src) {
 		let x = new Image;

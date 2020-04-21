@@ -178,13 +178,6 @@ class Engine {
 		}
 		`
 		document.head.appendChild(this.styling);
-		//title
-		let script = document.createElement("script");
-		script.src = "./Source.js";
-		let t = script.src;
-		let st = t.split("/");
-		let ti = st[st.length - 3];
-		if (!wrapperID) this.setTitle(ti.replace(/%20/g, " "));
 		this.resize = true;
 		window.addEventListener("resize", function () {
 			if (this.resize) {
@@ -303,10 +296,6 @@ class Engine {
 	}
 	clear() {
 		this.renderer.clear();
-	}
-	setTitle(title) {
-		document.querySelector("title").innerHTML = title;
-		return title;
 	}
 	getDistance(x1, y1, x2, y2) {
 		let distance1 = (x2 - x1) ** 2
