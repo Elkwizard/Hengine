@@ -7,9 +7,7 @@ class Collision {
         this.shapeA = shapeA;
         this.shapeB = shapeB;
         if (collisionPoints) {
-            let pen = 0;
-            for (let point of collisionPoints) pen += point.penetration;
-            this.penetration = pen / collisionPoints.length;
+            this.penetration = Math.min(...collisionPoints.map(e => e.penetration));
             this.collisionPoints = collisionPoints;
         }
     }
@@ -295,16 +293,13 @@ class Physics {
                         bTP += pen;
                     }
                 }
-                // for (let crn of aPC) c.draw(cl.PURPLE).circle(crn.x, crn.y, 5);
                 let collisionPointA = aPC.length ? Vector.sum(...aPC).over(aTP) : null;
                 let collisionPointB = bPC.length ? Vector.sum(...bPC).over(bTP) : null;
-                // if (aPC.length) c.draw(cl.GREEN).circle(collisionPointA.x, collisionPointA.y, 6);
-                // if (bPC.length) c.draw(cl.ORANGE).circle(collisionPointB.x, collisionPointB.y, 6);
                 const TRANSFORM_TO_LINKED_PENETRATION = (range) => e => {
                     let dot = e.dot(collisionAxis);
                     let pen = range.getPenetration(dot);
                     if (pen < 0) pen = range.getPenetration(-dot);
-                    return new Contact(a, b, e, pen);
+                    return new Contact(a, b, e, Math.min(leastIntersection, pen));
                 }
 
                 if (collisionPointA && !collisionPointB) collisionPoints = [TRANSFORM_TO_LINKED_PENETRATION(bRange)(collisionPointA)];
@@ -401,27 +396,29 @@ class Physics {
 
 
         //position
-        let tomMath;
-        tomMath = Physics.collide(col.shapeA, col.shapeB);
-        if (tomMath.colliding) {
-            col = tomMath;
-            let dir = col.dir.times(col.penetration);
-            //mass percents
-            let aPer = 1 - a.__mass / (a.__mass + b.__mass);
-            if (!mobileB) aPer = 1;
-            let bPer = 1 - aPer;
+        if (col.penetration > 0.05) {
+            let tomMath;
+            tomMath = Physics.collide(col.shapeA, col.shapeB);
+            if (tomMath.colliding) {
+                col = tomMath;
+                let dir = col.dir.times(col.penetration);
+                //mass percents
+                let aPer = 1 - a.__mass / (a.__mass + b.__mass);
+                if (!mobileB) aPer = 1;
+                let bPer = 1 - aPer;
 
-            //escape dirs
-            let aMove = dir.times(-1 * aPer);
-            let bMove = dir.times(1 * bPer);
+                //escape dirs
+                let aMove = dir.times(-1 * aPer);
+                let bMove = dir.times(1 * bPer);
 
 
-            //like, the escaping
-            a.privateMove(aMove);
-            b.privateMove(bMove);
-            // console.log(aMove, col.penetration);
-            a.cacheBoundingBoxes();
-            b.cacheBoundingBoxes();
+                //like, the escaping
+                a.privateMove(aMove);
+                b.privateMove(bMove);
+                // console.log(aMove, col.penetration);
+                a.cacheBoundingBoxes();
+                b.cacheBoundingBoxes();
+            } else return false;
         } else return false;
         const d = col.dir.times(-1);
 
@@ -431,7 +428,7 @@ class Physics {
         if (A_VEL_AT_COLLISION < 0 && B_VEL_AT_COLLISION < 0) return false;
 
         //friction
-        
+
         Physics.resolveContacts(a, b, col.collisionPoints, col.dir);
 
         //immobilize

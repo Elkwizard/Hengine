@@ -107,12 +107,7 @@ class Texture {
 	}
 	setPixel(x, y, clr) {
 		if (this.pixels[x] && this.pixels[x][y]) this.act_set(x, y, clr);
-		else if (!this.loops) return;
-		else {
-			x = (x % this.pixels.length + this.pixels.length) % this.pixels.length;
-			y = (y % this.pixels[0].length + this.pixels[0].length) % this.pixels[0].length;
-			this.act_set(x, y, clr);
-		}
+		return;
 	}
 	blur(amount = 1) {
 		for (let n = 0; n < amount; n++) for (let [x, y] of this) {
