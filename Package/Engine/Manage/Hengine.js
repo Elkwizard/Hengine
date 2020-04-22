@@ -214,7 +214,6 @@ class Hengine {
 					if (resource) await new Promise(function (resolve, reject) {
 						resource.onload = function () {
 							resolve();
-							// console.info("LOADED " + type + " [" + file + "] FROM [" + path + "]");
 						}
 					});
 				}

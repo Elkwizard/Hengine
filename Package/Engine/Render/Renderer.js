@@ -5,17 +5,10 @@ function lerp(a, b, t) {
 	return a * (1 - t) + b * t;
 }
 function quadLerp(a, b, c, d, tx, ty) {
-	let mDist = 1;
-	let distA = Math.max(0, mDist - Math.sqrt(tx ** 2 + ty ** 2));
-	let distB = Math.max(0, mDist - Math.sqrt((1 - tx) ** 2 + ty ** 2));
-	let distC = Math.max(0, mDist - Math.sqrt(tx ** 2 + (1 - ty) ** 2));
-	let distD = Math.max(0, mDist - Math.sqrt((tx - 1) ** 2 + (1 - ty) ** 2));
-	let A_T = a * distA;
-	let B_T = b * distB;
-	let C_T = c * distC;
-	let D_T = d * distD;
-	let result = (A_T + B_T + C_T + D_T) / (distA + distB + distC + distD);
-	return result;
+	const l = a * (1 - ty) + c * ty;
+	const r = b * (1 - ty) + d * ty;
+	let per = l * (1 - tx) + r * tx;
+	return per;
 }
 class Vertex {
 	constructor(x, y) {
@@ -465,7 +458,7 @@ class Artist {
 	noise2D(x, y, f = 1, seed = 0) {
 		x *= f;
 		y *= f;
-		const s_p = (x, y) => rand(rand(Math.trunc(x)) + rand(Math.trunc(y) * 2000) + seed * 100000);
+		const s_p = (x, y) => rand(rand(Math.floor(x)) + rand(Math.floor(y) * 2000) + seed * 100000);
 		const n = (x, y) => quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), x % 1, y % 1);
 		return n(x, y);
 	}

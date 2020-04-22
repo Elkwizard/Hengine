@@ -165,13 +165,10 @@ class Color {
 		return c1.times(1 - per).plus(c2.times(per));
 	}
 	static quadLerp(a, b, c, d, tx, ty) {
-		let mDist = 1;
-		let distA = mDist - Math.sqrt(tx ** 2 + ty ** 2);
-		let distB = mDist - Math.sqrt((1 - tx) ** 2 + ty ** 2);
-		let distC = mDist - Math.sqrt(tx ** 2 + (1 - ty) ** 2);
-		let distD = mDist - Math.sqrt((tx - 1) ** 2 + (1 - ty) ** 2);
-		let result = Color.sum(a.times(distA), b.times(distB), c.times(distC), d.times(distD)).over(distA + distB + distC + distD);
-		return result;
+		const l = a.times(1 - ty).plus(c.times(ty));
+		const r = b.times(1 - ty).plus(d.times(ty));
+		let per = l.times(1 - tx).plus(r.times(tx));
+		return per;
 	}
 	get_RGBA() {
 		return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";

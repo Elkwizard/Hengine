@@ -17,6 +17,13 @@ class Texture {
 			}
 		}
 		this.__image = null;
+		
+		//init image data
+		let array = new Uint8ClampedArray(4 * this.width * this.height);
+		for (let i = 0; i < array.length; i++) array[i] = 0;
+		this.imageData = new ImageData(array, this.width, this.height);
+		
+
 		this.loops = false;
 		this.updateImageData();
 	}
@@ -89,8 +96,23 @@ class Texture {
 			return this.pixels[x][y];
 		}
 	}
+	act_set(x, y, clr) {
+		this.pixels[x][y] = clr;
+		let inx = (y * this.width + x) * 4;
+		let data = this.imageData.data;
+		data[inx] = clr.red;
+		data[inx + 1] = clr.green;
+		data[inx + 2] = clr.blue;
+		data[inx + 3] = clr.alpha * 255;
+	}
 	setPixel(x, y, clr) {
-		if (this.pixels[x] && this.pixels[x][y]) this.pixels[x][y] = clr;
+		if (this.pixels[x] && this.pixels[x][y]) this.act_set(x, y, clr);
+		else if (!this.loops) return;
+		else {
+			x = (x % this.pixels.length + this.pixels.length) % this.pixels.length;
+			y = (y % this.pixels[0].length + this.pixels[0].length) % this.pixels[0].length;
+			this.act_set(x, y, clr);
+		}
 	}
 	blur(amount = 1) {
 		for (let n = 0; n < amount; n++) for (let [x, y] of this) {
@@ -106,27 +128,14 @@ class Texture {
 		}
 	}
 	updateImageData() {
-		let array = new Uint8ClampedArray(4 * this.width * this.height);
-		let cntr = 0;
-		for (let i = 0; i < this.height; i++) {
-			for (let j = 0; j < this.width; j++) {
-				let color = this.pixels[j][i];
-				array[cntr] = Math.floor(color.red);
-				array[cntr + 1] = Math.floor(color.green);
-				array[cntr + 2] = Math.floor(color.blue);
-				array[cntr + 3] = Math.floor(color.alpha * 255);
-				cntr += 4;
-			}
-		}
-		let img = new ImageData(array, this.width, this.height);
-		this.imageData = img;
 		let x = new Frame(this.width, this.height);
 		x.c.c.putImageData(this.imageData, 0, 0);
 		this.__image = x;
 	}
 	requestImage(width, height) {
-		if (!this.loops) return this.__image.img;
-		else {
+		if (!this.loops) {
+			return this.__image.img;
+		} else {
 			let frame = new OffscreenCanvas(width, height);
 			let c = frame.getContext("2d");
 			let img = this.__image.img;
