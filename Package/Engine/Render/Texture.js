@@ -28,19 +28,26 @@ class Texture {
 		this.updateImageData();
 	}
 	static fromString(str) {
-		function inv_channel(str) {
-			return str.charCodeAt(0);
+		function inv_channelPair(str) {
+			let bin = str.charCodeAt(0) .toString(2);
+			bin = "0".repeat(16 - bin.length) + bin;
+			let a = parseInt(bin.slice(0, 8), 2);
+			let b = parseInt(bin.slice(8), 2);
+			return [a, b]
 		}
 		function inv_color(str) {
 			let tok = str.split("");
-			return new Color(inv_channel(tok[0]), inv_channel(tok[1]), inv_channel(tok[2]), inv_channel(tok[3]) / 255);
+			let rg = inv_channelPair(tok[0]);
+			let ba = inv_channelPair(tok[1]);
+			return new Color(rg[0], rg[1], ba[0], ba[1] / 255);
 		}
+		const col_size = 2;
 		function inv_column(str) {
 			let result = [];
 			let acc = "";
 			for (let i = 0; i < str.length; i++) {
 				acc += str[i];
-				if ((i + 1) % 4 === 0) {
+				if ((i + 1) % col_size === 0) {
 					result.push(inv_color(acc));
 					acc = "";
 				}
@@ -59,23 +66,27 @@ class Texture {
 			let result = [];
 			for (let i = 0; i < data.length; i++) {
 				acc += data[i];        
-				if ((i + 1) % (h * 4) === 0) {
+				if ((i + 1) % (h * col_size) === 0) {
 					result.push(inv_column(acc));
 					acc = "";    
 				}
 			}
-			tex.pixels = result;
+			for (let [x, y] of tex) tex.setPixel(x, y, result[x][y]);
 			tex.updateImageData();
 			return tex;
 		}
 		return inv_toString(str);
 	}
 	toString() {
-		function channel(v) {
-			return String.fromCharCode(Math.floor(v))
+		function channelPair(a, b) {
+			let aStr = Math.floor(a).toString(2);
+			let bStr = Math.floor(b).toString(2);
+			let difA = 8 - aStr.length;
+			let difB = 8 - bStr.length;
+			return String.fromCharCode(parseInt("0".repeat(difA) + aStr + "0".repeat(difB) + bStr, 2));
 		}
 		function color(col) {
-			return channel(col.red) + channel(col.green) + channel(col.blue) + channel(col.alpha * 255);
+			return channelPair(col.red, col.green) + channelPair(col.blue, col.alpha * 255);
 		}
 		function column(col) {
 			return col.map(e => color(e)).join("");
