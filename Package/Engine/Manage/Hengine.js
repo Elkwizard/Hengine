@@ -44,6 +44,10 @@ class Hengine {
 		window.save = this.save.bind(this);
 		window.get = this.get.bind(this);
 		window.fileSize = this.fileSize.bind(this);
+		window.packageFiles = this.packageFiles.bind(this);
+		window.importPackage = this.importPackage.bind(this);
+		window.clearFiles = this.clearFiles.bind(this);
+		window.saveRaw = this.saveRaw.bind(this);
 		window.getRaw = this.getRaw.bind(this);
 		this.SPRITE_PATH = "../Art/Sprites/";
 		this.ANIMATION_PATH = "../Art/Animations/";
@@ -68,7 +72,7 @@ class Hengine {
 			STRING_ARRAY: ["str_ary", "str_array"],
 			OBJECT: ["obj", "col"],
 			BOOLEAN: ["bln", "bool"],
-			IMAGE: ["img", "png", "bmp", "txr"]
+			IMAGE: ["img", "png", "jpg", "bmp", "txr"]
 		};
 		for (let type in this.fileAliases) {
 			for (let alt of this.fileAliases[type]) {
@@ -98,7 +102,43 @@ class Hengine {
 		document.querySelector("title").innerHTML = title;
 		return title;
 	}
-	save(file, data) {
+	clearFiles(loc = this.getProjectName()) {
+		let src = "HengineLocalSaves/" + loc + "/";
+		for (let key in localStorage) {
+			if (key.indexOf(src) > -1) delete localStorage[key];
+		}
+	}
+	importPackage(pack, loc = this.getProjectName()) {
+		let data = JSON.parse(pack);
+		for (let key in data) {
+			this.saveRaw(key, data[key], loc);
+		}
+		return data;
+	}
+	packageFiles(files = [], loc = this.getProjectName()) {
+		let data = {};
+		let src = "HengineLocalSaves/" + loc + "/";
+		for (let file of files) {
+			let path = src + file;
+			data[file] = localStorage[path];
+		}
+		let packageString = JSON.stringify(data);
+		//escape chars
+		packageString = packageString
+			.replace(/\\"/g, "\\\\\\\"")
+			.replace(/([^\\])"/g, "$1\\\"");
+		return packageString;
+	}
+	saveRaw(file, data, loc = this.getProjectName()) {
+		let type = file.split(".")[1];
+		if (!this.fileTypes[type.toUpperCase()]) {
+			type = "STRING";
+		}
+		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
+		localStorage["HengineLocalSaves/" + loc + "/" + name] = data;
+		return data;
+	}
+	save(file, data, loc = this.getProjectName()) {
 		
 		let type = file.split(".")[1];
 		if (!this.fileTypes[type.toUpperCase()]) {
@@ -109,23 +149,23 @@ class Hengine {
 		if (this.fileAliases.OBJECT.includes(type.toLowerCase())) data = JSON.stringify(data);
 		data += "";
 		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
-		localStorage["HengineLocalSaves/" + this.getProjectName() + "/" + name] = data;
+		localStorage["HengineLocalSaves/" + loc + "/" + name] = data;
 		return actData;
 	}
-	fileSize(file) {
-		let data = this.getRaw(file);
+	fileSize(file, path = this.getProjectName()) {
+		let data = this.getRaw(file, path);
 		if (data) {
 			return data.length * 8;
 		}
 	}
-	getRaw(file) {
+	getRaw(file, path = this.getProjectName()) {
 		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
-		let dat = localStorage["HengineLocalSaves/" + this.getProjectName() + "/" + name];
+		let dat = localStorage["HengineLocalSaves/" + path + "/" + name];
 		return dat;
 	} 
-	get(file) {
+	get(file, path = this.getProjectName()) {
 		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
-		let dat = localStorage["HengineLocalSaves/" + this.getProjectName() + "/" + name];
+		let dat = localStorage["HengineLocalSaves/" + path + "/" + name];
 		if (dat) {
 			let type = file.split(".")[1].toUpperCase();
 			if (!this.fileTypes[type]) type = "STRING";

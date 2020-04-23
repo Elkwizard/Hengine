@@ -277,11 +277,21 @@ class Color {
 		x.div(col);
 		return x;
 	}
+	dif(color) {
+		let red = Math.abs(this.red - color.red) / 255;
+		let green = Math.abs(this.green - color.green) / 255;
+		let blue = Math.abs(this.blue - color.blue) / 255;
+		let alpha = Math.abs(this.alpha - color.alpha) / 255;
+		return (red + green + blue + alpha) / 4;
+	}
 	static grayScale(per) {
 		let r = 255 * per;
 		let g = 255 * per;
 		let b = 255 * per;
 		return new Color(r, g, b, 1);
+	}
+	get brightness() {
+		return (this.red + this.blue + this.green) / (3 * 255);
 	}
 }
 class ColorLibrary {

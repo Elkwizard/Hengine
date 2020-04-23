@@ -27,6 +27,41 @@ class Texture {
 		this.loops = false;
 		this.updateImageData();
 	}
+	static async fromDataURI(uri, w_o, h_o) {
+		let img = new Image();
+		img.src = uri;
+		let tex;
+		return await new Promise(function (resolve, reject) {
+			img.onload = function () {
+				let canvas = document.createElement("canvas");
+				canvas.style.position = "absolute";
+				canvas.style.zIndex = "4";
+				document.body.appendChild(img);
+				let style = getComputedStyle(img);
+				let w = w_o ? w_o : parseInt(style.width);
+				let h = h_o ? h_o : parseInt(style.height);
+				tex = new Texture(w, h);
+				canvas.width = w;
+				canvas.height = h;
+				let ctx = canvas.getContext("2d");
+				ctx.imageSmoothingEnabled = false;
+				ctx.drawImage(img, 0, 0, w, h);
+				let data = ctx.getImageData(0, 0, w, h).data;
+				for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
+					let inx = (j * w + i) * 4;
+					let red = data[inx];
+					let green = data[inx + 1];
+					let blue = data[inx + 2];
+					let alpha = data[inx + 3] / 255;
+					let col = new Color(red, green, blue, alpha);
+					tex.setPixel(i, j, col);
+				}
+				tex.updateImageData();
+				img.outerHTML = "";
+				resolve(tex);
+			}
+		});
+	}
 	static fromString(str) {
 		function inv_channelPair(str) {
 			let bin = str.charCodeAt(0) .toString(2);
