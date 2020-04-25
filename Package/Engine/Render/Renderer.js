@@ -560,26 +560,19 @@ class Artist {
 	}
 	drawImage(img, x, y, width, height) {
 		if (typeof x === "object") {
-			width = x.width;
-			height = x.height;
-			y = x.y;
-			x = x.x;
+			this.drawImage(img, x.x, x.y, x.width, x.height);
 		}
 		if (width === undefined) width = img.width;
 		if (height === undefined) height = img.height;
 		if (img instanceof Frame) img = img.img;
 		if (img instanceof Texture) img = img.requestImage(width, height);
-		// console.log(img);
 		this.c.drawImage(img, x, y, width, height);
 	}
 	drawAnimation(animation, x, y, width, height, advance = true) {
 		if (typeof x === "object") {
-			width = x.width;
-			height = x.height;
-			y = x.y;
-			x = x.x;
-			if (y !== undefined && y) animation.advance();
-		} else if (advance) animation.advance();
+			this.drawAnimation(animation, x.x, x.y, x.width, x.height, y);
+		}
+		if (advance) animation.advance();
 		let img = animation.img;
 		if (img instanceof Frame) img = img.img;
 		if (width === undefined) width = img.width;

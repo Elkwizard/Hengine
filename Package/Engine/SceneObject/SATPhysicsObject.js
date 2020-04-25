@@ -356,16 +356,10 @@ class PhysicsObject extends SceneObject {
     moveTowards(point, ferocity = 1) {
         let dif = point.minus(this.middle);
         this.velocity.add(dif.mul(ferocity / 100));
-        this.logMod(function () {
-            this.moveTowards(point, ferocity);
-        });
     }
     moveAwayFrom(point, ferocity = 1) {
         let dif = this.middle.minus(point);
         this.velocity.add(dif.times(ferocity / 100));
-        this.logMod(function () {
-            this.moveAwayFrom(point, ferocity);
-        });
     }
     getImpulseRatio(point, axis) {
         let r_N = point.minus(this.centerOfMass).normal;
