@@ -286,8 +286,7 @@ class SceneObject {
 		c.restore();
 	}
 	engineDrawUpdate() {
-		let d = s.adjustedDisplay;
-		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, (new Rect(d.x, d.y, d.width, d.height, s.viewRotation)).getBoundingBox());
+		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, s.adjustedDisplay.__boundingBox);
 		if (!this.hidden && onScreen) {
 			this.runDraw();
 		}

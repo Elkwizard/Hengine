@@ -72,7 +72,7 @@ class Hengine {
 			STRING_ARRAY: ["str_ary", "str_array"],
 			OBJECT: ["obj", "col"],
 			BOOLEAN: ["bln", "bool"],
-			IMAGE: ["img", "png", "jpg", "bmp", "txr"]
+			IMAGE: ["img", "png", "jpg", "jpeg", "bmp", "txr"]
 		};
 		for (let type in this.fileAliases) {
 			for (let alt of this.fileAliases[type]) {
@@ -95,7 +95,7 @@ class Hengine {
 		let t = script.src;
 		let st = t.split("/");
 		let ti = st[st.length - 3];
-		ti.replace(/%20/g, " ");
+		ti = ti.replace(/%20/g, " ");
 		return ti;
 	}
 	setTitle(title) {
@@ -109,9 +109,9 @@ class Hengine {
 		}
 	}
 	importPackage(pack, loc = this.getProjectName()) {
-		let data = JSON.parse(pack);
+		let data = pack;
 		for (let key in data) {
-			this.saveRaw(key, data[key], loc);
+			if (!this.getRaw(key, loc)) this.saveRaw(key, data[key], loc);
 		}
 		return data;
 	}
@@ -122,18 +122,10 @@ class Hengine {
 		}
 		let packageString = JSON.stringify(data);
 		//escape chars
-		packageString = packageString
-			.replace(/\\"/g, "\\\\\\\"")
-			.replace(/([^\\])"/g, "$1\\\"");
 		return packageString;
 	}
 	getFileType(fileName) {
 		let type = fileName.split(".")[1];
-		let section = type.indexOf("(");
-		if (section > -1) {
-			let sectionNumber = parseInt(type.slice(section + 1));
-			type = type.slice(0, section);
-		}
 		if (!this.fileTypes[type.toUpperCase()]) {
 			console.log(type);
 			type = "STRING";
@@ -187,7 +179,12 @@ class Hengine {
 		return this.sounds[src];
 	}
 	loadImage(src) {
-		return this.images[src];
+		let img = this.images[src];
+		console.log(img.width, img.height);
+		let f = new Frame(img.width, img.height);
+		f.c.c.drawImage(img, 0, 0, f.width, f.height);
+
+		return f;
 	}
 	loadAnimation(src) {
 		return Animation.copy(this.animations[src]);

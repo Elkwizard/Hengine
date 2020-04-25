@@ -243,10 +243,32 @@ class InactiveScene {
 		let ns = new ParticleObject(spawner, this, name);
 		return ns;
 	}
-	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1)) {
+	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), falls = false, slows = true, fades = true) {
+		name = this.genName_PRIVATE(this.contains, "Default-Explosion-Spawner");
+		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
+		this.contains[name] = ns;
+		for (let i = 0; i < amountParticles; i++) {
+			ns.spawnParticle();
+		}
+		ns.particleFalls = falls;
+		ns.particleFades = fades;
+		ns.particleSlows = slows;
+		ns.active = false;
+		ns.update = function() {
+			let n = 0;
+			for (let key in ns.spawns) n++;
+			if (!n) ns.remove();
+		}
+		return ns;
+	}
+	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), falls = false, slows = true, fades = true, active = true) {
 		name = this.genName_PRIVATE(this.contains, name);
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
 		this.contains[name] = ns;
+		ns.particleFalls = falls;
+		ns.particleFades = fades;
+		ns.particleSlows = slows;
+		ns.active = active;
 		return ns;
 	}
 	addScript(name, opts) {
@@ -539,7 +561,11 @@ class Scene extends InactiveScene {
 		let nMax = new Vertex(this.display.x + this.display.width, this.display.y + this.display.height);
 		nMin = this.adjustPointForZoom(nMin);
 		nMax = this.adjustPointForZoom(nMax);
-		return new Rect(nMin, nMax);
+		let w = nMax.x - nMin.x;
+		let h = nMax.y - nMin.y;
+		let d = new Rect(-w / 2, -h / 2, w, h, this.viewRotation);
+		d.__boundingBox = d.getModel(nMin.plus(nMax).over(2), 0).getBoundingBox();
+		return d;
 	}
 	enginePhysicsUpdate() {
 		let startTime = performance.now();
@@ -560,7 +586,7 @@ class Scene extends InactiveScene {
 		for (let rect of this.containsArray) rect.pushToRemoveQueue = p;
         //grid
         let cells = {};
-        let isUseless = a => !(a instanceof PhysicsObject) || (a instanceof ParticleObject);
+        let isUseless = a => !(a instanceof PhysicsObject);
         let useful = [];
         let useless = [];
 

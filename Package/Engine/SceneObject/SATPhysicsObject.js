@@ -253,7 +253,7 @@ class PhysicsObject extends SceneObject {
         if (!this.completelyStatic) {
             for (let other of others) {
                 if (other !== this) {
-                    if (other instanceof PhysicsObject && other.tag !== "Engine-Particle") {
+                    if (other instanceof PhysicsObject) {
                         if (this.optimize(this, other)) {
                             if (this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
                                 let col = Physics.fullCollide(this, other);

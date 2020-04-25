@@ -1,15 +1,6 @@
 function clamp(n, a, b) {
 	return Math.max(a, Math.min(b, n));
 }
-function lerp(a, b, t) {
-	return a * (1 - t) + b * t;
-}
-function quadLerp(a, b, c, d, tx, ty) {
-	const l = a * (1 - ty) + c * ty;
-	const r = b * (1 - ty) + d * ty;
-	let per = l * (1 - tx) + r * tx;
-	return per;
-}
 class Vertex {
 	constructor(x, y) {
 		this.x = x;
@@ -42,7 +33,7 @@ class Artist {
 		this.textMode = "left";
 		this.currentlyClipped = false;
 		let pathObj = {
-			circle: function (x, y, radius) {
+			circle(x, y, radius) {
 				radius = Math.abs(radius);
 				if (typeof x === "object") {
 					radius = x.radius;
@@ -52,12 +43,12 @@ class Artist {
 				this.c.beginPath();
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);
 			},
-			arc: function (x, y, radius, startAngle, endAngle, counterClockwise) {
+			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
 				radius = Math.abs(radius);
 				this.c.beginPath();
 				this.c.arc(x, y, radius, startAngle, endAngle, counterClockwise);
 			},
-			sector: function (x, y, radius, startAngle, endAngle) {
+			sector(x, y, radius, startAngle, endAngle) {
 				radius = Math.abs(radius);
 				this.c.beginPath();
 				this.c.moveTo(x, y);
@@ -65,20 +56,21 @@ class Artist {
 				this.c.arc(x, y, radius, startAngle, endAngle);
 				this.c.lineTo(x, y);
 			},
-			ellipse: function (x, y, rx, ry) {
+			ellipse(x, y, rx, ry) {
 				rx = Math.abs(rx);
 				ry = Math.abs(ry);
 				this.c.beginPath();
 				this.c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
 			},
-			rect: function (x, y, width, height) {
+			rect(x, y, width, height) {
+				this.c.beginPath();
 				if (typeof x === "object") {
 					this.c.rect(x.x, x.y, x.width, x.height);
 				} else {
 					this.c.rect(x, y, width, height);
 				}
 			},
-			triangle: function (v1, v2, v3) {
+			triangle(v1, v2, v3) {
 				this.c.beginPath();
 				if (v1 instanceof Triangle) {
 					v2 = v1.vertices[1];
@@ -90,7 +82,7 @@ class Artist {
 				this.c.lineTo(v3.x, v3.y);
 				this.c.lineTo(v1.x, v1.y);
 			},
-			text: function (font, text, x, y, pack = false) {
+			text(font, text, x, y, pack = false) {
 				text = text + "";
 				this.c.font = font;
 				if (pack) {
@@ -122,7 +114,7 @@ class Artist {
 				}
 				return textRequests
 			},
-			shape: function (...v) {
+			shape(...v) {
 				this.c.beginPath();
 				if (v.length) {
 					this.c.moveTo(v[0].x, v[0].y);
@@ -138,41 +130,41 @@ class Artist {
 			this.pathObj[func] = this.pathObj[func].bind(this);
 		}
 		this.drawObj = {
-			circle: function (x, y, radius) {
+			circle(x, y, radius) {
 				pathObj.circle(x, y, radius);
 				this.c.fill();
 			},
-			arc: function (x, y, radius, startAngle, endAngle, counterClockwise) {
+			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
 				pathObj.arc(x, y, radius, startAngle, endAngle);
 				this.c.fill();
 			},
-			sector: function (x, y, radius, startAngle, endAngle) {
+			sector(x, y, radius, startAngle, endAngle) {
 				pathObj.sector(x, y, radius, startAngle, endAngle);
 				this.c.fill();
 			},
-			ellipse: function (x, y, rx, ry) {
+			ellipse(x, y, rx, ry) {
 				pathObj.ellipse(x, y, rx, ry);
 				this.c.fill();
 			},
-			rect: function (x, y, width, height) {
+			rect(x, y, width, height) {
 				pathObj.rect(x, y, width, height);
 				this.c.fill();
 			},
-			triangle: function (v1, v2, v3) {
+			triangle(v1, v2, v3) {
 				pathObj.triangle(v1, v2, v3);
 				this.c.fill();
 			},
-			text: function (font, text, x, y, pack) {
+			text(font, text, x, y, pack) {
 				let req = pathObj.text(font, text, x, y, pack);
 				for (let r of req) {
 					this.c.fillText(r.text, r.x, r.y);
 				}
 			},
-			shape: function (...v) {
+			shape(...v) {
 				pathObj.shape(...v);
 				this.c.fill();
 			},
-			infer: function (obj) {
+			infer(obj) {
 				if (obj.radius !== undefined) {
 					this.draw(this.c.fillStyle).circle(obj);
 				} else {
@@ -184,37 +176,37 @@ class Artist {
 			this.drawObj[func] = this.drawObj[func].bind(this);
 		}
 		this.strokeObj = {
-			circle: function (x, y, radius) {
+			circle(x, y, radius) {
 				pathObj.circle(x, y, radius);
 				this.c.stroke();
 			},
-			arc: function (x, y, radius, startAngle, endAngle, counterClockwise) {
+			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
 				pathObj.arc(x, y, radius, startAngle, endAngle);
 				this.c.stroke();
 			},
-			sector: function (x, y, radius, startAngle, endAngle) {
+			sector(x, y, radius, startAngle, endAngle) {
 				pathObj.sector(x, y, radius, startAngle, endAngle);
 				this.c.stroke();
 			},
-			ellipse: function (x, y, rx, ry) {
+			ellipse(x, y, rx, ry) {
 				pathObj.ellipse(x, y, rx, ry);
 				this.c.stroke();
 			},
-			rect: function (x, y, width, height) {
+			rect(x, y, width, height) {
 				pathObj.rect(x, y, width, height);
 				this.c.stroke();
 			},
-			triangle: function (v1, v2, v3) {
+			triangle(v1, v2, v3) {
 				pathObj.triangle(v1, v2, v3);
 				this.c.stroke();
 			},
-			text: function (font, text, x, y, pack) {
+			text(font, text, x, y, pack) {
 				let req = pathObj.text(font, text, x, y, pack);
 				for (let r of req) {
 					this.c.strokeText(r.text, r.x, r.y);
 				}
 			},
-			line: function (x, y, x1, y1) {
+			line(x, y, x1, y1) {
 				if (typeof x == "object") {
 					if (!x) return;
 					if (x instanceof Line) {
@@ -262,11 +254,11 @@ class Artist {
 				this.rotate(-angle);
 				this.translate(-x, -y);
 			},
-			shape: function (...v) {
+			shape(...v) {
 				pathObj.shape(...v);
 				this.c.stroke();
 			},
-			infer: function (obj) {
+			infer(obj) {
 				if (obj.radius !== undefined) {
 					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).circle(obj);
 				} else {
@@ -278,35 +270,35 @@ class Artist {
 			this.strokeObj[func] = this.strokeObj[func].bind(this);
 		}
 		this.clipObj = {
-			circle: function (x, y, radius) {
+			circle(x, y, radius) {
 				pathObj.circle(x, y, radius);
 				this.c.clip();
 			},
-			arc: function (x, y, radius, startAngle, endAngle, counterClockwise) {
+			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
 				pathObj.arc(x, y, radius, startAngle, endAngle);
 				this.c.clip();
 			},
-			sector: function (x, y, radius, startAngle, endAngle) {
+			sector(x, y, radius, startAngle, endAngle) {
 				pathObj.sector(x, y, radius, startAngle, endAngle);
 				this.c.clip();
 			},
-			ellipse: function (x, y, rx, ry) {
+			ellipse(x, y, rx, ry) {
 				pathObj.ellipse(x, y, rx, ry);
 				this.c.clip();
 			},
-			rect: function (x, y, width, height) {
+			rect(x, y, width, height) {
 				pathObj.rect(x, y, width, height);
 				this.c.clip();
 			},
-			triangle: function (v1, v2, v3) {
+			triangle(v1, v2, v3) {
 				pathObj.triangle(v1, v2, v3);
 				this.c.clip();
 			},
-			shape: function (...v) {
+			shape(...v) {
 				pathObj.shape(...v);
 				this.c.clip();
 			},
-			infer: function (obj) {
+			infer(obj) {
 				if (obj.radius !== undefined) {
 					this.clip().circle(obj);
 				} else {
@@ -316,6 +308,76 @@ class Artist {
 		}
 		for (let func in this.clipObj) {
 			this.clipObj[func] = this.clipObj[func].bind(this);
+		}
+		this.imageStyle = null;
+		this.imageObj = {
+			circle(x, y, radius) {
+				pathObj.circle(x, y, radius);
+				this.c.clip();
+				if (x instanceof Circle) {
+					radius = x.radius;
+					y = x.y;
+					x = x.x;
+				}
+				this.drawImage(this.imageStyle, x - radius, y - radius, radius * 2, radius * 2);
+				this.unclip();
+			},
+			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
+				pathObj.arc(x, y, radius, startAngle, endAngle);
+				this.c.clip();
+				this.drawImage(this.imageStyle, x - radius, y - radius, radius * 2, radius * 2);
+				this.unclip();
+			},
+			sector(x, y, radius, startAngle, endAngle) {
+				pathObj.sector(x, y, radius, startAngle, endAngle);
+				this.c.clip();
+				this.drawImage(this.imageStyle, x - radius, y - radius, radius * 2, radius * 2);
+				this.unclip();
+			},
+			ellipse(x, y, rx, ry) {
+				pathObj.ellipse(x, y, rx, ry);
+				this.c.clip();
+				this.drawImage(this.imageStyle, x - rx, y - ry, rx * 2, ry * 2);
+				this.unclip();
+			},
+			rect(x, y, width, height) {
+				pathObj.rect(x, y, width, height);
+				this.c.clip();
+				this.drawImage(this.imageStyle, x, y, width, height);
+				this.unclip();
+			},
+			triangle(v1, v2, v3) {
+				pathObj.triangle(v1, v2, v3);
+				this.c.clip();
+				let v = [v1, v2, v3];
+				let minX = Math.min(...v.map(e => e.x));
+				let maxX = Math.max(...v.map(e => e.x));
+				let minY = Math.min(...v.map(e => e.y));
+				let maxY = Math.max(...v.map(e => e.y));
+				this.drawImage(this.imageStyle, minX, minY, maxX - minX, maxY - minY);
+				this.unclip();
+			},
+			shape(...v) {
+				pathObj.shape(...v);
+				this.c.clip();
+				let minX = Math.min(...v.map(e => e.x));
+				let maxX = Math.max(...v.map(e => e.x));
+				let minY = Math.min(...v.map(e => e.y));
+				let maxY = Math.max(...v.map(e => e.y));
+				this.drawImage(this.imageStyle, minX, minY, maxX - minX, maxY - minY);
+				this.unclip();
+			},
+			infer(obj) {
+				if (obj.radius !== undefined) {
+					this.image(this.imageStyle).circle(obj);
+				} else {
+					this.image(this.imageStyle).shape(...obj.getCorners());
+				}
+			}
+			
+		};
+		for (let func in this.imageObj) {
+			this.imageObj[func] = this.imageObj[func].bind(this);
 		}
 		this.state = {
 			rotation: 0,
@@ -426,11 +488,9 @@ class Artist {
 		this.c.fillStyle = "transparent";
 		return this.strokeObj;
 	}
-	save() {
-		this.c.save();
-	}
-	restore() {
-		this.c.restore();
+	image(img) {
+		this.imageStyle = img;
+		return this.imageObj;
 	}
 	clip() {
 		if (!this.currentlyClipped) {
@@ -443,39 +503,60 @@ class Artist {
 		this.c.restore();
 		this.currentlyClipped = false;
 	}
+	save() {
+		this.c.save();
+	}
+	restore() {
+		this.c.restore();
+	}
 	clear() {
 		this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 	color(color) {
-		this.c.fillStyle = (this.c.strokeStyle = color);
+		this.c.fillStyle = this.c.strokeStyle = color;
+	}
+	lerp(a, b, t) {
+		return a * (1 - t) + b * t;
+	}
+	quadLerp(a, b, c, d, tx, ty) {
+		const l = this.lerp(a, c, ty);
+		const r = this.lerp(b, d, ty);
+		let per = this.lerp(l, r, tx);
+		return per;
+	}
+	cubeLerp(a, b, c, d, a2, b2, c2, d2, tx, ty, tz) {
+		let top = this.quadLerp(a, b, c, d, tx, ty);
+		let bottom = this.quadLerp(a2, b2, c2, d2, tx, ty);
+		return this.lerp(top, bottom, tz);
 	}
 	noise(x, f = 1, seed = 0) {
 		x *= f;
 		const s_0 = n => rand(seed + Math.floor(n));
-		const n = x => lerp(s_0(x), s_0(x + 1), x % 1);
+		const n = x => this.lerp(s_0(x), s_0(x + 1), x % 1);
 		return n(x);
 	}
 	noise2D(x, y, f = 1, seed = 0) {
 		x *= f;
 		y *= f;
 		const s_p = (x, y) => rand(rand(Math.floor(x)) + rand(Math.floor(y) * 2000) + seed * 100000);
-		const n = (x, y) => quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), x % 1, y % 1);
+		const n = (x, y) => this.quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), x % 1, y % 1);
 		return n(x, y);
+	}
+	noise3D(x, y, z, f = 1, seed = 0) {
+		x *= f;
+		y *= f;
+		z *= f;
+		const s_p = (x, y, z) => rand(rand(Math.floor(x)) + rand(Math.floor(y) * 2000) + rand(Math.floor(z) * 2000000) + seed * 100000);
+		const n = (x, y, z) => this.cubeLerp(
+			s_p(x, y, z), s_p(x + 1, y, z), s_p(x, y + 1, z), s_p(x + 1, y + 1, z),
+			s_p(x, y, z + 1), s_p(x + 1, y, z + 1), s_p(x, y + 1, z + 1), s_p(x + 1, y + 1, z + 1),
+			x % 1, y % 1, z % 1);
+		return n(x, y, z);
 	}
 	rotateAround(x, y, r) {
 		this.translate(x, y)
 		this.rotate(r);
 		this.translate(-x, -y);
-	}
-	drawTexture(txr = new Texture(0, 0), x = 0, y = 0, width = txr.width, height = txr.height) {
-		if (typeof x === "object") {
-			width = x.width;
-			height = x.height;
-			y = x.y;
-			x = x.x;
-		}
-		let f = txr.requestImage(width, height);
-		this.c.drawImage(f, x, y, width, height);
 	}
 	drawImage(img, x, y, width, height) {
 		if (typeof x === "object") {
@@ -484,9 +565,10 @@ class Artist {
 			y = x.y;
 			x = x.x;
 		}
-		if (img instanceof Frame) img = img.img;
 		if (width === undefined) width = img.width;
 		if (height === undefined) height = img.height;
+		if (img instanceof Frame) img = img.img;
+		if (img instanceof Texture) img = img.requestImage(width, height);
 		// console.log(img);
 		this.c.drawImage(img, x, y, width, height);
 	}

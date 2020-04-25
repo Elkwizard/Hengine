@@ -90,13 +90,15 @@ class Geometry {
         let y2 = l.a.y;
         let dx2 = l.b.x - l.a.x;
         let dy2 = l.b.y - l.a.y;
+        if (!dx1) dx1 = 0.000001;
+        if (!dx2) dx2 = 0.000001;
         let rightSide = (y1 - (dy1 / dx1) * x1) - (y2 - (dy2 / dx2) * x2);
         let leftCof = (dy2 / dx2) - (dy1 / dx1);
         const MIN = Math.min(l.a.x, l.b.x);
         const MAX = Math.max(l.a.x, l.b.x);
         let x = rightSide / leftCof;
         let outOfBounds = false;
-        if (x < MIN || x > MAX) {
+        if (x < MIN - 0.0001 || x > MAX + 0.0001) {
             outOfBounds = true;
             x = clamp(x, MIN, MAX);
         }

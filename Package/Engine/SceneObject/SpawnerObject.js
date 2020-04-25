@@ -1,22 +1,22 @@
 class Directions {
-	constructor(up, down, left, right, prec) {
+	constructor(up, down, left, right, prec = 0.3) {
 		this.up = up;
 		this.down = down;
 		this.left = left;
 		this.right = right;
-		if (prec === undefined) prec = 0.3;
 		this.prec = prec;
 		this.angle = 0;
 	}
-	static fromAngle(a) {
+	static fromAngle(a, prec = 0.3) {
 		let dir = new Directions(0, 0, 0, 0);
-		dir.angle = a;
+        dir.angle = a;
+        this.prec = prec;
 		return dir;
 	}
 	getRandomSpeed() {
 		if (this.angle) {
 			let min = -this.angle - this.prec;
-			let max = -this.angle + this.prec;
+            let max = -this.angle + this.prec;
 			let angle = Math.random() * (max - min) + min;
 			let result = Vector2.fromAngle(angle);
 			return result;
@@ -99,6 +99,7 @@ class ParticleSpawnerObject extends SceneObject {
             particle.enginePhysicsUpdate();
             particle.lifeSpan++;
         }
+        this.update();
     }
 }
 class ParticleObject extends SceneObject {

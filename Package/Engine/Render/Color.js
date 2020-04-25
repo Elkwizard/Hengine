@@ -160,9 +160,7 @@ class Color {
 		return result;
 	}
 	static lerp(color1, color2, per) {
-		let c1 = Color.copy(color1);
-		let c2 = Color.copy(color2);
-		return c1.times(1 - per).plus(c2.times(per));
+		return color1.times(1 - per).plus(color2.times(per));
 	}
 	static quadLerp(a, b, c, d, tx, ty) {
 		const l = a.times(1 - ty).plus(c.times(ty));
