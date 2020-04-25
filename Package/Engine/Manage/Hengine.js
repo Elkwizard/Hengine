@@ -59,7 +59,7 @@ class Hengine {
 		this.fileTypes = {
 			NUMBER: str => parseFloat(str),
 			STRING: str => str,
-			NUMBER_ARRAY: str => str.split(",").map(e => parseInt(e)),
+			NUMBER_ARRAY: str => str.split(",").map(e => parseFloat(e)),
 			STRING_ARRAY: str => str.split(","),
 			OBJECT: str => JSON.parse(str),
 			BOOLEAN: str => str === "true",
@@ -127,7 +127,6 @@ class Hengine {
 	getFileType(fileName) {
 		let type = fileName.split(".")[1];
 		if (!this.fileTypes[type.toUpperCase()]) {
-			console.log(type);
 			type = "STRING";
 		}
 		return type.toUpperCase();
