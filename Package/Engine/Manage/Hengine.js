@@ -179,7 +179,6 @@ class Hengine {
 	}
 	loadImage(src) {
 		let img = this.images[src];
-		console.log(img.width, img.height);
 		let f = new Frame(img.width, img.height);
 		f.c.c.drawImage(img, 0, 0, f.width, f.height);
 

@@ -155,6 +155,11 @@ class PhysicsObject extends SceneObject {
         this.hasGravity = true;
         this.slows = true;
     }
+    demobilize() {
+        this.completelyStatic = true;
+        this.hasGravity = false;
+        this.slows = false;
+    }
     clearCollisions() {
         for (let [key, value] of this.colliding) this.colliding[key] = null;
         this.canMoveThisFrame = true;

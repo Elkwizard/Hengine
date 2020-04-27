@@ -790,18 +790,14 @@ class Scene extends InactiveScene {
 		return new Vector2(newX, newY); //return the result
 	}
 	screenSpaceToWorldSpace(point) {
-		let displayM = this.display.middle; //optimize .middle() calls
-		let newX = point.x + this.display.x //move points to have accurate x with display movement
-		let newY = point.y + this.display.y //move points to have accurate y with display movement
-		let DX = newX - displayM.x; //distance from the middle to the point
-		let DY = newY - displayM.y; //distance from the middle to the point
-		let distX = Math.abs(DX); //positive distance
-		let distY = Math.abs(DY); //positive distance
-		newX = this.home.extend(DX, (distX) * ((1 / this.zoom) - 1)); //extend x according to it's distance from the center
-		newY = this.home.extend(DY, (distY) * ((1 / this.zoom) - 1)); //extend y according to it's distance from the center
-		newX += displayM.x; //re-center x
-		newY += displayM.y; //re-center y
-		return Geometry.rotatePointAround(displayM, new Vector2(newX, newY), -this.viewRotation); //return the result
+		let newX = (point.x - width / 2) / this.zoom + width / 2 + this.display.x;
+		let newY = (point.y - height / 2) / this.zoom + height / 2 + this.display.y;
+		return Geometry.rotatePointAround(new Vector2(width / 2, height / 2), new Vector2(newX, newY), -this.viewRotation); //return the result
+	}
+	worldSpaceToScreenSpace(point) {
+		let newX = this.zoom * (point.x - width / 2 - this.display.x) + width / 2;
+		let newY = this.zoom * (point.y - height / 2 - this.display.y) + height / 2;
+		return Geometry.rotatePointAround(new Vector2(width / 2, height / 2), new Vector2(newX, newY), this.viewRotation); //return the result
 	}
 	updateDisplayAt(x, y, width, height) {
 		this.display = new Rect(x, y, width, height);
