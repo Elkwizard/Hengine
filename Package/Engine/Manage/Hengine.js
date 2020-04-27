@@ -164,11 +164,11 @@ class Hengine {
 	}
 	initImage(src) {
 		let x = new Image;
-		x.src = this.SPRITE_PATH + src;
+		x.src = src;
 		return x;
 	}
 	initSound(src) {
-		let x = new Sound(this.SOUND_PATH + src);
+		let x = new Sound(src);
 		return x;
 	}
 	initAnimation(src, frames, delay, loop, response) {
@@ -199,15 +199,15 @@ class Hengine {
 		for (let element in scripts) {
 			let path;
 			if (element === "engine") {
-				path = scripts[element]["Path"] ? scripts[element]["Path"] : rootSrc;
+				path = scripts[element]["path"] ? scripts[element]["path"] : rootSrc;
 			} else if (element === "sprites") {
-				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Art/Sprites";
+				path = scripts[element]["path"] ? scripts[element]["path"] : "../Art/Sprites";
 			} else if (element === "animations") {
-				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Art/Animations";
+				path = scripts[element]["path"] ? scripts[element]["path"] : "../Art/Animations";
 			} else if (element === "sounds") {
-				path = scripts[element]["Path"] ? scripts[element]["Path"] : "../Sounds";
+				path = scripts[element]["path"] ? scripts[element]["path"] : "../Sounds";
 			} else if (element === "code") {
-				path = scripts[element]["Path"] ? scripts[element]["Path"] : ".";
+				path = scripts[element]["path"] ? scripts[element]["path"] : ".";
 			}
 			for (let folder in scripts[element].files) {
 				for (let file of scripts[element].files[folder]) {
@@ -218,15 +218,15 @@ class Hengine {
 						if (window.HENGINE) {
 							if (element === "animations") {
 								type = "ANIMATION"
-								resource = window.HENGINE.initAnimation(file.folder, file.frames, file.delay, file.loop || false);
+								resource = window.HENGINE.initAnimation(path + "/" + folder + "/" + file.folder, file.frames, file.delay, file.loop || false);
 								window.HENGINE.animations[file.folder] = resource;
 							} else if (element === "sprites") {
 								type = "IMAGE";
-								resource = window.HENGINE.initImage(file);
+								resource = window.HENGINE.initImage(path + "/" + folder + "/" + file);
 								window.HENGINE.images[file] = resource;
 							} else if (element === "sounds") {
 								type = "SOUND";
-								resource = window.HENGINE.initSound(file);
+								resource = window.HENGINE.initSound(path + "/" + folder + "/" + file);
 								window.HENGINE.sounds[file] = resource;
 							}
 						}

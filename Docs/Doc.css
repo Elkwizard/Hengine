@@ -42,10 +42,7 @@
 .tl-view {
     color: white;
 }
-.fn-view {
-    color: cyan;
-}
-.pr-view {
+.fn-view, .pr-view, .cs-view {
     color: cyan;
 }
 .desc {
@@ -54,7 +51,7 @@
     top: 50%;
 }
 .title {
-    font-size: 30px;
+    font-size: 26px;
     font-style: bold;
     /* text-shadow: 2px 2px 5px white; */
     padding: 5px;

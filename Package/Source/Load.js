@@ -15,8 +15,9 @@ Hengine.load({
 		}
 	},
 	"sprites": {
+		"path": "../../Docs",
 		"files": {
-			".": ["Chicken.png"]
+			".": ["PR.png", "TL.png", "CS.png", "FN.png"]
 		}
 	},
 	"animations": {
@@ -33,7 +34,7 @@ Hengine.load({
 	},
 	"code": {
 		"files": {
-			".": ["LocalFiles.js", "Script List", "Set List", "Source"]
+			".": ["../../Docs/DocOrg", "../../Docs/Documentation", "LocalFiles", "Script List", "Set List", "Source"]
 		}
 	}
 });

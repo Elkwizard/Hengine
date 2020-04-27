@@ -6,7 +6,7 @@ class Animation {
 			this.frames = [];
 			for (let i = 0; i < frames; i++) {
 				this.frames.push(new Image);
-				this.frames[i].src = "../Art/Animations/" + src + "/" + (i + 1) + ".png";
+				this.frames[i].src = src + "/" + (i + 1) + ".png";
 			}
 			this.loop = loop;
 			this.finResponse = finResponse;

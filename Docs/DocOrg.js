@@ -27,7 +27,7 @@ class DocOrg {
         button.className = node.value.type + "-view choice";
         button.style.width = width.toFixed(2) + "vw";
         button.style.left = (inx * width) + "vw";
-        let img = (node.value.type === "tl") ? `<img src="Collection.png" class="icon">` : `<img src="${node.value.type.toUpperCase()}.png" class="icon">`;
+        let img = `<img src="${node.value.type.toUpperCase()}.png" class="icon">`;
         let desc = node.value.desc ? `<div class="desc">
             ${node.value.desc}
         </div>` : ``;
