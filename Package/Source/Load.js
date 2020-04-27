@@ -33,7 +33,7 @@ Hengine.load({
 	},
 	"code": {
 		"files": {
-			".": ["../../Docs/DocOrg", "../../Docs/Documentation", "LocalFiles", "Script List", "Set List", "Source"]
+			".": ["LocalFiles", "Script List", "Set List", "Source"]
 		}
 	}
 });
