@@ -95,6 +95,7 @@ class Artist {
 							lines[lines.length - 1] = lines[lines.length - 1].substr(0, prevLen);
 							lines.push(word);
 						}
+						if (word === "\n") lines.push("");
 					}
 					text = lines.join("\n").slice(1);
 				}
@@ -490,6 +491,7 @@ class Artist {
 	}
 	image(img) {
 		this.imageStyle = img;
+		this.save();
 		return this.imageObj;
 	}
 	clip() {

@@ -134,8 +134,7 @@ class Texture {
 		return toString(this);
 	}
 	clear() {
-		for (let i = 0; i < this.pixels.length; i++) for (let j = 0; j < this.pixels[0].length; j++) this.pixels[i][j] = cl.BLANK;
-		this.imageData = this.imageData.map(e => 0);
+		for (let i = 0; i < this.pixels.length; i++) for (let j = 0; j < this.pixels[0].length; j++) this.act_set(i, j, cl.BLANK);
 	}
 	getPixel(x, y) {
 		if (this.pixels[x] && this.pixels[x][y]) return this.pixels[x][y];

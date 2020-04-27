@@ -33,7 +33,7 @@ Hengine.load({
 	},
 	"code": {
 		"files": {
-			".": ["Script List", "Set List", "Source"]
+			".": ["LocalFiles.js", "Script List", "Set List", "Source"]
 		}
 	}
 });
