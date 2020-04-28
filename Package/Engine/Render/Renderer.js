@@ -1,6 +1,10 @@
 function clamp(n, a, b) {
 	return Math.max(a, Math.min(b, n));
 }
+function remap(n, a, b, a2, b2) {
+	let t = (n - a) / (b - a);
+	return a2 * (1 - t) + b2 * t;
+}
 class Vertex {
 	constructor(x, y) {
 		this.x = x;
@@ -402,6 +406,39 @@ class Artist {
 	get middle() {
 		return { x: this.canvas.width / 2, y: this.canvas.height / 2 };
 	}
+	draw(color) {
+		let c = color;
+		if (color instanceof Color) c = color.getRGBA();
+		this.c.fillStyle = c;
+		return this.drawObj;
+	}
+	stroke(color, lineWidth = 1, endStyle = "flat") {
+		let c = color;
+		if (endStyle === "flat") endStyle = "butt";
+		if (color instanceof Color) c = color.getRGBA();
+		this.c.strokeStyle = c;
+		this.c.lineCap = endStyle;
+		this.c.lineWidth = lineWidth;
+		this.c.beginPath();
+		this.c.fillStyle = "transparent";
+		return this.strokeObj;
+	}
+	image(img) {
+		this.imageStyle = img;
+		// this.save();
+		return this.imageObj;
+	}
+	clip() {
+		if (!this.currentlyClipped) {
+			this.currentlyClipped = true;
+			this.c.save();
+		}
+		return this.clipObj;
+	}
+	unclip() {
+		// this.c.restore();
+		this.currentlyClipped = false;
+	}
 	getTextWidth(font, str) {
 		this.c.font = font;
 		return this.c.measureText(str).width;
@@ -471,39 +508,6 @@ class Artist {
 	}
 	scale(x, y) {
 		this.c.scale(x, y);
-	}
-	draw(color) {
-		let c = color;
-		if (color instanceof Color) c = color.get_RGBA();
-		this.c.fillStyle = c;
-		return this.drawObj;
-	}
-	stroke(color, lineWidth = 1, endStyle = "flat") {
-		let c = color;
-		if (endStyle === "flat") endStyle = "butt";
-		if (color instanceof Color) c = color.get_RGBA();
-		this.c.strokeStyle = c;
-		this.c.lineCap = endStyle;
-		this.c.lineWidth = lineWidth;
-		this.c.beginPath();
-		this.c.fillStyle = "transparent";
-		return this.strokeObj;
-	}
-	image(img) {
-		this.imageStyle = img;
-		this.save();
-		return this.imageObj;
-	}
-	clip() {
-		if (!this.currentlyClipped) {
-			this.currentlyClipped = true;
-			this.c.save();
-		}
-		return this.clipObj;
-	}
-	unclip() {
-		this.c.restore();
-		this.currentlyClipped = false;
 	}
 	save() {
 		this.c.save();
@@ -588,7 +592,7 @@ class Artist {
 	}
 	setBackground(color) {
 		let c = color;
-		if (color instanceof Color) c = color.get_RGBA();
+		if (color instanceof Color) c = color.getRGBA();
 		if (color instanceof Image) c = "url(" + color.src + ")";
 		this.canvas.style.background = c;
 	}

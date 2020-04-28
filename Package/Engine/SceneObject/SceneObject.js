@@ -103,7 +103,7 @@ class SceneObject {
 			}
 
 			if (shape instanceof Rect) {
-				term = "R " + shape.rotation.toFixed(0) + " " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.width.toFixed(0) + " " + shape.height.toFixed(2);
+				term = "R " + shape.rotation.toFixed(0) + " " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.width.toFixed(0) + " " + shape.height.toFixed(0);
 			} else if (shape instanceof Polygon) {
 				term = "P " + shape.rotation.toFixed(0) + " " + shape.vertices.map(e => e.x.toFixed(0) + "|" + e.y.toFixed(0)).join(" ");
 			}
@@ -122,6 +122,7 @@ class SceneObject {
 					break;
 				case "R":
 					result.push(new Rect(args[1], args[2], args[3], args[4], args[0]));
+					break;
 				case "P":
 					result.push(new Polygon(shape.split(" ").slice(2).map(e => new Vector2(parseFloat(e.split("|")[0]), parseFloat(e.split("|")[1]))), args[0]))
 					break;

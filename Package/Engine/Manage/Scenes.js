@@ -63,10 +63,12 @@ class InactiveScene {
 			n.rotationStatic = el.rotationStatic;
 			n.hasGravity = el.hasGravity;
 			n.slows = el.slows;
+			n.rotation = el.rotation;
 		} else {
 			n = this.addElement(el.name + " - copy", el.x, el.y, { ...el.controls }, el.tag);
 		}
-		n.shapes = { ...el.shapes };
+		let ser = el.serializeShapes();
+		n.parseShapes(ser);
 		el.runLog(n);
 		return n;
 	}
@@ -145,75 +147,6 @@ class InactiveScene {
 		this.contains[name] = n;
 		return n;
 	}
-	// addRectElement(name, x, y, width, height, controls = new Controls(), tag = "", src = "") {
-	// 	name = this.genName_PRIVATE(this.contains, name);
-	// 	if (width < 0) {
-	// 		width = -width;
-	// 		x -= width;
-	// 	}
-	// 	if (height < 0) {
-	// 		height = -height;
-	// 		y -= height;
-	// 	}
-	// 	this.contains[name] = new SceneObject(name, x, y, width, height, controls, tag, this);
-	// 	let n = this.contains[name];
-	// 	let self = this;
-	// 	if (src) {
-	// 		let img = loadImage(src);
-	// 		this.changeElementDraw(n, function () {
-	// 			c.drawImage(img, this.x, this.y, this.width, this.height);
-	// 		});
-	// 	} else n.mod(function () {
-	// 		this.draw = self.defaultDraw.bind(this);
-	// 		this.update = self.defaultUpdate.bind(this);
-	// 	});
-	// 	return n;
-	// }
-	// addRectElement(name, x = 0, y = 0, width = 0, height = 0, gravity = false, controls = new Controls(), tag = "", src = "") {
-	// 	name = this.genName_PRIVATE(this.contains, name);
-	// 	if (width < 0) {
-	// 		width = -width;
-	// 		x -= width;
-	// 	}
-	// 	if (height < 0) {
-	// 		height = -height;
-	// 		y -= height;
-	// 	}
-	// 	this.contains[name] = new PhysicsObject(name, x, y, width, height, gravity, controls, tag, this);
-	// 	let n = this.contains[name];
-	// 	let self = this;
-	// 	if (src) {
-	// 		let img = loadImage(src);
-	// 		this.changeElementDraw(n, function () {
-	// 			c.drawImage(img, this.x, this.y, this.width, this.height);
-	// 		});
-	// 	} else n.mod(function () {
-	// 		this.draw = self.defaultPhysDraw.bind(this);
-	// 		this.update = self.defaultUpdate.bind(this);
-	// 	});
-	// 	return n;
-	// }
-	// addCircleElement(name, x = 0, y = 0, radius = 0, gravity = false, controls = new Controls(), tag = "", src = "") {
-	// 	name = this.genName_PRIVATE(this.contains, name);
-	// 	if (radius < 0) {
-	// 		radius *= -1;
-	// 		x -= radius * 2;
-	// 		y -= radius * 2;
-	// 	}
-	// 	this.contains[name] = new CirclePhysicsObject(name, x, y, radius, gravity, controls, tag, this);
-	// 	let n = this.contains[name];
-	// 	let self = this;
-	// 	if (src) {
-	// 		let img = loadImage(src);
-	// 		this.changeElementDraw(n, function () {
-	// 			c.drawImage(img, this.x - this.radius, this.y - this.radius, this.width, this.height);
-	// 		});
-	// 	} else n.mod(function () {
-	// 		this.draw = self.defaultPhysDraw.bind(this);
-	// 		this.update = self.defaultUpdate.bind(this);
-	// 	});
-	// 	return n;
-	// }
 	addUI(name, x, y, width, height, draw = function () { }) {
 		name = this.genName_PRIVATE(this.contains, name);
 		if (width < 0) {
@@ -702,18 +635,19 @@ class Scene extends InactiveScene {
             rect.enginePhysicsUpdate();
         }
 
-//         // show cells
-//         this.drawInWorldSpace(e => {
-//         	for (let [key, cell] of cells) {
-//         		let x = parseInt(key.split(",")[0]) * this.cellSize;
-//         		let y = parseInt(key.split(",")[1]) * this.cellSize;
-//         		let r = new Rect(x, y, this.cellSize, this.cellSize);
-//         		c.stroke(cl.RED, 3).rect(r);
-//         		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
-//         		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
-//         		c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
-//         	}
-//         });
+        // // show cells
+        // this.drawInWorldSpace(e => {
+        // 	for (let [key, cell] of cells) {
+        // 		let x = parseInt(key.split(",")[0]) * this.cellSize;
+        // 		let y = parseInt(key.split(",")[1]) * this.cellSize;
+        // 		let r = new Rect(x, y, this.cellSize, this.cellSize);
+		// 		c.stroke(cl.RED, 3).rect(r);
+        // 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
+        // 		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
+        // 		c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
+        // 	}
+		// });
+		
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
 		for (let rect of this.containsArray) rect.isBeingUpdated = false;
@@ -724,7 +658,7 @@ class Scene extends InactiveScene {
     }
 	recalculateAverageCellSize(newEl) {
 		let oldAvg = this.cellSize;
-		let mul = this.containsArray.filter(e => e instanceof PhysicsObject && !(e instanceof ParticleObject)).length;
+		let mul = this.containsArray.filter(e => e instanceof PhysicsObject).length;
 		oldAvg *= mul;
 		let newSize = newEl.width + newEl.height;
 		let newAverageMax = (oldAvg + newSize) / (mul + 1);

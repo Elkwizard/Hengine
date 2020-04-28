@@ -168,14 +168,14 @@ class Color {
 		let per = l.times(1 - tx).plus(r.times(tx));
 		return per;
 	}
-	get_RGBA() {
+	getRGBA() {
 		return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
 	}
-	get_HEX() {
+	getHEX() {
 		return "#" + Color.numToHex(this.red) + Color.numToHex(this.green) + Color.numToHex(this.blue);
 	}
 	toString() {
-		return this.get_RGBA();
+		return this.getRGBA();
 	}
 	equals(color) {
 		if (this.red == color.red && this.green == color.green && this.blue == color.blue && this.alpha == color.alpha) {
