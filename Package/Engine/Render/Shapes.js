@@ -175,18 +175,22 @@ class Polygon extends Shape {
 	center(pos) {
 		let offset = pos.minus(this.middle);
 		this.vertices = this.vertices.map(e => e.plus(offset));
+		return this;
 	}
 	scale(factor) {
 		let middle = this.middle;
 		this.vertices = this.vertices.map(e => middle.plus(e.minus(middle).times(factor)));
 		this.subdivideForCollisions();
+		return this;
 	}
 	scaleAbout(pos, factor) {
 		this.vertices = this.vertices.map(e => pos.plus(e.minus(pos).times(factor)));
 		this.subdivideForCollisions();
+		return this;
 	}
 	move(dir) {
 		for (let vert of this.vertices) vert.add(dir);
+		return this;
 	}
 	get() {
 		return new Polygon([...this.vertices], this.rotation);
@@ -241,16 +245,19 @@ class Rect extends Polygon {
 	center(pos) {
 		this.x = pos.x - this.width / 2;
 		this.y = pos.y - this.height / 2;
+		return this;
 	}
 	scale(factor) {
 		let middle = this.middle;
 		this.width *= factor;
 		this.height *= factor;
 		this.center(middle);
+		return this;
 	}
 	move(dir) {
 		this.x += dir.x;
 		this.y += dir.y;
+		return this;
 	}
 	get() {
 		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
@@ -276,22 +283,26 @@ class Circle extends Shape {
 	center(pos) {
 		this.x = pos.x;
 		this.y = pos.y;
+		return this;
 	}
 	scale(factor) {
 		this.radius *= factor;
+		return this;
 	}
 	scaleAbout(pos, factor) {
 		let nPos = pos.plus((new Vector2(this.x, this.y)).minus(pos).times(factor));
 		this.x = nPos.x;
 		this.y = nPos.y;
 		this.radius *= factor;
-	}
-	getBoundingBox() {
-		return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+		return this;
 	}
 	move(dir) {
 		this.x += dir.x;
 		this.y += dir.y;
+		return this;
+	}
+	getBoundingBox() {
+		return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
 	}
 	get() {
 		return new Circle(this.x, this.y, this.radius);

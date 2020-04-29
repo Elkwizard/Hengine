@@ -33,6 +33,7 @@ class Artist {
 
 		this.custom = {};
 		this.c = this.canvas.getContext('2d');
+		this.__c = this.c;
 		this._background = new Color(0, 0, 0, 0);
 		this.textMode = "left";
 		this.currentlyClipped = false;
@@ -317,8 +318,7 @@ class Artist {
 		this.imageStyle = null;
 		this.imageObj = {
 			circle(x, y, radius) {
-				pathObj.circle(x, y, radius);
-				this.c.clip();
+				this.clip().arc(x, y, radius);
 				if (x instanceof Circle) {
 					radius = x.radius;
 					y = x.y;
@@ -328,32 +328,27 @@ class Artist {
 				this.unclip();
 			},
 			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.arc(x, y, radius, startAngle, endAngle);
-				this.c.clip();
+				this.clip().arc(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.drawImage(this.imageStyle, x - radius, y - radius, radius * 2, radius * 2);
 				this.unclip();
 			},
 			sector(x, y, radius, startAngle, endAngle) {
-				pathObj.sector(x, y, radius, startAngle, endAngle);
-				this.c.clip();
+				this.clip().sector(x, y, radius, startAngle, endAngle);
 				this.drawImage(this.imageStyle, x - radius, y - radius, radius * 2, radius * 2);
 				this.unclip();
 			},
 			ellipse(x, y, rx, ry) {
-				pathObj.ellipse(x, y, rx, ry);
-				this.c.clip();
+				this.clip().ellipse(x, y, rx, ry);
 				this.drawImage(this.imageStyle, x - rx, y - ry, rx * 2, ry * 2);
 				this.unclip();
 			},
 			rect(x, y, width, height) {
-				pathObj.rect(x, y, width, height);
-				this.c.clip();
+				this.clip().rect(x, y, width, height);
 				this.drawImage(this.imageStyle, x, y, width, height);
 				this.unclip();
 			},
 			triangle(v1, v2, v3) {
-				pathObj.triangle(v1, v2, v3);
-				this.c.clip();
+				this.clip().triangle(v1, v2, v3);
 				let v = [v1, v2, v3];
 				let minX = Math.min(...v.map(e => e.x));
 				let maxX = Math.max(...v.map(e => e.x));
@@ -363,8 +358,7 @@ class Artist {
 				this.unclip();
 			},
 			shape(...v) {
-				pathObj.shape(...v);
-				this.c.clip();
+				this.clip().shape(...v);
 				let minX = Math.min(...v.map(e => e.x));
 				let maxX = Math.max(...v.map(e => e.x));
 				let minY = Math.min(...v.map(e => e.y));
@@ -425,19 +419,25 @@ class Artist {
 	}
 	image(img) {
 		this.imageStyle = img;
-		// this.save();
 		return this.imageObj;
 	}
 	clip() {
 		if (!this.currentlyClipped) {
 			this.currentlyClipped = true;
-			this.c.save();
+			this.save();
 		}
 		return this.clipObj;
 	}
 	unclip() {
-		// this.c.restore();
+		this.restore();
 		this.currentlyClipped = false;
+	}
+	embody(frame) {
+		this.__c = this.c;
+		this.c = frame.c.c;
+	}
+	unembody() {
+		this.c = this.__c;
 	}
 	getTextWidth(font, str) {
 		this.c.font = font;

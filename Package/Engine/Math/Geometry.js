@@ -49,20 +49,30 @@ class Geometry {
         return result;
     }
     static projectPointOntoLine(p, d) {
-		/* --My Own Personal Derivation--
-		let x1 = p.x;
-		let y1 = p.y;
-		let dx = d.x;
-		let dy = d.y;
-		if (!dx) dx = 0.000000001;
-		let xv = ((dx**2) * x1 + (dx * dy * y1)) / (dx**2 + dy**2);
-		let yv = (dy / dx) * xv;
-		let xrs = Math.sign(xv);
-		let xr = Math.sqrt(xv ** 2 + yv ** 2);
-		let xfv = xrs * xr;
-		//return xfv;*/
-        // --Dot Product--
         return p.x * d.x + p.y * d.y;
+    }
+    static rayCastPolygons(rayOrigin, rayDir, polygons) {
+        let lines = [];
+        for (let polygon of polygons) lines.push(...polygon.getEdges());
+        return Geometry.rayCastLines(rayOrigin, rayDir, lines);
+    }
+    static rayCastLines(rayOrigin, rayDir, lines) {
+        let result = null;
+        let outOfBounds = true;
+        let minDist = Infinity;
+        for (let l of lines) {
+            let clos = Geometry.closestPointOnLineObjectInDirectionLimited(rayOrigin, rayDir, l);
+            if (!clos.outOfBounds) {
+                let p = clos.result;
+                let dist = Geometry.distToPoint2(p, rayOrigin);
+                if (dist < minDist) {
+                    minDist = dist;
+                    outOfBounds = false;
+                    result = clos.result;
+                }
+            }
+        }
+        return { result, outOfBounds };
     }
     static closestPointOnLineObjectInDirection(p, d, l) {
         let x1 = p.x;
@@ -94,11 +104,11 @@ class Geometry {
         if (!dx2) dx2 = 0.000001;
         let rightSide = (y1 - (dy1 / dx1) * x1) - (y2 - (dy2 / dx2) * x2);
         let leftCof = (dy2 / dx2) - (dy1 / dx1);
-        const MIN = Math.min(l.a.x, l.b.x);
-        const MAX = Math.max(l.a.x, l.b.x);
+        const MIN = Math.min(l.a.x, l.a.x + dx2);
+        const MAX = Math.max(l.a.x, l.a.x + dx2);
         let x = rightSide / leftCof;
         let outOfBounds = false;
-        if (x < MIN - 0.0001 || x > MAX + 0.0001) {
+        if (x < MIN || x > MAX) {
             outOfBounds = true;
             x = clamp(x, MIN, MAX);
         }
@@ -106,7 +116,7 @@ class Geometry {
         let dirX = x - p.x;
         let dirY = y - p.y;
         if (dirX * d.x + dirY * d.y < 0) outOfBounds = true;
-        return {result: new Vector2(x, y), outOfBounds};
+        return { result: new Vector2(x, y), outOfBounds };
     }
     static closestPointOnCircle(p, cr) {
         let dif = new Vector2(p.x - cr.x, p.y - cr.y);
@@ -160,15 +170,15 @@ class Geometry {
         if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
         const A = l.a;
         const B = l.b;
-        const SIGN_X = (A.x < B.x)? -1:1;
-        const SIGN_Y = (A.y < B.y)? -1:1;
+        const SIGN_X = (A.x < B.x) ? -1 : 1;
+        const SIGN_Y = (A.y < B.y) ? -1 : 1;
         if (Math.abs(A.x - B.x) < 0.001) A.x += SIGN_X * 0.0001;
         if (Math.abs(A.y - B.y) < 0.001) A.y += SIGN_Y * 0.0001;
         const MIN = Math.min(A.x, B.x);
         const MAX = Math.max(A.x, B.x);
         const m_1 = (B.y - A.y) / (B.x - A.x);
         const m_2 = (B.x - A.x) / (B.y - A.y);
-        const X = clamp((p.y + m_2 * p.x + m_1 * A.x - A.y) / (m_1 + m_2), MIN, MAX); 
+        const X = clamp((p.y + m_2 * p.x + m_1 * A.x - A.y) / (m_1 + m_2), MIN, MAX);
         const Y = m_1 * X + A.y - m_1 * A.x;
         return new Vector2(X, Y);
     }
@@ -177,8 +187,8 @@ class Geometry {
         if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
         const A = l.a;
         const B = l.b;
-        const SIGN_X = (A.x < B.x)? -1:1;
-        const SIGN_Y = (A.y < B.y)? -1:1;
+        const SIGN_X = (A.x < B.x) ? -1 : 1;
+        const SIGN_Y = (A.y < B.y) ? -1 : 1;
         if (Math.abs(A.x - B.x) < 0.001) A.x += SIGN_X * 0.0001;
         if (Math.abs(A.y - B.y) < 0.001) A.y += SIGN_Y * 0.0001;
         const MIN = Math.min(A.x, B.x);
@@ -191,7 +201,7 @@ class Geometry {
             X = clamp(X, MIN, MAX);
         }
         const Y = m_1 * X + A.y - m_1 * A.x;
-        return {result: new Vector2(X, Y), outOfBounds};
+        return { result: new Vector2(X, Y), outOfBounds };
     }
     static closestPointOnLine(p, d) {
         let x1 = p.x;
@@ -215,7 +225,7 @@ class Geometry {
     }
     static subdividePolygonList(polygon) {
         let otherPolygons = [];
-    
+
         let slice = null;
         let newPolygon = [...polygon];
         for (let i = 0; i < polygon.length; i++) {
@@ -226,7 +236,7 @@ class Geometry {
                 let b = polygon[(i + 1) % polygon.length];
                 edges.push(new Line(a, b));
             }
-    
+
             //everything else
             let point = polygon[i];
             let v1 = point.minus(polygon[(i + 1) % polygon.length]).normalize().times(-1);
@@ -281,7 +291,7 @@ class Geometry {
                 currentIndex = (currentIndex + 1) % leftOvers.length;
                 currentPolygon.push(leftOvers[currentIndex]);
             }
-            while(currentIndex !== indexA) {
+            while (currentIndex !== indexA) {
                 currentIndex = (currentIndex + 1 + leftOvers.length) % leftOvers.length;
                 otherPolygon.push(leftOvers[currentIndex]);
             }

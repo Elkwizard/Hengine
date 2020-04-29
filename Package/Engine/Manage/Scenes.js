@@ -416,19 +416,70 @@ class InactiveScene {
 		return [collideAry, notCollideAry]
 	}
 }
+class Display extends Rect {
+	constructor(x, y, width, height, rotation = 0, zoom = 1) {
+		super(x, y, width, height, rotation);
+		this.zoom = zoom;
+		this.view = new Frame(width, height);
+		this.newView = new Frame(width, height);
+	}
+	restoreZoom() {
+		this.zoom = 1;
+	}
+	zoomIn(amount) {
+		this.zoom *= 1 + amount;
+	}
+	zoomOut(amount) {
+		this.zoom /= 1 + amount;
+	}
+	getWorld() {
+		let m = this.getModel(Vector2.origin, 0);
+		m.scale(1 / this.zoom);
+		m.cacheBoundingBox(m.getBoundingBox());
+		this.newView = new Frame(width, height);
+		return m;
+	}
+	updateView(width, height) {
+		this.view.width = width;
+		this.view.height = height;
+	}
+	transformToWorld(artist) {
+		artist.translate(width / 2, height / 2);
+		artist.rotate(this.rotation);
+		artist.scale(this.zoom, this.zoom);
+		artist.translate(-width / 2, -height / 2);
+		artist.translate(-this.x, -this.y);
+	}
+	transformFromWorld(artist) {
+		artist.translate(this.x, this.y);
+		artist.translate(width / 2, height / 2);
+		artist.scale(1 / this.zoom, 1 / this.zoom);
+		artist.rotate(-this.rotation);
+		artist.translate(-width / 2, -height / 2);
+	}
+	screenSpaceToWorldSpace(point) {
+		let newX = (point.x - width / 2) / this.zoom + width / 2 + this.x;
+		let newY = (point.y - height / 2) / this.zoom + height / 2 + this.y;
+		return Geometry.rotatePointAround(new Vector2(width / 2, height / 2), new Vector2(newX, newY), -this.rotation); //return the result
+	}
+	worldSpaceToScreenSpace(point) {
+		let newX = this.zoom * (point.x - width / 2 - this.x) + width / 2;
+		let newY = this.zoom * (point.y - height / 2 - this.y) + height / 2;
+		return Geometry.rotatePointAround(new Vector2(width / 2, height / 2), new Vector2(newX, newY), this.rotation); //return the result
+	}
+}
 class Scene extends InactiveScene {
 	constructor(name, context, gravity, airResistance, home) {
 		super(name, gravity, airResistance);
 		this.c = context;
 		this.home = home;
-		this.zoom = 1;
 		this.cullGraphics = true;
 		this.speedModulation = 1;
-        this.constraints = [];
+		this.constraints = [];
+		this.cameras = {};
 		this.collisionEvents = false;
-		this.viewRotation = 0;
-		this.display = new Rect(0, 0, this.c.canvas.width, this.c.canvas.height)
-		this.adjustedDisplay = new Rect(this.display.x, this.display.y, this.display.width, this.display.height);
+		this.camera = new Display(0, 0, this.c.canvas.width, this.c.canvas.height, 0, 1);
+		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
 		M.engineClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			for (let o of this.collidePoint(adjusted)) {
@@ -464,41 +515,16 @@ class Scene extends InactiveScene {
 		this.removeQueue = [];
 	}
 	drawInWorldSpace(artist) {
-		this.c.c.translate(this.c.middle.x, this.c.middle.y)
-		this.c.c.scale(this.zoom, this.zoom);
-		this.c.c.rotate(this.viewRotation);
-		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
-		this.c.c.translate(-this.display.x, -this.display.y)
+		this.c.save();
+		this.camera.transformToWorld(this.c);
 		artist();
-		this.c.c.translate(this.display.x, this.display.y)
-		this.c.c.translate(this.c.middle.x, this.c.middle.y)
-		this.c.c.scale(1 / this.zoom, 1 / this.zoom)
-		this.c.c.rotate(-this.viewRotation);
-		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
+		this.c.restore();
 	}
 	drawInScreenSpace(artist) {
-		this.c.c.translate(this.display.x, this.display.y)
-		this.c.c.translate(this.c.middle.x, this.c.middle.y)
-		this.c.c.scale(1 / this.zoom, 1 / this.zoom)
-		this.c.c.rotate(-this.viewRotation);
-		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
+		this.c.save();
+		this.camera.transformFromWorld(this.c);
 		artist();
-		this.c.c.translate(this.c.middle.x, this.c.middle.y)
-		this.c.c.scale(this.zoom, this.zoom)
-		this.c.c.rotate(this.viewRotation);
-		this.c.c.translate(-this.c.middle.x, -this.c.middle.y)
-		this.c.c.translate(-this.display.x, -this.display.y)
-	}
-	repairDisplay() {
-		let nMin = new Vertex(this.display.x, this.display.y);
-		let nMax = new Vertex(this.display.x + this.display.width, this.display.y + this.display.height);
-		nMin = this.adjustPointForZoom(nMin);
-		nMax = this.adjustPointForZoom(nMax);
-		let w = nMax.x - nMin.x;
-		let h = nMax.y - nMin.y;
-		let d = new Rect(-w / 2, -h / 2, w, h, this.viewRotation);
-		d.__boundingBox = d.getModel(nMin.plus(nMax).over(2), 0).getBoundingBox();
-		return d;
+		this.c.restore();
 	}
 	enginePhysicsUpdate() {
 		let startTime = performance.now();
@@ -665,32 +691,46 @@ class Scene extends InactiveScene {
 		this.cellSize = newAverageMax;
 		newEl.usedForCellSize = true;
 	}
+	addCamera(name, camera) {
+		name = this.genName_PRIVATE(this.cameras, name);
+		this.cameras[name] = camera;
+		return this.cameras[name];
+	}
+	getCamera(name) {
+		return this.cameras[name];
+	}
+	renderCamera(camera) {
+		let screen = camera.getWorld().__boundingBox;
+		this.c.embody(camera.newView);
+		camera.transformToWorld(this.c);
+		for (let rect of this.containsArray) {
+			rect.engineDrawUpdate(screen);
+			rect.lifeSpan++;
+		}
+		this.c.unembody();
+		camera.view = camera.newView;
+		return camera.view;
+	}
 	engineDrawUpdate() {
 		this.updateArray();
-		for (let rect of this.containsArray) rect.isBeingUpdated = true;
-		this.display.width = this.c.canvas.width;
-		this.display.height = this.c.canvas.height;
 		this.home.beforeScript.run();
-		this.adjustedDisplay = this.repairDisplay();
-		this.c.c.translate(this.c.middle.x, this.c.middle.y);
-		this.c.c.scale(this.zoom, this.zoom);
-		this.c.c.rotate(this.viewRotation);
-		this.c.c.translate(-this.c.middle.x, -this.c.middle.y);
-		this.c.c.translate(-this.display.x, -this.display.y);
-		this.home.updateScript.run();
+		for (let rect of this.containsArray) rect.isBeingUpdated = true;
 		let q = this.removeQueue;
 		function p(x) {
 			q.push(x);
 		}
 		for (let rect of this.containsArray) rect.pushToRemoveQueue = p;
+
+
+		this.camera.width = this.c.canvas.width;
+		this.camera.height = this.c.canvas.height;
+		this.home.updateScript.run();
 		this.containsArray.sort(function (a, b) {
 			return a.layer - b.layer;
 		});
-		for (let rect of this.containsArray) {
-			rect.engineDrawUpdate();
-			rect.lifeSpan++;
-		}
-		this.c.clearTransformations();
+		for (let cameraName in this.cameras) this.renderCamera(this.cameras[cameraName]);
+		this.c.image(this.renderCamera(this.camera)).rect(0, 0, width, height);
+
 		this.home.afterScript.run();
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
@@ -709,52 +749,34 @@ class Scene extends InactiveScene {
 	unloadScene(els) {
 		this.removeElement(els);
 	}
-	adjustPointForZoom(point) {
-		let displayM = this.display.middle; //optimize .middle() calls
-		let newX = point.x;
-		let newY = point.y;
-		let DX = newX - displayM.x; //distance from the middle to the point
-		let DY = newY - displayM.y; //distance from the middle to the point
-		let distX = Math.abs(DX); //positive distance
-		let distY = Math.abs(DY); //positive distance
-		newX = this.home.extend(DX, (distX) * ((1 / this.zoom) - 1)); //extend x according to it's distance from the center
-		newY = this.home.extend(DY, (distY) * ((1 / this.zoom) - 1)); //extend y according to it's distance from the center
-		newX += displayM.x; //re-center x
-		newY += displayM.y; //re-center y
-		return new Vector2(newX, newY); //return the result
-	}
 	screenSpaceToWorldSpace(point) {
-		let newX = (point.x - width / 2) / this.zoom + width / 2 + this.display.x;
-		let newY = (point.y - height / 2) / this.zoom + height / 2 + this.display.y;
-		return Geometry.rotatePointAround(new Vector2(width / 2, height / 2), new Vector2(newX, newY), -this.viewRotation); //return the result
+		return this.camera.screenSpaceToWorldSpace(point);
 	}
 	worldSpaceToScreenSpace(point) {
-		let newX = this.zoom * (point.x - width / 2 - this.display.x) + width / 2;
-		let newY = this.zoom * (point.y - height / 2 - this.display.y) + height / 2;
-		return Geometry.rotatePointAround(new Vector2(width / 2, height / 2), new Vector2(newX, newY), this.viewRotation); //return the result
+		return this.camera.worldSpaceToScreenSpace(point);
 	}
-	updateDisplayAt(x, y, width, height) {
-		this.display = new Rect(x, y, width, height);
+	updateCameraAt(x, y, width, height) {
+		this.camera = new Display(x, y, width, height, this.camera.rotation, this.camera.zoom);
 	}
-	centerDisplayAt(point) {
-		this.display.x = point.x - this.c.canvas.width / 2;
-		this.display.y = point.y - this.c.canvas.height / 2;
+	centerCameraAt(point) {
+		this.camera.x = point.x - this.c.canvas.width / 2;
+		this.camera.y = point.y - this.c.canvas.height / 2;
 	}
-	moveDisplayTowards(point, ferocity) {
+	moveCameraTowards(point, ferocity) {
 		let goal = P(point.x - this.c.canvas.width / 2, point.y - this.c.canvas.height / 2);
-		let pos = P(this.display.x, this.display.y);
+		let pos = P(this.camera.x, this.camera.y);
 		let dif = P(goal.x - pos.x, goal.y - pos.y);
 		let move = P(Math.sign(dif.x) * ferocity, Math.sign(dif.y) * ferocity);
-		this.display.x = pos.x + move.x;
-		this.display.y = pos.y + move.y;
+		this.camera.x = pos.x + move.x;
+		this.camera.y = pos.y + move.y;
 	}
 	zoomIn(amount) {
-		this.zoom *= 1 + amount;
+		this.camera.zoomIn(amount);
 	}
 	zoomOut(amount) {
-		this.zoom /= 1 + amount;
+		this.camera.zoomOut(amount);
 	}
 	restoreZoom() {
-		this.zoom = 1;
+		this.camera.restoreZoom();
 	}
 }
