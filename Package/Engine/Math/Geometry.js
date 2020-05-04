@@ -245,6 +245,7 @@ class Geometry {
             let a2 = v2.getAngle();
             let dif = Math.abs(a2 - a1);
             if (a2 < a1) dif = Math.PI * 2 - dif;
+            dif = Math.PI * 2 - dif;
             if (dif > Math.PI) {
                 let dir = v1.plus(v2).over(-2).normalize();
                 let considerable = [];

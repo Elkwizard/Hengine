@@ -352,7 +352,15 @@ class PhysicsObject extends SceneObject {
             let pi2 = Math.PI * 2;
             this.rotation = ((this.rotation % pi2) + pi2) % pi2;
 
+            //any number of terrible things may have happened by this point.
+            if (isNaN(this.velocity.x)) this.velocity.x = 0;
+            if (isNaN(this.velocity.y)) this.velocity.y = 0;
+            if (isNaN(this.x)) this.x = this.lastX;
+            if (isNaN(this.y)) this.y = this.lastY;
+
+
             this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
+
             this.lastX = this.x;
             this.lastY = this.y;
 

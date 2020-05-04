@@ -141,7 +141,7 @@ class SceneObject {
 	}
 	getBoundingBox() {
 		let shapes = this.getModels();
-		let boxes = shapes.map(e => e.__boundingBox);
+		let boxes = shapes.map(e => e.getBoundingBox());
 		if (boxes.length === 1) return boxes[0];
 		let mins = boxes.map(e => e.vertices[0]);
 		let maxs = boxes.map(e => e.vertices[2]);
@@ -269,6 +269,14 @@ class SceneObject {
 		for (let x of this.log) x.bind(el)();
 		return el;
 	}
+	drawInModelSpace(artist) {
+		c.save();
+		let middle = this.middle;
+		c.translate(middle);
+		c.rotate(this.rotation);
+		artist();
+		c.restore();
+	}
 	runDraw() {
 		let middle = this.middle;
 		c.save();
@@ -310,6 +318,7 @@ class SceneObject {
 	remove() {
 		if (this.isBeingUpdated) this.pushToRemoveQueue(this);
 		else this.home.removeElement(this);
+		this.isDead = true;
 	}
 	move() {
 		if (K.P(this.controls.up)) {

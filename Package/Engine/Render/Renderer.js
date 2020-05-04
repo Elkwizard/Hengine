@@ -247,8 +247,10 @@ class Artist {
 				}
 				let angle = Math.atan2(y1 - y, x1 - x);
 				let mag = Math.sqrt((x1 - x) ** 2 + (y1 - y) ** 2);
+				this.save();
 				this.translate(x, y);
 				this.rotate(angle);
+				this.c.beginPath();
 				this.c.moveTo(0, 0);
 				this.c.lineTo(mag - this.c.lineWidth * 4 + 0.5, 0);
 				this.c.stroke();
@@ -257,8 +259,7 @@ class Artist {
 					P(mag - this.c.lineWidth * 4, this.c.lineWidth * 2),
 					P(mag, 0)
 				);
-				this.rotate(-angle);
-				this.translate(-x, -y);
+				this.restore();
 			},
 			shape(...v) {
 				pathObj.shape(...v);
@@ -490,7 +491,7 @@ class Artist {
 		this.state.translation.x += y;
 		this.c.translate(x, y);
 	}
-	scale(x, y) {
+	scale(x, y = x) {
 		if (typeof x == "object") {
 			y = x.y;
 			x = x.x;
@@ -505,9 +506,6 @@ class Artist {
 	}
 	clearTransformations() {
 		this.c.resetTransform();
-	}
-	scale(x, y) {
-		this.c.scale(x, y);
 	}
 	save() {
 		this.c.save();
@@ -535,6 +533,10 @@ class Artist {
 		let bottom = this.quadLerp(a2, b2, c2, d2, tx, ty);
 		return this.lerp(top, bottom, tz);
 	}
+	noiseTCorrect(t) {
+		const f = (x) => (x - 2) * (x + 2) * x;
+		return f(-2.31 * t + 1.155) / 6.158 + 0.5;
+	}
 	noise(x, f = 1, seed = 0) {
 		x *= f;
 		const s_0 = n => rand(seed + Math.floor(n));
@@ -545,7 +547,7 @@ class Artist {
 		x *= f;
 		y *= f;
 		const s_p = (x, y) => rand(rand(Math.floor(x)) + rand(Math.floor(y) * 2000) + seed * 100000);
-		const n = (x, y) => this.quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), x % 1, y % 1);
+		const n = (x, y) => this.quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), this.noiseTCorrect(x % 1), this.noiseTCorrect(y % 1));
 		return n(x, y);
 	}
 	noise3D(x, y, z, f = 1, seed = 0) {

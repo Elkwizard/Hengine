@@ -8,7 +8,7 @@ class Collision {
         this.shapeB = shapeB;
         if (collisionPoints) {
             this.penetration = Math.min(...collisionPoints.map(e => e.penetration));
-            this.collisionPoints = collisionPoints;
+            this.contacts = collisionPoints;
         }
     }
 }
@@ -320,6 +320,11 @@ class Physics {
         } else col = new Collision(false, a, b);
         return col;
     }
+    static getTotalPenetration(contacts) {
+        let t = 0;
+        for (let con of contacts) t += con.penetration;
+        return t;
+    }
     static fullCollide(a, b) {
         let tempCollisions = [];
         let shapes = a.getModels();
@@ -331,12 +336,19 @@ class Physics {
         }
         let cols = tempCollisions.filter(e => e.colliding);
         if (cols.length) {
-            return cols.map(e => {
-                let n = e;
-                n.a = a;
-                n.b = b;
-                return n;
-            });
+            let max = cols[0];
+            let maxPen = Physics.getTotalPenetration(cols[0].contacts);
+            let contacts = [];
+            for (let col of cols) {
+                contacts.push(...col.contacts);
+                let pen = Physics.getTotalPenetration(col.contacts);
+                if (pen > maxPen) {
+                    maxPen = pen;
+                    max = col;
+                }
+            }
+            let res = new Collision(true, a, b, max.shapeA, max.shapeB, max.dir, contacts);
+            return [res];
         }
         return [];
     }
@@ -350,8 +362,7 @@ class Physics {
         //impulse resolution
         let impulsesA = [];
         let impulsesB = [];
-        let totalPenetrationDiv = 0;
-        for (let contact of contacts) totalPenetrationDiv += contact.penetration;
+        let totalPenetrationDiv = Physics.getTotalPenetration(contacts);
         for (let contact of contacts) {
             let p = contact.point;
             let impulses = Physics.getImpulses(a, b, dir, p);
@@ -411,6 +422,8 @@ class Physics {
                 let aMove = dir.times(-1 * aPer);
                 let bMove = dir.times(1 * bPer);
 
+                //who knows
+                if (col.penetration > col.a.__boundingBox.width + col.a.__boundingBox.height || col.penetration > col.b.__boundingBox.width + col.b.__boundingBox.height) return false;
 
                 //like, the escaping
                 a.privateMove(aMove);
@@ -429,7 +442,7 @@ class Physics {
 
         //friction
 
-        Physics.resolveContacts(a, b, col.collisionPoints, col.dir);
+        Physics.resolveContacts(a, b, col.contacts, col.dir);
 
         //immobilize
         a.canMoveThisFrame = false;
@@ -615,7 +628,6 @@ class Physics {
         const j_B = j_DYNAMIC * PER_B + j_STATIC_B * (1 - PER_B);
         const I_A = n.times(-j_A);
         const I_B = n.times(j_B);
-
 
         impulseA = new Impulse(I_A, collisionPoint);
         impulseB = new Impulse(I_B, collisionPoint);

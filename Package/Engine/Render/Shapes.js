@@ -242,6 +242,9 @@ class Rect extends Polygon {
 			this.height = max.y - min.y;
 		}
 	}
+	subdivideForCollisions() {
+
+	}
 	center(pos) {
 		this.x = pos.x - this.width / 2;
 		this.y = pos.y - this.height / 2;
