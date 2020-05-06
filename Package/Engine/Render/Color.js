@@ -178,7 +178,8 @@ class Color {
 		return this.getRGBA();
 	}
 	equals(color) {
-		if (this.red == color.red && this.green == color.green && this.blue == color.blue && this.alpha == color.alpha) {
+		const th = 0.1;
+		if (Math.abs(this.red - color.red) < th && Math.abs(this.green - color.green) < th && Math.abs(this.blue - color.blue) < th && Math.abs(this.alpha - color.alpha) < th) {
 			return true;
 		} else {
 			return false;
@@ -301,6 +302,7 @@ class ColorLibrary {
 		this.GREEN = new Color("#090");
 		this.ORANGE = new Color("#f90");
 		this.PURPLE = new Color("#909");
+		this.MAGENTA = new Color("#f0f");
 		this.BLANK = new Color(0, 0, 0, 0);
 		this.BLACK = new Color(0, 0, 0, 1);
 		this.WHITE = new Color(255, 255, 255, 1);

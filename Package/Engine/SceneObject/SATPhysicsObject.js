@@ -10,7 +10,6 @@ class PhysicsObject extends SceneObject {
         this.direction = Vector2.origin;
         this.lastX = this.x;
         this.lastY = this.y;
-        this.hasPhysics = true;
         this.limitsVelocity = true;
         this.optimize = (a, b) => true;
         this.canMoveThisFrame = true;
@@ -20,7 +19,6 @@ class PhysicsObject extends SceneObject {
         this.positionStatic = !gravity;
         this.rotationStatic = !gravity;
         this.constraintLeader = false;
-        this.contactPoints = [];
         this.prohibited = [];
         this.canCollide = true;
         this._gravity = null;
@@ -164,7 +162,6 @@ class PhysicsObject extends SceneObject {
         for (let [key, value] of this.colliding) this.colliding[key] = null;
         this.canMoveThisFrame = true;
         this.allCollidingWith.clear();
-        this.contactPoints = [];
         this.prohibited = [];
     }
     drawWithoutRotation(artist) {

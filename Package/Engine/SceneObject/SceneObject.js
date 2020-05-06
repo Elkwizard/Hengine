@@ -46,9 +46,6 @@ class SceneObject {
 		this.update = function () { };
 		this.draw = function (shape) { };
 		this.custom = {};
-		this.hasPhysics = false;
-		this.isUI = false;
-		this.isRectangle = true;
 		this.hovered = false;
 		this.layer = 0;
 		this.scripts = new ScriptContainer();

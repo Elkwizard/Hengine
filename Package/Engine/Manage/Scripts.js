@@ -58,7 +58,7 @@ class Script {
             let found = false;
             for (let flag of flags) {
                 if (name === flag.join("") || name === flag.join("_") || name === flag.join("-")) {
-                    let key = "script" + flag.map(e => e.capitalize()).join("");
+					let key = "script" + flag.map(e => e.capitalize()).join("");
                     local[key] = local[key].add(fn);
                     found = true;
                 }
@@ -114,7 +114,8 @@ class ScriptContainer {
 	}
     run(str, ...args) {
 		for (let m of this) {
-			m["script" + str.capitalize()](m, ...args);
+			let key = "script" + str.capitalize();
+			m[key](m, ...args);
 		}
     }
 }

@@ -659,8 +659,8 @@ class Physics {
             let dy_N0 = -dy_N * mDif;
             let dx_N1 = dx_N * mDif;
             let dy_N1 = dy_N * mDif;
-            let iA = new Impulse(new Vector2(dx_N0 / 10, dy_N0 / 10), pA);
-            let iB = new Impulse(new Vector2(dx_N1 / 10, dy_N1 / 10), pB);
+            let iA = new Impulse((new Vector2(dx_N0 / 10, dy_N0 / 10)).times(a.__mass), pA);
+            let iB = new Impulse((new Vector2(dx_N1 / 10, dy_N1 / 10)).times(b.__mass), pB);
             if (!a.constraintLeader) {
                 a.applyImpulse(iA);
                 a.privateSetX(a.x + dx_N0);

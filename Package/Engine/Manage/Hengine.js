@@ -49,6 +49,7 @@ class Hengine {
 		window.clearFiles = this.clearFiles.bind(this);
 		window.saveRaw = this.saveRaw.bind(this);
 		window.getRaw = this.getRaw.bind(this);
+		window.setTitle = this.setTitle.bind(this);
 		this.SPRITE_PATH = "../Art/Sprites/";
 		this.ANIMATION_PATH = "../Art/Animations/";
 		this.SOUND_PATH = "../Sound/";

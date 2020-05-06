@@ -319,7 +319,7 @@ class Artist {
 		this.imageStyle = null;
 		this.imageObj = {
 			circle(x, y, radius) {
-				this.clip().arc(x, y, radius);
+				this.clip().circle(x, y, radius);
 				if (x instanceof Circle) {
 					radius = x.radius;
 					y = x.y;

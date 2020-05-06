@@ -280,7 +280,6 @@ class InactiveScene {
 	}
 	UI(name) {
 		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			e.isUI = true;
 			e.logMod(function UI() {
 				this.home.UI(this);
 			});
@@ -769,6 +768,9 @@ class Scene extends InactiveScene {
 		let move = P(Math.sign(dif.x) * ferocity, Math.sign(dif.y) * ferocity);
 		this.camera.x = pos.x + move.x;
 		this.camera.y = pos.y + move.y;
+	}
+	get zoom() {
+		return this.camera.zoom;
 	}
 	zoomIn(amount) {
 		this.camera.zoomIn(amount);

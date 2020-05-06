@@ -160,6 +160,7 @@ class ParticleObject extends SceneObject {
         this.drawPrefix();
         this.runDraw();
         this.drawSuffix();
+        this.scripts.run("escapeDraw");
     }
     enginePhysicsUpdate() {
         this.lastX = this.x;
