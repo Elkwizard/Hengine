@@ -1,3 +1,60 @@
+class LocalFileSystem {
+    static get header() {
+        return "LOCAL_FILE_SYSTEM_";
+    }
+    static clear(key) {
+        let prev = LocalFileSystem.header + key;
+        let value = "";
+        let n = 0;
+        let name;
+        let names = [];
+        do {
+            name = prev + "_INX_" + n;
+            n++;
+            if (localStorage[name] !== undefined) {
+                names.push(name);
+            }
+        } while(localStorage[name] !== undefined);
+        for (let name of names) {
+            delete localStorage[name];
+        }
+        return value;
+        
+    }
+    static put(key, value) {
+        let values = [];
+        let acc = "";
+        for (let i = 0; i < value.length; i++) {
+            acc += value[i];
+            if ((i + 1) % 10000 === 0) {
+                values.push(acc);
+                acc = "";
+            }
+        }
+        values.push(acc);
+        values = values.map((e, i) => [e, "_INX_" + i]);
+        
+        for (let v of values) {
+            let K = LocalFileSystem.header + key + v[1];
+            let value = v[0];
+            localStorage[K] = value;
+        }
+    }
+    static get(key) {
+        let prev = LocalFileSystem.header + key;
+        let value = "";
+        let n = 0;
+        let name;
+        do {
+            name = prev + "_INX_" + n;
+            n++;
+            if (localStorage[name] !== undefined) {
+                value += localStorage[name];
+            }
+        } while(localStorage[name] !== undefined);
+        return value;
+    } 
+}
 class Hengine {
 	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
 		//everything needs randomness
@@ -46,7 +103,6 @@ class Hengine {
 		window.fileSize = this.fileSize.bind(this);
 		window.packageFiles = this.packageFiles.bind(this);
 		window.importPackage = this.importPackage.bind(this);
-		window.clearFiles = this.clearFiles.bind(this);
 		window.saveRaw = this.saveRaw.bind(this);
 		window.getRaw = this.getRaw.bind(this);
 		window.setTitle = this.setTitle.bind(this);
@@ -103,12 +159,6 @@ class Hengine {
 		document.querySelector("title").innerHTML = title;
 		return title;
 	}
-	clearFiles(loc = this.getProjectName()) {
-		let src = "HengineLocalSaves/" + loc + "/";
-		for (let key in localStorage) {
-			if (key.indexOf(src) > -1) delete localStorage[key];
-		}
-	}
 	importPackage(pack, loc = this.getProjectName()) {
 		let data = pack;
 		for (let key in data) {
@@ -122,7 +172,6 @@ class Hengine {
 			data[file] = this.getRaw(file, loc);
 		}
 		let packageString = JSON.stringify(data);
-		//escape chars
 		return packageString;
 	}
 	getFileType(fileName) {
@@ -134,12 +183,12 @@ class Hengine {
 	}
 	saveRaw(file, data, loc = this.getProjectName()) {
 		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
-		localStorage["HengineLocalSaves/" + loc + "/" + name] = data;
+		LocalFileSystem.put("HengineLocalSaves/" + loc + "/" + name, data);
 		return data;
 	}
 	getRaw(file, loc = this.getProjectName()) {
 		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
-		let dat = localStorage["HengineLocalSaves/" + loc + "/" + name];
+		let dat = LocalFileSystem.get("HengineLocalSaves/" + loc + "/" + name);
 		return dat;
 	}
 	save(file, data, loc = this.getProjectName()) {
