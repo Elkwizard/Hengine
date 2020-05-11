@@ -399,13 +399,16 @@ class Physics {
         }
     }
     static resolve(col) {
+        //collision events
+        
         //resolve collisions
         let a = col.a;
         let b = col.b;
         let mobileA = !Physics.isWall(a);
         let mobileB = !Physics.isWall(b);
+        const d = col.dir.times(-1);
 
-
+    
         //position
         if (col.penetration > 0.05) {
             let tomMath;
@@ -433,7 +436,6 @@ class Physics {
                 b.cacheBoundingBoxes();
             } else return false;
         } else return false;
-        const d = col.dir.times(-1);
 
         //velocity
         const A_VEL_AT_COLLISION = a.velocity.dot(col.dir);
@@ -461,64 +463,52 @@ class Physics {
             b.prohibited.push(inv_dir);
         }
 
+    }
+    static events(col) {
+        //cache vars
+        let a = col.a;
+        let b = col.b;
+        let mobileA = !Physics.isWall(a);
+        let mobileB = !Physics.isWall(b);
+        const d = col.dir.times(-1);
+        
         //do custom collision response
         if (!a.colliding.general) a.colliding.general = [b];
-        else a.colliding.general.push(b);
+        else if (!a.colliding.general.includes(b)) a.colliding.general.push(b);
         if (!b.colliding.general) b.colliding.general = [a];
-        else b.colliding.general.push(a);
+        else if (!b.colliding.general.includes(a)) b.colliding.general.push(a);
         let top = d.y > 0.2;
         let bottom = d.y < -0.2;
         let right = d.x > -0.2;
         let left = d.x < 0.2;
         if (left) {
             if (!a.colliding.left) a.colliding.left = [b];
-            else a.colliding.left.push(b);
+            else if (!a.colliding.left.includes(b)) a.colliding.left.push(b);
             if (!b.colliding.right) b.colliding.right = [a];
-            else b.colliding.right.push(a);
+            else if (!b.colliding.right.includes(a)) b.colliding.right.push(a);
         }
         if (right) {
             if (!a.colliding.right) a.colliding.right = [b];
-            else a.colliding.right.push(b);
+            else if (!a.colliding.right.includes(b)) a.colliding.right.push(b);
             if (!b.colliding.left) b.colliding.left = [a];
-            else b.colliding.left.push(a);
+            else if (!b.colliding.left.includes(a)) b.colliding.left.push(a);
         }
         if (top) {
             if (!a.colliding.top) a.colliding.top = [b];
-            else a.colliding.top.push(b);
+            else if (!a.colliding.top.includes(b)) a.colliding.top.push(b);
             if (!b.colliding.bottom) b.colliding.top = [a];
-            else b.colliding.bottom.push(a);
+            else if (!b.colliding.bottom.includes(a)) b.colliding.bottom.push(a);
         }
         if (bottom) {
             if (!a.colliding.bottom) a.colliding.bottom = [b];
-            else a.colliding.bottom.push(b);
+            else if (!a.colliding.bottom.includes(b)) a.colliding.bottom.push(b);
             if (!b.colliding.top) b.colliding.top = [a];
-            else b.colliding.top.push(a);
+            else if (!b.colliding.top.includes(a)) b.colliding.top.push(a);
         }
         if (s.collisionEvents) {
             Physics.runEventListeners(a);
             Physics.runEventListeners(b);
         }
-        return true;
-    }
-    static resolveResults(resolution) {
-        const a = resolution.a;
-        const b = resolution.b;
-
-        //prevent interpenetration
-        a.privateMove(resolution.movement.aMove);
-        b.privateMove(resolution.movement.bMove);
-        a.cacheBoundingBoxes();
-        b.cacheBoundingBoxes();
-
-        //impulses
-        a.applyImpulse(resolution.impulses.impulseA);
-        b.applyImpulse(resolution.impulses.impulseB);
-
-        //friction
-        a.applyAngularImpulse(resolution.friction.impulseAngularA);
-        a.applyLinearImpulse(resolution.friction.impulseLinearA);
-        b.applyAngularImpulse(resolution.friction.impulseAngularB);
-        b.applyLinearImpulse(resolution.friction.impulseLinearB);
     }
     static runEventListeners(a) {
         function runEvents(name) {

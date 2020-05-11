@@ -147,7 +147,7 @@ class InactiveScene {
 		this.contains[name] = n;
 		return n;
 	}
-	addUI(name, x, y, width, height, draw = function () { }) {
+	addUIElement(name, x, y, width, height, draw = function () { }) {
 		name = this.genName_PRIVATE(this.contains, name);
 		if (width < 0) {
 			width = -width;
@@ -758,11 +758,17 @@ class Scene extends InactiveScene {
 		this.camera = new Display(x, y, width, height, this.camera.rotation, this.camera.zoom);
 	}
 	centerCameraAt(point) {
-		this.camera.x = point.x - this.c.canvas.width / 2;
-		this.camera.y = point.y - this.c.canvas.height / 2;
+		this.camera.x = point.x - width / 2;
+		this.camera.y = point.y - height / 2;
+	}
+	centerCameraX(x) {
+		this.camera.x = x - width / 2;
+	}
+	centerCameraY(y) {
+		this.camera.y = y - height / 2;
 	}
 	moveCameraTowards(point, ferocity) {
-		let goal = P(point.x - this.c.canvas.width / 2, point.y - this.c.canvas.height / 2);
+		let goal = P(point.x - width / 2, point.y - height / 2);
 		let pos = P(this.camera.x, this.camera.y);
 		let dif = P(goal.x - pos.x, goal.y - pos.y);
 		let move = P(Math.sign(dif.x) * ferocity, Math.sign(dif.y) * ferocity);

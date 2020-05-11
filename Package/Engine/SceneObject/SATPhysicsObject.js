@@ -271,6 +271,9 @@ class PhysicsObject extends SceneObject {
                                             Physics.resolve(collision);
                                         }
                                     }
+                                    for (let collision of col) {
+                                        Physics.events(collision);
+                                    }
                                 }
                             }
                         }

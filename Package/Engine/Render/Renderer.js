@@ -212,6 +212,16 @@ class Artist {
 					this.c.strokeText(r.text, r.x, r.y);
 				}
 			},
+			connector(...points) {
+				if (points.length) {
+					this.c.beginPath();
+					this.c.moveTo(points[0].x, points[0].y);
+					for (let i = 1; i < points.length; i++) {
+						this.c.lineTo(points[i].x, points[i].y);
+					}
+					this.c.stroke();
+				}
+			},
 			line(x, y, x1, y1) {
 				if (typeof x == "object") {
 					if (!x) return;
@@ -374,7 +384,7 @@ class Artist {
 					this.image(this.imageStyle).shape(...obj.getCorners());
 				}
 			}
-			
+
 		};
 		for (let func in this.imageObj) {
 			this.imageObj[func] = this.imageObj[func].bind(this);

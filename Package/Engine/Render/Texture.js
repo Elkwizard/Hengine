@@ -199,6 +199,10 @@ class Texture {
 		if (!this.loops) {
 			return this.__image.img;
 		} else {
+			width = Math.abs(width);
+			height = Math.abs(height);
+			if (!width) width = 0;
+			if (!height) height = 0;
 			let frame = new OffscreenCanvas(width, height);
 			let c = frame.getContext("2d");
 			let img = this.__image.img;

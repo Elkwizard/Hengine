@@ -165,7 +165,9 @@ class ParticleObject extends SceneObject {
     enginePhysicsUpdate() {
         this.lastX = this.x;
         this.lastY = this.y;
-        if (this.spawner.falls) this.velocity.y += this.home.gravity.y / 4;
+        if (this.spawner.particleFalls) {
+            this.velocity.y += this.home.gravity.y;
+        }
         if (this.spawner.particleSlows) {
             this.velocity.mul(this.home.linearDragForce)
         }

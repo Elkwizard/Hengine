@@ -140,7 +140,8 @@ class Vector {
 		return v.op(Math.abs.bind(Math), 0);
 	}
 	static sum(...v) {
-		return (new v[0].constructor(0, 0, 0, 0)).add(...v);
+		let construct = v.length ? v[0].constructor : this;
+		return (new construct(0, 0, 0, 0)).add(...v);
 	}
     static prohibitDirections(proDirs, dir) {
         let remove = [];
