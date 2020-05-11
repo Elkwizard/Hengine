@@ -1,8 +1,8 @@
 class Sound {
     constructor(src) {
+        this.src = src;
         let aud = new Audio(this.src);
         this.sounds = [aud];
-        this.src = src;
     }
     set onload(fn) {
         fn();
@@ -10,10 +10,10 @@ class Sound {
     play(volume = 1) {
         volume = Math.max(0, Math.min(1, volume));
         let found = false;
-        for (const snd of this.sounds) {
-            if (!snd.currentTime) {
-                snd.volume = volume;
-                snd.play();
+        for (const SND of this.sounds) {
+            if (!SND.currentTime) {
+                SND.volume = volume;
+                SND.play();
                 found = true;
                 break;
             }

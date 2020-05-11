@@ -1,9 +1,7 @@
 class InactiveScene {
-	constructor(name, gravity, airResistance) {
+	constructor(name, gravity) {
 		if (!gravity) gravity = new Vector2(0, 0.1);
-		if (!airResistance) airResistance = 0.025;
 		this.gravity = gravity;
-		this.airResistance = airResistance
 		this.name = name;
 		this.rebound = 0;
 		this.containsArray = [];
@@ -415,8 +413,8 @@ class InactiveScene {
 		return [collideAry, notCollideAry]
 	}
 }
-class Display extends Rect {
-	constructor(x, y, width, height, rotation = 0, zoom = 1) {
+class Camera extends Rect {
+	constructor(x, y, width, height, zoom = 1, rotation = 0) {
 		super(x, y, width, height, rotation);
 		this.zoom = zoom;
 		this.view = new Frame(width, height);
@@ -457,9 +455,10 @@ class Display extends Rect {
 		artist.translate(-width / 2, -height / 2);
 	}
 	screenSpaceToWorldSpace(point) {
+		point = Geometry.rotatePointAround(new Vector2(width / 2, height / 2), point, -this.rotation);
 		let newX = (point.x - width / 2) / this.zoom + width / 2 + this.x;
 		let newY = (point.y - height / 2) / this.zoom + height / 2 + this.y;
-		return Geometry.rotatePointAround(new Vector2(width / 2, height / 2), new Vector2(newX, newY), -this.rotation); //return the result
+		return new Vector2(newX, newY) //return the result
 	}
 	worldSpaceToScreenSpace(point) {
 		let newX = this.zoom * (point.x - width / 2 - this.x) + width / 2;
@@ -468,8 +467,8 @@ class Display extends Rect {
 	}
 }
 class Scene extends InactiveScene {
-	constructor(name, context, gravity, airResistance, home) {
-		super(name, gravity, airResistance);
+	constructor(name, context, gravity, home) {
+		super(name, gravity);
 		this.c = context;
 		this.home = home;
 		this.cullGraphics = true;
@@ -477,7 +476,7 @@ class Scene extends InactiveScene {
 		this.constraints = [];
 		this.cameras = {};
 		this.collisionEvents = false;
-		this.camera = new Display(0, 0, this.c.canvas.width, this.c.canvas.height, 0, 1);
+		this.camera = new Camera(0, 0, this.c.canvas.width, this.c.canvas.height, 1, 0);
 		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
 		M.engineClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
@@ -755,7 +754,7 @@ class Scene extends InactiveScene {
 		return this.camera.worldSpaceToScreenSpace(point);
 	}
 	updateCameraAt(x, y, width, height) {
-		this.camera = new Display(x, y, width, height, this.camera.rotation, this.camera.zoom);
+		this.camera = new Camera(x, y, width, height, this.camera.rotation, this.camera.zoom);
 	}
 	centerCameraAt(point) {
 		this.camera.x = point.x - width / 2;

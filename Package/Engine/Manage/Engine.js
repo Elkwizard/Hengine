@@ -35,7 +35,7 @@ class DelayedFunction {
 	}
 }
 class Engine {
-	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
+	constructor(wrapper = document.body) {
 		M.addListenersTo(setupAlerts());
 		this.fps = 60;
 		this.fpsContinuous = 0;
@@ -44,14 +44,8 @@ class Engine {
 		this.frameLengths = [];
 		this.frameLength = 0;
 		this.frameCount = 0;
-		//fallbacks
-		function f(a, b) {
-			return (a === undefined) ? b : a
-		}
-		let W = f(width, innerWidth);
-		let H = f(height, innerHeight);
-		let AR = f(airResistance, 0.025);
-		let G = f(gravity, new Vector2(0, 0.2));
+		
+		
 		this.paused = false;
 		this.output = function (m) {
 			alert(m);
@@ -69,18 +63,20 @@ class Engine {
 				this.f = new FunctionLibrary();
 			}
 		} catch (e) { }
+
 		//setup canvas and scene
-		let canvas = document.getElementById(canvasID);
-		if (!canvas) {
-			canvas = document.createElement('canvas');
-			canvas.id = "Engine Canvas";
-			M.addListenersTo(canvas);
-			if (!wrapperID) document.body.appendChild(canvas);
-			else document.getElementById(wrapperID).appendChild(canvas);
-		}
+		let bound = wrapper.getClientRects()[0];
+		let W = bound.width;
+		let H = bound.height;
+		let canvas = document.createElement("canvas");
+		canvas.id = "Engine Canvas";
+		M.addListenersTo(canvas);
+		wrapper.appendChild(canvas);
+		this.wrapper = wrapper;
+
 		this.renderer = new Artist(canvas.id, W, H);
 		window.g = this;
-		this.scene = new Scene("Engine Scene", this.renderer, G, AR, this);
+		this.scene = new Scene("Engine Scene", this.renderer, new Vector2(0, 0.2), this);
 		//update loops
 		this.afterScript = new Script("after");
 		this.fixedScript = new Script("fixed");
@@ -125,6 +121,7 @@ class Engine {
 				//update
 				if (!this.paused) {
 					K.update();
+					M.update();
 					this.updateDelayedCalls();
 					this.beforeUpdate();
 					this.clear();
@@ -182,8 +179,15 @@ class Engine {
 		window.addEventListener("resize", function () {
 			if (this.resize) {
 				let pixelate = this.renderer.c.imageSmoothingEnabled;
-				this.renderer.canvas.width = innerWidth;
-				this.renderer.canvas.height = innerHeight;
+				let bound = this.wrapper.getClientRects()[0];
+				if (this.wrapper === document.body) {
+					bound = {
+						width: innerWidth,
+						height: innerHeight
+					};
+				}
+				this.renderer.canvas.width = bound.width;
+				this.renderer.canvas.height = bound.height;
 				this.renderer.c.imageSmoothingEnabled = pixelate;
 			}
 		}.bind(this));

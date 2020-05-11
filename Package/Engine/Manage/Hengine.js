@@ -56,13 +56,14 @@ class LocalFileSystem {
     } 
 }
 class Hengine {
-	constructor(wrapperID, width, height, airResistance, gravity, canvasID) {
+	constructor(wrapper = document.body) {
 		//everything needs randomness
 		this.randomSeed = 1;
 		window.rand = this.rand.bind(this);
 
 		//create engine
-		this.g = new Engine(wrapperID, width, height, airResistance, gravity, canvasID);
+		document.body.style.margin = 0;
+		this.g = new Engine(wrapper);
 		this.s = this.g.scene;
 		this.c = this.g.renderer;
 		this.C = this.c.c;

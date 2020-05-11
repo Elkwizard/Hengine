@@ -466,8 +466,8 @@ class Physics {
     }
     static events(col) {
         //cache vars
-        let a = col.a;
-        let b = col.b;
+        const a = col.a;
+        const b = col.b;
         let mobileA = !Physics.isWall(a);
         let mobileB = !Physics.isWall(b);
         const d = col.dir.times(-1);
@@ -505,10 +505,10 @@ class Physics {
             if (!b.colliding.top) b.colliding.top = [a];
             else if (!b.colliding.top.includes(a)) b.colliding.top.push(a);
         }
-        if (s.collisionEvents) {
-            Physics.runEventListeners(a);
-            Physics.runEventListeners(b);
-        }
+        // if (s.collisionEvents) {
+        //     Physics.runEventListeners(a);
+        //     Physics.runEventListeners(b);
+        // }
     }
     static runEventListeners(a) {
         function runEvents(name) {

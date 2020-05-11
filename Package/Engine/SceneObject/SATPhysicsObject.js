@@ -281,6 +281,7 @@ class PhysicsObject extends SceneObject {
                 }
             }
         }
+        if (s.collisionEvents) Physics.runEventListeners(this);
         return [];
     }
     checkAndResolveCollisions(others) {
