@@ -186,8 +186,8 @@ class Engine {
 						height: innerHeight
 					};
 				}
-				this.renderer.canvas.width = bound.width;
-				this.renderer.canvas.height = bound.height;
+				this.renderer.canvas.width = bound.width - 1;
+				this.renderer.canvas.height = bound.height - 1;
 				this.renderer.c.imageSmoothingEnabled = pixelate;
 			}
 		}.bind(this));
