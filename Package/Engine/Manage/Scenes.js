@@ -619,8 +619,12 @@ class Scene extends InactiveScene {
 
             this.SAT.gridChecks += updater.length;
             this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
-            rect.physicsUpdate(updater);
-        }
+			rect.physicsUpdate(updater);
+		}
+		let usefulElements = useful.map(e => e[0]);
+		if (this.collisionEvents) for (let el of usefulElements) {
+			Physics.runEventListeners(el);
+		}
         
         
         //solve constraints #2
