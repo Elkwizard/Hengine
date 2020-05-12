@@ -25,6 +25,18 @@ class Sound {
             aud.play();
         }
     }
+    static async noteSequenceLoop(notes, iterations) {
+        for (let n = 0; n < iterations; n++) {
+            if (n < iterations - 1) await Sound.noteSequence(notes);
+            else return Sound.noteSequence(notes);
+        }
+    }
+    static async noteSequence(notes) {
+        for (let i = 0; i < notes.length; i++) {
+            if (i < notes.length - 1) await Sound.note(...notes[i]);
+            else return Sound.note(...notes[i]);
+        }
+    }
     static wave(hertz, duration, type, volume) {
         let osc = Sound.context.createOscillator();
         osc.type = type;
@@ -32,21 +44,27 @@ class Sound {
         osc.connect(Sound.gainNode);
         osc.start();
         Sound.gainNode.gain.value = volume;
-        setTimeout(function () {
-            osc.stop();
-            osc.disconnect(Sound.gainNode);
-        }, duration);
+        return new Promise(function (resolve) {
+            setTimeout(function () {
+                osc.stop();
+                osc.disconnect(Sound.gainNode);
+                resolve();
+            }, duration);
+        });
+    }
+    static sawtooth(hertz, duration, volume = 1) {
+        return Sound.wave(hertz, duration, "sawtooth", volume);
     }
     static sin(hertz, duration, volume = 1) {
-        Sound.wave(hertz, duration, "sine", volume);
+        return Sound.wave(hertz, duration, "sine", volume);
     }
     static square(hertz, duration, volume = 1) {
-        Sound.wave(hertz, duration, "square", volume);
+        return Sound.wave(hertz, duration, "square", volume);
     }
     static triangle(hertz, duration, volume = 1) {
-        Sound.wave(hertz, duration, "triangle", volume);
+        return Sound.wave(hertz, duration, "triangle", volume);
     }
-    static note(note = "C", duration = 1000, octave = 4, volume = 1, type = "sin") {
+    static note(note, duration, octave, volume, type) {
         const noteTable = {
             "C0": 16.35,
             "C#0": 17.32,
@@ -157,9 +175,25 @@ class Sound {
             "A#8": 7458.62,
             "B8": 7902.13
         }
-        let freq = 440.00;
-        freq = noteTable[note.toUpperCase() + octave];
-        Sound[type](freq, duration, volume);
+        let promises = [];
+        let notes = [[note, duration, octave, volume, type]];
+        if (Array.isArray(note)) notes = note;
+        for (let note of notes) {
+            if (note[0] === undefined) note[0] = "C";
+            if (note[1] === undefined) note[1] = 1000;
+            if (note[2] === undefined) note[2] = 4;
+            if (note[3] === undefined) note[3] = 1;
+            if (note[4] === undefined) note[4] = "sin";
+        }
+        for (let note of notes) {
+            let freq = 440.00;
+            freq = noteTable[note[0].toUpperCase() + note[2]];
+            promises.push(Sound[note[4]](freq, note[1], note[3]));
+        }
+        return new Promise(async function(resolve) {
+            for (let pro of promises) await pro;
+            resolve();
+        });
     }
 }
 Sound.context = new AudioContext();
