@@ -68,6 +68,9 @@ class Shape {
 		//return the area of the shape
 		return 0;
 	}
+	get perimeter() {
+		return 0;
+	}
 	cacheBoundingBox(box) {
 		//store bounding box for later use
 		this.__boundingBox = box;
@@ -108,6 +111,12 @@ class Polygon extends Shape {
 	get area() {
 		let bound = this.getBoundingBox();
 		return bound.width * bound.height;
+	}
+	get perimeter() {
+		let sum = 0;
+		let edges = this.getEdges();
+		for (let el of edges) sum += Math.sqrt((el.b.x - el.a.x) ** 2 + (el.b.y - el.a.y) ** 2);
+		return sum;
 	}
 	subdivideForCollisions() {
 		this.collisionShapes = Geometry.subdividePolygon(this);
@@ -224,6 +233,9 @@ class Rect extends Polygon {
 	get area() {
 		return this.width * this.height;
 	}
+	get perimeter() {
+		return this.width * 2 + this.height * 2;
+	}
 	get vertices() {
 		return [
 			new Vector2(this.x, this.y),
@@ -275,6 +287,9 @@ class Circle extends Shape {
 	}
 	get area() {
 		return Math.PI * this.radius ** 2;
+	}
+	get perimeter() {
+		return Math.PI * this.radius * 2;
 	}
 	get middle() {
 		return new Vector2(this.x, this.y);

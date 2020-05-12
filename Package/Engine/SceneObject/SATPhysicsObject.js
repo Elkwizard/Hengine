@@ -28,6 +28,7 @@ class PhysicsObject extends SceneObject {
         this._friction = null;
         this._rotation = 0;
         this.__mass = 0; //mass cache
+        this.__perimeter = 0; //perimeter cache
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
         this.newColliding = new CollisionMoniter();
@@ -102,6 +103,11 @@ class PhysicsObject extends SceneObject {
         let totalMass = 0;
         for (let [name, shape] of this.shapes) totalMass += shape.area;
         return totalMass;
+    }
+    get perimeter() {
+        let totalPer = 0;
+        for (let [name, shape] of this.shapes) totalPer += shape.perimeter;
+        return totalPer;
     }
     set speed(a) {
         this.velocity = a;
@@ -281,12 +287,10 @@ class PhysicsObject extends SceneObject {
                 }
             }
         }
-        // if (s.collisionEvents) Physics.runEventListeners(this);
         return [];
     }
     checkAndResolveCollisions(others) {
         const dir = this.velocity.get().normalize();
-        // c.stroke(cl.RED, 3).arrow(this.middle, this.middle.plus(dir.times(10)));
         others = others.sort(function (a, b) {
             let mA = Vector2.fromPoint(a);
             let mB = Vector2.fromPoint(b);
@@ -346,6 +350,7 @@ class PhysicsObject extends SceneObject {
 
                 this.cacheBoundingBoxes();
                 this.__mass = this.mass;
+                this.__perimeter = this.perimeter;
 
                 this.checkAndResolveCollisions(others);
             }
