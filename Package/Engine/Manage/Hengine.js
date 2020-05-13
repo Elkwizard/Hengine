@@ -285,7 +285,7 @@ class Hengine {
 		}
 	}
 	static utilityApplicationPackage(code = []) {
-		return new ApplicationPackage(code, [], [], [], [], false);
+		return new ApplicationPackage(Hengine.defaultEnginePackage, code, [], [], [], false);
 	}
 	static defaultApplicationPackage(code = [], art = [], animations = [], music = []) {
 		return new ApplicationPackage(Hengine.defaultEnginePackage, code, art, animations, music, true);

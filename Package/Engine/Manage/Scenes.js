@@ -702,16 +702,19 @@ class Scene extends InactiveScene {
 		return this.cameras[name];
 	}
 	renderCamera(camera) {
-		let screen = camera.getWorld().__boundingBox;
-		this.c.embody(camera.newView);
-		camera.transformToWorld(this.c);
-		for (let rect of this.containsArray) {
-			rect.engineDrawUpdate(screen);
-			rect.lifeSpan++;
+		if (this.c.canvas.width && this.c.canvas.height) { 
+			let screen = camera.getWorld().__boundingBox;
+			this.c.embody(camera.newView);
+			camera.transformToWorld(this.c);
+			for (let rect of this.containsArray) {
+				rect.engineDrawUpdate(screen);
+				rect.lifeSpan++;
+			}
+			this.c.unembody();
+			camera.view = camera.newView;
+			return camera.view;
 		}
-		this.c.unembody();
-		camera.view = camera.newView;
-		return camera.view;
+		return new Frame(1, 1);
 	}
 	engineDrawUpdate() {
 		this.updateArray();
