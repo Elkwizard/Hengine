@@ -40,7 +40,7 @@ class Sound {
     static wave(hertz, duration, type, volume) {
         let osc = Sound.context.createOscillator();
         osc.type = type;
-        osc.frequency.setValueAtTime(hertz, Sound.context.currentTime);
+        osc.frequency.value = hertz;
         osc.connect(Sound.gainNode);
         osc.start();
         Sound.gainNode.gain.value = volume;
@@ -176,75 +176,6 @@ class Sound {
             "B8": 7902.13
         }
     }
-    static get Note() {
-        return class {
-            constructor(notes, durations, octaves, volumes, types) {
-                this.notes = notes;
-                this.octaves = octaves;
-                this.durations = durations;
-                this.volumes = volumes;
-                this.types = types;
-            }
-            play() {
-                let promises = [];
-                let table = Sound.noteFrequencyTable;
-                for (let i = 0; i < this.notes.length; i++) {
-                    let freq = 440.00;
-                    freq = table[this.notes[i].toUpperCase() + this.octaves[i]];
-                    promises.push(
-                        Sound[
-                            this.types[
-                                Math.min(i, this.types.length)
-                            ]
-                        ](
-                            freq, 
-                            this.durations[
-                                Math.min(i, this.durations.length)
-                            ], 
-                            this.volumes[
-                                Math.min(i, this.volumes.length)
-                            ]
-                        )
-                    );
-                }
-                return new Promise(async function(resolve) {
-                    for (let pro of promises) await pro;
-                    resolve();
-                });
-            }
-            get() {
-                return new Note(this.notes, this.durations, this.octaves, this.volumes, this.types);
-            }
-            static octaveShift(note, octaves) {
-                let n = note.get();
-                n.octaves = n.octaves.map(e => e + octaves);
-                return n;
-            }
-            static fromNotes(...NOTES) {
-                let notes = [];
-                let durations = [];
-                let octaves = [];
-                let volumes = [];
-                let types = [];
-                for (let note of NOTES) {
-                    for (let i = 0; i < note.notes.length; i++) {
-                        notes.push(note.notes[i]);
-                        durations.push(note.durations[Math.min(i, note.durations.length)]);
-                        octaves.push(note.octaves[Math.min(i, note.octaves.length)]);
-                        volumes.push(note.volumes[Math.min(i, note.volumes.length)]);
-                        types.push(note.types[Math.min(i, note.types.length)]);
-                    }
-                }
-                return new this(notes, durations, octaves, volumes, types);
-            }
-            static fromNote(note = "C", octave = 4, duration = 1000, volume = 1, type = "sin") {
-                return new this([note], [duration], [octave], [volume], [type]);
-            }
-            static fromChord(notes = ["C", "C"], octaves = [4, 5], duration = 1000, volume = 1, type = "sin") {
-                return new this([notes], [duration], octaves, [volume], [type]);
-            }
-        }
-    }
     static note(note) {
         return note.play();
     }
@@ -252,3 +183,69 @@ class Sound {
 Sound.context = new AudioContext();
 Sound.gainNode = Sound.context.createGain();
 Sound.gainNode.connect(Sound.context.destination);
+Sound.Note = class {
+    constructor(notes, durations, octaves, volumes, types) {
+        this.notes = notes;
+        this.octaves = octaves;
+        this.durations = durations;
+        this.volumes = volumes;
+        this.types = types;
+    }
+    play() {
+        let promises = [];
+        let table = Sound.noteFrequencyTable;
+        for (let i = 0; i < this.notes.length; i++) {
+            let freq = 440.00;
+            freq = table[this.notes[i].toUpperCase() + this.octaves[i]];
+            promises.push(
+                Sound.wave(
+                    freq,
+                    this.durations[
+                        Math.min(i, this.durations.length - 1)
+                    ],
+                    this.types[
+                        Math.min(i, this.types.length - 1)
+                    ],
+                    this.volumes[
+                        Math.min(i, this.volumes.length - 1)
+                    ]
+                )
+            );
+        }
+        return new Promise(async function (resolve) {
+            for (let pro of promises) await pro;
+            resolve();
+        });
+    }
+    get() {
+        return new Sound.Note(this.notes, this.durations, this.octaves, this.volumes, this.types);
+    }
+    octaveShift(octaves) {
+        let n = this.get();
+        n.octaves = n.octaves.map(e => Math.max(0, Math.min(8, e + octaves)));
+        return n;
+    }
+    static fromNotes(...NOTES) {
+        let notes = [];
+        let durations = [];
+        let octaves = [];
+        let volumes = [];
+        let types = [];
+        for (let note of NOTES) {
+            for (let i = 0; i < note.notes.length; i++) {
+                notes.push(note.notes[i]);
+                durations.push(note.durations[Math.min(i, note.durations.length - 1)]);
+                octaves.push(note.octaves[Math.min(i, note.octaves.length - 1)]);
+                volumes.push(note.volumes[Math.min(i, note.volumes.length - 1)]);
+                types.push(note.types[Math.min(i, note.types.length - 1)]);
+            }
+        }
+        return new this(notes, durations, octaves, volumes, types);
+    }
+    static fromNote(note = "C", octave = 4, duration = 1000, volume = 1, type = "sine") {
+        return new this([note], [duration], [octave], [volume], [type]);
+    }
+    static fromChord(notes = ["C", "C"], octaves = [4, 5], duration = 1000, volume = 1, type = "sine") {
+        return new this(notes, [duration], octaves, [volume], [type]);
+    }
+}

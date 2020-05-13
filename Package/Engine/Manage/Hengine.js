@@ -238,6 +238,57 @@ class Hengine {
 	loadAnimation(src) {
 		return Animation.copy(this.animations[src]);
 	}
+	static get defaultRenderPackage() {
+		return ["Color", "Shapes", "Animation", "Frame", "Texture", "Renderer", "Graph"];
+	}
+	static get defaultManagementPackage() {
+		return ["PrototypeOverload", "Scripts", "Scenes", "Engine", "Hengine"];
+	}
+	static get defaultMathPackage() {
+		return ["Vector", "Geometry", "Physics"];
+	}
+	static get defaultUtilityPackage() {
+		return ["Input", "Sound", "Time", "Console"];
+	}
+	static get defaultSceneObjectPackage() {
+		return ["SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
+	}
+	static get defaultFilePackage() {
+		return {
+			Render: Hengine.defaultRenderPackage,
+			Math: Hengine.defaultMathPackage,
+			Util: Hengine.defaultUtilityPackage,
+			SceneObject: Hengine.defaultSceneObjectPackage,
+			Manage: Hengine.defaultManagementPackage
+		}
+	}
+	static defaultApplicationPackage(code = [], art = [], animations = [], music = []) {
+		return {
+			engine: {
+				files: Hengine.defaultFilePackage
+			},
+			sounds: {
+				files: {
+					".": music
+				}
+			},
+			sprites: {
+				files: {
+					".": art
+				}
+			},
+			animations: {
+				files: {
+					".": animations
+				}
+			},
+			code: {
+				files: {
+					".": code
+				}
+			}
+		};
+	}
 	static async load(scripts) {
 		let scriptHome = document.querySelector("script"); //find yourself
 		let pathSRC = scriptHome.src.split("/");
