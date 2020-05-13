@@ -113,8 +113,10 @@ class MouseHandler extends InputHandler {
 		});
 		el.addEventListener("pointermove", function (e) {
 			m.updatePosition(e, "move");
-			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
-			m.dragEnd = adjusted;
+			if (m.down) {
+				let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
+				m.dragEnd = adjusted;
+			}
 			m.engineMove(e);
 			for (let ev of m.onMove) ev(e);
 		});
