@@ -295,7 +295,13 @@ class Hengine {
 		};
 	}
 	static async load(scripts) {
-		let scriptHome = document.querySelectorAll("script").filter(e => e.src.indexOf("Hengine") > -1)[0]; //find yourself
+		let scriptHome = document.querySelectorAll("script"); //find yourself
+		for (let el of scriptHome) {
+			if (el.src.indexOf("Hengine") > -1) {
+				scriptHome = el;
+				break;
+			}
+		}
 		let pathSRC = scriptHome.src.split("/");
 		pathSRC.pop();
 		pathSRC.pop();
