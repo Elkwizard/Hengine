@@ -18,6 +18,9 @@ class Artist {
 	constructor(canvasID, width, height) {
 		if (typeof canvasID === "object") this.canvas = canvasID;
 		else this.canvas = document.getElementById(canvasID);
+		if (this.canvas.style) {
+			this.canvas.style.position = "absolute";
+		}
 		if (width) {
 			this.canvas.width = width;
 		}
