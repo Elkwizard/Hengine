@@ -55,6 +55,21 @@ class LocalFileSystem {
         return value;
     } 
 }
+class ApplicationPackageElement {
+	constructor(files) {
+		this.files = files;
+	}
+}
+class ApplicationPackage {
+	constructor(engine, code, art, animations, sound, canvas) {
+		this.engine = new ApplicationPackageElement(engine);
+		this.code = new ApplicationPackageElement({ ".": code });
+		this.sprites = new ApplicationPackageElement({ ".": art });
+		this.animations = new ApplicationPackageElement({ ".": animations });
+		this.sounds = new ApplicationPackageElement({ ".": sound });
+		this.utility = !canvas;
+	}
+}
 class Hengine {
 	constructor(wrapper = document.body) {
 		//everything needs randomness
@@ -153,7 +168,9 @@ class Hengine {
 		let t = script.src;
 		let st = t.split("/");
 		let ti = st[st.length - 3];
-		ti = ti.replace(/%20/g, " ");
+		if (ti) {
+			ti = ti.replace(/%20/g, " ");
+		}
 		return ti;
 	}
 	setTitle(title) {
@@ -258,7 +275,7 @@ class Hengine {
 	static get defaultSceneObjectPackage() {
 		return ["SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
 	}
-	static get defaultFilePackage() {
+	static get defaultEnginePackage() {
 		return {
 			Render: Hengine.defaultRenderPackage,
 			Math: Hengine.defaultMathPackage,
@@ -267,32 +284,11 @@ class Hengine {
 			Manage: Hengine.defaultManagementPackage
 		}
 	}
+	static utilityApplicationPackage(code = []) {
+		return new ApplicationPackage(code, [], [], [], [], false);
+	}
 	static defaultApplicationPackage(code = [], art = [], animations = [], music = []) {
-		return {
-			engine: {
-				files: Hengine.defaultFilePackage
-			},
-			sounds: {
-				files: {
-					".": music
-				}
-			},
-			sprites: {
-				files: {
-					".": art
-				}
-			},
-			animations: {
-				files: {
-					".": animations
-				}
-			},
-			code: {
-				files: {
-					".": code
-				}
-			}
-		};
+		return new ApplicationPackage(Hengine.defaultEnginePackage, code, art, animations, music, true);
 	}
 	static async load(scripts) {
 		let scriptHome = document.querySelectorAll("script"); //find yourself
@@ -345,6 +341,11 @@ class Hengine {
 					} else {
 						if (file === "Hengine") {
 							window.HENGINE = new Hengine();
+							if (scripts.utility) {
+								HENGINE.g.resize = false;
+								width = 0;
+								height = 0;
+							}
 						} else {
 							if (file.match(/DATA/g)) {
 								eval(file.slice(5));
