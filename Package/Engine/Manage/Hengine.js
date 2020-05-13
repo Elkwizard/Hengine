@@ -157,7 +157,12 @@ class Hengine {
 		return ti;
 	}
 	setTitle(title) {
-		document.querySelector("title").innerHTML = title;
+		let t = document.querySelector("title");
+		if (!t) {
+			t = document.createElement("title");
+			document.head.appendChild(t);
+		}
+		t.innerHTML = title;
 		return title;
 	}
 	importPackage(pack, loc = this.getProjectName()) {
