@@ -1,11 +1,10 @@
 function P(x = 0, y = 0) {
-	return { x: x, y: y };
+	return { x, y };
 }
 class ScreenRecording {
-	constructor(name, past) {
+	constructor(name) {
 		this.name = name;
 		this.frames = [];
-		if (past) this.frames = ScreenRecording.parse(past).frames;
 		this.isRecording = false;
 	}
 	start() {
@@ -99,11 +98,9 @@ class Engine {
 				else throw e;
 			}
 		}.bind(this);
-		setInterval(this.engineUpdate, 16);
 		this.FPS_FRAMES_TO_COUNT = 10;
 		this.animate = function () {
 			try {
-				requestAnimationFrame(this.animate);
 				this.frameCount++;
 				this.currentTime = performance.now();
 				//fps
@@ -142,7 +139,11 @@ class Engine {
 				else throw e;
 			}
 		}.bind(this);
-		this.animate();
+		
+		
+		window.intervals.push(this.engineUpdate);
+		window.animationFrames.push(this.animate);
+
 		//append text
 		this.styling = document.createElement("style");
 		this.styling.innerHTML =
@@ -223,8 +224,8 @@ class Engine {
 	set preservePixelart(a) {
 		this.renderer.c.imageSmoothingEnabled = !a;
 	}
-	createScreenRecording(name, past) {
-		this.recordings[name] = new ScreenRecording(name, past);
+	createScreenRecording(name) {
+		this.recordings[name] = new ScreenRecording(name);
 		return this.recordings[name];
 	}
 	updateScreenRecordings() {

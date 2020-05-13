@@ -414,11 +414,12 @@ class InactiveScene {
 	}
 }
 class Camera extends Rect {
-	constructor(x, y, width, height, zoom = 1, rotation = 0) {
+	constructor(x, y, width, height, zoom = 1, rotation = 0, RenderType = Frame) {
 		super(x, y, width, height, rotation);
 		this.zoom = zoom;
-		this.view = new Frame(width, height);
-		this.newView = new Frame(width, height);
+		this.RenderType = RenderType;
+		this.view = new this.RenderType(width, height);
+		this.newView = new this.RenderType(width, height);
 	}
 	restoreZoom() {
 		this.zoom = 1;
@@ -433,7 +434,7 @@ class Camera extends Rect {
 		let m = this.getModel(Vector2.origin, 0);
 		m.scale(1 / this.zoom);
 		m.cacheBoundingBox(m.getBoundingBox());
-		this.newView = new Frame(width, height);
+		this.newView = new this.RenderType(width, height);
 		return m;
 	}
 	updateView(width, height) {

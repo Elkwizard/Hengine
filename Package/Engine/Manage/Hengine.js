@@ -70,6 +70,24 @@ class ApplicationPackage {
 		this.utility = !canvas;
 	}
 }
+//create game loop
+(function() {
+	window.intervals = [];
+	setInterval(function() {
+		for (let fn of window.intervals) {
+			fn();
+		}
+	}, 16);
+
+	window.animationFrames = [];
+	function animate() {
+		requestAnimationFrame(animate);
+		for (let fn of window.animationFrames) {
+			fn();
+		}
+	}
+	animate();
+})();
 class Hengine {
 	constructor(wrapper = document.body) {
 		//everything needs randomness
@@ -170,7 +188,7 @@ class Hengine {
 		let ti = st[st.length - 3];
 		if (ti) {
 			ti = ti.replace(/%20/g, " ");
-		}
+		} else ti = "Unknown";
 		return ti;
 	}
 	setTitle(title) {

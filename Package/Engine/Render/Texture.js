@@ -400,7 +400,6 @@ class TextureDrawingContext {
 				let n_y = ay * trans.y;
 				ax = n_x;
 				ay = n_y;
-
 			} else if (trans.type === "translation") {
 				ax += trans.x;
 				ay += trans.y;
@@ -448,7 +447,6 @@ class TextureDrawingContext {
 	arc(x, y, r, st, et) {
 		let min = this.getTransformedPoint(x, y);
 		let max = this.getTransformedPoint(x + r, y);
-		// console.log(min, max);
 		this.path.push(new TextureDrawingContextPath(this, "arc", min.x, min.y, Math.sqrt((max.x - min.x) ** 2 + (max.y - min.y) ** 2), st, et));
 	}
 	beginPath() {
