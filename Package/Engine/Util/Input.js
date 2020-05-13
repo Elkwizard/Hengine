@@ -105,29 +105,23 @@ class MouseHandler extends InputHandler {
 		el.addEventListener("pointerdown", function (e) {
 			m.button = e.button;
 			m.updatePosition(e, "down");
-			if (m.engine) {
-				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m)
-				m.dragStart = m.dragEnd = adjusted;
-			}
+			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
+			m.dragStart = m.dragEnd = adjusted;
 			m.down = true;
 			m.keys[m.mouseMap[e.button]] = true;
 			for (let ev of m.onDown) ev(e);
 		});
 		el.addEventListener("pointermove", function (e) {
 			m.updatePosition(e, "move");
-			if (m.engine && m.down) {
-				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
-				m.dragEnd = adjusted;
-			}
+			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
+			m.dragEnd = adjusted;
 			m.engineMove(e);
 			for (let ev of m.onMove) ev(e);
 		});
 		el.addEventListener("pointerup", function (e) {
 			m.updatePosition(e, "up");
-			if (m.engine) {
-				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
-				m.dragEnd = adjusted;
-			}
+			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
+			m.dragEnd = adjusted;
 			m.down = false;
 			m.keys[m.mouseMap[e.button]] = false;
 			for (let ev of m.onUp) ev(e);
