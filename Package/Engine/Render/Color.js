@@ -7,7 +7,7 @@ class Color {
 		this.custom = {};
 		this.limited = true;
 		if (b === undefined && g === undefined && typeof r == "string") {
-			if (!(r[0].indexOf("rgb") > -1 || r[0].indexOf("#") > -1)) {
+			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0) {
 				r = Color.CSSColor(r);
 			}
 			function parseRGBA(str) {

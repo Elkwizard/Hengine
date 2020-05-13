@@ -14,10 +14,38 @@ class Listener {
 		this.methods.push(fn);
 	}
 }
-class KeyboardHandler {
+class InputHandler {
 	constructor() {
-		this.keyCounts = { };
 		this.keys = { };
+		this.keyDownCounts = { };
+		this.keyUpCounts = { };
+	}
+	P(key) {
+		return !!this.keys[key];
+	}
+	R(key) {
+		return !this.keys[key];
+	}
+	JP(key) {
+		return this.keyDownCounts[key] === 1;
+	}
+	JR(key) {
+		return this.keyUpCounts[key] === 1;
+	}
+	update() {
+		for (let key in this.keys) {
+			if (!this.keyDownCounts[key]) this.keyDownCounts[key] = 0;
+			if (!this.keyUpCounts[key]) this.keyUpCounts[key] = 0;
+			if (this.P(key)) this.keyDownCounts[key]++;
+			else this.keyDownCounts[key] = 0;
+			if (this.R(key)) this.keyUpCounts[key]++;
+			else this.keyUpCounts[key] = 0;
+		}
+	}
+}
+class KeyboardHandler extends InputHandler {
+	constructor() {
+		super();
 		this.custom = { };
 		this.onDown = new Listener();
 		this.onUp = new Listener();
@@ -38,22 +66,10 @@ class KeyboardHandler {
 		this.onDown.clear();
 		this.onUp.clear();
 	}
-	P(key) {
-		return !!this.keys[key];
-	}
-	JP(key) {
-		return this.keyCounts[key] == 1;
-	}
-	update() {
-		for (let key in this.keys) {
-			if (!this.keyCounts[key]) this.keyCounts[key] = 0;
-			if (this.P(key)) this.keyCounts[key]++;
-			else this.keyCounts[key] = 0;
-		}
-	}
 }
-class MouseHandler {
+class MouseHandler extends InputHandler {
 	constructor() {
+		super();
 		this.down = false;
 		this.x = 0;
 		this.y = 0;
@@ -62,12 +78,6 @@ class MouseHandler {
 			y: 0
 		};
 		this.mouseMap = ["Left", "Middle", "Right"];
-		this.keys = {
-			"Left": false,
-			"Middle": false,
-			"Right": false
-		};
-		this.keyCounts = { };
 		this.button = 0;
 		this.dragStart = Vector2.origin;
 		this.dragEnd = Vector2.origin;
@@ -142,19 +152,6 @@ class MouseHandler {
 		this.onRight.clear();
 		this.onScroll.clear();
 		this.onClick.clear();
-	}
-	P(key) {
-		return !!this.keys[key];
-	}
-	JP(key) {
-		return this.keyCounts[key] === 1;
-	}
-	update() {
-		for (let key in this.keys) {
-			if (!this.keyCounts[key]) this.keyCounts[key] = 0;
-			if (this.P(key)) this.keyCounts[key]++;
-			else this.keyCounts[key] = 0;
-		}
 	}
 	updatePosition(e, name) {
 		try {

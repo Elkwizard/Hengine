@@ -136,6 +136,9 @@ class Vector {
 		for (let n in this) ary.push(this[n].toFixed(n));
 		return "\u27e8 " + ary.join(", ") + " \u27e9"; 
 	}
+	static lerp(a, b, t) {
+		return a.times(1 - t).plus(b.times(t));
+	}
 	static abs(v) {
 		return v.op(Math.abs.bind(Math), 0);
 	}
