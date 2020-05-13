@@ -33,8 +33,8 @@ class Sound {
     }
     static async noteSequence(notes) {
         for (let i = 0; i < notes.length; i++) {
-            if (i < notes.length - 1) await Sound.note(...notes[i]);
-            else return Sound.note(...notes[i]);
+            if (i < notes.length - 1) await Sound.note(notes[i]);
+            else return Sound.note(notes[i]);
         }
     }
     static wave(hertz, duration, type, volume) {
@@ -64,8 +64,8 @@ class Sound {
     static triangle(hertz, duration, volume = 1) {
         return Sound.wave(hertz, duration, "triangle", volume);
     }
-    static note(note, duration, octave, volume, type) {
-        const noteTable = {
+    static get noteFrequencyTable() {
+        return {
             "C0": 16.35,
             "C#0": 17.32,
             "D0": 18.35,
@@ -175,25 +175,78 @@ class Sound {
             "A#8": 7458.62,
             "B8": 7902.13
         }
-        let promises = [];
-        let notes = [[note, duration, octave, volume, type]];
-        if (Array.isArray(note)) notes = note;
-        for (let note of notes) {
-            if (note[0] === undefined) note[0] = "C";
-            if (note[1] === undefined) note[1] = 1000;
-            if (note[2] === undefined) note[2] = 4;
-            if (note[3] === undefined) note[3] = 1;
-            if (note[4] === undefined) note[4] = "sin";
+    }
+    static get Note() {
+        return class {
+            constructor(notes, durations, octaves, volumes, types) {
+                this.notes = notes;
+                this.octaves = octaves;
+                this.durations = durations;
+                this.volumes = volumes;
+                this.types = types;
+            }
+            play() {
+                let promises = [];
+                let table = Sound.noteFrequencyTable;
+                for (let i = 0; i < this.notes.length; i++) {
+                    let freq = 440.00;
+                    freq = table[this.notes[i].toUpperCase() + this.octaves[i]];
+                    promises.push(
+                        Sound[
+                            this.types[
+                                Math.min(i, this.types.length)
+                            ]
+                        ](
+                            freq, 
+                            this.durations[
+                                Math.min(i, this.durations.length)
+                            ], 
+                            this.volumes[
+                                Math.min(i, this.volumes.length)
+                            ]
+                        )
+                    );
+                }
+                return new Promise(async function(resolve) {
+                    for (let pro of promises) await pro;
+                    resolve();
+                });
+            }
+            get() {
+                return new Note(this.notes, this.durations, this.octaves, this.volumes, this.types);
+            }
+            static octaveShift(note, octaves) {
+                let n = note.get();
+                n.octaves = n.octaves.map(e => e + octaves);
+                return n;
+            }
+            static fromNotes(...NOTES) {
+                let notes = [];
+                let durations = [];
+                let octaves = [];
+                let volumes = [];
+                let types = [];
+                for (let note of NOTES) {
+                    for (let i = 0; i < note.notes.length; i++) {
+                        notes.push(note.notes[i]);
+                        durations.push(note.durations[Math.min(i, note.durations.length)]);
+                        octaves.push(note.octaves[Math.min(i, note.octaves.length)]);
+                        volumes.push(note.volumes[Math.min(i, note.volumes.length)]);
+                        types.push(note.types[Math.min(i, note.types.length)]);
+                    }
+                }
+                return new this(notes, durations, octaves, volumes, types);
+            }
+            static fromNote(note = "C", octave = 4, duration = 1000, volume = 1, type = "sin") {
+                return new this([note], [duration], [octave], [volume], [type]);
+            }
+            static fromChord(notes = ["C", "C"], octaves = [4, 5], duration = 1000, volume = 1, type = "sin") {
+                return new this([notes], [duration], octaves, [volume], [type]);
+            }
         }
-        for (let note of notes) {
-            let freq = 440.00;
-            freq = noteTable[note[0].toUpperCase() + note[2]];
-            promises.push(Sound[note[4]](freq, note[1], note[3]));
-        }
-        return new Promise(async function(resolve) {
-            for (let pro of promises) await pro;
-            resolve();
-        });
+    }
+    static note(note) {
+        return note.play();
     }
 }
 Sound.context = new AudioContext();
