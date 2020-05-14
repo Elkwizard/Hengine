@@ -34,7 +34,7 @@ class DelayedFunction {
 	}
 }
 class Engine {
-	constructor(wrapper = document.body) {
+	constructor(utility, wrapper = document.body) {
 		M.addListenersTo(setupAlerts());
 		this.fps = 60;
 		this.fpsContinuous = 0;
@@ -64,16 +64,22 @@ class Engine {
 		} catch (e) { }
 
 		//setup canvas and scene
+		let canvas;
 		let bound = wrapper.getClientRects()[0];
 		let W = bound.width;
 		let H = bound.height;
-		let canvas = document.createElement("canvas");
-		canvas.id = "Engine Canvas";
-		M.addListenersTo(canvas);
-		wrapper.appendChild(canvas);
-		this.wrapper = wrapper;
+		if (!utility) {
+			canvas = document.createElement("canvas");
+			canvas.id = "Engine Canvas";
+			M.addListenersTo(canvas);
+			wrapper.appendChild(canvas);
+			this.wrapper = wrapper;
+		} else {
+			this.wrapper = document.body;
+			canvas = new OffscreenCanvas(1, 1);
+		}
 
-		this.renderer = new Artist(canvas.id, W, H);
+		this.renderer = new Artist(canvas, W, H);
 		window.g = this;
 		this.scene = new Scene("Engine Scene", this.renderer, new Vector2(0, 0.2), this);
 		//update loops

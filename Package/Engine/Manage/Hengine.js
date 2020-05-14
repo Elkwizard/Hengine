@@ -93,14 +93,14 @@ class ApplicationPackage {
 
 })();
 class Hengine {
-	constructor(wrapper = document.body) {
+	constructor(utility, wrapper = document.body) {
 		//everything needs randomness
 		this.randomSeed = 1;
 		window.rand = this.rand.bind(this);
 
 		//create engine
 		document.body.style.margin = 0;
-		this.g = new Engine(wrapper);
+		this.g = new Engine(utility, wrapper);
 		this.s = this.g.scene;
 		this.c = this.g.renderer;
 		this.C = this.c.c;
@@ -362,12 +362,7 @@ class Hengine {
 						}
 					} else {
 						if (file === "Hengine") {
-							window.HENGINE = new Hengine();
-							if (scripts.utility) {
-								HENGINE.g.resize = false;
-								width = 0;
-								height = 0;
-							}
+							window.HENGINE = new Hengine(scripts.utility);
 						} else {
 							if (file.match(/DATA/g)) {
 								eval(file.slice(5));

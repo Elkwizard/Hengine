@@ -185,7 +185,7 @@ class InactiveScene {
 		ns.particleFades = fades;
 		ns.particleSlows = slows;
 		ns.active = false;
-		ns.update = function() {
+		ns.update = function () {
 			let n = 0;
 			for (let key in ns.spawns) n++;
 			if (!n) ns.remove();
@@ -410,7 +410,7 @@ class InactiveScene {
 				notCollideAry.push(hitbox);
 			}
 		}
-		return [collideAry, notCollideAry]
+		return [collideAry, notCollideAry];
 	}
 }
 class Camera extends Rect {
@@ -542,149 +542,130 @@ class Scene extends InactiveScene {
 			q.push(x);
 		}
 		for (let rect of this.containsArray) rect.pushToRemoveQueue = p;
-        //grid
-        let cells = {};
-        let isUseless = a => !(a instanceof PhysicsObject);
-        let useful = [];
-        let useless = [];
+		//grid
+		let cells = {};
+		let isUseless = a => !(a instanceof PhysicsObject);
+		let useful = [];
+		let useless = [];
 
-        
-        //custom before updates run
-        for (let el of this.containsArray) {
-            el.scripts.run("beforeUpdate");
-        }
 
-        let sortedEls = this.containsArray;
-        for (let rect of sortedEls) {
-            if (isUseless(rect)) {
-                useless.push(rect);
-                continue;
-            } else useful.push([rect]);
-        }
-        for (let usef of useful) {
-            let rect = usef[0];
-            let cls = Physics.getCells(rect, this.cellSize);
-            for (let cl of cls) {
-                let key = cl.x + "," + cl.y;
-                if (cells[key]) cells[key].push(rect);
-                else cells[key] = [rect];
-                let use = usef;
-                use.push(cells[key]);
-            }
-        }
-        for (let usef of useful) {
-            //get rectangles
-            let [rect, ...updateCells] = usef;
-            let updater = [];
-            if (!rect.completelyStatic) for (let cell of updateCells) {
-                for (let r of cell) {
-                    if (r !== rect && !updater.includes(r)) updater.push(r);
-                }
-            }
-            usef.push(updater);
-        }
-        useful = [...(new Set(useful))];
-        const dir = this.gravity.get().normalize();
-        useful = useful.sort(function (a, b) {
-            let mA = Vector2.fromPoint(a[0]);
-            let mB = Vector2.fromPoint(b[0]);
-            let dA = mA.dot(dir);
-            let dB = mB.dot(dir);
-            return dB - dA;
-        });
-        //gravity phase
-        for (let el of useful) {
-            let rect = el[0];
-            rect.applyGravity(1);
-        }
-        //solve constraints #1
-        for (let constraint of this.constraints) {
-            constraint.solve();
-        }
-        
-        
-        //collision phase
-        for (let i = 0; i < useful.length; i++) {
-            let rect = useful[i][0];
-            let updater = useful[i][useful[i].length - 1];
+		//custom before updates run
+		for (let el of this.containsArray) {
+			el.scripts.run("beforeUpdate");
+		}
 
-            this.SAT.gridChecks += updater.length;
-            this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
-            if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
-            rect.physicsUpdate(updater);
-        }
-        //collision phase
-        for (let i = useful.length - 1; i > 0; i--) {
-            let rect = useful[i][0];
-            let updater = useful[i][useful[i].length - 1];
+		let sortedEls = this.containsArray;
+		for (let rect of sortedEls) {
+			if (isUseless(rect)) {
+				useless.push(rect);
+				continue;
+			} else useful.push([rect]);
+		}
+		for (let usef of useful) {
+			let rect = usef[0];
+			let cls = Physics.getCells(rect, this.cellSize);
+			for (let cl of cls) {
+				let key = cl.x + "," + cl.y;
+				if (cells[key]) cells[key].push(rect);
+				else cells[key] = [rect];
+				let use = usef;
+				use.push(cells[key]);
+			}
+		}
+		for (let usef of useful) {
+			//get rectangles
+			let [rect, ...updateCells] = usef;
+			let updater = [];
+			if (!rect.completelyStatic) for (let cell of updateCells) {
+				for (let r of cell) {
+					if (r !== rect && !updater.includes(r)) updater.push(r);
+				}
+			}
+			usef.push(updater);
+		}
+		useful = [...(new Set(useful))];
+		const dir = this.gravity.get().normalize();
+		useful = useful.sort(function (a, b) {
+			let mA = Vector2.fromPoint(a[0]);
+			let mB = Vector2.fromPoint(b[0]);
+			let dA = mA.dot(dir);
+			let dB = mB.dot(dir);
+			return dB - dA;
+		});
+		//gravity phase
+		for (let el of useful) {
+			let rect = el[0];
+			rect.applyGravity(1);
+		}
+		//solve constraints #1
+		for (let constraint of this.constraints) {
+			constraint.solve();
+		}
 
-            this.SAT.gridChecks += updater.length;
-            this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
+
+		//collision phase
+		for (let i = 0; i < useful.length; i++) {
+			let rect = useful[i][0];
+			let updater = useful[i][useful[i].length - 1];
+
+			this.SAT.gridChecks += updater.length;
+			this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
+			if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
+			rect.physicsUpdate(updater);
+		}
+		//collision phase
+		for (let i = useful.length - 1; i > 0; i--) {
+			let rect = useful[i][0];
+			let updater = useful[i][useful[i].length - 1];
+
+			this.SAT.gridChecks += updater.length;
+			this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
 			rect.physicsUpdate(updater);
 		}
 		let usefulElements = useful.map(e => e[0]);
 		if (this.collisionEvents) for (let el of usefulElements) {
 			Physics.runEventListeners(el);
 		}
-        
-        
-        //solve constraints #2
-        for (let constraint of this.constraints) {
-            constraint.solve();
-        }
-
-//        prohibited direction render
-//        this.drawInWorldSpace(e => {
-//            for (let i = 0; i < useful.length; i++) {
-//                let rect = useful[i][0];
-//                for (let prohibit of rect.prohibited) c.stroke(cl.RED, 2).arrow(rect.middle, rect.middle.plus(prohibit.times(20)));
-//            }
-//        });
-
-        //custom updates run
-        for (let usef of useful) {
-            let rect = usef[0];
-            rect.enginePhysicsUpdate();
-        }
-
-//			update order render
-//			 this.drawInWorldSpace(e => {
-//			 	for (let i = 0; i < useful.length; i++) {
-//			 		let other = useful[i][0];
-//			 		let x = other.middle.x;
-//			 		let y = other.middle.y;
-//			 		c.draw(cl.RED).text("10px Arial", "#" + (i + 1), x, y);
-//			 	}
-//			 });
 
 
-        //non collision fixed update
-        for (let rect of useless) {
-            if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
-            rect.enginePhysicsUpdate();
-        }
+		//solve constraints #2
+		for (let constraint of this.constraints) {
+			constraint.solve();
+		}
 
-        // // show cells
-        // this.drawInWorldSpace(e => {
-        // 	for (let [key, cell] of cells) {
-        // 		let x = parseInt(key.split(",")[0]) * this.cellSize;
-        // 		let y = parseInt(key.split(",")[1]) * this.cellSize;
-        // 		let r = new Rect(x, y, this.cellSize, this.cellSize);
+		//custom updates run
+		for (let usef of useful) {
+			let rect = usef[0];
+			rect.enginePhysicsUpdate();
+		}
+
+		//non collision fixed update
+		for (let rect of useless) {
+			if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
+			rect.enginePhysicsUpdate();
+		}
+
+		// // show cells
+		// this.drawInWorldSpace(e => {
+		// 	for (let [key, cell] of cells) {
+		// 		let x = parseInt(key.split(",")[0]) * this.cellSize;
+		// 		let y = parseInt(key.split(",")[1]) * this.cellSize;
+		// 		let r = new Rect(x, y, this.cellSize, this.cellSize);
 		// 		c.stroke(cl.RED, 3).rect(r);
-        // 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
-        // 		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
-        // 		c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
-        // 	}
+		// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
+		// 		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
+		// 		c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
+		// 	}
 		// });
-		
+
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
 		for (let rect of this.containsArray) rect.isBeingUpdated = false;
 		// console.log(performance.now() - startTime);
 	}
-    constrain(a, b, aOffset = Vector2.origin, bOffset = Vector2.origin, length = "CURRENT_DIST") {
-        this.constraints.push(new Constraint(a, b, aOffset, bOffset, length));
-    }
+	constrain(a, b, aOffset = Vector2.origin, bOffset = Vector2.origin, length = "CURRENT_DIST") {
+		this.constraints.push(new Constraint(a, b, aOffset, bOffset, length));
+	}
 	recalculateAverageCellSize(newEl) {
 		let oldAvg = this.cellSize;
 		let mul = this.containsArray.filter(e => e instanceof PhysicsObject).length;
@@ -703,19 +684,16 @@ class Scene extends InactiveScene {
 		return this.cameras[name];
 	}
 	renderCamera(camera) {
-		if (this.c.canvas.width && this.c.canvas.height) { 
-			let screen = camera.getWorld().__boundingBox;
-			this.c.embody(camera.newView);
-			camera.transformToWorld(this.c);
-			for (let rect of this.containsArray) {
-				rect.engineDrawUpdate(screen);
-				rect.lifeSpan++;
-			}
-			this.c.unembody();
-			camera.view = camera.newView;
-			return camera.view;
+		let screen = camera.getWorld().__boundingBox;
+		this.c.embody(camera.newView);
+		camera.transformToWorld(this.c);
+		for (let rect of this.containsArray) {
+			rect.engineDrawUpdate(screen);
+			rect.lifeSpan++;
 		}
-		return new Frame(1, 1);
+		this.c.unembody();
+		camera.view = camera.newView;
+		return camera.view;
 	}
 	engineDrawUpdate() {
 		this.updateArray();
