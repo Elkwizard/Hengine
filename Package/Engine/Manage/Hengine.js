@@ -283,7 +283,7 @@ class Hengine {
 		return Animation.copy(this.animations[src]);
 	}
 	static get defaultRenderPackage() {
-		return ["Color", "Shapes", "Animation", "Frame", "Texture", "Renderer", "Graph"];
+		return ["Color", "Shapes", "Spline", "Animation", "Frame", "Texture", "Renderer", "Graph"];
 	}
 	static get defaultManagementPackage() {
 		return ["PrototypeOverload", "Scripts", "Scenes", "Engine", "Hengine"];
