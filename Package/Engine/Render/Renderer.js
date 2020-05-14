@@ -101,7 +101,7 @@ class Artist {
 					}
 					text = lines.join("\n").slice(1);
 				}
-				let fs = parseInt(font);
+				let fs = this.getFontValue(font);
 				let blocks = text.split("\n");
 				let textRequests = [];
 				for (let i = 0; i < blocks.length; i++) {
@@ -361,6 +361,9 @@ class Artist {
 				this.drawImage(this.imageStyle, x - rx, y - ry, rx * 2, ry * 2);
 				this.unclip();
 			},
+			default(x, y) {
+				this.drawImage(this.imageStyle, x, y);
+			},
 			rect(x, y, width, height) {
 				this.clip().rect(x, y, width, height);
 				this.drawImage(this.imageStyle, x, y, width, height);
@@ -458,9 +461,16 @@ class Artist {
 	unembody() {
 		this.c = this.__c;
 	}
+	getFontValue(font) {
+		return parseInt(font.slice(0, font.indexOf("px")));
+	}
 	getTextWidth(font, str) {
 		this.c.font = font;
-		return this.c.measureText(str).width;
+		let spl = str.toString().split("\n");
+		return Math.max(...spl.map(e => this.c.measureText(e).width));
+	}
+	getTextHeight(font, str) {
+		return str.trim().split("\n").length * this.getFontValue(font);
 	}
 	getPixel(x, y) {
 		let d = this.c.getImageData(x, y, 1, 1).data;
