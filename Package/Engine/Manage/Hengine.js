@@ -87,6 +87,10 @@ class ApplicationPackage {
 		}
 	}
 	animate();
+
+
+	document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
+
 })();
 class Hengine {
 	constructor(wrapper = document.body) {
