@@ -420,6 +420,9 @@ class Vector3 extends Vector {
 			this.z = x;
 		}
 	}
+	static fromPoint(p) {
+		return new Vector3(p.x, p.y, p.z);
+	}
 	static get origin() {
 		return new Vector3(0, 0, 0);
 	}

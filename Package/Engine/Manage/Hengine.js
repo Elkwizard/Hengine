@@ -289,7 +289,7 @@ class Hengine {
 		return ["PrototypeOverload", "Scripts", "Scenes", "Engine", "Hengine"];
 	}
 	static get defaultMathPackage() {
-		return ["Vector", "Geometry", "Physics"];
+		return ["Vector", "Geometry", "Physics", "../Render/3DExperimental"];
 	}
 	static get defaultUtilityPackage() {
 		return ["Input", "Sound", "Time", "Console"];
