@@ -85,6 +85,14 @@ class Matrix {
 	toFixed() {
 		return this.map(e => e.toFixed(2)).toString();
 	}
+	equals(m) {
+		let equal = true;
+		check: for (let i = 0; i < this.cols.length; i++) for (let j = 0; j < this.cols[0].length; j++) if (Math.abs(this.cols[i][j] - m.cols[i][j]) > 0.00001) {
+			equal = false;
+			break check;
+		}
+		return equal;
+	}
 	static identity(dim) {
 		let m = new Matrix(dim, dim);
 		for (let i = 0; i < dim; i++) m.cols[i][i] = 1;
@@ -103,6 +111,12 @@ class Matrix2x2 extends Matrix {
 		this.cols[1][0] = m10;
 		this.cols[0][1] = m01;
 		this.cols[1][1] = m11;
+	}
+	get determinant() {
+		return this.cols[0][0] * this.cols[1][1] - this.cols[0][1] * this.cols[1][0];
+	}
+	inverse() {
+		return (new Matrix2x2(this.cols[1][1], -this.cols[1][0], -this.cols[0][1], this.cols[0][0]).times(1 / this.determinant));
 	}
 }
 class Matrix3x3 extends Matrix {
@@ -171,7 +185,12 @@ class Vector {
 				this[x] = e(this[x], v[x] || 0);
 			}
 		} else if (v instanceof Matrix) {
-			let n = this.constructor.fromMatrix(this.toMatrix().mul(v));
+			let chk = e(2, 3);
+			let action = "times";
+			if (chk === 6);
+			else if (chk === -1) action = "minus";
+			else if (chk === 5) action = "plus";
+			let n = this.constructor.fromMatrix(this.toMatrix()[action](v));
 			for (let x in this) {
 				this[x] = n[x];
 			}

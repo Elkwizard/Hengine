@@ -33,6 +33,7 @@ class Artist {
 		this.__c = this.c;
 		this._background = new Color(0, 0, 0, 0);
 		this.textMode = "left";
+		this.textModeVertical = "top";
 		this.currentlyClipped = false;
 		let pathObj = {
 			circle(x, y, radius) {
@@ -102,18 +103,26 @@ class Artist {
 					text = lines.join("\n").slice(1);
 				}
 				let fs = this.getFontValue(font);
+				let tmh = this.getTextHeight(font, text);
 				let blocks = text.split("\n");
 				let textRequests = [];
 				for (let i = 0; i < blocks.length; i++) {
 					let ax = x;
-					let tmb = this.c.measureText(blocks[i]);
+					let ay = y + (i + 1) * fs;
+					let tmw = this.c.measureText(blocks[i]).width;
 					if (this.textMode == "left");
 					else if (this.textMode == "center") {
-						ax -= tmb.width / 2;
+						ax -= tmw / 2;
 					} else if (this.textMode == "right") {
-						ax -= tmb.width;
+						ax -= tmw;
 					}
-					textRequests.push({ text: blocks[i], x: ax, y: y + ((i + 1) * fs) });
+					if (this.textModeVertical == "top");
+					else if (this.textMode == "center") {
+						ay -= tmh / 2;
+					} else if (this.textMode = "right") {
+						ay -= tmh;
+					}
+					textRequests.push({ text: blocks[i], x: ax, y: ay });
 				}
 				return textRequests
 			},
