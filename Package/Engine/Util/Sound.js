@@ -27,14 +27,12 @@ class Sound {
     }
     static async noteSequenceLoop(notes, iterations) {
         for (let n = 0; n < iterations; n++) {
-            if (n < iterations - 1) await Sound.noteSequence(notes);
-            else return Sound.noteSequence(notes);
+            await Sound.noteSequence(notes);
         }
     }
     static async noteSequence(notes) {
         for (let i = 0; i < notes.length; i++) {
-            if (i < notes.length - 1) await Sound.note(notes[i]);
-            else return Sound.note(notes[i]);
+            await Sound.note(notes[i]);
         }
     }
     static wave(hertz, duration, type, volume) {
@@ -213,7 +211,7 @@ Sound.Note = class {
             );
         }
         return new Promise(async function (resolve) {
-            for (let pro of promises) await pro;
+            await Promise.all(promises);
             resolve();
         });
     }
