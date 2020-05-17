@@ -64,8 +64,8 @@ class Render3D {
         return new Vector3(x, y, z);
     }
     static cameraRotationFromMouse(camera, mouse) {
-        camera.rotation.x = Math.PI / 2 * (mouse.y - height / 2) / height;
-        camera.rotation.y = Math.PI / 2 * (mouse.x - width / 2) / width;
+        camera.rotation.x = Math.PI * (mouse.y - height / 2) / height;
+        camera.rotation.y = Math.PI * (mouse.x - width / 2) / width;
     }
     static moveCameraAlongRotation(camera, v) {
         let nr = Render3D.rotatePointAround(Vector3.origin, v, camera.rotation.times(-1));
@@ -215,7 +215,13 @@ class Mesh {
 		let ary = [];
 		for (let tri of this.tris) ary.push(fn(tri));
 		return new Mesh(...ary);
-	}
+    }
+    color(col) {
+        return new Mesh(...this.tris.map(e => {
+            e.color = col;
+            return e;
+        }));
+    }
 	transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
 		return this.each(tri => tri.each_t(v => Render3D.transformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz)));
     }
@@ -226,7 +232,6 @@ class Mesh {
         const width = c.canvas.width;
         const height = c.canvas.height;
 		let m_1 = this.transform(...Render3D.getCameraTransform(camera));
-		m_1.tris.sort((a, b) => b.maxZ - a.maxZ);
 		m_1.tris = m_1.tris.filter(tri => {
 			let toCamera = tri.middle;
 			let dot = toCamera.dot(tri.normal);
@@ -235,7 +240,8 @@ class Mesh {
 				return false;
 			}
 			return dot >= 0;
-		})
+		});
+		m_1.tris.sort((a, b) => b.maxZ - a.maxZ);
 		let m_0 = m_1.project();
 		m_0 = m_0.each(tri => tri.each(v => {
 			return new Vector3(v.x + width / 2, v.y + height / 2, v.z);
@@ -253,7 +259,7 @@ class Mesh {
 			return onScreen;
 		})
 		m_0.each(tri => {
-			let light = (tri.lightNormal.y + 1) / 2;
+			let light = (tri.lightNormal.dot(Render3D.lightDirection) + 1) / 2;
 			let col = Color.lerp(tri.color, cl.BLACK, (1 - light));
 			c.draw(col).shape(...tri.vertices);
 			c.stroke(col, 1, "round").shape(...tri.vertices);
@@ -264,3 +270,4 @@ class Mesh {
 		});
 	}
 }
+Render3D.lightDirection = new Vector3(0, 1, 0);

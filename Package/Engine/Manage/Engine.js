@@ -70,7 +70,7 @@ class Engine {
 		if (!utility) {
 			canvas = document.createElement("canvas");
 			canvas.id = "Engine Canvas";
-			M.addListenersTo(canvas);
+			M.addListenersTo(document.body);
 			wrapper.appendChild(canvas);
 			this.wrapper = wrapper;
 		} else {
