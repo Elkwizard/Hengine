@@ -26,7 +26,7 @@ class Render3D {
     static projectVector3(v) {
         let x = v.x;
         let y = v.y;
-        let z = v.z / 1000;
+        let z = Math.max(v.z / 1000, 0.01);
         return new Vector3(x / z, y / z, v.z);
     }
     static getCameraTransform(camera) {
@@ -162,6 +162,7 @@ class Tri {
 		this.middle = Vector.sum(...this.vertices).over(3);
 		this.color = cl.WHITE;
 		this.maxZ = Math.max(...this.vertices.map(e => e.z));
+		this.minZ = Math.min(...this.vertices.map(e => e.z));
 	}
 	t_rotate(r, v) {
 		let tri = this.rotate(r, v);
