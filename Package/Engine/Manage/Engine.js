@@ -35,7 +35,6 @@ class DelayedFunction {
 }
 class Engine {
 	constructor(utility, wrapper = document.body) {
-		M.addListenersTo(setupAlerts());
 		this.fps = 60;
 		this.fpsContinuous = 0;
 		this.lastTime = performance.now();
@@ -145,43 +144,10 @@ class Engine {
 				else throw e;
 			}
 		}.bind(this);
-		
-		
+				
 		window.intervals.push(this.engineUpdate);
 		window.animationFrames.push(this.animate);
 
-		//append text
-		this.styling = document.createElement("style");
-		this.styling.innerHTML =
-			`
-		body{
-			margin: 0px;
-		}
-		.engine-window-options{
-			background: #ccc;
-			padding: 5px;
-			color: black;
-			font: 18px Helvetica;
-		}
-		.engine-window-header{
-			padding-left: 10px;
-			border-bottom: 3px #ddd solid;
-			padding-bottom: 10px;
-			font: 25px serif;
-		}
-		.engine-window-header-button{
-			float: right;
-			background: red;
-			border-radius: 5px;	
-			border: 2px black solid;
-			font: 15px arial;
-		}
-		.engine-window-wrapper{
-			padding: 10px;
-			padding-top: 0px;
-		}
-		`
-		document.head.appendChild(this.styling);
 		this.resize = true;
 		window.addEventListener("resize", function () {
 			if (this.resize) {
@@ -284,10 +250,6 @@ class Engine {
 		if (!this.hasGraphs) return;
 		return this.fpsGraph.get();
 	}
-	checkAlerts() {
-		let alert = document.querySelector(".alert");
-		if (alert) if (parseFloat(getComputedStyle(alert).opacity) < 0.02) alert.style.display = "none";
-	}
 	end() {
 		this.pause();
 		this.animate = a => a;
@@ -296,8 +258,6 @@ class Engine {
 		K.clearListeners();
 		let canvas = document.getElementById(this.renderer.canvas.id);
 		if (canvas) canvas.outerHTML = "";
-		let alert = document.getElementsByClassName("alert")[0];
-		if (alert) alert.outerHTML = "";
 	}
 	pause() {
 		this.paused = true
@@ -322,112 +282,4 @@ class Engine {
 	contract(a, b) {
 		return a - (b * Math.sign(a));
 	}
-}
-
-//alerts
-function setupAlerts() {
-	let ale = document.createElement("div");
-	ale.className = "alert";
-	ale.innerHTML = `
-	<span class="alert-default-text">This page says</span>
-	<div class="alert-content"></div>
-	<button class="alert-close-button">OK</button>`;
-	document.body.appendChild(ale);
-	let styling = document.createElement("style");
-	styling.innerHTML = `
-	.alert {
-		background: #fff;
-		border-radius: 2px;
-		box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.4);
-		position: absolute;
-		left: 50%;
-		top: -5%;
- 		padding: 15px;
-		width: 27%;
-		min-height: 13%;
-		transform: translate(-50%, 0);
-		opacity: 0;
-		padding-bottom: 15px;
-		transition: all .15s;
-		font-family: sans-serif;
-		z-index: 10000000;
-	}
-	.alert-default-text {
-		color: black;
-	}
-	.alert-content {
-		color: #666;
-		font-size: 14px;
-		margin-top: 10px;
-		overflow: auto;
-		max-height: 200px;
-	}
-	.alert-close-button {
-		background: rgba(115, 152, 245, 1);
-		border: none;
-		border-radius: 5px;
-		color: white;
-		width: 65px;
-		height: 33px;
-		position: absolute;
-		right: 15px;
-		bottom: 15px;
-		font-size: 11.5px;
-		font-weight: bold;
-		box-shadow: 0px 0px 3px rgba(115, 152, 245, 1);
-	}`;
-	document.head.appendChild(styling);
-	let clb = document.querySelector(".alert-close-button");
-	let al = document.querySelector(".alert");
-	let cont = document.querySelector(".alert-content");
-	let alerts = [];
-	let alertClosed = true;
-	function closeAlert() {
-		al.style.top = "-5%";
-		al.style.opacity = "0";
-		alertClosed = true;
-		if (alerts.length > 0) {
-			window.alert(alerts[alerts.length - 1], true);
-			alerts.pop();
-		}
-	}
-	clb.onclick = function () {
-		closeAlert();
-	};
-	window.alert = function (m, isSequence = false) {
-		if (alertClosed) {
-			al.style.display = "block";
-			m = m + "";
-			m = m.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
-			al.style.transition = "all 0s";
-			let style = { top: "-5%", opacity: "0" };
-			if (isSequence) {
-				style.top = "-1%";
-				style.opacity = "1";
-			}
-			al.style.top = style.top;
-			al.style.opacity = style.opacity;
-			alertClosed = false;
-
-			let breaks = m.match(/<br>/g);
-			if (breaks) {
-				if (breaks.length > 0) al.style.paddingBottom = "60px";
-				else al.style.paddingBottom = "15px";
-			}
-			cont.innerHTML = m;
-			window.setTimeout(function () {
-				al.style.transition = "all .15s";
-				al.style.top = "5px";
-				al.style.opacity = "1";
-			}, 1);
-		} else {
-			alerts.unshift(m);
-		}
-	}
-	window.addEventListener("keydown", function (e) {
-		if (e.key == "Enter" || e.key == " ") {
-			closeAlert();
-		}
-	});
-	return al;
 }
