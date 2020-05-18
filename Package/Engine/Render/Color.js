@@ -10,25 +10,12 @@ class Color {
 			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0) {
 				r = Color.CSSColor(r);
 			}
-			function parseRGBA(str) {
-				let rgba = "";
-				let state = false;
-				for (let char of str) {
-					if (char == ")" || char == "(") {
-						state = !state;
-					}
-					else if (state) {
-						rgba += char;
-					}
-				}
-				let rgbaList = rgba.split(",");
-				red = parseFloat(rgbaList[0]);
-				green = parseFloat(rgbaList[1]);
-				blue = parseFloat(rgbaList[2]);
-				alpha = (rgbaList.length > 3) ? parseFloat(rgbaList[3]) : 1;
-			}
 			if (r[0] == "r") {
-				parseRGBA(r);
+				let col = Color.parseRGBA(r);
+				red = col.red;
+				green = col.green;
+				blue = col.blue;
+				alpha = col.alpha;
 			} else if (r[0] == "#") {
 				function hexToNum(hex) {
 					if (isNaN(parseInt(hex))) {
@@ -82,7 +69,11 @@ class Color {
 					rgb += parseHex(group) + ((n == 3) ? "" : ", ");
 				}
 				rgb += ")";
-				parseRGBA(rgb);
+				let col = Color.parseRGBA(rgb);
+				red = col.red;
+				green = col.green;
+				blue = col.blue;
+				alpha = col.alpha;
 			}
 		} else {
 			red = (r === undefined) ? 0 : r;
@@ -95,6 +86,24 @@ class Color {
 		this.blue = blue;
 		this.alpha = alpha;
 		this.constrain();
+	}
+	static parseRGBA(str) {
+		let rgba = "";
+		let state = false;
+		for (let char of str) {
+			if (char == ")" || char == "(") {
+				state = !state;
+			}
+			else if (state) {
+				rgba += char;
+			}
+		}
+		let rgbaList = rgba.split(",");
+		let red = parseFloat(rgbaList[0]);
+		let green = parseFloat(rgbaList[1]);
+		let blue = parseFloat(rgbaList[2]);
+		let alpha = (rgbaList.length > 3) ? parseFloat(rgbaList[3]) : 1;
+		return { red, green, blue, alpha };
 	}
 	static CSSColor(word) {
 		//processed
