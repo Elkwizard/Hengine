@@ -32,6 +32,9 @@ class InputHandler {
 	JR(key) {
 		return this.keyUpCounts[key] === 1;
 	}
+	inputAdjust() {
+		
+	}
 	update() {
 		for (let key in this.keys) {
 			if (!this.keyDownCounts[key]) this.keyDownCounts[key] = 0;
@@ -41,6 +44,7 @@ class InputHandler {
 			if (this.R(key)) this.keyUpCounts[key]++;
 			else this.keyUpCounts[key] = 0;
 		}
+		this.inputAdjust();
 	}
 }
 class KeyboardHandler extends InputHandler {
@@ -74,6 +78,14 @@ class MouseHandler extends InputHandler {
 		this.x = 0;
 		this.y = 0;
 		this.last = {
+			x: 0,
+			y: 0
+		};
+		this.world = {
+			x: 0,
+			y: 0
+		};
+		this.worldLast = {
 			x: 0,
 			y: 0
 		};
@@ -125,7 +137,9 @@ class MouseHandler extends InputHandler {
 			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
 			m.dragEnd = adjusted;
 			m.down = false;
-			m.keys[m.mouseMap[e.button]] = false;
+			for (let inx of m.mouseMap) {
+				m.keys[inx] = false;
+			}
 			for (let ev of m.onUp) ev(e);
 		});
 		this.__right__ = function (e) {
@@ -140,6 +154,12 @@ class MouseHandler extends InputHandler {
 			m.button = e.button;
 			for (let ev of m.onScroll) ev(e.deltaY);
 		});
+	}
+	inputAdjust() {
+		if (this.engine) {
+			this.world = this.engine.scene.screenSpaceToWorldSpace(this);
+			this.worldLast = this.engine.scene.screenSpaceToWorldSpace(this.last);
+		}
 	}
 	clearListeners() {
 		this.onDown.clear();

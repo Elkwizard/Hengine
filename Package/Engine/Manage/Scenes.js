@@ -477,11 +477,12 @@ class Scene extends InactiveScene {
 		this.constraints = [];
 		this.cameras = {};
 		this.collisionEvents = false;
+		this.mouseEvents = false;
 		this.camera = new Camera(0, 0, this.c.canvas.width, this.c.canvas.height, 1, 0);
 		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
 		M.engineClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
-			for (let o of this.collidePoint(adjusted)) {
+			if (this.mouseEvents) for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.click(adjusted);
 				let m = this.get(o);
 				m.scripts.run("click", adjusted);
@@ -489,7 +490,7 @@ class Scene extends InactiveScene {
 		}.bind(this);
 		M.engineRightClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
-			for (let o of this.collidePoint(adjusted)) {
+			if (this.mouseEvents) for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.rightClick(adjusted);
 				let m = this.get(o);
 				m.scripts.run("rightClick", adjusted);
@@ -497,17 +498,19 @@ class Scene extends InactiveScene {
 		}.bind(this);
 		M.engineMove = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
-			let collided = this.collidePointBoth(adjusted);
-			for (let o of collided[0]) {
-				if (!o.hovered) {
-					o.response.hover(adjusted);
-					let m = this.get(o);
-					m.scripts.run("hover", adjusted);
+			if (this.mouseEvents) {
+				let collided = this.collidePointBoth(adjusted);
+				for (let o of collided[0]) {
+					if (!o.hovered) {
+						o.response.hover(adjusted);
+						let m = this.get(o);
+						m.scripts.run("hover", adjusted);
+					}
+					o.hovered = true;
 				}
-				o.hovered = true;
-			}
-			for (let o of collided[1]) {
-				if (o) o.hovered = false;
+				for (let o of collided[1]) {
+					if (o) o.hovered = false;
+				}
 			}
 		}.bind(this);
 		this.cellSize = 150;
