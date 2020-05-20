@@ -34,7 +34,7 @@ class Line {
 		}
 	}
 	get length() {
-		return this.b.minus(this.a).mag;
+		return this.b.Vminus(this.a).mag;
 	}
 	get midPoint() {
 		let ax = (this.a.x + this.b.x) / 2;
@@ -42,11 +42,11 @@ class Line {
 		return new Vector2(ax, ay);
 	}
 	get vector() {
-		return this.b.minus(this.a).normalize();
+		return this.b.Vminus(this.a).normalize();
 	}
 	set vector(v) {
 		let mag = this.length;
-		let nB = this.a.plus(v.get().normalize().times(mag));
+		let nB = this.a.Vplus(v.get().normalize().Ntimes(mag));
 		this.b = nB;
 	}
 	get slope() {
@@ -106,7 +106,7 @@ class Polygon extends Shape {
 		this.vertices = vertices;
 	}
 	get middle() {
-		return Vector.sum(...this.vertices).over(this.vertices.length);
+		return Vector.sum(...this.vertices).Nover(this.vertices.length);
 	}
 	get area() {
 		let bound = this.getBoundingBox();
@@ -167,7 +167,7 @@ class Polygon extends Shape {
 		for (let i = 0; i < this.vertices.length; i++) {
 			let inx1 = i;
 			let inx2 = (i + 1) % this.vertices.length;
-			let slope = this.vertices[inx2].minus(this.vertices[inx1]).normal.normalize();
+			let slope = this.vertices[inx2].Vminus(this.vertices[inx1]).normal.normalize();
 			axes.push(slope);
 		}
 		return axes;
@@ -182,23 +182,23 @@ class Polygon extends Shape {
 		return edges;
 	}
 	center(pos) {
-		let offset = pos.minus(this.middle);
-		this.vertices = this.vertices.map(e => e.plus(offset));
+		let offset = pos.Vminus(this.middle);
+		this.vertices = this.vertices.map(e => e.Vplus(offset));
 		return this;
 	}
 	scale(factor) {
 		let middle = this.middle;
-		this.vertices = this.vertices.map(e => middle.plus(e.minus(middle).times(factor)));
+		this.vertices = this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor)));
 		this.subdivideForCollisions();
 		return this;
 	}
 	scaleAbout(pos, factor) {
-		this.vertices = this.vertices.map(e => pos.plus(e.minus(pos).times(factor)));
+		this.vertices = this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor)));
 		this.subdivideForCollisions();
 		return this;
 	}
 	move(dir) {
-		for (let vert of this.vertices) vert.add(dir);
+		for (let vert of this.vertices) vert.Vadd(dir);
 		return this;
 	}
 	get() {
@@ -308,7 +308,7 @@ class Circle extends Shape {
 		return this;
 	}
 	scaleAbout(pos, factor) {
-		let nPos = pos.plus((new Vector2(this.x, this.y)).minus(pos).times(factor));
+		let nPos = pos.plus((new Vector2(this.x, this.y)).Vminus(pos).Ntimes(factor));
 		this.x = nPos.x;
 		this.y = nPos.y;
 		this.radius *= factor;

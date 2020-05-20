@@ -150,9 +150,9 @@ class SceneObject {
 	}
 	rotateAround(point, rotation) {
 		let middle = this.middle;
-		let dif = point.minus(middle);
+		let dif = point.Vminus(middle);
 		let nDif = Geometry.rotatePointAround(Vector2.origin, dif, rotation);
-		this.middle = middle.add(nDif.minus(dif).times(-1));
+		this.middle = middle.Vadd(nDif.Vminus(dif).Ntimes(-1));
 		this.rotation += rotation;
 	}
 	addShape(name, shape) {
@@ -167,10 +167,10 @@ class SceneObject {
 		for (let shape of shapes) {
 			let area = shape.area;
 			totalArea += area;
-			center.add(shape.middle.times(area));
+			center.Vadd(shape.middle.Ntimes(area));
 		}
-		center.div(totalArea);
-		let dif = center.times(-1);
+		center.Ndiv(totalArea);
+		let dif = center.Ntimes(-1);
 		for (let shape of shapes) {
 			shape.move(dif);
 		}
@@ -285,7 +285,7 @@ class SceneObject {
 				let sMiddle = shape.middle;
 				c.translate(sMiddle);
 				c.rotate(shape.rotation);
-				c.translate(sMiddle.times(-1));
+				c.translate(sMiddle.Ntimes(-1));
 			}
 			this.draw(name, shape);
 			this.scripts.run("draw", name, shape);

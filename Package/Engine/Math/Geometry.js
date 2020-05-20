@@ -239,15 +239,15 @@ class Geometry {
 
             //everything else
             let point = polygon[i];
-            let v1 = point.minus(polygon[(i + 1) % polygon.length]).normalize().times(-1);
-            let v2 = point.minus(polygon[(i - 1 + polygon.length) % polygon.length]).normalize().times(-1);
+            let v1 = point.Vminus(polygon[(i + 1) % polygon.length]).normalize().Ntimes(-1);
+            let v2 = point.Vminus(polygon[(i - 1 + polygon.length) % polygon.length]).normalize().Ntimes(-1);
             let a1 = v1.getAngle();
             let a2 = v2.getAngle();
             let dif = Math.abs(a2 - a1);
             if (a2 < a1) dif = Math.PI * 2 - dif;
             if (counter) dif = Math.PI * 2 - dif;
             if (dif > Math.PI) {
-                let dir = v1.plus(v2).over(-2).normalize();
+                let dir = v1.Vplus(v2).Nover(-2).normalize();
                 let considerable = [];
                 for (let j = 0; j < polygon.length; j++) if (j !== i && j !== (i - 1 + polygon.length) % polygon.length) {
                     edges[j].indices = [j, (j + 1) % polygon.length];
@@ -312,8 +312,8 @@ class Geometry {
     static overlapLineLine(l1, l2) {
         let pol = Geometry.projectPointOntoLine;
         let dirs = [
-            Vector2.fromAngle(l1.b.minus(l1.a).getAngle() + Math.PI / 2),
-            Vector2.fromAngle(l2.b.minus(l2.a).getAngle() + Math.PI / 2),
+            Vector2.fromAngle(l1.b.Vminus(l1.a).getAngle() + Math.PI / 2),
+            Vector2.fromAngle(l2.b.Vminus(l2.a).getAngle() + Math.PI / 2),
         ];
         for (let dir of dirs) {
             let a = pol(l1.a, dir);

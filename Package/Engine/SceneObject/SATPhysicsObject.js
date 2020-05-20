@@ -172,26 +172,26 @@ class PhysicsObject extends SceneObject {
     }
     drawWithoutRotation(artist) {
         let com = this.centerOfMass;
-        let rot = this.parent ? this.parent.rotation : this.rotation;
+        let rot = this.rotation;
         c.translate(com);
         c.rotate(-rot);
-        c.translate(com.times(-1));
+        c.translate(com.Ntimes(-1));
         artist.bind(this)();
         c.translate(com);
         c.rotate(rot);
-        c.translate(com.times(-1));
+        c.translate(com.Ntimes(-1));
     }
     getPointVelocity(point) {
         if (!this.rotationStatic) {
-            let r_A = point.minus(this.centerOfMass);
+            let r_A = point.Vminus(this.centerOfMass);
             let v_A = this.angularVelocity;
-            let sum = r_A.normal.times(v_A).plus(this.velocity);
+            let sum = r_A.normal.Ntimes(v_A).Vplus(this.velocity);
             return sum;
         } else return this.velocity;
     }
     slowDown() {
         //apply linear drag;
-        let drag = this.velocity.get().mul(-(1 - this.linearDragForce) * this.__mass);
+        let drag = this.velocity.get().Nmul(-(1 - this.linearDragForce) * this.__mass);
         let iD = new Impulse(drag, this.centerOfMass);
         this.applyImpulse(iD);
 
@@ -318,7 +318,7 @@ class PhysicsObject extends SceneObject {
         if (this.hasGravity) {
             //gravity
             let gv = this.gravity;
-            let gravitationalForce = gv.times(coef / this.getSpeedModulation() * this.__mass);
+            let gravitationalForce = gv.Ntimes(coef / this.getSpeedModulation() * this.__mass);
             let iG = new Impulse(gravitationalForce, this.centerOfMass);
             this.applyImpulse(iG);
         }
@@ -332,9 +332,9 @@ class PhysicsObject extends SceneObject {
                 if (this.slows) this.slowDown();
                 
                 //linear
-                this.velocity.add(this.acceleration.times(spdMod));
+                this.velocity.Vadd(this.acceleration.Ntimes(spdMod));
                 if (this.limitsVelocity) this.capSpeed();
-                if (this.positionStatic) this.velocity.mul(0);
+                if (this.positionStatic || this.velocity.mag > 30) this.velocity.Nmul(0);
 
 
                 let newX = this.x + this.velocity.x * 2 * spdMod;
@@ -373,15 +373,15 @@ class PhysicsObject extends SceneObject {
         });
     }
     moveTowards(point, ferocity = 1) {
-        let dif = point.minus(this.middle);
-        this.velocity.add(dif.mul(ferocity / 100));
+        let dif = point.Vminus(this.middle);
+        this.velocity.Vadd(dif.Ntimes(ferocity / 100));
     }
     moveAwayFrom(point, ferocity = 1) {
-        let dif = this.middle.minus(point);
-        this.velocity.add(dif.times(ferocity / 100));
+        let dif = this.middle.Vminus(point);
+        this.velocity.Vadd(dif.Ntimes(ferocity / 100));
     }
     getImpulseRatio(point, axis) {
-        let r_N = point.minus(this.centerOfMass).normal;
+        let r_N = point.Vminus(this.centerOfMass).normal;
         let r = r_N.mag;
         if (r < 0.01) return 1;
         let I = axis;
@@ -392,26 +392,27 @@ class PhysicsObject extends SceneObject {
     }
     applyImpulse(impulse, name = "no name") {
         if (!impulse || !impulse.force.mag) return;
-        impulse.force.div(this.__mass);
+        impulse.force.Ndiv(this.__mass);
         this.applyLinearImpulse(impulse);
         this.applyAngularImpulse(impulse);
         // c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(10).plus(impulse.source));
+        // c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(10).Vplus(impulse.source));
     }
     applyLinearImpulse(impulse) {
         if (!impulse) return;
         let ratio = this.getSpeedModulation();
-        this.velocity.add(impulse.force.times(ratio));
+        this.velocity.Vadd(impulse.force.Ntimes(ratio));
     }
     applyAngularImpulse(impulse) {
         if (!impulse) return;
-        let r = impulse.source.minus(this.centerOfMass);
+        let r = impulse.source.Vminus(this.centerOfMass);
         if (!r.x && !r.y && r.x + r.y < 0.01) return;
         let r_N = r.normal;
         let I = impulse.force;
         let proj = I.projectOnto(r_N);
         let sign = Math.sign(proj.dot(r_N));
         let v_theta = sign * Math.sqrt((proj.x ** 2 + proj.y ** 2) / (r.x ** 2 + r.y ** 2));
+        if (v_theta > Math.PI * 2) v_theta = 0;
         this.angularVelocity += v_theta * this.getSpeedModulation();
     }
 }

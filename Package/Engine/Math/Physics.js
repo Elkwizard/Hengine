@@ -100,8 +100,8 @@ class Constraint {
     getEnds() {
         let aM = this.a.middle;
         let bM = this.b.middle;
-        let pA = Geometry.rotatePointAround(aM, aM.plus(this.aOffset), this.a.rotation);
-        let pB = Geometry.rotatePointAround(bM, bM.plus(this.bOffset), this.b.rotation);
+        let pA = Geometry.rotatePointAround(aM, aM.Vplus(this.aOffset), this.a.rotation);
+        let pB = Geometry.rotatePointAround(bM, bM.Vplus(this.bOffset), this.b.rotation);
         return new Line(pA, pB);
     }
     solve() {
@@ -152,11 +152,9 @@ class Physics {
             s.SAT.collisions++;
             let collisionAxis = (new Vector2(b.x - a.x, b.y - a.y)).normalize();
             let penetration = a.radius + b.radius - Geometry.distToPoint(a, b);
-            let aPoint = collisionAxis.times(a.radius).plus(a.middle);
-            let bPoint = collisionAxis.times(-b.radius).plus(b.middle);
-            let collisionPoint = aPoint.plus(bPoint).over(2);
-
-
+            let aPoint = collisionAxis.Ntimes(a.radius).Vplus(a.middle);
+            let bPoint = collisionAxis.Ntimes(-b.radius).Vplus(b.middle);
+            let collisionPoint = aPoint.Vplus(bPoint).Nover(2);
 
             col = new Collision(true, a, b, a, b, collisionAxis, [new Contact(a, b, collisionPoint, penetration)]);
         } else col = new Collision(false, a, b);
@@ -202,7 +200,7 @@ class Physics {
             if (!bestPoint) return new Collision(false, a, b);
             let bestDist = Geometry.distToPoint(bestPoint, a.middle);
             //towards collision, from a
-            let collisionAxis = bestPoint.minus(a.middle).normalize();
+            let collisionAxis = bestPoint.Vminus(a.middle).normalize();
             let penetration = a.radius + (inside ? bestDist : -bestDist);
             if (inside) collisionAxis.mul(-1);
 
@@ -267,7 +265,7 @@ class Physics {
             let [aRange, bRange, edge, intersect] = pairs[0];
             leastIntersection = Math.abs(intersect);
             if (leastIntersection <= 0) return new Collision(false, a, b); //fake collision?
-            collisionAxis = edge.times(-Math.sign(intersect));
+            collisionAxis = edge.Ntimes(-Math.sign(intersect));
             if (collisionAxis) {
                 let aPC = [];
                 let bPC = [];
@@ -279,7 +277,7 @@ class Physics {
                     let proj = corner.dot(edge);
                     if (bRange.contains(proj)) {
                         let pen = bRange.getPenetration(proj);
-                        aPC.push(corner.times(pen));
+                        aPC.push(corner.Ntimes(pen));
                         aPC2.push(corner);
                         aTP += pen;
                     }
@@ -288,13 +286,13 @@ class Physics {
                     let proj = corner.dot(edge);
                     if (aRange.contains(proj)) {
                         let pen = aRange.getPenetration(proj);
-                        bPC.push(corner.times(pen));
+                        bPC.push(corner.Ntimes(pen));
                         bPC2.push(corner);
                         bTP += pen;
                     }
                 }
-                let collisionPointA = aPC.length ? Vector.sum(...aPC).over(aTP) : null;
-                let collisionPointB = bPC.length ? Vector.sum(...bPC).over(bTP) : null;
+                let collisionPointA = aPC.length ? Vector.sum(...aPC).Nover(aTP) : null;
+                let collisionPointB = bPC.length ? Vector.sum(...bPC).Nover(bTP) : null;
                 const TRANSFORM_TO_LINKED_PENETRATION = (range) => e => {
                     let dot = e.dot(collisionAxis);
                     let pen = range.getPenetration(dot);
@@ -374,19 +372,19 @@ class Physics {
             let iB2 = friction.impulseB;
             let ratio = contact.penetration / totalPenetrationDiv;
             if (iA) {
-                iA.force.mul(ratio);
+                iA.force.Nmul(ratio);
                 impulsesA.push(iA, iA2);
             }
             if (iA2) {
-                iA2.force.mul(ratio);
+                iA2.force.Nmul(ratio);
                 impulsesB.push(iA2);
             }
             if (iB) {
-                iB.force.mul(ratio);
+                iB.force.Nmul(ratio);
                 impulsesB.push(iB, iB2);
             }
             if (iB2) {
-                iB2.force.mul(ratio);
+                iB2.force.Nmul(ratio);
                 impulsesB.push(iB2);
             }
 
@@ -406,7 +404,7 @@ class Physics {
         let b = col.b;
         let mobileA = !Physics.isWall(a);
         let mobileB = !Physics.isWall(b);
-        const d = col.dir.times(-1);
+        const d = col.dir.Ntimes(-1);
 
     
         //position
@@ -415,15 +413,15 @@ class Physics {
             tomMath = Physics.collide(col.shapeA, col.shapeB);
             if (tomMath.colliding) {
                 col = tomMath;
-                let dir = col.dir.times(col.penetration);
+                let dir = col.dir.Ntimes(col.penetration);
                 //mass percents
                 let aPer = 1 - a.__mass / (a.__mass + b.__mass);
                 if (!mobileB) aPer = 1;
                 let bPer = 1 - aPer;
 
                 //escape dirs
-                let aMove = dir.times(-1 * aPer);
-                let bMove = dir.times(1 * bPer);
+                let aMove = dir.Ntimes(-1 * aPer);
+                let bMove = dir.Ntimes(1 * bPer);
 
                 //who knows
                 if (col.penetration > col.a.__boundingBox.width + col.a.__boundingBox.height || col.penetration > col.b.__boundingBox.width + col.b.__boundingBox.height) return false;
@@ -449,7 +447,7 @@ class Physics {
         //immobilize
         a.canMoveThisFrame = false;
         const dir = col.dir;
-        const inv_dir = dir.times(-1);
+        const inv_dir = dir.Ntimes(-1);
         if (b.positionStatic) {
             a.prohibited.push(dir);
         }
@@ -470,7 +468,7 @@ class Physics {
         const b = col.b;
         let mobileA = !Physics.isWall(a);
         let mobileB = !Physics.isWall(b);
-        const d = col.dir.times(-1);
+        const d = col.dir.Ntimes(-1);
         
         //do custom collision response
         if (!a.colliding.general) a.colliding.general = [b];
@@ -541,7 +539,7 @@ class Physics {
                 finalCells.push(...cells);
             } else {
                 let cells = [];
-                let edges = r.getEdges().map(e => e.a.minus(e.b).normalize());
+                let edges = r.getEdges().map(e => e.a.Vminus(e.b).normalize());
                 let corners = r.getCorners();
                 let nums = [0, 1, 2, 3];
                 if (r.width < cellsize) {
@@ -586,10 +584,10 @@ class Physics {
     }
     static getFrictionImpulses(a, b, collisionPoint, tangent) {
         let impulseA, impulseB;
-        let frictionA = a.getPointVelocity(collisionPoint).projectOnto(tangent).times(-0.05);//.times(-this.friction * otherFriction * 2);
-        let frictionB = b.getPointVelocity(collisionPoint).projectOnto(tangent).times(-0.05);//.times(-this.friction * otherFriction * 2);
-        impulseA = new Impulse(frictionA.times(a.__mass), collisionPoint);
-        impulseB = new Impulse(frictionB.times(b.__mass), collisionPoint);
+        let frictionA = a.getPointVelocity(collisionPoint).projectOnto(tangent).Ntimes(-0.05);//.times(-this.friction * otherFriction * 2);
+        let frictionB = b.getPointVelocity(collisionPoint).projectOnto(tangent).Ntimes(-0.05);//.times(-this.friction * otherFriction * 2);
+        impulseA = new Impulse(frictionA.Ntimes(a.__mass), collisionPoint);
+        impulseB = new Impulse(frictionB.Ntimes(b.__mass), collisionPoint);
         return { impulseA, impulseB };
     }
     static getImpulses(a, b, dir, collisionPoint) {
@@ -599,13 +597,13 @@ class Physics {
         const m_B = b.__mass;
         const v_A = a.getPointVelocity(collisionPoint);
         const v_B = b.getPointVelocity(collisionPoint);
-        const v_AB = v_B.minus(v_A);
+        const v_AB = v_B.Vminus(v_A);
         const n = dir;
         if (v_AB.dot(n) > 0) return { impulseA: null, impulseB: null }; //going away
         const e = Math.max(1 - a.snuzzlement, 1 - b.snuzzlement);
         //v_AB dot n = (v_B - v_A) dot n;
 
-        const j_DYNAMIC = v_AB.times(-(1 + e)).dot(n) / (1 / m_A + 1 / m_B);
+        const j_DYNAMIC = -(1 + e) * v_AB.dot(n) / (1 / m_A + 1 / m_B);
         const j_STATIC_A = v_A.dot(n) * (1 + e) * m_A; //just for walls
         const j_STATIC_B = v_B.dot(n) * (1 + e) * m_B;  //just for walls
         const V_A_DOT_N = v_A.dot(n);
@@ -616,8 +614,8 @@ class Physics {
         if (!V_B_DOT_N) PER_B = 1;
         const j_A = j_DYNAMIC * PER_A + j_STATIC_A * (1 - PER_A);
         const j_B = j_DYNAMIC * PER_B + j_STATIC_B * (1 - PER_B);
-        const I_A = n.times(-j_A);
-        const I_B = n.times(j_B);
+        const I_A = n.Ntimes(-j_A);
+        const I_B = n.Ntimes(j_B);
 
         impulseA = new Impulse(I_A, collisionPoint);
         impulseB = new Impulse(I_B, collisionPoint);
@@ -649,8 +647,8 @@ class Physics {
             let dy_N0 = -dy_N * mDif;
             let dx_N1 = dx_N * mDif;
             let dy_N1 = dy_N * mDif;
-            let iA = new Impulse((new Vector2(dx_N0 / 10, dy_N0 / 10)).times(a.__mass), pA);
-            let iB = new Impulse((new Vector2(dx_N1 / 10, dy_N1 / 10)).times(b.__mass), pB);
+            let iA = new Impulse((new Vector2(dx_N0 / 10, dy_N0 / 10)).Ntimes(a.__mass), pA);
+            let iB = new Impulse((new Vector2(dx_N1 / 10, dy_N1 / 10)).Ntimes(b.__mass), pB);
             if (!a.constraintLeader) {
                 a.applyImpulse(iA);
                 a.privateSetX(a.x + dx_N0);

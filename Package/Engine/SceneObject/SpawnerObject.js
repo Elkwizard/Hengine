@@ -169,7 +169,7 @@ class ParticleObject extends SceneObject {
             this.velocity.y += this.home.gravity.y;
         }
         if (this.spawner.particleSlows) {
-            this.velocity.mul(this.home.linearDragForce)
+            this.velocity.Nmul(this.home.linearDragForce)
         }
         this.x += this.velocity.x * 2;
         this.y += this.velocity.y * 2;

@@ -319,7 +319,7 @@ class Vector {
 		return new this(...m.cols[0]);
 	}
 	static lerp(a, b, t) {
-		return a.times(1 - t).plus(b.times(t));
+		return a.Ntimes(1 - t).Vplus(b.Ntimes(t));
 	}
 	static abs(v) {
 		return v.op(Math.abs.bind(Math), 0);
@@ -337,12 +337,12 @@ class Vector {
 		for (let proDir of proDirs) {
 			let dot = proDir.dot(dir);
 			if (dot > 0) {
-				let bad = dir.times(dot / mag);
+				let bad = dir.Ntimes(dot / mag);
 				remove.push(bad);
 			}
 		}
-		let wrong = remove.length ? Vector.sum(...remove).over(remove.length) : new dir.constructor(0, 0, 0, 0);
-		return dir.minus(wrong);
+		let wrong = remove.length ? Vector.sum(...remove).Nover(remove.length) : new dir.constructor(0, 0, 0, 0);
+		return dir.Vminus(wrong);
 	}
 }
 class Vector1 extends Vector {
@@ -409,6 +409,88 @@ class Vector2 extends Vector {
 	}
 	get normal() {
 		return new Vector2(-this.y, this.x);
+	}
+	set mag(m) {
+		let M = this.mag;
+		if (M) {
+			this.x /= M / m;
+			this.y /= M / m;
+		}
+	}
+	get mag() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+	normalize() {
+		let m = this.mag;
+		if (m) {
+			this.x /= m;
+			this.y /= m;
+		}
+		return this;
+	}
+	Vplus(v) {
+		return new Vector2(this.x + v.x, this.y + v.y);
+	}
+	Vminus(v) {
+		return new Vector2(this.x - v.x, this.y - v.y);
+	}
+	Vtimes(v) {
+		return new Vector2(this.x * v.x, this.y * v.y);
+	}
+	Vover(v) {
+		return new Vector2(this.x / v.x, this.y / v.y);
+	}
+	Nplus(v) {
+		return new Vector2(this.x + v, this.y + v);
+	}
+	Nminus(v) {
+		return new Vector2(this.x - v, this.y - v);
+	}
+	Ntimes(v) {
+		return new Vector2(this.x * v, this.y * v);
+	}
+	Nover(v) {
+		return new Vector2(this.x / v, this.y / v);
+	}
+	Vadd(v) {
+		this.x += v.x;
+		this.y += v.y;
+		return this;
+	}
+	Vsub(v) {
+		this.x -= v.x;
+		this.y -= v.y;
+		return this;
+	}
+	Vmul(v) {
+		this.x *= v.x;
+		this.y *= v.y;
+		return this;
+	}
+	Vdiv(v) {
+		this.x /= v.x;
+		this.y /= v.y;
+		return this;
+	}
+	Nadd(v) {
+		this.x += v;
+		this.y += v;
+		return this;
+	}
+	Nsub(v) {
+		this.x -= v;
+		this.y -= v;
+		return this;
+	}
+	Nmul(v) {
+		this.x *= v;
+		this.y *= v;
+		return this;
+	}
+	Ndiv(v) {
+		this.x /= v;
+		this.y /= v;
+		return this;
 	}
 }
 class Vector3 extends Vector {
