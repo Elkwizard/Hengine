@@ -160,7 +160,8 @@ class Tri {
 		this.normal = A.cross(B).normalize();
 		this.lightNormal = this.normal;
 		this.middle = Vector.sum(...this.vertices).over(3);
-		this.color = cl.WHITE;
+        this.color = cl.WHITE;
+        const mags = this.vertices.map(e => e.mag);
 		this.maxZ = Math.max(...this.vertices.map(e => e.z));
 		this.minZ = Math.min(...this.vertices.map(e => e.z));
 	}

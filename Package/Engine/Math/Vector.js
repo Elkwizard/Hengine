@@ -328,6 +328,9 @@ class Vector {
 		let construct = v.length ? v[0].constructor : this;
 		return (new construct(0, 0, 0, 0)).add(...v);
 	}
+	static avg(...v) {
+		return this.sum(...v).over(v.length);
+	}
 	static prohibitDirections(proDirs, dir) {
 		let remove = [];
 		let mag = dir.mag;
