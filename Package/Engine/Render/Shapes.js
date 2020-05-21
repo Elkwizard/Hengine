@@ -64,6 +64,12 @@ class Shape {
 		this.__boundingBox = null; //bounding box cache
 		this.collisionShapes = [this]; //a list of the shapes that make up the shape
 	}
+	get middle() {
+		return Vector2.origin;
+	}
+	set middle(a) {
+		this.center(a);
+	}
 	get area() {
 		//return the area of the shape
 		return 0;
@@ -104,6 +110,9 @@ class Polygon extends Shape {
 	constructor(vertices, rotation = 0) {
 		super(rotation);
 		this.vertices = vertices;
+	}
+	set middle(a) {
+		this.center(a);
 	}
 	get middle() {
 		return Vector.sum(...this.vertices).Nover(this.vertices.length);
@@ -227,6 +236,9 @@ class Rect extends Polygon {
 		this.width = w;
 		this.height = h;
 	}
+	set middle(a) {
+		this.center(a);
+	}
 	get middle() {
 		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
 	}
@@ -285,14 +297,17 @@ class Circle extends Shape {
 		this.y = y;
 		this.radius = Math.abs(radius);
 	}
+	set middle(a) {
+		this.center(a);
+	}
+	get middle() {
+		return new Vector2(this.x, this.y);
+	}
 	get area() {
 		return Math.PI * this.radius ** 2;
 	}
 	get perimeter() {
 		return Math.PI * this.radius * 2;
-	}
-	get middle() {
-		return new Vector2(this.x, this.y);
 	}
 	getModel(pos, rot) {
 		let p = Geometry.rotatePointAround(pos, pos.plus(new Vector2(this.x, this.y)), rot);

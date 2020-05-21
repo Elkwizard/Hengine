@@ -1,59 +1,66 @@
 class LocalFileSystem {
-    static get header() {
-        return "LOCAL_FILE_SYSTEM_";
-    }
-    static clear(key) {
-        let prev = LocalFileSystem.header + key;
-        let value = "";
-        let n = 0;
-        let name;
-        let names = [];
-        do {
-            name = prev + "_INX_" + n;
-            n++;
-            if (localStorage[name] !== undefined) {
-                names.push(name);
-            }
-        } while(localStorage[name] !== undefined);
-        for (let name of names) {
-            delete localStorage[name];
-        }
-        return value;
-        
-    }
-    static put(key, value) {
-        let values = [];
-        let acc = "";
-        for (let i = 0; i < value.length; i++) {
-            acc += value[i];
-            if ((i + 1) % 10000 === 0) {
-                values.push(acc);
-                acc = "";
-            }
-        }
-        values.push(acc);
-        values = values.map((e, i) => [e, "_INX_" + i]);
-        
-        for (let v of values) {
-            let K = LocalFileSystem.header + key + v[1];
-            let value = v[0];
-            localStorage[K] = value;
-        }
-    }
-    static get(key) {
-        let prev = LocalFileSystem.header + key;
-        let value = "";
-        let n = 0;
-        let name;
-        do {
-            name = prev + "_INX_" + n;
-            n++;
-            if (localStorage[name] !== undefined) {
-                value += localStorage[name];
-            }
-        } while(localStorage[name] !== undefined);
-        return value;
-    } 
+	static get header() {
+		return "LOCAL_FILE_SYSTEM_";
+	}
+	static clearAll() {
+		localStorage.clear();
+	}
+	static clear(key) {
+		let prev = LocalFileSystem.header + key;
+		let value = "";
+		let n = 0;
+		let name;
+		let names = [];
+		do {
+			name = prev + "_INX_" + n;
+			n++;
+			if (localStorage[name] !== undefined) {
+				names.push(name);
+			}
+		} while (localStorage[name] !== undefined);
+		for (let name of names) {
+			delete localStorage[name];
+		}
+		return value;
+
+	}
+	static put(key, value) {
+		try {
+			let values = [];
+			let acc = "";
+			for (let i = 0; i < value.length; i++) {
+				acc += value[i];
+				if ((i + 1) % 10000 === 0) {
+					values.push(acc);
+					acc = "";
+				}
+			}
+			values.push(acc);
+			values = values.map((e, i) => [e, "_INX_" + i]);
+
+			for (let v of values) {
+				let K = LocalFileSystem.header + key + v[1];
+				let value = v[0];
+				localStorage[K] = value;
+			}
+		} catch (e) {
+			LocalFileSystem.clear(key);
+		}
+	}
+	static get(key) {
+		let prev = LocalFileSystem.header + key;
+		let value = "";
+		let n = 0;
+		let name;
+		do {
+			name = prev + "_INX_" + n;
+			n++;
+			if (localStorage[name] !== undefined) {
+				value += localStorage[name];
+			}
+		} while (localStorage[name] !== undefined);
+		return value;
+	}
 }
 class ApplicationPackageElement {
 	constructor(files) {
@@ -71,9 +78,9 @@ class ApplicationPackage {
 	}
 }
 //create game loop
-(function() {
+(function () {
 	window.intervals = [];
-	setInterval(function() {
+	setInterval(function () {
 		for (let fn of window.intervals) {
 			fn();
 		}
@@ -132,18 +139,11 @@ class Hengine {
 			});
 		}
 		window.custom = this.custom;
-		window.loadImage = this.loadImage.bind(this);
-		window.loadAnimation = this.loadAnimation.bind(this);
-		window.loadSound = this.loadSound.bind(this);
-		window.middle = this.middle.bind(this);
-		window.save = this.save.bind(this);
-		window.get = this.get.bind(this);
-		window.fileSize = this.fileSize.bind(this);
-		window.packageFiles = this.packageFiles.bind(this);
-		window.importPackage = this.importPackage.bind(this);
-		window.saveRaw = this.saveRaw.bind(this);
-		window.getRaw = this.getRaw.bind(this);
-		window.setTitle = this.setTitle.bind(this);
+		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "middle", "save", "get", "fileSize", "packageFiles", "importPackage", "getRaw", "saveRaw", "setTitle"];
+
+		for (let EXP of EXPORT) {
+			window[EXP] = this[EXP].bind(this);
+		}
 		this.SPRITE_PATH = "../Art/Sprites/";
 		this.ANIMATION_PATH = "../Art/Animations/";
 		this.SOUND_PATH = "../Sound/";
@@ -177,6 +177,36 @@ class Hengine {
 
 		//title
 		this.setTitle(this.getProjectName());
+
+		//defaults
+		window.WALLS = new InactiveScene("WALLS");
+		WALLS.addPhysicsRectElement("Ceiling", width / 2, -50, width, 100, false);
+		WALLS.addPhysicsRectElement("Floor", width / 2, height + 50, width, 100, false);
+		WALLS.addPhysicsRectElement("Left Wall", -50, height / 2, 100, height + 200, false);
+		WALLS.addPhysicsRectElement("Right Wall", width + 50, height / 2, 100, height + 200, false);
+
+
+		window.PLAYER_MOVEMENT = new ElementScript("PLAYER_MOVEMENT", {
+			init() {
+				if (!this.controls.up) {
+					this.controls = new Controls("w", "s", "a", "d");
+				}
+				this.completelyStatic = false;
+				this.hasGravity = true;
+			},
+			update() {
+				if (K.P(this.controls.down)) this.speed.y += 0.2;
+				if (K.P(this.controls.left)) this.accel.x = -0.1;
+				else if (K.P(this.controls.right)) this.accel.x = 0.1;
+				else this.accel.x = 0;
+				if (K.P(this.controls.up)) {
+					if (this.colliding.bottom) {
+						this.speed.y = -5;
+					}
+				}
+			}
+		});
+
 	}
 	get width() {
 		return this.s.display.width;

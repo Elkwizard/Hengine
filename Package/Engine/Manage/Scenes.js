@@ -1,6 +1,5 @@
 class InactiveScene {
-	constructor(name, gravity) {
-		if (!gravity) gravity = new Vector2(0, 0.1);
+	constructor(name, gravity = 0.2) {
 		this.gravity = gravity;
 		this.name = name;
 		this.rebound = 0;

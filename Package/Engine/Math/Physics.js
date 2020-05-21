@@ -396,7 +396,6 @@ class Physics {
         }
     }
     static resolve(col) {
-        //collision events
         
         //resolve collisions
         let a = col.a;

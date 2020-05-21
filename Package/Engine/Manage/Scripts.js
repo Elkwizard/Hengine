@@ -119,24 +119,3 @@ class ScriptContainer {
 		}
     }
 }
-//presets
-const PLAYER_MOVEMENT = new ElementScript("PLAYER_MOVEMENT", {
-	init() {
-		if (!this.controls.up) {
-			this.controls = new Controls("w", "s", "a", "d");
-		}
-		this.completelyStatic = false;
-		this.hasGravity = true;
-	},
-	update() {
-		if (K.P(this.controls.down)) this.speed.y += 0.2;
-		if (K.P(this.controls.left)) this.accel.x = -0.1;
-		else if (K.P(this.controls.right)) this.accel.x = 0.1;
-		else this.accel.x = 0;
-		if (K.P(this.controls.up)) {
-			if (this.colliding.bottom) {
-				this.speed.y = -5;
-			}
-		}
-	}
-});

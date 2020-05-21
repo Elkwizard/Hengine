@@ -1,39 +1,55 @@
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, gravity, controls, tag, home) {
         super(name, x, y, controls, tag, home);
+
+        //velocity
         this.velocity = Vector2.origin;
         this.acceleration = Vector2.origin;
-        this.angularVelocity = 0;
-        this.angularAcceleration = 0;
-        this.hasGravity = gravity;
-        this.slows = gravity;
-        this.direction = Vector2.origin;
-        this.lastX = this.x;
-        this.lastY = this.y;
-        this.limitsVelocity = true;
-        this.optimize = (a, b) => true;
-        this.canMoveThisFrame = true;
-        this.optimalRotation = (this.width > this.height) ? Math.PI / 2 : (this.height > this.width) ? 0 : null;
-        this.snuzzlement = 1;
-        this.density = 0.1;
-        this.positionStatic = !gravity;
-        this.rotationStatic = !gravity;
-        this.constraintLeader = false;
-        this.prohibited = [];
-        this.canCollide = true;
-        this._gravity = null;
-        this._mass = null;
+        //velocity loss
         this._linearDragForce = null;
         this._angularDragForce = null;
         this._friction = null;
+        this.limitsVelocity = true;
+        this.slows = gravity;
+        
+        //acceleration
+        this.angularVelocity = 0;
+        this.angularAcceleration = 0;
+        this.hasGravity = gravity;
+        this._gravity = null;
+
+        //previous states
+        this.lastRotation = 0;
+        this.lastVelocity = Vector2.origin;
+        this.last = this.middle;
+        this.lastAngularVelocity = 0;
+
+        //previous state differences
+        this.direction = Vector2.origin;
+        this.angularDirection = 0;
+        
+        //collision detection
+
+        //collisions
+        //detection
+        this.optimize = (a, b) => true;
+        this.canMoveThisFrame = true;
+        this.canCollide = true;
+        this.constraintLeader = false;
+        //response
+        this.snuzzlement = 1;
+        this._mass = null;
+        this.density = 0.1;
+        this.positionStatic = !gravity;
+        this.rotationStatic = !gravity;
+        this.prohibited = [];
         this._rotation = 0;
         this.__mass = 0; //mass cache
         this.__perimeter = 0; //perimeter cache
+        //data
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
         this.newColliding = new CollisionMoniter();
-        this.collisionLog = [];
-        this.usedForCellSize = false;
         this.response.collide = {
             general: function () { },
             top: function () { },
@@ -63,9 +79,8 @@ class PhysicsObject extends SceneObject {
             }
         };
 
-        //overridable
-        //getCustomCorners -> single polygon
-        //getModels -> multiple shapes
+        //scene
+        this.usedForCellSize = false;
     }
     get gravity() {
         if (this._gravity === null) return this.home.gravity;
@@ -315,6 +330,16 @@ class PhysicsObject extends SceneObject {
     enginePhysicsUpdate() {
         this.scripts.run("update");
         this.update();
+
+        this.direction = this.middle.Vminus(this.last);
+        this.last = this.middle;
+        
+        this.lastVelocity = this.velocity.get();
+        this.lastAngularVelocity = this.angularVelocity;
+
+        this.angularDirection = this.rotation - this.lastRotation; 
+        this.lastRotation = this.rotation;
+
     }
     applyGravity(coef = 1) {
         if (this.hasGravity) {
@@ -362,15 +387,8 @@ class PhysicsObject extends SceneObject {
             //any number of terrible things may have happened by this point.
             if (isNaN(this.velocity.x)) this.velocity.x = 0;
             if (isNaN(this.velocity.y)) this.velocity.y = 0;
-            if (isNaN(this.x)) this.x = this.lastX;
-            if (isNaN(this.y)) this.y = this.lastY;
-
-
-            this.direction = new Vector2(this.x - this.lastX, this.y - this.lastY);
-
-            this.lastX = this.x;
-            this.lastY = this.y;
-
+            if (isNaN(this.x)) this.x = this.last.x;
+            if (isNaN(this.y)) this.y = this.last.y;
         });
     }
     moveTowards(point, ferocity = 1) {
