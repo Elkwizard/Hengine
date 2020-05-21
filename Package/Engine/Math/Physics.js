@@ -178,10 +178,6 @@ class Physics {
             collisionAxis.normalize();
             if (inside) collisionAxis.mul(-1);
 
-
-
-            // c.draw(cl.LIME).circle(bestPoint.x, bestPoint.y, 4);
-
             let col = new Collision(true, a, b, a, b, collisionAxis, [new Contact(a, b, bestPoint, penetration)]);
             return col;
         } else return new Collision(false, a, b);
@@ -211,6 +207,8 @@ class Physics {
     }
     static collidePolygonPolygon(a, b) {
         s.SAT.boxChecks++;
+        // c.stroke(cl.RED, 1).rect(a.__boundingBox);
+        // c.stroke(cl.BLUE, 1).rect(b.__boundingBox);
         if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return new Collision(false, a, b);
 
         s.SAT.SATChecks++;
@@ -325,6 +323,7 @@ class Physics {
     }
     static fullCollide(a, b) {
         let tempCollisions = [];
+        if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return [];
         let shapes = a.getModels();
         let otherShapes = b.getModels();
         for (let shape of shapes) {

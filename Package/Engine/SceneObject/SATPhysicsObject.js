@@ -257,7 +257,7 @@ class PhysicsObject extends SceneObject {
         }
     }
     detectCollisions(others) {
-        let collisions = [];
+        let collisions = 0;
         if (!this.completelyStatic) {
             for (let other of others) {
                 if (other !== this) {
@@ -265,6 +265,7 @@ class PhysicsObject extends SceneObject {
                         if (this.optimize(this, other)) {
                             if (this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
                                 let col = Physics.fullCollide(this, other);
+                                collisions++;
                                 if (col.length) {
                                     this.allCollidingWith["Shape - " + other.name] = other;
                                     other.allCollidingWith["Shape - " + this.name] = this;
@@ -287,6 +288,7 @@ class PhysicsObject extends SceneObject {
                 }
             }
         }
+        // c.draw(cl.RED).text("20px monospace", collisions, this.x, this.y);
         return [];
     }
     checkAndResolveCollisions(others) {
@@ -325,7 +327,6 @@ class PhysicsObject extends SceneObject {
     }
     physicsUpdate(others) {
         s.drawInWorldSpace(e => {
-
             let spdMod = this.getSpeedModulation();
             for (let i = 0; i < this.home.physicsRealism; i++) {
                 //slow

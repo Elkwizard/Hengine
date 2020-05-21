@@ -20,6 +20,12 @@ class InputHandler {
 		this.keyDownCounts = { };
 		this.keyUpCounts = { };
 	}
+	PL(key) {
+		return this.keyDownCounts[key];
+	}
+	RL(key) {
+		return this.keyUpCounts[key];
+	}
 	P(key) {
 		return !!this.keys[key];
 	}
@@ -37,8 +43,8 @@ class InputHandler {
 	}
 	update() {
 		for (let key in this.keys) {
-			if (!this.keyDownCounts[key]) this.keyDownCounts[key] = 0;
-			if (!this.keyUpCounts[key]) this.keyUpCounts[key] = 0;
+			if (this.keyDownCounts[key] === undefined) this.keyDownCounts[key] = 0;
+			if (this.keyUpCounts[key] === undefined) this.keyUpCounts[key] = 2;
 			if (this.P(key)) this.keyDownCounts[key]++;
 			else this.keyDownCounts[key] = 0;
 			if (this.R(key)) this.keyUpCounts[key]++;
@@ -89,6 +95,11 @@ class MouseHandler extends InputHandler {
 			x: 0,
 			y: 0
 		};
+		this.keys = {
+			"Left": false,
+			"Middle": false,
+			"Right": false
+		};
 		this.mouseMap = ["Left", "Middle", "Right"];
 		this.button = 0;
 		this.dragStart = Vector2.origin;
@@ -111,7 +122,6 @@ class MouseHandler extends InputHandler {
 		this.listenerRoot = el;
 		el.addEventListener("click", function (e) {
 			m.updatePosition(e, "click");
-			m.engineClick(e);
 			for (let ev of m.onClick) ev(e);
 		});
 		el.addEventListener("pointerdown", function (e) {
@@ -140,6 +150,7 @@ class MouseHandler extends InputHandler {
 			for (let inx of m.mouseMap) {
 				m.keys[inx] = false;
 			}
+			m.engineClick(e);
 			for (let ev of m.onUp) ev(e);
 		});
 		this.__right__ = function (e) {

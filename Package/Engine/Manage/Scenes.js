@@ -388,9 +388,10 @@ class InactiveScene {
 	collidePoint(point) {
 		let collideAry = [];
 		for (let hitbox of this.updateArray().filter(e => !(e instanceof ParticleObject))) {
+			let p = (hitbox instanceof UIObject) ? this.worldSpaceToScreenSpace(point) : point;
 			let shapes = hitbox.getModels();
 			let colliding = false;
-			for (let shape of shapes) if (Physics.collidePoint(shape, point).colliding) colliding = true;
+			for (let shape of shapes) if (Physics.collidePoint(shape, p).colliding) colliding = true;
 			if (colliding) {
 				collideAry.push(hitbox);
 			}
@@ -398,19 +399,8 @@ class InactiveScene {
 		return collideAry;
 	}
 	collidePointBoth(point) {
-		let collideAry = [];
-		let notCollideAry = [];
-		for (let hitbox of this.updateArray().filter(e => !(e instanceof ParticleObject))) {
-			let shapes = hitbox.getModels();
-			let colliding = false;
-			for (let shape of shapes) if (Physics.collidePoint(shape, point).colliding) colliding = true;
-			if (colliding) {
-				collideAry.push(hitbox);
-			} else {
-				notCollideAry.push(hitbox);
-			}
-		}
-		return [collideAry, notCollideAry];
+		let collideAry = this.collidePoint(point);
+		return [collideAry, this.containsArray.filter(e => !collideAry.includes(e))];
 	}
 }
 class Camera extends Rect {
@@ -482,7 +472,8 @@ class Scene extends InactiveScene {
 		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
 		M.engineClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
-			if (this.mouseEvents) for (let o of this.collidePoint(adjusted)) {
+			let collided = this.collidePoint(adjusted);
+			if (this.mouseEvents) for (let o of collided) {
 				this.get(o).response.click(adjusted);
 				let m = this.get(o);
 				m.scripts.run("click", adjusted);
@@ -656,8 +647,13 @@ class Scene extends InactiveScene {
 		// 		let r = new Rect(x, y, this.cellSize, this.cellSize);
 		// 		c.stroke(cl.RED, 3).rect(r);
 		// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
-		// 		for (let or of cell) c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
-		// 		c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
+		// 		let n = 0;
+		// 		for (let or of cell) {
+		// 			c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
+		// 			n++;
+		// 		}
+		// 		c.draw(cl.BLUE).text("20px monospace", n, r.middle.x, r.middle.y);
+		// 		// c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
 		// 	}
 		// });
 

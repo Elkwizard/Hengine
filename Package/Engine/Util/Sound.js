@@ -102,16 +102,24 @@ class Sound {
         }
     }
     static wave(hertz, duration, type, volume) {
+        const LERP_LENGTH = .1;
         let osc = Sound.context.createOscillator();
         osc.type = type;
         osc.frequency.value = hertz;
-        osc.connect(Sound.gainNode);
         osc.start();
-        Sound.gainNode.gain.value = volume;
+        let gainNode = Sound.context.createGain();
+        osc.connect(gainNode);
+        const SEC_DURATION = duration / 1000;
+        const CURRENT_TIME = Sound.context.currentTime;
+        gainNode.gain.value = 0.00001;
+        gainNode.gain.exponentialRampToValueAtTime(volume, CURRENT_TIME + SEC_DURATION * LERP_LENGTH);
+        gainNode.gain.setValueAtTime(volume, CURRENT_TIME + SEC_DURATION - SEC_DURATION * LERP_LENGTH);
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, CURRENT_TIME + SEC_DURATION);
+        gainNode.connect(Sound.gainNode);
         return new Promise(function (resolve) {
             setTimeout(function () {
                 osc.stop();
-                osc.disconnect(Sound.gainNode);
+                gainNode.disconnect(Sound.gainNode);
                 resolve();
             }, duration);
         });
