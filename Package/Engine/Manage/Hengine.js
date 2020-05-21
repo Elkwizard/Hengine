@@ -45,6 +45,7 @@ class LocalFileSystem {
 			}
 		} catch (e) {
 			LocalFileSystem.clear(key);
+			console.warn("File '" + key + "' was to big. It was erased.");
 		}
 	}
 	static get(key) {
@@ -95,8 +96,6 @@ class ApplicationPackage {
 	}
 	animate();
 
-
-	document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
 
 })();
 class Hengine {
@@ -393,6 +392,7 @@ class Hengine {
 					} else {
 						if (file === "Hengine") {
 							window.HENGINE = new Hengine(scripts.utility);
+							document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
 						} else {
 							if (file.match(/DATA/g)) {
 								eval(file.slice(5));
