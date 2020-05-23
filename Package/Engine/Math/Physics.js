@@ -256,11 +256,17 @@ class Physics {
         let col;
         if (colliding) {
             pairs = pairs
-                .map(e => [e[0], e[1], e[2], Range.getOverlap(e[0], e[1])])
-                .sort((a, b) => {
-                    return Math.abs(a[3]) - Math.abs(b[3]);
-                });
-            let [aRange, bRange, edge, intersect] = pairs[0];
+                .map(e => [e[0], e[1], e[2], Range.getOverlap(e[0], e[1])]);
+            let minimumAry = pairs[0];
+            let minimumOverlap = Infinity;
+            for (let el of pairs) {
+                let abs = Math.abs(el[3]);
+                if (abs < minimumOverlap) {
+                    minimumOverlap = abs;
+                    minimumAry = el;
+                }
+            }
+            let [aRange, bRange, edge, intersect] = minimumAry;
             leastIntersection = Math.abs(intersect);
             if (leastIntersection <= 0) return new Collision(false, a, b); //fake collision?
             collisionAxis = edge.Ntimes(-Math.sign(intersect));
@@ -396,7 +402,7 @@ class Physics {
         }
     }
     static resolve(col) {
-        
+
         //resolve collisions
         let a = col.a;
         let b = col.b;
@@ -404,7 +410,7 @@ class Physics {
         let mobileB = !Physics.isWall(b);
         const d = col.dir.Ntimes(-1);
 
-    
+
         //position
         if (col.penetration > 0.05) {
             let tomMath;
@@ -467,7 +473,7 @@ class Physics {
         let mobileA = !Physics.isWall(a);
         let mobileB = !Physics.isWall(b);
         const d = col.dir.Ntimes(-1);
-        
+
         //do custom collision response
         if (!a.colliding.general) a.colliding.general = [b];
         else if (!a.colliding.general.includes(b)) a.colliding.general.push(b);
@@ -520,6 +526,76 @@ class Physics {
             runEvents(dir);
             a.lastColliding[dir] = a.colliding[dir];
         }
+    }
+    static getLineCells(a, b, cellSize) {
+        a = a.over(cellSize);
+        b = b.over(cellSize);
+        function floor(v) {
+            return new Vector2(Math.floor(v.x), Math.floor(v.y));
+        }
+        if (!(b.x - a.x)) {
+            let mag = b.y - a.y;
+            let ps = [];
+            for (let i = 0; i < mag; i++) {
+                ps.push(floor(new Vector2(a.x, a.y + i)));
+            }
+            return ps;
+        }
+        function point(v) {
+            c.draw(cl.RED).circle(v.x * cellSize, v.y * cellSize, 5);
+        }
+        const vct = b.minus(a).normalize();
+        function getRect(x, y, m, b) {
+            let minX = m * x + b;
+            let maxX = m * (x + 1) + b;
+
+            let minY = (y - b) / m;
+            let maxY = (y + 1 - b) / m;
+
+            let ps = [];
+
+            const off = 0.0001;
+            if (minY > x && minY < x + 1) {
+                ps.push(new Vector2(minY, y - off));
+            }
+            if (maxY > x && maxY < x + 1) {
+                ps.push(new Vector2(maxY, y + 1 + off));
+            }
+            if (minX > y && minX < y + 1) {
+                ps.push(new Vector2(x - off, minX));
+            }
+            if (maxX > y && maxX < y + 1) {
+                ps.push(new Vector2(x + 1 + off, maxX));
+            }
+
+            for (let p of ps) point(p);
+
+            if (!ps.length) return new Vector2(x, y);
+            if (ps.length === 1) return floor(ps[0]);
+
+            let rt = ps[0];
+            if (ps[1].dot(vct) > ps[0].dot(vct)) rt = ps[1];
+            return floor(rt);
+        }
+        let points = [];
+        let loc = floor(a);
+        let M = (b.y - a.y) / (b.x - a.x);
+        let B = a.y - M * a.x;
+
+        const dist = Geometry.distToPoint2(a, b);
+
+        let steps = 0;
+        while (Geometry.distToPoint2(a, loc) <= dist && steps < 1000) {
+            steps++;
+
+            points.push(loc);
+            let n = getRect(loc.x, loc.y, M, B);
+            if (n.equals(loc)) n = floor(n.plus(vct));
+            loc = n;
+        }
+        points.push(loc);
+        loc = getRect(loc.x, loc.y, M, B);
+        return points;
     }
     static getCells(rect, cellsize) {
         let finalCells = [];

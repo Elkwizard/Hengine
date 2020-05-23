@@ -431,17 +431,28 @@ class Artist {
 	get middle() {
 		return { x: this.canvas.width / 2, y: this.canvas.height / 2 };
 	}
-	draw(color) {
+	createRadialGradient(x, y, radius, ...cols) {
+		let grd = this.c.createRadialGradient(x, y, 0.00000001, x, y, radius);
+		for (let i = 0; i < cols.length; i++) grd.addColorStop(i / (cols.length - 1), this.getContextColor(cols[i]));
+		return grd;
+	}
+	createLinearGradient(x, y, x2, y2, ...cols) {
+		let grd = this.c.createLinearGradient(x, y, x2, y2);
+		for (let i = 0; i < cols.length; i++) grd.addColorStop(i / (cols.length - 1), this.getContextColor(cols[i]));
+		return grd;
+	}
+	getContextColor(color) {
 		let c = color;
 		if (color instanceof Color) c = color.getRGBA();
-		this.c.fillStyle = c;
+		return c;
+	}
+	draw(color) {
+		this.c.fillStyle = this.getContextColor(color);
 		return this.drawObj;
 	}
 	stroke(color, lineWidth = 1, endStyle = "flat") {
-		let c = color;
+		this.c.strokeStyle = this.getContextColor(color);
 		if (endStyle === "flat") endStyle = "butt";
-		if (color instanceof Color) c = color.getRGBA();
-		this.c.strokeStyle = c;
 		this.c.lineCap = endStyle;
 		this.c.lineWidth = lineWidth;
 		this.c.beginPath();
