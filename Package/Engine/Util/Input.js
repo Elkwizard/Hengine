@@ -142,7 +142,7 @@ class MouseHandler extends InputHandler {
 			m.engineMove(e);
 			for (let ev of m.onMove) ev(e);
 		});
-		el.addEventListener("pointerup", function (e) {
+		function mouseUp(e) {
 			m.updatePosition(e, "up");
 			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
 			m.dragEnd = adjusted;
@@ -152,7 +152,8 @@ class MouseHandler extends InputHandler {
 			}
 			m.engineClick(e);
 			for (let ev of m.onUp) ev(e);
-		});
+		};
+		el.addEventListener("pointerup", mouseUp);
 		this.__right__ = function (e) {
 			m.button = e.button;
 			e.preventDefault();

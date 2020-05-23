@@ -601,15 +601,22 @@ class Physics {
         let finalCells = [];
         for (let r of rect.getModels()) {
             let bound = r.getBoundingBox();
-            if (!(r instanceof Rect) || (bound.width * bound.height) / (cellsize ** 2) < 30) {
-                let cells = [];
-                for (let i = 0; i <= Math.ceil(bound.width / cellsize); i++) {
-                    for (let j = 0; j <= Math.ceil(bound.height / cellsize); j++) {
-                        let x = i + Math.floor(bound.x / cellsize);
-                        let y = j + Math.floor(bound.y / cellsize);
-                        cells.push(P(x, y));
-                    }
-                }
+            if (r instanceof Circle || (bound.width * bound.height) / (cellsize ** 2) < 30) {
+                const x = bound.x;
+                const y = bound.y;
+                const w = bound.width;
+                const h = bound.height;
+                const c = cellsize;
+                const dim = new Vector2(w, h);
+                const min = new Vector2(x, y);
+                const max = min.plus(dim);
+                const f = (v) => new Vector2(Math.floor(v.x / c), Math.floor(v.y / c));
+                const start = f(min);
+                const end = f(max);
+                const d = end.minus(start);
+                const result = [];
+                for (let i = 0; i <= d.x; i++) for (let j = 0; j <= d.y; j++) result.push(start.plus(new Vector2(i, j)));
+                let cells = result;
                 finalCells.push(...cells);
             } else {
                 let cells = [];

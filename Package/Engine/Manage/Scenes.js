@@ -541,7 +541,6 @@ class Scene extends InactiveScene {
 		let useful = [];
 		let useless = [];
 
-
 		//custom before updates run
 		for (let el of this.containsArray) {
 			el.scripts.run("beforeUpdate");
@@ -595,7 +594,6 @@ class Scene extends InactiveScene {
 			constraint.solve();
 		}
 
-
 		//collision phase
 		for (let i = 0; i < useful.length; i++) {
 			let rect = useful[i][0];
@@ -606,6 +604,12 @@ class Scene extends InactiveScene {
 			if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
 			rect.physicsUpdate(updater);
 		}
+
+		//solve constraints #2
+		for (let constraint of this.constraints) {
+			constraint.solve();
+		}
+
 		//collision phase
 		for (let i = useful.length - 1; i > 0; i--) {
 			let rect = useful[i][0];
@@ -620,12 +624,6 @@ class Scene extends InactiveScene {
 			Physics.runEventListeners(el);
 		}
 
-
-		//solve constraints #2
-		for (let constraint of this.constraints) {
-			constraint.solve();
-		}
-
 		//custom updates run
 		for (let usef of useful) {
 			let rect = usef[0];
@@ -638,7 +636,7 @@ class Scene extends InactiveScene {
 			rect.enginePhysicsUpdate();
 		}
 
-		// // show cells
+		// // show cells=
 		// this.drawInWorldSpace(e => {
 		// 	for (let [key, cell] of cells) {
 		// 		let x = parseInt(key.split(",")[0]) * this.cellSize;
