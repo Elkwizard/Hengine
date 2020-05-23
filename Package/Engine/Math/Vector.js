@@ -536,3 +536,16 @@ class Vector4 extends Vector {
 		return new Vector4((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 }
+//isNaN
+(function() {
+	const nN = window.isNaN.bind(window);
+	window.isNaN = function(n) {
+		if (n instanceof Vector) {
+			if (n instanceof Vector1) return nN(n.x);
+			if (n instanceof Vector2) return nN(n.x) || nN(n.y);
+			if (n instanceof Vector3) return nN(n.x) || nN(n.y) || nN(n.z);
+			if (n instanceof Vector4) return nN(n.x) || nN(n.y) || nN(n.z) || nN(n.w);
+		}
+		return nN(n);
+	}
+})();

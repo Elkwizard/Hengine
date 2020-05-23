@@ -132,6 +132,7 @@ class InactiveScene {
 		name = this.genName_PRIVATE(this.contains, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
+		n.cacheMass();
 		this.changeElementDraw(n, this.defaultPhysDraw);
 		this.contains[name] = n;
 		return n;
@@ -140,6 +141,7 @@ class InactiveScene {
 		name = this.genName_PRIVATE(this.contains, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Circle(0, 0, radius));
+		n.cacheMass();
 		this.changeElementDraw(n, this.defaultPhysDraw);
 		this.contains[name] = n;
 		return n;
@@ -636,7 +638,7 @@ class Scene extends InactiveScene {
 			rect.enginePhysicsUpdate();
 		}
 
-		// // show cells=
+		// // show cells
 		// this.drawInWorldSpace(e => {
 		// 	for (let [key, cell] of cells) {
 		// 		let x = parseInt(key.split(",")[0]) * this.cellSize;

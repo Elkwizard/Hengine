@@ -698,6 +698,8 @@ class Physics {
         const I_A = n.Ntimes(-j_A);
         const I_B = n.Ntimes(j_B);
 
+        if (!m_A || !m_B) console.log({j_DYNAMIC, j_STATIC_A, j_STATIC_B, PER_A, PER_B, m_A, m_B, a, b});
+
         impulseA = new Impulse(I_A, collisionPoint);
         impulseB = new Impulse(I_B, collisionPoint);
 

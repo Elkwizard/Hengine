@@ -375,7 +375,7 @@ class PhysicsObject extends SceneObject {
                 this.privateSetRotation(newRotation);
 
                 this.cacheBoundingBoxes();
-                this.__mass = this.mass;
+                this.cacheMass();
                 this.__perimeter = this.perimeter;
 
                 this.checkAndResolveCollisions(others);
@@ -390,6 +390,9 @@ class PhysicsObject extends SceneObject {
             if (isNaN(this.x)) this.x = this.last.x;
             if (isNaN(this.y)) this.y = this.last.y;
         });
+    }
+    cacheMass() {
+        this.__mass = this.mass;
     }
     moveTowards(point, ferocity = 1) {
         let dif = point.Vminus(this.middle);
