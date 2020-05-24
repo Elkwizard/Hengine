@@ -6,18 +6,46 @@ Function.prototype.add = function (fn = function () { }) {
 		return fn(...a);
 	}
 }
+Function.prototype.performance = function(...args) {
+	const t_1 = performance.now();
+	const iter = 100;
+	for (let i = 0; i < iter; i++) {
+		this(...args);
+	}
+	const t_2 = performance.now();
+	return (t_2 - t_1) / iter;
+}
 Number.prototype.toDegrees = function () {
 	return this * (180 / Math.PI);
 }
 Number.prototype.toRadians = function () {
 	return this * (Math.PI / 180);
 }
+Number.prototype.sin01 = function () {
+	return (Math.sin(this) + 1) / 2;
+}
+Number.prototype.cos01 = function () {
+	return (Math.cos(this) + 1) / 2;
+}
+Number.prototype.approxSqrt = function (amt = 5) {
+	let g = 1 / this;
+	for (let i = 0; i < amt; i++) g = (g + this / g) / 2;
+	return g;
+}
 Number.prototype.movedTowards = function (value, ferocity) {
 	let dir = ferocity * (value - this) * 2;
 	return this + dir;
 }
-String.prototype.capitalize = function() {
+String.prototype.capitalize = function () {
 	return this[0].toUpperCase() + this.slice(1);
+}
+String.prototype.cut = function (char) {
+	const inx = this.indexOf(char);
+	if (inx === -1) return [this, ""];
+	return [
+		this.slice(0, inx),
+		this.slice(inx)
+	];
 }
 Object.prototype.toString = function (depth = 0) {
 	if (depth < 1) {

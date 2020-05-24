@@ -366,6 +366,12 @@ class Physics {
         let impulsesA = [];
         let impulsesB = [];
         let totalPenetrationDiv = Physics.getTotalPenetration(contacts);
+        function addiA(iA) {
+            impulsesA.push(iA);
+        }
+        function addiB(iB) {
+            impulsesB.push(iB);
+        }
         for (let contact of contacts) {
             let p = contact.point;
             let impulses = Physics.getImpulses(a, b, dir, p);
@@ -378,27 +384,27 @@ class Physics {
             let ratio = contact.penetration / totalPenetrationDiv;
             if (iA) {
                 iA.force.Nmul(ratio);
-                impulsesA.push(iA, iA2);
+                addiA(iA);
             }
             if (iA2) {
                 iA2.force.Nmul(ratio);
-                impulsesB.push(iA2);
+                addiA(iA2);
             }
             if (iB) {
                 iB.force.Nmul(ratio);
-                impulsesB.push(iB, iB2);
+                addiB(iB);
             }
             if (iB2) {
                 iB2.force.Nmul(ratio);
-                impulsesB.push(iB2);
+                addiB(iB2);
             }
 
         }
         for (let iA of impulsesA) {
-            a.applyImpulse(iA);
+            a.applyImpulse(iA, iA.name);
         }
         for (let iB of impulsesB) {
-            b.applyImpulse(iB);
+            b.applyImpulse(iB, iB.name);
         }
     }
     static resolve(col) {
@@ -698,10 +704,12 @@ class Physics {
         const I_A = n.Ntimes(-j_A);
         const I_B = n.Ntimes(j_B);
 
-        if (!m_A || !m_B) console.log({j_DYNAMIC, j_STATIC_A, j_STATIC_B, PER_A, PER_B, m_A, m_B, a, b});
+        const impulse_name = {j_DYNAMIC, j_STATIC_A, j_STATIC_B, PER_A, PER_B, m_A, m_B, a, b}.toString();
 
         impulseA = new Impulse(I_A, collisionPoint);
         impulseB = new Impulse(I_B, collisionPoint);
+        impulseA.name = impulse_name;
+        impulseB.name = impulse_name;
 
         if (b.completelyStatic) impulseB = null;
 

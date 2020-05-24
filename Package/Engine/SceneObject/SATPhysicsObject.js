@@ -208,7 +208,7 @@ class PhysicsObject extends SceneObject {
         //apply linear drag;
         let drag = this.velocity.get().Nmul(-(1 - this.linearDragForce) * this.__mass);
         let iD = new Impulse(drag, this.centerOfMass);
-        this.applyImpulse(iD);
+        this.applyImpulse(iD, "drag");
 
         if (this.velocity.mag < 0.01) this.velocity.mag = 0;
         if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
@@ -347,7 +347,7 @@ class PhysicsObject extends SceneObject {
             let gv = this.gravity;
             let gravitationalForce = gv.Ntimes(coef / this.getSpeedModulation() * this.__mass);
             let iG = new Impulse(gravitationalForce, this.centerOfMass);
-            this.applyImpulse(iG);
+            this.applyImpulse(iG, "gravity");
         }
     }
     physicsUpdate(others) {
@@ -415,17 +415,18 @@ class PhysicsObject extends SceneObject {
     applyImpulse(impulse, name = "no name") {
         if (!impulse || !impulse.force.mag) return;
         impulse.force.Ndiv(this.__mass);
-        this.applyLinearImpulse(impulse);
-        this.applyAngularImpulse(impulse);
+        this.applyLinearImpulse(impulse, name);
+        this.applyAngularImpulse(impulse, name);
         // c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
         // c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(10).Vplus(impulse.source));
     }
-    applyLinearImpulse(impulse) {
+    applyLinearImpulse(impulse, name) {
         if (!impulse) return;
         let ratio = this.getSpeedModulation();
-        this.velocity.Vadd(impulse.force.Ntimes(ratio));
+        const vel = impulse.force.Ntimes(ratio);
+        this.velocity.Vadd(vel);
     }
-    applyAngularImpulse(impulse) {
+    applyAngularImpulse(impulse, name) {
         if (!impulse) return;
         let r = impulse.source.Vminus(this.centerOfMass);
         if (!r.x && !r.y && r.x + r.y < 0.01) return;
@@ -436,5 +437,7 @@ class PhysicsObject extends SceneObject {
         let v_theta = sign * Math.sqrt((proj.x ** 2 + proj.y ** 2) / (r.x ** 2 + r.y ** 2));
         if (v_theta > Math.PI * 2) v_theta = 0;
         this.angularVelocity += v_theta * this.getSpeedModulation();
+
+        
     }
 }
