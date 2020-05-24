@@ -287,7 +287,7 @@ class Hengine {
 		}
 	}
 	initImage(src) {
-		let x = new Image;
+		let x = new Image();
 		x.src = src;
 		return x;
 	}

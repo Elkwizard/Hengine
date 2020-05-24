@@ -307,7 +307,7 @@ class TextureDrawingContextPath {
 			let valid = [];
 			let y = minY + i;
 			for (let line of lines) {
-				let min = Math.min(line[1], line[3]);
+				let min = Math.min(line[1], line[3]) + 1;
 				let max = Math.max(line[1], line[3]);
 				if (min <= y && max >= y && max - min) valid.push(line);
 			}

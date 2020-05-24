@@ -534,74 +534,90 @@ class Physics {
         }
     }
     static getLineCells(a, b, cellSize) {
-        a = a.over(cellSize);
-        b = b.over(cellSize);
-        function floor(v) {
-            return new Vector2(Math.floor(v.x), Math.floor(v.y));
-        }
-        if (!(b.x - a.x)) {
-            let mag = b.y - a.y;
-            let ps = [];
-            for (let i = 0; i < mag; i++) {
-                ps.push(floor(new Vector2(a.x, a.y + i)));
-            }
-            return ps;
-        }
-        function point(v) {
-            c.draw(cl.RED).circle(v.x * cellSize, v.y * cellSize, 5);
-        }
-        const vct = b.minus(a).normalize();
-        function getRect(x, y, m, b) {
-            let minX = m * x + b;
-            let maxX = m * (x + 1) + b;
+        let cells = [];
+        const c = cellSize;
+        const f = (v) => new Vector2(Math.floor(v.x / c), Math.floor(v.y / c));
+        let minX = Math.min(a.x, b.x);
+        let maxX = Math.max(a.x, b.x);
+        let minY = Math.min(a.y, b.y);
+        let maxY = Math.max(a.y, b.y);
+        a = new Vector2(minX, minY);
+        b = new Vector2(maxX, maxY);
+        let A = f(a);
+        let B = f(b);
+        let d = B.Vminus(A);
+        for (let i = 0; i <= d.x; i++) for (let j = 0; j <= d.y; j++) cells.push(A.plus(new Vector2(i, j)));
 
-            let minY = (y - b) / m;
-            let maxY = (y + 1 - b) / m;
+        return cells;
+        // //bad
+        // a = a.over(cellSize);
+        // b = b.over(cellSize);
+        // function floor(v) {
+        //     return new Vector2(Math.floor(v.x), Math.floor(v.y));
+        // }
+        // if (!(b.x - a.x)) {
+        //     let mag = b.y - a.y;
+        //     let ps = [];
+        //     for (let i = 0; i < mag; i++) {
+        //         ps.push(floor(new Vector2(a.x, a.y + i)));
+        //     }
+        //     return ps;
+        // }
+        // function point(v) {
+        //     c.draw(cl.RED).circle(v.x * cellSize, v.y * cellSize, 5);
+        // }
+        // const vct = b.minus(a).normalize();
+        // function getRect(x, y, m, b) {
+        //     let minX = m * x + b;
+        //     let maxX = m * (x + 1) + b;
 
-            let ps = [];
+        //     let minY = (y - b) / m;
+        //     let maxY = (y + 1 - b) / m;
 
-            const off = 0.0001;
-            if (minY > x && minY < x + 1) {
-                ps.push(new Vector2(minY, y - off));
-            }
-            if (maxY > x && maxY < x + 1) {
-                ps.push(new Vector2(maxY, y + 1 + off));
-            }
-            if (minX > y && minX < y + 1) {
-                ps.push(new Vector2(x - off, minX));
-            }
-            if (maxX > y && maxX < y + 1) {
-                ps.push(new Vector2(x + 1 + off, maxX));
-            }
+        //     let ps = [];
 
-            for (let p of ps) point(p);
+        //     const off = 0.0001;
+        //     if (minY > x && minY < x + 1) {
+        //         ps.push(new Vector2(minY, y - off));
+        //     }
+        //     if (maxY > x && maxY < x + 1) {
+        //         ps.push(new Vector2(maxY, y + 1 + off));
+        //     }
+        //     if (minX > y && minX < y + 1) {
+        //         ps.push(new Vector2(x - off, minX));
+        //     }
+        //     if (maxX > y && maxX < y + 1) {
+        //         ps.push(new Vector2(x + 1 + off, maxX));
+        //     }
 
-            if (!ps.length) return new Vector2(x, y);
-            if (ps.length === 1) return floor(ps[0]);
+        //     // for (let p of ps) point(p);
 
-            let rt = ps[0];
-            if (ps[1].dot(vct) > ps[0].dot(vct)) rt = ps[1];
-            return floor(rt);
-        }
-        let points = [];
-        let loc = floor(a);
-        let M = (b.y - a.y) / (b.x - a.x);
-        let B = a.y - M * a.x;
+        //     if (!ps.length) return new Vector2(x, y);
+        //     if (ps.length === 1) return floor(ps[0]);
 
-        const dist = Geometry.distToPoint2(a, b);
+        //     let rt = ps[0];
+        //     if (ps[1].dot(vct) > ps[0].dot(vct)) rt = ps[1];
+        //     return floor(rt);
+        // }
+        // let points = [];
+        // let loc = floor(a);
+        // let M = (b.y - a.y) / (b.x - a.x);
+        // let B = a.y - M * a.x;
 
-        let steps = 0;
-        while (Geometry.distToPoint2(a, loc) <= dist && steps < 1000) {
-            steps++;
+        // const dist = Geometry.distToPoint2(a, b);
 
-            points.push(loc);
-            let n = getRect(loc.x, loc.y, M, B);
-            if (n.equals(loc)) n = floor(n.plus(vct));
-            loc = n;
-        }
-        points.push(loc);
-        loc = getRect(loc.x, loc.y, M, B);
-        return points;
+        // let steps = 0;
+        // while (Geometry.distToPoint2(a, loc) <= dist && steps < 1000) {
+        //     steps++;
+
+        //     points.push(loc);
+        //     let n = getRect(loc.x, loc.y, M, B);
+        //     if (n.equals(loc)) n = floor(n.plus(vct));
+        //     loc = n;
+        // }
+        // points.push(loc);
+        // loc = getRect(loc.x, loc.y, M, B);
+        // return points;
     }
     static getCells(rect, cellsize) {
         let finalCells = [];
@@ -625,43 +641,50 @@ class Physics {
                 let cells = result;
                 finalCells.push(...cells);
             } else {
+                let indv = r.getEdges().map(e => Physics.getLineCells(e.a, e.b, cellsize));
                 let cells = [];
-                let edges = r.getEdges().map(e => e.a.Vminus(e.b).normalize());
-                let corners = r.getCorners();
-                let nums = [0, 1, 2, 3];
-                if (r.width < cellsize) {
-                    nums = [0];
-                    let x = (corners[0].x + corners[1].x) / 2;
-                    let y = (corners[0].y + corners[1].y) / 2;
-                    let x2 = (corners[2].x + corners[3].x) / 2;
-                    let y2 = (corners[2].y + corners[3].y) / 2;
-                    cells.push(P(x, y), P(x2, y2));
-                }
-                if (r.height < cellsize) {
-                    nums = [1];
-                    let x = (corners[1].x + corners[2].x) / 2;
-                    let y = (corners[1].y + corners[2].y) / 2;
-                    let x2 = (corners[3].x + corners[0].x) / 2;
-                    let y2 = (corners[3].y + corners[0].y) / 2;
-                    cells.push(P(x, y), P(x2, y2));
-                }
-                for (let i of nums) {
-                    let crn1 = corners[i];
-                    let crn2 = corners[i - 1] ? corners[i - 1] : corners[corners.length - 1];
-                    let d = Geometry.distToPoint(crn1, crn2);
-                    let dir = edges[i];
-                    let originX = crn1.x / cellsize;
-                    let originY = crn1.y / cellsize;
-                    let steps = 3;
-                    for (let j = 0; j <= Math.ceil(d / cellsize) * steps; j++) {
-                        let x = originX + dir.x * j / steps;
-                        let y = originY + dir.y * j / steps;
-                        cells.push(P(Math.floor(x + 1), Math.floor(y)));
-                        cells.push(P(Math.floor(x), Math.floor(y + 1)));
-                        cells.push(P(Math.floor(x), Math.floor(y)));
-                    }
-                }
+                for (let i of indv) cells.push(...i);
                 finalCells.push(...cells);
+
+                
+
+                // let cells = [];
+                // let edges = r.getEdges().map(e => e.a.Vminus(e.b).normalize());
+                // let corners = r.getCorners();
+                // let nums = [0, 1, 2, 3];
+                // if (r.width < cellsize) {
+                //     nums = [0];
+                //     let x = (corners[0].x + corners[1].x) / 2;
+                //     let y = (corners[0].y + corners[1].y) / 2;
+                //     let x2 = (corners[2].x + corners[3].x) / 2;
+                //     let y2 = (corners[2].y + corners[3].y) / 2;
+                //     cells.push(P(x, y), P(x2, y2));
+                // }
+                // if (r.height < cellsize) {
+                //     nums = [1];
+                //     let x = (corners[1].x + corners[2].x) / 2;
+                //     let y = (corners[1].y + corners[2].y) / 2;
+                //     let x2 = (corners[3].x + corners[0].x) / 2;
+                //     let y2 = (corners[3].y + corners[0].y) / 2;
+                //     cells.push(P(x, y), P(x2, y2));
+                // }
+                // for (let i of nums) {
+                //     let crn1 = corners[i];
+                //     let crn2 = corners[i - 1] ? corners[i - 1] : corners[corners.length - 1];
+                //     let d = Geometry.distToPoint(crn1, crn2);
+                //     let dir = edges[i];
+                //     let originX = crn1.x / cellsize;
+                //     let originY = crn1.y / cellsize;
+                //     let steps = 3;
+                //     for (let j = 0; j <= Math.ceil(d / cellsize) * steps; j++) {
+                //         let x = originX + dir.x * j / steps;
+                //         let y = originY + dir.y * j / steps;
+                //         cells.push(P(Math.floor(x + 1), Math.floor(y)));
+                //         cells.push(P(Math.floor(x), Math.floor(y + 1)));
+                //         cells.push(P(Math.floor(x), Math.floor(y)));
+                //     }
+                // }
+                // finalCells.push(...cells);
             }
         }
         return finalCells;

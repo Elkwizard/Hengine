@@ -345,7 +345,7 @@ class PhysicsObject extends SceneObject {
         if (this.hasGravity) {
             //gravity
             let gv = this.gravity;
-            let gravitationalForce = gv.Ntimes(coef / this.getSpeedModulation() * this.__mass);
+            let gravitationalForce = gv.Ntimes(coef * this.__mass);
             let iG = new Impulse(gravitationalForce, this.centerOfMass);
             this.applyImpulse(iG, "gravity");
         }
@@ -422,8 +422,7 @@ class PhysicsObject extends SceneObject {
     }
     applyLinearImpulse(impulse, name) {
         if (!impulse) return;
-        let ratio = this.getSpeedModulation();
-        const vel = impulse.force.Ntimes(ratio);
+        const vel = impulse.force
         this.velocity.Vadd(vel);
     }
     applyAngularImpulse(impulse, name) {
@@ -436,7 +435,7 @@ class PhysicsObject extends SceneObject {
         let sign = Math.sign(proj.dot(r_N));
         let v_theta = sign * Math.sqrt((proj.x ** 2 + proj.y ** 2) / (r.x ** 2 + r.y ** 2));
         if (v_theta > Math.PI * 2) v_theta = 0;
-        this.angularVelocity += v_theta * this.getSpeedModulation();
+        this.angularVelocity += v_theta;
 
         
     }

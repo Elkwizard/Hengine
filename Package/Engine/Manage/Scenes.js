@@ -750,13 +750,10 @@ class Scene extends InactiveScene {
 	centerCameraY(y) {
 		this.camera.y = y - height / 2;
 	}
-	moveCameraTowards(point, ferocity) {
-		let goal = P(point.x - width / 2, point.y - height / 2);
-		let pos = P(this.camera.x, this.camera.y);
-		let dif = P(goal.x - pos.x, goal.y - pos.y);
-		let move = P(Math.sign(dif.x) * ferocity, Math.sign(dif.y) * ferocity);
-		this.camera.x = pos.x + move.x;
-		this.camera.y = pos.y + move.y;
+	moveCameraTowards(point, ferocity = 0.1) {
+		const cameraPoint = this.camera.middle;
+		let dif = point.Vminus(cameraPoint).Ntimes(ferocity);
+		this.camera.middle = cameraPoint.plus(dif);
 	}
 	get zoom() {
 		return this.camera.zoom;
