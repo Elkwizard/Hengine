@@ -175,6 +175,9 @@ class Vector {
 		let dist = Math.sqrt(sum);
 		return dist;
 	}
+	get normalized() {
+		return this.get().normalize();
+	}
 	op(e, v) {
 		if (typeof v === "number") {
 			for (let x in this) {

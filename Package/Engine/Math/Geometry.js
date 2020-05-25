@@ -342,6 +342,16 @@ class Geometry {
             }
         }
     }
+    static overlapPoint(poly, p) {
+        poly.cacheBoundingBox(poly.getBoundingBox());
+        let col = Physics.collidePoint(poly, p);
+        return col.colliding;
+    }
+    static overlapShapes(poly, poly2) {
+        poly.cacheBoundingBox(poly.getBoundingBox());
+        poly2.cacheBoundingBox(poly2.getBoundingBox());
+        return Physics.collide(poly, poly2).colliding;
+    }
     static pointInsideRectangle(p, r) {
         if (!r.rotation) {
             return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;

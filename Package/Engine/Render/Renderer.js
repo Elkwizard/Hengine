@@ -39,9 +39,15 @@ class Artist {
 			circle(x, y, radius) {
 				radius = Math.abs(radius);
 				if (typeof x === "object") {
-					radius = x.radius;
-					y = x.y;
-					x = x.x;
+					if (x.radius !== undefined) {
+						radius = x.radius;
+						y = x.y;
+						x = x.x;
+					} else {
+						radius = y;
+						y = x.y;
+						x = x.x;
+					}
 				}
 				this.c.beginPath();
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);

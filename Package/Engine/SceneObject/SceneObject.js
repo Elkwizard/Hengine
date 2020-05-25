@@ -36,7 +36,7 @@ class SceneObject {
 	constructor(name, x, y, controls, tag, home) {
 		this.x = x;
 		this.y = y;
-		this.shapes = {};
+		this.shapes = { };
 		this.rotation = 0;
 		this.name = name;
 		this.home = home;
@@ -68,6 +68,9 @@ class SceneObject {
 			interact2: function () { }
 		};
 		this.isBeingUpdated = false;
+
+		this.__width = 0;
+		this.__height = 0;
 	}
 	get middle() {
 		return new Vector2(this.x, this.y);
@@ -81,14 +84,14 @@ class SceneObject {
 		this.scale(factor);
 	}
 	get width() {
-		return this.__boundingBox.width;
+		return this.__width;
 	}
 	set height(a) {
 		let factor = a / this.height;
 		this.scale(factor);
 	}
 	get height() {
-		return this.__boundingBox.height;
+		return this.__height;
 	}
 	serializeShapes() {
 		let shapes = this.getShapes();
@@ -159,6 +162,7 @@ class SceneObject {
 		this.shapes[name] = shape;
 		if (shape instanceof Polygon && !(shape instanceof Rect)) shape.subdivideForCollisions();
 		this.cacheBoundingBoxes();
+		this.cacheDimensions();
 	}
 	centerModels() {
 		let center = Vector2.origin;
@@ -175,17 +179,28 @@ class SceneObject {
 			shape.move(dif);
 		}
 	}
+	cacheDimensions() {
+		let old_rot = this.rotation;
+		this.rotation = 0;
+		let bound = this.getBoundingBox();
+		this.__width = bound.width;
+		this.__height = bound.height;
+		this.rotation = old_rot;
+	}
 	removeShape(name) {
 		let shape = this.shapes[name];
 		delete this.shapes[name];
+		this.cacheDimensions();
 		return shape;
 	}
 	removeAllShapes() {
 		let names = [];
 		for (let [name, shape] of this.shapes) names.push(name);
+		let shapes = [];
 		for (let name of names) {
-			delete this.shapes[name];
+			shapes.push(this.removeShape(name));
 		}
+		return shapes;
 	}
 	getShape(name) {
 		return this.shapes[name];
@@ -303,7 +318,7 @@ class SceneObject {
 		// for (let shape of this.getShapes()) c.stroke(cl.GREEN, 1).rect(shape.__boundingBox);
 		this.scripts.run("escapeDraw");
 	}
-	enginePhysicsUpdate(hitboxes) {
+	engineFixedUpdate(hitboxes) {
 		if (this.controls) {
 			this.move();
 		}

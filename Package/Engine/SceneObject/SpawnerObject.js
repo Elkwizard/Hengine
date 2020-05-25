@@ -91,12 +91,12 @@ class ParticleSpawnerObject extends SceneObject {
         }
 
     }
-    enginePhysicsUpdate() {
+    engineFixedUpdate() {
         if (this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
             this.spawnParticle();
         }
         for (let [name, particle] of this.spawns) {
-            particle.enginePhysicsUpdate();
+            particle.engineFixedUpdate();
             particle.lifeSpan++;
         }
         this.update();
@@ -162,7 +162,7 @@ class ParticleObject extends SceneObject {
         this.drawSuffix();
         this.scripts.run("escapeDraw");
     }
-    enginePhysicsUpdate() {
+    engineFixedUpdate() {
         this.lastX = this.x;
         this.lastY = this.y;
         if (this.spawner.particleFalls) {

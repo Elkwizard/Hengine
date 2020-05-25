@@ -12,6 +12,12 @@ class Collision {
         }
     }
 }
+class CollisionPair {
+    constructor(object, checks) {
+        this.object = object;
+        this.others = checks;
+    }
+}
 class CollisionMoniter {
     constructor() {
         this.top = null;
@@ -104,8 +110,8 @@ class Constraint {
         let pB = Geometry.rotatePointAround(bM, bM.Vplus(this.bOffset), this.b.rotation);
         return new Line(pA, pB);
     }
-    solve() {
-        Physics.solveLengthConstraint(this);
+    solve(intensity = 1) {
+        Physics.solveLengthConstraint(this, intensity);
     }
 }
 class Physics {
@@ -513,10 +519,6 @@ class Physics {
             if (!b.colliding.top) b.colliding.top = [a];
             else if (!b.colliding.top.includes(a)) b.colliding.top.push(a);
         }
-        // if (s.collisionEvents) {
-        //     Physics.runEventListeners(a);
-        //     Physics.runEventListeners(b);
-        // }
     }
     static runEventListeners(a) {
         function runEvents(name) {
@@ -549,75 +551,77 @@ class Physics {
         for (let i = 0; i <= d.x; i++) for (let j = 0; j <= d.y; j++) cells.push(A.plus(new Vector2(i, j)));
 
         return cells;
-        // //bad
-        // a = a.over(cellSize);
-        // b = b.over(cellSize);
-        // function floor(v) {
-        //     return new Vector2(Math.floor(v.x), Math.floor(v.y));
-        // }
-        // if (!(b.x - a.x)) {
-        //     let mag = b.y - a.y;
-        //     let ps = [];
-        //     for (let i = 0; i < mag; i++) {
-        //         ps.push(floor(new Vector2(a.x, a.y + i)));
-        //     }
-        //     return ps;
-        // }
-        // function point(v) {
-        //     c.draw(cl.RED).circle(v.x * cellSize, v.y * cellSize, 5);
-        // }
-        // const vct = b.minus(a).normalize();
-        // function getRect(x, y, m, b) {
-        //     let minX = m * x + b;
-        //     let maxX = m * (x + 1) + b;
+        
+        /*
+        //bad
+        a = a.over(cellSize);
+        b = b.over(cellSize);
+        function floor(v) {
+            return new Vector2(Math.floor(v.x), Math.floor(v.y));
+        }
+        if (!(b.x - a.x)) {
+            let mag = b.y - a.y;
+            let ps = [];
+            for (let i = 0; i < mag; i++) {
+                ps.push(floor(new Vector2(a.x, a.y + i)));
+            }
+            return ps;
+        }
+        function point(v) {
+            c.draw(cl.RED).circle(v.x * cellSize, v.y * cellSize, 5);
+        }
+        const vct = b.minus(a).normalize();
+        function getRect(x, y, m, b) {
+            let minX = m * x + b;
+            let maxX = m * (x + 1) + b;
 
-        //     let minY = (y - b) / m;
-        //     let maxY = (y + 1 - b) / m;
+            let minY = (y - b) / m;
+            let maxY = (y + 1 - b) / m;
 
-        //     let ps = [];
+            let ps = [];
 
-        //     const off = 0.0001;
-        //     if (minY > x && minY < x + 1) {
-        //         ps.push(new Vector2(minY, y - off));
-        //     }
-        //     if (maxY > x && maxY < x + 1) {
-        //         ps.push(new Vector2(maxY, y + 1 + off));
-        //     }
-        //     if (minX > y && minX < y + 1) {
-        //         ps.push(new Vector2(x - off, minX));
-        //     }
-        //     if (maxX > y && maxX < y + 1) {
-        //         ps.push(new Vector2(x + 1 + off, maxX));
-        //     }
+            const off = 0.0001;
+            if (minY > x && minY < x + 1) {
+                ps.push(new Vector2(minY, y - off));
+            }
+            if (maxY > x && maxY < x + 1) {
+                ps.push(new Vector2(maxY, y + 1 + off));
+            }
+            if (minX > y && minX < y + 1) {
+                ps.push(new Vector2(x - off, minX));
+            }
+            if (maxX > y && maxX < y + 1) {
+                ps.push(new Vector2(x + 1 + off, maxX));
+            }
 
-        //     // for (let p of ps) point(p);
+            // for (let p of ps) point(p);
 
-        //     if (!ps.length) return new Vector2(x, y);
-        //     if (ps.length === 1) return floor(ps[0]);
+            if (!ps.length) return new Vector2(x, y);
+            if (ps.length === 1) return floor(ps[0]);
 
-        //     let rt = ps[0];
-        //     if (ps[1].dot(vct) > ps[0].dot(vct)) rt = ps[1];
-        //     return floor(rt);
-        // }
-        // let points = [];
-        // let loc = floor(a);
-        // let M = (b.y - a.y) / (b.x - a.x);
-        // let B = a.y - M * a.x;
+            let rt = ps[0];
+            if (ps[1].dot(vct) > ps[0].dot(vct)) rt = ps[1];
+            return floor(rt);
+        }
+        let points = [];
+        let loc = floor(a);
+        let M = (b.y - a.y) / (b.x - a.x);
+        let B = a.y - M * a.x;
 
-        // const dist = Geometry.distToPoint2(a, b);
+        const dist = Geometry.distToPoint2(a, b);
 
-        // let steps = 0;
-        // while (Geometry.distToPoint2(a, loc) <= dist && steps < 1000) {
-        //     steps++;
+        let steps = 0;
+        while (Geometry.distToPoint2(a, loc) <= dist && steps < 1000) {
+            steps++;
 
-        //     points.push(loc);
-        //     let n = getRect(loc.x, loc.y, M, B);
-        //     if (n.equals(loc)) n = floor(n.plus(vct));
-        //     loc = n;
-        // }
-        // points.push(loc);
-        // loc = getRect(loc.x, loc.y, M, B);
-        // return points;
+            points.push(loc);
+            let n = getRect(loc.x, loc.y, M, B);
+            if (n.equals(loc)) n = floor(n.plus(vct));
+            loc = n;
+        }
+        points.push(loc);
+        loc = getRect(loc.x, loc.y, M, B);
+        return points; */
     }
     static getCells(rect, cellsize) {
         let finalCells = [];
@@ -645,46 +649,6 @@ class Physics {
                 let cells = [];
                 for (let i of indv) cells.push(...i);
                 finalCells.push(...cells);
-
-                
-
-                // let cells = [];
-                // let edges = r.getEdges().map(e => e.a.Vminus(e.b).normalize());
-                // let corners = r.getCorners();
-                // let nums = [0, 1, 2, 3];
-                // if (r.width < cellsize) {
-                //     nums = [0];
-                //     let x = (corners[0].x + corners[1].x) / 2;
-                //     let y = (corners[0].y + corners[1].y) / 2;
-                //     let x2 = (corners[2].x + corners[3].x) / 2;
-                //     let y2 = (corners[2].y + corners[3].y) / 2;
-                //     cells.push(P(x, y), P(x2, y2));
-                // }
-                // if (r.height < cellsize) {
-                //     nums = [1];
-                //     let x = (corners[1].x + corners[2].x) / 2;
-                //     let y = (corners[1].y + corners[2].y) / 2;
-                //     let x2 = (corners[3].x + corners[0].x) / 2;
-                //     let y2 = (corners[3].y + corners[0].y) / 2;
-                //     cells.push(P(x, y), P(x2, y2));
-                // }
-                // for (let i of nums) {
-                //     let crn1 = corners[i];
-                //     let crn2 = corners[i - 1] ? corners[i - 1] : corners[corners.length - 1];
-                //     let d = Geometry.distToPoint(crn1, crn2);
-                //     let dir = edges[i];
-                //     let originX = crn1.x / cellsize;
-                //     let originY = crn1.y / cellsize;
-                //     let steps = 3;
-                //     for (let j = 0; j <= Math.ceil(d / cellsize) * steps; j++) {
-                //         let x = originX + dir.x * j / steps;
-                //         let y = originY + dir.y * j / steps;
-                //         cells.push(P(Math.floor(x + 1), Math.floor(y)));
-                //         cells.push(P(Math.floor(x), Math.floor(y + 1)));
-                //         cells.push(P(Math.floor(x), Math.floor(y)));
-                //     }
-                // }
-                // finalCells.push(...cells);
             }
         }
         return finalCells;
@@ -738,10 +702,8 @@ class Physics {
 
         return { impulseA, impulseB };
     }
-
-
     //constraints
-    static solveLengthConstraint(constraint) {
+    static solveLengthConstraint(constraint, intensity) {
         let a = constraint.a;
         let b = constraint.b;
         let len = constraint.length;
@@ -761,17 +723,22 @@ class Physics {
             let dy_N0 = -dy_N * mDif;
             let dx_N1 = dx_N * mDif;
             let dy_N1 = dy_N * mDif;
-            let iA = new Impulse((new Vector2(dx_N0 / 10, dy_N0 / 10)).Ntimes(a.__mass), pA);
-            let iB = new Impulse((new Vector2(dx_N1 / 10, dy_N1 / 10)).Ntimes(b.__mass), pB);
+            const F = 1 / 10;
+            const VECTOR_A = new Vector2(dx_N0 * F, dy_N0 * F);
+            const VECTOR_B = new Vector2(dx_N1 * F, dy_N1 * F);
+            let iA = new Impulse(VECTOR_A.Ntimes(a.__mass), pA);
+            let iB = new Impulse(VECTOR_B.Ntimes(b.__mass), pB);
             if (!a.constraintLeader) {
                 a.applyImpulse(iA);
-                a.privateSetX(a.x + dx_N0);
-                a.privateSetY(a.y + dy_N0);
+                a.privateMove(VECTOR_A);
+                // a.privateSetX(a.x + dx_N0);
+                // a.privateSetY(a.y + dy_N0);
             }
             if (!b.constraintLeader) {
                 b.applyImpulse(iB);
-                b.privateSetX(b.x + dx_N1);
-                b.privateSetY(b.y + dy_N1);
+                b.privateMove(VECTOR_B);
+                // b.privateSetX(b.x + dx_N1);
+                // b.privateSetY(b.y + dy_N1);
             }
             return dif;
         }

@@ -18,19 +18,49 @@ class ScreenRecording {
 		return window.c.createAnimation(this.frames, 1, true);
 	}
 }
-class DelayedFunction {
-	constructor(fn, wait) {
+class IntervalFunction {
+	constructor(fn, len, type) {
 		this.fn = fn;
-		this.limit = wait;
+		this.type = type;
+		this.interval = len;
 		this.timer = 0;
 		this.done = false;
 	}
 	increment() {
 		this.timer++;
-		if (this.timer > this.limit) {
-			this.fn();
+		this.respond();
+		if (this.timer > this.interval) {
 			this.done = true;
 		}
+	}
+	respond() {
+
+	}
+}
+class DelayedFunction extends IntervalFunction {
+	constructor(fn, wait, type) {
+		super(fn, wait, type);
+	}
+	respond() {
+		if (this.timer > this.interval) {
+			this.fn();
+		}
+	}
+}
+class TransitionFunction extends IntervalFunction {
+	constructor(fn, wait, type) {
+		super(fn, wait, type);
+	}
+	respond() {
+		this.fn(this.timer / this.interval);
+	}
+}
+class ContinuousFunction extends IntervalFunction {
+	constructor(fn, type) {
+		super(fn, Infinity, type);
+	}
+	respond() {
+		this.fn(this.timer);
 	}
 }
 class Engine {
@@ -86,7 +116,7 @@ class Engine {
 		this.fixedScript = new Script("fixed");
 		this.beforeScript = new Script("before");
 		this.updateScript = new Script("update");
-		this.delayed = [];
+		this.intervalFns = [];
 
 		M.engine = this;
 		//for real this time
@@ -95,7 +125,7 @@ class Engine {
 				if (this.hasFixedPhysicsUpdateCycle) if (!this.paused) {
 					this.fixedUpdate();
 					this.fixedScript.run();
-					this.scene.enginePhysicsUpdate();
+					this.scene.engineFixedUpdate();
                     this.afterFixedUpdate();
 				}
 			} catch (e) {
@@ -123,17 +153,19 @@ class Engine {
 				if (!this.paused) {
 					K.update();
 					M.update();
-					this.updateDelayedCalls();
+					this.updateIntervalCalls("BEFORE");
 					this.beforeUpdate();
 					this.clear();
+					this.updateIntervalCalls("UPDATE");
 					this.update();
 					this.scene.engineDrawUpdate();
 					if (!this.hasFixedPhysicsUpdateCycle) {
 						this.fixedUpdate();
 						this.fixedScript.run();
-						this.scene.enginePhysicsUpdate();
+						this.scene.engineFixedUpdate();
 						this.afterFixedUpdate();
 					}
+					this.updateIntervalCalls("AFTER");
 					this.afterUpdate();
 					this.updateScreenRecordings();
 					M.last = { x: M.x, y: M.y };
@@ -207,16 +239,25 @@ class Engine {
 			if (r.isRecording) r.frames.push(f);
 		}
 	}
-	delay(fn, frames) {
-		this.delayed.push(new DelayedFunction(fn, frames));
+	continuous(fn, type = "AFTER") {
+		this.intervalFns.push(new ContinuousFunction(fn, type.toUpperCase()));
 	}
-	updateDelayedCalls() {
+	transition(fn, frames, type = "BEFORE") {
+		this.intervalFns.push(new TransitionFunction(fn, frames, type.toUpperCase()));
+	}
+	delay(fn, frames, type = "BEFORE") {
+		this.intervalFns.push(new DelayedFunction(fn, frames, type.toUpperCase()));
+	}
+	updateIntervalCalls(type) {
 		let remaining = [];
-		for (let i = 0; i < this.delayed.length; i++) {
-			this.delayed[i].increment();
-			if (!this.delayed[i].done) remaining.push(this.delayed[i]);
+		for (let i = 0; i < this.intervalFns.length; i++) {
+			const int_fn = this.intervalFns[i];
+			if (int_fn.type === type) {
+				int_fn.increment();
+			}
+			if (!int_fn.done) remaining.push(int_fn);
 		}
-		this.delayed = remaining;
+		this.intervalFns = remaining;
 	}
 	makeGraph(yName, minValue, maxValue, getY, msLimit = 5000, colors) {
 		if (this.hasGraphs) {

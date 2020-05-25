@@ -507,6 +507,12 @@ class Scene extends InactiveScene {
 		}.bind(this);
 		this.cellSize = 150;
 		this.removeQueue = [];
+
+		this.physics = {
+			gravitySort() {
+
+			}
+		}
 	}
 	drawInWorldSpace(artist) {
 		this.c.save();
@@ -520,7 +526,7 @@ class Scene extends InactiveScene {
 		artist();
 		this.c.restore();
 	}
-	enginePhysicsUpdate() {
+	engineFixedUpdate() {
 		let startTime = performance.now();
 		this.SAT = {
 			possibleChecks: 0,
@@ -538,23 +544,65 @@ class Scene extends InactiveScene {
 		}
 		for (let rect of this.containsArray) rect.pushToRemoveQueue = p;
 		//grid
-		let cells = {};
-		let isUseless = a => !(a instanceof PhysicsObject);
-		let useful = [];
-		let useless = [];
 
 		//custom before updates run
 		for (let el of this.containsArray) {
 			el.scripts.run("beforeUpdate");
 		}
 
-		let sortedEls = this.containsArray;
-		for (let rect of sortedEls) {
+		const arrays = this.extractUsefulCellArrays(this.containsArray);
+
+		//physics
+		this.gravitySort(arrays.useful);
+		this.gravityPhase(arrays.usefulArray);
+		this.constraintSolve();
+		this.collisionStep(arrays.useful);
+		this.constraintSolve();
+		this.collisionStep([...arrays.useful].reverse());
+
+		//events
+		if (this.collisionEvents) this.runEventListeners(arrays.usefulArray);
+
+		//particle movement
+		for (let rect of arrays.useless) if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
+
+		//non collision fixed update
+		this.physicsObjectFixedUpdate(this.containsArray)
+
+		for (let rect of q) rect.home.removeElement(rect);
+		this.removeQueue = [];
+		for (let rect of this.containsArray) rect.isBeingUpdated = false;
+		// console.log(performance.now() - startTime);
+	}
+	physicsObjectFixedUpdate(useful) {
+		for (let rect of useful) {
+			rect.engineFixedUpdate();
+		}
+	}
+	runEventListeners(useful) {
+		for (let el of useful) {
+			Physics.runEventListeners(el);
+		}
+	}
+	gravityPhase(useful) {
+		for (let el of useful) {
+			let rect = el;
+			rect.applyGravity(1);
+		}
+	}
+	extractUsefulCellArrays(elements) {
+		let cells = { };
+		let useful = [];
+		let useless = [];
+		let isUseless = a => !(a instanceof PhysicsObject);
+		//categorize
+		for (let rect of elements) {
 			if (isUseless(rect)) {
 				useless.push(rect);
 				continue;
 			} else useful.push([rect]);
 		}
+		//get cells, accumulate cells
 		for (let usef of useful) {
 			let rect = usef[0];
 			let cls = Physics.getCells(rect, this.cellSize);
@@ -566,7 +614,8 @@ class Scene extends InactiveScene {
 				use.push(cells[key]);
 			}
 		}
-		for (let usef of useful) {
+		//map to collisionPairs
+		useful = useful.map(usef => {
 			//get rectangles
 			let [rect, ...updateCells] = usef;
 			let updater = [];
@@ -575,68 +624,10 @@ class Scene extends InactiveScene {
 					if (r !== rect && !updater.includes(r)) updater.push(r);
 				}
 			}
-			usef.push(updater);
-		}
-		useful = [...(new Set(useful))];
-		const dir = this.gravity.get().normalize();
-		useful = useful.sort(function (a, b) {
-			let mA = Vector2.fromPoint(a[0]);
-			let mB = Vector2.fromPoint(b[0]);
-			let dA = mA.dot(dir);
-			let dB = mB.dot(dir);
-			return dB - dA;
+			return new CollisionPair(rect, updater);
 		});
-		//gravity phase
-		for (let el of useful) {
-			let rect = el[0];
-			rect.applyGravity(1);
-		}
-		//solve constraints #1
-		for (let constraint of this.constraints) {
-			constraint.solve();
-		}
-
-		//collision phase
-		for (let i = 0; i < useful.length; i++) {
-			let rect = useful[i][0];
-			let updater = useful[i][useful[i].length - 1];
-
-			this.SAT.gridChecks += updater.length;
-			this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
-			if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
-			rect.physicsUpdate(updater);
-		}
-
-		//solve constraints #2
-		for (let constraint of this.constraints) {
-			constraint.solve();
-		}
-
-		//collision phase
-		for (let i = useful.length - 1; i > 0; i--) {
-			let rect = useful[i][0];
-			let updater = useful[i][useful[i].length - 1];
-
-			this.SAT.gridChecks += updater.length;
-			this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
-			rect.physicsUpdate(updater);
-		}
-		let usefulElements = useful.map(e => e[0]);
-		if (this.collisionEvents) for (let el of usefulElements) {
-			Physics.runEventListeners(el);
-		}
-
-		//custom updates run
-		for (let usef of useful) {
-			let rect = usef[0];
-			rect.enginePhysicsUpdate();
-		}
-
-		//non collision fixed update
-		for (let rect of useless) {
-			if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
-			rect.enginePhysicsUpdate();
-		}
+		//remove duplicates
+		useful = [...(new Set(useful))];
 
 		// // show cells
 		// this.drawInWorldSpace(e => {
@@ -655,11 +646,36 @@ class Scene extends InactiveScene {
 		// 		// c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
 		// 	}
 		// });
+		
+		let usefulArray = useful.map(e => e.object);
+		return { useful, useless, usefulArray };
+	}
+	gravitySort(useful) {
+		const dir = this.gravity.get().normalize();
+		useful.sort(function (a, b) {
+			let mA = Vector2.fromPoint(a.object);
+			let mB = Vector2.fromPoint(b.object);
+			let dA = mA.dot(dir);
+			let dB = mB.dot(dir);
+			return dB - dA;
+		});
+	}
+	collisionStep(useful) {
+		for (let i = 0; i < useful.length; i++) {
+			let rect = useful[i].object;
+			let updater = useful[i].others;
 
-		for (let rect of q) rect.home.removeElement(rect);
-		this.removeQueue = [];
-		for (let rect of this.containsArray) rect.isBeingUpdated = false;
-		// console.log(performance.now() - startTime);
+			this.SAT.gridChecks += updater.length;
+			this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
+			if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
+			rect.physicsUpdate(updater);
+		}
+	}
+	constraintSolve() {
+		let random = this.constraints.randomize();
+		for (let constraint of random) {
+			constraint.solve();
+		}
 	}
 	constrain(a, b, aOffset = Vector2.origin, bOffset = Vector2.origin, length = "CURRENT_DIST") {
 		this.constraints.push(new Constraint(a, b, aOffset, bOffset, length));

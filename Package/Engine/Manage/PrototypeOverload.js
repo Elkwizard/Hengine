@@ -4,9 +4,14 @@ Function.prototype.add = function (fn = function () { }) {
 	return function (...a) {
 		self(...a);
 		return fn(...a);
-	}
+	};
 }
-Function.prototype.performance = function(...args) {
+Function.prototype.param = function (...args) {
+	return function () {
+		this(...args);
+	};
+}
+Function.prototype.performance = function (...args) {
 	const t_1 = performance.now();
 	const iter = 100;
 	for (let i = 0; i < iter; i++) {
@@ -14,6 +19,14 @@ Function.prototype.performance = function(...args) {
 	}
 	const t_2 = performance.now();
 	return (t_2 - t_1) / iter;
+}
+Array.prototype.randomize = function() {
+	const result = [];
+	const copy = [...this];
+	while (copy.length) {
+		result.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+	}
+	return result;
 }
 Number.prototype.toDegrees = function () {
 	return this * (180 / Math.PI);

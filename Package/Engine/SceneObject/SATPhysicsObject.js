@@ -174,7 +174,7 @@ class PhysicsObject extends SceneObject {
         this.hasGravity = true;
         this.slows = true;
     }
-    demobilize() {
+    immobilize() {
         this.completelyStatic = true;
         this.hasGravity = false;
         this.slows = false;
@@ -327,7 +327,7 @@ class PhysicsObject extends SceneObject {
     getSpeedModulation() {
         return this.home.speedModulation / this.home.physicsRealism;
     }
-    enginePhysicsUpdate() {
+    engineFixedUpdate() {
         this.scripts.run("update");
         this.update();
 
@@ -389,6 +389,12 @@ class PhysicsObject extends SceneObject {
             if (isNaN(this.velocity.y)) this.velocity.y = 0;
             if (isNaN(this.x)) this.x = this.last.x;
             if (isNaN(this.y)) this.y = this.last.y;
+
+            // if (this.velocity.mag < 0.0001 && this.angularVelocity < 0.0001) {
+            //     this.x = this.last.x;
+            //     this.y = this.last.y;
+            //     this.rotation = this.lastRotation;
+            // }
         });
     }
     cacheMass() {
@@ -422,7 +428,7 @@ class PhysicsObject extends SceneObject {
     }
     applyLinearImpulse(impulse, name) {
         if (!impulse) return;
-        const vel = impulse.force
+        const vel = impulse.force;//.Ntimes(this.getImpulseRatio(impulse.source, impulse.force.normalized))
         this.velocity.Vadd(vel);
     }
     applyAngularImpulse(impulse, name) {
