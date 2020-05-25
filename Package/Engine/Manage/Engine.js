@@ -221,11 +221,11 @@ class Engine {
 			]);
 		}
 	}
-	get preservePixelart() {
-		return !this.renderer.c.imageSmoothingEnabled;
-	}
 	set preservePixelart(a) {
 		this.renderer.c.imageSmoothingEnabled = !a;
+	}
+	get preservePixelart() {
+		return !this.renderer.c.imageSmoothingEnabled;
 	}
 	createScreenRecording(name) {
 		this.recordings[name] = new ScreenRecording(name);

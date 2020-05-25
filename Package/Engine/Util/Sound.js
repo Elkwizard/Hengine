@@ -91,51 +91,6 @@ class Sound {
             aud.play();
         }
     }
-    static async noteSequenceLoop(notes, iterations) {
-        for (let n = 0; n < iterations; n++) {
-            await Sound.noteSequence(notes);
-        }
-    }
-    static async noteSequence(notes) {
-        for (let i = 0; i < notes.length; i++) {
-            await Sound.note(notes[i]);
-        }
-    }
-    static wave(hertz, duration, type, volume) {
-        const LERP_LENGTH = .1;
-        let osc = Sound.context.createOscillator();
-        osc.type = type;
-        osc.frequency.value = hertz;
-        osc.start();
-        let gainNode = Sound.context.createGain();
-        osc.connect(gainNode);
-        const SEC_DURATION = duration / 1000;
-        const CURRENT_TIME = Sound.context.currentTime;
-        gainNode.gain.value = 0.00001;
-        gainNode.gain.exponentialRampToValueAtTime(volume, CURRENT_TIME + SEC_DURATION * LERP_LENGTH);
-        gainNode.gain.setValueAtTime(volume, CURRENT_TIME + SEC_DURATION - SEC_DURATION * LERP_LENGTH);
-        gainNode.gain.exponentialRampToValueAtTime(0.00001, CURRENT_TIME + SEC_DURATION);
-        gainNode.connect(Sound.gainNode);
-        return new Promise(function (resolve) {
-            setTimeout(function () {
-                osc.stop();
-                gainNode.disconnect(Sound.gainNode);
-                resolve();
-            }, duration);
-        });
-    }
-    static sawtooth(hertz, duration, volume = 1) {
-        return Sound.wave(hertz, duration, "sawtooth", volume);
-    }
-    static sin(hertz, duration, volume = 1) {
-        return Sound.wave(hertz, duration, "sine", volume);
-    }
-    static square(hertz, duration, volume = 1) {
-        return Sound.wave(hertz, duration, "square", volume);
-    }
-    static triangle(hertz, duration, volume = 1) {
-        return Sound.wave(hertz, duration, "triangle", volume);
-    }
     static get noteFrequencyTable() {
         return {
             "C0": 16.35,
@@ -247,6 +202,51 @@ class Sound {
             "A#8": 7458.62,
             "B8": 7902.13
         }
+    }
+    static async noteSequenceLoop(notes, iterations) {
+        for (let n = 0; n < iterations; n++) {
+            await Sound.noteSequence(notes);
+        }
+    }
+    static async noteSequence(notes) {
+        for (let i = 0; i < notes.length; i++) {
+            await Sound.note(notes[i]);
+        }
+    }
+    static wave(hertz, duration, type, volume) {
+        const LERP_LENGTH = .1;
+        let osc = Sound.context.createOscillator();
+        osc.type = type;
+        osc.frequency.value = hertz;
+        osc.start();
+        let gainNode = Sound.context.createGain();
+        osc.connect(gainNode);
+        const SEC_DURATION = duration / 1000;
+        const CURRENT_TIME = Sound.context.currentTime;
+        gainNode.gain.value = 0.00001;
+        gainNode.gain.exponentialRampToValueAtTime(volume, CURRENT_TIME + SEC_DURATION * LERP_LENGTH);
+        gainNode.gain.setValueAtTime(volume, CURRENT_TIME + SEC_DURATION - SEC_DURATION * LERP_LENGTH);
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, CURRENT_TIME + SEC_DURATION);
+        gainNode.connect(Sound.gainNode);
+        return new Promise(function (resolve) {
+            setTimeout(function () {
+                osc.stop();
+                gainNode.disconnect(Sound.gainNode);
+                resolve();
+            }, duration);
+        });
+    }
+    static sawtooth(hertz, duration, volume = 1) {
+        return Sound.wave(hertz, duration, "sawtooth", volume);
+    }
+    static sin(hertz, duration, volume = 1) {
+        return Sound.wave(hertz, duration, "sine", volume);
+    }
+    static square(hertz, duration, volume = 1) {
+        return Sound.wave(hertz, duration, "square", volume);
+    }
+    static triangle(hertz, duration, volume = 1) {
+        return Sound.wave(hertz, duration, "triangle", volume);
     }
     static note(note) {
         return note.play();

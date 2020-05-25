@@ -82,12 +82,12 @@ class PhysicsObject extends SceneObject {
         //scene
         this.usedForCellSize = false;
     }
+    set gravity(a) {
+        this._gravity = a;
+    }
     get gravity() {
         if (this._gravity === null) return this.home.gravity;
         else return this._gravity;
-    }
-    set gravity(a) {
-        this._gravity = a;
     }
     set friction(a) {
         this._friction = a;

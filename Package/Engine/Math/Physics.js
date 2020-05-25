@@ -55,11 +55,11 @@ class Range {
         this.min = min;
         this.max = max;
     }
-    fix() {
-        if (this._min > this._max) [this._min, this._max] = [this._max, this._min];
-    }
     get mean() {
         return (this.min + this.max) / 2;
+    }
+    fix() {
+        if (this._min > this._max) [this._min, this._max] = [this._max, this._min];
     }
     extend(n) {
         this.min -= n;

@@ -311,6 +311,18 @@ class Hengine {
 	loadAnimation(src) {
 		return Animation.copy(this.animations[src]);
 	}
+	rand(sd) {
+		let seed = this.randomSeed++;
+		if (sd !== undefined) seed = sd;
+		let a = (seed * 6.12849) % 8.7890975
+		let b = (a * 256783945.4758903) % 238462.567890;
+		let r = (a * b) % 1;
+		this.randomSeed += r;
+		return r;
+	}
+	middle() {
+		return this.c.middle();
+	}
 	static get defaultRenderPackage() {
 		return ["Color", "Shapes", "Spline", "Animation", "Frame", "Texture", "Renderer", "Graph"];
 	}
@@ -414,17 +426,5 @@ class Hengine {
 				}
 			}
 		}
-	}
-	rand(sd) {
-		let seed = this.randomSeed++;
-		if (sd !== undefined) seed = sd;
-		let a = (seed * 6.12849) % 8.7890975
-		let b = (a * 256783945.4758903) % 238462.567890;
-		let r = (a * b) % 1;
-		this.randomSeed += r;
-		return r;
-	}
-	middle() {
-		return this.c.middle();
 	}
 }

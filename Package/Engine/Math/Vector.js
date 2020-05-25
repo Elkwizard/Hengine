@@ -366,19 +366,36 @@ class Vector2 extends Vector {
 		this.x = x;
 		this.y = y;
 	}
-	static get origin() {
-		return new Vector2(0, 0);
+	set angle(angle) {
+		const M = this.mag;
+		if (M) {
+			const v = Vector2.fromAngle(angle);
+			this.x = v.x * M;
+			this.y = v.y * M;
+		}
 	}
-	static random() {
-		return new Vector2((Math.random() * 2) - 1, (Math.random() * 2) - 1);
+	get angle() {
+		return this.getAngle();
 	}
-	static fromAngle(a) {
-		let x = Math.cos(a);
-		let y = Math.sin(a);
-		return new Vector2(x, y);
+	set normal(a) {
+		let normNorm = new Vector2(-a.y, a.x);
+		normNorm.mag = this.mag;
+		this.x = normNorm.x;
+		this.y = normNorm.y;
+		return this;
 	}
-	static fromPoint(p) {
-		return new Vector2(p.x, p.y);
+	get normal() {
+		return new Vector2(-this.y, this.x);
+	}
+	set mag(m) {
+		let M = this.mag;
+		if (M) {
+			this.x /= M / m;
+			this.y /= M / m;
+		}
+	}
+	get mag() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
 	op(e, v) {
 		if (typeof v === "number") {
@@ -402,26 +419,6 @@ class Vector2 extends Vector {
 	}
 	getAngle() {
 		return Math.atan2(this.y, this.x);
-	}
-	set normal(a) {
-		let normNorm = new Vector2(-a.y, a.x);
-		normNorm.mag = this.mag;
-		this.x = normNorm.x;
-		this.y = normNorm.y;
-		return this;
-	}
-	get normal() {
-		return new Vector2(-this.y, this.x);
-	}
-	set mag(m) {
-		let M = this.mag;
-		if (M) {
-			this.x /= M / m;
-			this.y /= M / m;
-		}
-	}
-	get mag() {
-		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
 	normalize() {
 		let m = this.mag;
@@ -495,6 +492,20 @@ class Vector2 extends Vector {
 		this.y /= v;
 		return this;
 	}
+	static get origin() {
+		return new Vector2(0, 0);
+	}
+	static random() {
+		return new Vector2((Math.random() * 2) - 1, (Math.random() * 2) - 1);
+	}
+	static fromAngle(a) {
+		let x = Math.cos(a);
+		let y = Math.sin(a);
+		return new Vector2(x, y);
+	}
+	static fromPoint(p) {
+		return new Vector2(p.x, p.y);
+	}
 }
 class Vector3 extends Vector {
 	constructor(x, y, z) {
@@ -508,11 +519,11 @@ class Vector3 extends Vector {
 			this.z = x;
 		}
 	}
-	static fromPoint(p) {
-		return new Vector3(p.x, p.y, p.z);
-	}
 	static get origin() {
 		return new Vector3(0, 0, 0);
+	}
+	static fromPoint(p) {
+		return new Vector3(p.x, p.y, p.z);
 	}
 	static random() {
 		return new Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);

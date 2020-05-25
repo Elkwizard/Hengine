@@ -72,12 +72,12 @@ class SceneObject {
 		this.__width = 0;
 		this.__height = 0;
 	}
-	get middle() {
-		return new Vector2(this.x, this.y);
-	}
 	set middle(a) {
 		this.x = a.x;
 		this.y = a.y;
+	}
+	get middle() {
+		return new Vector2(this.x, this.y);
 	}
 	set width(a) {
 		let factor = a / this.width;
