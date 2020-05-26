@@ -110,6 +110,7 @@ class Polygon extends Shape {
 	constructor(vertices, rotation = 0) {
 		super(rotation);
 		this.vertices = vertices;
+		this.vertexDirection = true;
 	}
 	set middle(a) {
 		this.center(a);
@@ -127,8 +128,11 @@ class Polygon extends Shape {
 		for (let el of edges) sum += Math.sqrt((el.b.x - el.a.x) ** 2 + (el.b.y - el.a.y) ** 2);
 		return sum;
 	}
-	subdivideForCollisions() {
-		this.collisionShapes = Geometry.subdividePolygon(this);
+	subdivideForCollisions(direction) {
+		if (direction === undefined) direction = this.vertexDirection;
+		else this.vertexDirection = direction;
+		this.collisionShapes = Geometry.subdividePolygon(this, direction);
+		// console.trace(this.vertices.length);
 	}
 	getBoundingBox() {
 		let x = this.vertices.map(e => e.x);
@@ -198,12 +202,12 @@ class Polygon extends Shape {
 	scale(factor) {
 		let middle = this.middle;
 		this.vertices = this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor)));
-		this.subdivideForCollisions();
+		this.subdivideForCollisions(this.vertexDirection);
 		return this;
 	}
 	scaleAbout(pos, factor) {
 		this.vertices = this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor)));
-		this.subdivideForCollisions();
+		this.subdivideForCollisions(this.vertexDirection);
 		return this;
 	}
 	move(dir) {
@@ -211,7 +215,9 @@ class Polygon extends Shape {
 		return this;
 	}
 	get() {
-		return new Polygon([...this.vertices], this.rotation);
+		let poly = new Polygon([...this.vertices], this.rotation);
+		poly.vertexDirection = this.vertexDirection;
+		return poly;
 	}
 }
 class Rect extends Polygon {

@@ -92,11 +92,12 @@ class Range {
     }
 }
 class Constraint {
-    constructor(a, b, aOffset, bOffset, length) {
+    constructor(a, b, aOffset, bOffset, length, stiffness) {
         this.a = a;
         this.b = b;
         this.aOffset = aOffset;
         this.bOffset = bOffset;
+        this.stiffness = stiffness;
         if (length === "CURRENT_DIST") {
             let ends = this.getEnds();
             length = Geometry.distToPoint(ends.a, ends.b);
@@ -407,10 +408,10 @@ class Physics {
 
         }
         for (let iA of impulsesA) {
-            a.applyImpulse(iA, iA.name);
+            a.internalApplyImpulse(iA, iA.name);
         }
         for (let iB of impulsesB) {
-            b.applyImpulse(iB, iB.name);
+            b.internalApplyImpulse(iB, iB.name);
         }
     }
     static resolve(col) {
@@ -723,19 +724,19 @@ class Physics {
             let dy_N0 = -dy_N * mDif;
             let dx_N1 = dx_N * mDif;
             let dy_N1 = dy_N * mDif;
-            const F = 1 / 10;
+            const F = 1 / 10 * intensity * constraint.stiffness;
             const VECTOR_A = new Vector2(dx_N0 * F, dy_N0 * F);
             const VECTOR_B = new Vector2(dx_N1 * F, dy_N1 * F);
             let iA = new Impulse(VECTOR_A.Ntimes(a.__mass), pA);
             let iB = new Impulse(VECTOR_B.Ntimes(b.__mass), pB);
             if (!a.constraintLeader) {
-                a.applyImpulse(iA);
+                a.internalApplyImpulse(iA);
                 a.privateMove(VECTOR_A);
                 // a.privateSetX(a.x + dx_N0);
                 // a.privateSetY(a.y + dy_N0);
             }
             if (!b.constraintLeader) {
-                b.applyImpulse(iB);
+                b.internalApplyImpulse(iB);
                 b.privateMove(VECTOR_B);
                 // b.privateSetX(b.x + dx_N1);
                 // b.privateSetY(b.y + dy_N1);

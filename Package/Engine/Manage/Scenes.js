@@ -553,12 +553,14 @@ class Scene extends InactiveScene {
 		const arrays = this.extractUsefulCellArrays(this.containsArray);
 
 		//physics
-		this.gravitySort(arrays.useful);
-		this.gravityPhase(arrays.usefulArray);
-		this.constraintSolve();
-		this.collisionStep(arrays.useful);
-		this.constraintSolve();
-		this.collisionStep([...arrays.useful].reverse());
+		for (let i = 0; i < this.physicsRealism; i++) {
+			this.gravitySort(arrays.useful);
+			this.gravityPhase(arrays.usefulArray);
+			this.constraintSolve();
+			this.collisionStep(arrays.useful);
+			this.constraintSolve();
+			this.collisionStep([...arrays.useful].reverse());
+		}
 
 		//events
 		if (this.collisionEvents) this.runEventListeners(arrays.usefulArray);
@@ -672,13 +674,15 @@ class Scene extends InactiveScene {
 		}
 	}
 	constraintSolve() {
-		let random = this.constraints.randomize();
-		for (let constraint of random) {
-			constraint.solve();
+		for (let i = 1; i < 3; i++) {
+			let random = this.constraints.randomize();
+			for (let constraint of random) {
+				constraint.solve(1 / i);
+			}
 		}
 	}
-	constrain(a, b, aOffset = Vector2.origin, bOffset = Vector2.origin, length = "CURRENT_DIST") {
-		this.constraints.push(new Constraint(a, b, aOffset, bOffset, length));
+	constrain(a, b, aOffset = Vector2.origin, bOffset = Vector2.origin, length = "CURRENT_DIST", stiffness = 1) {
+		this.constraints.push(new Constraint(a, b, aOffset, bOffset, length, stiffness));
 	}
 	recalculateAverageCellSize(newEl) {
 		let oldAvg = this.cellSize;

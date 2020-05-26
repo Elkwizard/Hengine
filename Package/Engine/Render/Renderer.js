@@ -92,6 +92,11 @@ class Artist {
 				this.c.lineTo(v1.x, v1.y);
 			},
 			text(font, text, x, y, pack = false) {
+				if (typeof x === "object") {
+					y = x.y;
+					x = x.x;
+					pack = y;
+				}
 				text = text + "";
 				this.c.font = font;
 				if (pack) {

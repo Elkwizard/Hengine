@@ -163,7 +163,10 @@ class Tri {
         this.color = cl.WHITE;
         const mags = this.vertices.map(e => e.mag);
 		this.maxZ = Math.max(...this.vertices.map(e => e.z));
-		this.minZ = Math.min(...this.vertices.map(e => e.z));
+        this.minZ = Math.min(...this.vertices.map(e => e.z));
+        // this.sortZ = (this.vertices[0].mag + this.vertices[1].mag + this.vertices[2].mag) / 3;
+        this.sortMinZ = Math.min(...this.vertices.map(e => e.mag));
+        this.sortMaxZ = Math.max(...this.vertices.map(e => e.mag));
 	}
 	t_rotate(r, v) {
 		let tri = this.rotate(r, v);
@@ -242,7 +245,11 @@ class Mesh {
 			}
 			return dot >= 0;
 		});
-		m_1.tris.sort((a, b) => b.maxZ - a.maxZ);
+		m_1.tris.sort((a, b) => {
+            if (a.sortMaxZ < b.sortMaxZ) return 1;
+            if (a.sortMaxZ > b.sortMaxZ) return -1;
+            return 0;
+        });
 		let m_0 = m_1.project();
 		m_0 = m_0.each(tri => tri.each(v => {
 			return new Vector3(v.x + width / 2, v.y + height / 2, v.z);

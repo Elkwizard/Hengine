@@ -204,48 +204,6 @@ class PhysicsObject extends SceneObject {
             return sum;
         } else return this.velocity;
     }
-    slowDown() {
-        //apply linear drag;
-        let drag = this.velocity.get().Nmul(-(1 - this.linearDragForce) * this.__mass);
-        let iD = new Impulse(drag, this.centerOfMass);
-        this.applyImpulse(iD, "drag");
-
-        if (this.velocity.mag < 0.01) this.velocity.mag = 0;
-        if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
-        
-        //wacky air
-        // let removals = [];
-
-        // //find surface area against wind
-        // let totalSize = 0;
-        // for (let name in this.shapes) {
-        //     let model = this.getModel(name);
-        //     let edges = model.getEdges();
-        //     for (let edge of edges) {
-        //         c.stroke(cl.LIME, 2).line(edge);
-        //         let a = edge.a;
-        //         let b = edge.b;
-        //         let v = b.minus(a).normal;
-        //         v = v.projectOnto(this.velocity);
-        //         totalSize += v.mag;
-        //         removals.push(v);
-        //     }
-        // }
-        // let rmI = 0;
-        // for (let name in this.shapes) {
-        //     let model = this.getModel(name);
-        //     let edges = model.getEdges();
-        //     for (let edge of edges) {
-        //         c.stroke(cl.LIME, 2).line(edge);
-        //         let v = removals[rmI++].over(totalSize);
-        //         if (v.dot(this.velocity) < 0) {
-        //             let mid = edge.midPoint;
-        //             let r = v.times(this.velocity);
-        //             c.stroke(cl.RED, 2).arrow(mid.minus(v.times(200)), mid);
-        //         }
-        //     }
-        // }
-    }
     capSpeed() {
         let m = Math.sqrt(this.mass) / 2;
         if (this.velocity.mag > m) this.velocity.mag = m;
@@ -316,6 +274,7 @@ class PhysicsObject extends SceneObject {
             let dif = dB - dA;
             return -dif;
         });
+        others = [...others.filter(e => e.completelyStatic), ...others.filter(e => !e.completelyStatic)];
         let collisions;
         if (!this.completelyStatic) collisions = this.detectCollisions(others);
         if (!this.completelyStatic) {
@@ -347,39 +306,46 @@ class PhysicsObject extends SceneObject {
             let gv = this.gravity;
             let gravitationalForce = gv.Ntimes(coef * this.__mass);
             let iG = new Impulse(gravitationalForce, this.centerOfMass);
-            this.applyImpulse(iG, "gravity");
+            this.internalApplyImpulse(iG, "gravity");
         }
+    }
+    slowDown() {
+        //apply linear drag;
+        let drag = this.velocity.get().Nmul(-(1 - this.linearDragForce) * this.__mass / this.home.physicsRealism);
+        let iD = new Impulse(drag, this.centerOfMass);
+        this.internalApplyImpulse(iD, "drag");
+
+        if (this.velocity.mag < 0.01) this.velocity.mag = 0;
+        if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
     }
     physicsUpdate(others) {
         s.drawInWorldSpace(e => {
             let spdMod = this.getSpeedModulation();
-            for (let i = 0; i < this.home.physicsRealism; i++) {
-                //slow
-                if (this.slows) this.slowDown();
-                
-                //linear
-                this.velocity.Vadd(this.acceleration.Ntimes(spdMod));
-                if (this.limitsVelocity) this.capSpeed();
-                if (this.positionStatic || this.velocity.mag > 30) this.velocity.Nmul(0);
+            //slow
+            if (this.slows) this.slowDown();
+            
+            //linear
+            this.velocity.Vadd(this.acceleration.Ntimes(spdMod));
+            if (this.limitsVelocity) this.capSpeed();
+            if (this.positionStatic || this.velocity.mag > 30) this.velocity.Nmul(0);
 
 
-                let newX = this.x + this.velocity.x * 2 * spdMod;
-                let newY = this.y + this.velocity.y * 2 * spdMod;
-                this.privateSetX(newX);
-                this.privateSetY(newY);
+            let newX = this.x + this.velocity.x * 2 * spdMod;
+            let newY = this.y + this.velocity.y * 2 * spdMod;
+            this.privateSetX(newX);
+            this.privateSetY(newY);
 
-                //angular
-                this.angularVelocity += this.angularAcceleration * spdMod;
-                if (this.rotationStatic) this.angularVelocity = 0;
-                let newRotation = this.rotation + this.angularVelocity * spdMod;
-                this.privateSetRotation(newRotation);
+            //angular
+            this.angularVelocity += this.angularAcceleration * spdMod;
+            if (this.rotationStatic) this.angularVelocity = 0;
+            let newRotation = this.rotation + this.angularVelocity * spdMod;
+            this.privateSetRotation(newRotation);
 
-                this.cacheBoundingBoxes();
-                this.cacheMass();
-                this.__perimeter = this.perimeter;
+            this.cacheBoundingBoxes();
+            this.cacheMass();
+            this.__perimeter = this.perimeter;
 
-                this.checkAndResolveCollisions(others);
-            }
+            this.checkAndResolveCollisions(others);
 
             let pi2 = Math.PI * 2;
             this.rotation = ((this.rotation % pi2) + pi2) % pi2;
@@ -389,12 +355,6 @@ class PhysicsObject extends SceneObject {
             if (isNaN(this.velocity.y)) this.velocity.y = 0;
             if (isNaN(this.x)) this.x = this.last.x;
             if (isNaN(this.y)) this.y = this.last.y;
-
-            // if (this.velocity.mag < 0.0001 && this.angularVelocity < 0.0001) {
-            //     this.x = this.last.x;
-            //     this.y = this.last.y;
-            //     this.rotation = this.lastRotation;
-            // }
         });
     }
     cacheMass() {
@@ -418,17 +378,21 @@ class PhysicsObject extends SceneObject {
         if (!pMag) return 1;
         return 1 - pMag / I.mag;
     }
-    applyImpulse(impulse, name = "no name") {
+    internalApplyImpulse(impulse, name = "no name") {
         if (!impulse || !impulse.force.mag) return;
         impulse.force.Ndiv(this.__mass);
         this.applyLinearImpulse(impulse, name);
         this.applyAngularImpulse(impulse, name);
-        // c.stroke(cl.PURPLE, 1).circle(impulse.source.x, impulse.source.y, 2);
-        // c.stroke(cl.PURPLE, 1).arrow(impulse.source, impulse.force.times(10).Vplus(impulse.source));
+    }
+    applyImpulse(impulse, name = "no name") {
+        if (!impulse || !impulse.force.mag) return;
+        impulse.force.Ndiv(this.__mass / this.home.physicsRealism);
+        this.applyLinearImpulse(impulse, name);
+        this.applyAngularImpulse(impulse, name);
     }
     applyLinearImpulse(impulse, name) {
         if (!impulse) return;
-        const vel = impulse.force;//.Ntimes(this.getImpulseRatio(impulse.source, impulse.force.normalized))
+        const vel = impulse.force;
         this.velocity.Vadd(vel);
     }
     applyAngularImpulse(impulse, name) {
@@ -442,7 +406,5 @@ class PhysicsObject extends SceneObject {
         let v_theta = sign * Math.sqrt((proj.x ** 2 + proj.y ** 2) / (r.x ** 2 + r.y ** 2));
         if (v_theta > Math.PI * 2) v_theta = 0;
         this.angularVelocity += v_theta;
-
-        
     }
 }

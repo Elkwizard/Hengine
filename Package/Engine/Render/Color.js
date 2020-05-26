@@ -267,7 +267,9 @@ class Color {
 	static random() {
 		return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random());
 	}
-
+	static rand(seed) {
+		return new Color(rand(seed) * 255, rand(seed + 1) * 255, rand(seed + 2) * 255, rand(seed + 3));
+	}
 	static add(c1, c2) {
 		let mixer = new Color(0, 0, 0, 0);
 		mixer.add(c1);
@@ -418,7 +420,6 @@ class Color {
 		return this;
 	}
 	get() {
-		// console.log(this.red,this.green,this.blue,this.alpha);
 		return new Color(this.red, this.green, this.blue, this.alpha);
 	}
 	plus(col) {

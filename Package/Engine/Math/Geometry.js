@@ -1,4 +1,12 @@
 class Geometry {
+    static reimann(fn, a, b, iter = 1000) {
+        let sum = 0;
+        let dif = (b - a) / iter;
+        for (let i = 0; i < iter; i++) {
+            sum += fn(dif * i + a);
+        }
+        return sum / iter;
+    }
     static distToLineObject(p, l) {
         let cp = Geometry.closestPointOnLineObject(p, l);
         return Geometry.distToPoint(p, cp);
@@ -223,9 +231,10 @@ class Geometry {
         let nDif = new Vector2(cos * dif.x - sin * dif.y, sin * dif.x + cos * dif.y);
         return new Vector2(origin.x + nDif.x, origin.y + nDif.y);
     }
-    static subdividePolygonList(polygon) {
+    static subdividePolygonList(polygon, direction) {
         let otherPolygons = [];
         let counter = polygon[1].x - polygon[0].x < 0;
+        if (direction !== undefined) counter = !direction;
         let slice = null;
         let newPolygon = [...polygon];
         for (let i = 0; i < polygon.length; i++) {
@@ -306,8 +315,8 @@ class Geometry {
             return otherPolygons;
         } else return [polygon];
     }
-    static subdividePolygon(polygon) {
-        return Geometry.subdividePolygonList(polygon.vertices).map(e => new Polygon(e, 0));
+    static subdividePolygon(polygon, direction) {
+        return Geometry.subdividePolygonList(polygon.vertices, direction).map(e => new Polygon(e, 0));
     }
     static overlapLineLine(l1, l2) {
         let pol = Geometry.projectPointOntoLine;

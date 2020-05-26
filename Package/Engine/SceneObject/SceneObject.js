@@ -246,6 +246,12 @@ class SceneObject {
 		});
 		return result;
 	}
+	vertexDirection(dir) {
+		const type = dir === "CLOCKWISE";
+		for (let [name, shape] of this.shapes) if (shape instanceof Polygon) {
+			shape.subdivideForCollisions(type);
+		}
+	}
 	rename(name) {
 		delete this.home.contains[this.name];
 		this.home.contains[name] = this;
