@@ -631,23 +631,23 @@ class Scene extends InactiveScene {
 		//remove duplicates
 		useful = [...(new Set(useful))];
 
-		// show cells
-		this.drawInWorldSpace(e => {
-			for (let [key, cell] of cells) {
-				let x = parseInt(key.split(",")[0]) * this.cellSize;
-				let y = parseInt(key.split(",")[1]) * this.cellSize;
-				let r = new Rect(x, y, this.cellSize, this.cellSize);
-				c.stroke(cl.RED, 3).rect(r);
-				c.draw(new Color(255, 0, 0, 0.15)).rect(r);
-				// let n = 0;
-				// for (let or of cell) {
-				// 	c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
-				// 	n++;
-				// }
-				// c.draw(cl.BLUE).text("20px monospace", n, r.middle.x, r.middle.y);
-				// c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
-			}
-		});
+		// // show cells
+		// this.drawInWorldSpace(e => {
+		// 	for (let [key, cell] of cells) {
+		// 		let x = parseInt(key.split(",")[0]) * this.cellSize;
+		// 		let y = parseInt(key.split(",")[1]) * this.cellSize;
+		// 		let r = new Rect(x, y, this.cellSize, this.cellSize);
+		// 		c.stroke(cl.RED, 3).rect(r);
+		// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
+		// 		// let n = 0;
+		// 		// for (let or of cell) {
+		// 		// 	c.stroke(cl.ORANGE, 2).arrow(r.middle, or.middle);
+		// 		// 	n++;
+		// 		// }
+		// 		// c.draw(cl.BLUE).text("20px monospace", n, r.middle.x, r.middle.y);
+		// 		// c.draw(cl.ORANGE).circle(r.middle.x, r.middle.y, 3);
+		// 	}
+		// });
 		
 		let usefulArray = useful.map(e => e.object);
 		return { useful, useless, usefulArray };
