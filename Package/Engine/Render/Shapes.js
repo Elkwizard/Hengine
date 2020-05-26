@@ -132,7 +132,6 @@ class Polygon extends Shape {
 		if (direction === undefined) direction = this.vertexDirection;
 		else this.vertexDirection = direction;
 		this.collisionShapes = Geometry.subdividePolygon(this, direction);
-		// console.trace(this.vertices.length);
 	}
 	getBoundingBox() {
 		let x = this.vertices.map(e => e.x);

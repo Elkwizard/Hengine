@@ -407,6 +407,15 @@ class Vector2 extends Vector {
 		}
 		return this;
 	}
+	rotate(angle) {
+		let cos = Math.cos(angle);
+		let sin = Math.sin(angle);
+		let t_x = this.x;
+		let t_y = this.y;
+		this.x = t_x * cos - t_y * sin;
+		this.y = t_x * sin + t_y * cos;
+		return this;
+	}
 	dot(v) {
 		return this.x * v.x + this.y * v.y;
 	}

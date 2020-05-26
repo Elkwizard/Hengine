@@ -52,6 +52,7 @@ class SceneObject {
 		this.lifeSpan = 0;
 		this.log = [];
 		this.isDead = false;
+		this.onScreen = true;
 		this.cullGraphics = true;
 		this.cacheBoundingBoxes();
 		this.response = {
@@ -164,6 +165,9 @@ class SceneObject {
 		this.cacheBoundingBoxes();
 		this.cacheDimensions();
 	}
+	modelSpace(v) {
+		return v.rotate(this.rotation).plus(this.middle);
+	}
 	centerModels() {
 		let center = Vector2.origin;
 		let shapes = this.getShapes();
@@ -226,6 +230,7 @@ class SceneObject {
 		let middle = Vector2.origin;
 		for (let shape of this.getShapes()) shape.scaleAbout(middle, factor);
 		this.cacheBoundingBoxes();
+		this.cacheDimensions();
 	}
 	getModels() {
 		let ary = this.getShapes();
@@ -319,6 +324,7 @@ class SceneObject {
 		if (!this.hidden && onScreen) {
 			this.runDraw();
 		}
+		this.onScreen = onScreen;
 		//bound visual
 		// c.stroke(cl.GREEN, 1).rect(this.__boundingBox);
 		// for (let shape of this.getShapes()) c.stroke(cl.GREEN, 1).rect(shape.__boundingBox);
