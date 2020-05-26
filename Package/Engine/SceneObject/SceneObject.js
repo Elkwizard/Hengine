@@ -160,6 +160,7 @@ class SceneObject {
 		this.rotation += rotation;
 	}
 	addShape(name, shape) {
+		shape = shape.get();
 		this.shapes[name] = shape;
 		if (shape instanceof Polygon && !(shape instanceof Rect)) shape.subdivideForCollisions();
 		this.cacheBoundingBoxes();

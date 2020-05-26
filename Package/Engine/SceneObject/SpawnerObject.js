@@ -1,17 +1,6 @@
 class Directions {
-	constructor(up, down, left, right, prec = 0.3) {
-		this.up = up;
-		this.down = down;
-		this.left = left;
-		this.right = right;
+	constructor(prec = 0.3) {
 		this.prec = prec;
-		this.angle = 0;
-	}
-	static fromAngle(a, prec = 0.3) {
-		let dir = new Directions(0, 0, 0, 0);
-        dir.angle = a;
-        this.prec = prec;
-		return dir;
 	}
 	getRandomSpeed() {
 		if (this.angle) {
@@ -25,20 +14,20 @@ class Directions {
 			return this.fix(result);
 		}
 	}
+}
+class CardinalDirections extends Directions {
+    constructor(up, down, left, right, prec = 0.3) {
+        super(prec);
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+    }
+    getRandomSpeed() {
+        return this.fix(Vector2.random());
+    }
 	fix(v) {
-		if (this.angle) {
-			let va = -this.angle;
-			let min = va - this.prec;
-			let max = va + this.prec;
-			let a = v.getAngle();
-			if (a < min) a = min;
-			if (a > max) a = max;
-			let result = Vector2.fromAngle(a);
-			result.mag = v.mag;
-			return result;
-		} else {
-			return new Vector2(this.fixH(v.x), this.fixV(v.y));
-		}
+        return new Vector2(this.fixH(v.x), this.fixV(v.y));
 	}
 	fixH(val) {
 		if (this.left && this.right) return val;
@@ -52,6 +41,16 @@ class Directions {
 		if (this.down) return Math.abs(val);
 		else return val * this.prec;
 	}
+}
+class AngleDirections extends Directions {
+    constructor(angle, prec = 0.3) {
+        super(angle, prec);
+        this.angle = angle;
+    }
+    getRandomSpeed(v) {
+        let val = Math.random() * this.prec * 2 - this.prec;
+        return Vector2.fromAngle(this.angle + val);
+    }
 }
 class ParticleSpawnerObject extends SceneObject {
     constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), home) {
@@ -89,7 +88,6 @@ class ParticleSpawnerObject extends SceneObject {
         for (let i = 0; i < len; i++) {
             this.home.addParticle(this);
         }
-
     }
     engineFixedUpdate() {
         if (this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
@@ -105,6 +103,7 @@ class ParticleSpawnerObject extends SceneObject {
 class ParticleObject extends SceneObject {
     constructor(spawner, home, name) {
         super(name, 0, 0, false, "Engine-Particle", home);
+
         this.cullGraphics = false;
         this.lastX = 0;
         this.lastY = 0;
@@ -115,6 +114,7 @@ class ParticleObject extends SceneObject {
         this.drawSuffix = e => e;
         this.particleInit();
         this.completelyStatic = false;
+        this.lifeSpan = 0;
     }
     particleInit() {
         let sp = this.spawner;
@@ -126,7 +126,7 @@ class ParticleObject extends SceneObject {
         this.y = sY;
         let shape = this.spawner.particleShape.get();
         shape.scale(pSize);
-        this.addShape("geo", shape);
+        this.addShape("default", shape);
         this.lastX = sX;
         this.lastY = sY;
 

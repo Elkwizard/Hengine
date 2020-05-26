@@ -1,11 +1,24 @@
 class Geometry {
-    static reimann(fn, a, b, iter = 1000) {
+    static reimann(fn, a, b, iter = 1000, RRAM = false) {
         let sum = 0;
         let dif = (b - a) / iter;
+        RRAM = +RRAM * dif;
         for (let i = 0; i < iter; i++) {
-            sum += fn(dif * i + a);
+            sum += fn(dif * i + a + RRAM);
         }
-        return sum / iter;
+        return sum * dif;
+    }
+    static reimannTerms(fn, a, b, iter = 1000, RRAM = false) {
+        let sum = 0;
+        let acc = [];
+        let dif = (b - a) / iter;
+        RRAM = +RRAM * dif;
+        for (let i = 0; i < iter; i++) {
+            let v = fn(dif * i + a + RRAM);
+            sum += v;
+            acc.push((v * dif).toFixed(3));
+        }
+        return acc.join(" + ") + " = " + (sum * dif).toFixed(3);
     }
     static distToLineObject(p, l) {
         let cp = Geometry.closestPointOnLineObject(p, l);

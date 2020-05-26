@@ -274,7 +274,7 @@ class PhysicsObject extends SceneObject {
             let dif = dB - dA;
             return -dif;
         });
-        others = [...others.filter(e => e.completelyStatic), ...others.filter(e => !e.completelyStatic)];
+        others = [...others.filter(e => !e.completelyStatic), ...others.filter(e => e.completelyStatic)];
         let collisions;
         if (!this.completelyStatic) collisions = this.detectCollisions(others);
         if (!this.completelyStatic) {
@@ -336,7 +336,7 @@ class PhysicsObject extends SceneObject {
             this.privateSetY(newY);
 
             //angular
-            this.angularVelocity += this.angularAcceleration * spdMod;
+            this.angularVelocity += this.angularAcceleration;
             if (this.rotationStatic) this.angularVelocity = 0;
             let newRotation = this.rotation + this.angularVelocity * spdMod;
             this.privateSetRotation(newRotation);
@@ -348,7 +348,8 @@ class PhysicsObject extends SceneObject {
             this.checkAndResolveCollisions(others);
 
             let pi2 = Math.PI * 2;
-            this.rotation = ((this.rotation % pi2) + pi2) % pi2;
+            if (this.rotation < -pi2) this.rotation = -(-this.rotation % pi2);
+            if (this.rotation > pi2) this.rotation = this.rotation % pi2;
 
             //any number of terrible things may have happened by this point.
             if (isNaN(this.velocity.x)) this.velocity.x = 0;
