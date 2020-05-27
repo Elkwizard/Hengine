@@ -141,7 +141,7 @@ class Artist {
 				this.c.beginPath();
 				if (v.length) {
 					this.c.moveTo(v[0].x, v[0].y);
-					for (let i = 0; i <= v.length; i++) {
+					for (let i = 1; i <= v.length; i++) {
 						let index = i % v.length;
 						this.c.lineTo(v[index].x, v[index].y);
 					}

@@ -237,11 +237,11 @@ class Physics {
             let aRange = new Range();
             let bRange = new Range();
             if (!(edge.x + edge.y)) continue;
-            let aPoints = aCorners.map(e => e.x * edge.x + e.y * edge.y);
+            let aPoints = aCorners.map(e => e.dot(edge));
             aRange.min = Math.min(...aPoints);
             aRange.max = Math.max(...aPoints);
 
-            let bPoints = bCorners.map(e => e.x * edge.x + e.y * edge.y);
+            let bPoints = bCorners.map(e => e.dot(edge));
             bRange.min = Math.min(...bPoints);
             bRange.max = Math.max(...bPoints);
             if (!(Range.intersect(aRange, bRange))) {

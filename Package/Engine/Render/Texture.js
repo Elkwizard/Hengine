@@ -1,9 +1,8 @@
-class Texture {
+class Texture extends ImageType {
 	constructor(width, height) {
+		super(width, height, false);
 		let self = this;
 		this.c = new Artist({ getContext() { return new TextureDrawingContext(self); } }, width, height);
-		width = Math.floor(width);
-		height = Math.floor(height);
 		this.width = width;
 		this.height = height;
 		this.pixels = [];
@@ -30,8 +29,9 @@ class Texture {
 		this.blankImageData = this.imageData2;
 		this.blank = this.pixels.map(e => e.map(e => new Color(0, 0, 0, 0)));
 
-		this.loops = false;
 		this.updateImageData();
+
+		this.changed = false;
 	}
 	static async fromDataURI(uri, w_o, h_o) {
 		let img = new Image();
@@ -165,6 +165,7 @@ class Texture {
 		} else this.act_set(x, y, clr);
 	}
 	act_set(x, y, clr) {
+		this.changed = true;
 		this.pixels[x][y] = clr;
 		let inx = (y * this.width + x) * 4;
 		let data = this.imageData.data;
@@ -195,22 +196,12 @@ class Texture {
 		x.c.c.putImageData(this.imageData, 0, 0);
 		this.__image = x;
 	}
-	requestImage(width, height) {
-		if (!this.loops) {
-			return this.__image.img;
-		} else {
-			width = Math.abs(width);
-			height = Math.abs(height);
-			if (!width) width = 0;
-			if (!height) height = 0;
-			let frame = new OffscreenCanvas(width, height);
-			let c = frame.getContext("2d");
-			let img = this.__image.img;
-			for (let i = 0; i < frame.width / this.width; i++) for (let j = 0; j < frame.height / this.height; j++) {
-				c.drawImage(img, i * this.width, j * this.height, this.width, this.height);
-			}
-			return frame;
+	makeImage() {
+		if (this.changed) {
+			this.changed = false;
+			this.updateImageData();
 		}
+		return this.__image.img;
 	}
 }
 class TextureDrawingContextPath {
@@ -307,7 +298,7 @@ class TextureDrawingContextPath {
 			let valid = [];
 			let y = minY + i;
 			for (let line of lines) {
-				let min = Math.min(line[1], line[3]) + 1;
+				let min = Math.min(line[1], line[3]);
 				let max = Math.max(line[1], line[3]);
 				if (min <= y && max >= y && max - min) valid.push(line);
 			}
@@ -384,7 +375,6 @@ class TextureDrawingContext {
 			this.cos_sin.push(new TextureDrawingContextVertex(Math.cos(i.toRadians()), Math.sin(i.toRadians())));
 		}
 	}
-
 	getTransformedPoint(x, y) {
 		let ax = x;
 		let ay = y;
@@ -418,14 +408,20 @@ class TextureDrawingContext {
 		this.saveStack.pop();
 	}
 	translate(x, y) {
-		this.transform.push(new TextureDrawingContextTransform("translation", x, y));
+		if (x || y) {
+			this.transform.push(new TextureDrawingContextTransform("translation", x, y));
+		}
 	}
 	rotate(angle) {
-		this.transform.push(new TextureDrawingContextTransform("rotation", Math.cos(angle), Math.sin(angle)));
+		if (Math.abs(angle) > 0.0001) {
+			this.transform.push(new TextureDrawingContextTransform("rotation", Math.cos(angle), Math.sin(angle)));
+		}
 	}
 	scale(x, y) {
-		this.lineWidthFactor *= x;
-		this.transform.push(new TextureDrawingContextTransform("scale", x, y));
+		if (x !== 1 || y !== 1) {
+			this.lineWidthFactor *= x;
+			this.transform.push(new TextureDrawingContextTransform("scale", x, y));
+		}
 	}
 	clearRect(x, y, w, h) {
 		this.tex.pixels = this.tex.blank.map(e => e.map(e => e));

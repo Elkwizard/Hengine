@@ -2,6 +2,12 @@ class LocalFileSystem {
 	static get header() {
 		return "LOCAL_FILE_SYSTEM_";
 	}
+	static compress(str) {
+		return str;
+	}
+	static decompress(str) {
+		return str;
+	}
 	static clearAll() {
 		localStorage.clear();
 	}
@@ -25,6 +31,7 @@ class LocalFileSystem {
 
 	}
 	static put(key, value) {
+		value = LocalFileSystem.compress(value);
 		try {
 			let values = [];
 			let acc = "";
@@ -60,7 +67,7 @@ class LocalFileSystem {
 				value += localStorage[name];
 			}
 		} while (localStorage[name] !== undefined);
-		return value;
+		return LocalFileSystem.decompress(value);
 	}
 }
 class ApplicationPackageElement {
@@ -95,8 +102,6 @@ class ApplicationPackage {
 		}
 	}
 	animate();
-
-
 })();
 class Hengine {
 	constructor(utility, wrapper = document.body) {
@@ -191,6 +196,7 @@ class Hengine {
 					this.controls = new Controls("w", "s", "a", "d");
 				}
 				this.completelyStatic = false;
+				s.collisionEvents = true;
 				this.hasGravity = true;
 			},
 			update() {

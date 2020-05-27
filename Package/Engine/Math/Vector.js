@@ -249,6 +249,9 @@ class Vector {
 		let result = Vector.abs(this.minus(v)).total() < 0.00001;
 		return result;
 	}
+	inverse() {
+		return this.times(-1);
+	}
 	compare(v1, v2) {
 		if (v1.dot(this) > v2.dot(this)) return v1;
 		return v2;
@@ -439,6 +442,9 @@ class Vector2 extends Vector {
 			this.y /= m;
 		}
 		return this;
+	}
+	inverse() {
+		return new Vector2(-this.x, -this.y);
 	}
 	Vplus(v) {
 		return new Vector2(this.x + v.x, this.y + v.y);
