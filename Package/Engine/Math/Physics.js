@@ -214,8 +214,6 @@ class Physics {
     }
     static collidePolygonPolygon(a, b) {
         s.SAT.boxChecks++;
-        // c.stroke(cl.RED, 1).rect(a.__boundingBox);
-        // c.stroke(cl.BLUE, 1).rect(b.__boundingBox);
         if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return new Collision(false, a, b);
 
         s.SAT.SATChecks++;
@@ -223,8 +221,8 @@ class Physics {
         let aEdges = a.getAxes();
         let bEdges = b.getAxes();
         let edges = [
-            aEdges,
-            bEdges
+            ...aEdges,
+            ...bEdges
         ];
         let aCorners = a.getCorners();
         let bCorners = b.getCorners();
@@ -234,22 +232,16 @@ class Physics {
         let collisionPoints = null;
         let leastIntersection = Infinity;
         let pairs = [];
-        for (let i = 0; i < edges.length; i++) for (let edge of edges[i]) {
+        for (let i = 0; i < edges.length; i++) {
+            let edge = edges[i];
             let aRange = new Range();
             let bRange = new Range();
             if (!(edge.x + edge.y)) continue;
-            let aPoints = [];
-            for (let point of aCorners) {
-                let projection = point.x * edge.x + point.y * edge.y;
-                aPoints.push(projection);
-            }
+            let aPoints = aCorners.map(e => e.x * edge.x + e.y * edge.y);
             aRange.min = Math.min(...aPoints);
             aRange.max = Math.max(...aPoints);
-            let bPoints = [];
-            for (let point of bCorners) {
-                let projection = point.x * edge.x + point.y * edge.y;
-                bPoints.push(projection);
-            }
+
+            let bPoints = bCorners.map(e => e.x * edge.x + e.y * edge.y);
             bRange.min = Math.min(...bPoints);
             bRange.max = Math.max(...bPoints);
             if (!(Range.intersect(aRange, bRange))) {
@@ -263,7 +255,7 @@ class Physics {
         let col;
         if (colliding) {
             pairs = pairs
-                .map(e => [e[0], e[1], e[2], Range.getOverlap(e[0], e[1])]);
+                .map(e => [...e, Range.getOverlap(e[0], e[1])]);
             let minimumAry = pairs[0];
             let minimumOverlap = Infinity;
             for (let el of pairs) {
@@ -408,10 +400,10 @@ class Physics {
 
         }
         for (let iA of impulsesA) {
-            a.internalApplyImpulse(iA, iA.name);
+            a.internalApplyImpulse(iA);
         }
         for (let iB of impulsesB) {
-            b.internalApplyImpulse(iB, iB.name);
+            b.internalApplyImpulse(iB);
         }
     }
     static resolve(col) {
@@ -692,12 +684,8 @@ class Physics {
         const I_A = n.Ntimes(-j_A);
         const I_B = n.Ntimes(j_B);
 
-        const impulse_name = {j_DYNAMIC, j_STATIC_A, j_STATIC_B, PER_A, PER_B, m_A, m_B, a, b}.toString();
-
         impulseA = new Impulse(I_A, collisionPoint);
         impulseB = new Impulse(I_B, collisionPoint);
-        impulseA.name = impulse_name;
-        impulseB.name = impulse_name;
 
         if (b.completelyStatic) impulseB = null;
 

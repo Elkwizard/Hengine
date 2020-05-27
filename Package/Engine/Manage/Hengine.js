@@ -138,7 +138,7 @@ class Hengine {
 			});
 		}
 		window.custom = this.custom;
-		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "middle", "save", "get", "fileSize", "packageFiles", "importPackage", "getRaw", "saveRaw", "setTitle"];
+		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "fileExists", "middle", "save", "get", "fileSize", "packageFiles", "importPackage", "getRaw", "saveRaw", "setTitle"];
 
 		for (let EXP of EXPORT) {
 			window[EXP] = this[EXP].bind(this);
@@ -264,6 +264,9 @@ class Hengine {
 		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
 		let dat = LocalFileSystem.get("HengineLocalSaves/" + loc + "/" + name);
 		return dat;
+	}
+	fileExists(file, loc = this.getProjectName()) {
+		return this.getRaw(file, loc) !== undefined;
 	}
 	save(file, data, loc = this.getProjectName()) {
 		let type = this.getFileType(file);

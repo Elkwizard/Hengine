@@ -251,7 +251,7 @@ class PhysicsObject extends SceneObject {
                                             Physics.resolve(collision);
                                         }
                                     }
-                                    for (let collision of col) {
+                                    if (this.home.collisionEvents) for (let collision of col) {
                                         Physics.events(collision);
                                     }
                                 }
@@ -261,19 +261,11 @@ class PhysicsObject extends SceneObject {
                 }
             }
         }
-        // c.draw(cl.RED).text("20px monospace", collisions, this.x, this.y);
         return [];
     }
     checkAndResolveCollisions(others) {
         const dir = this.velocity.get().normalize();
-        others = others.sort(function (a, b) {
-            let mA = Vector2.fromPoint(a);
-            let mB = Vector2.fromPoint(b);
-            let dA = mA.dot(dir);
-            let dB = mB.dot(dir);
-            let dif = dB - dA;
-            return -dif;
-        });
+        others = others.sort((a, b) => (a.x - b.x) * dir.x + (a.y - b.y) * dir.y);
         others = [...others.filter(e => !e.completelyStatic), ...others.filter(e => e.completelyStatic)];
         let collisions;
         if (!this.completelyStatic) collisions = this.detectCollisions(others);
@@ -400,12 +392,6 @@ class PhysicsObject extends SceneObject {
         if (!impulse) return;
         let r = impulse.source.Vminus(this.centerOfMass);
         if (!r.x && !r.y && r.x + r.y < 0.01) return;
-        let r_N = r.normal;
-        let I = impulse.force;
-        let proj = I.projectOnto(r_N);
-        let sign = Math.sign(proj.dot(r_N));
-        let v_theta = sign * Math.sqrt((proj.x ** 2 + proj.y ** 2) / (r.x ** 2 + r.y ** 2));
-        if (v_theta > Math.PI * 2) v_theta = 0;
-        this.angularVelocity += v_theta;
+        this.angularVelocity += -impulse.force.cross(r) / (r.mag ** 2);
     }
 }

@@ -419,6 +419,9 @@ class Vector2 extends Vector {
 	dot(v) {
 		return this.x * v.x + this.y * v.y;
 	}
+	cross(v) {
+		return this.x * v.y - this.y * v.x;
+	}
 	projectOnto(v) {
 		let u = this;
 		let dot = u.x * v.x + u.y * v.y;

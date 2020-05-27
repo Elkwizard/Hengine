@@ -1,19 +1,11 @@
 class Directions {
 	constructor(prec = 0.3) {
 		this.prec = prec;
-	}
-	getRandomSpeed() {
-		if (this.angle) {
-			let min = -this.angle - this.prec;
-            let max = -this.angle + this.prec;
-			let angle = Math.random() * (max - min) + min;
-			let result = Vector2.fromAngle(angle);
-			return result;
-		} else {
-			let result = Vector2.fromAngle(Math.random() * 2 * Math.PI);
-			return this.fix(result);
-		}
-	}
+    }
+    //get particle speed
+    getRandomSpeed() {
+        return Vector2.origin;
+    }
 }
 class CardinalDirections extends Directions {
     constructor(up, down, left, right, prec = 0.3) {

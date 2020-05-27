@@ -28,6 +28,9 @@ Array.prototype.randomize = function() {
 	}
 	return result;
 }
+Array.prototype.sum = function() {
+	return this.reduce((a, b) => a + b);
+}
 Number.prototype.toDegrees = function () {
 	return this * (180 / Math.PI);
 }
