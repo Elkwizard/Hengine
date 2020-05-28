@@ -163,6 +163,18 @@ class Vector {
 		this.mul(m);
 		return this;
 	}
+	get sqrMag() {
+		let sum = 0;
+		for (let x in this) {
+			if (typeof this[x] !== "number") continue;
+			let i = 0;
+			let j = this[x];
+			let dif = i - j;
+			sum += dif ** 2;
+		}
+		let dist = sum;
+		return dist;
+	}
 	get mag() {
 		let sum = 0;
 		for (let x in this) {
@@ -249,6 +261,9 @@ class Vector {
 		let result = Vector.abs(this.minus(v)).total() < 0.00001;
 		return result;
 	}
+	invert() {
+		return this.mul(-1);
+	}
 	inverse() {
 		return this.times(-1);
 	}
@@ -290,8 +305,8 @@ class Vector {
 	}
 	bestFit(v) {
 		let d1 = this.dot(v);
-		let d2 = this.times(-1).dot(v);
-		if (d2 < d1) return this.times(-1);
+		let d2 = this.inverse().dot(v);
+		if (d2 < d1) return this.inverse();
 		else return this.get();
 	}
 	get() {
@@ -390,6 +405,9 @@ class Vector2 extends Vector {
 	get normal() {
 		return new Vector2(-this.y, this.x);
 	}
+	get sqrMag() {
+		return this.x * this.x + this.y * this.y;
+	}
 	set mag(m) {
 		let M = this.mag;
 		if (M) {
@@ -441,6 +459,11 @@ class Vector2 extends Vector {
 			this.x /= m;
 			this.y /= m;
 		}
+		return this;
+	}
+	invert() {
+		this.x = -this.x;
+		this.y = -this.y;
 		return this;
 	}
 	inverse() {

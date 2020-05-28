@@ -261,8 +261,8 @@ class Geometry {
 
             //everything else
             let point = polygon[i];
-            let v1 = point.Vminus(polygon[(i + 1) % polygon.length]).normalize().Ntimes(-1);
-            let v2 = point.Vminus(polygon[(i - 1 + polygon.length) % polygon.length]).normalize().Ntimes(-1);
+            let v1 = point.Vminus(polygon[(i + 1) % polygon.length]).normalize().inverse();
+            let v2 = point.Vminus(polygon[(i - 1 + polygon.length) % polygon.length]).normalize().inverse();
             let a1 = v1.getAngle();
             let a2 = v2.getAngle();
             let dif = Math.abs(a2 - a1);

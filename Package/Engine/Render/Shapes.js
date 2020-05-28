@@ -77,6 +77,10 @@ class Shape {
 	get perimeter() {
 		return 0;
 	}
+	cache(shape) {
+		//retrieve cached values
+		this.__boundingBox = shape.__boundingBox;
+	}
 	cacheBoundingBox(box) {
 		//store bounding box for later use
 		this.__boundingBox = box;
@@ -111,6 +115,7 @@ class Polygon extends Shape {
 		super(rotation);
 		this.vertices = vertices;
 		this.vertexDirection = true;
+		this.__axes = [];
 	}
 	set middle(a) {
 		this.center(a);
@@ -183,6 +188,13 @@ class Polygon extends Shape {
 			axes.push(slope);
 		}
 		return axes;
+	}
+	cacheAxes(axes) {
+		this.__axes = axes;
+	}
+	cache(shape) {
+		this.__axes = shape.__axes;
+		this.__boundingBox = shape.__boundingBox;
 	}
 	getEdges() {
 		let edges = [];

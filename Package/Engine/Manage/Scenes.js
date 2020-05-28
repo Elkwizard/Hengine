@@ -469,6 +469,7 @@ class Scene extends InactiveScene {
 		this.cameras = {};
 		this.collisionEvents = false;
 		this.mouseEvents = false;
+		this.collisionCache = false;
 		this.camera = new Camera(0, 0, this.c.canvas.width, this.c.canvas.height, 1, 0);
 		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
 		M.engineClick = function (e) {
@@ -554,6 +555,7 @@ class Scene extends InactiveScene {
 
 		//physics
 		for (let i = 0; i < this.physicsRealism; i++) {
+			this.updateSceneObjectCaches(arrays.usefulArray);
 			this.gravitySort(arrays.useful);
 			this.gravityPhase(arrays.usefulArray);
 			this.constraintSolve();
@@ -567,14 +569,18 @@ class Scene extends InactiveScene {
 
 		//particle movement
 		for (let rect of arrays.useless) if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
+		this.updateSceneObjectCaches(arrays.useless);
 
 		//non collision fixed update
-		this.physicsObjectFixedUpdate(this.containsArray)
+		this.physicsObjectFixedUpdate(this.containsArray);
 
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
 		for (let rect of this.containsArray) rect.isBeingUpdated = false;
 		// console.log(performance.now() - startTime);
+	}
+	updateSceneObjectCaches(useful) {
+		for (const el of useful) el.updateCaches();
 	}
 	physicsObjectFixedUpdate(useful) {
 		for (let rect of useful) {

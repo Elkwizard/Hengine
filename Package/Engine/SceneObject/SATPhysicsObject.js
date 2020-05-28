@@ -47,6 +47,7 @@ class PhysicsObject extends SceneObject {
         this.__mass = 0; //mass cache
         this.__perimeter = 0; //perimeter cache
         //data
+        this.__collisionCache = new CollisionCache();
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
         this.newColliding = new CollisionMoniter();
@@ -190,11 +191,11 @@ class PhysicsObject extends SceneObject {
         let rot = this.rotation;
         c.translate(com);
         c.rotate(-rot);
-        c.translate(com.Ntimes(-1));
+        c.translate(com.inverse());
         artist.bind(this)();
         c.translate(com);
         c.rotate(rot);
-        c.translate(com.Ntimes(-1));
+        c.translate(com.inverse());
     }
     getPointVelocity(point) {
         if (!this.rotationStatic) {
@@ -333,9 +334,7 @@ class PhysicsObject extends SceneObject {
             let newRotation = this.rotation + this.angularVelocity * spdMod;
             this.privateSetRotation(newRotation);
 
-            this.cacheBoundingBoxes();
-            this.cacheMass();
-            this.__perimeter = this.perimeter;
+            this.updateCaches();
 
             this.checkAndResolveCollisions(others);
 
@@ -349,6 +348,23 @@ class PhysicsObject extends SceneObject {
             if (isNaN(this.x)) this.x = this.last.x;
             if (isNaN(this.y)) this.y = this.last.y;
         });
+    }
+    updateCaches() {
+        this.cacheAxes();
+        this.cacheMass();
+        this.cacheBoundingBoxes();
+        this.cacheDimensions();
+        this.__perimeter = this.perimeter;
+    }
+    cacheAxes() {
+        const pos = this.middle;
+        const rot = this.rotation;
+        for (const [name, shape] of this.shapes) {
+            if (shape instanceof Polygon) {
+                const model = shape.getModel(pos, rot);
+                shape.cacheAxes(model.getAxes());
+            }
+        }
     }
     cacheMass() {
         this.__mass = this.mass;

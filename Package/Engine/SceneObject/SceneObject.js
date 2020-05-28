@@ -156,15 +156,14 @@ class SceneObject {
 		let middle = this.middle;
 		let dif = point.Vminus(middle);
 		let nDif = Geometry.rotatePointAround(Vector2.origin, dif, rotation);
-		this.middle = middle.Vadd(nDif.Vminus(dif).Ntimes(-1));
+		this.middle = middle.Vadd(nDif.Vminus(dif).inverse());
 		this.rotation += rotation;
 	}
 	addShape(name, shape) {
 		shape = shape.get();
 		this.shapes[name] = shape;
 		if (shape instanceof Polygon && !(shape instanceof Rect)) shape.subdivideForCollisions();
-		this.cacheBoundingBoxes();
-		this.cacheDimensions();
+		this.updateCaches();
 	}
 	modelSpace(v) {
 		return v.rotate(this.rotation).plus(this.middle);
@@ -179,7 +178,7 @@ class SceneObject {
 			center.Vadd(shape.middle.Ntimes(area));
 		}
 		center.Ndiv(totalArea);
-		let dif = center.Ntimes(-1);
+		let dif = center.inverse();
 		for (let shape of shapes) {
 			shape.move(dif);
 		}
@@ -195,7 +194,7 @@ class SceneObject {
 	removeShape(name) {
 		let shape = this.shapes[name];
 		delete this.shapes[name];
-		this.cacheDimensions();
+		this.updateCaches();
 		return shape;
 	}
 	removeAllShapes() {
@@ -241,13 +240,13 @@ class SceneObject {
 		let result = [];
 		for (let i = 0; i < ary.length; i++) {
 			result.push(...ary[i].collisionShapes.map(e => {
-				e.__boundingBox = ary[i].__boundingBox;
+				e.cache(ary[i]);
 				return e;
 			}));
 		}
 		result = result.map(e => {
 			let el = e.getModel(pos, rot);
-			el.__boundingBox = e.__boundingBox;
+			el.cache(e);
 			return el;
 		});
 		return result;
@@ -312,7 +311,7 @@ class SceneObject {
 				let sMiddle = shape.middle;
 				c.translate(sMiddle);
 				c.rotate(shape.rotation);
-				c.translate(sMiddle.Ntimes(-1));
+				c.translate(sMiddle.inverse());
 			}
 			this.draw(name, shape);
 			this.scripts.run("draw", name, shape);
@@ -337,7 +336,10 @@ class SceneObject {
 		}
 		this.update();
 		this.scripts.run("update");
+	}
+	updateCaches() {
 		this.cacheBoundingBoxes();
+		this.cacheDimensions();
 	}
 	pushToRemoveQueue(x) {
 		return null;
