@@ -55,13 +55,16 @@ class Note {
                 types.push(note.types[Math.min(i, note.types.length - 1)]);
             }
         }
-        return new this(notes, durations, octaves, volumes, types);
+        return new Note(notes, durations, octaves, volumes, types);
+    }
+    static rest(duration) {
+        return new Note(["C"], [duration], [4], [0], ["sine"]);
     }
     static fromNote(note = "C", octave = 4, duration = 1000, volume = 1, type = "sine") {
-        return new this([note], [duration], [octave], [volume], [type]);
+        return new Note([note], [duration], [octave], [volume], [type]);
     }
     static fromChord(notes = ["C", "C"], octaves = [4, 5], duration = 1000, volume = 1, type = "sine") {
-        return new this(notes, [duration], octaves, [volume], [type]);
+        return new Note(notes, [duration], octaves, [volume], [type]);
     }
 }
 class Sound {
