@@ -26,17 +26,17 @@ class InputHandler {
 	RL(key) {
 		return this.keyUpCounts[key];
 	}
-	P(key) {
-		return !!this.keys[key];
+	P(...keys) {
+		return keys.map(key => !!this.keys[key]).includes(true);
 	}
 	R(key) {
-		return !this.keys[key];
+		return keys.map(key => !this.keys[key]).includes(true);
 	}
 	JP(key) {
-		return this.keyDownCounts[key] === 1;
+		return keys.map(key => this.keyDownCounts[key] === 1).includes(true);
 	}
 	JR(key) {
-		return this.keyUpCounts[key] === 1;
+		return keys.map(key => this.keyUpCounts[key] === 1).includes(true);
 	}
 	inputAdjust() {
 		
@@ -45,9 +45,9 @@ class InputHandler {
 		for (let key in this.keys) {
 			if (this.keyDownCounts[key] === undefined) this.keyDownCounts[key] = 0;
 			if (this.keyUpCounts[key] === undefined) this.keyUpCounts[key] = 2;
-			if (this.P(key)) this.keyDownCounts[key]++;
+			if (this.keys[key]) this.keyDownCounts[key]++;
 			else this.keyDownCounts[key] = 0;
-			if (this.R(key)) this.keyUpCounts[key]++;
+			if (!this.keys[key]) this.keyUpCounts[key]++;
 			else this.keyUpCounts[key] = 0;
 		}
 		this.inputAdjust();

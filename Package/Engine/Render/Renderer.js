@@ -80,6 +80,7 @@ class Artist {
 				}
 			},
 			triangle(v1, v2, v3) {
+				[v1, v2, v3] = this.pathObj.validatePoints([v1, v2, v3]);
 				this.c.beginPath();
 				if (v1 instanceof Triangle) {
 					v2 = v1.vertices[1];
@@ -138,6 +139,7 @@ class Artist {
 				return textRequests
 			},
 			shape(...v) {
+				v = this.pathObj.validatePoints(v);
 				this.c.beginPath();
 				if (v.length) {
 					this.c.moveTo(v[0].x, v[0].y);
@@ -146,6 +148,13 @@ class Artist {
 						this.c.lineTo(v[index].x, v[index].y);
 					}
 				}
+			},
+			validatePoints(points) {
+				return points.map(e => {
+					if (Math.abs(e.x) > 100000) e.x = Math.sign(e.x) * 100000; 
+					if (Math.abs(e.y) > 100000) e.y = Math.sign(e.y) * 100000;
+					return e;
+				});
 			}
 		}
 		this.pathObj = pathObj;
@@ -231,6 +240,7 @@ class Artist {
 			},
 			connector(...points) {
 				if (points.length) {
+					points = this.pathObj.validatePoints(points);
 					this.c.beginPath();
 					this.c.moveTo(points[0].x, points[0].y);
 					for (let i = 1; i < points.length; i++) {
@@ -631,8 +641,7 @@ class Artist {
 		}
 		if (width === undefined) width = img.width;
 		if (height === undefined) height = img.height;
-		if (img instanceof Frame) img = img.img;
-		if (img instanceof Texture) img = img.requestImage(width, height);
+		if (img instanceof ImageType) img = img.requestImage(width, height);
 		this.c.drawImage(img, x, y, width, height);
 	}
 	drawAnimation(animation, x, y, width, height, advance = true) {

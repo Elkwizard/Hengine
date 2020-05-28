@@ -91,6 +91,9 @@ class Sound {
             aud.play();
         }
     }
+    static noteFrequency(noteInx) {
+        return 15.4323309696 * 1.05946405842 ** noteInx;
+    }
     static get noteFrequencyTable() {
         return {
             "C0": 16.35,

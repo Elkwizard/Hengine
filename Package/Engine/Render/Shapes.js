@@ -109,6 +109,10 @@ class Shape {
 		//return a copy of the shape
 		return new Shape(this.rotation);
 	}
+	static lerp(a, b, t) {
+		//returns the lerp from a to b at t
+		return new Shape(a.rotation * (1 - t) + b.rotation * t);
+	}
 }
 class Polygon extends Shape {
 	constructor(vertices, rotation = 0) {
@@ -230,6 +234,10 @@ class Polygon extends Shape {
 		poly.vertexDirection = this.vertexDirection;
 		return poly;
 	}
+	static lerp(a, b, t) {
+		const vertices = a.vertices.map((v, inx) => Vector2.lerp(v, b.vertices[inx], t));
+		return new Polygon(vertices, a.rotation * (1 - t) + b.rotation * t);
+	}
 }
 class Rect extends Polygon {
 	constructor(x, y, w, h, rotation = 0) {
@@ -306,6 +314,11 @@ class Rect extends Polygon {
 	get() {
 		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
 	}
+	static lerp(a, b, t) {
+		const dim = Vector2.lerp(new Vector2(a.width, a.height), new Vector2(b.width, b.height), t);
+		const pos = Vector2.lerp(new Vector2(a.x, a.y), new Vector2(b.x, b.y), t);
+		return new Rect(pos.x, pos.y, dim.x, dim.y, a.rotation * (1 - t) + b.rotation * t);
+	}
 }
 class Circle extends Shape {
 	constructor(x, y, radius) {
@@ -356,5 +369,10 @@ class Circle extends Shape {
 	}
 	get() {
 		return new Circle(this.x, this.y, this.radius);
+	}
+	static lerp(a, b, t) {
+		const pos = Vector2.lerp(new Vector2(a.x, a.y),new Vector2(b.x, b.y), t);
+		const radius = a.radius * (1 - t) + b.radius * t;
+		return new Circle(pos.x, pos.y, radius);
 	}
 }

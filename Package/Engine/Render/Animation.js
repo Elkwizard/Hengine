@@ -22,9 +22,15 @@ class Animation {
 		this.timer = 0;
 		this.totalTime = this.frames.length * this.delay;
 	}
-	static copy(anim) {
-		let a = new Animation(anim.frames, anim.delay, anim.loop, anim.finResponse);
-		return a;
+	fromImage(frame, imgWidth, imgHeight, delay = 0, loop = true, finResponse = e => e) {
+		const frames = frame.width / imgWidth;
+		const frameImgs = [];
+		for (let i = 0; i < frames; i++) {
+			const img = new Frame(imgWidth, imgHeight);
+			img.c.c.drawImage(img, i * imgWidth, 0, imgWidth, imgHeight, 0, 0, imgWidth, imgHeight);
+			frameImgs.push(img);
+		}
+		let anim = new Animation(frameImgs, delay, loop, finResponse);
 	}
 	set onload(fn) {
 		fn();
@@ -49,5 +55,9 @@ class Animation {
 	reset() {
 		this.timer = -1;
 		this.advance();
+	}
+	static copy(anim) {
+		let a = new Animation(anim.frames, anim.delay, anim.loop, anim.finResponse);
+		return a;
 	}
 }
