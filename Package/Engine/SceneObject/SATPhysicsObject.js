@@ -47,7 +47,6 @@ class PhysicsObject extends SceneObject {
         this.__mass = 0; //mass cache
         this.__perimeter = 0; //perimeter cache
         //data
-        this.__collisionCache = new CollisionCache();
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
         this.newColliding = new CollisionMoniter();
@@ -248,11 +247,11 @@ class PhysicsObject extends SceneObject {
                                     this.colliding.general.push(other);
                                     other.colliding.general.push(this);
                                     if (this.canCollide && other.canCollide) {
-                                        for (let collision of col) {
+                                        for (const collision of col) {
                                             Physics.resolve(collision);
                                         }
                                     }
-                                    if (this.home.collisionEvents) for (let collision of col) {
+                                    if (this.home.collisionEvents) for (const collision of col) {
                                         Physics.events(collision);
                                     }
                                 }

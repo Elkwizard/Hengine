@@ -9,6 +9,11 @@ class Collision {
             this.contacts = collisionPoints;
         }
     }
+    setObjects(a, b) {
+        this.a = a;
+        this.b = b;
+        return this;
+    }
     switch() {
         return new Collision(this.colliding, this.b, this.a, this.dir.inverse(), this.contacts);
     }
@@ -33,36 +38,6 @@ class CollisionCacheData {
         };
     }
 }
-class CollisionCache {
-    constructor() {
-        this.map = new Map();
-    }
-    put(collision) {
-        this.map.set(collision.b, new CollisionCacheData(collision));
-    }
-    get(object) {
-        return this.map.get(object) || null;
-    }
-    invalidate(object) {
-        this.map.delete(object);
-        return false;
-    }
-    validate(object) {
-        const collision = this.get(object);
-        if (collision) {
-            const A = collision.collision.a;
-            const B = collision.collision.b;
-            const dThetaA = A.rotation - collision.aPrev.rotation;
-            const dThetaB = B.rotation - collision.bPrev.rotation;
-            const dA = collision.aPrev.position.Vminus(A.middle).sqrMag + dThetaA ** 2;
-            const dB = collision.bPrev.position.Vminus(B.middle).sqrMag + dThetaB ** 2;
-            const sum = dA + dB;
-            if (sum > CollisionCache.THRESHOLD) return this.invalidate(object);
-            else return true;
-        } else return false;
-    }
-}
-CollisionCache.THRESHOLD = 0.3;
 class CollisionMoniter {
     constructor() {
         this.top = null;
@@ -269,17 +244,13 @@ class Physics {
 
         s.SAT.SATChecks++;
 
-        let edges;
-        if (prevCol) edges = [prevCol.axis];
-        else {
-            const toB = b.middle.Vminus(a.middle);
-            const aEdges = a.__axes.filter(e => e.dot(toB) < 0);
-            const bEdges = b.__axes.filter(e => e.dot(toB) > 0);
-            edges = [
-                ...aEdges,
-                ...bEdges
-            ];
-        }
+        const toB = b.middle.Vminus(a.middle);
+        const aEdges = a.__axes.filter(e => e.dot(toB) < 0);
+        const bEdges = b.__axes.filter(e => e.dot(toB) > 0);
+        let edges = [
+            ...aEdges,
+            ...bEdges
+        ];
         const aCorners = a.getCorners();
         const bCorners = b.getCorners();
 
@@ -291,23 +262,31 @@ class Physics {
         let leastIntersection = Infinity;
         let pairs = [];
         for (let i = 0; i < edges.length; i++) {
-            let edge = edges[i];
-            let aRange = new Range();
-            let bRange = new Range();
-            if (!(edge.x + edge.y)) continue;
-            let aPoints = aCorners.map(e => e.dot(edge));
-            aRange.min = Math.min(...aPoints);
-            aRange.max = Math.max(...aPoints);
-
-            let bPoints = bCorners.map(e => e.dot(edge));
-            bRange.min = Math.min(...bPoints);
-            bRange.max = Math.max(...bPoints);
-            if (!(Range.intersect(aRange, bRange))) {
+            const edge = edges[i];
+            let a_max = -Infinity;
+            let b_min = Infinity;
+            let a_min = Infinity;
+            let b_max = -Infinity;
+            for (const corner of aCorners) {
+                const value = corner.dot(edge);
+                if (value < a_min) a_min = value;
+                if (value > a_max) a_max = value; 
+            }
+            for (const corner of bCorners) {
+                const value = corner.dot(edge);
+                if (value < b_min) b_min = value;
+                if (value > b_max) b_max = value; 
+            }
+            const includes = b_max > a_min && a_max > b_min;
+            if (!includes) {
                 colliding = false;
                 break;
             } else {
-                //colliding along axis!
-                pairs.push([aRange, bRange, edge]);
+                pairs.push([
+                    new Range(a_min, a_max), 
+                    new Range(b_min, b_max), 
+                    edge
+                ]);
             }
         }
         let col;
@@ -386,41 +365,35 @@ class Physics {
     }
     static fullCollide(a, b) {
         let tempCollisions = [];
-        if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) {
-            //axis invalid
-            if (s.collisionCache) {
-                a.__collisionCache.invalidate(b);
-                b.__collisionCache.invalidate(a);
-            }
-            return [];
-        }
-        if (s.collisionCache) {
-            a.__collisionCache.validate(b);
-            b.__collisionCache.validate(a);
-        }
+        if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return [];
+
         let shapes = a.getModels();
         let otherShapes = b.getModels();
-        const axis = s.collisionCache ? a.__collisionCache.get(b) || b.__collisionCache.get(a) : null;
+
         for (let shape of shapes) {
             for (let otherShape of otherShapes) {
-                tempCollisions.push(Physics.collide(shape, otherShape, axis));
+                tempCollisions.push(Physics.collide(shape, otherShape));
             }
         }
         let cols = tempCollisions.filter(e => e.colliding);
         if (cols.length) {
-            let max = cols[0];
-            let maxPen = Physics.getTotalPenetration(cols[0].contacts);
-            let contacts = [];
-            for (let col of cols) {
-                contacts.push(...col.contacts);
-                let pen = Physics.getTotalPenetration(col.contacts);
-                if (pen > maxPen) {
-                    maxPen = pen;
-                    max = col;
+            if (cols.length === 1) {
+                return [cols[0].setObjects(a, b)];
+            } else {
+                let max = cols[0];
+                let maxPen = Physics.getTotalPenetration(cols[0].contacts);
+                let contacts = [];
+                for (let col of cols) {
+                    contacts.push(...col.contacts);
+                    let pen = Physics.getTotalPenetration(col.contacts);
+                    if (pen > maxPen) {
+                        maxPen = pen;
+                        max = col;
+                    }
                 }
+                let res = new Collision(true, a, b, max.dir, contacts);
+                return [res];
             }
-            let res = new Collision(true, a, b, max.dir, contacts);
-            return [res];
         }
         return [];
     }
@@ -486,8 +459,6 @@ class Physics {
 
         //position
         if (col.penetration > 0.05) {
-            a.__collisionCache.put(col);
-            b.__collisionCache.put(col.switch());
             const dir = col.dir.Ntimes(col.penetration);
             //mass percents
             const aPer = mobileB ? 1 - a.__mass / (a.__mass + b.__mass) : 1;

@@ -469,7 +469,6 @@ class Scene extends InactiveScene {
 		this.cameras = {};
 		this.collisionEvents = false;
 		this.mouseEvents = false;
-		this.collisionCache = false;
 		this.camera = new Camera(0, 0, this.c.canvas.width, this.c.canvas.height, 1, 0);
 		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
 		M.engineClick = function (e) {
