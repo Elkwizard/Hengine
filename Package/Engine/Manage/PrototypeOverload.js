@@ -20,6 +20,10 @@ Function.prototype.performance = function (...args) {
 	const t_2 = performance.now();
 	return (t_2 - t_1) / iter;
 }
+Array.prototype.test = function(test) {
+	for (let i = 0; i < this.length; i++) if (test(this[i])) return true;
+	return false;
+}
 Array.prototype.randomize = function() {
 	const result = [];
 	const copy = [...this];

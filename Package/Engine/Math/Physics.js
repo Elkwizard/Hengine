@@ -241,6 +241,12 @@ class Physics {
         return { min, max };
     }
     static collidePolygonPoints(corners, axes, points) {
+        let ax = [];
+        for (let axis of axes) {
+            let inv = axis.inverse();
+            if (!ax.test(e => e.equals(inv))) ax.push(axis); 
+        }
+        axes = ax;
         let cols = [];
         for (let i = 0; i < points.length; i++) cols.push(true);
         for (let i = 0; i < axes.length; i++) {
@@ -259,15 +265,6 @@ class Physics {
         let toB = b.middle.minus(a.middle);
         let aAxes = a.__axes.map(e => e.inverse());
         let bAxes = b.__axes;
-
-        // let edges = a.getEdges();
-        // for (let i = 0; i < aAxes.length; i++) {
-        //     if (aAxes[i].dot(toB) > 0) c.stroke(cl.RED, 2).arrow(edges[i].midPoint, edges[i].midPoint.plus(aAxes[i].times(40)));
-        // }
-        // edges = b.getEdges();
-        // for (let i = 0; i < bAxes.length; i++) {
-        //     if (bAxes[i].dot(toB) > 0) c.stroke(cl.RED, 2).arrow(edges[i].midPoint, edges[i].midPoint.plus(bAxes[i].times(40)));
-        // }
 
         aAxes = aAxes.filter(e => e.dot(toB) > 0);
         bAxes = bAxes.filter(e => e.dot(toB) > 0);
