@@ -1,5 +1,5 @@
 class Animation {
-	constructor(src = "", frames = 1, delay = 0, loop = false, finResponse = e => e) {
+	constructor(src = "", frames = 1, delay = 0, loop = false, finResponse = () => null) {
 		this.stopped = false;
 		if (!Array.isArray(src)) {
 			this.frameCount = frames;
@@ -22,7 +22,7 @@ class Animation {
 		this.timer = 0;
 		this.totalTime = this.frames.length * this.delay;
 	}
-	fromImage(frame, imgWidth, imgHeight, delay = 0, loop = true, finResponse = e => e) {
+	fromImage(frame, imgWidth, imgHeight, delay = 0, loop = true, finResponse = () => null) {
 		const frames = frame.width / imgWidth;
 		const frameImgs = [];
 		for (let i = 0; i < frames; i++) {
