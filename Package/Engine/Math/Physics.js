@@ -303,8 +303,8 @@ class Physics {
         }
         if (colliding && bestAxis) {
             let contacts = [];
-            let contactsA = Physics.collidePolygonPoints(bCorners, bAxes, aCorners);
-            let contactsB = Physics.collidePolygonPoints(aCorners, aAxes, bCorners);
+            let contactsA = Physics.collidePolygonPoints(bCorners, b.__axes, aCorners);
+            let contactsB = Physics.collidePolygonPoints(aCorners, a.__axes, bCorners);
             for (let i = 0; i < contactsA.length; i++) {
                 let dot = contactsA[i].dot(bestAxis);
                 let pen = (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot;
@@ -316,6 +316,7 @@ class Physics {
                 if (pen > 0) contacts.push({ point: contactsB[i], pen });
             }
             contacts = contacts.map(e => new Contact(a, b, e.point, e.pen));
+            if (!contacts.length) return new Collision(false, a, b);
             return new Collision(true, a, b, bestAxis, contacts);
         } else return new Collision(false, a, b);
     }
