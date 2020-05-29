@@ -262,15 +262,19 @@ class Physics {
         return { min, max };
     }
     static collidePolygonPoints(corners, axes, points) {
+        let cols = [];
+        for (let i = 0; i < points.length; i++) cols.push(true);
         for (let i = 0; i < axes.length; i++) {
             let range = Physics.projectPolygonToAxis(corners, axes[i]);
-            let proj = point.dot(axes[i]);
-            let includes = proj >= range.min && proj <= range.max;
-            if (!includes) {
-                return false;
+            for (let j = 0; j < points.length; j++) {
+                let proj = points[j].dot(axes[i]);
+                let includes = proj >= range.min && proj <= range.max;
+                if (!includes) {
+                    cols[j] = false;
+                }
             }
         }
-        return true;
+        return points.filter((e, i) => cols[i]);
     }
     static collidePolygonPolygon(a, b) {
         let toB = b.middle.minus(a.middle);
@@ -312,27 +316,17 @@ class Physics {
             let n_range = Physics.projectOntoAxis(aCorners, bCorners, normal);
             let contactsA = Physics.collidePolygonPoints(bCorners, bAxes, aCorners);
             let contactsB = Physics.collidePolygonPoints(aCorners, aAxes, bCorners);
-            for (let i = 0; i < aCorners.length; i++) {
-                let dot = aCorners[i].dot(bestAxis);
-                // let n_dot = aCorners[i].dot(normal);
-                // if (dot >= bestRange.b_min &&
-                //     dot <= bestRange.b_max &&
-                //     n_dot >= n_range.b_min &&
-                //     n_dot <= n_range.b_max) 
-                if (Physics.collidePolygonPointValues(bCorners, bAxes, aCorners[i])) contacts.push({
-                        point: aCorners[i],
-                        pen: (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot
-                    });
+            for (let i = 0; i < contactsA.length; i++) {
+                let dot = contactsA[i].dot(bestAxis);
+                contacts.push({
+                    point: contactsA[i],
+                    pen: (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot
+                });
             }
-            for (let i = 0; i < bCorners.length; i++) {
-                let dot = bCorners[i].dot(bestAxis);
-                // let n_dot = bCorners[i].dot(normal);
-                // if (dot >= bestRange.a_min &&
-                //     dot <= bestRange.a_max &&
-                //     n_dot >= n_range.a_min &&
-                //     n_dot <= n_range.a_max)
-                if (Physics.collidePolygonPointValues(aCorners, aAxes, bCorners[i])) contacts.push({
-                        point: bCorners[i],
+            for (let i = 0; i < contactsB.length; i++) {
+                let dot = contactsB[i].dot(bestAxis);
+                contacts.push({
+                        point: contactsB[i],
                         pen: (dot < bestRange.a_m) ? dot - bestRange.a_min : bestRange.a_max - dot
                     });
             }
@@ -654,8 +648,8 @@ class Physics {
         impulseA = new Impulse(I_A, collisionPoint);
         impulseB = new Impulse(I_B, collisionPoint);
 
-        c.stroke(cl.RED).arrow(a.middle, collisionPoint);
-        c.draw(cl.ORANGE).circle(collisionPoint, 5);
+        // c.stroke(cl.RED).arrow(a.middle, collisionPoint);
+        // c.draw(cl.ORANGE).circle(collisionPoint, 5);
 
         if (b.completelyStatic) impulseB = null;
 
