@@ -333,7 +333,7 @@ class PhysicsObject extends SceneObject {
             let newRotation = this.rotation + this.angularVelocity * spdMod;
             this.privateSetRotation(newRotation);
 
-            this.updateCaches();
+            this.updateMovementCaches();
 
             this.checkAndResolveCollisions(others);
 
@@ -347,6 +347,10 @@ class PhysicsObject extends SceneObject {
             if (isNaN(this.x)) this.x = this.last.x;
             if (isNaN(this.y)) this.y = this.last.y;
         });
+    }
+    updateMovementCaches() {
+        this.cacheBoundingBoxes();
+        this.cacheAxes();
     }
     updateCaches() {
         this.cacheAxes();

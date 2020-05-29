@@ -257,8 +257,20 @@ class Physics {
     }
     static collidePolygonPolygon(a, b) {
         let toB = b.middle.minus(a.middle);
-        let aAxes = a.__axes.filter(e => e.dot(toB) < 0).map(e => e.inverse());
-        let bAxes = b.__axes.filter(e => e.dot(toB) > 0);
+        let aAxes = a.__axes.map(e => e.inverse());
+        let bAxes = b.__axes;
+
+        // let edges = a.getEdges();
+        // for (let i = 0; i < aAxes.length; i++) {
+        //     if (aAxes[i].dot(toB) > 0) c.stroke(cl.RED, 2).arrow(edges[i].midPoint, edges[i].midPoint.plus(aAxes[i].times(40)));
+        // }
+        // edges = b.getEdges();
+        // for (let i = 0; i < bAxes.length; i++) {
+        //     if (bAxes[i].dot(toB) > 0) c.stroke(cl.RED, 2).arrow(edges[i].midPoint, edges[i].midPoint.plus(bAxes[i].times(40)));
+        // }
+
+        aAxes = aAxes.filter(e => e.dot(toB) > 0);
+        bAxes = bAxes.filter(e => e.dot(toB) > 0);
         let axes = [
             ...aAxes,
             ...bAxes
@@ -297,17 +309,13 @@ class Physics {
             let contactsB = Physics.collidePolygonPoints(aCorners, aAxes, bCorners);
             for (let i = 0; i < contactsA.length; i++) {
                 let dot = contactsA[i].dot(bestAxis);
-                contacts.push({
-                    point: contactsA[i],
-                    pen: (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot
-                });
+                let pen = (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot;
+                if (pen > 0) contacts.push({ point: contactsA[i], pen });
             }
             for (let i = 0; i < contactsB.length; i++) {
                 let dot = contactsB[i].dot(bestAxis);
-                contacts.push({
-                        point: contactsB[i],
-                        pen: (dot < bestRange.a_m) ? dot - bestRange.a_min : bestRange.a_max - dot
-                    });
+                let pen = (dot < bestRange.a_m) ? dot - bestRange.a_min : bestRange.a_max - dot;
+                if (pen > 0) contacts.push({ point: contactsB[i], pen });
             }
             contacts = contacts.map(e => new Contact(a, b, e.point, e.pen));
             return new Collision(true, a, b, bestAxis, contacts);
@@ -628,6 +636,7 @@ class Physics {
         impulseB = new Impulse(I_B, collisionPoint);
 
         // c.stroke(cl.RED).arrow(a.middle, collisionPoint);
+        // c.stroke(cl.RED).arrow(collisionPoint, collisionPoint.plus(I_A.normalized.times(50)));
         // c.draw(cl.ORANGE).circle(collisionPoint, 5);
 
         if (b.completelyStatic) impulseB = null;

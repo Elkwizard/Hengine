@@ -133,6 +133,14 @@ class SceneObject {
 		for (let shape of result) this.addShape(num++, shape);
 		return result;
 	}
+	cacheDimensions() {
+		let old_rot = this.rotation;
+		this.rotation = 0;
+		let bound = this.getBoundingBox();
+		this.__width = bound.width;
+		this.__height = bound.height;
+		this.rotation = old_rot;
+	}
 	cacheBoundingBoxes() {
 		let shapes = this.getShapes();
 		let pos = this.middle;
@@ -163,7 +171,6 @@ class SceneObject {
 		shape = shape.get();
 		this.shapes[name] = shape;
 		if (shape instanceof Polygon && !(shape instanceof Rect)) shape.subdivideForCollisions();
-		this.updateCaches();
 	}
 	worldSpaceToModelSpace(v) {
 		return v.rotate(this.rotation).Vplus(this.middle);
@@ -186,18 +193,9 @@ class SceneObject {
 			shape.move(dif);
 		}
 	}
-	cacheDimensions() {
-		let old_rot = this.rotation;
-		this.rotation = 0;
-		let bound = this.getBoundingBox();
-		this.__width = bound.width;
-		this.__height = bound.height;
-		this.rotation = old_rot;
-	}
 	removeShape(name) {
 		let shape = this.shapes[name];
 		delete this.shapes[name];
-		this.updateCaches();
 		return shape;
 	}
 	removeAllShapes() {
@@ -232,8 +230,6 @@ class SceneObject {
 	scale(factor) {
 		let middle = Vector2.origin;
 		for (let shape of this.getShapes()) shape.scaleAbout(middle, factor);
-		this.cacheBoundingBoxes();
-		this.cacheDimensions();
 	}
 	getModels() {
 		let ary = this.getShapes();

@@ -123,10 +123,12 @@ class Engine {
 		this.engineUpdate = function () {
 			try {
 				if (this.hasFixedPhysicsUpdateCycle) if (!this.paused) {
+					this.updateIntervalCalls("FIXED_UPDATE");
 					this.fixedUpdate();
 					this.fixedScript.run();
 					this.scene.engineFixedUpdate();
                     this.afterFixedUpdate();
+					this.updateIntervalCalls("AFTER_FIXED");
 				}
 			} catch (e) {
 				if (this.catchErrors) this.output("Fixed Update Error: " + e);
@@ -161,9 +163,11 @@ class Engine {
 					this.scene.engineDrawUpdate();
 					if (!this.hasFixedPhysicsUpdateCycle) {
 						this.fixedUpdate();
+						this.updateIntervalCalls("FIXED_UPDATE");
 						this.fixedScript.run();
 						this.scene.engineFixedUpdate();
 						this.afterFixedUpdate();
+						this.updateIntervalCalls("AFTER_FIXED");
 					}
 					this.updateIntervalCalls("AFTER");
 					this.afterUpdate();

@@ -5,7 +5,6 @@ class InactiveScene {
 		this.rebound = 0;
 		this.elementArray = [];
 		this.custom = {};
-		this.templates = {};
 		this.angularDragForce = .995;
 		this.linearDragForce = .995;
 		this.frictionDragForce = 0.2;
@@ -410,7 +409,6 @@ class Camera extends Rect {
 	getWorld() {
 		let m = this.getModel(Vector2.origin, 0);
 		m.scale(1 / this.zoom);
-		m.cacheBoundingBox(m.getBoundingBox());
 		this.newView = new this.RenderType(width, height);
 		return m;
 	}
@@ -693,7 +691,7 @@ class Scene extends InactiveScene {
 		return this.cameras[name];
 	}
 	renderCamera(camera) {
-		let screen = camera.getWorld().__boundingBox;
+		let screen = camera.getWorld().getBoundingBox();
 		this.c.embody(camera.newView);
 		camera.transformToWorld(this.c);
 		for (let rect of this.elementArray) {
