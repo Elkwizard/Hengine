@@ -168,15 +168,13 @@ class Geometry {
         return bestPoint;
     }
     static closestPointOnPolygon(point, r) {
-        let edges = [];
-        let corners = r.getCorners();
+        let toB = r.middle.Vminus(point);
+        let edges = r.getEdges().filter(e => {
+            let v = e.b.Vminus(e.a).normal;
+            return v.dot(toB) > 0;
+        })
         let bestPoint = null;
         let bestDist = Infinity;
-        for (let i = 0; i < corners.length; i++) {
-            let a = corners[i];
-            let b = corners[(i + 1) % corners.length];
-            edges.push(new Line(a, b));
-        }
         for (let edge of edges) {
             let p = Geometry.closestPointOnLineObject(point, edge);
             let dist = Geometry.distToPoint2(p, point);

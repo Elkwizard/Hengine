@@ -195,27 +195,6 @@ class Physics {
         } else col = new Collision(false, a, b);
         return col;
     }
-    static collidePolygonCircle(a, b) {
-        const bestPoint = Geometry.closestPointOnPolygon(b.middle, a);
-        const inside = Physics.collidePolygonPoint(a, b.middle).colliding;
-        const colliding = Geometry.distToPoint2(bestPoint, b.middle) < b.radius ** 2 || inside;
-
-        let col;
-        if (colliding) {
-            s.SAT.collisions++;
-            if (!bestPoint) return new Collision(false, a, b);
-
-            //towards b, from collision
-            const collisionAxis = b.middle.Vminus(bestPoint);
-            const bestDist = collisionAxis.mag;
-            collisionAxis.Ndiv(bestDist);
-            const penetration = b.radius + (inside ? bestDist : -bestDist);
-            if (inside) collisionAxis.invert();
-
-            col = new Collision(true, a, b, collisionAxis, [new Contact(a, b, bestPoint, penetration)]);
-            return col;
-        } else return new Collision(false, a, b);
-    }
     static collideCirclePolygon(a, b) {
         const bestPoint = Geometry.closestPointOnPolygon(a.middle, b);
         const inside = Physics.collidePolygonPoint(b, a.middle).colliding;

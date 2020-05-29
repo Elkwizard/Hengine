@@ -1,3 +1,9 @@
+let globalSquareRoots = 0;
+let sqrt = Math.sqrt.bind(Math);
+Math.sqrt = function(n) {
+	globalSquareRoots++;
+	return sqrt(n);
+}
 const MESSAGE_BEGIN = "__BEGIN__";
 const MESSAGE_END = "__END__";
 const MESSAGE_BODY = (m) => "__MESSAGE { " + m + "}__"
