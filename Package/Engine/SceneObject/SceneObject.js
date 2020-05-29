@@ -54,10 +54,11 @@ class SceneObject {
 		this.isDead = false;
 		this.onScreen = true;
 		this.cullGraphics = true;
+		this.cacheBoundingBoxes();
 		this.response = {
-			click: () => null,
-			rightClick: () => null,
-			hover: () => null
+			click: e => e,
+			rightClick: e => e,
+			hover: e => e
 		}
 		this.response.input = {
 			up: function () { },
@@ -71,15 +72,6 @@ class SceneObject {
 
 		this.__width = 0;
 		this.__height = 0;
-		
-		this.caches = new CacheManager();
-		this.caches.createCache("boundingBox", this.getBoundingBox.bind(this), function () {
-			for (let name in this.shapes) {
-				let shape = this.shapes[name];
-				shape.caches.invalidateCache("boundingBox");
-				if (shape instanceof Polygon) shape.caches.invalidateCache("axes");
-			}
-		}.bind(this));
 	}
 	set middle(a) {
 		this.x = a.x;
@@ -141,12 +133,19 @@ class SceneObject {
 		for (let shape of result) this.addShape(num++, shape);
 		return result;
 	}
+	cacheBoundingBoxes() {
+		let shapes = this.getShapes();
+		let pos = this.middle;
+		let rot = this.rotation;
+		for (let i = 0; i < shapes.length; i++) shapes[i].cacheBoundingBox(shapes[i].getModel(pos, rot).getBoundingBox()); //transfer from model to root shape
+		this.__boundingBox = this.getBoundingBox();
+	}
 	getBoundingBox() {
 		let shapes = this.getModels();
 		let boxes = shapes.map(e => e.getBoundingBox());
 		if (boxes.length === 1) return boxes[0];
-		let mins = boxes.map(e => new Vector2(e.x, e.y));
-		let maxs = boxes.map(e => new Vector2(e.x + e.width, e.y + e.height));
+		let mins = boxes.map(e => e.vertices[0]);
+		let maxs = boxes.map(e => e.vertices[2]);
 		let minX = Math.min(...mins.map(e => e.x));
 		let minY = Math.min(...mins.map(e => e.y));
 		let maxX = Math.max(...maxs.map(e => e.x));
@@ -164,13 +163,7 @@ class SceneObject {
 		shape = shape.get();
 		this.shapes[name] = shape;
 		if (shape instanceof Polygon && !(shape instanceof Rect)) shape.subdivideForCollisions();
-		shape.caches.createCache("boundingBox", function() {
-			return shape.getModel(this.middle, this.rotation).getBoundingBox();
-		}.bind(this));
-		if (shape instanceof Polygon) shape.caches.createCache("axes", function() {
-			return shape.getModel(this.middle, this.rotation).getAxes();
-		}.bind(this));
-		this.caches.invalidateCache("boundingBox");
+		this.updateCaches();
 	}
 	worldSpaceToModelSpace(v) {
 		return v.rotate(this.rotation).Vplus(this.middle);
@@ -192,8 +185,6 @@ class SceneObject {
 		for (let shape of shapes) {
 			shape.move(dif);
 		}
-		this.caches.invalidateCache("boundingBox");
-		this.cacheDimensions();
 	}
 	cacheDimensions() {
 		let old_rot = this.rotation;
@@ -333,7 +324,7 @@ class SceneObject {
 		c.translate(middle.inverse());
 	}
 	engineDrawUpdate(screen) {
-		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.caches.getCache("boundingBox"), screen);
+		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, screen);
 		if (!this.hidden && onScreen) {
 			this.runDraw();
 		}
