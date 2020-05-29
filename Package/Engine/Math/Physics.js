@@ -239,39 +239,52 @@ class Physics {
         } else col = new Collision(false, a, b);
         return col;
     }
-    static projectOntoAxis (v_a, v_b, ax) {
-        let a_max = -Infinity;
-        let b_min = Infinity;
-        let a_min = Infinity;
-        let b_max = -Infinity;
-        for (let corner of v_a) {
-            let value = corner.dot(ax);
-            if (value < a_min) a_min = value;
-            if (value > a_max) a_max = value;
-        }
-        for (let corner of v_b) {
-            let value = corner.dot(ax);
-            if (value < b_min) b_min = value;
-            if (value > b_max) b_max = value;
-        }
-        return { a_min, a_max, b_min, b_max, a_m: (a_min + a_max) / 2, b_m: (b_min + b_max) / 2 };
-    }
-    static collidePolygonCircle (a, b) {
+    static collidePolygonCircle(a, b) {
         return Physics.collideCirclePolygon(b, a).switch();
     }
-    static collidePolygonPolygon (a, b) {
+    static projectOntoAxis(v_a, v_b, ax) {
+        let aRange = Physics.projectPolygonToAxis(v_a, ax);
+        let bRange = Physics.projectPolygonToAxis(v_b, ax);
+        let a_min = aRange.min;
+        let a_max = aRange.max;
+        let b_min = bRange.min;
+        let b_max = bRange.max;
+        return { a_min, a_max, b_min, b_max, a_m: (a_min + a_max) / 2, b_m: (b_min + b_max) / 2 };
+    }
+    static projectPolygonToAxis(v, ax) {
+        let min = Infinity;
+        let max = -Infinity;
+        for (let i = 0; i < v.length; i++) {
+            let value = v[i].dot(ax);
+            if (value < min) min = value;
+            if (value > max) max = value;
+        }
+        return { min, max };
+    }
+    static collidePolygonPoints(corners, axes, points) {
+        for (let i = 0; i < axes.length; i++) {
+            let range = Physics.projectPolygonToAxis(corners, axes[i]);
+            let proj = point.dot(axes[i]);
+            let includes = proj >= range.min && proj <= range.max;
+            if (!includes) {
+                return false;
+            }
+        }
+        return true;
+    }
+    static collidePolygonPolygon(a, b) {
         let toB = b.middle.minus(a.middle);
-        let aAxes = a.getAxes().filter(e => e.dot(toB) < 0).map(e => e.inverse());
-        let bAxes = b.getAxes().filter(e => e.dot(toB) > 0);
+        let aAxes = a.__axes.filter(e => e.dot(toB) < 0).map(e => e.inverse());
+        let bAxes = b.__axes.filter(e => e.dot(toB) > 0);
         let axes = [
             ...aAxes,
             ...bAxes
         ];
-    
+
         let aCorners = a.getCorners();
         let bCorners = b.getCorners();
         let colliding = true;
-    
+
         let bestAxis = Vector2.up;
         let bestRange = {};
         let minOverlap = Infinity;
@@ -279,14 +292,13 @@ class Physics {
             const axis = axes[i];
             let range = Physics.projectOntoAxis(aCorners, bCorners, axis);
             let { a_min, a_max, b_min, b_max, a_m, b_m } = range;
-            
+
             let includes = b_max > a_min && a_max > b_min;
-    
             if (!includes) {
                 colliding = false;
                 break;
             } else {
-                let overlap = (a_m < b_m) ? a_max - b_min : b_max - a_min;
+                let overlap = Math.abs((a_m < b_m) ? a_max - b_min : b_max - a_min);
                 if (overlap < minOverlap) {
                     minOverlap = overlap;
                     bestAxis = axis;
@@ -298,27 +310,31 @@ class Physics {
             let contacts = [];
             let normal = bestAxis.normal;
             let n_range = Physics.projectOntoAxis(aCorners, bCorners, normal);
+            let contactsA = Physics.collidePolygonPoints(bCorners, bAxes, aCorners);
+            let contactsB = Physics.collidePolygonPoints(aCorners, aAxes, bCorners);
             for (let i = 0; i < aCorners.length; i++) {
                 let dot = aCorners[i].dot(bestAxis);
-                let n_dot = aCorners[i].dot(normal);
-                if (dot >= bestRange.b_min &&
-                    dot <= bestRange.b_max &&
-                    n_dot >= n_range.b_min &&
-                    n_dot <= n_range.b_max) contacts.push({
+                // let n_dot = aCorners[i].dot(normal);
+                // if (dot >= bestRange.b_min &&
+                //     dot <= bestRange.b_max &&
+                //     n_dot >= n_range.b_min &&
+                //     n_dot <= n_range.b_max) 
+                if (Physics.collidePolygonPointValues(bCorners, bAxes, aCorners[i])) contacts.push({
                         point: aCorners[i],
                         pen: (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot
-                    }); 
+                    });
             }
             for (let i = 0; i < bCorners.length; i++) {
                 let dot = bCorners[i].dot(bestAxis);
-                let n_dot = bCorners[i].dot(normal);
-                if (dot >= bestRange.a_min &&
-                    dot <= bestRange.a_max &&
-                    n_dot >= n_range.a_min &&
-                    n_dot <= n_range.a_max) contacts.push({
+                // let n_dot = bCorners[i].dot(normal);
+                // if (dot >= bestRange.a_min &&
+                //     dot <= bestRange.a_max &&
+                //     n_dot >= n_range.a_min &&
+                //     n_dot <= n_range.a_max)
+                if (Physics.collidePolygonPointValues(aCorners, aAxes, bCorners[i])) contacts.push({
                         point: bCorners[i],
                         pen: (dot < bestRange.a_m) ? dot - bestRange.a_min : bestRange.a_max - dot
-                    }); 
+                    });
             }
             contacts = contacts.map(e => new Contact(a, b, e.point, e.pen));
             return new Collision(true, a, b, bestAxis, contacts);
@@ -366,15 +382,16 @@ class Physics {
     static fullCollideBool(a, b) {
         return !!Physics.fullCollide(a, b).length;
     }
-    static resolveContacts (a, b, contacts, direction) {
+    static resolveContacts(a, b, contacts, direction) {
         let penFactor = 1 / Physics.getTotalPenetration(contacts);
         let impulsesA = [], impulsesB = [];
+        let tangent = direction.normal;
         for (let i = 0; i < contacts.length; i++) {
             let contact = contacts[i];
             let { impulseA, impulseB } = Physics.getImpulses(a, b, direction, contact.point);
             if (impulseA) impulsesA.push(impulseA.forceMul(contact.penetration));
             if (impulseB) impulsesB.push(impulseB.forceMul(contact.penetration));
-            let friction = Physics.getFrictionImpulses(a, b, direction, contact.point);
+            let friction = Physics.getFrictionImpulses(a, b, tangent, contact.point);
             impulseA = friction.impulseA;
             impulseB = friction.impulseB;
             if (impulseA) impulsesA.push(impulseA.forceMul(contact.penetration));
@@ -383,30 +400,35 @@ class Physics {
         for (let i = 0; i < impulsesA.length; i++) a.applyImpulse(impulsesA[i].forceMul(penFactor));
         for (let i = 0; i < impulsesB.length; i++) b.applyImpulse(impulsesB[i].forceMul(penFactor));
     }
-    static resolve (col) {
+    static resolve(col) {
         let { a, b, dir, contacts, penetration } = col;
-    
+
         //going away
         if (b.velocity.dot(dir) - b.velocity.dot(dir) < 0) return;
-    
-    
+
+
         let move = dir.Ntimes(-penetration);
         let massPerA = a.__mass / (a.__mass + b.__mass);
         let massPerB = 1 - massPerA;
         let isWallB = Physics.isWall(b);
-    
+
         a.privateMove(isWallB ? move : move.Ntimes(massPerA));
         a.cacheBoundingBoxes();
         if (!isWallB) {
             b.privateMove(move.Ntimes(-massPerB));
             b.cacheBoundingBoxes();
         }
-    
+
         Physics.resolveContacts(a, b, contacts, dir);
-    
-        //immobilize
+
+        // for (let contact of contacts.slice(0, 1)) c.stroke(cl.RED, 2).arrow(contact.point, contact.point.plus(dir.times(40)));
+
+        // immobilize
         a.canMoveThisFrame = false;
         const inv_dir = dir.inverse();
+        if (a.positionStatic) {
+            b.prohibited.push(inv_dir);
+        }
         for (let i = 0; i < b.prohibited.length; i++) {
             let pro = b.prohibited[i];
             const dot = pro.dot(dir);
@@ -416,9 +438,6 @@ class Physics {
         }
         if (b.positionStatic) {
             a.prohibited.push(dir);
-        }
-        if (a.positionStatic) {
-            b.prohibited.push(inv_dir);
         }
     }
     static events(col) {
@@ -634,6 +653,9 @@ class Physics {
 
         impulseA = new Impulse(I_A, collisionPoint);
         impulseB = new Impulse(I_B, collisionPoint);
+
+        c.stroke(cl.RED).arrow(a.middle, collisionPoint);
+        c.draw(cl.ORANGE).circle(collisionPoint, 5);
 
         if (b.completelyStatic) impulseB = null;
 
