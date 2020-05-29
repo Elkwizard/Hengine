@@ -25,6 +25,11 @@ class CacheManager {
         let cache = new Cache(getValue, onInvalidate);
         this.caches.set(name, cache);
     }
+    extract(manager) {
+        for (let [key, value] of manager) {
+            this.createCache(key, value.getValue, value.onInvalidate);
+        }
+    }
     invalidateCache(name) {
         this.caches.get(name).invalidate();
     }

@@ -61,7 +61,7 @@ class Line {
 class Shape {
 	constructor(rotation = 0) {
 		this.rotation = rotation;
-		this.__boundingBox = null; //bounding box cache
+		this.caches = new CacheManager(); // caches
 		this.collisionShapes = [this]; //a list of the shapes that make up the shape
 	}
 	get middle() {
@@ -79,7 +79,7 @@ class Shape {
 	}
 	cache(shape) {
 		//retrieve cached values
-		this.__boundingBox = shape.__boundingBox;
+		this.caches.extract(shape.caches);
 	}
 	cacheBoundingBox(box) {
 		//store bounding box for later use
@@ -119,7 +119,6 @@ class Polygon extends Shape {
 		super(rotation);
 		this.vertices = vertices;
 		this.vertexDirection = true;
-		this.__axes = [];
 	}
 	set middle(a) {
 		this.center(a);
@@ -192,13 +191,6 @@ class Polygon extends Shape {
 			axes.push(slope);
 		}
 		return axes;
-	}
-	cacheAxes(axes) {
-		this.__axes = axes;
-	}
-	cache(shape) {
-		this.__axes = shape.__axes;
-		this.__boundingBox = shape.__boundingBox;
 	}
 	getEdges() {
 		let edges = [];
