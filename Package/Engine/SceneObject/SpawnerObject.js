@@ -78,7 +78,8 @@ class ParticleSpawnerObject extends SceneObject {
         let len = 1;
         if (this.particleDelay < 1) len = 1 / this.particleDelay;
         for (let i = 0; i < len; i++) {
-            this.home.addParticle(this);
+            let name = "Particle #" + this.particleNumber++ + " from " + this.name;
+            let ns = new ParticleObject(this, this.home, name);
         }
     }
     engineFixedUpdate() {

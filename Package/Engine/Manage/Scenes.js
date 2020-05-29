@@ -70,7 +70,7 @@ class InactiveScene {
 		return n;
 	}
 	hideElement(name) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			this.elements[e].hide();
 			this.elements[e].logMod(function HIDE() {
 				this.hide();
@@ -79,7 +79,7 @@ class InactiveScene {
 		return this;
 	}
 	showElement(name) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			this.elements[e].show();
 			this.elements[e].logMod(function SHOW() {
 				this.show();
@@ -87,7 +87,7 @@ class InactiveScene {
 		}.bind(this));
 		return this;
 	}
-	genName_PRIVATE(database, name) {
+	genName(database, name) {
 		let num = 0;
 		let n = name;
 		function check() {
@@ -99,7 +99,7 @@ class InactiveScene {
 		return n;
 	}
 	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.elements, name);
+		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.changeElementDraw(n, this.defaultDraw);
@@ -107,7 +107,7 @@ class InactiveScene {
 		return n;
 	}
 	addCircleElement(name, x, y, radius, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.elements, name);
+		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this);
 		n.addShape("default", new Circle(0, 0, radius));
 		this.changeElementDraw(n, this.defaultDraw);
@@ -115,21 +115,21 @@ class InactiveScene {
 		return n;
 	}
 	addElement(name, x, y, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.elements, name);
+		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this);
 		this.changeElementDraw(n, this.defaultDraw);
 		this.elements[name] = n;
 		return n;
 	}
 	addPhysicsElement(name, x, y, gravity, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.elements, name);
+		name = this.genName(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		this.changeElementDraw(n, this.defaultPhysDraw);
 		this.elements[name] = n;
 		return n;
 	}
 	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.elements, name);
+		name = this.genName(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		n.cacheMass();
@@ -138,7 +138,7 @@ class InactiveScene {
 		return n;
 	}
 	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.elements, name);
+		name = this.genName(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Circle(0, 0, radius));
 		n.cacheMass();
@@ -147,7 +147,7 @@ class InactiveScene {
 		return n;
 	}
 	addUIElement(name, x, y, width, height, draw = function () { }) {
-		name = this.genName_PRIVATE(this.elements, name);
+		name = this.genName(this.elements, name);
 		if (width < 0) {
 			width = -width;
 			x -= width;
@@ -162,21 +162,15 @@ class InactiveScene {
 		return n;
 	}
 	addContainer(name, active) {
-		name = this.genName_PRIVATE(this.elements, name);
+		name = this.genName(this.elements, name);
 		let x = new InactiveScene(name);
 		x.active = active;
 		x.home = this.home;
 		this.elements[name] = x;
 		return x;
 	}
-	addParticle(spawner) {
-		let name = "Particle #" + spawner.particleNumber++ + " from " + spawner.name;
-		name = this.genName_PRIVATE(this.elements, name);
-		let ns = new ParticleObject(spawner, this, name);
-		return ns;
-	}
-	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), falls = false, slows = true, fades = true) {
-		name = this.genName_PRIVATE(this.elements, "Default-Explosion-Spawner");
+	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true) {
+		name = this.genName(this.elements, "Default-Explosion-Spawner");
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
 		this.elements[name] = ns;
 		for (let i = 0; i < amountParticles; i++) {
@@ -193,8 +187,8 @@ class InactiveScene {
 		}
 		return ns;
 	}
-	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), falls = false, slows = true, fades = true, active = true) {
-		name = this.genName_PRIVATE(this.elements, name);
+	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true, active = true) {
+		name = this.genName(this.elements, name);
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
 		this.elements[name] = ns;
 		ns.particleFalls = falls;
@@ -208,7 +202,7 @@ class InactiveScene {
 		return window[name];
 	}
 	removeElement(name) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			let x = this.elements[e.name];
 			if (x) {
 				x.isDead = true;
@@ -264,11 +258,11 @@ class InactiveScene {
 		}
 		return ary;
 	}
-	performFunctionBasedOnType_PRIVATE(name, func) {
+	performFunctionBasedOnType(name, func) {
 		if (typeof name === "object") {
 			if (Array.isArray(name)) {
 				for (let item of name) {
-					this.performFunctionBasedOnType_PRIVATE(item, func);
+					this.performFunctionBasedOnType(item, func);
 				}
 			} else {
 				func(name);
@@ -277,16 +271,8 @@ class InactiveScene {
 			func(this.get(name));
 		}
 	}
-	UI(name) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			e.logMod(function UI() {
-				this.home.UI(this);
-			});
-		}.bind(this));
-		return this;
-	}
 	changeElementDraw(name, newDraw) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			e.draw = newDraw.bind(e);
 			e.logMod(function CHANGE_DRAW() {
 				this.home.changeElementDraw(this, newDraw);
@@ -295,7 +281,7 @@ class InactiveScene {
 		return this;
 	}
 	changeElementMethod(name, method, newMethod) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			e[method] = newMethod.bind(e);
 			e.logMod(function CHANGE_METHOD() {
 				this.home.changeElementMethod(this, method, newMethod);
@@ -304,7 +290,7 @@ class InactiveScene {
 		return this;
 	}
 	changeElementResponse(name, input, newResponse) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			this.elements[e].response.input[input] = newResponse.bind(this.elements[e]);
 			this.elements[e].logMod(function CHANGE_INPUT() {
 				this.home.changeElementResponse(this, input, newResponse);
@@ -313,7 +299,7 @@ class InactiveScene {
 		return this;
 	}
 	changeElementUpdate(name, newUpdate) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			e.update = newUpdate.bind(e);
 			e.logMod(function CHANGE_UPDATE() {
 				this.home.changeElementUpdate(this, newUpdate);
@@ -322,7 +308,7 @@ class InactiveScene {
 		return this;
 	}
 	changeElementCollideResponse(name, dir, newResponse) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			e.response.collide[dir] = newResponse.bind(e);
 			e.logMod(function CHANGE_COLLIDE_RESPONSE() {
 				this.home.changeElementCollideResponse(this, dir, newResponse);
@@ -331,7 +317,7 @@ class InactiveScene {
 		return this;
 	}
 	changeElementCollideRule(name, newRule) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			(new ElementScript("auto_generated_collide_rule #" + performance.now(), {
 				collide_rule(l, e) {
 					return newRule.bind(this)(e);
@@ -344,7 +330,7 @@ class InactiveScene {
 		return this;
 	}
 	changeElementCollideOptimize(name, newRule) {
-		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
+		this.performFunctionBasedOnType(name, function (e) {
 			e.optimize = newRule.bind(e);
 			e.logMod(function CHANGE_COLLIDE_OPTIMIZE() {
 				this.home.changeElementCollideOptimize(this, newRule);
@@ -699,7 +685,7 @@ class Scene extends InactiveScene {
 		newEl.usedForCellSize = true;
 	}
 	addCamera(name, camera) {
-		name = this.genName_PRIVATE(this.cameras, name);
+		name = this.genName(this.cameras, name);
 		this.cameras[name] = camera;
 		return this.cameras[name];
 	}

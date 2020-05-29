@@ -571,6 +571,24 @@ class Vector3 extends Vector {
 			this.y = x;
 			this.z = x;
 		}
+	}	
+	static get left() {
+		return new Vector3(-1, 0, 0);
+	}
+	static get right() {
+		return new Vector3(1, 0, 0);
+	}
+	static get up() {
+		return new Vector3(0, -1, 0);
+	}
+	static get down() {
+		return new Vector3(0, 1, 0);
+	}
+	static get forward() {
+		return new Vector3(0, 0, 1);
+	}
+	static get backward() {
+		return new Vector3(0, 0, -1);
 	}
 	static get origin() {
 		return new Vector3(0, 0, 0);
