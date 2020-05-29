@@ -305,10 +305,10 @@ class SceneObject {
 	}
 	runDraw() {
 		let middle = this.middle;
-		c.save();
 		c.translate(middle);
-		c.rotate(this.rotation);
-		for (let [name, shape] of this.shapes) {
+		if (this.rotation) c.rotate(this.rotation);
+		for (let name in this.shapes) {
+			let shape = this.shapes[name];
 			if (shape.rotation) {
 				c.save();
 				let sMiddle = shape.middle;
@@ -320,7 +320,8 @@ class SceneObject {
 			this.scripts.run("draw", name, shape);
 			if (shape.rotation) c.restore();
 		}
-		c.restore();
+		c.rotate(-this.rotation);
+		c.translate(middle.inverse());
 	}
 	engineDrawUpdate(screen) {
 		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, screen);
