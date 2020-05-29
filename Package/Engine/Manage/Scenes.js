@@ -3,7 +3,7 @@ class InactiveScene {
 		this.gravity = gravity;
 		this.name = name;
 		this.rebound = 0;
-		this.containsArray = [];
+		this.elementArray = [];
 		this.custom = {};
 		this.templates = {};
 		this.angularDragForce = .995;
@@ -29,20 +29,20 @@ class InactiveScene {
 			this.home.c.draw("Black").circle(this.middle.x, this.middle.y, this.width / 2);
 		}
 		this.defaultUpdate = function () { }
-		this.contains = {};
+		this.elements = {};
 	}
 	updateArray() {
-		this.containsArray = [];
-		for (let rect in this.contains) {
-			let cont = this.contains[rect];
+		this.elementArray = [];
+		for (let rect in this.elements) {
+			let cont = this.elements[rect];
 			if (cont instanceof InactiveScene) {
 				if (cont.active) {
 					let ary = cont.updateArray();
-					this.containsArray.push(...ary);
+					this.elementArray.push(...ary);
 				}
-			} else this.containsArray.push(cont);
+			} else this.elementArray.push(cont);
 		}
-		return this.containsArray;
+		return this.elementArray;
 	}
 	copy(el) {
 		let n;
@@ -71,8 +71,8 @@ class InactiveScene {
 	}
 	hideElement(name) {
 		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			this.contains[e].hide();
-			this.contains[e].logMod(function HIDE() {
+			this.elements[e].hide();
+			this.elements[e].logMod(function HIDE() {
 				this.hide();
 			});
 		}.bind(this));
@@ -80,8 +80,8 @@ class InactiveScene {
 	}
 	showElement(name) {
 		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			this.contains[e].show();
-			this.contains[e].logMod(function SHOW() {
+			this.elements[e].show();
+			this.elements[e].logMod(function SHOW() {
 				this.show();
 			});
 		}.bind(this));
@@ -99,55 +99,55 @@ class InactiveScene {
 		return n;
 	}
 	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.changeElementDraw(n, this.defaultDraw);
-		this.contains[name] = n;
+		this.elements[name] = n;
 		return n;
 	}
 	addCircleElement(name, x, y, radius, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this);
 		n.addShape("default", new Circle(0, 0, radius));
 		this.changeElementDraw(n, this.defaultDraw);
-		this.contains[name] = n;
+		this.elements[name] = n;
 		return n;
 	}
 	addElement(name, x, y, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this);
 		this.changeElementDraw(n, this.defaultDraw);
-		this.contains[name] = n;
+		this.elements[name] = n;
 		return n;
 	}
 	addPhysicsElement(name, x, y, gravity, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		this.changeElementDraw(n, this.defaultPhysDraw);
-		this.contains[name] = n;
+		this.elements[name] = n;
 		return n;
 	}
 	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		n.cacheMass();
 		this.changeElementDraw(n, this.defaultPhysDraw);
-		this.contains[name] = n;
+		this.elements[name] = n;
 		return n;
 	}
 	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls(), tag = "") {
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Circle(0, 0, radius));
 		n.cacheMass();
 		this.changeElementDraw(n, this.defaultPhysDraw);
-		this.contains[name] = n;
+		this.elements[name] = n;
 		return n;
 	}
 	addUIElement(name, x, y, width, height, draw = function () { }) {
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		if (width < 0) {
 			width = -width;
 			x -= width;
@@ -156,29 +156,29 @@ class InactiveScene {
 			height = -height;
 			y -= height;
 		}
-		this.contains[name] = new UIObject(name, x, y, draw, this);
-		let n = this.contains[name];
+		this.elements[name] = new UIObject(name, x, y, draw, this);
+		let n = this.elements[name];
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		return n;
 	}
 	addContainer(name, active) {
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		let x = new InactiveScene(name);
 		x.active = active;
 		x.home = this.home;
-		this.contains[name] = x;
+		this.elements[name] = x;
 		return x;
 	}
 	addParticle(spawner) {
 		let name = "Particle #" + spawner.particleNumber++ + " from " + spawner.name;
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		let ns = new ParticleObject(spawner, this, name);
 		return ns;
 	}
 	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), falls = false, slows = true, fades = true) {
-		name = this.genName_PRIVATE(this.contains, "Default-Explosion-Spawner");
+		name = this.genName_PRIVATE(this.elements, "Default-Explosion-Spawner");
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
-		this.contains[name] = ns;
+		this.elements[name] = ns;
 		for (let i = 0; i < amountParticles; i++) {
 			ns.spawnParticle();
 		}
@@ -194,9 +194,9 @@ class InactiveScene {
 		return ns;
 	}
 	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), falls = false, slows = true, fades = true, active = true) {
-		name = this.genName_PRIVATE(this.contains, name);
+		name = this.genName_PRIVATE(this.elements, name);
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
-		this.contains[name] = ns;
+		this.elements[name] = ns;
 		ns.particleFalls = falls;
 		ns.particleFades = fades;
 		ns.particleSlows = slows;
@@ -209,30 +209,30 @@ class InactiveScene {
 	}
 	removeElement(name) {
 		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			let x = this.contains[e.name];
+			let x = this.elements[e.name];
 			if (x) {
 				x.isDead = true;
-				delete this.contains[e.name];
-			} else if (e.home.contains[e.name]) {
+				delete this.elements[e.name];
+			} else if (e.home.elements[e.name]) {
 				e.home.removeElement(e);
 			}
 		}.bind(this));
 	}
 	removeAllElements() {
-		for (let x in this.contains) {
-			delete this.contains[x];
+		for (let x in this.elements) {
+			delete this.elements[x];
 		}
 	}
 	get(name) {
 		if (typeof name === "object") {
 			return name;
 		} else {
-			return this.contains[name];
+			return this.elements[name];
 		}
 	}
 	getAllElements() {
 		this.updateArray();
-		return this.containsArray;
+		return this.elementArray;
 	}
 	getElementsMatch(fn) {
 		let ary = [];
@@ -305,8 +305,8 @@ class InactiveScene {
 	}
 	changeElementResponse(name, input, newResponse) {
 		this.performFunctionBasedOnType_PRIVATE(name, function (e) {
-			this.contains[e].response.input[input] = newResponse.bind(this.contains[e]);
-			this.contains[e].logMod(function CHANGE_INPUT() {
+			this.elements[e].response.input[input] = newResponse.bind(this.elements[e]);
+			this.elements[e].logMod(function CHANGE_INPUT() {
 				this.home.changeElementResponse(this, input, newResponse);
 			});
 		}.bind(this));
@@ -401,7 +401,7 @@ class InactiveScene {
 	}
 	collidePointBoth(point) {
 		let collideAry = this.collidePoint(point);
-		return [collideAry, this.containsArray.filter(e => !collideAry.includes(e))];
+		return [collideAry, this.elementArray.filter(e => !collideAry.includes(e))];
 	}
 }
 class Camera extends Rect {
@@ -535,22 +535,22 @@ class Scene extends InactiveScene {
 			SATChecks: 0,
 			collisions: 0
 		}
-		for (let rect of this.containsArray) rect.isBeingUpdated = true;
+		for (let rect of this.elementArray) rect.isBeingUpdated = true;
 		this.updateArray();
 		this.clearAllCollisions();
 		let q = this.removeQueue;
 		function p(x) {
 			q.push(x);
 		}
-		for (let rect of this.containsArray) rect.pushToRemoveQueue = p;
+		for (let rect of this.elementArray) rect.pushToRemoveQueue = p;
 		//grid
 
 		//custom before updates run
-		for (let el of this.containsArray) {
+		for (let el of this.elementArray) {
 			el.scripts.run("beforeUpdate");
 		}
 
-		const arrays = this.extractUsefulCellArrays(this.containsArray);
+		const arrays = this.extractUsefulCellArrays(this.elementArray);
 
 		//physics
 		for (let i = 0; i < this.physicsRealism; i++) {
@@ -571,11 +571,11 @@ class Scene extends InactiveScene {
 		this.updateSceneObjectCaches(arrays.useless);
 
 		//non collision fixed update
-		this.physicsObjectFixedUpdate(this.containsArray);
+		this.physicsObjectFixedUpdate(this.elementArray);
 
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
-		for (let rect of this.containsArray) rect.isBeingUpdated = false;
+		for (let rect of this.elementArray) rect.isBeingUpdated = false;
 		// console.log(performance.now() - startTime);
 	}
 	updateSceneObjectCaches(useful) {
@@ -603,7 +603,7 @@ class Scene extends InactiveScene {
 		let useless = [];
 		let isUseless = a => !(a instanceof PhysicsObject);
 		//categorize
-		for (let rect of elements) {
+		for (let rect of this.elementArray) {
 			if (isUseless(rect)) {
 				useless.push(rect);
 				continue;
@@ -673,7 +673,7 @@ class Scene extends InactiveScene {
 			let updater = useful[i].others;
 
 			this.SAT.gridChecks += updater.length;
-			this.SAT.possibleChecks += updater.length ? s.containsArray.length : 0;
+			this.SAT.possibleChecks += updater.length ? s.elementArray.length : 0;
 			if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
 			rect.physicsUpdate(updater);
 		}
@@ -691,7 +691,7 @@ class Scene extends InactiveScene {
 	}
 	recalculateAverageCellSize(newEl) {
 		let oldAvg = this.cellSize;
-		let mul = this.containsArray.filter(e => e instanceof PhysicsObject).length;
+		let mul = this.elementArray.filter(e => e instanceof PhysicsObject).length;
 		oldAvg *= mul;
 		let newSize = newEl.width + newEl.height;
 		let newAverageMax = (oldAvg + newSize) / (mul + 1);
@@ -710,7 +710,7 @@ class Scene extends InactiveScene {
 		let screen = camera.getWorld().__boundingBox;
 		this.c.embody(camera.newView);
 		camera.transformToWorld(this.c);
-		for (let rect of this.containsArray) {
+		for (let rect of this.elementArray) {
 			rect.engineDrawUpdate(screen);
 			rect.lifeSpan++;
 		}
@@ -721,18 +721,18 @@ class Scene extends InactiveScene {
 	engineDrawUpdate() {
 		this.updateArray();
 		this.home.beforeScript.run();
-		for (let rect of this.containsArray) rect.isBeingUpdated = true;
+		for (let rect of this.elementArray) rect.isBeingUpdated = true;
 		let q = this.removeQueue;
 		function p(x) {
 			q.push(x);
 		}
-		for (let rect of this.containsArray) rect.pushToRemoveQueue = p;
+		for (let rect of this.elementArray) rect.pushToRemoveQueue = p;
 
 
 		this.camera.width = this.c.canvas.width;
 		this.camera.height = this.c.canvas.height;
 		this.home.updateScript.run();
-		this.containsArray.sort(function (a, b) {
+		this.elementArray.sort(function (a, b) {
 			return a.layer - b.layer;
 		});
 		for (let cameraName in this.cameras) this.renderCamera(this.cameras[cameraName]);
@@ -741,12 +741,12 @@ class Scene extends InactiveScene {
 		this.home.afterScript.run();
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
-		for (let rect of this.containsArray) rect.isBeingUpdated = false;
+		for (let rect of this.elementArray) rect.isBeingUpdated = false;
 	}
 	loadScene(sc) {
 		sc.updateArray();
 		let els = [];
-		for (let el of sc.containsArray) {
+		for (let el of sc.elementArray) {
 			let n = this.copy(el);
 			n.rename(sc.name + "&" + el.name);
 			els.push(n);

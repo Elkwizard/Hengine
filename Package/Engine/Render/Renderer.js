@@ -1,3 +1,6 @@
+const MESSAGE_BEGIN = "__BEGIN__";
+const MESSAGE_END = "__END__";
+const MESSAGE_BODY = (m) => "__MESSAGE { " + m + "}__"
 function clamp(n, a, b) {
 	return Math.max(a, Math.min(b, n));
 }

@@ -261,8 +261,8 @@ class SceneObject {
 		}
 	}
 	rename(name) {
-		delete this.home.contains[this.name];
-		this.home.contains[name] = this;
+		delete this.home.elements[this.name];
+		this.home.elements[name] = this;
 		this.name = name;
 		this.logMod(function () {
 			this.rename(name);
