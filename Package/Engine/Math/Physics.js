@@ -303,8 +303,6 @@ class Physics {
         }
         if (colliding && bestAxis) {
             let contacts = [];
-            let normal = bestAxis.normal;
-            let n_range = Physics.projectOntoAxis(aCorners, bCorners, normal);
             let contactsA = Physics.collidePolygonPoints(bCorners, bAxes, aCorners);
             let contactsB = Physics.collidePolygonPoints(aCorners, aAxes, bCorners);
             for (let i = 0; i < contactsA.length; i++) {
@@ -378,8 +376,8 @@ class Physics {
             if (impulseA) impulsesA.push(impulseA.forceMul(contact.penetration));
             if (impulseB) impulsesB.push(impulseB.forceMul(contact.penetration));
         }
-        for (let i = 0; i < impulsesA.length; i++) a.applyImpulse(impulsesA[i].forceMul(penFactor));
-        for (let i = 0; i < impulsesB.length; i++) b.applyImpulse(impulsesB[i].forceMul(penFactor));
+        for (let i = 0; i < impulsesA.length; i++) a.internalApplyImpulse(impulsesA[i].forceMul(penFactor));
+        for (let i = 0; i < impulsesB.length; i++) b.internalApplyImpulse(impulsesB[i].forceMul(penFactor));
     }
     static resolve(col) {
         let { a, b, dir, contacts, penetration } = col;
