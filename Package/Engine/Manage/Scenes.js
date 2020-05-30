@@ -711,7 +711,7 @@ class Scene extends InactiveScene {
 			q.push(x);
 		}
 		for (let rect of this.elementArray) rect.pushToRemoveQueue = p;
-
+		this.updateSceneObjectCaches(this.elementArray);
 
 		this.camera.width = this.c.canvas.width;
 		this.camera.height = this.c.canvas.height;

@@ -367,7 +367,8 @@ class PhysicsObject extends SceneObject {
     cacheAxes() {
         const pos = this.middle;
         const rot = this.rotation;
-        for (const [name, shape] of this.shapes) {
+        for (const name in this.shapes) {
+            let shape = this.shapes[name];
             if (shape instanceof Polygon) {
                 const model = shape.getModel(pos, rot);
                 shape.cacheAxes(model.getAxes());

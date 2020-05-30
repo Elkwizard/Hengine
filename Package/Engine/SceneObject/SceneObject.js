@@ -206,6 +206,7 @@ class SceneObject {
 		this.shapes[name] = shape;
 		if (shape instanceof Polygon && !(shape instanceof Rect)) shape.subdivideForCollisions();
 		this.cacheMass();
+		this.cacheBoundingBoxes();
 	}
 	worldSpaceToModelSpace(v) {
 		return v.rotate(this.rotation).Vplus(this.middle);

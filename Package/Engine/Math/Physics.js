@@ -311,7 +311,8 @@ class Physics {
                 colliding = false;
                 break;
             } else {
-                let overlap = Math.abs((a_m < b_m) ? a_max - b_min : b_max - a_min);
+                let overlap = (a_m < b_m) ? a_max - b_min : b_max - a_min;
+                if (overlap < 0) overlap = Infinity;
                 if (overlap < minOverlap) {
                     minOverlap = overlap;
                     bestAxis = axis;
@@ -412,11 +413,9 @@ class Physics {
 
         let aMove = isWallB ? move : move.Ntimes(massPerA);
         a.privateMove(aMove);
-        // a.cacheBoundingBoxes(aMove);
         if (!isWallB) {
             let bMove = move.Ntimes(-massPerB);
             b.privateMove(bMove);
-            // b.cacheBoundingBoxes(bMove);
         }
 
         Physics.resolveContacts(a, b, contacts, dir);

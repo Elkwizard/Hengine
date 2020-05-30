@@ -93,6 +93,10 @@ class Shape {
 		//return the world space model of the relative shape
 		return new Shape(0);
 	}
+	getModelCosSin(pos, cos, sin) {
+		//get model with precalculated values
+		return new Shape(0);
+	}
 	center(pos) {
 		//center the polygon at _pos_
 	}
@@ -346,8 +350,12 @@ class Circle extends Shape {
 		return Math.PI * this.radius * 2;
 	}
 	getModel(pos, rot) {
-		let p = Geometry.rotatePointAround(pos, pos.plus(new Vector2(this.x, this.y)), rot);
-		return new Circle(p.x, p.y, this.radius);
+		return this.getModelCosSin(pos, Math.cos(rot), Math.sin(rot));
+	}
+	getModelCosSin(pos, cos, sin) {
+		let t_x = this.x * cos - this.y * sin + pos.x;
+		let t_y = this.x * sin + this.y * cos + pos.y;
+		return new Circle(t_x, t_y, this.radius);
 	}
 	center(pos) {
 		this.x = pos.x;
