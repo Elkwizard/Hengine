@@ -1,7 +1,7 @@
 class ImageType {
 	constructor(width, height, loops = false) {
-		this.width = Math.floor(width);
-		this.height = Math.floor(height);
+		this.width = Math.round(width);
+		this.height = Math.round(height);
 		this.loops = loops;
 	}
 	makeImage() {
