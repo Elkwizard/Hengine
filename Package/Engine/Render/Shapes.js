@@ -143,8 +143,9 @@ class Polygon extends Shape {
 		this.collisionShapes = Geometry.subdividePolygon(this, direction);
 	}
 	getBoundingBox() {
-		let x = this.vertices.map(e => e.x);
-		let y = this.vertices.map(e => e.y);
+		let verts = this.vertices;
+		let x = verts.map(e => e.x);
+		let y = verts.map(e => e.y);
 		let minX = Math.min(...x);
 		let maxX = Math.max(...x);
 		let minY = Math.min(...y);
@@ -152,6 +153,9 @@ class Polygon extends Shape {
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
 	getModel(pos, rot) {
+		return this.getModelCosSin(pos, Math.cos(rot), Math.sin(rot));
+	}
+	getModelCosSin(pos, cos, sin) {
 		let middle = this.middle;
 		let rotation = this.rotation;
 		let verts;
@@ -167,8 +171,8 @@ class Polygon extends Shape {
 					return new Vector2(middle.x + nX, middle.y + nY);
 				});
 		} else verts = this.getCorners();
-		let m_sin = Math.sin(rot);
-		let m_cos = Math.cos(rot);
+		let m_sin = sin;
+		let m_cos = cos;
 		verts = verts
 			.map(e => {
 				let difX = e.x;
@@ -185,10 +189,11 @@ class Polygon extends Shape {
 	}
 	getAxes() {
 		let axes = [];
-		for (let i = 0; i < this.vertices.length; i++) {
+		let verts = this.vertices;
+		for (let i = 0; i < verts.length; i++) {
 			let inx1 = i;
-			let inx2 = (i + 1) % this.vertices.length;
-			let slope = this.vertices[inx2].Vminus(this.vertices[inx1]).normal.normalize();
+			let inx2 = (i + 1) % verts.length;
+			let slope = verts[inx2].Vminus(verts[inx1]).normal.normalize();
 			axes.push(slope);
 		}
 		return axes;
@@ -202,10 +207,11 @@ class Polygon extends Shape {
 	}
 	getEdges() {
 		let edges = [];
-		for (let i = 0; i < this.vertices.length; i++) {
+		let verts = this.vertices;
+		for (let i = 0; i < verts.length; i++) {
 			let inx1 = i;
-			let inx2 = (i + 1) % this.vertices.length;
-			edges.push(new Line(this.vertices[inx1], this.vertices[inx2]));
+			let inx2 = (i + 1) % verts.length;
+			edges.push(new Line(verts[inx1], verts[inx2]));
 		}
 		return edges;
 	}

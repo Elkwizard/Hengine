@@ -46,6 +46,7 @@ class PhysicsObject extends SceneObject {
         this._rotation = 0;
         this.__mass = 0; //mass cache
         this.__perimeter = 0; //perimeter cache
+        this.hasCollideRule = false;
         //data
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
@@ -156,6 +157,10 @@ class PhysicsObject extends SceneObject {
     get centerOfMass() {
         return this.middle;
     }
+	onAddScript(script) {
+        const value = 1;
+		if (this.scripts[script].scriptCollideRule(value) !== value) this.hasCollideRule = true;
+	}
     collideBasedOnRule(e) {
         let judgement = [];
         for (let m of this.scripts) {
@@ -180,7 +185,7 @@ class PhysicsObject extends SceneObject {
         this.slows = false;
     }
     clearCollisions() {
-        for (let [key, value] of this.colliding) this.colliding[key] = null;
+        this.colliding.clear();
         this.canMoveThisFrame = true;
         this.allCollidingWith.clear();
         this.prohibited = [];
@@ -222,11 +227,13 @@ class PhysicsObject extends SceneObject {
         if (!this.positionStatic) {
             this.x += v.x;
             this.y += v.y;
+            this.moveBoundingBoxCache(v);
         }
     }
     privateSetRotation(a) {
         if (!this.rotationStatic) {
             this.rotation = a;
+            this.cacheRotation();
         }
     }
     detectCollisions(others) {
@@ -236,20 +243,17 @@ class PhysicsObject extends SceneObject {
                 if (other !== this) {
                     if (other instanceof PhysicsObject) {
                         if (this.optimize(this, other)) {
-                            if (this.collideBasedOnRule(other) && other.collideBasedOnRule(this)) {
+                            if ((!this.hasCollideRule || this.collideBasedOnRule(other)) && (!other.hasCollideRule || other.collideBasedOnRule(this))) {
                                 let col = Physics.fullCollide(this, other);
                                 collisions++;
                                 if (col.length) {
-                                    this.allCollidingWith["Shape - " + other.name] = other;
-                                    other.allCollidingWith["Shape - " + this.name] = this;
-                                    if (!this.colliding.general) this.colliding.general = [];
-                                    if (!other.colliding.general) other.colliding.general = [];
-                                    this.colliding.general.push(other);
-                                    other.colliding.general.push(this);
                                     if (this.canCollide && other.canCollide) {
                                         for (const collision of col) {
                                             Physics.resolve(collision);
                                         }
+                                    } else {
+                                        this.colliding.add(other, Vector2.down);
+                                        other.colliding.add(this, Vector2.up);
                                     }
                                     if (this.home.collisionEvents) for (const collision of col) {
                                         Physics.events(collision);
@@ -261,19 +265,13 @@ class PhysicsObject extends SceneObject {
                 }
             }
         }
-        return [];
     }
     checkAndResolveCollisions(others) {
-        const dir = this.velocity.get().normalize();
+        const dir = this.velocity.normalized;
         others = others.sort((a, b) => (a.x - b.x) * dir.x + (a.y - b.y) * dir.y);
         others = [...others.filter(e => !e.completelyStatic), ...others.filter(e => e.completelyStatic)];
         let collisions;
         if (!this.completelyStatic) collisions = this.detectCollisions(others);
-        if (!this.completelyStatic) {
-            for (let col of collisions) {
-                Physics.resolveResults(col);
-            }
-        }
     }
     getSpeedModulation() {
         return this.home.speedModulation / this.home.physicsRealism;
@@ -348,16 +346,23 @@ class PhysicsObject extends SceneObject {
             if (isNaN(this.y)) this.y = this.last.y;
         });
     }
+    moveBoundingBoxCache(v) {
+        this.__boundingBox.x += v.x;
+        this.__boundingBox.y += v.y;
+        for (let name in this.shapes) {
+            let rect = this.shapes[name];
+            rect.__boundingBox.x += v.x;
+            rect.__boundingBox.y += v.y;
+        }
+    }
     updateMovementCaches() {
-        this.cacheBoundingBoxes();
         this.cacheAxes();
     }
     updateCaches() {
-        this.cacheAxes();
-        this.cacheMass();
         this.cacheBoundingBoxes();
+        this.updateMovementCaches();
         this.cacheDimensions();
-        this.__perimeter = this.perimeter;
+        // this.__perimeter = this.perimeter;
     }
     cacheAxes() {
         const pos = this.middle;

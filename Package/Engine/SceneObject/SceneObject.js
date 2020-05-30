@@ -38,6 +38,8 @@ class SceneObject {
 		this.y = y;
 		this.shapes = { };
 		this.rotation = 0;
+		this.__cosRot = 1;
+		this.__sinRot = 0;
 		this.name = name;
 		this.home = home;
 		this.tag = tag;
@@ -102,7 +104,6 @@ class SceneObject {
 			if (shape instanceof Circle) {
 				term = "C " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.radius.toFixed(0);
 			}
-
 			if (shape instanceof Rect) {
 				term = "R " + shape.rotation.toFixed(0) + " " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.width.toFixed(0) + " " + shape.height.toFixed(0);
 			} else if (shape instanceof Polygon) {
@@ -133,6 +134,13 @@ class SceneObject {
 		for (let shape of result) this.addShape(num++, shape);
 		return result;
 	}
+	onAddScript(script) {
+
+	}
+	cacheRotation() {
+		this.__cosRot = Math.cos(this.rotation);
+		this.__sinRot = Math.sin(this.rotation);
+	}
 	cacheDimensions() {
 		let old_rot = this.rotation;
 		this.rotation = 0;
@@ -143,17 +151,43 @@ class SceneObject {
 	}
 	cacheBoundingBoxes() {
 		let shapes = this.getShapes();
-		let pos = this.middle;
-		let rot = this.rotation;
-		for (let i = 0; i < shapes.length; i++) shapes[i].cacheBoundingBox(shapes[i].getModel(pos, rot).getBoundingBox()); //transfer from model to root shape
+		let models = this.getShapeModels();
+		for (let i = 0; i < shapes.length; i++) shapes[i].cacheBoundingBox(models[i].getBoundingBox()); //transfer from model to root shape
 		this.__boundingBox = this.getBoundingBox();
 	}
+	getShapeModels() {
+		let pos = this.middle;
+		let cos = this.__cosRot;
+		let sin = this.__sinRot;
+		let result = [];
+		for (let name in this.shapes) result.push(this.shapes[name].getModelCosSin(pos, cos, sin));
+		return result;
+	}
+	getModels() {
+		let middle = this.middle;
+		let pos = middle;
+		let cos = this.__cosRot;
+		let sin = this.__sinRot;
+		let result = [];
+		for (let name in this.shapes) {
+			result.push(...this.shapes[name].collisionShapes.map(e => {
+				e.cache(this.shapes[name]);
+				return e;
+			}));
+		}
+		result = result.map(e => {
+			let el = e.getModelCosSin(pos, cos, sin);
+			el.cache(e);
+			return el;
+		});
+		return result;
+	}
 	getBoundingBox() {
-		let shapes = this.getModels();
+		let shapes = this.getShapeModels();
 		let boxes = shapes.map(e => e.getBoundingBox());
 		if (boxes.length === 1) return boxes[0];
-		let mins = boxes.map(e => e.vertices[0]);
-		let maxs = boxes.map(e => e.vertices[2]);
+		let mins = boxes.map(e => new Vector2(e.x, e.y));
+		let maxs = boxes.map(e => new Vector2(e.x + e.width, e.y + e.height));
 		let minX = Math.min(...mins.map(e => e.x));
 		let minY = Math.min(...mins.map(e => e.y));
 		let maxX = Math.max(...maxs.map(e => e.x));
@@ -171,6 +205,7 @@ class SceneObject {
 		shape = shape.get();
 		this.shapes[name] = shape;
 		if (shape instanceof Polygon && !(shape instanceof Rect)) shape.subdivideForCollisions();
+		this.cacheMass();
 	}
 	worldSpaceToModelSpace(v) {
 		return v.rotate(this.rotation).Vplus(this.middle);
@@ -196,11 +231,12 @@ class SceneObject {
 	removeShape(name) {
 		let shape = this.shapes[name];
 		delete this.shapes[name];
+		this.cacheMass();
 		return shape;
 	}
 	removeAllShapes() {
 		let names = [];
-		for (let [name, shape] of this.shapes) names.push(name);
+		for (let name in this.shapes) names.push(name);
 		let shapes = [];
 		for (let name of names) {
 			shapes.push(this.removeShape(name));
@@ -224,31 +260,12 @@ class SceneObject {
 	}
 	getShapes() {
 		let ary = [];
-		for (let [name, shape] of this.shapes) ary.push(shape);
+		for (let name in this.shapes) ary.push(this.shapes[name]);
 		return ary;
 	}
 	scale(factor) {
 		let middle = Vector2.origin;
 		for (let shape of this.getShapes()) shape.scaleAbout(middle, factor);
-	}
-	getModels() {
-		let ary = this.getShapes();
-		let middle = this.middle;
-		let pos = middle;
-		let rot = this.rotation;
-		let result = [];
-		for (let i = 0; i < ary.length; i++) {
-			result.push(...ary[i].collisionShapes.map(e => {
-				e.cache(ary[i]);
-				return e;
-			}));
-		}
-		result = result.map(e => {
-			let el = e.getModel(pos, rot);
-			el.cache(e);
-			return el;
-		});
-		return result;
 	}
 	vertexDirection(dir) {
 		const type = dir === "CLOCKWISE";
@@ -340,6 +357,7 @@ class SceneObject {
 	updateCaches() {
 		this.cacheBoundingBoxes();
 		this.cacheDimensions();
+		this.cacheRotation();
 	}
 	pushToRemoveQueue(x) {
 		return null;

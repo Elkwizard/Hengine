@@ -25,34 +25,55 @@ class CollisionPair {
         this.others = checks;
     }
 }
-class CollisionCacheData {
-    constructor(collision) {
-        this.axis = collision.dir;
-        this.collision = collision;
-        this.aPrev = {
-            position: collision.a.middle,
-            rotation: collision.a.rotation
-        }
-        this.bPrev = {
-            position: collision.b.middle,
-            rotation: collision.b.rotation
-        };
-    }
-}
 class CollisionMoniter {
     constructor() {
-        this.top = null;
-        this.bottom = null;
-        this.left = null;
-        this.right = null;
-        this.general = null;
+        this.elements = [];
+    }
+    get general() {
+        return this.elements.map(e => e.element);
+    }
+    get left() {
+        return this.direction(Vector2.left);
+    }
+    get right() {
+        return this.direction(Vector2.right);
+    }
+    get top() {
+        return this.direction(Vector2.up);
+    }
+    get bottom() {
+        return this.direction(Vector2.down);
+    }
+    extract(moniter) {
+        this.elements = moniter.elements.map(e => ({
+            dir: e.dir,
+            element: e.element
+        }));
+    }
+    clear() {
+        this.elements = [];
+    }
+    add(element, dir) {
+        this.elements.push({ element, dir });
     }
     has(el) {
-        return this.general && this.general.filter(e => e === el).length > 0;
+        for (let element of this.elements) if (element.element === el) return true;
+        return false;
+    }
+    direction(d) {
+        let result = this.objectTest(e => e.dir.dot(d) > 0.2);
+        if (result) return result.map(e => e.element);
+        return null;
+    }
+    objectTest(test) {
+        if (!this.elements.length) return null;
+        let result = this.elements.filter(test);
+        if (result.length > 0) return result;
+        else return null;
     }
     test(test) {
-        if (!this.general) return null;
-        let result = this.general.filter(test);
+        if (!this.elements.length) return null;
+        let result = this.elements.map(e => e.element).filter(test);
         if (result.length > 0) return result;
         else return null;
     }
@@ -319,7 +340,7 @@ class Physics {
     }
     static getTotalPenetration(contacts) {
         let t = 0;
-        for (let con of contacts) t += con.penetration;
+        for (let i = 0; i < contacts.length; i++) t += contacts[i].penetration;
         return t;
     }
     static fullCollide(a, b) {
@@ -329,9 +350,9 @@ class Physics {
         let shapes = a.getModels();
         let otherShapes = b.getModels();
 
-        for (let shape of shapes) {
-            for (let otherShape of otherShapes) {
-                tempCollisions.push(Physics.collide(shape, otherShape));
+        for (let i = 0; i < shapes.length; i++) {
+            for (let j = 0; j < otherShapes.length; j++) {
+                tempCollisions.push(Physics.collide(shapes[i], otherShapes[j]));
             }
         }
         let cols = tempCollisions.filter(e => e.colliding);
@@ -389,11 +410,13 @@ class Physics {
         let massPerB = 1 - massPerA;
         let isWallB = Physics.isWall(b);
 
-        a.privateMove(isWallB ? move : move.Ntimes(massPerA));
-        a.cacheBoundingBoxes();
+        let aMove = isWallB ? move : move.Ntimes(massPerA);
+        a.privateMove(aMove);
+        // a.cacheBoundingBoxes(aMove);
         if (!isWallB) {
-            b.privateMove(move.Ntimes(-massPerB));
-            b.cacheBoundingBoxes();
+            let bMove = move.Ntimes(-massPerB);
+            b.privateMove(bMove);
+            // b.cacheBoundingBoxes(bMove);
         }
 
         Physics.resolveContacts(a, b, contacts, dir);
@@ -421,41 +444,10 @@ class Physics {
         //cache vars
         const a = col.a;
         const b = col.b;
-        const d = col.dir.inverse();
 
         //do custom collision response
-        if (!a.colliding.general) a.colliding.general = [b];
-        else if (!a.colliding.general.includes(b)) a.colliding.general.push(b);
-        if (!b.colliding.general) b.colliding.general = [a];
-        else if (!b.colliding.general.includes(a)) b.colliding.general.push(a);
-        let top = d.y > 0.2;
-        let bottom = d.y < -0.2;
-        let right = d.x > -0.2;
-        let left = d.x < 0.2;
-        if (left) {
-            if (!a.colliding.left) a.colliding.left = [b];
-            else if (!a.colliding.left.includes(b)) a.colliding.left.push(b);
-            if (!b.colliding.right) b.colliding.right = [a];
-            else if (!b.colliding.right.includes(a)) b.colliding.right.push(a);
-        }
-        if (right) {
-            if (!a.colliding.right) a.colliding.right = [b];
-            else if (!a.colliding.right.includes(b)) a.colliding.right.push(b);
-            if (!b.colliding.left) b.colliding.left = [a];
-            else if (!b.colliding.left.includes(a)) b.colliding.left.push(a);
-        }
-        if (top) {
-            if (!a.colliding.top) a.colliding.top = [b];
-            else if (!a.colliding.top.includes(b)) a.colliding.top.push(b);
-            if (!b.colliding.bottom) b.colliding.top = [a];
-            else if (!b.colliding.bottom.includes(a)) b.colliding.bottom.push(a);
-        }
-        if (bottom) {
-            if (!a.colliding.bottom) a.colliding.bottom = [b];
-            else if (!a.colliding.bottom.includes(b)) a.colliding.bottom.push(b);
-            if (!b.colliding.top) b.colliding.top = [a];
-            else if (!b.colliding.top.includes(a)) b.colliding.top.push(a);
-        }
+        if (!a.colliding.has(b)) a.colliding.add(b, col.dir);
+        if (!b.colliding.has(a)) b.colliding.add(a, col.dir.inverse());
     }
     static runEventListeners(a) {
         function runEvents(name) {
@@ -466,11 +458,8 @@ class Physics {
                 a.scripts.run("collide" + name.capitalize(), el);
             }
         }
-
-        for (let dir of ["general", "top", "bottom", "left", "right"]) {
-            runEvents(dir);
-            a.lastColliding[dir] = a.colliding[dir];
-        }
+        for (let dir of ["left", "right", "top", "bottom", "general"]) runEvents(dir);
+        a.lastColliding.extract(a.colliding);
     }
     static getLineCells(a, b, cellSize) {
         let cells = [];
@@ -595,10 +584,10 @@ class Physics {
     }
     static getFrictionImpulses(a, b, tangent, collisionPoint) {
         let impulseA, impulseB;
-        let frictionA = a.getPointVelocity(collisionPoint).projectOnto(tangent).Ntimes(-0.05);//.times(-this.friction * otherFriction * 2);
-        let frictionB = b.getPointVelocity(collisionPoint).projectOnto(tangent).Ntimes(-0.05);//.times(-this.friction * otherFriction * 2);
-        impulseA = new Impulse(frictionA.Ntimes(a.__mass), collisionPoint);
-        impulseB = new Impulse(frictionB.Ntimes(b.__mass), collisionPoint);
+        let frictionA = tangent.Ntimes(a.getPointVelocity(collisionPoint).dot(tangent) * -0.05 * a.__mass);//.times(-this.friction * otherFriction * 2);
+        let frictionB = tangent.Ntimes(b.getPointVelocity(collisionPoint).dot(tangent) * -0.05 * b.__mass);//.times(-this.friction * otherFriction * 2);
+        impulseA = new Impulse(frictionA, collisionPoint);
+        impulseB = new Impulse(frictionB, collisionPoint);
         return { impulseA, impulseB };
     }
     static getImpulses(a, b, dir, collisionPoint) {

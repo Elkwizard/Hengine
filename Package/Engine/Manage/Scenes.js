@@ -749,6 +749,9 @@ class Scene extends InactiveScene {
 	updateCameraAt(x, y, width, height) {
 		this.camera = new Camera(x, y, width, height, this.camera.rotation, this.camera.zoom);
 	}
+	rotateCameraAt(rotation) {
+		this.camera.rotation = rotation;
+	}
 	centerCameraAt(point) {
 		this.camera.x = point.x - width / 2;
 		this.camera.y = point.y - height / 2;
@@ -758,6 +761,10 @@ class Scene extends InactiveScene {
 	}
 	centerCameraY(y) {
 		this.camera.y = y - height / 2;
+	}
+	rotateCameraTowards(rotation, ferocity = 0.1) {
+		let dif = Geometry.signedAngularDist(rotation, this.camera.rotation);
+		this.camera.rotation += dif * ferocity;
 	}
 	moveCameraTowards(point, ferocity = 0.1) {
 		const cameraPoint = this.camera.middle;

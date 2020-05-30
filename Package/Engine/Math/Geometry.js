@@ -44,7 +44,7 @@ class Geometry {
         if (r2 < r1) dif *= -1;
         if (Math.abs(dif - pi2) < Math.abs(dif)) dif -= pi2;
         if (r2 < r1) dif *= -1;
-        return dif;
+        return -dif;
     }
     static distToRect(p, r) {
         let d = Math.sqrt(Geometry.distToRect2);

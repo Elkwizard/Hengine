@@ -29,13 +29,13 @@ class InputHandler {
 	P(...keys) {
 		return keys.map(key => !!this.keys[key]).includes(true);
 	}
-	R(key) {
+	R(...keys) {
 		return keys.map(key => !this.keys[key]).includes(true);
 	}
-	JP(key) {
+	JP(...keys) {
 		return keys.map(key => this.keyDownCounts[key] === 1).includes(true);
 	}
-	JR(key) {
+	JR(...keys) {
 		return keys.map(key => this.keyUpCounts[key] === 1).includes(true);
 	}
 	inputAdjust() {
