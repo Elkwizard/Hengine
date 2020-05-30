@@ -2,13 +2,11 @@ class Texture extends ImageType {
 	constructor(width, height) {
 		super(width, height, false);
 		let self = this;
-		this.c = new Artist({ getContext() { return new TextureDrawingContext(self); } }, width, height);
-		this.width = width;
-		this.height = height;
+		this.c = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
 		this.pixels = [];
-		for (let i = 0; i < width; i++) {
+		for (let i = 0; i < this.width; i++) {
 			this.pixels.push([]);
-			for (let j = 0; j < height; j++) {
+			for (let j = 0; j < this.height; j++) {
 				this.pixels[i].push(new Color(0, 0, 0, 0));
 			}
 		}

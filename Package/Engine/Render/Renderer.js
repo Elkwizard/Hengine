@@ -606,38 +606,11 @@ class Artist {
 		let per = this.lerp(l, r, tx);
 		return per;
 	}
-	cubeLerp(a, b, c, d, a2, b2, c2, d2, tx, ty, tz) {
-		let top = this.quadLerp(a, b, c, d, tx, ty);
-		let bottom = this.quadLerp(a2, b2, c2, d2, tx, ty);
-		return this.lerp(top, bottom, tz);
-	}
-	noiseTCorrect(t) {
-		const f = (x) => (x - 2) * (x + 2) * x;
-		return f(-2.31 * t + 1.155) / 6.158 + 0.5;
-	}
 	noise(x, f = 1, seed = 0) {
-		x *= f;
-		const s_0 = n => rand(seed + Math.floor(n));
-		const n = x => this.lerp(s_0(x), s_0(x + 1), x % 1);
-		return n(x);
+		return Random.perlin(x, f, seed);
 	}
 	noise2D(x, y, f = 1, seed = 0) {
-		x *= f;
-		y *= f;
-		const s_p = (x, y) => rand(rand(Math.floor(x)) + rand(Math.floor(y) * 2000) + seed * 100000);
-		const n = (x, y) => this.quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), this.noiseTCorrect(x % 1), this.noiseTCorrect(y % 1));
-		return n(x, y);
-	}
-	noise3D(x, y, z, f = 1, seed = 0) {
-		x *= f;
-		y *= f;
-		z *= f;
-		const s_p = (x, y, z) => rand(rand(Math.floor(x)) + rand(Math.floor(y) * 2000) + rand(Math.floor(z) * 2000000) + seed * 100000);
-		const n = (x, y, z) => this.cubeLerp(
-			s_p(x, y, z), s_p(x + 1, y, z), s_p(x, y + 1, z), s_p(x + 1, y + 1, z),
-			s_p(x, y, z + 1), s_p(x + 1, y, z + 1), s_p(x, y + 1, z + 1), s_p(x + 1, y + 1, z + 1),
-			x % 1, y % 1, z % 1);
-		return n(x, y, z);
+		return Random.perlin2D(x, y, f, seed);
 	}
 	rotateAround(x, y, r) {
 		this.translate(x, y)
