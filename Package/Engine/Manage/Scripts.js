@@ -21,6 +21,7 @@ class Script {
 		}
 	}
 	attachTo(obj, bindTo, ...args) {
+		const exists = (obj instanceof ScriptContainer) ? obj.exists : { };
 		obj[this.name] = {
 			run: function () {
 				for (let x in this) {
@@ -60,6 +61,7 @@ class Script {
                 if (name === flag.join("") || name === flag.join("_") || name === flag.join("-")) {
 					let key = "script" + flag.map(e => e.capitalize()).join("");
                     local[key] = local[key].add(fn);
+                    exists[key] = true;
                     found = true;
                 }
             }
@@ -100,11 +102,12 @@ class ElementScript extends Script {
 }
 class ScriptContainer {
 	constructor() {
+		this.exists = { };
 		this[Symbol.iterator] = function* () {
 			let ary = [];
 			for (let m in this) {
 				let a = this[m];
-				if (typeof a !== "function") ary.push(a);
+				if (typeof a !== "function" && m !== "exists") ary.push(a);
 			}
 			ary = ary.sort((a, b) => a.scriptNumber - b.scriptNumber);
 			for (let a of ary) {
@@ -113,8 +116,8 @@ class ScriptContainer {
 		};
 	}
     run(str, ...args) {
-		for (let m of this) {
-			let key = "script" + str.capitalize();
+		let key = "script" + str.capitalize();
+		if (this.exists[key]) for (let m of this) {
 			m[key](m, ...args);
 		}
     }
