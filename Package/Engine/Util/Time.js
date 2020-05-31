@@ -1,4 +1,7 @@
 class Time {
+	static get currentTime() {
+		return performance.now();
+	}
 	static getTime() {
 		let d = new Date();
 		let t = d.getTime();
@@ -26,7 +29,6 @@ class Time {
 			days: days,
 			years: years
 		};
-
 	}
 	static formatTime(t) {
 		let ary = [];

@@ -16,13 +16,13 @@ class Note {
                 Sound.wave(
                     freq,
                     this.durations[
-                        Math.min(i, this.durations.length - 1)
+                    Math.min(i, this.durations.length - 1)
                     ],
                     this.types[
-                        Math.min(i, this.types.length - 1)
+                    Math.min(i, this.types.length - 1)
                     ],
                     this.volumes[
-                        Math.min(i, this.volumes.length - 1)
+                    Math.min(i, this.volumes.length - 1)
                     ]
                 )
             );
@@ -218,6 +218,35 @@ class Sound {
         for (let i = 0; i < notes.length; i++) {
             await Sound.note(notes[i]);
         }
+    }
+    static waveProcedure(procedure, duration, volume = 1, type = "sine") {
+        const LERP_LENGTH = .1;
+        let osc = Sound.context.createOscillator();
+        osc.type = type;
+        osc.start();
+        let gainNode = Sound.context.createGain();
+        osc.connect(gainNode);
+        const SEC_DURATION = duration / 1000;
+        const CURRENT_TIME = Sound.context.currentTime;
+        const ACT_LERP_LENGTH = Math.min(0.01, SEC_DURATION * LERP_LENGTH);
+        gainNode.gain.value = 0.00001;
+        if (!volume) volume = 0.00001;
+        gainNode.gain.exponentialRampToValueAtTime(volume, CURRENT_TIME + ACT_LERP_LENGTH);
+        gainNode.gain.setValueAtTime(volume, CURRENT_TIME + SEC_DURATION - ACT_LERP_LENGTH);
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, CURRENT_TIME + SEC_DURATION);
+        gainNode.connect(Sound.gainNode);
+
+        let procedureInterval = setInterval(function () {
+            osc.frequency.value = procedure((Sound.context.currentTime - CURRENT_TIME) / SEC_DURATION);
+        }, 3);
+        return new Promise(function (resolve) {
+            setTimeout(function () {
+                clearInterval(procedureInterval);
+                osc.stop();
+                gainNode.disconnect(Sound.gainNode);
+                resolve();
+            }, duration);
+        });
     }
     static wave(hertz, duration, type, volume) {
         const LERP_LENGTH = .1;
