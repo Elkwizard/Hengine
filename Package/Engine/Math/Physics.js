@@ -14,7 +14,7 @@ class Collision {
         this.b = b;
         return this;
     }
-    switch() {
+    inverse() {
         if (this.colliding) return new Collision(true, this.b, this.a, this.dir.inverse(), this.contacts);
         else return new Collision(false, this.a, this.b);
     }
@@ -238,7 +238,7 @@ class Physics {
         return col;
     }
     static collidePolygonCircle(a, b) {
-        return Physics.collideCirclePolygon(b, a).switch();
+        return Physics.collideCirclePolygon(b, a).inverse();
     }
     static projectOntoAxis(v_a, v_b, ax) {
         let aRange = Physics.projectPolygonToAxis(v_a, ax);
@@ -319,16 +319,7 @@ class Physics {
             }
         }
         if (colliding && bestAxis) {
-            let contacts = [];
-            // let betterACorners = [];
-            // let betterBCorners = [];
-            // for (let corner of aCorners) {
-            //     if (b.middle.Vminus(corner).dot(toB) > 0) betterACorners.push(corner);     
-            // }
-            // for (let corner of bCorners) {
-            //     if (a.middle.Vminus(corner).dot(toB) < 0) betterBCorners.push(corner);     
-            // }
-            let contactsA = Physics.collidePolygonPoints(bCorners, b.__axes, aCorners).slice(0, 2);
+            let contacts = [];            let contactsA = Physics.collidePolygonPoints(bCorners, b.__axes, aCorners).slice(0, 2);
             let contactsB = Physics.collidePolygonPoints(aCorners, a.__axes, bCorners).slice(0, 2);
             for (let i = 0; i < contactsA.length; i++) {
                 let dot = contactsA[i].dot(bestAxis);
@@ -387,25 +378,26 @@ class Physics {
         return !!Physics.fullCollide(a, b).length;
     }
     static resolveContacts(a, b, contacts, direction) {
-        let penFactor = 1 / Physics.getTotalPenetration(contacts);
+        let penFactor = Physics.getTotalPenetration(contacts);
         let impulsesA = [], impulsesB = [];
         let tangent = direction.normal;
         for (let i = 0; i < contacts.length; i++) {
             let contact = contacts[i];
+            const factor = contact.penetration / penFactor;
             let { impulseA, impulseB } = Physics.getImpulses(a, b, direction, contact.point);
-            if (impulseA) impulsesA.push(impulseA.forceMul(contact.penetration));
-            if (impulseB) impulsesB.push(impulseB.forceMul(contact.penetration));
+            if (impulseA) impulsesA.push(impulseA.forceMul(factor));
+            if (impulseB) impulsesB.push(impulseB.forceMul(factor));
             let friction = Physics.getFrictionImpulses(a, b, tangent, contact.point);
             impulseA = friction.impulseA;
             impulseB = friction.impulseB;
-            if (impulseA) impulsesA.push(impulseA.forceMul(contact.penetration));
-            if (impulseB) impulsesB.push(impulseB.forceMul(contact.penetration));
+            if (impulseA) impulsesA.push(impulseA.forceMul(factor));
+            if (impulseB) impulsesB.push(impulseB.forceMul(factor));
         }
-        for (let i = 0; i < impulsesA.length; i++) a.internalApplyImpulse(impulsesA[i].forceMul(penFactor));
-        for (let i = 0; i < impulsesB.length; i++) b.internalApplyImpulse(impulsesB[i].forceMul(penFactor));
+        for (let i = 0; i < impulsesA.length; i++) a.internalApplyImpulse(impulsesA[i]);
+        for (let i = 0; i < impulsesB.length; i++) b.internalApplyImpulse(impulsesB[i]);
     }
     static resolve(col) {
-        let { a, b, dir, contacts, penetration } = col;
+        const { a, b, dir, contacts, penetration } = col;
 
         if (b.velocity.dot(dir) - b.velocity.dot(dir) < 0) return;
 
