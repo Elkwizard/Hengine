@@ -53,7 +53,9 @@ class Texture extends ImageType {
 		return toString(this);
 	}
 	clear() {
-		for (let i = 0; i < this.pixels.length; i++) for (let j = 0; j < this.pixels[0].length; j++) this.act_set(i, j, cl.BLANK);
+		let height = this.pixels[0].length;
+		let width = this.pixels.length;
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.act_set(i, j, cl.BLANK);
 	}
 	getPixel(x, y) {
 		if (this.pixels[x] && this.pixels[x][y]) return this.pixels[x][y];
@@ -213,14 +215,29 @@ class TextureDrawingContextPath {
 		this.type = type;
 		this.args = args;
 	}
-	static fillPixel(ctx, x, y, col) {
+	static fillScanline(ctx, xmin, xmax, y, col) {
+		let tex = ctx.tex;
+		y = Math.round(y);
+		if (y < 0) return;
+		if (y > tex.height - 1) return;
+		xmin = Math.round(clamp(xmin, 0, tex.width - 1));
+		xmax = Math.round(clamp(xmax, 0, tex.width - 1));
+		let range = xmax - xmin;
+		for (let i = 0; i < range; i++) {
+			TextureDrawingContextPath.noCullFillPixel(ctx, xmin + i, y, col);
+		}
+	}
+	static noCullFillPixel(ctx, x, y, col) {
 		if (ctx.underly) col = ctx.underly(x, y);
+		let tex = ctx.tex;
+		tex.act_add(x, y, col);
+	}
+	static fillPixel(ctx, x, y, col) {
 		x = Math.round(x);
 		y = Math.round(y);
-		let tex = ctx.tex;
-		if (x >= 0 && x <= tex.pixels.length - 1)
-			if (y >= 0 && y <= tex.pixels[0].length - 1) {
-				tex.act_add(x, y, col);
+		if (x >= 0 && x <= ctx.tex.pixels.length - 1)
+			if (y >= 0 && y <= ctx.tex.pixels[0].length - 1) {
+				TextureDrawingContextPath.noCullFillPixel(ctx, x, y, col);
 			}
 	}
 	static strokePixel(ctx, x, y, col) {
@@ -250,42 +267,10 @@ class TextureDrawingContextPath {
 	}
 	static fill_arc(ctx, x, y, radius, startAngle, endAngle) {
 		let col = new Color(ctx.fillStyle);
-		for (let i = 0; i < radius * 2; i++) for (let j = 0; j < radius * 2; j++) {
-			let ox = i - radius;
-			let oy = j - radius;
-			if (ox ** 2 + oy ** 2 < radius ** 2) {
-				TextureDrawingContextPath.fillPixel(ctx, ox + x, oy + y, col);
-			}
-		}
-	}
-	static fill_rect(ctx, x, y, width, height) {
-		let col = new Color(ctx.fillStyle);
-		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) TextureDrawingContextPath.fillPixel(ctx, x + i, y + j, col);
-	}
-	static stroke_rect(ctx, x, y, width, height) {
-		let col = new Color(ctx.strokeStyle);
-		for (let i = 0; i < 2; i++) for (let j = 0; j < width; j++) TextureDrawingContextPath.strokePixel(ctx, x + j, y + i * height, col);
-		for (let i = 0; i < 2; i++) for (let j = 0; j < height; j++) TextureDrawingContextPath.strokePixel(ctx, x + i * width, y + j, col);
-
-	}
-	static fill_triangle(ctx, ax, ay, bx, by, cx, cy) {
-		let col = new Color(ctx.fillStyle);
-		let f_dist = Math.sqrt((ax - cx) ** 2 + (ay - cy) ** 2);
-		let total = Math.sqrt(Math.max((ax - bx) ** 2 + (ay - by) ** 2, (cx - bx) ** 2 + (cy - by) ** 2));
-		let inc = 1 / total;
-		for (let i = 0; i < 1; i += inc) {
-			let Ax = bx * (1 - i) + ax * i;
-			let Ay = by * (1 - i) + ay * i;
-			let Cx = bx * (1 - i) + cx * i;
-			let Cy = by * (1 - i) + cy * i;
-			let D = i * f_dist;
-			let dx = (Cx - Ax) / D;
-			let dy = (Cy - Ay) / D;
-			for (let j = 0; j < D; j++) {
-				let Px = Math.floor(Ax + dx * j);
-				let Py = Math.floor(Ay + dy * j);
-				TextureDrawingContextPath.fillPixel(ctx, Px, Py, col);
-			}
+		const form = x => 2 * Math.sqrt(-x * x + 2 * x);
+		for (let i = 0; i < radius * 2; i++) {
+			let w = form(i / radius) * radius;
+			TextureDrawingContextPath.fillScanline(ctx, x - w / 2, x + w / 2, y + i - radius, col);
 		}
 	}
 	static fill_polygon(ctx, lines) {
@@ -319,11 +304,7 @@ class TextureDrawingContextPath {
 			for (let i = 0; i < intersections.length - 1; i += 3) {
 				let min = intersections[i];
 				let max = intersections[i + 1];
-				let range = max - min;
-				for (let j = 0; j < range; j++) {
-					let x = min + j;
-					TextureDrawingContextPath.fillPixel(ctx, x, y, col);
-				}
+				TextureDrawingContextPath.fillScanline(ctx, min, max, y, col);
 			}
 		}
 	}
@@ -471,7 +452,7 @@ class TextureDrawingContext {
 		if (this.path.length) {
 			let polygon = [];
 			for (let p of this.path) {
-				if (p.type === "arc" || p.type === "rect") {
+				if (p.type === "arc") {
 					if (polygon.length > 2) (new TextureDrawingContextPath(this, "polygon", polygon)).fill();
 					polygon = [];
 					p.fill();
