@@ -235,23 +235,21 @@ class PhysicsObject extends SceneObject {
         if (!this.completelyStatic) {
             for (let other of others) {
                 if (other !== this) {
-                    if (other instanceof PhysicsObject) {
-                        if (this.optimize(this, other)) {
-                            if ((!this.hasCollideRule || this.collideBasedOnRule(other)) && (!other.hasCollideRule || other.collideBasedOnRule(this))) {
-                                let col = Physics.fullCollide(this, other);
-                                collisions++;
-                                if (col.length) {
-                                    if (this.canCollide && other.canCollide) {
-                                        for (const collision of col) {
-                                            Physics.resolve(collision);
-                                        }
-                                    } else {
-                                        this.colliding.add(other, Vector2.down);
-                                        other.colliding.add(this, Vector2.up);
+                    if (this.optimize(other) && other.optimize(this)) {
+                        if ((!this.hasCollideRule || this.collideBasedOnRule(other)) && (!other.hasCollideRule || other.collideBasedOnRule(this))) {
+                            let col = Physics.fullCollide(this, other);
+                            collisions++;
+                            if (col.length) {
+                                if (this.canCollide && other.canCollide) {
+                                    for (const collision of col) {
+                                        Physics.resolve(collision);
                                     }
-                                    if (this.home.collisionEvents) for (const collision of col) {
-                                        Physics.events(collision);
-                                    }
+                                } else {
+                                    this.colliding.add(other, Vector2.down);
+                                    other.colliding.add(this, Vector2.up);
+                                }
+                                if (this.home.collisionEvents) for (const collision of col) {
+                                    Physics.events(collision);
                                 }
                             }
                         }
