@@ -117,6 +117,7 @@ class Hengine {
 		this.C = this.c.c;
 		this.custom = {};
 		this.cl = new ColorLibrary();
+		this.sl = new SoundLibrary();
 		this.K = K;
 		this.M = M;
 		window.g = this.g;
@@ -124,6 +125,7 @@ class Hengine {
 		window.c = this.c;
 		window.C = this.C;
 		window.cl = this.cl;
+		window.sl = this.sl;
 		if (!(window.width || window.height)) {
 			Object.defineProperty(window, "width", {
 				get: function () {

@@ -237,8 +237,8 @@ class Sound {
         gainNode.connect(Sound.gainNode);
 
         let procedureInterval = setInterval(function () {
-            osc.frequency.value = procedure((Sound.context.currentTime - CURRENT_TIME) / SEC_DURATION);
-        }, 3);
+            osc.frequency.value = clamp(procedure((Sound.context.currentTime - CURRENT_TIME) * 1000), -24000, 24000);
+        }, 1);
         return new Promise(function (resolve) {
             setTimeout(function () {
                 clearInterval(procedureInterval);
@@ -252,7 +252,7 @@ class Sound {
         const LERP_LENGTH = .1;
         let osc = Sound.context.createOscillator();
         osc.type = type;
-        osc.frequency.value = hertz;
+        osc.frequency.value = clamp(hertz, -24000, 24000);
         osc.start();
         let gainNode = Sound.context.createGain();
         osc.connect(gainNode);
@@ -272,18 +272,6 @@ class Sound {
             }, duration);
         });
     }
-    static sawtooth(hertz, duration, volume = 1) {
-        return Sound.wave(hertz, duration, "sawtooth", volume);
-    }
-    static sin(hertz, duration, volume = 1) {
-        return Sound.wave(hertz, duration, "sine", volume);
-    }
-    static square(hertz, duration, volume = 1) {
-        return Sound.wave(hertz, duration, "square", volume);
-    }
-    static triangle(hertz, duration, volume = 1) {
-        return Sound.wave(hertz, duration, "triangle", volume);
-    }
     static note(note) {
         return note.play();
     }
@@ -292,3 +280,25 @@ Sound.context = new AudioContext();
 Sound.gainNode = Sound.context.createGain();
 Sound.gainNode.connect(Sound.context.destination);
 Sound.Note = Note;
+
+class SoundEffect {
+    constructor(wave, duration, type = "sine") {
+        this.wave = wave;
+        this.duration = duration;
+        this.type = type;
+    }
+    play(volume = 1) {
+        Sound.waveProcedure(this.wave, this.duration, volume, this.type);
+    }
+
+}
+class SoundLibrary {
+    constructor () {
+        this.LASER = new SoundEffect(t => Math.log(t * 0.02) * 4000, 200);
+        this.ICE = new SoundEffect(t => t ** 2, 155);
+        this.DEATH = new SoundEffect(t => {
+            t = 450 - t;
+            return Math.tan(t * 0.02) * t * 4;
+        }, 480);
+    }
+}
