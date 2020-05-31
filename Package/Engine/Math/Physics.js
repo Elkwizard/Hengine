@@ -192,7 +192,7 @@ class Physics {
             }
             return new Collision(colliding, a, b);
         } else {
-            let nP = Geometry.rotatePointAround(a.centerOfMass, b, -a.rotation);
+            let nP = Geometry.rotatePointAround(a.middle, b, -a.rotation);
             let colliding = a.x <= nP.x && a.x + a.width >= nP.x && a.y <= nP.y && a.y + a.height >= nP.y;
             return new Collision(colliding, a, b);
         }

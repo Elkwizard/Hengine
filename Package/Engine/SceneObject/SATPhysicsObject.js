@@ -151,12 +151,6 @@ class PhysicsObject extends SceneObject {
     get completelyStatic() {
         return this.positionStatic && this.rotationStatic;
     }
-    set centerOfMass(a) {
-        this.middle = a;
-    }
-    get centerOfMass() {
-        return this.middle;
-    }
 	onAddScript(script) {
         const value = 1;
 		if (this.scripts[script].scriptCollideRule(value) !== value) this.hasCollideRule = true;
@@ -191,7 +185,7 @@ class PhysicsObject extends SceneObject {
         this.prohibited = [];
     }
     drawWithoutRotation(artist) {
-        let com = this.centerOfMass;
+        let com = this.middle;
         let rot = this.rotation;
         c.translate(com);
         c.rotate(-rot);
@@ -295,14 +289,14 @@ class PhysicsObject extends SceneObject {
             //gravity
             let gv = this.gravity;
             let gravitationalForce = gv.Ntimes(coef * this.__mass);
-            let iG = new Impulse(gravitationalForce, this.centerOfMass);
+            let iG = new Impulse(gravitationalForce, this.middle);
             this.internalApplyImpulse(iG, "gravity");
         }
     }
     slowDown() {
         //apply linear drag;
         let drag = this.velocity.get().Nmul(-(1 - this.linearDragForce) * this.__mass / this.home.physicsRealism);
-        let iD = new Impulse(drag, this.centerOfMass);
+        let iD = new Impulse(drag, this.middle);
         this.internalApplyImpulse(iD, "drag");
 
         // if (this.velocity.mag < 0.01) this.velocity.mag = 0;
@@ -387,7 +381,7 @@ class PhysicsObject extends SceneObject {
         this.velocity.Vadd(dif.Ntimes(ferocity / 100));
     }
     getImpulseRatio(point, axis) {
-        let r_N = point.Vminus(this.centerOfMass).normal;
+        let r_N = point.Vminus(this.middle).normal;
         let r = r_N.mag;
         if (r < 0.01) return 1;
         let I = axis;
@@ -415,7 +409,7 @@ class PhysicsObject extends SceneObject {
     }
     applyAngularImpulse(impulse, name) {
         if (!impulse) return;
-        let r = impulse.source.Vminus(this.centerOfMass);
+        let r = impulse.source.Vminus(this.middle);
         if (!r.x && !r.y && r.x + r.y < 0.01) return;
         this.angularVelocity += -impulse.force.cross(r) / (r.mag ** 2);
     }
