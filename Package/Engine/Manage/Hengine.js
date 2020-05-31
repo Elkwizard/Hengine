@@ -337,13 +337,13 @@ class Hengine {
 		return this.c.middle();
 	}
 	static get defaultRenderPackage() {
-		return ["Color", "Shapes", "Spline", "Animation", "Frame", "Texture", "Renderer", "Graph"];
+		return ["Color", "Shapes", "Spline", "Animation", "Frame", "Texture", "Renderer", "Graph", "3DExperimental"];
 	}
 	static get defaultManagementPackage() {
 		return ["PrototypeOverload", "Cache", "Scripts", "Scenes", "Engine", "Hengine"];
 	}
 	static get defaultMathPackage() {
-		return ["Vector", "Geometry", "Physics", "../Render/3DExperimental"];
+		return ["Operable", "Vector", "Geometry", "Physics"];
 	}
 	static get defaultUtilityPackage() {
 		return ["Input", "Sound", "Time", "Console", "Random"];
@@ -353,8 +353,8 @@ class Hengine {
 	}
 	static get defaultEnginePackage() {
 		return {
-			Render: Hengine.defaultRenderPackage,
 			Math: Hengine.defaultMathPackage,
+			Render: Hengine.defaultRenderPackage,
 			Util: Hengine.defaultUtilityPackage,
 			SceneObject: Hengine.defaultSceneObjectPackage,
 			Manage: Hengine.defaultManagementPackage

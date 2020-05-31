@@ -123,6 +123,9 @@ class Texture extends ImageType {
 		}
 		return this.__image.img;
 	}
+	static upScale(tex, w, h) {
+		
+	}
 	static async fromDataURI(uri, w_o, h_o) {
 		let img = new Image();
 		img.src = uri;

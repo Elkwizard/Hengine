@@ -1,5 +1,6 @@
-class Color {
+class Color extends Operable {
 	constructor(r, g, b, a) {
+		super("red", "green", "blue", "alpha");
 		let red = 0;
 		let green = 0;
 		let blue = 0;
@@ -270,70 +271,10 @@ class Color {
 	static rand(seed) {
 		return new Color(rand(seed) * 255, rand(seed + 1) * 255, rand(seed + 2) * 255, rand(seed + 3));
 	}
-	static add(c1, c2) {
-		let mixer = new Color(0, 0, 0, 0);
-		mixer.add(c1);
-		mixer.add(c2);
-		return mixer;
-	}
-	static sub(c1, c2) {
-		let mixer = new Color(0, 0, 0, 0);
-		mixer.add(c1);
-		mixer.sub(c2);
-		return mixer;
-	}
-	static div(c1, c2) {
-		let mixer = new Color(0, 0, 0, 0);
-		mixer.add(c1);
-		mixer.div(c2);
-		return mixer;
-	}
-	static mul(c1, c2) {
-		let mixer = new Color(0, 0, 0, 0);
-		mixer.add(c1);
-		mixer.mul(c2);
-		return mixer;
-	}
-	static avg(c1, c2) {
-		let mixer = new Color(0, 0, 0, 0);
-		mixer.add(c1);
-		mixer.add(c2);
-		mixer.div(2);
-		return mixer;
-	}
 	invert() {
 		let n = (new Color(255, 255, 255, 1)).sub(this);
 		n.alpha = this.alpha;
 		return n;
-	}
-	static rangeAround(color, dist) {
-		let colorAry = [];
-		for (let i = -dist; i < dist + 1; i++) {
-			let a = color.red + (i * 10);
-			let b = color.green + (i * 10);
-			let c = color.blue + (i * 10);
-			let n = new Color(a, b, c, color.alpha);
-			n.constrain();
-			colorAry.push(n);
-		}
-		return colorAry;
-	}
-	static copy(color) {
-		return new Color(color.red, color.green, color.blue, color.alpha);
-	}
-	static sum(...colors) {
-		let result = new Color(0, 0, 0, 0);
-		for (let color of colors) result.add(color);
-		return result;
-	}
-	static lerp(color1, color2, per) {
-		return color1.times(1 - per).plus(color2.times(per));
-	}
-	static quadLerp(a, b, c, d, tx, ty) {
-		const l = a.times(1 - ty).plus(c.times(ty));
-		const r = b.times(1 - ty).plus(d.times(ty));
-		let per = l.times(1 - tx).plus(r.times(tx));
-		return per;
 	}
 	getRGBA() {
 		return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
@@ -352,95 +293,18 @@ class Color {
 			return false;
 		}
 	}
+	op(fn, v) {
+		this.super_op(fn, v);
+		this.constrain();
+		return this;
+	}
 	constrain() {
 		if (this.limited) {
-			function con(min, max, val) {
-				if (val < min) return min;
-				else if (val > max) return max;
-				else return val;
-			}
-			this.red = con(0, 255, this.red);
-			this.green = con(0, 255, this.green);
-			this.blue = con(0, 255, this.blue);
-			this.alpha = con(0, 1, this.alpha);
+			this.red = clamp(this.red, 0, 255);
+			this.green = clamp(this.green, 0, 255);
+			this.blue = clamp(this.blue, 0, 255);
+			this.alpha = clamp(this.alpha, 0, 1);
 		}
-	}
-	static isColorOrNumber(color) {
-		let col = color;
-		if (color instanceof Color) {
-			col = color;
-		} else {
-			col = new Color(color, color, color, color);
-		}
-		return col;
-	}
-	add(color) {
-		let col = Color.isColorOrNumber(color);
-		this.red += col.red;
-		this.green += col.green;
-		this.blue += col.blue;
-		this.alpha += col.alpha;
-		this.constrain();
-		return this;
-	}
-	sub(color) {
-		let col = Color.isColorOrNumber(color);
-		this.red -= col.red;
-		this.green -= col.green;
-		this.blue -= col.blue;
-		this.alpha -= col.alpha;
-		this.constrain();
-		return this;
-	}
-	mul(color) {
-		let col = Color.isColorOrNumber(color);
-		this.red *= col.red;
-		this.green *= col.green;
-		this.blue *= col.blue;
-		this.alpha *= col.alpha;
-		this.constrain();
-		return this;
-	}
-	div(color) {
-		let col = Color.isColorOrNumber(color);
-		this.red /= col.red;
-		this.green /= col.green;
-		this.blue /= col.blue;
-		this.alpha /= col.alpha;
-		this.constrain();
-		return this;
-	}
-	mod(color) {
-		let col = Color.isColorOrNumber(color);
-		this.red %= col.red;
-		this.green %= col.green;
-		this.blue %= col.blue;
-		this.alpha %= col.alpha;
-		this.constrain();
-		return this;
-	}
-	get() {
-		return new Color(this.red, this.green, this.blue, this.alpha);
-	}
-	plus(col) {
-		let x = this.get();
-		x.add(col);
-		return x;
-	}
-	minus(col) {
-		let x = this.get();
-		x.sub(col);
-		return x;
-	}
-	times(col) {
-		let x = this.get();
-		x.mul(col);
-		return x;
-	}
-	over(col) {
-		let x = this.get();
-		x.div(col);
-		return x;
 	}
 	dif(color) {
 		let red = Math.abs(this.red - color.red) / 255;
@@ -448,6 +312,23 @@ class Color {
 		let blue = Math.abs(this.blue - color.blue) / 255;
 		let alpha = Math.abs(this.alpha - color.alpha) / 255;
 		return (red + green + blue + alpha) / 4;
+	}
+	static get empty() {
+		return new Color(0, 0, 0, 0);
+	}
+	static avg(c1, c2) {
+		return c1.plus(c2).over(2);
+	}
+	static sum(...colors) {
+		let result = new Color(0, 0, 0, 0);
+		for (let color of colors) result.add(color);
+		return result;
+	}
+	static lerp(a, b, t) {
+		return Color.empty.map((value, channel) => Interpolation.lerp(a[channel], b[channel], t));
+	}
+	static quadLerp(a, b, c, d, tx, ty) {
+		return Color.empty.map((value, channel) => Interpolation.quadLerp(a[channel], b[channel], c[channel], d[channel], tx, ty));
 	}
 	static alpha(col, alpha) {
 		let cl = col.get();

@@ -154,9 +154,9 @@ class Matrix4x4 extends Matrix {
 		this.cols[3][3] = m33;
 	}
 }
-class Vector {
-	constructor() {
-
+class Vector extends Operable {
+	constructor(types) {
+		super(...types);
 	}
 	set mag(m) {
 		this.normalize();
@@ -211,46 +211,6 @@ class Vector {
 			}
 		}
 		return this;
-	}
-	add(...vl) {
-		for (let v of vl) this.op((a, b) => a + b, v);
-		return this;
-	}
-	sub(...vl) {
-		for (let v of vl) this.op((a, b) => a - b, v);
-		return this;
-	}
-	mul(...vl) {
-		for (let v of vl) this.op((a, b) => a * b, v);
-		return this;
-	}
-	div(...vl) {
-		for (let v of vl) this.op((a, b) => a / b, v);
-		return this;
-	}
-	mod(...vl) {
-		for (let v of vl) this.op((a, b) => a % b, v);
-		return this;
-	}
-	plus(...v) {
-		let vn = this.get();
-		vn.add(...v);
-		return vn;
-	}
-	minus(...v) {
-		let vn = this.get();
-		vn.sub(...v);
-		return vn;
-	}
-	over(...v) {
-		let vn = this.get();
-		vn.div(...v);
-		return vn;
-	}
-	times(...v) {
-		let vn = this.get();
-		vn.mul(...v);
-		return vn;
 	}
 	total() {
 		let result = 0;
@@ -309,9 +269,6 @@ class Vector {
 		if (d2 < d1) return this.inverse();
 		else return this.get();
 	}
-	get() {
-		return new this.constructor(this.x, this.y, this.z, this.w);
-	}
 	toString() {
 		let ary = [];
 		for (let n in this) ary.push(this[n]);
@@ -368,7 +325,7 @@ class Vector {
 }
 class Vector1 extends Vector {
 	constructor(x) {
-		super();
+		super("x");
 		this.x = x;
 	}
 	static get origin() {
@@ -380,7 +337,7 @@ class Vector1 extends Vector {
 }
 class Vector2 extends Vector {
 	constructor(x, y) {
-		super();
+		super("x", "y");
 		this.x = x;
 		this.y = y;
 	}
@@ -418,7 +375,7 @@ class Vector2 extends Vector {
 	get mag() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
-	op(e, v) {
+	op(v, e) {
 		if (typeof v === "number") {
 			this.x = e(this.x, v);
 			this.y = e(this.y, v);
@@ -562,7 +519,7 @@ class Vector2 extends Vector {
 }
 class Vector3 extends Vector {
 	constructor(x, y, z) {
-		super();
+		super("x", "y", "z");
 		this.x = x;
 		if (y !== undefined) {
 			this.y = y;
@@ -602,7 +559,7 @@ class Vector3 extends Vector {
 }
 class Vector4 extends Vector {
 	constructor(x, y, z, w) {
-		super();
+		super("x", "y", "z", "w");
 		this.x = x;
 		if (y !== undefined) {
 			this.y = y;
