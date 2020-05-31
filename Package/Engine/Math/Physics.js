@@ -210,7 +210,7 @@ class Physics {
             const bPoint = collisionAxis.Ntimes(-b.radius).Vplus(b.middle);
             const collisionPoint = aPoint.Vplus(bPoint).Nover(2);
 
-            col = new Collision(true, a, b, collisionAxis, [new Contact(a, b, collisionPoint, penetration)]);
+            col = new Collision(true, a, b, collisionAxis, [new Contact(collisionPoint, penetration)]);
         } else col = new Collision(false, a, b);
         return col;
     }
@@ -233,7 +233,7 @@ class Physics {
             if (inside) collisionAxis.invert();
 
 
-            col = new Collision(true, a, b, collisionAxis, [new Contact(a, b, bestPoint, penetration)]);
+            col = new Collision(true, a, b, collisionAxis, [new Contact(bestPoint, penetration)]);
         } else col = new Collision(false, a, b);
         return col;
     }

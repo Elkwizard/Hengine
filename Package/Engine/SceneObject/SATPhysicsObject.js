@@ -203,7 +203,7 @@ class PhysicsObject extends SceneObject {
     }
     getPointVelocity(point) {
         if (!this.rotationStatic) {
-            let r_A = point.Vminus(this.centerOfMass);
+            let r_A = point.Vminus(this.middle);
             let v_A = this.angularVelocity;
             let sum = r_A.normal.Ntimes(v_A).Vplus(this.velocity);
             return sum;
