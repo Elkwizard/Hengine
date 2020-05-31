@@ -454,6 +454,12 @@ class Artist {
 			}
 		}
 	}
+	set preservePixelart(a) {
+		this.c.imageSmoothingEnabled = !a;
+	}
+	get preservePixelart() {
+		return !this.c.imageSmoothingEnabled;
+	}
 	get background() {
 		return this._background;
 	}

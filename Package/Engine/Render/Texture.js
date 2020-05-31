@@ -125,6 +125,39 @@ class Texture extends ImageType {
 		}
 		return this.__image.img;
 	}
+	scale(w, h) {
+		w = Math.round(w);
+		h = Math.round(h);
+		let r = new Texture(w, h);
+		let w_f = this.width / w;
+		let h_f = this.height / h;
+		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
+			let x = Math.floor(i * w_f);
+			let y = Math.floor(j * h_f);
+			let tx = (i * w_f) % 1;
+			let ty = (j * h_f) % 1;
+			let a = this.pixels[x][y];
+			let b, c, d;
+			if (this.pixels[x + 1]) b = this.pixels[x + 1][y];
+			else b = a;
+			if (this.pixels[x + 1] && this.pixels[x + 1][y + 1]) d = this.pixels[x + 1][y + 1];
+			else d = b;
+			if (this.pixels[x][y + 1]) c = this.pixels[x][y + 1];
+			else c = a;
+			// if (this.pixels[x + 1])
+			r.shader_set(i, j, Color.quadLerp(a, b, c, d, tx, ty));
+		}
+		r.changed = true;
+		return r;
+	}
+	portion(x, y, w, h) {
+		x = Math.round(x);
+		y = Math.round(y);
+		let r = new Texture(w, h);
+		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) r.shader_set(i, j, this.getPixel(x + i, y + j));
+		r.changed = true;
+		return r;
+	}
 	static async fromDataURI(uri, w_o, h_o) {
 		let img = new Image();
 		img.src = uri;

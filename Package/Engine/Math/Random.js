@@ -63,7 +63,7 @@ class Random {
         return n(x, y, z);
     }
     static getVoronoiCell(x) {
-        return { x: Math.floor(x) + seedRand(Math.floor(x)) };
+        return { x: Math.floor(x) + Random.seedRand(Math.floor(x)) };
     }
     static voronoi(x, f = 1, seed = Random.seed) {
         x *= f;
@@ -86,7 +86,7 @@ class Random {
         x *= f;
         y *= f;
         x += seed;
-        y += x / seed;
+        y += seed * 2000;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) {
             let cell = Random.getVoronoiCell2D(x + i, y + j);
@@ -107,8 +107,8 @@ class Random {
         y *= f;
         z *= f;
         x += seed;
-        y += x / seed + z;
-        z += seed / y + seed;
+        y += seed * 2000;
+        z += seed * 2000000;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) for (let k = -1; k < 2; k++) {
             let cell = Random.getVoronoiCell3D(x + i, y + j, z + k);

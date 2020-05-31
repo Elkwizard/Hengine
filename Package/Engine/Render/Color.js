@@ -319,13 +319,13 @@ class Color extends Operable {
 		return (red + green + blue + alpha) / 4;
 	}
 	static get empty() {
-		return new Color(0, 0, 0, 0);
+		return Color.optimizedConstruct(0, 0, 0, 0);
 	}
 	static avg(c1, c2) {
 		return c1.plus(c2).over(2);
 	}
 	static sum(...colors) {
-		let result = new Color(0, 0, 0, 0);
+		let result = Color.optimizedConstruct(0, 0, 0, 0);
 		for (let color of colors) result.add(color);
 		return result;
 	}

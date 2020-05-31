@@ -1,7 +1,7 @@
 class ImageType {
 	constructor(width, height, loops = false) {
-		this.width = Math.round(width);
-		this.height = Math.round(height);
+		this.width = Math.max(1, Math.round(width));
+		this.height = Math.max(1, Math.round(height));
 		this.loops = loops;
 	}
 	makeImage() {
@@ -30,7 +30,7 @@ let Frame = class extends ImageType {
 		super(width, height, false);
 		this.img = new OffscreenCanvas(this.width, this.height);
 		this.c = new Artist(this.img);
-		this.c.c.imageSmoothingEnabled = !g.preservePixelart;
+		this.c.c.imageSmoothingEnabled = window.c ? !window.c.preservePixelart : false;
 	}
 	makeImage() {
 		return this.img;
@@ -46,7 +46,7 @@ try {
 			this.img.width = this.width;
 			this.img.height = this.height;
 			this.c = new Artist(this.img);
-			this.c.c.imageSmoothingEnabled = !g.preservePixelart;
+			this.c.c.imageSmoothingEnabled = window.c ? !c.preservePixelart : false;
 		}
 		makeImage() {
 			return this.img;
