@@ -230,6 +230,7 @@ class Sound {
         const SEC_DURATION = duration / 1000;
         const CURRENT_TIME = Sound.context.currentTime;
         gainNode.gain.value = 0.00001;
+        if (!volume) volume = 0.00001;
         gainNode.gain.exponentialRampToValueAtTime(volume, CURRENT_TIME + SEC_DURATION * LERP_LENGTH);
         gainNode.gain.setValueAtTime(volume, CURRENT_TIME + SEC_DURATION - SEC_DURATION * LERP_LENGTH);
         gainNode.gain.exponentialRampToValueAtTime(0.00001, CURRENT_TIME + SEC_DURATION);
