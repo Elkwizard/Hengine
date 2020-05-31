@@ -31,6 +31,98 @@ class Texture extends ImageType {
 
 		this.changed = false;
 	}
+	toString() {
+		function channelPair(a, b) {
+			let aStr = Math.floor(a).toString(2);
+			let bStr = Math.floor(b).toString(2);
+			let difA = 8 - aStr.length;
+			let difB = 8 - bStr.length;
+			return String.fromCharCode(parseInt("0".repeat(difA) + aStr + "0".repeat(difB) + bStr, 2));
+		}
+		function color(col) {
+			return channelPair(col.red, col.green) + channelPair(col.blue, col.alpha * 255);
+		}
+		function column(col) {
+			return col.map(e => color(e)).join("");
+		}
+		function toString(tex) {
+			let result = tex.width + "," + tex.height + ":";
+			for (let col of tex.pixels) result += column(col);
+			return result;
+		}
+		return toString(this);
+	}
+	clear() {
+		for (let i = 0; i < this.pixels.length; i++) for (let j = 0; j < this.pixels[0].length; j++) this.act_set(i, j, cl.BLANK);
+	}
+	getPixel(x, y) {
+		if (this.pixels[x] && this.pixels[x][y]) return this.pixels[x][y];
+		else if (!this.loops) return new Color(0, 0, 0, 0);
+		else {
+			x = (x % this.pixels.length + this.pixels.length) % this.pixels.length;
+			y = (y % this.pixels[0].length + this.pixels[0].length) % this.pixels[0].length;
+			return this.pixels[x][y];
+		}
+	}
+	shader(fn, ...args) {
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) this.shader_set(i, j, fn(i, j, ...args));
+		this.changed = true;
+	}
+	act_get(x, y) {
+		return this.pixels[x][y];
+	}
+	act_add(x, y, clr) {
+		let t = clr.alpha;
+		if (clr.alpha !== 1) {
+			let c1 = this.act_get(x, y);
+			if (c1.alpha) {
+				let col = new Color(clr.red * t + c1.red * (1 - t), clr.green * t + c1.green * (1 - t), clr.blue * t + c1.blue * (1 - t));
+				this.act_set(x, y, col);
+			} else this.act_set(x, y, clr);
+		} else this.act_set(x, y, clr);
+	}
+	shader_set(x, y, clr) {
+		this.pixels[x][y] = clr;
+		let inx = (y * this.width + x) * 4;
+		let data = this.imageData.data;
+		data[inx] = clr.red;
+		data[inx + 1] = clr.green;
+		data[inx + 2] = clr.blue;
+		data[inx + 3] = clr.alpha * 255;
+	}
+	act_set(x, y, clr) {
+		this.changed = true;
+		this.shader_set(x, y, clr);
+	}
+	setPixel(x, y, clr) {
+		if (this.pixels[x] && this.pixels[x][y]) this.act_set(x, y, clr);
+		return;
+	}
+	blur(amount = 1) {
+		for (let n = 0; n < amount; n++) for (let [x, y] of this) {
+			let colors = [];
+			for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) {
+				colors.push(this.getPixel(x + i, y + j));
+			}
+			let col = new Color(0, 0, 0, 1);
+			col.limited = false;
+			for (let color of colors) col.add(color);
+			col.div(colors.length);
+			this.setPixel(x, y, col);
+		}
+	}
+	updateImageData() {
+		let x = new Frame(this.width, this.height);
+		x.c.c.putImageData(this.imageData, 0, 0);
+		this.__image = x;
+	}
+	makeImage() {
+		if (this.changed) {
+			this.changed = false;
+			this.updateImageData();
+		}
+		return this.__image.img;
+	}
 	static async fromDataURI(uri, w_o, h_o) {
 		let img = new Image();
 		img.src = uri;
@@ -38,8 +130,6 @@ class Texture extends ImageType {
 		return await new Promise(function (resolve, reject) {
 			img.onload = function () {
 				let canvas = document.createElement("canvas");
-				canvas.style.position = "absolute";
-				canvas.style.zIndex = "4";
 				document.body.appendChild(img);
 				let style = getComputedStyle(img);
 				let w = w_o ? w_o : parseInt(style.width);
@@ -115,91 +205,6 @@ class Texture extends ImageType {
 			return tex;
 		}
 		return inv_toString(str);
-	}
-	toString() {
-		function channelPair(a, b) {
-			let aStr = Math.floor(a).toString(2);
-			let bStr = Math.floor(b).toString(2);
-			let difA = 8 - aStr.length;
-			let difB = 8 - bStr.length;
-			return String.fromCharCode(parseInt("0".repeat(difA) + aStr + "0".repeat(difB) + bStr, 2));
-		}
-		function color(col) {
-			return channelPair(col.red, col.green) + channelPair(col.blue, col.alpha * 255);
-		}
-		function column(col) {
-			return col.map(e => color(e)).join("");
-		}
-		function toString(tex) {
-			let result = tex.width + "," + tex.height + ":";
-			for (let col of tex.pixels) result += column(col);
-			return result;
-		}
-		return toString(this);
-	}
-	clear() {
-		for (let i = 0; i < this.pixels.length; i++) for (let j = 0; j < this.pixels[0].length; j++) this.act_set(i, j, cl.BLANK);
-	}
-	getPixel(x, y) {
-		if (this.pixels[x] && this.pixels[x][y]) return this.pixels[x][y];
-		else if (!this.loops) return new Color(0, 0, 0, 0);
-		else {
-			x = (x % this.pixels.length + this.pixels.length) % this.pixels.length;
-			y = (y % this.pixels[0].length + this.pixels[0].length) % this.pixels[0].length;
-			return this.pixels[x][y];
-		}
-	}
-	act_get(x, y) {
-		return this.pixels[x][y];
-	}
-	act_add(x, y, clr) {
-		let t = clr.alpha;
-		if (clr.alpha !== 1) {
-			let c1 = this.act_get(x, y);
-			if (c1.alpha) {
-				let col = new Color(clr.red * t + c1.red * (1 - t), clr.green * t + c1.green * (1 - t), clr.blue * t + c1.blue * (1 - t));
-				this.act_set(x, y, col);
-			} else this.act_set(x, y, clr);
-		} else this.act_set(x, y, clr);
-	}
-	act_set(x, y, clr) {
-		this.changed = true;
-		this.pixels[x][y] = clr;
-		let inx = (y * this.width + x) * 4;
-		let data = this.imageData.data;
-		data[inx] = clr.red;
-		data[inx + 1] = clr.green;
-		data[inx + 2] = clr.blue;
-		data[inx + 3] = clr.alpha * 255;
-	}
-	setPixel(x, y, clr) {
-		if (this.pixels[x] && this.pixels[x][y]) this.act_set(x, y, clr);
-		return;
-	}
-	blur(amount = 1) {
-		for (let n = 0; n < amount; n++) for (let [x, y] of this) {
-			let colors = [];
-			for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) {
-				colors.push(this.getPixel(x + i, y + j));
-			}
-			let col = new Color(0, 0, 0, 1);
-			col.limited = false;
-			for (let color of colors) col.add(color);
-			col.div(colors.length);
-			this.setPixel(x, y, col);
-		}
-	}
-	updateImageData() {
-		let x = new Frame(this.width, this.height);
-		x.c.c.putImageData(this.imageData, 0, 0);
-		this.__image = x;
-	}
-	makeImage() {
-		if (this.changed) {
-			this.changed = false;
-			this.updateImageData();
-		}
-		return this.__image.img;
 	}
 }
 class TextureDrawingContextPath {

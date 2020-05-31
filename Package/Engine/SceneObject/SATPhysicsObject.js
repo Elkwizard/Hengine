@@ -305,8 +305,8 @@ class PhysicsObject extends SceneObject {
         let iD = new Impulse(drag, this.centerOfMass);
         this.internalApplyImpulse(iD, "drag");
 
-        if (this.velocity.mag < 0.0001) this.velocity.mag = 0;
-        if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
+        // if (this.velocity.mag < 0.01) this.velocity.mag = 0;
+        // if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
     }
     physicsUpdate(others) {
         s.drawInWorldSpace(e => {

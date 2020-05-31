@@ -449,6 +449,11 @@ class Color {
 		let alpha = Math.abs(this.alpha - color.alpha) / 255;
 		return (red + green + blue + alpha) / 4;
 	}
+	static alpha(col, alpha) {
+		let cl = col.get();
+		cl.alpha = alpha;
+		return cl;
+	}
 	static colorScale(col, per) {
 		let cl = col.times(per);
 		cl.alpha = col.alpha;

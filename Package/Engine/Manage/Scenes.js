@@ -642,7 +642,7 @@ class Scene extends InactiveScene {
 		return { useful, useless, usefulArray };
 	}
 	gravitySort(useful) {
-		const dir = this.gravity.get().normalize();
+		const dir = this.gravity.normalized;
 		useful.sort(function (a, b) {
 			let mA = Vector2.fromPoint(a.object);
 			let mB = Vector2.fromPoint(b.object);

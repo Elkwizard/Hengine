@@ -5,7 +5,7 @@ class Collision {
         this.a = a;
         this.b = b;
         if (collisionPoints) {
-            this.penetration = Math.min(...collisionPoints.map(e => e.penetration));
+            this.penetration = Math.min(...collisionPoints.map(e => e.penetration)) - 0.001;
             this.contacts = collisionPoints;
         }
     }
@@ -79,9 +79,7 @@ class CollisionMoniter {
     }
 }
 class Contact {
-    constructor(a, b, point, penetration) {
-        this.a = a;
-        this.b = b;
+    constructor(point, penetration) {
         this.point = point;
         this.penetration = penetration;
     }
@@ -322,19 +320,26 @@ class Physics {
         }
         if (colliding && bestAxis) {
             let contacts = [];
-            let contactsA = Physics.collidePolygonPoints(bCorners, b.__axes, aCorners);
-            let contactsB = Physics.collidePolygonPoints(aCorners, a.__axes, bCorners);
+            let betterACorners = [];
+            let betterBCorners = [];
+            for (let corner of aCorners) {
+                if (b.middle.Vminus(corner).dot(toB) > 0) betterACorners.push(corner);     
+            }
+            for (let corner of bCorners) {
+                if (a.middle.Vminus(corner).dot(toB) < 0) betterBCorners.push(corner);     
+            }
+            let contactsA = Physics.collidePolygonPoints(bCorners, b.__axes, betterACorners);
+            let contactsB = Physics.collidePolygonPoints(aCorners, a.__axes, betterBCorners);
             for (let i = 0; i < contactsA.length; i++) {
                 let dot = contactsA[i].dot(bestAxis);
                 let pen = (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot;
-                if (pen > 0) contacts.push({ point: contactsA[i], pen });
+                if (pen > 0) contacts.push(new Contact(contactsA[i], pen));
             }
             for (let i = 0; i < contactsB.length; i++) {
                 let dot = contactsB[i].dot(bestAxis);
                 let pen = (dot < bestRange.a_m) ? dot - bestRange.a_min : bestRange.a_max - dot;
-                if (pen > 0) contacts.push({ point: contactsB[i], pen });
+                if (pen > 0) contacts.push(new Contact(contactsB[i], pen));
             }
-            contacts = contacts.map(e => new Contact(a, b, e.point, e.pen));
             if (!contacts.length) return new Collision(false, a, b);
             return new Collision(true, a, b, bestAxis, contacts);
         } else return new Collision(false, a, b);
@@ -402,25 +407,24 @@ class Physics {
     static resolve(col) {
         let { a, b, dir, contacts, penetration } = col;
 
-        //going away
         if (b.velocity.dot(dir) - b.velocity.dot(dir) < 0) return;
 
+        if (penetration > 0.05) {
+            //going away
+            let move = dir.Ntimes(-penetration);
+            let massPerA = a.__mass / (a.__mass + b.__mass);
+            let massPerB = 1 - massPerA;
+            let isWallB = Physics.isWall(b);
 
-        let move = dir.Ntimes(-penetration);
-        let massPerA = a.__mass / (a.__mass + b.__mass);
-        let massPerB = 1 - massPerA;
-        let isWallB = Physics.isWall(b);
-
-        let aMove = isWallB ? move : move.Ntimes(massPerA);
-        a.privateMove(aMove);
-        if (!isWallB) {
-            let bMove = move.Ntimes(-massPerB);
-            b.privateMove(bMove);
+            let aMove = isWallB ? move : move.Ntimes(massPerA);
+            a.privateMove(aMove);
+            if (!isWallB) {
+                let bMove = move.Ntimes(-massPerB);
+                b.privateMove(bMove);
+            }
         }
 
         Physics.resolveContacts(a, b, contacts, dir);
-
-        // for (let contact of contacts.slice(0, 1)) c.stroke(cl.RED, 2).arrow(contact.point, contact.point.plus(dir.times(40)));
 
         // immobilize
         a.canMoveThisFrame = false;
