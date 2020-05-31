@@ -1,6 +1,6 @@
 class Color extends Operable {
 	constructor(r, g, b, a) {
-		super("red", "green", "blue", "alpha");
+		super();
 		let red = 0;
 		let green = 0;
 		let blue = 0;
@@ -324,9 +324,6 @@ class Color extends Operable {
 		for (let color of colors) result.add(color);
 		return result;
 	}
-	static lerp(a, b, t) {
-		return Color.empty.map((value, channel) => Interpolation.lerp(a[channel], b[channel], t));
-	}
 	static quadLerp(a, b, c, d, tx, ty) {
 		return Color.empty.map((value, channel) => Interpolation.quadLerp(a[channel], b[channel], c[channel], d[channel], tx, ty));
 	}
@@ -350,6 +347,7 @@ class Color extends Operable {
 		return (this.red + this.blue + this.green) / (3 * 255);
 	}
 }
+Color.modValues = ["red", "green", "blue", "alpha"];
 class ColorLibrary {
 	constructor() {
 		this.RED = new Color("#f00");

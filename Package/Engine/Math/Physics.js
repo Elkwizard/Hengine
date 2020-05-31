@@ -320,16 +320,16 @@ class Physics {
         }
         if (colliding && bestAxis) {
             let contacts = [];
-            let betterACorners = [];
-            let betterBCorners = [];
-            for (let corner of aCorners) {
-                if (b.middle.Vminus(corner).dot(toB) > 0) betterACorners.push(corner);     
-            }
-            for (let corner of bCorners) {
-                if (a.middle.Vminus(corner).dot(toB) < 0) betterBCorners.push(corner);     
-            }
-            let contactsA = Physics.collidePolygonPoints(bCorners, b.__axes, betterACorners);
-            let contactsB = Physics.collidePolygonPoints(aCorners, a.__axes, betterBCorners);
+            // let betterACorners = [];
+            // let betterBCorners = [];
+            // for (let corner of aCorners) {
+            //     if (b.middle.Vminus(corner).dot(toB) > 0) betterACorners.push(corner);     
+            // }
+            // for (let corner of bCorners) {
+            //     if (a.middle.Vminus(corner).dot(toB) < 0) betterBCorners.push(corner);     
+            // }
+            let contactsA = Physics.collidePolygonPoints(bCorners, b.__axes, aCorners).slice(0, 2);
+            let contactsB = Physics.collidePolygonPoints(aCorners, a.__axes, bCorners).slice(0, 2);
             for (let i = 0; i < contactsA.length; i++) {
                 let dot = contactsA[i].dot(bestAxis);
                 let pen = (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot;

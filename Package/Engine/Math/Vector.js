@@ -155,8 +155,8 @@ class Matrix4x4 extends Matrix {
 	}
 }
 class Vector extends Operable {
-	constructor(types) {
-		super(...types);
+	constructor() {
+		super();
 	}
 	set mag(m) {
 		this.normalize();
@@ -190,7 +190,7 @@ class Vector extends Operable {
 	get normalized() {
 		return this.get().normalize();
 	}
-	op(e, v) {
+	op(v, e) {
 		if (typeof v === "number") {
 			for (let x in this) {
 				this[x] = e(this[x], v);
@@ -211,15 +211,6 @@ class Vector extends Operable {
 			}
 		}
 		return this;
-	}
-	total() {
-		let result = 0;
-		for (let n in this) result += this[n];
-		return result;
-	}
-	equals(v) {
-		let result = Vector.abs(this.minus(v)).total() < 0.00001;
-		return result;
 	}
 	invert() {
 		return this.mul(-1);
@@ -300,7 +291,7 @@ class Vector extends Operable {
 		return a.Ntimes(1 - t).Vplus(b.Ntimes(t));
 	}
 	static abs(v) {
-		return v.op(Math.abs.bind(Math), 0);
+		return v.op(0, Math.abs.bind(Math));
 	}
 	static sum(...v) {
 		let construct = v.length ? v[0].constructor : this;
@@ -323,9 +314,10 @@ class Vector extends Operable {
 		return dir.Vminus(wrong);
 	}
 }
+Vector.modValues = [];
 class Vector1 extends Vector {
 	constructor(x) {
-		super("x");
+		super();
 		this.x = x;
 	}
 	static get origin() {
@@ -335,9 +327,10 @@ class Vector1 extends Vector {
 		return new Vector1((Math.random() * 2) - 1);
 	}
 }
+Vector1.modValues = ["x"];
 class Vector2 extends Vector {
 	constructor(x, y) {
-		super("x", "y");
+		super();
 		this.x = x;
 		this.y = y;
 	}
@@ -517,9 +510,10 @@ class Vector2 extends Vector {
 		return new Vector2(p.x, p.y);
 	}
 }
+Vector2.modValues = ["x", "y"];
 class Vector3 extends Vector {
 	constructor(x, y, z) {
-		super("x", "y", "z");
+		super();
 		this.x = x;
 		if (y !== undefined) {
 			this.y = y;
@@ -557,9 +551,10 @@ class Vector3 extends Vector {
 		return new Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 }
+Vector3.modValues = ["x", "y", "z"];
 class Vector4 extends Vector {
 	constructor(x, y, z, w) {
-		super("x", "y", "z", "w");
+		super();
 		this.x = x;
 		if (y !== undefined) {
 			this.y = y;
@@ -571,6 +566,30 @@ class Vector4 extends Vector {
 			this.w = x;
 		}
 	}
+	static get left() {
+		return new Vector4(-1, 0, 0, 0);
+	}
+	static get right() {
+		return new Vector4(1, 0, 0, 0);
+	}
+	static get up() {
+		return new Vector4(0, -1, 0, 0);
+	}
+	static get down() {
+		return new Vector4(0, 1, 0, 0);
+	}
+	static get forward() {
+		return new Vector4(0, 0, 1, 0);
+	}
+	static get backward() {
+		return new Vector4(0, 0, -1, 0);
+	}
+	static get before() {
+		return new Vector4(0, 0, 0, -1);
+	}
+	static get after() {
+		return new Vector4(0, 0, 0, 1);
+	}
 	static get origin() {
 		return new Vector4(0, 0, 0, 0);
 	}
@@ -578,6 +597,7 @@ class Vector4 extends Vector {
 		return new Vector4((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 }
+Vector4.modValues = ["x", "y", "z", "w"];
 //isNaN
 (function() {
 	const nN = window.isNaN.bind(window);
