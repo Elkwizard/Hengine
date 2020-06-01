@@ -536,6 +536,7 @@ class Scene extends InactiveScene {
 
 		const arrays = this.extractUsefulCellArrays(this.elementArray);
 
+		this.cleanConstraints();
 		//physics
 		for (let i = 0; i < this.physicsRealism; i++) {
 			this.updateSceneObjectCaches(arrays.usefulArray);
@@ -546,6 +547,7 @@ class Scene extends InactiveScene {
 			this.constraintSolve();
 			this.collisionStep([...arrays.useful].reverse());
 		}
+		this.updatePreviousData(arrays.usefulArray);
 
 		//events
 		if (this.collisionEvents) this.runEventListeners(arrays.usefulArray);
@@ -634,6 +636,17 @@ class Scene extends InactiveScene {
 		
 		let usefulArray = useful.map(e => e.object);
 		return { useful, useless, usefulArray };
+	}
+	updatePreviousData(useful) {
+		for (let use of useful) use.updatePreviousData();
+	}
+	cleanConstraints() {
+		let keep = [];
+		for (let con of this.constraints) {
+			if (con.a.isDead || con.b.isDead);
+			else keep.push(con);
+		}
+		this.constraints = keep;
 	}
 	gravitySort(useful) {
 		const dir = this.gravity.normalized;

@@ -368,7 +368,7 @@ class Hengine {
 	static defaultApplicationPackage(code = [], art = [], animations = [], music = []) {
 		return new ApplicationPackage(Hengine.defaultEnginePackage, code, art, animations, music, true);
 	}
-	static async load(scripts) {
+	static async load(scripts, onload = () => null) {
 		let scriptHome = document.querySelectorAll("script"); //find yourself
 		for (let el of scriptHome) {
 			if (el.src.indexOf("Hengine") > -1) {
@@ -420,6 +420,7 @@ class Hengine {
 						if (file === "Hengine") {
 							window.HENGINE = new Hengine(scripts.utility);
 							document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
+							onload();
 						} else {
 							if (file.match(/DATA/g)) {
 								eval(file.slice(5));
@@ -429,6 +430,7 @@ class Hengine {
 									script.src = src + ".js";
 									document.body.appendChild(script);
 									resource = script;
+									Hengine.scriptsLoaded.push(file);
 								}
 							}
 						}
@@ -443,3 +445,4 @@ class Hengine {
 		}
 	}
 }
+Hengine.scriptsLoaded = [];

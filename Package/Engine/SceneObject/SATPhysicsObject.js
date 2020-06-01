@@ -271,7 +271,8 @@ class PhysicsObject extends SceneObject {
     engineFixedUpdate() {
         this.scripts.run("update");
         this.update();
-
+    }
+    updatePreviousData() {
         this.direction = this.middle.Vminus(this.last);
         this.last = this.middle;
         
@@ -280,7 +281,6 @@ class PhysicsObject extends SceneObject {
 
         this.angularDirection = this.rotation - this.lastRotation; 
         this.lastRotation = this.rotation;
-
     }
     applyGravity(coef = 1) {
         if (this.hasGravity) {

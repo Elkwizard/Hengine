@@ -624,7 +624,7 @@ class Physics {
 
         // c.stroke(cl.RED).arrow(a.middle, collisionPoint);
         // c.stroke(cl.RED).arrow(collisionPoint, collisionPoint.plus(I_A.normalized.times(50)));
-        // c.draw(cl.ORANGE).circle(collisionPoint, 5);
+        c.draw(cl.ORANGE).circle(collisionPoint, 5);
 
         if (b.completelyStatic) impulseB = null;
 
