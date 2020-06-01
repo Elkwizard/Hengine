@@ -206,7 +206,6 @@ class SceneObject {
 		this.shapes[name] = shape;
 		if (shape instanceof Polygon && !(shape instanceof Rect)) {
 			shape.vertexDirection = Geometry.vertexDirection(shape.vertices);
-			console.log(shape.vertexDirection);
 			shape.subdivideForCollisions();
 		}
 		this.cacheMass();
