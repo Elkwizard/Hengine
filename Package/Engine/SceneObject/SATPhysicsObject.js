@@ -197,9 +197,9 @@ class PhysicsObject extends SceneObject {
     }
     getPointVelocity(point) {
         if (!this.rotationStatic) {
-            let r_A = point.Vminus(this.middle);
-            let v_A = this.angularVelocity;
-            let sum = r_A.normal.Ntimes(v_A).Vplus(this.velocity);
+            let r_A = point.Vminus(this.middle).normal.Ntimes(this.angularVelocity);
+            // r_A.mag = r_A.sqrMag;
+            let sum = r_A.Vplus(this.velocity);
             return sum;
         } else return this.velocity;
     }
@@ -296,6 +296,7 @@ class PhysicsObject extends SceneObject {
         let drag = this.velocity.get().Nmul(-(1 - this.linearDragForce) * this.__mass / this.home.physicsRealism);
         let iD = new Impulse(drag, this.middle);
         this.internalApplyImpulse(iD, "drag");
+        this.angularVelocity *= this.angularDragForce;
 
         // if (this.velocity.mag < 0.01) this.velocity.mag = 0;
         // if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;

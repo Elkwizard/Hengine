@@ -233,10 +233,6 @@ class Geometry {
     }
     static rotatePointAround(origin, point, angle) {
         let dif = new Vector2(point.x - origin.x, point.y - origin.y);
-        // let a = dif.getAngle();
-        // a += angle;
-        // let nDif = Vector2.fromAngle(a);
-        // nDif.mul(dif.mag);
         let sin = Math.sin(angle);
         let cos = Math.cos(angle);
         let nDif = new Vector2(cos * dif.x - sin * dif.y, sin * dif.x + cos * dif.y);
@@ -327,7 +323,20 @@ class Geometry {
         } else return [polygon];
     }
     static subdividePolygon(polygon, direction) {
-        return Geometry.subdividePolygonList(polygon.vertices, direction).map(e => new Polygon(e, 0));
+        return Geometry.subdividePolygonList(polygon.vertices, direction).map(e => new Polygon(Geometry.clockwise(e), 0));
+    }
+    static clockwise(verts) {
+        let middle = Vector2.sum(...verts).over(verts.length);
+        return verts.map(e => e.minus(middle)).sort((a, b) => a.getAngle() - b.getAngle()).map(e => e.plus(middle));
+    }
+    static vertexDirection(verts) {
+        let middle = Vector2.sum(...verts).over(verts.length);
+        let dif = 0;
+        verts = verts.map(e => e.minus(middle).getAngle());
+        for (let i = 0; i < verts.length - 1; i++) {
+            dif += verts[i + 1] - verts[i];
+        }
+        return dif < 0;
     }
     static overlapLineLine(l1, l2) {
         let pol = Geometry.projectPointOntoLine;

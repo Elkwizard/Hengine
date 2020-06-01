@@ -122,7 +122,7 @@ class Polygon extends Shape {
 	constructor(vertices, rotation = 0) {
 		super(rotation);
 		this.vertices = vertices;
-		this.vertexDirection = true;
+		this.vertexDirection = vertices;
 		this.__axes = [];
 	}
 	set middle(a) {
@@ -235,8 +235,9 @@ class Polygon extends Shape {
 		this.subdivideForCollisions(this.vertexDirection);
 		return this;
 	}
-	move(dir) {
+	move(dir, isCollisionShape) {
 		for (let vert of this.vertices) vert.Vadd(dir);
+		if (!isCollisionShape) for (let shape of this.collisionShapes) shape.move(dir, true);
 		return this;
 	}
 	get() {

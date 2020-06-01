@@ -260,9 +260,7 @@ class Color extends Operable {
 		return "#" + colorMap[word.toLowerCase()];
 	}
 	static optimizedConstruct(red, green, blue, alpha) {
-		let obj = { red, green, blue, alpha, limited: true };
-		Object.setPrototypeOf(obj, Color.prototype);
-		return obj;
+		return new Color(red, green, blue, alpha);
 	}
 	static numToHex(num) {
 		let a = Math.floor(num / 16);

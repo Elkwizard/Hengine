@@ -204,7 +204,11 @@ class SceneObject {
 	addShape(name, shape) {
 		shape = shape.get();
 		this.shapes[name] = shape;
-		if (shape instanceof Polygon && !(shape instanceof Rect)) shape.subdivideForCollisions();
+		if (shape instanceof Polygon && !(shape instanceof Rect)) {
+			shape.vertexDirection = Geometry.vertexDirection(shape.vertices);
+			console.log(shape.vertexDirection);
+			shape.subdivideForCollisions();
+		}
 		this.cacheMass();
 		this.cacheBoundingBoxes();
 	}

@@ -263,7 +263,7 @@ class Physics {
         let ax = [];
         for (let axis of axes) {
             let inv = axis.inverse();
-            if (!ax.test(e => e.equals(inv))) ax.push(axis); 
+            if (!ax.test(e => e.equals(inv))) ax.push(axis);
         }
         axes = ax;
         let cols = [];
@@ -319,8 +319,14 @@ class Physics {
             }
         }
         if (colliding && bestAxis) {
-            let contacts = [];            let contactsA = Physics.collidePolygonPoints(bCorners, b.__axes, aCorners).slice(0, 2);
-            let contactsB = Physics.collidePolygonPoints(aCorners, a.__axes, bCorners).slice(0, 2);
+            let contacts = [];
+            let contactsA = Physics.collidePolygonPoints(bCorners, b.__axes, aCorners);
+            let contactsB = Physics.collidePolygonPoints(aCorners, a.__axes, bCorners);
+            if (!Physics.advanced) {
+                contactsA = contactsA.slice(0, 2);
+                contactsB = contactsB.slice(0, 2);
+            }
+            
             for (let i = 0; i < contactsA.length; i++) {
                 let dot = contactsA[i].dot(bestAxis);
                 let pen = (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot;
@@ -331,6 +337,7 @@ class Physics {
                 let pen = (dot < bestRange.a_m) ? dot - bestRange.a_min : bestRange.a_max - dot;
                 if (pen > 0) contacts.push(new Contact(contactsB[i], pen));
             }
+            if (Physics.advanced) contacts = contacts.sort((a, b) => b.penetration - a.penetration).slice(0, 2);
             if (!contacts.length) return new Collision(false, a, b);
             return new Collision(true, a, b, bestAxis, contacts);
         } else return new Collision(false, a, b);
@@ -369,6 +376,7 @@ class Physics {
                     }
                 }
                 let res = new Collision(true, a, b, max.dir, contacts);
+                res.penetration = Math.max(...cols.map(e => e.penetration));
                 return [res];
             }
         }
@@ -407,7 +415,6 @@ class Physics {
             let massPerA = a.__mass / (a.__mass + b.__mass);
             let massPerB = 1 - massPerA;
             let isWallB = Physics.isWall(b);
-
             let aMove = isWallB ? move : move.Ntimes(massPerA);
             a.privateMove(aMove);
             if (!isWallB) {
@@ -666,3 +673,4 @@ class Physics {
         return 0;
     }
 }
+Physics.advanced = true;
