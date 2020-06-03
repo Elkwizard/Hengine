@@ -326,7 +326,7 @@ class Physics {
                 contactsA = contactsA.slice(0, 2);
                 contactsB = contactsB.slice(0, 2);
             }
-            
+
             for (let i = 0; i < contactsA.length; i++) {
                 let dot = contactsA[i].dot(bestAxis);
                 let pen = (dot < bestRange.b_m) ? dot - bestRange.b_min : bestRange.b_max - dot;
@@ -448,8 +448,8 @@ class Physics {
         const b = col.b;
 
         //do custom collision response
-        if (!a.colliding.has(b)) a.colliding.add(b, col.dir);
-        if (!b.colliding.has(a)) b.colliding.add(a, col.dir.inverse());
+        a.colliding.add(b, col.dir);
+        b.colliding.add(a, col.dir.inverse());
     }
     static runEventListeners(a) {
         function runEvents(name) {
@@ -624,7 +624,7 @@ class Physics {
 
         // c.stroke(cl.RED).arrow(a.middle, collisionPoint);
         // c.stroke(cl.RED).arrow(collisionPoint, collisionPoint.plus(I_A.normalized.times(50)));
-        c.draw(cl.ORANGE).circle(collisionPoint, 5);
+        // c.draw(cl.ORANGE).circle(collisionPoint, 5);
 
         if (b.completelyStatic) impulseB = null;
 
@@ -674,3 +674,90 @@ class Physics {
     }
 }
 Physics.advanced = true;
+
+// if (false) 
+Physics.collidePolygonPolygon = function (a, b) {
+    let toB = b.middle.minus(a.middle);
+    let aAxes = a.__axes.map(e => e.inverse());
+    let bAxes = b.__axes;
+
+    aAxes = aAxes.filter(e => e.dot(toB) > 0);
+    bAxes = bAxes.filter(e => e.dot(toB) > 0);
+    const axes = [
+        ...aAxes,
+        ...bAxes
+    ];
+
+    let aCorners = a.getCorners();
+    let bCorners = b.getCorners();
+
+
+    let bestAxis = Vector2.up;
+    let minOverlap = Infinity;
+    const amtContacts = aCorners.length + bCorners.length;
+    const bInxOffset = aCorners.length;
+
+    let contactsValid = [];
+    let contactPenetration = [];
+    for (let i = 0; i < amtContacts; i++) contactsValid.push(true);
+    for (let i = 0; i < amtContacts; i++) contactPenetration.push(0);
+    for (let i = 0; i < axes.length; i++) {
+        let axis = axes[i];
+        let projA = aCorners.map(e => e.dot(axis));
+        let projB = bCorners.map(e => e.dot(axis));
+        let aRange = { min: Math.min(...projA), max: Math.max(...projA) };
+        let bRange = { min: Math.min(...projB), max: Math.max(...projB) };
+
+        let overlap = aRange.max > bRange.min && bRange.max > aRange.min;
+        console.log(overlap, aRange, bRange);
+        if (!overlap) return new Collision(false, a, b);
+        let a_middle = (aRange.min + aRange.max) / 2;
+        let b_middle = (bRange.min + bRange.max) / 2;
+        for (let i = 0; i < projA.length; i++) {
+            if (contactsValid[i]) {
+                let proj = projA[i];
+                let within = proj > bRange.min && proj < bRange.max;
+                contactsValid[i] = within;
+            }
+        }
+        for (let i = 0; i < projB.length; i++) {
+            if (contactsValid[i + bInxOffset]) {
+                let proj = projB[i];
+                let within = proj > aRange.min && proj < aRange.max;
+                contactsValid[i + bInxOffset] = within;
+            }
+        }
+        let over = (a_middle < b_middle) ? aRange.max - bRange.min : bRange.max - aRange.min;
+        if (over < minOverlap && axis.dot(toB) > 0) {
+            minOverlap = over;
+            bestAxis = axis;
+
+            //get contact depth
+            for (let i = 0; i < projA.length; i++) {
+                if (contactsValid[i]) {
+                    let proj = projA[i];
+                    contactPenetration[i] = (proj < b_middle) ? proj - bRange.min : bRange.max - proj;
+                }
+            }
+            for (let i = 0; i < projB.length; i++) {
+                if (contactsValid[i + bInxOffset]) {
+                    let proj = projB[i];
+                    contactPenetration[i + bInxOffset] = (proj < a_middle) ? proj - aRange.min : aRange.max - proj;
+                }
+            }
+        }
+    }
+    contacts = [...aCorners]
+        .map((contactPoint, inx) => [contactPoint, inx])
+        .filter((contactArray, inx) => contactsValid[inx])
+        .map(contactArray => new Contact(contactArray[0], Math.abs(contactPenetration[contactArray[1]])));
+
+    for (let contact of contacts) {
+        c.stroke(cl.RED, 2).arrow(contact.point, contact.point.plus(bestAxis.times(contact.penetration)));
+    }
+    console.log(contacts);
+
+    contacts = contacts.sort((a, b) => b.penetration - a.penetration).slice(0, 2);
+    if (!contacts.length) return new Collision(false, a, b);
+    return new Collision(true, a, b, bestAxis, contacts);
+}

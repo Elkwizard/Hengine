@@ -50,7 +50,6 @@ class PhysicsObject extends SceneObject {
         //data
         this.colliding = new CollisionMoniter();
         this.lastColliding = new CollisionMoniter();
-        this.newColliding = new CollisionMoniter();
         this.response.collide = {
             general: function () { },
             top: function () { },
@@ -262,8 +261,7 @@ class PhysicsObject extends SceneObject {
         const dir = this.velocity.normalized;
         others = others.sort((a, b) => (a.x - b.x) * dir.x + (a.y - b.y) * dir.y);
         others = [...others.filter(e => !e.completelyStatic), ...others.filter(e => e.completelyStatic)];
-        let collisions;
-        if (!this.completelyStatic) collisions = this.detectCollisions(others);
+        this.detectCollisions(others);
     }
     getSpeedModulation() {
         return this.home.speedModulation / this.home.physicsRealism;

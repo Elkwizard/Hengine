@@ -317,20 +317,27 @@ class Geometry {
             }
             let a = currentPolygon;
             let b = otherPolygon;
+            
             otherPolygons.push(...Geometry.subdividePolygonList(a));
             otherPolygons.push(...Geometry.subdividePolygonList(b));
             return otherPolygons;
         } else return [polygon];
     }
+    static getMiddle(verts) {
+        return Vector2.sum(...verts).over(verts.length);
+    }
     static subdividePolygon(polygon, direction) {
-        return Geometry.subdividePolygonList(polygon.vertices, direction).map(e => new Polygon(Geometry.clockwise(e), 0));
+        let verts = polygon.vertices;
+        let middle = Geometry.getMiddle(verts);
+        verts = verts.map(e => e.Vminus(middle));
+        return Geometry.subdividePolygonList(verts, direction).map(e => new Polygon(Geometry.clockwise(e).map(e => e.Vplus(middle)), 0));
     }
     static clockwise(verts) {
-        let middle = Vector2.sum(...verts).over(verts.length);
+        let middle = Geometry.getMiddle(verts);
         return verts.map(e => e.minus(middle)).sort((a, b) => a.getAngle() - b.getAngle()).map(e => e.plus(middle));
     }
     static vertexDirection(verts) {
-        let middle = Vector2.sum(...verts).over(verts.length);
+        let middle = Geometry.getMiddle(verts);
         let dif = 0;
         verts = verts.map(e => e.minus(middle).getAngle());
         for (let i = 0; i < verts.length - 1; i++) {

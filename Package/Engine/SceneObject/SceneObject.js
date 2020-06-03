@@ -75,6 +75,13 @@ class SceneObject {
 		this.__width = 0;
 		this.__height = 0;
 	}
+	get defaultShape() {
+		return this.getShape("default");
+	}
+	set defaultShape(a) {
+		this.removeShape("default");
+		this.addShape("default", a);
+	}
 	set middle(a) {
 		this.x = a.x;
 		this.y = a.y;

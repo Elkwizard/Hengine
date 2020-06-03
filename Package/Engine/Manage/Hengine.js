@@ -103,6 +103,11 @@ class ApplicationPackage {
 	}
 	animate();
 })();
+function exit(...msg) { 
+	console.log(...msg);
+	window.intervals = [];
+	window.animationFrames = [];
+}
 class Hengine {
 	constructor(utility, wrapper = document.body) {
 		//everything needs randomness
