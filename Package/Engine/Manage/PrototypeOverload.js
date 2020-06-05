@@ -1,4 +1,3 @@
-
 Function.prototype.add = function (fn = function () { }) {
 	let self = this;
 	return function (...a) {

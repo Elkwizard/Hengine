@@ -20,6 +20,26 @@ class InputHandler {
 		this.keyDownCounts = { };
 		this.keyUpCounts = { };
 	}
+	//lengthy
+	justPressed(...keys) {
+		return this.JP(...keys);
+	}
+	justReleased(...keys) {
+		return this.JR(...keys);
+	}
+	pressed(...keys) {
+		return this.P(...keys);
+	}
+	released(...keys) {
+		return this.R(...keys);
+	}
+	pressLength(key) {
+		return this.PL(key);
+	}
+	releaseLength(key) {
+		return this.RL(key);
+	}
+	//small
 	PL(key) {
 		return this.keyDownCounts[key];
 	}

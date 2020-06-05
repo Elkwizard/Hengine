@@ -131,6 +131,13 @@ class Hengine {
 		window.C = this.C;
 		window.cl = this.cl;
 		window.sl = this.sl;
+		window.gameEngine = g;
+		window.scene = s;
+		window.renderer = c;
+		window.colorLibrary = cl;
+		window.soundLibrary = sl;
+		window.keyboard = K;
+		window.mouse = M;
 		if (!(window.width || window.height)) {
 			Object.defineProperty(window, "width", {
 				get: function () {
