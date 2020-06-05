@@ -16,7 +16,7 @@ class PhysicsObject extends SceneObject {
         this.angularVelocity = 0;
         this.angularAcceleration = 0;
         this.hasGravity = gravity;
-        this._gravity = null;
+        this.gravity = this.physicsEngine.gravity;
 
         //previous states
         this.lastRotation = 0;
@@ -61,13 +61,6 @@ class PhysicsObject extends SceneObject {
 
         //scene
         this.usedForCellSize = false;
-    }
-    set gravity(a) {
-        this._gravity = a;
-    }
-    get gravity() {
-        if (this._gravity === null) return this.physicsEngine.gravity;
-        else return this._gravity;
     }
     set mass(a) {
         this._mass = a;
@@ -155,33 +148,28 @@ class PhysicsObject extends SceneObject {
     getPointVelocity(point) {
         if (!this.rotationStatic) {
             let r_A = point.Vminus(this.middle).normal.Ntimes(this.angularVelocity);
-            // r_A.mag = r_A.sqrMag;
             let sum = r_A.Vplus(this.velocity);
             return sum;
         } else return this.velocity;
     }
     capSpeed() {
-        let m = Math.sqrt(this.mass) / 2;
+        let m = Math.sqrt(this.__mass) / 2;
         if (this.velocity.mag > m) this.velocity.mag = m;
     }
     privateSetX(x) {
         if (!this.positionStatic) {
             this.x = x;
-            this.__middle.x += v.x;
         }
     }
     privateSetY(y) {
         if (!this.positionStatic) {
             this.y = y;
-            this.__middle.y += v.y;
         }
     }
     privateMove(v) {
         if (!this.positionStatic) {
             this.x += v.x;
             this.y += v.y;
-            this.__middle.x += v.x;
-            this.__middle.y += v.y;
             this.moveBoundingBoxCache(v);
         }
     }
@@ -256,8 +244,6 @@ class PhysicsObject extends SceneObject {
         this.velocity.y += this.velocity.y * dragFactor;
         this.angularVelocity *= this.angularDragForce;
 
-        // if (this.velocity.mag < 0.01) this.velocity.mag = 0;
-        // if (Math.abs(this.angularVelocity) < 0.00001) this.angularVelocity = 0;
     }
     physicsUpdate(others) {
         s.drawInWorldSpace(e => {
@@ -354,26 +340,24 @@ class PhysicsObject extends SceneObject {
         return 1 - pMag / I.mag;
     }
     internalApplyImpulse(impulse, name = "no name") {
-        if (!impulse || !(impulse.force.x || impulse.force.y) ) return;
+        if (!impulse || !(impulse.force.x || impulse.force.y)) return;
         impulse.force.Ndiv(this.__mass * this.physicsEngine.physicsRealism);
         this.applyLinearImpulse(impulse, name);
         this.applyAngularImpulse(impulse, name);
     }
     applyImpulse(impulse, name = "no name") {
-        if (!impulse || !impulse.force.mag) return;
+        if (!impulse || !(impulse.force.x || impulse.force.y)) return;
         impulse.force.Ndiv(this.__mass);
         this.applyLinearImpulse(impulse, name);
         this.applyAngularImpulse(impulse, name);
     }
     applyLinearImpulse(impulse, name) {
-        if (!impulse) return;
         const vel = impulse.force;
         this.velocity.Vadd(vel);
     }
     applyAngularImpulse(impulse, name) {
-        if (!impulse) return;
         let r = impulse.source.Vminus(this.middle);
         if (!r.x && !r.y && r.x + r.y < 0.01) return;
-        this.angularVelocity += -impulse.force.cross(r) / (r.mag ** 2);
+        this.angularVelocity += -impulse.force.cross(r) / r.sqrMag;
     }
 }

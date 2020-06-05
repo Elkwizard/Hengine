@@ -763,10 +763,15 @@ class PhysicsEngine {
 			let [rect, ...updateCells] = usef;
 			let updater = [];
 			if (!rect.completelyStatic) for (let cell of updateCells) {
-				for (let r of cell) {
-					if (r !== rect && !updater.includes(r)) updater.push(r);
-				}
-			}
+                updater.push(...cell);
+                // for (let r of cell) {
+				// 	if (r !== rect && !updater.includes(r)) updater.push(r);
+				// }
+            }
+            updater = new Set(updater);
+            updater.delete(rect);
+            updater = [...updater];
+            
 			return new CollisionPair(rect, updater);
 		});
 		//remove duplicates
