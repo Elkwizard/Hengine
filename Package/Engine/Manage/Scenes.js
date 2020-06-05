@@ -1,21 +1,9 @@
 class InactiveScene {
-	constructor(name, gravity = 0.2) {
-		this.gravity = gravity;
+	constructor(name) {
 		this.name = name;
 		this.rebound = 0;
 		this.elementArray = [];
 		this.custom = {};
-		this.angularDragForce = .995;
-		this.linearDragForce = .995;
-		this.frictionDragForce = 0.2;
-		this.SAT = {
-			possibleChecks: 0,
-			gridChecks: 0,
-			boxChecks: 0,
-			SATChecks: 0,
-			collisions: 0
-		};
-		this.physicsRealism = 1;
 		this.defaultDraw = function (name, shape) {
 			c.draw("#000").infer(shape);
 			c.stroke("cyan", 1).infer(shape);
@@ -447,17 +435,15 @@ class Camera extends Rect {
 }
 class Scene extends InactiveScene {
 	constructor(name, context, gravity, home) {
-		super(name, gravity);
+		super(name);
 		this.c = context;
 		this.home = home;
 		this.cullGraphics = true;
-		this.speedModulation = 1;
-		this.constraints = [];
 		this.cameras = {};
-		this.collisionEvents = false;
 		this.mouseEvents = false;
 		this.camera = new Camera(0, 0, this.c.canvas.width, this.c.canvas.height, 1, 0);
 		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
+		this.physicsEngine = new PhysicsEngine(gravity);
 		M.engineClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			let collided = this.collidePoint(adjusted);
@@ -492,7 +478,6 @@ class Scene extends InactiveScene {
 				}
 			}
 		}.bind(this);
-		this.cellSize = 150;
 		this.removeQueue = [];
 
 		this.physics = {
@@ -515,13 +500,6 @@ class Scene extends InactiveScene {
 	}
 	engineFixedUpdate() {
 		let startTime = performance.now();
-		this.SAT = {
-			possibleChecks: 0,
-			gridChecks: 0,
-			boxChecks: 0,
-			SATChecks: 0,
-			collisions: 0
-		}
 		for (let rect of this.elementArray) rect.isBeingUpdated = true;
 		this.updateArray();
 		this.clearAllCollisions();
@@ -537,23 +515,7 @@ class Scene extends InactiveScene {
 			el.scripts.run("beforeUpdate");
 		}
 
-		const arrays = this.extractUsefulCellArrays(this.elementArray);
-
-		this.cleanConstraints();
-		//physics
-		for (let i = 0; i < this.physicsRealism; i++) {
-			this.updateSceneObjectCaches(arrays.usefulArray);
-			this.gravitySort(arrays.useful);
-			this.gravityPhase(arrays.usefulArray);
-			this.constraintSolve();
-			this.collisionStep(arrays.useful);
-			this.constraintSolve();
-			this.collisionStep([...arrays.useful].reverse());
-		}
-		this.updatePreviousData(arrays.usefulArray);
-
-		//events
-		if (this.collisionEvents) this.runEventListeners(arrays.usefulArray);
+		let arrays = this.physicsEngine.run(this.elementArray);
 
 		//particle movement
 		for (let rect of arrays.useless) if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
@@ -567,6 +529,9 @@ class Scene extends InactiveScene {
 		for (let rect of this.elementArray) rect.isBeingUpdated = false;
 		// console.log(performance.now() - startTime);
 	}
+	constrain(a, b, ap, bp, str) {
+		this.physicsEngine.constrain(a, b, ap, bp, str);
+	}
 	updateSceneObjectCaches(useful) {
 		for (const el of useful) el.updateCaches();
 	}
@@ -574,123 +539,6 @@ class Scene extends InactiveScene {
 		for (let rect of useful) {
 			rect.engineFixedUpdate();
 		}
-	}
-	runEventListeners(useful) {
-		for (let el of useful) {
-			Physics.runEventListeners(el);
-		}
-	}
-	gravityPhase(useful) {
-		for (let el of useful) {
-			let rect = el;
-			rect.applyGravity(1);
-		}
-	}
-	extractUsefulCellArrays(elements) {
-		let cells = { };
-		let useful = [];
-		let useless = [];
-		let isUseless = a => !(a instanceof PhysicsObject);
-		//categorize
-		for (let rect of this.elementArray) {
-			if (isUseless(rect)) {
-				useless.push(rect);
-				continue;
-			} else useful.push([rect]);
-		}
-		//get cells, accumulate cells
-		for (let usef of useful) {
-			let rect = usef[0];
-			let cls = Physics.getCells(rect, this.cellSize);
-			for (let cl of cls) {
-				let key = cl.x + "," + cl.y;
-				if (cells[key]) cells[key].push(rect);
-				else cells[key] = [rect];
-				let use = usef;
-				use.push(cells[key]);
-			}
-		}
-		//map to collisionPairs
-		useful = useful.map(usef => {
-			//get rectangles
-			let [rect, ...updateCells] = usef;
-			let updater = [];
-			if (!rect.completelyStatic) for (let cell of updateCells) {
-				for (let r of cell) {
-					if (r !== rect && !updater.includes(r)) updater.push(r);
-				}
-			}
-			return new CollisionPair(rect, updater);
-		});
-		//remove duplicates
-		useful = [...(new Set(useful))];
-
-		// show cells
-		// this.drawInWorldSpace(e => {
-		// 	const cell_size = this.cellSize;
-		// 	for (let [key, cell] of cells) {
-		// 		let x = parseInt(key.split(",")[0]) * cell_size;
-		// 		let y = parseInt(key.split(",")[1]) * cell_size;
-		// 		let r = new Rect(x, y, cell_size, cell_size);
-		// 		c.stroke(cl.RED, 3).rect(r);
-		// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
-		// 	}
-		// });
-		
-		let usefulArray = useful.map(e => e.object);
-		return { useful, useless, usefulArray };
-	}
-	updatePreviousData(useful) {
-		for (let use of useful) use.updatePreviousData();
-	}
-	cleanConstraints() {
-		let keep = [];
-		for (let con of this.constraints) {
-			if (con.a.isDead || con.b.isDead);
-			else keep.push(con);
-		}
-		this.constraints = keep;
-	}
-	gravitySort(useful) {
-		const dir = this.gravity.normalized;
-		useful.sort(function (a, b) {
-			let mA = Vector2.fromPoint(a.object);
-			let mB = Vector2.fromPoint(b.object);
-			let dA = mA.dot(dir);
-			let dB = mB.dot(dir);
-			return dB - dA;
-		});
-	}
-	collisionStep(useful) {
-		for (let i = 0; i < useful.length; i++) {
-			let rect = useful[i].object;
-			let updater = useful[i].others;
-
-			this.SAT.gridChecks += updater.length;
-			this.SAT.possibleChecks += updater.length ? s.elementArray.length : 0;
-			if (!rect.usedForCellSize) this.recalculateAverageCellSize(rect);
-			rect.physicsUpdate(updater);
-		}
-	}
-	constraintSolve() {
-		for (let i = 1; i < 3; i++) {
-			let random = this.constraints.randomize();
-			for (let constraint of random) {
-				constraint.solve(1 / i);
-			}
-		}
-	}
-	constrain(a, b, aOffset = Vector2.origin, bOffset = Vector2.origin, length = "CURRENT_DIST", stiffness = 1) {
-		this.constraints.push(new Constraint(a, b, aOffset, bOffset, length, stiffness));
-	}
-	recalculateAverageCellSize(newEl) {
-		let oldAvg = this.cellSize;
-		let mul = this.elementArray.filter(e => e instanceof PhysicsObject).length;
-		oldAvg *= mul;
-		let newSize = newEl.width + newEl.height;
-		let newAverageMax = (oldAvg + newSize) / (mul + 1);
-		this.cellSize = newAverageMax;
-		newEl.usedForCellSize = true;
 	}
 	addCamera(name, camera) {
 		name = this.genName(this.cameras, name);

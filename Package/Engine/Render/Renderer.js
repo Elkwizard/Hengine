@@ -411,7 +411,7 @@ class Artist {
 				this.unclip();
 			},
 			default(x, y) {
-				this.drawImage(x, y);
+				this.drawImageInternal(x, y, this.imageStyle.width, this.imageStyle.height);
 			},
 			rect(x, y, width, height) {
 				this.clip().rect(x, y, width, height);

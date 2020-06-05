@@ -1,7 +1,7 @@
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, gravity, controls, tag, home) {
         super(name, x, y, controls, tag, home);
-
+        this.physicsEngine = this.home.physicsEngine;
         //velocity
         this.velocity = Vector2.origin;
         this.acceleration = Vector2.origin;
@@ -57,27 +57,6 @@ class PhysicsObject extends SceneObject {
             left: function () { },
             right: function () { }
         };
-        this.allCollidingWith = {
-            includes: function (name) {
-                for (let x in this) {
-                    if (typeof this[x] !== "function" && this[x] === name) return this[x];
-                }
-                return false;
-            },
-            includesTag: function (tag) {
-                for (let x in this) {
-                    if (typeof this[x] !== "function" && this[x].tag === tag) return this[x];
-                };
-                return false;
-            },
-            clear: function () {
-                for (let x in this) {
-                    if (typeof this[x] !== "function") {
-                        delete this[x];
-                    }
-                }
-            }
-        };
 
         //scene
         this.usedForCellSize = false;
@@ -86,7 +65,7 @@ class PhysicsObject extends SceneObject {
         this._gravity = a;
     }
     get gravity() {
-        if (this._gravity === null) return this.home.gravity;
+        if (this._gravity === null) return this.physicsEngine.gravity;
         else return this._gravity;
     }
     set friction(a) {
@@ -94,21 +73,21 @@ class PhysicsObject extends SceneObject {
     }
     get friction() {
         if (this._friction !== null) return this._friction;
-        return this.home.frictionDragForce;
+        return this.physicsEngine.frictionDragForce;
     }
     set linearDragForce(a) {
         this._linearDragForce = a;
     }
     get linearDragForce() {
         if (this._angularDragForce !== null) return this._linearDragForce;
-        return this.home.linearDragForce;
+        return this.physicsEngine.linearDragForce;
     }
     set angularDragForce(a) {
         this._angularDragForce = a;
     }
     get angularDragForce() {
         if (this._angularDragForce !== null) return this._angularDragForce;
-        return this.home.angularDragForce;
+        return this.physicsEngine.angularDragForce;
     }
     set mass(a) {
         this._mass = a;
@@ -180,7 +159,6 @@ class PhysicsObject extends SceneObject {
     clearCollisions() {
         this.colliding.clear();
         this.canMoveThisFrame = true;
-        this.allCollidingWith.clear();
         this.prohibited = [];
     }
     drawWithoutRotation(artist) {
@@ -230,14 +208,12 @@ class PhysicsObject extends SceneObject {
         }
     }
     detectCollisions(others) {
-        let collisions = 0;
         if (!this.completelyStatic) {
             for (let other of others) {
                 if (other !== this) {
                     if (this.optimize(other) && other.optimize(this)) {
                         if ((!this.hasCollideRule || this.collideBasedOnRule(other)) && (!other.hasCollideRule || other.collideBasedOnRule(this))) {
                             let col = Physics.fullCollide(this, other);
-                            collisions++;
                             if (col.length) {
                                 if (this.canCollide && other.canCollide) {
                                     for (const collision of col) {
@@ -264,7 +240,7 @@ class PhysicsObject extends SceneObject {
         this.detectCollisions(others);
     }
     getSpeedModulation() {
-        return this.home.speedModulation / this.home.physicsRealism;
+        return this.physicsEngine.speedModulation / this.physicsEngine.physicsRealism;
     }
     engineFixedUpdate() {
         this.scripts.run("update");
@@ -291,7 +267,7 @@ class PhysicsObject extends SceneObject {
     }
     slowDown() {
         //apply linear drag;
-        let drag = this.velocity.get().Nmul(-(1 - this.linearDragForce) * this.__mass / this.home.physicsRealism);
+        let drag = this.velocity.get().Nmul(-(1 - this.linearDragForce) * this.__mass / this.physicsEngine.physicsRealism);
         let iD = new Impulse(drag, this.middle);
         this.internalApplyImpulse(iD, "drag");
         this.angularVelocity *= this.angularDragForce;
@@ -320,6 +296,7 @@ class PhysicsObject extends SceneObject {
             this.angularVelocity += this.angularAcceleration;
             if (this.rotationStatic) this.angularVelocity = 0;
             let newRotation = this.rotation + this.angularVelocity * spdMod;
+            
             this.privateSetRotation(newRotation);
 
             this.updateMovementCaches();
@@ -389,7 +366,7 @@ class PhysicsObject extends SceneObject {
     }
     internalApplyImpulse(impulse, name = "no name") {
         if (!impulse || !impulse.force.mag) return;
-        impulse.force.Ndiv(this.__mass * this.home.physicsRealism);
+        impulse.force.Ndiv(this.__mass * this.physicsEngine.physicsRealism);
         this.applyLinearImpulse(impulse, name);
         this.applyAngularImpulse(impulse, name);
     }

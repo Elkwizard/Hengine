@@ -161,9 +161,9 @@ class Constraint {
 }
 class Physics {
     static collide(a, b) {
-        s.SAT.boxChecks++;
+        s.physicsEngine.SAT.boxChecks++;
         if (!Geometry.overlapRectRect(a.__boundingBox, b.__boundingBox)) return new Collision(false, a, b);
-        s.SAT.SATChecks++;
+        s.physicsEngine.SAT.SATChecks++;
         let nameA = (a instanceof Circle) ? "Circle" : "Polygon";
         let nameB = (b instanceof Circle) ? "Circle" : "Polygon";
         return Physics["collide" + nameA + nameB](a, b);
@@ -201,7 +201,6 @@ class Physics {
         const colliding = (b.x - a.x) ** 2 + (b.y - a.y) ** 2 < (a.radius + b.radius) ** 2;
         let col;
         if (colliding) {
-            s.SAT.collisions++;
             const collisionAxis = b.middle.Vminus(a.middle);
             const axisMag = collisionAxis.mag;
             const penetration = a.radius + b.radius - axisMag;
@@ -218,11 +217,9 @@ class Physics {
         const bestPoint = Geometry.closestPointOnPolygon(a.middle, b);
         const inside = Physics.collidePolygonPoint(b, a.middle).colliding;
         const colliding = Geometry.distToPoint2(bestPoint, a.middle) < a.radius ** 2 || inside;
-        s.SAT.SATChecks++;
         //getting resolution data
         let col;
         if (colliding) {
-            s.SAT.collisions++;
             if (!bestPoint) return new Collision(false, a, b);
 
             //towards collision, from a
@@ -406,7 +403,7 @@ class Physics {
     }
     static resolve(col) {
         const { a, b, dir, contacts, penetration } = col;
-
+        a.physicsEngine.SAT.collisions++;
         if (b.velocity.dot(dir) - b.velocity.dot(dir) < 0) return;
 
         if (penetration > 0.05) {
@@ -674,3 +671,173 @@ class Physics {
     }
 }
 Physics.advanced = true;
+class PhysicsEngine {
+    constructor(gravity) {
+        this.gravity = gravity;
+		this.angularDragForce = .995;
+		this.linearDragForce = .995;
+		this.frictionDragForce = 0.2;
+        this.cellSize = 150;
+        this.collisionEvents = false;
+        this.constraints = [];
+        this.physicsRealism = 1;
+        this.speedModulation = 1;
+		this.SAT = {
+			possibleChecks: 0,
+			gridChecks: 0,
+			boxChecks: 0,
+			SATChecks: 0,
+			collisions: 0
+		};
+    }
+    run(elements) {
+		this.SAT = {
+			possibleChecks: 0,
+			gridChecks: 0,
+			boxChecks: 0,
+			SATChecks: 0,
+			collisions: 0
+        };
+        
+		const arrays = this.extractUsefulCellArrays(elements);
+
+		this.cleanConstraints();
+		//physics
+		for (let i = 0; i < this.physicsRealism; i++) {
+			this.updateCaches(arrays.usefulArray);
+			this.gravitySort(arrays.useful);
+			this.gravityPhase(arrays.usefulArray);
+			this.constraintSolve();
+			this.collisionStep(arrays.useful);
+			this.constraintSolve();
+			this.collisionStep([...arrays.useful].reverse());
+		}
+		this.updatePreviousData(arrays.usefulArray);
+
+		//events
+		if (this.collisionEvents) this.runEventListeners(arrays.usefulArray);
+
+        return arrays;
+    }
+    updateCaches(useful) {
+		for (const el of useful) el.updateCaches();
+    }
+	runEventListeners(useful) {
+		for (let el of useful) {
+			Physics.runEventListeners(el);
+		}
+	}
+	gravityPhase(useful) {
+		for (let el of useful) {
+			let rect = el;
+			rect.applyGravity(1);
+		}
+	}
+	extractUsefulCellArrays(elements) {
+		let cells = { };
+		let useful = [];
+		let useless = [];
+		let isUseless = a => !(a instanceof PhysicsObject);
+		//categorize
+		for (let rect of elements) {
+			if (isUseless(rect)) {
+				useless.push(rect);
+				continue;
+			} else useful.push([rect]);
+		}
+		//get cells, accumulate cells
+		for (let usef of useful) {
+			let rect = usef[0];
+			let cls = Physics.getCells(rect, this.cellSize);
+			for (let cl of cls) {
+				let key = cl.x + "," + cl.y;
+				if (cells[key]) cells[key].push(rect);
+				else cells[key] = [rect];
+				let use = usef;
+				use.push(cells[key]);
+			}
+		}
+		//map to collisionPairs
+		useful = useful.map(usef => {
+			//get rectangles
+			let [rect, ...updateCells] = usef;
+			let updater = [];
+			if (!rect.completelyStatic) for (let cell of updateCells) {
+				for (let r of cell) {
+					if (r !== rect && !updater.includes(r)) updater.push(r);
+				}
+			}
+			return new CollisionPair(rect, updater);
+		});
+		//remove duplicates
+		useful = [...(new Set(useful))];
+
+		// show cells
+		// s.drawInWorldSpace(e => {
+		// 	const cell_size = this.cellSize;
+		// 	for (let [key, cell] of cells) {
+		// 		let x = parseInt(key.split(",")[0]) * cell_size;
+		// 		let y = parseInt(key.split(",")[1]) * cell_size;
+		// 		let r = new Rect(x, y, cell_size, cell_size);
+		// 		c.stroke(cl.RED, 3).rect(r);
+		// 		c.draw(new Color(255, 0, 0, 0.15)).rect(r);
+		// 	}
+		// });
+		
+		let usefulArray = useful.map(e => e.object);
+		return { useful, useless, usefulArray };
+	}
+	updatePreviousData(useful) {
+		for (let use of useful) use.updatePreviousData();
+	}
+	cleanConstraints() {
+		let keep = [];
+		for (let con of this.constraints) {
+			if (con.a.isDead || con.b.isDead);
+			else keep.push(con);
+		}
+		this.constraints = keep;
+	}
+	gravitySort(useful) {
+		const dir = this.gravity.normalized;
+		useful.sort(function (a, b) {
+			let mA = Vector2.fromPoint(a.object);
+			let mB = Vector2.fromPoint(b.object);
+			let dA = mA.dot(dir);
+			let dB = mB.dot(dir);
+			return dB - dA;
+		});
+	}
+	collisionStep(useful) {
+        let amtObjects = useful.length;
+		for (let i = 0; i < useful.length; i++) {
+			let rect = useful[i].object;
+			let updater = useful[i].others;
+
+			this.SAT.gridChecks += updater.length;
+			this.SAT.possibleChecks += updater.length ? s.elementArray.length : 0;
+            if (!rect.usedForCellSize) this.recalculateAverageCellSize(amtObjects, rect);
+			rect.physicsUpdate(updater);
+		}
+	}
+	constraintSolve() {
+		for (let i = 1; i < 3; i++) {
+			let random = this.constraints.randomize();
+			for (let constraint of random) {
+				constraint.solve(1 / i);
+			}
+		}
+	}
+	constrain(a, b, aOffset = Vector2.origin, bOffset = Vector2.origin, length = "CURRENT_DIST", stiffness = 1) {
+		this.constraints.push(new Constraint(a, b, aOffset, bOffset, length, stiffness));
+	}
+	recalculateAverageCellSize(otherElements, newEl) {
+		let oldAvg = this.cellSize;
+		let mul = otherElements;
+		oldAvg *= mul;
+		let newSize = newEl.width + newEl.height;
+		let newAverageMax = (oldAvg + newSize) / (mul + 1);
+		this.cellSize = newAverageMax;
+		newEl.usedForCellSize = true;
+	}
+}

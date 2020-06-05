@@ -15,7 +15,7 @@ class ScreenRecording {
 	}
 	getAnimation() {
 		if (!this.frames.length) return null;
-		return window.c.createAnimation(this.frames, 1, true);
+		return c.createAnimation(this.frames, 1, true);
 	}
 }
 class IntervalFunction {

@@ -18,7 +18,6 @@ class Graph extends Frame {
             constructor(getY) {
                 this.getY = getY;
                 this.data = [];
-                // this.permanentData = "";
             }
         }
         if (!Array.isArray(yName)) {
@@ -148,7 +147,7 @@ class Graph extends Frame {
                 y + 3
             );
         }
-        this.c.drawImage(this.graphFrame, this.leftOffset + 2, 0);
+        this.c.image(this.graphFrame).default(this.leftOffset + 2, 0);
         let timeStart = Time.formatMS(Math.floor(this.timeOffset));
         let timeEnd = Time.formatMS(Math.floor(this.timeOffset) + this.msLimit);
         this.c.draw(black).rect(this.leftOffset, 200 + this.bottomTextOffset, this.c.c.measureText(timeStart).width, 200);
@@ -156,7 +155,6 @@ class Graph extends Frame {
         this.c.draw(black).rect(this.leftOffset + this.mainGraphWidth - 10 - this.c.c.measureText(timeEnd).width, 200 + this.bottomTextOffset, 200, 200);
         this.c.textMode = "right";
         this.c.draw(white).text("10px Arial", timeEnd, this.mainGraphWidth - 10 + this.leftOffset, 200 + this.bottomTextOffset);
-
         return this;
     }
 }
