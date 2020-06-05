@@ -66,6 +66,15 @@ Array.dim3 = function(w, h, d, fn = (x, y, z) => null) {
 	}
 	return ary;
 }
+Array.dim = function(dimension, ...size) {
+    let ary = [];
+    if (dimension !== 1) {
+        let d = size[0];
+        size.shift();
+        for (let i = 0; i < d; i++) ary.push(Array.dim(dimension - 1, ...size));
+    } else for (let i = 0; i < size[0]; i++) ary.push(null);
+    return ary;
+}
 Array.prototype.test = function(test) {
 	for (let i = 0; i < this.length; i++) if (test(this[i])) return true;
 	return false;
