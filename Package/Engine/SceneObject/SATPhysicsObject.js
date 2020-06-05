@@ -6,9 +6,9 @@ class PhysicsObject extends SceneObject {
         this.velocity = Vector2.origin;
         this.acceleration = Vector2.origin;
         //velocity loss
-        this._linearDragForce = null;
-        this._angularDragForce = null;
-        this._friction = null;
+        this.linearDragForce = this.physicsEngine.linearDragForce;
+        this.angularDragForce = this.physicsEngine.angularDragForce;
+        this.friction = this.physicsEngine.frictionDragForce;
         this.limitsVelocity = true;
         this.slows = gravity;
         
@@ -46,6 +46,7 @@ class PhysicsObject extends SceneObject {
         this._rotation = 0;
         this.__mass = 0; //mass cache
         this.__perimeter = 0; //perimeter cache
+        this.__middle = this.middle;
         this.hasCollideRule = false;
         //data
         this.colliding = new CollisionMoniter();
@@ -67,27 +68,6 @@ class PhysicsObject extends SceneObject {
     get gravity() {
         if (this._gravity === null) return this.physicsEngine.gravity;
         else return this._gravity;
-    }
-    set friction(a) {
-        this._friction = a;
-    }
-    get friction() {
-        if (this._friction !== null) return this._friction;
-        return this.physicsEngine.frictionDragForce;
-    }
-    set linearDragForce(a) {
-        this._linearDragForce = a;
-    }
-    get linearDragForce() {
-        if (this._angularDragForce !== null) return this._linearDragForce;
-        return this.physicsEngine.linearDragForce;
-    }
-    set angularDragForce(a) {
-        this._angularDragForce = a;
-    }
-    get angularDragForce() {
-        if (this._angularDragForce !== null) return this._angularDragForce;
-        return this.physicsEngine.angularDragForce;
     }
     set mass(a) {
         this._mass = a;
@@ -187,17 +167,21 @@ class PhysicsObject extends SceneObject {
     privateSetX(x) {
         if (!this.positionStatic) {
             this.x = x;
+            this.__middle.x += v.x;
         }
     }
     privateSetY(y) {
         if (!this.positionStatic) {
             this.y = y;
+            this.__middle.y += v.y;
         }
     }
     privateMove(v) {
         if (!this.positionStatic) {
             this.x += v.x;
             this.y += v.y;
+            this.__middle.x += v.x;
+            this.__middle.y += v.y;
             this.moveBoundingBoxCache(v);
         }
     }
@@ -267,9 +251,9 @@ class PhysicsObject extends SceneObject {
     }
     slowDown() {
         //apply linear drag;
-        let drag = this.velocity.get().Nmul(-(1 - this.linearDragForce) * this.__mass / this.physicsEngine.physicsRealism);
-        let iD = new Impulse(drag, this.middle);
-        this.internalApplyImpulse(iD, "drag");
+        let dragFactor = -(1 - this.linearDragForce) / this.physicsEngine.physicsRealism;
+        this.velocity.x += this.velocity.x * dragFactor;
+        this.velocity.y += this.velocity.y * dragFactor;
         this.angularVelocity *= this.angularDragForce;
 
         // if (this.velocity.mag < 0.01) this.velocity.mag = 0;
@@ -314,6 +298,10 @@ class PhysicsObject extends SceneObject {
             if (isNaN(this.y)) this.y = this.last.y;
         });
     }
+    newShapeCache() {
+        this.cacheBoundingBoxes();
+		this.cacheMass();
+    }
     moveBoundingBoxCache(v) {
         this.__boundingBox.x += v.x;
         this.__boundingBox.y += v.y;
@@ -338,8 +326,9 @@ class PhysicsObject extends SceneObject {
         for (const name in this.shapes) {
             let shape = this.shapes[name];
             if (shape instanceof Polygon) {
-                const model = shape.getModel(pos, rot);
-                shape.cacheAxes(model.getAxes());
+                let axes = [];
+                for (let sh of shape.collisionShapes) axes.push(...sh.getModel(pos, rot).getAxes());
+                shape.cacheAxes(axes);
             }
         }
     }
@@ -365,7 +354,7 @@ class PhysicsObject extends SceneObject {
         return 1 - pMag / I.mag;
     }
     internalApplyImpulse(impulse, name = "no name") {
-        if (!impulse || !impulse.force.mag) return;
+        if (!impulse || !(impulse.force.x || impulse.force.y) ) return;
         impulse.force.Ndiv(this.__mass * this.physicsEngine.physicsRealism);
         this.applyLinearImpulse(impulse, name);
         this.applyAngularImpulse(impulse, name);

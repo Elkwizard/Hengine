@@ -1,9 +1,11 @@
 class InactiveScene {
-	constructor(name) {
+	constructor(name, gravity) {
 		this.name = name;
 		this.rebound = 0;
 		this.elementArray = [];
 		this.custom = {};
+		this.gravity = gravity;
+		this.physicsEngine = new PhysicsEngine(gravity);
 		this.defaultDraw = function (name, shape) {
 			c.draw("#000").infer(shape);
 			c.stroke("cyan", 1).infer(shape);
@@ -435,7 +437,7 @@ class Camera extends Rect {
 }
 class Scene extends InactiveScene {
 	constructor(name, context, gravity, home) {
-		super(name);
+		super(name, gravity);
 		this.c = context;
 		this.home = home;
 		this.cullGraphics = true;
@@ -443,7 +445,6 @@ class Scene extends InactiveScene {
 		this.mouseEvents = false;
 		this.camera = new Camera(0, 0, this.c.canvas.width, this.c.canvas.height, 1, 0);
 		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
-		this.physicsEngine = new PhysicsEngine(gravity);
 		M.engineClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			let collided = this.collidePoint(adjusted);

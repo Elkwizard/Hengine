@@ -215,7 +215,8 @@ class SceneObject {
 			shape.vertexDirection = Geometry.vertexDirection(shape.vertices);
 			shape.subdivideForCollisions();
 		}
-		this.cacheMass();
+	}
+	newShapeCache() {
 		this.cacheBoundingBoxes();
 	}
 	worldSpaceToModelSpace(v) {
