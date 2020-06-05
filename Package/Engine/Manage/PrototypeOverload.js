@@ -20,6 +20,52 @@ Function.prototype.performance = function (...args) {
 	const t_2 = performance.now();
 	return (t_2 - t_1) / iter;
 }
+Array.dim2 = function(w, h, fn = (x, y) => null) {
+	let ary = [];
+	for (let i = 0; i < w; i++) {
+		ary.push([]);
+		for (let j = 0; j < h; j++) ary[i].push(fn(i, j));
+	}
+	ary[Symbol.iterator] = function*() {
+		for (let i = 0; i < this.length; i++) 
+			for (let j = 0; j < this[0].length; j++) yield [i, j];
+	};
+	ary.width = w;
+	ary.height = h;
+	ary.map = function (fn) {
+		let nAry = Array.dim2(w, h);
+		for (let i = 0; i < this.length; i++) 
+			for (let j = 0; j < this[0].length; j++) nAry[i][j] = fn(this[i][j], i, j, this);
+		return nAry;
+	}
+	return ary;
+}
+Array.dim3 = function(w, h, d, fn = (x, y, z) => null) {
+	let ary = [];
+	for (let i = 0; i < w; i++) {
+		ary.push([]);
+		for (let j = 0; j < h; j++) {
+			ary[i].push([]);
+			for (let k = 0; k < d; k++) ary[i][j].push(fn(i, j, k));
+		}
+	}
+	ary.width = w;
+	ary.height = h;
+	ary.depth = d;
+	ary[Symbol.iterator] = function*() {
+		for (let i = 0; i < this.length; i++) 
+			for (let j = 0; j < this[0].length; j++) 
+				for (let k = 0; k < this[0][0].length; k++) yield [i, j, k];
+	};
+	ary.map = function (fn) {
+		let nAry = Array.dim3(w, h, d);
+		for (let i = 0; i < this.length; i++) 
+			for (let j = 0; j < this[0].length; j++) 
+				for (let k = 0; k < this[0][0].length; k++) nAry[i][j][k] = fn(this[i][j][k], i, j, k, this);
+		return nAry;
+	}
+	return ary;
+}
 Array.prototype.test = function(test) {
 	for (let i = 0; i < this.length; i++) if (test(this[i])) return true;
 	return false;

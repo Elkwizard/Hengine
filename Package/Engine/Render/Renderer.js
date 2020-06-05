@@ -305,21 +305,27 @@ class Artist {
 						x = x.x;
 					}
 				}
-				let angle = Math.atan2(y1 - y, x1 - x);
-				let mag = Math.sqrt((x1 - x) ** 2 + (y1 - y) ** 2);
-				this.save();
-				this.translate(x, y);
-				this.rotate(angle);
+				let v_x = x1 - x;
+				let v_y = y1 - y;
+				let mag = Math.sqrt(v_x ** 2 + v_y ** 2);
+				v_x /= mag;
+				v_y /= mag;
+				let n_x = -v_y;
+				let n_y = v_x;
 				this.c.beginPath();
-				this.c.moveTo(0, 0);
-				this.c.lineTo(mag - this.c.lineWidth * 4 + 0.5, 0);
+				this.c.moveTo(x, y);
+				this.c.lineTo(x1, y1);
 				this.c.stroke();
-				this.draw(this.c.strokeStyle).triangle(
-					P(mag - this.c.lineWidth * 4, -this.c.lineWidth * 2),
-					P(mag - this.c.lineWidth * 4, this.c.lineWidth * 2),
-					P(mag, 0)
-				);
-				this.restore();
+				this.c.fillStyle = this.c.strokeStyle;
+				let l2 = this.c.lineWidth * 2;
+				this.c.beginPath();
+				x1 -= v_x * l2;
+				y1 -= v_y * l2;
+				this.c.moveTo(x1 + n_x * l2, y1 + n_y * l2);
+				this.c.lineTo(x1 - n_x * l2, y1 - n_y * l2);
+				this.c.lineTo(x1 + v_x * l2 * 2, y1 + v_y * l2 * 2);
+				this.c.lineTo(x1 + n_x * l2, y1 + n_y * l2);
+				this.c.fill();
 			},
 			shape(...v) {
 				pathObj.shape(...v);
@@ -377,6 +383,7 @@ class Artist {
 			this.clipObj[func] = this.clipObj[func].bind(this);
 		}
 		this.imageStyle = null;
+		this.imageStyleSource = new Rect(0, 0, 0, 0);
 		this.imageObj = {
 			circle(x, y, radius) {
 				this.clip().circle(x, y, radius);
@@ -385,30 +392,30 @@ class Artist {
 					y = x.y;
 					x = x.x;
 				}
-				this.drawImage(this.imageStyle, x - radius, y - radius, radius * 2, radius * 2);
+				this.drawImageInternal(x - radius, y - radius, radius * 2, radius * 2);
 				this.unclip();
 			},
 			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
 				this.clip().arc(x, y, radius, startAngle, endAngle, counterClockwise);
-				this.drawImage(this.imageStyle, x - radius, y - radius, radius * 2, radius * 2);
+				this.drawImageInternal(x - radius, y - radius, radius * 2, radius * 2);
 				this.unclip();
 			},
 			sector(x, y, radius, startAngle, endAngle) {
 				this.clip().sector(x, y, radius, startAngle, endAngle);
-				this.drawImage(this.imageStyle, x - radius, y - radius, radius * 2, radius * 2);
+				this.drawImageInternal(x - radius, y - radius, radius * 2, radius * 2);
 				this.unclip();
 			},
 			ellipse(x, y, rx, ry) {
 				this.clip().ellipse(x, y, rx, ry);
-				this.drawImage(this.imageStyle, x - rx, y - ry, rx * 2, ry * 2);
+				this.drawImageInternal(x - rx, y - ry, rx * 2, ry * 2);
 				this.unclip();
 			},
 			default(x, y) {
-				this.drawImage(this.imageStyle, x, y);
+				this.drawImage(x, y);
 			},
 			rect(x, y, width, height) {
 				this.clip().rect(x, y, width, height);
-				this.drawImage(this.imageStyle, x, y, width, height);
+				this.drawImageInternal(x, y, width, height);
 				this.unclip();
 			},
 			triangle(v1, v2, v3) {
@@ -418,7 +425,7 @@ class Artist {
 				let maxX = Math.max(...v.map(e => e.x));
 				let minY = Math.min(...v.map(e => e.y));
 				let maxY = Math.max(...v.map(e => e.y));
-				this.drawImage(this.imageStyle, minX, minY, maxX - minX, maxY - minY);
+				this.drawImageInternal(minX, minY, maxX - minX, maxY - minY);
 				this.unclip();
 			},
 			shape(...v) {
@@ -427,14 +434,14 @@ class Artist {
 				let maxX = Math.max(...v.map(e => e.x));
 				let minY = Math.min(...v.map(e => e.y));
 				let maxY = Math.max(...v.map(e => e.y));
-				this.drawImage(this.imageStyle, minX, minY, maxX - minX, maxY - minY);
+				this.drawImageInternal(minX, minY, maxX - minX, maxY - minY);
 				this.unclip();
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.image(this.imageStyle).circle(obj);
+					this.image(this.imageStyle, this.imageStyleSource).circle(obj);
 				} else {
-					this.image(this.imageStyle).shape(...obj.getCorners());
+					this.image(this.imageStyle, this.imageStyleSource).shape(...obj.getCorners());
 				}
 			}
 
@@ -498,7 +505,13 @@ class Artist {
 		this.c.fillStyle = "transparent";
 		return this.strokeObj;
 	}
-	image(img) {
+	drawImageInternal(x, y, w, h) {
+		this.drawImage(this.imageStyle, x, y, w, h, this.imageStyleSource);
+	}
+	image(img, sx = 0, sy = 0, sw = img.width, sh = img.height) {
+		if (sx instanceof Rect) this.imageStyleSource = sx.get();
+		else this.imageStyleSource = new Rect(sx, sy, sw, sh);
+		
 		this.imageStyle = img;
 		return this.imageObj;
 	}
@@ -626,14 +639,11 @@ class Artist {
 		this.rotate(r);
 		this.translate(-x, -y);
 	}
-	drawImage(img, x, y, width, height) {
-		if (typeof x === "object") {
-			this.drawImage(img, x.x, x.y, x.width, x.height);
-		}
+	drawImage(img, x, y, width, height, clp = new Rect(0, 0, img.width, img.height)) {
+		if (img instanceof ImageType) img = img.requestImage(width, height);
 		if (width === undefined) width = img.width;
 		if (height === undefined) height = img.height;
-		if (img instanceof ImageType) img = img.requestImage(width, height);
-		this.c.drawImage(img, x, y, width, height);
+		this.c.drawImage(img, clp.x, clp.y, clp.width, clp.height, x, y, width, height);
 	}
 	drawAnimation(animation, x, y, width, height, advance = true) {
 		if (typeof x === "object") {

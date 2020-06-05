@@ -227,6 +227,9 @@ class InactiveScene {
 		this.updateArray();
 		return this.elementArray;
 	}
+	getPhysicsElements() {
+		return this.updateArray().filter(e => e instanceof PhysicsObject);
+	}
 	getElementsMatch(fn) {
 		let ary = [];
 		let oAry = this.updateArray();
@@ -768,6 +771,12 @@ class Scene extends InactiveScene {
 	}
 	centerCameraY(y) {
 		this.camera.y = y - height / 2;
+	}
+	rotateCamera(theta) {
+		this.camera.rotation += theta;
+	}
+	moveCamera(vector) {
+		this.camera.middle = this.camera.middle.plus(vector);
 	}
 	rotateCameraTowards(rotation, ferocity = 0.1) {
 		let dif = Geometry.signedAngularDist(rotation, this.camera.rotation);

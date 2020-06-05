@@ -41,7 +41,7 @@ class Random {
     static perlin(x, f = 1, seed = Random.seed) {
         x *= f;
         const s_0 = n => Random.seedRand(seed + Math.floor(n));
-        const n = x => Interpolation.lerp(s_0(x), s_0(x + 1), x % 1);
+        const n = x => Interpolation.lerp(s_0(x), s_0(x + 1), Random.noiseTCorrect(x % 1));
         return n(x);
     }
     static perlin2D(x, y, f = 1, seed = Random.seed) {
@@ -59,7 +59,7 @@ class Random {
         const n = (x, y, z) => Interpolation.cubeLerp(
             s_p(x, y, z), s_p(x + 1, y, z), s_p(x, y + 1, z), s_p(x + 1, y + 1, z),
             s_p(x, y, z + 1), s_p(x + 1, y, z + 1), s_p(x, y + 1, z + 1), s_p(x + 1, y + 1, z + 1),
-            x % 1, y % 1, z % 1);
+            Random.noiseTCorrect(x % 1), Random.noiseTCorrect(y % 1), Random.noiseTCorrect(z % 1));
         return n(x, y, z);
     }
     static getVoronoiCell(x) {
