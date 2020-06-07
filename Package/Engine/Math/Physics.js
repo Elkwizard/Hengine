@@ -390,6 +390,19 @@ class CollisionDetector {
             if (PhysicsVector.dot(axis, toB) > 0) bAxes.push(axis);
         }
 
+        if (!aAxes.length || !bAxes.length) {
+            let aAxes = [];
+            for (let i = 0; i < a.vertices.length / 2; i++) {
+                let axis = PhysicsVector.normal(PhysicsVector.sub(a.vertices[i], a.vertices[(i + 1) % a.vertices.length]));
+                aAxes.push(axis);
+            }
+            let bAxes = [];
+            for (let i = 0; i < b.vertices.length / 2; i++) {
+                let axis = PhysicsVector.normal(PhysicsVector.sub(b.vertices[(i + 1) % b.vertices.length], b.vertices[i]));
+                bAxes.push(axis);
+            }
+        }
+
         aAxes = aAxes;
         bAxes = bAxes;
         let axes = [aAxes, bAxes];
@@ -429,7 +442,6 @@ class CollisionDetector {
                 bestRange = [{ min: aMin, max: aMax }, { min: bMin, max: bMax }];
             }
         }
-
         if (bestIndex[0] === null) return null;
         if (!bestRange[0]) return null;
         let bestAxis = axes[bestIndex[0]][bestIndex[1]];
@@ -475,9 +487,10 @@ class CollisionDetector {
                 return new CollisionDetector.Contact(contact, pen);
             });
         let contacts = [...contactsA, ...contactsB];
-        if (!contacts.length) return null;
-
-        return new CollisionDetector.Collision(bestAxis, contacts);
+        if (!contacts.length || contacts.length === a.vertices.length + b.vertices.length) {
+            let col = new CollisionDetector.Collision(bestAxis, []);
+            col.penetration = minOverlap;
+        } else return new CollisionDetector.Collision(bestAxis, contacts);
     }
 }
 CollisionDetector.Collision = class {
@@ -779,7 +792,7 @@ class PhysicsEngine {
             collisionPairs.set(body, cellsTotal);
         }
 
-        
+
         // for (let i in grid.cells) if (grid.cells[i]) for (let j in grid.cells[i]) if (typeof grid.cells[i][j] === "object") {
         //     c.stroke(cl.RED, 2).rect(i * cellsize, j * cellsize, cellsize, cellsize);
         //     // console.log(i, j);

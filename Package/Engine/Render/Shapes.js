@@ -65,9 +65,6 @@ class Shape {
 	get middle() {
 		return Vector2.origin;
 	}
-	set middle(a) {
-		this.center(a);
-	}
 	getBoundingBox() {
 		//return the smallest rectangle that contains the shape
 		return new Rect(0, 0, 0, 0, 0);
@@ -114,7 +111,7 @@ class Polygon extends Shape {
 		this.area = (maxX - minX) * (maxY - minY);
 	}
 	set middle(a) {
-		this.center(a);
+		this.vertices = this.center(a).vertices;
 	}
 	get middle() {
 		return Vector.sum(...this.vertices).Nover(this.vertices.length);
@@ -218,7 +215,9 @@ class Rect extends Polygon {
 		this.area = this.width * this.height;
 	}
 	set middle(a) {
-		this.center(a);
+		let pos = this.center(a);
+		this.x = pos.x;
+		this.y = pos.y;
 	}
 	get middle() {
 		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
