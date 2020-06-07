@@ -437,7 +437,7 @@ class CollisionDetector {
 
         //A contacts
         let validAVerts = [];
-        for (let i = 0; i < a.vertices.length; i++) validAVerts.push(true);
+        for (let i = 0; i < a.vertices.length; i++) validAVerts.push(!!bAxes.length);
         for (let i = 0; i < bAxes.length; i++) {
             let { min, max } = proj[0][i];
             for (let j = 0; j < a.vertices.length; j++) {
@@ -457,7 +457,7 @@ class CollisionDetector {
 
         //B contacts
         let validBVerts = [];
-        for (let i = 0; i < b.vertices.length; i++) validBVerts.push(true);
+        for (let i = 0; i < b.vertices.length; i++) validBVerts.push(!!aAxes.length);
         for (let i = 0; i < aAxes.length; i++) {
             let { min, max } = proj[1][i];
             for (let j = 0; j < b.vertices.length; j++) {
