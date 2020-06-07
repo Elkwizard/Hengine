@@ -59,7 +59,9 @@ class Line {
 	}
 }
 class Shape {
-	constructor() { }
+	constructor() { 
+		this.area = 0;
+	}
 	get middle() {
 		return Vector2.origin;
 	}
@@ -103,6 +105,13 @@ class Polygon extends Shape {
 	constructor(vertices) {
 		super();
 		this.vertices = vertices;
+		let x = vertices.map(e => e.x);
+		let y = vertices.map(e => e.y);
+		let minX = Math.min(...x);
+		let maxX = Math.max(...x);
+		let minY = Math.min(...y);
+		let maxY = Math.max(...y);
+		this.area = (maxX - minX) * (maxY - minY);
 	}
 	set middle(a) {
 		this.center(a);
@@ -164,22 +173,17 @@ class Polygon extends Shape {
 	}
 	center(pos) {
 		let offset = pos.Vminus(this.middle);
-		this.vertices = this.vertices.map(e => e.Vplus(offset));
-		return this;
+		return new Polygon(this.vertices.map(e => e.Vplus(offset)));
 	}
 	scale(factor) {
 		let middle = this.middle;
-		this.vertices = this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor)));
-		return this;
+		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))));
 	}
 	scaleAbout(pos, factor) {
-		this.vertices = this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor)));
-		return this;
+		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))));
 	}
-	move(dir, isCollisionShape) {
-		for (let vert of this.vertices) vert.Vadd(dir);
-		if (!isCollisionShape) for (let shape of this.collisionShapes) shape.move(dir, true);
-		return this;
+	move(dir) {
+		return new Polygon(this.vertices.map(vert => vert.plus(dir)));
 	}
 	get() {
 		let poly = new Polygon([...this.vertices], this.rotation);
@@ -211,6 +215,7 @@ class Rect extends Polygon {
 		this.y = y;
 		this.width = w;
 		this.height = h;
+		this.area = this.width * this.height;
 	}
 	set middle(a) {
 		this.center(a);
@@ -240,21 +245,16 @@ class Rect extends Polygon {
 		return new Rect(this.x, this.y, this.width, this.height);
 	}
 	center(pos) {
-		this.x = pos.x - this.width / 2;
-		this.y = pos.y - this.height / 2;
-		return this;
+		return new Rect(pos.x - this.width / 2, pos.y - this.height / 2, this.width, this.height);
 	}
 	scale(factor) {
-		let middle = this.middle;
-		this.width *= factor;
-		this.height *= factor;
-		this.center(middle);
-		return this;
+		factor -= 1;
+		let dw = this.width * factor;
+		let dh = this.height * factor;
+		return new Rect(this.x - dw / 2, this.y - dh / 2, this.width + dw, this.height + dh);
 	}
 	move(dir) {
-		this.x += dir.x;
-		this.y += dir.y;
-		return this;
+		return new Rect(this.x + dir.x, this.y + dir.y, this.width, this.height);
 	}
 	get() {
 		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
@@ -271,6 +271,7 @@ class Circle extends Shape {
 		this.x = x;
 		this.y = y;
 		this.radius = Math.abs(radius);
+		this.area = this.radius * this.radius * Math.PI;
 	}
 	set middle(a) {
 		this.center(a);
@@ -287,25 +288,17 @@ class Circle extends Shape {
 		return new Circle(t_x, t_y, this.radius);
 	}
 	center(pos) {
-		this.x = pos.x;
-		this.y = pos.y;
-		return this;
+		return new Circle(pos.x, pos.y, this.radius);
 	}
 	scale(factor) {
-		this.radius *= factor;
-		return this;
+		return new Circle(this.x, this.y, this.radius * factor)
 	}
 	scaleAbout(pos, factor) {
 		let nPos = pos.plus((new Vector2(this.x, this.y)).Vminus(pos).Ntimes(factor));
-		this.x = nPos.x;
-		this.y = nPos.y;
-		this.radius *= factor;
-		return this;
+		return new Circle(nPos.x, nPos.y, this.radius * factor);
 	}
 	move(dir) {
-		this.x += dir.x;
-		this.y += dir.y;
-		return this;
+		return new Circle(this.x + dir.x, this.y + dir.y, this.radius);
 	}
 	getBoundingBox() {
 		return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);

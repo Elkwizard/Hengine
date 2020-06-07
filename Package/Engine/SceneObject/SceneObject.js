@@ -56,7 +56,6 @@ class SceneObject {
 		this.isDead = false;
 		this.onScreen = true;
 		this.cullGraphics = true;
-		this.cacheBoundingBoxes();
 		this.response = {
 			click: e => e,
 			rightClick: e => e,
@@ -203,9 +202,12 @@ class SceneObject {
 		}
 		center.Ndiv(totalArea);
 		let dif = center.inverse();
-		for (let shape of shapes) {
-			shape.move(dif);
+		let nShapes = new Map();
+		for (let name in this.shapes) {
+			nShapes.set(name, this.shapes[name].move(dif));
 		}
+		this.removeAllShapes();
+		for (let [name, shape] of nShapes) this.addShape(name, shape);
 	}
 	removeShape(name) {
 		let shape = this.shapes[name];
@@ -243,7 +245,10 @@ class SceneObject {
 	}
 	scale(factor) {
 		let middle = Vector2.origin;
-		for (let shape of this.getShapes()) shape.scaleAbout(middle, factor);
+		let nShapes = new Map();
+		for (let name in this.shapes) nShapes.set(name, this.shapes[name].scaleAbout(middle, factor));
+		this.removeAllShapes();
+		for (let [name, shape] of nShapes) this.addShape(name, shape);
 	}
 	rename(name) {
 		delete this.home.elements[this.name];

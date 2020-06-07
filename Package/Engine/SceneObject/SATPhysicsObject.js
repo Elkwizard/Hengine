@@ -4,6 +4,7 @@ class PhysicsObject extends SceneObject {
 
         this.body = new RigidBody(x, y, gravity ? RigidBody.DYNAMIC : RigidBody.STATIC);
         this.home.physicsEngine.addBody(this.body);
+
         this.body.userData.sceneObject = this;
         this.body.collisionFilter = function (body) {
             let sceneObject = body.userData.sceneObject;
@@ -35,6 +36,9 @@ class PhysicsObject extends SceneObject {
         };
 
         this.shapeNameIDMap = new Map();
+    }
+    get mass() {
+        return this.body.mass;
     }
     get canCollide() {
         return this.body.type === RigidBody.TRIGGER;
@@ -69,6 +73,12 @@ class PhysicsObject extends SceneObject {
         let cols = this.shapeNameIDMap.get(name);
         for (let i = 0; i < cols.length; i++) this.body.removeShape(cols[i]);
         return shape;
+    }
+    getModels() {
+        return this.body.getModels()
+            .map(model => (model instanceof CircleCollider) ? 
+                new Circle(model.position.x, model.position.y, model.radius) 
+                : new Polygon(model.vertices.map(vert => Vector2.fromPhysicsVector(vert))));
     }
 	onAddScript(script) {
         const value = 1;

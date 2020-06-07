@@ -6,6 +6,7 @@ class InactiveScene {
 		this.custom = {};
 		this.gravity = gravity;
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
+		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
 		this.defaultDraw = function (name, shape) {
 			c.draw("#000").infer(shape);
 			c.stroke("cyan", 1).infer(shape);
@@ -365,10 +366,11 @@ class InactiveScene {
 	collidePoint(point) {
 		let collideAry = [];
 		for (let hitbox of this.updateArray().filter(e => !(e instanceof ParticleObject))) {
+
 			let p = (hitbox instanceof UIObject) ? this.worldSpaceToScreenSpace(point) : point;
 			let shapes = hitbox.getModels();
 			let colliding = false;
-			for (let shape of shapes) if (Geometry.overlapPoint(shape, p).colliding) colliding = true;
+			for (let shape of shapes) if (Geometry.overlapPoint(shape, p)) colliding = true;
 			if (colliding) {
 				collideAry.push(hitbox);
 			}
@@ -401,7 +403,7 @@ class Camera extends Rect {
 	getWorld() {
 		let middle = this.middle;
 		let m = new Polygon(this.vertices.map(vert => vert.Vminus(middle))).getModelCosSin(middle, Math.cos(this.rotation), Math.sin(this.rotation));
-		m.scale(1 / this.zoom);
+		m = m.scale(1 / this.zoom);
 		this.newView = new this.RenderType(width, height);
 		return m;
 	}
@@ -439,7 +441,6 @@ class Scene extends InactiveScene {
 	constructor(name, context, gravity, home) {
 		super(name, gravity);
 		this.physicsEngine.oncollide = this.handleCollisionEvent.bind(this);
-		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
 		this.c = context;
 		this.home = home;
 		this.cullGraphics = true;
