@@ -501,15 +501,23 @@ class Scene extends InactiveScene {
 		artist();
 		this.c.restore();
 	}
-	engineFixedUpdate() {
+	startUpdate() {
 		for (let rect of this.elementArray) rect.isBeingUpdated = true;
 		this.updateArray();
-		this.clearAllCollisions();
 		let q = this.removeQueue;
 		function p(x) {
 			q.push(x);
 		}
 		for (let rect of this.elementArray) rect.pushToRemoveQueue = p;
+	}
+	endUpdate() {
+		for (let rect of this.removeQueue) rect.home.removeElement(rect);
+		this.removeQueue = [];
+		for (let rect of this.elementArray) rect.isBeingUpdated = false;
+	}
+	engineFixedUpdate() {
+		this.startUpdate();
+		this.clearAllCollisions();
 		//custom before updates run
 		for (let el of this.elementArray) {
 			el.scripts.run("beforeUpdate");
@@ -517,9 +525,7 @@ class Scene extends InactiveScene {
 		this.clearAllCollisions();
 		this.physicsEngine.run();
 		this.physicsObjectFixedUpdate(this.elementArray);
-		for (let rect of q) rect.home.removeElement(rect);
-		this.removeQueue = [];
-		for (let rect of this.elementArray) rect.isBeingUpdated = false;
+		this.endUpdate();
 	}
 	handleCollisionEvent(a, b, direction) {
 		let A = a.userData.sceneObject;
@@ -567,14 +573,8 @@ class Scene extends InactiveScene {
 		return camera.view;
 	}
 	engineDrawUpdate() {
-		this.updateArray();
 		this.home.beforeScript.run();
-		for (let rect of this.elementArray) rect.isBeingUpdated = true;
-		let q = this.removeQueue;
-		function p(x) {
-			q.push(x);
-		}
-		for (let rect of this.elementArray) rect.pushToRemoveQueue = p;
+		this.startUpdate();
 		this.updateSceneObjectCaches(this.elementArray);
 
 		this.camera.width = this.c.canvas.width;
@@ -587,9 +587,7 @@ class Scene extends InactiveScene {
 		this.c.image(this.renderCamera(this.camera)).rect(0, 0, width, height);
 
 		this.home.afterScript.run();
-		for (let rect of q) rect.home.removeElement(rect);
-		this.removeQueue = [];
-		for (let rect of this.elementArray) rect.isBeingUpdated = false;
+		this.endUpdate();
 	}
 	loadScene(sc) {
 		sc.updateArray();
