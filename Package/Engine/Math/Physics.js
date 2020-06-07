@@ -190,6 +190,8 @@ class RigidBody {
 
         this.collisionFilter = body => true;
         this.engine = null;
+
+        this.canRotate = true;
     }
     getModels() {
         let pos = this.position;
@@ -220,9 +222,11 @@ class RigidBody {
     }
     integrate() {
         this.position.add(this.velocity);
-        this.angle += this.angularVelocity;
-        this.cosAngle = Math.cos(this.angle);
-        this.sinAngle = Math.sin(this.angle);
+        if (this.canRotate) {
+            this.angle += this.angularVelocity;
+            this.cosAngle = Math.cos(this.angle);
+            this.sinAngle = Math.sin(this.angle);
+        }
     }
     pointVelocity(p) {
         return PhysicsVector.add(this.velocity, PhysicsVector.normal(PhysicsVector.sub(p, this.position)).mul(this.angularVelocity));
@@ -232,7 +236,7 @@ class RigidBody {
         this.velocity.add(imp);
         let radius = PhysicsVector.sub(pos, this.position);
         let cross = -PhysicsVector.cross(imp, radius) / PhysicsVector.sqrMag(radius);
-        if (cross) this.angularVelocity += cross;
+        if (cross && this.canRotate) this.angularVelocity += cross;
     }
     static fromPolygon(vertices, type = RigidBody.DYNAMIC) {
         let position = vertices.reduce((a, b) => PhysicsVector.add(a, b));
@@ -569,7 +573,7 @@ class CollisionResolver {
             let impulseA_t = PhysicsVector.mul(impulseDir, -PhysicsVector.dot(pVel, impulseDir) * bodyA.mass * factor * this.engine.friction);
 
 
-            impulsesA.push({ point: contact.point, impulse: PhysicsVector.add(impulseA_n, impulseA_t) });   
+            impulsesA.push({ point: contact.point, impulse: PhysicsVector.add(impulseA_n, impulseA_t) });
         }
         for (let impulse of impulsesA) {
             bodyA.applyImpulse(impulse.point, impulse.impulse);
@@ -722,7 +726,10 @@ class PhysicsEngine {
                         if (collision.penetration > maxPenetration) {
                             maxPenetration = collision.penetration;
                             best = collision;
-                            contacts.push(...collision.contacts);
+                            if (contacts.length) contacts.push(...collision.contacts
+                                .filter(contact => !contacts
+                                    .test(con => con.x === contact.x && con.y === contact.y).length));
+                            else contacts.push(...collision.contacts);
                         }
                     }
                 }
@@ -753,9 +760,9 @@ class PhysicsEngine {
     run() {
         this.integrate();
         let cellsize = 100;
-        for (let i = 0; i < this.bodies.length; i++) for (let j = 0; j < this.bodies[i].shapes.length; j++) cellsize += Math.sqrt(this.bodies[i].shapes[j].mass);
+        for (let i = 0; i < this.bodies.length; i++) for (let j = 0; j < this.bodies[i].shapes.length; j++) cellsize += Math.sqrt(this.bodies[i].shapes[j].mass) * 2;
         cellsize /= this.bodies.length + 1;
-        
+
         let grid = new Grid(cellsize);
 
         //create grid
@@ -771,6 +778,13 @@ class PhysicsEngine {
             }
             collisionPairs.set(body, cellsTotal);
         }
+
+        
+        // for (let i in grid.cells) if (grid.cells[i]) for (let j in grid.cells[i]) if (typeof grid.cells[i][j] === "object") {
+        //     c.stroke(cl.RED, 2).rect(i * cellsize, j * cellsize, cellsize, cellsize);
+        //     // console.log(i, j);
+        // }
+
         let g = this.gravity;
         let gravitySort = (a, b) => PhysicsVector.dot(b.position, g) - PhysicsVector.dot(a.position, g);
         let inverseGravitySort = (a, b) => PhysicsVector.dot(a.position, g) - PhysicsVector.dot(b.position, g);
