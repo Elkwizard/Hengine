@@ -1,3 +1,10 @@
+function physicsPolygonSubdivider(poly) {
+    let verts = poly.map(vert => Vector2.fromPoint(vert));
+    let middle = Geometry.getMiddle(verts);
+    verts = verts.map(vert => vert.Vminus(middle));
+    let list = Geometry.subdividePolygonList(verts, Geometry.vertexDirection(verts)).map(verts => Geometry.clockwise(verts.map(vert => vert.Vplus(middle))));
+    return list.map(verts => verts.map(vert => new PhysicsVector(vert.x, vert.y)));
+}
 class CollisionMoniter {
     constructor() {
         this.elements = [];

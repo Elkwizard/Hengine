@@ -189,6 +189,7 @@ class RigidBody {
         this.prohibitedDirections = [];
 
         this.collisionFilter = body => true;
+        this.engine = null;
     }
     getModels() {
         let pos = this.position;
@@ -208,8 +209,13 @@ class RigidBody {
     }
     addShape(sh) {
         let shapes = [sh];
+
+        if (sh instanceof PolygonCollider && this.engine && this.engine.polygonVertexListSubdivider) {
+            shapes = this.engine.polygonVertexListSubdivider(sh.vertices).map(poly => new PolygonCollider(poly));
+        }
+
         this.shapes.push(...shapes);
-        this.mass += sh.mass;
+        for (let sha of shapes) this.mass += sha.mass;
         return shapes;
     }
     integrate() {
@@ -660,6 +666,7 @@ class PhysicsEngine {
         this.constraints = [];
         this.constraintIterations = 3;
         this.oncollide = (a, b, dir) => null;
+        this.polygonVertexListSubdivider = null;
     }
     addConstraint(constraint) {
         this.constraints.push(constraint);
@@ -780,6 +787,7 @@ class PhysicsEngine {
         return null;
     }
     addBody(b) {
+        b.engine = this;
         this.bodies.push(b);
     }
     removeBody(id) {

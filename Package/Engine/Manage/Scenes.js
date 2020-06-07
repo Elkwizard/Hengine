@@ -1,5 +1,5 @@
 class InactiveScene {
-	constructor(name = "scene", gravity = new Vector2(0, 0.2)) {
+	constructor(name = "scene", gravity = new Vector2(0, 0.1)) {
 		this.name = name;
 		this.rebound = 0;
 		this.elementArray = [];
@@ -439,6 +439,7 @@ class Scene extends InactiveScene {
 	constructor(name, context, gravity, home) {
 		super(name, gravity);
 		this.physicsEngine.oncollide = this.handleCollisionEvent.bind(this);
+		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
 		this.c = context;
 		this.home = home;
 		this.cullGraphics = true;

@@ -110,7 +110,7 @@ class Engine {
 
 		this.renderer = new Artist(canvas, W, H);
 		window.g = this;
-		this.scene = new Scene("Engine Scene", this.renderer, new Vector2(0, 0.2), this);
+		this.scene = new Scene("Engine Scene", this.renderer, new Vector2(0, 0), this);
 		//update loops
 		this.afterScript = new Script("after");
 		this.fixedScript = new Script("fixed");

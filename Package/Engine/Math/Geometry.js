@@ -339,7 +339,7 @@ class Geometry {
     static vertexDirection(verts) {
         let middle = Geometry.getMiddle(verts);
         let dif = 0;
-        verts = verts.map(e => e.minus(middle).getAngle());
+        verts = verts.map(e => e.Vminus(middle).getAngle());
         for (let i = 0; i < verts.length - 1; i++) {
             dif += verts[i + 1] - verts[i];
         }
