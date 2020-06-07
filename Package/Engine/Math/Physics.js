@@ -556,13 +556,14 @@ class CollisionResolver {
             let factor = contact.penetration / totalPenetration;
 
             let impulseDir = direction;
-            let impulseA_n = PhysicsVector.mul(impulseDir, -PhysicsVector.dot(bodyA.pointVelocity(contact.point), impulseDir) * bodyA.mass * factor);
+            let pVel = bodyA.pointVelocity(contact.point);
+            let impulseA_n = PhysicsVector.mul(impulseDir, -PhysicsVector.dot(pVel, impulseDir) * bodyA.mass * factor);
 
             impulseDir = PhysicsVector.normal(direction);
-            let impulseA_t = PhysicsVector.mul(impulseDir, -PhysicsVector.dot(bodyA.pointVelocity(contact.point), impulseDir) * bodyA.mass * factor * this.engine.friction);
+            let impulseA_t = PhysicsVector.mul(impulseDir, -PhysicsVector.dot(pVel, impulseDir) * bodyA.mass * factor * this.engine.friction);
 
 
-            impulsesA.push({ point: contact.point, impulse: PhysicsVector.add(impulseA_n, impulseA_t) });
+            impulsesA.push({ point: contact.point, impulse: PhysicsVector.add(impulseA_n, impulseA_t) });   
         }
         for (let impulse of impulsesA) {
             bodyA.applyImpulse(impulse.point, impulse.impulse);
@@ -723,7 +724,7 @@ class PhysicsEngine {
                     let collisionDirection = best.direction;
                     if (!STATIC) for (let pro of body2.prohibitedDirections) {
                         let dot = PhysicsVector.dot(pro, collisionDirection);
-                        if (dot > 0.8) {
+                        if (dot > 0.9) {
                             STATIC = true;
                             break;
                         }
@@ -767,6 +768,7 @@ class PhysicsEngine {
         let inverseGravitySort = (a, b) => PhysicsVector.dot(a.position, g) - PhysicsVector.dot(b.position, g);
         this.solveConstraints();
         this.collisions(gravitySort, grid, collisionPairs);
+        this.integrate();
         this.solveConstraints();
         this.collisions(inverseGravitySort, grid, collisionPairs);
 

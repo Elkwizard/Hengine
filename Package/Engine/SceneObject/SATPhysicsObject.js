@@ -130,10 +130,10 @@ class PhysicsObject extends SceneObject {
         let dif = this.middle.Vminus(point);
         this.velocity.Vadd(dif.Ntimes(ferocity / 100));
     }
-    applyImpulse(point, force) {
-        this.applyPhysicsImpulse(point, force.times(this.body.mass));
+    applyImpulseMass(point, force) {
+        this.applyImpulse(point, force.times(this.body.mass));
     }
-    applyPhysicsImpulse(point, force) {
+    applyImpulse(point, force) {
         this.body.applyImpulse(point.toPhysicsVector(), force.toPhysicsVector());
     }
 }
