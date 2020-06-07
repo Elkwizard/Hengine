@@ -190,9 +190,10 @@ class InactiveScene {
 	}
 	removeElement(name) {
 		this.performFunctionBasedOnType(name, function (e) {
-			let x = this.elements[e.name];
-			if (x) {
-				x.isDead = true;
+			let el = this.elements[e.name];
+			if (el) {
+				el.isDead = true;
+				this.physicsEngine.removeBody(el.body.id);
 				delete this.elements[e.name];
 			} else if (e.home.elements[e.name]) {
 				e.home.removeElement(e);
@@ -528,8 +529,13 @@ class Scene extends InactiveScene {
 			B.colliding.add(A, Vector2.fromPhysicsVector(direction).inverse());
 		}
 	}
-	constrain(a, b, ap, bp, str) {
-		this.physicsEngine.constrain(a, b, ap, bp, str);
+	constrain(a, b, ap = Vector2.origin, bp = Vector2.origin, str = "CURRENT_DIST") {
+		let con = new PhysicsConstraint.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), str);
+		if (str === "CURRENT_DIST") {
+			let ends = con.getEnds();
+			con.length = Geometry.distToPoint(ends[0], ends[1]);
+		}
+		this.physicsEngine.addConstraint(con);
 	}
 	updateSceneObjectCaches(useful) {
 		for (const el of useful) el.updateCaches();
