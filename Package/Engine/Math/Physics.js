@@ -413,7 +413,7 @@ class CollisionDetector {
                 if (dot < bMin) bMin = dot;
                 if (dot > bMax) bMax = dot;
             }
-            if (aMax <= bMin || aMin >= bMax) return null;
+            if (aMax < bMin || aMin > bMax) return null;
 
             if (i) proj[0][I] = { min: bMin, max: bMax };
             else proj[1][I] = { min: aMin, max: aMax };
@@ -741,6 +741,7 @@ class PhysicsEngine {
                     }
                     this.oncollide(body, body2, collisionDirection);
                     if (body.type === RigidBody.TRIGGER || body2.type === RigidBody.TRIGGER) continue;
+                    contacts = [...new Set(contacts)];
                     if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
                     else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
                 }
