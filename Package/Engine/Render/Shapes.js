@@ -59,31 +59,12 @@ class Line {
 	}
 }
 class Shape {
-	constructor(rotation = 0) {
-		this.rotation = rotation;
-		this.__boundingBox = null; //bounding box cache
-		this.collisionShapes = [this]; //a list of the shapes that make up the shape
-	}
+	constructor() { }
 	get middle() {
 		return Vector2.origin;
 	}
 	set middle(a) {
 		this.center(a);
-	}
-	get area() {
-		//return the area of the shape
-		return 0;
-	}
-	get perimeter() {
-		return 0;
-	}
-	cache(shape) {
-		//retrieve cached values
-		this.__boundingBox = shape.__boundingBox;
-	}
-	cacheBoundingBox(box) {
-		//store bounding box for later use
-		this.__boundingBox = box;
 	}
 	getBoundingBox() {
 		//return the smallest rectangle that contains the shape
@@ -119,32 +100,15 @@ class Shape {
 	}
 }
 class Polygon extends Shape {
-	constructor(vertices, rotation = 0) {
-		super(rotation);
+	constructor(vertices) {
+		super();
 		this.vertices = vertices;
-		this.vertexDirection = vertices;
-		this.__axes = [];
 	}
 	set middle(a) {
 		this.center(a);
 	}
 	get middle() {
 		return Vector.sum(...this.vertices).Nover(this.vertices.length);
-	}
-	get area() {
-		let bound = this.getBoundingBox();
-		return bound.width * bound.height;
-	}
-	get perimeter() {
-		let sum = 0;
-		let edges = this.getEdges();
-		for (let el of edges) sum += Math.sqrt((el.b.x - el.a.x) ** 2 + (el.b.y - el.a.y) ** 2);
-		return sum;
-	}
-	subdivideForCollisions(direction) {
-		if (direction === undefined) direction = this.vertexDirection;
-		else this.vertexDirection = direction;
-		this.collisionShapes = Geometry.subdividePolygon(this, direction);
 	}
 	getBoundingBox() {
 		let verts = this.vertices;
@@ -160,21 +124,7 @@ class Polygon extends Shape {
 		return this.getModelCosSin(pos, Math.cos(rot), Math.sin(rot));
 	}
 	getModelCosSin(pos, cos, sin) {
-		let middle = this.middle;
-		let rotation = this.rotation;
-		let verts;
-		if (rotation) {
-			let t_sin = Math.sin(rotation);
-			let t_cos = Math.cos(rotation);
-			verts = this.getCorners()
-				.map(e => {
-					let difX = e.x - middle.x;
-					let difY = e.y - middle.y;
-					let nX = t_cos * difX - t_sin * difY;
-					let nY = t_sin * difX + t_cos * difY;
-					return new Vector2(middle.x + nX, middle.y + nY);
-				});
-		} else verts = this.getCorners();
+		let verts = this.getCorners();
 		let m_sin = sin;
 		let m_cos = cos;
 		verts = verts
@@ -202,13 +152,6 @@ class Polygon extends Shape {
 		}
 		return axes;
 	}
-	cacheAxes(axes) {
-		this.__axes = axes;
-	}
-	cache(shape) {
-		this.__axes = shape.__axes;
-		this.__boundingBox = shape.__boundingBox;
-	}
 	getEdges() {
 		let edges = [];
 		let verts = this.vertices;
@@ -227,12 +170,10 @@ class Polygon extends Shape {
 	scale(factor) {
 		let middle = this.middle;
 		this.vertices = this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor)));
-		this.subdivideForCollisions(this.vertexDirection);
 		return this;
 	}
 	scaleAbout(pos, factor) {
 		this.vertices = this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor)));
-		this.subdivideForCollisions(this.vertexDirection);
 		return this;
 	}
 	move(dir, isCollisionShape) {
@@ -242,7 +183,6 @@ class Polygon extends Shape {
 	}
 	get() {
 		let poly = new Polygon([...this.vertices], this.rotation);
-		poly.vertexDirection = this.vertexDirection;
 		return poly;
 	}
 	static lerp(a, b, t) {
@@ -251,8 +191,8 @@ class Polygon extends Shape {
 	}
 }
 class Rect extends Polygon {
-	constructor(x, y, w, h, rotation = 0) {
-		super([], rotation);
+	constructor(x, y, w, h) {
+		super([]);
 		if (typeof x === "object") {
 			w = y.x - x.x;
 			h = y.y - x.y;
@@ -278,12 +218,6 @@ class Rect extends Polygon {
 	get middle() {
 		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
 	}
-	get area() {
-		return this.width * this.height;
-	}
-	get perimeter() {
-		return this.width * 2 + this.height * 2;
-	}
 	get vertices() {
 		return [
 			new Vector2(this.x, this.y),
@@ -302,8 +236,8 @@ class Rect extends Polygon {
 			this.height = max.y - min.y;
 		}
 	}
-	subdivideForCollisions() {
-
+	getBoundingBox() {
+		return new Rect(this.x, this.y, this.width, this.height);
 	}
 	center(pos) {
 		this.x = pos.x - this.width / 2;
@@ -333,7 +267,7 @@ class Rect extends Polygon {
 }
 class Circle extends Shape {
 	constructor(x, y, radius) {
-		super(0);
+		super();
 		this.x = x;
 		this.y = y;
 		this.radius = Math.abs(radius);
@@ -343,12 +277,6 @@ class Circle extends Shape {
 	}
 	get middle() {
 		return new Vector2(this.x, this.y);
-	}
-	get area() {
-		return Math.PI * this.radius ** 2;
-	}
-	get perimeter() {
-		return Math.PI * this.radius * 2;
 	}
 	getModel(pos, rot) {
 		return this.getModelCosSin(pos, Math.cos(rot), Math.sin(rot));

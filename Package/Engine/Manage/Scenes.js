@@ -1,11 +1,11 @@
 class InactiveScene {
-	constructor(name, gravity) {
+	constructor(name = "scene", gravity = new Vector2(0, 0.2)) {
 		this.name = name;
 		this.rebound = 0;
 		this.elementArray = [];
 		this.custom = {};
 		this.gravity = gravity;
-		this.physicsEngine = new PhysicsEngine(gravity);
+		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
 		this.defaultDraw = function (name, shape) {
 			c.draw("#000").infer(shape);
 			c.stroke("cyan", 1).infer(shape);
@@ -121,7 +121,6 @@ class InactiveScene {
 		name = this.genName(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
-		n.cacheMass();
 		this.changeElementDraw(n, this.defaultPhysDraw);
 		this.elements[name] = n;
 		return n;
@@ -130,7 +129,6 @@ class InactiveScene {
 		name = this.genName(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Circle(0, 0, radius));
-		n.cacheMass();
 		this.changeElementDraw(n, this.defaultPhysDraw);
 		this.elements[name] = n;
 		return n;
@@ -338,10 +336,9 @@ class InactiveScene {
 		this.defaultUpdate = newUpdate;
 	}
 	clearAllCollisions() {
-		for (let rect of this.updateArray()) {
-			if (rect.clearCollisions) {
-				rect.clearCollisions();
-			}
+		let phys = this.getPhysicsElements();
+		for (let i = 0; i < phys.length; i++) {
+			phys[i].colliding.clear();
 		}
 	}
 	collideRect(box) {
@@ -370,7 +367,7 @@ class InactiveScene {
 			let p = (hitbox instanceof UIObject) ? this.worldSpaceToScreenSpace(point) : point;
 			let shapes = hitbox.getModels();
 			let colliding = false;
-			for (let shape of shapes) if (Physics.collidePoint(shape, p).colliding) colliding = true;
+			for (let shape of shapes) if (Geometry.overlapPoint(shape, p).colliding) colliding = true;
 			if (colliding) {
 				collideAry.push(hitbox);
 			}
@@ -384,7 +381,8 @@ class InactiveScene {
 }
 class Camera extends Rect {
 	constructor(x, y, width, height, zoom = 1, rotation = 0, RenderType = Frame) {
-		super(x, y, width, height, rotation);
+		super(x, y, width, height);
+		this.rotation = rotation;
 		this.zoom = zoom;
 		this.RenderType = RenderType;
 		this.view = new this.RenderType(width, height);
@@ -400,7 +398,8 @@ class Camera extends Rect {
 		this.zoom /= 1 + amount;
 	}
 	getWorld() {
-		let m = this.getModel(Vector2.origin, 0);
+		let middle = this.middle;
+		let m = new Polygon(this.vertices.map(vert => vert.Vminus(middle))).getModelCosSin(middle, Math.cos(this.rotation), Math.sin(this.rotation));
 		m.scale(1 / this.zoom);
 		this.newView = new this.RenderType(width, height);
 		return m;
@@ -438,11 +437,13 @@ class Camera extends Rect {
 class Scene extends InactiveScene {
 	constructor(name, context, gravity, home) {
 		super(name, gravity);
+		this.physicsEngine.oncollide = this.handleCollisionEvent.bind(this);
 		this.c = context;
 		this.home = home;
 		this.cullGraphics = true;
 		this.cameras = {};
 		this.mouseEvents = false;
+		this.collisionEvents = true;
 		this.camera = new Camera(0, 0, this.c.canvas.width, this.c.canvas.height, 1, 0);
 		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
 		M.engineClick = function (e) {
@@ -500,7 +501,6 @@ class Scene extends InactiveScene {
 		this.c.restore();
 	}
 	engineFixedUpdate() {
-		let startTime = performance.now();
 		for (let rect of this.elementArray) rect.isBeingUpdated = true;
 		this.updateArray();
 		this.clearAllCollisions();
@@ -509,26 +509,24 @@ class Scene extends InactiveScene {
 			q.push(x);
 		}
 		for (let rect of this.elementArray) rect.pushToRemoveQueue = p;
-		//grid
-
 		//custom before updates run
 		for (let el of this.elementArray) {
 			el.scripts.run("beforeUpdate");
 		}
-
-		let arrays = this.physicsEngine.run(this.elementArray);
-
-		//particle movement
-		for (let rect of arrays.useless) if (rect.physicsUpdate) for (let i = 0; i < 2; i++) rect.physicsUpdate([]);
-		this.updateSceneObjectCaches(arrays.useless);
-
-		//non collision fixed update
+		this.clearAllCollisions();
+		this.physicsEngine.run();
 		this.physicsObjectFixedUpdate(this.elementArray);
-
 		for (let rect of q) rect.home.removeElement(rect);
 		this.removeQueue = [];
 		for (let rect of this.elementArray) rect.isBeingUpdated = false;
-		// console.log(performance.now() - startTime);
+	}
+	handleCollisionEvent(a, b, direction) {
+		let A = a.userData.sceneObject;
+		let B = b.userData.sceneObject;
+		if (A && B && this.collisionEvents) {
+			A.colliding.add(B, Vector2.fromPhysicsVector(direction));
+			B.colliding.add(A, Vector2.fromPhysicsVector(direction).inverse());
+		}
 	}
 	constrain(a, b, ap, bp, str) {
 		this.physicsEngine.constrain(a, b, ap, bp, str);
@@ -551,6 +549,7 @@ class Scene extends InactiveScene {
 	}
 	renderCamera(camera) {
 		let screen = camera.getWorld().getBoundingBox();
+		window.screen = screen;
 		this.c.embody(camera.newView);
 		camera.transformToWorld(this.c);
 		for (let rect of this.elementArray) {

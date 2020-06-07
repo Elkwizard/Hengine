@@ -209,18 +209,15 @@ class Hengine {
 				if (!this.controls.up) {
 					this.controls = new Controls("w", "s", "a", "d");
 				}
-				this.completelyStatic = false;
-				s.collisionEvents = true;
-				this.hasGravity = true;
+				this.mobilize();
 			},
 			update() {
-				if (K.P(this.controls.down)) this.speed.y += 0.2;
-				if (K.P(this.controls.left)) this.accel.x = -0.1;
-				else if (K.P(this.controls.right)) this.accel.x = 0.1;
-				else this.accel.x = 0;
+				if (K.P(this.controls.down)) this.velocity.y += 0.2;
+				if (K.P(this.controls.left)) this.velocity.x += -0.1;
+				else if (K.P(this.controls.right)) this.velocity.x += 0.1;
 				if (K.P(this.controls.up)) {
 					if (this.colliding.bottom) {
-						this.speed.y = -5;
+						this.velocity.y = -5;
 					}
 				}
 			}
@@ -357,7 +354,7 @@ class Hengine {
 		return ["PrototypeOverload", "Scripts", "Scenes", "Engine", "Hengine"];
 	}
 	static get defaultMathPackage() {
-		return ["Random", "Operable", "Vector", "Geometry", "Physics"];
+		return ["Random", "Operable", "Vector", "Geometry", "Physics", "PhysicsAPI"];
 	}
 	static get defaultUtilityPackage() {
 		return ["Input", "Sound", "Time", "Console"];

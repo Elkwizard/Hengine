@@ -157,12 +157,9 @@ class SceneObject {
 		this.rotation = old_rot;
 	}
 	cacheBoundingBoxes() {
-		let shapes = this.getShapes();
-		let models = this.getShapeModels();
-		for (let i = 0; i < shapes.length; i++) shapes[i].cacheBoundingBox(models[i].getBoundingBox()); //transfer from model to root shape
 		this.__boundingBox = this.getBoundingBox();
 	}
-	getShapeModels() {
+	getModels() {
 		let pos = this.middle;
 		let cos = this.__cosRot;
 		let sin = this.__sinRot;
@@ -170,27 +167,8 @@ class SceneObject {
 		for (let name in this.shapes) result.push(this.shapes[name].getModelCosSin(pos, cos, sin));
 		return result;
 	}
-	getModels() {
-		let middle = this.middle;
-		let pos = middle;
-		let cos = this.__cosRot;
-		let sin = this.__sinRot;
-		let result = [];
-		for (let name in this.shapes) {
-			result.push(...this.shapes[name].collisionShapes.map(e => {
-				e.cache(this.shapes[name]);
-				return e;
-			}));
-		}
-		result = result.map(e => {
-			let el = e.getModelCosSin(pos, cos, sin);
-			el.cache(e);
-			return el;
-		});
-		return result;
-	}
 	getBoundingBox() {
-		let shapes = this.getShapeModels();
+		let shapes = this.getModels();
 		let boxes = shapes.map(e => e.getBoundingBox());
 		if (boxes.length === 1) return boxes[0];
 		let mins = boxes.map(e => new Vector2(e.x, e.y));
@@ -201,20 +179,9 @@ class SceneObject {
 		let maxY = Math.max(...maxs.map(e => e.y));
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
-	rotateAround(point, rotation) {
-		let middle = this.middle;
-		let dif = point.Vminus(middle);
-		let nDif = Geometry.rotatePointAround(Vector2.origin, dif, rotation);
-		this.middle = middle.Vadd(nDif.Vminus(dif).inverse());
-		this.rotation += rotation;
-	}
 	addShape(name, shape) {
 		shape = shape.get();
 		this.shapes[name] = shape;
-		if (shape instanceof Polygon && !(shape instanceof Rect)) {
-			shape.vertexDirection = Geometry.vertexDirection(shape.vertices);
-			shape.subdivideForCollisions();
-		}
 	}
 	newShapeCache() {
 		this.cacheBoundingBoxes();
@@ -243,7 +210,6 @@ class SceneObject {
 	removeShape(name) {
 		let shape = this.shapes[name];
 		delete this.shapes[name];
-		this.cacheMass();
 		return shape;
 	}
 	removeAllShapes() {
@@ -259,7 +225,7 @@ class SceneObject {
 		return this.shapes[name];
 	}
 	getModel(name) {
-		return this.shapes[name].getModel(this.middle, this.rotation);
+		return this.shapes[name].getModelCosSin(this.middle, this.__cosRot, this.__sinRot);
 	}
 	reorderShapes(order) {
 		let shapes = this.getShapes();
@@ -278,12 +244,6 @@ class SceneObject {
 	scale(factor) {
 		let middle = Vector2.origin;
 		for (let shape of this.getShapes()) shape.scaleAbout(middle, factor);
-	}
-	vertexDirection(dir) {
-		const type = dir === "CLOCKWISE";
-		for (let [name, shape] of this.shapes) if (shape instanceof Polygon) {
-			shape.subdivideForCollisions(type);
-		}
 	}
 	rename(name) {
 		delete this.home.elements[this.name];
@@ -353,10 +313,9 @@ class SceneObject {
 		if (!this.hidden && onScreen) {
 			this.runDraw();
 		}
+		// s.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
+		// s.drawInScreenSpace(e => c.stroke(cl.RED, 1).rect(screen));
 		this.onScreen = onScreen;
-		//bound visual
-		// c.stroke(cl.GREEN, 1).rect(this.__boundingBox);
-		// for (let shape of this.getShapes()) c.stroke(cl.GREEN, 1).rect(shape.__boundingBox);
 		this.scripts.run("escapeDraw");
 	}
 	engineFixedUpdate(hitboxes) {

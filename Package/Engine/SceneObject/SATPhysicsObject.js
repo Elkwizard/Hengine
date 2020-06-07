@@ -1,22 +1,19 @@
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, gravity, controls, tag, home) {
         super(name, x, y, controls, tag, home);
-        this.physicsEngine = this.home.physicsEngine;
-        //velocity
-        this.velocity = Vector2.origin;
-        this.acceleration = Vector2.origin;
-        //velocity loss
-        this.linearDragForce = this.physicsEngine.linearDragForce;
-        this.angularDragForce = this.physicsEngine.angularDragForce;
-        this.friction = this.physicsEngine.frictionDragForce;
-        this.limitsVelocity = true;
-        this.slows = gravity;
-        
-        //acceleration
-        this.angularVelocity = 0;
-        this.angularAcceleration = 0;
-        this.hasGravity = gravity;
-        this.gravity = this.physicsEngine.gravity;
+
+        this.body = new RigidBody(x, y, gravity ? RigidBody.DYNAMIC : RigidBody.STATIC);
+        this.home.physicsEngine.addBody(this.body);
+        this.body.userData.sceneObject = this;
+        this.body.collisionFilter = function (body) {
+            let sceneObject = body.userData.sceneObject;
+            if (this.optimize(sceneObject) && sceneObject.optimize(this)) {
+                if ((!this.hasCollideRule || this.collideBasedOnRule(sceneObject)) && (!sceneObject.hasCollideRule || sceneObject.collideBasedOnRule(this))) {
+                    return true;
+                }
+            }
+            return false;
+        }.bind(this);
 
         //previous states
         this.lastRotation = 0;
@@ -24,29 +21,7 @@ class PhysicsObject extends SceneObject {
         this.last = this.middle;
         this.lastAngularVelocity = 0;
 
-        //previous state differences
-        this.direction = Vector2.origin;
-        this.angularDirection = 0;
-        
-        //collision detection
-
-        //collisions
-        //detection
-        this.optimize = (a, b) => true;
-        this.canMoveThisFrame = true;
-        this.canCollide = true;
-        this.constraintLeader = false;
-        //response
-        this.snuzzlement = 1;
-        this._mass = null;
-        this.density = 0.1;
-        this.positionStatic = !gravity;
-        this.rotationStatic = !gravity;
-        this.prohibited = [];
-        this._rotation = 0;
-        this.__mass = 0; //mass cache
-        this.__perimeter = 0; //perimeter cache
-        this.__middle = this.middle;
+        this.optimize = other => true;
         this.hasCollideRule = false;
         //data
         this.colliding = new CollisionMoniter();
@@ -59,48 +34,41 @@ class PhysicsObject extends SceneObject {
             right: function () { }
         };
 
-        //scene
-        this.usedForCellSize = false;
+        this.shapeNameIDMap = new Map();
     }
-    set mass(a) {
-        this._mass = a;
+    get canCollide() {
+        return this.body.type === RigidBody.TRIGGER;
     }
-    get mass() {
-        if (this._mass !== null) return this._mass;
-        let totalMass = 0;
-        for (let [name, shape] of this.shapes) totalMass += shape.area;
-        return totalMass;
+    set canCollide(a) {
+        this.body.type = a ? this.body.type : RigidBody.TRIGGER;
     }
-    get perimeter() {
-        let totalPer = 0;
-        for (let [name, shape] of this.shapes) totalPer += shape.perimeter;
-        return totalPer;
+    get velocity() {
+        return this.body.velocity;
     }
-    set speed(a) {
-        this.velocity = a;
+    set velocity(a) {
+        this.body.velocity = a.toPhysicsVector();
     }
-    get speed() {
-        return this.velocity;
+    get angularVelocity() {
+        return this.body.angularVelocity;
     }
-    set accel(a) {
-        this.acceleration = a;
+    set angularVelocity(a) {
+        this.body.angularVelocity = a;
     }
-    get accel() {
-        return this.acceleration;
+    addShape(name, shape) {
+		shape = shape.get();
+        this.shapes[name] = shape;
+        let collider;
+        if (shape instanceof Polygon) collider = new PolygonCollider(shape.vertices.map(vert => vert.toPhysicsVector()));
+        else collider = new CircleCollider(shape.x, shape.y,shape.radius);
+        let colliders = this.body.addShape(collider);
+        this.shapeNameIDMap.set(name, colliders);
     }
-    set hasGravity(a) {
-        this._hasGravity = a;
-        this.slows = a;
-    }
-    get hasGravity() {
-        return this._hasGravity;
-    }
-    set completelyStatic(a) {
-        this.positionStatic = a;
-        this.rotationStatic = a;
-    }
-    get completelyStatic() {
-        return this.positionStatic && this.rotationStatic;
+    removeShape(name) {
+        let shape = this.shapes[name];
+        delete this.shapes[name];
+        let cols = this.shapeNameIDMap.get(name);
+        for (let i = 0; i < cols.length; i++) this.body.removeShape(cols[i]);
+        return shape;
     }
 	onAddScript(script) {
         const value = 1;
@@ -114,25 +82,14 @@ class PhysicsObject extends SceneObject {
         return !judgement.includes(false);
     }
     stop() {
-        this.velocity = Vector2.origin;
-        this.acceleration = Vector2.origin;
-        this.angularVelocity = 0;
-        this.angularAcceleration = 0;
+        this.body.velocity.mul(0);
+        this.body.angularVelocity = 0;
     }
     mobilize() {
-        this.completelyStatic = false;
-        this.hasGravity = true;
-        this.slows = true;
+        this.body.type = RigidBody.DYNAMIC;
     }
     immobilize() {
-        this.completelyStatic = true;
-        this.hasGravity = false;
-        this.slows = false;
-    }
-    clearCollisions() {
-        this.colliding.clear();
-        this.canMoveThisFrame = true;
-        this.prohibited = [];
+        this.body.type = RigidBody.STATIC;
     }
     drawWithoutRotation(artist) {
         let com = this.middle;
@@ -145,78 +102,12 @@ class PhysicsObject extends SceneObject {
         c.rotate(rot);
         c.translate(com.inverse());
     }
-    getPointVelocity(point) {
-        if (!this.rotationStatic) {
-            let r_A = point.Vminus(this.middle).normal.Ntimes(this.angularVelocity);
-            let sum = r_A.Vplus(this.velocity);
-            return sum;
-        } else return this.velocity;
-    }
-    capSpeed() {
-        let m = Math.sqrt(this.__mass) / 2;
-        if (this.velocity.mag > m) this.velocity.mag = m;
-    }
-    privateSetX(x) {
-        if (!this.positionStatic) {
-            this.x = x;
-        }
-    }
-    privateSetY(y) {
-        if (!this.positionStatic) {
-            this.y = y;
-        }
-    }
-    privateMove(v) {
-        if (!this.positionStatic) {
-            this.x += v.x;
-            this.y += v.y;
-            this.moveBoundingBoxCache(v);
-        }
-    }
-    privateSetRotation(a) {
-        if (!this.rotationStatic) {
-            this.rotation = a;
-            this.cacheRotation();
-        }
-    }
-    detectCollisions(others) {
-        if (!this.completelyStatic) {
-            for (let other of others) {
-                if (other !== this) {
-                    if (this.optimize(other) && other.optimize(this)) {
-                        if ((!this.hasCollideRule || this.collideBasedOnRule(other)) && (!other.hasCollideRule || other.collideBasedOnRule(this))) {
-                            let col = Physics.fullCollide(this, other);
-                            if (col.length) {
-                                if (this.canCollide && other.canCollide) {
-                                    for (const collision of col) {
-                                        Physics.resolve(collision);
-                                    }
-                                } else {
-                                    this.colliding.add(other, Vector2.down);
-                                    other.colliding.add(this, Vector2.up);
-                                }
-                                if (this.home.collisionEvents) for (const collision of col) {
-                                    Physics.events(collision);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    checkAndResolveCollisions(others) {
-        const dir = this.velocity.normalized;
-        others = others.sort((a, b) => (a.x - b.x) * dir.x + (a.y - b.y) * dir.y);
-        others = [...others.filter(e => !e.completelyStatic), ...others.filter(e => e.completelyStatic)];
-        this.detectCollisions(others);
-    }
-    getSpeedModulation() {
-        return this.physicsEngine.speedModulation / this.physicsEngine.physicsRealism;
-    }
     engineFixedUpdate() {
         this.scripts.run("update");
         this.update();
+        this.x = this.body.position.x;
+        this.y = this.body.position.y;
+        this.rotation = this.body.angle;
     }
     updatePreviousData() {
         this.direction = this.middle.Vminus(this.last);
@@ -228,98 +119,8 @@ class PhysicsObject extends SceneObject {
         this.angularDirection = this.rotation - this.lastRotation; 
         this.lastRotation = this.rotation;
     }
-    applyGravity(coef = 1) {
-        if (this.hasGravity) {
-            //gravity
-            let gv = this.gravity;
-            let gravitationalForce = gv.Ntimes(coef * this.__mass);
-            let iG = new Impulse(gravitationalForce, this.middle);
-            this.internalApplyImpulse(iG, "gravity");
-        }
-    }
-    slowDown() {
-        //apply linear drag;
-        let dragFactor = -(1 - this.linearDragForce) / this.physicsEngine.physicsRealism;
-        this.velocity.x += this.velocity.x * dragFactor;
-        this.velocity.y += this.velocity.y * dragFactor;
-        this.angularVelocity *= this.angularDragForce;
-
-    }
-    physicsUpdate(others) {
-        s.drawInWorldSpace(e => {
-            let spdMod = this.getSpeedModulation();
-            //slow
-            if (this.slows) this.slowDown();
-            
-            //linear
-            this.velocity.Vadd(this.acceleration.Ntimes(spdMod));
-            if (this.limitsVelocity) this.capSpeed();
-            if (this.positionStatic || this.velocity.mag > 30) this.velocity.Nmul(0);
-
-
-            let newX = this.x + this.velocity.x * 2 * spdMod;
-            let newY = this.y + this.velocity.y * 2 * spdMod;
-            this.privateSetX(newX);
-            this.privateSetY(newY);
-
-            //angular
-            this.angularVelocity += this.angularAcceleration;
-            if (this.rotationStatic) this.angularVelocity = 0;
-            let newRotation = this.rotation + this.angularVelocity * spdMod;
-            
-            this.privateSetRotation(newRotation);
-
-            this.updateMovementCaches();
-
-            this.checkAndResolveCollisions(others);
-
-            let pi2 = Math.PI * 2;
-            if (this.rotation < -pi2) this.rotation = -(-this.rotation % pi2);
-            if (this.rotation > pi2) this.rotation = this.rotation % pi2;
-
-            //any number of terrible things may have happened by this point.
-            if (isNaN(this.velocity.x)) this.velocity.x = 0;
-            if (isNaN(this.velocity.y)) this.velocity.y = 0;
-            if (isNaN(this.x)) this.x = this.last.x;
-            if (isNaN(this.y)) this.y = this.last.y;
-        });
-    }
-    newShapeCache() {
-        this.cacheBoundingBoxes();
-		this.cacheMass();
-    }
-    moveBoundingBoxCache(v) {
-        this.__boundingBox.x += v.x;
-        this.__boundingBox.y += v.y;
-        for (let name in this.shapes) {
-            let rect = this.shapes[name];
-            rect.__boundingBox.x += v.x;
-            rect.__boundingBox.y += v.y;
-        }
-    }
-    updateMovementCaches() {
-        this.cacheAxes();
-    }
-    updateCaches() {
-        this.cacheBoundingBoxes();
-        this.updateMovementCaches();
-        this.cacheDimensions();
-        // this.__perimeter = this.perimeter;
-    }
-    cacheAxes() {
-        const pos = this.middle;
-        const rot = this.rotation;
-        for (const name in this.shapes) {
-            let shape = this.shapes[name];
-            if (shape instanceof Polygon) {
-                let axes = [];
-                for (let sh of shape.collisionShapes) axes.push(...sh.getModel(pos, rot).getAxes());
-                shape.cacheAxes(axes);
-            }
-        }
-    }
-    cacheMass() {
-        this.__mass = this.mass;
+    physicsUpdate() {
+        
     }
     moveTowards(point, ferocity = 1) {
         let dif = point.Vminus(this.middle);
@@ -329,35 +130,10 @@ class PhysicsObject extends SceneObject {
         let dif = this.middle.Vminus(point);
         this.velocity.Vadd(dif.Ntimes(ferocity / 100));
     }
-    getImpulseRatio(point, axis) {
-        let r_N = point.Vminus(this.middle).normal;
-        let r = r_N.mag;
-        if (r < 0.01) return 1;
-        let I = axis;
-        let proj = I.projectOnto(r_N);
-        let pMag = proj.mag;
-        if (!pMag) return 1;
-        return 1 - pMag / I.mag;
+    applyImpulse(point, force) {
+        this.applyPhysicsImpulse(point, force.times(this.body.mass));
     }
-    internalApplyImpulse(impulse, name = "no name") {
-        if (!impulse || !(impulse.force.x || impulse.force.y)) return;
-        impulse.force.Ndiv(this.__mass * this.physicsEngine.physicsRealism);
-        this.applyLinearImpulse(impulse, name);
-        this.applyAngularImpulse(impulse, name);
-    }
-    applyImpulse(impulse, name = "no name") {
-        if (!impulse || !(impulse.force.x || impulse.force.y)) return;
-        impulse.force.Ndiv(this.__mass);
-        this.applyLinearImpulse(impulse, name);
-        this.applyAngularImpulse(impulse, name);
-    }
-    applyLinearImpulse(impulse, name) {
-        const vel = impulse.force;
-        this.velocity.Vadd(vel);
-    }
-    applyAngularImpulse(impulse, name) {
-        let r = impulse.source.Vminus(this.middle);
-        if (!r.x && !r.y && r.x + r.y < 0.01) return;
-        this.angularVelocity += -impulse.force.cross(r) / r.sqrMag;
+    applyPhysicsImpulse(point, force) {
+        this.body.applyImpulse(point.toPhysicsVector(), force.toPhysicsVector());
     }
 }

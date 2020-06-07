@@ -379,9 +379,28 @@ class Geometry {
         }
     }
     static overlapPoint(poly, p) {
-        poly.cacheBoundingBox(poly.getBoundingBox());
-        let col = Physics.collidePoint(poly, p);
-        return col.colliding;
+        if (poly instanceof Circle) return (p.x - poly.x) ** 2 + (p.y - poly.y) ** 2 < poly.radius ** 2;
+        else {
+            let axes = [];
+            poly = poly.vertices;
+            for (let i = 0; i < poly.length; i++) {
+                axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normalize())
+            }
+            let col = true;
+            for (let i = 0; i < axes.length; i++) {
+                let axis = axes[i];
+                let min = Infinity;
+                let max = -Infinity;
+                for (let i = 0; i < poly.length; i++) {
+                    let dot = poly[i].dot(axis);
+                    if (dot < min) min = dot;
+                    if (dot > max) max = dot;
+                }
+                let proj = p.dot(axis);
+                if (proj < min || proj > max) return false;
+            }
+            return col;
+        }
     }
     static overlapShapes(poly, poly2) {
         poly.cacheBoundingBox(poly.getBoundingBox());

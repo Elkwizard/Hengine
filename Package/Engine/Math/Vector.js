@@ -483,6 +483,12 @@ class Vector2 extends Vector {
 		this.y /= v;
 		return this;
 	}
+	toPhysicsVector() {
+		return new PhysicsVector(this.x, this.y);
+	}
+	static fromPhysicsVector(v) {
+		return new Vector2(v.x, v.y);
+	}
 	static get left() {
 		return new Vector2(-1, 0);
 	}
