@@ -71,9 +71,10 @@ class PolygonCollider {
     constructor(vertices) {
         this.vertices = vertices;
         this.position = vertices.reduce((a, b) => PhysicsVector.add(a, b)).div(vertices.length);
-        let bounds = Bounds.fromPolygon(this);
-        this.mass = bounds.width * bounds.height;
-        this.inertia = this.mass / 12 * (bounds.width ** 2 + bounds.height ** 2); // TODO: FIX THE UNIVERSE
+        this.bounds = Bounds.fromPolygon(this);
+    }
+    size() {
+        return this.bounds.width;
     }
     getModel(pos, cos, sin) {
         let poly = new PolygonCollider(this.vertices.map(vert => {
@@ -89,8 +90,9 @@ class CircleCollider {
     constructor(x, y, radius) {
         this.position = new PhysicsVector(x, y);
         this.radius = radius;
-        this.mass = this.radius * this.radius * Math.PI;
-        this.inertia = this.mass / 4 * this.radius ** 2;
+    }
+    size() {
+        return this.radius * 2;
     }
     getModel(pos, cos, sin) {
         let circ = new CircleCollider(this.position.x + pos.x, this.position.y + pos.y, this.radius);
@@ -138,6 +140,22 @@ class Grid {
     }
     insertCircleCollider(body, circ) {
         return this.cellsBounds(body, circ.bounds);
+    }
+}
+
+//mass
+class ShapeMass {
+    static massCircleCollider(circ) {
+        return circ.radius ** 2 * Math.PI;
+    }
+    static inertiaCircleCollider(circ) {
+        return circ.radius ** 4 * Math.PI / 4;
+    }
+    static massPolygonCollider(poly) {
+        return poly.bounds.width * poly.bounds.height;
+    }
+    static inertiaPolygonCollider(poly) {
+        return (poly.bounds.width ** 3 * poly.bounds.height + poly.bounds.height ** 3 * poly.bounds.width) / 12;
     }
 }
 
@@ -200,6 +218,8 @@ class RigidBody {
 
         this.canRotate = true;
         this.isTrigger = false;
+
+        this.__models = [];
     }
     set angle(a) {
         this._angle = a;
@@ -208,6 +228,9 @@ class RigidBody {
     }
     get angle() {
         return this._angle;
+    }
+    cacheModels() {
+        this.__models = this.getModels();
     }
     getModels() {
         let pos = this.position;
@@ -234,15 +257,15 @@ class RigidBody {
 
         this.shapes.push(...shapes);
         for (let sha of shapes) {
-            this.mass += sha.mass;
-            this.inertia += sha.inertia;
+            this.mass += ShapeMass["mass" + sha.constructor.name](sha);
+            this.inertia += ShapeMass["inertia" + sha.constructor.name](sha);
         }
         return shapes;
     }
-    integrate() {
-        this.position.add(this.velocity);
+    integrate(intensity) {
+        this.position.add(PhysicsVector.mul(this.velocity, intensity));
         if (this.canRotate) {
-            this.angle += this.angularVelocity;
+            this.angle += this.angularVelocity * intensity;
             this.cosAngle = Math.cos(this.angle);
             this.sinAngle = Math.sin(this.angle);
         }
@@ -495,7 +518,7 @@ class CollisionDetector {
             let { min, max } = proj[1][i];
             for (let j = 0; j < b.vertices.length; j++) {
                 let dot = PhysicsVector.dot(b.vertices[j], aAxes[i]);
-                if (dot < min || dot > max) validBVerts[j] = false;
+                if (validBVerts[j] && (dot < min || dot > max)) validBVerts[j] = false;
             }
         }
         let { min: aMin, max: aMax } = bestRange[0];
@@ -716,6 +739,7 @@ class PhysicsEngine {
         this.constraintIterations = 3;
         this.oncollide = (a, b, dir) => null;
         this.polygonVertexListSubdivider = null;
+        this.iterations = 3;
     }
     addConstraint(constraint) {
         this.constraints.push(constraint);
@@ -728,14 +752,20 @@ class PhysicsEngine {
             }
         }
     }
-    integrate() {
+    applyForces() {
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
             if (body.type === RigidBody.STATIC) continue;
-            body.integrate();
             body.velocity = PhysicsVector.add(body.velocity, this.gravity);
             body.velocity.mul(this.linearDrag);
             body.angularVelocity *= this.angularDrag;
+        }
+    }
+    integrate(intensity) {
+        for (let i = 0; i < this.bodies.length; i++) {
+            let body = this.bodies[i];
+            if (body.type === RigidBody.STATIC) continue;
+            body.integrate(intensity);
         }
     }
     collisions(order, grid, collisionPairs) {
@@ -755,8 +785,8 @@ class PhysicsEngine {
                 let collisions = [];
                 let body2 = collidable[j];
                 if (body2 === body) continue;
-                let shapesA = body.getModels();
-                let shapesB = body2.getModels();
+                let shapesA = body.__models;
+                let shapesB = body2.__models;
                 for (let sI = 0; sI < shapesA.length; sI++) for (let sJ = 0; sJ < shapesB.length; sJ++) {
                     let shapeA = shapesA[sI];
                     let shapeB = shapesB[sJ];
@@ -793,19 +823,24 @@ class PhysicsEngine {
                     }
                     this.oncollide(body, body2, collisionDirection);
                     if (body.isTrigger || body2.isTrigger) continue;
-                    contacts = [...new Set(contacts)];
                     if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
-                    else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
+                    else {
+                        this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
+                        body2.cacheModels();
+                    }
+                    body.cacheModels();
                 }
             }
             //immobilize
             body.canMoveThisStep = false;
         }
     }
+    cacheModels() {
+        for (let i = 0; i < this.bodies.length; i++) this.bodies[i].cacheModels();
+    }
     run() {
-        this.integrate();
         let cellsize = 100;
-        for (let i = 0; i < this.bodies.length; i++) for (let j = 0; j < this.bodies[i].shapes.length; j++) cellsize += Math.sqrt(this.bodies[i].shapes[j].mass) * 2;
+        for (let i = 0; i < this.bodies.length; i++) for (let j = 0; j < this.bodies[i].shapes.length; j++) cellsize += this.bodies[i].shapes[j].size() * 2;
         cellsize /= this.bodies.length + 1;
 
         let grid = new Grid(cellsize);
@@ -824,21 +859,27 @@ class PhysicsEngine {
             collisionPairs.set(body, cellsTotal);
         }
 
-
         // for (let i in grid.cells) if (grid.cells[i]) for (let j in grid.cells[i]) if (typeof grid.cells[i][j] === "object") {
         //     c.stroke(cl.RED, 2).rect(i * cellsize, j * cellsize, cellsize, cellsize);
-        //     // console.log(i, j);
         // }
-
-        let g = this.gravity;
-        let gravitySort = (a, b) => PhysicsVector.dot(b.position, g) - PhysicsVector.dot(a.position, g);
-        let inverseGravitySort = (a, b) => PhysicsVector.dot(a.position, g) - PhysicsVector.dot(b.position, g);
-        this.solveConstraints();
-        this.collisions(gravitySort, grid, collisionPairs);
-        this.integrate();
-        this.solveConstraints();
-        this.collisions(inverseGravitySort, grid, collisionPairs);
-
+        this.applyForces();
+        let intensity = 1 / this.iterations;
+        for (let i = 0; i < this.iterations; i++) {
+            //sorts
+            let g = this.gravity;
+            let gravitySort = (a, b) => PhysicsVector.dot(b.position, g) - PhysicsVector.dot(a.position, g);
+            let inverseGravitySort = (a, b) => PhysicsVector.dot(a.position, g) - PhysicsVector.dot(b.position, g);
+            
+            //step
+            this.integrate(intensity);
+            this.cacheModels();
+            this.solveConstraints();
+            this.collisions(gravitySort, grid, collisionPairs);
+            this.integrate(intensity);
+            this.cacheModels();
+            this.solveConstraints();
+            this.collisions(inverseGravitySort, grid, collisionPairs);
+        }
     }
     getBody(id) {
         for (let i = 0; i < this.bodies.length; i++) {
