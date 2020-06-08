@@ -41,10 +41,10 @@ class PhysicsObject extends SceneObject {
         return this.body.mass;
     }
     get canCollide() {
-        return this.body.type === RigidBody.TRIGGER;
+        return this.body.isTrigger;
     }
     set canCollide(a) {
-        this.body.type = a ? this.body.type : RigidBody.TRIGGER;
+        this.body.isTrigger = a;
     }
     get velocity() {
         return this.body.velocity;

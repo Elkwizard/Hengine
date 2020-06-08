@@ -1,4 +1,5 @@
 //vectors
+const INFINITY = 1e135;
 class PhysicsVector {
     constructor(x, y) {
         this.x = x;
@@ -42,6 +43,9 @@ class PhysicsVector {
     static cross(a, b) {
         return a.x * b.y - a.y * b.x;
     }
+    static crossNV(a, b) {
+        return new PhysicsVector(-a * b.y, a * b.x);
+    }
     static invert(a) {
         return new PhysicsVector(-a.x, -a.y);
     }
@@ -69,6 +73,7 @@ class PolygonCollider {
         this.position = vertices.reduce((a, b) => PhysicsVector.add(a, b)).div(vertices.length);
         let bounds = Bounds.fromPolygon(this);
         this.mass = bounds.width * bounds.height;
+        this.inertia = this.mass / 12 * (bounds.width ** 2 + bounds.height ** 2); // TODO: FIX THE UNIVERSE
     }
     getModel(pos, cos, sin) {
         let poly = new PolygonCollider(this.vertices.map(vert => {
@@ -85,6 +90,7 @@ class CircleCollider {
         this.position = new PhysicsVector(x, y);
         this.radius = radius;
         this.mass = this.radius * this.radius * Math.PI;
+        this.inertia = this.mass / 4 * this.radius ** 2;
     }
     getModel(pos, cos, sin) {
         let circ = new CircleCollider(this.position.x + pos.x, this.position.y + pos.y, this.radius);
@@ -183,6 +189,7 @@ class RigidBody {
         this.angularVelocity = 0;
 
         this.mass = 0;
+        this.inertia = 0;
 
         this.restitution = 0;
         this.canMoveThisStep = true;
@@ -192,6 +199,15 @@ class RigidBody {
         this.engine = null;
 
         this.canRotate = true;
+        this.isTrigger = false;
+    }
+    set angle(a) {
+        this._angle = a;
+        this.cosAngle = Math.cos(a);
+        this.sinAngle = Math.sin(a);
+    }
+    get angle() {
+        return this._angle;
     }
     getModels() {
         let pos = this.position;
@@ -217,7 +233,10 @@ class RigidBody {
         }
 
         this.shapes.push(...shapes);
-        for (let sha of shapes) this.mass += sha.mass;
+        for (let sha of shapes) {
+            this.mass += sha.mass;
+            this.inertia += sha.inertia;
+        }
         return shapes;
     }
     integrate() {
@@ -229,14 +248,17 @@ class RigidBody {
         }
     }
     pointVelocity(p) {
-        return PhysicsVector.add(this.velocity, PhysicsVector.normal(PhysicsVector.sub(p, this.position)).mul(this.angularVelocity));
+        let r = PhysicsVector.sub(p, this.position);
+        return PhysicsVector.add(this.velocity, new PhysicsVector(-r.y * this.angularVelocity, r.x * this.angularVelocity));
     }
     applyImpulse(pos, imp) {
-        imp.div(this.mass);
-        this.velocity.add(imp);
+        //linear
+        this.velocity.add(PhysicsVector.div(imp, this.mass));
+
+        //angular
         let radius = PhysicsVector.sub(pos, this.position);
-        let cross = -PhysicsVector.cross(imp, radius) / PhysicsVector.sqrMag(radius);
-        if (cross && this.canRotate) this.angularVelocity += cross;
+        let cross = PhysicsVector.cross(radius, imp);
+        if (cross && this.canRotate) this.angularVelocity += cross / this.inertia;
     }
     static fromPolygon(vertices, type = RigidBody.DYNAMIC) {
         let position = vertices.reduce((a, b) => PhysicsVector.add(a, b));
@@ -264,7 +286,6 @@ class RigidBody {
 }
 RigidBody.DYNAMIC = Symbol("DYNAMIC");
 RigidBody.STATIC = Symbol("STATIC");
-RigidBody.TRIGGER = Symbol("TRIGGER");
 RigidBody.nextID = 0;
 
 //detection
@@ -513,6 +534,17 @@ class CollisionResolver {
     constructor(engine) {
         this.engine = engine;
     }
+    getJ(vAB, mA, mB, iA, iB, e, n, rA, rB) {
+        // let inertiaTerm = ((rA × n) × rA) ÷ iA + ((rB × n) × rB) ÷ iB) · n;// nice
+        //optimized
+        let inertiaTerm = (n.x ** 2 * (iB * rA.y ** 2 + iA * rB.y ** 2)
+        + n.y ** 2 * (iB * rA.x ** 2 + iA * rB.x ** 2)
+        + n.x * n.y * (2 * iB * rA.x * rA.y + 2 * iA * rB.x * rB.y)) / (iA * iB);
+
+        let invMassSum = 1 / mA + 1 / mB + inertiaTerm;
+        let j = (1 + e) * PhysicsVector.dot(vAB, n) / invMassSum;
+        return j;
+    }
     dynamicResolve(bodyA, bodyB, direction, penetration, contacts) {
         let move = PhysicsVector.mul(direction, penetration);
         let moveA = PhysicsVector.mul(move, bodyB.mass / (bodyA.mass + bodyB.mass));
@@ -532,25 +564,21 @@ class CollisionResolver {
             let factor = contact.penetration / totalPenetration;
 
             //normal
-            let velA = bodyA.pointVelocity(contact.point);
-            let velB = bodyB.pointVelocity(contact.point);
-            let impulseDir = direction;
+            let vAB = bodyB.pointVelocity(contact.point).sub(bodyA.pointVelocity(contact.point));
+            let rA = PhysicsVector.sub(contact.point, bodyA.position);
+            let rB = PhysicsVector.sub(contact.point, bodyB.position);
             let e = Math.max(bodyA.restitution, bodyB.restitution);
-            let invMassSum = 1 / bodyA.mass + 1 / bodyB.mass
-            let j_n = (1 + e) / invMassSum;
-            j_n *= PhysicsVector.dot(PhysicsVector.sub(velB, velA), impulseDir);
-            j_n *= factor;
+            let n = direction;
+            let j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
 
-            let impulseA_n = PhysicsVector.mul(impulseDir, j_n);
+            let impulseA_n = PhysicsVector.mul(direction, j_n);
             let impulseB_n = PhysicsVector.invert(impulseA_n);
 
             //friction
-            impulseDir = PhysicsVector.normal(direction);
-            let j_t = 1 / invMassSum;
-            j_t *= PhysicsVector.dot(PhysicsVector.sub(velB, velA), impulseDir);
-            j_t *= factor * this.engine.friction;
+            let t = PhysicsVector.normal(direction);
+            let j_t = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, t, rA, rB) * factor * this.engine.friction;
 
-            let impulseA_t = PhysicsVector.mul(impulseDir, j_t);
+            let impulseA_t = PhysicsVector.mul(t, j_t);
             let impulseB_t = PhysicsVector.invert(impulseA_t);
 
 
@@ -578,13 +606,17 @@ class CollisionResolver {
             let contact = contacts[i];
             let factor = contact.penetration / totalPenetration;
 
-            let impulseDir = direction;
-            let pVel = bodyA.pointVelocity(contact.point);
-            let impulseA_n = PhysicsVector.mul(impulseDir, -PhysicsVector.dot(pVel, impulseDir) * bodyA.mass * factor);
+            let n = direction;
+            let vAB = bodyA.pointVelocity(contact.point);
+            let e = bodyA.restitution;
+            let rA = PhysicsVector.sub(contact.point, bodyA.position);
+            let rB = new PhysicsVector(0, 0);
+            let j_n = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, n, rA, rB) * factor;
+            let impulseA_n = PhysicsVector.mul(n, j_n);
 
-            impulseDir = PhysicsVector.normal(direction);
-            let impulseA_t = PhysicsVector.mul(impulseDir, -PhysicsVector.dot(pVel, impulseDir) * bodyA.mass * factor * this.engine.friction);
-
+            let t = PhysicsVector.normal(n);
+            let j_t = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, t, rA, rB) * factor * this.engine.friction;
+            let impulseA_t = PhysicsVector.mul(t, j_t);
 
             impulsesA.push({ point: contact.point, impulse: PhysicsVector.add(impulseA_n, impulseA_t) });
         }
@@ -760,7 +792,7 @@ class PhysicsEngine {
                         body.prohibitedDirections.push(collisionDirection);
                     }
                     this.oncollide(body, body2, collisionDirection);
-                    if (body.type === RigidBody.TRIGGER || body2.type === RigidBody.TRIGGER) continue;
+                    if (body.isTrigger || body2.isTrigger) continue;
                     contacts = [...new Set(contacts)];
                     if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
                     else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
