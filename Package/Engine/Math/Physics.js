@@ -25,6 +25,14 @@ class PhysicsVector {
         this.y /= b;
         return this;
     }
+    normalize() {
+        let m = PhysicsVector.mag(this);
+        if (m) {
+            this.x /= m;
+            this.y /= m;
+        }
+        return this;
+    }
     static add(a, b) {
         return new PhysicsVector(a.x + b.x, a.y + b.y);
     }
@@ -70,7 +78,10 @@ PhysicsVector.__ = [new PhysicsVector(0, 0), new PhysicsVector(0, 0), new Physic
 class PolygonCollider {
     constructor(vertices) {
         this.vertices = vertices;
-        this.position = vertices.reduce((a, b) => PhysicsVector.add(a, b)).div(vertices.length);
+        let acc = this.vertices[0];
+        this.position = new PhysicsVector(acc.x, acc.y);
+        for (let i = 1; i < this.vertices.length; i++) this.position.add(this.vertices[i]);
+        this.position.div(this.vertices.length);
         this.bounds = Bounds.fromPolygon(this);
     }
     size() {
@@ -82,7 +93,6 @@ class PolygonCollider {
             let t_y = vert.x * sin + vert.y * cos + pos.y;
             return new PhysicsVector(t_x, t_y);
         }));
-        poly.bounds = Bounds.fromPolygon(poly);
         return poly;
     }
 }
@@ -112,12 +122,16 @@ class Grid {
         if (!this.cells[x][y]) this.cells[x][y] = [];
         this.cells[x][y].push(shape);
     }
-    query(cells) {
+    query(body, cells) {
         let bodies = [];
+        let found = [];
+        found[body.id] = true;
         for (let i = 0; i < cells.length; i++) {
-            if (this.cells[cells[i].x] && this.cells[cells[i].x][cells[i].y]) bodies.push(...this.cells[cells[i].x][cells[i].y]);
+            let cl = cells[i];
+            // if (this.cells[cl.x] && this.cells[cl.x][cl.y]) 
+            bodies.push(...this.cells[cl.x][cl.y].filter(b => !found[b.id] ? found[b.id] = true : false));
         }
-        return [...new Set(bodies)];
+        return bodies;
     }
     cellsBounds(body, bounds) {
         let cells = [];
@@ -166,6 +180,9 @@ class Bounds {
         this.y = y;
         this.width = w;
         this.height = h;
+    }
+    static notOverlap(a, b) {
+        return a.x + a.width < b.x || a.x > b.x + b.width || a.y + a.height < b.y || a.y > b.y + b.height;
     }
     static overlap(a, b) {
         return a.x + a.width > b.x && b.x + b.width > a.x && a.y + a.height > b.y && b.y + b.height > a.y;
@@ -219,7 +236,7 @@ class RigidBody {
         this.canRotate = true;
         this.isTrigger = false;
 
-        this.__models = [];
+        this.__models = null;
     }
     set angle(a) {
         this._angle = a;
@@ -231,6 +248,7 @@ class RigidBody {
     }
     cacheModels() {
         this.__models = this.getModels();
+        return this.__models;
     }
     getModels() {
         let pos = this.position;
@@ -271,16 +289,15 @@ class RigidBody {
         }
     }
     pointVelocity(p) {
-        let r = PhysicsVector.sub(p, this.position);
-        return PhysicsVector.add(this.velocity, new PhysicsVector(-r.y * this.angularVelocity, r.x * this.angularVelocity));
+        return new PhysicsVector(-(p.y - this.position.y) * this.angularVelocity, (p.x - this.position.x) * this.angularVelocity).add(this.velocity);
     }
     applyImpulse(pos, imp) {
         //linear
-        this.velocity.add(PhysicsVector.div(imp, this.mass));
+        this.velocity.x += imp.x / this.mass;
+        this.velocity.y += imp.y / this.mass;
 
         //angular
-        let radius = PhysicsVector.sub(pos, this.position);
-        let cross = PhysicsVector.cross(radius, imp);
+        let cross = (pos.x - this.position.x) * imp.y - (pos.y - this.position.y) * imp.x;
         if (cross && this.canRotate) this.angularVelocity += cross / this.inertia;
     }
     static fromPolygon(vertices, type = RigidBody.DYNAMIC) {
@@ -317,7 +334,7 @@ class CollisionDetector {
         this.engine = engine;
     }
     collide(shapeA, shapeB) {
-        if (!Bounds.overlap(shapeA.bounds, shapeB.bounds)) return null;
+        if (Bounds.notOverlap(shapeA.bounds, shapeB.bounds)) return null;
         return this[shapeA.constructor.name + "_" + shapeB.constructor.name](shapeA, shapeB);
     }
     CircleCollider_PolygonCollider(a, b) {
@@ -407,9 +424,9 @@ class CollisionDetector {
         let between = PhysicsVector.sub(b.position, a.position);
         let sqrMag = PhysicsVector.sqrMag(between);
         if (sqrMag < (a.radius + b.radius) ** 2) {
-            let axis = PhysicsVector.normalize(between);
-            let pointA = PhysicsVector.add(a.position, PhysicsVector.mul(axis, a.radius));
-            let pointB = PhysicsVector.add(b.position, PhysicsVector.mul(axis, -b.radius));
+            let axis = between.normalize();
+            let pointA = PhysicsVector.mul(axis, a.radius).add(a.position);
+            let pointB = PhysicsVector.mul(axis, -b.radius).add(b.position);
             let point = PhysicsVector.add(pointA, pointB).div(2);
             return new CollisionDetector.Collision(
                 axis,
@@ -493,7 +510,8 @@ class CollisionDetector {
 
         //A contacts
         let validAVerts = [];
-        for (let i = 0; i < a.vertices.length; i++) validAVerts.push(!!bAxes.length);
+        let aFill = !!bAxes.length;
+        for (let i = 0; i < a.vertices.length; i++) validAVerts.push(aFill);
         for (let i = 0; i < bAxes.length; i++) {
             let { min, max } = proj[0][i];
             for (let j = 0; j < a.vertices.length; j++) {
@@ -509,11 +527,12 @@ class CollisionDetector {
                 let dot = PhysicsVector.dot(contact, bestAxis);
                 let pen = (dot < bMid) ? dot - bMin : bMax - dot;
                 return new CollisionDetector.Contact(contact, pen);
-            })
+            });
 
         //B contacts
         let validBVerts = [];
-        for (let i = 0; i < b.vertices.length; i++) validBVerts.push(!!aAxes.length);
+        let bFill = !!aAxes.length;
+        for (let i = 0; i < b.vertices.length; i++) validBVerts.push(bFill);
         for (let i = 0; i < aAxes.length; i++) {
             let { min, max } = proj[1][i];
             for (let j = 0; j < b.vertices.length; j++) {
@@ -530,6 +549,8 @@ class CollisionDetector {
                 let pen = (dot < aMid) ? dot - aMin : aMax - dot;
                 return new CollisionDetector.Contact(contact, pen);
             });
+
+        //end
         let contacts = [...contactsA, ...contactsB];
         if (!contacts.length || contacts.length === a.vertices.length + b.vertices.length) {
             let col = new CollisionDetector.Collision(bestAxis, []);
@@ -594,7 +615,7 @@ class CollisionResolver {
             let n = direction;
             let j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
 
-            let impulseA_n = PhysicsVector.mul(direction, j_n);
+            let impulseA_n = PhysicsVector.mul(n, j_n);
             let impulseB_n = PhysicsVector.invert(impulseA_n);
 
             //friction
@@ -605,13 +626,15 @@ class CollisionResolver {
             let impulseB_t = PhysicsVector.invert(impulseA_t);
 
 
-            impulsesA.push({ point: contact.point, impulse: PhysicsVector.add(impulseA_n, impulseA_t) });
-            impulsesB.push({ point: contact.point, impulse: PhysicsVector.add(impulseB_n, impulseB_t) });
+            impulsesA.push({ point: contact.point, impulse: impulseA_n.add(impulseA_t) });
+            impulsesB.push({ point: contact.point, impulse: impulseB_n.add(impulseB_t) });
         }
-        for (let impulse of impulsesA) {
+        for (let i = 0; i < impulsesA.length; i++) {
+            let impulse = impulsesA[i];
             bodyA.applyImpulse(impulse.point, impulse.impulse);
         }
-        for (let impulse of impulsesB) {
+        for (let i = 0; i < impulsesB.length; i++) {
+            let impulse = impulsesB[i];
             bodyB.applyImpulse(impulse.point, impulse.impulse);
         }
     }
@@ -739,7 +762,7 @@ class PhysicsEngine {
         this.constraintIterations = 3;
         this.oncollide = (a, b, dir) => null;
         this.polygonVertexListSubdivider = null;
-        this.iterations = 3;
+        this.iterations = 2;
     }
     addConstraint(constraint) {
         this.constraints.push(constraint);
@@ -756,7 +779,7 @@ class PhysicsEngine {
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
             if (body.type === RigidBody.STATIC) continue;
-            body.velocity = PhysicsVector.add(body.velocity, this.gravity);
+            body.velocity.add(this.gravity);
             body.velocity.mul(this.linearDrag);
             body.angularVelocity *= this.angularDrag;
         }
@@ -768,35 +791,39 @@ class PhysicsEngine {
             body.integrate(intensity);
         }
     }
-    collisions(order, grid, collisionPairs) {
+    collisions(order, dynBodies, collisionPairs) {
         this.bodies.sort(order);
         //collisions
-        for (let i = 0; i < this.bodies.length; i++) {
-            let body = this.bodies[i];
-            if (body.type === RigidBody.STATIC) continue;
+        for (let i = 0; i < dynBodies.length; i++) {
+            let body = dynBodies[i];
             //mobilize
             body.canMoveThisStep = true;
             body.prohibitedDirections = [];
 
 
-            let others = grid.query(collisionPairs.get(body)).filter(body.collisionFilter);
-            let collidable = [...others.filter(e => e.type === RigidBody.DYNAMIC), ...others.filter(e => e.type === RigidBody.STATIC)];
+            let others = collisionPairs.get(body);
+            // for (let el of others) {
+            //     c.stroke(cl.ORANGE, 1).arrow(body.position, el.position);
+            // }
+            let collidable = others//[...others.filter(e => e.type === RigidBody.DYNAMIC), ...others.filter(e => e.type === RigidBody.STATIC)];
             for (let j = 0; j < collidable.length; j++) {
                 let collisions = [];
                 let body2 = collidable[j];
-                if (body2 === body) continue;
-                let shapesA = body.__models;
-                let shapesB = body2.__models;
+                let shapesA = body.__models || body.cacheModels();
+                let shapesB = body2.__models || body2.cacheModels();
+                
                 for (let sI = 0; sI < shapesA.length; sI++) for (let sJ = 0; sJ < shapesB.length; sJ++) {
                     let shapeA = shapesA[sI];
                     let shapeB = shapesB[sJ];
-                    collisions.push(this.collisionDetector.collide(shapeA, shapeB));
+                    let col = this.collisionDetector.collide(shapeA, shapeB);
+                    collisions.push(col);
                 }
 
                 let contacts = [];
                 let maxPenetration = -Infinity;
                 let best = null;
-                for (let collision of collisions) {
+                for (let ci = 0; ci < collisions.length; ci++) {
+                    let collision = collisions[ci];
                     if (collision) {
                         if (collision.penetration > maxPenetration) {
                             maxPenetration = collision.penetration;
@@ -836,7 +863,7 @@ class PhysicsEngine {
         }
     }
     cacheModels() {
-        for (let i = 0; i < this.bodies.length; i++) this.bodies[i].cacheModels();
+        for (let i = 0; i < this.bodies.length; i++) this.bodies[i].__models = null;
     }
     run() {
         let cellsize = 100;
@@ -849,7 +876,7 @@ class PhysicsEngine {
         let collisionPairs = new Map();
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
-            let models = body.getModels();
+            let models = body.__models || body.getModels();
             let cellsTotal = [];
             for (let j = 0; j < models.length; j++) {
                 let model = models[j];
@@ -858,10 +885,19 @@ class PhysicsEngine {
             }
             collisionPairs.set(body, cellsTotal);
         }
-
-        // for (let i in grid.cells) if (grid.cells[i]) for (let j in grid.cells[i]) if (typeof grid.cells[i][j] === "object") {
-        //     c.stroke(cl.RED, 2).rect(i * cellsize, j * cellsize, cellsize, cellsize);
-        // }
+        let dynBodies = this.bodies.filter(body => body.type === RigidBody.DYNAMIC);
+        for (let i = 0; i < dynBodies.length; i++) {
+            let body = dynBodies[i];
+            let cellsTotal = collisionPairs.get(body);
+            let bodies = grid.query(body, cellsTotal).filter(body.collisionFilter);
+            collisionPairs.set(body, bodies);
+        }
+        if (false) for (let i in grid.cells) if (grid.cells[i]) for (let j in grid.cells[i]) if (typeof grid.cells[i][j] === "object") {
+            c.stroke(cl.RED, 2).rect(i * cellsize, j * cellsize, cellsize, cellsize);
+            for (let el of grid.cells[i][j]) {
+                c.stroke(cl.ORANGE, 1).arrow(i * cellsize, j * cellsize, el.position.x, el.position.y);
+            }
+        }
         this.applyForces();
         let intensity = 1 / this.iterations;
         for (let i = 0; i < this.iterations; i++) {
@@ -874,11 +910,11 @@ class PhysicsEngine {
             this.integrate(intensity);
             this.cacheModels();
             this.solveConstraints();
-            this.collisions(gravitySort, grid, collisionPairs);
+            this.collisions(gravitySort, dynBodies, collisionPairs);
             this.integrate(intensity);
             this.cacheModels();
             this.solveConstraints();
-            this.collisions(inverseGravitySort, grid, collisionPairs);
+            this.collisions(inverseGravitySort, dynBodies, collisionPairs);
         }
     }
     getBody(id) {
