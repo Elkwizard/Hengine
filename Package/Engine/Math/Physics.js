@@ -1,5 +1,54 @@
 //vectors
 const INFINITY = 1e135;
+class PhysicsMath {
+    static intersectLine(A, A1, B, B1) {
+        let m_A = (A1.y - A.y) / (A1.x - A.x);
+        let b_A = A.y - m_A * A.x;
+        let m_B = (B1.y - B.y) / (B1.x - B.x);
+        let b_B = B.y - m_B * B.x;
+        
+        if (m_A === m_B) return null;
+        
+        let x = (b_B - b_A) / (m_A - m_B);
+        if (m_A === Infinity) {
+            let x = A.x;
+            let y = m_B * x + b_B;
+            if (x < Math.min(B.x, B1.x)) return null;
+            if (x > Math.max(B.x, B1.x)) return null;
+            if (y < Math.min(A.y, A1.y)) return null;
+            if (y > Math.max(A.y, A1.y)) return null;
+            return { x, y };
+        }
+
+        if (m_B === Infinity) {
+            let x = B.x;
+            let y = m_A * x + b_A;
+            if (x < Math.min(A.x, A1.x)) return null;
+            if (x > Math.max(A.x, A1.x)) return null;
+            if (y < Math.min(B.y, B1.y)) return null;
+            if (y > Math.max(B.y, B1.y)) return null;
+            return { x, y };
+        }
+        if (x < Math.min(A.x, A1.x)) return null;
+        if (x > Math.max(A.x, A1.x)) return null;
+        if (x < Math.min(B.x, B1.x)) return null;
+        if (x > Math.max(B.x, B1.x)) return null;
+
+        let y = m_A * x + b_A;
+        return { x, y };
+    }
+    static intersectPolygon(a, b) {
+        let points = [];
+        
+        for (let i = 0; i < a.length; i++) for (let j = 0; j < b.length; j++) {
+            let p = PhysicsVector.intersectLine(a[i][0], a[i][1], b[j][0], b[j][1]);
+            if (p) points.push(p);
+        }
+        if (!points.length) return points;
+
+        return points;
+    }
+}
 class PhysicsVector {
     constructor(x, y) {
         this.x = x;
