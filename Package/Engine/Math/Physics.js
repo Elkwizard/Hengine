@@ -494,160 +494,60 @@ class CollisionDetector {
     }
     PolygonCollider_PolygonCollider(a, b) {
         let toB = PhysicsVector.sub(b.position, a.position);
+        let aAxes = a.axes.filter(ax => PhysicsVector.dot(ax, toB) > 0)
+        let bAxes = b.axes.filter(ax => PhysicsVector.dot(ax, toB) > 0);
 
-        let inter = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
-        
-        //no intersection
-        if (inter.length < 2) return null;
+        let axes = [aAxes, bAxes];
+        let proj = [
+            new Array(bAxes.length),
+            new Array(aAxes.length)
+        ];
+        let minOverlap = Infinity;
+        let bestIndex = [null, null];
+        let bestRange = [];
+        for (let i = 0; i < axes.length; i++) for (let I = 0; I < axes[i].length; I++) {
+            axes[i][I] = PhysicsVector.normalize(axes[i][I]);
+            let axis = axes[i][I];
+            let aMin = Infinity;
+            let aMax = -Infinity;
+            let bMin = Infinity;
+            let bMax = -Infinity;
+            for (let j = 0; j < a.vertices.length; j++) {
+                let dot = PhysicsVector.dot(a.vertices[j], axis);
+                if (dot < aMin) aMin = dot;
+                if (dot > aMax) aMax = dot;
+            }
+            for (let j = 0; j < b.vertices.length; j++) {
+                let dot = PhysicsVector.dot(b.vertices[j], axis);
+                if (dot < bMin) bMin = dot;
+                if (dot > bMax) bMax = dot;
+            }
+            if (aMax < bMin || aMin > bMax) return null;
 
-        inter = inter
-            .map(p => [
-                p,
-                (p.x - b.position.x) ** 2 + (p.y - b.position.y) ** 2
-            ])
-            .sort((a, b) => a[1] - b[1])
-            .slice(0, 2)
-            .map(con => con[0])
+            if (i) proj[0][I] = { min: bMin, max: bMax };
+            else proj[1][I] = { min: aMin, max: aMax };
 
-        //axes
-        let aAxes = a.axes.filter(ax => PhysicsVector.dot(toB, ax) >= 0);
-        let bAxes = b.axes.filter(ax => PhysicsVector.dot(toB, ax) < 0).map(ax => ax.mul(-1));
-
-        if (!aAxes.length && !bAxes.length) return null;
-
-        let dx = inter[1].x - inter[0].x;
-        let dy = inter[1].y - inter[0].y;
-        let mag = Math.sqrt(dx * dx + dy * dy);
-        dx /= mag;
-        dy /= mag;
-        let axis = new PhysicsVector(dy, -dx);
-        if (PhysicsVector.dot(axis, toB) < 0) axis.mul(-1);
-        let bestDot = -Infinity;
-        let best = null;
-        for (let i = 0; i < aAxes.length; i++) {
-            let dot = PhysicsVector.dot(aAxes[i], axis);
-            if (dot > bestDot) {
-                bestDot = dot;
-                best = aAxes[i];
+            let overlap = ((aMin + aMax) / 2 < (bMin + bMax) / 2) ? aMax - bMin : bMax - aMin;
+            if (overlap < minOverlap) {
+                minOverlap = overlap;
+                bestIndex = [i, I];
+                bestRange = [{ min: aMin, max: aMax }, { min: bMin, max: bMax }];
             }
         }
-        for (let i = 0; i < bAxes.length; i++) {
-            let dot = PhysicsVector.dot(bAxes[i], axis);
-            if (dot > bestDot) {
-                bestDot = dot;
-                best = bAxes[i];
-            }
-        }
-        if (!best) return null;
-        axis = best;
+        if (bestIndex[0] === null) return null;
+        if (!bestRange[0]) return null;
+        let bestAxis = axes[bestIndex[0]][bestIndex[1]];
+        if (!bestAxis) return null;
 
-        let aMin = Infinity;
-        let aMax = -Infinity;
-        for (let i = 0; i < a.vertices.length; i++) {
-            let dot = PhysicsVector.dot(a.vertices[i], axis);
-            if (dot < aMin) aMin = dot;
-            if (dot > aMax) aMax = dot;
-        }
-        
-        let bMin = Infinity;
-        let bMax = -Infinity;
-        for (let i = 0; i < b.vertices.length; i++) {
-            let dot = PhysicsVector.dot(b.vertices[i], axis);
-            if (dot < bMin) bMin = dot;
-            if (dot > bMax) bMax = dot;
-        }
+        let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
+        let contacts = intersections.map(contact => {
+                let pen = minOverlap / 2;
+                return new CollisionDetector.Contact(contact, pen);
+            });
 
-        let overlap = ((aMin + aMax) / 2 < (bMin + bMax) / 2) ? aMax - bMin : bMax - aMin;
-        
-        if (Math.abs(dx + dy) < 0.001) inter = [inter[0]];
-
-        let contacts = inter.map(cont => new CollisionDetector.Contact(new PhysicsVector(cont.x, cont.y), overlap / inter.length));
-        
-        let col = CollisionDetector.Collision.fromData(axis, contacts, overlap);
-
-        return col;
-
-
-        // let toB = PhysicsVector.sub(b.position, a.position);
-        // let aAxes = [];
-        // for (let i = 0; i < a.vertices.length; i++) {
-        //     let axis = PhysicsVector.normal(PhysicsVector.sub(a.vertices[i], a.vertices[(i + 1) % a.vertices.length]));
-        //     if (PhysicsVector.dot(axis, toB) > 0) aAxes.push(axis);
-        // }
-        // let bAxes = [];
-        // for (let i = 0; i < b.vertices.length; i++) {
-        //     let axis = PhysicsVector.normal(PhysicsVector.sub(b.vertices[(i + 1) % b.vertices.length], b.vertices[i]));
-        //     if (PhysicsVector.dot(axis, toB) > 0) bAxes.push(axis);
-        // }
-
-        // if (!aAxes.length || !bAxes.length) {
-        //     let aAxes = [];
-        //     for (let i = 0; i < a.vertices.length / 2; i++) {
-        //         let axis = PhysicsVector.normal(PhysicsVector.sub(a.vertices[i], a.vertices[(i + 1) % a.vertices.length]));
-        //         aAxes.push(axis);
-        //     }
-        //     let bAxes = [];
-        //     for (let i = 0; i < b.vertices.length / 2; i++) {
-        //         let axis = PhysicsVector.normal(PhysicsVector.sub(b.vertices[(i + 1) % b.vertices.length], b.vertices[i]));
-        //         bAxes.push(axis);
-        //     }
-        // }
-
-        // aAxes = aAxes;
-        // bAxes = bAxes;
-        // let axes = [aAxes, bAxes];
-        // let proj = [
-        //     new Array(bAxes.length),
-        //     new Array(aAxes.length)
-        // ];
-        // let minOverlap = Infinity;
-        // let bestIndex = [null, null];
-        // let bestRange = [];
-        // for (let i = 0; i < axes.length; i++) for (let I = 0; I < axes[i].length; I++) {
-        //     axes[i][I] = PhysicsVector.normalize(axes[i][I]);
-        //     let axis = axes[i][I];
-        //     let aMin = Infinity;
-        //     let aMax = -Infinity;
-        //     let bMin = Infinity;
-        //     let bMax = -Infinity;
-        //     for (let j = 0; j < a.vertices.length; j++) {
-        //         let dot = PhysicsVector.dot(a.vertices[j], axis);
-        //         if (dot < aMin) aMin = dot;
-        //         if (dot > aMax) aMax = dot;
-        //     }
-        //     for (let j = 0; j < b.vertices.length; j++) {
-        //         let dot = PhysicsVector.dot(b.vertices[j], axis);
-        //         if (dot < bMin) bMin = dot;
-        //         if (dot > bMax) bMax = dot;
-        //     }
-        //     if (aMax < bMin || aMin > bMax) return null;
-
-        //     if (i) proj[0][I] = { min: bMin, max: bMax };
-        //     else proj[1][I] = { min: aMin, max: aMax };
-
-        //     let overlap = ((aMin + aMax) / 2 < (bMin + bMax) / 2) ? aMax - bMin : bMax - aMin;
-        //     if (overlap < minOverlap) {
-        //         minOverlap = overlap;
-        //         bestIndex = [i, I];
-        //         bestRange = [{ min: aMin, max: aMax }, { min: bMin, max: bMax }];
-        //     }
-        // }
-        // if (bestIndex[0] === null) return null;
-        // if (!bestRange[0]) return null;
-        // let bestAxis = axes[bestIndex[0]][bestIndex[1]];
-        // if (!bestAxis) return null;
-
-        // let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
-        // let contacts = intersections.map(contact => {
-        //         let dot = PhysicsVector.dot(contact, bestAxis);
-        //         let pen = (dot < aMid) ? dot - aMin : aMax - dot;
-        //         return new CollisionDetector.Contact(contact, pen);
-        //     });
-
-        // if (!contacts.length || contacts.length === a.vertices.length + b.vertices.length) {
-        //     let col = new CollisionDetector.Collision(bestAxis, []);
-        //     col.penetration = minOverlap;
-        // } else return new CollisionDetector.Collision(bestAxis, contacts);
+        if (!contacts.length) {
+            return new CollisionDetector.Collision(bestAxis, [], minOverlap);
+        } else return new CollisionDetector.Collision(bestAxis, contacts, minOverlap);
     }
 }
 CollisionDetector.Collision = class {
