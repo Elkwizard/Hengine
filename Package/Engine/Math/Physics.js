@@ -44,7 +44,6 @@ class PhysicsMath {
             let p = PhysicsMath.intersectLine(a[i], a[(i + 1) % a.length], b[j], b[(j + 1) % b.length]);
             if (p) points.push(p);
         }
-        if (!points.length) return points;
 
         return points;
     }
@@ -217,13 +216,13 @@ class ShapeMass {
         return circ.radius ** 2 * Math.PI;
     }
     static inertiaCircleCollider(circ) {
-        return circ.radius ** 4 * Math.PI / 4;
+        return (circ.position.x ** 2 + circ.position.y ** 2) + circ.radius ** 4 * Math.PI / 4;
     }
     static massPolygonCollider(poly) {
         return poly.bounds.width * poly.bounds.height;
     }
     static inertiaPolygonCollider(poly) {
-        return (poly.bounds.width ** 3 * poly.bounds.height + poly.bounds.height ** 3 * poly.bounds.width) / 12;
+        return (poly.position.x ** 2 + poly.position.y ** 2) + (poly.bounds.width ** 3 * poly.bounds.height + poly.bounds.height ** 3 * poly.bounds.width) / 12;
     }
 }
 
@@ -281,6 +280,7 @@ class RigidBody {
         this.inertia = 0;
 
         this.restitution = 0;
+        this.friction = 0.2;
         this.canMoveThisStep = true;
         this.prohibitedDirections = [];
 
@@ -472,16 +472,14 @@ class CollisionDetector {
         if (col) {
             col.direction.mul(-1);
         }
-        return col || null;
+        return col;
     }
     CircleCollider_CircleCollider(a, b) {
         let between = PhysicsVector.sub(b.position, a.position);
         let sqrMag = PhysicsVector.sqrMag(between);
         if (sqrMag < (a.radius + b.radius) ** 2) {
             let axis = between.normalize();
-            let pointA = PhysicsVector.mul(axis, a.radius).add(a.position);
-            let pointB = PhysicsVector.mul(axis, -b.radius).add(b.position);
-            let point = PhysicsVector.add(pointA, pointB).div(2);
+            let point = new PhysicsVector((axis.x * a.radius + a.position.x + axis.x * -b.radius + b.position.x) / 2, (axis.y * a.radius + a.position.y + axis.y * -b.radius + b.position.y) / 2);
             return CollisionDetector.Collision.inferPenetration(
                 axis,
                 [new CollisionDetector.Contact(
@@ -493,6 +491,10 @@ class CollisionDetector {
         return null;
     }
     PolygonCollider_PolygonCollider(a, b) {
+
+        let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
+        if (intersections.length < 2) return null;
+
         let toB = PhysicsVector.sub(b.position, a.position);
         let aAxes = a.axes.filter(ax => PhysicsVector.dot(ax, toB) > 0)
         let bAxes = b.axes.filter(ax => PhysicsVector.dot(ax, toB) > 0);
@@ -531,19 +533,29 @@ class CollisionDetector {
             if (overlap < minOverlap) {
                 minOverlap = overlap;
                 bestIndex = [i, I];
-                bestRange = [{ min: aMin, max: aMax }, { min: bMin, max: bMax }];
+                bestRange = { aMin, aMax, bMin, bMax };
             }
         }
         if (bestIndex[0] === null) return null;
-        if (!bestRange[0]) return null;
         let bestAxis = axes[bestIndex[0]][bestIndex[1]];
         if (!bestAxis) return null;
 
-        let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
-        let contacts = intersections.map(contact => {
-                let pen = minOverlap / 2;
-                return new CollisionDetector.Contact(contact, pen);
-            });
+        let { aMin, aMax, bMin, bMax } = bestRange;
+        let rMin = 0;
+        let rMax = 0;
+        if ((aMin + aMax) / 2 < (bMin + bMax) / 2) {
+            rMin = bMin;
+            rMax = aMax;
+        } else {
+            rMin = aMin;
+            rMax = bMax;
+        }
+
+        let contacts = intersections
+        .map(contact => {
+            let pen = minOverlap / 2;
+            return new CollisionDetector.Contact(contact, pen);
+        });
 
         if (!contacts.length) {
             return new CollisionDetector.Collision(bestAxis, [], minOverlap);
@@ -599,6 +611,8 @@ class CollisionResolver {
 
         if (!penetration) return;
 
+        let friction = (bodyA.friction + bodyB.friction) / 2;
+
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
 
@@ -621,7 +635,7 @@ class CollisionResolver {
 
             //friction
             let t = PhysicsVector.normal(direction);
-            let j_t = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, t, rA, rB) * factor * this.engine.friction;
+            let j_t = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, t, rA, rB) * factor * friction;
 
             let impulseA_t = PhysicsVector.mul(t, j_t);
             let impulseB_t = PhysicsVector.invert(impulseA_t);
@@ -643,7 +657,9 @@ class CollisionResolver {
         let move = PhysicsVector.mul(direction, penetration);
         bodyA.position.sub(move);
 
-        if (penetration < 0.05) return;
+        if (!penetration) return;
+        
+        let friction = (bodyA.friction + bodyB.friction) / 2;
 
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
@@ -662,7 +678,7 @@ class CollisionResolver {
             let impulseA_n = PhysicsVector.mul(n, j_n);
 
             let t = PhysicsVector.normal(n);
-            let j_t = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, t, rA, rB) * factor * this.engine.friction;
+            let j_t = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, t, rA, rB) * factor * friction;
             let impulseA_t = PhysicsVector.mul(t, j_t);
 
             impulsesA.push({ point: contact.point, impulse: PhysicsVector.add(impulseA_n, impulseA_t) });
@@ -806,9 +822,6 @@ class PhysicsEngine {
 
 
             let others = collisionPairs.get(body);
-            // for (let el of others) {
-            //     c.stroke(cl.ORANGE, 1).arrow(body.position, el.position);
-            // }
             let collidable = others//[...others.filter(e => e.type === RigidBody.DYNAMIC), ...others.filter(e => e.type === RigidBody.STATIC)];
             for (let j = 0; j < collidable.length; j++) {
                 let collisions = [];
@@ -929,6 +942,7 @@ class PhysicsEngine {
     }
     addBody(b) {
         b.engine = this;
+        b.friction = this.friction;
         this.bodies.push(b);
     }
     removeBody(id) {
