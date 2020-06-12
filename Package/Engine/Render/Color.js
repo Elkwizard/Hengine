@@ -297,7 +297,7 @@ class Color extends Operable {
 		}
 	}
 	op(fn, v) {
-		this.super_op(fn, v);
+		super.op(fn, v);
 		this.constrain();
 		return this;
 	}

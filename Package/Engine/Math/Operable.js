@@ -7,14 +7,6 @@ class Operable {
         for (let x of this.constructor.modValues) args.push(this[x]);
         return new this.constructor(...args);
     }
-    super_op(v, fn) {
-        if (typeof v === "number") {
-            for (let x of this.constructor.modValues) this[x] = fn(this[x], v);
-        } else {
-            for (let x of this.constructor.modValues) this[x] = fn(this[x], v[x]);
-        }
-        return this;
-    }
     op(v, fn) {
         if (typeof v === "number") {
             for (let x of this.constructor.modValues) this[x] = fn(this[x], v);
