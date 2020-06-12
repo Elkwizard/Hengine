@@ -97,6 +97,10 @@ class Engine {
 		let bound = wrapper.getClientRects()[0];
 		let W = bound.width;
 		let H = bound.height;
+		if (wrapper === document.body) {
+			W = innerWidth;
+			H = innerHeight;
+		}
 		if (!utility) {
 			canvas = document.createElement("canvas");
 			canvas.id = "Engine Canvas";
