@@ -349,7 +349,6 @@ class RigidBody {
         //linear
         this.velocity.x += imp.x / this.mass;
         this.velocity.y += imp.y / this.mass;
-
         //angular
         let cross = (pos.x - this.position.x) * imp.y - (pos.y - this.position.y) * imp.x;
         if (cross && this.canRotate) this.angularVelocity += cross / this.inertia;
@@ -552,10 +551,11 @@ class CollisionDetector {
         }
 
         let contacts = intersections
-        .map(contact => {
-            let pen = minOverlap / 2;
-            return new CollisionDetector.Contact(contact, pen);
-        });
+            .map(contact => {
+                let dot = PhysicsVector.dot(contact, bestAxis);
+                let pen = Math.abs(rMax - dot + rMin);
+                return new CollisionDetector.Contact(contact, pen || minOverlap / 2);
+            });
 
         if (!contacts.length) {
             return new CollisionDetector.Collision(bestAxis, [], minOverlap);
@@ -611,7 +611,7 @@ class CollisionResolver {
 
         if (!penetration) return;
 
-        let friction = (bodyA.friction + bodyB.friction) / 2;
+        let friction = (bodyA.friction + bodyB.friction) / 2 / this.engine.iterations;
 
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
@@ -659,7 +659,7 @@ class CollisionResolver {
 
         if (!penetration) return;
         
-        let friction = (bodyA.friction + bodyB.friction) / 2;
+        let friction = (bodyA.friction + bodyB.friction) / 2 / this.engine.iterations;
 
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
@@ -777,7 +777,7 @@ class PhysicsEngine {
         this.collisionResolver = new CollisionResolver(this);
         this.linearDrag = 0.995;
         this.angularDrag = 0.995;
-        this.friction = 0.2;
+        this.friction = 0.8;
         this.constraints = [];
         this.constraintIterations = 3;
         this.oncollide = (a, b, dir) => null;
