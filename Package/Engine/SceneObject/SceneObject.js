@@ -111,9 +111,9 @@ class SceneObject {
 				term = "C " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.radius.toFixed(0);
 			}
 			if (shape instanceof Rect) {
-				term = "R " + shape.rotation.toFixed(0) + " " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.width.toFixed(0) + " " + shape.height.toFixed(0);
+				term = "R " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.width.toFixed(0) + " " + shape.height.toFixed(0);
 			} else if (shape instanceof Polygon) {
-				term = "P " + shape.rotation.toFixed(0) + " " + shape.vertices.map(e => e.x.toFixed(0) + "|" + e.y.toFixed(0)).join(" ");
+				term = "P " + shape.vertices.map(e => e.x.toFixed(0) + "|" + e.y.toFixed(0)).join(" ");
 			}
 			result.push(term);
 		}
@@ -129,10 +129,10 @@ class SceneObject {
 					result.push(new Circle(args[0], args[1], args[2]));
 					break;
 				case "R":
-					result.push(new Rect(args[1], args[2], args[3], args[4], args[0]));
+					result.push(new Rect(args[0], args[1], args[2], args[3]));
 					break;
 				case "P":
-					result.push(new Polygon(shape.split(" ").slice(2).map(e => new Vector2(parseFloat(e.split("|")[0]), parseFloat(e.split("|")[1]))), args[0]))
+					result.push(new Polygon(shape.split(" ").slice(1).map(e => new Vector2(parseFloat(e.split("|")[0]), parseFloat(e.split("|")[1])))))
 					break;
 			}
 		}

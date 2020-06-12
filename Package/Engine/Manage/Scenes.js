@@ -45,11 +45,7 @@ class InactiveScene {
 		} else if (el instanceof UIObject) {
 			n = this.addUI(el.name + " - copy", el.x, el.y, el.width, el.height);
 		} else if (el instanceof PhysicsObject) {
-			n = this.addPhysicsElement(el.name + " - copy", el.x, el.y, !el.completelyStatic, { ...el.controls }, el.tag);
-			n.positionStatic = el.positionStatic;
-			n.rotationStatic = el.rotationStatic;
-			n.hasGravity = el.hasGravity;
-			n.slows = el.slows;
+			n = this.addPhysicsElement(el.name + " - copy", el.x, el.y, el.body.type === RigidBody.DYNAMIC, { ...el.controls }, el.tag);
 			n.rotation = el.rotation;
 		} else {
 			n = this.addElement(el.name + " - copy", el.x, el.y, { ...el.controls }, el.tag);

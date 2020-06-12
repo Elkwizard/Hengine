@@ -491,14 +491,31 @@ class CollisionDetector {
         return null;
     }
     PolygonCollider_PolygonCollider(a, b) {
-
-        let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
-        if (intersections.length < 2) return null;
-
         let toB = PhysicsVector.sub(b.position, a.position);
-        let aAxes = a.axes.filter(ax => PhysicsVector.dot(ax, toB) > 0)
-        let bAxes = b.axes.filter(ax => PhysicsVector.dot(ax, toB) > 0);
-
+        let aAxes = [];
+        for (let i = 0; i < a.vertices.length; i++) {
+            let axis = PhysicsVector.normal(PhysicsVector.sub(a.vertices[i], a.vertices[(i + 1) % a.vertices.length]));
+            if (PhysicsVector.dot(axis, toB) > 0) aAxes.push(axis);
+        }
+        let bAxes = [];
+        for (let i = 0; i < b.vertices.length; i++) {
+            let axis = PhysicsVector.normal(PhysicsVector.sub(b.vertices[(i + 1) % b.vertices.length], b.vertices[i]));
+            if (PhysicsVector.dot(axis, toB) > 0) bAxes.push(axis);
+        }
+        if (!aAxes.length || !bAxes.length) {
+            let aAxes = [];
+            for (let i = 0; i < a.vertices.length / 2; i++) {
+                let axis = PhysicsVector.normal(PhysicsVector.sub(a.vertices[i], a.vertices[(i + 1) % a.vertices.length]));
+                aAxes.push(axis);
+            }
+            let bAxes = [];
+            for (let i = 0; i < b.vertices.length / 2; i++) {
+                let axis = PhysicsVector.normal(PhysicsVector.sub(b.vertices[(i + 1) % b.vertices.length], b.vertices[i]));
+                bAxes.push(axis);
+            }
+        }
+        aAxes = aAxes;
+        bAxes = bAxes;
         let axes = [aAxes, bAxes];
         let proj = [
             new Array(bAxes.length),
@@ -525,41 +542,68 @@ class CollisionDetector {
                 if (dot > bMax) bMax = dot;
             }
             if (aMax < bMin || aMin > bMax) return null;
-
             if (i) proj[0][I] = { min: bMin, max: bMax };
             else proj[1][I] = { min: aMin, max: aMax };
-
             let overlap = ((aMin + aMax) / 2 < (bMin + bMax) / 2) ? aMax - bMin : bMax - aMin;
             if (overlap < minOverlap) {
                 minOverlap = overlap;
                 bestIndex = [i, I];
-                bestRange = { aMin, aMax, bMin, bMax };
+                bestRange = [{ min: aMin, max: aMax }, { min: bMin, max: bMax }];
             }
         }
         if (bestIndex[0] === null) return null;
+        if (!bestRange[0]) return null;
         let bestAxis = axes[bestIndex[0]][bestIndex[1]];
         if (!bestAxis) return null;
 
-        let { aMin, aMax, bMin, bMax } = bestRange;
-        let rMin = 0;
-        let rMax = 0;
-        if ((aMin + aMax) / 2 < (bMin + bMax) / 2) {
-            rMin = bMin;
-            rMax = aMax;
-        } else {
-            rMin = aMin;
-            rMax = bMax;
+        //A contacts
+        let validAVerts = [];
+        for (let i = 0; i < a.vertices.length; i++) validAVerts.push(!!bAxes.length);
+        let aFill = !!bAxes.length;
+        for (let i = 0; i < a.vertices.length; i++) validAVerts.push(aFill);
+        for (let i = 0; i < bAxes.length; i++) {
+            let { min, max } = proj[0][i];
+            for (let j = 0; j < a.vertices.length; j++) {
+                let dot = PhysicsVector.dot(a.vertices[j], bAxes[i]);
+                if (validAVerts[j] && (dot < min || dot > max)) validAVerts[j] = false;
+            }
         }
+        let { min: bMin, max: bMax } = bestRange[1];
+        let bMid = (bMin + bMax) / 2;
+        let contactsA = a.vertices
+            .filter((contact, inx) => validAVerts[inx])
+            .map(contact => {
+                let dot = PhysicsVector.dot(contact, bestAxis);
+                let pen = (dot < bMid) ? dot - bMin : bMax - dot;
+                return new CollisionDetector.Contact(contact, pen);
+            });
 
-        let contacts = intersections
-        .map(contact => {
-            let pen = minOverlap / 2;
-            return new CollisionDetector.Contact(contact, pen);
-        });
+        //B contacts
+        let validBVerts = [];
+        for (let i = 0; i < b.vertices.length; i++) validBVerts.push(!!aAxes.length);
+        let bFill = !!aAxes.length;
+        for (let i = 0; i < b.vertices.length; i++) validBVerts.push(bFill);
+        for (let i = 0; i < aAxes.length; i++) {
+            let { min, max } = proj[1][i];
+            for (let j = 0; j < b.vertices.length; j++) {
+                let dot = PhysicsVector.dot(b.vertices[j], aAxes[i]);
+                if (validBVerts[j] && (dot < min || dot > max)) validBVerts[j] = false;
+            }
+        }
+        let { min: aMin, max: aMax } = bestRange[0];
+        let aMid = (aMin + aMax) / 2;
+        let contactsB = b.vertices
+            .filter((contact, inx) => validBVerts[inx])
+            .map(contact => {
+                let dot = PhysicsVector.dot(contact, bestAxis);
+                let pen = (dot < aMid) ? dot - aMin : aMax - dot;
+                return new CollisionDetector.Contact(contact, pen);
+            });
 
-        if (!contacts.length) {
-            return new CollisionDetector.Collision(bestAxis, [], minOverlap);
-        } else return new CollisionDetector.Collision(bestAxis, contacts, minOverlap);
+        //end
+        let contacts = [...contactsA, ...contactsB];
+        if (contacts.length === a.vertices.length + b.vertices.length) contacts = [];
+        return new CollisionDetector.Collision(bestAxis, contacts, minOverlap);
     }
 }
 CollisionDetector.Collision = class {
@@ -822,7 +866,7 @@ class PhysicsEngine {
 
 
             let others = collisionPairs.get(body);
-            let collidable = others//[...others.filter(e => e.type === RigidBody.DYNAMIC), ...others.filter(e => e.type === RigidBody.STATIC)];
+            let collidable = [...others.filter(e => e.type === RigidBody.DYNAMIC), ...others.filter(e => e.type === RigidBody.STATIC)];
             for (let j = 0; j < collidable.length; j++) {
                 let collisions = [];
                 let body2 = collidable[j];
@@ -868,11 +912,7 @@ class PhysicsEngine {
                     this.oncollide(body, body2, collisionDirection);
                     if (body.isTrigger || body2.isTrigger) continue;
                     if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
-                    else {
-                        this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
-                        body2.cacheModels();
-                    }
-                    body.cacheModels();
+                    else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
                 }
             }
             //immobilize
