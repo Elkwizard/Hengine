@@ -380,7 +380,7 @@ class Hengine {
 	static async load(scripts, onload = () => null) {
 		let scriptHome = document.querySelectorAll("script"); //find yourself
 		for (let el of scriptHome) {
-			if (el.src.indexOf("Hengine") > -1) {
+			if (el.src.indexOf("Engine/Manage/Hengine") > -1) {
 				scriptHome = el;
 				break;
 			}
