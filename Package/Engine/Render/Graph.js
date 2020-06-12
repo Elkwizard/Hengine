@@ -1,8 +1,6 @@
 class Graph extends Frame {
-    constructor(yName, minValue, maxValue, getY, msLimit = 5000, colors, updater) {
+    constructor(yName, minValue, maxValue, getY, msLimit = 5000, colors = [{ color: "white", limit: maxValue }], updater = null) {
         super(400, 225);
-        updater.catchErrors = false;
-        if (!colors) colors = [];
         let c = new Frame(1, 1).c;
         this.leftOffset = Math.max(c.c.measureText(maxValue.toString()).width, c.c.measureText(minValue.toString()).width) + 10;
         this.bottomTextOffset = 5;
@@ -44,6 +42,7 @@ class Graph extends Frame {
         return this.mainGraphWidth * ((fV - this.timeOffset) / this.msLimit);
     }
     getColor(n) {
+        let black = (this.colorScheme.toLowerCase() == "dark") ? "black" : "white";
         for (let color of this.colors) {
             if (n >= color.limit) return color.color;
         }

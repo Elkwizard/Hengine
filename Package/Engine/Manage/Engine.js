@@ -84,7 +84,7 @@ class Engine {
 		this.afterUpdate = function () { };
 		this.fixedUpdate = function () { };
         this.afterFixedUpdate = function () { };
-		this.catchErrors = true;
+		this.catchErrors = false;
 		this.hasFixedPhysicsUpdateCycle = true;
 		try {
 			if (FunctionLibrary) {
@@ -277,7 +277,6 @@ class Engine {
 		for (let graph of this.graphs) {
 			for (let key in graph.vars) {
 				let data = P(t, graph.vars[key].getY(t));
-				// graph.vars[key].permanentData += data.x + "," + data.y + " ";
 				graph.vars[key].data.push(data);
 				if (graph.vars[key].data.length > graph.msLimit / 16) graph.vars[key].data.shift();
 			}

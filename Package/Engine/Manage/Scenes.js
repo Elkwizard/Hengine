@@ -199,7 +199,7 @@ class InactiveScene {
 	}
 	removeAllElements() {
 		for (let x in this.elements) {
-			delete this.elements[x];
+			this.removeElement(this.elements[x]);
 		}
 	}
 	get(name) {

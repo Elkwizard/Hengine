@@ -123,6 +123,16 @@ class PhysicsVector {
 PhysicsVector.__ = [new PhysicsVector(0, 0), new PhysicsVector(0, 0), new PhysicsVector(0, 0), new PhysicsVector(0, 0)];
 
 //shapes
+class PolygonModel {
+    constructor(vertices, position, axes, projections, collider) {
+        this.vertices = vertices;
+        this.position = position;
+        this.axes = axes;
+        this.projections = projections;
+        this.collider = collider;
+        this.bounds = Bounds.fromPolygon(this);
+    }
+}
 class PolygonCollider {
     constructor(vertices) {
         this.vertices = vertices;
@@ -142,30 +152,59 @@ class PolygonCollider {
             dy /= m;
             this.axes.push(new PhysicsVector(-dy, dx));
         }
+
+        this.projections = [];
+        for (let i = 0; i < this.axes.length; i++) {
+            let axis = this.axes[i];
+            let min = Infinity;
+            let max = -Infinity;
+            for (let j = 0; j < this.vertices.length; j++) {
+                let dot = PhysicsVector.dot(this.vertices[j], axis);
+                if (dot < min) min = dot;
+                if (dot > max) max = dot;
+            }
+            this.projections.push([min, max]);
+        }
     }
     size() {
         return this.bounds.width;
     }
     getModel(pos, cos, sin) {
-        let poly = new PolygonCollider(this.vertices.map(vert => {
-            let t_x = vert.x * cos - vert.y * sin + pos.x;
-            let t_y = vert.x * sin + vert.y * cos + pos.y;
+        let axes = this.axes.map(ax => {
+            let t_x = ax.x * cos - ax.y * sin;
+            let t_y = ax.x * sin + ax.y * cos;
             return new PhysicsVector(t_x, t_y);
-        }));
+        });
+        let poly = new PolygonModel(this.vertices.map(vert => {
+                let t_x = vert.x * cos - vert.y * sin + pos.x;
+                let t_y = vert.x * sin + vert.y * cos + pos.y;
+                return new PhysicsVector(t_x, t_y);
+            }), PhysicsVector.add(this.position, pos), axes, this.projections.map((r, inx) => {
+                let o = PhysicsVector.dot(pos, axes[inx]);
+                return [r[0] + o, r[1] + o];
+            }), this);
         return poly;
+    }
+}
+class CircleModel {
+    constructor(x, y, radius) {
+        this.position = new PhysicsVector(x, y);
+        this.radius = radius;
+        this.bounds = Bounds.fromCircle(this);
     }
 }
 class CircleCollider {
     constructor(x, y, radius) {
         this.position = new PhysicsVector(x, y);
         this.radius = radius;
-        this.bounds = Bounds.fromCircle(this);
     }
     size() {
         return this.radius * 2;
     }
     getModel(pos, cos, sin) {
-        let circ = new CircleCollider(this.position.x + pos.x, this.position.y + pos.y, this.radius);
+        let t_x = this.position.x * cos - this.position.y * sin + pos.x;
+        let t_y = this.position.x * sin + this.position.y * cos + pos.y;
+        let circ = new CircleModel(t_x, t_y, this.radius);
         return circ;
     }
 }
@@ -187,7 +226,6 @@ class Grid {
         found[body.id] = true;
         for (let i = 0; i < cells.length; i++) {
             let cl = cells[i];
-            // if (this.cells[cl.x] && this.cells[cl.x][cl.y]) 
             bodies.push(...this.cells[cl.x][cl.y].filter(b => !found[b.id] ? found[b.id] = true : false));
         }
         return bodies;
@@ -390,7 +428,7 @@ class CollisionDetector {
         if (Bounds.notOverlap(shapeA.bounds, shapeB.bounds)) return null;
         return this[shapeA.constructor.name + "_" + shapeB.constructor.name](shapeA, shapeB);
     }
-    CircleCollider_PolygonCollider(a, b) {
+    CircleModel_PolygonModel(a, b) {
         let bestDist = Infinity;
         let bestPoint = null;
         let ax = a.position.x;
@@ -466,14 +504,14 @@ class CollisionDetector {
         }
         return null;
     }
-    PolygonCollider_CircleCollider(a, b) {
-        let col = this.CircleCollider_PolygonCollider(b, a);
+    PolygonModel_CircleModel(a, b) {
+        let col = this.CircleModel_PolygonModel(b, a);
         if (col) {
             col.direction.mul(-1);
         }
         return col;
     }
-    CircleCollider_CircleCollider(a, b) {
+    CircleModel_CircleModel(a, b) {
         let between = PhysicsVector.sub(b.position, a.position);
         let sqrMag = PhysicsVector.sqrMag(between);
         if (sqrMag < (a.radius + b.radius) ** 2) {
@@ -489,44 +527,52 @@ class CollisionDetector {
         }
         return null;
     }
-    PolygonCollider_PolygonCollider(a, b) {
+    PolygonModel_PolygonModel(a, b) {
 
         let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
         if (intersections.length < 2) return null;
 
         let toB = PhysicsVector.sub(b.position, a.position);
-        let aAxes = a.axes.filter(ax => PhysicsVector.dot(ax, toB) > 0)
-        let bAxes = b.axes.filter(ax => PhysicsVector.dot(ax, toB) > 0);
+        
+        //A
+        let aAxes = [...a.axes];
+        for (let i = 0; i < aAxes.length; i++) aAxes[i] = [aAxes[i], a.projections[i]];
+        aAxes = aAxes.filter(ax => PhysicsVector.dot(ax[0], toB) > 0);
+
+        //B
+        let bAxes = [...b.axes];
+        for (let i = 0; i < bAxes.length; i++) bAxes[i] = [bAxes[i], b.projections[i]];
+        bAxes = bAxes.filter(ax => PhysicsVector.dot(ax[0], toB) > 0);
 
         let axes = [aAxes, bAxes];
-        let proj = [
-            new Array(bAxes.length),
-            new Array(aAxes.length)
-        ];
         let minOverlap = Infinity;
         let bestIndex = [null, null];
         let bestRange = [];
         for (let i = 0; i < axes.length; i++) for (let I = 0; I < axes[i].length; I++) {
-            axes[i][I] = PhysicsVector.normalize(axes[i][I]);
-            let axis = axes[i][I];
+            let axis = axes[i][I][0];
             let aMin = Infinity;
             let aMax = -Infinity;
             let bMin = Infinity;
             let bMax = -Infinity;
-            for (let j = 0; j < a.vertices.length; j++) {
-                let dot = PhysicsVector.dot(a.vertices[j], axis);
-                if (dot < aMin) aMin = dot;
-                if (dot > aMax) aMax = dot;
-            }
-            for (let j = 0; j < b.vertices.length; j++) {
-                let dot = PhysicsVector.dot(b.vertices[j], axis);
-                if (dot < bMin) bMin = dot;
-                if (dot > bMax) bMax = dot;
+            if (i) {
+                bMin = axes[i][I][1][0];
+                bMax = axes[i][I][1][1];
+                for (let j = 0; j < a.vertices.length; j++) {
+                    let dot = PhysicsVector.dot(a.vertices[j], axis);
+                    if (dot < aMin) aMin = dot;
+                    if (dot > aMax) aMax = dot;
+                }
+            } else {
+                aMin = axes[i][I][1][0];
+                aMax = axes[i][I][1][1];
+                for (let j = 0; j < b.vertices.length; j++) {
+                    let dot = PhysicsVector.dot(b.vertices[j], axis);
+                    if (dot < bMin) bMin = dot;
+                    if (dot > bMax) bMax = dot;
+                }
             }
             if (aMax < bMin || aMin > bMax) return null;
 
-            if (i) proj[0][I] = { min: bMin, max: bMax };
-            else proj[1][I] = { min: aMin, max: aMax };
 
             let overlap = ((aMin + aMax) / 2 < (bMin + bMax) / 2) ? aMax - bMin : bMax - aMin;
             if (overlap < minOverlap) {
@@ -536,7 +582,7 @@ class CollisionDetector {
             }
         }
         if (bestIndex[0] === null) return null;
-        let bestAxis = axes[bestIndex[0]][bestIndex[1]];
+        let bestAxis = axes[bestIndex[0]][bestIndex[1]][0];
         if (!bestAxis) return null;
 
         let { aMin, aMax, bMin, bMax } = bestRange;
@@ -595,8 +641,8 @@ class CollisionResolver {
         // let inertiaTerm = ((rA × n) × rA) ÷ iA + ((rB × n) × rB) ÷ iB) · n;// nice
         //optimized
         let inertiaTerm = (n.x ** 2 * (iB * rA.y ** 2 + iA * rB.y ** 2)
-        + n.y ** 2 * (iB * rA.x ** 2 + iA * rB.x ** 2)
-        + n.x * n.y * (2 * iB * rA.x * rA.y + 2 * iA * rB.x * rB.y)) / (iA * iB);
+            + n.y ** 2 * (iB * rA.x ** 2 + iA * rB.x ** 2)
+            + n.x * n.y * (2 * iB * rA.x * rA.y + 2 * iA * rB.x * rB.y)) / (iA * iB);
 
         let invMassSum = 1 / mA + 1 / mB + inertiaTerm;
         let j = (1 + e) * PhysicsVector.dot(vAB, n) / invMassSum;
@@ -658,7 +704,7 @@ class CollisionResolver {
         bodyA.position.sub(move);
 
         if (!penetration) return;
-        
+
         let friction = (bodyA.friction + bodyB.friction) / 2 / this.engine.iterations;
 
         let totalPenetration = 0;
@@ -828,7 +874,7 @@ class PhysicsEngine {
                 let body2 = collidable[j];
                 let shapesA = body.__models || body.cacheModels();
                 let shapesB = body2.__models || body2.cacheModels();
-                
+
                 for (let sI = 0; sI < shapesA.length; sI++) for (let sJ = 0; sJ < shapesB.length; sJ++) {
                     let shapeA = shapesA[sI];
                     let shapeB = shapesB[sJ];
@@ -922,7 +968,7 @@ class PhysicsEngine {
             let g = this.gravity;
             let gravitySort = (a, b) => PhysicsVector.dot(b.position, g) - PhysicsVector.dot(a.position, g);
             let inverseGravitySort = (a, b) => PhysicsVector.dot(a.position, g) - PhysicsVector.dot(b.position, g);
-            
+
             //step
             this.integrate(intensity);
             this.cacheModels();
