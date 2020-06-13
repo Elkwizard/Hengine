@@ -1,7 +1,7 @@
 (function () {
     let script = document.getElementsByTagName("script")[0];
     let title = script.title || "Hengine Project";
-    let scripts = (script.getAttribute("scripts") || "").replace(/\.js/g, "").split(" ");
+    let scripts = (script.getAttribute("scripts") || "").replace(/\.js/g, "").split(" ").filter(str => str.length);
     
     let src = script.src.split("/");
     src.pop();
