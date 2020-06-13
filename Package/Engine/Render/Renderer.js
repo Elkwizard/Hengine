@@ -26,6 +26,13 @@ class Vertex {
 		return "(" + this.x + ", " + this.y + ")";
 	}
 }
+const TextMode = {
+	LEFT: Symbol("LEFT"),
+	RIGHT: Symbol("RIGHT"),
+	CENTER: Symbol("CENTER"),
+	TOP: Symbol("TOP"),
+	BOTTOM: Symbol("BOTTOM"),
+};
 class Artist {
 	constructor(canvasID, width, height) {
 		if (typeof canvasID === "object") this.canvas = canvasID;
@@ -44,8 +51,8 @@ class Artist {
 		this.c = this.canvas.getContext('2d');
 		this.__c = this.c;
 		this._background = new Color(0, 0, 0, 0);
-		this.textMode = "left";
-		this.textModeVertical = "top";
+		this.textMode = TextMode.LEFT;
+		this.textModeVertical = TextMode.TOP;
 		this.currentlyClipped = false;
 		let pathObj = {
 			circle(x, y, radius) {
@@ -110,7 +117,7 @@ class Artist {
 					x = x.x;
 					pack = y;
 				}
-				text = text + "";
+				text = (text + "").replace(/\t/, "    ");
 				this.c.font = font;
 				if (pack) {
 					let words = text.split(" ");
@@ -134,16 +141,16 @@ class Artist {
 					let ax = x;
 					let ay = y + (i + 1) * fs;
 					let tmw = this.c.measureText(blocks[i]).width;
-					if (this.textMode == "left");
-					else if (this.textMode == "center") {
+					if (this.textMode == TextMode.LEFT);
+					else if (this.textMode == TextMode.CENTER) {
 						ax -= tmw / 2;
-					} else if (this.textMode == "right") {
+					} else if (this.textMode == TextMode.RIGHT) {
 						ax -= tmw;
 					}
-					if (this.textModeVertical == "top");
-					else if (this.textMode == "center") {
+					if (this.textModeVertical == TextMode.TOP);
+					else if (this.textMode == TextMode.CENTER) {
 						ay -= tmh / 2;
-					} else if (this.textMode = "right") {
+					} else if (this.textMode = TextMode.BOTTOM) {
 						ay -= tmh;
 					}
 					textRequests.push({ text: blocks[i], x: ax, y: ay });

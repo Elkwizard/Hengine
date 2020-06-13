@@ -37,6 +37,12 @@ class IntervalFunction {
 
 	}
 }
+IntervalFunction.BEFORE_UPDATE = Symbol("BEFORE_UPDATE");
+IntervalFunction.UPDATE = Symbol("UPDATE");
+IntervalFunction.AFTER_UPDATE = Symbol("AFTER_UPDATE");
+IntervalFunction.FIXED_UPDATE = Symbol("FIXED_UPDATE");
+IntervalFunction.AFTER_FIXED_UPDATE = Symbol("AFTER_FIXED_UPDATE");
+
 class DelayedFunction extends IntervalFunction {
 	constructor(fn, wait, type) {
 		super(fn, wait, type);
@@ -127,12 +133,12 @@ class Engine {
 		this.engineUpdate = function () {
 			try {
 				if (this.hasFixedPhysicsUpdateCycle) if (!this.paused) {
-					this.updateIntervalCalls("FIXED_UPDATE");
+					this.updateIntervalCalls(IntervalFunction.FIXED_UPDATE);
 					this.fixedUpdate();
 					this.fixedScript.run();
 					this.scene.engineFixedUpdate();
                     this.afterFixedUpdate();
-					this.updateIntervalCalls("AFTER_FIXED");
+					this.updateIntervalCalls(IntervalFunction.AFTER_FIXED_UPDATE);
 				}
 			} catch (e) {
 				if (this.catchErrors) this.output("Fixed Update Error: " + e);
@@ -159,21 +165,21 @@ class Engine {
 				if (!this.paused) {
 					K.update();
 					M.update();
-					this.updateIntervalCalls("BEFORE");
+					this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
 					this.beforeUpdate();
 					this.clear();
-					this.updateIntervalCalls("UPDATE");
+					this.updateIntervalCalls(IntervalFunction.UPDATE);
 					this.update();
 					this.scene.engineDrawUpdate();
 					if (!this.hasFixedPhysicsUpdateCycle) {
 						this.fixedUpdate();
-						this.updateIntervalCalls("FIXED_UPDATE");
+						this.updateIntervalCalls(IntervalFunction.FIXED_UPDATE);
 						this.fixedScript.run();
 						this.scene.engineFixedUpdate();
 						this.afterFixedUpdate();
-						this.updateIntervalCalls("AFTER_FIXED");
+						this.updateIntervalCalls(IntervalFunction.AFTER_FIXED_UPDATE);
 					}
-					this.updateIntervalCalls("AFTER");
+					this.updateIntervalCalls(IntervalFunction.AFTER);
 					this.afterUpdate();
 					this.updateScreenRecordings();
 					M.last = { x: M.x, y: M.y };
@@ -241,14 +247,14 @@ class Engine {
 			if (r.isRecording) r.frames.push(f);
 		}
 	}
-	continuous(fn, type = "AFTER") {
-		this.intervalFns.push(new ContinuousFunction(fn, type.toUpperCase()));
+	continuous(fn, type = IntervalFunction.AFTER) {
+		this.intervalFns.push(new ContinuousFunction(fn, type));
 	}
-	transition(fn, frames, type = "BEFORE") {
-		this.intervalFns.push(new TransitionFunction(fn, frames, type.toUpperCase()));
+	transition(fn, frames, type = IntervalFunction.BEFORE) {
+		this.intervalFns.push(new TransitionFunction(fn, frames, type));
 	}
-	delay(fn, frames, type = "BEFORE") {
-		this.intervalFns.push(new DelayedFunction(fn, frames, type.toUpperCase()));
+	delay(fn, frames, type = IntervalFunction.BEFORE) {
+		this.intervalFns.push(new DelayedFunction(fn, frames, type));
 	}
 	updateIntervalCalls(type) {
 		let remaining = [];

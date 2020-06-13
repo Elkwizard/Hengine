@@ -310,7 +310,7 @@ class Hengine {
 		}
 	}
 	initImage(src) {
-		let x = new Image();
+		let x = new Frame();
 		x.src = src;
 		return x;
 	}
@@ -327,8 +327,7 @@ class Hengine {
 	loadImage(src) {
 		let img = this.images[src];
 		let f = new Frame(img.width, img.height);
-		f.c.c.drawImage(img, 0, 0, f.width, f.height);
-
+		f.c.image(img).default(0, 0);
 		return f;
 	}
 	loadAnimation(src) {

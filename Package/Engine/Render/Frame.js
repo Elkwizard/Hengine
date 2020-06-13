@@ -1,5 +1,5 @@
 class ImageType {
-	constructor(width, height, loops = false) {
+	constructor(width = 1, height = 1, loops = false) {
 		this.width = Math.max(1, Math.round(width));
 		this.height = Math.max(1, Math.round(height));
 		this.loops = loops;
@@ -32,6 +32,17 @@ let Frame = class extends ImageType {
 		this.c = new Artist(this.img);
 		this.c.c.imageSmoothingEnabled = window.c ? !window.c.preservePixelart : false;
 	}
+	set src(src) {
+		let img = new Image();
+		img.src = src;
+		img.onload = function () {
+			this.width = img.width;
+			this.height = img.height;
+			this.img.width = img.width;
+			this.img.height = img.height;
+			this.c.c.drawImage(img, 0, 0);
+		}.bind(this);
+	}
 	makeImage() {
 		return this.img;
 	}
@@ -47,6 +58,17 @@ try {
 			this.img.height = this.height;
 			this.c = new Artist(this.img);
 			this.c.c.imageSmoothingEnabled = window.c ? !c.preservePixelart : false;
+		}
+		set src(src) {
+			let img = new Image();
+			img.src = src;
+			img.onload = function () {
+				this.width = img.width;
+				this.height = img.height;
+				this.img.width = img.width;
+				this.img.height = img.height;
+				this.c.c.drawImage(img, 0, 0);
+			}.bind(this);
 		}
 		makeImage() {
 			return this.img;

@@ -536,12 +536,34 @@ class CollisionDetector {
         
         //A
         let aAxes = [...a.axes];
-        for (let i = 0; i < aAxes.length; i++) aAxes[i] = [aAxes[i], a.projections[i]];
-        aAxes = aAxes.filter(ax => PhysicsVector.dot(ax[0], toB) > 0);
+        for (let i = 0; i < aAxes.length; i++) aAxes[i] = [PhysicsVector.invert(aAxes[i]), [-a.projections[i][1], -a.projections[i][0]]];
+        
+        //draw axes
+        // for (let i = 0; i < a.vertices.length; i++) {
+        //     let A = a.vertices[i];
+        //     let B = a.vertices[(i + 1) % a.vertices.length];
+        //     let x = (A.x + B.x) / 2;
+        //     let y = (A.y + B.y) / 2;
+        //     let ax = aAxes[i][0];
+        //     if (PhysicsVector.dot(ax, toB) > 0) c.stroke(cl.ORANGE, 2).arrow(x, y, x + ax.x * 30, y + ax.y * 30);
+        // }
 
         //B
         let bAxes = [...b.axes];
         for (let i = 0; i < bAxes.length; i++) bAxes[i] = [bAxes[i], b.projections[i]];
+        
+        //draw axes
+        // for (let i = 0; i < b.vertices.length; i++) {
+        //     let A = b.vertices[i];
+        //     let B = b.vertices[(i + 1) % b.vertices.length];
+        //     let x = (A.x + B.x) / 2;
+        //     let y = (A.y + B.y) / 2;
+        //     let ax = bAxes[i][0];
+        //     if (PhysicsVector.dot(ax, toB) > 0) c.stroke(cl.BLUE, 2).arrow(x, y, x + ax.x * 30, y + ax.y * 30);
+        // }
+        
+        // c.stroke(cl.YELLOW, 0.5).shape(...a.vertices);
+        aAxes = aAxes.filter(ax => PhysicsVector.dot(ax[0], toB) > 0);
         bAxes = bAxes.filter(ax => PhysicsVector.dot(ax[0], toB) > 0);
 
         let axes = [aAxes, bAxes];
@@ -555,24 +577,25 @@ class CollisionDetector {
             let bMin = Infinity;
             let bMax = -Infinity;
             if (i) {
-                bMin = axes[i][I][1][0];
-                bMax = axes[i][I][1][1];
+                bMin = axes[1][I][1][0];
+                bMax = axes[1][I][1][1];
                 for (let j = 0; j < a.vertices.length; j++) {
                     let dot = PhysicsVector.dot(a.vertices[j], axis);
                     if (dot < aMin) aMin = dot;
                     if (dot > aMax) aMax = dot;
                 }
             } else {
-                aMin = axes[i][I][1][0];
-                aMax = axes[i][I][1][1];
+                aMin = axes[0][I][1][0];
+                aMax = axes[0][I][1][1];
                 for (let j = 0; j < b.vertices.length; j++) {
                     let dot = PhysicsVector.dot(b.vertices[j], axis);
                     if (dot < bMin) bMin = dot;
                     if (dot > bMax) bMax = dot;
                 }
             }
-            if (aMax < bMin || aMin > bMax) return null;
-
+            if (aMax < bMin || aMin > bMax) {
+                return null;
+            }
 
             let overlap = ((aMin + aMax) / 2 < (bMin + bMax) / 2) ? aMax - bMin : bMax - aMin;
             if (overlap < minOverlap) {
@@ -596,11 +619,16 @@ class CollisionDetector {
             rMax = bMax;
         }
 
+        intersections = intersections.slice(0, 2);
+        let cA = intersections[0];
+        let cB = intersections[1];
+        if (Math.abs(cA.x - cB.x) < 0.01 && Math.abs(cA.y - cB.y) < 0.01) intersections = [cA];
+
         let contacts = intersections
             .map(contact => {
                 let dot = PhysicsVector.dot(contact, bestAxis);
                 let pen = Math.abs(rMax - dot + rMin);
-                return new CollisionDetector.Contact(contact, pen || minOverlap / 2);
+                return new CollisionDetector.Contact(contact, pen || minOverlap / intersections.length);
             });
 
         if (!contacts.length) {

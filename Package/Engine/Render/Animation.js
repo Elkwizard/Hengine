@@ -5,7 +5,7 @@ class Animation {
 			this.frameCount = frames;
 			this.frames = [];
 			for (let i = 0; i < frames; i++) {
-				this.frames.push(new Image());
+				this.frames.push(new Frame());
 				this.frames[i].src = src + "/" + (i + 1) + ".png";
 			}
 			this.loop = loop;
