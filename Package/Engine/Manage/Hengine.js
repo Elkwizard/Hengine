@@ -406,6 +406,9 @@ class Hengine {
 			for (let folder in scripts[element].files) {
 				for (let file of scripts[element].files[folder]) {
 					let src = path + "/" + folder + "/" + file;
+					//absolute path
+					if (file[1] === ":") src = file;
+					
 					let resource = null;
 					let type = "SCRIPT";
 					if (element === "sprites" || element === "animations" || element === "sounds") {

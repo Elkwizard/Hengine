@@ -1,6 +1,8 @@
 (function () {
     let script = document.getElementsByTagName("script")[0];
     let title = script.title || "Hengine Project";
+    let scripts = (script.getAttribute("scripts") || "").replace(/\.js/g, "").split(" ");
+    
     let src = script.src.split("/");
     src.pop();
     src = src.join("/") + "/Package/Engine/Manage/Hengine.js";
@@ -11,7 +13,7 @@
             document.head.appendChild(script);
             return new Promise(function (resolve) {
                 script.onload = async function () {
-                    await Hengine.load(Hengine.defaultApplicationPackage());
+                    await Hengine.load(Hengine.defaultApplicationPackage(scripts));
                     setTitle(title);
                     resolve();
                 }
