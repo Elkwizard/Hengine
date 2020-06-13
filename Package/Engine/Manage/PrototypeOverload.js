@@ -143,7 +143,6 @@ String.prototype.indent = function () {
 			if (lines.length <= 1) return value;
 			let tbs = tabs(lines[0]);
 			let tbs1 = tabs(lines[1]) - 1;
-			if (tbs1) console.log(tbs1, value);
 			if (tbs1 <= tbs) return value;
 			else {
 				while (tabs(lines[1]) - 1 > tbs) {
