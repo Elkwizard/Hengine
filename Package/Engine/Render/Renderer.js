@@ -31,7 +31,7 @@ const TextMode = {
 	RIGHT: Symbol("RIGHT"),
 	CENTER: Symbol("CENTER"),
 	TOP: Symbol("TOP"),
-	BOTTOM: Symbol("BOTTOM"),
+	BOTTOM: Symbol("BOTTOM")
 };
 class Artist {
 	constructor(canvasID, width, height) {
@@ -141,16 +141,16 @@ class Artist {
 					let ax = x;
 					let ay = y + (i + 1) * fs;
 					let tmw = this.c.measureText(blocks[i]).width;
-					if (this.textMode == TextMode.LEFT);
-					else if (this.textMode == TextMode.CENTER) {
+					if (this.textMode === TextMode.LEFT);
+					else if (this.textMode === TextMode.CENTER) {
 						ax -= tmw / 2;
-					} else if (this.textMode == TextMode.RIGHT) {
+					} else if (this.textMode === TextMode.RIGHT) {
 						ax -= tmw;
 					}
-					if (this.textModeVertical == TextMode.TOP);
-					else if (this.textMode == TextMode.CENTER) {
+					if (this.textModeVertical === TextMode.TOP);
+					else if (this.textMode === TextMode.CENTER) {
 						ay -= tmh / 2;
-					} else if (this.textMode = TextMode.BOTTOM) {
+					} else if (this.textMode === TextMode.BOTTOM) {
 						ay -= tmh;
 					}
 					textRequests.push({ text: blocks[i], x: ax, y: ay });

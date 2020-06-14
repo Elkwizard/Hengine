@@ -37,14 +37,26 @@ class PhysicsObject extends SceneObject {
 
         this.shapeNameIDMap = new Map();
     }
+    set snuzzlement(a) {
+        this.body.restitution = 1 - a;
+    }
+    get snuzzlement() {
+        return 1 - this.body.restitution;
+    }
+    set rotation(a) {
+        if (this.body) this.body.angle = a;
+    }
+    get rotation() {
+        return this.body && this.body.angle;
+    }
     get mass() {
         return this.body.mass;
     }
     get canCollide() {
-        return this.body.isTrigger;
+        return !this.body.isTrigger;
     }
     set canCollide(a) {
-        this.body.isTrigger = a;
+        this.body.isTrigger = !a;
     }
     get velocity() {
         return this.body.velocity;
@@ -117,7 +129,6 @@ class PhysicsObject extends SceneObject {
         this.update();
         this.x = this.body.position.x;
         this.y = this.body.position.y;
-        this.rotation = this.body.angle;
     }
     updatePreviousData() {
         this.direction = this.middle.Vminus(this.last);

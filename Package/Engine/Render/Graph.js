@@ -119,7 +119,7 @@ class Graph extends Frame {
                 }
                 last = data;
             }
-            this.graphFrame.c.textMode = "right";
+            this.graphFrame.c.textMode = TextMode.RIGHT;
             let y = this.getYValue(last.y);
             if (y > 185) y -= 15;
             let prefix = key + ": ";
@@ -152,7 +152,7 @@ class Graph extends Frame {
         this.c.draw(black).rect(this.leftOffset, 200 + this.bottomTextOffset, this.c.c.measureText(timeStart).width, 200);
         this.c.draw(white).text("10px Arial", timeStart, this.leftOffset, 200 + this.bottomTextOffset);
         this.c.draw(black).rect(this.leftOffset + this.mainGraphWidth - 10 - this.c.c.measureText(timeEnd).width, 200 + this.bottomTextOffset, 200, 200);
-        this.c.textMode = "right";
+        this.c.textMode = TextMode.RIGHT;
         this.c.draw(white).text("10px Arial", timeEnd, this.mainGraphWidth - 10 + this.leftOffset, 200 + this.bottomTextOffset);
         return this;
     }

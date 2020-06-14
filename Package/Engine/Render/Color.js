@@ -361,6 +361,7 @@ class ColorLibrary {
 		this.ORANGE = new Color("#f90");
 		this.PURPLE = new Color("#909");
 		this.MAGENTA = new Color("#f0f");
+		this.PINK = new Color(255, 192, 203)
 		this.BLANK = new Color(0, 0, 0, 0);
 		this.BLACK = new Color(0, 0, 0, 1);
 		this.WHITE = new Color(255, 255, 255, 1);
