@@ -297,16 +297,8 @@ class SceneObject {
 		if (this.rotation) c.rotate(this.rotation);
 		for (let name in this.shapes) {
 			let shape = this.shapes[name];
-			if (shape.rotation) {
-				c.save();
-				let sMiddle = shape.middle;
-				c.translate(sMiddle);
-				c.rotate(shape.rotation);
-				c.translate(sMiddle.inverse());
-			}
 			this.draw(name, shape);
 			this.scripts.run("draw", name, shape);
-			if (shape.rotation) c.restore();
 		}
 		c.rotate(-this.rotation);
 		c.translate(middle.inverse());

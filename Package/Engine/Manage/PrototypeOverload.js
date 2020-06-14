@@ -10,9 +10,10 @@ Function.prototype.param = function (...args) {
 		this(...args);
 	};
 };
+Function.performanceIterations = 100;
 Function.prototype.performance = function (...args) {
 	const t_1 = performance.now();
-	const iter = 100;
+	const iter = Function.performanceIterations;
 	for (let i = 0; i < iter; i++) {
 		this(...args);
 	}

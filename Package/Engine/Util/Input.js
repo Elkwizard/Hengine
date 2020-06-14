@@ -103,18 +103,9 @@ class MouseHandler extends InputHandler {
 		this.down = false;
 		this.x = 0;
 		this.y = 0;
-		this.last = {
-			x: 0,
-			y: 0
-		};
-		this.world = {
-			x: 0,
-			y: 0
-		};
-		this.worldLast = {
-			x: 0,
-			y: 0
-		};
+		this.last = Vector2.origin;
+		this.world = Vector2.origin;
+		this.worldLast = Vector2.origin;
 		this.keys = {
 			"Left": false,
 			"Middle": false,

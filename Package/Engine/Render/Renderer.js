@@ -218,6 +218,8 @@ class Artist {
 			infer(obj) {
 				if (obj.radius !== undefined) {
 					this.draw(this.c.fillStyle).circle(obj);
+				} else if (obj.width !== undefined) {
+					this.draw(this.c.fillStyle).rect(obj);	
 				} else {
 					this.draw(this.c.fillStyle).shape(...obj.getCorners());
 				}
@@ -294,6 +296,7 @@ class Artist {
 						x = x.x;
 					}
 				}
+				this.c.beginPath();
 				this.c.moveTo(x, y)
 				this.c.lineTo(x1, y1)
 				this.c.stroke()
@@ -341,6 +344,8 @@ class Artist {
 			infer(obj) {
 				if (obj.radius !== undefined) {
 					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).circle(obj);
+				} else if (obj.radius !== undefined) {
+					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).rect(obj);	
 				} else {
 					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).shape(...obj.getCorners());
 				}
@@ -381,6 +386,8 @@ class Artist {
 			infer(obj) {
 				if (obj.radius !== undefined) {
 					this.clip().circle(obj);
+				} else if (obj.width !== undefined) {
+					this.clip().rect(obj);	
 				} else {
 					this.clip().shape(...obj.getCorners());
 				}
@@ -447,6 +454,8 @@ class Artist {
 			infer(obj) {
 				if (obj.radius !== undefined) {
 					this.image(this.imageStyle, this.imageStyleSource).circle(obj);
+				} else if (obj.width !== undefined) {
+					this.image(this.imageStyle, this.imageStyleSource).rect(obj);	
 				} else {
 					this.image(this.imageStyle, this.imageStyleSource).shape(...obj.getCorners());
 				}
@@ -508,8 +517,6 @@ class Artist {
 		if (endStyle === "flat") endStyle = "butt";
 		this.c.lineCap = endStyle;
 		this.c.lineWidth = lineWidth;
-		this.c.beginPath();
-		this.c.fillStyle = "transparent";
 		return this.strokeObj;
 	}
 	drawImageInternal(x, y, w, h) {

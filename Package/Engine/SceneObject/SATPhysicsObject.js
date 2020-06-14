@@ -37,6 +37,15 @@ class PhysicsObject extends SceneObject {
 
         this.shapeNameIDMap = new Map();
     }
+    get middle() {
+        return new Vector2(this.x, this.y);
+    }
+    set middle(a) {
+        this.x = a.x;
+        this.y = a.y;
+        this.body.position.x = a.x;
+        this.body.position.y = a.y;
+    }
     set snuzzlement(a) {
         this.body.restitution = 1 - a;
     }
