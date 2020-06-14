@@ -1,5 +1,5 @@
 class Graph extends Frame {
-    constructor(yName, minValue, maxValue, getY, msLimit = 5000, colors = [{ color: "white", limit: maxValue }], updater = null) {
+    constructor(yName, minValue, maxValue, getY, msLimit = 5000, colors = [{ color: "white", limit: 0 }], updater = null) {
         super(400, 225);
         let c = new Frame(1, 1).c;
         this.leftOffset = Math.max(c.c.measureText(maxValue.toString()).width, c.c.measureText(minValue.toString()).width) + 10;
@@ -43,6 +43,7 @@ class Graph extends Frame {
     }
     getColor(n) {
         let black = (this.colorScheme.toLowerCase() == "dark") ? "black" : "white";
+        
         for (let color of this.colors) {
             if (n >= color.limit) return color.color;
         }
@@ -81,7 +82,7 @@ class Graph extends Frame {
     get() {
         let black = (this.colorScheme.toLowerCase() == "dark") ? "black" : "white";
         let white = (this.colorScheme.toLowerCase() == "dark") ? "white" : "black";
-        this.c.textMode = "left";
+        this.c.textMode = TextMode.LEFT;
         this.c.draw(black).rect(this.leftOffset + 2, 0, 420, 198);
         this.graphFrame.c.clear();
         this.graphFrame.c.c.setLineDash([4, 2]);

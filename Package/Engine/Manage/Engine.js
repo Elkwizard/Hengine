@@ -216,7 +216,7 @@ class Engine {
 		this.hasGraphs = grh;
 		if (this.hasGraphs) {
 			this.graphs = [];
-			this.fpsGraph = this.makeGraph("FPS", 0, 60, e => this.fps, 2000, [
+			this.fpsGraph = this.makeGraph("FPS", 0, 60, e => Math.floor(this.fpsContinuous), 2000, [
 				{
 					limit: 50,
 					color: "lime"

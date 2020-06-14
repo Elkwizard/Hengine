@@ -217,8 +217,8 @@ class Grid {
         this.cells = [];
     }
     addShape(x, y, shape) {
-        if (!this.cells[x]) this.cells[x] = [];
-        if (!this.cells[x][y]) this.cells[x][y] = [];
+        if (this.cells[x] === undefined) this.cells[x] = [];
+        if (this.cells[x][y] === undefined) this.cells[x][y] = [];
         this.cells[x][y].push(shape);
     }
     query(body, cells) {
@@ -393,6 +393,7 @@ class RigidBody {
     }
     applyImpulse(pos, imp) {
         // c.stroke(cl.RED, 1).circle(pos, 5);
+        // c.stroke(cl.ORANGE).arrow(pos, PhysicsVector.add(pos, PhysicsVector.div(imp, 10)))
         //linear
         this.velocity.x += imp.x / this.mass;
         this.velocity.y += imp.y / this.mass;
@@ -542,7 +543,7 @@ class CollisionDetector {
         if (intersections.length < 2) return null;
 
         let toB = PhysicsVector.sub(b.position, a.position);
-        
+
         //A
         // let aAxes = [...a.axes];
 
@@ -570,7 +571,7 @@ class CollisionDetector {
         // }
 
         // c.stroke(cl.YELLOW, 0.5).shape(...a.vertices);
-        
+
         let axes = [...a.axes.map(ax => PhysicsVector.invert(ax)), ...b.axes].filter(ax => PhysicsVector.dot(ax, toB) > 0);;
         let minOverlap = Infinity;
         let bestAxis = null;
@@ -892,11 +893,17 @@ class PhysicsEngine {
 
 
             let others = collisionPairs.get(body);
-            let collidable = others;
-            
+            let vel = body.velocity;
+            let collidable = others.sort((a, b) => (a.position.x - b.position.x) * vel.x + (a.position.y - b.position.y) * vel.y);
+
             // checks
-            // c.draw(cl.RED).text("20px monospace", others.length, body.position.x, body.position.y);
-            
+            c.draw(cl.RED).text("20px monospace", others.length, body.position.x, body.position.y);
+            if (others.length > 10) {
+                for (let i = 0; i < others.length; i++) {
+                    c.stroke(cl.RED).arrow(body.position, others[i].position);
+                }
+            }
+
             for (let j = 0; j < collidable.length; j++) {
                 let collisions = [];
                 let body2 = collidable[j];
@@ -909,22 +916,29 @@ class PhysicsEngine {
                     let col = this.collisionDetector.collide(shapeA, shapeB);
                     collisions.push(col);
                 }
-
                 let contacts = [];
                 let maxPenetration = -Infinity;
                 let best = null;
-                for (let ci = 0; ci < collisions.length; ci++) {
-                    let collision = collisions[ci];
-                    if (collision) {
-
-                        if (collision.penetration > maxPenetration) {
-                            maxPenetration = collision.penetration;
-                            best = collision;
-                            if (contacts.length) contacts.push(...collision.contacts
-                                .filter(contact => !contacts
-                                    .test(con => con.x === contact.x && con.y === contact.y).length));
-                            else contacts.push(...collision.contacts);
+                if (collisions.length > 1) {
+                    for (let ci = 0; ci < collisions.length; ci++) {
+                        let collision = collisions[ci];
+                        if (collision) {
+                            if (collision.penetration > maxPenetration) {
+                                maxPenetration = collision.penetration;
+                                best = collision;
+                                if (contacts.length) contacts.push(...collision.contacts
+                                    .filter(contact => !contacts
+                                        .test(con => con.x === contact.x && con.y === contact.y).length));
+                                else contacts.push(...collision.contacts);
+                            }
                         }
+                    }
+                } else {
+                    let col = collisions[0];
+                    if (col) {
+                        best = col;
+                        contacts = col.contacts;
+                        maxPenetration = col.penetration;
                     }
                 }
                 if (best) {
@@ -961,7 +975,7 @@ class PhysicsEngine {
             cellsize = 0;
             let body = this.bodies[Math.floor(this.bodies.length / 2)];
             for (let j = 0; j < body.shapes.length; j++) {
-                cellsize += body.shapes[j].size() * 2;
+                cellsize += body.shapes[j].size();
             }
         }
 

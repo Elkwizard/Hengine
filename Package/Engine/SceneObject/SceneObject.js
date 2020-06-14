@@ -181,9 +181,7 @@ class SceneObject {
 	addShape(name, shape) {
 		shape = shape.get();
 		this.shapes[name] = shape;
-	}
-	newShapeCache() {
-		this.cacheBoundingBoxes();
+		this.cacheDimensions();
 	}
 	worldSpaceToModelSpace(v) {
 		return v.Vminus(this.middle).rotate(-this.rotation);
@@ -332,7 +330,6 @@ class SceneObject {
 	}
 	updateCaches() {
 		this.cacheBoundingBoxes();
-		this.cacheDimensions();
 		this.cacheRotation();
 	}
 	pushToRemoveQueue(x) {
