@@ -897,12 +897,12 @@ class PhysicsEngine {
             let collidable = others.sort((a, b) => (a.position.x - b.position.x) * vel.x + (a.position.y - b.position.y) * vel.y);
 
             // checks
-            c.draw(cl.RED).text("20px monospace", others.length, body.position.x, body.position.y);
-            if (others.length > 10) {
-                for (let i = 0; i < others.length; i++) {
-                    c.stroke(cl.RED).arrow(body.position, others[i].position);
-                }
-            }
+            // c.draw(cl.RED).text("20px monospace", others.length, body.position.x, body.position.y);
+            // if (others.length > 10) {
+            //     for (let i = 0; i < others.length; i++) {
+            //         c.stroke(cl.RED).arrow(body.position, others[i].position);
+            //     }
+            // }
 
             for (let j = 0; j < collidable.length; j++) {
                 let collisions = [];
