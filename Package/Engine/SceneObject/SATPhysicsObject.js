@@ -80,13 +80,12 @@ class PhysicsObject extends SceneObject {
         this.body.angularVelocity = a;
     }
     addShape(name, shape) {
-		shape = shape.get();
-        this.shapes[name] = shape;
         let collider;
         if (shape instanceof Polygon) collider = new PolygonCollider(shape.vertices.map(vert => vert.toPhysicsVector()));
-        else collider = new CircleCollider(shape.x, shape.y,shape.radius);
+        else collider = new CircleCollider(shape.x, shape.y, shape.radius);
         let colliders = this.body.addShape(collider);
         this.shapeNameIDMap.set(name, colliders);
+        super.addShape(name, shape);
     }
     removeShape(name) {
         let shape = this.shapes[name];

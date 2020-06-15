@@ -255,7 +255,7 @@ class ShapeMass {
         return circ.radius ** 2 * Math.PI;
     }
     static inertiaCircleCollider(circ) {
-        return (circ.position.x ** 2 + circ.position.y ** 2) + circ.radius ** 4 * Math.PI / 4;
+        return (circ.position.x ** 2 + circ.position.y ** 2) + 5 * circ.radius ** 4 * Math.PI / 4;
     }
     static massPolygonCollider(poly) {
         return poly.bounds.width * poly.bounds.height;
@@ -942,6 +942,7 @@ class PhysicsEngine {
                     }
                 }
                 if (best) {
+                    // for (let cont of contacts) c.draw(cl.ORANGE).circle(cont.point, 4);
                     let STATIC = body2.type === RigidBody.STATIC || 0;
                     let collisionDirection = best.direction;
                     if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
