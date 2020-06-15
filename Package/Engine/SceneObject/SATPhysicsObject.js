@@ -96,7 +96,7 @@ class PhysicsObject extends SceneObject {
         return shape;
     }
     getModels() {
-        return this.body.getModels()
+        return this.body.cacheModels()
             .map(model => (model instanceof CircleModel) ? 
                 new Circle(model.position.x, model.position.y, model.radius) 
                 : new Polygon(model.vertices.map(vert => Vector2.fromPhysicsVector(vert))));

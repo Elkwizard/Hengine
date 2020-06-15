@@ -3,6 +3,7 @@ class ImageType {
 		this.width = Math.max(1, Math.round(width));
 		this.height = Math.max(1, Math.round(height));
 		this.loops = loops;
+		this.loaded = true;
 	}
 	makeImage() {
 		return null;
@@ -35,12 +36,14 @@ let Frame = class extends ImageType {
 	set src(src) {
 		let img = new Image();
 		img.src = src;
+		this.loaded = false;
 		img.onload = function () {
 			this.width = img.width;
 			this.height = img.height;
 			this.img.width = img.width;
 			this.img.height = img.height;
 			this.c.c.drawImage(img, 0, 0);
+			this.loaded = true;
 		}.bind(this);
 	}
 	makeImage() {
@@ -62,12 +65,14 @@ try {
 		set src(src) {
 			let img = new Image();
 			img.src = src;
+			this.loaded = false;
 			img.onload = function () {
 				this.width = img.width;
 				this.height = img.height;
 				this.img.width = img.width;
 				this.img.height = img.height;
 				this.c.c.drawImage(img, 0, 0);
+				this.loaded = true;
 			}.bind(this);
 		}
 		makeImage() {

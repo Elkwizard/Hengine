@@ -294,14 +294,14 @@ class SceneObject {
 	runDraw() {
 		let middle = this.middle;
 		c.translate(middle);
-		if (this.rotation) c.rotate(this.rotation);
+		c.rotate(this.rotation);
 		for (let name in this.shapes) {
 			let shape = this.shapes[name];
 			this.draw(name, shape);
 			this.scripts.run("draw", name, shape);
 		}
 		c.rotate(-this.rotation);
-		c.translate(middle.inverse());
+		c.translate(-middle.x, -middle.y);
 	}
 	engineDrawUpdate(screen) {
 		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, screen);

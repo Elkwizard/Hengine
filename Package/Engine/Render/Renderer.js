@@ -681,4 +681,167 @@ class Artist {
 		if (color instanceof Image) c = "url(" + color.src + ")";
 		this.canvas.style.background = c;
 	}
+	compileCommand(drawType, drawArgs, shapeArgs) {
+		let color;
+
+		let shape;
+		if (shapeArgs instanceof Polygon) shape = "shape";
+		if (shapeArgs instanceof Rect) shape = "rect";
+		if (shapeArgs instanceof Circle) shape = "circle";
+
+		switch (drawType) {
+			case "stroke":
+				color = drawArgs[0];
+				if (color instanceof Color) color = color.getRGBA();
+				let lineWidth = drawArgs[1] || 1;
+				let lineCap = drawArgs[2] || "flat";
+				if (lineCap === "flat") lineCap = "butt";
+
+				if (shape === "rect") {
+					return function () {
+						this.c.lineWidth = lineWidth;
+						this.c.lineCap = lineCap;
+						this.c.strokeStyle = color;
+						this.c.strokeRect(shapeArgs.x, shapeArgs.y, shapeArgs.width, shapeArgs.height);
+					}.bind(this);
+				}
+
+				if (shape === "circle") {
+					return function () {
+						this.c.lineWidth = lineWidth;
+						this.c.lineCap = lineCap;
+						this.c.strokeStyle = color;
+						this.c.beginPath();
+						this.c.arc(shapeArgs.x, shapeArgs.y, shapeArgs.radius, 0, 6.283185307179586);
+						this.c.stroke();
+					}.bind(this);
+				}
+
+				if (shape === "shape") {
+					let vert = shapeArgs.getCorners();
+					let len = vert.length;
+					let lines = [];
+					for (let i = 0; i < len; i++) lines.push(vert[(i + 1) % len]);
+					return function () {
+						this.c.lineWidth = lineWidth;
+						this.c.lineCap = lineCap;
+						this.c.strokeStyle = color;
+						this.c.beginPath();
+						this.c.moveTo(vert[0].x, vert[0].y);
+						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y); 
+						this.c.stroke();
+					}.bind(this);
+				}
+
+				break;
+			case "draw":
+				color = drawArgs[0];
+				if (color instanceof Color) color = color.getRGBA();
+
+				if (shape === "rect") {
+					return function () {
+						this.c.fillStyle = color;
+						this.c.fillRect(shapeArgs.x, shapeArgs.y, shapeArgs.width, shapeArgs.height);
+					}.bind(this);
+				}
+
+				if (shape === "circle") {
+					return function () {
+						this.c.fillStyle = color;
+						this.c.beginPath();
+						this.c.arc(shapeArgs.x, shapeArgs.y, shapeArgs.radius, 0, 6.283185307179586);
+						this.c.fill();
+					}.bind(this);
+				}
+
+				if (shape === "shape") {
+					let vert = shapeArgs.getCorners();
+					let len = vert.length;
+					let lines = [];
+					for (let i = 0; i < len; i++) lines.push(vert[(i + 1) % len]);
+					return function () {
+						this.c.fillStyle = color;
+						this.c.beginPath();
+						this.c.moveTo(vert[0].x, vert[0].y);
+						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y); 
+						this.c.fill();
+					}.bind(this);
+				}
+
+				break;
+			case "image":
+				let imageStyle = drawArgs[0];
+				let [clipX = 0, clipY = 0, clipW = imageStyle.width, clipH = imageStyle.height] = drawArgs.slice(1);
+				if (clipX instanceof Rect) {
+					clipH = clipX.height;
+					clipW = clipX.width;
+					clipY = clipX.y;
+					clipX = clipX.x;
+				}
+
+				let boundW, boundH, boundX, boundY;
+				if (shape === "rect") {
+					boundW = shapeArgs.width;
+					boundH = shapeArgs.height;
+					boundX = shapeArgs.x;
+					boundY = shapeArgs.y;
+				}
+				if (shape === "circle") {
+					boundW = shapeArgs.radius * 2;
+					boundH = boundW;
+					boundX = shapeArgs.x - boundW / 2;
+					boundY = shapeArgs.y - boundH / 2;
+				}
+				let v;
+				if (shape === "shape") {
+					v = shapeArgs.getCorners();
+					let minX = Math.min(...v.map(e => e.x));
+					let maxX = Math.max(...v.map(e => e.x));
+					let minY = Math.min(...v.map(e => e.y));
+					let maxY = Math.max(...v.map(e => e.y));
+					boundX = minX;
+					boundY = minY;
+					boundW = maxX - minX;
+					boundH = maxY - minY;
+				}
+
+				let img = imageStyle;
+				if (img instanceof ImageType) img = img.requestImage(boundW, boundH);
+
+				if (shape === "rect") {
+					return function () {
+						this.c.drawImage(img, clipX, clipY, clipW, clipH, boundX, boundY, boundW, boundH);
+					}.bind(this);
+				}
+
+				if (shape === "circle") {
+					return function () {
+						this.c.save();
+						this.c.beginPath();
+						this.c.arc(shapeArgs.x, shapeArgs.y, shapeArgs.radius, 0, 6.283185307179586);
+						this.c.clip();
+						this.c.drawImage(img, clipX, clipY, clipW, clipH, boundX, boundY, boundW, boundH);
+						this.restore();
+					}.bind(this);
+				}
+
+				if (shape === "shape") {
+					let len = v.length;
+					let lines = [];
+					for (let i = 0; i < len; i++) lines.push(v[(i + 1) % len]);
+					return function () {
+						this.c.save();
+						this.c.beginPath();
+						this.c.moveTo(v[0].x, v[0].y);
+						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y); 
+						this.c.clip();
+						this.c.drawImage(img, clipX, clipY, clipW, clipH, boundX, boundY, boundW, boundH);
+						this.c.restore();
+					}.bind(this);
+				}
+				
+				break;
+		}
+		return function () { };
+	}
 }
