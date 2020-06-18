@@ -92,6 +92,7 @@ class PhysicsObject extends SceneObject {
         delete this.shapes[name];
         let cols = this.shapeNameIDMap.get(name);
         for (let i = 0; i < cols.length; i++) this.body.removeShape(cols[i]);
+        this.shapeNameIDMap.delete(name);
         return shape;
     }
     getModels() {
@@ -133,7 +134,7 @@ class PhysicsObject extends SceneObject {
         c.translate(com.inverse());
     }
     engineFixedUpdate() {
-        this.scripts.run("update");
+        this.scripts.run("Update");
         this.update();
         this.x = this.body.position.x;
         this.y = this.body.position.y;

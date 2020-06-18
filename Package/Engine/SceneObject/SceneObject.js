@@ -137,7 +137,7 @@ class SceneObject {
 			}
 		}
 		let num = 0;
-		for (let shape of result) this.addShape(num++, shape);
+		for (let shape of result) this.addShape(num++ + "", shape);
 		return result;
 	}
 	onAddScript(script) {
@@ -298,27 +298,26 @@ class SceneObject {
 		for (let name in this.shapes) {
 			let shape = this.shapes[name];
 			this.draw(name, shape);
-			this.scripts.run("draw", name, shape);
+			this.scripts.run("Draw", name, shape);
 		}
 		c.rotate(-this.rotation);
 		c.translate(-middle.x, -middle.y);
 	}
 	engineDrawUpdate(screen) {
-		let onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, screen);
-		if (!this.hidden && onScreen) {
+		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, screen);
+		if (!this.hidden && this.onScreen) {
 			this.runDraw();
 		}
 		// s.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
 		// s.drawInScreenSpace(e => c.stroke(cl.RED, 1).rect(screen));
-		this.onScreen = onScreen;
-		this.scripts.run("escapeDraw");
+		this.scripts.run("EscapeDraw");
 	}
 	engineFixedUpdate(hitboxes) {
 		if (this.controls) {
 			this.move();
 		}
 		this.update();
-		this.scripts.run("update");
+		this.scripts.run("Update");
 	}
 	updateCaches() {
 		this.cacheBoundingBoxes();

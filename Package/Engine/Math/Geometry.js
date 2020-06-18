@@ -240,8 +240,7 @@ class Geometry {
     }
     static subdividePolygonList(polygon, direction) {
         let otherPolygons = [];
-        let counter = polygon[1].x - polygon[0].x < 0;
-        if (direction !== undefined) counter = !direction;
+        let counter = direction;
         let slice = null;
         let newPolygon = [...polygon];
         for (let i = 0; i < polygon.length; i++) {
@@ -326,11 +325,11 @@ class Geometry {
     static getMiddle(verts) {
         return Vector2.sum(...verts).over(verts.length);
     }
-    static subdividePolygon(polygon, direction) {
+    static subdividePolygon(polygon) {
         let verts = polygon.vertices;
         let middle = Geometry.getMiddle(verts);
         verts = verts.map(e => e.Vminus(middle));
-        return Geometry.subdividePolygonList(verts, direction).map(e => new Polygon(Geometry.clockwise(e).map(e => e.Vplus(middle)), 0));
+        return Geometry.subdividePolygonList(verts, Geometry.vertexDirection(polygon)).map(e => new Polygon(Geometry.clockwise(e).map(e => e.Vplus(middle)), 0));
     }
     static clockwise(verts) {
         let middle = Geometry.getMiddle(verts);
@@ -343,7 +342,7 @@ class Geometry {
         for (let i = 0; i < verts.length - 1; i++) {
             dif += verts[i + 1] - verts[i];
         }
-        return dif < 0;
+        return dif > 0;
     }
     static overlapLineLine(l1, l2) {
         let pol = Geometry.projectPointOntoLine;

@@ -116,7 +116,7 @@ class ScriptContainer {
 		};
 	}
     run(str, ...args) {
-		let key = "script" + str.capitalize();
+		let key = "script" + str;
 		if (this.exists[key]) for (let m of this) {
 			m[key](m, ...args);
 		}

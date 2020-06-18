@@ -396,11 +396,13 @@ class Camera extends Rect {
 	zoomOut(amount) {
 		this.zoom /= 1 + amount;
 	}
+	createView() {
+		this.newView = new this.RenderType(width, height);
+	}
 	getWorld() {
 		let middle = this.middle;
 		let m = new Polygon(this.vertices.map(vert => vert.Vminus(middle))).getModelCosSin(middle, Math.cos(this.rotation), Math.sin(this.rotation));
 		m = m.scale(1 / this.zoom);
-		this.newView = new this.RenderType(width, height);
 		return m;
 	}
 	updateView(width, height) {
@@ -451,7 +453,7 @@ class Scene extends InactiveScene {
 			if (this.mouseEvents) for (let o of collided) {
 				this.get(o).response.click(adjusted);
 				let m = this.get(o);
-				m.scripts.run("click", adjusted);
+				m.scripts.run("Click", adjusted);
 			}
 		}.bind(this);
 		M.engineRightClick = function (e) {
@@ -459,7 +461,7 @@ class Scene extends InactiveScene {
 			if (this.mouseEvents) for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.rightClick(adjusted);
 				let m = this.get(o);
-				m.scripts.run("rightClick", adjusted);
+				m.scripts.run("RightClick", adjusted);
 			}
 		}.bind(this);
 		M.engineMove = function (e) {
@@ -470,7 +472,7 @@ class Scene extends InactiveScene {
 					if (!o.hovered) {
 						o.response.hover(adjusted);
 						let m = this.get(o);
-						m.scripts.run("hover", adjusted);
+						m.scripts.run("Hover", adjusted);
 					}
 					o.hovered = true;
 				}
@@ -559,15 +561,23 @@ class Scene extends InactiveScene {
 	}
 	renderCamera(camera) {
 		let screen = camera.getWorld().getBoundingBox();
-		window.screen = screen;
-		this.c.embody(camera.newView);
+		
+		if (camera !== this.camera) {
+			camera.createView();
+			this.c.embody(camera.newView);
+		} else this.c.save();
+		
 		camera.transformToWorld(this.c);
+		
 		for (let rect of this.elementArray) {
 			rect.engineDrawUpdate(screen);
 			rect.lifeSpan++;
 		}
-		this.c.unembody();
-		camera.view = camera.newView;
+
+		if (camera !== this.camera) {
+			this.c.unembody();	
+			camera.view = camera.newView;
+		} else this.c.restore();
 		return camera.view;
 	}
 	engineDrawUpdate() {
@@ -582,7 +592,8 @@ class Scene extends InactiveScene {
 			return a.layer - b.layer;
 		});
 		for (let cameraName in this.cameras) this.renderCamera(this.cameras[cameraName]);
-		this.c.image(this.renderCamera(this.camera)).rect(0, 0, width, height);
+		this.renderCamera(this.camera);
+		// this.c.image(this.renderCamera(this.camera)).rect(0, 0, width, height);
 
 		this.home.afterScript.run();
 		this.endUpdate();

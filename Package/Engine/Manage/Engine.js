@@ -235,6 +235,12 @@ class Engine {
 			]);
 		}
 	}
+	set HFPUC(a) {
+		this.hasFixedPhysicsUpdateCycle = a;
+	}
+	get HFPUC() {
+		return this.hasFixedPhysicsUpdateCycle;
+	}
 	createScreenRecording(name) {
 		this.recordings[name] = new ScreenRecording(name);
 		return this.recordings[name];

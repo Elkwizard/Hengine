@@ -153,7 +153,7 @@ class ParticleObject extends SceneObject {
         this.drawPrefix();
         this.runDraw();
         this.drawSuffix();
-        this.scripts.run("escapeDraw");
+        this.scripts.run("EscapeDraw");
     }
     engineFixedUpdate() {
         this.lastX = this.x;
@@ -169,6 +169,6 @@ class ParticleObject extends SceneObject {
         if (this.lifeSpan > this.spawner.particleLifeSpan) {
             this.remove();
         }
-        this.scripts.run("update");
+        this.scripts.run("Update");
     }
 }

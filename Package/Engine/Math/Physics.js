@@ -1,53 +1,5 @@
 //vectors
 const INFINITY = 1e135;
-class PhysicsMath {
-    static intersectLine(A, A1, B, B1) {
-        let m_A = (A1.y - A.y) / (A1.x - A.x);
-        let b_A = A.y - m_A * A.x;
-        let m_B = (B1.y - B.y) / (B1.x - B.x);
-        let b_B = B.y - m_B * B.x;
-
-        if (m_A === m_B) return null;
-
-        let x = (b_B - b_A) / (m_A - m_B);
-        if (Math.abs(m_A) > INFINITY) {
-            let x = A.x;
-            let y = m_B * x + b_B;
-            if (x < Math.min(B.x, B1.x)) return null;
-            if (x > Math.max(B.x, B1.x)) return null;
-            if (y < Math.min(A.y, A1.y)) return null;
-            if (y > Math.max(A.y, A1.y)) return null;
-            return { x, y };
-        }
-
-        if (Math.abs(m_B) > INFINITY) {
-            let x = B.x;
-            let y = m_A * x + b_A;
-            if (x < Math.min(A.x, A1.x)) return null;
-            if (x > Math.max(A.x, A1.x)) return null;
-            if (y < Math.min(B.y, B1.y)) return null;
-            if (y > Math.max(B.y, B1.y)) return null;
-            return { x, y };
-        }
-        if (x < Math.min(A.x, A1.x)) return null;
-        if (x > Math.max(A.x, A1.x)) return null;
-        if (x < Math.min(B.x, B1.x)) return null;
-        if (x > Math.max(B.x, B1.x)) return null;
-
-        let y = m_A * x + b_A;
-        return { x, y };
-    }
-    static intersectPolygon(a, b) {
-        let points = [];
-
-        for (let i = 0; i < a.length; i++) for (let j = 0; j < b.length; j++) {
-            let p = PhysicsMath.intersectLine(a[i], a[(i + 1) % a.length], b[j], b[(j + 1) % b.length]);
-            if (p) points.push(p);
-        }
-
-        return points;
-    }
-}
 class PhysicsVector {
     constructor(x, y) {
         this.x = x;
@@ -80,6 +32,9 @@ class PhysicsVector {
             this.y /= m;
         }
         return this;
+    }
+    equals(v) {
+        return Math.abs(this.x - v.x) < 1.0001 && Math.abs(this.y - v.y) < 1.0001;
     }
     static add(a, b) {
         return new PhysicsVector(a.x + b.x, a.y + b.y);
@@ -121,6 +76,57 @@ class PhysicsVector {
     }
 }
 PhysicsVector.__ = [new PhysicsVector(0, 0), new PhysicsVector(0, 0), new PhysicsVector(0, 0), new PhysicsVector(0, 0)];
+
+//geo
+
+class PhysicsMath {
+    static intersectLine(A, A1, B, B1) {
+        let m_A = (A1.y - A.y) / (A1.x - A.x);
+        let b_A = A.y - m_A * A.x;
+        let m_B = (B1.y - B.y) / (B1.x - B.x);
+        let b_B = B.y - m_B * B.x;
+
+        if (m_A === m_B) return null;
+
+        let x = (b_B - b_A) / (m_A - m_B);
+        if (Math.abs(m_A) > INFINITY) {
+            let x = A.x;
+            let y = m_B * x + b_B;
+            if (x < Math.min(B.x, B1.x)) return null;
+            if (x > Math.max(B.x, B1.x)) return null;
+            if (y < Math.min(A.y, A1.y)) return null;
+            if (y > Math.max(A.y, A1.y)) return null;
+            return new PhysicsVector(x, y);
+        }
+
+        if (Math.abs(m_B) > INFINITY) {
+            let x = B.x;
+            let y = m_A * x + b_A;
+            if (x < Math.min(A.x, A1.x)) return null;
+            if (x > Math.max(A.x, A1.x)) return null;
+            if (y < Math.min(B.y, B1.y)) return null;
+            if (y > Math.max(B.y, B1.y)) return null;
+            return new PhysicsVector(x, y);
+        }
+        if (x < Math.min(A.x, A1.x)) return null;
+        if (x > Math.max(A.x, A1.x)) return null;
+        if (x < Math.min(B.x, B1.x)) return null;
+        if (x > Math.max(B.x, B1.x)) return null;
+
+        let y = m_A * x + b_A;
+        return new PhysicsVector(x, y);
+    }
+    static intersectPolygon(a, b) {
+        let points = [];
+
+        for (let i = 0; i < a.length; i++) for (let j = 0; j < b.length; j++) {
+            let p = PhysicsMath.intersectLine(a[i], a[(i + 1) % a.length], b[j], b[(j + 1) % b.length]);
+            if (p) points.push(p);
+        }
+
+        return points;
+    }
+}
 
 //shapes
 class PolygonModel {
@@ -909,12 +915,16 @@ class PhysicsEngine {
                 let body2 = collidable[j];
                 let shapesA = body.cacheModels();
                 let shapesB = body2.cacheModels();
-
-                for (let sI = 0; sI < shapesA.length; sI++) for (let sJ = 0; sJ < shapesB.length; sJ++) {
-                    let shapeA = shapesA[sI];
-                    let shapeB = shapesB[sJ];
-                    let col = this.collisionDetector.collide(shapeA, shapeB);
+                if (shapesA.length === 1 && shapesB.length === 1) {
+                    let col = this.collisionDetector.collide(shapesA[0], shapesB[0]);
                     collisions.push(col);
+                } else {
+                    for (let sI = 0; sI < shapesA.length; sI++) for (let sJ = 0; sJ < shapesB.length; sJ++) {
+                        let shapeA = shapesA[sI];
+                        let shapeB = shapesB[sJ];
+                        let col = this.collisionDetector.collide(shapeA, shapeB);
+                        collisions.push(col);
+                    }
                 }
                 let contacts = [];
                 let maxPenetration = -Infinity;
@@ -926,10 +936,14 @@ class PhysicsEngine {
                             if (collision.penetration > maxPenetration) {
                                 maxPenetration = collision.penetration;
                                 best = collision;
-                                if (contacts.length) contacts.push(...collision.contacts
+                                // if (contacts.length) 
+                                contacts.push(...collision.contacts
                                     .filter(contact => !contacts
-                                        .test(con => con.x === contact.x && con.y === contact.y).length));
-                                else contacts.push(...collision.contacts);
+                                        .test(con => con.point.equals(contact.point))
+                                    )
+                                );
+                                contacts = collision.contacts;
+                                // else contacts.push(...collision.contacts);
                             }
                         }
                     }
@@ -1004,9 +1018,9 @@ class PhysicsEngine {
         }
         if (false) for (let i in grid.cells) if (grid.cells[i]) for (let j in grid.cells[i]) if (typeof grid.cells[i][j] === "object") {
             c.stroke(cl.RED, 2).rect(i * cellsize, j * cellsize, cellsize, cellsize);
-            // for (let el of grid.cells[i][j]) {
-            //     c.stroke(cl.ORANGE, 1).arrow(i * cellsize, j * cellsize, el.position.x, el.position.y);
-            // }
+            if (false) for (let el of grid.cells[i][j]) {
+                c.stroke(cl.ORANGE, 1).arrow(i * cellsize, j * cellsize, el.position.x, el.position.y);
+            }
         }
         this.applyForces();
         let intensity = 1 / this.iterations;
