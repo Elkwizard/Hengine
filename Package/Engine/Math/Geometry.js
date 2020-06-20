@@ -36,6 +36,30 @@ class Geometry {
     static distToPoint(p, p2) {
         return Math.sqrt(Geometry.distToPoint2(p, p2));
     }
+    static closest(p, points) {
+        let bestDist = Infinity;
+        let best = null;
+        for (let i = 0; i < points.length; i++) {
+            let dist = Geometry.distToPoint2(points[i], p);
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = points[i];
+            }
+        }
+        return best;
+    }
+    static farthest(p, points) {
+        let bestDist = -Infinity;
+        let best = null;
+        for (let i = 0; i < points.length; i++) {
+            let dist = Geometry.distToPoint2(points[i], p);
+            if (dist > bestDist) {
+                bestDist = dist;
+                best = points[i];
+            }
+        }
+        return best;
+    }
     static signedAngularDist(r1, r2) {
         const pi2 = 2 * Math.PI;
         r1 = (r1 % pi2 + pi2) % pi2;

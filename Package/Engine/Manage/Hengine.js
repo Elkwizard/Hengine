@@ -347,7 +347,7 @@ class Hengine {
 		return this.c.middle();
 	}
 	static get defaultRenderPackage() {
-		return ["Color", "Shapes", "Spline", "Animation", "Frame", "Texture", "Renderer", "Graph", "3DExperimental"];
+		return ["Color", "Shapes", "Spline", "Animation", "Frame", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental"];
 	}
 	static get defaultManagementPackage() {
 		return ["PrototypeOverload", "Scripts", "Scenes", "Engine", "Hengine"];
