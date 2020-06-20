@@ -520,6 +520,12 @@ class Artist {
 		return this.strokeObj;
 	}
 	drawImageInternal(x, y, w, h) {
+		if (typeof x === "object") {
+			h = x.height;
+			w = x.width;
+			y = x.y;
+			x = x.x;
+		}
 		this.drawImage(this.imageStyle, x, y, w, h, this.imageStyleSource);
 	}
 	image(img, sx = 0, sy = 0, sw = img.width, sh = img.height) {
