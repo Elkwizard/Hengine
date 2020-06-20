@@ -3,6 +3,8 @@ class WebcamCapture extends ImageType {
 		super(1, 1, false);
 		this.data = { video: null };
 		WebcamCapture.getWebcam(this.data);
+		this.lastCaptureTime = 0;
+		this.lastCapture = null;
 	}
 	static async getWebcam(home) {
 		const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -16,12 +18,18 @@ class WebcamCapture extends ImageType {
 	}
 	makeImage() {
 		if (this.data.video) {
-			const v = this.data.video;
-			if (v.videoWidth) this.width = v.videoWidth; 
-			if (v.videoHeight) this.height = v.videoHeight;
-			const img = new_OffscreenCanvas(this.width, this.height);
-			img.getContext("2d").drawImage(this.data.video, 0, 0);
-			return img;
+			if (performance.now() - this.lastCaptureTime > 16 || !this.lastCapture) {
+				const v = this.data.video;
+				if (v.videoWidth) this.width = v.videoWidth; 
+				if (v.videoHeight) this.height = v.videoHeight;
+				const img = new_OffscreenCanvas(this.width, this.height);
+				img.getContext("2d").drawImage(this.data.video, 0, 0);
+				this.lastCapture = img;
+				this.lastCaptureTime = performance.now();
+				return img;
+			} else {
+				return this.lastCapture;
+			}
 		} else return WebcamCapture.EMPTY;
 	}
 }

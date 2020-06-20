@@ -493,6 +493,22 @@ class Artist {
 	get middle() {
 		return { x: this.canvas.width / 2, y: this.canvas.height / 2 };
 	}
+	getTexture(x, y, w, h) {
+		let imageData = this.c.getImageData(x, y, w, h);
+		let tex = new Texture(w, h);
+		tex.imageData = imageData;
+		let data = imageData.data;
+		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
+			let inx = (i + j * w) * 4;
+			let r = data[inx + 0];
+			let g = data[inx + 1];
+			let b = data[inx + 2];
+			let a = data[inx + 3];
+			tex.pixels[i][j] = new Color(r, g, b, a);
+		}
+		tex.changed = true;
+		return tex;
+	}
 	createRadialGradient(x, y, radius, ...cols) {
 		let grd = this.c.createRadialGradient(x, y, 0.00000001, x, y, radius);
 		for (let i = 0; i < cols.length; i++) grd.addColorStop(i / (cols.length - 1), this.getContextColor(cols[i]));
