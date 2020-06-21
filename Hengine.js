@@ -104,7 +104,6 @@
     };
     let code = windowGlobals(script.innerHTML);
     code = `(async function() { await hengine.js; ${code} })();`;
-    console.log(code);
     let nScript = document.createElement("script");
     nScript.innerHTML = code;
     document.head.appendChild(nScript);
