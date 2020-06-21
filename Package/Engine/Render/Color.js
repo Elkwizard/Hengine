@@ -314,7 +314,7 @@ class Color extends Operable {
 		let green = Math.abs(this.green - color.green) / 255;
 		let blue = Math.abs(this.blue - color.blue) / 255;
 		let alpha = Math.abs(this.alpha - color.alpha) / 255;
-		return (red + green + blue + alpha) / 4;
+		return (((red + green + blue + alpha) * 10) ** 2) / 1600;
 	}
 	static get empty() {
 		return Color.optimizedConstruct(0, 0, 0, 0);

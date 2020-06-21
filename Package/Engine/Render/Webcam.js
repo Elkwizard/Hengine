@@ -20,10 +20,13 @@ class WebcamCapture extends ImageType {
 		if (this.data.video) {
 			if (performance.now() - this.lastCaptureTime > 16 || !this.lastCapture) {
 				const v = this.data.video;
-				if (v.videoWidth) this.width = v.videoWidth; 
-				if (v.videoHeight) this.height = v.videoHeight;
-				const img = new_OffscreenCanvas(this.width, this.height);
-				img.getContext("2d").drawImage(this.data.video, 0, 0);
+				let mwidth = Math.min(v.videoWidth, v.videoHeight);
+				let ox = (v.videoHeight < v.videoWidth) ? (v.videoWidth - mwidth) / 2 : 0;
+				let oy = (v.videoHeight > v.videoWidth) ? (v.videoHeight - mwidth) / 2 : 0;
+				this.width = mwidth;
+				this.height = mwidth;
+				const img = new_OffscreenCanvas(mwidth, mwidth);
+				img.getContext("2d").drawImage(this.data.video, ox, oy, mwidth, mwidth, 0, 0, mwidth, mwidth);
 				this.lastCapture = img;
 				this.lastCaptureTime = performance.now();
 				return img;

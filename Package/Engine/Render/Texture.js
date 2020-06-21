@@ -67,7 +67,9 @@ class Texture extends ImageType {
 		}
 	}
 	shader(fn, ...args) {
-		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) this.shader_set(i, j, fn(i, j, ...args));
+		let coms = [];
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j, ...args)]);
+		for (let i = 0; i < coms.length; i++) this.shader_set(coms[i][0], coms[i][1], coms[i][2]);
 		this.changed = true;
 	}
 	act_get(x, y) {
