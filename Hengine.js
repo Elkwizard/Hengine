@@ -76,7 +76,6 @@
         for (let charObj of jsCodeChars) {
             if (charObj.exists) result += charObj.value;
         }
-        console.log(result);
         return result;
     }
     //compiler end
