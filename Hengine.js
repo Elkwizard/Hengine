@@ -1,6 +1,33 @@
-(function () {
-    //compiler
-    function windowGlobals(jsCode) {
+const HengineCompiler = {
+    windowGlobals(jsCode) {
+        //remove comments
+        jsCode = jsCode
+            .replace(/\/\/(.*)(\n|$)/g, "$2")
+            .replace(/\/\*((.|\n)*)\*\//g, "");
+        function findStrings(str) {
+            let regions = [];
+            let inString = false;
+            let startInx = 0;
+            let stringType = "'";
+            let escaped = false;
+            for (let i = 0; i < str.length; i++) {
+                const char = str[i];
+                if (char.match(/["'`]/g) && !inString && !escaped) {
+                    startInx = i + 1;
+                    stringType = char;
+                    inString = true;
+                } else if (inString && char === stringType && !escaped) {
+                    inString = false;
+                    if (i - startInx) regions.push([startInx - 1, i + 1]);
+                }
+                if (char === "\\") escaped = true;
+                else escaped = false;
+            }
+            return regions;
+        }
+
+
+        //compile globals
         function findBrackets(str) {
             let regions = [];
             let inBrackets = 0;
@@ -15,14 +42,34 @@
                 }
                 if (char === "}") {
                     inBrackets--;
-                    if (!inBrackets) regions.push([startInx, i]);
-                }   
+                    if (!inBrackets) regions.push([startInx, i + 1]);
+                }
             }
             return regions;
         }
         function match(str, regex) {
             return [...str.matchAll(regex)];
         }
+
+        //remove strings
+        let strRegions = findStrings(jsCode);
+        let allStrings = [];
+        const STR_PLACEHOLDER = "[8_STRING_8]";
+        jsCode = jsCode.split("");
+        for (let i = 0; i < strRegions.length; i++) {
+            let r = strRegions[i];
+            let str = jsCode.splice(r[0], r[1] - r[0], STR_PLACEHOLDER).join("");
+            allStrings.push(str);
+            let len = str.length;
+            let offsetLength = len - 1;
+            for (let j = i + 1; j < strRegions.length; j++) strRegions[j] = [strRegions[j][0] - offsetLength, strRegions[j][1] - offsetLength];
+        }
+        jsCode = jsCode.join("");
+
+        //turn functions and classes into variables
+        jsCode = jsCode.replace(/\bfunction\s+(\w+)\s*\(/g, "var $1 = function $1(");
+        jsCode = jsCode.replace(/\bclass\s+(\w+)\s*\{/g, "let $1 = class $1 {");
+
         let bracketRanges = findBrackets(jsCode);
         let matches = match(jsCode, /(let|var|const)\s+(\w+)\s*=\s*(.+);?/g);
         matches = matches.filter(match => {
@@ -59,10 +106,11 @@
 
             let startInx = inx + str.indexOf("=") + 1;
             let remainingText = jsCode.slice(startInx).trim();
-            
+
             let curInx = 0;
             let valueText = fChar;
-            while ((depth["("] || depth["["] || depth["{"]) || remainingText[curInx] != ";") {
+            let found = false;
+            while ((depth["("] || depth["["] || depth["{"]) || (remainingText[curInx] != ";" && !found)) {
                 curInx++;
                 let char = remainingText[curInx];
                 if (char == "(") depth["("]++;
@@ -71,11 +119,11 @@
                 if (char == "]") depth["["]--;
                 if (char == "{") depth["{"]++;
                 if (char == "}") depth["{"]--;
+                if (depth["{"]) found = true;
                 valueText += char;
             }
-            // if (valueText) console.log(valueText);
             let endInx = startInx + valueText.length + 1;
-            
+
             len = endInx - inx;
             value = valueText;
 
@@ -85,7 +133,7 @@
             jsCodeChars[inx].exists = true;
 
             let compCode = `GLOBAL_${type.toUpperCase()}_ASSIGN`;
-        
+
 
             if (type === "var" || type === "let") {
                 compCode = `window.${name} = ${value}`;
@@ -111,21 +159,24 @@
         for (let charObj of jsCodeChars) {
             if (charObj.exists) result += charObj.value;
         }
-        result = result.replace(/\/\/(.*)(\n|$)/g, "/*$1*/$2");
-        result = result.replace(/\/\*(.*)\*\//g, "");
-        
+
+
+        for (let string of allStrings) {
+            result = result.replace(/\[8_STRING_8\]/, string);
+        }
+
         return result;
     }
-    //compiler end
-    
+};
+(function () {
     let script = document.getElementsByTagName("script")[0];
     let title = script.title || "Hengine Project";
     let scripts = (script.getAttribute("scripts") || "").replace(/\.js/g, "").split(" ").filter(str => str.length);
-    
+
     let src = script.src.split("/");
     src.pop();
     src = src.join("/") + "/Package/Engine/Manage/Hengine.js";
-    window.hengine = { 
+    window.hengine = {
         get js() {
             let script = document.createElement("script");
             script.src = src;
@@ -139,7 +190,7 @@
             });
         }
     };
-    let code = windowGlobals(script.innerHTML);
+    let code = HengineCompiler.windowGlobals(script.innerHTML);
     code = `(async function() { await hengine.js; ${code} })();`;
     let nScript = document.createElement("script");
     nScript.innerHTML = code;
