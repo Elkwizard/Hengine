@@ -27,7 +27,6 @@
         let matches = match(jsCode, /(let|var|const)\s+(\w+)\s*=\s*(.+);?/g);
         matches = matches.filter(match => {
             let inx = match.index;
-            if (!match[0].match(/=/g)) return false;
             for (let range of bracketRanges) {
                 if (inx >= range[0] && inx <= range[1]) return false;
             }
@@ -38,27 +37,62 @@
             let str = match[0].trim();
             let len = str.length;
             let inx = match.index;
-            for (let i = 0; i < len; i++) {
-                jsCodeChars[inx + i].exists = false;
-            }
-            jsCodeChars[inx].exists = true;
+
             let type = "var";
             if (str.match(/^let/g)) type = "let";
             if (str.match(/^const/g)) type = "const";
             let spaceInx = str.indexOf(" ");
             let afterSpace = str.slice(spaceInx).trim();
 
+            let vInx = afterSpace.indexOf("=");
+            let name = afterSpace.slice(0, vInx).trim();
+            let value = afterSpace.slice(vInx + 1).trim();
+            let depth = {
+                "(": 0,
+                "[": 0,
+                "{": 0
+            };
+            let fChar = value[0];
+            if (fChar === "(") depth["("] = 1;
+            if (fChar === "[") depth["["] = 1;
+            if (fChar === "{") depth["{"] = 1;
+
+            let startInx = inx + str.indexOf("=") + 1;
+            let remainingText = jsCode.slice(startInx).trim();
+            
+            let curInx = 0;
+            let valueText = fChar;
+            while ((depth["("] || depth["["] || depth["{"]) || remainingText[curInx] != ";") {
+                curInx++;
+                let char = remainingText[curInx];
+                if (char == "(") depth["("]++;
+                if (char == ")") depth["("]--;
+                if (char == "[") depth["["]++;
+                if (char == "]") depth["["]--;
+                if (char == "{") depth["{"]++;
+                if (char == "}") depth["{"]--;
+                valueText += char;
+            }
+            // if (valueText) console.log(valueText);
+            let endInx = startInx + valueText.length + 1;
+            
+            len = endInx - inx;
+            value = valueText;
+
+            for (let i = 0; i < len; i++) {
+                jsCodeChars[inx + i].exists = false;
+            }
+            jsCodeChars[inx].exists = true;
+
             let compCode = `GLOBAL_${type.toUpperCase()}_ASSIGN`;
+        
 
             if (type === "var" || type === "let") {
-                compCode = "window." + afterSpace;
+                compCode = `window.${name} = ${value}`;
             } else {
-                let vInx = afterSpace.indexOf("=");
-                let name = afterSpace.slice(0, vInx).trim();
-                let value = afterSpace.slice(vInx).trim();
                 if (value[value.length - 1] === ";") value = value.slice(0, value.length - 1);
                 compCode = `(function() {
-        const __temp__ ${value};
+        const __temp__ = ${value};
         if ("${name}" in window) delete window["${name}"];
         Object.defineProperty(window, "${name}", {
             set: function (newValue) {
@@ -68,14 +102,17 @@
                 return __temp__;
             }
         });
-    })();`
+    })();`;
             }
             jsCodeChars[inx].value = compCode;
         }
+
         let result = "";
         for (let charObj of jsCodeChars) {
             if (charObj.exists) result += charObj.value;
         }
+
+        console.log(result);
         return result;
     }
     //compiler end
