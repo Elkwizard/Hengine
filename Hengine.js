@@ -28,11 +28,12 @@
     setTitle(title);
 
     //compile code
-    let code = HengineCompiler.compile(script.innerHTML);
+    let code = script.innerHTML;
+    if (script.hasAttribute("compiled")) code = HengineCompiler.compile(code);
 
     let nScript = document.createElement("script");
     nScript.innerHTML = code;
     document.head.appendChild(nScript);
-    script.innerHTML = "";
+    
 
 })();
