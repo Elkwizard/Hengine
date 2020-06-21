@@ -111,8 +111,9 @@
         for (let charObj of jsCodeChars) {
             if (charObj.exists) result += charObj.value;
         }
-
-        console.log(result);
+        result = result.replace(/\/\/(.*)(\n|$)/g, "/*$1*/$2");
+        result = result.replace(/\/\*(.*)\*\//g, "");
+        
         return result;
     }
     //compiler end
