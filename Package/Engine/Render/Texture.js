@@ -33,11 +33,8 @@ class Texture extends ImageType {
 	}
 	toString() {
 		function channelPair(a, b) {
-			let aStr = Math.floor(a).toString(2);
-			let bStr = Math.floor(b).toString(2);
-			let difA = 8 - aStr.length;
-			let difB = 8 - bStr.length;
-			return String.fromCharCode(parseInt("0".repeat(difA) + aStr + "0".repeat(difB) + bStr, 2));
+			let charCode = a << 8 | b;
+			return String.fromCharCode(charCode);
 		}
 		function color(col) {
 			return channelPair(col.red, col.green) + channelPair(col.blue, col.alpha * 255);
@@ -195,11 +192,10 @@ class Texture extends ImageType {
 	}
 	static fromString(str) {
 		function inv_channelPair(str) {
-			let bin = str.charCodeAt(0).toString(2);
-			bin = "0".repeat(16 - bin.length) + bin;
-			let a = parseInt(bin.slice(0, 8), 2);
-			let b = parseInt(bin.slice(8), 2);
-			return [a, b]
+			let bin = str.charCodeAt(0);
+			let a = bin >> 8;
+			let b = bin - (b << 8);
+			return [a, b];
 		}
 		function inv_color(str) {
 			let tok = str.split("");
