@@ -194,7 +194,7 @@ class Texture extends ImageType {
 		function inv_channelPair(str) {
 			let bin = str.charCodeAt(0);
 			let a = bin >> 8;
-			let b = bin - (b << 8);
+			let b = bin - (a << 8);
 			return [a, b];
 		}
 		function inv_color(str) {
