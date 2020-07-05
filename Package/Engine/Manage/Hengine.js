@@ -237,7 +237,7 @@ class Hengine {
 		let st = t.split("/");
 		let ti = st[st.length - 3];
 		if (ti) {
-			ti = ti.replace(/%20/g, " ");
+			ti = unescape(ti);
 		} else ti = "Unknown";
 		return ti;
 	}

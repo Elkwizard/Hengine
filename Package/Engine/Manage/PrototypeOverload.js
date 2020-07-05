@@ -1,3 +1,6 @@
+window.assert = function(condition, name) {
+	if (!condition) console.warn(`Assertion "${name}" failed.`);
+};
 Function.prototype.add = function (fn = function () { }) {
 	let self = this;
 	return function (...a) {
