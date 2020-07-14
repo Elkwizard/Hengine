@@ -23,59 +23,28 @@ Function.prototype.performance = function (...args) {
 	const t_2 = performance.now();
 	return (t_2 - t_1) / iter;
 };
-Array.dim2 = function (w, h, fn = (x, y) => null) {
+Array.dim = function (...dims) {
 	let ary = [];
-	for (let i = 0; i < w; i++) {
-		ary.push([]);
-		for (let j = 0; j < h; j++) ary[i].push(fn(i, j));
-	}
-	ary[Symbol.iterator] = function* () {
-		for (let i = 0; i < this.length; i++)
-			for (let j = 0; j < this[0].length; j++) yield [i, j];
-	};
-	ary.width = w;
-	ary.height = h;
-	ary.map = function (fn) {
-		let nAry = Array.dim2(w, h);
-		for (let i = 0; i < this.length; i++)
-			for (let j = 0; j < this[0].length; j++) nAry[i][j] = fn(this[i][j], i, j, this);
-		return nAry;
-	}
-	return ary;
-};
-Array.dim3 = function (w, h, d, fn = (x, y, z) => null) {
-	let ary = [];
-	for (let i = 0; i < w; i++) {
-		ary.push([]);
-		for (let j = 0; j < h; j++) {
-			ary[i].push([]);
-			for (let k = 0; k < d; k++) ary[i][j].push(fn(i, j, k));
+	if (dims.length > 1) {
+		let dim = dims.shift();
+		for (let i = 0; i < dim; i++) {
+			ary.push(Array.dim(...dims));
 		}
+	} else {
+		for (let i = 0; i < dims[0]; i++) ary.push(null);
 	}
-	ary.width = w;
-	ary.height = h;
-	ary.depth = d;
+	ary.map = function (fn, ...coords) {
+		let result = [];
+		if (this.length && Array.isArray(this[0])) {
+			for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...[...coords, i]));
+		} else if (this.length) {
+			for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
+		}
+		return result;
+	}.bind(ary);
 	ary[Symbol.iterator] = function* () {
-		for (let i = 0; i < this.length; i++)
-			for (let j = 0; j < this[0].length; j++)
-				for (let k = 0; k < this[0][0].length; k++) yield [i, j, k];
-	};
-	ary.map = function (fn) {
-		let nAry = Array.dim3(w, h, d);
-		for (let i = 0; i < this.length; i++)
-			for (let j = 0; j < this[0].length; j++)
-				for (let k = 0; k < this[0][0].length; k++) nAry[i][j][k] = fn(this[i][j][k], i, j, k, this);
-		return nAry;
-	}
-	return ary;
-};
-Array.dim = function (dimension, ...size) {
-	let ary = [];
-	if (dimension !== 1) {
-		let d = size[0];
-		size.shift();
-		for (let i = 0; i < d; i++) ary.push(Array.dim(dimension - 1, ...size));
-	} else for (let i = 0; i < size[0]; i++) ary.push(null);
+
+	}.bind(ary);
 	return ary;
 };
 Array.prototype.test = function (test) {
