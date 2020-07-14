@@ -23,28 +23,37 @@ Function.prototype.performance = function (...args) {
 	const t_2 = performance.now();
 	return (t_2 - t_1) / iter;
 };
+Array.prototype.map = function (fn, ...coords) {
+	let result = [];
+	if (this.length && Array.isArray(this[0]) && this.multiDimensional) {
+		result.multiDimensional = true;
+		for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...[...coords, i]));
+	} else if (this.length) 
+		for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
+	return result;
+};
+Array.prototype.flatten = function () {
+	if (this.length) {
+		let result = [];
+		if (Array.isArray(this[0])) for (let i = 0; i < this.length; i++) result.push(...this[i].flatten());
+		else for (let i = 0; i < this.length; i++) result.push(this[i]);
+		return result;
+	}
+	return [];
+}
+Array.prototype[Symbol.iterator] = function* () {
+	let all = this.flatten();
+	for (let i = 0; i < all.length; i++) yield all[i];
+};
 Array.dim = function (...dims) {
 	let ary = [];
 	if (dims.length > 1) {
 		let dim = dims.shift();
-		for (let i = 0; i < dim; i++) {
-			ary.push(Array.dim(...dims));
-		}
+		for (let i = 0; i < dim; i++) ary.push(Array.dim(...dims));
 	} else {
 		for (let i = 0; i < dims[0]; i++) ary.push(null);
 	}
-	ary.map = function (fn, ...coords) {
-		let result = [];
-		if (this.length && Array.isArray(this[0])) {
-			for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...[...coords, i]));
-		} else if (this.length) {
-			for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
-		}
-		return result;
-	}.bind(ary);
-	ary[Symbol.iterator] = function* () {
-
-	}.bind(ary);
+	ary.multiDimensional = true;
 	return ary;
 };
 Array.prototype.test = function (test) {
