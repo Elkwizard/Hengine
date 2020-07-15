@@ -31,6 +31,9 @@ class Texture extends ImageType {
 
 		this.changed = false;
 	}
+	get brightness() {
+		return this.pixels.map(column => column.map(col => col.brightness));
+	}
 	toString() {
 		function channelPair(a, b) {
 			let charCode = a << 8 | b;
@@ -68,6 +71,7 @@ class Texture extends ImageType {
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j, ...args)]);
 		for (let i = 0; i < coms.length; i++) this.shader_set(coms[i][0], coms[i][1], coms[i][2]);
 		this.changed = true;
+		return this;
 	}
 	act_get(x, y) {
 		return this.pixels[x][y];
@@ -156,6 +160,12 @@ class Texture extends ImageType {
 		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) r.shader_set(i, j, this.getPixel(x + i, y + j));
 		r.changed = true;
 		return r;
+	}
+	static grayScale(bright) {
+		return (new Texture(bright.length, bright[0].length)).shader((x, y) => Color.grayScale(bright[x][y]));
+	}
+	static colorScale(col, bright) {
+		return (new Texture(bright.length, bright[0].length)).shader((x, y) => Color.colorScale(col, bright[x][y]));
 	}
 	static async fromDataURI(uri, w_o, h_o) {
 		let img = new Image();

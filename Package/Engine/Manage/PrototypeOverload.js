@@ -35,7 +35,7 @@ Array.prototype.map = function (fn, ...coords) {
 Array.prototype.flatten = function () {
 	if (this.length) {
 		let result = [];
-		if (Array.isArray(this[0])) for (let i = 0; i < this.length; i++) result.push(...this[i].flatten());
+		if (Array.isArray(this[0]) && this.multiDimensional) for (let i = 0; i < this.length; i++) result.push(...this[i].flatten());
 		else for (let i = 0; i < this.length; i++) result.push(this[i]);
 		return result;
 	}
