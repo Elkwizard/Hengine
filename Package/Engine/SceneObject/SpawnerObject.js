@@ -102,9 +102,9 @@ class ParticleObject extends SceneObject {
         this.lastY = 0;
         this.velocity = Vector2.origin;
         this.spawner = spawner;
-        this.draw = e => e;
-        this.drawPrefix = e => e;
-        this.drawSuffix = e => e;
+        this.draw = function () { };
+        this.drawPrefix = function () { };
+        this.drawSuffix = function () { };
         this.particleInit();
         this.completelyStatic = false;
         this.lifeSpan = 0;
@@ -114,11 +114,9 @@ class ParticleObject extends SceneObject {
         let pSize = sp.particleSize + ((Math.random() - Math.random()) * sp.particleSizeVariance);
         let sX = sp.x;
         let sY = sp.y;
-        let n = this;
         this.x = sX;
         this.y = sY;
-        let shape = this.spawner.particleShape.get();
-        shape.scale(pSize);
+        let shape = this.spawner.particleShape.scale(pSize);
         this.addShape("default", shape);
         this.lastX = sX;
         this.lastY = sY;
@@ -131,12 +129,12 @@ class ParticleObject extends SceneObject {
         
         //art
         if (sp.particleFades) {
-            this.drawPrefix = e => {
+            this.drawPrefix = function () {
                 this.home.c.c.globalAlpha = Math.max(0, 1 - (this.lifeSpan / sp.particleLifeSpan));
-            }
-            this.drawSuffix = e => {
+            };
+            this.drawSuffix = function () {
                 this.home.c.c.globalAlpha = 1;
-            }
+            };
         }
         if (sp.particleDraw instanceof Script) {
             this.draw = function () { };
@@ -144,7 +142,7 @@ class ParticleObject extends SceneObject {
         } else {
             this.draw = sp.particleDraw.bind(this);
         }
-        sp.spawns[n.name] = this;
+        sp.spawns[this.name] = this;
     }
     remove() {
         delete this.spawner.spawns[this.name];
@@ -162,7 +160,7 @@ class ParticleObject extends SceneObject {
             this.velocity.y += this.home.gravity.y;
         }
         if (this.spawner.particleSlows) {
-            this.velocity.Nmul(this.home.linearDragForce)
+            this.velocity.Nmul(this.home.physicsEngine.linearDrag);
         }
         this.x += this.velocity.x * 2;
         this.y += this.velocity.y * 2;
