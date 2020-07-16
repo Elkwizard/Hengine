@@ -1,14 +1,4 @@
-//Global Functions
-function clamp(n, a, b) {
-	return Math.max(a, Math.min(b, n));
-}
-function remap(n, a, b, a2, b2) {
-	let t = (n - a) / (b - a);
-	return a2 * (1 - t) + b2 * t;
-}
-function threshold(n, t) {
-	return !!(n > t);
-}
+
 function assert(condition, name) {
 	if (!condition) console.warn(`Assertion "${name}" failed.`);
 };
