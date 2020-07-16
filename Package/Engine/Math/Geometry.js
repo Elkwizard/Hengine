@@ -210,20 +210,7 @@ class Geometry {
         return bestPoint;
     }
     static closestPointOnLineObject(p, l) {
-        if (l.b.y < l.a.y) [l.a, l.b] = [l.b, l.a];
-        const A = l.a;
-        const B = l.b;
-        const SIGN_X = (A.x < B.x) ? -1 : 1;
-        const SIGN_Y = (A.y < B.y) ? -1 : 1;
-        if (Math.abs(A.x - B.x) < 0.001) A.x += SIGN_X * 0.0001;
-        if (Math.abs(A.y - B.y) < 0.001) A.y += SIGN_Y * 0.0001;
-        const MIN = Math.min(A.x, B.x);
-        const MAX = Math.max(A.x, B.x);
-        const m_1 = (B.y - A.y) / (B.x - A.x);
-        const m_2 = (B.x - A.x) / (B.y - A.y);
-        const X = clamp((p.y + m_2 * p.x + m_1 * A.x - A.y) / (m_1 + m_2), MIN, MAX);
-        const Y = m_1 * X + A.y - m_1 * A.x;
-        return new Vector2(X, Y);
+        return p.Vminus(l.a).projectOnto(l.b.Vminus(l.a)).Vplus(l.a);
     }
     static closestPointOnLineObjectLimited(p, l) {
         let outOfBounds = false;
