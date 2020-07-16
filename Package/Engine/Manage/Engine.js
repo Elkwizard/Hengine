@@ -179,7 +179,7 @@ class Engine {
 						this.afterFixedUpdate();
 						this.updateIntervalCalls(IntervalFunction.AFTER_FIXED_UPDATE);
 					}
-					this.updateIntervalCalls(IntervalFunction.AFTER);
+					this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
 					this.afterUpdate();
 					this.updateScreenRecordings();
 					M.last = { x: M.x, y: M.y };
@@ -253,13 +253,13 @@ class Engine {
 			if (r.isRecording) r.frames.push(f);
 		}
 	}
-	continuous(fn, type = IntervalFunction.AFTER) {
+	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
 		this.intervalFns.push(new ContinuousFunction(fn, type));
 	}
-	transition(fn, frames, type = IntervalFunction.BEFORE) {
+	transition(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.intervalFns.push(new TransitionFunction(fn, frames, type));
 	}
-	delay(fn, frames, type = IntervalFunction.BEFORE) {
+	delay(fn, frames, type = IntervalFunction.BEFORE_UDPATE) {
 		this.intervalFns.push(new DelayedFunction(fn, frames, type));
 	}
 	updateIntervalCalls(type) {

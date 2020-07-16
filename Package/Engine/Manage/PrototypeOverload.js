@@ -1,6 +1,9 @@
-window.assert = function(condition, name) {
-	if (!condition) console.warn(`Assertion "${name}" failed.`);
-};
+let globalSquareRoots = 0;
+let sqrt = Math.sqrt.bind(Math);
+Math.sqrt = function(n) {
+	globalSquareRoots++;
+	return sqrt(n);
+}
 Function.prototype.add = function (fn = function () { }) {
 	let self = this;
 	return function (...a) {

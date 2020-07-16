@@ -36,9 +36,15 @@ class ImageType {
 let Frame = class extends ImageType {
 	constructor(width, height) {
 		super(width, height, false);
+		if (typeof width === "string") {
+			this.src = width;
+			width = 10;
+			height = 10;
+		}
 		this.img = new_OffscreenCanvas(this.width, this.height);
 		this.c = new Artist(this.img);
 		this.c.c.imageSmoothingEnabled = window.c ? !window.c.preservePixelart : false;
+		this.renderer = this.c;
 	}
 	set src(src) {
 		let img = new Image();
