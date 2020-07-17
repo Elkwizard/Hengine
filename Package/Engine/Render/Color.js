@@ -156,7 +156,6 @@ class Color extends Operable {
 		return this;
 	}
 	constrain() {
-		const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 		if (this.limited) {
 			this.red = clamp(this.red, 0, 255);
 			this.green = clamp(this.green, 0, 255);

@@ -1,8 +1,4 @@
 
-function assert(condition, name) {
-	if (!condition) console.warn(`Assertion "${name}" failed.`);
-};
-
 class LocalFileSystem {
 	static get header() {
 		return "LOCAL_FILE_SYSTEM_";
@@ -351,11 +347,14 @@ class Hengine {
 	middle() {
 		return this.c.middle();
 	}
+	static get defaultPreloadPackage() {
+		return ["PrototypeOverload"];
+	}
 	static get defaultRenderPackage() {
 		return ["Color", "Shapes", "Spline", "Animation", "Frame", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental"];
 	}
 	static get defaultManagementPackage() {
-		return ["PrototypeOverload", "Scripts", "Scenes", "Engine", "Hengine"];
+		return ["Scripts", "Scenes", "Engine", "Hengine"];
 	}
 	static get defaultMathPackage() {
 		return ["Random", "Operable", "Vector", "Geometry", "Physics", "PhysicsAPI"];
@@ -368,12 +367,13 @@ class Hengine {
 	}
 	static get defaultEnginePackage() {
 		return {
+			Preload: Hengine.defaultPreloadPackage,
 			Math: Hengine.defaultMathPackage,
 			Render: Hengine.defaultRenderPackage,
 			Util: Hengine.defaultUtilityPackage,
 			SceneObject: Hengine.defaultSceneObjectPackage,
 			Manage: Hengine.defaultManagementPackage
-		}
+		};
 	}
 	static utilityApplicationPackage(code = []) {
 		return new ApplicationPackage(Hengine.defaultEnginePackage, code, [], [], [], false);
