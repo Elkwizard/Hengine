@@ -26,7 +26,7 @@ class Render3D {
     static projectVector3(v) {
         let x = v.x;
         let y = v.y;
-        let z = Math.max(v.z, 0.1);
+        let z = Math.max(v.z, 1);
         return new Vector3(x / z, y / z, v.z);
     }
     static getCameraTransform(camera) {
@@ -149,7 +149,7 @@ class Render3D {
     }
 }
 Render3D.camera = {
-	pos: new Vector3(0, 0, -100),
+	pos: new Vector3(0, 0, 0),
 	rotation: new Vector3(0, 0, 0)
 };
 class Tri {
@@ -163,8 +163,12 @@ class Tri {
 		let B = this.vertices[1].minus(this.vertices[0]);
 		this.normal = A.cross(B).normalize();
 		this.lightNormal = this.normal;
-		this.middle = Vector.sum(...this.vertices).over(3);
-        this.sortZ = (this.vertices[0].z + this.vertices[1].z + this.vertices[2].z) / 3;
+        this.middle = Vector.sum(...this.vertices).over(3);
+        let az = this.vertices[0].z;
+        let bz = this.vertices[1].z;
+        let cz = this.vertices[2].z;
+        this.sortZ = (az + bz + cz) / 3;
+        this.maxZ = Math.max(az, bz, cz);
     }
     get() {
         let t = new Tri(...this.vertices);
@@ -281,8 +285,8 @@ class Mesh {
 		m_1.tris = m_1.tris.filter(tri => {
 			let toCamera = tri.middle;
 			let dot = toCamera.dot(tri.normal);
-			let min = tri.maxZ;
-			if (min < 100) {
+            let max = tri.maxZ;
+			if (max < 1) {
 				return false;
 			}
 			return dot >= 0;

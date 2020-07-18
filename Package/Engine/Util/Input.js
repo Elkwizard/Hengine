@@ -206,5 +206,3 @@ class MouseHandler extends InputHandler {
 		if (this.listenerRoot) this.listenerRoot.removeEventListener("contextmenu", this.__right__);
 	}
 }
-const K = new KeyboardHandler();
-const M = new MouseHandler();

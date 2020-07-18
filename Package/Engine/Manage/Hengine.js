@@ -117,6 +117,10 @@ class Hengine {
 
 		//create engine
 		document.body.style.margin = 0;
+		this.K = new KeyboardHandler();
+		this.M = new MouseHandler();
+		window.K = this.K;
+		window.M = this.M;
 		this.g = new Engine(utility, wrapper);
 		this.s = this.g.scene;
 		this.c = this.g.renderer;
