@@ -63,13 +63,13 @@ class Render3D {
 
         return new Vector3(x, y, z);
     }
-    static cameraRotationFromMouse(camera, mouse) {
-        camera.rotation.x = Math.PI * (mouse.y - height / 2) / height;
-        camera.rotation.y = Math.PI * (mouse.x - width / 2) / width;
+    static cameraRotationFromMouse(mouse) {
+        Render3D.camera.rotation.x = Math.PI * (mouse.y - height / 2) / height;
+        Render3D.camera.rotation.y = Math.PI * (mouse.x - width / 2) / width;
     }
-    static moveCameraAlongRotation(camera, v) {
-        let nr = Render3D.rotatePointAround(Vector3.origin, v, camera.rotation.inverse());
-        camera.pos.add(nr);   
+    static moveCameraAlongRotation(v) {
+        let nr = Render3D.rotatePointAround(Vector3.origin, v, Render3D.camera.rotation.inverse());
+        Render3D.camera.pos.add(nr);   
     }
     static renderScene(c, ...meshes) {
         let triangles = [];
@@ -155,19 +155,22 @@ Render3D.camera = {
 class Tri {
 	constructor(a, b, c) {
 		this.vertices = [a, b, c];
-		let A = b.minus(c);
-		let B = b.minus(a);
+        this.color = cl.WHITE;
+        this.calculateNormals();
+    }
+    calculateNormals() {
+		let A = this.vertices[1].minus(this.vertices[2]);
+		let B = this.vertices[1].minus(this.vertices[0]);
 		this.normal = A.cross(B).normalize();
 		this.lightNormal = this.normal;
 		this.middle = Vector.sum(...this.vertices).over(3);
-        this.color = cl.WHITE;
-        const mags = this.vertices.map(e => e.mag);
-		this.maxZ = Math.max(...this.vertices.map(e => e.z));
-        this.minZ = Math.min(...this.vertices.map(e => e.z));
-        // this.sortZ = (this.vertices[0].mag + this.vertices[1].mag + this.vertices[2].mag) / 3;
-        this.sortMinZ = Math.min(...this.vertices.map(e => e.mag));
-        this.sortMaxZ = Math.max(...this.vertices.map(e => e.mag));
-	}
+        this.sortZ = (this.vertices[0].z + this.vertices[1].z + this.vertices[2].z) / 3;
+    }
+    get() {
+        let t = new Tri(...this.vertices);
+        t.color = this.color;
+        return t;
+    }
 	t_rotate(r, v) {
 		let tri = this.rotate(r, v);
 		tri.lightNormal = this.lightNormal;
@@ -212,9 +215,42 @@ class Tri {
 }
 class Mesh {
 	constructor(...tris) {
-		this.tris = tris;
-		this.middle = tris.length ? Vector.sum(...tris.map(e => e.middle)).over(tris.length) : Vector3.origin;
-	}
+        this.tris = tris;
+		this.middle = this.tris.length ? Vector.sum(...this.tris.map(e => e.middle)).over(this.tris.length) : Vector3.origin;
+    }
+    calculateNormals() {
+        for (let tri of this.tris) tri.calculateNormals();
+    }
+    subdivide() {
+        let m = this.get();
+		let tris = [];
+		for (let i = 0; i < m.tris.length; i++) {
+			let t = m.tris[i].get();
+
+			const A = t.vertices[0];
+			const B = t.vertices[1];
+			const C = t.vertices[2];
+
+			const AB = A.plus(B).over(2);
+			const BC = B.plus(C).over(2);
+			const CA = C.plus(A).over(2);
+
+			let ts = [
+				new Tri(AB, B, BC), 
+				new Tri(BC, C, CA),
+				new Tri(CA, A, AB), 
+				new Tri(CA, AB, BC)
+            ];
+            for (let tri of ts) tri.color = t.color;
+
+			tris.push(...ts);
+		}
+		m.tris = tris;
+        return m;
+    }
+    get() {
+        return new Mesh(...this.tris.map(tri => tri.get()));
+    }
 	each(fn) {
 		let ary = [];
 		for (let tri of this.tris) ary.push(fn(tri));
@@ -245,27 +281,28 @@ class Mesh {
 			}
 			return dot >= 0;
 		});
-		m_1.tris.sort((a, b) => {
-            if (a.sortMaxZ < b.sortMaxZ) return 1;
-            if (a.sortMaxZ > b.sortMaxZ) return -1;
-            return 0;
-        });
+		m_1.tris.sort((a, b) => b.sortZ - a.sortZ);
 		let m_0 = m_1.project();
 		m_0 = m_0.each(tri => tri.each(v => {
 			return new Vector3(v.x + width / 2, v.y + height / 2, v.z);
-		}));
-		let screen = new Polygon([new Vector2(0, 0), new Vector2(width, 0), new Vector2(width, height), new Vector2(0, height)]);
-		screen.cacheBoundingBox(screen.getBoundingBox());
+        }));
+        let screen = new Rect(0, 0, width, height);
 		m_0.tris = m_0.tris.filter(tri => {
-			let trianglePolygon = new Polygon([
-				new Vector2(tri.vertices[0].x, tri.vertices[0].y),
-				new Vector2(tri.vertices[1].x, tri.vertices[1].y),
-				new Vector2(tri.vertices[2].x, tri.vertices[2].y)
-			]);
-			trianglePolygon.cacheBoundingBox(trianglePolygon.getBoundingBox());
-			let onScreen = Physics.collidePolygonPolygon(screen, trianglePolygon).colliding;
-			return onScreen;
-		})
+            let minX = Infinity;
+            let maxX = -Infinity;
+            let minY = Infinity;
+            let maxY = -Infinity;
+
+            for (let i = 0; i < tri.vertices.length; i++) {
+                let v = tri.vertices[i];
+                if (v.x < minX) minX = v.x;
+                if (v.x > maxX) maxX = v.x;
+                if (v.y < minY) minY = v.y;
+                if (v.y > maxY) maxY = v.y;
+            }
+
+            return minX < screen.x + screen.width && minY < screen.y + screen.height && maxX > screen.x && maxY > screen.y;
+        })
 		m_0.each(tri => {
 			let light = (tri.lightNormal.dot(Render3D.lightDirection) + 1) / 2;
 			let col = Color.lerp(tri.color, cl.BLACK, (1 - light));
