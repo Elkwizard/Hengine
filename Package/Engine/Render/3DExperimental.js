@@ -26,7 +26,7 @@ class Render3D {
     static projectVector3(v) {
         let x = v.x;
         let y = v.y;
-        let z = Math.max(v.z / 1000, 0.01);
+        let z = Math.max(v.z, 0.1);
         return new Vector3(x / z, y / z, v.z);
     }
     static getCameraTransform(camera) {
@@ -218,6 +218,12 @@ class Mesh {
         this.tris = tris;
 		this.middle = this.tris.length ? Vector.sum(...this.tris.map(e => e.middle)).over(this.tris.length) : Vector3.origin;
     }
+    rotate(r, v) {
+        return this.each(tri => tri.rotate(r, v));
+    }
+    translate(o) {
+        return this.each(tri => tri.translate(o));
+    }
     calculateNormals() {
         for (let tri of this.tris) tri.calculateNormals();
     }
@@ -276,7 +282,7 @@ class Mesh {
 			let toCamera = tri.middle;
 			let dot = toCamera.dot(tri.normal);
 			let min = tri.maxZ;
-			if (min < 30) {
+			if (min < 100) {
 				return false;
 			}
 			return dot >= 0;
@@ -284,7 +290,7 @@ class Mesh {
 		m_1.tris.sort((a, b) => b.sortZ - a.sortZ);
 		let m_0 = m_1.project();
 		m_0 = m_0.each(tri => tri.each(v => {
-			return new Vector3(v.x + width / 2, v.y + height / 2, v.z);
+			return new Vector3((width / 2) * v.x + width / 2, (width / 2) * v.y + height / 2, v.z);
         }));
         let screen = new Rect(0, 0, width, height);
 		m_0.tris = m_0.tris.filter(tri => {
