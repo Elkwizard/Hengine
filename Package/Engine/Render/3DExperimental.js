@@ -146,10 +146,10 @@ Render3D.camera = {
 	rotation: new Vector3(0, 0, 0)
 };
 class Tri {
-	constructor(a, b, c) {
+	constructor(a, b, c, calc = true) {
 		this.vertices = [a, b, c];
         this.color = cl.WHITE;
-        this.calculateNormals();
+        if (calc) this.calculateNormals();
     }
     calculateNormals() {
 		let A = this.vertices[1].minus(this.vertices[2]);
@@ -163,15 +163,22 @@ class Tri {
         this.sortZ = (az + bz + cz) / 3;
         this.maxZ = Math.max(az, bz, cz);
     }
+    copyProperties(tri) {
+        tri.color = this.color;
+        tri.normal = this.normal;
+        tri.lightNormal = this.lightNormal;
+        tri.sortZ = this.sortZ;
+        tri.maxZ = this.maxZ;
+        tri.middle = this.middle;
+    }
     get() {
-        let t = new Tri(...this.vertices);
-        t.color = this.color;
+        let t = new Tri(...this.vertices, false);
+        this.copyProperties(t);
         return t;
     }
 	t_rotate(r, v) {
 		let tri = this.rotate(r, v);
 		tri.lightNormal = this.lightNormal;
-		tri.color = this.color;
 		return tri;
 	}
 	rotate(r, v) {
@@ -195,17 +202,30 @@ class Tri {
 		let ary = [];
 		for (let vert of this.vertices) ary.push(fn(vert));
 		let t = new Tri(...ary);
-		t.lightNormal = this.lightNormal;
-		t.color = this.color;
 		return t;
+    }
+    cameraTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
+        let t = new Tri(...this.vertices.map(v => Render3D.transformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz)));
+        let t_2 = t.get();
+        t_2.vertices = t_2.vertices.map(v => Render3D.projectVector3(v));
+        t.copyProperties(t_2);
+        t_2.color = this.color;
+        return t_2;
+    }
+    transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
+        let t = new Tri(...this.vertices.map(v => Render3D.transformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz)));
+        t.color = this.color;
+        return t;
+    }
+    project() {
+        let t = new Tri(...this.vertices.map(Render3D.projectVector3), false);
+		this.copyProperties(t);
+        return t;
     }
 	each(fn) {
 		let ary = [];
 		for (let vert of this.vertices) ary.push(fn(vert));
 		let t = new Tri(...ary);
-		t.normal = this.normal;
-		t.middle = this.middle;
-		t.lightNormal = this.lightNormal;
 		t.color = this.color;
 		return t;
 	}
@@ -213,7 +233,8 @@ class Tri {
 class Mesh {
 	constructor(...tris) {
         this.tris = tris;
-		this.middle = this.tris.length ? Vector.sum(...this.tris.map(e => e.middle)).over(this.tris.length) : Vector3.origin;
+        this.middle = Vector3.origin;
+        if (tris.length) this.middle = Vector3.sum(...tris.map(tri => tri.middle)).div(tris.length);
     }
     rotate(r, v) {
         return this.each(tri => tri.rotate(r, v));
@@ -265,16 +286,19 @@ class Mesh {
             return e;
         }));
     }
+    cameraTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
+        return this.each(tri => tri.cameraTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz));
+    }
 	transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
-		return this.each(tri => tri.each_t(v => Render3D.transformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz)));
+		return this.each(tri => tri.transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz));
     }
     project() {
-        return this.each(tri => tri.each(v => Render3D.projectVector3(v)));
+        return this.each(tri => tri.project());
     }
 	render(c, camera) {
         const width = c.canvas.width;
         const height = c.canvas.height;
-		let m_1 = this.transform(...Render3D.getCameraTransform(camera));
+		let m_1 = this.cameraTransform(...Render3D.getCameraTransform(camera));
 		m_1.tris = m_1.tris.filter(tri => {
 			let toCamera = tri.middle;
 			let dot = toCamera.dot(tri.normal);
@@ -285,7 +309,7 @@ class Mesh {
 			return dot >= 0;
 		});
 		m_1.tris.sort((a, b) => b.sortZ - a.sortZ);
-		let m_0 = m_1.project();
+		let m_0 = m_1;
 		m_0 = m_0.each(tri => tri.each(v => {
 			return new Vector3((width / 2) * v.x + width / 2, (width / 2) * v.y + height / 2, v.z);
         }));
