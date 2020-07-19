@@ -124,9 +124,9 @@ class MouseHandler extends InputHandler {
 		this.onMove = new Listener();
 		this.engine = null;
 		this.listenerRoot = null;
-		this.engineClick = e => e;
-		this.engineRightClick = e => e;
-		this.engineMove = e => e;
+		this.engineClick = function () { };
+		this.engineRightClick = function () { };
+		this.engineMove = function () { };
 	}
 	addListenersTo(el) {
 		let m = this;
@@ -206,5 +206,3 @@ class MouseHandler extends InputHandler {
 		if (this.listenerRoot) this.listenerRoot.removeEventListener("contextmenu", this.__right__);
 	}
 }
-const K = new KeyboardHandler();
-const M = new MouseHandler();

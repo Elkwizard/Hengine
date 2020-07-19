@@ -1,3 +1,4 @@
+
 class LocalFileSystem {
 	static get header() {
 		return "LOCAL_FILE_SYSTEM_";
@@ -116,6 +117,10 @@ class Hengine {
 
 		//create engine
 		document.body.style.margin = 0;
+		this.K = new KeyboardHandler();
+		this.M = new MouseHandler();
+		window.K = this.K;
+		window.M = this.M;
 		this.g = new Engine(utility, wrapper);
 		this.s = this.g.scene;
 		this.c = this.g.renderer;
@@ -237,7 +242,7 @@ class Hengine {
 		let st = t.split("/");
 		let ti = st[st.length - 3];
 		if (ti) {
-			ti = ti.replace(/%20/g, " ");
+			ti = unescape(ti);
 		} else ti = "Unknown";
 		return ti;
 	}
@@ -346,11 +351,14 @@ class Hengine {
 	middle() {
 		return this.c.middle();
 	}
+	static get defaultPreloadPackage() {
+		return ["PrototypeOverload"];
+	}
 	static get defaultRenderPackage() {
 		return ["Color", "Shapes", "Spline", "Animation", "Frame", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental"];
 	}
 	static get defaultManagementPackage() {
-		return ["PrototypeOverload", "Scripts", "Scenes", "Engine", "Hengine"];
+		return ["Scripts", "Scenes", "Engine", "Hengine"];
 	}
 	static get defaultMathPackage() {
 		return ["Random", "Operable", "Vector", "Geometry", "Physics", "PhysicsAPI"];
@@ -363,12 +371,13 @@ class Hengine {
 	}
 	static get defaultEnginePackage() {
 		return {
+			Preload: Hengine.defaultPreloadPackage,
 			Math: Hengine.defaultMathPackage,
 			Render: Hengine.defaultRenderPackage,
 			Util: Hengine.defaultUtilityPackage,
 			SceneObject: Hengine.defaultSceneObjectPackage,
 			Manage: Hengine.defaultManagementPackage
-		}
+		};
 	}
 	static utilityApplicationPackage(code = []) {
 		return new ApplicationPackage(Hengine.defaultEnginePackage, code, [], [], [], false);

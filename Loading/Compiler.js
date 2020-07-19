@@ -9,6 +9,7 @@ const HengineCompiler = {
         return jsCode;
     },
     windowGlobals(jsCode) {
+        jsCode += "\n";
         //remove comments
         function findStrings(str) {
             let regions = [];
@@ -116,7 +117,7 @@ const HengineCompiler = {
             let curInx = 0;
             let valueText = fChar;
             let found = false;
-            while ((depth["("] || depth["["] || depth["{"]) || (remainingText[curInx] != ";" && !found)) {
+            while (((depth["("] || depth["["] || depth["{"]) || (remainingText[curInx] != ";" && !found)) && remainingText[curInx]) {
                 curInx++;
                 let char = remainingText[curInx];
                 if (char == "(") depth["("]++;

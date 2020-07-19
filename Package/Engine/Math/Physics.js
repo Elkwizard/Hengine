@@ -550,34 +550,6 @@ class CollisionDetector {
 
         let toB = PhysicsVector.sub(b.position, a.position);
 
-        //A
-        // let aAxes = [...a.axes];
-
-        //draw axes
-        // for (let i = 0; i < a.vertices.length; i++) {
-        //     let A = a.vertices[i];
-        //     let B = a.vertices[(i + 1) % a.vertices.length];
-        //     let x = (A.x + B.x) / 2;
-        //     let y = (A.y + B.y) / 2;
-        //     let ax = aAxes[i];
-        //     if (PhysicsVector.dot(ax, toB) > 0) c.stroke(cl.ORANGE, 2).arrow(x, y, x + ax.x * 30, y + ax.y * 30);
-        // }
-
-        //B
-        // let bAxes = [...b.axes];
-
-        //draw axes
-        // for (let i = 0; i < b.vertices.length; i++) {
-        //     let A = b.vertices[i];
-        //     let B = b.vertices[(i + 1) % b.vertices.length];
-        //     let x = (A.x + B.x) / 2;
-        //     let y = (A.y + B.y) / 2;
-        //     let ax = bAxes[i];
-        //     if (PhysicsVector.dot(ax, toB) > 0) c.stroke(cl.BLUE, 2).arrow(x, y, x + ax.x * 30, y + ax.y * 30);
-        // }
-
-        // c.stroke(cl.YELLOW, 0.5).shape(...a.vertices);
-
         let axes = [...a.axes.map(ax => PhysicsVector.invert(ax)), ...b.axes].filter(ax => PhysicsVector.dot(ax, toB) > 0);;
         let minOverlap = Infinity;
         let bestAxis = null;
@@ -705,6 +677,8 @@ class CollisionResolver {
             let rB = PhysicsVector.sub(contact.point, bodyB.position);
             let e = Math.max(bodyA.restitution, bodyB.restitution);
             let n = direction;
+            // assert(PhysicsVector.dot(vAB, n) <= 0, "Traveling toward collision");
+            if (PhysicsVector.dot(vAB, n) > -0.01) continue; 
             let j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
 
             let impulseA_n = PhysicsVector.mul(n, j_n);
@@ -746,11 +720,12 @@ class CollisionResolver {
             let contact = contacts[i];
             let factor = contact.penetration / totalPenetration;
 
-            let n = direction;
             let vAB = bodyA.pointVelocity(contact.point);
             let e = bodyA.restitution;
             let rA = PhysicsVector.sub(contact.point, bodyA.position);
             let rB = new PhysicsVector(0, 0);
+            let n = direction;
+            // if (PhysicsVector.dot(vAB, n) <= 0) continue;
             let j_n = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, n, rA, rB) * factor;
             let impulseA_n = PhysicsVector.mul(n, j_n);
 

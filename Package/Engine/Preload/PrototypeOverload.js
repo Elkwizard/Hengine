@@ -1,3 +1,22 @@
+function clamp(n, a, b) {
+	return Math.max(a, Math.min(b, n));
+}
+function remap(n, a, b, a2, b2) {
+	let t = (n - a) / (b - a);
+	return a2 * (1 - t) + b2 * t;
+}
+function threshold(n, t) {
+	return !!(n > t);
+}
+function assert(condition, name) {
+	if (!condition) console.warn(`Assertion "${name}" failed.`);
+}
+let globalSquareRoots = 0;
+let sqrt = Math.sqrt.bind(Math);
+Math.sqrt = function(n) {
+	globalSquareRoots++;
+	return sqrt(n);
+}
 Function.prototype.add = function (fn = function () { }) {
 	let self = this;
 	return function (...a) {
@@ -20,59 +39,37 @@ Function.prototype.performance = function (...args) {
 	const t_2 = performance.now();
 	return (t_2 - t_1) / iter;
 };
-Array.dim2 = function (w, h, fn = (x, y) => null) {
-	let ary = [];
-	for (let i = 0; i < w; i++) {
-		ary.push([]);
-		for (let j = 0; j < h; j++) ary[i].push(fn(i, j));
-	}
-	ary[Symbol.iterator] = function* () {
-		for (let i = 0; i < this.length; i++)
-			for (let j = 0; j < this[0].length; j++) yield [i, j];
-	};
-	ary.width = w;
-	ary.height = h;
-	ary.map = function (fn) {
-		let nAry = Array.dim2(w, h);
-		for (let i = 0; i < this.length; i++)
-			for (let j = 0; j < this[0].length; j++) nAry[i][j] = fn(this[i][j], i, j, this);
-		return nAry;
-	}
-	return ary;
+Array.prototype.map = function (fn, ...coords) {
+	let result = [];
+	if (this.length && Array.isArray(this[0]) && this.multiDimensional) {
+		result.multiDimensional = true;
+		for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...[...coords, i]));
+	} else if (this.length) 
+		for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
+	return result;
 };
-Array.dim3 = function (w, h, d, fn = (x, y, z) => null) {
-	let ary = [];
-	for (let i = 0; i < w; i++) {
-		ary.push([]);
-		for (let j = 0; j < h; j++) {
-			ary[i].push([]);
-			for (let k = 0; k < d; k++) ary[i][j].push(fn(i, j, k));
-		}
+Array.prototype.flatten = function () {
+	if (this.length) {
+		let result = [];
+		if (Array.isArray(this[0]) && this.multiDimensional) for (let i = 0; i < this.length; i++) result.push(...this[i].flatten());
+		else for (let i = 0; i < this.length; i++) result.push(this[i]);
+		return result;
 	}
-	ary.width = w;
-	ary.height = h;
-	ary.depth = d;
-	ary[Symbol.iterator] = function* () {
-		for (let i = 0; i < this.length; i++)
-			for (let j = 0; j < this[0].length; j++)
-				for (let k = 0; k < this[0][0].length; k++) yield [i, j, k];
-	};
-	ary.map = function (fn) {
-		let nAry = Array.dim3(w, h, d);
-		for (let i = 0; i < this.length; i++)
-			for (let j = 0; j < this[0].length; j++)
-				for (let k = 0; k < this[0][0].length; k++) nAry[i][j][k] = fn(this[i][j][k], i, j, k, this);
-		return nAry;
-	}
-	return ary;
+	return [];
+}
+Array.prototype[Symbol.iterator] = function* () {
+	let all = this.flatten();
+	for (let i = 0; i < all.length; i++) yield all[i];
 };
-Array.dim = function (dimension, ...size) {
+Array.dim = function (...dims) {
 	let ary = [];
-	if (dimension !== 1) {
-		let d = size[0];
-		size.shift();
-		for (let i = 0; i < d; i++) ary.push(Array.dim(dimension - 1, ...size));
-	} else for (let i = 0; i < size[0]; i++) ary.push(null);
+	if (dims.length > 1) {
+		let dim = dims.shift();
+		for (let i = 0; i < dim; i++) ary.push(Array.dim(...dims));
+	} else {
+		for (let i = 0; i < dims[0]; i++) ary.push(null);
+	}
+	ary.multiDimensional = true;
 	return ary;
 };
 Array.prototype.test = function (test) {

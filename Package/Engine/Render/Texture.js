@@ -31,13 +31,13 @@ class Texture extends ImageType {
 
 		this.changed = false;
 	}
+	get brightness() {
+		return this.pixels.map(column => column.map(col => col.brightness));
+	}
 	toString() {
 		function channelPair(a, b) {
-			let aStr = Math.floor(a).toString(2);
-			let bStr = Math.floor(b).toString(2);
-			let difA = 8 - aStr.length;
-			let difB = 8 - bStr.length;
-			return String.fromCharCode(parseInt("0".repeat(difA) + aStr + "0".repeat(difB) + bStr, 2));
+			let charCode = a << 8 | b;
+			return String.fromCharCode(charCode);
 		}
 		function color(col) {
 			return channelPair(col.red, col.green) + channelPair(col.blue, col.alpha * 255);
@@ -71,6 +71,7 @@ class Texture extends ImageType {
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j, ...args)]);
 		for (let i = 0; i < coms.length; i++) this.shader_set(coms[i][0], coms[i][1], coms[i][2]);
 		this.changed = true;
+		return this;
 	}
 	act_get(x, y) {
 		return this.pixels[x][y];
@@ -160,6 +161,12 @@ class Texture extends ImageType {
 		r.changed = true;
 		return r;
 	}
+	static grayScale(bright) {
+		return (new Texture(bright.length, bright[0].length)).shader((x, y) => Color.grayScale(bright[x][y]));
+	}
+	static colorScale(col, bright) {
+		return (new Texture(bright.length, bright[0].length)).shader((x, y) => Color.colorScale(col, bright[x][y]));
+	}
 	static async fromDataURI(uri, w_o, h_o) {
 		let img = new Image();
 		img.src = uri;
@@ -195,11 +202,10 @@ class Texture extends ImageType {
 	}
 	static fromString(str) {
 		function inv_channelPair(str) {
-			let bin = str.charCodeAt(0).toString(2);
-			bin = "0".repeat(16 - bin.length) + bin;
-			let a = parseInt(bin.slice(0, 8), 2);
-			let b = parseInt(bin.slice(8), 2);
-			return [a, b]
+			let bin = str.charCodeAt(0);
+			let a = bin >> 8;
+			let b = bin - (a << 8);
+			return [a, b];
 		}
 		function inv_color(str) {
 			let tok = str.split("");

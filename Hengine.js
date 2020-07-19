@@ -1,6 +1,6 @@
 (async function () {
     //locate self
-    let script = document.getElementsByTagName("script")[0];
+    let script = document.currentScript;
     let title = script.title || "Hengine Project";
     let scripts = (script.getAttribute("scripts") || "").replace(/\.js/g, "").split(" ").filter(str => str.length);
 
@@ -34,6 +34,4 @@
     let nScript = document.createElement("script");
     nScript.innerHTML = code;
     document.head.appendChild(nScript);
-    
-
 })();
