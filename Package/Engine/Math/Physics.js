@@ -961,7 +961,7 @@ class PhysicsEngine {
                     let collisionDirection = best.direction;
                     if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
                         let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
-                        if (dot > 0.8) {
+                        if (dot > Infinity) {
                             STATIC = true;
                             break;
                         }
