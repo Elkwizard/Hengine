@@ -97,7 +97,7 @@ class Render3D {
         for (let tri of mesh.tris) tri.color = color;
         return mesh;
     }
-    static makeCylinder(X, Y, Z, r, h, XA = "x", YA = "y", ZA = "z", RES = 10, color = cl.WHITE) {
+    static makeCylinder(X, Y, Z, r, h, color = cl.WHITE, RES = 10) {
         let tris = [];
         let total = RES;
         let radius = r;
@@ -134,15 +134,8 @@ class Render3D {
         let offset = new Vector3(X, Y, Z);
         return new Mesh(...tris.map(e => {
             e = e.each(vert => {
-                let xyz = vert.get();
-                vert.x = xyz[XA];
-                vert.y = xyz[YA];
-                vert.z = xyz[ZA];
                 return vert.plus(offset);
             });
-            if (YA === "z") {
-                e = new Tri(...e.vertices.reverse());
-            }
             e.color = color;
             return e;
         }));
