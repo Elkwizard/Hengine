@@ -259,7 +259,7 @@ class Engine {
 	transition(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.intervalFns.push(new TransitionFunction(fn, frames, type));
 	}
-	delay(fn, frames, type = IntervalFunction.BEFORE_UDPATE) {
+	delay(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.intervalFns.push(new DelayedFunction(fn, frames, type));
 	}
 	updateIntervalCalls(type) {

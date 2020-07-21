@@ -29,8 +29,8 @@ class Render3D {
         let z = Math.max(v.z, 1);
         return new Vector3(x / z, y / z, v.z);
     }
-    static getCameraTransform(camera) {
-        return [-camera.pos.x, -camera.pos.y, -camera.pos.z, Math.cos(camera.rotation.x), Math.sin(camera.rotation.x), Math.cos(camera.rotation.y), Math.sin(camera.rotation.y), Math.cos(camera.rotation.z), Math.sin(camera.rotation.z)];
+    static getCameraTransform() {
+        return [-Render3D.camera.pos.x, -Render3D.camera.pos.y, -Render3D.camera.pos.z, Math.cos(Render3D.camera.rotation.x), Math.sin(Render3D.camera.rotation.x), Math.cos(Render3D.camera.rotation.y), Math.sin(Render3D.camera.rotation.y), Math.cos(Render3D.camera.rotation.z), Math.sin(Render3D.camera.rotation.z)];
     }
     static transformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
         let x, t_x, y, t_y, z, t_z;
@@ -97,7 +97,7 @@ class Render3D {
         for (let tri of mesh.tris) tri.color = color;
         return mesh;
     }
-    static makeCylinder(X, Y, Z, r, h, XA = "x", YA = "y", ZA = "z", RES = 10, color = cl.WHITE) {
+    static makeCylinder(X, Y, Z, r, h, color = cl.WHITE, RES = 10) {
         let tris = [];
         let total = RES;
         let radius = r;
@@ -134,15 +134,8 @@ class Render3D {
         let offset = new Vector3(X, Y, Z);
         return new Mesh(...tris.map(e => {
             e = e.each(vert => {
-                let xyz = vert.get();
-                vert.x = xyz[XA];
-                vert.y = xyz[YA];
-                vert.z = xyz[ZA];
                 return vert.plus(offset);
             });
-            if (YA === "z") {
-                e = new Tri(...e.vertices.reverse());
-            }
             e.color = color;
             return e;
         }));
@@ -156,31 +149,13 @@ class Tri {
 	constructor(a, b, c) {
 		this.vertices = [a, b, c];
         this.color = cl.WHITE;
-        this.calculateNormals();
-    }
-    calculateNormals() {
-		let A = this.vertices[1].minus(this.vertices[2]);
-		let B = this.vertices[1].minus(this.vertices[0]);
-		this.normal = A.cross(B).normalize();
-		this.lightNormal = this.normal;
-        this.middle = Vector.sum(...this.vertices).over(3);
-        let az = this.vertices[0].z;
-        let bz = this.vertices[1].z;
-        let cz = this.vertices[2].z;
-        this.sortZ = (az + bz + cz) / 3;
-        this.maxZ = Math.max(az, bz, cz);
+        this.middle = a.plus(b).plus(c).over(3);
     }
     get() {
         let t = new Tri(...this.vertices);
         t.color = this.color;
         return t;
     }
-	t_rotate(r, v) {
-		let tri = this.rotate(r, v);
-		tri.lightNormal = this.lightNormal;
-		tri.color = this.color;
-		return tri;
-	}
 	rotate(r, v) {
 		let nVerts = [];
 		let origin = v;
@@ -198,21 +173,10 @@ class Tri {
 		tri.color = this.color;
 		return tri;
     }
-    each_t(fn) {
-		let ary = [];
-		for (let vert of this.vertices) ary.push(fn(vert));
-		let t = new Tri(...ary);
-		t.lightNormal = this.lightNormal;
-		t.color = this.color;
-		return t;
-    }
 	each(fn) {
 		let ary = [];
 		for (let vert of this.vertices) ary.push(fn(vert));
 		let t = new Tri(...ary);
-		t.normal = this.normal;
-		t.middle = this.middle;
-		t.lightNormal = this.lightNormal;
 		t.color = this.color;
 		return t;
 	}
@@ -220,16 +184,14 @@ class Tri {
 class Mesh {
 	constructor(...tris) {
         this.tris = tris;
-		this.middle = this.tris.length ? Vector.sum(...this.tris.map(e => e.middle)).over(this.tris.length) : Vector3.origin;
+        this.middle = Vector3.origin;
+        if (tris.length) this.middle = Vector3.sum(...tris.map(tri => tri.middle)).div(tris.length);
     }
     rotate(r, v) {
         return this.each(tri => tri.rotate(r, v));
     }
     translate(o) {
         return this.each(tri => tri.translate(o));
-    }
-    calculateNormals() {
-        for (let tri of this.tris) tri.calculateNormals();
     }
     subdivide() {
         let m = this.get();
@@ -272,57 +234,80 @@ class Mesh {
             return e;
         }));
     }
+    cameraTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
+        return this.each(tri => tri.cameraTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz));
+    }
 	transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
-		return this.each(tri => tri.each_t(v => Render3D.transformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz)));
+		return this.each(tri => tri.transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz));
     }
     project() {
-        return this.each(tri => tri.each(v => Render3D.projectVector3(v)));
+        return this.each(tri => tri.project());
     }
 	render(c, camera) {
         const width = c.canvas.width;
         const height = c.canvas.height;
-		let m_1 = this.transform(...Render3D.getCameraTransform(camera));
-		m_1.tris = m_1.tris.filter(tri => {
-			let toCamera = tri.middle;
-			let dot = toCamera.dot(tri.normal);
-            let max = tri.maxZ;
-			if (max < 1) {
-				return false;
-			}
-			return dot >= 0;
-		});
-		m_1.tris.sort((a, b) => b.sortZ - a.sortZ);
-		let m_0 = m_1.project();
-		m_0 = m_0.each(tri => tri.each(v => {
-			return new Vector3((width / 2) * v.x + width / 2, (width / 2) * v.y + height / 2, v.z);
-        }));
-        let screen = new Rect(0, 0, width, height);
-		m_0.tris = m_0.tris.filter(tri => {
+        let cameraTransform = Render3D.getCameraTransform();
+
+        let rTris = [];
+        for (let i = 0; i < this.tris.length; i++) {
+            let t = this.tris[i];
+            let tv = t.vertices;
+            let A = tv[1].minus(tv[0]);
+            let B = tv[1].minus(tv[2]);
+            let n = B.cross(A);
+            let toCamera = t.middle.minus(Render3D.camera.pos);
+            if (n.dot(toCamera) < 0) continue;
+            let mz = Math.max(tv[0].z, tv[1].z, tv[2].z);
+            if (mz < 1) continue;
+            //projection
+
+            let t_2 = new Tri(...tv.map(v => {
+                let m = Render3D.projectVector3(Render3D.transformVector3(v, ...cameraTransform))
+                m.x *= width / 2;
+                m.y *= width / 2;
+                m.x += width / 2;
+                m.y += height / 2;
+                return m;
+            }));
+
+            //culling
+            
             let minX = Infinity;
             let maxX = -Infinity;
             let minY = Infinity;
             let maxY = -Infinity;
 
-            for (let i = 0; i < tri.vertices.length; i++) {
-                let v = tri.vertices[i];
+            for (let j = 0; j < t_2.vertices.length; j++) {
+                let v = t_2.vertices[j];
                 if (v.x < minX) minX = v.x;
                 if (v.x > maxX) maxX = v.x;
                 if (v.y < minY) minY = v.y;
                 if (v.y > maxY) maxY = v.y;
             }
 
-            return minX < screen.x + screen.width && minY < screen.y + screen.height && maxX > screen.x && maxY > screen.y;
-        })
-		m_0.each(tri => {
-			let light = (tri.lightNormal.dot(Render3D.lightDirection) + 1) / 2;
-			let col = Color.lerp(tri.color, cl.BLACK, (1 - light));
+            if (minX > width || minY > height || maxX < 0 || maxY < 0) continue;
+            
+            //lighting
+
+			let light = (n.normalize().dot(Render3D.lightDirection) + 1) / 2;
+			let col = Color.lerp(t.color, cl.BLACK, (1 - light));
+            t_2.color = col;
+
+
+            rTris.push(t_2);
+        }
+        rTris.sort((a, b) => b.middle.z - a.middle.z);
+
+		for (let i = 0; i < rTris.length; i++) {
+            let tri = rTris[i];
+            let col = tri.color;
 			c.draw(col).shape(...tri.vertices);
 			c.stroke(col, 1, "round").shape(...tri.vertices);
 			// c.draw(cl.RED).circle(tri.vertices[0].x, tri.vertices[0].y, 3);
 			// c.draw(cl.LIME).circle(tri.vertices[1].x, tri.vertices[1].y, 3);
 			// c.draw(cl.BLUE).circle(tri.vertices[2].x, tri.vertices[2].y, 3);
-			return tri;
-		});
+			
+		};
 	}
 }
 Render3D.lightDirection = new Vector3(0, 1, 0);
