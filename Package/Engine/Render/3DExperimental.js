@@ -257,8 +257,6 @@ class Mesh {
             let n = B.cross(A);
             let toCamera = t.middle.minus(Render3D.camera.pos);
             if (n.dot(toCamera) < 0) continue;
-            let mz = Math.max(tv[0].z, tv[1].z, tv[2].z);
-            if (mz < 1) continue;
             //projection
 
             let t_2 = new Tri(...tv.map(v => {
@@ -269,6 +267,9 @@ class Mesh {
                 m.y += height / 2;
                 return m;
             }));
+
+            let mz = Math.max(t_2.vertices[0].z, t_2.vertices[1].z, t_2.vertices[2].z);
+            if (mz < 1) continue;
 
             //culling
             
