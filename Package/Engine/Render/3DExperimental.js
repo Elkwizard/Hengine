@@ -251,15 +251,9 @@ class Mesh {
         let rTris = [];
         for (let i = 0; i < this.tris.length; i++) {
             let t = this.tris[i];
-            let tv = t.vertices;
-            let A = tv[1].minus(tv[0]);
-            let B = tv[1].minus(tv[2]);
-            let n = B.cross(A);
-            let toCamera = t.middle.minus(Render3D.camera.pos);
-            if (n.dot(toCamera) < 0) continue;
             //projection
 
-            let t_2 = new Tri(...tv.map(v => {
+            let t_2 = new Tri(...t.vertices.map(v => {
                 let m = Render3D.projectVector3(Render3D.transformVector3(v, ...cameraTransform))
                 m.x *= width / 2;
                 m.y *= width / 2;
@@ -270,6 +264,14 @@ class Mesh {
 
             let mz = Math.max(t_2.vertices[0].z, t_2.vertices[1].z, t_2.vertices[2].z);
             if (mz < 1) continue;
+
+
+            let tv = t_2.vertices;
+            let A = tv[1].minus(tv[0]);
+            let B = tv[1].minus(tv[2]);
+            let n = B.cross(A);
+            let toCamera = t.middle.minus(Render3D.camera.pos);
+            if (n.dot(toCamera) <= 0) continue;
 
             //culling
             
