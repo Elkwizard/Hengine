@@ -81,21 +81,31 @@ class Render3D {
     }
     static makeCube(x, y, z, w, h, d, color = cl.WHITE) {
         let mesh = new Mesh(
-            new Tri(new Vector3(x, y, z), new Vector3(x + w, y, z), new Vector3(x + w, y + h, z)),
-            new Tri(new Vector3(x + w, y + h, z), new Vector3(x, y + h, z), new Vector3(x, y, z)),
-            new Tri(new Vector3(x, y, z + d), new Vector3(x, y, z), new Vector3(x, y + h, z)),
-            new Tri(new Vector3(x, y, z + d), new Vector3(x, y + h, z), new Vector3(x, y + h, z + d)),
-            new Tri(new Vector3(x, y, z + d), new Vector3(x + w, y, z), new Vector3(x, y, z)),
-            new Tri(new Vector3(x, y, z + d), new Vector3(x + w, y, z + d), new Vector3(x + w, y, z)),
-            new Tri(new Vector3(x + w, y, z), new Vector3(x + w, y, z + d), new Vector3(x + w, y + h, z)),
-            new Tri(new Vector3(x + w, y, z + d), new Vector3(x + w, y + h, z + d), new Vector3(x + w, y + h, z)),
-            new Tri(new Vector3(x, y + h, z + d), new Vector3(x, y + h, z), new Vector3(x + w, y + h, z)),
-            new Tri(new Vector3(x + w, y + h, z), new Vector3(x + w, y + h, z + d), new Vector3(x, y + h, z + d)),
-            new Tri(new Vector3(x + w, y, z + d), new Vector3(x, y, z + d), new Vector3(x + w, y + h, z + d)),
-            new Tri(new Vector3(x, y, z + d), new Vector3(x, y + h, z + d), new Vector3(x + w, y + h, z + d))
+            new Tri(new Vector3(x - w / 2, y - h / 2, z - d / 2), new Vector3(x + w / 2, y - h / 2, z - d / 2), new Vector3(x + w / 2, y + h / 2, z - d / 2)),
+            new Tri(new Vector3(x + w / 2, y + h / 2, z - d / 2), new Vector3(x - w / 2, y + h / 2, z - d / 2), new Vector3(x - w / 2, y - h / 2, z - d / 2)),
+            new Tri(new Vector3(x - w / 2, y - h / 2, z + d / 2), new Vector3(x - w / 2, y - h / 2, z - d / 2), new Vector3(x - w / 2, y + h / 2, z - d / 2)),
+            new Tri(new Vector3(x - w / 2, y - h / 2, z + d / 2), new Vector3(x - w / 2, y + h / 2, z - d / 2), new Vector3(x - w / 2, y + h / 2, z + d / 2)),
+            new Tri(new Vector3(x - w / 2, y - h / 2, z + d / 2), new Vector3(x + w / 2, y - h / 2, z - d / 2), new Vector3(x - w / 2, y - h / 2, z - d / 2)),
+            new Tri(new Vector3(x - w / 2, y - h / 2, z + d / 2), new Vector3(x + w / 2, y - h / 2, z + d / 2), new Vector3(x + w / 2, y - h / 2, z - d / 2)),
+            new Tri(new Vector3(x + w / 2, y - h / 2, z - d / 2), new Vector3(x + w / 2, y - h / 2, z + d / 2), new Vector3(x + w / 2, y + h / 2, z - d / 2)),
+            new Tri(new Vector3(x + w / 2, y - h / 2, z + d / 2), new Vector3(x + w / 2, y + h / 2, z + d / 2), new Vector3(x + w / 2, y + h / 2, z - d / 2)),
+            new Tri(new Vector3(x - w / 2, y + h / 2, z + d / 2), new Vector3(x - w / 2, y + h / 2, z - d / 2), new Vector3(x + w / 2, y + h / 2, z - d / 2)),
+            new Tri(new Vector3(x + w / 2, y + h / 2, z - d / 2), new Vector3(x + w / 2, y + h / 2, z + d / 2), new Vector3(x - w / 2, y + h / 2, z + d / 2)),
+            new Tri(new Vector3(x + w / 2, y - h / 2, z + d / 2), new Vector3(x - w / 2, y - h / 2, z + d / 2), new Vector3(x + w / 2, y + h / 2, z + d / 2)),
+            new Tri(new Vector3(x - w / 2, y - h / 2, z + d / 2), new Vector3(x - w / 2, y + h / 2, z + d / 2), new Vector3(x + w / 2, y + h / 2, z + d / 2))
         );
         for (let tri of mesh.tris) tri.color = color;
         return mesh;
+    }
+    static makeSphere(x, y, z, r, color = cl.WHITE, subdivisions = 3) {
+        let m = Render3D.makeCube(x, y, z, 20, 20, 20, color);
+        for (let i = 0; i < subdivisions; i++) m = m.subdivide();
+        for (let tri of m.tris) for (let v of tri.vertices) {
+            v.sub(m.middle);
+            v.mag = r;
+            v.add(m.middle);
+        }
+        return m;
     }
     static makeCylinder(X, Y, Z, r, h, color = cl.WHITE, RES = 10) {
         let tris = [];
@@ -253,6 +263,12 @@ class Mesh {
             let t = this.tris[i];
             //projection
 
+            
+            let tv = t.vertices;
+            let A = tv[1].minus(tv[0]);
+            let B = tv[1].minus(tv[2]);
+            let ln = B.cross(A);
+
             let t_2 = new Tri(...t.vertices.map(v => {
                 let m = Render3D.projectVector3(Render3D.transformVector3(v, ...cameraTransform))
                 m.x *= width / 2;
@@ -266,9 +282,9 @@ class Mesh {
             if (mz < 1) continue;
 
 
-            let tv = t_2.vertices;
-            let A = tv[1].minus(tv[0]);
-            let B = tv[1].minus(tv[2]);
+            tv = t_2.vertices;
+            A = tv[1].minus(tv[0]);
+            B = tv[1].minus(tv[2]);
             let n = B.cross(A);
             let toCamera = t.middle.minus(Render3D.camera.pos);
             if (n.dot(toCamera) <= 0) continue;
@@ -292,7 +308,7 @@ class Mesh {
             
             //lighting
 
-			let light = (n.normalize().dot(Render3D.lightDirection) + 1) / 2;
+			let light = (ln.normalize().dot(Render3D.lightDirection) + 1) / 2;
 			let col = Color.lerp(t.color, cl.BLACK, (1 - light));
             t_2.color = col;
 
