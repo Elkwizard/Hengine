@@ -482,12 +482,6 @@ class Scene extends InactiveScene {
 			}
 		}.bind(this);
 		this.removeQueue = [];
-
-		this.physics = {
-			gravitySort() {
-
-			}
-		}
 	}
 	drawInWorldSpace(artist) {
 		this.c.save();
