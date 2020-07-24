@@ -86,7 +86,35 @@ class PhysicsMath {
         let m_B = (B1.y - B.y) / (B1.x - B.x);
         let b_B = B.y - m_B * B.x;
 
-        if (m_A === m_B) return null;
+        if (m_A === m_B) {
+            const nx = -(A1.y - A.y);
+            const ny = A1.x - A.x;
+            const a_dot_n = nx * A.x + ny * A.y;
+            const b_dot_n = nx * B.x + ny * B.y;
+            if (a_dot_n === b_dot_n) {
+                const a_dot = -ny * A.x + nx * A.y;
+                const b_dot = -ny * B.x + nx * B.y;
+                const a_dot1 = -ny * A1.x + nx * A1.y;
+                const b_dot1 = -ny * B1.x + nx * B1.y;
+                const amin = Math.min(a_dot, a_dot1);
+                const amax = Math.max(a_dot, a_dot1);
+                const bmin = Math.min(b_dot, b_dot1);
+                const bmax = Math.max(b_dot, b_dot1);
+                if (amax < bmin || bmax < amin) return null;
+                let abest = amin;
+                let bbest = bmax;
+                if ((amin + amax) / 2 < (bmin + bmax) / 2) {
+                    abest = amax;
+                    bbest = bmin;
+                }
+                const ap = (abest === a_dot) ? A : A1;
+                const bp = (bbest === b_dot) ? B : B1;
+                const x = (ap.x + bp.x) / 2;
+                const y = (ap.y + bp.y) / 2;
+                return new PhysicsVector(x, y);
+            }
+            return null;
+        }
 
         let x = (b_B - b_A) / (m_A - m_B);
         if (Math.abs(m_A) > INFINITY) {
@@ -911,14 +939,12 @@ class PhysicsEngine {
                             if (collision.penetration > maxPenetration) {
                                 maxPenetration = collision.penetration;
                                 best = collision;
-                                // if (contacts.length) 
                                 contacts.push(...collision.contacts
                                     .filter(contact => !contacts
                                         .test(con => con.point.equals(contact.point))
                                     )
                                 );
                                 contacts = collision.contacts;
-                                // else contacts.push(...collision.contacts);
                             }
                         }
                     }
@@ -948,6 +974,7 @@ class PhysicsEngine {
                     if (body.isTrigger || body2.isTrigger) continue;
                     if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
                     else {
+                        // exit();
                         this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
                     }
                 }
