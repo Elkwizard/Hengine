@@ -161,11 +161,7 @@ class Color extends Operable {
 		}
 	}
 	dif(color) {
-		let red = Math.abs(this.red - color.red) / 255;
-		let green = Math.abs(this.green - color.green) / 255;
-		let blue = Math.abs(this.blue - color.blue) / 255;
-		let alpha = Math.abs(this.alpha - color.alpha) / 255;
-		return (((red + green + blue + alpha) * 10) ** 2) / 1600;
+		return Color.modValues.map(ch => Math.abs(this[ch] - color[ch])).total();
 	}
 	static get empty() {
 		return new Color(0, 0, 0, 0);

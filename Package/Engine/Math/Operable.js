@@ -48,6 +48,9 @@ class Operable {
         for (let x of this.constructor.modValues) args.push(fn(this[x], x));
         return new this.constructor(...args);
     }
+    abs() {
+        return this.map(Math.abs);
+    }
     total() {
         let sum = 0;
         for (let x of this.constructor.modValues) sum += Math.abs(this[x]);

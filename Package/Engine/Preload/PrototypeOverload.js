@@ -84,7 +84,7 @@ Array.prototype.randomize = function () {
 	}
 	return result;
 };
-Array.prototype.sum = function () {
+Array.prototype.total = function () {
 	return this.reduce((a, b) => a + b);
 };
 Number.prototype.toDegrees = function () {
