@@ -82,8 +82,11 @@ class Matrix {
 		}
 		return String.fromCharCode(9484) + spaces + String.fromCharCode(9488) + "\n" + result.join("\n") + "\n" + String.fromCharCode(9492) + spaces + String.fromCharCode(9496);
 	}
-	toFixed() {
-		return this.map(e => e.toFixed(2)).toString();
+	toFixed(digits) {
+		return this.map(e => e.toFixed(digits)).toString();
+	}
+	toMaxed(digits) {
+		return this.map(e => e.toMaxed(digits)).toString();
 	}
 	equals(m) {
 		let equal = true;
@@ -92,6 +95,9 @@ class Matrix {
 			break check;
 		}
 		return equal;
+	}
+	*[Symbol.iterator]() {
+		for (let i = 0; i < this.cols.length; i++) for (let j = 0; j < this.cols[i].length; j++) yield this.cols[i][j];
 	}
 	static identity(dim) {
 		let m = new Matrix(dim, dim);
@@ -165,7 +171,7 @@ class Vector extends Operable {
 	}
 	get sqrMag() {
 		let sum = 0;
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			if (typeof this[x] !== "number") continue;
 			let i = 0;
 			let j = this[x];
@@ -177,7 +183,7 @@ class Vector extends Operable {
 	}
 	get mag() {
 		let sum = 0;
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			if (typeof this[x] !== "number") continue;
 			let i = 0;
 			let j = this[x];
@@ -192,11 +198,11 @@ class Vector extends Operable {
 	}
 	op(v, e) {
 		if (typeof v === "number") {
-			for (let x in this) {
+			for (let x of this.constructor.modValues) {
 				this[x] = e(this[x], v);
 			}
 		} else if (v instanceof Vector) {
-			for (let x in this) {
+			for (let x of this.constructor.modValues) {
 				this[x] = e(this[x], v[x] || 0);
 			}
 		} else if (v instanceof Matrix) {
@@ -206,7 +212,7 @@ class Vector extends Operable {
 			else if (chk === -1) action = "minus";
 			else if (chk === 5) action = "plus";
 			let n = this.constructor.fromMatrix(this.toMatrix()[action](v));
-			for (let x in this) {
+			for (let x of this.constructor.modValues) {
 				this[x] = n[x];
 			}
 		}
@@ -224,7 +230,7 @@ class Vector extends Operable {
 	}
 	normalize() {
 		let sum = 0;
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			if (typeof this[x] !== "number") continue;
 			let i = 0;
 			let j = this[x];
@@ -235,7 +241,7 @@ class Vector extends Operable {
 		if (dist <= 0) {
 			return this;
 		}
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			if (typeof this[x] !== "number") continue;
 			this[x] /= dist;
 		}
@@ -243,7 +249,7 @@ class Vector extends Operable {
 	}
 	dot(v) {
 		let result = 0;
-		for (let x in this) result += this[x] * v[x];
+		for (let x of this.constructor.modValues) result += this[x] * v[x];
 		return result;
 	}
 	cross(V) {
@@ -262,20 +268,21 @@ class Vector extends Operable {
 	}
 	toString() {
 		let ary = [];
-		for (let n in this) ary.push(this[n]);
+		for (let n of this.constructor.modValues) ary.push(this[n]);
 		return "\u27e8 " + ary.join(", ") + " \u27e9";
 	}
-	toFixed(n) {
-		let ary = [];
-		for (let n in this) ary.push(this[n].toFixed(n));
-		return "\u27e8 " + ary.join(", ") + " \u27e9";
+	toFixed(digits) {
+		return this.map(v => v.toFixed(digits)).toString();
+	}
+	toMaxed(digits) {
+		return this.map(v => v.toMaxed(digits)).toString();
 	}
 	toMatrix() {
 		let count = 0;
-		for (let x in this) count++;
+		for (let x of this.constructor.modValues) count++;
 		let m = new Matrix(count, 1);
 		count = 0;
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			m.cols[0][count] = this[x];
 			count++;
 		}
@@ -613,6 +620,10 @@ Vector4.modValues = ["x", "y", "z", "w"];
 			if (n instanceof Vector2) return nN(n.x) || nN(n.y);
 			if (n instanceof Vector3) return nN(n.x) || nN(n.y) || nN(n.z);
 			if (n instanceof Vector4) return nN(n.x) || nN(n.y) || nN(n.z) || nN(n.w);
+		}
+		if (n instanceof Matrix) {
+			for (let item of n) if (nN(item)) return true;
+			return false;
 		}
 		return nN(n);
 	}

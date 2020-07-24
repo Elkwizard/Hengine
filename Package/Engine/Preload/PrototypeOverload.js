@@ -108,6 +108,9 @@ Number.prototype.movedTowards = function (value, ferocity) {
 	let dir = ferocity * (value - this) * 2;
 	return this + dir;
 };
+Number.prototype.toMaxed = function (digits) {
+	return Math.round(this * 10 ** digits) / 10 ** digits + "";
+}
 String.prototype.capitalize = function () {
 	return this[0].toUpperCase() + this.slice(1);
 };
