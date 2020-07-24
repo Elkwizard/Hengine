@@ -1,11 +1,11 @@
-function clamp(n, a, b) {
+Number.clamp = function (n, a, b) {
 	return Math.max(a, Math.min(b, n));
 }
-function remap(n, a, b, a2, b2) {
+Number.remap = function (n, a, b, a2, b2) {
 	let t = (n - a) / (b - a);
 	return a2 * (1 - t) + b2 * t;
 }
-function threshold(n, t) {
+Number.threshold = function (n, t) {
 	return !!(n > t);
 }
 function assert(condition, name) {
@@ -13,7 +13,7 @@ function assert(condition, name) {
 }
 let globalSquareRoots = 0;
 let sqrt = Math.sqrt.bind(Math);
-Math.sqrt = function(n) {
+Math.sqrt = function (n) {
 	globalSquareRoots++;
 	return sqrt(n);
 }
@@ -44,7 +44,7 @@ Array.prototype.map = function (fn, ...coords) {
 	if (this.length && Array.isArray(this[0]) && this.multiDimensional) {
 		result.multiDimensional = true;
 		for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...[...coords, i]));
-	} else if (this.length) 
+	} else if (this.length)
 		for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
 	return result;
 };

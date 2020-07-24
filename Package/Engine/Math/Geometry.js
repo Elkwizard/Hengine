@@ -132,7 +132,7 @@ class Geometry {
         let leftCof = (dy2 / dx2) - (dy1 / dx1);
         const MIN = Math.min(l.a.x, l.b.x);
         const MAX = Math.max(l.a.x, l.b.x);
-        let x = clamp(rightSide / leftCof, MIN, MAX);
+        let x = Number.clamp(rightSide / leftCof, MIN, MAX);
         let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
         return new Vector2(x, y);
     }
@@ -155,7 +155,7 @@ class Geometry {
         let outOfBounds = false;
         if (x < MIN || x > MAX) {
             outOfBounds = true;
-            x = clamp(x, MIN, MAX);
+            x = Number.clamp(x, MIN, MAX);
         }
         let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
         let dirX = x - p.x;
@@ -228,7 +228,7 @@ class Geometry {
         let X = (p.y + m_2 * p.x + m_1 * A.x - A.y) / (m_1 + m_2);
         if (X < MIN || X > MAX) {
             outOfBounds = true;
-            X = clamp(X, MIN, MAX);
+            X = Number.clamp(X, MIN, MAX);
         }
         const Y = m_1 * X + A.y - m_1 * A.x;
         return { result: new Vector2(X, Y), outOfBounds };

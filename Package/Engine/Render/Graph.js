@@ -36,7 +36,7 @@ class Graph extends Frame {
         this.updater.graphs.push(this);
     }
     getYValue(fV) {
-        return clamp(200 - ((fV - this.minValue) / (this.maxValue - this.minValue)) * 200, 0, 198);
+        return Number.clamp(200 - ((fV - this.minValue) / (this.maxValue - this.minValue)) * 200, 0, 198);
     }
     getXValue(fV) {
         return this.mainGraphWidth * ((fV - this.timeOffset) / this.msLimit);

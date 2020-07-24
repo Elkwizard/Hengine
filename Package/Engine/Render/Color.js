@@ -157,10 +157,10 @@ class Color extends Operable {
 	}
 	constrain() {
 		if (this.limited) {
-			this.red = clamp(this.red, 0, 255);
-			this.green = clamp(this.green, 0, 255);
-			this.blue = clamp(this.blue, 0, 255);
-			this.alpha = clamp(this.alpha, 0, 1);
+			this.red = Number.clamp(this.red, 0, 255);
+			this.green = Number.clamp(this.green, 0, 255);
+			this.blue = Number.clamp(this.blue, 0, 255);
+			this.alpha = Number.clamp(this.alpha, 0, 1);
 		}
 	}
 	dif(color) {

@@ -261,8 +261,8 @@ class TextureDrawingContextPath {
 		y = Math.round(y);
 		if (y < 0) return;
 		if (y > tex.height - 1) return;
-		xmin = Math.round(clamp(xmin, 0, tex.width - 1));
-		xmax = Math.round(clamp(xmax, 0, tex.width - 1));
+		xmin = Math.round(Number.clamp(xmin, 0, tex.width - 1));
+		xmax = Math.round(Number.clamp(xmax, 0, tex.width - 1));
 		let range = xmax - xmin;
 		for (let i = 0; i < range; i++) {
 			TextureDrawingContextPath.noCullFillPixel(ctx, xmin + i, y, col);
