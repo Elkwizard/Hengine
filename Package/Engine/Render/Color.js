@@ -111,10 +111,7 @@ class Color extends Operable {
 	}
 	static CSSColor(word) {
 		//processed
-		return "#" + Color.CSSColors[word.toLowerCase()];
-	}
-	static optimizedConstruct(red, green, blue, alpha) {
-		return new Color(red, green, blue, alpha);
+		return Color.CSSColors[word.toLowerCase()];
 	}
 	static numToHex(num) {
 		let a = Math.floor(num / 16);
@@ -171,13 +168,13 @@ class Color extends Operable {
 		return (((red + green + blue + alpha) * 10) ** 2) / 1600;
 	}
 	static get empty() {
-		return Color.optimizedConstruct(0, 0, 0, 0);
+		return new Color(0, 0, 0, 0);
 	}
 	static avg(c1, c2) {
 		return c1.plus(c2).over(2);
 	}
 	static sum(...colors) {
-		let result = Color.optimizedConstruct(0, 0, 0, 0);
+		let result = Color.empty;
 		for (let color of colors) result.add(color);
 		return result;
 	}
