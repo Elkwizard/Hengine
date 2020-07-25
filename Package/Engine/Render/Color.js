@@ -8,8 +8,14 @@ class Color extends Operable {
 		this.custom = {};
 		this.limited = true;
 		if (b === undefined && g === undefined && typeof r == "string") {
-			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0) {
+			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0 && r.indexOf("hsv") < 0) {
 				let col = Color.CSSColor(r);
+				red = col.red;
+				green = col.green;
+				blue = col.blue;
+				alpha = col.alpha;
+			} else if (r[0] == "h") {
+				let col = Color.parseHSVA(r);
 				red = col.red;
 				green = col.green;
 				blue = col.blue;
@@ -21,69 +27,17 @@ class Color extends Operable {
 				blue = col.blue;
 				alpha = col.alpha;
 			} else if (r[0] == "#") {
-				function hexToNum(hex) {
-					if (isNaN(parseInt(hex))) {
-						switch (hex) {
-							case "a":
-								return 10;
-							case "b":
-								return 11;
-							case "c":
-								return 12;
-							case "d":
-								return 13;
-							case "e":
-								return 14;
-							case "f":
-								return 15;
-						}
-					} else {
-						return parseInt(hex);
-					}
-				}
-				function parseHex(chars) {
-					let c1 = chars[0];
-					let c2 = chars[1];
-					let result = 0;
-					result += hexToNum(c1) * 16;
-					result += hexToNum(c2);
-					return result;
-				}
-				let rgb = "rgb(";
-				let groups = ["", "", ""];
-				let n = 0;
-				if (r.length === 4) {
-					let newR = "";
-					for (let char of r) {
-						if (char !== "#") {
-							newR += char + char;
-						}
-					}
-					r = "#" + newR;
-				}
-				for (let char of r) {
-					if (char != "#") {
-						n++;
-						groups[Math.floor((n - 1) / 2)] += char;
-					}
-				}
-				n = 0;
-				for (let group of groups) {
-					n++;
-					rgb += parseHex(group) + ((n == 3) ? "" : ", ");
-				}
-				rgb += ")";
-				let col = Color.parseRGBA(rgb);
-				red = col.red;
-				green = col.green;
-				blue = col.blue;
-				alpha = col.alpha;
+				let num = parseInt(r.slice(1), 16);
+				red = num >> 16;
+				green = (num & 0x00FF00) >> 8;
+				blue = num & 0x0000FF;
+				alpha = 1;
 			}
 		} else {
-			red = (r === undefined) ? 0 : r;
-			green = (g === undefined) ? 0 : g;
-			blue = (b === undefined) ? 0 : b;
-			alpha = (a === undefined) ? 1 : a;
+			red = r || 0;
+			green = g || 0;
+			blue = b || 0;
+			alpha = a || 1;
 		}
 		this.red = red;
 		this.green = green;
@@ -91,39 +45,8 @@ class Color extends Operable {
 		this.alpha = alpha;
 		this.constrain();
 	}
-	static parseRGBA(str) {
-		let rgba = "";
-		let state = false;
-		for (let char of str) {
-			if (char == ")" || char == "(") {
-				state = !state;
-			}
-			else if (state) {
-				rgba += char;
-			}
-		}
-		let rgbaList = rgba.split(",");
-		let red = parseFloat(rgbaList[0]);
-		let green = parseFloat(rgbaList[1]);
-		let blue = parseFloat(rgbaList[2]);
-		let alpha = (rgbaList.length > 3) ? parseFloat(rgbaList[3]) : 1;
-		return { red, green, blue, alpha };
-	}
-	static CSSColor(word) {
-		//processed
-		return Color.CSSColors[word.toLowerCase()];
-	}
-	static numToHex(num) {
-		let a = Math.floor(num / 16);
-		let b = Math.floor(num % 16);
-		let hexAry = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
-		return hexAry[a] + hexAry[b];
-	}
-	static random() {
-		return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random());
-	}
-	static rand(seed) {
-		return new Color(rand(seed) * 255, rand(seed + 1) * 255, rand(seed + 2) * 255, rand(seed + 3));
+	get brightness() {
+		return (this.red + this.blue + this.green) / (3 * 255);
 	}
 	invert() {
 		let n = (new Color(255, 255, 255, 1)).sub(this);
@@ -193,8 +116,91 @@ class Color extends Operable {
 		let b = 255 * per;
 		return new Color(r, g, b, 1);
 	}
-	get brightness() {
-		return (this.red + this.blue + this.green) / (3 * 255);
+	static CSSColor(word) {
+		//processed
+		return Color.CSSColors[word.toLowerCase()];
+	}
+	static numToHex(num) {
+		let a = Math.floor(num / 16);
+		let b = Math.floor(num % 16);
+		let hexAry = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
+		return hexAry[a] + hexAry[b];
+	}
+	static random() {
+		return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random());
+	}
+	static rand(seed) {
+		return new Color(rand(seed) * 255, rand(seed + 1) * 255, rand(seed + 2) * 255, rand(seed + 3));
+	}
+	static parseHSVA(str) {
+		let hsv = "";
+		let state = false;
+		for (let char of str) {
+			if (char == ")" || char == "(") {
+				state = !state;
+			}
+			else if (state) {
+				hsv += char;
+			}
+		}
+		let hsvaList = hsv.split(",");
+		let h = parseFloat(hsvaList[0]);
+		let s = parseFloat(hsvaList[1]);
+		let v = parseFloat(hsvaList[2]);
+		let alpha = (hsvaList.length > 3) ? parseFloat(hsvaList[3]) : 1;
+		
+		h = Math.max(h, 0);
+		h %= 360;
+		let seg = ~~(h / 120);
+		let t = (h % 120) / 120;
+		let r = 0, g = 0, b = 0;
+		switch (seg) {
+			case 0:
+				r = 255 * (1 - t);
+				g = 255 * t;
+				break;
+			case 1:
+				g = 255 * (1 - t);
+				b = 255 * t;
+				break;
+			case 2:
+				b = 255 * (1 - t);
+				r = 255 * t;
+				break;
+		}
+		let targetBrightness = v * 255;
+		let scaleBrightness = targetBrightness / Math.max(r, g, b);
+		r *= scaleBrightness;
+		g *= scaleBrightness;
+		b *= scaleBrightness;
+		let middle = (r + g + b) / 3;
+		let dr = r - middle;
+		let dg = g - middle;
+		let db = b - middle;
+		r = middle + s * dr;
+		g = middle + s * dg;
+		b = middle + s * db;
+
+
+		return { red: r, green: g, blue: b, alpha };
+	}
+	static parseRGBA(str) {
+		let rgba = "";
+		let state = false;
+		for (let char of str) {
+			if (char == ")" || char == "(") {
+				state = !state;
+			}
+			else if (state) {
+				rgba += char;
+			}
+		}
+		let rgbaList = rgba.split(",");
+		let red = parseFloat(rgbaList[0]);
+		let green = parseFloat(rgbaList[1]);
+		let blue = parseFloat(rgbaList[2]);
+		let alpha = (rgbaList.length > 3) ? parseFloat(rgbaList[3]) : 1;
+		return { red, green, blue, alpha };
 	}
 }
 Color.CSSColors = {
