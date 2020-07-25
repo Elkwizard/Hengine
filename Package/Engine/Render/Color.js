@@ -8,14 +8,14 @@ class Color extends Operable {
 		this.custom = {};
 		this.limited = true;
 		if (b === undefined && g === undefined && typeof r == "string") {
-			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0 && r.indexOf("hsv") < 0) {
+			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0 && r.indexOf("hsl") < 0) {
 				let col = Color.CSSColor(r);
 				red = col.red;
 				green = col.green;
 				blue = col.blue;
 				alpha = col.alpha;
 			} else if (r[0] == "h") {
-				let col = Color.parseHSVA(r);
+				let col = Color.parseHSLA(r);
 				red = col.red;
 				green = col.green;
 				blue = col.blue;
@@ -27,7 +27,9 @@ class Color extends Operable {
 				blue = col.blue;
 				alpha = col.alpha;
 			} else if (r[0] == "#") {
-				let num = parseInt(r.slice(1), 16);
+				let str = r.slice(1);
+				if (str.length === 3) str = str[0].repeat(2) + str[1].repeat(2) + str[2].repeat(2);
+				let num = parseInt(str, 16);
 				red = num >> 16;
 				green = (num & 0x00FF00) >> 8;
 				blue = num & 0x0000FF;
@@ -136,22 +138,22 @@ class Color extends Operable {
 		if (str[str.length - 1] === "%") return parseFloat(str) / 100 * limit;
 		return parseFloat(str);
 	}
-	static parseHSVA(str) {
-		let hsv = "";
+	static parseHSLA(str) {
+		let hsl = "";
 		let state = false;
 		for (let char of str) {
 			if (char == ")" || char == "(") {
 				state = !state;
 			}
 			else if (state) {
-				hsv += char;
+				hsl += char;
 			}
 		}
-		let hsvaList = hsv.split(",");
-		let h = Color.parseNum(hsvaList[0], 360);
-		let s = Color.parseNum(hsvaList[1], 1);
-		let v = Color.parseNum(hsvaList[2], 1);
-		let alpha = (hsvaList.length > 3) ? Color.parseNum(hsvaList[3], 1) : 1;
+		let hslaList = hsl.split(",");
+		let h = Color.parseNum(hslaList[0], 360);
+		let s = Color.parseNum(hslaList[1], 1);
+		let v = Color.parseNum(hslaList[2], 1);
+		let alpha = (hslaList.length > 3) ? Color.parseNum(hslaList[3], 1) : 1;
 		
 		h = Math.max(h, 0);
 		h %= 360;
