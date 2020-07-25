@@ -132,6 +132,10 @@ class Color extends Operable {
 	static rand(seed) {
 		return new Color(rand(seed) * 255, rand(seed + 1) * 255, rand(seed + 2) * 255, rand(seed + 3));
 	}
+	static parseNum(str, limit) {
+		if (str[str.length - 1] === "%") return parseFloat(str) / 100 * limit;
+		return parseFloat(str);
+	}
 	static parseHSVA(str) {
 		let hsv = "";
 		let state = false;
@@ -144,10 +148,10 @@ class Color extends Operable {
 			}
 		}
 		let hsvaList = hsv.split(",");
-		let h = parseFloat(hsvaList[0]);
-		let s = parseFloat(hsvaList[1]);
-		let v = parseFloat(hsvaList[2]);
-		let alpha = (hsvaList.length > 3) ? parseFloat(hsvaList[3]) : 1;
+		let h = Color.parseNum(hsvaList[0], 360);
+		let s = Color.parseNum(hsvaList[1], 1);
+		let v = Color.parseNum(hsvaList[2], 1);
+		let alpha = (hsvaList.length > 3) ? Color.parseNum(hsvaList[3], 1) : 1;
 		
 		h = Math.max(h, 0);
 		h %= 360;
@@ -181,7 +185,6 @@ class Color extends Operable {
 		g = middle + s * dg;
 		b = middle + s * db;
 
-
 		return { red: r, green: g, blue: b, alpha };
 	}
 	static parseRGBA(str) {
@@ -196,10 +199,10 @@ class Color extends Operable {
 			}
 		}
 		let rgbaList = rgba.split(",");
-		let red = parseFloat(rgbaList[0]);
-		let green = parseFloat(rgbaList[1]);
-		let blue = parseFloat(rgbaList[2]);
-		let alpha = (rgbaList.length > 3) ? parseFloat(rgbaList[3]) : 1;
+		let red = Color.parseNum(rgbaList[0], 255);
+		let green = Color.parseNum(rgbaList[1], 255);
+		let blue = Color.parseNum(rgbaList[2], 255);
+		let alpha = (rgbaList.length > 3) ? Color.parseNum(rgbaList[3], 1) : 1;
 		return { red, green, blue, alpha };
 	}
 }
