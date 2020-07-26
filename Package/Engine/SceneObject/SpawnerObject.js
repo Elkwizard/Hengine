@@ -96,7 +96,6 @@ class ParticleSpawnerObject extends SceneObject {
 class ParticleObject extends SceneObject {
     constructor(spawner, home, name) {
         super(name, 0, 0, false, "Engine-Particle", home);
-
         this.cullGraphics = false;
         this.lastX = 0;
         this.lastY = 0;

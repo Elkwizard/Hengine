@@ -27,16 +27,24 @@ class InactiveScene {
 			UIObject: {
 				draw(name, shape) {
 					c.draw(cl.BLACK).infer(shape);
-					c.stroke(cl.RED, 1).infer(shape);
+					c.stroke(cl.PURPLE, 1).infer(shape);
+				},
+				update() { },
+				scripts: []
+			},
+			ParticleSpawnerObject: {
+				draw(name, shape) { },
+				update() { },
+				scripts: []
+			},
+			ParticleObject: {
+				draw(name, shape) { 
+					c.draw(cl.BLACK).infer(shape);
 				},
 				update() { },
 				scripts: []
 			}
 		};
-		this.defaultParticleDraw = function () {
-			this.home.c.draw("Black").circle(this.middle.x, this.middle.y, this.width / 2);
-		}
-		this.defaultUpdate = function () { }
 		this.elements = {};
 	}
 	updateArray() {
@@ -178,7 +186,7 @@ class InactiveScene {
 		this.elements[name] = x;
 		return x;
 	}
-	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true) {
+	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true) {
 		name = this.genName(this.elements, "Default-Explosion-Spawner");
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
 		this.elements[name] = ns;
@@ -196,7 +204,7 @@ class InactiveScene {
 		}
 		return ns;
 	}
-	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true, active = true) {
+	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true, active = true) {
 		name = this.genName(this.elements, name);
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
 		this.elements[name] = ns;
@@ -350,13 +358,6 @@ class InactiveScene {
 			});
 		}.bind(this));
 		return this;
-	}
-	changeAllElementDraw(newDraw) {
-		this.defaultDraw = newDraw;
-		this.defaultPhysDraw = newDraw;
-	}
-	changeAllElementUpdate(newUpdate) {
-		this.defaultUpdate = newUpdate;
 	}
 	clearAllCollisions() {
 		let phys = this.getPhysicsElements();
