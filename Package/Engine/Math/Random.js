@@ -31,6 +31,12 @@ class Random {
         let r = (a * b) % 1;
         return r;
     }
+    static range(min = 0, max = 1) {
+        return Math.random() * (max - min) + min;
+    }
+    static choice(arr) {
+        return arr[Math.random() * arr.length];
+    }
     static noiseTCorrect(t) {
         return Interpolation.smoothT(t);
     }
