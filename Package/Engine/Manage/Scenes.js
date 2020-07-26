@@ -405,13 +405,12 @@ class InactiveScene {
 	}
 }
 class Camera extends Rect {
-	constructor(x, y, width, height, zoom = 1, rotation = 0, RenderType = Frame) {
+	constructor(x, y, width, height, zoom = 1, rotation = 0) {
 		super(x, y, width, height);
 		this.rotation = rotation;
 		this.zoom = zoom;
-		this.RenderType = RenderType;
-		this.view = new this.RenderType(width, height);
-		this.newView = new this.RenderType(width, height);
+		this.view = new Frame(width, height);
+		this.newView = new Frame(width, height);
 	}
 	restoreZoom() {
 		this.zoom = 1;

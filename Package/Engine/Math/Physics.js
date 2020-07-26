@@ -86,7 +86,7 @@ class PhysicsMath {
         let m_B = (B1.y - B.y) / (B1.x - B.x);
         let b_B = B.y - m_B * B.x;
 
-        if (m_A === m_B) {
+        if (m_A === m_B || (Math.abs(m_A) > INFINITY && Math.abs(m_B) > INFINITY)) {
             const nx = -(A1.y - A.y);
             const ny = A1.x - A.x;
             const a_dot_n = nx * A.x + ny * A.y;

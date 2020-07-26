@@ -129,69 +129,10 @@ class Engine {
 		this.intervalFns = [];
 
 		M.engine = this;
-		//for real this time
-		this.engineUpdate = function () {
-			try {
-				if (this.hasFixedPhysicsUpdateCycle) if (!this.paused) {
-					this.updateIntervalCalls(IntervalFunction.FIXED_UPDATE);
-					this.fixedUpdate();
-					this.fixedScript.run();
-					this.scene.engineFixedUpdate();
-                    this.afterFixedUpdate();
-					this.updateIntervalCalls(IntervalFunction.AFTER_FIXED_UPDATE);
-				}
-			} catch (e) {
-				if (this.catchErrors) this.output("Fixed Update Error: " + e);
-				else throw e;
-			}
-		}.bind(this);
 		this.FPS_FRAMES_TO_COUNT = 10;
-		this.animate = function () {
-			try {
-				this.frameCount++;
-				this.currentTime = performance.now();
-				//fps
-				this.frameLength = this.currentTime - this.lastTime;
-				this.lastTime = this.currentTime;
-				this.frameLengths.push(this.frameLength);
-				if (this.frameLengths.length > this.FPS_FRAMES_TO_COUNT) {
-					this.frameLengths.shift();
-					let val = this.frameLengths.reduce((p, c) => p + c) / this.FPS_FRAMES_TO_COUNT;
-					this.fpsContinuous = 1000 / val;
-				}
-				this.updateGraphs();
-				if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
-				//update
-				if (!this.paused) {
-					K.update();
-					M.update();
-					this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
-					this.beforeUpdate();
-					this.clear();
-					this.updateIntervalCalls(IntervalFunction.UPDATE);
-					this.update();
-					this.scene.engineDrawUpdate();
-					if (!this.hasFixedPhysicsUpdateCycle) {
-						this.fixedUpdate();
-						this.updateIntervalCalls(IntervalFunction.FIXED_UPDATE);
-						this.fixedScript.run();
-						this.scene.engineFixedUpdate();
-						this.afterFixedUpdate();
-						this.updateIntervalCalls(IntervalFunction.AFTER_FIXED_UPDATE);
-					}
-					this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
-					this.afterUpdate();
-					this.updateScreenRecordings();
-					M.last = { x: M.x, y: M.y };
-				}
-			} catch (e) {
-				if (this.catchErrors) this.output("Draw Error: " + e);
-				else throw e;
-			}
-		}.bind(this);
 				
-		window.intervals.push(this.engineUpdate);
-		window.animationFrames.push(this.animate);
+		window.intervals.push(this.engineFixedUpdate.bind(this));
+		window.animationFrames.push(this.engineDrawUpdate.bind(this));
 
 		this.resize = true;
 		window.addEventListener("resize", function () {
@@ -233,6 +174,58 @@ class Engine {
 					color: "red"
 				}
 			]);
+		}
+	}
+	engineFixedUpdateInternal() {
+		this.updateIntervalCalls(IntervalFunction.FIXED_UPDATE);
+		this.fixedUpdate();
+		this.fixedScript.run();
+		this.scene.engineFixedUpdate();
+		this.afterFixedUpdate();
+		this.updateIntervalCalls(IntervalFunction.AFTER_FIXED_UPDATE);
+	}
+	engineDrawUpdate() {
+		try {
+			this.frameCount++;
+			this.currentTime = performance.now();
+			//fps
+			this.frameLength = this.currentTime - this.lastTime;
+			this.lastTime = this.currentTime;
+			this.frameLengths.push(this.frameLength);
+			if (this.frameLengths.length > this.FPS_FRAMES_TO_COUNT) {
+				this.frameLengths.shift();
+				let val = this.frameLengths.reduce((p, c) => p + c) / this.FPS_FRAMES_TO_COUNT;
+				this.fpsContinuous = 1000 / val;
+			}
+			this.updateGraphs();
+			if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
+			//update
+			if (!this.paused) {
+				K.update();
+				M.update();
+				this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
+				this.beforeUpdate();
+				this.clear();
+				this.updateIntervalCalls(IntervalFunction.UPDATE);
+				this.update();
+				this.scene.engineDrawUpdate();
+				if (!this.hasFixedPhysicsUpdateCycle) this.engineFixedUpdateInternal();
+				this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
+				this.afterUpdate();
+				this.updateScreenRecordings();
+				M.last = { x: M.x, y: M.y };
+			}
+		} catch (e) {
+			if (this.catchErrors) this.output("Draw Error: " + e);
+			else throw e;
+		}
+	}
+	engineFixedUpdate() {
+		try {
+			if (this.hasFixedPhysicsUpdateCycle) if (!this.paused) this.engineFixedUpdateInternal();
+		} catch (e) {
+			if (this.catchErrors) this.output("Fixed Update Error: " + e);
+			else throw e;
 		}
 	}
 	set HFPUC(a) {
