@@ -321,18 +321,4 @@ class Engine {
 	clear() {
 		this.renderer.clear();
 	}
-	getDistance(x1, y1, x2, y2) {
-		let distance1 = (x2 - x1) ** 2
-		let distance2 = (y2 - y1) ** 2
-		return Math.sqrt(distance1 + distance2)
-	}
-	getDistanceWithPoints(point, point2) {
-		return this.getDistance(point.x, point.y, point2.x, point2.y);
-	}
-	extend(a, b) {
-		return a + (b * Math.sign(a));
-	}
-	contract(a, b) {
-		return a - (b * Math.sign(a));
-	}
 }

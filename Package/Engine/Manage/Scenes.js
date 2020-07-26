@@ -7,14 +7,32 @@ class InactiveScene {
 		this.gravity = gravity;
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
 		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
-		this.defaultDraw = function (name, shape) {
-			c.draw("#000").infer(shape);
-			c.stroke("cyan", 1).infer(shape);
-		}
-		this.defaultPhysDraw = function (name, shape) {
-			c.draw("#000").infer(shape);
-			c.stroke("red", 1).infer(shape);
-		}
+		this.defaults = {
+			SceneObject: {
+				draw(name, shape) {
+					c.draw(cl.BLACK).infer(shape);
+					c.stroke(cl.CYAN, 1).infer(shape);
+				},
+				update() { },
+				scripts: []
+			},
+			PhysicsObject: {
+				draw(name, shape) {
+					c.draw(cl.BLACK).infer(shape);
+					c.stroke(cl.RED, 1).infer(shape);
+				},
+				update() { },
+				scripts: []
+			},
+			UIObject: {
+				draw(name, shape) {
+					c.draw(cl.BLACK).infer(shape);
+					c.stroke(cl.RED, 1).infer(shape);
+				},
+				update() { },
+				scripts: []
+			}
+		};
 		this.defaultParticleDraw = function () {
 			this.home.c.draw("Black").circle(this.middle.x, this.middle.y, this.width / 2);
 		}
@@ -84,11 +102,17 @@ class InactiveScene {
 		while (database[check()] !== undefined) num++;
 		return n;
 	}
+	initializeSceneObject(sceneObject) {
+		const d = this.defaults[sceneObject.constructor.name];
+		this.changeElementDraw(sceneObject, d.draw);
+		this.changeElementUpdate(sceneObject, d.update);
+		for (let script of d.scripts) script.addTo(sceneObject);
+	}
 	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
-		this.changeElementDraw(n, this.defaultDraw);
+		this.initializeSceneObject(n);
 		this.elements[name] = n;
 		return n;
 	}
@@ -96,21 +120,21 @@ class InactiveScene {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this);
 		n.addShape("default", new Circle(0, 0, radius));
-		this.changeElementDraw(n, this.defaultDraw);
+		this.initializeSceneObject(n);
 		this.elements[name] = n;
 		return n;
 	}
 	addElement(name, x, y, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this);
-		this.changeElementDraw(n, this.defaultDraw);
+		this.initializeSceneObject(n);
 		this.elements[name] = n;
 		return n;
 	}
 	addPhysicsElement(name, x, y, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
-		this.changeElementDraw(n, this.defaultPhysDraw);
+		this.initializeSceneObject(n);
 		this.elements[name] = n;
 		return n;
 	}
@@ -118,7 +142,7 @@ class InactiveScene {
 		name = this.genName(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
-		this.changeElementDraw(n, this.defaultPhysDraw);
+		this.initializeSceneObject(n);
 		this.elements[name] = n;
 		return n;
 	}
@@ -126,7 +150,7 @@ class InactiveScene {
 		name = this.genName(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
 		n.addShape("default", new Circle(0, 0, radius));
-		this.changeElementDraw(n, this.defaultPhysDraw);
+		this.initializeSceneObject(n);
 		this.elements[name] = n;
 		return n;
 	}
@@ -143,6 +167,7 @@ class InactiveScene {
 		this.elements[name] = new UIObject(name, x, y, draw, this);
 		let n = this.elements[name];
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
+		this.initializeSceneObject(n);
 		return n;
 	}
 	addContainer(name, active) {
