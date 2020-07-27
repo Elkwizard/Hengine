@@ -269,12 +269,16 @@ class Mesh {
             let B = tv[1].minus(tv[2]);
             let ln = B.cross(A);
 
-            let t_2 = new Tri(...t.vertices.map(v => {
-                let m = Render3D.projectVector3(Render3D.transformVector3(v, ...cameraTransform))
-                m.x *= width / 2;
-                m.y *= width / 2;
-                m.x += width / 2;
-                m.y += height / 2;
+            // let t_2 = new Tri(...tv.map(v => {
+            //     let m = Render3D.projectVector3(Render3D.transformVector3(v, ...cameraTransform))
+            //     m.x *= width / 2;
+            //     m.y *= width / 2;
+            //     m.x += width / 2;
+            //     m.y += height / 2;
+            //     return m;
+            // }));
+            let t_2 = new Tri(...tv.map(v => {
+                let m = Render3D.transformVector3(v, ...cameraTransform);
                 return m;
             }));
 
@@ -286,8 +290,17 @@ class Mesh {
             A = tv[1].minus(tv[0]);
             B = tv[1].minus(tv[2]);
             let n = B.cross(A);
-            let toCamera = t.middle.minus(Render3D.camera.pos);
+            let toCamera = t_2.middle;
             if (n.dot(toCamera) <= 0) continue;
+
+            t_2.vertices = t_2.vertices.map(v => {
+                let m = Render3D.projectVector3(v);
+                m.x *= width / 2;
+                m.y *= width / 2;
+                m.x += width / 2;
+                m.y += height / 2;
+                return m;
+            });
 
             //culling
             
