@@ -294,12 +294,6 @@ class Vector extends Operable {
 	static fromMatrix(m) {
 		return new this(...m.cols[0]);
 	}
-	static lerp(a, b, t) {
-		return a.Ntimes(1 - t).Vplus(b.Ntimes(t));
-	}
-	static abs(v) {
-		return v.op(0, Math.abs.bind(Math));
-	}
 	static sum(...v) {
 		let construct = v.length ? v[0].constructor : this;
 		return (new construct(0, 0, 0, 0)).add(...v);
@@ -313,12 +307,12 @@ class Vector extends Operable {
 		for (let proDir of proDirs) {
 			let dot = proDir.dot(dir);
 			if (dot > 0) {
-				let bad = dir.Ntimes(dot / mag);
+				let bad = dir.times(dot / mag);
 				remove.push(bad);
 			}
 		}
-		let wrong = remove.length ? Vector.sum(...remove).Nover(remove.length) : new dir.constructor(0, 0, 0, 0);
-		return dir.Vminus(wrong);
+		let wrong = remove.length ? Vector.sum(...remove).over(remove.length) : new dir.constructor(0, 0, 0, 0);
+		return dir.minus(wrong);
 	}
 }
 Vector.modValues = [];
