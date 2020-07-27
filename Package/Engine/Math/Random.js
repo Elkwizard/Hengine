@@ -22,6 +22,14 @@ class Interpolation {
         let bottom = Interpolation.quadLerp(a2, b2, c2, d2, tx, ty);
         return Interpolation.lerp(top, bottom, tz);
     }
+    static smoothMin(a, b, k = 1) {
+        const t = clamp((b - a) / k + 0.5, 0, 1);
+        const t2 = t * (1 - t) * 0.5 * k;
+        return Interpolation.lerp(a, b, t) - t2;
+    }
+    static smoothMax(a, b, k = 1) {
+        return Interpolation.smoothMin(a, b, -k);
+    }
 }
 class Random {
     static seedRand(seed) {
