@@ -58,8 +58,9 @@ class Line {
 		return this.slope * x + this.a.y;
 	}
 }
-class Shape {
+class Shape extends Operable {
 	constructor() { 
+		super();
 		this.area = 0;
 	}
 	get middle() {
@@ -67,7 +68,7 @@ class Shape {
 	}
 	getBoundingBox() {
 		//return the smallest rectangle that contains the shape
-		return new Rect(0, 0, 0, 0, 0);
+		return new Rect(0, 0, 0, 0);
 	}
 	getModel(pos, rot) {
 		//return the world space model of the relative shape
@@ -91,11 +92,7 @@ class Shape {
 	}
 	get() {
 		//return a copy of the shape
-		return new Shape(this.rotation);
-	}
-	static lerp(a, b, t) {
-		//returns the lerp from a to b at t
-		return new Shape(a.rotation * (1 - t) + b.rotation * t);
+		return new Shape();
 	}
 }
 class Polygon extends Shape {
@@ -258,12 +255,8 @@ class Rect extends Polygon {
 	get() {
 		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
 	}
-	static lerp(a, b, t) {
-		const dim = Vector2.lerp(new Vector2(a.width, a.height), new Vector2(b.width, b.height), t);
-		const pos = Vector2.lerp(new Vector2(a.x, a.y), new Vector2(b.x, b.y), t);
-		return new Rect(pos.x, pos.y, dim.x, dim.y, a.rotation * (1 - t) + b.rotation * t);
-	}
 }
+Rect.modValues = ["x", "y", "width", "height"];
 class Circle extends Shape {
 	constructor(x, y, radius) {
 		super();
@@ -305,9 +298,5 @@ class Circle extends Shape {
 	get() {
 		return new Circle(this.x, this.y, this.radius);
 	}
-	static lerp(a, b, t) {
-		const pos = Vector2.lerp(new Vector2(a.x, a.y),new Vector2(b.x, b.y), t);
-		const radius = a.radius * (1 - t) + b.radius * t;
-		return new Circle(pos.x, pos.y, radius);
-	}
 }
+Circle.modValues = ["x", "y", "radius"];

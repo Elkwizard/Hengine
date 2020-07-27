@@ -7,9 +7,6 @@ Number.remap = function (n, a, b, a2, b2) {
 Number.threshold = function (n, t) {
 	return !!(n > t);
 }
-Number.lerp = function (a, b, t) {
-	return a * (1 - t) + b * t;
-}
 function assert(condition, name) {
 	if (!condition) console.warn(`Assertion "${name}" failed.`);
 }
@@ -112,7 +109,7 @@ Number.prototype.movedTowards = function (value, ferocity) {
 };
 Number.prototype.toMaxed = function (digits) {
 	return Math.round(this * 10 ** digits) / 10 ** digits + "";
-}
+};
 String.prototype.capitalize = function () {
 	return this[0].toUpperCase() + this.slice(1);
 };
@@ -176,4 +173,11 @@ Object.prototype[Symbol.iterator] = function* () {
 	for (let x in this) {
 		yield [x, this[x]];
 	}
-}
+};
+
+//Make Number behave like operable
+Number.lerp = function (a, b, t) { return a * (1 - t) + b * t; };
+Number.prototype.plus = function (n) { return this + n; };
+Number.prototype.minus = function (n) { return this - n; };
+Number.prototype.times = function (n) { return this * n; };
+Number.prototype.over = function (n) { return this / n; };

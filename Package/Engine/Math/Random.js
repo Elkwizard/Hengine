@@ -9,7 +9,7 @@ class Interpolation {
         return Interpolation.quadLerp(a, b, c, d, Interpolation.smoothT(tx), Interpolation.smoothT(ty));
     }
     static lerp(a, b, t) {
-        return a * (1 - t) + b * t;
+        return a.times(1 - t).plus(b.times(t));
     }
     static quadLerp(a, b, c, d, tx, ty) {
         const l = Interpolation.lerp(a, c, ty);
