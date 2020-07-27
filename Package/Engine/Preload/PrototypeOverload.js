@@ -2,11 +2,13 @@ Number.clamp = function (n, a, b) {
 	return Math.max(a, Math.min(b, n));
 }
 Number.remap = function (n, a, b, a2, b2) {
-	let t = (n - a) / (b - a);
-	return a2 * (1 - t) + b2 * t;
+	return Number.lerp(a2, b2, (n - a) / (b - a));
 }
 Number.threshold = function (n, t) {
 	return !!(n > t);
+}
+Number.lerp = function (a, b, t) {
+	return a * (1 - t) + b * t;
 }
 function assert(condition, name) {
 	if (!condition) console.warn(`Assertion "${name}" failed.`);
