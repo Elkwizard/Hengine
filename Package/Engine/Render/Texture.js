@@ -10,29 +10,28 @@ class Texture extends ImageType {
 				this.pixels[i].push(new Color(0, 0, 0, 0));
 			}
 		}
-		this[Symbol.iterator] = function* () {
-			for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
-				yield [i, j];
-			}
-		}
-		this.__image = null;
+		this.__image = new Frame(width, height);
 
 		//init image data
 		let array = new Uint8ClampedArray(4 * this.width * this.height);
 		for (let i = 0; i < array.length; i++) array[i] = 0;
 		this.imageData = new ImageData(array, this.width, this.height);
+		
+		//blank
 		let array2 = new Uint8ClampedArray(4 * this.width * this.height);
 		for (let i = 0; i < array.length; i++) array2[i] = 0;
 		this.imageData2 = new ImageData(array2, this.width, this.height);
 		this.blankImageData = this.imageData2;
 		this.blank = this.pixels.map(e => e.map(e => new Color(0, 0, 0, 0)));
 
-		this.updateImageData();
 
 		this.changed = false;
 	}
 	get brightness() {
 		return this.pixels.map(column => column.map(col => col.brightness));
+	}
+	*[Symbol.iterator]() {
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) yield this.pixels[i][j];
 	}
 	toString() {
 		function channelPair(a, b) {
@@ -117,14 +116,22 @@ class Texture extends ImageType {
 		}
 	}
 	updateImageData() {
-		let x = new Frame(this.width, this.height);
-		x.c.c.putImageData(this.imageData, 0, 0);
-		this.__image = x;
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
+			let inx = 4 * (j * this.width + i);
+			let { red, green, blue, alpha } = this.pixels[i][j];
+			this.imageData.data[inx] = ~~red;
+			this.imageData.data[inx + 1] = ~~green;
+			this.imageData.data[inx + 2] = ~~blue;
+			this.imageData.data[inx + 3] = ~~(alpha * 255);
+		}
+		this.changed = true;
 	}
 	makeImage() {
 		if (this.changed) {
 			this.changed = false;
-			this.updateImageData();
+			let x = new Frame(this.width, this.height);
+			x.c.c.putImageData(this.imageData, 0, 0);
+			this.__image = x;
 		}
 		return this.__image.img;
 	}
@@ -194,7 +201,6 @@ class Texture extends ImageType {
 					let col = new Color(red, green, blue, alpha);
 					tex.setPixel(i, j, col);
 				}
-				tex.updateImageData();
 				img.outerHTML = "";
 				resolve(tex);
 			}
@@ -244,7 +250,6 @@ class Texture extends ImageType {
 				}
 			}
 			for (let [x, y] of tex) tex.setPixel(x, y, result[x][y]);
-			tex.updateImageData();
 			return tex;
 		}
 		return inv_toString(str);

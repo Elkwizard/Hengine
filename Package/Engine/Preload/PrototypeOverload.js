@@ -51,7 +51,7 @@ Array.prototype.map = function (fn, ...coords) {
 Array.prototype.flatten = function () {
 	if (this.length) {
 		let result = [];
-		if (Array.isArray(this[0]) && this.multiDimensional) for (let i = 0; i < this.length; i++) result.push(...this[i].flatten());
+		if (this.multiDimensional) for (let i = 0; i < this.length; i++) result.push(...this[i].flatten());
 		else for (let i = 0; i < this.length; i++) result.push(this[i]);
 		return result;
 	}
@@ -65,11 +65,11 @@ Array.dim = function (...dims) {
 	let ary = [];
 	if (dims.length > 1) {
 		let dim = dims.shift();
+		ary.multiDimensional = true;
 		for (let i = 0; i < dim; i++) ary.push(Array.dim(...dims));
 	} else {
 		for (let i = 0; i < dims[0]; i++) ary.push(null);
 	}
-	ary.multiDimensional = true;
 	return ary;
 };
 Array.prototype.test = function (test) {
