@@ -315,13 +315,10 @@ class Hengine {
 		}
 	}
 	initImage(src) {
-		let x = new Frame();
-		x.src = src;
-		return x;
+		return new Frame(src);
 	}
 	initSound(src) {
-		let x = new Sound(src);
-		return x;
+		return new Sound(src);
 	}
 	initAnimation(src, frames, delay, loop, response) {
 		return new Animation(src, frames, delay, loop, response);

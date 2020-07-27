@@ -38,8 +38,8 @@ let Frame = class extends ImageType {
 		super(width, height, false);
 		if (typeof width === "string") {
 			this.src = width;
-			width = 10;
-			height = 10;
+			this.width = 10;
+			this.height = 10;
 		}
 		this.img = new_OffscreenCanvas(this.width, this.height);
 		this.c = new Artist(this.img);
