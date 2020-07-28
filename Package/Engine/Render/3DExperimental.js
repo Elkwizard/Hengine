@@ -4,19 +4,19 @@ class Render3D {
         let y = point.y;
         let z = point.z;
         let r;
-    
+
         r = Geometry.rotatePointAround(new Vector2(origin.x, origin.z), new Vector2(x, z), rotation.y);
         x = r.x;
         z = r.y;
-        
+
         r = Geometry.rotatePointAround(new Vector2(origin.y, origin.z), new Vector2(y, z), rotation.x);
         y = r.x;
         z = r.y;
-        
+
         r = Geometry.rotatePointAround(new Vector2(origin.x, origin.y), new Vector2(x, y), rotation.z);
         x = r.x;
         y = r.y;
-    
+
         return new Vector3(x, y, z);
     }
     static toScreen(p) {
@@ -31,6 +31,45 @@ class Render3D {
     }
     static getCameraTransform() {
         return [-Render3D.camera.pos.x, -Render3D.camera.pos.y, -Render3D.camera.pos.z, Math.cos(Render3D.camera.rotation.x), Math.sin(Render3D.camera.rotation.x), Math.cos(Render3D.camera.rotation.y), Math.sin(Render3D.camera.rotation.y), Math.cos(Render3D.camera.rotation.z), Math.sin(Render3D.camera.rotation.z)];
+    }
+    static rotateTransformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
+        let x, t_x, y, t_y, z, t_z;
+        x = v.x;
+        y = v.y;
+        z = v.z;
+
+        t_x = x - ox;
+        t_y = y - oy;
+        t_z = z - oz;
+
+        x = t_x;
+        y = t_y;
+        z = t_z;
+
+        t_x = x * cosy - z * siny;
+        t_z = x * siny + z * cosy;
+        x = t_x;
+        z = t_z;
+
+        t_y = y * cosx - z * sinx;
+        t_z = y * sinx + z * cosx;
+        y = t_y;
+        z = t_z;
+
+        t_x = x * cosz - y * sinz;
+        t_y = x * sinz + y * cosz;
+        x = t_x;
+        y = t_y;
+
+        t_x = x + ox;
+        t_y = y + oy;
+        t_z = z + oz;
+
+        x = t_x;
+        y = t_y;
+        z = t_z;
+
+        return new Vector3(x, y, z);
     }
     static transformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
         let x, t_x, y, t_y, z, t_z;
@@ -50,12 +89,12 @@ class Render3D {
         t_z = x * siny + z * cosy;
         x = t_x;
         z = t_z;
-        
+
         t_y = y * cosx - z * sinx;
         t_z = y * sinx + z * cosx;
         y = t_y;
         z = t_z;
-        
+
         t_x = x * cosz - y * sinz;
         t_y = x * sinz + y * cosz;
         x = t_x;
@@ -69,7 +108,7 @@ class Render3D {
     }
     static moveCameraAlongRotation(v) {
         let nr = Render3D.rotatePointAround(Vector3.origin, v, Render3D.camera.rotation.inverse());
-        Render3D.camera.pos.add(nr);   
+        Render3D.camera.pos.add(nr);
     }
     static renderScene(c, ...meshes) {
         let triangles = [];
@@ -151,13 +190,17 @@ class Render3D {
         }));
     }
 }
+Render3D.WIREFRAME = Symbol("WIREFRAME");
+Render3D.SOLID = Symbol("SOLID");
+Render3D.VERTEX = Symbol("VERTEX");
+Render3D.renderType = Render3D.SOLID;
 Render3D.camera = {
-	pos: new Vector3(0, 0, 0),
-	rotation: new Vector3(0, 0, 0)
+    pos: new Vector3(0, 0, 0),
+    rotation: new Vector3(0, 0, 0)
 };
 class Tri {
-	constructor(a, b, c) {
-		this.vertices = [a, b, c];
+    constructor(a, b, c) {
+        this.vertices = [a, b, c];
         this.color = cl.WHITE;
         this.middle = a.plus(b).plus(c).over(3);
     }
@@ -166,77 +209,84 @@ class Tri {
         t.color = this.color;
         return t;
     }
-	rotate(r, v) {
-		let nVerts = [];
-		let origin = v;
-		for (let v of this.vertices) {
-			nVerts.push(Render3D.rotatePointAround(origin, v, r));
-		}
-		let tri = new Tri(...nVerts);
-		tri.color = this.color;
-		return tri;
-	}
-	translate(v) {
-		let nVerts = [];
-		for (let vert of this.vertices) nVerts.push(vert.plus(v));
-		let tri = new Tri(...nVerts);
-		tri.color = this.color;
-		return tri;
+    rotate(r, v) {
+        let ox = v.x, oy = v.y, oz = v.z;
+        let cosx = Math.cos(r.x), sinx = Math.sin(r.x);
+        let cosy = Math.cos(r.y), siny = Math.sin(r.y);
+        let cosz = Math.cos(r.z), sinz = Math.sin(r.z);
+        return this.rotateTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz);
     }
-	each(fn) {
-		let ary = [];
-		for (let vert of this.vertices) ary.push(fn(vert));
-		let t = new Tri(...ary);
-		t.color = this.color;
-		return t;
-	}
+    translate(v) {
+        let nVerts = [];
+        for (let vert of this.vertices) nVerts.push(vert.plus(v));
+        let tri = new Tri(...nVerts);
+        tri.color = this.color;
+        return tri;
+    }
+    each(fn) {
+        let ary = [];
+        for (let vert of this.vertices) ary.push(fn(vert));
+        let t = new Tri(...ary);
+        t.color = this.color;
+        return t;
+    }
+    rotateTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
+        return this.each(v => Render3D.rotateTransformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz));
+    }
 }
 class Mesh {
-	constructor(...tris) {
+    constructor(...tris) {
         this.tris = tris;
         this.middle = Vector3.origin;
         if (tris.length) this.middle = Vector3.sum(...tris.map(tri => tri.middle)).div(tris.length);
     }
     rotate(r, v) {
-        return this.each(tri => tri.rotate(r, v));
+        let ox = v.x, oy = v.y, oz = v.z;
+        let cosx = Math.cos(r.x), sinx = Math.sin(r.x);
+        let cosy = Math.cos(r.y), siny = Math.sin(r.y);
+        let cosz = Math.cos(r.z), sinz = Math.sin(r.z);
+        return this.rotateTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz);
+    }
+    rotateTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
+        return this.each(tri => tri.rotateTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz));
     }
     translate(o) {
         return this.each(tri => tri.translate(o));
     }
     subdivide() {
         let m = this.get();
-		let tris = [];
-		for (let i = 0; i < m.tris.length; i++) {
-			let t = m.tris[i].get();
+        let tris = [];
+        for (let i = 0; i < m.tris.length; i++) {
+            let t = m.tris[i].get();
 
-			const A = t.vertices[0];
-			const B = t.vertices[1];
-			const C = t.vertices[2];
+            const A = t.vertices[0];
+            const B = t.vertices[1];
+            const C = t.vertices[2];
 
-			const AB = A.plus(B).over(2);
-			const BC = B.plus(C).over(2);
-			const CA = C.plus(A).over(2);
+            const AB = A.plus(B).over(2);
+            const BC = B.plus(C).over(2);
+            const CA = C.plus(A).over(2);
 
-			let ts = [
-				new Tri(AB, B, BC), 
-				new Tri(BC, C, CA),
-				new Tri(CA, A, AB), 
-				new Tri(CA, AB, BC)
+            let ts = [
+                new Tri(AB, B, BC),
+                new Tri(BC, C, CA),
+                new Tri(CA, A, AB),
+                new Tri(CA, AB, BC)
             ];
             for (let tri of ts) tri.color = t.color;
 
-			tris.push(...ts);
-		}
-		m.tris = tris;
+            tris.push(...ts);
+        }
+        m.tris = tris;
         return m;
     }
     get() {
         return new Mesh(...this.tris.map(tri => tri.get()));
     }
-	each(fn) {
-		let ary = [];
-		for (let tri of this.tris) ary.push(fn(tri));
-		return new Mesh(...ary);
+    each(fn) {
+        let ary = [];
+        for (let tri of this.tris) ary.push(fn(tri));
+        return new Mesh(...ary);
     }
     color(col) {
         return new Mesh(...this.tris.map(e => {
@@ -247,13 +297,13 @@ class Mesh {
     cameraTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
         return this.each(tri => tri.cameraTransform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz));
     }
-	transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
-		return this.each(tri => tri.transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz));
+    transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
+        return this.each(tri => tri.transform(ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz));
     }
     project() {
         return this.each(tri => tri.project());
     }
-	render(c, camera) {
+    render(c, camera) {
         const width = c.canvas.width;
         const height = c.canvas.height;
         let cameraTransform = Render3D.getCameraTransform();
@@ -263,20 +313,12 @@ class Mesh {
             let t = this.tris[i];
             //projection
 
-            
+
             let tv = t.vertices;
             let A = tv[1].minus(tv[0]);
             let B = tv[1].minus(tv[2]);
             let ln = B.cross(A);
 
-            // let t_2 = new Tri(...tv.map(v => {
-            //     let m = Render3D.projectVector3(Render3D.transformVector3(v, ...cameraTransform))
-            //     m.x *= width / 2;
-            //     m.y *= width / 2;
-            //     m.x += width / 2;
-            //     m.y += height / 2;
-            //     return m;
-            // }));
             let t_2 = new Tri(...tv.map(v => {
                 let m = Render3D.transformVector3(v, ...cameraTransform);
                 return m;
@@ -303,7 +345,7 @@ class Mesh {
             });
 
             //culling
-            
+
             let minX = Infinity;
             let maxX = -Infinity;
             let minY = Infinity;
@@ -318,11 +360,11 @@ class Mesh {
             }
 
             if (minX > width || minY > height || maxX < 0 || maxY < 0) continue;
-            
+
             //lighting
 
-			let light = (ln.normalize().dot(Render3D.lightDirection) + 1) / 2;
-			let col = Color.lerp(t.color, cl.BLACK, (1 - light));
+            let light = (ln.normalize().dot(Render3D.lightDirection) + 1) / 2;
+            let col = Color.lerp(t.color, cl.BLACK, (1 - light));
             t_2.color = col;
 
 
@@ -330,16 +372,26 @@ class Mesh {
         }
         rTris.sort((a, b) => b.middle.z - a.middle.z);
 
-		for (let i = 0; i < rTris.length; i++) {
-            let tri = rTris[i];
-            let col = tri.color;
-			c.draw(col).shape(...tri.vertices);
-			c.stroke(col, 1, "round").shape(...tri.vertices);
-			// c.draw(cl.RED).circle(tri.vertices[0].x, tri.vertices[0].y, 3);
-			// c.draw(cl.LIME).circle(tri.vertices[1].x, tri.vertices[1].y, 3);
-			// c.draw(cl.BLUE).circle(tri.vertices[2].x, tri.vertices[2].y, 3);
-			
-		};
-	}
+        if (Render3D.renderType === Render3D.SOLID) {
+            for (let i = 0; i < rTris.length; i++) {
+                let tri = rTris[i];
+                let col = tri.color;
+                c.draw(col).shape(...tri.vertices);
+                c.stroke(col, 1, "round").shape(...tri.vertices);
+            }
+        } else if (Render3D.renderType === Render3D.WIREFRAME) {
+            for (let i = 0; i < rTris.length; i++) {
+                let tri = rTris[i];
+                let col = tri.color;
+                c.stroke(col, 1, "round").shape(...tri.vertices);
+            }
+        } else if (Render3D.renderType === Render3D.VERTEX) {
+            for (let i = 0; i < rTris.length; i++) {
+                let tri = rTris[i];
+                let col = tri.color;
+                for (let j = 0; j < tri.vertices.length; j++) c.draw(col).circle(tri.vertices[j], 2);
+            }
+        }
+    }
 }
 Render3D.lightDirection = new Vector3(0, 1, 0);
