@@ -361,6 +361,8 @@ class RigidBody {
         this.engine = null;
 
         this.canRotate = true;
+        this.sleeping = 0;
+        this.collidingBodies = [];
         this.isTrigger = false;
 
         this.__models = null;
@@ -373,6 +375,9 @@ class RigidBody {
     }
     get angle() {
         return this._angle;
+    }
+    addCollidingBody(body) {
+        if (!this.collidingBodies.includes(body)) this.collidingBodies.push(body);
     }
     displace(v) {
         this.position.add(v);
@@ -418,8 +423,6 @@ class RigidBody {
         if (this.canRotate) {
             this.position.add(dif);
             this.angle += this.angularVelocity * intensity;
-            this.cosAngle = Math.cos(this.angle);
-            this.sinAngle = Math.sin(this.angle);
         } else this.displace(dif);
     }
     pointVelocity(p) {
@@ -706,7 +709,7 @@ class CollisionResolver {
             let e = Math.max(bodyA.restitution, bodyB.restitution);
             let n = direction;
             // assert(PhysicsVector.dot(vAB, n) <= 0, "Traveling toward collision");
-            if (PhysicsVector.dot(vAB, n) > -0.01) continue; 
+            if (PhysicsVector.dot(vAB, n) > -0.01) continue;
             let j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
 
             let impulseA_n = PhysicsVector.mul(n, j_n);
@@ -863,6 +866,17 @@ class PhysicsEngine {
         this.oncollide = (a, b, dir) => null;
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
+        this.sleepDuration = Infinity;
+    }
+    isAsleep(body) {
+        return body.sleeping > this.sleepDuration;
+    }
+    clearCollidingBodies() {
+        for (let i = 0; i < this.bodies.length; i++) {
+            let body = this.bodies[i];
+            if (this.isAsleep(body)) continue;
+            body.collidingBodies = [];
+        }
     }
     addConstraint(constraint) {
         this.constraints.push(constraint);
@@ -875,19 +889,19 @@ class PhysicsEngine {
             }
         }
     }
-    applyForces() {
-        for (let i = 0; i < this.bodies.length; i++) {
-            let body = this.bodies[i];
-            if (body.type === RigidBody.STATIC) continue;
+    applyForces(dynBodies) {
+        for (let i = 0; i < dynBodies.length; i++) {
+            let body = dynBodies[i];
+            if (this.isAsleep(body)) continue;
             body.velocity.add(this.gravity);
             body.velocity.mul(this.linearDrag);
             body.angularVelocity *= this.angularDrag;
         }
     }
-    integrate(intensity) {
-        for (let i = 0; i < this.bodies.length; i++) {
-            let body = this.bodies[i];
-            if (body.type === RigidBody.STATIC) continue;
+    integrate(intensity, dynBodies) {
+        for (let i = 0; i < dynBodies.length; i++) {
+            let body = dynBodies[i];
+            if (this.isAsleep(body)) continue;
             body.integrate(intensity);
         }
     }
@@ -957,6 +971,8 @@ class PhysicsEngine {
                     }
                 }
                 if (best) {
+                    body2.addCollidingBody(body);
+                    body.addCollidingBody(body2);
                     // for (let cont of contacts) c.draw(cl.ORANGE).circle(cont.point, 4);
                     let STATIC = body2.type === RigidBody.STATIC || 0;
                     let collisionDirection = best.direction;
@@ -986,7 +1002,7 @@ class PhysicsEngine {
     cacheModels() {
         for (let i = 0; i < this.bodies.length; i++) this.bodies[i].__models = null;
     }
-    run() {
+    createGrid(dynBodies) {
         let cellsize = 100;
         if (this.bodies.length) {
             cellsize = 0;
@@ -1011,11 +1027,11 @@ class PhysicsEngine {
             }
             collisionPairs.set(body, cellsTotal);
         }
-        let dynBodies = this.bodies.filter(body => body.type === RigidBody.DYNAMIC);
         for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
             let cellsTotal = collisionPairs.get(body);
             let bodies = grid.query(body, cellsTotal).filter(body.collisionFilter);
+            if (this.isAsleep(body)) bodies = [];
             collisionPairs.set(body, bodies);
         }
         if (false) for (let i in grid.cells) if (grid.cells[i]) for (let j in grid.cells[i]) if (typeof grid.cells[i][j] === "object") {
@@ -1024,7 +1040,16 @@ class PhysicsEngine {
                 c.stroke(cl.ORANGE, 1).arrow(i * cellsize, j * cellsize, el.position.x, el.position.y);
             }
         }
-        this.applyForces();
+        return collisionPairs;
+    }
+    lowActivity(body) {
+        return PhysicsVector.mag(body.velocity) < 0.1 && Math.abs(body.angularVelocity) < 0.01;
+    }
+    run() {
+        let dynBodies = this.bodies.filter(body => body.type === RigidBody.DYNAMIC);
+        this.clearCollidingBodies();
+        const collisionPairs = this.createGrid(dynBodies);
+        this.applyForces(dynBodies);
         let intensity = 1 / this.iterations;
         for (let i = 0; i < this.iterations; i++) {
             //sorts
@@ -1033,12 +1058,21 @@ class PhysicsEngine {
             let inverseGravitySort = (a, b) => PhysicsVector.dot(a.position, g) - PhysicsVector.dot(b.position, g);
 
             //step
-            this.integrate(intensity);
+            this.integrate(intensity, dynBodies);
             this.solveConstraints();
             this.collisions(gravitySort, dynBodies, collisionPairs);
-            this.integrate(intensity);
+            this.integrate(intensity, dynBodies);
             this.solveConstraints();
             this.collisions(inverseGravitySort, dynBodies, collisionPairs);
+        }
+        for (let i = 0; i < dynBodies.length; i++) {
+            let body = dynBodies[i];
+            if (this.lowActivity(body)) body.sleeping++;
+            else body.sleeping = 0;
+
+            if (this.isAsleep(body)) for (let j = 0; j < body.collidingBodies.length; j++) {
+                if (!this.lowActivity(body.collidingBodies[j])) body.sleeping = 0;
+            }
         }
     }
     getBody(id) {

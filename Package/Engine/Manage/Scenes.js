@@ -362,7 +362,7 @@ class InactiveScene {
 	clearAllCollisions() {
 		let phys = this.getPhysicsElements();
 		for (let i = 0; i < phys.length; i++) {
-			phys[i].colliding.clear();
+			if (!this.physicsEngine.isAsleep(phys[i].body)) phys[i].colliding.clear();
 		}
 	}
 	collideRect(box) {
@@ -536,7 +536,6 @@ class Scene extends InactiveScene {
 	}
 	engineFixedUpdate() {
 		this.startUpdate();
-		this.clearAllCollisions();
 		//custom before updates run
 		for (let el of this.elementArray) {
 			el.scripts.run("beforeUpdate");
