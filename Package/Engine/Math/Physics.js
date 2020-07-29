@@ -433,8 +433,6 @@ class RigidBody {
         return new PhysicsVector(-(p.y - this.position.y) * this.angularVelocity, (p.x - this.position.x) * this.angularVelocity).add(this.velocity);
     }
     applyImpulse(pos, imp) {
-        // c.stroke(cl.RED, 1).circle(pos, 5);
-        // c.stroke(cl.ORANGE).arrow(pos, PhysicsVector.add(pos, PhysicsVector.div(imp, 10)))
         //linear
         this.velocity.x += imp.x / this.mass;
         this.velocity.y += imp.y / this.mass;
@@ -1047,7 +1045,7 @@ class PhysicsEngine {
         return collisionPairs;
     }
     lowActivity(body) {
-        return PhysicsVector.mag(body.velocity) < 0.1 && Math.abs(body.angularVelocity) < 0.005;
+        return PhysicsVector.mag(body.velocity) < 0.1 && Math.abs(body.angularVelocity) < 0.01;
     }
     run() {
         let dynBodies = this.bodies.filter(body => body.type === RigidBody.DYNAMIC);
