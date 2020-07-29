@@ -379,6 +379,10 @@ class RigidBody {
     addCollidingBody(body) {
         if (!this.collidingBodies.includes(body)) this.collidingBodies.push(body);
     }
+    wake() {
+        this.sleeping = 0;
+        for (let i = 0; i < this.collidingBodies.length; i++) if (this.collidingBodies[i].sleeping) this.collidingBodies[i].wake();
+    }
     displace(v) {
         this.position.add(v);
         if (this.__models) for (let i = 0; i < this.__models.length; i++) {
@@ -866,7 +870,7 @@ class PhysicsEngine {
         this.oncollide = (a, b, dir) => null;
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
-        this.sleepDuration = Infinity;
+        this.sleepDuration = 3;
     }
     isAsleep(body) {
         return body.sleeping > this.sleepDuration;
@@ -1068,11 +1072,7 @@ class PhysicsEngine {
         for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
             if (this.lowActivity(body)) body.sleeping++;
-            else body.sleeping = 0;
-
-            if (this.isAsleep(body)) for (let j = 0; j < body.collidingBodies.length; j++) {
-                if (!this.lowActivity(body.collidingBodies[j])) body.sleeping = 0;
-            }
+            else body.wake();
         }
     }
     getBody(id) {
