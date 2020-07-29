@@ -1047,7 +1047,7 @@ class PhysicsEngine {
         return collisionPairs;
     }
     lowActivity(body) {
-        return PhysicsVector.mag(body.velocity) < 0.1 && Math.abs(body.angularVelocity) < 0.01;
+        return PhysicsVector.mag(body.velocity) < 0.1 && Math.abs(body.angularVelocity) < 0.005;
     }
     run() {
         let dynBodies = this.bodies.filter(body => body.type === RigidBody.DYNAMIC);
