@@ -870,7 +870,7 @@ class PhysicsEngine {
         this.oncollide = (a, b, dir) => null;
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
-        this.sleepDuration = 3;
+        this.sleepDuration = 10;
     }
     isAsleep(body) {
         return body.sleeping > this.sleepDuration;
@@ -1072,7 +1072,11 @@ class PhysicsEngine {
         for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
             if (this.lowActivity(body)) body.sleeping++;
-            else body.wake();
+            else body.sleeping = 0;
+        }
+        for (let i = 0; i < dynBodies.length; i++) {
+            let body = dynBodies[i];
+            if (!body.sleeping) body.wake();
         }
     }
     getBody(id) {
