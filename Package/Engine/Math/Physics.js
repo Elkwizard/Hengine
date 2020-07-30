@@ -1076,9 +1076,7 @@ class PhysicsEngine {
                 body.sleeping++;
             } else {
                 body.sleeping = 0;
-                if (body.disrupted) {
-                    body.wake();
-                }
+                if (body.disrupted) body.wake();
             }
             body.disrupted = false;
         }
