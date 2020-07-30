@@ -360,9 +360,12 @@ class RigidBody {
         this.collisionFilter = body => true;
         this.engine = null;
 
-        this.canRotate = true;
+        //sleep
         this.sleeping = 0;
+        this.disrupted = false;
         this.collidingBodies = [];
+
+        this.canRotate = true;
         this.isTrigger = false;
 
         this.__models = null;
@@ -381,7 +384,7 @@ class RigidBody {
     }
     wake() {
         this.sleeping = 0;
-        for (let i = 0; i < this.collidingBodies.length; i++) if (this.collidingBodies[i].sleeping) this.collidingBodies[i].wake();
+        for (let i = 0; i < this.collidingBodies.length; i++) this.collidingBodies[i].disrupted = true;
     }
     displace(v) {
         this.position.add(v);
@@ -871,7 +874,7 @@ class PhysicsEngine {
         this.sleepDuration = 10;
     }
     isAsleep(body) {
-        return body.sleeping > this.sleepDuration;
+        return body.sleeping > this.sleepDuration && !body.disrupted;
     }
     clearCollidingBodies() {
         for (let i = 0; i < this.bodies.length; i++) {
@@ -1069,12 +1072,15 @@ class PhysicsEngine {
         }
         for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
-            if (this.lowActivity(body)) body.sleeping++;
-            else body.sleeping = 0;
-        }
-        for (let i = 0; i < dynBodies.length; i++) {
-            let body = dynBodies[i];
-            if (!body.sleeping) body.wake();
+            if (this.lowActivity(body)) {
+                body.sleeping++;
+            } else {
+                body.sleeping = 0;
+                if (body.disrupted) {
+                    body.wake();
+                }
+            }
+            body.disrupted = false;
         }
     }
     getBody(id) {
