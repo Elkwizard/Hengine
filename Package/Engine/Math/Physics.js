@@ -362,7 +362,6 @@ class RigidBody {
 
         //sleep
         this.sleeping = 0;
-        this.disrupted = false;
         this.collidingBodies = [];
 
         this.canRotate = true;
@@ -384,7 +383,6 @@ class RigidBody {
     }
     wake() {
         this.sleeping = 0;
-        for (let i = 0; i < this.collidingBodies.length; i++) this.collidingBodies[i].disrupted = true;
     }
     displace(v) {
         this.position.add(v);
@@ -874,7 +872,7 @@ class PhysicsEngine {
         this.sleepDuration = 10;
     }
     isAsleep(body) {
-        return body.sleeping > this.sleepDuration && !body.disrupted;
+        return body.sleeping > this.sleepDuration;
     }
     clearCollidingBodies() {
         for (let i = 0; i < this.bodies.length; i++) {
@@ -994,10 +992,7 @@ class PhysicsEngine {
                     this.oncollide(body, body2, collisionDirection);
                     if (body.isTrigger || body2.isTrigger) continue;
                     if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
-                    else {
-                        // exit();
-                        this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
-                    }
+                    else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
                 }
             }
             //immobilize
@@ -1070,15 +1065,20 @@ class PhysicsEngine {
             this.solveConstraints();
             this.collisions(inverseGravitySort, dynBodies, collisionPairs);
         }
-        for (let i = 0; i < dynBodies.length; i++) {
+        for (let i = 0; i < this.bodies.length; i++) {
+            let body = this.bodies[i];
+            if (this.lowActivity(body)) body.sleeping++;
+            else body.wake();
+        }
+        //all static objects are sleeping
+        awakenNeighborsLoop: for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
-            if (this.lowActivity(body)) {
-                body.sleeping++;
-            } else {
-                body.sleeping = 0;
-                if (body.disrupted) body.wake();
+            for (let j = 0; j < body.collidingBodies.length; j++) {
+                if (!body.collidingBodies[j].sleeping) {
+                    body.wake();
+                    continue awakenNeighborsLoop;
+                }
             }
-            body.disrupted = false;
         }
     }
     getBody(id) {
