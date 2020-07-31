@@ -1071,14 +1071,9 @@ class PhysicsEngine {
             else body.wake();
         }
         //all static objects are sleeping
-        awakenNeighborsLoop: for (let i = 0; i < dynBodies.length; i++) {
+        for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
-            for (let j = 0; j < body.collidingBodies.length; j++) {
-                if (!body.collidingBodies[j].sleeping) {
-                    body.wake();
-                    continue awakenNeighborsLoop;
-                }
-            }
+            if (this.isAsleep(body)) for (let j = 0; j < body.collidingBodies.length; j++) if (!body.collidingBodies[j].sleeping) body.wake();
         }
     }
     getBody(id) {
