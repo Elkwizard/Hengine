@@ -137,11 +137,8 @@ class SceneObject {
 			}
 		}
 		let num = 0;
-		for (let shape of result) this.addShape(num++ + "", shape);
+		for (let shape of result) this.addShape(`Shape #${num++}`, shape);
 		return result;
-	}
-	onAddScript(script) {
-
 	}
 	cacheRotation() {
 		this.__cosRot = Math.cos(this.rotation);
@@ -288,6 +285,13 @@ class SceneObject {
 		let middle = this.middle;
 		c.translate(middle);
 		c.rotate(this.rotation);
+		artist();
+		c.restore();
+	}
+	drawInWorldSpace(artist) {
+		c.save();
+		c.rotate(-this.rotation);
+		c.translate(-this.x, -this.y);
 		artist();
 		c.restore();
 	}

@@ -33,7 +33,7 @@ class ImageType {
 		}
 	}
 }
-let Frame = class extends ImageType {
+class Frame extends ImageType {
 	constructor(width, height) {
 		super(width, height, false);
 		if (typeof width === "string") {
