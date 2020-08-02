@@ -177,6 +177,7 @@ class MouseHandler extends InputHandler {
 			});
 		}
 		function touchHandle(e) {
+			e.preventDefault();
 			let p = e.targetTouches[0];
 			if (!p) handle({
 				x: m.x, 

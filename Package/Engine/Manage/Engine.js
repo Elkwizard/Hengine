@@ -107,16 +107,19 @@ class Engine {
 			W = innerWidth;
 			H = innerHeight;
 		}
+		let wrp = document.body;
 		if (!utility) {
 			canvas = document.createElement("canvas");
 			canvas.id = "Engine Canvas";
 			wrapper.appendChild(canvas);
 			this.wrapper = wrapper;
+			wrp = canvas;
 		} else {
 			this.wrapper = document.body;
 			canvas = new OffscreenCanvas(1, 1);
 		}
-		this.mouse = new MouseHandler(this, document.body);
+
+		this.mouse = new MouseHandler(this, wrp);
 		this.keyboard = new KeyboardHandler();
 
 		this.renderer = new Artist(canvas, W, H);
