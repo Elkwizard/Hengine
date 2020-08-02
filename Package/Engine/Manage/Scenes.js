@@ -472,7 +472,7 @@ class Scene extends InactiveScene {
 		this.collisionEvents = true;
 		this.camera = new Camera(0, 0, this.c.canvas.width, this.c.canvas.height, 1, 0);
 		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
-		M.engineClick = function (e) {
+		this.home.mouse.engineClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			let collided = this.collidePoint(adjusted);
 			if (this.mouseEvents) for (let o of collided) {
@@ -481,7 +481,7 @@ class Scene extends InactiveScene {
 				m.scripts.run("Click", adjusted);
 			}
 		}.bind(this);
-		M.engineRightClick = function (e) {
+		this.home.mouse.engineRightClick = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			if (this.mouseEvents) for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.rightClick(adjusted);
@@ -489,7 +489,7 @@ class Scene extends InactiveScene {
 				m.scripts.run("RightClick", adjusted);
 			}
 		}.bind(this);
-		M.engineMove = function (e) {
+		this.home.mouse.engineMove = function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			if (this.mouseEvents) {
 				let collided = this.collidePointBoth(adjusted);

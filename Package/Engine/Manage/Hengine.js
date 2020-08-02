@@ -117,10 +117,7 @@ class Hengine {
 
 		//create engine
 		document.body.style.margin = 0;
-		this.K = new KeyboardHandler();
-		this.M = new MouseHandler();
-		window.K = this.K;
-		window.M = this.M;
+
 		this.g = new Engine(utility, wrapper);
 		this.s = this.g.scene;
 		this.c = this.g.renderer;
@@ -128,8 +125,10 @@ class Hengine {
 		this.custom = {};
 		this.cl = new ColorLibrary();
 		this.sl = new SoundLibrary();
-		this.K = K;
-		this.M = M;
+		this.K = this.g.keyboard;
+		this.M = this.g.mouse;
+		window.K = this.K;
+		window.M = this.M;
 		window.g = this.g;
 		window.s = this.s;
 		window.c = this.c;

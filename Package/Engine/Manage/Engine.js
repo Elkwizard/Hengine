@@ -110,16 +110,16 @@ class Engine {
 		if (!utility) {
 			canvas = document.createElement("canvas");
 			canvas.id = "Engine Canvas";
-			M.addListenersTo(document.body);
 			wrapper.appendChild(canvas);
 			this.wrapper = wrapper;
 		} else {
 			this.wrapper = document.body;
 			canvas = new OffscreenCanvas(1, 1);
 		}
+		this.mouse = new MouseHandler(this, document.body);
+		this.keyboard = new KeyboardHandler();
 
 		this.renderer = new Artist(canvas, W, H);
-		window.g = this;
 		this.scene = new Scene("Engine Scene", this.renderer, new Vector2(0, 0.2), this);
 		//update loops
 		this.afterScript = new Script("after");
@@ -128,7 +128,6 @@ class Engine {
 		this.updateScript = new Script("update");
 		this.intervalFns = [];
 
-		M.engine = this;
 		this.FPS_FRAMES_TO_COUNT = 10;
 				
 		window.intervals.push(this.engineFixedUpdate.bind(this));

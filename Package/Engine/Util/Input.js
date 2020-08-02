@@ -98,7 +98,7 @@ class KeyboardHandler extends InputHandler {
 	}
 }
 class MouseHandler extends InputHandler {
-	constructor() {
+	constructor(engine, root) {
 		super();
 		this.down = false;
 		this.x = 0;
@@ -122,11 +122,12 @@ class MouseHandler extends InputHandler {
 		this.onRight = new Listener();
 		this.onScroll = new Listener();
 		this.onMove = new Listener();
-		this.engine = null;
-		this.listenerRoot = null;
+		this.engine = engine;
+		this.listenerRoot = root;
 		this.engineClick = function () { };
 		this.engineRightClick = function () { };
 		this.engineMove = function () { };
+		this.addListenersTo(this.listenerRoot);
 	}
 	addListenersTo(el) {
 		let m = this;
@@ -135,26 +136,26 @@ class MouseHandler extends InputHandler {
 			m.updatePosition(e, "click");
 			for (let ev of m.onClick) ev(e);
 		});
-		el.addEventListener("pointerdown", function (e) {
+		function handleDown(e) {
 			m.button = e.button;
-			m.updatePosition(e, "down");
+			m.updatePosition(e);
 			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
 			m.dragStart = m.dragEnd = adjusted;
 			m.down = true;
 			m.keys[m.mouseMap[e.button]] = true;
 			for (let ev of m.onDown) ev(e);
-		});
-		el.addEventListener("pointermove", function (e) {
-			m.updatePosition(e, "move");
+		}
+		function handleMove(e) {
+			m.updatePosition(e);
 			if (m.down) {
 				let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
 				m.dragEnd = adjusted;
 			}
 			m.engineMove(e);
 			for (let ev of m.onMove) ev(e);
-		});
-		function mouseUp(e) {
-			m.updatePosition(e, "up");
+		};
+		function handleUp(e) {
+			m.updatePosition(e);
 			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
 			m.dragEnd = adjusted;
 			m.down = false;
@@ -164,7 +165,47 @@ class MouseHandler extends InputHandler {
 			m.engineClick(e);
 			for (let ev of m.onUp) ev(e);
 		};
-		el.addEventListener("pointerup", mouseUp);
+
+		//pointers and touch
+
+		function mouseHandle(e) {
+			handle({
+				x: e.x,
+				y: e.y,
+				button: e.button,
+				type: e.type.slice(5)
+			});
+		}
+		function touchHandle(e) {
+			let p = e.targetTouches[0];
+			if (!p) handle({
+				x: m.x, 
+				y: m.y,
+				button: 0,
+				type: "up"
+			});
+			else handle({
+				x: p.pageX,
+				y: p.pageY,
+				button: 0,
+				type: { start: "down", end: "up", move: "move" }[e.type.slice(5)]
+			});
+		}
+		function handle(e) {
+			if (e.type === "down") handleDown(e);
+			if (e.type === "up") handleUp(e);
+			if (e.type === "move") handleMove(e);
+		}
+		el.addEventListener("mousedown", mouseHandle);
+		el.addEventListener("mousemove", mouseHandle);
+		el.addEventListener("mouseup", mouseHandle);
+		el.addEventListener("touchstart", touchHandle);
+		el.addEventListener("touchmove", touchHandle);
+		el.addEventListener("touchend", touchHandle);
+		el.addEventListener("touchcancel", touchHandle);
+
+		//end
+
 		this.__right__ = function (e) {
 			m.button = e.button;
 			e.preventDefault();
@@ -192,14 +233,14 @@ class MouseHandler extends InputHandler {
 		this.onScroll.clear();
 		this.onClick.clear();
 	}
-	updatePosition(e, name) {
+	updatePosition(e) {
 		try {
-			let bound = g.renderer.canvas.getBoundingClientRect();
-			this.x = e.clientX - bound.x;
-			this.y = e.clientY - bound.y;
+			let bound = this.engine.renderer.canvas.getBoundingClientRect();
+			this.x = e.x - bound.x;
+			this.y = e.y - bound.y;
 		} catch (e) {
-			this.x = e.clientX;
-			this.y = e.clientY;
+			this.x = e.x;
+			this.y = e.y;
 		}
 	}
 	allowSave() {
