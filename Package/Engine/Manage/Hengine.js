@@ -116,9 +116,11 @@ class Hengine {
 		window.rand = this.rand.bind(this);
 
 		//create engine
-		document.body.style.margin = 0;
-		document.body.style.overflow = "hidden";
-
+		if (!utility) {
+			document.body.style.margin = 0;
+			document.body.style.overflow = "hidden";
+		}
+		
 		this.g = new Engine(utility, wrapper);
 		this.s = this.g.scene;
 		this.c = this.g.renderer;
