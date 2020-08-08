@@ -23,6 +23,7 @@ class Interpolation {
         return Interpolation.lerp(top, bottom, tz);
     }
     static smoothMin(a, b, k = 1) {
+        k *= -1;
         const t = Number.clamp((b - a) / k + 0.5, 0, 1);
         const t2 = t * (1 - t) * 0.5 * k;
         return Interpolation.lerp(a, b, t) - t2;
