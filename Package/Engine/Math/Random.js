@@ -24,9 +24,9 @@ class Interpolation {
     }
     static smoothMin(a, b, k = 1) {
         k *= -1;
-        const t = Number.clamp((b - a) / k + 0.5, 0, 1);
-        const t2 = t * (1 - t) * 0.5 * k;
-        return Interpolation.lerp(a, b, t) - t2;
+        let t = Number.clamp((b - a) / k + 0.5, 0, 1);
+        let t2 = t * (1 - t) * 0.5 * k;
+        return (1 - t) * a + t * b + t2;
     }
     static smoothMax(a, b, k = 1) {
         return Interpolation.smoothMin(a, b, -k);
