@@ -379,7 +379,7 @@ class RigidBody {
         return this._angle;
     }
     addCollidingBody(body) {
-        if (!this.collidingBodies.includes(body)) this.collidingBodies.push(body);
+        if (this.type !== RigidBody.STATIC && !this.collidingBodies.includes(body)) this.collidingBodies.push(body);
     }
     wake() {
         this.sleeping = 0;
