@@ -312,6 +312,7 @@ class SceneObject {
 		if (!this.hidden && this.onScreen) {
 			this.runDraw();
 		}
+		// else console.log(1);
 		// s.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
 		// s.drawInScreenSpace(e => c.stroke(cl.RED, 1).rect(screen));
 		this.scripts.run("EscapeDraw");

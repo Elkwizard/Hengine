@@ -353,7 +353,7 @@ class RigidBody {
         this.inertia = 0;
 
         this.restitution = 0;
-        this.friction = 0.2;
+        this.friction = null;
         this.canMoveThisStep = true;
         this.prohibitedDirections = [];
 
@@ -1084,7 +1084,7 @@ class PhysicsEngine {
     }
     addBody(b) {
         b.engine = this;
-        b.friction = this.friction;
+        if (b.friction === null) b.friction = this.friction;
         this.bodies.push(b);
     }
     removeBody(id) {

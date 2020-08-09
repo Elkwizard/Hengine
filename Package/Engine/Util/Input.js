@@ -8,9 +8,10 @@ class Listener {
 		}
 	}
 	clear() {
-		this.methods = [];
+		this.methods = this.methods.filter(m => m.required);
 	}
-	listen(fn) {
+	listen(fn, required = false) {
+		fn.required = required;
 		this.methods.push(fn);
 	}
 }
@@ -58,9 +59,6 @@ class InputHandler {
 	JR(...keys) {
 		return keys.map(key => this.keyUpCounts[key] === 1).includes(true);
 	}
-	inputAdjust() {
-		
-	}
 	update() {
 		for (let key in this.keys) {
 			if (this.keyDownCounts[key] === undefined) this.keyDownCounts[key] = 0;
@@ -70,7 +68,6 @@ class InputHandler {
 			if (!this.keys[key]) this.keyUpCounts[key]++;
 			else this.keyUpCounts[key] = 0;
 		}
-		this.inputAdjust();
 	}
 }
 class KeyboardHandler extends InputHandler {
@@ -124,9 +121,6 @@ class MouseHandler extends InputHandler {
 		this.onMove = new Listener();
 		this.engine = engine;
 		this.listenerRoot = root;
-		this.engineClick = function () { };
-		this.engineRightClick = function () { };
-		this.engineMove = function () { };
 		this.addListenersTo(this.listenerRoot);
 	}
 	addListenersTo(el) {
@@ -139,7 +133,7 @@ class MouseHandler extends InputHandler {
 		function handleDown(e) {
 			m.button = e.button;
 			m.updatePosition(e);
-			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
+			let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
 			m.dragStart = m.dragEnd = adjusted;
 			m.down = true;
 			m.keys[m.mouseMap[e.button]] = true;
@@ -148,21 +142,19 @@ class MouseHandler extends InputHandler {
 		function handleMove(e) {
 			m.updatePosition(e);
 			if (m.down) {
-				let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
+				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
 				m.dragEnd = adjusted;
 			}
-			m.engineMove(e);
 			for (let ev of m.onMove) ev(e);
 		};
 		function handleUp(e) {
 			m.updatePosition(e);
-			let adjusted = m.engine ? m.engine.scene.screenSpaceToWorldSpace(m) : Vector2.fromPoint(m);
+			let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
 			m.dragEnd = adjusted;
 			m.down = false;
 			for (let inx of m.mouseMap) {
 				m.keys[inx] = false;
 			}
-			m.engineClick(e);
 			for (let ev of m.onUp) ev(e);
 		};
 
@@ -220,7 +212,8 @@ class MouseHandler extends InputHandler {
 			for (let ev of m.onScroll) ev(e.deltaY);
 		});
 	}
-	inputAdjust() {
+	update() {
+		super.update();
 		if (this.engine) {
 			this.world = this.engine.scene.screenSpaceToWorldSpace(this);
 			this.worldLast = this.engine.scene.screenSpaceToWorldSpace(this.last);

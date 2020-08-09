@@ -38,7 +38,7 @@ class InactiveScene {
 				scripts: []
 			},
 			ParticleObject: {
-				draw(name, shape) { 
+				draw(name, shape) {
 					c.draw(cl.BLACK).infer(shape);
 				},
 				update() { },
@@ -54,6 +54,10 @@ class InactiveScene {
 			if (cont instanceof InactiveScene) {
 				if (cont.active) {
 					let ary = cont.updateArray();
+					for (let el of ary) if (el.body) {
+						cont.physicsEngine.removeBody(el.body.id);
+						this.physicsEngine.addBody(el.body);
+					}
 					this.elementArray.push(...ary);
 				}
 			} else this.elementArray.push(cont);
@@ -470,9 +474,8 @@ class Scene extends InactiveScene {
 		this.cameras = {};
 		this.mouseEvents = false;
 		this.collisionEvents = true;
-		this.camera = new Camera(0, 0, this.c.canvas.width, this.c.canvas.height, 1, 0);
-		this.adjustedDisplay = new Rect(this.camera.x, this.camera.y, this.camera.width, this.camera.height);
-		this.home.mouse.engineClick = function (e) {
+		this.camera = new Camera(0, 0, this.c.width, this.c.height, 1, 0);
+		this.home.mouse.onDown.listen(function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			let collided = this.collidePoint(adjusted);
 			if (this.mouseEvents) for (let o of collided) {
@@ -480,16 +483,16 @@ class Scene extends InactiveScene {
 				let m = this.get(o);
 				m.scripts.run("Click", adjusted);
 			}
-		}.bind(this);
-		this.home.mouse.engineRightClick = function (e) {
+		}.bind(this), true);
+		this.home.mouse.onRight.listen(function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			if (this.mouseEvents) for (let o of this.collidePoint(adjusted)) {
 				this.get(o).response.rightClick(adjusted);
 				let m = this.get(o);
 				m.scripts.run("RightClick", adjusted);
 			}
-		}.bind(this);
-		this.home.mouse.engineMove = function (e) {
+		}.bind(this), true);
+		this.home.mouse.onMove.listen(function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			if (this.mouseEvents) {
 				let collided = this.collidePointBoth(adjusted);
@@ -505,7 +508,7 @@ class Scene extends InactiveScene {
 					if (o) o.hovered = false;
 				}
 			}
-		}.bind(this);
+		}.bind(this), true);
 		this.removeQueue = [];
 	}
 	drawInWorldSpace(artist) {
@@ -579,21 +582,21 @@ class Scene extends InactiveScene {
 	}
 	renderCamera(camera) {
 		let screen = camera.getWorld().getBoundingBox();
-		
+
 		if (camera !== this.camera) {
 			camera.createView();
 			this.c.embody(camera.newView);
 		} else this.c.save();
-		
+
 		camera.transformToWorld(this.c);
-		
+
 		for (let rect of this.elementArray) {
 			rect.engineDrawUpdate(screen);
 			rect.lifeSpan++;
 		}
 
 		if (camera !== this.camera) {
-			this.c.unembody();	
+			this.c.unembody();
 			camera.view = camera.newView;
 		} else this.c.restore();
 		return camera.view;

@@ -176,6 +176,21 @@ class Hengine {
 		this.images = {};
 		this.sounds = {};
 
+		this.initFileSystem();
+
+		//title
+		this.setTitle(this.getProjectName());
+
+		//defaults
+		this.initDefaults();
+	}
+	get width() {
+		return this.s.display.width;
+	}
+	get height() {
+		return this.s.display.height;
+	}
+	initFileSystem() {
 		this.fileTypes = {
 			NUMBER: str => parseFloat(str),
 			STRING: str => str,
@@ -199,11 +214,8 @@ class Hengine {
 				this.fileTypes[alt.toUpperCase()] = this.fileTypes[type];
 			}
 		}
-
-		//title
-		this.setTitle(this.getProjectName());
-
-		//defaults
+	}
+	initDefaults() {	
 		window.WALLS = new InactiveScene("WALLS");
 		WALLS.addPhysicsRectElement("Ceiling", width / 2, -50, width, 100, false);
 		WALLS.addPhysicsRectElement("Floor", width / 2, height + 50, width, 100, false);
@@ -211,7 +223,7 @@ class Hengine {
 		WALLS.addPhysicsRectElement("Right Wall", width + 50, height / 2, 100, height + 200, false);
 
 
-		window.PLAYER_MOVEMENT = new ElementScript("PLAYER_MOVEMENT", {
+		s.addScript("PLAYER_MOVEMENT", {
 			init() {
 				if (!this.controls.up) {
 					this.controls = new Controls("w", "s", "a", "d");
@@ -229,13 +241,28 @@ class Hengine {
 				}
 			}
 		});
-
-	}
-	get width() {
-		return this.s.display.width;
-	}
-	get height() {
-		return this.s.display.height;
+		s.addScript("DRAGGABLE", {
+			init(l) {
+				l.dragged = false;
+				l.offset = Vector2.origin;
+				s.mouseEvents = true;
+			},
+			click(l, m) {
+				l.dragged = true;
+				l.offset = this.worldSpaceToModelSpace(m);
+			},
+			update(l) {
+				if (M.JR("Left")) l.dragged = false; 
+				if (l.dragged) {
+					this.middle = M.world.minus(l.offset);
+					if (this.body) {
+						//keep awake
+						this.stop();
+						this.body.sleeping = 0;
+					}
+				}
+			}
+		});
 	}
 	getProjectName() {
 		let script = document.createElement("script");
