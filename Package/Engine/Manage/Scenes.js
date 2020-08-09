@@ -369,30 +369,10 @@ class InactiveScene {
 			if (!this.physicsEngine.isAsleep(phys[i].body)) phys[i].colliding.clear();
 		}
 	}
-	collideRect(box) {
-		let collideAry = [];
-		for (let hitbox of this.updateArray()) {
-			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Shape") + "Shape";
-			if (Physics[name](hitbox, box).colliding) {
-				collideAry.push(hitbox);
-			}
-		}
-		return collideAry;
-	}
-	collideCircle(cir) {
-		let collideAry = [];
-		for (let hitbox of this.updateArray()) {
-			let name = "collide" + ((hitbox instanceof CirclePhysicsObject) ? "Circle" : "Shape") + "Circle";
-			if (Physics[name](hitbox, cir).colliding) {
-				collideAry.push(hitbox);
-			}
-		}
-		return collideAry;
-	}
 	collidePoint(point) {
 		let collideAry = [];
-		for (let hitbox of this.updateArray().filter(e => !(e instanceof ParticleObject))) {
-
+		let options = this.updateArray().filter(e => !(e instanceof ParticleObject));
+		for (let hitbox of options) {
 			let p = (hitbox instanceof UIObject) ? this.worldSpaceToScreenSpace(point) : point;
 			let shapes = hitbox.getModels();
 			let colliding = false;
@@ -479,17 +459,15 @@ class Scene extends InactiveScene {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			let collided = this.collidePoint(adjusted);
 			if (this.mouseEvents) for (let o of collided) {
-				this.get(o).response.click(adjusted);
-				let m = this.get(o);
-				m.scripts.run("Click", adjusted);
+				o.response.click(adjusted);
+				o.scripts.run("Click", adjusted);
 			}
 		}.bind(this), true);
 		this.home.mouse.onRight.listen(function (e) {
 			let adjusted = this.screenSpaceToWorldSpace(e);
 			if (this.mouseEvents) for (let o of this.collidePoint(adjusted)) {
-				this.get(o).response.rightClick(adjusted);
-				let m = this.get(o);
-				m.scripts.run("RightClick", adjusted);
+				o.response.rightClick(adjusted);
+				o.scripts.run("RightClick", adjusted);
 			}
 		}.bind(this), true);
 		this.home.mouse.onMove.listen(function (e) {
@@ -499,13 +477,12 @@ class Scene extends InactiveScene {
 				for (let o of collided[0]) {
 					if (!o.hovered) {
 						o.response.hover(adjusted);
-						let m = this.get(o);
-						m.scripts.run("Hover", adjusted);
+						o.scripts.run("Hover", adjusted);
 					}
 					o.hovered = true;
 				}
 				for (let o of collided[1]) {
-					if (o) o.hovered = false;
+					o.hovered = false;
 				}
 			}
 		}.bind(this), true);

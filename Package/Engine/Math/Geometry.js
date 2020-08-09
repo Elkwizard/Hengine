@@ -389,8 +389,11 @@ class Geometry {
         }
     }
     static overlapPoint(poly, p) {
-        if (poly instanceof Circle) return (p.x - poly.x) ** 2 + (p.y - poly.y) ** 2 < poly.radius ** 2;
-        else {
+        if (poly instanceof Circle) {
+            let dx = p.x - poly.x;
+            let dy = p.y - poly.y;
+            return dx * dx + dy * dy < poly.radius ** 2;
+        } else {
             let axes = [];
             poly = poly.vertices;
             for (let i = 0; i < poly.length; i++) {

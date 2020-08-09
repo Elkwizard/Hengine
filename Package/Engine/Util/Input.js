@@ -204,7 +204,6 @@ class MouseHandler extends InputHandler {
 			e.preventDefault();
 			m.updatePosition(e, "right");
 			for (let ev of m.onRight) ev(e);
-			m.engineRightClick(e);
 		}
 		el.addEventListener("contextmenu", this.__right__);
 		el.addEventListener("wheel", function (e) {
