@@ -388,6 +388,11 @@ class Vector2 extends Vector {
 		this.y = t_x * sin + t_y * cos;
 		return this;
 	}
+	rotated(angle) {
+		let cos = Math.cos(angle);
+		let sin = Math.sin(angle);
+		return new Vector2(this.x * cos - this.y * sin, this.x * sin + this.y * cos);
+	}
 	dot(v) {
 		return this.x * v.x + this.y * v.y;
 	}

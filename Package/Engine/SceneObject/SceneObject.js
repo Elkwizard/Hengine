@@ -184,7 +184,7 @@ class SceneObject {
 		return v.Vminus(this.middle).rotate(-this.rotation);
 	}
 	modelSpaceToWorldSpace(v) {
-		return v.rotate(this.rotation).Vplus(this.middle);
+		return v.rotated(this.rotation).Vplus(this.middle);
 	}
 	centerModels() {
 		let center = Vector2.origin;
