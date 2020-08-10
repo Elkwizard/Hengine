@@ -54,23 +54,29 @@ class Random {
         return f(-2.31 * t + 1.155) / 6.158 + 0.5;
     }
     static perlin(x, f = 1, seed = Random.seed) {
+        x += seed;
         x *= f;
-        const s_0 = n => Random.seedRand(seed + Math.floor(n));
+        const s_0 = n => Random.seedRand(Math.floor(n));
         const n = x => Interpolation.lerp(s_0(x), s_0(x + 1), Random.noiseTCorrect(x % 1));
         return n(x);
     }
     static perlin2D(x, y, f = 1, seed = Random.seed) {
+        x += seed;
+        y += seed;
         x *= f;
         y *= f;
-        const s_p = (x, y) => Random.seedRand(Math.floor(x) + Math.floor(y) * 2000 + seed * 100000);
+        const s_p = (x, y) => Random.seedRand(Math.floor(x) + Math.floor(y) * 2000);
         const n = (x, y) => Interpolation.quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), Random.noiseTCorrect(x % 1), Random.noiseTCorrect(y % 1));
         return n(x, y);
     }
     static perlin3D(x, y, z, f = 1, seed = Random.seed) {
+        x += seed;
+        y += seed;
+        z += seed;
         x *= f;
         y *= f;
         z *= f;
-        const s_p = (x, y, z) => Random.seedRand(Random.seedRand(Math.floor(x)) + Random.seedRand(Math.floor(y) * 2000) + Random.seedRand(Math.floor(z) * 2000000) + seed * 100000);
+        const s_p = (x, y, z) => Random.seedRand(Random.seedRand(Math.floor(x)) + Random.seedRand(Math.floor(y) * 2000) + Random.seedRand(Math.floor(z) * 2000000));
         const n = (x, y, z) => Interpolation.cubeLerp(
             s_p(x, y, z), s_p(x + 1, y, z), s_p(x, y + 1, z), s_p(x + 1, y + 1, z),
             s_p(x, y, z + 1), s_p(x + 1, y, z + 1), s_p(x, y + 1, z + 1), s_p(x + 1, y + 1, z + 1),
@@ -81,8 +87,8 @@ class Random {
         return { x: Math.floor(x) + Random.seedRand(Math.floor(x)) };
     }
     static voronoi(x, f = 1, seed = Random.seed) {
-        x *= f;
         x += seed;
+        x *= f;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) {
             let cell = Random.getVoronoiCell(x + i);
@@ -98,10 +104,10 @@ class Random {
         };
     }
     static voronoi2D(x, y, f = 1, seed = Random.seed) {
+        x += seed;
+        y += seed;
         x *= f;
         y *= f;
-        x += seed;
-        y += seed * 2000;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) {
             let cell = Random.getVoronoiCell2D(x + i, y + j);
@@ -118,12 +124,12 @@ class Random {
         };
     }
     static voronoi3D(x, y, z, f = 1, seed = Random.seed) {
+        x += seed;
+        y += seed;
+        z += seed;
         x *= f;
         y *= f;
         z *= f;
-        x += seed;
-        y += seed * 2000;
-        z += seed * 2000000;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) for (let k = -1; k < 2; k++) {
             let cell = Random.getVoronoiCell3D(x + i, y + j, z + k);
