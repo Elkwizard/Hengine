@@ -3,6 +3,7 @@ class Texture extends ImageType {
 		super(width, height, false);
 		let self = this;
 		this.c = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
+		this.renderer = this.c;
 		this.pixels = [];
 		for (let i = 0; i < this.width; i++) {
 			this.pixels.push([]);
@@ -103,17 +104,26 @@ class Texture extends ImageType {
 		return;
 	}
 	blur(amount = 1) {
-		for (let n = 0; n < amount; n++) for (let [x, y] of this) {
-			let colors = [];
-			for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) {
-				colors.push(this.getPixel(x + i, y + j));
+		let newPixels = this.pixels.map((col, x) => col.map((color, y) => {
+			let r = 0;
+			let g = 0;
+			let b = 0;
+			let a = 0;
+			for (let i = -amount; i <= amount; i++) for (let j = -amount; j <= amount; j++) {
+				let col = this.getPixel(x + i, y + j);
+				r += col.red;
+				g += col.green;
+				b += col.blue;
+				a += col.alpha;
 			}
-			let col = new Color(0, 0, 0, 1);
-			col.limited = false;
-			for (let color of colors) col.add(color);
-			col.div(colors.length);
-			this.setPixel(x, y, col);
-		}
+			r /= 9;
+			g /= 9;
+			b /= 9;
+			a /= 9;
+			return new Color(r, g, b, a);
+		}));
+		this.pixels = newPixels;
+		this.updateImageData();
 	}
 	updateImageData() {
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
