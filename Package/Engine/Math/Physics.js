@@ -585,8 +585,8 @@ class CollisionDetector {
             let toB = PhysicsVector.sub(a.position, b.position);
             let inside = PhysicsVector.dot(toB, axis) > 0;
 
-            if (bestDist > a.radius ** 2 && !inside) return null;
-            
+            if (bestDist > a.radius && !inside) return null;
+
             if (inside) {
                 axis = PhysicsVector.invert(axis);
                 bestDist = bestDist + a.radius;
