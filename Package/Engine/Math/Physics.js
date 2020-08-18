@@ -479,6 +479,57 @@ class CollisionDetector {
         return this[shapeA.constructor.name + "_" + shapeB.constructor.name](shapeA, shapeB);
     }
     CircleModel_PolygonModel(a, b) {
+        //SAT
+
+        // let axes = [];
+        // let accX = 0, accY = 0;
+        // for (let i = 0; i < b.vertices.length; i++) {
+        //     let a = b.vertices[i];
+        //     let b = b.vertices[(i + 1) % b.vertices.length];
+        //     let mag = Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
+
+        //     axes.push(new PhysicsVector((b.x - a.x) / mag, (b.y - a.y) / mag));
+        //     accX += a.x;
+        //     accY += a.y;
+
+        // }
+        // accX /= b.vertices.length;
+        // accY /= b.vertices.length;
+
+        // let toMiddleMag = Math.sqrt((a.position.x - accX) ** 2 + (a.position.y - accY) ** 2);
+        // axes.push(new PhysicsVector((a.position.x - accX) / toMiddleMag, (a.position.y - accY) / toMiddleMag));
+
+        // let minOverlap = Infinity;
+        // let bestAxis = null;
+
+        // for (let i = 0; i < axes.length; i++) {
+        //     let ax = axes[i];
+        //     let projA = PhysicsVector.dot(a.position, ax);
+        //     let minA = projA - a.radius;
+        //     let maxA = projA + a.radius;
+
+        //     let minB = Infinity;
+        //     let maxB = -Infinity;
+        //     for (let j = 0; j < b.vertices.length; j++) {
+        //         let point = b.vertices[j];
+        //         let proj = PhysicsVector.dot(point, ax);
+        //         if (proj < minB) minB = proj;
+        //         if (proj > maxB) maxB = proj;
+        //     }
+
+        //     let overlap = (projA < (minB + maxB) / 2) ? maxA - minB : maxB - minA;
+        //     if (overlap > 0 && overlap < minOverlap) {
+        //         minOverlap = overlap;
+        //         bestAxis = ax;
+        //     }
+        // }
+
+        // if (bestAxis) {
+        //     return CollisionDetector.Collision.inferPenetration(bestAxis, [new CollisionDetector.Contact(, minOverlap)]);
+        // }
+
+        //CLOSEST POINT
+
         let bestDist = Infinity;
         let bestPoint = null;
         let ax = a.position.x;
@@ -527,7 +578,6 @@ class CollisionDetector {
             }
         }
         if (bestPoint) {
-            if (bestDist > a.radius ** 2) return null;
             let between = PhysicsVector.sub(bestPoint, a.position);
             bestDist = Math.sqrt(bestDist);
             let axis = PhysicsVector.normalize(between);
@@ -535,6 +585,8 @@ class CollisionDetector {
             let toB = PhysicsVector.sub(a.position, b.position);
             let inside = PhysicsVector.dot(toB, axis) > 0;
 
+            if (bestDist > a.radius ** 2 && !inside) return null;
+            
             if (inside) {
                 axis = PhysicsVector.invert(axis);
                 bestDist = bestDist + a.radius;
