@@ -103,8 +103,13 @@ class PhysicsObject extends SceneObject {
                 : new Polygon(model.vertices.map(vert => Vector2.fromPhysicsVector(vert))));
     }
 	onAddScript(script) {
-        const value = 1;
-		if (this.scripts[script].scriptCollideRule(value) !== value) this.hasCollideRule = true;
+        super.onAddScript(script);
+        const value = { };
+        try {
+            if (this.scripts[script].scriptCollideRule(value) !== value) this.hasCollideRule = true;
+        } catch (err) {
+            this.hasCollideRule = true;
+        }
 	}
     collideBasedOnRule(e) {
         let judgement = [];

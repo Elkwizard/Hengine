@@ -175,6 +175,9 @@ class SceneObject {
 		let maxY = Math.max(...maxs.map(e => e.y));
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
+	onAddScript(script) {
+
+	}
 	addShape(name, shape) {
 		shape = shape.get();
 		this.shapes[name] = shape;

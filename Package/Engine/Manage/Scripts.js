@@ -94,8 +94,10 @@ class ElementScript extends Script {
 	}
 	addTo(el, ...args) {
 		let sc = this;
-		el.mod(function () {
-			sc.attachTo(this.scripts, this, ...args);
+		sc.attachTo(el.scripts, el, ...args);
+		el.onAddScript(this.name);
+		el.logMod(function () {
+			sc.addTo(this);
 		});
 		return this;
 	}
