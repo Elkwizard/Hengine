@@ -399,6 +399,9 @@ class RigidBody {
         let sin = this.sinAngle;
         return this.shapes.map(shape => shape.getModel(pos, cos, sin));
     }
+    clearShapes() {
+        this.shapes = [];
+    }
     removeShape(sh) {
         let inx = null;
         for (let i = 0; i < this.shapes.length; i++) {

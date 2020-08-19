@@ -80,13 +80,30 @@ class PhysicsObject extends SceneObject {
     set angularVelocity(a) {
         this.body.angularVelocity = a;
     }
+    centerModels() {
+        super.centerModels();
+        this.shapeSync();
+    }
+    positionSync() {
+        this.x = this.body.position.x;
+        this.y = this.body.position.y;
+        this.rotation = this.body.angle;
+    }
+    shapeSync() {
+        this.shapeNameIDMap.clear();
+        this.body.clearShapes();
+        for (let name in this.shapes) {
+            let shape = this.shapes[name];
+            let collider;
+            if (shape instanceof Polygon) collider = new PolygonCollider(shape.vertices.map(vert => vert.toPhysicsVector()));
+            else collider = new CircleCollider(shape.x, shape.y, shape.radius);
+            let colliders = this.body.addShape(collider);
+            this.shapeNameIDMap.set(name, colliders);
+        }
+    }
     addShape(name, shape) {
-        let collider;
-        if (shape instanceof Polygon) collider = new PolygonCollider(shape.vertices.map(vert => vert.toPhysicsVector()));
-        else collider = new CircleCollider(shape.x, shape.y, shape.radius);
-        let colliders = this.body.addShape(collider);
-        this.shapeNameIDMap.set(name, colliders);
         super.addShape(name, shape);
+        this.shapeSync();
     }
     removeShape(name) {
         let shape = this.shapes[name];
@@ -142,8 +159,7 @@ class PhysicsObject extends SceneObject {
     engineFixedUpdate() {
         this.scripts.run("Update");
         this.update();
-        this.x = this.body.position.x;
-        this.y = this.body.position.y;
+        this.positionSync();
     }
     updatePreviousData() {
         this.direction = this.middle.Vminus(this.last);

@@ -187,6 +187,12 @@ class Polygon extends Shape {
 		const vertices = a.vertices.map((v, inx) => Vector2.lerp(v, b.vertices[inx], t));
 		return new Polygon(vertices, a.rotation * (1 - t) + b.rotation * t);
 	}
+	static regular(sides, radius) {
+		let v = [];
+		for (let i = 0; i < sides; i++)
+			v.push(Vector2.fromAngle(i / sides * 2 * Math.PI).times(radius));
+		return new Polygon(v);
+	}
 }
 class Rect extends Polygon {
 	constructor(x, y, w, h) {

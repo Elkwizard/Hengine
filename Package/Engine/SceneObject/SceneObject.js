@@ -200,12 +200,8 @@ class SceneObject {
 		}
 		center.Ndiv(totalArea);
 		let dif = center.inverse();
-		let nShapes = new Map();
-		for (let name in this.shapes) {
-			nShapes.set(name, this.shapes[name].move(dif));
-		}
-		this.removeAllShapes();
-		for (let [name, shape] of nShapes) this.addShape(name, shape);
+		for (let name in this.shapes) 
+			this.shapes[name] = this.shapes[name].move(dif);
 	}
 	removeShape(name) {
 		let shape = this.shapes[name];
