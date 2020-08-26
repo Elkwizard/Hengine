@@ -111,7 +111,7 @@ class Polygon extends Shape {
 		this.vertices = this.center(a).vertices;
 	}
 	get middle() {
-		return Vector.sum(...this.vertices).Nover(this.vertices.length);
+		return Vector.sum(this.vertices).Nover(this.vertices.length);
 	}
 	getBoundingBox() {
 		let verts = this.vertices;

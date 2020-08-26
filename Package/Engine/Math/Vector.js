@@ -294,13 +294,6 @@ class Vector extends Operable {
 	static fromMatrix(m) {
 		return new this(...m.cols[0]);
 	}
-	static sum(...v) {
-		let construct = v.length ? v[0].constructor : this;
-		return (new construct(0, 0, 0, 0)).add(...v);
-	}
-	static avg(...v) {
-		return this.sum(...v).over(v.length);
-	}
 	static prohibitDirections(proDirs, dir) {
 		let remove = [];
 		let mag = dir.mag;
@@ -311,7 +304,7 @@ class Vector extends Operable {
 				remove.push(bad);
 			}
 		}
-		let wrong = remove.length ? Vector.sum(...remove).over(remove.length) : new dir.constructor(0, 0, 0, 0);
+		let wrong = remove.length ? Vector.avg(remove) : new dir.constructor(0, 0, 0, 0);
 		return dir.minus(wrong);
 	}
 }

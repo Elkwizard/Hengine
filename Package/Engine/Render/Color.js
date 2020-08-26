@@ -91,14 +91,6 @@ class Color extends Operable {
 	static get empty() {
 		return new Color(0, 0, 0, 0);
 	}
-	static avg(c1, c2) {
-		return c1.plus(c2).over(2);
-	}
-	static sum(...colors) {
-		let result = Color.empty;
-		for (let color of colors) result.add(color);
-		return result;
-	}
 	static quadLerp(a, b, c, d, tx, ty) {
 		return Color.empty.map((value, channel) => Interpolation.quadLerp(a[channel], b[channel], c[channel], d[channel], tx, ty));
 	}

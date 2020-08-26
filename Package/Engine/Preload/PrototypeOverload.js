@@ -16,6 +16,7 @@ Math.sqrt = function (n) {
 	globalSquareRoots++;
 	return sqrt(n);
 }
+//Function
 Function.prototype.add = function (fn = function () { }) {
 	let self = this;
 	return function (...a) {
@@ -37,6 +38,10 @@ Function.prototype.performance = function (...args) {
 	}
 	const t_2 = performance.now();
 	return (t_2 - t_1) / iter;
+};
+//Array
+Array.prototype.pushArray = function (arr) {
+	for (let i = 0; i < arr.length; i++) this.push(arr[i]);
 };
 Array.prototype.map = function (fn, ...coords) {
 	let result = [];
@@ -86,6 +91,7 @@ Array.prototype.randomize = function () {
 Array.prototype.total = function () {
 	return this.reduce((a, b) => a + b);
 };
+//Number
 Number.prototype.toDegrees = function () {
 	return this * (180 / Math.PI);
 };
@@ -110,6 +116,7 @@ Number.prototype.movedTowards = function (value, ferocity) {
 Number.prototype.toMaxed = function (digits) {
 	return Math.round(this * 10 ** digits) / 10 ** digits + "";
 };
+//String
 String.prototype.capitalize = function () {
 	return this[0].toUpperCase() + this.slice(1);
 };

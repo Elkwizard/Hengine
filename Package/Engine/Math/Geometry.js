@@ -98,7 +98,7 @@ class Geometry {
     }
     static rayCastPolygons(rayOrigin, rayDir, polygons) {
         let lines = [];
-        for (let polygon of polygons) lines.push(...polygon.getEdges());
+        for (let i = 0; i < polygons.length; i++) lines.push(...polygons[i].getEdges());
         return Geometry.rayCastLines(rayOrigin, rayDir, lines);
     }
     static rayCastLines(rayOrigin, rayDir, lines) {
@@ -334,7 +334,7 @@ class Geometry {
         } else return [polygon];
     }
     static getMiddle(verts) {
-        return Vector2.sum(...verts).over(verts.length);
+        return Vector2.sum(verts).over(verts.length);
     }
     static subdividePolygon(polygon) {
         let verts = polygon.vertices;

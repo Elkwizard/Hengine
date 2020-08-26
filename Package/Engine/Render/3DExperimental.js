@@ -113,13 +113,13 @@ class Render3D {
     static renderScene(c, ...meshes) {
         let triangles = [];
         for (let m of meshes) {
-            triangles.push(...m.tris);
+            triangles.pushArray(m.tris);
         }
-        let mesh = new Mesh(...triangles);
+        let mesh = new Mesh(triangles);
         mesh.render(c, Render3D.camera);
     }
     static makeCube(x, y, z, w, h, d, color = cl.WHITE) {
-        let mesh = new Mesh(
+        let mesh = new Mesh([
             new Tri(new Vector3(x - w / 2, y - h / 2, z - d / 2), new Vector3(x + w / 2, y - h / 2, z - d / 2), new Vector3(x + w / 2, y + h / 2, z - d / 2)),
             new Tri(new Vector3(x + w / 2, y + h / 2, z - d / 2), new Vector3(x - w / 2, y + h / 2, z - d / 2), new Vector3(x - w / 2, y - h / 2, z - d / 2)),
             new Tri(new Vector3(x - w / 2, y - h / 2, z + d / 2), new Vector3(x - w / 2, y - h / 2, z - d / 2), new Vector3(x - w / 2, y + h / 2, z - d / 2)),
@@ -132,7 +132,7 @@ class Render3D {
             new Tri(new Vector3(x + w / 2, y + h / 2, z - d / 2), new Vector3(x + w / 2, y + h / 2, z + d / 2), new Vector3(x - w / 2, y + h / 2, z + d / 2)),
             new Tri(new Vector3(x + w / 2, y - h / 2, z + d / 2), new Vector3(x - w / 2, y - h / 2, z + d / 2), new Vector3(x + w / 2, y + h / 2, z + d / 2)),
             new Tri(new Vector3(x - w / 2, y - h / 2, z + d / 2), new Vector3(x - w / 2, y + h / 2, z + d / 2), new Vector3(x + w / 2, y + h / 2, z + d / 2))
-        );
+        ]);
         for (let tri of mesh.tris) tri.color = color;
         return mesh;
     }
@@ -181,7 +181,7 @@ class Render3D {
             ));
         }
         let offset = new Vector3(X, Y, Z);
-        return new Mesh(...tris.map(e => {
+        return new Mesh(tris.map(e => {
             e = e.each(vert => {
                 return vert.plus(offset);
             });
@@ -235,10 +235,10 @@ class Tri {
     }
 }
 class Mesh {
-    constructor(...tris) {
+    constructor(tris) {
         this.tris = tris;
         this.middle = Vector3.origin;
-        if (tris.length) this.middle = Vector3.sum(...tris.map(tri => tri.middle)).div(tris.length);
+        if (tris.length) this.middle = Vector3.sum(tris.map(tri => tri.middle)).div(tris.length);
     }
     rotate(r, v) {
         let ox = v.x, oy = v.y, oz = v.z;
@@ -281,15 +281,15 @@ class Mesh {
         return m;
     }
     get() {
-        return new Mesh(...this.tris.map(tri => tri.get()));
+        return new Mesh(this.tris.map(tri => tri.get()));
     }
     each(fn) {
         let ary = [];
         for (let tri of this.tris) ary.push(fn(tri));
-        return new Mesh(...ary);
+        return new Mesh(ary);
     }
     color(col) {
-        return new Mesh(...this.tris.map(e => {
+        return new Mesh(this.tris.map(e => {
             e.color = col;
             return e;
         }));

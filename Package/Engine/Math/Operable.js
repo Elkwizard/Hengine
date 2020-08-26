@@ -59,6 +59,13 @@ class Operable {
     equals(v) {
         return this.minus(v).total() < 0.00001;
     }
+	static sum(v) {
+		let construct = v.length ? v[0].constructor : this;
+		return (new construct(...construct.modValues.map(name => 0))).add(...v);
+	}
+	static avg(v) {
+		return this.sum(v).over(v.length);
+	}
     static lerp(a, b, t) {
         let ops = a.constructor.modValues;
         let args = [];
