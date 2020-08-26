@@ -59,9 +59,14 @@ class Operable {
     equals(v) {
         return this.minus(v).total() < 0.00001;
     }
+    static get empty() {
+        return new this(...this.modValues.map(name => 0));
+    }
 	static sum(v) {
 		let construct = v.length ? v[0].constructor : this;
-		return (new construct(...construct.modValues.map(name => 0))).add(...v);
+        let acc = construct.empty;
+        for (let i = 0; i < v.length; i++) acc.add(v[i]);
+        return acc;
 	}
 	static avg(v) {
 		return this.sum(v).over(v.length);

@@ -189,3 +189,4 @@ Number.prototype.plus = function (n) { return this + n; };
 Number.prototype.minus = function (n) { return this - n; };
 Number.prototype.times = function (n) { return this * n; };
 Number.prototype.over = function (n) { return this / n; };
+Number.empty = 0;
