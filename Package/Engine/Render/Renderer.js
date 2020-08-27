@@ -458,6 +458,18 @@ class Artist {
 			}
 		}
 	}
+	set width(a) {
+		this.canvas.width = a;
+	}
+	get width() {
+		return this.canvas.width;
+	}
+	set height(a) {
+		this.canvas.height = a;
+	}
+	get height() {
+		return this.canvas.height;
+	}
 	set preservePixelart(a) {
 		this.c.imageSmoothingEnabled = !a;
 	}

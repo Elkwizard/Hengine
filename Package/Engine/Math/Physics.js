@@ -633,13 +633,12 @@ class CollisionDetector {
         return null;
     }
     PolygonModel_PolygonModel(a, b) {
-
         let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
         if (intersections.length < 2) return null;
 
         let toB = PhysicsVector.sub(b.position, a.position);
 
-        let axes = [...a.axes.map(ax => PhysicsVector.invert(ax)), ...b.axes].filter(ax => PhysicsVector.dot(ax, toB) > 0);;
+        let axes = [...a.axes.map(ax => PhysicsVector.invert(ax)), ...b.axes].filter(ax => PhysicsVector.dot(ax, toB) > 0);
         let minOverlap = Infinity;
         let bestAxis = null;
         let bestRange = [];
