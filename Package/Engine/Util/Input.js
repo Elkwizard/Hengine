@@ -69,11 +69,11 @@ class InputHandler {
 			else this.keyUpCounts[key] = 0;
 		}
 	}
+	afterUpdate() { }
 }
 class KeyboardHandler extends InputHandler {
 	constructor() {
 		super();
-		this.custom = { };
 		this.onDown = new Listener();
 		this.onUp = new Listener();
 		let k = this;
@@ -97,12 +97,6 @@ class KeyboardHandler extends InputHandler {
 class MouseHandler extends InputHandler {
 	constructor(engine, root) {
 		super();
-		this.down = false;
-		this.x = 0;
-		this.y = 0;
-		this.last = Vector2.origin;
-		this.world = Vector2.origin;
-		this.worldLast = Vector2.origin;
 		this.keys = {
 			"Left": false,
 			"Middle": false,
@@ -110,9 +104,17 @@ class MouseHandler extends InputHandler {
 		};
 		this.mouseMap = ["Left", "Middle", "Right"];
 		this.button = 0;
-		this.dragStart = Vector2.origin;
-		this.dragEnd = Vector2.origin;
-		this.custom = { };
+		//Screen
+		this.screen = Vector2.origin;
+		this.screenLast = Vector2.origin;
+		this.screenDragStart = Vector2.origin;
+		this.screenDragEnd = Vector2.origin;
+		//World
+		this.world = Vector2.origin;
+		this.worldLast = Vector2.origin;
+		this.worldDragStart = Vector2.origin;
+		this.worldDragEnd = Vector2.origin;
+		//Listeners
 		this.onDown = new Listener();
 		this.onUp = new Listener();
 		this.onClick = new Listener();
@@ -133,28 +135,26 @@ class MouseHandler extends InputHandler {
 		function handleDown(e) {
 			m.button = e.button;
 			m.updatePosition(e);
-			let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
-			m.dragStart = m.dragEnd = adjusted;
-			m.down = true;
+			m.worldDragStart = m.engine.scene.screenSpaceToWorldSpace(m.screen);
+			m.worldDragEnd = m.worldDragStart.get();
+			m.screenDragStart = m.screen.get();
+			m.screenDragEnd = m.screenDragStart.get();
 			m.keys[m.mouseMap[e.button]] = true;
 			for (let ev of m.onDown) ev(e);
 		}
 		function handleMove(e) {
 			m.updatePosition(e);
-			if (m.down) {
-				let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
-				m.dragEnd = adjusted;
+			if (m.P("Left", "Middle", "Right")) {
+				m.worldDragEnd = m.engine.scene.screenSpaceToWorldSpace(m.screen);
+				m.screenDragEnd = m.screen.get();
 			}
 			for (let ev of m.onMove) ev(e);
 		};
 		function handleUp(e) {
 			m.updatePosition(e);
-			let adjusted = m.engine.scene.screenSpaceToWorldSpace(m);
-			m.dragEnd = adjusted;
-			m.down = false;
-			for (let inx of m.mouseMap) {
-				m.keys[inx] = false;
-			}
+			m.worldDragEnd = m.engine.scene.screenSpaceToWorldSpace(m.screen);
+			m.screenDragEnd = m.screen.get();
+			for (let inx of m.mouseMap) m.keys[inx] = false;
 			for (let ev of m.onUp) ev(e);
 		};
 
@@ -211,12 +211,13 @@ class MouseHandler extends InputHandler {
 			for (let ev of m.onScroll) ev(e.deltaY);
 		});
 	}
+	afterUpdate() {
+		this.screenLast = this.screen.get();
+	}
 	update() {
 		super.update();
-		if (this.engine) {
-			this.world = this.engine.scene.screenSpaceToWorldSpace(this);
-			this.worldLast = this.engine.scene.screenSpaceToWorldSpace(this.last);
-		}
+		this.world = this.engine.scene.screenSpaceToWorldSpace(this.screen);
+		this.worldLast = this.engine.scene.screenSpaceToWorldSpace(this.screenLast);
 	}
 	clearListeners() {
 		this.onDown.clear();
@@ -229,11 +230,11 @@ class MouseHandler extends InputHandler {
 	updatePosition(e) {
 		try {
 			let bound = this.engine.renderer.canvas.getBoundingClientRect();
-			this.x = e.x - bound.x;
-			this.y = e.y - bound.y;
+			this.screen.x = e.x - bound.x;
+			this.screen.y = e.y - bound.y;
 		} catch (e) {
-			this.x = e.x;
-			this.y = e.y;
+			this.screen.x = e.x;
+			this.screen.y = e.y;
 		}
 	}
 	allowSave() {

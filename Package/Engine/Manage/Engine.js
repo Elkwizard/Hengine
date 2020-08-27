@@ -215,7 +215,8 @@ class Engine {
 				this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
 				this.afterUpdate();
 				this.updateScreenRecordings();
-				M.last = { x: M.x, y: M.y };
+				K.afterUpdate();
+				M.afterUpdate();
 			}
 		} catch (e) {
 			if (this.catchErrors) this.output("Draw Error: " + e);
