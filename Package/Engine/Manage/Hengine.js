@@ -215,8 +215,8 @@ class Hengine {
 			}
 		}
 	}
-	initDefaults() {	
-		window.WALLS = new InactiveScene("WALLS");
+	initDefaults() {
+		window.WALLS = s.main.addContainer("WALLS", false);
 		WALLS.addPhysicsRectElement("Ceiling", width / 2, -50, width, 100, false);
 		WALLS.addPhysicsRectElement("Floor", width / 2, height + 50, width, 100, false);
 		WALLS.addPhysicsRectElement("Left Wall", -50, height / 2, 100, height + 200, false);
@@ -381,10 +381,10 @@ class Hengine {
 		return ["PrototypeOverload"];
 	}
 	static get defaultRenderPackage() {
-		return ["Color", "Shapes", "Spline", "Gradient", "Animation", "Frame", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental"];
+		return ["Color", "Shapes", "Spline", "Gradient", "Animation", "Frame", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental", "Camera"];
 	}
 	static get defaultManagementPackage() {
-		return ["Scripts", "Scenes", "Engine", "Hengine"];
+		return ["Scripts", "ElementContainer", "Scenes", "Engine", "Hengine"];
 	}
 	static get defaultMathPackage() {
 		return ["Random", "Operable", "Vector", "Geometry", "Physics", "PhysicsAPI"];
@@ -463,11 +463,7 @@ class Hengine {
 							}
 						}
 					} else {
-						if (file === "Hengine") {
-							window.HENGINE = new Hengine(scripts.utility);
-							document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
-							onload();
-						} else {
+						if (file !== "Hengine") {
 							if (file.match(/DATA/g)) {
 								eval(file.slice(5));
 							} else {
@@ -489,6 +485,10 @@ class Hengine {
 				}
 			}
 		}
+		//All Files Loaded!
+		window.HENGINE = new Hengine(scripts.utility);
+		document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
+		onload();
 	}
 }
 Hengine.scriptsLoaded = [];

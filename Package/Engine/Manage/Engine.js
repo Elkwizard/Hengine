@@ -123,7 +123,7 @@ class Engine {
 		this.keyboard = new KeyboardHandler();
 
 		this.renderer = new Artist(canvas, W, H);
-		this.scene = new Scene("Engine Scene", this.renderer, new Vector2(0, 0.2), this);
+		this.scene = new Scene(this.renderer, new Vector2(0, 0.2), this);
 		//update loops
 		this.afterScript = new Script("after");
 		this.fixedScript = new Script("fixed");

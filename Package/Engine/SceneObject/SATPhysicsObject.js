@@ -3,8 +3,7 @@ class PhysicsObject extends SceneObject {
         super(name, x, y, controls, tag, home);
 
         this.body = new RigidBody(x, y, gravity ? RigidBody.DYNAMIC : RigidBody.STATIC);
-        this.home.physicsEngine.addBody(this.body);
-
+        if (this.home.active) this.activate();
         this.body.userData.sceneObject = this;
         this.body.collisionFilter = function (body) {
             let sceneObject = body.userData.sceneObject;
@@ -80,6 +79,12 @@ class PhysicsObject extends SceneObject {
     set angularVelocity(a) {
         this.body.angularVelocity = a;
     }
+    activate() {
+        this.home.scene.physicsEngine.addBody(this.body);
+    }
+    deactivate() {
+        this.home.scene.physicsEngine.removeBody(this.body.id);
+    }
     centerModels() {
         super.centerModels();
         this.shapeSync();
@@ -141,6 +146,7 @@ class PhysicsObject extends SceneObject {
     }
     mobilize() {
         this.body.type = RigidBody.DYNAMIC;
+        this.body.wake();
     }
     immobilize() {
         this.body.type = RigidBody.STATIC;
