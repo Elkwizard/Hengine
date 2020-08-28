@@ -281,6 +281,76 @@ class Artist {
 				this.c.lineTo(x1, y1)
 				this.c.stroke()
 			},
+			measure(font, text, x, y, x1, y1) {
+				if (typeof x == "object") {
+					if (x instanceof Line) {
+						x1 = x.b.x;
+						y1 = x.b.y;
+						y = x.a.y;
+						x = x.a.x;
+					} else {
+						x1 = y.x;
+						y1 = y.y;
+						y = x.y;
+						x = x.x;
+					}
+				}
+
+				let width = this.getTextWidth(font, text);
+				let height = this.getTextHeight(font, text);
+
+				let dx = x1 - x;
+				let dy = y1 - y;
+				let nx = -dy;
+				let ny = dx;
+				let m = Math.sqrt((dx ** 2) + (dy ** 2));
+			
+				if (!m) return;
+
+				nx *= height / m / 2;
+				ny *= height / m / 2;
+				
+				let length = (m - (width + this.getFontValue(font))) / 2;
+				dx *= length / m;
+				dy *= length / m;
+
+				this.c.beginPath();
+				this.c.moveTo(x, y);
+				this.c.lineTo(x + dx, y + dy);
+				this.c.stroke();
+
+				
+				this.c.beginPath();
+				this.c.moveTo(x1, y1);
+				this.c.lineTo(x1 - dx, y1 - dy);
+				this.c.stroke();
+
+				let rot = Math.atan2(dy, dx);
+
+				dx = (x1 - x) / 2;
+				dy = (y1 - y) / 2;
+				this.c.save();
+				this.c.translate(x + dx, y + dy);
+				this.c.rotate(rot);
+				this.c.translate(-width / 2, height / 4);
+				this.c.fillStyle = this.c.strokeStyle;
+				this.c.font = font;
+				this.c.fillText(text, 0, 0);
+				this.c.restore();
+
+				//Left
+				this.c.beginPath();
+				this.c.moveTo(x + nx, y + ny);
+				this.c.lineTo(x - nx, y - ny);
+				this.c.stroke();
+				
+				//Right
+				this.c.beginPath();
+				this.c.moveTo(x1 + nx, y1 + ny);
+				this.c.lineTo(x1 - nx, y1 - ny);
+				this.c.stroke();
+
+			},
 			arrow(x, y, x1, y1) {
 				if (typeof x == "object") {
 					if (x instanceof Line) {
