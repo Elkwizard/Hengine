@@ -47,6 +47,8 @@ class Hengine {
 		if (!utility) {
 			document.body.style.margin = 0;
 			document.body.style.overflow = "hidden";
+
+			document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
 		}
 		
 		this.g = new Engine(utility, wrapper);
@@ -355,6 +357,10 @@ class Hengine {
 		pathSRC.pop();
 		let rootSrc = pathSRC.join("/") + "/Engine";
 		console.log("EXTRACTING FROM ROOT [" + rootSrc + "]");
+		function instantiateHengine() {
+			window.HENGINE = new Hengine(scripts.utility);
+			onload();
+		}
 		for (let element in scripts) {
 			let path;
 			if (element === "engine") {
@@ -397,13 +403,7 @@ class Hengine {
 							if (file.match(/DATA/g)) {
 								eval(file.slice(5));
 							} else {
-
-								if (element === "code" && !window.HENGINE) {
-									// Create Hengine
-									window.HENGINE = new Hengine(scripts.utility);
-									document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
-									onload();
-								}
+								if (element === "code" && !window.HENGINE) instantiateHengine();
 
 								if (!document.querySelector(`script[src="${src}.js"]`)) {
 									let script = document.createElement("script");
@@ -422,6 +422,7 @@ class Hengine {
 					});
 				}
 			}
+			if (!window.HENGINE) instantiateHengine();
 		}
 	}
 }
