@@ -80,9 +80,8 @@ class Artist {
 				}
 			},
 			triangle(v1, v2, v3) {
-				[v1, v2, v3] = this.pathObj.validatePoints([v1, v2, v3]);
 				this.c.beginPath();
-				if (v1 instanceof Triangle) {
+				if (v1 && v1.vertices) {
 					v2 = v1.vertices[1];
 					v3 = v1.vertices[2];
 					v1 = v1.vertices[0];
@@ -150,10 +149,9 @@ class Artist {
 				}
 			},
 			validatePoints(points) {
-				return points.map(e => {
-					if (Math.abs(e.x) > 100000) e.x = Math.sign(e.x) * 100000; 
-					if (Math.abs(e.y) > 100000) e.y = Math.sign(e.y) * 100000;
-					return e;
+				return points.filter(e => {
+					if (Math.abs(e.x) > 100000) return false; 
+					if (Math.abs(e.y) > 100000) return false;
 				});
 			}
 		}

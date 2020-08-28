@@ -54,7 +54,7 @@ class ParticleSpawnerObject extends SceneObject {
         this.particleDelay = delay;
         this.particleInitSpeed = spd;
         this.particleLifeSpan = timer;
-        this.spawns = {};
+        this.spawns = { };
         this.particleSize = size;
         this.particleDraw = draw;
         this.particleSizeVariance = sizeVariance;
@@ -69,8 +69,8 @@ class ParticleSpawnerObject extends SceneObject {
         this.slows = false;
     }
     engineDrawUpdate() {
-        for (let [name, particle] of this.spawns) {
-            particle.engineDrawUpdate();
+        for (let key in this.spawns) {
+            this.spawns[key].engineDrawUpdate();
         }
     }
     spawnParticle() {

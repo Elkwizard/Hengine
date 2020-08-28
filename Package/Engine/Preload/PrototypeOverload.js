@@ -176,6 +176,7 @@ ${contents.join(",\n").indent()}
 	}
 })();
 Array.prototype.toString = Object.prototype.toString;
+//Object
 Object.prototype[Symbol.iterator] = function* () {
 	for (let x in this) {
 		yield [x, this[x]];
