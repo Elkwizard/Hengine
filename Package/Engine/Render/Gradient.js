@@ -22,7 +22,8 @@ class Gradient {
 			let a = valueStop;
 			let inx = this.valueStops.indexOf(valueStop);
 			let b = this.valueStops[inx - 1];
-			return a.value.constructor.lerp(a.value, b.value, (v - a.start) / (b.start - a.start));
+			if (b !== undefined) return a.value.constructor.lerp(a.value, b.value, (v - a.start) / (b.start - a.start));
+			else return a.value;
 		}
 		return new Color(0, 0, 0, 0);
 	}

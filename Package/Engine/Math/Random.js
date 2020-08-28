@@ -33,12 +33,24 @@ class Interpolation {
     }
 }
 class Random {
+    static random() {
+        return Random.seedRand(this.seed);
+    }
     static seedRand(seed) {
         seed += 1e5;
         let a = (seed * 6.12849) % 8.7890975
         let b = (a * 256783945.4758903) % 238462.567890;
         let r = (a * b) % 1;
-        return r;
+        return Math.abs(r);
+    }
+    static octave(alg, freq, oc, ...sample) {
+        let n = 0;
+        let scl = 0;
+        for (let i = 1; i < 1 + oc; i++) {
+            scl += 1 / i;
+            n += Random[alg](...sample, freq * i) / i;
+        }
+        return n / scl;
     }
     static range(min = 0, max = 1) {
         return Math.random() * (max - min) + min;

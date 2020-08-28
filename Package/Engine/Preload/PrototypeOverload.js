@@ -142,7 +142,7 @@ String.prototype.indent = function () {
 	}
 	function string(value, depth) {
 		if (!value) return value + "";
-		if (typeof value === "string") return `"${value}"`;
+		if (typeof value === "string") return JSON.stringify(value);
 		if (typeof value === "number") return value + "";
 		if (typeof value === "function") {
 			value += "";

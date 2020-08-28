@@ -1,6 +1,6 @@
-//setup code here
+// Setup code here
+renderer.background = cl.BLACK;
+gameEngine.continuous(function (time) {
+	// This gets run every frame
 
-g.update = () => {
-	//this gets run every frame
-	
-}
+});

@@ -61,13 +61,13 @@ class Camera {
 	}
 	drawInWorldSpace(artist, c = renderer) {
 		c.save();
-		this.camera.transformToWorld(this.c);
+		this.transformToWorld(c);
 		artist();
 		c.restore();
 	}
 	drawInScreenSpace(artist, c = renderer) {
 		c.save();
-		this.camera.transformToScreen(this.c);
+		this.transformToScreen(c);
 		artist();
 		c.restore();
 	}

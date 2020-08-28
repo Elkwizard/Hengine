@@ -1,76 +1,4 @@
 
-class LocalFileSystem {
-	static get header() {
-		return "LOCAL_FILE_SYSTEM_";
-	}
-	static compress(str) {
-		return str;
-	}
-	static decompress(str) {
-		return str;
-	}
-	static clearAll() {
-		localStorage.clear();
-	}
-	static clear(key) {
-		let prev = LocalFileSystem.header + key;
-		let value = "";
-		let n = 0;
-		let name;
-		let names = [];
-		do {
-			name = prev + "_INX_" + n;
-			n++;
-			if (localStorage[name] !== undefined) {
-				names.push(name);
-			}
-		} while (localStorage[name] !== undefined);
-		for (let name of names) {
-			delete localStorage[name];
-		}
-		return value;
-
-	}
-	static put(key, value) {
-		value = LocalFileSystem.compress(value);
-		try {
-			let values = [];
-			let acc = "";
-			for (let i = 0; i < value.length; i++) {
-				acc += value[i];
-				if ((i + 1) % 10000 === 0) {
-					values.push(acc);
-					acc = "";
-				}
-			}
-			values.push(acc);
-			values = values.map((e, i) => [e, "_INX_" + i]);
-
-			for (let v of values) {
-				let K = LocalFileSystem.header + key + v[1];
-				let value = v[0];
-				localStorage[K] = value;
-			}
-		} catch (e) {
-			LocalFileSystem.clear(key);
-			console.warn("File '" + key + "' was to big. It was erased.");
-		}
-	}
-	static get(key) {
-		let prev = LocalFileSystem.header + key;
-		let value = "";
-		let n = 0;
-		let name;
-		do {
-			name = prev + "_INX_" + n;
-			n++;
-			if (localStorage[name] !== undefined) {
-				value += localStorage[name];
-			}
-		} while (localStorage[name] !== undefined);
-		return LocalFileSystem.decompress(value);
-	}
-}
 class ApplicationPackageElement {
 	constructor(files) {
 		this.files = files;
@@ -145,7 +73,12 @@ class Hengine {
 		window.soundLibrary = sl;
 		window.keyboard = K;
 		window.mouse = M;
-		if (!(window.width || window.height)) {
+		if (!(window.width || window.height || window.middle)) {
+			Object.defineProperty(window, "middle", {
+				get: function() {
+					return new Vector2(width / 2, height / 2);
+				}
+			});
 			Object.defineProperty(window, "width", {
 				get: function () {
 					return window.c.canvas.width;
@@ -164,11 +97,11 @@ class Hengine {
 			});
 		}
 		window.custom = this.custom;
-		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "fileExists", "middle", "save", "get", "fileSize", "packageFiles", "importPackage", "getRaw", "saveRaw", "setTitle", "setCursor"];
-
+		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "fileExists", "save", "get", "fileSize", "packageFiles", "importPackage", "getRaw", "saveRaw", "setTitle", "setCursor"];
 		for (let EXP of EXPORT) {
 			window[EXP] = this[EXP].bind(this);
 		}
+
 		this.SPRITE_PATH = "../Art/Sprites/";
 		this.ANIMATION_PATH = "../Art/Animations/";
 		this.SOUND_PATH = "../Sound/";
@@ -374,9 +307,6 @@ class Hengine {
 		this.randomSeed += r;
 		return r;
 	}
-	middle() {
-		return this.c.middle();
-	}
 	static get defaultPreloadPackage() {
 		return ["PrototypeOverload"];
 	}
@@ -390,7 +320,7 @@ class Hengine {
 		return ["Random", "Operable", "Vector", "Geometry", "Physics", "PhysicsAPI"];
 	}
 	static get defaultUtilityPackage() {
-		return ["Input", "Sound", "Time", "Console"];
+		return ["Input", "Sound", "Time", "Console", "LocalFileSystem"];
 	}
 	static get defaultSceneObjectPackage() {
 		return ["SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
@@ -428,15 +358,15 @@ class Hengine {
 		for (let element in scripts) {
 			let path;
 			if (element === "engine") {
-				path = scripts[element]["path"] ? scripts[element]["path"] : rootSrc;
+				path = scripts[element].path ? scripts[element].path : rootSrc;
 			} else if (element === "sprites") {
-				path = scripts[element]["path"] ? scripts[element]["path"] : "../Art/Sprites";
+				path = scripts[element].path ? scripts[element].path : "../Art/Sprites";
 			} else if (element === "animations") {
-				path = scripts[element]["path"] ? scripts[element]["path"] : "../Art/Animations";
+				path = scripts[element].path ? scripts[element].path : "../Art/Animations";
 			} else if (element === "sounds") {
-				path = scripts[element]["path"] ? scripts[element]["path"] : "../Sounds";
+				path = scripts[element].path ? scripts[element].path : "../Sounds";
 			} else if (element === "code") {
-				path = scripts[element]["path"] ? scripts[element]["path"] : ".";
+				path = scripts[element].path ? scripts[element].path : ".";
 			}
 			for (let folder in scripts[element].files) {
 				for (let file of scripts[element].files[folder]) {
@@ -467,6 +397,14 @@ class Hengine {
 							if (file.match(/DATA/g)) {
 								eval(file.slice(5));
 							} else {
+
+								if (element === "code" && !window.HENGINE) {
+									// Create Hengine
+									window.HENGINE = new Hengine(scripts.utility);
+									document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
+									onload();
+								}
+
 								if (!document.querySelector(`script[src="${src}.js"]`)) {
 									let script = document.createElement("script");
 									script.src = src + ".js";
@@ -485,10 +423,6 @@ class Hengine {
 				}
 			}
 		}
-		//All Files Loaded!
-		window.HENGINE = new Hengine(scripts.utility);
-		document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
-		onload();
 	}
 }
 Hengine.scriptsLoaded = [];
