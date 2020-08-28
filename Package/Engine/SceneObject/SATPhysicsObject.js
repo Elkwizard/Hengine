@@ -16,9 +16,7 @@ class PhysicsObject extends SceneObject {
         }.bind(this);
 
         //previous states
-        this.lastRotation = 0;
         this.lastVelocity = Vector2.origin;
-        this.last = this.middle;
         this.lastAngularVelocity = 0;
 
         this.optimize = other => true;
@@ -166,16 +164,6 @@ class PhysicsObject extends SceneObject {
         this.scripts.run("Update");
         this.update();
         this.positionSync();
-    }
-    updatePreviousData() {
-        this.direction = this.middle.Vminus(this.last);
-        this.last = this.middle;
-        
-        this.lastVelocity = this.velocity.get();
-        this.lastAngularVelocity = this.angularVelocity;
-
-        this.angularDirection = this.rotation - this.lastRotation; 
-        this.lastRotation = this.rotation;
     }
     physicsUpdate() {
         

@@ -76,9 +76,10 @@ class Scene {
 		this.main.startUpdate();
 		//custom before updates run
 		for (let el of this.main.elementArray) {
-			el.scripts.run("beforeUpdate");
+			el.scripts.run("BeforeUpdate");
 		}
 		this.clearAllCollisions();
+		this.updatePreviousData(this.main.elementArray);
 		this.physicsEngine.run();
 		this.physicsObjectFixedUpdate(this.main.elementArray);
 		this.main.endUpdate();
@@ -101,6 +102,11 @@ class Scene {
 	}
 	updateSceneObjectCaches(useful) {
 		for (const el of useful) el.updateCaches();
+	}
+	updatePreviousData(useful) {
+		for (let rect of useful) {
+			rect.updatePreviousData();
+		}
 	}
 	physicsObjectFixedUpdate(useful) {
 		for (let rect of useful) {

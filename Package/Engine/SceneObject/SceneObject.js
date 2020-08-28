@@ -36,6 +36,8 @@ class SceneObject {
 	constructor(name, x, y, controls, tag, home) {
 		this.x = x;
 		this.y = y;
+		this.lastMiddle = this.middle;
+        this.lastRotation = 0;
 		this.shapes = { };
 		this.rotation = 0;
 		this.__cosRot = 1;
@@ -101,6 +103,10 @@ class SceneObject {
 	}
 	get height() {
 		return this.__height;
+	}
+	updatePreviousData() {
+        this.lastMiddle = this.middle;
+        this.lastRotation = this.rotation;
 	}
 	serializeShapes() {
 		let shapes = this.getShapes();

@@ -79,7 +79,7 @@ class ParticleSpawnerObject extends SceneObject {
         if (this.particleDelay < 1) len = 1 / this.particleDelay;
         for (let i = 0; i < len; i++) {
             let name = "Particle #" + this.particleNumber++ + " from " + this.name;
-            let ns = new ParticleObject(this, this.home, name);
+            this.spawns[name] = new ParticleObject(this, this.home, name);
         }
     }
     engineFixedUpdate() {
@@ -87,6 +87,7 @@ class ParticleSpawnerObject extends SceneObject {
             this.spawnParticle();
         }
         for (let [name, particle] of this.spawns) {
+            particle.updatePreviousData();
             particle.engineFixedUpdate();
             particle.lifeSpan++;
         }
@@ -141,7 +142,6 @@ class ParticleObject extends SceneObject {
         } else {
             this.draw = sp.particleDraw.bind(this);
         }
-        sp.spawns[this.name] = this;
     }
     remove() {
         delete this.spawner.spawns[this.name];

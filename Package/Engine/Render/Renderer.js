@@ -152,6 +152,7 @@ class Artist {
 				return points.filter(e => {
 					if (Math.abs(e.x) > 100000) return false; 
 					if (Math.abs(e.y) > 100000) return false;
+					return true;
 				});
 			}
 		}
