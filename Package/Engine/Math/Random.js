@@ -34,7 +34,7 @@ class Interpolation {
 }
 class Random {
     static random() {
-        return Random.seedRand(this.seed);
+        return Random.seedRand(this.seed++);
     }
     static seedRand(seed) {
         seed += 1e5;
