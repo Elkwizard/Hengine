@@ -19,7 +19,7 @@ class CardinalDirections extends Directions {
         return this.fix(Vector2.random());
     }
 	fix(v) {
-        return new Vector2(this.fixH(v.x), this.fixV(v.y));
+        return new Vector2(this.fixH(v.x), this.fixV(v.y)).normalize();
 	}
 	fixH(val) {
 		if (this.left && this.right) return val;
@@ -121,9 +121,9 @@ class ParticleObject extends SceneObject {
         this.lastX = sX;
         this.lastY = sY;
 
-        let vel = sp.particleDirections.getRandomSpeed();
-        vel.x = (sp.particleInitSpeed * vel.x) + ((Math.random() - Math.random()) * sp.particleSpeedVariance);
-        vel.y = (sp.particleInitSpeed * vel.y) + ((Math.random() - Math.random()) * sp.particleSpeedVariance);
+        let varianceVector = new Vector2(sp.particleSpeedVariance, 0);
+        varianceVector.angle = Math.random() * 2 * Math.PI;
+        let vel = sp.particleDirections.getRandomSpeed().times(sp.particleInitSpeed).plus(varianceVector);
         this.velocity = vel;
         this.layer = sp.layer;
         
