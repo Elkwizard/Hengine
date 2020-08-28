@@ -39,6 +39,9 @@ function exit(...msg) {
 }
 class Hengine {
 	constructor(utility, wrapper = document.body) {
+		if (!window.HENGINE_EXISTS) {
+			window.HENGINE_EXISTS = true;
+		} else throw new Error("Multiple Hengines");
 		//everything needs randomness
 		this.randomSeed = 1;
 		window.rand = this.rand.bind(this);
@@ -51,30 +54,32 @@ class Hengine {
 			document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
 		}
 		
-		this.g = new Engine(utility, wrapper);
-		this.s = this.g.scene;
-		this.c = this.g.renderer;
-		this.C = this.c.c;
-		this.custom = {};
+		this.gameEngine = new Engine(utility, wrapper);
+		this.scene = this.gameEngine.scene;
+		this.renderer = this.gameEngine.renderer;
+		this.keyboard = this.gameEngine.keyboard;
+		this.mouse = this.gameEngine.mouse;
+		
+		//Abbreviations
 		this.cl = new ColorLibrary();
 		this.sl = new SoundLibrary();
-		this.K = this.g.keyboard;
-		this.M = this.g.mouse;
-		window.K = this.K;
-		window.M = this.M;
-		window.g = this.g;
-		window.s = this.s;
-		window.c = this.c;
-		window.C = this.C;
+		window.K = this.keyboard;
+		window.M = this.mouse;
+		window.g = this.gameEngine;
+		window.s = this.scene;
+		window.c = this.renderer;
 		window.cl = this.cl;
 		window.sl = this.sl;
-		window.gameEngine = g;
-		window.scene = s;
-		window.renderer = c;
+		
+		//Words
+		window.gameEngine = this.gameEngine;
+		window.scene = this.scene;
+		window.renderer = this.renderer;
 		window.colorLibrary = cl;
 		window.soundLibrary = sl;
-		window.keyboard = K;
-		window.mouse = M;
+		window.keyboard = this.keyboard;
+		window.mouse = this.mouse;
+
 		if (!(window.width || window.height || window.middle)) {
 			Object.defineProperty(window, "middle", {
 				get: function() {

@@ -486,6 +486,12 @@ class Artist {
 	get middle() {
 		return { x: this.canvas.width / 2, y: this.canvas.height / 2 };
 	}
+	set alpha(a) {
+		this.c.globalAlpha = a;
+	}
+	get alpha() {
+		return this.c.globalAlpha;
+	}
 	getTexture(x, y, w, h) {
 		let imageData = this.c.getImageData(x, y, w, h);
 		let tex = new Texture(w, h);

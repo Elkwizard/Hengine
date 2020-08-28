@@ -45,7 +45,7 @@ class AngleDirections extends Directions {
     }
 }
 class ParticleSpawnerObject extends SceneObject {
-    constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new Directions(1, 1, 1, 1), home) {
+    constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), home) {
         super(name, x, y, false, "Particle-Spawner", home);
         this.active = true;
         this.particleFades = true;
@@ -59,7 +59,7 @@ class ParticleSpawnerObject extends SceneObject {
         this.particleDraw = draw;
         this.particleSizeVariance = sizeVariance;
         this.particleShape = new Rect(-0.5, -0.5, 1, 1);
-        this.dirs = dirs;
+        this.particleDirections = dirs;
         this.isSpawner = true;
         this.particleSpeedVariance = speedVariance;
         this.particleNumber = 0;
@@ -120,7 +120,7 @@ class ParticleObject extends SceneObject {
         this.lastX = sX;
         this.lastY = sY;
 
-        let vel = sp.dirs.getRandomSpeed();
+        let vel = sp.particleDirections.getRandomSpeed();
         vel.x = (sp.particleInitSpeed * vel.x) + ((Math.random() - Math.random()) * sp.particleSpeedVariance);
         vel.y = (sp.particleInitSpeed * vel.y) + ((Math.random() - Math.random()) * sp.particleSpeedVariance);
         this.velocity = vel;
@@ -129,10 +129,10 @@ class ParticleObject extends SceneObject {
         //art
         if (sp.particleFades) {
             this.drawPrefix = function () {
-                this.home.c.c.globalAlpha = Math.max(0, 1 - (this.lifeSpan / sp.particleLifeSpan));
+                this.home.scene.renderer.alpha = Number.clamp(1 - (this.lifeSpan / sp.particleLifeSpan), 0, 1);
             };
             this.drawSuffix = function () {
-                this.home.c.c.globalAlpha = 1;
+                this.home.scene.renderer.alpha = 1;
             };
         }
         if (sp.particleDraw instanceof Script) {
@@ -156,10 +156,10 @@ class ParticleObject extends SceneObject {
         this.lastX = this.x;
         this.lastY = this.y;
         if (this.spawner.particleFalls) {
-            this.velocity.y += this.home.gravity.y;
+            this.velocity.y += this.home.scene.gravity.y;
         }
         if (this.spawner.particleSlows) {
-            this.velocity.Nmul(this.home.physicsEngine.linearDrag);
+            this.velocity.Nmul(this.home.scene.physicsEngine.linearDrag);
         }
         this.x += this.velocity.x * 2;
         this.y += this.velocity.y * 2;

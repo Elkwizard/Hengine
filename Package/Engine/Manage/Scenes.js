@@ -5,13 +5,13 @@ class Scene {
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
 		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
 		this.physicsEngine.oncollide = this.handleCollisionEvent.bind(this);
-		this.c = context;
+		this.renderer = context;
 		this.home = home;
 		this.cullGraphics = true;
 		this.cameras = {};
 		this.mouseEvents = false;
 		this.collisionEvents = true;
-		this.camera = new Camera(0, 0, this.c.width, this.c.height, 1, 0);
+		this.camera = new Camera(0, 0, this.renderer.width, this.renderer.height, 1, 0);
 		this.home.mouse.onDown.listen(function (e) {
 			let adjusted = this.camera.screenSpaceToWorldSpace(e);
 			let collided = this.collidePoint(adjusted);
@@ -120,10 +120,10 @@ class Scene {
 
 		if (camera !== this.camera) {
 			camera.createView();
-			this.c.embody(camera.newView);
-		} else this.c.save();
+			this.renderer.embody(camera.newView);
+		} else this.renderer.save();
 
-		camera.transformToWorld(this.c);
+		camera.transformToWorld(this.renderer);
 
 		for (let rect of this.main.elementArray) {
 			rect.engineDrawUpdate(screen);
@@ -131,9 +131,9 @@ class Scene {
 		}
 
 		if (camera !== this.camera) {
-			this.c.unembody();
+			this.renderer.unembody();
 			camera.view = camera.newView;
-		} else this.c.restore();
+		} else this.renderer.restore();
 		return camera.view;
 	}
 	engineDrawUpdate() {
@@ -141,8 +141,8 @@ class Scene {
 		this.main.startUpdate();
 		this.updateSceneObjectCaches(this.main.elementArray);
 
-		this.camera.width = this.c.canvas.width;
-		this.camera.height = this.c.canvas.height;
+		this.camera.width = this.renderer.canvas.width;
+		this.camera.height = this.renderer.canvas.height;
 		this.home.updateScript.run();
 		this.main.elementArray.sort(function (a, b) {
 			return a.layer - b.layer;
