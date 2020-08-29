@@ -74,17 +74,16 @@ class ParticleSpawnerObject extends SceneObject {
         }
     }
     spawnParticle() {
-        //spawn
-        let len = 1;
-        if (this.particleDelay < 1) len = 1 / this.particleDelay;
-        for (let i = 0; i < len; i++) {
-            let name = "Particle #" + this.particleNumber++ + " from " + this.name;
-            this.spawns[name] = new ParticleObject(this, this.home, name);
-        }
+        const name = `Particle #${this.particleNumber++} from ${this.name}`; 
+        this.spawns[name] = new ParticleObject(this, this.home, name);
     }
     engineFixedUpdate() {
         if (this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
-            this.spawnParticle();
+            let len = 1;
+            if (this.particleDelay < 1) len = 1 / this.particleDelay;
+            for (let i = 0; i < len; i++) {
+                this.spawnParticle();
+            }
         }
         for (let [name, particle] of this.spawns) {
             particle.updatePreviousData();
@@ -96,30 +95,19 @@ class ParticleSpawnerObject extends SceneObject {
 }
 class ParticleObject extends SceneObject {
     constructor(spawner, home, name) {
-        super(name, 0, 0, false, "Engine-Particle", home);
+        super(name, spawner.x, spawner.y, false, "Engine-Particle", home);
         this.cullGraphics = false;
-        this.lastX = 0;
-        this.lastY = 0;
         this.velocity = Vector2.origin;
         this.spawner = spawner;
         this.draw = function () { };
         this.drawPrefix = function () { };
         this.drawSuffix = function () { };
-        this.particleInit();
-        this.completelyStatic = false;
-        this.lifeSpan = 0;
-    }
-    particleInit() {
+
+        //Particle Init
         let sp = this.spawner;
         let pSize = sp.particleSize + ((Math.random() - Math.random()) * sp.particleSizeVariance);
-        let sX = sp.x;
-        let sY = sp.y;
-        this.x = sX;
-        this.y = sY;
         let shape = this.spawner.particleShape.scale(pSize);
         this.addShape("default", shape);
-        this.lastX = sX;
-        this.lastY = sY;
 
         let varianceVector = new Vector2(sp.particleSpeedVariance, 0);
         varianceVector.angle = Math.random() * 2 * Math.PI;
@@ -142,6 +130,10 @@ class ParticleObject extends SceneObject {
         } else {
             this.draw = sp.particleDraw.bind(this);
         }
+        //Done
+
+        this.completelyStatic = false;
+        this.lifeSpan = 0;
     }
     remove() {
         delete this.spawner.spawns[this.name];
