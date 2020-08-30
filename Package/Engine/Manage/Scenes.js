@@ -48,6 +48,14 @@ class Scene {
 		window[name] = new ElementScript(name, opts);
 		return window[name];
 	}
+	handleCollisionEvent(a, b, direction) {
+		let A = a.userData.sceneObject;
+		let B = b.userData.sceneObject;
+		if (A && B && this.collisionEvents) {
+			A.colliding.add(B, Vector2.fromPhysicsVector(direction));
+			B.colliding.add(A, Vector2.fromPhysicsVector(direction).inverse());
+		}
+	}
 	clearAllCollisions() {
 		let phys = this.main.getPhysicsElements();
 		for (let i = 0; i < phys.length; i++) {
@@ -81,8 +89,21 @@ class Scene {
 		this.clearAllCollisions();
 		this.updatePreviousData(this.main.elementArray);
 		this.physicsEngine.run();
+		if (this.collisionEvents) this.handleCollisionEvents(this.main.getPhysicsElements());
 		this.physicsObjectFixedUpdate(this.main.elementArray);
 		this.main.endUpdate();
+	}
+	handleCollisionEvents(useful) {
+		const types = [["left", "CollideLeft"], ["right", "CollideRight"], ["top", "CollideTop"], ["bottom", "CollideBottom"], ["general", "CollideGeneral"]];
+
+		for (let rect of useful) {
+			for (let type of types) {
+				let last = rect.lastColliding[type[0]];
+				let col = rect.colliding[type[0]];
+				if (col && last) for (let body of col) if (!last.includes(body)) rect.scripts.run(type[1], body);
+			}	
+			rect.lastColliding.extract(rect.colliding);
+		}
 	}
 	handleCollisionEvent(a, b, direction) {
 		let A = a.userData.sceneObject;
