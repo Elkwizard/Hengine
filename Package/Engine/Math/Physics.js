@@ -1151,6 +1151,7 @@ class PhysicsEngine {
         }
 
         if (inx !== null) {
+            this.bodies[inx].wake();
             let validConstraints = [];
             for (let i = 0; i < this.constraints.length; i++) {
                 let con = this.constraints[i];
