@@ -56,10 +56,10 @@ class Scene {
 			B.colliding.add(A, Vector2.fromPhysicsVector(direction).inverse());
 		}
 	}
-	clearAllCollisions() {
-		let phys = this.main.getPhysicsElements();
-		for (let i = 0; i < phys.length; i++) {
-			if (!this.physicsEngine.isAsleep(phys[i].body)) phys[i].colliding.clear();
+	clearCollisions(phys) {
+		for (let rect of phys) {
+			rect.colliding.elements = rect.colliding.elements.filter(container => !container.element.isDead);
+			if (!this.physicsEngine.isAsleep(rect.body)) rect.colliding.clear();
 		}
 	}
 	collidePoint(point) {
@@ -86,10 +86,11 @@ class Scene {
 		for (let el of this.main.elementArray) {
 			el.scripts.run("BeforeUpdate");
 		}
-		this.clearAllCollisions();
+		let phys = this.main.getPhysicsElements();
+		this.clearCollisions(phys);
 		this.updatePreviousData(this.main.elementArray);
 		this.physicsEngine.run();
-		if (this.collisionEvents) this.handleCollisionEvents(this.main.getPhysicsElements());
+		if (this.collisionEvents) this.handleCollisionEvents(phys);
 		this.physicsObjectFixedUpdate(this.main.elementArray);
 		this.main.endUpdate();
 	}
