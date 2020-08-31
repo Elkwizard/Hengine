@@ -8,21 +8,42 @@ function physicsPolygonSubdivider(poly) {
 class CollisionMoniter {
     constructor() {
         this.elements = [];
+        this.physicsObjects = [];
     }
     get general() {
         return this.elements.map(e => e.element);
     }
     get left() {
-        return this.direction(Vector2.left);
+        let els = [];
+        for (let i = 0; i < this.elements.length; i++) {
+            let el = this.elements[i];
+            if (el.dir.x < -0.2) els.push(el.element);
+        }
+        return els.length ? els : null;
     }
     get right() {
-        return this.direction(Vector2.right);
+        let els = [];
+        for (let i = 0; i < this.elements.length; i++) {
+            let el = this.elements[i];
+            if (el.dir.x > 0.2) els.push(el.element);
+        }
+        return els.length ? els : null;
     }
     get top() {
-        return this.direction(Vector2.up);
+        let els = [];
+        for (let i = 0; i < this.elements.length; i++) {
+            let el = this.elements[i];
+            if (el.dir.y < -0.2) els.push(el.element);
+        }
+        return els.length ? els : null;
     }
     get bottom() {
-        return this.direction(Vector2.down);
+        let els = [];
+        for (let i = 0; i < this.elements.length; i++) {
+            let el = this.elements[i];
+            if (el.dir.y > 0.2) els.push(el.element);
+        }
+        return els.length ? els : null;
     }
     extract(moniter) {
         this.elements = moniter.elements.map(e => ({
@@ -30,11 +51,19 @@ class CollisionMoniter {
             element: e.element
         }));
     }
+    removeDead() {
+        this.elements = this.elements.filter(el => !el.element.isDead);
+        this.physicsObjects = this.elements.map(el => el.element);
+    }
     clear() {
         this.elements = [];
+        this.physicsObjects = [];
     }
     add(element, dir) {
-        this.elements.push({ element, dir });
+        if (!this.physicsObjects.includes(element)) {
+            this.physicsObjects.push(element);
+            this.elements.push({ element, dir });
+        }
     }
     has(el) {
         for (let element of this.elements) if (element.element === el) return true;

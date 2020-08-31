@@ -58,7 +58,7 @@ class Scene {
 	}
 	clearCollisions(phys) {
 		for (let rect of phys) {
-			rect.colliding.elements = rect.colliding.elements.filter(container => !container.element.isDead);
+			rect.colliding.removeDead();
 			if (!this.physicsEngine.isAsleep(rect.body)) rect.colliding.clear();
 		}
 	}
