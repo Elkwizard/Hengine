@@ -90,7 +90,6 @@ class PhysicsObject extends SceneObject {
     positionSync() {
         this.x = this.body.position.x;
         this.y = this.body.position.y;
-        this.rotation = this.body.angle;
     }
     shapeSync() {
         this.shapeNameIDMap.clear();

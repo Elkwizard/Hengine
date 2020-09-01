@@ -189,6 +189,13 @@ class SceneObject {
 		this.shapes[name] = shape;
 		this.cacheDimensions();
 	}
+	rotateAround(point, rotation) {
+		let dif = this.middle.minus(point);
+		dif.rotate(rotation);
+		dif.add(point);
+		this.middle = dif;
+		this.rotation += rotation;
+	}
 	worldSpaceToModelSpace(v) {
 		return v.Vminus(this.middle).rotate(-this.rotation);
 	}

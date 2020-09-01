@@ -4,9 +4,13 @@ class Time {
 	}
 	static getTime() {
 		let d = new Date();
-		let t = d.getTime();
-		t -= (7 * 60 * 60 * 1000);
-		return Time.millisecondsToStandard(t, 1970);
+		return {
+			seconds: d.getSeconds(),
+			minutes: d.getMinutes(),
+			hours: d.getHours(),
+			days: d.getDay(),
+			years: d.getYear() + 1900
+		};
 	}
 	static sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));

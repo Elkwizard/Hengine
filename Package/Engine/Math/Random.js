@@ -36,6 +36,9 @@ class Random {
     static random() {
         return Random.seedRand(this.seed++);
     }
+    static range(min = 0, max = 1) {
+        return Random.random() * (max - min) + min;
+    }
     static seedRand(seed) {
         seed += 1e5;
         let a = (seed * 6.12849) % 8.7890975
@@ -52,11 +55,8 @@ class Random {
         }
         return n / scl;
     }
-    static range(min = 0, max = 1) {
-        return Math.random() * (max - min) + min;
-    }
     static choice(arr) {
-        return arr[Math.random() * arr.length];
+        return arr[Random.random() * arr.length];
     }
     static noiseTCorrect(t) {
         return Interpolation.smoothT(t);
