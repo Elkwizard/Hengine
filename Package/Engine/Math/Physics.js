@@ -736,8 +736,6 @@ class CollisionResolver {
         bodyA.displace(moveA)
         if (bodyB.canMoveThisStep) bodyB.displace(moveB);
 
-        if (!penetration) return;
-
         let friction = (bodyA.friction + bodyB.friction) / 2 / this.engine.iterations;
 
         let totalPenetration = 0;
@@ -783,10 +781,9 @@ class CollisionResolver {
         }
     }
     staticResolve(bodyA, bodyB, direction, penetration, contacts) {
+
         let move = PhysicsVector.mul(direction, -penetration);
         bodyA.displace(move);
-
-        if (!penetration) return;
 
         let friction = (bodyA.friction + bodyB.friction) / 2 / this.engine.iterations;
 
@@ -1018,11 +1015,10 @@ class PhysicsEngine {
                     }
                 }
                 if (best) {
+                    let collisionDirection = best.direction; 
                     body2.addCollidingBody(body);
                     body.addCollidingBody(body2);
-                    // for (let cont of contacts) c.draw(cl.ORANGE).circle(cont.point, 4);
                     let STATIC = body2.type === RigidBody.STATIC || 0;
-                    let collisionDirection = best.direction;
                     if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
                         let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
                         if (dot > 0.8) {

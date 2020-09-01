@@ -172,8 +172,8 @@ class MouseHandler extends InputHandler {
 			e.preventDefault();
 			let p = e.targetTouches[0];
 			if (!p) handle({
-				x: m.x, 
-				y: m.y,
+				x: m.screen.x, 
+				y: m.screen.y,
 				button: 0,
 				type: "up"
 			});
