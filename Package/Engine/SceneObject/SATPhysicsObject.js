@@ -97,9 +97,7 @@ class PhysicsObject extends SceneObject {
         this.body.clearShapes();
         for (let name in this.shapes) {
             let shape = this.shapes[name];
-            let collider;
-            if (shape instanceof Polygon) collider = new PolygonCollider(shape.vertices.map(vert => vert.toPhysicsVector()));
-            else collider = new CircleCollider(shape.x, shape.y, shape.radius);
+            let collider = shape.toPhysicsShape();
             let colliders = this.body.addShape(collider);
             this.shapeNameIDMap.set(name, colliders);
         }

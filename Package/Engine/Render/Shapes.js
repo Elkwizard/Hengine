@@ -96,8 +96,9 @@ class Shape extends Operable {
 	}
 }
 class Polygon extends Shape {
-	constructor(vertices) {
+	constructor(vertices, alreadyClockwise) {
 		super();
+		this.alreadyClockwise = alreadyClockwise;
 		this.vertices = vertices;
 		let x = vertices.map(e => e.x);
 		let y = vertices.map(e => e.y);
@@ -182,6 +183,9 @@ class Polygon extends Shape {
 	get() {
 		let poly = new Polygon([...this.vertices], this.rotation);
 		return poly;
+	}
+	toPhysicsShape() {
+		return new PolygonCollider(this.vertices.map(v => v.toPhysicsVector()), this.alreadyClockwise);
 	}
 	static lerp(a, b, t) {
 		const vertices = a.vertices.map((v, inx) => Vector2.lerp(v, b.vertices[inx], t));
@@ -303,6 +307,9 @@ class Circle extends Shape {
 	}
 	get() {
 		return new Circle(this.x, this.y, this.radius);
+	}
+	toPhysicsShape() {
+		return new CircleCollider(this.x, this.y, this.radius);
 	}
 }
 Circle.modValues = ["x", "y", "radius"];

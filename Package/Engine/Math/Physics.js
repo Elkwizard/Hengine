@@ -173,24 +173,14 @@ class PolygonModel {
     }
 }
 class PolygonCollider {
-    constructor(vertices) {
+    constructor(vertices, alreadyClockwise = false) {
+        this.alreadyClockwise = alreadyClockwise;
         this.vertices = vertices;
         let acc = this.vertices[0];
         this.position = new PhysicsVector(acc.x, acc.y);
         for (let i = 1; i < this.vertices.length; i++) this.position.add(this.vertices[i]);
         this.position.div(this.vertices.length);
         this.bounds = Bounds.fromPolygon(this);
-        this.axes = [];
-        for (let i = 0; i < this.vertices.length; i++) {
-            let a = this.vertices[i];
-            let b = this.vertices[(i + 1) % this.vertices.length];
-            let dx = b.x - a.x;
-            let dy = b.y - a.y;
-            let m = Math.sqrt(dx ** 2 + dy ** 2);
-            dx /= m;
-            dy /= m;
-            this.axes.push(new PhysicsVector(-dy, dx));
-        }
     }
     size() {
         return this.bounds.width;
@@ -416,7 +406,7 @@ class RigidBody {
         let shapes = [sh];
 
         if (sh instanceof PolygonCollider && this.engine && this.engine.polygonVertexListSubdivider) {
-            shapes = this.engine.polygonVertexListSubdivider(sh.vertices).map(poly => new PolygonCollider(poly));
+            shapes = this.engine.polygonVertexListSubdivider(sh.vertices, sh.alreadyClockwise).map(poly => new PolygonCollider(poly));
         }
 
         this.shapes.push(...shapes);
@@ -923,7 +913,7 @@ class PhysicsEngine {
         this.oncollide = (a, b, dir) => null;
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
-        this.sleepDuration = 10;
+        this.sleepDuration = 15;
     }
     isAsleep(body) {
         return body.sleeping > this.sleepDuration;
