@@ -1015,9 +1015,10 @@ class PhysicsEngine {
                     }
                 }
                 if (best) {
-                    let collisionDirection = best.direction; 
+                    let collisionDirection = best.direction;
                     body2.addCollidingBody(body);
                     body.addCollidingBody(body2);
+                    if (!maxPenetration) continue;
                     let STATIC = body2.type === RigidBody.STATIC || 0;
                     if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
                         let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
