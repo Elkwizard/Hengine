@@ -99,7 +99,15 @@ class Polygon extends Shape {
 	constructor(vertices, alreadyClockwise) {
 		super();
 		this.alreadyClockwise = alreadyClockwise;
-		this.vertices = vertices;
+		this.vertices = [];
+		for (let v of vertices) {
+			let valid = true;
+			for (let v2 of this.vertices) if (v.equals(v2)) {
+				valid = false;
+				break;
+			}
+			if (valid) this.vertices.push(v);
+		}
 		let x = vertices.map(e => e.x);
 		let y = vertices.map(e => e.y);
 		let minX = Math.min(...x);

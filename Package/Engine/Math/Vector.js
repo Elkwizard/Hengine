@@ -362,6 +362,9 @@ class Vector2 extends Vector {
 	get mag() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
+	equals(v, t = 0.00001) {
+		return Math.abs(this.x - v.x) < t && Math.abs(this.y - v.y) < t;
+	}
 	op(v, e) {
 		if (typeof v === "number") {
 			this.x = e(this.x, v);
