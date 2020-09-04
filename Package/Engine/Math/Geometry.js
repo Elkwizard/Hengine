@@ -1,4 +1,112 @@
 class Geometry {
+    static gridToPolygons(srcGrid, CELL_SIZE) {
+        
+        function sample(x, y) {
+            if (x in grid && y in grid[x]) return grid[x][y];
+            return false;
+        }
+        function set(arr, x, y, v) {
+            if (x in arr && y in arr[x]) arr[x][y] = v;
+        }
+        function point(x, y) {
+            return new Vector2(x, y);
+        }
+        let pathGrid = [];
+        for (let i = 0; i < grid.length + 1; i++) {
+            pathGrid.push([]);
+            for (let j = 0; j < grid.length + 1; j++) {
+                pathGrid[i].push(null);
+            }
+        }
+        let pointGrid = [];
+        for (let i = 0; i < grid.length + 1; i++) {
+            pointGrid.push([]);
+            for (let j = 0; j < grid.length + 1; j++) {
+                pointGrid[i].push(null);
+            }
+        }
+        let startingPoints = [];
+        for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
+            const V = sample(i, j);
+            if (V) {
+                const A = sample(i, j - 1);
+                const B = sample(i + 1, j);
+                const C = sample(i, j + 1);
+                const D = sample(i - 1, j);
+
+
+                if (!A) set(pathGrid, i, j, Vector2.right);
+                if (!B) set(pathGrid, i + 1, j, Vector2.down);
+                if (!C) set(pathGrid, i + 1, j + 1, Vector2.left);
+                if (!D) set(pathGrid, i, j + 1, Vector2.up);
+
+                const SUM = A + B + C + D;
+
+                const A_p = point(i, j - 1);
+                const B_p = point(i + 1, j);
+                const C_p = point(i, j + 1);
+                const D_p = point(i - 1, j);
+                const V_p = point(i, j);
+
+
+                let ul = true;
+                let ur = true;
+                let ll = true;
+                let lr = true;
+
+                if (A) ul = false, ur = false;
+                if (B) ur = false, lr = false;
+                if (C) ll = false, lr = false;
+                if (D) ul = false, ll = false;
+
+                if (ul) set(pointGrid, i, j, true);
+                if (ur) set(pointGrid, i + 1, j, true);
+                if (ll) set(pointGrid, i, j + 1, true);
+                if (lr) set(pointGrid, i + 1, j + 1, true);
+
+                if (ul) startingPoints.push(V_p);
+                if (ur) startingPoints.push(B_p);
+                if (ll) startingPoints.push(C_p);
+                if (lr) startingPoints.push(point(i + 1, j + 1));
+            }
+        }
+        // for (let i = 0; i < pathGrid.length; i++) for (let j = 0; j < pathGrid[0].length; j++) {
+        //     let v = pathGrid[i][j];
+        //     if (v) {
+        //         c.stroke(cl.ORANGE, 2).arrow(point(i, j).times(CELL_SIZE), point(i, j).times(CELL_SIZE).plus(v.times(CELL_SIZE)));
+        //     }
+        // }
+        // for (let i = 0; i < pointGrid.length; i++) for (let j = 0; j < pointGrid[0].length; j++) {
+        //     let p = pointGrid[i][j];
+        //     if (p) {
+        //         // c.stroke(cl.LIME, 3).circle(point(i, j), 5);
+        //     }
+        // }
+        // for (let i = 0; i < startingPoints.length; i++) {
+        //     let p = startingPoints[i];
+        //     c.stroke(cl.LIME, 3).circle(p.times(CELL_SIZE), 5);
+        // } 
+        let polygons = [];
+        while (startingPoints.length) {
+            let start = startingPoints[0];
+            let current = start.get();
+            let points = [];
+            do {
+                let v = pathGrid[~~current.x][~~current.y];
+                if (!v) break;
+                current.add(v);
+                let found = startingPoints.find(vec => vec.equals(current));
+                if (found) {
+                    points.push(found.times(CELL_SIZE));
+                    startingPoints.splice(startingPoints.indexOf(found), 1);
+                }
+            } while (!current.equals(start));
+            if (points.length) polygons.push(points);
+        }
+
+        // for (let points of polygons) c.stroke(cl.PURPLE, 2).shape(...points);
+        return polygons.map(poly => new Polygon(poly, true));       
+    }
     static reimann(fn, a, b, iter = 1000, RRAM = false) {
         let sum = 0;
         let dif = (b - a) / iter;
