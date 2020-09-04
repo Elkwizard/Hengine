@@ -1,31 +1,67 @@
 class Geometry {
     static gridToPolygons(srcGrid, CELL_SIZE) {
         
+        let grid = [];
+        for (let i = 0; i < srcGrid.length; i++) {
+            grid.push([]);
+            for (let j = 0; j < srcGrid[0].length; j++) {
+                grid[i].push(srcGrid[i][j]);
+            }
+        }
+
+
+        //methods
         function sample(x, y) {
             if (x in grid && y in grid[x]) return grid[x][y];
             return false;
         }
+
         function set(arr, x, y, v) {
             if (x in arr && y in arr[x]) arr[x][y] = v;
         }
         function point(x, y) {
             return new Vector2(x, y);
         }
+
+        //remove diagonals
+
+        for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
+            const V = sample(i, j);
+            if (V) {
+                const A = sample(i, j - 1);
+                const B = sample(i + 1, j);
+                const C = sample(i, j + 1);
+                const D = sample(i - 1, j);
+
+                const A2 = sample(i + 1, j - 1);
+                const B2 = sample(i + 1, j + 1);
+                const C2 = sample(i - 1, j + 1);
+                const D2 = sample(i - 1, j - 1);
+
+                if (A2) if (!A && !B) grid[i][j - 1] = true;
+                if (B2) if (!B && !C) grid[i + 1][j] = true;
+                if (C2) if (!C && !D) grid[i][j + 1] = true;
+                if (D2) if (!D && !A) grid[i - 1][j] = true;
+            }   
+        }
+
+
         let pathGrid = [];
         for (let i = 0; i < grid.length + 1; i++) {
             pathGrid.push([]);
-            for (let j = 0; j < grid.length + 1; j++) {
+            for (let j = 0; j < grid[0].length + 1; j++) {
                 pathGrid[i].push(null);
             }
         }
         let pointGrid = [];
         for (let i = 0; i < grid.length + 1; i++) {
             pointGrid.push([]);
-            for (let j = 0; j < grid.length + 1; j++) {
+            for (let j = 0; j < grid[0].length + 1; j++) {
                 pointGrid[i].push(null);
             }
         }
         let startingPoints = [];
+
         for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
             const V = sample(i, j);
             if (V) {
@@ -82,18 +118,17 @@ class Geometry {
         //         // c.stroke(cl.LIME, 3).circle(point(i, j), 5);
         //     }
         // }
-        // for (let i = 0; i < startingPoints.length; i++) {
-        //     let p = startingPoints[i];
-        //     c.stroke(cl.LIME, 3).circle(p.times(CELL_SIZE), 5);
-        // } 
         let polygons = [];
+        // startingPoints = [];
         while (startingPoints.length) {
             let start = startingPoints[0];
             let current = start.get();
             let points = [];
+            let lastArrow = null;
             do {
                 let v = pathGrid[~~current.x][~~current.y];
                 if (!v) break;
+                lastArrow = v;
                 current.add(v);
                 let found = startingPoints.find(vec => vec.equals(current));
                 if (found) {
