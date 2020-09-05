@@ -1,9 +1,9 @@
 function physicsPolygonSubdivider(poly, alreadyClock) {
-    let verts = poly.map(vert => Vector2.fromPoint(vert));
+    let verts = poly.map(vert => Vector2.fromPhysicsVector(vert));
     let middle = Geometry.getMiddle(verts);
     verts = verts.map(vert => vert.Vminus(middle));
-    let list = Geometry.subdividePolygonList(verts, Geometry.vertexDirection(verts)).map(verts => (alreadyClock ? verts : Geometry.clockwise(verts)).map(vert => vert.Vplus(middle)));
-    return list.map(verts => verts.map(vert => new PhysicsVector(vert.x, vert.y)));
+    let list = Geometry.subdividePolygonList(alreadyClock ? verts : Geometry.clockwise(verts)).map(verts => verts.map(vert => vert.Vplus(middle)));
+    return list.map(verts => Polygon.removeDuplicates(verts).map(vert => vert.toPhysicsVector()));
 }
 class CollisionMoniter {
     constructor() {

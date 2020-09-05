@@ -36,7 +36,7 @@ class Line {
 	get length() {
 		return this.b.Vminus(this.a).mag;
 	}
-	get midPoint() {
+	get middle() {
 		let ax = (this.a.x + this.b.x) / 2;
 		let ay = (this.a.y + this.b.y) / 2;
 		return new Vector2(ax, ay);
@@ -99,15 +99,7 @@ class Polygon extends Shape {
 	constructor(vertices, alreadyClockwise) {
 		super();
 		this.alreadyClockwise = alreadyClockwise;
-		this.vertices = [];
-		for (let v of vertices) {
-			let valid = true;
-			for (let v2 of this.vertices) if (v.equals(v2)) {
-				valid = false;
-				break;
-			}
-			if (valid) this.vertices.push(v);
-		}
+		this.vertices = Polygon.removeDuplicates(vertices);
 		let x = vertices.map(e => e.x);
 		let y = vertices.map(e => e.y);
 		let minX = Math.min(...x);
@@ -115,6 +107,20 @@ class Polygon extends Shape {
 		let minY = Math.min(...y);
 		let maxY = Math.max(...y);
 		this.area = (maxX - minX) * (maxY - minY);
+	}
+	static removeDuplicates(verts) {
+		let vertices = [];
+
+		for (let v of verts) {
+			let valid = true;
+			for (let v2 of vertices) if (v.equals(v2)) {
+				valid = false;
+				break;
+			}
+			if (valid) vertices.push(v);
+		}
+
+		return vertices;
 	}
 	set middle(a) {
 		this.vertices = this.center(a).vertices;
@@ -189,7 +195,7 @@ class Polygon extends Shape {
 		return new Polygon(this.vertices.map(vert => vert.plus(dir)));
 	}
 	get() {
-		let poly = new Polygon([...this.vertices], this.rotation);
+		let poly = new Polygon([...this.vertices], this.alreadyClockwise);
 		return poly;
 	}
 	toPhysicsShape() {

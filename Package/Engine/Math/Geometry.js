@@ -392,98 +392,145 @@ class Geometry {
         let nDif = new Vector2(cos * dif.x - sin * dif.y, sin * dif.x + cos * dif.y);
         return new Vector2(origin.x + nDif.x, origin.y + nDif.y);
     }
-    static subdividePolygonList(polygon, direction) {
-        let otherPolygons = [];
-        let counter = direction;
-        let slice = null;
-        let newPolygon = [...polygon];
-        for (let i = 0; i < polygon.length; i++) {
-            //recalculate edges
-            let edges = [];
-            for (let i = 0; i < polygon.length; i++) {
-                let a = polygon[i];
-                let b = polygon[(i + 1) % polygon.length];
-                edges.push(new Line(a, b));
-            }
+    static subdividePolygonList(vertices) {
+        vertices = [...vertices];
+        //edges
+        let vectors = [];
+        let edges = [];
+        let middle = Vector2.origin;
+        for (let i = 0; i < vertices.length; i++) {
+            const A = vertices[i];
+            const B = vertices[(i + 1) % vertices.length];
+            vectors.push(B.minus(A).normalize());
+            edges.push(new Line(A, B));
+            middle.add(A);
+        }
 
-            //everything else
-            let point = polygon[i];
-            let v1 = point.Vminus(polygon[(i + 1) % polygon.length]).normalize().inverse();
-            let v2 = point.Vminus(polygon[(i - 1 + polygon.length) % polygon.length]).normalize().inverse();
-            let a1 = v1.getAngle();
-            let a2 = v2.getAngle();
-            let dif = Math.abs(a2 - a1);
-            if (a2 < a1) dif = Math.PI * 2 - dif;
-            if (counter) dif = Math.PI * 2 - dif;
-            if (dif > Math.PI) {
-                let dir = v1.Vplus(v2).Nover(-2).normalize();
-                let considerable = [];
-                for (let j = 0; j < polygon.length; j++) if (j !== i && j !== (i - 1 + polygon.length) % polygon.length) {
-                    edges[j].indices = [j, (j + 1) % polygon.length];
-                    considerable.push(edges[j]);
-                }
-                let bestDist = Infinity;
-                let bestPoint = null;
-                let bestLine = null;
-                for (let line of considerable) {
-                    let bp = Geometry.closestPointOnLineObjectInDirectionLimited(point, dir, line);
-                    if (!bp.outOfBounds) {
-                        let dist = Geometry.distToPoint2(bp.result, point);
-                        if (dist < bestDist) {
-                            bestDist = dist;
-                            bestPoint = bp.result;
-                            bestLine = line;
-                        }
-                    }
-                }
-                if (bestPoint && bestLine) {
-                    slice = new Line(bestPoint, point);
-                    newPolygon.splice(bestLine.indices[1], 0, bestPoint);
-                    break;
-                }
-            }
+        //direction
+        middle.div(vertices.length);
+
+        const INDEX_DATA = [];
+        const CONVEX = [];
+        
+        for (let i = 0; i < edges.length; i++) {
+            const INX = i;
+            const NEXT_INX = (i + 1) % edges.length;
+            const A = edges[INX];
+            const B = edges[NEXT_INX];
+            const VEC_A = vectors[INX];
+            const VEC_B = vectors[NEXT_INX];
+            const VERT_A = vertices[INX];
+            const VERT_B = vertices[NEXT_INX];
+
+            let angle = Math.abs(VEC_B.angle - VEC_A.angle);
+            if (VEC_B.angle < VEC_A.angle) angle = Math.PI * 2 - angle;
+
+            let convex = angle <= Math.PI;
+
+            INDEX_DATA.push({ INX, NEXT_INX, A, B, VEC_A, VEC_B, VERT_A, VERT_B, convex });
+            CONVEX.push(convex);
         }
-        let leftOvers = newPolygon;
-        let currentPolygon = [];
-        function getIndex(corner) {
-            for (let i = 0; i < leftOvers.length; i++) {
-                if (leftOvers[i].equals(corner)) return i;
-            }
-            return 0;
-        }
-        if (slice) {
-            currentPolygon = [slice.a];
-            let otherPolygon = [slice.b];
-            let indexA = getIndex(slice.a);
-            let indexB = getIndex(slice.b);
-            let currentIndex = indexA;
-            while (currentIndex !== indexB) {
-                currentIndex = (currentIndex + 1) % leftOvers.length;
-                currentPolygon.push(leftOvers[currentIndex]);
-            }
-            while (currentIndex !== indexA) {
-                currentIndex = (currentIndex + 1 + leftOvers.length) % leftOvers.length;
-                otherPolygon.push(leftOvers[currentIndex]);
-            }
-            for (let point of currentPolygon) {
-                leftOvers.splice(getIndex(point), 1);
-            }
-            let a = currentPolygon;
-            let b = otherPolygon;
+
+        if (CONVEX.includes(false)) {
+            const CONCAVE_INX = CONVEX.indexOf(false);
+            const { INX, NEXT_INX, A, B, VEC_A, VEC_B, VERT_A, VERT_B, convex } = INDEX_DATA[CONCAVE_INX];
+
+            const VERTEX = VERT_B;
             
-            otherPolygons.push(...Geometry.subdividePolygonList(a));
-            otherPolygons.push(...Geometry.subdividePolygonList(b));
-            return otherPolygons;
-        } else return [polygon];
+            const AWAY = VEC_A.minus(VEC_B).normalize();
+
+            const SEGMENTS = [];
+            for (let i = 0; i < edges.length; i++) {
+                if (i === INX) continue;
+                if (i === NEXT_INX) continue;
+                const EDGE = edges[i];
+                const TO_MIDDLE_A =  EDGE.a.minus(VERTEX);
+                const TO_MIDDLE_B =  EDGE.b.minus(VERTEX);
+                if (TO_MIDDLE_A.dot(AWAY) < 0 && TO_MIDDLE_B.dot(AWAY) < 0) continue;
+                SEGMENTS.push(edges[i]);
+            }
+            if (!SEGMENTS.length) return [vertices];
+
+            const EPSILON = 0.00001;
+            
+            const dx = AWAY.x || EPSILON;
+            const dy = AWAY.y || EPSILON;
+            const b = VERTEX.y - dy / dx * VERTEX.x;
+
+            let intersects = [];
+            for (let i = 0; i < SEGMENTS.length; i++) {
+                const SEG = SEGMENTS[i];
+                const SEG_LENGTH = SEG.length;
+                const SEG_VECTOR = SEG.vector;
+
+                let ix = VERTEX.x;
+                let iy = VERTEX.y;
+
+                const dx_2 = (SEG.b.x - SEG.a.x) || EPSILON;
+                const dy_2 = (SEG.b.y - SEG.a.y) || EPSILON;
+                const b_2 = SEG.a.y - dy_2 / dx_2 * SEG.a.x;
+
+                ix = (b - b_2) / (dy_2 / dx_2 - dy / dx);
+                iy = dy / dx * ix + b;
+
+                const INTERSECT = new Vector2(ix, iy);
+                const DOT = INTERSECT.minus(SEG.a).dot(SEG.vector);
+                
+                if (DOT > 0 && DOT < SEG_LENGTH) intersects.push({ point: INTERSECT, segment: SEG });
+                const SHIFT = SEG_VECTOR.times(SEG_LENGTH * 0.1);
+                if (!DOT) intersects.push({ point: INTERSECT.plus(SHIFT), segment: SEG });
+                if (DOT === SEG_LENGTH) intersects.push({ point: INTERSECT.minus(SHIFT), segment: SEG }); 
+            }
+            if (intersects.length) {
+                const INTERSECT = intersects.sort((a, b) => a.point.minus(VERTEX).sqrMag - b.point.minus(VERTEX).sqrMag)[0];
+                const INX = edges.indexOf(INTERSECT.segment);
+                const INX_A = INX;
+                const INX_B = (INX + 1) % vertices.length;
+                // renderer.draw(cl.RED).circle(vertices[INX_A], 5);
+                // renderer.draw(cl.RED).circle(vertices[INX_B], 5);
+                vertices.splice(INX_B, 0, INTERSECT.point);
+
+                const NEW_INX = vertices.indexOf(INTERSECT.point);
+                const VERTEX_INX = vertices.indexOf(VERTEX);
+
+                let polyA = [];
+                let polyB = [];
+                if (NEW_INX < VERTEX_INX) {
+                    polyA = [...vertices.slice(VERTEX_INX), ...vertices.slice(0, NEW_INX + 1)];
+                    polyB = vertices.slice(NEW_INX, VERTEX_INX + 1);
+                } else {
+                    polyA = vertices.slice(VERTEX_INX, NEW_INX + 1);
+                    polyB = [...vertices.slice(NEW_INX), ...vertices.slice(0, VERTEX_INX + 1)];
+                }
+
+                // renderer.stroke(cl.PURPLE, 4).shape(...polyA);
+                // renderer.stroke(cl.GREEN, 4).shape(...polyB);
+                // console.log(NEW_INX);
+                
+                // renderer.draw(cl.ORANGE).circle(INTERSECT.point, 5);
+                // renderer.draw(cl.YELLOW).circle(vertices[NEW_INX], 5);
+
+                let polysA = Geometry.subdividePolygonList(polyA);
+                let polysB = Geometry.subdividePolygonList(polyB);
+
+                return [...polysA, ...polysB];
+            } else return [vertices];
+
+            // for (let seg of SEGMENTS) renderer.stroke(cl.PURPLE, 2).arrow(seg);
+
+            // renderer.stroke(cl.ORANGE, 2).arrow(VERT_B, VERT_B.plus(AWAY.times(F)));
+
+            // renderer.draw(convex ? cl.RED : cl.GREEN).circle(VERT_B, 3);
+        } else return [vertices];
+
+        // for (let edge of edges) {
+        //  renderer.stroke(cl.YELLOW).arrow(edge);
+        // }
+        
+        return [vertices];
     }
     static getMiddle(verts) {
         return Vector2.sum(verts).over(verts.length);
-    }
-    static subdividePolygon(polygon) {
-        let verts = polygon.vertices;
-        let middle = Geometry.getMiddle(verts);
-        verts = verts.map(e => e.Vminus(middle));
-        return Geometry.subdividePolygonList(verts, Geometry.vertexDirection(polygon)).map(e => new Polygon(Geometry.clockwise(e).map(e => e.Vplus(middle)), 0));
     }
     static clockwise(verts) {
         let middle = Geometry.getMiddle(verts);
