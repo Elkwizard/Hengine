@@ -42,7 +42,7 @@ class PhysicsObject extends SceneObject {
         this.y = a.y;
         this.body.position.x = a.x;
         this.body.position.y = a.y;
-        this.body.__models = null;
+        this.body.invalidateModels();
     }
     set snuzzlement(a) {
         this.body.restitution = 1 - a;

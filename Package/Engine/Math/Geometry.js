@@ -25,25 +25,42 @@ class Geometry {
 
         //remove diagonals
 
-        for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
-            const V = sample(i, j);
-            if (V) {
-                const A = sample(i, j - 1);
-                const B = sample(i + 1, j);
-                const C = sample(i, j + 1);
-                const D = sample(i - 1, j);
+        let broken = true;
+        while (broken) {
+            broken = false;
+            for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
+                const V = sample(i, j);
+                if (V) {
+                    const A = sample(i, j - 1);
+                    const B = sample(i + 1, j);
+                    const C = sample(i, j + 1);
+                    const D = sample(i - 1, j);
 
-                const A2 = sample(i + 1, j - 1);
-                const B2 = sample(i + 1, j + 1);
-                const C2 = sample(i - 1, j + 1);
-                const D2 = sample(i - 1, j - 1);
+                    const A2 = sample(i + 1, j - 1);
+                    const B2 = sample(i + 1, j + 1);
+                    const C2 = sample(i - 1, j + 1);
+                    const D2 = sample(i - 1, j - 1);
 
-                if (A2) if (!A && !B) grid[i][j - 1] = true;
-                if (B2) if (!B && !C) grid[i + 1][j] = true;
-                if (C2) if (!C && !D) grid[i][j + 1] = true;
-                if (D2) if (!D && !A) grid[i - 1][j] = true;
-            }   
+                    if (A2) if (!A && !B) {
+                        broken = true;
+                        grid[i][j - 1] = true;
+                    }
+                    if (B2) if (!B && !C) {
+                        broken = true;
+                        grid[i + 1][j] = true;
+                    }
+                    if (C2) if (!C && !D) {
+                        broken = true;
+                        grid[i][j + 1] = true;
+                    }
+                    if (D2) if (!D && !A) {
+                        broken = true;
+                        grid[i - 1][j] = true;
+                    }
+                }   
+            }
         }
+
 
 
         let pathGrid = [];
@@ -118,6 +135,7 @@ class Geometry {
         //         // c.stroke(cl.LIME, 3).circle(point(i, j), 5);
         //     }
         // }
+        // for(let p of startingPoints) c.draw(cl.PURPLE).circle(p.times(CELL_SIZE), 5);
         let polygons = [];
         // startingPoints = [];
         while (startingPoints.length) {

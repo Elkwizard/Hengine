@@ -90,10 +90,10 @@ class Texture extends ImageType {
 		this.pixels[x][y] = clr;
 		let inx = (y * this.width + x) * 4;
 		let data = this.imageData.data;
-		data[inx] = clr.red;
-		data[inx + 1] = clr.green;
-		data[inx + 2] = clr.blue;
-		data[inx + 3] = clr.alpha * 255;
+		data[inx] = ~~clr.red;
+		data[inx + 1] = ~~clr.green;
+		data[inx + 2] = ~~clr.blue;
+		data[inx + 3] = ~~(clr.alpha * 255);
 	}
 	act_set(x, y, clr) {
 		this.changed = true;
@@ -259,7 +259,8 @@ class Texture extends ImageType {
 					acc = "";
 				}
 			}
-			for (let [x, y] of tex) tex.setPixel(x, y, result[x][y]);
+			tex.pixels = result;
+			tex.updateImageData();
 			return tex;
 		}
 		return inv_toString(str);

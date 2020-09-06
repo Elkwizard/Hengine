@@ -357,13 +357,13 @@ class RigidBody {
         this.canRotate = true;
         this.isTrigger = false;
 
-        this.__models = null;
+        this.invalidateModels();
     }
     set angle(a) {
         this._angle = a;
         this.cosAngle = Math.cos(a);
         this.sinAngle = Math.sin(a);
-        this.__models = null;
+        this.invalidateModels();
     }
     get angle() {
         return this._angle;
@@ -376,21 +376,36 @@ class RigidBody {
     }
     displace(v) {
         this.position.add(v);
-        if (this.__models) for (let i = 0; i < this.__models.length; i++) {
-            this.__models[i].displace(v);
+        for (let i = 0; i < this.__models.length; i++) {
+            if (this.__models[i]) this.__models[i].displace(v);
         }
     }
-    cacheModels() {
-        return this.__models || (this.__models = this.getModels());
+    invalidateModels() {
+        this.__models = [];
+        for (let i = 0; i < this.shapes.length; i++) this.__models.push(null);
     }
-    getModels() {
+    getModel(i) {
         let pos = this.position;
         let cos = this.cosAngle;
         let sin = this.sinAngle;
-        return this.shapes.map(shape => shape.getModel(pos, cos, sin));
+        return this.shapes[i].getModel(pos, cos, sin);
+    }
+    getModels() {
+        let models = [];
+        for (let i = 0; i < this.shapes.length; i++) models.push(this.cacheModel(i));
+        return models;
+    }
+    cacheModel(i) {
+        return this.__models[i] ? this.__models[i] : (this.__models[i] = this.getModel(i));
+    }
+    cacheModels() {
+        let models = [];
+        for (let i = 0; i < this.shapes.length; i++) models.push(this.cacheModel(i));
+        return models;
     }
     clearShapes() {
         this.shapes = [];
+        this.invalidateModels();
     }
     removeShape(sh) {
         let inx = null;
@@ -401,6 +416,7 @@ class RigidBody {
             }
         }
         if (inx !== null) this.shapes.splice(inx, 1);
+        this.invalidateModels();
     }
     addShape(sh) {
         let shapes = [sh];
@@ -414,6 +430,7 @@ class RigidBody {
             this.mass += ShapeMass["mass" + sha.constructor.name](sha);
             this.inertia += ShapeMass["inertia" + sha.constructor.name](sha);
         }
+        this.invalidateModels();
         return shapes;
     }
     integrate(intensity) {
@@ -467,11 +484,11 @@ class CollisionDetector {
     constructor(engine) {
         this.engine = engine;
     }
-    collide(shapeA, shapeB) {
+    collide(shapeA, shapeB, arg) {
         if (Bounds.notOverlap(shapeA.bounds, shapeB.bounds)) return null;
-        return this[shapeA.constructor.name + "_" + shapeB.constructor.name](shapeA, shapeB);
+        return this[shapeA.constructor.name + "_" + shapeB.constructor.name](shapeA, shapeB, arg);
     }
-    CircleModel_PolygonModel(a, b) {
+    CircleModel_PolygonModel(a, b, _unused) {
         //SAT
 
         // let axes = [];
@@ -599,14 +616,14 @@ class CollisionDetector {
         }
         return null;
     }
-    PolygonModel_CircleModel(a, b) {
-        let col = this.CircleModel_PolygonModel(b, a);
+    PolygonModel_CircleModel(a, b, _unused) {
+        let col = this.CircleModel_PolygonModel(b, a, PhysicsVector.invert(_unused));
         if (col) {
             col.direction.mul(-1);
         }
         return col;
     }
-    CircleModel_CircleModel(a, b) {
+    CircleModel_CircleModel(a, b, _unused) {
         let between = PhysicsVector.sub(b.position, a.position);
         let sqrMag = PhysicsVector.sqrMag(between);
         if (sqrMag < (a.radius + b.radius) ** 2) {
@@ -622,13 +639,15 @@ class CollisionDetector {
         }
         return null;
     }
-    PolygonModel_PolygonModel(a, b) {
+    PolygonModel_PolygonModel(a, b, between) {
         let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
         if (intersections.length < 2) return null;
 
         let toB = PhysicsVector.sub(b.position, a.position);
 
+
         let axes = [...a.axes.map(ax => PhysicsVector.invert(ax)), ...b.axes].filter(ax => PhysicsVector.dot(ax, toB) > 0);
+        if (!axes.length) return null;
         let minOverlap = Infinity;
         let bestAxis = null;
         let bestRange = [];
@@ -949,6 +968,35 @@ class PhysicsEngine {
             body.integrate(intensity);
         }
     }
+    resolve(body, body2, col) {
+        // scene.camera.drawInWorldSpace(() => {
+        //     for (let contact of col.contacts) renderer.draw(cl.ORANGE).circle(contact.point, 5);
+        // });
+        let collisionDirection = col.direction;
+        let maxPenetration = col.penetration;
+        let contacts = col.contacts;
+        body2.addCollidingBody(body);
+        body.addCollidingBody(body2);
+        if (!maxPenetration) return;
+        let STATIC = body2.type === RigidBody.STATIC || 0;
+        if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
+            let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
+            if (dot > 0.8) {
+                STATIC = true;
+                break;
+            }
+        }
+        if (STATIC) {
+            body.prohibitedDirections.push(collisionDirection);
+        }
+        this.oncollide(body, body2, collisionDirection);
+        if (body.isTrigger || body2.isTrigger) return;
+        if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
+        else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
+        
+        //immobilize
+        body.canMoveThisStep = false;
+    }
     collisions(order, dynBodies, collisionPairs) {
         this.bodies.sort(order);
         //collisions
@@ -970,78 +1018,28 @@ class PhysicsEngine {
             //         c.stroke(cl.RED).arrow(body.position, others[i].position);
             //     }
             // }
-
             for (let j = 0; j < collidable.length; j++) {
-                let collisions = [];
                 let body2 = collidable[j];
-                let shapesA = body.cacheModels();
-                let shapesB = body2.cacheModels();
-                if (shapesA.length === 1 && shapesB.length === 1) {
-                    let col = this.collisionDetector.collide(shapesA[0], shapesB[0]);
-                    collisions.push(col);
+                if (body.shapes.length === 1 && body2.shapes.length === 1) {
+                    let col = this.collisionDetector.collide(body.cacheModel(0), body2.cacheModel(0), PhysicsVector.sub(body2.position, body.position));
+                    if (col) this.resolve(body, body2, col);
                 } else {
-                    for (let sI = 0; sI < shapesA.length; sI++) for (let sJ = 0; sJ < shapesB.length; sJ++) {
-                        let shapeA = shapesA[sI];
-                        let shapeB = shapesB[sJ];
-                        let col = this.collisionDetector.collide(shapeA, shapeB);
-                        collisions.push(col);
-                    }
-                }
-                let contacts = [];
-                let maxPenetration = -Infinity;
-                let best = null;
-                if (collisions.length > 1) {
-                    for (let ci = 0; ci < collisions.length; ci++) {
-                        let collision = collisions[ci];
-                        if (collision) {
-                            if (collision.penetration > maxPenetration) {
-                                maxPenetration = collision.penetration;
-                                best = collision;
-                                contacts.push(...collision.contacts
-                                    .filter(contact => !contacts
-                                        .test(con => con.point.equals(contact.point))
-                                    )
-                                );
-                                contacts = collision.contacts;
-                            }
+                    let best = null;
+                    let penetration = -Infinity;
+                    for (let sI = 0; sI < body.shapes.length; sI++) for (let sJ = 0; sJ < body2.shapes.length; sJ++) {
+                        let col = this.collisionDetector.collide(body.cacheModel(sI), body2.cacheModel(sJ), PhysicsVector.sub(body2.position, body.position));
+                        if (col) if (col.penetration > penetration) {
+                            penetration = col.penetration;
+                            best = col;
                         }
                     }
-                } else {
-                    let col = collisions[0];
-                    if (col) {
-                        best = col;
-                        contacts = col.contacts;
-                        maxPenetration = col.penetration;
-                    }
-                }
-                if (best) {
-                    let collisionDirection = best.direction;
-                    body2.addCollidingBody(body);
-                    body.addCollidingBody(body2);
-                    if (!maxPenetration) continue;
-                    let STATIC = body2.type === RigidBody.STATIC || 0;
-                    if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
-                        let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
-                        if (dot > 0.8) {
-                            STATIC = true;
-                            break;
-                        }
-                    }
-                    if (STATIC) {
-                        body.prohibitedDirections.push(collisionDirection);
-                    }
-                    this.oncollide(body, body2, collisionDirection);
-                    if (body.isTrigger || body2.isTrigger) continue;
-                    if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
-                    else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
+                    if (best) this.resolve(body, body2, best);
                 }
             }
-            //immobilize
-            body.canMoveThisStep = false;
         }
     }
     cacheModels() {
-        for (let i = 0; i < this.bodies.length; i++) this.bodies[i].__models = null;
+        for (let i = 0; i < this.bodies.length; i++) this.bodies[i].invalidateModels();
     }
     createGrid(dynBodies) {
         let cellsize = 100;

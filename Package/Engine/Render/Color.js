@@ -36,10 +36,10 @@ class Color extends Operable {
 				alpha = 1;
 			}
 		} else {
-			red = r || 0;
-			green = g || 0;
-			blue = b || 0;
-			alpha = a || 1;
+			red = (r !== undefined) ? r : 0;
+			green = (g !== undefined) ? g : 0;
+			blue = (b !== undefined) ? b : 0;
+			alpha = (a !== undefined) ? a : 1;
 		}
 		this.red = red;
 		this.green = green;

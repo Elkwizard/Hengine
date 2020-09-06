@@ -119,7 +119,17 @@ class Hengine {
 		this.initFileSystem();
 
 		//title
-		this.setTitle(this.getProjectName());
+
+		let script = document.createElement("script");
+		script.src = "./Source.js";
+		let t = script.src;
+		let st = t.split("/");
+		let ti = st[st.length - 3];
+		if (ti) {
+			ti = unescape(ti);
+		} else ti = "Unknown";
+
+		this.setTitle(ti);
 
 		//defaults
 		this.initDefaults();
@@ -205,15 +215,7 @@ class Hengine {
 		});
 	}
 	getProjectName() {
-		let script = document.createElement("script");
-		script.src = "./Source.js";
-		let t = script.src;
-		let st = t.split("/");
-		let ti = st[st.length - 3];
-		if (ti) {
-			ti = unescape(ti);
-		} else ti = "Unknown";
-		return ti;
+		return document.querySelector("title").innerText;
 	}
 	setTitle(title) {
 		let t = document.querySelector("title");

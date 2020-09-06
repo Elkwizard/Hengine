@@ -182,17 +182,17 @@ class Polygon extends Shape {
 	}
 	center(pos) {
 		let offset = pos.Vminus(this.middle);
-		return new Polygon(this.vertices.map(e => e.Vplus(offset)));
+		return new Polygon(this.vertices.map(e => e.Vplus(offset)), this.alreadyClockwise);
 	}
 	scale(factor) {
 		let middle = this.middle;
-		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))));
+		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))), this.alreadyClockwise);
 	}
 	scaleAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))));
+		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))), this.alreadyClockwise);
 	}
 	move(dir) {
-		return new Polygon(this.vertices.map(vert => vert.plus(dir)));
+		return new Polygon(this.vertices.map(vert => vert.plus(dir)), this.alreadyClockwise);
 	}
 	get() {
 		let poly = new Polygon([...this.vertices], this.alreadyClockwise);
