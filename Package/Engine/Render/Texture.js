@@ -4,32 +4,18 @@ class Texture extends ImageType {
 		let self = this;
 		this.c = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
 		this.renderer = this.c;
-		this.pixels = [];
-		for (let i = 0; i < this.width; i++) {
-			this.pixels.push([]);
-			for (let j = 0; j < this.height; j++) {
-				this.pixels[i].push(new Color(0, 0, 0, 0));
-			}
-		}
+		this.pixels = Array.dim(this.width, this.height).map(() => new Color(0, 0, 0, 0));
 		this.__image = new Frame(width, height);
 
 		//init image data
 		let array = new Uint8ClampedArray(4 * this.width * this.height);
 		for (let i = 0; i < array.length; i++) array[i] = 0;
 		this.imageData = new ImageData(array, this.width, this.height);
-		
-		//blank
-		let array2 = new Uint8ClampedArray(4 * this.width * this.height);
-		for (let i = 0; i < array.length; i++) array2[i] = 0;
-		this.imageData2 = new ImageData(array2, this.width, this.height);
-		this.blankImageData = this.imageData2;
-		this.blank = this.pixels.map(e => e.map(e => new Color(0, 0, 0, 0)));
-
 
 		this.changed = false;
 	}
 	get brightness() {
-		return this.pixels.map(column => column.map(col => col.brightness));
+		return this.pixels.map(col => col.brightness);
 	}
 	*[Symbol.iterator]() {
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) yield this.pixels[i][j];
@@ -104,7 +90,7 @@ class Texture extends ImageType {
 		return;
 	}
 	blur(amount = 1) {
-		let newPixels = this.pixels.map((col, x) => col.map((color, y) => {
+		let newPixels = this.pixels.map((col, x, y) => {
 			let r = 0;
 			let g = 0;
 			let b = 0;
@@ -121,7 +107,7 @@ class Texture extends ImageType {
 			b /= 9;
 			a /= 9;
 			return new Color(r, g, b, a);
-		}));
+		});
 		this.pixels = newPixels;
 		this.updateImageData();
 	}
@@ -259,6 +245,8 @@ class Texture extends ImageType {
 					acc = "";
 				}
 			}
+			//fix pixels
+			result.multiDimensional = true;
 			tex.pixels = result;
 			tex.updateImageData();
 			return tex;

@@ -45,12 +45,18 @@ Array.prototype.pushArray = function (arr) {
 };
 Array.prototype.map = function (fn, ...coords) {
 	let result = [];
-	if (this.length && Array.isArray(this[0]) && this.multiDimensional) {
+	if (this.length && this.multiDimensional) {
 		result.multiDimensional = true;
-		for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...[...coords, i]));
+		for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...coords, i));
 	} else if (this.length)
 		for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
 	return result;
+};
+Array.prototype.forEach = function (fn, ...coords) {
+	if (this.length && this.multiDimensional) {
+		for (let i = 0; i < this.length; i++) this[i].forEach(fn, ...coords, i);
+	} else if (this.length)
+		for (let i = 0; i < this.length; i++) fn(this[i], ...coords, i);
 };
 Array.prototype.flatten = function () {
 	if (this.length) {

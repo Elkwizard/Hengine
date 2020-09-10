@@ -1,13 +1,7 @@
 class Geometry {
     static gridToPolygons(srcGrid, CELL_SIZE) {
         
-        let grid = [];
-        for (let i = 0; i < srcGrid.length; i++) {
-            grid.push([]);
-            for (let j = 0; j < srcGrid[0].length; j++) {
-                grid[i].push(srcGrid[i][j]);
-            }
-        }
+        let grid = srcGrid.map(v => v);
 
 
         //methods
@@ -63,20 +57,8 @@ class Geometry {
 
 
 
-        let pathGrid = [];
-        for (let i = 0; i < grid.length + 1; i++) {
-            pathGrid.push([]);
-            for (let j = 0; j < grid[0].length + 1; j++) {
-                pathGrid[i].push(null);
-            }
-        }
-        let pointGrid = [];
-        for (let i = 0; i < grid.length + 1; i++) {
-            pointGrid.push([]);
-            for (let j = 0; j < grid[0].length + 1; j++) {
-                pointGrid[i].push(null);
-            }
-        }
+        let pathGrid = Array.dim(grid.length + 1, grid[0].length + 2);
+        let pointGrid = Array.dim(grid.length + 1, grid[0].length + 2);
         let startingPoints = [];
 
         for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
@@ -93,7 +75,6 @@ class Geometry {
                 if (!C) set(pathGrid, i + 1, j + 1, Vector2.left);
                 if (!D) set(pathGrid, i, j + 1, Vector2.up);
 
-                const SUM = A + B + C + D;
 
                 const A_p = point(i, j - 1);
                 const B_p = point(i + 1, j);

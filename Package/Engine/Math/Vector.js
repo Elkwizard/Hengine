@@ -1,12 +1,6 @@
 class Matrix {
 	constructor(height, width) {
-		this.cols = [];
-		for (let i = 0; i < width; i++) {
-			this.cols.push([]);
-			for (let j = 0; j < height; j++) {
-				this.cols[i].push(0);
-			}
-		}
+		this.cols = Array.dim(width, height).map(() => 0);
 	}
 	get() {
 		let m = new this.constructor(this.cols[0].length, this.cols.length);
