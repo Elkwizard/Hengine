@@ -66,7 +66,7 @@ class Scene {
 		let collideAry = [];
 		let options = this.main.updateArray().filter(e => !(e instanceof ParticleObject));
 		for (let hitbox of options) {
-			let p = (hitbox instanceof UIObject) ? this.worldSpaceToScreenSpace(point) : point;
+			let p = (hitbox instanceof UIObject) ? this.camera.worldSpaceToScreenSpace(point) : point;
 			let shapes = hitbox.getModels();
 			let colliding = false;
 			for (let shape of shapes) if (Geometry.overlapPoint(shape, p)) colliding = true;

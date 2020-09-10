@@ -586,7 +586,7 @@ class Geometry {
             let axes = [];
             poly = poly.vertices;
             for (let i = 0; i < poly.length; i++) {
-                axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normalize())
+                axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normal.normalize())
             }
             let col = true;
             for (let i = 0; i < axes.length; i++) {
