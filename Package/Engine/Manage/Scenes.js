@@ -62,6 +62,26 @@ class Scene {
 			if (!this.physicsEngine.isAsleep(rect.body)) rect.colliding.clear();
 		}
 	}
+	rayCast(origin, ray, shapes = this.main.elementArray) {
+		shapes = shapes.filter(shape => !(shape instanceof UIObject));
+		let bestDist = Infinity;
+		let hitShape = null;
+		let hit = null;
+		for (let shape of shapes) {
+			let models = shape.getModels();
+			let result = Geometry.rayCast(origin, ray, models);
+			if (result.hitPoint) {
+				let hp = result.hitPoint;
+				let dist = (hp.x - origin.x) ** 2 + (hp.y - origin.y) ** 2;
+				if (dist < bestDist) {
+					bestDist = dist;
+					hitShape = shape;
+					hit = hp;
+				}
+			}
+		}
+		return { hitPoint: hit, hitShape };
+	}
 	collidePoint(point) {
 		let collideAry = [];
 		let options = this.main.updateArray().filter(e => !(e instanceof ParticleObject));

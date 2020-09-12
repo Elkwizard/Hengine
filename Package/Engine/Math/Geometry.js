@@ -1,6 +1,6 @@
 class Geometry {
     static gridToPolygons(srcGrid, CELL_SIZE) {
-        
+
         let grid = srcGrid.map(v => v);
 
 
@@ -51,7 +51,7 @@ class Geometry {
                         broken = true;
                         grid[i - 1][j] = true;
                     }
-                }   
+                }
             }
         }
 
@@ -139,7 +139,7 @@ class Geometry {
         }
 
         // for (let points of polygons) c.stroke(cl.PURPLE, 2).shape(...points);
-        return polygons.map(poly => new Polygon(poly, true));       
+        return polygons.map(poly => new Polygon(poly, true));
     }
     static reimann(fn, a, b, iter = 1000, RRAM = false) {
         let sum = 0;
@@ -238,28 +238,80 @@ class Geometry {
     static projectPointOntoLine(p, d) {
         return p.x * d.x + p.y * d.y;
     }
-    static rayCastPolygons(rayOrigin, rayDir, polygons) {
-        let lines = [];
-        for (let i = 0; i < polygons.length; i++) lines.push(...polygons[i].getEdges());
-        return Geometry.rayCastLines(rayOrigin, rayDir, lines);
-    }
-    static rayCastLines(rayOrigin, rayDir, lines) {
-        let result = null;
-        let outOfBounds = true;
-        let minDist = Infinity;
-        for (let l of lines) {
-            let clos = Geometry.closestPointOnLineObjectInDirectionLimited(rayOrigin, rayDir, l);
-            if (!clos.outOfBounds) {
-                let p = clos.result;
-                let dist = Geometry.distToPoint2(p, rayOrigin);
-                if (dist < minDist) {
-                    minDist = dist;
-                    outOfBounds = false;
-                    result = clos.result;
+    static rayCast(p, r, shapes) {
+        let hit = null;
+        let hitShape = null;
+        let bestDist = Infinity;
+        const EPSILON = 0.0001;
+        for (let shape of shapes) {
+            let nHit = null;
+            if (shape instanceof Circle) {
+                let normal = r.normal;
+                let proj_P = normal.dot(p);
+                let proj_C = normal.dot(shape);
+                if (Math.abs(proj_P - proj_C) < shape.radius && p.minus(shape).dot(r) <= 0) {
+                    let t = (proj_C + shape.radius - proj_P) / (shape.radius * 2);
+                    let upVec = r.times(-1);
+                    let crossVec = upVec.normal;
+                    let baseP = shape.middle.sub(crossVec.times(shape.radius)).add(crossVec.times(t * shape.radius * 2));
+                    let y = Math.sqrt(1 - (2 * t - 1) ** 2);
+                    baseP.add(upVec.times(y * shape.radius));
+                    if (baseP.minus(p).dot(r) >= 0) nHit = baseP;
+                }
+            } else if (shape instanceof Polygon) {
+                let edges = shape.getEdges();
+                let bestDist = Infinity;
+                let bestPoint = null;
+                edges = edges.filter(edge => {
+                    let n = edge.vector.normal;
+                    return n.dot(r) >= 0 && Math.max(edge.a.minus(p).dot(r), edge.b.minus(p).dot(r)) > 0;
+                });
+                let normal = r.normal;
+                let dx = r.x;
+                let dy = r.y || EPSILON;
+                let b = p.y - p.x * dy / dx;
+                for (let edge of edges) {
+                    let proj_P = normal.dot(p);
+                    let proj_A = normal.dot(edge.a);
+                    let proj_B = normal.dot(edge.b);
+                    [proj_A, proj_B] = [Math.min(proj_A, proj_B), Math.max(proj_A, proj_B)];
+                    if (proj_P >= proj_A && proj_P <= proj_B) {
+                        let vec = edge.vector;
+                        let dx2 = vec.x || EPSILON;
+                        let dy2 = vec.y || EPSILON;
+                        let b2 = edge.a.y - edge.a.x * dy2 / dx2;
+                        let x, y;
+                        if (Math.abs(dx) > EPSILON) {
+                            // dy / dx * x + b = dy2 / dx2 * x + b2
+                            // dy / dx * x - dy2 / dx2 * x = b2 - b
+                            // (dy / dx - dy2 / dx2) * x = b2 - b
+                            // x = (b2 - b) / (dy / dx - dy2 / dx2)
+                            x = (b2 - b) / (dy / dx - dy2 / dx2);
+                            y = dy / dx * x + b;
+                        } else {
+                            x = p.x;
+                            y = dy2 / dx2 * x + b2;
+                        }
+                        let dist = (x - p.x) ** 2 + (y - p.y) ** 2;
+                        if (dist < bestDist) {
+                            bestDist = dist;
+                            bestPoint = new Vector2(x, y);
+                        }
+
+                    }
+                    nHit = bestPoint;
+                }
+            }
+            if (nHit) {
+                let nDist = (nHit.x - p.x) ** 2 + (nHit.y - p.y) ** 2;
+                if (nDist < bestDist && nHit.minus(p).dot(r) >= 0) {
+                    hit = nHit;
+                    bestDist = nDist;
+                    hitShape = shape;
                 }
             }
         }
-        return { result, outOfBounds };
+        return { hitPoint: hit, hitShape };
     }
     static closestPointOnLineObjectInDirection(p, d, l) {
         let x1 = p.x;
@@ -410,7 +462,7 @@ class Geometry {
 
         const INDEX_DATA = [];
         const CONVEX = [];
-        
+
         for (let i = 0; i < edges.length; i++) {
             const INX = i;
             const NEXT_INX = (i + 1) % edges.length;
@@ -435,7 +487,7 @@ class Geometry {
             const { INX, NEXT_INX, A, B, VEC_A, VEC_B, VERT_A, VERT_B, convex } = INDEX_DATA[CONCAVE_INX];
 
             const VERTEX = VERT_B;
-            
+
             const AWAY = VEC_A.minus(VEC_B).normalize();
 
             const SEGMENTS = [];
@@ -443,15 +495,15 @@ class Geometry {
                 if (i === INX) continue;
                 if (i === NEXT_INX) continue;
                 const EDGE = edges[i];
-                const TO_MIDDLE_A =  EDGE.a.minus(VERTEX);
-                const TO_MIDDLE_B =  EDGE.b.minus(VERTEX);
+                const TO_MIDDLE_A = EDGE.a.minus(VERTEX);
+                const TO_MIDDLE_B = EDGE.b.minus(VERTEX);
                 if (TO_MIDDLE_A.dot(AWAY) < 0 && TO_MIDDLE_B.dot(AWAY) < 0) continue;
                 SEGMENTS.push(edges[i]);
             }
             if (!SEGMENTS.length) return [vertices];
 
             const EPSILON = 0.00001;
-            
+
             const dx = AWAY.x || EPSILON;
             const dy = AWAY.y || EPSILON;
             const b = VERTEX.y - dy / dx * VERTEX.x;
@@ -474,11 +526,11 @@ class Geometry {
 
                 const INTERSECT = new Vector2(ix, iy);
                 const DOT = INTERSECT.minus(SEG.a).dot(SEG.vector);
-                
+
                 if (DOT > 0 && DOT < SEG_LENGTH) intersects.push({ point: INTERSECT, segment: SEG });
                 const SHIFT = SEG_VECTOR.times(SEG_LENGTH * 0.1);
                 if (!DOT) intersects.push({ point: INTERSECT.plus(SHIFT), segment: SEG });
-                if (DOT === SEG_LENGTH) intersects.push({ point: INTERSECT.minus(SHIFT), segment: SEG }); 
+                if (DOT === SEG_LENGTH) intersects.push({ point: INTERSECT.minus(SHIFT), segment: SEG });
             }
             if (intersects.length) {
                 const INTERSECT = intersects.sort((a, b) => a.point.minus(VERTEX).sqrMag - b.point.minus(VERTEX).sqrMag)[0];
@@ -505,7 +557,7 @@ class Geometry {
                 // renderer.stroke(cl.PURPLE, 4).shape(...polyA);
                 // renderer.stroke(cl.GREEN, 4).shape(...polyB);
                 // console.log(NEW_INX);
-                
+
                 // renderer.draw(cl.ORANGE).circle(INTERSECT.point, 5);
                 // renderer.draw(cl.YELLOW).circle(vertices[NEW_INX], 5);
 
@@ -525,7 +577,7 @@ class Geometry {
         // for (let edge of edges) {
         //  renderer.stroke(cl.YELLOW).arrow(edge);
         // }
-        
+
         return [vertices];
     }
     static getMiddle(verts) {
