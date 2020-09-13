@@ -36,10 +36,10 @@ class CardinalDirections extends Directions {
 }
 class AngleDirections extends Directions {
     constructor(angle, prec = 0.3) {
-        super(angle, prec);
+        super(prec);
         this.angle = angle;
     }
-    getRandomSpeed(v) {
+    getRandomSpeed() {
         let val = Math.random() * this.prec * 2 - this.prec;
         return Vector2.fromAngle(this.angle + val);
     }

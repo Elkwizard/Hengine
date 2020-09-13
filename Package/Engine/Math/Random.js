@@ -39,6 +39,9 @@ class Random {
     static range(min = 0, max = 1) {
         return Random.random() * (max - min) + min;
     }
+    static angle() {
+        return Random.random() * 2 * Math.PI;
+    }
     static seedRand(seed) {
         seed += 1e5;
         let a = (seed * 6.12849) % 8.7890975
