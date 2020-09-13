@@ -70,12 +70,8 @@ class Shape extends Operable {
 		//return the smallest rectangle that contains the shape
 		return new Rect(0, 0, 0, 0);
 	}
-	getModel(pos, rot) {
+	getModel(transf) {
 		//return the world space model of the relative shape
-		return new Shape(0);
-	}
-	getModelCosSin(pos, cos, sin) {
-		//get model with precalculated values
 		return new Shape(0);
 	}
 	center(pos) {
@@ -138,10 +134,10 @@ class Polygon extends Shape {
 		let maxY = Math.max(...y);
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
-	getModel(pos, rot) {
-		return this.getModelCosSin(pos, Math.cos(rot), Math.sin(rot));
-	}
-	getModelCosSin(pos, cos, sin) {
+	getModel(transf) {
+		let pos = transf.position;
+		let cos = transf.cosRotation;
+		let sin = transf.sinRotation;
 		let verts = this.getCorners();
 		let m_sin = sin;
 		let m_cos = cos;
@@ -295,10 +291,10 @@ class Circle extends Shape {
 	get middle() {
 		return new Vector2(this.x, this.y);
 	}
-	getModel(pos, rot) {
-		return this.getModelCosSin(pos, Math.cos(rot), Math.sin(rot));
-	}
-	getModelCosSin(pos, cos, sin) {
+	getModel(transf) {
+		let pos = transf.position;
+		let cos = transf.cosRotation;
+		let sin = transf.sinRotation;
 		let t_x = this.x * cos - this.y * sin + pos.x;
 		let t_y = this.x * sin + this.y * cos + pos.y;
 		return new Circle(t_x, t_y, this.radius);

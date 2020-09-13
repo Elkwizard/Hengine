@@ -95,9 +95,10 @@ class ParticleSpawnerObject extends SceneObject {
 }
 class ParticleObject extends SceneObject {
     constructor(spawner, home, name) {
-        super(name, spawner.x, spawner.y, false, "Engine-Particle", home);
+        super(name, spawner.transform.position.x, spawner.transform.position.y, false, "Engine-Particle", home);
         this.cullGraphics = false;
         this.velocity = Vector2.origin;
+        this.angularVelocity = 0;
         this.spawner = spawner;
         this.draw = function () { };
         this.drawPrefix = function () { };
@@ -152,9 +153,11 @@ class ParticleObject extends SceneObject {
         }
         if (this.spawner.particleSlows) {
             this.velocity.Nmul(this.home.scene.physicsEngine.linearDrag);
+            this.angularVelocity *= this.home.scene.physicsEngine.linearDrag;
         }
-        this.x += this.velocity.x * 2;
-        this.y += this.velocity.y * 2;
+        this.transform.position.x += this.velocity.x * 2;
+        this.transform.position.y += this.velocity.y * 2;
+        this.transform.rotation += this.angularVelocity;
         if (this.lifeSpan > this.spawner.particleLifeSpan) {
             this.remove();
         }

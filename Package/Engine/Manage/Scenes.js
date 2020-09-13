@@ -110,10 +110,18 @@ class Scene {
 		let phys = this.main.getPhysicsElements();
 		this.clearCollisions(phys);
 		this.updatePreviousData(this.main.elementArray);
+		this.beforePhysicsStep(phys);
 		this.physicsEngine.run();
+		this.afterPhysicsStep(phys);
 		if (this.collisionEvents) this.handleCollisionEvents(phys);
 		this.physicsObjectFixedUpdate(this.main.elementArray);
 		this.main.endUpdate();
+	}
+	beforePhysicsStep(phys) {
+		for (let el of phys) el.beforePhysicsStep();
+	}
+	afterPhysicsStep(phys) {
+		for (let el of phys) el.afterPhysicsStep();
 	}
 	handleCollisionEvents(useful) {
 		const types = [["left", "CollideLeft"], ["right", "CollideRight"], ["top", "CollideTop"], ["bottom", "CollideBottom"], ["general", "CollideGeneral"]];
@@ -122,7 +130,10 @@ class Scene {
 			for (let type of types) {
 				let last = rect.lastColliding[type[0]];
 				let col = rect.colliding[type[0]];
-				if (col && last) for (let body of col) if (!last.includes(body)) rect.scripts.run(type[1], body);
+				if (col && last) {
+					last = last.map(cd => cd.element);
+					for (let body of col) if (!last.includes(body.element)) rect.scripts.run(type[1], body);
+				}
 			}	
 			rect.lastColliding.extract(rect.colliding);
 		}

@@ -84,22 +84,25 @@ class ElementContainer {
 	copy(el) {
 		let n;
 		if (el instanceof ParticleSpawnerObject) {
-			n = this.addParticleSpawner(el.name + " - copy", el.x, el.y, el.particleSize, el.particleInitSpeed, el.particleDelay, el.particleLifeSpan, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
+			n = this.addParticleSpawner(el.name + " - copy", 0, 0, el.particleSize, el.particleInitSpeed, el.particleDelay, el.particleLifeSpan, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
 			n.particleSlows = el.particleSlows;
 			n.particleFades = el.particleFades;
 			n.particleFalls = el.particleFalls;
 			n.active = el.active;
 		} else if (el instanceof UIObject) {
-			n = this.addUI(el.name + " - copy", el.x, el.y, el.width, el.height);
+			n = this.addUI(el.name + " - copy", 0, 0, el.width, el.height);
 		} else if (el instanceof PhysicsObject) {
-			n = this.addPhysicsElement(el.name + " - copy", el.x, el.y, el.body.type === RigidBody.DYNAMIC, { ...el.controls }, el.tag);
+			n = this.addPhysicsElement(el.name + " - copy", 0, 0, el.body.type === RigidBody.DYNAMIC, { ...el.controls }, el.tag);
 			n.rotation = el.rotation;
 		} else {
-			n = this.addElement(el.name + " - copy", el.x, el.y, { ...el.controls }, el.tag);
+			n = this.addElement(el.name + " - copy", 0, 0, { ...el.controls }, el.tag);
 		}
+		n.transform = el.transform.get();
+		n.lastTransform = el.lastTransform.get();
 		let ser = el.serializeShapes();
 		n.parseShapes(ser);
 		el.runLog(n);
+		
 		return n;
 	}
 	hideElement(name) {

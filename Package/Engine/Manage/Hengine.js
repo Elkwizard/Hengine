@@ -320,7 +320,7 @@ class Hengine {
 		return ["PrototypeOverload"];
 	}
 	static get defaultRenderPackage() {
-		return ["Color", "Shapes", "Spline", "Gradient", "Animation", "Frame", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental", "Camera"];
+		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "Animation", "Frame", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental", "Camera"];
 	}
 	static get defaultManagementPackage() {
 		return ["Scripts", "ElementContainer", "Scenes", "Engine", "Hengine"];

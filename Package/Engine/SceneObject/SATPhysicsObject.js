@@ -34,27 +34,11 @@ class PhysicsObject extends SceneObject {
 
         this.shapeNameIDMap = new Map();
     }
-    get middle() {
-        return new Vector2(this.x, this.y);
-    }
-    set middle(a) {
-        this.x = a.x;
-        this.y = a.y;
-        this.body.position.x = a.x;
-        this.body.position.y = a.y;
-        this.body.invalidateModels();
-    }
     set snuzzlement(a) {
         this.body.restitution = 1 - a;
     }
     get snuzzlement() {
         return 1 - this.body.restitution;
-    }
-    set rotation(a) {
-        if (this.body) this.body.angle = a;
-    }
-    get rotation() {
-        return this.body && this.body.angle;
     }
     get mass() {
         return this.body.mass;
@@ -88,8 +72,8 @@ class PhysicsObject extends SceneObject {
         this.shapeSync();
     }
     positionSync() {
-        this.x = this.body.position.x;
-        this.y = this.body.position.y;
+        this.transform.position.x = this.body.position.x;
+        this.transform.position.y = this.body.position.y;
     }
     shapeSync() {
         this.shapeNameIDMap.clear();
@@ -146,24 +130,21 @@ class PhysicsObject extends SceneObject {
     immobilize() {
         this.body.type = RigidBody.STATIC;
     }
-    drawWithoutRotation(artist) {
-        let com = this.middle;
-        let rot = this.rotation;
-        c.translate(com);
-        c.rotate(-rot);
-        c.translate(com.inverse());
-        artist.bind(this)();
-        c.translate(com);
-        c.rotate(rot);
-        c.translate(com.inverse());
-    }
     engineFixedUpdate() {
         this.scripts.run("Update");
         this.update();
         this.positionSync();
     }
-    physicsUpdate() {
-        
+    beforePhysicsStep() {
+        this.body.position.x = this.transform.position.x;
+        this.body.position.y = this.transform.position.y;
+        this.body.angle = this.transform.rotation;
+        this.body.invalidateModels();
+    }
+    afterPhysicsStep() {
+        this.transform.position.x = this.body.position.x;
+        this.transform.position.y = this.body.position.y;
+        this.transform.rotation = this.body.angle;
     }
     moveTowards(point, ferocity = 1) {
         let dif = point.Vminus(this.middle);

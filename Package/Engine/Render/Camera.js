@@ -51,7 +51,7 @@ class Camera {
 	}
 	getWorld() {
 		let middle = this.middle;
-		let m = new Polygon(this.vertices.map(vert => vert.Vminus(middle))).getModelCosSin(middle, Math.cos(this.rotation), Math.sin(this.rotation));
+		let m = new Polygon(this.vertices.map(vert => vert.Vminus(middle))).getModel(new Transform(this.middle.x, this.middle.y, this.rotation));
 		m = m.scale(1 / this.zoom);
 		return m;
 	}

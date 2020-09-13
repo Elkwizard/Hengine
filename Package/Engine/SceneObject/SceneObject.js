@@ -34,14 +34,9 @@ class Controls {
 //Actual SceneObject
 class SceneObject {
 	constructor(name, x, y, controls, tag, home) {
-		this.x = x;
-		this.y = y;
-		this.lastMiddle = this.middle;
-        this.lastRotation = 0;
-		this.shapes = { };
-		this.rotation = 0;
-		this.__cosRot = 1;
-		this.__sinRot = 0;
+		this.transform = new Transform(x, y, 0);
+		this.lastTransform = this.transform.get();
+		this.shapes = {};
 		this.name = name;
 		this.home = home;
 		this.tag = tag;
@@ -83,13 +78,6 @@ class SceneObject {
 		this.removeShape("default");
 		this.addShape("default", a);
 	}
-	set middle(a) {
-		this.x = a.x;
-		this.y = a.y;
-	}
-	get middle() {
-		return new Vector2(this.x, this.y);
-	}
 	set width(a) {
 		let factor = a / this.width;
 		this.scale(factor);
@@ -105,8 +93,7 @@ class SceneObject {
 		return this.__height;
 	}
 	updatePreviousData() {
-        this.lastMiddle = this.middle;
-        this.lastRotation = this.rotation;
+		this.lastTransform = this.transform.get();
 	}
 	serializeShapes() {
 		let shapes = this.getShapes();
@@ -146,27 +133,20 @@ class SceneObject {
 		for (let shape of result) this.addShape(`Shape #${num++}`, shape);
 		return result;
 	}
-	cacheRotation() {
-		this.__cosRot = Math.cos(this.rotation);
-		this.__sinRot = Math.sin(this.rotation);
-	}
 	cacheDimensions() {
-		let old_rot = this.rotation;
-		this.rotation = 0;
+		let old_rot = this.transform.rotation;
+		this.transform.rotation = 0;
 		let bound = this.getBoundingBox();
 		this.__width = bound.width;
 		this.__height = bound.height;
-		this.rotation = old_rot;
+		this.transform.rotation = old_rot;
 	}
 	cacheBoundingBoxes() {
 		this.__boundingBox = this.getBoundingBox();
 	}
 	getModels() {
-		let pos = this.middle;
-		let cos = this.__cosRot;
-		let sin = this.__sinRot;
 		let result = [];
-		for (let name in this.shapes) result.push(this.shapes[name].getModelCosSin(pos, cos, sin));
+		for (let name in this.shapes) result.push(this.shapes[name].getModel(this.transform));
 		return result;
 	}
 	getBoundingBox() {
@@ -189,19 +169,6 @@ class SceneObject {
 		this.shapes[name] = shape;
 		this.cacheDimensions();
 	}
-	rotateAround(point, rotation) {
-		let dif = this.middle.minus(point);
-		dif.rotate(rotation);
-		dif.add(point);
-		this.middle = dif;
-		this.rotation += rotation;
-	}
-	worldSpaceToModelSpace(v) {
-		return v.Vminus(this.middle).rotate(-this.rotation);
-	}
-	modelSpaceToWorldSpace(v) {
-		return v.rotated(this.rotation).Vplus(this.middle);
-	}
 	centerModels() {
 		let center = Vector2.origin;
 		let shapes = this.getShapes();
@@ -213,7 +180,7 @@ class SceneObject {
 		}
 		center.Ndiv(totalArea);
 		let dif = center.inverse();
-		for (let name in this.shapes) 
+		for (let name in this.shapes)
 			this.shapes[name] = this.shapes[name].move(dif);
 	}
 	removeShape(name) {
@@ -234,7 +201,7 @@ class SceneObject {
 		return this.shapes[name];
 	}
 	getModel(name) {
-		return this.shapes[name].getModelCosSin(this.middle, this.__cosRot, this.__sinRot);
+		return this.shapes[name].getModel(this.transform);
 	}
 	reorderShapes(order) {
 		let shapes = this.getShapes();
@@ -277,10 +244,6 @@ class SceneObject {
 			this.show();
 		});
 	}
-	position(p) {
-		this.x = p.x;
-		this.y = p.y;
-	}
 	logMod(func) {
 		this.log.push(func);
 	}
@@ -292,32 +255,14 @@ class SceneObject {
 		for (let x of this.log) x.bind(el)();
 		return el;
 	}
-	drawInModelSpace(artist) {
-		c.save();
-		let middle = this.middle;
-		c.translate(middle);
-		c.rotate(this.rotation);
-		artist();
-		c.restore();
-	}
-	drawInWorldSpace(artist) {
-		c.save();
-		c.rotate(-this.rotation);
-		c.translate(-this.x, -this.y);
-		artist();
-		c.restore();
-	}
 	runDraw() {
-		let middle = this.middle;
-		c.translate(middle);
-		c.rotate(this.rotation);
-		for (let name in this.shapes) {
-			let shape = this.shapes[name];
-			this.draw(name, shape);
-			this.scripts.run("Draw", name, shape);
-		}
-		c.rotate(-this.rotation);
-		c.translate(-middle.x, -middle.y);
+		this.transform.drawInModelSpace(() => {
+			for (let name in this.shapes) {
+				let shape = this.shapes[name];
+				this.draw(name, shape);
+				this.scripts.run("Draw", name, shape);
+			}
+		});
 	}
 	engineDrawUpdate(screen) {
 		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, screen);
@@ -325,7 +270,7 @@ class SceneObject {
 			this.runDraw();
 		}
 		// else console.log(1);
-		// s.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
+		// s.camera.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
 		// s.drawInScreenSpace(e => c.stroke(cl.RED, 1).rect(screen));
 		this.scripts.run("EscapeDraw");
 	}
@@ -338,7 +283,6 @@ class SceneObject {
 	}
 	updateCaches() {
 		this.cacheBoundingBoxes();
-		this.cacheRotation();
 	}
 	pushToRemoveQueue(x) {
 		return null;
