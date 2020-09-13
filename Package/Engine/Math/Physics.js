@@ -699,7 +699,7 @@ class CollisionDetector {
         let contacts = intersections
             .map(contact => {
                 let dot = PhysicsVector.dot(contact, bestAxis);
-                let pen = Math.abs(rMax - dot + rMin);
+                let pen = rMin + rMax - Math.abs(dot - (rMin + rMax) / 2);
                 return new CollisionDetector.Contact(contact, pen || 1);
             });
 
@@ -926,7 +926,7 @@ class PhysicsEngine {
         this.friction = 0.8;
         this.constraints = [];
         this.constraintIterations = 3;
-        this.oncollide = (a, b, dir) => null;
+        this.oncollide = (a, b, dir, contacts) => null;
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
         this.sleepDuration = 15;
@@ -989,7 +989,7 @@ class PhysicsEngine {
         if (STATIC) {
             body.prohibitedDirections.push(collisionDirection);
         }
-        this.oncollide(body, body2, collisionDirection);
+        this.oncollide(body, body2, collisionDirection, contacts);
         if (body.isTrigger || body2.isTrigger) return;
         if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
         else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);

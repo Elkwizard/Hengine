@@ -48,12 +48,13 @@ class Scene {
 		window[name] = new ElementScript(name, opts);
 		return window[name];
 	}
-	handleCollisionEvent(a, b, direction) {
+	handleCollisionEvent(a, b, direction, contacts) {
 		let A = a.userData.sceneObject;
 		let B = b.userData.sceneObject;
 		if (A && B && this.collisionEvents) {
-			A.colliding.add(B, Vector2.fromPhysicsVector(direction));
-			B.colliding.add(A, Vector2.fromPhysicsVector(direction).inverse());
+			contacts = contacts.map(v => Contact.fromPhysicsContact(v));
+			A.colliding.add(B, Vector2.fromPhysicsVector(direction), contacts);
+			B.colliding.add(A, Vector2.fromPhysicsVector(direction).inverse(), contacts);
 		}
 	}
 	clearCollisions(phys) {
@@ -124,14 +125,6 @@ class Scene {
 				if (col && last) for (let body of col) if (!last.includes(body)) rect.scripts.run(type[1], body);
 			}	
 			rect.lastColliding.extract(rect.colliding);
-		}
-	}
-	handleCollisionEvent(a, b, direction) {
-		let A = a.userData.sceneObject;
-		let B = b.userData.sceneObject;
-		if (A && B && this.collisionEvents) {
-			A.colliding.add(B, Vector2.fromPhysicsVector(direction));
-			B.colliding.add(A, Vector2.fromPhysicsVector(direction).inverse());
 		}
 	}
 	constrain(a, b, ap = Vector2.origin, bp = Vector2.origin, str = "CURRENT_DIST") {

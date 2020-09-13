@@ -22,8 +22,8 @@ class PhysicsObject extends SceneObject {
         this.optimize = other => true;
         this.hasCollideRule = false;
         //data
-        this.colliding = new CollisionMoniter();
-        this.lastColliding = new CollisionMoniter();
+        this.colliding = new CollisionMonitor();
+        this.lastColliding = new CollisionMonitor();
         this.response.collide = {
             general: function () { },
             top: function () { },
