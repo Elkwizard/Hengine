@@ -104,7 +104,7 @@ class Hengine {
 			});
 		}
 		window.custom = this.custom;
-		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "fileExists", "save", "get", "fileSize", "packageFiles", "importPackage", "getRaw", "saveRaw", "setTitle", "setCursor"];
+		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "fileExists", "save", "get", "deleteFile", "getAllFiles", "fileSize", "packageFiles", "importPackage", "getRaw", "saveRaw", "setTitle", "setCursor"];
 		for (let EXP of EXPORT) {
 			window[EXP] = this[EXP].bind(this);
 		}
@@ -148,7 +148,8 @@ class Hengine {
 			STRING_ARRAY: str => str.split(","),
 			OBJECT: str => JSON.parse(str),
 			BOOLEAN: str => str === "true",
-			IMAGE: str => Texture.fromString(str)
+			IMAGE: str => Texture.fromString(str),
+			GRAY_MAP: str => GrayMap.fromString(str)
 		};
 		this.fileAliases = {
 			NUMBER: ["num", "int", "float", "double"],
@@ -157,7 +158,8 @@ class Hengine {
 			STRING_ARRAY: ["str_ary", "str_array"],
 			OBJECT: ["obj", "col"],
 			BOOLEAN: ["bln", "bool"],
-			IMAGE: ["img", "png", "jpg", "jpeg", "bmp", "txr"]
+			IMAGE: ["img", "png", "jpg", "jpeg", "bmp", "txr"],
+			GRAY_MAP: ["gray_map", "grm"]
 		};
 		for (let type in this.fileAliases) {
 			for (let alt of this.fileAliases[type]) {
@@ -251,15 +253,15 @@ class Hengine {
 		}
 		return type.toUpperCase();
 	}
+	getFilePath(file, loc) {
+		return "HengineLocalSaves/" + loc + "/" + file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
+	}
 	saveRaw(file, data, loc = this.getProjectName()) {
-		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
-		LocalFileSystem.put("HengineLocalSaves/" + loc + "/" + name, data);
+		LocalFileSystem.put(this.getFilePath(file, loc), data);
 		return data;
 	}
 	getRaw(file, loc = this.getProjectName()) {
-		let name = file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
-		let dat = LocalFileSystem.get("HengineLocalSaves/" + loc + "/" + name);
-		return dat;
+		return LocalFileSystem.get(this.getFilePath(file, loc));
 	}
 	fileExists(file, loc = this.getProjectName()) {
 		return this.getRaw(file, loc) !== undefined;
@@ -277,6 +279,20 @@ class Hengine {
 		if (data) {
 			return data.length * 8;
 		}
+	}
+	getAllFiles() {
+		let files = LocalFileSystem.getAllFiles().map(file => {
+			let inx = file.indexOf("/") + 1;
+			let nFile = file.slice(inx);
+			let inx2 = nFile.indexOf("/");
+			let loc = nFile.slice(0, inx2);
+			let fileName = nFile.slice(inx2 + 1);
+			return { location: loc, file: fileName };
+		});
+		return files;
+	}
+	deleteFile(file, loc = this.getProjectName()) {
+		LocalFileSystem.clear(this.getFilePath(file, loc));
 	}
 	get(file, loc = this.getProjectName()) {
 		let dat = this.getRaw(file, loc);
@@ -320,7 +336,7 @@ class Hengine {
 		return ["PrototypeOverload"];
 	}
 	static get defaultRenderPackage() {
-		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "Animation", "Frame", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental", "Camera"];
+		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "Animation", "Frame", "GrayMap", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental", "Camera"];
 	}
 	static get defaultManagementPackage() {
 		return ["Scripts", "ElementContainer", "Scenes", "Engine", "Hengine"];

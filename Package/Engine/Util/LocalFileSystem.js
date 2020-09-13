@@ -11,6 +11,21 @@ class LocalFileSystem {
 	static clearAll() {
 		localStorage.clear();
 	}
+	static getAllFiles() {
+		let files = [];
+		let header = LocalFileSystem.header;
+		for (let key in localStorage) {
+			if (key.indexOf(header) > -1) {
+				let act_key = key.slice(header.length);
+				let inx = act_key.length - 1;
+				while (act_key[inx].match(/\d/g)) inx--;
+				inx -= 4;
+				act_key = act_key.slice(0, inx);
+				if (!files.includes(act_key)) files.push(act_key);
+			}
+		}
+		return files;
+	}
 	static clear(key) {
 		let prev = LocalFileSystem.header + key;
 		let value = "";
@@ -50,9 +65,11 @@ class LocalFileSystem {
 				let value = v[0];
 				localStorage[K] = value;
 			}
+			return true;
 		} catch (e) {
 			LocalFileSystem.clear(key);
 			console.warn("File '" + key + "' was to big. It was erased.");
+			return false;
 		}
 	}
 	static get(key) {
@@ -68,5 +85,12 @@ class LocalFileSystem {
 			}
 		} while (localStorage[name] !== undefined);
 		return LocalFileSystem.decompress(value);
+	}
+	static getRemainingSpace() {
+		let key = "FILE_SIZE_CHECK";
+		let data = "";
+		let inc = "#".repeat(10000);
+		while (LocalFileSystem.put(key, data)) data += inc;
+		return (data.length / 512).toMaxed(1) + "kb";
 	}
 }

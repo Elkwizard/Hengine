@@ -113,6 +113,7 @@ class ParticleObject extends SceneObject {
         let varianceVector = new Vector2(sp.particleSpeedVariance, 0);
         varianceVector.angle = Math.random() * 2 * Math.PI;
         let vel = sp.particleDirections.getRandomSpeed().times(sp.particleInitSpeed).plus(varianceVector);
+        vel.rotate(sp.transform.rotation);
         this.velocity = vel;
         this.layer = sp.layer;
         

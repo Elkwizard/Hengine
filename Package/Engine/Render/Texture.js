@@ -33,7 +33,7 @@ class Texture extends ImageType {
 		}
 		function toString(tex) {
 			let result = tex.width + "," + tex.height + ":";
-			for (let col of tex.pixels) result += column(col);
+			for (let i = 0; i < tex.pixels.length; i++) result += column(tex.pixels[i]);
 			return result;
 		}
 		return toString(this);
