@@ -147,8 +147,7 @@ class ParticleObject extends SceneObject {
         this.scripts.run("EscapeDraw");
     }
     engineFixedUpdate() {
-        this.lastX = this.x;
-        this.lastY = this.y;
+        this.lastTransform = this.transform.get();
         if (this.spawner.particleFalls) {
             this.velocity.y += this.home.scene.gravity.y;
         }
