@@ -47,7 +47,7 @@ class Camera {
 		this.zoom /= 1 + amount;
 	}
 	createView() {
-		this.newView = new this.RenderType(width, height);
+		this.newView = new Frame(width, height);
 	}
 	getWorld() {
 		let middle = this.middle;

@@ -34,7 +34,7 @@ class Interpolation {
 }
 class Random {
     static random() {
-        return Random.seedRand(this.seed++);
+        return Random.seedRand(Random.seed++);
     }
     static range(min = 0, max = 1) {
         return Random.random() * (max - min) + min;
@@ -59,7 +59,7 @@ class Random {
         return n / scl;
     }
     static choice(arr) {
-        return arr[Random.random() * arr.length];
+        return arr[Math.floor(Random.random() * arr.length)];
     }
     static noiseTCorrect(t) {
         return Interpolation.smoothT(t);

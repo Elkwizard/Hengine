@@ -160,7 +160,6 @@ class Scene {
 		}
 	}
 	addCamera(name, camera) {
-		name = this.genName(this.cameras, name);
 		this.cameras[name] = camera;
 		return this.cameras[name];
 	}

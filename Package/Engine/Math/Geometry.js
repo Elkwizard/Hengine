@@ -124,6 +124,7 @@ class Geometry {
             let current = start.get();
             let points = [];
             let lastArrow = null;
+            let counter = false;
             do {
                 let v = pathGrid[~~current.x][~~current.y];
                 if (!v) break;
@@ -135,11 +136,11 @@ class Geometry {
                     startingPoints.splice(startingPoints.indexOf(found), 1);
                 }
             } while (!current.equals(start));
-            if (points.length) polygons.push(points);
+            if (points.length && !counter) polygons.push(points);
         }
 
         // for (let points of polygons) c.stroke(cl.PURPLE, 2).shape(...points);
-        return polygons.map(poly => new Polygon(poly, true));
+        return polygons.filter(poly => Geometry.isClockwise(poly));
     }
     static reimann(fn, a, b, iter = 1000, RRAM = false) {
         let sum = 0;
@@ -573,19 +574,57 @@ class Geometry {
 
             // renderer.draw(convex ? cl.RED : cl.GREEN).circle(VERT_B, 3);
         } else return [vertices];
-
-        // for (let edge of edges) {
-        //  renderer.stroke(cl.YELLOW).arrow(edge);
-        // }
-
-        return [vertices];
     }
     static getMiddle(verts) {
         return Vector2.sum(verts).over(verts.length);
     }
+    static isClockwise(verts) {
+        //DAD_ALG
+        if (verts.length < 3) return true;
+        let bestY = Infinity;
+        let best = null;
+        for (let i = 0; i < verts.length; i++) {
+            if (verts[i].y < bestY) {
+                bestY = verts[i].y;
+                best = verts[i];
+            }
+        }
+        if (!best) return true;
+        let greater = false;
+        for (let i = 0; i < verts.length; i++) {
+            if (verts[i].x > best.x) {
+                greater = true;
+                break;
+            }
+        }
+        let inxA = (verts.indexOf(best) + 1) % verts.length;
+        if (greater) {
+            let nextBestY = Infinity;
+            let nextBest = null;
+            for (let i = 0; i < verts.length; i++) {
+                if (verts[i] !== best && verts[i].y < nextBestY && verts[i].x > best.x) {
+                    nextBestY = verts[i].y;
+                    nextBest = verts[i];
+                }
+            }
+            let inxB = verts.indexOf(nextBest);
+            return inxA === inxB;
+        } else {
+            let nextBestY = Infinity;
+            let nextBest = null;
+            for (let i = 0; i < verts.length; i++) {
+                if (verts[i] !== best && verts[i].y < nextBestY) {
+                    nextBestY = verts[i].y;
+                    nextBest = verts[i];
+                }
+            }
+            for (let i = 0; i < verts.length; i++)
+                if (verts[i] !== best && verts[i].x > nextBest.x && i === inxA) return true;
+            return false;
+        }
+    }
     static clockwise(verts) {
-        let middle = Geometry.getMiddle(verts);
-        return verts.map(e => e.minus(middle)).sort((a, b) => a.getAngle() - b.getAngle()).map(e => e.plus(middle));
+        return Geometry.isClockwise(verts) ? verts : [...verts].reverse();
     }
     static vertexDirection(verts) {
         let middle = Geometry.getMiddle(verts);
