@@ -37,6 +37,7 @@ class SceneObject {
 		this.transform = new Transform(x, y, 0);
 		this.lastTransform = this.transform.get();
 		this.shapes = {};
+		this.graphicalBoundingBox = null;
 		this.name = name;
 		this.home = home;
 		this.tag = tag;
@@ -265,7 +266,7 @@ class SceneObject {
 		});
 	}
 	engineDrawUpdate(screen) {
-		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, screen);
+		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox || this.__boundingBox, screen);
 		if (!this.hidden && this.onScreen) {
 			this.runDraw();
 		}

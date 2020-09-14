@@ -257,6 +257,20 @@ class Rect extends Polygon {
 			this.height = max.y - min.y;
 		}
 	}
+	static composeBoundingBoxes(boxes) {
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
+		for (let i = 0; i < boxes.length; i++) {
+			let box = boxes[i];
+			if (box.x < minX) minX = box.x;
+			if (box.y < minY) minY = box.y;
+			if (box.x + box.width > maxX) maxX = box.x + box.width;
+			if (box.y + box.height > maxY) maxY = box.y + box.height;
+		}
+		return new Rect(minX, minY, maxX - minX, maxY - minY);
+	}
 	getBoundingBox() {
 		return new Rect(this.x, this.y, this.width, this.height);
 	}
