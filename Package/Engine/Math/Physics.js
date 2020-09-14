@@ -356,6 +356,7 @@ class RigidBody {
 
         this.canRotate = true;
         this.isTrigger = false;
+        this.simulated = true;
 
         this.invalidateModels();
     }
@@ -1085,6 +1086,10 @@ class PhysicsEngine {
         return PhysicsVector.mag(body.velocity) < 0.1 && Math.abs(body.angularVelocity) < 0.01;
     }
     run() {
+        //remove unsimulated
+        let backupBodies = this.bodies;
+        this.bodies = this.bodies.filter(body => body.simulated);
+
         let dynBodies = this.bodies.filter(body => body.type === RigidBody.DYNAMIC);
         this.clearCollidingBodies();
         const collisionPairs = this.createGrid(dynBodies);
@@ -1114,6 +1119,9 @@ class PhysicsEngine {
             let body = dynBodies[i];
             if (this.isAsleep(body)) for (let j = 0; j < body.collidingBodies.length; j++) if (!body.collidingBodies[j].sleeping) body.wake();
         }
+        
+        //add back unsimulated
+        this.bodies = backupBodies;
     }
     getBody(id) {
         for (let i = 0; i < this.bodies.length; i++) {

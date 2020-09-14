@@ -14,6 +14,10 @@ class Transform {
 	get() {
 		return new Transform(this.position.x, this.position.y, this.rotation);
 	}
+	dif(transf) {
+		const EPSILON = 0.001;
+		return Math.abs(this.position.x - transf.position.x) > EPSILON || Math.abs(this.position.y - transf.position.y) > EPSILON || Math.abs(this.rotation - transf.rotation) > EPSILON;
+	}
 	rotateAround(point, rotation) {
 		let dif = this.position.minus(point);
 		dif.rotate(rotation);

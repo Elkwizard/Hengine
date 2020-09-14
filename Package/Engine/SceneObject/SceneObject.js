@@ -43,6 +43,7 @@ class SceneObject {
 		this.tag = tag;
 		this.controls = controls;
 		this.hidden = false;
+		this.onScreen = false;
 		this.update = function () { };
 		this.draw = function (shape) { };
 		this.custom = {};
@@ -143,7 +144,7 @@ class SceneObject {
 		this.transform.rotation = old_rot;
 	}
 	cacheBoundingBoxes() {
-		this.__boundingBox = this.getBoundingBox();
+		if (this.transform.dif(this.lastTransform)) this.__boundingBox = this.getBoundingBox();
 	}
 	getModels() {
 		let result = [];
@@ -269,7 +270,8 @@ class SceneObject {
 		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox || this.__boundingBox, screen);
 		if (!this.hidden && this.onScreen) {
 			this.runDraw();
-		}
+			this.onScreen = true;
+		} else this.onScreen = false;
 		// else console.log(1);
 		// s.camera.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
 		// s.drawInScreenSpace(e => c.stroke(cl.RED, 1).rect(screen));
