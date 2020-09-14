@@ -167,7 +167,7 @@ class Scene {
 		return this.cameras[name];
 	}
 	renderCamera(camera) {
-		let screen = camera.getWorld().getBoundingBox();
+		let screen = camera.getScreen();
 
 		if (camera !== this.camera) {
 			camera.createView();

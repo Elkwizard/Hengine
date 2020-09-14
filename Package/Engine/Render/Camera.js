@@ -55,6 +55,9 @@ class Camera {
 		m = m.scale(1 / this.zoom);
 		return m;
 	}
+	getScreen() {
+		return this.getWorld().getBoundingBox();
+	}
 	updateView(width, height) {
 		this.view.width = width;
 		this.view.height = height;
