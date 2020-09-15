@@ -14,7 +14,7 @@ class Scene {
 		this.camera = new Camera(0, 0, this.renderer.width, this.renderer.height, 1, 0);
 		this.home.mouse.onDown.listen(function (e) {
 			let adjusted = this.camera.screenSpaceToWorldSpace(e);
-			let collided = this.collidePoint(adjusted);
+			let collided = this.collidePoint(adjusted, false);
 			if (this.mouseEvents) for (let o of collided) {
 				o.response.click(adjusted);
 				o.scripts.run("Click", adjusted);
@@ -22,7 +22,7 @@ class Scene {
 		}.bind(this), true);
 		this.home.mouse.onRight.listen(function (e) {
 			let adjusted = this.camera.screenSpaceToWorldSpace(e);
-			if (this.mouseEvents) for (let o of this.collidePoint(adjusted)) {
+			if (this.mouseEvents) for (let o of this.collidePoint(adjusted, false)) {
 				o.response.rightClick(adjusted);
 				o.scripts.run("RightClick", adjusted);
 			}
@@ -30,7 +30,7 @@ class Scene {
 		this.home.mouse.onMove.listen(function (e) {
 			let adjusted = this.camera.screenSpaceToWorldSpace(e);
 			if (this.mouseEvents) {
-				let collided = this.collidePointBoth(adjusted);
+				let collided = this.collidePointBoth(adjusted, false);
 				for (let o of collided[0]) {
 					if (!o.hovered) {
 						o.response.hover(adjusted);
@@ -83,9 +83,9 @@ class Scene {
 		}
 		return { hitPoint: hit, hitShape };
 	}
-	collidePoint(point) {
+	collidePoint(point, override = true) {
 		let collideAry = [];
-		let options = this.main.updateArray().filter(e => !(e instanceof ParticleObject));
+		let options = this.main.updateArray().filter(e => !(e instanceof ParticleObject) && (e.onScreen || override));
 		for (let hitbox of options) {
 			let p = (hitbox instanceof UIObject) ? this.camera.worldSpaceToScreenSpace(point) : point;
 			let shapes = hitbox.getModels();
@@ -97,8 +97,8 @@ class Scene {
 		}
 		return collideAry;
 	}
-	collidePointBoth(point) {
-		let collideAry = this.collidePoint(point);
+	collidePointBoth(point, override = true) {
+		let collideAry = this.collidePoint(point, override);
 		return [collideAry, this.main.elementArray.filter(e => !collideAry.includes(e))];
 	}
 	engineFixedUpdate() {
