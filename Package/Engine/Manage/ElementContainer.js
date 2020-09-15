@@ -270,6 +270,12 @@ class ElementContainer {
 	getPhysicsElements() {
 		return this.updateArray().filter(e => e instanceof PhysicsObject);
 	}
+	getUIElements() {
+		return this.updateArray().filter(e => e instanceof UIObject);
+	}
+	getOnScreenElements() {
+		return this.updateArray().filter(e => e.onScreen);
+	}
 	getElementsMatch(fn) {
 		let ary = [];
 		let oAry = this.updateArray();

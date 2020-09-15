@@ -27,7 +27,7 @@ class CollisionMonitor {
         this.physicsObjects = [];
     }
     get general() {
-        return this.elements.map(e => e);
+        return this.elements.length ? this.elements.map(e => e) : null;
     }
     get left() {
         let els = [];

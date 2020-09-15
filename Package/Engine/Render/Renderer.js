@@ -138,6 +138,7 @@ class Artist {
 				return textRequests
 			},
 			shape(...v) {
+				if (v[0] && v[0].vertices) v = v[0].vertices;
 				v = this.pathObj.validatePoints(v);
 				this.c.beginPath();
 				if (v.length) {
@@ -493,6 +494,7 @@ class Artist {
 				this.unclip();
 			},
 			shape(...v) {
+				if (v[0] && v[0].vertices) v = v.vertices;
 				this.clip().shape(...v);
 				let minX = Math.min(...v.map(e => e.x));
 				let maxX = Math.max(...v.map(e => e.x));

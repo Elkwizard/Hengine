@@ -45,6 +45,7 @@ class Frame extends ImageType {
 		this.c = new Artist(this.img);
 		this.c.c.imageSmoothingEnabled = window.c ? !window.c.preservePixelart : false;
 		this.renderer = this.c;
+		this.onload = () => null;
 	}
 	set src(src) {
 		let img = new Image();
@@ -57,6 +58,7 @@ class Frame extends ImageType {
 			this.img.height = img.height;
 			this.c.c.drawImage(img, 0, 0);
 			this.loaded = true;
+			this.onload();
 		}.bind(this);
 	}
 	makeImage() {

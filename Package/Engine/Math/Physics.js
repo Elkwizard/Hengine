@@ -900,16 +900,17 @@ PhysicsConstraint.Length = class extends PhysicsConstraint {
 
             if (!dx) dx = 0;
             if (!dy) dy = 0;
-
+            let pA = 2 * this.bodyB.mass / (this.bodyA.mass + this.bodyB.mass);
+            let pB = 2 - pA;
             if (this.bodyA.type === RigidBody.DYNAMIC) {
-                this.bodyA.position.x += dx;
-                this.bodyA.position.y += dy;
-                this.bodyA.applyImpulse(ends[0], new PhysicsVector(dx * this.bodyA.mass, dy * this.bodyA.mass));
+                this.bodyA.position.x += dx * pA;
+                this.bodyA.position.y += dy * pA;
+                this.bodyA.applyImpulse(ends[0], new PhysicsVector(dx * this.bodyA.mass * pA, dy * this.bodyA.mass * pA));
             }
             if (this.bodyB.type === RigidBody.DYNAMIC) {
-                this.bodyB.position.x -= dx;
-                this.bodyB.position.y -= dy;
-                this.bodyB.applyImpulse(ends[1], new PhysicsVector(-dx * this.bodyB.mass, -dy * this.bodyB.mass));
+                this.bodyB.position.x -= dx * pB;
+                this.bodyB.position.y -= dy * pB;
+                this.bodyB.applyImpulse(ends[1], new PhysicsVector(-dx * this.bodyB.mass * pB, -dy * this.bodyB.mass * pB));
             }
 
         }

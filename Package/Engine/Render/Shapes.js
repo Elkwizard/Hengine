@@ -150,7 +150,7 @@ class Polygon extends Shape {
 				return new Vector2(nX + pos.x, nY + pos.y);
 				
 			});
-		return new Polygon(verts);
+		return new Polygon(verts, this.alreadyClockwise);
 	}
 	getCorners() {
 		return this.vertices;
@@ -190,6 +190,9 @@ class Polygon extends Shape {
 	move(dir) {
 		return new Polygon(this.vertices.map(vert => vert.plus(dir)), this.alreadyClockwise);
 	}
+	rotate(angle) {
+		return this.getModel(new Transform(0, 0, angle));
+	}
 	get() {
 		let poly = new Polygon([...this.vertices], this.alreadyClockwise);
 		return poly;
@@ -197,15 +200,14 @@ class Polygon extends Shape {
 	toPhysicsShape() {
 		return new PolygonCollider(this.vertices.map(v => v.toPhysicsVector()), this.alreadyClockwise);
 	}
-	static lerp(a, b, t) {
-		const vertices = a.vertices.map((v, inx) => Vector2.lerp(v, b.vertices[inx], t));
-		return new Polygon(vertices, a.rotation * (1 - t) + b.rotation * t);
+	static fromPhysicsShape(sh) {
+		return new Polygon(sh.vertices.map(v => Vector2.fromPhysicsVector(v)), sh.alreadyClockwise);
 	}
 	static regular(sides, radius) {
 		let v = [];
 		for (let i = 0; i < sides; i++)
 			v.push(Vector2.fromAngle(i / sides * 2 * Math.PI).times(radius));
-		return new Polygon(v);
+		return new Polygon(v, true);
 	}
 }
 class Rect extends Polygon {
@@ -334,6 +336,9 @@ class Circle extends Shape {
 	}
 	toPhysicsShape() {
 		return new CircleCollider(this.x, this.y, this.radius);
+	}
+	static fromPhysicsShape(sh) {
+		return new Circle(sh.position.x, sh.position.y, sh.radius);
 	}
 }
 Circle.modValues = ["x", "y", "radius"];

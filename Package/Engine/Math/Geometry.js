@@ -561,11 +561,13 @@ class Geometry {
 
                 // renderer.draw(cl.ORANGE).circle(INTERSECT.point, 5);
                 // renderer.draw(cl.YELLOW).circle(vertices[NEW_INX], 5);
-
-                let polysA = Geometry.subdividePolygonList(polyA);
-                let polysB = Geometry.subdividePolygonList(polyB);
-
-                return [...polysA, ...polysB];
+                try {
+                    let polysA = Geometry.subdividePolygonList(polyA);
+                    let polysB = Geometry.subdividePolygonList(polyB);
+                    return [...polysA, ...polysB];
+                } catch (e) {
+                    return [polyB, polyB];
+                }
             } else return [vertices];
 
             // for (let seg of SEGMENTS) renderer.stroke(cl.PURPLE, 2).arrow(seg);
