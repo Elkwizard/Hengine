@@ -186,7 +186,7 @@ class ElementContainer {
 		this.elements[name] = n;
 		return n;
 	}
-	addUIElement(name, x, y, width, height, draw = function () { }) {
+	addUIElement(name, x, y, width, height, draw = function (name, shape) { }) {
 		name = this.genName(this.elements, name);
 		if (width < 0) {
 			width = -width;
@@ -196,10 +196,11 @@ class ElementContainer {
 			height = -height;
 			y -= height;
 		}
-		this.elements[name] = new UIObject(name, x, y, draw, this);
+		this.elements[name] = new UIObject(name, x, y, this);
 		let n = this.elements[name];
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
+		n.draw = draw.bind(n);
 		return n;
 	}
 	addContainer(name, active) {

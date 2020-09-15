@@ -1,7 +1,6 @@
 class UIObject extends SceneObject {
-    constructor(name, x, y, draw, home) {
+    constructor(name, x, y, home) {
         super(name, x, y, null, "UI", home);
-        this.draw = draw.bind(this);
     }
     engineDrawUpdate() {
         this.onScreen = true;
