@@ -34,6 +34,12 @@ class PhysicsObject extends SceneObject {
 
         this.shapeNameIDMap = new Map();
     }
+    get mobile() {
+        return this.body.type === RigidBody.DYNAMIC;
+    }
+    set mobile(a) {
+        this.body.type = a ? RigidBody.DYNAMIC : RigidBody.STATIC;
+    }
     set snuzzlement(a) {
         this.body.restitution = 1 - a;
     }

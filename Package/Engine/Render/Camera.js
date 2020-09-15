@@ -81,7 +81,7 @@ class Camera {
 		artist.translate(-width / 2, -height / 2);
 		artist.translate(-this.x, -this.y);
 	}
-	transformFromWorld(artist) {
+	transformToScreen(artist) {
 		artist.translate(this.x, this.y);
 		artist.translate(width / 2, height / 2);
 		artist.scale(1 / this.zoom, 1 / this.zoom);
