@@ -34,11 +34,19 @@ class PhysicsObject extends SceneObject {
 
         this.shapeNameIDMap = new Map();
     }
+    get gravity() {
+        return this.body.gravity;
+    }
+    set gravity(a) {
+        this.body.gravity = a;
+    }
     get mobile() {
         return this.body.type === RigidBody.DYNAMIC;
     }
     set mobile(a) {
         this.body.type = a ? RigidBody.DYNAMIC : RigidBody.STATIC;
+        this.body.gravity = a;
+        if (a) this.body.wake();
     }
     set snuzzlement(a) {
         this.body.restitution = 1 - a;
@@ -130,11 +138,10 @@ class PhysicsObject extends SceneObject {
         this.body.angularVelocity = 0;
     }
     mobilize() {
-        this.body.type = RigidBody.DYNAMIC;
-        this.body.wake();
+        this.mobile = true;
     }
     immobilize() {
-        this.body.type = RigidBody.STATIC;
+        this.mobile = false;
     }
     engineFixedUpdate() {
         this.scripts.run("Update");
