@@ -26,6 +26,29 @@ class PhysicsObject extends SceneObject {
         this.lastColliding = new CollisionMonitor();
 
         this.shapeNameIDMap = new Map();
+
+        //fake velocity
+        let vel = this.body.velocity;
+        let vec = Vector2.fromPhysicsVector(vel);
+        delete vec.x;
+        delete vec.y;
+        Object.defineProperty(vec, "x", {
+            get() {
+                return vel.x;
+            },
+            set(a) {
+                vel.x = a;
+            }
+        });
+        Object.defineProperty(vec, "y", {
+            get() {
+                return vel.y;
+            },
+            set(a) {
+                vel.y = a;
+            }
+        });
+        this._velocity = vec;
     }
     get airResistance() {
         return this.body.airResistance;
@@ -63,7 +86,7 @@ class PhysicsObject extends SceneObject {
         this.body.isTrigger = !a;
     }
     get velocity() {
-        return this.body.velocity;
+        return this._velocity;
     }
     set velocity(a) {
         this.body.velocity = a.toPhysicsVector();
