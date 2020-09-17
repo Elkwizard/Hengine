@@ -212,7 +212,7 @@ class Polygon extends Shape {
 }
 class Rect extends Polygon {
 	constructor(x, y, w, h) {
-		super([]);
+		super([], true);
 		if (typeof x === "object") {
 			w = y.x - x.x;
 			h = y.y - x.y;

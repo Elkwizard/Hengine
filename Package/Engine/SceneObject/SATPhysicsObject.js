@@ -120,6 +120,7 @@ class PhysicsObject extends SceneObject {
             let colliders = this.body.addShape(collider);
             this.shapeNameIDMap.set(name, colliders);
         }
+        this.cacheBoundingBoxes();
     }
     addShape(name, shape) {
         super.addShape(name, shape);

@@ -131,7 +131,7 @@ class SceneObject {
 		this.transform.rotation = old_rot;
 	}
 	cacheBoundingBoxes() {
-		if (this.transform.dif(this.lastTransform)) this.__boundingBox = this.getBoundingBox();
+		this.__boundingBox = this.getBoundingBox();
 	}
 	getModels() {
 		let result = [];
@@ -157,6 +157,7 @@ class SceneObject {
 		shape = shape.get();
 		this.shapes[name] = shape;
 		this.cacheDimensions();
+		this.cacheBoundingBoxes();
 	}
 	centerModels() {
 		let center = Vector2.origin;
@@ -269,7 +270,7 @@ class SceneObject {
 		this.scripts.run("Update");
 	}
 	updateCaches() {
-		this.cacheBoundingBoxes();
+		if (this.transform.dif(this.lastTransform)) this.cacheBoundingBoxes();
 	}
 	pushToRemoveQueue(x) {
 		return null;
