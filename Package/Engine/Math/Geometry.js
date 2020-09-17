@@ -477,7 +477,7 @@ class Geometry {
             let angle = Math.abs(VEC_B.angle - VEC_A.angle);
             if (VEC_B.angle < VEC_A.angle) angle = Math.PI * 2 - angle;
 
-            let convex = angle <= Math.PI;
+            let convex = angle <= Math.PI || !angle;
 
             INDEX_DATA.push({ INX, NEXT_INX, A, B, VEC_A, VEC_B, VERT_A, VERT_B, convex });
             CONVEX.push(convex);
@@ -513,25 +513,22 @@ class Geometry {
             for (let i = 0; i < SEGMENTS.length; i++) {
                 const SEG = SEGMENTS[i];
                 const SEG_LENGTH = SEG.length;
-                const SEG_VECTOR = SEG.vector;
+                // let ix = VERTEX.x;
+                // let iy = VERTEX.y;
 
-                let ix = VERTEX.x;
-                let iy = VERTEX.y;
+                // const dx_2 = (SEG.b.x - SEG.a.x) || EPSILON;
+                // const dy_2 = (SEG.b.y - SEG.a.y) || EPSILON;
+                // const b_2 = SEG.a.y - dy_2 / dx_2 * SEG.a.x;
 
-                const dx_2 = (SEG.b.x - SEG.a.x) || EPSILON;
-                const dy_2 = (SEG.b.y - SEG.a.y) || EPSILON;
-                const b_2 = SEG.a.y - dy_2 / dx_2 * SEG.a.x;
+                // ix = (b - b_2) / (dy_2 / dx_2 - dy / dx);
+                // iy = dy / dx * ix + b;
 
-                ix = (b - b_2) / (dy_2 / dx_2 - dy / dx);
-                iy = dy / dx * ix + b;
-
-                const INTERSECT = new Vector2(ix, iy);
+                // const INTERSECT = new Vector2(ix, iy);
+                const INTERSECT = Geometry.intersectRayLine(VERTEX, AWAY, SEG);
+                if (!INTERSECT) continue;
                 const DOT = INTERSECT.minus(SEG.a).dot(SEG.vector);
 
-                if (DOT > 0 && DOT < SEG_LENGTH) intersects.push({ point: INTERSECT, segment: SEG });
-                const SHIFT = SEG_VECTOR.times(SEG_LENGTH * 0.1);
-                if (!DOT) intersects.push({ point: INTERSECT.plus(SHIFT), segment: SEG });
-                if (DOT === SEG_LENGTH) intersects.push({ point: INTERSECT.minus(SHIFT), segment: SEG });
+                if (DOT >= 0 && DOT <= SEG_LENGTH) intersects.push({ point: INTERSECT, segment: SEG });
             }
             if (intersects.length) {
                 const INTERSECT = intersects.sort((a, b) => a.point.minus(VERTEX).sqrMag - b.point.minus(VERTEX).sqrMag)[0];
@@ -576,6 +573,44 @@ class Geometry {
 
             // renderer.draw(convex ? cl.RED : cl.GREEN).circle(VERT_B, 3);
         } else return [vertices];
+    }
+    static intersectRayLine(o, r, l) {
+        let result = null;
+        if (l.a.x === l.b.x) {
+            if (r.x) {
+                let dx = r.x;
+                let dy = r.y;
+                let b = o.y - dy / dx * o.x;
+                let x = l.a.x;
+                let y = dy / dx * x + b;
+                let minY = Math.min(l.a.y, l.b.y);
+                let maxY = Math.max(l.a.y, l.b.y);
+                if (y >= minY && y <= maxY) result = new Vector2(x, y);
+            }
+        } else {
+            if (r.x) {
+                let dx = r.x;
+                let dy = r.y;
+                let b = o.y - dy / dx * o.x;
+                let dx2 = l.b.x - l.a.x;
+                let dy2 = l.b.y - l.a.y;
+                let b2 = l.a.y - dy2 / dx2 * l.a.x;
+                let x = (b2 - b) / (dy / dx - dy2 / dx2);
+                let minX = Math.min(l.a.x, l.b.x);
+                let maxX = Math.max(l.a.x, l.b.x);
+                if (x >= minX && x <= maxX) result = new Vector2(x, dy / dx * x + b);
+            } else {    
+                let dx2 = l.b.x - l.a.x;
+                let dy2 = l.b.y - l.a.y;
+                let b2 = l.a.y - dy2 / dx2 * l.a.x;
+                let x = o.x;
+                let minX = Math.min(l.a.x, l.b.x);
+                let maxX = Math.max(l.a.x, l.b.x);
+                if (x >= minX && x <= maxX) result = new Vector2(x, dy2 / dx2 * x + b2);
+            }
+        }
+        if (result && result.minus(o).dot(r) <= 0) result = null; 
+        return result;
     }
     static getMiddle(verts) {
         return Vector2.sum(verts).over(verts.length);

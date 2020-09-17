@@ -55,19 +55,6 @@ class SceneObject {
 		this.isDead = false;
 		this.onScreen = true;
 		this.cullGraphics = true;
-		this.response = {
-			click: e => e,
-			rightClick: e => e,
-			hover: e => e
-		}
-		this.response.input = {
-			up: function () { },
-			down: function () { },
-			left: function () { },
-			right: function () { },
-			interact1: function () { },
-			interact2: function () { }
-		};
 		this.isBeingUpdated = false;
 
 		this.__width = 0;
@@ -278,9 +265,6 @@ class SceneObject {
 		this.scripts.run("EscapeDraw");
 	}
 	engineFixedUpdate(hitboxes) {
-		if (this.controls) {
-			this.move();
-		}
 		this.update();
 		this.scripts.run("Update");
 	}
@@ -294,25 +278,5 @@ class SceneObject {
 		if (this.isBeingUpdated) this.pushToRemoveQueue(this);
 		else this.home.removeElement(this);
 		this.isDead = true;
-	}
-	move() {
-		if (K.P(this.controls.up)) {
-			this.response.input.up();
-		}
-		if (K.P(this.controls.down)) {
-			this.response.input.down();
-		}
-		if (K.P(this.controls.left)) {
-			this.response.input.left();
-		}
-		if (K.P(this.controls.right)) {
-			this.response.input.right();
-		}
-		if (K.P(this.controls.interact1)) {
-			this.response.input.interact1();
-		}
-		if (K.P(this.controls.interact2)) {
-			this.response.input.interact2();
-		}
 	}
 }

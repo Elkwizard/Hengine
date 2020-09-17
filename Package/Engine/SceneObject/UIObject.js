@@ -7,7 +7,4 @@ class UIObject extends SceneObject {
         if (!this.hidden) this.home.scene.camera.drawInScreenSpace(this.runDraw.bind(this));
 		this.scripts.run("EscapeDraw");
     }
-    engineFixedUpdate() {
-
-    }
 }

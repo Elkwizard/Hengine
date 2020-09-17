@@ -339,29 +339,11 @@ class ElementContainer {
 		}.bind(this));
 		return this;
 	}
-	changeElementResponse(name, input, newResponse) {
-		this.performFunctionBasedOnType(name, function (e) {
-			this.elements[e].response.input[input] = newResponse.bind(this.elements[e]);
-			this.elements[e].logMod(function CHANGE_INPUT() {
-				this.home.changeElementResponse(this, input, newResponse);
-			});
-		}.bind(this));
-		return this;
-	}
 	changeElementUpdate(name, newUpdate) {
 		this.performFunctionBasedOnType(name, function (e) {
 			e.update = newUpdate.bind(e);
 			e.logMod(function CHANGE_UPDATE() {
 				this.home.changeElementUpdate(this, newUpdate);
-			});
-		}.bind(this));
-		return this;
-	}
-	changeElementCollideResponse(name, dir, newResponse) {
-		this.performFunctionBasedOnType(name, function (e) {
-			e.response.collide[dir] = newResponse.bind(e);
-			e.logMod(function CHANGE_COLLIDE_RESPONSE() {
-				this.home.changeElementCollideResponse(this, dir, newResponse);
 			});
 		}.bind(this));
 		return this;

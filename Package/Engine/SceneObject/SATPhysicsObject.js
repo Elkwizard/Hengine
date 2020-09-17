@@ -24,15 +24,14 @@ class PhysicsObject extends SceneObject {
         //data
         this.colliding = new CollisionMonitor();
         this.lastColliding = new CollisionMonitor();
-        this.response.collide = {
-            general: function () { },
-            top: function () { },
-            bottom: function () { },
-            left: function () { },
-            right: function () { }
-        };
 
         this.shapeNameIDMap = new Map();
+    }
+    get airResistance() {
+        return this.body.airResistance;
+    }
+    set airResistance(a) {
+        this.body.airResistance = a;
     }
     get gravity() {
         return this.body.gravity;

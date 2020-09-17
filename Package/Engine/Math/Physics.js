@@ -357,6 +357,7 @@ class RigidBody {
         this.canRotate = true;
         this.isTrigger = false;
         this.gravity = true;
+        this.airResistance = true;
         this.simulated = true;
 
         this.invalidateModels();
@@ -960,8 +961,10 @@ class PhysicsEngine {
             let body = dynBodies[i];
             if (this.isAsleep(body)) continue;
             if (body.gravity) body.velocity.add(this.gravity);
-            body.velocity.mul(this.linearDrag);
-            body.angularVelocity *= this.angularDrag;
+            if (body.airResistance) {
+                body.velocity.mul(this.linearDrag);
+                body.angularVelocity *= this.angularDrag;
+            }
         }
     }
     integrate(intensity, dynBodies) {

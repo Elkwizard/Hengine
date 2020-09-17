@@ -16,14 +16,12 @@ class Scene {
 			let adjusted = this.camera.screenSpaceToWorldSpace(e);
 			let collided = this.collidePoint(adjusted, false);
 			if (this.mouseEvents) for (let o of collided) {
-				o.response.click(adjusted);
 				o.scripts.run("Click", adjusted);
 			}
 		}.bind(this), true);
 		this.home.mouse.onRight.listen(function (e) {
 			let adjusted = this.camera.screenSpaceToWorldSpace(e);
 			if (this.mouseEvents) for (let o of this.collidePoint(adjusted, false)) {
-				o.response.rightClick(adjusted);
 				o.scripts.run("RightClick", adjusted);
 			}
 		}.bind(this), true);
@@ -33,7 +31,6 @@ class Scene {
 				let collided = this.collidePointBoth(adjusted, false);
 				for (let o of collided[0]) {
 					if (!o.hovered) {
-						o.response.hover(adjusted);
 						o.scripts.run("Hover", adjusted);
 					}
 					o.hovered = true;
