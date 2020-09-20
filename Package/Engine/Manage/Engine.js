@@ -18,57 +18,6 @@ class ScreenRecording {
 		return c.createAnimation(this.frames, 1, true);
 	}
 }
-class IntervalFunction {
-	constructor(fn, len, type) {
-		this.fn = fn;
-		this.type = type;
-		this.interval = len;
-		this.timer = 0;
-		this.done = false;
-	}
-	increment() {
-		this.timer++;
-		this.respond();
-		if (this.timer > this.interval) {
-			this.done = true;
-		}
-	}
-	respond() {
-
-	}
-}
-IntervalFunction.BEFORE_UPDATE = Symbol("BEFORE_UPDATE");
-IntervalFunction.UPDATE = Symbol("UPDATE");
-IntervalFunction.AFTER_UPDATE = Symbol("AFTER_UPDATE");
-IntervalFunction.FIXED_UPDATE = Symbol("FIXED_UPDATE");
-IntervalFunction.AFTER_FIXED_UPDATE = Symbol("AFTER_FIXED_UPDATE");
-
-class DelayedFunction extends IntervalFunction {
-	constructor(fn, wait, type) {
-		super(fn, wait, type);
-	}
-	respond() {
-		if (this.timer > this.interval) {
-			this.fn();
-		}
-	}
-}
-class TransitionFunction extends IntervalFunction {
-	constructor(fn, wait, type) {
-		super(fn, wait, type);
-	}
-	respond() {
-		this.fn(this.timer / this.interval);
-	}
-}
-class ContinuousFunction extends IntervalFunction {
-	constructor(fn, type) {
-		super(fn, Infinity, type);
-	}
-	respond() {
-		this.fn(this.timer);
-	}
-}
 class Engine {
 	constructor(utility, wrapper = document.body) {
 		this.fps = 60;
@@ -85,11 +34,6 @@ class Engine {
 			alert(m);
 		}
 		this.console = new Console();
-		this.update = function () { };
-		this.beforeUpdate = function () { };
-		this.afterUpdate = function () { };
-		this.fixedUpdate = function () { };
-        this.afterFixedUpdate = function () { };
 		this.catchErrors = false;
 		this.hasFixedPhysicsUpdateCycle = true;
 		try {
@@ -125,11 +69,7 @@ class Engine {
 		this.renderer = new Artist(canvas, W, H);
 		this.scene = new Scene(this.renderer, new Vector2(0, 0.2), this);
 		//update loops
-		this.afterScript = new Script("after");
-		this.fixedScript = new Script("fixed");
-		this.beforeScript = new Script("before");
-		this.updateScript = new Script("update");
-		this.intervalFns = [];
+		this.intervals = new IntervalFunctionManager();
 
 		this.FPS_FRAMES_TO_COUNT = 10;
 				
@@ -179,12 +119,9 @@ class Engine {
 		}
 	}
 	engineFixedUpdateInternal() {
-		this.updateIntervalCalls(IntervalFunction.FIXED_UPDATE);
-		this.fixedUpdate();
-		this.fixedScript.run();
+		this.intervals.fixedUpdate();
 		this.scene.engineFixedUpdate();
-		this.afterFixedUpdate();
-		this.updateIntervalCalls(IntervalFunction.AFTER_FIXED_UPDATE);
+		this.intervals.afterFixedUpdate();
 	}
 	engineDrawUpdate() {
 		try {
@@ -205,15 +142,12 @@ class Engine {
 			if (!this.paused) {
 				K.update();
 				M.update();
-				this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
-				this.beforeUpdate();
+				this.intervals.beforeUpdate();
 				this.clear();
-				this.updateIntervalCalls(IntervalFunction.UPDATE);
-				this.update();
+				this.intervals.update();
 				this.scene.engineDrawUpdate();
 				if (!this.hasFixedPhysicsUpdateCycle) this.engineFixedUpdateInternal();
-				this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
-				this.afterUpdate();
+				this.intervals.afterUpdate();
 				this.updateScreenRecordings();
 				K.afterUpdate();
 				M.afterUpdate();
@@ -248,26 +182,6 @@ class Engine {
 			let r = this.recordings[key];
 			if (r.isRecording) r.frames.push(f);
 		}
-	}
-	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
-		this.intervalFns.push(new ContinuousFunction(fn, type));
-	}
-	transition(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
-		this.intervalFns.push(new TransitionFunction(fn, frames, type));
-	}
-	delay(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
-		this.intervalFns.push(new DelayedFunction(fn, frames, type));
-	}
-	updateIntervalCalls(type) {
-		let remaining = [];
-		for (let i = 0; i < this.intervalFns.length; i++) {
-			const int_fn = this.intervalFns[i];
-			if (int_fn.type === type) {
-				int_fn.increment();
-			}
-			if (!int_fn.done) remaining.push(int_fn);
-		}
-		this.intervalFns = remaining;
 	}
 	makeGraph(yName, minValue, maxValue, getY, msLimit = 5000, colors) {
 		if (this.hasGraphs) {

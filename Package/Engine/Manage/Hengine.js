@@ -339,10 +339,10 @@ class Hengine {
 		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "Animation", "Frame", "GrayMap", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental", "Camera"];
 	}
 	static get defaultManagementPackage() {
-		return ["Scripts", "ElementContainer", "Scenes", "Engine", "Hengine"];
+		return ["Scripts", "ElementContainer", "Scenes", "IntervalFunction", "Engine", "Hengine"];
 	}
 	static get defaultMathPackage() {
-		return ["Random", "Operable", "Vector", "Geometry", "Physics", "PhysicsAPI"];
+		return ["Operable", "Interpolation", "Random", "Vector", "Geometry", "Physics", "PhysicsAPI"];
 	}
 	static get defaultUtilityPackage() {
 		return ["Input", "Sound", "Time", "Console", "LocalFileSystem"];

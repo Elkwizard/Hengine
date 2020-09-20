@@ -196,4 +196,5 @@ Number.prototype.plus = function (n) { return this + n; };
 Number.prototype.minus = function (n) { return this - n; };
 Number.prototype.times = function (n) { return this * n; };
 Number.prototype.over = function (n) { return this / n; };
+Number.prototype.get = function () { return this; };
 Number.empty = 0;

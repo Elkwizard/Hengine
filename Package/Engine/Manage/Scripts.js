@@ -15,11 +15,6 @@ class Script {
 	removeMethod(name) {
 		delete this.methods[name];
 	}
-	run() {
-		for (let x in this.methods) {
-			this.methods[x]();
-		}
-	}
 	attachTo(obj, bindTo, ...args) {
 		const exists = (obj instanceof ScriptContainer) ? obj.exists : { };
 		obj[this.name] = {
