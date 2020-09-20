@@ -1,4 +1,3 @@
-
 class ApplicationPackageElement {
 	constructor(files) {
 		this.files = files;

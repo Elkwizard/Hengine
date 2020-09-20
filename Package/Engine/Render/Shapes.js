@@ -187,6 +187,12 @@ class Polygon extends Shape {
 	scaleAbout(pos, factor) {
 		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))), this.alreadyClockwise);
 	}
+	scaleXAbout(pos, factor) {
+		return new Polygon(this.vertices.map(e => new Vector2(pos + (pos - e.x) * factor, e.y)), this.alreadyClockwise);
+	}
+	scaleYAbout(pos, factor) {
+		return new Polygon(this.vertices.map(e => new Vector2(e.x, pos + (pos - e.y) * factor)), this.alreadyClockwise);
+	}
 	move(dir) {
 		return new Polygon(this.vertices.map(vert => vert.plus(dir)), this.alreadyClockwise);
 	}
@@ -324,6 +330,12 @@ class Circle extends Shape {
 	scaleAbout(pos, factor) {
 		let nPos = pos.plus((new Vector2(this.x, this.y)).Vminus(pos).Ntimes(factor));
 		return new Circle(nPos.x, nPos.y, this.radius * factor);
+	}
+	scaleXAbout(pos, factor) {
+		return this.scaleAbout(pos, factor);
+	}
+	scaleYAbout(pos, factor) {
+		return this.scaleAbout(pos, factor);
 	}
 	move(dir) {
 		return new Circle(this.x + dir.x, this.y + dir.y, this.radius);

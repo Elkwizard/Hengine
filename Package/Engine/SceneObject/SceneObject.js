@@ -69,14 +69,14 @@ class SceneObject {
 	}
 	set width(a) {
 		let factor = a / this.width;
-		this.scale(factor);
+		this.scaleX(factor);
 	}
 	get width() {
 		return this.__width;
 	}
 	set height(a) {
 		let factor = a / this.height;
-		this.scale(factor);
+		this.scaleY(factor);
 	}
 	get height() {
 		return this.__height;
@@ -125,7 +125,8 @@ class SceneObject {
 	cacheDimensions() {
 		let old_rot = this.transform.rotation;
 		this.transform.rotation = 0;
-		let bound = this.getBoundingBox();
+		this.cacheBoundingBoxes();
+		let bound = this.__boundingBox;
 		this.__width = bound.width;
 		this.__height = bound.height;
 		this.transform.rotation = old_rot;
@@ -157,7 +158,6 @@ class SceneObject {
 		shape = shape.get();
 		this.shapes[name] = shape;
 		this.cacheDimensions();
-		this.cacheBoundingBoxes();
 	}
 	centerModels() {
 		let center = Vector2.origin;
@@ -209,10 +209,16 @@ class SceneObject {
 	}
 	scale(factor) {
 		let middle = Vector2.origin;
-		let nShapes = new Map();
-		for (let name in this.shapes) nShapes.set(name, this.shapes[name].scaleAbout(middle, factor));
-		this.removeAllShapes();
-		for (let [name, shape] of nShapes) this.addShape(name, shape);
+		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleAbout(middle, factor);
+		this.cacheDimensions();
+	}
+	scaleX(factor) {
+		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleXAbout(0, factor);
+		this.cacheDimensions();
+	}
+	scaleY(factor) {
+		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleYAbout(0, factor);
+		this.cacheDimensions();
 	}
 	rename(name) {
 		delete this.home.elements[this.name];
