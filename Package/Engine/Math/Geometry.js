@@ -625,8 +625,10 @@ class Geometry {
                 bestY = verts[i].y;
                 best = verts[i];
             }
+            if (best && verts[i].y === bestY && verts[i].x < best.x) best = verts[i]; 
         }
         if (!best) return true;
+
         let greater = false;
         for (let i = 0; i < verts.length; i++) {
             if (verts[i].x > best.x) {
