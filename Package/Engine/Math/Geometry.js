@@ -656,6 +656,7 @@ class Geometry {
                     nextBestY = verts[i].y;
                     nextBest = verts[i];
                 }
+                if (nextBest && verts[i].y === nextBestY && verts[i].x < nextBest.x) nextBest = verts[i]; 
             }
             for (let i = 0; i < verts.length; i++)
                 if (verts[i] !== best && verts[i].x > nextBest.x && i === inxA) return true;
