@@ -11,6 +11,12 @@ class Transform {
 	get rotation() {
 		return this._rotation;
 	}
+	get direction() {
+		return new Vector2(this.cosRotation, this.sinRotation);
+	}
+	set direction(v) {
+		this.angle = v.angle;
+	}
 	get() {
 		return new Transform(this.position.x, this.position.y, this.rotation);
 	}

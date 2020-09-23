@@ -1088,7 +1088,7 @@ class PhysicsEngine {
         return collisionPairs;
     }
     lowActivity(body) {
-        return PhysicsVector.mag(body.velocity) < 0.1 && Math.abs(body.angularVelocity) < 0.01;
+        return PhysicsVector.mag(body.velocity) < 0.1 && Math.abs(body.angularVelocity) < 0.001;
     }
     run() {
         //remove unsimulated

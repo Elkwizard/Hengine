@@ -76,6 +76,11 @@ class PhysicsObject extends SceneObject {
     get snuzzlement() {
         return 1 - this.body.restitution;
     }
+    set mass(a) {
+        let scale = a / this.body.mass;
+        this.body.mass *= scale;
+        this.body.inertia *= scale;
+    }
     get mass() {
         return this.body.mass;
     }
