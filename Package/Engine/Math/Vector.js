@@ -115,7 +115,7 @@ class Matrix2x2 extends Matrix {
 	get determinant() {
 		return this.cols[0][0] * this.cols[1][1] - this.cols[0][1] * this.cols[1][0];
 	}
-	inverse() {
+	get inverse() {
 		return (new Matrix2x2(this.cols[1][1], -this.cols[1][0], -this.cols[0][1], this.cols[0][0]).times(1 / this.determinant));
 	}
 }
@@ -215,7 +215,7 @@ class Vector extends Operable {
 	invert() {
 		return this.mul(-1);
 	}
-	inverse() {
+	get inverse() {
 		return this.times(-1);
 	}
 	compare(v1, v2) {
@@ -256,8 +256,8 @@ class Vector extends Operable {
 	}
 	bestFit(v) {
 		let d1 = this.dot(v);
-		let d2 = this.inverse().dot(v);
-		if (d2 < d1) return this.inverse();
+		let d2 = this.inverse.dot(v);
+		if (d2 < d1) return this.inverse;
 		else return this.get();
 	}
 	toString() {
@@ -412,7 +412,7 @@ class Vector2 extends Vector {
 		this.y = -this.y;
 		return this;
 	}
-	inverse() {
+	get inverse() {
 		return new Vector2(-this.x, -this.y);
 	}
 	Vplus(v) {

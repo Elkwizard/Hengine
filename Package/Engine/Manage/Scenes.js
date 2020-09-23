@@ -30,12 +30,11 @@ class Scene {
 			if (this.mouseEvents) {
 				let collided = this.collidePointBoth(adjusted, false);
 				for (let o of collided[0]) {
-					if (!o.hovered) {
-						o.scripts.run("Hover", adjusted);
-					}
+					if (!o.hovered) o.scripts.run("Hover", adjusted);
 					o.hovered = true;
 				}
 				for (let o of collided[1]) {
+					if (o.hovered) o.scripts.run("Unhover", adjusted);
 					o.hovered = false;
 				}
 			}
@@ -51,7 +50,7 @@ class Scene {
 		if (A && B && this.collisionEvents) {
 			contacts = contacts.map(v => Contact.fromPhysicsContact(v));
 			A.colliding.add(B, Vector2.fromPhysicsVector(direction), contacts);
-			B.colliding.add(A, Vector2.fromPhysicsVector(direction).inverse(), contacts);
+			B.colliding.add(A, Vector2.fromPhysicsVector(direction).inverse, contacts);
 		}
 	}
 	clearCollisions(phys) {

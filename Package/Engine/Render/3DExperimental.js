@@ -107,7 +107,7 @@ class Render3D {
         Render3D.camera.rotation.y = Math.PI * (mouse.x - width / 2) / width;
     }
     static moveCameraAlongRotation(v) {
-        let nr = Render3D.rotatePointAround(Vector3.origin, v, Render3D.camera.rotation.inverse());
+        let nr = Render3D.rotatePointAround(Vector3.origin, v, Render3D.camera.rotation.inverse);
         Render3D.camera.pos.add(nr);
     }
     static renderScene(c, ...meshes) {

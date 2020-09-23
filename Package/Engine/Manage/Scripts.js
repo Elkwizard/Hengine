@@ -39,7 +39,8 @@ class Script {
             ["collide", "right"],
             ["click"],
             ["right", "click"],
-            ["hover"],
+			["hover"],
+			["unhover"]
         ]
 		let local = obj[this.name];
         local.scriptNumber = 0;

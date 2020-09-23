@@ -169,7 +169,7 @@ class SceneObject {
 			center.Vadd(shape.middle.Ntimes(area));
 		}
 		center.Ndiv(totalArea);
-		let dif = center.inverse();
+		let dif = center.inverse;
 		for (let name in this.shapes)
 			this.shapes[name] = this.shapes[name].move(dif);
 	}
