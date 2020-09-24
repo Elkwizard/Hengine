@@ -5,6 +5,9 @@ class PhysicsVector {
         this.x = x;
         this.y = y;
     }
+    get() {
+        return new PhysicsVector(this.x, this.y);
+    }
     add(b) {
         this.x += b.x;
         this.y += b.y;
@@ -444,7 +447,7 @@ class RigidBody {
         } else this.displace(dif);
     }
     pointVelocity(p) {
-        return new PhysicsVector(-(p.y - this.position.y) * this.angularVelocity, (p.x - this.position.x) * this.angularVelocity).add(this.velocity);
+        return new PhysicsVector(-(p.y - this.position.y) * this.angularVelocity + this.velocity.x, (p.x - this.position.x) * this.angularVelocity + this.velocity.y);
     }
     applyImpulse(pos, imp) {
         //linear
@@ -642,7 +645,7 @@ class CollisionDetector {
         }
         return null;
     }
-    PolygonModel_PolygonModel(a, b, between) {
+    PolygonModel_PolygonModel(a, b, _unused) {
         let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
         if (intersections.length < 2) return null;
 
@@ -670,7 +673,7 @@ class CollisionDetector {
                 if (dot < bMin) bMin = dot;
                 if (dot > bMax) bMax = dot;
             }
-            if (aMax < bMin || aMin > bMax) {
+            if (aMax <= bMin || aMin >= bMax) {
                 return null;
             }
 
@@ -702,9 +705,10 @@ class CollisionDetector {
         let contacts = intersections
             .map(contact => {
                 let dot = PhysicsVector.dot(contact, bestAxis);
-                let pen = rMin + rMax - Math.abs(dot - (rMin + rMax) / 2);
-                return new CollisionDetector.Contact(contact, pen || 1);
-            });
+                let pen = Math.abs((rMax - rMin) / 2 - Math.abs(dot - (rMin + rMax) / 2));
+                return new CollisionDetector.Contact(contact, pen);
+            })
+            .filter(contact => contact.penetration);
 
         if (!contacts.length) {
             return new CollisionDetector.Collision(bestAxis, [], minOverlap);
@@ -789,9 +793,13 @@ class CollisionResolver {
             let impulseA_t = PhysicsVector.mul(t, j_t);
             let impulseB_t = PhysicsVector.invert(impulseA_t);
 
+            
 
-            impulsesA.push({ point: contact.point, impulse: impulseA_n.add(impulseA_t) });
-            impulsesB.push({ point: contact.point, impulse: impulseB_n.add(impulseB_t) });
+            let impulseA = impulseA_n.add(impulseA_t);
+            let impulseB = impulseB_n.add(impulseB_t);
+            impulsesA.push({ point: contact.point, impulse: impulseA });
+            impulsesB.push({ point: contact.point, impulse: impulseB });
+        
         }
         for (let i = 0; i < impulsesA.length; i++) {
             let impulse = impulsesA[i];
@@ -975,9 +983,6 @@ class PhysicsEngine {
         }
     }
     resolve(body, body2, col) {
-        // scene.camera.drawInWorldSpace(() => {
-        //     for (let contact of col.contacts) renderer.draw(cl.ORANGE).circle(contact.point, 5);
-        // });
         let collisionDirection = col.direction;
         let maxPenetration = col.penetration;
         let contacts = col.contacts;
@@ -1024,6 +1029,7 @@ class PhysicsEngine {
             //         c.stroke(cl.RED).arrow(body.position, others[i].position);
             //     }
             // }
+
             for (let j = 0; j < collidable.length; j++) {
                 let body2 = collidable[j];
                 if (body.shapes.length === 1 && body2.shapes.length === 1) {
@@ -1032,14 +1038,26 @@ class PhysicsEngine {
                 } else {
                     let best = null;
                     let penetration = -Infinity;
+                    let dir = new PhysicsVector(0, 0);
                     for (let sI = 0; sI < body.shapes.length; sI++) for (let sJ = 0; sJ < body2.shapes.length; sJ++) {
                         let col = this.collisionDetector.collide(body.cacheModel(sI), body2.cacheModel(sJ), PhysicsVector.sub(body2.position, body.position));
-                        if (col) if (col.penetration > penetration) {
-                            penetration = col.penetration;
-                            best = col;
+                        if (col) {
+                            dir.add(col.direction);
+                            if (col.penetration > penetration) {
+                                penetration = col.penetration;
+                                best = col;
+                            }
                         }
                     }
-                    if (best) this.resolve(body, body2, best);
+                    if (best) {
+                        best.direction = PhysicsVector.normalize(dir);
+                        for (let contact of best.contacts) {
+                            // renderer.stroke(cl.RED, 2).arrow(contact.point, PhysicsVector.add(contact.point, PhysicsVector.mul(best.direction, contact.penetration)));
+                            // console.log(contact);
+                            // renderer.draw(cl.RED).circle(contact.point, 5);
+                        }
+                        this.resolve(body, body2, best);
+                    }
                 }
             }
         }
