@@ -586,6 +586,8 @@ class Geometry {
                 let minY = Math.min(l.a.y, l.b.y);
                 let maxY = Math.max(l.a.y, l.b.y);
                 if (y >= minY && y <= maxY) result = new Vector2(x, y);
+            } else {
+                if (o.x === l.a.x) result = new Vector2(o.x, Number.clamp(o.y, Math.min(l.a.y, l.b.y), Math.max(l.a.y, l.b.y)));
             }
         } else {
             if (r.x) {
