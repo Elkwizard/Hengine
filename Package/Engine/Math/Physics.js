@@ -673,7 +673,7 @@ class CollisionDetector {
                 if (dot < bMin) bMin = dot;
                 if (dot > bMax) bMax = dot;
             }
-            if (aMax <= bMin || aMin >= bMax) {
+            if (aMax < bMin || aMin > bMax) {
                 return null;
             }
 
@@ -706,9 +706,8 @@ class CollisionDetector {
             .map(contact => {
                 let dot = PhysicsVector.dot(contact, bestAxis);
                 let pen = Math.abs((rMax - rMin) / 2 - Math.abs(dot - (rMin + rMax) / 2));
-                return new CollisionDetector.Contact(contact, pen);
-            })
-            .filter(contact => contact.penetration);
+                return new CollisionDetector.Contact(contact, pen || 0.01);
+            });
 
         if (!contacts.length) {
             return new CollisionDetector.Collision(bestAxis, [], minOverlap);
