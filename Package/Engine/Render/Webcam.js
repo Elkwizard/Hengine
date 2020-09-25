@@ -16,6 +16,12 @@ class WebcamCapture extends ImageType {
 		};
 		videoHTML.play();
 	}
+	getFrame() {
+		let image = this.makeImage();
+		let frame = new Frame(image.width, image.height);
+		frame.renderer.c.drawImage(image, 0, 0);
+		return frame;
+	}
 	makeImage() {
 		if (this.data.video) {
 			if (performance.now() - this.lastCaptureTime > 16 || !this.lastCapture) {

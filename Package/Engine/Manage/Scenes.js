@@ -144,7 +144,6 @@ class Scene {
 		} else this.renderer.save();
 
 		camera.transformToWorld(this.renderer);
-
 		for (let rect of this.main.elementArray) {
 			rect.engineDrawUpdate(screen);
 			rect.lifeSpan++;
@@ -187,9 +186,7 @@ class Scene {
 		this.updateSceneObjectCaches(this.main.elementArray);
 		this.camera.width = this.renderer.canvas.width;
 		this.camera.height = this.renderer.canvas.height;
-		this.main.elementArray.sort(function (a, b) {
-			return a.layer - b.layer;
-		});
+		this.main.elementArray.sort((a, b) => a.layer - b.layer);
 		for (let cameraName in this.cameras) this.renderCamera(this.cameras[cameraName]);
 		this.renderCamera(this.camera);
 		// this.c.image(this.renderCamera(this.camera)).rect(0, 0, width, height);

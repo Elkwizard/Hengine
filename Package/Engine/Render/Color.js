@@ -360,12 +360,13 @@ class ColorLibrary {
 		this.ORANGE = new Color("#f90");
 		this.PURPLE = new Color("#909");
 		this.MAGENTA = new Color("#f0f");
-		this.PINK = new Color(255, 192, 203)
+		this.PINK = new Color(255, 192, 203);
 		this.BLANK = new Color(0, 0, 0, 0);
 		this.BLACK = new Color(0, 0, 0, 1);
 		this.WHITE = new Color(255, 255, 255, 1);
 		this.CYAN = new Color(0, 255, 255, 1);
 		this.GRAY = new Color(128, 128, 128, 1);
+		this.DARK_GRAY = new Color("#222");
 		this.LIGHT_GRAY = new Color("#ccc");
 		this.RAZZMATAZZ = new Color("#e3256b");
 		this.CREAM = new Color("#fff185");
