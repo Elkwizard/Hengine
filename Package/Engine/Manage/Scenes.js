@@ -160,29 +160,27 @@ class Scene {
 		if (this.mouseEvents) {
 			let adjusted = mouse.world;
 			if (mouse.justPressed("Left")) {
-				if (this.mouseEvents) for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
+				for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
 					if (o.isDead) continue;
 					o.scripts.run("Click", adjusted);
 				}
 			}
 			if (mouse.justPressed("Right")) {
-				if (this.mouseEvents) for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
+				for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
 					if (o.isDead) continue;
 					o.scripts.run("RightClick", adjusted);
 				}
 			}
-			if (this.mouseEvents) {
-				let collided = this.collidePointBoth(adjusted, false);
-				for (let o of collided[0].sort((a, b) => b.layer - a.layer)) {
-					if (o.isDead) continue;
-					if (!o.hovered) o.scripts.run("Hover", adjusted);
-					o.hovered = true;
-				}
-				for (let o of collided[1].sort((a, b) => b.layer - a.layer)) {
-					if (o.isDead) continue;
-					if (o.hovered) o.scripts.run("Unhover", adjusted);
-					o.hovered = false;
-				}
+			let collided = this.collidePointBoth(adjusted, false);
+			for (let o of collided[0].sort((a, b) => b.layer - a.layer)) {
+				if (o.isDead) continue;
+				if (!o.hovered) o.scripts.run("Hover", adjusted);
+				o.hovered = true;
+			}
+			for (let o of collided[1].sort((a, b) => b.layer - a.layer)) {
+				if (o.isDead) continue;
+				if (o.hovered) o.scripts.run("Unhover", adjusted);
+				o.hovered = false;
 			}
 		}
 		this.main.startUpdate();
