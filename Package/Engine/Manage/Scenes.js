@@ -12,33 +12,6 @@ class Scene {
 		this.mouseEvents = false;
 		this.collisionEvents = true;
 		this.camera = new Camera(0, 0, this.renderer.width, this.renderer.height, 1, 0);
-		this.home.mouse.onDown.listen(function (e) {
-			let adjusted = this.camera.screenSpaceToWorldSpace(e);
-			let collided = this.collidePoint(adjusted, false);
-			if (this.mouseEvents) for (let o of collided) {
-				o.scripts.run("Click", adjusted);
-			}
-		}.bind(this), true);
-		this.home.mouse.onRight.listen(function (e) {
-			let adjusted = this.camera.screenSpaceToWorldSpace(e);
-			if (this.mouseEvents) for (let o of this.collidePoint(adjusted, false)) {
-				o.scripts.run("RightClick", adjusted);
-			}
-		}.bind(this), true);
-		this.home.mouse.onMove.listen(function (e) {
-			let adjusted = this.camera.screenSpaceToWorldSpace(e);
-			if (this.mouseEvents) {
-				let collided = this.collidePointBoth(adjusted, false);
-				for (let o of collided[0]) {
-					if (!o.hovered) o.scripts.run("Hover", adjusted);
-					o.hovered = true;
-				}
-				for (let o of collided[1]) {
-					if (o.hovered) o.scripts.run("Unhover", adjusted);
-					o.hovered = false;
-				}
-			}
-		}.bind(this), true);
 	}
 	addScript(name, opts) {
 		window[name] = new ElementScript(name, opts);
@@ -184,6 +157,34 @@ class Scene {
 		return camera.view;
 	}
 	engineDrawUpdate() {
+		if (this.mouseEvents) {
+			let adjusted = mouse.world;
+			if (mouse.justPressed("Left")) {
+				if (this.mouseEvents) for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
+					if (o.isDead) continue;
+					o.scripts.run("Click", adjusted);
+				}
+			}
+			if (mouse.justPressed("Right")) {
+				if (this.mouseEvents) for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
+					if (o.isDead) continue;
+					o.scripts.run("RightClick", adjusted);
+				}
+			}
+			if (this.mouseEvents) {
+				let collided = this.collidePointBoth(adjusted, false);
+				for (let o of collided[0].sort((a, b) => b.layer - a.layer)) {
+					if (o.isDead) continue;
+					if (!o.hovered) o.scripts.run("Hover", adjusted);
+					o.hovered = true;
+				}
+				for (let o of collided[1].sort((a, b) => b.layer - a.layer)) {
+					if (o.isDead) continue;
+					if (o.hovered) o.scripts.run("Unhover", adjusted);
+					o.hovered = false;
+				}
+			}
+		}
 		this.main.startUpdate();
 		this.updateSceneObjectCaches(this.main.elementArray);
 		this.camera.width = this.renderer.canvas.width;

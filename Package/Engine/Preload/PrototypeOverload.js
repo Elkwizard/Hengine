@@ -197,4 +197,5 @@ Number.prototype.minus = function (n) { return this - n; };
 Number.prototype.times = function (n) { return this * n; };
 Number.prototype.over = function (n) { return this / n; };
 Number.prototype.get = function () { return this; };
+Number.prototype.equals = function (n) { return Math.abs(this - n) < 0.00000001; }
 Number.empty = 0;

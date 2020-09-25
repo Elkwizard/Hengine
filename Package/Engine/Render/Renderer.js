@@ -598,9 +598,10 @@ class Artist {
 		this.c.fillStyle = this.getContextColor(color);
 		return this.drawObj;
 	}
-	stroke(color, lineWidth = 1, endStyle = "flat") {
+	stroke(color, lineWidth = 1, endStyle = "flat", lineJoin = "bevel") {
 		this.c.strokeStyle = this.getContextColor(color);
 		if (endStyle === "flat") endStyle = "butt";
+		this.c.lineJoin = lineJoin;
 		this.c.lineCap = endStyle;
 		this.c.lineWidth = lineWidth;
 		return this.strokeObj;
@@ -718,6 +719,15 @@ class Artist {
 	}
 	restore() {
 		this.c.restore();
+	}
+	clearRect(x, y, w, h) {
+		if (x.width) {
+			h = x.height;
+			w = x.width;
+			y = x.y;
+			x = x.x;
+		}
+		this.c.clearRect(x, y, w, h);
 	}
 	clear() {
 		this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
