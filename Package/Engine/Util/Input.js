@@ -161,7 +161,13 @@ class MouseHandler extends InputHandler {
 		//pointers and touch
 
 		function mouseHandle(e) {
-			handle({
+			if (e.type === "mouseout") handle({
+				x: m.screen.x,
+				y: m.screen.y,
+				button: 0,
+				type: "up"
+			});
+			else handle({
 				x: e.x,
 				y: e.y,
 				button: e.button,
@@ -192,6 +198,7 @@ class MouseHandler extends InputHandler {
 		el.addEventListener("mousedown", mouseHandle);
 		el.addEventListener("mousemove", mouseHandle);
 		el.addEventListener("mouseup", mouseHandle);
+		el.addEventListener("mouseout", mouseHandle);
 		el.addEventListener("touchstart", touchHandle);
 		el.addEventListener("touchmove", touchHandle);
 		el.addEventListener("touchend", touchHandle);
