@@ -1,4 +1,4 @@
-class Script {
+class ElementScript {
 	constructor(name, opts) {
 		this.name = name;
 		this.methods = {};
@@ -7,13 +7,6 @@ class Script {
 			fn.flag = op;
 			this.methods[op] = fn;
 		}
-	}
-	addMethod(name, callback, flag) {
-		this.methods[name] = callback;
-		this.methods[name].flag = flag;
-	}
-	removeMethod(name) {
-		delete this.methods[name];
 	}
 	attachTo(obj, bindTo, ...args) {
 		const exists = (obj instanceof ScriptContainer) ? obj.exists : { };
@@ -74,19 +67,6 @@ class Script {
 		}
 		for (let init of inits) init();
 		return this;
-	}
-	addTo(obj, ...args) {
-		this.attachTo(obj, obj, ...args);
-		return this;
-	}
-}
-class ElementScript extends Script {
-	constructor(name, opts) {
-		super(name, opts);
-	}
-	addMethod(name, callback, flag) {
-		this.methods[name] = callback;
-		this.methods[name].flag = flag;
 	}
 	addTo(el, ...args) {
 		let sc = this;

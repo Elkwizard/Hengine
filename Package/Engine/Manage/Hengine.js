@@ -350,7 +350,7 @@ class Hengine {
 		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "Animation", "Frame", "GrayMap", "Texture", "Webcam", "Renderer", "Graph", "3DExperimental", "Camera"];
 	}
 	static get defaultManagementPackage() {
-		return ["Scripts", "ElementContainer", "Scenes", "IntervalFunction", "Engine", "Hengine"];
+		return ["ElementContainer", "Scenes", "IntervalFunction", "Engine", "Hengine"];
 	}
 	static get defaultMathPackage() {
 		return ["Operable", "Interpolation", "Random", "Vector", "Geometry", "Physics", "PhysicsAPI"];
@@ -359,7 +359,7 @@ class Hengine {
 		return ["Input", "Sound", "Time", "Console", "LocalFileSystem"];
 	}
 	static get defaultSceneObjectPackage() {
-		return ["SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
+		return ["Scripts", "SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
 	}
 	static get defaultEnginePackage() {
 		return {

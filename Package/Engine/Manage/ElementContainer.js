@@ -186,7 +186,7 @@ class ElementContainer {
 		this.elements[name] = n;
 		return n;
 	}
-	addUIElement(name, x, y, width, height, draw = function (name, shape) { }) {
+	addUIElement(name, x, y, width, height, draw = this.defaults.UIObject.draw) {
 		name = this.genName(this.elements, name);
 		if (width < 0) {
 			width = -width;

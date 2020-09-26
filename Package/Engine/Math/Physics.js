@@ -705,10 +705,9 @@ class CollisionDetector {
         let contacts = intersections
             .map(contact => {
                 let dot = PhysicsVector.dot(contact, bestAxis);
-                let pen = (rMax - rMin) / 2 - Math.abs(dot - (rMin + rMax) / 2);
+                let pen = Math.abs((rMax - rMin) / 2 - Math.abs(dot - (rMin + rMax) / 2));
                 return new CollisionDetector.Contact(contact, pen || 0.01);
             })
-            .filter(contact => contact.penetration > 0);
 
         if (!contacts.length) {
             return new CollisionDetector.Collision(bestAxis, [], minOverlap);
@@ -986,6 +985,7 @@ class PhysicsEngine {
         let collisionDirection = col.direction;
         let maxPenetration = col.penetration;
         let contacts = col.contacts;
+        // for (let cont of contacts) renderer.draw(cl.ORANGE).circle(cont.point, 5); 
         body2.addCollidingBody(body);
         body.addCollidingBody(body2);
         if (!maxPenetration) return;
