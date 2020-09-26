@@ -705,9 +705,10 @@ class CollisionDetector {
         let contacts = intersections
             .map(contact => {
                 let dot = PhysicsVector.dot(contact, bestAxis);
-                let pen = Math.abs((rMax - rMin) / 2 - Math.abs(dot - (rMin + rMax) / 2));
+                let pen = (rMax - rMin) / 2 - Math.abs(dot - (rMin + rMax) / 2);
                 return new CollisionDetector.Contact(contact, pen || 0.01);
-            });
+            })
+            .filter(contact => contact.penetration > 0);
 
         if (!contacts.length) {
             return new CollisionDetector.Collision(bestAxis, [], minOverlap);
@@ -988,17 +989,7 @@ class PhysicsEngine {
         body2.addCollidingBody(body);
         body.addCollidingBody(body2);
         if (!maxPenetration) return;
-        let STATIC = body2.type === RigidBody.STATIC || 0;
-        if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
-            let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
-            if (dot > 0.8) {
-                STATIC = true;
-                break;
-            }
-        }
-        if (STATIC) {
-            body.prohibitedDirections.push(collisionDirection);
-        }
+        let STATIC = body2.type === RigidBody.STATIC;
         this.oncollide(body, body2, collisionDirection, contacts);
         if (body.isTrigger || body2.isTrigger) return;
         if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
