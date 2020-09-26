@@ -12,6 +12,18 @@ class ImageType {
 		this.loops = loops;
 		this.loaded = true;
 	}
+	download(name) {
+		let canvas = document.createElement("canvas");
+		let img = this.makeImage();
+		if (!img) return;
+		canvas.width = img.width;
+		canvas.height = img.height;
+		canvas.getContext("2d").drawImage(img, 0, 0);
+		let a = document.createElement("a");
+		a.href = canvas.toDataURL();
+		a.download = name + ".png";
+		a.click();
+	}
 	makeImage() {
 		return null;
 	}

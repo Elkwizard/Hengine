@@ -150,7 +150,6 @@ class Texture extends ImageType {
 			else d = b;
 			if (this.pixels[x][y + 1]) c = this.pixels[x][y + 1];
 			else c = a;
-			// if (this.pixels[x + 1])
 			r.shader_set(i, j, Color.quadLerp(a, b, c, d, tx, ty));
 		}
 		r.changed = true;
@@ -180,6 +179,7 @@ class Texture extends ImageType {
 				document.body.appendChild(img);
 				let style = getComputedStyle(img);
 				let w = w_o ? w_o : parseInt(style.width);
+				if (w_o && !h_o) h_o = Math.floor(parseInt(style.height) * w_o / parseInt(style.width));
 				let h = h_o ? h_o : parseInt(style.height);
 				tex = new Texture(w, h);
 				canvas.width = w;

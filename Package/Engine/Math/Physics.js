@@ -1049,7 +1049,11 @@ class PhysicsEngine {
                         }
                     }
                     if (best) {
-                        best.direction = PhysicsVector.normalize(dir);
+                        dir = PhysicsVector.normalize(dir);
+                        let dot = PhysicsVector.dot(dir, best.direction);
+                        if (dot < 0) continue;//PhysicsVector.invert(dir);
+                        best.penetration *= Math.abs(dot);
+                        best.direction = dir;
                         for (let contact of best.contacts) {
                             // renderer.stroke(cl.RED, 2).arrow(contact.point, PhysicsVector.add(contact.point, PhysicsVector.mul(best.direction, contact.penetration)));
                             // console.log(contact);

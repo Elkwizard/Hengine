@@ -95,31 +95,18 @@ class Artist {
 				if (typeof x === "object") {
 					y = x.y;
 					x = x.x;
-					pack = y;
+					pack = y || false;
 				}
 				text = (text + "").replace(/\t/, "    ");
+				if (pack) text = this.packText(font, text, pack);
 				this.c.font = font;
-				if (pack) {
-					let words = text.split(" ");
-					let lines = [""];
-					for (let word of words) {
-						let prevLen = lines[lines.length - 1].length;
-						lines[lines.length - 1] += " " + word;
-						if (this.c.measureText(lines[lines.length - 1]).width > pack) {
-							lines[lines.length - 1] = lines[lines.length - 1].substr(0, prevLen);
-							lines.push(word);
-						}
-						if (word === "\n") lines.push("");
-					}
-					text = lines.join("\n").slice(1);
-				}
 				let fs = this.getFontValue(font);
 				let tmh = this.getTextHeight(font, text);
 				let blocks = text.split("\n");
 				let textRequests = [];
 				for (let i = 0; i < blocks.length; i++) {
 					let ax = x;
-					let ay = y + (i + 1) * fs;
+					let ay = y + (i + 1) * fs - fs * 0.26;
 					let tmw = this.c.measureText(blocks[i]).width;
 					if (this.textMode === TextMode.LEFT);
 					else if (this.textMode === TextMode.CENTER) {
@@ -128,9 +115,9 @@ class Artist {
 						ax -= tmw;
 					}
 					if (this.textModeVertical === TextMode.TOP);
-					else if (this.textMode === TextMode.CENTER) {
+					else if (this.textModeVertical === TextMode.CENTER) {
 						ay -= tmh / 2;
-					} else if (this.textMode === TextMode.BOTTOM) {
+					} else if (this.textModeVertical === TextMode.BOTTOM) {
 						ay -= tmh;
 					}
 					textRequests.push({ text: blocks[i], x: ax, y: ay });
@@ -643,13 +630,33 @@ class Artist {
 	getFontValue(font) {
 		return parseInt(font.slice(0, font.indexOf("px")));
 	}
-	getTextWidth(font, str) {
+	packText(font, str, pack) {
 		this.c.font = font;
-		let spl = str.toString().split("\n");
+		let text = str.replace(/\t/g, "    ");
+		let words = text.split(" ");
+		let lines = [""];
+		for (let i = 0; i < words.length; i++) {
+			let word = words[i];
+			let prevLen = lines[lines.length - 1].length;
+			lines[lines.length - 1] += (i ? " " : "") + word;
+			if (this.c.measureText(lines[lines.length - 1]).width > pack) {
+				lines[lines.length - 1] = lines[lines.length - 1].slice(0, prevLen);
+				lines.push(word);
+			}
+			if (word === "\n") lines.push("");
+		}
+		return lines.join("\n");
+	}
+	getTextWidth(font, str) {
+		str += "";
+		this.c.font = font;
+		let spl = str.replace(/\t/g, "    ").split("\n");
 		return Math.max(...spl.map(e => this.c.measureText(e).width));
 	}
-	getTextHeight(font, str) {
-		return str.trim().split("\n").length * this.getFontValue(font);
+	getTextHeight(font, str, pack) {
+		str += "";
+		if (pack) str = this.packText(font, str, pack);
+		return str.split("\n").length * this.getFontValue(font);
 	}
 	getPixel(x, y) {
 		let d = this.c.getImageData(x, y, 1, 1).data;

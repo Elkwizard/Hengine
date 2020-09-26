@@ -265,7 +265,7 @@ class Hengine {
 		return type.toUpperCase();
 	}
 	getFilePath(file, loc) {
-		return "HengineLocalSaves/" + loc + "/" + file.split(".")[0] + "." + file.split(".")[1].toLowerCase();
+		return "HengineLocalSaves\\" + escape(loc) + "\\" + escape(file.split(".")[0]) + "." + file.split(".")[1].toLowerCase();
 	}
 	saveRaw(file, data, loc = this.getProjectName()) {
 		LocalFileSystem.put(this.getFilePath(file, loc), data);
@@ -293,12 +293,12 @@ class Hengine {
 	}
 	getAllFiles() {
 		let files = LocalFileSystem.getAllFiles().map(file => {
-			let inx = file.indexOf("/") + 1;
+			let inx = file.indexOf("\\") + 1;
 			let nFile = file.slice(inx);
-			let inx2 = nFile.indexOf("/");
+			let inx2 = nFile.indexOf("\\");
 			let loc = nFile.slice(0, inx2);
 			let fileName = nFile.slice(inx2 + 1);
-			return { location: loc, file: fileName };
+			return { location: unescape(loc), file: unescape(fileName) };
 		});
 		return files;
 	}

@@ -10,6 +10,14 @@ Number.threshold = function (n, t) {
 function assert(condition, name) {
 	if (!condition) console.warn(`Assertion "${name}" failed.`);
 }
+function define(name, value) {
+	delete window[name];
+	Object.defineProperty(window, name, {
+		get() {
+			return value();
+		}
+	});
+}
 let globalSquareRoots = 0;
 let sqrt = Math.sqrt.bind(Math);
 Math.sqrt = function (n) {
