@@ -69,7 +69,7 @@ class UIContainer {
     }
     setHeight(h) {
         this.borderBox.height = h;
-        // if (this.contentBox.height < this.borderBox.height) this.contentBox.y = this.borderBox.middle.y;
+        if (this.contentBox.height < this.borderBox.height) this.contentBox.y = this.borderBox.middle.y;
     }
     setWidth(w) {
         let contentWidth = w;
@@ -119,6 +119,7 @@ class UIContainer {
         let y = this.contentBox.y;
         let right = transform.direction;
         let down = right.normal;
+        let offset = right.times(-this.borderBox.width / 2).plus(down.times(-this.borderBox.height / 2));
         for (let i = 0; i < this.packedContent.length; i++) {
             let x = this.contentBox.x;
             let row = this.packedContent[i];
@@ -129,7 +130,9 @@ class UIContainer {
                 let horizontal = right.times(x + comp.margin);
                 let vertical = down.times(y + comp.margin + this.contentOffsets[i][j]);
                 let point = horizontal.plus(vertical).plus(transform.position);
-                layouts.push(comp.layout(new Transform(point.x, point.y, transform.rotation)));
+                let layout = comp.layout(new Transform(point.x, point.y, transform.rotation));
+                layout.transform.position.add(offset);
+                layouts.push(layout);
                 x += comp.marginBox.width;
             }
             y += biggestInc;
