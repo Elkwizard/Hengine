@@ -22,7 +22,10 @@ class Transform {
 	}
 	dif(transf) {
 		const EPSILON = 0.001;
-		return Math.abs(this.position.x - transf.position.x) > EPSILON || Math.abs(this.position.y - transf.position.y) > EPSILON || Math.abs(this.rotation - transf.rotation) > EPSILON;
+		let dx = Math.abs(this.position.x - transf.position.x);
+		let dy = Math.abs(this.position.y - transf.position.y);
+		let dr = Math.abs(this.rotation - transf.rotation);
+		return dx > EPSILON || dy > EPSILON || dr > EPSILON;
 	}
 	rotateAround(point, rotation) {
 		let dif = this.position.minus(point);

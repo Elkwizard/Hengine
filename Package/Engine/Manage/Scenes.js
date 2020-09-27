@@ -78,7 +78,6 @@ class Scene {
 		}
 		let phys = this.main.getPhysicsElements();
 		this.clearCollisions(phys);
-		this.updatePreviousData(this.main.elementArray);
 		this.beforePhysicsStep(phys);
 		this.physicsEngine.run();
 		this.afterPhysicsStep(phys);
@@ -115,11 +114,11 @@ class Scene {
 		}
 		this.physicsEngine.addConstraint(con);
 	}
-	updateSceneObjectCaches(useful) {
-		for (const el of useful) el.updateCaches();
+	updateCaches() {
+		for (const el of this.main.elementArray) el.updateCaches();
 	}
-	updatePreviousData(useful) {
-		for (let rect of useful) {
+	updatePreviousData() {
+		for (let rect of this.main.elementArray) {
 			rect.updatePreviousData();
 		}
 	}
@@ -183,7 +182,6 @@ class Scene {
 			}
 		}
 		this.main.startUpdate();
-		this.updateSceneObjectCaches(this.main.elementArray);
 		this.camera.width = this.renderer.canvas.width;
 		this.camera.height = this.renderer.canvas.height;
 		this.main.elementArray.sort((a, b) => a.layer - b.layer);

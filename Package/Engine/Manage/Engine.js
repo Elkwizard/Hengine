@@ -140,8 +140,8 @@ class Engine {
 			if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
 			//update
 			if (!this.paused) {
-				K.update();
-				M.update();
+				this.keyboard.update();
+				this.mouse.update();
 				this.intervals.beforeUpdate();
 				this.clear();
 				this.intervals.update();
@@ -149,8 +149,10 @@ class Engine {
 				if (!this.hasFixedPhysicsUpdateCycle) this.engineFixedUpdateInternal();
 				this.intervals.afterUpdate();
 				this.updateScreenRecordings();
-				K.afterUpdate();
-				M.afterUpdate();
+				this.keyboard.afterUpdate();
+				this.mouse.afterUpdate();
+				this.scene.updateCaches();
+				this.scene.updatePreviousData();
 			}
 		} catch (e) {
 			if (this.catchErrors) this.output("Draw Error: " + e);
