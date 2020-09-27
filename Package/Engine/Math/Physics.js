@@ -990,6 +990,16 @@ class PhysicsEngine {
         body.addCollidingBody(body2);
         if (!maxPenetration) return;
         let STATIC = body2.type === RigidBody.STATIC;
+        if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
+            let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
+            if (dot > 0.8) {
+                STATIC = true;
+                break;
+            }
+        }
+        if (STATIC) {
+            body.prohibitedDirections.push(collisionDirection);
+        }
         this.oncollide(body, body2, collisionDirection, contacts);
         if (body.isTrigger || body2.isTrigger) return;
         if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
