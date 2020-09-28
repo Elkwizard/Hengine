@@ -126,7 +126,7 @@ class ParticleObject extends SceneObject {
                 this.home.scene.renderer.alpha = 1;
             };
         }
-        if (sp.particleDraw instanceof Script) {
+        if (sp.particleDraw instanceof ElementScript) {
             this.draw = function () { };
             sp.particleDraw.addTo(this);
         } else {
