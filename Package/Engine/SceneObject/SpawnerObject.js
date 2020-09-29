@@ -68,10 +68,29 @@ class ParticleSpawnerObject extends SceneObject {
         this.rotationStatic = true;
         this.slows = false;
     }
-    engineDrawUpdate() {
+    getBoundingBox() {
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
         for (let key in this.spawns) {
-            this.spawns[key].engineDrawUpdate();
+            let p = this.spawns[key].transform.position;
+            if (p.x < minX) minX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y > maxY) maxY = p.y;
         }
+        return new Rect(minX, minY, maxX - minX, maxY - minY);
+    }
+    engineDrawUpdate(screen) {
+		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox || this.__boundingBox, screen);
+		if (!this.hidden && this.onScreen) {
+            for (let key in this.spawns) this.spawns[key].engineDrawUpdate();
+        }
+    }
+    updatePreviousData() {
+        super.updatePreviousData();
+        for (let name in this.spawns) this.spawns[name].updatePreviousData();
     }
     spawnParticle() {
         const name = `Particle #${this.particleNumber++} from ${this.name}`; 
@@ -84,9 +103,10 @@ class ParticleSpawnerObject extends SceneObject {
             for (let i = 0; i < len; i++) {
                 this.spawnParticle();
             }
+            this.cacheBoundingBoxes();
         }
-        for (let [name, particle] of this.spawns) {
-            particle.updatePreviousData();
+        for (let name in this.spawns) {
+            let particle = this.spawns[name];
             particle.engineFixedUpdate();
             particle.lifeSpan++;
         }
@@ -96,7 +116,6 @@ class ParticleSpawnerObject extends SceneObject {
 class ParticleObject extends SceneObject {
     constructor(spawner, home, name) {
         super(name, spawner.transform.position.x, spawner.transform.position.y, false, "Engine-Particle", home);
-        this.cullGraphics = false;
         this.velocity = Vector2.origin;
         this.angularVelocity = 0;
         this.spawner = spawner;
