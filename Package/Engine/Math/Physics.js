@@ -555,13 +555,13 @@ class CollisionDetector {
             let end = b.vertices[(i + 1) % b.vertices.length];
 
             let submission;
-            if (end.x - start.x === 0) {
+            if (Math.abs(end.x - start.x) < 0.0001) {
                 let min_ = Math.min(start.y, end.y);
                 let max_ = Math.max(start.y, end.y);
                 submission = new PhysicsVector(start.x, ay);
                 if (ay < min_) submission.y = min_;
                 if (ay > max_) submission.y = max_;
-            } else if (end.y - start.y === 0) {
+            } else if (Math.abs(end.y - start.y) < 0.0001) {
                 let min_ = Math.min(start.x, end.x);
                 let max_ = Math.max(start.x, end.x);
                 submission = new PhysicsVector(ax, start.y);

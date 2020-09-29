@@ -29,7 +29,7 @@ class Scene {
 	clearCollisions(phys) {
 		for (let rect of phys) {
 			rect.colliding.removeDead();
-			if (!this.physicsEngine.isAsleep(rect.body)) rect.colliding.clear();
+			if (!(this.physicsEngine.isAsleep(rect.body) && rect.mobile)) rect.colliding.clear();
 		}
 	}
 	rayCast(origin, ray, shapes = this.main.elementArray) {
@@ -92,15 +92,23 @@ class Scene {
 		for (let el of phys) el.afterPhysicsStep();
 	}
 	handleCollisionEvents(useful) {
-		const types = [["left", "CollideLeft"], ["right", "CollideRight"], ["top", "CollideTop"], ["bottom", "CollideBottom"], ["general", "CollideGeneral"]];
+		const types = [
+			["left", "CollideLeft", "CollideRight"], 
+			["right", "CollideRight", "CollideLeft"], 
+			["top", "CollideTop", "CollideBottom"], 
+			["bottom", "CollideBottom", "CollideTop"], 
+			["general", "CollideGeneral", "CollideGeneral"]
+		];
 
 		for (let rect of useful) {
-			for (let type of types) {
-				let last = rect.lastColliding[type[0]];
+			for (let type of types) { 
+				let last = rect.lastColliding[type[0]] || [];
 				let col = rect.colliding[type[0]];
-				if (col && last) {
+				if (col) {
 					last = last.map(cd => cd.element);
-					for (let body of col) if (!last.includes(body.element)) rect.scripts.run(type[1], body);
+					for (let body of col) if (!last.includes(body.element)) {
+						rect.scripts.run(type[1], body);
+					}
 				}
 			}	
 			rect.lastColliding.extract(rect.colliding);
