@@ -50,6 +50,12 @@ class PhysicsObject extends SceneObject {
         });
         this._velocity = vec;
     }
+    get friction() {
+        return this.body.friction;
+    }
+    set friction(a) {
+        this.body.friction = a;
+    }
     get airResistance() {
         return this.body.airResistance;
     }
@@ -94,7 +100,8 @@ class PhysicsObject extends SceneObject {
         return this._velocity;
     }
     set velocity(a) {
-        this.body.velocity = a.toPhysicsVector();
+        this._velocity.x = a.x;
+        this._velocity.y = a.y;
     }
     get angularVelocity() {
         return this.body.angularVelocity;
