@@ -746,9 +746,11 @@ class CollisionResolver {
     getJ(vAB, mA, mB, iA, iB, e, n, rA, rB) {
         // let inertiaTerm = ((rA × n) × rA) ÷ iA + ((rB × n) × rB) ÷ iB) · n;// nice
         //optimized
-        let inertiaTerm = (n.x ** 2 * (iB * rA.y ** 2 + iA * rB.y ** 2)
-            + n.y ** 2 * (iB * rA.x ** 2 + iA * rB.x ** 2)
-            + n.x * n.y * (2 * iB * rA.x * rA.y + 2 * iA * rB.x * rB.y)) / (iA * iB);
+        let inertiaTerm = PhysicsVector.dot(PhysicsVector.add(PhysicsVector.div(PhysicsVector.crossNV(PhysicsVector.cross(rA, n), rA), iA), PhysicsVector.div(PhysicsVector.crossNV(PhysicsVector.cross(rB, n), rB), iB)), n);
+        // console.log(inertiaTerm);
+        // let inertiaTerm = (n.x ** 2 * (iB * rA.y ** 2 + iA * rB.y ** 2)
+        //     + n.y ** 2 * (iB * rA.x ** 2 + iA * rB.x ** 2)
+        //     + n.x * n.y * (2 * iB * rA.x * rA.y + 2 * iA * rB.x * rB.y)) / (iA * iB);
 
         let invMassSum = 1 / mA + 1 / mB + inertiaTerm;
         let j = (1 + e) * PhysicsVector.dot(vAB, n) / invMassSum;
@@ -837,7 +839,9 @@ class CollisionResolver {
             let j_t = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, t, rA, rB) * factor * friction;
             let impulseA_t = PhysicsVector.mul(t, j_t);
 
-            impulsesA.push({ point: contact.point, impulse: PhysicsVector.add(impulseA_n, impulseA_t) });
+            let impulseA = PhysicsVector.add(impulseA_n, impulseA_t);
+            // console.log(j_n + 2 * bodyA.mass * PhysicsVector.dot(vAB, n));
+            impulsesA.push({ point: contact.point, impulse: impulseA });
         }
         for (let impulse of impulsesA) {
             bodyA.applyImpulse(impulse.point, impulse.impulse);
