@@ -42,16 +42,18 @@ class Transform {
 	}
 	drawInModelSpace(artist, c = renderer) {
 		c.translate(this.position.x, this.position.y);
-		c.rotate(this.rotation);
+		let r = this.rotation;
+		if (r) c.rotate(this.rotation);
 		artist();
-		c.rotate(-this.rotation);
+		if (r) c.rotate(-this.rotation);
 		c.translate(-this.position.x, -this.position.y);
 	}
 	drawInWorldSpace(artist, c = renderer) {
-		c.rotate(-this.rotation);
+		let r = this.rotation;
+		if (r) c.rotate(-this.rotation);
 		c.translate(-this.position.x, -this.position.y);
 		artist();
 		c.translate(this.position.x, this.position.y);
-		c.rotate(this.rotation);
+		if (r) c.rotate(this.rotation);
 	}
 }

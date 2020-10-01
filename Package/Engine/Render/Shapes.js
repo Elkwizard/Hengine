@@ -211,8 +211,9 @@ class Polygon extends Shape {
 	}
 	static regular(sides, radius) {
 		let v = [];
+		let o = Math.PI / sides;
 		for (let i = 0; i < sides; i++)
-			v.push(Vector2.fromAngle(i / sides * 2 * Math.PI).times(radius));
+			v.push(Vector2.fromAngle(i / sides * 2 * Math.PI + o).times(radius));
 		return new Polygon(v, true);
 	}
 }

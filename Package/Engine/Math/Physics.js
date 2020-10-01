@@ -752,6 +752,8 @@ class CollisionResolver {
         //     + n.y ** 2 * (iB * rA.x ** 2 + iA * rB.x ** 2)
         //     + n.x * n.y * (2 * iB * rA.x * rA.y + 2 * iA * rB.x * rB.y)) / (iA * iB);
 
+        // let inertiaTerm = ((-iB * n.x ** 2 + rA.y) * (rA.x + rA.y) + (iA * n.y ** 2 * rB.x) * (rB.x - rB.y) + (n.x * n.y) * ((iB * rA.x) * (rA.x - rA.y) - (iA * rB.y) * (rB.x - rB.y))) / (iA * iB);
+
         let invMassSum = 1 / mA + 1 / mB + inertiaTerm;
         let j = (1 + e) * PhysicsVector.dot(vAB, n) / invMassSum;
         return j;

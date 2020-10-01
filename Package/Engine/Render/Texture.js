@@ -17,6 +17,18 @@ class Texture extends ImageType {
 	get brightness() {
 		return this.pixels.map(col => col.brightness);
 	}
+	get red() {
+		return this.pixels.map(col => col.red);
+	}
+	get green() {
+		return this.pixels.map(col => col.green);
+	}
+	get blue() {
+		return this.pixels.map(col => col.blue);
+	}
+	get alpha() {
+		return this.pixels.map(col => col.alpha);
+	}
 	*[Symbol.iterator]() {
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) yield this.pixels[i][j];
 	}
