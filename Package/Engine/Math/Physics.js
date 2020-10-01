@@ -1,5 +1,5 @@
 //vectors
-const INFINITY = 1e135;
+const INFINITY = 1e13;
 class PhysicsVector {
     constructor(x, y) {
         this.x = x;
