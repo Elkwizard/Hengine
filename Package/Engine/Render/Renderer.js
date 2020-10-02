@@ -238,7 +238,7 @@ class Artist {
 					this.c.stroke();
 				}
 			},
-			spline(spline, prec = 1000) {
+			spline(spline, prec = 100) {
 				let inc = 1 / prec;
 				this.c.beginPath();
 				this.c.moveTo(spline.a.x, spline.a.y);
@@ -402,7 +402,7 @@ class Artist {
 				this.c.clip();
 			},
 			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.arc(x, y, radius, startAngle, endAngle);
+				pathObj.arc(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.clip();
 			},
 			sector(x, y, radius, startAngle, endAngle) {

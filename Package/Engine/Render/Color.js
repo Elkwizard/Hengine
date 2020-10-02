@@ -8,14 +8,14 @@ class Color extends Operable {
 		this.custom = {};
 		this.limited = true;
 		if (b === undefined && g === undefined && typeof r == "string") {
-			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0 && r.indexOf("hsl") < 0) {
+			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0 && r.indexOf("hsb") < 0) {
 				let col = Color.CSSColor(r);
 				red = col.red;
 				green = col.green;
 				blue = col.blue;
 				alpha = col.alpha;
 			} else if (r[0] == "h") {
-				let col = Color.parseHSLA(r);
+				let col = Color.parseHSBA(r);
 				red = col.red;
 				green = col.green;
 				blue = col.blue;
@@ -45,6 +45,13 @@ class Color extends Operable {
 		this.green = green;
 		this.blue = blue;
 		this.alpha = alpha;
+		this.constrain();
+	}
+	set brightness(n) {
+		let scale = n / this.brightness;
+		this.red *= scale;
+		this.green *= scale;
+		this.blue *= scale;
 		this.constrain();
 	}
 	get brightness() {
@@ -134,44 +141,58 @@ class Color extends Operable {
 		if (str[str.length - 1] === "%") return parseFloat(str) / 100 * limit;
 		return parseFloat(str);
 	}
-	static parseHSLA(str) {
-		let hsl = "";
+	static parseHSBA(str) {
+		let hsb = "";
 		let state = false;
 		for (let char of str) {
 			if (char == ")" || char == "(") {
 				state = !state;
 			}
 			else if (state) {
-				hsl += char;
+				hsb += char;
 			}
 		}
-		let hslaList = hsl.split(",");
-		let h = Color.parseNum(hslaList[0], 360);
-		let s = Color.parseNum(hslaList[1], 1);
-		let v = Color.parseNum(hslaList[2], 1);
-		let alpha = (hslaList.length > 3) ? Color.parseNum(hslaList[3], 1) : 1;
+		let hsbaList = hsb.split(",");
+		let H = Color.parseNum(hsbaList[0], 360);
+		let S = Color.parseNum(hsbaList[1], 1);
+		let B = Color.parseNum(hsbaList[2], 1);
+		let alpha = (hsbaList.length > 3) ? Color.parseNum(hsbaList[3], 1) : 1;
 		
-		h = Math.max(h, 0);
-		h %= 360;
-		let seg = ~~(h / 120);
-		let t = (h % 120) / 120;
+		H = Math.max(H, 0);
+		H %= 360;
+		let seg = ~~(H / 120);
+		let t = (H % 120) / 120;
+		let ot = t + Math.sin(2 * Math.PI * t) / (2 * Math.PI);
+		// let ot1 = 2 * 255 * Math.min(1 - t, 0.5);
+		// let ot2 = 2 * 255 * Math.min(t, 0.5);
+		let st = 1 + Math.sin(Math.PI * t);
 		let r = 0, g = 0, b = 0;
 		switch (seg) {
 			case 0:
-				r = 255 * (1 - t);
-				g = 255 * t;
+				g = 255 * ot;
+				r = 255 - g;
+				// g = ot2;
+				// r = ot1;
 				break;
 			case 1:
-				g = 255 * (1 - t);
-				b = 255 * t;
+				b = 255 * ot;
+				g = 255 - b;
+				// b = ot2;
+				// g = ot1; 
 				break;
 			case 2:
-				b = 255 * (1 - t);
-				r = 255 * t;
+				r = 255 * ot;
+				b = 255 - r;
+				// r = ot2;
+				// b = ot1;
 				break;
 		}
-		let targetBrightness = v * 255;
-		let scaleBrightness = targetBrightness / Math.max(r, g, b);
+
+		let scaleBrightness = st;
+		scaleBrightness *= B;
+		// r = 255;
+		// g = 255;
+		// b = 0;
 		r *= scaleBrightness;
 		g *= scaleBrightness;
 		b *= scaleBrightness;
@@ -179,9 +200,9 @@ class Color extends Operable {
 		let dr = r - middle;
 		let dg = g - middle;
 		let db = b - middle;
-		r = middle + s * dr;
-		g = middle + s * dg;
-		b = middle + s * db;
+		r = middle + S * dr;
+		g = middle + S * dg;
+		b = middle + S * db;
 
 		return { red: r, green: g, blue: b, alpha };
 	}
