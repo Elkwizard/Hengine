@@ -70,7 +70,10 @@ class Operable {
 	}
 	static avg(v) {
 		return this.sum(v).over(v.length);
-	}
+    }
+    static clamp(n, a, b) {
+        return new this(...this.modValues.map(x => Math.max(a[x], Math.min(b[x], n[x]))));
+    }
     static lerp(a, b, t) {
         let ops = a.constructor.modValues;
         let args = [];

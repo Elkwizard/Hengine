@@ -165,7 +165,7 @@ class Color extends Operable {
 		let ot = t + Math.sin(2 * Math.PI * t) / (2 * Math.PI);
 		// let ot1 = 2 * 255 * Math.min(1 - t, 0.5);
 		// let ot2 = 2 * 255 * Math.min(t, 0.5);
-		let st = 1 + Math.sin(Math.PI * t);
+		let st = (3 + Math.sin(2 * Math.PI * t - Math.PI / 2)) / 2;
 		let r = 0, g = 0, b = 0;
 		switch (seg) {
 			case 0:
