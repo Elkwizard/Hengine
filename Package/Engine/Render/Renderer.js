@@ -188,8 +188,8 @@ class Artist {
 					this.draw(this.c.fillStyle).circle(obj);
 				} else if (obj.width !== undefined) {
 					this.draw(this.c.fillStyle).rect(obj);	
-				} else {
-					this.draw(this.c.fillStyle).shape(...obj.getCorners());
+				} else if (obj.vertices !== undefined) {
+					this.draw(this.c.fillStyle).shape(...obj.vertices);
 				}
 			}
 		}
@@ -381,11 +381,15 @@ class Artist {
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).circle(obj);
+					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).circle(obj);
 				} else if (obj.radius !== undefined) {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).rect(obj);	
-				} else {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap).shape(...obj.getCorners());
+					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).rect(obj);	
+				} else if (obj.vertices !== undefined) {
+					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).shape(...obj.vertices);
+				} else if (obj instanceof Line) {
+					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).line(obj);
+				} else if (obj instanceof Spline) {
+					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).spline(obj);
 				}
 			}
 		}
@@ -426,8 +430,8 @@ class Artist {
 					this.clip().circle(obj);
 				} else if (obj.width !== undefined) {
 					this.clip().rect(obj);	
-				} else {
-					this.clip().shape(...obj.getCorners());
+				} else if (obj.vertices !== undefined) {
+					this.clip().shape(...obj.vertices);
 				}
 			}
 		}
@@ -435,7 +439,6 @@ class Artist {
 			this.clipObj[func] = this.clipObj[func].bind(this);
 		}
 		this.imageStyle = null;
-		this.imageStyleSource = new Rect(0, 0, 0, 0);
 		this.imageObj = {
 			circle(x, y, radius) {
 				this.clip().circle(x, y, radius);
@@ -465,10 +468,20 @@ class Artist {
 			default(x, y) {
 				this.drawImageInternal(x, y, this.imageStyle.width, this.imageStyle.height);
 			},
+			inferHeight(x, y, w) {
+				let h = this.imageStyle.height;
+				if (w !== undefined) h *= w / this.imageStyle.width;
+				else w = this.imageStyle.width;
+				this.drawImageInternal(x, y, w, h);
+			},
+			inferWidth(x, y, h) {
+				let w = this.imageStyle.width;
+				if (h !== undefined) w *= h / this.imageStyle.height;
+				else h = this.imageStyle.height;
+				this.drawImageInternal(x, y, w, h);
+			},
 			rect(x, y, width, height) {
-				this.clip().rect(x, y, width, height);
 				this.drawImageInternal(x, y, width, height);
-				this.unclip();
 			},
 			triangle(v1, v2, v3) {
 				this.clip().triangle(v1, v2, v3);
@@ -492,11 +505,11 @@ class Artist {
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.image(this.imageStyle, this.imageStyleSource).circle(obj);
+					this.image(this.imageStyle).circle(obj);
 				} else if (obj.width !== undefined) {
-					this.image(this.imageStyle, this.imageStyleSource).rect(obj);	
-				} else {
-					this.image(this.imageStyle, this.imageStyleSource).shape(...obj.getCorners());
+					this.image(this.imageStyle).rect(obj);	
+				} else if (obj.vertices !== undefined) {
+					this.image(this.imageStyle).shape(...obj.vertices);
 				}
 			}
 
@@ -550,6 +563,18 @@ class Artist {
 	get alpha() {
 		return this.c.globalAlpha;
 	}
+	getPixel(x, y) {
+		let d = this.c.getImageData(x, y, 1, 1).data;
+		return new Color(d[0], d[1], d[2], d[3])
+	}
+	setPixel(x, y, col) {
+		let data = new Uint8ClampedArray(4);
+		data[0] = col.red;
+		data[1] = col.green;
+		data[2] = col.blue;
+		data[3] = col.alpha * 255;
+		this.c.putImageData(new ImageData(data, 1, 1), x, y);
+	}
 	getTexture(x, y, w, h) {
 		let imageData = this.c.getImageData(x, y, w, h);
 		let tex = new Texture(w, h);
@@ -600,12 +625,9 @@ class Artist {
 			y = x.y;
 			x = x.x;
 		}
-		this.drawImage(this.imageStyle, x, y, w, h, this.imageStyleSource);
+		this.drawImage(this.imageStyle, x, y, w, h);
 	}
-	image(img, sx = 0, sy = 0, sw = img.width, sh = img.height) {
-		if (sx instanceof Rect) this.imageStyleSource = sx.get();
-		else this.imageStyleSource = new Rect(sx, sy, sw, sh);
-		
+	image(img) {
 		this.imageStyle = img;
 		return this.imageObj;
 	}
@@ -657,10 +679,6 @@ class Artist {
 		str += "";
 		if (pack) str = this.packText(font, str, pack);
 		return str.split("\n").length * this.getFontValue(font);
-	}
-	getPixel(x, y) {
-		let d = this.c.getImageData(x, y, 1, 1).data;
-		return new Color(d[0], d[1], d[2], d[3])
 	}
 	contentToFrame() {
 		let n = new Frame(this.canvas.width, this.canvas.height);
@@ -762,11 +780,11 @@ class Artist {
 		this.rotate(r);
 		this.translate(-x, -y);
 	}
-	drawImage(img, x, y, width, height, clp = new Rect(0, 0, img.width, img.height)) {
+	drawImage(img, x, y, width, height) {
 		if (img instanceof ImageType) img = img.requestImage(width, height);
 		if (width === undefined) width = img.width;
 		if (height === undefined) height = img.height;
-		this.c.drawImage(img, clp.x, clp.y, clp.width, clp.height, x, y, width, height);
+		this.c.drawImage(img, x, y, width, height);
 	}
 	drawAnimation(animation, x, y, width, height, advance = true) {
 		if (typeof x === "object") {
@@ -827,7 +845,7 @@ class Artist {
 				}
 
 				if (shape === "shape") {
-					let vert = shapeArgs.getCorners();
+					let vert = shapeArgs.vertices;
 					let len = vert.length;
 					let lines = [];
 					for (let i = 0; i < len; i++) lines.push(vert[(i + 1) % len]);
@@ -864,7 +882,7 @@ class Artist {
 				}
 
 				if (shape === "shape") {
-					let vert = shapeArgs.getCorners();
+					let vert = shapeArgs.vertices;
 					let len = vert.length;
 					let lines = [];
 					for (let i = 0; i < len; i++) lines.push(vert[(i + 1) % len]);
@@ -903,7 +921,7 @@ class Artist {
 				}
 				let v;
 				if (shape === "shape") {
-					v = shapeArgs.getCorners();
+					v = shapeArgs.vertices;
 					let minX = Math.min(...v.map(e => e.x));
 					let maxX = Math.max(...v.map(e => e.x));
 					let minY = Math.min(...v.map(e => e.y));

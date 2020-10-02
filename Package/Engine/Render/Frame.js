@@ -12,6 +12,12 @@ class ImageType {
 		this.loops = loops;
 		this.loaded = true;
 	}
+	inferWidth(height) {
+		return this.width * height / this.height;
+	}
+	inferHeight(width) {
+		return this.height * width / this.width;
+	}
 	download(name) {
 		let canvas = document.createElement("canvas");
 		let img = this.makeImage();
@@ -72,6 +78,23 @@ class Frame extends ImageType {
 			this.loaded = true;
 			this.onload();
 		}.bind(this);
+	}
+	clip(x, y, w, h) {
+		if (x.width !== undefined) {
+			h = x.height;
+			w = x.width;
+			y = x.y;
+			x = x.x;
+		}
+		let f = new Frame(w, h);
+		f.renderer.c.drawImage(this.img, x, y, w, h, 0, 0, w, h);
+		return f;
+	}
+	static fromImageType(img) {
+		let offscreen = img.makeImage();
+		let f = new Frame(offscreen.width, offscreen.height);
+		f.renderer.c.drawImage(offscreen, 0, 0);
+		return f;
 	}
 	makeImage() {
 		return this.img;

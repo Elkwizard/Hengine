@@ -104,6 +104,10 @@ class Color extends Operable {
 		cl.alpha = col.alpha;
 		return cl;
 	}
+	static saturate(col, a) {
+		let b = col.brightness * 255;
+		return new Color(b + (col.red - b) * a, b + (col.green - b) * a, b + (col.blue - b) * a, col.alpha);
+	}
 	static grayScale(per) {
 		let r = 255 * per;
 		let g = 255 * per;

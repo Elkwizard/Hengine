@@ -5,6 +5,7 @@ class WebcamCapture extends ImageType {
 		WebcamCapture.getWebcam(this.data);
 		this.lastCaptureTime = 0;
 		this.lastCapture = null;
+		this.recording = true;
 	}
 	static async getWebcam(home) {
 		const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -22,9 +23,15 @@ class WebcamCapture extends ImageType {
 		frame.renderer.c.drawImage(image, 0, 0);
 		return frame;
 	}
+	pause() {
+		this.recording = false;
+	}
+	play() {
+		this.recording = true;
+	}
 	makeImage() {
 		if (this.data.video) {
-			if (performance.now() - this.lastCaptureTime > 16 || !this.lastCapture) {
+			if ((this.recording && performance.now() - this.lastCaptureTime > 16) || !this.lastCapture) {
 				const v = this.data.video;
 				let mwidth = Math.min(v.videoWidth, v.videoHeight);
 				let ox = (v.videoHeight < v.videoWidth) ? (v.videoWidth - mwidth) / 2 : 0;

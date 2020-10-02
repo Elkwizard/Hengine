@@ -366,7 +366,7 @@ class Geometry {
     }
     static closestPointOnPolygonInDirection(point, dir, r) {
         let edges = [];
-        let corners = r.getCorners();
+        let corners = r.vertices;
         let bestPoint = null;
         let bestDist = Infinity;
         for (let i = 0; i < corners.length; i++) {

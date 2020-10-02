@@ -138,7 +138,7 @@ class Polygon extends Shape {
 		let pos = transf.position;
 		let cos = transf.cosRotation;
 		let sin = transf.sinRotation;
-		let verts = this.getCorners();
+		let verts = this.vertices;
 		let m_sin = sin;
 		let m_cos = cos;
 		verts = verts
@@ -151,9 +151,6 @@ class Polygon extends Shape {
 				
 			});
 		return new Polygon(verts, this.alreadyClockwise);
-	}
-	getCorners() {
-		return this.vertices;
 	}
 	getAxes() {
 		let axes = [];

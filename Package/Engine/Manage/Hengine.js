@@ -287,9 +287,8 @@ class Hengine {
 	}
 	fileSize(file, loc = this.getProjectName()) {
 		let data = this.getRaw(file, loc);
-		if (data) {
-			return data.length * 8;
-		}
+		if (data) return (data.length / 512).toMaxed(1) + "kb";
+		return 0;
 	}
 	getAllFiles() {
 		let files = LocalFileSystem.getAllFiles().map(file => {
