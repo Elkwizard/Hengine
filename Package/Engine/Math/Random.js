@@ -18,9 +18,15 @@ class Random {
     static octave(alg, freq, oc, ...sample) {
         let n = 0;
         let scl = 0;
+        let len = Random[alg].length + 1;
+        let seed = Random.seed;
+        if (len === sample.length) {
+            seed = sample[sample.length - 1];
+            sample.length = len - 1;
+        }
         for (let i = 1; i < 1 + oc; i++) {
             scl += 1 / i;
-            n += Random[alg](...sample, freq * i) / i;
+            n += Random[alg](...sample, freq * i, seed) / i;
         }
         return n / scl;
     }
