@@ -69,7 +69,7 @@ class UIContainer {
     }
     setHeight(h) {
         this.borderBox.height = h;
-        if (this.contentBox.height < this.borderBox.height) this.contentBox.y = this.borderBox.middle.y;
+        if (this.contentBox.height < this.borderBox.height) this.contentBox.y = this.borderBox.middle.y - this.contentBox.height / 2;
     }
     setWidth(w) {
         let contentWidth = w;
