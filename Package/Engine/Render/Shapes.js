@@ -94,7 +94,7 @@ class Shape extends Operable {
 class Polygon extends Shape {
 	constructor(vertices, alreadyClockwise) {
 		super();
-		this.alreadyClockwise = alreadyClockwise;
+		if (!alreadyClockwise) vertices = Geometry.clockwise(vertices);
 		this.vertices = Polygon.removeDuplicates(vertices);
 		let x = vertices.map(e => e.x);
 		let y = vertices.map(e => e.y);
@@ -150,7 +150,7 @@ class Polygon extends Shape {
 				return new Vector2(nX + pos.x, nY + pos.y);
 				
 			});
-		return new Polygon(verts, this.alreadyClockwise);
+		return new Polygon(verts, true);
 	}
 	getAxes() {
 		let axes = [];
@@ -175,36 +175,36 @@ class Polygon extends Shape {
 	}
 	center(pos) {
 		let offset = pos.Vminus(this.middle);
-		return new Polygon(this.vertices.map(e => e.Vplus(offset)), this.alreadyClockwise);
+		return new Polygon(this.vertices.map(e => e.Vplus(offset)), true);
 	}
 	scale(factor) {
 		let middle = this.middle;
-		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))), this.alreadyClockwise);
+		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))), true);
 	}
 	scaleAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))), this.alreadyClockwise);
+		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))), true);
 	}
 	scaleXAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => new Vector2(pos + (pos - e.x) * factor, e.y)), this.alreadyClockwise);
+		return new Polygon(this.vertices.map(e => new Vector2(pos + (pos - e.x) * factor, e.y)), true);
 	}
 	scaleYAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => new Vector2(e.x, pos + (pos - e.y) * factor)), this.alreadyClockwise);
+		return new Polygon(this.vertices.map(e => new Vector2(e.x, pos + (pos - e.y) * factor)), true);
 	}
 	move(dir) {
-		return new Polygon(this.vertices.map(vert => vert.plus(dir)), this.alreadyClockwise);
+		return new Polygon(this.vertices.map(vert => vert.plus(dir)), true);
 	}
 	rotate(angle) {
 		return this.getModel(new Transform(0, 0, angle));
 	}
 	get() {
-		let poly = new Polygon([...this.vertices], this.alreadyClockwise);
+		let poly = new Polygon([...this.vertices], true);
 		return poly;
 	}
 	toPhysicsShape() {
-		return new PolygonCollider(this.vertices.map(v => v.toPhysicsVector()), this.alreadyClockwise);
+		return new PolygonCollider(this.vertices.map(v => v.toPhysicsVector()));
 	}
 	static fromPhysicsShape(sh) {
-		return new Polygon(sh.vertices.map(v => Vector2.fromPhysicsVector(v)), sh.alreadyClockwise);
+		return new Polygon(sh.vertices.map(v => Vector2.fromPhysicsVector(v)), true);
 	}
 	static regular(sides, radius) {
 		let v = [];

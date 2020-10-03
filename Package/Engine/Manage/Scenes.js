@@ -114,8 +114,8 @@ class Scene {
 			rect.lastColliding.extract(rect.colliding);
 		}
 	}
-	constrain(a, b, ap = Vector2.origin, bp = Vector2.origin, str = "CURRENT_DIST") {
-		let con = new PhysicsConstraint.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), str);
+	constrain(a, b, ap = Vector2.origin, bp = Vector2.origin, str = "CURRENT_DIST", stiffness = 1) {
+		let con = new PhysicsConstraint.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), str, stiffness);
 		if (str === "CURRENT_DIST") {
 			let ends = con.getEnds();
 			con.length = Geometry.distToPoint(ends[0], ends[1]);

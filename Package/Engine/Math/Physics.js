@@ -176,8 +176,7 @@ class PolygonModel {
     }
 }
 class PolygonCollider {
-    constructor(vertices, alreadyClockwise = false) {
-        this.alreadyClockwise = alreadyClockwise;
+    constructor(vertices) {
         this.vertices = vertices;
         let acc = this.vertices[0];
         this.position = new PhysicsVector(acc.x, acc.y);
@@ -428,7 +427,7 @@ class RigidBody {
         let shapes = [sh];
 
         if (sh instanceof PolygonCollider && this.engine && this.engine.polygonVertexListSubdivider) {
-            shapes = this.engine.polygonVertexListSubdivider(sh.vertices, sh.alreadyClockwise).map(poly => new PolygonCollider(poly));
+            shapes = this.engine.polygonVertexListSubdivider(sh.vertices).map(poly => new PolygonCollider(poly));
         }
 
         this.shapes.push(...shapes);
@@ -883,9 +882,10 @@ class PhysicsConstraint {
     }
 }
 PhysicsConstraint.Length = class extends PhysicsConstraint {
-    constructor(a, b, ao, bo, l) {
+    constructor(a, b, ao, bo, l, stiffness) {
         super(a, b, ao, bo);
         this.length = l;
+        this.stiffness = stiffness;
     }
     solve(int) {
         let ends = this.getEnds();
@@ -910,6 +910,7 @@ PhysicsConstraint.Length = class extends PhysicsConstraint {
             dy *= int;
 
             if (this.bodyA.type === RigidBody.STATIC || this.bodyB.type === RigidBody.STATIC) dif *= 2;
+            dif *= this.stiffness;
             dx *= dif;
             dy *= dif;
 

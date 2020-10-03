@@ -1,8 +1,8 @@
-function physicsPolygonSubdivider(poly, alreadyClock) {
+function physicsPolygonSubdivider(poly) {
     let verts = poly.map(vert => Vector2.fromPhysicsVector(vert));
     let middle = Geometry.getMiddle(verts);
     verts = verts.map(vert => vert.Vminus(middle));
-    let list = Geometry.subdividePolygonList(alreadyClock ? verts : Geometry.clockwise(verts)).map(verts => verts.map(vert => vert.Vplus(middle)));
+    let list = Geometry.subdividePolygonList(verts).map(verts => verts.map(vert => vert.Vplus(middle)));
     return list.map(verts => Polygon.removeDuplicates(verts).map(vert => vert.toPhysicsVector()));
 }
 class Contact {
