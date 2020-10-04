@@ -1051,22 +1051,26 @@ class PhysicsEngine {
                         let col = this.collisionDetector.collide(body.cacheModel(sI), body2.cacheModel(sJ), PhysicsVector.sub(body2.position, body.position));
                         if (col) collisions.push(col);
                     }
+                    if (!collisions.length) continue;
                     let contacts = [];
                     let dir = new PhysicsVector(0, 0);
+                    let penetration = -Infinity;
+                    let best = null;
                     for (let cI = 0; cI < collisions.length; cI++) {
                         let col = collisions[cI];
-                        dir.add(PhysicsVector.mul(col.direction, col.contacts.length));
+                        dir.add(col.direction);
                         contacts.push(...col.contacts);
-                    }
-                    if (contacts.length) {
-                        let penetration = -Infinity;
-                        for (let cI = 0; cI < contacts.length; cI++) {
-                            let contact = contacts[cI];
-                            if (contact.penetration > penetration) penetration = contact.penetration;
+                        if (col.penetration > penetration) {
+                            penetration = col.penetration;
+                            best = col;
                         }
-                        let collision = new CollisionDetector.Collision(PhysicsVector.normalize(dir), contacts, penetration);
-                        this.resolve(body, body2, collision);
                     }
+                    best.contacts = contacts;
+                    dir = PhysicsVector.normalize(dir);
+                    let dot = PhysicsVector.dot(dir, best.direction);
+                    best.penetration *= dot;
+                    best.direction = dir;
+                    this.resolve(body, body2, best);
                 }
             }
         }
