@@ -782,7 +782,7 @@ class CollisionResolver {
             let e = Math.max(bodyA.restitution, bodyB.restitution);
             let n = direction;
             // assert(PhysicsVector.dot(vAB, n) <= 0, "Traveling toward collision");
-            if (PhysicsVector.dot(vAB, n) > -0.01) continue;
+            // if (PhysicsVector.dot(vAB, n) > -0.01) continue;
             let j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
 
             let impulseA_n = PhysicsVector.mul(n, j_n);
@@ -1046,10 +1046,15 @@ class PhysicsEngine {
                     let best = null;
                     let penetration = -Infinity;
                     let dir = new PhysicsVector(0, 0);
+                    let total = 0;
+                    let contacts = [];
                     for (let sI = 0; sI < body.shapes.length; sI++) for (let sJ = 0; sJ < body2.shapes.length; sJ++) {
                         let col = this.collisionDetector.collide(body.cacheModel(sI), body2.cacheModel(sJ), PhysicsVector.sub(body2.position, body.position));
                         if (col) {
-                            dir.add(col.direction);
+                            contacts.push(...col.contacts);
+                            let factor = col.contacts.length;
+                            dir.add(PhysicsVector.mul(col.direction, factor));
+                            total += factor;
                             if (col.penetration > penetration) {
                                 penetration = col.penetration;
                                 best = col;
@@ -1057,16 +1062,17 @@ class PhysicsEngine {
                         }
                     }
                     if (best) {
-                        dir = PhysicsVector.normalize(dir);
+                        dir.div(total);
                         let dot = PhysicsVector.dot(dir, best.direction);
-                        if (dot < 0) continue;//PhysicsVector.invert(dir);
-                        best.penetration *= Math.abs(dot);
+                        if (dot <= 0) continue;
+                        best.penetration *= dot;
                         best.direction = dir;
-                        for (let contact of best.contacts) {
-                            // renderer.stroke(cl.RED, 2).arrow(contact.point, PhysicsVector.add(contact.point, PhysicsVector.mul(best.direction, contact.penetration)));
+                        best.contacts = contacts;
+                        // for (let contact of best.contacts) {
+                            // renderer.stroke(cl.RED, 2).arrow(contact.point, PhysicsVector.add(contact.point, PhysicsVector.mul(best.direction, contact.penetration * 100)));
                             // console.log(contact);
                             // renderer.draw(cl.RED).circle(contact.point, 5);
-                        }
+                        // }
                         this.resolve(body, body2, best);
                     }
                 }
