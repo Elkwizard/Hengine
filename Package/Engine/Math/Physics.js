@@ -1056,15 +1056,17 @@ class PhysicsEngine {
                     let dir = new PhysicsVector(0, 0);
                     let penetration = -Infinity;
                     let best = null;
+                    for (let cI = 0; cI < collisions.length; cI++) dir.add(collisions[cI].direction);
                     for (let cI = 0; cI < collisions.length; cI++) {
                         let col = collisions[cI];
-                        dir.add(col.direction);
+                        if (PhysicsVector.dot(col.direction, dir) < 0) continue;
                         contacts.push(...col.contacts);
                         if (col.penetration > penetration) {
                             penetration = col.penetration;
                             best = col;
                         }
                     }
+                    if (!contacts.length) continue;
                     best.contacts = contacts;
                     dir = PhysicsVector.normalize(dir);
                     let dot = PhysicsVector.dot(dir, best.direction);
