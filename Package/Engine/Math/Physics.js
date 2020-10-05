@@ -969,7 +969,7 @@ class PhysicsEngine {
         for (let i = 0; i < this.constraintIterations; i++) {
             let cons = [...this.constraints];
             while (cons.length) {
-                cons.splice(Math.floor(Math.random() * cons.length), 1)[0].solve(1 / this.constraintIterations);
+                cons.splice(Math.floor(Math.random() * cons.length), 1)[0].solve(1 / this.constraintIterations / this.iterations);
             }
         }
     }
