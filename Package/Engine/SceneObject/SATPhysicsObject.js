@@ -119,10 +119,6 @@ class PhysicsObject extends SceneObject {
         super.centerModels();
         this.shapeSync();
     }
-    positionSync() {
-        this.transform.position.x = this.body.position.x;
-        this.transform.position.y = this.body.position.y;
-    }
     shapeSync() {
         this.shapeNameIDMap.clear();
         this.body.clearShapes();
@@ -193,7 +189,6 @@ class PhysicsObject extends SceneObject {
     engineFixedUpdate() {
         this.scripts.run("Update");
         this.update();
-        this.positionSync();
     }
     beforePhysicsStep() {
         this.body.position.x = this.transform.position.x;

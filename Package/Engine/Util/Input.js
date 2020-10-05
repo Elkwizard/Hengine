@@ -78,13 +78,16 @@ class KeyboardHandler extends InputHandler {
 		this.onUp = new Listener();
 		let k = this;
 		document.addEventListener("keydown", function (e) {
-			k.keys[e.key.toLowerCase()] = true;
+			k.keys[k.getKeySignature(e.key)] = true;
 			for (let ev of k.onDown) ev(e);
 		});
 		document.addEventListener("keyup", function (e) {
-			k.keys[e.key.toLowerCase()] = false;
+			k.keys[k.getKeySignature(e.key)] = false;
 			for (let ev of k.onUp) ev(e);
 		});
+	}
+	getKeySignature(key) {
+		return (key.length === 1) ? key.toLowerCase() : key;
 	}
 	clearListeners() {
 		this.onDown.clear();
