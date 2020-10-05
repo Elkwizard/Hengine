@@ -207,11 +207,11 @@ class PhysicsObject extends SceneObject {
         this.transform.rotation = this.body.angle;
     }
     moveTowards(point, ferocity = 1) {
-        let dif = point.Vminus(this.middle);
+        let dif = point.Vminus(this.transform.position);
         this.velocity.Vadd(dif.Ntimes(ferocity / 100));
     }
     moveAwayFrom(point, ferocity = 1) {
-        let dif = this.middle.Vminus(point);
+        let dif = this.transform.position.Vminus(point);
         this.velocity.Vadd(dif.Ntimes(ferocity / 100));
     }
     applyImpulseMass(point, force) {

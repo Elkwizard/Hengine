@@ -154,6 +154,9 @@ class SceneObject {
 	onAddScript(script) {
 
 	}
+	hasShape(name) {
+		return name in this.shapes;
+	}
 	addShape(name, shape) {
 		shape = shape.get();
 		this.shapes[name] = shape;
