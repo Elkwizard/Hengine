@@ -55,7 +55,7 @@ class SceneObject {
 		this.onScreen = true;
 		this.cullGraphics = true;
 		this.isBeingUpdated = false;
-		this.scripts = new ScriptContainer();
+		this.scripts = new ScriptContainer(this);
 		this.__scripts;
 		this.__width = 0;
 		this.__height = 0;

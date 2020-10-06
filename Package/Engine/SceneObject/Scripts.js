@@ -9,34 +9,11 @@ class ElementScript {
 		}
 	}
 	attachTo(obj, bindTo, ...args) {
-		const exists = (obj instanceof ScriptContainer) ? obj.exists : { };
-		obj[this.name] = {
-			run: function () {
-				for (let x in this) {
-					let m = this[x];
-					if (x !== "run") m();
-				}
-			}
-		};
+		const exists = obj.exists;
+		obj[this.name] = new LocalScript();
 		if (bindTo === undefined) bindTo = obj;
-        let flags = [
-            ["update"],
-            ["draw"],
-            ["escape", "draw"],
-            ["before", "update"],
-            ["collide", "rule"],
-            ["collide", "general"],
-            ["collide", "top"],
-            ["collide", "bottom"],
-            ["collide", "left"],
-            ["collide", "right"],
-            ["click"],
-            ["right", "click"],
-			["hover"],
-			["unhover"]
-        ]
+        let flags = LocalScript.flags;
 		let local = obj[this.name];
-        local.scriptNumber = 0;
         for (let flag of flags) {
             let result = "script" + flag.map(e => e.capitalize()).join("");
             local[result] = function (l, e) {  };
@@ -78,14 +55,36 @@ class ElementScript {
 		return this;
 	}
 }
-class ScriptContainer {
+class LocalScript {
 	constructor() {
+		this.scriptNumber = 0;
+	}
+}
+LocalScript.flags = [
+	["update"],
+	["draw"],
+	["escape", "draw"],
+	["before", "update"],
+	["collide", "rule"],
+	["collide", "general"],
+	["collide", "top"],
+	["collide", "bottom"],
+	["collide", "left"],
+	["collide", "right"],
+	["click"],
+	["right", "click"],
+	["hover"],
+	["unhover"]
+];
+class ScriptContainer {
+	constructor(element) {
+		this.element = element;
 		this.exists = { };
 		this[Symbol.iterator] = function* () {
 			let ary = [];
 			for (let m in this) {
 				let a = this[m];
-				if (typeof a !== "function" && m !== "exists") ary.push(a);
+				if (a instanceof LocalScript) ary.push(a);
 			}
 			ary = ary.sort((a, b) => a.scriptNumber - b.scriptNumber);
 			for (let a of ary) {
@@ -94,6 +93,7 @@ class ScriptContainer {
 		};
 	}
 	run(str, ...args) {
+		if (this.element.removed) return;
 		let key = "script" + str;
 		if (this.exists[key]) for (let m of this) {
 			m[key](m, ...args);
