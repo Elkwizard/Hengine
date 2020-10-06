@@ -83,8 +83,8 @@ class ParticleSpawnerObject extends SceneObject {
         return new Rect(minX, minY, maxX - minX, maxY - minY);
     }
     engineDrawUpdate(screen) {
-		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox || this.__boundingBox, screen);
-		if (!this.hidden && this.onScreen) {
+        this.determineOnScreen(screen);
+        if (!this.hidden && this.onScreen) {
             for (let key in this.spawns) this.spawns[key].engineDrawUpdate();
         }
     }

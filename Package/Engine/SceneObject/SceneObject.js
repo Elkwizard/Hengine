@@ -255,8 +255,12 @@ class SceneObject {
 			}
 		});
 	}
-	engineDrawUpdate(screen) {
+	determineOnScreen(screen) {
 		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox || this.__boundingBox, screen);
+		return this.onScreen;
+	}
+	engineDrawUpdate(screen) {
+		this.determineOnScreen(screen);
 		if (!this.hidden && this.onScreen) {
 			this.runDraw();
 			this.onScreen = true;

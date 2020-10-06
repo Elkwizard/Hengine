@@ -200,7 +200,7 @@ class PhysicsObject extends SceneObject {
         this.transform.position.x = this.body.position.x;
         this.transform.position.y = this.body.position.y;
         this.transform.rotation = this.body.angle;
-        this.cacheBoundingBoxes();
+        this.updateCaches();
     }
     moveTowards(point, ferocity = 1) {
         let dif = point.Vminus(this.transform.position);
