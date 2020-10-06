@@ -49,23 +49,23 @@ class SceneObject {
 		this.custom = {};
 		this.hovered = false;
 		this.layer = 0;
-		this.scripts = new ScriptContainer();
 		this.lifeSpan = 0;
 		this.log = [];
-		this.isDead = false;
+		this.removed = false;
 		this.onScreen = true;
 		this.cullGraphics = true;
 		this.isBeingUpdated = false;
-
+		this.scripts = new ScriptContainer();
+		this.__scripts;
 		this.__width = 0;
 		this.__height = 0;
-	}
-	get defaultShape() {
-		return this.getShape("default");
 	}
 	set defaultShape(a) {
 		this.removeShape("default");
 		this.addShape("default", a);
+	}
+	get defaultShape() {
+		return this.getShape("default");
 	}
 	set width(a) {
 		let factor = a / this.width;
@@ -262,6 +262,7 @@ class SceneObject {
 			this.onScreen = true;
 		} else this.onScreen = false;
 		// else console.log(1);
+		renderer.stroke(cl.BLACK, 2).rect(this.__boundingBox);
 		// s.camera.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
 		// s.drawInScreenSpace(e => c.stroke(cl.RED, 1).rect(screen));
 		this.scripts.run("EscapeDraw");
@@ -276,9 +277,12 @@ class SceneObject {
 	pushToRemoveQueue(x) {
 		return null;
 	}
+	end() {
+		this.removed = true;
+	}
 	remove() {
 		if (this.isBeingUpdated) this.pushToRemoveQueue(this);
 		else this.home.removeElement(this);
-		this.isDead = true;
+		this.end();
 	}
 }

@@ -248,7 +248,7 @@ class ElementContainer {
 		this.performFunctionBasedOnType(name, function (e) {
 			let el = this.elements[e.name];
 			if (el) {
-				el.isDead = true;
+				el.end();
 				if (el.body) this.scene.physicsEngine.removeBody(el.body.id);
 				delete this.elements[e.name];
 			} else if (e.home.elements[e.name]) {

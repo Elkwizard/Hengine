@@ -65,7 +65,7 @@ class CollisionMonitor {
         this.elements = monitor.elements.map(e => new CollisionData(e.element, e.direction, e.contacts));
     }
     removeDead() {
-        this.elements = this.elements.filter(el => !el.element.isDead);
+        this.elements = this.elements.filter(el => !el.element.removed);
         this.physicsObjects = this.elements.map(el => el.element);
     }
     clear() {

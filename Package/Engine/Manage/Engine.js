@@ -1,23 +1,6 @@
 function P(x = 0, y = 0) {
 	return { x, y };
 }
-class ScreenRecording {
-	constructor(name) {
-		this.name = name;
-		this.frames = [];
-		this.isRecording = false;
-	}
-	start() {
-		this.isRecording = true;
-	}
-	stop() {
-		this.isRecording = false;
-	}
-	getAnimation() {
-		if (!this.frames.length) return null;
-		return c.createAnimation(this.frames, 1, true);
-	}
-}
 class Engine {
 	constructor(utility, wrapper = document.body) {
 		this.fps = 60;
@@ -92,7 +75,6 @@ class Engine {
 				this.renderer.c.imageSmoothingEnabled = pixelate;
 			}
 		}.bind(this));
-		this.recordings = {};
 
 		let grh = true;
 		try { Graph; } catch (e) { grh = false; };
@@ -148,7 +130,6 @@ class Engine {
 				this.scene.engineDrawUpdate();
 				if (!this.hasFixedPhysicsUpdateCycle) this.engineFixedUpdateInternal();
 				this.intervals.afterUpdate();
-				this.updateScreenRecordings();
 				this.keyboard.afterUpdate();
 				this.mouse.afterUpdate();
 				this.scene.updateCaches();
@@ -172,18 +153,6 @@ class Engine {
 	}
 	get HFPUC() {
 		return this.hasFixedPhysicsUpdateCycle;
-	}
-	createScreenRecording(name) {
-		this.recordings[name] = new ScreenRecording(name);
-		return this.recordings[name];
-	}
-	updateScreenRecordings() {
-		let f;
-		for (let key in this.recordings) {
-			if (!f) f = this.renderer.contentToFrame();
-			let r = this.recordings[key];
-			if (r.isRecording) r.frames.push(f);
-		}
 	}
 	makeGraph(yName, minValue, maxValue, getY, msLimit = 5000, colors) {
 		if (this.hasGraphs) {
