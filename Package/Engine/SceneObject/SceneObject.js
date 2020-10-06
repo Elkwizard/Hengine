@@ -123,13 +123,12 @@ class SceneObject {
 		return result;
 	}
 	cacheDimensions() {
-		let old_rot = this.transform.rotation;
-		this.transform.rotation = 0;
+		let shapes = this.getShapes();
+		let boxes = shapes.map(e => e.getBoundingBox());
+		let bounds = Rect.composeBoundingBoxes(boxes);
+		this.__width = bounds.width;
+		this.__height = bounds.height;
 		this.cacheBoundingBoxes();
-		let bound = this.__boundingBox;
-		this.__width = bound.width;
-		this.__height = bound.height;
-		this.transform.rotation = old_rot;
 	}
 	cacheBoundingBoxes() {
 		this.__boundingBox = this.getBoundingBox();
@@ -142,14 +141,7 @@ class SceneObject {
 	getBoundingBox() {
 		let shapes = this.getModels();
 		let boxes = shapes.map(e => e.getBoundingBox());
-		if (boxes.length === 1) return boxes[0];
-		let mins = boxes.map(e => new Vector2(e.x, e.y));
-		let maxs = boxes.map(e => new Vector2(e.x + e.width, e.y + e.height));
-		let minX = Math.min(...mins.map(e => e.x));
-		let minY = Math.min(...mins.map(e => e.y));
-		let maxX = Math.max(...maxs.map(e => e.x));
-		let maxY = Math.max(...maxs.map(e => e.y));
-		return new Rect(minX, minY, maxX - minX, maxY - minY);
+		return Rect.composeBoundingBoxes(boxes);
 	}
 	onAddScript(script) {
 

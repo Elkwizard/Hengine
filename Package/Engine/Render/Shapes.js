@@ -264,6 +264,7 @@ class Rect extends Polygon {
 		}
 	}
 	static composeBoundingBoxes(boxes) {
+		if (boxes.length === 1) return boxes[0];
 		let minX = Infinity;
 		let minY = Infinity;
 		let maxX = -Infinity;
