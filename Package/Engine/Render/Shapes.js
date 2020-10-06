@@ -289,6 +289,16 @@ class Rect extends Polygon {
 		let dh = this.height * factor;
 		return new Rect(this.x - dw / 2, this.y - dh / 2, this.width + dw, this.height + dh);
 	}
+	scaleX(factor) {
+		factor -= 1;
+		let dw = this.width * factor;
+		return new Rect(this.x - dw / 2, this.y, this.width + dw, this.height);
+	}
+	scaleY(factor) {
+		factor -= 1;
+		let dh = this.height * factor;
+		return new Rect(this.x, this.y - dh / 2, this.width, this.height + dh);
+	}
 	move(dir) {
 		return new Rect(this.x + dir.x, this.y + dir.y, this.width, this.height);
 	}
