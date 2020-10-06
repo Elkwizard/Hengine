@@ -266,7 +266,7 @@ class SceneObject {
 			this.onScreen = true;
 		} else this.onScreen = false;
 		// else console.log(1);
-		renderer.stroke(cl.BLACK, 2).rect(this.__boundingBox);
+		// renderer.stroke(cl.BLACK, 2).rect(this.__boundingBox);
 		// s.camera.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
 		// s.drawInScreenSpace(e => c.stroke(cl.RED, 1).rect(screen));
 		this.scripts.run("EscapeDraw");
