@@ -575,7 +575,7 @@ class Artist {
 		data[3] = col.alpha * 255;
 		this.c.putImageData(new ImageData(data, 1, 1), x, y);
 	}
-	getTexture(x, y, w, h) {
+	getTexture(x = 0, y = 0, w = this.width, h = this.height) {
 		let imageData = this.c.getImageData(x, y, w, h);
 		let tex = new Texture(w, h);
 		tex.imageData = imageData;

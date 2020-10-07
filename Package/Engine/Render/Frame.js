@@ -18,7 +18,7 @@ class ImageType {
 	inferHeight(width) {
 		return this.height * width / this.width;
 	}
-	download(name) {
+	async download(name) {
 		let canvas = document.createElement("canvas");
 		let img = this.makeImage();
 		if (!img) return;
@@ -28,7 +28,12 @@ class ImageType {
 		let a = document.createElement("a");
 		a.href = canvas.toDataURL();
 		a.download = name + ".png";
-		a.click();
+		return new Promise(resolve => {
+			a.onclick = function () {
+				resolve();
+			};
+			a.click();
+		});
 	}
 	makeImage() {
 		return null;
@@ -65,13 +70,14 @@ class Frame extends ImageType {
 		this.renderer = this.c;
 		this.onload = () => null;
 	}
-	static sourceExists(src) {
+	static async sourceExists(src) {
 		let img = new Image();
 		img.src = src;
-		return new Promise(function (resolve) {
+		let result = await new Promise(function (resolve) {
 			img.onerror = () => resolve(false);
 			img.onload = () => resolve(true);
 		});
+		return result;
 	}
 	set src(src) {
 		let img = new Image();
