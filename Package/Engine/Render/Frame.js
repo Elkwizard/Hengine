@@ -56,14 +56,22 @@ class Frame extends ImageType {
 		super(width, height, false);
 		if (typeof width === "string") {
 			this.src = width;
-			this.width = 10;
-			this.height = 10;
+			this.width = 1;
+			this.height = 1;
 		}
 		this.img = new_OffscreenCanvas(this.width, this.height);
 		this.c = new Artist(this.img);
 		this.c.c.imageSmoothingEnabled = window.c ? !window.c.preservePixelart : false;
 		this.renderer = this.c;
 		this.onload = () => null;
+	}
+	static sourceExists(src) {
+		let img = new Image();
+		img.src = src;
+		return new Promise(function (resolve) {
+			img.onerror = () => resolve(false);
+			img.onload = () => resolve(true);
+		});
 	}
 	set src(src) {
 		let img = new Image();
