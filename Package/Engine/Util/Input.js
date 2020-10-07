@@ -105,15 +105,15 @@ class MouseHandler extends InputHandler {
 		this.mouseMap = ["Left", "Middle", "Right"];
 		this.button = 0;
 		//Screen
-		this.screen = Vector2.origin;
-		this.screenLast = Vector2.origin;
-		this.screenDragStart = Vector2.origin;
-		this.screenDragEnd = Vector2.origin;
+		Vector2.defineReference(this, "screen", Vector2.origin);
+		Vector2.defineReference(this, "screenLast", Vector2.origin);
+		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
+		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
 		//World
-		this.world = Vector2.origin;
-		this.worldLast = Vector2.origin;
-		this.worldDragStart = Vector2.origin;
-		this.worldDragEnd = Vector2.origin;
+		Vector2.defineReference(this, "world", Vector2.origin);
+		Vector2.defineReference(this, "worldLast", Vector2.origin);
+		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
+		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
 		//Listeners
 		this.onDown = new Listener();
 		this.onUp = new Listener();

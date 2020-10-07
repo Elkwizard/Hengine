@@ -62,6 +62,21 @@ class Operable {
     static get empty() {
         return new this(...this.modValues.map(name => 0));
     }
+    static defineReference(obj, key, value) {
+        let mod = value.constructor.modValues;
+        let len = mod.length;
+        delete obj[key];
+        let store = value;
+        Object.defineProperty(obj, key, {
+            set(a) {
+                for (let i = 0; i < len; i++) store[mod[i]] = a[mod[i]];
+            },
+            get() {
+                return value;
+            }
+        })
+
+    }
 	static sum(v) {
 		let construct = v.length ? v[0].constructor : this;
         let acc = construct.empty;
