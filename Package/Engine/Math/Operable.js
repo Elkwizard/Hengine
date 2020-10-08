@@ -15,33 +15,29 @@ class Operable {
         }
         return this;
     }
-	add(...vl) {
-		for (let v of vl) this.op(v, (a, b) => a + b);
-		return this;
+	add(v) {
+		return this.op(v, (a, b) => a + b);
 	}
-	sub(...vl) {
-		for (let v of vl) this.op(v, (a, b) => a - b);
-		return this;
+	sub(v) {
+		return this.op(v, (a, b) => a - b);
 	}
-	mul(...vl) {
-		for (let v of vl) this.op(v, (a, b) => a * b);
-		return this;
+	mul(v) {
+		return this.op(v, (a, b) => a * b);
 	}
-	div(...vl) {
-		for (let v of vl) this.op(v, (a, b) => a / b);
-		return this;
+	div(v) {
+		return this.op(v, (a, b) => a / b);
 	}
-    plus(...v) {
-        return this.get().add(...v);
+    plus(v) {
+        return this.get().add(v);
     }
-    minus(...v) {
-        return this.get().sub(...v);
+    minus(v) {
+        return this.get().sub(v);
     }
-    times(...v) {
-        return this.get().mul(...v);
+    times(v) {
+        return this.get().mul(v);
     }
-    over(...v) {
-        return this.get().div(...v);
+    over(v) {
+        return this.get().div(v);
     }
     map(fn) {
         let args = [];

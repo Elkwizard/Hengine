@@ -124,8 +124,8 @@ class Artist {
 				}
 				return textRequests
 			},
-			shape(...v) {
-				if (v[0] && v[0].vertices) v = v[0].vertices;
+			shape(v) {
+				if (v.vertices) v = v.vertices;
 				v = this.pathObj.validatePoints(v);
 				this.c.beginPath();
 				if (v.length) {
@@ -179,8 +179,8 @@ class Artist {
 					this.c.fillText(r.text, r.x, r.y);
 				}
 			},
-			shape(...v) {
-				pathObj.shape(...v);
+			shape(v) {
+				pathObj.shape(v);
 				this.c.fill();
 			},
 			infer(obj) {
@@ -189,7 +189,7 @@ class Artist {
 				} else if (obj.width !== undefined) {
 					this.draw(this.c.fillStyle).rect(obj);	
 				} else if (obj.vertices !== undefined) {
-					this.draw(this.c.fillStyle).shape(...obj.vertices);
+					this.draw(this.c.fillStyle).shape(obj.vertices);
 				}
 			}
 		}
@@ -227,7 +227,7 @@ class Artist {
 					this.c.strokeText(r.text, r.x, r.y);
 				}
 			},
-			connector(...points) {
+			connector(points) {
 				if (points.length) {
 					points = this.pathObj.validatePoints(points);
 					this.c.beginPath();
@@ -375,8 +375,8 @@ class Artist {
 				this.c.lineTo(x1 + n_x * l2, y1 + n_y * l2);
 				this.c.fill();
 			},
-			shape(...v) {
-				pathObj.shape(...v);
+			shape(v) {
+				pathObj.shape(v);
 				this.c.stroke();
 			},
 			infer(obj) {
@@ -385,7 +385,7 @@ class Artist {
 				} else if (obj.radius !== undefined) {
 					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).rect(obj);	
 				} else if (obj.vertices !== undefined) {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).shape(...obj.vertices);
+					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).shape(obj.vertices);
 				} else if (obj instanceof Line) {
 					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).line(obj);
 				} else if (obj instanceof Spline) {
@@ -421,8 +421,8 @@ class Artist {
 				pathObj.triangle(v1, v2, v3);
 				this.c.clip();
 			},
-			shape(...v) {
-				pathObj.shape(...v);
+			shape(v) {
+				pathObj.shape(v);
 				this.c.clip();
 			},
 			infer(obj) {
@@ -431,7 +431,7 @@ class Artist {
 				} else if (obj.width !== undefined) {
 					this.clip().rect(obj);	
 				} else if (obj.vertices !== undefined) {
-					this.clip().shape(...obj.vertices);
+					this.clip().shape(obj.vertices);
 				}
 			}
 		}
@@ -486,21 +486,15 @@ class Artist {
 			triangle(v1, v2, v3) {
 				this.clip().triangle(v1, v2, v3);
 				let v = [v1, v2, v3];
-				let minX = Math.min(...v.map(e => e.x));
-				let maxX = Math.max(...v.map(e => e.x));
-				let minY = Math.min(...v.map(e => e.y));
-				let maxY = Math.max(...v.map(e => e.y));
-				this.drawImageInternal(minX, minY, maxX - minX, maxY - minY);
+				let bound = Rect.bound(v);
+				this.drawImageInternal(bound.x, bound.y, bound.width, bound.height);
 				this.unclip();
 			},
-			shape(...v) {
-				if (v[0] && v[0].vertices) v = v.vertices;
-				this.clip().shape(...v);
-				let minX = Math.min(...v.map(e => e.x));
-				let maxX = Math.max(...v.map(e => e.x));
-				let minY = Math.min(...v.map(e => e.y));
-				let maxY = Math.max(...v.map(e => e.y));
-				this.drawImageInternal(minX, minY, maxX - minX, maxY - minY);
+			shape(v) {
+				if (v.vertices) v = v.vertices;
+				this.clip().shape(v);
+				let bound = Rect.bound(v);
+				this.drawImageInternal(bound.x, bound.y, bound.width, bound.height);
 				this.unclip();
 			},
 			infer(obj) {
@@ -509,7 +503,7 @@ class Artist {
 				} else if (obj.width !== undefined) {
 					this.image(this.imageStyle).rect(obj);	
 				} else if (obj.vertices !== undefined) {
-					this.image(this.imageStyle).shape(...obj.vertices);
+					this.image(this.imageStyle).shape(obj.vertices);
 				}
 			}
 
@@ -591,12 +585,12 @@ class Artist {
 		tex.changed = true;
 		return tex;
 	}
-	createRadialGradient(x, y, radius, ...cols) {
+	createRadialGradient(x, y, radius, cols) {
 		let grd = this.c.createRadialGradient(x, y, 0.00000001, x, y, radius);
 		for (let i = 0; i < cols.length; i++) grd.addColorStop(i / (cols.length - 1), this.getContextColor(cols[i]));
 		return grd;
 	}
-	createLinearGradient(x, y, x2, y2, ...cols) {
+	createLinearGradient(x, y, x2, y2, cols) {
 		let grd = this.c.createLinearGradient(x, y, x2, y2);
 		for (let i = 0; i < cols.length; i++) grd.addColorStop(i / (cols.length - 1), this.getContextColor(cols[i]));
 		return grd;

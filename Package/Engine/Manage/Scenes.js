@@ -70,21 +70,6 @@ class Scene {
 		let collideAry = this.collidePoint(point, override);
 		return [collideAry, this.main.elementArray.filter(e => !collideAry.includes(e))];
 	}
-	engineFixedUpdate() {
-		this.main.startUpdate();
-		//custom before updates run
-		for (let el of this.main.elementArray) {
-			el.scripts.run("BeforeUpdate");
-		}
-		let phys = this.main.getPhysicsElements();
-		this.clearCollisions(phys);
-		this.beforePhysicsStep(phys);
-		this.physicsEngine.run();
-		this.afterPhysicsStep(phys);
-		if (this.collisionEvents) this.handleCollisionEvents(phys);
-		this.physicsObjectFixedUpdate(this.main.elementArray);
-		this.main.endUpdate();
-	}
 	beforePhysicsStep(phys) {
 		for (let el of phys) el.beforePhysicsStep();
 	}
@@ -130,11 +115,6 @@ class Scene {
 			rect.updatePreviousData();
 		}
 	}
-	physicsObjectFixedUpdate(useful) {
-		for (let rect of useful) {
-			rect.engineFixedUpdate();
-		}
-	}
 	addCamera(name, camera) {
 		this.cameras[name] = camera;
 		return this.cameras[name];
@@ -152,7 +132,7 @@ class Scene {
 
 		camera.transformToWorld(this.renderer);
 		for (let rect of this.main.elementArray) {
-			rect.engineDrawUpdate(screen);
+			rect.engineDraw(screen);
 			rect.lifeSpan++;
 		}
 
@@ -162,7 +142,13 @@ class Scene {
 		} else this.renderer.restore();
 		return camera.view;
 	}
-	engineDrawUpdate() {
+	script(type, ...args) {
+		let el = this.main.elementArray;
+		for (let i = 0; i < el.length; i++) {
+			el[i].scripts.run(type, ...args);
+		}
+	}
+	engineUpdate() {
 		if (this.mouseEvents) {
 			let adjusted = mouse.world;
 			if (mouse.justPressed("Left")) {
@@ -186,12 +172,26 @@ class Scene {
 			}
 		}
 		this.main.startUpdate();
-		this.camera.width = this.renderer.canvas.width;
-		this.camera.height = this.renderer.canvas.height;
+
+		this.script("BeforeUpdate");
+
+		//draw
+		this.camera.width = this.renderer.width;
+		this.camera.height = this.renderer.height;
 		this.main.elementArray.sort((a, b) => a.layer - b.layer);
 		for (let cameraName in this.cameras) this.renderCamera(this.cameras[cameraName]);
 		this.renderCamera(this.camera);
-		// this.c.image(this.renderCamera(this.camera)).rect(0, 0, width, height);
+		
+		//physics
+		for (let i = 0; i < this.main.elementArray.length; i++) this.main.elementArray[i].engineUpdate();
+			
+		let phys = this.main.getPhysicsElements();
+		this.clearCollisions(phys);
+		this.beforePhysicsStep(phys);
+		this.physicsEngine.run();
+		this.afterPhysicsStep(phys);
+		if (this.collisionEvents) this.handleCollisionEvents(phys);
+
 		this.main.endUpdate();
 	}
 }

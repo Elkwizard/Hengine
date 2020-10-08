@@ -40,7 +40,7 @@ class Note {
         n.octaves = n.octaves.map(e => Math.max(0, Math.min(8, e + octaves)));
         return n;
     }
-    static fromNotes(...NOTES) {
+    static fromNotes(NOTES) {
         let notes = [];
         let durations = [];
         let octaves = [];

@@ -62,9 +62,10 @@ class LocalScript {
 }
 LocalScript.flags = [
 	["update"],
+	// ["before", "update"],
+	// ["after", "update"],
 	["draw"],
 	["escape", "draw"],
-	["before", "update"],
 	["collide", "rule"],
 	["collide", "general"],
 	["collide", "top"],

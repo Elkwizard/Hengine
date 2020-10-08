@@ -1,28 +1,3 @@
-class Triangle {
-	constructor(p1, p2, p3) {
-		this.vertices = [p1, p2, p3];
-	}
-	middle() {
-		function average(ary) {
-			let sum = 0;
-			for (let num of ary) {
-				sum += num;
-			}
-			sum /= ary.length;
-			return sum;
-		}
-		let res = new Vertex();
-		let xs = [];
-		let ys = [];
-		for (let x of this.vertices) {
-			xs.push(x.x);
-			ys.push(x.y);
-		}
-		res.x = average(xs);
-		res.y = average(ys);
-		return res;
-	}
-}
 class Line {
 	constructor(x, y, x2, y2) {
 		if (typeof x === "object") {
@@ -56,6 +31,53 @@ class Line {
 	}
 	evaluate(x) {
 		return this.slope * x + this.a.y;
+	}
+}
+class Range {
+	constructor(min, max) {
+		this._max = Infinity;
+		this._min = -Infinity;
+		this.min = min;
+		this.max = max;
+	}
+	set min(a) {
+		let b = this.max;
+		this._min = Math.min(a, b);
+		this._max = Math.max(a, b);
+	}
+	get min() {
+		return this._min;
+	}
+	set max(a) {
+		let b = this.min;
+		this._min = Math.min(a, b);
+		this._max = Math.max(a, b);
+	}
+	get max() {
+		return this._max;
+	}
+	get span() {
+		return this.max - this.min;
+	}
+	includes(value) {
+		return value > this.min && value < this.max;
+	}
+	expand(value) {
+		if (value < this.min) this._min = value;
+		if (value > this.max) this._max = value;
+	}
+	intersect(r) {
+		return this.max > r.min && r.max > this.min;
+	}
+	static fromValues(values) {
+		let min = Infinity;
+		let max = -Infinity;
+		for (let i = 0; i < values.length; i++) {
+			const v = values[i];
+			if (v < min) min = v;
+			if (v > max) max = v;
+		}
+		return new Range(min, max);
 	}
 }
 class Shape extends Operable {
@@ -96,13 +118,9 @@ class Polygon extends Shape {
 		super();
 		if (!alreadyClockwise) vertices = Geometry.clockwise(vertices);
 		this.vertices = Polygon.removeDuplicates(vertices);
-		let x = vertices.map(e => e.x);
-		let y = vertices.map(e => e.y);
-		let minX = Math.min(...x);
-		let maxX = Math.max(...x);
-		let minY = Math.min(...y);
-		let maxY = Math.max(...y);
-		this.area = (maxX - minX) * (maxY - minY);
+		let x = Range.fromValues(vertices.map(e => e.x));
+		let y = Range.fromValues(vertices.map(e => e.y));
+		this.area = x.span * y.span;
 	}
 	static removeDuplicates(verts) {
 		let vertices = [];
@@ -125,14 +143,7 @@ class Polygon extends Shape {
 		return Vector.sum(this.vertices).Nover(this.vertices.length);
 	}
 	getBoundingBox() {
-		let verts = this.vertices;
-		let x = verts.map(e => e.x);
-		let y = verts.map(e => e.y);
-		let minX = Math.min(...x);
-		let maxX = Math.max(...x);
-		let minY = Math.min(...y);
-		let maxY = Math.max(...y);
-		return new Rect(minX, minY, maxX - minX, maxY - minY);
+		return Rect.bound(this.vertices);
 	}
 	getModel(transf) {
 		let pos = transf.position;
@@ -197,7 +208,7 @@ class Polygon extends Shape {
 		return this.getModel(new Transform(0, 0, angle));
 	}
 	get() {
-		let poly = new Polygon([...this.vertices], true);
+		let poly = new Polygon(this.vertices.map(vert => vert), true);
 		return poly;
 	}
 	toPhysicsShape() {
@@ -237,6 +248,20 @@ class Rect extends Polygon {
 		this.height = h;
 		this.area = this.width * this.height;
 	}
+	set xRange(v) {
+		this.x = v.min;
+		this.width = v.max - v.min;
+	}
+	get xRange() {
+		return new Range(this.x, this.x + this.width);
+	}
+	set yRange(v) {
+		this.y = v.min;
+		this.height = v.max - v.min;
+	}
+	get yRange() {
+		return new Range(this.y, this.y + this.height);
+	}
 	set middle(a) {
 		let pos = this.center(a);
 		this.x = pos.x;
@@ -262,21 +287,6 @@ class Rect extends Polygon {
 			this.width = max.x - min.x;
 			this.height = max.y - min.y;
 		}
-	}
-	static composeBoundingBoxes(boxes) {
-		if (boxes.length === 1) return boxes[0];
-		let minX = Infinity;
-		let minY = Infinity;
-		let maxX = -Infinity;
-		let maxY = -Infinity;
-		for (let i = 0; i < boxes.length; i++) {
-			let box = boxes[i];
-			if (box.x < minX) minX = box.x;
-			if (box.y < minY) minY = box.y;
-			if (box.x + box.width > maxX) maxX = box.x + box.width;
-			if (box.y + box.height > maxY) maxY = box.y + box.height;
-		}
-		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
 	getBoundingBox() {
 		return new Rect(this.x, this.y, this.width, this.height);
@@ -305,6 +315,35 @@ class Rect extends Polygon {
 	}
 	get() {
 		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
+	}
+	static bound(points) {
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
+		for (let i = 0; i < points.length; i++) {
+			let v = points[i]
+			if (v.x < minX) minX = v.x;
+			if (v.y < minY) minY = v.y;
+			if (v.x > maxX) maxX = v.x;
+			if (v.y > maxY) maxY = v.y;
+		}
+		return new Rect(minX, minY, maxX - minX, maxY - minY);
+	}
+	static composeBoundingBoxes(boxes) {
+		if (boxes.length === 1) return boxes[0];
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
+		for (let i = 0; i < boxes.length; i++) {
+			let box = boxes[i];
+			if (box.x < minX) minX = box.x;
+			if (box.y < minY) minY = box.y;
+			if (box.x + box.width > maxX) maxX = box.x + box.width;
+			if (box.y + box.height > maxY) maxY = box.y + box.height;
+		}
+		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
 }
 Rect.modValues = ["x", "y", "width", "height"];

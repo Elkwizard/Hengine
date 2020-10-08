@@ -1,5 +1,5 @@
 class Gradient {
-	constructor(...valueStops) {
+	constructor(valueStops) {
 		this.valueStops = valueStops;
 		this.processRanges();
 	}

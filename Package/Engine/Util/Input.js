@@ -22,17 +22,17 @@ class InputHandler {
 		this.keyUpCounts = { };
 	}
 	//lengthy
-	justPressed(...keys) {
-		return this.JP(...keys);
+	justPressed(keys) {
+		return this.JP(keys);
 	}
-	justReleased(...keys) {
-		return this.JR(...keys);
+	justReleased(keys) {
+		return this.JR(keys);
 	}
-	pressed(...keys) {
-		return this.P(...keys);
+	pressed(keys) {
+		return this.P(keys);
 	}
-	released(...keys) {
-		return this.R(...keys);
+	released(keys) {
+		return this.R(keys);
 	}
 	pressLength(key) {
 		return this.PL(key);
@@ -47,17 +47,17 @@ class InputHandler {
 	RL(key) {
 		return this.keyUpCounts[key];
 	}
-	P(...keys) {
-		return keys.map(key => !!this.keys[key]).includes(true);
+	P(keys) {
+		return (Array.isArray(keys) ? keys : [keys]).map(key => !!this.keys[key]).includes(true);
 	}
-	R(...keys) {
-		return keys.map(key => !this.keys[key]).includes(true);
+	R(keys) {
+		return (Array.isArray(keys) ? keys : [keys]).map(key => !this.keys[key]).includes(true);
 	}
-	JP(...keys) {
-		return keys.map(key => this.keyDownCounts[key] === 1).includes(true);
+	JP(keys) {
+		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyDownCounts[key] === 1).includes(true);
 	}
-	JR(...keys) {
-		return keys.map(key => this.keyUpCounts[key] === 1).includes(true);
+	JR(keys) {
+		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyUpCounts[key] === 1).includes(true);
 	}
 	update() {
 		for (let key in this.keys) {

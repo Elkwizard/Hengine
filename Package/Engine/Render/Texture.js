@@ -64,9 +64,9 @@ class Texture extends ImageType {
 			return this.pixels[x][y];
 		}
 	}
-	shader(fn, ...args) {
+	shader(fn) {
 		let coms = [];
-		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j, ...args)]);
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j)]);
 		for (let i = 0; i < coms.length; i++) this.shader_set(coms[i][0], coms[i][1], coms[i][2]);
 		this.changed = true;
 		return this;
@@ -267,7 +267,7 @@ class Texture extends ImageType {
 	}
 }
 class TextureDrawingContextPath {
-	constructor(ctx, type, ...args) {
+	constructor(ctx, type, args) {
 		this.ctx = ctx;
 		this.type = type;
 		this.args = args;
@@ -484,7 +484,7 @@ class TextureDrawingContext {
 	arc(x, y, r, st, et) {
 		let min = this.getTransformedPoint(x, y);
 		let max = this.getTransformedPoint(x + r, y);
-		this.path.push(new TextureDrawingContextPath(this, "arc", min.x, min.y, Math.sqrt((max.x - min.x) ** 2 + (max.y - min.y) ** 2), st, et));
+		this.path.push(new TextureDrawingContextPath(this, "arc", [min.x, min.y, Math.sqrt((max.x - min.x) ** 2 + (max.y - min.y) ** 2), st, et]));
 	}
 	beginPath() {
 		this.path = [];
@@ -495,7 +495,7 @@ class TextureDrawingContext {
 	}
 	lineTo(x, y) {
 		let min = this.getTransformedPoint(x, y);
-		this.path.push(new TextureDrawingContextPath(this, "line", this.lineStart.x, this.lineStart.y, min.x, min.y));
+		this.path.push(new TextureDrawingContextPath(this, "line", [this.lineStart.x, this.lineStart.y, min.x, min.y]));
 		this.lineStart = min;
 	}
 	stroke() {
@@ -510,14 +510,14 @@ class TextureDrawingContext {
 			let polygon = [];
 			for (let p of this.path) {
 				if (p.type === "arc") {
-					if (polygon.length > 2) (new TextureDrawingContextPath(this, "polygon", polygon)).fill();
+					if (polygon.length > 2) (new TextureDrawingContextPath(this, "polygon", [polygon])).fill();
 					polygon = [];
 					p.fill();
 				} else {
 					polygon.push(p.args);
 				}
 			}
-			if (polygon.length > 2) (new TextureDrawingContextPath(this, "polygon", polygon)).fill();
+			if (polygon.length > 2) (new TextureDrawingContextPath(this, "polygon", [polygon])).fill();
 		}
 	}
 }

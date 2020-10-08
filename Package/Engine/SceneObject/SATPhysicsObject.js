@@ -186,10 +186,6 @@ class PhysicsObject extends SceneObject {
     immobilize() {
         this.mobile = false;
     }
-    engineFixedUpdate() {
-        this.scripts.run("Update");
-        this.update();
-    }
     beforePhysicsStep() {
         this.body.position.x = this.transform.position.x;
         this.body.position.y = this.transform.position.y;

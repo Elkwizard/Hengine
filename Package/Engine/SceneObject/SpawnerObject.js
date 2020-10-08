@@ -82,10 +82,10 @@ class ParticleSpawnerObject extends SceneObject {
         }
         return new Rect(minX, minY, maxX - minX, maxY - minY);
     }
-    engineDrawUpdate(screen) {
+    engineDraw(screen) {
         this.determineOnScreen(screen);
         if (!this.hidden && this.onScreen) {
-            for (let key in this.spawns) this.spawns[key].engineDrawUpdate();
+            for (let key in this.spawns) this.spawns[key].engineDraw();
         }
     }
     updatePreviousData() {
@@ -96,7 +96,7 @@ class ParticleSpawnerObject extends SceneObject {
         const name = `Particle #${this.particleNumber++} from ${this.name}`; 
         this.spawns[name] = new ParticleObject(this, this.home, name);
     }
-    engineFixedUpdate() {
+    engineUpdate() {
         if (this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
             let len = 1;
             if (this.particleDelay < 1) len = 1 / this.particleDelay;
@@ -107,7 +107,7 @@ class ParticleSpawnerObject extends SceneObject {
         }
         for (let name in this.spawns) {
             let particle = this.spawns[name];
-            particle.engineFixedUpdate();
+            particle.engineUpdate();
             particle.lifeSpan++;
         }
         this.update();
@@ -159,13 +159,13 @@ class ParticleObject extends SceneObject {
     remove() {
         delete this.spawner.spawns[this.name];
     }
-    engineDrawUpdate() {
+    engineDraw() {
         this.drawPrefix();
         this.runDraw();
         this.drawSuffix();
         this.scripts.run("EscapeDraw");
     }
-    engineFixedUpdate() {
+    engineUpdate() {
         this.lastTransform = this.transform.get();
         if (this.spawner.particleFalls) {
             this.velocity.y += this.home.scene.gravity.y;

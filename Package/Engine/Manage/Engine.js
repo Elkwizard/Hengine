@@ -18,7 +18,6 @@ class Engine {
 		}
 		this.console = new Console();
 		this.catchErrors = false;
-		this.hasFixedPhysicsUpdateCycle = true;
 		try {
 			if (FunctionLibrary) {
 				this.f = new FunctionLibrary();
@@ -55,9 +54,8 @@ class Engine {
 		this.intervals = new IntervalFunctionManager();
 
 		this.FPS_FRAMES_TO_COUNT = 10;
-				
-		window.intervals.push(this.engineFixedUpdate.bind(this));
-		window.animationFrames.push(this.engineDrawUpdate.bind(this));
+
+		window.animationFrames.push(this.engineUpdate.bind(this));
 
 		this.resize = true;
 		window.addEventListener("resize", function () {
@@ -100,12 +98,7 @@ class Engine {
 			]);
 		}
 	}
-	engineFixedUpdateInternal() {
-		this.intervals.fixedUpdate();
-		this.scene.engineFixedUpdate();
-		this.intervals.afterFixedUpdate();
-	}
-	engineDrawUpdate() {
+	engineUpdate() {
 		try {
 			this.frameCount++;
 			this.currentTime = performance.now();
@@ -127,32 +120,17 @@ class Engine {
 				this.intervals.beforeUpdate();
 				this.clear();
 				this.intervals.update();
-				this.scene.engineDrawUpdate();
-				if (!this.hasFixedPhysicsUpdateCycle) this.engineFixedUpdateInternal();
+				this.scene.engineUpdate();
 				this.intervals.afterUpdate();
 				this.keyboard.afterUpdate();
-				this.mouse.afterUpdate();
 				this.scene.updateCaches();
 				this.scene.updatePreviousData();
+				this.mouse.afterUpdate();
 			}
 		} catch (e) {
-			if (this.catchErrors) this.output("Draw Error: " + e);
+			if (this.catchErrors) this.output("Update Error: " + e);
 			else throw e;
 		}
-	}
-	engineFixedUpdate() {
-		try {
-			if (this.hasFixedPhysicsUpdateCycle) if (!this.paused) this.engineFixedUpdateInternal();
-		} catch (e) {
-			if (this.catchErrors) this.output("Fixed Update Error: " + e);
-			else throw e;
-		}
-	}
-	set HFPUC(a) {
-		this.hasFixedPhysicsUpdateCycle = a;
-	}
-	get HFPUC() {
-		return this.hasFixedPhysicsUpdateCycle;
 	}
 	makeGraph(yName, minValue, maxValue, getY, msLimit = 5000, colors) {
 		if (this.hasGraphs) {

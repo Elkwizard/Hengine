@@ -62,7 +62,7 @@ class ElementContainer {
 			let cont = this.elements[rect];
 			if (cont instanceof ElementContainer) {
 				let ary = cont.updateArray();
-				this.elementArray.push(...ary);
+				this.elementArray.pushArray(ary);
 			} else this.elementArray.push(cont);
 		}
 		return this.elementArray;

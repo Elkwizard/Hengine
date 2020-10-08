@@ -110,7 +110,7 @@ class Render3D {
         let nr = Render3D.rotatePointAround(Vector3.origin, v, Render3D.camera.rotation.inverse);
         Render3D.camera.pos.add(nr);
     }
-    static renderScene(c, ...meshes) {
+    static renderScene(c, meshes) {
         let triangles = [];
         for (let m of meshes) {
             triangles.pushArray(m.tris);

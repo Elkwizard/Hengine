@@ -259,20 +259,15 @@ class SceneObject {
 		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox || this.__boundingBox, screen);
 		return this.onScreen;
 	}
-	engineDrawUpdate(screen) {
+	engineDraw(screen) {
 		this.determineOnScreen(screen);
 		if (!this.hidden && this.onScreen) {
 			this.runDraw();
 			this.onScreen = true;
 		} else this.onScreen = false;
-		// else console.log(1);
-		// renderer.stroke(cl.BLACK, 2).rect(this.__boundingBox);
-		// s.camera.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
-		// s.drawInScreenSpace(e => c.stroke(cl.RED, 1).rect(screen));
 		this.scripts.run("EscapeDraw");
 	}
-	engineFixedUpdate(hitboxes) {
-		this.update();
+	engineUpdate() {
 		this.scripts.run("Update");
 	}
 	updateCaches() {
