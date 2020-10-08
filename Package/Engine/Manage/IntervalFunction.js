@@ -20,8 +20,6 @@ class IntervalFunction {
 IntervalFunction.BEFORE_UPDATE = Symbol("BEFORE_UPDATE");
 IntervalFunction.UPDATE = Symbol("UPDATE");
 IntervalFunction.AFTER_UPDATE = Symbol("AFTER_UPDATE");
-IntervalFunction.FIXED_UPDATE = Symbol("FIXED_UPDATE");
-IntervalFunction.AFTER_FIXED_UPDATE = Symbol("AFTER_FIXED_UPDATE");
 
 class DelayedFunction extends IntervalFunction {
 	constructor(fn, wait, type) {
@@ -61,12 +59,6 @@ class IntervalFunctionManager {
 	}
 	afterUpdate() {
 		this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
-	}
-	fixedUpdate() {
-		this.updateIntervalCalls(IntervalFunction.FIXED_UPDATE);
-	}
-	afterFixedUpdate() {
-		this.updateIntervalCalls(IntervalFunction.AFTER_FIXED_UPDATE);
 	}
 	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
 		this.functions.push(new ContinuousFunction(fn, type));
