@@ -127,12 +127,12 @@ class Texture extends ImageType {
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
 			let inx = 4 * (j * this.width + i);
 			let { red, green, blue, alpha } = this.pixels[i][j];
-			this.imageData.data[inx] = ~~red;
-			this.imageData.data[inx + 1] = ~~green;
-			this.imageData.data[inx + 2] = ~~blue;
-			this.imageData.data[inx + 3] = ~~(alpha * 255);
+			this.imageData.data[inx] = red;
+			this.imageData.data[inx + 1] = green;
+			this.imageData.data[inx + 2] = blue;
+			this.imageData.data[inx + 3] = alpha * 255;
 		}
-		this.changed = true;
+		this.changed = false;
 	}
 	makeImage() {
 		if (this.changed) {
@@ -174,6 +174,13 @@ class Texture extends ImageType {
 		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) r.shader_set(i, j, this.getPixel(x + i, y + j));
 		r.changed = true;
 		return r;
+	}
+	get() {
+		let tex = new Texture(this.width, this.height);
+		tex.pixels = this.pixels.map(v => v.get());
+		tex.updateImageData();
+		tex.changed = true;
+		return tex;
 	}
 	static grayScale(bright) {
 		return (new Texture(bright.length, bright[0].length)).shader((x, y) => Color.grayScale(bright[x][y]));
