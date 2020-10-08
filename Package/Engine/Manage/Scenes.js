@@ -192,6 +192,8 @@ class Scene {
 		this.afterPhysicsStep(phys);
 		if (this.collisionEvents) this.handleCollisionEvents(phys);
 
+		this.script("AfterUpdate");
+
 		this.main.endUpdate();
 	}
 }
