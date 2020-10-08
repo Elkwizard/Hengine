@@ -13,7 +13,6 @@ class ElementContainer {
 					c.draw(cl.BLACK).infer(shape);
 					c.stroke(cl.CYAN, 1).infer(shape);
 				},
-				update() { },
 				scripts: []
 			},
 			PhysicsObject: {
@@ -21,7 +20,6 @@ class ElementContainer {
 					c.draw(cl.BLACK).infer(shape);
 					c.stroke(cl.RED, 1).infer(shape);
 				},
-				update() { },
 				scripts: []
 			},
 			UIObject: {
@@ -29,19 +27,16 @@ class ElementContainer {
 					c.draw(cl.BLACK).infer(shape);
 					c.stroke(cl.PURPLE, 1).infer(shape);
 				},
-				update() { },
 				scripts: []
 			},
 			ParticleSpawnerObject: {
 				draw(name, shape) { },
-				update() { },
 				scripts: []
 			},
 			ParticleObject: {
 				draw(name, shape) {
 					c.draw(cl.BLACK).infer(shape);
 				},
-				update() { },
 				scripts: []
 			}
 		};
@@ -137,7 +132,6 @@ class ElementContainer {
 	initializeSceneObject(sceneObject) {
 		const d = this.defaults[sceneObject.constructor.name];
 		this.changeElementDraw(sceneObject, d.draw);
-		this.changeElementUpdate(sceneObject, d.update);
 		for (let script of d.scripts) script.addTo(sceneObject);
 	}
 	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
@@ -335,15 +329,6 @@ class ElementContainer {
 			e[method] = newMethod.bind(e);
 			e.logMod(function CHANGE_METHOD() {
 				this.home.changeElementMethod(this, method, newMethod);
-			});
-		}.bind(this));
-		return this;
-	}
-	changeElementUpdate(name, newUpdate) {
-		this.performFunctionBasedOnType(name, function (e) {
-			e.update = newUpdate.bind(e);
-			e.logMod(function CHANGE_UPDATE() {
-				this.home.changeElementUpdate(this, newUpdate);
 			});
 		}.bind(this));
 		return this;

@@ -44,8 +44,7 @@ class SceneObject {
 		this.controls = controls;
 		this.hidden = false;
 		this.onScreen = false;
-		this.update = function () { };
-		this.draw = function (shape) { };
+		this.draw = function (name, shape) { };
 		this.custom = {};
 		this.hovered = false;
 		this.layer = 0;
