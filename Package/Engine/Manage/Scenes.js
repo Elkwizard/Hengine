@@ -96,7 +96,7 @@ class Scene {
 					}
 				}
 			}	
-			rect.lastColliding.extract(rect.colliding);
+			rect.lastColliding = rect.colliding.get();
 		}
 	}
 	constrain(a, b, ap = Vector2.origin, bp = Vector2.origin, str = "CURRENT_DIST", stiffness = 1) {

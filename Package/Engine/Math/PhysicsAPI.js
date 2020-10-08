@@ -61,12 +61,15 @@ class CollisionMonitor {
         }
         return els.length ? els : null;
     }
-    extract(monitor) {
-        this.elements = monitor.elements.map(e => new CollisionData(e.element, e.direction, e.contacts));
+    get() {
+        let mon = new CollisionMonitor();
+        mon.elements = this.elements.map(e => new CollisionData(e.element, e.direction, e.contacts));
+        mon.physicsObjects = this.physicsObjects.map(el => el);
+        return mon;
     }
     removeDead() {
         this.elements = this.elements.filter(el => !el.element.removed);
-        this.physicsObjects = this.elements.map(el => el.element);
+        this.physicsObjects = this.physicsObjects.map(el => !el.removed);
     }
     clear() {
         this.elements = [];

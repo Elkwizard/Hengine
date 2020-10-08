@@ -12,8 +12,8 @@ class Random {
         seed += 1e5;
         let a = (seed * 6.12849) % 8.7890975
         let b = (a * 256783945.4758903) % 238462.567890;
-        let r = (a * b) % 1;
-        return Math.abs(r);
+        let r = Math.abs(a * b) % 1;
+        return r;
     }
     static octave(alg, freq, oc, ...sample) {
         let n = 0;
