@@ -59,6 +59,15 @@ class Range {
 	get span() {
 		return this.max - this.min;
 	}
+	getValueFromInterval(interval) {
+		return (this.max - this.min) * interval + this.min;
+	}
+	getIntervalValue(value) {
+		return (value - this.min) / (this.max - this.min);
+	}
+	getDepth(value) {
+		return (this.max - this.min) / 2 - Math.abs(value - (this.min + this.max) / 2);
+	}
 	includes(value) {
 		return value > this.min && value < this.max;
 	}
