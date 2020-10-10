@@ -87,18 +87,18 @@ class Hengine {
 			});
 			Object.defineProperty(window, "width", {
 				get: function () {
-					return window.c.canvas.width;
+					return window.c.width;
 				},
 				set: function (a) {
-					window.c.canvas.width = a;
+					window.c.width = a;
 				}
 			});
 			Object.defineProperty(window, "height", {
 				get: function () {
-					return window.c.canvas.height;
+					return window.c.height;
 				},
 				set: function (a) {
-					window.c.canvas.height = a;
+					window.c.height = a;
 				}
 			});
 		}
@@ -132,12 +132,6 @@ class Hengine {
 
 		//defaults
 		this.initDefaults();
-	}
-	get width() {
-		return this.s.display.width;
-	}
-	get height() {
-		return this.s.display.height;
 	}
 	initFileSystem() {
 		this.fileTypes = {

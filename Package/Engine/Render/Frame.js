@@ -65,7 +65,7 @@ class Frame extends ImageType {
 			this.height = 1;
 		}
 		this.img = new_OffscreenCanvas(this.width, this.height);
-		this.c = new Artist(this.img);
+		this.c = new Artist(this.img, this.width, this.height);
 		this.c.c.imageSmoothingEnabled = window.c ? !window.c.preservePixelart : false;
 		this.renderer = this.c;
 		this.onload = () => null;

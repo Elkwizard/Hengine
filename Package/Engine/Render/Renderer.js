@@ -15,21 +15,31 @@ const TextMode = {
 	BOTTOM: Symbol("BOTTOM")
 };
 class Artist {
-	constructor(canvasID, width, height) {
-		if (typeof canvasID === "object") this.canvas = canvasID;
-		else this.canvas = document.getElementById(canvasID);
+	constructor(canvas, width, height) {
+		this.canvas = canvas;
+
 		if (this.canvas.style) {
 			this.canvas.style.position = "absolute";
-		}
-		if (width) {
-			this.canvas.width = width;
-		}
-		if (height) {
-			this.canvas.height = height;
 		}
 
 		this.custom = {};
 		this.c = this.canvas.getContext('2d');
+
+		//Device Pixel Ratio
+		if (this.canvas.style) {
+			let w = width;
+			let h = height;
+			this.canvas.style.width = w;
+			this.canvas.style.height = h;
+			this.canvas.width = w * devicePixelRatio;
+			this.canvas.height = h * devicePixelRatio;
+			this.c.scale(devicePixelRatio, devicePixelRatio);
+		} else {
+			this.canvas.width = width;
+			this.canvas.height = height;
+		}
+
+
 		this.__c = this.c;
 		this._background = new Color(0, 0, 0, 0);
 		this.textMode = TextMode.LEFT;
@@ -524,16 +534,20 @@ class Artist {
 		}
 	}
 	set width(a) {
-		this.canvas.width = a;
+		this.canvas.width = a * devicePixelRatio;
+		if (this.canvas.style) this.canvas.style.width = a;
+		this.c.scale(devicePixelRatio, devicePixelRatio);
 	}
 	get width() {
-		return this.canvas.width;
+		return this.canvas.width / devicePixelRatio;
 	}
 	set height(a) {
-		this.canvas.height = a;
+		this.canvas.height = a * devicePixelRatio;
+		if (this.canvas.style) this.canvas.style.height = a;
+		this.c.scale(devicePixelRatio, devicePixelRatio);
 	}
 	get height() {
-		return this.canvas.height;
+		return this.canvas.height / devicePixelRatio;
 	}
 	set preservePixelart(a) {
 		this.c.imageSmoothingEnabled = !a;
