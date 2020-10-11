@@ -572,8 +572,8 @@ class Artist {
 		return this.c.globalAlpha;
 	}
 	getPixel(x, y) {
-		let d = this.c.getImageData(x, y, 1, 1).data;
-		return new Color(d[0], d[1], d[2], d[3])
+		let d = this.c.getImageData(x * devicePixelRatio, y * devicePixelRatio, 1, 1).data;
+		return new Color(d[0], d[1], d[2], d[3] / 255);
 	}
 	setPixel(x, y, col) {
 		let data = new Uint8ClampedArray(4);
@@ -584,17 +584,20 @@ class Artist {
 		this.c.putImageData(new ImageData(data, 1, 1), x, y);
 	}
 	getTexture(x = 0, y = 0, w = this.width, h = this.height) {
-		let imageData = this.c.getImageData(x, y, w, h);
+		x *= devicePixelRatio;
+		y *= devicePixelRatio;
+		let W = ~~(w * devicePixelRatio);
+		let H = ~~(h * devicePixelRatio);
+		let imageData = this.c.getImageData(x, y, W, H);
 		let tex = new Texture(w, h);
-		tex.imageData = imageData;
 		let data = imageData.data;
 		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
-			let inx = (i + j * w) * 4;
+			let inx = (Math.round(i * devicePixelRatio) + Math.round(j * devicePixelRatio) * W) * 4;
 			let r = data[inx + 0];
 			let g = data[inx + 1];
 			let b = data[inx + 2];
-			let a = data[inx + 3];
-			tex.pixels[i][j] = new Color(r, g, b, a);
+			let a = data[inx + 3] / 255;
+			tex.shader_set(i, j, new Color(r, g, b, a));
 		}
 		tex.changed = true;
 		return tex;

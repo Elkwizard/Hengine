@@ -576,7 +576,8 @@ class Geometry {
     }
     static intersectRayLine(o, r, l) {
         let result = null;
-        if (l.a.x === l.b.x) {
+        const EPSILON = 0.0001;
+        if (Math.abs(l.a.x - l.b.x) < EPSILON) {
             if (r.x) {
                 let dx = r.x;
                 let dy = r.y;
@@ -590,7 +591,7 @@ class Geometry {
                 if (o.x === l.a.x) result = new Vector2(o.x, Number.clamp(o.y, Math.min(l.a.y, l.b.y), Math.max(l.a.y, l.b.y)));
             }
         } else {
-            if (r.x) {
+            if (Math.abs(r.x) > EPSILON) {
                 let dx = r.x;
                 let dy = r.y;
                 let b = o.y - dy / dx * o.x;
