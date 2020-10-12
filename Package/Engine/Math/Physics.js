@@ -650,8 +650,7 @@ class CollisionDetector {
         return null;
     }
     PolygonModel_PolygonModel(a, b, _unused) {
-        let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
-        if (intersections.length < 2) return null;
+        // if (intersections.length < 2) return null;
 
         let toB = PhysicsVector.sub(b.position, a.position);
 
@@ -688,7 +687,8 @@ class CollisionDetector {
             }
         }
         if (!bestAxis) return null;
-
+        let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
+        
         let { aMin, aMax, bMin, bMax } = bestRange;
         let rMin = 0;
         let rMax = 0;
@@ -700,10 +700,13 @@ class CollisionDetector {
             rMax = bMax;
         }
 
-        let cA = intersections[0];
-        let cB = intersections[1];
-        if (Math.abs(cA.x - cB.x) < 0.01 && Math.abs(cA.y - cB.y) < 0.01) intersections = [cA];
-        else intersections = [cA, cB];
+        if (intersections.length >= 2) {
+            let cA = intersections[0];
+            let cB = intersections[1];
+            if (Math.abs(cA.x - cB.x) < 0.01 && Math.abs(cA.y - cB.y) < 0.01) intersections = [cA];
+            else intersections = [cA, cB];
+        }
+
         let contacts = intersections
             .map(contact => {
                 let dot = PhysicsVector.dot(contact, bestAxis);

@@ -109,8 +109,8 @@ class Artist {
 				}
 				text = (text + "").replace(/\t/, "    ");
 				if (pack) text = this.packText(font, text, pack);
-				this.c.font = font;
-				let fs = this.getFontValue(font);
+				this.c.font = font.toString();
+				let fs = font.size;
 				let tmh = this.getTextHeight(font, text);
 				let blocks = text.split("\n");
 				let textRequests = [];
@@ -308,7 +308,7 @@ class Artist {
 				nx *= height / m / 2;
 				ny *= height / m / 2;
 				
-				let length = (m - (width + this.getFontValue(font))) / 2;
+				let length = (m - (width + font.size)) / 2;
 				dx *= length / m;
 				dy *= length / m;
 
@@ -332,7 +332,7 @@ class Artist {
 				this.c.rotate(rot);
 				this.c.translate(-width / 2, height / 4);
 				this.c.fillStyle = this.c.strokeStyle;
-				this.c.font = font;
+				this.c.font = font.toString();
 				this.c.fillText(text, 0, 0);
 				this.c.restore();
 
@@ -660,11 +660,8 @@ class Artist {
 	unembody() {
 		this.c = this.__c;
 	}
-	getFontValue(font) {
-		return parseInt(font.slice(0, font.indexOf("px")));
-	}
 	packText(font, str, pack) {
-		this.c.font = font;
+		this.c.font = font.toString();
 		let text = str.replace(/\t/g, "    ");
 		let words = text.split(" ");
 		let lines = [""];
@@ -682,14 +679,14 @@ class Artist {
 	}
 	getTextWidth(font, str) {
 		str += "";
-		this.c.font = font;
+		this.c.font = font.toString();
 		let spl = str.replace(/\t/g, "    ").split("\n");
 		return Math.max(...spl.map(e => this.c.measureText(e).width));
 	}
 	getTextHeight(font, str, pack) {
 		str += "";
 		if (pack) str = this.packText(font, str, pack);
-		return str.split("\n").length * this.getFontValue(font);
+		return str.split("\n").length * font.size;
 	}
 	contentToFrame() {
 		let n = new Frame(this.canvas.width, this.canvas.height);
