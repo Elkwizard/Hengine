@@ -1,8 +1,26 @@
 function new_OffscreenCanvas(width, height) {
-	if (window.OffscreenCanvas) return new OffscreenCanvas(width, height);
-	const canvas = document.createElement("canvas");
-	canvas.width = width;
-	canvas.height = height;
+	let canvas;
+	if (window.OffscreenCanvas) {
+		canvas = new OffscreenCanvas(width, height);
+	} else {
+		canvas = document.createElement("canvas");
+		canvas.width = width;
+		canvas.height = height;
+	}
+	canvas.style = {
+		set width(a) {
+			canvas.width = a;
+		},
+		get width() {
+			return canvas.width;
+		},
+		set height(a) {
+			canvas.height = a;
+		},
+		get height() {
+			return canvas.height;
+		}
+	};
 	return canvas;
 }
 class ImageType {
@@ -70,28 +88,25 @@ class Frame extends ImageType {
 		this.renderer = this.c;
 		this.onload = () => null;
 	}
-	static async sourceExists(src) {
-		let img = new Image();
-		img.src = src;
-		let result = await new Promise(function (resolve) {
-			img.onerror = () => resolve(false);
-			img.onload = () => resolve(true);
-		});
-		return result;
-	}
 	set src(src) {
 		let img = new Image();
 		img.src = src;
 		this.loaded = false;
 		img.onload = function () {
-			this.width = img.width;
-			this.height = img.height;
 			this.img.width = img.width;
 			this.img.height = img.height;
-			this.c.c.drawImage(img, 0, 0);
+			this.width = img.width;
+			this.height = img.height;
+			this.c.c.drawImage(img, 0, 0, img.width, img.height);
 			this.loaded = true;
 			this.onload();
 		}.bind(this);
+	}
+	stretch(w, h) {
+		if (!h) h = this.inferHeight(w);
+		let f = new Frame(w, h);
+		f.renderer.c.drawImage(this.img, 0, 0, w, h);
+		return f;
 	}
 	clip(x, y, w, h) {
 		if (x.width !== undefined) {
@@ -104,13 +119,22 @@ class Frame extends ImageType {
 		f.renderer.c.drawImage(this.img, x, y, w, h, 0, 0, w, h);
 		return f;
 	}
+	makeImage() {
+		return this.img;
+	}
+	static async sourceExists(src) {
+		let img = new Image();
+		img.src = src;
+		let result = await new Promise(function (resolve) {
+			img.onerror = () => resolve(false);
+			img.onload = () => resolve(true);
+		});
+		return result;
+	}
 	static fromImageType(img) {
 		let offscreen = img.makeImage();
 		let f = new Frame(offscreen.width, offscreen.height);
 		f.renderer.c.drawImage(offscreen, 0, 0);
 		return f;
-	}
-	makeImage() {
-		return this.img;
 	}
 }

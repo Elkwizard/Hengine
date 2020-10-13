@@ -82,6 +82,9 @@ class Operable {
 	static avg(v) {
 		return this.sum(v).over(v.length);
     }
+    static remap(n, a, b, a2, b2) {
+        return new this(...this.modValues.map(x => (n[x] - a[x]) / (b[x] - a[x]) * (b2[x] - a2[x]) + a2[x]));
+    }
     static clamp(n, a, b) {
         return new this(...this.modValues.map(x => Math.max(a[x], Math.min(b[x], n[x]))));
     }

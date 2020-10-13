@@ -110,7 +110,6 @@ class ParticleSpawnerObject extends SceneObject {
             particle.engineUpdate();
             particle.lifeSpan++;
         }
-        this.update();
     }
 }
 class ParticleObject extends SceneObject {

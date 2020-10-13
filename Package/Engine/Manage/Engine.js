@@ -10,8 +10,8 @@ class Engine {
 		this.frameLengths = [];
 		this.frameLength = 0;
 		this.frameCount = 0;
-		
-		
+
+
 		this.paused = false;
 		this.output = function (m) {
 			alert(m);
@@ -73,30 +73,24 @@ class Engine {
 				this.renderer.c.imageSmoothingEnabled = pixelate;
 			}
 		}.bind(this));
-
-		let grh = true;
-		try { Graph; } catch (e) { grh = false; };
-		this.hasGraphs = grh;
-		if (this.hasGraphs) {
-			this.graphs = [];
-			this.fpsGraph = this.makeGraph("FPS", 0, 60, e => Math.floor(this.fpsContinuous), 2000, [
-				{
-					limit: 50,
-					color: "lime"
-				},
-				{
-					limit: 30,
-					color: "yellow"
-				},
-				{
-					limit: 15,
-					color: "orange"
-				},
-				{
-					color: "red"
-				}
-			]);
-		}
+		this.graphs = [];
+		// this.fpsGraph = this.makeGraph("FPS", 0, 60, e => Math.floor(this.fpsContinuous), 2000, [
+		// 	{
+		// 		limit: 50,
+		// 		color: "lime"
+		// 	},
+		// 	{
+		// 		limit: 30,
+		// 		color: "yellow"
+		// 	},
+		// 	{
+		// 		limit: 15,
+		// 		color: "orange"
+		// 	},
+		// 	{
+		// 		color: "red"
+		// 	}
+		// ]);
 	}
 	engineUpdate() {
 		try {
@@ -132,34 +126,15 @@ class Engine {
 			else throw e;
 		}
 	}
-	makeGraph(yName, minValue, maxValue, getY, msLimit = 5000, colors) {
-		if (this.hasGraphs) {
-			let f = new Graph(yName, minValue, maxValue, getY, msLimit, colors, this);
-			return f;
-		}
-	}
-	parseGraphData(data) {
-		let result = data.split(" ").map(e => {
-			let split = e.split(",");
-			return P(parseFloat(split[0]), parseFloat(split[1]));
-		});
-		result.pop();
-		return result;
+	makeGraphPlane(graphs, frameLimit) {
+		let f = new GraphPlane(graphs, frameLimit);
+		this.graphs.push(f);
+		return f;
 	}
 	updateGraphs() {
-		if (!this.hasGraphs) return;
-		let t = performance.now();
-		for (let graph of this.graphs) {
-			for (let key in graph.vars) {
-				let data = P(t, graph.vars[key].getY(t));
-				graph.vars[key].data.push(data);
-				if (graph.vars[key].data.length > graph.msLimit / 16) graph.vars[key].data.shift();
-			}
-			if (t > graph.msLimit) graph.timeOffset = t - graph.msLimit;
-		}
+		for (let i = 0; i < this.graphs.length; i++) this.graphs[i].update();
 	}
 	getFPSGraph() {
-		if (!this.hasGraphs) return;
 		return this.fpsGraph.get();
 	}
 	end() {

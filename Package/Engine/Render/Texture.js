@@ -143,7 +143,7 @@ class Texture extends ImageType {
 		}
 		return this.__image.img;
 	}
-	scale(w, h) {
+	stretch(w, h) {
 		w = Math.round(w);
 		h = Math.round(h);
 		let r = new Texture(w, h);

@@ -103,9 +103,9 @@ class Artist {
 			},
 			text(font, text, x, y, pack = false) {
 				if (typeof x === "object") {
+					pack = y || false;
 					y = x.y;
 					x = x.x;
-					pack = y || false;
 				}
 				text = (text + "").replace(/\t/, "    ");
 				if (pack) text = this.packText(font, text, pack);
@@ -476,6 +476,10 @@ class Artist {
 				this.unclip();
 			},
 			default(x, y) {
+				if (typeof x === "object") {
+					y = x.y;
+					x = x.x;
+				}
 				this.drawImageInternal(x, y, this.imageStyle.width, this.imageStyle.height);
 			},
 			inferHeight(x, y, w) {
@@ -561,9 +565,6 @@ class Artist {
 	set background(a) {
 		this._background = a;
 		this.setBackground(a);
-	}
-	get middle() {
-		return { x: this.canvas.width / 2, y: this.canvas.height / 2 };
 	}
 	set alpha(a) {
 		this.c.globalAlpha = a;
@@ -689,7 +690,7 @@ class Artist {
 		return str.split("\n").length * font.size;
 	}
 	contentToFrame() {
-		let n = new Frame(this.canvas.width, this.canvas.height);
+		let n = new Frame(this.width, this.height);
 		n.c.drawImage(this.canvas, 0, 0);
 		return n;
 	}
@@ -697,11 +698,11 @@ class Artist {
 		return 1 / (1 + (Math.E ** -x));
 	}
 	invertX() {
-		this.translate(this.canvas.width, 0);
+		this.translate(this.width, 0);
 		this.scale(-1, 1);
 	}
 	invertY() {
-		this.translate(0, this.canvas.height);
+		this.translate(0, this.height);
 		this.scale(1, -1);
 	}
 	simpleCircle(color, border) {
@@ -763,7 +764,7 @@ class Artist {
 		this.c.clearRect(x, y, w, h);
 	}
 	clear() {
-		this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		this.c.clearRect(0, 0, this.width, this.height);
 	}
 	color(color) {
 		this.c.fillStyle = this.c.strokeStyle = color;
