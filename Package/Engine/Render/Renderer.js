@@ -553,6 +553,9 @@ class Artist {
 	get height() {
 		return this.canvas.height / devicePixelRatio;
 	}
+	get middle() {
+		return new Vector2(this.width / 2, this.height / 2);
+	}
 	set preservePixelart(a) {
 		this.c.imageSmoothingEnabled = !a;
 	}

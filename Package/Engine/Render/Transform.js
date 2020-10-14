@@ -1,6 +1,6 @@
 class Transform {
 	constructor(x, y, rotation) {
-		this.position = new Vector2(x, y);
+		Vector2.defineReference(this, "position", new Vector2(x, y));
 		this.rotation = rotation;
 	}
 	set rotation(a) {

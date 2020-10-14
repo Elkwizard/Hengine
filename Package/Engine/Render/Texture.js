@@ -137,11 +137,12 @@ class Texture extends ImageType {
 	makeImage() {
 		if (this.changed) {
 			this.changed = false;
-			let x = new Frame(this.width, this.height);
-			x.c.c.putImageData(this.imageData, 0, 0);
+			let x = new_OffscreenCanvas(this.width, this.height);
+			let c = x.getContext("2d");
+			c.putImageData(this.imageData, 0, 0);
 			this.__image = x;
 		}
-		return this.__image.img;
+		return this.__image;
 	}
 	stretch(w, h) {
 		w = Math.round(w);

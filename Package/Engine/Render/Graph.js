@@ -1,10 +1,11 @@
 class Graph {
-    constructor(name, y, minY, maxY, color) {
+    constructor(name, y, minY, maxY, color, decimalPlaces = 2) {
         this.name = name;
         this.y = y;
         this.minY = minY;
         this.maxY = maxY;
         this.color = color;
+        this.decimalPlaces = decimalPlaces;
         this.data = [];
         this.plane = null;
         this.lastRemappedDataPoint = null;
@@ -16,9 +17,10 @@ class Graph {
         let dataValue = this.data[this.data.length - 1];
         let prefix = "-";
         if (dataValue >= 0) prefix = " ";
-        let dText = `${this.name}: ${prefix + Math.abs(this.data[this.data.length - 1]).toFixed(3)}`;
+        let dText = `${this.name}: ${prefix + Math.abs(this.data[this.data.length - 1]).toFixed(this.decimalPlaces)}`;
         let point = data[data.length - 1];
         point.x = Math.min(point.x, this.plane.graphRect.xRange.max - this.plane.font.size / 2);
+        point.y = Number.clamp(point.y, this.plane.graphRect.yRange.min + this.plane.font.size / 2, this.plane.graphRect.yRange.max - this.plane.font.size / 2 - renderer.getTextHeight(this.plane.font, this.name));
         this.lastRemappedDataPoint = { point, text: dText };
     }
     label(renderer) {
@@ -71,14 +73,19 @@ class GraphPlane extends Frame {
         this.graphRect = new Rect(this.boundingRect.x, this.boundingRect.y, this.boundingRect.width, this.boundingRect.height - bottomOffset);
     }
     draw() {
+        function formatTime(t) {
+            return t.toString().split("").reverse().map((e, i) => (!(i % 3) && i) ? "," + e : e).join("").split("").reverse().join("");
+        }
         let renderer = this.renderer;
         renderer.clear();
         renderer.draw(cl.BLACK).rect(this.boundingRect);
         renderer.textMode = TextMode.LEFT;
         renderer.textModeVertical = TextMode.BOTTOM;
-        renderer.draw(cl.WHITE).text(this.font, this.minFrame + "F", this.boundingRect.xRange.min + this.font.size / 2, this.boundingRect.yRange.max - this.font.size / 2);
+        let minTime = Math.max(0, performance.now());
+        let timeLimit = this.frameLimit * 16;
+        renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame)} F / ${Time.formatMS(minTime)}`, this.boundingRect.xRange.min + this.font.size / 2, this.boundingRect.yRange.max - this.font.size / 2);
         renderer.textMode = TextMode.RIGHT;
-        renderer.draw(cl.WHITE).text(this.font, (this.minFrame + this.frameLimit) + "F", this.boundingRect.xRange.max - this.font.size / 2, this.boundingRect.yRange.max - this.font.size / 2);
+        renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame + this.frameLimit)} F / ${Time.formatMS(minTime + timeLimit)}`, this.boundingRect.xRange.max - this.font.size / 2, this.boundingRect.yRange.max - this.font.size / 2);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].draw(renderer);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].label(renderer);
         renderer.stroke(cl.WHITE).rect(this.boundingRect);

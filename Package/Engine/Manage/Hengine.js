@@ -202,6 +202,7 @@ class Hengine {
 				if (l.dragged) {
 					this.transform.position = M.world.minus(l.offset);
 					if (l.bounds) {
+						this.cacheBoundingBoxes();
 						let { x, y, width, height } = this.__boundingBox;
 						let ox = x - this.transform.position.x;
 						let oy = y - this.transform.position.y;

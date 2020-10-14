@@ -1,41 +1,16 @@
-class Camera {
-	constructor(x, y, width, height, zoom = 1, rotation = 0) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.rotation = rotation;
+class Camera extends Transform {
+	constructor(x, y, rotation = 0, zoom = 1) {
+		super(x, y, rotation);
 		this.zoom = zoom;
-		this.view = new Frame(width, height);
-		this.newView = new Frame(width, height);
-	}
-	get vertices() {
-		return [
-			new Vector2(this.x, this.y),
-			new Vector2(this.x + this.width, this.y),
-			new Vector2(this.x + this.width, this.y + this.height),
-			new Vector2(this.x, this.y + this.height)
-		];
-	}
-	set middle(a) {
-		this.x = a.x - this.width / 2;
-		this.y = a.y - this.height / 2;
-	}
-	get middle() {
-		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
-	}
-	move(vector) {
-		this.x += vector.x;
-		this.y += vector.y;
 	}
 	rotateTowards(rotation, ferocity = 0.1) {
 		let dif = Geometry.signedAngularDist(rotation, this.rotation);
 		this.rotation += dif * ferocity;
 	}
 	moveTowards(point, ferocity = 0.1) {
-		const cameraPoint = this.middle;
+		const cameraPoint = this.position;
 		let dif = point.Vminus(cameraPoint).Ntimes(ferocity);
-		this.middle = cameraPoint.plus(dif);
+		this.position = cameraPoint.plus(dif);
 	}
 	restoreZoom() {
 		this.zoom = 1;
@@ -46,21 +21,13 @@ class Camera {
 	zoomOut(amount) {
 		this.zoom /= 1 + amount;
 	}
-	createView() {
-		this.newView = new Frame(width, height);
-	}
-	getWorld() {
-		let middle = this.middle;
-		let m = new Polygon(this.vertices.map(vert => vert.Vminus(middle))).getModel(new Transform(this.middle.x, this.middle.y, this.rotation));
-		m = m.scale(1 / this.zoom);
-		return m;
-	}
-	getScreen() {
-		return this.getWorld().getBoundingBox();
-	}
-	updateView(width, height) {
-		this.view.width = width;
-		this.view.height = height;
+	getScreen(width, height) {
+		return Rect.bound([
+			new Vector2(width / 2, height / 2),
+			new Vector2(width / 2, -height / 2),
+			new Vector2(-width / 2, height / 2),
+			new Vector2(-width / 2, -height / 2)
+		].map(v => v.rotate(this.rotation).div(this.zoom).plus(this.position)));
 	}
 	drawInWorldSpace(artist, c = renderer) {
 		c.save();
@@ -75,28 +42,21 @@ class Camera {
 		c.restore();
 	}
 	transformToWorld(artist) {
-		artist.translate(width / 2, height / 2);
+		artist.translate(artist.middle);
 		artist.rotate(this.rotation);
-		artist.scale(this.zoom, this.zoom);
-		artist.translate(-width / 2, -height / 2);
-		artist.translate(-this.x, -this.y);
+		artist.scale(this.zoom);
+		artist.translate(this.position.inverse);
 	}
 	transformToScreen(artist) {
-		artist.translate(this.x, this.y);
-		artist.translate(width / 2, height / 2);
-		artist.scale(1 / this.zoom, 1 / this.zoom);
+		artist.translate(this.position);
+		artist.scale(1 / this.zoom);
 		artist.rotate(-this.rotation);
-		artist.translate(-width / 2, -height / 2);
+		artist.translate(artist.middle.inverse);
 	}
 	screenSpaceToWorldSpace(point) {
-		point = Geometry.rotatePointAround(new Vector2(width / 2, height / 2), point, -this.rotation);
-		let newX = (point.x - width / 2) / this.zoom + width / 2 + this.x;
-		let newY = (point.y - height / 2) / this.zoom + height / 2 + this.y;
-		return new Vector2(newX, newY) //return the result
+		return point.minus(middle).rotate(-this.rotation).over(this.zoom).plus(this.position);
 	}
 	worldSpaceToScreenSpace(point) {
-		let newX = this.zoom * (point.x - width / 2 - this.x) + width / 2;
-		let newY = this.zoom * (point.y - height / 2 - this.y) + height / 2;
-		return Geometry.rotatePointAround(new Vector2(width / 2, height / 2), new Vector2(newX, newY), this.rotation); //return the result
+		return point.minus(this.position).times(this.zoom).rotate(this.rotation).plus(middle);
 	}
 }

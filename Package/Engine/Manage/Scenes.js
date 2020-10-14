@@ -8,10 +8,9 @@ class Scene {
 		this.renderer = context;
 		this.home = home;
 		this.cullGraphics = true;
-		this.cameras = {};
 		this.mouseEvents = false;
 		this.collisionEvents = true;
-		this.camera = new Camera(0, 0, this.renderer.width, this.renderer.height, 1, 0);
+		this.camera = new Camera(this.renderer.width / 2, this.renderer.height / 2, 0, 1);
 	}
 	addScript(name, opts) {
 		window[name] = new ElementScript(name, opts);
@@ -115,32 +114,18 @@ class Scene {
 			rect.updatePreviousData();
 		}
 	}
-	addCamera(name, camera) {
-		this.cameras[name] = camera;
-		return this.cameras[name];
-	}
-	getCamera(name) {
-		return this.cameras[name];
-	}
-	renderCamera(camera) {
-		let screen = camera.getScreen();
+	renderCamera() {
+		let screen = this.camera.getScreen(width, height);
 
-		if (camera !== this.camera) {
-			camera.createView();
-			this.renderer.embody(camera.newView);
-		} else this.renderer.save();
+		this.renderer.save();
 
-		camera.transformToWorld(this.renderer);
+		this.camera.transformToWorld(this.renderer);
 		for (let rect of this.main.elementArray) {
 			rect.engineDraw(screen);
 			rect.lifeSpan++;
 		}
 
-		if (camera !== this.camera) {
-			this.renderer.unembody();
-			camera.view = camera.newView;
-		} else this.renderer.restore();
-		return camera.view;
+		this.renderer.restore();
 	}
 	script(type, ...args) {
 		let el = this.main.elementArray;
@@ -179,8 +164,7 @@ class Scene {
 		this.camera.width = this.renderer.width;
 		this.camera.height = this.renderer.height;
 		this.main.elementArray.sort((a, b) => a.layer - b.layer);
-		for (let cameraName in this.cameras) this.renderCamera(this.cameras[cameraName]);
-		this.renderCamera(this.camera);
+		this.renderCamera();
 		
 		//physics
 		for (let i = 0; i < this.main.elementArray.length; i++) this.main.elementArray[i].engineUpdate();
