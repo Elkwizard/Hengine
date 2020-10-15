@@ -90,6 +90,17 @@ Array.dim = function (...dims) {
 	}
 	return ary;
 };
+Array.dimFilled = function (val, ...dims) {
+	let ary = [];
+	if (dims.length > 1) {
+		let dim = dims.shift();
+		ary.multiDimensional = true;
+		for (let i = 0; i < dim; i++) ary.push(Array.dimFilled(val, ...dims));
+	} else {
+		for (let i = 0; i < dims[0]; i++) ary.push(val);
+	}
+	return ary;
+};
 Array.prototype.test = function (test) {
 	for (let i = 0; i < this.length; i++) if (test(this[i])) return true;
 	return false;

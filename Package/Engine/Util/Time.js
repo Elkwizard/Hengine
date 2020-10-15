@@ -37,12 +37,13 @@ class Time {
 	static formatTime(t) {
 		let ary = [];
 		let shorthand = {
-			"years": "yr",
+			"years": "y",
 			"days": "d",
+			"hours": "h",
 			"minutes": "m",
 			"seconds": "s"
 		}
-		for (let key of ["years", "days", "minutes", "seconds"]) {
+		for (let key of ["years", "days", "hours", "minutes", "seconds"]) {
 			let start = t[key];
 			if (start % 1) start = t[key].toFixed(2); 
 			if (t[key] || key == "seconds") ary.push(start + shorthand[key]);

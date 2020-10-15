@@ -4,8 +4,8 @@ class Texture extends ImageType {
 		let self = this;
 		this.c = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
 		this.renderer = this.c;
-		this.pixels = Array.dim(this.width, this.height).map(() => new Color(0, 0, 0, 0));
-		this.__image = new Frame(width, height);
+		this.pixels = Array.dimFilled(new Color(0, 0, 0, 0), this.width, this.height);
+		this.__image = new OffscreenCanvas(width, height);
 
 		//init image data
 		let array = new Uint8ClampedArray(4 * this.width * this.height);
