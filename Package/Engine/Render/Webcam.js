@@ -1,6 +1,6 @@
 class WebcamCapture extends ImageType {
 	constructor() {
-		super(1, 1, false);
+		super(1, 1);
 		this.data = { video: null };
 		WebcamCapture.getWebcam(this.data);
 		this.lastCaptureTime = 0;

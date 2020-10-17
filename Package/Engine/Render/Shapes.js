@@ -56,8 +56,11 @@ class Range {
 	get max() {
 		return this._max;
 	}
-	get span() {
+	get length() {
 		return this.max - this.min;
+	}
+	clip(range) {
+		return new Range(Number.clamp(this.min, range.min, range.max), Number.clamp(this.max, range.min, range.max));
 	}
 	getValueFromInterval(interval) {
 		return (this.max - this.min) * interval + this.min;
@@ -129,7 +132,7 @@ class Polygon extends Shape {
 		this.vertices = Polygon.removeDuplicates(vertices);
 		let x = Range.fromValues(vertices.map(e => e.x));
 		let y = Range.fromValues(vertices.map(e => e.y));
-		this.area = x.span * y.span;
+		this.area = x.length * y.length;
 	}
 	static removeDuplicates(verts) {
 		let vertices = [];
@@ -297,6 +300,11 @@ class Rect extends Polygon {
 			this.height = max.y - min.y;
 		}
 	}
+	clip(rect) {
+		let xRange = this.xRange.clip(rect.xRange);
+		let yRange = this.yRange.clip(rect.yRange);
+		return Rect.fromRanges(xRange, yRange);
+	}
 	getBoundingBox() {
 		return new Rect(this.x, this.y, this.width, this.height);
 	}
@@ -324,6 +332,9 @@ class Rect extends Polygon {
 	}
 	get() {
 		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
+	}
+	static fromRanges(xRange, yRange) {
+		return new Rect(xRange.min, yRange.min, xRange.length, yRange.length);
 	}
 	static bound(points) {
 		let minX = Infinity;

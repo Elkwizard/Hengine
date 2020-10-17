@@ -1,16 +1,16 @@
 class Scene {
-	constructor(context, gravity = new Vector2(0, 0.1), home) {
+	constructor(context, gravity = new Vector2(0, 0.1), engine) {
 		this.main = new ElementContainer("Main", true, this, null);
 		this.gravity = gravity;
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
 		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
 		this.physicsEngine.oncollide = this.handleCollisionEvent.bind(this);
 		this.renderer = context;
-		this.home = home;
+		this.engine = engine;
 		this.cullGraphics = true;
 		this.mouseEvents = false;
 		this.collisionEvents = true;
-		this.camera = new Camera(this.renderer.width / 2, this.renderer.height / 2, 0, 1);
+		this.camera = new Camera(this.renderer.width / 2, this.renderer.height / 2, 0, 1, engine);
 	}
 	addScript(name, opts) {
 		window[name] = new ElementScript(name, opts);
@@ -115,7 +115,7 @@ class Scene {
 		}
 	}
 	renderCamera() {
-		let screen = this.camera.getScreen(width, height);
+		let screen = this.camera.getScreen();
 
 		this.renderer.save();
 

@@ -1,6 +1,6 @@
 class Texture extends ImageType {
 	constructor(width, height) {
-		super(width, height, false);
+		super(width, height);
 		let self = this;
 		this.c = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
 		this.renderer = this.c;
@@ -13,6 +13,7 @@ class Texture extends ImageType {
 		this.imageData = new ImageData(array, this.width, this.height);
 
 		this.changed = false;
+		this.loops = false;
 	}
 	get brightness() {
 		return this.pixels.map(col => col.brightness);

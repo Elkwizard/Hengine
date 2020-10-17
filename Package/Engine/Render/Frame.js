@@ -24,10 +24,9 @@ function new_OffscreenCanvas(width, height) {
 	return canvas;
 }
 class ImageType {
-	constructor(width = 1, height = 1, loops = false) {
+	constructor(width = 1, height = 1) {
 		this.width = Math.max(1, Math.round(width));
 		this.height = Math.max(1, Math.round(height));
-		this.loops = loops;
 		this.loaded = true;
 	}
 	inferWidth(height) {
@@ -56,27 +55,10 @@ class ImageType {
 	makeImage() {
 		return null;
 	}
-	requestImage(width, height) {
-		if (!this.loops) {
-			return this.makeImage();
-		} else {
-			width = Math.abs(width);
-			height = Math.abs(height);
-			if (!width) width = 0;
-			if (!height) height = 0;
-			let frame = new_OffscreenCanvas(width, height);
-			let c = frame.getContext("2d");
-			let img = this.makeImage();
-			for (let i = 0; i < frame.width / this.width; i++) for (let j = 0; j < frame.height / this.height; j++) {
-				c.drawImage(img, i * this.width, j * this.height, this.width, this.height);
-			}
-			return frame;
-		}
-	}
 }
 class Frame extends ImageType {
 	constructor(width, height) {
-		super(width, height, false);
+		super(width, height);
 		if (typeof width === "string") {
 			this.src = width;
 			this.width = 1;

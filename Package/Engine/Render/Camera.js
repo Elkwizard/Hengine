@@ -1,7 +1,8 @@
 class Camera extends Transform {
-	constructor(x, y, rotation = 0, zoom = 1) {
+	constructor(x, y, rotation = 0, zoom = 1, engine) {
 		super(x, y, rotation);
 		this.zoom = zoom;
+		this.engine = engine;
 	}
 	rotateTowards(rotation, ferocity = 0.1) {
 		let dif = Geometry.signedAngularDist(rotation, this.rotation);
@@ -21,7 +22,8 @@ class Camera extends Transform {
 	zoomOut(amount) {
 		this.zoom /= 1 + amount;
 	}
-	getScreen(width, height) {
+	getScreen() {
+		let { width, height } = this.engine.renderer;
 		return Rect.bound([
 			new Vector2(width / 2, height / 2),
 			new Vector2(width / 2, -height / 2),

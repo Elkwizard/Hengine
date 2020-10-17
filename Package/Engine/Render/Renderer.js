@@ -793,7 +793,7 @@ class Artist {
 		this.translate(-x, -y);
 	}
 	drawImage(img, x, y, width, height) {
-		if (img instanceof ImageType) img = img.requestImage(width, height);
+		if (img instanceof ImageType) img = img.makeImage();
 		if (width === undefined) width = img.width;
 		if (height === undefined) height = img.height;
 		this.c.drawImage(img, x, y, width, height);
@@ -945,7 +945,7 @@ class Artist {
 				}
 
 				let img = imageStyle;
-				if (img instanceof ImageType) img = img.requestImage(boundW, boundH);
+				if (img instanceof ImageType) img = img.makeImage();
 
 				if (shape === "rect") {
 					return function () {
