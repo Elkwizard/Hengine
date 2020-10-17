@@ -5,6 +5,7 @@ class GPUShader extends ImageType {
 		this.args = [];
 		this.compiled = null;
 		this.augmented = null;
+		this.lastArguments = [];
 		this.image = new_OffscreenCanvas(width, height);
 	}
 	resize(width, height) {
@@ -107,7 +108,8 @@ class GPUShader extends ImageType {
 
 		this.compiled = { shaderProgram, uniforms, c };
 	}
-	arguments(uniformData = []) {
+	arguments(uniformData = this.lastArguments) {
+		this.lastArguments = uniformData;
 		if (!this.compiled) console.warn("Couldn't apply arguments: Shader wasn't compiled.");
 		let { shaderProgram, uniforms, c } = this.compiled;
 		let { width, height } = c.canvas;
