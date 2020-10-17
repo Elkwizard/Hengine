@@ -7,6 +7,10 @@ class GPUShader extends ImageType {
 		this.augmented = null;
 		this.lastArguments = [];
 		this.image = new_OffscreenCanvas(width, height);
+		this.c = this.image.getContext("webgl");
+		if (this.c === null) return console.warn("Your browser doesn't support webgl.");
+		this.image.addEventListener("webglcontextlost", e => e.preventDefault());
+		this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.arguments()));
 	}
 	resize(width, height) {
 		this.width = width;
@@ -14,7 +18,7 @@ class GPUShader extends ImageType {
 		this.shade();
 	}
 	shade() {
-		let { c } = this.augmented;
+		const c = this.c;
 		let { width, height } = c.canvas;
 		c.viewport(0, 0, width, height);
 		c.clear(c.COLOR_BUFFER_BIT);
@@ -22,17 +26,16 @@ class GPUShader extends ImageType {
 	}
 	compile() {
 		//init
-		const c = this.image.getContext("webgl");
-		if (c === null) return console.warn("Your browser doesn't support webgl.");
+		const c = this.c;
 
 		//sources
 		const vertexSource = `
 				attribute vec4 vertexPosition;
 
-				uniform lowp float halfWidth;
-				uniform lowp float halfHeight;
+				uniform highp float halfWidth;
+				uniform highp float halfHeight;
 
-				varying lowp vec2 position;
+				varying highp vec2 position;
 
 				void main() {
 					gl_Position = vertexPosition;
@@ -41,6 +44,7 @@ class GPUShader extends ImageType {
 			`;
 		let uniformMatches = [...this.glsl.matchAll(/uniform(?:\s+(low|medium|high)p)?\s+(sampler2D|int|float|(i?)vec[234])\s+(\w+)\s*(?:\[(\d+)\]|)/g)];
 		let uniforms = [];
+		let uniformProperties = [];
 		for (let i = 0; i < uniformMatches.length; i++) {
 			let u = uniformMatches[i];
 			let args = [];
@@ -51,14 +55,31 @@ class GPUShader extends ImageType {
 			let name = args[3];
 			let isArray = !!args[4];
 			let arrayCount = isArray ? args[4] : 0;
-			uniforms.push({ precision, type, name, isArray, arrayCount, integer });
+			let properties = [];
+			if (isArray) properties.push(`int ${name}_length`);
+			if (type === "sampler2D") {
+				if (isArray) {
+					properties.push(`vec2 ${name}_resolution[${arrayCount}]`);
+				} else {
+					properties.push(`vec2 ${name}_resolution`);
+				}
+			}
+			uniformProperties.push(...properties);
+			uniforms.push({ precision, type, name, isArray, arrayCount, integer, properties: properties.map(p => {
+				let t = p.split(" ")[1];
+				let inx = t.indexOf("[");
+				if (inx > -1) return t.slice(0, inx);
+				else return t;	
+			}) });
 		}
+		let uniformPropertyDeclarations = uniformProperties.map(p => `uniform highp ${p};`).join("\n");
+		
 		const pixelSource = `
-				uniform lowp float width;
-				uniform lowp float height;
-				uniform lowp vec2 resolution;
+				uniform highp vec2 resolution;
+				${uniformPropertyDeclarations}
 
-				varying lowp vec2 position;
+				varying highp vec2 position;
+				
 				${this.glsl}
 
 				void main() {
@@ -66,7 +87,6 @@ class GPUShader extends ImageType {
 					gl_FragColor.rgb *= gl_FragColor.a;
 				}
 			`;
-
 		//shader programs
 		function compileShader(type, source) {
 			let shader = c.createShader(type);
@@ -106,17 +126,16 @@ class GPUShader extends ImageType {
 
 		c.useProgram(shaderProgram);
 
-		this.compiled = { shaderProgram, uniforms, c };
+		this.compiled = { shaderProgram, uniforms };
 	}
 	arguments(uniformData = this.lastArguments) {
 		this.lastArguments = uniformData;
 		if (!this.compiled) console.warn("Couldn't apply arguments: Shader wasn't compiled.");
-		let { shaderProgram, uniforms, c } = this.compiled;
+		let { shaderProgram, uniforms } = this.compiled;
+		const c = this.c;
 		let { width, height } = c.canvas;
 
 		//uniforms in vertex
-		c.uniform1f(c.getUniformLocation(shaderProgram, "width"), width);
-		c.uniform1f(c.getUniformLocation(shaderProgram, "height"), height);
 		c.uniform2f(c.getUniformLocation(shaderProgram, "resolution"), width, height);
 		c.uniform1f(c.getUniformLocation(shaderProgram, "halfWidth"), width / 2);
 		c.uniform1f(c.getUniformLocation(shaderProgram, "halfHeight"), height / 2);
@@ -127,23 +146,32 @@ class GPUShader extends ImageType {
 		for (let i = 0; i < uniforms.length; i++) {
 			let u = uniforms[i];
 			let data = uniformData[i];
+			let p = u.properties;
 
 			let location = c.getUniformLocation(shaderProgram, u.name);
 
+			if (u.isArray) {
+				let arraySize = parseInt(u.arrayCount);
+				c.uniform1i(c.getUniformLocation(shaderProgram, p[0]), arraySize);
+			}
 			if (u.type === "sampler2D") {
 				if (u.isArray) {
 					let array = [];
 					let arraySize = parseInt(u.arrayCount);
+					let resolutions = [];
 					for (let i = 0; i < arraySize; i++) {
 						let unit = textureUnit++;
 						let tex = GPUShader.imageTypeToTexture(c, data[i], unit);
 						array.push(unit);
+						resolutions.push(data[i].width, data[i].height);
 					}
 					c.uniform1iv(location, new Int32Array(array));
+					c.uniform2fv(c.getUniformLocation(shaderProgram, p[1]), new Float32Array(resolutions));
 				} else {
 					let unit = textureUnit++;
 					let tex = GPUShader.imageTypeToTexture(c, data, unit);
 					c.uniform1i(location, unit);
+					c.uniform2f(c.getUniformLocation(shaderProgram, p[0]), data.width, data.height);
 				}
 			} else {
 				let singleData;
