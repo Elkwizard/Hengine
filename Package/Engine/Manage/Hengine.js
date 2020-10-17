@@ -58,51 +58,38 @@ class Hengine {
 		this.renderer = this.gameEngine.renderer;
 		this.keyboard = this.gameEngine.keyboard;
 		this.mouse = this.gameEngine.mouse;
-		
-		//Abbreviations
-		this.cl = new ColorLibrary();
-		this.sl = new SoundLibrary();
-		window.K = this.keyboard;
-		window.M = this.mouse;
-		window.g = this.gameEngine;
-		window.s = this.scene;
-		window.c = this.renderer;
-		window.cl = this.cl;
-		window.sl = this.sl;
+		this.colorLibrary = new ColorLibrary();
+		this.soundLibrary = new SoundLibrary();
+		window.cl = this.colorLibrary;
+		window.sl = this.soundLibrary;
 		
 		//Words
 		window.gameEngine = this.gameEngine;
 		window.scene = this.scene;
 		window.renderer = this.renderer;
-		window.colorLibrary = cl;
-		window.soundLibrary = sl;
+		window.colorLibrary = this.colorLibrary;
+		window.soundLibrary = this.soundLibrary;
 		window.keyboard = this.keyboard;
 		window.mouse = this.mouse;
 
+		let hengine = this;
 		if (!(window.width || window.height || window.middle)) {
 			Object.defineProperty(window, "middle", {
 				get: function() {
-					return new Vector2(width / 2, height / 2);
+					return new Vector2(hengine.renderer.width / 2, hengine.renderer.height / 2);
 				}
 			});
 			Object.defineProperty(window, "width", {
 				get: function () {
-					return window.c.width;
-				},
-				set: function (a) {
-					window.c.width = a;
+					return hengine.renderer.width;
 				}
 			});
 			Object.defineProperty(window, "height", {
 				get: function () {
-					return window.c.height;
-				},
-				set: function (a) {
-					window.c.height = a;
+					return hengine.renderer.height;
 				}
 			});
 		}
-		window.custom = this.custom;
 		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "fileExists", "save", "get", "deleteFile", "getAllFiles", "fileSize", "packageFiles", "importPackage", "getRaw", "saveRaw", "setTitle", "setCursor"];
 		for (let EXP of EXPORT) {
 			window[EXP] = this[EXP].bind(this);
@@ -161,14 +148,15 @@ class Hengine {
 		}
 	}
 	initDefaults() {
-		window.WALLS = s.main.addContainer("WALLS", false);
+		window.WALLS = scene.main.addContainer("WALLS", false);
+		let { width, height } = this.renderer;
 		WALLS.addPhysicsRectElement("Ceiling", width / 2, -50, width, 100, false);
 		WALLS.addPhysicsRectElement("Floor", width / 2, height + 50, width, 100, false);
 		WALLS.addPhysicsRectElement("Left Wall", -50, height / 2, 100, height + 200, false);
 		WALLS.addPhysicsRectElement("Right Wall", width + 50, height / 2, 100, height + 200, false);
 
 
-		s.addScript("PLAYER_MOVEMENT", {
+		this.scene.addScript("PLAYER_MOVEMENT", {
 			init() {
 				if (!this.controls.up) {
 					this.controls = new Controls("w", "s", "a", "d");
@@ -176,31 +164,31 @@ class Hengine {
 				this.mobilize();
 			},
 			update() {
-				if (K.P(this.controls.down)) this.velocity.y += 0.2;
-				if (K.P(this.controls.left)) this.velocity.x += -0.1;
-				else if (K.P(this.controls.right)) this.velocity.x += 0.1;
-				if (K.P(this.controls.up)) {
+				if (keyboard.pressed(this.controls.down)) this.velocity.y += 0.2;
+				if (keyboard.pressed(this.controls.left)) this.velocity.x += -0.1;
+				else if (keyboard.pressed(this.controls.right)) this.velocity.x += 0.1;
+				if (keyboard.pressed(this.controls.up)) {
 					if (this.colliding.bottom) {
 						this.velocity.y = -5;
 					}
 				}
 			}
 		});
-		s.addScript("DRAGGABLE", {
+		this.scene.addScript("DRAGGABLE", {
 			init(l, bounds = null) {
 				l.dragged = false;
 				l.offset = Vector2.origin;
 				l.bounds = bounds;
-				s.mouseEvents = true;
+				scene.mouseEvents = true;
 			},
 			click(l, m) {
 				l.dragged = true;
 				l.offset = this.transform.worldSpaceToModelSpace(m);
 			},
 			update(l) {
-				if (M.JR("Left")) l.dragged = false; 
+				if (mouse.justReleased("Left")) l.dragged = false; 
 				if (l.dragged) {
-					this.transform.position = M.world.minus(l.offset);
+					this.transform.position = mouse.world.minus(l.offset);
 					if (l.bounds) {
 						this.cacheBoundingBoxes();
 						let { x, y, width, height } = this.__boundingBox;
@@ -322,7 +310,7 @@ class Hengine {
 	loadImage(src) {
 		let img = this.images[src];
 		let f = new Frame(img.width, img.height);
-		f.c.image(img).default(0, 0);
+		f.renderer.image(img).default(0, 0);
 		return f;
 	}
 	loadAnimation(src) {

@@ -49,7 +49,7 @@ class Engine {
 		this.keyboard = new KeyboardHandler();
 
 		this.renderer = new Artist(canvas, W, H);
-		this.scene = new Scene(this.renderer, new Vector2(0, 0.2), this);
+		this.scene = new Scene(new Vector2(0, 0.2), this);
 		//update loops
 		this.intervals = new IntervalFunctionManager();
 
@@ -60,7 +60,7 @@ class Engine {
 		this.resize = true;
 		window.addEventListener("resize", function () {
 			if (this.resize) {
-				let pixelate = this.renderer.c.imageSmoothingEnabled;
+				let pixelate = this.renderer.preservePixelart;
 				let bound = this.wrapper.getClientRects()[0];
 				if (this.wrapper === document.body) {
 					bound = {
@@ -70,7 +70,7 @@ class Engine {
 				}
 				this.renderer.width = bound.width - 1;
 				this.renderer.height = bound.height - 1;
-				this.renderer.c.imageSmoothingEnabled = pixelate;
+				this.renderer.preservePixelart = pixelate;
 			}
 		}.bind(this));
 		this.graphs = [];

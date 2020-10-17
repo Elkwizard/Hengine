@@ -1,6 +1,6 @@
 class PhysicsObject extends SceneObject {
-    constructor(name, x, y, gravity, controls, tag, home) {
-        super(name, x, y, controls, tag, home);
+    constructor(name, x, y, gravity, controls, tag, home, engine) {
+        super(name, x, y, controls, tag, home, engine);
 
         this.body = new RigidBody(x, y, gravity ? RigidBody.DYNAMIC : RigidBody.STATIC);
         if (this.home.active) this.activate();
@@ -110,10 +110,10 @@ class PhysicsObject extends SceneObject {
         this.body.angularVelocity = a;
     }
     activate() {
-        this.home.scene.physicsEngine.addBody(this.body);
+        this.engine.scene.physicsEngine.addBody(this.body);
     }
     deactivate() {
-        this.home.scene.physicsEngine.removeBody(this.body.id);
+        this.engine.scene.physicsEngine.removeBody(this.body.id);
     }
     centerModels() {
         super.centerModels();

@@ -65,9 +65,8 @@ class Frame extends ImageType {
 			this.height = 1;
 		}
 		this.img = new_OffscreenCanvas(this.width, this.height);
-		this.c = new Artist(this.img, this.width, this.height);
-		this.c.preservePixelart = true;
-		this.renderer = this.c;
+		this.renderer = new Artist(this.img, this.width, this.height);
+		this.renderer.preservePixelart = true;
 		this.onload = () => null;
 	}
 	set src(src) {
@@ -79,7 +78,7 @@ class Frame extends ImageType {
 			this.img.height = img.height;
 			this.width = img.width;
 			this.height = img.height;
-			this.c.c.drawImage(img, 0, 0, img.width, img.height);
+			this.renderer.c.drawImage(img, 0, 0, img.width, img.height);
 			this.loaded = true;
 			this.onload();
 		}.bind(this);

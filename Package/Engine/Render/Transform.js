@@ -40,20 +40,20 @@ class Transform {
 	modelSpaceToWorldSpace(v) {
 		return v.rotated(this.rotation).Vplus(this.position);
 	}
-	drawInModelSpace(artist, c = renderer) {
-		c.translate(this.position.x, this.position.y);
+	drawInModelSpace(artist, renderer) {
+		renderer.translate(this.position.x, this.position.y);
 		let r = this.rotation;
-		if (r) c.rotate(this.rotation);
+		if (r) renderer.rotate(this.rotation);
 		artist();
-		if (r) c.rotate(-this.rotation);
-		c.translate(-this.position.x, -this.position.y);
+		if (r) renderer.rotate(-this.rotation);
+		renderer.translate(-this.position.x, -this.position.y);
 	}
-	drawInWorldSpace(artist, c = renderer) {
+	drawInWorldSpace(artist, renderer) {
 		let r = this.rotation;
-		if (r) c.rotate(-this.rotation);
-		c.translate(-this.position.x, -this.position.y);
+		if (r) renderer.rotate(-this.rotation);
+		renderer.translate(-this.position.x, -this.position.y);
 		artist();
-		c.translate(this.position.x, this.position.y);
-		if (r) c.rotate(this.rotation);
+		renderer.translate(this.position.x, this.position.y);
+		if (r) renderer.rotate(this.rotation);
 	}
 }

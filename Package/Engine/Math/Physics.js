@@ -1036,10 +1036,10 @@ class PhysicsEngine {
             let collidable = others.sort((a, b) => (a.position.x - b.position.x) * vel.x + (a.position.y - b.position.y) * vel.y);
 
             // checks
-            // c.draw(cl.RED).text("20px monospace", others.length, body.position.x, body.position.y);
+            // renderer.draw(cl.RED).text("20px monospace", others.length, body.position.x, body.position.y);
             // if (others.length > 10) {
             //     for (let i = 0; i < others.length; i++) {
-            //         c.stroke(cl.RED).arrow(body.position, others[i].position);
+            //         renderer.stroke(cl.RED).arrow(body.position, others[i].position);
             //     }
             // }
 
@@ -1116,9 +1116,9 @@ class PhysicsEngine {
             collisionPairs.set(body, bodies);
         }
         if (false) for (let i in grid.cells) if (grid.cells[i]) for (let j in grid.cells[i]) if (typeof grid.cells[i][j] === "object") {
-            c.stroke(cl.RED, 2).rect(i * cellsize, j * cellsize, cellsize, cellsize);
+            renderer.stroke(cl.RED, 2).rect(i * cellsize, j * cellsize, cellsize, cellsize);
             if (false) for (let el of grid.cells[i][j]) {
-                c.stroke(cl.ORANGE, 1).arrow(i * cellsize, j * cellsize, el.position.x, el.position.y);
+                renderer.stroke(cl.ORANGE, 1).arrow(i * cellsize, j * cellsize, el.position.x, el.position.y);
             }
         }
         return collisionPairs;

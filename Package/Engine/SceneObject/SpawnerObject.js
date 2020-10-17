@@ -45,8 +45,8 @@ class AngleDirections extends Directions {
     }
 }
 class ParticleSpawnerObject extends SceneObject {
-    constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), home) {
-        super(name, x, y, false, "Particle-Spawner", home);
+    constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), home, engine) {
+        super(name, x, y, false, "Particle-Spawner", home, engine);
         this.active = true;
         this.particleFades = true;
         this.particleSlows = true;
@@ -94,7 +94,7 @@ class ParticleSpawnerObject extends SceneObject {
     }
     spawnParticle() {
         const name = `Particle #${this.particleNumber++} from ${this.name}`; 
-        this.spawns[name] = new ParticleObject(this, this.home, name);
+        this.spawns[name] = new ParticleObject(this, name, this.home, this.engine);
     }
     engineUpdate() {
         if (this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
@@ -113,8 +113,8 @@ class ParticleSpawnerObject extends SceneObject {
     }
 }
 class ParticleObject extends SceneObject {
-    constructor(spawner, home, name) {
-        super(name, spawner.transform.position.x, spawner.transform.position.y, false, "Engine-Particle", home);
+    constructor(spawner, name, home, engine) {
+        super(name, spawner.transform.position.x, spawner.transform.position.y, false, "Engine-Particle", home, engine);
         this.velocity = Vector2.origin;
         this.angularVelocity = 0;
         this.spawner = spawner;
@@ -138,10 +138,10 @@ class ParticleObject extends SceneObject {
         //art
         if (sp.particleFades) {
             this.drawPrefix = function () {
-                this.home.scene.renderer.alpha = Number.clamp(1 - (this.lifeSpan / sp.particleLifeSpan), 0, 1);
+                this.engine.renderer.alpha = Number.clamp(1 - (this.lifeSpan / sp.particleLifeSpan), 0, 1);
             };
             this.drawSuffix = function () {
-                this.home.scene.renderer.alpha = 1;
+                this.engine.renderer.alpha = 1;
             };
         }
         if (sp.particleDraw instanceof ElementScript) {
@@ -167,11 +167,11 @@ class ParticleObject extends SceneObject {
     engineUpdate() {
         this.lastTransform = this.transform.get();
         if (this.spawner.particleFalls) {
-            this.velocity.y += this.home.scene.gravity.y;
+            this.velocity.y += this.engine.scene.gravity.y;
         }
         if (this.spawner.particleSlows) {
-            this.velocity.Nmul(this.home.scene.physicsEngine.linearDrag);
-            this.angularVelocity *= this.home.scene.physicsEngine.linearDrag;
+            this.velocity.Nmul(this.engine.scene.physicsEngine.linearDrag);
+            this.angularVelocity *= this.engine.scene.physicsEngine.linearDrag;
         }
         this.transform.position.x += this.velocity.x * 2;
         this.transform.position.y += this.velocity.y * 2;

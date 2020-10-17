@@ -107,16 +107,16 @@ class Geometry {
         // for (let i = 0; i < pathGrid.length; i++) for (let j = 0; j < pathGrid[0].length; j++) {
         //     let v = pathGrid[i][j];
         //     if (v) {
-        //         c.stroke(cl.ORANGE, 2).arrow(point(i, j).times(CELL_SIZE), point(i, j).times(CELL_SIZE).plus(v.times(CELL_SIZE)));
+        //         renderer.stroke(cl.ORANGE, 2).arrow(point(i, j).times(CELL_SIZE), point(i, j).times(CELL_SIZE).plus(v.times(CELL_SIZE)));
         //     }
         // }
         // for (let i = 0; i < pointGrid.length; i++) for (let j = 0; j < pointGrid[0].length; j++) {
         //     let p = pointGrid[i][j];
         //     if (p) {
-        //         // c.stroke(cl.LIME, 3).circle(point(i, j), 5);
+        //         // renderer.stroke(cl.LIME, 3).circle(point(i, j), 5);
         //     }
         // }
-        // for(let p of startingPoints) c.draw(cl.PURPLE).circle(p.times(CELL_SIZE), 5);
+        // for(let p of startingPoints) renderer.draw(cl.PURPLE).circle(p.times(CELL_SIZE), 5);
         let polygons = [];
         // startingPoints = [];
         while (startingPoints.length) {
@@ -139,7 +139,7 @@ class Geometry {
             if (points.length && !counter) polygons.push(points);
         }
 
-        // for (let points of polygons) c.stroke(cl.PURPLE, 2).shape(...points);
+        // for (let points of polygons) renderer.stroke(cl.PURPLE, 2).shape(...points);
         return polygons.filter(poly => Geometry.isClockwise(poly));
     }
     static reimann(fn, a, b, iter = 1000, RRAM = false) {

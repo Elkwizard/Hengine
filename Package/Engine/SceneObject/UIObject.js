@@ -1,10 +1,10 @@
 class UIObject extends SceneObject {
-    constructor(name, x, y, home) {
-        super(name, x, y, null, "UI", home);
+    constructor(name, x, y, home, engine) {
+        super(name, x, y, null, "UI", home, engine);
     }
     engineDraw() {
         this.onScreen = true;
-        if (!this.hidden) this.home.scene.camera.drawInScreenSpace(this.runDraw.bind(this));
+        if (!this.hidden) this.engine.scene.camera.drawInScreenSpace(this.runDraw.bind(this));
 		this.scripts.run("EscapeDraw");
     }
 }

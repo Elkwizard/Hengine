@@ -1,16 +1,15 @@
 class Scene {
-	constructor(context, gravity = new Vector2(0, 0.1), engine) {
-		this.main = new ElementContainer("Main", true, this, null);
+	constructor(gravity = new Vector2(0, 0.1), engine) {
+		this.engine = engine;
+		this.main = new ElementContainer("Main", true, null, this.engine);
 		this.gravity = gravity;
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
 		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
 		this.physicsEngine.oncollide = this.handleCollisionEvent.bind(this);
-		this.renderer = context;
-		this.engine = engine;
 		this.cullGraphics = true;
 		this.mouseEvents = false;
 		this.collisionEvents = true;
-		this.camera = new Camera(this.renderer.width / 2, this.renderer.height / 2, 0, 1, engine);
+		this.camera = new Camera(this.engine.renderer.width / 2, this.engine.renderer.height / 2, 0, 1, engine);
 	}
 	addScript(name, opts) {
 		window[name] = new ElementScript(name, opts);
@@ -117,15 +116,15 @@ class Scene {
 	renderCamera() {
 		let screen = this.camera.getScreen();
 
-		this.renderer.save();
+		this.engine.renderer.save();
 
-		this.camera.transformToWorld(this.renderer);
+		this.camera.transformToWorld(this.engine.renderer);
 		for (let rect of this.main.elementArray) {
 			rect.engineDraw(screen);
 			rect.lifeSpan++;
 		}
 
-		this.renderer.restore();
+		this.engine.renderer.restore();
 	}
 	script(type, ...args) {
 		let el = this.main.elementArray;
@@ -161,8 +160,8 @@ class Scene {
 		this.script("BeforeUpdate");
 
 		//draw
-		this.camera.width = this.renderer.width;
-		this.camera.height = this.renderer.height;
+		this.camera.width = this.engine.renderer.width;
+		this.camera.height = this.engine.renderer.height;
 		this.main.elementArray.sort((a, b) => a.layer - b.layer);
 		this.renderCamera();
 		

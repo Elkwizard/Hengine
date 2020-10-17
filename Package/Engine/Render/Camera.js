@@ -31,29 +31,33 @@ class Camera extends Transform {
 			new Vector2(-width / 2, -height / 2)
 		].map(v => v.rotate(this.rotation).div(this.zoom).plus(this.position)));
 	}
-	drawInWorldSpace(artist, c = renderer) {
-		c.save();
-		this.transformToWorld(c);
+	drawInWorldSpace(artist) {
+		let renderer = this.engine.renderer;
+		renderer.save();
+		this.transformToWorld(renderer);
 		artist();
-		c.restore();
+		renderer.restore();
 	}
-	drawInScreenSpace(artist, c = renderer) {
-		c.save();
-		this.transformToScreen(c);
+	drawInScreenSpace(artist) {
+		let renderer = this.engine.renderer;
+		renderer.save();
+		this.transformToScreen(renderer);
 		artist();
-		c.restore();
+		renderer.restore();
 	}
-	transformToWorld(artist) {
-		artist.translate(artist.middle);
-		artist.rotate(this.rotation);
-		artist.scale(this.zoom);
-		artist.translate(this.position.inverse);
+	transformToWorld() {
+		let renderer = this.engine.renderer;
+		renderer.translate(renderer.middle);
+		renderer.rotate(this.rotation);
+		renderer.scale(this.zoom);
+		renderer.translate(this.position.inverse);
 	}
-	transformToScreen(artist) {
-		artist.translate(this.position);
-		artist.scale(1 / this.zoom);
-		artist.rotate(-this.rotation);
-		artist.translate(artist.middle.inverse);
+	transformToScreen() {
+		let renderer = this.engine.renderer;
+		renderer.translate(this.position);
+		renderer.scale(1 / this.zoom);
+		renderer.rotate(-this.rotation);
+		renderer.translate(renderer.middle.inverse);
 	}
 	screenSpaceToWorldSpace(point) {
 		return point.minus(middle).rotate(-this.rotation).over(this.zoom).plus(this.position);

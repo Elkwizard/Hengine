@@ -2,8 +2,7 @@ class Texture extends ImageType {
 	constructor(width, height) {
 		super(width, height);
 		let self = this;
-		this.c = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
-		this.renderer = this.c;
+		this.renderer = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
 		this.pixels = Array.dimFilled(new Color(0, 0, 0, 0), this.width, this.height);
 		this.__image = new OffscreenCanvas(width, height);
 

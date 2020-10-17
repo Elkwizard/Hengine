@@ -33,13 +33,14 @@ class Controls {
 }
 //Actual SceneObject
 class SceneObject {
-	constructor(name, x, y, controls, tag, home) {
+	constructor(name, x, y, controls, tag, home, engine) {
 		this.transform = new Transform(x, y, 0);
 		this.lastTransform = this.transform.get();
 		this.shapes = {};
 		this.graphicalBoundingBox = null;
 		this.name = name;
 		this.home = home;
+		this.engine = engine;
 		this.tag = tag;
 		this.controls = controls;
 		this.hidden = false;
@@ -252,7 +253,7 @@ class SceneObject {
 				this.draw(name, shape);
 				this.scripts.run("Draw", name, shape);
 			}
-		});
+		}, this.engine.renderer);
 	}
 	determineOnScreen(screen) {
 		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox || this.__boundingBox, screen);

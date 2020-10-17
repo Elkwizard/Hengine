@@ -1,31 +1,31 @@
 class ElementContainer {
-	constructor(name = "container", active, scene, home) {
+	constructor(name = "container", active, home, engine) {
 		this.elements = { };
 		this.active = active;
-		this.home = home;
-		this.scene = scene;
 		this.name = name;
+		this.home = home;
+		this.engine = engine;
 		this.elementArray = [];
 		this.removeQueue = [];
 		this.defaults = {
 			SceneObject: {
 				draw(name, shape) {
-					c.draw(cl.BLACK).infer(shape);
-					c.stroke(cl.CYAN, 1).infer(shape);
+					renderer.draw(cl.BLACK).infer(shape);
+					renderer.stroke(cl.CYAN, 1).infer(shape);
 				},
 				scripts: []
 			},
 			PhysicsObject: {
 				draw(name, shape) {
-					c.draw(cl.BLACK).infer(shape);
-					c.stroke(cl.RED, 1).infer(shape);
+					renderer.draw(cl.BLACK).infer(shape);
+					renderer.stroke(cl.RED, 1).infer(shape);
 				},
 				scripts: []
 			},
 			UIObject: {
 				draw(name, shape) {
-					c.draw(cl.BLACK).infer(shape);
-					c.stroke(cl.PURPLE, 1).infer(shape);
+					renderer.draw(cl.BLACK).infer(shape);
+					renderer.stroke(cl.PURPLE, 1).infer(shape);
 				},
 				scripts: []
 			},
@@ -35,7 +35,7 @@ class ElementContainer {
 			},
 			ParticleObject: {
 				draw(name, shape) {
-					c.draw(cl.BLACK).infer(shape);
+					renderer.draw(cl.BLACK).infer(shape);
 				},
 				scripts: []
 			}
@@ -136,7 +136,7 @@ class ElementContainer {
 	}
 	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, tag, this);
+		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements[name] = n;
@@ -144,7 +144,7 @@ class ElementContainer {
 	}
 	addCircleElement(name, x, y, radius, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, tag, this);
+		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
 		n.addShape("default", new Circle(0, 0, radius));
 		this.initializeSceneObject(n);
 		this.elements[name] = n;
@@ -152,21 +152,21 @@ class ElementContainer {
 	}
 	addElement(name, x, y, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, tag, this);
+		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
 		this.initializeSceneObject(n);
 		this.elements[name] = n;
 		return n;
 	}
 	addPhysicsElement(name, x, y, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
-		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
+		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this, this.engine);
 		this.initializeSceneObject(n);
 		this.elements[name] = n;
 		return n;
 	}
 	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
-		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
+		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements[name] = n;
@@ -174,7 +174,7 @@ class ElementContainer {
 	}
 	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
-		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this);
+		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this, this.engine);
 		n.addShape("default", new Circle(0, 0, radius));
 		this.initializeSceneObject(n);
 		this.elements[name] = n;
@@ -182,30 +182,22 @@ class ElementContainer {
 	}
 	addUIElement(name, x, y, width, height, draw = this.defaults.UIObject.draw) {
 		name = this.genName(this.elements, name);
-		if (width < 0) {
-			width = -width;
-			x -= width;
-		}
-		if (height < 0) {
-			height = -height;
-			y -= height;
-		}
-		this.elements[name] = new UIObject(name, x, y, this);
-		let n = this.elements[name];
+		let n = new UIObject(name, x, y, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
+		this.elements[name] = n;
 		n.draw = draw.bind(n);
 		return n;
 	}
 	addContainer(name, active) {
 		name = this.genName(this.elements, name);
-		let x = new ElementContainer(name, active, this.scene, this);
+		let x = new ElementContainer(name, active, this, this.engine);
 		this.elements[name] = x;
 		return x;
 	}
 	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true) {
 		name = this.genName(this.elements, "Default-Explosion-Spawner");
-		let ns = new ParticleSpawnerObject(name, x, y, size, spd, 1, timer, draw, sizeVariance, speedVariance, dirs, this);
+		let ns = new ParticleSpawnerObject(name, x, y, size, spd, 1, timer, draw, sizeVariance, speedVariance, dirs, this, this.engine);
 		this.elements[name] = ns;
 		for (let i = 0; i < amountParticles; i++) {
 			ns.spawnParticle();
@@ -223,7 +215,7 @@ class ElementContainer {
 	}
 	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), falls = false, slows = true, fades = true, active = true) {
 		name = this.genName(this.elements, name);
-		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this);
+		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this, this.engine);
 		this.elements[name] = ns;
 		ns.particleFalls = falls;
 		ns.particleFades = fades;
@@ -243,7 +235,7 @@ class ElementContainer {
 			let el = this.elements[e.name];
 			if (el) {
 				el.end();
-				if (el.body) this.scene.physicsEngine.removeBody(el.body.id);
+				if (el.body) this.engine.scene.physicsEngine.removeBody(el.body.id);
 				delete this.elements[e.name];
 			} else if (e.home.elements[e.name]) {
 				e.home.removeElement(e);

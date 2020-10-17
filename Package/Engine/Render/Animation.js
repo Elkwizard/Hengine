@@ -27,7 +27,7 @@ class Animation {
 		const frameImgs = [];
 		for (let i = 0; i < frames; i++) {
 			const img = new Frame(imgWidth, imgHeight);
-			img.c.c.drawImage(img, i * imgWidth, 0, imgWidth, imgHeight, 0, 0, imgWidth, imgHeight);
+			img.renderer.c.drawImage(img, i * imgWidth, 0, imgWidth, imgHeight, 0, 0, imgWidth, imgHeight);
 			frameImgs.push(img);
 		}
 		let anim = new Animation(frameImgs, delay, loop, finResponse);
