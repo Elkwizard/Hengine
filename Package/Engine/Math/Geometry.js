@@ -743,7 +743,7 @@ class Geometry {
         poly2.cacheBoundingBox(poly2.getBoundingBox());
         return Physics.collide(poly, poly2).colliding;
     }
-    static pointInsideRectangle(p, r) {
+    static pointInsideRect(p, r) {
         if (!r.rotation) {
             return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
         } else {
@@ -755,7 +755,7 @@ class Geometry {
     }
     static overlapCircleRect(c, r) {
         let dist = Geometry.distToRect2(c, r);
-        let inside = Geometry.pointInsideRectangle(c, r);
+        let inside = Geometry.pointInsideRect(c, r);
         return (dist < c.radius ** 2) || inside;
     }
     static overlapRectRect(r, r2) {

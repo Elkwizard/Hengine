@@ -9,6 +9,48 @@ class GPUShader extends ImageType {
 		this.c = this.image.getContext("webgl");
 		if (this.c === null) return console.warn("Your browser doesn't support webgl.");
 		this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.setArguments(this.arguments)));
+		this.shadingRectPositions = [
+			-1, 1,
+			1, 1,
+			-1, -1,
+			1, -1
+		];
+		this.amountVertices = 4;
+	}
+	setShadeRects(rects, redraw = true) {
+		let a = Vector2.origin;
+		let b = new Vector2(this.width, this.height);
+		let a2 = new Vector2(-1, 1);
+		let b2 = new Vector2(1, -1);
+		rects = rects.map(r => {
+			let min = Vector2.remap(r.min, a, b, a2, b2);
+			let max = Vector2.remap(r.max, a, b, a2, b2);
+			return [min.x, min.y, max.x, min.y, min.x, max.y, max.x, max.y];
+		});
+		let positions = [];
+		for (let i = 0; i < rects.length; i++) {
+			let r = rects[i];
+			if (i) {
+				let rl = rects[i - 1];
+				positions.push(rl[6], rl[7], r[0], r[1]);
+			}
+			positions.push(...r);
+		}
+		this.shadingRectPositions = positions;
+		this.amountVertices = this.shadingRectPositions.length / 2;
+		this.updatePositionBuffer();
+		if (redraw) this.shade();
+	}
+	updatePositionBuffer() {
+		const c = this.c;
+		const positionBuffer = c.createBuffer();
+		c.bindBuffer(c.ARRAY_BUFFER, positionBuffer);
+		const positions = this.shadingRectPositions;
+		c.bufferData(c.ARRAY_BUFFER, new Float32Array(positions), c.STATIC_DRAW);
+		let vertexPositionPointer = c.getAttribLocation(this.compiled.shaderProgram, "vertexPosition");
+		c.vertexAttribPointer(vertexPositionPointer, 2, c.FLOAT, false, 0, 0);
+		c.enableVertexAttribArray(vertexPositionPointer);
+		
 	}
 	updateResolutionUniforms() {
 		const c = this.c;
@@ -30,7 +72,7 @@ class GPUShader extends ImageType {
 	}
 	shade() {
 		this.c.clear(this.c.COLOR_BUFFER_BIT);
-		this.c.drawArrays(this.c.TRIANGLE_STRIP, 0, 4);
+		this.c.drawArrays(this.c.TRIANGLE_STRIP, 0, this.amountVertices);
 	}
 	compile() {
 		//init
@@ -119,35 +161,18 @@ class GPUShader extends ImageType {
 		c.attachShader(shaderProgram, pixelShader);
 		c.linkProgram(shaderProgram);
 
-		//pointer
-		let vertexPositionPointer = c.getAttribLocation(shaderProgram, "vertexPosition");
-
-		//square
-		const positionBuffer = c.createBuffer();
-		c.bindBuffer(c.ARRAY_BUFFER, positionBuffer);
-		const positions = [
-			-1.0, 1.0,
-			1.0, 1.0,
-			-1.0, -1.0,
-			1.0, -1.0,
-		];
-		c.bufferData(c.ARRAY_BUFFER, new Float32Array(positions), c.STATIC_DRAW);
-
 		c.clearColor(0, 0, 0, 0);
 		c.enable(c.BLEND);
 		c.blendFunc(c.SRC_ALPHA, c.ONE_MINUS_SRC_ALPHA);
-
-		//transfer
-		c.vertexAttribPointer(vertexPositionPointer, 2, c.FLOAT, false, 0, 0);
-		c.enableVertexAttribArray(vertexPositionPointer);
 
 		c.useProgram(shaderProgram);
 
 		this.compiled = { shaderProgram, uniformMap };
 
+		this.updatePositionBuffer();
 		this.updateResolutionUniforms();
 	}
-	setArguments(uniformData, redraw = true) {
+	setArguments(uniformData = { }, redraw = true) {
 		this.lastArguments = uniformData;
 		if (!this.compiled) console.warn("Couldn't apply arguments: Shader wasn't compiled.");
 		let { shaderProgram, uniformMap } = this.compiled;
