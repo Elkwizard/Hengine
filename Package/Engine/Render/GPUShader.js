@@ -4,22 +4,32 @@ class GPUShader extends ImageType {
 		this.glsl = glsl;
 		this.args = [];
 		this.compiled = null;
-		this.augmented = null;
-		this.lastArguments = [];
+		this.arguments = { };
 		this.image = new_OffscreenCanvas(width, height);
 		this.c = this.image.getContext("webgl");
 		if (this.c === null) return console.warn("Your browser doesn't support webgl.");
-		// this.image.addEventListener("webglcontextlost", e => e.preventDefault());
-		this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.arguments()));
+		this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.setArguments(this.arguments)));
 	}
-	resize(width, height) {
+	updateResolutionUniforms() {
+		const c = this.c;
+		const shaderProgram = this.compiled.shaderProgram;
+		c.uniform2f(c.getUniformLocation(shaderProgram, "resolution"), this.width, this.height);
+		c.uniform1f(c.getUniformLocation(shaderProgram, "halfWidth"), this.width / 2);
+		c.uniform1f(c.getUniformLocation(shaderProgram, "halfHeight"), this.height / 2);
+	}
+	resize(width, height, redraw = true) {
+		width = Math.max(1, Math.abs(Math.floor(width)));
+		height = Math.max(1, Math.abs(Math.floor(height)));
+		this.image.width = width;
+		this.image.height = height;
 		this.width = width;
 		this.height = height;
-		this.shade();
+		this.updateResolutionUniforms();
+		if (redraw) this.shade();
 	}
 	shade() {
 		const c = this.c;
-		let { width, height } = c.canvas;
+		let { width, height } = this.image;
 		c.viewport(0, 0, width, height);
 		c.clear(c.COLOR_BUFFER_BIT);
 		c.drawArrays(c.TRIANGLE_STRIP, 0, 4);
@@ -73,6 +83,13 @@ class GPUShader extends ImageType {
 				else return t;	
 			}) });
 		}
+		let uniformMap = { };
+		for (let i = 0; i < uniforms.length; i++) {
+			let u = uniforms[i];
+			uniformMap[u.name] = u;
+		}
+
+		//composite pixelSource
 		let uniformPropertyDeclarations = uniformProperties.map(p => `uniform highp ${p};`).join("\n");
 		let defineDeclarations = defines.map(v => `#define ${v}`).join("\n");
 		const pixelSource = `
@@ -128,27 +145,24 @@ class GPUShader extends ImageType {
 
 		c.useProgram(shaderProgram);
 
-		this.compiled = { shaderProgram, uniforms };
+		this.compiled = { shaderProgram, uniformMap };
+
+		this.updateResolutionUniforms();
 	}
-	arguments(uniformData = this.lastArguments) {
+	setArguments(uniformData, redraw = true) {
 		this.lastArguments = uniformData;
 		if (!this.compiled) console.warn("Couldn't apply arguments: Shader wasn't compiled.");
-		let { shaderProgram, uniforms } = this.compiled;
+		let { shaderProgram, uniformMap } = this.compiled;
 		const c = this.c;
-		let { width, height } = c.canvas;
-
-		//uniforms in vertex
-		c.uniform2f(c.getUniformLocation(shaderProgram, "resolution"), width, height);
-		c.uniform1f(c.getUniformLocation(shaderProgram, "halfWidth"), width / 2);
-		c.uniform1f(c.getUniformLocation(shaderProgram, "halfHeight"), height / 2);
-
 
 		//uniforms in shader
 		let textureUnit = 0;
-		for (let i = 0; i < uniforms.length; i++) {
-			let u = uniforms[i];
-			let data = uniformData[i];
+		for (let arg in uniformData) {
+			let u = uniformMap[arg];
+			if (u === undefined) console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+			let data = uniformData[arg];
 			let p = u.properties;
+			this.arguments[arg] = data;
 
 			let location = c.getUniformLocation(shaderProgram, u.name);
 
@@ -204,8 +218,7 @@ class GPUShader extends ImageType {
 				}
 			}
 		}
-		this.augmented = { c };
-		this.shade();
+		if (redraw) this.shade();
 	}
 	makeImage() {
 		return this.image;

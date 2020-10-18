@@ -240,12 +240,6 @@ class Polygon extends Shape {
 class Rect extends Polygon {
 	constructor(x, y, w, h) {
 		super([], true);
-		if (typeof x === "object") {
-			w = y.x - x.x;
-			h = y.y - x.y;
-			y = x.y;
-			x = x.x;
-		}
 		if (w < 0) {
 			w *= -1;
 			x -= w;
@@ -259,6 +253,26 @@ class Rect extends Polygon {
 		this.width = w;
 		this.height = h;
 		this.area = this.width * this.height;
+	}
+	set min(v) {
+		let dx = v.x - this.x;
+		let dy = v.y - this.y;
+		this.width -= dx;
+		this.height -= dy;
+		this.x += dx;
+		this.y += dy;
+	}
+	get min() {
+		return new Vector2(this.x, this.y);
+	}
+	set max(v) {
+		let dx = v.x - this.x - this.width;
+		let dy = v.y - this.y - this.height;
+		this.width += dx;
+		this.height += dy;
+	}
+	get max() {
+		return new Vector2(this.x + this.width, this.y + this.height);
 	}
 	set xRange(v) {
 		this.x = v.min;
@@ -332,6 +346,9 @@ class Rect extends Polygon {
 	}
 	get() {
 		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
+	}
+	static fromMinMax(min, max) {
+		return new Rect(min.x, min.y, max.x - min.x, max.y - min.y);
 	}
 	static fromRanges(xRange, yRange) {
 		return new Rect(xRange.min, yRange.min, xRange.length, yRange.length);
