@@ -5,7 +5,6 @@ class Color extends Operable {
 		let green = 0;
 		let blue = 0;
 		let alpha = 0;
-		this.custom = {};
 		this.limited = true;
 		if (b === undefined && g === undefined && typeof r == "string") {
 			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0 && r.indexOf("hsb") < 0) {
