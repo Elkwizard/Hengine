@@ -314,7 +314,7 @@ class Hengine {
 		return f;
 	}
 	loadAnimation(src) {
-		return Animation.copy(this.animations[src]);
+		return this.animations[src].get();
 	}
 	rand(sd) {
 		let seed = this.randomSeed++;
@@ -330,7 +330,7 @@ class Hengine {
 		return ["PrototypeOverload"];
 	}
 	static get defaultRenderPackage() {
-		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "Animation", "GrayMap", "Frame", "Texture", "Webcam", "GPUShader", "Font", "Renderer", "Graph", "3DExperimental", "Camera"];
+		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "GrayMap", "Frame", "Animation", "Texture", "Webcam", "GPUShader", "Font", "Renderer", "Graph", "3DExperimental", "Camera"];
 	}
 	static get defaultManagementPackage() {
 		return ["ElementContainer", "Scenes", "IntervalFunction", "Engine", "Hengine"];

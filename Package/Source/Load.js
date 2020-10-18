@@ -5,12 +5,7 @@ APPLICATION_PACKAGE.sprites = {
 		".": [] // Put image names here
 	}
 };
-APPLICATION_PACKAGE.animations = {
-	files: {
-		".": [] // Put animations reps here
-	}
-};
-/* Animation Rep */
+/* Animation Representation */
 /*
 {
 	folder: "MyAnimation", | Name of folder
@@ -19,6 +14,11 @@ APPLICATION_PACKAGE.animations = {
 	frames: 10             | Amount of frames in animation
 }
 */
+APPLICATION_PACKAGE.animations = {
+	files: {
+		".": [] // Put animations representations here
+	}
+};
 APPLICATION_PACKAGE.sounds = {
 	files: {
 		".": [] // Put sound names here

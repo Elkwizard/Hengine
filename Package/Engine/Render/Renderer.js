@@ -793,9 +793,7 @@ class Artist {
 		this.translate(-x, -y);
 	}
 	drawImage(img, x, y, width, height) {
-		if (img instanceof ImageType) img = img.makeImage();
-		if (width === undefined) width = img.width;
-		if (height === undefined) height = img.height;
+		img = img.makeImage();
 		this.c.drawImage(img, x, y, width, height);
 	}
 	drawAnimation(animation, x, y, width, height, advance = true) {

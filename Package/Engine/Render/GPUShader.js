@@ -16,6 +16,7 @@ class GPUShader extends ImageType {
 		c.uniform2f(c.getUniformLocation(shaderProgram, "resolution"), this.width, this.height);
 		c.uniform1f(c.getUniformLocation(shaderProgram, "halfWidth"), this.width / 2);
 		c.uniform1f(c.getUniformLocation(shaderProgram, "halfHeight"), this.height / 2);
+		c.viewport(0, 0, this.width, this.height);
 	}
 	resize(width, height, redraw = true) {
 		width = Math.max(1, Math.abs(Math.floor(width)));
@@ -28,11 +29,8 @@ class GPUShader extends ImageType {
 		if (redraw) this.shade();
 	}
 	shade() {
-		const c = this.c;
-		let { width, height } = this.image;
-		c.viewport(0, 0, width, height);
-		c.clear(c.COLOR_BUFFER_BIT);
-		c.drawArrays(c.TRIANGLE_STRIP, 0, 4);
+		this.c.clear(this.c.COLOR_BUFFER_BIT);
+		this.c.drawArrays(this.c.TRIANGLE_STRIP, 0, 4);
 	}
 	compile() {
 		//init
