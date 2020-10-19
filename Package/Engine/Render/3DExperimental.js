@@ -19,9 +19,9 @@ class Render3D {
 
         return new Vector3(x, y, z);
     }
-    static toScreen(p) {
-        let P = Render3D.projectVector3(Render3D.transformVector3(p, ...Render3D.getCameraTransform(Render3D.camera)));
-        return new Vector2(P.x + width / 2, P.y + height / 2);
+    static toScreen(p, transform = Render3D.getCameraTransform()) {
+        let P = Render3D.projectVector3(Render3D.transformVector3(p, ...transform));
+        return new Vector2(P.x * width / 2 + width / 2, P.y * width / 2 + height / 2);
     }
     static projectVector3(v) {
         let x = v.x;
@@ -116,7 +116,7 @@ class Render3D {
             triangles.pushArray(m.tris);
         }
         let mesh = new Mesh(triangles);
-        mesh.render(c, Render3D.camera);
+        mesh.render(c);
     }
     static makeCube(x, y, z, w, h, d, color = cl.WHITE) {
         let mesh = new Mesh([
@@ -303,7 +303,7 @@ class Mesh {
     project() {
         return this.each(tri => tri.project());
     }
-    render(c, camera) {
+    render(c) {
         const width = c.canvas.width;
         const height = c.canvas.height;
         let cameraTransform = Render3D.getCameraTransform();
@@ -376,8 +376,8 @@ class Mesh {
             for (let i = 0; i < rTris.length; i++) {
                 let tri = rTris[i];
                 let col = tri.color;
-                c.draw(col).shape(...tri.vertices);
-                c.stroke(col, 1, "round").shape(...tri.vertices);
+                c.draw(col).shape(tri.vertices);
+                c.stroke(col, 1, "round").shape(tri.vertices);
             }
         } else if (Render3D.renderType === Render3D.WIREFRAME) {
             for (let i = 0; i < rTris.length; i++) {

@@ -5,10 +5,11 @@ class GPUShader extends ImageType {
 		this.args = [];
 		this.compiled = null;
 		this.arguments = { };
+		this.shadeRects = [];
 		this.image = new_OffscreenCanvas(width, height);
 		this.c = this.image.getContext("webgl");
 		if (this.c === null) return console.warn("Your browser doesn't support webgl.");
-		this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.setArguments(this.arguments)));
+		this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.setShadeRects(this.shadeRects, false), this.setArguments(this.arguments)));
 		this.shadingRectPositions = [
 			-1, 1,
 			1, 1,
@@ -18,15 +19,20 @@ class GPUShader extends ImageType {
 		this.amountVertices = 4;
 	}
 	setShadeRects(rects, redraw = true) {
+		this.shadeRects = rects;
 		let a = Vector2.origin;
 		let b = new Vector2(this.width, this.height);
 		let a2 = new Vector2(-1, 1);
 		let b2 = new Vector2(1, -1);
-		rects = rects.map(r => {
-			let min = Vector2.remap(r.min, a, b, a2, b2);
-			let max = Vector2.remap(r.max, a, b, a2, b2);
-			return [min.x, min.y, max.x, min.y, min.x, max.y, max.x, max.y];
-		});
+		let screen = new Rect(0, 0, this.width, this.height);
+		rects = rects
+			.map(r => r.clip(screen))
+			.filter(r => r.area > 0.1)
+			.map(r => {
+				let min = Vector2.remap(r.min, a, b, a2, b2);
+				let max = Vector2.remap(r.max, a, b, a2, b2);
+				return [min.x, min.y, max.x, min.y, min.x, max.y, max.x, max.y];
+			});
 		let positions = [];
 		for (let i = 0; i < rects.length; i++) {
 			let r = rects[i];
