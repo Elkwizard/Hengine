@@ -1,1 +1,1 @@
-//Put scene.addScript calls here
+//Put ElementScripts here

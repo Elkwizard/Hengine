@@ -21,42 +21,22 @@ class InputHandler {
 		this.keyDownCounts = { };
 		this.keyUpCounts = { };
 	}
-	//lengthy
-	justPressed(keys) {
-		return this.JP(keys);
-	}
-	justReleased(keys) {
-		return this.JR(keys);
-	}
-	pressed(keys) {
-		return this.P(keys);
-	}
-	released(keys) {
-		return this.R(keys);
-	}
 	pressLength(key) {
-		return this.PL(key);
-	}
-	releaseLength(key) {
-		return this.RL(key);
-	}
-	//small
-	PL(key) {
 		return this.keyDownCounts[key];
 	}
-	RL(key) {
+	releaseLength(key) {
 		return this.keyUpCounts[key];
 	}
-	P(keys) {
+	pressed(keys) {
 		return (Array.isArray(keys) ? keys : [keys]).map(key => !!this.keys[key]).includes(true);
 	}
-	R(keys) {
+	released(keys) {
 		return (Array.isArray(keys) ? keys : [keys]).map(key => !this.keys[key]).includes(true);
 	}
-	JP(keys) {
+	justPressed(keys) {
 		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyDownCounts[key] === 1).includes(true);
 	}
-	JR(keys) {
+	justReleased(keys) {
 		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyUpCounts[key] === 1).includes(true);
 	}
 	update() {
@@ -69,22 +49,36 @@ class InputHandler {
 			else this.keyUpCounts[key] = 0;
 		}
 	}
-	afterUpdate() { }
+	afterUpdate() { 
+		
+	}
 }
 class KeyboardHandler extends InputHandler {
 	constructor() {
 		super();
 		this.onDown = new Listener();
 		this.onUp = new Listener();
+		this.downQueue = [];
+		this.upQueue = [];
 		let k = this;
 		document.addEventListener("keydown", function (e) {
-			k.keys[k.getKeySignature(e.key)] = true;
-			for (let ev of k.onDown) ev(e);
+			if (e.key === "Tab") e.preventDefault();
+			let sig = k.getKeySignature(e.key);
+			k.keys[sig] = true;
+			for (let ev of k.onDown) ev(sig);
+			k.downQueue.push(new KeyboardHandler.Event(sig, e.key));
 		});
 		document.addEventListener("keyup", function (e) {
-			k.keys[k.getKeySignature(e.key)] = false;
-			for (let ev of k.onUp) ev(e);
+			let sig = k.getKeySignature(e.key);
+			k.keys[sig] = false;
+			for (let ev of k.onUp) ev(sig);
+			k.upQueue.push(new KeyboardHandler.Event(sig, e.key));
 		});
+	}
+	afterUpdate() {
+		super.afterUpdate();
+		this.downQueue = [];
+		this.upQueue = [];
 	}
 	getKeySignature(key) {
 		return (key.length === 1) ? key.toLowerCase() : key;
@@ -92,6 +86,12 @@ class KeyboardHandler extends InputHandler {
 	clearListeners() {
 		this.onDown.clear();
 		this.onUp.clear();
+	}
+}
+KeyboardHandler.Event = class {
+	constructor(key, text) {
+		this.key = key;
+		this.text = text;
 	}
 }
 class MouseHandler extends InputHandler {
@@ -104,6 +104,9 @@ class MouseHandler extends InputHandler {
 		};
 		this.mouseMap = ["Left", "Middle", "Right"];
 		this.button = 0;
+		this.downQueue = [];
+		this.moveQueue = [];
+		this.upQueue = [];
 		//Screen
 		Vector2.defineReference(this, "screen", Vector2.origin);
 		Vector2.defineReference(this, "screenLast", Vector2.origin);
@@ -139,23 +142,29 @@ class MouseHandler extends InputHandler {
 			m.worldDragEnd = m.worldDragStart.get();
 			m.screenDragStart = m.screen.get();
 			m.screenDragEnd = m.screenDragStart.get();
-			m.keys[m.mouseMap[e.button]] = true;
-			for (let ev of m.onDown) ev(e);
+			let sig = m.mouseMap[e.button];
+			m.keys[sig] = true;
+			for (let ev of m.onDown) ev(sig);
+			m.downQueue.push(new MouseHandler.Event(sig, new Vector2(e.x, e.y)));
 		}
 		function handleMove(e) {
 			m.updatePosition(e);
-			if (m.P("Left", "Middle", "Right")) {
+			if (m.pressed("Left", "Middle", "Right")) {
 				m.worldDragEnd = m.engine.scene.camera.screenSpaceToWorldSpace(m.screen);
 				m.screenDragEnd = m.screen.get();
 			}
-			for (let ev of m.onMove) ev(e);
+			let sig = m.mouseMap[m.button];
+			for (let ev of m.onMove) ev(sig);
+			m.moveQueue.push(new MouseHandler.Event(sig, new Vector2(e.x, e.y)));	
 		};
 		function handleUp(e) {
 			m.updatePosition(e);
 			m.worldDragEnd = m.engine.scene.camera.screenSpaceToWorldSpace(m.screen);
 			m.screenDragEnd = m.screen.get();
 			for (let inx of m.mouseMap) m.keys[inx] = false;
-			for (let ev of m.onUp) ev(e);
+			let sig = m.mouseMap[m.button];
+			for (let ev of m.onUp) ev(sig);
+			m.upQueue.push(new MouseHandler.Event(sig, new Vector2(e.x, e.y)));
 		};
 
 		//pointers and touch
@@ -219,7 +228,11 @@ class MouseHandler extends InputHandler {
 		});
 	}
 	afterUpdate() {
+		super.afterUpdate();
 		this.screenLast = this.screen.get();
+		this.downQueue = [];
+		this.moveQueue = [];
+		this.upQueue = [];
 	}
 	update() {
 		super.update();
@@ -246,5 +259,25 @@ class MouseHandler extends InputHandler {
 	}
 	allowSave() {
 		if (this.listenerRoot) this.listenerRoot.removeEventListener("contextmenu", this.__right__);
+	}
+}
+MouseHandler.Event = class {
+	constructor(button, location) {
+		this.button = button;
+		this.location = location;
+	}
+}
+class ClipboardHandler {
+	constructor() {
+		this.data = "";
+		document.body.addEventListener("paste", e => {
+			this.data = e.clipboardData.getData("text/plain");
+		});
+	}
+	write(value) {
+		navigator.clipboard.writeText(value);
+	}
+	read() {
+		return this.data;
 	}
 }

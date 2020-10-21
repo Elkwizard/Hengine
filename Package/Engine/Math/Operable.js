@@ -3,9 +3,7 @@ class Operable {
         
     }
     get() {
-        let args = [];
-        for (let x of this.constructor.modValues) args.push(this[x]);
-        return new this.constructor(...args);
+        return new this.constructor(...this.constructor.modValues.map(v => this[v]));
     }
     op(v, fn) {
         if (typeof v === "number") {

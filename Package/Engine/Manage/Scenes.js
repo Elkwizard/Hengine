@@ -11,10 +11,6 @@ class Scene {
 		this.collisionEvents = true;
 		this.camera = new Camera(this.engine.renderer.width / 2, this.engine.renderer.height / 2, 0, 1, engine);
 	}
-	addScript(name, opts) {
-		window[name] = new ElementScript(name, opts);
-		return window[name];
-	}
 	handleCollisionEvent(a, b, direction, contacts) {
 		let A = a.userData.sceneObject;
 		let B = b.userData.sceneObject;

@@ -738,17 +738,8 @@ class Geometry {
             return col;
         }
     }
-    static overlapShapes(poly, poly2) {
-        poly.cacheBoundingBox(poly.getBoundingBox());
-        poly2.cacheBoundingBox(poly2.getBoundingBox());
-        return Physics.collide(poly, poly2).colliding;
-    }
     static pointInsideRect(p, r) {
-        if (!r.rotation) {
-            return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
-        } else {
-            return Physics.collidePolygonPoint(r, p).colliding;
-        }
+        return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
     }
     static pointInsideCircle(p, c) {
         return Geometry.distToPoint(p, c) ** 2 < c.radius ** 2;
@@ -757,6 +748,13 @@ class Geometry {
         let dist = Geometry.distToRect2(c, r);
         let inside = Geometry.pointInsideRect(c, r);
         return (dist < c.radius ** 2) || inside;
+    }
+    static overlapShapes(poly, poly2) {
+        if (r instanceof Rect) {
+            
+        } else {
+
+        }
     }
     static overlapRectRect(r, r2) {
         if (!r || !r2) return false;

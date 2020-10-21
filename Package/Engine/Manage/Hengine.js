@@ -58,6 +58,7 @@ class Hengine {
 		this.renderer = this.gameEngine.renderer;
 		this.keyboard = this.gameEngine.keyboard;
 		this.mouse = this.gameEngine.mouse;
+		this.clipboard = this.gameEngine.clipboard;
 		this.colorLibrary = new ColorLibrary();
 		this.soundLibrary = new SoundLibrary();
 		window.cl = this.colorLibrary;
@@ -71,6 +72,7 @@ class Hengine {
 		window.soundLibrary = this.soundLibrary;
 		window.keyboard = this.keyboard;
 		window.mouse = this.mouse;
+		window.clipboard = this.clipboard;
 
 		let hengine = this;
 		if (!(window.width || window.height || window.middle)) {
@@ -154,62 +156,6 @@ class Hengine {
 		WALLS.addPhysicsRectElement("Floor", width / 2, height + 50, width, 100, false);
 		WALLS.addPhysicsRectElement("Left Wall", -50, height / 2, 100, height + 200, false);
 		WALLS.addPhysicsRectElement("Right Wall", width + 50, height / 2, 100, height + 200, false);
-
-
-		this.scene.addScript("PLAYER_MOVEMENT", {
-			init() {
-				if (!this.controls.up) {
-					this.controls = new Controls("w", "s", "a", "d");
-				}
-				this.mobilize();
-			},
-			update() {
-				if (keyboard.pressed(this.controls.down)) this.velocity.y += 0.2;
-				if (keyboard.pressed(this.controls.left)) this.velocity.x += -0.1;
-				else if (keyboard.pressed(this.controls.right)) this.velocity.x += 0.1;
-				if (keyboard.pressed(this.controls.up)) {
-					if (this.colliding.bottom) {
-						this.velocity.y = -5;
-					}
-				}
-			}
-		});
-		this.scene.addScript("DRAGGABLE", {
-			init(l, bounds = null) {
-				l.dragged = false;
-				l.offset = Vector2.origin;
-				l.bounds = bounds;
-				scene.mouseEvents = true;
-			},
-			click(l, m) {
-				l.dragged = true;
-				l.offset = this.transform.worldSpaceToModelSpace(m);
-			},
-			update(l) {
-				if (mouse.justReleased("Left")) l.dragged = false; 
-				if (l.dragged) {
-					this.transform.position = mouse.world.minus(l.offset);
-					if (l.bounds) {
-						this.cacheBoundingBoxes();
-						let { x, y, width, height } = this.__boundingBox;
-						let ox = x - this.transform.position.x;
-						let oy = y - this.transform.position.y;
-						if (x < l.bounds.x) x = l.bounds.x;
-						if (y < l.bounds.y) y = l.bounds.y;
-						if (x + width > l.bounds.x + l.bounds.width) x = l.bounds.x + l.bounds.width - width;
-						if (y + height > l.bounds.y + l.bounds.height) y = l.bounds.y + l.bounds.height - height;
-						this.transform.position.x = x - ox;
-						this.transform.position.y = y - oy;
-					}
-					this.cacheBoundingBoxes();
-					if (this.body) {
-						//keep awake
-						this.stop();
-						this.body.wake();
-					}
-				}
-			}
-		});
 	}
 	getProjectName() {
 		return document.querySelector("title").innerText;
@@ -344,6 +290,9 @@ class Hengine {
 	static get defaultSceneObjectPackage() {
 		return ["Scripts", "SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
 	}
+	static get defaultScriptPackage() {
+		return ["TextArea", "PlayerMovement", "Draggable"];
+	}
 	static get defaultEnginePackage() {
 		return {
 			Preload: Hengine.defaultPreloadPackage,
@@ -351,7 +300,8 @@ class Hengine {
 			Render: Hengine.defaultRenderPackage,
 			Util: Hengine.defaultUtilityPackage,
 			SceneObject: Hengine.defaultSceneObjectPackage,
-			Manage: Hengine.defaultManagementPackage
+			Manage: Hengine.defaultManagementPackage,
+			Scripts: Hengine.defaultScriptPackage
 		};
 	}
 	static utilityApplicationPackage(code = []) {

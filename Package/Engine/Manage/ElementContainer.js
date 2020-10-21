@@ -24,7 +24,7 @@ class ElementContainer {
 			},
 			UIObject: {
 				draw(name, shape) {
-					renderer.draw(cl.BLACK).infer(shape);
+					renderer.draw(cl.WHITE).infer(shape);
 					renderer.stroke(cl.PURPLE, 1).infer(shape);
 				},
 				scripts: []

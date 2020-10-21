@@ -19,8 +19,8 @@ class Graph {
         if (dataValue >= 0) prefix = " ";
         let dText = `${this.name}: ${prefix + Math.abs(this.data[this.data.length - 1]).toFixed(this.decimalPlaces)}`;
         let point = data[data.length - 1];
-        point.x = Math.min(point.x, this.plane.graphRect.xRange.max - this.plane.font.size / 2);
-        point.y = Number.clamp(point.y, this.plane.graphRect.yRange.min + this.plane.font.size / 2, this.plane.graphRect.yRange.max - this.plane.font.size / 2 - renderer.getTextHeight(this.plane.font, this.name));
+        point.x = Math.min(point.x, this.plane.graphRect.xRange.max - this.plane.font.lineHeight / 2);
+        point.y = Number.clamp(point.y, this.plane.graphRect.yRange.min + this.plane.font.lineHeight / 2, this.plane.graphRect.yRange.max - this.plane.font.lineHeight / 2 - renderer.getTextHeight(this.plane.font, this.name));
         this.lastRemappedDataPoint = { point, text: dText };
     }
     label(renderer) {
@@ -29,7 +29,7 @@ class Graph {
         renderer.textModeVertical = TextMode.TOP;
         let width = renderer.getTextWidth(this.plane.font, text);
         let height = renderer.getTextHeight(this.plane.font, text);
-        renderer.draw(new Color(0, 0, 0, 0.7)).rect(point.x - width - this.plane.font.size / 2, point.y - this.plane.font.size / 2, width + this.plane.font.size, height + this.plane.font.size);
+        renderer.draw(new Color(0, 0, 0, 0.7)).rect(point.x - width - this.plane.font.lineHeight / 2, point.y - this.plane.font.lineHeight / 2, width + this.plane.font.lineHeight, height + this.plane.font.lineHeight);
         // renderer.draw(cl.BLACK).text(this.plane.font, text, point.plus(1));
         renderer.draw(this.color).text(this.plane.font, text, point);
     }
@@ -68,7 +68,7 @@ class GraphPlane extends Frame {
 
         this.lastImgTime = -20;
 
-        let bottomOffset = this.font.size * 2;
+        let bottomOffset = this.font.lineHeight * 2;
         this.boundingRect = new Rect(0, 0, this.width, this.height);
         this.graphRect = new Rect(this.boundingRect.x, this.boundingRect.y, this.boundingRect.width, this.boundingRect.height - bottomOffset);
     }
@@ -83,9 +83,9 @@ class GraphPlane extends Frame {
         renderer.textModeVertical = TextMode.BOTTOM;
         let minTime = Math.max(0, performance.now());
         let timeLimit = this.frameLimit * 16;
-        renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame)} F / ${Time.formatMS(minTime)}`, this.boundingRect.xRange.min + this.font.size / 2, this.boundingRect.yRange.max - this.font.size / 2);
+        renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame)} F / ${Time.formatMS(minTime)}`, this.boundingRect.xRange.min + this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
         renderer.textMode = TextMode.RIGHT;
-        renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame + this.frameLimit)} F / ${Time.formatMS(minTime + timeLimit)}`, this.boundingRect.xRange.max - this.font.size / 2, this.boundingRect.yRange.max - this.font.size / 2);
+        renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame + this.frameLimit)} F / ${Time.formatMS(minTime + timeLimit)}`, this.boundingRect.xRange.max - this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].draw(renderer);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].label(renderer);
         renderer.stroke(cl.WHITE).rect(this.boundingRect);

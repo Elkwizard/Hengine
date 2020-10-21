@@ -2,7 +2,7 @@ class GPUShader extends ImageType {
 	constructor(width, height, glsl) {
 		super(width, height);
 		this.glsl = glsl;
-		this.args = [];
+		this.errorLog = [];
 		this.compiled = null;
 		this.arguments = { };
 		this.shadeRects = [];
@@ -152,16 +152,18 @@ class GPUShader extends ImageType {
 					gl_FragColor.rgb *= gl_FragColor.a;
 				}
 			`;
+		const errorlog = v => (this.errorLog.push(v), false);
 		//shader programs
 		function compileShader(type, source) {
 			let shader = c.createShader(type);
 			c.shaderSource(shader, source);
 			c.compileShader(shader);
-			if (!c.getShaderParameter(shader, c.COMPILE_STATUS)) return console.warn("Shader didn't compile: " + c.getShaderInfoLog(shader));
+			if (!c.getShaderParameter(shader, c.COMPILE_STATUS)) return errorlog("Shader didn't compile: " + c.getShaderInfoLog(shader));
 			return shader;
 		}
 		const vertexShader = compileShader(c.VERTEX_SHADER, vertexSource);
 		const pixelShader = compileShader(c.FRAGMENT_SHADER, pixelSource);
+		if (!pixelShader) return false;
 		const shaderProgram = c.createProgram();
 		c.attachShader(shaderProgram, vertexShader);
 		c.attachShader(shaderProgram, pixelShader);
@@ -177,10 +179,10 @@ class GPUShader extends ImageType {
 
 		this.updatePositionBuffer();
 		this.updateResolutionUniforms();
+
+		return true;
 	}
 	setArguments(uniformData = { }, redraw = true) {
-		this.lastArguments = uniformData;
-		if (!this.compiled) console.warn("Couldn't apply arguments: Shader wasn't compiled.");
 		let { shaderProgram, uniformMap } = this.compiled;
 		const c = this.c;
 

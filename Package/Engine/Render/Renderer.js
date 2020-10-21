@@ -22,7 +22,6 @@ class Artist {
 			this.canvas.style.position = "absolute";
 		}
 
-		this.custom = {};
 		this.c = this.canvas.getContext('2d');
 
 		//Device Pixel Ratio
@@ -44,7 +43,7 @@ class Artist {
 		this._background = new Color(0, 0, 0, 0);
 		this.textMode = TextMode.LEFT;
 		this.textModeVertical = TextMode.TOP;
-		this.currentlyClipped = false;
+		this.tabReplacement = "    ";
 		let pathObj = {
 			circle(x, y, radius) {
 				radius = Math.abs(radius);
@@ -107,16 +106,16 @@ class Artist {
 					y = x.y;
 					x = x.x;
 				}
-				text = (text + "").replace(/\t/, "    ");
+				text = (text + "").replace(/\t/g, this.tabReplacement);
 				if (pack) text = this.packText(font, text, pack);
 				this.c.font = font.toString();
-				let fs = font.size;
-				let tmh = this.getTextHeight(font, text);
-				let blocks = text.split("\n");
+				const tmh = this.getTextHeight(font, text);
+				const blocks = text.split("\n");
 				let textRequests = [];
+				const yOffset =  font.size * .24 - font.lineHeight / 2;
 				for (let i = 0; i < blocks.length; i++) {
 					let ax = x;
-					let ay = y + (i + 1) * fs - fs * 0.26;
+					let ay = y + (i + 1) * font.lineHeight + yOffset;
 					let tmw = this.c.measureText(blocks[i]).width;
 					if (this.textMode === TextMode.LEFT);
 					else if (this.textMode === TextMode.CENTER) {
@@ -556,6 +555,12 @@ class Artist {
 	get middle() {
 		return new Vector2(this.width / 2, this.height / 2);
 	}
+	set tabSize(a) {
+		this.tabReplacement = " ".repeat(a);
+	}
+	get tabSize() {
+		return this.tabReplacement.length;
+	}
 	set preservePixelart(a) {
 		this.c.imageSmoothingEnabled = !a;
 	}
@@ -647,15 +652,11 @@ class Artist {
 		return this.imageObj;
 	}
 	clip() {
-		if (!this.currentlyClipped) {
-			this.currentlyClipped = true;
-			this.save();
-		}
+		this.save();
 		return this.clipObj;
 	}
 	unclip() {
 		this.restore();
-		this.currentlyClipped = false;
 	}
 	embody(frame) {
 		this.__c = this.c;
@@ -666,7 +667,7 @@ class Artist {
 	}
 	packText(font, str, pack) {
 		this.c.font = font.toString();
-		let text = str.replace(/\t/g, "    ");
+		let text = str.replace(/\t/g, this.tabReplacement);
 		let words = text.split(" ");
 		let lines = [""];
 		for (let i = 0; i < words.length; i++) {
@@ -681,16 +682,24 @@ class Artist {
 		}
 		return lines.join("\n");
 	}
+	getTextBounds(font, str, pack) {
+		str += "";
+		if (pack) str = this.packText(font, str, pack);
+		let spl = str.replace(/\t/g, this.tabReplacement).split("\n");
+		let width = Math.max(...spl.map(e => this.c.measureText(e).width));
+		let height = spl.length * font.lineHeight;
+		return { width, height };
+	}
 	getTextWidth(font, str) {
 		str += "";
 		this.c.font = font.toString();
-		let spl = str.replace(/\t/g, "    ").split("\n");
+		let spl = str.replace(/\t/g, this.tabReplacement).split("\n");
 		return Math.max(...spl.map(e => this.c.measureText(e).width));
 	}
 	getTextHeight(font, str, pack) {
 		str += "";
 		if (pack) str = this.packText(font, str, pack);
-		return str.split("\n").length * font.size;
+		return str.split("\n").length * font.lineHeight;
 	}
 	contentToFrame() {
 		let n = new Frame(this.width, this.height);

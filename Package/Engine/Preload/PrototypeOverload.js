@@ -208,7 +208,7 @@ Object.prototype[Symbol.iterator] = function* () {
 	}
 };
 
-//Make Number behave like operable
+//Make Number behave like Operable
 Number.prototype.abs = function () { return Math.abs(this); };
 Number.lerp = function (a, b, t) { return a * (1 - t) + b * t; };
 Number.prototype.plus = function (n) { return this + n; };
