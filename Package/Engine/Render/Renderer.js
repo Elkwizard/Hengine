@@ -593,6 +593,12 @@ class Artist {
 		this.c.putImageData(new ImageData(data, 1, 1), x, y);
 	}
 	getTexture(x = 0, y = 0, w = this.width, h = this.height) {
+		if (typeof x === "object") {
+			h = x.height;
+			w = x.width;
+			y = x.y;
+			x = x.x;
+		}
 		x *= devicePixelRatio;
 		y *= devicePixelRatio;
 		let W = ~~(w * devicePixelRatio);
@@ -610,6 +616,17 @@ class Artist {
 		}
 		tex.changed = true;
 		return tex;
+	}
+	getFrame(x = 0, y = 0, w = this.width, h = this.height) {
+		if (typeof x === "object") {
+			h = x.height;
+			w = x.width;
+			y = x.y;
+			x = x.x;
+		}
+		let frame = new Frame(w, h);
+		frame.renderer.c.drawImage(this.canvas, x * devicePixelRatio, y * devicePixelRatio, w * devicePixelRatio, h * devicePixelRatio, 0, 0, w, h);
+		return frame;
 	}
 	createRadialGradient(x, y, radius, cols) {
 		let grd = this.c.createRadialGradient(x, y, 0.00000001, x, y, radius);

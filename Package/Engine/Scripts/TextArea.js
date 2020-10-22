@@ -22,6 +22,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.keyTimer = 0;
 		l.highlighting = false;
 		l.ignored = [];
+		l.ignoredRemoval = [];
 		l.alwaysIgnored = [];
 
 		l.mouse.onScroll.listen(dy => {
@@ -33,6 +34,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 	},
 	ignore(l, key) {
 		l.ignored.push(key);
+		l.ignoredRemoval.push(false);
 	},
 	alwaysIgnore(l, key) {
 		l.alwaysIgnored.push(key);
@@ -115,6 +117,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 					l.value = listValue.join("");
 					l.selectionEnd = start + newChar.length;
 					if (start === end || cut) l.selectionStart = l.selectionEnd;
+					if (paste) l.selectionStart = l.selectionEnd = start + newChar.length;
 				}
 			}
 		}
@@ -153,6 +156,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 					l.value = listValue.join("");
 				}
 			}
+			l.selectionStart = l.selectionEnd;
 		} else {
 			if (key === "Backspace" || key === "Delete") {
 				let listValue = l.value.split("");
@@ -171,8 +175,8 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 	},
 	updateTextBoundingBox(l) {
 		let { width, height } = this;
-		let rightOffset = l.multiline ? l.scrollBarSize : 0;
-		let bottomOffset = l.multiline ? l.scrollBarSize : 0;
+		let rightOffset = (l.multiline && l.relativeTextViewBox.height < l.relativeTextBoundingBox.height) ? l.scrollBarSize : 0;
+		let bottomOffset = (l.multiline && l.relativeTextViewBox.width < l.relativeTextBoundingBox.width) ? l.scrollBarSize : 0;
 		l.relativeTextViewBox = new Rect(-width / 2 + l.padding, -height / 2 + l.padding, width - l.padding - rightOffset, height - l.padding - bottomOffset);
 		l.relativeTextBoundingBox = new Rect(l.relativeTextViewBox.x, l.relativeTextViewBox.y, l.renderer.getTextWidth(l.font, l.value), l.renderer.getTextHeight(l.font, l.value));
 		l.clampScrollOffset();
@@ -233,7 +237,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 				key = key.text;
 				let inx = l.ignored.indexOf(key);
 				if (inx > -1) {
-					l.ignored.splice(inx, 1);
+					l.ignoredRemoval[inx] = true;
 					continue;
 				}
 				let inx2 = l.alwaysIgnored.indexOf(key);
@@ -245,6 +249,21 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 			l.updateTextBoundingBox();
 			l.scrollCursorIntoView();
 		}
+
+		//filter disables
+		let stillIgnore = [];
+		let stillIgnoreRemoval = [];
+		for (let i = 0; i < l.ignored.length; i++) {
+			let condition = !(l.ignoredRemoval[i] && l.keyboard.released(l.ignored[i]));
+			console.log(condition);
+			if (condition) {
+				stillIgnore.push(l.ignored[i]);
+				stillIgnoreRemoval.push(l.ignoredRemoval[i]);
+			}
+		}
+		l.ignored = stillIgnore;
+		l.ignoredRemoval = stillIgnoreRemoval;
+
 		l.updateTextBoundingBox();
 	},
 	draw(l, name, shape) {
@@ -252,7 +271,9 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.renderer.textMode = TextMode.LEFT;
 		l.renderer.textModeVertical = TextMode.TOP;
 
-		l.renderer.clip().rect(l.relativeTextViewBox);
+		let rtvb = l.relativeTextViewBox;
+		let expand = 1;
+		l.renderer.clip().rect(rtvb.x - expand, rtvb.y - expand, rtvb.width + expand * 2, rtvb.height + expand * 2);
 		l.renderer.save();
 		l.renderer.translate(l.scrollOffset.inverse);
 		l.renderText(l.value, l.font, l.relativeTextViewBox.min);
@@ -354,7 +375,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		} else l.scrollOffset.y = 0;
 
 
-		l.renderer.stroke(cl.BLACK).rect(shape);
+		// l.renderer.stroke(cl.BLACK).rect(shape);
 
 		l.renderer.textMode = prevTextMode[0];
 		l.renderer.textModeVertical = prevTextMode[1];

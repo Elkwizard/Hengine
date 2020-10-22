@@ -1,3 +1,4 @@
+// devicePixelRatio = 1;
 class GPUShader extends ImageType {
 	constructor(width, height, glsl) {
 		super(width, height);
@@ -6,7 +7,7 @@ class GPUShader extends ImageType {
 		this.compiled = null;
 		this.arguments = { };
 		this.shadeRects = [];
-		this.image = new_OffscreenCanvas(width, height);
+		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
 		this.c = this.image.getContext("webgl");
 		if (this.c === null) return console.warn("Your browser doesn't support webgl.");
 		this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.setShadeRects(this.shadeRects, false), this.setArguments(this.arguments)));
@@ -64,13 +65,13 @@ class GPUShader extends ImageType {
 		c.uniform2f(c.getUniformLocation(shaderProgram, "resolution"), this.width, this.height);
 		c.uniform1f(c.getUniformLocation(shaderProgram, "halfWidth"), this.width / 2);
 		c.uniform1f(c.getUniformLocation(shaderProgram, "halfHeight"), this.height / 2);
-		c.viewport(0, 0, this.width, this.height);
+		c.viewport(0, 0, this.image.width, this.image.height);
 	}
 	resize(width, height, redraw = true) {
 		width = Math.max(1, Math.abs(Math.floor(width)));
 		height = Math.max(1, Math.abs(Math.floor(height)));
-		this.image.width = width;
-		this.image.height = height;
+		this.image.width = width * devicePixelRatio;
+		this.image.height = height * devicePixelRatio;
 		this.width = width;
 		this.height = height;
 		this.updateResolutionUniforms();
@@ -190,7 +191,10 @@ class GPUShader extends ImageType {
 		let textureUnit = 0;
 		for (let arg in uniformData) {
 			let u = uniformMap[arg];
-			if (u === undefined) console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+			if (u === undefined) {
+				console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+				continue;
+			}
 			let data = uniformData[arg];
 			let p = u.properties;
 			this.arguments[arg] = data;
