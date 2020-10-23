@@ -59,12 +59,13 @@ class Hengine {
 		this.keyboard = this.gameEngine.keyboard;
 		this.mouse = this.gameEngine.mouse;
 		this.clipboard = this.gameEngine.clipboard;
+		this.fileSystem = this.gameEngine.fileSystem;
 		this.colorLibrary = new ColorLibrary();
 		this.soundLibrary = new SoundLibrary();
+		
+		//window
 		window.cl = this.colorLibrary;
 		window.sl = this.soundLibrary;
-		
-		//Words
 		window.gameEngine = this.gameEngine;
 		window.scene = this.scene;
 		window.renderer = this.renderer;
@@ -73,6 +74,7 @@ class Hengine {
 		window.keyboard = this.keyboard;
 		window.mouse = this.mouse;
 		window.clipboard = this.clipboard;
+		window.fileSystem = this.fileSystem;
 
 		let hengine = this;
 		if (!(window.width || window.height || window.middle)) {
@@ -92,7 +94,7 @@ class Hengine {
 				}
 			});
 		}
-		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "fileExists", "save", "get", "deleteFile", "getAllFiles", "fileSize", "packageFiles", "importPackage", "getRaw", "saveRaw", "setTitle", "setCursor"];
+		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "setTitle", "setCursor"];
 		for (let EXP of EXPORT) {
 			window[EXP] = this[EXP].bind(this);
 		}
@@ -104,10 +106,8 @@ class Hengine {
 		this.images = {};
 		this.sounds = {};
 
-		this.initFileSystem();
 
 		//title
-
 		let script = document.createElement("script");
 		script.src = "./Source.js";
 		let t = script.src;
@@ -122,33 +122,6 @@ class Hengine {
 		//defaults
 		this.initDefaults();
 	}
-	initFileSystem() {
-		this.fileTypes = {
-			NUMBER: str => parseFloat(str),
-			STRING: str => str,
-			NUMBER_ARRAY: str => str.split(",").map(e => parseFloat(e)),
-			STRING_ARRAY: str => str.split(","),
-			OBJECT: str => JSON.parse(str),
-			BOOLEAN: str => str === "true",
-			IMAGE: str => Texture.fromString(str),
-			GRAY_MAP: str => GrayMap.fromString(str)
-		};
-		this.fileAliases = {
-			NUMBER: ["num", "int", "float", "double"],
-			STRING: ["txt", "str", "file", "char"],
-			NUMBER_ARRAY: ["num_ary", "num_array"],
-			STRING_ARRAY: ["str_ary", "str_array"],
-			OBJECT: ["obj", "col"],
-			BOOLEAN: ["bln", "bool"],
-			IMAGE: ["img", "png", "jpg", "jpeg", "bmp", "txr"],
-			GRAY_MAP: ["gray_map", "grm"]
-		};
-		for (let type in this.fileAliases) {
-			for (let alt of this.fileAliases[type]) {
-				this.fileTypes[alt.toUpperCase()] = this.fileTypes[type];
-			}
-		}
-	}
 	initDefaults() {
 		window.WALLS = scene.main.addContainer("WALLS", false);
 		let { width, height } = this.renderer;
@@ -156,9 +129,6 @@ class Hengine {
 		WALLS.addPhysicsRectElement("Floor", width / 2, height + 50, width, 100, false);
 		WALLS.addPhysicsRectElement("Left Wall", -50, height / 2, 100, height + 200, false);
 		WALLS.addPhysicsRectElement("Right Wall", width + 50, height / 2, 100, height + 200, false);
-	}
-	getProjectName() {
-		return document.querySelector("title").innerText;
 	}
 	setTitle(title) {
 		let t = document.querySelector("title");
@@ -172,77 +142,8 @@ class Hengine {
 	setCursor(cursor) {
 		document.body.style.cursor = cursor;
 	}
-	importPackage(pack, loc = this.getProjectName()) {
-		let data = pack;
-		for (let key in data) {
-			if (!this.getRaw(key, loc)) this.saveRaw(key, data[key], loc);
-		}
-		return data;
-	}
-	packageFiles(files = [], loc = this.getProjectName()) {
-		let data = {};
-		for (let file of files) {
-			data[file] = this.getRaw(file, loc);
-		}
-		let packageString = JSON.stringify(data);
-		return packageString;
-	}
-	getFileType(fileName) {
-		let type = fileName.split(".")[1];
-		if (!this.fileTypes[type.toUpperCase()]) {
-			type = "STRING";
-		}
-		return type.toUpperCase();
-	}
-	getFilePath(file, loc) {
-		return "HengineLocalSaves\\" + escape(loc) + "\\" + escape(file.split(".")[0]) + "." + file.split(".")[1].toLowerCase();
-	}
-	saveRaw(file, data, loc = this.getProjectName()) {
-		LocalFileSystem.put(this.getFilePath(file, loc), data);
-		return data;
-	}
-	getRaw(file, loc = this.getProjectName()) {
-		return LocalFileSystem.get(this.getFilePath(file, loc));
-	}
-	fileExists(file, loc = this.getProjectName()) {
-		return this.getRaw(file, loc) !== undefined;
-	}
-	save(file, data, loc = this.getProjectName()) {
-		let type = this.getFileType(file);
-		let actData = data;
-		if (this.fileAliases.OBJECT.includes(type.toLowerCase())) data = JSON.stringify(data);
-		data += "";
-		this.saveRaw(file, data, loc);
-		return actData;
-	}
-	fileSize(file, loc = this.getProjectName()) {
-		let data = this.getRaw(file, loc);
-		if (data) return (data.length / 512).toMaxed(1) + "kb";
-		return 0;
-	}
-	getAllFiles() {
-		let files = LocalFileSystem.getAllFiles().map(file => {
-			let inx = file.indexOf("\\") + 1;
-			let nFile = file.slice(inx);
-			let inx2 = nFile.indexOf("\\");
-			let loc = nFile.slice(0, inx2);
-			let fileName = nFile.slice(inx2 + 1);
-			return { location: unescape(loc), file: unescape(fileName) };
-		});
-		return files;
-	}
-	deleteFile(file, loc = this.getProjectName()) {
-		LocalFileSystem.clear(this.getFilePath(file, loc));
-	}
-	get(file, loc = this.getProjectName()) {
-		let dat = this.getRaw(file, loc);
-		if (dat) {
-			let type = this.getFileType(file);
-			return this.fileTypes[type](dat);
-		}
-	}
 	initImage(src) {
-		return new Frame(src);
+		return new HImage(src);
 	}
 	initSound(src) {
 		return new Sound(src);

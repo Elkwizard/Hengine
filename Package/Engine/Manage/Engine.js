@@ -48,9 +48,11 @@ class Engine {
 		this.mouse = new MouseHandler(this, wrp);
 		this.keyboard = new KeyboardHandler();
 		this.clipboard = new ClipboardHandler();
+		this.fileSystem = new FileSystem();
 
 		this.renderer = new Artist(canvas, W, H);
 		this.scene = new Scene(new Vector2(0, 0.2), this);
+
 		//update loops
 		this.intervals = new IntervalFunctionManager();
 

@@ -100,6 +100,6 @@ class GraphPlane extends Frame {
             this.lastImgTime = performance.now();
             this.draw();
         }
-        return this.img;
+        return this.image;
     }
 }

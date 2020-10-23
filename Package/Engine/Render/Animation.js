@@ -6,8 +6,7 @@ class Animation extends ImageType {
 			this.frameCount = frames;
 			this.frames = [];
 			for (let i = 0; i < frames; i++) {
-				this.frames.push(new Frame());
-				this.frames[i].src = src + "/" + (i + 1) + ".png";
+				this.frames.push(new HImage(`${src}/${i + 1}.png`));
 			}
 			this.loop = loop;
 			this.finResponse = finResponse;
@@ -43,7 +42,7 @@ class Animation extends ImageType {
 	}
 	makeImage() {
 		this.advance();
-		return this.image.img;
+		return this.image.image;
 	}
 	stop() {
 		this.stopped = true;
