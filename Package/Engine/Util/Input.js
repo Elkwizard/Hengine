@@ -34,7 +34,7 @@ class InputHandler {
 		return (Array.isArray(keys) ? keys : [keys]).map(key => !this.keys[key]).includes(true);
 	}
 	justPressed(keys) {
-		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyDownCounts[key] === 1).includes(true);
+		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyDownCounts[key] === 1 && this.keyUpCounts[key] === 0).includes(true);
 	}
 	justReleased(keys) {
 		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyUpCounts[key] === 1).includes(true);

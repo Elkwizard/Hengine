@@ -7,13 +7,20 @@ class Vertex {
 		return "(" + this.x + ", " + this.y + ")";
 	}
 }
-const TextMode = {
+const TextModeX = {
 	LEFT: Symbol("LEFT"),
-	RIGHT: Symbol("RIGHT"),
 	CENTER: Symbol("CENTER"),
+	RIGHT: Symbol("RIGHT")
+};
+const TextModeY = {
 	TOP: Symbol("TOP"),
+	CENTER: Symbol("CENTER"),
 	BOTTOM: Symbol("BOTTOM")
 };
+const TextMode = { };
+for (let x in TextModeX) for (let y in TextModeY) {
+	TextMode[y + "_" + x] = [TextModeX[x], TextModeY[y]];
+}
 class Artist {
 	constructor(canvas, width, height) {
 		this.canvas = canvas;
@@ -41,9 +48,8 @@ class Artist {
 
 		this.__c = this.c;
 		this._background = new Color(0, 0, 0, 0);
-		this.textMode = TextMode.LEFT;
-		this.textModeVertical = TextMode.TOP;
-		this.tabReplacement = "    ";
+		this.textModeX = TextModeX.LEFT;
+		this.textModeY = TextModeY.TOP;
 		let pathObj = {
 			circle(x, y, radius) {
 				radius = Math.abs(radius);
@@ -100,16 +106,36 @@ class Artist {
 				this.c.lineTo(v3.x, v3.y);
 				this.c.lineTo(v1.x, v1.y);
 			},
+			lineText(font, text, x, y) {
+				if (typeof x === "object") {
+					y = x.y;
+					x = x.x;
+				}
+				this.c.font = font.toString();
+				text = font.processString(text);
+
+				if (this.textModeX !== TextModeX.LEFT) {
+					let w = this.c.measureText(text).width;
+					if (this.textModeX === TextModeX.RIGHT) x -= w;
+					else x -= w / 2;
+				}
+				y += font.size * 0.24 - font.lineHeight / 2;
+				if (this.textModeY !== TextModeY.BOTTOM) {
+					if (this.textModeY === TextModeY.TOP) y += font.lineHeight;
+					else y += font.lineHeight / 2;
+				}
+				return { text, x, y }
+			},
 			text(font, text, x, y, pack = false) {
 				if (typeof x === "object") {
 					pack = y || false;
 					y = x.y;
 					x = x.x;
 				}
-				text = (text + "").replace(/\t/g, this.tabReplacement);
-				if (pack) text = this.packText(font, text, pack);
+				text = font.processString(text);
+				if (pack) text = font.packText(text, pack);
 				this.c.font = font.toString();
-				const tmh = this.getTextHeight(font, text);
+				const tmh = font.getTextHeight(text);
 				const blocks = text.split("\n");
 				let textRequests = [];
 				const yOffset =  font.size * .24 - font.lineHeight / 2;
@@ -117,16 +143,16 @@ class Artist {
 					let ax = x;
 					let ay = y + (i + 1) * font.lineHeight + yOffset;
 					let tmw = this.c.measureText(blocks[i]).width;
-					if (this.textMode === TextMode.LEFT);
-					else if (this.textMode === TextMode.CENTER) {
+					if (this.textModeX === TextModeX.LEFT);
+					else if (this.textModeX === TextModeX.CENTER) {
 						ax -= tmw / 2;
-					} else if (this.textMode === TextMode.RIGHT) {
+					} else if (this.textModeX === TextModeX.RIGHT) {
 						ax -= tmw;
 					}
-					if (this.textModeVertical === TextMode.TOP);
-					else if (this.textModeVertical === TextMode.CENTER) {
+					if (this.textModeY === TextModeY.TOP);
+					else if (this.textModeY === TextModeY.CENTER) {
 						ay -= tmh / 2;
-					} else if (this.textModeVertical === TextMode.BOTTOM) {
+					} else if (this.textModeY === TextModeY.BOTTOM) {
 						ay -= tmh;
 					}
 					textRequests.push({ text: blocks[i], x: ax, y: ay });
@@ -188,6 +214,10 @@ class Artist {
 					this.c.fillText(r.text, r.x, r.y);
 				}
 			},
+			lineText(font, text, x, y) {
+				let req = pathObj.lineText(font, text, x, y);
+				this.c.fillText(req.text, req.x, req.y);
+			},
 			shape(v) {
 				pathObj.shape(v);
 				this.c.fill();
@@ -235,6 +265,10 @@ class Artist {
 				for (let r of req) {
 					this.c.strokeText(r.text, r.x, r.y);
 				}
+			},
+			lineText(font, text, x, y) {
+				let req = pathObj.lineText(font, text, x, y);
+				this.c.strokeText(req.text, req.x, req.y);
 			},
 			connector(points) {
 				if (points.length) {
@@ -293,8 +327,8 @@ class Artist {
 					}
 				}
 
-				let width = this.getTextWidth(font, text);
-				let height = this.getTextHeight(font, text);
+				let width = font.getTextWidth(text);
+				let height = font.getTextHeight(text);
 
 				let dx = x1 - x;
 				let dy = y1 - y;
@@ -555,11 +589,16 @@ class Artist {
 	get middle() {
 		return new Vector2(this.width / 2, this.height / 2);
 	}
-	set tabSize(a) {
-		this.tabReplacement = " ".repeat(a);
+	set textMode(a) {
+		this.textModeX = a[0];
+		this.textModeY = a[1];
 	}
-	get tabSize() {
-		return this.tabReplacement.length;
+	get textMode() {
+		let vx = this.textModeX.toString();
+		vx = vx.slice(7, vx.length - 1);
+		let vy = this.textModeY.toString();
+		vy = vy.slice(7, vy.length - 1);
+		return TextMode[vy + "_" + vx];
 	}
 	set preservePixelart(a) {
 		this.c.imageSmoothingEnabled = !a;
@@ -591,42 +630,6 @@ class Artist {
 		data[2] = col.blue;
 		data[3] = col.alpha * 255;
 		this.c.putImageData(new ImageData(data, 1, 1), x, y);
-	}
-	getTexture(x = 0, y = 0, w = this.width, h = this.height) {
-		if (typeof x === "object") {
-			h = x.height;
-			w = x.width;
-			y = x.y;
-			x = x.x;
-		}
-		x *= devicePixelRatio;
-		y *= devicePixelRatio;
-		let W = ~~(w * devicePixelRatio);
-		let H = ~~(h * devicePixelRatio);
-		let imageData = this.c.getImageData(x, y, W, H);
-		let tex = new Texture(w, h);
-		let data = imageData.data;
-		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
-			let inx = (Math.round(i * devicePixelRatio) + Math.round(j * devicePixelRatio) * W) * 4;
-			let r = data[inx + 0];
-			let g = data[inx + 1];
-			let b = data[inx + 2];
-			let a = data[inx + 3] / 255;
-			tex.shader_set(i, j, new Color(r, g, b, a));
-		}
-		tex.changed = true;
-		return tex;
-	}
-	getFrame(x = 0, y = 0, w = this.width, h = this.height) {
-		if (typeof x === "object") {
-			h = x.height;
-			w = x.width;
-			y = x.y;
-			x = x.x;
-		}
-		let frame = new Frame(w, h);
-		frame.renderer.c.drawImage(this.canvas, x * devicePixelRatio, y * devicePixelRatio, w * devicePixelRatio, h * devicePixelRatio, 0, 0, w, h);
-		return frame;
 	}
 	createRadialGradient(x, y, radius, cols) {
 		let grd = this.c.createRadialGradient(x, y, 0.00000001, x, y, radius);
@@ -681,42 +684,6 @@ class Artist {
 	}
 	unembody() {
 		this.c = this.__c;
-	}
-	packText(font, str, pack) {
-		this.c.font = font.toString();
-		let text = str.replace(/\t/g, this.tabReplacement);
-		let words = text.split(" ");
-		let lines = [""];
-		for (let i = 0; i < words.length; i++) {
-			let word = words[i];
-			let prevLen = lines[lines.length - 1].length;
-			lines[lines.length - 1] += (i ? " " : "") + word;
-			if (this.c.measureText(lines[lines.length - 1]).width > pack) {
-				lines[lines.length - 1] = lines[lines.length - 1].slice(0, prevLen);
-				lines.push(word);
-			}
-			if (word === "\n") lines.push("");
-		}
-		return lines.join("\n");
-	}
-	getTextBounds(font, str, pack) {
-		str += "";
-		if (pack) str = this.packText(font, str, pack);
-		let spl = str.replace(/\t/g, this.tabReplacement).split("\n");
-		let width = Math.max(...spl.map(e => this.c.measureText(e).width));
-		let height = spl.length * font.lineHeight;
-		return { width, height };
-	}
-	getTextWidth(font, str) {
-		str += "";
-		this.c.font = font.toString();
-		let spl = str.replace(/\t/g, this.tabReplacement).split("\n");
-		return Math.max(...spl.map(e => this.c.measureText(e).width));
-	}
-	getTextHeight(font, str, pack) {
-		str += "";
-		if (pack) str = this.packText(font, str, pack);
-		return str.split("\n").length * font.lineHeight;
 	}
 	contentToFrame() {
 		let n = new Frame(this.width, this.height);
@@ -795,24 +762,6 @@ class Artist {
 	clear() {
 		this.c.clearRect(0, 0, this.width, this.height);
 	}
-	color(color) {
-		this.c.fillStyle = this.c.strokeStyle = color;
-	}
-	lerp(a, b, t) {
-		return a * (1 - t) + b * t;
-	}
-	quadLerp(a, b, c, d, tx, ty) {
-		const l = this.lerp(a, c, ty);
-		const r = this.lerp(b, d, ty);
-		let per = this.lerp(l, r, tx);
-		return per;
-	}
-	noise(x, f = 1, seed = 0) {
-		return Random.perlin(x, f, seed);
-	}
-	noise2D(x, y, f = 1, seed = 0) {
-		return Random.perlin2D(x, y, f, seed);
-	}
 	rotateAround(x, y, r) {
 		this.translate(x, y)
 		this.rotate(r);
@@ -820,17 +769,6 @@ class Artist {
 	}
 	drawImage(img, x, y, width, height) {
 		img = img.makeImage();
-		this.c.drawImage(img, x, y, width, height);
-	}
-	drawAnimation(animation, x, y, width, height, advance = true) {
-		if (typeof x === "object") {
-			this.drawAnimation(animation, x.x, x.y, x.width, x.height, y);
-		}
-		if (advance) animation.advance();
-		let img = animation.img;
-		if (img instanceof Frame) img = img.img;
-		if (width === undefined) width = img.width;
-		if (height === undefined) height = img.height;
 		this.c.drawImage(img, x, y, width, height);
 	}
 	drawWithAlpha(a, shape) {

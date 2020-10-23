@@ -183,6 +183,35 @@ class Texture extends ImageType {
 		tex.changed = true;
 		return tex;
 	}
+	static fromRenderer(renderer, x, y, w, h) {
+		if (!x) x = 0;
+		if (!y) y = 0;
+		if (!w) w = renderer.width;
+		if (!h) h = renderer.height;
+		if (typeof x === "object") {
+			h = x.height;
+			w = x.width;
+			y = x.y;
+			x = x.x;
+		}
+		x *= devicePixelRatio;
+		y *= devicePixelRatio;
+		let W = ~~(w * devicePixelRatio);
+		let H = ~~(h * devicePixelRatio);
+		let imageData = renderer.c.getImageData(x, y, W, H);
+		let tex = new Texture(w, h);
+		let data = imageData.data;
+		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
+			let inx = (Math.round(i * devicePixelRatio) + Math.round(j * devicePixelRatio) * W) * 4;
+			let r = data[inx + 0];
+			let g = data[inx + 1];
+			let b = data[inx + 2];
+			let a = data[inx + 3] / 255;
+			tex.shader_set(i, j, new Color(r, g, b, a));
+		}
+		tex.changed = true;
+		return tex;
+	}
 	static grayScale(bright) {
 		return (new Texture(bright.length, bright[0].length)).shader((x, y) => Color.grayScale(bright[x][y]));
 	}

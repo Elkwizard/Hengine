@@ -19,7 +19,7 @@ class UIComponent {
         this.margin = margin;
         this.block = block;
         if (maxWidth) this.setWidth(maxWidth);
-        else this.setWidth(renderer.getTextWidth(this.font, this.content) + this.padding * 2);
+        else this.setWidth(this.font.getTextWidth(this.content) + this.padding * 2);
         if (maxHeight) this.setHeight(maxHeight);
     }
     setHeight(h) {
@@ -29,8 +29,8 @@ class UIComponent {
     }
     setWidth(w) {
         let contentWidth = w - this.padding * 2;
-        this.packedContent = renderer.packText(this.font, this.content, contentWidth);
-        let contentHeight = renderer.getTextHeight(this.font, this.packedContent);
+        this.packedContent = this.font.packText(this.content, contentWidth);
+        let contentHeight = this.font.getTextHeight(this.packedContent);
         this.contentBox = new Rect(this.padding, this.padding, contentWidth, contentHeight);
         this.borderBox = new Rect(0, 0, w, this.contentBox.height + this.padding * 2);
         this.marginBox = new Rect(-this.margin, -this.margin, this.borderBox.width + this.margin * 2, this.borderBox.height + this.margin * 2);
@@ -51,13 +51,13 @@ UIComponent.UI_LAYOUT = new ElementScript("UI_LAYOUT", {
         l.offset = new Vector2(x, y);
         l.scriptNumber = 1000;
         l.color = cl.BLACK;
+        l.renderer = this.engine.renderer;
     },
     draw(l) {
-        let prev = [renderer.textMode, renderer.textModeVertical];
-        renderer.textMode = TextMode.LEFT;
-        renderer.textModeVertical = TextMode.CENTER;
-        renderer.draw(l.color).text(l.font, l.content, l.offset);
-        [renderer.textMode, renderer.textModeVertical] = prev;
+        let prev = l.renderer.textMode;
+        l.renderer.textMode = TextMode.CENTER_LEFT;
+        l.renderer.draw(l.color).text(l.font, l.content, l.offset);
+        l.renderer.textMode = prev;
     }
 });
 

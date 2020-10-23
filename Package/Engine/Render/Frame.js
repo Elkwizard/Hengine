@@ -89,19 +89,23 @@ class Frame extends ImageType {
 		f.renderer.c.drawImage(this.img, 0, 0, w, h);
 		return f;
 	}
-	clip(x, y, w, h) {
-		if (x.width !== undefined) {
+	makeImage() {
+		return this.img;
+	}
+	static fromRenderer(renderer, x, y, w, h) {
+		if (!x) x = 0;
+		if (!y) y = 0;
+		if (!w) w = renderer.width;
+		if (!h) h = renderer.height;
+		if (typeof x === "object") {
 			h = x.height;
 			w = x.width;
 			y = x.y;
 			x = x.x;
 		}
 		let f = new Frame(w, h);
-		f.renderer.c.drawImage(this.img, x, y, w, h, 0, 0, w, h);
+		f.renderer.c.drawImage(renderer.canvas, x * devicePixelRatio, y * devicePixelRatio, w * devicePixelRatio, y * devicePixelRatio, 0, 0, w, h);
 		return f;
-	}
-	makeImage() {
-		return this.img;
 	}
 	static async sourceExists(src) {
 		let img = new Image();

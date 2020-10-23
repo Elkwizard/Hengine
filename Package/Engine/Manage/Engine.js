@@ -107,7 +107,7 @@ class Engine {
 				this.fpsContinuous = 1000 / val;
 			}
 			this.updateGraphs();
-			if (Math.abs(this.fpsContinuous - this.fps) > 5 && Math.abs(this.fpsContinuous - this.fps) < 40) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
+			if (Math.abs(this.fpsContinuous - this.fps) > 5) this.fps = Math.min(60, Math.floor(this.fpsContinuous));
 			//update
 			if (!this.paused) {
 				this.keyboard.update();

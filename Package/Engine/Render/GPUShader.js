@@ -1,4 +1,3 @@
-// devicePixelRatio = 1;
 class GPUShader extends ImageType {
 	constructor(width, height, glsl) {
 		super(width, height);

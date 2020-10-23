@@ -20,15 +20,14 @@ class Graph {
         let dText = `${this.name}: ${prefix + Math.abs(this.data[this.data.length - 1]).toFixed(this.decimalPlaces)}`;
         let point = data[data.length - 1];
         point.x = Math.min(point.x, this.plane.graphRect.xRange.max - this.plane.font.lineHeight / 2);
-        point.y = Number.clamp(point.y, this.plane.graphRect.yRange.min + this.plane.font.lineHeight / 2, this.plane.graphRect.yRange.max - this.plane.font.lineHeight / 2 - renderer.getTextHeight(this.plane.font, this.name));
+        point.y = Number.clamp(point.y, this.plane.graphRect.yRange.min + this.plane.font.lineHeight / 2, this.plane.graphRect.yRange.max - this.plane.font.lineHeight / 2 - this.plane.font.getTextHeight(this.name));
         this.lastRemappedDataPoint = { point, text: dText };
     }
     label(renderer) {
         let { text, point } = this.lastRemappedDataPoint;
-        renderer.textMode = TextMode.RIGHT;
-        renderer.textModeVertical = TextMode.TOP;
-        let width = renderer.getTextWidth(this.plane.font, text);
-        let height = renderer.getTextHeight(this.plane.font, text);
+        renderer.textMode = TextMode.TOP_RIGHT;
+        let width = this.plane.font.getTextWidth(text);
+        let height = this.plane.font.getTextHeight(text);
         renderer.draw(new Color(0, 0, 0, 0.7)).rect(point.x - width - this.plane.font.lineHeight / 2, point.y - this.plane.font.lineHeight / 2, width + this.plane.font.lineHeight, height + this.plane.font.lineHeight);
         // renderer.draw(cl.BLACK).text(this.plane.font, text, point.plus(1));
         renderer.draw(this.color).text(this.plane.font, text, point);
@@ -79,12 +78,11 @@ class GraphPlane extends Frame {
         let renderer = this.renderer;
         renderer.clear();
         renderer.draw(cl.BLACK).rect(this.boundingRect);
-        renderer.textMode = TextMode.LEFT;
-        renderer.textModeVertical = TextMode.BOTTOM;
+        renderer.textMode = TextMode.BOTTOM_LEFT;
         let minTime = Math.max(0, performance.now());
         let timeLimit = this.frameLimit * 16;
         renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame)} F / ${Time.formatMS(minTime)}`, this.boundingRect.xRange.min + this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
-        renderer.textMode = TextMode.RIGHT;
+        renderer.textMode = TextMode.BOTTOM_RIGHT;
         renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame + this.frameLimit)} F / ${Time.formatMS(minTime + timeLimit)}`, this.boundingRect.xRange.max - this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].draw(renderer);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].label(renderer);
