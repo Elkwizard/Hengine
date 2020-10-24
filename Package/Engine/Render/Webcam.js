@@ -2,6 +2,7 @@ class WebcamCapture extends ImageType {
 	constructor() {
 		super(1, 1);
 		this.data = { video: null };
+		this.loaded = false;
 		WebcamCapture.getWebcam(this.data);
 		this.lastCaptureTime = 0;
 		this.lastCapture = null;
@@ -31,6 +32,7 @@ class WebcamCapture extends ImageType {
 	}
 	makeImage() {
 		if (this.data.video) {
+			this.loaded = true;
 			if ((this.recording && performance.now() - this.lastCaptureTime > 16) || !this.lastCapture) {
 				const v = this.data.video;
 				let mwidth = Math.min(v.videoWidth, v.videoHeight);

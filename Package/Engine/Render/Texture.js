@@ -4,7 +4,7 @@ class Texture extends ImageType {
 		let self = this;
 		this.renderer = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
 		this.pixels = Array.dimFilled(new Color(0, 0, 0, 0), this.width, this.height);
-		this.__image = new OffscreenCanvas(width, height);
+		this.image = new_OffscreenCanvas(width, height);
 
 		//init image data
 		let array = new Uint8ClampedArray(4 * this.width * this.height);
@@ -137,12 +137,10 @@ class Texture extends ImageType {
 	makeImage() {
 		if (this.changed) {
 			this.changed = false;
-			let x = new_OffscreenCanvas(this.width, this.height);
-			let c = x.getContext("2d");
+			let c = this.image.getContext("2d");
 			c.putImageData(this.imageData, 0, 0);
-			this.__image = x;
 		}
-		return this.__image;
+		return this.image;
 	}
 	stretch(w, h) {
 		w = Math.round(w);
@@ -168,7 +166,7 @@ class Texture extends ImageType {
 		r.changed = true;
 		return r;
 	}
-	portion(x, y, w, h) {
+	clip(x, y, w, h) {
 		x = Math.round(x);
 		y = Math.round(y);
 		let r = new Texture(w, h);

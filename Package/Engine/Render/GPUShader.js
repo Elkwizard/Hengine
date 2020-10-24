@@ -17,6 +17,7 @@ class GPUShader extends ImageType {
 			1, -1
 		];
 		this.amountVertices = 4;
+		this.loaded = false;
 	}
 	setShadeRects(rects, redraw = true) {
 		this.shadeRects = rects;
@@ -77,6 +78,7 @@ class GPUShader extends ImageType {
 		if (redraw) this.shade();
 	}
 	shade() {
+		this.loaded = true;
 		this.c.clear(this.c.COLOR_BUFFER_BIT);
 		this.c.drawArrays(this.c.TRIANGLE_STRIP, 0, this.amountVertices);
 	}
@@ -255,6 +257,7 @@ class GPUShader extends ImageType {
 		if (redraw) this.shade();
 	}
 	makeImage() {
+		if (!this.loaded) this.shade();
 		return this.image;
 	}
 	static imageTypeToTexture(c, image, textureUnit) {

@@ -206,7 +206,9 @@ class ElementContainer {
 		ns.particleFades = fades;
 		ns.particleSlows = slows;
 		ns.active = false;
-		ns.update = function () {
+		let curUpdate = ns.engineUpdate.bind(ns);
+		ns.engineUpdate = function () {
+			curUpdate();
 			let n = 0;
 			for (let key in ns.spawns) n++;
 			if (!n) ns.remove();

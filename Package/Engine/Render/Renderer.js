@@ -768,8 +768,9 @@ class Artist {
 		this.translate(-x, -y);
 	}
 	drawImage(img, x, y, width, height) {
-		img = img.makeImage();
-		this.c.drawImage(img, x, y, width, height);
+		let cis = img.makeImage(); //CanvasImageSource
+		if (!img.loaded) return;
+		this.c.drawImage(cis, x, y, width, height);
 	}
 	drawWithAlpha(a, shape) {
 		this.c.globalAlpha = a;

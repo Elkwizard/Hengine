@@ -89,7 +89,6 @@ class Frame extends ImageType {
 		this.image = new_OffscreenCanvas(this.width, this.height);
 		this.renderer = new Artist(this.image, this.width, this.height);
 		this.renderer.preservePixelart = true;
-		this.onload = () => null;
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
@@ -99,6 +98,14 @@ class Frame extends ImageType {
 	}
 	makeImage() {
 		return this.image;
+	}
+	clip(x, y, w, h) {
+		return Frame.fromRenderer(this.renderer, x, y, w, h);
+	}
+	get() {
+		let f = new Frame(this.width, this.height);
+		f.renderer.c.drawImage(this.image, 0, 0, this.width, this.height);
+		return f;
 	}
 	static fromRenderer(renderer, x, y, w, h) {
 		if (!x) x = 0;

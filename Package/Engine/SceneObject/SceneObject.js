@@ -270,8 +270,11 @@ class SceneObject {
 	engineUpdate() {
 		this.scripts.run("Update");
 	}
+	hasMoved() {
+		return this.transform.dif(this.lastTransform);
+	}
 	updateCaches() {
-		if (this.transform.dif(this.lastTransform)) this.cacheBoundingBoxes();
+		if (this.hasMoved()) this.cacheBoundingBoxes();
 	}
 	pushToRemoveQueue(x) {
 		return null;

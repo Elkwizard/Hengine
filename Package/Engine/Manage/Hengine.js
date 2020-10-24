@@ -155,10 +155,7 @@ class Hengine {
 		return this.sounds[src];
 	}
 	loadImage(src) {
-		let img = this.images[src];
-		let f = new Frame(img.width, img.height);
-		f.renderer.image(img).default(0, 0);
-		return f;
+		return this.images[src];
 	}
 	loadAnimation(src) {
 		return this.animations[src].get();
@@ -223,8 +220,8 @@ class Hengine {
 		pathSRC.pop();
 		pathSRC.pop();
 		pathSRC.pop();
-		let rootSrc = pathSRC.join("/") + "/Engine";
-		console.log("EXTRACTING FROM ROOT [" + rootSrc + "]");
+		let rootSrc = `${pathSRC.join("/")}/Engine`;
+		console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
 		function instantiateHengine() {
 			window.HENGINE = new Hengine(scripts.utility);
 			onload();
@@ -254,15 +251,15 @@ class Hengine {
 						if (window.HENGINE) {
 							if (element === "animations") {
 								type = "ANIMATION"
-								resource = window.HENGINE.initAnimation(path + "/" + folder + "/" + file.folder, file.frames, file.delay, file.loop || false);
+								resource = window.HENGINE.initAnimation(`${path}/${folder}/${file.folder}`, file.frames, file.delay, file.loops || false);
 								window.HENGINE.animations[file.folder] = resource;
 							} else if (element === "sprites") {
 								type = "IMAGE";
-								resource = window.HENGINE.initImage(path + "/" + folder + "/" + file);
+								resource = window.HENGINE.initImage(src);
 								window.HENGINE.images[file] = resource;
 							} else if (element === "sounds") {
 								type = "SOUND";
-								resource = window.HENGINE.initSound(path + "/" + folder + "/" + file);
+								resource = window.HENGINE.initSound(src);
 								window.HENGINE.sounds[file] = resource;
 							}
 						}

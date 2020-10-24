@@ -2,8 +2,7 @@ class Directions {
 	constructor(prec = 0.3) {
 		this.prec = prec;
     }
-    //get particle speed
-    getRandomSpeed() {
+    getRandomVelocity() {
         return Vector2.origin;
     }
 }
@@ -15,7 +14,7 @@ class CardinalDirections extends Directions {
         this.left = left;
         this.right = right;
     }
-    getRandomSpeed() {
+    getRandomVelocity() {
         return this.fix(Vector2.random());
     }
 	fix(v) {
@@ -39,7 +38,7 @@ class AngleDirections extends Directions {
         super(prec);
         this.angle = angle;
     }
-    getRandomSpeed() {
+    getRandomVelocity() {
         let val = Math.random() * this.prec * 2 - this.prec;
         return Vector2.fromAngle(this.angle + val);
     }
@@ -96,6 +95,9 @@ class ParticleSpawnerObject extends SceneObject {
         const name = `Particle #${this.particleNumber++} from ${this.name}`; 
         this.spawns[name] = new ParticleObject(this, name, this.home, this.engine);
     }
+    hasMoved() {
+        return true;
+    }
     engineUpdate() {
         if (this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
             let len = 1;
@@ -130,7 +132,7 @@ class ParticleObject extends SceneObject {
 
         let varianceVector = new Vector2(sp.particleSpeedVariance, 0);
         varianceVector.angle = Math.random() * 2 * Math.PI;
-        let vel = sp.particleDirections.getRandomSpeed().times(sp.particleInitSpeed).plus(varianceVector);
+        let vel = sp.particleDirections.getRandomVelocity().times(sp.particleInitSpeed).plus(varianceVector);
         vel.rotate(sp.transform.rotation);
         this.velocity = vel;
         this.layer = sp.layer;
