@@ -619,6 +619,10 @@ class Artist {
 	get alpha() {
 		return this.c.globalAlpha;
 	}
+	setCursor(cursor) {
+		let style = this.canvas.style;
+		if ("cursor" in style) style.cursor = cursor;
+	}
 	getPixel(x, y) {
 		let d = this.c.getImageData(x * devicePixelRatio, y * devicePixelRatio, 1, 1).data;
 		return new Color(d[0], d[1], d[2], d[3] / 255);

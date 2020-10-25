@@ -18,6 +18,21 @@ function define(name, value) {
 		}
 	});
 }
+Object.defineProperty(window, "title", {
+	get() {
+		let tag = document.getElementsByTagName("title")[0];
+		if (!tag) return "";
+		return tag.innerText;
+	},
+	set(a) {
+		let tag = document.getElementsByTagName("title")[0];
+		if (!tag) {
+			tag = document.createElement("title");
+			document.head.appendChild(tag);
+		}
+		tag.innerText = a;
+	}
+});
 let globalSquareRoots = 0;
 let sqrt = Math.sqrt.bind(Math);
 Math.sqrt = function (n) {

@@ -7,11 +7,11 @@ load(String.raw`
 	(/p)
 	(2)Type(/2)
 	(p)**
-		class WebcamCapture extends #ImageType# { ... }
+	class WebcamCapture extends #ImageType# { ... }
 	**(/p)
 	(2)Syntax(/2)
 	(p)**
-		new WebcamCapture()
+	new WebcamCapture()
 	**(/p)
 	(2)Properties(/2)
 	(p)

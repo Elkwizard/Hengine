@@ -1,5 +1,5 @@
 // Specify path for any component (Sounds, Sprites, Code, etc...) to get it from somewhere else.
-const APPLICATION_PACKAGE = Hengine.defaultApplicationPackage(["LocalFiles", "ScriptList", "ContainerList", "Source"]);
+const APPLICATION_PACKAGE = HengineLoader.defaultApplicationPackage(["LocalFiles", "ScriptList", "ContainerList", "Source"]);
 APPLICATION_PACKAGE.sprites = {
 	files: {
 		".": [] // Put image names here
@@ -24,4 +24,4 @@ APPLICATION_PACKAGE.sounds = {
 		".": [] // Put sound names here
 	}
 };
-Hengine.load(APPLICATION_PACKAGE);
+HengineLoader.load(APPLICATION_PACKAGE);

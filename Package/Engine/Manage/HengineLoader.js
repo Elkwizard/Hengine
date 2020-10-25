@@ -4,24 +4,16 @@ class ApplicationPackageElement {
 	}
 }
 class ApplicationPackage {
-	constructor(engine, code, art, animations, sound, canvas) {
+	constructor(engine, code, art, animations, sound) {
 		this.engine = new ApplicationPackageElement(engine);
 		this.code = new ApplicationPackageElement({ ".": code });
 		this.sprites = new ApplicationPackageElement({ ".": art });
 		this.animations = new ApplicationPackageElement({ ".": animations });
 		this.sounds = new ApplicationPackageElement({ ".": sound });
-		this.utility = !canvas;
 	}
 }
-//create game loop
+//create animation loop
 (function () {
-	window.intervals = [];
-	setInterval(function () {
-		for (let fn of window.intervals) {
-			fn();
-		}
-	}, 16);
-
 	window.animationFrames = [];
 	function animate() {
 		requestAnimationFrame(animate);
@@ -33,68 +25,41 @@ class ApplicationPackage {
 })();
 function exit(...msg) { 
 	console.log(...msg);
-	window.intervals = [];
 	window.animationFrames = [];
 }
-class Hengine {
-	constructor(utility, wrapper = document.body) {
-		if (!window.HENGINE_EXISTS) {
-			window.HENGINE_EXISTS = true;
-		} else throw new Error("Multiple Hengines");
-		//everything needs randomness
-		this.randomSeed = 1;
-		window.rand = this.rand.bind(this);
-
-		//create engine
-		if (!utility) {
-			document.body.style.margin = 0;
-			document.body.style.overflow = "hidden";
-
-			document.head.innerHTML += `<link rel="icon" href="https://elkwizard.github.io/Hengine/Package/favicon.ico" type="image/x-icon"></link>`;
-		}
-		
-		this.gameEngine = new Engine(utility, wrapper);
-		this.scene = this.gameEngine.scene;
-		this.renderer = this.gameEngine.renderer;
-		this.keyboard = this.gameEngine.keyboard;
-		this.mouse = this.gameEngine.mouse;
-		this.clipboard = this.gameEngine.clipboard;
-		this.fileSystem = this.gameEngine.fileSystem;
-		this.colorLibrary = new ColorLibrary();
-		this.soundLibrary = new SoundLibrary();
+class HengineLoader {
+	constructor(wrapper = document.body) {
+		this.hengine = new Hengine(wrapper);
 		
 		//window
-		window.cl = this.colorLibrary;
-		window.sl = this.soundLibrary;
-		window.gameEngine = this.gameEngine;
-		window.scene = this.scene;
-		window.renderer = this.renderer;
-		window.colorLibrary = this.colorLibrary;
-		window.soundLibrary = this.soundLibrary;
-		window.keyboard = this.keyboard;
-		window.mouse = this.mouse;
-		window.clipboard = this.clipboard;
-		window.fileSystem = this.fileSystem;
+		window.cl = this.hengine.colorLibrary;
+		window.hengine = this.hengine;
+		window.scene = this.hengine.scene;
+		window.renderer = this.hengine.renderer;
+		window.keyboard = this.hengine.keyboard;
+		window.mouse = this.hengine.mouse;
+		window.clipboard = this.hengine.clipboard;
+		window.fileSystem = this.hengine.fileSystem;
 
 		let hengine = this;
 		if (!(window.width || window.height || window.middle)) {
 			Object.defineProperty(window, "middle", {
 				get: function() {
-					return new Vector2(hengine.renderer.width / 2, hengine.renderer.height / 2);
+					return new Vector2(hengine.hengine.renderer.width / 2, hengine.hengine.renderer.height / 2);
 				}
 			});
 			Object.defineProperty(window, "width", {
 				get: function () {
-					return hengine.renderer.width;
+					return hengine.hengine.renderer.width;
 				}
 			});
 			Object.defineProperty(window, "height", {
 				get: function () {
-					return hengine.renderer.height;
+					return hengine.hengine.renderer.height;
 				}
 			});
 		}
-		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound", "setTitle", "setCursor"];
+		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound"];
 		for (let EXP of EXPORT) {
 			window[EXP] = this[EXP].bind(this);
 		}
@@ -106,7 +71,6 @@ class Hengine {
 		this.images = {};
 		this.sounds = {};
 
-
 		//title
 		let script = document.createElement("script");
 		script.src = "./Source.js";
@@ -117,30 +81,7 @@ class Hengine {
 			ti = unescape(ti);
 		} else ti = "Unknown";
 
-		this.setTitle(ti);
-
-		//defaults
-		this.initDefaults();
-	}
-	initDefaults() {
-		window.WALLS = scene.main.addContainer("WALLS", false);
-		let { width, height } = this.renderer;
-		WALLS.addPhysicsRectElement("Ceiling", width / 2, -50, width, 100, false);
-		WALLS.addPhysicsRectElement("Floor", width / 2, height + 50, width, 100, false);
-		WALLS.addPhysicsRectElement("Left Wall", -50, height / 2, 100, height + 200, false);
-		WALLS.addPhysicsRectElement("Right Wall", width + 50, height / 2, 100, height + 200, false);
-	}
-	setTitle(title) {
-		let t = document.querySelector("title");
-		if (!t) {
-			t = document.createElement("title");
-			document.head.appendChild(t);
-		}
-		t.innerHTML = title;
-		return title;
-	}
-	setCursor(cursor) {
-		document.body.style.cursor = cursor;
+		window.title = ti;
 	}
 	initImage(src) {
 		return new HImage(src);
@@ -160,16 +101,6 @@ class Hengine {
 	loadAnimation(src) {
 		return this.animations[src].get();
 	}
-	rand(sd) {
-		let seed = this.randomSeed++;
-		if (sd !== undefined) seed = sd;
-		seed += 1e5;
-		let a = (seed * 6.12849) % 8.7890975
-		let b = (a * 256783945.4758903) % 238462.567890;
-		let r = (a * b) % 1;
-		this.randomSeed += r;
-		return r;
-	}
 	static get defaultPreloadPackage() {
 		return ["PrototypeOverload"];
 	}
@@ -177,13 +108,13 @@ class Hengine {
 		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "GrayMap", "Frame", "Animation", "Texture", "Webcam", "GPUShader", "Font", "Renderer", "Graph", "3DExperimental", "Camera"];
 	}
 	static get defaultManagementPackage() {
-		return ["ElementContainer", "Scenes", "IntervalFunction", "Engine", "Hengine"];
+		return ["ElementContainer", "Scenes", "IntervalFunction", "Engine", "HengineLoader"];
 	}
 	static get defaultMathPackage() {
 		return ["Operable", "Interpolation", "Random", "Vector", "Geometry", "Physics", "PhysicsAPI"];
 	}
 	static get defaultUtilityPackage() {
-		return ["Input", "Sound", "Time", "Console", "LocalFileSystem"];
+		return ["Input", "Sound", "Time", "LocalFileSystem"];
 	}
 	static get defaultSceneObjectPackage() {
 		return ["Scripts", "SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
@@ -193,20 +124,17 @@ class Hengine {
 	}
 	static get defaultEnginePackage() {
 		return {
-			Preload: Hengine.defaultPreloadPackage,
-			Math: Hengine.defaultMathPackage,
-			Render: Hengine.defaultRenderPackage,
-			Util: Hengine.defaultUtilityPackage,
-			SceneObject: Hengine.defaultSceneObjectPackage,
-			Manage: Hengine.defaultManagementPackage,
-			Scripts: Hengine.defaultScriptPackage
+			Preload: HengineLoader.defaultPreloadPackage,
+			Math: HengineLoader.defaultMathPackage,
+			Render: HengineLoader.defaultRenderPackage,
+			Util: HengineLoader.defaultUtilityPackage,
+			SceneObject: HengineLoader.defaultSceneObjectPackage,
+			Manage: HengineLoader.defaultManagementPackage,
+			Scripts: HengineLoader.defaultScriptPackage
 		};
 	}
-	static utilityApplicationPackage(code = []) {
-		return new ApplicationPackage(Hengine.defaultEnginePackage, code, [], [], [], false);
-	}
 	static defaultApplicationPackage(code = [], art = [], animations = [], music = []) {
-		return new ApplicationPackage(Hengine.defaultEnginePackage, code, art, animations, music, true);
+		return new ApplicationPackage(HengineLoader.defaultEnginePackage, code, art, animations, music);
 	}
 	static async load(scripts, onload = () => null) {
 		let scriptHome = document.querySelectorAll("script"); //find yourself
@@ -220,10 +148,13 @@ class Hengine {
 		pathSRC.pop();
 		pathSRC.pop();
 		pathSRC.pop();
-		let rootSrc = `${pathSRC.join("/")}/Engine`;
+		let rootSrc = pathSRC.join("/");
+		//icon
+		document.head.innerHTML += `<link rel="icon" href="${rootSrc}/favicon.ico" type="image/x-icon"></link>`;
+		rootSrc += "/Engine";
 		console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
 		function instantiateHengine() {
-			window.HENGINE = new Hengine(scripts.utility);
+			window.HENGINE = new HengineLoader(document.body);
 			onload();
 		}
 		for (let element in scripts) {
@@ -264,7 +195,7 @@ class Hengine {
 							}
 						}
 					} else {
-						if (file !== "Hengine") {
+						if (file !== "HengineLoader") {
 							if (file.match(/DATA/g)) {
 								eval(file.slice(5));
 							} else {
@@ -275,7 +206,7 @@ class Hengine {
 									script.src = src + ".js";
 									document.body.appendChild(script);
 									resource = script;
-									Hengine.scriptsLoaded.push(file);
+									HengineLoader.scriptsLoaded.push(file);
 								}
 							}
 						}
@@ -291,4 +222,4 @@ class Hengine {
 		}
 	}
 }
-Hengine.scriptsLoaded = [];
+HengineLoader.scriptsLoaded = [];

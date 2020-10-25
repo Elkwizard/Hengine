@@ -118,7 +118,7 @@ class Render3D {
         let mesh = new Mesh(triangles);
         mesh.render(c);
     }
-    static makeCube(x, y, z, w, h, d, color = cl.WHITE) {
+    static makeCube(x, y, z, w, h, d, color = Color.WHITE) {
         let mesh = new Mesh([
             new Tri(new Vector3(x - w / 2, y - h / 2, z - d / 2), new Vector3(x + w / 2, y - h / 2, z - d / 2), new Vector3(x + w / 2, y + h / 2, z - d / 2)),
             new Tri(new Vector3(x + w / 2, y + h / 2, z - d / 2), new Vector3(x - w / 2, y + h / 2, z - d / 2), new Vector3(x - w / 2, y - h / 2, z - d / 2)),
@@ -136,7 +136,7 @@ class Render3D {
         for (let tri of mesh.tris) tri.color = color;
         return mesh;
     }
-    static makeSphere(x, y, z, r, color = cl.WHITE, subdivisions = 3) {
+    static makeSphere(x, y, z, r, color = Color.WHITE, subdivisions = 3) {
         let m = Render3D.makeCube(x, y, z, 20, 20, 20, color);
         for (let i = 0; i < subdivisions; i++) m = m.subdivide();
         for (let tri of m.tris) for (let v of tri.vertices) {
@@ -146,7 +146,7 @@ class Render3D {
         }
         return m;
     }
-    static makeCylinder(X, Y, Z, r, h, color = cl.WHITE, RES = 10) {
+    static makeCylinder(X, Y, Z, r, h, color = Color.WHITE, RES = 10) {
         let tris = [];
         let total = RES;
         let radius = r;
@@ -201,7 +201,7 @@ Render3D.camera = {
 class Tri {
     constructor(a, b, c) {
         this.vertices = [a, b, c];
-        this.color = cl.WHITE;
+        this.color = Color.WHITE;
         this.middle = a.plus(b).plus(c).over(3);
     }
     get() {
@@ -364,7 +364,7 @@ class Mesh {
             //lighting
 
             let light = (ln.normalize().dot(Render3D.lightDirection) + 1) / 2;
-            let col = Color.lerp(t.color, cl.BLACK, (1 - light));
+            let col = Color.lerp(t.color, Color.BLACK, (1 - light));
             t_2.color = col;
 
 

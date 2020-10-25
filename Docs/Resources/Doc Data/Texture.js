@@ -7,7 +7,7 @@ load(String.raw`
 	(/p)
 	(2)Type(/2)
 	(p)**
-		class Texture extends #ImageType# { ... }
+	class Texture extends #ImageType# { ... }
 	**(/p)
 	(2)Syntax(/2)
 	(p)**

@@ -107,16 +107,16 @@ class Geometry {
         // for (let i = 0; i < pathGrid.length; i++) for (let j = 0; j < pathGrid[0].length; j++) {
         //     let v = pathGrid[i][j];
         //     if (v) {
-        //         renderer.stroke(cl.ORANGE, 2).arrow(point(i, j).times(CELL_SIZE), point(i, j).times(CELL_SIZE).plus(v.times(CELL_SIZE)));
+        //         renderer.stroke(Color.ORANGE, 2).arrow(point(i, j).times(CELL_SIZE), point(i, j).times(CELL_SIZE).plus(v.times(CELL_SIZE)));
         //     }
         // }
         // for (let i = 0; i < pointGrid.length; i++) for (let j = 0; j < pointGrid[0].length; j++) {
         //     let p = pointGrid[i][j];
         //     if (p) {
-        //         // renderer.stroke(cl.LIME, 3).circle(point(i, j), 5);
+        //         // renderer.stroke(Color.LIME, 3).circle(point(i, j), 5);
         //     }
         // }
-        // for(let p of startingPoints) renderer.draw(cl.PURPLE).circle(p.times(CELL_SIZE), 5);
+        // for(let p of startingPoints) renderer.draw(Color.PURPLE).circle(p.times(CELL_SIZE), 5);
         let polygons = [];
         // startingPoints = [];
         while (startingPoints.length) {
@@ -139,7 +139,7 @@ class Geometry {
             if (points.length && !counter) polygons.push(points);
         }
 
-        // for (let points of polygons) renderer.stroke(cl.PURPLE, 2).shape(...points);
+        // for (let points of polygons) renderer.stroke(Color.PURPLE, 2).shape(...points);
         return polygons.filter(poly => Geometry.isClockwise(poly));
     }
     static reimann(fn, a, b, iter = 1000, RRAM = false) {
@@ -535,8 +535,8 @@ class Geometry {
                 const INX = edges.indexOf(INTERSECT.segment);
                 const INX_A = INX;
                 const INX_B = (INX + 1) % vertices.length;
-                // renderer.draw(cl.RED).circle(vertices[INX_A], 5);
-                // renderer.draw(cl.RED).circle(vertices[INX_B], 5);
+                // renderer.draw(Color.RED).circle(vertices[INX_A], 5);
+                // renderer.draw(Color.RED).circle(vertices[INX_B], 5);
                 vertices.splice(INX_B, 0, INTERSECT.point);
 
                 const NEW_INX = vertices.indexOf(INTERSECT.point);
@@ -552,12 +552,12 @@ class Geometry {
                     polyB = [...vertices.slice(NEW_INX), ...vertices.slice(0, VERTEX_INX + 1)];
                 }
 
-                // renderer.stroke(cl.PURPLE, 4).shape(...polyA);
-                // renderer.stroke(cl.GREEN, 4).shape(...polyB);
+                // renderer.stroke(Color.PURPLE, 4).shape(...polyA);
+                // renderer.stroke(Color.GREEN, 4).shape(...polyB);
                 // console.log(NEW_INX);
 
-                // renderer.draw(cl.ORANGE).circle(INTERSECT.point, 5);
-                // renderer.draw(cl.YELLOW).circle(vertices[NEW_INX], 5);
+                // renderer.draw(Color.ORANGE).circle(INTERSECT.point, 5);
+                // renderer.draw(Color.YELLOW).circle(vertices[NEW_INX], 5);
                 try {
                     let polysA = Geometry.subdividePolygonList(polyA);
                     let polysB = Geometry.subdividePolygonList(polyB);
@@ -567,11 +567,11 @@ class Geometry {
                 }
             } else return [vertices];
 
-            // for (let seg of SEGMENTS) renderer.stroke(cl.PURPLE, 2).arrow(seg);
+            // for (let seg of SEGMENTS) renderer.stroke(Color.PURPLE, 2).arrow(seg);
 
-            // renderer.stroke(cl.ORANGE, 2).arrow(VERT_B, VERT_B.plus(AWAY.times(F)));
+            // renderer.stroke(Color.ORANGE, 2).arrow(VERT_B, VERT_B.plus(AWAY.times(F)));
 
-            // renderer.draw(convex ? cl.RED : cl.GREEN).circle(VERT_B, 3);
+            // renderer.draw(convex ? Color.RED : Color.GREEN).circle(VERT_B, 3);
         } else return [vertices];
     }
     static intersectRayLine(o, r, l) {

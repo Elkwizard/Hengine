@@ -102,12 +102,12 @@ class Color extends Operable {
 	}
 	static alpha(col, alpha) {
 		let cl = col.get();
-		cl.alpha = alpha;
+		Color.alpha = alpha;
 		return cl;
 	}
 	static colorScale(col, per) {
 		let cl = col.times(per);
-		cl.alpha = col.alpha;
+		Color.alpha = col.alpha;
 		return cl;
 	}
 	static saturate(col, a) {
@@ -374,36 +374,29 @@ Color.CSSColors = {
 	yellow: new Color(255, 255, 0),
 }
 Color.modValues = ["red", "green", "blue", "alpha"];
-class ColorLibrary {
-	constructor() {
-		this.RED = new Color("#f00");
-		this.BLUE = new Color("#00f");
-		this.YELLOW = new Color("#ff0");
-		this.GOLD = new Color("#d4af37");
-		this.GREEN = new Color("#090");
-		this.ORANGE = new Color("#f90");
-		this.PURPLE = new Color("#909");
-		this.MAGENTA = new Color("#f0f");
-		this.PINK = new Color(255, 192, 203);
-		this.BLANK = new Color(0, 0, 0, 0);
-		this.BLACK = new Color(0, 0, 0, 1);
-		this.WHITE = new Color(255, 255, 255, 1);
-		this.CYAN = new Color(0, 255, 255, 1);
-		this.GRAY = new Color(128, 128, 128, 1);
-		this.DARK_GRAY = new Color("#222");
-		this.LIGHT_GRAY = new Color("#ccc");
-		this.RAZZMATAZZ = new Color("#e3256b");
-		this.CREAM = new Color("#fff185");
-		this.LIME = new Color(0, 255, 0, 1);
-		this.BROWN = new Color("#7d5314");
-		this.DARK_BROWN = new Color("#5a2000");
-		this.SKY_BLUE = new Color("#87ceeb");
-		this.TOBIN = new Color("#20a02a");
-		this.ZOE = new Color("#261550");
-		this.MAX = new Color("#161616");
-		this.MOLLY = new Color("#8b8");
-	}
-	add(name, color) {
-		this[name.toUpperCase()] = color;
-	}
-}
+Color.RED = new Color("#f00");
+Color.BLUE = new Color("#00f");
+Color.YELLOW = new Color("#ff0");
+Color.GOLD = new Color("#d4af37");
+Color.GREEN = new Color("#090");
+Color.ORANGE = new Color("#f90");
+Color.PURPLE = new Color("#909");
+Color.MAGENTA = new Color("#f0f");
+Color.PINK = new Color(255, 192, 203);
+Color.BLANK = new Color(0, 0, 0, 0);
+Color.BLACK = new Color(0, 0, 0, 1);
+Color.WHITE = new Color(255, 255, 255, 1);
+Color.CYAN = new Color(0, 255, 255, 1);
+Color.GRAY = new Color(128, 128, 128, 1);
+Color.DARK_GRAY = new Color("#222");
+Color.LIGHT_GRAY = new Color("#ccc");
+Color.RAZZMATAZZ = new Color("#e3256b");
+Color.CREAM = new Color("#fff185");
+Color.LIME = new Color(0, 255, 0, 1);
+Color.BROWN = new Color("#7d5314");
+Color.DARK_BROWN = new Color("#5a2000");
+Color.SKY_BLUE = new Color("#87ceeb");
+Color.TOBIN = new Color("#20a02a");
+Color.ZOE = new Color("#261550");
+Color.MAX = new Color("#161616");
+Color.MOLLY = new Color("#8b8");

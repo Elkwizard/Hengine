@@ -1,5 +1,5 @@
 const TEXT_AREA = new ElementScript("TEXT_AREA", {
-	init(l, font, paddingEM = 0.5, multiline = true, renderText = (text, font, pos, getLoc) => l.renderer.draw(cl.BLACK).text(font, text, pos)) {
+	init(l, font, paddingEM = 0.5, multiline = true, renderText = (text, font, pos, getLoc) => l.renderer.draw(Color.BLACK).text(font, text, pos)) {
 		this.engine.scene.mouseEvents = true;
 		l.renderer = this.engine.renderer;
 		l.keyboard = this.engine.keyboard;
@@ -8,7 +8,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.focused = false;
 		l.value = "";
 		l.font = font;
-		l.caretColor = cl.BLACK;
+		l.caretColor = Color.BLACK;
 		l.highlightColor = new Color(0, 0, 255, 0.2);
 		l.multiline = multiline;
 		l.renderText = renderText;
@@ -263,8 +263,8 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 	update(l) {
 		let inTextArea = Geometry.pointInsideRect(this.transform.worldSpaceToModelSpace(l.mouse.screen), l.relativeTextViewBox);
 
-		if (inTextArea) setCursor("text");
-		else setCursor("default");
+		if (inTextArea) l.renderer.setCursor("text");
+		else l.renderer.setCursor("default");
 
 		if (l.mouse.justPressed("Left")) {
 			if (inTextArea) l.highlighting = l.select(l.mouse.screen, "start");
@@ -412,9 +412,9 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 				if (l.mouse.pressed("Left") && Geometry.pointInsideRect(localMouse, barX)) {
 					l.scrollOffset.x = Number.clamp(xFullSize * (localMouse.x - thumbX.width / 2 + width / 2) / fullScrollWidth, 0, xFullSize - xViewSize);
 				}
-				l.renderer.draw(cl.LIGHT_GRAY).rect(barX);
-				l.renderer.draw(cl.GRAY).rect(thumbX);
-				l.renderer.stroke(cl.BLACK).rect(barX);
+				l.renderer.draw(Color.LIGHT_GRAY).rect(barX);
+				l.renderer.draw(Color.GRAY).rect(thumbX);
+				l.renderer.stroke(Color.BLACK).rect(barX);
 			}
 		} else l.scrollOffset.x = 0;
 
@@ -426,13 +426,13 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 				l.scrollOffset.y = Number.clamp(yFullSize * (localMouse.y - thumbY.height / 2 + height / 2) / fullScrollHeight, 0, yFullSize - yViewSize);
 			}
 
-			l.renderer.draw(cl.LIGHT_GRAY).rect(barY);
-			l.renderer.draw(cl.GRAY).rect(thumbY);
-			l.renderer.stroke(cl.BLACK).rect(barY);
+			l.renderer.draw(Color.LIGHT_GRAY).rect(barY);
+			l.renderer.draw(Color.GRAY).rect(thumbY);
+			l.renderer.stroke(Color.BLACK).rect(barY);
 		} else l.scrollOffset.y = 0;
 
 
-		// l.renderer.stroke(cl.BLACK).rect(shape);
+		// l.renderer.stroke(Color.BLACK).rect(shape);
 
 		l.renderer.textMode = prevTextMode;
 

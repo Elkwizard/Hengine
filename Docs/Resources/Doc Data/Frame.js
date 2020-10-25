@@ -7,13 +7,15 @@ load(String.raw`
 	(/p)
 	(2)Type(/2)
 	(p)**
-		class Frame extends #ImageType# { ... }
+	class Frame extends #ImageType# { ... }
 	**(/p)
 	(2)Subclasses(/2)
-	(p)#Graph#(/p)
+	(p)
+		#GraphPlane#
+	(/p)
 	(2)Syntax(/2)
 	(p)**
-		new Frame(width, height)
+	new Frame(width, height)
 	**(/p)
 	(2)Parameters(/2)
 	(p)

@@ -1,8 +1,5 @@
-function P(x = 0, y = 0) {
-	return { x, y };
-}
-class Engine {
-	constructor(utility, wrapper = document.body) {
+class Hengine {
+	constructor(wrapper = document.body) {
 		this.fps = 60;
 		this.fpsContinuous = 0;
 		this.lastTime = performance.now();
@@ -11,41 +8,30 @@ class Engine {
 		this.frameLength = 0;
 		this.frameCount = 0;
 
-
 		this.paused = false;
 		this.output = function (m) {
 			alert(m);
 		}
-		this.console = new Console();
 		this.catchErrors = false;
-		try {
-			if (FunctionLibrary) {
-				this.f = new FunctionLibrary();
-			}
-		} catch (e) { }
 
 		//setup canvas and scene
-		let canvas;
+		// if (wrapper === document.body) {
+		// 	W = innerWidth;
+		// 	H = innerHeight;
+		// }
+		let canvas = document.createElement("canvas");
+		canvas.id = "hengineCanvas";
+
+		this.wrapper = wrapper;
+		this.wrapper.style.margin = 0;
+		this.wrapper.style.overflow = "hidden";
 		let bound = wrapper.getClientRects()[0];
 		let W = bound.width;
 		let H = bound.height;
-		if (wrapper === document.body) {
-			W = innerWidth;
-			H = innerHeight;
-		}
-		let wrp = document.body;
-		if (!utility) {
-			canvas = document.createElement("canvas");
-			canvas.id = "Engine Canvas";
-			wrapper.appendChild(canvas);
-			this.wrapper = wrapper;
-			wrp = canvas;
-		} else {
-			this.wrapper = document.body;
-			canvas = new OffscreenCanvas(1, 1);
-		}
-
-		this.mouse = new MouseHandler(this, wrp);
+		this.wrapper.appendChild(canvas);
+		
+		//Input / Output
+		this.mouse = new MouseHandler(this, canvas);
 		this.keyboard = new KeyboardHandler();
 		this.clipboard = new ClipboardHandler();
 		this.fileSystem = new FileSystem();
@@ -71,29 +57,15 @@ class Engine {
 						height: innerHeight
 					};
 				}
-				this.renderer.width = bound.width - 1;
-				this.renderer.height = bound.height - 1;
+				this.renderer.width = bound.width;
+				this.renderer.height = bound.height;
 				this.renderer.preservePixelart = pixelate;
 			}
 		}.bind(this));
 		this.graphs = [];
-		// this.fpsGraph = this.makeGraph("FPS", 0, 60, e => Math.floor(this.fpsContinuous), 2000, [
-		// 	{
-		// 		limit: 50,
-		// 		color: "lime"
-		// 	},
-		// 	{
-		// 		limit: 30,
-		// 		color: "yellow"
-		// 	},
-		// 	{
-		// 		limit: 15,
-		// 		color: "orange"
-		// 	},
-		// 	{
-		// 		color: "red"
-		// 	}
-		// ]);
+		this.fpsGraph = this.makeGraphPlane([
+			new Graph("FPS", () => this.fpsContinuous, 0, 60, Color.LIME, 1)
+		], 2000);
 	}
 	engineUpdate() {
 		try {
@@ -141,11 +113,7 @@ class Engine {
 		return this.fpsGraph.get();
 	}
 	end() {
-		this.pause();
-		this.animate = a => a;
-		this.engineUpdate = a => a;
-		M.clearListeners();
-		K.clearListeners();
+		exit("Ended");
 		let canvas = document.getElementById(this.renderer.canvas.id);
 		if (canvas) canvas.outerHTML = "";
 	}

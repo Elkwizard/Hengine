@@ -177,6 +177,7 @@
 	padding: 0.2em;
 	display: inline-block;
 	border-radius: 0.15em;
+	margin: 0.1em;
 	white-space: pre;
 }
 .code-snippet {

@@ -53,7 +53,7 @@ class Texture extends ImageType {
 	clear() {
 		let height = this.pixels[0].length;
 		let width = this.pixels.length;
-		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.act_set(i, j, cl.BLANK);
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.act_set(i, j, Color.BLANK);
 	}
 	getPixel(x, y) {
 		if (this.pixels[x] && this.pixels[x][y]) return this.pixels[x][y];

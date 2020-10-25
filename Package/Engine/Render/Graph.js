@@ -29,7 +29,7 @@ class Graph {
         let width = this.plane.font.getTextWidth(text);
         let height = this.plane.font.getTextHeight(text);
         renderer.draw(new Color(0, 0, 0, 0.7)).rect(point.x - width - this.plane.font.lineHeight / 2, point.y - this.plane.font.lineHeight / 2, width + this.plane.font.lineHeight, height + this.plane.font.lineHeight);
-        // renderer.draw(cl.BLACK).text(this.plane.font, text, point.plus(1));
+        // renderer.draw(Color.BLACK).text(this.plane.font, text, point.plus(1));
         renderer.draw(this.color).text(this.plane.font, text, point);
     }
     getRemappedData() {
@@ -62,9 +62,9 @@ class GraphPlane extends Frame {
         this.frameLimit = frameLimit;
         this.stepSize = Math.ceil(this.frameLimit / 300);
         this.minFrame = 0;
+        this.frameCount = 0;
 
         this.font = new Font(10, "Serif");
-
         this.lastImgTime = -20;
 
         let bottomOffset = this.font.lineHeight * 2;
@@ -77,21 +77,20 @@ class GraphPlane extends Frame {
         }
         let renderer = this.renderer;
         renderer.clear();
-        renderer.draw(cl.BLACK).rect(this.boundingRect);
+        renderer.draw(Color.BLACK).rect(this.boundingRect);
         renderer.textMode = TextMode.BOTTOM_LEFT;
         let minTime = Math.max(0, performance.now());
         let timeLimit = this.frameLimit * 16;
-        renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame)} F / ${Time.formatMS(minTime)}`, this.boundingRect.xRange.min + this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
+        renderer.draw(Color.WHITE).text(this.font, `${formatTime(this.minFrame)} F / ${Time.formatMS(minTime)}`, this.boundingRect.xRange.min + this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
         renderer.textMode = TextMode.BOTTOM_RIGHT;
-        renderer.draw(cl.WHITE).text(this.font, `${formatTime(this.minFrame + this.frameLimit)} F / ${Time.formatMS(minTime + timeLimit)}`, this.boundingRect.xRange.max - this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
+        renderer.draw(Color.WHITE).text(this.font, `${formatTime(this.minFrame + this.frameLimit)} F / ${Time.formatMS(minTime + timeLimit)}`, this.boundingRect.xRange.max - this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].draw(renderer);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].label(renderer);
-        renderer.stroke(cl.WHITE).rect(this.boundingRect);
-        renderer.stroke(cl.WHITE).line(this.graphRect.xRange.min, this.graphRect.yRange.max, this.graphRect.xRange.max, this.graphRect.yRange.max);
+        renderer.stroke(Color.WHITE).rect(this.boundingRect);
+        renderer.stroke(Color.WHITE).line(this.graphRect.xRange.min, this.graphRect.yRange.max, this.graphRect.xRange.max, this.graphRect.yRange.max);
     }
     update() {
-        
-        let t = gameEngine.frameCount;
+        let t = this.frameCount++;
         this.minFrame = Math.max(0, t - this.frameLimit);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].update(t);
     }

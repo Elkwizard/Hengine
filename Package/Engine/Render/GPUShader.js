@@ -5,7 +5,7 @@ class GPUShader extends ImageType {
 		this.errorLog = [];
 		this.compiled = null;
 		this.arguments = { };
-		this.shadeRects = [];
+		this.shadeRects = [new Rect(0, width)];
 		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
 		this.c = this.image.getContext("webgl");
 		if (this.c === null) return console.warn("Your browser doesn't support webgl.");
@@ -19,7 +19,7 @@ class GPUShader extends ImageType {
 		this.amountVertices = 4;
 		this.loaded = false;
 	}
-	setShadeRects(rects, redraw = true) {
+	setShadeRects(rects) {
 		this.shadeRects = rects;
 		let a = Vector2.origin;
 		let b = new Vector2(this.width, this.height);
@@ -46,7 +46,7 @@ class GPUShader extends ImageType {
 		this.shadingRectPositions = positions;
 		this.amountVertices = this.shadingRectPositions.length / 2;
 		this.updatePositionBuffer();
-		if (redraw) this.shade();
+		this.loaded = false;
 	}
 	updatePositionBuffer() {
 		const c = this.c;
@@ -67,7 +67,7 @@ class GPUShader extends ImageType {
 		c.uniform1f(c.getUniformLocation(shaderProgram, "halfHeight"), this.height / 2);
 		c.viewport(0, 0, this.image.width, this.image.height);
 	}
-	resize(width, height, redraw = true) {
+	resize(width, height) {
 		width = Math.max(1, Math.abs(Math.floor(width)));
 		height = Math.max(1, Math.abs(Math.floor(height)));
 		this.image.width = width * devicePixelRatio;
@@ -75,7 +75,7 @@ class GPUShader extends ImageType {
 		this.width = width;
 		this.height = height;
 		this.updateResolutionUniforms();
-		if (redraw) this.shade();
+		this.loaded = false;
 	}
 	shade() {
 		this.loaded = true;
@@ -182,9 +182,11 @@ class GPUShader extends ImageType {
 		this.updatePositionBuffer();
 		this.updateResolutionUniforms();
 
+		this.loaded = false;
+
 		return true;
 	}
-	setArguments(uniformData = { }, redraw = true) {
+	setArguments(uniformData = { }) {
 		let { shaderProgram, uniformMap } = this.compiled;
 		const c = this.c;
 
@@ -254,7 +256,7 @@ class GPUShader extends ImageType {
 				}
 			}
 		}
-		if (redraw) this.shade();
+		this.loaded = false;
 	}
 	makeImage() {
 		if (!this.loaded) this.shade();

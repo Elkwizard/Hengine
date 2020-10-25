@@ -50,7 +50,7 @@ UIComponent.UI_LAYOUT = new ElementScript("UI_LAYOUT", {
         l.content = content;
         l.offset = new Vector2(x, y);
         l.scriptNumber = 1000;
-        l.color = cl.BLACK;
+        l.color = Color.BLACK;
         l.renderer = this.engine.renderer;
     },
     draw(l) {

@@ -10,22 +10,22 @@ class ElementContainer {
 		this.defaults = {
 			SceneObject: {
 				draw(name, shape) {
-					renderer.draw(cl.BLACK).infer(shape);
-					renderer.stroke(cl.CYAN, 1).infer(shape);
+					renderer.draw(Color.BLACK).infer(shape);
+					renderer.stroke(Color.CYAN, 1).infer(shape);
 				},
 				scripts: []
 			},
 			PhysicsObject: {
 				draw(name, shape) {
-					renderer.draw(cl.BLACK).infer(shape);
-					renderer.stroke(cl.RED, 1).infer(shape);
+					renderer.draw(Color.BLACK).infer(shape);
+					renderer.stroke(Color.RED, 1).infer(shape);
 				},
 				scripts: []
 			},
 			UIObject: {
 				draw(name, shape) {
-					renderer.draw(cl.WHITE).infer(shape);
-					renderer.stroke(cl.BLACK, 1).infer(shape);
+					renderer.draw(Color.WHITE).infer(shape);
+					renderer.stroke(Color.BLACK, 1).infer(shape);
 				},
 				scripts: []
 			},
@@ -35,7 +35,7 @@ class ElementContainer {
 			},
 			ParticleObject: {
 				draw(name, shape) {
-					renderer.draw(cl.BLACK).infer(shape);
+					renderer.draw(Color.BLACK).infer(shape);
 				},
 				scripts: []
 			}
