@@ -26,7 +26,7 @@ class DelayedFunction extends IntervalFunction {
 		super(fn, wait, type);
 	}
 	respond() {
-		if (this.timer > this.interval) {
+		if (this.timer === this.interval) {
 			this.fn();
 		}
 	}

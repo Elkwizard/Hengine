@@ -2,6 +2,9 @@ class Random {
     static random() {
         return Random.seedRand(Random.seed++);
     }
+    static bool(chance) {
+        return Random.random() < chance;
+    }
     static range(min = 0, max = 1) {
         return Random.random() * (max - min) + min;
     }
