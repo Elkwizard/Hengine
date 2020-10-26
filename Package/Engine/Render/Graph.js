@@ -28,6 +28,7 @@ class Graph {
         renderer.textMode = TextMode.TOP_RIGHT;
         let width = this.plane.font.getTextWidth(text);
         let height = this.plane.font.getTextHeight(text);
+        point.x = Math.max(width + this.plane.font.lineHeight, point.x);
         renderer.draw(new Color(0, 0, 0, 0.7)).rect(point.x - width - this.plane.font.lineHeight / 2, point.y - this.plane.font.lineHeight / 2, width + this.plane.font.lineHeight, height + this.plane.font.lineHeight);
         // renderer.draw(Color.BLACK).text(this.plane.font, text, point.plus(1));
         renderer.draw(this.color).text(this.plane.font, text, point);
@@ -81,9 +82,9 @@ class GraphPlane extends Frame {
         renderer.textMode = TextMode.BOTTOM_LEFT;
         let minTime = Math.max(0, performance.now());
         let timeLimit = this.frameLimit * 16;
-        renderer.draw(Color.WHITE).text(this.font, `${formatTime(this.minFrame)} F / ${Time.formatMS(minTime)}`, this.boundingRect.xRange.min + this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
+        renderer.draw(Color.WHITE).text(this.font, `${formatTime(this.minFrame)}f`, this.boundingRect.xRange.min + this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
         renderer.textMode = TextMode.BOTTOM_RIGHT;
-        renderer.draw(Color.WHITE).text(this.font, `${formatTime(this.minFrame + this.frameLimit)} F / ${Time.formatMS(minTime + timeLimit)}`, this.boundingRect.xRange.max - this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
+        renderer.draw(Color.WHITE).text(this.font, `${formatTime(this.minFrame + this.frameLimit)}f`, this.boundingRect.xRange.max - this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].draw(renderer);
         for (let i = 0; i < this.graphs.length; i++) this.graphs[i].label(renderer);
         renderer.stroke(Color.WHITE).rect(this.boundingRect);

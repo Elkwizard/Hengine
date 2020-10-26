@@ -12,20 +12,9 @@ class ApplicationPackage {
 		this.sounds = new ApplicationPackageElement({ ".": sound });
 	}
 }
-//create animation loop
-(function () {
-	window.animationFrames = [];
-	function animate() {
-		requestAnimationFrame(animate);
-		for (let fn of window.animationFrames) {
-			fn();
-		}
-	}
-	animate();
-})();
 function exit(...msg) { 
 	console.log(...msg);
-	window.animationFrames = [];
+	IntervalManager.intervals = [];
 }
 class HengineLoader {
 	constructor(wrapper = document.body) {
@@ -40,6 +29,7 @@ class HengineLoader {
 		window.mouse = this.hengine.mouse;
 		window.clipboard = this.hengine.clipboard;
 		window.fileSystem = this.hengine.fileSystem;
+		window.intervals = this.hengine.intervals;
 
 		let hengine = this;
 		if (!(window.width || window.height || window.middle)) {
@@ -108,7 +98,7 @@ class HengineLoader {
 		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "GrayMap", "Frame", "Animation", "Texture", "Webcam", "GPUShader", "Font", "Renderer", "Graph", "3DExperimental", "Camera"];
 	}
 	static get defaultManagementPackage() {
-		return ["ElementContainer", "Scenes", "IntervalFunction", "Engine", "HengineLoader"];
+		return ["ElementContainer", "Scenes", "Intervals", "Hengine", "HengineLoader"];
 	}
 	static get defaultMathPackage() {
 		return ["Operable", "Interpolation", "Random", "Vector", "Geometry", "Physics", "PhysicsAPI"];

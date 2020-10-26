@@ -26,7 +26,11 @@ class ElementScript {
             for (let flag of flags) {
                 if (name === flag.join("") || name === flag.join("_") || name === flag.join("-")) {
 					let key = "script" + flag.map(e => e.capitalize()).join("");
-                    local[key] = local[key].add(fn);
+					let localFn = local[key].bind(bindTo);
+                    local[key] = function (...args) {
+						localFn();
+						return fn(...args);
+					}
                     exists[key] = true;
                     found = true;
                 }

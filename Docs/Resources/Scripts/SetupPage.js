@@ -2,7 +2,13 @@ const DOCS = {
 	"Structure": {
 		"Hengine": {},
 		"HengineLoader": {},
-		"IntervalFunction": {}
+		"Intervals": {
+			"IntervalFunction": {},
+			"DelayedFunction": {},
+			"TransitionFunction": {},
+			"ContinuousFunction": {},
+			"IntervalManager": {}
+		}
 	},
 	"Management": {
 		"Scene": {},

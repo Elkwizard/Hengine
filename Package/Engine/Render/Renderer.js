@@ -751,7 +751,7 @@ class Artist {
 	save() {
 		this.c.save();
 	}
-	restore() {
+	restore() {	
 		this.c.restore();
 	}
 	clearRect(x, y, w, h) {
@@ -765,6 +765,13 @@ class Artist {
 	}
 	clear() {
 		this.c.clearRect(0, 0, this.width, this.height);
+	}
+	clearScreen() {
+		this.clear();
+	}
+	fill(color) {
+		this.c.fillStyle = this.getContextColor(color);
+		this.c.fillRect(0, 0, this.width, this.height);
 	}
 	rotateAround(x, y, r) {
 		this.translate(x, y)

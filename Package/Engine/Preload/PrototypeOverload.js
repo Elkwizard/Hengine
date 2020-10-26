@@ -33,20 +33,7 @@ Object.defineProperty(window, "title", {
 		tag.innerText = a;
 	}
 });
-let globalSquareRoots = 0;
-let sqrt = Math.sqrt.bind(Math);
-Math.sqrt = function (n) {
-	globalSquareRoots++;
-	return sqrt(n);
-}
 //Function
-Function.prototype.add = function (fn = function () { }) {
-	let self = this;
-	return function (...a) {
-		self(...a);
-		return fn(...a);
-	};
-};
 Function.prototype.param = function (...args) {
 	return function () {
 		this(...args);
@@ -137,17 +124,6 @@ Number.prototype.toDegrees = function () {
 };
 Number.prototype.toRadians = function () {
 	return this * (Math.PI / 180);
-};
-Number.prototype.sin01 = function () {
-	return (Math.sin(this) + 1) / 2;
-};
-Number.prototype.cos01 = function () {
-	return (Math.cos(this) + 1) / 2;
-};
-Number.prototype.approxSqrt = function (amt = 5) {
-	let g = 1 / this;
-	for (let i = 0; i < amt; i++) g = (g + this / g) / 2;
-	return g;
 };
 Number.prototype.movedTowards = function (value, ferocity) {
 	let dir = ferocity * (value - this) * 2;
