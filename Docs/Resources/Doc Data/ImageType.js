@@ -13,15 +13,6 @@ load(String.raw`
 	(p)
 		#HImage#, #Frame#, #Animation#, #WebcamCapture#, #Texture#, #GraphPlane#, #GPUShader#.
 	(/p)
-	(2)Syntax(/2)
-	(p)**
-	new ImageType(width, height)
-	**(/p)
-	(2)Parameters(/2)
-	(p)
-		(param:width$Number$)The width in CSS Pixels of the ImageType.(/param)
-		(param:height$Number$)The height in CSS Pixels of the ImageType.(/param)
-	(/p)
 	(2)Properties(/2)
 	(p)
 		(prop:width$Number$)The width in CSS Pixels of the ImageType.(/prop)

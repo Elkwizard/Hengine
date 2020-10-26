@@ -168,7 +168,11 @@ class MouseHandler extends InputHandler {
 		};
 
 		//pointers and touch
-
+		function handle(e) {
+			if (e.type === "down") handleDown(e);
+			if (e.type === "up") handleUp(e);
+			if (e.type === "move") handleMove(e);
+		}
 		function mouseHandle(e) {
 			if (e.type === "mouseout") handle({
 				x: m.screen.x,
@@ -192,17 +196,19 @@ class MouseHandler extends InputHandler {
 				button: 0,
 				type: "up"
 			});
-			else handle({
-				x: p.pageX,
-				y: p.pageY,
-				button: 0,
-				type: { start: "down", end: "up", move: "move" }[e.type.slice(5)]
-			});
-		}
-		function handle(e) {
-			if (e.type === "down") handleDown(e);
-			if (e.type === "up") handleUp(e);
-			if (e.type === "move") handleMove(e);
+			else {
+				let type = { start: "down", end: "up", move: "move"}[e.type.slice(5)];
+				handle({
+					x: p.pageX,
+					y: p.pageY,
+					button: 0,
+					type
+				});
+				if (type === "down") {
+					m.screenLast = m.screen.get();
+					m.worldLast = m.world.get();	
+				}
+			}
 		}
 		el.addEventListener("mousedown", mouseHandle);
 		el.addEventListener("mousemove", mouseHandle);

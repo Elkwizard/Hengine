@@ -106,7 +106,7 @@ class Artist {
 				this.c.lineTo(v3.x, v3.y);
 				this.c.lineTo(v1.x, v1.y);
 			},
-			lineText(font, text, x, y) {
+			textLine(font, text, x, y) {
 				if (typeof x === "object") {
 					y = x.y;
 					x = x.x;
@@ -214,8 +214,8 @@ class Artist {
 					this.c.fillText(r.text, r.x, r.y);
 				}
 			},
-			lineText(font, text, x, y) {
-				let req = pathObj.lineText(font, text, x, y);
+			textLine(font, text, x, y) {
+				let req = pathObj.textLine(font, text, x, y);
 				this.c.fillText(req.text, req.x, req.y);
 			},
 			shape(v) {
@@ -266,8 +266,8 @@ class Artist {
 					this.c.strokeText(r.text, r.x, r.y);
 				}
 			},
-			lineText(font, text, x, y) {
-				let req = pathObj.lineText(font, text, x, y);
+			textLine(font, text, x, y) {
+				let req = pathObj.textLine(font, text, x, y);
 				this.c.strokeText(req.text, req.x, req.y);
 			},
 			connector(points) {
