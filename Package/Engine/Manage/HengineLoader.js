@@ -92,7 +92,7 @@ class HengineLoader {
 		return this.animations[src].get();
 	}
 	static get defaultPreloadPackage() {
-		return ["PrototypeOverload"];
+		return ["PrototypeOverload", "Lazy", "Operable"];
 	}
 	static get defaultRenderPackage() {
 		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "GrayMap", "Frame", "Animation", "Texture", "Webcam", "GPUShader", "Font", "Renderer", "Graph", "3DExperimental", "Camera"];
@@ -101,7 +101,7 @@ class HengineLoader {
 		return ["ElementContainer", "Scenes", "Intervals", "Hengine", "HengineLoader"];
 	}
 	static get defaultMathPackage() {
-		return ["Operable", "Interpolation", "Random", "Vector", "Geometry", "Physics", "PhysicsAPI"];
+		return ["Interpolation", "Random", "Vector", "Geometry", "Physics", "PhysicsAPI"];
 	}
 	static get defaultUtilityPackage() {
 		return ["Input", "Sound", "Time", "LocalFileSystem"];

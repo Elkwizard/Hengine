@@ -185,8 +185,11 @@
 }
 .code {
 	display: block;
+}
+.code, .code * {
 	background: lightgray;
 	color: black;
+	font-family: monospace;
 }
 .name {
 	font-family: var(--monospace);
@@ -214,4 +217,9 @@
 	width: 2.6em;
 	height: 2.6em;
 	/* padding: 0 !important; */
+}
+table td {
+	border-right: 1px var(--highlight) solid;
+	border-bottom: 1px var(--highlight) solid;
+	text-align: center;
 }

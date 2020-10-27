@@ -119,3 +119,12 @@ class Font {
 		return font;
 	}
 }
+Font.defaultFamilies = ["Serif", "Arial", "Cursive"];
+Font.defaultSizes = [];
+for (let i = 0; i < 20; i++) Font.defaultSizes.push((i + 1) * 5);
+for (let i = 0; i < Font.defaultSizes.length; i++) {
+	for (let j = 0; j < Font.defaultFamilies.length; j++) {
+		const NAME = Font.defaultFamilies[j] + Font.defaultSizes[i];
+		Lazy.define(Font, NAME, () => new Font(Font.defaultSizes[i], Font.defaultFamilies[j]));
+	}
+}

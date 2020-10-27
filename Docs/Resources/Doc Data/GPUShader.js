@@ -13,7 +13,15 @@ load(String.raw`
 	(/p)
 	(2)GLSL to JS Types(/2)
 	(p)
-		The type correspondences between languages are as follows: *float | int = Number*, *vec2 | ivec2 = #Vector2#*, *vec3 | ivec3 = #Vector3#*, *vec4 | ivec4 = #Vector4# | #Color#*, *sampler2D = #ImageType#*.
+		The type correspondences between languages are as follows: 
+		(p2)**<table>
+			<tr><td>GLSL</td><td>JS</td></tr>
+			<tr><td>float | int</td><td>Number</td></tr>
+			<tr><td>vec2 | ivec2</td><td>#Vector2#</td></tr>
+			<tr><td>vec3 | ivec3</td><td>#Vector3#</td></tr>
+			<tr><td>vec4 | ivec4</td><td>#Vector4# | #Color#</td></tr>
+			<tr><td>sampler2D</td><td>#ImageType#</td></tr>
+		</table>**(/p2)
 	(/p)
 	(2)Type(/2)
 	(p)**

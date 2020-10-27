@@ -102,12 +102,12 @@ class Color extends Operable {
 	}
 	static alpha(col, alpha) {
 		let cl = col.get();
-		Color.alpha = alpha;
+		cl.alpha = alpha;
 		return cl;
 	}
 	static colorScale(col, per) {
 		let cl = col.times(per);
-		Color.alpha = col.alpha;
+		cl.alpha = col.alpha;
 		return cl;
 	}
 	static saturate(col, a) {

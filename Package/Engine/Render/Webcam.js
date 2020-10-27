@@ -4,9 +4,10 @@ class WebcamCapture extends ImageType {
 		this.data = { video: null };
 		this.loaded = false;
 		WebcamCapture.getWebcam(this.data);
-		this.lastCaptureTime = 0;
-		this.lastCapture = null;
+		this.lastCaptureTime = -20;
 		this.recording = true;
+		this.image = new OffscreenCanvas(this.width, this.height);
+		this.c = this.image.getContext("2d");
 	}
 	static async getWebcam(home) {
 		const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -33,22 +34,19 @@ class WebcamCapture extends ImageType {
 	makeImage() {
 		if (this.data.video) {
 			this.loaded = true;
-			if ((this.recording && performance.now() - this.lastCaptureTime > 16) || !this.lastCapture) {
+			if ((this.recording && performance.now() - this.lastCaptureTime > 16)) {
 				const v = this.data.video;
 				let mwidth = Math.min(v.videoWidth, v.videoHeight);
 				let ox = (v.videoHeight < v.videoWidth) ? (v.videoWidth - mwidth) / 2 : 0;
 				let oy = (v.videoHeight > v.videoWidth) ? (v.videoHeight - mwidth) / 2 : 0;
 				this.width = mwidth;
 				this.height = mwidth;
-				const img = new_OffscreenCanvas(mwidth, mwidth);
-				img.getContext("2d").drawImage(this.data.video, ox, oy, mwidth, mwidth, 0, 0, mwidth, mwidth);
-				this.lastCapture = img;
+				this.image.width = mwidth;
+				this.image.height = mwidth;
+				this.c.drawImage(this.data.video, ox, oy, mwidth, mwidth, 0, 0, mwidth, mwidth);
 				this.lastCaptureTime = performance.now();
-				return img;
-			} else {
-				return this.lastCapture;
 			}
-		} else return WebcamCapture.EMPTY;
+		}
+		return this.image;
 	}
 }
-WebcamCapture.EMPTY = new_OffscreenCanvas(1, 1);

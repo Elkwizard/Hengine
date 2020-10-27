@@ -211,7 +211,7 @@ class GPUShader extends ImageType {
 					let resolutions = [];
 					for (let i = 0; i < arraySize; i++) {
 						let unit = textureUnit++;
-						let tex = GPUShader.imageTypeToTexture(c, data[i], unit);
+						GPUShader.imageTypeToTexture(c, data[i], unit);
 						array.push(unit);
 						resolutions.push(data[i].width, data[i].height);
 					}
@@ -219,7 +219,7 @@ class GPUShader extends ImageType {
 					c.uniform2fv(c.getUniformLocation(shaderProgram, p[1]), new Float32Array(resolutions));
 				} else {
 					let unit = textureUnit++;
-					let tex = GPUShader.imageTypeToTexture(c, data, unit);
+					GPUShader.imageTypeToTexture(c, data, unit);
 					c.uniform1i(location, unit);
 					c.uniform2f(c.getUniformLocation(shaderProgram, p[0]), data.width, data.height);
 				}
@@ -264,15 +264,17 @@ class GPUShader extends ImageType {
 	}
 	static imageTypeToTexture(c, image, textureUnit) {
 		let tex = c.createTexture();
-		c.activeTexture(c.TEXTURE0 + textureUnit)
+		c.activeTexture(c.TEXTURE0 + textureUnit);
 		c.bindTexture(c.TEXTURE_2D, tex);
 
+		let gl_image = image.makeImage();
+		c.texImage2D(c.TEXTURE_2D, 0, c.RGBA, c.RGBA, c.UNSIGNED_BYTE, gl_image);
+
+		c.texParameteri(c.TEXTURE_2D, c.TEXTURE_MIN_FILTER, c.LINEAR);
+		c.texParameteri(c.TEXTURE_2D, c.TEXTURE_MAG_FILTER, c.LINEAR);
 		c.texParameteri(c.TEXTURE_2D, c.TEXTURE_WRAP_S, c.CLAMP_TO_EDGE);
 		c.texParameteri(c.TEXTURE_2D, c.TEXTURE_WRAP_T, c.CLAMP_TO_EDGE);
-		c.texParameteri(c.TEXTURE_2D, c.TEXTURE_MIN_FILTER, c.LINEAR);
-
-		c.texImage2D(c.TEXTURE_2D, 0, c.RGBA, c.RGBA, c.UNSIGNED_BYTE, image.makeImage());
-
+		
 		return {
 			width: image.width,
 			height: image.height,
