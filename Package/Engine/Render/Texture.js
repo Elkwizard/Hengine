@@ -5,6 +5,7 @@ class Texture extends ImageType {
 		this.renderer = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
 		this.pixels = Array.dimFilled(new Color(0, 0, 0, 0), this.width, this.height);
 		this.image = new_OffscreenCanvas(width, height);
+		this.c = this.image.getContext("2d");
 
 		//init image data
 		let array = new Uint8ClampedArray(4 * this.width * this.height);
@@ -137,8 +138,7 @@ class Texture extends ImageType {
 	makeImage() {
 		if (this.changed) {
 			this.changed = false;
-			let c = this.image.getContext("2d");
-			c.putImageData(this.imageData, 0, 0);
+			this.c.putImageData(this.imageData, 0, 0);
 		}
 		return this.image;
 	}
@@ -296,6 +296,7 @@ class Texture extends ImageType {
 			result.multiDimensional = true;
 			tex.pixels = result;
 			tex.updateImageData();
+			tex.changed = true;
 			return tex;
 		}
 		return inv_toString(str);

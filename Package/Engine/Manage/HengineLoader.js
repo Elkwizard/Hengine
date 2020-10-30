@@ -1,15 +1,16 @@
 class ApplicationPackageElement {
-	constructor(files) {
+	constructor(files, path) {
 		this.files = files;
+		this.path = path;
 	}
 }
 class ApplicationPackage {
 	constructor(engine, code, art, animations, sound) {
-		this.engine = new ApplicationPackageElement(engine);
-		this.code = new ApplicationPackageElement({ ".": code });
-		this.sprites = new ApplicationPackageElement({ ".": art });
-		this.animations = new ApplicationPackageElement({ ".": animations });
-		this.sounds = new ApplicationPackageElement({ ".": sound });
+		this.engine = new ApplicationPackageElement(engine, "");
+		this.code = new ApplicationPackageElement({ ".": code }, ".");
+		this.sprites = new ApplicationPackageElement({ ".": art }, "../Art/Sprites");
+		this.animations = new ApplicationPackageElement({ ".": animations }, "../Art/Animations");
+		this.sounds = new ApplicationPackageElement({ ".": sound }, "../Sounds");
 	}
 }
 function exit(...msg) { 
@@ -54,9 +55,6 @@ class HengineLoader {
 			window[EXP] = this[EXP].bind(this);
 		}
 
-		this.SPRITE_PATH = "../Art/Sprites/";
-		this.ANIMATION_PATH = "../Art/Animations/";
-		this.SOUND_PATH = "../Sound/";
 		this.animations = {};
 		this.images = {};
 		this.sounds = {};
@@ -147,18 +145,20 @@ class HengineLoader {
 			window.HENGINE = new HengineLoader(document.body);
 			onload();
 		}
-		for (let element in scripts) {
+		let elements = ["engine", "sprites", "animations", "sounds", "code"];
+		for (let element of elements) {
+			if (!scripts[element]) continue;
 			let path;
 			if (element === "engine") {
 				path = scripts[element].path ? scripts[element].path : rootSrc;
 			} else if (element === "sprites") {
-				path = scripts[element].path ? scripts[element].path : "../Art/Sprites";
+				path = scripts[element].path;
 			} else if (element === "animations") {
-				path = scripts[element].path ? scripts[element].path : "../Art/Animations";
+				path = scripts[element].path;
 			} else if (element === "sounds") {
-				path = scripts[element].path ? scripts[element].path : "../Sounds";
+				path = scripts[element].path;
 			} else if (element === "code") {
-				path = scripts[element].path ? scripts[element].path : ".";
+				path = scripts[element].path;
 			}
 			for (let folder in scripts[element].files) {
 				for (let file of scripts[element].files[folder]) {

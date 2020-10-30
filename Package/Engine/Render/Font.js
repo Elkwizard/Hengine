@@ -119,7 +119,7 @@ class Font {
 		return font;
 	}
 }
-Font.defaultFamilies = ["Serif", "Arial", "Cursive"];
+Font.defaultFamilies = ["Serif", "Arial", "Cursive", "Monospace"];
 Font.defaultSizes = [];
 for (let i = 0; i < 20; i++) Font.defaultSizes.push((i + 1) * 5);
 for (let i = 0; i < Font.defaultSizes.length; i++) {

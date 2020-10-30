@@ -1,6 +1,7 @@
 const DOCS = {
 	"Structure": {
 		"Hengine": {},
+		"ApplicationPackage": {},
 		"HengineLoader": {},
 		"Intervals": {
 			"IntervalFunction": {},
@@ -17,6 +18,7 @@ const DOCS = {
 	"Superclasses": {
 		"SceneObject": {},
 		"Operable": {},
+		"Lazy": {}
 	},
 	"Rendering": {
 		"Image Types": {
@@ -93,4 +95,4 @@ function getListHTML(name, obj) {
 	else return `<div class="nav-section"><span class="nav-section-header">${name}</span><ul class="nav-section-list">${values.map(k => `<li class="nav-section-item">${getListHTML(k, obj[k])}</li>`).join("")}</ul></div>`;
 }
 document.getElementById("navigation").innerHTML = getListHTML("Navigation", DOCS);
-loadPage("GPUShader");
+loadPage("IntervalFunction");

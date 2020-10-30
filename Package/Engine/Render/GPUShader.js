@@ -4,12 +4,14 @@ class GPUShader extends ImageType {
 		this.glsl = glsl;
 		this.errorLog = [];
 		this.compiled = null;
+		this.compileState = { compiled: false, error: "none" };
 		this.arguments = { };
 		this.shadeRects = [new Rect(0, width)];
 		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
 		this.c = this.image.getContext("webgl");
 		if (this.c === null) return console.warn("Your browser doesn't support webgl.");
-		this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.setShadeRects(this.shadeRects, false), this.setArguments(this.arguments)));
+		// this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.setShadeRects(this.shadeRects, false), this.setArguments(this.arguments)));
+		this.image.addEventListener("webglcontextrestored", e => console.log(e));
 		this.shadingRectPositions = [
 			-1, 1,
 			1, 1,
@@ -18,6 +20,7 @@ class GPUShader extends ImageType {
 		];
 		this.amountVertices = 4;
 		this.loaded = false;
+		this.currentTextureUnit = 0;
 	}
 	setShadeRects(rects) {
 		this.shadeRects = rects;
@@ -115,21 +118,25 @@ class GPUShader extends ImageType {
 			let isArray = !!args[4];
 			let arrayCount = isArray ? args[4] : 0;
 			let properties = [];
+			let textureUnit = this.currentTextureUnit;
 			if (isArray) defines.push(`${name}_length ${arrayCount}`);
 			if (type === "sampler2D") {
 				if (isArray) {
+					textureUnit += parseInt(arrayCount);
 					properties.push(`vec2 ${name}_resolution[${arrayCount}]`);
 				} else {
+					textureUnit++;
 					properties.push(`vec2 ${name}_resolution`);
 				}
 			}
 			uniformProperties.push(...properties);
-			uniforms.push({ precision, type, name, isArray, arrayCount, integer, properties: properties.map(p => {
+			uniforms.push({ precision, type, name, isArray, arrayCount, integer, textureUnit, properties: properties.map(p => {
 				let t = p.split(" ")[1];
 				let inx = t.indexOf("[");
 				if (inx > -1) return t.slice(0, inx);
 				else return t;	
 			}) });
+			this.currentTextureUnit = textureUnit;
 		}
 		let uniformMap = { };
 		for (let i = 0; i < uniforms.length; i++) {
@@ -156,16 +163,24 @@ class GPUShader extends ImageType {
 			`;
 		const errorlog = v => (this.errorLog.push(v), false);
 		//shader programs
+		let error = "none";
 		function compileShader(type, source) {
 			let shader = c.createShader(type);
 			c.shaderSource(shader, source);
 			c.compileShader(shader);
-			if (!c.getShaderParameter(shader, c.COMPILE_STATUS)) return errorlog("Shader didn't compile: " + c.getShaderInfoLog(shader));
+			if (!c.getShaderParameter(shader, c.COMPILE_STATUS)) {
+				error = c.getShaderInfoLog(shader)
+				return false;
+			}
 			return shader;
 		}
 		const vertexShader = compileShader(c.VERTEX_SHADER, vertexSource);
 		const pixelShader = compileShader(c.FRAGMENT_SHADER, pixelSource);
-		if (!pixelShader) return false;
+		if (!pixelShader) {
+			exit();
+			this.compileState = { compiled: false, error };
+			return false;
+		}
 		const shaderProgram = c.createProgram();
 		c.attachShader(shaderProgram, vertexShader);
 		c.attachShader(shaderProgram, pixelShader);
@@ -184,6 +199,7 @@ class GPUShader extends ImageType {
 
 		this.loaded = false;
 
+		this.compileState = { compiled: true, error };
 		return true;
 	}
 	setArguments(uniformData = { }) {
@@ -191,7 +207,6 @@ class GPUShader extends ImageType {
 		const c = this.c;
 
 		//uniforms in shader
-		let textureUnit = 0;
 		for (let arg in uniformData) {
 			let u = uniformMap[arg];
 			if (u === undefined) {
@@ -209,6 +224,7 @@ class GPUShader extends ImageType {
 					let array = [];
 					let arraySize = parseInt(u.arrayCount);
 					let resolutions = [];
+					let textureUnit = u.textureUnit;
 					for (let i = 0; i < arraySize; i++) {
 						let unit = textureUnit++;
 						GPUShader.imageTypeToTexture(c, data[i], unit);
@@ -218,7 +234,7 @@ class GPUShader extends ImageType {
 					c.uniform1iv(location, new Int32Array(array));
 					c.uniform2fv(c.getUniformLocation(shaderProgram, p[1]), new Float32Array(resolutions));
 				} else {
-					let unit = textureUnit++;
+					let unit = u.textureUnit;
 					GPUShader.imageTypeToTexture(c, data, unit);
 					c.uniform1i(location, unit);
 					c.uniform2f(c.getUniformLocation(shaderProgram, p[0]), data.width, data.height);

@@ -41,19 +41,19 @@ class Transform {
 		return v.rotated(this.rotation).Vplus(this.position);
 	}
 	drawInModelSpace(artist, renderer) {
-		renderer.translate(this.position.x, this.position.y);
 		let r = this.rotation;
-		if (r) renderer.rotate(this.rotation);
+		renderer.translate(this.position.x, this.position.y);
+		if (r) renderer.rotate(r);
 		artist();
-		if (r) renderer.rotate(-this.rotation);
+		if (r) renderer.rotate(-r);
 		renderer.translate(-this.position.x, -this.position.y);
 	}
 	drawInWorldSpace(artist, renderer) {
 		let r = this.rotation;
-		if (r) renderer.rotate(-this.rotation);
+		if (r) renderer.rotate(-r);
 		renderer.translate(-this.position.x, -this.position.y);
 		artist();
 		renderer.translate(this.position.x, this.position.y);
-		if (r) renderer.rotate(this.rotation);
+		if (r) renderer.rotate(r);
 	}
 }
