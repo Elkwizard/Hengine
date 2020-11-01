@@ -985,7 +985,9 @@ class Artist {
 		}
 		return function () { };
 	}
-	mesh(mesh) {
-		console.log(mesh)
+	webGL(gl) {
+		let glCanvas = new_OffscreenCanvas(this.canvas.width, this.canvas.height);
+		gl(glCanvas.getContext("webgl"));
+		this.c.drawImage(glCanvas, 0, 0, this.width, this.height);
 	}
 }

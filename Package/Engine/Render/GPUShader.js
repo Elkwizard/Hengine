@@ -72,7 +72,6 @@ class GPUShader extends ImageType {
 		let vertexPositionPointer = c.getAttribLocation(this.compiled.shaderProgram, "vertexPosition");
 		c.vertexAttribPointer(vertexPositionPointer, 2, c.FLOAT, false, 0, 0);
 		c.enableVertexAttribArray(vertexPositionPointer);
-		
 	}
 	updateResolutionUniforms() {
 		const c = this.c;
