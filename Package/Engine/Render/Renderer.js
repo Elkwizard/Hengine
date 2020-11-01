@@ -17,7 +17,7 @@ const TextModeY = {
 	CENTER: Symbol("CENTER"),
 	BOTTOM: Symbol("BOTTOM")
 };
-const TextMode = { };
+const TextMode = {};
 for (let x in TextModeX) for (let y in TextModeY) {
 	TextMode[y + "_" + x] = [TextModeX[x], TextModeY[y]];
 }
@@ -68,16 +68,32 @@ class Artist {
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);
 			},
 			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
+				if (typeof x === "object") {
+					counterClockwise = ea;
+					ea = sa;
+					sa = radius;
+					radius = y;
+					y = x.y;
+					x = x.x;
+				}
 				radius = Math.abs(radius);
 				this.c.beginPath();
 				this.c.arc(x, y, radius, startAngle, endAngle, counterClockwise);
 			},
-			sector(x, y, radius, startAngle, endAngle) {
+			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
+				if (typeof x === "object") {
+					counterClockwise = ea;
+					ea = sa;
+					sa = radius;
+					radius = y;
+					y = x.y;
+					x = x.x;
+				}
 				radius = Math.abs(radius);
 				this.c.beginPath();
 				this.c.moveTo(x, y);
 				this.c.lineTo(x + radius * Math.cos(startAngle), y + radius * Math.sin(startAngle));
-				this.c.arc(x, y, radius, startAngle, endAngle);
+				this.c.arc(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.lineTo(x, y);
 			},
 			ellipse(x, y, rx, ry) {
@@ -138,7 +154,7 @@ class Artist {
 				const tmh = font.getTextHeight(text);
 				const blocks = text.split("\n");
 				let textRequests = [];
-				const yOffset =  font.size * .24 - font.lineHeight / 2;
+				const yOffset = font.size * .24 - font.lineHeight / 2;
 				for (let i = 0; i < blocks.length; i++) {
 					let ax = x;
 					let ay = y + (i + 1) * font.lineHeight + yOffset;
@@ -173,7 +189,7 @@ class Artist {
 			},
 			validatePoints(points) {
 				return points.filter(e => {
-					if (Math.abs(e.x) > 100000) return false; 
+					if (Math.abs(e.x) > 100000) return false;
 					if (Math.abs(e.y) > 100000) return false;
 					return true;
 				});
@@ -226,7 +242,7 @@ class Artist {
 				if (obj.radius !== undefined) {
 					this.draw(this.c.fillStyle).circle(obj);
 				} else if (obj.width !== undefined) {
-					this.draw(this.c.fillStyle).rect(obj);	
+					this.draw(this.c.fillStyle).rect(obj);
 				} else if (obj.vertices !== undefined) {
 					this.draw(this.c.fillStyle).shape(obj.vertices);
 				}
@@ -335,12 +351,12 @@ class Artist {
 				let nx = -dy;
 				let ny = dx;
 				let m = Math.sqrt((dx ** 2) + (dy ** 2));
-			
+
 				if (!m) return;
 
 				nx *= height / m / 2;
 				ny *= height / m / 2;
-				
+
 				let length = (m - (width + font.size)) / 2;
 				dx *= length / m;
 				dy *= length / m;
@@ -350,7 +366,7 @@ class Artist {
 				this.c.lineTo(x + dx, y + dy);
 				this.c.stroke();
 
-				
+
 				this.c.beginPath();
 				this.c.moveTo(x1, y1);
 				this.c.lineTo(x1 - dx, y1 - dy);
@@ -374,7 +390,7 @@ class Artist {
 				this.c.moveTo(x + nx, y + ny);
 				this.c.lineTo(x - nx, y - ny);
 				this.c.stroke();
-				
+
 				//Right
 				this.c.beginPath();
 				this.c.moveTo(x1 + nx, y1 + ny);
@@ -382,8 +398,38 @@ class Artist {
 				this.c.stroke();
 
 			},
+			arcArrow(x, y, radius, sa, ea, counterClockwise) {
+				if (typeof x === "object") {
+					counterClockwise = ea;
+					ea = sa;
+					sa = radius;
+					radius = y;
+					y = x.y;
+					x = x.x;
+				}
+				this.c.beginPath();
+				this.c.arc(x, y, radius, sa, ea, counterClockwise);
+				this.c.stroke();
+				this.c.fillStyle = this.c.strokeStyle;
+				let ox = Math.cos(ea);
+				let oy = Math.sin(ea);
+				let px = x + ox * radius;
+				let py = y + oy * radius;
+				let nx = -oy;
+				let ny = ox;
+				if (counterClockwise) {
+					nx *= -1;
+					ny *= -1;
+				}
+				this.c.beginPath();
+				let l2 = this.c.lineWidth * 2;
+				this.c.moveTo(px + nx * l2 * 2, py + ny * l2 * 2);
+				this.c.lineTo(px - ox * l2, py - oy * l2);
+				this.c.lineTo(px + ox * l2, py + oy * l2);
+				this.c.fill();
+			},
 			arrow(x, y, x1, y1) {
-				if (typeof x == "object") {
+				if (typeof x === "object") {
 					if (x instanceof Line) {
 						x1 = x.b.x;
 						y1 = x.b.y;
@@ -426,7 +472,7 @@ class Artist {
 				if (obj.radius !== undefined) {
 					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).circle(obj);
 				} else if (obj.radius !== undefined) {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).rect(obj);	
+					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).rect(obj);
 				} else if (obj.vertices !== undefined) {
 					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).shape(obj.vertices);
 				} else if (obj instanceof Line) {
@@ -472,7 +518,7 @@ class Artist {
 				if (obj.radius !== undefined) {
 					this.clip().circle(obj);
 				} else if (obj.width !== undefined) {
-					this.clip().rect(obj);	
+					this.clip().rect(obj);
 				} else if (obj.vertices !== undefined) {
 					this.clip().shape(obj.vertices);
 				}
@@ -548,7 +594,7 @@ class Artist {
 				if (obj.radius !== undefined) {
 					this.image(this.imageStyle).circle(obj);
 				} else if (obj.width !== undefined) {
-					this.image(this.imageStyle).rect(obj);	
+					this.image(this.imageStyle).rect(obj);
 				} else if (obj.vertices !== undefined) {
 					this.image(this.imageStyle).shape(obj.vertices);
 				}
@@ -751,7 +797,7 @@ class Artist {
 	save() {
 		this.c.save();
 	}
-	restore() {	
+	restore() {
 		this.c.restore();
 	}
 	clearRect(x, y, w, h) {
@@ -841,7 +887,7 @@ class Artist {
 						this.c.strokeStyle = color;
 						this.c.beginPath();
 						this.c.moveTo(vert[0].x, vert[0].y);
-						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y); 
+						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y);
 						this.c.stroke();
 					}.bind(this);
 				}
@@ -876,7 +922,7 @@ class Artist {
 						this.c.fillStyle = color;
 						this.c.beginPath();
 						this.c.moveTo(vert[0].x, vert[0].y);
-						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y); 
+						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y);
 						this.c.fill();
 					}.bind(this);
 				}
@@ -946,13 +992,13 @@ class Artist {
 						this.c.save();
 						this.c.beginPath();
 						this.c.moveTo(v[0].x, v[0].y);
-						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y); 
+						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y);
 						this.c.clip();
 						this.c.drawImage(img, clipX, clipY, clipW, clipH, boundX, boundY, boundW, boundH);
 						this.c.restore();
 					}.bind(this);
 				}
-				
+
 				break;
 		}
 		return function () { };

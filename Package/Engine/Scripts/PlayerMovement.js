@@ -12,7 +12,7 @@ const PLAYER_MOVEMENT = new ElementScript("PLAYER_MOVEMENT", {
 		else if (l.keyboard.pressed(this.controls.right)) this.velocity.x += 0.1;
 		if (l.keyboard.pressed(this.controls.up)) {
 			if (this.colliding.bottom) {
-				this.velocity.y = -5;
+				this.velocity.y -= 5;
 			}
 		}
 	}
