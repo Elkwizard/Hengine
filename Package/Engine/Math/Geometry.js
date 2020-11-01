@@ -1,4 +1,18 @@
 class Geometry {
+    static triangulate(vertices) {
+        const result = [];
+        if (vertices.length < 3) return [];
+        if (vertices.length === 3) return [vertices];
+        for (let i = 0; i < vertices.length / 2; i++) {
+            let a = vertices[vertices.length - 1 - i];
+            let b = i ? vertices[vertices.length - i] : vertices[0];
+            let c = vertices[i + 1];
+            let d = vertices[i + 2];
+            if (a !== d) result.push([a, c, d], [a, b, c]);
+        }
+        if (vertices.length % 2 === 1) result.pop();
+        return result;
+    }
     static gridToPolygons(srcGrid, CELL_SIZE) {
 
         let grid = srcGrid.map(v => v);
@@ -619,52 +633,14 @@ class Geometry {
         return Vector2.sum(verts).over(verts.length);
     }
     static isClockwise(verts) {
-        //DAD_ALG
-        if (verts.length < 3) return true;
-        let bestY = Infinity;
-        let best = null;
+        //HENRY_ALG
+        let sum = 0;
         for (let i = 0; i < verts.length; i++) {
-            if (verts[i].y < bestY) {
-                bestY = verts[i].y;
-                best = verts[i];
-            }
-            if (best && verts[i].y === bestY && verts[i].x < best.x) best = verts[i]; 
+            let a = verts[i];
+            let b = verts[(i + 1) % verts.length];
+            sum += (b.x - a.x) * (a.y + b.y) / 2;
         }
-        if (!best) return true;
-
-        let greater = false;
-        for (let i = 0; i < verts.length; i++) {
-            if (verts[i].x > best.x) {
-                greater = true;
-                break;
-            }
-        }
-        let inxA = (verts.indexOf(best) + 1) % verts.length;
-        if (greater) {
-            let nextBestY = Infinity;
-            let nextBest = null;
-            for (let i = 0; i < verts.length; i++) {
-                if (verts[i] !== best && verts[i].y < nextBestY && verts[i].x > best.x) {
-                    nextBestY = verts[i].y;
-                    nextBest = verts[i];
-                }
-            }
-            let inxB = verts.indexOf(nextBest);
-            return inxA === inxB;
-        } else {
-            let nextBestY = Infinity;
-            let nextBest = null;
-            for (let i = 0; i < verts.length; i++) {
-                if (verts[i] !== best && verts[i].y < nextBestY) {
-                    nextBestY = verts[i].y;
-                    nextBest = verts[i];
-                }
-                if (nextBest && verts[i].y === nextBestY && verts[i].x < nextBest.x) nextBest = verts[i]; 
-            }
-            for (let i = 0; i < verts.length; i++)
-                if (verts[i] !== best && verts[i].x > nextBest.x && i === inxA) return true;
-            return false;
-        }
+        return sum < 0;
     }
     static clockwise(verts) {
         return Geometry.isClockwise(verts) ? verts : [...verts].reverse();

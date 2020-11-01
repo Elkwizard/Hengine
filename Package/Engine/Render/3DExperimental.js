@@ -1,23 +1,26 @@
 class Render3D {
     static rotatePointAround(origin, point, rotation) {
-        let x = point.x;
-        let y = point.y;
-        let z = point.z;
+
+        let x = point.x - origin.x;
+        let y = point.y - origin.y;
+        let z = point.z - origin.z;
         let r;
 
-        r = Geometry.rotatePointAround(new Vector2(origin.x, origin.z), new Vector2(x, z), rotation.y);
+
+        r = Geometry.rotatePointAround(Vector2.origin, new Vector2(y, z), rotation.x);
+        y = r.x;
+        z = r.y;
+        
+        r = Geometry.rotatePointAround(Vector2.origin, new Vector2(x, z), rotation.y);
         x = r.x;
         z = r.y;
 
-        r = Geometry.rotatePointAround(new Vector2(origin.y, origin.z), new Vector2(y, z), rotation.x);
-        y = r.x;
-        z = r.y;
 
-        r = Geometry.rotatePointAround(new Vector2(origin.x, origin.y), new Vector2(x, y), rotation.z);
+        r = Geometry.rotatePointAround(Vector2.origin, new Vector2(x, y), rotation.z);
         x = r.x;
         y = r.y;
 
-        return new Vector3(x, y, z);
+        return new Vector3(x, y, z).plus(origin);
     }
     static toScreen(p, transform = Render3D.getCameraTransform()) {
         let P = Render3D.projectVector3(Render3D.transformVector3(p, ...transform));
@@ -30,7 +33,7 @@ class Render3D {
         return new Vector3(x / z, y / z, v.z);
     }
     static getCameraTransform() {
-        return [-Render3D.camera.pos.x, -Render3D.camera.pos.y, -Render3D.camera.pos.z, Math.cos(Render3D.camera.rotation.x), Math.sin(Render3D.camera.rotation.x), Math.cos(Render3D.camera.rotation.y), Math.sin(Render3D.camera.rotation.y), Math.cos(Render3D.camera.rotation.z), Math.sin(Render3D.camera.rotation.z)];
+        return [-Render3D.camera.position.x, -Render3D.camera.position.y, -Render3D.camera.position.z, Math.cos(Render3D.camera.rotation.x), Math.sin(Render3D.camera.rotation.x), Math.cos(Render3D.camera.rotation.y), Math.sin(Render3D.camera.rotation.y), Math.cos(Render3D.camera.rotation.z), Math.sin(Render3D.camera.rotation.z)];
     }
     static rotateTransformVector3(v, ox, oy, oz, cosx, sinx, cosy, siny, cosz, sinz) {
         let x, t_x, y, t_y, z, t_z;
@@ -108,7 +111,7 @@ class Render3D {
     }
     static moveCameraAlongRotation(v) {
         let nr = Render3D.rotatePointAround(Vector3.origin, v, Render3D.camera.rotation.inverse);
-        Render3D.camera.pos.add(nr);
+        Render3D.camera.position.add(nr);
     }
     static renderScene(c, meshes) {
         let triangles = [];
@@ -118,7 +121,7 @@ class Render3D {
         let mesh = new Mesh(triangles);
         mesh.render(c);
     }
-    static makeCube(x, y, z, w, h, d, color = Color.WHITE) {
+    static makePrism(x, y, z, w, h, d, color = Color.WHITE) {
         let mesh = new Mesh([
             new Tri(new Vector3(x - w / 2, y - h / 2, z - d / 2), new Vector3(x + w / 2, y - h / 2, z - d / 2), new Vector3(x + w / 2, y + h / 2, z - d / 2)),
             new Tri(new Vector3(x + w / 2, y + h / 2, z - d / 2), new Vector3(x - w / 2, y + h / 2, z - d / 2), new Vector3(x - w / 2, y - h / 2, z - d / 2)),
@@ -137,7 +140,7 @@ class Render3D {
         return mesh;
     }
     static makeSphere(x, y, z, r, color = Color.WHITE, subdivisions = 3) {
-        let m = Render3D.makeCube(x, y, z, 20, 20, 20, color);
+        let m = Render3D.makePrism(x, y, z, 20, 20, 20, color);
         for (let i = 0; i < subdivisions; i++) m = m.subdivide();
         for (let tri of m.tris) for (let v of tri.vertices) {
             v.sub(m.middle);
@@ -195,7 +198,7 @@ Render3D.SOLID = Symbol("SOLID");
 Render3D.VERTEX = Symbol("VERTEX");
 Render3D.renderType = Render3D.SOLID;
 Render3D.camera = {
-    pos: new Vector3(0, 0, 0),
+    position: new Vector3(0, 0, 0),
     rotation: new Vector3(0, 0, 0)
 };
 class Tri {
@@ -203,6 +206,7 @@ class Tri {
         this.vertices = [a, b, c];
         this.color = Color.WHITE;
         this.middle = a.plus(b).plus(c).over(3);
+        this.sortZ = this.middle.z; //(a.x ** 2 + a.y ** 2 + b.x ** 2 + b.y ** 2 + c.x ** 2 + c.y ** 2) / 3;
     }
     get() {
         let t = new Tri(...this.vertices);
@@ -370,8 +374,7 @@ class Mesh {
 
             rTris.push(t_2);
         }
-        rTris.sort((a, b) => b.middle.z - a.middle.z);
-
+        rTris.sort((a, b) => b.sortZ - a.sortZ);
         if (Render3D.renderType === Render3D.SOLID) {
             for (let i = 0; i < rTris.length; i++) {
                 let tri = rTris[i];
@@ -383,7 +386,7 @@ class Mesh {
             for (let i = 0; i < rTris.length; i++) {
                 let tri = rTris[i];
                 let col = tri.color;
-                c.stroke(col, 1, "round").shape(...tri.vertices);
+                c.stroke(col, 1, "round").shape(tri.vertices);
             }
         } else if (Render3D.renderType === Render3D.VERTEX) {
             for (let i = 0; i < rTris.length; i++) {

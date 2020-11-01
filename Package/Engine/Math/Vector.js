@@ -1,159 +1,3 @@
-class Matrix {
-	constructor(height, width) {
-		this.cols = Array.dim(width, height).map(() => 0);
-	}
-	get() {
-		let m = new this.constructor(this.cols[0].length, this.cols.length);
-		m.cols = this.cols.map(e => e.map(e => e));
-		return m;
-	}
-	plus(v) {
-		if (typeof v === "number") return this.get().opNumber(v, (a, b) => a + b);
-		else {
-			if (v instanceof Vector) v = v.toMatrix();
-			return this.get().opMatrix(v, (a, b) => a + b);
-		}
-	}
-	minus(v) {
-		if (typeof v === "number") return this.get().opNumber(v, (a, b) => a - b);
-		else {
-			if (v instanceof Vector) v = v.toMatrix();
-			return this.get().opMatrix(v, (a, b) => a - b);
-		}
-	}
-	times(v) {
-		if (typeof v === "number") return this.get().opNumber(v, (a, b) => a * b);
-		else {
-			if (v instanceof Vector) v = v.toMatrix();
-			return this.mulMatrix(v);
-		}
-	}
-	map(fn) {
-		let g = this.get();
-		g.cols = g.cols.map((e, x) => e.map((e, y) => fn(e, x, y)));
-		return g;
-	}
-	reciprocal() {
-		return this.map(e => 1 / e);
-	}
-	opMatrix(n, fn) {
-		this.cols = this.cols.map((e, x) => e.map((e, y) => fn(e, n.cols[x][y])));
-		return this;
-	}
-	opNumber(n, fn) {
-		this.cols = this.cols.map(e => e.map(e => fn(e, n)));
-		return this;
-	}  
-	mulMatrix(m) {
-		let result = new Matrix(this.cols[0].length, m.cols.length);
-		for (let c = 0; c < m.cols.length; c++) {
-			for (let i = 0; i < this.cols[0].length; i++) {
-				let v = 0;
-				for (let j = 0; j < this.cols.length; j++) {
-					v += m.cols[c][j] * this.cols[j][i];
-				}
-				result.cols[c][i] = v;
-			}
-		}
-		return result;
-	}
-	toString() {
-		let result = [];
-		let vertical = String.fromCharCode(9474);
-		let maxLen = this.cols.map(e => Math.max(...e.map(e => e.toString().length)));
-		let amountSpaces = [];
-		for (let num of maxLen) amountSpaces.push(" ".repeat(num));
-		amountSpaces = amountSpaces.join(" ").length + 2;
-		let spaces = " ".repeat(amountSpaces);
-		for (let i = 0; i < this.cols[0].length; i++) {
-			let row = [];
-			for (let j = 0; j < this.cols.length; j++) {
-				let num = this.cols[j][i].toString();
-				num = " ".repeat(maxLen[j] - num.length) + num;
-				row.push(num);
-			}
-			result.push(vertical + " " + row.join(" ") + " " + vertical);
-		}
-		return String.fromCharCode(9484) + spaces + String.fromCharCode(9488) + "\n" + result.join("\n") + "\n" + String.fromCharCode(9492) + spaces + String.fromCharCode(9496);
-	}
-	toFixed(digits) {
-		return this.map(e => e.toFixed(digits)).toString();
-	}
-	toMaxed(digits) {
-		return this.map(e => e.toMaxed(digits)).toString();
-	}
-	equals(m) {
-		let equal = true;
-		check: for (let i = 0; i < this.cols.length; i++) for (let j = 0; j < this.cols[0].length; j++) if (Math.abs(this.cols[i][j] - m.cols[i][j]) > 0.00001) {
-			equal = false;
-			break check;
-		}
-		return equal;
-	}
-	*[Symbol.iterator]() {
-		for (let i = 0; i < this.cols.length; i++) for (let j = 0; j < this.cols[i].length; j++) yield this.cols[i][j];
-	}
-	static identity(dim) {
-		let m = new Matrix(dim, dim);
-		for (let i = 0; i < dim; i++) m.cols[i][i] = 1;
-		return m;
-	}
-	static rotation(angle) {
-		let c = Math.cos(angle);
-		let s = Math.sin(angle);
-		return new Matrix2x2(c, -s, s, c);
-	}
-}
-class Matrix2x2 extends Matrix {
-	constructor(m00 = 0, m10 = 0, m01 = 0, m11 = 0) {
-		super(2, 2);
-		this.cols[0][0] = m00;
-		this.cols[1][0] = m10;
-		this.cols[0][1] = m01;
-		this.cols[1][1] = m11;
-	}
-	get determinant() {
-		return this.cols[0][0] * this.cols[1][1] - this.cols[0][1] * this.cols[1][0];
-	}
-	get inverse() {
-		return (new Matrix2x2(this.cols[1][1], -this.cols[1][0], -this.cols[0][1], this.cols[0][0]).times(1 / this.determinant));
-	}
-}
-class Matrix3x3 extends Matrix {
-	constructor(m00 = 0, m10 = 0, m20 = 0, m01 = 0, m11 = 0, m21 = 0, m02, m12, m22) {
-		super(3, 3);
-		this.cols[0][0] = m00;
-		this.cols[1][0] = m10;
-		this.cols[2][0] = m20;
-		this.cols[0][1] = m01;
-		this.cols[1][1] = m11;
-		this.cols[2][1] = m21;
-		this.cols[0][2] = m02;
-		this.cols[1][2] = m12;
-		this.cols[2][2] = m22;
-	}
-}
-class Matrix4x4 extends Matrix {
-	constructor(m00 = 0, m01 = 0, m02 = 0, m03 = 0, m10 = 0, m11 = 0, m12 = 0, m13 = 0, m20 = 0, m21 = 0, m22 = 0, m23 = 0, m30 = 0, m31 = 0, m32 = 0, m33 = 0) {
-		super(4, 4);
-		this.cols[0][0] = m00;
-		this.cols[0][1] = m01;
-		this.cols[0][2] = m02;
-		this.cols[0][3] = m03;
-		this.cols[1][0] = m10;
-		this.cols[1][1] = m11;
-		this.cols[1][2] = m12;
-		this.cols[1][3] = m13;
-		this.cols[2][0] = m20;
-		this.cols[2][1] = m21;
-		this.cols[2][2] = m22;
-		this.cols[2][3] = m23;
-		this.cols[3][0] = m30;
-		this.cols[3][1] = m31;
-		this.cols[3][2] = m32;
-		this.cols[3][3] = m33;
-	}
-}
 class Vector extends Operable {
 	constructor() {
 		super();
@@ -310,6 +154,9 @@ class Vector1 extends Vector {
 	}
 	static get origin() {
 		return new Vector1(0);
+	}
+	static x(x) {
+		return new Vector1(x);
 	}
 	static random() {
 		return new Vector1((Math.random() * 2) - 1);
@@ -500,6 +347,12 @@ class Vector2 extends Vector {
 	static get origin() {
 		return new Vector2(0, 0);
 	}
+	static x(x) {
+		return new Vector2(x, 0);
+	}
+	static y(y) {
+		return new Vector2(0, y);
+	}
 	static random() {
 		return new Vector2((Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
@@ -545,6 +398,15 @@ class Vector3 extends Vector {
 	}
 	static get origin() {
 		return new Vector3(0, 0, 0);
+	}
+	static x(x) {
+		return new Vector3(x, 0, 0);
+	}
+	static y(y) {
+		return new Vector3(0, y, 0);
+	}
+	static z(z) {
+		return new Vector3(0, 0, z);
 	}
 	static fromPoint(p) {
 		return new Vector3(p.x, p.y, p.z);
@@ -594,6 +456,18 @@ class Vector4 extends Vector {
 	}
 	static get origin() {
 		return new Vector4(0, 0, 0, 0);
+	}
+	static x(x) {
+		return new Vector4(x, 0, 0, 0);
+	}
+	static y(y) {
+		return new Vector4(0, y, 0, 0);
+	}
+	static z(z) {
+		return new Vector4(0, 0, z, 0);
+	}
+	static w(w) {
+		return new Vector4(0, 0, 0, w);
 	}
 	static random() {
 		return new Vector4((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
