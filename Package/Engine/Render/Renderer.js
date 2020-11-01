@@ -17,7 +17,7 @@ const TextModeY = {
 	CENTER: Symbol("CENTER"),
 	BOTTOM: Symbol("BOTTOM")
 };
-const TextMode = {};
+const TextMode = { };
 for (let x in TextModeX) for (let y in TextModeY) {
 	TextMode[y + "_" + x] = [TextModeX[x], TextModeY[y]];
 }
@@ -751,24 +751,6 @@ class Artist {
 		this.translate(0, this.height);
 		this.scale(1, -1);
 	}
-	simpleCircle(color, border) {
-		return function () {
-			this.home.c.draw(color).circle(this.middle.x, this.middle.y, this.width / 2);
-			this.home.c.stroke(border, 2).circle(this.middle.x, this.middle.y, this.width / 2);
-		}
-	}
-	simpleRect(color, border) {
-		return function () {
-			this.home.c.draw(color).rect(this.x, this.y, this.width, this.height);
-			this.home.c.stroke(border, 2).rect(this.x, this.y, this.width, this.height);
-		}
-	}
-	drawCircle(color, x, y, radius) {
-		this.c.fillStyle = color;
-		this.c.beginPath();
-		this.c.arc(x, y, radius, 0, 2 * Math.PI);
-		this.c.fill();
-	}
 	translate(x, y) {
 		if (typeof x == "object") {
 			y = x.y;
@@ -1002,5 +984,8 @@ class Artist {
 				break;
 		}
 		return function () { };
+	}
+	mesh(mesh) {
+		console.log(mesh)
 	}
 }

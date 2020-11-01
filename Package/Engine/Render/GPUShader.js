@@ -1,10 +1,22 @@
+class GLSLError {
+	constructor(string, prefixLength) {
+		string = string.cut(":")[1];
+		let [lineStr, descStr] = string.cut(":");
+		lineStr = lineStr.trim();
+		this.line = parseInt(lineStr) - prefixLength;
+		this.desc = descStr.trim();
+	}
+	toString() {
+		return `line ${this.line}: ${this.desc}`;
+	}
+}
 class GPUShader extends ImageType {
 	constructor(width, height, glsl) {
 		super(width, height);
 		this.glsl = glsl;
 		this.errorLog = [];
 		this.compiled = null;
-		this.compileState = { compiled: false, error: "none" };
+		this.compileState = { compiled: false, error: null };
 		this.arguments = { };
 		this.shadeRects = [new Rect(0, width)];
 		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
@@ -85,6 +97,11 @@ class GPUShader extends ImageType {
 		this.c.clear(this.c.COLOR_BUFFER_BIT);
 		this.c.drawArrays(this.c.TRIANGLE_STRIP, 0, this.amountVertices);
 	}
+	formatError(string, prefixLength) {
+		let errors = string.split("ERROR: ");
+		errors.shift();
+		return errors.map(string => new GLSLError(string, prefixLength));
+	}
 	compile() {
 		//init
 		const c = this.c;
@@ -147,13 +164,9 @@ class GPUShader extends ImageType {
 		//composite pixelSource
 		let uniformPropertyDeclarations = uniformProperties.map(p => `uniform highp ${p};`).join("\n");
 		let defineDeclarations = defines.map(v => `#define ${v}`).join("\n");
+		const prefix = `uniform highp vec2 resolution;\n${defineDeclarations}\n${uniformPropertyDeclarations}\nvarying highp vec2 position;`;
 		const pixelSource = `
-				uniform highp vec2 resolution;
-				${defineDeclarations}
-				${uniformPropertyDeclarations}
-
-				varying highp vec2 position;
-				
+				${prefix}
 				${this.glsl}
 
 				void main() {
@@ -162,14 +175,16 @@ class GPUShader extends ImageType {
 				}
 			`;
 		const errorlog = v => (this.errorLog.push(v), false);
+		let prefixLength = prefix.split("\n").length + 1;
 		//shader programs
-		let error = "none";
+		let error = null;
+		let self = this;
 		function compileShader(type, source) {
 			let shader = c.createShader(type);
 			c.shaderSource(shader, source);
 			c.compileShader(shader);
 			if (!c.getShaderParameter(shader, c.COMPILE_STATUS)) {
-				error = c.getShaderInfoLog(shader)
+				error = self.formatError(c.getShaderInfoLog(shader), prefixLength);
 				return false;
 			}
 			return shader;

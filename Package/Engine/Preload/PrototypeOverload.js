@@ -141,7 +141,7 @@ String.prototype.cut = function (char) {
 	if (inx === -1) return [this, ""];
 	return [
 		this.slice(0, inx),
-		this.slice(inx)
+		this.slice(inx + 1)
 	];
 };
 String.prototype.indent = function () {

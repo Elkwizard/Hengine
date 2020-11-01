@@ -42,6 +42,7 @@ load(String.raw`
 		(prop:glsl $String$)The GLSL code to shade the domain of the GPUShader. While this value can be set, *.compile* needs to be called again before the drawn image will change.(/prop)
 		(prop:shadeRects $Rect[]$readonly)A list of #Rect#s within the boundary of the GPUShader that will have the shader run. Initially an empty array, signifying that the entire domain will be shaded.(/prop)
 		(prop:errorLog $String[]$readonly)A list of all of the GLSL errors thrown during compilation.(/prop)
+		(prop:compileState $Object$)An object with two properties, compiled$Boolean$ and error$GLSLError[]$. compiled will be whether or not the compilation was successful, and error is a list of all the errors that were thrown if it didn't compile.(/prop)
 	(/p)
 	(2)Methods(/2)
 	(p)

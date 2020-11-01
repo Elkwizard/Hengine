@@ -29,6 +29,7 @@ const DOCS = {
 			"Texture": {},
 			"WebcamCapture": {},
 			"GPUShader": {},
+			"GLSLError": {},
 			"GraphPlane": {},
 			"Graph": {}
 		},
