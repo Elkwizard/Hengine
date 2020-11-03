@@ -1,6 +1,5 @@
 class Render3D {
     static rotatePointAround(origin, point, rotation) {
-
         let x = point.x - origin.x;
         let y = point.y - origin.y;
         let z = point.z - origin.z;
@@ -200,6 +199,9 @@ class Mesh {
         this.tris = tris;
         this.middle = Vector3.origin;
         if (tris.length) this.middle = Vector3.sum(tris.map(tri => tri.middle)).div(tris.length);
+        this.vertexCount = this.tris.length * 3;
+        this.positionBuffer = null;
+        this.indexBuffer = null;
     }
     rotate(r, v = this.middle) {
         let ox = v.x, oy = v.y, oz = v.z;
@@ -264,94 +266,135 @@ class Mesh {
     project() {
         return this.each(tri => tri.project());
     }
-    render(c) {
-        const width = c.canvas.width;
-        const height = c.canvas.height;
-        let cameraTransform = Render3D.getCameraTransform();
+    process(renderer) {
+        const gl = renderer.gl.c;
+		const shaderProgram = renderer.gl.shaderProgram;
 
-        let rTris = [];
-        for (let i = 0; i < this.tris.length; i++) {
-            let t = this.tris[i];
-            //projection
+		//vertex positions
+		const positions = [];
+		for (let i = 0; i < this.tris.length; i++) {
+			const v = this.tris[i].vertices;
+			positions.push(
+				v[0].x, v[0].y, v[0].z,
+				v[1].x, v[1].y, v[1].z,
+				v[2].x, v[2].y, v[2].z
+			);
+		}
+
+		//fix position aspect ratios & invert y-axis
+		const AR = -renderer.width / renderer.height;
+		for (let i = 0; i < positions.length; i += 3) {
+			positions[i + 1] *= AR;
+		}
+
+		//vertex indices
+		const indices = [];
+		for (let i = 0; i < positions.length / 3; i++) indices.push(i);
+
+		//vertex normals
+		const indexNormals = [];
+		for (let i = 0; i < indices.length; i += 3) {
+			let ax = positions[indices[i + 0] * 3 + 0];
+			let ay = positions[indices[i + 0] * 3 + 1];
+			let az = positions[indices[i + 0] * 3 + 2];
+			let bx = positions[indices[i + 1] * 3 + 0];
+			let by = positions[indices[i + 1] * 3 + 1];
+			let bz = positions[indices[i + 1] * 3 + 2];
+			let cx = positions[indices[i + 2] * 3 + 0];
+			let cy = positions[indices[i + 2] * 3 + 1];
+			let cz = positions[indices[i + 2] * 3 + 2];
+			let ux = bx - cx;
+			let uy = by - cy;
+			let uz = bz - cz;
+			let vx = bx - ax;
+			let vy = by - ay;
+			let vz = bz - az;
+			let nx = uy * vz - uz * vy;
+			let ny = uz * vx - ux * vz;
+			let nz = ux * vy - uy * vx;
+			let m = Math.sqrt(nx * nx + ny * ny + nz * nz);
+			let x = nx / m;
+			let y = ny / m;
+			let z = nz / m;
+			indexNormals.push(x, y, z);
+		}
+		let normals = [];
+		for (let i = 0; i < positions.length; i++) normals.push(0);
+
+		for (let i = 0; i < indices.length; i++) {
+			let inx = indices[i] * 3;
+			let inx2 = Math.floor(i / 3) * 3;
+			normals[inx + 0] += indexNormals[inx2 + 0];
+			normals[inx + 1] += indexNormals[inx2 + 1];
+			normals[inx + 2] += indexNormals[inx2 + 2];
+		}
+		for (let i = 0; i < normals.length; i += 3) {
+			let x = normals[i + 0];
+			let y = normals[i + 1];
+			let z = normals[i + 2];
+			let m = Math.sqrt(x * x + y * y + z * z);
+			normals[i + 0] = x / m;
+			normals[i + 1] = y / m;
+			normals[i + 2] = z / m;
+		}
+
+		//vertex colors
+		const colors = [];
+		for (let i = 0; i < this.tris.length; i++) {
+			let { red, green, blue, alpha } = this.tris[i].color;
+			red /= 255;
+			green /= 255;
+			blue /= 255;
+			colors.push(
+				red, green, blue, alpha,
+				red, green, blue, alpha,
+				red, green, blue, alpha,
+				red, green, blue, alpha
+			);
+		}
 
 
-            let tv = t.vertices;
-            let A = tv[1].minus(tv[0]);
-            let B = tv[1].minus(tv[2]);
-            let ln = B.cross(A);
 
-            let t_2 = new Tri(...tv.map(v => {
-                let m = Render3D.transformVector3(v, ...cameraTransform);
-                return m;
-            }));
+		//buffers
+		const positionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
-            let mz = Math.max(t_2.vertices[0].z, t_2.vertices[1].z, t_2.vertices[2].z);
-            if (mz < 1) continue;
+		const normalBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
 
+		const colorBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
-            tv = t_2.vertices;
-            A = tv[1].minus(tv[0]);
-            B = tv[1].minus(tv[2]);
-            let n = B.cross(A);
-            let toCamera = t_2.middle;
-            if (n.dot(toCamera) <= 0) continue;
+		const indexBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
-            t_2.vertices = t_2.vertices.map(v => {
-                let m = Render3D.projectVector3(v);
-                m.x *= width / 2;
-                m.y *= width / 2;
-                m.x += width / 2;
-                m.y += height / 2;
-                return m;
-            });
+		//attributes
 
-            //culling
+		//vertex positions
+		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+		let vertexPositionPointer = gl.getAttribLocation(shaderProgram, "vertexPosition");
+		gl.vertexAttribPointer(vertexPositionPointer, 3, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(vertexPositionPointer);
 
-            let minX = Infinity;
-            let maxX = -Infinity;
-            let minY = Infinity;
-            let maxY = -Infinity;
+		//vertex normals
+		gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+		let vertexNormalPointer = gl.getAttribLocation(shaderProgram, "vertexNormal");
+		gl.vertexAttribPointer(vertexNormalPointer, 3, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(vertexNormalPointer);
 
-            for (let j = 0; j < t_2.vertices.length; j++) {
-                let v = t_2.vertices[j];
-                if (v.x < minX) minX = v.x;
-                if (v.x > maxX) maxX = v.x;
-                if (v.y < minY) minY = v.y;
-                if (v.y > maxY) maxY = v.y;
-            }
+		//vertex colors
+		gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+		let vertexColorPointer = gl.getAttribLocation(shaderProgram, "vertexColor");
+		gl.vertexAttribPointer(vertexColorPointer, 4, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(vertexColorPointer);
 
-            if (minX > width || minY > height || maxX < 0 || maxY < 0) continue;
-
-            //lighting
-
-            let light = (ln.normalize().dot(Render3D.lightDirection) + 1) / 2;
-            let col = Color.lerp(t.color, Color.BLACK, (1 - light));
-            t_2.color = col;
-
-
-            rTris.push(t_2);
-        }
-        rTris.sort((a, b) => b.sortZ - a.sortZ);
-        if (Render3D.renderType === Render3D.SOLID) {
-            for (let i = 0; i < rTris.length; i++) {
-                let tri = rTris[i];
-                let col = tri.color;
-                c.draw(col).shape(tri.vertices);
-                c.stroke(col, 1, "round").shape(tri.vertices);
-            }
-        } else if (Render3D.renderType === Render3D.WIREFRAME) {
-            for (let i = 0; i < rTris.length; i++) {
-                let tri = rTris[i];
-                let col = tri.color;
-                c.stroke(col, 1, "round").shape(tri.vertices);
-            }
-        } else if (Render3D.renderType === Render3D.VERTEX) {
-            for (let i = 0; i < rTris.length; i++) {
-                let tri = rTris[i];
-                let col = tri.color;
-                for (let j = 0; j < tri.vertices.length; j++) c.draw(col).circle(tri.vertices[j], 2);
-            }
-        }
+        this.positionBuffer = positionBuffer;
+        this.indexBuffer = indexBuffer;
+        this.vertexCount = indices.length;  
     }
 }
 Render3D.lightDirection = new Vector3(0, 1, 0);

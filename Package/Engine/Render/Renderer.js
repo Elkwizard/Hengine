@@ -997,20 +997,16 @@ class Artist {
 			gl_Position.z /= 100.0;
 			position = gl_Position.xy;
 			highp float light = vertexNormal.y * 0.5 + 0.5;
-			color = vertexColor;//vec4(1.0, 0.0, 0.0, 1.0);
+			color = vertexColor;
 			color.rgb *= light;
 		}
 	`;
 		const pixelSource = `
 		varying highp vec2 position;
 		varying highp vec4 color;
-		
-		highp vec4 shader() {
-			return color;
-		}
 
 		void main() {
-			gl_FragColor = shader();
+			gl_FragColor = color;
 			gl_FragColor.rgb *= gl_FragColor.a;
 		}
 	`;
@@ -1042,192 +1038,8 @@ class Artist {
 
 		gl.useProgram(shaderProgram);
 	}
-	initMesh(mesh) {
-		const gl = this.gl.c;
-		const shaderProgram = this.gl.shaderProgram;
-
-		//gl
-		let x = 2 * mouse.screen.x / width;
-		let y = -2 * mouse.screen.y / height;
-		let z = 1.2;
-		//vertex positions
-		// const positions = [
-		// 	// Front face
-		// 	x + -1.0, y + -1.0, 1.0 + z,
-		// 	x + 1.0, y + -1.0, 1.0 + z,
-		// 	x + 1.0, y + 1.0, 1.0 + z,
-		// 	x + -1.0, y + 1.0, 1.0 + z,
-
-		// 	// Back face
-		// 	x + -1.0, y + -1.0, -1.0 + z,
-		// 	x + -1.0, y + 1.0, -1.0 + z,
-		// 	x + 1.0, y + 1.0, -1.0 + z,
-		// 	x + 1.0, y + -1.0, -1.0 + z,
-
-		// 	// Top face
-		// 	x + -1.0, y + 1.0, -1.0 + z,
-		// 	x + -1.0, y + 1.0, 1.0 + z,
-		// 	x + 1.0, y + 1.0, 1.0 + z,
-		// 	x + 1.0, y + 1.0, -1.0 + z,
-
-		// 	// Bottom face
-		// 	x + -1.0, y + -1.0, -1.0 + z,
-		// 	x + 1.0, y + -1.0, -1.0 + z,
-		// 	x + 1.0, y + -1.0, 1.0 + z,
-		// 	x + -1.0, y + -1.0, 1.0 + z,
-
-		// 	// Right face
-		// 	x + 1.0, y + -1.0, -1.0 + z,
-		// 	x + 1.0, y + 1.0, -1.0 + z,
-		// 	x + 1.0, y + 1.0, 1.0 + z,
-		// 	x + 1.0, y + -1.0, 1.0 + z,
-
-		// 	// Left face
-		// 	x + -1.0, y + -1.0, -1.0 + z,
-		// 	x + -1.0, y + -1.0, 1.0 + z,
-		// 	x + -1.0, y + 1.0, 1.0 + z,
-		// 	x + -1.0, y + 1.0, -1.0 + z,
-		// ];
-
-		// //vertex indices
-		// const indices = [
-		// 	0, 1, 2, 0, 2, 3,    // front
-		// 	4, 5, 6, 4, 6, 7,    // back
-		// 	8, 9, 10, 8, 10, 11,   // top
-		// 	12, 13, 14, 12, 14, 15,   // bottom
-		// 	16, 17, 18, 16, 18, 19,   // right
-		// 	20, 21, 22, 20, 22, 23,   // left
-		// ];
-
-		const positions = [];
-		for (let i = 0; i < mesh.tris.length; i++) {
-			const v = mesh.tris[i].vertices;
-			positions.push(
-				v[0].x, v[0].y, v[0].z,
-				v[1].x, v[1].y, v[1].z,
-				v[2].x, v[2].y, v[2].z
-			);
-		}
-
-		const indices = [];
-		for (let i = 0; i < positions.length / 3; i++) indices.push(i);
-
-		//fix position aspect ratios & invert y-axis
-		const AR = -this.width / this.height;
-		for (let i = 0; i < positions.length; i += 3) {
-			positions[i + 1] *= AR;
-		}
-
-		//vertex normals
-		const indexNormals = [];
-		for (let i = 0; i < indices.length; i += 3) {
-			let ax = positions[indices[i + 0] * 3 + 0];
-			let ay = positions[indices[i + 0] * 3 + 1];
-			let az = positions[indices[i + 0] * 3 + 2];
-			let bx = positions[indices[i + 1] * 3 + 0];
-			let by = positions[indices[i + 1] * 3 + 1];
-			let bz = positions[indices[i + 1] * 3 + 2];
-			let cx = positions[indices[i + 2] * 3 + 0];
-			let cy = positions[indices[i + 2] * 3 + 1];
-			let cz = positions[indices[i + 2] * 3 + 2];
-			let ux = bx - cx;
-			let uy = by - cy;
-			let uz = bz - cz;
-			let vx = bx - ax;
-			let vy = by - ay;
-			let vz = bz - az;
-			let nx = uy * vz - uz * vy;
-			let ny = uz * vx - ux * vz;
-			let nz = ux * vy - uy * vx;
-			let m = Math.sqrt(nx * nx + ny * ny + nz * nz);
-			let x = nx / m;
-			let y = ny / m;
-			let z = nz / m;
-			indexNormals.push(x, y, z);
-		}
-		let normals = [];
-		for (let i = 0; i < positions.length; i++) normals.push(0);
-
-		for (let i = 0; i < indices.length; i++) {
-			let inx = indices[i] * 3;
-			let inx2 = Math.floor(i / 3) * 3;
-			normals[inx + 0] += indexNormals[inx2 + 0];
-			normals[inx + 1] += indexNormals[inx2 + 1];
-			normals[inx + 2] += indexNormals[inx2 + 2];
-		}
-		for (let i = 0; i < normals.length; i += 3) {
-			let x = normals[i + 0];
-			let y = normals[i + 1];
-			let z = normals[i + 2];
-			let m = Math.sqrt(x * x + y * y + z * z);
-			normals[i + 0] = x / m;
-			normals[i + 1] = y / m;
-			normals[i + 2] = z / m;
-		}
-		//vertex colors
-		const colors = [];
-		// Random.seed = Math.floor(intervals.frameCount / 50);
-		// for (let i = 0; i < positions.length / 3; i++) {
-		// 	let color = Color.saturate(Random.color(), 4);
-		// 	colors.push(color.red, color.green, color.blue, color.alpha);
-		// }
-
-		for (let i = 0; i < mesh.tris.length; i++) {
-			let { red, green, blue, alpha } = mesh.tris[i].color;
-			red /= 255;
-			green /= 255;
-			blue /= 255;
-			colors.push(
-				red, green, blue, alpha,
-				red, green, blue, alpha,
-				red, green, blue, alpha,
-				red, green, blue, alpha
-			);
-		}
-
-
-
-		//buffers
-		const positionBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-		const normalBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-
-		const colorBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-
-		const indexBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-
-		//attributes
-
-		//vertex positions
-		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-		let vertexPositionPointer = gl.getAttribLocation(shaderProgram, "vertexPosition");
-		gl.vertexAttribPointer(vertexPositionPointer, 3, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(vertexPositionPointer);
-
-		//vertex normals
-		gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-		let vertexNormalPointer = gl.getAttribLocation(shaderProgram, "vertexNormal");
-		gl.vertexAttribPointer(vertexNormalPointer, 3, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(vertexNormalPointer);
-
-		//vertex colors
-		gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-		let vertexColorPointer = gl.getAttribLocation(shaderProgram, "vertexColor");
-		gl.vertexAttribPointer(vertexColorPointer, 4, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(vertexColorPointer);
-
-		return { positionBuffer, indexBuffer, vertexCount: indices.length };
-	}
 	webGL(mesh) {
-		const { positionBuffer, indexBuffer, vertexCount } = this.initMesh(mesh);
+		const { positionBuffer, indexBuffer, vertexCount } = mesh;
 
 		const gl = this.gl.c;
 
