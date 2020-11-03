@@ -145,11 +145,11 @@ class IntervalManager {
 IntervalManager.FPS_FRAMES_TO_COUNT = 30;
 (function () {
 	IntervalManager.intervals = [];
-	function animate() {
+	function animate(param) {
 		requestAnimationFrame(animate);
 		for (let i = 0; i < IntervalManager.intervals.length; i++) {
 			IntervalManager.intervals[i]();
 		}
 	}
-	animate();
+	requestAnimationFrame(animate);
 })();

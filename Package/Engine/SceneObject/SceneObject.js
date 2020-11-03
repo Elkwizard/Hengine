@@ -60,6 +60,14 @@ class SceneObject {
 		this.__width = 0;
 		this.__height = 0;
 	}
+	set name(a) {
+		delete this.home.elements[this._name];
+		this._name = a;
+		this.home.elements[this._name] = this;
+	}
+	get name() {
+		return this._name;
+	}
 	set defaultShape(a) {
 		this.removeShape("default");
 		this.addShape("default", a);
@@ -214,14 +222,6 @@ class SceneObject {
 	scaleY(factor) {
 		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleYAbout(0, factor);
 		this.cacheDimensions();
-	}
-	rename(name) {
-		delete this.home.elements[this.name];
-		this.home.elements[name] = this;
-		this.name = name;
-		this.logMod(function () {
-			this.rename(name);
-		});
 	}
 	hide() {
 		this.hidden = true;

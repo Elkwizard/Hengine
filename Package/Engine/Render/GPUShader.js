@@ -9,6 +9,11 @@ class GLSLError {
 	toString() {
 		return `line ${this.line}: ${this.desc}`;
 	}
+	static format(string, prefixLength) {
+		let errors = string.split("ERROR: ");
+		errors.shift();
+		return errors.map(string => new GLSLError(string, prefixLength));
+	}
 }
 class GPUShader extends ImageType {
 	constructor(width, height, glsl) {
@@ -96,11 +101,6 @@ class GPUShader extends ImageType {
 		this.c.clear(this.c.COLOR_BUFFER_BIT);
 		this.c.drawArrays(this.c.TRIANGLE_STRIP, 0, this.amountVertices);
 	}
-	formatError(string, prefixLength) {
-		let errors = string.split("ERROR: ");
-		errors.shift();
-		return errors.map(string => new GLSLError(string, prefixLength));
-	}
 	compile() {
 		//init
 		const c = this.c;
@@ -183,7 +183,7 @@ class GPUShader extends ImageType {
 			c.shaderSource(shader, source);
 			c.compileShader(shader);
 			if (!c.getShaderParameter(shader, c.COMPILE_STATUS)) {
-				error = self.formatError(c.getShaderInfoLog(shader), prefixLength);
+				error = GLSLError.format(c.getShaderInfoLog(shader), prefixLength);
 				return false;
 			}
 			return shader;

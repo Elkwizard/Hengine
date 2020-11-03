@@ -11,6 +11,9 @@ class Random {
     static angle() {
         return Random.random() * 2 * Math.PI;
     }
+    static color() {
+        return new Color(Random.random(), Random.random(), Random.random(), 1);
+    }
     static seedRand(seed) {
         seed += 1e5;
         let a = (seed * 6.12849) % 8.7890975;

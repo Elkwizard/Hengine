@@ -130,12 +130,6 @@ class Color extends Operable {
 		let hexAry = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
 		return hexAry[a] + hexAry[b];
 	}
-	static random() {
-		return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random());
-	}
-	static rand(seed) {
-		return new Color(rand(seed) * 255, rand(seed + 1) * 255, rand(seed + 2) * 255, rand(seed + 3));
-	}
 	static parseNum(str, limit) {
 		if (str[str.length - 1] === "%") return parseFloat(str) / 100 * limit;
 		return parseFloat(str);

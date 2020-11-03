@@ -484,10 +484,6 @@ Vector4.modValues = ["x", "y", "z", "w"];
 			if (n instanceof Vector3) return nN(n.x) || nN(n.y) || nN(n.z);
 			if (n instanceof Vector4) return nN(n.x) || nN(n.y) || nN(n.z) || nN(n.w);
 		}
-		if (n instanceof Matrix) {
-			for (let item of n) if (nN(item)) return true;
-			return false;
-		}
 		return nN(n);
 	}
 })();

@@ -51,7 +51,8 @@ Function.prototype.performance = function (...args) {
 };
 //Array
 Array.prototype.pushArray = function (arr) {
-	for (let i = 0; i < arr.length; i++) this.push(arr[i]);
+	let len = arr.length;
+	for (let i = 0; i < len; i++) this.push(arr[i]);
 };
 Array.prototype.map = function (fn, ...coords) {
 	let result = [];

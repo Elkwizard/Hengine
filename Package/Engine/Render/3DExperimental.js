@@ -140,7 +140,7 @@ class Render3D {
         return mesh;
     }
     static makeSphere(x, y, z, r, color = Color.WHITE, subdivisions = 3) {
-        let m = Render3D.makePrism(x, y, z, 20, 20, 20, color);
+        let m = Render3D.makePrism(x, y, z, r * 2, r * 2, r * 2, color);
         for (let i = 0; i < subdivisions; i++) m = m.subdivide();
         for (let tri of m.tris) for (let v of tri.vertices) {
             v.sub(m.middle);
@@ -148,49 +148,6 @@ class Render3D {
             v.add(m.middle);
         }
         return m;
-    }
-    static makeCylinder(X, Y, Z, r, h, color = Color.WHITE, RES = 10) {
-        let tris = [];
-        let total = RES;
-        let radius = r;
-        let y = 0;
-        let start = new Vector3(-radius, 0, 0);
-        for (let i = 0; i < total; i++) {
-            let angle = Math.PI * 2 * i / total;
-            let angle2 = Math.PI * 2 * (i + 1) / total;
-            let v = Vector2.fromAngle(angle + Math.PI).times(radius);
-            let v2 = Vector2.fromAngle(angle2 + Math.PI).times(radius);
-            if (i < total - 1 && !start.equals(v2) && !start.equals(v)) {
-                tris.push(new Tri(
-                    new Vector3(start.x, y - h, start.z),
-                    new Vector3(v2.x, y - h, v2.y),
-                    new Vector3(v.x, y - h, v.y)
-                ));
-                tris.push(new Tri(
-                    new Vector3(v.x, y, v.y),
-                    new Vector3(v2.x, y, v2.y),
-                    new Vector3(start.x, y, start.z)
-                ));
-            }
-            tris.push(new Tri(
-                new Vector3(v.x, y, v.y),
-                new Vector3(v.x, y - h, v.y),
-                new Vector3(v2.x, y, v2.y)
-            ));
-            tris.push(new Tri(
-                new Vector3(v.x, y - h, v.y),
-                new Vector3(v2.x, y - h, v2.y),
-                new Vector3(v2.x, y, v2.y)
-            ));
-        }
-        let offset = new Vector3(X, Y, Z);
-        return new Mesh(tris.map(e => {
-            e = e.each(vert => {
-                return vert.plus(offset);
-            });
-            e.color = color;
-            return e;
-        }));
     }
 }
 Render3D.WIREFRAME = Symbol("WIREFRAME");
@@ -213,7 +170,7 @@ class Tri {
         t.color = this.color;
         return t;
     }
-    rotate(r, v) {
+    rotate(r, v = this.middle) {
         let ox = v.x, oy = v.y, oz = v.z;
         let cosx = Math.cos(r.x), sinx = Math.sin(r.x);
         let cosy = Math.cos(r.y), siny = Math.sin(r.y);
@@ -244,7 +201,7 @@ class Mesh {
         this.middle = Vector3.origin;
         if (tris.length) this.middle = Vector3.sum(tris.map(tri => tri.middle)).div(tris.length);
     }
-    rotate(r, v) {
+    rotate(r, v = this.middle) {
         let ox = v.x, oy = v.y, oz = v.z;
         let cosx = Math.cos(r.x), sinx = Math.sin(r.x);
         let cosy = Math.cos(r.y), siny = Math.sin(r.y);
