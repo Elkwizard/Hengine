@@ -38,8 +38,8 @@ class SceneObject {
 		this.lastTransform = this.transform.get();
 		this.shapes = {};
 		this.graphicalBoundingBox = null;
-		this.name = name;
 		this.home = home;
+		this.name = name;
 		this.engine = engine;
 		this.tag = tag;
 		this.controls = controls;

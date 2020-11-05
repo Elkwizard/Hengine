@@ -158,9 +158,6 @@ class Vector1 extends Vector {
 	static x(x) {
 		return new Vector1(x);
 	}
-	static random() {
-		return new Vector1((Math.random() * 2) - 1);
-	}
 }
 Vector1.modValues = ["x"];
 class Vector2 extends Vector {
@@ -353,16 +350,13 @@ class Vector2 extends Vector {
 	static y(y) {
 		return new Vector2(0, y);
 	}
-	static random() {
-		return new Vector2((Math.random() * 2) - 1, (Math.random() * 2) - 1);
-	}
 	static fromAngle(a) {
 		let x = Math.cos(a);
 		let y = Math.sin(a);
 		return new Vector2(x, y);
 	}
 	static fromPoint(p) {
-		return new Vector2(p.x, p.y);
+		return new Vector2(p.x || 0, p.y || 0);
 	}
 }
 Vector2.modValues = ["x", "y"];
@@ -409,12 +403,13 @@ class Vector3 extends Vector {
 		return new Vector3(0, 0, z);
 	}
 	static fromPoint(p) {
-		return new Vector3(p.x, p.y, p.z);
+		return new Vector3(p.x || 0, p.y || 0, p.z || 0);
 	}
-	static random() {
-		return new Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
+	static fromAngle(r, d = Vector3.right) {
+		return Matrix.mulPoint(Matrix.rotation(r.x, r.y, r.z), d);
 	}
 }
+
 Vector3.modValues = ["x", "y", "z"];
 class Vector4 extends Vector {
 	constructor(x, y, z, w) {
@@ -468,9 +463,6 @@ class Vector4 extends Vector {
 	}
 	static w(w) {
 		return new Vector4(0, 0, 0, w);
-	}
-	static random() {
-		return new Vector4((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
 	}
 }
 Vector4.modValues = ["x", "y", "z", "w"];

@@ -111,20 +111,31 @@ class Font {
 		return str.split("\n").length * this.lineHeight;
 	}
 	toString() {
-		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${this.family}`;
+		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${(Font.importedFamilies.includes(this.family)) ? `'${this.family}'` : this.family}`;
 	}
 	get() {
 		let font = new Font(this.size, this.family, this.bold, this.italic);
 		font.lineHeight = this.lineHeight;
 		return font;
 	}
+	static importFamily(font, url) {
+		Font.css.innerHTML += `
+			@import url(${url})`;
+		Font.importedFamilies.push(font);
+	}
 }
 Font.defaultFamilies = ["Serif", "Arial", "Cursive", "Monospace"];
 Font.defaultSizes = [];
-for (let i = 0; i < 20; i++) Font.defaultSizes.push((i + 1) * 5);
-for (let i = 0; i < Font.defaultSizes.length; i++) {
-	for (let j = 0; j < Font.defaultFamilies.length; j++) {
-		const NAME = Font.defaultFamilies[j] + Font.defaultSizes[i];
-		Lazy.define(Font, NAME, () => new Font(Font.defaultSizes[i], Font.defaultFamilies[j]));
+// setup
+(function () {
+	for (let i = 0; i < 20; i++) Font.defaultSizes.push((i + 1) * 5);
+	for (let i = 0; i < Font.defaultSizes.length; i++) {
+		for (let j = 0; j < Font.defaultFamilies.length; j++) {
+			const NAME = Font.defaultFamilies[j] + Font.defaultSizes[i];
+			Lazy.define(Font, NAME, () => new Font(Font.defaultSizes[i], Font.defaultFamilies[j]));
+		}
 	}
-}
+	Font.importedFamilies = [];
+	Font.css = document.createElement("style");
+	document.head.appendChild(Font.css);
+})();

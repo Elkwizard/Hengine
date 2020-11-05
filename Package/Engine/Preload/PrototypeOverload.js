@@ -145,6 +145,9 @@ String.prototype.cut = function (char) {
 		this.slice(inx + 1)
 	];
 };
+String.prototype.pad = function (size) {
+	return " ".repeat(size - this.length) + this;
+}
 String.prototype.indent = function () {
 	return this.split("\n").map(str => "\t" + str).join("\n");
 };

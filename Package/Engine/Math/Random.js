@@ -12,7 +12,7 @@ class Random {
         return Random.random() * 2 * Math.PI;
     }
     static color() {
-        return new Color(Random.random(), Random.random(), Random.random(), 1);
+        return new Color(Random.random() * 255, Random.random() * 255, Random.random() * 255, 1);
     }
     static seedRand(seed) {
         seed += 1e5;

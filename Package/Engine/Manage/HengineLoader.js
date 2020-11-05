@@ -14,7 +14,7 @@ class ApplicationPackage {
 	}
 }
 function exit(...msg) { 
-	console.log(...msg);
+	console.warn("EXITED", ...msg);
 	IntervalManager.intervals = [];
 }
 class HengineLoader {
@@ -93,13 +93,13 @@ class HengineLoader {
 		return ["PrototypeOverload", "Lazy", "Operable"];
 	}
 	static get defaultRenderPackage() {
-		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "GrayMap", "Frame", "Animation", "Texture", "Webcam", "GPUShader", "Font", "Renderer", "Graph", "3DExperimental", "Camera"];
+		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "GrayMap", "Frame", "Animation", "Texture", "Webcam", "GPUShader", "Font", "Renderer", "Graph", "Mesh", "Camera"];
 	}
 	static get defaultManagementPackage() {
 		return ["ElementContainer", "Scenes", "Intervals", "Hengine", "HengineLoader"];
 	}
 	static get defaultMathPackage() {
-		return ["Interpolation", "Random", "Vector", "Geometry", "Physics", "PhysicsAPI"];
+		return ["Interpolation", "Random", "Matrix", "Vector", "Geometry", "Physics", "PhysicsAPI"];
 	}
 	static get defaultUtilityPackage() {
 		return ["Input", "Sound", "Time", "LocalFileSystem"];

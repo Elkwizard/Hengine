@@ -2,7 +2,6 @@ class Scene {
 	constructor(gravity = new Vector2(0, 0.1), engine) {
 		this.engine = engine;
 		this.main = new ElementContainer("Main", true, null, this.engine);
-		this.gravity = gravity;
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
 		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
 		this.physicsEngine.oncollide = this.handleCollisionEvent.bind(this);

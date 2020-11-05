@@ -15,7 +15,7 @@ class CardinalDirections extends Directions {
         this.right = right;
     }
     getRandomVelocity() {
-        return this.fix(Vector2.random());
+        return this.fix(new Vector2(Random.range(-1, 1), Random.range(-1, 1)));
     }
 	fix(v) {
         return new Vector2(this.fixH(v.x), this.fixV(v.y)).normalize();
@@ -169,7 +169,7 @@ class ParticleObject extends SceneObject {
     engineUpdate() {
         this.lastTransform = this.transform.get();
         if (this.spawner.particleFalls) {
-            this.velocity.y += this.engine.scene.gravity.y;
+            this.velocity.y += this.engine.scene.physicsEngine.gravity.y;
         }
         if (this.spawner.particleSlows) {
             this.velocity.Nmul(this.engine.scene.physicsEngine.linearDrag);

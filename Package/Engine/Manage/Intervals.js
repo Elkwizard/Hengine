@@ -90,7 +90,7 @@ class IntervalManager {
 			this.updateGraphs();
 			this.engine.keyboard.update();
 			this.engine.mouse.update();
-			this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATEA);
+			this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
 			this.engine.renderer.clearScreen();
 			this.updateIntervalCalls(IntervalFunction.UPDATE)
 			this.engine.scene.engineUpdate();
