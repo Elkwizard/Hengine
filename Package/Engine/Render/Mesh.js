@@ -29,12 +29,12 @@ class Mesh {
             Matrix.mulMatrix(
                 Matrix.translation(-v.x, -v.y, -v.z),
                 Matrix.mulMatrix(
-                    Matrix.rotation(r.x, r.y, r.z),
+                    Matrix.glRotation(r.x, r.y, r.z),
                     Matrix.translation(v.x, v.y, v.z)
                 )
             )
         );
-        this.normalTransform = Matrix.mulMatrix(this.normalTransform, Matrix.rotation(-r.x, -r.y, -r.z));
+        this.normalTransform = Matrix.mulMatrix(this.normalTransform, Matrix.glRotation(r.x, r.y, r.z));
     }
     translate(o) {
         this.transform = Matrix.mulMatrix(

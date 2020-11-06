@@ -8,13 +8,9 @@ class Matrix {
 		];
 	}
 	static mulPoint(m, p) {
-		let x = m[0] * p.x + m[1] * p.y + m[2] * p.z + m[3];
-		let y = m[4] * p.x + m[5] * p.y + m[6] * p.z + m[7];
-		let z = m[8] * p.x + m[9] * p.y + m[10] * p.z + m[11];
-
-		// let x = m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12];
-		// let y = m[1] * p.x + m[5] * p.y + m[9] * p.z + m[13];
-		// let z = m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14];
+		let x = m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12];
+		let y = m[1] * p.x + m[5] * p.y + m[9] * p.z + m[13];
+		let z = m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14];
 		return new Vector3(x, y, z);
 	}
 	static mulMatrix(M0, M1) {
@@ -127,10 +123,13 @@ class Matrix {
 			x, y, z, 1
 		];
 	}
+	static glRotation(x, y, z) {
+		return Matrix.rotation(x, y, z);
+	}
 	static glCamera(ox, oy, oz, rx, ry, rz) {
 		return Matrix.mulMatrix(
 			Matrix.translation(-ox, -oy, -oz),
-			Matrix.rotation(rx, ry, rz)
+			Matrix.glRotation(-rx, -ry, -rz)
 		);
 	}
 	static stringify(m) {

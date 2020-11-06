@@ -999,7 +999,7 @@ class Artist {
 		const bigIndicesExt = gl.getExtension("OES_element_index_uint");
 
 		//sources
-		const zNear = 0.01;
+		const zNear = 0.001;
 		const zFar = 100;
 		const vertexSource = `
 			attribute vec4 vertexPosition;
@@ -1038,7 +1038,7 @@ class Artist {
 			varying highp vec4 color;
 
 			void main() {
-				if (position.z < 0.01) discard;
+				if (position.z < ${zNear}) discard;
 				// gl_FragColor.rgb = vec3(position.z);
 				// gl_FragColor.a = 1.0;
 				// gl_FragColor = vec4(gl_FragCoord.xyz * vec3(0.001, 0.001, 1.0), 1.0);
