@@ -1118,7 +1118,7 @@ class PhysicsEngine {
     createGrid(dynBodies) {
         let cellsize = 100;
         if (this.bodies.length) {
-            cellsize = 0;
+            cellsize = 1;
             let body = this.bodies[Math.floor(this.bodies.length / 2)];
             for (let j = 0; j < body.shapes.length; j++) {
                 cellsize += body.shapes[j].size();

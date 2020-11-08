@@ -200,6 +200,12 @@ class Vector2 extends Vector {
 	get mag() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
+	get inverse() {
+		return new Vector2(-this.x, -this.y);
+	}
+	get() {
+		return new Vector2(this.x, this.y);
+	}
 	equals(v, t = 0.00001) {
 		return Math.abs(this.x - v.x) < t && Math.abs(this.y - v.y) < t;
 	}
@@ -255,9 +261,6 @@ class Vector2 extends Vector {
 		this.x = -this.x;
 		this.y = -this.y;
 		return this;
-	}
-	get inverse() {
-		return new Vector2(-this.x, -this.y);
 	}
 	Vplus(v) {
 		return new Vector2(this.x + v.x, this.y + v.y);

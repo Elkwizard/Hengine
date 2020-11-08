@@ -169,7 +169,7 @@ class GPUShader extends ImageType {
 
 				void main() {
 					gl_FragColor = shader();
-					gl_FragColor.rgb *= gl_FragColor.a;
+					gl_FragColor.rgb *= clamp(gl_FragColor.a, 0.0, 1.0);
 				}
 			`;
 		let prefixLength = prefix.split("\n").length + 1;
