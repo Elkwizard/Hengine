@@ -4,9 +4,13 @@ class Time {
 	}
 	static getTime() {
 		let d = new Date();
-		let t = d.getTime();
-		t -= (7 * 60 * 60 * 1000);
-		return Time.millisecondsToStandard(t, 1970);
+		return {
+			seconds: d.getSeconds(),
+			minutes: d.getMinutes(),
+			hours: d.getHours(),
+			days: d.getDay(),
+			years: d.getYear() + 1900
+		};
 	}
 	static sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -33,12 +37,13 @@ class Time {
 	static formatTime(t) {
 		let ary = [];
 		let shorthand = {
-			"years": "yr",
+			"years": "y",
 			"days": "d",
+			"hours": "h",
 			"minutes": "m",
 			"seconds": "s"
 		}
-		for (let key of ["years", "days", "minutes", "seconds"]) {
+		for (let key of ["years", "days", "hours", "minutes", "seconds"]) {
 			let start = t[key];
 			if (start % 1) start = t[key].toFixed(2); 
 			if (t[key] || key == "seconds") ary.push(start + shorthand[key]);

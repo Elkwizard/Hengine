@@ -40,7 +40,7 @@ class Note {
         n.octaves = n.octaves.map(e => Math.max(0, Math.min(8, e + octaves)));
         return n;
     }
-    static fromNotes(...NOTES) {
+    static fromNotes(NOTES) {
         let notes = [];
         let durations = [];
         let octaves = [];
@@ -237,7 +237,7 @@ class Sound {
         gainNode.connect(Sound.gainNode);
 
         let procedureInterval = setInterval(function () {
-            osc.frequency.value = clamp(procedure((Sound.context.currentTime - CURRENT_TIME) * 1000), -24000, 24000);
+            osc.frequency.value = Number.clamp(procedure((Sound.context.currentTime - CURRENT_TIME) * 1000), -24000, 24000);
         }, 1);
         return new Promise(function (resolve) {
             setTimeout(function () {
@@ -252,7 +252,7 @@ class Sound {
         const LERP_LENGTH = .1;
         let osc = Sound.context.createOscillator();
         osc.type = type;
-        osc.frequency.value = clamp(hertz, -24000, 24000);
+        osc.frequency.value = Number.clamp(hertz, -24000, 24000);
         osc.start();
         let gainNode = Sound.context.createGain();
         osc.connect(gainNode);

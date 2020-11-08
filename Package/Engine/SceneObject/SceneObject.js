@@ -33,74 +33,63 @@ class Controls {
 }
 //Actual SceneObject
 class SceneObject {
-	constructor(name, x, y, controls, tag, home) {
-		this.x = x;
-		this.y = y;
-		this.shapes = { };
-		this.rotation = 0;
-		this.__cosRot = 1;
-		this.__sinRot = 0;
-		this.name = name;
+	constructor(name, x, y, controls, tag, home, engine) {
+		this.transform = new Transform(x, y, 0);
+		this.lastTransform = this.transform.get();
+		this.shapes = {};
+		this.graphicalBoundingBox = null;
 		this.home = home;
+		this.name = name;
+		this.engine = engine;
 		this.tag = tag;
 		this.controls = controls;
 		this.hidden = false;
-		this.update = function () { };
-		this.draw = function (shape) { };
-		this.custom = {};
+		this.onScreen = false;
+		this.draw = function (name, shape) { };
 		this.hovered = false;
 		this.layer = 0;
-		this.scripts = new ScriptContainer();
 		this.lifeSpan = 0;
 		this.log = [];
-		this.isDead = false;
+		this.removed = false;
 		this.onScreen = true;
 		this.cullGraphics = true;
-		this.response = {
-			click: e => e,
-			rightClick: e => e,
-			hover: e => e
-		}
-		this.response.input = {
-			up: function () { },
-			down: function () { },
-			left: function () { },
-			right: function () { },
-			interact1: function () { },
-			interact2: function () { }
-		};
 		this.isBeingUpdated = false;
-
+		this.scripts = new ScriptContainer(this);
+		this.__scripts;
 		this.__width = 0;
 		this.__height = 0;
 	}
-	get defaultShape() {
-		return this.getShape("default");
+	set name(a) {
+		delete this.home.elements[this._name];
+		this._name = a;
+		this.home.elements[this._name] = this;
+	}
+	get name() {
+		return this._name;
 	}
 	set defaultShape(a) {
 		this.removeShape("default");
 		this.addShape("default", a);
 	}
-	set middle(a) {
-		this.x = a.x;
-		this.y = a.y;
-	}
-	get middle() {
-		return new Vector2(this.x, this.y);
+	get defaultShape() {
+		return this.getShape("default");
 	}
 	set width(a) {
 		let factor = a / this.width;
-		this.scale(factor);
+		this.scaleX(factor);
 	}
 	get width() {
 		return this.__width;
 	}
 	set height(a) {
 		let factor = a / this.height;
-		this.scale(factor);
+		this.scaleY(factor);
 	}
 	get height() {
 		return this.__height;
+	}
+	updatePreviousData() {
+		this.lastTransform = this.transform.get();
 	}
 	serializeShapes() {
 		let shapes = this.getShapes();
@@ -137,57 +126,40 @@ class SceneObject {
 			}
 		}
 		let num = 0;
-		for (let shape of result) this.addShape(num++ + "", shape);
+		for (let shape of result) this.addShape(`Shape #${num++}`, shape);
 		return result;
 	}
-	onAddScript(script) {
-
-	}
-	cacheRotation() {
-		this.__cosRot = Math.cos(this.rotation);
-		this.__sinRot = Math.sin(this.rotation);
-	}
 	cacheDimensions() {
-		let old_rot = this.rotation;
-		this.rotation = 0;
-		let bound = this.getBoundingBox();
-		this.__width = bound.width;
-		this.__height = bound.height;
-		this.rotation = old_rot;
+		let shapes = this.getShapes();
+		let boxes = shapes.map(e => e.getBoundingBox());
+		let bounds = Rect.composeBoundingBoxes(boxes);
+		this.__width = bounds.width;
+		this.__height = bounds.height;
+		this.cacheBoundingBoxes();
 	}
 	cacheBoundingBoxes() {
 		this.__boundingBox = this.getBoundingBox();
 	}
 	getModels() {
-		let pos = this.middle;
-		let cos = this.__cosRot;
-		let sin = this.__sinRot;
 		let result = [];
-		for (let name in this.shapes) result.push(this.shapes[name].getModelCosSin(pos, cos, sin));
+		for (let name in this.shapes) result.push(this.shapes[name].getModel(this.transform));
 		return result;
 	}
 	getBoundingBox() {
 		let shapes = this.getModels();
 		let boxes = shapes.map(e => e.getBoundingBox());
-		if (boxes.length === 1) return boxes[0];
-		let mins = boxes.map(e => new Vector2(e.x, e.y));
-		let maxs = boxes.map(e => new Vector2(e.x + e.width, e.y + e.height));
-		let minX = Math.min(...mins.map(e => e.x));
-		let minY = Math.min(...mins.map(e => e.y));
-		let maxX = Math.max(...maxs.map(e => e.x));
-		let maxY = Math.max(...maxs.map(e => e.y));
-		return new Rect(minX, minY, maxX - minX, maxY - minY);
+		return Rect.composeBoundingBoxes(boxes);
+	}
+	onAddScript(script) {
+
+	}
+	hasShape(name) {
+		return name in this.shapes;
 	}
 	addShape(name, shape) {
 		shape = shape.get();
 		this.shapes[name] = shape;
 		this.cacheDimensions();
-	}
-	worldSpaceToModelSpace(v) {
-		return v.Vminus(this.middle).rotate(-this.rotation);
-	}
-	modelSpaceToWorldSpace(v) {
-		return v.rotate(this.rotation).Vplus(this.middle);
 	}
 	centerModels() {
 		let center = Vector2.origin;
@@ -199,13 +171,9 @@ class SceneObject {
 			center.Vadd(shape.middle.Ntimes(area));
 		}
 		center.Ndiv(totalArea);
-		let dif = center.inverse();
-		let nShapes = new Map();
-		for (let name in this.shapes) {
-			nShapes.set(name, this.shapes[name].move(dif));
-		}
-		this.removeAllShapes();
-		for (let [name, shape] of nShapes) this.addShape(name, shape);
+		let dif = center.inverse;
+		for (let name in this.shapes)
+			this.shapes[name] = this.shapes[name].move(dif);
 	}
 	removeShape(name) {
 		let shape = this.shapes[name];
@@ -225,7 +193,7 @@ class SceneObject {
 		return this.shapes[name];
 	}
 	getModel(name) {
-		return this.shapes[name].getModelCosSin(this.middle, this.__cosRot, this.__sinRot);
+		return this.shapes[name].getModel(this.transform);
 	}
 	reorderShapes(order) {
 		let shapes = this.getShapes();
@@ -243,18 +211,16 @@ class SceneObject {
 	}
 	scale(factor) {
 		let middle = Vector2.origin;
-		let nShapes = new Map();
-		for (let name in this.shapes) nShapes.set(name, this.shapes[name].scaleAbout(middle, factor));
-		this.removeAllShapes();
-		for (let [name, shape] of nShapes) this.addShape(name, shape);
+		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleAbout(middle, factor);
+		this.cacheDimensions();
 	}
-	rename(name) {
-		delete this.home.elements[this.name];
-		this.home.elements[name] = this;
-		this.name = name;
-		this.logMod(function () {
-			this.rename(name);
-		});
+	scaleX(factor) {
+		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleXAbout(0, factor);
+		this.cacheDimensions();
+	}
+	scaleY(factor) {
+		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleYAbout(0, factor);
+		this.cacheDimensions();
 	}
 	hide() {
 		this.hidden = true;
@@ -268,10 +234,6 @@ class SceneObject {
 			this.show();
 		});
 	}
-	position(p) {
-		this.x = p.x;
-		this.y = p.y;
-	}
 	logMod(func) {
 		this.log.push(func);
 	}
@@ -283,72 +245,45 @@ class SceneObject {
 		for (let x of this.log) x.bind(el)();
 		return el;
 	}
-	drawInModelSpace(artist) {
-		c.save();
-		let middle = this.middle;
-		c.translate(middle);
-		c.rotate(this.rotation);
-		artist();
-		c.restore();
-	}
 	runDraw() {
-		let middle = this.middle;
-		c.translate(middle);
-		c.rotate(this.rotation);
-		for (let name in this.shapes) {
-			let shape = this.shapes[name];
-			this.draw(name, shape);
-			this.scripts.run("Draw", name, shape);
-		}
-		c.rotate(-this.rotation);
-		c.translate(-middle.x, -middle.y);
+		this.transform.drawInModelSpace(() => {
+			for (let name in this.shapes) {
+				let shape = this.shapes[name];
+				this.draw(name, shape);
+				this.scripts.run("Draw", name, shape);
+			}
+		}, this.engine.renderer);
 	}
-	engineDrawUpdate(screen) {
-		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.__boundingBox, screen);
+	determineOnScreen(screen) {
+		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox || this.__boundingBox, screen);
+		return this.onScreen;
+	}
+	engineDraw(screen) {
+		this.determineOnScreen(screen);
 		if (!this.hidden && this.onScreen) {
 			this.runDraw();
-		}
-		// s.drawInScreenSpace(e => c.stroke(cl.GREEN, 1).rect(this.__boundingBox));
-		// s.drawInScreenSpace(e => c.stroke(cl.RED, 1).rect(screen));
+			this.onScreen = true;
+		} else this.onScreen = false;
 		this.scripts.run("EscapeDraw");
 	}
-	engineFixedUpdate(hitboxes) {
-		if (this.controls) {
-			this.move();
-		}
-		this.update();
+	engineUpdate() {
 		this.scripts.run("Update");
 	}
+	hasMoved() {
+		return this.transform.dif(this.lastTransform);
+	}
 	updateCaches() {
-		this.cacheBoundingBoxes();
-		this.cacheRotation();
+		if (this.hasMoved()) this.cacheBoundingBoxes();
 	}
 	pushToRemoveQueue(x) {
 		return null;
 	}
+	end() {
+		this.removed = true;
+	}
 	remove() {
 		if (this.isBeingUpdated) this.pushToRemoveQueue(this);
 		else this.home.removeElement(this);
-		this.isDead = true;
-	}
-	move() {
-		if (K.P(this.controls.up)) {
-			this.response.input.up();
-		}
-		if (K.P(this.controls.down)) {
-			this.response.input.down();
-		}
-		if (K.P(this.controls.left)) {
-			this.response.input.left();
-		}
-		if (K.P(this.controls.right)) {
-			this.response.input.right();
-		}
-		if (K.P(this.controls.interact1)) {
-			this.response.input.interact1();
-		}
-		if (K.P(this.controls.interact2)) {
-			this.response.input.interact2();
-		}
+		this.end();
 	}
 }

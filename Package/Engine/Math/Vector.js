@@ -1,159 +1,3 @@
-class Matrix {
-	constructor(height, width) {
-		this.cols = [];
-		for (let i = 0; i < width; i++) {
-			this.cols.push([]);
-			for (let j = 0; j < height; j++) {
-				this.cols[i].push(0);
-			}
-		}
-	}
-	get() {
-		let m = new this.constructor(this.cols[0].length, this.cols.length);
-		m.cols = this.cols.map(e => e.map(e => e));
-		return m;
-	}
-	plus(v) {
-		if (typeof v === "number") return this.get().opNumber(v, (a, b) => a + b);
-		else {
-			if (v instanceof Vector) v = v.toMatrix();
-			return this.get().opMatrix(v, (a, b) => a + b);
-		}
-	}
-	minus(v) {
-		if (typeof v === "number") return this.get().opNumber(v, (a, b) => a - b);
-		else {
-			if (v instanceof Vector) v = v.toMatrix();
-			return this.get().opMatrix(v, (a, b) => a - b);
-		}
-	}
-	times(v) {
-		if (typeof v === "number") return this.get().opNumber(v, (a, b) => a * b);
-		else {
-			if (v instanceof Vector) v = v.toMatrix();
-			return this.mulMatrix(v);
-		}
-	}
-	map(fn) {
-		let g = this.get();
-		g.cols = g.cols.map((e, x) => e.map((e, y) => fn(e, x, y)));
-		return g;
-	}
-	reciprocal() {
-		return this.map(e => 1 / e);
-	}
-	opMatrix(n, fn) {
-		this.cols = this.cols.map((e, x) => e.map((e, y) => fn(e, n.cols[x][y])));
-		return this;
-	}
-	opNumber(n, fn) {
-		this.cols = this.cols.map(e => e.map(e => fn(e, n)));
-		return this;
-	}  
-	mulMatrix(m) {
-		let result = new Matrix(this.cols[0].length, m.cols.length);
-		for (let c = 0; c < m.cols.length; c++) {
-			for (let i = 0; i < this.cols[0].length; i++) {
-				let v = 0;
-				for (let j = 0; j < this.cols.length; j++) {
-					v += m.cols[c][j] * this.cols[j][i];
-				}
-				result.cols[c][i] = v;
-			}
-		}
-		return result;
-	}
-	toString() {
-		let result = [];
-		let vertical = String.fromCharCode(9474);
-		let maxLen = this.cols.map(e => Math.max(...e.map(e => e.toString().length)));
-		let amountSpaces = [];
-		for (let num of maxLen) amountSpaces.push(" ".repeat(num));
-		amountSpaces = amountSpaces.join(" ").length + 2;
-		let spaces = " ".repeat(amountSpaces);
-		for (let i = 0; i < this.cols[0].length; i++) {
-			let row = [];
-			for (let j = 0; j < this.cols.length; j++) {
-				let num = this.cols[j][i].toString();
-				num = " ".repeat(maxLen[j] - num.length) + num;
-				row.push(num);
-			}
-			result.push(vertical + " " + row.join(" ") + " " + vertical);
-		}
-		return String.fromCharCode(9484) + spaces + String.fromCharCode(9488) + "\n" + result.join("\n") + "\n" + String.fromCharCode(9492) + spaces + String.fromCharCode(9496);
-	}
-	toFixed() {
-		return this.map(e => e.toFixed(2)).toString();
-	}
-	equals(m) {
-		let equal = true;
-		check: for (let i = 0; i < this.cols.length; i++) for (let j = 0; j < this.cols[0].length; j++) if (Math.abs(this.cols[i][j] - m.cols[i][j]) > 0.00001) {
-			equal = false;
-			break check;
-		}
-		return equal;
-	}
-	static identity(dim) {
-		let m = new Matrix(dim, dim);
-		for (let i = 0; i < dim; i++) m.cols[i][i] = 1;
-		return m;
-	}
-	static rotation(angle) {
-		let c = Math.cos(angle);
-		let s = Math.sin(angle);
-		return new Matrix2x2(c, -s, s, c);
-	}
-}
-class Matrix2x2 extends Matrix {
-	constructor(m00 = 0, m10 = 0, m01 = 0, m11 = 0) {
-		super(2, 2);
-		this.cols[0][0] = m00;
-		this.cols[1][0] = m10;
-		this.cols[0][1] = m01;
-		this.cols[1][1] = m11;
-	}
-	get determinant() {
-		return this.cols[0][0] * this.cols[1][1] - this.cols[0][1] * this.cols[1][0];
-	}
-	inverse() {
-		return (new Matrix2x2(this.cols[1][1], -this.cols[1][0], -this.cols[0][1], this.cols[0][0]).times(1 / this.determinant));
-	}
-}
-class Matrix3x3 extends Matrix {
-	constructor(m00 = 0, m10 = 0, m20 = 0, m01 = 0, m11 = 0, m21 = 0, m02, m12, m22) {
-		super(3, 3);
-		this.cols[0][0] = m00;
-		this.cols[1][0] = m10;
-		this.cols[2][0] = m20;
-		this.cols[0][1] = m01;
-		this.cols[1][1] = m11;
-		this.cols[2][1] = m21;
-		this.cols[0][2] = m02;
-		this.cols[1][2] = m12;
-		this.cols[2][2] = m22;
-	}
-}
-class Matrix4x4 extends Matrix {
-	constructor(m00 = 0, m01 = 0, m02 = 0, m03 = 0, m10 = 0, m11 = 0, m12 = 0, m13 = 0, m20 = 0, m21 = 0, m22 = 0, m23 = 0, m30 = 0, m31 = 0, m32 = 0, m33 = 0) {
-		super(4, 4);
-		this.cols[0][0] = m00;
-		this.cols[0][1] = m01;
-		this.cols[0][2] = m02;
-		this.cols[0][3] = m03;
-		this.cols[1][0] = m10;
-		this.cols[1][1] = m11;
-		this.cols[1][2] = m12;
-		this.cols[1][3] = m13;
-		this.cols[2][0] = m20;
-		this.cols[2][1] = m21;
-		this.cols[2][2] = m22;
-		this.cols[2][3] = m23;
-		this.cols[3][0] = m30;
-		this.cols[3][1] = m31;
-		this.cols[3][2] = m32;
-		this.cols[3][3] = m33;
-	}
-}
 class Vector extends Operable {
 	constructor() {
 		super();
@@ -165,7 +9,7 @@ class Vector extends Operable {
 	}
 	get sqrMag() {
 		let sum = 0;
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			if (typeof this[x] !== "number") continue;
 			let i = 0;
 			let j = this[x];
@@ -177,7 +21,7 @@ class Vector extends Operable {
 	}
 	get mag() {
 		let sum = 0;
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			if (typeof this[x] !== "number") continue;
 			let i = 0;
 			let j = this[x];
@@ -192,21 +36,21 @@ class Vector extends Operable {
 	}
 	op(v, e) {
 		if (typeof v === "number") {
-			for (let x in this) {
+			for (let x of this.constructor.modValues) {
 				this[x] = e(this[x], v);
 			}
 		} else if (v instanceof Vector) {
-			for (let x in this) {
+			for (let x of this.constructor.modValues) {
 				this[x] = e(this[x], v[x] || 0);
 			}
-		} else if (v instanceof Matrix) {
+		} else if (v instanceof Matrix4) {
 			let chk = e(2, 3);
 			let action = "times";
 			if (chk === 6);
 			else if (chk === -1) action = "minus";
 			else if (chk === 5) action = "plus";
 			let n = this.constructor.fromMatrix(this.toMatrix()[action](v));
-			for (let x in this) {
+			for (let x of this.constructor.modValues) {
 				this[x] = n[x];
 			}
 		}
@@ -215,7 +59,7 @@ class Vector extends Operable {
 	invert() {
 		return this.mul(-1);
 	}
-	inverse() {
+	get inverse() {
 		return this.times(-1);
 	}
 	compare(v1, v2) {
@@ -224,7 +68,7 @@ class Vector extends Operable {
 	}
 	normalize() {
 		let sum = 0;
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			if (typeof this[x] !== "number") continue;
 			let i = 0;
 			let j = this[x];
@@ -235,7 +79,7 @@ class Vector extends Operable {
 		if (dist <= 0) {
 			return this;
 		}
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			if (typeof this[x] !== "number") continue;
 			this[x] /= dist;
 		}
@@ -243,7 +87,7 @@ class Vector extends Operable {
 	}
 	dot(v) {
 		let result = 0;
-		for (let x in this) result += this[x] * v[x];
+		for (let x of this.constructor.modValues) result += this[x] * v[x];
 		return result;
 	}
 	cross(V) {
@@ -256,26 +100,27 @@ class Vector extends Operable {
 	}
 	bestFit(v) {
 		let d1 = this.dot(v);
-		let d2 = this.inverse().dot(v);
-		if (d2 < d1) return this.inverse();
+		let d2 = this.inverse.dot(v);
+		if (d2 < d1) return this.inverse;
 		else return this.get();
 	}
 	toString() {
 		let ary = [];
-		for (let n in this) ary.push(this[n]);
+		for (let n of this.constructor.modValues) ary.push(this[n]);
 		return "\u27e8 " + ary.join(", ") + " \u27e9";
 	}
-	toFixed(n) {
-		let ary = [];
-		for (let n in this) ary.push(this[n].toFixed(n));
-		return "\u27e8 " + ary.join(", ") + " \u27e9";
+	toFixed(digits) {
+		return this.map(v => v.toFixed(digits)).toString();
+	}
+	toMaxed(digits) {
+		return this.map(v => v.toMaxed(digits)).toString();
 	}
 	toMatrix() {
 		let count = 0;
-		for (let x in this) count++;
-		let m = new Matrix(count, 1);
+		for (let x of this.constructor.modValues) count++;
+		let m = new Matrix4(count, 1);
 		count = 0;
-		for (let x in this) {
+		for (let x of this.constructor.modValues) {
 			m.cols[0][count] = this[x];
 			count++;
 		}
@@ -287,31 +132,18 @@ class Vector extends Operable {
 	static fromMatrix(m) {
 		return new this(...m.cols[0]);
 	}
-	static lerp(a, b, t) {
-		return a.Ntimes(1 - t).Vplus(b.Ntimes(t));
-	}
-	static abs(v) {
-		return v.op(0, Math.abs.bind(Math));
-	}
-	static sum(...v) {
-		let construct = v.length ? v[0].constructor : this;
-		return (new construct(0, 0, 0, 0)).add(...v);
-	}
-	static avg(...v) {
-		return this.sum(...v).over(v.length);
-	}
 	static prohibitDirections(proDirs, dir) {
 		let remove = [];
 		let mag = dir.mag;
 		for (let proDir of proDirs) {
 			let dot = proDir.dot(dir);
 			if (dot > 0) {
-				let bad = dir.Ntimes(dot / mag);
+				let bad = dir.times(dot / mag);
 				remove.push(bad);
 			}
 		}
-		let wrong = remove.length ? Vector.sum(...remove).Nover(remove.length) : new dir.constructor(0, 0, 0, 0);
-		return dir.Vminus(wrong);
+		let wrong = remove.length ? Vector.avg(remove) : new dir.constructor(0, 0, 0, 0);
+		return dir.minus(wrong);
 	}
 }
 Vector.modValues = [];
@@ -323,8 +155,8 @@ class Vector1 extends Vector {
 	static get origin() {
 		return new Vector1(0);
 	}
-	static random() {
-		return new Vector1((Math.random() * 2) - 1);
+	static x(x) {
+		return new Vector1(x);
 	}
 }
 Vector1.modValues = ["x"];
@@ -368,6 +200,9 @@ class Vector2 extends Vector {
 	get mag() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
+	equals(v, t = 0.00001) {
+		return Math.abs(this.x - v.x) < t && Math.abs(this.y - v.y) < t;
+	}
 	op(v, e) {
 		if (typeof v === "number") {
 			this.x = e(this.x, v);
@@ -386,6 +221,11 @@ class Vector2 extends Vector {
 		this.x = t_x * cos - t_y * sin;
 		this.y = t_x * sin + t_y * cos;
 		return this;
+	}
+	rotated(angle) {
+		let cos = Math.cos(angle);
+		let sin = Math.sin(angle);
+		return new Vector2(this.x * cos - this.y * sin, this.x * sin + this.y * cos);
 	}
 	dot(v) {
 		return this.x * v.x + this.y * v.y;
@@ -416,7 +256,7 @@ class Vector2 extends Vector {
 		this.y = -this.y;
 		return this;
 	}
-	inverse() {
+	get inverse() {
 		return new Vector2(-this.x, -this.y);
 	}
 	Vplus(v) {
@@ -504,8 +344,11 @@ class Vector2 extends Vector {
 	static get origin() {
 		return new Vector2(0, 0);
 	}
-	static random() {
-		return new Vector2((Math.random() * 2) - 1, (Math.random() * 2) - 1);
+	static x(x) {
+		return new Vector2(x, 0);
+	}
+	static y(y) {
+		return new Vector2(0, y);
 	}
 	static fromAngle(a) {
 		let x = Math.cos(a);
@@ -513,7 +356,7 @@ class Vector2 extends Vector {
 		return new Vector2(x, y);
 	}
 	static fromPoint(p) {
-		return new Vector2(p.x, p.y);
+		return new Vector2(p.x || 0, p.y || 0);
 	}
 }
 Vector2.modValues = ["x", "y"];
@@ -550,13 +393,23 @@ class Vector3 extends Vector {
 	static get origin() {
 		return new Vector3(0, 0, 0);
 	}
-	static fromPoint(p) {
-		return new Vector3(p.x, p.y, p.z);
+	static x(x) {
+		return new Vector3(x, 0, 0);
 	}
-	static random() {
-		return new Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
+	static y(y) {
+		return new Vector3(0, y, 0);
+	}
+	static z(z) {
+		return new Vector3(0, 0, z);
+	}
+	static fromPoint(p) {
+		return new Vector3(p.x || 0, p.y || 0, p.z || 0);
+	}
+	static fromAngle(r, d = Vector3.right) {
+		return Matrix4.mulPoint(Matrix4.rotation(r.x, r.y, r.z), d);
 	}
 }
+
 Vector3.modValues = ["x", "y", "z"];
 class Vector4 extends Vector {
 	constructor(x, y, z, w) {
@@ -599,8 +452,17 @@ class Vector4 extends Vector {
 	static get origin() {
 		return new Vector4(0, 0, 0, 0);
 	}
-	static random() {
-		return new Vector4((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
+	static x(x) {
+		return new Vector4(x, 0, 0, 0);
+	}
+	static y(y) {
+		return new Vector4(0, y, 0, 0);
+	}
+	static z(z) {
+		return new Vector4(0, 0, z, 0);
+	}
+	static w(w) {
+		return new Vector4(0, 0, 0, w);
 	}
 }
 Vector4.modValues = ["x", "y", "z", "w"];

@@ -1,10 +1,9 @@
 class PhysicsObject extends SceneObject {
-    constructor(name, x, y, gravity, controls, tag, home) {
-        super(name, x, y, controls, tag, home);
+    constructor(name, x, y, gravity, controls, tag, home, engine) {
+        super(name, x, y, controls, tag, home, engine);
 
         this.body = new RigidBody(x, y, gravity ? RigidBody.DYNAMIC : RigidBody.STATIC);
-        this.home.physicsEngine.addBody(this.body);
-
+        if (this.home.active) this.activate();
         this.body.userData.sceneObject = this;
         this.body.collisionFilter = function (body) {
             let sceneObject = body.userData.sceneObject;
@@ -17,34 +16,71 @@ class PhysicsObject extends SceneObject {
         }.bind(this);
 
         //previous states
-        this.lastRotation = 0;
         this.lastVelocity = Vector2.origin;
-        this.last = this.middle;
         this.lastAngularVelocity = 0;
 
         this.optimize = other => true;
         this.hasCollideRule = false;
         //data
-        this.colliding = new CollisionMoniter();
-        this.lastColliding = new CollisionMoniter();
-        this.response.collide = {
-            general: function () { },
-            top: function () { },
-            bottom: function () { },
-            left: function () { },
-            right: function () { }
-        };
+        this.colliding = new CollisionMonitor();
+        this.lastColliding = new CollisionMonitor();
 
         this.shapeNameIDMap = new Map();
+
+        //fake velocity
+        let vel = this.body.velocity;
+        let vec = Vector2.fromPhysicsVector(vel);
+        delete vec.x;
+        delete vec.y;
+        Object.defineProperty(vec, "x", {
+            get() {
+                return vel.x;
+            },
+            set(a) {
+                vel.x = a;
+            }
+        });
+        Object.defineProperty(vec, "y", {
+            get() {
+                return vel.y;
+            },
+            set(a) {
+                vel.y = a;
+            }
+        });
+        this._velocity = vec;
     }
-    get middle() {
-        return new Vector2(this.x, this.y);
+    get canRotate() {
+        return this.body.canRotate;
     }
-    set middle(a) {
-        this.x = a.x;
-        this.y = a.y;
-        this.body.position.x = a.x;
-        this.body.position.y = a.y;
+    set canRotate(a) {
+        this.body.canRotate = a;
+    }
+    get friction() {
+        return this.body.friction;
+    }
+    set friction(a) {
+        this.body.friction = a;
+    }
+    get airResistance() {
+        return this.body.airResistance;
+    }
+    set airResistance(a) {
+        this.body.airResistance = a;
+    }
+    get gravity() {
+        return this.body.gravity;
+    }
+    set gravity(a) {
+        this.body.gravity = a;
+    }
+    get mobile() {
+        return this.body.type === RigidBody.DYNAMIC;
+    }
+    set mobile(a) {
+        this.body.type = a ? RigidBody.DYNAMIC : RigidBody.STATIC;
+        this.body.gravity = a;
+        if (a) this.body.wake();
     }
     set snuzzlement(a) {
         this.body.restitution = 1 - a;
@@ -52,11 +88,10 @@ class PhysicsObject extends SceneObject {
     get snuzzlement() {
         return 1 - this.body.restitution;
     }
-    set rotation(a) {
-        if (this.body) this.body.angle = a;
-    }
-    get rotation() {
-        return this.body && this.body.angle;
+    set mass(a) {
+        let scale = a / this.body.mass;
+        this.body.mass *= scale;
+        this.body.inertia *= scale;
     }
     get mass() {
         return this.body.mass;
@@ -68,10 +103,11 @@ class PhysicsObject extends SceneObject {
         this.body.isTrigger = !a;
     }
     get velocity() {
-        return this.body.velocity;
+        return this._velocity;
     }
     set velocity(a) {
-        this.body.velocity = a.toPhysicsVector();
+        this._velocity.x = a.x;
+        this._velocity.y = a.y;
     }
     get angularVelocity() {
         return this.body.angularVelocity;
@@ -79,13 +115,42 @@ class PhysicsObject extends SceneObject {
     set angularVelocity(a) {
         this.body.angularVelocity = a;
     }
+    activate() {
+        this.engine.scene.physicsEngine.addBody(this.body);
+    }
+    deactivate() {
+        this.engine.scene.physicsEngine.removeBody(this.body.id);
+    }
+    centerModels() {
+        super.centerModels();
+        this.shapeSync();
+    }
+    shapeSync() {
+        this.shapeNameIDMap.clear();
+        this.body.clearShapes();
+        for (let name in this.shapes) {
+            let shape = this.shapes[name];
+            let collider = shape.toPhysicsShape();
+            let colliders = this.body.addShape(collider);
+            this.shapeNameIDMap.set(name, colliders);
+        }
+        this.cacheDimensions();
+    }
+    scale(factor) {
+        super.scale(factor);
+        this.shapeSync();
+    }
+    scaleX(factor) {
+        super.scaleX(factor);
+        this.shapeSync();
+    }
+    scaleY(factor) {
+        super.scaleY(factor);
+        this.shapeSync();
+    }
     addShape(name, shape) {
-        let collider;
-        if (shape instanceof Polygon) collider = new PolygonCollider(shape.vertices.map(vert => vert.toPhysicsVector()));
-        else collider = new CircleCollider(shape.x, shape.y, shape.radius);
-        let colliders = this.body.addShape(collider);
-        this.shapeNameIDMap.set(name, colliders);
         super.addShape(name, shape);
+        this.shapeSync();
     }
     removeShape(name) {
         let shape = this.shapes[name];
@@ -102,8 +167,13 @@ class PhysicsObject extends SceneObject {
                 : new Polygon(model.vertices.map(vert => Vector2.fromPhysicsVector(vert))));
     }
 	onAddScript(script) {
-        const value = 1;
-		if (this.scripts[script].scriptCollideRule(value) !== value) this.hasCollideRule = true;
+        super.onAddScript(script);
+        const value = { };
+        try {
+            if (this.scripts[script].scriptCollideRule(value) !== value) this.hasCollideRule = true;
+        } catch (err) {
+            this.hasCollideRule = true;
+        }
 	}
     collideBasedOnRule(e) {
         let judgement = [];
@@ -117,47 +187,29 @@ class PhysicsObject extends SceneObject {
         this.body.angularVelocity = 0;
     }
     mobilize() {
-        this.body.type = RigidBody.DYNAMIC;
+        this.mobile = true;
     }
     immobilize() {
-        this.body.type = RigidBody.STATIC;
+        this.mobile = false;
     }
-    drawWithoutRotation(artist) {
-        let com = this.middle;
-        let rot = this.rotation;
-        c.translate(com);
-        c.rotate(-rot);
-        c.translate(com.inverse());
-        artist.bind(this)();
-        c.translate(com);
-        c.rotate(rot);
-        c.translate(com.inverse());
+    beforePhysicsStep() {
+        this.body.position.x = this.transform.position.x;
+        this.body.position.y = this.transform.position.y;
+        this.body.angle = this.transform.rotation;
+        this.body.invalidateModels();
     }
-    engineFixedUpdate() {
-        this.scripts.run("Update");
-        this.update();
-        this.x = this.body.position.x;
-        this.y = this.body.position.y;
-    }
-    updatePreviousData() {
-        this.direction = this.middle.Vminus(this.last);
-        this.last = this.middle;
-        
-        this.lastVelocity = this.velocity.get();
-        this.lastAngularVelocity = this.angularVelocity;
-
-        this.angularDirection = this.rotation - this.lastRotation; 
-        this.lastRotation = this.rotation;
-    }
-    physicsUpdate() {
-        
+    afterPhysicsStep() {
+        this.transform.position.x = this.body.position.x;
+        this.transform.position.y = this.body.position.y;
+        this.transform.rotation = this.body.angle;
+        this.updateCaches();
     }
     moveTowards(point, ferocity = 1) {
-        let dif = point.Vminus(this.middle);
+        let dif = point.Vminus(this.transform.position);
         this.velocity.Vadd(dif.Ntimes(ferocity / 100));
     }
     moveAwayFrom(point, ferocity = 1) {
-        let dif = this.middle.Vminus(point);
+        let dif = this.transform.position.Vminus(point);
         this.velocity.Vadd(dif.Ntimes(ferocity / 100));
     }
     applyImpulseMass(point, force) {

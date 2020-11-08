@@ -1,4 +1,161 @@
 class Geometry {
+    static triangulate(vertices) {
+        const result = [];
+        if (vertices.length < 3) return [];
+        if (vertices.length === 3) return [vertices];
+        for (let i = 0; i < vertices.length / 2; i++) {
+            let a = vertices[vertices.length - 1 - i];
+            let b = i ? vertices[vertices.length - i] : vertices[0];
+            let c = vertices[i + 1];
+            let d = vertices[i + 2];
+            if (a !== d) result.push([a, c, d], [a, b, c]);
+        }
+        if (vertices.length % 2 === 1) result.pop();
+        return result;
+    }
+    static gridToPolygons(srcGrid, CELL_SIZE) {
+
+        let grid = srcGrid.map(v => v);
+
+
+        //methods
+        function sample(x, y) {
+            if (x in grid && y in grid[x]) return grid[x][y];
+            return false;
+        }
+
+        function set(arr, x, y, v) {
+            if (x in arr && y in arr[x]) arr[x][y] = v;
+        }
+        function point(x, y) {
+            return new Vector2(x, y);
+        }
+
+        //remove diagonals
+
+        let broken = true;
+        while (broken) {
+            broken = false;
+            for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
+                const V = sample(i, j);
+                if (V) {
+                    const A = sample(i, j - 1);
+                    const B = sample(i + 1, j);
+                    const C = sample(i, j + 1);
+                    const D = sample(i - 1, j);
+
+                    const A2 = sample(i + 1, j - 1);
+                    const B2 = sample(i + 1, j + 1);
+                    const C2 = sample(i - 1, j + 1);
+                    const D2 = sample(i - 1, j - 1);
+
+                    if (A2) if (!A && !B) {
+                        broken = true;
+                        grid[i][j - 1] = true;
+                    }
+                    if (B2) if (!B && !C) {
+                        broken = true;
+                        grid[i + 1][j] = true;
+                    }
+                    if (C2) if (!C && !D) {
+                        broken = true;
+                        grid[i][j + 1] = true;
+                    }
+                    if (D2) if (!D && !A) {
+                        broken = true;
+                        grid[i - 1][j] = true;
+                    }
+                }
+            }
+        }
+
+
+
+        let pathGrid = Array.dim(grid.length + 1, grid[0].length + 2);
+        let pointGrid = Array.dim(grid.length + 1, grid[0].length + 2);
+        let startingPoints = [];
+
+        for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
+            const V = sample(i, j);
+            if (V) {
+                const A = sample(i, j - 1);
+                const B = sample(i + 1, j);
+                const C = sample(i, j + 1);
+                const D = sample(i - 1, j);
+
+
+                if (!A) set(pathGrid, i, j, Vector2.right);
+                if (!B) set(pathGrid, i + 1, j, Vector2.down);
+                if (!C) set(pathGrid, i + 1, j + 1, Vector2.left);
+                if (!D) set(pathGrid, i, j + 1, Vector2.up);
+
+
+                const A_p = point(i, j - 1);
+                const B_p = point(i + 1, j);
+                const C_p = point(i, j + 1);
+                const D_p = point(i - 1, j);
+                const V_p = point(i, j);
+
+
+                let ul = true;
+                let ur = true;
+                let ll = true;
+                let lr = true;
+
+                if (A) ul = false, ur = false;
+                if (B) ur = false, lr = false;
+                if (C) ll = false, lr = false;
+                if (D) ul = false, ll = false;
+
+                if (ul) set(pointGrid, i, j, true);
+                if (ur) set(pointGrid, i + 1, j, true);
+                if (ll) set(pointGrid, i, j + 1, true);
+                if (lr) set(pointGrid, i + 1, j + 1, true);
+
+                if (ul) startingPoints.push(V_p);
+                if (ur) startingPoints.push(B_p);
+                if (ll) startingPoints.push(C_p);
+                if (lr) startingPoints.push(point(i + 1, j + 1));
+            }
+        }
+        // for (let i = 0; i < pathGrid.length; i++) for (let j = 0; j < pathGrid[0].length; j++) {
+        //     let v = pathGrid[i][j];
+        //     if (v) {
+        //         renderer.stroke(Color.ORANGE, 2).arrow(point(i, j).times(CELL_SIZE), point(i, j).times(CELL_SIZE).plus(v.times(CELL_SIZE)));
+        //     }
+        // }
+        // for (let i = 0; i < pointGrid.length; i++) for (let j = 0; j < pointGrid[0].length; j++) {
+        //     let p = pointGrid[i][j];
+        //     if (p) {
+        //         // renderer.stroke(Color.LIME, 3).circle(point(i, j), 5);
+        //     }
+        // }
+        // for(let p of startingPoints) renderer.draw(Color.PURPLE).circle(p.times(CELL_SIZE), 5);
+        let polygons = [];
+        // startingPoints = [];
+        while (startingPoints.length) {
+            let start = startingPoints[0];
+            let current = start.get();
+            let points = [];
+            let lastArrow = null;
+            let counter = false;
+            do {
+                let v = pathGrid[~~current.x][~~current.y];
+                if (!v) break;
+                lastArrow = v;
+                current.add(v);
+                let found = startingPoints.find(vec => vec.equals(current));
+                if (found) {
+                    points.push(found.times(CELL_SIZE));
+                    startingPoints.splice(startingPoints.indexOf(found), 1);
+                }
+            } while (!current.equals(start));
+            if (points.length && !counter) polygons.push(points);
+        }
+
+        // for (let points of polygons) renderer.stroke(Color.PURPLE, 2).shape(...points);
+        return polygons.filter(poly => Geometry.isClockwise(poly));
+    }
     static reimann(fn, a, b, iter = 1000, RRAM = false) {
         let sum = 0;
         let dif = (b - a) / iter;
@@ -96,28 +253,80 @@ class Geometry {
     static projectPointOntoLine(p, d) {
         return p.x * d.x + p.y * d.y;
     }
-    static rayCastPolygons(rayOrigin, rayDir, polygons) {
-        let lines = [];
-        for (let polygon of polygons) lines.push(...polygon.getEdges());
-        return Geometry.rayCastLines(rayOrigin, rayDir, lines);
-    }
-    static rayCastLines(rayOrigin, rayDir, lines) {
-        let result = null;
-        let outOfBounds = true;
-        let minDist = Infinity;
-        for (let l of lines) {
-            let clos = Geometry.closestPointOnLineObjectInDirectionLimited(rayOrigin, rayDir, l);
-            if (!clos.outOfBounds) {
-                let p = clos.result;
-                let dist = Geometry.distToPoint2(p, rayOrigin);
-                if (dist < minDist) {
-                    minDist = dist;
-                    outOfBounds = false;
-                    result = clos.result;
+    static rayCast(p, r, shapes) {
+        let hit = null;
+        let hitShape = null;
+        let bestDist = Infinity;
+        const EPSILON = 0.0001;
+        for (let shape of shapes) {
+            let nHit = null;
+            if (shape instanceof Circle) {
+                let normal = r.normal;
+                let proj_P = normal.dot(p);
+                let proj_C = normal.dot(shape);
+                if (Math.abs(proj_P - proj_C) < shape.radius && p.minus(shape).dot(r) <= 0) {
+                    let t = (proj_C + shape.radius - proj_P) / (shape.radius * 2);
+                    let upVec = r.times(-1);
+                    let crossVec = upVec.normal;
+                    let baseP = shape.middle.sub(crossVec.times(shape.radius)).add(crossVec.times(t * shape.radius * 2));
+                    let y = Math.sqrt(1 - (2 * t - 1) ** 2);
+                    baseP.add(upVec.times(y * shape.radius));
+                    if (baseP.minus(p).dot(r) >= 0) nHit = baseP;
+                }
+            } else if (shape instanceof Polygon) {
+                let edges = shape.getEdges();
+                let bestDist = Infinity;
+                let bestPoint = null;
+                edges = edges.filter(edge => {
+                    let n = edge.vector.normal;
+                    return n.dot(r) >= 0 && Math.max(edge.a.minus(p).dot(r), edge.b.minus(p).dot(r)) > 0;
+                });
+                let normal = r.normal;
+                let dx = r.x;
+                let dy = r.y || EPSILON;
+                let b = p.y - p.x * dy / dx;
+                for (let edge of edges) {
+                    let proj_P = normal.dot(p);
+                    let proj_A = normal.dot(edge.a);
+                    let proj_B = normal.dot(edge.b);
+                    [proj_A, proj_B] = [Math.min(proj_A, proj_B), Math.max(proj_A, proj_B)];
+                    if (proj_P >= proj_A && proj_P <= proj_B) {
+                        let vec = edge.vector;
+                        let dx2 = vec.x || EPSILON;
+                        let dy2 = vec.y || EPSILON;
+                        let b2 = edge.a.y - edge.a.x * dy2 / dx2;
+                        let x, y;
+                        if (Math.abs(dx) > EPSILON) {
+                            // dy / dx * x + b = dy2 / dx2 * x + b2
+                            // dy / dx * x - dy2 / dx2 * x = b2 - b
+                            // (dy / dx - dy2 / dx2) * x = b2 - b
+                            // x = (b2 - b) / (dy / dx - dy2 / dx2)
+                            x = (b2 - b) / (dy / dx - dy2 / dx2);
+                            y = dy / dx * x + b;
+                        } else {
+                            x = p.x;
+                            y = dy2 / dx2 * x + b2;
+                        }
+                        let dist = (x - p.x) ** 2 + (y - p.y) ** 2;
+                        if (dist < bestDist) {
+                            bestDist = dist;
+                            bestPoint = new Vector2(x, y);
+                        }
+
+                    }
+                    nHit = bestPoint;
+                }
+            }
+            if (nHit) {
+                let nDist = (nHit.x - p.x) ** 2 + (nHit.y - p.y) ** 2;
+                if (nDist < bestDist && nHit.minus(p).dot(r) >= 0) {
+                    hit = nHit;
+                    bestDist = nDist;
+                    hitShape = shape;
                 }
             }
         }
-        return { result, outOfBounds };
+        return { hitPoint: hit, hitShape };
     }
     static closestPointOnLineObjectInDirection(p, d, l) {
         let x1 = p.x;
@@ -132,7 +341,7 @@ class Geometry {
         let leftCof = (dy2 / dx2) - (dy1 / dx1);
         const MIN = Math.min(l.a.x, l.b.x);
         const MAX = Math.max(l.a.x, l.b.x);
-        let x = clamp(rightSide / leftCof, MIN, MAX);
+        let x = Number.clamp(rightSide / leftCof, MIN, MAX);
         let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
         return new Vector2(x, y);
     }
@@ -155,7 +364,7 @@ class Geometry {
         let outOfBounds = false;
         if (x < MIN || x > MAX) {
             outOfBounds = true;
-            x = clamp(x, MIN, MAX);
+            x = Number.clamp(x, MIN, MAX);
         }
         let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
         let dirX = x - p.x;
@@ -171,7 +380,7 @@ class Geometry {
     }
     static closestPointOnPolygonInDirection(point, dir, r) {
         let edges = [];
-        let corners = r.getCorners();
+        let corners = r.vertices;
         let bestPoint = null;
         let bestDist = Infinity;
         for (let i = 0; i < corners.length; i++) {
@@ -228,7 +437,7 @@ class Geometry {
         let X = (p.y + m_2 * p.x + m_1 * A.x - A.y) / (m_1 + m_2);
         if (X < MIN || X > MAX) {
             outOfBounds = true;
-            X = clamp(X, MIN, MAX);
+            X = Number.clamp(X, MIN, MAX);
         }
         const Y = m_1 * X + A.y - m_1 * A.x;
         return { result: new Vector2(X, Y), outOfBounds };
@@ -249,102 +458,200 @@ class Geometry {
         let nDif = new Vector2(cos * dif.x - sin * dif.y, sin * dif.x + cos * dif.y);
         return new Vector2(origin.x + nDif.x, origin.y + nDif.y);
     }
-    static subdividePolygonList(polygon, direction) {
-        let otherPolygons = [];
-        let counter = direction;
-        let slice = null;
-        let newPolygon = [...polygon];
-        for (let i = 0; i < polygon.length; i++) {
-            //recalculate edges
-            let edges = [];
-            for (let i = 0; i < polygon.length; i++) {
-                let a = polygon[i];
-                let b = polygon[(i + 1) % polygon.length];
-                edges.push(new Line(a, b));
-            }
+    static subdividePolygonList(vertices) {
+        vertices = [...vertices];
+        //edges
+        let vectors = [];
+        let edges = [];
+        let middle = Vector2.origin;
+        for (let i = 0; i < vertices.length; i++) {
+            const A = vertices[i];
+            const B = vertices[(i + 1) % vertices.length];
+            vectors.push(B.minus(A).normalize());
+            edges.push(new Line(A, B));
+            middle.add(A);
+        }
 
-            //everything else
-            let point = polygon[i];
-            let v1 = point.Vminus(polygon[(i + 1) % polygon.length]).normalize().inverse();
-            let v2 = point.Vminus(polygon[(i - 1 + polygon.length) % polygon.length]).normalize().inverse();
-            let a1 = v1.getAngle();
-            let a2 = v2.getAngle();
-            let dif = Math.abs(a2 - a1);
-            if (a2 < a1) dif = Math.PI * 2 - dif;
-            if (counter) dif = Math.PI * 2 - dif;
-            if (dif > Math.PI) {
-                let dir = v1.Vplus(v2).Nover(-2).normalize();
-                let considerable = [];
-                for (let j = 0; j < polygon.length; j++) if (j !== i && j !== (i - 1 + polygon.length) % polygon.length) {
-                    edges[j].indices = [j, (j + 1) % polygon.length];
-                    considerable.push(edges[j]);
+        //direction
+        middle.div(vertices.length);
+
+        const INDEX_DATA = [];
+        const CONVEX = [];
+
+        for (let i = 0; i < edges.length; i++) {
+            const INX = i;
+            const NEXT_INX = (i + 1) % edges.length;
+            const A = edges[INX];
+            const B = edges[NEXT_INX];
+            const VEC_A = vectors[INX];
+            const VEC_B = vectors[NEXT_INX];
+            const VERT_A = vertices[INX];
+            const VERT_B = vertices[NEXT_INX];
+
+            let angle = Math.abs(VEC_B.angle - VEC_A.angle);
+            if (VEC_B.angle < VEC_A.angle) angle = Math.PI * 2 - angle;
+
+            let convex = angle <= Math.PI || !angle;
+
+            INDEX_DATA.push({ INX, NEXT_INX, A, B, VEC_A, VEC_B, VERT_A, VERT_B, convex });
+            CONVEX.push(convex);
+        }
+
+        if (CONVEX.includes(false)) {
+            const CONCAVE_INX = CONVEX.indexOf(false);
+            const { INX, NEXT_INX, A, B, VEC_A, VEC_B, VERT_A, VERT_B, convex } = INDEX_DATA[CONCAVE_INX];
+
+            const VERTEX = VERT_B;
+
+            const AWAY = VEC_A.minus(VEC_B).normalize();
+
+            const SEGMENTS = [];
+            for (let i = 0; i < edges.length; i++) {
+                if (i === INX) continue;
+                if (i === NEXT_INX) continue;
+                const EDGE = edges[i];
+                const TO_MIDDLE_A = EDGE.a.minus(VERTEX);
+                const TO_MIDDLE_B = EDGE.b.minus(VERTEX);
+                if (TO_MIDDLE_A.dot(AWAY) < 0 && TO_MIDDLE_B.dot(AWAY) < 0) continue;
+                SEGMENTS.push(edges[i]);
+            }
+            if (!SEGMENTS.length) return [vertices];
+
+            const EPSILON = 0.00001;
+
+            const dx = AWAY.x || EPSILON;
+            const dy = AWAY.y || EPSILON;
+            const b = VERTEX.y - dy / dx * VERTEX.x;
+
+            let intersects = [];
+            for (let i = 0; i < SEGMENTS.length; i++) {
+                const SEG = SEGMENTS[i];
+                const SEG_LENGTH = SEG.length;
+                // let ix = VERTEX.x;
+                // let iy = VERTEX.y;
+
+                // const dx_2 = (SEG.b.x - SEG.a.x) || EPSILON;
+                // const dy_2 = (SEG.b.y - SEG.a.y) || EPSILON;
+                // const b_2 = SEG.a.y - dy_2 / dx_2 * SEG.a.x;
+
+                // ix = (b - b_2) / (dy_2 / dx_2 - dy / dx);
+                // iy = dy / dx * ix + b;
+
+                // const INTERSECT = new Vector2(ix, iy);
+                const INTERSECT = Geometry.intersectRayLine(VERTEX, AWAY, SEG);
+                if (!INTERSECT) continue;
+                const DOT = INTERSECT.minus(SEG.a).dot(SEG.vector);
+
+                if (DOT >= 0 && DOT <= SEG_LENGTH) intersects.push({ point: INTERSECT, segment: SEG });
+            }
+            if (intersects.length) {
+                const INTERSECT = intersects.sort((a, b) => a.point.minus(VERTEX).sqrMag - b.point.minus(VERTEX).sqrMag)[0];
+                const INX = edges.indexOf(INTERSECT.segment);
+                const INX_A = INX;
+                const INX_B = (INX + 1) % vertices.length;
+                // renderer.draw(Color.RED).circle(vertices[INX_A], 5);
+                // renderer.draw(Color.RED).circle(vertices[INX_B], 5);
+                vertices.splice(INX_B, 0, INTERSECT.point);
+
+                const NEW_INX = vertices.indexOf(INTERSECT.point);
+                const VERTEX_INX = vertices.indexOf(VERTEX);
+
+                let polyA = [];
+                let polyB = [];
+                if (NEW_INX < VERTEX_INX) {
+                    polyA = [...vertices.slice(VERTEX_INX), ...vertices.slice(0, NEW_INX + 1)];
+                    polyB = vertices.slice(NEW_INX, VERTEX_INX + 1);
+                } else {
+                    polyA = vertices.slice(VERTEX_INX, NEW_INX + 1);
+                    polyB = [...vertices.slice(NEW_INX), ...vertices.slice(0, VERTEX_INX + 1)];
                 }
-                let bestDist = Infinity;
-                let bestPoint = null;
-                let bestLine = null;
-                for (let line of considerable) {
-                    let bp = Geometry.closestPointOnLineObjectInDirectionLimited(point, dir, line);
-                    if (!bp.outOfBounds) {
-                        let dist = Geometry.distToPoint2(bp.result, point);
-                        if (dist < bestDist) {
-                            bestDist = dist;
-                            bestPoint = bp.result;
-                            bestLine = line;
-                        }
-                    }
+
+                // renderer.stroke(Color.PURPLE, 4).shape(...polyA);
+                // renderer.stroke(Color.GREEN, 4).shape(...polyB);
+                // console.log(NEW_INX);
+
+                // renderer.draw(Color.ORANGE).circle(INTERSECT.point, 5);
+                // renderer.draw(Color.YELLOW).circle(vertices[NEW_INX], 5);
+                try {
+                    let polysA = Geometry.subdividePolygonList(polyA);
+                    let polysB = Geometry.subdividePolygonList(polyB);
+                    return [...polysA, ...polysB];
+                } catch (e) {
+                    return [polyB, polyB];
                 }
-                if (bestPoint && bestLine) {
-                    slice = new Line(bestPoint, point);
-                    newPolygon.splice(bestLine.indices[1], 0, bestPoint);
-                    break;
-                }
+            } else return [vertices];
+
+            // for (let seg of SEGMENTS) renderer.stroke(Color.PURPLE, 2).arrow(seg);
+
+            // renderer.stroke(Color.ORANGE, 2).arrow(VERT_B, VERT_B.plus(AWAY.times(F)));
+
+            // renderer.draw(convex ? Color.RED : Color.GREEN).circle(VERT_B, 3);
+        } else return [vertices];
+    }
+    static intersectRayLine(o, r, l) {
+        let result = null;
+        const EPSILON = 0.0001;
+        if (Math.abs(l.a.x - l.b.x) < EPSILON) {
+            if (r.x) {
+                let dx = r.x;
+                let dy = r.y;
+                let b = o.y - dy / dx * o.x;
+                let x = l.a.x;
+                let y = dy / dx * x + b;
+                let minY = Math.min(l.a.y, l.b.y);
+                let maxY = Math.max(l.a.y, l.b.y);
+                if (y >= minY && y <= maxY) result = new Vector2(x, y);
+            } else {
+                if (o.x === l.a.x) result = new Vector2(o.x, Number.clamp(o.y, Math.min(l.a.y, l.b.y), Math.max(l.a.y, l.b.y)));
+            }
+        } else {
+            if (Math.abs(r.x) > EPSILON) {
+                let dx = r.x;
+                let dy = r.y;
+                let b = o.y - dy / dx * o.x;
+                let dx2 = l.b.x - l.a.x;
+                let dy2 = l.b.y - l.a.y;
+                let b2 = l.a.y - dy2 / dx2 * l.a.x;
+                let x = (b2 - b) / (dy / dx - dy2 / dx2);
+                let minX = Math.min(l.a.x, l.b.x);
+                let maxX = Math.max(l.a.x, l.b.x);
+                if (x >= minX && x <= maxX) result = new Vector2(x, dy / dx * x + b);
+            } else {    
+                let dx2 = l.b.x - l.a.x;
+                let dy2 = l.b.y - l.a.y;
+                let b2 = l.a.y - dy2 / dx2 * l.a.x;
+                let x = o.x;
+                let minX = Math.min(l.a.x, l.b.x);
+                let maxX = Math.max(l.a.x, l.b.x);
+                if (x >= minX && x <= maxX) result = new Vector2(x, dy2 / dx2 * x + b2);
             }
         }
-        let leftOvers = newPolygon;
-        let currentPolygon = [];
-        function getIndex(corner) {
-            for (let i = 0; i < leftOvers.length; i++) {
-                if (leftOvers[i].equals(corner)) return i;
-            }
-            return 0;
-        }
-        if (slice) {
-            currentPolygon = [slice.a];
-            let otherPolygon = [slice.b];
-            let indexA = getIndex(slice.a);
-            let indexB = getIndex(slice.b);
-            let currentIndex = indexA;
-            while (currentIndex !== indexB) {
-                currentIndex = (currentIndex + 1) % leftOvers.length;
-                currentPolygon.push(leftOvers[currentIndex]);
-            }
-            while (currentIndex !== indexA) {
-                currentIndex = (currentIndex + 1 + leftOvers.length) % leftOvers.length;
-                otherPolygon.push(leftOvers[currentIndex]);
-            }
-            for (let point of currentPolygon) {
-                leftOvers.splice(getIndex(point), 1);
-            }
-            let a = currentPolygon;
-            let b = otherPolygon;
-            
-            otherPolygons.push(...Geometry.subdividePolygonList(a));
-            otherPolygons.push(...Geometry.subdividePolygonList(b));
-            return otherPolygons;
-        } else return [polygon];
+        if (result && result.minus(o).dot(r) <= 0) result = null; 
+        return result;
     }
     static getMiddle(verts) {
-        return Vector2.sum(...verts).over(verts.length);
+        return Vector2.sum(verts).over(verts.length);
     }
-    static subdividePolygon(polygon) {
-        let verts = polygon.vertices;
-        let middle = Geometry.getMiddle(verts);
-        verts = verts.map(e => e.Vminus(middle));
-        return Geometry.subdividePolygonList(verts, Geometry.vertexDirection(polygon)).map(e => new Polygon(Geometry.clockwise(e).map(e => e.Vplus(middle)), 0));
+    static isClockwise(verts) {
+        let sum = 0;
+        for (let i = 0; i < verts.length; i++) {
+            let a = verts[i];
+            let b = verts[(i + 1) % verts.length];
+            sum += (b.x - a.x) * (a.y + b.y) / 2;
+        }
+        return sum < 0;
+    }
+    static area(verts) {
+        let sum = 0;
+        for (let i = 0; i < verts.length; i++) {
+            let a = verts[i];
+            let b = verts[(i + 1) % verts.length];
+            sum += (b.x - a.x) * (a.y + b.y) / 2;
+        }
+        return sum / 2;
     }
     static clockwise(verts) {
-        let middle = Geometry.getMiddle(verts);
-        return verts.map(e => e.minus(middle)).sort((a, b) => a.getAngle() - b.getAngle()).map(e => e.plus(middle));
+        return Geometry.isClockwise(verts) ? verts : [...verts].reverse();
     }
     static vertexDirection(verts) {
         let middle = Geometry.getMiddle(verts);
@@ -389,12 +696,15 @@ class Geometry {
         }
     }
     static overlapPoint(poly, p) {
-        if (poly instanceof Circle) return (p.x - poly.x) ** 2 + (p.y - poly.y) ** 2 < poly.radius ** 2;
-        else {
+        if (poly instanceof Circle) {
+            let dx = p.x - poly.x;
+            let dy = p.y - poly.y;
+            return dx * dx + dy * dy < poly.radius ** 2;
+        } else {
             let axes = [];
             poly = poly.vertices;
             for (let i = 0; i < poly.length; i++) {
-                axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normalize())
+                axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normal.normalize())
             }
             let col = true;
             for (let i = 0; i < axes.length; i++) {
@@ -412,25 +722,23 @@ class Geometry {
             return col;
         }
     }
-    static overlapShapes(poly, poly2) {
-        poly.cacheBoundingBox(poly.getBoundingBox());
-        poly2.cacheBoundingBox(poly2.getBoundingBox());
-        return Physics.collide(poly, poly2).colliding;
-    }
-    static pointInsideRectangle(p, r) {
-        if (!r.rotation) {
-            return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
-        } else {
-            return Physics.collidePolygonPoint(r, p).colliding;
-        }
+    static pointInsideRect(p, r) {
+        return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
     }
     static pointInsideCircle(p, c) {
         return Geometry.distToPoint(p, c) ** 2 < c.radius ** 2;
     }
     static overlapCircleRect(c, r) {
         let dist = Geometry.distToRect2(c, r);
-        let inside = Geometry.pointInsideRectangle(c, r);
+        let inside = Geometry.pointInsideRect(c, r);
         return (dist < c.radius ** 2) || inside;
+    }
+    static overlapShapes(poly, poly2) {
+        if (r instanceof Rect) {
+            
+        } else {
+
+        }
     }
     static overlapRectRect(r, r2) {
         if (!r || !r2) return false;

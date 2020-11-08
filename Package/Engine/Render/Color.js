@@ -5,11 +5,16 @@ class Color extends Operable {
 		let green = 0;
 		let blue = 0;
 		let alpha = 0;
-		this.custom = {};
 		this.limited = true;
 		if (b === undefined && g === undefined && typeof r == "string") {
-			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0) {
+			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0 && r.indexOf("hsb") < 0) {
 				let col = Color.CSSColor(r);
+				red = col.red;
+				green = col.green;
+				blue = col.blue;
+				alpha = col.alpha;
+			} else if (r[0] == "h") {
+				let col = Color.parseHSBA(r);
 				red = col.red;
 				green = col.green;
 				blue = col.blue;
@@ -21,69 +26,19 @@ class Color extends Operable {
 				blue = col.blue;
 				alpha = col.alpha;
 			} else if (r[0] == "#") {
-				function hexToNum(hex) {
-					if (isNaN(parseInt(hex))) {
-						switch (hex) {
-							case "a":
-								return 10;
-							case "b":
-								return 11;
-							case "c":
-								return 12;
-							case "d":
-								return 13;
-							case "e":
-								return 14;
-							case "f":
-								return 15;
-						}
-					} else {
-						return parseInt(hex);
-					}
-				}
-				function parseHex(chars) {
-					let c1 = chars[0];
-					let c2 = chars[1];
-					let result = 0;
-					result += hexToNum(c1) * 16;
-					result += hexToNum(c2);
-					return result;
-				}
-				let rgb = "rgb(";
-				let groups = ["", "", ""];
-				let n = 0;
-				if (r.length === 4) {
-					let newR = "";
-					for (let char of r) {
-						if (char !== "#") {
-							newR += char + char;
-						}
-					}
-					r = "#" + newR;
-				}
-				for (let char of r) {
-					if (char != "#") {
-						n++;
-						groups[Math.floor((n - 1) / 2)] += char;
-					}
-				}
-				n = 0;
-				for (let group of groups) {
-					n++;
-					rgb += parseHex(group) + ((n == 3) ? "" : ", ");
-				}
-				rgb += ")";
-				let col = Color.parseRGBA(rgb);
-				red = col.red;
-				green = col.green;
-				blue = col.blue;
-				alpha = col.alpha;
+				let str = r.slice(1);
+				if (str.length === 3) str = str[0].repeat(2) + str[1].repeat(2) + str[2].repeat(2);
+				let num = parseInt(str, 16);
+				red = num >> 16;
+				green = (num & 0x00FF00) >> 8;
+				blue = num & 0x0000FF;
+				alpha = 1;
 			}
 		} else {
-			red = (r === undefined) ? 0 : r;
-			green = (g === undefined) ? 0 : g;
-			blue = (b === undefined) ? 0 : b;
-			alpha = (a === undefined) ? 1 : a;
+			red = (r !== undefined) ? r : 0;
+			green = (g !== undefined) ? g : 0;
+			blue = (b !== undefined) ? b : 0;
+			alpha = (a !== undefined) ? a : 1;
 		}
 		this.red = red;
 		this.green = green;
@@ -91,42 +46,15 @@ class Color extends Operable {
 		this.alpha = alpha;
 		this.constrain();
 	}
-	static parseRGBA(str) {
-		let rgba = "";
-		let state = false;
-		for (let char of str) {
-			if (char == ")" || char == "(") {
-				state = !state;
-			}
-			else if (state) {
-				rgba += char;
-			}
-		}
-		let rgbaList = rgba.split(",");
-		let red = parseFloat(rgbaList[0]);
-		let green = parseFloat(rgbaList[1]);
-		let blue = parseFloat(rgbaList[2]);
-		let alpha = (rgbaList.length > 3) ? parseFloat(rgbaList[3]) : 1;
-		return { red, green, blue, alpha };
+	set brightness(n) {
+		let scale = n / this.brightness;
+		this.red *= scale;
+		this.green *= scale;
+		this.blue *= scale;
+		this.constrain();
 	}
-	static CSSColor(word) {
-		//processed
-		return "#" + Color.CSSColors[word.toLowerCase()];
-	}
-	static optimizedConstruct(red, green, blue, alpha) {
-		return new Color(red, green, blue, alpha);
-	}
-	static numToHex(num) {
-		let a = Math.floor(num / 16);
-		let b = Math.floor(num % 16);
-		let hexAry = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
-		return hexAry[a] + hexAry[b];
-	}
-	static random() {
-		return new Color(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random());
-	}
-	static rand(seed) {
-		return new Color(rand(seed) * 255, rand(seed + 1) * 255, rand(seed + 2) * 255, rand(seed + 3));
+	get brightness() {
+		return (this.red + this.blue + this.green) / (3 * 255);
 	}
 	invert() {
 		let n = (new Color(255, 255, 255, 1)).sub(this);
@@ -157,29 +85,17 @@ class Color extends Operable {
 	}
 	constrain() {
 		if (this.limited) {
-			this.red = clamp(this.red, 0, 255);
-			this.green = clamp(this.green, 0, 255);
-			this.blue = clamp(this.blue, 0, 255);
-			this.alpha = clamp(this.alpha, 0, 1);
+			this.red = Number.clamp(this.red, 0, 255);
+			this.green = Number.clamp(this.green, 0, 255);
+			this.blue = Number.clamp(this.blue, 0, 255);
+			this.alpha = Number.clamp(this.alpha, 0, 1);
 		}
 	}
 	dif(color) {
-		let red = Math.abs(this.red - color.red) / 255;
-		let green = Math.abs(this.green - color.green) / 255;
-		let blue = Math.abs(this.blue - color.blue) / 255;
-		let alpha = Math.abs(this.alpha - color.alpha) / 255;
-		return (((red + green + blue + alpha) * 10) ** 2) / 1600;
+		return Color.modValues.map(ch => Math.abs(this[ch] - color[ch])).total();
 	}
 	static get empty() {
-		return Color.optimizedConstruct(0, 0, 0, 0);
-	}
-	static avg(c1, c2) {
-		return c1.plus(c2).over(2);
-	}
-	static sum(...colors) {
-		let result = Color.optimizedConstruct(0, 0, 0, 0);
-		for (let color of colors) result.add(color);
-		return result;
+		return new Color(0, 0, 0, 0);
 	}
 	static quadLerp(a, b, c, d, tx, ty) {
 		return Color.empty.map((value, channel) => Interpolation.quadLerp(a[channel], b[channel], c[channel], d[channel], tx, ty));
@@ -194,14 +110,112 @@ class Color extends Operable {
 		cl.alpha = col.alpha;
 		return cl;
 	}
+	static saturate(col, a) {
+		let b = col.brightness * 255;
+		return new Color(b + (col.red - b) * a, b + (col.green - b) * a, b + (col.blue - b) * a, col.alpha);
+	}
 	static grayScale(per) {
 		let r = 255 * per;
 		let g = 255 * per;
 		let b = 255 * per;
 		return new Color(r, g, b, 1);
 	}
-	get brightness() {
-		return (this.red + this.blue + this.green) / (3 * 255);
+	static CSSColor(word) {
+		//processed
+		return Color.CSSColors[word.toLowerCase()];
+	}
+	static numToHex(num) {
+		let a = Math.floor(num / 16);
+		let b = Math.floor(num % 16);
+		let hexAry = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
+		return hexAry[a] + hexAry[b];
+	}
+	static parseNum(str, limit) {
+		if (str[str.length - 1] === "%") return parseFloat(str) / 100 * limit;
+		return parseFloat(str);
+	}
+	static parseHSBA(str) {
+		let hsb = "";
+		let state = false;
+		for (let char of str) {
+			if (char == ")" || char == "(") {
+				state = !state;
+			}
+			else if (state) {
+				hsb += char;
+			}
+		}
+		let hsbaList = hsb.split(",");
+		let H = Color.parseNum(hsbaList[0], 360);
+		let S = Color.parseNum(hsbaList[1], 1);
+		let B = Color.parseNum(hsbaList[2], 1);
+		let alpha = (hsbaList.length > 3) ? Color.parseNum(hsbaList[3], 1) : 1;
+		
+		H = Math.max(H, 0);
+		H %= 360;
+		let seg = ~~(H / 120);
+		let t = (H % 120) / 120;
+		let ot = t + Math.sin(2 * Math.PI * t) / (2 * Math.PI);
+		// let ot1 = 2 * 255 * Math.min(1 - t, 0.5);
+		// let ot2 = 2 * 255 * Math.min(t, 0.5);
+		let st = (3 + Math.sin(2 * Math.PI * t - Math.PI / 2)) / 2;
+		let r = 0, g = 0, b = 0;
+		switch (seg) {
+			case 0:
+				g = 255 * ot;
+				r = 255 - g;
+				// g = ot2;
+				// r = ot1;
+				break;
+			case 1:
+				b = 255 * ot;
+				g = 255 - b;
+				// b = ot2;
+				// g = ot1; 
+				break;
+			case 2:
+				r = 255 * ot;
+				b = 255 - r;
+				// r = ot2;
+				// b = ot1;
+				break;
+		}
+
+		let scaleBrightness = st;
+		scaleBrightness *= B;
+		// r = 255;
+		// g = 255;
+		// b = 0;
+		r *= scaleBrightness;
+		g *= scaleBrightness;
+		b *= scaleBrightness;
+		let middle = (r + g + b) / 3;
+		let dr = r - middle;
+		let dg = g - middle;
+		let db = b - middle;
+		r = middle + S * dr;
+		g = middle + S * dg;
+		b = middle + S * db;
+
+		return { red: r, green: g, blue: b, alpha };
+	}
+	static parseRGBA(str) {
+		let rgba = "";
+		let state = false;
+		for (let char of str) {
+			if (char == ")" || char == "(") {
+				state = !state;
+			}
+			else if (state) {
+				rgba += char;
+			}
+		}
+		let rgbaList = rgba.split(",");
+		let red = Color.parseNum(rgbaList[0], 255);
+		let green = Color.parseNum(rgbaList[1], 255);
+		let blue = Color.parseNum(rgbaList[2], 255);
+		let alpha = (rgbaList.length > 3) ? Color.parseNum(rgbaList[3], 1) : 1;
+		return { red, green, blue, alpha };
 	}
 }
 Color.CSSColors = {
@@ -354,35 +368,29 @@ Color.CSSColors = {
 	yellow: new Color(255, 255, 0),
 }
 Color.modValues = ["red", "green", "blue", "alpha"];
-class ColorLibrary {
-	constructor() {
-		this.RED = new Color("#f00");
-		this.BLUE = new Color("#00f");
-		this.YELLOW = new Color("#ff0");
-		this.GOLD = new Color("#d4af37");
-		this.GREEN = new Color("#090");
-		this.ORANGE = new Color("#f90");
-		this.PURPLE = new Color("#909");
-		this.MAGENTA = new Color("#f0f");
-		this.PINK = new Color(255, 192, 203)
-		this.BLANK = new Color(0, 0, 0, 0);
-		this.BLACK = new Color(0, 0, 0, 1);
-		this.WHITE = new Color(255, 255, 255, 1);
-		this.CYAN = new Color(0, 255, 255, 1);
-		this.GRAY = new Color(128, 128, 128, 1);
-		this.LIGHT_GRAY = new Color("#ccc");
-		this.RAZZMATAZZ = new Color("#e3256b");
-		this.CREAM = new Color("#fff185");
-		this.LIME = new Color(0, 255, 0, 1);
-		this.BROWN = new Color("#7d5314");
-		this.DARK_BROWN = new Color("#5a2000");
-		this.SKY_BLUE = new Color("#87ceeb");
-		this.TOBIN = new Color("#20a02a");
-		this.ZOE = new Color("#261550");
-		this.MAX = new Color("#161616");
-		this.MOLLY = new Color("#8b8");
-	}
-	add(name, color) {
-		this[name.toUpperCase()] = color;
-	}
-}
+Color.RED = new Color("#f00");
+Color.BLUE = new Color("#00f");
+Color.YELLOW = new Color("#ff0");
+Color.GOLD = new Color("#d4af37");
+Color.GREEN = new Color("#090");
+Color.ORANGE = new Color("#f90");
+Color.PURPLE = new Color("#909");
+Color.MAGENTA = new Color("#f0f");
+Color.PINK = new Color(255, 192, 203);
+Color.BLANK = new Color(0, 0, 0, 0);
+Color.BLACK = new Color(0, 0, 0, 1);
+Color.WHITE = new Color(255, 255, 255, 1);
+Color.CYAN = new Color(0, 255, 255, 1);
+Color.GRAY = new Color(128, 128, 128, 1);
+Color.DARK_GRAY = new Color("#222");
+Color.LIGHT_GRAY = new Color("#ccc");
+Color.RAZZMATAZZ = new Color("#e3256b");
+Color.CREAM = new Color("#fff185");
+Color.LIME = new Color(0, 255, 0, 1);
+Color.BROWN = new Color("#7d5314");
+Color.DARK_BROWN = new Color("#5a2000");
+Color.SKY_BLUE = new Color("#87ceeb");
+Color.TOBIN = new Color("#20a02a");
+Color.ZOE = new Color("#261550");
+Color.MAX = new Color("#161616");
+Color.MOLLY = new Color("#8b8");

@@ -1,160 +1,105 @@
-class Graph extends Frame {
-    constructor(yName, minValue, maxValue, getY, msLimit = 5000, colors = [{ color: "white", limit: 0 }], updater = null) {
-        super(400, 225);
-        let c = new Frame(1, 1).c;
-        this.leftOffset = Math.max(c.c.measureText(maxValue.toString()).width, c.c.measureText(minValue.toString()).width) + 10;
-        this.bottomTextOffset = 5;
-        this.mainGraphWidth = 400 - this.leftOffset;
-        this.yName = yName;
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        this.getY = getY;
-        this.msLimit = msLimit;
-        this.updater = updater;
-        this.colors = colors;
-        class EQN {
-            constructor(getY) {
-                this.getY = getY;
-                this.data = [];
-            }
+class Graph {
+    constructor(name, y, minY, maxY, color, decimalPlaces = 2) {
+        this.name = name;
+        this.y = y;
+        this.minY = minY;
+        this.maxY = maxY;
+        this.color = color;
+        this.decimalPlaces = decimalPlaces;
+        this.data = [];
+        this.plane = null;
+        this.lastRemappedDataPoint = null;
+    }
+    draw(renderer) {
+        let data = this.getRemappedData();
+        if (!data.length) return;
+        renderer.stroke(this.color, 1).connector(data);
+        let dataValue = this.data[this.data.length - 1];
+        let prefix = "-";
+        if (dataValue >= 0) prefix = " ";
+        let dText = `${this.name}: ${prefix + Math.abs(this.data[this.data.length - 1]).toFixed(this.decimalPlaces)}`;
+        let point = data[data.length - 1];
+        point.x = Math.min(point.x, this.plane.graphRect.xRange.max - this.plane.font.lineHeight / 2);
+        point.y = Number.clamp(point.y, this.plane.graphRect.yRange.min + this.plane.font.lineHeight / 2, this.plane.graphRect.yRange.max - this.plane.font.lineHeight / 2 - this.plane.font.getTextHeight(this.name));
+        this.lastRemappedDataPoint = { point, text: dText };
+    }
+    label(renderer) {
+        let { text, point } = this.lastRemappedDataPoint;
+        renderer.textMode = TextMode.TOP_RIGHT;
+        let width = this.plane.font.getTextWidth(text);
+        let height = this.plane.font.getTextHeight(text);
+        point.x = Math.max(width + this.plane.font.lineHeight, point.x);
+        renderer.draw(new Color(0, 0, 0, 0.7)).rect(point.x - width - this.plane.font.lineHeight / 2, point.y - this.plane.font.lineHeight / 2, width + this.plane.font.lineHeight, height + this.plane.font.lineHeight);
+        // renderer.draw(Color.BLACK).text(this.plane.font, text, point.plus(1));
+        renderer.draw(this.color).text(this.plane.font, text, point);
+    }
+    getRemappedData() {
+        let { x, y, width, height } = this.plane.graphRect;
+        let data = [];
+        for (let i = 0; i < this.data.length; i += this.plane.stepSize) data.push(this.data[i]);
+        data.push(this.data[this.data.length - 1]);
+        return data.map((v, i) => Vector2.clamp(
+            Vector2.remap(
+                new Vector2(i * this.plane.stepSize, v), 
+                new Vector2(0, this.minY), 
+                new Vector2(this.plane.frameLimit, this.maxY), 
+                new Vector2(x, y + height), 
+                new Vector2(x + width, y)
+            ),
+            new Vector2(x, y),
+            new Vector2(x + width, y + height)
+        ));
+    }
+    update(t) {
+        this.data.push(this.y(t));
+        if (this.data.length > this.plane.frameLimit) this.data.shift();
+    }
+}
+class GraphPlane extends Frame {
+    constructor(graphs, frameLimit) {
+        super(300, 200);
+        for (let i = 0; i < graphs.length; i++) graphs[i].plane = this;
+        this.graphs = graphs;
+        this.frameLimit = frameLimit;
+        this.stepSize = Math.ceil(this.frameLimit / 300);
+        this.minFrame = 0;
+        this.frameCount = 0;
+
+        this.font = new Font(10, "Serif");
+        this.lastImgTime = -20;
+
+        let bottomOffset = this.font.lineHeight * 2;
+        this.boundingRect = new Rect(0, 0, this.width, this.height);
+        this.graphRect = new Rect(this.boundingRect.x, this.boundingRect.y, this.boundingRect.width, this.boundingRect.height - bottomOffset);
+    }
+    draw() {
+        function formatTime(t) {
+            return t.toString().split("").reverse().map((e, i) => (!(i % 3) && i) ? "," + e : e).join("").split("").reverse().join("");
         }
-        if (!Array.isArray(yName)) {
-            this.vars = {
-                [yName]: new EQN(getY)
-            };
-        } else {
-            this.vars = {};
-            for (let i = 0; i < yName.length; i++) this.vars[yName[i]] = new EQN(getY[i]);
+        let renderer = this.renderer;
+        renderer.clear();
+        renderer.draw(Color.BLACK).rect(this.boundingRect);
+        renderer.textMode = TextMode.BOTTOM_LEFT;
+        let minTime = Math.max(0, performance.now());
+        let timeLimit = this.frameLimit * 16;
+        renderer.draw(Color.WHITE).text(this.font, `${formatTime(this.minFrame)}f`, this.boundingRect.xRange.min + this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
+        renderer.textMode = TextMode.BOTTOM_RIGHT;
+        renderer.draw(Color.WHITE).text(this.font, `${formatTime(this.minFrame + this.frameLimit)}f`, this.boundingRect.xRange.max - this.font.lineHeight / 2, this.boundingRect.yRange.max - this.font.lineHeight / 2);
+        for (let i = 0; i < this.graphs.length; i++) this.graphs[i].draw(renderer);
+        for (let i = 0; i < this.graphs.length; i++) this.graphs[i].label(renderer);
+        renderer.stroke(Color.WHITE).rect(this.boundingRect);
+        renderer.stroke(Color.WHITE).line(this.graphRect.xRange.min, this.graphRect.yRange.max, this.graphRect.xRange.max, this.graphRect.yRange.max);
+    }
+    update() {
+        let t = this.frameCount++;
+        this.minFrame = Math.max(0, t - this.frameLimit);
+        for (let i = 0; i < this.graphs.length; i++) this.graphs[i].update(t);
+    }
+    makeImage() {
+        if (performance.now() - this.lastImgTime > 10) {
+            this.lastImgTime = performance.now();
+            this.draw();
         }
-        this.timeOffset = 0;
-        this.colorScheme = "dark";
-        let black = (this.colorScheme.toLowerCase() == "dark") ? "black" : "white";
-        let white = (this.colorScheme.toLowerCase() == "dark") ? "white" : "black";
-        this.drawBasics(black, white);
-        let graphFrame = new Frame(400, 198);
-        this.graphFrame = graphFrame;
-        this.updater.graphs.push(this);
-    }
-    getYValue(fV) {
-        return clamp(200 - ((fV - this.minValue) / (this.maxValue - this.minValue)) * 200, 0, 198);
-    }
-    getXValue(fV) {
-        return this.mainGraphWidth * ((fV - this.timeOffset) / this.msLimit);
-    }
-    getColor(n) {
-        let black = (this.colorScheme.toLowerCase() == "dark") ? "black" : "white";
-        
-        for (let color of this.colors) {
-            if (n >= color.limit) return color.color;
-        }
-        return black;
-    }
-    drawBasics(black, white) {
-        this.c.draw(black).rect(0, 0, this.width, this.height);
-        this.c.stroke(white, 2).rect(this.leftOffset, -2, 422, 200);
-        this.c.c.font = "10px Arial";
-        this.c.textMode = "center";
-        this.c.draw(white).text("10px Arial", this.maxValue, this.leftOffset / 2, 2);
-        this.c.draw(white).text("10px Arial", this.minValue, this.leftOffset / 2, 190);
-        let tx = this.leftOffset / 2;
-        let ty = 100;
-        if (!Array.isArray(this.yName)) {
-            this.c.translate(tx, ty);
-            this.c.rotate(-Math.PI / 2);
-            this.c.draw(white).text("10px Arial", this.yName.split("").join(" "), 0, -5);
-            this.c.rotate(Math.PI / 2);
-            this.c.translate(-tx, -ty);
-        }
-        this.c.draw(white).text("10px Arial", "Time", 220, 200 + this.bottomTextOffset);
-        this.c.textMode = "left";
-        this.c.draw(white).text("10px Arial", "5000", this.leftOffset + 370, 200 + this.bottomTextOffset);
-        this.c.draw(white).text("10px Arial", "0", this.leftOffset, 200 + this.bottomTextOffset);
-    }
-    get colorScheme() {
-        return this._colorScheme;
-    }
-    set colorScheme(a) {
-        this._colorScheme = a;
-        let black = (this.colorScheme.toLowerCase() == "dark") ? "black" : "white";
-        let white = (this.colorScheme.toLowerCase() == "dark") ? "white" : "black";
-        this.drawBasics(black, white);
-    }
-    get() {
-        let black = (this.colorScheme.toLowerCase() == "dark") ? "black" : "white";
-        let white = (this.colorScheme.toLowerCase() == "dark") ? "white" : "black";
-        this.c.textMode = TextMode.LEFT;
-        this.c.draw(black).rect(this.leftOffset + 2, 0, 420, 198);
-        this.graphFrame.c.clear();
-        this.graphFrame.c.c.setLineDash([4, 2]);
-        let lastCol = {
-            limit: this.maxValue
-        };
-        for (let i = 0; i < this.colors.length; i++) {
-            this.graphFrame.c.c.globalAlpha = 0.1;
-            let col = this.colors[i];
-            let dif = lastCol.limit - col.limit;
-            if (!col.limit) col.limit = this.minValue;
-            this.graphFrame.c.draw(col.color).rect(0, this.getYValue(lastCol.limit), this.mainGraphWidth, this.getYValue(col.limit) - this.getYValue(lastCol.limit));
-            this.graphFrame.c.c.globalAlpha = .5;
-            this.graphFrame.c.stroke(col.color, 2).line(0, this.getYValue(lastCol.limit), this.mainGraphWidth, this.getYValue(lastCol.limit));
-            lastCol = col;
-        }
-        this.graphFrame.c.c.globalAlpha = 1;
-        this.graphFrame.c.c.setLineDash([]);
-        let len = 0;
-        for (let key in this.vars) len++;
-        for (let key in this.vars) {
-            let last = null;
-            let fData = this.vars[key].data;
-            let step = 1;
-            if (fData.length > 300) step = Math.ceil(fData.length / 300);
-            for (let i = 0; i - step < fData.length; i += step) {
-                let data = fData[Math.min(i, fData.length - 1)];
-                if (last) {
-                    let x1 = this.getXValue(last.x);
-                    let y1 = this.getYValue(last.y);
-                    let x2 = this.getXValue(data.x);
-                    let y2 = this.getYValue(data.y);
-                    let col = this.getColor(data.y);
-                    this.graphFrame.c.stroke(col, 3).line(x1, y1, x2, y2);
-                }
-                last = data;
-            }
-            this.graphFrame.c.textMode = TextMode.RIGHT;
-            let y = this.getYValue(last.y);
-            if (y > 185) y -= 15;
-            let prefix = key + ": ";
-            if (len == 1) prefix = "";
-            let text = prefix + last.y;
-            let w = this.c.c.measureText(text).width;
-            let lastX = this.getXValue(last.x);
-            this.graphFrame.c.draw(black).rect(
-                lastX - 10 - w,
-                y + 1,
-                w + 6,
-                16
-            );
-            this.graphFrame.c.stroke(white, 1).rect(
-                lastX - 10 - w,
-                y + 1,
-                w + 6,
-                16
-            );
-            this.graphFrame.c.draw(white).text(
-                "10px Arial",
-                text,
-                lastX - 8,
-                y + 3
-            );
-        }
-        this.c.image(this.graphFrame).default(this.leftOffset + 2, 0);
-        let timeStart = Time.formatMS(Math.floor(this.timeOffset));
-        let timeEnd = Time.formatMS(Math.floor(this.timeOffset) + this.msLimit);
-        this.c.draw(black).rect(this.leftOffset, 200 + this.bottomTextOffset, this.c.c.measureText(timeStart).width, 200);
-        this.c.draw(white).text("10px Arial", timeStart, this.leftOffset, 200 + this.bottomTextOffset);
-        this.c.draw(black).rect(this.leftOffset + this.mainGraphWidth - 10 - this.c.c.measureText(timeEnd).width, 200 + this.bottomTextOffset, 200, 200);
-        this.c.textMode = TextMode.RIGHT;
-        this.c.draw(white).text("10px Arial", timeEnd, this.mainGraphWidth - 10 + this.leftOffset, 200 + this.bottomTextOffset);
-        return this;
+        return this.image;
     }
 }

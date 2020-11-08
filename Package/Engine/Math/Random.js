@@ -1,35 +1,43 @@
-class Interpolation {
-    static smoothT(t) {
-        return -2 * t * t * t + 3 * t * t;
-    }
-    static slerp(a, b, t) {
-        return Interpolation.lerp(a, b, Interpolation.smoothT(t));
-    }
-    static squadlerp(a, b, c, d, tx, ty) {
-        return Interpolation.quadLerp(a, b, c, d, Interpolation.smoothT(tx), Interpolation.smoothT(ty));
-    }
-    static lerp(a, b, t) {
-        return a * (1 - t) + b * t;
-    }
-    static quadLerp(a, b, c, d, tx, ty) {
-        const l = Interpolation.lerp(a, c, ty);
-        const r = Interpolation.lerp(b, d, ty);
-        let per = Interpolation.lerp(l, r, tx);
-        return per;
-    }
-    static cubeLerp(a, b, c, d, a2, b2, c2, d2, tx, ty, tz) {
-        let top = Interpolation.quadLerp(a, b, c, d, tx, ty);
-        let bottom = Interpolation.quadLerp(a2, b2, c2, d2, tx, ty);
-        return Interpolation.lerp(top, bottom, tz);
-    }
-}
 class Random {
+    static random() {
+        return Random.seedRand(Random.seed++);
+    }
+    static bool(chance) {
+        return Random.random() < chance;
+    }
+    static range(min = 0, max = 1) {
+        return Random.random() * (max - min) + min;
+    }
+    static angle() {
+        return Random.random() * 2 * Math.PI;
+    }
+    static color() {
+        return new Color(Random.random() * 255, Random.random() * 255, Random.random() * 255, 1);
+    }
     static seedRand(seed) {
         seed += 1e5;
-        let a = (seed * 6.12849) % 8.7890975
+        let a = (seed * 6.12849) % 8.7890975;
         let b = (a * 256783945.4758903) % 238462.567890;
-        let r = (a * b) % 1;
+        let r = Math.abs(a * b) % 1;
         return r;
+    }
+    static octave(alg, freq, oc, ...sample) {
+        let n = 0;
+        let scl = 0;
+        let len = Random[alg].length + 1;
+        let seed = Random.seed;
+        if (len === sample.length) {
+            seed = sample[sample.length - 1];
+            sample.length = len - 1;
+        }
+        for (let i = 1; i < 1 + oc; i++) {
+            scl += 1 / i;
+            n += Random[alg](...sample, freq * i, seed) / i;
+        }
+        return n / scl;
+    }
+    static choice(arr) {
+        return arr[Math.floor(Random.random() * arr.length)];
     }
     static noiseTCorrect(t) {
         return Interpolation.smoothT(t);
@@ -40,27 +48,42 @@ class Random {
     }
     static perlin(x, f = 1, seed = Random.seed) {
         x *= f;
-        const s_0 = n => Random.seedRand(seed + Math.floor(n));
-        const n = x => Interpolation.lerp(s_0(x), s_0(x + 1), Random.noiseTCorrect(x % 1));
-        return n(x);
+        x += seed;
+        const s_0 = n => Random.seedRand(Math.floor(n));
+        let xt = x % 1;
+        if (xt < 0) xt++;
+        return Interpolation.lerp(s_0(x), s_0(x + 1), Random.noiseTCorrect(xt));
     }
     static perlin2D(x, y, f = 1, seed = Random.seed) {
         x *= f;
         y *= f;
-        const s_p = (x, y) => Random.seedRand(Math.floor(x) + Math.floor(y) * 2000 + seed * 100000);
-        const n = (x, y) => Interpolation.quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), Random.noiseTCorrect(x % 1), Random.noiseTCorrect(y % 1));
-        return n(x, y);
+        x += seed;
+        y += seed;
+        const s_p = (x, y) => Random.seedRand(Math.floor(x) + Math.floor(y) * 2000);
+        let xt = x % 1;
+        let yt = y % 1;
+        if (xt < 0) xt++;
+        if (yt < 0) yt++;
+        return Interpolation.quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), Random.noiseTCorrect(xt), Random.noiseTCorrect(yt));
     }
     static perlin3D(x, y, z, f = 1, seed = Random.seed) {
         x *= f;
         y *= f;
         z *= f;
-        const s_p = (x, y, z) => Random.seedRand(Random.seedRand(Math.floor(x)) + Random.seedRand(Math.floor(y) * 2000) + Random.seedRand(Math.floor(z) * 2000000) + seed * 100000);
-        const n = (x, y, z) => Interpolation.cubeLerp(
+        x += seed;
+        y += seed;
+        z += seed;
+        const s_p = (x, y, z) => Random.seedRand(Random.seedRand(Math.floor(x)) + Random.seedRand(Math.floor(y) * 2000) + Random.seedRand(Math.floor(z) * 2000000));
+        let xt = x % 1;
+        let yt = y % 1;
+        let zt = z % 1;
+        if (xt < 0) xt++;
+        if (yt < 0) yt++;
+        if (zt < 0) zt++;
+        return Interpolation.cubeLerp(
             s_p(x, y, z), s_p(x + 1, y, z), s_p(x, y + 1, z), s_p(x + 1, y + 1, z),
             s_p(x, y, z + 1), s_p(x + 1, y, z + 1), s_p(x, y + 1, z + 1), s_p(x + 1, y + 1, z + 1),
-            Random.noiseTCorrect(x % 1), Random.noiseTCorrect(y % 1), Random.noiseTCorrect(z % 1));
-        return n(x, y, z);
+            Random.noiseTCorrect(xt), Random.noiseTCorrect(yt), Random.noiseTCorrect(zt));
     }
     static getVoronoiCell(x) {
         return { x: Math.floor(x) + Random.seedRand(Math.floor(x)) };
@@ -86,7 +109,7 @@ class Random {
         x *= f;
         y *= f;
         x += seed;
-        y += seed * 2000;
+        y += seed;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) {
             let cell = Random.getVoronoiCell2D(x + i, y + j);
@@ -107,8 +130,8 @@ class Random {
         y *= f;
         z *= f;
         x += seed;
-        y += seed * 2000;
-        z += seed * 2000000;
+        y += seed;
+        z += seed;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) for (let k = -1; k < 2; k++) {
             let cell = Random.getVoronoiCell3D(x + i, y + j, z + k);

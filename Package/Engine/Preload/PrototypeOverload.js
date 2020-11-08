@@ -1,29 +1,39 @@
-function clamp(n, a, b) {
+Number.clamp = function (n, a, b) {
 	return Math.max(a, Math.min(b, n));
 }
-function remap(n, a, b, a2, b2) {
-	let t = (n - a) / (b - a);
-	return a2 * (1 - t) + b2 * t;
+Number.remap = function (n, a, b, a2, b2) {
+	return Number.lerp(a2, b2, (n - a) / (b - a));
 }
-function threshold(n, t) {
+Number.threshold = function (n, t) {
 	return !!(n > t);
 }
 function assert(condition, name) {
 	if (!condition) console.warn(`Assertion "${name}" failed.`);
 }
-let globalSquareRoots = 0;
-let sqrt = Math.sqrt.bind(Math);
-Math.sqrt = function(n) {
-	globalSquareRoots++;
-	return sqrt(n);
+function define(name, value) {
+	delete window[name];
+	Object.defineProperty(window, name, {
+		get() {
+			return value();
+		}
+	});
 }
-Function.prototype.add = function (fn = function () { }) {
-	let self = this;
-	return function (...a) {
-		self(...a);
-		return fn(...a);
-	};
-};
+Object.defineProperty(window, "title", {
+	get() {
+		let tag = document.getElementsByTagName("title")[0];
+		if (!tag) return "";
+		return tag.innerText;
+	},
+	set(a) {
+		let tag = document.getElementsByTagName("title")[0];
+		if (!tag) {
+			tag = document.createElement("title");
+			document.head.appendChild(tag);
+		}
+		tag.innerText = a;
+	}
+});
+//Function
 Function.prototype.param = function (...args) {
 	return function () {
 		this(...args);
@@ -39,37 +49,44 @@ Function.prototype.performance = function (...args) {
 	const t_2 = performance.now();
 	return (t_2 - t_1) / iter;
 };
-Array.prototype.map = function (fn, ...coords) {
-	let result = [];
-	if (this.length && Array.isArray(this[0]) && this.multiDimensional) {
-		result.multiDimensional = true;
-		for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...[...coords, i]));
-	} else if (this.length) 
-		for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
-	return result;
+//Array
+Array.prototype.pushArray = function (arr) {
+	let len = arr.length;
+	for (let i = 0; i < len; i++) this.push(arr[i]);
 };
-Array.prototype.flatten = function () {
-	if (this.length) {
+Array.makeMultidimensional = function (arr) {
+	arr.multiDimensional = true;
+	arr.flatten = function () {
 		let result = [];
-		if (Array.isArray(this[0]) && this.multiDimensional) for (let i = 0; i < this.length; i++) result.push(...this[i].flatten());
-		else for (let i = 0; i < this.length; i++) result.push(this[i]);
+		for (let i = 0; i < this.length; i++) result.pushArray(this[i].flatten());
 		return result;
-	}
-	return [];
+	}.bind(arr);
+	arr[Symbol.iterator] = function* () {
+		let all = this.flatten();
+		for (let i = 0; i < all.length; i++) yield all[i];
+	}.bind(arr);
+	arr.forEach = function (fn, ...coords) {
+		for (let i = 0; i < this.length; i++) this[i].forEach(fn, ...coords, i);
+	}.bind(arr);
+	arr.map = function (fn, ...coords) {
+		let result = [];
+		Array.makeMultidimensional(result);
+		for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...coords, i));
+		return result;
+	}.bind(arr);
+	arr.fill = function (value) {
+		for (let i = 0; i < this.length; i++) this[i].fill(value);
+	}.bind(arr);
 }
-Array.prototype[Symbol.iterator] = function* () {
-	let all = this.flatten();
-	for (let i = 0; i < all.length; i++) yield all[i];
-};
 Array.dim = function (...dims) {
 	let ary = [];
 	if (dims.length > 1) {
 		let dim = dims.shift();
+		Array.makeMultidimensional(ary);
 		for (let i = 0; i < dim; i++) ary.push(Array.dim(...dims));
 	} else {
 		for (let i = 0; i < dims[0]; i++) ary.push(null);
 	}
-	ary.multiDimensional = true;
 	return ary;
 };
 Array.prototype.test = function (test) {
@@ -84,30 +101,24 @@ Array.prototype.randomize = function () {
 	}
 	return result;
 };
-Array.prototype.sum = function () {
+Array.prototype.total = function () {
 	return this.reduce((a, b) => a + b);
 };
+//Number
 Number.prototype.toDegrees = function () {
 	return this * (180 / Math.PI);
 };
 Number.prototype.toRadians = function () {
 	return this * (Math.PI / 180);
 };
-Number.prototype.sin01 = function () {
-	return (Math.sin(this) + 1) / 2;
-};
-Number.prototype.cos01 = function () {
-	return (Math.cos(this) + 1) / 2;
-};
-Number.prototype.approxSqrt = function (amt = 5) {
-	let g = 1 / this;
-	for (let i = 0; i < amt; i++) g = (g + this / g) / 2;
-	return g;
-};
 Number.prototype.movedTowards = function (value, ferocity) {
 	let dir = ferocity * (value - this) * 2;
 	return this + dir;
 };
+Number.prototype.toMaxed = function (digits) {
+	return Math.round(this * 10 ** digits) / 10 ** digits + "";
+};
+//String
 String.prototype.capitalize = function () {
 	return this[0].toUpperCase() + this.slice(1);
 };
@@ -116,9 +127,12 @@ String.prototype.cut = function (char) {
 	if (inx === -1) return [this, ""];
 	return [
 		this.slice(0, inx),
-		this.slice(inx)
+		this.slice(inx + 1)
 	];
 };
+String.prototype.pad = function (size) {
+	return " ".repeat(size - this.length) + this;
+}
 String.prototype.indent = function () {
 	return this.split("\n").map(str => "\t" + str).join("\n");
 };
@@ -133,7 +147,7 @@ String.prototype.indent = function () {
 	}
 	function string(value, depth) {
 		if (!value) return value + "";
-		if (typeof value === "string") return `"${value}"`;
+		if (typeof value === "string") return JSON.stringify(value);
 		if (typeof value === "number") return value + "";
 		if (typeof value === "function") {
 			value += "";
@@ -167,8 +181,20 @@ ${contents.join(",\n").indent()}
 	}
 })();
 Array.prototype.toString = Object.prototype.toString;
+//Object
 Object.prototype[Symbol.iterator] = function* () {
 	for (let x in this) {
 		yield [x, this[x]];
 	}
-}
+};
+
+//Make Number behave like Operable
+Number.prototype.abs = function () { return Math.abs(this); };
+Number.lerp = function (a, b, t) { return a * (1 - t) + b * t; };
+Number.prototype.plus = function (n) { return this + n; };
+Number.prototype.minus = function (n) { return this - n; };
+Number.prototype.times = function (n) { return this * n; };
+Number.prototype.over = function (n) { return this / n; };
+Number.prototype.get = function () { return this; };
+Number.prototype.equals = function (n) { return Math.abs(this - n) < 0.00000001; }
+Number.empty = 0;

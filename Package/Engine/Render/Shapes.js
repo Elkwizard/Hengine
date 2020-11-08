@@ -1,28 +1,3 @@
-class Triangle {
-	constructor(p1, p2, p3) {
-		this.vertices = [p1, p2, p3];
-	}
-	middle() {
-		function average(ary) {
-			let sum = 0;
-			for (let num of ary) {
-				sum += num;
-			}
-			sum /= ary.length;
-			return sum;
-		}
-		let res = new Vertex();
-		let xs = [];
-		let ys = [];
-		for (let x of this.vertices) {
-			xs.push(x.x);
-			ys.push(x.y);
-		}
-		res.x = average(xs);
-		res.y = average(ys);
-		return res;
-	}
-}
 class Line {
 	constructor(x, y, x2, y2) {
 		if (typeof x === "object") {
@@ -36,7 +11,7 @@ class Line {
 	get length() {
 		return this.b.Vminus(this.a).mag;
 	}
-	get midPoint() {
+	get middle() {
 		let ax = (this.a.x + this.b.x) / 2;
 		let ay = (this.a.y + this.b.y) / 2;
 		return new Vector2(ax, ay);
@@ -58,8 +33,68 @@ class Line {
 		return this.slope * x + this.a.y;
 	}
 }
-class Shape {
+class Range {
+	constructor(min, max) {
+		this._max = Infinity;
+		this._min = -Infinity;
+		this.min = min;
+		this.max = max;
+	}
+	set min(a) {
+		let b = this.max;
+		this._min = Math.min(a, b);
+		this._max = Math.max(a, b);
+	}
+	get min() {
+		return this._min;
+	}
+	set max(a) {
+		let b = this.min;
+		this._min = Math.min(a, b);
+		this._max = Math.max(a, b);
+	}
+	get max() {
+		return this._max;
+	}
+	get length() {
+		return this.max - this.min;
+	}
+	clip(range) {
+		return new Range(Number.clamp(this.min, range.min, range.max), Number.clamp(this.max, range.min, range.max));
+	}
+	getValueFromInterval(interval) {
+		return (this.max - this.min) * interval + this.min;
+	}
+	getIntervalValue(value) {
+		return (value - this.min) / (this.max - this.min);
+	}
+	getDepth(value) {
+		return (this.max - this.min) / 2 - Math.abs(value - (this.min + this.max) / 2);
+	}
+	includes(value) {
+		return value > this.min && value < this.max;
+	}
+	expand(value) {
+		if (value < this.min) this._min = value;
+		if (value > this.max) this._max = value;
+	}
+	intersect(r) {
+		return this.max > r.min && r.max > this.min;
+	}
+	static fromValues(values) {
+		let min = Infinity;
+		let max = -Infinity;
+		for (let i = 0; i < values.length; i++) {
+			const v = values[i];
+			if (v < min) min = v;
+			if (v > max) max = v;
+		}
+		return new Range(min, max);
+	}
+}
+class Shape extends Operable {
 	constructor() { 
+		super();
 		this.area = 0;
 	}
 	get middle() {
@@ -67,14 +102,10 @@ class Shape {
 	}
 	getBoundingBox() {
 		//return the smallest rectangle that contains the shape
-		return new Rect(0, 0, 0, 0, 0);
+		return new Rect(0, 0, 0, 0);
 	}
-	getModel(pos, rot) {
+	getModel(transf) {
 		//return the world space model of the relative shape
-		return new Shape(0);
-	}
-	getModelCosSin(pos, cos, sin) {
-		//get model with precalculated values
 		return new Shape(0);
 	}
 	center(pos) {
@@ -91,46 +122,44 @@ class Shape {
 	}
 	get() {
 		//return a copy of the shape
-		return new Shape(this.rotation);
-	}
-	static lerp(a, b, t) {
-		//returns the lerp from a to b at t
-		return new Shape(a.rotation * (1 - t) + b.rotation * t);
+		return new Shape();
 	}
 }
 class Polygon extends Shape {
-	constructor(vertices) {
+	constructor(vertices, alreadyClockwise) {
 		super();
-		this.vertices = vertices;
-		let x = vertices.map(e => e.x);
-		let y = vertices.map(e => e.y);
-		let minX = Math.min(...x);
-		let maxX = Math.max(...x);
-		let minY = Math.min(...y);
-		let maxY = Math.max(...y);
-		this.area = (maxX - minX) * (maxY - minY);
+		if (!alreadyClockwise) vertices = Geometry.clockwise(vertices);
+		this.vertices = Polygon.removeDuplicates(vertices);
+		this.area = Geometry.area(this.vertices);
+	}
+	static removeDuplicates(verts) {
+		let vertices = [];
+
+		for (let v of verts) {
+			let valid = true;
+			for (let v2 of vertices) if (v.equals(v2)) {
+				valid = false;
+				break;
+			}
+			if (valid) vertices.push(v);
+		}
+
+		return vertices;
 	}
 	set middle(a) {
 		this.vertices = this.center(a).vertices;
 	}
 	get middle() {
-		return Vector.sum(...this.vertices).Nover(this.vertices.length);
+		return Vector.sum(this.vertices).Nover(this.vertices.length);
 	}
 	getBoundingBox() {
+		return Rect.bound(this.vertices);
+	}
+	getModel(transf) {
+		let pos = transf.position;
+		let cos = transf.cosRotation;
+		let sin = transf.sinRotation;
 		let verts = this.vertices;
-		let x = verts.map(e => e.x);
-		let y = verts.map(e => e.y);
-		let minX = Math.min(...x);
-		let maxX = Math.max(...x);
-		let minY = Math.min(...y);
-		let maxY = Math.max(...y);
-		return new Rect(minX, minY, maxX - minX, maxY - minY);
-	}
-	getModel(pos, rot) {
-		return this.getModelCosSin(pos, Math.cos(rot), Math.sin(rot));
-	}
-	getModelCosSin(pos, cos, sin) {
-		let verts = this.getCorners();
 		let m_sin = sin;
 		let m_cos = cos;
 		verts = verts
@@ -142,10 +171,7 @@ class Polygon extends Shape {
 				return new Vector2(nX + pos.x, nY + pos.y);
 				
 			});
-		return new Polygon(verts);
-	}
-	getCorners() {
-		return this.vertices;
+		return new Polygon(verts, true);
 	}
 	getAxes() {
 		let axes = [];
@@ -170,36 +196,48 @@ class Polygon extends Shape {
 	}
 	center(pos) {
 		let offset = pos.Vminus(this.middle);
-		return new Polygon(this.vertices.map(e => e.Vplus(offset)));
+		return new Polygon(this.vertices.map(e => e.Vplus(offset)), true);
 	}
 	scale(factor) {
 		let middle = this.middle;
-		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))));
+		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))), true);
 	}
 	scaleAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))));
+		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))), true);
+	}
+	scaleXAbout(pos, factor) {
+		return new Polygon(this.vertices.map(e => new Vector2(pos + (pos - e.x) * factor, e.y)), true);
+	}
+	scaleYAbout(pos, factor) {
+		return new Polygon(this.vertices.map(e => new Vector2(e.x, pos + (pos - e.y) * factor)), true);
 	}
 	move(dir) {
-		return new Polygon(this.vertices.map(vert => vert.plus(dir)));
+		return new Polygon(this.vertices.map(vert => vert.plus(dir)), true);
+	}
+	rotate(angle) {
+		return this.getModel(new Transform(0, 0, angle));
 	}
 	get() {
-		let poly = new Polygon([...this.vertices], this.rotation);
+		let poly = new Polygon(this.vertices.map(vert => vert), true);
 		return poly;
 	}
-	static lerp(a, b, t) {
-		const vertices = a.vertices.map((v, inx) => Vector2.lerp(v, b.vertices[inx], t));
-		return new Polygon(vertices, a.rotation * (1 - t) + b.rotation * t);
+	toPhysicsShape() {
+		return new PolygonCollider(this.vertices.map(v => v.toPhysicsVector()));
+	}
+	static fromPhysicsShape(sh) {
+		return new Polygon(sh.vertices.map(v => Vector2.fromPhysicsVector(v)), true);
+	}
+	static regular(sides, radius) {
+		let v = [];
+		let o = Math.PI / sides;
+		for (let i = 0; i < sides; i++)
+			v.push(Vector2.fromAngle(i / sides * 2 * Math.PI + o).times(radius));
+		return new Polygon(v, true);
 	}
 }
 class Rect extends Polygon {
 	constructor(x, y, w, h) {
-		super([]);
-		if (typeof x === "object") {
-			w = y.x - x.x;
-			h = y.y - x.y;
-			y = x.y;
-			x = x.x;
-		}
+		super([], true);
 		if (w < 0) {
 			w *= -1;
 			x -= w;
@@ -213,6 +251,40 @@ class Rect extends Polygon {
 		this.width = w;
 		this.height = h;
 		this.area = this.width * this.height;
+	}
+	set min(v) {
+		let dx = v.x - this.x;
+		let dy = v.y - this.y;
+		this.width -= dx;
+		this.height -= dy;
+		this.x += dx;
+		this.y += dy;
+	}
+	get min() {
+		return new Vector2(this.x, this.y);
+	}
+	set max(v) {
+		let dx = v.x - this.x - this.width;
+		let dy = v.y - this.y - this.height;
+		this.width += dx;
+		this.height += dy;
+	}
+	get max() {
+		return new Vector2(this.x + this.width, this.y + this.height);
+	}
+	set xRange(v) {
+		this.x = v.min;
+		this.width = v.max - v.min;
+	}
+	get xRange() {
+		return new Range(this.x, this.x + this.width);
+	}
+	set yRange(v) {
+		this.y = v.min;
+		this.height = v.max - v.min;
+	}
+	get yRange() {
+		return new Range(this.y, this.y + this.height);
 	}
 	set middle(a) {
 		let pos = this.center(a);
@@ -240,6 +312,11 @@ class Rect extends Polygon {
 			this.height = max.y - min.y;
 		}
 	}
+	clip(rect) {
+		let xRange = this.xRange.clip(rect.xRange);
+		let yRange = this.yRange.clip(rect.yRange);
+		return Rect.fromRanges(xRange, yRange);
+	}
 	getBoundingBox() {
 		return new Rect(this.x, this.y, this.width, this.height);
 	}
@@ -252,18 +329,59 @@ class Rect extends Polygon {
 		let dh = this.height * factor;
 		return new Rect(this.x - dw / 2, this.y - dh / 2, this.width + dw, this.height + dh);
 	}
+	scaleX(factor) {
+		factor -= 1;
+		let dw = this.width * factor;
+		return new Rect(this.x - dw / 2, this.y, this.width + dw, this.height);
+	}
+	scaleY(factor) {
+		factor -= 1;
+		let dh = this.height * factor;
+		return new Rect(this.x, this.y - dh / 2, this.width, this.height + dh);
+	}
 	move(dir) {
 		return new Rect(this.x + dir.x, this.y + dir.y, this.width, this.height);
 	}
 	get() {
 		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
 	}
-	static lerp(a, b, t) {
-		const dim = Vector2.lerp(new Vector2(a.width, a.height), new Vector2(b.width, b.height), t);
-		const pos = Vector2.lerp(new Vector2(a.x, a.y), new Vector2(b.x, b.y), t);
-		return new Rect(pos.x, pos.y, dim.x, dim.y, a.rotation * (1 - t) + b.rotation * t);
+	static fromMinMax(min, max) {
+		return new Rect(min.x, min.y, max.x - min.x, max.y - min.y);
+	}
+	static fromRanges(xRange, yRange) {
+		return new Rect(xRange.min, yRange.min, xRange.length, yRange.length);
+	}
+	static bound(points) {
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
+		for (let i = 0; i < points.length; i++) {
+			let v = points[i]
+			if (v.x < minX) minX = v.x;
+			if (v.y < minY) minY = v.y;
+			if (v.x > maxX) maxX = v.x;
+			if (v.y > maxY) maxY = v.y;
+		}
+		return new Rect(minX, minY, maxX - minX, maxY - minY);
+	}
+	static composeBoundingBoxes(boxes) {
+		if (boxes.length === 1) return boxes[0];
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
+		for (let i = 0; i < boxes.length; i++) {
+			let box = boxes[i];
+			if (box.x < minX) minX = box.x;
+			if (box.y < minY) minY = box.y;
+			if (box.x + box.width > maxX) maxX = box.x + box.width;
+			if (box.y + box.height > maxY) maxY = box.y + box.height;
+		}
+		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
 }
+Rect.modValues = ["x", "y", "width", "height"];
 class Circle extends Shape {
 	constructor(x, y, radius) {
 		super();
@@ -278,10 +396,10 @@ class Circle extends Shape {
 	get middle() {
 		return new Vector2(this.x, this.y);
 	}
-	getModel(pos, rot) {
-		return this.getModelCosSin(pos, Math.cos(rot), Math.sin(rot));
-	}
-	getModelCosSin(pos, cos, sin) {
+	getModel(transf) {
+		let pos = transf.position;
+		let cos = transf.cosRotation;
+		let sin = transf.sinRotation;
 		let t_x = this.x * cos - this.y * sin + pos.x;
 		let t_y = this.x * sin + this.y * cos + pos.y;
 		return new Circle(t_x, t_y, this.radius);
@@ -296,6 +414,12 @@ class Circle extends Shape {
 		let nPos = pos.plus((new Vector2(this.x, this.y)).Vminus(pos).Ntimes(factor));
 		return new Circle(nPos.x, nPos.y, this.radius * factor);
 	}
+	scaleXAbout(pos, factor) {
+		return this.scaleAbout(pos, factor);
+	}
+	scaleYAbout(pos, factor) {
+		return this.scaleAbout(pos, factor);
+	}
 	move(dir) {
 		return new Circle(this.x + dir.x, this.y + dir.y, this.radius);
 	}
@@ -305,9 +429,11 @@ class Circle extends Shape {
 	get() {
 		return new Circle(this.x, this.y, this.radius);
 	}
-	static lerp(a, b, t) {
-		const pos = Vector2.lerp(new Vector2(a.x, a.y),new Vector2(b.x, b.y), t);
-		const radius = a.radius * (1 - t) + b.radius * t;
-		return new Circle(pos.x, pos.y, radius);
+	toPhysicsShape() {
+		return new CircleCollider(this.x, this.y, this.radius);
+	}
+	static fromPhysicsShape(sh) {
+		return new Circle(sh.position.x, sh.position.y, sh.radius);
 	}
 }
+Circle.modValues = ["x", "y", "radius"];

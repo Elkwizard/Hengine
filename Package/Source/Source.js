@@ -1,6 +1,6 @@
-//setup code here
+// Setup code here
 
-g.update = () => {
-	//this gets run every frame
-	
-}
+intervals.continuous(function (time) {
+	// This gets run every frame
+
+});

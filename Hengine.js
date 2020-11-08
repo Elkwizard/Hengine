@@ -7,7 +7,7 @@
     //process filesystem
     let src = script.src.split("/");
     src.pop();
-    let hengineSrc = src.join("/") + "/Package/Engine/Manage/Hengine.js";
+    let hengineLoaderSrc = src.join("/") + "/Package/Engine/Manage/HengineLoader.js";
     let compilerSrc = src.join("/") + "/Loading/Compiler.js";
 
     function load(src) {
@@ -22,10 +22,10 @@
     }
 
     await load(compilerSrc);
-    await load(hengineSrc);
-    await Hengine.load(Hengine.defaultApplicationPackage(scripts));
+    await load(hengineLoaderSrc);
+    await HengineLoader.load(HengineLoader.defaultApplicationPackage(scripts));
 
-    setTitle(title);
+    window.title = title;
 
     //compile code
     let code = script.innerHTML;

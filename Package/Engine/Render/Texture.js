@@ -1,38 +1,37 @@
 class Texture extends ImageType {
 	constructor(width, height) {
-		super(width, height, false);
+		super(width, height);
 		let self = this;
-		this.c = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
-		this.pixels = [];
-		for (let i = 0; i < this.width; i++) {
-			this.pixels.push([]);
-			for (let j = 0; j < this.height; j++) {
-				this.pixels[i].push(new Color(0, 0, 0, 0));
-			}
-		}
-		this[Symbol.iterator] = function* () {
-			for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
-				yield [i, j];
-			}
-		}
-		this.__image = null;
+		this.renderer = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
+		this.pixels = Array.dim(this.width, this.height).fill(new Color(0, 0, 0, 0));
+		this.image = new_OffscreenCanvas(width, height);
+		this.c = this.image.getContext("2d");
 
 		//init image data
 		let array = new Uint8ClampedArray(4 * this.width * this.height);
 		for (let i = 0; i < array.length; i++) array[i] = 0;
 		this.imageData = new ImageData(array, this.width, this.height);
-		let array2 = new Uint8ClampedArray(4 * this.width * this.height);
-		for (let i = 0; i < array.length; i++) array2[i] = 0;
-		this.imageData2 = new ImageData(array2, this.width, this.height);
-		this.blankImageData = this.imageData2;
-		this.blank = this.pixels.map(e => e.map(e => new Color(0, 0, 0, 0)));
-
-		this.updateImageData();
 
 		this.changed = false;
+		this.loops = false;
 	}
 	get brightness() {
-		return this.pixels.map(column => column.map(col => col.brightness));
+		return this.pixels.map(col => col.brightness);
+	}
+	get red() {
+		return this.pixels.map(col => col.red);
+	}
+	get green() {
+		return this.pixels.map(col => col.green);
+	}
+	get blue() {
+		return this.pixels.map(col => col.blue);
+	}
+	get alpha() {
+		return this.pixels.map(col => col.alpha);
+	}
+	*[Symbol.iterator]() {
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) yield this.pixels[i][j];
 	}
 	toString() {
 		function channelPair(a, b) {
@@ -47,7 +46,7 @@ class Texture extends ImageType {
 		}
 		function toString(tex) {
 			let result = tex.width + "," + tex.height + ":";
-			for (let col of tex.pixels) result += column(col);
+			for (let i = 0; i < tex.pixels.length; i++) result += column(tex.pixels[i]);
 			return result;
 		}
 		return toString(this);
@@ -55,7 +54,7 @@ class Texture extends ImageType {
 	clear() {
 		let height = this.pixels[0].length;
 		let width = this.pixels.length;
-		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.act_set(i, j, cl.BLANK);
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.act_set(i, j, Color.BLANK);
 	}
 	getPixel(x, y) {
 		if (this.pixels[x] && this.pixels[x][y]) return this.pixels[x][y];
@@ -66,9 +65,9 @@ class Texture extends ImageType {
 			return this.pixels[x][y];
 		}
 	}
-	shader(fn, ...args) {
+	shader(fn) {
 		let coms = [];
-		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j, ...args)]);
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j)]);
 		for (let i = 0; i < coms.length; i++) this.shader_set(coms[i][0], coms[i][1], coms[i][2]);
 		this.changed = true;
 		return this;
@@ -104,31 +103,46 @@ class Texture extends ImageType {
 		return;
 	}
 	blur(amount = 1) {
-		for (let n = 0; n < amount; n++) for (let [x, y] of this) {
-			let colors = [];
-			for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) {
-				colors.push(this.getPixel(x + i, y + j));
+		let newPixels = this.pixels.map((col, x, y) => {
+			let r = 0;
+			let g = 0;
+			let b = 0;
+			let a = 0;
+			for (let i = -amount; i <= amount; i++) for (let j = -amount; j <= amount; j++) {
+				let col = this.getPixel(x + i, y + j);
+				r += col.red;
+				g += col.green;
+				b += col.blue;
+				a += col.alpha;
 			}
-			let col = new Color(0, 0, 0, 1);
-			col.limited = false;
-			for (let color of colors) col.add(color);
-			col.div(colors.length);
-			this.setPixel(x, y, col);
-		}
+			r /= 9;
+			g /= 9;
+			b /= 9;
+			a /= 9;
+			return new Color(r, g, b, a);
+		});
+		this.pixels = newPixels;
+		this.updateImageData();
 	}
 	updateImageData() {
-		let x = new Frame(this.width, this.height);
-		x.c.c.putImageData(this.imageData, 0, 0);
-		this.__image = x;
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
+			let inx = 4 * (j * this.width + i);
+			let { red, green, blue, alpha } = this.pixels[i][j];
+			this.imageData.data[inx] = red;
+			this.imageData.data[inx + 1] = green;
+			this.imageData.data[inx + 2] = blue;
+			this.imageData.data[inx + 3] = alpha * 255;
+		}
+		this.changed = false;
 	}
 	makeImage() {
 		if (this.changed) {
 			this.changed = false;
-			this.updateImageData();
+			this.c.putImageData(this.imageData, 0, 0);
 		}
-		return this.__image.img;
+		return this.image;
 	}
-	scale(w, h) {
+	stretch(w, h) {
 		w = Math.round(w);
 		h = Math.round(h);
 		let r = new Texture(w, h);
@@ -147,19 +161,54 @@ class Texture extends ImageType {
 			else d = b;
 			if (this.pixels[x][y + 1]) c = this.pixels[x][y + 1];
 			else c = a;
-			// if (this.pixels[x + 1])
 			r.shader_set(i, j, Color.quadLerp(a, b, c, d, tx, ty));
 		}
 		r.changed = true;
 		return r;
 	}
-	portion(x, y, w, h) {
+	clip(x, y, w, h) {
 		x = Math.round(x);
 		y = Math.round(y);
 		let r = new Texture(w, h);
 		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) r.shader_set(i, j, this.getPixel(x + i, y + j));
 		r.changed = true;
 		return r;
+	}
+	get() {
+		let tex = new Texture(this.width, this.height);
+		tex.pixels = this.pixels.map(v => v.get());
+		tex.updateImageData();
+		tex.changed = true;
+		return tex;
+	}
+	static fromRenderer(renderer, x, y, w, h) {
+		if (!x) x = 0;
+		if (!y) y = 0;
+		if (!w) w = renderer.width;
+		if (!h) h = renderer.height;
+		if (typeof x === "object") {
+			h = x.height;
+			w = x.width;
+			y = x.y;
+			x = x.x;
+		}
+		x *= devicePixelRatio;
+		y *= devicePixelRatio;
+		let W = ~~(w * devicePixelRatio);
+		let H = ~~(h * devicePixelRatio);
+		let imageData = renderer.c.getImageData(x, y, W, H);
+		let tex = new Texture(w, h);
+		let data = imageData.data;
+		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
+			let inx = (Math.round(i * devicePixelRatio) + Math.round(j * devicePixelRatio) * W) * 4;
+			let r = data[inx + 0];
+			let g = data[inx + 1];
+			let b = data[inx + 2];
+			let a = data[inx + 3] / 255;
+			tex.shader_set(i, j, new Color(r, g, b, a));
+		}
+		tex.changed = true;
+		return tex;
 	}
 	static grayScale(bright) {
 		return (new Texture(bright.length, bright[0].length)).shader((x, y) => Color.grayScale(bright[x][y]));
@@ -177,6 +226,7 @@ class Texture extends ImageType {
 				document.body.appendChild(img);
 				let style = getComputedStyle(img);
 				let w = w_o ? w_o : parseInt(style.width);
+				if (w_o && !h_o) h_o = Math.floor(parseInt(style.height) * w_o / parseInt(style.width));
 				let h = h_o ? h_o : parseInt(style.height);
 				tex = new Texture(w, h);
 				canvas.width = w;
@@ -194,7 +244,6 @@ class Texture extends ImageType {
 					let col = new Color(red, green, blue, alpha);
 					tex.setPixel(i, j, col);
 				}
-				tex.updateImageData();
 				img.outerHTML = "";
 				resolve(tex);
 			}
@@ -243,15 +292,18 @@ class Texture extends ImageType {
 					acc = "";
 				}
 			}
-			for (let [x, y] of tex) tex.setPixel(x, y, result[x][y]);
+			//fix pixels
+			Array.makeMultidimensional(result);
+			tex.pixels = result;
 			tex.updateImageData();
+			tex.changed = true;
 			return tex;
 		}
 		return inv_toString(str);
 	}
 }
 class TextureDrawingContextPath {
-	constructor(ctx, type, ...args) {
+	constructor(ctx, type, args) {
 		this.ctx = ctx;
 		this.type = type;
 		this.args = args;
@@ -261,8 +313,8 @@ class TextureDrawingContextPath {
 		y = Math.round(y);
 		if (y < 0) return;
 		if (y > tex.height - 1) return;
-		xmin = Math.round(clamp(xmin, 0, tex.width - 1));
-		xmax = Math.round(clamp(xmax, 0, tex.width - 1));
+		xmin = Math.round(Number.clamp(xmin, 0, tex.width - 1));
+		xmax = Math.round(Number.clamp(xmax, 0, tex.width - 1));
 		let range = xmax - xmin;
 		for (let i = 0; i < range; i++) {
 			TextureDrawingContextPath.noCullFillPixel(ctx, xmin + i, y, col);
@@ -468,7 +520,7 @@ class TextureDrawingContext {
 	arc(x, y, r, st, et) {
 		let min = this.getTransformedPoint(x, y);
 		let max = this.getTransformedPoint(x + r, y);
-		this.path.push(new TextureDrawingContextPath(this, "arc", min.x, min.y, Math.sqrt((max.x - min.x) ** 2 + (max.y - min.y) ** 2), st, et));
+		this.path.push(new TextureDrawingContextPath(this, "arc", [min.x, min.y, Math.sqrt((max.x - min.x) ** 2 + (max.y - min.y) ** 2), st, et]));
 	}
 	beginPath() {
 		this.path = [];
@@ -479,7 +531,7 @@ class TextureDrawingContext {
 	}
 	lineTo(x, y) {
 		let min = this.getTransformedPoint(x, y);
-		this.path.push(new TextureDrawingContextPath(this, "line", this.lineStart.x, this.lineStart.y, min.x, min.y));
+		this.path.push(new TextureDrawingContextPath(this, "line", [this.lineStart.x, this.lineStart.y, min.x, min.y]));
 		this.lineStart = min;
 	}
 	stroke() {
@@ -494,14 +546,14 @@ class TextureDrawingContext {
 			let polygon = [];
 			for (let p of this.path) {
 				if (p.type === "arc") {
-					if (polygon.length > 2) (new TextureDrawingContextPath(this, "polygon", polygon)).fill();
+					if (polygon.length > 2) (new TextureDrawingContextPath(this, "polygon", [polygon])).fill();
 					polygon = [];
 					p.fill();
 				} else {
 					polygon.push(p.args);
 				}
 			}
-			if (polygon.length > 2) (new TextureDrawingContextPath(this, "polygon", polygon)).fill();
+			if (polygon.length > 2) (new TextureDrawingContextPath(this, "polygon", [polygon])).fill();
 		}
 	}
 }
