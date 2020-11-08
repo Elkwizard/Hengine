@@ -431,10 +431,6 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 			l.renderer.stroke(Color.BLACK).rect(barY);
 		} else l.scrollOffset.y = 0;
 
-
-		// l.renderer.stroke(Color.BLACK).rect(shape);
-
 		l.renderer.textMode = prevTextMode;
-
 	}
 });

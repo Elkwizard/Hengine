@@ -43,7 +43,7 @@ class Vector extends Operable {
 			for (let x of this.constructor.modValues) {
 				this[x] = e(this[x], v[x] || 0);
 			}
-		} else if (v instanceof Matrix) {
+		} else if (v instanceof Matrix4) {
 			let chk = e(2, 3);
 			let action = "times";
 			if (chk === 6);
@@ -118,7 +118,7 @@ class Vector extends Operable {
 	toMatrix() {
 		let count = 0;
 		for (let x of this.constructor.modValues) count++;
-		let m = new Matrix(count, 1);
+		let m = new Matrix4(count, 1);
 		count = 0;
 		for (let x of this.constructor.modValues) {
 			m.cols[0][count] = this[x];
@@ -406,7 +406,7 @@ class Vector3 extends Vector {
 		return new Vector3(p.x || 0, p.y || 0, p.z || 0);
 	}
 	static fromAngle(r, d = Vector3.right) {
-		return Matrix.mulPoint(Matrix.rotation(r.x, r.y, r.z), d);
+		return Matrix4.mulPoint(Matrix4.rotation(r.x, r.y, r.z), d);
 	}
 }
 

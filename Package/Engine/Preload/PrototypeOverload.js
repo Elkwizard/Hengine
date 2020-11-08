@@ -54,53 +54,38 @@ Array.prototype.pushArray = function (arr) {
 	let len = arr.length;
 	for (let i = 0; i < len; i++) this.push(arr[i]);
 };
-Array.prototype.map = function (fn, ...coords) {
-	let result = [];
-	if (this.length && this.multiDimensional) {
-		result.multiDimensional = true;
-		for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...coords, i));
-	} else if (this.length)
-		for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
-	return result;
-};
-Array.prototype.forEach = function (fn, ...coords) {
-	if (this.length && this.multiDimensional) {
-		for (let i = 0; i < this.length; i++) this[i].forEach(fn, ...coords, i);
-	} else if (this.length)
-		for (let i = 0; i < this.length; i++) fn(this[i], ...coords, i);
-};
-Array.prototype.flatten = function () {
-	if (this.length) {
+Array.makeMultidimensional = function (arr) {
+	arr.multiDimensional = true;
+	arr.flatten = function () {
 		let result = [];
-		if (this.multiDimensional) for (let i = 0; i < this.length; i++) result.push(...this[i].flatten());
-		else for (let i = 0; i < this.length; i++) result.push(this[i]);
+		for (let i = 0; i < this.length; i++) result.pushArray(this[i].flatten());
 		return result;
-	}
-	return [];
+	}.bind(arr);
+	arr[Symbol.iterator] = function* () {
+		let all = this.flatten();
+		for (let i = 0; i < all.length; i++) yield all[i];
+	}.bind(arr);
+	arr.forEach = function (fn, ...coords) {
+		for (let i = 0; i < this.length; i++) this[i].forEach(fn, ...coords, i);
+	}.bind(arr);
+	arr.map = function (fn, ...coords) {
+		let result = [];
+		Array.makeMultidimensional(result);
+		for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...coords, i));
+		return result;
+	}.bind(arr);
+	arr.fill = function (value) {
+		for (let i = 0; i < this.length; i++) this[i].fill(value);
+	}.bind(arr);
 }
-Array.prototype[Symbol.iterator] = function* () {
-	let all = this.flatten();
-	for (let i = 0; i < all.length; i++) yield all[i];
-};
 Array.dim = function (...dims) {
 	let ary = [];
 	if (dims.length > 1) {
 		let dim = dims.shift();
-		ary.multiDimensional = true;
+		Array.makeMultidimensional(ary);
 		for (let i = 0; i < dim; i++) ary.push(Array.dim(...dims));
 	} else {
 		for (let i = 0; i < dims[0]; i++) ary.push(null);
-	}
-	return ary;
-};
-Array.dimFilled = function (val, ...dims) {
-	let ary = [];
-	if (dims.length > 1) {
-		let dim = dims.shift();
-		ary.multiDimensional = true;
-		for (let i = 0; i < dim; i++) ary.push(Array.dimFilled(val, ...dims));
-	} else {
-		for (let i = 0; i < dims[0]; i++) ary.push(val);
 	}
 	return ary;
 };

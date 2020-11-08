@@ -93,7 +93,7 @@ class HengineLoader {
 		return ["PrototypeOverload", "Lazy", "Operable"];
 	}
 	static get defaultRenderPackage() {
-		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "GrayMap", "Frame", "Animation", "Texture", "Webcam", "GPUShader", "Font", "Renderer", "Graph", "Mesh", "Camera"];
+		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "GrayMap", "Frame", "Animation", "Texture", "Webcam", "GPUShader", "Font", "WebGLRenderer2D", "WebGLRenderer3D", "Renderer", "Graph", "Mesh", "Camera"];
 	}
 	static get defaultManagementPackage() {
 		return ["ElementContainer", "Scenes", "Intervals", "Hengine", "HengineLoader"];

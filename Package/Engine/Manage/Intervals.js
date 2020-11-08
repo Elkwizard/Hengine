@@ -87,6 +87,7 @@ class IntervalManager {
 		}
 		//update
 		if (!this.paused) {
+			this.engine.renderer.beforeFrame();
 			this.updateGraphs();
 			this.engine.keyboard.update();
 			this.engine.mouse.update();
@@ -99,6 +100,7 @@ class IntervalManager {
 			this.engine.scene.updateCaches();
 			this.engine.scene.updatePreviousData();
 			this.engine.mouse.afterUpdate();
+			this.engine.renderer.afterFrame();
 		}
 	}
 	makeGraphPlane(graphs, frameLimit) {

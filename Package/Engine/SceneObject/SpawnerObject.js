@@ -83,6 +83,7 @@ class ParticleSpawnerObject extends SceneObject {
     }
     engineDraw(screen) {
         this.determineOnScreen(screen);
+
         if (!this.hidden && this.onScreen) {
             for (let key in this.spawns) this.spawns[key].engineDraw();
         }
@@ -118,8 +119,9 @@ class ParticleObject extends SceneObject {
     constructor(spawner, name, home, engine) {
         super(name, spawner.transform.position.x, spawner.transform.position.y, false, "Engine-Particle", home, engine);
         this.velocity = Vector2.origin;
-        this.angularVelocity = 0;
         this.spawner = spawner;
+        this.name = name;
+        this.angularVelocity = 0;
         this.draw = function () { };
         this.drawPrefix = function () { };
         this.drawSuffix = function () { };
@@ -156,6 +158,16 @@ class ParticleObject extends SceneObject {
 
         this.completelyStatic = false;
         this.lifeSpan = 0;
+    }
+    set name(a) {
+        if (this.spawner) {
+            delete this.spawner.spawns[this._name];
+            this._name = a;
+            this.spawner.spawns[this._name] = this;
+        }
+    }
+    get name() {
+        return this._name;
     }
     remove() {
         delete this.spawner.spawns[this.name];

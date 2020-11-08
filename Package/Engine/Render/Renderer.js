@@ -46,24 +46,8 @@ class Artist {
 		}
 
 
-		this.gl = {
-			canvas: new_OffscreenCanvas(this.canvas.width, this.canvas.height),
-			c: null,
-			shadeSmooth: false,
-			camera: {
-				position: Vector3.origin,
-				rotation: Vector3.origin
-			},
-			cameraTransform: Matrix.identity(),
-			shaderProgram: null,
-			uniformLocations: {
-				worldLocation: null,
-				normalLocation: null
-			}
-		};
-	
-		this.webGLInit();
-
+		this.gl3 = new WebGLRenderer3D(this);
+		this.gl2 = new WebGLRenderer2D(this);
 
 		this.__c = this.c;
 		this._background = new Color(0, 0, 0, 0);
@@ -800,6 +784,18 @@ class Artist {
 	clearScreen() {
 		this.clear();
 	}
+	beforeFrame() {
+		if (this.gl2.exists) this.gl2.beforeFrame();
+		if (this.gl3.exists) this.gl3.beforeFrame();
+	}
+	afterFrame() {
+		if (this.gl2.exists) this.gl2.afterFrame();
+		if (this.gl3.exists) this.gl3.afterFrame();
+		if (this.gl2.changed) this.c.drawImage(this.gl2.canvas, 0, 0, this.width, this.height);
+		if (this.gl3.changed) this.c.drawImage(this.gl3.canvas, 0, 0, this.width, this.height);
+		this.gl2.changed = false;
+		this.gl3.changed = false;
+	}
 	fill(color) {
 		this.c.fillStyle = this.getContextColor(color);
 		this.c.fillRect(0, 0, this.width, this.height);
@@ -987,135 +983,5 @@ class Artist {
 				break;
 		}
 		return function () { };
-	}
-	webGLInit() {
-
-		this.gl.c = this.gl.canvas.getContext("webgl");
-
-		const gl = this.gl.c;
-		if (!gl) exit("Your browser does not have Webgl.");
-
-		//big meshes
-		const bigIndicesExt = gl.getExtension("OES_element_index_uint");
-
-		//sources
-		const zNear = 0.001;
-		const zFar = 100;
-		const vertexSource = `
-			attribute vec4 vertexPosition;
-			attribute vec4 vertexNormal;
-			attribute vec4 vertexColor;
-
-			uniform mat4 worldTransform;
-			uniform mat4 normalTransform;
-
-			varying highp vec3 position;
-			varying highp vec4 color;
-
-			void main() {
-				color.rgb = vertexPosition.xyz;
-				gl_Position = worldTransform * vertexPosition;
-				gl_Position.xy /= max(gl_Position.z - ${zNear}, ${zNear});
-				gl_Position.z = (gl_Position.z - ${zNear}) / (${zFar}.0 - ${zNear});
-				position = gl_Position.xyz;
-				highp float light = (normalTransform * vertexNormal).y * 0.5 + 0.5;
-				
-				//color += vertexColor;
-				//color -= vertexColor;
-				color = vertexColor;
-
-				color.rgb *= light;
-
-
-				//color.a  =1.0;
-
-				//from fragmentShader
-				color.rgb *= color.a;
-			}
-		`;
-		const pixelSource = `
-			varying highp vec3 position;
-			varying highp vec4 color;
-
-			void main() {
-				if (position.z < ${zNear}) discard;
-				// gl_FragColor.rgb = vec3(position.z);
-				// gl_FragColor.a = 1.0;
-				// gl_FragColor = vec4(gl_FragCoord.xyz * vec3(0.001, 0.001, 1.0), 1.0);
-				gl_FragColor = color;
-			}
-		`;
-		//shader programs
-		function compileShader(type, source) {
-			let shader = gl.createShader(type);
-			gl.shaderSource(shader, source);
-			gl.compileShader(shader);
-			if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-				exit(gl.getShaderInfoLog(shader));
-				return false;
-			}
-			return shader;
-		}
-		const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
-		const pixelShader = compileShader(gl.FRAGMENT_SHADER, pixelSource);
-		if (!pixelShader) return;
-		const shaderProgram = gl.createProgram();
-		this.gl.shaderProgram = shaderProgram;
-
-		gl.attachShader(shaderProgram, vertexShader);
-		gl.attachShader(shaderProgram, pixelShader);
-		gl.linkProgram(shaderProgram);
-
-		// gl.enable(gl.CULL_FACE);
-		// gl.cullFace(gl.BACK);
-
-		gl.clearColor(0, 0, 0, 0);
-		gl.enable(gl.BLEND);
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-		gl.enable(gl.DEPTH_TEST);
-		gl.depthFunc(gl.LEQUAL);
-		gl.depthRange(zNear, 1);
-
-		gl.useProgram(shaderProgram);
-
-		this.gl.uniformLocations = {
-			worldLocation: gl.getUniformLocation(shaderProgram, "worldTransform"),
-			normalLocation: gl.getUniformLocation(shaderProgram, "normalTransform")
-		};
-	}
-	webGL(mesh) {
-		
-		const { positionBuffer, indexBuffer, vertexCount } = mesh;
-
-		const { c: gl, canvas, uniformLocations: { normalLocation, worldLocation }, camera: { rotation, position } } = this.gl;
-
-		canvas.width = this.canvas.width;
-		canvas.height = this.canvas.height;
-
-
-		//transform matrix
-		const AR = canvas.width / canvas.height;
-		const aspectRatioTransform = Matrix.scale(1, -AR, 1);
-		const cameraTransform = Matrix.glCamera(position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
-		const worldTransform = Matrix.mulMatrix(
-			cameraTransform,
-			aspectRatioTransform
-		);
-		const modelTransform = mesh.transform;
-		const transform = Matrix.mulMatrix(modelTransform, worldTransform);
-
-		this.gl.cameraTransform = worldTransform;
-
-		gl.uniformMatrix4fv(worldLocation, false, new Float32Array(transform));
-		gl.uniformMatrix4fv(normalLocation, false, new Float32Array(mesh.normalTransform));
-
-		gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
-
-		this.c.drawImage(this.gl.canvas, 0, 0, this.width, this.height);
 	}
 }

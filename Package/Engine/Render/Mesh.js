@@ -20,36 +20,36 @@ class Mesh {
         this.resetTransform();
     }
     resetTransform() {
-        this.transform = Matrix.identity();
-        this.normalTransform = Matrix.identity();
+        this.transform = Matrix4.identity();
+        this.normalTransform = Matrix4.identity();
     }
     rotate(r, v = this.middle) {
-        this.transform = Matrix.mulMatrix(
+        this.transform = Matrix4.mulMatrix(
             this.transform,
-            Matrix.mulMatrix(
-                Matrix.translation(-v.x, -v.y, -v.z),
-                Matrix.mulMatrix(
-                    Matrix.glRotation(r.x, r.y, r.z),
-                    Matrix.translation(v.x, v.y, v.z)
+            Matrix4.mulMatrix(
+                Matrix4.translation(-v.x, -v.y, -v.z),
+                Matrix4.mulMatrix(
+                    Matrix4.glRotation(r.x, r.y, r.z),
+                    Matrix4.translation(v.x, v.y, v.z)
                 )
             )
         );
-        this.normalTransform = Matrix.mulMatrix(this.normalTransform, Matrix.glRotation(r.x, r.y, r.z));
+        this.normalTransform = Matrix4.mulMatrix(this.normalTransform, Matrix4.glRotation(r.x, r.y, r.z));
     }
     translate(o) {
-        this.transform = Matrix.mulMatrix(
+        this.transform = Matrix4.mulMatrix(
             this.transform,
-            Matrix.translation(o.x, o.y, o.z)
+            Matrix4.translation(o.x, o.y, o.z)
         );
     }
     scale(s, v = this.middle) {
-        this.transform = Matrix.mulMatrix(
+        this.transform = Matrix4.mulMatrix(
             this.transform,
-            Matrix.mulMatrix(
-                Matrix.translation(v.x, v.y, v.z),
-                Matrix.mulMatrix(
-                    Matrix.scale(s.x, s.y, s.z),
-                    Matrix.translation(-v.x, -v.y, -v.z)
+            Matrix4.mulMatrix(
+                Matrix4.translation(v.x, v.y, v.z),
+                Matrix4.mulMatrix(
+                    Matrix4.scale(s.x, s.y, s.z),
+                    Matrix4.translation(-v.x, -v.y, -v.z)
                 )
             )
         );
@@ -61,7 +61,7 @@ class Mesh {
         return new Mesh(this.tris.map(tri => tri.get()));
     }
     process(renderer) {
-        const { c: gl, shaderProgram, shadeSmooth } = renderer.gl;
+        const { c: gl, shaderProgram, shadeSmooth } = renderer;
 
         //vertex positions & indices
 
@@ -143,7 +143,6 @@ class Mesh {
             normals[i + 1] = y / m;
             normals[i + 2] = z / m;
         }
-
 
         //vertex colors
         let amountColorChannels = (positions.length / 3) * 4;

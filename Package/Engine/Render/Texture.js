@@ -3,7 +3,7 @@ class Texture extends ImageType {
 		super(width, height);
 		let self = this;
 		this.renderer = new Artist({ getContext() { return new TextureDrawingContext(self); } }, this.width, this.height);
-		this.pixels = Array.dimFilled(new Color(0, 0, 0, 0), this.width, this.height);
+		this.pixels = Array.dim(this.width, this.height).fill(new Color(0, 0, 0, 0));
 		this.image = new_OffscreenCanvas(width, height);
 		this.c = this.image.getContext("2d");
 
@@ -293,7 +293,7 @@ class Texture extends ImageType {
 				}
 			}
 			//fix pixels
-			result.multiDimensional = true;
+			Array.makeMultidimensional(result);
 			tex.pixels = result;
 			tex.updateImageData();
 			tex.changed = true;

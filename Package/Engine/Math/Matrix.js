@@ -1,4 +1,81 @@
-class Matrix {
+class Matrix3 {
+	static identity() {
+		return [
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
+		];
+	}
+	static mulPoint(m, p) {
+		let x = m[0] * p.x + m[3] * p.y + m[6];
+		let y = m[1] * p.x + m[4] * p.y + m[7];
+		return new Vector2(x, y);
+	}
+	static rotation(t) {
+		let c = Math.cos(-t);
+		let s = Math.sin(-t);
+		return [
+			c,	-s,	0,
+			s,	c,	0,
+			0,	0,	1
+		];
+	}
+	static scale(x, y) {
+		return [
+			x, 0, 0,
+			0, y, 0,
+			0, 0, 1
+		];
+	}
+	static translation(x, y) {
+		return [
+			1, 0, 0,
+			0, 1, 0,
+			x, y, 1
+		];
+	}
+	static mulMatrix(M0, M1) {
+		let m00 = M0[0] * M1[0] + M0[1] * M1[3] + M0[2] * M1[6];
+		let m01 = M0[0] * M1[1] + M0[1] * M1[4] + M0[2] * M1[7];
+		let m02 = M0[0] * M1[2] + M0[1] * M1[5] + M0[2] * M1[8];
+		let m10 = M0[3] * M1[0] + M0[4] * M1[3] + M0[5] * M1[6];
+		let m11 = M0[3] * M1[1] + M0[4] * M1[4] + M0[5] * M1[7];
+		let m12 = M0[3] * M1[2] + M0[4] * M1[5] + M0[5] * M1[8];
+		let m20 = M0[6] * M1[0] + M0[7] * M1[3] + M0[8] * M1[6];
+		let m21 = M0[6] * M1[1] + M0[7] * M1[4] + M0[8] * M1[7];
+		let m22 = M0[6] * M1[2] + M0[7] * M1[5] + M0[8] * M1[8];
+		return [
+			m00, m01, m02,
+			m10, m11, m12,
+			m20, m21, m22
+		];
+	}
+	static mulMatrices(matrices) {
+		let matrix = matrices[0];
+		for (let i = 1; i < matrices.length; i++) matrix = Matrix3.mulMatrix(matrix, matrices[i]);
+		return matrix;
+	}
+	static stringify(m) {
+		const [topleft, topright, bottomleft, bottomright, vertical] = [9484, 9488, 9492, 9496, 9474].map(num => String.fromCharCode(num));
+		let n = m.map(n => n.toMaxed(2));
+		let max0 = Math.max(n[0].length, n[3].length, n[6].length);
+		let max1 = Math.max(n[1].length, n[4].length, n[7].length);
+		let max2 = Math.max(n[2].length, n[5].length, n[8].length);
+		let fullspan = max0 + max1 + max2 + 4;
+		let top = `${topleft}${" ".repeat(fullspan)}${topright}`;
+		let middle0 = `${vertical} ${n[0].pad(max0)} ${n[1].pad(max1)} ${n[2].pad(max2)} ${vertical}`;
+		let middle1 = `${vertical} ${n[3].pad(max0)} ${n[4].pad(max1)} ${n[5].pad(max2)} ${vertical}`;
+		let middle2 = `${vertical} ${n[6].pad(max0)} ${n[7].pad(max1)} ${n[8].pad(max2)} ${vertical}`;
+		let bottom = `${bottomleft}${" ".repeat(fullspan)}${bottomright}`;
+
+		return `${top}
+${middle0}
+${middle1}
+${middle2}
+${bottom}`;
+	}
+}
+class Matrix4 {
 	static identity() {
 		return [
 			1, 0, 0, 0,
@@ -124,12 +201,12 @@ class Matrix {
 		];
 	}
 	static glRotation(x, y, z) {
-		return Matrix.rotation(x, y, z);
+		return Matrix4.rotation(x, y, z);
 	}
 	static glCamera(ox, oy, oz, rx, ry, rz) {
-		return Matrix.mulMatrix(
-			Matrix.translation(-ox, -oy, -oz),
-			Matrix.glRotation(-rx, -ry, -rz)
+		return Matrix4.mulMatrix(
+			Matrix4.translation(-ox, -oy, -oz),
+			Matrix4.glRotation(-rx, -ry, -rz)
 		);
 	}
 	static stringify(m) {
