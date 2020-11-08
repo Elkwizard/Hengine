@@ -155,8 +155,6 @@ class Scene {
 		this.script("BeforeUpdate");
 
 		//draw
-		this.camera.width = this.engine.renderer.width;
-		this.camera.height = this.engine.renderer.height;
 		this.main.elementArray.sort((a, b) => a.layer - b.layer);
 		this.renderCamera();
 		

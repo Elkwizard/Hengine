@@ -633,7 +633,6 @@ class Geometry {
         return Vector2.sum(verts).over(verts.length);
     }
     static isClockwise(verts) {
-        //HENRY_ALG
         let sum = 0;
         for (let i = 0; i < verts.length; i++) {
             let a = verts[i];
@@ -641,6 +640,15 @@ class Geometry {
             sum += (b.x - a.x) * (a.y + b.y) / 2;
         }
         return sum < 0;
+    }
+    static area(verts) {
+        let sum = 0;
+        for (let i = 0; i < verts.length; i++) {
+            let a = verts[i];
+            let b = verts[(i + 1) % verts.length];
+            sum += (b.x - a.x) * (a.y + b.y) / 2;
+        }
+        return sum / 2;
     }
     static clockwise(verts) {
         return Geometry.isClockwise(verts) ? verts : [...verts].reverse();

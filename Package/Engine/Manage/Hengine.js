@@ -42,7 +42,7 @@ class Hengine {
 		}.bind(this));
 	}
 	end() {
-		exit("HALTED");
+		exit("Hengine.end()");
 		let canvas = document.getElementById(this.renderer.canvas.id);
 		if (canvas) canvas.outerHTML = "";
 	}

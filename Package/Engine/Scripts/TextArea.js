@@ -60,6 +60,17 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.updateTextBoundingBox();
 		l.saveVersion();
 	},
+	focus(l) {
+		l.focused = true;
+		l.selectionStart = l.value.length;
+		l.selectionEnd = l.value.length;
+	},
+	selectRange(l, min, max) {
+		min = Math.max(min, 0);
+		max = Math.min(max, l.value.length);
+		l.selectionStart = min;
+		l.selectionEnd = max;
+	},
 	getCharacterIndex(l, p) {
 		let index = 0;
 		let hitboxGroups = l.value.split("\n");

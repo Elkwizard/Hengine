@@ -50,6 +50,12 @@ class PhysicsObject extends SceneObject {
         });
         this._velocity = vec;
     }
+    get canRotate() {
+        return this.body.canRotate;
+    }
+    set canRotate(a) {
+        this.body.canRotate = a;
+    }
     get friction() {
         return this.body.friction;
     }

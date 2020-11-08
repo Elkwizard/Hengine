@@ -469,8 +469,10 @@ class RigidBody {
         this.velocity.x += imp.x / this.mass;
         this.velocity.y += imp.y / this.mass;
         //angular
-        let cross = (pos.x - this.position.x) * imp.y - (pos.y - this.position.y) * imp.x;
-        if (cross && this.canRotate) this.angularVelocity += cross / this.inertia;
+        if (this.canRotate) {
+            let cross = (pos.x - this.position.x) * imp.y - (pos.y - this.position.y) * imp.x;
+            if (cross) this.angularVelocity += cross / this.inertia;
+        }
     }
     static fromPolygon(vertices, type = RigidBody.DYNAMIC) {
         let position = vertices.reduce((a, b) => PhysicsVector.add(a, b));
@@ -935,8 +937,11 @@ PhysicsConstraint.Length = class extends PhysicsConstraint {
 
             if (!dx) dx = 0;
             if (!dy) dy = 0;
-            let pA = 2 * this.bodyB.mass / (this.bodyA.mass + this.bodyB.mass);
-            let pB = 2 - pA;
+            let pA = 1, pB = 1;
+            if (this.bodyA.type === RigidBody.DYNAMIC && this.bodyB.type === RigidBody.DYNAMIC) {
+                pA = 2 * this.bodyB.mass / (this.bodyA.mass + this.bodyB.mass);
+                pB = 2 - pA;
+            }
             if (this.bodyA.type === RigidBody.DYNAMIC) {
                 this.bodyA.position.x += dx * pA;
                 this.bodyA.position.y += dy * pA;
@@ -980,6 +985,14 @@ class PhysicsEngine {
     }
     addConstraint(constraint) {
         this.constraints.push(constraint);
+    }
+    getConstraints(id) {
+        let constraints = [];
+        for (let i = 0; i < this.constraints.length; i++) {
+            let con = this.constraints[i];
+            if (con.bodyA.id === id || con.bodyB.id === id) constraints.push(con);
+        }
+        return constraints;
     }
     solveConstraints() {
         for (let i = 0; i < this.constraintIterations; i++) {
@@ -1152,11 +1165,12 @@ class PhysicsEngine {
         );
     }
     handleSleep(dynBodies) {
+        let sleepDuration = this.iterations * this.sleepDuration;
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
             if (this.lowActivity(body)) {
                 body.sleeping++;
-                if (body.sleeping === this.sleepDuration) body.stop();
+                if (body.sleeping === sleepDuration) body.stop();
             } else body.wake();
         }
 

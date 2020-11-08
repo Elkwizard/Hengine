@@ -56,4 +56,10 @@ class Transform {
 		renderer.translate(this.position.x, this.position.y);
 		if (r) renderer.rotate(r);
 	}
+	drawWithoutRotation(artist, renderer) {
+		let r = this.rotation;
+		if (r) renderer.rotate(-r);
+		artist();
+		if (r) renderer.rotate(r);
+	}
 }

@@ -47,10 +47,23 @@ class ContinuousFunction extends IntervalFunction {
 		this.fn(this.timer);
 	}
 }
+class WaitUntilFunction extends IntervalFunction {
+	constructor(fn, event, type) {
+		super(fn, Infinity, type);
+		this.event = event;
+	}
+	respond() {
+		if (this.event()) {
+			this.fn();
+			this.done = true;
+		}
+	}
+}
 class IntervalManager {
 	constructor(engine) {
 		this.engine = engine;
 		this.paused = false;
+		this.waitCondition = null;
 		this.functions = [];
 		this.performanceData = true;
 		this.frameCount = 0;
@@ -85,12 +98,16 @@ class IntervalManager {
 			this.rawFps = getFPSRange(1);
 			this.fps = Math.floor(Number.clamp(this.averageFps, 0, 60));
 		}
-		//update
+		//input is necessary
+		this.engine.keyboard.update();
+		this.engine.mouse.update();
+		if (this.paused && this.waitCondition && this.waitCondition()) {
+			this.paused = false;
+			this.waitCondition = null;
+		} 
 		if (!this.paused) {
 			this.engine.renderer.beforeFrame();
 			this.updateGraphs();
-			this.engine.keyboard.update();
-			this.engine.mouse.update();
 			this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
 			this.engine.renderer.clearScreen();
 			this.updateIntervalCalls(IntervalFunction.UPDATE)
@@ -99,9 +116,9 @@ class IntervalManager {
 			this.engine.keyboard.afterUpdate();
 			this.engine.scene.updateCaches();
 			this.engine.scene.updatePreviousData();
-			this.engine.mouse.afterUpdate();
-			this.engine.renderer.afterFrame();
 		}
+		this.engine.mouse.afterUpdate();
+		this.engine.renderer.afterFrame();
 	}
 	makeGraphPlane(graphs, frameLimit) {
 		let f = new GraphPlane(graphs, frameLimit);
@@ -113,6 +130,10 @@ class IntervalManager {
 	}
 	pause() {
 		this.paused = true
+	}
+	pauseUntil(fn) {
+		this.paused = true;
+		this.waitCondition = fn;
 	}
 	play() {
 		this.paused = false
@@ -131,6 +152,9 @@ class IntervalManager {
 	}
 	delay(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new DelayedFunction(fn, frames, type));
+	}
+	waitUntil(fn, event, type = IntervalFunction.BEFORE_UPDATE) {
+		this.functions.push(new WaitUntilFunction(fn, event, type));
 	}
 	updateIntervalCalls(type) {
 		let remaining = [];

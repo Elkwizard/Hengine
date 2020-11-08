@@ -19,7 +19,6 @@ class GPUShader extends ImageType {
 	constructor(width, height, glsl) {
 		super(width, height);
 		this.glsl = glsl;
-		this.errorLog = [];
 		this.compiled = null;
 		this.compileState = { compiled: false, error: null };
 		this.arguments = { };
@@ -173,7 +172,6 @@ class GPUShader extends ImageType {
 					gl_FragColor.rgb *= gl_FragColor.a;
 				}
 			`;
-		const errorlog = v => (this.errorLog.push(v), false);
 		let prefixLength = prefix.split("\n").length + 1;
 		//shader programs
 		let error = null;
@@ -191,7 +189,6 @@ class GPUShader extends ImageType {
 		const vertexShader = compileShader(c.VERTEX_SHADER, vertexSource);
 		const pixelShader = compileShader(c.FRAGMENT_SHADER, pixelSource);
 		if (!pixelShader) {
-			exit();
 			this.compileState = { compiled: false, error };
 			return false;
 		}

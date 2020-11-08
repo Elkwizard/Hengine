@@ -130,9 +130,7 @@ class Polygon extends Shape {
 		super();
 		if (!alreadyClockwise) vertices = Geometry.clockwise(vertices);
 		this.vertices = Polygon.removeDuplicates(vertices);
-		let x = Range.fromValues(vertices.map(e => e.x));
-		let y = Range.fromValues(vertices.map(e => e.y));
-		this.area = x.length * y.length;
+		this.area = Geometry.area(this.vertices);
 	}
 	static removeDuplicates(verts) {
 		let vertices = [];
