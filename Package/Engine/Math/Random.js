@@ -2,7 +2,7 @@ class Random {
     static random() {
         return Random.seedRand(Random.seed++);
     }
-    static bool(chance) {
+    static bool(chance = 0.5) {
         return Random.random() < chance;
     }
     static range(min = 0, max = 1) {

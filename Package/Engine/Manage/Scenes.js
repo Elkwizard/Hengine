@@ -10,6 +10,14 @@ class Scene {
 		this.collisionEvents = true;
 		this.camera = new Camera(this.engine.renderer.width / 2, this.engine.renderer.height / 2, 0, 1, engine);
 	}
+	dispatchMessage(message, mask = () => true) {
+		let elements = this.main.getAllElements().filter(el => mask(el));
+		for (let i = 0; i < elements.length; i++) elements[i].scripts.run("Message", message);
+	}
+	dispatchCommand(command, mask = () => true) {
+		let elements = this.main.getAllElements().filter(el => mask(el));
+		for (let i = 0; i < elements.length; i++) command(elements[i]);
+	}
 	handleCollisionEvent(a, b, direction, contacts) {
 		let A = a.userData.sceneObject;
 		let B = b.userData.sceneObject;
@@ -25,7 +33,8 @@ class Scene {
 			if (!(this.physicsEngine.isAsleep(rect.body) && rect.mobile)) rect.colliding.clear();
 		}
 	}
-	rayCast(origin, ray, shapes = this.main.elementArray) {
+	rayCast(origin, ray, mask = () => true) {
+		let shapes = this.main.updateArray().filter(el => mask(el));
 		shapes = shapes.filter(shape => !(shape instanceof UIObject));
 		let bestDist = Infinity;
 		let hitShape = null;

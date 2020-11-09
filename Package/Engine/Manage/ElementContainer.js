@@ -1,6 +1,6 @@
 class ElementContainer {
 	constructor(name = "container", active, home, engine) {
-		this.elements = { };
+		this.elements = {};
 		this.active = active;
 		this.name = name;
 		this.home = home;
@@ -44,21 +44,21 @@ class ElementContainer {
 	activate() {
 		this.active = true;
 		this.updateArray();
-		for (let element of this.elementArray) if (element.body) element.activate();
+		for (let element of this.elementArray) element.activate();
 	}
 	deactivate() {
 		this.updateArray();
 		this.active = false;
-		for (let element of this.elementArray) if (element.body) element.deactivate();
+		for (let element of this.elementArray) element.deactivate();
 	}
-	updateArray() { 
+	updateArray() {
 		this.elementArray = [];
 		if (this.active) for (let rect in this.elements) {
 			let cont = this.elements[rect];
 			if (cont instanceof ElementContainer) {
 				let ary = cont.updateArray();
 				this.elementArray.pushArray(ary);
-			} else this.elementArray.push(cont);
+			} else if (cont.active) this.elementArray.push(cont);
 		}
 		return this.elementArray;
 	}
@@ -83,7 +83,7 @@ class ElementContainer {
 			n.particleSlows = el.particleSlows;
 			n.particleFades = el.particleFades;
 			n.particleFalls = el.particleFalls;
-			n.active = el.active;
+			n.particleActive = el.particleActive;
 		} else if (el instanceof UIObject) {
 			n = this.addUI(el.name + " - copy", 0, 0, el.width, el.height);
 		} else if (el instanceof PhysicsObject) {
@@ -97,7 +97,7 @@ class ElementContainer {
 		let ser = el.serializeShapes();
 		n.parseShapes(ser);
 		el.runLog(n);
-		
+
 		return n;
 	}
 	hideElement(name) {
@@ -130,6 +130,7 @@ class ElementContainer {
 		return n;
 	}
 	initializeSceneObject(sceneObject) {
+		sceneObject.activate();
 		const d = this.defaults[sceneObject.constructor.name];
 		this.changeElementDraw(sceneObject, d.draw);
 		for (let script of d.scripts) script.addTo(sceneObject);
@@ -205,7 +206,7 @@ class ElementContainer {
 		ns.particleFalls = falls;
 		ns.particleFades = fades;
 		ns.particleSlows = slows;
-		ns.active = false;
+		ns.particleActive = false;
 		let curUpdate = ns.engineUpdate.bind(ns);
 		ns.engineUpdate = function () {
 			curUpdate();
@@ -213,6 +214,7 @@ class ElementContainer {
 			for (let key in ns.spawns) n++;
 			if (!n) ns.remove();
 		}
+		this.initializeSceneObject(ns);
 		return ns;
 	}
 	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), falls = false, slows = true, fades = true, active = true) {
@@ -222,7 +224,8 @@ class ElementContainer {
 		ns.particleFalls = falls;
 		ns.particleFades = fades;
 		ns.particleSlows = slows;
-		ns.active = active;
+		ns.particleActive = active;
+		this.initializeSceneObject(ns);
 		return ns;
 	}
 	removeContainer(name) {
@@ -253,8 +256,15 @@ class ElementContainer {
 		return (name instanceof Object) ? name : this.elements[name];
 	}
 	getAllElements() {
-		this.updateArray();
-		return this.elementArray;
+		let array = [];
+		for (let rect in this.elements) {
+			let cont = this.elements[rect];
+			if (cont instanceof ElementContainer) {
+				let ary = cont.updateArray();
+				array.pushArray(ary);
+			} else array.push(cont);
+		}
+		return array;
 	}
 	getPhysicsElements() {
 		return this.updateArray().filter(e => e instanceof PhysicsObject);
@@ -336,15 +346,6 @@ class ElementContainer {
 			})).addTo(e);
 			e.logMod(function CHANGE_COLLIDE_RULE() {
 				this.home.changeElementCollideRule(this, newRule);
-			});
-		}.bind(this));
-		return this;
-	}
-	changeElementCollideOptimize(name, newRule) {
-		this.performFunctionBasedOnType(name, function (e) {
-			e.optimize = newRule.bind(e);
-			e.logMod(function CHANGE_COLLIDE_OPTIMIZE() {
-				this.home.changeElementCollideOptimize(this, newRule);
 			});
 		}.bind(this));
 		return this;

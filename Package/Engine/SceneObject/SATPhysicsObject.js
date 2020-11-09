@@ -1,25 +1,13 @@
 class PhysicsObject extends SceneObject {
     constructor(name, x, y, gravity, controls, tag, home, engine) {
         super(name, x, y, controls, tag, home, engine);
-
         this.body = new RigidBody(x, y, gravity ? RigidBody.DYNAMIC : RigidBody.STATIC);
-        if (this.home.active) this.activate();
         this.body.userData.sceneObject = this;
         this.body.collisionFilter = function (body) {
             let sceneObject = body.userData.sceneObject;
-            if (this.optimize(sceneObject) && sceneObject.optimize(this)) {
-                if ((!this.hasCollideRule || this.collideBasedOnRule(sceneObject)) && (!sceneObject.hasCollideRule || sceneObject.collideBasedOnRule(this))) {
-                    return true;
-                }
-            }
-            return false;
+            return (!this.hasCollideRule || this.collideBasedOnRule(sceneObject)) && (!sceneObject.hasCollideRule || sceneObject.collideBasedOnRule(this));
         }.bind(this);
 
-        //previous states
-        this.lastVelocity = Vector2.origin;
-        this.lastAngularVelocity = 0;
-
-        this.optimize = other => true;
         this.hasCollideRule = false;
         //data
         this.colliding = new CollisionMonitor();
@@ -29,7 +17,7 @@ class PhysicsObject extends SceneObject {
 
         //fake velocity
         let vel = this.body.velocity;
-        let vec = Vector2.fromPhysicsVector(vel);
+        let vec = Vector2.origin;
         delete vec.x;
         delete vec.y;
         Object.defineProperty(vec, "x", {
@@ -116,9 +104,11 @@ class PhysicsObject extends SceneObject {
         this.body.angularVelocity = a;
     }
     activate() {
+        super.activate();
         this.engine.scene.physicsEngine.addBody(this.body);
     }
     deactivate() {
+        super.deactivate();
         this.engine.scene.physicsEngine.removeBody(this.body.id);
     }
     centerModels() {

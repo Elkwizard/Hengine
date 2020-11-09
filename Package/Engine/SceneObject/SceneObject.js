@@ -34,6 +34,7 @@ class Controls {
 //Actual SceneObject
 class SceneObject {
 	constructor(name, x, y, controls, tag, home, engine) {
+		this.active = true;
 		this.transform = new Transform(x, y, 0);
 		this.lastTransform = this.transform.get();
 		this.shapes = {};
@@ -87,6 +88,12 @@ class SceneObject {
 	}
 	get height() {
 		return this.__height;
+	}
+	activate() {
+		this.active = true;
+	}
+	deactivate() {
+		this.active = false;
 	}
 	updatePreviousData() {
 		this.lastTransform = this.transform.get();

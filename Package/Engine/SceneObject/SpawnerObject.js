@@ -46,7 +46,7 @@ class AngleDirections extends Directions {
 class ParticleSpawnerObject extends SceneObject {
     constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), home, engine) {
         super(name, x, y, false, "Particle-Spawner", home, engine);
-        this.active = true;
+        this.particleActive = true;
         this.particleFades = true;
         this.particleSlows = true;
         this.particleFalls = false;

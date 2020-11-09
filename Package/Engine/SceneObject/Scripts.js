@@ -79,7 +79,8 @@ LocalScript.flags = [
 	["click"],
 	["right", "click"],
 	["hover"],
-	["unhover"]
+	["unhover"],
+	["message"]
 ];
 class ScriptContainer {
 	constructor(element) {
