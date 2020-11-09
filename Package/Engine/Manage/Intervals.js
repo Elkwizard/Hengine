@@ -63,7 +63,6 @@ class IntervalManager {
 	constructor(engine) {
 		this.engine = engine;
 		this.paused = false;
-		this.waitCondition = null;
 		this.functions = [];
 		this.performanceData = true;
 		this.frameCount = 0;
@@ -101,10 +100,6 @@ class IntervalManager {
 		//input is necessary
 		this.engine.keyboard.update();
 		this.engine.mouse.update();
-		if (this.paused && this.waitCondition && this.waitCondition()) {
-			this.paused = false;
-			this.waitCondition = null;
-		} 
 		if (!this.paused) {
 			this.engine.renderer.beforeFrame();
 			this.updateGraphs();
@@ -130,10 +125,6 @@ class IntervalManager {
 	}
 	pause() {
 		this.paused = true
-	}
-	pauseUntil(fn) {
-		this.paused = true;
-		this.waitCondition = fn;
 	}
 	play() {
 		this.paused = false
