@@ -32,15 +32,13 @@ class Controls {
 	}
 }
 //Actual SceneObject
-class SceneObject {
+class SceneObject extends SceneElement {
 	constructor(name, x, y, controls, tag, home, engine) {
-		this.active = true;
+		super(name, home.active, home);
 		this.transform = new Transform(x, y, 0);
 		this.lastTransform = this.transform.get();
-		this.shapes = {};
+		this.shapes = new Map();
 		this.graphicalBoundingBox = null;
-		this.home = home;
-		this.name = name;
 		this.engine = engine;
 		this.tag = tag;
 		this.controls = controls;
@@ -51,7 +49,6 @@ class SceneObject {
 		this.layer = 0;
 		this.lifeSpan = 0;
 		this.log = [];
-		this.removed = false;
 		this.onScreen = true;
 		this.cullGraphics = true;
 		this.isBeingUpdated = false;
@@ -59,14 +56,6 @@ class SceneObject {
 		this.__scripts;
 		this.__width = 0;
 		this.__height = 0;
-	}
-	set name(a) {
-		delete this.home.elements[this._name];
-		this._name = a;
-		this.home.elements[this._name] = this;
-	}
-	get name() {
-		return this._name;
 	}
 	set defaultShape(a) {
 		this.removeShape("default");
@@ -88,12 +77,6 @@ class SceneObject {
 	}
 	get height() {
 		return this.__height;
-	}
-	activate() {
-		this.active = true;
-	}
-	deactivate() {
-		this.active = false;
 	}
 	updatePreviousData() {
 		this.lastTransform = this.transform.get();
@@ -149,7 +132,7 @@ class SceneObject {
 	}
 	getModels() {
 		let result = [];
-		for (let name in this.shapes) result.push(this.shapes[name].getModel(this.transform));
+		for (let [name, shape] of this.shapes) result.push(shape.getModel(this.transform));
 		return result;
 	}
 	getBoundingBox() {
@@ -161,11 +144,11 @@ class SceneObject {
 
 	}
 	hasShape(name) {
-		return name in this.shapes;
+		return this.shapes.has(name);
 	}
 	addShape(name, shape) {
 		shape = shape.get();
-		this.shapes[name] = shape;
+		this.shapes.set(name, shape);
 		this.cacheDimensions();
 	}
 	centerModels() {
@@ -179,17 +162,17 @@ class SceneObject {
 		}
 		center.Ndiv(totalArea);
 		let dif = center.inverse;
-		for (let name in this.shapes)
-			this.shapes[name] = this.shapes[name].move(dif);
+		for (let [name, shape] of this.shapes)
+			this.shapes.set(name, shape.move(dif));
 	}
 	removeShape(name) {
-		let shape = this.shapes[name];
-		delete this.shapes[name];
+		let shape = this.shapes.get(name);
+		this.shapes.delete(name);
 		return shape;
 	}
 	removeAllShapes() {
 		let names = [];
-		for (let name in this.shapes) names.push(name);
+		for (let [name, shape] of this.shapes) names.push(name);
 		let shapes = [];
 		for (let name of names) {
 			shapes.push(this.removeShape(name));
@@ -197,36 +180,27 @@ class SceneObject {
 		return shapes;
 	}
 	getShape(name) {
-		return this.shapes[name];
+		return this.shapes.get(name);
 	}
 	getModel(name) {
-		return this.shapes[name].getModel(this.transform);
-	}
-	reorderShapes(order) {
-		let shapes = this.getShapes();
-		let nShapes = new Array(shapes.length);
-		this.shapes = {};
-		for (let i = 0; i < order.length; i++) {
-			nShapes[i] = shapes[order[i]];
-		}
-		for (let i = 0; i < nShapes.length; i++) this.shapes[i + 1] = nShapes[i];
+		return this.shapes.get(name).getModel(this.transform);
 	}
 	getShapes() {
 		let ary = [];
-		for (let name in this.shapes) ary.push(this.shapes[name]);
+		for (let [name, shape] of this.shapes) ary.push(shape);
 		return ary;
 	}
 	scale(factor) {
 		let middle = Vector2.origin;
-		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleAbout(middle, factor);
+		for (let [name, shape] of this.shapes) this.shapes.set(name, shape.scaleAbout(middle, factor));
 		this.cacheDimensions();
 	}
 	scaleX(factor) {
-		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleXAbout(0, factor);
+		for (let [name, shape] of this.shapes) this.shapes.set(name, shape.scaleXAbout(0, factor));
 		this.cacheDimensions();
 	}
 	scaleY(factor) {
-		for (let name in this.shapes) this.shapes[name] = this.shapes[name].scaleYAbout(0, factor);
+		for (let [name, shape] of this.shapes) this.shapes.set(name, shape.scaleYAbout(0, factor));
 		this.cacheDimensions();
 	}
 	hide() {
@@ -254,8 +228,7 @@ class SceneObject {
 	}
 	runDraw() {
 		this.transform.drawInModelSpace(() => {
-			for (let name in this.shapes) {
-				let shape = this.shapes[name];
+			for (let [name, shape] of this.shapes) {
 				this.draw(name, shape);
 				this.scripts.run("Draw", name, shape);
 			}
@@ -281,16 +254,5 @@ class SceneObject {
 	}
 	updateCaches() {
 		if (this.hasMoved()) this.cacheBoundingBoxes();
-	}
-	pushToRemoveQueue(x) {
-		return null;
-	}
-	end() {
-		this.removed = true;
-	}
-	remove() {
-		if (this.isBeingUpdated) this.pushToRemoveQueue(this);
-		else this.home.removeElement(this);
-		this.end();
 	}
 }

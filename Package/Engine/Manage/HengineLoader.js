@@ -105,7 +105,7 @@ class HengineLoader {
 		return ["Input", "Sound", "Time", "LocalFileSystem"];
 	}
 	static get defaultSceneObjectPackage() {
-		return ["Scripts", "SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
+		return ["Scripts", "SceneElement", "SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
 	}
 	static get defaultScriptPackage() {
 		return ["TextArea", "PlayerMovement", "Draggable"];

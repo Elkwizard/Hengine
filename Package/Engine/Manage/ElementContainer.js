@@ -1,11 +1,9 @@
-class ElementContainer {
+class ElementContainer extends SceneElement {
 	constructor(name = "container", active, home, engine) {
-		this.elements = {};
-		this.active = active;
-		this.name = name;
-		this.home = home;
+		super(name, active, home);
+		this.elements = new Map();
 		this.engine = engine;
-		this.elementArray = [];
+		this.sceneObjectArray = [];
 		this.removeQueue = [];
 		this.defaults = {
 			SceneObject: {
@@ -42,39 +40,36 @@ class ElementContainer {
 		};
 	}
 	activate() {
-		this.active = true;
+		super.activate();
 		this.updateArray();
-		for (let element of this.elementArray) element.activate();
+		for (let [name, element] of this.elements) if (!element.active) element.activate();
 	}
 	deactivate() {
+		super.deactivate();
 		this.updateArray();
-		this.active = false;
-		for (let element of this.elementArray) element.deactivate();
+		for (let [name, element] of this.elements) if (element.active) element.deactivate();
 	}
 	updateArray() {
-		this.elementArray = [];
-		if (this.active) for (let rect in this.elements) {
-			let cont = this.elements[rect];
-			if (cont instanceof ElementContainer) {
-				let ary = cont.updateArray();
-				this.elementArray.pushArray(ary);
-			} else if (cont.active) this.elementArray.push(cont);
+		this.sceneObjectArray = [];
+		for (let [name, element] of this.elements) {
+			if (!element.active) continue;
+			if (element instanceof ElementContainer) this.sceneObjectArray.pushArray(element.updateArray());
+			else this.sceneObjectArray.push(element);
 		}
-		return this.elementArray;
+		return this.sceneObjectArray;
 	}
 	startUpdate() {
 		this.updateArray();
-		for (let rect of this.elementArray) rect.isBeingUpdated = true;
-		let q = this.removeQueue;
-		function p(x) {
-			q.push(x);
-		}
-		for (let rect of this.elementArray) rect.pushToRemoveQueue = p;
+		//remove queued
+		for (let [name, element] of this.elements) if (element.removed) this.removeElement(element);
+		//recurse
+		for (let [name, element] of this.elements) if (element instanceof ElementContainer) element.startUpdate();
 	}
 	endUpdate() {
-		for (let rect of this.removeQueue) rect.home.removeElement(rect);
-		this.removeQueue = [];
-		for (let rect of this.elementArray) rect.isBeingUpdated = false;
+		//remove queued
+		for (let [name, element] of this.elements) if (element.removed) this.removeElement(element);
+		//recurse
+		for (let [name, element] of this.elements) if (element instanceof ElementContainer) element.endUpdate();
 	}
 	copy(el) {
 		let n;
@@ -100,24 +95,6 @@ class ElementContainer {
 
 		return n;
 	}
-	hideElement(name) {
-		this.performFunctionBasedOnType(name, function (e) {
-			this.elements[e].hide();
-			this.elements[e].logMod(function HIDE() {
-				this.hide();
-			});
-		}.bind(this));
-		return this;
-	}
-	showElement(name) {
-		this.performFunctionBasedOnType(name, function (e) {
-			this.elements[e].show();
-			this.elements[e].logMod(function SHOW() {
-				this.show();
-			});
-		}.bind(this));
-		return this;
-	}
 	genName(database, name) {
 		let num = 0;
 		let n = name;
@@ -126,11 +103,11 @@ class ElementContainer {
 			if (num) n += " (" + num + ")";
 			return n;
 		}
-		while (database[check()] !== undefined) num++;
+		while (database.has(check())) num++;
 		return n;
 	}
 	initializeSceneObject(sceneObject) {
-		sceneObject.activate();
+		if (this.active) sceneObject.activate();
 		const d = this.defaults[sceneObject.constructor.name];
 		this.changeElementDraw(sceneObject, d.draw);
 		for (let script of d.scripts) script.addTo(sceneObject);
@@ -140,7 +117,7 @@ class ElementContainer {
 		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
-		this.elements[name] = n;
+		this.elements.set(name, n);
 		return n;
 	}
 	addCircleElement(name, x, y, radius, controls = new Controls(), tag = "") {
@@ -148,21 +125,21 @@ class ElementContainer {
 		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
 		n.addShape("default", new Circle(0, 0, radius));
 		this.initializeSceneObject(n);
-		this.elements[name] = n;
+		this.elements.set(name, n);
 		return n;
 	}
 	addElement(name, x, y, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
 		this.initializeSceneObject(n);
-		this.elements[name] = n;
+		this.elements.set(name, n);
 		return n;
 	}
 	addPhysicsElement(name, x, y, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this, this.engine);
 		this.initializeSceneObject(n);
-		this.elements[name] = n;
+		this.elements.set(name, n);
 		return n;
 	}
 	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls(), tag = "") {
@@ -170,7 +147,7 @@ class ElementContainer {
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
-		this.elements[name] = n;
+		this.elements.set(name, n);
 		return n;
 	}
 	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls(), tag = "") {
@@ -178,7 +155,7 @@ class ElementContainer {
 		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this, this.engine);
 		n.addShape("default", new Circle(0, 0, radius));
 		this.initializeSceneObject(n);
-		this.elements[name] = n;
+		this.elements.set(name, n);
 		return n;
 	}
 	addUIElement(name, x, y, width, height, draw = this.defaults.UIObject.draw) {
@@ -186,20 +163,20 @@ class ElementContainer {
 		let n = new UIObject(name, x, y, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
-		this.elements[name] = n;
+		this.elements.set(name, n);
 		n.draw = draw.bind(n);
 		return n;
 	}
-	addContainer(name, active) {
+	addContainer(name, active = true) {
 		name = this.genName(this.elements, name);
 		let x = new ElementContainer(name, active, this, this.engine);
-		this.elements[name] = x;
+		this.elements.set(name, x);
 		return x;
 	}
 	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true) {
 		name = this.genName(this.elements, "Default-Explosion-Spawner");
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, 1, timer, draw, sizeVariance, speedVariance, dirs, this, this.engine);
-		this.elements[name] = ns;
+		this.elements.set(name, ns);
 		for (let i = 0; i < amountParticles; i++) {
 			ns.spawnParticle();
 		}
@@ -211,7 +188,7 @@ class ElementContainer {
 		ns.engineUpdate = function () {
 			curUpdate();
 			let n = 0;
-			for (let key in ns.spawns) n++;
+			for (let entry of ns.spawns) n++;
 			if (!n) ns.remove();
 		}
 		this.initializeSceneObject(ns);
@@ -220,7 +197,7 @@ class ElementContainer {
 	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), falls = false, slows = true, fades = true, active = true) {
 		name = this.genName(this.elements, name);
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this, this.engine);
-		this.elements[name] = ns;
+		this.elements.set(name, ns);
 		ns.particleFalls = falls;
 		ns.particleFades = fades;
 		ns.particleSlows = slows;
@@ -228,41 +205,27 @@ class ElementContainer {
 		this.initializeSceneObject(ns);
 		return ns;
 	}
-	removeContainer(name) {
-		let container = this.get(name);
-		if (container instanceof ElementContainer) {
-			container.deactivate();
-			delete this.elements[container.name];
+	removeElement(element) {
+		if (element.container === this) {
+			if (element.active) element.deactivate();
+			element.removed = true;
+			this.elements.delete(element.name);
 		}
 	}
-	removeElement(name) {
-		this.performFunctionBasedOnType(name, function (e) {
-			let el = this.elements[e.name];
-			if (el) {
-				el.end();
-				if (el.body) this.engine.scene.physicsEngine.removeBody(el.body.id);
-				delete this.elements[e.name];
-			} else if (e.home.elements[e.name]) {
-				e.home.removeElement(e);
-			}
-		}.bind(this));
+	removeElements(elements) {
+		for (let i = 0; i < elements.length; i++) this.removeElement(elements[i]);
 	}
 	removeAllElements() {
-		for (let x in this.elements) {
-			this.removeElement(this.elements[x]);
-		}
+		for (let [name, element] of this.elements) this.removeElement(element);
 	}
 	get(name) {
-		return (name instanceof Object) ? name : this.elements[name];
+		return this.elements.get(name);
 	}
 	getAllElements() {
 		let array = [];
-		for (let rect in this.elements) {
-			let cont = this.elements[rect];
-			if (cont instanceof ElementContainer) {
-				let ary = cont.updateArray();
-				array.pushArray(ary);
-			} else array.push(cont);
+		for (let [name, element] of this.elements) {
+			if (element instanceof ElementContainer) array.pushArray(element.getAllElements());
+			else array.push(element);
 		}
 		return array;
 	}
@@ -323,7 +286,7 @@ class ElementContainer {
 		this.performFunctionBasedOnType(name, function (e) {
 			e.draw = newDraw.bind(e);
 			e.logMod(function CHANGE_DRAW() {
-				this.home.changeElementDraw(this, newDraw);
+				this.container.changeElementDraw(this, newDraw);
 			});
 		}.bind(this));
 		return this;
@@ -332,7 +295,7 @@ class ElementContainer {
 		this.performFunctionBasedOnType(name, function (e) {
 			e[method] = newMethod.bind(e);
 			e.logMod(function CHANGE_METHOD() {
-				this.home.changeElementMethod(this, method, newMethod);
+				this.container.changeElementMethod(this, method, newMethod);
 			});
 		}.bind(this));
 		return this;
@@ -345,7 +308,7 @@ class ElementContainer {
 				}
 			})).addTo(e);
 			e.logMod(function CHANGE_COLLIDE_RULE() {
-				this.home.changeElementCollideRule(this, newRule);
+				this.container.changeElementCollideRule(this, newRule);
 			});
 		}.bind(this));
 		return this;

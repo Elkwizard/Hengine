@@ -70,7 +70,7 @@ class Scene {
 	}
 	collidePointBoth(point, override = true) {
 		let collideAry = this.collidePoint(point, override);
-		return [collideAry, this.main.elementArray.filter(e => !collideAry.includes(e))];
+		return [collideAry, this.main.sceneObjectArray.filter(e => !collideAry.includes(e))];
 	}
 	beforePhysicsStep(phys) {
 		for (let el of phys) el.beforePhysicsStep();
@@ -110,10 +110,10 @@ class Scene {
 		this.physicsEngine.addConstraint(con);
 	}
 	updateCaches() {
-		for (const el of this.main.elementArray) el.updateCaches();
+		for (const el of this.main.sceneObjectArray) el.updateCaches();
 	}
 	updatePreviousData() {
-		for (let rect of this.main.elementArray) {
+		for (let rect of this.main.sceneObjectArray) {
 			rect.updatePreviousData();
 		}
 	}
@@ -123,7 +123,7 @@ class Scene {
 		this.engine.renderer.save();
 
 		this.camera.transformToWorld(this.engine.renderer);
-		for (let rect of this.main.elementArray) {
+		for (let rect of this.main.sceneObjectArray) {
 			rect.engineDraw(screen);
 			rect.lifeSpan++;
 		}
@@ -131,7 +131,7 @@ class Scene {
 		this.engine.renderer.restore();
 	}
 	script(type, ...args) {
-		let el = this.main.elementArray;
+		let el = this.main.sceneObjectArray;
 		for (let i = 0; i < el.length; i++) {
 			el[i].scripts.run(type, ...args);
 		}
@@ -164,11 +164,11 @@ class Scene {
 		this.script("BeforeUpdate");
 
 		//draw
-		this.main.elementArray.sort((a, b) => a.layer - b.layer);
+		this.main.sceneObjectArray.sort((a, b) => a.layer - b.layer);
 		this.renderCamera();
 		
 		//physics
-		for (let i = 0; i < this.main.elementArray.length; i++) this.main.elementArray[i].engineUpdate();
+		for (let i = 0; i < this.main.sceneObjectArray.length; i++) this.main.sceneObjectArray[i].engineUpdate();
 			
 		let phys = this.main.getPhysicsElements();
 		this.clearCollisions(phys);

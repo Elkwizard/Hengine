@@ -53,7 +53,7 @@ class ParticleSpawnerObject extends SceneObject {
         this.particleDelay = delay;
         this.particleInitSpeed = spd;
         this.particleLifeSpan = timer;
-        this.spawns = { };
+        this.spawns = new Map();
         this.particleSize = size;
         this.particleDraw = draw;
         this.particleSizeVariance = sizeVariance;
@@ -72,8 +72,8 @@ class ParticleSpawnerObject extends SceneObject {
         let minY = Infinity;
         let maxX = -Infinity;
         let maxY = -Infinity;
-        for (let key in this.spawns) {
-            let p = this.spawns[key].transform.position;
+        for (let [name, spawn] of this.spawns) {
+            let p = spawn.transform.position;
             if (p.x < minX) minX = p.x;
             if (p.y < minY) minY = p.y;
             if (p.x > maxX) maxX = p.x;
@@ -85,16 +85,16 @@ class ParticleSpawnerObject extends SceneObject {
         this.determineOnScreen(screen);
 
         if (!this.hidden && this.onScreen) {
-            for (let key in this.spawns) this.spawns[key].engineDraw();
+            for (let [name, spawn] of this.spawns) spawn.engineDraw();
         }
     }
     updatePreviousData() {
         super.updatePreviousData();
-        for (let name in this.spawns) this.spawns[name].updatePreviousData();
+        for (let [name, spawn] of this.spawns) spawn.updatePreviousData();
     }
     spawnParticle() {
         const name = `Particle #${this.particleNumber++} from ${this.name}`; 
-        this.spawns[name] = new ParticleObject(this, name, this.home, this.engine);
+        this.spawns[name] = new ParticleObject(this, name, this.container, this.engine);
     }
     hasMoved() {
         return true;
@@ -108,10 +108,9 @@ class ParticleSpawnerObject extends SceneObject {
             }
             this.cacheBoundingBoxes();
         }
-        for (let name in this.spawns) {
-            let particle = this.spawns[name];
-            particle.engineUpdate();
-            particle.lifeSpan++;
+        for (let [name, spawn] of this.spawns) {
+            spawn.engineUpdate();
+            spawn.lifeSpan++;
         }
     }
 }

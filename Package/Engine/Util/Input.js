@@ -17,9 +17,9 @@ class Listener {
 }
 class InputHandler {
 	constructor() {
-		this.keys = { };
-		this.keyDownCounts = { };
-		this.keyUpCounts = { };
+		this.keys = new Map();
+		this.keyDownCounts = new Map();
+		this.keyUpCounts = new Map();
 	}
 	pressLength(key) {
 		return this.keyDownCounts[key];
@@ -28,25 +28,28 @@ class InputHandler {
 		return this.keyUpCounts[key];
 	}
 	pressed(keys) {
-		return (Array.isArray(keys) ? keys : [keys]).map(key => !!this.keys[key]).includes(true);
+		return (Array.isArray(keys) ? keys : [keys]).map(key => !!this.keys.get(key)).includes(true);
 	}
 	released(keys) {
-		return (Array.isArray(keys) ? keys : [keys]).map(key => !this.keys[key]).includes(true);
+		return (Array.isArray(keys) ? keys : [keys]).map(key => !this.keys.get(key)).includes(true);
 	}
 	justPressed(keys) {
-		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyDownCounts[key] === 1 && this.keyUpCounts[key] === 0).includes(true);
+		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyDownCounts.get(key) === 1 && this.keyUpCounts.get(key) === 0).includes(true);
 	}
 	justReleased(keys) {
-		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyUpCounts[key] === 1).includes(true);
+		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyUpCounts.get(key) === 1).includes(true);
 	}
 	update() {
-		for (let key in this.keys) {
-			if (this.keyDownCounts[key] === undefined) this.keyDownCounts[key] = 0;
-			if (this.keyUpCounts[key] === undefined) this.keyUpCounts[key] = 2;
-			if (this.keys[key]) this.keyDownCounts[key]++;
-			else this.keyDownCounts[key] = 0;
-			if (!this.keys[key]) this.keyUpCounts[key]++;
-			else this.keyUpCounts[key] = 0;
+		for (let [key, pressed] of this.keys) {
+			if (!this.keyDownCounts.has(key)) this.keyDownCounts.set(key, 0);
+			if (!this.keyUpCounts.has(key)) this.keyUpCounts.set(key, 2);
+			if (pressed) {
+				this.keyDownCounts.set(key, this.keyDownCounts.get(key) + 1);
+				this.keyUpCounts.set(key, 0);
+			} else {
+				this.keyUpCounts.set(key, this.keyUpCounts.get(key) + 1);
+				this.keyDownCounts.set(key, 0);
+			}
 		}
 	}
 	afterUpdate() { 
@@ -64,16 +67,19 @@ class KeyboardHandler extends InputHandler {
 		document.addEventListener("keydown", function (e) {
 			if (e.key === "Tab") e.preventDefault();
 			let sig = k.getKeySignature(e.key);
-			k.keys[sig] = true;
+			k.keys.set(sig, true);
 			for (let ev of k.onDown) ev(sig);
 			k.downQueue.push(new KeyboardHandler.Event(sig, e.key));
 		});
 		document.addEventListener("keyup", function (e) {
 			let sig = k.getKeySignature(e.key);
-			k.keys[sig] = false;
+			k.keys.set(sig, false);
 			for (let ev of k.onUp) ev(sig);
 			k.upQueue.push(new KeyboardHandler.Event(sig, e.key));
 		});
+		document.body.onblur = () => {
+			for (let [key, pressed] of k.keys) k.keys.set(key, false);
+		};
 	}
 	afterUpdate() {
 		super.afterUpdate();
@@ -97,11 +103,6 @@ KeyboardHandler.Event = class {
 class MouseHandler extends InputHandler {
 	constructor(engine, root) {
 		super();
-		this.keys = {
-			"Left": false,
-			"Middle": false,
-			"Right": false
-		};
 		this.mouseMap = ["Left", "Middle", "Right"];
 		this.button = 0;
 		this.downQueue = [];
@@ -143,7 +144,7 @@ class MouseHandler extends InputHandler {
 			m.screenDragStart = m.screen.get();
 			m.screenDragEnd = m.screenDragStart.get();
 			let sig = m.mouseMap[e.button];
-			m.keys[sig] = true;
+			m.keys.set(sig, true);
 			for (let ev of m.onDown) ev(sig);
 			m.downQueue.push(new MouseHandler.Event(sig, new Vector2(e.x, e.y)));
 		}
@@ -161,7 +162,7 @@ class MouseHandler extends InputHandler {
 			m.updatePosition(e);
 			m.worldDragEnd = m.engine.scene.camera.screenSpaceToWorldSpace(m.screen);
 			m.screenDragEnd = m.screen.get();
-			for (let inx of m.mouseMap) m.keys[inx] = false;
+			for (let inx of m.mouseMap) m.keys.set(inx, false);
 			let sig = m.mouseMap[m.button];
 			for (let ev of m.onUp) ev(sig);
 			m.upQueue.push(new MouseHandler.Event(sig, new Vector2(e.x, e.y)));

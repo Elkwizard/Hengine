@@ -118,8 +118,7 @@ class PhysicsObject extends SceneObject {
     shapeSync() {
         this.shapeNameIDMap.clear();
         this.body.clearShapes();
-        for (let name in this.shapes) {
-            let shape = this.shapes[name];
+        for (let [name, shape] of this.shapes) {
             let collider = shape.toPhysicsShape();
             let colliders = this.body.addShape(collider);
             this.shapeNameIDMap.set(name, colliders);
@@ -143,8 +142,7 @@ class PhysicsObject extends SceneObject {
         this.shapeSync();
     }
     removeShape(name) {
-        let shape = this.shapes[name];
-        delete this.shapes[name];
+        super.removeShape(name);
         let cols = this.shapeNameIDMap.get(name);
         for (let i = 0; i < cols.length; i++) this.body.removeShape(cols[i]);
         this.shapeNameIDMap.delete(name);
