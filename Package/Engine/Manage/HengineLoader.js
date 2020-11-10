@@ -1,16 +1,75 @@
-class ApplicationPackageElement {
-	constructor(files, path) {
-		this.files = files;
-		this.path = path;
+class PathManager {
+	static isRoot(path) {
+		return /^((http(s?)|file):\/\/|[A-Z]:\/)/g.test(path);
+	}
+	static findRoot(path) {
+		let rootPrefix = path.match(/^((http(s?)|file):\/\/|[A-Z]:\/)/g);
+		return rootPrefix ? rootPrefix[0] : "";
+	}
+	static simplify(path) {
+		let rootPrefix = findRoot(path);
+		if (rootPrefix) {
+			path = path.slice(rootPrefix.length);
+		}
+
+		let pieces = path.split("/");
+		let resultPath = [];
+		for (let i = 0; i < pieces.length; i++) {
+			if (pieces[i] === ".") continue;
+			if (pieces[i] === "..") {
+				resultPath.pop();
+				continue;
+			}
+			resultPath.push(pieces[i]);
+		}
+		return rootPrefix + resultPath.join("/");
+	}
+	static join2Paths(a, b) {
+		if (isRoot(b)) return simplify(b);
+		if (a && b) return simplify(`${a}/${b}`);
+		if (a) return simplify(a);
+		if (b) return simplify(b);
+		return "";
+	}
+	static join(paths) {
+		let a = paths[0];
+		for (let i = 1; i < paths.length; i++) a = PathManager.join2Paths(a, paths[i]);
+		return a;
 	}
 }
-class ApplicationPackage {
-	constructor(engine, code, art, animations, sound) {
-		this.engine = new ApplicationPackageElement(engine, "");
-		this.code = new ApplicationPackageElement({ ".": code }, ".");
-		this.sprites = new ApplicationPackageElement({ ".": art }, "../Art/Sprites");
-		this.animations = new ApplicationPackageElement({ ".": animations }, "../Art/Animations");
-		this.sounds = new ApplicationPackageElement({ ".": sound }, "../Sounds");
+class HengineResource {
+	constructor(src) {
+		this.src = src;
+	}
+}
+class HengineScriptResource extends HengineResource {
+	constructor(src) {
+		super(src);
+		const script = document.createElement("script");
+		script.src = src;
+		document.head.appendChild(src);
+		this.promise = new Promise(function (resolve) {
+			script.onload = function () {
+				resolve();
+			}
+			script.onerror = function () {
+				resolve();
+			}
+		});
+	}
+}
+class HengineImageResource extends HengineResource {
+	constructor(src) {
+		super(src);
+		const image = new HImage(src);
+		this.promise = new Promise(function (resolve) {
+			image.image.onload = function () {
+				resolve();
+			}
+			image.image.onerror = function () {
+				resolve();
+			}
+		});
 	}
 }
 function exit(...msg) { 
@@ -120,6 +179,9 @@ class HengineLoader {
 			Manage: HengineLoader.defaultManagementPackage,
 			Scripts: HengineLoader.defaultScriptPackage
 		};
+	}
+	static defaultEngineResources() {
+
 	}
 	static defaultApplicationPackage(code = [], art = [], animations = [], music = []) {
 		return new ApplicationPackage(HengineLoader.defaultEnginePackage, code, art, animations, music);
