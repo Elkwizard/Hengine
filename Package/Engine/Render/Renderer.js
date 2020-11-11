@@ -565,12 +565,22 @@ class Artist {
 				this.drawImageInternal(x, y, this.imageStyle.width, this.imageStyle.height);
 			},
 			inferHeight(x, y, w) {
+				if (typeof x === "object") {
+					w = y;
+					y = x.y;
+					x = x.x;
+				}
 				let h = this.imageStyle.height;
 				if (w !== undefined) h *= w / this.imageStyle.width;
 				else w = this.imageStyle.width;
 				this.drawImageInternal(x, y, w, h);
 			},
 			inferWidth(x, y, h) {
+				if (typeof x === "object") {
+					h = y;
+					y = x.y;
+					x = x.x;
+				}
 				let w = this.imageStyle.width;
 				if (h !== undefined) w *= h / this.imageStyle.height;
 				else h = this.imageStyle.height;

@@ -24,9 +24,6 @@ class Animation extends ImageType {
 		this.timer = 0;
 		this.totalTime = this.frames.length * this.delay;
 	}
-	set onload(fn) {
-		fn();
-	}
 	advance() {
 		if (!this.stopped) {
 			this.timer++;

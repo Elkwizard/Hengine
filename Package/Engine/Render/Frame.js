@@ -62,13 +62,11 @@ class HImage extends ImageType {
 		this.image = new Image();
 		this.image.src = src;
 		this.loaded = false;
-		this.onload = () => null;
-		this.image.onload = () => {
+		this.image.addEventListener("load", function () {
 			this.width = this.image.width / devicePixelRatio;
 			this.height = this.image.height / devicePixelRatio;
 			this.loaded = true;
-			this.onload();
-		};
+		}.bind(this));
 	}
 	static async imageExists(src) {
 		let img = new Image();

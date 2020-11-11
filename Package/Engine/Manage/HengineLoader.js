@@ -7,7 +7,7 @@ class PathManager {
 		return rootPrefix ? rootPrefix[0] : "";
 	}
 	static simplify(path) {
-		let rootPrefix = findRoot(path);
+		let rootPrefix = PathManager.findRoot(path);
 		if (rootPrefix) {
 			path = path.slice(rootPrefix.length);
 		}
@@ -25,10 +25,10 @@ class PathManager {
 		return rootPrefix + resultPath.join("/");
 	}
 	static join2Paths(a, b) {
-		if (isRoot(b)) return simplify(b);
-		if (a && b) return simplify(`${a}/${b}`);
-		if (a) return simplify(a);
-		if (b) return simplify(b);
+		if (PathManager.isRoot(b)) return PathManager.simplify(b);
+		if (a && b) return PathManager.simplify(`${a}/${b}`);
+		if (a) return PathManager.simplify(a);
+		if (b) return PathManager.simplify(b);
 		return "";
 	}
 	static join(paths) {
@@ -41,34 +41,86 @@ class HengineResource {
 	constructor(src) {
 		this.src = src;
 	}
+	load() {
+
+	}
 }
 class HengineScriptResource extends HengineResource {
 	constructor(src) {
 		super(src);
+	}
+	load() {
 		const script = document.createElement("script");
-		script.src = src;
-		document.head.appendChild(src);
-		this.promise = new Promise(function (resolve) {
+		script.src = this.src;
+		document.head.appendChild(script);
+		return new Promise(function (resolve) {
 			script.onload = function () {
-				resolve();
+				resolve(script);
 			}
 			script.onerror = function () {
-				resolve();
+				resolve(null);
 			}
+		});
+	}
+}
+class HengineSoundResource extends HengineResource {
+	constructor(src) {
+		super(src);
+	}
+	load() {
+		const sound = new Sound(this.src);
+		return new Promise(function (resolve) {
+			sound.audio.addEventListener("load", function () {
+				resolve(sound);
+			});
+			sound.audio.addEventListener("error", function () {
+				resolve(null);
+			});
 		});
 	}
 }
 class HengineImageResource extends HengineResource {
 	constructor(src) {
 		super(src);
-		const image = new HImage(src);
-		this.promise = new Promise(function (resolve) {
-			image.image.onload = function () {
-				resolve();
+	}
+	load() {
+		const image = new HImage(this.src);
+		return new Promise(function (resolve) {
+			image.image.addEventListener("load", function () {
+				resolve(image);
+			});
+			image.image.addEventListener("error", function () {
+				resolve(null);
+			});
+		});
+	}
+}
+class HengineAnimationResource extends HengineResource {
+	constructor(src, frames, delay, loops) {
+		super(src);
+		this.frames = frames;
+		this.delay = delay;
+		this.loops = loops;
+	}
+	load() {
+		const animation = new Animation(this.src, this.frames, this.delay, this.loops);
+		const promises = [];
+		for (let i = 0; i < animation.frames.length; i++) {
+			const image = animation.frames[i];
+			if (image instanceof Frame) {
+				promises.push(new Promise(function (resolve) {
+					image.image.addEventListener("load", function () {
+						resolve(animation);
+					});
+					image.image.addEventListener("error", function () {
+						resolve(null);
+					});
+				}));
 			}
-			image.image.onerror = function () {
-				resolve();
-			}
+		}
+		return new Promise(async function (resolve) {
+			await Promise.all(promises);
+			resolve(animation);
 		});
 	}
 }
@@ -109,14 +161,9 @@ class HengineLoader {
 				}
 			});
 		}
-		const EXPORT = ["initImage", "initAnimation", "initSound", "loadImage", "loadAnimation", "loadSound"];
-		for (let EXP of EXPORT) {
-			window[EXP] = this[EXP].bind(this);
-		}
+		window.loadResource = this.loadResource.bind(this);
 
-		this.animations = {};
-		this.images = {};
-		this.sounds = {};
+		this.resources = new Map();
 
 		//title
 		let script = document.createElement("script");
@@ -130,63 +177,19 @@ class HengineLoader {
 
 		window.title = ti;
 	}
-	initImage(src) {
-		return new HImage(src);
+	loadResource(src) {
+		if (PathManager.isRoot(src)) {
+			return this.resources.get(src) || null;
+		} else {
+			const processed = escape(src).replace(/([\.\\])/g, "\\$1");
+			const regex = new RegExp(processed + "$");
+			for (let [path, resource] of this.resources) {
+				if (path.match(regex)) return resource;
+			}
+			return null;
+		}
 	}
-	initSound(src) {
-		return new Sound(src);
-	}
-	initAnimation(src, frames, delay, loop, response) {
-		return new Animation(src, frames, delay, loop, response);
-	}
-	loadSound(src) {
-		return this.sounds[src];
-	}
-	loadImage(src) {
-		return this.images[src];
-	}
-	loadAnimation(src) {
-		return this.animations[src].get();
-	}
-	static get defaultPreloadPackage() {
-		return ["PrototypeOverload", "Lazy", "Operable"];
-	}
-	static get defaultRenderPackage() {
-		return ["Color", "Transform", "Shapes", "Spline", "Gradient", "GrayMap", "Frame", "Animation", "Texture", "Webcam", "GPUShader", "Font", "WebGLRenderer2D", "WebGLRenderer3D", "Renderer", "Graph", "Mesh", "Camera"];
-	}
-	static get defaultManagementPackage() {
-		return ["ElementContainer", "Scenes", "Intervals", "Hengine", "HengineLoader"];
-	}
-	static get defaultMathPackage() {
-		return ["Interpolation", "Random", "Matrix", "Vector", "Geometry", "Physics", "PhysicsAPI"];
-	}
-	static get defaultUtilityPackage() {
-		return ["Input", "Sound", "Time", "LocalFileSystem"];
-	}
-	static get defaultSceneObjectPackage() {
-		return ["Scripts", "SceneElement", "SceneObject", "SATPhysicsObject", "SpawnerObject", "UIObject"];
-	}
-	static get defaultScriptPackage() {
-		return ["TextArea", "PlayerMovement", "Draggable"];
-	}
-	static get defaultEnginePackage() {
-		return {
-			Preload: HengineLoader.defaultPreloadPackage,
-			Math: HengineLoader.defaultMathPackage,
-			Render: HengineLoader.defaultRenderPackage,
-			Util: HengineLoader.defaultUtilityPackage,
-			SceneObject: HengineLoader.defaultSceneObjectPackage,
-			Manage: HengineLoader.defaultManagementPackage,
-			Scripts: HengineLoader.defaultScriptPackage
-		};
-	}
-	static defaultEngineResources() {
-
-	}
-	static defaultApplicationPackage(code = [], art = [], animations = [], music = []) {
-		return new ApplicationPackage(HengineLoader.defaultEnginePackage, code, art, animations, music);
-	}
-	static async load(scripts, onload = () => null) {
+	static async load(userResources) {
 		let scriptHome = document.querySelectorAll("script"); //find yourself
 		for (let el of scriptHome) {
 			if (el.src.indexOf("Engine/Manage/Hengine") > -1) {
@@ -199,79 +202,41 @@ class HengineLoader {
 		pathSRC.pop();
 		pathSRC.pop();
 		let rootSrc = pathSRC.join("/");
+		
 		//icon
 		document.head.innerHTML += `<link rel="icon" href="${rootSrc}/favicon.ico" type="image/x-icon"></link>`;
+		
 		rootSrc += "/Engine";
 		console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
-		function instantiateHengine() {
-			window.HENGINE = new HengineLoader(document.body);
-			onload();
-		}
-		let elements = ["engine", "sprites", "animations", "sounds", "code"];
-		for (let element of elements) {
-			if (!scripts[element]) continue;
-			let path;
-			if (element === "engine") {
-				path = scripts[element].path ? scripts[element].path : rootSrc;
-			} else if (element === "sprites") {
-				path = scripts[element].path;
-			} else if (element === "animations") {
-				path = scripts[element].path;
-			} else if (element === "sounds") {
-				path = scripts[element].path;
-			} else if (element === "code") {
-				path = scripts[element].path;
-			}
-			for (let folder in scripts[element].files) {
-				for (let file of scripts[element].files[folder]) {
-					let src = path + "/" + folder + "/" + file;
-					//absolute path
-					if (file[1] === ":") src = file;
-					
-					let resource = null;
-					let type = "SCRIPT";
-					if (element === "sprites" || element === "animations" || element === "sounds") {
-						if (window.HENGINE) {
-							if (element === "animations") {
-								type = "ANIMATION"
-								resource = window.HENGINE.initAnimation(`${path}/${folder}/${file.folder}`, file.frames, file.delay, file.loops || false);
-								window.HENGINE.animations[file.folder] = resource;
-							} else if (element === "sprites") {
-								type = "IMAGE";
-								resource = window.HENGINE.initImage(src);
-								window.HENGINE.images[file] = resource;
-							} else if (element === "sounds") {
-								type = "SOUND";
-								resource = window.HENGINE.initSound(src);
-								window.HENGINE.sounds[file] = resource;
-							}
-						}
-					} else {
-						if (file !== "HengineLoader") {
-							if (file.match(/DATA/g)) {
-								eval(file.slice(5));
-							} else {
-								if (element === "code" && !window.HENGINE) instantiateHengine();
 
-								if (!document.querySelector(`script[src="${src}.js"]`)) {
-									let script = document.createElement("script");
-									script.src = src + ".js";
-									document.body.appendChild(script);
-									resource = script;
-									HengineLoader.scriptsLoaded.push(file);
-								}
-							}
-						}
-					}
-					if (resource) await new Promise(function (resolve, reject) {
-						resource.onload = function () {
-							resolve();
-						}
-					});
-				}
-			}
-			if (!window.HENGINE) instantiateHengine();
+		for (let i = 0; i < HengineLoader.engineResources.length; i++) {
+			let path = HengineLoader.engineResources[i];
+			let resource = new HengineScriptResource(PathManager.join([rootSrc, path + ".js"]));
+			await resource.load();	
+		}
+		
+		const hengineLoader = new HengineLoader(document.body);
+		window.hengineLoader = hengineLoader;
+
+		for (let i = 0; i < userResources.length; i++) {
+			const resource = await userResources[i].load();
+			if (!resource) console.warn(`LOADING FAILED FOR RESOURCE [${userResources[i].src}]`);
+			hengineLoader.resources.set(userResources[i].src, resource);
 		}
 	}
 }
-HengineLoader.scriptsLoaded = [];
+HengineLoader.engineResources = [
+	"Preload/PrototypeOverload", "Preload/Lazy", "Preload/Operable",
+
+	"Math/Interpolation", "Math/Random", "Math/Matrix", "Math/Vector", "Math/Geometry", "Math/Physics", "Math/PhysicsAPI",
+
+	"Render/Color", "Render/Transform", "Render/Shapes", "Render/Spline", "Render/Gradient", "Render/GrayMap", "Render/Frame", "Render/Animation", "Render/Texture", "Render/Webcam", "Render/GPUShader", "Render/Font", "Render/WebGLRenderer2D", "Render/WebGLRenderer3D", "Render/Renderer", "Render/Graph", "Render/Mesh", "Render/Camera",
+
+	"Util/Input", "Util/Sound", "Util/Time", "Util/LocalFileSystem",
+
+	"SceneObject/Scripts", "SceneObject/SceneElement", "SceneObject/SceneObject", "SceneObject/SATPhysicsObject", "SceneObject/SpawnerObject", "SceneObject/UIObject",
+
+	"Scripts/TextArea", "Scripts/PlayerMovement", "Scripts/Draggable",
+	
+	"Manage/ElementContainer", "Manage/Scenes", "Manage/Intervals", "Manage/Hengine",
+];
