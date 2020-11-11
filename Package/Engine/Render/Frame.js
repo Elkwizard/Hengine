@@ -9,13 +9,13 @@ function new_OffscreenCanvas(width, height) {
 	}
 	canvas.style = {
 		set width(a) {
-			canvas.width = a;
+			canvas.width = parseInt(a);
 		},
 		get width() {
 			return canvas.width;
 		},
 		set height(a) {
-			canvas.height = a;
+			canvas.height = parseInt(a);
 		},
 		get height() {
 			return canvas.height;

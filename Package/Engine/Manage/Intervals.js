@@ -77,7 +77,7 @@ class IntervalManager {
 		this.graphs = [];
 		this.fpsGraph = this.makeGraphPlane([
 			new Graph("FPS", () => this.averageFps, 0, 60, Color.LIME, 1)
-		], 200);
+		], 400);
 
 		IntervalManager.intervals.push(this.update.bind(this));
 	}
@@ -115,7 +115,7 @@ class IntervalManager {
 		this.engine.mouse.afterUpdate();
 		this.engine.renderer.afterFrame();
 	}
-	makeGraphPlane(graphs, frameLimit) {
+	makeGraphPlane(graphs, frameLimit = 400) {
 		let f = new GraphPlane(graphs, frameLimit);
 		this.graphs.push(f);
 		return f;

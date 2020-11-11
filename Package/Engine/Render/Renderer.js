@@ -35,8 +35,8 @@ class Artist {
 		if (this.canvas.style) {
 			let w = width;
 			let h = height;
-			this.canvas.style.width = w;
-			this.canvas.style.height = h;
+			this.canvas.style.width = w + "px";
+			this.canvas.style.height = h + "px";
 			this.canvas.width = w * devicePixelRatio;
 			this.canvas.height = h * devicePixelRatio;
 			this.c.scale(devicePixelRatio, devicePixelRatio);
@@ -620,7 +620,7 @@ class Artist {
 	}
 	set width(a) {
 		this.canvas.width = a * devicePixelRatio;
-		if (this.canvas.style) this.canvas.style.width = a;
+		if (this.canvas.style) this.canvas.style.width = a + "px";
 		this.c.scale(devicePixelRatio, devicePixelRatio);
 	}
 	get width() {
@@ -628,7 +628,7 @@ class Artist {
 	}
 	set height(a) {
 		this.canvas.height = a * devicePixelRatio;
-		if (this.canvas.style) this.canvas.style.height = a;
+		if (this.canvas.style) this.canvas.style.height = a + "px";
 		this.c.scale(devicePixelRatio, devicePixelRatio);
 	}
 	get height() {

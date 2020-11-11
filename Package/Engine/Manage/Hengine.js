@@ -6,7 +6,7 @@ class Hengine {
 
 		this.wrapper = wrapper;
 		this.wrapper.style.margin = 0;
-		this.wrapper.style.overflow = "hidden";
+		// this.wrapper.style.overflow = "hidden";
 		let bound = wrapper.getClientRects()[0];
 		let W = bound.width;
 		let H = bound.height;

@@ -129,7 +129,7 @@ function exit(...msg) {
 	IntervalManager.intervals = [];
 }
 class HengineLoader {
-	constructor(wrapper = document.body) {
+	constructor(wrapper) {
 		this.hengine = new Hengine(wrapper);
 		
 		//window
@@ -215,6 +215,8 @@ class HengineLoader {
 			await resource.load();	
 		}
 		
+		document.body.style.width = "100vw";
+		document.body.style.height = "100vh";
 		const hengineLoader = new HengineLoader(document.body);
 		window.hengineLoader = hengineLoader;
 

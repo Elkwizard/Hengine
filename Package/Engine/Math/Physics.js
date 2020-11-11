@@ -971,11 +971,11 @@ class PhysicsEngine {
         this.oncollide = (a, b, dir, contacts) => null;
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
-        this.sleepDuration = 100;
-        this.sleepingActivityThreshold = 0.2;
+        this.sleepDuration = 200;
+        this.sleepingActivityThreshold = 0.3;
     }
     isAsleep(body) {
-        return body.sleeping > this.sleepDuration;
+        return body.sleeping > this.sleepDuration * this.iterations;
     }
     clearCollidingBodies() {
         for (let i = 0; i < this.bodies.length; i++) {
@@ -1166,6 +1166,7 @@ class PhysicsEngine {
         );
     }
     handleSleep(dynBodies) {
+        if (!isFinite(this.sleepDuration)) return;
         let sleepDuration = this.iterations * this.sleepDuration;
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
