@@ -971,7 +971,7 @@ class PhysicsEngine {
         this.oncollide = (a, b, dir, contacts) => null;
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
-        this.sleepDuration = 40;
+        this.sleepDuration = 100;
         this.sleepingActivityThreshold = 0.2;
     }
     isAsleep(body) {
