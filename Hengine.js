@@ -23,7 +23,7 @@
 
     await load(compilerSrc);
     await load(hengineLoaderSrc);
-    await HengineLoader.load(HengineLoader.defaultApplicationPackage(scripts));
+    await HengineLoader.load([]);
 
     window.title = title;
 

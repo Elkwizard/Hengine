@@ -76,6 +76,7 @@ Array.makeMultidimensional = function (arr) {
 	}.bind(arr);
 	arr.fill = function (value) {
 		for (let i = 0; i < this.length; i++) this[i].fill(value);
+		return this;
 	}.bind(arr);
 }
 Array.dim = function (...dims) {

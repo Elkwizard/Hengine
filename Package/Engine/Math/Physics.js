@@ -972,6 +972,7 @@ class PhysicsEngine {
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
         this.sleepDuration = 40;
+        this.sleepingActivityThreshold = 0.2;
     }
     isAsleep(body) {
         return body.sleeping > this.sleepDuration;
@@ -1155,13 +1156,13 @@ class PhysicsEngine {
         return collisionPairs;
     }
     lowActivity(body) {
-        return (
+        return body.type === RigidBody.STATIC || (
             //linear 
-            PhysicsVector.sqrMag(PhysicsVector.sub(body.position, body.lastPosition)) < 0.2 ** 2 &&
-            PhysicsVector.sqrMag(body.velocity) < 0.2 ** 2 && 
+            PhysicsVector.sqrMag(PhysicsVector.sub(body.position, body.lastPosition)) < this.sleepingActivityThreshold ** 2 &&
+            PhysicsVector.sqrMag(body.velocity) < this.sleepingActivityThreshold ** 2 && 
             //angular
-            Math.abs(body.angle - body.lastAngle) < 0.005 &&
-            Math.abs(body.angularVelocity) < 0.005
+            Math.abs(body.angle - body.lastAngle) < this.sleepingActivityThreshold / 40 &&
+            Math.abs(body.angularVelocity) < this.sleepingActivityThreshold / 40
         );
     }
     handleSleep(dynBodies) {
@@ -1201,7 +1202,6 @@ class PhysicsEngine {
         //sorts
         let g = this.gravity;
         let gravitySort = (a, b) => (b.position.x - a.position.x) * g.x + (b.position.y - a.position.y) * g.y;
-        let inverseGravitySort = (a, b) => (a.position.x - b.position.x) * g.x + (a.position.y - b.position.y) * g.y;
         
         for (let i = 0; i < this.iterations; i++) {
             this.step++;
