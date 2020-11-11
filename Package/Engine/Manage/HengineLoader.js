@@ -87,6 +87,9 @@ class HengineImageResource extends HengineResource {
 		const image = new HImage(this.src);
 		return new Promise(function (resolve) {
 			image.image.addEventListener("load", function () {
+				// update dimensions in interim
+				image.width = image.image.width;
+				image.height = image.image.height;
 				resolve(image);
 			});
 			image.image.addEventListener("error", function () {
@@ -107,9 +110,12 @@ class HengineAnimationResource extends HengineResource {
 		const promises = [];
 		for (let i = 0; i < animation.frames.length; i++) {
 			const image = animation.frames[i];
-			if (image instanceof Frame) {
+			if (image instanceof HImage) {
 				promises.push(new Promise(function (resolve) {
 					image.image.addEventListener("load", function () {
+						// update dimensions in interim
+						animation.width = image.image.width;
+						animation.height = image.image.height;
 						resolve(animation);
 					});
 					image.image.addEventListener("error", function () {
@@ -214,7 +220,7 @@ class HengineLoader {
 			let resource = new HengineScriptResource(PathManager.join([rootSrc, path + ".js"]));
 			await resource.load();	
 		}
-		
+
 		document.body.style.width = "100vw";
 		document.body.style.height = "100vh";
 		const hengineLoader = new HengineLoader(document.body);

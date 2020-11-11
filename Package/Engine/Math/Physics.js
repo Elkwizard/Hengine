@@ -1183,9 +1183,14 @@ class PhysicsEngine {
         }
 
         //wake bodies that are in contact with woken bodies
-        for (let n = 0; n < 2; n++) for (let i = 0; i < dynBodies.length; i++) {
+        for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
-            if (this.isAsleep(body)) for (let j = 0; j < body.collidingBodies.length; j++) if (!body.collidingBodies[j].sleeping) body.wake();
+            if (!body.sleeping) {
+                for (let j = 0; j < body.collidingBodies.length; j++) {
+                    let body2 = body.collidingBodies[j];
+                    body2.wake();
+                }
+            }
         }
     }
     run() {
