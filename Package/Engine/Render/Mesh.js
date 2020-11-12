@@ -283,12 +283,12 @@ class Mesh {
         let mesh = new Mesh([
             new Tri(new Vector3(x, y - h / 2, z), new Vector3(x - w / 2, y, z - d / 2), new Vector3(x + w / 2, y, z - d / 2)),
             new Tri(new Vector3(x, y + h / 2, z), new Vector3(x + w / 2, y, z - d / 2), new Vector3(x - w / 2, y, z - d / 2)),
-            new Tri(new Vector3(x, y - h / 2, z), new Vector3(x + w / 2, y, z - w / 2), new Vector3(x + w / 2, y, z + w / 2)),
-            new Tri(new Vector3(x, y + h / 2, z), new Vector3(x + w / 2, y, z + w / 2), new Vector3(x + w / 2, y, z - w / 2)),
+            new Tri(new Vector3(x, y - h / 2, z), new Vector3(x + w / 2, y, z - d / 2), new Vector3(x + w / 2, y, z + d / 2)),
+            new Tri(new Vector3(x, y + h / 2, z), new Vector3(x + w / 2, y, z + d / 2), new Vector3(x + w / 2, y, z - d / 2)),
             new Tri(new Vector3(x, y - h / 2, z), new Vector3(x + w / 2, y, z + d / 2), new Vector3(x - w / 2, y, z + d / 2)),
             new Tri(new Vector3(x, y + h / 2, z), new Vector3(x - w / 2, y, z + d / 2), new Vector3(x + w / 2, y, z + d / 2)),
-            new Tri(new Vector3(x, y - h / 2, z), new Vector3(x - w / 2, y, z + w / 2), new Vector3(x - w / 2, y, z - w / 2)),
-            new Tri(new Vector3(x, y + h / 2, z), new Vector3(x - w / 2, y, z - w / 2), new Vector3(x - w / 2, y, z + w / 2)),
+            new Tri(new Vector3(x, y - h / 2, z), new Vector3(x - w / 2, y, z + d / 2), new Vector3(x - w / 2, y, z - d / 2)),
+            new Tri(new Vector3(x, y + h / 2, z), new Vector3(x - w / 2, y, z - d / 2), new Vector3(x - w / 2, y, z + d / 2)),
         ]);
         mesh.color(color);
         return mesh;
@@ -311,7 +311,7 @@ class Mesh {
     static sphere(x, y, z, r, color = Color.WHITE, subdivisions = 3) {
         let m = Mesh.hexahedron(x, y, z, r * 2, r * 2, r * 2, color);
         m = Mesh.subdivide(m, subdivisions);
-        return Mesh.inflate(m);
+        return Mesh.inflate(m, r);
     }
     static inflate(mesh, r) {
         let tris = [];
