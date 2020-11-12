@@ -50,7 +50,7 @@ class Artist {
 		this.gl2 = new WebGLRenderer2D(this);
 
 		this.__c = this.c;
-		this._background = new Color(0, 0, 0, 0);
+		this.background = Color.WHITE;
 		this.textModeX = TextModeX.LEFT;
 		this.textModeY = TextModeY.TOP;
 		let pathObj = {
