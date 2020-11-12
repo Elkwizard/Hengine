@@ -61,7 +61,7 @@ class Mesh {
         return new Mesh(this.tris.map(tri => tri.get()));
     }
     process(renderer) {
-        const { c: gl, shaderProgram, shadeSmooth } = renderer;
+        const { c: gl, shadeSmooth } = renderer;
 
         //vertex positions & indices
 
@@ -191,8 +191,6 @@ class Mesh {
         const colors = [];
         for (let i = 0; i < amountColorChannels; i++) colors.push(indexColors[i] / indexColorOverloads[Math.floor(i / 4)]);
 
-
-
         //buffers
         const indexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -211,28 +209,11 @@ class Mesh {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
         //attributes
-
-        //vertex positions
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        let vertexPositionPointer = gl.getAttribLocation(shaderProgram, "vertexPosition");
-        gl.vertexAttribPointer(vertexPositionPointer, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(vertexPositionPointer);
-
-        //vertex normals
-        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-        let vertexNormalPointer = gl.getAttribLocation(shaderProgram, "vertexNormal");
-        gl.vertexAttribPointer(vertexNormalPointer, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(vertexNormalPointer);
-
-        //vertex colors
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        let vertexColorPointer = gl.getAttribLocation(shaderProgram, "vertexColor");
-        gl.vertexAttribPointer(vertexColorPointer, 4, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(vertexColorPointer);
-
         this.positionBuffer = positionBuffer;
-        this.vertexCount = vertexCount;
+        this.normalBuffer = normalBuffer;
+        this.colorBuffer = colorBuffer;
         this.indexBuffer = indexBuffer;
+        this.vertexCount = vertexCount;
 
     }
     static subdivide(mesh, sub) {

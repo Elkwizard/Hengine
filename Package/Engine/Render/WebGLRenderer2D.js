@@ -17,8 +17,8 @@ class WebGLRenderer2D {
 	}
 	// context methods
 	clear() {
-		const gl = this.c;
 		const { red, green, blue } = this.artist.background;
+		const gl = this.c;
 		gl.clearColor(red / 255, green / 255, blue / 255, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 	}
@@ -141,30 +141,6 @@ class WebGLRenderer2D {
 		this.currentIndex = I;
 	}
 	//internal methods
-	draw() {
-		// this.clear();
-		// let mx = mouse.screen.x;
-		// let my = mouse.screen.y;
-		// this.fillStyle = this._color255(255, 0, 0, 1);
-		// let points = Polygon.regular(100, 100).vertices;
-		// this.translate(mx, my);
-		// const scale = Math.sin(intervals.frameCount / 52) * 0.5 + 1;
-		// this.rotate(intervals.frameCount / 100);
-		// this.scale(scale, scale);
-		// this.fillPolygon(points);
-		// for (let i = 0; i < 100; i++) {
-		// 	this.save();
-		// 	this.rotate(i / 100 * Math.PI);
-		// 	this.translate(Math.random() * width, Math.random() * height);
-		// 	this.scale(0.95 ** i, 0.95 ** i);
-		// 	this.fillStyle = this._color255(Math.random() * 255, Math.random() * 255, Math.random() * 255, 1);
-		// 	this.fillPolygon(points);
-		// 	this.restore();
-		// }
-		// this.resetTransform();
-		// this.fillStyle = this._color255(0, 255, 0, 1);
-		// this.fillPolygon(points);
-	}
 	initializeDataStructures() {
 		this.canvas = new_OffscreenCanvas(this.artist.canvas.width, this.artist.canvas.height);
 		this.c = null;

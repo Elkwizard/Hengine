@@ -111,13 +111,38 @@ class WebGLRenderer3D {
 			normalLocation: gl.getUniformLocation(shaderProgram, "normalTransform")
 		};
 	}
+	clear() {
+		const { c: gl } = this;
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	}
 	render(mesh) {
-		const { positionBuffer, indexBuffer, vertexCount } = mesh;
+		const { positionBuffer, normalBuffer, colorBuffer, indexBuffer, vertexCount } = mesh;
 
-		const { c: gl, canvas, uniformLocations: { normalLocation, worldLocation }, camera: { rotation, position } } = this;
+		const { c: gl, canvas, shaderProgram, uniformLocations: { normalLocation, worldLocation }, camera: { rotation, position } } = this;
 
 		canvas.width = this.artist.canvas.width;
 		canvas.height = this.artist.canvas.height;
+
+		// attributes
+		
+        //vertex positions
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        let vertexPositionPointer = gl.getAttribLocation(shaderProgram, "vertexPosition");
+        gl.vertexAttribPointer(vertexPositionPointer, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vertexPositionPointer);
+
+        //vertex normals
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+        let vertexNormalPointer = gl.getAttribLocation(shaderProgram, "vertexNormal");
+        gl.vertexAttribPointer(vertexNormalPointer, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vertexNormalPointer);
+
+        //vertex colors
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        let vertexColorPointer = gl.getAttribLocation(shaderProgram, "vertexColor");
+        gl.vertexAttribPointer(vertexColorPointer, 4, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vertexColorPointer);
+
 
 
 		//transform matrix
@@ -135,11 +160,10 @@ class WebGLRenderer3D {
 
 		gl.uniformMatrix4fv(worldLocation, false, new Float32Array(transform));
 		gl.uniformMatrix4fv(normalLocation, false, new Float32Array(mesh.normalTransform));
-
+			
 		gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 		gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
 
 		this.changed = true;
