@@ -54,8 +54,29 @@ Array.prototype.pushArray = function (arr) {
 	let len = arr.length;
 	for (let i = 0; i < len; i++) this.push(arr[i]);
 };
+Array.prototype.map = function (fn, ...coords) {
+	let result = [];
+	for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
+	return result;
+};
+Array.prototype.forEach = function (fn, ...coords) {
+	for (let i = 0; i < this.length; i++) fn(this[i], ...coords, i);
+};
+Array.prototype.flatten = function () {
+	return this;
+};
+Array.prototype.sample = function (index) {
+	if (index in this) return this[index];
+	return null;
+}
 Array.makeMultidimensional = function (arr) {
 	arr.multiDimensional = true;
+	arr.sample = function (...indices) {
+		let index = indices[0];
+		indices.shift();
+		if (index in this) return this[index].sample(...indices);
+		return null;
+	};
 	arr.flatten = function () {
 		let result = [];
 		for (let i = 0; i < this.length; i++) result.pushArray(this[i].flatten());

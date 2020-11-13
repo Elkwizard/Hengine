@@ -15,11 +15,7 @@ class Random {
         return new Color(Random.random() * 255, Random.random() * 255, Random.random() * 255, 1);
     }
     static seedRand(seed) {
-        seed += 1e5;
-        let a = (seed * 6.12849) % 8.7890975;
-        let b = (a * 256783945.4758903) % 238462.567890;
-        let r = Math.abs(a * b) % 1;
-        return r;
+        return Random.distribution(seed);
     }
     static octave(alg, freq, oc, ...sample) {
         let n = 0;
@@ -142,3 +138,14 @@ class Random {
     }
 }
 Random.seed = Math.random() * 1000;
+Random.uniform = function (seed) {
+    seed += 1e5;
+    let a = (seed * 6.12849) % 8.7890975;
+    let b = (a * 256783945.4758903) % 238462.567890;
+    let r = Math.abs(a * b) % 1;
+    return r;
+};
+Random.normal = function (seed) {
+    return Random.uniform(seed) + Random.uniform(seed + 1000);
+};
+Random.distribution = Random.uniform;

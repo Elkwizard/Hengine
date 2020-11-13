@@ -156,6 +156,66 @@ class Geometry {
         // for (let points of polygons) renderer.stroke(Color.PURPLE, 2).shape(...points);
         return polygons.filter(poly => Geometry.isClockwise(poly));
     }
+    static gridToRects(srcGrid, CELL_SIZE) {
+        let grid = [];
+        for (let i = 0; i < srcGrid.length; i++) {
+            grid.push([]);
+            for (let j = 0; j < srcGrid[0].length; j++) grid[i].push(srcGrid[i][j]);
+        }
+        let result = [];
+
+        function sample(x, y) {
+            return x in grid && y in grid[x] && grid[x][y];
+        }
+        function set(x, y, v) {
+            if (x in grid && y in grid[x]) grid[x][y] = v;
+        }
+
+        function validRect(r) {
+            for (let i = 0; i < r.width; i++) for (let j = 0; j < r.height; j++) if (!sample(r.x + i, r.y + j)) return false;
+            return true;
+        }
+        function clearRect(r) {
+            for (let i = 0; i < r.width; i++) for (let j = 0; j < r.height; j++) set(r.x + i, r.y + j, false);
+        }
+
+        for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
+            if (!grid[i][j]) continue;
+            let currentRect = new Rect(i, j, 1, 1);
+            while (validRect(currentRect)) {
+                currentRect.width++;
+                currentRect.height++;
+            }
+            currentRect.width--;
+            if (validRect(currentRect)) {
+                // width is too big
+                while (validRect(currentRect)) currentRect.height++;
+                currentRect.height--;
+            } else {
+                currentRect.width++;
+                currentRect.height--;
+                if (validRect(currentRect)) {
+                    // height is too big
+                    while (validRect(currentRect)) currentRect.width++;
+                    currentRect.width--;
+                } else {
+                    // square
+                    currentRect.width--;
+                }
+            }
+            clearRect(currentRect);
+            // while (validRect(currentRect)) currentRect.height++;
+
+            
+
+            result.push(currentRect);
+        }
+
+
+        for (let i = 0; i < result.length; i++) result[i].mul(CELL_SIZE);
+
+        return result;
+    }
     static reimann(fn, a, b, iter = 1000, RRAM = false) {
         let sum = 0;
         let dif = (b - a) / iter;
@@ -527,17 +587,6 @@ class Geometry {
             for (let i = 0; i < SEGMENTS.length; i++) {
                 const SEG = SEGMENTS[i];
                 const SEG_LENGTH = SEG.length;
-                // let ix = VERTEX.x;
-                // let iy = VERTEX.y;
-
-                // const dx_2 = (SEG.b.x - SEG.a.x) || EPSILON;
-                // const dy_2 = (SEG.b.y - SEG.a.y) || EPSILON;
-                // const b_2 = SEG.a.y - dy_2 / dx_2 * SEG.a.x;
-
-                // ix = (b - b_2) / (dy_2 / dx_2 - dy / dx);
-                // iy = dy / dx * ix + b;
-
-                // const INTERSECT = new Vector2(ix, iy);
                 const INTERSECT = Geometry.intersectRayLine(VERTEX, AWAY, SEG);
                 if (!INTERSECT) continue;
                 const DOT = INTERSECT.minus(SEG.a).dot(SEG.vector);
@@ -549,8 +598,6 @@ class Geometry {
                 const INX = edges.indexOf(INTERSECT.segment);
                 const INX_A = INX;
                 const INX_B = (INX + 1) % vertices.length;
-                // renderer.draw(Color.RED).circle(vertices[INX_A], 5);
-                // renderer.draw(Color.RED).circle(vertices[INX_B], 5);
                 vertices.splice(INX_B, 0, INTERSECT.point);
 
                 const NEW_INX = vertices.indexOf(INTERSECT.point);
@@ -566,12 +613,6 @@ class Geometry {
                     polyB = [...vertices.slice(NEW_INX), ...vertices.slice(0, VERTEX_INX + 1)];
                 }
 
-                // renderer.stroke(Color.PURPLE, 4).shape(...polyA);
-                // renderer.stroke(Color.GREEN, 4).shape(...polyB);
-                // console.log(NEW_INX);
-
-                // renderer.draw(Color.ORANGE).circle(INTERSECT.point, 5);
-                // renderer.draw(Color.YELLOW).circle(vertices[NEW_INX], 5);
                 try {
                     let polysA = Geometry.subdividePolygonList(polyA);
                     let polysB = Geometry.subdividePolygonList(polyB);
@@ -581,11 +622,6 @@ class Geometry {
                 }
             } else return [vertices];
 
-            // for (let seg of SEGMENTS) renderer.stroke(Color.PURPLE, 2).arrow(seg);
-
-            // renderer.stroke(Color.ORANGE, 2).arrow(VERT_B, VERT_B.plus(AWAY.times(F)));
-
-            // renderer.draw(convex ? Color.RED : Color.GREEN).circle(VERT_B, 3);
         } else return [vertices];
     }
     static intersectRayLine(o, r, l) {
