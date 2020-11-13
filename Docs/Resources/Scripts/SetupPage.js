@@ -1,8 +1,13 @@
 const DOCS = {
 	"Structure": {
 		"Hengine": {},
-		"ApplicationPackage": {},
 		"HengineLoader": {},
+		"HengineResource": {
+			"HengineResource": {},
+			"HengineImageResource": {},
+			"HengineAnimationResource": {},
+			"HengineScriptResource": {}
+		},
 		"Intervals": {
 			"IntervalFunction": {},
 			"DelayedFunction": {},
