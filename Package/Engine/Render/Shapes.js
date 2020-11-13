@@ -252,22 +252,8 @@ class Rect extends Polygon {
 		this.height = h;
 		this.area = this.width * this.height;
 	}
-	set min(v) {
-		let dx = v.x - this.x;
-		let dy = v.y - this.y;
-		this.width -= dx;
-		this.height -= dy;
-		this.x += dx;
-		this.y += dy;
-	}
 	get min() {
 		return new Vector2(this.x, this.y);
-	}
-	set max(v) {
-		let dx = v.x - this.x - this.width;
-		let dy = v.y - this.y - this.height;
-		this.width += dx;
-		this.height += dy;
 	}
 	get max() {
 		return new Vector2(this.x + this.width, this.y + this.height);

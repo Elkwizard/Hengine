@@ -21,6 +21,15 @@ const TextMode = {};
 for (let x in TextModeX) for (let y in TextModeY) {
 	TextMode[y + "_" + x] = [TextModeX[x], TextModeY[y]];
 }
+class ArtistImage extends ImageType {
+	constructor (artist) {
+		super(artist.width, artist.height);
+		this.artist = artist;
+	}
+	makeImage() {
+		return this.artist.canvas;
+	}
+}
 class Artist {
 	constructor(canvas, width, height) {
 		this.canvas = canvas;
@@ -30,6 +39,7 @@ class Artist {
 		}
 
 		this.c = this.canvas.getContext('2d');
+		this.__c = this.c;
 
 		//Device Pixel Ratio
 		if (this.canvas.style) {
@@ -49,10 +59,10 @@ class Artist {
 		this.gl3 = new WebGLRenderer3D(this);
 		this.gl2 = new WebGLRenderer2D(this);
 
-		this.__c = this.c;
-		this.background = Color.WHITE;
-		this.textModeX = TextModeX.LEFT;
-		this.textModeY = TextModeY.TOP;
+		this.imageType = new ArtistImage(this);
+
+		this.preservePixelart = true;
+		this.textMode = TextMode.TOP_LEFT;
 		let pathObj = {
 			circle(x, y, radius) {
 				radius = Math.abs(radius);
@@ -654,13 +664,6 @@ class Artist {
 	get preservePixelart() {
 		return !this.c.imageSmoothingEnabled;
 	}
-	get background() {
-		return this._background;
-	}
-	set background(a) {
-		this._background = a;
-		this.setBackground(a);
-	}
 	set alpha(a) {
 		this.c.globalAlpha = a;
 	}
@@ -792,7 +795,7 @@ class Artist {
 		this.c.clearRect(0, 0, this.width, this.height);
 	}
 	clearScreen() {
-		this.clear();
+		this.fill(Color.WHITE);
 	}
 	beforeFrame() {
 		if (this.gl2.exists) this.gl2.beforeFrame();
@@ -824,12 +827,6 @@ class Artist {
 		this.c.globalAlpha = a;
 		shape();
 		this.c.globalAlpha = 1;
-	}
-	setBackground(color) {
-		let c = color;
-		if (color instanceof Color) c = color.getRGBA();
-		if (color instanceof Image) c = "url(" + color.src + ")";
-		this.canvas.style.background = c;
 	}
 	compileCommand(drawType, drawArgs, shapeArgs) {
 		let color;

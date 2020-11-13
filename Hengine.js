@@ -8,7 +8,6 @@
     let src = script.src.split("/");
     src.pop();
     let hengineLoaderSrc = src.join("/") + "/Package/Engine/Manage/HengineLoader.js";
-    let compilerSrc = src.join("/") + "/Loading/Compiler.js";
 
     function load(src) {
         const script = document.createElement("script");
@@ -21,15 +20,12 @@
         });
     }
 
-    await load(compilerSrc);
     await load(hengineLoaderSrc);
-    await HengineLoader.load([]);
+    await HengineLoader.load(scripts.map(src => new HengineScriptResource(src)));
 
     window.title = title;
 
-    //compile code
     let code = script.innerHTML;
-    if (script.hasAttribute("compiled")) code = HengineCompiler.compile(code);
 
     let nScript = document.createElement("script");
     nScript.innerHTML = code;

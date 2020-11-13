@@ -52,7 +52,7 @@ class Texture extends ImageType {
 	clear() {
 		let height = this.pixels[0].length;
 		let width = this.pixels.length;
-		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.act_set(i, j, Color.BLANK);
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.setPixelInternal(i, j, Color.BLANK);
 	}
 	getPixel(x, y) {
 		if (this.pixels[x] && this.pixels[x][y]) return this.pixels[x][y];
@@ -66,24 +66,14 @@ class Texture extends ImageType {
 	shader(fn) {
 		let coms = [];
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j)]);
-		for (let i = 0; i < coms.length; i++) this.shader_set(coms[i][0], coms[i][1], coms[i][2]);
+		for (let i = 0; i < coms.length; i++) this.shaderSetPixel(coms[i][0], coms[i][1], coms[i][2]);
 		this.changed = true;
 		return this;
 	}
-	act_get(x, y) {
+	getPixelInternal(x, y) {
 		return this.pixels[x][y];
 	}
-	act_add(x, y, clr) {
-		let t = clr.alpha;
-		if (clr.alpha !== 1) {
-			let c1 = this.act_get(x, y);
-			if (c1.alpha) {
-				let col = new Color(clr.red * t + c1.red * (1 - t), clr.green * t + c1.green * (1 - t), clr.blue * t + c1.blue * (1 - t));
-				this.act_set(x, y, col);
-			} else this.act_set(x, y, clr);
-		} else this.act_set(x, y, clr);
-	}
-	shader_set(x, y, clr) {
+	shaderSetPixel(x, y, clr) {
 		this.pixels[x][y] = clr;
 		let inx = (y * this.width + x) * 4;
 		let data = this.imageData.data;
@@ -92,12 +82,12 @@ class Texture extends ImageType {
 		data[inx + 2] = clr.blue;
 		data[inx + 3] = clr.alpha * 255;
 	}
-	act_set(x, y, clr) {
+	setPixelInternal(x, y, clr) {
 		this.changed = true;
-		this.shader_set(x, y, clr);
+		this.shaderSetPixel(x, y, clr);
 	}
 	setPixel(x, y, clr) {
-		if (this.pixels[x] && this.pixels[x][y]) this.act_set(x, y, clr);
+		if (this.pixels[x] && this.pixels[x][y]) this.setPixelInternal(x, y, clr);
 		return;
 	}
 	blur(amount = 1) {
@@ -159,7 +149,7 @@ class Texture extends ImageType {
 			else d = b;
 			if (this.pixels[x][y + 1]) c = this.pixels[x][y + 1];
 			else c = a;
-			r.shader_set(i, j, Color.quadLerp(a, b, c, d, tx, ty));
+			r.shaderSetPixel(i, j, Color.quadLerp(a, b, c, d, tx, ty));
 		}
 		r.changed = true;
 		return r;
@@ -168,7 +158,7 @@ class Texture extends ImageType {
 		x = Math.round(x);
 		y = Math.round(y);
 		let r = new Texture(w, h);
-		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) r.shader_set(i, j, this.getPixel(x + i, y + j));
+		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) r.shaderSetPixel(i, j, this.getPixel(x + i, y + j));
 		r.changed = true;
 		return r;
 	}
@@ -203,7 +193,7 @@ class Texture extends ImageType {
 			let g = data[inx + 1];
 			let b = data[inx + 2];
 			let a = data[inx + 3] / 255;
-			tex.shader_set(i, j, new Color(r, g, b, a));
+			tex.shaderSetPixel(i, j, new Color(r, g, b, a));
 		}
 		tex.changed = true;
 		return tex;
@@ -248,32 +238,32 @@ class Texture extends ImageType {
 		});
 	}
 	static fromString(str) {
-		function inv_channelPair(str) {
+		function invChannelPair(str) {
 			let bin = str.charCodeAt(0);
 			let a = bin >> 8;
 			let b = bin - (a << 8);
 			return [a, b];
 		}
-		function inv_color(str) {
+		function invColor(str) {
 			let tok = str.split("");
-			let rg = inv_channelPair(tok[0]);
-			let ba = inv_channelPair(tok[1]);
+			let rg = invChannelPair(tok[0]);
+			let ba = invChannelPair(tok[1]);
 			return new Color(rg[0], rg[1], ba[0], ba[1] / 255);
 		}
 		const col_size = 2;
-		function inv_column(str) {
+		function invColumn(str) {
 			let result = [];
 			let acc = "";
 			for (let i = 0; i < str.length; i++) {
 				acc += str[i];
 				if ((i + 1) % col_size === 0) {
-					result.push(inv_color(acc));
+					result.push(invColor(acc));
 					acc = "";
 				}
 			}
 			return result;
 		}
-		function inv_toString(str) {
+		function invToString(str) {
 			let inx = str.indexOf(":");
 			let data = str.slice(inx + 1);
 			let header = str.slice(0, inx);
@@ -286,7 +276,7 @@ class Texture extends ImageType {
 			for (let i = 0; i < data.length; i++) {
 				acc += data[i];
 				if ((i + 1) % (h * col_size) === 0) {
-					result.push(inv_column(acc));
+					result.push(invColumn(acc));
 					acc = "";
 				}
 			}
@@ -297,6 +287,6 @@ class Texture extends ImageType {
 			tex.changed = true;
 			return tex;
 		}
-		return inv_toString(str);
+		return invToString(str);
 	}
 }

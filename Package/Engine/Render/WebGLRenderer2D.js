@@ -17,9 +17,8 @@ class WebGLRenderer2D {
 	}
 	// context methods
 	clear() {
-		const { red, green, blue } = this.artist.background;
 		const gl = this.c;
-		gl.clearColor(red / 255, green / 255, blue / 255, 1);
+		gl.clearColor(1, 1, 1, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 	}
 	scale(x, y) {
