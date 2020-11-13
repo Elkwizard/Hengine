@@ -514,55 +514,6 @@ class CollisionDetector {
         return this[shapeA.constructor.name + "_" + shapeB.constructor.name](shapeA, shapeB, arg);
     }
     CircleModel_PolygonModel(a, b, _unused) {
-        //SAT
-
-        // let axes = [];
-        // let accX = 0, accY = 0;
-        // for (let i = 0; i < b.vertices.length; i++) {
-        //     let a = b.vertices[i];
-        //     let b = b.vertices[(i + 1) % b.vertices.length];
-        //     let mag = Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
-
-        //     axes.push(new PhysicsVector((b.x - a.x) / mag, (b.y - a.y) / mag));
-        //     accX += a.x;
-        //     accY += a.y;
-
-        // }
-        // accX /= b.vertices.length;
-        // accY /= b.vertices.length;
-
-        // let toMiddleMag = Math.sqrt((a.position.x - accX) ** 2 + (a.position.y - accY) ** 2);
-        // axes.push(new PhysicsVector((a.position.x - accX) / toMiddleMag, (a.position.y - accY) / toMiddleMag));
-
-        // let minOverlap = Infinity;
-        // let bestAxis = null;
-
-        // for (let i = 0; i < axes.length; i++) {
-        //     let ax = axes[i];
-        //     let projA = PhysicsVector.dot(a.position, ax);
-        //     let minA = projA - a.radius;
-        //     let maxA = projA + a.radius;
-
-        //     let minB = Infinity;
-        //     let maxB = -Infinity;
-        //     for (let j = 0; j < b.vertices.length; j++) {
-        //         let point = b.vertices[j];
-        //         let proj = PhysicsVector.dot(point, ax);
-        //         if (proj < minB) minB = proj;
-        //         if (proj > maxB) maxB = proj;
-        //     }
-
-        //     let overlap = (projA < (minB + maxB) / 2) ? maxA - minB : maxB - minA;
-        //     if (overlap > 0 && overlap < minOverlap) {
-        //         minOverlap = overlap;
-        //         bestAxis = ax;
-        //     }
-        // }
-
-        // if (bestAxis) {
-        //     return CollisionDetector.Collision.inferPenetration(bestAxis, [new CollisionDetector.Contact(, minOverlap)]);
-        // }
-
         //CLOSEST POINT
 
         let bestDist = Infinity;
@@ -665,8 +616,6 @@ class CollisionDetector {
         return null;
     }
     PolygonModel_PolygonModel(a, b, _unused) {
-        // if (intersections.length < 2) return null;
-
         let toB = PhysicsVector.sub(b.position, a.position);
 
         let axes = [...a.axes.map(ax => PhysicsVector.invert(ax)), ...b.axes].filter(ax => PhysicsVector.dot(ax, toB) > 0);
@@ -705,8 +654,9 @@ class CollisionDetector {
         let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
         
         let { aMin, aMax, bMin, bMax } = bestRange;
-        let rMin = 0;
-        let rMax = 0;
+        // exit(bestRange);
+        let rMin;
+        let rMax;
         if ((aMin + aMax) / 2 < (bMin + bMax) / 2) {
             rMin = bMin;
             rMax = aMax;
@@ -718,15 +668,14 @@ class CollisionDetector {
         if (intersections.length >= 2) {
             let cA = intersections[0];
             let cB = intersections[1];
-            if (Math.abs(cA.x - cB.x) < 0.01 && Math.abs(cA.y - cB.y) < 0.01) intersections = [cA];
-            else intersections = [cA, cB];
+            intersections = [new PhysicsVector((cA.x + cB.x) / 2, (cA.y + cB.y) / 2)];
         }
 
         let contacts = intersections
             .map(contact => {
                 let dot = PhysicsVector.dot(contact, bestAxis);
                 let pen = Math.abs((rMax - rMin) / 2 - Math.abs(dot - (rMin + rMax) / 2));
-                return new CollisionDetector.Contact(contact, pen || 0.01);
+                return new CollisionDetector.Contact(contact, Math.max(pen, 0.01) || 0.0001);
             });
         
         if (!contacts.length) {
@@ -972,10 +921,13 @@ class PhysicsEngine {
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
         this.sleepDuration = 200;
-        this.sleepingActivityThreshold = 0.3;
+        this.sleepingActivityThreshold = 0.4;
+    }
+    getSleepDuration() {
+        return this.sleepDuration * this.iterations;
     }
     isAsleep(body) {
-        return body.sleeping > this.sleepDuration * this.iterations;
+        return body.sleeping > this.getSleepDuration();
     }
     clearCollidingBodies() {
         for (let i = 0; i < this.bodies.length; i++) {
@@ -1025,7 +977,9 @@ class PhysicsEngine {
         let collisionDirection = col.direction;
         let maxPenetration = col.penetration;
         let contacts = col.contacts;
-        // for (let cont of contacts) renderer.draw(Color.ORANGE).circle(cont.point, 5); 
+        scene.camera.drawInWorldSpace(() => {
+            for (let cont of contacts) renderer.draw(Color.ORANGE).circle(cont.point, 5); 
+        });
         body2.addCollidingBody(body);
         body.addCollidingBody(body2);
         if (!maxPenetration) return;
@@ -1158,16 +1112,16 @@ class PhysicsEngine {
     lowActivity(body) {
         return body.type === RigidBody.STATIC || (
             //linear 
-            PhysicsVector.sqrMag(PhysicsVector.sub(body.position, body.lastPosition)) < this.sleepingActivityThreshold ** 2 &&
+            PhysicsVector.sqrMag(PhysicsVector.sub(body.position, body.lastPosition)) * this.iterations < (this.sleepingActivityThreshold * 2) ** 2 &&
             PhysicsVector.sqrMag(body.velocity) < this.sleepingActivityThreshold ** 2 && 
             //angular
-            Math.abs(body.angle - body.lastAngle) < this.sleepingActivityThreshold / 40 &&
+            Math.abs(body.angle - body.lastAngle) * this.iterations < (this.sleepingActivityThreshold * 2) / 40 &&
             Math.abs(body.angularVelocity) < this.sleepingActivityThreshold / 40
         );
     }
     handleSleep(dynBodies) {
         if (!isFinite(this.sleepDuration)) return;
-        let sleepDuration = this.iterations * this.sleepDuration;
+        let sleepDuration = this.getSleepDuration();
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
             if (this.lowActivity(body)) {
@@ -1183,7 +1137,7 @@ class PhysicsEngine {
         }
 
         //wake bodies that are in contact with woken bodies
-        for (let i = 0; i < dynBodies.length; i++) {
+        for (let n = 0; n < 3; n++) for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
             if (!body.sleeping) {
                 for (let j = 0; j < body.collidingBodies.length; j++) {
