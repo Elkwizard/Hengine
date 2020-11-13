@@ -921,7 +921,7 @@ class PhysicsEngine {
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
         this.sleepDuration = 200;
-        this.sleepingActivityThreshold = 0.4;
+        this.sleepingActivityThreshold = 0.6;
     }
     getSleepDuration() {
         return this.sleepDuration * this.iterations;

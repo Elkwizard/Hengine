@@ -20,12 +20,14 @@ class PhysicsObject extends SceneObject {
         let vec = Vector2.origin;
         delete vec.x;
         delete vec.y;
+        let body = this.body;
         Object.defineProperty(vec, "x", {
             get() {
                 return vel.x;
             },
             set(a) {
                 vel.x = a;
+                body.wake();
             }
         });
         Object.defineProperty(vec, "y", {
@@ -34,6 +36,7 @@ class PhysicsObject extends SceneObject {
             },
             set(a) {
                 vel.y = a;
+                body.wake();
             }
         });
         this._velocity = vec;
