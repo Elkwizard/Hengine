@@ -977,9 +977,9 @@ class PhysicsEngine {
         let collisionDirection = col.direction;
         let maxPenetration = col.penetration;
         let contacts = col.contacts;
-        scene.camera.drawInWorldSpace(() => {
-            for (let cont of contacts) renderer.draw(Color.ORANGE).circle(cont.point, 5); 
-        });
+        // scene.camera.drawInWorldSpace(() => {
+        //     for (let cont of contacts) renderer.draw(Color.ORANGE).circle(cont.point, 5); 
+        // });
         body2.addCollidingBody(body);
         body.addCollidingBody(body2);
         if (!maxPenetration) return;
