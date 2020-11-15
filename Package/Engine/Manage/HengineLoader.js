@@ -1,9 +1,9 @@
 class PathManager {
 	static isRoot(path) {
-		return /^((http(s?)|file):\/\/|[A-Z]:\/)/g.test(path);
+		return /^((http(s?)|file):\/\/|[A-Z]:\/|file:(\/\/\/|\\\\\\))/g.test(path);
 	}
 	static findRoot(path) {
-		let rootPrefix = path.match(/^((http(s?)|file):\/\/|[A-Z]:\/)/g);
+		let rootPrefix = path.match(/^((http(s?)|file):\/\/|[A-Z]:\/|file:(\/\/\/|\\\\\\))/g);
 		return rootPrefix ? rootPrefix[0] : "";
 	}
 	static simplify(path) {
@@ -130,14 +130,14 @@ class HengineAnimationResource extends HengineResource {
 		});
 	}
 }
-function exit(...msg) { 
+function exit(...msg) {
 	console.warn("EXITED", ...msg);
 	IntervalManager.intervals = [];
 }
 class HengineLoader {
 	constructor(wrapper) {
 		this.hengine = new Hengine(wrapper);
-		
+
 		//window
 		window.cl = this.hengine.colorLibrary;
 		window.hengine = this.hengine;
@@ -152,7 +152,7 @@ class HengineLoader {
 		let hengine = this;
 		if (!(window.width || window.height || window.middle)) {
 			Object.defineProperty(window, "middle", {
-				get: function() {
+				get: function () {
 					return new Vector2(hengine.hengine.renderer.width / 2, hengine.hengine.renderer.height / 2);
 				}
 			});
@@ -195,42 +195,111 @@ class HengineLoader {
 			return null;
 		}
 	}
-	static async load(userResources) {
-		let scriptHome = document.querySelectorAll("script"); //find yourself
-		for (let el of scriptHome) {
-			if (el.src.indexOf("Engine/Manage/Hengine") > -1) {
-				scriptHome = el;
-				break;
+	static load(userResources) {
+		async function loadResources() {
+			let scriptHome = document.querySelectorAll("script"); //find yourself
+			for (let el of scriptHome) {
+				if (el.src.indexOf("Engine/Manage/Hengine") > -1) {
+					scriptHome = el;
+					break;
+				}
 			}
-		}
-		let pathSRC = scriptHome.src.split("/");
-		pathSRC.pop();
-		pathSRC.pop();
-		pathSRC.pop();
-		let rootSrc = pathSRC.join("/");
-		
-		//icon
-		document.head.innerHTML += `<link rel="icon" href="${rootSrc}/favicon.ico" type="image/x-icon"></link>`;
-		
-		rootSrc += "/Engine";
-		console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
+			let pathSRC = scriptHome.src.split("/");
+			pathSRC.pop();
+			pathSRC.pop();
+			pathSRC.pop();
+			let rootSrc = pathSRC.join("/");
 
-		for (let i = 0; i < HengineLoader.engineResources.length; i++) {
-			let path = HengineLoader.engineResources[i];
-			let resource = new HengineScriptResource(PathManager.join([rootSrc, path + ".js"]));
-			await resource.load();	
-		}
+			//icon
+			document.head.innerHTML += `<link rel="icon" href="${rootSrc}/favicon.ico" type="image/x-icon"></link>`;
 
-		document.body.style.width = "100vw";
-		document.body.style.height = "100vh";
-		const hengineLoader = new HengineLoader(document.body);
-		window.hengineLoader = hengineLoader;
+			rootSrc += "/Engine";
+			console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
 
-		for (let i = 0; i < userResources.length; i++) {
-			const resource = await userResources[i].load();
-			if (!resource) console.warn(`LOADING FAILED FOR RESOURCE [${userResources[i].src}]`);
-			hengineLoader.resources.set(userResources[i].src, resource);
+			let totalResourceCount = HengineLoader.engineResources.length + userResources.length;
+			let loadedResources = 0;
+
+			// loading bar
+
+			let overlay = document.createElement("div");
+			overlay.style.position = "absolute";
+			overlay.style.boxSizing = "border-box";
+			overlay.style.left = "0";
+			overlay.style.top = "0";
+			overlay.style.width = "100vw";
+			overlay.style.height = "100vh";
+			overlay.style.backgroundColor = "black";
+			overlay.style.zIndex = "100";
+			overlay.style.display = "flex";
+			overlay.style.flexDirection = "column";
+			overlay.style.alignItems = "center";
+			overlay.style.justifyContent = "center";
+			let loading = document.createElement("div");
+			loading.style.display = "flex";
+			loading.style.flexDirection = "row";
+			loading.style.alignItems = "center";
+			loading.style.color = "white";
+			loading.innerHTML = "LOADING ";
+			loading.style.font = "40px Arial";
+			let percentage = document.createElement("span");
+			percentage.innerHTML = "0%";
+			percentage.style.marginLeft = "20px";
+			loading.appendChild(percentage);
+			let loadingBar = document.createElement("div");
+			loadingBar.style.display = "inline-block";
+			loadingBar.style.width = "50vw";
+			loadingBar.style.height = "60px";
+			loadingBar.style.border = "5px white solid";
+			loadingBar.style.marginLeft = "30px";
+			let loadingBarExpand = document.createElement("div");
+			loadingBarExpand.style.backgroundColor = "white";
+			loadingBarExpand.style.width = "0";
+			loadingBarExpand.style.height = "100%";
+			loadingBarExpand.style.position = "relative";
+			loadingBarExpand.style.left = "-1px";
+			loadingBar.appendChild(loadingBarExpand);
+			loading.appendChild(loadingBar);
+			overlay.appendChild(loading);
+			let loadingWhat = document.createElement("div");
+			loadingWhat.style.color = "white";
+			loadingWhat.style.font = "20px Arial";
+			loadingWhat.style.marginTop = "20px";
+			overlay.appendChild(loadingWhat);
+			document.body.appendChild(overlay);
+
+			// loading bar end
+
+			for (let i = 0; i < HengineLoader.engineResources.length; i++) {
+				let path = HengineLoader.engineResources[i];
+				let resource = new HengineScriptResource(PathManager.join([rootSrc, path + ".js"]));
+				await resource.load();
+				loadedResources++;
+				percentage.innerHTML = `${Math.floor(loadedResources / totalResourceCount * 100)}%`;
+				loadingBarExpand.style.width = `${loadedResources / totalResourceCount * 100}%`;
+				loadingWhat.innerText = resource.src;
+			}
+
+
+			document.body.style.width = "100vw";
+			document.body.style.height = "100vh";
+			const hengineLoader = new HengineLoader(document.body);
+			window.hengineLoader = hengineLoader;
+
+
+			for (let i = 0; i < userResources.length; i++) {
+				const resource = await userResources[i].load();
+				if (!resource) console.warn(`LOADING FAILED FOR RESOURCE [${userResources[i].src}]`);
+				hengineLoader.resources.set(userResources[i].src, resource);
+				loadedResources++;
+				percentage.innerHTML = `${Math.floor(loadedResources / totalResourceCount * 100)}%`;
+				loadingBarExpand.style.width = `${loadedResources / totalResourceCount * 100}%`;
+				loadingWhat.innerText = userResources[i].src;
+			}
+
+			overlay.outerHTML = "";
 		}
+		if (document.body && document.head) loadResources();
+		else window.addEventListener("load", loadResources);
 	}
 }
 HengineLoader.engineResources = [
@@ -245,6 +314,6 @@ HengineLoader.engineResources = [
 	"SceneObject/Scripts", "SceneObject/SceneElement", "SceneObject/SceneObject", "SceneObject/SATPhysicsObject", "SceneObject/SpawnerObject", "SceneObject/UIObject",
 
 	"Scripts/TextArea", "Scripts/PlayerMovement", "Scripts/Draggable",
-	
+
 	"Manage/ElementContainer", "Manage/Scenes", "Manage/Intervals", "Manage/Hengine",
 ];
