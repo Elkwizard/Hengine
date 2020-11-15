@@ -80,11 +80,14 @@ LocalScript.flags = [
 	["right", "click"],
 	["hover"],
 	["unhover"],
-	["message"]
+	["message"],
+	["remove"],
+	["activate"],
+	["deactivate"]
 ];
 class ScriptContainer {
-	constructor(element) {
-		this.element = element;
+	constructor(sceneObject) {
+		this.sceneObject = sceneObject;
 		this.exists = { };
 		this[Symbol.iterator] = function* () {
 			let ary = [];
@@ -99,7 +102,7 @@ class ScriptContainer {
 		};
 	}
 	run(str, ...args) {
-		if (this.element.removed) return;
+		if (this.sceneObject.removed && str !== "Remove") return;
 		let key = "script" + str;
 		if (this.exists[key]) for (let m of this) {
 			m[key](m, ...args);

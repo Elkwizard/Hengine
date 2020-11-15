@@ -178,9 +178,8 @@ class PolygonModel {
 class PolygonCollider {
     constructor(vertices) {
         this.vertices = vertices;
-        let acc = this.vertices[0];
-        this.position = new PhysicsVector(acc.x, acc.y);
-        for (let i = 1; i < this.vertices.length; i++) this.position.add(this.vertices[i]);
+        this.position = new PhysicsVector(0, 0);
+        for (let i = 0; i < this.vertices.length; i++) this.position.add(this.vertices[i]);
         this.position.div(this.vertices.length);
         this.bounds = Bounds.fromPolygon(this);
     }

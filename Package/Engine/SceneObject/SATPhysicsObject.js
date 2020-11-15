@@ -145,11 +145,12 @@ class PhysicsObject extends SceneObject {
         this.shapeSync();
     }
     removeShape(name) {
-        super.removeShape(name);
-        let cols = this.shapeNameIDMap.get(name);
-        for (let i = 0; i < cols.length; i++) this.body.removeShape(cols[i]);
-        this.shapeNameIDMap.delete(name);
-        return shape;
+        if (super.removeShape(name)) {
+            let cols = this.shapeNameIDMap.get(name);
+            for (let i = 0; i < cols.length; i++) this.body.removeShape(cols[i]);
+            this.shapeNameIDMap.delete(name);
+            return shape;
+        } else return null;
     }
     getModels() {
         return this.body.cacheModels()

@@ -61,13 +61,19 @@ class ElementContainer extends SceneElement {
 	startUpdate() {
 		this.updateArray();
 		//remove queued
-		for (let [name, element] of this.elements) if (element.removed) this.removeElement(element);
+		for (let [name, element] of this.elements) {
+			if (element.removed) this.removeElement(element);
+			else element.beingUpdated = true;
+		}
 		//recurse
 		for (let [name, element] of this.elements) if (element instanceof ElementContainer) element.startUpdate();
 	}
 	endUpdate() {
 		//remove queued
-		for (let [name, element] of this.elements) if (element.removed) this.removeElement(element);
+		for (let [name, element] of this.elements) {
+			if (element.removed) this.removeElement(element);
+			else element.beingUpdated = false;
+		}
 		//recurse
 		for (let [name, element] of this.elements) if (element instanceof ElementContainer) element.endUpdate();
 	}
@@ -207,6 +213,7 @@ class ElementContainer extends SceneElement {
 	}
 	removeElement(element) {
 		if (element.container === this) {
+			element.scripts.run("Remove");
 			if (element.active) element.deactivate();
 			element.removed = true;
 			this.elements.delete(element.name);
@@ -228,6 +235,9 @@ class ElementContainer extends SceneElement {
 			else array.push(element);
 		}
 		return array;
+	}
+	getActiveElements() {
+		return this.updateArray();
 	}
 	getPhysicsElements() {
 		return this.updateArray().filter(e => e instanceof PhysicsObject);

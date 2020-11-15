@@ -169,6 +169,7 @@ class ParticleObject extends SceneObject {
         return this._name;
     }
     remove() {
+        this.scripts.run("Remove");
         delete this.spawner.spawns[this.name];
     }
     engineDraw() {

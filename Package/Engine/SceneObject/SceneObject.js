@@ -51,7 +51,7 @@ class SceneObject extends SceneElement {
 		this.log = [];
 		this.onScreen = true;
 		this.cullGraphics = true;
-		this.isBeingUpdated = false;
+		this.beingUpdated = false;
 		this.scripts = new ScriptContainer(this);
 		this.__scripts;
 		this.__width = 0;
@@ -77,6 +77,14 @@ class SceneObject extends SceneElement {
 	}
 	get height() {
 		return this.__height;
+	}
+	activate() {
+		super.activate();
+		this.scripts.run("Activate");
+	}
+	deactivate() {
+		super.deactivate();
+		this.scripts.run("Deactivate");
 	}
 	updatePreviousData() {
 		this.lastTransform = this.transform.get();
@@ -168,7 +176,7 @@ class SceneObject extends SceneElement {
 	removeShape(name) {
 		let shape = this.shapes.get(name);
 		this.shapes.delete(name);
-		return shape;
+		return shape || null;
 	}
 	removeAllShapes() {
 		let names = [];
