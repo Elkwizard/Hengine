@@ -1,9 +1,13 @@
-function physicsPolygonSubdivider(poly) {
-    let verts = poly.map(vert => Vector2.fromPhysicsVector(vert));
-    let middle = Geometry.getMiddle(verts);
-    verts = verts.map(vert => vert.Vminus(middle));
-    let list = Geometry.subdividePolygonList(verts).map(verts => verts.map(vert => vert.Vplus(middle)));
+function physicsPolygonSubdivider(input) {
+    let poly = new Polygon(input.map(v => Vector2.fromPhysicsVector(v)));
+    let list = Geometry.subdividePolygonList(poly.vertices);
     return list.map(verts => Polygon.removeDuplicates(verts).map(vert => vert.toPhysicsVector()));
+}
+function physicsAPIcollideShapes(shape, shape2) {
+    return CollisionDetector.collide(
+        shape.toPhysicsShape().getModel(new PhysicsVector(0, 0), 1, 0),
+        shape2.toPhysicsShape().getModel(new PhysicsVector(0, 0), 1, 0)
+    );
 }
 class Contact {
     constructor(point, penetration) {

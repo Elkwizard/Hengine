@@ -101,53 +101,52 @@ class Shape extends Operable {
 		return Vector2.origin;
 	}
 	getBoundingBox() {
-		//return the smallest rectangle that contains the shape
+		// return the smallest rectangle that contains the shape
 		return new Rect(0, 0, 0, 0);
 	}
 	getModel(transf) {
-		//return the world space model of the relative shape
+		// return the world space model of the relative shape
 		return new Shape(0);
 	}
 	center(pos) {
-		//center the polygon at _pos_
+		// center the polygon at _pos_
 	}
 	scale(factor) {
-		//scale the shape about its center by _factor_
+		// scale the shape about its center by _factor_
 	}
 	scaleAbout(pos, factor) {
-		//scale shape relative to _pos_ by _factor_
+		// scale shape relative to _pos_ by _factor_
 	}
 	move(dir) {
-		//move by _dir_
+		// move by _dir_
 	}
 	get() {
-		//return a copy of the shape
+		// return a copy of the shape
 		return new Shape();
 	}
 }
 class Polygon extends Shape {
-	constructor(vertices, alreadyClockwise) {
+	constructor(vertices) {
 		super();
-		if (!alreadyClockwise) vertices = Geometry.clockwise(vertices);
-		this.vertices = Polygon.removeDuplicates(vertices);
-		this.area = Geometry.area(this.vertices);
-	}
-	static removeDuplicates(verts) {
-		let vertices = [];
-
-		for (let v of verts) {
-			let valid = true;
-			for (let v2 of vertices) if (v.equals(v2)) {
-				valid = false;
-				break;
+		if (vertices.length) {
+			let length = vertices.length;
+			vertices = vertices.slice(0, length);
+			
+			// make clockwise
+			let signedArea = 0;
+			for (let i = 0; i < length; i++) {
+				let a = vertices[i];
+				let b = vertices[(i + 1) % length];
+				signedArea += (b.x - a.x) * (a.y + b.y) / 2;
 			}
-			if (valid) vertices.push(v);
+			if (signedArea > 0) vertices.reverse();
+			
+			this.vertices = Polygon.removeDuplicates(vertices);
+			this.area = Math.abs(signedArea);
+		} else {
+			this.vertices = [];
+			this.area = 0;
 		}
-
-		return vertices;
-	}
-	set middle(a) {
-		this.vertices = this.center(a).vertices;
 	}
 	get middle() {
 		return Vector.sum(this.vertices).Nover(this.vertices.length);
@@ -173,17 +172,6 @@ class Polygon extends Shape {
 			});
 		return new Polygon(verts, true);
 	}
-	getAxes() {
-		let axes = [];
-		let verts = this.vertices;
-		for (let i = 0; i < verts.length; i++) {
-			let inx1 = i;
-			let inx2 = (i + 1) % verts.length;
-			let slope = verts[inx2].Vminus(verts[inx1]).normal.normalize();
-			axes.push(slope);
-		}
-		return axes;
-	}
 	getEdges() {
 		let edges = [];
 		let verts = this.vertices;
@@ -196,36 +184,44 @@ class Polygon extends Shape {
 	}
 	center(pos) {
 		let offset = pos.Vminus(this.middle);
-		return new Polygon(this.vertices.map(e => e.Vplus(offset)), true);
+		return new Polygon(this.vertices.map(e => e.Vplus(offset)));
 	}
 	scale(factor) {
 		let middle = this.middle;
-		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))), true);
+		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))));
+	}
+	scaleX(factor) {
+		let middle = this.middle.x;
+		return new Polygon(this.vertices.map(e => new Vector2((e.x - middle) * factor + middle, e.y)));
+	}
+	scaleY(factor) {
+		let middle = this.middle.y;
+		return new Polygon(this.vertices.map(e => new Vector2(e.x, (e.y - middle) * factor + middle)));
 	}
 	scaleAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))), true);
+		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))));
 	}
 	scaleXAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => new Vector2(pos + (pos - e.x) * factor, e.y)), true);
+		return new Polygon(this.vertices.map(e => new Vector2(pos + (pos - e.x) * factor, e.y)));
 	}
 	scaleYAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => new Vector2(e.x, pos + (pos - e.y) * factor)), true);
+		return new Polygon(this.vertices.map(e => new Vector2(e.x, pos + (pos - e.y) * factor)));
 	}
 	move(dir) {
-		return new Polygon(this.vertices.map(vert => vert.plus(dir)), true);
+		return new Polygon(this.vertices.map(vert => vert.plus(dir)));
 	}
 	rotate(angle) {
 		return this.getModel(new Transform(0, 0, angle));
 	}
 	get() {
-		let poly = new Polygon(this.vertices.map(vert => vert), true);
+		let poly = new Polygon(this.vertices.map(vert => vert));
 		return poly;
 	}
 	toPhysicsShape() {
 		return new PolygonCollider(this.vertices.map(v => v.toPhysicsVector()));
 	}
 	static fromPhysicsShape(sh) {
-		return new Polygon(sh.vertices.map(v => Vector2.fromPhysicsVector(v)), true);
+		return new Polygon(sh.vertices.map(v => Vector2.fromPhysicsVector(v)));
 	}
 	static regular(sides, radius) {
 		let v = [];
@@ -234,10 +230,24 @@ class Polygon extends Shape {
 			v.push(Vector2.fromAngle(i / sides * 2 * Math.PI + o).times(radius));
 		return new Polygon(v, true);
 	}
+	static removeDuplicates(verts) {
+		let vertices = [];
+
+		mainLoop: for (let i = 0; i < verts.length; i++) {
+			let v = verts[i];
+			for (let j = 0; j < vertices.length; j++) {
+				let v2 = vertices[j];
+				if (v.equals(v2)) continue mainLoop;
+			}
+			vertices.push(v);
+		}
+
+		return vertices;
+	}
 }
 class Rect extends Polygon {
 	constructor(x, y, w, h) {
-		super([], true);
+		super([]);
 		if (w < 0) {
 			w *= -1;
 			x -= w;
@@ -258,24 +268,11 @@ class Rect extends Polygon {
 	get max() {
 		return new Vector2(this.x + this.width, this.y + this.height);
 	}
-	set xRange(v) {
-		this.x = v.min;
-		this.width = v.max - v.min;
-	}
 	get xRange() {
 		return new Range(this.x, this.x + this.width);
 	}
-	set yRange(v) {
-		this.y = v.min;
-		this.height = v.max - v.min;
-	}
 	get yRange() {
 		return new Range(this.y, this.y + this.height);
-	}
-	set middle(a) {
-		let pos = this.center(a);
-		this.x = pos.x;
-		this.y = pos.y;
 	}
 	get middle() {
 		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
@@ -324,6 +321,15 @@ class Rect extends Polygon {
 		factor -= 1;
 		let dh = this.height * factor;
 		return new Rect(this.x, this.y - dh / 2, this.width, this.height + dh);
+	}
+	scaleAbout(pos, factor) {
+		return new Rect((this.x - pos.x) * factor + pos.x, (this.y - pos.y) * factor + pos.y, this.width * factor, this.height * factor);
+	}
+	scaleXAbout(pos, factor) {
+		return new Rect((this.x - pos.x) * factor + pos.x, this.y, this.width * factor, this.height);
+	}
+	scaleYAbout(pos, factor) {
+		return new Rect(this.x, (this.y - pos.y) * factor + pos.y, this.width, this.height * factor);
 	}
 	move(dir) {
 		return new Rect(this.x + dir.x, this.y + dir.y, this.width, this.height);
@@ -375,9 +381,6 @@ class Circle extends Shape {
 		this.y = y;
 		this.radius = Math.abs(radius);
 		this.area = this.radius * this.radius * Math.PI;
-	}
-	set middle(a) {
-		this.center(a);
 	}
 	get middle() {
 		return new Vector2(this.x, this.y);

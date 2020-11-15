@@ -61,7 +61,7 @@ class Scene {
 			let p = (hitbox instanceof UIObject) ? this.camera.worldSpaceToScreenSpace(point) : point;
 			let shapes = hitbox.getModels();
 			let colliding = false;
-			for (let shape of shapes) if (Geometry.overlapPoint(shape, p)) colliding = true;
+			for (let shape of shapes) if (Geometry.overlapPoint(p, shape)) colliding = true;
 			if (colliding) {
 				collideAry.push(hitbox);
 			}

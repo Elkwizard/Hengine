@@ -2,10 +2,8 @@ class Vector extends Operable {
 	constructor() {
 		super();
 	}
-	set mag(m) {
-		this.normalize();
-		this.mul(m);
-		return this;
+	set sqrMag(a) {
+		this.mag = Math.sqrt(a);
 	}
 	get sqrMag() {
 		let sum = 0;
@@ -19,6 +17,11 @@ class Vector extends Operable {
 		let dist = sum;
 		return dist;
 	}
+	set mag(m) {
+		this.normalize();
+		this.mul(m);
+		return this;
+	}
 	get mag() {
 		let sum = 0;
 		for (let x of this.constructor.modValues) {
@@ -31,8 +34,20 @@ class Vector extends Operable {
 		let dist = Math.sqrt(sum);
 		return dist;
 	}
+	set normalized(a) {
+		let m = this.mag;
+		this.x = a.x * m;
+		this.y = a.y * m;
+	}
 	get normalized() {
 		return this.get().normalize();
+	}
+	set inverse(a) {
+		this.x = -a.x;
+		this.y = -a.y;
+	}
+	get inverse() {
+		return this.times(-1);
 	}
 	op(v, e) {
 		if (typeof v === "number") {
@@ -58,9 +73,6 @@ class Vector extends Operable {
 	}
 	invert() {
 		return this.mul(-1);
-	}
-	get inverse() {
-		return this.times(-1);
 	}
 	compare(v1, v2) {
 		if (v1.dot(this) > v2.dot(this)) return v1;
@@ -115,22 +127,11 @@ class Vector extends Operable {
 	toMaxed(digits) {
 		return this.map(v => v.toMaxed(digits)).toString();
 	}
-	toMatrix() {
-		let count = 0;
-		for (let x of this.constructor.modValues) count++;
-		let m = new Matrix4(count, 1);
-		count = 0;
-		for (let x of this.constructor.modValues) {
-			m.cols[0][count] = this[x];
-			count++;
-		}
-		return m;
+	static dist(a, b) {
+		return a.minus(b).mag;
 	}
-	applyMatrix(m) {
-		return this.constructor.fromMatrix(m.times(this.toMatrix()));
-	}
-	static fromMatrix(m) {
-		return new this(...m.cols[0]);
+	static sqrDist(a, b) {
+		return a.minus(b).sqrMag;
 	}
 	static prohibitDirections(proDirs, dir) {
 		let remove = [];

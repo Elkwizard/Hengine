@@ -503,16 +503,13 @@ RigidBody.nextID = 0;
 
 //detection
 class CollisionDetector {
-    constructor(engine) {
-        this.engine = engine;
-    }
-    collide(shapeA, shapeB, arg) {
+    static collide(shapeA, shapeB, arg) {
         // renderer.stroke(Color.LIME).rect(shapeA.bounds);
         // renderer.stroke(Color.BLUE).rect(shapeB.bounds);
         if (Bounds.notOverlap(shapeA.bounds, shapeB.bounds)) return null;
         return this[shapeA.constructor.name + "_" + shapeB.constructor.name](shapeA, shapeB, arg);
     }
-    CircleModel_PolygonModel(a, b, _unused) {
+    static CircleModel_PolygonModel(a, b, _unused) {
         //CLOSEST POINT
 
         let bestDist = Infinity;
@@ -591,14 +588,14 @@ class CollisionDetector {
         }
         return null;
     }
-    PolygonModel_CircleModel(a, b, _unused) {
+    static PolygonModel_CircleModel(a, b, _unused) {
         let col = this.CircleModel_PolygonModel(b, a, PhysicsVector.invert(_unused));
         if (col) {
             col.direction.mul(-1);
         }
         return col;
     }
-    CircleModel_CircleModel(a, b, _unused) {
+    static CircleModel_CircleModel(a, b, _unused) {
         let between = PhysicsVector.sub(b.position, a.position);
         let sqrMag = PhysicsVector.sqrMag(between);
         if (sqrMag < (a.radius + b.radius) ** 2) {
@@ -614,7 +611,7 @@ class CollisionDetector {
         }
         return null;
     }
-    PolygonModel_PolygonModel(a, b, _unused) {
+    static PolygonModel_PolygonModel(a, b, _unused) {
         let toB = PhysicsVector.sub(b.position, a.position);
 
         let axes = [...a.axes.map(ax => PhysicsVector.invert(ax)), ...b.axes].filter(ax => PhysicsVector.dot(ax, toB) > 0);
@@ -909,7 +906,6 @@ class PhysicsEngine {
     constructor(gravity = new PhysicsVector(0, 0.2)) {
         this.gravity = gravity;
         this.bodies = [];
-        this.collisionDetector = new CollisionDetector(this);
         this.collisionResolver = new CollisionResolver(this);
         this.linearDrag = 0.995;
         this.angularDrag = 0.995;
@@ -1032,12 +1028,12 @@ class PhysicsEngine {
             for (let j = 0; j < collidable.length; j++) {
                 let body2 = collidable[j];
                 if (body.shapes.length === 1 && body2.shapes.length === 1) {
-                    let col = this.collisionDetector.collide(body.cacheModel(0), body2.cacheModel(0), PhysicsVector.sub(body2.position, body.position));
+                    let col = CollisionDetector.collide(body.cacheModel(0), body2.cacheModel(0), PhysicsVector.sub(body2.position, body.position));
                     if (col) this.resolve(body, body2, col);
                 } else {
                     let collisions = [];
                     for (let sI = 0; sI < body.shapes.length; sI++) for (let sJ = 0; sJ < body2.shapes.length; sJ++) {
-                        let col = this.collisionDetector.collide(body.cacheModel(sI), body2.cacheModel(sJ), PhysicsVector.sub(body2.position, body.position));
+                        let col = CollisionDetector.collide(body.cacheModel(sI), body2.cacheModel(sJ), PhysicsVector.sub(body2.position, body.position));
                         if (col) collisions.push(col);
                     }
                     if (!collisions.length) continue;
