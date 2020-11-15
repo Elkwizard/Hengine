@@ -1,4 +1,19 @@
 class Geometry {
+    static smooth(vertices) {
+        if (vertices.length <= 2) return vertices;
+        let result = [];
+
+        for (let i = 0; i < vertices.length; i++) {
+            let a = vertices[i];
+            let b = vertices[(i + 1) % vertices.length];
+            let c = vertices[(i + 2) % vertices.length];
+            let M = a.plus(c).plus(b.times(6)).over(8);
+
+            result.push(a.plus(b).over(2), M, c.plus(b).over(2));
+        }
+
+        return result;
+    }
     static triangulate(vertices) {
         const result = [];
         if (vertices.length < 3) return [];
@@ -206,7 +221,7 @@ class Geometry {
             clearRect(currentRect);
             // while (validRect(currentRect)) currentRect.height++;
 
-            
+
 
             result.push(currentRect);
         }
@@ -652,7 +667,7 @@ class Geometry {
                 let minX = Math.min(l.a.x, l.b.x);
                 let maxX = Math.max(l.a.x, l.b.x);
                 if (x >= minX && x <= maxX) result = new Vector2(x, dy / dx * x + b);
-            } else {    
+            } else {
                 let dx2 = l.b.x - l.a.x;
                 let dy2 = l.b.y - l.a.y;
                 let b2 = l.a.y - dy2 / dx2 * l.a.x;
@@ -662,7 +677,7 @@ class Geometry {
                 if (x >= minX && x <= maxX) result = new Vector2(x, dy2 / dx2 * x + b2);
             }
         }
-        if (result && result.minus(o).dot(r) <= 0) result = null; 
+        if (result && result.minus(o).dot(r) <= 0) result = null;
         return result;
     }
     static getMiddle(verts) {
@@ -771,7 +786,7 @@ class Geometry {
     }
     static overlapShapes(poly, poly2) {
         if (r instanceof Rect) {
-            
+
         } else {
 
         }
