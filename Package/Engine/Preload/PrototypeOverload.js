@@ -1,12 +1,3 @@
-Number.clamp = function (n, a, b) {
-	return Math.max(a, Math.min(b, n));
-}
-Number.remap = function (n, a, b, a2, b2) {
-	return Number.lerp(a2, b2, (n - a) / (b - a));
-}
-Number.threshold = function (n, t) {
-	return !!(n > t);
-}
 function assert(condition, name) {
 	if (!condition) console.warn(`Assertion "${name}" failed.`);
 }
@@ -211,12 +202,27 @@ Object.prototype[Symbol.iterator] = function* () {
 };
 
 //Make Number behave like Operable
-Number.prototype.abs = function () { return Math.abs(this); };
-Number.lerp = function (a, b, t) { return a * (1 - t) + b * t; };
+Number.abs = n => Math.abs(n);
+Number.clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+Number.lerp = (a, b, t) => a * (1 - t) + b * t;
+Number.remap = (n, a, b, a2, b2) => (n - a) / (b - a) * (b2 - a2) + a2;
+Number.min = (a, b) => Math.min(a, b);
+Number.max = (a, b) => Math.max(a, b);
+Object.defineProperty(Number.prototype, "mag", {
+	get() {
+		return Math.abs(this);
+	}
+});
+Object.defineProperty(Number.prototype, "sqrMag", {
+	get() {
+		return this ** 2;
+	}
+})
 Number.prototype.plus = function (n) { return this + n; };
 Number.prototype.minus = function (n) { return this - n; };
 Number.prototype.times = function (n) { return this * n; };
 Number.prototype.over = function (n) { return this / n; };
 Number.prototype.get = function () { return this; };
 Number.prototype.equals = function (n) { return Math.abs(this - n) < 0.00000001; }
+
 Number.empty = 0;

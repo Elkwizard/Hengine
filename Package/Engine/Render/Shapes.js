@@ -125,6 +125,7 @@ class Shape extends Operable {
 		return new Shape();
 	}
 }
+Shape.modValues = [];
 class Polygon extends Shape {
 	constructor(vertices) {
 		super();
@@ -245,6 +246,7 @@ class Polygon extends Shape {
 		return vertices;
 	}
 }
+Polygon.modValues = [];
 class Rect extends Polygon {
 	constructor(x, y, w, h) {
 		super([]);

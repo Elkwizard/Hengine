@@ -4,7 +4,7 @@ function physicsPolygonSubdivider(input) {
     return list.map(verts => Polygon.removeDuplicates(verts).map(vert => vert.toPhysicsVector()));
 }
 function physicsAPIcollideShapes(shape, shape2) {
-    return CollisionDetector.collide(
+    return !!CollisionDetector.collide(
         shape.toPhysicsShape().getModel(new PhysicsVector(0, 0), 1, 0),
         shape2.toPhysicsShape().getModel(new PhysicsVector(0, 0), 1, 0)
     );

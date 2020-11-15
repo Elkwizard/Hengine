@@ -86,6 +86,19 @@ class Operable {
     static clamp(n, a, b) {
         return new this(...this.modValues.map(x => Math.max(a[x], Math.min(b[x], n[x]))));
     }
+    static filled(value) {
+        return new this(...this.modValues.map(() => value));
+    }
+    static min(a, b) {
+        if (a instanceof Number) a = this.filled(a);
+        if (b instanceof Number) b = this.filled(b);
+        return new this(...this.modValues.map(x => Math.min(a[x], b[x])));
+    }
+    static max(a, b) {
+        if (a instanceof Number) a = this.filled(a);
+        if (b instanceof Number) b = this.filled(b);
+        return new this(...this.modValues.map(x => Math.max(a[x], b[x])));
+    }
     static lerp(a, b, t) {
         let ops = a.constructor.modValues;
         let args = [];
