@@ -216,67 +216,10 @@ class HengineLoader {
 			rootSrc += "/Engine";
 			console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
 
-			let totalResourceCount = HengineLoader.engineResources.length + userResources.length;
-			let loadedResources = 0;
-
-			// loading bar
-
-			let overlay = document.createElement("div");
-			overlay.style.position = "absolute";
-			overlay.style.boxSizing = "border-box";
-			overlay.style.left = "0";
-			overlay.style.top = "0";
-			overlay.style.width = "100vw";
-			overlay.style.height = "100vh";
-			overlay.style.backgroundColor = "black";
-			overlay.style.zIndex = "100";
-			overlay.style.display = "flex";
-			overlay.style.flexDirection = "column";
-			overlay.style.alignItems = "center";
-			overlay.style.justifyContent = "center";
-			let loading = document.createElement("div");
-			loading.style.display = "flex";
-			loading.style.flexDirection = "row";
-			loading.style.alignItems = "center";
-			loading.style.color = "white";
-			loading.innerHTML = "LOADING ";
-			loading.style.font = "40px Arial";
-			let percentage = document.createElement("span");
-			percentage.innerHTML = "0%";
-			percentage.style.marginLeft = "20px";
-			loading.appendChild(percentage);
-			let loadingBar = document.createElement("div");
-			loadingBar.style.display = "inline-block";
-			loadingBar.style.width = "50vw";
-			loadingBar.style.height = "60px";
-			loadingBar.style.border = "5px white solid";
-			loadingBar.style.marginLeft = "30px";
-			let loadingBarExpand = document.createElement("div");
-			loadingBarExpand.style.backgroundColor = "white";
-			loadingBarExpand.style.width = "0";
-			loadingBarExpand.style.height = "100%";
-			loadingBarExpand.style.position = "relative";
-			loadingBarExpand.style.left = "-1px";
-			loadingBar.appendChild(loadingBarExpand);
-			loading.appendChild(loadingBar);
-			overlay.appendChild(loading);
-			let loadingWhat = document.createElement("div");
-			loadingWhat.style.color = "white";
-			loadingWhat.style.font = "20px Arial";
-			loadingWhat.style.marginTop = "20px";
-			overlay.appendChild(loadingWhat);
-			document.body.appendChild(overlay);
-
-			// loading bar end
-
 			for (let i = 0; i < HengineLoader.engineResources.length; i++) {
 				let path = HengineLoader.engineResources[i];
 				let resource = new HengineScriptResource(PathManager.join([rootSrc, path + ".js"]));
 				await resource.load();
-				loadedResources++;
-				percentage.innerHTML = `${Math.floor(loadedResources / totalResourceCount * 100)}%`;
-				loadingBarExpand.style.width = `${loadedResources / totalResourceCount * 100}%`;
-				loadingWhat.innerText = resource.src;
 			}
 
 
@@ -290,13 +233,7 @@ class HengineLoader {
 				const resource = await userResources[i].load();
 				if (!resource) console.warn(`LOADING FAILED FOR RESOURCE [${userResources[i].src}]`);
 				hengineLoader.resources.set(userResources[i].src, resource);
-				loadedResources++;
-				percentage.innerHTML = `${Math.floor(loadedResources / totalResourceCount * 100)}%`;
-				loadingBarExpand.style.width = `${loadedResources / totalResourceCount * 100}%`;
-				loadingWhat.innerText = userResources[i].src;
 			}
-
-			overlay.outerHTML = "";
 		}
 		if (document.body && document.head) loadResources();
 		else window.addEventListener("load", loadResources);
