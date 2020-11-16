@@ -185,10 +185,13 @@ class PhysicsObject extends SceneObject {
         this.mobile = false;
     }
     beforePhysicsStep() {
-        this.body.position.x = this.transform.position.x;
-        this.body.position.y = this.transform.position.y;
-        this.body.angle = this.transform.rotation;
-        this.body.invalidateModels();
+        let dx = !this.body.position.x.equals(this.transform.position.x);
+        let dy = !this.body.position.y.equals(this.transform.position.y);
+        let dtheta = !this.body.angle.equals(this.transform.rotation);
+        if (dx) this.body.position.x = this.transform.position.x;
+        if (dy) this.body.position.y = this.transform.position.y;
+        if (dtheta) this.body.angle = this.transform.rotation;
+        if (dx || dy || dtheta) this.body.invalidateModels();
     }
     afterPhysicsStep() {
         this.transform.position.x = this.body.position.x;

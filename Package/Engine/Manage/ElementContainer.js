@@ -52,7 +52,7 @@ class ElementContainer extends SceneElement {
 	updateArray() {
 		this.sceneObjectArray = [];
 		for (let [name, element] of this.elements) {
-			if (!element.active) continue;
+			if (!element.active || element.removed) continue;
 			if (element instanceof ElementContainer) this.sceneObjectArray.pushArray(element.updateArray());
 			else this.sceneObjectArray.push(element);
 		}
@@ -231,6 +231,7 @@ class ElementContainer extends SceneElement {
 	getAllElements() {
 		let array = [];
 		for (let [name, element] of this.elements) {
+			if (element.removed) continue;
 			if (element instanceof ElementContainer) array.pushArray(element.getAllElements());
 			else array.push(element);
 		}
