@@ -235,8 +235,19 @@ class HengineLoader {
 				hengineLoader.resources.set(userResources[i].src, resource);
 			}
 		}
-		if (document.body && document.head) loadResources();
-		else window.addEventListener("load", loadResources);
+		if (document.body && document.head) {
+			return new Promise(async function (resolve) {
+				await loadResources();
+				resolve();
+			});
+		} else {
+			return new Promise(function (resolve) {
+				window.addEventListener("load", async function () {
+					await loadResources();
+					resolve();
+				});
+			});
+		}
 	}
 }
 HengineLoader.engineResources = [

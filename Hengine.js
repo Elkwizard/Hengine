@@ -23,6 +23,7 @@
     await load(hengineLoaderSrc);
     await HengineLoader.load(scripts.map(src => new HengineScriptResource(src)));
 
+
     window.title = title;
 
     let code = script.innerHTML;
