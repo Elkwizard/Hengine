@@ -146,6 +146,6 @@ Random.uniform = function (seed) {
     return r;
 };
 Random.normal = function (seed) {
-    return Random.uniform(seed) + Random.uniform(seed + 1000);
+    return (Random.uniform(seed) + Random.uniform(seed + 1000)) / 2;
 };
 Random.distribution = Random.uniform;

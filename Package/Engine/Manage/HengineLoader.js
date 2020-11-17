@@ -236,10 +236,7 @@ class HengineLoader {
 			}
 		}
 		if (document.body && document.head) {
-			return new Promise(async function (resolve) {
-				await loadResources();
-				resolve();
-			});
+			return loadResources();
 		} else {
 			return new Promise(function (resolve) {
 				window.addEventListener("load", async function () {
