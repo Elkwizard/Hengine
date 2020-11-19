@@ -21,6 +21,8 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.scrollOffset = Vector2.origin;
 		l.updateTextBoundingBox();
 
+		l.keyboardShortcuts = ["a", "z", "c", "v", "x"];
+
 		l.keyTimer = 0;
 		l.highlighting = false;
 		l.ignored = [];
@@ -291,6 +293,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 				key = key.text;
 
 				if (key === "Control" || key === "Shift") continue;
+				if (keyboard.pressed("Control") && !l.keyboardShortcuts.includes(key.toLowerCase())) continue;
 
 				let inx = l.ignored.indexOf(key);
 				if (inx > -1) {
@@ -335,7 +338,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.renderer.clip().rect(rtvb.x - expand, rtvb.y - expand, rtvb.width + expand * 2, rtvb.height + expand * 2);
 		l.renderer.save();
 		l.renderer.translate(l.scrollOffset.inverse);
-		
+
 		let lines = l.value.split("\n");
 		let textPos = l.relativeTextViewBox.min;
 		let startLine = Math.floor(l.scrollOffset.y / l.font.lineHeight);
@@ -386,7 +389,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		}
 		l.renderer.restore();
 		l.renderer.unclip();
-		
+
 
 
 
@@ -430,16 +433,18 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		} else l.scrollOffset.x = 0;
 
 		if (ys) {
-			//Y Bar Drag
-			let thumbY = new Rect(width / 2 - l.scrollBarSize, -height / 2 + fullScrollHeight * l.scrollOffset.y / yFullSize, l.scrollBarSize, fullScrollHeight * yRatio);
-			let barY = new Rect(width / 2 - l.scrollBarSize, -height / 2, l.scrollBarSize, fullScrollHeight);
-			if (l.mouse.pressed("Left") && Geometry.pointInsideRect(localMouse, barY)) {
-				l.scrollOffset.y = Number.clamp(yFullSize * (localMouse.y - thumbY.height / 2 + height / 2) / fullScrollHeight, 0, yFullSize - yViewSize);
-			}
+			if (l.multiline) {
+				//Y Bar Drag
+				let thumbY = new Rect(width / 2 - l.scrollBarSize, -height / 2 + fullScrollHeight * l.scrollOffset.y / yFullSize, l.scrollBarSize, fullScrollHeight * yRatio);
+				let barY = new Rect(width / 2 - l.scrollBarSize, -height / 2, l.scrollBarSize, fullScrollHeight);
+				if (l.mouse.pressed("Left") && Geometry.pointInsideRect(localMouse, barY)) {
+					l.scrollOffset.y = Number.clamp(yFullSize * (localMouse.y - thumbY.height / 2 + height / 2) / fullScrollHeight, 0, yFullSize - yViewSize);
+				}
 
-			l.renderer.draw(Color.LIGHT_GRAY).rect(barY);
-			l.renderer.draw(Color.GRAY).rect(thumbY);
-			l.renderer.stroke(Color.BLACK).rect(barY);
+				l.renderer.draw(Color.LIGHT_GRAY).rect(barY);
+				l.renderer.draw(Color.GRAY).rect(thumbY);
+				l.renderer.stroke(Color.BLACK).rect(barY);
+			}
 		} else l.scrollOffset.y = 0;
 
 		l.renderer.textMode = prevTextMode;
