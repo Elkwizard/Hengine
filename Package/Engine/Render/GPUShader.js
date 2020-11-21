@@ -22,12 +22,21 @@ class GPUShader extends ImageType {
 		this.compiled = null;
 		this.compileState = { compiled: false, error: null };
 		this.args = { };
-		this.shadeRects = [new Rect(0, width)];
+		this.shadeRects = [new Rect(0, 0, width, height)];
 		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
 		this.c = this.image.getContext("webgl");
 		if (this.c === null) return console.warn("Your browser doesn't support webgl.");
-		// this.image.addEventListener("webglcontextrestored", () => (this.compile(), this.setShadeRects(this.shadeRects, false), this.setArguments(this.arguments)));
-		this.image.addEventListener("webglcontextrestored", e => console.log(e));
+		this.image.addEventListener("webglcontextlost", e => {
+			e.preventDefault();
+			console.warn("Webgl Context Lost");
+		});
+		this.image.addEventListener("webglcontextrestored", e => {
+			console.warn("Webgl Context Restored");
+			e.preventDefault();
+			this.compile();
+			this.setShadeRects(this.shadeRects);
+			this.setArguments(this.args);
+		});
 		this.shadingRectPositions = [
 			-1, 1,
 			1, 1,
@@ -46,6 +55,8 @@ class GPUShader extends ImageType {
 		return this._compiled;
 	}
 	setShadeRects(rects) {
+		if (this.c.isContextLost()) return;
+
 		this.shadeRects = rects;
 		let a = Vector2.origin;
 		let b = new Vector2(this.width, this.height);
@@ -75,6 +86,8 @@ class GPUShader extends ImageType {
 		this.loaded = false;
 	}
 	updatePositionBuffer() {
+		if (this.c.isContextLost()) return;
+
 		const c = this.c;
 		const positionBuffer = c.createBuffer();
 		c.bindBuffer(c.ARRAY_BUFFER, positionBuffer);
@@ -85,6 +98,8 @@ class GPUShader extends ImageType {
 		c.enableVertexAttribArray(vertexPositionPointer);
 	}
 	updateResolutionUniforms() {
+		if (this.c.isContextLost()) return;
+
 		const c = this.c;
 		const shaderProgram = this.compiled.shaderProgram;
 		c.uniform2f(c.getUniformLocation(shaderProgram, "resolution"), this.width, this.height);
@@ -93,6 +108,8 @@ class GPUShader extends ImageType {
 		c.viewport(0, 0, this.image.width, this.image.height);
 	}
 	resize(width, height) {
+		if (this.c.isContextLost()) return;
+
 		width = Math.max(1, Math.abs(Math.ceil(width)));
 		height = Math.max(1, Math.abs(Math.ceil(height)));
 		this.image.width = width * devicePixelRatio;
@@ -103,11 +120,15 @@ class GPUShader extends ImageType {
 		this.loaded = false;
 	}
 	shade() {
+		if (this.c.isContextLost()) return;
+
 		this.loaded = true;
 		this.c.clear(this.c.COLOR_BUFFER_BIT);
 		this.c.drawArrays(this.c.TRIANGLE_STRIP, 0, this.amountVertices);
 	}
 	compile() {
+		if (this.c.isContextLost()) return;
+
 		//init
 		const c = this.c;
 
@@ -228,6 +249,8 @@ class GPUShader extends ImageType {
 		else return console.warn("Webgl uniform '" + arg + "' doesn't exist.");
 	}
 	setArguments(uniformData = { }) {
+		if (this.c.isContextLost()) return;
+
 		let { shaderProgram, uniformMap } = this.compiled;
 		const c = this.c;
 

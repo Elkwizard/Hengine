@@ -263,6 +263,8 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 	scrollCursorIntoView(l) {
 		if (l.value.length === 0) return;
 		let pos = l.getTextLocation(l.selectionEnd).plus(l.renderTextOffset);
+		if ((pos.x - l.relativeTextViewBox.x).equals(l.renderTextOffset.x)) l.scrollOffset.x = 0;
+		if ((pos.y - l.relativeTextViewBox.y).equals(l.renderTextOffset.y)) l.scrollOffset.y = 0;
 		let inx = Math.max(0, l.selectionEnd - 1);
 		let bounds = l.getCharacterHitbox(inx).move(l.renderTextOffset);
 		let box = l.relativeTextViewBox;
