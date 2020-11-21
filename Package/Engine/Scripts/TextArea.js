@@ -1,5 +1,5 @@
 const TEXT_AREA = new ElementScript("TEXT_AREA", {
-	init(l, font, paddingEM = 0.5, multiline = true, renderText = (text, font, pos, getLoc) => l.renderer.draw(Color.BLACK).text(font, text, pos)) {
+	init(l, font, paddingEM = 0.5, multiline = true, renderText = (text, font, pos, getLoc, lineIndex) => l.renderer.draw(Color.BLACK).text(font, text, pos)) {
 		this.engine.scene.mouseEvents = true;
 		l.renderer = this.engine.renderer;
 		l.keyboard = this.engine.keyboard;
@@ -16,9 +16,9 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.selectionStart = 0;
 		l.selectionEnd = 0;
 
-
 		l.padding = paddingEM * l.font.size;
 		l.scrollBarSize = 20;
+		l.scrollSpeed = 20;
 		l.scrollOffset = Vector2.origin;
 		l.updateTextBoundingBox();
 
@@ -33,7 +33,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 
 		l.mouse.onScroll.listen(dy => {
 			if (this.hovered) {
-				l.scrollOffset.y += dy / 4;
+				l.scrollOffset.y += Math.sign(dy) * l.scrollSpeed;
 				l.clampScrollOffset();
 			}
 		});
@@ -235,30 +235,36 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		let relativeTextBoundingBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, l.font.getTextWidth(l.value), l.font.getTextHeight(l.value));
 		let rightOffset = (l.multiline && relativeTextViewBox.height < relativeTextBoundingBox.height) ? l.scrollBarSize : 0;
 		let bottomOffset = (l.multiline && relativeTextViewBox.width < relativeTextBoundingBox.width) ? l.scrollBarSize : 0;
-		l.relativeTextViewBox = new Rect(-width / 2 + l.padding, -height / 2 + l.padding, width - l.padding - rightOffset, height - l.padding - bottomOffset);
-		l.relativeTextBoundingBox = new Rect(l.relativeTextViewBox.x, l.relativeTextViewBox.y, l.font.getTextWidth(l.value), l.font.getTextHeight(l.value));
+		l.relativeTextViewBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, width - l.padding * 2 - rightOffset, height - l.padding * 2 - bottomOffset);
+		l.relativeTextBoundingBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, l.font.getTextWidth(l.value) + l.renderTextOffset.x, l.font.getTextHeight(l.value) + l.renderTextOffset.y);
 		l.clampScrollOffset();
 	},
 	select(l, p, type) {
 		l.focused = true;
 		l.keyTimer = 0;
 		let lp = this.transform.worldSpaceToModelSpace(p);
-		if (Geometry.pointInsideRect(lp, l.relativeTextViewBox)) {
-			let inx = l.getCharacterIndex(lp.plus(l.scrollOffset));;
+		let rtvb = l.relativeTextViewBox;
+		let textAreaHitbox = (type === "start") ? 
+			rtvb : 
+			new Rect(rtvb.x - l.padding, rtvb.y - l.padding, rtvb.width + l.padding * 2, rtvb.height + l.padding * 2);
+		if (Geometry.pointInsideRect(lp, textAreaHitbox)) {
+			let inx = l.getCharacterIndex(lp.plus(l.scrollOffset).minus(l.renderTextOffset));
+			let preStart = l.selectionStart;
+			let preEnd = l.selectionEnd;
 			if (type === "start") l.selectionStart = l.selectionEnd = inx;
 			else l.selectionEnd = inx;
 			l.updateTextBoundingBox();
 			l.scrollCursorIntoView();
 			l.selectAction();
-			return true;
+			return { changed: l.selectionStart !== preStart || l.selectionEnd !== preEnd };
 		}
 		return false;
 	},
 	scrollCursorIntoView(l) {
 		if (l.value.length === 0) return;
-		let pos = l.getTextLocation(l.selectionEnd);
+		let pos = l.getTextLocation(l.selectionEnd).plus(l.renderTextOffset);
 		let inx = Math.max(0, l.selectionEnd - 1);
-		let bounds = l.getCharacterHitbox(inx);
+		let bounds = l.getCharacterHitbox(inx).move(l.renderTextOffset);
 		let box = l.relativeTextViewBox;
 		let min = box.min.plus(l.scrollOffset);
 		let max = box.max.plus(l.scrollOffset);
@@ -275,18 +281,24 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		return l.keyboard.pressed("Shift") || l.highlighting;
 	},
 	update(l) {
-		let screenMouse = l.mouse.screen.minus(l.renderTextOffset);
-		let inTextArea = Geometry.pointInsideRect(this.transform.worldSpaceToModelSpace(screenMouse), l.relativeTextViewBox);
+		let inTextArea = Geometry.pointInsideRect(this.transform.worldSpaceToModelSpace(l.mouse.screen), l.relativeTextViewBox);
 
 		if (inTextArea) l.renderer.setCursor("text");
 		else l.renderer.setCursor("default");
 
 		if (l.mouse.justPressed("Left")) {
-			if (inTextArea) l.highlighting = l.select(screenMouse, "start");
+			if (inTextArea) l.highlighting = !!l.select(l.mouse.screen, "start");
 			else l.focused = false;
 		}
 		if (l.mouse.pressed("Left") && l.highlighting) {
-			l.select(screenMouse, "move");
+			let selection = l.select(l.mouse.screen, "move"); 
+			if (selection && selection.changed) {
+				let relativeMousePosition = this.transform.worldSpaceToModelSpace(mouse.screen);
+				if (relativeMousePosition.x > l.relativeTextViewBox.max.x) l.scrollOffset.x += l.scrollSpeed / 4;
+				if (relativeMousePosition.y > l.relativeTextViewBox.max.y) l.scrollOffset.y += l.scrollSpeed / 4;
+				if (relativeMousePosition.x < l.relativeTextViewBox.min.x) l.scrollOffset.x -= l.scrollSpeed / 4;
+				if (relativeMousePosition.y < l.relativeTextViewBox.min.y) l.scrollOffset.y -= l.scrollSpeed / 4;
+			}
 		}
 		if (l.mouse.released("Left")) l.highlighting = false;
 		if (l.focused && l.keyboard.downQueue.length) {
@@ -341,17 +353,22 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.renderer.save();
 		l.renderer.translate(l.scrollOffset.inverse);
 
+		// renderer.stroke(Color.LIME, 3).rect(l.relativeTextViewBox);
+		// renderer.stroke(Color.RED, 3).rect(l.relativeTextBoundingBox);
+
 		let lines = l.value.split("\n");
 		let textPos = l.relativeTextViewBox.min;
 		let startLine = Math.floor(l.scrollOffset.y / l.font.lineHeight);
 		let endLine = Math.min(lines.length, Math.floor(l.relativeTextViewBox.height / l.font.lineHeight) + startLine + 1);
 		textPos.y += l.font.lineHeight * startLine;
 		for (let i = startLine; i < endLine; i++) {
-			l.renderText(lines[i], l.font, textPos, inx => l.getTextLocationColumnRow(inx, i));
+			l.renderText(lines[i], l.font, textPos, inx => l.getTextLocationColumnRow(inx, i), i);
 			textPos.y += l.font.lineHeight;
 		}
 
 		if (l.focused) {
+			l.renderer.save();
+			l.renderer.translate(l.renderTextOffset);
 			//highlight
 			if (l.selectionStart !== l.selectionEnd) {
 				let start = l.selectionStart;
@@ -388,6 +405,8 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 			l.keyTimer++;
 			let cursorPos = l.getTextLocation(l.selectionEnd);
 			if (Math.sin(l.keyTimer * 0.1) > 0) l.renderer.stroke(l.caretColor, 2).line(cursorPos, cursorPos.plus(new Vector2(0, l.font.lineHeight)));
+			
+			l.renderer.restore();
 		}
 		l.renderer.restore();
 		l.renderer.unclip();
@@ -425,7 +444,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 				//X Bar Drag
 				let thumbX = new Rect(-width / 2 + fullScrollWidth * l.scrollOffset.x / xFullSize, height / 2 - l.scrollBarSize, fullScrollWidth * xRatio, l.scrollBarSize);
 				let barX = new Rect(-width / 2, height / 2 - l.scrollBarSize, fullScrollWidth, l.scrollBarSize);
-				if (l.mouse.pressed("Left") && Geometry.pointInsideRect(localMouse, barX)) {
+				if (!l.highlighting && l.mouse.pressed("Left") && Geometry.pointInsideRect(localMouse, barX)) {
 					l.scrollOffset.x = Number.clamp(xFullSize * (localMouse.x - thumbX.width / 2 + width / 2) / fullScrollWidth, 0, xFullSize - xViewSize);
 				}
 				l.renderer.draw(Color.LIGHT_GRAY).rect(barX);
@@ -439,7 +458,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 				//Y Bar Drag
 				let thumbY = new Rect(width / 2 - l.scrollBarSize, -height / 2 + fullScrollHeight * l.scrollOffset.y / yFullSize, l.scrollBarSize, fullScrollHeight * yRatio);
 				let barY = new Rect(width / 2 - l.scrollBarSize, -height / 2, l.scrollBarSize, fullScrollHeight);
-				if (l.mouse.pressed("Left") && Geometry.pointInsideRect(localMouse, barY)) {
+				if (!l.highlighting && l.mouse.pressed("Left") && Geometry.pointInsideRect(localMouse, barY)) {
 					l.scrollOffset.y = Number.clamp(yFullSize * (localMouse.y - thumbY.height / 2 + height / 2) / fullScrollHeight, 0, yFullSize - yViewSize);
 				}
 
