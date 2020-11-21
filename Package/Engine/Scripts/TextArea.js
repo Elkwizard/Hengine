@@ -87,7 +87,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		else if (yRow >= 0) {
 			let { startInx, array } = hitboxGroups[yRow];
 			array = array.split("").map((char, i) => l.getCharacterHitbox(i + startInx));
-			index = startInx + array.length;
+			index = (p.x - l.relativeTextViewBox.x < 0) ? startInx : startInx + array.length;
 			for (let i = 0; i < array.length; i++) {
 				let rect = array[i];
 				if (Geometry.pointInsideRect(p, rect)) {
