@@ -31,7 +31,7 @@ class ArtistImage extends ImageType {
 	}
 }
 class Artist {
-	constructor(canvas, width, height) {
+	constructor(canvas, width, height, imageType) {
 		this.canvas = canvas;
 
 		if (this.canvas.style) {
@@ -59,13 +59,12 @@ class Artist {
 		this.gl3 = new WebGLRenderer3D(this);
 		this.gl2 = new WebGLRenderer2D(this);
 
-		this.imageType = new ArtistImage(this);
+		this.imageType = imageType || new ArtistImage(this);
 
 		this.preservePixelart = true;
 		this.textMode = TextMode.TOP_LEFT;
 		let pathObj = {
 			circle(x, y, radius) {
-				radius = Math.abs(radius);
 				if (typeof x === "object") {
 					if (x.radius !== undefined) {
 						radius = x.radius;
@@ -77,6 +76,7 @@ class Artist {
 						x = x.x;
 					}
 				}
+				radius = Math.abs(radius);
 				this.c.beginPath();
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);
 			},
@@ -630,6 +630,7 @@ class Artist {
 	}
 	set width(a) {
 		this.canvas.width = a * devicePixelRatio;
+		this.imageType.width = a;
 		if (this.canvas.style) this.canvas.style.width = a + "px";
 		this.c.scale(devicePixelRatio, devicePixelRatio);
 	}
@@ -638,6 +639,7 @@ class Artist {
 	}
 	set height(a) {
 		this.canvas.height = a * devicePixelRatio;
+		this.imageType.height = a;
 		if (this.canvas.style) this.canvas.style.height = a + "px";
 		this.c.scale(devicePixelRatio, devicePixelRatio);
 	}

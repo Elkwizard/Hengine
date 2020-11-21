@@ -18,7 +18,7 @@ class Hengine {
 		this.clipboard = new ClipboardHandler();
 		this.fileSystem = new FileSystem();
 
-		this.renderer = new Artist(canvas, W, H);
+		this.renderer = new Artist(canvas, W, H, null);
 		this.scene = new Scene(new Vector2(0, 0.2), this);
 
 		//update loops

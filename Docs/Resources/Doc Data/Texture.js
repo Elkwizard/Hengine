@@ -69,11 +69,11 @@ load(String.raw`
 		(method:get@@$Texture$) 
 			Returns a copy of the Texture.
 		(/method)
-		(method:Texture.fromRenderer@renderer, x, y, width, height | renderer, region@$Texture$)
-			Returns a Texture representation of the pixels within the specified region in the given #Renderer#.
+		(method:Texture.fromImageType@imageType, x, y, width, height | renderer, region@$Texture$)
+			Returns a Texture representation of the pixels within the specified region in the given #ImageType#.
 			(2)Parameters(/2)
 			(p2)
-				(param:renderer $Renderer$)The #Renderer# that the pixels are to be sampled from.(/param)
+				(param:imageType $ImageType$)The #ImageType# that the pixels are to be sampled from.(/param)
 				(param:x $Number$)The X coordinate of the left extent of the rectangle.(/param)
 				(param:y $Number$)The Y coordinate of the top extent of the rectangle.(/param)
 				(param:width $Number$)The width of the rectangle.(/param)

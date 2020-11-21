@@ -169,22 +169,30 @@ class Texture extends ImageType {
 		tex.changed = true;
 		return tex;
 	}
-	static fromRenderer(renderer, x, y, w, h) {
-		if (!x) x = 0;
-		if (!y) y = 0;
-		if (!w) w = renderer.width;
-		if (!h) h = renderer.height;
+	static fromImageType(image, x, y, w, h) {
 		if (typeof x === "object") {
 			h = x.height;
 			w = x.width;
 			y = x.y;
 			x = x.x;
 		}
+		
+		if (!x) x = 0;
+		if (!y) y = 0;
+		if (!w) w = image.width;
+		if (!h) h = image.height;
+
+		let img = image.makeImage();
+		
+		let canvas = new_OffscreenCanvas(img.width, img.height);
+		let context = canvas.getContext("2d");
+		context.drawImage(img, 0, 0);
+
 		x *= devicePixelRatio;
 		y *= devicePixelRatio;
 		let W = ~~(w * devicePixelRatio);
 		let H = ~~(h * devicePixelRatio);
-		let imageData = renderer.c.getImageData(x, y, W, H);
+		let imageData = context.getImageData(x, y, W, H);
 		let tex = new Texture(w, h);
 		let data = imageData.data;
 		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {

@@ -12,6 +12,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.highlightColor = new Color(0, 0, 255, 0.2);
 		l.multiline = multiline;
 		l.renderText = renderText;
+		l.renderTextOffset = Vector2.origin;
 		l.selectionStart = 0;
 		l.selectionEnd = 0;
 
@@ -274,17 +275,18 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		return l.keyboard.pressed("Shift") || l.highlighting;
 	},
 	update(l) {
-		let inTextArea = Geometry.pointInsideRect(this.transform.worldSpaceToModelSpace(l.mouse.screen), l.relativeTextViewBox);
+		let screenMouse = l.mouse.screen.minus(l.renderTextOffset);
+		let inTextArea = Geometry.pointInsideRect(this.transform.worldSpaceToModelSpace(screenMouse), l.relativeTextViewBox);
 
 		if (inTextArea) l.renderer.setCursor("text");
 		else l.renderer.setCursor("default");
 
 		if (l.mouse.justPressed("Left")) {
-			if (inTextArea) l.highlighting = l.select(l.mouse.screen, "start");
+			if (inTextArea) l.highlighting = l.select(screenMouse, "start");
 			else l.focused = false;
 		}
 		if (l.mouse.pressed("Left") && l.highlighting) {
-			l.select(l.mouse.screen, "move");
+			l.select(screenMouse, "move");
 		}
 		if (l.mouse.released("Left")) l.highlighting = false;
 		if (l.focused && l.keyboard.downQueue.length) {

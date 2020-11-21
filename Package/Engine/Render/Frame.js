@@ -25,8 +25,8 @@ function new_OffscreenCanvas(width, height) {
 }
 class ImageType {
 	constructor(width = 1, height = 1) {
-		this.width = Math.max(1, Math.round(width));
-		this.height = Math.max(1, Math.round(height));
+		this.width = Math.max(1, Math.ceil(width));
+		this.height = Math.max(1, Math.ceil(height));
 		this.loaded = true;
 	}
 	inferWidth(height) {
@@ -85,7 +85,7 @@ class Frame extends ImageType {
 	constructor(width, height) {
 		super(width, height);
 		this.image = new_OffscreenCanvas(this.width, this.height);
-		this.renderer = new Artist(this.image, this.width, this.height);
+		this.renderer = new Artist(this.image, this.width, this.height, this);
 		this.renderer.preservePixelart = true;
 	}
 	stretch(w, h) {
@@ -98,32 +98,29 @@ class Frame extends ImageType {
 		return this.image;
 	}
 	clip(x, y, w, h) {
-		return Frame.fromRenderer(this.renderer, x, y, w, h);
+		return Frame.fromImageType(this, x, y, w, h);
 	}
 	get() {
 		let f = new Frame(this.width, this.height);
 		f.renderer.c.drawImage(this.image, 0, 0, this.width, this.height);
 		return f;
 	}
-	static fromRenderer(renderer, x, y, w, h) {
-		if (!x) x = 0;
-		if (!y) y = 0;
-		if (!w) w = renderer.width;
-		if (!h) h = renderer.height;
+	static fromImageType(img, x, y, w, h) {
 		if (typeof x === "object") {
 			h = x.height;
 			w = x.width;
 			y = x.y;
 			x = x.x;
 		}
-		let f = new Frame(w, h);
-		f.renderer.c.drawImage(renderer.canvas, x * devicePixelRatio, y * devicePixelRatio, w * devicePixelRatio, y * devicePixelRatio, 0, 0, w, h);
-		return f;
-	}
-	static fromImageType(img) {
+
+		if (!x) x = 0;
+		if (!y) y = 0;
+		if (!w) w = img.width;
+		if (!h) h = img.height;
+		
 		let offscreen = img.makeImage();
-		let f = new Frame(offscreen.width, offscreen.height);
-		f.renderer.c.drawImage(offscreen, 0, 0);
+		let f = new Frame(w, h);
+		f.renderer.c.drawImage(offscreen, x * devicePixelRatio, y * devicePixelRatio, w * devicePixelRatio, h * devicePixelRatio, 0, 0, w, h);
 		return f;
 	}
 }

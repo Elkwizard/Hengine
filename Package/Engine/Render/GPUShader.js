@@ -21,7 +21,7 @@ class GPUShader extends ImageType {
 		this.glsl = glsl;
 		this.compiled = null;
 		this.compileState = { compiled: false, error: null };
-		this.arguments = { };
+		this.args = { };
 		this.shadeRects = [new Rect(0, width)];
 		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
 		this.c = this.image.getContext("webgl");
@@ -37,6 +37,13 @@ class GPUShader extends ImageType {
 		this.amountVertices = 4;
 		this.loaded = false;
 		this.currentTextureUnit = 0;
+	}
+	set compiled(a) {
+		this._compiled = a;
+	}
+	get compiled() {
+		if (!this._compiled) exit("Didn't compile GPUShader");
+		return this._compiled;
 	}
 	setShadeRects(rects) {
 		this.shadeRects = rects;
@@ -86,8 +93,8 @@ class GPUShader extends ImageType {
 		c.viewport(0, 0, this.image.width, this.image.height);
 	}
 	resize(width, height) {
-		width = Math.max(1, Math.abs(Math.floor(width)));
-		height = Math.max(1, Math.abs(Math.floor(height)));
+		width = Math.max(1, Math.abs(Math.ceil(width)));
+		height = Math.max(1, Math.abs(Math.ceil(height)));
 		this.image.width = width * devicePixelRatio;
 		this.image.height = height * devicePixelRatio;
 		this.width = width;
@@ -213,6 +220,13 @@ class GPUShader extends ImageType {
 		this.compileState = { compiled: true, error };
 		return true;
 	}
+	argumentExists(arg) {
+		return arg in this.compiled.uniformMap;
+	}
+	getArgument(arg) {
+		if (arg in this.args) return this.args[arg];
+		else return console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+	}
 	setArguments(uniformData = { }) {
 		let { shaderProgram, uniformMap } = this.compiled;
 		const c = this.c;
@@ -226,7 +240,7 @@ class GPUShader extends ImageType {
 			}
 			let data = uniformData[arg];
 			let p = u.properties;
-			this.arguments[arg] = data;
+			this.args[arg] = data;
 
 			let location = c.getUniformLocation(shaderProgram, u.name);
 
@@ -295,6 +309,7 @@ class GPUShader extends ImageType {
 		c.bindTexture(c.TEXTURE_2D, tex);
 
 		let gl_image = image.makeImage();
+		//if (image instanceof ArtistImage) console.log(gl_image);
 		c.texImage2D(c.TEXTURE_2D, 0, c.RGBA, c.RGBA, c.UNSIGNED_BYTE, gl_image);
 
 		c.texParameteri(c.TEXTURE_2D, c.TEXTURE_MIN_FILTER, c.LINEAR);
