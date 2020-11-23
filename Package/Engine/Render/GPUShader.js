@@ -215,6 +215,7 @@ varying highp vec2 position;`;
 		gl.attachShader(shaderProgram, vertexShader);
 		gl.attachShader(shaderProgram, pixelShader);
 		gl.linkProgram(shaderProgram);
+		gl.useProgram(shaderProgram);
 
 		// uniforms
 
@@ -252,9 +253,9 @@ varying highp vec2 position;`;
 				for (let i = 0; i < arrayCount; i++) {
 					// setup textures
 					let tex = gl.createTexture();
-					
 					gl.bindTexture(gl.TEXTURE_2D, tex);
 
+					// wrapping and stretching
 					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -262,6 +263,11 @@ varying highp vec2 position;`;
 
 					textures.push(tex);
 				}
+				if (isArray) {
+					let units = new Int32Array(arrayCount);
+					for (let i = 0; i < units.length; i++) units[i] = textureUnit + i;
+					gl.uniform1iv(location, units);
+				} else gl.uniform1i(location, textureUnit);
 			}
 
 			uniformMap[name] = { type, name, location, isArray, arrayCount, integer, isTexture, textureUnit, textures };
@@ -271,8 +277,6 @@ varying highp vec2 position;`;
 		gl.clearColor(0, 0, 0, 0);
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-		gl.useProgram(shaderProgram);
 
 		this.compiled = { shaderProgram, uniformMap };
 
@@ -295,7 +299,7 @@ varying highp vec2 position;`;
 		if (this.c.isContextLost()) return;
 
 		let { shaderProgram, uniformMap } = this.compiled;
-		const c = this.c;
+		const gl = this.c;
 
 		//uniforms in shader
 		for (let arg in uniformData) {
@@ -312,23 +316,17 @@ varying highp vec2 position;`;
 
 			if (u.type === "sampler2D") {
 				if (u.isArray) {
-					let array = [];
 					let arraySize = u.arrayCount;
-					let resolutions = [];
 					let textureUnit = u.textureUnit;
 					let tex = u.textures;
 					for (let i = 0; i < arraySize; i++) {
 						let unit = textureUnit++;
 						this.writeTexture(unit, tex[i], data[i]);
-						array.push(unit);
-						resolutions.push(data[i].width, data[i].height);
 					}
-					c.uniform1iv(location, new Int32Array(array));
 				} else {
 					let unit = u.textureUnit;
 					let tex = u.textures[0];
 					this.writeTexture(unit, tex, data);
-					c.uniform1i(location, unit);
 				}
 			} else {
 
@@ -356,10 +354,10 @@ varying highp vec2 position;`;
 						else bufferData.push(data[i]);
 					}
 					let buffer = new Float32Array(bufferData);
-					c[setFunctionName](location, buffer);
+					gl[setFunctionName](location, buffer);
 				} else {
 					if (vector) c[setFunctionName](location, ...dataKeys.map(key => data[key]));
-					else c[setFunctionName](location, data);
+					else gl[setFunctionName](location, data);
 				}
 			}
 		}
