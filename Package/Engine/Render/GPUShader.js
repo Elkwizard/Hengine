@@ -267,7 +267,6 @@ varying highp vec2 position;`;
 			uniformMap[name] = { type, name, location, isArray, arrayCount, integer, isTexture, textureUnit, textures };
 
 		}
-		console.log(uniformMap);
 
 		gl.clearColor(0, 0, 0, 0);
 		gl.enable(gl.BLEND);
