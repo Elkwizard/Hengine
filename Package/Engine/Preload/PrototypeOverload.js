@@ -154,6 +154,36 @@ Object.defineProperty(window, "title", {
 	proto(String.prototype, "indent", function () {
 		return this.split("\n").map(str => "\t" + str).join("\n");
 	});
+	proto(String.prototype, "inverseMatchAll", function (regex) {
+		let validMap = new Array(this.length).fill(true);
+
+		let result = [];
+
+		let matchAll = this.matchAll(regex);
+		for (let match of matchAll) {
+			let full = match[0];
+			let index = match.index;
+			for (let i = 0; i < full.length; i++) validMap[index + i] = false;
+		}
+
+		for (let i = 0; i < this.length; i++) {
+			let acc = "";
+			let startIndex = i;
+			while (validMap[i]) {
+				acc += this[i];
+				i++;
+			}
+			if (acc.length) {
+				let match = [acc];
+				match.index = startIndex;
+				match.input = this + "";
+				match.groups = undefined;
+				result.push(match);
+			}
+		}
+
+		return result;
+	});
 	(function () {
 		function tabs(str) {
 			let tabs = str.match(/(    |\t)/g);

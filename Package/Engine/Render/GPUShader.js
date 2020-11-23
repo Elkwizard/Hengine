@@ -15,13 +15,40 @@ class GLSLError {
 		return errors.map(string => new GLSLError(string, prefixLength));
 	}
 }
+class GLSLPrecompiler {
+	static compile(glsl) {
+		// remove comments
+
+		//single line
+		glsl = glsl.replace(/\/\/(.*?)(\n|$)/g, "$2");
+
+		//multiline
+		glsl = glsl.replace(/\/\*((.|\n)*?)\*\//g, "");
+
+		// find and replace #defines
+		let preDefineMatches = [...glsl.matchAll(/#define (\w+) (.*?)(?:\n|$)/g)];
+
+		glsl = glsl.replace(/[\t ]*#define (\w+) (.*?)(?:\n|$)/g, "");
+
+		for (let i = 0; i < preDefineMatches.length; i++) {
+			let match = preDefineMatches[i];
+			let name = match[1];
+			let value = match[2];
+			let regex = new RegExp("\\b" + name + "\\b", "g");
+
+			glsl = glsl.replace(regex, value);
+		}
+
+		return glsl;
+	}
+}
 class GPUShader extends ImageType {
 	constructor(width, height, glsl) {
 		super(width, height);
 		this.glsl = glsl;
 		this.compiled = null;
 		this.compileState = { compiled: false, error: null };
-		this.args = { };
+		this.args = {};
 		this.shadeRects = [new Rect(0, 0, width, height)];
 		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
 		this.c = this.image.getContext("webgl");
@@ -146,10 +173,17 @@ class GPUShader extends ImageType {
 					position = vec2((vertexPosition.x + 1.0) * halfWidth, (1.0 - vertexPosition.y) * halfHeight);
 				}
 			`;
-		let uniformMatches = [...this.glsl.matchAll(/uniform(?:\s+(low|medium|high)p)?\s+(sampler2D|int|float|(i?)vec[234])\s+(\w+)\s*(?:\[(\d+)\]|)/g)];
+		this.glsl = GLSLPrecompiler.compile(this.glsl);
+
+
+		// create uniform map
+		let validVarRegex = String.raw`(sampler2D|int|float|(i?)vec[234])\s+(\w+)\s*(?:\[(\d+)\]|)`;
+		let uniformMatches = [...this.glsl.matchAll(new RegExp(String.raw`uniform(?:\s+(low|medium|high)p)?\s+${validVarRegex}`, "g"))];
+
 		let uniforms = [];
 		let uniformProperties = [];
 		let defines = [];
+		this.currentTextureUnit = 0;
 		for (let i = 0; i < uniformMatches.length; i++) {
 			let u = uniformMatches[i];
 			let args = [];
@@ -162,6 +196,7 @@ class GPUShader extends ImageType {
 			let arrayCount = isArray ? args[4] : 0;
 			let properties = [];
 			let textureUnit = this.currentTextureUnit;
+			// properties
 			if (isArray) defines.push(`${name}_length ${arrayCount}`);
 			if (type === "sampler2D") {
 				if (isArray) {
@@ -173,15 +208,18 @@ class GPUShader extends ImageType {
 				}
 			}
 			uniformProperties.push(...properties);
-			uniforms.push({ precision, type, name, isArray, arrayCount, integer, textureUnit, properties: properties.map(p => {
-				let t = p.split(" ")[1];
-				let inx = t.indexOf("[");
-				if (inx > -1) return t.slice(0, inx);
-				else return t;	
-			}) });
+			uniforms.push({
+				precision, type, name, isArray, arrayCount, integer, textureUnit, 
+				properties: properties.map(p => {
+					let t = p.split(" ")[1];
+					let inx = t.indexOf("[");
+					if (inx > -1) return t.slice(0, inx);
+					else return t;
+				})
+			});
 			this.currentTextureUnit = textureUnit;
 		}
-		let uniformMap = { };
+		let uniformMap = {};
 		for (let i = 0; i < uniforms.length; i++) {
 			let u = uniforms[i];
 			uniformMap[u.name] = u;
@@ -248,7 +286,7 @@ class GPUShader extends ImageType {
 		if (arg in this.args) return this.args[arg];
 		else return console.warn("Webgl uniform '" + arg + "' doesn't exist.");
 	}
-	setArguments(uniformData = { }) {
+	setArguments(uniformData = {}) {
 		if (this.c.isContextLost()) return;
 
 		let { shaderProgram, uniformMap } = this.compiled;
@@ -339,7 +377,7 @@ class GPUShader extends ImageType {
 		c.texParameteri(c.TEXTURE_2D, c.TEXTURE_MAG_FILTER, c.LINEAR);
 		c.texParameteri(c.TEXTURE_2D, c.TEXTURE_WRAP_S, c.CLAMP_TO_EDGE);
 		c.texParameteri(c.TEXTURE_2D, c.TEXTURE_WRAP_T, c.CLAMP_TO_EDGE);
-		
+
 		return {
 			width: image.width,
 			height: image.height,
