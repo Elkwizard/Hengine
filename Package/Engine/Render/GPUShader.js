@@ -51,8 +51,8 @@ class GPUShader extends ImageType {
 		this.args = {};
 		this.shadeRects = [new Rect(0, 0, width, height)];
 		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
-		this.c = this.image.getContext("webgl");
-		if (this.c === null) return console.warn("Your browser doesn't support webgl.");
+		this.gl = this.image.getContext("webgl");
+		if (this.gl === null) return console.warn("Your browser doesn't support webgl.");
 		this.image.addEventListener("webglcontextlost", e => {
 			e.preventDefault();
 			console.warn("Webgl Context Lost");
@@ -60,9 +60,11 @@ class GPUShader extends ImageType {
 		this.image.addEventListener("webglcontextrestored", e => {
 			console.warn("Webgl Context Restored");
 			e.preventDefault();
-			this.compile();
-			this.setShadeRects(this.shadeRects);
-			this.setArguments(this.args);
+			if (this._compiled) {
+				this.compile();
+				this.setShadeRects(this.shadeRects);
+				this.setArguments(this.args);
+			}
 		});
 		this.shadingRectPositions = [
 			-1, 1,
@@ -86,7 +88,7 @@ class GPUShader extends ImageType {
 		return this._compiled;
 	}
 	setShadeRects(rects) {
-		if (this.c.isContextLost()) return;
+		if (this.gl.isContextLost()) return;
 
 		this.shadeRects = rects;
 		let a = Vector2.origin;
@@ -117,26 +119,26 @@ class GPUShader extends ImageType {
 		this.loaded = false;
 	}
 	updatePositionBuffer() {
-		if (this.c.isContextLost()) return;
+		if (this.gl.isContextLost()) return;
 
-		const c = this.c;
-		const positionBuffer = c.createBuffer();
-		c.bindBuffer(c.ARRAY_BUFFER, positionBuffer);
+		const gl = this.gl;
+		const positionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 		const positions = this.shadingRectPositions;
-		c.bufferData(c.ARRAY_BUFFER, new Float32Array(positions), c.STATIC_DRAW);
-		let vertexPositionPointer = c.getAttribLocation(this.compiled.shaderProgram, "vertexPosition");
-		c.vertexAttribPointer(vertexPositionPointer, 2, c.FLOAT, false, 0, 0);
-		c.enableVertexAttribArray(vertexPositionPointer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+		let vertexPositionPointer = gl.getAttribLocation(this.compiled.shaderProgram, "vertexPosition");
+		gl.vertexAttribPointer(vertexPositionPointer, 2, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(vertexPositionPointer);
 	}
 	updateResolutionUniforms() {
 		if (!this.compiled) return;
-		if (this.c.isContextLost()) return;
+		if (this.gl.isContextLost()) return;
 
-		const c = this.c;
-		c.uniform2f(this.uniformLocations.resolution, this.width, this.height);
-		c.uniform1f(this.uniformLocations.halfWidth, this.width / 2);
-		c.uniform1f(this.uniformLocations.halfHeight, this.height / 2);
-		c.viewport(0, 0, this.image.width, this.image.height);
+		const gl = this.gl;
+		gl.uniform2f(this.uniformLocations.resolution, this.width, this.height);
+		gl.uniform1f(this.uniformLocations.halfWidth, this.width / 2);
+		gl.uniform1f(this.uniformLocations.halfHeight, this.height / 2);
+		gl.viewport(0, 0, this.image.width, this.image.height);
 	}
 	resize(width, height) {
 		width = Math.max(1, Math.abs(Math.ceil(width)));
@@ -149,17 +151,17 @@ class GPUShader extends ImageType {
 		this.loaded = false;
 	}
 	shade() {
-		if (this.c.isContextLost()) return;
+		if (this.gl.isContextLost()) return;
 
 		this.loaded = true;
-		this.c.clear(this.c.COLOR_BUFFER_BIT);
-		this.c.drawArrays(this.c.TRIANGLE_STRIP, 0, this.amountVertices);
+		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+		this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, this.amountVertices);
 	}
 	compile() {
-		if (this.c.isContextLost()) return;
+		if (this.gl.isContextLost()) return;
 
 		//init
-		const gl = this.c;
+		const gl = this.gl;
 
 		//sources
 		const vertexSource = `
@@ -296,10 +298,10 @@ varying highp vec2 position;`;
 		else return console.warn("Webgl uniform '" + arg + "' doesn't exist.");
 	}
 	setArguments(uniformData = {}) {
-		if (this.c.isContextLost()) return;
+		if (this.gl.isContextLost()) return;
 
 		let { shaderProgram, uniformMap } = this.compiled;
-		const gl = this.c;
+		const gl = this.gl;
 
 		//uniforms in shader
 		for (let arg in uniformData) {
@@ -316,22 +318,13 @@ varying highp vec2 position;`;
 
 			if (u.type === "sampler2D") {
 				if (u.isArray) {
-					let arraySize = u.arrayCount;
-					let textureUnit = u.textureUnit;
-					let tex = u.textures;
-					for (let i = 0; i < arraySize; i++) {
-						let unit = textureUnit++;
-						this.writeTexture(unit, tex[i], data[i]);
-					}
-				} else {
-					let unit = u.textureUnit;
-					let tex = u.textures[0];
-					this.writeTexture(unit, tex, data);
-				}
+					for (let i = 0; i < u.arrayCount; i++) 
+						this.writeTexture(u.textureUnit + i, u.textures[i], data[i]);
+				} else this.writeTexture(u.textureUnit, u.textures[0], data);
 			} else {
-
-				if (u.isArray && data[0] instanceof Color) data = data.map(color => ({ red: color.red / 255, green: color.green / 255, blue: color.blue / 255, alpha: color.alpha }));
-				else if (data instanceof Color) data = { red: data.red / 255, green: data.green / 255, blue: data.blue / 255, alpha: data.alpha };
+				const COLOR_CONVERT = color => new Vector4(color.red / 255, color.green / 255, color.blue / 255, color.alpha);
+				if (u.isArray && data[0] instanceof Color) data = data.map(COLOR_CONVERT);
+				else if (data instanceof Color) data = COLOR_CONVERT(data);
 
 				let singleData;
 				if (u.isArray) singleData = data[0];
@@ -339,7 +332,7 @@ varying highp vec2 position;`;
 
 				let dataKeys = [];
 				for (let key in singleData) dataKeys.push(key);
-				let vector = !(typeof singleData === "number");
+				let vector = typeof singleData !== "number";
 				let setFunctionName = "uniform";
 				setFunctionName += vector ? dataKeys.length : 1;
 				setFunctionName += u.integer ? "i" : "f";
@@ -356,7 +349,7 @@ varying highp vec2 position;`;
 					let buffer = new Float32Array(bufferData);
 					gl[setFunctionName](location, buffer);
 				} else {
-					if (vector) c[setFunctionName](location, ...dataKeys.map(key => data[key]));
+					if (vector) gl[setFunctionName](location, ...dataKeys.map(key => data[key]));
 					else gl[setFunctionName](location, data);
 				}
 			}
@@ -368,7 +361,7 @@ varying highp vec2 position;`;
 		return this.image;
 	}
 	writeTexture(textureUnit, texture, data) {
-		const gl = this.c;
+		const gl = this.gl;
 		gl.activeTexture(gl.TEXTURE0 + textureUnit);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.makeImage());

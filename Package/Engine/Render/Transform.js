@@ -28,7 +28,7 @@ class Transform {
 		return dx > EPSILON || dy > EPSILON || dr > EPSILON;
 	}
 	rotateAround(point, rotation) {
-		let dif = this.position.minus(point);
+		let dif = this.position.Vminus(point);
 		dif.rotate(rotation);
 		dif.add(point);
 		this.position = dif;
@@ -42,18 +42,20 @@ class Transform {
 	}
 	drawInModelSpace(artist, renderer) {
 		let r = this.rotation;
-		renderer.translate(this.position.x, this.position.y);
+		let { x, y } = this.position;
+		renderer.translate(x, y);
 		if (r) renderer.rotate(r);
 		artist();
 		if (r) renderer.rotate(-r);
-		renderer.translate(-this.position.x, -this.position.y);
+		renderer.translate(-x, -y);
 	}
 	drawInWorldSpace(artist, renderer) {
 		let r = this.rotation;
+		let { x, y } = this.position;
 		if (r) renderer.rotate(-r);
-		renderer.translate(-this.position.x, -this.position.y);
+		renderer.translate(-x, -y);
 		artist();
-		renderer.translate(this.position.x, this.position.y);
+		renderer.translate(x, y);
 		if (r) renderer.rotate(r);
 	}
 	drawWithoutRotation(artist, renderer) {

@@ -60,10 +60,9 @@ class Operable {
         let mod = value.constructor.modValues;
         let len = mod.length;
         delete obj[key];
-        let store = value;
         Object.defineProperty(obj, key, {
             set(a) {
-                for (let i = 0; i < len; i++) store[mod[i]] = a[mod[i]];
+                for (let i = 0; i < len; i++) value[mod[i]] = a[mod[i]];
             },
             get() {
                 return value;

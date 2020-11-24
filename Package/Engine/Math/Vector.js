@@ -368,13 +368,8 @@ class Vector3 extends Vector {
 	constructor(x, y, z) {
 		super();
 		this.x = x;
-		if (y !== undefined) {
-			this.y = y;
-			this.z = z;
-		} else {
-			this.y = x;
-			this.z = x;
-		}
+		this.y = y;
+		this.z = z;
 	}	
 	static get left() {
 		return new Vector3(-1, 0, 0);
@@ -419,15 +414,9 @@ class Vector4 extends Vector {
 	constructor(x, y, z, w) {
 		super();
 		this.x = x;
-		if (y !== undefined) {
-			this.y = y;
-			this.z = z;
-			this.w = w;
-		} else {
-			this.y = x;
-			this.z = x;
-			this.w = x;
-		}
+		this.y = y;
+		this.z = z;
+		this.w = w;
 	}
 	static get left() {
 		return new Vector4(-1, 0, 0, 0);

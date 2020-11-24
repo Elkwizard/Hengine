@@ -17,7 +17,7 @@ class WebGLRenderer2D {
 	}
 	// context methods
 	clear() {
-		const gl = this.c;
+		const gl = this.gl;
 		gl.clearColor(1, 1, 1, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 	}
@@ -142,7 +142,7 @@ class WebGLRenderer2D {
 	//internal methods
 	initializeDataStructures() {
 		this.canvas = new_OffscreenCanvas(this.artist.canvas.width, this.artist.canvas.height);
-		this.c = null;
+		this.gl = null;
 		this.screenTransform = Matrix3.identity();
 		this.states = [WebGLRenderer2DState.identity()];
 		this.savedStates = [];
@@ -187,9 +187,9 @@ class WebGLRenderer2D {
 	setup() {
 		this.initializeDataStructures();
 		this.exists = true;
-		this.c = this.canvas.getContext("webgl");
+		this.gl = this.canvas.getContext("webgl");
 
-		const gl = this.c;
+		const gl = this.gl;
 		if (!gl) exit("Your browser does not have Webgl.");
 
 		this.attributes.vertexPositionPointer = 0;
@@ -288,7 +288,7 @@ void main() {
 		}
 	}
 	render() {
-		const gl = this.c;
+		const gl = this.gl;
 
 		gl.uniformMatrix3fv(this.uniforms.screenTransformLocation, false, new Float32Array(this.screenTransform));
 		WebGLRenderer2DState.setStateUniforms(this.states, gl, this.uniforms.stateLocations);
@@ -340,19 +340,19 @@ void main() {
 		return [r / 255, g / 255, b / 255, a];
 	}
 	_updatePositions() {
-		const gl = this.c;
+		const gl = this.gl;
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.positionBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.arrays.positionArray), gl.DYNAMIC_DRAW);
 		gl.vertexAttribPointer(this.attributes.vertexPositionPointer, 2, gl.FLOAT, false, 0, 0);
 	}
 	_updateStateIndices() {
-		const gl = this.c;
+		const gl = this.gl;
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.stateIndexBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.arrays.stateIndexArray), gl.DYNAMIC_DRAW);
 		gl.vertexAttribPointer(this.attributes.vertexStateIndexPointer, 1, gl.FLOAT, false, 0, 0);
 	}
 	_updateIndices() {
-		const gl = this.c;
+		const gl = this.gl;
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.indexBuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int32Array(this.arrays.indexArray), gl.DYNAMIC_DRAW);
 	}

@@ -11,7 +11,7 @@ class WebGLRenderer3D {
 	}
 	initializeDataStructures() {
 		this.canvas = new_OffscreenCanvas(this.artist.canvas.width, this.artist.canvas.height);
-		this.c = null;
+		this.gl = null;
 		this.shadeSmooth = false;
 		this.camera = {
 			position: Vector3.origin,
@@ -28,9 +28,9 @@ class WebGLRenderer3D {
 	setup() {
 		this.initializeDataStructures();
 		this.exists = true;
-		this.c = this.canvas.getContext("webgl");
+		this.gl = this.canvas.getContext("webgl");
 
-		const gl = this.c;
+		const gl = this.gl;
 		if (!gl) exit("Your browser does not have Webgl.");
 
 		//big meshes

@@ -10,7 +10,6 @@ class Texture extends ImageType {
 		for (let i = 0; i < array.length; i++) array[i] = 0;
 		this.imageData = new ImageData(array, this.width, this.height);
 
-		this.changed = false;
 		this.loops = false;
 	}
 	get brightness() {
@@ -67,7 +66,7 @@ class Texture extends ImageType {
 		let coms = [];
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j)]);
 		for (let i = 0; i < coms.length; i++) this.shaderSetPixel(coms[i][0], coms[i][1], coms[i][2]);
-		this.changed = true;
+		this.loaded = false;
 		return this;
 	}
 	getPixelInternal(x, y) {
@@ -83,7 +82,7 @@ class Texture extends ImageType {
 		data[inx + 3] = clr.alpha * 255;
 	}
 	setPixelInternal(x, y, clr) {
-		this.changed = true;
+		this.loaded = false;
 		this.shaderSetPixel(x, y, clr);
 	}
 	setPixel(x, y, clr) {
@@ -121,11 +120,11 @@ class Texture extends ImageType {
 			this.imageData.data[inx + 2] = blue;
 			this.imageData.data[inx + 3] = alpha * 255;
 		}
-		this.changed = false;
+		this.loaded = false;
 	}
 	makeImage() {
-		if (this.changed) {
-			this.changed = false;
+		if (!this.loaded) {
+			this.loaded = true;
 			this.c.putImageData(this.imageData, 0, 0);
 		}
 		return this.image;
@@ -151,7 +150,7 @@ class Texture extends ImageType {
 			else c = a;
 			r.shaderSetPixel(i, j, Color.quadLerp(a, b, c, d, tx, ty));
 		}
-		r.changed = true;
+		r.loaded = false;
 		return r;
 	}
 	clip(x, y, w, h) {
@@ -159,14 +158,14 @@ class Texture extends ImageType {
 		y = Math.round(y);
 		let r = new Texture(w, h);
 		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) r.shaderSetPixel(i, j, this.getPixel(x + i, y + j));
-		r.changed = true;
+		r.loaded = false;
 		return r;
 	}
 	get() {
 		let tex = new Texture(this.width, this.height);
 		tex.pixels = this.pixels.map(v => v.get());
 		tex.updateImageData();
-		tex.changed = true;
+		tex.loaded = false;
 		return tex;
 	}
 	static fromImageType(image, x, y, w, h) {
@@ -203,7 +202,7 @@ class Texture extends ImageType {
 			let a = data[inx + 3] / 255;
 			tex.shaderSetPixel(i, j, new Color(r, g, b, a));
 		}
-		tex.changed = true;
+		tex.loaded = false;
 		return tex;
 	}
 	static grayScale(bright) {
@@ -292,7 +291,7 @@ class Texture extends ImageType {
 			Array.makeMultidimensional(result);
 			tex.pixels = result;
 			tex.updateImageData();
-			tex.changed = true;
+			tex.loaded = false;
 			return tex;
 		}
 		return invToString(str);

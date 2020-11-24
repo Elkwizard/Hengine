@@ -6,7 +6,7 @@ class WebcamCapture extends ImageType {
 		WebcamCapture.getWebcam(this.data);
 		this.lastCaptureTime = -20;
 		this.recording = true;
-		this.image = new OffscreenCanvas(this.width, this.height);
+		this.image = new_OffscreenCanvas(this.width, this.height);
 		this.c = this.image.getContext("2d");
 	}
 	static async getWebcam(home) {
