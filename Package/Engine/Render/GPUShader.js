@@ -10,6 +10,7 @@ class GLSLError {
 		return `line ${this.line}: ${this.desc}`;
 	}
 	static format(string, prefixLength) {
+		console.log(string);
 		let errors = string.split("ERROR: ");
 		errors.shift();
 		return errors.map(string => new GLSLError(string, prefixLength));
@@ -21,7 +22,7 @@ class GLSLPrecompiler {
 
 		//single line
 		glsl = glsl.replace(/\/\/(.*?)(\n|$)/g, "$2");
-
+		
 		//multiline
 		glsl = glsl.replace(/\/\*((.|\n)*?)\*\//g, "");
 
@@ -165,7 +166,7 @@ class GPUShader extends ImageType {
 
 		//sources
 		const vertexSource = `
-				attribute vec4 vertexPosition;
+				attribute highp vec4 vertexPosition;
 
 				uniform highp float halfWidth;
 				uniform highp float halfHeight;
@@ -181,20 +182,25 @@ class GPUShader extends ImageType {
 
 		// study glsl
 
+		this.allUniformNames = [...this.glsl.matchAll(/uniform\s+(?:.*?)\s+(\w+)(?:\s+\=\s+(?:.*?))?;/g)].map(match => match[1]);
+
 		// end studying
 
-		const prefix = `uniform highp vec2 resolution;
+		const prefix = `
+precision highp float;
+precision highp int;
+uniform highp vec2 resolution;
 varying highp vec2 position;`;
 		const pixelSource = `
-				${prefix}
-				${this.glsl}
+${prefix}
+${this.glsl}
 
-				void main() {
-					gl_FragColor = shader();
-					gl_FragColor.rgb *= clamp(gl_FragColor.a, 0.0, 1.0);
-				}
-			`;
+void main() {
+	gl_FragColor = shader();
+	gl_FragColor.rgb *= clamp(gl_FragColor.a, 0.0, 1.0);
+}`;
 		let prefixLength = prefix.split("\n").length + 1;
+
 		//shader programs
 		let error = null;
 		function compileShader(type, source) {
@@ -207,6 +213,7 @@ varying highp vec2 position;`;
 			}
 			return shader;
 		}
+		
 		const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
 		const pixelShader = compileShader(gl.FRAGMENT_SHADER, pixelSource);
 		if (!pixelShader) {
@@ -220,7 +227,6 @@ varying highp vec2 position;`;
 		gl.useProgram(shaderProgram);
 
 		// uniforms
-
 		for (let key in this.uniformLocations) this.uniformLocations[key] = gl.getUniformLocation(shaderProgram, key);
 
 		// user uniforms
@@ -307,7 +313,9 @@ varying highp vec2 position;`;
 		for (let arg in uniformData) {
 			let u = uniformMap[arg];
 			if (u === undefined) {
-				console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+				if (!this.allUniformNames.includes(arg)) {
+					console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+				}
 				continue;
 			}
 			let data = uniformData[arg];

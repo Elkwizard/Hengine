@@ -198,89 +198,33 @@ highp vec4 getInput() {
 		
 		return true;
 	}
-	toOutputByte(float) {
-		float.x = (float.x - this.outputMins[0]) / this.outputFactors[0];
-		float.y = (float.y - this.outputMins[1]) / this.outputFactors[1];
-		float.z = (float.z - this.outputMins[2]) / this.outputFactors[2];
-		float.w = (float.w - this.outputMins[3]) / this.outputFactors[3];
-		return float;
-	}
-	toInputByte(float) {
-		float.x = (float.x - this.inputMins[0]) / this.inputFactors[0];
-		float.y = (float.y - this.inputMins[1]) / this.inputFactors[1];
-		float.z = (float.z - this.inputMins[2]) / this.inputFactors[2];
-		float.w = (float.w - this.inputMins[3]) / this.inputFactors[3];
-		return float;
-	}
-	toOutputFloat(byte) {
-		byte.x = byte.x * this.outputFactors[0] + this.outputMins[0];
-		byte.y = byte.y * this.outputFactors[1] + this.outputMins[1];
-		byte.z = byte.z * this.outputFactors[2] + this.outputMins[2];
-		byte.w = byte.w * this.outputFactors[3] + this.outputMins[3];
-		return byte;
-	}
-	toInputFloat(byte) {
-		byte.x = byte.x * this.inputFactors[0] + this.inputMins[0];
-		byte.y = byte.y * this.inputFactors[1] + this.inputMins[1];
-		byte.z = byte.z * this.inputFactors[2] + this.inputMins[2];
-		byte.w = byte.w * this.inputFactors[3] + this.inputMins[3];
-		return byte;
-	}
-	compute(data) {
+	compute(buffer) {
 		const gl = this.gl;
-		const buffer = GPUComputationBuffer.fromFloatData(this.problemSize, data, this.inputRanges);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.problemWidth, this.problemHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, buffer.buffer);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		gl.readPixels(0, 0, this.problemWidth, this.problemHeight, gl.RGBA, gl.UNSIGNED_BYTE, buffer.buffer);
-		return buffer.toFloatData(this.outputRanges, new Float32Array(data.length * 4));
 	}
-	static asFloat32Array(objects, keys) {
-		let arr = new Float32Array(objects.length * 4);
-		if (keys.length === 1) {
-			let [key0] = keys;
-			for (let i = 0; i < objects.length; i++) {
-				let inx = i * 4;
-				arr[inx] = objects[i][key0];
-			}
-		} else if (keys.length === 2) {
-			let [key0, key1] = keys;
-			for (let i = 0; i < objects.length; i++) {
-				let inx = i * 4;
-				arr[inx] = objects[i][key0];
-				arr[inx + 1] = objects[i][key1];
-			}
-		} else if (keys.length === 3) {
-			let [key0, key1, key2] = keys;
-			for (let i = 0; i < objects.length; i++) {
-				let inx = i * 4;
-				arr[inx] = objects[i][key0];
-				arr[inx + 1] = objects[i][key1];
-				arr[inx + 2] = objects[i][key2];
-			}
-		} else {
-			let [key0, key1, key2, key3] = keys;
-			for (let i = 0; i < objects.length; i++) {
-				let inx = i * 4;
-				arr[inx] = objects[i][key0];
-				arr[inx + 1] = objects[i][key1];
-				arr[inx + 2] = objects[i][key2];
-				arr[inx + 3] = objects[i][key3];
-			}
-		}
-		return arr;
+	createBuffer() {
+		return GPUComputationByteBuffer.create(this.problemSize);
 	}
-	static asObjects(float32Array, keys) {
-		let objects = new Array(float32Array.length / 4);
-		for (let i = 0; i < objects.length; i++) {
-			let inx = i * 4;
-			let obj = { };
-			for (let j = 0; j < keys.length; j++) obj[keys[j]] = float32Array[inx + j];
-			objects[i] = obj;
-		}
-		return objects;
+	writeBufferInput(buffer, inx, data, keys = ["x", "y", "z", "w"]) {
+		inx *= 4;
+		if (keys[0] in data) buffer.buffer[inx] = (data[keys[0]] - this.inputMins[0]) / this.inputFactors[0];
+		if (keys[1] in data) buffer.buffer[inx + 1] = (data[keys[1]] - this.inputMins[1]) / this.inputFactors[1];
+		if (keys[2] in data) buffer.buffer[inx + 2] = (data[keys[2]] - this.inputMins[2]) / this.inputFactors[2];
+		if (keys[3] in data) buffer.buffer[inx + 3] = (data[keys[3]] - this.inputMins[3]) / this.inputFactors[3];
+	}
+	readBufferOutput(buffer, inx, keys = ["x", "y", "z", "w"]) {
+		inx *= 4;
+		const data = { };
+		if (keys[0]) data[keys[0]] = buffer.buffer[inx] * this.outputFactors[0] + this.outputMins[0];
+		if (keys[1]) data[keys[1]] = buffer.buffer[inx + 1] * this.outputFactors[1] + this.outputMins[1];
+		if (keys[2]) data[keys[2]] = buffer.buffer[inx + 2] * this.outputFactors[2] + this.outputMins[2];
+		if (keys[3]) data[keys[3]] = buffer.buffer[inx + 3] * this.outputFactors[3] + this.outputMins[3];
+		return data;
 	}
 }
-class GPUComputationBuffer {
+class GPUComputationByteBuffer {
 	constructor(buffer) {
 		this.length = buffer.length / 4;
 		this.buffer = buffer;
@@ -300,12 +244,12 @@ class GPUComputationBuffer {
 	}
 	get(index) {
 		index *= 4;
-		return new GPUComputationEntry(
+		return new Uint8Array([
 			this.buffer[index],
 			this.buffer[index + 1],
 			this.buffer[index + 2],
 			this.buffer[index + 3]
-		);
+		]);
 	}
 	set(index, value) {
 		index *= 4;
@@ -336,17 +280,17 @@ class GPUComputationBuffer {
 		return result;
 	}
 	static fromByteArray(arr) {
-		return new GPUComputationBuffer(arr);
+		return new GPUComputationByteBuffer(arr);
 	}
 	static create(size) {
-		return new GPUComputationBuffer(new Uint8Array(size * 4));
+		return new GPUComputationByteBuffer(new Uint8Array(size * 4));
 	}
 	static fromByteData(size, data) {
-		let buffer = GPUComputationBuffer.create(size);
+		let buffer = GPUComputationByteBuffer.create(size);
 		buffer.setAll(data);
 	}
 	static fromFloatData(size, data, ranges) {
-		let buffer = GPUComputationBuffer.create(size);
+		let buffer = GPUComputationByteBuffer.create(size);
 		let min0 = ranges[0].min;
 		let min1 = ranges[1].min;
 		let min2 = ranges[2].min;
@@ -368,11 +312,3 @@ class GPUComputationBuffer {
 }
 GPUComputation.SIGNED_BYTES = [new Range(-128, 127), new Range(-128, 127), new Range(-128, 127), new Range(-128, 127)];
 GPUComputation.UNSIGNED_BYTES = [new Range(0, 255), new Range(0, 255), new Range(0, 255), new Range(0, 255)];
-class GPUComputationEntry {
-	constructor(x, y, z, w) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.w = w;
-	}
-}
