@@ -17,18 +17,22 @@ class Random {
     static seedRand(seed) {
         return Random.distribution(seed);
     }
-    static octave(alg, freq, oc, ...sample) {
+    static octave(oc, alg, ...sampleAndFreq) {
+        freq = sampleAndFreq.pop();
+        let sample = sampleAndFreq;
+
         let n = 0;
         let scl = 0;
-        let len = Random[alg].length + 1;
+        alg = Random[alg];
+        let len = alg.length + 1;
         let seed = Random.seed;
         if (len === sample.length) {
             seed = sample[sample.length - 1];
-            sample.length = len - 1;
+            sample.length = alg.length;
         }
         for (let i = 1; i < 1 + oc; i++) {
             scl += 1 / i;
-            n += Random[alg](...sample, freq * i, seed) / i;
+            n += alg(...sample, freq * i, seed) / i;
         }
         return n / scl;
     }

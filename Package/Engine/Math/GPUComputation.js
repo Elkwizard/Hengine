@@ -1,6 +1,7 @@
 class GPUComputation {
-	constructor(dataSize, unitSize, inputKeys, inputRanges, outputRanges, operation) {
+	constructor(dataSize, inputKeys, inputRanges, outputRanges, operation) {
 		this.problemSizeExact = dataSize * 4;
+		let unitSize = inputKeys.length;
 		this.unitSize = unitSize;
 		this.glsl = operation;
 		this.inputRanges = inputRanges;
@@ -140,6 +141,9 @@ class GPUComputation {
 		inputArgString = inputArgString.join(",\n");
 
 		const prefix = `
+precision highp sampler2D;
+precision highp float;
+
 ${textureDeclarationString}
 varying highp vec2 position;
 
@@ -254,7 +258,7 @@ ${inputArgString}
 		inx *= 4;
 		let keys = this.inputKeys;
 		for (let i = 0; i < keys.length; i++) {
-			if (keys[i] in data) buffer[Math.floor(i / 4)].buffer[inx + i % 4] = (data[keys[i]] - this.inputMins[i]) / this.inputFactors[i];
+			buffer[Math.floor(i / 4)].buffer[inx + i % 4] = (data[keys[i]] - this.inputMins[i]) / this.inputFactors[i];
 		}
 	}
 	readBufferOutput(buffer, inx, keys = ["x", "y", "z", "w"]) {

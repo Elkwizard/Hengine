@@ -189,6 +189,8 @@ class GPUShader extends ImageType {
 		const prefix = `
 precision highp float;
 precision highp int;
+precision highp sampler2D;
+
 uniform highp vec2 resolution;
 varying highp vec2 position;`;
 		const pixelSource = `
@@ -302,6 +304,9 @@ void main() {
 	getArgument(arg) {
 		if (arg in this.args) return this.args[arg];
 		else return console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+	}
+	setArgument(arg, value) {
+		this.setArguments({ [arg]: value });
 	}
 	setArguments(uniformData = {}) {
 		if (this.gl.isContextLost()) return;

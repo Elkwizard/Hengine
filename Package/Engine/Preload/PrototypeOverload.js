@@ -67,35 +67,70 @@ Object.defineProperty(window, "title", {
 	});
 	Array.makeMultidimensional = function (arr) {
 		arr.multiDimensional = true;
-		arr.sample = function (...indices) {
+		proto(arr, "sample", function (...indices) {
 			let index = indices[0];
 			indices.shift();
 			if (index in this) return this[index].sample(...indices);
 			return null;
-		}.bind(arr);
-		arr.flatten = function () {
+		}.bind(arr));
+		proto(arr, "flatten", function () {
 			let result = [];
 			for (let i = 0; i < this.length; i++) result.pushArray(this[i].flatten());
 			return result;
-		}.bind(arr);
-		arr[Symbol.iterator] = function* () {
+		}.bind(arr));
+		proto(arr, Symbol.iterator, function* () {
 			let all = this.flatten();
 			for (let i = 0; i < all.length; i++) yield all[i];
-		}.bind(arr);
-		arr.forEach = function (fn, ...coords) {
+		}.bind(arr));
+		proto(arr, "forEach", function (fn, ...coords) {
 			for (let i = 0; i < this.length; i++) this[i].forEach(fn, ...coords, i);
-		}.bind(arr);
-		arr.map = function (fn, ...coords) {
+		}.bind(arr));
+		proto(arr, "map", function (fn, ...coords) {
 			let result = [];
 			Array.makeMultidimensional(result);
 			for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...coords, i));
 			return result;
-		}.bind(arr);
-		arr.fill = function (value) {
+		}.bind(arr));
+		proto(arr, "fill", function (value) {
 			for (let i = 0; i < this.length; i++) this[i].fill(value);
 			return this;
-		}.bind(arr);
+		}.bind(arr));
 	}
+	Array.makeGridString = function (arr) {
+		if (!arr.length) return "";
+
+		let maxWidths = [];
+		for (let i = 0; i < arr.length; i++) maxWidths.push(Math.max(...arr[i].map(w => (w + "").length)) + 2);
+
+		let result = "";
+
+		let vBar = String.fromCharCode(9474);
+
+		for (let j = 0; j < arr[0].length + 1; j++) {
+			if (j) {
+				result += vBar;
+				for (let i = 0; i < arr.length; i++) {
+					let str = ` ${arr[i][j - 1]} `;
+					result += str.padRight(maxWidths[i]) + "|";
+				}
+				result += "\n";
+			}
+			let vBegin = j ? String.fromCharCode(9500) : String.fromCharCode(9484);
+			if (j === arr[0].length) vBegin = String.fromCharCode(9492);
+			result += vBegin;
+			for (let i = 0; i < arr.length; i++) {
+				let v = j ? String.fromCharCode(9532) : String.fromCharCode(9516);
+				if (j === arr[0].length) v = String.fromCharCode(9524);
+				if (i === arr.length - 1) v = String.fromCharCode(9508);
+				if (i === arr.length - 1 && j === arr[0].length) v = String.fromCharCode(9496);
+				if (i === arr.length - 1 && !j) v = String.fromCharCode(9488);
+				result += String.fromCharCode(9472).repeat(maxWidths[i]) + v;
+			}
+			result += "\n";
+		}
+
+		return result;
+	};
 	Array.dim = function (...dims) {
 		let ary = [];
 		if (dims.length > 1) {
@@ -150,6 +185,9 @@ Object.defineProperty(window, "title", {
 	});
 	proto(String.prototype, "pad", function (size) {
 		return " ".repeat(size - this.length) + this;
+	});
+	proto(String.prototype, "padRight", function (size) {
+		return this + " ".repeat(size - this.length);
 	});
 	proto(String.prototype, "indent", function () {
 		return this.split("\n").map(str => "\t" + str).join("\n");
