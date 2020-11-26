@@ -155,7 +155,6 @@ ${inputArgString}
 	);
 }
 `;
-		console.log(prefix);
 		let minVectorO = [];
 		let maxVectorO = [];
 		for (let i = 0; i < this.outputRanges.length; i++) {
@@ -235,7 +234,7 @@ ${inputArgString}
 		// write to textures
 		for (let i = 0; i < this.inputTextureCount; i++) {
 			gl.activeTexture(gl.TEXTURE0 + i);
-			console.log(buffer[i].toFloatData(this.inputRanges, new Float32Array(buffer[i].length * 4)).map(x => Math.round(x * 100) / 100));
+			// console.log(buffer[i].toFloatData(this.inputRanges, new Float32Array(buffer[i].length * 4)).map(x => Math.round(x * 100) / 100));
 			gl.bindTexture(gl.TEXTURE_2D, this.inputTextures[i]);
 			gl.texImage2D(gl.TEXTURE_2D, 0, format, width, height, 0, format, type, buffer[i].buffer);
 		}
