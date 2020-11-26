@@ -1,12 +1,15 @@
 class GPUComputation {
-	constructor(dataSize, unitSize, inputRanges, outputRanges, operation) {
+	constructor(dataSize, unitSize, inputKeys, inputRanges, outputRanges, operation) {
 		this.problemSizeExact = dataSize * 4;
 		this.unitSize = unitSize;
 		this.glsl = operation;
 		this.inputRanges = inputRanges;
 		this.outputRanges = outputRanges;
-		while (this.inputRanges.length < 4) this.inputRanges.push(new Range(0, 255));
-		while (this.outputRanges.length < 4) this.outputRanges.push(new Range(0, 255));
+		
+		let inputTextures = Math.ceil(unitSize / 4);
+
+		while (this.inputRanges.length < inputTextures * 4) this.inputRanges.push(new Range(0, 255));
+		while (this.outputRanges.length < 4	) this.outputRanges.push(new Range(0, 255));
 		this.inputMins = this.inputRanges.map(x => x.min);
 		this.inputFactors = this.inputRanges.map(x => x.length / 255);
 		this.outputMins = this.outputRanges.map(x => x.min);
@@ -15,11 +18,14 @@ class GPUComputation {
 		// get texture size
 		const BUFFER = 16;
 
+		this.inputTextureCount = inputTextures;
+		this.inputKeys = inputKeys;
+
 		let amountPixels = Math.ceil(dataSize / BUFFER) * BUFFER;
 
 		let problemWidth = 1;
 		let problemHeight = 1;
-			
+
 		if (Math.sqrt(amountPixels) % 1) {
 			function primeFactors(number) {
 				if (number < 2) return [];
@@ -59,25 +65,8 @@ class GPUComputation {
 			if (this._compiled) this.compile();
 		});
 
-		this.uniformLocations = {
-			inputTexture: null
-		};
-		const gl = this.gl;
-		this.inputTexture = gl.createTexture();
-
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, this.inputTexture);
-		
-		// wrapping and stretching
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-		// pixel buffer
-		this.pixelBuffer = new Uint8Array(this.problemSize * 4);
-		this.outputBuffer = new Array(this.problemSize * 4);//new Float8Array(this.problemSize * 4);
-	}	
+		this.inputTextures = [];
+	}
 	set compiled(a) {
 		this._compiled = a;
 	}
@@ -91,9 +80,25 @@ class GPUComputation {
 		//init
 		const gl = this.gl;
 
+		// recreate, or just create input textures
+		this.inputTextures = [];
+
+		for (let i = 0; i < this.inputTextureCount; i++) {
+			let tex = gl.createTexture();
+
+			gl.activeTexture(gl.TEXTURE0 + i);
+			gl.bindTexture(gl.TEXTURE_2D, tex);
+
+			// wrapping and stretching
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+			this.inputTextures.push(tex);
+		}
+
 		//sources
-		const SCALE = 1.0;
-		const SCALE_STR = SCALE.toFixed(2);
 		const vertexSource = `
 				attribute vec4 vertexPosition;
 
@@ -101,39 +106,61 @@ class GPUComputation {
 
 				void main() {
 					gl_Position = vertexPosition;
-					position = vec2((vertexPosition.x + 1.0) / 2.0 * ${SCALE_STR}, (vertexPosition.y + 1.0) / 2.0 * ${SCALE_STR});
+					position = vec2((vertexPosition.x + 1.0) / 2.0, (vertexPosition.y + 1.0) / 2.0);
 				}
 			`;
-		
+
 		let minVectorI = [];
-		let maxVectorI = [];
+		let spanVectorI = [];
 		for (let i = 0; i < this.inputRanges.length; i++) {
 			minVectorI.push(this.inputRanges[i].min);
-			maxVectorI.push(this.inputRanges[i].max);
+			spanVectorI.push(this.inputRanges[i].max - this.inputRanges[i].min);
 		}
-		while (minVectorI.length < 4) {
-			minVectorI.push(0);
-			maxVectorI.push(0);
+		minVectorI = minVectorI.map(x => x.toFixed(5));
+		spanVectorI = spanVectorI.map(x => x.toFixed(5));
+
+		let inputFieldString = this.inputRanges.slice(0, this.unitSize).map((r, i) => `\thighp float ${this.inputKeys[i]};`).join("\n");
+		let textureDeclarationString = [];
+		let colorGetterString = [];
+		let inputArgString = [];
+		for (let i = 0; i < this.inputRanges.length / 4; i++) {
+			textureDeclarationString.push(`uniform highp sampler2D inputTexture${i};`);
+			colorGetterString.push(`	highp vec4 color${i} = texture2D(inputTexture${i}, position);`);
+			let num0 = i * 4 + 0;
+			let num1 = i * 4 + 1;
+			let num2 = i * 4 + 2;
+			let num3 = i * 4 + 3;
+			if (num0 < this.unitSize) inputArgString.push(`\t\tcolor${i}.r * ${spanVectorI[num0]} + ${minVectorI[num0]}`);
+			if (num1 < this.unitSize) inputArgString.push(`\t\tcolor${i}.g * ${spanVectorI[num1]} + ${minVectorI[num1]}`);
+			if (num2 < this.unitSize) inputArgString.push(`\t\tcolor${i}.b * ${spanVectorI[num2]} + ${minVectorI[num2]}`);
+			if (num3 < this.unitSize) inputArgString.push(`\t\tcolor${i}.a * ${spanVectorI[num3]} + ${minVectorI[num3]}`);
 		}
-		let minVec4I = `vec4(${minVectorI.map(comp => comp.toFixed(5)).join(", ")})`;
-		let spanVec4I = `vec4(${maxVectorI.map((comp, inx) => (comp - minVectorI[inx]).toFixed(5)).join(", ")})`;
+		textureDeclarationString = textureDeclarationString.join("\n");
+		colorGetterString = colorGetterString.join("\n");
+		inputArgString = inputArgString.join(",\n");
 
 		const prefix = `
-uniform highp sampler2D inputTexture;
+${textureDeclarationString}
 varying highp vec2 position;
-highp vec4 getInput() {
-	return texture2D(inputTexture, position / ${SCALE_STR}) * ${spanVec4I} + ${minVec4I};
+
+struct Input {
+${inputFieldString}
+};
+
+Input getInput() {
+${colorGetterString}
+	
+	return Input(
+${inputArgString}
+	);
 }
 `;
+		console.log(prefix);
 		let minVectorO = [];
 		let maxVectorO = [];
 		for (let i = 0; i < this.outputRanges.length; i++) {
 			minVectorO.push(this.outputRanges[i].min);
 			maxVectorO.push(this.outputRanges[i].max);
-		}
-		while (minVectorO.length < 4) {
-			minVectorO.push(0);
-			maxVectorO.push(0);
 		}
 		let minVec4O = `vec4(${minVectorO.map(comp => comp.toFixed(5)).join(", ")})`;
 		let spanVec4O = `vec4(${maxVectorO.map((comp, inx) => (comp - minVectorO[inx]).toFixed(5)).join(", ")})`;
@@ -143,7 +170,7 @@ highp vec4 getInput() {
 				${this.glsl}
 
 				void main() {
-					gl_FragColor = (compute() - ${minVec4O}) / ${spanVec4O};
+					gl_FragColor = (compute(getInput()) - ${minVec4O}) / ${spanVec4O};
 				}
 			`;
 		let prefixLength = prefix.split("\n").length + 1;
@@ -173,9 +200,9 @@ highp vec4 getInput() {
 
 		// uniforms
 
-		for (let key in this.uniformLocations) this.uniformLocations[key] = gl.getUniformLocation(shaderProgram, key);
-
-		gl.uniform1i(this.uniformLocations.inputTexture, 0);
+		for (let i = 0; i < this.inputTextures.length; i++) {
+			gl.uniform1i(gl.getUniformLocation(shaderProgram, `inputTexture${i}`), i);
+		}
 
 		this.compiled = { shaderProgram };
 
@@ -183,10 +210,10 @@ highp vec4 getInput() {
 		const positionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 		let float32Array = new Float32Array([
-			-1,	 1,
-			 1,	 1,
-			-1,	-1,
-			 1,	-1
+			-1, 1,
+			1, 1,
+			-1, -1,
+			1, -1
 		]);
 		gl.bufferData(gl.ARRAY_BUFFER, float32Array, gl.STATIC_DRAW);
 		// console.log(this.problemWidth, this.problemHeight);
@@ -195,32 +222,50 @@ highp vec4 getInput() {
 		gl.enableVertexAttribArray(vertexPositionPointer);
 
 		this.compileState = { compiled: true, error };
-		
+
 		return true;
 	}
 	compute(buffer) {
 		const gl = this.gl;
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.problemWidth, this.problemHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, buffer.buffer);
+		const width = this.problemWidth;
+		const height = this.problemHeight;
+		const format = gl.RGBA;
+		const type = gl.UNSIGNED_BYTE;
+
+		// write to textures
+		for (let i = 0; i < this.inputTextureCount; i++) {
+			gl.activeTexture(gl.TEXTURE0 + i);
+			console.log(buffer[i].toFloatData(this.inputRanges, new Float32Array(buffer[i].length * 4)).map(x => Math.round(x * 100) / 100));
+			gl.bindTexture(gl.TEXTURE_2D, this.inputTextures[i]);
+			gl.texImage2D(gl.TEXTURE_2D, 0, format, width, height, 0, format, type, buffer[i].buffer);
+		}
+
+		// compute with textures
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-		gl.readPixels(0, 0, this.problemWidth, this.problemHeight, gl.RGBA, gl.UNSIGNED_BYTE, buffer.buffer);
+
+		//read result
+		gl.readPixels(0, 0, width, height, format, type, buffer[0].buffer);
 	}
 	createBuffer() {
-		return GPUComputationByteBuffer.create(this.problemSize);
+		let buffer = [];
+		for (let i = 0; i < this.inputTextureCount; i++) buffer.push(GPUComputationByteBuffer.create(this.problemSize));
+		return buffer;
 	}
-	writeBufferInput(buffer, inx, data, keys = ["x", "y", "z", "w"]) {
+	writeBufferInput(buffer, inx, data) {
 		inx *= 4;
-		if (keys[0] in data) buffer.buffer[inx] = (data[keys[0]] - this.inputMins[0]) / this.inputFactors[0];
-		if (keys[1] in data) buffer.buffer[inx + 1] = (data[keys[1]] - this.inputMins[1]) / this.inputFactors[1];
-		if (keys[2] in data) buffer.buffer[inx + 2] = (data[keys[2]] - this.inputMins[2]) / this.inputFactors[2];
-		if (keys[3] in data) buffer.buffer[inx + 3] = (data[keys[3]] - this.inputMins[3]) / this.inputFactors[3];
+		let keys = this.inputKeys;
+		for (let i = 0; i < keys.length; i++) {
+			if (keys[i] in data) buffer[Math.floor(i / 4)].buffer[inx + i % 4] = (data[keys[i]] - this.inputMins[i]) / this.inputFactors[i];
+		}
 	}
 	readBufferOutput(buffer, inx, keys = ["x", "y", "z", "w"]) {
+		let readBuffer = buffer[0].buffer;
 		inx *= 4;
-		const data = { };
-		if (keys[0]) data[keys[0]] = buffer.buffer[inx] * this.outputFactors[0] + this.outputMins[0];
-		if (keys[1]) data[keys[1]] = buffer.buffer[inx + 1] * this.outputFactors[1] + this.outputMins[1];
-		if (keys[2]) data[keys[2]] = buffer.buffer[inx + 2] * this.outputFactors[2] + this.outputMins[2];
-		if (keys[3]) data[keys[3]] = buffer.buffer[inx + 3] * this.outputFactors[3] + this.outputMins[3];
+		const data = {};
+		if (keys[0]) data[keys[0]] = readBuffer[inx] * this.outputFactors[0] + this.outputMins[0];
+		if (keys[1]) data[keys[1]] = readBuffer[inx + 1] * this.outputFactors[1] + this.outputMins[1];
+		if (keys[2]) data[keys[2]] = readBuffer[inx + 2] * this.outputFactors[2] + this.outputMins[2];
+		if (keys[3]) data[keys[3]] = readBuffer[inx + 3] * this.outputFactors[3] + this.outputMins[3];
 		return data;
 	}
 }
@@ -272,9 +317,9 @@ class GPUComputationByteBuffer {
 			let inx = i * 4;
 			if (inx > result.length - 3) break;
 			result[inx] = this.buffer[inx] * factor0 + min0,
-			result[inx + 1] = this.buffer[inx + 1] * factor1 + min1,
-			result[inx + 2] = this.buffer[inx + 2] * factor2 + min2,
-			result[inx + 3] = this.buffer[inx + 3] * factor3 + min3
+				result[inx + 1] = this.buffer[inx + 1] * factor1 + min1,
+				result[inx + 2] = this.buffer[inx + 2] * factor2 + min2,
+				result[inx + 3] = this.buffer[inx + 3] * factor3 + min3
 		}
 
 		return result;
