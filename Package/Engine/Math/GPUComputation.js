@@ -53,7 +53,7 @@ class GPUComputation {
 
 		// webgl
 		this.image = new_OffscreenCanvas(problemWidth, problemHeight);
-		this.gl = this.image.getContext("webgl");
+		this.gl = this.image.getContext("webgl2");
 		this.compiled = null;
 		if (this.gl === null) return console.warn("Your browser doesn't support webgl.");
 		this.image.addEventListener("webglcontextlost", e => {
@@ -100,10 +100,10 @@ class GPUComputation {
 		}
 
 		//sources
-		const vertexSource = `
-				attribute vec4 vertexPosition;
+		const vertexSource = `#version 300 es
+				in vec4 vertexPosition;
 
-				varying highp vec2 position;
+				out highp vec2 position;
 
 				void main() {
 					gl_Position = vertexPosition;
@@ -125,8 +125,8 @@ class GPUComputation {
 		let colorGetterString = [];
 		let inputArgString = [];
 		for (let i = 0; i < this.inputRanges.length / 4; i++) {
-			textureDeclarationString.push(`uniform highp sampler2D inputTexture${i};`);
-			colorGetterString.push(`	highp vec4 color${i} = texture2D(inputTexture${i}, position);`);
+			textureDeclarationString.push(`uniform sampler2D inputTexture${i};`);
+			colorGetterString.push(`	vec4 color${i} = texture(inputTexture${i}, position);`);
 			let num0 = i * 4 + 0;
 			let num1 = i * 4 + 1;
 			let num2 = i * 4 + 2;
@@ -140,12 +140,13 @@ class GPUComputation {
 		colorGetterString = colorGetterString.join("\n");
 		inputArgString = inputArgString.join(",\n");
 
-		const prefix = `
+		const prefix = `#version 300 es
 precision highp sampler2D;
 precision highp float;
+precision highp int;
 
 ${textureDeclarationString}
-varying highp vec2 position;
+in highp vec2 position;
 
 struct Input {
 ${inputFieldString}
@@ -168,12 +169,13 @@ ${inputArgString}
 		let minVec4O = `vec4(${minVectorO.map(comp => comp.toFixed(5)).join(", ")})`;
 		let spanVec4O = `vec4(${maxVectorO.map((comp, inx) => (comp - minVectorO[inx]).toFixed(5)).join(", ")})`;
 
-		const pixelSource = `
-				${prefix}
+		const pixelSource = `${prefix}
 				${this.glsl}
 
+				out vec4 pixelColor;
+
 				void main() {
-					gl_FragColor = (compute(getInput()) - ${minVec4O}) / ${spanVec4O};
+					pixelColor = (compute(getInput()) - ${minVec4O}) / ${spanVec4O};
 				}
 			`;
 		let prefixLength = prefix.split("\n").length + 1;

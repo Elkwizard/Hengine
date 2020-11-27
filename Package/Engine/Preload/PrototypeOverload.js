@@ -96,41 +96,6 @@ Object.defineProperty(window, "title", {
 			return this;
 		}.bind(arr));
 	}
-	Array.makeGridString = function (arr) {
-		if (!arr.length) return "";
-
-		let maxWidths = [];
-		for (let i = 0; i < arr.length; i++) maxWidths.push(Math.max(...arr[i].map(w => (w + "").length)) + 2);
-
-		let result = "";
-
-		let vBar = String.fromCharCode(9474);
-
-		for (let j = 0; j < arr[0].length + 1; j++) {
-			if (j) {
-				result += vBar;
-				for (let i = 0; i < arr.length; i++) {
-					let str = ` ${arr[i][j - 1]} `;
-					result += str.padRight(maxWidths[i]) + "|";
-				}
-				result += "\n";
-			}
-			let vBegin = j ? String.fromCharCode(9500) : String.fromCharCode(9484);
-			if (j === arr[0].length) vBegin = String.fromCharCode(9492);
-			result += vBegin;
-			for (let i = 0; i < arr.length; i++) {
-				let v = j ? String.fromCharCode(9532) : String.fromCharCode(9516);
-				if (j === arr[0].length) v = String.fromCharCode(9524);
-				if (i === arr.length - 1) v = String.fromCharCode(9508);
-				if (i === arr.length - 1 && j === arr[0].length) v = String.fromCharCode(9496);
-				if (i === arr.length - 1 && !j) v = String.fromCharCode(9488);
-				result += String.fromCharCode(9472).repeat(maxWidths[i]) + v;
-			}
-			result += "\n";
-		}
-
-		return result;
-	};
 	Array.dim = function (...dims) {
 		let ary = [];
 		if (dims.length > 1) {

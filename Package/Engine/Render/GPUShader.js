@@ -10,7 +10,6 @@ class GLSLError {
 		return `line ${this.line}: ${this.desc}`;
 	}
 	static format(string, prefixLength) {
-		console.log(string);
 		let errors = string.split("ERROR: ");
 		errors.shift();
 		return errors.map(string => new GLSLError(string, prefixLength));
@@ -52,7 +51,7 @@ class GPUShader extends ImageType {
 		this.args = {};
 		this.shadeRects = [new Rect(0, 0, width, height)];
 		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
-		this.gl = this.image.getContext("webgl");
+		this.gl = this.image.getContext("webgl2");
 		if (this.gl === null) return console.warn("Your browser doesn't support webgl.");
 		this.image.addEventListener("webglcontextlost", e => {
 			e.preventDefault();
@@ -165,13 +164,13 @@ class GPUShader extends ImageType {
 		const gl = this.gl;
 
 		//sources
-		const vertexSource = `
-				attribute highp vec4 vertexPosition;
+		const vertexSource = `#version 300 es
+				in highp vec4 vertexPosition;
 
 				uniform highp float halfWidth;
 				uniform highp float halfHeight;
 
-				varying highp vec2 position;
+				out highp vec2 position;
 
 				void main() {
 					gl_Position = vertexPosition;
@@ -186,21 +185,23 @@ class GPUShader extends ImageType {
 
 		// end studying
 
-		const prefix = `
+		const prefix = `#version 300 es
 precision highp float;
 precision highp int;
 precision highp sampler2D;
 
 uniform highp vec2 resolution;
-varying highp vec2 position;`;
-		const pixelSource = `
-${prefix}
+in highp vec2 position;`;
+		const pixelSource = `${prefix}
 ${this.glsl}
 
+out highp vec4 pixelColor;
+
 void main() {
-	gl_FragColor = shader();
-	gl_FragColor.rgb *= clamp(gl_FragColor.a, 0.0, 1.0);
-}`;
+	pixelColor = shader();
+	pixelColor.rgb *= clamp(pixelColor.a, 0.0, 1.0);
+}
+`;
 		let prefixLength = prefix.split("\n").length + 1;
 
 		//shader programs
