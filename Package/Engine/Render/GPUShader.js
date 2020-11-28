@@ -312,7 +312,7 @@ void main() {
 	setArguments(uniformData = {}) {
 		if (this.gl.isContextLost()) return;
 
-		let { shaderProgram, uniformMap } = this.compiled;
+		let { uniformMap } = this.compiled;
 		const gl = this.gl;
 
 		//uniforms in shader

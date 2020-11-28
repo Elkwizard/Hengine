@@ -27,7 +27,6 @@ class Hengine {
 		this.resize = true;
 		window.addEventListener("resize", function () {
 			if (this.resize) {
-				let pixelate = this.renderer.preservePixelart;
 				let bound = this.wrapper.getClientRects()[0];
 				if (this.wrapper === document.body) {
 					bound = {
@@ -37,7 +36,6 @@ class Hengine {
 				}
 				this.renderer.width = bound.width;
 				this.renderer.height = bound.height;
-				this.renderer.preservePixelart = pixelate;
 			}
 		}.bind(this));
 	}

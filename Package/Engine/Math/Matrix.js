@@ -15,9 +15,9 @@ class Matrix3 {
 		let c = Math.cos(-t);
 		let s = Math.sin(-t);
 		return [
-			c,	-s,	0,
-			s,	c,	0,
-			0,	0,	1
+			c, -s, 0,
+			s, c, 0,
+			0, 0, 1
 		];
 	}
 	static scale(x, y) {
@@ -54,6 +54,13 @@ class Matrix3 {
 		let matrix = matrices[0];
 		for (let i = 1; i < matrices.length; i++) matrix = Matrix3.mulMatrix(matrix, matrices[i]);
 		return matrix;
+	}
+	static copy(m) {
+		return [
+			m[0], m[1], m[2],
+			m[3], m[4], m[5],
+			m[6], m[7], m[8]
+		];
 	}
 	static stringify(m) {
 		const [topleft, topright, bottomleft, bottomright, vertical] = [9484, 9488, 9492, 9496, 9474].map(num => String.fromCharCode(num));
@@ -186,10 +193,10 @@ class Matrix4 {
 		let cz = Math.cos(z);
 		let sz = Math.sin(z);
 		return [
-			cz * cy,		cz * sy * sx + -sz * cx,	cz * sy * cx + sz * sx,		0,
-			sz * cy,		sz * sy * sx + cz * cx,		sz * sy * cx + cz * -sx,	0,
-			-sy,			cy * sx,					cy * cx,					0,
-			0,				0,							0,							1
+			cz * cy, cz * sy * sx + -sz * cx, cz * sy * cx + sz * sx, 0,
+			sz * cy, sz * sy * sx + cz * cx, sz * sy * cx + cz * -sx, 0,
+			-sy, cy * sx, cy * cx, 0,
+			0, 0, 0, 1
 		];
 	}
 	static translation(x, y, z) {
@@ -208,6 +215,14 @@ class Matrix4 {
 			Matrix4.translation(-ox, -oy, -oz),
 			Matrix4.glRotation(-rx, -ry, -rz)
 		);
+	}
+	static copy(m) {
+		return [
+			m[0], m[1], m[2], m[3],
+			m[4], m[5], m[6], m[7],
+			m[8], m[9], m[10], m[11],
+			m[12], m[13], m[14], m[15]
+		];
 	}
 	static stringify(m) {
 		const [topleft, topright, bottomleft, bottomright, vertical] = [9484, 9488, 9492, 9496, 9474].map(num => String.fromCharCode(num));

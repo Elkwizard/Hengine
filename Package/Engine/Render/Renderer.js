@@ -22,7 +22,7 @@ for (let x in TextModeX) for (let y in TextModeY) {
 	TextMode[y + "_" + x] = [TextModeX[x], TextModeY[y]];
 }
 class ArtistImage extends ImageType {
-	constructor (artist) {
+	constructor(artist) {
 		super(artist.width, artist.height);
 		this.artist = artist;
 	}
@@ -58,6 +58,8 @@ class Artist {
 
 		this.gl3 = new WebGLRenderer3D(this);
 		this.gl2 = new WebGLRenderer2D(this);
+		this.imageRenderer = new WebGLImageRenderer(new_OffscreenCanvas(this.canvas.width, this.canvas.height));
+		this.imageRendererCreated = false;
 
 		this.imageType = imageType || new ArtistImage(this);
 
@@ -629,19 +631,26 @@ class Artist {
 		}
 	}
 	set width(a) {
+		let px = this.preservePixelart;
 		this.canvas.width = a * devicePixelRatio;
 		this.imageType.width = a;
 		if (this.canvas.style) this.canvas.style.width = a + "px";
 		this.c.scale(devicePixelRatio, devicePixelRatio);
+		if (this.imageRendererCreated) this.imageRenderer.canvas.height = this.canvas.height;
+		this.preservePixelart = px;
 	}
 	get width() {
 		return this.canvas.width / devicePixelRatio;
 	}
 	set height(a) {
+		let px = this.preservePixelart;
 		this.canvas.height = a * devicePixelRatio;
 		this.imageType.height = a;
 		if (this.canvas.style) this.canvas.style.height = a + "px";
 		this.c.scale(devicePixelRatio, devicePixelRatio);
+		if (this.imageRendererCreated) this.imageRenderer.canvas.width = this.canvas.width;
+		this.preservePixelart = px;
+
 	}
 	get height() {
 		return this.canvas.height / devicePixelRatio;
@@ -662,6 +671,7 @@ class Artist {
 	}
 	set preservePixelart(a) {
 		this.c.imageSmoothingEnabled = !a;
+		if (this.imageRendererCreated) this.imageRenderer.setImageSmoothing(!a);
 	}
 	get preservePixelart() {
 		return !this.c.imageSmoothingEnabled;
@@ -785,7 +795,7 @@ class Artist {
 		this.c.restore();
 	}
 	clearRect(x, y, w, h) {
-		if (x.width) {
+		if (typeof x === "object") {
 			h = x.height;
 			w = x.width;
 			y = x.y;
@@ -795,6 +805,24 @@ class Artist {
 	}
 	clear() {
 		this.c.clearRect(0, 0, this.width, this.height);
+	}
+	drawImageGPU(image, x, y, w, h, changed = false) {
+		if (typeof x === "object") {
+			changed = h;
+			h = x.height;
+			w = x.width;
+			y = x.y;
+			x = x.x;
+		}
+		if (!this.imageRendererCreated) {
+			this.imageRenderer.setup();
+			this.imageRendererCreated = true;
+		}
+		image = image.makeImage();
+		if (changed) this.imageRenderer.invalidateCache(image);
+		
+		let t = this.c.getTransform();
+		this.imageRenderer.drawImage(image, x, y, w, h, [t.a, t.b, 0, t.c, t.d, 0, t.e, t.f, 1], this.c.globalAlpha);
 	}
 	clearScreen() {
 		this.fill(Color.WHITE);
@@ -810,6 +838,14 @@ class Artist {
 		if (this.gl3.changed) this.c.drawImage(this.gl3.canvas, 0, 0, this.width, this.height);
 		this.gl2.changed = false;
 		this.gl3.changed = false;
+		if (this.imageRendererCreated) {
+			this.imageRenderer.render();
+			// let prev = this.alpha;
+			// this.alpha = 1;
+			this.c.drawImage(this.imageRenderer.canvas, 0, 0, this.width, this.height);
+			// this.alpha = prev;
+			this.imageRenderer.clear();
+		}
 	}
 	fill(color) {
 		this.c.fillStyle = this.getContextColor(color);
@@ -826,9 +862,9 @@ class Artist {
 		this.c.drawImage(cis, x, y, width, height);
 	}
 	drawWithAlpha(a, shape) {
-		this.c.globalAlpha = a;
+		this.alpha = a;
 		shape();
-		this.c.globalAlpha = 1;
+		this.alpha = 1;
 	}
 	compileCommand(drawType, drawArgs, shapeArgs) {
 		let color;
