@@ -64,6 +64,7 @@ class Artist {
 		this.imageType = imageType || new ArtistImage(this);
 
 		this.preservePixelart = true;
+		this.c.imageSmoothingQuality = "high";
 		this.alpha = 1;
 		this.textMode = TextMode.TOP_LEFT;
 		let pathObj = {
@@ -817,18 +818,14 @@ class Artist {
 		}
 		if (!this.imageRendererCreated) {
 			this.imageRenderer.setup();
-			if (this.preservePixelart) this.imageRenderer.setImageSmoothing(false);
+			this.imageRenderer.setImageSmoothing(!this.preservePixelart);
 			this.imageRendererCreated = true;
 		}
 		image = image.makeImage();
 		if (changed) this.imageRenderer.invalidateCache(image);
 		
 		let t = this.c.getTransform();
-		this.imageRenderer.drawImage(image, x, y, w, h, [
-			t.a, t.b, 0, 
-			t.c, t.d, 0, 
-			t.e, t.f, 1
-		], this._globalAlpha);
+		this.imageRenderer.drawImage(image, x, y, w, h, [t.a, t.b, 0, t.c, t.d, 0, t.e, t.f, 1], this._globalAlpha);
 	}
 	clearScreen() {
 		this.fill(Color.WHITE);
