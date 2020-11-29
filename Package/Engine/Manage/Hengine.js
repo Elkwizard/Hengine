@@ -42,6 +42,6 @@ class Hengine {
 	end() {
 		exit("Hengine.end()");
 		let canvas = document.getElementById(this.renderer.canvas.id);
-		if (canvas) canvas.outerHTML = "";
+		if (canvas) canvas.remove();
 	}
 }

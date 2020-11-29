@@ -37,8 +37,6 @@ class WebGLImageRenderer {
 		
 		const { gl, glState } = this;
 
-		
-
 		this.wasSetup = true;
 
 		glState.MAX_TEXTURE_UNITS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);;
@@ -116,6 +114,11 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((x, i) => `\t\tcase ${i}:\n\t
 		glState.positionBuffer = gl.createBuffer();
 		glState.positionPointer = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		glState.positionArray = new Float32Array(amountBufferElements);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, glState.positionBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, glState.positionArray, gl.DYNAMIC_DRAW);
+		gl.vertexAttribPointer(glState.positionPointer, 2, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(glState.positionPointer);
 
 		let transformIndexBuffer = gl.createBuffer();
 		let transformIndexPointer = gl.getAttribLocation(shaderProgram, "vertexTransformIndex");
@@ -203,7 +206,6 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((x, i) => `\t\tcase ${i}:\n\t
 
 		glState.textureIndexMap = new Map();
 
-
 		// same initialization strategy as for texture buffer, but needs to be updated each frame
 		glState.textureIndexBuffer = gl.createBuffer();
 		glState.textureIndexPointer = gl.getAttribLocation(shaderProgram, "vertexTextureIndex");
@@ -234,12 +236,24 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((x, i) => `\t\tcase ${i}:\n\t
 
 		glState.transformLocation = gl.getUniformLocation(shaderProgram, "vertexTransform");
 		glState.transformArray = new Float32Array(9 /* matrix elements */ * glState.MAX_TEXTURE_UNITS /* one transform per image */);
+		/* populate transform array
+			-matrices always in the form:
+				| x x 0 |
+				| x x 0 |
+				| x x 1 |
+		*/
+		for (let i = 0; i < glState.MAX_TEXTURE_UNITS; i++) {
+			glState.transformArray[i * 9 + 8] = 1;
+		}
 
 		glState.alphaLocation = gl.getUniformLocation(shaderProgram, "alpha");
 		glState.alphaArray = new Float32Array(glState.MAX_TEXTURE_UNITS);
+		
 
 		// bind position buffer to all future bufferData calls
 		gl.bindBuffer(gl.ARRAY_BUFFER, glState.positionBuffer);
+
+		this.resize(this.canvas.width, this.canvas.height);
 
 	}
 	clear() {
@@ -292,7 +306,6 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((x, i) => `\t\tcase ${i}:\n\t
 		glState.positionArray[bufferIndex + 10] = x;
 		glState.positionArray[bufferIndex + 11] = y + h;
 
-
 		// texture indices
 		glState.textureIndexArray[indexBufferIndex + 0] = texIndex;
 		glState.textureIndexArray[indexBufferIndex + 1] = texIndex;
@@ -304,13 +317,10 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((x, i) => `\t\tcase ${i}:\n\t
 		// transform elements
 		glState.transformArray[currentTransformIndex + 0] = transform[0];
 		glState.transformArray[currentTransformIndex + 1] = transform[1];
-		glState.transformArray[currentTransformIndex + 2] = transform[2];
 		glState.transformArray[currentTransformIndex + 3] = transform[3];
 		glState.transformArray[currentTransformIndex + 4] = transform[4];
-		glState.transformArray[currentTransformIndex + 5] = transform[5];
 		glState.transformArray[currentTransformIndex + 6] = transform[6];
 		glState.transformArray[currentTransformIndex + 7] = transform[7];
-		glState.transformArray[currentTransformIndex + 8] = transform[8];
 
 		// alpha
 		glState.alphaArray[alphaIndex] = alpha;
@@ -331,23 +341,26 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((x, i) => `\t\tcase ${i}:\n\t
 		glState.textureIndexMap.clear();
 		glState.currentTextureIndex = 0;
 	}
+	resize(width, height) {
+		const { gl, glState } = this;
+
+		this.canvas.width = width;
+		this.canvas.height = height;
+		gl.uniform2f(glState.resolutionLocation, width, height);
+		gl.viewport(0, 0, width, height);
+	}
 	render() {
 		const { gl, glState } = this;
 
 		if (!glState.currentQuadIndex) return;
 
-		gl.uniform2f(glState.resolutionLocation, gl.canvas.width, gl.canvas.height);
-		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
 		gl.bindBuffer(gl.ARRAY_BUFFER, glState.textureIndexBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, glState.textureIndexArray, gl.DYNAMIC_DRAW);
 		gl.vertexAttribPointer(glState.textureIndexPointer, 1, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(glState.textureIndexPointer);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, glState.positionBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, glState.positionArray, gl.DYNAMIC_DRAW);
 		gl.vertexAttribPointer(glState.positionPointer, 2, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(glState.positionPointer);
 
 		gl.uniformMatrix3fv(glState.transformLocation, false, glState.transformArray);
 		gl.uniform1fv(glState.alphaLocation, glState.alphaArray);

@@ -64,6 +64,7 @@ class Artist {
 		this.imageType = imageType || new ArtistImage(this);
 
 		this.preservePixelart = true;
+		this.alpha = 1;
 		this.textMode = TextMode.TOP_LEFT;
 		let pathObj = {
 			circle(x, y, radius) {
@@ -636,7 +637,7 @@ class Artist {
 		this.imageType.width = a;
 		if (this.canvas.style) this.canvas.style.width = a + "px";
 		this.c.scale(devicePixelRatio, devicePixelRatio);
-		if (this.imageRendererCreated) this.imageRenderer.canvas.height = this.canvas.height;
+		if (this.imageRendererCreated) this.imageRenderer.resize(this.canvas.width, this.imageRenderer.canvas.height);
 		this.preservePixelart = px;
 	}
 	get width() {
@@ -648,9 +649,8 @@ class Artist {
 		this.imageType.height = a;
 		if (this.canvas.style) this.canvas.style.height = a + "px";
 		this.c.scale(devicePixelRatio, devicePixelRatio);
-		if (this.imageRendererCreated) this.imageRenderer.canvas.width = this.canvas.width;
+		if (this.imageRendererCreated) this.imageRenderer.resize(this.imageRenderer.canvas.width, this.canvas.height);
 		this.preservePixelart = px;
-
 	}
 	get height() {
 		return this.canvas.height / devicePixelRatio;
@@ -677,10 +677,11 @@ class Artist {
 		return !this.c.imageSmoothingEnabled;
 	}
 	set alpha(a) {
+		this._globalAlpha = a;
 		this.c.globalAlpha = a;
 	}
 	get alpha() {
-		return this.c.globalAlpha;
+		return this._globalAlpha;
 	}
 	setCursor(cursor) {
 		let style = this.canvas.style;
@@ -808,7 +809,7 @@ class Artist {
 	}
 	drawImageGPU(image, x, y, w, h, changed = false) {
 		if (typeof x === "object") {
-			changed = h;
+			changed = y;
 			h = x.height;
 			w = x.width;
 			y = x.y;
@@ -816,13 +817,18 @@ class Artist {
 		}
 		if (!this.imageRendererCreated) {
 			this.imageRenderer.setup();
+			if (this.preservePixelart) this.imageRenderer.setImageSmoothing(false);
 			this.imageRendererCreated = true;
 		}
 		image = image.makeImage();
 		if (changed) this.imageRenderer.invalidateCache(image);
 		
 		let t = this.c.getTransform();
-		this.imageRenderer.drawImage(image, x, y, w, h, [t.a, t.b, 0, t.c, t.d, 0, t.e, t.f, 1], this.c.globalAlpha);
+		this.imageRenderer.drawImage(image, x, y, w, h, [
+			t.a, t.b, 0, 
+			t.c, t.d, 0, 
+			t.e, t.f, 1
+		], this._globalAlpha);
 	}
 	clearScreen() {
 		this.fill(Color.WHITE);
@@ -838,12 +844,13 @@ class Artist {
 		if (this.gl3.changed) this.c.drawImage(this.gl3.canvas, 0, 0, this.width, this.height);
 		this.gl2.changed = false;
 		this.gl3.changed = false;
+
 		if (this.imageRendererCreated) {
 			this.imageRenderer.render();
-			// let prev = this.alpha;
-			// this.alpha = 1;
+			let prev = this.alpha;
+			this.alpha = 1;
 			this.c.drawImage(this.imageRenderer.canvas, 0, 0, this.width, this.height);
-			// this.alpha = prev;
+			this.alpha = prev;
 			this.imageRenderer.clear();
 		}
 	}

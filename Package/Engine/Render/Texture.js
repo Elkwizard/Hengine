@@ -239,7 +239,7 @@ class Texture extends ImageType {
 					let col = new Color(red, green, blue, alpha);
 					tex.setPixel(i, j, col);
 				}
-				img.outerHTML = "";
+				img.remove();
 				resolve(tex);
 			}
 		});
