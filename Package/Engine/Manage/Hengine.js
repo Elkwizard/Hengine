@@ -1,16 +1,16 @@
 class Hengine {
-	constructor(wrapper = document.body) {
+	constructor() {
+		let wrapper = document.body;
+
 		//setup canvas and scene
 		let canvas = document.createElement("canvas");
 		canvas.id = "hengineCanvas";
+		canvas.style.position = "absolute";
 
-		this.wrapper = wrapper;
-		this.wrapper.style.margin = 0;
-		// this.wrapper.style.overflow = "hidden";
-		let bound = wrapper.getClientRects()[0];
-		let W = bound.width;
-		let H = bound.height;
-		this.wrapper.appendChild(canvas);
+		wrapper.style.margin = 0;
+		wrapper.style.overflow = "hidden";
+		
+		wrapper.appendChild(canvas);
 		
 		//Input / Output
 		this.mouse = new MouseHandler(this, canvas);
@@ -18,26 +18,31 @@ class Hengine {
 		this.clipboard = new ClipboardHandler();
 		this.fileSystem = new FileSystem();
 
-		this.renderer = new Artist(canvas, W, H, null);
+		this.renderer = new Artist(canvas, innerWidth, innerHeight, null, this.updateCanvasSizing.bind(this));
+		this.updateCanvasSizing();
+		
 		this.scene = new Scene(new Vector2(0, 0.2), this);
-
+		
 		//update loops
 		this.intervals = new IntervalManager(this);
 
 		this.resize = true;
+
 		window.addEventListener("resize", function () {
 			if (this.resize) {
-				let bound = this.wrapper.getClientRects()[0];
-				if (this.wrapper === document.body) {
-					bound = {
-						width: innerWidth,
-						height: innerHeight
-					};
-				}
-				this.renderer.width = bound.width;
-				this.renderer.height = bound.height;
+				this.renderer.width = innerWidth;
+				this.renderer.height = innerHeight;
 			}
+			this.updateCanvasSizing();
 		}.bind(this));
+	}
+	updateCanvasSizing() {
+		let packed = new Rect(0, 0, innerWidth, innerHeight).largestWithin(this.renderer.width, this.renderer.height);
+		
+		this.renderer.canvas.style.left = packed.x + "px";
+		this.renderer.canvas.style.top = packed.y + "px";
+		this.renderer.canvas.style.width = packed.width + "px";
+		this.renderer.canvas.style.height = packed.height + "px";
 	}
 	end() {
 		exit("Hengine.end()");

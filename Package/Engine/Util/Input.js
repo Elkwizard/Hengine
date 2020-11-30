@@ -176,8 +176,8 @@ class MouseHandler extends InputHandler {
 		}
 		function mouseHandle(e) {
 			if (e.type === "mouseout") handle({
-				x: m.screen.x,
-				y: m.screen.y,
+				x: m.getPageLocation().x,
+				y: m.getPageLocation().y,
 				button: 0,
 				type: "up"
 			});
@@ -192,8 +192,8 @@ class MouseHandler extends InputHandler {
 			e.preventDefault();
 			let p = e.targetTouches[0];
 			if (!p) handle({
-				x: m.screen.x, 
-				y: m.screen.y,
+				x: m.getPageLocation().x, 
+				y: m.getPageLocation().y,
 				button: 0,
 				type: "up"
 			});
@@ -254,15 +254,16 @@ class MouseHandler extends InputHandler {
 		this.onScroll.clear();
 		this.onClick.clear();
 	}
+	getPageLocation() {
+		let bound = this.engine.renderer.canvas.getBoundingClientRect();
+		let scale = this.engine.renderer.width / bound.width;
+		return this.screen.over(scale).plus(bound);
+	}
 	updatePosition(e) {
-		try {
-			let bound = this.engine.renderer.canvas.getBoundingClientRect();
-			this.screen.x = e.x - bound.x;
-			this.screen.y = e.y - bound.y;
-		} catch (e) {
-			this.screen.x = e.x;
-			this.screen.y = e.y;
-		}
+		let bound = this.engine.renderer.canvas.getBoundingClientRect();
+		let scale = this.engine.renderer.width / bound.width;
+		this.screen.x = (e.x - bound.x) * scale;
+		this.screen.y = (e.y - bound.y) * scale;
 	}
 	allowSave() {
 		if (this.listenerRoot) this.listenerRoot.removeEventListener("contextmenu", this.__right__);

@@ -96,8 +96,7 @@ class SceneObject extends SceneElement {
 			let term = "";
 			if (shape instanceof Circle) {
 				term = "C " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.radius.toFixed(0);
-			}
-			if (shape instanceof Rect) {
+			} else if (shape instanceof Rect) {
 				term = "R " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.width.toFixed(0) + " " + shape.height.toFixed(0);
 			} else if (shape instanceof Polygon) {
 				term = "P " + shape.vertices.map(e => e.x.toFixed(0) + "|" + e.y.toFixed(0)).join(" ");

@@ -31,42 +31,28 @@ class ArtistImage extends ImageType {
 	}
 }
 class Artist {
-	constructor(canvas, width, height, imageType) {
+	constructor(canvas, width, height, imageType, onresize = () => null) {
 		this.canvas = canvas;
 
-		if (this.canvas.style) {
-			this.canvas.style.position = "absolute";
-		}
+		this.onresize = onresize;
 
 		this.c = this.canvas.getContext('2d');
 		this.__c = this.c;
 
-		//Device Pixel Ratio
-		if (this.canvas.style) {
-			let w = width;
-			let h = height;
-			this.canvas.style.width = w + "px";
-			this.canvas.style.height = h + "px";
-			this.canvas.width = w * devicePixelRatio;
-			this.canvas.height = h * devicePixelRatio;
-			this.c.scale(devicePixelRatio, devicePixelRatio);
-		} else {
-			this.canvas.width = width;
-			this.canvas.height = height;
-		}
+		this.imageType = imageType || new ArtistImage(this);
+		
+		this.preservePixelart = true;
+		this.c.imageSmoothingQuality = "high";
+		this.alpha = 1;
+		this.textMode = TextMode.TOP_LEFT;
 
+		this.resize(width, height, false);
 
 		this.gl3 = new WebGLRenderer3D(this);
 		this.gl2 = new WebGLRenderer2D(this);
 		this.imageRenderer = new WebGLImageRenderer(new_OffscreenCanvas(this.canvas.width, this.canvas.height));
 		this.imageRendererCreated = false;
 
-		this.imageType = imageType || new ArtistImage(this);
-
-		this.preservePixelart = true;
-		this.c.imageSmoothingQuality = "high";
-		this.alpha = 1;
-		this.textMode = TextMode.TOP_LEFT;
 		let pathObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
@@ -633,25 +619,13 @@ class Artist {
 		}
 	}
 	set width(a) {
-		let px = this.preservePixelart;
-		this.canvas.width = a * devicePixelRatio;
-		this.imageType.width = a;
-		if (this.canvas.style) this.canvas.style.width = a + "px";
-		this.c.scale(devicePixelRatio, devicePixelRatio);
-		if (this.imageRendererCreated) this.imageRenderer.resize(this.canvas.width, this.imageRenderer.canvas.height);
-		this.preservePixelart = px;
+		this.resize(a, this.height);
 	}
 	get width() {
 		return this.canvas.width / devicePixelRatio;
 	}
 	set height(a) {
-		let px = this.preservePixelart;
-		this.canvas.height = a * devicePixelRatio;
-		this.imageType.height = a;
-		if (this.canvas.style) this.canvas.style.height = a + "px";
-		this.c.scale(devicePixelRatio, devicePixelRatio);
-		if (this.imageRendererCreated) this.imageRenderer.resize(this.imageRenderer.canvas.width, this.canvas.height);
-		this.preservePixelart = px;
+		this.resize(this.width, a);
 	}
 	get height() {
 		return this.canvas.height / devicePixelRatio;
@@ -683,6 +657,19 @@ class Artist {
 	}
 	get alpha() {
 		return this._globalAlpha;
+	}
+	resize(width, height, trigger = true) {
+		let px = this.preservePixelart;
+		let al = this.alpha;
+		this.canvas.width = width * devicePixelRatio;
+		this.canvas.height = height * devicePixelRatio;
+		this.imageType.width = width;
+		this.imageType.height = height;
+		this.c.scale(devicePixelRatio, devicePixelRatio);
+		if (this.imageRendererCreated) this.imageRenderer.resize(this.canvas.width, this.canvas.height);
+		this.alpha = al;
+		this.preservePixelart = px;
+		if (trigger) this.onresize();
 	}
 	setCursor(cursor) {
 		let style = this.canvas.style;

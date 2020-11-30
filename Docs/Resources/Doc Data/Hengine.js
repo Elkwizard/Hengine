@@ -8,13 +8,8 @@ load(String.raw`
 	(p)**
 	new Hengine([wrapper])
 	**(/p)
-	(2)Parameters(/2)
-	(p)
-		(param:wrapper $HTMLElement$)A container for the Hengine instance being created. Default is *document.body*.(/param)
-	(/p)
 	(2)Properties(/2)
 	(p)
-		(prop:wrapper $HTMLElement$)The HTMLElement containing the canvas for the #Renderer#.(/prop)
 		(prop:mouse $MouseHandler$)
 			The #MouseHandler# associated with the Hengine instance. 
 			This tracks mouse events and data, such as movement, clicking, and position in both screen space and world space.

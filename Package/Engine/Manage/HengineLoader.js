@@ -135,8 +135,8 @@ function exit(...msg) {
 	IntervalManager.intervals = [];
 }
 class HengineLoader {
-	constructor(wrapper) {
-		this.hengine = new Hengine(wrapper);
+	constructor() {
+		this.hengine = new Hengine();
 
 		//window
 		window.cl = this.hengine.colorLibrary;
@@ -157,11 +157,17 @@ class HengineLoader {
 				}
 			});
 			Object.defineProperty(window, "width", {
+				set: function (a) {
+					hengine.hengine.renderer.width = a;
+				},
 				get: function () {
 					return hengine.hengine.renderer.width;
 				}
 			});
 			Object.defineProperty(window, "height", {
+				set: function (a) {
+					hengine.hengine.renderer.height = a;
+				},
 				get: function () {
 					return hengine.hengine.renderer.height;
 				}
@@ -225,7 +231,7 @@ class HengineLoader {
 
 			document.body.style.width = "100vw";
 			document.body.style.height = "100vh";
-			const hengineLoader = new HengineLoader(document.body);
+			const hengineLoader = new HengineLoader();
 			window.hengineLoader = hengineLoader;
 
 

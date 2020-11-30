@@ -297,6 +297,21 @@ class Rect extends Polygon {
 			this.height = max.y - min.y;
 		}
 	}
+	largestWithin(width, height) {
+		let m = height / width;
+
+		let w, h;
+		
+		if (m * this.width / 2 < this.height / 2) {
+			w = this.width;
+			h = m * this.width;
+		} else {
+			h = this.height;
+			w = this.height / m;
+		}
+
+		return new Rect(this.width / 2 - w / 2, this.height / 2 - h / 2, w, h);
+	}
 	clip(rect) {
 		let xRange = this.xRange.clip(rect.xRange);
 		let yRange = this.yRange.clip(rect.yRange);
