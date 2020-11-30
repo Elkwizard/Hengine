@@ -344,23 +344,26 @@ void main() {
 				if (u.isArray) singleData = data[0];
 				else singleData = data;
 
+				if (singleData === undefined) continue;
+
 				let dataKeys = [];
-				for (let key in singleData) dataKeys.push(key);
+				for (let key of ["x", "y", "z", "w"]) if (key in singleData) dataKeys.push(key);
 				let vector = typeof singleData !== "number";
 				let setFunctionName = "uniform";
-				setFunctionName += vector ? dataKeys.length : 1;
+				let components = vector ? dataKeys.length : 1;
+				setFunctionName += components;
 				setFunctionName += u.integer ? "i" : "f";
 
 
 				if (u.isArray) {
 					setFunctionName += "v";
-					let bufferData = [];
 					let arraySize = u.arrayCount;
-					for (let i = 0; i < arraySize; i++) {
-						if (vector) for (let j = 0; j < dataKeys.length; j++) bufferData.push(data[i][dataKeys[j]]);
-						else bufferData.push(data[i]);
+					let buffer = new Float32Array(arraySize * components);
+					let bufferIndex = 0;
+					for (let i = 0; i < data.length; i++) {
+						if (vector) for (let j = 0; j < dataKeys.length; j++) buffer[bufferIndex++] = data[i][dataKeys[j]];
+						else buffer[bufferIndex++] = data[i];
 					}
-					let buffer = new Float32Array(bufferData);
 					gl[setFunctionName](location, buffer);
 				} else {
 					if (vector) gl[setFunctionName](location, ...dataKeys.map(key => data[key]));
