@@ -3,6 +3,7 @@ load(String.raw`
 	(p)
 		The HengineLoader is a class that loads and sets up a standard configuration for the #Hengine#. 
 		The HengineLoader allows for resources to be loaded in a synchronized way. *.loadResource* is also present on *window*. 
+		The *width* and *height* properties of *.hengine.renderer* are also available on *window*.
 	(/p)
 	(2)Type(/2)
 	(p)**
@@ -10,12 +11,8 @@ load(String.raw`
 	**(/p)
 	(2)Syntax(/2)
 	(p)**
-	new HengineLoader([wrapper])
+	new HengineLoader()
 	**(/p)
-	(2)Parameters(/2)
-	(p)
-		(param:wrapper $HTMLElement$)The wrapper for the #Hengine# being loaded. Default is *document.body*.(/param)
-	(/p)
 	(2)Properties(/2)
 	(p)
 		(prop:hengine $Hengine$)The #Hengine# that was loaded by the HengineLoader. All of the Hengine defined properties of the #Hengine# are also globalized to *window*.(/prop)

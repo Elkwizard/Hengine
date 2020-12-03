@@ -57,6 +57,27 @@ load(String.raw`
 			Compiles the GLSL code. If this succeeds, the method returns true. Otherwise, the method returns false.
 			This method needs to be called before GPUShader's can be drawn.
 		(/method)
+		(method:getArgument@arg@$any$)
+			Gets the value of the specified uniform within the GLSL program.
+			(2)Parameters(/2)
+			(p2)
+				(param:arg $String$)
+					The name of the uniform to get the value of.
+				(/param)
+			(/p2)
+		(/method)
+		(method:setArgument@arg, value@$void$)
+			Sets the value of the given uniform to the given value.
+			(2)Parameters(/2)
+			(p2)
+				(param:arg $String$)
+					The name of the uniform to set the value of.
+				(/param)
+				(param:value $any$)
+					The value to set the uniform to.
+				(/param)
+			(/p2)
+		(/method)
 		(method:setArguments@args@$void$)
 			Sets the value of the specified uniforms within the GLSL program.
 			(2)Parameters(/2)

@@ -5,11 +5,15 @@ load(String.raw`
 	(/p)
 	(2)Type(/2)
 	(p)**
-		class IntervalFunction { ... }
+	class IntervalFunction { ... }
 	**(/p)
+	(2)Subclasses(/2)
+	(p)
+		#ContinuousFunction#, #DelayedFunction#, #TransitionFunction#, #WaitUntilFunction#.
+	(/p)
 	(2)Syntax(/2)
 	(p)**
-		new IntervalFunction(function, duration, type)
+	new IntervalFunction(function, duration, type)
 	**(/p)
 	(2)Parameters(/2)
 	(p)
