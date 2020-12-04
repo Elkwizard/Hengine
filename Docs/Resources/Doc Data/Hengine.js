@@ -3,7 +3,6 @@ load(String.raw`
 	(p)
 		The Hengine represents the highest level container for the elements of the Hengine. 
 		It also serves as the object for accessing the DOM representation of the Hengine's Canvas on the page. 
-		The Hengine's Canvas will be expanded to fit the window with the aspect ratio of *.renderer*.
 	(/p)
 	(2)Type(/2)
 	(p)**
@@ -39,8 +38,12 @@ load(String.raw`
 			The #Scene# that manages all of the #SceneObject#s in the Hengine instance.
 			This manages the physics and camera rendering of all of the #SceneObject#s.
 		(/prop)
-		(prop:resize $Boolean$)
-			Whether or not the *.renderer*'s canvas expands to fill the screen after the browser window changes size.
+		(prop:scalingMode $ScalingMode.Symbol$)
+			How the aspect ratio of the canvas should be preserved when scaling to fit the screen. 
+			For *ScalingMode.STRETCH*, the canvas will expand to fit the edges of the screen, ignoring aspect ratio.
+			For *ScalingMode.PRESERVE_ASPECT_RATIO*, the canvas will expand to fit the edges of the screen while still maintaining aspect ratio.
+			For *ScalingMode.INTEGER_MULTIPLE*, the canvas will expand to fit the edges of the screen, while still maintaining an aspect ratio, and only scaling by integers.
+			Default value is *ScalingMode.STRETCH*.
 		(/prop)
 	(/p)
 	(2)Methods(/2)

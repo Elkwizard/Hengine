@@ -3,7 +3,7 @@ load(String.raw`
 	(p)
 		A GraphPlane is a data structure for storing the visualization of #Graph#s over time. 
 		A GraphPlane can have any number of #Graph#s displayed on it. 
-		GraphPlanes should not be constructed with *new*. 
+		GraphPlanes should not be constructed. 
 		They should be created with *#IntervalManager#.prototype.makeGraphPlane*.
 	(/p)
 	(2)Type(/2)

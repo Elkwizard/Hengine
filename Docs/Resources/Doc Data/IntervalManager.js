@@ -21,7 +21,7 @@ load(String.raw`
 		(prop:fps $Number$readonly)The current amount of frames that are run per second. This value is smoothed, so drastic changes might take around 30 frames to become noticable in this property.(/prop)
 		(prop:rawFps $Number$readonly)The current amount of frames that are run per second. This value is not smoothed.(/prop)
 		(prop:frameCount $Number$readonly)The current amount of frames that have been drawn.(/prop)
-		(prop:fpsGraph $GraphPlane$)A #GraphPlane# that has one #Graph#, which is of *.fps*.(/prop)
+		(prop:fpsGraph $GraphPlane$readonly)A #GraphPlane# that has one #Graph#, which is of *.fps*.(/prop)
 		(prop:performanceData $Boolean$)Whether or not the IntervalManager should track performance data. Default is *true*.(/prop)
 	(/p)
 	(2)Methods(/2)

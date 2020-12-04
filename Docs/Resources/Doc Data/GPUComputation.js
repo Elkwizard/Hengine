@@ -18,7 +18,7 @@ load(String.raw`
 		(param:inputKeys $String[]$)An array of names for each input bytes.(/param)
 		(param:inputRanges $Range[]$)A list of #Range#s for each of the input bytes to be mapped to.(/param)
 		(param:outputRanges $Range[]$)A list of #Range#s for each of the output bytes to be mapped to.(/param)
-		(param:operation $String$)GLSL code that defines a function called *vec4 compute(Input in)*, where *in* is an object that has a property for each input byte, associated with it's name from *inputKeys*.(/param)
+		(param:operation $String$)GLSL code that defines a function called *vec4 compute(Input data)*, where *data* is an object that has a property for each input byte, associated with it's name from *inputKeys*.(/param)
 	(/p)
 	(2)Properties(/2)
 	(p)

@@ -26,6 +26,7 @@ function load(str) {
 
 	str = str.replace(new RegExp(escapeStartParen, "g"), "(").replace(new RegExp(escapeEndParen, "g"), ")");
 	document.getElementById("content").innerHTML = str;
+	document.getElementById("content").scrollTo(0, 0);
 }
 function getLink(name) {
 	return `<a href="javascript:loadPage('${name}')">${name}</a>`;
