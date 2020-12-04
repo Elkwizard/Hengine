@@ -72,7 +72,6 @@ class IntervalManager {
 		this.lastTime = performance.now();
 		this.currentTime = performance.now();
 		this.frameLengths = [];
-		this.frameCount = 0;
 
 		this.graphs = [];
 		this.fpsGraph = this.makeGraphPlane([
@@ -135,7 +134,7 @@ class IntervalManager {
 	transition(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new TransitionFunction(fn, frames, type));
 	}
-	animate(object, property, value, time, curve = t => t, type = IntervalFunction.BEFORE_UPDATE) {
+	animate(object, property, value, time, curve = Interpolation.linear, type = IntervalFunction.BEFORE_UPDATE) {
 		let start = object[property].get();
 		this.transition(t => {
 			object[property] = Interpolation.lerp(start, value, curve(t));

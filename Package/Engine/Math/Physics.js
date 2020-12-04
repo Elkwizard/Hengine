@@ -84,12 +84,14 @@ PhysicsVector.__ = [new PhysicsVector(0, 0), new PhysicsVector(0, 0), new Physic
 
 class PhysicsMath {
     static intersectLine(A, A1, B, B1) {
+
         let m_A = (A1.y - A.y) / (A1.x - A.x);
         let b_A = A.y - m_A * A.x;
         let m_B = (B1.y - B.y) / (B1.x - B.x);
         let b_B = B.y - m_B * B.x;
 
         if (m_A === m_B || (Math.abs(m_A) > INFINITY && Math.abs(m_B) > INFINITY)) {
+
             const nx = -(A1.y - A.y);
             const ny = A1.x - A.x;
             const a_dot_n = nx * A.x + ny * A.y;
@@ -662,9 +664,10 @@ class CollisionDetector {
         }
 
         if (intersections.length >= 2) {
-            let cA = intersections[0];
-            let cB = intersections[1];
-            intersections = [new PhysicsVector((cA.x + cB.x) / 2, (cA.y + cB.y) / 2)];
+            let final = new PhysicsVector(0, 0);
+            for (let i = 0; i < intersections.length; i++) final.add(intersections[i]);
+            final.div(intersections.length);
+            intersections = [final];
         }
 
         let contacts = intersections

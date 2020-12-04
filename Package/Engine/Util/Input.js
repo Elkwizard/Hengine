@@ -257,7 +257,7 @@ class MouseHandler extends InputHandler {
 	getPageLocation() {
 		let bound = this.engine.renderer.canvas.getBoundingClientRect();
 		let scale = this.engine.renderer.width / bound.width;
-		return this.screen.over(scale).plus(bound);
+		return this.screen.over(scale).plus(new Vector2(bound.x, bound.y));
 	}
 	updatePosition(e) {
 		let bound = this.engine.renderer.canvas.getBoundingClientRect();

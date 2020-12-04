@@ -62,10 +62,10 @@ class Range {
 	clip(range) {
 		return new Range(Number.clamp(this.min, range.min, range.max), Number.clamp(this.max, range.min, range.max));
 	}
-	getValueFromInterval(interval) {
+	fromIntervalValue(interval) {
 		return (this.max - this.min) * interval + this.min;
 	}
-	getIntervalValue(value) {
+	toIntervalValue(value) {
 		return (value - this.min) / (this.max - this.min);
 	}
 	getDepth(value) {

@@ -243,6 +243,10 @@ void main() {
 		uniformTypeMap.set(gl.INT_VEC2, { type: "ivec2", integer: true });
 		uniformTypeMap.set(gl.INT_VEC3, { type: "ivec3", integer: true });
 		uniformTypeMap.set(gl.INT_VEC4, { type: "ivec4", integer: true });
+		uniformTypeMap.set(gl.UNSIGNED_INT, { type: "int", integer: true });
+		uniformTypeMap.set(gl.UNSIGNED_INT_VEC2, { type: "ivec2", integer: true });
+		uniformTypeMap.set(gl.UNSIGNED_INT_VEC3, { type: "ivec3", integer: true });
+		uniformTypeMap.set(gl.UNSIGNED_INT_VEC4, { type: "ivec4", integer: true });
 		uniformTypeMap.set(gl.SAMPLER_2D, { type: "sampler2D", integer: false });
 		let uniformCount = gl.getProgramParameter(shaderProgram, gl.ACTIVE_UNIFORMS);
 		let currentTextureUnit = 0;
@@ -347,8 +351,8 @@ void main() {
 				if (singleData === undefined) continue;
 
 				let dataKeys = [];
-				for (let key of ["x", "y", "z", "w"]) if (key in singleData) dataKeys.push(key);
 				let vector = typeof singleData !== "number";
+				if (vector) for (let key of ["x", "y", "z", "w"]) if (key in singleData) dataKeys.push(key);
 				let setFunctionName = "uniform";
 				let components = vector ? dataKeys.length : 1;
 				setFunctionName += components;

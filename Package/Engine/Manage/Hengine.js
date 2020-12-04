@@ -1,3 +1,8 @@
+const ScalingMode = {
+	STRETCH: Symbol("STRETCH"),
+	PRESERVE_ASPECT_RATIO: Symbol("PRESERVE_ASPECT_RATIO"),
+	INTEGER_MULTIPLE: Symbol("INTEGER_MULTIPLE")
+};
 class Hengine {
 	constructor() {
 		let wrapper = document.body;
@@ -18,18 +23,22 @@ class Hengine {
 		this.clipboard = new ClipboardHandler();
 		this.fileSystem = new FileSystem();
 
-		this.renderer = new Artist(canvas, innerWidth, innerHeight, null, this.updateCanvasSizing.bind(this));
-		this.updateCanvasSizing();
+		this.renderer = new Artist(canvas, innerWidth, innerHeight, null, () => {
+			this.updateCanvasSizing();
+			this.scene.camera.position = this.renderer.middle;
+		});
 		
 		this.scene = new Scene(new Vector2(0, 0.2), this);
 		
+		this.updateCanvasSizing();
+
 		//update loops
 		this.intervals = new IntervalManager(this);
 
-		this.resize = true;
+		this.scalingMode = ScalingMode.STRETCH;
 
 		window.addEventListener("resize", function () {
-			if (this.resize) {
+			if (this.scalingMode === ScalingMode.STRETCH) {
 				this.renderer.width = innerWidth;
 				this.renderer.height = innerHeight;
 			}
@@ -39,6 +48,17 @@ class Hengine {
 	updateCanvasSizing() {
 		let packed = new Rect(0, 0, innerWidth, innerHeight).largestWithin(this.renderer.width, this.renderer.height);
 		
+		if (this.scalingMode === ScalingMode.INTEGER_MULTIPLE) {
+			let scale = packed.width / this.renderer.width;
+			if (scale < 1) {
+				let newScale = 1 / Math.ceil(1 / scale);
+				packed = packed.scale(newScale / scale);
+			} else {
+				let newScale = Math.floor(scale);
+				packed = packed.scale(newScale / scale);
+			}
+		}
+
 		this.renderer.canvas.style.left = packed.x + "px";
 		this.renderer.canvas.style.top = packed.y + "px";
 		this.renderer.canvas.style.width = packed.width + "px";

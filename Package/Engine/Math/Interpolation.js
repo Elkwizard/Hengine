@@ -1,12 +1,9 @@
 class Interpolation {
-    static smoothT(t) {
-        return -2 * t * t * t + 3 * t * t;
-    }
     static slerp(a, b, t) {
-        return Interpolation.lerp(a, b, Interpolation.smoothT(t));
+        return Interpolation.lerp(a, b, Interpolation.smooth(t));
     }
     static squadlerp(a, b, c, d, tx, ty) {
-        return Interpolation.quadLerp(a, b, c, d, Interpolation.smoothT(tx), Interpolation.smoothT(ty));
+        return Interpolation.quadLerp(a, b, c, d, Interpolation.smooth(tx), Interpolation.smooth(ty));
     }
     static lerp(a, b, t) {
         return a.times(1 - t).plus(b.times(t));
@@ -30,5 +27,17 @@ class Interpolation {
     }
     static smoothMax(a, b, k = 1) {
         return Interpolation.smoothMin(a, b, -k);
-	}
+    }
+    static linear(t) {
+        return t;
+    }
+    static smooth(t) {
+        return -2 * t ** 3 + 3 * t ** 2;
+    }
+    static increasing(t) {
+        return t ** 2;
+    }
+    static decreasing(t) {
+        return 1 - (1 - t) ** 2;
+    }
 }
