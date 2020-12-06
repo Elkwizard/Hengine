@@ -11,14 +11,14 @@ git clone "https://www.github.com/Elkwizard/Hengine"
 ## Usage
 Before using the Hengine, it must be included in your HTML file in one of two possible ways.
 
-1. Including a script tag pointing to `Hengine/Package/Engine/Manage/Hengine.js`, and linking to an external main Javascript file.
+1. Including a script tag pointing to `Hengine/Package/Engine/Manage/HengineLoader.js`, and linking to an external main Javascript file.
 
     ```html
     app.html:
 
     <html>
         <head>
-            <script src="https://elkwizard.github.io/Hengine/Package/Engine/Manage/Hengine.js"></script>
+            <script src="https://elkwizard.github.io/Hengine/Package/Engine/Manage/HengineLoader.js"></script>
         </head>
         <body>
             <script>
