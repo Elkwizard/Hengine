@@ -12,11 +12,11 @@ class Matrix3 {
 		return new Vector2(x, y);
 	}
 	static rotation(t) {
-		let c = Math.cos(-t);
-		let s = Math.sin(-t);
+		let c = Math.cos(t);
+		let s = Math.sin(t);
 		return [
-			c, -s, 0,
-			s, c, 0,
+			c, s, 0,
+			-s, c, 0,
 			0, 0, 1
 		];
 	}

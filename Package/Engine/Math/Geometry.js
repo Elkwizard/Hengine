@@ -1,5 +1,20 @@
 class Geometry {
-    static smooth(shape) {
+    static smoothConnector(path) {
+        let result = [path[0]];
+        for (let i = 0; i < path.length - 2; i++) {
+            let a = path[i];
+            let b = path[i + 1];
+            let c = path[i + 2];
+            let M = a.plus(c).plus(b.times(6)).over(8);
+
+            result.push(a.plus(b).over(2), M, c.plus(b).over(2));
+        }
+
+        result.push(path[path.length - 1]);
+
+        return result;
+    }
+    static smoothPolygon(shape) {
         let vertices = shape.vertices;
         if (vertices.length <= 2) return shape.get();
         let result = [];

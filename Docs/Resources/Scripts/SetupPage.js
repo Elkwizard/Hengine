@@ -31,6 +31,7 @@ const DOCS = {
 			"ImageType": {},
 			"Frame": {},
 			"HImage": {},
+			"VideoView": {},
 			"Animation": {},
 			"Texture": {},
 			"WebcamCapture": {},
@@ -61,6 +62,7 @@ const DOCS = {
 		},
 		"Range": {},
 		"Vector": {},
+		"Matrix3": {},
 		"Transform": {},
 		"Geometry": {},
 		"Interpolation": {}

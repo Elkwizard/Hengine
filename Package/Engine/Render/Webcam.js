@@ -1,23 +1,23 @@
 class WebcamCapture extends ImageType {
 	constructor() {
 		super(1, 1);
-		this.data = { video: null };
+		this.video = null;
 		this.loaded = false;
-		WebcamCapture.getWebcam(this.data);
+		this.getWebcam();
 		this.lastCaptureTime = -20;
 		this.recording = true;
 		this.image = new_OffscreenCanvas(this.width, this.height);
 		this.c = this.image.getContext("2d");
 	}
-	static async getWebcam(home) {
+	async getWebcam() {
 		const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-		const videoHTML = document.createElement("video");
-		videoHTML.srcObject = mediaStream;
-		videoHTML.oncanplay = function () {
+		this.video = document.createElement("video");
+		this.video.srcObject = mediaStream;
+		this.video.oncanplay = () => {
 			console.log("Webcam Streaming");
-			home.video = videoHTML;
+			this.video = videoHTML;
 		};
-		videoHTML.play();
+		this.video.play();
 	}
 	getFrame() {
 		let image = this.makeImage();
@@ -32,10 +32,10 @@ class WebcamCapture extends ImageType {
 		this.recording = true;
 	}
 	makeImage() {
-		if (this.data.video) {
+		if (this.video) {
 			this.loaded = true;
 			if ((this.recording && performance.now() - this.lastCaptureTime > 16)) {
-				const v = this.data.video;
+				const v = this.video;
 				let mwidth = Math.min(v.videoWidth, v.videoHeight);
 				let ox = (v.videoHeight < v.videoWidth) ? (v.videoWidth - mwidth) / 2 : 0;
 				let oy = (v.videoHeight > v.videoWidth) ? (v.videoHeight - mwidth) / 2 : 0;
@@ -43,7 +43,7 @@ class WebcamCapture extends ImageType {
 				this.height = mwidth;
 				this.image.width = mwidth;
 				this.image.height = mwidth;
-				this.c.drawImage(this.data.video, ox, oy, mwidth, mwidth, 0, 0, mwidth, mwidth);
+				this.c.drawImage(this.video, ox, oy, mwidth, mwidth, 0, 0, mwidth, mwidth);
 				this.lastCaptureTime = performance.now();
 			}
 		}

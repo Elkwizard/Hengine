@@ -98,6 +98,20 @@ class HengineImageResource extends HengineResource {
 		});
 	}
 }
+class HengineVideoResource extends HengineResource {
+	constructor(src, loops) {
+		super(src);
+		this.loops = loops;
+	}
+	load() {
+		const video = new VideoView(this.src, this.loops);
+		return new Promise(function (resolve) {
+			video.video.addEventListener("canplay", () => {
+				resolve(video);
+			});
+		});
+	}
+}
 class HengineAnimationResource extends HengineResource {
 	constructor(src, frames, delay, loops) {
 		super(src);
@@ -237,7 +251,8 @@ class HengineLoader {
 
 			for (let i = 0; i < userResources.length; i++) {
 				const resource = await userResources[i].load();
-				if (!resource) console.warn(`LOADING FAILED FOR RESOURCE [${userResources[i].src}]`);
+				if (resource) console.log(`LOADED RESOURCE [${userResources[i].src}]`);
+				else console.warn(`LOADING FAILED FOR RESOURCE [${userResources[i].src}]`);
 				hengineLoader.resources.set(userResources[i].src, resource);
 			}
 		}
@@ -257,7 +272,7 @@ HengineLoader.engineResources = [
 
 	"Math/Interpolation", "Math/Random", "Math/Matrix", "Math/Vector", "Math/Geometry", "Math/Physics", "Math/PhysicsAPI",
 
-	"Render/Color", "Render/Transform", "Render/Shapes", "Render/Spline", "Render/Gradient", "Render/GrayMap", "Render/Frame", "Render/Animation", "Render/Texture", "Render/Webcam", "Render/GPUShader", "Math/GPUComputation", "Render/WebGLImageRenderer", "Render/Font", "Render/WebGLRenderer2D", "Render/WebGLRenderer3D", "Render/Renderer", "Render/Graph", "Render/Mesh", "Render/Camera",
+	"Render/Color", "Render/Transform", "Render/Shapes", "Render/Spline", "Render/Gradient", "Render/GrayMap", "Render/Frame", "Render/Animation", "Render/Texture", "Render/Webcam", "Render/VideoView", "Render/GPUShader", "Math/GPUComputation", "Render/WebGLImageRenderer", "Render/Font", "Render/WebGLRenderer2D", "Render/WebGLRenderer3D", "Render/Renderer", "Render/Graph", "Render/Mesh", "Render/Camera",
 
 	"Util/Input", "Util/Sound", "Util/Time", "Util/LocalFileSystem",
 

@@ -11,7 +11,7 @@ load(String.raw`
 	**(/p)
 	(2)Subclasses(/2)
 	(p)
-		#HImage#, #Frame#, #Animation#, #WebcamCapture#, #Texture#, #GraphPlane#, #GPUShader#.
+		#HImage#, #VideoView#, #Frame#, #Animation#, #WebcamCapture#, #Texture#, #GraphPlane#, #GPUShader#.
 	(/p)
 	(2)Properties(/2)
 	(p)
