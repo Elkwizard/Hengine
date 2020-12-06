@@ -1,0 +1,98 @@
+<script src="https://elkwizard.github.io/Hengine/Hengine.js">
+	title = "Hengine Demos - Shaders";
+
+	hengine.scalingMode = ScalingMode.PRESERVE_ASPECT_RATIO;
+	const CODE_INPUT = new ElementScript("CODE_INPUT", {
+		init(l) {
+			this.draw = () => null;
+			TEXT_AREA.addTo(codeInput, new Font(20, "Monospace"));
+		},
+		update(l) {
+
+		},
+		draw(l, name, shape) {
+			renderer.draw(Color.DARK_GRAY).rect(shape);
+			renderer.stroke(Color.WHITE).rect(shape);
+		}
+	});
+	const codeInput = scene.main.addUIElement("codeInput", width * 0.75, height / 2, width / 2, height);
+	CODE_INPUT.addTo(codeInput);
+	codeInput.scripts.TEXT_AREA.setValue(`uniform float time;
+uniform vec2 mouse;
+
+vec4 shader() {
+	vec2 uv = position / resolution;
+	return vec4(uv, 1.0, 1.0);
+}`);
+	let lastValue = "";
+	const F = 1;
+	let shader = new GPUShader(width / 2 / F, height / F, "");
+	renderer.background = Color.BLACK;
+	codeInput.scripts.TEXT_AREA.alwaysIgnore("Alt");
+	let time = 0;
+	const l = codeInput.scripts.TEXT_AREA;
+	l.caretColor = Color.WHITE;
+	l.highlightColor = new Color(255, 255, 255, 0.4);
+	let webcam = null;
+
+
+	let bold = codeInput.scripts.TEXT_AREA.font.family.toLowerCase() === "monospace";
+	let boldFont = codeInput.scripts.TEXT_AREA.font.get();
+	if (bold) boldFont.bold = true;
+
+	function highlight(text, font, color, regex, inverse, getLoc) {
+		let matches = text[inverse ? "inverseMatchAll" : "matchAll"](regex);
+		for (let match of matches) {
+			let text = match[0];
+			let inx = match.index;
+			let pos = getLoc(inx);
+			let bounds = font.getTextBounds(text);
+			// renderer.stroke(Color.BLUE).rect(pos.plus(l.renderTextOffset).x, pos.plus(l.renderTextOffset).y, bounds.width, bounds.height);
+			renderer.draw(color).textLine(font, text, pos.plus(l.renderTextOffset));
+		}
+	}
+	l.renderTextOffset = new Vector2(50, 0);
+	l.renderText = (text, font, pos, getLoc, lineIndex) => {
+		//renderer.draw(Color.LIGHT_GRAY).textLine(font, text, pos.plus(l.renderTextOffset));
+		renderer.draw(Color.WHITE).textLine(font, lineIndex + 1, pos);
+		let startTabs = text.match(/^\t+/g);
+		if (startTabs) {
+			startTabs = startTabs[0].length;
+			let tabWidth = font.getTextWidth("\t");
+			for (let i = 0; i < startTabs; i++) renderer.stroke(Color.GRAY).line(i * tabWidth + pos.x + l.renderTextOffset.x, pos.y + l.renderTextOffset.y, i * tabWidth + pos.x + l.renderTextOffset.x, pos.y + l.renderTextOffset.y + font.lineHeight);
+		}
+		let functionRegex = String.raw`\b(?:(?:a?(?:sin|cos|tan))|length|dot|cross|texture|clamp|normalize|min|max|ceil|smoothstep|round|floor|mod|sqrt|mix|pow|abs|float|int|sampler2D|mat[234]|(?:(?:i|b|)vec[234]))\b`;
+		let keywordRegex = String.raw`\b(?:return|struct|void|in|out|(?:low|medium|high)p|uniform|position|resolution|shader|for|continue|break|if|else|define)\b`;
+		let primitiveRegex = String.raw`\b((?:\d+(?:\.\d+)?)|(?:true|false))\b`;
+		let symbolRegex = String.raw`(?:[^\w\s]+)`;
+		let commentRegex = String.raw`(?:\/\/(?:.*))|(?:\/\*(?:.*?)(?:$|\*\/))|(?:(^|\/\*)(?:.*?)\*\/)`;
+
+		highlight(text, font, Color.SKY_BLUE, new RegExp(functionRegex, "g"), false, getLoc);
+		highlight(text, font, Color.WHITE, new RegExp(symbolRegex, "g"), false, getLoc);
+		highlight(text, font, Color.PURPLE.plus(Color.LIGHT_GRAY.over(3)), new RegExp(keywordRegex, "g"), false, getLoc);
+		highlight(text, font, Color.MAGENTA, new RegExp(primitiveRegex, "g"), false, getLoc);
+		highlight(text, boldFont, Color.GREEN, new RegExp(commentRegex, "g"), false, getLoc);
+		highlight(text, font, Color.LIGHT_GRAY, new RegExp(`(${[commentRegex, symbolRegex, primitiveRegex, keywordRegex, functionRegex].join("|")})`, "g"), true, getLoc);
+	};
+	hengine.intervals.continuous(function () {
+		if (!shader.glsl || (keyboard.pressed("Alt") && keyboard.justPressed("Enter"))) {
+			if (keyboard.justPressed("Enter")) codeInput.scripts.TEXT_AREA.ignore("Enter");
+			shader.glsl = codeInput.scripts.TEXT_AREA.getValue();
+			shader.compile();
+			time = 0;
+		}
+		if (shader.argumentExists("webcam") && !webcam) webcam = new WebcamCapture();
+		time++;
+		let args = { time, mouse: mouse.screen };
+		if (shader.argumentExists("webcam")) args.webcam = webcam;
+		shader.setArguments(args);
+		renderer.image(shader).rect(0, 0, width / 2, height);
+		renderer.textMode = TextMode.BOTTOM_LEFT;
+		renderer.draw(Color.RED).textLine(Font.Monospace40, hengine.intervals.fps, 10, height - 10);
+		renderer.textMode = TextMode.TOP_LEFT;
+		renderer.draw(Color.BLACK).textLine(Font.Monospace30, "Press Alt + Enter to compile and run shader", 10, 10);
+		renderer.textMode = TextMode.TOP_LEFT;
+		if (shader.compileState.error) renderer.draw(Color.RED).text(new Font(30, "Monospace"), shader.compileState.error.map(e => e.toString()).join("\n\n"), 10, 10, shader.width - 20);
+	}, IntervalFunction.UPDATE);
+
+</script>

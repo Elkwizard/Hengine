@@ -1,0 +1,9 @@
+<script src="https://elkwizard.github.io/Hengine/Hengine.js">
+	title = "Hengine Demos - Hello World";
+	
+	renderer.textMode = TextMode.CENTER_CENTER; // Text will be drawn relative to its center
+
+	intervals.continuous(() => {
+		renderer.draw(Color.BLACK).text(Font.Arial50, "Hello World!", middle); // Draw "Hello World" to the middle of the screen
+	});
+</script>
