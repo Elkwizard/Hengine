@@ -41,7 +41,7 @@ Before using the Hengine, it must be included in your HTML file in one of two po
 	});
 	```
 
-	2. Including a script tag pointing to `Hengine/Hengine.js` with the main Javascript code embedded within.
+2. Including a script tag pointing to `Hengine/Hengine.js` with the main Javascript code embedded within.
 
 	```html
 	compactApp.html:
