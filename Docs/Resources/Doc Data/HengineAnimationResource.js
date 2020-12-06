@@ -9,7 +9,7 @@ load(String.raw`
 	**(/p)
 	(2)Syntax(/2)
 	(p)**
-	new HengineAnimationResource(src)
+	new HengineAnimationResource(src, frames, delay, loops)
 	**(/p)
 	(2)Parameters(/2)
 	(p)

@@ -6,6 +6,7 @@ const DOCS = {
 			"HengineResource": {},
 			"HengineImageResource": {},
 			"HengineAnimationResource": {},
+			"HengineVideoResource": {},
 			"HengineScriptResource": {}
 		},
 		"Intervals": {

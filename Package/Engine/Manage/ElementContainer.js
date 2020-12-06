@@ -164,13 +164,12 @@ class ElementContainer extends SceneElement {
 		this.elements.set(name, n);
 		return n;
 	}
-	addUIElement(name, x, y, width, height, draw = this.defaults.UIObject.draw) {
+	addUIElement(name, x, y, width, height) {
 		name = this.genName(this.elements, name);
 		let n = new UIObject(name, x, y, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
-		n.draw = draw.bind(n);
 		return n;
 	}
 	addContainer(name, active = true) {
