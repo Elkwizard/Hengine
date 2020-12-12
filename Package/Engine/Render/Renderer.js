@@ -1,12 +1,4 @@
-class Vertex {
-	constructor(x, y) {
-		this.x = x;
-		this.y = y;
-	}
-	toString() {
-		return "(" + this.x + ", " + this.y + ")";
-	}
-}
+// Text Modes
 const TextModeX = {
 	LEFT: Symbol("LEFT"),
 	CENTER: Symbol("CENTER"),
@@ -21,6 +13,13 @@ const TextMode = {};
 for (let x in TextModeX) for (let y in TextModeY) {
 	TextMode[y + "_" + x] = [TextModeX[x], TextModeY[y]];
 }
+
+// Blend Modes
+const BlendMode = {
+	COMBINE: Symbol("COMBINE"),
+	ADD: Symbol("ADD")
+};
+
 class ArtistImage extends ImageType {
 	constructor(artist) {
 		super(artist.width, artist.height);
@@ -37,7 +36,6 @@ class Artist {
 		this.onresize = onresize;
 
 		this.c = this.canvas.getContext('2d');
-		this.__c = this.c;
 
 		this.imageType = imageType || new ArtistImage(this);
 		
@@ -645,11 +643,24 @@ class Artist {
 		return TextMode[vy + "_" + vx];
 	}
 	set preservePixelart(a) {
+		this._preservePixelart = a;
 		this.c.imageSmoothingEnabled = !a;
 		if (this.imageRendererCreated) this.imageRenderer.setImageSmoothing(!a);
 	}
 	get preservePixelart() {
-		return !this.c.imageSmoothingEnabled;
+		return this._preservePixelart;
+	}
+	set blendMode(a) {
+		this._blendMode = a;
+		this.c.globalCompositeOperation = {
+			[BlendMode.COMBINE]: "source-over",
+			[BlendMode.ADD]: "lighter"
+		}[a];
+		if (this.imageRendererCreated) this.imageRenderer.setBlendMode(a);
+
+	}
+	get blendMode() {
+		return this._blendMode;
 	}
 	set alpha(a) {
 		this._globalAlpha = a;
@@ -657,6 +668,27 @@ class Artist {
 	}
 	get alpha() {
 		return this._globalAlpha;
+	}
+	set transform(a) {
+		const m = Matrix3.mulMatrix(
+			Matrix3.scale(devicePixelRatio, devicePixelRatio, Matrix3.temp[0]),
+			a,
+			Matrix3.temp[1]
+		);
+		this.c.setTransform(m[0], m[1], m[3], m[4], m[6], m[7]);
+	}
+	get transform() {
+		const t = this.c.getTransform();
+		const ratio = 1 / devicePixelRatio;
+		return Matrix3.mulMatrix(
+			Matrix3.scale(ratio, ratio, Matrix3.temp[1]),
+			Matrix3.matrix(
+				t.a, 	t.c,	t.e, 
+				t.b, 	t.d, 	t.f, 
+				0, 		0, 		1, 
+				Matrix3.temp[0]
+			)
+		);
 	}
 	resize(width, height, trigger = true) {
 		let px = this.preservePixelart;
@@ -721,7 +753,9 @@ class Artist {
 			y = x.y;
 			x = x.x;
 		}
-		this.drawImage(this.imageStyle, x, y, w, h);
+		let cis = this.imageStyle.makeImage(); //CanvasImageSource
+		if (!this.imageStyle.loaded) return;
+		this.c.drawImage(cis, x, y, w, h);
 	}
 	image(img) {
 		this.imageStyle = img;
@@ -733,13 +767,6 @@ class Artist {
 	}
 	unclip() {
 		this.restore();
-	}
-	embody(frame) {
-		this.__c = this.c;
-		this.c = frame.c.c;
-	}
-	unembody() {
-		this.c = this.__c;
 	}
 	contentToFrame() {
 		let n = new Frame(this.width, this.height);
@@ -805,7 +832,8 @@ class Artist {
 		}
 		if (!this.imageRendererCreated) {
 			this.imageRenderer.setup();
-			this.imageRenderer.setImageSmoothing(!this.preservePixelart);
+			this.imageRenderer.setImageSmoothing(this.c.imageSmoothingEnabled);
+			this.imageRenderer.setImageSmoothing(this.c.globalCompositeOperation);
 			this.imageRendererCreated = true;
 		}
 		image = image.makeImage();
@@ -848,9 +876,7 @@ class Artist {
 		this.translate(-x, -y);
 	}
 	drawImage(img, x, y, width, height) {
-		let cis = img.makeImage(); //CanvasImageSource
-		if (!img.loaded) return;
-		this.c.drawImage(cis, x, y, width, height);
+		
 	}
 	drawWithAlpha(a, shape) {
 		this.alpha = a;

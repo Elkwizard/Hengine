@@ -214,6 +214,8 @@ class PolygonCollider {
         return poly;
     }
 }
+PolygonModel.SYMBOL = Symbol("POLYGON");
+
 class CircleModel {
     constructor(x, y, radius) {
         this.position = new PhysicsVector(x, y);
@@ -241,26 +243,40 @@ class CircleCollider {
         return circ;
     }
 }
+CircleModel.SYMBOL = Symbol("CIRCLE");
 
 //grid
-class Grid {
+class PhysicsGrid {
     constructor(cellsize) {
         this.cellsize = cellsize;
-        this.cells = [];
+        this.cells = new Map();
+        this.queryFoundMap = new Map();
     }
-    addShape(x, y, shape) {
-        if (this.cells[x] === undefined) this.cells[x] = [];
-        if (this.cells[x][y] === undefined) this.cells[x][y] = [];
-        this.cells[x][y].push(shape);
+    addBody(x, y, body) {
+        if (!this.cells.has(x)) this.cells.set(x, new Map());
+        let column = this.cells.get(x);
+        if (!column.has(y)) column.set(y, []);
+        column.get(y).push(body);
     }
-    query(body, cells) {
+    query(body, cells, filter) {
         let bodies = [];
         let found = [];
         found[body.id] = true;
         for (let i = 0; i < cells.length; i++) {
+            // expansion of: bodies.push(...this.cells[cl.x][cl.y].filter(b => (!found[b.id] && filter(b)) ? found[b.id] = true : false));
             let cl = cells[i];
-            bodies.push(...this.cells[cl.x][cl.y].filter(b => !found[b.id] ? found[b.id] = true : false));
+            let cellBodies = this.cells.get(cl.x).get(cl.y);
+            for (let j = 0; j < cellBodies.length; j++) {
+                const b = cellBodies[j];
+                const id = b.id;
+                if (!(id in found)) {
+                    found[id] = true;
+                    if (filter(b)) bodies.push(b);
+                }
+            }
         }
+        if (!window.count) window.count = 0;
+        window.count += cells.length;
         return bodies;
     }
     cellsBounds(body, bounds) {
@@ -274,7 +290,7 @@ class Grid {
         let rx = endX - startX;
         let ry = endY - startY;
         for (let i = 0; i <= rx; i++) for (let j = 0; j <= ry; j++) {
-            this.addShape(startX + i, startY + j, body);
+            this.addBody(startX + i, startY + j, body);
             cells.push({ x: startX + i, y: startY + j });
         }
         return cells;
@@ -506,10 +522,8 @@ RigidBody.nextID = 0;
 //detection
 class CollisionDetector {
     static collide(shapeA, shapeB, arg) {
-        // renderer.stroke(Color.LIME).rect(shapeA.bounds);
-        // renderer.stroke(Color.BLUE).rect(shapeB.bounds);
         if (Bounds.notOverlap(shapeA.bounds, shapeB.bounds)) return null;
-        return this[shapeA.constructor.name + "_" + shapeB.constructor.name](shapeA, shapeB, arg);
+        return CollisionDetector.jumpTable[shapeA.constructor.SYMBOL][shapeB.constructor.SYMBOL](shapeA, shapeB, arg);
     }
     static CircleModel_PolygonModel(a, b, _unused) {
         //CLOSEST POINT
@@ -705,6 +719,16 @@ CollisionDetector.Contact = class {
         this.penetration = penetration;
     }
 }
+CollisionDetector.jumpTable = {
+    [PolygonModel.SYMBOL]: {
+        [PolygonModel.SYMBOL]: CollisionDetector.PolygonModel_PolygonModel,
+        [CircleModel.SYMBOL]: CollisionDetector.PolygonModel_CircleModel
+    },
+    [CircleModel.SYMBOL]: {
+        [PolygonModel.SYMBOL]: CollisionDetector.CircleModel_PolygonModel,
+        [CircleModel.SYMBOL]: CollisionDetector.CircleModel_CircleModel
+    }
+};
 
 //resolution
 class CollisionResolver {
@@ -1078,7 +1102,7 @@ class PhysicsEngine {
             }
         }
 
-        let grid = new Grid(cellsize);
+        let grid = new PhysicsGrid(cellsize);
 
         //create grid
         let collisionPairs = new Map();
@@ -1096,14 +1120,13 @@ class PhysicsEngine {
         for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
             let cellsTotal = collisionPairs.get(body);
-            let bodies = grid.query(body, cellsTotal).filter(body.collisionFilter);
+            let bodies = grid.query(body, cellsTotal, body.collisionFilter);
             collisionPairs.set(body, bodies);
         }
-        if (false) for (let i in grid.cells) if (grid.cells[i]) for (let j in grid.cells[i]) if (typeof grid.cells[i][j] === "object") {
-            renderer.stroke(Color.RED, 2).rect(i * cellsize, j * cellsize, cellsize, cellsize);
-            if (false) for (let el of grid.cells[i][j]) {
-                renderer.stroke(Color.ORANGE, 1).arrow(i * cellsize, j * cellsize, el.position.x, el.position.y);
-            }
+
+        if (false) for (let [x, column] of grid.cells) for (let [y, cell] of column) {
+            for (let body of cell) coloredQuad(x * cellsize, y * cellsize, cellsize, cellsize, 0, 0, 1, 0.1);
+            outlinedQuad(x * cellsize, y * cellsize, cellsize, cellsize, 3, 0, 1, 0, 1);
         }
         return collisionPairs;
     }

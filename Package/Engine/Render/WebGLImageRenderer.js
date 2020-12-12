@@ -34,12 +34,12 @@ class WebGLImageRenderer {
 			e.preventDefault();
 			this.setup();
 		});
-		
+
 		const { gl, glState } = this;
 
 		this.wasSetup = true;
 
-		glState.MAX_TEXTURE_UNITS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);;
+		glState.MAX_TEXTURE_UNITS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 
 		//sources
 		const vertexSource = `#version 300 es
@@ -248,7 +248,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((x, i) => `\t\tcase ${i}:\n\t
 
 		glState.alphaLocation = gl.getUniformLocation(shaderProgram, "alpha");
 		glState.alphaArray = new Float32Array(glState.MAX_TEXTURE_UNITS);
-		
+
 
 		// bind position buffer to all future bufferData calls
 		gl.bindBuffer(gl.ARRAY_BUFFER, glState.positionBuffer);
@@ -326,6 +326,19 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((x, i) => `\t\tcase ${i}:\n\t
 		glState.alphaArray[alphaIndex] = alpha;
 
 		if (glState.currentQuadIndex === glState.MAX_TEXTURE_UNITS) this.render();
+	}
+	setBlendMode(blend) {
+		const { gl, glState } = this;
+
+		switch (blend) {
+			case "source-over":
+				gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+				break;
+			case "lighter":
+				gl.blendFunc(gl.ONE, gl.ONE);
+				break;
+		}
+
 	}
 	setImageSmoothing(smooth) {
 		const { gl, glState } = this;

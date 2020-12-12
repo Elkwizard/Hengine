@@ -215,7 +215,7 @@ class HengineLoader {
 			return null;
 		}
 	}
-	static load(userResources) {
+	static load(userResources, engineLoaded = false) {
 		async function loadResources() {
 			let scriptHome = document.querySelectorAll("script"); //find yourself
 			for (let el of scriptHome) {
@@ -236,8 +236,9 @@ class HengineLoader {
 			rootSrc += "/Engine";
 			console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
 
-			for (let i = 0; i < HengineLoader.engineResources.length; i++) {
+			if (!engineLoaded) for (let i = 0; i < HengineLoader.engineResources.length; i++) {
 				let path = HengineLoader.engineResources[i];
+				let name = path.match(/\/(.*?)$/g)[0].slice(1);
 				let resource = new HengineScriptResource(PathManager.join([rootSrc, path + ".js"]));
 				await resource.load();
 			}
@@ -272,7 +273,7 @@ HengineLoader.engineResources = [
 
 	"Math/Interpolation", "Math/Random", "Math/Matrix", "Math/Vector", "Math/Geometry", "Math/Physics", "Math/PhysicsAPI",
 
-	"Render/Color", "Render/Transform", "Render/Shapes", "Render/Spline", "Render/Gradient", "Render/GrayMap", "Render/Frame", "Render/Animation", "Render/Texture", "Render/Webcam", "Render/VideoView", "Render/GPUShader", "Math/GPUComputation", "Render/WebGLImageRenderer", "Render/Font", "Render/WebGLRenderer2D", "Render/WebGLRenderer3D", "Render/Renderer", "Render/Graph", "Render/Mesh", "Render/Camera",
+	"Render/Color", "Render/Transform", "Render/Shapes", "Render/Spline", "Render/Gradient", "Render/GrayMap", "Render/Frame", "Render/Animation", "Render/Texture", "Render/Webcam", "Render/VideoView", "Render/GPUShader", "Math/GPUComputation", "Render/WebGL2DContext", "Render/WebGLRenderer", "Render/WebGLImageRenderer", "Render/Font", "Render/WebGLRenderer2D", "Render/WebGLRenderer3D", "Render/Renderer", "Render/Graph", "Render/Mesh", "Render/Camera",
 
 	"Util/Input", "Util/Sound", "Util/Time", "Util/LocalFileSystem",
 

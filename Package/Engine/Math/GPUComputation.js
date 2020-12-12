@@ -72,8 +72,10 @@ class GPUComputation {
 		this._compiled = a;
 	}
 	get compiled() {
-		if (!this._compiled) exit("Didn't compile GPUComputation");
-		return this._compiled;
+		if (!this._compiled) {
+			exit("Didn't compile GPUComputation");
+			return null;
+		} return this._compiled;
 	}
 	compile() {
 		if (this.gl.isContextLost()) return;
@@ -231,6 +233,8 @@ ${inputArgString}
 		return true;
 	}
 	compute(buffer) {
+		if (!this.compiled) return;
+
 		const gl = this.gl;
 		const width = this.problemWidth;
 		const height = this.problemHeight;

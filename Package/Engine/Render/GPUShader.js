@@ -84,8 +84,10 @@ class GPUShader extends ImageType {
 		this._compiled = a;
 	}
 	get compiled() {
-		if (!this._compiled) exit("Didn't compile GPUShader");
-		return this._compiled;
+		if (!this._compiled) {
+			exit("Didn't compile GPUShader");
+			return null;
+		} return this._compiled;
 	}
 	setShadeRects(rects) {
 		if (this.gl.isContextLost()) return;
@@ -152,6 +154,8 @@ class GPUShader extends ImageType {
 	}
 	shade() {
 		if (this.gl.isContextLost()) return;
+		// make sure it exists
+		if (!this.compiled) return;
 
 		this.loaded = true;
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);

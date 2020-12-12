@@ -94,7 +94,7 @@ class ParticleSpawnerObject extends SceneObject {
     }
     spawnParticle() {
         const name = `Particle #${this.particleNumber++} from ${this.name}`; 
-        this.spawns[name] = new ParticleObject(this, name, this.container, this.engine);
+        this.spawns.set(name, new ParticleObject(this, name, this.container, this.engine));
     }
     hasMoved() {
         return true;
@@ -160,9 +160,9 @@ class ParticleObject extends SceneObject {
     }
     set name(a) {
         if (this.spawner) {
-            delete this.spawner.spawns[this._name];
+            this.spawner.spawns.delete(this._name);
             this._name = a;
-            this.spawner.spawns[this._name] = this;
+            this.spawner.spawns.set(this._name, this);
         }
     }
     get name() {
@@ -170,7 +170,7 @@ class ParticleObject extends SceneObject {
     }
     remove() {
         this.scripts.run("Remove");
-        delete this.spawner.spawns[this.name];
+        this.spawner.spawns.delete(this.name);
     }
     engineDraw() {
         this.drawPrefix();

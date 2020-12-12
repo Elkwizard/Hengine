@@ -593,6 +593,7 @@ class Geometry {
         else return Geometry.pointInsidePolygon(p, poly);
     }
     // basic shapes
+    
     // closest point
     static closestPointOnCircle(p, cr) {
         let dif = new Vector2(p.x - cr.x, p.y - cr.y);

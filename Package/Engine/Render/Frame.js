@@ -23,11 +23,29 @@ function new_OffscreenCanvas(width, height) {
 	};
 	return canvas;
 }
+
 class ImageType {
 	constructor(width = 1, height = 1) {
-		this.width = Math.max(1, Math.ceil(width));
-		this.height = Math.max(1, Math.ceil(height));
+		this._width = Math.max(1, Math.ceil(width));
+		this._height = Math.max(1, Math.ceil(height));
 		this.loaded = true;
+	}
+	resize(width, height) { } // virtual
+	set width(a) {
+		const prev = this._width;
+		this._width = a;
+		if (prev !== a) this.resize(this._width, this._height);
+	}
+	get width() {
+		return this._width;
+	}
+	set height(a) {
+		const prev = this._height;
+		this._height = a;
+		if (prev !== a) this.resize(this._width, this._height);
+	}
+	get height() {
+		return this._height;
 	}
 	inferWidth(height) {
 		return this.width * height / this.height;
