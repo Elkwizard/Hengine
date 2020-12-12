@@ -1079,8 +1079,6 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 		outlinedTriangle, outlinedQuad, outlinedEllipse, outlinedPolygon, lineSegment, lineSegments,
 
-		getPixelData,
-
 		BLEND_MODE_COMBINE, BLEND_MODE_ADD
 	};
 
