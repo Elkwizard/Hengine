@@ -58,16 +58,6 @@ class Vector extends Operable {
 			for (let x of this.constructor.modValues) {
 				this[x] = e(this[x], v[x] || 0);
 			}
-		} else if (v instanceof Matrix4) {
-			let chk = e(2, 3);
-			let action = "times";
-			if (chk === 6);
-			else if (chk === -1) action = "minus";
-			else if (chk === 5) action = "plus";
-			let n = this.constructor.fromMatrix(this.toMatrix()[action](v));
-			for (let x of this.constructor.modValues) {
-				this[x] = n[x];
-			}
 		}
 		return this;
 	}
@@ -403,9 +393,6 @@ class Vector3 extends Vector {
 	}
 	static fromPoint(p) {
 		return new Vector3(p.x || 0, p.y || 0, p.z || 0);
-	}
-	static fromAngle(r, d = Vector3.right) {
-		return Matrix4.mulPoint(Matrix4.rotation(r.x, r.y, r.z), d);
 	}
 }
 

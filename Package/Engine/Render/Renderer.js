@@ -46,11 +46,6 @@ class Artist {
 
 		this.resize(width, height, false);
 
-		this.gl3 = new WebGLRenderer3D(this);
-		this.gl2 = new WebGLRenderer2D(this);
-		this.imageRenderer = new WebGLImageRenderer(new_OffscreenCanvas(this.canvas.width, this.canvas.height));
-		this.imageRendererCreated = false;
-
 		let pathObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
@@ -645,7 +640,6 @@ class Artist {
 	set preservePixelart(a) {
 		this._preservePixelart = a;
 		this.c.imageSmoothingEnabled = !a;
-		if (this.imageRendererCreated) this.imageRenderer.setImageSmoothing(!a);
 	}
 	get preservePixelart() {
 		return this._preservePixelart;
@@ -656,7 +650,6 @@ class Artist {
 			[BlendMode.COMBINE]: "source-over",
 			[BlendMode.ADD]: "lighter"
 		}[a];
-		if (this.imageRendererCreated) this.imageRenderer.setBlendMode(a);
 
 	}
 	get blendMode() {
@@ -698,7 +691,6 @@ class Artist {
 		this.imageType.width = width;
 		this.imageType.height = height;
 		this.c.scale(devicePixelRatio, devicePixelRatio);
-		if (this.imageRendererCreated) this.imageRenderer.resize(this.canvas.width, this.canvas.height);
 		this.alpha = al;
 		this.preservePixelart = px;
 		if (trigger) this.onresize();
@@ -822,49 +814,14 @@ class Artist {
 	clear() {
 		this.c.clearRect(0, 0, this.width, this.height);
 	}
-	drawImageGPU(image, x, y, w, h, changed = false) {
-		if (typeof x === "object") {
-			changed = y;
-			h = x.height;
-			w = x.width;
-			y = x.y;
-			x = x.x;
-		}
-		if (!this.imageRendererCreated) {
-			this.imageRenderer.setup();
-			this.imageRenderer.setImageSmoothing(this.c.imageSmoothingEnabled);
-			this.imageRenderer.setImageSmoothing(this.c.globalCompositeOperation);
-			this.imageRendererCreated = true;
-		}
-		image = image.makeImage();
-		if (changed) this.imageRenderer.invalidateCache(image);
-		
-		let t = this.c.getTransform();
-		this.imageRenderer.drawImage(image, x, y, w, h, [t.a, t.b, 0, t.c, t.d, 0, t.e, t.f, 1], this._globalAlpha);
-	}
 	clearScreen() {
 		this.fill(Color.WHITE);
 	}
 	beforeFrame() {
-		if (this.gl2.exists) this.gl2.beforeFrame();
-		if (this.gl3.exists) this.gl3.beforeFrame();
+		
 	}
 	afterFrame() {
-		if (this.gl2.exists) this.gl2.afterFrame();
-		if (this.gl3.exists) this.gl3.afterFrame();
-		if (this.gl2.changed) this.c.drawImage(this.gl2.canvas, 0, 0, this.width, this.height);
-		if (this.gl3.changed) this.c.drawImage(this.gl3.canvas, 0, 0, this.width, this.height);
-		this.gl2.changed = false;
-		this.gl3.changed = false;
-
-		if (this.imageRendererCreated) {
-			this.imageRenderer.render();
-			let prev = this.alpha;
-			this.alpha = 1;
-			this.c.drawImage(this.imageRenderer.canvas, 0, 0, this.width, this.height);
-			this.alpha = prev;
-			this.imageRenderer.clear();
-		}
+		
 	}
 	fill(color) {
 		this.c.fillStyle = this.getContextColor(color);
