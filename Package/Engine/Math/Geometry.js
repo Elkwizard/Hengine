@@ -527,6 +527,9 @@ class Geometry {
 
         } else return [vertices];
     }
+    static subdividePolygon(poly) {
+        return Geometry.subdividePolygonList(poly.vertices).map(v => new Polygon(v));
+    }
     static intersectRayLine(o, r, l) {
         let result = null;
         const EPSILON = 0.0001;

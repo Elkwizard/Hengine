@@ -441,25 +441,20 @@ class RigidBody {
         this.invalidateModels();
     }
     removeShape(sh) {
-        let inx = null;
-        for (let i = 0; i < this.shapes.length; i++) {
-            if (this.shapes[i] === sh) {
-                inx = i;
-                break;
-            }
-        }
-        if (inx !== null) this.shapes.splice(inx, 1);
+        let inx = this.shapes.indexOf(sh);
+        if (inx > -1) this.shapes.splice(inx, 1);
         this.invalidateModels();
     }
     addShape(sh) {
         let shapes = [sh];
 
-        if (sh instanceof PolygonCollider && this.engine && this.engine.polygonVertexListSubdivider) {
-            shapes = this.engine.polygonVertexListSubdivider(sh.vertices).map(poly => new PolygonCollider(poly));
-        }
+        // if (sh instanceof PolygonCollider && this.engine && this.engine.polygonVertexListSubdivider) {
+        //     shapes = this.engine.polygonVertexListSubdivider(sh.vertices).map(poly => new PolygonCollider(poly));
+        // }
 
         this.shapes.push(...shapes);
-        for (let sha of shapes) {
+        for (let i = 0; i < shapes.length; i++) {
+            const sha = shapes[i];
             this.mass += ShapeMass["mass" + sha.constructor.name](sha);
             this.inertia += ShapeMass["inertia" + sha.constructor.name](sha);
         }

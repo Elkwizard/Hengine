@@ -12,8 +12,8 @@ class PhysicsObject extends SceneObject {
         //data
         this.colliding = new CollisionMonitor();
         this.lastColliding = new CollisionMonitor();
-
-        this.shapeNameIDMap = new Map();
+        
+		this.physicsShapes = new Map();
 
         //fake velocity
         let vel = this.body.velocity;
@@ -116,48 +116,25 @@ class PhysicsObject extends SceneObject {
     }
     centerModels() {
         super.centerModels();
-        this.shapeSync();
     }
-    shapeSync() {
-        this.shapeNameIDMap.clear();
-        this.body.clearShapes();
-        for (let [name, shape] of this.shapes) {
-            let collider = shape.toPhysicsShape();
-            let colliders = this.body.addShape(collider);
-            this.shapeNameIDMap.set(name, colliders);
-        }
-        this.cacheDimensions();
-    }
-    scale(factor) {
-        super.scale(factor);
-        this.shapeSync();
-    }
-    scaleX(factor) {
-        super.scaleX(factor);
-        this.shapeSync();
-    }
-    scaleY(factor) {
-        super.scaleY(factor);
-        this.shapeSync();
-    }
-    addShape(name, shape) {
-        super.addShape(name, shape);
-        this.shapeSync();
-    }
-    removeShape(name) {
-        if (super.removeShape(name)) {
-            let cols = this.shapeNameIDMap.get(name);
-            for (let i = 0; i < cols.length; i++) this.body.removeShape(cols[i]);
-            this.shapeNameIDMap.delete(name);
-            return shape;
-        } else return null;
-    }
-    getModels() {
-        return this.body.cacheModels()
-            .map(model => (model instanceof CircleModel) ? 
-                new Circle(model.position.x, model.position.y, model.radius) 
-                : new Polygon(model.vertices.map(vert => Vector2.fromPhysicsVector(vert))));
-    }
+	addShape(name, shape) {
+		super.addShape(name, shape);
+		const convex = this.convexShapes.get(shape);
+        const physicsShapes = [];
+		for (let i = 0; i < convex.length; i++) {
+			const physicsShape = convex[i].toPhysicsShape();
+			this.body.addShape(physicsShape);
+			physicsShapes.push(physicsShape);
+		}
+		this.physicsShapes.set(shape, physicsShapes);
+	}
+	removeShape(name) {
+		const shape = super.removeShape(name);
+        const physics = this.physicsShapes.get(shape);
+		for (let i = 0; i < physics.length; i++) this.body.removeShape(physics[i]);
+		this.physicsShapes.delete(shape);
+		return shape;
+	}
 	onAddScript(script) {
         super.onAddScript(script);
         const value = { };

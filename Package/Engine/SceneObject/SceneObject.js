@@ -38,6 +38,7 @@ class SceneObject extends SceneElement {
 		this.transform = new Transform(x, y, 0);
 		this.lastTransform = this.transform.get();
 		this.shapes = new Map();
+		this.convexShapes = new Map();
 		this.graphicalBoundingBox = null;
 		this.engine = engine;
 		this.tag = tag;
@@ -58,8 +59,7 @@ class SceneObject extends SceneElement {
 		this.__height = 0;
 	}
 	set defaultShape(a) {
-		this.removeShape("default");
-		this.addShape("default", a);
+		this.modifyShape("default", a);
 	}
 	get defaultShape() {
 		return this.getShape("default");
@@ -137,11 +137,6 @@ class SceneObject extends SceneElement {
 	cacheBoundingBoxes() {
 		this.__boundingBox = this.getBoundingBox();
 	}
-	getModels() {
-		let result = [];
-		for (let [name, shape] of this.shapes) result.push(shape.getModel(this.transform));
-		return result;
-	}
 	getBoundingBox() {
 		let shapes = this.getModels();
 		let boxes = shapes.map(e => e.getBoundingBox());
@@ -154,60 +149,83 @@ class SceneObject extends SceneElement {
 		return this.shapes.has(name);
 	}
 	addShape(name, shape) {
-		shape = shape.get();
 		this.shapes.set(name, shape);
+		this.convexShapes.set(shape, Geometry.subdividePolygon(shape));
 		this.cacheDimensions();
 	}
-	centerModels() {
+	removeShape(name) {
+		const shape = this.shapes.get(name);
+		this.shapes.delete(name);
+		this.convexShapes.delete(shape);
+		return shape;
+	}
+	modifyShape(name, shape) {
+		this.removeShape(name);
+		this.addShape(name, shape);
+	}
+	getShapes() {
+		let shapes = [];
+		for (let [name, shape] of this.shapes) shapes.push(shape);
+		return shapes;
+	}
+	getConvexShapes() {
+		let shapes = [];
+		for (let [shape, convexShapes] of this.convexShapes) shapes.pushArray(convexShapes);
+		return shapes;
+	}
+	getModels() {
+		let models = [];
+		for (let [name, shape] of this.shapes) models.push(shape.getModel(this.transform));
+		return models;
+	}
+	getConvexModels() {
+		let models = [];
+		for (let [shape, shapes] of this.convexShapes) for (let i = 0; i < shapes.length; i++) models.push(shapes[i].getModel(this.transform));
+		return models;
+	}
+	centerShapes() {
 		let center = Vector2.origin;
-		let shapes = this.getShapes();
 		let totalArea = 0;
-		for (let shape of shapes) {
+		let names = [];
+		let shapes = [];
+		for (let [name, shape] of this.shapes) {
 			let area = shape.area;
 			totalArea += area;
 			center.Vadd(shape.middle.Ntimes(area));
+			names.push(name);
+			shapes.push(shape);
 		}
 		center.Ndiv(totalArea);
 		let dif = center.inverse;
-		for (let [name, shape] of this.shapes)
-			this.shapes.set(name, shape.move(dif));
-	}
-	removeShape(name) {
-		let shape = this.shapes.get(name);
-		this.shapes.delete(name);
-		return shape || null;
+		for (let i = 0; i < names.length; i++) this.modifyShape(names[i], shapes[i].move(dif));
 	}
 	removeAllShapes() {
 		let names = [];
 		for (let [name, shape] of this.shapes) names.push(name);
 		let shapes = [];
-		for (let name of names) {
-			shapes.push(this.removeShape(name));
-		}
+		for (let i = 0; i < names.length; i++) shapes.push(this.removeShape(names[i]));
 		return shapes;
 	}
 	getShape(name) {
 		return this.shapes.get(name);
 	}
+	getConvexShapesFromShape(name) {
+		return this.convexShapes.get(this.shapes.get(name));
+	}
 	getModel(name) {
 		return this.shapes.get(name).getModel(this.transform);
 	}
-	getShapes() {
-		let ary = [];
-		for (let [name, shape] of this.shapes) ary.push(shape);
-		return ary;
-	}
 	scale(factor) {
 		let middle = Vector2.origin;
-		for (let [name, shape] of this.shapes) this.shapes.set(name, shape.scaleAbout(middle, factor));
+		for (let [name, shape] of this.shapes) this.modifyShape(name, shape.scaleAbout(middle, factor));
 		this.cacheDimensions();
 	}
 	scaleX(factor) {
-		for (let [name, shape] of this.shapes) this.shapes.set(name, shape.scaleXAbout(0, factor));
+		for (let [name, shape] of this.shapes) this.modifyShape(name, shape.scaleXAbout(0, factor));
 		this.cacheDimensions();
 	}
 	scaleY(factor) {
-		for (let [name, shape] of this.shapes) this.shapes.set(name, shape.scaleYAbout(0, factor));
+		for (let [name, shape] of this.shapes) this.modifyShape(name, shape.scaleYAbout(0, factor));
 		this.cacheDimensions();
 	}
 	hide() {

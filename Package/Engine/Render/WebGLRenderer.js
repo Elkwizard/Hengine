@@ -164,20 +164,16 @@ class WebGLArtist {
 				v_y /= mag;
 				let n_x = -v_y;
 				let n_y = v_x;
-				this.c.beginPath();
-				this.c.moveTo(x, y);
-				this.c.lineTo(x1, y1);
-				this.c.stroke();
-				this.c.fillStyle = this.c.strokeStyle;
-				let l2 = this.c.lineWidth * 2;
-				this.c.beginPath();
+				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				let l2 = this.currentLineWidth * 2;
 				x1 -= v_x * l2;
 				y1 -= v_y * l2;
-				this.c.moveTo(x1 + n_x * l2, y1 + n_y * l2);
-				this.c.lineTo(x1 - n_x * l2, y1 - n_y * l2);
-				this.c.lineTo(x1 + v_x * l2 * 2, y1 + v_y * l2 * 2);
-				this.c.lineTo(x1 + n_x * l2, y1 + n_y * l2);
-				this.c.fill();
+				this.gl.coloredTriangle(
+					x1 + n_x * l2, y1 + n_y * l2,
+					x1 - n_x * l2, y1 - n_y * l2,
+					x1 + v_x * l2 * 2, y1 + v_y * l2 * 2,
+					this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha
+				);
 			},
 			shape(points) {
 				if (points.vertices) points = points.vertices;

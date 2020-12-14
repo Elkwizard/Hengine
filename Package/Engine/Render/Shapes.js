@@ -150,7 +150,7 @@ class Polygon extends Shape {
 		}
 	}
 	get middle() {
-		return Vector.sum(this.vertices).Nover(this.vertices.length);
+		return Vector2.sum(this.vertices).Nover(this.vertices.length);
 	}
 	getBoundingBox() {
 		return Rect.bound(this.vertices);

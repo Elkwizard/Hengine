@@ -3,6 +3,8 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 	const glState = {};
 	const glAttributes = {};
 	const glShaders = {};
+	let drawCallCount = 0;
+	let clearCount = 0;
 
 	//#region constants
 
@@ -109,10 +111,11 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		glState.derivativeExt = gl.getExtension("OES_standard_derivatives");
 
 
-		const MAX_VECTORS = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS) - 50;
+		const MAX_VECTORS = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS) - 1;
 		const MAX_3X3_MATRICES = Math.floor(MAX_VECTORS / 3);
 
-		glState.MAX_BATCH_TRIS = Math.min(1000, MAX_3X3_MATRICES);
+		glState.MAX_BATCH_TRIS = 10000;
+		glState.MAX_BATCH_TRANSFORMS = MAX_3X3_MATRICES;
 		glState.currentTriIndex = 0;
 
 		// textures
@@ -140,7 +143,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 				in highp float vertexLineWidth;
 				in highp vec2 vertexLineNormal;
 
-				uniform highp mat3 vertexTransforms[${glState.MAX_BATCH_TRIS}];
+				uniform highp mat3 vertexTransforms[${glState.MAX_BATCH_TRANSFORMS}];
 				uniform highp vec2 resolution;
 
 				out highp vec3 color;
@@ -239,7 +242,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 								highp float o = max(slope(UV.x), slope(UV.y)) * 0.1;
 								antialias *= 1.0 - smoothstep(abs(UV.x), 0.5, 0.5 - o) + 1.0 - smoothstep(abs(UV.y), 0.5, 0.5 - o);
 							}
-						} else {
+						} else if (circleRadius > 0.0) {
 							highp float o = 0.5 / circleRadius;
 						
 							highp float ilen = length(UV);
@@ -301,7 +304,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		createAttribute("vertexTextureIndex", 1);
 
 		// uniforms
-		glState.transformData = new Float32Array(glState.MAX_BATCH_TRIS * 9);
+		glState.transformData = new Float32Array(glState.MAX_BATCH_TRANSFORMS * 9);
 		glState.currentTransformIndex = 0;
 		glState.shouldIncrementTransform = false;
 
@@ -458,6 +461,8 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 	function clear() {
 		render();
 		gl.clear(gl.COLOR_BUFFER_BIT);
+		clearCount++;
+		bound.drawCallsPerClear = drawCallCount / clearCount;
 	}
 
 	function render() {
@@ -486,6 +491,8 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		gl.drawArrays(gl.TRIANGLES, 0, glState.currentTriIndex * 3);
 
 		glState.currentTriIndex = 0;
+
+		drawCallCount++;
 	}
 	//#endregion
 
