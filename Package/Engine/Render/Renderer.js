@@ -675,7 +675,7 @@ class Artist {
 		const ratio = 1 / devicePixelRatio;
 		return Matrix3.mulMatrix(
 			Matrix3.scale(ratio, ratio, Matrix3.temp[1]),
-			Matrix3.matrix(
+			Matrix3.create(
 				t.a, 	t.c,	t.e, 
 				t.b, 	t.d, 	t.f, 
 				0, 		0, 		1, 

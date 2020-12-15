@@ -114,8 +114,8 @@ class ScriptContainer {
 		this.sortedLocalScripts = this.sortedLocalScripts.filter(v => v.scriptSource !== script);
 		this.implementedMethods.clear();
 		for (let i = 0; i < this.sortedLocalScripts.length; i++) {
-			const m = this.sortedLocalScripts[i];
-			for (let flag of script.implementedMethods) this.implementedMethods.add(flag);
+			const m = this.sortedLocalScripts[i].scriptSource;
+			for (let flag of m.implementedMethods) this.implementedMethods.add(flag);
 		}
 	}
 	removeDefault() {

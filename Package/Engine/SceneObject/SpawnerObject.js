@@ -83,7 +83,6 @@ class ParticleSpawnerObject extends SceneObject {
     }
     engineDraw(screen) {
         this.determineOnScreen(screen);
-        // this.onScreen = true;
 
         if (!this.hidden && this.onScreen) {
             this.engine.renderer.save();

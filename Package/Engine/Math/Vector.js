@@ -152,7 +152,7 @@ class Vector1 extends Vector {
 }
 Vector1.modValues = ["x"];
 class Vector2 extends Vector {
-	constructor(x, y) {
+	constructor(x, y = x) {
 		super();
 		this.x = x;
 		this.y = y;
@@ -357,7 +357,7 @@ class Vector2 extends Vector {
 }
 Vector2.modValues = ["x", "y"];
 class Vector3 extends Vector {
-	constructor(x, y, z) {
+	constructor(x, y = x, z = x) {
 		super();
 		this.x = x;
 		this.y = y;
@@ -400,7 +400,7 @@ class Vector3 extends Vector {
 
 Vector3.modValues = ["x", "y", "z"];
 class Vector4 extends Vector {
-	constructor(x, y, z, w) {
+	constructor(x, y = x, z = x, w = x) {
 		super();
 		this.x = x;
 		this.y = y;

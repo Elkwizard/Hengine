@@ -356,11 +356,10 @@ class WebGLArtist {
 		return this._alpha;
 	}
 	set transform(a) {
-		Matrix3.copy(a, this.currentTransform);
-		this.gl.setTransform(this.currentTransform);
+		this.gl.setTransform(a.get(this.currentTransform));
 	}
 	get transform() {
-		return Matrix3.copy(this.currentTransform);
+		return this.currentTransform.get();
 	}
 	resize(width, height, trigger = true) {
 		let px = this.preservePixelart;
@@ -433,7 +432,7 @@ class WebGLArtist {
 		this.gl.setTransform(this.currentTransform);
 	}
 	save() {
-		this.transformStack.push(Matrix3.copy(this.currentTransform));
+		this.transformStack.push(this.currentTransform.get());
 		this.alphaStack.push(this.alpha);
 	}
 	restore() {
