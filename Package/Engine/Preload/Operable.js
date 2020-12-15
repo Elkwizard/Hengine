@@ -2,8 +2,9 @@ class Operable {
     constructor() {
         
     }
-    get() {
-        return new this.constructor(...this.constructor.modValues.map(v => this[v]));
+    get(result = this.constructor.empty) {
+        for (let x of this.constructor.modValues) result[x] = this[x];
+        return result;
     }
     op(v, fn) {
         if (typeof v === "number") {

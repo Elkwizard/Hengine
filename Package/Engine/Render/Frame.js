@@ -118,8 +118,8 @@ class Frame extends ImageType {
 	clip(x, y, w, h) {
 		return Frame.fromImageType(this, x, y, w, h);
 	}
-	get() {
-		let f = new Frame(this.width, this.height);
+	get(f = new Frame(this.width, this.height)) {
+		f.renderer.resize(this.width, this.height, false);
 		f.renderer.c.drawImage(this.image, 0, 0, this.width, this.height);
 		return f;
 	}

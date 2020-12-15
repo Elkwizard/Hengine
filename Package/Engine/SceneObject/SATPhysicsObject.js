@@ -1,6 +1,6 @@
 class PhysicsObject extends SceneObject {
-    constructor(name, x, y, gravity, controls, tag, home, engine) {
-        super(name, x, y, controls, tag, home, engine);
+    constructor(name, x, y, gravity, controls, tag, container, engine) {
+        super(name, x, y, controls, tag, container, engine);
         this.body = new RigidBody(x, y, gravity ? RigidBody.DYNAMIC : RigidBody.STATIC);
         this.body.userData.sceneObject = this;
         this.body.collisionFilter = function (body) {
@@ -127,7 +127,7 @@ class PhysicsObject extends SceneObject {
 			physicsShapes.push(physicsShape);
 		}
 		this.physicsShapes.set(shape, physicsShapes);
-	}
+    }
 	removeShape(name) {
 		const shape = super.removeShape(name);
         const physics = this.physicsShapes.get(shape);
@@ -137,12 +137,7 @@ class PhysicsObject extends SceneObject {
 	}
 	onAddScript(script) {
         super.onAddScript(script);
-        const value = { };
-        try {
-            if (this.scripts[script].scriptCollideRule(value) !== value) this.hasCollideRule = true;
-        } catch (err) {
-            this.hasCollideRule = true;
-        }
+        if (script.implements("CollideRule")) this.hasCollideRule = true;
 	}
     collideBasedOnRule(e) {
         let judgement = [];

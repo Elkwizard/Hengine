@@ -33,8 +33,8 @@ class Controls {
 }
 //Actual SceneObject
 class SceneObject extends SceneElement {
-	constructor(name, x, y, controls, tag, home, engine) {
-		super(name, home.active, home);
+	constructor(name, x, y, controls, tag, container, engine) {
+		super(name, container.active, container);
 		this.transform = new Transform(x, y, 0);
 		this.lastTransform = this.transform.get();
 		this.shapes = new Map();
@@ -45,7 +45,6 @@ class SceneObject extends SceneElement {
 		this.controls = controls;
 		this.hidden = false;
 		this.onScreen = false;
-		this.draw = function (name, shape) { };
 		this.hovered = false;
 		this.layer = 0;
 		this.lifeSpan = 0;
@@ -87,7 +86,7 @@ class SceneObject extends SceneElement {
 		this.scripts.run("Deactivate");
 	}
 	updatePreviousData() {
-		this.lastTransform = this.transform.get();
+		this.lastTransform = this.transform.get(this.lastTransform);
 	}
 	serializeShapes() {
 		let shapes = this.getShapes();
@@ -148,9 +147,9 @@ class SceneObject extends SceneElement {
 	hasShape(name) {
 		return this.shapes.has(name);
 	}
-	addShape(name, shape) {
+	addShape(name, shape, convex = false) {
 		this.shapes.set(name, shape);
-		this.convexShapes.set(shape, Geometry.subdividePolygon(shape));
+		this.convexShapes.set(shape, (shape instanceof Polygon && !convex) ? Geometry.subdividePolygon(shape) : [shape]);
 		this.cacheDimensions();
 	}
 	removeShape(name) {
@@ -252,9 +251,8 @@ class SceneObject extends SceneElement {
 		return el;
 	}
 	runDraw() {
-		this.transform.drawInModelSpace(() => {
+		if (this.scripts.implements("Draw")) this.transform.drawInModelSpace(() => {
 			for (let [name, shape] of this.shapes) {
-				this.draw(name, shape);
 				this.scripts.run("Draw", name, shape);
 			}
 		}, this.engine.renderer);

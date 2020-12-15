@@ -17,8 +17,10 @@ class Transform {
 	set direction(v) {
 		this.angle = v.angle;
 	}
-	get() {
-		return new Transform(this.position.x, this.position.y, this.rotation);
+	get(transf = new Transform(0, 0, 0)) {
+		transf.position = this.position;
+		transf.rotation = this.rotation;
+		return transf;
 	}
 	dif(transf) {
 		const EPSILON = 0.001;

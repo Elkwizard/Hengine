@@ -65,8 +65,7 @@ class CollisionMonitor {
         }
         return els.length ? els : null;
     }
-    get() {
-        let mon = new CollisionMonitor();
+    get(mon = new CollisionMonitor) {
         mon.elements = this.elements.map(e => new CollisionData(e.element, e.direction, e.contacts));
         mon.physicsObjects = this.physicsObjects.map(el => el);
         return mon;

@@ -120,7 +120,7 @@ class Shape extends Operable {
 	move(dir) {
 		// move by _dir_
 	}
-	get() {
+	get(result = new Shape()) {
 		// return a copy of the shape
 		return new Shape();
 	}
@@ -214,9 +214,10 @@ class Polygon extends Shape {
 	rotate(angle) {
 		return this.getModel(new Transform(0, 0, angle));
 	}
-	get() {
-		let poly = new Polygon(this.vertices.map(vert => vert));
-		return poly;
+	get(result = new Polygon([])) {
+		result.vertices = this.vertices;
+		result.area = this.area;
+		return result;
 	}
 	toPhysicsShape() {
 		return new PolygonCollider(this.vertices.map(v => v.toPhysicsVector()));
@@ -351,8 +352,12 @@ class Rect extends Polygon {
 	move(dir) {
 		return new Rect(this.x + dir.x, this.y + dir.y, this.width, this.height);
 	}
-	get() {
-		return new Rect(this.x, this.y, this.width, this.height, this.rotation);
+	get(result = new Rect(0, 0, 0, 0)) {
+		result.x = this.x;
+		result.y = this.y;
+		result.width = this.width;
+		result.height = this.height;
+		return result;
 	}
 	static fromMinMax(min, max) {
 		return new Rect(min.x, min.y, max.x - min.x, max.y - min.y);
@@ -432,8 +437,11 @@ class Circle extends Shape {
 	getBoundingBox() {
 		return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
 	}
-	get() {
-		return new Circle(this.x, this.y, this.radius);
+	get(result = new Circle(0, 0, 0)) {
+		result.x = this.x;
+		result.y = this.y;
+		result.radius = this.radius;
+		return result;
 	}
 	toPhysicsShape() {
 		return new CircleCollider(this.x, this.y, this.radius);

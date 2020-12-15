@@ -19,7 +19,6 @@ load(String.raw`
 	(2)Properties(/2)
 	(p)
 		(prop:src $String$readonly)The file path to the image the HImage represents.(/prop)
-		(prop:onload $Function$)A function that will be called when the HImage finishes fetching the image data from the file.(/prop)
 	(/p)
 	(2)Methods(/2)
 	(p)

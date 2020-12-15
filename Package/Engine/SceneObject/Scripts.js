@@ -2,110 +2,134 @@ class ElementScript {
 	constructor(name, opts) {
 		this.name = name;
 		this.methods = {};
+		let local = {};
+		let placeholder = arg => arg;
+
+		let implementedMethods = new Set();
+
 		for (let op in opts) {
+			let methodName = op;
+			let method = opts[op];
+
+			let found = false;
+
+			for (let flag of LocalScript.flags) if (methodName === flag) {
+				let localName = `script${methodName.capitalize()}`;
+				local[localName] = method;
+				found = true;
+				implementedMethods.add(localName);
+			}
+
+			if (!found) {
+				let name = this.name;
+				local[methodName] = function (...args) {
+					return method.call(this, this.scripts[name], ...args);
+				};
+			}
+
+
 			let fn = opts[op];
 			fn.flag = op;
 			this.methods[op] = fn;
 		}
+
+		for (let flag of LocalScript.flags) {
+			let name = `script${flag.capitalize()}`;
+			if (!(name in local)) local[name] = placeholder;
+		}
+
+
+		this.methodNames = Object.keys(local);
+		this.localTemplate = local;
+		this.implementedMethods = implementedMethods;
 	}
-	attachTo(obj, bindTo, ...args) {
-		const exists = obj.exists;
-		obj[this.name] = new LocalScript();
-		if (bindTo === undefined) bindTo = obj;
-        let flags = LocalScript.flags;
-		let local = obj[this.name];
-        for (let flag of flags) {
-            let result = "script" + flag.map(e => e.capitalize()).join("");
-            local[result] = function (l, e) {  };
-		}
-		let inits = [];
-        for (let m in this.methods) {
-            let name = m.toLowerCase();
-            let fn = this.methods[m].bind(bindTo);
-            let found = false;
-            for (let flag of flags) {
-                if (name === flag.join("") || name === flag.join("_") || name === flag.join("-")) {
-					let key = "script" + flag.map(e => e.capitalize()).join("");
-					let localFn = local[key].bind(bindTo);
-                    local[key] = function (...args) {
-						localFn();
-						return fn(...args);
-					}
-                    exists[key] = true;
-                    found = true;
-                }
-            }
-            if (!found) {
-                if (name === "init" || name === "start") {
-					inits.push(() => fn(local, ...args));
-                } else {
-                    local[m] = function (...params) {
-                        return fn(local, ...params);
-                    }.bind(bindTo);
-                    local[m].flag = m;
-                }
-			}
-		}
-		for (let init of inits) init();
-		return this;
+	implements(method) {
+		return this.implementedMethods.has("script" + method);
 	}
 	addTo(el, ...args) {
-		let sc = this;
-		sc.attachTo(el.scripts, el, ...args);
-		el.onAddScript(this.name);
-		el.logMod(function () {
-			sc.addTo(this);
-		});
-		return this;
+		el.scripts.add(this, ...args);
 	}
 }
 class LocalScript {
-	constructor() {
+	constructor(source) {
 		this.scriptNumber = 0;
+		this.scriptSource = source;
 	}
 }
 LocalScript.flags = [
-	["update"],
-	["before", "update"],
-	["after", "update"],
-	["draw"],
-	["escape", "draw"],
-	["collide", "rule"],
-	["collide", "general"],
-	["collide", "top"],
-	["collide", "bottom"],
-	["collide", "left"],
-	["collide", "right"],
-	["click"],
-	["right", "click"],
-	["hover"],
-	["unhover"],
-	["message"],
-	["remove"],
-	["activate"],
-	["deactivate"]
+	"init",
+	"update",
+	"beforeUpdate",
+	"afterUpdate",
+	"draw",
+	"escapeDraw",
+	"collideRule",
+	"collideGeneral",
+	"collideTop",
+	"collideBottom",
+	"collideLeft",
+	"collideRight",
+	"click",
+	"rightClick",
+	"hover",
+	"unhover",
+	"message",
+	"remove",
+	"activate",
+	"deactivate"
 ];
+
 class ScriptContainer {
 	constructor(sceneObject) {
 		this.sceneObject = sceneObject;
-		this.exists = { };
-		this[Symbol.iterator] = function* () {
-			let ary = [];
-			for (let m in this) {
-				let a = this[m];
-				if (a instanceof LocalScript) ary.push(a);
-			}
-			ary = ary.sort((a, b) => a.scriptNumber - b.scriptNumber);
-			for (let a of ary) {
-				yield a;
-			}
-		};
+		this.implementedMethods = new Set();
+		this.sortedLocalScripts = [];
+	}
+	get default() {
+		return this.sceneObject.container.defaultScript;
+	}
+	add(script, ...args) {
+		let local = new LocalScript(script);
+		this[script.name] = local;
+
+		for (let i = 0; i < script.methodNames.length; i++) {
+			let name = script.methodNames[i];
+			local[name] = script.localTemplate[name].bind(this.sceneObject);
+		}
+
+		for (let flag of script.implementedMethods) this.implementedMethods.add(flag);
+
+		this.sortedLocalScripts.push(local);
+		this.sortedLocalScripts.sort((a, b) => a.scriptNumber - b.scriptNumber);
+		
+		local.scriptInit(local, ...args);
+
+		this.sceneObject.onAddScript(script);
+
+		this.sceneObject.logMod(function () {
+			script.addTo(this, ...args);
+		});
+	}
+	remove(script) {
+		this.sortedLocalScripts = this.sortedLocalScripts.filter(v => v.scriptSource !== script);
+		this.implementedMethods.clear();
+		for (let i = 0; i < this.sortedLocalScripts.length; i++) {
+			const m = this.sortedLocalScripts[i];
+			for (let flag of script.implementedMethods) this.implementedMethods.add(flag);
+		}
+	}
+	removeDefault() {
+		this.remove(this.default);
+	}
+	implements(method) {
+		return this.implementedMethods.has("script" + method);
 	}
 	run(str, ...args) {
 		if (this.sceneObject.removed && str !== "Remove") return;
 		let key = "script" + str;
-		if (this.exists[key]) for (let m of this) {
-			m[key](m, ...args);
+		if (this.implementedMethods.has(key)) for (let i = 0; i < this.sortedLocalScripts.length; i++) {
+			const local = this.sortedLocalScripts[i];
+			local[key](local, ...args);
 		}
-    }
+	}
 }

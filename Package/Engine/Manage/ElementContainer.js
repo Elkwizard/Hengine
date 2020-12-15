@@ -1,43 +1,45 @@
 class ElementContainer extends SceneElement {
-	constructor(name = "container", active, home, engine) {
-		super(name, active, home);
+	constructor(name = "container", active, container, engine) {
+		super(name, active, container);
 		this.elements = new Map();
 		this.engine = engine;
 		this.sceneObjectArray = [];
 		this.removeQueue = [];
-		this.defaults = {
-			SceneObject: {
-				draw(name, shape) {
-					renderer.draw(Color.BLACK).infer(shape);
-					renderer.stroke(Color.CYAN, 1).infer(shape);
-				},
-				scripts: []
+		this.defaultScript = new ElementScript("DEFAULT", {
+			init(l) {
+				let fill;
+				let outline;
+
+				switch (this.constructor) {
+					case SceneObject: 
+						fill = Color.BLACK;
+						outline = Color.CYAN;
+						break;
+					case PhysicsObject:
+						fill = Color.BLACK;
+						outline = Color.RED;
+						break;
+					case UIObject:
+						fill = Color.WHITE;
+						outline = Color.BLACK;
+						break;
+					case ParticleSpawnerObject:
+						fill = Color.BLANK;
+						outline = Color.BLANK;
+						break;
+					default:
+						fill = Color.BLACK;
+						outline = Color.PURPLE;
+				}
+
+				l.outline = outline;
+				l.fill = fill;
 			},
-			PhysicsObject: {
-				draw(name, shape) {
-					renderer.draw(Color.BLACK).infer(shape);
-					renderer.stroke(Color.RED, 1).infer(shape);
-				},
-				scripts: []
-			},
-			UIObject: {
-				draw(name, shape) {
-					renderer.draw(Color.WHITE).infer(shape);
-					renderer.stroke(Color.BLACK, 1).infer(shape);
-				},
-				scripts: []
-			},
-			ParticleSpawnerObject: {
-				draw(name, shape) { },
-				scripts: []
-			},
-			ParticleObject: {
-				draw(name, shape) {
-					renderer.draw(Color.BLACK).infer(shape);
-				},
-				scripts: []
+			draw(l, name, shape) {
+				this.engine.renderer.draw(l.fill).infer(shape);
+				this.engine.renderer.stroke(l.outline, 1).infer(shape);
 			}
-		};
+		});
 	}
 	activate() {
 		super.activate();
@@ -94,7 +96,7 @@ class ElementContainer extends SceneElement {
 			n = this.addElement(el.name + " - copy", 0, 0, { ...el.controls }, el.tag);
 		}
 		n.transform = el.transform.get();
-		n.lastTransform = el.lastTransform.get();
+		n.lastTransform = el.lastTransform.get(n.lastTransform);
 		let ser = el.serializeShapes();
 		n.parseShapes(ser);
 		el.runLog(n);
@@ -114,9 +116,7 @@ class ElementContainer extends SceneElement {
 	}
 	initializeSceneObject(sceneObject) {
 		if (this.active) sceneObject.activate();
-		const d = this.defaults[sceneObject.constructor.name];
-		this.changeElementDraw(sceneObject, d.draw);
-		for (let script of d.scripts) script.addTo(sceneObject);
+		this.defaultScript.addTo(sceneObject);
 	}
 	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
@@ -291,36 +291,5 @@ class ElementContainer extends SceneElement {
 		} else {
 			func(this.get(name));
 		}
-	}
-	changeElementDraw(name, newDraw) {
-		this.performFunctionBasedOnType(name, function (e) {
-			e.draw = newDraw.bind(e);
-			e.logMod(function CHANGE_DRAW() {
-				this.container.changeElementDraw(this, newDraw);
-			});
-		}.bind(this));
-		return this;
-	}
-	changeElementMethod(name, method, newMethod) {
-		this.performFunctionBasedOnType(name, function (e) {
-			e[method] = newMethod.bind(e);
-			e.logMod(function CHANGE_METHOD() {
-				this.container.changeElementMethod(this, method, newMethod);
-			});
-		}.bind(this));
-		return this;
-	}
-	changeElementCollideRule(name, newRule) {
-		this.performFunctionBasedOnType(name, function (e) {
-			(new ElementScript("auto_generated_collide_rule #" + performance.now(), {
-				collide_rule(l, e) {
-					return newRule.bind(this)(e);
-				}
-			})).addTo(e);
-			e.logMod(function CHANGE_COLLIDE_RULE() {
-				this.container.changeElementCollideRule(this, newRule);
-			});
-		}.bind(this));
-		return this;
 	}
 }

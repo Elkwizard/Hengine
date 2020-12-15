@@ -1,5 +1,5 @@
 class Animation extends ImageType {
-	constructor(src = "", frames = 1, delay = 0, loops = false, onend = () => null) {
+	constructor(src = "", frames = 1, delay = 0, loops = false, onEnd = () => null) {
 		super(1, 1);
 		this.stopped = false;
 		if (!Array.isArray(src)) {
@@ -9,14 +9,14 @@ class Animation extends ImageType {
 				this.frames.push(new HImage(`${src}/${i + 1}.png`));
 			}
 			this.loops = loops;
-			this.onend = onend;
+			this.onEnd = onEnd;
 			this.delay = delay;
 		} else {
 			this.frames = src;
 			this.frameCount = this.frames.length;
 			this.delay = frames;
 			this.loops = delay;
-			this.onend = loops || function () { }
+			this.onEnd = loops || function () { }
 		}
 		this.image = this.frames[0];
 		this.width = this.image.width;
@@ -29,7 +29,7 @@ class Animation extends ImageType {
 			this.timer++;
 			if (this.timer >= this.totalTime - 1) {
 				this.timer = this.loops ? 0 : this.totalTime - 1;
-				this.onend();
+				this.onEnd();
 			}
 			let index = Math.floor(this.timer / this.delay);
 			this.image = this.frames[index];
@@ -51,10 +51,14 @@ class Animation extends ImageType {
 		this.timer = -1;
 		this.advance();
 	}
-	get() {
-		return new Animation(this.frames, this.delay, this.loops, this.onend);
+	get(animation = new Animation([], 0, false, () => null)) {
+		animation.frames = this.frames;
+		animation.delay = this.delay;
+		animation.loops = this.loops;
+		animation.onEnd = this.onEnd;
+		return animation;
 	}
-	static fromImage(frame, imgWidth, imgHeight, delay = 0, loops = true, onend = () => null) {
+	static fromImage(frame, imgWidth, imgHeight, delay = 0, loops = true, onEnd = () => null) {
 		const frames = frame.width / imgWidth;
 		const frameImg = frame.makeImage();
 		const frameImgs = [];
@@ -63,6 +67,6 @@ class Animation extends ImageType {
 			img.renderer.c.drawImage(frameImg, i * imgWidth, 0, imgWidth, imgHeight, 0, 0, imgWidth, imgHeight);
 			frameImgs.push(img);
 		}
-		return new Animation(frameImgs, delay, loops, onend);
+		return new Animation(frameImgs, delay, loops, onEnd);
 	}
 }

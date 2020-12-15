@@ -113,8 +113,11 @@ class Font {
 	toString() {
 		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${(Font.importedFamilies.includes(this.family)) ? `'${this.family}'` : this.family}`;
 	}
-	get() {
-		let font = new Font(this.size, this.family, this.bold, this.italic);
+	get(font = new Font(0, "serif", false, false)) {
+		font.size = this.size;
+		font.family = this.family;
+		font.bold = this.bold;
+		font.italic = this.italic;
 		font.lineHeight = this.lineHeight;
 		return font;
 	}

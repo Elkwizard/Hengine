@@ -4,7 +4,7 @@ class Scene {
 		this.main = new ElementContainer("Main", true, null, this.engine);
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
 		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
-		this.physicsEngine.oncollide = this.handleCollisionEvent.bind(this);
+		this.physicsEngine.onCollide = this.handleCollisionEvent.bind(this);
 		this.cullGraphics = true;
 		this.mouseEvents = false;
 		this.collisionEvents = true;

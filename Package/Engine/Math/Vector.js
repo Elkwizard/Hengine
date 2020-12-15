@@ -194,8 +194,10 @@ class Vector2 extends Vector {
 	get inverse() {
 		return new Vector2(-this.x, -this.y);
 	}
-	get() {
-		return new Vector2(this.x, this.y);
+	get(result = new Vector2()) {
+		result.x = this.x;
+		result.y = this.y;
+		return result;
 	}
 	equals(v, t = 0.00001) {
 		return Math.abs(this.x - v.x) < t && Math.abs(this.y - v.y) < t;

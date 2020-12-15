@@ -44,8 +44,8 @@ class AngleDirections extends Directions {
     }
 }
 class ParticleSpawnerObject extends SceneObject {
-    constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), home, engine) {
-        super(name, x, y, false, "Particle-Spawner", home, engine);
+    constructor(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), container, engine) {
+        super(name, x, y, false, "Particle-Spawner", container, engine);
         this.particleActive = true;
         this.particleFades = true;
         this.particleSlows = true;
@@ -83,9 +83,13 @@ class ParticleSpawnerObject extends SceneObject {
     }
     engineDraw(screen) {
         this.determineOnScreen(screen);
+        // this.onScreen = true;
 
         if (!this.hidden && this.onScreen) {
-            for (let [name, spawn] of this.spawns) spawn.engineDraw();
+            this.engine.renderer.save();
+            const currentAlpha = this.engine.renderer.alpha;
+            for (let [name, spawn] of this.spawns) spawn.engineDraw(currentAlpha);
+            this.engine.renderer.restore();
         }
     }
     updatePreviousData() {
@@ -100,7 +104,7 @@ class ParticleSpawnerObject extends SceneObject {
         return true;
     }
     engineUpdate() {
-        if (this.active && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
+        if (this.particleActive && this.lifeSpan % Math.ceil(this.particleDelay) === 0) {
             let len = 1;
             if (this.particleDelay < 1) len = 1 / this.particleDelay;
             for (let i = 0; i < len; i++) {
@@ -115,21 +119,21 @@ class ParticleSpawnerObject extends SceneObject {
     }
 }
 class ParticleObject extends SceneObject {
-    constructor(spawner, name, home, engine) {
-        super(name, spawner.transform.position.x, spawner.transform.position.y, false, "Engine-Particle", home, engine);
+    constructor(spawner, name, container, engine) {
+        super(name, spawner.transform.position.x, spawner.transform.position.y, false, "Engine-Particle", container, engine);
         this.velocity = Vector2.origin;
         this.spawner = spawner;
         this.name = name;
         this.angularVelocity = 0;
-        this.draw = function () { };
-        this.drawPrefix = function () { };
-        this.drawSuffix = function () { };
+        this.drawPrefix = function (currentAlpha) {
+            this.engine.renderer.alpha = currentAlpha;
+        };
 
         //Particle Init
         let sp = this.spawner;
         let pSize = sp.particleSize + ((Math.random() - Math.random()) * sp.particleSizeVariance);
         let shape = this.spawner.particleShape.scale(pSize);
-        this.addShape("default", shape);
+        this.addShape("default", shape, true);
 
         let varianceVector = new Vector2(sp.particleSpeedVariance, 0);
         varianceVector.angle = Math.random() * 2 * Math.PI;
@@ -140,18 +144,12 @@ class ParticleObject extends SceneObject {
         
         //art
         if (sp.particleFades) {
-            this.drawPrefix = function () {
-                this.engine.renderer.alpha = Number.clamp(1 - (this.lifeSpan / sp.particleLifeSpan), 0, 1);
-            };
-            this.drawSuffix = function () {
-                this.engine.renderer.alpha = 1;
+            this.drawPrefix = function (currentAlpha) {
+                this.engine.renderer.alpha = currentAlpha * Number.clamp(1 - (this.lifeSpan / sp.particleLifeSpan), 0, 1);
             };
         }
         if (sp.particleDraw instanceof ElementScript) {
-            this.draw = function () { };
             sp.particleDraw.addTo(this);
-        } else {
-            this.draw = sp.particleDraw.bind(this);
         }
         //Done
 
@@ -172,14 +170,13 @@ class ParticleObject extends SceneObject {
         this.scripts.run("Remove");
         this.spawner.spawns.delete(this.name);
     }
-    engineDraw() {
-        this.drawPrefix();
+    engineDraw(currentAlpha) {
+        this.drawPrefix(currentAlpha);
         this.runDraw();
-        this.drawSuffix();
         this.scripts.run("EscapeDraw");
     }
     engineUpdate() {
-        this.lastTransform = this.transform.get();
+        this.lastTransform = this.transform.get(this.lastTransform);
         if (this.spawner.particleFalls) {
             this.velocity.y += this.engine.scene.physicsEngine.gravity.y;
         }

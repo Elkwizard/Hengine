@@ -354,7 +354,6 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.renderer.clip().rect(rtvb.x - expand, rtvb.y - expand, rtvb.width + expand * 2, rtvb.height + expand * 2);
 		l.renderer.save();
 		l.renderer.translate(l.scrollOffset.inverse);
-
 		// renderer.stroke(Color.LIME, 3).rect(l.relativeTextViewBox);
 		// renderer.stroke(Color.RED, 3).rect(l.relativeTextBoundingBox);
 
@@ -412,8 +411,6 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		}
 		l.renderer.restore();
 		l.renderer.unclip();
-
-
 
 
 		//X Bar Values

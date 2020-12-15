@@ -1,8 +1,8 @@
 class WebGLArtist {
-	constructor(canvas, width, height, imageType, onresize = () => null) {
+	constructor(canvas, width, height, imageType, onResize = () => null) {
 		this.canvas = canvas;
 
-		this.onresize = onresize;
+		this.onResize = onResize;
 
 		this.gl = defineWebGL2DContext();
 		this.gl.create(canvas);
@@ -21,15 +21,22 @@ class WebGLArtist {
 		this.currentLineWidth = 1;
 		this.currentTransform = Matrix3.identity();
 		this.transformStack = [];
+		this.alphaStack = [];
 
 		this.resize(width, height, false);
 
 		this.drawObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					radius = y;
-					y = x.y;
-					x = x.x;
+					if (x.radius !== undefined) {
+						radius = x.radius;
+						y = x.y;
+						x = x.x;
+					} else {
+						radius = y;
+						y = x.y;
+						x = x.x;
+					}
 				}
 				this.gl.coloredEllipse(x, y, radius, radius, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
 			},
@@ -80,9 +87,15 @@ class WebGLArtist {
 		this.strokeObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					radius = y;
-					y = x.y;
-					x = x.x;
+					if (x.radius !== undefined) {
+						radius = x.radius;
+						y = x.y;
+						x = x.x;
+					} else {
+						radius = y;
+						y = x.y;
+						x = x.x;
+					}
 				}
 				this.gl.outlinedEllipse(x, y, radius, radius, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
 			},
@@ -206,9 +219,15 @@ class WebGLArtist {
 		this.imageObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					radius = y;
-					y = x.y;
-					x = x.x;
+					if (x.radius !== undefined) {
+						radius = x.radius;
+						y = x.y;
+						x = x.x;
+					} else {
+						radius = y;
+						y = x.y;
+						x = x.x;
+					}
 				}
 				this.gl.texturedEllipse(x, y, radius, radius, 0, 0, 1, 1, this.currentImage.makeImage());
 			},
@@ -351,7 +370,7 @@ class WebGLArtist {
 		this.imageType.height = height;
 		this.alpha = al;
 		this.preservePixelart = px;
-		if (trigger) this.onresize();
+		if (trigger) this.onResize();
 	}
 	setCursor(cursor) {
 		let style = this.canvas.style;
@@ -415,11 +434,14 @@ class WebGLArtist {
 	}
 	save() {
 		this.transformStack.push(Matrix3.copy(this.currentTransform));
+		this.alphaStack.push(this.alpha);
 	}
 	restore() {
 		if (this.transformStack.length) {
 			this.currentTransform = this.transformStack.pop();
 			this.gl.setTransform(this.currentTransform);
+			this.alpha = this.alphaStack.pop();
+			this.gl.setGlobalAlpha(this.alpha);
 		}
 	}
 	clear() {
@@ -443,9 +465,10 @@ class WebGLArtist {
 		this.translate(-x, -y);
 	}
 	drawWithAlpha(a, shape) {
-		this.alpha = a;
+		let prev = this.alpha;
+		this.alpha *= a;
 		shape();
-		this.alpha = 1;
+		this.alpha = prev;
 	}
 }
 
@@ -469,8 +492,8 @@ class WebGLFrame extends ImageType {
 	clip(x, y, w, h) {
 		return WebGLFrame.fromImageType(this, x, y, w, h);
 	}
-	get() {
-		let f = new WebGLFrame(this.width, this.height);
+	get(f = new WebGLFrame(this.width, this.height)) {
+		f.renderer.resize(this.width, this.height, false);
 		f.renderer.gl.texturedQuad(0, 0, this.width, this.height, 0, 0, 1, 1, this.makeImage());
 		return f;
 	}

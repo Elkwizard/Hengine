@@ -5,8 +5,10 @@ class PhysicsVector {
         this.x = x;
         this.y = y;
     }
-    get() {
-        return new PhysicsVector(this.x, this.y);
+    get(result = new PhysicsVector()) {
+        result.x = this.x;
+        result.y = this.y;
+        return result;
     }
     add(b) {
         this.x += b.x;
@@ -934,7 +936,7 @@ class PhysicsEngine {
         this.friction = 0.894;
         this.constraints = [];
         this.constraintIterations = 3;
-        this.oncollide = (a, b, dir, contacts) => null;
+        this.onCollide = (a, b, dir, contacts) => null;
         this.polygonVertexListSubdivider = null;
         this.iterations = 2;
         this.sleepDuration = 200;
@@ -1011,7 +1013,7 @@ class PhysicsEngine {
         if (STATIC) {
             body.prohibitedDirections.push(collisionDirection);
         }
-        this.oncollide(body, body2, collisionDirection, contacts);
+        this.onCollide(body, body2, collisionDirection, contacts);
         if (body.isTrigger || body2.isTrigger) return;
         if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
         else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);

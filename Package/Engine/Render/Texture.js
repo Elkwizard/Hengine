@@ -161,8 +161,8 @@ class Texture extends ImageType {
 		r.loaded = false;
 		return r;
 	}
-	get() {
-		let tex = new Texture(this.width, this.height);
+	get(tex = new Texture(this.width, this.height)) {
+		if (tex.width !== this.width || tex.height !== this.height) return null;
 		tex.pixels = this.pixels.map(v => v.get());
 		tex.updateImageData();
 		tex.loaded = false;

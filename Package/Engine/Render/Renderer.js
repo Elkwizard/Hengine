@@ -30,10 +30,10 @@ class ArtistImage extends ImageType {
 	}
 }
 class Artist {
-	constructor(canvas, width, height, imageType, onresize = () => null) {
+	constructor(canvas, width, height, imageType, onResize = () => null) {
 		this.canvas = canvas;
 
-		this.onresize = onresize;
+		this.onResize = onResize;
 
 		this.c = this.canvas.getContext('2d');
 
@@ -656,11 +656,11 @@ class Artist {
 		return this._blendMode;
 	}
 	set alpha(a) {
-		this._globalAlpha = a;
+		this._alpha = a;
 		this.c.globalAlpha = a;
 	}
 	get alpha() {
-		return this._globalAlpha;
+		return this._alpha;
 	}
 	set transform(a) {
 		const m = Matrix3.mulMatrix(
@@ -693,7 +693,7 @@ class Artist {
 		this.c.scale(devicePixelRatio, devicePixelRatio);
 		this.alpha = al;
 		this.preservePixelart = px;
-		if (trigger) this.onresize();
+		if (trigger) this.onResize();
 	}
 	setCursor(cursor) {
 		let style = this.canvas.style;
@@ -801,6 +801,7 @@ class Artist {
 	}
 	restore() {
 		this.c.restore();
+		this._alpha = this.c.globalAlpha;
 	}
 	clearRect(x, y, w, h) {
 		if (typeof x === "object") {
@@ -812,7 +813,10 @@ class Artist {
 		this.c.clearRect(x, y, w, h);
 	}
 	clear() {
-		this.c.clearRect(0, 0, this.width, this.height);
+		this.c.save();
+		this.c.resetTransform();
+		this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		this.c.restore();
 	}
 	clearScreen() {
 		this.fill(Color.WHITE);
@@ -832,13 +836,11 @@ class Artist {
 		this.rotate(r);
 		this.translate(-x, -y);
 	}
-	drawImage(img, x, y, width, height) {
-		
-	}
 	drawWithAlpha(a, shape) {
-		this.alpha = a;
+		let prev = this.alpha;
+		this.alpha *= a;
 		shape();
-		this.alpha = 1;
+		this.alpha = prev;
 	}
 	compileCommand(drawType, drawArgs, shapeArgs) {
 		let color;

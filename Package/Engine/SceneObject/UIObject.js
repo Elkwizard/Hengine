@@ -1,6 +1,6 @@
 class UIObject extends SceneObject {
-    constructor(name, x, y, home, engine) {
-        super(name, x, y, null, "UI", home, engine);
+    constructor(name, x, y, container, engine) {
+        super(name, x, y, null, "UI", container, engine);
     }
     engineDraw() {
         this.onScreen = true;
@@ -45,7 +45,7 @@ class UIComponent {
 }
 UIComponent.UI_LAYOUT = new ElementScript("UI_LAYOUT", {
     init(l, font, content, x, y) {
-        this.draw = () => null;
+        this.scripts.removeDefault();
         l.font = font;
         l.content = content;
         l.offset = new Vector2(x, y);

@@ -98,12 +98,6 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 
 		setup();
 
-		const loseContext = gl.getExtension("WEBGL_lose_context");
-		// loseContext.loseContext();
-		// loseContext.restoreContext();
-
-		window.lc = loseContext;
-
 		if (debug) bound.gl = gl;
 	}
 

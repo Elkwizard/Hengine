@@ -1,9 +1,3 @@
-window.assert = function (condition, name) {
-	if (!condition) {
-		console.warn(`Assertion "${name}" failed.`);
-		debugger;
-	}
-};
 window.define = function (name, value) {
 	delete window[name];
 	Object.defineProperty(window, name, {
