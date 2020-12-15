@@ -448,20 +448,12 @@ class RigidBody {
         this.invalidateModels();
     }
     addShape(sh) {
-        let shapes = [sh];
-
-        // if (sh instanceof PolygonCollider && this.engine && this.engine.polygonVertexListSubdivider) {
-        //     shapes = this.engine.polygonVertexListSubdivider(sh.vertices).map(poly => new PolygonCollider(poly));
-        // }
-
-        this.shapes.push(...shapes);
-        for (let i = 0; i < shapes.length; i++) {
-            const sha = shapes[i];
-            this.mass += ShapeMass["mass" + sha.constructor.name](sha);
-            this.inertia += ShapeMass["inertia" + sha.constructor.name](sha);
-        }
+        this.shapes.push(sh);
+        const name = sh.constructor.name;
+        this.mass += ShapeMass["mass" + name](sh);
+        this.inertia += ShapeMass["inertia" + name](sh);
         this.invalidateModels();
-        return shapes;
+        return sh;
     }
     integrate(intensity) {
         let dif = PhysicsVector.mul(this.velocity, intensity);
@@ -840,11 +832,36 @@ class CollisionResolver {
     }
 }
 class PhysicsConstraint {
+    constructor(body, offset) {
+        this.body = body;
+        this.offset = offset;
+    }
+    hasBody(b) {
+        return this.body === b;
+    }
+    getPoint() {
+        let ax = this.offset.x;
+        let ay = this.offset.y;
+        let ac = this.body.cosAngle;
+        let as = this.body.sinAngle;
+        let t_ax = ax * ac - ay * as;
+        let t_ay = ax * as + ay * ac;
+
+        return new PhysicsVector(t_ax + this.body.position.x, t_ay + this.body.position.y);
+    }
+    solve(int) {
+        // ...
+    }
+}
+class PhysicsConstraint2 {
     constructor(a, b, aOff, bOff) {
         this.bodyA = a;
         this.bodyB = b;
         this.offsetA = aOff;
         this.offsetB = bOff;
+    }
+    hasBody(b) {
+        return this.bodyA === b || this.bodyB === b;
     }
     getEnds() {
         let ax = this.offsetA.x;
@@ -867,11 +884,11 @@ class PhysicsConstraint {
             new PhysicsVector(t_bx + this.bodyB.position.x, t_by + this.bodyB.position.y)
         ];
     }
-    solve() {
-        //solve
+    solve(int) {
+        // ...
     }
 }
-PhysicsConstraint.Length = class extends PhysicsConstraint {
+PhysicsConstraint.Length = class extends PhysicsConstraint2 {
     constructor(a, b, ao, bo, l, stiffness) {
         super(a, b, ao, bo);
         this.length = l;
@@ -892,12 +909,9 @@ PhysicsConstraint.Length = class extends PhysicsConstraint {
         if (sum !== this.length ** 2) {
             let dist = Math.sqrt(sum);
             let dif = (dist - this.length) / 2;
-            dx /= dist;
-            dy /= dist;
-            dx /= 10;
-            dy /= 10;
-            dx *= int;
-            dy *= int;
+            let factor = int / (dist * 10);
+            dx *= factor;
+            dy *= factor;
 
             if (this.bodyA.type === RigidBody.STATIC || this.bodyB.type === RigidBody.STATIC) dif *= 2;
             dif *= this.stiffness;
@@ -925,6 +939,29 @@ PhysicsConstraint.Length = class extends PhysicsConstraint {
         }
     }
 }
+PhysicsConstraint.Position = class extends PhysicsConstraint {
+    constructor(body, offset, point) {
+        super(body, offset);
+        this.point = point;
+    }
+    solve(int) {
+        const a = this.getPoint();
+        const b = this.point;
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        const dist = Math.sqrt(dx ** 2 + dy ** 2);
+        const DIV = 1;
+        const factor = int / (dist * DIV);
+        dx *= factor;
+        dy *= factor;
+
+        this.body.position.x += dx * DIV;
+        this.body.position.y += dy * DIV;
+
+        this.body.applyImpulse(a, new PhysicsVector(dx * this.body.mass, dy * this.body.mass));
+
+    }
+}
 //engine
 class PhysicsEngine {
     constructor(gravity = new PhysicsVector(0, 0.2)) {
@@ -937,7 +974,6 @@ class PhysicsEngine {
         this.constraints = [];
         this.constraintIterations = 3;
         this.onCollide = (a, b, dir, contacts) => null;
-        this.polygonVertexListSubdivider = null;
         this.iterations = 2;
         this.sleepDuration = 200;
         this.sleepingActivityThreshold = 0.6;
@@ -1218,11 +1254,12 @@ class PhysicsEngine {
         }
 
         if (inx !== null) {
-            this.bodies[inx].wake();
+            let body = this.bodies[inx];
+            body.wake();
             let validConstraints = [];
             for (let i = 0; i < this.constraints.length; i++) {
                 let con = this.constraints[i];
-                if (con.bodyA.id !== id && con.bodyB.id !== id) validConstraints.push(con);
+                if (!con.hasBody(body)) validConstraints.push(con);
             }
             this.constraints = validConstraints;
             this.bodies.splice(inx, 1);

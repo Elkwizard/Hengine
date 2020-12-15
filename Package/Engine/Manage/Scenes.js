@@ -3,7 +3,6 @@ class Scene {
 		this.engine = engine;
 		this.main = new ElementContainer("Main", true, null, this.engine);
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
-		this.physicsEngine.polygonVertexListSubdivider = physicsPolygonSubdivider;
 		this.physicsEngine.onCollide = this.handleCollisionEvent.bind(this);
 		this.cullGraphics = true;
 		this.mouseEvents = false;
@@ -101,12 +100,17 @@ class Scene {
 			rect.lastColliding = rect.colliding.get();
 		}
 	}
-	constrain(a, b, ap = Vector2.origin, bp = Vector2.origin, str = "CURRENT_DIST", stiffness = 1) {
-		let con = new PhysicsConstraint.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), str, stiffness);
-		if (str === "CURRENT_DIST") {
+	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null, stiffness = 1) {
+		let con = new PhysicsConstraint.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length, stiffness);
+		if (length === null) {
 			let ends = con.getEnds();
-			con.length = Geometry.distToPoint(ends[0], ends[1]);
+			con.length = Vector2.dist(ends[0], ends[1]);
 		}
+		this.physicsEngine.addConstraint(con);
+	}
+	constrainPosition(a, offset = Vector2.origin, point = null) {
+		let con = new PhysicsConstraint.Position(a.body, offset.toPhysicsVector(), point);
+		if (point === null) con.point = con.getPoint();
 		this.physicsEngine.addConstraint(con);
 	}
 	updateCaches() {

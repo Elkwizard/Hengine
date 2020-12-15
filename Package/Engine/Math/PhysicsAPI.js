@@ -1,8 +1,3 @@
-function physicsPolygonSubdivider(input) {
-    let poly = new Polygon(input.map(v => Vector2.fromPhysicsVector(v)));
-    let list = Geometry.subdividePolygonList(poly.vertices);
-    return list.map(verts => Polygon.removeDuplicates(verts).map(vert => vert.toPhysicsVector()));
-}
 function physicsAPIcollideShapes(shape, shape2) {
     return !!CollisionDetector.collide(
         shape.toPhysicsShape().getModel(new PhysicsVector(0, 0), 1, 0),

@@ -149,7 +149,8 @@ class SceneObject extends SceneElement {
 	}
 	addShape(name, shape, convex = false) {
 		this.shapes.set(name, shape);
-		this.convexShapes.set(shape, (shape instanceof Polygon && !convex) ? Geometry.subdividePolygon(shape) : [shape]);
+		if (shape instanceof Rect || shape instanceof Circle) convex = true;
+		this.convexShapes.set(shape, convex ? [shape] : Geometry.subdividePolygon(shape));
 		this.cacheDimensions();
 	}
 	removeShape(name) {
@@ -216,15 +217,21 @@ class SceneObject extends SceneElement {
 	}
 	scale(factor) {
 		let middle = Vector2.origin;
-		for (let [name, shape] of this.shapes) this.modifyShape(name, shape.scaleAbout(middle, factor));
+		let entries = [];
+		for (let entry of this.shapes) entries.push(entry);
+		for (let i = 0; i < entries.length; i++) this.modifyShape(entries[i][0], entries[i][1].scaleAbout(middle, factor));
 		this.cacheDimensions();
 	}
-	scaleX(factor) {
-		for (let [name, shape] of this.shapes) this.modifyShape(name, shape.scaleXAbout(0, factor));
+	scaleX(factor) {	
+		let entries = [];
+		for (let entry of this.shapes) entries.push(entry);
+		for (let i = 0; i < entries.length; i++) this.modifyShape(entries[i][0], entries[i][1].scaleXAbout(0, factor));
 		this.cacheDimensions();
 	}
 	scaleY(factor) {
-		for (let [name, shape] of this.shapes) this.modifyShape(name, shape.scaleYAbout(0, factor));
+		let entries = [];
+		for (let entry of this.shapes) entries.push(entry);
+		for (let i = 0; i < entries.length; i++) this.modifyShape(entries[i][0], entries[i][1].scaleYAbout(0, factor));
 		this.cacheDimensions();
 	}
 	hide() {
