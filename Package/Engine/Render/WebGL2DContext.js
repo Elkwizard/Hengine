@@ -21,6 +21,17 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 	// BLEND MODE
 	const BLEND_MODE_COMBINE = 0x00;
 	const BLEND_MODE_ADD = 0x01;
+	
+	// LINE JOIN
+	const LINE_JOIN_ROUND = 0x02;
+	const LINE_JOIN_MITER = 0x03;
+	const LINE_JOIN_BEVEL = 0x04;
+
+	// LINE CAP
+	const LINE_CAP_FLAT = 0x05;
+	const LINE_CAP_ROUND = 0x06;
+	const LINE_CAP_SQUARE = 0x07;
+	const LINE_CAP_NOT_APPLICABLE = 0x08;
 
 	//#endregion
 
@@ -149,6 +160,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 				out highp vec2 position;
 				out highp float alpha;
 				out highp float lineWidth;
+				out highp vec2 scaleFactor;
 
 				void main() {
 					highp vec2 pos = vertexPosition;
@@ -173,8 +185,10 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 						else if (vertexIndex == 2) uv = vec2(0.0, 1.0);
 					}
 
-					highp float some = vertexTransformIndex;
-					pos = (vertexTransforms[int(vertexTransformIndex)] * vec3(pos, 1.0)).xy;
+					highp mat3 transf = vertexTransforms[int(vertexTransformIndex)];
+					pos = (transf * vec3(pos, 1.0)).xy;
+					scaleFactor.y = length(transf * vec3(0.0, 1.0, 0.0));
+					scaleFactor.x = length(transf * vec3(1.0, 0.0, 0.0));
 					gl_Position = vec4(pos.x / resolution.x * 2.0 - 1.0, 1.0 - pos.y / resolution.y * 2.0, 0.0, 1.0);
 
 					// out
@@ -201,6 +215,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 				in highp float type;
 				in highp vec2 uv;
 				in highp float lineWidth;
+				in highp vec2 scaleFactor;
 
 				uniform highp sampler2D textures[${glState.MAX_TEXTURE_UNITS}];
 
@@ -227,14 +242,15 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 						highp vec2 UV = uv - 0.5;
 
-						UV.x /= 1.0 - slope(UV.x) * lineWidth * 2.5;
-						UV.y /= 1.0 - slope(UV.y) * lineWidth * 2.5;
+						UV.x /= 1.0 - slope(UV.x) * lineWidth * scaleFactor.x * 2.5;
+						UV.y /= 1.0 - slope(UV.y) * lineWidth * scaleFactor.y * 2.5;
 
-						
 						if (circleRadius < 0.0) {
 							if (UV.x < 0.5 && UV.y < 0.5 && UV.x > -0.5 && UV.y > -0.5) {
-								highp float o = max(slope(UV.x), slope(UV.y)) * 0.1;
-								antialias *= 1.0 - smoothstep(abs(UV.x), 0.5, 0.5 - o) + 1.0 - smoothstep(abs(UV.y), 0.5, 0.5 - o);
+								highp float ox = slope(UV.x) * 0.07;
+								highp float oy = slope(UV.y) * 0.07;
+								antialias *= 1.0 - smoothstep(abs(UV.x), 0.5, 0.5 - ox) + 1.0 - smoothstep(abs(UV.y), 0.5, 0.5 - oy);
+								if (antialias < 0.01) discard;
 							}
 						} else if (circleRadius > 0.0) {
 							highp float o = 0.5 / circleRadius;
@@ -322,7 +338,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		]);
 		resize(glState.width ?? gl.canvas.width, glState.height ?? gl.canvas.height);
 
-		glState.miterLimit = 0.1;
+		glState.miterLimit = 0.9;
 
 		gl.clearColor(0, 0, 0, 0);
 	}
@@ -669,20 +685,33 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		avlw.changed = true;
 	}
 
-	function lineSegment(ax, ay, bx, by, lineWidth, r, g, b, a) {
+	function lineSegment(ax, ay, bx, by, lineWidth, lineCap, r, g, b, a) {
+
 		let nx = ay - by;
 		let ny = bx - ax;
 		const m = getMagnitude(nx, ny);
 		nx /= m;
 		ny /= m;
 
+		if (lineCap === LINE_CAP_SQUARE) {
+			const radius = lineWidth / 2;
+			let dx = ny * radius;
+			let dy = -nx * radius;
+			ax -= dx;
+			ay -= dy;
+			bx += dx;
+			by += dy;
+		} else if (lineCap === LINE_CAP_ROUND) {
+			const radius = lineWidth / 2;
+			coloredEllipse(ax, ay, radius, radius, r, g, b, a);
+			coloredEllipse(bx, by, radius, radius, r, g, b, a);
+		}
+
 		drawLineTriangle(ax, ay, bx, by, lineWidth, nx, ny, nx, ny, r, g, b, a);
 		drawLineTriangle(bx, by, ax, ay, lineWidth, -nx, -ny, -nx, -ny, r, g, b, a);
 	}
 
-	function lineSegments(segments, lineWidth, r, g, b, a, closed = false, noDuplicates = false, copy = true) {
-		closed = true;
-
+	function lineSegments(segments, lineWidth, lineCap, lineJoin, r, g, b, a, closed = false, noDuplicates = false, copy = true) {
 		if (segments.length < 4) return;
 
 		if (copy) segments = [...segments];
@@ -724,6 +753,44 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 			vectors = vectors.filter(duplicateRemove);
 		}
 
+		// line cap
+		if (!closed) {
+			if (lineCap === LINE_CAP_SQUARE) {
+				const radius = lineWidth / 2;
+				segments[0] -= vectors[0] * radius;
+				segments[1] -= vectors[1] * radius;
+				segments[segments.length - 2] += vectors[vectors.length - 4] * radius;
+				segments[segments.length - 1] += vectors[vectors.length - 3] * radius;
+			} else if (lineCap === LINE_CAP_ROUND) {
+				const radius = lineWidth / 2;
+				coloredEllipse(segments[0], segments[1], radius, radius, r, g, b, a);
+				coloredEllipse(segments[segments.length - 2], segments[segments.length - 1], radius, radius, r, g, b, a);
+			}
+		}
+
+		// line join round
+		if (lineJoin === LINE_JOIN_ROUND) {
+			const radius = lineWidth / 2;
+			for (let i = 0; i < segments.length - 2; i += 2) {
+				const ax = segments[i + 0];
+				const ay = segments[i + 1];
+				const bx = segments[i + 2];
+				const by = segments[i + 3];
+
+				let nx = -vectors[i + 1];
+				let ny = vectors[i];
+				const m = getMagnitude(nx, ny);
+				nx /= m;
+				ny /= m;
+
+				drawLineTriangle(ax, ay, bx, by, lineWidth, nx, ny, nx, ny, r, g, b, a);
+				drawLineTriangle(bx, by, ax, ay, lineWidth, -nx, -ny, -nx, -ny, r, g, b, a);
+
+				if (i < segments.length - 4 || closed) coloredEllipse(segments[i + 2], segments[i + 3], radius, radius, r, g, b, a);
+			}
+			return;
+		}
+
 		const miterNormals = [];
 		const miterSuccess = [];
 
@@ -748,7 +815,34 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 			if (isFinite(miterFactor)) miterNormals.push(miterFactor * vertexNormalAX, miterFactor * vertexNormalAY);
 			else miterNormals.push(vertexNormalX, vertexNormalY);
 
-			miterSuccess.push(Math.abs(dot) > glState.miterLimit);
+			const miterSuccessDot = getDot(dx, dy, dxLast, dyLast);
+
+			let unitMiterSuccess = -miterSuccessDot < glState.miterLimit;
+			if (unitMiterSuccess && lineJoin !== LINE_JOIN_BEVEL) {
+				miterSuccess.push(true);
+			} else {
+				// bevel
+				miterSuccess.push(false);
+				const ax = segments[i];
+				const ay = segments[i + 1];
+				const vmx = vertexNormalAX;
+				const vmy = vertexNormalAY;
+				let v1x = -dy;
+				let v1y = dx;
+				let v2x = -dyLast;
+				let v2y = dxLast;
+
+				if (getDot(vmx, vmy, v1x, v1y) < 0) {
+					v1x = -v1x;
+					v1y = -v1y;
+					v2x = -v2x;
+					v2y = -v2y;
+				}
+
+				const radius = lineWidth / 2;
+
+				coloredTriangle(ax, ay, ax + radius * v1x, ay + radius * v1y, ax + radius * v2x, ay + radius * v2y, r, g, b, a);
+			}
 		}
 
 		let closingMiterNormalX;
@@ -781,7 +875,34 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 				closingMiterNormalY = vertexNormalY;
 			}
 
-			closingMiterSuccess = Math.abs(dot) > glState.miterLimit;
+			const miterSuccessDot = getDot(dx, dy, dxLast, dyLast);
+
+			let unitMiterSuccess = -miterSuccessDot < glState.miterLimit;
+			if (unitMiterSuccess && lineJoin !== LINE_JOIN_BEVEL) {
+				closingMiterSuccess = true;
+			} else {
+				// bevel
+				closingMiterSuccess = false;
+				const ax = segments[0];
+				const ay = segments[1];
+				const vmx = vertexNormalAX;
+				const vmy = vertexNormalAY;
+				let v1x = -dy;
+				let v1y = dx;
+				let v2x = -dyLast;
+				let v2y = dxLast;
+
+				if (getDot(vmx, vmy, v1x, v1y) < 0) {
+					v1x = -v1x;
+					v1y = -v1y;
+					v2x = -v2x;
+					v2y = -v2y;
+				}
+
+				const radius = lineWidth / 2;
+
+				coloredTriangle(ax, ay, ax + radius * v1x, ay + radius * v1y, ax + radius * v2x, ay + radius * v2y, r, g, b, a);
+			}
 		}
 
 		const closingNormalsValid = closed && closingMiterSuccess;
@@ -836,14 +957,12 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 	}
 
-	function outlinedTriangle(ax, ay, bx, by, cx, cy, lineWidth, r, g, b, a) {
-		beforeBufferWrite(1);
-
+	function outlinedTriangle(ax, ay, bx, by, cx, cy, lineWidth, lineJoin, r, g, b, a) {
 		lineSegments([
 			ax, ay,
 			bx, by,
 			cx, cy
-		], lineWidth, r, g, b, a, true, true, false);
+		], lineWidth, LINE_CAP_NOT_APPLICABLE, lineJoin, r, g, b, a, true, true, false);
 	}
 
 	function outlinedQuad(x, y, w, h, lineWidth, r, g, b, a) {
@@ -943,8 +1062,8 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		avlw.changed = true;
 	}
 
-	function outlinedPolygon(vertices, lineWidth, r, g, b, a) {
-		lineSegments(vertices, lineWidth, r, g, b, a, true, false, true);
+	function outlinedPolygon(vertices, lineWidth, lineJoin, r, g, b, a) {
+		lineSegments(vertices, lineWidth, LINE_CAP_NOT_APPLICABLE, lineJoin, r, g, b, a, true, false, true);
 	}
 	//#endregion
 
@@ -1080,7 +1199,11 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 		outlinedTriangle, outlinedQuad, outlinedEllipse, outlinedPolygon, lineSegment, lineSegments,
 
-		BLEND_MODE_COMBINE, BLEND_MODE_ADD
+		BLEND_MODE_COMBINE, BLEND_MODE_ADD,
+
+		LINE_JOIN_MITER, LINE_JOIN_BEVEL, LINE_JOIN_ROUND,
+
+		LINE_CAP_FLAT, LINE_CAP_ROUND, LINE_CAP_SQUARE
 	};
 
 	for (const key in components) bound[key] = components[key];

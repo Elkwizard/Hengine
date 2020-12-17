@@ -35,12 +35,12 @@ class LocalFileSystem {
 		do {
 			name = prev + "_INX_" + n;
 			n++;
-			if (localStorage[name] !== undefined) {
+			if (localStorage.getItem(name) !== null) {
 				names.push(name);
 			}
-		} while (localStorage[name] !== undefined);
+		} while (localStorage.getItem(name) !== null);
 		for (let name of names) {
-			delete localStorage[name];
+			localStorage.removeItem(name);
 		}
 		return value;
 
@@ -63,7 +63,7 @@ class LocalFileSystem {
 			for (let v of values) {
 				let K = LocalFileSystem.header + key + v[1];
 				let value = v[0];
-				localStorage[K] = value;
+				localStorage.setItem(K, value);
 			}
 			return true;
 		} catch (e) {
@@ -80,10 +80,10 @@ class LocalFileSystem {
 		do {
 			name = prev + "_INX_" + n;
 			n++;
-			if (localStorage[name] !== undefined) {
-				value += localStorage[name];
+			if (localStorage.getItem(name) !== null) {
+				value += localStorage.getItem(name);
 			}
-		} while (localStorage[name] !== undefined);
+		} while (localStorage.getItem(name) !== null);
 		return LocalFileSystem.decompress(value);
 	}
 	static getRemainingSpace() {

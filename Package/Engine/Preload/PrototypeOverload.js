@@ -6,6 +6,11 @@ window.define = function (name, value) {
 		}
 	});
 };
+function defineEnum(...values) {
+	const obj = { };
+	for (let i = 0; i < values.length; i++) obj[values[i]] = Symbol(values[i]);
+	return obj;
+}
 Object.defineProperty(window, "title", {
 	get() {
 		let tag = document.getElementsByTagName("title")[0];

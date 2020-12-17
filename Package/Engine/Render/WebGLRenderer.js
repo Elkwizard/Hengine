@@ -19,6 +19,19 @@ class WebGLArtist {
 		this.currentAlpha = 0;
 		this.currentColor = Color.BLANK;
 		this.currentLineWidth = 1;
+		this.currentLineCap = this.gl.LINE_CAP_FLAT;
+		this.currentLineJoin = this.gl.LINE_JOIN_MITER;
+		
+		this.lineJoinMap = new Map([
+			[LineJoin.MITER, this.gl.LINE_JOIN_MITER],
+			[LineJoin.BEVEL, this.gl.LINE_JOIN_BEVEL],
+			[LineJoin.ROUND, this.gl.LINE_JOIN_ROUND]
+		]);
+		this.lineCapMap = new Map([
+			[LineJoin.FLAT, this.gl.LINE_CAP_FLAT],
+			[LineJoin.SQUARE, this.gl.LINE_CAP_SQUARE],
+			[LineJoin.ROUND, this.gl.LINE_CAP_ROUND]
+		]);
 		this.currentTransform = Matrix3.identity();
 		this.transformStack = [];
 		this.alphaStack = [];
@@ -73,11 +86,11 @@ class WebGLArtist {
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.draw(this.currentColor).circle(obj);
+					this.drawObj.circle(obj);
 				} else if (obj.width !== undefined) {
-					this.draw(this.currentColor).rect(obj);
+					this.drawObj.rect(obj);
 				} else if (obj.vertices !== undefined) {
-					this.draw(this.currentColor).shape(obj.vertices);
+					this.drawObj.shape(obj.vertices);
 				}
 			}
 		}
@@ -118,7 +131,7 @@ class WebGLArtist {
 				this.gl.outlinedQuad(x, y, width, height, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
 			},
 			triangle(v1, v2, v3) {
-				this.gl.outlinedTriangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.outlinedTriangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, this.currentLineWidth, this.currentLineJoin, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
 			},
 			connector(points) {
 				if (points.length) {
@@ -126,7 +139,7 @@ class WebGLArtist {
 					for (let i = 0; i < points.length; i++) {
 						vertices.push(points[i].x, points[i].y);
 					}
-					this.gl.lineSegments(vertices, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha, false, false, false);
+					this.gl.lineSegments(vertices, this.currentLineWidth, this.currentLineCap, this.currentLineJoin, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha, false, false, false);
 				}
 			},
 			spline(spline, prec = 100) {
@@ -137,7 +150,7 @@ class WebGLArtist {
 					vertices.push(p.x, p.y);
 				}
 				vertices.push(spline.b.x, spline.b.y);
-				this.gl.lineSegments(vertices, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha, false, false, false);
+				this.gl.lineSegments(vertices, this.currentLineWidth, this.currentLineCap, this.currentLineJoin, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha, false, false, false);
 			},
 			line(x, y, x1, y1) {
 				if (typeof x == "object") {
@@ -154,7 +167,7 @@ class WebGLArtist {
 						x = x.x;
 					}
 				}
-				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentLineCap, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
 			},
 			arrow(x, y, x1, y1) {
 				if (typeof x === "object") {
@@ -177,7 +190,7 @@ class WebGLArtist {
 				v_y /= mag;
 				let n_x = -v_y;
 				let n_y = v_x;
-				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentLineCap, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
 				let l2 = this.currentLineWidth * 2;
 				x1 -= v_x * l2;
 				y1 -= v_y * l2;
@@ -195,20 +208,20 @@ class WebGLArtist {
 					for (let i = 0; i < points.length; i++) {
 						vertices.push(points[i].x, points[i].y);
 					}
-					this.gl.outlinedPolygon(vertices, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+					this.gl.outlinedPolygon(vertices, this.currentLineWidth, this.currentLineJoin, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
 				}
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.stroke(this.currentColor, this.currentLineWidth).circle(obj);
+					this.strokeObj.circle(obj);
 				} else if (obj.radius !== undefined) {
-					this.stroke(this.currentColor, this.currentLineWidth).rect(obj);
+					this.strokeObj.rect(obj);
 				} else if (obj.vertices !== undefined) {
-					this.stroke(this.currentColor, this.currentLineWidth).shape(obj.vertices);
+					this.strokeObj.shape(obj.vertices);
 				} else if (obj instanceof Line) {
-					this.stroke(this.currentColor, this.currentLineWidth).line(obj);
+					this.strokeObj.line(obj);
 				} else if (obj instanceof Spline) {
-					this.stroke(this.currentColor, this.currentLineWidth).spline(obj);
+					this.strokeObj.spline(obj);
 				}
 			}
 		}
@@ -303,11 +316,11 @@ class WebGLArtist {
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.image(this.currentImage).circle(obj);
+					this.imageObj.circle(obj);
 				} else if (obj.width !== undefined) {
-					this.image(this.currentImage).rect(obj);
+					this.imageObj.rect(obj);
 				} else if (obj.vertices !== undefined) {
-					this.image(this.currentImage).shape(obj.vertices);
+					this.imageObj.shape(obj.vertices);
 				}
 			}
 		};
@@ -386,9 +399,11 @@ class WebGLArtist {
 		this.useColor(color);
 		return this.drawObj;
 	}
-	stroke(color, lineWidth = 1) {
+	stroke(color, lineWidth = 1, lineCap = "flat", lineJoin = "bevel") {
 		this.useColor(color);
 		this.currentLineWidth = lineWidth;
+		this.currentLineCap = this.lineCapMap.get(lineCap);
+		this.currentLineJoin = this.lineJoinMap.get(lineJoin);
 		return this.strokeObj;
 	}
 	image(img) {
@@ -471,7 +486,7 @@ class WebGLArtist {
 	}
 }
 
-class WebGLFrame extends ImageType {
+class FastFrame extends ImageType {
 	constructor(width, height) {
 		super(width, height);
 		this.image = new_OffscreenCanvas(this.width, this.height);
@@ -480,7 +495,7 @@ class WebGLFrame extends ImageType {
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
-		let f = new WebGLFrame(w, h);
+		let f = new FastFrame(w, h);
 		f.renderer.gl.texturedQuad(0, 0, w, h, 0, 0, 1, 1, this.makeImage());
 		return f;
 	}
@@ -489,9 +504,9 @@ class WebGLFrame extends ImageType {
 		return this.image;
 	}
 	clip(x, y, w, h) {
-		return WebGLFrame.fromImageType(this, x, y, w, h);
+		return FastFrame.fromImageType(this, x, y, w, h);
 	}
-	get(f = new WebGLFrame(this.width, this.height)) {
+	get(f = new FastFrame(this.width, this.height)) {
 		f.renderer.resize(this.width, this.height, false);
 		f.renderer.gl.texturedQuad(0, 0, this.width, this.height, 0, 0, 1, 1, this.makeImage());
 		return f;
@@ -509,7 +524,7 @@ class WebGLFrame extends ImageType {
 		if (!w) w = img.width;
 		if (!h) h = img.height;
 
-		let f = new WebGLFrame(w, h);
+		let f = new FastFrame(w, h);
 		f.renderer.gl.texturedQuad(0, 0, width, height, x / img.width, y / img.height, w / img.width, h / img.height, img.makeImage());
 		return f;
 	}

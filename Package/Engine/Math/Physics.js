@@ -92,36 +92,7 @@ class PhysicsMath {
         let m_B = (B1.y - B.y) / (B1.x - B.x);
         let b_B = B.y - m_B * B.x;
 
-        if (m_A === m_B || (Math.abs(m_A) > INFINITY && Math.abs(m_B) > INFINITY)) {
-
-            const nx = -(A1.y - A.y);
-            const ny = A1.x - A.x;
-            const a_dot_n = nx * A.x + ny * A.y;
-            const b_dot_n = nx * B.x + ny * B.y;
-            if (a_dot_n === b_dot_n) {
-                const a_dot = -ny * A.x + nx * A.y;
-                const b_dot = -ny * B.x + nx * B.y;
-                const a_dot1 = -ny * A1.x + nx * A1.y;
-                const b_dot1 = -ny * B1.x + nx * B1.y;
-                const amin = Math.min(a_dot, a_dot1);
-                const amax = Math.max(a_dot, a_dot1);
-                const bmin = Math.min(b_dot, b_dot1);
-                const bmax = Math.max(b_dot, b_dot1);
-                if (amax < bmin || bmax < amin) return null;
-                let abest = amin;
-                let bbest = bmax;
-                if ((amin + amax) / 2 < (bmin + bmax) / 2) {
-                    abest = amax;
-                    bbest = bmin;
-                }
-                const ap = (abest === a_dot) ? A : A1;
-                const bp = (bbest === b_dot) ? B : B1;
-                const x = (ap.x + bp.x) / 2;
-                const y = (ap.y + bp.y) / 2;
-                return new PhysicsVector(x, y);
-            }
-            return null;
-        }
+        if (m_A === m_B || (Math.abs(m_A) > INFINITY && Math.abs(m_B) > INFINITY)) return null;
 
         let x = (b_B - b_A) / (m_A - m_B);
         if (Math.abs(m_A) > INFINITY) {
@@ -510,11 +481,11 @@ RigidBody.nextID = 0;
 
 //detection
 class CollisionDetector {
-    static collide(shapeA, shapeB, arg) {
+    static collide(shapeA, shapeB) {
         if (Bounds.notOverlap(shapeA.bounds, shapeB.bounds)) return null;
-        return CollisionDetector.jumpTable[shapeA.constructor.SYMBOL][shapeB.constructor.SYMBOL](shapeA, shapeB, arg);
+        return CollisionDetector.jumpTable[shapeA.constructor.SYMBOL][shapeB.constructor.SYMBOL](shapeA, shapeB);
     }
-    static CircleModel_PolygonModel(a, b, _unused) {
+    static CircleModel_PolygonModel(a, b) {
         //CLOSEST POINT
 
         let bestDist = Infinity;
@@ -593,14 +564,14 @@ class CollisionDetector {
         }
         return null;
     }
-    static PolygonModel_CircleModel(a, b, _unused) {
+    static PolygonModel_CircleModel(a, b) {
         let col = this.CircleModel_PolygonModel(b, a, PhysicsVector.invert(_unused));
         if (col) {
             col.direction.mul(-1);
         }
         return col;
     }
-    static CircleModel_CircleModel(a, b, _unused) {
+    static CircleModel_CircleModel(a, b) {
         let between = PhysicsVector.sub(b.position, a.position);
         let sqrMag = PhysicsVector.sqrMag(between);
         if (sqrMag < (a.radius + b.radius) ** 2) {
@@ -616,7 +587,7 @@ class CollisionDetector {
         }
         return null;
     }
-    static PolygonModel_PolygonModel(a, b, _unused) {
+    static PolygonModel_PolygonModel(a, b) {
         let toB = PhysicsVector.sub(b.position, a.position);
 
         let axes = [...a.axes.map(ax => PhysicsVector.invert(ax)), ...b.axes].filter(ax => PhysicsVector.dot(ax, toB) > 0);
@@ -653,7 +624,7 @@ class CollisionDetector {
         }
         if (!bestAxis) return null;
         let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
-        
+
         let { aMin, aMax, bMin, bMax } = bestRange;
         // exit(bestRange);
         let rMin;
@@ -679,7 +650,7 @@ class CollisionDetector {
                 let pen = Math.abs((rMax - rMin) / 2 - Math.abs(dot - (rMin + rMax) / 2));
                 return new CollisionDetector.Contact(contact, Math.max(pen, 0.01) || 0.0001);
             });
-        
+
         if (!contacts.length) {
             return new CollisionDetector.Collision(bestAxis, [], minOverlap);
         } else return new CollisionDetector.Collision(bestAxis, contacts, minOverlap);
@@ -982,7 +953,7 @@ class PhysicsEngine {
         return this.sleepDuration * this.iterations;
     }
     isAsleep(body) {
-        return body.sleeping > this.getSleepDuration();
+        return body.sleeping >= this.getSleepDuration();
     }
     clearCollidingBodies() {
         for (let i = 0; i < this.bodies.length; i++) {
@@ -1033,11 +1004,15 @@ class PhysicsEngine {
         let maxPenetration = col.penetration;
         let contacts = col.contacts;
         // scene.camera.drawInWorldSpace(() => {
-        //     for (let cont of contacts) renderer.draw(Color.ORANGE).circle(cont.point, 5); 
+        //     for (let cont of contacts) renderer.stroke(Color.ORANGE, 1).line(body.position, cont.point); 
         // });
         body2.addCollidingBody(body);
         body.addCollidingBody(body2);
-        if (!maxPenetration) return;
+
+        if (!maxPenetration || maxPenetration < 0.01) return;
+        this.onCollide(body, body2, collisionDirection, contacts);
+
+        if (body.isTrigger || body2.isTrigger) return;
         let STATIC = body2.type === RigidBody.STATIC;
         if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
             let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
@@ -1049,13 +1024,13 @@ class PhysicsEngine {
         if (STATIC) {
             body.prohibitedDirections.push(collisionDirection);
         }
-        this.onCollide(body, body2, collisionDirection, contacts);
-        if (body.isTrigger || body2.isTrigger) return;
         if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
         else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
 
+        if (!body.sleeping) body2.wake();
+
         //immobilize
-        body.canMoveThisStep = false;
+        // body.canMoveThisStep = false;
     }
     collisions(order, dynBodies, collisionPairs) {
         dynBodies.sort(order);
@@ -1088,12 +1063,12 @@ class PhysicsEngine {
             for (let j = 0; j < collidable.length; j++) {
                 let body2 = collidable[j];
                 if (body.shapes.length === 1 && body2.shapes.length === 1) {
-                    let col = CollisionDetector.collide(body.cacheModel(0), body2.cacheModel(0), PhysicsVector.sub(body2.position, body.position));
+                    let col = CollisionDetector.collide(body.cacheModel(0), body2.cacheModel(0));
                     if (col) this.resolve(body, body2, col);
                 } else {
                     let collisions = [];
                     for (let sI = 0; sI < body.shapes.length; sI++) for (let sJ = 0; sJ < body2.shapes.length; sJ++) {
-                        let col = CollisionDetector.collide(body.cacheModel(sI), body2.cacheModel(sJ), PhysicsVector.sub(body2.position, body.position));
+                        let col = CollisionDetector.collide(body.cacheModel(sI), body2.cacheModel(sJ));
                         if (col) collisions.push(col);
                     }
                     if (!collisions.length) continue;
@@ -1167,7 +1142,7 @@ class PhysicsEngine {
         return body.type === RigidBody.STATIC || (
             //linear 
             PhysicsVector.sqrMag(PhysicsVector.sub(body.position, body.lastPosition)) * this.iterations < (this.sleepingActivityThreshold * 2) ** 2 &&
-            PhysicsVector.sqrMag(body.velocity) < this.sleepingActivityThreshold ** 2 && 
+            PhysicsVector.sqrMag(body.velocity) < this.sleepingActivityThreshold ** 2 &&
             //angular
             Math.abs(body.angle - body.lastAngle) * this.iterations < (this.sleepingActivityThreshold * 2) / 40 &&
             Math.abs(body.angularVelocity) < this.sleepingActivityThreshold / 40
@@ -1176,10 +1151,27 @@ class PhysicsEngine {
     handleSleep(dynBodies) {
         if (!isFinite(this.sleepDuration)) return;
         let sleepDuration = this.getSleepDuration();
+
+        //wake bodies that are in contact with woken bodies
+        for (let n = 0; n < 3; n++) for (let i = 0; i < dynBodies.length; i++) {
+            let body = dynBodies[i];
+            if (body.sleeping >= sleepDuration) {
+                const cb = body.collidingBodies;
+                for (let j = 0; j < cb.length; j++) {
+                    renderer.stroke(Color.ORANGE, 2).arrow(cb[j].position, body.position);
+                    if (!cb[j].sleeping) {
+                        body.wake();
+                        break;
+                    }
+                }
+            }
+        }
+
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
             if (this.lowActivity(body)) {
                 body.sleeping++;
+                renderer.stroke(Color.ORANGE, 1).infer(body.cacheModel(0));
                 if (body.sleeping === sleepDuration) body.stop();
             } else body.wake();
         }
@@ -1188,17 +1180,6 @@ class PhysicsEngine {
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
             body.updateLastData();
-        }
-
-        //wake bodies that are in contact with woken bodies
-        for (let n = 0; n < 3; n++) for (let i = 0; i < dynBodies.length; i++) {
-            let body = dynBodies[i];
-            if (!body.sleeping) {
-                for (let j = 0; j < body.collidingBodies.length; j++) {
-                    let body2 = body.collidingBodies[j];
-                    body2.wake();
-                }
-            }
         }
     }
     run() {
@@ -1212,11 +1193,11 @@ class PhysicsEngine {
         this.applyForces(dynBodies);
         let intensity = 1 / this.iterations;
         this.step = 0;
-        
+
         //sorts
         let g = this.gravity;
         let gravitySort = (a, b) => (b.position.x - a.position.x) * g.x + (b.position.y - a.position.y) * g.y;
-        
+
         for (let i = 0; i < this.iterations; i++) {
             this.step++;
 

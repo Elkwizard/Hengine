@@ -85,7 +85,7 @@ class ScriptContainer {
 		this.implementedMethods = new Set();
 		this.sortedLocalScripts = [];
 	}
-	get default() {
+	get defaultScript() {
 		return this.sceneObject.container.defaultScript;
 	}
 	add(script, ...args) {
@@ -118,8 +118,12 @@ class ScriptContainer {
 			for (let flag of m.implementedMethods) this.implementedMethods.add(flag);
 		}
 	}
+	has(script) {
+		return !!this.sortedLocalScripts.find(l => l.scriptSource === script);
+	}
 	removeDefault() {
-		this.remove(this.default);
+		const defaultScript = this.defaultScript;
+		if (this.has(defaultScript)) this.remove(defaultScript);
 	}
 	implements(method) {
 		return this.implementedMethods.has("script" + method);

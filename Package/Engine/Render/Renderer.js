@@ -1,24 +1,15 @@
 // Text Modes
-const TextModeX = {
-	LEFT: Symbol("LEFT"),
-	CENTER: Symbol("CENTER"),
-	RIGHT: Symbol("RIGHT")
-};
-const TextModeY = {
-	TOP: Symbol("TOP"),
-	CENTER: Symbol("CENTER"),
-	BOTTOM: Symbol("BOTTOM")
-};
+const TextModeX = defineEnum("LEFT", "CENTER", "RIGHT");
+const TextModeY = defineEnum("TOP", "CENTER", "BOTTOM");
+
 const TextMode = {};
 for (let x in TextModeX) for (let y in TextModeY) {
 	TextMode[y + "_" + x] = [TextModeX[x], TextModeY[y]];
 }
 
-// Blend Modes
-const BlendMode = {
-	COMBINE: Symbol("COMBINE"),
-	ADD: Symbol("ADD")
-};
+const BlendMode = defineEnum("ADD", "COMBINE");
+const LineJoin = defineEnum("MITER", "BEVEL", "ROUND");
+const LineCap = defineEnum("FLAT", "SQUARE", "ROUND");
 
 class ArtistImage extends ImageType {
 	constructor(artist) {
@@ -39,6 +30,17 @@ class Artist {
 
 		this.imageType = imageType || new ArtistImage(this);
 		
+		this.lineJoinMap = new Map([
+			[LineJoin.MITER, "miter"],
+			[LineJoin.BEVEL, "bevel"],
+			[LineJoin.ROUND, "round"]
+		]);
+		this.lineCapMap = new Map([
+			[LineJoin.FLAT, "butt"],
+			[LineJoin.SQUARE, "square"],
+			[LineJoin.ROUND, "round"]
+		]);
+
 		this.preservePixelart = true;
 		this.c.imageSmoothingQuality = "high";
 		this.alpha = 1;
@@ -236,11 +238,11 @@ class Artist {
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.draw(this.c.fillStyle).circle(obj);
+					this.drawObj.circle(obj);
 				} else if (obj.width !== undefined) {
-					this.draw(this.c.fillStyle).rect(obj);
+					this.drawObj.rect(obj);
 				} else if (obj.vertices !== undefined) {
-					this.draw(this.c.fillStyle).shape(obj.vertices);
+					this.drawObj.shape(obj.vertices);
 				}
 			}
 		}
@@ -466,15 +468,15 @@ class Artist {
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).circle(obj);
+					this.strokeObj.circle(obj);
 				} else if (obj.radius !== undefined) {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).rect(obj);
+					this.strokeObj.rect(obj);
 				} else if (obj.vertices !== undefined) {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).shape(obj.vertices);
+					this.strokeObj.shape(obj.vertices);
 				} else if (obj instanceof Line) {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).line(obj);
+					this.strokeObj.line(obj);
 				} else if (obj instanceof Spline) {
-					this.stroke(this.c.strokeStyle, this.c.lineWidth, this.c.lineCap, this.c.lineJoin).spline(obj);
+					this.strokeObj.spline(obj);
 				}
 			}
 		}
@@ -512,11 +514,11 @@ class Artist {
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.clip().circle(obj);
+					this.clipObj.circle(obj);
 				} else if (obj.width !== undefined) {
-					this.clip().rect(obj);
+					this.clipObj.rect(obj);
 				} else if (obj.vertices !== undefined) {
-					this.clip().shape(obj.vertices);
+					this.clipObj.shape(obj.vertices);
 				}
 			}
 		}
@@ -598,11 +600,11 @@ class Artist {
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
-					this.image(this.imageStyle).circle(obj);
+					this.imageObj.circle(obj);
 				} else if (obj.width !== undefined) {
-					this.image(this.imageStyle).rect(obj);
+					this.imageObj.rect(obj);
 				} else if (obj.vertices !== undefined) {
-					this.image(this.imageStyle).shape(obj.vertices);
+					this.imageObj.shape(obj.vertices);
 				}
 			}
 
@@ -730,11 +732,10 @@ class Artist {
 		this.c.fillStyle = this.getContextColor(color);
 		return this.drawObj;
 	}
-	stroke(color, lineWidth = 1, endStyle = "flat", lineJoin = "bevel") {
+	stroke(color, lineWidth = 1, lineCap = "flat", lineJoin = "bevel") {
 		this.c.strokeStyle = this.getContextColor(color);
-		if (endStyle === "flat") endStyle = "butt";
-		this.c.lineJoin = lineJoin;
-		this.c.lineCap = endStyle;
+		this.c.lineJoin = this.lineJoinMap.get(lineJoin);
+		this.c.lineCap = this.lineCapMap.get(lineCap);
 		this.c.lineWidth = lineWidth;
 		return this.strokeObj;
 	}
