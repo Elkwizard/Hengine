@@ -425,7 +425,7 @@ class Artist {
 				this.c.lineTo(px - ox * l2, py - oy * l2);
 				this.c.lineTo(px + ox * l2, py + oy * l2);
 				this.c.fill();
-			},
+			},	
 			arrow(x, y, x1, y1) {
 				if (typeof x === "object") {
 					if (x instanceof Line) {

@@ -253,6 +253,8 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 								if (antialias < 0.01) discard;
 							}
 						} else if (circleRadius > 0.0) {
+							highp float circleRadius = 1.0 / min(slope(UV.x), slope(UV.y));
+
 							highp float o = 0.5 / circleRadius;
 						
 							highp float ilen = length(UV);

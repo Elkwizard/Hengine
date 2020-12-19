@@ -378,7 +378,7 @@ class RigidBody {
         if (this.type !== RigidBody.STATIC && !this.collidingBodies.includes(body)) this.collidingBodies.push(body);
     }
     wake() {
-        this.sleeping = 0;
+        if (this.type === RigidBody.DYNAMIC) this.sleeping = 0;
     }
     displace(v) {
         this.position.add(v);
@@ -637,12 +637,12 @@ class CollisionDetector {
             rMax = bMax;
         }
 
-        if (intersections.length >= 2) {
-            let final = new PhysicsVector(0, 0);
-            for (let i = 0; i < intersections.length; i++) final.add(intersections[i]);
-            final.div(intersections.length);
-            intersections = [final];
-        }
+        // if (intersections.length >= 2) {
+        //     let final = new PhysicsVector(0, 0);
+        //     for (let i = 0; i < intersections.length; i++) final.add(intersections[i]);
+        //     final.div(intersections.length);
+        //     intersections = [final];
+        // }
 
         let contacts = intersections
             .map(contact => {
@@ -947,13 +947,13 @@ class PhysicsEngine {
         this.onCollide = (a, b, dir, contacts) => null;
         this.iterations = 2;
         this.sleepDuration = 200;
-        this.sleepingActivityThreshold = 0.6;
+        this.sleepingActivityThreshold = 0.2;
     }
     getSleepDuration() {
         return this.sleepDuration * this.iterations;
     }
     isAsleep(body) {
-        return body.sleeping >= this.getSleepDuration();
+        return body.type === RigidBody.STATIC || body.sleeping >= this.getSleepDuration();
     }
     clearCollidingBodies() {
         for (let i = 0; i < this.bodies.length; i++) {
@@ -1013,7 +1013,16 @@ class PhysicsEngine {
         this.onCollide(body, body2, collisionDirection, contacts);
 
         if (body.isTrigger || body2.isTrigger) return;
+
         let STATIC = body2.type === RigidBody.STATIC;
+
+        if (!STATIC) {
+            if ((body.sleeping || body2.sleeping) && (!this.lowActivity(body) || !this.lowActivity(body2))) {
+                // console.log(body.userData.sceneObject.name, " => ", this.lowActivity(body), ", ", body2.userData.sceneObject.name, " => ", this.lowActivity(body2));
+                body2.wake();
+            }
+        }
+
         if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
             let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
             if (dot > 0.8) {
@@ -1027,10 +1036,8 @@ class PhysicsEngine {
         if (STATIC) this.collisionResolver.staticResolve(body, body2, collisionDirection, maxPenetration, contacts);
         else this.collisionResolver.dynamicResolve(body, body2, collisionDirection, maxPenetration, contacts);
 
-        if (!body.sleeping) body2.wake();
-
         //immobilize
-        // body.canMoveThisStep = false;
+        body.canMoveThisStep = false;
     }
     collisions(order, dynBodies, collisionPairs) {
         dynBodies.sort(order);
@@ -1041,16 +1048,16 @@ class PhysicsEngine {
 
         //collisions
         for (let i = 0; i < dynBodies.length; i++) {
-            let body = dynBodies[i];
+            const body = dynBodies[i];
+            const asleep = this.isAsleep(body);
+
             //mobilize
             body.canMoveThisStep = true;
             body.prohibitedDirections = [];
 
-            if (this.isAsleep(body)) continue;
-
-            let others = collisionPairs.get(body);
-            let vel = body.velocity;
-            let collidable = others.sort((a, b) => (a.position.x - b.position.x) * vel.x + (a.position.y - b.position.y) * vel.y);
+            const others = collisionPairs.get(body);
+            const vel = body.velocity;
+            const collidable = others.filter(b => !(this.isAsleep(b) && asleep)).sort((a, b) => (a.position.x - b.position.x) * vel.x + (a.position.y - b.position.y) * vel.y);
 
             // checks
             // renderer.draw(Color.RED).text("20px monospace", others.length, body.position.x, body.position.y);
@@ -1128,58 +1135,62 @@ class PhysicsEngine {
         for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
             let cellsTotal = collisionPairs.get(body);
-            let bodies = grid.query(body, cellsTotal, body.collisionFilter);
+            let bodies = grid.query(body, cellsTotal, b => body.collisionFilter(b));
+            // for (let j = 0; j < bodies.length; j++) {
+            //     renderer.stroke(Color.ORANGE, 2).arrow(body.position, bodies[j].position);
+            // }
             collisionPairs.set(body, bodies);
         }
 
-        if (false) for (let [x, column] of grid.cells) for (let [y, cell] of column) {
-            for (let body of cell) coloredQuad(x * cellsize, y * cellsize, cellsize, cellsize, 0, 0, 1, 0.1);
-            outlinedQuad(x * cellsize, y * cellsize, cellsize, cellsize, 3, 0, 1, 0, 1);
-        }
+        // scene.camera.drawInWorldSpace(() => {
+        //     for (let [x, column] of grid.cells) for (let [y, cell] of column) {
+        //         renderer.stroke(Color.RED, 1).rect(x * cellsize, y * cellsize, cellsize, cellsize);
+        //     }
+        // });
         return collisionPairs;
     }
     lowActivity(body) {
-        return body.type === RigidBody.STATIC || (
+        if (body.type === RigidBody.STATIC) return true;
+
+        const positionChange = PhysicsVector.sqrMag(PhysicsVector.sub(body.position, body.lastPosition));
+        const velocity = PhysicsVector.sqrMag(body.velocity);
+        const angleChange = Math.abs(body.angle - body.lastAngle);
+        const angularVelocity = Math.abs(body.angularVelocity);
+
+        body.position.get(body.lastPosition);
+        body.lastAngle = body.angle;
+
+        return (
             //linear 
-            PhysicsVector.sqrMag(PhysicsVector.sub(body.position, body.lastPosition)) * this.iterations < (this.sleepingActivityThreshold * 2) ** 2 &&
-            PhysicsVector.sqrMag(body.velocity) < this.sleepingActivityThreshold ** 2 &&
+            positionChange * this.iterations < (this.sleepingActivityThreshold * 2) ** 2 &&
+            velocity < this.sleepingActivityThreshold ** 2 &&
             //angular
-            Math.abs(body.angle - body.lastAngle) * this.iterations < (this.sleepingActivityThreshold * 2) / 40 &&
-            Math.abs(body.angularVelocity) < this.sleepingActivityThreshold / 40
+            angleChange * this.iterations < (this.sleepingActivityThreshold * 2) / 100 &&
+            angularVelocity < this.sleepingActivityThreshold / 100
         );
     }
     handleSleep(dynBodies) {
         if (!isFinite(this.sleepDuration)) return;
-        let sleepDuration = this.getSleepDuration();
 
-        //wake bodies that are in contact with woken bodies
-        for (let n = 0; n < 3; n++) for (let i = 0; i < dynBodies.length; i++) {
-            let body = dynBodies[i];
-            if (body.sleeping >= sleepDuration) {
-                const cb = body.collidingBodies;
-                for (let j = 0; j < cb.length; j++) {
-                    renderer.stroke(Color.ORANGE, 2).arrow(cb[j].position, body.position);
-                    if (!cb[j].sleeping) {
-                        body.wake();
-                        break;
-                    }
-                }
-            }
-        }
+        const sleepDuration = this.sleepDuration * this.iterations;
+
+        if (!window.maxY) window.maxY = 0;
 
         for (let i = 0; i < this.bodies.length; i++) {
-            let body = this.bodies[i];
+            const body = this.bodies[i];
             if (this.lowActivity(body)) {
                 body.sleeping++;
-                renderer.stroke(Color.ORANGE, 1).infer(body.cacheModel(0));
-                if (body.sleeping === sleepDuration) body.stop();
-            } else body.wake();
+            } else if (body.sleeping) body.wake();
         }
 
-        //update last position data
-        for (let i = 0; i < this.bodies.length; i++) {
-            let body = this.bodies[i];
-            body.updateLastData();
+        for (let n = 0; n < 30; n++) for (let i = 0; i < dynBodies.length; i++) {
+            const body = dynBodies[i];
+            if (body.sleeping < sleepDuration) continue;
+            const cb = body.collidingBodies;
+            for (let j = 0; j < cb.length; j++) if (!cb[j].sleeping) {
+                body.wake();
+                break;
+            }
         }
     }
     run() {

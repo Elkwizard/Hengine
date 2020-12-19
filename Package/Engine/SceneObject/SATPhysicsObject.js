@@ -184,5 +184,6 @@ class PhysicsObject extends SceneObject {
     }
     applyImpulse(point, force) {
         this.body.applyImpulse(point.toPhysicsVector(), force.toPhysicsVector());
+        this.body.wake();
     }
 }
