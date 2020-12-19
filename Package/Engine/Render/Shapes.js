@@ -72,7 +72,7 @@ class Range {
 		return (this.max - this.min) / 2 - Math.abs(value - (this.min + this.max) / 2);
 	}
 	includes(value) {
-		return value > this.min && value < this.max;
+		return value >= this.min && value <= this.max;
 	}
 	expand(value) {
 		if (value < this.min) this._min = value;

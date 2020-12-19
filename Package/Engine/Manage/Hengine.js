@@ -1,8 +1,4 @@
-const ScalingMode = {
-	STRETCH: Symbol("STRETCH"),
-	PRESERVE_ASPECT_RATIO: Symbol("PRESERVE_ASPECT_RATIO"),
-	INTEGER_MULTIPLE: Symbol("INTEGER_MULTIPLE")
-};
+const ScalingMode = defineEnum("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MULTIPLE");
 class Hengine {
 	constructor() {
 		let wrapper = document.body;

@@ -18,12 +18,11 @@ class Random {
         return Random.distribution(seed);
     }
     static octave(oc, alg, ...sampleAndFreq) {
-        freq = sampleAndFreq.pop();
+        const freq = sampleAndFreq.pop();
         let sample = sampleAndFreq;
 
         let n = 0;
         let scl = 0;
-        alg = Random[alg];
         let len = alg.length + 1;
         let seed = Random.seed;
         if (len === sample.length) {

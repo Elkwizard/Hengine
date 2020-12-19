@@ -36,9 +36,9 @@ class Artist {
 			[LineJoin.ROUND, "round"]
 		]);
 		this.lineCapMap = new Map([
-			[LineJoin.FLAT, "butt"],
-			[LineJoin.SQUARE, "square"],
-			[LineJoin.ROUND, "round"]
+			[LineCap.FLAT, "butt"],
+			[LineCap.SQUARE, "square"],
+			[LineCap.ROUND, "round"]
 		]);
 
 		this.preservePixelart = true;
@@ -733,7 +733,7 @@ class Artist {
 		this.c.fillStyle = this.getContextColor(color);
 		return this.drawObj;
 	}
-	stroke(color, lineWidth = 1, lineCap = "flat", lineJoin = "bevel") {
+	stroke(color, lineWidth = 1, lineCap = LineCap.FLAT, lineJoin = LineJoin.BEVEL) {
 		this.c.strokeStyle = this.getContextColor(color);
 		this.c.lineJoin = this.lineJoinMap.get(lineJoin);
 		this.c.lineCap = this.lineCapMap.get(lineCap);

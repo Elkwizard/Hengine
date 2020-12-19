@@ -28,9 +28,9 @@ class WebGLArtist {
 			[LineJoin.ROUND, this.gl.LINE_JOIN_ROUND]
 		]);
 		this.lineCapMap = new Map([
-			[LineJoin.FLAT, this.gl.LINE_CAP_FLAT],
-			[LineJoin.SQUARE, this.gl.LINE_CAP_SQUARE],
-			[LineJoin.ROUND, this.gl.LINE_CAP_ROUND]
+			[LineCap.FLAT, this.gl.LINE_CAP_FLAT],
+			[LineCap.SQUARE, this.gl.LINE_CAP_SQUARE],
+			[LineCap.ROUND, this.gl.LINE_CAP_ROUND]
 		]);
 		this.currentTransform = Matrix3.identity();
 		this.transformStack = [];
@@ -400,7 +400,7 @@ class WebGLArtist {
 		this.useColor(color);
 		return this.drawObj;
 	}
-	stroke(color, lineWidth = 1, lineCap = "flat", lineJoin = "bevel") {
+	stroke(color, lineWidth = 1, lineCap = LineCap.FLAT, lineJoin = LineJoin.BEVEL) {
 		this.useColor(color);
 		this.currentLineWidth = lineWidth;
 		this.currentLineCap = this.lineCapMap.get(lineCap);

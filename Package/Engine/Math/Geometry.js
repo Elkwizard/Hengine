@@ -186,7 +186,17 @@ class Geometry {
         }
 
         // for (let points of polygons) renderer.stroke(Color.PURPLE, 2).shape(...points);
-        return polygons.filter(poly => Geometry.isClockwise(poly)).map(vertices => new Polygon(vertices));
+        return polygons.filter(vertices => {
+            // is clockwise ?
+            let signedArea = 0;
+            let length = vertices.length;
+			for (let i = 0; i < length; i++) {
+				let a = vertices[i];
+				let b = vertices[(i + 1) % length];
+				signedArea += (b.x - a.x) * (a.y + b.y);
+            }
+            return signedArea < 0;
+        }).map(vertices => new Polygon(vertices));
     }
     static gridToRects(srcGrid, CELL_SIZE) {
         let grid = [];
