@@ -525,7 +525,8 @@ class Artist {
 		for (let func in this.clipObj) {
 			this.clipObj[func] = this.clipObj[func].bind(this);
 		}
-		this.imageStyle = null;
+		this.currentImage = null;
+		this.currentImageCIS = null;
 		this.imageObj = {
 			circle(x, y, radius) {
 				this.clip().circle(x, y, radius);
@@ -557,7 +558,7 @@ class Artist {
 					y = x.y;
 					x = x.x;
 				}
-				this.drawImageInternal(x, y, this.imageStyle.width, this.imageStyle.height);
+				this.drawImageInternal(x, y, this.currentImage.width, this.currentImage.height);
 			},
 			inferHeight(x, y, w) {
 				if (typeof x === "object") {
@@ -565,9 +566,9 @@ class Artist {
 					y = x.y;
 					x = x.x;
 				}
-				let h = this.imageStyle.height;
-				if (w !== undefined) h *= w / this.imageStyle.width;
-				else w = this.imageStyle.width;
+				let h = this.currentImage.height;
+				if (w !== undefined) h *= w / this.currentImage.width;
+				else w = this.currentImage.width;
 				this.drawImageInternal(x, y, w, h);
 			},
 			inferWidth(x, y, h) {
@@ -576,9 +577,9 @@ class Artist {
 					y = x.y;
 					x = x.x;
 				}
-				let w = this.imageStyle.width;
-				if (h !== undefined) w *= h / this.imageStyle.height;
-				else h = this.imageStyle.height;
+				let w = this.currentImage.width;
+				if (h !== undefined) w *= h / this.currentImage.height;
+				else h = this.currentImage.height;
 				this.drawImageInternal(x, y, w, h);
 			},
 			rect(x, y, width, height) {
@@ -740,18 +741,18 @@ class Artist {
 		return this.strokeObj;
 	}
 	drawImageInternal(x, y, w, h) {
+		if (!this.currentImage.loaded) return;
 		if (typeof x === "object") {
 			h = x.height;
 			w = x.width;
 			y = x.y;
 			x = x.x;
 		}
-		let cis = this.imageStyle.makeImage(); //CanvasImageSource
-		if (!this.imageStyle.loaded) return;
-		this.c.drawImage(cis, x, y, w, h);
+		this.c.drawImage(this.currentImageCIS, x, y, w, h);
 	}
 	image(img) {
-		this.imageStyle = img;
+		this.currentImageCIS = img.makeImage();
+		this.currentImage = img;
 		return this.imageObj;
 	}
 	clip() {
@@ -932,8 +933,8 @@ class Artist {
 
 				break;
 			case "image":
-				let imageStyle = drawArgs[0];
-				let [clipX = 0, clipY = 0, clipW = imageStyle.width, clipH = imageStyle.height] = drawArgs.slice(1);
+				let currentImage = drawArgs[0];
+				let [clipX = 0, clipY = 0, clipW = currentImage.width, clipH = currentImage.height] = drawArgs.slice(1);
 				if (clipX instanceof Rect) {
 					clipH = clipX.height;
 					clipW = clipX.width;
@@ -967,7 +968,7 @@ class Artist {
 					boundH = maxY - minY;
 				}
 
-				let img = imageStyle;
+				let img = currentImage;
 				if (img instanceof ImageType) img = img.makeImage();
 
 				if (shape === "rect") {

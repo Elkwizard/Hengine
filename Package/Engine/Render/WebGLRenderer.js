@@ -229,6 +229,7 @@ class WebGLArtist {
 			this.strokeObj[func] = this.strokeObj[func].bind(this);
 		}
 		this.currentImage = null;
+		this.currentImageCIS = null; // Canvas Image Source
 		this.imageObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
@@ -242,7 +243,7 @@ class WebGLArtist {
 						x = x.x;
 					}
 				}
-				this.gl.texturedEllipse(x, y, radius, radius, 0, 0, 1, 1, this.currentImage.makeImage());
+				this.gl.texturedEllipse(x, y, radius, radius, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			ellipse(x, y, rx, ry) {
 				if (typeof x === "object") {
@@ -251,7 +252,7 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.gl.texturedEllipse(x, y, rx, ry, 0, 0, 1, 1, this.currentImage.makeImage());
+				this.gl.texturedEllipse(x, y, rx, ry, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			rect(x, y, width, height) {
 				if (typeof x === "object") {
@@ -260,7 +261,7 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.gl.texturedQuad(x, y, width, height, 0, 0, 1, 1, this.currentImage.makeImage());
+				this.gl.texturedQuad(x, y, width, height, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			triangle(v1, v2, v3) {
 				this.imageObj.shape([v1, v2, v3]);
@@ -288,7 +289,7 @@ class WebGLArtist {
 						textureVertices.push((vertices[i] - minX) / width, (vertices[i + 1] - minY) / height);
 					}
 
-					this.gl.texturedPolygon(vertices, textureVertices, this.currentImage.makeImage());
+					this.gl.texturedPolygon(vertices, textureVertices, this.currentImageCIS);
 				}
 			},
 			default(x, y) {
@@ -296,7 +297,7 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.texturedQuad(x, y, this.currentImage.width, this.currentImage.height, 0, 0, 1, 1, this.currentImage.makeImage());
+				this.texturedQuad(x, y, this.currentImage.width, this.currentImage.height, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			inferHeight(x, y, w) {
 				if (typeof x === "object") {
@@ -304,7 +305,7 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.gl.texturedQuad(x, y, w, this.currentImage.inferHeight(w), 0, 0, 1, 1, this.currentImage.makeImage());
+				this.gl.texturedQuad(x, y, w, this.currentImage.inferHeight(w), 0, 0, 1, 1, this.currentImageCIS);
 			},
 			inferWidth(x, y, h) {
 				if (typeof x === "object") {
@@ -312,7 +313,7 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.gl.texturedQuad(x, y, this.currentImage.inferWidth(h), h, 0, 0, 1, 1, this.currentImage.makeImage());
+				this.gl.texturedQuad(x, y, this.currentImage.inferWidth(h), h, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
@@ -407,7 +408,8 @@ class WebGLArtist {
 		return this.strokeObj;
 	}
 	image(img) {
-		this.currentImage = img;
+		this.imageStyleCIS = img.makeImage();
+		this.imageStyle = img;
 		return this.imageObj;
 	}
 	contentToFrame() {
