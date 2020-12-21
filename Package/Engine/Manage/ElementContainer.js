@@ -272,7 +272,7 @@ class ElementContainer extends SceneElement {
 		let ary = [];
 		let oAry = this.updateArray();
 		for (let rect of oAry) {
-			if (rect.scripts[script]) {
+			if (rect.scripts[script.name]) {
 				ary.push(rect);
 			}
 		}

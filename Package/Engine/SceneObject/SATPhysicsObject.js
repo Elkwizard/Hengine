@@ -87,10 +87,10 @@ class PhysicsObject extends SceneObject {
     get mass() {
         return this.body.mass;
     }
-    get canCollide() {
+    get isTrigger() {
         return !this.body.isTrigger;
     }
-    set canCollide(a) {
+    set isTrigger(a) {
         this.body.isTrigger = !a;
     }
     get velocity() {

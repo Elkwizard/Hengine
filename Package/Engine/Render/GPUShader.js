@@ -362,11 +362,10 @@ void main() {
 				setFunctionName += components;
 				setFunctionName += u.integer ? "i" : "f";
 
-
 				if (u.isArray) {
 					setFunctionName += "v";
 					let arraySize = u.arrayCount;
-					let buffer = new Float32Array(arraySize * components);
+					let buffer = new (u.integer	 ? Int32Array : Float32Array)(arraySize * components);
 					let bufferIndex = 0;
 					for (let i = 0; i < data.length; i++) {
 						if (vector) for (let j = 0; j < dataKeys.length; j++) buffer[bufferIndex++] = data[i][dataKeys[j]];

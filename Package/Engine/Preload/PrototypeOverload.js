@@ -263,7 +263,7 @@ ${contents.join(",\n").indent()}
 	proto(Number.prototype, "times", function (n) { return this * n; });
 	proto(Number.prototype, "over", function (n) { return this / n; });
 	proto(Number.prototype, "get", function () { return this; });
-	proto(Number.prototype, "equals", function (n) { return Math.abs(this - n) < 0.00000001; });
+	proto(Number.prototype, "equals", function (n) { return Math.abs(this - n) < Operable.EPSILON; });
 
 	Number.empty = 0;
 })();

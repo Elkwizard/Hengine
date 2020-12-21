@@ -52,7 +52,7 @@ class Operable {
         return sum;
     }
     equals(v) {
-        return this.minus(v).total() < 0.00001;
+        return this.minus(v).total() < Operable.EPSILON * this.constructor.modValues.length;
     }
     static get empty() {
         return new this(...this.modValues.map(name => 0));
@@ -106,4 +106,5 @@ class Operable {
         return new a.constructor(...args);
     }
 }
+Operable.EPSILON = 0.000001;
 Operable.modValues = [];

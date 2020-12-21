@@ -601,9 +601,9 @@ class Geometry {
     static overlapShapes(r1, r2) {
         return physicsAPIcollideShapes(r1, r2);
     }
-    static overlapPoint(p, poly) {
-        if (poly instanceof Circle) return Geometry.pointInsideCircle(p, poly);
-        else return Geometry.pointInsidePolygon(p, poly);
+    static overlapPoint(p, shape) {
+        if (shape instanceof Circle) return Geometry.pointInsideCircle(p, shape);
+        else return Geometry.pointInsidePolygon(p, shape);
     }
     // basic shapes
     
@@ -636,15 +636,15 @@ class Geometry {
         return Vector2.clamp(point, r.min, r.max);
     }
     // point inside
-    static pointInsideRect(p, r) {
-        return p.x > r.x && p.y > r.y && p.x < r.x + r.width && p.y < r.y + r.height;
+    static pointInsideRect(p, rect) {
+        return p.x > rect.x && p.y > rect.y && p.x < rect.x + rect.width && p.y < rect.y + rect.height;
     }
-    static pointInsideCircle(p, c) {
-        return Vector2.sqrDist(p, c) < c.radius ** 2;
+    static pointInsideCircle(p, circle) {
+        return Vector2.sqrDist(p, circle) < circle.radius ** 2;
     }
-    static pointInsidePolygon(p, c) {
+    static pointInsidePolygon(p, polygon) {
         let axes = [];
-        let poly = c.vertices;
+        let poly = polygon.vertices;
         for (let i = 0; i < poly.length; i++) {
             axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normal.normalize())
         }

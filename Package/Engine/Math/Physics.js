@@ -375,7 +375,7 @@ class RigidBody {
         this.lastPosition = this.position.get();
     }
     addCollidingBody(body) {
-        if (this.type !== RigidBody.STATIC && !this.collidingBodies.includes(body)) this.collidingBodies.push(body);
+        if (!this.collidingBodies.includes(body)) this.collidingBodies.push(body);
     }
     wake() {
         if (this.type === RigidBody.DYNAMIC) this.sleeping = 0;
@@ -409,14 +409,21 @@ class RigidBody {
         for (let i = 0; i < this.shapes.length; i++) models.push(this.cacheModel(i));
         return models;
     }
+    wakeCollidingBodies() {
+        for (let i = 0; i < this.collidingBodies.length; i++) {
+            this.collidingBodies[i].wake();
+        }
+    }
     clearShapes() {
         this.shapes = [];
         this.invalidateModels();
+        this.wakeCollidingBodies();
     }
     removeShape(sh) {
         let inx = this.shapes.indexOf(sh);
         if (inx > -1) this.shapes.splice(inx, 1);
         this.invalidateModels();
+        this.wakeCollidingBodies();
     }
     addShape(sh) {
         this.shapes.push(sh);
@@ -424,6 +431,7 @@ class RigidBody {
         this.mass += ShapeMass["mass" + name](sh);
         this.inertia += ShapeMass["inertia" + name](sh);
         this.invalidateModels();
+        this.wakeCollidingBodies();
         return sh;
     }
     integrate(intensity) {
@@ -956,10 +964,10 @@ class PhysicsEngine {
         return body.type === RigidBody.STATIC || body.sleeping >= this.getSleepDuration();
     }
     clearCollidingBodies() {
+        const filter = body => body.type !== RigidBody.STATIC && this.isAsleep(body);
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
-            if (this.isAsleep(body)) continue;
-            body.collidingBodies = [];
+            if (!filter(body)) body.collidingBodies = body.collidingBodies.filter(filter);
         }
     }
     addConstraint(constraint) {
