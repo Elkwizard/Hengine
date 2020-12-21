@@ -573,7 +573,7 @@ class CollisionDetector {
         return null;
     }
     static PolygonModel_CircleModel(a, b) {
-        let col = this.CircleModel_PolygonModel(b, a, PhysicsVector.invert(_unused));
+        let col = CollisionDetector.CircleModel_PolygonModel(b, a);
         if (col) {
             col.direction.mul(-1);
         }

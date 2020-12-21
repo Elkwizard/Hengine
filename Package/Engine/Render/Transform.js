@@ -66,4 +66,12 @@ class Transform {
 		artist();
 		if (r) renderer.rotate(r);
 	}
+	static combine(a, b) {
+		let tx = a.position.x;
+		let ty = a.position.y;
+		tx += b.position.x * a.cosRotation - b.position.y * a.sinRotation;
+		ty += b.position.x * a.sinRotation + b.position.y * a.cosRotation;
+		let rotation = a.rotation + b.rotation;
+		return new Transform(tx, ty, rotation);
+	}
 }
