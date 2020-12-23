@@ -4,6 +4,12 @@ class Camera extends Transform {
 		this.zoom = zoom;
 		this.engine = engine;
 	}
+	set screen(a) {
+		this._screen = a;
+	}
+	get screen() {
+		return this._screen;
+	}
 	rotateTowards(rotation, ferocity = 0.1) {
 		let dif = Geometry.signedAngularDist(rotation, this.rotation);
 		this.rotation += dif * ferocity;
@@ -22,14 +28,15 @@ class Camera extends Transform {
 	zoomOut(amount) {
 		this.zoom /= 1 + amount;
 	}
-	getScreen() {
+	cacheScreen() {
 		let { width, height } = this.engine.renderer;
-		return Rect.bound([
+		this.screen = Rect.bound([
 			new Vector2(width / 2, height / 2),
 			new Vector2(width / 2, -height / 2),
 			new Vector2(-width / 2, height / 2),
 			new Vector2(-width / 2, -height / 2)
 		].map(v => v.rotate(this.rotation).div(this.zoom).plus(this.position)));
+		return this.screen;
 	}
 	drawInWorldSpace(artist) {
 		let renderer = this.engine.renderer;

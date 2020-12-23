@@ -179,22 +179,20 @@ class ElementContainer extends SceneElement {
 		return x;
 	}
 	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true) {
-		name = this.genName(this.elements, "Default-Explosion-Spawner");
+		const name = this.genName(this.elements, "Default-Explosion-Spawner");
 		let ns = new ParticleSpawnerObject(name, x, y, size, spd, 1, timer, draw, sizeVariance, speedVariance, dirs, this, this.engine);
 		this.elements.set(name, ns);
-		for (let i = 0; i < amountParticles; i++) {
-			ns.spawnParticle();
-		}
 		ns.particleFalls = falls;
 		ns.particleFades = fades;
 		ns.particleSlows = slows;
 		ns.particleActive = false;
+		for (let i = 0; i < amountParticles; i++) {
+			ns.spawnParticle();
+		}
 		let curUpdate = ns.engineUpdate.bind(ns);
 		ns.engineUpdate = function () {
 			curUpdate();
-			let n = 0;
-			for (let entry of ns.spawns) n++;
-			if (!n) ns.remove();
+			if (!ns.spawns.size) ns.remove();
 		}
 		this.initializeSceneObject(ns);
 		return ns;

@@ -361,7 +361,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 			let shader = gl.createShader(type);
 			gl.shaderSource(shader, source);
 			gl.compileShader(shader);
-			if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+			if (debug) if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 				error = gl.getShaderInfoLog(shader);
 				return false;
 			}

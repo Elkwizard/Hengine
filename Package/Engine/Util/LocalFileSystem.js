@@ -77,14 +77,16 @@ class LocalFileSystem {
 		let value = "";
 		let n = 0;
 		let name;
+		let exists = false;
 		do {
 			name = prev + "_INX_" + n;
 			n++;
 			if (localStorage.getItem(name) !== null) {
 				value += localStorage.getItem(name);
+				exists = true;
 			}
 		} while (localStorage.getItem(name) !== null);
-		return LocalFileSystem.decompress(value);
+		return exists ? LocalFileSystem.decompress(value) : undefined;
 	}
 	static getRemainingSpace() {
 		let key = "FILE_SIZE_CHECK";

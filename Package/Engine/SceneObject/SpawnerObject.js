@@ -147,9 +147,7 @@ class ParticleObject extends SceneObject {
                 this.engine.renderer.alpha = currentAlpha * Number.clamp(1 - (this.lifeSpan / sp.particleLifeSpan), 0, 1);
             };
         }
-        if (sp.particleDraw instanceof ElementScript) {
-            sp.particleDraw.addTo(this);
-        }
+        this.scripts.add(sp.particleDraw);
         //Done
 
         this.completelyStatic = false;

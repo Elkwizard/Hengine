@@ -122,7 +122,7 @@ class Scene {
 		}
 	}
 	renderCamera() {
-		let screen = this.camera.getScreen();
+		let screen = this.camera.cacheScreen();
 
 		this.engine.renderer.save();
 

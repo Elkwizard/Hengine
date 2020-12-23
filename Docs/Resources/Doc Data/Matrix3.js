@@ -17,7 +17,7 @@ load(String.raw`
 	**(/p)
 	(2)Parameters(/2)
 	(p)
-		(param:m[R][C] $Number$)The value at the position in the matrix specified by R rows and C columns.(/param)
+		(param:m[R][C] $Number$)The value at the position in the matrix specified by R rows and C columns. Example: *m01* for row 0 column 1.(/param)
 	(/p)
 	(2)Properties(/2)
 	(p)

@@ -408,8 +408,8 @@ class WebGLArtist {
 		return this.strokeObj;
 	}
 	image(img) {
-		this.imageStyleCIS = img.makeImage();
-		this.imageStyle = img;
+		this.currentImageCIS = img.makeImage();
+		this.currentImage = img;
 		return this.imageObj;
 	}
 	contentToFrame() {

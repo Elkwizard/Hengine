@@ -141,8 +141,9 @@ class PhysicsObject extends SceneObject {
 	}
     collideBasedOnRule(e) {
         let judgement = [];
-        for (let m of this.scripts) {
-            judgement.push(m.scriptCollideRule(m, e));
+        const scripts = this.scripts.sortedLocalScripts;
+        for (let i = 0; i < scripts.length; i++) {
+            judgement.push(scripts[i].scriptCollideRule(scripts[i], e));
         }
         return !judgement.includes(false);
     }

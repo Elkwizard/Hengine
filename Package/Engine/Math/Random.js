@@ -45,7 +45,7 @@ class Random {
         const f = (x) => (x - 2) * (x + 2) * x;
         return f(-2.31 * t + 1.155) / 6.158 + 0.5;
     }
-    static perlin(x, f = 1, seed = Random.seed) {
+    static perlin(x, f = 1, seed = Random.sampleSeed) {
         x *= f;
         x += seed;
         const s_0 = n => Random.seedRand(Math.floor(n));
@@ -53,7 +53,7 @@ class Random {
         if (xt < 0) xt++;
         return Interpolation.lerp(s_0(x), s_0(x + 1), Random.noiseTCorrect(xt));
     }
-    static perlin2D(x, y, f = 1, seed = Random.seed) {
+    static perlin2D(x, y, f = 1, seed = Random.sampleSeed) {
         x *= f;
         y *= f;
         x += seed;
@@ -65,7 +65,7 @@ class Random {
         if (yt < 0) yt++;
         return Interpolation.quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), Random.noiseTCorrect(xt), Random.noiseTCorrect(yt));
     }
-    static perlin3D(x, y, z, f = 1, seed = Random.seed) {
+    static perlin3D(x, y, z, f = 1, seed = Random.sampleSeed) {
         x *= f;
         y *= f;
         z *= f;
@@ -87,7 +87,7 @@ class Random {
     static getVoronoiCell(x) {
         return { x: Math.floor(x) + Random.seedRand(Math.floor(x)) };
     }
-    static voronoi(x, f = 1, seed = Random.seed) {
+    static voronoi(x, f = 1, seed = Random.sampleSeed) {
         x *= f;
         x += seed;
         let bestDist = Infinity;
@@ -104,7 +104,7 @@ class Random {
             y: Math.floor(y) + Random.seedRand(Math.floor(y) + Math.floor(x) * 10000)
         };
     }
-    static voronoi2D(x, y, f = 1, seed = Random.seed) {
+    static voronoi2D(x, y, f = 1, seed = Random.sampleSeed) {
         x *= f;
         y *= f;
         x += seed;
@@ -124,7 +124,7 @@ class Random {
             z: Math.floor(z) + Random.seedRand(Math.floor(y) * 10000 + Math.floor(x) * 100 + Math.floor(z) * 90000)
         };
     }
-    static voronoi3D(x, y, z, f = 1, seed = Random.seed) {
+    static voronoi3D(x, y, z, f = 1, seed = Random.sampleSeed) {
         x *= f;
         y *= f;
         z *= f;
@@ -139,8 +139,12 @@ class Random {
         }
         return bestDist;
     }
+    static reSeed() {
+        Random.seed = Math.random() * 1000;
+        Random.sampleSeed = Math.random() * 1000;
+    }
 }
-Random.seed = Math.random() * 1000;
+Random.reSeed();
 Random.uniform = function (seed) {
     seed += 1e5;
     let a = (seed * 6.12849) % 8.7890975;

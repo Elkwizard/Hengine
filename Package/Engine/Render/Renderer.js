@@ -632,13 +632,10 @@ class Artist {
 	set textMode(a) {
 		this.textModeX = a[0];
 		this.textModeY = a[1];
+		this._textMode = a;
 	}
 	get textMode() {
-		let vx = this.textModeX.toString();
-		vx = vx.slice(7, vx.length - 1);
-		let vy = this.textModeY.toString();
-		vy = vy.slice(7, vy.length - 1);
-		return TextMode[vy + "_" + vx];
+		return this._textMode;
 	}
 	set preservePixelart(a) {
 		this._preservePixelart = a;
