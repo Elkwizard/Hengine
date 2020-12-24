@@ -181,8 +181,8 @@ class ParticleObject extends SceneObject {
             this.velocity.Nmul(this.engine.scene.physicsEngine.linearDrag);
             this.angularVelocity *= this.engine.scene.physicsEngine.linearDrag;
         }
-        this.transform.position.x += this.velocity.x * 2;
-        this.transform.position.y += this.velocity.y * 2;
+        this.transform.position.x += this.velocity.x;
+        this.transform.position.y += this.velocity.y;
         this.transform.rotation += this.angularVelocity;
         if (this.lifeSpan > this.spawner.particleLifeSpan) {
             this.remove();

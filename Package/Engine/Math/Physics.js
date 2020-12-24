@@ -953,7 +953,7 @@ class PhysicsEngine {
         this.constraints = [];
         this.constraintIterations = 3;
         this.onCollide = (a, b, dir, contacts) => null;
-        this.iterations = 2;
+        this.iterations = 4;
         this.sleepDuration = 200;
         this.sleepingActivityThreshold = 0.2;
     }
@@ -1224,9 +1224,9 @@ class PhysicsEngine {
             this.integrate(intensity, dynBodies);
             this.solveConstraints();
             this.collisions(gravitySort, dynBodies, collisionPairs);
-            this.integrate(intensity, dynBodies);
-            this.solveConstraints();
-            this.collisions(gravitySort, dynBodies, collisionPairs);
+            // this.integrate(intensity, dynBodies);
+            // this.solveConstraints();
+            // this.collisions(gravitySort, dynBodies, collisionPairs);
             this.handleSleep(dynBodies);
         }
 

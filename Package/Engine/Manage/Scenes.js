@@ -1,5 +1,5 @@
 class Scene {
-	constructor(gravity = new Vector2(0, 0.1), engine) {
+	constructor(gravity, engine) {
 		this.engine = engine;
 		this.main = new ElementContainer("Main", true, null, this.engine);
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());

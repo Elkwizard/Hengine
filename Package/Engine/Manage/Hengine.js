@@ -24,7 +24,7 @@ class Hengine {
 			this.scene.camera.position = this.renderer.middle;
 		});
 		
-		this.scene = new Scene(new Vector2(0, 0.2), this);
+		this.scene = new Scene(new Vector2(0, 0.4), this);
 		
 		this.updateCanvasSizing();
 
