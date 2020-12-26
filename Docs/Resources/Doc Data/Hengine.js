@@ -30,6 +30,10 @@ load(String.raw`
 			The #IntervalManager# that runs the update loop for the Hengine instance. 
 			This keeps the Hengine running and tracks performance.
 		(/prop)
+		(prop:canvas $CanvasManager$)
+			The #CanvasManager# associated with the Hengine instance.
+			This manages the presence of the Hengine's canvas within the DOM.
+		(/prop)
 		(prop:renderer $Renderer$)
 			The #Renderer# associated with the Hengine instance.
 			This draws #SceneObject#s to the screen as well as evaluating many custom render commands.
@@ -37,13 +41,6 @@ load(String.raw`
 		(prop:scene $Scene$)
 			The #Scene# that manages all of the #SceneObject#s in the Hengine instance.
 			This manages the physics and camera rendering of all of the #SceneObject#s.
-		(/prop)
-		(prop:scalingMode $ScalingMode.Symbol$)
-			How the aspect ratio of the canvas should be preserved when scaling to fit the screen. 
-			For *ScalingMode.STRETCH*, the canvas will expand to fit the edges of the screen, ignoring aspect ratio.
-			For *ScalingMode.PRESERVE_ASPECT_RATIO*, the canvas will expand to fit the edges of the screen while still maintaining aspect ratio.
-			For *ScalingMode.INTEGER_MULTIPLE*, the canvas will expand to fit the edges of the screen, while still maintaining an aspect ratio, and only scaling by integers.
-			Default value is *ScalingMode.STRETCH*.
 		(/prop)
 	(/p)
 	(2)Methods(/2)
@@ -53,3 +50,12 @@ load(String.raw`
 		(/method)
 	(/p)
 `);
+
+
+// (prop:scalingMode $ScalingMode.Symbol$)
+// How the aspect ratio of the canvas should be preserved when scaling to fit the screen. 
+// For *ScalingMode.STRETCH*, the canvas will expand to fit the edges of the screen, ignoring aspect ratio.
+// For *ScalingMode.PRESERVE_ASPECT_RATIO*, the canvas will expand to fit the edges of the screen while still maintaining aspect ratio.
+// For *ScalingMode.INTEGER_MULTIPLE*, the canvas will expand to fit the edges of the screen, while still maintaining an aspect ratio, and only scaling by integers.
+// Default value is *ScalingMode.STRETCH*.
+// (/prop)

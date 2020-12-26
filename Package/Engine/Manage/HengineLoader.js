@@ -162,27 +162,28 @@ class HengineLoader {
 		window.clipboard = this.hengine.clipboard;
 		window.fileSystem = this.hengine.fileSystem;
 		window.intervals = this.hengine.intervals;
+		window.canvas = this.hengine.canvas;
 
 		let hengine = this;
 		if (!(window.width || window.height || window.middle)) {
 			Object.defineProperty(window, "middle", {
-				get: function () {
+				get() {
 					return new Vector2(hengine.hengine.renderer.width / 2, hengine.hengine.renderer.height / 2);
 				}
 			});
 			Object.defineProperty(window, "width", {
-				set: function (a) {
+				set(a) {
 					hengine.hengine.renderer.width = a;
 				},
-				get: function () {
+				get() {
 					return hengine.hengine.renderer.width;
 				}
 			});
 			Object.defineProperty(window, "height", {
-				set: function (a) {
+				set(a) {
 					hengine.hengine.renderer.height = a;
 				},
-				get: function () {
+				get() {
 					return hengine.hengine.renderer.height;
 				}
 			});
@@ -249,12 +250,27 @@ class HengineLoader {
 			const hengineLoader = new HengineLoader();
 			window.hengineLoader = hengineLoader;
 
+			let nonScriptPromiseAcc = [];
+			let nonScriptSourceAcc = [];
 
 			for (let i = 0; i < userResources.length; i++) {
-				const resource = await userResources[i].load();
-				if (resource) console.log(`LOADED RESOURCE [${userResources[i].src}]`);
-				else console.warn(`LOADING FAILED FOR RESOURCE [${userResources[i].src}]`);
-				hengineLoader.resources.set(userResources[i].src, resource);
+				const promise = userResources[i].load();
+				nonScriptPromiseAcc.push(promise);
+				nonScriptSourceAcc.push(userResources[i].src);
+
+				if (userResources[i] instanceof HengineScriptResource) {
+					const resources = await Promise.all(nonScriptPromiseAcc);
+					for (let i = 0; i < resources.length; i++) {
+						const src = nonScriptSourceAcc[i];
+						const resource = resources[i];
+
+						if (resource) console.log(`LOADED RESOURCE [${src}]`);
+						else console.warn(`LOADING FAILED FOR RESOURCE [${src}]`);
+						hengineLoader.resources.set(src, resource);
+					}
+					nonScriptPromiseAcc = [];
+					nonScriptSourceAcc = [];
+				}
 			}
 		}
 		if (document.body && document.head) return loadResources();
@@ -281,5 +297,5 @@ HengineLoader.engineResources = [
 
 	"Scripts/TextArea", "Scripts/PlayerMovement", "Scripts/Draggable",
 
-	"Manage/ElementContainer", "Manage/Scenes", "Manage/Intervals", "Manage/Hengine",
+	"Manage/ElementContainer", "Manage/Scenes", "Manage/Intervals", "Manage/Canvas", "Manage/Hengine",
 ];

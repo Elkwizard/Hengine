@@ -103,7 +103,7 @@ class IntervalManager {
 			this.engine.renderer.beforeFrame();
 			this.updateGraphs();
 			this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
-			this.engine.renderer.clearScreen();
+			this.engine.canvas.clearScreen();
 			this.updateIntervalCalls(IntervalFunction.UPDATE)
 			this.engine.scene.engineUpdate();
 			this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
@@ -161,7 +161,7 @@ class IntervalManager {
 IntervalManager.FPS_FRAMES_TO_COUNT = 30;
 (function () {
 	IntervalManager.intervals = [];
-	function animate(param) {
+	function animate(now) {
 		requestAnimationFrame(animate);
 		for (let i = 0; i < IntervalManager.intervals.length; i++) {
 			IntervalManager.intervals[i]();

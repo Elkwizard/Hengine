@@ -101,7 +101,7 @@ KeyboardHandler.Event = class {
 	}
 }
 class MouseHandler extends InputHandler {
-	constructor(engine, root) {
+	constructor(root, engine) {
 		super();
 		this.mouseMap = ["Left", "Middle", "Right"];
 		this.button = 0;

@@ -28,6 +28,7 @@ const DOCS = {
 		"Lazy": {}
 	},
 	"Rendering": {
+		"CanvasManager": {},
 		"Image Types": {
 			"ImageType": {},
 			"Frame": {},

@@ -101,16 +101,29 @@ class Scene {
 		}
 	}
 	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null, stiffness = 1) {
-		let con = new PhysicsConstraint.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length, stiffness);
+		let con = new PhysicsConstraint2.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length, stiffness);
 		if (length === null) {
 			let ends = con.getEnds();
 			con.length = Vector2.dist(ends[0], ends[1]);
 		}
 		this.physicsEngine.addConstraint(con);
 	}
-	constrainPosition(a, offset = Vector2.origin, point = null) {
-		let con = new PhysicsConstraint.Position(a.body, offset.toPhysicsVector(), point);
-		if (point === null) con.point = con.getPoint();
+	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null, stiffness = 1) {
+		let con = new PhysicsConstraint1.Length(a.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null, length, stiffness);
+		if (point === null) con.point = con.getEnds()[0];
+		if (length === null) {
+			let ends = con.getEnds();
+			con.length = Vector2.dist(ends[0], ends[1]);
+		}
+		this.physicsEngine.addConstraint(con);
+	}
+	constrainPosition(a, b, ap = Vector2.origin, bp = Vector2.origin) {
+		let con = new PhysicsConstraint2.Position(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector());
+		this.physicsEngine.addConstraint(con);
+	}
+	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
+		let con = new PhysicsConstraint1.Position(a.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null);
+		if (point === null) con.point = con.getEnds()[0];
 		this.physicsEngine.addConstraint(con);
 	}
 	updateCaches() {
