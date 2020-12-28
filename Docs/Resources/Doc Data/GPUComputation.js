@@ -28,9 +28,6 @@ load(String.raw`
 	(/p)
 	(2)Methods(/2)
 	(p)
-		(method:compile@@$void$)
-			Compiles the operation. This function must be called before calling compute.
-		(/method)
 		(method:compute@buffer@$void$)
 			Runs the GPUComputation's operation on the provided buffer. The output will be stored in the buffer afterwards.
 			(2)Parameters(/2)

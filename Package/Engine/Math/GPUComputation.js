@@ -67,6 +67,8 @@ class GPUComputation {
 		});
 
 		this.inputTextures = [];
+
+		this.compile();
 	}
 	set compiled(a) {
 		this._compiled = a;

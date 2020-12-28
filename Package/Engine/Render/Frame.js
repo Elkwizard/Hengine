@@ -102,9 +102,12 @@ class HImage extends ImageType {
 class Frame extends ImageType {
 	constructor(width, height) {
 		super(width, height);
-		this.image = new_OffscreenCanvas(this.width, this.height);
+		this.image = new_OffscreenCanvas(this.width * devicePixelRatio, this.height * devicePixelRatio);
 		this.renderer = new Artist(this.image, this.width, this.height, this);
 		this.renderer.preservePixelart = true;
+	}
+	resize(width, height) {
+		this.renderer.resize(width, height, true, false);
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);

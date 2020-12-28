@@ -3,7 +3,6 @@ load(String.raw`
 	(p)
 		A GPUShader is a data structure for storing the results of, and compiling, GLSL code on the GPU.
 		GPUShaders run code in parallel, making them much more efficient than their CPU counterparts \(#Texture#s\).
-		GPUShaders cannot be drawn until *.compile* is called.
 	(/p)
 	(2)Notes on Hengine Flavored GLSL:(/2)
 	(p)
@@ -39,7 +38,7 @@ load(String.raw`
 	(/p)
 	(2)Properties(/2)
 	(p)
-		(prop:glsl $String$)The GLSL code to shade the domain of the GPUShader. While this value can be set, *.compile* needs to be called again before the drawn image will change.(/prop)
+		(prop:glsl $String$readonly)The GLSL code to shade the domain of the GPUShader.(/prop)
 		(prop:shadeRects $Rect[]$readonly)A list of #Rect#s within the boundary of the GPUShader that will have the shader run. Initially an empty array, signifying that the entire domain will be shaded.(/prop)
 		(prop:errorLog $String[]$readonly)A list of all of the GLSL errors thrown during compilation.(/prop)
 		(prop:compileState $Object$)An object with two properties, compiled$Boolean$ and error$GLSLError[]$. compiled will be whether or not the compilation was successful, and error is a list of all the errors that were thrown if it didn't compile.(/prop)
@@ -52,10 +51,6 @@ load(String.raw`
 			(p2)
 				(param:rects $Rect[]$)The new rectangular domains to shade on the GPUShader.(/param)
 			(/p2)
-		(/method)
-		(method:compile@@$Boolean$)
-			Compiles the GLSL code. If this succeeds, the method returns true. Otherwise, the method returns false.
-			This method needs to be called before GPUShader's can be drawn.
 		(/method)
 		(method:getArgument@arg@$any$)
 			Gets the value of the specified uniform within the GLSL program.

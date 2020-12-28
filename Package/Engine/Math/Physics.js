@@ -454,7 +454,6 @@ class RigidBody {
         this.velocity.x += imp.x / this.mass;
         this.velocity.y += imp.y / this.mass;
 
-
         //angular
         if (this.canRotate) {
             let cross = (pos.x - this.position.x) * imp.y - (pos.y - this.position.y) * imp.x;

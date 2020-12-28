@@ -79,6 +79,8 @@ class GPUShader extends ImageType {
 			halfHeight: null,
 			resolution: null
 		};
+
+		this.compile();
 	}
 	set compiled(a) {
 		this._compiled = a;

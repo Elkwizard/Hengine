@@ -5,13 +5,12 @@ class WebGLArtist {
 		this.onResize = onResize;
 
 		this.gl = defineWebGL2DContext();
-		this.gl.create(canvas);
+		this.gl.create(canvas, true);
 
 		this.imageType = imageType || new ArtistImage(this);
 
 		this.preservePixelart = true;
 		this.alpha = 1;
-		this.textMode = TextMode.TOP_LEFT;
 
 		this.currentRed = 0;
 		this.currentGreen = 0;
@@ -21,7 +20,7 @@ class WebGLArtist {
 		this.currentLineWidth = 1;
 		this.currentLineCap = this.gl.LINE_CAP_FLAT;
 		this.currentLineJoin = this.gl.LINE_JOIN_MITER;
-		
+
 		this.lineJoinMap = new Map([
 			[LineJoin.MITER, this.gl.LINE_JOIN_MITER],
 			[LineJoin.BEVEL, this.gl.LINE_JOIN_BEVEL],
@@ -375,12 +374,16 @@ class WebGLArtist {
 	get transform() {
 		return this.currentTransform.get();
 	}
-	resize(width, height, trigger = true) {
+	resize(width, height, trigger = true, updateImageType = true) {
 		let px = this.preservePixelart;
 		let al = this.alpha;
 		this.gl.resize(width, height);
-		this.imageType.width = width;
-		this.imageType.height = height;
+
+		if (updateImageType) {
+			this.imageType.width = width;
+			this.imageType.height = height;
+		}
+
 		this.alpha = al;
 		this.preservePixelart = px;
 		if (trigger) this.onResize();
@@ -431,7 +434,13 @@ class WebGLArtist {
 			x = x.x;
 		}
 		// do translate
-		Matrix3.mulMatrix(this.currentTransform, Matrix3.translation(x, y, Matrix3.temp[0]), this.currentTransform);
+		const ct = this.currentTransform;
+
+		// optimized matrix multiplication
+		ct[6] += x * ct[0] + y * ct[3];
+		ct[7] += x * ct[1] + y * ct[4];
+		ct[8] += x * ct[2] + y * ct[5];
+
 		this.gl.setTransform(this.currentTransform);
 	}
 	scale(x, y = x) {
@@ -439,13 +448,69 @@ class WebGLArtist {
 			y = x.y;
 			x = x.x;
 		}
+
 		// do scale
-		Matrix3.mulMatrix(this.currentTransform, Matrix3.scale(x, y, Matrix3.temp[0]), this.currentTransform);
+
+		const ct = this.currentTransform;
+
+		
+
+		// Matrix3.mulMatrix(
+		// 	this.currentTransform,
+			
+		// 	[
+		// 		x, 0, 0,
+		// 		0, y, 0,
+		// 		0, 0, 1,
+		// 	], 
+		// 	this.currentTransform
+		// );
+
+		// let m00 = ct[0] * x;
+		// let m01 = ct[3] * y;
+		// let m02 = ct[6];
+		// let m10 = ct[1] * x;
+		// let m11 = ct[4] * y;
+		// let m12 = ct[7];
+		// let m20 = ct[2] * x;
+		// let m21 = ct[5] * y;
+		// let m22 = ct[8];
+		
+		this.currentTransform[0] *= x;
+		this.currentTransform[1] *= x;
+		this.currentTransform[2] *= x;
+		this.currentTransform[3] *= y;
+		this.currentTransform[4] *= y;
+		this.currentTransform[5] *= y;
+
+		
+		// Matrix3.create(
+		// 	m00, m01, m02,
+		// 	m10, m11, m12,
+		// 	m20, m21, m22,
+		// 	this.currentTransform
+		// );
+
 		this.gl.setTransform(this.currentTransform);
 	}
 	rotate(a) {
 		// do rotate
-		Matrix3.mulMatrix(this.currentTransform, Matrix3.rotation(a, Matrix3.temp[0]), this.currentTransform);
+
+		// optimized matrix multiplication
+		const c = Math.cos(a);
+		const s = Math.sin(a);
+
+		const ct = this.currentTransform;
+		
+		const [m0, m1, m2, m3, m4, m5] = ct;
+		
+		ct[0] = m0 * c + m3 * s;
+		ct[1] = m1 * c + m4 * s;
+		ct[2] = m2 * c + m5 * s;
+		ct[3] = -m0 * s + m3 * c;
+		ct[4] = -m1 * s + m4 * c;
+		ct[5] = -m2 * s + m5 * c;
+
 		this.gl.setTransform(this.currentTransform);
 	}
 	save() {
@@ -491,9 +556,12 @@ class WebGLArtist {
 class FastFrame extends ImageType {
 	constructor(width, height) {
 		super(width, height);
-		this.image = new_OffscreenCanvas(this.width, this.height);
+		this.image = new_OffscreenCanvas(this.width * devicePixelRatio, this.height * devicePixelRatio);
 		this.renderer = new WebGLArtist(this.image, this.width, this.height, this);
 		this.renderer.preservePixelart = true;
+	}
+	resize(width, height) {
+		this.renderer.resize(width, height, true, false);
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
@@ -531,3 +599,6 @@ class FastFrame extends ImageType {
 		return f;
 	}
 }
+
+
+if (!window.WebGL2RenderingContext) FastFrame = Frame;

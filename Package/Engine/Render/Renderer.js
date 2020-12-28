@@ -683,13 +683,17 @@ class Artist {
 			)
 		);
 	}
-	resize(width, height, trigger = true) {
+	resize(width, height, trigger = true, updateImageType = true) {
 		let px = this.preservePixelart;
 		let al = this.alpha;
 		this.canvas.width = width * devicePixelRatio;
 		this.canvas.height = height * devicePixelRatio;
-		this.imageType.width = width;
-		this.imageType.height = height;
+		
+		if (updateImageType) {
+			this.imageType.width = width;
+			this.imageType.height = height;
+		}
+
 		this.c.scale(devicePixelRatio, devicePixelRatio);
 		this.alpha = al;
 		this.preservePixelart = px;

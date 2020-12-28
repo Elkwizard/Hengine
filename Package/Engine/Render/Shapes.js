@@ -366,6 +366,8 @@ class Rect extends Polygon {
 		return new Rect(xRange.min, yRange.min, xRange.length, yRange.length);
 	}
 	static bound(points) {
+		if (!points.length) return new Rect(0, 0, 0, 0);
+
 		let minX = Infinity;
 		let minY = Infinity;
 		let maxX = -Infinity;

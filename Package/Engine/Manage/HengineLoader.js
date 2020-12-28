@@ -206,7 +206,7 @@ class HengineLoader {
 	}
 	loadResource(src) {
 		if (PathManager.isRoot(src)) {
-			return this.resources.get(src) || null;
+			return this.resources.get(src) ?? null;
 		} else {
 			const processed = escape(src).replace(/([\.\\])/g, "\\$1");
 			const regex = new RegExp(processed + "$");
@@ -253,10 +253,11 @@ class HengineLoader {
 			let nonScriptPromiseAcc = [];
 			let nonScriptSourceAcc = [];
 
+			const loadSuccess = src => console.log(`LOADED RESOURCE [${src}]`);
+			const loadFailure = src => console.warn(`LOADING FAILED FOR RESOURCE [${src}]`);
+
 			for (let i = 0; i < userResources.length; i++) {
-				const promise = userResources[i].load();
-				nonScriptPromiseAcc.push(promise);
-				nonScriptSourceAcc.push(userResources[i].src);
+				const userResource = userResources[i];
 
 				if (userResources[i] instanceof HengineScriptResource) {
 					const resources = await Promise.all(nonScriptPromiseAcc);
@@ -264,12 +265,24 @@ class HengineLoader {
 						const src = nonScriptSourceAcc[i];
 						const resource = resources[i];
 
-						if (resource) console.log(`LOADED RESOURCE [${src}]`);
-						else console.warn(`LOADING FAILED FOR RESOURCE [${src}]`);
+						if (resource) loadSuccess(src);
+						else loadFailure(src);
+
 						hengineLoader.resources.set(src, resource);
 					}
 					nonScriptPromiseAcc = [];
 					nonScriptSourceAcc = [];
+
+					// console.log([...hengineLoader.resources.entries()].toString(1))
+
+					const scriptResource = await userResource.load();
+					if (scriptResource) loadSuccess(userResource.src);
+					else loadFailure(userResource.src);
+					hengineLoader.resources.set(userResource.src, scriptResource);
+				} else {
+					const promise = userResource.load();
+					nonScriptPromiseAcc.push(promise);
+					nonScriptSourceAcc.push(userResource.src);
 				}
 			}
 		}

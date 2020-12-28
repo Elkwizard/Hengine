@@ -40,26 +40,23 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		let attr = {
 			name,
 			buffer: gl.createBuffer(),
-			pointer: gl.getAttribLocation(glState.program.shaderProgram, name),
+			pointer: 0,
 			data: new Float32Array(unitSize * glState.MAX_BATCH_TRIS * 3),
 			unitSize,
-			changed: false
+			unitSizex3: unitSize * 3, 
+			changed: false,
+			enabled: false
 		};
 		glAttributes[name] = attr;
-
-
-		// enable attribute
-		setAttribute(name, true);
-		gl.enableVertexAttribArray(attr.pointer);
-
 	}
 
-	function setAttribute(name, initialize = false) {
+	function setAttribute(name) {
 		let attr = glAttributes[name];
 
-		if (!initialize) {
-			if (!attr.changed) return;
-			attr.changed = false;
+		if (!attr.enabled) {
+			attr.enabled = true;
+			attr.pointer = gl.getAttribLocation(glState.program.shaderProgram, name),
+			gl.enableVertexAttribArray(attr.pointer);
 		}
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, attr.buffer);
@@ -78,24 +75,33 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 	function resize(width, height) {
 		glState.width = width;
 		glState.height = height;
-		gl.canvas.width = width * devicePixelRatio;
-		gl.canvas.height = height * devicePixelRatio;
-		updateResolution();
+		
+		const nwidth = Math.floor(width * devicePixelRatio);
+		const nheight = Math.floor(height * devicePixelRatio);
+		if (nwidth !== gl.canvas.width) gl.canvas.width = nwidth;
+		if (nheight !== gl.canvas.height) gl.canvas.height = nheight;
+		
+		if (glState.usedProgram) {
+			updateResolution();
+		}
 	}
 
 	function updateResolution() {
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-		gl.uniform2f(glState.program.uniforms.resolution, gl.canvas.width / devicePixelRatio, gl.canvas.height / devicePixelRatio);
+		gl.uniform2f(getUniformLocation("resolution"), gl.canvas.width / devicePixelRatio, gl.canvas.height / devicePixelRatio);
 	}
 	//#endregion
 
 	//#region basic
 	
-	function create(canvas) {
-		gl = canvas.getContext("webgl2");
+	function create(canvas, pixelRatioHandled = false) {
+		gl = canvas.getContext("webgl2", {
+			depth: false,
+			stencil: false
+		});
 
 		glState.contextExists = true;
-
+		
 		gl.canvas.addEventListener("webglcontextlost", e => {
 			e.preventDefault();
 			glState.contextExists = false;
@@ -107,14 +113,13 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 			console.warn("WebGL context restored");
 		});
 
-		setup();
+		setup(pixelRatioHandled);
 
 		if (debug) bound.gl = gl;
 	}
 
-	function setup() {
+	function setup(pixelRatioHandled) {
 		glState.derivativeExt = gl.getExtension("OES_standard_derivatives");
-
 
 		const MAX_VECTORS = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS) - 1;
 		const MAX_3X3_MATRICES = Math.floor(MAX_VECTORS / 3);
@@ -126,6 +131,93 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		// textures
 		glState.MAX_TEXTURE_UNITS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 
+		setupShaderProgram();
+
+		// initialize texture resources
+		glState.imageTextureMap = new Map();
+		glState.textureIndexMap = new Map();
+		glState.currentTextureIndex = 0;
+		glState.activeTextureIndex = 0;
+		glState.textures = [];
+
+		const textureIndexList = new Int32Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => i);
+
+		gl.uniform1iv(glState.program.uniforms.textures, textureIndexList);
+
+		// general attributes
+		createAttribute("vertexPosition", 2);
+		createAttribute("vertexTransformIndex", 1);
+		createAttribute("vertexCircleRadius", 1);
+		createAttribute("vertexType", 1);
+		createAttribute("vertexAlpha", 1);
+
+		// color attributes
+		createAttribute("vertexColor", 3);
+
+		// outline attributes
+		createAttribute("vertexLineWidth", 1);
+		createAttribute("vertexLineNormal", 2);
+
+		// texture attributes
+		createAttribute("vertexTexturePosition", 2);
+		createAttribute("vertexTextureIndex", 1);
+
+		// transforms
+		glState.transformData = new Float32Array(glState.MAX_BATCH_TRANSFORMS * 9);
+		glState.currentTransformIndex = 0;
+		glState.shouldIncrementTransform = false;
+
+		for (let i = 0; i < glState.MAX_BATCH_TRIS; i++) {
+			glState.transformData[i * 9 + 0] = 1;
+			glState.transformData[i * 9 + 4] = 1;
+			glState.transformData[i * 9 + 8] = 1;
+		}
+
+		// triangulation cache
+		glState.vertexCountTriangulationMap = new Map();
+
+		gl.enable(gl.BLEND);
+
+		// initialize state
+		setBlendMode(glState.blendMode ?? BLEND_MODE_COMBINE);
+		setImageSmoothing(glState.imageSmoothing ?? false);
+		setGlobalAlpha(glState.globalAlpha ?? 1);
+		setTransform(glState.currentTransform ?? [
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
+		]);
+
+		if (pixelRatioHandled) {
+			glState.width = gl.canvas.width / devicePixelRatio;
+			glState.height = gl.canvas.height / devicePixelRatio;
+		} else {
+			glState.width = gl.canvas.width;
+			glState.height = gl.canvas.height;
+		}
+
+		glState.miterLimit = 0.9;
+
+		gl.clearColor(0, 0, 0, 0);
+
+		glState.usedProgram = false;
+	}
+
+	function destroy() {
+		for (let name in glAttributes) destroyAttribute(name);
+		for (let i = 0; i < glState.textures.length; i++) gl.deleteTexture(glState.textures[i]);
+		gl.useProgram(null);
+		gl.deleteProgram(glState.program.shaderProgram);
+		gl.deleteShader(glState.program.vertexShader);
+		gl.deleteShader(glState.program.fragmentShader);
+	}
+	
+	function getUniformLocation(uniform) {
+		if (uniform in glState.program.uniforms) return glState.program.uniforms[uniform];
+		return glState.program.uniforms[uniform] = gl.getUniformLocation(glState.program.shaderProgram, uniform);
+	}
+
+	function setupShaderProgram(vsName, fsName) {
 		const textureSelectionGLSL = `
 switch (int(textureIndex)) {
 ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
@@ -136,7 +228,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 		// colors
 
-		glShaders.vertex = `#version 300 es
+		const vertexShaderSource = `#version 300 es
 				in highp vec2 vertexPosition;
 				in highp float vertexTransformIndex;
 				in highp vec3 vertexColor;
@@ -205,7 +297,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 				}
 			`;
 
-		glShaders.fragment = `#version 300 es
+		const fragmentShaderSource = `#version 300 es
 				in highp vec2 position;
 				in highp vec3 color;
 				in highp float alpha;
@@ -282,109 +374,27 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 				}
 			`;
 
-		glState.program = createProgram("vertex", "fragment", ["vertexTransforms", "textures", "resolution"]);
-
-
-		glState.imageTextureMap = new Map();
-		glState.textureIndexMap = new Map();
-		glState.currentTextureIndex = 0;
-		glState.activeTextureIndex = 0;
-		glState.textures = [];
-
-		const textureIndexList = new Int32Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => i);
-
-		gl.useProgram(glState.program.shaderProgram);
-
-		gl.uniform1iv(glState.program.uniforms.textures, textureIndexList);
-
-		// general attributes
-		createAttribute("vertexPosition", 2);
-		createAttribute("vertexTransformIndex", 1);
-		createAttribute("vertexCircleRadius", 1);
-		createAttribute("vertexType", 1);
-		createAttribute("vertexAlpha", 1);
-
-		// color attributes
-		createAttribute("vertexColor", 3);
-
-		// outline attributes
-		createAttribute("vertexLineWidth", 1);
-		createAttribute("vertexLineNormal", 2);
-
-		// texture attributes
-		createAttribute("vertexTexturePosition", 2);
-		createAttribute("vertexTextureIndex", 1);
-
-		// uniforms
-		glState.transformData = new Float32Array(glState.MAX_BATCH_TRANSFORMS * 9);
-		glState.currentTransformIndex = 0;
-		glState.shouldIncrementTransform = false;
-
-		glState.vertexCountTriangulationMap = new Map();
-
-		for (let i = 0; i < glState.MAX_BATCH_TRIS; i++) {
-			glState.transformData[i * 9 + 0] = 1;
-			glState.transformData[i * 9 + 4] = 1;
-			glState.transformData[i * 9 + 8] = 1;
-		}
-
-		gl.enable(gl.BLEND);
-
-		setBlendMode(glState.blendMode ?? BLEND_MODE_COMBINE);
-		setImageSmoothing(glState.imageSmoothing ?? false);
-		setGlobalAlpha(glState.globalAlpha ?? 1);
-		setTransform(glState.currentTransform ?? [
-			1, 0, 0,
-			0, 1, 0,
-			0, 0, 1
-		]);
-		resize(glState.width ?? gl.canvas.width, glState.height ?? gl.canvas.height);
-
-		glState.miterLimit = 0.9;
-
-		gl.clearColor(0, 0, 0, 0);
-	}
-
-	function destroy() {
-		for (let name in glAttributes) destroyAttribute(name);
-		for (let i = 0; i < glState.textures.length; i++) gl.deleteTexture(glState.textures[i]);
-		gl.useProgram(null);
-		gl.deleteProgram(glState.program.shaderProgram);
-		gl.deleteShader(glState.program.vertexShader);
-		gl.deleteShader(glState.program.fragmentShader);
-	}
-	
-	function createProgram(vsName, fsName, uniformNames = []) {
-		let error = null;
-
 		function compileShader(type, source) {
 			let shader = gl.createShader(type);
 			gl.shaderSource(shader, source);
 			gl.compileShader(shader);
-			if (debug) if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-				error = gl.getShaderInfoLog(shader);
-				return false;
-			}
 			return shader;
 		}
 
-		const vertexShader = compileShader(gl.VERTEX_SHADER, glShaders[vsName]);
-		if (error) console.log("vertex error: " + error);
-		error = null;
-		const fragmentShader = compileShader(gl.FRAGMENT_SHADER, glShaders[fsName]);
-		if (error) console.log("fragment error: " + error);
+		const vertexShader = compileShader(gl.VERTEX_SHADER, vertexShaderSource);
+		const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
 		const shaderProgram = gl.createProgram();
 		gl.attachShader(shaderProgram, vertexShader);
 		gl.attachShader(shaderProgram, fragmentShader);
 		gl.linkProgram(shaderProgram);
 
-		let uniforms = {};
+		const uniforms = {
+			// textures: gl.getUniformLocation(shaderProgram, "textures"),
+			// resolution: gl.getUniformLocation(shaderProgram, "resolution"),
+			// vertexTransforms: gl.getUniformLocation(shaderProgram, "vertexTransforms")
+		};
 
-		for (let i = 0; i < uniformNames.length; i++) {
-			uniforms[uniformNames[i]] = gl.getUniformLocation(shaderProgram, uniformNames[i]);
-		}
-
-		return {
+		glState.program = {
 			vertexShaderName: vsName,
 			fragmentShaderName: fsName,
 			vertexShader,
@@ -424,13 +434,10 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		// write to uniform buffer
 		transformData[transformIndex + 0] = matrix[0];
 		transformData[transformIndex + 1] = matrix[1];
-		// transformData[transformIndex + 2] = matrix[2];
 		transformData[transformIndex + 3] = matrix[3];
 		transformData[transformIndex + 4] = matrix[4];
-		// transformData[transformIndex + 5] = matrix[5];
 		transformData[transformIndex + 6] = matrix[6];
 		transformData[transformIndex + 7] = matrix[7];
-		// transformData[transformIndex + 8] = matrix[8];
 	}
 
 	function setImageSmoothing(smooth) {
@@ -480,6 +487,12 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 	function render() {
 		if (!glState.currentTriIndex) return;
 
+		if (!glState.usedProgram) {
+			glState.usedProgram = true;
+			gl.useProgram(glState.program.shaderProgram);
+			resize(glState.width, glState.height);
+		}
+
 		// general
 		setAttribute("vertexPosition");
 		setAttribute("vertexTransformIndex");
@@ -498,7 +511,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		setAttribute("vertexTexturePosition");
 		setAttribute("vertexTextureIndex");
 
-		gl.uniformMatrix3fv(glState.program.uniforms.vertexTransforms, false, glState.transformData);
+		gl.uniformMatrix3fv(getUniformLocation("vertexTransforms"), false, glState.transformData);
 
 		gl.drawArrays(gl.TRIANGLES, 0, glState.currentTriIndex * 3);
 
@@ -535,6 +548,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 	//#endregion
 
 	//#region general
+	let avData, avaData, avrData, avtriData, avtData;
 	function writeTriangleAttributeData(ax, ay, bx, by, cx, cy, alpha, radius, vertexType) {
 		if (!glState.contextExists) return;
 
@@ -543,46 +557,48 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		const avtri = glAttributes.vertexTransformIndex;
 		const avt = glAttributes.vertexType;
 		const ava = glAttributes.vertexAlpha;
-		const vertexPositionIndex = glState.currentTriIndex * av.unitSize * 3;
-		const vertexAlphaIndex = glState.currentTriIndex * ava.unitSize * 3;
-		const vertexTransformIndexIndex = glState.currentTriIndex * avtri.unitSize * 3;
-		const vertexRadiusIndex = glState.currentTriIndex * avr.unitSize * 3;
-		const vertexTypeIndex = glState.currentTriIndex * avt.unitSize * 3;
-		const vertexTransformIndex = glState.currentTriIndex * 9 /* size of matrix */;
+		const vertexPositionIndex = glState.currentTriIndex * av.unitSizex3;
+		const vertexAlphaIndex = glState.currentTriIndex * ava.unitSizex3;
+		const vertexTransformIndexIndex = glState.currentTriIndex * avtri.unitSizex3;
+		const vertexRadiusIndex = glState.currentTriIndex * avr.unitSizex3;
+		const vertexTypeIndex = glState.currentTriIndex * avt.unitSizex3;
 
 		glState.currentTriIndex++;
 
 		// vertex positions
-		av.data[vertexPositionIndex + 0] = ax;
-		av.data[vertexPositionIndex + 1] = ay;
-		av.data[vertexPositionIndex + 2] = bx;
-		av.data[vertexPositionIndex + 3] = by;
-		av.data[vertexPositionIndex + 4] = cx;
-		av.data[vertexPositionIndex + 5] = cy;
+		avData = av.data;
+		avData[vertexPositionIndex + 0] = ax;
+		avData[vertexPositionIndex + 1] = ay;
+		avData[vertexPositionIndex + 2] = bx;
+		avData[vertexPositionIndex + 3] = by;
+		avData[vertexPositionIndex + 4] = cx;
+		avData[vertexPositionIndex + 5] = cy;
 
 		// globalAlpha and vertex alpha
 		const computedAlpha = alpha * glState.globalAlpha;
-		ava.data[vertexAlphaIndex + 0] = computedAlpha;
-		ava.data[vertexAlphaIndex + 1] = computedAlpha;
-		ava.data[vertexAlphaIndex + 2] = computedAlpha;
+		avaData = ava.data;
+		avaData[vertexAlphaIndex + 0] = computedAlpha;
+		avaData[vertexAlphaIndex + 1] = computedAlpha;
+		avaData[vertexAlphaIndex + 2] = computedAlpha;
 
 		// circle radius
-		avr.data[vertexRadiusIndex + 0] = radius;
-		avr.data[vertexRadiusIndex + 1] = radius;
-		avr.data[vertexRadiusIndex + 2] = radius;
-
-		const tr = glState.transform;
+		avrData = avr.data;
+		avrData[vertexRadiusIndex + 0] = radius;
+		avrData[vertexRadiusIndex + 1] = radius;
+		avrData[vertexRadiusIndex + 2] = radius;
 
 		// transform index
+		avtriData = avtri.data;
 		const currentTransformIndex = glState.currentTransformIndex;
-		avtri.data[vertexTransformIndexIndex + 0] = currentTransformIndex;
-		avtri.data[vertexTransformIndexIndex + 1] = currentTransformIndex;
-		avtri.data[vertexTransformIndexIndex + 2] = currentTransformIndex;
+		avtriData[vertexTransformIndexIndex + 0] = currentTransformIndex;
+		avtriData[vertexTransformIndexIndex + 1] = currentTransformIndex;
+		avtriData[vertexTransformIndexIndex + 2] = currentTransformIndex;
 
 		// vertex booleans
-		avt.data[vertexTypeIndex + 0] = vertexType;
-		avt.data[vertexTypeIndex + 1] = vertexType;
-		avt.data[vertexTypeIndex + 2] = vertexType;
+		avtData = avt.data;
+		avtData[vertexTypeIndex + 0] = vertexType;
+		avtData[vertexTypeIndex + 1] = vertexType;
+		avtData[vertexTypeIndex + 2] = vertexType;
 
 
 		av.changed = true;
@@ -603,7 +619,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		beforeBufferWrite(1);
 
 		const avc = glAttributes.vertexColor;
-		const vertexColorIndex = glState.currentTriIndex * avc.unitSize * 3;
+		const vertexColorIndex = glState.currentTriIndex * avc.unitSizex3;
 
 		writeTriangleAttributeData(ax, ay, bx, by, cx, cy, a, radius, GL_COLORED);
 
@@ -655,9 +671,9 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		const avc = glAttributes.vertexColor;
 		const avn = glAttributes.vertexLineNormal;
 		const avlw = glAttributes.vertexLineWidth;
-		const vertexColorIndex = glState.currentTriIndex * avc.unitSize * 3;
-		const vertexLineNormalIndex = glState.currentTriIndex * avn.unitSize * 3;
-		const vertexLineWidthIndex = glState.currentTriIndex * avlw.unitSize * 3;
+		const vertexColorIndex = glState.currentTriIndex * avc.unitSizex3;
+		const vertexLineNormalIndex = glState.currentTriIndex * avn.unitSizex3;
+		const vertexLineWidthIndex = glState.currentTriIndex * avlw.unitSizex3;
 
 		writeTriangleAttributeData(ax, ay, bx, by, ax, ay, a, -1, GL_LINE);
 
@@ -972,8 +988,8 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 		const avc = glAttributes.vertexColor;
 		const avlw = glAttributes.vertexLineWidth;
-		const vertexColorIndex = glState.currentTriIndex * avc.unitSize * 3;
-		const vertexLineWidthIndex = glState.currentTriIndex * avlw.unitSize * 3;
+		const vertexColorIndex = glState.currentTriIndex * avc.unitSizex3;
+		const vertexLineWidthIndex = glState.currentTriIndex * avlw.unitSizex3;
 
 		x -= lineWidth / 2;
 		y -= lineWidth / 2;
@@ -1019,8 +1035,8 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 		const avc = glAttributes.vertexColor;
 		const avlw = glAttributes.vertexLineWidth;
-		const vertexColorIndex = glState.currentTriIndex * avc.unitSize * 3;
-		const vertexLineWidthIndex = glState.currentTriIndex * avlw.unitSize * 3;
+		const vertexColorIndex = glState.currentTriIndex * avc.unitSizex3;
+		const vertexLineWidthIndex = glState.currentTriIndex * avlw.unitSizex3;
 
 		rx += lineWidth / 2;
 		ry += lineWidth / 2;
@@ -1137,8 +1153,8 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 		const avt = glAttributes.vertexTexturePosition;
 		const avti = glAttributes.vertexTextureIndex;
-		const vertexTextureBufferIndex = glState.currentTriIndex * avt.unitSize * 3;
-		const vertexTextureIndexBufferIndex = glState.currentTriIndex * avti.unitSize * 3;
+		const vertexTextureBufferIndex = glState.currentTriIndex * avt.unitSizex3;
+		const vertexTextureIndexBufferIndex = glState.currentTriIndex * avti.unitSizex3;
 
 		writeTriangleAttributeData(ax, ay, bx, by, cx, cy, 1, radius, GL_TEXTURED);
 
