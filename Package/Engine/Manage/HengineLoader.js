@@ -88,8 +88,7 @@ class HengineImageResource extends HengineResource {
 		return new Promise(function (resolve) {
 			image.image.addEventListener("load", function () {
 				// update dimensions in interim
-				image.width = image.image.width;
-				image.height = image.image.height;
+				image.forceLoad();
 				resolve(image);
 			});
 			image.image.addEventListener("error", function () {
@@ -107,6 +106,7 @@ class HengineVideoResource extends HengineResource {
 		const video = new VideoView(this.src, this.loops);
 		return new Promise(function (resolve) {
 			video.video.addEventListener("canplay", () => {
+				video.forceLoad();
 				resolve(video);
 			});
 		});
@@ -128,8 +128,6 @@ class HengineAnimationResource extends HengineResource {
 				promises.push(new Promise(function (resolve) {
 					image.image.addEventListener("load", function () {
 						// update dimensions in interim
-						animation.width = image.image.width;
-						animation.height = image.image.height;
 						resolve(animation);
 					});
 					image.image.addEventListener("error", function () {
@@ -140,6 +138,7 @@ class HengineAnimationResource extends HengineResource {
 		}
 		return new Promise(async function (resolve) {
 			await Promise.all(promises);
+			animation.forceLoad();
 			resolve(animation);
 		});
 	}

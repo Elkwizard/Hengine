@@ -22,10 +22,15 @@ class VideoView extends ImageType {
 		this.video = document.createElement("video");;
 		this.video.src = this.src;
 		this.video.muted = true;
-		this.video.addEventListener("canplay", () => {
-			this.loaded = true;
-		});
+		this.video.addEventListener("canplay", this.forceLoad.bind(this));
 		this.video.play();
+	}
+	forceLoad() {
+		this.loaded = true;
+		this.width = this.video.videoWidth / devicePixelRatio;
+		this.height = this.video.videoHeight / devicePixelRatio;
+		this.image.width = this.video.videoWidth;
+		this.image.height = this.video.videoHeight;	
 	}
 	getFrame() {
 		let image = this.makeImage();
@@ -44,11 +49,6 @@ class VideoView extends ImageType {
 	makeImage() {
 		if (this.loaded) {
 			if ((this.playing && performance.now() - this.lastCaptureTime > 16)) {
-				const v = this.video;
-				this.width = v.videoWidth / devicePixelRatio;
-				this.height = v.videoHeight / devicePixelRatio;
-				this.image.width = v.videoWidth;
-				this.image.height = v.videoHeight;
 				this.c.drawImage(this.video, 0, 0, this.image.width, this.image.height);
 				this.lastCaptureTime = performance.now();
 			}

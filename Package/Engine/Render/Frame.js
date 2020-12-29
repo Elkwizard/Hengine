@@ -80,11 +80,12 @@ class HImage extends ImageType {
 		this.image = new Image();
 		this.image.src = src;
 		this.loaded = false;
-		this.image.addEventListener("load", function () {
-			this.width = this.image.width / devicePixelRatio;
-			this.height = this.image.height / devicePixelRatio;
-			this.loaded = true;
-		}.bind(this));
+		this.image.addEventListener("load", this.forceLoad.bind(this));
+	}
+	forceLoad() {
+		this.width = this.image.width / devicePixelRatio;
+		this.height = this.image.height / devicePixelRatio;
+		this.loaded = true;
 	}
 	static async imageExists(src) {
 		let img = new Image();
@@ -141,7 +142,7 @@ class Frame extends ImageType {
 		
 		let offscreen = img.makeImage();
 		let f = new Frame(w, h);
-		f.renderer.c.drawImage(offscreen, x * devicePixelRatio, y * devicePixelRatio, w * devicePixelRatio, h * devicePixelRatio, 0, 0, w, h);
+		f.renderer.c.drawImage(offscreen, x, y, w * devicePixelRatio, h * devicePixelRatio, 0, 0, w, h);
 		return f;
 	}
 }

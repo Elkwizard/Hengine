@@ -2,27 +2,36 @@ class Animation extends ImageType {
 	constructor(src = "", frames = 1, delay = 0, loops = false, onEnd = () => null) {
 		super(1, 1);
 		this.stopped = false;
+		let promise;
 		if (!Array.isArray(src)) {
 			this.frameCount = frames;
 			this.frames = [];
+
 			for (let i = 0; i < frames; i++) {
 				this.frames.push(new HImage(`${src}/${i + 1}.png`));
 			}
 			this.loops = loops;
 			this.onEnd = onEnd;
 			this.delay = delay;
+			promise = Promise.all(this.frames.map(frame => new Promise(resolve => {
+				frame.image.addEventListener("load", () => resolve(frame));
+			})));
 		} else {
 			this.frames = src;
 			this.frameCount = this.frames.length;
 			this.delay = frames;
 			this.loops = delay;
 			this.onEnd = loops || function () { }
+			promise = Promise.resolve(this.frames);
 		}
 		this.image = this.frames[0];
-		this.width = this.image.width;
-		this.height = this.image.height;
 		this.timer = 0;
 		this.totalTime = this.frames.length * this.delay;
+		promise.then(this.forceLoad.bind(this));
+	}
+	forceLoad() {
+		this.width = this.image.width;
+		this.height = this.image.height;
 	}
 	advance() {
 		if (!this.stopped) {

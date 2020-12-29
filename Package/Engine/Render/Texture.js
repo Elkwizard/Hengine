@@ -189,8 +189,8 @@ class Texture extends ImageType {
 
 		x *= devicePixelRatio;
 		y *= devicePixelRatio;
-		let W = Math.floor(w * devicePixelRatio);
-		let H = Math.floor(h * devicePixelRatio);
+		let W = Math.floor(img.width);//Math.floor(w * devicePixelRatio);
+		let H = Math.floor(img.height);//Math.floor(h * devicePixelRatio);
 		let imageData = context.getImageData(x, y, W, H);
 		let tex = new Texture(w, h);
 		let data = imageData.data;

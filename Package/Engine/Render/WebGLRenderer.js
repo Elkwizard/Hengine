@@ -420,6 +420,10 @@ class WebGLArtist {
 		n.c.drawImage(this.canvas, 0, 0);
 		return n;
 	}
+	clearTransformations() {
+		Matrix3.identity(this.currentTransform);
+		this.gl.setTransform(this.currentTransform);
+	}
 	invertX() {
 		this.translate(this.width, 0);
 		this.scale(-1, 1);
@@ -538,7 +542,7 @@ class WebGLArtist {
 
 	}
 	fill(color) {
-		this.gl.coloredRect(0, 0, this.width, this.height, color.red / 255, color.green / 255, color.blue / 255, color.alpha);
+		this.gl.coloredQuad(0, 0, this.width, this.height, color.red / 255, color.green / 255, color.blue / 255, color.alpha);
 	}
 	rotateAround(x, y, r) {
 		this.translate(x, y)
@@ -595,7 +599,7 @@ class FastFrame extends ImageType {
 		if (!h) h = img.height;
 
 		let f = new FastFrame(w, h);
-		f.renderer.gl.texturedQuad(0, 0, width, height, x / img.width, y / img.height, w / img.width, h / img.height, img.makeImage());
+		f.renderer.gl.texturedQuad(0, 0, w, h, x / img.width, y / img.height, w / img.width, h / img.height, img.makeImage());
 		return f;
 	}
 }
