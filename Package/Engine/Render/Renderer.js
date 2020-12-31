@@ -29,7 +29,7 @@ class Artist {
 		this.c = this.canvas.getContext('2d');
 
 		this.imageType = imageType || new ArtistImage(this);
-		
+
 		this.lineJoinMap = new Map([
 			[LineJoin.MITER, "miter"],
 			[LineJoin.BEVEL, "bevel"],
@@ -156,19 +156,24 @@ class Artist {
 				for (let i = 0; i < blocks.length; i++) {
 					let ax = x;
 					let ay = y + (i + 1) * font.lineHeight + yOffset;
-					let tmw = this.c.measureText(blocks[i]).width;
-					if (this.textModeX === TextModeX.LEFT);
-					else if (this.textModeX === TextModeX.CENTER) {
-						ax -= tmw / 2;
-					} else if (this.textModeX === TextModeX.RIGHT) {
-						ax -= tmw;
+					if (this.textModeX !== TextModeX.LEFT) {
+						let tmw = this.c.measureText(blocks[i]).width;
+
+						if (this.textModeX === TextModeX.CENTER) {
+							ax -= tmw / 2;
+						} else if (this.textModeX === TextModeX.RIGHT) {
+							ax -= tmw;
+						}
 					}
-					if (this.textModeY === TextModeY.TOP);
-					else if (this.textModeY === TextModeY.CENTER) {
-						ay -= tmh / 2;
-					} else if (this.textModeY === TextModeY.BOTTOM) {
-						ay -= tmh;
+
+					if (this.textModeY !== TextModeY.TOP) {
+						if (this.textModeY === TextModeY.CENTER) {
+							ay -= tmh / 2;
+						} else if (this.textModeY === TextModeY.BOTTOM) {
+							ay -= tmh;
+						}
 					}
+
 					textRequests.push({ text: blocks[i], x: ax, y: ay });
 				}
 				return textRequests
@@ -425,7 +430,7 @@ class Artist {
 				this.c.lineTo(px - ox * l2, py - oy * l2);
 				this.c.lineTo(px + ox * l2, py + oy * l2);
 				this.c.fill();
-			},	
+			},
 			arrow(x, y, x1, y1) {
 				if (typeof x === "object") {
 					if (x instanceof Line) {
@@ -676,9 +681,9 @@ class Artist {
 		return Matrix3.mulMatrix(
 			Matrix3.scale(ratio, ratio, Matrix3.temp[1]),
 			Matrix3.create(
-				t.a, 	t.c,	t.e, 
-				t.b, 	t.d, 	t.f, 
-				0, 		0, 		1, 
+				t.a, t.c, t.e,
+				t.b, t.d, t.f,
+				0, 0, 1,
 				Matrix3.temp[0]
 			)
 		);
@@ -688,7 +693,7 @@ class Artist {
 		let al = this.alpha;
 		this.canvas.width = width * devicePixelRatio;
 		this.canvas.height = height * devicePixelRatio;
-		
+
 		if (updateImageType) {
 			this.imageType.width = width;
 			this.imageType.height = height;
@@ -825,10 +830,10 @@ class Artist {
 		this.fill(Color.WHITE);
 	}
 	beforeFrame() {
-		
+
 	}
 	afterFrame() {
-		
+
 	}
 	fill(color) {
 		this.c.fillStyle = this.getContextColor(color);

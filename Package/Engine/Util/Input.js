@@ -22,22 +22,54 @@ class InputHandler {
 		this.keyUpCounts = new Map();
 	}
 	pressLength(key) {
-		return this.keyDownCounts[key];
+		return this.keyDownCounts.get(key);
 	}
 	releaseLength(key) {
-		return this.keyUpCounts[key];
+		return this.keyUpCounts.get(key);
 	}
 	pressed(keys) {
-		return (Array.isArray(keys) ? keys : [keys]).map(key => !!this.keys.get(key)).includes(true);
+		if (Array.isArray(keys)) {
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i];
+				if (!this.keys.get(key)) return false;
+			}
+			return true;
+		} else {
+			return !!this.keys.get(keys);
+		}
 	}
 	released(keys) {
-		return (Array.isArray(keys) ? keys : [keys]).map(key => !this.keys.get(key)).includes(true);
+		if (Array.isArray(keys)) {
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i];
+				if (this.keys.get(key)) return false;
+			}
+			return true;
+		} else {
+			return !this.keys.get(keys);
+		}
 	}
 	justPressed(keys) {
-		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyDownCounts.get(key) === 1 && this.keyUpCounts.get(key) === 0).includes(true);
+		if (Array.isArray(keys)) {
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i];
+				if (this.keyDownCounts.get(key) !== 1) return false;
+			}	
+			return true;
+		} else {
+			return this.keyDownCounts.get(keys) === 1;
+		}
 	}
 	justReleased(keys) {
-		return (Array.isArray(keys) ? keys : [keys]).map(key => this.keyUpCounts.get(key) === 1).includes(true);
+		if (Array.isArray(keys)) {
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i];
+				if (this.keyUpCounts.get(key) !== 1) return false;
+			}	
+			return true;
+		} else {
+			return this.keyUpCounts.get(keys) === 1;
+		}
 	}
 	update() {
 		for (let [key, pressed] of this.keys) {

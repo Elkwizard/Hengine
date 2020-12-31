@@ -53,16 +53,15 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 	function setAttribute(name) {
 		let attr = glAttributes[name];
 
+		gl.bindBuffer(gl.ARRAY_BUFFER, attr.buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, attr.data, gl.DYNAMIC_DRAW);
+
 		if (!attr.enabled) {
 			attr.enabled = true;
 			attr.pointer = gl.getAttribLocation(glState.program.shaderProgram, name),
 			gl.enableVertexAttribArray(attr.pointer);
+			gl.vertexAttribPointer(attr.pointer, attr.unitSize, gl.FLOAT, false, 0, 0);
 		}
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, attr.buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, attr.data, gl.DYNAMIC_DRAW);
-
-		gl.vertexAttribPointer(attr.pointer, attr.unitSize, gl.FLOAT, false, 0, 0);
 	}
 
 	function destroyAttribute(name) {

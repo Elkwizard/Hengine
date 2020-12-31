@@ -62,21 +62,13 @@ class Color extends Operable {
 		return n;
 	}
 	getRGBA() {
-		return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
+		return "rgba(" + Math.floor(this.red) + ", " + Math.floor(this.green) + ", " + Math.floor(this.blue) + ", " + this.alpha + ")";
 	}
-	getHEX() {
+	getHex() {
 		return "#" + Color.numToHex(this.red) + Color.numToHex(this.green) + Color.numToHex(this.blue);
 	}
 	toString() {
 		return this.getRGBA();
-	}
-	equals(color) {
-		const th = 0.1;
-		if (Math.abs(this.red - color.red) < th && Math.abs(this.green - color.green) < th && Math.abs(this.blue - color.blue) < th && Math.abs(this.alpha - color.alpha) < th) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 	op(fn, v) {
 		super.op(fn, v);
@@ -218,6 +210,7 @@ class Color extends Operable {
 		return { red, green, blue, alpha };
 	}
 }
+Color.EPSILON = 1 / 255;
 Color.CSSColors = {
 	aliceblue: new Color(240, 248, 255),
 	antiquewhite: new Color(250, 235, 215),

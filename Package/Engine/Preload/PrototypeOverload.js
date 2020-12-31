@@ -61,7 +61,7 @@ Object.defineProperty(window, "title", {
 		return null;
 	});
 	Array.makeMultidimensional = function (arr) {
-		arr.multiDimensional = true;
+		proto(arr, "multiDimensional", true);
 		proto(arr, "sample", function (...indices) {
 			let index = indices[0];
 			indices.shift();

@@ -404,7 +404,7 @@ class Circle extends Shape {
 		this.x = x;
 		this.y = y;
 		this.radius = Math.abs(radius);
-		this.area = this.radius * this.radius * Math.PI;
+		this.area = this.radius ** 2 * Math.PI;
 	}
 	get middle() {
 		return new Vector2(this.x, this.y);
