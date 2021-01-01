@@ -141,7 +141,7 @@ class Polygon extends Shape {
 				signedArea += (b.x - a.x) * (a.y + b.y) / 2;
 			}
 			if (signedArea > 0) vertices.reverse();
-			
+
 			this.vertices = Polygon.removeDuplicates(vertices);
 			this.area = Math.abs(signedArea);
 		} else {

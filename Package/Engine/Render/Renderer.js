@@ -65,7 +65,7 @@ class Artist {
 				this.c.beginPath();
 				this.c.arc(x, y, radius, 0, 2 * Math.PI);
 			},
-			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
+			arc(x, y, radius, sa, ea, counterClockwise) {
 				if (typeof x === "object") {
 					counterClockwise = ea;
 					ea = sa;
@@ -76,9 +76,9 @@ class Artist {
 				}
 				radius = Math.abs(radius);
 				this.c.beginPath();
-				this.c.arc(x, y, radius, startAngle, endAngle, counterClockwise);
+				this.c.arc(x, y, radius, sa, ea, counterClockwise);
 			},
-			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
+			sector(x, y, radius, sa, ea, counterClockwise) {
 				if (typeof x === "object") {
 					counterClockwise = ea;
 					ea = sa;
@@ -90,8 +90,8 @@ class Artist {
 				radius = Math.abs(radius);
 				this.c.beginPath();
 				this.c.moveTo(x, y);
-				this.c.lineTo(x + radius * Math.cos(startAngle), y + radius * Math.sin(startAngle));
-				this.c.arc(x, y, radius, startAngle, endAngle, counterClockwise);
+				this.c.lineTo(x + radius * Math.cos(sa), y + radius * Math.sin(sa));
+				this.c.arc(x, y, radius, sa, ea, counterClockwise);
 				this.c.lineTo(x, y);
 			},
 			ellipse(x, y, rx, ry) {
@@ -208,11 +208,11 @@ class Artist {
 				this.c.fill();
 			},
 			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.arc(x, y, radius, startAngle, endAngle);
+				pathObj.arc(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.fill();
 			},
-			sector(x, y, radius, startAngle, endAngle) {
-				pathObj.sector(x, y, radius, startAngle, endAngle);
+			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
+				pathObj.sector(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.fill();
 			},
 			ellipse(x, y, rx, ry) {
@@ -260,11 +260,11 @@ class Artist {
 				this.c.stroke();
 			},
 			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.arc(x, y, radius, startAngle, endAngle);
+				pathObj.arc(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.stroke();
 			},
-			sector(x, y, radius, startAngle, endAngle) {
-				pathObj.sector(x, y, radius, startAngle, endAngle);
+			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
+				pathObj.sector(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.stroke();
 			},
 			ellipse(x, y, rx, ry) {
@@ -497,8 +497,8 @@ class Artist {
 				pathObj.arc(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.clip();
 			},
-			sector(x, y, radius, startAngle, endAngle) {
-				pathObj.sector(x, y, radius, startAngle, endAngle);
+			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
+				pathObj.sector(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.c.clip();
 			},
 			ellipse(x, y, rx, ry) {
@@ -548,8 +548,8 @@ class Artist {
 				this.drawImageInternal(x - radius, y - radius, radius * 2, radius * 2);
 				this.unclip();
 			},
-			sector(x, y, radius, startAngle, endAngle) {
-				this.clip().sector(x, y, radius, startAngle, endAngle);
+			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
+				this.clip().sector(x, y, radius, startAngle, endAngle, counterClockwise);
 				this.drawImageInternal(x - radius, y - radius, radius * 2, radius * 2);
 				this.unclip();
 			},
