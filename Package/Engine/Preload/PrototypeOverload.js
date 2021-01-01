@@ -26,6 +26,43 @@ Object.defineProperty(window, "title", {
 			enumerable: false
 		});
 	}
+	// types
+	function addByteBufferConversions(type, bufferType) {
+		if (typeof bufferType === "string") {
+			proto(type.prototype, "toByteBuffer", function () {
+				const buffer = new ByteBuffer();
+				buffer.write[bufferType](this);
+				return buffer;
+			});
+			proto(type, "fromByteBuffer", function (buffer) {
+				buffer.pointer = 0;
+				return buffer.read[bufferType]();
+			});
+		} else {
+			proto(type.prototype, "toByteBuffer", function () {
+				const buffer = new ByteBuffer();
+				bufferType[0](this, buffer);
+				return buffer;
+			});
+			proto(type, "fromByteBuffer", function (buffer) {
+				buffer.pointer = 0;
+				return bufferType[1](buffer);
+			});
+		}
+	}
+	addByteBufferConversions(String, "string");
+	addByteBufferConversions(Number, "float64");
+	addByteBufferConversions(Boolean, "bool");
+	addByteBufferConversions(Object, [
+		function (object, buffer) {
+			buffer.write.string(JSON.stringify(object));
+		},
+		function (buffer) {
+			return JSON.parse(buffer.read.string());
+		}
+	]);
+
+
 	//Function
 	proto(Function.prototype, "param", function (...args) {
 		return function () {

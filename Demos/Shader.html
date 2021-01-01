@@ -74,7 +74,7 @@ vec4 shader() {
 		highlight(text, boldFont, Color.GREEN, new RegExp(commentRegex, "g"), false, getLoc);
 		highlight(text, font, Color.LIGHT_GRAY, new RegExp(`(${[commentRegex, symbolRegex, primitiveRegex, keywordRegex, functionRegex].join("|")})`, "g"), true, getLoc);
 	};
-	hengine.intervals.continuous(function () {
+	intervals.continuous(function () {
 		if (!shader.glsl || (keyboard.pressed("Alt") && keyboard.justPressed("Enter"))) {
 			if (keyboard.justPressed("Enter")) codeInput.scripts.TEXT_AREA.ignore("Enter");
 			shader.glsl = codeInput.scripts.TEXT_AREA.getValue();

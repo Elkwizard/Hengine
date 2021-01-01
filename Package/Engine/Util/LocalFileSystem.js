@@ -47,6 +47,7 @@ class LocalFileSystem {
 	}
 	static put(key, value) {
 		value = LocalFileSystem.compress(value);
+		LocalFileSystem.clear(key);
 		try {
 			let values = [];
 			let acc = "";
@@ -86,7 +87,7 @@ class LocalFileSystem {
 				exists = true;
 			}
 		} while (localStorage.getItem(name) !== null);
-		return exists ? LocalFileSystem.decompress(value) : undefined;
+		return exists ? LocalFileSystem.decompress(value) : null;
 	}
 	static getRemainingSpace() {
 		let key = "FILE_SIZE_CHECK";
@@ -96,79 +97,264 @@ class LocalFileSystem {
 		return (data.length / 512).toMaxed(1) + "kb";
 	}
 }
+class ByteBuffer {
+	constructor(bytes = null) {
+		this.data = (bytes !== null) ? new Uint8Array(bytes) : new Uint8Array(2);
+		this.pointer = 0;
+		this.write = new ByteBuffer.Writer(this);
+		this.read = new ByteBuffer.Reader(this);
+		this.shouldResize = true;
+	}
+	get byteLength() {
+		return this.data.length;
+	}
+	alloc(amount) {
+		if (this.shouldResize) while (this.pointer + amount >= this.data.length) {
+			const newData = new Uint8Array(this.data.length * 2);
+			newData.set(this.data);
+			this.data = newData;
+		}
+	}
+	clear() {
+		this.pointer = 0;
+		this.data.fill(0);
+	}
+	finalize() {
+		this.data = this.data.slice(0, this.pointer);
+	}
+	toString() {
+		let result = "";
+		for (let i = 0; i < this.data.length; i += 2) {
+			const charCode = this.data[i] << 8 | (this.data[i + 1] || 0);
+			result += String.fromCharCode(charCode);
+		}
+		return result;
+	}
+	get(buffer = new ByteBuffer()) {
+		buffer.data = this.data.slice(0, this.data.length);
+		buffer.pointer = this.pointer;
+		buffer.shouldResize = this.shouldResize;
+		return buffer;
+	}
+	toByteBuffer() {
+		return this;
+	}
+	static fromByteBuffer(buffer) {
+		return buffer.get();
+	}
+	static fromString(string) {
+		const buffer = new ByteBuffer(string.length * 2);
+		buffer.shouldResize = false;
+		for (let i = 0; i < string.length; i++) buffer.write.int16(string.charCodeAt(i));
+		buffer.pointer = 0;
+		buffer.shouldResize = true;
+		return buffer;
+	}
+}
+ByteBuffer.float32ConvertBuffer = new ArrayBuffer(4);
+ByteBuffer.float32 = new Float32Array(ByteBuffer.float32ConvertBuffer);
+ByteBuffer.bytes32 = new Uint8Array(ByteBuffer.float32ConvertBuffer);
+ByteBuffer.float64ConvertBuffer = new ArrayBuffer(8);
+ByteBuffer.float64 = new Float64Array(ByteBuffer.float64ConvertBuffer);
+ByteBuffer.bytes64 = new Uint8Array(ByteBuffer.float64ConvertBuffer);
+ByteBuffer.Writer = class {
+	constructor(buffer) {
+		this.buffer = buffer;
+	}
+	bigInt(bigint) {
+		let bytes = 0n;
+		let value = 1n;
+		const sign = (bigint > 0n) ? 1n : -1n;
+		bigint = bigint * sign;
+		while (bigint >= value) {
+			value *= 256n;
+			bytes++;
+		}
+		const byteSize = BigInt("0xFF");
+		
+		this.int32(Number(bytes * sign));
+		for (let i = bytes - 1n; i >= 0n; i--) {
+			this.int8(Number(bigint >> (i * 8n) & byteSize));
+		}
+	}
+	string(string) {
+		const len = string.length;
+		this.int32(len);
+		for (let i = 0; i < len; i++) this.int16(string.charCodeAt(i));
+	}
+	bool(bool) {
+		this.int8(+bool);
+	}
+	bool8(a, b, c, d, e, f, g, h) {
+		this.int8(+a << 7 | +b << 6 | +c << 5 | +d << 4 | +e << 3 | +f << 2 | +g << 1 | +h);
+	}
+	float64(float) {
+		ByteBuffer.float64[0] = float;
+		this.int8(ByteBuffer.bytes64[0]);
+		this.int8(ByteBuffer.bytes64[1]);
+		this.int8(ByteBuffer.bytes64[2]);
+		this.int8(ByteBuffer.bytes64[3]);
+		this.int8(ByteBuffer.bytes64[4]);
+		this.int8(ByteBuffer.bytes64[5]);
+		this.int8(ByteBuffer.bytes64[6]);
+		this.int8(ByteBuffer.bytes64[7]);
+	}
+	float32(float) {
+		ByteBuffer.float32[0] = float;
+		this.int8(ByteBuffer.bytes32[0]);
+		this.int8(ByteBuffer.bytes32[1]);
+		this.int8(ByteBuffer.bytes32[2]);
+		this.int8(ByteBuffer.bytes32[3]);
+	}
+	int32(int) {
+		int &= 0xFFFFFFFF;
+		this.int16(int >> 16);
+		this.int16(int);
+	}
+	int16(int) {
+		int &= 0xFFFF;
+		this.int8(int >> 8);
+		this.int8(int);
+	}
+	int8(int) {
+		this.buffer.alloc(1);
+		int &= 0xFF;
+		this.buffer.data[this.buffer.pointer] = int;
+		this.buffer.pointer++;
+	}
+	array(type, data) {
+		const { length } = data;
+		this.int32(length);
+		for (let i = 0; i < length; i++) this[type](data[i]);
+	}
+	byteBuffer(data) {
+		this.array("int8", data.data);
+	}
+}
+ByteBuffer.Reader = class {
+	constructor(buffer) {
+		this.buffer = buffer;
+	}
+	bigInt() {
+		const byteNum = this.int32();
+		const bytes = BigInt(Math.abs(byteNum));
+		let result = 0n;
+		for (let i = bytes - 1n; i >= 0n; i--) {
+			result |= BigInt(this.int8()) << (i * 8n);
+		}
+		if (byteNum > 0) return result;
+		return -result;
+	}
+	string() {
+		const len = this.int32();
+		let result = "";
+		for (let i = 0; i < len; i++) result += String.fromCharCode(this.int16());
+		return result;
+	}
+	bool() {
+		return !!this.int8();
+	}
+	bool8() {
+		const int = this.int8();
+		return [
+			!!(int >> 7),
+			!!((int >> 6) & 1),
+			!!((int >> 5) & 1),
+			!!((int >> 4) & 1),
+			!!((int >> 3) & 1),
+			!!((int >> 2) & 1),
+			!!((int >> 1) & 1),
+			!!(int & 1)
+		];
+	}
+	float64() {
+		ByteBuffer.bytes64[0] = this.int8();
+		ByteBuffer.bytes64[1] = this.int8();
+		ByteBuffer.bytes64[2] = this.int8();
+		ByteBuffer.bytes64[3] = this.int8();
+		ByteBuffer.bytes64[4] = this.int8();
+		ByteBuffer.bytes64[5] = this.int8();
+		ByteBuffer.bytes64[6] = this.int8();
+		ByteBuffer.bytes64[7] = this.int8(); 
+		return ByteBuffer.float64[0];
+	}
+	float32() {
+		ByteBuffer.bytes32[0] = this.int8();
+		ByteBuffer.bytes32[1] = this.int8();
+		ByteBuffer.bytes32[2] = this.int8();
+		ByteBuffer.bytes32[3] = this.int8();
+		return ByteBuffer.float32[0];
+	}
+	int32() {
+		let result = this.int16() << 16 | this.int16();
+		return result;
+	}
+	int16() {
+		return this.int8() << 8 | this.int8();
+	}
+	int8() {
+		const result = this.buffer.data[this.buffer.pointer];
+		this.buffer.pointer++;
+		return result;
+	}
+	array(type) {
+		const length = this.int32();
+		let result = new Array(length);
+		for (let i = 0; i < length; i++) {
+			result[i] = this[type]();
+		}
+		return result;
+	}
+	byteBuffer() {
+		return new ByteBuffer(this.array("int8"));
+	}
+};
 class FileSystem {
 	constructor() {
-		this.fileTypes = {
-			NUMBER: str => parseFloat(str),
-			STRING: str => str,
-			NUMBER_ARRAY: str => str.split(",").map(e => parseFloat(e)),
-			STRING_ARRAY: str => str.split(","),
-			OBJECT: str => JSON.parse(str),
-			BOOLEAN: str => str === "true",
-			IMAGE: str => Texture.fromString(str),
-			GRAY_MAP: str => GrayMap.fromString(str)
-		};
-		this.fileAliases = {
-			NUMBER: ["num", "int", "float", "double"],
-			STRING: ["txt", "str", "file", "char"],
-			NUMBER_ARRAY: ["num_ary", "num_array"],
-			STRING_ARRAY: ["str_ary", "str_array"],
-			OBJECT: ["obj", "col"],
-			BOOLEAN: ["bln", "bool"],
-			IMAGE: ["img", "png", "jpg", "jpeg", "bmp", "txr"],
-			GRAY_MAP: ["gray_map", "grm"]
-		};
-		for (let type in this.fileAliases) {
-			for (let alt of this.fileAliases[type]) {
-				this.fileTypes[alt.toUpperCase()] = this.fileTypes[type];
-			}
+		this.fileTypes = {};
+
+		this.registerFileType(ByteBuffer, ["buf", "buffer", "dat"]);
+		this.registerFileType(Number, ["num", "int", "flt"]);
+		this.registerFileType(String, ["str", "txt", "json", "js", "html", "css"]);
+		this.registerFileType(Object, ["obj"]);
+		this.registerFileType(Boolean, ["bool"]);
+		this.registerFileType(Texture, ["txr", "img", "bmp", "png", "jpg", "jpeg"]);
+		this.registerFileType(GrayMap, ["gmp", "grm", "map", "grid"]);
+	}
+	registerFileType(ObjectType, extensions = []) {
+		extensions.push(ObjectType.name);
+		for (let i = 0; i < extensions.length; i++) {
+			const key = extensions[i].toLowerCase();
+			if (key in this.fileTypes) console.warn(`File Extension Collision: extension '${key}' is currently mapped to ${this.fileTypes[key].name}`);
+			this.fileTypes[key] = ObjectType;
 		}
 	}
 	getProjectName() {
 		return document.querySelector("title").innerText;
 	}
-	importPackage(pack, loc = this.getProjectName()) {
-		let data = pack;
-		for (let key in data) {
-			if (!this.getRaw(key, loc)) this.saveRaw(key, data[key], loc);
-		}
-		return data;
-	}
-	packageFiles(files = [], loc = this.getProjectName()) {
-		let data = {};
-		for (let file of files) {
-			data[file] = this.getRaw(file, loc);
-		}
-		let packageString = JSON.stringify(data);
-		return packageString;
-	}
 	getFileType(fileName) {
-		let type = fileName.split(".")[1];
-		if (!this.fileTypes[type.toUpperCase()]) {
-			type = "STRING";
-		}
-		return type.toUpperCase();
+		let type = fileName.split(".")[1].toLowerCase();
+		return this.fileTypes[type] ?? ByteBuffer;
 	}
 	getFilePath(file, loc) {
 		return "HengineLocalSaves\\" + escape(loc) + "\\" + escape(file.split(".")[0]) + "." + file.split(".")[1].toLowerCase();
 	}
 	saveRaw(file, data, loc = this.getProjectName()) {
-		LocalFileSystem.put(this.getFilePath(file, loc), data);
+		LocalFileSystem.put(this.getFilePath(file, loc), data.toString());
 		return data;
 	}
 	getRaw(file, loc = this.getProjectName()) {
-		return LocalFileSystem.get(this.getFilePath(file, loc));
+		const path = this.getFilePath(file, loc);
+		const result = LocalFileSystem.get(path);
+		if (result !== null) return ByteBuffer.fromString(result);
+		return new ByteBuffer();
 	}
 	fileExists(file, loc = this.getProjectName()) {
-		return this.getRaw(file, loc) !== undefined;
+		return this.getRaw(file, loc) !== null;
 	}
 	save(file, data, loc = this.getProjectName()) {
-		let type = this.getFileType(file);
-		let actData = data;
-		if (this.fileAliases.OBJECT.includes(type.toLowerCase())) data = JSON.stringify(data);
-		data += "";
-		this.saveRaw(file, data, loc);
-		return actData;
+		this.saveRaw(file, data.toByteBuffer(), loc);
+		return data;
 	}
 	fileSize(file, loc = this.getProjectName()) {
 		let data = this.getRaw(file, loc);
@@ -191,9 +377,9 @@ class FileSystem {
 	}
 	get(file, loc = this.getProjectName()) {
 		let dat = this.getRaw(file, loc);
-		if (dat) {
+		if (dat !== null) {
 			let type = this.getFileType(file);
-			return this.fileTypes[type](dat);
+			return type.fromByteBuffer(dat);
 		}
 	}
 }

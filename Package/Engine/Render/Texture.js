@@ -1,7 +1,8 @@
 class Texture extends ImageType {
 	constructor(width, height) {
 		super(width, height);
-		this.pixels = Array.dim(this.width, this.height).fill(new Color(0, 0, 0, 0));
+		this.pixels = Array.dim(this.width, this.height);
+		for (let i = 0; i < this.pixels.length; i++) for (let j = 0; j < this.pixels[0].length; j++) this.pixels[i][j] = new Color(0, 0, 0, 0);
 		this.image = new_OffscreenCanvas(width, height);
 		this.c = this.image.getContext("2d");
 
@@ -29,24 +30,6 @@ class Texture extends ImageType {
 	}
 	*[Symbol.iterator]() {
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) yield this.pixels[i][j];
-	}
-	toString() {
-		function channelPair(a, b) {
-			let charCode = a << 8 | b;
-			return String.fromCharCode(charCode);
-		}
-		function color(col) {
-			return channelPair(col.red, col.green) + channelPair(col.blue, col.alpha * 255);
-		}
-		function column(col) {
-			return col.map(e => color(e)).join("");
-		}
-		function toString(tex) {
-			let result = tex.width + "," + tex.height + ":";
-			for (let i = 0; i < tex.pixels.length; i++) result += column(tex.pixels[i]);
-			return result;
-		}
-		return toString(this);
 	}
 	clear() {
 		let height = this.pixels[0].length;
@@ -187,15 +170,17 @@ class Texture extends ImageType {
 		let context = canvas.getContext("2d");
 		context.drawImage(img, 0, 0);
 
-		x *= devicePixelRatio;
-		y *= devicePixelRatio;
+		const ratio = img.width / image.width;
+
+		x *= ratio;
+		y *= ratio;
 		let W = Math.floor(img.width);//Math.floor(w * devicePixelRatio);
 		let H = Math.floor(img.height);//Math.floor(h * devicePixelRatio);
 		let imageData = context.getImageData(x, y, W, H);
 		let tex = new Texture(w, h);
 		let data = imageData.data;
 		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
-			let inx = (Math.round(i * devicePixelRatio) + Math.round(j * devicePixelRatio) * W) * 4;
+			let inx = (Math.round(i * ratio) + Math.round(j * ratio) * W) * 4;
 			let r = data[inx + 0];
 			let g = data[inx + 1];
 			let b = data[inx + 2];
@@ -244,56 +229,43 @@ class Texture extends ImageType {
 			}
 		});
 	}
-	static fromString(str) {
-		function invChannelPair(str) {
-			let bin = str.charCodeAt(0);
-			let a = bin >> 8;
-			let b = bin - (a << 8);
-			return [a, b];
+	toByteBuffer() {
+		const buffer = new ByteBuffer();
+
+		buffer.write.int32(this.width);
+		buffer.write.int32(this.height);
+
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
+			const pixel = this.pixels[i][j];
+			
+			buffer.write.int8(pixel.red);
+			buffer.write.int8(pixel.green);
+			buffer.write.int8(pixel.blue);
+			buffer.write.int8(pixel.alpha * 255);
 		}
-		function invColor(str) {
-			let tok = str.split("");
-			let rg = invChannelPair(tok[0]);
-			let ba = invChannelPair(tok[1]);
-			return new Color(rg[0], rg[1], ba[0], ba[1] / 255);
+
+		buffer.finalize();
+
+		return buffer;
+	}
+	static fromByteBuffer(buffer) {
+		buffer.pointer = 0;
+
+		const width = buffer.read.int32();
+		const height = buffer.read.int32();
+
+		const texture = new Texture(width, height);
+
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) {
+			const pixel = texture.pixels[i][j];
+			pixel.red = buffer.read.int8();
+			pixel.green = buffer.read.int8();
+			pixel.blue = buffer.read.int8();
+			pixel.alpha = buffer.read.int8() / 255;
 		}
-		const col_size = 2;
-		function invColumn(str) {
-			let result = [];
-			let acc = "";
-			for (let i = 0; i < str.length; i++) {
-				acc += str[i];
-				if ((i + 1) % col_size === 0) {
-					result.push(invColor(acc));
-					acc = "";
-				}
-			}
-			return result;
-		}
-		function invToString(str) {
-			let inx = str.indexOf(":");
-			let data = str.slice(inx + 1);
-			let header = str.slice(0, inx);
-			let sp = header.split(",");
-			let w = parseFloat(sp[0]);
-			let h = parseFloat(sp[1]);
-			let tex = new Texture(w, h);
-			let acc = "";
-			let result = [];
-			for (let i = 0; i < data.length; i++) {
-				acc += data[i];
-				if ((i + 1) % (h * col_size) === 0) {
-					result.push(invColumn(acc));
-					acc = "";
-				}
-			}
-			//fix pixels
-			Array.makeMultidimensional(result);
-			tex.pixels = result;
-			tex.updateImageData();
-			tex.loaded = false;
-			return tex;
-		}
-		return invToString(str);
+
+		texture.updateImageData();
+
+		return texture;
 	}
 }
