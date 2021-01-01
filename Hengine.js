@@ -8,7 +8,7 @@
     let src = script.src.split("/");
     src.pop();
     let hengineLoaderSrc = src.join("/") + "/Package/Engine/Manage/HengineLoader.js";
-
+ 
     function load(src) {
         const script = document.createElement("script");
         script.src = src;
@@ -30,5 +30,5 @@
 
     let nScript = document.createElement("script");
     nScript.innerHTML = code;
-    document.head.appendChild(nScript);
+    (script.parentNode ?? document.querySelector("html")).appendChild(nScript);
 })();
