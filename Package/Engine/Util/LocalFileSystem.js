@@ -321,6 +321,9 @@ class FileSystem {
 		this.registerFileType(Texture, ["txr", "img", "bmp", "png", "jpg", "jpeg"]);
 		this.registerFileType(GrayMap, ["gmp", "grm", "map", "grid"]);
 	}
+	createFile(name, create) {
+		if (!this.fileExists(name)) this.save(name, create());
+	}
 	registerFileType(ObjectType, extensions = []) {
 		extensions.push(ObjectType.name);
 		for (let i = 0; i < extensions.length; i++) {
@@ -347,7 +350,7 @@ class FileSystem {
 		const path = this.getFilePath(file, loc);
 		const result = LocalFileSystem.get(path);
 		if (result !== null) return ByteBuffer.fromString(result);
-		return new ByteBuffer();
+		return null;
 	}
 	fileExists(file, loc = this.getProjectName()) {
 		return this.getRaw(file, loc) !== null;

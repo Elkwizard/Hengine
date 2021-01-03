@@ -104,7 +104,7 @@ class Scene {
 		let con = new PhysicsConstraint2.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length, stiffness);
 		if (length === null) {
 			let ends = con.getEnds();
-			con.length = Vector2.dist(ends[0], ends[1]);
+			con.length = Vector2.dist(Vector2.fromPhysicsVector(ends[0]), Vector2.fromPhysicsVector(ends[1]));
 		}
 		this.physicsEngine.addConstraint(con);
 	}
@@ -113,7 +113,7 @@ class Scene {
 		if (point === null) con.point = con.getEnds()[0];
 		if (length === null) {
 			let ends = con.getEnds();
-			con.length = Vector2.dist(ends[0], ends[1]);
+			con.length = Vector2.dist(Vector2.fromPhysicsVector(ends[0]), Vector2.fromPhysicsVector(ends[1]));
 		}
 		this.physicsEngine.addConstraint(con);
 	}

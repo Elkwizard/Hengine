@@ -308,7 +308,7 @@ HengineLoader.engineResources = [
 
 	"SceneObject/Scripts", "SceneObject/SceneElement", "SceneObject/SceneObject", "SceneObject/SATPhysicsObject", "SceneObject/SpawnerObject", "SceneObject/UIObject",
 
-	"Scripts/TextArea", "Scripts/PlayerMovement", "Scripts/Draggable",
+	"Scripts/ParticleSpawner", "Scripts/TextArea", "Scripts/PlayerMovement", "Scripts/Draggable",
 
 	"Manage/ElementContainer", "Manage/Scenes", "Manage/Intervals", "Manage/Canvas", "Manage/Hengine",
 ];
