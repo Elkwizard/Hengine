@@ -306,7 +306,7 @@ HengineLoader.engineResources = [
 
 	"Util/Input", "Util/Sound", "Util/Time", "Util/LocalFileSystem",
 
-	"SceneObject/Scripts", "SceneObject/SceneElement", "SceneObject/SceneObject", "SceneObject/SATPhysicsObject", "SceneObject/SpawnerObject", "SceneObject/UIObject",
+	"SceneObject/Scripts", "SceneObject/SceneElement", "SceneObject/SceneObject", "SceneObject/SATPhysicsObject", "SceneObject/UIObject",
 
 	"Scripts/ParticleSpawner", "Scripts/TextArea", "Scripts/PlayerMovement", "Scripts/Draggable",
 

@@ -49,10 +49,6 @@ const DOCS = {
 		"Gradient": {},
 		"GrayMap": {}
 	},
-	"Particles": {
-		"ParticleSpawnerObject": {},
-		"ParticleObject": {}
-	},
 	"Geometry": {
 		"Shapes": {
 			"Shape": {},
@@ -89,7 +85,8 @@ const DOCS = {
 		"ElementScript": {},
 		"PLAYER_MOVEMENT": {},
 		"DRAGGABLE": {},
-		"TEXT_AREA": {}
+		"TEXT_AREA": {},
+		"PARTICLE_SPAWNER": {}
 	},
 	"Miscellaneous": {
 		"Time": {},
