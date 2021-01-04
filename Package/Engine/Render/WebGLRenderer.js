@@ -265,6 +265,20 @@ class WebGLArtist {
 			triangle(v1, v2, v3) {
 				this.imageObj.shape([v1, v2, v3]);
 			},
+			warp(ax, ay, bx, by, cx, cy, dx, dy) {
+				if (typeof ax === "object") {
+					if (ax.vertices) [{ x: ax, y: ay }, { x: bx, y: by }, { x: cx, y: cy }, { x: dx, y: dy }] = ax.vertices;
+					else {
+						({ x: ax, y: ay } = ax);
+						({ x: bx, y: by } = ay);
+						({ x: cx, y: cy } = bx);
+						({ x: dx, y: dy } = by);
+					}
+				}
+				
+				this.gl.texturedTriangle(ax, ay, bx, by, cx, cy, 0, 0, 1, 0, 1, 1, this.currentImageCIS);
+				this.gl.texturedTriangle(ax, ay, dx, dy, cx, cy, 0, 0, 0, 1, 1, 1, this.currentImageCIS);
+			},
 			shape(points) {
 				if (points.vertices) points = points.vertices;
 				if (points.length) {

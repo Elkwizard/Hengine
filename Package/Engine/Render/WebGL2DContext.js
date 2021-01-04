@@ -641,7 +641,9 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 	}
 
 	function coloredEllipse(x, y, rx, ry, r, g, b, a) {
-		coloredQuad(x - rx, y - ry, rx * 2, ry * 2, r, g, b, a, Math.max(rx, ry));
+		const radius = Math.max(rx, ry);
+		if (radius <= 0) return;
+		coloredQuad(x - rx, y - ry, rx * 2, ry * 2, r, g, b, a, radius);
 	}
 
 	function coloredPolygon(vertices, r, g, b, a) {
@@ -1030,6 +1032,10 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 	}
 
 	function outlinedEllipse(x, y, rx, ry, lineWidth, r, g, b, a) {
+		const radius = Math.max(rx, ry);
+		
+		if (radius <= 0) return;
+		
 		beforeBufferWrite(2);
 
 		const avc = glAttributes.vertexColor;
@@ -1039,12 +1045,10 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 		rx += lineWidth / 2;
 		ry += lineWidth / 2;
-		let type = GL_LINE;
 		x -= rx;
 		y -= ry;
 		const w = rx * 2;
 		const h = ry * 2;
-		const radius = Math.max(rx, ry);
 		writeTriangleAttributeData(x, y, x + w, y, x, y + h, a, radius, GL_OUTLINED_QUAD | GL_TRIANGLE_1);
 		writeTriangleAttributeData(x + w, y + h, x + w, y, x, y + h, a, radius, GL_OUTLINED_QUAD | GL_TRIANGLE_2);
 
@@ -1178,6 +1182,8 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 	}
 
 	function texturedEllipse(x, y, rx, ry, tx, ty, tw, th, tex) {
+		const radius = Math.max(rx, ry);
+		if (radius <= 0) return;
 		texturedQuad(x - rx, y - ry, rx * 2, ry * 2, tx, ty, tw, th, tex, Math.max(rx, ry));
 	}
 	

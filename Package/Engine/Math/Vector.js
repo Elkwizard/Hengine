@@ -160,13 +160,12 @@ class Vector2 extends Vector {
 	set angle(angle) {
 		const M = this.mag;
 		if (M) {
-			const v = Vector2.fromAngle(angle);
-			this.x = v.x * M;
-			this.y = v.y * M;
+			this.x = Math.cos(angle) * M;
+			this.y = Math.sin(angle) * M;
 		}
 	}
 	get angle() {
-		return this.getAngle();
+		return Math.atan2(this.y, this.x);
 	}
 	set normal(a) {
 		let normNorm = new Vector2(-a.y, a.x);
@@ -238,9 +237,6 @@ class Vector2 extends Vector {
 		let mag2 = v.x ** 2 + v.y ** 2;
 		let k = dot / mag2;
 		return new Vector2(v.x * k, v.y * k);
-	}
-	getAngle() {
-		return Math.atan2(this.y, this.x);
 	}
 	normalize() {
 		let m = this.mag;
@@ -362,7 +358,7 @@ class Vector3 extends Vector {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-	}	
+	}
 	static get left() {
 		return new Vector3(-1, 0, 0);
 	}
@@ -449,9 +445,9 @@ class Vector4 extends Vector {
 }
 Vector4.modValues = ["x", "y", "z", "w"];
 //isNaN
-(function() {
+(function () {
 	const nN = window.isNaN.bind(window);
-	window.isNaN = function(n) {
+	window.isNaN = function (n) {
 		if (n instanceof Vector) {
 			if (n instanceof Vector1) return nN(n.x);
 			if (n instanceof Vector2) return nN(n.x) || nN(n.y);
@@ -459,5 +455,76 @@ Vector4.modValues = ["x", "y", "z", "w"];
 			if (n instanceof Vector4) return nN(n.x) || nN(n.y) || nN(n.z) || nN(n.w);
 		}
 		return nN(n);
+	}
+})();
+
+
+(function () {
+	// angles
+
+	const combinations = [
+		["x", "y"],
+		["x", "z"],
+		["x", "w"],
+		["y", "z"],
+		["y", "w"],
+		["z", "w"]
+	];
+
+	function proto(obj, name, value) {
+		Object.defineProperty(obj, name, {
+			value,
+			enumerable: false
+		});
+	}
+	function protoGetSet(obj, name, get, set) {
+		Object.defineProperty(obj, name, {
+			get,
+			set,
+			enumerable: false,
+		});
+	}
+
+	for (let i = 0; i < combinations.length; i++) {
+		const [x, y] = combinations[i];
+		const XY = x.toUpperCase() + y.toUpperCase();
+
+		function rotateXY(angle) {
+			const c = Math.cos(angle);
+			const s = Math.sin(angle);
+			const t_x = this[x] * c - this[y] * s;
+			const t_y = this[x] * s + this[y] * c;
+			this[x] = t_x;
+			this[y] = t_y;
+			return this;
+		}
+
+		const rotateXYname = `rotate${XY}`;
+		const rotatedXYname = `rotated${XY}`;
+		const angleXYname = `angle${XY}`;
+
+		function rotatedXY(angle) {
+			return this.get()[rotateXYname](angle);
+		}
+
+		function getAngleXY() {
+			return Math.atan2(this[y], this[x]);
+		}
+
+		function setAngleXY(angle) {
+			const M = Math.sqrt(this[x] ** 2 + this[y] ** 2);
+			this[x] = Math.cos(angle) * M;
+			this[y] = Math.sin(angle) * M;
+		}
+
+		proto(Vector4.prototype, rotateXYname, rotateXY);
+		proto(Vector4.prototype, rotatedXYname, rotatedXY);
+		protoGetSet(Vector4.prototype, angleXYname, getAngleXY, setAngleXY);
+
+		if (y !== "w") {
+			proto(Vector3.prototype, rotateXYname, rotateXY);
+			proto(Vector3.prototype, rotatedXYname, rotatedXY);
+			protoGetSet(Vector3.prototype, angleXYname, getAngleXY, setAngleXY);
+		}
 	}
 })();
