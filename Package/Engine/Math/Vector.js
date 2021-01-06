@@ -359,18 +359,35 @@ class Vector3 extends Vector {
 		return new Vector3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
 	}
 	rotateAboutAxis(axis, angle) {
-		// const vec = new Vector3(axis.x, axis.y, axis.z - )
+		const randomVectorX = (axis.x === 0 && axis.y === 0 && axis.z !== 0) ? 1 : 0;
+		const randomVectorZ = 1 - randomVectorX;
 
-		const xAxis = axis.cross((axis.x === 0 && axis.y === 0 && axis.z !== 0) ? new Vector3(1, 0, 0) : new Vector3(0, 0, 1)).normalized;
-		const yAxis = axis.cross(xAxis).normalized;
+		let xAxisX = axis.y * randomVectorZ;
+		let xAxisY = axis.z * randomVectorX - axis.x * randomVectorZ;
+		let xAxisZ = -axis.y * randomVectorX;
 
-		const x = this.dot(xAxis);
-		const y = this.dot(yAxis);
+		const xAxisMagnitude = xAxisX ** 2 + xAxisY ** 2 + xAxisZ ** 2;
 
-		const xVec = xAxis.times(x);
-		const yVec = yAxis.times(y);
+		xAxisX /= xAxisMagnitude;
+		xAxisY /= xAxisMagnitude;
+		xAxisZ /= xAxisMagnitude;
 
-		this.sub(xVec.plus(yVec));
+		let yAxisX = axis.y * xAxisZ - axis.z * xAxisY;
+		let yAxisY = axis.z * xAxisX - axis.x * xAxisZ;
+		let yAxisZ = axis.x * xAxisY - axis.y * xAxisX;
+
+		const yAxisMagnitude = yAxisX ** 2 + yAxisY ** 2 + yAxisZ ** 2;
+
+		yAxisX /= yAxisMagnitude;
+		yAxisY /= yAxisMagnitude;
+		yAxisZ /= yAxisMagnitude;
+
+		const x = xAxisX * this.x + xAxisY * this.y + xAxisZ * this.z;
+		const y = yAxisX * this.x + yAxisY * this.y + yAxisZ * this.z;
+
+		this.x -= xAxisX * x + yAxisX * y;
+		this.y -= xAxisY * x + yAxisY * y;
+		this.z -= xAxisZ * x + yAxisZ * y;
 
 		const c = Math.cos(angle);
 		const s = Math.sin(angle);
@@ -378,10 +395,9 @@ class Vector3 extends Vector {
 		const xPrime = x * c - y * s;
 		const yPrime = x * s + y * c;
 
-		const xVecPrime = xAxis.times(xPrime);
-		const yVecPrime = yAxis.times(yPrime);
-
-		this.add(xVecPrime.plus(yVecPrime));
+		this.x += xAxisX * xPrime + yAxisX * yPrime;
+		this.y += xAxisY * xPrime + yAxisY * yPrime;
+		this.z += xAxisZ * xPrime + yAxisZ * yPrime;
 
 		return this;
 	}
