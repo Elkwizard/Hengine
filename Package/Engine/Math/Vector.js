@@ -92,11 +92,6 @@ class Vector extends Operable {
 		for (let x of this.constructor.modValues) result += this[x] * v[x];
 		return result;
 	}
-	cross(V) {
-		let u = new Vector3(this.x, this.y || 0, this.z || 0);
-		let v = new Vector3(V.x, V.y || 0, V.z || 0);
-		return new Vector3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
-	}
 	projectOnto(v) {
 		return v.times(this.dot(v) / (v.mag ** 2));
 	}
@@ -358,6 +353,37 @@ class Vector3 extends Vector {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+	cross(v) {
+		const u = this;
+		return new Vector3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
+	}
+	rotateAboutAxis(axis, angle) {
+		// const vec = new Vector3(axis.x, axis.y, axis.z - )
+
+		const xAxis = axis.cross((axis.x === 0 && axis.y === 0 && axis.z !== 0) ? new Vector3(1, 0, 0) : new Vector3(0, 0, 1)).normalized;
+		const yAxis = axis.cross(xAxis).normalized;
+
+		const x = this.dot(xAxis);
+		const y = this.dot(yAxis);
+
+		const xVec = xAxis.times(x);
+		const yVec = yAxis.times(y);
+
+		this.sub(xVec.plus(yVec));
+
+		const c = Math.cos(angle);
+		const s = Math.sin(angle);
+
+		const xPrime = x * c - y * s;
+		const yPrime = x * s + y * c;
+
+		const xVecPrime = xAxis.times(xPrime);
+		const yVecPrime = yAxis.times(yPrime);
+
+		this.add(xVecPrime.plus(yVecPrime));
+
+		return this;
 	}
 	static get left() {
 		return new Vector3(-1, 0, 0);

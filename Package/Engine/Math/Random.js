@@ -1,4 +1,7 @@
 class Random {
+    static seedRand(seed) {
+        return Random.distribution(seed);
+    }
     static random() {
         return Random.seedRand(Random.seed++);
     }
@@ -13,9 +16,6 @@ class Random {
     }
     static color() {
         return new Color(Random.random() * 255, Random.random() * 255, Random.random() * 255, 1);
-    }
-    static seedRand(seed) {
-        return Random.distribution(seed);
     }
     static octave(oc, alg, ...sampleAndFreq) {
         const freq = sampleAndFreq.pop();
@@ -40,10 +40,6 @@ class Random {
     }
     static noiseTCorrect(t) {
         return Interpolation.smoothT(t);
-    }
-    static noiseTCorrect(t) {
-        const f = (x) => (x - 2) * (x + 2) * x;
-        return f(-2.31 * t + 1.155) / 6.158 + 0.5;
     }
     static perlin(x, f = 1, seed = Random.sampleSeed) {
         x *= f;
@@ -147,9 +143,9 @@ class Random {
 Random.reSeed();
 Random.uniform = function (seed) {
     seed += 1e5;
-    let a = (seed * 6.12849) % 8.7890975;
-    let b = (a * 256783945.4758903) % 238462.567890;
-    let r = Math.abs(a * b) % 1;
+    let a = (seed * 638835776.12849) % 8.7890975;
+    let b = (a * 256783945.4758903) % 2.567890;
+    let r = Math.abs(a * b * 382749.294873597) % 1;
     return r;
 };
 Random.normal = function (seed) {

@@ -40,6 +40,10 @@ class Artist {
 			[LineCap.SQUARE, "square"],
 			[LineCap.ROUND, "round"]
 		]);
+		this.blendModeMap = new Map([
+			[BlendMode.COMBINE, "source-over"],
+			[BlendMode.ADD, "lighter"]
+		]);
 
 		this.preservePixelart = true;
 		this.c.imageSmoothingQuality = "high";
@@ -651,11 +655,7 @@ class Artist {
 	}
 	set blendMode(a) {
 		this._blendMode = a;
-		this.c.globalCompositeOperation = {
-			[BlendMode.COMBINE]: "source-over",
-			[BlendMode.ADD]: "lighter"
-		}[a];
-
+		this.c.globalCompositeOperation = this.blendModeMap.get(a);
 	}
 	get blendMode() {
 		return this._blendMode;

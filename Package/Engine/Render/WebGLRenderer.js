@@ -31,6 +31,10 @@ class WebGLArtist {
 			[LineCap.SQUARE, this.gl.LINE_CAP_SQUARE],
 			[LineCap.ROUND, this.gl.LINE_CAP_ROUND]
 		]);
+		this.blendModeMap = new Map([
+			[BlendMode.COMBINE, this.gl.BLEND_MODE_COMBINE],
+			[BlendMode.ADD, this.gl.BLEND_MODE_ADD]
+		]);
 		this.currentTransform = Matrix3.identity();
 		this.transformStack = [];
 		this.alphaStack = [];
@@ -269,10 +273,12 @@ class WebGLArtist {
 				if (typeof ax === "object") {
 					if (ax.vertices) [{ x: ax, y: ay }, { x: bx, y: by }, { x: cx, y: cy }, { x: dx, y: dy }] = ax.vertices;
 					else {
-						({ x: ax, y: ay } = ax);
-						({ x: bx, y: by } = ay);
-						({ x: cx, y: cy } = bx);
-						({ x: dx, y: dy } = by);
+						(
+							{ x: ax, y: ay } = ax,
+							{ x: bx, y: by } = ay,
+							{ x: cx, y: cy } = bx,
+							{ x: dx, y: dy } = by
+						);
 					}
 				}
 				
@@ -366,10 +372,7 @@ class WebGLArtist {
 	}
 	set blendMode(a) {
 		this._blendMode = a;
-		this.gl.setBlendMode({
-			[BlendMode.COMBINE]: this.gl.BLEND_MODE_COMBINE,
-			[BlendMode.ADD]: this.gl.BLEND_MODE_ADD
-		}[a]);
+		this.gl.setBlendMode(this.blendModeMap.get(a));
 
 	}
 	get blendMode() {

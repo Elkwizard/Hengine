@@ -18,16 +18,16 @@ class Operable {
         return this.get().op(v, fn);
     }
     add(v) {
-        return this.op(v, (a, b) => a + b);
+        return this.op(v, Operable.addFunc);
     }
     sub(v) {
-        return this.op(v, (a, b) => a - b);
+        return this.op(v, Operable.subFunc);
     }
     mul(v) {
-        return this.op(v, (a, b) => a * b);
+        return this.op(v, Operable.mulFunc);
     }
     div(v) {
-        return this.op(v, (a, b) => a / b);
+        return this.op(v, Operable.divFunc);
     }
     plus(v) {
         return this.get().add(v);
@@ -42,12 +42,9 @@ class Operable {
         return this.get().div(v);
     }
     map(fn) {
-        let args = [];
-        for (let x of this.constructor.modValues) args.push(fn(this[x], x));
-        return new this.constructor(...args);
-    }
-    abs() {
-        return this.map(Math.abs);
+        const result = this.get();
+        for (let x of this.constructor.modValues) result[x] = fn(result[x]);
+        return result;
     }
     total() {
         let sum = 0;
@@ -89,7 +86,7 @@ class Operable {
         return new this(...this.modValues.map(x => Math.max(a[x], Math.min(b[x], n[x]))));
     }
     static filled(value) {
-        return new this(...this.modValues.map(() => value));
+        return new this(...this.modValues.fill(value));
     }
     static min(a, b) {
         return a.gop(b, Math.min);
@@ -97,9 +94,44 @@ class Operable {
     static max(a, b) {
         return a.gop(b, Math.max);
     }
+    static pow(a, power) {
+        return a.gob(power, Math.pow);    
+    }
     static lerp(a, b, t) {
         return a.gop(b, (A, B) => A * (1 - t) + B * t);
     }
 }
+
+(function () {
+    // Math. functions
+
+    const mathFunctions = [
+        "round", "floor", "ceil", "trunc",
+        "abs",
+        "sqrt",
+        "log", "log2", "log10",
+        "sin", "cos", "tan", "sinh", "cosh", "tanh",
+        "asin", "acos", "atan", "asinh", "acosh", "atanh",
+        "sign"
+    ];
+
+    for (let i = 0; i < mathFunctions.length; i++) {
+        const fnName = mathFunctions[i];
+        const fn = Math[fnName].bind(Math);
+
+        Object.defineProperty(Operable, fnName, {
+            value: function (arg) {
+                return arg.map(fn);
+            },
+            enumerable: false
+        });
+    }
+
+})();
+
 Operable.EPSILON = 0.000001;
 Operable.modValues = [];
+Operable.addFunc = (a, b) => a + b;
+Operable.subFunc = (a, b) => a - b;
+Operable.mulFunc = (a, b) => a * b;
+Operable.divFunc = (a, b) => a / b;
