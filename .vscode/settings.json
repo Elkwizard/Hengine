@@ -1,0 +1,13 @@
+{
+	"files.associations": {
+		"cmath": "cpp",
+		"memory": "cpp",
+		"new": "cpp",
+		"tuple": "cpp",
+		"type_traits": "cpp",
+		"xmemory": "cpp",
+		"xstring": "cpp",
+		"xutility": "cpp",
+		"numeric": "cpp"
+	}
+}

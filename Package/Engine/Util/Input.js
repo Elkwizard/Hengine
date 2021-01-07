@@ -39,7 +39,7 @@ class InputHandler {
 	get allJustReleased() {
 		const result = [];
 		for (let [key, count] of this.keyUpCounts) if (count === 1) result.push(key);
-		return result;	
+		return result;
 	}
 	pressLength(key) {
 		return this.keyDownCounts.get(key);
@@ -74,7 +74,7 @@ class InputHandler {
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
 				if (this.keyDownCounts.get(key) !== 1) return false;
-			}	
+			}
 			return true;
 		} else {
 			return this.keyDownCounts.get(keys) === 1;
@@ -85,7 +85,7 @@ class InputHandler {
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
 				if (this.keyUpCounts.get(key) !== 1) return false;
-			}	
+			}
 			return true;
 		} else {
 			return this.keyUpCounts.get(keys) === 1;
@@ -104,8 +104,8 @@ class InputHandler {
 			}
 		}
 	}
-	afterUpdate() { 
-		
+	afterUpdate() {
+
 	}
 }
 class KeyboardHandler extends InputHandler {
@@ -208,7 +208,7 @@ class MouseHandler extends InputHandler {
 			}
 			let sig = m.mouseMap[m.button];
 			for (let ev of m.onMove) ev(sig);
-			m.moveQueue.push(new MouseHandler.Event(sig, new Vector2(e.x, e.y)));	
+			m.moveQueue.push(new MouseHandler.Event(sig, new Vector2(e.x, e.y)));
 		};
 		function handleUp(e) {
 			m.updatePosition(e);
@@ -228,8 +228,8 @@ class MouseHandler extends InputHandler {
 		}
 		function mouseHandle(e) {
 			if (e.type === "mouseout") handle({
-				x: m.getPageLocation().x,
-				y: m.getPageLocation().y,
+				x: m.pageLocation.x,
+				y: m.pageLocation.y,
 				button: 0,
 				type: "up"
 			});
@@ -244,13 +244,13 @@ class MouseHandler extends InputHandler {
 			e.preventDefault();
 			let p = e.targetTouches[0];
 			if (!p) handle({
-				x: m.getPageLocation().x, 
-				y: m.getPageLocation().y,
+				x: m.pageLocation.x,
+				y: m.pageLocation.y,
 				button: 0,
 				type: "up"
 			});
 			else {
-				let type = { start: "down", end: "up", move: "move"}[e.type.slice(5)];
+				let type = { start: "down", end: "up", move: "move" }[e.type.slice(5)];
 				handle({
 					x: p.pageX,
 					y: p.pageY,
@@ -259,7 +259,7 @@ class MouseHandler extends InputHandler {
 				});
 				if (type === "down") {
 					m.screenLast = m.screen.get();
-					m.worldLast = m.world.get();	
+					m.worldLast = m.world.get();
 				}
 			}
 		}
@@ -283,6 +283,8 @@ class MouseHandler extends InputHandler {
 		el.addEventListener("contextmenu", this.__right__);
 		el.addEventListener("wheel", function (e) {
 			m.button = e.button;
+			if (e.deltaY < 0) m.keys.set("WheelUp", true);
+			else if (e.deltaY > 0) m.keys.set("WheelDown", true);
 			for (let ev of m.onScroll) ev(e.deltaY);
 		});
 	}
@@ -292,6 +294,8 @@ class MouseHandler extends InputHandler {
 		this.downQueue = [];
 		this.moveQueue = [];
 		this.upQueue = [];
+		this.keys.set("WheelUp", false);
+		this.keys.set("WheelDown", false);
 	}
 	update() {
 		super.update();
@@ -306,7 +310,7 @@ class MouseHandler extends InputHandler {
 		this.onScroll.clear();
 		this.onClick.clear();
 	}
-	getPageLocation() {
+	get pageLocation() {
 		let bound = this.engine.renderer.canvas.getBoundingClientRect();
 		let scale = this.engine.renderer.width / bound.width;
 		return this.screen.over(scale).plus(new Vector2(bound.x, bound.y));
