@@ -21,6 +21,26 @@ class InputHandler {
 		this.keyDownCounts = new Map();
 		this.keyUpCounts = new Map();
 	}
+	get allPressed() {
+		const result = [];
+		for (let [key, pressed] of this.keys) if (pressed) result.push(key);
+		return result;
+	}
+	get allReleased() {
+		const result = [];
+		for (let [key, pressed] of this.keys) if (!pressed) result.push(key);
+		return result;
+	}
+	get allJustPressed() {
+		const result = [];
+		for (let [key, count] of this.keyDownCounts) if (count === 1) result.push(key);
+		return result;
+	}
+	get allJustReleased() {
+		const result = [];
+		for (let [key, count] of this.keyUpCounts) if (count === 1) result.push(key);
+		return result;	
+	}
 	pressLength(key) {
 		return this.keyDownCounts.get(key);
 	}
