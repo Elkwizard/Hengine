@@ -401,6 +401,9 @@ class Vector3 extends Vector {
 
 		return this;
 	}
+	rotatedAboutAxis(axis, angle) {
+		return this.get().rotateAboutAxis(axis, angle);
+	}
 	static get left() {
 		return new Vector3(-1, 0, 0);
 	}
