@@ -55,7 +55,7 @@ class Scene {
 	}
 	collidePoint(point, override = true) {
 		let collideAry = [];
-		let options = this.main.updateArray().filter(e => !(e instanceof ParticleObject) && (e.onScreen || override));
+		let options = this.main.updateArray().filter(e => e.onScreen || override);
 		for (let hitbox of options) {
 			let p = (hitbox instanceof UIObject) ? this.camera.worldSpaceToScreenSpace(point) : point;
 			let shapes = hitbox.getConvexModels();

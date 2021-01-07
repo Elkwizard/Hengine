@@ -22,8 +22,15 @@ class CanvasManager {
 		});
 
 		this.clearScreen = () => this.renderer.fill(Color.WHITE);
-	}
 
+		this.cursor = "default";
+	}
+	set cursor(a) {
+		this.canvas.style.cursor = a;
+	}
+	get cursor() {
+		return this.canvas.style.cursor;
+	}
 	updateSize() {
 		let packed = new Rect(0, 0, innerWidth, innerHeight).largestWithin(this.renderer.width, this.renderer.height);
 

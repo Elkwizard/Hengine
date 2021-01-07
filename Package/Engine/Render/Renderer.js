@@ -305,15 +305,19 @@ class Artist {
 				}
 			},
 			spline(spline, prec = 100) {
-				let inc = 1 / prec;
 				this.c.beginPath();
 				this.c.moveTo(spline.a.x, spline.a.y);
-				for (let i = 0; i < 1; i += inc) {
-					const p = spline.getPoint(i);
-					this.c.lineTo(p.x, p.y);
-				}
-				this.c.lineTo(spline.d.x, spline.d.y);
+				this.c.bezierCurveTo(spline.b.x, spline.b.y, spline.c.x, spline.c.y, spline.d.x, spline.d.y);
 				this.c.stroke();
+				// let inc = 1 / prec;
+				// this.c.beginPath();
+				// this.c.moveTo(spline.a.x, spline.a.y);
+				// for (let i = 0; i < 1; i += inc) {
+				// 	const p = spline.getPoint(i);
+				// 	this.c.lineTo(p.x, p.y);
+				// }
+				// this.c.lineTo(spline.d.x, spline.d.y);
+				// this.c.stroke();
 			},
 			line(x, y, x1, y1) {
 				if (typeof x == "object") {

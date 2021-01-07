@@ -23,10 +23,6 @@ class ElementContainer extends SceneElement {
 						fill = Color.WHITE;
 						outline = Color.BLACK;
 						break;
-					case ParticleSpawnerObject:
-						fill = Color.BLANK;
-						outline = Color.BLANK;
-						break;
 					default:
 						fill = Color.BLACK;
 						outline = Color.PURPLE;
@@ -81,13 +77,7 @@ class ElementContainer extends SceneElement {
 	}
 	copy(el) {
 		let n;
-		if (el instanceof ParticleSpawnerObject) {
-			n = this.addParticleSpawner(el.name + " - copy", 0, 0, el.particleSize, el.particleInitSpeed, el.particleDelay, el.particleLifeSpan, el.particleDraw, el.particleSizeVariance, el.particleSpeedVariance, el.dirs);
-			n.particleSlows = el.particleSlows;
-			n.particleFades = el.particleFades;
-			n.particleFalls = el.particleFalls;
-			n.particleActive = el.particleActive;
-		} else if (el instanceof UIObject) {
+		if (el instanceof UIObject) {
 			n = this.addUI(el.name + " - copy", 0, 0, el.width, el.height);
 		} else if (el instanceof PhysicsObject) {
 			n = this.addPhysicsElement(el.name + " - copy", 0, 0, el.body.type === RigidBody.DYNAMIC, { ...el.controls }, el.tag);
@@ -177,36 +167,6 @@ class ElementContainer extends SceneElement {
 		let x = new ElementContainer(name, active, this, this.engine);
 		this.elements.set(name, x);
 		return x;
-	}
-	addParticleExplosion(amountParticles, x, y, size = 1, spd = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(1, 1, 1, 1), falls = false, slows = true, fades = true) {
-		const name = this.genName(this.elements, "Default-Explosion-Spawner");
-		let ns = new ParticleSpawnerObject(name, x, y, size, spd, 1, timer, draw, sizeVariance, speedVariance, dirs, this, this.engine);
-		this.elements.set(name, ns);
-		ns.particleFalls = falls;
-		ns.particleFades = fades;
-		ns.particleSlows = slows;
-		ns.particleActive = false;
-		for (let i = 0; i < amountParticles; i++) {
-			ns.spawnParticle();
-		}
-		let curUpdate = ns.engineUpdate.bind(ns);
-		ns.engineUpdate = function () {
-			curUpdate();
-			if (!ns.spawns.size) ns.remove();
-		}
-		this.initializeSceneObject(ns);
-		return ns;
-	}
-	addParticleSpawner(name, x, y, size = 1, spd = 1, delay = 1, timer = 50, draw = this.defaults.ParticleObject.draw, sizeVariance = 0, speedVariance = 0, dirs = new CardinalDirections(true, true, true, true), falls = false, slows = true, fades = true, active = true) {
-		name = this.genName(this.elements, name);
-		let ns = new ParticleSpawnerObject(name, x, y, size, spd, delay, timer, draw, sizeVariance, speedVariance, dirs, this, this.engine);
-		this.elements.set(name, ns);
-		ns.particleFalls = falls;
-		ns.particleFades = fades;
-		ns.particleSlows = slows;
-		ns.particleActive = active;
-		this.initializeSceneObject(ns);
-		return ns;
 	}
 	removeElement(element) {
 		if (element.container === this) {

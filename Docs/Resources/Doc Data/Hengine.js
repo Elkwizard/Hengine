@@ -2,7 +2,6 @@ load(String.raw`
 	(1)(Class)Hengine(/1)
 	(p)
 		The Hengine represents the highest level container for the elements of the Hengine. 
-		It also serves as the object for accessing the DOM representation of the Hengine's Canvas on the page. 
 	(/p)
 	(2)Type(/2)
 	(p)**

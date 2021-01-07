@@ -4,12 +4,13 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.renderer = this.engine.renderer;
 		l.keyboard = this.engine.keyboard;
 		l.clipboard = this.engine.clipboard;
+		l.canvas = this.engine.canvas;
 		l.mouse = this.engine.mouse;
 		l.focused = false;
 		l.value = "";
 		l.font = font;
 		l.caretColor = Color.BLACK;
-		l.highlightColor = new Color(0, 0, 255, 0.2);
+		l.highlightColor = new Color(10, 10, 255, 0.2);
 		l.multiline = multiline;
 		l.renderText = renderText;
 		l.renderTextOffset = Vector2.origin;
@@ -63,10 +64,23 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.updateTextBoundingBox();
 		l.saveVersion();
 	},
+	blurOthers(l) {
+		const elements = this.engine.scene.main.getAllElements();
+
+		for (let i = 0; i < elements.length; i++) {
+			const scripts = elements[i].scripts;
+			if (scripts.has(TEXT_AREA)) scripts.TEXT_AREA.blur();
+		}
+	},
 	focus(l) {
+		l.blurOthers();
+
 		l.focused = true;
 		l.selectionStart = l.value.length;
 		l.selectionEnd = l.value.length;
+	},
+	blur(l) {
+		l.focused = false;
 	},
 	selectRange(l, min, max) {
 		min = Math.max(min, 0);
@@ -240,6 +254,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.clampScrollOffset();
 	},
 	select(l, p, type) {
+		l.blurOthers();
 		l.focused = true;
 		l.keyTimer = 0;
 		let lp = this.transform.worldSpaceToModelSpace(p);
@@ -282,20 +297,29 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 	keepSelection(l) {
 		return l.keyboard.pressed("Shift") || l.highlighting;
 	},
+	getMousePosition(l) {
+		return (this instanceof UIObject) ? mouse.screen : mouse.world;
+	},
+	beforeUpdate(l) {
+		TEXT_AREA.staticData.anyTextAreaHovered = false;
+	},
+	afterUpdate(l) {
+		l.canvas.cursor = TEXT_AREA.staticData.anyTextAreaHovered ? "text" : "default";
+	},
 	update(l) {
-		let inTextArea = Geometry.pointInsideRect(this.transform.worldSpaceToModelSpace(l.mouse.screen), l.relativeTextViewBox);
+		let inTextArea = Geometry.pointInsideRect(this.transform.worldSpaceToModelSpace(l.getMousePosition()), l.relativeTextViewBox);
 
-		if (inTextArea) l.renderer.setCursor("text");
-		else l.renderer.setCursor("default");
+		if (inTextArea) TEXT_AREA.staticData.anyTextAreaHovered = true;
 
 		if (l.mouse.justPressed("Left")) {
-			if (inTextArea) l.highlighting = !!l.select(l.mouse.screen, "start");
+			if (inTextArea) l.highlighting = !!l.select(l.getMousePosition(), "start");
 			else l.focused = false;
 		}
+
 		if (l.mouse.pressed("Left") && l.highlighting) {
-			let selection = l.select(l.mouse.screen, "move"); 
+			let selection = l.select(l.getMousePosition(), "move"); 
 			if (selection && selection.changed) {
-				let relativeMousePosition = this.transform.worldSpaceToModelSpace(mouse.screen);
+				let relativeMousePosition = this.transform.worldSpaceToModelSpace(l.getMousePosition());
 				if (relativeMousePosition.x > l.relativeTextViewBox.max.x) l.scrollOffset.x += l.scrollSpeed / 4;
 				if (relativeMousePosition.y > l.relativeTextViewBox.max.y) l.scrollOffset.y += l.scrollSpeed / 4;
 				if (relativeMousePosition.x < l.relativeTextViewBox.min.x) l.scrollOffset.x -= l.scrollSpeed / 4;
@@ -436,7 +460,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		if (xs && !ys) fullScrollWidth = width;
 		if (!xs && ys) fullScrollHeight = height;
 
-		let localMouse = this.transform.worldSpaceToModelSpace(l.mouse.screen);
+		let localMouse = this.transform.worldSpaceToModelSpace(l.getMousePosition());
 
 		if (xs) {
 			if (l.multiline) {
@@ -470,3 +494,4 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.renderer.textMode = prevTextMode;
 	}
 });
+TEXT_AREA.staticData.anyTextAreaHovered = false;

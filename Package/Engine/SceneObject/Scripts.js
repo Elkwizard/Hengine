@@ -1,6 +1,7 @@
 class ElementScript {
 	constructor(name, opts) {
 		this.name = name;
+		this.staticData = {};
 		this.methods = {};
 		let local = {};
 		let placeholder = arg => arg;

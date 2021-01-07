@@ -1,12 +1,51 @@
-class Transform {
+class Transform extends Matrix3 {
 	constructor(x, y, rotation) {
-		Vector2.defineReference(this, "position", new Vector2(x, y));
+		super(
+			1, 0, x,
+			0, 1, y,
+			0, 0, 1
+		);
 		this.rotation = rotation;
+
+
+		// create an double bound position object, so (transf.position.x += ...) works
+
+		this._position = Vector2.origin;
+		delete this._position.x;
+		delete this._position.y;
+		const self = this;
+		Object.defineProperties(this._position, {
+			x: {
+				set: value => self[6] = value,
+				get: () => self[6]
+			},
+			y: {
+				set: value => self[7] = value,
+				get: () => self[7]
+			}
+		});
+	}
+	set position(vec) {
+		this[6] = vec.x;
+		this[7] = vec.y;
+	}
+	get position () {
+		return this._position;
+	}
+	get sinRotation() {
+		return this[1];
+	}
+	get cosRotation() {
+		return this[0];
 	}
 	set rotation(a) {
 		this._rotation = a;
-		this.cosRotation = Math.cos(a);
-		this.sinRotation = Math.sin(a);
+		const cos = Math.cos(a);
+		const sin = Math.sin(a);
+		this[0] = cos;
+		this[1] = sin;
+		this[3] = -sin;
+		this[4] = cos;
 	}
 	get rotation() {
 		return this._rotation;
@@ -40,11 +79,12 @@ class Transform {
 		return v.Vminus(this.position).rotate(-this.rotation);
 	}
 	modelSpaceToWorldSpace(v) {
-		return v.rotated(this.rotation).Vplus(this.position);
+		return v.rotated(this.rotation).Vadd(this.position);
 	}
 	drawInModelSpace(artist, renderer) {
-		let r = this.rotation;
-		let { x, y } = this.position;
+		const r = this.rotation;
+		const x = this[6];
+		const y = this[7];
 		renderer.translate(x, y);
 		if (r) renderer.rotate(r);
 		artist();
@@ -52,8 +92,9 @@ class Transform {
 		renderer.translate(-x, -y);
 	}
 	drawInWorldSpace(artist, renderer) {
-		let r = this.rotation;
-		let { x, y } = this.position;
+		const r = this.rotation;
+		const x = this[6];
+		const y = this[7];
 		if (r) renderer.rotate(-r);
 		renderer.translate(-x, -y);
 		artist();
@@ -61,7 +102,7 @@ class Transform {
 		if (r) renderer.rotate(r);
 	}
 	drawWithoutRotation(artist, renderer) {
-		let r = this.rotation;
+		const r = this.rotation;
 		if (r) renderer.rotate(-r);
 		artist();
 		if (r) renderer.rotate(r);
@@ -71,7 +112,7 @@ class Transform {
 		let ty = a.position.y;
 		tx += b.position.x * a.cosRotation - b.position.y * a.sinRotation;
 		ty += b.position.x * a.sinRotation + b.position.y * a.cosRotation;
-		let rotation = a.rotation + b.rotation;
+		const rotation = a.rotation + b.rotation;
 		return new Transform(tx, ty, rotation);
 	}
 }

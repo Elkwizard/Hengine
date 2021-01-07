@@ -366,7 +366,7 @@ class Vector3 extends Vector {
 		let xAxisY = axis.z * randomVectorX - axis.x * randomVectorZ;
 		let xAxisZ = -axis.y * randomVectorX;
 
-		const xAxisMagnitude = xAxisX ** 2 + xAxisY ** 2 + xAxisZ ** 2;
+		const xAxisMagnitude = Math.sqrt(xAxisX ** 2 + xAxisY ** 2 + xAxisZ ** 2);
 
 		xAxisX /= xAxisMagnitude;
 		xAxisY /= xAxisMagnitude;
@@ -376,7 +376,7 @@ class Vector3 extends Vector {
 		let yAxisY = axis.z * xAxisX - axis.x * xAxisZ;
 		let yAxisZ = axis.x * xAxisY - axis.y * xAxisX;
 
-		const yAxisMagnitude = yAxisX ** 2 + yAxisY ** 2 + yAxisZ ** 2;
+		const yAxisMagnitude = Math.sqrt(yAxisX ** 2 + yAxisY ** 2 + yAxisZ ** 2);
 
 		yAxisX /= yAxisMagnitude;
 		yAxisY /= yAxisMagnitude;

@@ -152,7 +152,7 @@ class WebGLArtist {
 					const p = spline.getPoint(i);
 					vertices.push(p.x, p.y);
 				}
-				vertices.push(spline.b.x, spline.b.y);
+				vertices.push(spline.d.x, spline.d.y);
 				this.gl.lineSegments(vertices, this.currentLineWidth, this.currentLineCap, this.currentLineJoin, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha, false, false, false);
 			},
 			line(x, y, x1, y1) {

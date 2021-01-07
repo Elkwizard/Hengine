@@ -21,10 +21,10 @@ Object.defineProperty(window, "title", {
 });
 (function () {
 	function proto(obj, name, value) {
-		Object.defineProperty(obj, name, {
-			value,
-			enumerable: false
-		});
+		Object.defineProperty(obj, name, { value, enumerable: false });
+	}
+	function protoGetSet(obj, name, get, set) {
+		Object.defineProperty(obj, name, { get, set, enumerable: false });
 	}
 	// types
 	function addByteBufferConversions(type, bufferType) {
@@ -78,6 +78,11 @@ Object.defineProperty(window, "title", {
 		return (t_2 - t_1) / iter;
 	});
 	//Array
+	protoGetSet(Array.prototype, "last", function () {
+		return this[this.length - 1];
+	}, function (value) {
+		if (this.length) this[this.length - 1] = value;
+	});
 	proto(Array.prototype, "pushArray", function (arr) {
 		let len = arr.length;
 		for (let i = 0; i < len; i++) this.push(arr[i]);
