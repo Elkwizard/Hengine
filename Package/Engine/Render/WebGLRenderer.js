@@ -39,7 +39,7 @@ class WebGLArtist {
 		this.transformStack = [];
 		this.alphaStack = [];
 
-		this.resize(width, height, false);
+		this.resize(width, height);
 
 		this.drawObj = {
 			circle(x, y, radius) {
@@ -348,17 +348,11 @@ class WebGLArtist {
 			this.imageObj[func] = this.imageObj[func].bind(this);
 		}
 	}
-	set width(a) {
-		this.resize(a, this.height);
-	}
 	get width() {
-		return this.canvas.width / devicePixelRatio;
-	}
-	set height(a) {
-		this.resize(this.width, a);
+		return this.canvas.width / __devicePixelRatio;
 	}
 	get height() {
-		return this.canvas.height / devicePixelRatio;
+		return this.canvas.height / __devicePixelRatio;
 	}
 	get middle() {
 		return new Vector2(this.width / 2, this.height / 2);
@@ -391,19 +385,13 @@ class WebGLArtist {
 	get transform() {
 		return this.currentTransform.get();
 	}
-	resize(width, height, trigger = true, updateImageType = true) {
+	resize(width, height) {
 		let px = this.preservePixelart;
 		let al = this.alpha;
 		this.gl.resize(width, height);
 
-		if (updateImageType) {
-			this.imageType.width = width;
-			this.imageType.height = height;
-		}
-
 		this.alpha = al;
 		this.preservePixelart = px;
-		if (trigger) this.onResize();
 	}
 	setCursor(cursor) {
 		let style = this.canvas.style;
@@ -577,12 +565,12 @@ class WebGLArtist {
 class FastFrame extends ImageType {
 	constructor(width, height) {
 		super(width, height);
-		this.image = new_OffscreenCanvas(this.width * devicePixelRatio, this.height * devicePixelRatio);
+		this.image = new_OffscreenCanvas(this.width * __devicePixelRatio, this.height * __devicePixelRatio);
 		this.renderer = new WebGLArtist(this.image, this.width, this.height, this);
 		this.renderer.preservePixelart = true;
 	}
 	resize(width, height) {
-		this.renderer.resize(width, height, true, false);
+		this.renderer.resize(width, height);
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
@@ -598,7 +586,7 @@ class FastFrame extends ImageType {
 		return FastFrame.fromImageType(this, x, y, w, h);
 	}
 	get(f = new FastFrame(this.width, this.height)) {
-		f.renderer.resize(this.width, this.height, false);
+		f.renderer.resize(this.width, this.height);
 		f.renderer.gl.texturedQuad(0, 0, this.width, this.height, 0, 0, 1, 1, this.makeImage());
 		return f;
 	}

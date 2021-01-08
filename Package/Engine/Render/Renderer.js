@@ -21,10 +21,8 @@ class ArtistImage extends ImageType {
 	}
 }
 class Artist {
-	constructor(canvas, width, height, imageType, onResize = () => null) {
+	constructor(canvas, width, height, imageType) {
 		this.canvas = canvas;
-
-		this.onResize = onResize;
 
 		this.c = this.canvas.getContext('2d');
 
@@ -50,7 +48,7 @@ class Artist {
 		this.alpha = 1;
 		this.textMode = TextMode.TOP_LEFT;
 
-		this.resize(width, height, false);
+		this.resize(width, height);
 
 		let pathObj = {
 			circle(x, y, radius) {
@@ -304,20 +302,11 @@ class Artist {
 					this.c.stroke();
 				}
 			},
-			spline(spline, prec = 100) {
+			spline(spline) {
 				this.c.beginPath();
 				this.c.moveTo(spline.a.x, spline.a.y);
 				this.c.bezierCurveTo(spline.b.x, spline.b.y, spline.c.x, spline.c.y, spline.d.x, spline.d.y);
 				this.c.stroke();
-				// let inc = 1 / prec;
-				// this.c.beginPath();
-				// this.c.moveTo(spline.a.x, spline.a.y);
-				// for (let i = 0; i < 1; i += inc) {
-				// 	const p = spline.getPoint(i);
-				// 	this.c.lineTo(p.x, p.y);
-				// }
-				// this.c.lineTo(spline.d.x, spline.d.y);
-				// this.c.stroke();
 			},
 			line(x, y, x1, y1) {
 				if (typeof x == "object") {
@@ -627,17 +616,11 @@ class Artist {
 			this.imageObj[func] = this.imageObj[func].bind(this);
 		}
 	}
-	set width(a) {
-		this.resize(a, this.height);
-	}
 	get width() {
-		return this.canvas.width / devicePixelRatio;
-	}
-	set height(a) {
-		this.resize(this.width, a);
+		return this.canvas.width / __devicePixelRatio;
 	}
 	get height() {
-		return this.canvas.height / devicePixelRatio;
+		return this.canvas.height / __devicePixelRatio;
 	}
 	get middle() {
 		return new Vector2(this.width / 2, this.height / 2);
@@ -673,7 +656,7 @@ class Artist {
 	}
 	set transform(a) {
 		const m = Matrix3.mulMatrix(
-			Matrix3.scale(devicePixelRatio, devicePixelRatio, Matrix3.temp[0]),
+			Matrix3.scale(__devicePixelRatio, __devicePixelRatio, Matrix3.temp[0]),
 			a,
 			Matrix3.temp[1]
 		);
@@ -681,7 +664,7 @@ class Artist {
 	}
 	get transform() {
 		const t = this.c.getTransform();
-		const ratio = 1 / devicePixelRatio;
+		const ratio = 1 / __devicePixelRatio;
 		return Matrix3.mulMatrix(
 			Matrix3.scale(ratio, ratio, Matrix3.temp[1]),
 			Matrix3.create(
@@ -692,28 +675,21 @@ class Artist {
 			)
 		);
 	}
-	resize(width, height, trigger = true, updateImageType = true) {
+	resize(width, height) {
 		let px = this.preservePixelart;
 		let al = this.alpha;
-		this.canvas.width = width * devicePixelRatio;
-		this.canvas.height = height * devicePixelRatio;
-
-		if (updateImageType) {
-			this.imageType.width = width;
-			this.imageType.height = height;
-		}
-
-		this.c.scale(devicePixelRatio, devicePixelRatio);
+		this.canvas.width = width * __devicePixelRatio;
+		this.canvas.height = height * __devicePixelRatio;
+		this.c.scale(__devicePixelRatio, __devicePixelRatio);
 		this.alpha = al;
 		this.preservePixelart = px;
-		if (trigger) this.onResize();
 	}
 	setCursor(cursor) {
 		let style = this.canvas.style;
 		if ("cursor" in style) style.cursor = cursor;
 	}
 	getPixel(x, y) {
-		let d = this.c.getImageData(x * devicePixelRatio, y * devicePixelRatio, 1, 1).data;
+		let d = this.c.getImageData(x * __devicePixelRatio, y * __devicePixelRatio, 1, 1).data;
 		return new Color(d[0], d[1], d[2], d[3] / 255);
 	}
 	setPixel(x, y, col) {

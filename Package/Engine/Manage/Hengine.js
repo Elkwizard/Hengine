@@ -4,6 +4,10 @@ class Hengine {
 
 		//setup canvas and scene
 		let canvas = document.createElement("canvas");
+
+		canvas.width = innerWidth;
+		canvas.height = innerHeight;
+
 		canvas.id = "hengineCanvas";
 		canvas.style.position = "absolute";
 
@@ -17,7 +21,7 @@ class Hengine {
 		this.keyboard = new KeyboardHandler();
 		this.clipboard = new ClipboardHandler();
 		this.fileSystem = new FileSystem();
-		this.canvas = new CanvasManager(canvas, this);
+		this.canvas = new CanvasImage(canvas, this);
 		this.renderer = this.canvas.renderer;
 		
 		this.scene = new Scene(new Vector2(0, 0.4), this);

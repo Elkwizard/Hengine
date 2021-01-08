@@ -7,7 +7,7 @@ class Scene {
 		this.cullGraphics = true;
 		this.mouseEvents = false;
 		this.collisionEvents = true;
-		this.camera = new Camera(this.engine.renderer.width / 2, this.engine.renderer.height / 2, 0, 1, engine);
+		this.camera = new Camera(this.engine.canvas.width / 2, this.engine.canvas.height / 2, 0, 1, engine);
 	}
 	dispatchMessage(message, mask = () => true) {
 		let elements = this.main.getAllElements().filter(el => mask(el));

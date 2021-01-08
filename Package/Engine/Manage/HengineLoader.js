@@ -167,23 +167,23 @@ class HengineLoader {
 		if (!(window.width || window.height || window.middle)) {
 			Object.defineProperty(window, "middle", {
 				get() {
-					return new Vector2(hengine.hengine.renderer.width / 2, hengine.hengine.renderer.height / 2);
+					return new Vector2(hengine.hengine.canvas.width / 2, hengine.hengine.canvas.height / 2);
 				}
 			});
 			Object.defineProperty(window, "width", {
 				set(a) {
-					hengine.hengine.renderer.width = a;
+					hengine.hengine.canvas.width = a;
 				},
 				get() {
-					return hengine.hengine.renderer.width;
+					return hengine.hengine.canvas.width;
 				}
 			});
 			Object.defineProperty(window, "height", {
 				set(a) {
-					hengine.hengine.renderer.height = a;
+					hengine.hengine.canvas.height = a;
 				},
 				get() {
-					return hengine.hengine.renderer.height;
+					return hengine.hengine.canvas.height;
 				}
 			});
 		}
@@ -193,10 +193,10 @@ class HengineLoader {
 
 		//title
 		let script = document.createElement("script");
-		script.src = "./Source.js";
+		script.src = "./fake.js";
 		let t = script.src;
 		let st = t.split("/");
-		let ti = st[st.length - 3];
+		let ti = st[st.length - 2];
 		if (ti) {
 			ti = unescape(ti);
 		} else ti = "Unknown";

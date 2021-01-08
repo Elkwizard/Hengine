@@ -27,8 +27,8 @@ class VideoView extends ImageType {
 	}
 	forceLoad() {
 		this.loaded = true;
-		this.width = this.video.videoWidth / devicePixelRatio;
-		this.height = this.video.videoHeight / devicePixelRatio;
+		this.width = this.video.videoWidth / __devicePixelRatio;
+		this.height = this.video.videoHeight / __devicePixelRatio;
 		this.image.width = this.video.videoWidth;
 		this.image.height = this.video.videoHeight;	
 	}

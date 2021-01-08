@@ -83,8 +83,8 @@ class HImage extends ImageType {
 		this.image.addEventListener("load", this.forceLoad.bind(this));
 	}
 	forceLoad() {
-		this.width = this.image.width / devicePixelRatio;
-		this.height = this.image.height / devicePixelRatio;
+		this.width = this.image.width / __devicePixelRatio;
+		this.height = this.image.height / __devicePixelRatio;
 		this.loaded = true;
 	}
 	static async imageExists(src) {
@@ -103,12 +103,12 @@ class HImage extends ImageType {
 class Frame extends ImageType {
 	constructor(width, height) {
 		super(width, height);
-		this.image = new_OffscreenCanvas(this.width * devicePixelRatio, this.height * devicePixelRatio);
+		this.image = new_OffscreenCanvas(this.width * __devicePixelRatio, this.height * __devicePixelRatio);
 		this.renderer = new Artist(this.image, this.width, this.height, this);
 		this.renderer.preservePixelart = true;
 	}
 	resize(width, height) {
-		this.renderer.resize(width, height, true, false);
+		this.renderer.resize(width, height);
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
@@ -123,7 +123,7 @@ class Frame extends ImageType {
 		return Frame.fromImageType(this, x, y, w, h);
 	}
 	get(f = new Frame(this.width, this.height)) {
-		f.renderer.resize(this.width, this.height, false);
+		f.renderer.resize(this.width, this.height);
 		f.renderer.c.drawImage(this.image, 0, 0, this.width, this.height);
 		return f;
 	}
@@ -142,7 +142,7 @@ class Frame extends ImageType {
 		
 		let offscreen = img.makeImage();
 		let f = new Frame(w, h);
-		f.renderer.c.drawImage(offscreen, x, y, w * devicePixelRatio, h * devicePixelRatio, 0, 0, w, h);
+		f.renderer.c.drawImage(offscreen, x, y, w * __devicePixelRatio, h * __devicePixelRatio, 0, 0, w, h);
 		return f;
 	}
 }

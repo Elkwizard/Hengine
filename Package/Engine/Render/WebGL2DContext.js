@@ -75,8 +75,8 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		glState.width = width;
 		glState.height = height;
 		
-		const nwidth = Math.floor(width * devicePixelRatio);
-		const nheight = Math.floor(height * devicePixelRatio);
+		const nwidth = Math.floor(width * __devicePixelRatio);
+		const nheight = Math.floor(height * __devicePixelRatio);
 		if (nwidth !== gl.canvas.width) gl.canvas.width = nwidth;
 		if (nheight !== gl.canvas.height) gl.canvas.height = nheight;
 		
@@ -87,7 +87,7 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 
 	function updateResolution() {
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-		gl.uniform2f(getUniformLocation("resolution"), gl.canvas.width / devicePixelRatio, gl.canvas.height / devicePixelRatio);
+		gl.uniform2f(getUniformLocation("resolution"), gl.canvas.width / __devicePixelRatio, gl.canvas.height / __devicePixelRatio);
 	}
 	//#endregion
 
@@ -188,8 +188,8 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		]);
 
 		if (pixelRatioHandled) {
-			glState.width = gl.canvas.width / devicePixelRatio;
-			glState.height = gl.canvas.height / devicePixelRatio;
+			glState.width = gl.canvas.width / __devicePixelRatio;
+			glState.height = gl.canvas.height / __devicePixelRatio;
 		} else {
 			glState.width = gl.canvas.width;
 			glState.height = gl.canvas.height;

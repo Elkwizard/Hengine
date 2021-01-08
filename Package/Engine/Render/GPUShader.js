@@ -50,7 +50,7 @@ class GPUShader extends ImageType {
 		this.compileState = { compiled: false, error: null };
 		this.args = {};
 		this.shadeRects = [new Rect(0, 0, width, height)];
-		this.image = new_OffscreenCanvas(width * devicePixelRatio, height * devicePixelRatio);
+		this.image = new_OffscreenCanvas(width * __devicePixelRatio, height * __devicePixelRatio);
 		this.gl = this.image.getContext("webgl2");
 		if (this.gl === null) return console.warn("Your browser doesn't support webgl.");
 		this.image.addEventListener("webglcontextlost", e => {
@@ -147,8 +147,8 @@ class GPUShader extends ImageType {
 	resize(width, height) {
 		width = Math.max(1, Math.abs(Math.ceil(width)));
 		height = Math.max(1, Math.abs(Math.ceil(height)));
-		this.image.width = width * devicePixelRatio;
-		this.image.height = height * devicePixelRatio;
+		this.image.width = width * __devicePixelRatio;
+		this.image.height = height * __devicePixelRatio;
 		this.width = width;
 		this.height = height;
 		this.updateResolutionUniforms();

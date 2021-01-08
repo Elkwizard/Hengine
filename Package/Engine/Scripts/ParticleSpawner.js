@@ -43,7 +43,7 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 		l.delay = p.delay ?? l.delay ?? 1  ;
 		const imageType = p.imageType ?? FastFrame;
 		if (!(l.frame instanceof imageType)) {
-			l.frame = new imageType(this.engine.renderer.width, this.engine.renderer.height);
+			l.frame = new imageType(this.engine.canvas.width, this.engine.canvas.height);
 			l.gl = l.frame.renderer;
 		}
 	},
@@ -86,8 +86,8 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 
 		gl.transform = renderer.transform;
 
-		frame.width = this.engine.renderer.width;
-		frame.height = this.engine.renderer.height;
+		frame.width = this.engine.canvas.width;
+		frame.height = this.engine.canvas.height;
 
 		const screen = scene.camera.screen.get();
 		screen.x -= l.radius;

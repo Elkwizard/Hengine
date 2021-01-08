@@ -311,13 +311,13 @@ class MouseHandler extends InputHandler {
 		this.onClick.clear();
 	}
 	get pageLocation() {
-		let bound = this.engine.renderer.canvas.getBoundingClientRect();
-		let scale = this.engine.renderer.width / bound.width;
+		let bound = this.engine.canvas.canvas.getBoundingClientRect();
+		let scale = this.engine.canvas.width / bound.width;
 		return this.screen.over(scale).plus(new Vector2(bound.x, bound.y));
 	}
 	updatePosition(e) {
-		let bound = this.engine.renderer.canvas.getBoundingClientRect();
-		let scale = this.engine.renderer.width / bound.width;
+		let bound = this.engine.canvas.canvas.getBoundingClientRect();
+		let scale = this.engine.canvas.width / bound.width;
 		this.screen.x = (e.x - bound.x) * scale;
 		this.screen.y = (e.y - bound.y) * scale;
 	}
