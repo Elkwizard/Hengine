@@ -428,6 +428,32 @@ class Artist {
 				this.c.lineTo(px + ox * l2, py + oy * l2);
 				this.c.fill();
 			},
+			splineArrow(spline) {
+				let { d: { x: Dx, y: Dy } } = spline;
+				const pointA = spline.getPoint(0.95);
+				const dx = Dx - pointA.x;
+				const dy = Dy - pointA.y;
+				const m = Math.sqrt(dx ** 2 + dy ** 2);
+				const ndx = dx / m;
+				const ndy = dy / m;
+				const nndx = -ndy;
+				const nndy = ndx;
+				const l2 = this.c.lineWidth * 2;
+				Dx -= ndx * l2 * 2;
+				Dy -= ndy * l2 * 2;
+				
+				this.c.beginPath();
+				this.c.moveTo(spline.a.x, spline.a.y);
+				this.c.bezierCurveTo(spline.b.x, spline.b.y, spline.c.x, spline.c.y, Dx + ndx * l2, Dy + ndy * l2);
+				this.c.stroke();
+
+				this.c.fillStyle = this.c.strokeStyle;
+				this.c.beginPath();
+				this.c.moveTo(Dx + nndx * l2, Dy + nndy * l2);
+				this.c.lineTo(Dx - nndx * l2, Dy - nndy * l2);
+				this.c.lineTo(Dx + ndx * l2 * 2, Dy + ndy * l2 * 2);
+				this.c.fill();
+			},
 			arrow(x, y, x1, y1) {
 				if (typeof x === "object") {
 					if (x instanceof Line) {

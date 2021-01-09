@@ -51,9 +51,9 @@ class InputHandler {
 		if (Array.isArray(keys)) {
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
-				if (!this.keys.get(key)) return false;
+				if (this.keys.get(key)) return true;
 			}
-			return true;
+			return false;
 		} else {
 			return !!this.keys.get(keys);
 		}
@@ -62,9 +62,9 @@ class InputHandler {
 		if (Array.isArray(keys)) {
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
-				if (this.keys.get(key)) return false;
+				if (!this.keys.get(key)) return true;
 			}
-			return true;
+			return false;
 		} else {
 			return !this.keys.get(keys);
 		}
@@ -73,9 +73,9 @@ class InputHandler {
 		if (Array.isArray(keys)) {
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
-				if (this.keyDownCounts.get(key) !== 1) return false;
+				if (this.keyDownCounts.get(key) === 1) return true;
 			}
-			return true;
+			return false;
 		} else {
 			return this.keyDownCounts.get(keys) === 1;
 		}
@@ -84,9 +84,9 @@ class InputHandler {
 		if (Array.isArray(keys)) {
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
-				if (this.keyUpCounts.get(key) !== 1) return false;
+				if (this.keyUpCounts.get(key) === 1) return true;
 			}
-			return true;
+			return false;
 		} else {
 			return this.keyUpCounts.get(keys) === 1;
 		}

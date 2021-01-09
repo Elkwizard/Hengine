@@ -5,7 +5,7 @@ class Scene {
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
 		this.physicsEngine.onCollide = this.handleCollisionEvent.bind(this);
 		this.cullGraphics = true;
-		this.mouseEvents = false;
+		this.mouseEvents = true;
 		this.collisionEvents = true;
 		this.camera = new Camera(this.engine.canvas.width / 2, this.engine.canvas.height / 2, 0, 1, engine);
 	}
@@ -154,18 +154,20 @@ class Scene {
 		}
 	}
 	engineUpdate() {
+		
 		if (this.mouseEvents) {
 			let adjusted = mouse.world;
-			if (mouse.justPressed("Left")) {
+			if (mouse.justPressed(["Left", "Right", "Middle"])) {
+				let key = "";
+				if (mouse.justPressed("Middle")) key = "Middle";
+				if (mouse.justPressed("Right")) key = "Right";
+				if (mouse.justPressed("Left")) key = "Left";
+
 				for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
-					o.scripts.run("Click", adjusted);
+					o.scripts.run("Click", key, adjusted);
 				}
 			}
-			if (mouse.justPressed("Right")) {
-				for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
-					o.scripts.run("RightClick", adjusted);
-				}
-			}
+
 			let collided = this.collidePointBoth(adjusted, false);
 			for (let o of collided[0].sort((a, b) => b.layer - a.layer)) {
 				if (!o.hovered) o.scripts.run("Hover", adjusted);

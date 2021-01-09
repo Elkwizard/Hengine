@@ -71,7 +71,6 @@ LocalScript.flags = [
 	"collideLeft",
 	"collideRight",
 	"click",
-	"rightClick",
 	"hover",
 	"unhover",
 	"message",
