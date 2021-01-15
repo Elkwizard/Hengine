@@ -6,9 +6,9 @@ const DRAGGABLE = new ElementScript("DRAGGABLE", {
 		l.bounds = bounds;
 		this.engine.scene.mouseEvents = true;
 	},
-	click(l, m) {
+	click(l, key, mouse) {
 		l.dragged = true;
-		l.offset = this.transform.worldSpaceToModelSpace(m);
+		l.offset = this.transform.worldSpaceToModelSpace(mouse);
 	},
 	update(l) {
 		if (l.mouse.justReleased("Left")) l.dragged = false; 

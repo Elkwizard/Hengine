@@ -20,7 +20,7 @@
 			l.thrown = false;
 			l.scriptNumber = 2;
 		},
-		click(l, e) {
+		click(l, key, e) {
 			l.thrown = true;
 			l.offset = this.transform.worldSpaceToModelSpace(e);
 		},

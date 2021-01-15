@@ -143,10 +143,11 @@ class HengineAnimationResource extends HengineResource {
 		});
 	}
 }
-function exit(...msg) {
-	console.warn("EXITED", ...msg);
-	IntervalManager.intervals = [];
-}
+
+// function exit(...msg) {
+// 	console.warn("EXITED", ...msg);
+// 	IntervalManager.intervals = [];
+// }
 class HengineLoader {
 	constructor() {
 		this.hengine = new Hengine();

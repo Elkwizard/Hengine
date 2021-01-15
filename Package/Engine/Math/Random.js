@@ -39,7 +39,7 @@ class Random {
         return arr[Math.floor(Random.random() * arr.length)];
     }
     static noiseTCorrect(t) {
-        return Interpolation.smoothT(t);
+        return Interpolation.smooth(t);
     }
     static perlin(x, f = 1, seed = Random.sampleSeed) {
         x *= f;

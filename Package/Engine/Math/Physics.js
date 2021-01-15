@@ -248,8 +248,7 @@ class PhysicsGrid {
                 }
             }
         }
-        if (!window.count) window.count = 0;
-        window.count += cells.length;
+
         return bodies;
     }
     cellsBounds(body, bounds) {
@@ -1277,8 +1276,6 @@ class PhysicsEngine {
         if (!isFinite(this.sleepDuration)) return;
 
         const sleepDuration = this.sleepDuration * this.iterations;
-
-        if (!window.maxY) window.maxY = 0;
 
         for (let i = 0; i < this.bodies.length; i++) {
             const body = this.bodies[i];

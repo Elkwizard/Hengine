@@ -158,14 +158,34 @@ class IntervalManager {
 		this.functions = remaining;
 	}
 }
+
+class ExitError {
+	constructor(message) {
+		this.message = message;
+	}
+}
+function exit(...msg) {
+	IntervalManager.intervals = [];
+	if (IntervalManager.inInterval) throw new ExitError(msg);
+	else console.warn("EXITED", ...msg);
+}
+
 IntervalManager.FPS_FRAMES_TO_COUNT = 30;
 (function () {
 	IntervalManager.intervals = [];
+	IntervalManager.inInterval = false;
 	function animate(now) {
 		requestAnimationFrame(animate);
-		for (let i = 0; i < IntervalManager.intervals.length; i++) {
-			IntervalManager.intervals[i]();
+		IntervalManager.inInterval = true;
+		try {
+			for (let i = 0; i < IntervalManager.intervals.length; i++) {
+				IntervalManager.intervals[i]();
+			}
+		} catch (err) {
+			if (err instanceof ExitError) console.warn(...err.message);
+			else throw err;
 		}
+		IntervalManager.inInterval = false;
 	}
 	requestAnimationFrame(animate);
 })();
