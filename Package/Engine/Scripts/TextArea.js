@@ -23,7 +23,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.scrollOffset = Vector2.origin;
 		l.updateTextBoundingBox();
 
-		l.keyboardShortcuts = ["a", "z", "c", "v", "x", "ArrowLeft", "ArrowRight"];
+		l.keyboardShortcuts = ["a", "z", "c", "v", "x", "arrowleft", "arrowright"];
 
 		l.keyTimer = 0;
 		l.highlighting = false;
@@ -145,7 +145,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 
 		let control = l.keyboard.pressed("Control");
 		let shift = l.keyboard.pressed("Shift");
-		let resetSelection = !(control || shift);
+		let resetSelection = !((control && !(key === "ArrowLeft" || key === "ArrowRight")) || shift);
 		if (key.length === 1) {
 			if (control && key.toLowerCase() === "a") {
 				l.selectionStart = 0;
@@ -189,8 +189,28 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		//arrow keys
 		if (key.slice(0, 5) === "Arrow") {
 			if (l.selectionEnd === l.selectionStart || shift) {
-				if (key === "ArrowLeft") l.selectionEnd--;
-				else if (key === "ArrowRight") l.selectionEnd++;
+				if (control) {
+					const segments = l.value.split(/\b/g);
+					let index = 0;
+					for (let i = 0; i < segments.length; i++) {
+						const seg = segments[i];
+						if (key === "ArrowRight") {
+							if (index <= l.selectionEnd && l.selectionEnd < index + seg.length) {
+								l.selectionEnd = index + seg.length;
+								break;
+							}
+						} else if (key === "ArrowLeft") {
+							if (index < l.selectionEnd && l.selectionEnd <= index + seg.length) {
+								l.selectionEnd = index;
+								break;
+							}
+						}
+						index += seg.length;
+					}
+				} else {
+					if (key === "ArrowLeft") l.selectionEnd--;
+					else if (key === "ArrowRight") l.selectionEnd++;
+				}
 			} else {
 				if (key === "ArrowLeft") l.selectionEnd = l.selectionStart = start;
 				else if (key === "ArrowRight") l.selectionEnd = l.selectionStart = end;
