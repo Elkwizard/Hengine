@@ -23,10 +23,11 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.scrollOffset = Vector2.origin;
 		l.updateTextBoundingBox();
 
-		l.keyboardShortcuts = ["a", "z", "c", "v", "x"];
+		l.keyboardShortcuts = ["a", "z", "c", "v", "x", "ArrowLeft", "ArrowRight"];
 
 		l.keyTimer = 0;
 		l.highlighting = false;
+		l.clickTimer = 0;
 		l.ignored = [];
 		l.ignoredRemoval = [];
 		l.alwaysIgnored = [];
@@ -189,10 +190,10 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		if (key.slice(0, 5) === "Arrow") {
 			if (l.selectionEnd === l.selectionStart || shift) {
 				if (key === "ArrowLeft") l.selectionEnd--;
-				if (key === "ArrowRight") l.selectionEnd++;
+				else if (key === "ArrowRight") l.selectionEnd++;
 			} else {
 				if (key === "ArrowLeft") l.selectionEnd = l.selectionStart = start;
-				if (key === "ArrowRight") l.selectionEnd = l.selectionStart = end;
+				else if (key === "ArrowRight") l.selectionEnd = l.selectionStart = end;
 			}
 			if (key === "ArrowUp" || key === "ArrowDown") {
 				let p = l.getTextLocation(l.selectionEnd);
@@ -259,10 +260,14 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.keyTimer = 0;
 		let lp = this.transform.worldSpaceToModelSpace(p);
 		let rtvb = l.relativeTextViewBox;
-		let textAreaHitbox = (type === "start") ? 
-			rtvb : 
+		let textAreaHitbox = (type === "start") ?
+			rtvb :
 			new Rect(rtvb.x - l.padding, rtvb.y - l.padding, rtvb.width + l.padding * 2, rtvb.height + l.padding * 2);
-		if (Geometry.pointInsideRect(lp, textAreaHitbox)) {
+		if (Geometry.pointInsideRect(lp, textAreaHitbox) || type === "move") {
+			if (type === "move") {
+				lp.x = Number.clamp(lp.x, textAreaHitbox.x, textAreaHitbox.x + textAreaHitbox.width);
+				lp.y = Number.clamp(lp.y, textAreaHitbox.y, textAreaHitbox.y + textAreaHitbox.height);
+			}
 			let inx = l.getCharacterIndex(lp.plus(l.scrollOffset).minus(l.renderTextOffset));
 			let preStart = l.selectionStart;
 			let preEnd = l.selectionEnd;
@@ -273,7 +278,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 			l.selectAction();
 			return { changed: l.selectionStart !== preStart || l.selectionEnd !== preEnd };
 		}
-		return false;
+		return null;
 	},
 	scrollCursorIntoView(l) {
 		if (l.value.length === 0) return;
@@ -311,13 +316,16 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 
 		if (inTextArea) TEXT_AREA.staticData.anyTextAreaHovered = true;
 
-		if (l.mouse.justPressed("Left")) {
-			if (inTextArea) l.highlighting = !!l.select(l.getMousePosition(), "start");
-			else l.focused = false;
+		const doubleClick = l.mouse.justPressed("Left") && l.clickTimer < 15 && inTextArea;
+
+		if (l.mouse.justPressed("Left") && !doubleClick) {
+			if (inTextArea) {
+				l.highlighting = !!l.select(l.getMousePosition(), "start");
+			} else l.focused = false;
 		}
 
 		if (l.mouse.pressed("Left") && l.highlighting) {
-			let selection = l.select(l.getMousePosition(), "move"); 
+			let selection = l.select(l.getMousePosition(), "move");
 			if (selection && selection.changed) {
 				let relativeMousePosition = this.transform.worldSpaceToModelSpace(l.getMousePosition());
 				if (relativeMousePosition.x > l.relativeTextViewBox.max.x) l.scrollOffset.x += l.scrollSpeed / 4;
@@ -327,6 +335,24 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 			}
 		}
 		if (l.mouse.released("Left")) l.highlighting = false;
+
+		if (doubleClick) {
+			const segments = l.value.split(/\b/g);
+			let index = 0;
+			for (let i = 0; i < segments.length; i++) {
+				const seg = segments[i];
+				if (index <= l.selectionEnd && l.selectionEnd < index + seg.length) {
+					l.selectionStart = index;
+					l.selectionEnd = index + seg.length;
+					break;
+				}
+				index += seg.length;
+			}
+		}
+
+		if (l.mouse.justPressed("Left") && !doubleClick) l.clickTimer = 0;
+		l.clickTimer++;
+
 		if (l.focused && l.keyboard.downQueue.length) {
 			l.keyTimer = 0;
 			for (let key of l.keyboard.downQueue) {
@@ -430,7 +456,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 			l.keyTimer++;
 			let cursorPos = l.getTextLocation(l.selectionEnd);
 			if (Math.sin(l.keyTimer * 0.1) > 0) l.renderer.stroke(l.caretColor, 2).line(cursorPos, cursorPos.plus(new Vector2(0, l.font.lineHeight)));
-			
+
 			l.renderer.restore();
 		}
 		l.renderer.restore();
