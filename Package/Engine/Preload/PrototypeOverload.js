@@ -271,6 +271,16 @@ ${contents.join(",\n").indent()}
 		});
 	})();
 	proto(Array.prototype, "toString", Object.prototype.toString);
+	proto(Object.prototype, "deepCopy", function () {
+		const result = Array.isArray(this) ? [] : { };
+		for (const key in this) {
+			const value = this[key];
+			
+			if (typeof value === "object" && value !== null) result[key] = ("get" in value) ? value.get() : value.deepCopy();
+			else result[key] = value;
+		}
+		return result;
+	});
 
 	//Make Number behave like Operable
 	Number.abs = n => Math.abs(n);

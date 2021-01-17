@@ -1,12 +1,14 @@
 const DRAGGABLE = new ElementScript("DRAGGABLE", {
-	init(l, bounds = null) {
+	init(l, key = "Left", bounds = null) {
 		l.mouse = this.engine.mouse;
 		l.dragged = false;
+		l.key = key;
 		l.offset = Vector2.origin;
 		l.bounds = bounds;
 		this.engine.scene.mouseEvents = true;
 	},
 	click(l, key, mouse) {
+		if (key !== l.key) return;
 		l.dragged = true;
 		l.offset = this.transform.worldSpaceToModelSpace(mouse);
 	},
