@@ -323,6 +323,7 @@ class FileSystem {
 	}
 	createFile(name, create) {
 		if (!this.fileExists(name)) this.save(name, create());
+		return this.get(name);
 	}
 	registerFileType(ObjectType, extensions = []) {
 		extensions.push(ObjectType.name);

@@ -138,10 +138,7 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		glState.currentTextureIndex = 0;
 		glState.activeTextureIndex = 0;
 		glState.textures = [];
-
-		const textureIndexList = new Int32Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => i);
-
-		gl.uniform1iv(glState.program.uniforms.textures, textureIndexList);
+		glState.hasSetTextureIndices = false;
 
 		// general attributes
 		createAttribute("vertexPosition", 2);
@@ -509,6 +506,11 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		// textured
 		setAttribute("vertexTexturePosition");
 		setAttribute("vertexTextureIndex");
+		
+		if (!glState.hasSetTextureIndices && glAttributes.vertexTexturePosition.changed) {
+			glState.hasSetTextureIndices = true;
+			gl.uniform1iv(getUniformLocation("textures"), new Int32Array(glState.MAX_TEXTURE_UNITS).fill(0).map((_, i) => i));
+		}
 
 		gl.uniformMatrix3fv(getUniformLocation("vertexTransforms"), false, glState.transformData);
 

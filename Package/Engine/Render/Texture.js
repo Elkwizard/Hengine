@@ -37,7 +37,7 @@ class Texture extends ImageType {
 		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.setPixelInternal(i, j, Color.BLANK);
 	}
 	getPixel(x, y) {
-		if (this.pixels[x] && this.pixels[x][y]) return this.pixels[x][y];
+		if (x in this.pixels && y in this.pixels[x]) return this.pixels[x][y];
 		else if (!this.loops) return new Color(0, 0, 0, 0);
 		else {
 			x = (x % this.pixels.length + this.pixels.length) % this.pixels.length;
@@ -69,8 +69,7 @@ class Texture extends ImageType {
 		this.shaderSetPixel(x, y, clr);
 	}
 	setPixel(x, y, clr) {
-		if (this.pixels[x] && this.pixels[x][y]) this.setPixelInternal(x, y, clr);
-		return;
+		if (x in this.pixels && y in this.pixels[x]) this.setPixelInternal(x, y, clr);
 	}
 	blur(amount = 1) {
 		let newPixels = this.pixels.map((col, x, y) => {

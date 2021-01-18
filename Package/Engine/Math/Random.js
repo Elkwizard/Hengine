@@ -36,6 +36,7 @@ class Random {
         return n / scl;
     }
     static choice(arr) {
+        if (!Array.isArray(arr)) arr = Array.from(arr);
         return arr[Math.floor(Random.random() * arr.length)];
     }
     static noiseTCorrect(t) {
@@ -149,6 +150,6 @@ Random.uniform = function (seed) {
     return r;
 };
 Random.normal = function (seed) {
-    return (Random.uniform(seed) + Random.uniform(seed + 1000)) / 2;
+    return (Random.uniform(seed) + Random.uniform(seed + 1000) + Random.uniform(seed + 2000)) / 3;
 };
 Random.distribution = Random.uniform;
