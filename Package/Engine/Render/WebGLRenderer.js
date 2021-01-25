@@ -1,13 +1,12 @@
 class WebGLArtist {
-	constructor(canvas, width, height, imageType, onResize = () => null) {
+	constructor(canvas, width, height, imageType, pixelRatio) {
 		this.canvas = canvas;
-
-		this.onResize = onResize;
+		this.pixelRatio = pixelRatio;
 
 		this.gl = defineWebGL2DContext();
-		this.gl.create(canvas, true);
+		this.gl.create(canvas, true, pixelRatio);
 
-		this.imageType = imageType || new ArtistImage(this);
+		this.imageType = imageType;
 
 		this.preservePixelart = true;
 		this.alpha = 1;
@@ -273,17 +272,21 @@ class WebGLArtist {
 				if (typeof ax === "object") {
 					if (ax.vertices) [{ x: ax, y: ay }, { x: bx, y: by }, { x: cx, y: cy }, { x: dx, y: dy }] = ax.vertices;
 					else {
-						(
-							{ x: ax, y: ay } = ax,
-							{ x: bx, y: by } = ay,
-							{ x: cx, y: cy } = bx,
-							{ x: dx, y: dy } = by
-						);
+						[ax, ay, bx, by, cx, cy, dx, dy] = [ax.x, ax.y, ay.x, ay.y, bx.x, bx.y, by.x, by.y];
 					}
 				}
 				
 				this.gl.texturedTriangle(ax, ay, bx, by, cx, cy, 0, 0, 1, 0, 1, 1, this.currentImageCIS);
 				this.gl.texturedTriangle(ax, ay, dx, dy, cx, cy, 0, 0, 0, 1, 1, 1, this.currentImageCIS);
+			},
+			warpRegion(ax, ay, bx, by, cx, cy, dx, dy, tx, ty, tw, th) {
+				const pixelRatio = this.currentImageCIS.width / this.currentImage.width;
+				tx /= this.currentImageCIS.width / pixelRatio;
+				ty /= this.currentImageCIS.height / pixelRatio;
+				tw /= this.currentImageCIS.width / pixelRatio;
+				th /= this.currentImageCIS.height / pixelRatio;
+				this.gl.texturedTriangle(ax, ay, bx, by, cx, cy, tx, ty, tx + tw, ty, tx + tw, ty + th, this.currentImageCIS);
+				this.gl.texturedTriangle(ax, ay, dx, dy, cx, cy, tx, ty, tx, ty + th, tx + tw, ty + th, this.currentImageCIS);
 			},
 			shape(points) {
 				if (points.vertices) points = points.vertices;
@@ -316,7 +319,7 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.texturedQuad(x, y, this.currentImage.width, this.currentImage.height, 0, 0, 1, 1, this.currentImageCIS);
+				this.gl.texturedQuad(x, y, this.currentImage.width, this.currentImage.height, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			inferHeight(x, y, w) {
 				if (typeof x === "object") {
@@ -349,10 +352,10 @@ class WebGLArtist {
 		}
 	}
 	get width() {
-		return this.canvas.width / __devicePixelRatio;
+		return this.canvas.width / this.pixelRatio;
 	}
 	get height() {
-		return this.canvas.height / __devicePixelRatio;
+		return this.canvas.height / this.pixelRatio;
 	}
 	get middle() {
 		return new Vector2(this.width / 2, this.height / 2);
@@ -389,7 +392,6 @@ class WebGLArtist {
 		let px = this.preservePixelart;
 		let al = this.alpha;
 		this.gl.resize(width, height);
-
 		this.alpha = al;
 		this.preservePixelart = px;
 	}
@@ -563,18 +565,17 @@ class WebGLArtist {
 }
 
 class FastFrame extends ImageType {
-	constructor(width, height) {
+	constructor(width, height, pixelRatio = __devicePixelRatio) {
 		super(width, height);
-		this.image = new_OffscreenCanvas(this.width * __devicePixelRatio, this.height * __devicePixelRatio);
-		this.renderer = new WebGLArtist(this.image, this.width, this.height, this);
-		this.renderer.preservePixelart = true;
+		this.image = new_OffscreenCanvas(this.width * pixelRatio, this.height * pixelRatio);
+		this.renderer = new WebGLArtist(this.image, this.width, this.height, this, pixelRatio);
 	}
 	resize(width, height) {
 		this.renderer.resize(width, height);
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
-		let f = new FastFrame(w, h);
+		let f = new FastFrame(w, h, this.renderer.pixelRatio);
 		f.renderer.gl.texturedQuad(0, 0, w, h, 0, 0, 1, 1, this.makeImage());
 		return f;
 	}
@@ -585,7 +586,7 @@ class FastFrame extends ImageType {
 	clip(x, y, w, h) {
 		return FastFrame.fromImageType(this, x, y, w, h);
 	}
-	get(f = new FastFrame(this.width, this.height)) {
+	get(f = new FastFrame(this.width, this.height, this.renderer.pixelRatio)) {
 		f.renderer.resize(this.width, this.height);
 		f.renderer.gl.texturedQuad(0, 0, this.width, this.height, 0, 0, 1, 1, this.makeImage());
 		return f;
@@ -603,8 +604,9 @@ class FastFrame extends ImageType {
 		if (!w) w = img.width;
 		if (!h) h = img.height;
 
-		let f = new FastFrame(w, h);
-		f.renderer.gl.texturedQuad(0, 0, w, h, x / img.width, y / img.height, w / img.width, h / img.height, img.makeImage());
+		const offscreen = img.makeImage();
+		let f = new FastFrame(w, h, offscreen.width / img.width);
+		f.renderer.gl.texturedQuad(0, 0, w, h, x / img.width, y / img.height, w / img.width, h / img.height, offscreen);
 		return f;
 	}
 }

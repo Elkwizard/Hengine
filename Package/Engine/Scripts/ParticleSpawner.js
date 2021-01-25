@@ -40,7 +40,7 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 		l.active = p.active ?? l.active ?? true;
 		l.radius = p.radius ?? l.radius ?? 10;
 		l.lifeSpan = p.lifeSpan ?? l.lifeSpan ?? 100;
-		l.delay = p.delay ?? l.delay ?? 1  ;
+		l.delay = p.delay ?? l.delay ?? 1;
 		const imageType = p.imageType ?? FastFrame;
 		if (!(l.frame instanceof imageType)) {
 			l.frame = new imageType(this.engine.canvas.width, this.engine.canvas.height);

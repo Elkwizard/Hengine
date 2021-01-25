@@ -75,8 +75,6 @@ class GPUShader extends ImageType {
 		this.amountVertices = 4;
 		this.loaded = false;
 		this.uniformLocations = {
-			halfWidth: null,
-			halfHeight: null,
 			resolution: null
 		};
 
@@ -140,8 +138,6 @@ class GPUShader extends ImageType {
 
 		const gl = this.gl;
 		gl.uniform2f(this.uniformLocations.resolution, this.width, this.height);
-		gl.uniform1f(this.uniformLocations.halfWidth, this.width / 2);
-		gl.uniform1f(this.uniformLocations.halfHeight, this.height / 2);
 		gl.viewport(0, 0, this.image.width, this.image.height);
 	}
 	resize(width, height) {
@@ -173,14 +169,8 @@ class GPUShader extends ImageType {
 		const vertexSource = `#version 300 es
 				in highp vec4 vertexPosition;
 
-				uniform highp float halfWidth;
-				uniform highp float halfHeight;
-
-				out highp vec2 position;
-
 				void main() {
 					gl_Position = vertexPosition;
-					position = vec2((vertexPosition.x + 1.0) * halfWidth, (1.0 - vertexPosition.y) * halfHeight);
 				}
 			`;
 		this.glsl = GLSLPrecompiler.compile(this.glsl);
@@ -196,8 +186,8 @@ precision highp float;
 precision highp int;
 precision highp sampler2D;
 
-uniform highp vec2 resolution;
-in highp vec2 position;`;
+uniform vec2 resolution;
+#define position vec2(gl_FragCoord.x, resolution.y - gl_FragCoord.y)`;
 		const pixelSource = `${prefix}
 ${this.glsl}
 
@@ -258,7 +248,7 @@ void main() {
 		let currentTextureUnit = 0;
 		for (let i = 0; i < uniformCount; i++) {
 			let uniform = gl.getActiveUniform(shaderProgram, i);
-			if (uniform.name === "resolution" || uniform.name === "halfWidth" || uniform.name === "halfHeight") continue;
+			if (uniform.name === "resolution") continue;
 			let arrayCount = uniform.size;
 			let inx = uniform.name.indexOf("[");
 			let name = uniform.name.slice(0, (inx > -1) ? inx : uniform.name.length);

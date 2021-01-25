@@ -21,7 +21,7 @@ class Animation extends ImageType {
 			this.frameCount = this.frames.length;
 			this.delay = frames;
 			this.loops = delay;
-			this.onEnd = loops || function () { }
+			this.onEnd = loops || function () { };
 			promise = Promise.resolve(this.frames);
 		}
 		this.image = this.frames[0];

@@ -47,6 +47,9 @@ class ImageType {
 	get height() {
 		return this._height;
 	}
+	get pixelRatio() {
+		return this.makeImage().width / this.width;
+	}
 	inferWidth(height) {
 		return this.width * height / this.height;
 	}
@@ -83,36 +86,34 @@ class HImage extends ImageType {
 		this.image.addEventListener("load", this.forceLoad.bind(this));
 	}
 	forceLoad() {
-		this.width = this.image.width / __devicePixelRatio;
-		this.height = this.image.height / __devicePixelRatio;
+		this.width = this.image.width;
+		this.height = this.image.height;
 		this.loaded = true;
-	}
-	static async imageExists(src) {
-		let img = new Image();
-		img.src = src;
-		let result = await new Promise(function (resolve) {
-			img.onerror = () => resolve(false);
-			img.onload = () => resolve(true);
-		});
-		return result;
 	}
 	makeImage() {
 		return this.image;
 	}
+	static imageExists(src) {
+		const img = new Image();
+		img.src = src;
+		return new Promise(resolve => {
+			img.onerror = () => resolve(false);
+			img.onload = () => resolve(true);
+		});
+	}
 }
 class Frame extends ImageType {
-	constructor(width, height) {
+	constructor(width, height, pixelRatio = __devicePixelRatio) {
 		super(width, height);
-		this.image = new_OffscreenCanvas(this.width * __devicePixelRatio, this.height * __devicePixelRatio);
-		this.renderer = new Artist(this.image, this.width, this.height, this);
-		this.renderer.preservePixelart = true;
+		this.image = new_OffscreenCanvas(this.width * pixelRatio, this.height * pixelRatio);
+		this.renderer = new Artist(this.image, this.width, this.height, this, pixelRatio);
 	}
 	resize(width, height) {
 		this.renderer.resize(width, height);
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
-		let f = new Frame(w, h);
+		let f = new Frame(w, h, this.renderer.pixelRatio);
 		f.renderer.c.drawImage(this.image, 0, 0, w, h);
 		return f;
 	}
@@ -122,7 +123,7 @@ class Frame extends ImageType {
 	clip(x, y, w, h) {
 		return Frame.fromImageType(this, x, y, w, h);
 	}
-	get(f = new Frame(this.width, this.height)) {
+	get(f = new Frame(this.width, this.height, this.renderer.pixelRatio)) {
 		f.renderer.resize(this.width, this.height);
 		f.renderer.c.drawImage(this.image, 0, 0, this.width, this.height);
 		return f;
@@ -141,8 +142,9 @@ class Frame extends ImageType {
 		if (!h) h = img.height;
 		
 		let offscreen = img.makeImage();
-		let f = new Frame(w, h);
-		f.renderer.c.drawImage(offscreen, x, y, w * __devicePixelRatio, h * __devicePixelRatio, 0, 0, w, h);
+		const pixelRatio = offscreen.width / img.width;
+		let f = new Frame(w, h, pixelRatio);
+		f.renderer.c.drawImage(offscreen, x * pixelRatio, y * pixelRatio, w * pixelRatio, h * pixelRatio, 0, 0, w, h);
 		return f;
 	}
-}
+}	

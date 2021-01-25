@@ -127,18 +127,16 @@ class Font {
 		Font.importedFamilies.push(font);
 	}
 }
+// setup
 Font.defaultFamilies = ["Serif", "Arial", "Cursive", "Monospace"];
 Font.defaultSizes = [];
-// setup
-(function () {
-	for (let i = 0; i < 20; i++) Font.defaultSizes.push((i + 1) * 5);
-	for (let i = 0; i < Font.defaultSizes.length; i++) {
-		for (let j = 0; j < Font.defaultFamilies.length; j++) {
-			const NAME = Font.defaultFamilies[j] + Font.defaultSizes[i];
-			Lazy.define(Font, NAME, () => new Font(Font.defaultSizes[i], Font.defaultFamilies[j]));
-		}
+for (let i = 0; i < 20; i++) Font.defaultSizes.push((i + 1) * 5);
+for (let i = 0; i < Font.defaultSizes.length; i++) {
+	for (let j = 0; j < Font.defaultFamilies.length; j++) {
+		const NAME = Font.defaultFamilies[j] + Font.defaultSizes[i];
+		Lazy.define(Font, NAME, () => new Font(Font.defaultSizes[i], Font.defaultFamilies[j]));
 	}
-	Font.importedFamilies = [];
-	Font.css = document.createElement("style");
-	document.head.appendChild(Font.css);
-})();
+}
+Font.importedFamilies = [];
+Font.css = document.createElement("style");
+document.head.appendChild(Font.css);

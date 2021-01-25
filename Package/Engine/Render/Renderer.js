@@ -11,22 +11,13 @@ const BlendMode = defineEnum("ADD", "COMBINE");
 const LineJoin = defineEnum("MITER", "BEVEL", "ROUND");
 const LineCap = defineEnum("FLAT", "SQUARE", "ROUND");
 
-class ArtistImage extends ImageType {
-	constructor(artist) {
-		super(artist.width, artist.height);
-		this.artist = artist;
-	}
-	makeImage() {
-		return this.artist.canvas;
-	}
-}
 class Artist {
-	constructor(canvas, width, height, imageType) {
+	constructor(canvas, width, height, imageType, pixelRatio) {
 		this.canvas = canvas;
+		this.c = this.canvas.getContext("2d");
+		this.pixelRatio = pixelRatio;
 
-		this.c = this.canvas.getContext('2d');
-
-		this.imageType = imageType || new ArtistImage(this);
+		this.imageType = imageType;
 
 		this.lineJoinMap = new Map([
 			[LineJoin.MITER, "miter"],
@@ -643,10 +634,10 @@ class Artist {
 		}
 	}
 	get width() {
-		return this.canvas.width / __devicePixelRatio;
+		return this.canvas.width / this.pixelRatio;
 	}
 	get height() {
-		return this.canvas.height / __devicePixelRatio;
+		return this.canvas.height / this.pixelRatio;
 	}
 	get middle() {
 		return new Vector2(this.width / 2, this.height / 2);
@@ -682,7 +673,7 @@ class Artist {
 	}
 	set transform(a) {
 		const m = Matrix3.mulMatrix(
-			Matrix3.scale(__devicePixelRatio, __devicePixelRatio, Matrix3.temp[0]),
+			Matrix3.scale(this.pixelRatio, this.pixelRatio, Matrix3.temp[0]),
 			a,
 			Matrix3.temp[1]
 		);
@@ -690,7 +681,7 @@ class Artist {
 	}
 	get transform() {
 		const t = this.c.getTransform();
-		const ratio = 1 / __devicePixelRatio;
+		const ratio = 1 / this.pixelRatio;
 		return Matrix3.mulMatrix(
 			Matrix3.scale(ratio, ratio, Matrix3.temp[1]),
 			Matrix3.create(
@@ -704,9 +695,9 @@ class Artist {
 	resize(width, height) {
 		let px = this.preservePixelart;
 		let al = this.alpha;
-		this.canvas.width = width * __devicePixelRatio;
-		this.canvas.height = height * __devicePixelRatio;
-		this.c.scale(__devicePixelRatio, __devicePixelRatio);
+		this.canvas.width = width * this.pixelRatio;
+		this.canvas.height = height * this.pixelRatio;
+		this.c.scale(this.pixelRatio, this.pixelRatio);
 		this.alpha = al;
 		this.preservePixelart = px;
 	}
@@ -715,7 +706,7 @@ class Artist {
 		if ("cursor" in style) style.cursor = cursor;
 	}
 	getPixel(x, y) {
-		let d = this.c.getImageData(x * __devicePixelRatio, y * __devicePixelRatio, 1, 1).data;
+		let d = this.c.getImageData(x * this.pixelRatio, y * this.pixelRatio, 1, 1).data;
 		return new Color(d[0], d[1], d[2], d[3] / 255);
 	}
 	setPixel(x, y, col) {

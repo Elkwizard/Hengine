@@ -75,8 +75,8 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		glState.width = width;
 		glState.height = height;
 		
-		const nwidth = Math.floor(width * __devicePixelRatio);
-		const nheight = Math.floor(height * __devicePixelRatio);
+		const nwidth = Math.floor(width * glState.pixelRatio);
+		const nheight = Math.floor(height * glState.pixelRatio);
 		if (nwidth !== gl.canvas.width) gl.canvas.width = nwidth;
 		if (nheight !== gl.canvas.height) gl.canvas.height = nheight;
 		
@@ -87,19 +87,20 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 
 	function updateResolution() {
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-		gl.uniform2f(getUniformLocation("resolution"), gl.canvas.width / __devicePixelRatio, gl.canvas.height / __devicePixelRatio);
+		gl.uniform2f(getUniformLocation("resolution"), gl.canvas.width / glState.pixelRatio, gl.canvas.height / glState.pixelRatio);
 	}
 	//#endregion
 
 	//#region basic
 	
-	function create(canvas, pixelRatioHandled = false) {
+	function create(canvas, pixelRatioHandled = false, pixelRatio = devicePixelRatio) {
 		gl = canvas.getContext("webgl2", {
 			depth: false,
 			stencil: false
 		});
 
 		glState.contextExists = true;
+		glState.pixelRatio = pixelRatio;
 		
 		gl.canvas.addEventListener("webglcontextlost", e => {
 			e.preventDefault();
@@ -185,8 +186,8 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		]);
 
 		if (pixelRatioHandled) {
-			glState.width = gl.canvas.width / __devicePixelRatio;
-			glState.height = gl.canvas.height / __devicePixelRatio;
+			glState.width = gl.canvas.width / glState.pixelRatio;
+			glState.height = gl.canvas.height / glState.pixelRatio;
 		} else {
 			glState.width = gl.canvas.width;
 			glState.height = gl.canvas.height;
