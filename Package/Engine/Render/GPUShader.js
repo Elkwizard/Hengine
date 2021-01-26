@@ -181,13 +181,15 @@ class GPUShader extends ImageType {
 
 		// end studying
 
+		const pixelRatioStr = (1 / __devicePixelRatio).toFixed(4);
+		
 		const prefix = `#version 300 es
 precision highp float;
 precision highp int;
 precision highp sampler2D;
 
 uniform vec2 resolution;
-#define position vec2(gl_FragCoord.x, resolution.y - gl_FragCoord.y)`;
+#define position (vec2(gl_FragCoord.x * ${pixelRatioStr}, resolution.y - gl_FragCoord.y * ${pixelRatioStr}))`;
 		const pixelSource = `${prefix}
 ${this.glsl}
 
