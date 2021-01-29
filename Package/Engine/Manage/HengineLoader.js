@@ -305,7 +305,7 @@ HengineLoader.engineResources = [
 
 	"Render/Color", "Render/Transform", "Render/Shapes", "Render/Spline", "Render/Gradient", "Render/GrayMap", "Render/Frame", "Render/Animation", "Render/Texture", "Render/Webcam", "Render/VideoView", "Render/GPUShader", "Math/GPUComputation", "Render/WebGL2DContext", "Render/WebGLRenderer", "Render/Font", "Render/Renderer", "Render/Graph", "Render/Camera",
 
-	"Util/Input", "Util/Sound", "Util/Time", "Util/LocalFileSystem",
+	"Util/Input", "Util/Sound", "Util/Time", "Util/ByteBuffer", "Util/LocalFileSystem",
 
 	"SceneObject/Scripts", "SceneObject/SceneElement", "SceneObject/SceneObject", "SceneObject/SATPhysicsObject", "SceneObject/UIObject",
 
