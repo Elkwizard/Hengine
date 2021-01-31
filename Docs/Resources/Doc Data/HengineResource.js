@@ -9,7 +9,7 @@ load(String.raw`
 	**(/p)
 	(2)Subclasses(/2)
 	(p)
-		#HengineScriptResource#, #HengineImageResource#, #HengineAnimationResource#, #HengineSoundResource#.
+		#HengineScriptResource#, #HengineImageResource#, #HengineAnimationResource#, #HengineSoundResource#, #HengineFontResource#.
 	(/p)
 	(2)Syntax(/2)
 	(p)**

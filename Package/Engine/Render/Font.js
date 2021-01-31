@@ -111,7 +111,7 @@ class Font {
 		return str.split("\n").length * this.lineHeight;
 	}
 	toString() {
-		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${(Font.importedFamilies.includes(this.family)) ? `'${this.family}'` : this.family}`;
+		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${this.family}`;
 	}
 	get(font = new Font(0, "serif", false, false)) {
 		font.size = this.size;
@@ -120,11 +120,6 @@ class Font {
 		font.italic = this.italic;
 		font.lineHeight = this.lineHeight;
 		return font;
-	}
-	static importFamily(font, url) {
-		Font.css.innerHTML += `
-			@import url(${url})`;
-		Font.importedFamilies.push(font);
 	}
 }
 // setup
@@ -137,6 +132,3 @@ for (let i = 0; i < Font.defaultSizes.length; i++) {
 		Lazy.define(Font, NAME, () => new Font(Font.defaultSizes[i], Font.defaultFamilies[j]));
 	}
 }
-Font.importedFamilies = [];
-Font.css = document.createElement("style");
-document.head.appendChild(Font.css);

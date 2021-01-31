@@ -143,17 +143,31 @@ class HengineAnimationResource extends HengineResource {
 		});
 	}
 }
+class HengineFontResource extends HengineResource {
+	constructor(src) {
+		super(src);
+	}
+	load() {
+		const style = document.createElement("style");
+		style.innerHTML = `@import url(${JSON.stringify(this.src)})`;
 
-// function exit(...msg) {
-// 	console.warn("EXITED", ...msg);
-// 	IntervalManager.intervals = [];
-// }
+		return new Promise(async resolve => {
+			style.onload = () => {
+				document.fonts.ready.then(() => {
+					resolve(style);
+				});
+			};
+			style.onerror = () => resolve(null);
+			document.head.appendChild(style);
+		});
+	}
+}
+
 class HengineLoader {
 	constructor() {
 		this.hengine = new Hengine();
 
 		//window
-		window.cl = this.hengine.colorLibrary;
 		window.hengine = this.hengine;
 		window.scene = this.hengine.scene;
 		window.renderer = this.hengine.renderer;

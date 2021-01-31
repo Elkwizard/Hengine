@@ -61,13 +61,5 @@ load(String.raw`
 		(method:get@@$Font$)
 			Returns a copy of the Font.
 		(/method)
-		(method:Font.importFamily@font, url@$void$)
-			Imports a given font family from a URL.
-			(2)Parameters(/2)
-			(p2)
-				(param:font $String$)The official name of the font family from the URL.(/param)
-				(param:url $String$)The URL that contains the font family.(/param)
-			(/p2)
-		(/method)
 	(/p)
 `);

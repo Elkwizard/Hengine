@@ -7,7 +7,8 @@ const DOCS = {
 			"HengineImageResource": {},
 			"HengineAnimationResource": {},
 			"HengineVideoResource": {},
-			"HengineScriptResource": {}
+			"HengineScriptResource": {},
+			"HengineFontResource": {}
 		},
 		"Intervals": {
 			"IntervalFunction": {},
