@@ -232,6 +232,8 @@ class HengineLoader {
 	}
 	static load(userResources, engineLoaded = false) {
 		async function loadResources() {
+			console.time("loading engine");
+			
 			let scriptHome = document.querySelectorAll("script"); //find yourself
 			for (let el of scriptHome) {
 				if (el.src.indexOf("Engine/Manage/Hengine") > -1) {
@@ -252,10 +254,14 @@ class HengineLoader {
 			console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
 
 			if (!engineLoaded) for (let i = 0; i < HengineLoader.engineResources.length; i++) {
-				let path = HengineLoader.engineResources[i];
-				let name = path.match(/\/(.*?)$/g)[0].slice(1);
-				let resource = new HengineScriptResource(PathManager.join([rootSrc, path + ".js"]));
-				await resource.load();
+				const block = HengineLoader.engineResources[i];
+				const promises = [];
+				for (let i = 0; i < block.length; i++) {
+					const path = block[i];
+					const script = new HengineScriptResource(PathManager.join([rootSrc, path + ".js"]));
+					promises.push(script.load());
+				}
+				await Promise.all(promises);
 			}
 
 
@@ -299,6 +305,10 @@ class HengineLoader {
 					nonScriptSourceAcc.push(userResource.src);
 				}
 			}
+
+			console.timeEnd("loading engine");
+
+			//450ms;
 		}
 		if (document.body && document.head) return loadResources();
 		else {
@@ -313,17 +323,65 @@ class HengineLoader {
 }
 
 HengineLoader.engineResources = [
-	"Preload/PrototypeOverload", "Preload/Lazy", "Preload/Operable",
-
-	"Math/Interpolation", "Math/Random", "Math/Matrix", "Math/Vector", "Math/Geometry", "Math/Physics", "Math/PhysicsAPI",
-
-	"Render/Color", "Render/Transform", "Render/Shapes", "Render/Spline", "Render/Gradient", "Render/GrayMap", "Render/Frame", "Render/Animation", "Render/Texture", "Render/Webcam", "Render/VideoView", "Render/GPUShader", "Math/GPUComputation", "Render/WebGL2DContext", "Render/WebGLRenderer", "Render/Font", "Render/Renderer", "Render/Graph", "Render/Camera",
-
-	"Util/Input", "Util/Sound", "Util/Time", "Util/ByteBuffer", "Util/LocalFileSystem",
-
-	"SceneObject/Scripts", "SceneObject/SceneElement", "SceneObject/SceneObject", "SceneObject/SATPhysicsObject", "SceneObject/UIObject",
-
-	"Scripts/ParticleSpawner", "Scripts/TextArea", "Scripts/PlayerMovement", "Scripts/Draggable",
-
-	"Manage/ElementContainer", "Manage/Scenes", "Manage/Intervals", "Manage/Canvas", "Manage/Hengine",
+	[ // no dependencies
+		"Preload/PrototypeOverload",
+		"Preload/Lazy",
+		"Preload/Operable",
+		
+		"SceneObject/SceneElement",
+		"SceneObject/Scripts",
+		
+		"Manage/Scenes",
+		"Manage/Hengine",
+		"Manage/Intervals",
+		
+		"Util/ByteBuffer",
+		"Util/Input",
+		"Util/LocalFileSystem",
+		"Util/Sound",
+		"Util/Time",
+		
+		"Math/Matrix",
+		"Math/Geometry",
+		"Math/Physics",
+		"Math/PhysicsAPI",
+		"Math/Random",
+		"Math/Interpolation",
+		
+		"Render/Frame",
+		"Render/Transform",
+		"Render/Font",
+		"Render/Gradient",
+		"Render/Spline",
+		"Render/WebGL2DContext",	
+		"Render/GrayMap"
+	],
+	[ // basic dependencies
+		"Manage/Canvas",
+		"Manage/ElementContainer",
+		
+		"Scripts/Draggable",
+		"Scripts/ParticleSpawner",
+		"Scripts/PlayerMovement",
+		"Scripts/TextArea",
+		
+		"SceneObject/SceneObject",
+		"SceneObject/PhysicsObject",
+		"SceneObject/UIObject",
+		"Render/Color",
+		
+		"Math/Vector",
+		"Math/GPUComputation",
+		
+		"Render/Shapes",
+		"Render/Animation",
+		"Render/Camera",
+		"Render/Webcam",
+		"Render/Graph",
+		"Render/Texture",
+		"Render/VideoView",
+		"Render/WebGLRenderer",
+		"Render/Renderer",
+		"Render/GPUShader"
+	]
 ];

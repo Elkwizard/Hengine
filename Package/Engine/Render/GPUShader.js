@@ -177,7 +177,7 @@ class GPUShader extends ImageType {
 
 		// study glsl
 
-		this.allUniformNames = [...this.glsl.matchAll(/uniform\s+(?:.*?)\s+(\w+)(?:\s+\=\s+(?:.*?))?;/g)].map(match => match[1]);
+		this.allUniformNames = [...this.glsl.matchAll(/uniform\s+(?:.*?)\s+(\w+)(?:\[\d+\])?(?:\s+\=\s+(?:.*?))?;/g)].map(match => match[1]);
 
 		// end studying
 
