@@ -944,7 +944,9 @@ PhysicsConstraint2.Position = class extends PhysicsConstraint2 {
         const [a, b] = this.getEnds();
         let dx = b.x - a.x;
         let dy = b.y - a.y;
-        const dist = Math.sqrt(dx ** 2 + dy ** 2);
+        const sum = dx ** 2 + dy ** 2;
+        if (!sum) return;
+        const dist = Math.sqrt(sum);
         const factor = 5 / dist;
         const ndx = dx * factor;
         const ndy = dy * factor;
@@ -1024,7 +1026,9 @@ PhysicsConstraint1.Position = class extends PhysicsConstraint1 {
         const [a, b] = this.getEnds();
         let dx = b.x - a.x;
         let dy = b.y - a.y;
-        const dist = Math.sqrt(dx ** 2 + dy ** 2);
+        const sum = dx ** 2 + dy ** 2;
+        if (!sum) return;
+        const dist = Math.sqrt(sum);
         const factor = 2 * int / dist;
         dx *= factor;
         dy *= factor;

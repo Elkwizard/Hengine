@@ -608,15 +608,18 @@ class Geometry {
     // basic shapes
     
     // closest point
-    static closestPointOnCircle(p, cr) {
-        let dif = new Vector2(p.x - cr.x, p.y - cr.y);
-        dif.mag = cr.radius;
-        dif.add(cr);
+    static closestPointOnRect(point, rect) {
+        return Vector2.clamp(point, rect.min, rect.max);
+    }
+    static closestPointOnCircle(p, circle) {
+        let dif = new Vector2(p.x - circle.x, p.y - circle.y);
+        dif.mag = circle.radius;
+        dif.add(circle);
         return dif;
     }
-    static closestPointOnPolygon(point, r) {
-        let toB = r.middle.Vminus(point);
-        let edges = r.getEdges().filter(e => {
+    static closestPointOnPolygon(point, polygon) {
+        let toB = polygon.middle.Vminus(point);
+        let edges = polygon.getEdges().filter(e => {
             let v = e.b.Vminus(e.a).normal;
             return v.dot(toB) > 0;
         })
@@ -632,8 +635,15 @@ class Geometry {
         }
         return bestPoint;
     }
-    static closestPointOnRect(point, r) {
-        return Vector2.clamp(point, r.min, r.max);
+    // dist
+    static distToRect(p, rect) {
+        return Vector2.dist(p, Geometry.closestPointOnRect(p, rect));
+    }
+    static distToCircle(p, circle) {
+        return Vector2.dist(p, Geometry.closestPointOnCircle(p, circle));
+    }
+    static distToPolygon(p, polygon) {
+        return Vector2.dist(p, Geometry.closestPointOnPolygon(p, polygon));
     }
     // point inside
     static pointInsideRect(p, rect) {
@@ -657,14 +667,14 @@ class Geometry {
         return true;
     }
     // overlap
-    static overlapPolygonPolygon(p, p2) {
-        return physicsAPIcollideShapes(p, p2);
+    static overlapPolygonPolygon(polygon, polygon2) {
+        return physicsAPIcollideShapes(polygon, polygon2);
     }
-    static overlapRectRect(r, r2) {
-        if (!r || !r2) return false;
-        return r.x < r2.x + r2.width && r.x + r.width > r2.x && r.y < r2.y + r2.height && r.y + r.height > r2.y;
+    static overlapRectRect(rect, rect2) {
+        if (!rect || !rect2) return false;
+        return rect.x < rect2.x + rect2.width && rect.x + rect.width > rect2.x && rect.y < rect2.y + rect2.height && rect.y + rect.height > rect2.y;
     }
-    static overlapCircleCircle(c, c2) {
-        return Vector2.sqrDist(c, c2) < (c.radius + c2.radius) ** 2;
+    static overlapCircleCircle(circle, circle2) {
+        return Vector2.sqrDist(circle, circle2) < (circle.radius + circle2.radius) ** 2;
     }
 }

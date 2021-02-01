@@ -182,7 +182,7 @@ IntervalManager.FPS_FRAMES_TO_COUNT = 30;
 				IntervalManager.intervals[i]();
 			}
 		} catch (err) {
-			if (err instanceof ExitError) console.warn(...err.message);
+			if (err instanceof ExitError) console.warn("EXITED", ...err.message);
 			else throw err;
 		}
 		IntervalManager.inInterval = false;

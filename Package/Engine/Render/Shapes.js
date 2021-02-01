@@ -344,10 +344,10 @@ class Rect extends Polygon {
 		return new Rect((this.x - pos.x) * factor + pos.x, (this.y - pos.y) * factor + pos.y, this.width * factor, this.height * factor);
 	}
 	scaleXAbout(pos, factor) {
-		return new Rect((this.x - pos.x) * factor + pos.x, this.y, this.width * factor, this.height);
+		return new Rect((this.x - pos) * factor + pos, this.y, this.width * factor, this.height);
 	}
 	scaleYAbout(pos, factor) {
-		return new Rect(this.x, (this.y - pos.y) * factor + pos.y, this.width, this.height * factor);
+		return new Rect(this.x, (this.y - pos) * factor + pos, this.width, this.height * factor);
 	}
 	move(dir) {
 		return new Rect(this.x + dir.x, this.y + dir.y, this.width, this.height);

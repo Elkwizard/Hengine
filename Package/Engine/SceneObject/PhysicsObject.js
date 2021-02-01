@@ -114,9 +114,6 @@ class PhysicsObject extends SceneObject {
         super.deactivate();
         this.engine.scene.physicsEngine.removeBody(this.body.id);
     }
-    centerModels() {
-        super.centerModels();
-    }
 	addShape(name, shape) {
 		super.addShape(name, shape);
 		const convex = this.convexShapes.get(shape);
