@@ -156,28 +156,19 @@ class Color extends Operable {
 			case 0:
 				g = 255 * ot;
 				r = 255 - g;
-				// g = ot2;
-				// r = ot1;
 				break;
 			case 1:
 				b = 255 * ot;
 				g = 255 - b;
-				// b = ot2;
-				// g = ot1; 
 				break;
 			case 2:
 				r = 255 * ot;
 				b = 255 - r;
-				// r = ot2;
-				// b = ot1;
 				break;
 		}
 
 		let scaleBrightness = st;
 		scaleBrightness *= B;
-		// r = 255;
-		// g = 255;
-		// b = 0;
 		r *= scaleBrightness;
 		g *= scaleBrightness;
 		b *= scaleBrightness;
