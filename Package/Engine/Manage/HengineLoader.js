@@ -222,10 +222,12 @@ class HengineLoader {
 		if (PathManager.isRoot(src)) {
 			return this.resources.get(src) ?? null;
 		} else {
-			const processed = src.replace(/([\.\\])/g, "\\$1");
+			const processed = src.replace(/[/\\]/g, "/").replace(/([\.\\])/g, "\\$1");
+			const processed2 = src.replace(/[/\\]/g, "\\").replace(/([\.\\])/g, "\\$1");
 			const regex = new RegExp(processed + "$");
+			const regex2 = new RegExp(processed2 + "$");
 			for (let [path, resource] of this.resources) {
-				if (path.match(regex)) return resource;
+				if (path.match(regex) || path.match(regex2)) return resource;
 			}
 			return null;
 		}
