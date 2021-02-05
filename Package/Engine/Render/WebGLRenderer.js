@@ -489,10 +489,8 @@ class WebGLArtist {
 		
 		this.currentTransform[0] *= x;
 		this.currentTransform[1] *= x;
-		this.currentTransform[2] *= x;
 		this.currentTransform[3] *= y;
 		this.currentTransform[4] *= y;
-		this.currentTransform[5] *= y;
 
 		
 		// Matrix3.create(

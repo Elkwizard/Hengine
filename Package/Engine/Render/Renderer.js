@@ -672,24 +672,16 @@ class Artist {
 		return this._alpha;
 	}
 	set transform(a) {
-		const m = Matrix3.mulMatrix(
-			Matrix3.scale(this.pixelRatio, this.pixelRatio, Matrix3.temp[0]),
-			a,
-			Matrix3.temp[1]
-		);
-		this.c.setTransform(m[0], m[1], m[3], m[4], m[6], m[7]);
+		const m = a;
+		this.c.setTransform(m[0] * this.pixelRatio, m[1] * this.pixelRatio, m[3] * this.pixelRatio, m[4] * this.pixelRatio, m[6] * this.pixelRatio, m[7] * this.pixelRatio);
 	}
 	get transform() {
-		const t = this.c.getTransform();
+		const { a, b, c, d, e, f } = this.c.getTransform();
 		const ratio = 1 / this.pixelRatio;
-		return Matrix3.mulMatrix(
-			Matrix3.scale(ratio, ratio, Matrix3.temp[1]),
-			Matrix3.create(
-				t.a, t.c, t.e,
-				t.b, t.d, t.f,
-				0, 0, 1,
-				Matrix3.temp[0]
-			)
+		return Matrix3.create(
+			a * ratio, c * ratio, e * ratio,
+			b * ratio, d * ratio, f * ratio,
+			0, 0, 1
 		);
 	}
 	resize(width, height) {
@@ -715,7 +707,7 @@ class Artist {
 		data[1] = col.green;
 		data[2] = col.blue;
 		data[3] = col.alpha * 255;
-		this.c.putImageData(new ImageData(data, 1, 1), x, y);
+		this.c.putImageData(new ImageData(data, 1, 1), x * this.pixelRatio, y * this.pixelRatio);
 	}
 	createRadialGradient(x, y, radius, cols) {
 		let grd = this.c.createRadialGradient(x, y, 0.00000001, x, y, radius);

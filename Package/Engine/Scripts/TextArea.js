@@ -278,7 +278,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.blurOthers();
 		l.focused = true;
 		l.keyTimer = 0;
-		let lp = this.transform.worldSpaceToModelSpace(p);
+		let lp = this.transform.globalSpaceToLocalSpace(p);
 		let rtvb = l.relativeTextViewBox;
 		let textAreaHitbox = (type === "start") ?
 			rtvb :
@@ -332,7 +332,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		l.canvas.cursor = TEXT_AREA.staticData.anyTextAreaHovered ? "text" : "default";
 	},
 	update(l) {
-		let inTextArea = Geometry.pointInsideRect(this.transform.worldSpaceToModelSpace(l.getMousePosition()), l.relativeTextViewBox);
+		let inTextArea = Geometry.pointInsideRect(this.transform.globalSpaceToLocalSpace(l.getMousePosition()), l.relativeTextViewBox);
 
 		if (inTextArea) TEXT_AREA.staticData.anyTextAreaHovered = true;
 
@@ -347,7 +347,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		if (l.mouse.pressed("Left") && l.highlighting) {
 			let selection = l.select(l.getMousePosition(), "move");
 			if (selection && selection.changed) {
-				let relativeMousePosition = this.transform.worldSpaceToModelSpace(l.getMousePosition());
+				let relativeMousePosition = this.transform.globalSpaceToLocalSpace(l.getMousePosition());
 				if (relativeMousePosition.x > l.relativeTextViewBox.max.x) l.scrollOffset.x += l.scrollSpeed / 4;
 				if (relativeMousePosition.y > l.relativeTextViewBox.max.y) l.scrollOffset.y += l.scrollSpeed / 4;
 				if (relativeMousePosition.x < l.relativeTextViewBox.min.x) l.scrollOffset.x -= l.scrollSpeed / 4;
@@ -506,7 +506,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		if (xs && !ys) fullScrollWidth = width;
 		if (!xs && ys) fullScrollHeight = height;
 
-		let localMouse = this.transform.worldSpaceToModelSpace(l.getMousePosition());
+		let localMouse = this.transform.globalSpaceToLocalSpace(l.getMousePosition());
 
 		if (xs) {
 			if (l.multiline) {

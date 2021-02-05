@@ -22,20 +22,20 @@
 		},
 		click(l, key, e) {
 			l.thrown = true;
-			l.offset = this.transform.worldSpaceToModelSpace(e);
+			l.offset = this.transform.globalSpaceToLocalSpace(e);
 		},
 		update(l) {
 			if (mouse.justReleased("Left")) l.thrown = false;
 			this.layer = +l.thrown;
 			if (l.thrown) {
-				let dif = mouse.world.minus(this.transform.modelSpaceToWorldSpace(l.offset));
+				let dif = mouse.world.minus(this.transform.globalSpaceToLocalSpace(l.offset));
 				dif.div(1000);
 				this.applyImpulseMass(this.transform.position, dif);
 			}
 		},
 		escapeDraw(l) {
 			if (l.thrown) {
-				let start = this.transform.modelSpaceToWorldSpace(l.offset);
+				let start = this.transform.localSpaceToGlobalSpace(l.offset);
 				let end = mouse.world.get();
 				renderer.stroke(Color.RED, 2).arrow(start, end);
 			}

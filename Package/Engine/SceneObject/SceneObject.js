@@ -260,7 +260,7 @@ class SceneObject extends SceneElement {
 		return el;
 	}
 	runDraw() {
-		if (this.scripts.implements("Draw")) this.transform.drawInModelSpace(() => {
+		if (this.scripts.implements("Draw")) this.transform.drawInLocalSpace(() => {
 			const entries = [...this.shapes.entries()];
 			for (let [name, shape] of entries) {
 				this.scripts.run("Draw", name, shape);

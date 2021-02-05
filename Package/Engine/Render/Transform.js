@@ -6,8 +6,7 @@ class Transform extends Matrix3 {
 			0, 0, 1
 		);
 		this.rotation = rotation;
-
-
+		
 		// create an double bound position object, so (transf.position.x += ...) works
 
 		this._position = Vector2.origin;
@@ -17,11 +16,13 @@ class Transform extends Matrix3 {
 		Object.defineProperties(this._position, {
 			x: {
 				set: value => self[6] = value,
-				get: () => self[6]
+				get: () => self[6],
+				configurable: true
 			},
 			y: {
 				set: value => self[7] = value,
-				get: () => self[7]
+				get: () => self[7],
+				configurable: true
 			}
 		});
 	}
@@ -32,16 +33,12 @@ class Transform extends Matrix3 {
 	get position () {
 		return this._position;
 	}
-	get sinRotation() {
-		return this[1];
-	}
-	get cosRotation() {
-		return this[0];
-	}
 	set rotation(a) {
 		this._rotation = a;
 		const cos = Math.cos(a);
 		const sin = Math.sin(a);
+		this.cosRotation = cos;
+		this.sinRotation = sin;
 		this[0] = cos;
 		this[1] = sin;
 		this[3] = -sin;
@@ -75,13 +72,13 @@ class Transform extends Matrix3 {
 		this.position = dif;
 		this.rotation += rotation;
 	}
-	worldSpaceToModelSpace(v) {
+	globalSpaceToLocalSpace(v) {
 		return v.Vminus(this.position).rotate(-this.rotation);
 	}
-	modelSpaceToWorldSpace(v) {
+	localSpaceToGlobalSpace(v) {
 		return v.rotated(this.rotation).Vadd(this.position);
 	}
-	drawInModelSpace(artist, renderer) {
+	drawInLocalSpace(artist, renderer) {
 		const r = this.rotation;
 		const x = this[6];
 		const y = this[7];
@@ -91,7 +88,7 @@ class Transform extends Matrix3 {
 		if (r) renderer.rotate(-r);
 		renderer.translate(-x, -y);
 	}
-	drawInWorldSpace(artist, renderer) {
+	drawInGlobalSpace(artist, renderer) {
 		const r = this.rotation;
 		const x = this[6];
 		const y = this[7];

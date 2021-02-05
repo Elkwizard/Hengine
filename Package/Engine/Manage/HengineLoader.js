@@ -234,8 +234,6 @@ class HengineLoader {
 	}
 	static load(userResources, engineLoaded = false) {
 		async function loadResources() {
-			console.time("loading engine");
-			
 			let scriptHome = document.querySelectorAll("script"); //find yourself
 			for (let el of scriptHome) {
 				if (el.src.indexOf("Engine/Manage/Hengine") > -1) {
@@ -255,6 +253,8 @@ class HengineLoader {
 			rootSrc += "/Engine";
 			console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
 
+			console.time("loading engine");
+			
 			if (!engineLoaded) for (let i = 0; i < HengineLoader.engineResources.length; i++) {
 				const block = HengineLoader.engineResources[i];
 				const promises = [];
@@ -265,6 +265,8 @@ class HengineLoader {
 				}
 				await Promise.all(promises);
 			}
+
+			console.timeEnd("loading engine");
 
 
 			document.body.style.width = "100vw";
@@ -277,6 +279,8 @@ class HengineLoader {
 
 			const loadSuccess = src => console.log(`LOADED RESOURCE [${src}]`);
 			const loadFailure = src => console.warn(`LOADING FAILED FOR RESOURCE [${src}]`);
+
+			console.time("loading user resources");
 
 			for (let i = 0; i < userResources.length; i++) {
 				const userResource = userResources[i];
@@ -308,7 +312,7 @@ class HengineLoader {
 				}
 			}
 
-			console.timeEnd("loading engine");
+			console.timeEnd("loading user resources");
 
 			//450ms;
 		}

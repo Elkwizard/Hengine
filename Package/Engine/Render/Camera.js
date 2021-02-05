@@ -3,12 +3,7 @@ class Camera extends Transform {
 		super(x, y, rotation);
 		this.zoom = zoom;
 		this.engine = engine;
-	}
-	set screen(a) {
-		this._screen = a;
-	}
-	get screen() {
-		return this._screen;
+		this.screen = new Rect(0, 0, 1, 1);
 	}
 	rotateTowards(rotation, ferocity = 0.1) {
 		let dif = Geometry.signedAngularDist(rotation, this.rotation);
@@ -35,7 +30,7 @@ class Camera extends Transform {
 			new Vector2(width / 2, -height / 2),
 			new Vector2(-width / 2, height / 2),
 			new Vector2(-width / 2, -height / 2)
-		].map(v => v.rotate(this.rotation).div(this.zoom).plus(this.position)));
+		].map(v => v.rotate(this.rotation).Ndiv(this.zoom).Vadd(this.position)));
 		return this.screen;
 	}
 	drawInWorldSpace(artist) {
@@ -67,9 +62,9 @@ class Camera extends Transform {
 		renderer.translate(renderer.middle.inverse);
 	}
 	screenSpaceToWorldSpace(point) {
-		return point.minus(middle).rotate(-this.rotation).over(this.zoom).plus(this.position);
+		return point.Vminus(this.engine.renderer.middle).rotate(-this.rotation).Ndiv(this.zoom).Vadd(this.position);
 	}
 	worldSpaceToScreenSpace(point) {
-		return point.minus(this.position).times(this.zoom).rotate(this.rotation).plus(middle);
+		return point.Vminus(this.position).Nmul(this.zoom).rotate(this.rotation).Vadd(this.engine.renderer.middle);
 	}
 }
