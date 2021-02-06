@@ -383,18 +383,7 @@ class WebGLArtist {
 		return this._alpha;
 	}
 	set transform(a) {
-		// if (a instanceof Camera) {
-		// 	const { cosRotation: c, sinRotation: s, zoom: z, position: { x, y } } = a;
-		// 	const m = Matrix3.create(
-		// 		c * z, -s * z, this.width / 2 - x * c * z + y * s * z,
-		// 		s * z, c * z, this.height / 2 - x * s * z - y * c * z,
-		// 		0, 0, 1
-		// 	);
-
-		// 	this.transform = m;
-		// } else {
-			this.gl.setTransform(a.get(this.currentTransform));
-		// }
+		this.gl.setTransform(a.get(this.currentTransform));
 	}
 	get transform() {
 		return this.currentTransform.get();
