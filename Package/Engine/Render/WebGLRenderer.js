@@ -383,7 +383,18 @@ class WebGLArtist {
 		return this._alpha;
 	}
 	set transform(a) {
-		this.gl.setTransform(a.get(this.currentTransform));
+		// if (a instanceof Camera) {
+		// 	const { cosRotation: c, sinRotation: s, zoom: z, position: { x, y } } = a;
+		// 	const m = Matrix3.create(
+		// 		c * z, -s * z, this.width / 2 - x * c * z + y * s * z,
+		// 		s * z, c * z, this.height / 2 - x * s * z - y * c * z,
+		// 		0, 0, 1
+		// 	);
+
+		// 	this.transform = m;
+		// } else {
+			this.gl.setTransform(a.get(this.currentTransform));
+		// }
 	}
 	get transform() {
 		return this.currentTransform.get();
@@ -428,8 +439,7 @@ class WebGLArtist {
 		return n;
 	}
 	clearTransformations() {
-		Matrix3.identity(this.currentTransform);
-		this.gl.setTransform(this.currentTransform);
+		this.gl.setTransform(Matrix3.identity(this.currentTransform));
 	}
 	invertX() {
 		this.translate(this.width, 0);
@@ -450,7 +460,6 @@ class WebGLArtist {
 		// optimized matrix multiplication
 		ct[6] += x * ct[0] + y * ct[3];
 		ct[7] += x * ct[1] + y * ct[4];
-		ct[8] += x * ct[2] + y * ct[5];
 
 		this.gl.setTransform(this.currentTransform);
 	}
@@ -463,8 +472,6 @@ class WebGLArtist {
 		// do scale
 
 		const ct = this.currentTransform;
-
-		
 
 		// Matrix3.mulMatrix(
 		// 	this.currentTransform,
@@ -537,11 +544,9 @@ class WebGLArtist {
 	clear() {
 		this.gl.clear();
 	}
-	clearScreen() {
-		this.fill(Color.WHITE);
-	}
 	beforeFrame() {
-
+		this.clearTransformations();
+		this.scale(this.pixelRatio, this.pixelRatio);
 	}
 	afterFrame() {
 

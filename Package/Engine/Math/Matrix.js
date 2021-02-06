@@ -1,8 +1,8 @@
 class Matrix3 extends Float64Array {
 	constructor(
-		m00 = 0, m01 = 0, m02 = 0,
-		m10 = 0, m11 = 0, m12 = 0,
-		m20 = 0, m21 = 0, m22 = 0
+		m00 = 1, m01 = 0, m02 = 0,
+		m10 = 0, m11 = 1, m12 = 0,
+		m20 = 0, m21 = 0, m22 = 1
 	) {
 		super(9);
 		this[0] = m00;
@@ -85,15 +85,15 @@ ${bottom}`;
 		);
 	}
 	static mulPoint(m, p, result = new Vector2(0)) {
-		let x = m[0] * p.x + m[3] * p.y + m[6];
-		let y = m[1] * p.x + m[4] * p.y + m[7];
+		const x = m[0] * p.x + m[3] * p.y + m[6];
+		const y = m[1] * p.x + m[4] * p.y + m[7];
 		result.x = x;
 		result.y = y;
 		return result;
 	}
 	static rotation(t, result = new Matrix3()) {
-		let c = Math.cos(t);
-		let s = Math.sin(t);
+		const c = Math.cos(t);
+		const s = Math.sin(t);
 		return Matrix3.create(
 			c, -s, 0,
 			s, c, 0,
@@ -126,15 +126,15 @@ ${bottom}`;
 		);
 	}
 	static mulMatrix(M0, M1, result = new Matrix3()) {
-		let m00 = M0[0] * M1[0] + M0[3] * M1[1] + M0[6] * M1[2];
-		let m01 = M0[0] * M1[3] + M0[3] * M1[4] + M0[6] * M1[5];
-		let m02 = M0[0] * M1[6] + M0[3] * M1[7] + M0[6] * M1[8];
-		let m10 = M0[1] * M1[0] + M0[4] * M1[1] + M0[7] * M1[2];
-		let m11 = M0[1] * M1[3] + M0[4] * M1[4] + M0[7] * M1[5];
-		let m12 = M0[1] * M1[6] + M0[4] * M1[7] + M0[7] * M1[8];
-		let m20 = M0[2] * M1[0] + M0[5] * M1[1] + M0[8] * M1[2];
-		let m21 = M0[2] * M1[3] + M0[5] * M1[4] + M0[8] * M1[5];
-		let m22 = M0[2] * M1[6] + M0[5] * M1[7] + M0[8] * M1[8];
+		const m00 = M0[0] * M1[0] + M0[3] * M1[1] + M0[6] * M1[2];
+		const m01 = M0[0] * M1[3] + M0[3] * M1[4] + M0[6] * M1[5];
+		const m02 = M0[0] * M1[6] + M0[3] * M1[7] + M0[6] * M1[8];
+		const m10 = M0[1] * M1[0] + M0[4] * M1[1] + M0[7] * M1[2];
+		const m11 = M0[1] * M1[3] + M0[4] * M1[4] + M0[7] * M1[5];
+		const m12 = M0[1] * M1[6] + M0[4] * M1[7] + M0[7] * M1[8];
+		const m20 = M0[2] * M1[0] + M0[5] * M1[1] + M0[8] * M1[2];
+		const m21 = M0[2] * M1[3] + M0[5] * M1[4] + M0[8] * M1[5];
+		const m22 = M0[2] * M1[6] + M0[5] * M1[7] + M0[8] * M1[8];
 		return Matrix3.create(
 			m00, m01, m02,
 			m10, m11, m12,

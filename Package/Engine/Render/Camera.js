@@ -48,14 +48,14 @@ class Camera extends Transform {
 		renderer.restore();
 	}
 	transformToWorld() {
-		let renderer = this.engine.renderer;
+		const { renderer } = this.engine;
 		renderer.translate(renderer.middle);
 		renderer.rotate(this.rotation);
 		renderer.scale(this.zoom);
 		renderer.translate(this.position.inverse);
 	}
 	transformToScreen() {
-		let renderer = this.engine.renderer;
+		const { renderer } = this.engine;
 		renderer.translate(this.position);
 		renderer.scale(1 / this.zoom);
 		renderer.rotate(-this.rotation);

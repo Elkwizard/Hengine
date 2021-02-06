@@ -815,11 +815,9 @@ class Artist {
 		this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.c.restore();
 	}
-	clearScreen() {
-		this.fill(Color.WHITE);
-	}
 	beforeFrame() {
-
+		this.clearTransformations();
+		this.scale(devicePixelRatio, devicePixelRatio);
 	}
 	afterFrame() {
 
