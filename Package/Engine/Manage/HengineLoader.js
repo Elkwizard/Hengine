@@ -355,7 +355,6 @@ HengineLoader.engineResources = [
 		"Math/Interpolation",
 		
 		"Render/Frame",
-		"Render/Transform",
 		"Render/Font",
 		"Render/Gradient",
 		"Render/Spline",
@@ -372,8 +371,6 @@ HengineLoader.engineResources = [
 		"Scripts/TextArea",
 		
 		"SceneObject/SceneObject",
-		"SceneObject/PhysicsObject",
-		"SceneObject/UIObject",
 		"Render/Color",
 		
 		"Math/Vector",
@@ -381,6 +378,7 @@ HengineLoader.engineResources = [
 		
 		"Render/Shapes",
 		"Render/Animation",
+		"Render/Transform",
 		"Render/Camera",
 		"Render/Webcam",
 		"Render/Graph",
@@ -389,5 +387,9 @@ HengineLoader.engineResources = [
 		"Render/WebGLRenderer",
 		"Render/Renderer",
 		"Render/GPUShader"
+	],
+	[ // high level dependencies
+		"SceneObject/PhysicsObject",
+		"SceneObject/UIObject"
 	]
 ];
