@@ -28,8 +28,8 @@
 			if (mouse.justReleased("Left")) l.thrown = false;
 			this.layer = +l.thrown;
 			if (l.thrown) {
-				let dif = mouse.world.minus(this.transform.globalSpaceToLocalSpace(l.offset));
-				dif.div(1000);
+				let dif = mouse.world.minus(this.transform.localSpaceToGlobalSpace(l.offset));
+				dif.div(100);
 				this.applyImpulseMass(this.transform.position, dif);
 			}
 		},
@@ -50,14 +50,9 @@
 
 	const floor = scene.main.addPhysicsRectElement("floor", width / 2, height, width, 100, false, new Controls("w", "s", "a", "d"), "No Tag");
 
-	mouse.onScroll.listen(dy => (dy < 0) ? scene.camera.zoomIn(0.2) : scene.camera.zoomOut(0.2));
-
-
-
 	intervals.continuous(function (time) {
-		renderer.draw(Color.BLACK).text(Font.Arial30, "Use the mouse wheel to zoom\nClick and drag objects to throw them", 10, 10);
+		renderer.draw(Color.BLACK).text(Font.Arial30, "Click and drag objects to throw them", 10, 10);
 	}, IntervalFunction.AFTER_UPDATE);
 
-	scene.physicsEngine.iterations = 3;
-	scene.physicsEngine.sleepDuration = Infinity;
+	scene.physicsEngine.iterations = 5;
 </script>
