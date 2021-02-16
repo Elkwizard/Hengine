@@ -1,6 +1,6 @@
 <script src="../Hengine.js">
 	title = "Hengine Demos - Physics";
-	
+
 	const BLOCK = new ElementScript("BLOCK", {
 		init(l) {
 			this.draw = () => null;
@@ -28,9 +28,10 @@
 			if (mouse.justReleased("Left")) l.thrown = false;
 			this.layer = +l.thrown;
 			if (l.thrown) {
-				let dif = mouse.world.minus(this.transform.localSpaceToGlobalSpace(l.offset));
+				const pos = this.transform.localSpaceToGlobalSpace(l.offset);
+				let dif = mouse.world.minus(pos);
 				dif.div(100);
-				this.applyImpulseMass(this.transform.position, dif);
+				this.applyImpulseMass(pos, dif);
 			}
 		},
 		escapeDraw(l) {
@@ -41,7 +42,7 @@
 			}
 		}
 	});
-	
+
 	for (let i = 0; i < 50; i++) {
 		const block = scene.main.addPhysicsRectElement("block", width / 2, height - (i + 1) * 40, 40 - i / 100, 40, true, new Controls("w", "s", "a", "d"), "No Tag");
 		BLOCK.addTo(block);

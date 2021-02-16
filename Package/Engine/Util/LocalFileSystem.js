@@ -109,6 +109,13 @@ class FileSystem {
 		this.registerFileType(Texture, ["txr", "img", "bmp", "png", "jpg", "jpeg"]);
 		this.registerFileType(GrayMap, ["gmp", "grm", "map", "grid"]);
 	}
+	set projectName(a) {
+		this._projectName = a;
+	}
+	get projectName() {
+		if ("_projectName" in this) return this._projectName;
+		return this._projectName = document.title;
+	}
 	createFile(name, create) {
 		if (!this.fileExists(name)) this.save(name, create());
 		return this.get(name);
@@ -121,9 +128,6 @@ class FileSystem {
 			this.fileTypes[key] = ObjectType;
 		}
 	}
-	getProjectName() {
-		return document.querySelector("title").innerText;
-	}
 	getFileType(fileName) {
 		let type = fileName.split(".")[1].toLowerCase();
 		return this.fileTypes[type] ?? ByteBuffer;
@@ -131,26 +135,26 @@ class FileSystem {
 	getFilePath(file, loc) {
 		return "HengineLocalSaves\\" + escape(loc) + "\\" + escape(file.split(".")[0]) + "." + file.split(".")[1].toLowerCase();
 	}
-	saveRaw(file, data, loc = this.getProjectName()) {
+	saveRaw(file, data, loc = this.projectName) {
 		LocalFileSystem.put(this.getFilePath(file, loc), data.toString());
 		return data;
 	}
-	getRaw(file, loc = this.getProjectName()) {
+	getRaw(file, loc = this.projectName) {
 		const path = this.getFilePath(file, loc);
 		const result = LocalFileSystem.get(path);
 		if (result !== null) return ByteBuffer.fromString(result);
 		return null;
 	}
-	fileExists(file, loc = this.getProjectName()) {
+	fileExists(file, loc = this.projectName) {
 		return this.getRaw(file, loc) !== null;
 	}
-	save(file, data, loc = this.getProjectName()) {
+	save(file, data, loc = this.projectName) {
 		this.saveRaw(file, data.toByteBuffer(), loc);
 		return data;
 	}
-	fileSize(file, loc = this.getProjectName()) {
+	getFileSize(file, loc = this.projectName) {
 		let data = this.getRaw(file, loc);
-		if (data) return (data.length / 512).toMaxed(1) + "kb";
+		if (data) return (data.data.length / 1024).toMaxed(3) + "kb";
 		return 0;
 	}
 	getAllFiles() {
@@ -164,10 +168,10 @@ class FileSystem {
 		});
 		return files;
 	}
-	deleteFile(file, loc = this.getProjectName()) {
+	deleteFile(file, loc = this.projectName) {
 		LocalFileSystem.clear(this.getFilePath(file, loc));
 	}
-	get(file, loc = this.getProjectName()) {
+	get(file, loc = this.projectName) {
 		let dat = this.getRaw(file, loc);
 		if (dat !== null) {
 			let type = this.getFileType(file);

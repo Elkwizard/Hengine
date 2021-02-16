@@ -1054,6 +1054,17 @@ class PhysicsEngine {
         this.iterations = 4;
         this.sleepDuration = 200;
         this.sleepingActivityThreshold = 0.2;
+
+        this.constraintOrderGenerator = {
+            seed: 123456,
+            next() {
+                this.seed++;
+                let a = (this.seed * 638835776.12849) % 8.7890975;
+                let b = (a * 256783945.4758903) % 2.567890;
+                let r = Math.abs(a * b * 382749.294873597) % 1;
+                return r;
+            }
+        };
     }
     getSleepDuration() {
         return this.sleepDuration * this.iterations;
@@ -1084,7 +1095,7 @@ class PhysicsEngine {
         for (let i = 0; i < this.constraintIterations; i++) {
             let cons = [...this.constraints];
             while (cons.length) {
-                cons.splice(Math.floor(Math.random() * cons.length), 1)[0].solve(int);
+                cons.splice(Math.floor(this.constraintOrderGenerator.next() * cons.length), 1)[0].solve(int);
             }
         }
     }
