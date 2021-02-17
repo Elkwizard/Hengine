@@ -1,7 +1,7 @@
 class ByteBuffer {
-	constructor(bytes = null) {
+	constructor(bytes = null, pointer = 0) {
 		this.data = (bytes !== null) ? new Uint8Array(bytes) : new Uint8Array(2);
-		this.pointer = 0;
+		this.pointer = pointer;
 		this.write = new ByteBuffer.Writer(this);
 		this.read = new ByteBuffer.Reader(this);
 		this.shouldResize = true;
@@ -128,8 +128,9 @@ ByteBuffer.Writer = class {
 		this.int32(length);
 		for (let i = 0; i < length; i++) this[type](data[i]);
 	}
-	byteBuffer(data) {
-		this.array("int8", data.data);
+	byteBuffer(buffer) {
+		this.array("int8", buffer.data);
+		this.int32(buffer.pointer);
 	}
 }
 ByteBuffer.Reader = class {
@@ -207,6 +208,6 @@ ByteBuffer.Reader = class {
 		return result;
 	}
 	byteBuffer() {
-		return new ByteBuffer(this.array("int8"));
+		return new ByteBuffer(this.array("int8"), this.int32());
 	}
 };

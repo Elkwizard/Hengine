@@ -429,6 +429,7 @@ class WebGLArtist {
 	}
 	clearTransformations() {
 		this.gl.setTransform(Matrix3.identity(this.currentTransform));
+		this.scale(this.pixelRatio);
 	}
 	invertX() {
 		this.translate(this.width, 0);

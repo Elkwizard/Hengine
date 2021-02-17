@@ -11,13 +11,13 @@ class WebcamCapture extends ImageType {
 	}
 	async getWebcam() {
 		const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-		this.video = document.createElement("video");
-		this.video.srcObject = mediaStream;
-		this.video.oncanplay = () => {
+		const videoHTML = document.createElement("video");
+		videoHTML.srcObject = mediaStream;
+		videoHTML.oncanplay = () => {
 			console.log("Webcam Streaming");
 			this.video = videoHTML;
 		};
-		this.video.play();
+		videoHTML.play();
 	}
 	getFrame() {
 		let image = this.makeImage();

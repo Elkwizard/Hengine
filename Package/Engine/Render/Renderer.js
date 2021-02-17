@@ -792,6 +792,7 @@ class Artist {
 	}
 	clearTransformations() {
 		this.c.resetTransform();
+		this.scale(this.pixelRatio);
 	}
 	save() {
 		this.c.save();
@@ -817,7 +818,6 @@ class Artist {
 	}
 	beforeFrame() {
 		this.clearTransformations();
-		this.scale(devicePixelRatio, devicePixelRatio);
 	}
 	afterFrame() {
 
@@ -832,7 +832,7 @@ class Artist {
 		this.translate(-x, -y);
 	}
 	drawWithAlpha(a, shape) {
-		let prev = this.alpha;
+		const prev = this.alpha;
 		this.alpha *= a;
 		shape();
 		this.alpha = prev;
