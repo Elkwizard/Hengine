@@ -20,7 +20,6 @@ class Hengine {
 		this.mouse = new MouseHandler(canvas, this);
 		this.keyboard = new KeyboardHandler();
 		this.clipboard = new ClipboardHandler();
-		this.fileSystem = new FileSystem();
 		this.canvas = new CanvasImage(canvas, this);
 		this.renderer = this.canvas.renderer;
 		
@@ -30,6 +29,12 @@ class Hengine {
 
 		//update loops
 		this.intervals = new IntervalManager(this);
+
+		// create file system
+		const segments = location.toString().split("/");
+		const storageKey = `HengineFileSystem://${segments[segments.length - 2] ?? segments[segments.length - 1]}`;
+		this.fileSystem = (storageKey in localStorage) ? FileSystem.fromString(localStorage[storageKey]) : new FileSystem();
+		addEventListener("beforeunload", () => localStorage[storageKey] = this.fileSystem);
 	}
 	end() {
 		exit("Hengine.end()");

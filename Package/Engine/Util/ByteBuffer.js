@@ -1,6 +1,6 @@
 class ByteBuffer {
-	constructor(bytes = null, pointer = 0) {
-		this.data = (bytes !== null) ? new Uint8Array(bytes) : new Uint8Array(2);
+	constructor(bytes = 2, pointer = 0) {
+		this.data = new Uint8Array(bytes);
 		this.pointer = pointer;
 		this.write = new ByteBuffer.Writer(this);
 		this.read = new ByteBuffer.Reader(this);
@@ -23,14 +23,6 @@ class ByteBuffer {
 	finalize() {
 		this.data = this.data.slice(0, this.pointer);
 	}
-	toString() {
-		let result = "";
-		for (let i = 0; i < this.data.length; i += 2) {
-			const charCode = this.data[i] << 8 | (this.data[i + 1] || 0);
-			result += String.fromCharCode(charCode);
-		}
-		return result;
-	}
 	get(buffer = new ByteBuffer()) {
 		buffer.data = this.data.slice(0, this.data.length);
 		buffer.pointer = this.pointer;
@@ -40,16 +32,24 @@ class ByteBuffer {
 	toByteBuffer() {
 		return this;
 	}
-	static fromByteBuffer(buffer) {
-		return buffer.get();
+	toString() {
+		let result = String.fromCharCode(this.pointer >> 16, this.pointer & 0xFFFF);
+		for (let i = 0; i < this.data.length; i += 2) {
+			const charCode = this.data[i] << 8 | (this.data[i + 1] || 0);
+			result += String.fromCharCode(charCode);
+		}
+		return result;
 	}
 	static fromString(string) {
 		const buffer = new ByteBuffer(string.length * 2);
 		buffer.shouldResize = false;
-		for (let i = 0; i < string.length; i++) buffer.write.int16(string.charCodeAt(i));
-		buffer.pointer = 0;
+		for (let i = 2; i < string.length; i++) buffer.write.int16(string.charCodeAt(i));
+		buffer.pointer = (string.charCodeAt(0) << 16) | string.charCodeAt(1);
 		buffer.shouldResize = true;
 		return buffer;
+	}
+	static fromByteBuffer(buffer) {
+		return buffer.get();
 	}
 }
 ByteBuffer.float32ConvertBuffer = new ArrayBuffer(4);

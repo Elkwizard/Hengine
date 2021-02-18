@@ -343,7 +343,7 @@ HengineLoader.engineResources = [
 		
 		"Util/ByteBuffer",
 		"Util/Input",
-		"Util/LocalFileSystem",
+		"Util/FileSystem",
 		"Util/Sound",
 		"Util/Time",
 		
