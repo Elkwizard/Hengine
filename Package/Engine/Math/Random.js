@@ -39,16 +39,16 @@ class Random {
         }
         return n / scl;
     }
-    static noiseTCorrect(t) {
-        return Interpolation.smooth(t);
-    }
     static perlin(x, f = 1, seed = Random.sampleSeed) {
         x *= f;
         x += seed;
         const s_0 = n => Random.seedRand(Math.floor(n));
         let xt = x % 1;
         if (xt < 0) xt++;
-        return Interpolation.lerp(s_0(x), s_0(x + 1), Random.noiseTCorrect(xt));
+        return Interpolation.smoothLerp(
+            s_0(x), s_0(x + 1), 
+            xt
+        );
     }
     static perlin2D(x, y, f = 1, seed = Random.sampleSeed) {
         x *= f;
@@ -60,7 +60,10 @@ class Random {
         let yt = y % 1;
         if (xt < 0) xt++;
         if (yt < 0) yt++;
-        return Interpolation.quadLerp(s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), Random.noiseTCorrect(xt), Random.noiseTCorrect(yt));
+        return Interpolation.smoothQuadLerp(
+            s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), 
+            xt, yt
+        );
     }
     static perlin3D(x, y, z, f = 1, seed = Random.sampleSeed) {
         x *= f;
@@ -76,10 +79,11 @@ class Random {
         if (xt < 0) xt++;
         if (yt < 0) yt++;
         if (zt < 0) zt++;
-        return Interpolation.cubeLerp(
+        return Interpolation.smoothCubeLerp(
             s_p(x, y, z), s_p(x + 1, y, z), s_p(x, y + 1, z), s_p(x + 1, y + 1, z),
             s_p(x, y, z + 1), s_p(x + 1, y, z + 1), s_p(x, y + 1, z + 1), s_p(x + 1, y + 1, z + 1),
-            Random.noiseTCorrect(xt), Random.noiseTCorrect(yt), Random.noiseTCorrect(zt));
+            xt, yt, zt
+        );
     }
     static getVoronoiCell(x) {
         return { x: Math.floor(x) + Random.seedRand(Math.floor(x)) };

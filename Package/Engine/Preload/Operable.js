@@ -29,17 +29,17 @@ class Operable {
     div(v) {
         return this.op(v, Operable.divFunc);
     }
-    plus(v) {
-        return this.get().add(v);
+    plus(v, result) {
+        return this.get(result).add(v);
     }
-    minus(v) {
-        return this.get().sub(v);
+    minus(v, result) {
+        return this.get(result).sub(v);
     }
-    times(v) {
-        return this.get().mul(v);
+    times(v, result) {
+        return this.get(result).mul(v);
     }
-    over(v) {
-        return this.get().div(v);
+    over(v, result) {
+        return this.get(result).div(v);
     }
     map(fn) {
         const result = this.get();

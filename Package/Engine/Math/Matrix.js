@@ -33,6 +33,34 @@ class Matrix3 extends Float64Array {
 	get m21() { return this[5]; } 
 	set m22(a) { this[8] = a; } 
 	get m22() { return this[8]; } 
+	mul(M1) {
+		const m00 = this[0] * M1[0] + this[3] * M1[1] + this[6] * M1[2];
+		const m01 = this[0] * M1[3] + this[3] * M1[4] + this[6] * M1[5];
+		const m02 = this[0] * M1[6] + this[3] * M1[7] + this[6] * M1[8];
+		const m10 = this[1] * M1[0] + this[4] * M1[1] + this[7] * M1[2];
+		const m11 = this[1] * M1[3] + this[4] * M1[4] + this[7] * M1[5];
+		const m12 = this[1] * M1[6] + this[4] * M1[7] + this[7] * M1[8];
+		const m20 = this[2] * M1[0] + this[5] * M1[1] + this[8] * M1[2];
+		const m21 = this[2] * M1[3] + this[5] * M1[4] + this[8] * M1[5];
+		const m22 = this[2] * M1[6] + this[5] * M1[7] + this[8] * M1[8];
+		return Matrix3.create(
+			m00, m01, m02,
+			m10, m11, m12,
+			m20, m21, m22,
+			this
+		);
+	}
+	times(M1, result = null) {
+		if (M1 instanceof Matrix3) return this.get(result ?? new Matrix3()).mul(M1);
+		else {
+			result ??= new Vector2(0);
+			const x = this[0] * M1.x + this[3] * M1.y + this[6];
+			const y = this[1] * M1.x + this[4] * M1.y + this[7];
+			result.x = x;
+			result.y = y;
+			return result;	
+		}
+	}
 	get(result = new Matrix3()) {
 		result[0] = this[0];
 		result[1] = this[1];
@@ -84,13 +112,6 @@ ${bottom}`;
 			result
 		);
 	}
-	static mulPoint(m, p, result = new Vector2(0)) {
-		const x = m[0] * p.x + m[3] * p.y + m[6];
-		const y = m[1] * p.x + m[4] * p.y + m[7];
-		result.x = x;
-		result.y = y;
-		return result;
-	}
 	static rotation(t, result = new Matrix3()) {
 		const c = Math.cos(t);
 		const s = Math.sin(t);
@@ -117,26 +138,9 @@ ${bottom}`;
 			result
 		);
 	}
-	static mulMatrix(M0, M1, result = new Matrix3()) {
-		const m00 = M0[0] * M1[0] + M0[3] * M1[1] + M0[6] * M1[2];
-		const m01 = M0[0] * M1[3] + M0[3] * M1[4] + M0[6] * M1[5];
-		const m02 = M0[0] * M1[6] + M0[3] * M1[7] + M0[6] * M1[8];
-		const m10 = M0[1] * M1[0] + M0[4] * M1[1] + M0[7] * M1[2];
-		const m11 = M0[1] * M1[3] + M0[4] * M1[4] + M0[7] * M1[5];
-		const m12 = M0[1] * M1[6] + M0[4] * M1[7] + M0[7] * M1[8];
-		const m20 = M0[2] * M1[0] + M0[5] * M1[1] + M0[8] * M1[2];
-		const m21 = M0[2] * M1[3] + M0[5] * M1[4] + M0[8] * M1[5];
-		const m22 = M0[2] * M1[6] + M0[5] * M1[7] + M0[8] * M1[8];
-		return Matrix3.create(
-			m00, m01, m02,
-			m10, m11, m12,
-			m20, m21, m22,
-			result
-		);
-	}
 	static mulMatrices(matrices, result = new Matrix3()) {
-		Matrix3.mulMatrix(matrices[matrices.length - 2], matrices[matrices.length - 1], result);
-		for (let i = matrices.length - 3; i >= 0; i--) Matrix3.mulMatrix(matrices[i], result, result);
+		matrices[matrices.length - 2].times(matrices[matrices.length - 1], result);
+		for (let i = matrices.length - 3; i >= 0; i--) matrices[i].times(result, result);
 		return result;
 	}
 }
