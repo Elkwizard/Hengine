@@ -421,7 +421,7 @@ class Artist {
 			},
 			splineArrow(spline) {
 				let { d: { x: Dx, y: Dy } } = spline;
-				const pointA = spline.getPoint(0.95);
+				const pointA = spline.evaluate(0.95);
 				const dx = Dx - pointA.x;
 				const dy = Dy - pointA.y;
 				const m = Math.sqrt(dx ** 2 + dy ** 2);

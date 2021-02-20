@@ -117,14 +117,6 @@ ${bottom}`;
 			result
 		);
 	}
-	static fromTransform(transf, result = new Matrix3()) {
-		return Matrix3.create(
-			transf.cosRotation, -transf.sinRotation, 	transf.position.x,
-			transf.sinRotation, transf.cosRotation, 	transf.position.y,
-			0,					0,						1,
-			result
-		);
-	}
 	static mulMatrix(M0, M1, result = new Matrix3()) {
 		const m00 = M0[0] * M1[0] + M0[3] * M1[1] + M0[6] * M1[2];
 		const m01 = M0[0] * M1[3] + M0[3] * M1[4] + M0[6] * M1[5];

@@ -24,6 +24,7 @@ const DOCS = {
 		"ElementContainer": {},
 	},
 	"Superclasses": {
+		"SceneElement": {},
 		"SceneObject": {},
 		"Operable": {},
 		"Lazy": {}
@@ -60,7 +61,12 @@ const DOCS = {
 			"Spline": {}
 		},
 		"Range": {},
-		"Vector": {},
+		"Vector": {
+			"Vector": {},
+			"Vector2": {},
+			"Vector3": {},
+			"Vector4": {}
+		},
 		"Matrix3": {},
 		"Transform": {},
 		"Geometry": {},
@@ -68,7 +74,6 @@ const DOCS = {
 	},
 	"Physics": {
 		"PhysicsEngine": {},
-		"RigidBody": {},
 		"PhysicsObject": {}
 	},
 	"Input": {
@@ -90,7 +95,6 @@ const DOCS = {
 		"PARTICLE_SPAWNER": {}
 	},
 	"Miscellaneous": {
-		"Time": {},
 		"GPUComputation": {},
 		"FileSystem": {},
 		"Random": {},
@@ -106,4 +110,4 @@ function getListHTML(name, obj) {
 	else return `<div class="nav-section"><span class="nav-section-header">${name}</span><ul class="nav-section-list">${values.map(k => `<li class="nav-section-item">${getListHTML(k, obj[k])}</li>`).join("")}</ul></div>`;
 }
 document.getElementById("navigation").innerHTML = getListHTML("Navigation", DOCS);
-loadPage("Font");
+loadPage("SceneElement");

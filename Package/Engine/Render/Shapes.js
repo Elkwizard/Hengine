@@ -30,7 +30,7 @@ class Line {
 		return dy / dx;
 	}
 	evaluate(x) {
-		return this.slope * x + this.a.y;
+		return this.slope * (x - this.a.x) + this.a.y;
 	}
 }
 class Range {
@@ -93,37 +93,24 @@ class Range {
 	}
 }
 class Shape extends Operable {
-	constructor() { 
+	constructor() {
 		super();
 		this.area = 0;
 	}
-	get middle() {
-		return Vector2.origin;
-	}
-	getBoundingBox() {
-		// return the smallest rectangle that contains the shape
-		return new Rect(0, 0, 0, 0);
-	}
-	getModel(transf) {
-		// return the world space model of the relative shape
-		return new Shape(0);
-	}
-	center(pos) {
-		// center the polygon at _pos_
-	}
-	scale(factor) {
-		// scale the shape about its center by _factor_
-	}
-	scaleAbout(pos, factor) {
-		// scale shape relative to _pos_ by _factor_
-	}
-	move(dir) {
-		// move by _dir_
-	}
-	get(result = new Shape()) {
-		// return a copy of the shape
-		return new Shape();
-	}
+	get middle() { }
+	getModel(transf) { }
+	center(pos) { }
+	scale(factor) { }
+	scaleX(factor) { }
+	scaleY(factor) { }
+	scaleAbout(pos, factor) { }
+	scaleXAbout(pos, factor) { }
+	scaleYAbout(pos, factor) { }
+	move(dir) { }
+	getBoundingBox() { }
+	get(result = new Circle(0, 0, 0)) { }
+	toPhysicsShape() { }
+	static fromPhysicsShape(sh) { }
 }
 Shape.modValues = [];
 class Polygon extends Shape {
@@ -132,7 +119,7 @@ class Polygon extends Shape {
 		if (vertices.length) {
 			let length = vertices.length;
 			vertices = vertices.slice(0, length);
-			
+
 			// make clockwise
 			let signedArea = 0;
 			for (let i = 0; i < length; i++) {
@@ -169,7 +156,7 @@ class Polygon extends Shape {
 				let nX = m_cos * difX - m_sin * difY;
 				let nY = m_sin * difX + m_cos * difY;
 				return new Vector2(nX + pos.x, nY + pos.y);
-				
+
 			});
 		return new Polygon(verts, true);
 	}
@@ -302,7 +289,7 @@ class Rect extends Polygon {
 		let m = height / width;
 
 		let w, h;
-		
+
 		if (m * this.width / 2 < this.height / 2) {
 			w = this.width;
 			h = m * this.width;
@@ -422,6 +409,12 @@ class Circle extends Shape {
 	}
 	scale(factor) {
 		return new Circle(this.x, this.y, this.radius * factor)
+	}
+	scaleX(factor) {
+		return this.scale(factor);	
+	}
+	scaleY(factor) {
+		return this.scale(factor);
 	}
 	scaleAbout(pos, factor) {
 		let nPos = pos.plus((new Vector2(this.x, this.y)).Vminus(pos).Ntimes(factor));

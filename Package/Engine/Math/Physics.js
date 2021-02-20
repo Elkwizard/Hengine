@@ -31,7 +31,7 @@ class PhysicsVector {
         return this;
     }
     normalize() {
-        let m = PhysicsVector.mag(this);
+        const m = this.mag();
         if (m) {
             this.x /= m;
             this.y /= m;
@@ -41,43 +41,43 @@ class PhysicsVector {
     equals(v) {
         return Math.abs(this.x - v.x) < 1.0001 && Math.abs(this.y - v.y) < 1.0001;
     }
-    static add(a, b) {
-        return new PhysicsVector(a.x + b.x, a.y + b.y);
+    plus(b) {
+        return new PhysicsVector(this.x + b.x, this.y + b.y);
     }
-    static sub(a, b) {
-        return new PhysicsVector(a.x - b.x, a.y - b.y);
+    minus(b) {
+        return new PhysicsVector(this.x - b.x, this.y - b.y);
     }
-    static mul(a, b) {
-        return new PhysicsVector(a.x * b, a.y * b);
+    times(b) {
+        return new PhysicsVector(this.x * b, this.y * b);
     }
-    static div(a, b) {
-        return new PhysicsVector(a.x / b, a.y / b);
+    over(b) {
+        return new PhysicsVector(this.x / b, this.y / b);
     }
-    static dot(a, b) {
-        return a.x * b.x + a.y * b.y;
+    dot(b) {
+        return this.x * b.x + this.y * b.y;
     }
-    static cross(a, b) {
-        return a.x * b.y - a.y * b.x;
+    cross(b) {
+        return this.x * b.y - this.y * b.x;
+    }
+    inverse() {
+        return new PhysicsVector(-this.x, -this.y);
+    }
+    mag() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+    sqrMag() {
+        return this.x * this.x + this.y * this.y;
+    }
+    normalized() {
+        let mag = this.mag();
+        if (!mag) return new PhysicsVector(0, 0);
+        return new PhysicsVector(this.x / mag, this.y / mag);
+    }
+    normal() {
+        return new PhysicsVector(-this.y, this.x);
     }
     static crossNV(a, b) {
         return new PhysicsVector(-a * b.y, a * b.x);
-    }
-    static invert(a) {
-        return new PhysicsVector(-a.x, -a.y);
-    }
-    static mag(a) {
-        return Math.sqrt(a.x * a.x + a.y * a.y);
-    }
-    static sqrMag(a) {
-        return a.x * a.x + a.y * a.y;
-    }
-    static normalize(a) {
-        let mag = PhysicsVector.mag(a);
-        if (!mag) return new PhysicsVector(0, 0);
-        return new PhysicsVector(a.x / mag, a.y / mag);
-    }
-    static normal(a) {
-        return new PhysicsVector(-a.y, a.x);
     }
 }
 PhysicsVector.__ = [new PhysicsVector(0, 0), new PhysicsVector(0, 0), new PhysicsVector(0, 0), new PhysicsVector(0, 0)];
@@ -434,7 +434,7 @@ class RigidBody {
         return sh;
     }
     integrate(intensity) {
-        let dif = PhysicsVector.mul(this.velocity, intensity);
+        let dif = this.velocity.times(intensity);
         if (this.canRotate) {
             this.position.add(dif);
             this.angle += this.angularVelocity * intensity;
@@ -461,9 +461,9 @@ class RigidBody {
         }
     }
     static fromPolygon(vertices, type = RigidBody.DYNAMIC) {
-        let position = vertices.reduce((a, b) => PhysicsVector.add(a, b));
+        let position = vertices.reduce((a, b) => a.plus(b));
         position.div(vertices.length);
-        vertices = vertices.map(e => PhysicsVector.sub(e, position));
+        vertices = vertices.map(e => e.minus(position));
         let body = new RigidBody(position.x, position.y, type);
         body.addShape(new PolygonCollider(vertices));
         return body;
@@ -495,8 +495,6 @@ class CollisionDetector {
         return CollisionDetector.jumpTable[shapeA.constructor.SYMBOL][shapeB.constructor.SYMBOL](shapeA, shapeB);
     }
     static CircleModel_PolygonModel(a, b) {
-        //CLOSEST POINT
-
         let bestDist = Infinity;
         let bestPoint = null;
         let ax = a.position.x;
@@ -545,17 +543,17 @@ class CollisionDetector {
             }
         }
         if (bestPoint) {
-            let between = PhysicsVector.sub(bestPoint, a.position);
+            let between = bestPoint.minus(a.position);
             bestDist = Math.sqrt(bestDist);
             let axis = PhysicsVector.normalize(between);
 
-            let toB = PhysicsVector.sub(a.position, b.position);
-            let inside = PhysicsVector.dot(toB, axis) > 0;
+            let toB = a.position.minus(b.position);
+            let inside = toB.dot(axis) > 0;
 
             if (bestDist > a.radius && !inside) return null;
 
             if (inside) {
-                axis = PhysicsVector.invert(axis);
+                axis = axis.inverse();
                 bestDist = bestDist + a.radius;
             } else bestDist = a.radius - bestDist;
 
@@ -581,8 +579,8 @@ class CollisionDetector {
         return col;
     }
     static CircleModel_CircleModel(a, b) {
-        let between = PhysicsVector.sub(b.position, a.position);
-        let sqrMag = PhysicsVector.sqrMag(between);
+        let between = b.position.minus(a.position);
+        let sqrMag = between.sqrMag();
         if (sqrMag < (a.radius + b.radius) ** 2) {
             let axis = between.normalize();
             let point = new PhysicsVector((axis.x * a.radius + a.position.x + axis.x * -b.radius + b.position.x) / 2, (axis.y * a.radius + a.position.y + axis.y * -b.radius + b.position.y) / 2);
@@ -597,9 +595,9 @@ class CollisionDetector {
         return null;
     }
     static PolygonModel_PolygonModel(a, b) {
-        let toB = PhysicsVector.sub(b.position, a.position);
+        let toB = b.position.minus(a.position);
 
-        let axes = [...a.axes.map(ax => PhysicsVector.invert(ax)), ...b.axes].filter(ax => PhysicsVector.dot(ax, toB) > 0);
+        let axes = [...a.axes.map(ax => ax.inverse()), ...b.axes].filter(ax => ax.dot(toB) > 0);
         if (!axes.length) return null;
         let minOverlap = Infinity;
         let bestAxis = null;
@@ -611,12 +609,12 @@ class CollisionDetector {
             let bMin = Infinity;
             let bMax = -Infinity;
             for (let j = 0; j < a.vertices.length; j++) {
-                let dot = PhysicsVector.dot(a.vertices[j], axis);
+                let dot = a.vertices[j].dot(axis);
                 if (dot < aMin) aMin = dot;
                 if (dot > aMax) aMax = dot;
             }
             for (let j = 0; j < b.vertices.length; j++) {
-                let dot = PhysicsVector.dot(b.vertices[j], axis);
+                let dot = b.vertices[j].dot(axis);
                 if (dot < bMin) bMin = dot;
                 if (dot > bMax) bMax = dot;
             }
@@ -655,7 +653,7 @@ class CollisionDetector {
 
         let contacts = intersections
             .map(contact => {
-                let dot = PhysicsVector.dot(contact, bestAxis);
+                let dot = contact.dot(bestAxis);
                 let pen = Math.abs((rMax - rMin) / 2 - Math.abs(dot - (rMin + rMax) / 2));
                 return new CollisionDetector.Contact(contact, Math.max(pen, 0.01) || 0.0001);
             });
@@ -707,7 +705,7 @@ class CollisionResolver {
     getJ(vAB, mA, mB, iA, iB, e, n, rA, rB) {
         // let inertiaTerm = ((rA × n) × rA) ÷ iA + ((rB × n) × rB) ÷ iB) · n;// nice
         //optimized
-        let inertiaTerm = PhysicsVector.dot(PhysicsVector.add(PhysicsVector.div(PhysicsVector.crossNV(PhysicsVector.cross(rA, n), rA), iA), PhysicsVector.div(PhysicsVector.crossNV(PhysicsVector.cross(rB, n), rB), iB)), n);
+        let inertiaTerm = PhysicsVector.crossNV(rA.cross(n), rA).over(iA).plus(PhysicsVector.crossNV(rB.cross(n), rB).over(iB)).dot(n);
         // console.log(inertiaTerm);
         // let inertiaTerm = (n.x ** 2 * (iB * rA.y ** 2 + iA * rB.y ** 2)
         //     + n.y ** 2 * (iB * rA.x ** 2 + iA * rB.x ** 2)
@@ -716,13 +714,13 @@ class CollisionResolver {
         // let inertiaTerm = ((-iB * n.x ** 2 + rA.y) * (rA.x + rA.y) + (iA * n.y ** 2 * rB.x) * (rB.x - rB.y) + (n.x * n.y) * ((iB * rA.x) * (rA.x - rA.y) - (iA * rB.y) * (rB.x - rB.y))) / (iA * iB);
 
         let invMassSum = 1 / mA + 1 / mB + inertiaTerm;
-        let j = (1 + e) * PhysicsVector.dot(vAB, n) / invMassSum;
+        let j = (1 + e) * vAB.dot(n) / invMassSum;
         return j;
     }
     dynamicResolve(bodyA, bodyB, direction, penetration, contacts) {
-        let move = PhysicsVector.mul(direction, penetration);
-        let moveA = PhysicsVector.mul(move, -bodyB.mass / (bodyA.mass + bodyB.mass));
-        let moveB = PhysicsVector.mul(move, bodyA.mass / (bodyA.mass + bodyB.mass));
+        let move = direction.times(penetration);
+        let moveA = move.times(-bodyB.mass / (bodyA.mass + bodyB.mass));
+        let moveB = move.times(bodyA.mass / (bodyA.mass + bodyB.mass));
         bodyA.displace(moveA)
         if (bodyB.canMoveThisStep) bodyB.displace(moveB);
 
@@ -739,23 +737,21 @@ class CollisionResolver {
 
             //normal
             let vAB = bodyB.pointVelocity(contact.point).sub(bodyA.pointVelocity(contact.point));
-            let rA = PhysicsVector.sub(contact.point, bodyA.position);
-            let rB = PhysicsVector.sub(contact.point, bodyB.position);
+            let rA = contact.point.minus(bodyA.position);
+            let rB = contact.point.minus(bodyB.position);
             let e = Math.max(bodyA.restitution, bodyB.restitution);
             let n = direction;
-            // assert(PhysicsVector.dot(vAB, n) <= 0, "Traveling toward collision");
-            // if (PhysicsVector.dot(vAB, n) > -0.01) continue;
             let j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
 
-            let impulseA_n = PhysicsVector.mul(n, j_n);
-            let impulseB_n = PhysicsVector.invert(impulseA_n);
+            let impulseA_n = n.times(j_n);
+            let impulseB_n = impulseA_n.inverse();
 
             //friction
-            let t = PhysicsVector.normal(direction);
+            let t = direction.normal();
             let j_t = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, t, rA, rB) * factor * friction;
 
-            let impulseA_t = PhysicsVector.mul(t, j_t);
-            let impulseB_t = PhysicsVector.invert(impulseA_t);
+            let impulseA_t = t.times(j_t);
+            let impulseB_t = impulseA_t.inverse();
 
 
 
@@ -776,7 +772,7 @@ class CollisionResolver {
     }
     staticResolve(bodyA, bodyB, direction, penetration, contacts) {
 
-        let move = PhysicsVector.mul(direction, -penetration);
+        let move = direction.times(-penetration);
         bodyA.displace(move);
 
         let friction = (bodyA.friction * bodyB.friction) / this.engine.iterations;
@@ -791,19 +787,17 @@ class CollisionResolver {
 
             let vAB = bodyA.pointVelocity(contact.point);
             let e = bodyA.restitution;
-            let rA = PhysicsVector.sub(contact.point, bodyA.position);
+            let rA = contact.point.minus(bodyA.position);
             let rB = new PhysicsVector(0, 0);
             let n = direction;
-            // if (PhysicsVector.dot(vAB, n) <= 0) continue;
             let j_n = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, n, rA, rB) * factor;
-            let impulseA_n = PhysicsVector.mul(n, j_n);
+            let impulseA_n = n.times(j_n);
 
-            let t = PhysicsVector.normal(n);
+            let t = n.normal();
             let j_t = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, t, rA, rB) * factor * friction;
-            let impulseA_t = PhysicsVector.mul(t, j_t);
+            let impulseA_t = t.times(j_t);
 
-            let impulseA = PhysicsVector.add(impulseA_n, impulseA_t);
-            // console.log(j_n + 2 * bodyA.mass * PhysicsVector.dot(vAB, n));
+            let impulseA = impulseA_n.plus(impulseA_t);
             impulsesA.push({ point: contact.point, impulse: impulseA });
         }
         for (let impulse of impulsesA) {
@@ -1142,7 +1136,7 @@ class PhysicsEngine {
         }
 
         if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
-            let dot = PhysicsVector.dot(body2.prohibitedDirections[i], collisionDirection);
+            let dot = body2.prohibitedDirections[i].dot(collisionDirection);
             if (dot > 0.8) {
                 STATIC = true;
                 break;
@@ -1204,7 +1198,7 @@ class PhysicsEngine {
                     for (let cI = 0; cI < collisions.length; cI++) dir.add(collisions[cI].direction);
                     for (let cI = 0; cI < collisions.length; cI++) {
                         let col = collisions[cI];
-                        if (PhysicsVector.dot(col.direction, dir) < 0) continue;
+                        if (col.direction.dot(dir) < 0) continue;
                         contacts.push(...col.contacts);
                         if (col.penetration > penetration) {
                             penetration = col.penetration;
@@ -1214,7 +1208,7 @@ class PhysicsEngine {
                     if (!contacts.length) continue;
                     best.contacts = contacts;
                     dir = PhysicsVector.normalize(dir);
-                    let dot = PhysicsVector.dot(dir, best.direction);
+                    const dot = best.direction.dot(dir);
                     best.penetration *= dot;
                     best.direction = dir;
                     this.resolve(body, body2, best);
@@ -1270,8 +1264,8 @@ class PhysicsEngine {
     lowActivity(body) {
         if (body.type === RigidBody.STATIC) return true;
 
-        const positionChange = PhysicsVector.sqrMag(PhysicsVector.sub(body.position, body.lastPosition));
-        const velocity = PhysicsVector.sqrMag(body.velocity);
+        const positionChange = body.position.minus(body.lastPosition).sqrMag();
+        const velocity = body.velocity.sqrMag();
         const angleChange = Math.abs(body.angle - body.lastAngle);
         const angularVelocity = Math.abs(body.angularVelocity);
 

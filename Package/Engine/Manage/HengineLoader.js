@@ -345,7 +345,6 @@ HengineLoader.engineResources = [
 		"Util/Input",
 		"Util/FileSystem",
 		"Util/Sound",
-		"Util/Time",
 		
 		"Math/Matrix",
 		"Math/Geometry",

@@ -17,6 +17,10 @@ class Random {
     static color() {
         return new Color(Random.random() * 255, Random.random() * 255, Random.random() * 255, 1);
     }
+    static choice(arr) {
+        if (!Array.isArray(arr)) arr = Array.from(arr);
+        return arr[Math.floor(Random.random() * arr.length)];
+    }
     static octave(oc, alg, ...sampleAndFreq) {
         const freq = sampleAndFreq.pop();
         let sample = sampleAndFreq;
@@ -34,10 +38,6 @@ class Random {
             n += alg(...sample, freq * i, seed) / i;
         }
         return n / scl;
-    }
-    static choice(arr) {
-        if (!Array.isArray(arr)) arr = Array.from(arr);
-        return arr[Math.floor(Random.random() * arr.length)];
     }
     static noiseTCorrect(t) {
         return Interpolation.smooth(t);

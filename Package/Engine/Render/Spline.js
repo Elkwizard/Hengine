@@ -5,7 +5,7 @@ class Spline {
         this.c = c;
         this.d = d;
     }
-    getPoint(t) {
+    evaluate(t) {
         return Vector.lerp(Vector.lerp(Vector.lerp(this.a, this.b, t), Vector.lerp(this.b, this.c, t), t), Vector.lerp(Vector.lerp(this.b, this.c, t), Vector.lerp(this.c, this.d, t), t), t);
     }
 }

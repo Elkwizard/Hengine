@@ -258,12 +258,9 @@ class Geometry {
 
         return result;
     }
-    static distToLineObject(p, l) {
-        let cp = Geometry.closestPointOnLineObject(p, l);
+    static distToLine(p, l) {
+        let cp = Geometry.closestPointOnLine(p, l);
         return Vector2.dist(p, cp);
-    }
-    static distToCircle(p, c) {
-        return Vector2.dist(p, c) - c.radius;
     }
     static closest(p, points) {
         let bestDist = Infinity;
@@ -314,9 +311,6 @@ class Geometry {
         }
         result.corner = farthest;
         return result;
-    }
-    static projectPointOntoLine(p, d) {
-        return p.x * d.x + p.y * d.y;
     }
     static rayCast(p, r, shapes) {
         let hit = null;
@@ -393,43 +387,17 @@ class Geometry {
         }
         return { hitPoint: hit, hitShape };
     }
-    static closestPointOnLineObjectInDirection(p, d, l) {
-        let x1 = p.x;
-        let y1 = p.y;
-        let dx1 = d.x;
-        let dy1 = d.y;
-        let x2 = l.a.x;
-        let y2 = l.a.y;
-        let dx2 = l.b.x - l.a.x;
-        let dy2 = l.b.y - l.a.y;
-        let rightSide = (y1 - (dy1 / dx1) * x1) - (y2 - (dy2 / dx2) * x2);
-        let leftCof = (dy2 / dx2) - (dy1 / dx1);
-        const MIN = Math.min(l.a.x, l.b.x);
-        const MAX = Math.max(l.a.x, l.b.x);
-        let x = Number.clamp(rightSide / leftCof, MIN, MAX);
-        let y = (dy1 / dx1) * x + y1 - (dy1 / dx1) * x1;
-        return new Vector2(x, y);
-    }
-    static closestPointOnLineObject(p, l) {
+    static closestPointOnLine(p, l) {
         return p.Vminus(l.a).projectOnto(l.b.Vminus(l.a)).Vplus(l.a);
     }
-    static closestPointOnLineObjectLimited(p, l) {
+    static closestPointOnLineLimited(p, l) {
         let outOfBounds = false;
-        let onLine = Geometry.closestPointOnLineObject(p, l);
+        let onLine = Geometry.closestPointOnLine(p, l);
         let xRange = new Range(l.a.x, l.b.x);
         let yRange = new Range(l.a.y, l.b.y);
         if (!xRange.includes(onLine.x)) outOfBounds = true;
         else if (!yRange.includes(onLine.y)) outOfBounds = true;
         return { result: new Vector2(X, Y), outOfBounds };
-    }
-    static closestPointOnLine(p, d) {
-        let x1 = p.x;
-        let y1 = p.y;
-        let dx = d.x;
-        let dy = d.y;
-        let xv = ((dx ** 2) * x1 + (dx * dy * y1)) / (dx ** 2 + dy ** 2);
-        let yv = (dy / dx) * xv;
-        return new Vector2(xv, yv);
     }
     static subdividePolygonList(vertices) {
         vertices = [...vertices];
@@ -582,16 +550,15 @@ class Geometry {
         return result;
     }
     static overlapLineLine(l1, l2) {
-        let pol = Geometry.projectPointOntoLine;
         let dirs = [
             Vector2.fromAngle(l1.b.Vminus(l1.a).getAngle() + Math.PI / 2),
             Vector2.fromAngle(l2.b.Vminus(l2.a).getAngle() + Math.PI / 2),
         ];
         for (let dir of dirs) {
-            let a = pol(l1.a, dir);
-            let b = pol(l1.b, dir);
-            let a2 = pol(l2.a, dir);
-            let b2 = pol(l2.b, dir);
+            let a = l1.a.dot(dir);
+            let b = l1.b.dot(dir);
+            let a2 = l2.a.dot(dir);
+            let b2 = l2.b.dot(dir);
             if (b < a) [a, b] = [b, a];
             if (b2 < a2) [a2, b2] = [b2, a2];
             if (!(b > a2 && a < b2)) return false;
@@ -599,7 +566,7 @@ class Geometry {
         return true;
     }
     static overlapShapes(r1, r2) {
-        return physicsAPIcollideShapes(r1, r2);
+        return physicsAPICollideShapes(r1, r2);
     }
     static overlapPoint(p, shape) {
         if (shape instanceof Circle) return Geometry.pointInsideCircle(p, shape);
@@ -611,8 +578,8 @@ class Geometry {
     static closestPointOnRect(point, rect) {
         return Vector2.clamp(point, rect.min, rect.max);
     }
-    static closestPointOnCircle(p, circle) {
-        let dif = new Vector2(p.x - circle.x, p.y - circle.y);
+    static closestPointOnCircle(point, circle) {
+        let dif = new Vector2(point.x - circle.x, point.y - circle.y);
         dif.mag = circle.radius;
         dif.add(circle);
         return dif;
@@ -626,7 +593,7 @@ class Geometry {
         let bestPoint = null;
         let bestDist = Infinity;
         for (let edge of edges) {
-            let p = Geometry.closestPointOnLineObject(point, edge);
+            let p = Geometry.closestPointOnLine(point, edge);
             let dist = Vector2.sqrDist(p, point);
             if (dist < bestDist) {
                 bestDist = dist;
@@ -636,23 +603,23 @@ class Geometry {
         return bestPoint;
     }
     // dist
-    static distToRect(p, rect) {
-        return Vector2.dist(p, Geometry.closestPointOnRect(p, rect));
+    static distToRect(point, rect) {
+        return Vector2.dist(point, Geometry.closestPointOnRect(point, rect));
     }
-    static distToCircle(p, circle) {
-        return Vector2.dist(p, Geometry.closestPointOnCircle(p, circle));
+    static distToCircle(point, circle) {
+        return Vector2.dist(point, circle.middle) - radius;
     }
-    static distToPolygon(p, polygon) {
-        return Vector2.dist(p, Geometry.closestPointOnPolygon(p, polygon));
+    static distToPolygon(point, polygon) {
+        return Vector2.dist(point, Geometry.closestPointOnPolygon(point, polygon));
     }
     // point inside
-    static pointInsideRect(p, rect) {
-        return p.x > rect.x && p.y > rect.y && p.x < rect.x + rect.width && p.y < rect.y + rect.height;
+    static pointInsideRect(point, rect) {
+        return point.x > rect.x && point.y > rect.y && point.x < rect.x + rect.width && point.y < rect.y + rect.height;
     }
-    static pointInsideCircle(p, circle) {
-        return Vector2.sqrDist(p, circle) < circle.radius ** 2;
+    static pointInsideCircle(point, circle) {
+        return Vector2.sqrDist(point, circle) < circle.radius ** 2;
     }
-    static pointInsidePolygon(p, polygon) {
+    static pointInsidePolygon(point, polygon) {
         let axes = [];
         let poly = polygon.vertices;
         for (let i = 0; i < poly.length; i++) {
@@ -661,14 +628,14 @@ class Geometry {
         for (let i = 0; i < axes.length; i++) {
             let axis = axes[i];
             let range = Range.fromValues(poly.map(v => v.dot(axis)));
-            let proj = p.dot(axis);
+            let proj = point.dot(axis);
             if (!range.includes(proj)) return false;
         }
         return true;
     }
     // overlap
     static overlapPolygonPolygon(polygon, polygon2) {
-        return physicsAPIcollideShapes(polygon, polygon2);
+        return physicsAPICollideShapes(polygon, polygon2);
     }
     static overlapRectRect(rect, rect2) {
         if (!rect || !rect2) return false;

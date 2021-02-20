@@ -1,4 +1,4 @@
-function physicsAPIcollideShapes(shape, shape2) {
+function physicsAPICollideShapes(shape, shape2) {
     return !!CollisionDetector.collide(
         shape.toPhysicsShape().getModel(new PhysicsVector(0, 0), 1, 0),
         shape2.toPhysicsShape().getModel(new PhysicsVector(0, 0), 1, 0)

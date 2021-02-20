@@ -43,8 +43,7 @@ class Vector extends Operable {
 		return this.get().normalize();
 	}
 	set inverse(a) {
-		this.x = -a.x;
-		this.y = -a.y;
+		a.inverse.get(this);
 	}
 	get inverse() {
 		return this.times(-1);
@@ -133,19 +132,6 @@ class Vector extends Operable {
 	}
 }
 Vector.modValues = [];
-class Vector1 extends Vector {
-	constructor(x) {
-		super();
-		this.x = x;
-	}
-	static get origin() {
-		return new Vector1(0);
-	}
-	static x(x) {
-		return new Vector1(x);
-	}
-}
-Vector1.modValues = ["x"];
 class Vector2 extends Vector {
 	constructor(x, y = x) {
 		super();
@@ -494,7 +480,6 @@ Vector4.modValues = ["x", "y", "z", "w"];
 	const nN = window.isNaN.bind(window);
 	window.isNaN = function (n) {
 		if (n instanceof Vector) {
-			if (n instanceof Vector1) return nN(n.x);
 			if (n instanceof Vector2) return nN(n.x) || nN(n.y);
 			if (n instanceof Vector3) return nN(n.x) || nN(n.y) || nN(n.z);
 			if (n instanceof Vector4) return nN(n.x) || nN(n.y) || nN(n.z) || nN(n.w);

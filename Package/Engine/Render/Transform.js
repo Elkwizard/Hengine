@@ -47,11 +47,11 @@ class Transform extends Matrix3 {
 	get rotation() {
 		return this._rotation;
 	}
+	set direction(v) {
+		this.rotation = v.angle;
+	}
 	get direction() {
 		return new Vector2(this.cosRotation, this.sinRotation);
-	}
-	set direction(v) {
-		this.angle = v.angle;
 	}
 	get(transf = new Transform(0, 0, 0)) {
 		transf.position = this.position;

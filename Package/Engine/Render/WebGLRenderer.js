@@ -148,7 +148,7 @@ class WebGLArtist {
 				let inc = 1 / prec;
 				let vertices = [spline.a.x, spline.a.y];
 				for (let i = 0; i < 1; i += inc) {
-					const p = spline.getPoint(i);
+					const p = spline.evaluate(i);
 					vertices.push(p.x, p.y);
 				}
 				vertices.push(spline.d.x, spline.d.y);
