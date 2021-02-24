@@ -545,7 +545,7 @@ class CollisionDetector {
         if (bestPoint) {
             let between = bestPoint.minus(a.position);
             bestDist = Math.sqrt(bestDist);
-            let axis = PhysicsVector.normalize(between);
+            let axis = between.normalized();
 
             let toB = a.position.minus(b.position);
             let inside = toB.dot(axis) > 0;
@@ -1207,7 +1207,7 @@ class PhysicsEngine {
                     }
                     if (!contacts.length) continue;
                     best.contacts = contacts;
-                    dir = PhysicsVector.normalize(dir);
+                    dir = dir.normalized();
                     const dot = best.direction.dot(dir);
                     best.penetration *= dot;
                     best.direction = dir;

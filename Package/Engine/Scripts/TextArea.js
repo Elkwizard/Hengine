@@ -190,7 +190,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		if (key.slice(0, 5) === "Arrow") {
 			if (l.selectionEnd === l.selectionStart || shift) {
 				if (control) {
-					const segments = l.value.split(/\b/g);
+					const segments = l.getSelectableSegments();
 					let index = 0;
 					for (let i = 0; i < segments.length; i++) {
 						const seg = segments[i];
@@ -325,6 +325,29 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 	getMousePosition(l) {
 		return (this instanceof UIObject) ? mouse.screen : mouse.world;
 	},
+	getSelectableSegments(l) {
+		const segments = [];
+		let acc = "";
+
+		const type = char => {
+			if (char === "\n") return 0;
+			if (char.match(/\s/g)) return 1;
+			if (char.match(/\W/g)) return 2;
+			return 3; 
+		}
+
+		for (let i = 0; i < l.value.length; i++) {
+			const char = l.value[i];
+			const next = l.value[i + 1];
+			acc += char;
+			if (!next || type(char) !== type(next)) {
+				segments.push(acc);
+				acc = "";
+			}
+		}
+
+		return segments;
+	},
 	beforeUpdate(l) {
 		TEXT_AREA.staticData.anyTextAreaHovered = false;
 	},
@@ -337,15 +360,17 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		if (inTextArea) TEXT_AREA.staticData.anyTextAreaHovered = true;
 
 		const doubleClick = l.mouse.justPressed("Left") && l.clickTimer < 15 && inTextArea;
+	
+		const lastSelection = l.selectionEnd;
 
-		if (l.mouse.justPressed("Left") && !doubleClick) {
+		if (l.mouse.justPressed("Left")) {
 			if (inTextArea) {
-				l.highlighting = !!l.select(l.getMousePosition(), "start");
+				l.highlighting = !!l.select(l.getMousePosition(), "start") && !doubleClick;
 			} else l.focused = false;
 		}
 
 		if (l.mouse.pressed("Left") && l.highlighting) {
-			let selection = l.select(l.getMousePosition(), "move");
+			const selection = l.select(l.getMousePosition(), "move");
 			if (selection && selection.changed) {
 				let relativeMousePosition = this.transform.globalSpaceToLocalSpace(l.getMousePosition());
 				if (relativeMousePosition.x > l.relativeTextViewBox.max.x) l.scrollOffset.x += l.scrollSpeed / 4;
@@ -356,8 +381,9 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		}
 		if (l.mouse.released("Left")) l.highlighting = false;
 
-		if (doubleClick) {
-			const segments = l.value.split(/\b/g);
+		if (doubleClick && l.selectionEnd === lastSelection) {
+
+			const segments = l.getSelectableSegments();
 			let index = 0;
 			for (let i = 0; i < segments.length; i++) {
 				const seg = segments[i];
@@ -368,6 +394,7 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 				}
 				index += seg.length;
 			}
+			l.clickTimer = Infinity;
 		}
 
 		if (l.mouse.justPressed("Left") && !doubleClick) l.clickTimer = 0;
