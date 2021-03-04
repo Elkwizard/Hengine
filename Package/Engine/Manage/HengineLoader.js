@@ -143,9 +143,9 @@ class HengineAnimationResource extends HengineResource {
 		});
 	}
 }
-class HengineFontResource extends HengineResource {
+class HengineFontResource {
 	constructor(src) {
-		super(src);
+		this.src = src;
 	}
 	load() {
 		const style = document.createElement("style");
@@ -153,15 +153,16 @@ class HengineFontResource extends HengineResource {
 
 		return new Promise(async resolve => {
 			style.onload = () => {
-				document.fonts.ready.then(() => {
-					resolve(style);
-				});
+				const { family } = [...document.fonts][document.fonts.size - 1];
+				const testCSS = "20px " + family;
+				document.fonts.load(testCSS, HengineFontResource.TEST_STRING).then(() => resolve(family));
 			};
 			style.onerror = () => resolve(null);
 			document.head.appendChild(style);
 		});
 	}
 }
+HengineFontResource.TEST_STRING = String.fromCharCode(...new Array(255).fill(0).map((_, code) => code));
 
 class HengineLoader {
 	constructor() {

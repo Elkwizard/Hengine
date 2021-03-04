@@ -9,7 +9,7 @@
 	--highlight-2: rgb(255, 150, 150);
 	--subsection-indent: 10px;
 	--warning: rgb(255, 20, 20);
-	--monospace: 'Consolas';
+	--monospace: 'Consolas', monospace;
 	/* --foreground: rgb(20, 20, 20);
 	--background: rgb(255, 255, 255);
 	--highlight: rgb(100, 100, 255); */

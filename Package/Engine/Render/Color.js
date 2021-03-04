@@ -67,6 +67,9 @@ class Color extends Operable {
 	getHex() {
 		return "#" + Color.numToHex(this.red) + Color.numToHex(this.green) + Color.numToHex(this.blue);
 	}
+	getGLSL() {
+		return `vec4(${this.red / 255}, ${this.green / 255}, ${this.blue / 255}, ${this.alpha})`;
+	}
 	toString() {
 		return this.getRGBA();
 	}
