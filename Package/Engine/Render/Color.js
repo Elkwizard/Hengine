@@ -56,6 +56,9 @@ class Color extends Operable {
 	get brightness() {
 		return (this.red + this.blue + this.green) / (3 * 255);
 	}
+	get opaque() {
+		return new Color(this.red, this.green, this.blue, 1);
+	}
 	invert() {
 		let n = (new Color(255, 255, 255, 1)).sub(this);
 		n.alpha = this.alpha;

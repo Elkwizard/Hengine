@@ -6,6 +6,6 @@ class Spline {
         this.d = d;
     }
     evaluate(t) {
-        return Vector.lerp(Vector.lerp(Vector.lerp(this.a, this.b, t), Vector.lerp(this.b, this.c, t), t), Vector.lerp(Vector.lerp(this.b, this.c, t), Vector.lerp(this.c, this.d, t), t), t);
+        return Vector2.lerp(Vector2.lerp(Vector2.lerp(this.a, this.b, t), Vector2.lerp(this.b, this.c, t), t), Vector2.lerp(Vector2.lerp(this.b, this.c, t), Vector2.lerp(this.c, this.d, t), t), t);
     }
 }

@@ -75,7 +75,9 @@ class GPUShader extends ImageType {
 		this.amountVertices = 4;
 		this.loaded = false;
 		this.uniformLocations = {
-			resolution: null
+			resolution: null,
+			halfWidth: null,
+			halfHeight: null
 		};
 
 		this.compile();
@@ -137,6 +139,8 @@ class GPUShader extends ImageType {
 		if (this.gl.isContextLost()) return;
 
 		const gl = this.gl;
+		gl.uniform1f(this.uniformLocations.halfWidth, this.width / 2);
+		gl.uniform1f(this.uniformLocations.halfHeight, this.height / 2);
 		gl.uniform2f(this.uniformLocations.resolution, this.width, this.height);
 		gl.viewport(0, 0, this.image.width, this.image.height);
 	}
@@ -169,8 +173,14 @@ class GPUShader extends ImageType {
 		const vertexSource = `#version 300 es
 				in highp vec4 vertexPosition;
 
+				uniform highp float halfWidth;
+				uniform highp float halfHeight;
+
+				out highp vec2 position;
+
 				void main() {
 					gl_Position = vertexPosition;
+					position = vec2((vertexPosition.x + 1.0) * halfWidth, (1.0 - vertexPosition.y) * halfHeight);
 				}
 			`;
 		this.glsl = GLSLPrecompiler.compile(this.glsl);
@@ -181,15 +191,14 @@ class GPUShader extends ImageType {
 
 		// end studying
 
-		const pixelRatioStr = (1 / __devicePixelRatio).toFixed(4);
-		
 		const prefix = `#version 300 es
 precision highp float;
 precision highp int;
 precision highp sampler2D;
 
 uniform vec2 resolution;
-#define position (vec2(gl_FragCoord.x * ${pixelRatioStr}, resolution.y - gl_FragCoord.y * ${pixelRatioStr}))`;
+
+in vec2 position;`;
 		const pixelSource = `${prefix}
 ${this.glsl}
 
