@@ -7,33 +7,23 @@ class Color extends Operable {
 		let alpha = 0;
 		this.limited = true;
 		if (b === undefined && g === undefined && typeof r == "string") {
-			if (r.indexOf("rgb") < 0 && r.indexOf("#") < 0 && r.indexOf("hsb") < 0) {
-				let col = Color.CSSColor(r);
-				red = col.red;
-				green = col.green;
-				blue = col.blue;
-				alpha = col.alpha;
-			} else if (r[0] == "h") {
-				let col = Color.parseHSBA(r);
-				red = col.red;
-				green = col.green;
-				blue = col.blue;
-				alpha = col.alpha;
-			} else if (r[0] == "r") {
-				let col = Color.parseRGBA(r);
-				red = col.red;
-				green = col.green;
-				blue = col.blue;
-				alpha = col.alpha;
-			} else if (r[0] == "#") {
-				let str = r.slice(1);
-				if (str.length === 3) str = str[0].repeat(2) + str[1].repeat(2) + str[2].repeat(2);
-				let num = parseInt(str, 16);
-				red = num >> 16;
-				green = (num & 0x00FF00) >> 8;
-				blue = num & 0x0000FF;
-				alpha = 1;
+			let col;
+			if (r.match(/[\(#]/g)) {
+				// explicit
+				let rgb = r;
+				if (!r.match(/rgba?/g)) {
+					Color.span.style.color = r;
+					rgb = Color.span.style.color;
+				}
+				col = Color.parseRGBA(rgb);
+			} else {
+				// implicit
+				col = Color.CSSColor(r);
 			}
+			red = col.red;
+			green = col.green;
+			blue = col.blue;
+			alpha = col.alpha;
 		} else {
 			red = (r !== undefined) ? r : 0;
 			green = (g !== undefined) ? g : 0;
@@ -148,7 +138,7 @@ class Color extends Operable {
 		let S = Color.parseNum(hsbaList[1], 1);
 		let B = Color.parseNum(hsbaList[2], 1);
 		let alpha = (hsbaList.length > 3) ? Color.parseNum(hsbaList[3], 1) : 1;
-		
+
 		H = Math.max(H, 0);
 		H %= 360;
 		let seg = ~~(H / 120);
@@ -207,6 +197,7 @@ class Color extends Operable {
 		return { red, green, blue, alpha };
 	}
 }
+Color.modValues = ["red", "green", "blue", "alpha"];
 Color.EPSILON = 1 / 255;
 Color.CSSColors = {
 	aliceblue: new Color(240, 248, 255),
@@ -357,7 +348,7 @@ Color.CSSColors = {
 	whitesmoke: new Color(245, 245, 245),
 	yellow: new Color(255, 255, 0),
 }
-Color.modValues = ["red", "green", "blue", "alpha"];
+Color.span = document.createElement("span");
 Color.RED = new Color("#f00");
 Color.BLUE = new Color("#00f");
 Color.YELLOW = new Color("#ff0");
