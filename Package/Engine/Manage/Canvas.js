@@ -9,7 +9,7 @@ class CanvasImage extends ImageType {
 
 		this.renderer = new Artist(this.canvas, this.width, this.height, this, __devicePixelRatio);
 
-		this.scalingMode = ScalingMode.STRETCH;
+		this.scalingMode = ScalingMode.PRESERVE_ASPECT_RATIO;
 
 		window.addEventListener("resize", () => {
 			if (this.scalingMode === ScalingMode.STRETCH) {
