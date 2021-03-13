@@ -772,7 +772,7 @@ class CollisionResolver {
         let move = direction.times(-penetration);
         bodyA.displace(move);
 
-        let friction = (bodyA.friction * bodyB.friction) / this.engine.iterations;
+        let friction = bodyA.friction * bodyB.friction;
 
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
@@ -1237,7 +1237,7 @@ class PhysicsEngine {
             for (let j = 0; j < models.length; j++) {
                 let model = models[j];
                 let cells = grid.cellsBounds(body, model.bounds);
-                cellsTotal.push(...cells);
+                for (let ii = 0; ii < cells.length; ii++) cellsTotal.push(cells[ii]);
             }
             collisionPairs.set(body, cellsTotal);
         }
