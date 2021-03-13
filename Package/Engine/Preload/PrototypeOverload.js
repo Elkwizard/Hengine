@@ -272,6 +272,8 @@ ${contents.join(",\n").indent()}
 	})();
 	proto(Array.prototype, "toString", Object.prototype.toString);
 	proto(Object.prototype, "deepCopy", function () {
+		if (this instanceof Number || this instanceof String || this instanceof Boolean) return this.valueOf();
+		
 		const result = Array.isArray(this) ? [] : { };
 		for (const key in this) {
 			const value = this[key];

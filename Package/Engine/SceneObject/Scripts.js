@@ -100,9 +100,10 @@ class ScriptContainer {
 		for (let flag of script.implementedMethods) this.implementedMethods.add(flag);
 
 		this.sortedLocalScripts.push(local);
-		this.sortedLocalScripts.sort((a, b) => a.scriptNumber - b.scriptNumber);
 		
 		local.scriptInit(local, ...args);
+
+		this.sortedLocalScripts.sort((a, b) => a.scriptNumber - b.scriptNumber);
 
 		this.sceneObject.onAddScript(script);
 
@@ -115,14 +116,14 @@ class ScriptContainer {
 		this.implementedMethods.clear();
 		for (let i = 0; i < this.sortedLocalScripts.length; i++) {
 			const m = this.sortedLocalScripts[i].scriptSource;
-			for (let flag of m.implementedMethods) this.implementedMethods.add(flag);
+			for (const flag of m.implementedMethods) this.implementedMethods.add(flag);
 		}
 	}
 	has(script) {
 		return !!this.sortedLocalScripts.find(l => l.scriptSource === script);
 	}
 	removeDefault() {
-		const defaultScript = this.defaultScript;
+		const { defaultScript } = this;
 		if (this.has(defaultScript)) this.remove(defaultScript);
 	}
 	implements(method) {

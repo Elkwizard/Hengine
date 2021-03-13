@@ -162,29 +162,26 @@ class PolygonCollider {
         return Math.sqrt(this.bounds.width * this.bounds.height);
     }
     getModel(pos, cos, sin) {
-        let vertices = this.vertices.map(vert => {
+        const vertices = this.vertices.map(vert => {
             let t_x = vert.x * cos - vert.y * sin + pos.x;
             let t_y = vert.x * sin + vert.y * cos + pos.y;
             return new PhysicsVector(t_x, t_y);
         });
-        let axes = [];
+        const axes = [];
         for (let i = 0; i < vertices.length; i++) {
             let a = vertices[i];
             let b = vertices[(i + 1) % vertices.length];
             let dx = b.x - a.x;
             let dy = b.y - a.y;
             let m = Math.sqrt(dx ** 2 + dy ** 2);
-            dx /= m;
-            dy /= m;
-            axes.push(new PhysicsVector(-dy, dx));
+            axes.push(new PhysicsVector(-dy / m, dx / m));
         }
-        let cpx = this.position.x;
-        let cpy = this.position.y;
-        let px = cpx * cos - cpy * sin + pos.x;
-        let py = cpx * sin + cpy * cos + pos.y;
-        let position = new PhysicsVector(px, py);
-        let poly = new PolygonModel(vertices, position, axes, this);
-        return poly;
+        const cpx = this.position.x;
+        const cpy = this.position.y;
+        const px = cpx * cos - cpy * sin + pos.x;
+        const py = cpx * sin + cpy * cos + pos.y;
+        const position = new PhysicsVector(px, py);
+        return new PolygonModel(vertices, position, axes, this);
     }
 }
 PolygonModel.SYMBOL = Symbol("POLYGON");
@@ -390,10 +387,7 @@ class RigidBody {
         for (let i = 0; i < this.shapes.length; i++) this.__models.push(null);
     }
     getModel(i) {
-        let pos = this.position;
-        let cos = this.cosAngle;
-        let sin = this.sinAngle;
-        return this.shapes[i].getModel(pos, cos, sin);
+        return this.shapes[i].getModel(this.position, this.cosAngle, this.sinAngle);
     }
     getModels() {
         let models = [];
@@ -597,7 +591,15 @@ class CollisionDetector {
     static PolygonModel_PolygonModel(a, b) {
         let toB = b.position.minus(a.position);
 
-        let axes = [...a.axes.map(ax => ax.inverse()), ...b.axes].filter(ax => ax.dot(toB) > 0);
+        let axes = [];
+        for (let i = 0; i < a.axes.length; i++) {
+            const ax = a.axes[i];
+            if (ax.dot(toB) <= 0) axes.push(ax.inverse());
+        }
+        for (let i = 0; i < b.axes.length; i++) {
+            const ax = b.axes[i];
+            if (ax.dot(toB) > 0) axes.push(ax);
+        }
         if (!axes.length) return null;
         let minOverlap = Infinity;
         let bestAxis = null;
@@ -704,27 +706,24 @@ class CollisionResolver {
     }
     getJ(vAB, mA, mB, iA, iB, e, n, rA, rB) {
         // let inertiaTerm = ((rA × n) × rA) ÷ iA + ((rB × n) × rB) ÷ iB) · n;// nice
-        //optimized
-        let inertiaTerm = PhysicsVector.crossNV(rA.cross(n), rA).over(iA).plus(PhysicsVector.crossNV(rB.cross(n), rB).over(iB)).dot(n);
-        // console.log(inertiaTerm);
-        // let inertiaTerm = (n.x ** 2 * (iB * rA.y ** 2 + iA * rB.y ** 2)
-        //     + n.y ** 2 * (iB * rA.x ** 2 + iA * rB.x ** 2)
-        //     + n.x * n.y * (2 * iB * rA.x * rA.y + 2 * iA * rB.x * rB.y)) / (iA * iB);
-
-        // let inertiaTerm = ((-iB * n.x ** 2 + rA.y) * (rA.x + rA.y) + (iA * n.y ** 2 * rB.x) * (rB.x - rB.y) + (n.x * n.y) * ((iB * rA.x) * (rA.x - rA.y) - (iA * rB.y) * (rB.x - rB.y))) / (iA * iB);
-
-        let invMassSum = 1 / mA + 1 / mB + inertiaTerm;
-        let j = (1 + e) * vAB.dot(n) / invMassSum;
+        // const inertiaTerm = PhysicsVector.crossNV(rA.cross(n), rA).over(iA).plus(PhysicsVector.crossNV(rB.cross(n), rB).over(iB)).dot(n);
+        // optimized
+        const crossA = (rA.x * n.y - rA.y * n.x) / iA;
+        const crossB = (rB.x * n.y - rB.y * n.x) / iB;
+        const inertiaTerm = (crossA * rA.x + crossB * rB.x) * n.y - (crossA * rA.y + crossB * rB.y) * n.x;
+        
+        const invMassSum = 1 / mA + 1 / mB + inertiaTerm;
+        const j = (1 + e) * vAB.dot(n) / invMassSum;
         return j;
     }
     dynamicResolve(bodyA, bodyB, direction, penetration, contacts) {
-        let move = direction.times(penetration);
-        let moveA = move.times(-bodyB.mass / (bodyA.mass + bodyB.mass));
-        let moveB = move.times(bodyA.mass / (bodyA.mass + bodyB.mass));
-        bodyA.displace(moveA)
-        if (bodyB.canMoveThisStep) bodyB.displace(moveB);
+        const move = direction.times(penetration);
+        const moveA = move.times(-bodyB.mass / (bodyA.mass + bodyB.mass));
+        const moveB = move.times(bodyA.mass / (bodyA.mass + bodyB.mass));
+        bodyA.displace(moveA);
+        if (bodyB.canMoveThisStep || this.engine.iterations > 2) bodyB.displace(moveB);
 
-        let friction = (bodyA.friction * bodyB.friction) / this.engine.iterations;
+        let friction = (bodyA.friction * bodyB.friction)// / this.engine.iterations;
 
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
@@ -752,8 +751,6 @@ class CollisionResolver {
 
             let impulseA_t = t.times(j_t);
             let impulseB_t = impulseA_t.inverse();
-
-
 
             let impulseA = impulseA_n.add(impulseA_t);
             let impulseB = impulseB_n.add(impulseB_t);
@@ -890,7 +887,7 @@ PhysicsConstraint2.Length = class extends PhysicsConstraint2 {
     solve(int) {
         const [a, b] = this.getEnds();
         const { x: ax, y: ay } = a, { x: bx, y: by } = b;
-        
+
         const dx = bx - ax;
         const dy = by - ay;
         const m2 = dx ** 2 + dy ** 2;
@@ -907,7 +904,7 @@ PhysicsConstraint2.Length = class extends PhysicsConstraint2 {
             const ndy = dy / m * 5;
 
             const dist = dif * 2;
-            
+
             const dxA = ndx * pA;
             const dyA = ndy * pA;
             const dxB = -ndx * pB;
@@ -924,7 +921,7 @@ PhysicsConstraint2.Length = class extends PhysicsConstraint2 {
             this.bodyA.position.y += dyA * dist * F * 0.01;
             this.bodyB.position.x += dxB * dist * F * 0.01;
             this.bodyB.position.y += dyB * dist * F * 0.01;
-            
+
             this.bodyA.applyImpulse(a, new PhysicsVector(pdxA * this.bodyA.mass, pdyA * this.bodyA.mass));
             this.bodyB.applyImpulse(b, new PhysicsVector(pdxB * this.bodyB.mass, pdyB * this.bodyB.mass));
         }
@@ -964,7 +961,7 @@ PhysicsConstraint2.Position = class extends PhysicsConstraint2 {
         this.bodyA.position.y += dyA * F2;
         this.bodyB.position.x += dxB * F2;
         this.bodyB.position.y += dyB * F2;
-        
+
         this.bodyA.applyImpulse(a, new PhysicsVector(pdxA * this.bodyA.mass, pdyA * this.bodyA.mass));
         this.bodyB.applyImpulse(b, new PhysicsVector(pdxB * this.bodyB.mass, pdyB * this.bodyB.mass));
     }
@@ -978,7 +975,7 @@ PhysicsConstraint1.Length = class extends PhysicsConstraint1 {
     solve(int) {
         const [a, b] = this.getEnds();
         const { x: ax, y: ay } = a, { x: bx, y: by } = b;
-        
+
         const dx = bx - ax;
         const dy = by - ay;
         const m2 = dx ** 2 + dy ** 2;
@@ -996,7 +993,7 @@ PhysicsConstraint1.Length = class extends PhysicsConstraint1 {
             const ndy = dy / m * factor;
 
             const dist = dif * 2;
-            
+
             const dxA = ndx * 2;
             const dyA = ndy * 2;
 
@@ -1007,7 +1004,7 @@ PhysicsConstraint1.Length = class extends PhysicsConstraint1 {
 
             this.body.position.x += dxA * dist * F * 0.01;
             this.body.position.y += dyA * dist * F * 0.01;
-            
+
             this.body.applyImpulse(a, new PhysicsVector(pdxA * this.body.mass, pdyA * this.body.mass));
         }
     }
