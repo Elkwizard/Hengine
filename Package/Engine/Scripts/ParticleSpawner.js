@@ -1,5 +1,5 @@
 const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
-	init(l, properties = { }) {
+	init(l, properties = {}) {
 		l.particles = new Set();
 		l.setProperties(properties);
 		const spawner = this;
@@ -57,18 +57,20 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 		}
 	},
 	update(l) {
-		if (!l.active) return;
+		if (l.active) {
 
-		const pos = this.transform.position;
-		const last = l.lastTransform.position;
-		const count = 1 / l.delay;
+			const pos = this.transform.position;
+			const last = l.lastTransform.position;
+			const count = 1 / l.delay;
 
-		for (let i = 0; i < count; i++) {
-			const t = i / count;
-			const p = new l.Particle(Interpolation.lerp(last, pos, t), l.particles);
-			l.init(p);
-			if (!l.active) break;
-			l.particles.add(p);
+			for (let i = 0; i < count; i++) {
+				const t = i / count;
+				const p = new l.Particle(Interpolation.lerp(last, pos, t), l.particles);
+				l.init(p);
+				if (!l.active) break;
+				l.particles.add(p);
+			}
+
 		}
 
 		this.transform.get(l.lastTransform);
