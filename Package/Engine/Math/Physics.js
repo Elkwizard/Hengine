@@ -82,6 +82,30 @@ class PhysicsVector {
 }
 PhysicsVector.__ = [new PhysicsVector(0, 0), new PhysicsVector(0, 0), new PhysicsVector(0, 0), new PhysicsVector(0, 0)];
 
+//vector accumulator
+class PhysicsVectorAccumulator {
+	constructor() {
+		this.min = new PhysicsVector(0, 0);
+		this.max = new PhysicsVector(0, 0);
+		this._value = new PhysicsVector(0, 0);
+	}
+	get value() {
+		this._value.mul(0);
+		this._value.add(this.min).add(this.max);
+		return this._value;
+	}
+    reset() {
+        this.min.mul(0);
+        this.max.mul(0);
+    }
+	append(x = 0, y = 0) {
+		if (x < this.min.x) this.min.x = x;
+		else if (x > this.max.x) this.max.x = x;
+		if (y < this.min.y) this.min.y = y;
+		else if (y > this.max.y) this.max.y = y;
+	}
+}
+
 //geo
 
 class PhysicsMath {
@@ -356,6 +380,9 @@ class RigidBody {
         this.simulated = true;
 
         this.invalidateModels();
+
+        this.accelerationAccumulator = new PhysicsVectorAccumulator();
+        this.angularAccelerationAccumulator = new PhysicsVectorAccumulator();
     }
     set angle(a) {
         this._angle = a;
@@ -450,8 +477,17 @@ class RigidBody {
         //angular
         if (this.canRotate) {
             let cross = (pos.x - this.position.x) * imp.y - (pos.y - this.position.y) * imp.x;
-
             if (cross) this.angularVelocity += cross / this.inertia;
+        }
+    }
+    accumulateImpulse(pos, imp) {
+        //linear
+        this.accelerationAccumulator.append(imp.x / this.mass, imp.y / this.mass);
+
+        //angular
+        if (this.canRotate) {
+            let cross = (pos.x - this.position.x) * imp.y - (pos.y - this.position.y) * imp.x;
+            if (cross) this.angularAccelerationAccumulator.append(cross / this.inertia);
         }
     }
     static fromPolygon(vertices, type = RigidBody.DYNAMIC) {
@@ -723,82 +759,82 @@ class CollisionResolver {
         bodyA.displace(moveA);
         if (bodyB.canMoveThisStep || this.engine.iterations > 2) bodyB.displace(moveB);
 
-        let friction = (bodyA.friction * bodyB.friction)// / this.engine.iterations;
+        const friction = bodyA.friction * bodyB.friction // this.engine.iterations;
 
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
 
-        let impulsesA = [];
-        let impulsesB = [];
+        const impulsesA = [];
+        const impulsesB = [];
         for (let i = 0; i < contacts.length; i++) {
-            let contact = contacts[i];
-            let factor = contact.penetration / totalPenetration;
+            const contact = contacts[i];
+            const factor = contact.penetration / totalPenetration;
 
             //normal
-            let vAB = bodyB.pointVelocity(contact.point).sub(bodyA.pointVelocity(contact.point));
-            let rA = contact.point.minus(bodyA.position);
-            let rB = contact.point.minus(bodyB.position);
-            let e = Math.max(bodyA.restitution, bodyB.restitution);
-            let n = direction;
-            let j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
+            const vAB = bodyB.pointVelocity(contact.point).sub(bodyA.pointVelocity(contact.point));
+            const rA = contact.point.minus(bodyA.position);
+            const rB = contact.point.minus(bodyB.position);
+            const e = Math.max(bodyA.restitution, bodyB.restitution);
+            const n = direction;
+            const j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
 
-            let impulseA_n = n.times(j_n);
-            let impulseB_n = impulseA_n.inverse();
+            const impulseA_n = n.times(j_n);
+            const impulseB_n = impulseA_n.inverse();
 
             //friction
-            let t = direction.normal();
-            let j_t = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, t, rA, rB) * factor * friction;
+            const t = direction.normal();
+            const j_t = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, t, rA, rB) * factor * friction;
 
-            let impulseA_t = t.times(j_t);
-            let impulseB_t = impulseA_t.inverse();
+            const impulseA_t = t.times(j_t);
+            const impulseB_t = impulseA_t.inverse();
 
-            let impulseA = impulseA_n.add(impulseA_t);
-            let impulseB = impulseB_n.add(impulseB_t);
+            const impulseA = impulseA_n.add(impulseA_t);
+            const impulseB = impulseB_n.add(impulseB_t);
             impulsesA.push({ point: contact.point, impulse: impulseA });
             impulsesB.push({ point: contact.point, impulse: impulseB });
 
         }
         for (let i = 0; i < impulsesA.length; i++) {
-            let impulse = impulsesA[i];
-            bodyA.applyImpulse(impulse.point, impulse.impulse);
+            const impulse = impulsesA[i];
+            bodyA.accumulateImpulse(impulse.point, impulse.impulse);
         }
         for (let i = 0; i < impulsesB.length; i++) {
-            let impulse = impulsesB[i];
-            bodyB.applyImpulse(impulse.point, impulse.impulse);
+            const impulse = impulsesB[i];
+            bodyB.accumulateImpulse(impulse.point, impulse.impulse);
         }
     }
     staticResolve(bodyA, bodyB, direction, penetration, contacts) {
-
-        let move = direction.times(-penetration);
+        const move = direction.times(-penetration);
         bodyA.displace(move);
 
-        let friction = bodyA.friction * bodyB.friction;
+        const friction = bodyA.friction * bodyB.friction // this.engine.iterations;
 
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
 
-        let impulsesA = [];
+        const impulsesA = [];
         for (let i = 0; i < contacts.length; i++) {
-            let contact = contacts[i];
-            let factor = contact.penetration / totalPenetration;
+            const contact = contacts[i];
+            const factor = contact.penetration / totalPenetration;
 
-            let vAB = bodyA.pointVelocity(contact.point);
-            let e = bodyA.restitution;
-            let rA = contact.point.minus(bodyA.position);
-            let rB = new PhysicsVector(0, 0);
-            let n = direction;
-            let j_n = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, n, rA, rB) * factor;
-            let impulseA_n = n.times(j_n);
+            const vAB = bodyA.pointVelocity(contact.point);
+            const e = bodyA.restitution;
+            const rA = contact.point.minus(bodyA.position);
+            const rB = new PhysicsVector(0, 0);
+            const n = direction;
+            const j_n = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, n, rA, rB) * factor;
+            const impulseA_n = n.times(j_n);
 
-            let t = n.normal();
-            let j_t = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, t, rA, rB) * factor * friction;
-            let impulseA_t = t.times(j_t);
+            const t = n.normal();
+            const j_t = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, t, rA, rB) * factor * friction;
+            const impulseA_t = t.times(j_t);
 
-            let impulseA = impulseA_n.plus(impulseA_t);
+            const impulseA = impulseA_n.plus(impulseA_t);
             impulsesA.push({ point: contact.point, impulse: impulseA });
         }
-        for (let impulse of impulsesA) {
-            bodyA.applyImpulse(impulse.point, impulse.impulse);
+        for (let i = 0; i < impulsesA.length; i++) {
+            const impulse = impulsesA[i];
+            bodyA.accumulateImpulse(impulse.point, impulse.impulse);
         }
     }
 }
@@ -1151,9 +1187,10 @@ class PhysicsEngine {
     collisions(order, dynBodies, collisionPairs) {
         dynBodies.sort(order);
 
-        if (false) for (let i = 0; i < dynBodies.length; i++) {
-            renderer.draw(Color.RED).text(Font.Serif25, i + 1, dynBodies[i].position);
-        }
+        // for (let i = 0; i < dynBodies.length; i++) {
+        //     renderer.draw(Color.RED).text(Font.Serif25, i + 1, dynBodies[i].position);
+        // }
+
 
         //collisions
         for (let i = 0; i < dynBodies.length; i++) {
@@ -1211,6 +1248,16 @@ class PhysicsEngine {
                     this.resolve(body, body2, best);
                 }
             }
+
+            
+        }
+
+        for (let i = 0; i < dynBodies.length; i++) {
+            const body = dynBodies[i];
+            body.velocity.add(body.accelerationAccumulator.value);
+            body.angularVelocity += body.angularAccelerationAccumulator.value.x;
+            body.accelerationAccumulator.reset();
+            body.angularAccelerationAccumulator.reset();
         }
     }
     cacheModels() {
@@ -1252,8 +1299,9 @@ class PhysicsEngine {
         }
 
         // scene.camera.drawInWorldSpace(() => {
+        //     const LINE_WIDTH = 1 / scene.camera.zoom;
         //     for (let [x, column] of grid.cells) for (let [y, cell] of column) {
-        //         renderer.stroke(Color.RED, 1).rect(x * cellsize, y * cellsize, cellsize, cellsize);
+        //         renderer.stroke(Color.RED, LINE_WIDTH).rect(x * cellsize, y * cellsize, cellsize, cellsize);
         //     }
         // });
         return collisionPairs;
