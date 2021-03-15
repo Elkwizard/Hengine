@@ -1,4 +1,4 @@
-function defineWebGL2DContext(bound = { }, debug = false) {
+function defineWebGL2DContext(bound = {}, debug = false) {
 	let gl = null;
 	const glState = {};
 	const glAttributes = {};
@@ -21,7 +21,7 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 	// BLEND MODE
 	const BLEND_MODE_COMBINE = 0x00;
 	const BLEND_MODE_ADD = 0x01;
-	
+
 	// LINE JOIN
 	const LINE_JOIN_ROUND = 0x02;
 	const LINE_JOIN_MITER = 0x03;
@@ -43,7 +43,7 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 			pointer: 0,
 			data: new Float32Array(unitSize * glState.MAX_BATCH_TRIS * 3),
 			unitSize,
-			unitSizex3: unitSize * 3, 
+			unitSizex3: unitSize * 3,
 			changed: false,
 			enabled: false
 		};
@@ -59,7 +59,7 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		if (!attr.enabled) {
 			attr.enabled = true;
 			attr.pointer = gl.getAttribLocation(glState.program.shaderProgram, name),
-			gl.enableVertexAttribArray(attr.pointer);
+				gl.enableVertexAttribArray(attr.pointer);
 			gl.vertexAttribPointer(attr.pointer, attr.unitSize, gl.FLOAT, false, 0, 0);
 		}
 	}
@@ -74,12 +74,12 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 	function resize(width, height) {
 		glState.width = width;
 		glState.height = height;
-		
+
 		const nwidth = Math.floor(width * glState.pixelRatio);
 		const nheight = Math.floor(height * glState.pixelRatio);
 		if (nwidth !== gl.canvas.width) gl.canvas.width = nwidth;
 		if (nheight !== gl.canvas.height) gl.canvas.height = nheight;
-		
+
 		if (glState.usedProgram) {
 			updateResolution();
 		}
@@ -92,7 +92,7 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 	//#endregion
 
 	//#region basic
-	
+
 	function create(canvas, pixelRatioHandled = false, pixelRatio = devicePixelRatio) {
 		gl = canvas.getContext("webgl2", {
 			depth: false,
@@ -101,7 +101,7 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 
 		glState.contextExists = true;
 		glState.pixelRatio = pixelRatio;
-		
+
 		gl.canvas.addEventListener("webglcontextlost", e => {
 			e.preventDefault();
 			glState.contextExists = false;
@@ -137,7 +137,7 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		glState.imageTextureMap = new Map();
 		glState.textureIndexMap = new Map();
 		glState.currentTextureIndex = 0;
-		glState.activeTextureIndex = 0;
+		glState.activeTexture = null;
 		glState.textures = [];
 		glState.hasSetTextureIndices = false;
 
@@ -208,7 +208,7 @@ function defineWebGL2DContext(bound = { }, debug = false) {
 		gl.deleteShader(glState.program.vertexShader);
 		gl.deleteShader(glState.program.fragmentShader);
 	}
-	
+
 	function getUniformLocation(uniform) {
 		if (uniform in glState.program.uniforms) return glState.program.uniforms[uniform];
 		return glState.program.uniforms[uniform] = gl.getUniformLocation(glState.program.shaderProgram, uniform);
@@ -451,7 +451,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		glState.imageSmoothing = smooth;
 
 		// reset original active texture unit
-		gl.bindTexture(gl.TEXTURE_2D, glState.textures[glState.activeTextureIndex]);
+		gl.bindTexture(gl.TEXTURE_2D, glState.activeTexture);
 	}
 
 	function setBlendMode(mode) {
@@ -507,7 +507,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		// textured
 		setAttribute("vertexTexturePosition");
 		setAttribute("vertexTextureIndex");
-		
+
 		if (!glState.hasSetTextureIndices && glAttributes.vertexTexturePosition.changed) {
 			glState.hasSetTextureIndices = true;
 			gl.uniform1iv(getUniformLocation("textures"), new Int32Array(glState.MAX_TEXTURE_UNITS).fill(0).map((_, i) => i));
@@ -1036,9 +1036,9 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 	function outlinedEllipse(x, y, rx, ry, lineWidth, r, g, b, a) {
 		const radius = Math.max(rx, ry);
-		
+
 		if (radius <= 0) return;
-		
+
 		beforeBufferWrite(2);
 
 		const avc = glAttributes.vertexColor;
@@ -1101,14 +1101,12 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		if (glState.imageTextureMap.has(img)) {
 			gl.bindTexture(gl.TEXTURE_2D, glState.imageTextureMap.get(img));
 			writeToCurrentTexture(img);
-			gl.bindTexture(gl.TEXTURE_2D, glState.textures[glState.activeTextureIndex]);
+			gl.bindTexture(gl.TEXTURE_2D, glState.activeTexture);
 		}
 	}
 
 	function createTexture(img) {
 		const tex = gl.createTexture();
-
-		const previousTexture = glState.textures[glState.activeTextureIndex];
 
 		gl.bindTexture(gl.TEXTURE_2D, tex);
 
@@ -1121,7 +1119,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 
 		writeToCurrentTexture(img);
 
-		gl.bindTexture(gl.TEXTURE_2D, previousTexture);
+		gl.bindTexture(gl.TEXTURE_2D, glState.activeTexture);
 
 		glState.textures.push(tex);
 		glState.imageTextureMap.set(img, tex);
@@ -1130,7 +1128,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 	function activeTexture(tex, inx) {
 		gl.activeTexture(gl.TEXTURE0 + inx);
 		gl.bindTexture(gl.TEXTURE_2D, tex);
-		glState.activeTextureIndex = inx;
+		glState.activeTexture = tex;
 	}
 
 	function texturedTriangle(ax, ay, bx, by, cx, cy, atx, aty, btx, bty, ctx, cty, image, radius = -1) {
@@ -1148,12 +1146,12 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		if (glState.textureIndexMap.has(texture)) textureIndex = glState.textureIndexMap.get(texture);
 		else {
 			textureIndex = glState.currentTextureIndex++;
-			glState.textureIndexMap.set(texture, textureIndex);
 			if (glState.currentTextureIndex === glState.MAX_TEXTURE_UNITS) {
 				render();
 				glState.currentTextureIndex = 0;
 				glState.textureIndexMap.clear();
 			}
+			glState.textureIndexMap.set(texture, textureIndex);
 			activeTexture(texture, textureIndex);
 		}
 
@@ -1189,7 +1187,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 		if (radius <= 0) return;
 		texturedQuad(x - rx, y - ry, rx * 2, ry * 2, tx, ty, tw, th, tex, Math.max(rx, ry));
 	}
-	
+
 	function texturedPolygon(vertices, textureVertices, img) {
 		const triangulation = triangulate(vertices.length / 2);
 
@@ -1208,7 +1206,7 @@ ${new Array(glState.MAX_TEXTURE_UNITS).fill(0).map((v, i) => {
 			);
 		}
 	}
-	
+
 	//#endregion
 
 	//#region export

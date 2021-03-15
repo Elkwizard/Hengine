@@ -49,7 +49,7 @@ class Color extends Operable {
 	get opaque() {
 		return new Color(this.red, this.green, this.blue, 1);
 	}
-	invert() {
+	get inverse() {
 		let n = (new Color(255, 255, 255, 1)).sub(this);
 		n.alpha = this.alpha;
 		return n;
