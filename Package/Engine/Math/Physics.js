@@ -759,7 +759,7 @@ class CollisionResolver {
         bodyA.displace(moveA);
         if (bodyB.canMoveThisStep || this.engine.iterations > 2) bodyB.displace(moveB);
 
-        const friction = bodyA.friction * bodyB.friction // this.engine.iterations;
+        const friction = bodyA.friction * bodyB.friction; // this.engine.iterations;
 
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
@@ -807,7 +807,7 @@ class CollisionResolver {
         const move = direction.times(-penetration);
         bodyA.displace(move);
 
-        const friction = bodyA.friction * bodyB.friction // this.engine.iterations;
+        const friction = bodyA.friction * bodyB.friction;
 
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
@@ -1074,9 +1074,9 @@ class PhysicsEngine {
         this.collisionResolver = new CollisionResolver(this);
         this.linearDrag = 0.995;
         this.angularDrag = 0.995;
-        this.friction = 0.894;
+        this.friction = 0.4;
         this.constraints = [];
-        this.constraintIterations = 3;
+        this.constraintIterations = 4;
         this.onCollide = (a, b, dir, contacts) => null;
         this.iterations = 4;
         this.sleepDuration = 200;

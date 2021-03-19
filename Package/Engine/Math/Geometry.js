@@ -34,7 +34,7 @@ class Geometry {
         let vertices = shape.vertices;
         const result = [];
         if (vertices.length < 3) return [];
-        if (vertices.length === 3) return shape.get();
+        if (vertices.length === 3) return [[vertices[0], vertices[1], vertices[2]]];
         for (let i = 0; i < vertices.length / 2; i++) {
             let a = vertices[vertices.length - 1 - i];
             let b = i ? vertices[vertices.length - i] : vertices[0];
