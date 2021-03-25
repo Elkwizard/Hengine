@@ -1074,11 +1074,11 @@ class PhysicsEngine {
         this.collisionResolver = new CollisionResolver(this);
         this.linearDrag = 0.995;
         this.angularDrag = 0.995;
-        this.friction = 0.4;
+        this.friction = 0.5;
         this.constraints = [];
-        this.constraintIterations = 4;
+        this.constraintIterations = 5;
         this.onCollide = (a, b, dir, contacts) => null;
-        this.iterations = 4;
+        this.iterations = 10;
         this.sleepDuration = 200;
         this.sleepingActivityThreshold = 0.2;
 

@@ -19,7 +19,7 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 				}
 
 				if (l.slows) {
-					this.velocity.mul(0.995);
+					this.velocity.mul(physicsEngine.linearDrag);
 				}
 
 				this.position.add(this.velocity);
@@ -59,18 +59,21 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 	update(l) {
 		if (l.active) {
 
-			const pos = this.transform.position;
-			const last = l.lastTransform.position;
-			const count = 1 / l.delay;
+			if ((l.delay > 1 && this.lifeSpan % Math.ceil(l.delay) === 0) || l.delay <= 1) {
 
-			for (let i = 0; i < count; i++) {
-				const t = i / count;
-				const p = new l.Particle(Interpolation.lerp(last, pos, t), l.particles);
-				l.init(p);
-				if (!l.active) break;
-				l.particles.add(p);
+				const pos = this.transform.position;
+				const last = l.lastTransform.position;
+				const count = Math.max(1, 1 / l.delay);
+
+				for (let i = 0; i < count; i++) {
+					const t = (i + 1) / count;
+					const p = new l.Particle(Interpolation.lerp(last, pos, t), l.particles);
+					l.init(p);
+					if (!l.active) break;
+					l.particles.add(p);
+				}
+
 			}
-
 		}
 
 		this.transform.get(l.lastTransform);
