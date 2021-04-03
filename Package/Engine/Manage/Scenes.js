@@ -39,7 +39,7 @@ class Scene {
 		let hitShape = null;
 		let hit = null;
 		for (let shape of shapes) {
-			let models = shape.getModels();
+			let models = shape.getAllModels();
 			let result = Geometry.rayCast(origin, ray, models);
 			if (result.hitPoint) {
 				let hp = result.hitPoint;
@@ -153,48 +153,53 @@ class Scene {
 			el[i].scripts.run(type, ...args);
 		}
 	}
-	engineUpdate() {
-		
-		if (this.mouseEvents) {
-			let adjusted = mouse.world;
-			if (mouse.justPressed(["Left", "Right", "Middle"])) {
-				let key = "";
-				if (mouse.justPressed("Middle")) key = "Middle";
-				if (mouse.justPressed("Right")) key = "Right";
-				if (mouse.justPressed("Left")) key = "Left";
+	handleMouseEvents() {
+		const { mouse } = this.engine;
+	
+		const adjusted = mouse.world;
+		if (mouse.justPressed(["Left", "Right", "Middle"])) {
+			let key = "";
+			if (mouse.justPressed("Middle")) key = "Middle";
+			if (mouse.justPressed("Right")) key = "Right";
+			if (mouse.justPressed("Left")) key = "Left";
 
-				for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
-					o.scripts.run("Click", key, adjusted);
-				}
-			}
-
-			let collided = this.collidePointBoth(adjusted, false);
-			for (let o of collided[0].sort((a, b) => b.layer - a.layer)) {
-				if (!o.hovered) o.scripts.run("Hover", adjusted);
-				o.hovered = true;
-			}
-			for (let o of collided[1].sort((a, b) => b.layer - a.layer)) {
-				if (o.hovered) o.scripts.run("Unhover", adjusted);
-				o.hovered = false;
+			for (let o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
+				o.scripts.run("Click", key, adjusted);
 			}
 		}
+
+		let collided = this.collidePointBoth(adjusted, false);
+		for (let o of collided[0].sort((a, b) => b.layer - a.layer)) {
+			if (!o.hovered) o.scripts.run("Hover", adjusted);
+			o.hovered = true;
+		}
+		for (let o of collided[1].sort((a, b) => b.layer - a.layer)) {
+			if (o.hovered) o.scripts.run("Unhover", adjusted);
+			o.hovered = false;
+		}
+	}
+	engineUpdate() {
+		
+		if (this.mouseEvents) this.handleMouseEvents();
+
 		this.main.startUpdate();
 
 		this.script("BeforeUpdate");
 
-		//draw
-		this.main.sceneObjectArray.sort((a, b) => a.layer - b.layer);
-		this.renderCamera();
-		
 		//physics
 		for (let i = 0; i < this.main.sceneObjectArray.length; i++) this.main.sceneObjectArray[i].engineUpdate();
 			
-		let phys = this.main.getPhysicsElements();
+		const phys = this.main.getPhysicsElements();
 		this.clearCollisions(phys);
 		this.beforePhysicsStep(phys);
 		this.physicsEngine.run();
 		this.afterPhysicsStep(phys);
 		if (this.collisionEvents) this.handleCollisionEvents(phys);
+
+		//draw
+		this.main.sceneObjectArray.sort((a, b) => a.layer - b.layer);
+		this.renderCamera();
+
 
 		this.script("AfterUpdate");
 

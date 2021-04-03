@@ -22,11 +22,6 @@ class CanvasImage extends ImageType {
 
 		this.cursor = "default";
 	}
-	resize(width, height) {
-		this.renderer.resize(width, height);
-		if (this.engine.scene) this.engine.scene.camera.position = this.renderer.middle;
-		this.updateSize();
-	}
 	set scalingMode(a) {
 		this._scalingMode = a;
 		
@@ -44,8 +39,10 @@ class CanvasImage extends ImageType {
 	get cursor() {
 		return this.canvas.style.cursor;
 	}
-	makeImage() {
-		return this.canvas;
+	resize(width, height) {
+		this.renderer.resize(width, height);
+		if (this.engine.scene) this.engine.scene.camera.position = this.renderer.middle;
+		this.updateSize();
 	}
 	updateSize() {
 		let packed = new Rect(0, 0, innerWidth, innerHeight).largestWithin(this.width, this.height);
@@ -65,5 +62,8 @@ class CanvasImage extends ImageType {
 		this.canvas.style.top = packed.y + "px";
 		this.canvas.style.width = packed.width + "px";
 		this.canvas.style.height = packed.height + "px";
+	}
+	makeImage() {
+		return this.canvas;
 	}
 }

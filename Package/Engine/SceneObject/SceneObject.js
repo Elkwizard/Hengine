@@ -89,7 +89,7 @@ class SceneObject extends SceneElement {
 		this.lastTransform = this.transform.get(this.lastTransform);
 	}
 	serializeShapes() {
-		let shapes = this.getShapes();
+		let shapes = this.getAllShapes();
 		let result = [];
 		for (let shape of shapes) {
 			let term = "";
@@ -126,7 +126,7 @@ class SceneObject extends SceneElement {
 		return result;
 	}
 	cacheDimensions() {
-		let shapes = this.getShapes();
+		let shapes = this.getAllShapes();
 		let boxes = shapes.map(e => e.getBoundingBox());
 		let bounds = Rect.composeBoundingBoxes(boxes);
 		this.__width = bounds.width;
@@ -137,7 +137,7 @@ class SceneObject extends SceneElement {
 		this.__boundingBox = this.getBoundingBox();
 	}
 	getBoundingBox() {
-		let shapes = this.getModels();
+		let shapes = this.getAllModels();
 		let boxes = shapes.map(e => e.getBoundingBox());
 		return Rect.composeBoundingBoxes(boxes);
 	}
@@ -155,6 +155,7 @@ class SceneObject extends SceneElement {
 	}
 	removeShape(name) {
 		const shape = this.shapes.get(name);
+		if (!shape) return null;
 		this.shapes.delete(name);
 		this.convexShapes.delete(shape);
 		return shape;
@@ -163,17 +164,17 @@ class SceneObject extends SceneElement {
 		this.removeShape(name);
 		this.addShape(name, shape);
 	}
-	getShapes() {
+	getAllShapes() {
 		let shapes = [];
 		for (let [name, shape] of this.shapes) shapes.push(shape);
 		return shapes;
 	}
-	getConvexShapes() {
+	getAllConvexShapes() {
 		let shapes = [];
 		for (let [shape, convexShapes] of this.convexShapes) shapes.pushArray(convexShapes);
 		return shapes;
 	}
-	getModels() {
+	getAllModels() {
 		let models = [];
 		for (let [name, shape] of this.shapes) models.push(shape.getModel(this.transform));
 		return models;
@@ -209,7 +210,7 @@ class SceneObject extends SceneElement {
 	getShape(name) {
 		return this.shapes.get(name);
 	}
-	getConvexShapesFromShape(name) {
+	getConvexShapes(name) {
 		return this.convexShapes.get(this.shapes.get(name));
 	}
 	getModel(name) {

@@ -572,12 +572,12 @@ class FastFrame extends ImageType {
 		f.renderer.gl.texturedQuad(0, 0, w, h, 0, 0, 1, 1, this.makeImage());
 		return f;
 	}
+	clip(x, y, w, h) {
+		return FastFrame.fromImageType(this, x, y, w, h);
+	}
 	makeImage() {
 		this.renderer.gl.render();
 		return this.image;
-	}
-	clip(x, y, w, h) {
-		return FastFrame.fromImageType(this, x, y, w, h);
 	}
 	get(f = new FastFrame(this.width, this.height, this.renderer.pixelRatio)) {
 		f.renderer.resize(this.width, this.height);

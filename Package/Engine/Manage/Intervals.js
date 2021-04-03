@@ -104,7 +104,7 @@ class IntervalManager {
 			this.updateGraphs();
 			this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
 			this.engine.canvas.clearScreen();
-			this.updateIntervalCalls(IntervalFunction.UPDATE)
+			this.updateIntervalCalls(IntervalFunction.UPDATE);
 			this.engine.scene.engineUpdate();
 			this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
 			this.engine.keyboard.afterUpdate();

@@ -352,7 +352,9 @@ const TEXT_AREA = new ElementScript("TEXT_AREA", {
 		TEXT_AREA.staticData.anyTextAreaHovered = false;
 	},
 	afterUpdate(l) {
-		l.canvas.cursor = TEXT_AREA.staticData.anyTextAreaHovered ? "text" : "default";
+		const { anyTextAreaHovered } = TEXT_AREA.staticData;
+		if (!anyTextAreaHovered && l.canvas.cursor === "text") l.canvas.cursor = "default";
+		if (anyTextAreaHovered) l.canvas.cursor = "text";
 	},
 	update(l) {
 		let inTextArea = Geometry.pointInsideRect(this.transform.globalSpaceToLocalSpace(l.getMousePosition()), l.relativeTextViewBox);

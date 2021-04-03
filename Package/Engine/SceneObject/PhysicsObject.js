@@ -127,6 +127,7 @@ class PhysicsObject extends SceneObject {
     }
 	removeShape(name) {
 		const shape = super.removeShape(name);
+        if (shape === null) return null; 
         const physics = this.physicsShapes.get(shape);
 		for (let i = 0; i < physics.length; i++) this.body.removeShape(physics[i]);
 		this.physicsShapes.delete(shape);

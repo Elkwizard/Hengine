@@ -29,8 +29,8 @@ load(String.raw`
 			The #IntervalManager# that runs the update loop for the Hengine instance. 
 			This keeps the Hengine running and tracks performance.
 		(/prop)
-		(prop:canvas $CanvasManager$)
-			The #CanvasManager# associated with the Hengine instance.
+		(prop:canvas $CanvasImage$)
+			The #CanvasImage# associated with the Hengine instance.
 			This manages the presence of the Hengine's canvas within the DOM.
 		(/prop)
 		(prop:renderer $Renderer$)

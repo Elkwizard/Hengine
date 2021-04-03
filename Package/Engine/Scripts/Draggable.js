@@ -13,7 +13,7 @@ const DRAGGABLE = new ElementScript("DRAGGABLE", {
 		l.offset = this.transform.globalSpaceToLocalSpace(mouse);
 	},
 	update(l) {
-		if (l.mouse.justReleased("Left")) l.dragged = false; 
+		if (l.mouse.justReleased(l.key)) l.dragged = false; 
 		if (l.dragged) {
 			this.transform.position = l.mouse.world.minus(l.offset);
 			if (l.bounds) {

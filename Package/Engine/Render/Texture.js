@@ -104,13 +104,6 @@ class Texture extends ImageType {
 		}
 		this.loaded = false;
 	}
-	makeImage() {
-		if (!this.loaded) {
-			this.loaded = true;
-			this.c.putImageData(this.imageData, 0, 0);
-		}
-		return this.image;
-	}
 	stretch(w, h) {
 		w = Math.round(w);
 		h = Math.round(h);
@@ -142,6 +135,13 @@ class Texture extends ImageType {
 		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) r.shaderSetPixel(i, j, this.getPixel(x + i, y + j));
 		r.loaded = false;
 		return r;
+	}
+	makeImage() {
+		if (!this.loaded) {
+			this.loaded = true;
+			this.c.putImageData(this.imageData, 0, 0);
+		}
+		return this.image;
 	}
 	get(tex = new Texture(this.width, this.height)) {
 		if (tex.width !== this.width || tex.height !== this.height) return null;
@@ -199,7 +199,7 @@ class Texture extends ImageType {
 		let img = new Image();
 		img.src = uri;
 		let tex;
-		return await new Promise(function (resolve, reject) {
+		return await new Promise(resolve => {
 			img.onload = function () {
 				let canvas = document.createElement("canvas");
 				document.body.appendChild(img);

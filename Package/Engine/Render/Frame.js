@@ -30,7 +30,6 @@ class ImageType {
 		this._height = Math.max(1, Math.ceil(height));
 		this.loaded = true;
 	}
-	resize(width, height) { } // virtual
 	set width(a) {
 		const prev = this._width;
 		this._width = a;
@@ -50,11 +49,15 @@ class ImageType {
 	get pixelRatio() {
 		return this.makeImage().width / this.width;
 	}
+	resize(width, height) { } // virtual
 	inferWidth(height) {
 		return this.width * height / this.height;
 	}
 	inferHeight(width) {
 		return this.height * width / this.width;
+	}
+	makeImage() {
+		return null;
 	}
 	async download(name) {
 		let canvas = document.createElement("canvas");
@@ -72,9 +75,6 @@ class ImageType {
 			};
 			a.click();
 		});
-	}
-	makeImage() {
-		return null;
 	}
 }
 class HImage extends ImageType {
@@ -117,11 +117,11 @@ class Frame extends ImageType {
 		f.renderer.c.drawImage(this.image, 0, 0, w, h);
 		return f;
 	}
-	makeImage() {
-		return this.image;
-	}
 	clip(x, y, w, h) {
 		return Frame.fromImageType(this, x, y, w, h);
+	}
+	makeImage() {
+		return this.image;
 	}
 	get(f = new Frame(this.width, this.height, this.renderer.pixelRatio)) {
 		f.renderer.resize(this.width, this.height);

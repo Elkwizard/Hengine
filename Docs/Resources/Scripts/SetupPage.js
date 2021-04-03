@@ -30,7 +30,7 @@ const DOCS = {
 		"Lazy": {}
 	},
 	"Rendering": {
-		"CanvasManager": {},
+		"CanvasImage": {},
 		"Image Types": {
 			"ImageType": {},
 			"Frame": {},

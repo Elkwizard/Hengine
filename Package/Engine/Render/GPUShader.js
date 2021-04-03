@@ -383,14 +383,14 @@ void main() {
 		}
 		this.loaded = false;
 	}
-	makeImage() {
-		if (!this.loaded) this.shade();
-		return this.image;
-	}
 	writeTexture(textureUnit, texture, data) {
 		const gl = this.gl;
 		gl.activeTexture(gl.TEXTURE0 + textureUnit);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.makeImage());
+	}
+	makeImage() {
+		if (!this.loaded) this.shade();
+		return this.image;
 	}
 }

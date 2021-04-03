@@ -298,7 +298,7 @@ class Rect extends Polygon {
 			w = this.height / m;
 		}
 
-		return new Rect(this.width / 2 - w / 2, this.height / 2 - h / 2, w, h);
+		return new Rect(this.width / 2 - w / 2 + this.x, this.height / 2 - h / 2 + this.y, w, h);
 	}
 	clip(rect) {
 		let xRange = this.xRange.clip(rect.xRange);

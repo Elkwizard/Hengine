@@ -28,7 +28,7 @@ class Random {
         let n = 0;
         let scl = 0;
         let len = alg.length + 1;
-        let seed = Random.seed;
+        let seed = Random.sampleSeed;
         if (len === sample.length) {
             seed = sample[sample.length - 1];
             sample.length = alg.length;

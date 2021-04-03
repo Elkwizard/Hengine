@@ -46,10 +46,6 @@ class Animation extends ImageType {
 			this.height = this.image.height;
 		}
 	}
-	makeImage() {
-		this.advance();
-		return this.image.image;
-	}
 	stop() {
 		this.stopped = true;
 	}
@@ -66,6 +62,10 @@ class Animation extends ImageType {
 		animation.loops = this.loops;
 		animation.onEnd = this.onEnd;
 		return animation;
+	}
+	makeImage() {
+		this.advance();
+		return this.image.image;
 	}
 	static fromImage(frame, imgWidth, imgHeight, delay = 0, loops = true, onEnd = () => null) {
 		const frames = frame.width / imgWidth;
