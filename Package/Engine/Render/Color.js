@@ -122,62 +122,6 @@ class Color extends Operable {
 		if (str[str.length - 1] === "%") return parseFloat(str) / 100 * limit;
 		return parseFloat(str);
 	}
-	static parseHSBA(str) {
-		let hsb = "";
-		let state = false;
-		for (let char of str) {
-			if (char == ")" || char == "(") {
-				state = !state;
-			}
-			else if (state) {
-				hsb += char;
-			}
-		}
-		let hsbaList = hsb.split(",");
-		let H = Color.parseNum(hsbaList[0], 360);
-		let S = Color.parseNum(hsbaList[1], 1);
-		let B = Color.parseNum(hsbaList[2], 1);
-		let alpha = (hsbaList.length > 3) ? Color.parseNum(hsbaList[3], 1) : 1;
-
-		H = Math.max(H, 0);
-		H %= 360;
-		let seg = ~~(H / 120);
-		let t = (H % 120) / 120;
-		let ot = t + Math.sin(2 * Math.PI * t) / (2 * Math.PI);
-		// let ot1 = 2 * 255 * Math.min(1 - t, 0.5);
-		// let ot2 = 2 * 255 * Math.min(t, 0.5);
-		let st = (3 + Math.sin(2 * Math.PI * t - Math.PI / 2)) / 2;
-		let r = 0, g = 0, b = 0;
-		switch (seg) {
-			case 0:
-				g = 255 * ot;
-				r = 255 - g;
-				break;
-			case 1:
-				b = 255 * ot;
-				g = 255 - b;
-				break;
-			case 2:
-				r = 255 * ot;
-				b = 255 - r;
-				break;
-		}
-
-		let scaleBrightness = st;
-		scaleBrightness *= B;
-		r *= scaleBrightness;
-		g *= scaleBrightness;
-		b *= scaleBrightness;
-		let middle = (r + g + b) / 3;
-		let dr = r - middle;
-		let dg = g - middle;
-		let db = b - middle;
-		r = middle + S * dr;
-		g = middle + S * dg;
-		b = middle + S * db;
-
-		return { red: r, green: g, blue: b, alpha };
-	}
 	static parseRGBA(str) {
 		let rgba = "";
 		let state = false;

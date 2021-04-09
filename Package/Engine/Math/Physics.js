@@ -844,6 +844,10 @@ class PhysicsConstraint1 {
         this.body = body;
         this.offset = offset;
         this.point = point;
+        this._ends = [
+            this._endA = new PhysicsVector(0, 0),
+            this._endB = new PhysicsVector(0, 0)
+        ];
     }
     hasBody(b) {
         return this.body === b;
@@ -856,10 +860,13 @@ class PhysicsConstraint1 {
         let t_ax = ax * ac - ay * as;
         let t_ay = ax * as + ay * ac;
 
-        return [
-            new PhysicsVector(t_ax + this.body.position.x, t_ay + this.body.position.y),
-            this.point
-        ];
+
+        this._endA.x = t_ax + this.body.position.x;
+        this._endA.y = t_ay + this.body.position.y;
+        this._endB.x = this.point.x;
+        this._endB.y = this.point.y;
+
+        return this._ends;
     }
     solve(int) {
         // ...
@@ -871,6 +878,10 @@ class PhysicsConstraint2 {
         this.bodyB = b;
         this.offsetA = aOff;
         this.offsetB = bOff;
+        this._ends = [
+            this._endA = new PhysicsVector(0, 0),
+            this._endB = new PhysicsVector(0, 0)
+        ];
     }
     getPortions(int) {
         let pA = 1;
@@ -905,10 +916,12 @@ class PhysicsConstraint2 {
         let t_bx = bx * bc - by * bs;
         let t_by = bx * bs + by * bc;
 
-        return [
-            new PhysicsVector(t_ax + this.bodyA.position.x, t_ay + this.bodyA.position.y),
-            new PhysicsVector(t_bx + this.bodyB.position.x, t_by + this.bodyB.position.y)
-        ];
+        this._endA.x = t_ax + this.bodyA.position.x;
+        this._endA.y = t_ay + this.bodyA.position.y;
+        this._endB.x = t_bx + this.bodyB.position.x;
+        this._endB.y = t_by + this.bodyB.position.y;
+        
+        return this._ends;
     }
     solve(int) {
         // ...
