@@ -623,7 +623,7 @@ class Geometry {
         let axes = [];
         let poly = polygon.vertices;
         for (let i = 0; i < poly.length; i++) {
-            axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normal.normalize())
+            axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normal.normalize());
         }
         for (let i = 0; i < axes.length; i++) {
             let axis = axes[i];
