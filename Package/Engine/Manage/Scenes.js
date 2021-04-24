@@ -79,15 +79,15 @@ class Scene {
 	}
 	handleCollisionEvents(useful) {
 		const types = [
-			["left", "CollideLeft", "CollideRight"], 
-			["right", "CollideRight", "CollideLeft"], 
-			["top", "CollideTop", "CollideBottom"], 
-			["bottom", "CollideBottom", "CollideTop"], 
+			["left", "CollideLeft", "CollideRight"],
+			["right", "CollideRight", "CollideLeft"],
+			["top", "CollideTop", "CollideBottom"],
+			["bottom", "CollideBottom", "CollideTop"],
 			["general", "CollideGeneral", "CollideGeneral"]
 		];
 
 		for (let rect of useful) {
-			for (let type of types) { 
+			for (let type of types) {
 				let last = rect.lastColliding[type[0]] || [];
 				let col = rect.colliding[type[0]];
 				if (col) {
@@ -96,23 +96,23 @@ class Scene {
 						rect.scripts.run(type[1], body);
 					}
 				}
-			}	
+			}
 			rect.lastColliding = rect.colliding.get();
 		}
 	}
-	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null, stiffness = 1) {
-		let con = new PhysicsConstraint2.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length, stiffness);
+	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null) {
+		let con = new PhysicsConstraint2.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length);
 		if (length === null) {
-			let ends = con.getEnds();
+			const { ends } = con;
 			con.length = Vector2.dist(Vector2.fromPhysicsVector(ends[0]), Vector2.fromPhysicsVector(ends[1]));
 		}
 		this.physicsEngine.addConstraint(con);
 	}
-	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null, stiffness = 1) {
-		let con = new PhysicsConstraint1.Length(a.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null, length, stiffness);
-		if (point === null) con.point = con.getEnds()[0];
+	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null) {
+		let con = new PhysicsConstraint1.Length(a.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null, length);
+		if (point === null) con.point = con.ends[0];
 		if (length === null) {
-			let ends = con.getEnds();
+			const { ends } = con;
 			con.length = Vector2.dist(Vector2.fromPhysicsVector(ends[0]), Vector2.fromPhysicsVector(ends[1]));
 		}
 		this.physicsEngine.addConstraint(con);
@@ -123,7 +123,7 @@ class Scene {
 	}
 	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
 		let con = new PhysicsConstraint1.Position(a.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null);
-		if (point === null) con.point = con.getEnds()[0];
+		if (point === null) con.point = con.ends[0];
 		this.physicsEngine.addConstraint(con);
 	}
 	updateCaches() {
@@ -155,7 +155,7 @@ class Scene {
 	}
 	handleMouseEvents() {
 		const { mouse } = this.engine;
-	
+
 		const adjusted = mouse.world;
 		if (mouse.justPressed(["Left", "Right", "Middle"])) {
 			let key = "";
@@ -179,7 +179,7 @@ class Scene {
 		}
 	}
 	engineUpdate() {
-		
+
 		if (this.mouseEvents) this.handleMouseEvents();
 
 		this.main.startUpdate();
@@ -188,7 +188,7 @@ class Scene {
 
 		//physics
 		for (let i = 0; i < this.main.sceneObjectArray.length; i++) this.main.sceneObjectArray[i].engineUpdate();
-			
+
 		const phys = this.main.getPhysicsElements();
 		this.clearCollisions(phys);
 		this.beforePhysicsStep(phys);

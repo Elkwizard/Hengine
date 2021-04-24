@@ -5,6 +5,23 @@ class PhysicsVector {
         this.x = x;
         this.y = y;
     }
+    get mag() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+    get sqrMag() {
+        return this.x * this.x + this.y * this.y;
+    }
+    get normalized() {
+        let mag = this.mag;
+        if (!mag) return new PhysicsVector(0, 0);
+        return new PhysicsVector(this.x / mag, this.y / mag);
+    }
+    get normal() {
+        return new PhysicsVector(-this.y, this.x);
+    }
+    get inverse() {
+        return new PhysicsVector(-this.x, -this.y);
+    }
     get(result = new PhysicsVector()) {
         result.x = this.x;
         result.y = this.y;
@@ -31,7 +48,7 @@ class PhysicsVector {
         return this;
     }
     normalize() {
-        const m = this.mag();
+        const m = this.mag;
         if (m) {
             this.x /= m;
             this.y /= m;
@@ -59,22 +76,10 @@ class PhysicsVector {
     cross(b) {
         return this.x * b.y - this.y * b.x;
     }
-    inverse() {
-        return new PhysicsVector(-this.x, -this.y);
-    }
-    mag() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
-    }
-    sqrMag() {
-        return this.x * this.x + this.y * this.y;
-    }
-    normalized() {
-        let mag = this.mag();
-        if (!mag) return new PhysicsVector(0, 0);
-        return new PhysicsVector(this.x / mag, this.y / mag);
-    }
-    normal() {
-        return new PhysicsVector(-this.y, this.x);
+    invert() {
+        this.x = -this.x;
+        this.y = -this.y;
+        return this;
     }
     static crossNV(a, b) {
         return new PhysicsVector(-a * b.y, a * b.x);
@@ -89,6 +94,15 @@ class PhysicsMatrix {
         this.c = c;
         this.d = d;
     }
+    get inverse() {
+        const determinant = this.determinant();
+        if (!determinant) return null;
+        const invDeterminant = 1 / determinant;
+        return new PhysicsMatrix(
+            invDeterminant * this.d, invDeterminant * -this.b,
+            invDeterminant * -this.c, invDeterminant * this.a
+        );
+    }
     get(result = new PhysicsMatrix()) {
         result.a = this.a;
         result.b = this.b;
@@ -98,15 +112,6 @@ class PhysicsMatrix {
     }
     determinant() {
         return this.a * this.d - this.b * this.c;
-    }
-    inverse() {
-        const determinant = this.determinant();
-        if (!determinant) return null;
-        const invDeterminant = 1 / determinant;
-        return new PhysicsMatrix(
-            invDeterminant * this.d, invDeterminant * -this.b,
-            invDeterminant * -this.c, invDeterminant * this.a
-        );
     }
     times(m) {
         return new PhysicsMatrix(
@@ -128,7 +133,7 @@ class PhysicsMatrix {
         const b = invDeterminant * -this.b;
         const c = invDeterminant * -this.c;
         const d = invDeterminant * this.a;
-        
+
         return new PhysicsVector(
             a * vector.x + b * vector.y,
             c * vector.x + d * vector.y
@@ -629,7 +634,7 @@ class CollisionDetector {
         if (bestPoint) {
             let between = bestPoint.minus(a.position);
             bestDist = Math.sqrt(bestDist);
-            let axis = between.normalized();
+            let axis = between.normalized;
 
             let toB = a.position.minus(b.position);
             let inside = toB.dot(axis) > 0;
@@ -637,7 +642,7 @@ class CollisionDetector {
             if (bestDist > a.radius && !inside) return null;
 
             if (inside) {
-                axis = axis.inverse();
+                axis.invert();
                 bestDist = bestDist + a.radius;
             } else bestDist = a.radius - bestDist;
 
@@ -664,7 +669,7 @@ class CollisionDetector {
     }
     static CircleModel_CircleModel(a, b) {
         let between = b.position.minus(a.position);
-        let sqrMag = between.sqrMag();
+        let sqrMag = between.sqrMag;
         if (sqrMag < (a.radius + b.radius) ** 2) {
             let axis = between.normalize();
             let point = new PhysicsVector((axis.x * a.radius + a.position.x + axis.x * -b.radius + b.position.x) / 2, (axis.y * a.radius + a.position.y + axis.y * -b.radius + b.position.y) / 2);
@@ -684,7 +689,7 @@ class CollisionDetector {
         let axes = [];
         for (let i = 0; i < a.axes.length; i++) {
             const ax = a.axes[i];
-            if (ax.dot(toB) <= 0) axes.push(ax.inverse());
+            if (ax.dot(toB) <= 0) axes.push(ax.inverse);
         }
         for (let i = 0; i < b.axes.length; i++) {
             const ax = b.axes[i];
@@ -833,14 +838,14 @@ class CollisionResolver {
             const j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
 
             const impulseA_n = n.times(j_n);
-            const impulseB_n = impulseA_n.inverse();
+            const impulseB_n = impulseA_n.inverse;
 
             //friction
-            const t = direction.normal();
+            const t = direction.normal;
             const j_t = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, t, rA, rB) * factor * friction;
 
             const impulseA_t = t.times(j_t);
-            const impulseB_t = impulseA_t.inverse();
+            const impulseB_t = impulseA_t.inverse;
 
             const impulseA = impulseA_n.add(impulseA_t);
             const impulseB = impulseB_n.add(impulseB_t);
@@ -879,7 +884,7 @@ class CollisionResolver {
             const j_n = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, n, rA, rB) * factor;
             const impulseA_n = n.times(j_n);
 
-            const t = n.normal();
+            const t = n.normal;
             const j_t = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, t, rA, rB) * factor * friction;
             const impulseA_t = t.times(j_t);
 
@@ -902,11 +907,14 @@ class PhysicsConstraint1 {
             this._endA = new PhysicsVector(0, 0),
             this._endB = new PhysicsVector(0, 0)
         ];
+
+        const mA = 1 / body.mass;
+        this.forceToError = new PhysicsMatrix(
+            mA, null,
+            null, mA
+        );
     }
-    hasBody(b) {
-        return this.body === b;
-    }
-    getEnds() {
+    get ends() {
         let ax = this.offset.x;
         let ay = this.offset.y;
         let ac = this.body.cosAngle;
@@ -922,10 +930,29 @@ class PhysicsConstraint1 {
 
         return this._ends;
     }
-    solve(int) {
-        // ...
+    hasBody(b) {
+        return this.body === b;
+    }
+    solve() {
+        const { body, forceToError } = this;
+        const a = this.ends[0];
+
+        // velocity
+        const rA = a.minus(body.position);
+        const iA = 1 / body.inertia;
+        forceToError.b = rA.x * iA;
+        forceToError.c = rA.y * iA;
+        const hopefulAcceleration = this.error;
+        const force = forceToError.applyInverseTo(hopefulAcceleration);
+
+        if (!force) return;
+
+        force.mul(PhysicsConstraint1.INTENSITY);
+
+        if (body.type !== RigidBody.STATIC) body.applyImpulse(a, force);
     }
 }
+PhysicsConstraint1.INTENSITY = 0.95;
 class PhysicsConstraint2 {
     constructor(a, b, aOff, bOff) {
         this.bodyA = a;
@@ -936,25 +963,18 @@ class PhysicsConstraint2 {
             this._endA = new PhysicsVector(0, 0),
             this._endB = new PhysicsVector(0, 0)
         ];
+
+        const mA = 1 / a.mass;
+        const mB = 1 / b.mass;
+        this.forceToError = new PhysicsMatrix(
+            mA + mB, null,
+            null, mA + mB
+        );
     }
-    getPortions(int) {
-        let pA = 1;
-        if (this.bodyA.type === RigidBody.DYNAMIC && this.bodyB.type === RigidBody.DYNAMIC) pA = 2 * this.bodyB.mass / (this.bodyA.mass + this.bodyB.mass);
-        let pB = 2 - pA;
-        if (this.bodyA.type === RigidBody.STATIC) {
-            pA = 0;
-            pB = 2;
-        }
-        if (this.bodyB.type === RigidBody.STATIC) {
-            pA = 2;
-            pB = 0;
-        }
-        return [pA * int, pB * int];
+    get error() {
+        return new PhysicsVector(0, 0);
     }
-    hasBody(b) {
-        return this.bodyA === b || this.bodyB === b;
-    }
-    getEnds() {
+    get ends() {
         const ax = this.offsetA.x;
         const ay = this.offsetA.y;
         const ac = this.bodyA.cosAngle;
@@ -978,72 +998,12 @@ class PhysicsConstraint2 {
 
         return this._ends;
     }
-    solve(int) {
-        // ...
+    hasBody(b) {
+        return this.bodyA === b || this.bodyB === b;
     }
-}
-PhysicsConstraint2.Length = class extends PhysicsConstraint2 {
-    constructor(a, b, ao, bo, l, stiffness) {
-        super(a, b, ao, bo);
-        this.length = l;
-        this.stiffness = stiffness;
-    }
-    solve(int) {
-        const [a, b] = this.getEnds();
-        const { x: ax, y: ay } = a, { x: bx, y: by } = b;
-
-        const dx = bx - ax;
-        const dy = by - ay;
-        const m2 = dx ** 2 + dy ** 2;
-
-        if (m2 !== this.length ** 2 && m2) {
-            // solve
-            const [pA, pB] = this.getPortions(int);
-
-            const m = Math.sqrt(m2);
-
-            const dif = (m - this.length) / 2;
-
-            const ndx = dx / m * 5;
-            const ndy = dy / m * 5;
-
-            const dist = dif * 2;
-
-            const dxA = ndx * pA;
-            const dyA = ndy * pA;
-            const dxB = -ndx * pB;
-            const dyB = -ndy * pB;
-
-            const F = 0.3 / int;
-
-            const pdxA = dxA * dist * F * int;
-            const pdyA = dyA * dist * F * int;
-            const pdxB = dxB * dist * F * int;
-            const pdyB = dyB * dist * F * int;
-
-            this.bodyA.position.x += dxA * dist * F * 0.01;
-            this.bodyA.position.y += dyA * dist * F * 0.01;
-            this.bodyB.position.x += dxB * dist * F * 0.01;
-            this.bodyB.position.y += dyB * dist * F * 0.01;
-
-            this.bodyA.applyImpulse(a, new PhysicsVector(pdxA * this.bodyA.mass, pdyA * this.bodyA.mass));
-            this.bodyB.applyImpulse(b, new PhysicsVector(pdxB * this.bodyB.mass, pdyB * this.bodyB.mass));
-        }
-    }
-}
-PhysicsConstraint2.Position = class extends PhysicsConstraint2 {
-    constructor(a, b, ao, bo) {
-        super(a, b, ao, bo);
-        const mA = 1 / a.mass;
-        const mB = 1 / b.mass;
-        this.forceToError = new PhysicsMatrix(
-            mA + mB, null, 
-            null, mA + mB
-        );
-    }
-    solve(int) {
+    solve() {
         const { bodyA, bodyB, forceToError } = this;
-        const [a, b] = this.getEnds();
+        const [a, b] = this.ends;
 
         // velocity
         const rA = a.minus(bodyA.position);
@@ -1052,79 +1012,78 @@ PhysicsConstraint2.Position = class extends PhysicsConstraint2 {
         const iB = 1 / bodyB.inertia;
         forceToError.b = rB.x * iB + rA.x * iA;
         forceToError.c = -rB.y * iB + rA.y * iA;
-        const currentVelocityError = bodyA.pointVelocity(a).minus(bodyB.pointVelocity(b));
-        const currentPositionError = a.minus(b);
-        const hopefulAcceleration = currentVelocityError.plus(currentPositionError);
+        const hopefulAcceleration = this.error;
         const force = forceToError.applyInverseTo(hopefulAcceleration);
 
         if (!force) return;
 
-        if (bodyA.type !== RigidBody.STATIC) bodyA.applyImpulse(a, force.inverse());
-        if (bodyB.type !== RigidBody.STATIC) bodyB.applyImpulse(b, force);
+        force.mul(PhysicsConstraint2.INTENSITY);
+
+        if (bodyA.type !== RigidBody.STATIC) bodyA.applyImpulse(a, force);
+        if (bodyB.type !== RigidBody.STATIC) bodyB.applyImpulse(b, force.invert());
+    }
+}
+PhysicsConstraint2.INTENSITY = 0.9;
+PhysicsConstraint2.Length = class extends PhysicsConstraint2 {
+    constructor(a, b, ao, bo, l) {
+        super(a, b, ao, bo);
+        this.length = l;
+    }
+    get error() {
+        const { bodyA, bodyB } = this;
+        const [a, b] = this._ends;
+        const n = b.minus(a);
+        const { mag } = n;
+        n.div(mag); 
+        const currentPositionError = n.times(mag - this.length); 
+        const currentVelocityError = n.times(bodyB.pointVelocity(b).dot(n) - bodyA.pointVelocity(a).dot(n));
+        return currentVelocityError.plus(currentPositionError);
+    }
+}
+PhysicsConstraint2.Position = class extends PhysicsConstraint2 {
+    constructor(a, b, ao, bo) {
+        super(a, b, ao, bo);
+        const mA = 1 / a.mass;
+        const mB = 1 / b.mass;
+        this.forceToError = new PhysicsMatrix(
+            mA + mB, null,
+            null, mA + mB
+        );
+    }
+    get error() {
+        const { bodyA, bodyB } = this;
+        const [a, b] = this._ends;
+        const currentVelocityError = bodyB.pointVelocity(b).minus(bodyA.pointVelocity(a));
+        const currentPositionError = b.minus(a);
+        return currentVelocityError.plus(currentPositionError);
     }
 }
 PhysicsConstraint1.Length = class extends PhysicsConstraint1 {
-    constructor(body, offset, point, length, stiffness) {
+    constructor(body, offset, point, length) {
         super(body, offset, point);
         this.length = length;
-        this.stiffness = stiffness;
     }
-    solve(int) {
-        const [a, b] = this.getEnds();
-        const { x: ax, y: ay } = a, { x: bx, y: by } = b;
-
-        const dx = bx - ax;
-        const dy = by - ay;
-        const m2 = dx ** 2 + dy ** 2;
-
-        if (m2 !== this.length ** 2 && m2) {
-            // solve
-
-            const m = Math.sqrt(m2);
-
-            const dif = (m - this.length) / 2;
-
-            const factor = 0.1;
-
-            const ndx = dx / m * factor;
-            const ndy = dy / m * factor;
-
-            const dist = dif * 2;
-
-            const dxA = ndx * 2;
-            const dyA = ndy * 2;
-
-            const F = 0.3 / int;
-
-            const pdxA = dxA * dist * F * int;
-            const pdyA = dyA * dist * F * int;
-
-            this.body.position.x += dxA * dist * F * 0.01;
-            this.body.position.y += dyA * dist * F * 0.01;
-
-            this.body.applyImpulse(a, new PhysicsVector(pdxA * this.body.mass, pdyA * this.body.mass));
-        }
+    get error() {
+        const { body } = this;
+        const [a, b] = this._ends;
+        const n = b.minus(a);
+        const { mag } = n;
+        n.div(mag); 
+        const currentPositionError = n.times(mag - this.length); 
+        const currentVelocityError = n.times(-body.pointVelocity(a).dot(n));
+        return currentVelocityError.plus(currentPositionError);
     }
 }
 PhysicsConstraint1.Position = class extends PhysicsConstraint1 {
     constructor(body, offset, point) {
         super(body, offset, point);
     }
-    solve(int) {
-        const [a, b] = this.getEnds();
-        let dx = b.x - a.x;
-        let dy = b.y - a.y;
-        const sum = dx ** 2 + dy ** 2;
-        if (!sum) return;
-        const dist = Math.sqrt(sum);
-        const factor = 2 * int / dist;
-        dx *= factor;
-        dy *= factor;
-
-        this.body.position.x += dx * dist;
-        this.body.position.y += dy * dist;
-
-        this.body.applyImpulse(a, new PhysicsVector(dx * this.body.mass, dy * this.body.mass));
+    get error() {
+        const { body } = this;
+        const [a, b] = this.ends;
+        const currentVelocityError = body.pointVelocity(a).invert();
+        const currentPositionError = b.minus(a);
+        return currentVelocityError.plus(currentPositionError);
     }
 }
 
@@ -1300,7 +1259,7 @@ class PhysicsEngine {
                     }
                     if (!contacts.length) continue;
                     best.contacts = contacts;
-                    dir = dir.normalized();
+                    dir = dir.normalized;
                     const dot = best.direction.dot(dir);
                     best.penetration *= dot;
                     best.direction = dir;
@@ -1361,8 +1320,8 @@ class PhysicsEngine {
     lowActivity(body) {
         if (body.type === RigidBody.STATIC) return true;
 
-        const positionChange = body.position.minus(body.lastPosition).sqrMag();
-        const velocity = body.velocity.sqrMag();
+        const positionChange = body.position.minus(body.lastPosition).sqrMag;
+        const velocity = body.velocity.sqrMag;
         const angleChange = Math.abs(body.angle - body.lastAngle);
         const angularVelocity = Math.abs(body.angularVelocity);
 
