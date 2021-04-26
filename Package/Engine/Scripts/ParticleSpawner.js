@@ -19,7 +19,7 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 				}
 
 				if (l.slows) {
-					this.velocity.mul(physicsEngine.linearDrag);
+					this.velocity.mul(physicsEngine.drag);
 				}
 
 				this.position.add(this.velocity);
