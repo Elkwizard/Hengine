@@ -946,7 +946,7 @@ class PhysicsConstraint1 {
 
             forceToError.a = mA + iA * rA.y ** 2;
             forceToError.b = -iA * rA.x * rA.y;
-            forceToError.c = -iA * rA.x * rA.y;
+            forceToError.c = forceToError.b;
             forceToError.d = mA + iA * rA.x ** 2;
 
             const force = forceToError.applyInverseTo(this.error);
@@ -1031,7 +1031,7 @@ class PhysicsConstraint2 {
 
             forceToError.a = mA + iA * rA.y ** 2 + mB + iB * rB.y ** 2;
             forceToError.b = -iA * rA.x * rA.y - iB * rB.x * rB.y;
-            forceToError.c = -iA * rA.x * rA.y - iB * rB.x * rB.y;
+            forceToError.c = forceToError.b;
             forceToError.d = mA + iA * rA.x ** 2 + mB + iB * rB.x ** 2;
 
             const force = forceToError.applyInverseTo(this.error);
@@ -1047,7 +1047,7 @@ class PhysicsConstraint2 {
         return new PhysicsVector(velocityError.x + positionError.x, velocityError.y + positionError.y).mul(INTENSITY);
     }
 }
-PhysicsConstraint2.INTENSITY = 1//0.9;
+PhysicsConstraint2.INTENSITY = 0.9;
 
 // constraint implementations
 PhysicsConstraint2.Length = class extends PhysicsConstraint2 {
