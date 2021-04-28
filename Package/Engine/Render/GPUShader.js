@@ -242,19 +242,19 @@ void main() {
 		// user uniforms
 		let uniformMap = {};
 		let uniformTypeMap = new Map();
-		uniformTypeMap.set(gl.FLOAT, { type: "float", integer: false });
-		uniformTypeMap.set(gl.FLOAT_VEC2, { type: "vec2", integer: false });
-		uniformTypeMap.set(gl.FLOAT_VEC3, { type: "vec3", integer: false });
-		uniformTypeMap.set(gl.FLOAT_VEC4, { type: "vec4", integer: false });
-		uniformTypeMap.set(gl.INT, { type: "int", integer: true });
-		uniformTypeMap.set(gl.INT_VEC2, { type: "ivec2", integer: true });
-		uniformTypeMap.set(gl.INT_VEC3, { type: "ivec3", integer: true });
-		uniformTypeMap.set(gl.INT_VEC4, { type: "ivec4", integer: true });
-		uniformTypeMap.set(gl.UNSIGNED_INT, { type: "int", integer: true });
-		uniformTypeMap.set(gl.UNSIGNED_INT_VEC2, { type: "ivec2", integer: true });
-		uniformTypeMap.set(gl.UNSIGNED_INT_VEC3, { type: "ivec3", integer: true });
-		uniformTypeMap.set(gl.UNSIGNED_INT_VEC4, { type: "ivec4", integer: true });
-		uniformTypeMap.set(gl.SAMPLER_2D, { type: "sampler2D", integer: false });
+		uniformTypeMap.set(gl.FLOAT, { type: "float", size: 1, integer: false });
+		uniformTypeMap.set(gl.FLOAT_VEC2, { type: "vec2", size: 2, integer: false });
+		uniformTypeMap.set(gl.FLOAT_VEC3, { type: "vec3", size: 3, integer: false });
+		uniformTypeMap.set(gl.FLOAT_VEC4, { type: "vec4", size: 4, integer: false });
+		uniformTypeMap.set(gl.INT, { type: "int", size: 1, integer: true });
+		uniformTypeMap.set(gl.INT_VEC2, { type: "ivec2", size: 2, integer: true });
+		uniformTypeMap.set(gl.INT_VEC3, { type: "ivec3", size: 3, integer: true });
+		uniformTypeMap.set(gl.INT_VEC4, { type: "ivec4", size: 4, integer: true });
+		uniformTypeMap.set(gl.UNSIGNED_INT, { type: "int", size: 1, integer: true });
+		uniformTypeMap.set(gl.UNSIGNED_INT_VEC2, { type: "ivec2", size: 2, integer: true });
+		uniformTypeMap.set(gl.UNSIGNED_INT_VEC3, { type: "ivec3", size: 3, integer: true });
+		uniformTypeMap.set(gl.UNSIGNED_INT_VEC4, { type: "ivec4", size: 4, integer: true });
+		uniformTypeMap.set(gl.SAMPLER_2D, { type: "sampler2D", size: 1, integer: false });
 		let uniformCount = gl.getProgramParameter(shaderProgram, gl.ACTIVE_UNIFORMS);
 		let currentTextureUnit = 0;
 		for (let i = 0; i < uniformCount; i++) {
@@ -264,7 +264,7 @@ void main() {
 			let inx = uniform.name.indexOf("[");
 			let name = uniform.name.slice(0, (inx > -1) ? inx : uniform.name.length);
 			let isArray = inx > -1;
-			let { type, integer } = uniformTypeMap.get(uniform.type);
+			let { type, size, integer } = uniformTypeMap.get(uniform.type);
 			let textureUnit = null;
 			let textures = [];
 			let isTexture = type === "sampler2D";
@@ -292,7 +292,7 @@ void main() {
 				} else gl.uniform1i(location, textureUnit);
 			}
 
-			uniformMap[name] = { type, name, location, isArray, arrayCount, integer, isTexture, textureUnit, textures };
+			uniformMap[name] = { type, name, location, isArray, arrayCount, integer, isTexture, textureUnit, textures, size };
 
 		}
 
@@ -358,10 +358,14 @@ void main() {
 				if (singleData === undefined) continue;
 
 				let dataKeys = [];
-				let vector = typeof singleData !== "number";
-				if (vector) for (let key of ["x", "y", "z", "w"]) if (key in singleData) dataKeys.push(key);
+				const vector = u.size > 1;
+				const components = u.size;
+				if (vector) {
+					const availableKeys = ["x", "y", "z", "w"].slice(0, components);
+					for (const key of availableKeys) 
+						if (key in singleData) dataKeys.push(key);
+				}
 				let setFunctionName = "uniform";
-				let components = vector ? dataKeys.length : 1;
 				setFunctionName += components;
 				setFunctionName += u.integer ? "i" : "f";
 
