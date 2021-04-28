@@ -17,9 +17,20 @@ class Random {
     static color() {
         return new Color(Random.random() * 255, Random.random() * 255, Random.random() * 255, 1);
     }
-    static choice(arr) {
+    static choice(arr, percentages = null) {
         if (!Array.isArray(arr)) arr = Array.from(arr);
-        return arr[Math.floor(Random.random() * arr.length)];
+        if (percentages === null) {
+            return arr[Math.floor(Random.random() * arr.length)];
+        } else {
+            let min = 0;
+            let random = Random.random();
+            for (let i = 0; i < percentages.length; i++) {
+                const percent = percentages[i];
+                if (random >= min && random < min + percent) return arr[i];
+                min += percent;
+            }
+            return arr.last;
+        }
     }
     static octave(oc, alg, ...sampleAndFreq) {
         const freq = sampleAndFreq.pop();
