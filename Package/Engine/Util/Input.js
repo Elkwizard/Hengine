@@ -202,7 +202,7 @@ class MouseHandler extends InputHandler {
 		}
 		function handleMove(e) {
 			m.updatePosition(e);
-			if (m.pressed("Left", "Middle", "Right")) {
+			if (m.pressed(["Left", "Middle", "Right"])) {
 				m.worldDragEnd = m.engine.scene.camera.screenSpaceToWorldSpace(m.screen);
 				m.screenDragEnd = m.screen.get();
 			}

@@ -1324,18 +1324,19 @@ class PhysicsEngine {
     }
     createGrid(dynBodies) {
         let cellsize = 100;
-        if (this.bodies.length) {
+        const nonEmptyBodies = this.bodies.filter(body => body.shapes.length > 0);
+        if (nonEmptyBodies.length) {
             cellsize = 1;
-            let body = this.bodies[Math.floor(this.bodies.length / 2)];
+            const body = nonEmptyBodies[Math.floor(nonEmptyBodies.length / 2)];
             for (let j = 0; j < body.shapes.length; j++) {
                 cellsize += body.shapes[j].size();
             }
         }
 
-        let grid = new PhysicsGrid(cellsize);
+        const grid = new PhysicsGrid(cellsize);
 
         //create grid
-        let collisionPairs = new Map();
+        const collisionPairs = new Map();
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
             let models = body.cacheModels();
