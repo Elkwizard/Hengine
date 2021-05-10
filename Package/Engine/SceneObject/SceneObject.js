@@ -148,6 +148,7 @@ class SceneObject extends SceneElement {
 		return this.shapes.has(name);
 	}
 	addShape(name, shape, convex = false) {
+		if (this.shapes.has(name)) this.removeShape(name);
 		this.shapes.set(name, shape);
 		if (shape instanceof Rect || shape instanceof Circle) convex = true;
 		this.convexShapes.set(shape, convex ? [shape] : Geometry.subdividePolygon(shape));
@@ -175,13 +176,13 @@ class SceneObject extends SceneElement {
 		return shapes;
 	}
 	getAllModels() {
-		let models = [];
-		for (let [name, shape] of this.shapes) models.push(shape.getModel(this.transform));
+		const models = [];
+		for (const [name, shape] of this.shapes) models.push(shape.getModel(this.transform));
 		return models;
 	}
-	getConvexModels() {
-		let models = [];
-		for (let [shape, shapes] of this.convexShapes) for (let i = 0; i < shapes.length; i++) models.push(shapes[i].getModel(this.transform));
+	getAllConvexModels() {
+		const models = [];
+		for (const [shape, shapes] of this.convexShapes) for (let i = 0; i < shapes.length; i++) models.push(shapes[i].getModel(this.transform));
 		return models;
 	}
 	centerShapes() {
@@ -215,6 +216,12 @@ class SceneObject extends SceneElement {
 	}
 	getModel(name) {
 		return this.shapes.get(name).getModel(this.transform);
+	}
+	getConvexModels(name) {
+		const models = [];
+		const shapes = this.convexShapes.get(this.shapes.get(name));
+		for (let i = 0; i < shapes.length; i++) models.push(shapes[i].getModel(this.transform));
+		return models;
 	}
 	scale(factor) {
 		const pos = Vector2.origin;
@@ -261,9 +268,7 @@ class SceneObject extends SceneElement {
 	runDraw() {
 		if (this.scripts.implements("Draw")) this.transform.drawInLocalSpace(() => {
 			const entries = [...this.shapes.entries()];
-			for (let [name, shape] of entries) {
-				this.scripts.run("Draw", name, shape);
-			}
+			for (let [name, shape] of entries) this.scripts.run("Draw", name, shape);
 		}, this.engine.renderer);
 	}
 	determineOnScreen(screen) {

@@ -58,7 +58,7 @@ class Scene {
 		let options = this.main.updateArray().filter(e => e.onScreen || override);
 		for (let hitbox of options) {
 			let p = (hitbox instanceof UIObject) ? this.camera.worldSpaceToScreenSpace(point) : point;
-			let shapes = hitbox.getConvexModels();
+			let shapes = hitbox.getAllConvexModels();
 			let colliding = false;
 			for (let shape of shapes) if (Geometry.overlapPoint(p, shape)) colliding = true;
 			if (colliding) {
@@ -72,10 +72,10 @@ class Scene {
 		return [collideAry, this.main.sceneObjectArray.filter(e => !collideAry.includes(e))];
 	}
 	beforePhysicsStep(phys) {
-		for (let el of phys) el.beforePhysicsStep();
+		for (const el of phys) el.beforePhysicsStep();
 	}
 	afterPhysicsStep(phys) {
-		for (let el of phys) el.afterPhysicsStep();
+		for (const el of phys) el.afterPhysicsStep();
 	}
 	handleCollisionEvents(useful) {
 		const types = [
@@ -101,7 +101,7 @@ class Scene {
 		}
 	}
 	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null) {
-		let con = new PhysicsConstraint2.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length);
+		const con = new PhysicsConstraint2.Length(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length);
 		if (length === null) {
 			const { ends } = con;
 			con.length = Vector2.dist(Vector2.fromPhysicsVector(ends[0]), Vector2.fromPhysicsVector(ends[1]));
@@ -109,7 +109,7 @@ class Scene {
 		this.physicsEngine.addConstraint(con);
 	}
 	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null) {
-		let con = new PhysicsConstraint1.Length(a.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null, length);
+		const con = new PhysicsConstraint1.Length(a.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null, length);
 		if (point === null) con.point = con.ends[0];
 		if (length === null) {
 			const { ends } = con;
@@ -118,11 +118,11 @@ class Scene {
 		this.physicsEngine.addConstraint(con);
 	}
 	constrainPosition(a, b, ap = Vector2.origin, bp = Vector2.origin) {
-		let con = new PhysicsConstraint2.Position(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector());
+		const con = new PhysicsConstraint2.Position(a.body, b.body, ap.toPhysicsVector(), bp.toPhysicsVector());
 		this.physicsEngine.addConstraint(con);
 	}
 	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
-		let con = new PhysicsConstraint1.Position(a.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null);
+		const con = new PhysicsConstraint1.Position(a.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null);
 		if (point === null) con.point = con.ends[0];
 		this.physicsEngine.addConstraint(con);
 	}
@@ -135,7 +135,7 @@ class Scene {
 		}
 	}
 	renderCamera() {
-		let screen = this.camera.cacheScreen();
+		const screen = this.camera.cacheScreen();
 
 		this.engine.renderer.save();
 

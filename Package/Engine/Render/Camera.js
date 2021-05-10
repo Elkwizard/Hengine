@@ -24,6 +24,7 @@ class Camera extends Matrix3 {
 		});
 		this.zoom = zoom;
 		this.rotation = rotation;
+		this.cacheScreen();
 	}
 	set position(a) {
 		this._position.x = a.x;
@@ -89,14 +90,13 @@ class Camera extends Matrix3 {
 		this.zoom /= 1 + amount;
 	}
 	cacheScreen() {
-		let { width, height } = this.engine.renderer;
-		this.screen = Rect.bound([
+		const { width, height } = this.engine.renderer;
+		return this.screen = Rect.bound([
 			new Vector2(width / 2, height / 2),
 			new Vector2(width / 2, -height / 2),
 			new Vector2(-width / 2, height / 2),
 			new Vector2(-width / 2, -height / 2)
 		].map(v => v.rotate(this.rotation).Ndiv(this.zoom).Vadd(this.position)));
-		return this.screen;
 	}
 	drawInWorldSpace(artist) {
 		let renderer = this.engine.renderer;

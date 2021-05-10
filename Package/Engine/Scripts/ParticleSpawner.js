@@ -19,7 +19,7 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 				}
 
 				if (l.slows) {
-					this.velocity.mul(physicsEngine.drag);
+					this.velocity.mul(1 - physicsEngine.drag);
 				}
 
 				this.position.add(this.velocity);
@@ -30,6 +30,9 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 		l.toRemove = new Set();
 
 		l.lastTransform = this.transform.get();
+	},
+	removeAllParticles(l) {
+		l.particles.clear();
 	},
 	setProperties(l, p) {
 		l.init = p.init ?? l.init ?? (() => null);
@@ -79,13 +82,8 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 		this.transform.get(l.lastTransform);
 	},
 	escapeDraw(l) {
+		if (this.hidden) return;
 		const { gl, frame } = l;
-
-		// if (keyboard.justPressed(" ")) gl.clear();
-
-		// gl.clearTransformations();
-
-		// gl.fill(new Color(0, 0, 0, 0.1));
 
 		gl.clear();
 
@@ -102,7 +100,7 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 
 		const timerIncrement = 1 / l.lifeSpan;
 
-		let renderedParticles = 0;
+		let renderedParticles = false;
 
 		for (let p of l.particles) {
 			p.timer += timerIncrement
@@ -115,7 +113,7 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 
 			if (Geometry.pointInsideRect(p.position, screen)) {
 				l.draw(gl, p);
-				renderedParticles++;
+				renderedParticles = true;
 			}
 		}
 

@@ -55,6 +55,9 @@ class PhysicsVector {
         }
         return this;
     }
+    projectOnto(v) {
+        return v.times(this.dot(v) / v.sqrMag);
+    }
     equals(v) {
         return Math.abs(this.x - v.x) < 1.0001 && Math.abs(this.y - v.y) < 1.0001;
     }
@@ -128,7 +131,7 @@ class PhysicsMatrix {
     applyInverseTo(vector) {
         const determinant = this.determinant;
         if (!determinant) return null;
-        
+
         const invDeterminant = 1 / determinant;
         const a = this.d;
         const b = -this.b;
@@ -140,6 +143,95 @@ class PhysicsMatrix {
             invDeterminant * (c * vector.x + d * vector.y)
         );
     }
+    static force1ToZero(body, point) {
+        if (!body.dynamic) return new PhysicsVector(0, 0);
+
+        const mA = 1 / body.mass;
+        const iA = body.canRotate ? 1 / body.inertia : 0;
+        const rAx = point.x - body.position.x;
+        const rAy = point.y - body.position.y;
+
+        // construct force-to-velocity matrix
+        const a = -mA - iA * rAy ** 2;
+        const b = iA * rAx * rAy;
+        const c = b;
+        const d = -mA - iA * rAx ** 2;
+
+        const determinant = a * d - b * c;
+
+        // non-invertable matrix, I really don't know what to do here
+        if (!determinant) return new PhysicsVector(0, 0);
+
+        const invDeterminant = 1 / determinant;
+
+        // invert to get velocity-to-force matrix (save dividing by determinant for later)
+        const inverseA = d;
+        const inverseB = -b;
+        const inverseC = -c;
+        const inverseD = a;
+
+        const velocityX = -rAy * body.angularVelocity + body.velocity.x;
+        const velocityY = rAx * body.angularVelocity + body.velocity.y;
+
+        return new PhysicsVector(
+            invDeterminant * (inverseA * velocityX + inverseB * velocityY),
+            invDeterminant * (inverseC * velocityX + inverseD * velocityY)
+        );
+    }
+    static force2ToZero(bodyA, bodyB, point) {
+        const rAx = point.x - bodyA.position.x;
+        const rAy = point.y - bodyA.position.y;
+        const rBx = point.x - bodyB.position.x;
+        const rBy = point.y - bodyB.position.y;
+        const velocityError = new PhysicsVector(
+            (-rAy * bodyA.angularVelocity + bodyA.velocity.x) - (-rBy * bodyB.angularVelocity + bodyB.velocity.x),
+            (rAx * bodyA.angularVelocity + bodyA.velocity.y) - (rBx * bodyB.angularVelocity + bodyB.velocity.y)
+        );
+        return PhysicsMatrix.resolveVelocityError(bodyA, bodyB, velocityError, point);
+    }
+    static resolveVelocityError(bodyA, bodyB, error, point) {
+        const dynamicA = bodyA.dynamic;
+        const dynamicB = bodyB.dynamic;
+
+        if (dynamicA || dynamicB) {
+            const mA = dynamicA ? 1 / bodyA.mass : 0;
+            const mB = dynamicB ? 1 / bodyB.mass : 0;
+            const iA = (dynamicA && bodyA.canRotate) ? 1 / bodyA.inertia : 0;
+            const iB = (dynamicB && bodyB.canRotate) ? 1 / bodyB.inertia : 0;
+            const rAx = point.x - bodyA.position.x;
+            const rAy = point.y - bodyA.position.y;
+            const rBx = point.x - bodyB.position.x;
+            const rBy = point.y - bodyB.position.y;
+
+            // construct force-to-velocity matrix
+            const a = -(mA + iA * rAy ** 2 + mB + iB * rBy ** 2);
+            const b = iA * rAx * rAy + iB * rBx * rBy;
+            const c = b;
+            const d = -(mA + iA * rAx ** 2 + mB + iB * rBx ** 2);
+
+            const determinant = a * d - b * c;
+
+            // non-invertable matrix, I really don't know what to do here
+            if (!determinant) return new PhysicsVector(0, 0);
+
+            const invDeterminant = 1 / determinant;
+
+            // invert to get velocity-to-force matrix (save dividing by determinant for later)
+            const inverseA = invDeterminant * d;
+            const inverseB = invDeterminant * -b;
+            const inverseC = invDeterminant * -c;
+            const inverseD = invDeterminant * a;
+
+            const velocityX = error.x//();
+            const velocityY = error.y//();
+
+            return new PhysicsVector(
+                inverseA * velocityX + inverseB * velocityY,
+                inverseC * velocityX + inverseD * velocityY
+            );
+        }
+        return new PhysicsVector(0, 0);
+    }
 }
 
 //vector accumulator
@@ -148,6 +240,7 @@ class PhysicsVectorAccumulator {
         this.min = new PhysicsVector(0, 0);
         this.max = new PhysicsVector(0, 0);
         this._value = new PhysicsVector(0, 0);
+        this.length = 0;
     }
     get value() {
         this._value.mul(0);
@@ -157,12 +250,14 @@ class PhysicsVectorAccumulator {
     reset() {
         this.min.mul(0);
         this.max.mul(0);
+        this.length = 0;
     }
     append(x = 0, y = 0) {
         if (x < this.min.x) this.min.x = x;
         else if (x > this.max.x) this.max.x = x;
         if (y < this.min.y) this.min.y = y;
         else if (y > this.max.y) this.max.y = y;
+        this.length++;
     }
 }
 
@@ -453,6 +548,9 @@ class RigidBody {
     get angle() {
         return this._angle;
     }
+    get dynamic() {
+        return this.type !== RigidBody.STATIC;
+    }
     updateLastData() {
         this.lastAngle = this.angle;
         this.lastPosition = this.position.get();
@@ -461,9 +559,11 @@ class RigidBody {
         if (!this.collidingBodies.includes(body)) this.collidingBodies.push(body);
     }
     wake() {
-        if (this.type === RigidBody.DYNAMIC) this.sleeping = 0;
+        if (this.dynamic) this.sleeping = 0;
     }
     displace(v) {
+        if (!this.dynamic) return;
+
         this.position.add(v);
         for (let i = 0; i < this.__models.length; i++) {
             if (this.__models[i]) this.__models[i].displace(v);
@@ -515,7 +615,7 @@ class RigidBody {
         return sh;
     }
     integrate(intensity) {
-        let dif = this.velocity.times(intensity);
+        const dif = this.velocity.times(intensity);
         if (this.canRotate) {
             this.position.add(dif);
             this.angle += this.angularVelocity * intensity;
@@ -527,46 +627,15 @@ class RigidBody {
         this.angularVelocity = 0;
     }
     pointVelocity(p) {
-        if (this.type === RigidBody.STATIC) return new PhysicsVector(0, 0);
+        if (!this.dynamic) return new PhysicsVector(0, 0);
         return new PhysicsVector(-(p.y - this.position.y) * this.angularVelocity + this.velocity.x, (p.x - this.position.x) * this.angularVelocity + this.velocity.y);
     }
     pointForce(p) {
-        if (this.type === RigidBody.STATIC) return new PhysicsVector(0, 0);
-
-        const mA = 1 / this.mass;
-        const iA = 1 / this.inertia;
-        const rAx = p.x - this.position.x;
-        const rAy = p.y - this.position.y;
-
-        // construct force-to-velocity matrix
-        const a = mA + iA * rAy ** 2;
-        const b = -iA * rAx * rAy;
-        const c = b;
-        const d = mA + iA * rAx ** 2;
-
-        const determinant = a * d - b * c;
-
-        // non-invertable matrix, I really don't know what to do here
-        if (!determinant) return new PhysicsVector(0, 0);
-
-        const invDeterminant = 1 / determinant;
-
-        // invert to get velocity-to-force matrix (save dividing by determinant for later)
-        const inverseA = d;
-        const inverseB = -b;
-        const inverseC = -c;
-        const inverseD = a;
-
-        const velocityX = -rAy * this.angularVelocity + this.velocity.x;
-        const velocityY = rAx * this.angularVelocity + this.velocity.y;
-
-
-        return new PhysicsVector(
-            invDeterminant * (inverseA * velocityX + inverseB * velocityY), 
-            invDeterminant * (inverseC * velocityX + inverseD * velocityY)
-        );
+        return PhysicsMatrix.force1ToZero(this, p).invert();
     }
     applyImpulse(pos, imp) {
+        if (!this.dynamic) return;
+
         //linear
         this.velocity.x += imp.x / this.mass;
         this.velocity.y += imp.y / this.mass;
@@ -578,12 +647,14 @@ class RigidBody {
         }
     }
     accumulateImpulse(pos, imp) {
+        if (!this.dynamic) return;
+
         //linear
         this.accelerationAccumulator.append(imp.x / this.mass, imp.y / this.mass);
 
         //angular
         if (this.canRotate) {
-            let cross = (pos.x - this.position.x) * imp.y - (pos.y - this.position.y) * imp.x;
+            const cross = (pos.x - this.position.x) * imp.y - (pos.y - this.position.y) * imp.x;
             if (cross) this.angularAccelerationAccumulator.append(cross / this.inertia);
         }
     }
@@ -768,7 +839,6 @@ class CollisionDetector {
         let intersections = PhysicsMath.intersectPolygon(a.vertices, b.vertices);
 
         let { aMin, aMax, bMin, bMax } = bestRange;
-        // exit(bestRange);
         let rMin;
         let rMax;
         if ((aMin + aMax) / 2 < (bMin + bMax) / 2) {
@@ -845,9 +915,36 @@ class CollisionResolver {
         const crossB = (rB.x * n.y - rB.y * n.x) / iB;
         const inertiaTerm = (crossA * rA.x + crossB * rB.x) * n.y - (crossA * rA.y + crossB * rB.y) * n.x;
 
+        // const inertiaTerm = rA.cross(n) ** 2 / iA + rB.cross(n) ** 2 / iB
+
         const invMassSum = 1 / mA + 1 / mB + inertiaTerm;
         const j = (1 + e) * vAB.dot(n) / invMassSum;
         return j;
+    }
+    normalImpulse(bodyA, bodyB, rA, rB, mB, iB, normal, vAB) {
+        const e = Math.max(bodyA.restitution, bodyB.restitution);
+        return this.getJ(vAB, bodyA.mass, mB, bodyA.inertia, iB, e, normal, rA, rB);
+    }
+    frictionImpulse(bodyA, rA, rB, mB, iB, tangent, vAB, normalImpulse, staticFriction, kineticFriction) {
+        const jt = this.getJ(vAB, bodyA.mass, mB, bodyA.inertia, iB, 0, tangent, rA, rB);
+        if (Math.abs(jt) < normalImpulse * staticFriction) return jt;
+        else return Math.sign(jt) * normalImpulse * kineticFriction;
+    }
+    contactImpulse(dynamic, bodyA, bodyB, contact, normal, tangent, staticFriction, kineticFriction) {
+        const rA = contact.minus(bodyA.position);
+        const vAB = dynamic ? bodyB.pointVelocity(contact).sub(bodyA.pointVelocity(contact)) : bodyA.pointVelocity(contact).invert();
+        const rB = dynamic ? contact.minus(bodyB.position) : new PhysicsVector(0, 0);
+        const mB = dynamic ? bodyB.mass : INFINITY;
+        const iB = dynamic ? bodyB.inertia : INFINITY;
+        
+        const normalImpulse = this.normalImpulse(bodyA, bodyB, rA, rB, mB, iB, normal, vAB);
+        if (normalImpulse >= 0) return new PhysicsVector(0, 0);
+        const frictionImpulse = this.frictionImpulse(bodyA, rA, rB, mB, iB, tangent, vAB, -normalImpulse, staticFriction, kineticFriction);
+
+        return new PhysicsVector(
+            normalImpulse * normal.x + frictionImpulse * tangent.x,
+            normalImpulse * normal.y + frictionImpulse * tangent.y
+        );
     }
     dynamicResolve(bodyA, bodyB, direction, penetration, contacts) {
         const move = direction.times(penetration);
@@ -856,35 +953,20 @@ class CollisionResolver {
         bodyA.displace(moveA);
         if (bodyB.canMoveThisStep || this.engine.iterations > 2) bodyB.displace(moveB);
 
-        const friction = bodyA.friction * bodyB.friction;
-
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
+
+        const normal = direction;
+        const tangent = direction.normal;
+
+        const staticFriction = bodyA.friction * bodyB.friction;
+        const kineticFriction = staticFriction * 0.9;
 
         for (let i = 0; i < contacts.length; i++) {
             const contact = contacts[i];
             const factor = contact.penetration / totalPenetration;
-
-            //normal
-            const vAB = bodyB.pointVelocity(contact.point).sub(bodyA.pointVelocity(contact.point));
-            const rA = contact.point.minus(bodyA.position);
-            const rB = contact.point.minus(bodyB.position);
-            const e = Math.max(bodyA.restitution, bodyB.restitution);
-            const n = direction;
-            const j_n = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, n, rA, rB) * factor;
-
-            const impulseA_n = n.times(j_n);
-            const impulseB_n = impulseA_n.inverse;
-
-            //friction
-            const t = direction.normal;
-            const j_t = this.getJ(vAB, bodyA.mass, bodyB.mass, bodyA.inertia, bodyB.inertia, e, t, rA, rB) * factor * friction;
-
-            const impulseA_t = t.times(j_t);
-            const impulseB_t = impulseA_t.inverse;
-
-            const impulseA = impulseA_n.add(impulseA_t);
-            const impulseB = impulseB_n.add(impulseB_t);
+            const impulseA = this.contactImpulse(true, bodyA, bodyB, contact.point, normal, tangent, staticFriction, kineticFriction).mul(factor);
+            const impulseB = impulseA.inverse;
 
             bodyA.accumulateImpulse(contact.point, impulseA);
             bodyB.accumulateImpulse(contact.point, impulseB);
@@ -894,28 +976,19 @@ class CollisionResolver {
         const move = direction.times(-penetration);
         bodyA.displace(move);
 
-        const friction = bodyA.friction * bodyB.friction;
-
         let totalPenetration = 0;
         for (let i = 0; i < contacts.length; i++) totalPenetration += contacts[i].penetration;
+
+        const normal = direction;
+        const tangent = direction.normal;
+
+        const staticFriction = bodyA.friction * bodyB.friction;
+        const kineticFriction = staticFriction * 0.9;
 
         for (let i = 0; i < contacts.length; i++) {
             const contact = contacts[i];
             const factor = contact.penetration / totalPenetration;
-
-            const vAB = bodyA.pointVelocity(contact.point);
-            const e = bodyA.restitution;
-            const rA = contact.point.minus(bodyA.position);
-            const rB = new PhysicsVector(0, 0);
-            const n = direction;
-            const j_n = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, n, rA, rB) * factor;
-            const impulseA_n = n.times(j_n);
-
-            const t = n.normal;
-            const j_t = -this.getJ(vAB, bodyA.mass, INFINITY, bodyA.inertia, INFINITY, e, t, rA, rB) * factor * friction;
-            const impulseA_t = t.times(j_t);
-
-            const impulseA = impulseA_n.plus(impulseA_t);
+            const impulseA = this.contactImpulse(false, bodyA, bodyB, contact.point, normal, tangent, staticFriction, kineticFriction).mul(factor);
 
             bodyA.accumulateImpulse(contact.point, impulseA);
         }
@@ -959,7 +1032,7 @@ class PhysicsConstraint1 {
     solve() {
         const { body, forceToError } = this;
 
-        if (body.type !== RigidBody.STATIC) {
+        if (body.dynamic) {
             const a = this.ends[0];
 
             // velocity
@@ -996,8 +1069,8 @@ class PhysicsConstraint2 {
             this._endB = new PhysicsVector(0, 0)
         ];
 
-        const dynamicA = a.type !== RigidBody.STATIC;
-        const dynamicB = b.type !== RigidBody.STATIC;
+        const dynamicA = a.dynamic;
+        const dynamicB = b.dynamic;
         const mA = dynamicA ? 1 / a.mass : 0;
         const mB = dynamicB ? 1 / b.mass : 0;
         this.forceToError = new PhysicsMatrix(
@@ -1028,8 +1101,6 @@ class PhysicsConstraint2 {
         this._endB.x = t_bx + this.bodyB.position.x;
         this._endB.y = t_by + this.bodyB.position.y;
 
-        // if (this._endA.x > 1e5) exit(this.bodyA.position.x);
-
         return this._ends;
     }
     hasBody(b) {
@@ -1038,8 +1109,8 @@ class PhysicsConstraint2 {
     solve() {
         const { bodyA, bodyB, forceToError } = this;
 
-        const dynamicA = bodyA.type !== RigidBody.STATIC;
-        const dynamicB = bodyB.type !== RigidBody.STATIC;
+        const dynamicA = bodyA.dynamic;
+        const dynamicB = bodyB.dynamic;
 
         if (dynamicA || dynamicB) {
             const [a, b] = this.ends;
@@ -1142,7 +1213,7 @@ class PhysicsEngine {
         this.bodies = [];
         this.collisionResolver = new CollisionResolver(this);
         this.drag = 0.005;
-        this.friction = 0.5;
+        this.friction = 0.9;
         this.constraints = [];
         this.constraintIterations = 5;
         this.onCollide = (a, b, dir, contacts) => null;
@@ -1165,10 +1236,10 @@ class PhysicsEngine {
         return this.sleepDuration * this.iterations;
     }
     isAsleep(body) {
-        return body.type === RigidBody.STATIC || body.sleeping >= this.getSleepDuration();
+        return !body.dynamic || body.sleeping >= this.getSleepDuration();
     }
     clearCollidingBodies() {
-        const filter = body => body.type !== RigidBody.STATIC && this.isAsleep(body);
+        const filter = body => body.dynamic && this.isAsleep(body);
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
             if (!filter(body)) body.collidingBodies = body.collidingBodies.filter(filter);
@@ -1214,9 +1285,9 @@ class PhysicsEngine {
         let collisionDirection = col.direction;
         let maxPenetration = col.penetration;
         let contacts = col.contacts;
-        // scene.camera.drawInWorldSpace(() => {
-        //     for (let cont of contacts) renderer.stroke(Color.ORANGE, 1).line(body.position, cont.point); 
-        // });
+
+        // for (let cont of contacts) renderer.stroke(Color.ORANGE, 1).circle(cont.point, 3);
+
         body2.addCollidingBody(body);
         body.addCollidingBody(body2);
 
@@ -1225,7 +1296,7 @@ class PhysicsEngine {
 
         if (body.isTrigger || body2.isTrigger) return;
 
-        let STATIC = body2.type === RigidBody.STATIC;
+        let STATIC = !body2.dynamic;
 
         if (!STATIC) {
             if ((body.sleeping || body2.sleeping) && (!this.lowActivity(body) || !this.lowActivity(body2))) {
@@ -1314,10 +1385,7 @@ class PhysicsEngine {
                     this.resolve(body, body2, best);
                 }
             }
-
-
         }
-
     }
     cacheModels() {
         for (let i = 0; i < this.bodies.length; i++) this.bodies[i].invalidateModels();
@@ -1367,7 +1435,7 @@ class PhysicsEngine {
         return collisionPairs;
     }
     lowActivity(body) {
-        if (body.type === RigidBody.STATIC) return true;
+        if (!body.dynamic) return true;
 
         const positionChange = body.position.minus(body.lastPosition).sqrMag;
         const velocity = body.velocity.sqrMag;
@@ -1411,51 +1479,58 @@ class PhysicsEngine {
     applyAccumulatedImpulses(dynBodies) {
         for (let i = 0; i < dynBodies.length; i++) {
             const body = dynBodies[i];
-            body.velocity.add(body.accelerationAccumulator.value);
-            body.angularVelocity += body.angularAccelerationAccumulator.value.x;
-            body.accelerationAccumulator.reset();
-            body.angularAccelerationAccumulator.reset();
+            // if (body.accelerationAccumulator.length) {
+                body.velocity.add(body.accelerationAccumulator.value);
+                body.angularVelocity += body.angularAccelerationAccumulator.value.x;
+                body.accelerationAccumulator.reset();
+                body.angularAccelerationAccumulator.reset();
+            // }
         }
     }
     run() {
-        //remove unsimulated
-        const backupBodies = this.bodies;
-        this.bodies = this.bodies.filter(body => body.simulated);
+        scene.camera.drawInWorldSpace(() => {
+            //remove unsimulated
+            const backupBodies = this.bodies;
+            this.bodies = this.bodies.filter(body => body.simulated);
 
-        const dynBodies = this.bodies.filter(body => body.type === RigidBody.DYNAMIC);
-        
-        // approximate where they'll be at the end of the frame
-        this.integrate(dynBodies, 1);
-        const collisionPairs = this.createGrid(dynBodies);
-        this.integrate(dynBodies, -1);
-        
-        const intensity = 1 / (this.iterations * this.constraintIterations);
-        this.step = 0;
+            const dynBodies = this.bodies.filter(body => body.type === RigidBody.DYNAMIC);
 
-        //sorts
-        const { x: gx, y: gy } = this.gravity;
-        const gravitySort = (a, b) => (b.position.x - a.position.x) * gx + (b.position.y - a.position.y) * gy;
+            // approximate where they'll be at the end of the frame
+            this.integrate(dynBodies, 1);
+            const collisionPairs = this.createGrid(dynBodies);
+            this.integrate(dynBodies, -1);
 
-        this.clearCollidingBodies();
+            const intensity = 1 / (this.iterations * this.constraintIterations);
+            this.step = 0;
 
-        // solve
-        for (let i = 0; i < this.iterations; i++) {
-            this.step++;
+            //sorts
+            const { x: gx, y: gy } = this.gravity;
+            const gravitySort = (a, b) => (b.position.x - a.position.x) * gx + (b.position.y - a.position.y) * gy;
 
-            //step
-            for (let j = 0; j < this.constraintIterations; j++) {
-                this.applyForces(dynBodies, intensity);
-                this.solveConstraints();
-                // this.applyAccumulatedImpulses(dynBodies);
-                this.integrate(dynBodies, intensity);
+            this.clearCollidingBodies();
+
+            // solve
+            for (let i = 0; i < this.iterations; i++) {
+                this.step++;
+
+                //step
+                for (let j = 0; j < this.constraintIterations; j++) {
+                    this.applyForces(dynBodies, intensity);
+                    this.solveConstraints();
+                    // this.applyAccumulatedImpulses(dynBodies);
+                    this.integrate(dynBodies, intensity);
+                }
+                this.collisions(dynBodies, collisionPairs, gravitySort);
+                this.applyAccumulatedImpulses(dynBodies);
+                this.handleSleep(dynBodies);
+                // for (const body of dynBodies) {
+                //     renderer.stroke(Color.ORANGE).arrow(body.position, body.position.plus(body.velocity));
+                // }    
             }
-            this.collisions(dynBodies, collisionPairs, gravitySort);
-            this.applyAccumulatedImpulses(dynBodies);
-            this.handleSleep(dynBodies);
-        }
 
-        //add back unsimulated
-        this.bodies = backupBodies;
+            //add back unsimulated
+            this.bodies = backupBodies;
+        });
     }
     getBody(id) {
         for (let i = 0; i < this.bodies.length; i++) {
