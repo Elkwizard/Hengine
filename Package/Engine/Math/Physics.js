@@ -1213,7 +1213,7 @@ class PhysicsEngine {
         this.bodies = [];
         this.collisionResolver = new CollisionResolver(this);
         this.drag = 0.005;
-        this.friction = 0.9;
+        this.friction = 0.5;
         this.constraints = [];
         this.constraintIterations = 5;
         this.onCollide = (a, b, dir, contacts) => null;
