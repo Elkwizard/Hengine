@@ -375,6 +375,33 @@ class FileSystem { };
 
 			return true;
 		}
+		downloadBuffer(path, filename = "buffer.txt") {
+			const buffer = this.readFile(path, true).toBase64();
+			const a = document.createElement("a");
+			const uri = "data:text/plain;charset=utf-8," + encodeURIComponent(buffer);
+			a.setAttribute("href", uri);
+			a.setAttribute("download", filename);
+			return new Promise(resolve => {
+				a.onclick = () => resolve();
+				a.click();
+			});
+		}
+		uploadBuffer(path) {
+			const fi = document.createElement("input");
+			fi.type = "file";
+			fi.onchange = () => {
+				const file = fi.files[0];
+				if (file) {
+					const reader = new FileReader();
+					reader.readAsText(file);
+					reader.onload = () => {
+						const { result } = reader;
+						this.writeFile(path, ByteBuffer.fromBase64(result));
+					}
+				}
+			};
+			fi.click();
+		}
 		toString() {
 			for (const file of this.files) if (file instanceof ByteBuffer) file.finalize();
 			const buffer = new ByteBuffer();

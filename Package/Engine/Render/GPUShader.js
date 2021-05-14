@@ -1,10 +1,14 @@
 class GLSLError {
-	constructor(string, prefixLength) {
-		string = string.cut(":")[1];
+	constructor(rawString, prefixLength) {
+		const string = rawString.cut(":")[1];
 		let [lineStr, descStr] = string.cut(":");
 		lineStr = lineStr.trim();
 		this.line = parseInt(lineStr) - prefixLength;
 		this.desc = descStr.trim();
+		if (isNaN(this.line)) {
+			this.line = 0;
+			this.desc = rawString;
+		}
 	}
 	toString() {
 		return `line ${this.line}: ${this.desc}`;
@@ -87,7 +91,7 @@ class GPUShader extends ImageType {
 	}
 	get compiled() {
 		if (!this._compiled) {
-			exit("Didn't compile GPUShader");
+			exit("Didn't compile GPUShader", this.compileState.error);
 			return null;
 		} return this._compiled;
 	}
@@ -125,7 +129,7 @@ class GPUShader extends ImageType {
 	updatePositionBuffer() {
 		if (this.gl.isContextLost()) return;
 
-		const gl = this.gl;
+		const { gl } = this;
 		const positionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 		const positions = this.shadingRectPositions;
@@ -138,7 +142,7 @@ class GPUShader extends ImageType {
 		if (!this.compiled) return;
 		if (this.gl.isContextLost()) return;
 
-		const gl = this.gl;
+		const { gl } = this;
 		gl.uniform1f(this.uniformLocations.halfWidth, this.width / 2);
 		gl.uniform1f(this.uniformLocations.halfHeight, this.height / 2);
 		gl.uniform2f(this.uniformLocations.resolution, this.width, this.height);
@@ -167,7 +171,7 @@ class GPUShader extends ImageType {
 		if (this.gl.isContextLost()) return;
 
 		//init
-		const gl = this.gl;
+		const { gl } = this;
 
 		//sources
 		const vertexSource = `#version 300 es
@@ -271,10 +275,10 @@ void main() {
 			let location = gl.getUniformLocation(shaderProgram, uniform.name);
 			if (isTexture) {
 				textureUnit = currentTextureUnit;
-				currentTextureUnit += arrayCount;
 				for (let i = 0; i < arrayCount; i++) {
 					// setup textures
 					let tex = gl.createTexture();
+					gl.activeTexture(gl.TEXTURE0 + currentTextureUnit++);
 					gl.bindTexture(gl.TEXTURE_2D, tex);
 
 					// wrapping and stretching
@@ -310,11 +314,28 @@ void main() {
 		this.compileState = { compiled: true, error };
 		return true;
 	}
+	configureTexture(arg, config) {
+		if (arg in this.compiled.uniformMap) {
+			const { textures, isTexture, textureUnit } = this.compiled.uniformMap[arg];
+			if (!isTexture) return console.warn("Webgl uniform '" + arg + "' isn't a texture");
+			const { gl } = this;
+			for (let i = 0; i < textures.length; i++) {
+				const texture = textures[i];
+				gl.activeTexture(gl.TEXTURE0 + textureUnit + i);
+				gl.bindTexture(gl.TEXTURE_2D, texture);
+				if ("pixelated" in config) {
+					const value = config.pixelated ? gl.NEAREST : gl.LINEAR;
+					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, value);
+					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, value);
+				}
+			}
+		} else return console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+	}
 	argumentExists(arg) {
 		return arg in this.compiled.uniformMap;
 	}
 	getArgument(arg) {
-		if (arg in this.args) return this.args[arg];
+		if (arg in this.compiled.uniformMap) return this.args[arg];
 		else return console.warn("Webgl uniform '" + arg + "' doesn't exist.");
 	}
 	setArgument(arg, value) {
@@ -324,24 +345,21 @@ void main() {
 		if (this.gl.isContextLost()) return;
 
 		let { uniformMap } = this.compiled;
-		const gl = this.gl;
+		const { gl } = this;
 
 		//uniforms in shader
 		for (let arg in uniformData) {
 			let u = uniformMap[arg];
 			if (u === undefined) {
-				if (!this.allUniformNames.includes(arg)) {
-					console.warn("Webgl uniform '" + arg + "' doesn't exist.");
-				}
+				console.warn("Webgl uniform '" + arg + "' doesn't exist.");
 				continue;
 			}
 			let data = uniformData[arg];
-			let p = u.properties;
 			this.args[arg] = data;
 
 			let location = u.location;
 
-			if (u.type === "sampler2D") {
+			if (u.isTexture) {
 				if (u.isArray) {
 					for (let i = 0; i < u.arrayCount; i++) 
 						this.writeTexture(u.textureUnit + i, u.textures[i], data[i]);
@@ -372,7 +390,7 @@ void main() {
 				if (u.isArray) {
 					setFunctionName += "v";
 					let arraySize = u.arrayCount;
-					let buffer = new (u.integer	 ? Int32Array : Float32Array)(arraySize * components);
+					let buffer = new (u.integer	? Int32Array : Float32Array)(arraySize * components);
 					let bufferIndex = 0;
 					for (let i = 0; i < data.length; i++) {
 						if (vector) for (let j = 0; j < dataKeys.length; j++) buffer[bufferIndex++] = data[i][dataKeys[j]];
@@ -388,10 +406,11 @@ void main() {
 		this.loaded = false;
 	}
 	writeTexture(textureUnit, texture, data) {
-		const gl = this.gl;
+		const { gl } = this;
 		gl.activeTexture(gl.TEXTURE0 + textureUnit);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.makeImage());
+		if (data instanceof Texture) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, data.width, data.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data.updateImageData());
+		else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.makeImage());
 	}
 	makeImage() {
 		if (!this.loaded) this.shade();

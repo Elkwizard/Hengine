@@ -70,9 +70,7 @@ class ImageType {
 		a.href = canvas.toDataURL();
 		a.download = name + ".png";
 		return new Promise(resolve => {
-			a.onclick = function () {
-				resolve();
-			};
+			a.onclick = () => resolve();
 			a.click();
 		});
 	}

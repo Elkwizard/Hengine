@@ -40,6 +40,75 @@ class ByteBuffer {
 		}
 		return result;
 	}
+	toBase64() {
+		const binary = [...this.data];
+		const base64Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+		let base64 = "";
+		for (let i = 0; i < binary.length; i += 3) {
+			let a = binary[i];
+			let b = binary[i + 1];
+			let c = binary[i + 2];
+			if (b === undefined) {
+				// _==
+				const b0 = a >> 2;
+				const b1 = (a & 0b00000011) << 4;
+				base64 += base64Table[b0] + base64Table[b1] + "==";
+			} else if (c === undefined) {
+				// __=
+				const b0 = a >> 2;
+				const b1 = ((a & 0b00000011) << 4) | (b >> 4);
+				const b2 = (b & 0b00001111) << 2;
+				base64 += base64Table[b0] + base64Table[b1] + base64Table[b2] + "=";
+			} else {
+				// ___
+				const b0 = a >> 2;
+				const b1 = ((a & 0b00000011) << 4) | (b >> 4);
+				const b2 = (b & 0b00001111) << 2 | (c >> 6);
+				const b3 = c & 0b00111111;
+				base64 += base64Table[b0] + base64Table[b1] + base64Table[b2] + base64Table[b3];
+			}
+		}
+
+		return this.pointer + "/" + base64;
+	}
+	static fromBase64(base64) {
+		const base64Table = Object.fromEntries(
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+				.split("")
+				.map((c, i) => [c, i])
+		);
+			
+		const buffer = new ByteBuffer();
+
+		const index = base64.indexOf("/");
+		const pointer = parseInt(base64.slice(0, index));
+		base64 = base64.slice(index + 1);
+
+		for (let i = 0; i < base64.length; i += 4) {
+			const b0 = base64Table[base64[i]];
+			const b1 = base64Table[base64[i + 1]];
+			const b2 = base64Table[base64[i + 2]];
+			const b3 = base64Table[base64[i + 3]];
+
+			if (base64[i + 2] + base64[i + 3] === "==") {
+				// _==
+				buffer.write.int8((b0 << 2) | (b1 >> 4));
+			} else if (base64[i + 3] === "=") {
+				// __=
+				buffer.write.int8((b0 << 2) | (b1 >> 4));
+				buffer.write.int8(((b1 & 0b1111) << 4) | (b2 >> 2));
+			} else {
+				// ___
+				buffer.write.int8((b0 << 2) | (b1 >> 4));
+				buffer.write.int8(((b1 & 0b1111) << 4) | (b2 >> 2));
+				buffer.write.int8(((b2 & 0b11) << 6) | b3);
+			}
+		}
+		buffer.finalize();
+		buffer.pointer = pointer;
+		return buffer;
+	}
 	static fromString(string) {
 		const buffer = new ByteBuffer(string.length * 2);
 		buffer.shouldResize = false;

@@ -103,6 +103,7 @@ class Texture extends ImageType {
 			this.imageData.data[inx + 3] = alpha * 255;
 		}
 		this.loaded = false;
+		return this.imageData;
 	}
 	stretch(w, h) {
 		w = Math.round(w);
