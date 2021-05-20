@@ -53,7 +53,7 @@ class HengineScriptResource extends HengineResource {
 		const script = document.createElement("script");
 		script.src = this.src;
 		document.head.appendChild(script);
-		return new Promise(function (resolve) {
+		return new Promise(resolve => {
 			script.onload = function () {
 				resolve(script);
 			}
@@ -69,7 +69,7 @@ class HengineSoundResource extends HengineResource {
 	}
 	load() {
 		const sound = new Sound(this.src);
-		return new Promise(function (resolve) {
+		return new Promise(resolve => {
 			sound.audio.addEventListener("load", function () {
 				resolve(sound);
 			});
@@ -85,7 +85,7 @@ class HengineImageResource extends HengineResource {
 	}
 	load() {
 		const image = new HImage(this.src);
-		return new Promise(function (resolve) {
+		return new Promise(resolve => {
 			image.image.addEventListener("load", function () {
 				// update dimensions in interim
 				image.forceLoad();
@@ -104,7 +104,7 @@ class HengineVideoResource extends HengineResource {
 	}
 	load() {
 		const video = new VideoView(this.src, this.loops);
-		return new Promise(function (resolve) {
+		return new Promise(resolve => {
 			video.video.addEventListener("canplay", () => {
 				video.forceLoad();
 				resolve(video);
@@ -136,7 +136,7 @@ class HengineAnimationResource extends HengineResource {
 				}));
 			}
 		}
-		return new Promise(async function (resolve) {
+		return new Promise(async resolve => {
 			await Promise.all(promises);
 			animation.forceLoad();
 			resolve(animation);
@@ -163,6 +163,28 @@ class HengineFontResource {
 	}
 }
 HengineFontResource.TEST_STRING = String.fromCharCode(...new Array(255).fill(0).map((_, code) => code));
+class HengineTextResource extends HengineResource {
+	constructor(src) {
+		super(src);
+	}
+	load() {
+		return new Promise(async resolve => {
+			try {
+				const xhr = new XMLHttpRequest();
+				xhr.open("GET", this.src);
+				xhr.onreadystatechange = () => {
+					if (xhr.readyState === XMLHttpRequest.DONE) {
+						if (xhr.status === 0 || xhr.status === 200) resolve(xhr.responseText);
+						else resolve(null);
+					}
+				};
+				xhr.send();
+			} catch (err) {
+				resolve(null);
+			}
+		});
+	}
+}
 
 class HengineLoader {
 	constructor() {

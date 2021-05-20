@@ -23,12 +23,6 @@ class ByteBuffer {
 	finalize() {
 		this.data = this.data.slice(0, this.pointer);
 	}
-	get(buffer = new ByteBuffer()) {
-		buffer.data = this.data.slice(0, this.data.length);
-		buffer.pointer = this.pointer;
-		buffer.shouldResize = this.shouldResize;
-		return buffer;
-	}
 	toByteBuffer() {
 		return this;
 	}
@@ -71,6 +65,12 @@ class ByteBuffer {
 		}
 
 		return this.pointer + "/" + base64;
+	}
+	get(buffer = new ByteBuffer()) {
+		buffer.data = this.data.slice(0, this.data.length);
+		buffer.pointer = this.pointer;
+		buffer.shouldResize = this.shouldResize;
+		return buffer;
 	}
 	static fromBase64(base64) {
 		const base64Table = Object.fromEntries(

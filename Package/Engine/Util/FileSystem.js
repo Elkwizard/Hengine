@@ -376,9 +376,11 @@ class FileSystem { };
 			return true;
 		}
 		downloadBuffer(path, filename = "buffer.txt") {
-			const buffer = this.readFile(path, true).toBase64();
+			const buffer = this.readFile(path, true).get();
+			buffer.finalize();
+			const base64 = buffer.toBase64();
 			const a = document.createElement("a");
-			const uri = "data:text/plain;charset=utf-8," + encodeURIComponent(buffer);
+			const uri = "data:text/plain;charset=utf-8," + encodeURIComponent(base64);
 			a.setAttribute("href", uri);
 			a.setAttribute("download", filename);
 			return new Promise(resolve => {
