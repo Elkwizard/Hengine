@@ -807,7 +807,7 @@ class CollisionDetector {
         if (!axes.length) return null;
         let minOverlap = Infinity;
         let bestAxis = null;
-        let bestRange = [];
+        const bestRange = {};
         for (let i = 0; i < axes.length; i++) {
             let axis = axes[i];
             let aMin = Infinity;
@@ -832,7 +832,10 @@ class CollisionDetector {
             if (overlap < minOverlap) {
                 minOverlap = overlap;
                 bestAxis = axis;
-                bestRange = { aMin, aMax, bMin, bMax };
+                bestRange.aMin = aMin;
+                bestRange.aMax = aMax;
+                bestRange.bMin = bMin;
+                bestRange.bMax = bMax;
             }
         }
         if (!bestAxis) return null;

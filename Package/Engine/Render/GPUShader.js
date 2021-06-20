@@ -409,7 +409,7 @@ void main() {
 		const { gl } = this;
 		gl.activeTexture(gl.TEXTURE0 + textureUnit);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		if (data instanceof Texture) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, data.width, data.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data.updateImageData());
+		if (data instanceof Texture) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.updateImageData());
 		else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.makeImage());
 	}
 	makeImage() {

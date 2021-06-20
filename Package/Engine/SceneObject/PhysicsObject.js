@@ -41,6 +41,12 @@ class PhysicsObject extends SceneObject {
         });
         this._velocity = vec;
     }
+    get simulated() {
+        return this.body.simulated;
+    }
+    set simulated(a) {
+        this.body.simulated = a;
+    }
     get canRotate() {
         return this.body.canRotate;
     }
