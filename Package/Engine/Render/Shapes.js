@@ -40,6 +40,9 @@ class Range {
 		this.min = min;
 		this.max = max;
 	}
+	get middle() {
+		return (this.min + this.max) / 2;
+	}
 	set min(a) {
 		let b = this.max;
 		this._min = Math.min(a, b);
