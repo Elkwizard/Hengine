@@ -30,8 +30,6 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 		l.toRemove = new Set();
 
 		l.lastTransform = this.transform.get();
-
-		this.addShape("particleBoundingShape", new Rect(0, 0, 1, 1));
 	},
 	removeAllParticles(l) {
 		l.particles.clear();
@@ -81,13 +79,12 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 			}
 		}
 
-		if (l.particles.size) {
-			const particlePositions = [];
-			for (const particle of l.particles) particlePositions.push(particle.position);
-			this.modifyShape("particleBoundingShape", Rect.bound(particlePositions).move(this.transform.position.inverse));
-		} else this.modifyShape("particleBoundingShape", new Rect(0, 0, 1, 1));
-
 		this.transform.get(l.lastTransform);
+	},
+	getBoundingBox(l) {
+		const particlePositions = [];
+		for (const particle of l.particles) particlePositions.push(particle.position);
+		return Rect.bound(particlePositions);
 	},
 	escapeDraw(l) {
 		if (this.hidden) return;
