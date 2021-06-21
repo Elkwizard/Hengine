@@ -513,6 +513,8 @@ class RigidBody {
         this.sinAngle = 0;
         this.angularVelocity = 0;
 
+        // size
+        this.size = 0;
         this.mass = 0;
         this.inertia = 0;
 
@@ -528,6 +530,7 @@ class RigidBody {
         this.sleeping = 0;
         this.collidingBodies = [];
 
+        // booleans
         this.canRotate = true;
         this.isTrigger = false;
         this.gravity = true;
@@ -601,15 +604,19 @@ class RigidBody {
     }
     removeShape(sh) {
         let inx = this.shapes.indexOf(sh);
-        if (inx > -1) this.shapes.splice(inx, 1);
-        this.invalidateModels();
-        this.wakeCollidingBodies();
+        if (inx > -1) {
+            this.shapes.splice(inx, 1);
+            this.invalidateModels();
+            this.wakeCollidingBodies();
+            this.size -= sh.size();
+        }
     }
     addShape(sh) {
         this.shapes.push(sh);
         const name = sh.constructor.name;
         this.mass += ShapeMass["mass" + name](sh);
         this.inertia += ShapeMass["inertia" + name](sh);
+        this.size += sh.size();
         this.invalidateModels();
         this.wakeCollidingBodies();
         return sh;
@@ -1395,13 +1402,11 @@ class PhysicsEngine {
     }
     createGrid(dynBodies) {
         let cellsize = 100;
-        const nonEmptyBodies = this.bodies.filter(body => body.shapes.length > 0);
-        if (nonEmptyBodies.length) {
-            cellsize = 1;
-            const body = nonEmptyBodies[Math.floor(nonEmptyBodies.length / 2)];
-            for (let j = 0; j < body.shapes.length; j++) {
-                cellsize += body.shapes[j].size();
-            }
+        if (this.bodies.length) {
+            let meanSize = 0;
+            for (let i = 0; i < this.bodies.length; i++) meanSize += this.bodies[i].size;
+            meanSize /= this.bodies.length;
+            if (meanSize) cellsize = meanSize;
         }
 
         const grid = new PhysicsGrid(cellsize);
