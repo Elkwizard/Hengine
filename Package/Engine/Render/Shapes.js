@@ -82,7 +82,7 @@ class Range {
 		if (value > this.max) this._max = value;
 	}
 	intersect(r) {
-		return this.max > r.min && r.max > this.min;
+		return this.max >= r.min && r.max >= this.min;
 	}
 	static fromValues(values) {
 		let min = Infinity;

@@ -30,6 +30,8 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 		l.toRemove = new Set();
 
 		l.lastTransform = this.transform.get();
+
+		this.addShape("particleBoundingShape", new Rect(0, 0, 1, 1));
 	},
 	removeAllParticles(l) {
 		l.particles.clear();
@@ -79,6 +81,12 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 			}
 		}
 
+		if (l.particles.size) {
+			const particlePositions = [];
+			for (const particle of l.particles) particlePositions.push(particle.position);
+			this.modifyShape("particleBoundingShape", Rect.bound(particlePositions).move(this.transform.position.inverse));
+		} else this.modifyShape("particleBoundingShape", new Rect(0, 0, 1, 1));
+
 		this.transform.get(l.lastTransform);
 	},
 	escapeDraw(l) {
@@ -102,7 +110,7 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 
 		let renderedParticles = false;
 
-		for (let p of l.particles) {
+		for (const p of l.particles) {
 			p.timer += timerIncrement
 			if (p.timer > 1) {
 				l.toRemove.add(p);
@@ -117,7 +125,7 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 			}
 		}
 
-		for (let p of l.toRemove) l.particles.delete(p);
+		for (const p of l.toRemove) l.particles.delete(p);
 		l.toRemove.clear();
 
 		if (renderedParticles) this.engine.scene.camera.drawInScreenSpace(() => {
