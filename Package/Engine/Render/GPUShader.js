@@ -186,12 +186,12 @@ class GPUShader extends ImageType {
 					gl_Position = vertexPosition;
 					position = vec2((vertexPosition.x + 1.0) * halfWidth, (1.0 - vertexPosition.y) * halfHeight);
 				}
-			`;
+		`;
 		this.glsl = GLSLPrecompiler.compile(this.glsl);
 
 		// study glsl
 
-		this.allUniformNames = [...this.glsl.matchAll(/uniform\s+(?:.*?)\s+(\w+)(?:\[\d+\])?(?:\s+\=\s+(?:.*?))?;/g)].map(match => match[1]);
+		this.allUniformNames = new Set([...this.glsl.matchAll(/uniform\s+(?:.*?)\s+(\w+)(?:\[\d+\])?(?:\s+\=\s+(?:.*?))?;/g)].map(match => match[1]));
 
 		// end studying
 
@@ -317,7 +317,7 @@ void main() {
 	configureTexture(arg, config) {
 		if (arg in this.compiled.uniformMap) {
 			const { textures, isTexture, textureUnit } = this.compiled.uniformMap[arg];
-			if (!isTexture) return console.warn("Webgl uniform '" + arg + "' isn't a texture");
+			if (!isTexture) return console.warn(`Webgl uniform '${arg}' isn't a texture`);
 			const { gl } = this;
 			for (let i = 0; i < textures.length; i++) {
 				const texture = textures[i];
@@ -329,14 +329,17 @@ void main() {
 					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, value);
 				}
 			}
-		} else return console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+		} else this.checkArgumentExistence(arg);
+	}
+	checkArgumentExistence(arg) {
+		if (!this.argumentExists(arg)) console.warn(`WebGL uniform '${arg}' doesn't exist`);
 	}
 	argumentExists(arg) {
-		return arg in this.compiled.uniformMap;
+		return this.allUniformNames.has(arg);
 	}
 	getArgument(arg) {
 		if (arg in this.compiled.uniformMap) return this.args[arg];
-		else return console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+		else this.checkArgumentExistence(arg);
 	}
 	setArgument(arg, value) {
 		this.setArguments({ [arg]: value });
@@ -351,7 +354,7 @@ void main() {
 		for (let arg in uniformData) {
 			let u = uniformMap[arg];
 			if (u === undefined) {
-				console.warn("Webgl uniform '" + arg + "' doesn't exist.");
+				this.checkArgumentExistence(arg);
 				continue;
 			}
 			let data = uniformData[arg];

@@ -450,8 +450,6 @@ class TEXT_AREA extends ElementScript {
 		this.renderer.clip().rect(rtvb.x - expand, rtvb.y - expand, rtvb.width + expand * 2, rtvb.height + expand * 2);
 		this.renderer.save();
 		this.renderer.translate(this.scrollOffset.inverse);
-		// renderer.stroke(Color.LIME, 3).rect(this.relativeTextViewBox);
-		// renderer.stroke(Color.RED, 3).rect(this.relativeTextBoundingBox);
 
 		let lines = this.value.split("\n");
 		let textPos = this.relativeTextViewBox.min;

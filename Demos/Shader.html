@@ -1,23 +1,20 @@
-<script src="../Hengine.js">
-	title = "Hengine Demos - Shaders";
-
+<script src="../Hengine.js" title="Shader Editor">
 	hengine.scalingMode = ScalingMode.PRESERVE_ASPECT_RATIO;
-	const CODE_INPUT = new ElementScript("CODE_INPUT", {
-		init(l) {
-			this.draw = () => null;
-			TEXT_AREA.addTo(codeInput, new Font(20, "Monospace"));
-		},
-		update(l) {
-
-		},
-		draw(l, name, shape) {
+	class CODE_INPUT extends ElementScript {
+		init(obj) {
+			obj.scripts.removeDefault();
+			obj.scripts.add(TEXT_AREA, Font.Monospace20);
+			this.scriptNumber--;
+		}
+		draw(obj, name, shape) {
 			renderer.draw(Color.DARK_GRAY).rect(shape);
 			renderer.stroke(Color.WHITE).rect(shape);
 		}
-	});
+	}
 	const codeInput = scene.main.addUIElement("codeInput", width * 0.75, height / 2, width / 2, height);
-	CODE_INPUT.addTo(codeInput);
-	codeInput.scripts.TEXT_AREA.setValue(`uniform float time;
+	codeInput.scripts.add(CODE_INPUT);
+
+codeInput.scripts.TEXT_AREA.setValue(`uniform float time;
 uniform vec2 mouse;
 
 vec4 shader() {
@@ -34,26 +31,26 @@ vec4 shader() {
 	l.caretColor = Color.WHITE;
 	l.highlightColor = new Color(255, 255, 255, 0.4);
 	let webcam = null;
-
-
+	
 	let bold = codeInput.scripts.TEXT_AREA.font.family.toLowerCase() === "monospace";
 	let boldFont = codeInput.scripts.TEXT_AREA.font.get();
 	if (bold) boldFont.bold = true;
 
-	function highlight(text, font, color, regex, inverse, getLoc) {
+	function highlight(text, font, color, regex, inverse, getLoc) {	
 		let matches = text[inverse ? "inverseMatchAll" : "matchAll"](regex);
 		for (let match of matches) {
 			let text = match[0];
 			let inx = match.index;
 			let pos = getLoc(inx);
 			let bounds = font.getTextBounds(text);
+			const position = pos.plus(l.renderTextOffset);
 			// renderer.stroke(Color.BLUE).rect(pos.plus(l.renderTextOffset).x, pos.plus(l.renderTextOffset).y, bounds.width, bounds.height);
-			renderer.draw(color).textLine(font, text, pos.plus(l.renderTextOffset));
+			renderer.draw(color).textLine(font, text, position);
 		}
 	}
 	l.renderTextOffset = new Vector2(50, 0);
 	l.renderText = (text, font, pos, getLoc, lineIndex) => {
-		//renderer.draw(Color.LIGHT_GRAY).textLine(font, text, pos.plus(l.renderTextOffset));
+		//renderer.draw(Color.LIGHT_GRAY).textLine(font, text, pos.plus(l.renderTextOffset)); 
 		renderer.draw(Color.WHITE).textLine(font, lineIndex + 1, pos);
 		let startTabs = text.match(/^\t+/g);
 		if (startTabs) {
@@ -66,7 +63,7 @@ vec4 shader() {
 		let primitiveRegex = String.raw`\b((?:\d+(?:\.\d+)?)|(?:true|false))\b`;
 		let symbolRegex = String.raw`(?:[^\w\s]+)`;
 		let commentRegex = String.raw`(?:\/\/(?:.*))|(?:\/\*(?:.*?)(?:$|\*\/))|(?:(^|\/\*)(?:.*?)\*\/)`;
-
+		
 		highlight(text, font, Color.SKY_BLUE, new RegExp(functionRegex, "g"), false, getLoc);
 		highlight(text, font, Color.WHITE, new RegExp(symbolRegex, "g"), false, getLoc);
 		highlight(text, font, Color.PURPLE.plus(Color.LIGHT_GRAY.over(3)), new RegExp(keywordRegex, "g"), false, getLoc);
@@ -74,7 +71,7 @@ vec4 shader() {
 		highlight(text, boldFont, Color.GREEN, new RegExp(commentRegex, "g"), false, getLoc);
 		highlight(text, font, Color.LIGHT_GRAY, new RegExp(`(${[commentRegex, symbolRegex, primitiveRegex, keywordRegex, functionRegex].join("|")})`, "g"), true, getLoc);
 	};
-	intervals.continuous(function () {
+	hengine.intervals.continuous(function () {
 		if (!shader.glsl || (keyboard.pressed("Alt") && keyboard.justPressed("Enter"))) {
 			if (keyboard.justPressed("Enter")) codeInput.scripts.TEXT_AREA.ignore("Enter");
 			shader.glsl = codeInput.scripts.TEXT_AREA.getValue();
@@ -90,9 +87,43 @@ vec4 shader() {
 		renderer.textMode = TextMode.BOTTOM_LEFT;
 		renderer.draw(Color.RED).textLine(Font.Monospace40, hengine.intervals.fps, 10, height - 10);
 		renderer.textMode = TextMode.TOP_LEFT;
-		renderer.draw(Color.BLACK).textLine(Font.Monospace30, "Press Alt + Enter to compile and run shader", 10, 10);
-		renderer.textMode = TextMode.TOP_LEFT;
-		if (shader.compileState.error) renderer.draw(Color.RED).text(new Font(30, "Monospace"), shader.compileState.error.map(e => e.toString()).join("\n\n"), 10, 10, shader.width - 20);
+		if (shader.compileState.error) renderer.draw(Color.RED).text(Font.Monospace30, shader.compileState.error.map(e => e.toString()).join("\n\n"), 10, 10, shader.width - 20);
 	}, IntervalFunction.UPDATE);
-
 </script>
+
+<!-- 
+#define LIMIT 200.0
+#define CELL_SIZE 300.0
+#define STEPS 4
+
+uniform highp float time;
+
+highp vec2 squareSpinUV(highp vec2 mid) {
+	if (mid.x < -1.0) return vec2(-10.0);
+	mid *= resolution;
+	mid = mod(mid, CELL_SIZE) - CELL_SIZE / 2.0;
+	highp float angle = time / 100.0;
+	highp float c = cos(angle);
+	highp float s = sin(angle);
+	mid = vec2(mid.x * c - mid.y * s, mid.x * s + mid.y * c);
+
+	highp float md = abs(mid.x) + abs(mid.y);
+	if (md < LIMIT) {
+		highp vec2 uv = mid / LIMIT;
+		uv = vec2(uv.x - uv.y, uv.x + uv.y) * 0.707;
+		return uv;
+	}
+	return vec2(-10.0);
+}
+
+highp vec4 shader() {
+	highp vec2 mid = (position - resolution / 2.0) / resolution;
+	mid *= sin(time / 100.0);
+	highp vec2 uv = mid;
+	for (int i = 0; i < STEPS; i++) {
+		uv = squareSpinUV(uv);
+	}
+	if (uv.x > -1.0) return vec4(1.0);
+	return vec4(0.0);
+}
+ -->

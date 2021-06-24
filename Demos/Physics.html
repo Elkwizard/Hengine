@@ -1,47 +1,47 @@
 <script src="../Hengine.js">
 	title = "Hengine Demos - Physics";
 
-	const BLOCK = new ElementScript("BLOCK", {
-		init(l) {
-			this.draw = () => null;
-			l.color = Random.color();
-		},
-		draw(l, name, shape) {
-			renderer.draw(l.color).rect(shape);
+	class BLOCK extends ElementScript {
+		init(obj) {
+			obj.scripts.removeDefault();
+			this.color = Random.color();
+		}
+		draw(obj, name, shape) {
+			renderer.draw(this.color).rect(shape);
 			renderer.stroke(Color.BLACK, 2).rect(shape);
 		}
-	});
+	}
 
-	scene.mouseEvents = true;
-
-	const THROWABLE = new ElementScript("THROWABLE", {
-		init(l) {
-			l.offset = Vector2.origin;
-			l.thrown = false;
-			l.scriptNumber = 2;
-		},
-		click(l, key, e) {
-			l.thrown = true;
-			l.offset = this.transform.globalSpaceToLocalSpace(e);
-		},
-		update(l) {
-			if (mouse.justReleased("Left")) l.thrown = false;
-			this.layer = +l.thrown;
-			if (l.thrown) {
-				const pos = this.transform.localSpaceToGlobalSpace(l.offset);
+	class THROWABLE extends ElementScript {
+		init(obj) {
+			this.offset = Vector2.origin;
+			this.thrown = false;
+			this.scriptNumber = 2;
+		}
+		click(obj, key, mouse) {
+			this.thrown = true;
+			this.offset = obj.transform.globalSpaceToLocalSpace(mouse);
+		}
+		update(obj) {
+			if (mouse.justReleased("Left")) this.thrown = false;
+			obj.layer = +this.thrown;
+			if (this.thrown) {
+				const pos = obj.transform.localSpaceToGlobalSpace(this.offset);
 				let dif = mouse.world.minus(pos);
 				dif.div(100);
-				this.applyImpulseMass(pos, dif);
+				obj.scripts.PHYSICS.applyImpulseMass(pos, dif);
 			}
-		},
-		escapeDraw(l) {
-			if (l.thrown) {
-				let start = this.transform.localSpaceToGlobalSpace(l.offset);
-				let end = mouse.world.get();
+		}
+		escapeDraw(obj) {
+			if (this.thrown) {
+				const start = obj.transform.localSpaceToGlobalSpace(this.offset);
+				const end = mouse.world.get();
 				renderer.stroke(Color.RED, 2).arrow(start, end);
 			}
 		}
-	});
+	}
+
+	scene.mouseEvents = true;
 
 	for (let i = 0; i < 50; i++) {
 		const block = scene.main.addPhysicsRectElement("block", width / 2, height - (i + 1) * 40, 40 - i / 100, 40, true, new Controls("w", "s", "a", "d"), "No Tag");
