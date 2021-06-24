@@ -1,23 +1,19 @@
 class ElementContainer extends SceneElement {
 	constructor(name = "container", active, container, engine) {
-		super(name, active, container);
+		super(name, container);
 		this.elements = new Map();
 		this.engine = engine;
 		this.sceneObjectArray = [];
 		this.removeQueue = [];
-		this.defaultScript = new ElementScript("DEFAULT", {
-			init(l) {
+		this.defaultScript = class DEFAULT extends ElementScript {
+			init(obj) {
 				let fill;
 				let outline;
 
-				switch (this.constructor) {
+				switch (obj.constructor) {
 					case SceneObject: 
 						fill = Color.BLACK;
 						outline = Color.CYAN;
-						break;
-					case PhysicsObject:
-						fill = Color.BLACK;
-						outline = Color.RED;
 						break;
 					case UIObject:
 						fill = Color.WHITE;
@@ -28,28 +24,33 @@ class ElementContainer extends SceneElement {
 						outline = Color.PURPLE;
 				}
 
-				l.outline = outline;
-				l.fill = fill;
-			},
-			draw(l, name, shape) {
-				this.engine.renderer.draw(l.fill).infer(shape);
-				this.engine.renderer.stroke(l.outline, 1).infer(shape);
+				this.outline = outline;
+				this.fill = fill;
 			}
-		});
+			addScript(obj, script) {
+				if (script === PHYSICS) {
+					this.outline = Color.RED;
+					this.fill = Color.BLACK;
+				}
+			}
+			draw(obj, name, shape) {
+				obj.engine.renderer.draw(this.fill).infer(shape);
+				obj.engine.renderer.stroke(this.outline, 1).infer(shape);
+			}
+		};
+		this.active = active;
 	}
 	activate() {
-		super.activate();
 		this.updateArray();
-		for (let [name, element] of this.elements) if (!element.active) element.activate();
+		for (const [name, element] of this.elements) if (!element.active) element.activate();
 	}
 	deactivate() {
-		super.deactivate();
 		this.updateArray();
-		for (let [name, element] of this.elements) if (element.active) element.deactivate();
+		for (const [name, element] of this.elements) if (element.active) element.deactivate();
 	}
 	updateArray() {
 		this.sceneObjectArray = [];
-		for (let [name, element] of this.elements) {
+		for (const [name, element] of this.elements) {
 			if (!element.active || element.removed) continue;
 			if (element instanceof ElementContainer) this.sceneObjectArray.pushArray(element.updateArray());
 			else this.sceneObjectArray.push(element);
@@ -59,28 +60,28 @@ class ElementContainer extends SceneElement {
 	startUpdate() {
 		this.updateArray();
 		//remove queued
-		for (let [name, element] of this.elements) {
+		for (const [name, element] of this.elements) {
 			if (element.removed) this.removeElement(element);
 			else element.beingUpdated = true;
 		}
 		//recurse
-		for (let [name, element] of this.elements) if (element instanceof ElementContainer) element.startUpdate();
+		for (const [name, element] of this.elements) if (element instanceof ElementContainer) element.startUpdate();
 	}
 	endUpdate() {
 		//remove queued
-		for (let [name, element] of this.elements) {
+		for (const [name, element] of this.elements) {
 			if (element.removed) this.removeElement(element);
 			else element.beingUpdated = false;
 		}
 		//recurse
-		for (let [name, element] of this.elements) if (element instanceof ElementContainer) element.endUpdate();
+		for (const [name, element] of this.elements) if (element instanceof ElementContainer) element.endUpdate();
 	}
 	copy(el) {
 		let n;
 		if (el instanceof UIObject) {
 			n = this.addUI(el.name + " - copy", 0, 0, el.width, el.height);
-		} else if (el instanceof PhysicsObject) {
-			n = this.addPhysicsElement(el.name + " - copy", 0, 0, el.body.type === RigidBody.DYNAMIC, { ...el.controls }, el.tag);
+		} else if (el.scripts.has(PHYSICS)) {
+			n = this.addPhysicsElement(el.name + " - copy", 0, 0, el.scripts.PHYSICS.body.type === RigidBody.DYNAMIC, { ...el.controls }, el.tag);
 			n.rotation = el.rotation;
 		} else {
 			n = this.addElement(el.name + " - copy", 0, 0, { ...el.controls }, el.tag);
@@ -106,7 +107,7 @@ class ElementContainer extends SceneElement {
 	}
 	initializeSceneObject(sceneObject) {
 		if (this.active) sceneObject.activate();
-		this.defaultScript.addTo(sceneObject);
+		sceneObject.scripts.add(this.defaultScript);
 	}
 	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
@@ -133,25 +134,28 @@ class ElementContainer extends SceneElement {
 	}
 	addPhysicsElement(name, x, y, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
-		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this, this.engine);
+		const n = new SceneObject(name, x, y, controls, tag, this, this.engine);
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
+		n.scripts.add(PHYSICS, gravity);
 		return n;
 	}
 	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
-		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this, this.engine);
+		const n = new SceneObject(name, x, y, controls, tag, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
+		n.scripts.add(PHYSICS, gravity);
 		return n;
 	}
 	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
-		let n = new PhysicsObject(name, x, y, gravity, controls, tag, this, this.engine);
+		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
 		n.addShape("default", new Circle(0, 0, radius));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
+		n.scripts.add(PHYSICS, gravity);
 		return n;
 	}
 	addUIElement(name, x, y, width, height) {
@@ -170,7 +174,7 @@ class ElementContainer extends SceneElement {
 	}
 	removeElement(element) {
 		if (element.container === this) {
-			element.scripts.run("Remove");
+			element.scripts.run("remove");
 			if (element.active) element.deactivate();
 			element.removed = true;
 			this.elements.delete(element.name);
@@ -180,74 +184,36 @@ class ElementContainer extends SceneElement {
 		for (let i = 0; i < elements.length; i++) this.removeElement(elements[i]);
 	}
 	removeAllElements() {
-		for (let [name, element] of this.elements) this.removeElement(element);
+		for (const [name, element] of this.elements) this.removeElement(element);
 	}
 	get(name) {
 		return this.elements.get(name);
 	}
 	getAllElements() {
-		let array = [];
-		for (let [name, element] of this.elements) {
+		const array = [];
+		for (const [name, element] of this.elements) {
 			if (element.removed) continue;
 			if (element instanceof ElementContainer) array.pushArray(element.getAllElements());
 			else array.push(element);
 		}
 		return array;
 	}
+	getElementsMatch(fn) {
+		return this.updateArray().filter(fn);
+	}
 	getActiveElements() {
 		return this.updateArray();
 	}
-	getPhysicsElements() {
-		return this.updateArray().filter(e => e instanceof PhysicsObject);
-	}
 	getUIElements() {
-		return this.updateArray().filter(e => e instanceof UIObject);
+		return this.getElementsMatch(element => element instanceof UIObject);
 	}
 	getOnScreenElements() {
-		return this.updateArray().filter(e => e.onScreen);
-	}
-	getElementsMatch(fn) {
-		let ary = [];
-		let oAry = this.updateArray();
-		for (let rect of oAry) {
-			if (fn(rect)) {
-				ary.push(rect);
-			}
-		}
-		return ary;
+		return this.getElementsMatch(element => element.onScreen);
 	}
 	getElementsWithTag(tag) {
-		let ary = [];
-		let oAry = this.updateArray();
-		for (let rect of oAry) {
-			if (rect.tag === tag) {
-				ary.push(rect);
-			}
-		}
-		return ary;
+		return this.getElementsMatch(element => element.tag === tag);
 	}
 	getElementsWithScript(script) {
-		let ary = [];
-		let oAry = this.updateArray();
-		for (let rect of oAry) {
-			if (rect.scripts[script.name]) {
-				ary.push(rect);
-			}
-		}
-		return ary;
-	}
-	performFunctionBasedOnType(name, func) {
-		if (name instanceof ElementContainer) name = name.updateArray();
-		if (typeof name === "object") {
-			if (Array.isArray(name)) {
-				for (let item of name) {
-					this.performFunctionBasedOnType(item, func);
-				}
-			} else {
-				func(name);
-			}
-		} else {
-			func(this.get(name));
-		}
+		return this.getElementsMatch(element => element.scripts.has(script));
 	}
 }

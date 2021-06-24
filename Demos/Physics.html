@@ -45,8 +45,8 @@
 
 	for (let i = 0; i < 50; i++) {
 		const block = scene.main.addPhysicsRectElement("block", width / 2, height - (i + 1) * 40, 40 - i / 100, 40, true, new Controls("w", "s", "a", "d"), "No Tag");
-		BLOCK.addTo(block);
-		THROWABLE.addTo(block);
+		block.scripts.add(BLOCK);
+		block.scripts.add(THROWABLE);
 	}
 
 	const floor = scene.main.addPhysicsRectElement("floor", width / 2, height, width, 100, false, new Controls("w", "s", "a", "d"), "No Tag");

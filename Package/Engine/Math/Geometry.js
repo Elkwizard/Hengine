@@ -317,7 +317,7 @@ class Geometry {
         let hitShape = null;
         let bestDist = Infinity;
         const EPSILON = 0.0001;
-        for (let shape of shapes) {
+        for (const shape of shapes) {
             let nHit = null;
             if (shape instanceof Circle) {
                 let normal = r.normal;
@@ -344,7 +344,7 @@ class Geometry {
                 let dx = r.x;
                 let dy = r.y || EPSILON;
                 let b = p.y - p.x * dy / dx;
-                for (let edge of edges) {
+                for (const edge of edges) {
                     let proj_P = normal.dot(p);
                     let proj_A = normal.dot(edge.a);
                     let proj_B = normal.dot(edge.b);
@@ -554,7 +554,7 @@ class Geometry {
             Vector2.fromAngle(l1.b.Vminus(l1.a).getAngle() + Math.PI / 2),
             Vector2.fromAngle(l2.b.Vminus(l2.a).getAngle() + Math.PI / 2),
         ];
-        for (let dir of dirs) {
+        for (const dir of dirs) {
             let a = l1.a.dot(dir);
             let b = l1.b.dot(dir);
             let a2 = l2.a.dot(dir);
@@ -592,7 +592,7 @@ class Geometry {
         })
         let bestPoint = null;
         let bestDist = Infinity;
-        for (let edge of edges) {
+        for (const edge of edges) {
             let p = Geometry.closestPointOnLine(point, edge);
             let dist = Vector2.sqrDist(p, point);
             if (dist < bestDist) {

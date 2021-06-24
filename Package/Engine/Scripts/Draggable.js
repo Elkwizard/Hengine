@@ -1,39 +1,41 @@
-const DRAGGABLE = new ElementScript("DRAGGABLE", {
-	init(l, key = "Left", bounds = null) {
-		l.mouse = this.engine.mouse;
-		l.dragged = false;
-		l.key = key;
-		l.offset = Vector2.origin;
-		l.bounds = bounds;
-		this.engine.scene.mouseEvents = true;
-	},
-	click(l, key, mouse) {
-		if (key !== l.key) return;
-		l.dragged = true;
-		l.offset = this.transform.globalSpaceToLocalSpace(mouse);
-	},
-	update(l) {
-		if (l.mouse.justReleased(l.key)) l.dragged = false; 
-		if (l.dragged) {
-			this.transform.position = l.mouse.world.minus(l.offset);
-			if (l.bounds) {
-				this.cacheBoundingBoxes();
-				let { x, y, width, height } = this.__boundingBox;
-				let ox = x - this.transform.position.x;
-				let oy = y - this.transform.position.y;
-				if (x < l.bounds.x) x = l.bounds.x;
-				if (y < l.bounds.y) y = l.bounds.y;
-				if (x + width > l.bounds.x + l.bounds.width) x = l.bounds.x + l.bounds.width - width;
-				if (y + height > l.bounds.y + l.bounds.height) y = l.bounds.y + l.bounds.height - height;
-				this.transform.position.x = x - ox;
-				this.transform.position.y = y - oy;
+class DRAGGABLE extends ElementScript {
+	init(obj, key = "Left", bounds = null) {
+		this.mouse = obj.engine.mouse;
+		this.dragged = false;
+		this.key = key;
+		this.offset = Vector2.origin;
+		this.bounds = bounds;
+		obj.engine.scene.mouseEvents = true;
+	}
+	click(obj, key, mouse) {
+		if (key !== this.key) return;
+		this.dragged = true;
+		this.offset = obj.transform.globalSpaceToLocalSpace(this.getMousePosition());
+	}
+	update(obj) {
+		if (this.mouse.justReleased(this.key)) this.dragged = false; 
+		if (this.dragged) {
+			obj.transform.position = this.getMousePosition().minus(this.offset);
+			if (this.bounds) {
+				obj.cacheBoundingBoxes();
+				let { x, y, width, height } = obj.__boundingBox;
+				let ox = x - obj.transform.position.x;
+				let oy = y - obj.transform.position.y;
+				if (x < this.bounds.x) x = this.bounds.x;
+				if (y < this.bounds.y) y = this.bounds.y;
+				if (x + width > this.bounds.x + this.bounds.width) x = this.bounds.x + this.bounds.width - width;
+				if (y + height > this.bounds.y + this.bounds.height) y = this.bounds.y + this.bounds.height - height;
+				obj.transform.position.x = x - ox;
+				obj.transform.position.y = y - oy;
 			}
-			this.cacheBoundingBoxes();
-			if (this.body) {
+			obj.cacheBoundingBoxes();
+			if (obj.scripts.has(PHYSICS)) {
 				//keep awake
-				this.stop();
-				this.body.wake();
+				obj.scripts.PHYSICS.stop();
 			}
 		}
 	}
-});
+	getMousePosition(obj) {
+		return (obj instanceof UIObject) ? this.mouse.screen : this.mouse.world;
+	}
+}

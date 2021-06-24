@@ -389,6 +389,7 @@ HengineLoader.engineResources = [
 		
 		"Scripts/Draggable",
 		"Scripts/ParticleSpawner",
+		"Scripts/Physics",
 		"Scripts/PlayerMovement",
 		"Scripts/TextArea",
 		
@@ -411,7 +412,6 @@ HengineLoader.engineResources = [
 		"Render/GPUShader"
 	],
 	[ // high level dependencies
-		"SceneObject/PhysicsObject",
 		"SceneObject/UIObject"
 	]
 ];

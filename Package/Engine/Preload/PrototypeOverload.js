@@ -256,7 +256,10 @@ Object.defineProperty(window, "title", {
 			return value.toString(depth);
 		}
 		proto(Object.prototype, "toString", function (depth = 0) {
-			if (depth < 0) return "[object " + cls(this) + "]";
+			if (depth < 0) {
+				if (typeof this[Symbol.iterator] === "function") return cls(this) + `(${[...this].length})`;
+				return "[object " + cls(this) + "]";
+			}
 
 			let contents = [];
 			for (let key in this) {
@@ -283,6 +286,13 @@ ${contents.join(",\n").indent()}
 		}
 		return result;
 	});
+	
+	Object.shortcut = function (objectA, objectB, key) {
+		Object.defineProperty(objectA, key, {
+			set: a => objectB[key] = a,
+			get: () => objectB[key]
+		});
+	};
 
 	//Make Number behave like Operable
 	Number.abs = n => Math.abs(n);

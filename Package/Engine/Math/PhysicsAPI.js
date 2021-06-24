@@ -62,12 +62,12 @@ class CollisionMonitor {
     }
     get(mon = new CollisionMonitor) {
         mon.elements = this.elements.map(e => new CollisionData(e.element, e.direction, e.contacts));
-        mon.physicsObjects = this.physicsObjects.map(el => el);
+        mon.physicsObjects = Array.from(this.physicsObjects);
         return mon;
     }
     removeDead() {
         this.elements = this.elements.filter(el => !el.element.removed);
-        this.physicsObjects = this.physicsObjects.map(el => !el.removed);
+        this.physicsObjects = this.physicsObjects.filter(el => !el.removed);
     }
     clear() {
         this.elements = [];
@@ -80,7 +80,7 @@ class CollisionMonitor {
         }
     }
     has(el) {
-        for (let element of this.elements) if (element.element === el) return true;
+        for (let i = 0; i < this.elements.length; i++) if (this.elements[i].element === el) return true;
         return false;
     }
     direction(d) {

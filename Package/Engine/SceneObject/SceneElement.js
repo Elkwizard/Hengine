@@ -1,8 +1,7 @@
 class SceneElement {
-	constructor(name, active, container) {
+	constructor(name, container) {
 		this.container = container;
 		this.name = name;
-		this.active = active;
 		this.removed = false;
 	}
 	set name(a) {
@@ -15,12 +14,18 @@ class SceneElement {
 	get name() {
 		return this._name;
 	}
-	activate() {
-		this.active = true;
+	set active(a) {
+		if (this._active !== a) {
+			if (a) this.activate();
+			else if (this._active !== undefined) this.deactivate();
+		}
+		this._active = a;
 	}
-	deactivate() {
-		this.active = false;
+	get active() {
+		return this._active;
 	}
+	activate() { }
+	deactivate() { }
 	remove() {
 		this.removed = true;
 	}

@@ -34,7 +34,7 @@ class Controls {
 //Actual SceneObject
 class SceneObject extends SceneElement {
 	constructor(name, x, y, controls, tag, container, engine) {
-		super(name, container.active, container);
+		super(name, container);
 		this.transform = new Transform(x, y, 0);
 		this.lastTransform = this.transform.get();
 		this.shapes = new Map();
@@ -56,9 +56,11 @@ class SceneObject extends SceneElement {
 		this.__scripts;
 		this.__width = 0;
 		this.__height = 0;
+
+		this.active = container.active;
 	}
 	set defaultShape(a) {
-		this.modifyShape("default", a);
+		this.addShape("default", a);
 	}
 	get defaultShape() {
 		return this.getShape("default");
@@ -78,15 +80,13 @@ class SceneObject extends SceneElement {
 		return this.__height;
 	}
 	activate() {
-		super.activate();
-		this.scripts.run("Activate");
+		this.scripts.run("activate");
 	}
 	deactivate() {
-		super.deactivate();
-		this.scripts.run("Deactivate");
+		this.scripts.run("deactivate");
 	}
 	updatePreviousData() {
-		this.lastTransform = this.transform.get(this.lastTransform);
+		this.transform.get(this.lastTransform);
 	}
 	serializeShapes() {
 		let shapes = this.getAllShapes();
@@ -141,9 +141,6 @@ class SceneObject extends SceneElement {
 		let boxes = shapes.map(e => e.getBoundingBox());
 		return Rect.composeBoundingBoxes(boxes);
 	}
-	onAddScript(script) {
-
-	}
 	hasShape(name) {
 		return this.shapes.has(name);
 	}
@@ -153,17 +150,15 @@ class SceneObject extends SceneElement {
 		if (shape instanceof Rect || shape instanceof Circle) convex = true;
 		this.convexShapes.set(shape, convex ? [shape] : Geometry.subdividePolygon(shape));
 		this.cacheDimensions();
+		this.scripts.run("addShape", name, shape);
 	}
 	removeShape(name) {
 		const shape = this.shapes.get(name);
 		if (!shape) return null;
 		this.shapes.delete(name);
 		this.convexShapes.delete(shape);
+		this.scripts.run("removeShape", name, shape);
 		return shape;
-	}
-	modifyShape(name, shape) {
-		this.removeShape(name);
-		this.addShape(name, shape);
 	}
 	getAllShapes() {
 		let shapes = [];
@@ -199,7 +194,7 @@ class SceneObject extends SceneElement {
 		}
 		center.Ndiv(totalArea);
 		let dif = center.inverse;
-		for (let i = 0; i < names.length; i++) this.modifyShape(names[i], shapes[i].move(dif));
+		for (let i = 0; i < names.length; i++) this.addShape(names[i], shapes[i].move(dif));
 	}
 	removeAllShapes() {
 		let names = [];
@@ -227,19 +222,19 @@ class SceneObject extends SceneElement {
 		const pos = Vector2.origin;
 		const entries = [];
 		for (let entry of this.shapes) entries.push(entry);
-		for (let i = 0; i < entries.length; i++) this.modifyShape(entries[i][0], entries[i][1].scaleAbout(pos, factor));
+		for (let i = 0; i < entries.length; i++) this.addShape(entries[i][0], entries[i][1].scaleAbout(pos, factor));
 		this.cacheDimensions();
 	}
-	scaleX(factor) {	
+	scaleX(factor) {
 		let entries = [];
 		for (let entry of this.shapes) entries.push(entry);
-		for (let i = 0; i < entries.length; i++) this.modifyShape(entries[i][0], entries[i][1].scaleXAbout(0, factor));
+		for (let i = 0; i < entries.length; i++) this.addShape(entries[i][0], entries[i][1].scaleXAbout(0, factor));
 		this.cacheDimensions();
 	}
 	scaleY(factor) {
 		let entries = [];
 		for (let entry of this.shapes) entries.push(entry);
-		for (let i = 0; i < entries.length; i++) this.modifyShape(entries[i][0], entries[i][1].scaleYAbout(0, factor));
+		for (let i = 0; i < entries.length; i++) this.addShape(entries[i][0], entries[i][1].scaleYAbout(0, factor));
 		this.cacheDimensions();
 	}
 	hide() {
@@ -266,13 +261,13 @@ class SceneObject extends SceneElement {
 		return el;
 	}
 	runDraw() {
-		if (this.scripts.implements("Draw")) this.transform.drawInLocalSpace(() => {
-			const entries = [...this.shapes.entries()];
-			for (let [name, shape] of entries) this.scripts.run("Draw", name, shape);
+		if (this.scripts.implements("draw")) this.transform.drawInLocalSpace(() => {
+			const entries = Array.from(this.shapes.entries());
+			for (const [name, shape] of entries) this.scripts.run("draw", name, shape);
 		}, this.engine.renderer);
 	}
 	determineOnScreen(screen) {
-		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox || this.__boundingBox, screen);
+		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox ?? this.__boundingBox, screen);
 		return this.onScreen;
 	}
 	engineDraw(screen) {
@@ -281,10 +276,7 @@ class SceneObject extends SceneElement {
 			this.runDraw();
 			this.onScreen = true;
 		} else this.onScreen = false;
-		this.scripts.run("EscapeDraw");
-	}
-	engineUpdate() {
-		this.scripts.run("Update");
+		this.scripts.run("escapeDraw");
 	}
 	hasMoved() {
 		return this.transform.dif(this.lastTransform);

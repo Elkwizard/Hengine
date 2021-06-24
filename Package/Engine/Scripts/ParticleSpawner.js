@@ -1,10 +1,11 @@
-const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
-	init(l, properties = {}) {
-		l.particles = new Set();
-		l.setProperties(properties);
-		const spawner = this;
-		const { physicsEngine } = this.engine.scene;
-		l.Particle = class Particle {
+class PARTICLE_SPAWNER extends ElementScript {
+	init(obj, properties = {}) {
+		this.particles = new Set();
+		this.setProperties(properties);
+		const spawner = obj;
+		const { physicsEngine } = obj.engine.scene;
+		const self = this;
+		this.Particle = class Particle {
 			constructor(position, others) {
 				this.position = position;
 				this.velocity = Vector2.origin;
@@ -14,120 +15,113 @@ const PARTICLE_SPAWNER = new ElementScript("PARTICLE_SPAWNER", {
 				this.spawner = spawner;
 			}
 			update() {
-				if (l.falls) {
-					this.velocity.add(physicsEngine.gravity);
-				}
-
-				if (l.slows) {
-					this.velocity.mul(1 - physicsEngine.drag);
-				}
-
+				if (self.falls) this.velocity.add(physicsEngine.gravity);
+				if (self.slows) this.velocity.mul(1 - physicsEngine.drag);
 				this.position.add(this.velocity);
-
-				l.update(this);
+				self.particleUpdate(this);
 			}
 		};
-		l.toRemove = new Set();
+		this.toRemove = new Set();
 
-		l.lastTransform = this.transform.get();
-	},
-	removeAllParticles(l) {
-		l.particles.clear();
-	},
-	setProperties(l, p) {
-		l.init = p.init ?? l.init ?? (() => null);
-		l.update = p.update ?? l.update ?? (() => null);
-		l.draw = p.draw ?? l.draw ?? (() => null);
-		l.falls = p.falls ?? l.falls ?? false;
-		l.slows = p.slows ?? l.slows ?? false;
-		l.active = p.active ?? l.active ?? true;
-		l.radius = p.radius ?? l.radius ?? 10;
-		l.lifeSpan = p.lifeSpan ?? l.lifeSpan ?? 100;
-		l.delay = p.delay ?? l.delay ?? 1;
+		this.lastTransform = obj.transform.get();
+	}
+	removeAllParticles(obj) {
+		this.particles.clear();
+	}
+	setProperties(obj, p) {
+		this.init = p.init ?? this.init ?? (() => null);
+		this.particleUpdate = p.update ?? this.particleUpdate ?? (() => null);
+		this.particleDraw = p.draw ?? this.particleDraw ?? (() => null);
+		this.falls = p.falls ?? this.falls ?? false;
+		this.slows = p.slows ?? this.slows ?? false;
+		this.active = p.active ?? this.active ?? true;
+		this.radius = p.radius ?? this.radius ?? 10;
+		this.lifeSpan = p.lifeSpan ?? this.lifeSpan ?? 100;
+		this.delay = p.delay ?? this.delay ?? 1;
 		const imageType = p.imageType ?? FastFrame;
-		if (!(l.frame instanceof imageType)) {
-			l.frame = new imageType(this.engine.canvas.width, this.engine.canvas.height);
-			l.gl = l.frame.renderer;
+		if (!(this.frame instanceof imageType)) {
+			this.frame = new imageType(obj.engine.canvas.width, obj.engine.canvas.height);
+			this.gl = this.frame.renderer;
 		}
-	},
-	explode(l, count) {
-		const pos = this.transform.position;
+	}
+	explode(obj, count) {
+		const pos = obj.transform.position;
 
 		for (let i = 0; i < count; i++) {
-			const p = new l.Particle(pos.get(), l.particles);
-			l.init(p);
-			l.particles.add(p);
+			const p = new this.Particle(pos.get(), this.particles);
+			this.init(p);
+			this.particles.add(p);
 		}
-	},
-	update(l) {
-		if (l.active) {
+	}
+	update(obj) {
+		if (this.active) {
 
-			if ((l.delay > 1 && this.lifeSpan % Math.ceil(l.delay) === 0) || l.delay <= 1) {
+			if ((this.delay > 1 && obj.lifeSpan % Math.ceil(this.delay) === 0) || this.delay <= 1) {
 
-				const pos = this.transform.position;
-				const last = l.lastTransform.position;
-				const count = Math.max(1, 1 / l.delay);
+				const pos = obj.transform.position;
+				const last = this.lastTransform.position;
+				const count = Math.max(1, 1 / this.delay);
 
 				for (let i = 0; i < count; i++) {
 					const t = (i + 1) / count;
-					const p = new l.Particle(Interpolation.lerp(last, pos, t), l.particles);
-					l.init(p);
-					if (!l.active) break;
-					l.particles.add(p);
+					const p = new this.Particle(Interpolation.lerp(last, pos, t), this.particles);
+					this.init(p);
+					if (!this.active) break;
+					this.particles.add(p);
 				}
 
 			}
 		}
 
-		this.transform.get(l.lastTransform);
-	},
-	getBoundingBox(l) {
+		obj.transform.get(this.lastTransform);
+	}
+	getBoundingBox(obj) {
 		const particlePositions = [];
-		for (const particle of l.particles) particlePositions.push(particle.position);
+		for (const particle of this.particles) particlePositions.push(particle.position);
 		return Rect.bound(particlePositions);
-	},
-	escapeDraw(l) {
-		if (this.hidden) return;
-		const { gl, frame } = l;
+	}
+	escapeDraw(obj) {
+		if (obj.hidden) return;
+		const { gl, frame } = this;
 
 		gl.clear();
 
 		gl.transform = renderer.transform;
 
-		frame.width = this.engine.canvas.width;
-		frame.height = this.engine.canvas.height;
+		frame.width = obj.engine.canvas.width;
+		frame.height = obj.engine.canvas.height;
 
 		const screen = scene.camera.screen.get();
-		screen.x -= l.radius;
-		screen.y -= l.radius;
-		screen.width += l.radius * 2;
-		screen.height += l.radius * 2;
+		screen.x -= this.radius;
+		screen.y -= this.radius;
+		screen.width += this.radius * 2;
+		screen.height += this.radius * 2;
 
-		const timerIncrement = 1 / l.lifeSpan;
+		const timerIncrement = 1 / this.lifeSpan;
 
 		let renderedParticles = false;
 
-		for (const p of l.particles) {
+		for (const p of this.particles) {
 			p.timer += timerIncrement
 			if (p.timer > 1) {
-				l.toRemove.add(p);
+				this.toRemove.add(p);
 				continue;
 			}
 
 			p.update();
 
 			if (Geometry.pointInsideRect(p.position, screen)) {
-				l.draw(gl, p);
+				this.particleDraw(gl, p);
 				renderedParticles = true;
 			}
 		}
 
-		for (const p of l.toRemove) l.particles.delete(p);
-		l.toRemove.clear();
+		for (const p of this.toRemove) this.particles.delete(p);
+		this.toRemove.clear();
 
-		if (renderedParticles) this.engine.scene.camera.drawInScreenSpace(() => {
+		if (renderedParticles) obj.engine.scene.camera.drawInScreenSpace(() => {
 			renderer.image(frame).default(0, 0);
 		});
 
 	}
-});
+}

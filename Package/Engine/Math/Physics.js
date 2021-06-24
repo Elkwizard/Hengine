@@ -641,7 +641,7 @@ class RigidBody {
         return PhysicsMatrix.force1ToZero(this, p).invert();
     }
     applyImpulse(pos, imp) {
-        if (!this.dynamic) return;
+        if (!this.dynamic || this.mass === 0) return;
 
         //linear
         this.velocity.x += imp.x / this.mass;
