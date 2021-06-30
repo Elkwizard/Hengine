@@ -377,7 +377,6 @@ HengineLoader.engineResources = [
 		"Math/Interpolation",
 		
 		"Render/Frame",
-		"Render/Font",
 		"Render/Gradient",
 		"Render/Spline",
 		"Render/WebGL2DContext",	
@@ -399,6 +398,7 @@ HengineLoader.engineResources = [
 		"Math/Vector",
 		"Math/GPUComputation",
 		
+		"Render/Font",
 		"Render/Shapes",
 		"Render/Animation",
 		"Render/Transform",
