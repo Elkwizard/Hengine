@@ -1,7 +1,7 @@
 function physicsAPICollideShapes(shape, shape2) {
     return !!CollisionDetector.collide(
-        shape.toPhysicsShape().getModel(new PhysicsVector(0, 0), 1, 0),
-        shape2.toPhysicsShape().getModel(new PhysicsVector(0, 0), 1, 0)
+        shape.toPhysicsShape(), new PhysicsVector(0, 0), 1, 0,
+        shape2.toPhysicsShape(), new PhysicsVector(0, 0), 1, 0
     );
 }
 class Contact {

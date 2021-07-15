@@ -4,13 +4,13 @@ class PHYSICS extends ElementScript {
 		this.scene = this.engine.scene;
 		this.physicsEngine = this.scene.physicsEngine;
 		
-		this.body = new RigidBody(obj.transform.position.x, obj.transform.position.y, gravity ? RigidBody.DYNAMIC : RigidBody.STATIC);
+		this.body = new RigidBody(obj.transform.position.x, obj.transform.position.y, gravity);
         
 		// collide rule
 		this.body.userData.sceneObject = obj;
         this.body.collisionFilter = body => {
             const { sceneObject } = body.userData;
-			const success = (!this.hasCollideRule || obj.collideBasedOnRule(sceneObject)) && (!sceneObject.hasCollideRule || sceneObject.collideBasedOnRule(obj));
+			const success = (!this.hasCollideRule || this.collideBasedOnRule(sceneObject)) && (!sceneObject.hasCollideRule || sceneObject.scripts.PHYSICS.collideBasedOnRule(obj));
 			return success;
         };
 		this.hasCollideRule = obj.scripts.implements("collideRule");
@@ -72,12 +72,11 @@ class PHYSICS extends ElementScript {
 	}
 	set mobile(a) {
 		const { body } = this;
-        body.type = a ? RigidBody.DYNAMIC : RigidBody.STATIC;
-        body.gravity = a;
+        body.dynamic = !!a;
         if (a) body.wake();
 	}
 	get mobile() {
-		return this.body.type !== RigidBody.STATIC;
+		return this.body.dynamic;
 	}
 	set mass(a) {
 		const { body } = this;
@@ -155,5 +154,11 @@ class PHYSICS extends ElementScript {
 	stop(obj) {
 		this.body.stop();
 		this.body.wake();
+	}
+	collideBasedOnRule(obj, element) {
+		const scripts = obj.scripts.sortedScriptInstances;
+		for (let i = 0; i < scripts.length; i++)
+			if (!scripts[i].collideRule(element)) return false;
+		return true;
 	}
 }

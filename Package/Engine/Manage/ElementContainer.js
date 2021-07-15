@@ -81,7 +81,7 @@ class ElementContainer extends SceneElement {
 		if (el instanceof UIObject) {
 			n = this.addUI(el.name + " - copy", 0, 0, el.width, el.height);
 		} else if (el.scripts.has(PHYSICS)) {
-			n = this.addPhysicsElement(el.name + " - copy", 0, 0, el.scripts.PHYSICS.body.type === RigidBody.DYNAMIC, { ...el.controls }, el.tag);
+			n = this.addPhysicsElement(el.name + " - copy", 0, 0, el.scripts.PHYSICS.mobile, { ...el.controls }, el.tag);
 			n.rotation = el.rotation;
 		} else {
 			n = this.addElement(el.name + " - copy", 0, 0, { ...el.controls }, el.tag);

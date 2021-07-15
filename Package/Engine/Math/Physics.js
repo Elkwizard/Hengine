@@ -314,85 +314,127 @@ class PhysicsMath {
 }
 
 //shapes
-class PolygonModel {
-    constructor(vertices, position, axes, collider) {
-        this.vertices = vertices;
-        this.position = position;
-        this.axes = axes;
+class BaseModel {
+    constructor(collider) {
         this.collider = collider;
-        this.bounds = Bounds.fromPolygon(this);
+        this.bounds = collider.bounds.get();
     }
     displace(v) {
         this.bounds.x += v.x;
         this.bounds.y += v.y;
+    }
+}
+class BaseCollider {
+    constructor() {
+        this.cacheValid = false;
+    }
+    invalidateCache() {
+        this.cacheValid = false;
+    }
+    cacheModel(pos, cos, sin) {
+        if (this.cacheValid) return this.model;
+        else {
+            this.cacheValid = true;
+            this.model.update(pos, cos, sin);
+            this.model.bounds.center = pos;
+            return this.model;
+        }
+    }
+    displaceCache(v) {
+        this.model.displace(v);
+    }
+}
+
+class PolygonModel extends BaseModel {
+    constructor(collider) {
+        super(collider);
+        this.vertices = collider.vertices.map(vertex => new PhysicsVector(0, 0));
+        this.position = new PhysicsVector(0, 0);
+        this.axes = collider.axes.map(axis => new PhysicsVector(0, 0));
+    }
+    update(pos, cos, sin) {
+        const { collider } = this;
+        for (let i = 0; i < collider.vertices.length; i++) {
+            const { x, y } = collider.vertices[i];
+            const vertex = this.vertices[i];
+            vertex.x = x * cos - y * sin + pos.x;
+            vertex.y = x * sin + y * cos + pos.y;
+        }
+
+        for (let i = 0; i < collider.axes.length; i++) {
+            const { x, y } = collider.axes[i];
+            const axis = this.axes[i];
+            axis.x = x * cos - y * sin;
+            axis.y = x * sin + y * cos;
+        }
+
+        const { x, y } = collider.position;
+        this.position.x = x * cos - y * sin + pos.x;
+        this.position.y = x * sin + y * cos + pos.y;
+    }
+    displace(v) {
+        super.displace(v);
         this.position.add(v);
         for (let i = 0; i < this.vertices.length; i++) this.vertices[i].add(v);
     }
 }
-class PolygonCollider {
+class PolygonCollider extends BaseCollider {
     constructor(vertices) {
+        super();
         this.vertices = vertices;
         this.position = new PhysicsVector(0, 0);
-        for (let i = 0; i < this.vertices.length; i++) this.position.add(this.vertices[i]);
-        this.position.div(this.vertices.length);
+        for (let i = 0; i < vertices.length; i++) this.position.add(vertices[i]);
+        this.position.div(vertices.length);
+        this.axes = vertices.map((_, i) => {
+            const a = vertices[i];
+            const b = vertices[(i + 1) % vertices.length];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const m = 1 / Math.sqrt(dx * dx + dy * dy);
+            return new PhysicsVector(-dy * m, dx * m);
+        });
         this.bounds = Bounds.fromPolygon(this);
+
+        // models
+        this.model = new PolygonModel(this);
     }
     size() {
         return Math.sqrt(this.bounds.width * this.bounds.height);
     }
-    getModel(pos, cos, sin) {
-        const vertices = this.vertices.map(vert => {
-            let t_x = vert.x * cos - vert.y * sin + pos.x;
-            let t_y = vert.x * sin + vert.y * cos + pos.y;
-            return new PhysicsVector(t_x, t_y);
-        });
-        const axes = [];
-        for (let i = 0; i < vertices.length; i++) {
-            let a = vertices[i];
-            let b = vertices[(i + 1) % vertices.length];
-            let dx = b.x - a.x;
-            let dy = b.y - a.y;
-            let m = Math.sqrt(dx ** 2 + dy ** 2);
-            axes.push(new PhysicsVector(-dy / m, dx / m));
-        }
-        const cpx = this.position.x;
-        const cpy = this.position.y;
-        const px = cpx * cos - cpy * sin + pos.x;
-        const py = cpx * sin + cpy * cos + pos.y;
-        const position = new PhysicsVector(px, py);
-        return new PolygonModel(vertices, position, axes, this);
-    }
 }
-PolygonModel.SYMBOL = Symbol("POLYGON");
+PolygonCollider.SYMBOL = Symbol("POLYGON");
 
-class CircleModel {
-    constructor(x, y, radius) {
-        this.position = new PhysicsVector(x, y);
-        this.radius = radius;
-        this.bounds = Bounds.fromCircle(this);
+class CircleModel extends BaseModel {
+    constructor(collider) {
+        super(collider);
+        this.position = new PhysicsVector(0, 0);
+        this.radius = 0;
+    }
+    update(pos, cos, sin) {
+        const { collider } = this;
+        this.radius = collider.radius;
+        const { x, y } = collider.position;
+        this.position.x = cos * x - sin * y + pos.x;
+        this.position.y = sin * x + cos * y + pos.y;
     }
     displace(v) {
-        this.bounds.x += v.x;
-        this.bounds.y += v.y;
+        super.displace(v);
         this.position.add(v);
     }
 }
-class CircleCollider {
+class CircleCollider extends BaseCollider {
     constructor(x, y, radius) {
+        super();
         this.position = new PhysicsVector(x, y);
         this.radius = radius;
+        this.bounds = Bounds.fromCircle(this);
+        this.model = new CircleModel(this);
     }
     size() {
         return this.radius * 2;
     }
-    getModel(pos, cos, sin) {
-        let t_x = this.position.x * cos - this.position.y * sin + pos.x;
-        let t_y = this.position.x * sin + this.position.y * cos + pos.y;
-        let circ = new CircleModel(t_x, t_y, this.radius);
-        return circ;
-    }
 }
-CircleModel.SYMBOL = Symbol("CIRCLE");
+CircleCollider.SYMBOL = Symbol("CIRCLE");
 
 //grid
 class PhysicsGrid {
@@ -469,6 +511,13 @@ class Bounds {
         this.width = w;
         this.height = h;
     }
+    set center(position) {
+        this.x = position.x - this.width / 2;
+        this.y = position.y - this.height / 2;
+    }
+    get() {
+        return new Bounds(this.x, this.y, this.width, this.height);
+    }
     static notOverlap(a, b) {
         return a.x + a.width < b.x || a.x > b.x + b.width || a.y + a.height < b.y || a.y > b.y + b.height;
     }
@@ -476,31 +525,28 @@ class Bounds {
         return a.x + a.width > b.x && b.x + b.width > a.x && a.y + a.height > b.y && b.y + b.height > a.y;
     }
     static fromPolygon(p) {
-        let minX = Infinity;
-        let maxX = -Infinity;
-        let minY = Infinity;
-        let maxY = -Infinity;
+        let maxSqrRadius = 0;
         for (let i = 0; i < p.vertices.length; i++) {
-            let x = p.vertices[i].x;
-            let y = p.vertices[i].y;
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
+            const { x, y } = p.vertices[i];
+            const sqrRadius = x * x + y * y;
+            if (sqrRadius > maxSqrRadius) maxSqrRadius = sqrRadius;
         }
-        return new Bounds(minX, minY, maxX - minX, maxY - minY);
+        const radius = Math.sqrt(maxSqrRadius);
+        return new Bounds(-radius, -radius, radius * 2, radius * 2);
     }
     static fromCircle(c) {
-        return new Bounds(c.position.x - c.radius, c.position.y - c.radius, c.radius * 2, c.radius * 2);
+        const { x, y } = c.position;
+        const radius = c.radius + Math.sqrt(x * x + y * y);
+        return new Bounds(-radius, -radius, radius * 2, radius * 2);
     }
 }
 
 //rigidbodies
 class RigidBody {
-    constructor(x, y, type) {
+    constructor(x, y, dynamic) {
         this.userData = {};
         this.shapes = [];
-        this.type = type;
+        this.dynamic = dynamic;
         this.id = RigidBody.nextID++;
         //linear
         this.position = new PhysicsVector(x, y);
@@ -537,8 +583,6 @@ class RigidBody {
         this.airResistance = true;
         this.simulated = true;
 
-        this.invalidateModels();
-
         this.accelerationAccumulator = new PhysicsVectorAccumulator();
         this.angularAccelerationAccumulator = new PhysicsVectorAccumulator();
     }
@@ -550,9 +594,6 @@ class RigidBody {
     }
     get angle() {
         return this._angle;
-    }
-    get dynamic() {
-        return this.type !== RigidBody.STATIC;
     }
     updateLastData() {
         this.lastAngle = this.angle;
@@ -566,29 +607,27 @@ class RigidBody {
     }
     displace(v) {
         if (!this.dynamic) return;
-
         this.position.add(v);
-        for (let i = 0; i < this.__models.length; i++) {
-            if (this.__models[i]) this.__models[i].displace(v);
-        }
+        for (let i = 0; i < this.shapes.length; i++) this.shapes[i].displaceCache(v);
     }
     invalidateModels() {
-        this.__models = [];
-        for (let i = 0; i < this.shapes.length; i++) this.__models.push(null);
+        for (let i = 0; i < this.shapes.length; i++) this.shapes[i].invalidateCache();
     }
     getModel(i) {
-        return this.shapes[i].getModel(this.position, this.cosAngle, this.sinAngle);
+        const shape = this.shapes[i];
+        shape.invalidateCache();
+        return shape.cacheModel(this.position, this.cosAngle, this.sinAngle);
     }
     getModels() {
-        let models = [];
+        const models = [];
         for (let i = 0; i < this.shapes.length; i++) models.push(this.cacheModel(i));
         return models;
     }
     cacheModel(i) {
-        return this.__models[i] ? this.__models[i] : (this.__models[i] = this.getModel(i));
+        return this.shapes[i].cacheModel(this.position, this.cosAngle, this.sinAngle);
     }
     cacheModels() {
-        let models = [];
+        const models = [];
         for (let i = 0; i < this.shapes.length; i++) models.push(this.cacheModel(i));
         return models;
     }
@@ -603,7 +642,7 @@ class RigidBody {
         this.wakeCollidingBodies();
     }
     removeShape(sh) {
-        let inx = this.shapes.indexOf(sh);
+        const inx = this.shapes.indexOf(sh);
         if (inx > -1) {
             this.shapes.splice(inx, 1);
             this.invalidateModels();
@@ -622,12 +661,8 @@ class RigidBody {
         return sh;
     }
     integrate(intensity) {
-        const dif = this.velocity.times(intensity);
-        if (this.canRotate) {
-            this.position.add(dif);
-            this.angle += this.angularVelocity * intensity;
-            this.invalidateModels();
-        } else this.displace(dif);
+        this.displace(this.velocity.times(intensity));
+        if (this.canRotate) this.angle += this.angularVelocity * intensity;
     }
     stop() {
         this.velocity.mul(0);
@@ -665,16 +700,16 @@ class RigidBody {
             if (cross) this.angularAccelerationAccumulator.append(cross / this.inertia);
         }
     }
-    static fromPolygon(vertices, type = RigidBody.DYNAMIC) {
+    static fromPolygon(vertices, dynamic = true) {
         let position = vertices.reduce((a, b) => a.plus(b));
         position.div(vertices.length);
         vertices = vertices.map(e => e.minus(position));
-        let body = new RigidBody(position.x, position.y, type);
+        let body = new RigidBody(position.x, position.y, dynamic);
         body.addShape(new PolygonCollider(vertices));
         return body;
     }
-    static fromRect(x, y, w, h, type = RigidBody.DYNAMIC) {
-        let body = new RigidBody(x, y, type);
+    static fromRect(x, y, w, h, dynamic = true) {
+        let body = new RigidBody(x, y, dynamic);
         body.addShape(new PolygonCollider([
             new PhysicsVector(-w / 2, -h / 2),
             new PhysicsVector(w / 2, -h / 2),
@@ -683,21 +718,24 @@ class RigidBody {
         ]));
         return body;
     }
-    static fromCircle(x, y, r, type = RigidBody.DYNAMIC) {
-        let body = new RigidBody(x, y, type);
+    static fromCircle(x, y, r, dynamic = true) {
+        let body = new RigidBody(x, y, dynamic);
         body.addShape(new CircleCollider(0, 0, r));
         return body;
     }
 }
-RigidBody.DYNAMIC = Symbol("DYNAMIC");
-RigidBody.STATIC = Symbol("STATIC");
 RigidBody.nextID = 0;
 
 //detection
 class CollisionDetector {
-    static collide(shapeA, shapeB) {
-        if (Bounds.notOverlap(shapeA.bounds, shapeB.bounds)) return null;
+    static collideLiteral(shapeA, shapeB) {
         return CollisionDetector.jumpTable[shapeA.constructor.SYMBOL][shapeB.constructor.SYMBOL](shapeA, shapeB);
+    }
+    static collide(shapeA, posA, cosA, sinA, shapeB, posB, cosB, sinB) {
+        if (Bounds.notOverlap(shapeA.model.bounds, shapeB.model.bounds)) return;
+        shapeA.cacheModel(posA, cosA, sinA);
+        shapeB.cacheModel(posB, cosB, sinB);
+        return CollisionDetector.jumpTable[shapeA.constructor.SYMBOL][shapeB.constructor.SYMBOL](shapeA.model, shapeB.model);
     }
     static CircleModel_PolygonModel(a, b) {
         let bestDist = Infinity;
@@ -902,13 +940,13 @@ CollisionDetector.Contact = class {
     }
 }
 CollisionDetector.jumpTable = {
-    [PolygonModel.SYMBOL]: {
-        [PolygonModel.SYMBOL]: CollisionDetector.PolygonModel_PolygonModel,
-        [CircleModel.SYMBOL]: CollisionDetector.PolygonModel_CircleModel
+    [PolygonCollider.SYMBOL]: {
+        [PolygonCollider.SYMBOL]: CollisionDetector.PolygonModel_PolygonModel,
+        [CircleCollider.SYMBOL]: CollisionDetector.PolygonModel_CircleModel
     },
-    [CircleModel.SYMBOL]: {
-        [PolygonModel.SYMBOL]: CollisionDetector.CircleModel_PolygonModel,
-        [CircleModel.SYMBOL]: CollisionDetector.CircleModel_CircleModel
+    [CircleCollider.SYMBOL]: {
+        [PolygonCollider.SYMBOL]: CollisionDetector.CircleModel_PolygonModel,
+        [CircleCollider.SYMBOL]: CollisionDetector.CircleModel_CircleModel
     }
 };
 
@@ -946,7 +984,7 @@ class CollisionResolver {
         const rB = dynamic ? contact.minus(bodyB.position) : new PhysicsVector(0, 0);
         const mB = dynamic ? bodyB.mass : INFINITY;
         const iB = dynamic ? bodyB.inertia : INFINITY;
-        
+
         const normalImpulse = this.normalImpulse(bodyA, bodyB, rA, rB, mB, iB, normal, vAB);
         if (normalImpulse >= 0) return new PhysicsVector(0, 0);
         const frictionImpulse = this.frictionImpulse(bodyA, rA, rB, mB, iB, tangent, vAB, -normalImpulse, staticFriction, kineticFriction);
@@ -1344,6 +1382,8 @@ class PhysicsEngine {
             const body = dynBodies[i];
             const asleep = this.isAsleep(body);
 
+            const { position, cosAngle, sinAngle } = body;
+
             //mobilize
             body.canMoveThisStep = true;
             body.prohibitedDirections = [];
@@ -1361,14 +1401,20 @@ class PhysicsEngine {
             // }
 
             for (let j = 0; j < collidable.length; j++) {
-                let body2 = collidable[j];
+                const body2 = collidable[j];
                 if (body.shapes.length === 1 && body2.shapes.length === 1) {
-                    let col = CollisionDetector.collide(body.cacheModel(0), body2.cacheModel(0));
+                    const col = CollisionDetector.collide(
+                        body.shapes[0], position, cosAngle, sinAngle,
+                        body2.shapes[0], body2.position, body2.cosAngle, body2.sinAngle
+                    );
                     if (col) this.resolve(body, body2, col);
                 } else {
-                    let collisions = [];
+                    const collisions = [];
                     for (let sI = 0; sI < body.shapes.length; sI++) for (let sJ = 0; sJ < body2.shapes.length; sJ++) {
-                        let col = CollisionDetector.collide(body.cacheModel(sI), body2.cacheModel(sJ));
+                        const col = CollisionDetector.collide(
+                            body.shapes[sI], position, cosAngle, sinAngle,
+                            body2.shapes[sJ], body2.position, body2.cosAngle, body2.sinAngle
+                        );
                         if (col) collisions.push(col);
                     }
                     if (!collisions.length) continue;
@@ -1397,9 +1443,6 @@ class PhysicsEngine {
             }
         }
     }
-    cacheModels() {
-        for (let i = 0; i < this.bodies.length; i++) this.bodies[i].invalidateModels();
-    }
     createGrid(dynBodies) {
         let cellsize = 100;
         if (this.bodies.length) {
@@ -1415,10 +1458,10 @@ class PhysicsEngine {
         const collisionPairs = new Map();
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
-            let models = body.cacheModels();
             let cellsTotal = [];
+            const models = body.cacheModels();
             for (let j = 0; j < models.length; j++) {
-                let model = models[j];
+                const model = models[j];
                 let cells = grid.cellsBounds(body, model.bounds);
                 for (let ii = 0; ii < cells.length; ii++) cellsTotal.push(cells[ii]);
             }
@@ -1488,10 +1531,10 @@ class PhysicsEngine {
         for (let i = 0; i < dynBodies.length; i++) {
             const body = dynBodies[i];
             // if (body.accelerationAccumulator.length) {
-                body.velocity.add(body.accelerationAccumulator.value);
-                body.angularVelocity += body.angularAccelerationAccumulator.value.x;
-                body.accelerationAccumulator.reset();
-                body.angularAccelerationAccumulator.reset();
+            body.velocity.add(body.accelerationAccumulator.value);
+            body.angularVelocity += body.angularAccelerationAccumulator.value.x;
+            body.accelerationAccumulator.reset();
+            body.angularAccelerationAccumulator.reset();
             // }
         }
     }
@@ -1501,7 +1544,7 @@ class PhysicsEngine {
             const backupBodies = this.bodies;
             this.bodies = this.bodies.filter(body => body.simulated);
 
-            const dynBodies = this.bodies.filter(body => body.type === RigidBody.DYNAMIC);
+            const dynBodies = this.bodies.filter(body => body.dynamic);
 
             // approximate where they'll be at the end of the frame
             this.integrate(dynBodies, 1);
@@ -1509,7 +1552,6 @@ class PhysicsEngine {
             this.integrate(dynBodies, -1);
 
             const intensity = 1 / (this.iterations * this.constraintIterations);
-            this.step = 0;
 
             //sorts
             const { x: gx, y: gy } = this.gravity;
@@ -1518,18 +1560,18 @@ class PhysicsEngine {
             this.clearCollidingBodies();
 
             // solve
+            this.step = 0;
             for (let i = 0; i < this.iterations; i++) {
                 this.step++;
 
                 //step
-                for (let j = 0; j < this.constraintIterations; j++) {
-                    this.applyForces(dynBodies, intensity);
-                    this.solveConstraints();
-                    // this.applyAccumulatedImpulses(dynBodies);
-                    this.integrate(dynBodies, intensity);
-                }
+                this.applyForces(dynBodies, 1 / this.iterations);
+                this.solveConstraints();
                 this.collisions(dynBodies, collisionPairs, gravitySort);
                 this.applyAccumulatedImpulses(dynBodies);
+                this.integrate(dynBodies, 1 / this.iterations);
+                // for (let j = 0; j < this.constraintIterations; j++) {
+                // }
                 this.handleSleep(dynBodies);
                 // for (const body of dynBodies) {
                 //     renderer.stroke(Color.ORANGE).arrow(body.position, body.position.plus(body.velocity));

@@ -162,10 +162,11 @@ class Vector2 extends Vector {
 		return this.x * this.x + this.y * this.y;
 	}
 	set mag(m) {
-		let M = this.mag;
-		if (M) {
-			this.x /= M / m;
-			this.y /= M / m;
+		const { mag } = this;
+		if (mag) {
+			const factor = m / mag;
+			this.x *= factor;
+			this.y *= factor;
 		}
 	}
 	get mag() {

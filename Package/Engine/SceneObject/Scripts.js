@@ -28,7 +28,7 @@ class ElementScript {
 			this[prop] = (...args) => method(sceneObject, ...args);
 		}
 
-		const placeholder = () => null;
+		const placeholder = () => true;
 		for (const flag of ElementScript.flags) if (!(flag in this)) this[flag] = placeholder;
 
 		this.sceneObject = sceneObject;
