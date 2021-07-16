@@ -4,7 +4,7 @@ function defineEnum(...values) {
 	return obj;
 }
 
-const __devicePixelRatio = devicePixelRatio;
+window.__devicePixelRatio = devicePixelRatio;
 
 Object.defineProperty(window, "title", {
 	get() {

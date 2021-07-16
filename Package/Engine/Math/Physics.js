@@ -317,11 +317,6 @@ class PhysicsMath {
 class BaseModel {
     constructor(collider) {
         this.collider = collider;
-        this.bounds = collider.bounds.get();
-    }
-    displace(v) {
-        this.bounds.x += v.x;
-        this.bounds.y += v.y;
     }
 }
 class BaseCollider {
@@ -336,7 +331,6 @@ class BaseCollider {
         else {
             this.cacheValid = true;
             this.model.update(pos, cos, sin);
-            this.model.bounds.center = pos;
             return this.model;
         }
     }
@@ -373,7 +367,6 @@ class PolygonModel extends BaseModel {
         this.position.y = x * sin + y * cos + pos.y;
     }
     displace(v) {
-        super.displace(v);
         this.position.add(v);
         for (let i = 0; i < this.vertices.length; i++) this.vertices[i].add(v);
     }
@@ -393,13 +386,49 @@ class PolygonCollider extends BaseCollider {
             const m = 1 / Math.sqrt(dx * dx + dy * dy);
             return new PhysicsVector(-dy * m, dx * m);
         });
-        this.bounds = Bounds.fromPolygon(this);
+
+        { // bounding radius
+            let maxSqrRadius = 0;
+            for (let i = 0; i < vertices.length; i++) {
+                const { x, y } = vertices[i];
+                const sqrRadius = x * x + y * y;
+                if (sqrRadius > maxSqrRadius) maxSqrRadius = sqrRadius;
+            }
+            this.boundingRadius = Math.sqrt(maxSqrRadius);
+        };
 
         // models
         this.model = new PolygonModel(this);
     }
+    computeMatterData() {
+        const { vertices, position } = this;
+        { // mass
+            this.mass = 0;
+            for (let i = 0; i < vertices.length; i++) {
+                const a = vertices[i].minus(position);
+                const b = vertices[(i + 1) % vertices.length].minus(position);
+                this.mass += Math.abs(a.cross(b)) / 2;
+            }
+        };
+        { // inertia
+            let minX = Infinity;
+            let minY = Infinity;
+            let maxX = -Infinity;
+            let maxY = -Infinity;
+            for (let i = 0; i < vertices.length; i++) {
+                const { x, y } = vertices[i];
+                if (x < minX) minX = x;
+                if (y < minY) minY = y;
+                if (x > maxX) maxX = x;
+                if (y > maxY) maxY = y;
+            }
+            const width = maxX - minX;
+            const height = maxY - minY;
+            this.inertia = 1 / 12 * width ** 3 * height + height ** 3 * width;
+        };
+    }
     size() {
-        return Math.sqrt(this.bounds.width * this.bounds.height);
+        return Math.sqrt(this.mass);
     }
 }
 PolygonCollider.SYMBOL = Symbol("POLYGON");
@@ -418,7 +447,6 @@ class CircleModel extends BaseModel {
         this.position.y = sin * x + cos * y + pos.y;
     }
     displace(v) {
-        super.displace(v);
         this.position.add(v);
     }
 }
@@ -427,8 +455,12 @@ class CircleCollider extends BaseCollider {
         super();
         this.position = new PhysicsVector(x, y);
         this.radius = radius;
-        this.bounds = Bounds.fromCircle(this);
+        this.boundingRadius = this.position.mag + this.radius;
         this.model = new CircleModel(this);
+    }
+    computeMatterData() {
+        this.mass = this.radius ** 2 * Math.PI;
+        this.inertia = this.position.sqrMag + 1.25 * this.radius ** 2 * this.mass;
     }
     size() {
         return this.radius * 2;
@@ -469,13 +501,15 @@ class PhysicsGrid {
 
         return bodies;
     }
-    cellsBounds(body, bounds) {
-        let cells = [];
-        let startX = Math.floor(bounds.x / this.cellsize);
-        let startY = Math.floor(bounds.y / this.cellsize);
+    cellsBounds(body, radius) {
+        const { x, y } = body.position;
 
-        let endX = Math.floor((bounds.x + bounds.width) / this.cellsize);
-        let endY = Math.floor((bounds.y + bounds.height) / this.cellsize);
+        let cells = [];
+        let startX = Math.floor((x - radius) / this.cellsize);
+        let startY = Math.floor((y - radius) / this.cellsize);
+
+        let endX = Math.floor((x + radius) / this.cellsize);
+        let endY = Math.floor((y + radius) / this.cellsize);
 
         let rx = endX - startX;
         let ry = endY - startY;
@@ -484,60 +518,6 @@ class PhysicsGrid {
             cells.push({ x: startX + i, y: startY + j });
         }
         return cells;
-    }
-}
-
-//mass
-class ShapeMass {
-    static massCircleCollider(circ) {
-        return circ.radius ** 2 * Math.PI;
-    }
-    static inertiaCircleCollider(circ) {
-        return (circ.position.x ** 2 + circ.position.y ** 2) + 5 * circ.radius ** 4 * Math.PI / 4;
-    }
-    static massPolygonCollider(poly) {
-        return poly.bounds.width * poly.bounds.height;
-    }
-    static inertiaPolygonCollider(poly) {
-        return (poly.position.x ** 2 + poly.position.y ** 2) + (poly.bounds.width ** 3 * poly.bounds.height + poly.bounds.height ** 3 * poly.bounds.width) / 12;
-    }
-}
-
-//bounds
-class Bounds {
-    constructor(x, y, w, h) {
-        this.x = x;
-        this.y = y;
-        this.width = w;
-        this.height = h;
-    }
-    set center(position) {
-        this.x = position.x - this.width / 2;
-        this.y = position.y - this.height / 2;
-    }
-    get() {
-        return new Bounds(this.x, this.y, this.width, this.height);
-    }
-    static notOverlap(a, b) {
-        return a.x + a.width < b.x || a.x > b.x + b.width || a.y + a.height < b.y || a.y > b.y + b.height;
-    }
-    static overlap(a, b) {
-        return a.x + a.width > b.x && b.x + b.width > a.x && a.y + a.height > b.y && b.y + b.height > a.y;
-    }
-    static fromPolygon(p) {
-        let maxSqrRadius = 0;
-        for (let i = 0; i < p.vertices.length; i++) {
-            const { x, y } = p.vertices[i];
-            const sqrRadius = x * x + y * y;
-            if (sqrRadius > maxSqrRadius) maxSqrRadius = sqrRadius;
-        }
-        const radius = Math.sqrt(maxSqrRadius);
-        return new Bounds(-radius, -radius, radius * 2, radius * 2);
-    }
-    static fromCircle(c) {
-        const { x, y } = c.position;
-        const radius = c.radius + Math.sqrt(x * x + y * y);
-        return new Bounds(-radius, -radius, radius * 2, radius * 2);
     }
 }
 
@@ -652,9 +632,9 @@ class RigidBody {
     }
     addShape(sh) {
         this.shapes.push(sh);
-        const name = sh.constructor.name;
-        this.mass += ShapeMass["mass" + name](sh);
-        this.inertia += ShapeMass["inertia" + name](sh);
+        sh.computeMatterData();
+        this.mass += sh.mass;
+        this.inertia += sh.inertia;
         this.size += sh.size();
         this.invalidateModels();
         this.wakeCollidingBodies();
@@ -728,11 +708,49 @@ RigidBody.nextID = 0;
 
 //detection
 class CollisionDetector {
-    static collideLiteral(shapeA, shapeB) {
-        return CollisionDetector.jumpTable[shapeA.constructor.SYMBOL][shapeB.constructor.SYMBOL](shapeA, shapeB);
+    static collideBodies(bodyA, bodyB) {
+        if (bodyA.shapes.length === 1 && bodyB.shapes.length === 1) {
+            return CollisionDetector.collide(
+                bodyA.shapes[0], bodyA.position, bodyA.cosAngle, bodyA.sinAngle,
+                bodyB.shapes[0], bodyB.position, bodyB.cosAngle, bodyB.sinAngle
+            );
+        } else {
+            const collisions = [];
+            for (let sI = 0; sI < bodyA.shapes.length; sI++) for (let sJ = 0; sJ < bodyB.shapes.length; sJ++) {
+                const col = CollisionDetector.collide(
+                    bodyA.shapes[sI], bodyA.position, bodyA.cosAngle, bodyA.sinAngle,
+                    bodyB.shapes[sJ], bodyB.position, bodyB.cosAngle, bodyB.sinAngle
+                );
+                if (col !== null) collisions.push(col);
+            }
+            if (!collisions.length) return null;
+            const contacts = [];
+            let dir = new PhysicsVector(0, 0);
+            let penetration = -Infinity;
+            let best = null;
+            for (let cI = 0; cI < collisions.length; cI++) dir.add(collisions[cI].direction);
+            for (let cI = 0; cI < collisions.length; cI++) {
+                let col = collisions[cI];
+                if (col.direction.dot(dir) < 0) continue;
+                contacts.push(...col.contacts);
+                if (col.penetration > penetration) {
+                    penetration = col.penetration;
+                    best = col;
+                }
+            }
+            if (!contacts.length) return null;
+            best.contacts = contacts;
+            dir = dir.normalized;
+            const dot = best.direction.dot(dir);
+            best.penetration *= dot;
+            best.direction = dir;
+            return best;
+        }
     }
     static collide(shapeA, posA, cosA, sinA, shapeB, posB, cosB, sinB) {
-        if (Bounds.notOverlap(shapeA.model.bounds, shapeB.model.bounds)) return;
+        const dx = posB.x - posA.x;
+        const dy = posB.y - posA.y;
+        if (dx * dx + dy * dy > (shapeA.boundingRadius + shapeB.boundingRadius) ** 2) return null;
         shapeA.cacheModel(posA, cosA, sinA);
         shapeB.cacheModel(posB, cosB, sinB);
         return CollisionDetector.jumpTable[shapeA.constructor.SYMBOL][shapeB.constructor.SYMBOL](shapeA.model, shapeB.model);
@@ -996,8 +1014,9 @@ class CollisionResolver {
     }
     dynamicResolve(bodyA, bodyB, direction, penetration, contacts) {
         const move = direction.times(penetration);
-        const moveA = move.times(-bodyB.mass / (bodyA.mass + bodyB.mass));
-        const moveB = move.times(bodyA.mass / (bodyA.mass + bodyB.mass));
+        const portionA = bodyB.mass / (bodyA.mass + bodyB.mass);
+        const moveA = move.times(-portionA);
+        const moveB = move.times(1 - portionA);
         bodyA.displace(moveA);
         if (bodyB.canMoveThisStep || this.engine.iterations > 2) bodyB.displace(moveB);
 
@@ -1376,13 +1395,10 @@ class PhysicsEngine {
         //     renderer.draw(Color.RED).text(Font.Serif25, i + 1, dynBodies[i].position);
         // }
 
-
         //collisions
         for (let i = 0; i < dynBodies.length; i++) {
             const body = dynBodies[i];
             const asleep = this.isAsleep(body);
-
-            const { position, cosAngle, sinAngle } = body;
 
             //mobilize
             body.canMoveThisStep = true;
@@ -1392,54 +1408,10 @@ class PhysicsEngine {
             const vel = body.velocity;
             const collidable = others.filter(b => !(this.isAsleep(b) && asleep)).sort((a, b) => (a.position.x - b.position.x) * vel.x + (a.position.y - b.position.y) * vel.y);
 
-            // checks
-            // renderer.draw(Color.RED).text("20px monospace", others.length, body.position.x, body.position.y);
-            // if (others.length > 10) {
-            //     for (let i = 0; i < others.length; i++) {
-            //         renderer.stroke(Color.RED).arrow(body.position, others[i].position);
-            //     }
-            // }
-
             for (let j = 0; j < collidable.length; j++) {
                 const body2 = collidable[j];
-                if (body.shapes.length === 1 && body2.shapes.length === 1) {
-                    const col = CollisionDetector.collide(
-                        body.shapes[0], position, cosAngle, sinAngle,
-                        body2.shapes[0], body2.position, body2.cosAngle, body2.sinAngle
-                    );
-                    if (col) this.resolve(body, body2, col);
-                } else {
-                    const collisions = [];
-                    for (let sI = 0; sI < body.shapes.length; sI++) for (let sJ = 0; sJ < body2.shapes.length; sJ++) {
-                        const col = CollisionDetector.collide(
-                            body.shapes[sI], position, cosAngle, sinAngle,
-                            body2.shapes[sJ], body2.position, body2.cosAngle, body2.sinAngle
-                        );
-                        if (col) collisions.push(col);
-                    }
-                    if (!collisions.length) continue;
-                    let contacts = [];
-                    let dir = new PhysicsVector(0, 0);
-                    let penetration = -Infinity;
-                    let best = null;
-                    for (let cI = 0; cI < collisions.length; cI++) dir.add(collisions[cI].direction);
-                    for (let cI = 0; cI < collisions.length; cI++) {
-                        let col = collisions[cI];
-                        if (col.direction.dot(dir) < 0) continue;
-                        contacts.push(...col.contacts);
-                        if (col.penetration > penetration) {
-                            penetration = col.penetration;
-                            best = col;
-                        }
-                    }
-                    if (!contacts.length) continue;
-                    best.contacts = contacts;
-                    dir = dir.normalized;
-                    const dot = best.direction.dot(dir);
-                    best.penetration *= dot;
-                    best.direction = dir;
-                    this.resolve(body, body2, best);
-                }
+                const collision = CollisionDetector.collideBodies(body, body2);
+                if (collision !== null) this.resolve(body, body2, collision);
             }
         }
     }
@@ -1459,10 +1431,10 @@ class PhysicsEngine {
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
             let cellsTotal = [];
-            const models = body.cacheModels();
-            for (let j = 0; j < models.length; j++) {
-                const model = models[j];
-                let cells = grid.cellsBounds(body, model.bounds);
+            const { shapes } = body;
+            for (let j = 0; j < shapes.length; j++) {
+                const shape = shapes[j];
+                let cells = grid.cellsBounds(body, shape.boundingRadius);
                 for (let ii = 0; ii < cells.length; ii++) cellsTotal.push(cells[ii]);
             }
             collisionPairs.set(body, cellsTotal);
@@ -1539,48 +1511,46 @@ class PhysicsEngine {
         }
     }
     run() {
-        scene.camera.drawInWorldSpace(() => {
-            //remove unsimulated
-            const backupBodies = this.bodies;
-            this.bodies = this.bodies.filter(body => body.simulated);
+        //remove unsimulated
+        const backupBodies = this.bodies;
+        this.bodies = this.bodies.filter(body => body.simulated);
 
-            const dynBodies = this.bodies.filter(body => body.dynamic);
+        const dynBodies = this.bodies.filter(body => body.dynamic);
 
-            // approximate where they'll be at the end of the frame
-            this.integrate(dynBodies, 1);
-            const collisionPairs = this.createGrid(dynBodies);
-            this.integrate(dynBodies, -1);
+        // approximate where they'll be at the end of the frame
+        this.integrate(dynBodies, 1);
+        const collisionPairs = this.createGrid(dynBodies);
+        this.integrate(dynBodies, -1);
 
-            const intensity = 1 / (this.iterations * this.constraintIterations);
+        const intensity = 1 / (this.iterations * this.constraintIterations);
 
-            //sorts
-            const { x: gx, y: gy } = this.gravity;
-            const gravitySort = (a, b) => (b.position.x - a.position.x) * gx + (b.position.y - a.position.y) * gy;
+        //sorts
+        const { x: gx, y: gy } = this.gravity;
+        const gravitySort = (a, b) => (b.position.x - a.position.x) * gx + (b.position.y - a.position.y) * gy;
 
-            this.clearCollidingBodies();
+        this.clearCollidingBodies();
 
-            // solve
-            this.step = 0;
-            for (let i = 0; i < this.iterations; i++) {
-                this.step++;
+        // solve
+        this.step = 0;
+        for (let i = 0; i < this.iterations; i++) {
+            this.step++;
 
-                //step
-                this.applyForces(dynBodies, 1 / this.iterations);
-                this.solveConstraints();
-                this.collisions(dynBodies, collisionPairs, gravitySort);
-                this.applyAccumulatedImpulses(dynBodies);
-                this.integrate(dynBodies, 1 / this.iterations);
-                // for (let j = 0; j < this.constraintIterations; j++) {
-                // }
-                this.handleSleep(dynBodies);
-                // for (const body of dynBodies) {
-                //     renderer.stroke(Color.ORANGE).arrow(body.position, body.position.plus(body.velocity));
-                // }    
-            }
+            //step
+            this.applyForces(dynBodies, 1 / this.iterations);
+            this.solveConstraints();
+            this.collisions(dynBodies, collisionPairs, gravitySort);
+            this.applyAccumulatedImpulses(dynBodies);
+            this.integrate(dynBodies, 1 / this.iterations);
+            // for (let j = 0; j < this.constraintIterations; j++) {
+            // }
+            this.handleSleep(dynBodies);
+            // for (const body of dynBodies) {
+            //     renderer.stroke(Color.ORANGE).arrow(body.position, body.position.plus(body.velocity));
+            // }    
+        }
 
-            //add back unsimulated
-            this.bodies = backupBodies;
-        });
+        //add back unsimulated
+        this.bodies = backupBodies;
     }
     getBody(id) {
         for (let i = 0; i < this.bodies.length; i++) {
