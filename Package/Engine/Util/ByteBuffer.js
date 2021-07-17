@@ -1,6 +1,7 @@
 class ByteBuffer {
 	constructor(bytes = 2, pointer = 0) {
 		this.data = new Uint8Array(bytes);
+		this.view = new DataView(this.data.buffer);
 		this.pointer = pointer;
 		this.write = new ByteBuffer.Writer(this);
 		this.read = new ByteBuffer.Reader(this);
@@ -14,6 +15,7 @@ class ByteBuffer {
 			const newData = new Uint8Array(this.data.length * 2);
 			newData.set(this.data);
 			this.data = newData;
+			this.view = new DataView(this.data.buffer);
 		}
 	}
 	clear() {
@@ -27,11 +29,10 @@ class ByteBuffer {
 		return this;
 	}
 	toString() {
-		let result = String.fromCharCode(this.pointer >> 16, this.pointer & 0xFFFF);
-		for (let i = 0; i < this.data.length; i += 2) {
-			const charCode = this.data[i] << 8 | (this.data[i + 1] || 0);
-			result += String.fromCharCode(charCode);
-		}
+		let result = String.fromCharCode(this.pointer >> 16, this.pointer & 0xFFFF, this.byteLength >> 16, this.byteLength & 0xFFFF);
+		for (let i = 0; i < this.data.length; i += 2)
+			result += String.fromCharCode(this.data[i] << 8 | (this.data[i + 1] || 0));
+		
 		return result;
 	}
 	toBase64() {
@@ -101,15 +102,20 @@ class ByteBuffer {
 				buffer.write.uint8(((b2 & 0b11) << 6) | b3);
 			}
 		}
-		
+
 		buffer.finalize();
+
+		buffer.pointer = 0;
+
 		return buffer;
 	}
 	static fromString(string) {
-		const buffer = new ByteBuffer(string.length * 2);
+		// console.log(string[4].charCodeAt(0));
+		const length = string.charCodeAt(2) << 16 | string.charCodeAt(3);
+		const buffer = new ByteBuffer(length);
 		buffer.shouldResize = false;
-		for (let i = 2; i < string.length; i++) buffer.write.int16(string.charCodeAt(i));
-		buffer.pointer = (string.charCodeAt(0) << 16) | string.charCodeAt(1);
+		for (let i = 4; i < string.length; i++) buffer.write.uint16(string.charCodeAt(i));
+		buffer.pointer = string.charCodeAt(0) << 16 | string.charCodeAt(1);
 		buffer.shouldResize = true;
 		return buffer;
 	}
@@ -117,24 +123,6 @@ class ByteBuffer {
 		return buffer.get();
 	}
 }
-ByteBuffer.Converter = class {
-	constructor(type) {
-		const ArrayType = window[type + "Array"];
-		const buffer = new ArrayBuffer(ArrayType.BYTES_PER_ELEMENT);
-		this.bytes = new Uint8Array(buffer);
-		this.value = new ArrayType(buffer);
-		this.size = ArrayType.BYTES_PER_ELEMENT;
-	}
-	fromBytes(buffer, offset = 0) {
-		for (let i = 0; i < this.bytes.length; i++) this.bytes[i] = buffer[i + offset];
-		return this.value[0];
-	}
-	toBytes(value) {
-		this.value[0] = value;
-		return this.bytes;
-	}
-};
-ByteBuffer.converters = {};
 ByteBuffer.arrayTypes = ["Float32", "Float64", "Int8", "Int16", "Int32", "Uint8", "Uint16", "Uint32"];
 ByteBuffer.jsTypeAliases = {
 	"number": "float64",
@@ -144,13 +132,6 @@ ByteBuffer.jsTypeAliases = {
 ByteBuffer.Writer = class {
 	constructor(buffer) {
 		this.buffer = buffer;
-	}
-	_type(type, value) {
-		const convert = ByteBuffer.converters[type];
-		const bytes = convert.toBytes(value);
-		this.buffer.alloc(bytes.length);
-		this.buffer.data.set(bytes, this.buffer.pointer);
-		this.buffer.pointer += bytes.length;
 	}
 	bigInt(bigint) {
 		let bytes = 0n;
@@ -199,12 +180,6 @@ ByteBuffer.Writer = class {
 ByteBuffer.Reader = class {
 	constructor(buffer) {
 		this.buffer = buffer;
-	}
-	_type(type) {
-		const convert = ByteBuffer.converters[type];
-		const value = convert.fromBytes(this.buffer.data, this.buffer.pointer);
-		this.buffer.pointer += convert.size;
-		return value;
 	}
 	bigInt() {
 		const byteNum = this.int32();
@@ -260,10 +235,24 @@ ByteBuffer.Reader = class {
 
 for (let i = 0; i < ByteBuffer.arrayTypes.length; i++) {
 	const type = ByteBuffer.arrayTypes[i];
-	ByteBuffer.converters[type] = new ByteBuffer.Converter(type);
 	const method = type.toLowerCase();
-	ByteBuffer.Writer.prototype[method] = function (value) { this._type(type, value); };
-	ByteBuffer.Reader.prototype[method] = function () { return this._type(type); };
+
+	const setViewMethod = "set" + type;
+	const getViewMethod = "get" + type;
+	const { BYTES_PER_ELEMENT } = window[type + "Array"];
+	
+	ByteBuffer.Writer.prototype[method] = function (value) {
+		const { buffer } = this;
+		buffer.alloc(BYTES_PER_ELEMENT);
+		buffer.view[setViewMethod](buffer.pointer, value);
+		buffer.pointer += BYTES_PER_ELEMENT;
+	};
+	ByteBuffer.Reader.prototype[method] = function () {
+		const { buffer } = this;
+		const value = (buffer.pointer + BYTES_PER_ELEMENT <= buffer.data.length) ? buffer.view[getViewMethod](buffer.pointer) : 0;
+		buffer.pointer += BYTES_PER_ELEMENT;
+		return value;
+	};
 }
 for (const jsType in ByteBuffer.jsTypeAliases) {
 	const bufferType = ByteBuffer.jsTypeAliases[jsType];

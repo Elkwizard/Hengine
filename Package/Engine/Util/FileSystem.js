@@ -4,6 +4,7 @@ class FileSystem { };
 	function getFile(fs, address) {
 		const fileValue = fs.files[address];
 		let buffer = fileValue;
+		if (!fileValue) return null;
 		if (typeof fileValue === "string") buffer = ByteBuffer.fromString(fileValue);
 		fs.files[address] = buffer;
 		return fs.files[address];
@@ -14,11 +15,11 @@ class FileSystem { };
 		const entries = new Map();
 		const { pointer } = buffer;
 		buffer.pointer = 0;
-		entries.set("...dir", buffer.read.int32());
+		entries.set("...dir", buffer.read.uint32());
 		entries.set("..dir", address);
 		while (true) {
 			const name = buffer.read.string();
-			const address = buffer.read.int32();
+			const address = buffer.read.uint32();
 			if (address) entries.set(name, address);
 			else break;
 		}
@@ -49,7 +50,7 @@ class FileSystem { };
 		fs.files[fileIndex] = contents;
 		const directoryBuffer = getFile(fs, fs.directoryAddress);
 		directoryBuffer.write.string(name);
-		directoryBuffer.write.int32(fileIndex);
+		directoryBuffer.write.uint32(fileIndex);
 
 		return true;
 	}
@@ -68,7 +69,7 @@ class FileSystem { };
 	function getParentAddress(buffer) {
 		const { pointer } = buffer;
 		buffer.pointer = 0;
-		const address = buffer.read.int32();
+		const address = buffer.read.uint32();
 		buffer.pointer = pointer;
 		return address;
 	}
@@ -147,7 +148,7 @@ class FileSystem { };
 
 	FileSystem = class FileSystem {
 		constructor() {
-			this.files = [bytes("int32", 0)];
+			this.files = [bytes("uint32", 0)];
 			this.directoryAddress = 0;
 			this.free = [];
 
@@ -267,12 +268,12 @@ class FileSystem { };
 			entries.delete("..dir");
 			const directoryBuffer = getFile(this, this.directoryAddress);
 			directoryBuffer.pointer = 0;
-			const parentAddress = directoryBuffer.read.int32();
+			const parentAddress = directoryBuffer.read.uint32();
 			directoryBuffer.clear();
-			directoryBuffer.write.int32(parentAddress);
+			directoryBuffer.write.uint32(parentAddress);
 			for (const [name, address] of entries) {
 				directoryBuffer.write.string(name);
-				directoryBuffer.write.int32(address);
+				directoryBuffer.write.uint32(address);
 			}
 
 			this.directoryAddress = directoryAddress;
@@ -307,7 +308,7 @@ class FileSystem { };
 			}
 
 
-			writeFile(this, name, bytes("int32", this.directoryAddress));
+			writeFile(this, name, bytes("uint32", this.directoryAddress));
 
 			this.directoryAddress = directoryAddress;
 
@@ -323,17 +324,17 @@ class FileSystem { };
 				this.directoryAddress = directoryAddress;
 				return null;
 			}
-
+			
 			// get file
 			const entries = getDirectoryEntries(this, this.directoryAddress);
 			const file = getFile(this, entries.get(name));
-
+			
 			if (!file) {
 				if (!existenceCheck) error(`file '${name}' does not exist in '${this.directory}'`);
 				this.directoryAddress = directoryAddress;
 				return null;
 			}
-
+			
 			this.directoryAddress = directoryAddress;
 
 			const ext = getFileExt(path);
@@ -410,18 +411,22 @@ class FileSystem { };
 			fi.click();
 		}
 		toString() {
-			for (const file of this.files) if (file instanceof ByteBuffer) file.finalize();
+			for (const file of this.files)
+				if (file instanceof ByteBuffer) file.finalize();
+
 			const buffer = new ByteBuffer();
-			buffer.write.array("int32", this.free);
+			buffer.write.array("uint32", this.free);
 			buffer.write.array("string", this.files.map(file => file.toString()));
 			buffer.finalize();
+			buffer.pointer = 0;
+			buffer.pointer = buffer.byteLength;
 			return buffer.toString();
 		}
 		static fromString(string) {
 			const buffer = ByteBuffer.fromString(string);
 			buffer.pointer = 0;
 			const fs = new FileSystem();
-			fs.free = buffer.read.array("int32");
+			fs.free = buffer.read.array("uint32");
 			fs.files = buffer.read.array("string");
 			return fs;
 		}
