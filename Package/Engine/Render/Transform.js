@@ -79,9 +79,10 @@ class Transform extends Matrix3 {
 		return v.rotated(this.rotation).Vadd(this.position);
 	}
 	drawInLocalSpace(artist, renderer) {
-		const r = this.rotation;
 		const x = this[6];
 		const y = this[7];
+		const r = this._rotation;
+
 		renderer.translate(x, y);
 		if (r) renderer.rotate(r);
 		artist();
@@ -89,9 +90,10 @@ class Transform extends Matrix3 {
 		renderer.translate(-x, -y);
 	}
 	drawInGlobalSpace(artist, renderer) {
-		const r = this.rotation;
 		const x = this[6];
 		const y = this[7];
+		const r = this._rotation;
+
 		if (r) renderer.rotate(-r);
 		renderer.translate(-x, -y);
 		artist();
@@ -99,7 +101,7 @@ class Transform extends Matrix3 {
 		if (r) renderer.rotate(r);
 	}
 	drawWithoutRotation(artist, renderer) {
-		const r = this.rotation;
+		const r = this._rotation;
 		if (r) renderer.rotate(-r);
 		artist();
 		if (r) renderer.rotate(r);

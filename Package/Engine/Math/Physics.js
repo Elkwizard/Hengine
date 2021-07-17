@@ -262,7 +262,6 @@ class PhysicsVectorAccumulator {
 }
 
 //geometry
-
 class PhysicsMath {
     static intersectLine(A, A1, B, B1) {
 
@@ -1013,10 +1012,9 @@ class CollisionResolver {
         );
     }
     dynamicResolve(bodyA, bodyB, direction, penetration, contacts) {
-        const move = direction.times(penetration);
         const portionA = bodyB.mass / (bodyA.mass + bodyB.mass);
-        const moveA = move.times(-portionA);
-        const moveB = move.times(1 - portionA);
+        const moveA = direction.times(-portionA * penetration);
+        const moveB = direction.times((1 - portionA) * penetration);
         bodyA.displace(moveA);
         if (bodyB.canMoveThisStep || this.engine.iterations > 2) bodyB.displace(moveB);
 

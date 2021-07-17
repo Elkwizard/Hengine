@@ -146,22 +146,16 @@ class Polygon extends Shape {
 		return Rect.bound(this.vertices);
 	}
 	getModel(transf) {
-		let pos = transf.position;
-		let cos = transf.cosRotation;
-		let sin = transf.sinRotation;
-		let verts = this.vertices;
-		let m_sin = sin;
-		let m_cos = cos;
-		verts = verts
-			.map(e => {
-				let difX = e.x;
-				let difY = e.y;
-				let nX = m_cos * difX - m_sin * difY;
-				let nY = m_sin * difX + m_cos * difY;
-				return new Vector2(nX + pos.x, nY + pos.y);
-
-			});
-		return new Polygon(verts, true);
+		const pos = transf.position;
+		const cos = transf.cosRotation;
+		const sin = transf.sinRotation;
+	
+		return new Polygon(this.vertices
+			.map(vert => new Vector2(
+				vert.x * cos - vert.y * sin + pos.x,
+				vert.x * sin + vert.y * cos + pos.y
+			)
+		), true);
 	}
 	getEdges() {
 		let edges = [];
@@ -400,12 +394,15 @@ class Circle extends Shape {
 		return new Vector2(this.x, this.y);
 	}
 	getModel(transf) {
-		let pos = transf.position;
-		let cos = transf.cosRotation;
-		let sin = transf.sinRotation;
-		let t_x = this.x * cos - this.y * sin + pos.x;
-		let t_y = this.x * sin + this.y * cos + pos.y;
-		return new Circle(t_x, t_y, this.radius);
+		const pos = transf.position;
+		const cos = transf.cosRotation;
+		const sin = transf.sinRotation;
+
+		return new Circle(
+			this.x * cos - this.y * sin + pos.x,
+			this.x * sin + this.y * cos + pos.y,
+			this.radius
+		);
 	}
 	center(pos) {
 		return new Circle(pos.x, pos.y, this.radius);
