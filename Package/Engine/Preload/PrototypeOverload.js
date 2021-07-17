@@ -274,19 +274,23 @@ ${contents.join(",\n").indent()}
 		});
 	})();
 	proto(Array.prototype, "toString", Object.prototype.toString);
-	proto(Object.prototype, "deepCopy", function () {
-		if (this instanceof Number || this instanceof String || this instanceof Boolean) return this.valueOf();
-		
-		const result = Array.isArray(this) ? [] : { };
-		for (const key in this) {
-			const value = this[key];
-			
-			if (typeof value === "object" && value !== null) result[key] = ("get" in value) ? value.get() : value.deepCopy();
-			else result[key] = value;
-		}
-		return result;
-	});
 	
+	Object.generateInterface = function (object, template = {}, found = new Map()) {
+		for (const key in object) {
+			const value = object[key];
+			const type = typeof value;
+			if (type === "object") {
+				if (value === null) continue;
+				if (found.has(value)) template[key] = found.get(value);
+				else {
+					const child = { };
+					found.set(value, child);
+					template[key] = Object.generateInterface(value, child, found);
+				}
+			} else if (type !== "function") template[key] = type;
+		}
+		return template;
+	};
 	Object.shortcut = function (objectA, objectB, key) {
 		Object.defineProperty(objectA, key, {
 			set: a => objectB[key] = a,

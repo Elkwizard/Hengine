@@ -8,6 +8,7 @@ class FileSystem { };
 		fs.files[address] = buffer;
 		return fs.files[address];
 	}
+
 	function getDirectoryEntries(fs, address) {
 		const buffer = getFile(fs, address);
 		const entries = new Map();
@@ -213,7 +214,7 @@ class FileSystem { };
 			return result.join("\n");
 		}
 		fileExists(path) {
-			return this.readFile(path) !== null;
+			return this.readFile(path, false, true) !== null;
 		}
 		directoryExists(path) {
 			return this.fileExists(`${path}.dir`);
@@ -312,7 +313,7 @@ class FileSystem { };
 
 			return true;
 		}
-		readFile(path, raw = false) {
+		readFile(path, raw = false, existenceCheck = false) {
 			const pieces = path.split("/").filter(reflect);
 			const pathPieces = pieces.slice(0, pieces.length - 1);
 			const name = pieces[pieces.length - 1];
@@ -328,7 +329,7 @@ class FileSystem { };
 			const file = getFile(this, entries.get(name));
 
 			if (!file) {
-				error(`file '${name}' does not exist in '${this.directory}'`);
+				if (!existenceCheck) error(`file '${name}' does not exist in '${this.directory}'`);
 				this.directoryAddress = directoryAddress;
 				return null;
 			}
@@ -375,30 +376,34 @@ class FileSystem { };
 
 			return true;
 		}
-		downloadBuffer(path, filename = "buffer.txt") {
+		downloadFile(path) {
 			const buffer = this.readFile(path, true).get();
 			buffer.finalize();
 			const base64 = buffer.toBase64();
 			const a = document.createElement("a");
-			const uri = "data:text/plain;charset=utf-8," + encodeURIComponent(base64);
+			const uri = "data:application/octet-stream;base64," + base64;
 			a.setAttribute("href", uri);
-			a.setAttribute("download", filename);
+			const pathPieces = path.split("/");
+			const name = pathPieces[pathPieces.length - 1];
+			a.setAttribute("download", name);
 			return new Promise(resolve => {
 				a.onclick = () => resolve();
 				a.click();
 			});
 		}
-		uploadBuffer(path) {
+		uploadFile(path = null) {
 			const fi = document.createElement("input");
 			fi.type = "file";
 			fi.onchange = () => {
 				const file = fi.files[0];
 				if (file) {
 					const reader = new FileReader();
-					reader.readAsText(file);
+					reader.readAsArrayBuffer(file);
 					reader.onload = () => {
 						const { result } = reader;
-						this.writeFile(path, ByteBuffer.fromBase64(result));
+						const buffer = new ByteBuffer(result);
+						buffer.pointer = result.byteLength;
+						this.writeFile(path || file.name, buffer);
 					}
 				}
 			};

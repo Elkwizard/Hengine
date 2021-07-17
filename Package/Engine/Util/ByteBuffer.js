@@ -35,7 +35,7 @@ class ByteBuffer {
 		return result;
 	}
 	toBase64() {
-		const binary = [...this.data];
+		const binary = this.data;
 		const base64Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 		let base64 = "";
@@ -64,7 +64,7 @@ class ByteBuffer {
 			}
 		}
 
-		return this.pointer + "/" + base64;
+		return base64;
 	}
 	get(buffer = new ByteBuffer()) {
 		buffer.data = this.data.slice(0, this.data.length);
@@ -81,10 +81,6 @@ class ByteBuffer {
 			
 		const buffer = new ByteBuffer();
 
-		const index = base64.indexOf("/");
-		const pointer = parseInt(base64.slice(0, index));
-		base64 = base64.slice(index + 1);
-
 		for (let i = 0; i < base64.length; i += 4) {
 			const b0 = base64Table[base64[i]];
 			const b1 = base64Table[base64[i + 1]];
@@ -93,20 +89,20 @@ class ByteBuffer {
 
 			if (base64[i + 2] + base64[i + 3] === "==") {
 				// _==
-				buffer.write.int8((b0 << 2) | (b1 >> 4));
+				buffer.write.uint8((b0 << 2) | (b1 >> 4));
 			} else if (base64[i + 3] === "=") {
 				// __=
-				buffer.write.int8((b0 << 2) | (b1 >> 4));
-				buffer.write.int8(((b1 & 0b1111) << 4) | (b2 >> 2));
+				buffer.write.uint8((b0 << 2) | (b1 >> 4));
+				buffer.write.uint8(((b1 & 0b1111) << 4) | (b2 >> 2));
 			} else {
 				// ___
-				buffer.write.int8((b0 << 2) | (b1 >> 4));
-				buffer.write.int8(((b1 & 0b1111) << 4) | (b2 >> 2));
-				buffer.write.int8(((b2 & 0b11) << 6) | b3);
+				buffer.write.uint8((b0 << 2) | (b1 >> 4));
+				buffer.write.uint8(((b1 & 0b1111) << 4) | (b2 >> 2));
+				buffer.write.uint8(((b2 & 0b11) << 6) | b3);
 			}
 		}
+		
 		buffer.finalize();
-		buffer.pointer = pointer;
 		return buffer;
 	}
 	static fromString(string) {
@@ -121,15 +117,40 @@ class ByteBuffer {
 		return buffer.get();
 	}
 }
-ByteBuffer.float32ConvertBuffer = new ArrayBuffer(4);
-ByteBuffer.float32 = new Float32Array(ByteBuffer.float32ConvertBuffer);
-ByteBuffer.bytes32 = new Uint8Array(ByteBuffer.float32ConvertBuffer);
-ByteBuffer.float64ConvertBuffer = new ArrayBuffer(8);
-ByteBuffer.float64 = new Float64Array(ByteBuffer.float64ConvertBuffer);
-ByteBuffer.bytes64 = new Uint8Array(ByteBuffer.float64ConvertBuffer);
+ByteBuffer.Converter = class {
+	constructor(type) {
+		const ArrayType = window[type + "Array"];
+		const buffer = new ArrayBuffer(ArrayType.BYTES_PER_ELEMENT);
+		this.bytes = new Uint8Array(buffer);
+		this.value = new ArrayType(buffer);
+		this.size = ArrayType.BYTES_PER_ELEMENT;
+	}
+	fromBytes(buffer, offset = 0) {
+		for (let i = 0; i < this.bytes.length; i++) this.bytes[i] = buffer[i + offset];
+		return this.value[0];
+	}
+	toBytes(value) {
+		this.value[0] = value;
+		return this.bytes;
+	}
+};
+ByteBuffer.converters = {};
+ByteBuffer.arrayTypes = ["Float32", "Float64", "Int8", "Int16", "Int32", "Uint8", "Uint16", "Uint32"];
+ByteBuffer.jsTypeAliases = {
+	"number": "float64",
+	"boolean": "bool",
+	"bigint": "bigInt"
+};
 ByteBuffer.Writer = class {
 	constructor(buffer) {
 		this.buffer = buffer;
+	}
+	_type(type, value) {
+		const convert = ByteBuffer.converters[type];
+		const bytes = convert.toBytes(value);
+		this.buffer.alloc(bytes.length);
+		this.buffer.data.set(bytes, this.buffer.pointer);
+		this.buffer.pointer += bytes.length;
 	}
 	bigInt(bigint) {
 		let bytes = 0n;
@@ -144,89 +165,68 @@ ByteBuffer.Writer = class {
 		
 		this.int32(Number(bytes * sign));
 		for (let i = bytes - 1n; i >= 0n; i--) {
-			this.int8(Number(bigint >> (i * 8n) & byteSize));
+			this.uint8(Number(bigint >> (i * 8n) & byteSize));
 		}
 	}
 	string(string) {
 		const len = string.length;
-		this.int32(len);
-		for (let i = 0; i < len; i++) this.int16(string.charCodeAt(i));
+		this.uint32(len);
+		for (let i = 0; i < len; i++) this.uint16(string.charCodeAt(i));
 	}
 	bool(bool) {
-		this.int8(+bool);
+		this.uint8(+bool);
 	}
 	bool8(a, b, c, d, e, f, g, h) {
-		this.int8(+a << 7 | +b << 6 | +c << 5 | +d << 4 | +e << 3 | +f << 2 | +g << 1 | +h);
-	}
-	float64(float) {
-		ByteBuffer.float64[0] = float;
-		this.int8(ByteBuffer.bytes64[0]);
-		this.int8(ByteBuffer.bytes64[1]);
-		this.int8(ByteBuffer.bytes64[2]);
-		this.int8(ByteBuffer.bytes64[3]);
-		this.int8(ByteBuffer.bytes64[4]);
-		this.int8(ByteBuffer.bytes64[5]);
-		this.int8(ByteBuffer.bytes64[6]);
-		this.int8(ByteBuffer.bytes64[7]);
-	}
-	float32(float) {
-		ByteBuffer.float32[0] = float;
-		this.int8(ByteBuffer.bytes32[0]);
-		this.int8(ByteBuffer.bytes32[1]);
-		this.int8(ByteBuffer.bytes32[2]);
-		this.int8(ByteBuffer.bytes32[3]);
-	}
-	int32(int) {
-		int &= 0xFFFFFFFF;
-		this.int16(int >> 16);
-		this.int16(int);
-	}
-	int16(int) {
-		int &= 0xFFFF;
-		this.int8(int >> 8);
-		this.int8(int);
-	}
-	int8(int) {
-		this.buffer.alloc(1);
-		int &= 0xFF;
-		this.buffer.data[this.buffer.pointer] = int;
-		this.buffer.pointer++;
+		this.uint8(+a << 7 | +b << 6 | +c << 5 | +d << 4 | +e << 3 | +f << 2 | +g << 1 | +h);
 	}
 	array(type, data) {
 		const { length } = data;
-		this.int32(length);
+		this.uint32(length);
 		for (let i = 0; i < length; i++) this[type](data[i]);
 	}
 	byteBuffer(buffer) {
-		this.array("int8", buffer.data);
-		this.int32(buffer.pointer);
+		this.array("uint8", buffer.data);
+		this.uint32(buffer.pointer);
 	}
-}
+	object(template, value) {
+		for (const key in template) {
+			const type = template[key];
+			if (typeof type === "string") this[type](value[key]);
+			else this.object(type, value[key]);
+		}
+	}
+};
 ByteBuffer.Reader = class {
 	constructor(buffer) {
 		this.buffer = buffer;
+	}
+	_type(type) {
+		const convert = ByteBuffer.converters[type];
+		const value = convert.fromBytes(this.buffer.data, this.buffer.pointer);
+		this.buffer.pointer += convert.size;
+		return value;
 	}
 	bigInt() {
 		const byteNum = this.int32();
 		const bytes = BigInt(Math.abs(byteNum));
 		let result = 0n;
 		for (let i = bytes - 1n; i >= 0n; i--) {
-			result |= BigInt(this.int8()) << (i * 8n);
+			result |= BigInt(this.uint8()) << (i * 8n);
 		}
 		if (byteNum > 0) return result;
 		return -result;
 	}
 	string() {
-		const len = this.int32();
+		const len = this.uint32();
 		let result = "";
-		for (let i = 0; i < len; i++) result += String.fromCharCode(this.int16());
+		for (let i = 0; i < len; i++) result += String.fromCharCode(this.uint16());
 		return result;
 	}
 	bool() {
-		return !!this.int8();
+		return !!this.uint8();
 	}
 	bool8() {
-		const int = this.int8();
+		const int = this.uint8();
 		return [
 			!!(int >> 7),
 			!!((int >> 6) & 1),
@@ -238,45 +238,35 @@ ByteBuffer.Reader = class {
 			!!(int & 1)
 		];
 	}
-	float64() {
-		ByteBuffer.bytes64[0] = this.int8();
-		ByteBuffer.bytes64[1] = this.int8();
-		ByteBuffer.bytes64[2] = this.int8();
-		ByteBuffer.bytes64[3] = this.int8();
-		ByteBuffer.bytes64[4] = this.int8();
-		ByteBuffer.bytes64[5] = this.int8();
-		ByteBuffer.bytes64[6] = this.int8();
-		ByteBuffer.bytes64[7] = this.int8(); 
-		return ByteBuffer.float64[0];
-	}
-	float32() {
-		ByteBuffer.bytes32[0] = this.int8();
-		ByteBuffer.bytes32[1] = this.int8();
-		ByteBuffer.bytes32[2] = this.int8();
-		ByteBuffer.bytes32[3] = this.int8();
-		return ByteBuffer.float32[0];
-	}
-	int32() {
-		let result = this.int16() << 16 | this.int16();
-		return result;
-	}
-	int16() {
-		return this.int8() << 8 | this.int8();
-	}
-	int8() {
-		const result = this.buffer.data[this.buffer.pointer];
-		this.buffer.pointer++;
-		return result;
-	}
 	array(type) {
-		const length = this.int32();
-		let result = new Array(length);
-		for (let i = 0; i < length; i++) {
-			result[i] = this[type]();
-		}
+		const length = this.uint32();
+		const result = new Array(length);
+		for (let i = 0; i < length; i++) result[i] = this[type]();
 		return result;
 	}
 	byteBuffer() {
-		return new ByteBuffer(this.array("int8"), this.int32());
+		return new ByteBuffer(this.array("uint8"), this.uint32());
+	}
+	object(template) {
+		const object = { };
+		for (const key in template) {
+			const type = template[key];
+			if (typeof type === "string") object[key] = this[type]();
+			else object[key] = this.object(type);
+		}
+		return object;
 	}
 };
+
+for (let i = 0; i < ByteBuffer.arrayTypes.length; i++) {
+	const type = ByteBuffer.arrayTypes[i];
+	ByteBuffer.converters[type] = new ByteBuffer.Converter(type);
+	const method = type.toLowerCase();
+	ByteBuffer.Writer.prototype[method] = function (value) { this._type(type, value); };
+	ByteBuffer.Reader.prototype[method] = function () { return this._type(type); };
+}
+for (const jsType in ByteBuffer.jsTypeAliases) {
+	const bufferType = ByteBuffer.jsTypeAliases[jsType];
+	ByteBuffer.Writer.prototype[jsType] = ByteBuffer.Writer.prototype[bufferType];
+	ByteBuffer.Reader.prototype[jsType] = ByteBuffer.Reader.prototype[bufferType];
+}

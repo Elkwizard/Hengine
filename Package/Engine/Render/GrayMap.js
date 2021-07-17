@@ -14,22 +14,22 @@ class GrayMap {
 	toByteBuffer() {
 		const buffer = new ByteBuffer();
 
-		buffer.write.int32(this.width);
-		buffer.write.int32(this.height);
+		buffer.write.uint32(this.width);
+		buffer.write.uint32(this.height);
 
-		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) buffer.write.int8(this.data[i][j] * 255);
+		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) buffer.write.uint8(this.data[i][j] * 255);
 		
 		return buffer;
 	}
 	static fromByteBuffer(buffer) {
 		buffer.pointer = 0;
 
-		const width = buffer.read.int32();
-		const height = buffer.read.int32();
+		const width = buffer.read.uint32();
+		const height = buffer.read.uint32();
 
 		const map = new GrayMap(width, height);
 
-		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) map.data[i][j] = buffer.read.int8() / 255;
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) map.data[i][j] = buffer.read.uint8() / 255;
 
 		return map;
 	}

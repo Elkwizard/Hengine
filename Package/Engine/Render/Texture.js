@@ -232,16 +232,16 @@ class Texture extends ImageType {
 	toByteBuffer() {
 		const buffer = new ByteBuffer();
 
-		buffer.write.int32(this.width);
-		buffer.write.int32(this.height);
+		buffer.write.uint32(this.width);
+		buffer.write.uint32(this.height);
 
 		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
 			const pixel = this.pixels[i][j];
 			
-			buffer.write.int8(pixel.red);
-			buffer.write.int8(pixel.green);
-			buffer.write.int8(pixel.blue);
-			buffer.write.int8(pixel.alpha * 255);
+			buffer.write.uint8(pixel.red);
+			buffer.write.uint8(pixel.green);
+			buffer.write.uint8(pixel.blue);
+			buffer.write.uint8(pixel.alpha * 255);
 		}
 
 		buffer.finalize();
@@ -251,17 +251,17 @@ class Texture extends ImageType {
 	static fromByteBuffer(buffer) {
 		buffer.pointer = 0;
 
-		const width = buffer.read.int32();
-		const height = buffer.read.int32();
+		const width = buffer.read.uint32();
+		const height = buffer.read.uint32();
 
 		const texture = new Texture(width, height);
 
 		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) {
 			const pixel = texture.pixels[i][j];
-			pixel.red = buffer.read.int8();
-			pixel.green = buffer.read.int8();
-			pixel.blue = buffer.read.int8();
-			pixel.alpha = buffer.read.int8() / 255;
+			pixel.red = buffer.read.uint8();
+			pixel.green = buffer.read.uint8();
+			pixel.blue = buffer.read.uint8();
+			pixel.alpha = buffer.read.uint8() / 255;
 		}
 
 		texture.updateImageData();
