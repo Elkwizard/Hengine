@@ -11,10 +11,6 @@ class WebGLArtist {
 		this.preservePixelart = true;
 		this.alpha = 1;
 
-		this.currentRed = 0;
-		this.currentGreen = 0;
-		this.currentBlue = 0;
-		this.currentAlpha = 0;
 		this.currentColor = Color.BLANK;
 		this.currentLineWidth = 1;
 		this.currentLineCap = this.gl.LINE_CAP_FLAT;
@@ -53,7 +49,7 @@ class WebGLArtist {
 						x = x.x;
 					}
 				}
-				this.gl.coloredEllipse(x, y, radius, radius, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.coloredEllipse(x, y, radius, radius, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			ellipse(x, y, rx, ry) {
 				if (typeof x === "object") {
@@ -62,7 +58,7 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.gl.coloredEllipse(x, y, rx, ry, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.coloredEllipse(x, y, rx, ry, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			rect(x, y, width, height) {
 				if (typeof x === "object") {
@@ -71,10 +67,10 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.gl.coloredQuad(x, y, width, height, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.coloredQuad(x, y, width, height, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			triangle(v1, v2, v3) {
-				this.gl.coloredTriangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.coloredTriangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			shape(points) {
 				if (points.vertices) points = points.vertices;
@@ -83,7 +79,7 @@ class WebGLArtist {
 					for (let i = 0; i < points.length; i++) {
 						vertices.push(points[i].x, points[i].y);
 					}
-					this.gl.coloredPolygon(vertices, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+					this.gl.coloredPolygon(vertices, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 				}
 			},
 			infer(obj) {
@@ -112,7 +108,7 @@ class WebGLArtist {
 						x = x.x;
 					}
 				}
-				this.gl.outlinedEllipse(x, y, radius, radius, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.outlinedEllipse(x, y, radius, radius, this.currentLineWidth, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			ellipse(x, y, rx, ry) {
 				if (typeof x === "object") {
@@ -121,7 +117,7 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.gl.outlinedEllipse(x, y, rx, ry, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.outlinedEllipse(x, y, rx, ry, this.currentLineWidth, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			rect(x, y, width, height) {
 				if (typeof x === "object") {
@@ -130,10 +126,10 @@ class WebGLArtist {
 					y = x.y;
 					x = x.x;
 				}
-				this.gl.outlinedQuad(x, y, width, height, this.currentLineWidth, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.outlinedQuad(x, y, width, height, this.currentLineWidth, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			triangle(v1, v2, v3) {
-				this.gl.outlinedTriangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, this.currentLineWidth, this.currentLineJoin, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.outlinedTriangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, this.currentLineWidth, this.currentLineJoin, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			connector(points) {
 				if (points.length) {
@@ -141,7 +137,7 @@ class WebGLArtist {
 					for (let i = 0; i < points.length; i++) {
 						vertices.push(points[i].x, points[i].y);
 					}
-					this.gl.lineSegments(vertices, this.currentLineWidth, this.currentLineCap, this.currentLineJoin, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha, false, false, false);
+					this.gl.lineSegments(vertices, this.currentLineWidth, this.currentLineCap, this.currentLineJoin, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha, false, false, false);
 				}
 			},
 			spline(spline, prec = 100) {
@@ -152,7 +148,7 @@ class WebGLArtist {
 					vertices.push(p.x, p.y);
 				}
 				vertices.push(spline.d.x, spline.d.y);
-				this.gl.lineSegments(vertices, this.currentLineWidth, this.currentLineCap, this.currentLineJoin, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha, false, false, false);
+				this.gl.lineSegments(vertices, this.currentLineWidth, this.currentLineCap, this.currentLineJoin, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha, false, false, false);
 			},
 			line(x, y, x1, y1) {
 				if (typeof x == "object") {
@@ -169,7 +165,7 @@ class WebGLArtist {
 						x = x.x;
 					}
 				}
-				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentLineCap, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentLineCap, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			arrow(x, y, x1, y1) {
 				if (typeof x === "object") {
@@ -192,7 +188,7 @@ class WebGLArtist {
 				v_y /= mag;
 				let n_x = -v_y;
 				let n_y = v_x;
-				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentLineCap, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentLineCap, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 				let l2 = this.currentLineWidth * 2;
 				x1 -= v_x * l2;
 				y1 -= v_y * l2;
@@ -200,7 +196,7 @@ class WebGLArtist {
 					x1 + n_x * l2, y1 + n_y * l2,
 					x1 - n_x * l2, y1 - n_y * l2,
 					x1 + v_x * l2 * 2, y1 + v_y * l2 * 2,
-					this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha
+					this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha
 				);
 			},
 			shape(points) {
@@ -210,7 +206,7 @@ class WebGLArtist {
 					for (let i = 0; i < points.length; i++) {
 						vertices.push(points[i].x, points[i].y);
 					}
-					this.gl.outlinedPolygon(vertices, this.currentLineWidth, this.currentLineJoin, this.currentRed, this.currentGreen, this.currentBlue, this.currentAlpha);
+					this.gl.outlinedPolygon(vertices, this.currentLineWidth, this.currentLineJoin, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 				}
 			},
 			infer(obj) {
@@ -400,10 +396,6 @@ class WebGLArtist {
 		if ("cursor" in style) style.cursor = cursor;
 	}
 	useColor(color) {
-		this.currentRed = color.red / 255;
-		this.currentGreen = color.green / 255;
-		this.currentBlue = color.blue / 255;
-		this.currentAlpha = color.alpha;
 		this.currentColor = color;
 	}
 	draw(color) {
@@ -542,7 +534,7 @@ class WebGLArtist {
 
 	}
 	fill(color) {
-		this.gl.coloredQuad(0, 0, this.width, this.height, color.red / 255, color.green / 255, color.blue / 255, color.alpha);
+		this.gl.coloredQuad(0, 0, this.width, this.height, color.red, color.green, color.blue, color.alpha);
 	}
 	rotateAround(x, y, r) {
 		this.translate(x, y)
