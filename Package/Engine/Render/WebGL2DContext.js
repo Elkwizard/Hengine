@@ -1121,6 +1121,22 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			return rects;
 		}
 	}
+	function updateTextureCache(texture) {
+		const { spriteSheets, TEXTURE_SLOT_SIZE } = glState;
+		if (spriteSheets.textureLocations.has(texture)) {
+			const sheet = spriteSheets.textureLocations.get(texture);
+			const location = sheet.textureLocations.get(texture);
+			const width = location.width * TEXTURE_SLOT_SIZE;
+			const height = location.height * TEXTURE_SLOT_SIZE;
+			if (width === texture.width && height === texture.height) { // overwrite
+				gl.bindTexture(gl.TEXTURE_2D, sheet.texture);
+				gl.texSubImage2D(gl.TEXTURE_2D, 0, location.x * TEXTURE_SLOT_SIZE, location.y * TEXTURE_SLOT_SIZE, gl.RGBA, gl.UNSIGNED_BYTE, texture);
+			} else {
+				sheet.complete = false;
+				sheet.rects.splice(sheet.rects.indexOf(location), 1);
+			}
+		}
+	}
 	function flush() {
 		const { spriteSheets, TEXTURE_SLOT_SIZE, MAX_SPRITE_SHEETS } = glState;
 
@@ -1136,10 +1152,7 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		let locationRects = SpriteSheet.createLocationRects(unknownTextures, TEXTURE_SLOT_SIZE);
 		for (let i = 0; i < sheets.length && locationRects.length; i++) {
 			const sheet = sheets[i];
-			if (!sheet.complete) {
-				locationRects = sheet.pack(locationRects);
-				break;
-			}
+			if (!sheet.complete) locationRects = sheet.pack(locationRects);
 		}
 
 		while (locationRects.length)
@@ -1200,7 +1213,7 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		create, resize,
 		coloredQuad, coloredEllipse, coloredTriangle, coloredPolygon,
 		outlinedQuad, outlinedEllipse, outlinedTriangle, outlinedPolygon, lineSegment, lineSegments,
-		texturedQuad, texturedEllipse, texturedTriangle, texturedPolygon,
+		texturedQuad, texturedEllipse, texturedTriangle, texturedPolygon, updateTextureCache,
 		setTransform, setBlendMode, setGlobalAlpha, setImageSmoothing,
 		clear, render,
 		BLEND_MODE_ADD, BLEND_MODE_COMBINE,

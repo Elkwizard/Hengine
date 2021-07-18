@@ -409,9 +409,10 @@ class WebGLArtist {
 		this.currentLineJoin = this.lineJoinMap.get(lineJoin);
 		return this.strokeObj;
 	}
-	image(img) {
-		this.currentImageCIS = img.makeImage();
+	image(img, changed = false) {
 		this.currentImage = img;
+		this.currentImageCIS = img.makeImage();
+		if (changed) this.gl.updateTextureCache(this.currentImageCIS);
 		return this.imageObj;
 	}
 	contentToFrame() {
