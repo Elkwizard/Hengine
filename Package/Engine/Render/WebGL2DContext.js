@@ -1203,6 +1203,7 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		texturedQuad, texturedEllipse, texturedTriangle, texturedPolygon,
 		setTransform, setBlendMode, setGlobalAlpha, setImageSmoothing,
 		clear, render,
+		BLEND_MODE_ADD, BLEND_MODE_COMBINE,
 		LINE_JOIN_MITER, LINE_JOIN_BEVEL, LINE_JOIN_ROUND,
 		LINE_CAP_FLAT, LINE_CAP_ROUND, LINE_CAP_SQUARE
 	};
