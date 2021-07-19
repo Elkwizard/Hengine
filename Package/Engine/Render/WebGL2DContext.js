@@ -428,7 +428,18 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			glState.drawCalls = 0;
 
 			// textures
-			glState.spriteSheets = {
+			if (glState.spriteSheets) {
+				const { TEXTURE_SLOT_SIZE } = glState;
+				const { sheets } = glState.spriteSheets;
+				for (let i = 0; i < sheets.length; i++) {
+					const sheet = sheets[i];
+					sheet.createTexture();
+					for (let j = 0; j < sheet.rects.length; j++) {
+						const rect = sheet.rects[j];
+						gl.texSubImage2D(gl.TEXTURE_2D, 0, rect.x * TEXTURE_SLOT_SIZE, rect.y * TEXTURE_SLOT_SIZE, gl.RGBA, gl.UNSIGNED_BYTE, rect.texture);
+					}
+				}
+			} else glState.spriteSheets = {
 				// permanent
 				sheets: [],
 				textureLocations: new Map(),
@@ -1013,6 +1024,17 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 
 			// create storage for textures
 			this.textureLocations = new Map();
+			this.createTexture();
+
+			// pack sprites
+			this.complete = false;
+
+			this.spriteSheets = spriteSheets;
+			this.spriteSheets.sheets.push(this);
+		}
+		createTexture() {
+			const { textureSlotSize } = this;
+
 			this.texture = gl.createTexture();
 			gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
@@ -1022,12 +1044,6 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureSlotSize, textureSlotSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-
-			// pack sprites
-			this.complete = false;
-
-			this.spriteSheets = spriteSheets;
-			this.spriteSheets.sheets.push(this);
 		}
 		createSpace(x, y, width, height) {
 			this.spaces.push({ x, y, width, height });
