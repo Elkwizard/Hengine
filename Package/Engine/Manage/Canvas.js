@@ -1,4 +1,3 @@
-
 const ScalingMode = defineEnum("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MULTIPLE");
 
 class CanvasImage extends ImageType {

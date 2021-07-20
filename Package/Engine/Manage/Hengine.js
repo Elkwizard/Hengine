@@ -1,9 +1,9 @@
 class Hengine {
 	constructor() {
-		let wrapper = document.body;
+		const wrapper = document.body;
 
 		//setup canvas and scene
-		let canvas = document.createElement("canvas");
+		const canvas = document.createElement("canvas");
 
 		canvas.width = innerWidth;
 		canvas.height = innerHeight;

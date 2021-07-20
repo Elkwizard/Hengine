@@ -32,7 +32,7 @@ class ByteBuffer {
 		let result = String.fromCharCode(this.pointer >> 16, this.pointer & 0xFFFF, this.byteLength >> 16, this.byteLength & 0xFFFF);
 		for (let i = 0; i < this.data.length; i += 2)
 			result += String.fromCharCode(this.data[i] << 8 | (this.data[i + 1] || 0));
-		
+
 		return result;
 	}
 	toBase64() {
@@ -79,7 +79,7 @@ class ByteBuffer {
 				.split("")
 				.map((c, i) => [c, i])
 		);
-			
+
 		const buffer = new ByteBuffer();
 
 		for (let i = 0; i < base64.length; i += 4) {
@@ -143,7 +143,7 @@ ByteBuffer.Writer = class {
 			bytes++;
 		}
 		const byteSize = BigInt("0xFF");
-		
+
 		this.int32(Number(bytes * sign));
 		for (let i = bytes - 1n; i >= 0n; i--) {
 			this.uint8(Number(bigint >> (i * 8n) & byteSize));
@@ -169,11 +169,15 @@ ByteBuffer.Writer = class {
 		this.array("uint8", buffer.data);
 		this.uint32(buffer.pointer);
 	}
-	object(template, value) {
-		for (const key in template) {
-			const type = template[key];
-			if (typeof type === "string") this[type](value[key]);
-			else this.object(type, value[key]);
+	object(template, object, found = new Set()) {
+		if (!template || template === "undefined") return;
+		if (typeof template === "string") this[template](object);
+		else {
+			if (!found.has(template)) {
+				found.add(template);
+				for (const key in template)
+					this.object(template[key], object[key], found);
+			}
 		}
 	}
 };
@@ -222,14 +226,18 @@ ByteBuffer.Reader = class {
 	byteBuffer() {
 		return new ByteBuffer(this.array("uint8"), this.uint32());
 	}
-	object(template) {
-		const object = { };
-		for (const key in template) {
-			const type = template[key];
-			if (typeof type === "string") object[key] = this[type]();
-			else object[key] = this.object(type);
+	object(template, found = new Map()) {
+		if (!template || template === "undefined") return undefined;
+		if (typeof template === "string") return this[template]();
+		else {
+			if (found.has(template)) return found.get(template);
+			else {
+				const object = {};
+				found.set(template, object);
+				for (const key in template) object[key] = this.object(template[key], found);
+				return object;
+			}
 		}
-		return object;
 	}
 };
 
@@ -240,7 +248,7 @@ for (let i = 0; i < ByteBuffer.arrayTypes.length; i++) {
 	const setViewMethod = "set" + type;
 	const getViewMethod = "get" + type;
 	const { BYTES_PER_ELEMENT } = window[type + "Array"];
-	
+
 	ByteBuffer.Writer.prototype[method] = function (value) {
 		const { buffer } = this;
 		buffer.alloc(BYTES_PER_ELEMENT);

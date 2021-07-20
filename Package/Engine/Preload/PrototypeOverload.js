@@ -236,9 +236,10 @@ Object.defineProperty(window, "title", {
 			return obj.constructor.name;
 		}
 		function string(value, depth) {
-			if (!value) return value + "";
+			if (value === null) return "null";
 			if (typeof value === "string") return JSON.stringify(value);
 			if (typeof value === "number") return value + "";
+			if (typeof value === "bigint") return value + "n";
 			if (typeof value === "function") {
 				value += "";
 				let lines = value.split("\n");
