@@ -1,11 +1,12 @@
 class ByteBuffer {
-	constructor(bytes = 2, pointer = 0) {
+	constructor(bytes = 2, pointer = 0, littleEndian = false) {
 		this.data = new Uint8Array(bytes);
 		this.view = new DataView(this.data.buffer);
 		this.pointer = pointer;
 		this.write = new ByteBuffer.Writer(this);
 		this.read = new ByteBuffer.Reader(this);
 		this.shouldResize = true;
+		this.littleEndian = littleEndian;
 	}
 	get byteLength() {
 		return this.data.length;
@@ -124,14 +125,48 @@ class ByteBuffer {
 	}
 }
 ByteBuffer.arrayTypes = ["Float32", "Float64", "Int8", "Int16", "Int32", "Uint8", "Uint16", "Uint32"];
-ByteBuffer.jsTypeAliases = {
-	"number": "float64",
-	"boolean": "bool",
-	"bigint": "bigInt"
-};
+ByteBuffer.objectTypes = [
+	"undefined",
+	"null",
+	"function",
+	"object",
+	"array",
+	"bigInt",
+	"string",
+	"bool",
+	...ByteBuffer.arrayTypes.map(type => type.toLowerCase())
+];
 ByteBuffer.Writer = class {
 	constructor(buffer) {
 		this.buffer = buffer;
+	}
+	_getType(object) {
+		if (object === null) return "null";
+		if (object === undefined) return "undefined";
+		if (Array.isArray(object)) return "array";
+		const type = typeof object;
+		if (type.match(/function|object|string/)) return type;
+		if (type === "boolean") return "bool";
+		if (type === "number") {
+			const signed = object < 0;
+			const float = isNaN(object) || (object % 1) || (signed ? object < -2147483648 : object > 4294967295);
+			if (float) {
+				if (Math.fround(object) === object) return "float32";
+				else return "float64";
+			} else {
+				if (signed) {
+					if (object >= -128) return "int8";
+					if (object >= -32768) return "int16";
+					return "int32";
+				} else {
+					if (object < 256) return "uint8";
+					if (object < 65536) return "uint16";
+					return "uint32";
+				}
+			}
+		}
+		if (type === "bigint") return "bigInt";
+		return "null";
 	}
 	bigInt(bigint) {
 		let bytes = 0n;
@@ -169,16 +204,37 @@ ByteBuffer.Writer = class {
 		this.array("uint8", buffer.data);
 		this.uint32(buffer.pointer);
 	}
-	object(template, object, found = new Set()) {
-		if (!template || template === "undefined") return;
-		if (typeof template === "string") this[template](object);
-		else {
-			if (!found.has(template)) {
-				found.add(template);
-				for (const key in template)
-					this.object(template[key], object[key], found);
+	object(object, objectIDs /* object => id */) {
+		const type = this._getType(object);
+		const typeIndex = ByteBuffer.typeToIndex[type];
+		this.uint8(typeIndex);
+
+		if (type === "function" || type === "undefined" || type === "null") return;
+
+		if (type === "object" || type === "array") {
+			if (objectIDs === undefined) objectIDs = new Map();
+			const referenced = objectIDs.has(object);
+			this.bool(referenced);
+			if (referenced) this.uint32(objectIDs.get(object));
+			else {
+				const id = objectIDs.size;
+				objectIDs.set(object, id);
+
+				if (type === "object") {
+					const keys = Object.keys(object);
+					this.uint32(keys.length);
+					for (let i = 0; i < keys.length; i++) {
+						const key = keys[i];
+						const value = object[key];
+						this.string(key);
+						this.object(value, objectIDs);
+					}
+				} else {
+					this.uint32(object.length);
+					for (let i = 0; i < object.length; i++) this.object(object[i], objectIDs);
+				}
 			}
-		}
+		} else this[type](object);
 	}
 };
 ByteBuffer.Reader = class {
@@ -226,18 +282,36 @@ ByteBuffer.Reader = class {
 	byteBuffer() {
 		return new ByteBuffer(this.array("uint8"), this.uint32());
 	}
-	object(template, found = new Map()) {
-		if (!template || template === "undefined") return undefined;
-		if (typeof template === "string") return this[template]();
-		else {
-			if (found.has(template)) return found.get(template);
+	object(objectIDs /* id => object */) {
+		const type = ByteBuffer.indexToType[this.uint8()];
+		if (type === "undefined") return undefined;
+		if (type === "function" || type === "null") return null;
+
+		if (type === "object" || type === "array") {
+			if (objectIDs === undefined) objectIDs = new Map();
+			const referenced = this.bool();
+			if (referenced) return objectIDs.get(this.uint32());
 			else {
-				const object = {};
-				found.set(template, object);
-				for (const key in template) object[key] = this.object(template[key], found);
+				const object = (type === "object") ? {} : [];
+				const id = objectIDs.size;
+				objectIDs.set(id, object);
+
+				if (type === "object") {
+					const keys = this.uint32();
+					for (let i = 0; i < keys; i++) {
+						const key = this.string();
+						const value = this.object(objectIDs);
+						object[key] = value;
+					}
+				} else {
+					const length = this.uint32();
+					for (let i = 0; i < length; i++) object.push(this.object(objectIDs));
+				}
 				return object;
 			}
 		}
+
+		return this[type]();
 	}
 };
 
@@ -252,18 +326,21 @@ for (let i = 0; i < ByteBuffer.arrayTypes.length; i++) {
 	ByteBuffer.Writer.prototype[method] = function (value) {
 		const { buffer } = this;
 		buffer.alloc(BYTES_PER_ELEMENT);
-		buffer.view[setViewMethod](buffer.pointer, value);
+		buffer.view[setViewMethod](buffer.pointer, value, buffer.littleEndian);
 		buffer.pointer += BYTES_PER_ELEMENT;
 	};
 	ByteBuffer.Reader.prototype[method] = function () {
 		const { buffer } = this;
-		const value = (buffer.pointer + BYTES_PER_ELEMENT <= buffer.data.length) ? buffer.view[getViewMethod](buffer.pointer) : 0;
+		const value = (buffer.pointer + BYTES_PER_ELEMENT <= buffer.data.length) ? buffer.view[getViewMethod](buffer.pointer, buffer.littleEndian) : 0;
 		buffer.pointer += BYTES_PER_ELEMENT;
 		return value;
 	};
 }
-for (const jsType in ByteBuffer.jsTypeAliases) {
-	const bufferType = ByteBuffer.jsTypeAliases[jsType];
-	ByteBuffer.Writer.prototype[jsType] = ByteBuffer.Writer.prototype[bufferType];
-	ByteBuffer.Reader.prototype[jsType] = ByteBuffer.Reader.prototype[bufferType];
-}
+ByteBuffer.typeToIndex = Object.fromEntries(
+	ByteBuffer.objectTypes
+		.map((type, index) => [type, index])
+);
+ByteBuffer.indexToType = Object.fromEntries(
+	ByteBuffer.objectTypes
+		.map((type, index) => [index, type])
+);
