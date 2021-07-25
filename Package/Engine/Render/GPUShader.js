@@ -1,24 +1,3 @@
-class GLSLError {
-	constructor(rawString, prefixLength) {
-		const string = rawString.cut(":")[1];
-		let [lineStr, descStr] = string.cut(":");
-		lineStr = lineStr.trim();
-		this.line = parseInt(lineStr) - prefixLength;
-		this.desc = descStr.trim();
-		if (isNaN(this.line)) {
-			this.line = 0;
-			this.desc = rawString;
-		}
-	}
-	toString() {
-		return `line ${this.line}: ${this.desc}`;
-	}
-	static format(string, prefixLength) {
-		let errors = string.split("ERROR: ");
-		errors.shift();
-		return errors.map(string => new GLSLError(string, prefixLength));
-	}
-}
 class GLSLPrecompiler {
 	static compile(glsl) {
 		// remove comments
@@ -46,29 +25,401 @@ class GLSLPrecompiler {
 		return glsl;
 	}
 }
+class GLSLError {
+	constructor(rawString, prefixLength) {
+		const string = rawString.cut(":")[1];
+		let [lineStr, descStr] = string.cut(":");
+		lineStr = lineStr.trim();
+		this.line = parseInt(lineStr) - prefixLength;
+		this.desc = descStr.trim();
+		if (isNaN(this.line)) {
+			this.line = 0;
+			this.desc = rawString;
+		}
+	}
+	toString() {
+		return `line ${this.line}: ${this.desc}`;
+	}
+	static format(string, prefixLength) {
+		let errors = string.split("ERROR: ");
+		errors.shift();
+		return errors.map(string => new GLSLError(string, prefixLength));
+	}
+}
+class GLSLProgram {
+	constructor(gl, vs, fs, onerror = () => null) {
+		this.onerror = onerror;
+		this.gl = gl;
+		this.vs = vs;
+		this.fs = fs;
+
+		this.program = gl.createProgram();
+		this.errors = [];
+
+		// vertex shader
+		const vertex = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(vertex, vs);
+		gl.compileShader(vertex);
+		gl.attachShader(this.program, vertex);
+
+		// fragment shader
+		const fragment = gl.createShader(gl.FRAGMENT_SHADER);
+		gl.shaderSource(fragment, fs);
+		gl.compileShader(fragment);
+		gl.attachShader(this.program, fragment);
+
+		// linking
+		gl.linkProgram(this.program);
+		gl.deleteShader(vertex);
+		gl.deleteShader(fragment);
+
+		if (!gl.getShaderParameter(vertex, gl.COMPILE_STATUS)) this.error("VERTEX_SHADER", gl.getShaderInfoLog(vertex));
+		if (!gl.getShaderParameter(fragment, gl.COMPILE_STATUS)) this.error("FRAGMENT_SHADER", gl.getShaderInfoLog(fragment));
+		if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) this.error("LINKING", gl.getProgramInfoLog(this.program));
+
+		const originalProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+		this.use();
+
+		{ // uniforms
+			const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
+
+			this.uniforms = {};
+			this.uniformValues = {};
+
+			let nextTextureUnit = 0;
+			const maxTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+
+			for (let i = 0; i < uniformCount; i++) {
+				const { size: length, type, name } = gl.getActiveUniform(this.program, i);
+
+				const { integer, signed, rows, columns, texture } = this.getTypeInformation(type);
+
+				const processedName = name.replace(/\[(\d+)\]/g, ".$1");
+				const propertyPath = processedName.split(".");
+				if (propertyPath[propertyPath.length - 1] === "0") propertyPath.pop();
+
+				const array = length !== 1;
+				const matrix = columns !== 1;
+
+				let setFunctionName = "uniform";
+				if (matrix) {
+					setFunctionName += "Matrix";
+					if (rows !== columns) setFunctionName += rows + "x" + columns;
+					else setFunctionName += rows;
+				} else setFunctionName += rows;
+
+				if (!signed) setFunctionName += "u";
+				setFunctionName += integer ? "i" : "f";
+
+
+				const setWithArrayType = array || matrix;
+				let dataArray = null;
+
+				if (setWithArrayType) {
+					setFunctionName += "v";
+
+					const arrayLength = rows * columns * length;
+					if (integer) {
+						if (signed) dataArray = new Int32Array(arrayLength);
+						else dataArray = new Uint32Array(arrayLength);
+					} else dataArray = new Float32Array(arrayLength);
+				}
+
+				const location = gl.getUniformLocation(this.program, name);
+
+				let set;
+				if (array && (rows !== 1 || columns !== 1)) { // an array of not single values
+					const size = rows * columns;
+
+					if (matrix) set = values => {
+						for (let i = 0; i < values.length; i++)
+							dataArray.set(values[i], i * size);
+						gl[setFunctionName](location, false, dataArray);
+					};
+					else set = values => {
+						for (let i = 0; i < values.length; i++) {
+							const baseIndex = i * size;
+							this.getVectorComponents(values[i]);
+							for (let j = 0; j < size; j++) dataArray[baseIndex + j] = this.vectorBuffer[j];
+						}
+						gl[setFunctionName](location, dataArray);
+					};
+				} else {
+					if (matrix) {
+						set = value => {
+							dataArray.set(value, 0);
+							gl[setFunctionName](location, false, dataArray);
+						};
+					} else if (texture) {
+						const textureUnit = nextTextureUnit;
+						const indices = new Int32Array(length).map((_, index) => index + textureUnit);
+						if (array) gl[setFunctionName](location, indices);
+						else gl[setFunctionName](location, indices[0]);
+						for (let i = 0; i < length; i++) {
+							const texture = gl.createTexture();
+							const textureIndex = indices[i];
+							gl.activeTexture(gl.TEXTURE0 + textureIndex);
+							gl.bindTexture(gl.TEXTURE_2D, texture);
+
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+						}
+						if (array) set = images => {
+							for (let i = 0; i < images.length && i < length; i++) {
+								const image = images[i];
+								const imageCIS = (image instanceof Texture) ? data.updateImageData() : image.makeImage();
+								gl.activeTexture(gl.TEXTURE0 + indices[i]);
+								gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
+							}
+						};
+						else set = image => {
+							const imageCIS = (image instanceof Texture) ? data.updateImageData() : image.makeImage();
+							gl.activeTexture(gl.TEXTURE0 + textureUnit);
+							gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
+						}
+						if (nextTextureUnit + length > maxTextureUnits) this.error("TEXTURE", "Too many texture uniforms");
+						nextTextureUnit += length;
+					} else {
+						if (setWithArrayType) set = value => {
+							dataArray.set(value, 0);
+							gl[setFunctionName](location, dataArray);
+						};
+						else set = (...values) => gl[setFunctionName](location, ...values);
+					}
+				}
+
+				const descriptor = { usesDataArray: !!dataArray, set };
+
+				let currentStruct = this.uniforms;
+				for (let i = 0; i < propertyPath.length; i++) {
+					const property = propertyPath[i];
+					const last = i === propertyPath.length - 1;
+
+					if (last) {
+						currentStruct[property] = descriptor;
+					} else {
+						if (!(property in currentStruct)) currentStruct[property] = {};
+						currentStruct = currentStruct[property];
+					}
+				}
+			}
+
+			this.vectorTypes = [
+				["x", "y", "z", "w"],
+				["r", "g", "b", "a"],
+				["red", "green", "blue", "alpha"]
+			];
+
+			this.vectorBuffer = new Float32Array(4);
+		};
+
+		{ // attributes
+			this.attributes = {};
+			this.divisors = {};
+
+			const attributeCount = gl.getProgramParameter(this.program, gl.ACTIVE_ATTRIBUTES);
+			for (let i = 0; i < attributeCount; i++) {
+				const { type, name } = gl.getActiveAttrib(this.program, i);
+				const { rows, columns } = this.getTypeInformation(type);
+				const location = gl.getAttribLocation(this.program, name);
+				this.attributes[name] = {
+					name, location, rows, columns,
+					enabled: false, divisor: -1, isFiller: false
+				};
+				this.setDivisor(name, 0);
+			}
+		};
+
+		gl.useProgram(originalProgram);
+	}
+	error(type, error) {
+		this.onerror(type, error);
+		this.errors.push({ type, error });
+	}
+	getTypeInformation(type) {
+		const { gl } = this;
+
+		let integer = false, signed = true, rows = 1, columns = 1, texture = false;
+		switch (type) {
+			case gl.FLOAT: break;
+			case gl.FLOAT_VEC2: rows = 2; break;
+			case gl.FLOAT_VEC3: rows = 3; break;
+			case gl.FLOAT_VEC4: rows = 4; break;
+
+			case gl.INT: integer = true; break;
+			case gl.INT_VEC2: integer = true; rows = 2; break;
+			case gl.INT_VEC3: integer = true; rows = 3; break;
+			case gl.INT_VEC4: integer = true; rows = 4; break;
+
+			case gl.BOOL: integer = true; break;
+			case gl.BOOL_VEC2: integer = true; break;
+			case gl.BOOL_VEC3: integer = true; break;
+			case gl.BOOL_VEC4: integer = true; break;
+
+			case gl.FLOAT_MAT2: rows = 2; columns = 2; break;
+			case gl.FLOAT_MAT3: rows = 3; columns = 3; break;
+			case gl.FLOAT_MAT4: rows = 4; columns = 4; break;
+
+			case gl.SAMPLER_2D: integer = true; texture = true; break;
+
+			case gl.UNSIGNED_INT: integer = true; signed = false; break;
+			case gl.UNSIGNED_INT_VEC2: integer = true; rows = 2; signed = false; break;
+			case gl.UNSIGNED_INT_VEC3: integer = true; rows = 3; signed = false; break;
+			case gl.UNSIGNED_INT_VEC4: integer = true; rows = 4; signed = false; break;
+
+			case gl.FLOAT_MAT2x3: rows = 2; columns = 3; break;
+			case gl.FLOAT_MAT2x4: rows = 2; columns = 4; break;
+			case gl.FLOAT_MAT3x2: rows = 3; columns = 2; break;
+			case gl.FLOAT_MAT3x4: rows = 3; columns = 4; break;
+			case gl.FLOAT_MAT4x2: rows = 4; columns = 2; break;
+			case gl.FLOAT_MAT4x3: rows = 4; columns = 3; break;
+		}
+
+		return { integer, signed, rows, columns, texture };
+	}
+	getVectorComponents(value) {
+		if (value instanceof Color) {
+			this.vectorBuffer[0] = value.red / 255;
+			this.vectorBuffer[1] = value.green / 255;
+			this.vectorBuffer[2] = value.blue / 255;
+			this.vectorBuffer[3] = value.alpha;
+		} else if (typeof value[Symbol.iterator] === "function") this.vectorBuffer.set(value); // is iterable
+		else for (let i = 0; i < this.vectorTypes.length; i++) {
+			const type = this.vectorTypes[i];
+			if (type[0] in value) {
+				for (let j = 0; j < 4; j++) this.vectorBuffer[j] = value[type[j]];
+				break;
+			}
+		}
+	}
+	layoutAttributes(layout, divisor = 0) {
+		const currentAttributesList = this.divisors[divisor].attributes;
+		const currentAttributes = {};
+		for (let i = 0; i < currentAttributesList.length; i++) {
+			const attribute = currentAttributesList[i];
+			if (!attribute.isFiller) currentAttributes[attribute.name] = attribute;
+		}
+
+		const attributes = [];
+		let stride = 0;
+		for (let i = 0; i < layout.length; i++) {
+			const segment = layout[i];
+			const attribute = (typeof segment === "number") ? { rows: segment, columns: 1, isFiller: true } : currentAttributes[segment];
+			attributes.push(attribute);
+			stride += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
+		}
+
+		this.divisors[divisor].attributes = attributes;
+		this.divisors[divisor].stride = stride;
+	}
+	use() {
+		this.gl.useProgram(this.program);
+	}
+	focus() {
+		if (this.gl.getParameter(this.gl.CURRENT_PROGRAM) !== this.program) this.use();
+	}
+	setUniform(name, value, location = this.uniforms) {
+		if (name in location) {
+			if (location === this.uniforms) this.uniformValues[name] = value;
+			const child = location[name];
+			if ("set" in child && typeof child.set === "function") { // reached leaf
+				this.focus(); // need to be the gl.CURRENT_PROGRAM
+				if (child.usesDataArray) child.set(value);
+				else {
+					// vector or number
+					if (value instanceof ImageType) child.set(value);
+					else if (typeof value === "number") child.set(value);
+					else {
+						this.getVectorComponents(value);
+						child.set(...this.vectorBuffer);
+					}
+				}
+			} else for (const key in value)
+				this.setUniform(key, value[key], child); // more steps needed
+		} else if (location === this.uniforms) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
+	}
+	getUniform(name) {
+		if (name in this.uniforms) return this.uniformValues[name];
+		else this.error("UNIFORM_GET", `Uniform '${name}' doesn't exist`);
+	}
+	setDivisor(name, divisor) {
+		this.focus();
+		if (name in this.attributes) {
+			const attribute = this.attributes[name];
+
+			if (attribute.divisor in this.divisors) { // remove from previous
+				const previousAttributes = this.divisors[attribute.divisor];
+				previousAttributes.attributes.splice(previousAttributes.attributes.indexOf(attribute), 1);
+				previousAttributes.stride -= attribute.rows * attribute.columns * 4 /* bytes of GLFloat */;
+			}
+
+			if (!(divisor in this.divisors)) { // create divisor
+				this.divisors[divisor] = {
+					attributes: [],
+					stride: 0
+				};
+			}
+
+			const currentAttributes = this.divisors[divisor];
+
+			currentAttributes.attributes.push(attribute);
+			currentAttributes.attributes.sort((a, b) => a.location - b.location);
+			currentAttributes.stride += attribute.rows * attribute.columns * 4 /* bytes of GLFloat */;
+
+			this.focus(); // need to be the gl.CURRENT_PROGRAM
+			attribute.divisor = divisor;
+			for (let i = 0; i < attribute.columns; i++) this.gl.vertexAttribDivisor(attribute.location + i, divisor);
+		} else this.error(`Vertex attribute '${name}' doesn't exist`);
+	}
+	setAttributes(buffer, divisor = 0) {
+		if (divisor in this.divisors) {
+			const { gl } = this;
+			
+			this.focus(); // need to be the gl.CURRENT_PROGRAM
+			
+			const { attributes, stride } = this.divisors[divisor];
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+				
+			let offset = 0;
+			for (let i = 0; i < attributes.length; i++) {
+				const attribute = attributes[i];
+				if (attribute.isFiller) offset += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
+				else {
+					const enablingNeeded = !attribute.enabled;
+					if (enablingNeeded) attribute.enabled = true;
+					for (let j = 0; j < attribute.columns; j++) {
+						const pointer = attribute.location + j;
+						gl.vertexAttribPointer(pointer, attribute.rows, gl.FLOAT, false, stride, offset);
+						if (enablingNeeded) gl.enableVertexAttribArray(pointer);
+						offset += attribute.rows * 4 /* bytes per GLFloat */;
+					}
+				}
+			}
+		} else this.error(`No attributes with vertex divisor '${divisor}' exist`);
+	}
+}
 class GPUShader extends ImageType {
 	constructor(width, height, glsl) {
 		super(width, height);
 		this.glsl = glsl;
-		this.compiled = null;
-		this.compileState = { compiled: false, error: null };
 		this.args = {};
 		this.shadeRects = [new Rect(0, 0, width, height)];
+		this.compiled = false;
 		this.image = new_OffscreenCanvas(width * __devicePixelRatio, height * __devicePixelRatio);
 		this.gl = this.image.getContext("webgl2");
 		if (this.gl === null) return console.warn("Your browser doesn't support webgl.");
-		this.image.addEventListener("webglcontextlost", e => {
-			e.preventDefault();
+		this.image.addEventListener("webglcontextlost", event => {
+			event.preventDefault();
 			console.warn("Webgl Context Lost");
 		});
-		this.image.addEventListener("webglcontextrestored", e => {
+		this.image.addEventListener("webglcontextrestored", event => {
+			event.preventDefault();
 			console.warn("Webgl Context Restored");
-			e.preventDefault();
-			if (this._compiled) {
-				this.compile();
-				this.setShadeRects(this.shadeRects);
-				this.setArguments(this.args);
-			}
+			this.compile();
+			this.setShadeRects(this.shadeRects);
+			this.setArguments(this.args);
 		});
 		this.shadingRectPositions = [
 			-1, 1,
@@ -78,11 +429,6 @@ class GPUShader extends ImageType {
 		];
 		this.amountVertices = 4;
 		this.loaded = false;
-		this.uniformLocations = {
-			resolution: null,
-			halfWidth: null,
-			halfHeight: null
-		};
 
 		this.compile();
 	}
@@ -129,23 +475,22 @@ class GPUShader extends ImageType {
 	updatePositionBuffer() {
 		if (this.gl.isContextLost()) return;
 
-		const { gl } = this;
+		const { gl, program } = this;
 		const positionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 		const positions = this.shadingRectPositions;
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-		let vertexPositionPointer = gl.getAttribLocation(this.compiled.shaderProgram, "vertexPosition");
-		gl.vertexAttribPointer(vertexPositionPointer, 2, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(vertexPositionPointer);
+		
+		program.setAttributes(positionBuffer);
 	}
 	updateResolutionUniforms() {
 		if (!this.compiled) return;
 		if (this.gl.isContextLost()) return;
 
-		const { gl } = this;
-		gl.uniform1f(this.uniformLocations.halfWidth, this.width / 2);
-		gl.uniform1f(this.uniformLocations.halfHeight, this.height / 2);
-		gl.uniform2f(this.uniformLocations.resolution, this.width, this.height);
+		const { gl, program } = this;
+		program.setUniform("halfWidth", this.width / 2);
+		program.setUniform("halfHeight", this.height / 2);
+		program.setUniform("resolution", new Vector2(this.width, this.height));
 		gl.viewport(0, 0, this.image.width, this.image.height);
 	}
 	resize(width, height) {
@@ -160,12 +505,14 @@ class GPUShader extends ImageType {
 	}
 	shade() {
 		if (this.gl.isContextLost()) return;
-		// make sure it exists
 		if (!this.compiled) return;
 
+		const { gl } = this;
+
 		this.loaded = true;
-		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-		this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, this.amountVertices);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.amountVertices);
+		gl.flush();
 	}
 	compile() {
 		if (this.gl.isContextLost()) return;
@@ -175,7 +522,7 @@ class GPUShader extends ImageType {
 
 		//sources
 		const vertexSource = `#version 300 es
-				in highp vec4 vertexPosition;
+				in highp vec2 vertexPosition;
 
 				uniform highp float halfWidth;
 				uniform highp float halfHeight;
@@ -183,17 +530,11 @@ class GPUShader extends ImageType {
 				out highp vec2 position;
 
 				void main() {
-					gl_Position = vertexPosition;
+					gl_Position = vec4(vertexPosition, 0.0, 1.0);
 					position = vec2((vertexPosition.x + 1.0) * halfWidth, (1.0 - vertexPosition.y) * halfHeight);
 				}
 		`;
 		this.glsl = GLSLPrecompiler.compile(this.glsl);
-
-		// study glsl
-
-		this.allUniformNames = new Set([...this.glsl.matchAll(/uniform\s+(?:.*?)\s+(\w+)(?:\[\d+\])?(?:\s+\=\s+(?:.*?))?;/g)].map(match => match[1]));
-
-		// end studying
 
 		const prefix = `#version 300 es
 precision highp float;
@@ -209,6 +550,7 @@ ${this.glsl}
 out highp vec4 pixelColor;
 
 void main() {
+	resolution; // guarentee reference
 	pixelColor = shader();
 	pixelColor.rgb *= clamp(pixelColor.a, 0.0, 1.0);
 }
@@ -216,204 +558,41 @@ void main() {
 		let prefixLength = prefix.split("\n").length + 1;
 
 		//shader programs
-		let error = null;
-		function compileShader(type, source) {
-			let shader = gl.createShader(type);
-			gl.shaderSource(shader, source);
-			gl.compileShader(shader);
-			if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-				error = GLSLError.format(gl.getShaderInfoLog(shader), prefixLength);
-				return false;
-			}
-			return shader;
-		}
-		
-		const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource);
-		const pixelShader = compileShader(gl.FRAGMENT_SHADER, pixelSource);
-		if (!pixelShader) {
-			this.compileState = { compiled: false, error };
-			return false;
-		}
-		const shaderProgram = gl.createProgram();
-		gl.attachShader(shaderProgram, vertexShader);
-		gl.attachShader(shaderProgram, pixelShader);
-		gl.linkProgram(shaderProgram);
-		gl.useProgram(shaderProgram);
-
-		// uniforms
-		for (let key in this.uniformLocations) this.uniformLocations[key] = gl.getUniformLocation(shaderProgram, key);
-
-		// user uniforms
-		let uniformMap = {};
-		let uniformTypeMap = new Map();
-		uniformTypeMap.set(gl.FLOAT, { type: "float", size: 1, integer: false });
-		uniformTypeMap.set(gl.FLOAT_VEC2, { type: "vec2", size: 2, integer: false });
-		uniformTypeMap.set(gl.FLOAT_VEC3, { type: "vec3", size: 3, integer: false });
-		uniformTypeMap.set(gl.FLOAT_VEC4, { type: "vec4", size: 4, integer: false });
-		uniformTypeMap.set(gl.INT, { type: "int", size: 1, integer: true });
-		uniformTypeMap.set(gl.INT_VEC2, { type: "ivec2", size: 2, integer: true });
-		uniformTypeMap.set(gl.INT_VEC3, { type: "ivec3", size: 3, integer: true });
-		uniformTypeMap.set(gl.INT_VEC4, { type: "ivec4", size: 4, integer: true });
-		uniformTypeMap.set(gl.UNSIGNED_INT, { type: "int", size: 1, integer: true });
-		uniformTypeMap.set(gl.UNSIGNED_INT_VEC2, { type: "ivec2", size: 2, integer: true });
-		uniformTypeMap.set(gl.UNSIGNED_INT_VEC3, { type: "ivec3", size: 3, integer: true });
-		uniformTypeMap.set(gl.UNSIGNED_INT_VEC4, { type: "ivec4", size: 4, integer: true });
-		uniformTypeMap.set(gl.SAMPLER_2D, { type: "sampler2D", size: 1, integer: false });
-		let uniformCount = gl.getProgramParameter(shaderProgram, gl.ACTIVE_UNIFORMS);
-		let currentTextureUnit = 0;
-		for (let i = 0; i < uniformCount; i++) {
-			let uniform = gl.getActiveUniform(shaderProgram, i);
-			if (uniform.name === "resolution") continue;
-			let arrayCount = uniform.size;
-			let inx = uniform.name.indexOf("[");
-			let name = uniform.name.slice(0, (inx > -1) ? inx : uniform.name.length);
-			let isArray = inx > -1;
-			let { type, size, integer } = uniformTypeMap.get(uniform.type);
-			let textureUnit = null;
-			let textures = [];
-			let isTexture = type === "sampler2D";
-			let location = gl.getUniformLocation(shaderProgram, uniform.name);
-			if (isTexture) {
-				textureUnit = currentTextureUnit;
-				for (let i = 0; i < arrayCount; i++) {
-					// setup textures
-					let tex = gl.createTexture();
-					gl.activeTexture(gl.TEXTURE0 + currentTextureUnit++);
-					gl.bindTexture(gl.TEXTURE_2D, tex);
-
-					// wrapping and stretching
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-					textures.push(tex);
-				}
-				if (isArray) {
-					let units = new Int32Array(arrayCount);
-					for (let i = 0; i < units.length; i++) units[i] = textureUnit + i;
-					gl.uniform1iv(location, units);
-				} else gl.uniform1i(location, textureUnit);
-			}
-
-			uniformMap[name] = { type, name, location, isArray, arrayCount, integer, isTexture, textureUnit, textures, size };
-
-		}
+		this.program = new GLSLProgram(gl, vertexSource, pixelSource, (type, message) => {
+			if (type === "FRAGMENT_SHADER") {
+				const errors = GLSLError.format(message, prefixLength);
+				console.warn("Compilation Error", errors);
+			} else console.warn(message);
+		});
+		this.program.use();
 
 		gl.clearColor(0, 0, 0, 0);
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-		this.compiled = { shaderProgram, uniformMap };
+		this.compiled = true;
 
 		this.updatePositionBuffer();
 		this.updateResolutionUniforms();
 
 		this.loaded = false;
 
-		this.compileState = { compiled: true, error };
+		this.compileState = { compiled: true };
 		return true;
 	}
 	configureTexture(arg, config) {
-		if (arg in this.compiled.uniformMap) {
-			const { textures, isTexture, textureUnit } = this.compiled.uniformMap[arg];
-			if (!isTexture) return console.warn(`Webgl uniform '${arg}' isn't a texture`);
-			const { gl } = this;
-			for (let i = 0; i < textures.length; i++) {
-				const texture = textures[i];
-				gl.activeTexture(gl.TEXTURE0 + textureUnit + i);
-				gl.bindTexture(gl.TEXTURE_2D, texture);
-				if ("pixelated" in config) {
-					const value = config.pixelated ? gl.NEAREST : gl.LINEAR;
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, value);
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, value);
-				}
-			}
-		} else this.checkArgumentExistence(arg);
-	}
-	checkArgumentExistence(arg) {
-		if (!this.argumentExists(arg)) console.warn(`WebGL uniform '${arg}' doesn't exist`);
-	}
-	argumentExists(arg) {
-		return this.allUniformNames.has(arg);
+		this.program.configureUniformTexture(arg, config);
 	}
 	getArgument(arg) {
-		if (arg in this.compiled.uniformMap) return this.args[arg];
-		else this.checkArgumentExistence(arg);
+		return this.program.getUniform(arg);
 	}
 	setArgument(arg, value) {
 		this.setArguments({ [arg]: value });
 	}
 	setArguments(uniformData = {}) {
 		if (this.gl.isContextLost()) return;
-
-		let { uniformMap } = this.compiled;
-		const { gl } = this;
-
-		//uniforms in shader
-		for (let arg in uniformData) {
-			let u = uniformMap[arg];
-			if (u === undefined) {
-				this.checkArgumentExistence(arg);
-				continue;
-			}
-			let data = uniformData[arg];
-			this.args[arg] = data;
-
-			let location = u.location;
-
-			if (u.isTexture) {
-				if (u.isArray) {
-					for (let i = 0; i < u.arrayCount; i++) 
-						this.writeTexture(u.textureUnit + i, u.textures[i], data[i]);
-				} else this.writeTexture(u.textureUnit, u.textures[0], data);
-			} else {
-				const COLOR_CONVERT = color => new Vector4(color.red / 255, color.green / 255, color.blue / 255, color.alpha);
-				if (u.isArray && data[0] instanceof Color) data = data.map(COLOR_CONVERT);
-				else if (data instanceof Color) data = COLOR_CONVERT(data);
-
-				let singleData;
-				if (u.isArray) singleData = data[0];
-				else singleData = data;
-
-				if (singleData === undefined) continue;
-
-				let dataKeys = [];
-				const vector = u.size > 1;
-				const components = u.size;
-				if (vector) {
-					const availableKeys = ["x", "y", "z", "w"].slice(0, components);
-					for (const key of availableKeys) 
-						if (key in singleData) dataKeys.push(key);
-				}
-				let setFunctionName = "uniform";
-				setFunctionName += components;
-				setFunctionName += u.integer ? "i" : "f";
-
-				if (u.isArray) {
-					setFunctionName += "v";
-					let arraySize = u.arrayCount;
-					let buffer = new (u.integer	? Int32Array : Float32Array)(arraySize * components);
-					let bufferIndex = 0;
-					for (let i = 0; i < data.length; i++) {
-						if (vector) for (let j = 0; j < dataKeys.length; j++) buffer[bufferIndex++] = data[i][dataKeys[j]];
-						else buffer[bufferIndex++] = data[i];
-					}
-					gl[setFunctionName](location, buffer);
-				} else {
-					if (vector) gl[setFunctionName](location, ...dataKeys.map(key => data[key]));
-					else gl[setFunctionName](location, data);
-				}
-			}
-		}
+		for (const key in uniformData) this.program.setUniform(key, uniformData[key]);
 		this.loaded = false;
-	}
-	writeTexture(textureUnit, texture, data) {
-		const { gl } = this;
-		gl.activeTexture(gl.TEXTURE0 + textureUnit);
-		gl.bindTexture(gl.TEXTURE_2D, texture);
-		if (data instanceof Texture) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.updateImageData());
-		else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.makeImage());
 	}
 	makeImage() {
 		if (!this.loaded) this.shade();
