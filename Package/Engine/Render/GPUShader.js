@@ -166,19 +166,23 @@ class GLSLProgram {
 							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 						}
-						if (array) set = images => {
-							for (let i = 0; i < images.length && i < length; i++) {
-								const image = images[i];
-								const imageCIS = (image instanceof Texture) ? data.updateImageData() : image.makeImage();
-								gl.activeTexture(gl.TEXTURE0 + indices[i]);
-								gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
+						let pixelated = false;
+						function writeImage(image, index = 0) {
+							const imagePixelated = image instanceof Texture;
+							const imageCIS = imagePixelated ? image.updateImageData() : image.makeImage();
+							gl.activeTexture(gl.TEXTURE0 + indices[index]);
+							if (imagePixelated !== pixelated) {
+								pixelated = imagePixelated;
+								const param = pixelated ? gl.NEAREST : gl.LINEAR;
+								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
+								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
 							}
-						};
-						else set = image => {
-							const imageCIS = (image instanceof Texture) ? data.updateImageData() : image.makeImage();
-							gl.activeTexture(gl.TEXTURE0 + textureUnit);
 							gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
 						}
+						if (array) set = images => {
+							for (let i = 0; i < images.length && i < length; i++) writeImage(images[i], i);
+						};
+						else set = image => writeImage(image);
 						if (nextTextureUnit + length > maxTextureUnits) this.error("TEXTURE", "Too many texture uniforms");
 						nextTextureUnit += length;
 					} else {
@@ -336,8 +340,13 @@ class GLSLProgram {
 						child.set(...this.vectorBuffer);
 					}
 				}
-			} else for (const key in value)
-				this.setUniform(key, value[key], child); // more steps needed
+			} else {
+				const keys = Object.getOwnPropertyNames(value);
+				for (let i = 0; i < keys.length; i++) {
+					const key = keys[i];
+					this.setUniform(key, value[key], child); // more steps needed
+				}
+			}
 		} else if (location === this.uniforms) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
 	}
 	getUniform(name) {
