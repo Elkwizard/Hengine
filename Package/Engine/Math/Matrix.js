@@ -33,26 +33,31 @@ class Matrix3 extends Float64Array {
 	get m21() { return this[5]; } 
 	set m22(a) { this[8] = a; } 
 	get m22() { return this[8]; } 
+	get transposed() { return this.get().transpose(); }
+	transpose() {
+		return Matrix3.create(...this, this);
+	}
 	mul(M1) {
-		const m00 = this[0] * M1[0] + this[3] * M1[1] + this[6] * M1[2];
-		const m01 = this[0] * M1[3] + this[3] * M1[4] + this[6] * M1[5];
-		const m02 = this[0] * M1[6] + this[3] * M1[7] + this[6] * M1[8];
-		const m10 = this[1] * M1[0] + this[4] * M1[1] + this[7] * M1[2];
-		const m11 = this[1] * M1[3] + this[4] * M1[4] + this[7] * M1[5];
-		const m12 = this[1] * M1[6] + this[4] * M1[7] + this[7] * M1[8];
-		const m20 = this[2] * M1[0] + this[5] * M1[1] + this[8] * M1[2];
-		const m21 = this[2] * M1[3] + this[5] * M1[4] + this[8] * M1[5];
-		const m22 = this[2] * M1[6] + this[5] * M1[7] + this[8] * M1[8];
-		return Matrix3.create(
-			m00, m01, m02,
-			m10, m11, m12,
-			m20, m21, m22,
-			this
-		);
+		return this.times(M1, this);
 	}
 	times(M1, result = null) {
-		if (M1 instanceof Matrix3) return this.get(result ?? new Matrix3()).mul(M1);
-		else {
+		if (M1 instanceof Matrix3) {
+			const m00 = this[0] * M1[0] + this[3] * M1[1] + this[6] * M1[2];
+			const m01 = this[0] * M1[3] + this[3] * M1[4] + this[6] * M1[5];
+			const m02 = this[0] * M1[6] + this[3] * M1[7] + this[6] * M1[8];
+			const m10 = this[1] * M1[0] + this[4] * M1[1] + this[7] * M1[2];
+			const m11 = this[1] * M1[3] + this[4] * M1[4] + this[7] * M1[5];
+			const m12 = this[1] * M1[6] + this[4] * M1[7] + this[7] * M1[8];
+			const m20 = this[2] * M1[0] + this[5] * M1[1] + this[8] * M1[2];
+			const m21 = this[2] * M1[3] + this[5] * M1[4] + this[8] * M1[5];
+			const m22 = this[2] * M1[6] + this[5] * M1[7] + this[8] * M1[8];
+			return Matrix3.create(
+				m00, m01, m02,
+				m10, m11, m12,
+				m20, m21, m22,
+				result ?? new Matrix3()
+			);
+		} else {
 			result ??= new Vector2(0);
 			const x = this[0] * M1.x + this[3] * M1.y + this[6];
 			const y = this[1] * M1.x + this[4] * M1.y + this[7];
@@ -75,15 +80,15 @@ class Matrix3 extends Float64Array {
 	}
 	toString() {
 		const [topleft, topright, bottomleft, bottomright, vertical] = [9484, 9488, 9492, 9496, 9474].map(num => String.fromCharCode(num));
-		let n = [...this].map(n => n.toMaxed(2));
+		let n = [...this].map(v => v.toMaxed(2));
 		let max0 = Math.max(n[0].length, n[3].length, n[6].length);
 		let max1 = Math.max(n[1].length, n[4].length, n[7].length);
 		let max2 = Math.max(n[2].length, n[5].length, n[8].length);
 		let fullspan = max0 + max1 + max2 + 4;
 		let top = `${topleft}${" ".repeat(fullspan)}${topright}`;
-		let middle0 = `${vertical} ${n[0].pad(max0)} ${n[3].pad(max1)} ${n[6].pad(max2)} ${vertical}`;
-		let middle1 = `${vertical} ${n[1].pad(max0)} ${n[4].pad(max1)} ${n[7].pad(max2)} ${vertical}`;
-		let middle2 = `${vertical} ${n[2].pad(max0)} ${n[5].pad(max1)} ${n[8].pad(max2)} ${vertical}`;
+		let middle0 = `${vertical} ${n[0].pad(max0)} ${n[3].pad(max0)} ${n[6].pad(max0)} ${vertical}`;
+		let middle1 = `${vertical} ${n[1].pad(max1)} ${n[4].pad(max1)} ${n[7].pad(max1)} ${vertical}`;
+		let middle2 = `${vertical} ${n[2].pad(max2)} ${n[5].pad(max2)} ${n[8].pad(max2)} ${vertical}`;
 		let bottom = `${bottomleft}${" ".repeat(fullspan)}${bottomright}`;
 
 		return `${top}
@@ -139,6 +144,7 @@ ${bottom}`;
 		);
 	}
 	static mulMatrices(matrices, result = new Matrix3()) {
+		if (matrices.length === 1) return matrices[0].get(result);
 		matrices[matrices.length - 2].times(matrices[matrices.length - 1], result);
 		for (let i = matrices.length - 3; i >= 0; i--) matrices[i].times(result, result);
 		return result;

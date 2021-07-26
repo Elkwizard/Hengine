@@ -98,7 +98,7 @@ class GLSLProgram {
 				const propertyPath = processedName.split(".");
 				if (propertyPath[propertyPath.length - 1] === "0") propertyPath.pop();
 
-				const array = length !== 1;
+				const array = name.endsWith("[0]");
 				const matrix = columns !== 1;
 
 				let setFunctionName = "uniform";
@@ -168,6 +168,7 @@ class GLSLProgram {
 						}
 						let pixelated = false;
 						function writeImage(image, index = 0) {
+							if (index >= length) return;
 							const imagePixelated = image instanceof Texture;
 							const imageCIS = imagePixelated ? image.updateImageData() : image.makeImage();
 							gl.activeTexture(gl.TEXTURE0 + indices[index]);
@@ -179,9 +180,7 @@ class GLSLProgram {
 							}
 							gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
 						}
-						if (array) set = images => {
-							for (let i = 0; i < images.length && i < length; i++) writeImage(images[i], i);
-						};
+						if (array) set = images => images.forEach(writeImage);
 						else set = image => writeImage(image);
 						if (nextTextureUnit + length > maxTextureUnits) this.error("TEXTURE", "Too many texture uniforms");
 						nextTextureUnit += length;
