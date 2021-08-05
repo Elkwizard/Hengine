@@ -1,7 +1,7 @@
 load(String.raw`
 	(1)(Class)GLSLError(/1)
 	(p)
-		A GLSLError is a data structure to store an error thrown by compiling GLSL code.
+		A GLSLError is a data structure to store an error thrown by compiling #GLSL# code.
 		Do not construct GLSLErrors.
 	(/p)
 	(2)Type(/2)
@@ -15,7 +15,7 @@ load(String.raw`
 	(2)Parameters(/2)
 	(p)
 		(param:gl $String$)The error string directly from WebGL.(/param)
-		(param:prefixLength $Number$)The size of the pre-inserted GLSL before the user code.(/param)
+		(param:prefixLength $Number$)The size of the pre-inserted #GLSL# before the user code.(/param)
 	(/p)
 	(2)Properties(/2)
 	(p)
