@@ -14,5 +14,7 @@ load(String.raw`
 			<tr><td>vec4 | ivec4</td><td>#Vector4# | #Color#</td></tr>
 			<tr><td>sampler2D</td><td>#ImageType#</td></tr>
 		</table>**(/p2)
+		Matrix types (*mat2*, *mat3*, *mat4*) are represented as column major Iterables.
+		This means that #Matrix3# works as a value for *mat3*.
 	(/p)
 `);
