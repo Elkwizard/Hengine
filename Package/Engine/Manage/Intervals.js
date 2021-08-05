@@ -167,7 +167,10 @@ class ExitError {
 function exit(...msg) {
 	IntervalManager.intervals = [];
 	if (IntervalManager.inInterval) throw new ExitError(msg);
-	else console.warn("EXITED", ...msg);
+	else {
+		console.warn("EXITED", ...msg);
+		throw "";
+	}
 }
 
 IntervalManager.FPS_FRAMES_TO_COUNT = 30;

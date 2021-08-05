@@ -54,7 +54,6 @@ class GLSLProgram {
 		this.fs = fs;
 
 		this.program = gl.createProgram();
-		this.errors = [];
 
 		// vertex shader
 		const vertex = gl.createShader(gl.VERTEX_SHADER);
@@ -79,6 +78,31 @@ class GLSLProgram {
 
 		const originalProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 		this.use();
+
+		const queuedCalls = [];
+		const GL = new Proxy({
+			lostCache: {},
+			activeCache: {}
+		}, {
+			get(object, method) {
+				const lost = gl.isContextLost();
+				if (lost) {
+					if (method in object.lostCache) return object.lostCache[method];
+					return object.lostCache[method] = (...args) => queuedCalls.push({ method, args });
+				} else {
+					if (method in object.activeCache) return object.activeCache[method];
+					return object.activeCache[method] = (...args) => gl[method](...args);
+				}
+			}
+		});
+		
+		gl.canvas.addEventListener("webglcontextrestored", event => {
+			event.preventDefault();
+			while (queuedCalls.length) {
+				const call = queuedCalls.pop();
+				gl[call.method](...call.args);
+			}
+		});
 
 		{ // uniforms
 			const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
@@ -134,7 +158,7 @@ class GLSLProgram {
 					if (matrix) set = values => {
 						for (let i = 0; i < values.length; i++)
 							dataArray.set(values[i], i * size);
-						gl[setFunctionName](location, false, dataArray);
+						GL[setFunctionName](location, false, dataArray);
 					};
 					else set = values => {
 						for (let i = 0; i < values.length; i++) {
@@ -142,13 +166,13 @@ class GLSLProgram {
 							this.getVectorComponents(values[i]);
 							for (let j = 0; j < size; j++) dataArray[baseIndex + j] = this.vectorBuffer[j];
 						}
-						gl[setFunctionName](location, dataArray);
+						GL[setFunctionName](location, dataArray);
 					};
 				} else {
 					if (matrix) {
 						set = value => {
 							dataArray.set(value, 0);
-							gl[setFunctionName](location, false, dataArray);
+							GL[setFunctionName](location, false, dataArray);
 						};
 					} else if (texture) {
 						const textureUnit = nextTextureUnit;
@@ -171,14 +195,14 @@ class GLSLProgram {
 							if (index >= length) return;
 							const imagePixelated = image instanceof Texture;
 							const imageCIS = imagePixelated ? image.updateImageData() : image.makeImage();
-							gl.activeTexture(gl.TEXTURE0 + indices[index]);
+							GL.activeTexture(gl.TEXTURE0 + indices[index]);
 							if (imagePixelated !== pixelated) {
 								pixelated = imagePixelated;
 								const param = pixelated ? gl.NEAREST : gl.LINEAR;
-								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
-								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
+								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
+								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
 							}
-							gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
+							GL.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
 						}
 						if (array) set = images => images.forEach(writeImage);
 						else set = image => writeImage(image);
@@ -187,9 +211,9 @@ class GLSLProgram {
 					} else {
 						if (setWithArrayType) set = value => {
 							dataArray.set(value, 0);
-							gl[setFunctionName](location, dataArray);
+							GL[setFunctionName](location, dataArray);
 						};
-						else set = (...values) => gl[setFunctionName](location, ...values);
+						else set = (...values) => GL[setFunctionName](location, ...values);
 					}
 				}
 
@@ -237,9 +261,12 @@ class GLSLProgram {
 
 		gl.useProgram(originalProgram);
 	}
+	gl_dot(method, ...args) {
+		if (this.gl.isContextLost()) this.queuedCalls.push({ method, args });
+		else this.gl[method](...args);
+	}
 	error(type, error) {
 		this.onerror(type, error);
-		this.errors.push({ type, error });
 	}
 	getTypeInformation(type) {
 		const { gl } = this;
@@ -349,8 +376,11 @@ class GLSLProgram {
 		} else if (location === this.uniforms) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
 	}
 	getUniform(name) {
-		if (name in this.uniforms) return this.uniformValues[name];
+		if (this.hasUniform(name)) return this.uniformValues[name];
 		else this.error("UNIFORM_GET", `Uniform '${name}' doesn't exist`);
+	}
+	hasUniform(name) {
+		return name in this.uniforms;
 	}
 	setDivisor(name, divisor) {
 		this.focus();
@@ -405,26 +435,25 @@ class GLSLProgram {
 					}
 				}
 			}
-		} else this.error(`No attributes with vertex divisor '${divisor}' exist`);
+		} else this.error("ATTRIBUTE_SET", `No attributes with vertex divisor '${divisor}' exist`);
 	}
 }
 class GPUShader extends ImageType {
 	constructor(width, height, glsl) {
 		super(width, height);
 		this.glsl = glsl;
-		this.args = {};
 		this.shadeRects = [new Rect(0, 0, width, height)];
 		this.compiled = false;
 		this.image = new_OffscreenCanvas(width * __devicePixelRatio, height * __devicePixelRatio);
 		this.gl = this.image.getContext("webgl2");
-		if (this.gl === null) return console.warn("Your browser doesn't support webgl.");
+		if (this.gl === null) return console.warn("Your browser doesn't support WebGL.");
 		this.image.addEventListener("webglcontextlost", event => {
 			event.preventDefault();
-			console.warn("Webgl Context Lost");
+			console.warn("WebGL Context Lost");
 		});
 		this.image.addEventListener("webglcontextrestored", event => {
 			event.preventDefault();
-			console.warn("Webgl Context Restored");
+			console.warn("WebGL Context Restored");
 			this.compile();
 			this.setShadeRects(this.shadeRects);
 			this.setArguments(this.args);
@@ -570,7 +599,7 @@ void main() {
 			if (type === "FRAGMENT_SHADER") {
 				const errors = GLSLError.format(message, prefixLength);
 				console.warn("Compilation Error", errors);
-			} else console.warn(message);
+			}// else console.warn(message);
 		});
 		this.program.use();
 
@@ -588,8 +617,8 @@ void main() {
 		this.compileState = { compiled: true };
 		return true;
 	}
-	configureTexture(arg, config) {
-		this.program.configureUniformTexture(arg, config);
+	argumentExists(arg) {
+		return this.program.hasUniform(arg);
 	}
 	getArgument(arg) {
 		return this.program.getUniform(arg);
@@ -598,7 +627,6 @@ void main() {
 		this.setArguments({ [arg]: value });
 	}
 	setArguments(uniformData = {}) {
-		if (this.gl.isContextLost()) return;
 		for (const key in uniformData) this.program.setUniform(key, uniformData[key]);
 		this.loaded = false;
 	}
