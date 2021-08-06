@@ -33,9 +33,55 @@ class Matrix3 extends Float64Array {
 	get m21() { return this[5]; } 
 	set m22(a) { this[8] = a; } 
 	get m22() { return this[8]; } 
-	get transposed() { return this.get().transpose(); }
+	get determinant() {
+		const [
+			a, d, g,
+			b, e, h,
+			c, f, i
+		] = this;
+
+		return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
+	}
+	get transposed() {
+		return this.get().transpose();
+	}
+	get inverse() {
+		return this.get().invert();
+	}
 	transpose() {
 		return Matrix3.create(...this, this);
+	}
+	invert() {
+		const { determinant } = this;
+		if (determinant) {
+
+			// minors
+			const minors = new Matrix3();
+			const getIndex = (row, column) => column * 3 + row;
+			const getMinor = (row, column) => {
+				const firstRow = row ? 0 : 1;
+				const firstColumn = column ? 0 : 1;
+				const lastRow = (row === 2) ? 1 : 2;
+				const lastColumn = (column === 2) ? 1 : 2;
+				const a = this[getIndex(firstRow, firstColumn)];
+				const b = this[getIndex(firstRow, lastColumn)];
+				const c = this[getIndex(lastRow, firstColumn)];
+				const d = this[getIndex(lastRow, lastColumn)];
+
+				return a * d - b * c;
+			};
+			for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) minors[getIndex(r, c)] = getMinor(r, c);
+
+			// cofactors
+			for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++)
+				if ((r + (c % 2)) % 2 === 1) minors[getIndex(r, c)] *= -1;
+
+			// adjugate
+			minors.transpose();
+
+			// downscale
+			return minors.times(1 / determinant);
+		} else return null;
 	}
 	mul(M1) {
 		return this.times(M1, this);
@@ -55,6 +101,13 @@ class Matrix3 extends Float64Array {
 				m00, m01, m02,
 				m10, m11, m12,
 				m20, m21, m22,
+				result ?? new Matrix3()
+			);
+		} else if (typeof M1 === "number") {
+			return Matrix3.create(
+				this[0] * M1, this[3] * M1, this[6] * M1,
+				this[1] * M1, this[4] * M1, this[7] * M1,
+				this[2] * M1, this[5] * M1, this[8] * M1,
 				result ?? new Matrix3()
 			);
 		} else {
@@ -79,23 +132,7 @@ class Matrix3 extends Float64Array {
 		return result;
 	}
 	toString() {
-		const [topleft, topright, bottomleft, bottomright, vertical] = [9484, 9488, 9492, 9496, 9474].map(num => String.fromCharCode(num));
-		let n = [...this].map(v => v.toMaxed(2));
-		let max0 = Math.max(n[0].length, n[3].length, n[6].length);
-		let max1 = Math.max(n[1].length, n[4].length, n[7].length);
-		let max2 = Math.max(n[2].length, n[5].length, n[8].length);
-		let fullspan = max0 + max1 + max2 + 4;
-		let top = `${topleft}${" ".repeat(fullspan)}${topright}`;
-		let middle0 = `${vertical} ${n[0].pad(max0)} ${n[3].pad(max0)} ${n[6].pad(max0)} ${vertical}`;
-		let middle1 = `${vertical} ${n[1].pad(max1)} ${n[4].pad(max1)} ${n[7].pad(max1)} ${vertical}`;
-		let middle2 = `${vertical} ${n[2].pad(max2)} ${n[5].pad(max2)} ${n[8].pad(max2)} ${vertical}`;
-		let bottom = `${bottomleft}${" ".repeat(fullspan)}${bottomright}`;
-
-		return `${top}
-${middle0}
-${middle1}
-${middle2}
-${bottom}`;
+		
 	}
 	static create(m00, m01, m02, m10, m11, m12, m20, m21, m22, result = new Matrix3()) {
 		result[0] = m00;
@@ -150,6 +187,32 @@ ${bottom}`;
 		return result;
 	}
 }
+{ // create toString methods
+	const methods = ["toString", "toFixed", "toMaxed"];
+	for (let i = 0; i < methods.length; i++) {
+		const method = methods[i];
+		Matrix3.prototype[method] = function (count) {
+			const n = [...this].map(v => v[method](count));
+			const max0 = Math.max(n[0].length, n[1].length, n[2].length);
+			const max1 = Math.max(n[3].length, n[4].length, n[5].length);
+			const max2 = Math.max(n[6].length, n[7].length, n[8].length);
+			const fullspan = max0 + max1 + max2 + 6;
+			const pad = (string, length) => {
+				const empty = length - string.length;
+				const left = Math.ceil(empty / 2);
+				const right = empty - left;
+				return " ".repeat(left) + string + " ".repeat(right);
+			};
+			return `
+┌${                 " ".repeat(fullspan)                    }┐
+│ ${pad(n[0], max0)}  ${pad(n[3], max1)}  ${pad(n[6], max2)} │
+│ ${pad(n[1], max0)}  ${pad(n[4], max1)}  ${pad(n[7], max2)} │
+│ ${pad(n[2], max0)}  ${pad(n[5], max1)}  ${pad(n[8], max2)} │
+└${                " ".repeat(fullspan)                     }┘
+`.trim();
+		};
+	}
+};
 Matrix3.temp = [
 	Matrix3.identity(),
 	Matrix3.identity(),
