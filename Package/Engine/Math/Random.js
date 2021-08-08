@@ -14,6 +14,9 @@ class Random {
     static angle() {
         return Random.random() * 2 * Math.PI;
     }
+    static char() {
+        return String.fromCharCode(Math.round(Random.random() * 0xFFFF));
+    }
     static color() {
         return new Color(Random.random() * 255, Random.random() * 255, Random.random() * 255, 1);
     }
