@@ -273,8 +273,8 @@ ByteBuffer.Reader = class {
 			!!(int & 1)
 		];
 	}
-	array(type) {
-		const length = this.uint32();
+	array(type, count = null) {
+		const length = count ?? this.uint32();
 		const result = new Array(length);
 		for (let i = 0; i < length; i++) result[i] = this[type]();
 		return result;

@@ -46,9 +46,6 @@ class HengineResource {
 	}
 }
 class HengineScriptResource extends HengineResource {
-	constructor(src) {
-		super(src);
-	}
 	load() {
 		const script = document.createElement("script");
 		script.src = this.src;
@@ -64,9 +61,6 @@ class HengineScriptResource extends HengineResource {
 	}
 }
 class HengineSoundResource extends HengineResource {
-	constructor(src) {
-		super(src);
-	}
 	load() {
 		const sound = new Sound(this.src);
 		return new Promise(resolve => {
@@ -80,9 +74,6 @@ class HengineSoundResource extends HengineResource {
 	}
 }
 class HengineImageResource extends HengineResource {
-	constructor(src) {
-		super(src);
-	}
 	load() {
 		const image = new HImage(this.src);
 		return new Promise(resolve => {
@@ -144,9 +135,6 @@ class HengineAnimationResource extends HengineResource {
 	}
 }
 class HengineFontResource {
-	constructor(src) {
-		this.src = src;
-	}
 	load() {
 		const style = document.createElement("style");
 		style.innerHTML = `@import url(${JSON.stringify(this.src)})`;
@@ -164,9 +152,6 @@ class HengineFontResource {
 }
 HengineFontResource.TEST_STRING = String.fromCharCode(...new Array(255).fill(0).map((_, code) => code));
 class HengineTextResource extends HengineResource {
-	constructor(src) {
-		super(src);
-	}
 	load() {
 		return new Promise(async resolve => {
 			try {
@@ -175,6 +160,27 @@ class HengineTextResource extends HengineResource {
 				xhr.onreadystatechange = () => {
 					if (xhr.readyState === XMLHttpRequest.DONE) {
 						if (xhr.status === 0 || xhr.status === 200) resolve(xhr.responseText);
+						else resolve(null);
+					}
+				};
+				xhr.send();
+			} catch (err) {
+				resolve(null);
+			}
+		});
+	}
+}
+class HengineBinaryResource extends HengineResource {
+	load() {
+		return new Promise(async resolve => {
+			try {
+				const xhr = new XMLHttpRequest();
+				xhr.open("GET", this.src);
+				xhr.setRequestHeader("Content-Type", "application/octet-stream");
+				xhr.responseType = "arraybuffer";
+				xhr.onreadystatechange = () => {
+					if (xhr.readyState === XMLHttpRequest.DONE) {
+						if (xhr.status === 0 || xhr.status === 200) resolve(new ByteBuffer(xhr.response));
 						else resolve(null);
 					}
 				};
