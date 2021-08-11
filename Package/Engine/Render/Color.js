@@ -1,13 +1,8 @@
 class Color extends Operable {
 	constructor(r, g, b, a) {
 		super();
-		let red = 0;
-		let green = 0;
-		let blue = 0;
-		let alpha = 0;
 		this.limited = true;
 		if (b === undefined && g === undefined && typeof r == "string") {
-			let col;
 			if (r.match(/[\(#]/g)) {
 				// explicit
 				let rgb = r;
@@ -15,25 +10,17 @@ class Color extends Operable {
 					Color.span.style.color = r;
 					rgb = Color.span.style.color;
 				}
-				col = Color.parseRGBA(rgb);
+				Color.parseRGBA(rgb, this);
 			} else {
 				// implicit
-				col = Color.CSSColor(r);
+				Color.CSSColor(r, this);
 			}
-			red = col.red;
-			green = col.green;
-			blue = col.blue;
-			alpha = col.alpha;
 		} else {
-			red = (r !== undefined) ? r : 0;
-			green = (g !== undefined) ? g : 0;
-			blue = (b !== undefined) ? b : 0;
-			alpha = (a !== undefined) ? a : 1;
+			this.red = r ?? 0;
+			this.green = g ?? 0;
+			this.blue = b ?? 0;
+			this.alpha = a ?? 1;
 		}
-		this.red = red;
-		this.green = green;
-		this.blue = blue;
-		this.alpha = alpha;
 		this.constrain();
 	}
 	set brightness(n) {
@@ -108,9 +95,13 @@ class Color extends Operable {
 		let b = 255 * per;
 		return new Color(r, g, b, 1);
 	}
-	static CSSColor(word) {
+	static CSSColor(word, destination) {
 		//processed
-		return Color.CSSColors[word.toLowerCase()];
+		const color = Color.CSSColors[word.toLowerCase()];
+		destination.red = color.red;
+		destination.green = color.green;
+		destination.blue = color.blue;
+		destination.alpha = color.alpha;
 	}
 	static numToHex(num) {
 		let a = Math.floor(num / 16);
@@ -119,10 +110,11 @@ class Color extends Operable {
 		return hexAry[a] + hexAry[b];
 	}
 	static parseNum(str, limit) {
-		if (str[str.length - 1] === "%") return parseFloat(str) / 100 * limit;
-		return parseFloat(str);
+		const number = parseFloat(str);
+		if (str[str.length - 1] === "%") return number * limit / 100;
+		return number;
 	}
-	static parseRGBA(str) {
+	static parseRGBA(str, destination) {
 		let rgba = "";
 		let state = false;
 		for (let char of str) {
@@ -138,7 +130,11 @@ class Color extends Operable {
 		let green = Color.parseNum(rgbaList[1], 255);
 		let blue = Color.parseNum(rgbaList[2], 255);
 		let alpha = (rgbaList.length > 3) ? Color.parseNum(rgbaList[3], 1) : 1;
-		return { red, green, blue, alpha };
+
+		destination.red = red;
+		destination.green = green;
+		destination.blue = blue;
+		destination.alpha = alpha;
 	}
 }
 Color.modValues = ["red", "green", "blue", "alpha"];

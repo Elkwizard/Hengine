@@ -31,6 +31,7 @@ class WebGLArtist {
 			[BlendMode.ADD, this.gl.BLEND_MODE_ADD]
 		]);
 		this.currentTransform = Matrix3.identity();
+		this.transformStackPointer = 0;
 		this.transformStack = [];
 		this.alphaStack = [];
 
@@ -454,41 +455,13 @@ class WebGLArtist {
 
 		// do scale
 
+		// optimized matrix multiplication	
+		
 		const ct = this.currentTransform;
-
-		// Matrix3.mulMatrix(
-		// 	this.currentTransform,
-			
-		// 	[
-		// 		x, 0, 0,
-		// 		0, y, 0,
-		// 		0, 0, 1,
-		// 	], 
-		// 	this.currentTransform
-		// );
-
-		// let m00 = ct[0] * x;
-		// let m01 = ct[3] * y;
-		// let m02 = ct[6];
-		// let m10 = ct[1] * x;
-		// let m11 = ct[4] * y;
-		// let m12 = ct[7];
-		// let m20 = ct[2] * x;
-		// let m21 = ct[5] * y;
-		// let m22 = ct[8];
-		
-		this.currentTransform[0] *= x;
-		this.currentTransform[1] *= x;
-		this.currentTransform[3] *= y;
-		this.currentTransform[4] *= y;
-
-		
-		// Matrix3.create(
-		// 	m00, m01, m02,
-		// 	m10, m11, m12,
-		// 	m20, m21, m22,
-		// 	this.currentTransform
-		// );
+		ct[0] *= x;
+		ct[1] *= x;
+		ct[3] *= y;
+		ct[4] *= y;
 
 		this.gl.setTransform(this.currentTransform);
 	}
@@ -501,24 +474,30 @@ class WebGLArtist {
 
 		const ct = this.currentTransform;
 		
-		const [m0, m1, m2, m3, m4, m5] = ct;
+		const m0 = ct[0];
+		const m1 = ct[1];
+		const m2 = ct[2];
+		const m3 = ct[3];
+		const m4 = ct[4];
+		const m5 = ct[5];
 		
 		ct[0] = m0 * c + m3 * s;
 		ct[1] = m1 * c + m4 * s;
 		ct[2] = m2 * c + m5 * s;
-		ct[3] = -m0 * s + m3 * c;
-		ct[4] = -m1 * s + m4 * c;
-		ct[5] = -m2 * s + m5 * c;
+		ct[3] = m3 * c - m0 * s;
+		ct[4] = m4 * c - m1 * s;
+		ct[5] = m5 * c - m2 * s;
 
 		this.gl.setTransform(this.currentTransform);
 	}
 	save() {
-		this.transformStack.push(this.currentTransform.get());
+		const index = this.transformStackPointer++;
+		this.transformStack[index] = this.currentTransform.get(this.transformStack[index]);
 		this.alphaStack.push(this.alpha);
 	}
 	restore() {
-		if (this.transformStack.length) {
-			this.currentTransform = this.transformStack.pop();
+		if (this.transformStackPointer) {
+			this.transformStack[--this.transformStackPointer].get(this.currentTransform);
 			this.gl.setTransform(this.currentTransform);
 			this.alpha = this.alphaStack.pop();
 			this.gl.setGlobalAlpha(this.alpha);

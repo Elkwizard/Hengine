@@ -509,10 +509,13 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		if (!glState.hasContext) return;
 		guarenteeWebGLObjects();
 
-		const [
-			M00, M10, M20,
-			M01, M11, M21
-		] = glState.transformMatrix;
+		const { transformMatrix } = glState;
+		const M00 = transformMatrix[0];
+		const M10 = transformMatrix[1];
+		const M20 = transformMatrix[2];
+		const M01 = transformMatrix[3];
+		const M11 = transformMatrix[4];
+		const M21 = transformMatrix[5];
 
 		const index = glState.instancePointer;
 		const {
@@ -542,10 +545,13 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		if (!glState.hasContext) return;
 		guarenteeWebGLObjects();
 
-		const [
-			M00, M10, M20,
-			M01, M11, M21
-		] = glState.transformMatrix;
+		const { transformMatrix } = glState;
+		const M00 = transformMatrix[0];
+		const M10 = transformMatrix[1];
+		const M20 = transformMatrix[2];
+		const M01 = transformMatrix[3];
+		const M11 = transformMatrix[4];
+		const M21 = transformMatrix[5];
 
 		const index = glState.instancePointer;
 		const {
@@ -620,10 +626,13 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		const m21 = ay - ny * lw2;
 
 		// create instance
-		const [
-			M00, M10, M20,
-			M01, M11, M21
-		] = glState.transformMatrix;
+		const { transformMatrix } = glState;
+		const M00 = transformMatrix[0];
+		const M10 = transformMatrix[1];
+		const M20 = transformMatrix[2];
+		const M01 = transformMatrix[3];
+		const M11 = transformMatrix[4];
+		const M21 = transformMatrix[5];
 
 		const index = glState.instancePointer;
 		const {
@@ -661,10 +670,13 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 
 		if (image.width > glState.TEXTURE_SLOT_SIZE || image.height > glState.TEXTURE_SLOT_SIZE) return;
 
-		const [
-			M00, M10, M20,
-			M01, M11, M21
-		] = glState.transformMatrix;
+		const { transformMatrix } = glState;
+		const M00 = transformMatrix[0];
+		const M10 = transformMatrix[1];
+		const M20 = transformMatrix[2];
+		const M01 = transformMatrix[3];
+		const M11 = transformMatrix[4];
+		const M21 = transformMatrix[5];
 
 		const index = glState.instancePointer;
 		const {
