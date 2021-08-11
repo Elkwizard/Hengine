@@ -20,6 +20,7 @@ class InputHandler {
 		this.keys = new Map();
 		this.keyDownCounts = new Map();
 		this.keyUpCounts = new Map();
+		this.totalCount = 0;
 	}
 	get allPressed() {
 		const result = [];
@@ -42,10 +43,10 @@ class InputHandler {
 		return result;
 	}
 	pressLength(key) {
-		return this.keyDownCounts.get(key);
+		return this.keyDownCounts.get(key) ?? 0;
 	}
 	releaseLength(key) {
-		return this.keyUpCounts.get(key);
+		return this.keyUpCounts.get(key) ?? this.totalCount;
 	}
 	pressed(keys) {
 		if (Array.isArray(keys)) {
@@ -92,9 +93,9 @@ class InputHandler {
 		}
 	}
 	update() {
-		for (let [key, pressed] of this.keys) {
+		this.totalCount++;
+		for (const [key, pressed] of this.keys) {
 			if (!this.keyDownCounts.has(key)) this.keyDownCounts.set(key, 0);
-			if (!this.keyUpCounts.has(key)) this.keyUpCounts.set(key, 2);
 			if (pressed) {
 				this.keyDownCounts.set(key, this.keyDownCounts.get(key) + 1);
 				this.keyUpCounts.set(key, 0);
