@@ -386,11 +386,7 @@ class WebGLArtist {
 		return this.currentTransform.get();
 	}
 	resize(width, height) {
-		let px = this.preservePixelart;
-		let al = this.alpha;
 		this.gl.resize(width, height);
-		this.alpha = al;
-		this.preservePixelart = px;
 	}
 	setCursor(cursor) {
 		let style = this.canvas.style;

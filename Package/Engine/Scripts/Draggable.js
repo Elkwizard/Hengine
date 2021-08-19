@@ -15,24 +15,19 @@ class DRAGGABLE extends ElementScript {
 	update(obj) {
 		if (this.mouse.justReleased(this.key)) this.dragged = false; 
 		if (this.dragged) {
-			obj.transform.position = this.getMousePosition().minus(this.offset);
-			if (this.bounds) {
-				obj.cacheBoundingBoxes();
-				let { x, y, width, height } = obj.__boundingBox;
-				let ox = x - obj.transform.position.x;
-				let oy = y - obj.transform.position.y;
-				if (x < this.bounds.x) x = this.bounds.x;
-				if (y < this.bounds.y) y = this.bounds.y;
-				if (x + width > this.bounds.x + this.bounds.width) x = this.bounds.x + this.bounds.width - width;
-				if (y + height > this.bounds.y + this.bounds.height) y = this.bounds.y + this.bounds.height - height;
-				obj.transform.position.x = x - ox;
-				obj.transform.position.y = y - oy;
-			}
+			obj.transform.position = this.getMousePosition().minus(obj.transform.localSpaceToGlobalSpace(this.offset).minus(obj.transform.position));
 			obj.cacheBoundingBoxes();
-			if (obj.scripts.has(PHYSICS)) {
-				//keep awake
-				obj.scripts.PHYSICS.stop();
-			}
+			if (obj.scripts.has(PHYSICS)) obj.scripts.PHYSICS.stop();
+		}
+		if (this.bounds) {
+			obj.cacheBoundingBoxes();
+			const boxToPosition = obj.transform.position.minus(obj.__boundingBox.min);
+			const positionToBox = obj.transform.position.minus(obj.__boundingBox.max);
+			const { bounds } = this;
+			const { min, max } = bounds;
+			const newPosition = Vector2.clamp(obj.transform.position, min.plus(boxToPosition), max.plus(positionToBox));;
+			if (!newPosition.equals(obj.transform.position) && obj.scripts.has(PHYSICS)) obj.scripts.PHYSICS.stop();
+			obj.transform.position = newPosition;
 		}
 	}
 	getMousePosition(obj) {
