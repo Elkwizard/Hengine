@@ -693,6 +693,9 @@ class Artist {
 		this.alpha = al;
 		this.preservePixelart = px;
 	}
+	multiplyTransform(newTransform) {
+		this.c.transform(newTransform[0], newTransform[1], newTransform[3], newTransform[4], newTransform[6], newTransform[7]);
+	}
 	setCursor(cursor) {
 		let style = this.canvas.style;
 		if ("cursor" in style) style.cursor = cursor;

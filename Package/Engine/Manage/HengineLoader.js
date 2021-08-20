@@ -134,7 +134,7 @@ class HengineAnimationResource extends HengineResource {
 		});
 	}
 }
-class HengineFontResource {
+class HengineFontResource extends HengineResource {
 	load() {
 		const style = document.createElement("style");
 		style.innerHTML = `@import url(${JSON.stringify(this.src)})`;

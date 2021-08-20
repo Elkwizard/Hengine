@@ -3,7 +3,7 @@ class WebGLArtist {
 		this.canvas = canvas;
 		this.pixelRatio = pixelRatio;
 
-		this.gl = defineWebGL2DContext();
+		this.gl = defineWebGL2DContext({}, true);
 		this.gl.create(canvas, true, pixelRatio);
 
 		this.imageType = imageType;
@@ -388,8 +388,11 @@ class WebGLArtist {
 	resize(width, height) {
 		this.gl.resize(width, height);
 	}
+	multiplyTransform(newTransform) {
+		this.gl.setTransform(this.currentTransform.times(newTransform, this.currentTransform));
+	}
 	setCursor(cursor) {
-		let style = this.canvas.style;
+		const { style } = this.canvas;
 		if ("cursor" in style) style.cursor = cursor;
 	}
 	useColor(color) {
