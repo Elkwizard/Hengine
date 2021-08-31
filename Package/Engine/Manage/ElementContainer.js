@@ -174,9 +174,9 @@ class ElementContainer extends SceneElement {
 	}
 	removeElement(element) {
 		if (element.container === this) {
-			element.scripts.run("remove");
 			if (element.active) element.deactivate();
 			element.removed = true;
+			if (element instanceof SceneObject) element.scripts.run("remove");
 			this.elements.delete(element.name);
 		}
 	}

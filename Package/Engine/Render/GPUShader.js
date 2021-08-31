@@ -359,8 +359,8 @@ class GLSLProgram {
 				if (child.usesDataArray) child.set(value);
 				else {
 					// vector or number
-					if (value instanceof ImageType) child.set(value);
-					else if (typeof value === "number") child.set(value);
+					const type = typeof value;
+					if (value instanceof ImageType || type === "boolean" || type === "number") child.set(value);
 					else {
 						this.getVectorComponents(value);
 						child.set(...this.vectorBuffer);
@@ -439,12 +439,12 @@ class GLSLProgram {
 	}
 }
 class GPUShader extends ImageType {
-	constructor(width, height, glsl) {
+	constructor(width, height, glsl, pixelRatio = 1) {
 		super(width, height);
 		this.glsl = glsl;
 		this.shadeRects = [new Rect(0, 0, width, height)];
 		this.compiled = false;
-		this.image = new_OffscreenCanvas(width * __devicePixelRatio, height * __devicePixelRatio);
+		this.image = new_OffscreenCanvas(width * pixelRatio, height * pixelRatio);
 		this.gl = this.image.getContext("webgl2");
 		if (this.gl === null) return console.warn("Your browser doesn't support WebGL.");
 		this.image.addEventListener("webglcontextlost", event => {

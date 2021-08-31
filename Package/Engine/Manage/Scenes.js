@@ -13,7 +13,7 @@ class Scene {
 		let A = a.userData.sceneObject;
 		let B = b.userData.sceneObject;
 		if (A && B && this.collisionEvents) {
-			contacts = contacts.map(v => Contact.fromPhysicsContact(v));
+			contacts = contacts.map(v => Vector2.fromPhysicsVector(v));
 			direction = Vector2.fromPhysicsVector(direction);
 			A.scripts.PHYSICS.colliding.add(B, direction, contacts);
 			B.scripts.PHYSICS.colliding.add(A, direction.inverse, contacts);
@@ -37,7 +37,7 @@ class Scene {
 					hit = hp;
 				}
 			}
-		}
+		}	
 		return { hitPoint: hit, hitShape };
 	}
 	collidePoint(point, override = true) {
@@ -57,35 +57,6 @@ class Scene {
 	collidePointBoth(point, override = true) {
 		const collideAry = this.collidePoint(point, override);
 		return [collideAry, this.main.sceneObjectArray.filter(e => !collideAry.includes(e))];
-	}
-	handleCollisionEvents() {
-		const directions = [
-			["left", "collideLeft"],
-			["right", "collideRight"],
-			["top", "collideTop"],
-			["bottom", "collideBottom"],
-			["general", "collideGeneral"],	
-		];
-
-		const objects = this.main.getElementsWithScript(PHYSICS);
-		for (let i = 0; i < objects.length; i++) {
-			const object = objects[i];
-			const { lastColliding, colliding } = object.scripts.PHYSICS;
-			for (let i = 0; i < directions.length; i++) {
-				const direction = directions[i][0];
-				const now = colliding[direction];
-				if (now) {
-					const last = new Set();
-					const lastArray = lastColliding[direction];
-					if (lastArray) for (let j = 0; j < lastArray.length; j++) last.add(lastArray[j].element);
-					for (let j = 0; j < now.length; j++) {
-						const data = now[j];
-						if (!last.has(data.element)) object.scripts.run(directions[i][1], data);
-					}
-				}
-			}
-			colliding.get(lastColliding);
-		}
 	}
 	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null) {
 		const con = new PhysicsConstraint2.Length(a.scripts.PHYSICS.body, b.scripts.PHYSICS.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length);
@@ -109,23 +80,21 @@ class Scene {
 		this.physicsEngine.addConstraint(con);
 	}
 	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
-		const con = new PhysicsConstraint1.Position(a.scripts.PHYSICS.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null);
-		if (point === null) con.point = con.ends[0];
+		point ??= a.transform.localSpaceToGlobalSpace(offset);
+		const con = new PhysicsConstraint1.Position(a.scripts.PHYSICS.body, offset.toPhysicsVector(), point);
 		this.physicsEngine.addConstraint(con);
 	}
 	updateCaches() {
 		for (const el of this.main.sceneObjectArray) el.updateCaches();
 	}
 	updatePreviousData() {
-		for (const rect of this.main.sceneObjectArray) {
-			rect.updatePreviousData();
-		}
+		const objects = this.main.sceneObjectArray;
+		for (let i = 0; i < objects.length; i++) objects[i].updatePreviousData();
 	}
 	renderCamera() {
 		const screen = this.camera.cacheScreen();
 
 		this.engine.renderer.save();
-
 		this.camera.transformToWorld(this.engine.renderer);
 
 		const objects = this.main.sceneObjectArray;
@@ -143,6 +112,8 @@ class Scene {
 			objects[i].scripts.run(type, ...args);
 	}
 	handleMouseEvents() {
+		if (!this.mouseEvents) return;
+
 		const { mouse } = this.engine;
 
 		const adjusted = mouse.world;
@@ -168,21 +139,18 @@ class Scene {
 		}
 	}
 	engineUpdate() {
-		if (this.mouseEvents) this.handleMouseEvents();
+		this.handleMouseEvents();
 
 		this.main.startUpdate();
 		this.script("beforeUpdate");
 
 		// update
-		for (const element of this.main.updateArray()) {
-			element.scripts.run("update");
-		}
+		this.script("update");
 
 		//physics
 		this.script("beforePhysics");
-		this.physicsEngine.run();
+		this.camera.drawInWorldSpace(this.physicsEngine.run.bind(this.physicsEngine));
 		this.script("afterPhysics");
-		if (this.collisionEvents) this.handleCollisionEvents();
 
 		//draw
 		this.main.sceneObjectArray.sort((a, b) => a.layer - b.layer);

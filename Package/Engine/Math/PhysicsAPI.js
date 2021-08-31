@@ -4,15 +4,6 @@ function physicsAPICollideShapes(shape, shape2) {
         shape2.toPhysicsShape(), new PhysicsVector(0, 0), 1, 0
     );
 }
-class Contact {
-    constructor(point, penetration) {
-        this.point = point;
-        this.penetration = penetration;
-    }
-    static fromPhysicsContact(contact) {
-        return new Contact(Vector2.fromPhysicsVector(contact.point), contact.penetration);
-    }
-}
 class CollisionData {
     constructor(element, direction, contacts) {
         this.element = element;
@@ -22,76 +13,66 @@ class CollisionData {
 }
 class CollisionMonitor {
     constructor() {
-        this.elements = [];
-        this.physicsObjects = [];
+        this.elements = new Map();
     }
     get general() {
-        return this.elements.length ? this.elements.map(e => e) : null;
-    }
-    get left() {
-        let els = [];
-        for (let i = 0; i < this.elements.length; i++) {
-            let el = this.elements[i];
-            if (el.direction.x < -0.2) els.push(el);
+        if (this.elements.size) {
+            const elements = [];
+            for (const [element, data] of this.elements) elements.push(data);
+            return elements;
         }
-        return els.length ? els : null;
-    }
-    get right() {
-        let els = [];
-        for (let i = 0; i < this.elements.length; i++) {
-            let el = this.elements[i];
-            if (el.direction.x > 0.2) els.push(el);
-        }
-        return els.length ? els : null;
-    }
-    get top() {
-        let els = [];
-        for (let i = 0; i < this.elements.length; i++) {
-            let el = this.elements[i];
-            if (el.direction.y < -0.2) els.push(el);
-        }
-        return els.length ? els : null;
-    }
-    get bottom() {
-        let els = [];
-        for (let i = 0; i < this.elements.length; i++) {
-            let el = this.elements[i];
-            if (el.direction.y > 0.2) els.push(el);
-        }
-        return els.length ? els : null;
-    }
-    get(mon = new CollisionMonitor) {
-        mon.elements = this.elements.map(e => new CollisionData(e.element, e.direction, e.contacts));
-        mon.physicsObjects = Array.from(this.physicsObjects);
-        return mon;
-    }
-    removeDead() {
-        this.elements = this.elements.filter(el => !el.element.removed);
-        this.physicsObjects = this.physicsObjects.filter(el => !el.removed);
-    }
-    clear() {
-        this.elements = [];
-        this.physicsObjects = [];
-    }
-    add(element, dir, contacts) {
-        if (!this.physicsObjects.includes(element)) {
-            this.physicsObjects.push(element);
-            this.elements.push(new CollisionData(element, dir, contacts));
-        }
-    }
-    has(el) {
-        for (let i = 0; i < this.elements.length; i++) if (this.elements[i].element === el) return true;
-        return false;
-    }
-    direction(d) {
-        let result = this.test(e => e.direction.dot(d) > 0.2);
-        if (result) return result;
         return null;
     }
+    get left() {
+        const elements = [];
+        for (const [element, data] of this.elements)
+            if (data.direction.x < -0.2) elements.push(data);
+        return elements.length ? elements : null;
+    }
+    get right() {
+        const elements = [];
+        for (const [element, data] of this.elements)
+            if (data.direction.x > 0.2) elements.push(data);
+        return elements.length ? elements : null;
+    }
+    get top() {
+        const elements = [];
+        for (const [element, data] of this.elements)
+            if (data.direction.y < -0.2) elements.push(data);
+        return elements.length ? elements : null;
+    }
+    get bottom() {
+        const elements = [];
+        for (const [element, data] of this.elements)
+            if (data.direction.y > 0.2) elements.push(data);
+        return elements.length ? elements : null;
+    }
+    get(monitor = new CollisionMonitor()) {
+        monitor.clear();
+        for (const [element, data] of this.elements) monitor.add(element, data.direction, data.contacts);
+        return monitor;
+    }
+    removeDead() {
+        const newElements = new Map();
+        for (const [element, data] of this.elements) if (!element.removed) newElements.set(element, data);
+        this.elements = newElements;
+    }
+    clear() {
+        this.elements.clear();
+    }
+    add(element, dir, contacts) {
+        this.elements.set(element, new CollisionData(element, dir, contacts));
+    }
+    has(el) {
+        return this.elements.has(el);
+    }
+    direction(d) {
+        const result = this.test(data => data.direction.dot(d) > 0.2);
+        return result || null;
+    }
     test(test) {
-        if (!this.elements.length) return null;
-        let result = this.elements.filter(test);
-        if (result.length > 0) return result;
-        else return null;
+        const result = [];
+        for (const [element, data] of this.elements) if (test(data)) result.push(data);
+        return result.length ? result : null;
     }
 }

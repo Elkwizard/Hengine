@@ -11,10 +11,10 @@ class PLAYER_MOVEMENT extends ElementScript {
 		if (this.keyboard.pressed(obj.controls.down)) rb.velocity.y += 0.4;
 		if (this.keyboard.pressed(obj.controls.left)) rb.velocity.x += -0.2;
 		else if (this.keyboard.pressed(obj.controls.right)) rb.velocity.x += 0.2;
-		if (this.keyboard.pressed(obj.controls.up)) {
+		if (this.keyboard.pressed(obj.controls.up))
 			if (rb.colliding.bottom) {
-				rb.velocity.y -= 10;
+				const solid = rb.colliding.bottom.find(({ element }) => !element.scripts.PHYSICS.isTrigger);
+				if (solid) rb.velocity.y -= 10;
 			}
-		}
 	}
 }

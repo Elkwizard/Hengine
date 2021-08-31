@@ -192,6 +192,7 @@ class Matrix3 extends Float64Array {
 	for (let i = 0; i < methods.length; i++) {
 		const method = methods[i];
 		Matrix3.prototype[method] = function (count) {
+			if (method === "toString") count = 10;
 			const n = [...this].map(v => v[method](count));
 			const max0 = Math.max(n[0].length, n[1].length, n[2].length);
 			const max1 = Math.max(n[3].length, n[4].length, n[5].length);

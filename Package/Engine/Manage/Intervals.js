@@ -81,7 +81,6 @@ class IntervalManager {
 		IntervalManager.intervals.push(this.update.bind(this));
 	}
 	update() {
-		this.frameCount++;
 		if (this.performanceData) {
 			this.currentTime = performance.now();
 			//fps
@@ -96,6 +95,7 @@ class IntervalManager {
 			this.rawFps = getFPSRange(1);
 			this.fps = Math.floor(Number.clamp(this.averageFps, 0, 60));
 		}
+		
 		//input is necessary
 		this.engine.keyboard.update();
 		this.engine.mouse.update();
@@ -113,6 +113,8 @@ class IntervalManager {
 		}
 		this.engine.mouse.afterUpdate();
 		this.engine.renderer.afterFrame();
+		
+		this.frameCount++;
 	}
 	makeGraphPlane(graphs, frameLimit = 400) {
 		let f = new GraphPlane(graphs, frameLimit);
@@ -149,11 +151,11 @@ class IntervalManager {
 	updateIntervalCalls(type) {
 		let remaining = [];
 		for (let i = 0; i < this.functions.length; i++) {
-			const int_fn = this.functions[i];
-			if (int_fn.type === type) {
-				int_fn.increment();
+			const intFn = this.functions[i];
+			if (intFn.type === type) {
+				intFn.increment();
 			}
-			if (!int_fn.done) remaining.push(int_fn);
+			if (!intFn.done) remaining.push(intFn);
 		}
 		this.functions = remaining;
 	}
@@ -181,9 +183,8 @@ IntervalManager.FPS_FRAMES_TO_COUNT = 30;
 		requestAnimationFrame(animate);
 		IntervalManager.inInterval = true;
 		try {
-			for (let i = 0; i < IntervalManager.intervals.length; i++) {
+			for (let i = 0; i < IntervalManager.intervals.length; i++)
 				IntervalManager.intervals[i]();
-			}
 		} catch (err) {
 			if (err instanceof ExitError) console.warn("EXITED", ...err.message);
 			else throw err;

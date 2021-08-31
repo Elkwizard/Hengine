@@ -91,6 +91,7 @@ class ScriptContainer {
 	remove(script) {
 		if (!this.has(script)) return;
 		const instance = this.scripts.get(script);
+		instance.cleanUp();
 		this.scripts.delete(script);
 		this.sortedScriptInstances.splice(this.sortedScriptInstances.indexOf(instance), 1);
 
@@ -105,7 +106,7 @@ class ScriptContainer {
 		return this.implementedMethods.has(method);
 	}
 	run(method, ...args) {
-		if (this.sceneObject.removed && method !== "remove") return;
+		if (this.sceneObject.removed && method !== "remove" && method !== "deactivate") return;
 		if (this.implementedMethods.has(method))
 			for (let i = 0; i < this.sortedScriptInstances.length; i++)
 				this.sortedScriptInstances[i][method](...args);

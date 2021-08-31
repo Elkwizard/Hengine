@@ -141,7 +141,27 @@ class PHYSICS extends ElementScript {
         position.x = this.body.position.x;
         position.y = this.body.position.y;
         obj.transform.rotation = this.body.angle;
-        obj.updateCaches();	
+        obj.updateCaches();
+
+		if (this.scene.collisionEvents) {
+			const { directions } = PHYSICS;
+			const { lastColliding, colliding } = this;
+			for (let i = 0; i < directions.length; i++) {
+				const direction = directions[i][0];
+				const now = colliding[direction];
+				if (now) {
+					const last = new Set();
+					const lastArray = lastColliding[direction];
+					if (lastArray) for (let j = 0; j < lastArray.length; j++) last.add(lastArray[j].element);
+					for (let j = 0; j < now.length; j++) {
+						const data = now[j];
+						if (!last.has(data.element))
+							obj.scripts.run(directions[i][1], data);
+					}
+				}
+			}
+			colliding.get(lastColliding);
+		}
 	}
 	// custom methods
 	applyImpulse(obj, point, force) {
@@ -162,3 +182,10 @@ class PHYSICS extends ElementScript {
 		return true;
 	}
 }
+PHYSICS.directions = [
+	["left", "collideLeft"],
+	["right", "collideRight"],
+	["top", "collideTop"],
+	["bottom", "collideBottom"],
+	["general", "collideGeneral"],	
+];
