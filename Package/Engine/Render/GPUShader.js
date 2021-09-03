@@ -533,8 +533,8 @@ class GPUShader extends ImageType {
 	resize(width, height) {
 		width = Math.max(1, Math.abs(Math.ceil(width)));
 		height = Math.max(1, Math.abs(Math.ceil(height)));
-		this.image.width = width * __devicePixelRatio;
-		this.image.height = height * __devicePixelRatio;
+		this.image.width = width * this.pixelRatio;
+		this.image.height = height * this.pixelRatio;
 		this.width = width;
 		this.height = height;
 		this.updateResolutionUniforms();
