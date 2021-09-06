@@ -16,6 +16,14 @@ class Font {
 		if (a.toLowerCase().match(/(mono|consolas)/g)) {
 			this.getWidthCRC2D = str => str.length * 0.5498046875 * this.size;
 		};
+		this.keywordFamily = (
+			a === "monospace" ||
+			a === "sans-serif" ||
+			a === "serif" ||
+			a === "cursive" ||
+			a === "fantasy" ||
+			a === "system-ui"
+		);
 		this.refont();
 	}
 	get family() {
@@ -111,7 +119,7 @@ class Font {
 		return str.split("\n").length * this.lineHeight;
 	}
 	toString() {
-		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${this.family}`;
+		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${this.keywordFamily ? this.family : `'${this.family}'`}`;
 	}
 	get(font = new Font(0, "serif", false, false)) {
 		font.size = this.size;

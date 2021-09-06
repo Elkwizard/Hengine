@@ -142,7 +142,7 @@ class HengineFontResource extends HengineResource {
 		return new Promise(async resolve => {
 			style.onload = () => {
 				const { family } = [...document.fonts][document.fonts.size - 1];
-				const testCSS = "20px " + family;
+				const testCSS = `20px '${family}'`;
 				document.fonts.load(testCSS, HengineFontResource.TEST_STRING).then(() => resolve(family));
 			};
 			style.onerror = () => resolve(null);

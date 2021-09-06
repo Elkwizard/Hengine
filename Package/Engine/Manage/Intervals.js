@@ -5,6 +5,7 @@ class IntervalFunction {
 		this.interval = len;
 		this.timer = 0;
 		this.done = false;
+		this.promise = new Promise(resolve => this.resolve = resolve);
 	}
 	increment() {
 		this.respond();
@@ -26,9 +27,7 @@ class DelayedFunction extends IntervalFunction {
 		super(fn, wait, type);
 	}
 	respond() {
-		if (this.timer === this.interval) {
-			this.fn();
-		}
+		if (this.timer === this.interval) this.fn();
 	}
 }
 class TransitionFunction extends IntervalFunction {
@@ -132,30 +131,35 @@ class IntervalManager {
 	}
 	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
 		this.functions.push(new ContinuousFunction(fn, type));
+		return this.functions.last.promise;
 	}
 	transition(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new TransitionFunction(fn, frames, type));
+		return this.functions.last.promise;
 	}
 	animate(object, property, value, time, curve = Interpolation.linear, type = IntervalFunction.BEFORE_UPDATE) {
-		let start = object[property].get();
-		this.transition(t => {
+		const start = object[property].get();
+		return this.transition(t => {
 			object[property] = Interpolation.lerp(start, value, curve(t));
 		}, time, type);
 	}
 	delay(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new DelayedFunction(fn, frames, type));
+		return this.functions.last.promise;
 	}
 	waitUntil(fn, event, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new WaitUntilFunction(fn, event, type));
+		return this.functions.last.promise;
 	}
 	updateIntervalCalls(type) {
 		let remaining = [];
 		for (let i = 0; i < this.functions.length; i++) {
-			const intFn = this.functions[i];
-			if (intFn.type === type) {
-				intFn.increment();
+			const fn = this.functions[i];
+			if (fn.type === type) {
+				fn.increment();
 			}
-			if (!intFn.done) remaining.push(intFn);
+			if (fn.done) fn.resolve();
+			else remaining.push(fn);
 		}
 		this.functions = remaining;
 	}

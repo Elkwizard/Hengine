@@ -367,10 +367,10 @@ class GLSLProgram {
 					}
 				}
 			} else {
-				const keys = Object.getOwnPropertyNames(value);
+				const keys = Object.getOwnPropertyNames(child);
 				for (let i = 0; i < keys.length; i++) {
 					const key = keys[i];
-					this.setUniform(key, value[key], child); // more steps needed
+					if (key in value) this.setUniform(key, value[key], child); // more steps needed
 				}
 			}
 		} else if (location === this.uniforms) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
@@ -598,8 +598,8 @@ void main() {
 		this.program = new GLSLProgram(gl, vertexSource, pixelSource, (type, message) => {
 			if (type === "FRAGMENT_SHADER") {
 				const errors = GLSLError.format(message, prefixLength);
-				console.warn("Compilation Error", errors);
-			}// else console.warn(message);
+				exit("Compilation Error", errors);
+			} else console.warn(message);
 		});
 		this.program.use();
 

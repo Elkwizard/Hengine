@@ -92,6 +92,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		frame.height = obj.engine.canvas.height;
 
 		const screen = scene.camera.screen.get();
+		if (obj instanceof UIObject) screen.x = screen.y = 0;
 		screen.x -= this.radius;
 		screen.y -= this.radius;
 		screen.width += this.radius * 2;
@@ -119,9 +120,12 @@ class PARTICLE_SPAWNER extends ElementScript {
 		for (const p of this.toRemove) this.particles.delete(p);
 		this.toRemove.clear();
 
-		if (renderedParticles) obj.engine.scene.camera.drawInScreenSpace(() => {
-			renderer.image(frame).default(0, 0);
-		});
+		if (renderedParticles) {
+			if (obj instanceof UIObject) renderer.image(frame).default(0, 0);
+			else obj.engine.scene.camera.drawInScreenSpace(() => {
+				renderer.image(frame).default(0, 0);
+			});
+		}
 
 	}
 }
