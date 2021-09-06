@@ -56,8 +56,8 @@ class Camera extends Matrix3 {
 		const c = this.cosRotation;
 		const s = this.sinRotation;
 		const z = this.zoom;
-		const w = this.engine.renderer.width;
-		const h = this.engine.renderer.height;
+		const w = this.engine.canvas.width;
+		const h = this.engine.canvas.height;
 		this[6] = w / 2 - x * c * z + y * s * z;
 		this[7] = h / 2 - x * s * z - y * c * z;
 	}
@@ -90,7 +90,7 @@ class Camera extends Matrix3 {
 		this.zoom /= 1 + amount;
 	}
 	cacheScreen() {
-		const { width, height } = this.engine.renderer;
+		const { width, height } = this.engine.canvas;
 		return this.screen = Rect.bound([
 			new Vector2(width / 2, height / 2),
 			new Vector2(width / 2, -height / 2),

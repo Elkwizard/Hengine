@@ -16,7 +16,8 @@ class Artist {
 		this.canvas = canvas;
 		this.c = this.canvas.getContext("2d");
 		this.pixelRatio = pixelRatio;
-
+		this.width = width;
+		this.height = height;
 		this.imageType = imageType;
 
 		this.lineJoinMap = new Map([
@@ -633,12 +634,6 @@ class Artist {
 			this.imageObj[func] = this.imageObj[func].bind(this);
 		}
 	}
-	get width() {
-		return this.canvas.width / this.pixelRatio;
-	}
-	get height() {
-		return this.canvas.height / this.pixelRatio;
-	}
 	get middle() {
 		return new Vector2(this.width / 2, this.height / 2);
 	}
@@ -685,8 +680,10 @@ class Artist {
 		);
 	}
 	resize(width, height) {
-		let px = this.preservePixelart;
-		let al = this.alpha;
+		const px = this.preservePixelart;
+		const al = this.alpha;
+		this.width = width;
+		this.height = height;
 		this.canvas.width = width * this.pixelRatio;
 		this.canvas.height = height * this.pixelRatio;
 		this.c.scale(this.pixelRatio, this.pixelRatio);
