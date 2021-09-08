@@ -1,15 +1,3 @@
-title = "Yet ANOTHER GPUComputation implementation";
-
-class Timer {
-	static startTime = 0;
-	static time() {
-		this.startTime = performance.now();
-	}
-	static timeEnd(name) {
-		console.log(`%c${name}: ${(performance.now() - this.startTime).toMaxed(3)} ms`, "color: lime; font-weight: bold;");
-	}
-}
-
 class GPUComputation {
 	constructor(problems, glsl) {
 		this.problems = problems;
