@@ -16,13 +16,14 @@ class Font {
 		if (a.toLowerCase().match(/(mono|consolas)/g)) {
 			this.getWidthCRC2D = str => str.length * 0.5498046875 * this.size;
 		};
+		const l = a.toLowerCase();
 		this.keywordFamily = (
-			a === "monospace" ||
-			a === "sans-serif" ||
-			a === "serif" ||
-			a === "cursive" ||
-			a === "fantasy" ||
-			a === "system-ui"
+			l === "monospace" ||
+			l === "sans-serif" ||
+			l === "serif" ||
+			l === "cursive" ||
+			l === "fantasy" ||
+			l === "system-ui"
 		);
 		this.refont();
 	}
