@@ -44,17 +44,27 @@ class Range {
 		return (this.min + this.max) / 2;
 	}
 	set min(a) {
-		let b = this.max;
-		this._min = Math.min(a, b);
-		this._max = Math.max(a, b);
+		const b = this._max;
+		if (a < b) {
+			this._min = a;
+			this._max = b;
+		} else {
+			this._min = b;
+			this._max = a;
+		}
 	}
 	get min() {
 		return this._min;
 	}
 	set max(a) {
-		let b = this.min;
-		this._min = Math.min(a, b);
-		this._max = Math.max(a, b);
+		const b = this._min;
+		if (a < b) {
+			this._min = a;
+			this._max = b;
+		} else {
+			this._min = b;
+			this._max = a;
+		}
 	}
 	get max() {
 		return this._max;
@@ -63,7 +73,10 @@ class Range {
 		return this.max - this.min;
 	}
 	clip(range) {
-		return new Range(Number.clamp(this.min, range.min, range.max), Number.clamp(this.max, range.min, range.max));
+		return new Range(
+			Number.clamp(this.min, range.min, range.max),
+			Number.clamp(this.max, range.min, range.max)
+		);
 	}
 	fromIntervalValue(interval) {
 		return (this.max - this.min) * interval + this.min;
@@ -77,7 +90,7 @@ class Range {
 	includes(value) {
 		return value >= this.min && value <= this.max;
 	}
-	expand(value) {
+	include(value) {
 		if (value < this.min) this._min = value;
 		if (value > this.max) this._max = value;
 	}
