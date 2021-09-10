@@ -58,6 +58,7 @@ class TEXT_AREA extends ElementScript {
 		return this.value;
 	}
 	setValue(obj, value) {
+		value += "";
 		this.value = "";
 		for (let i = 0; i < value.length; i++) {
 			this.processKey(value[i]);
@@ -388,7 +389,6 @@ class TEXT_AREA extends ElementScript {
 		}
 
 		if (this.mouse.pressed("Left") && this.highlighting) {
-			console.log("scrolling");
 			const selection = this.select(this.getMousePosition(), "move");
 			if (selection && !selection.changed) {
 				const relativeMousePosition = obj.transform.globalSpaceToLocalSpace(this.getMousePosition());
