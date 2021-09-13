@@ -1,24 +1,15 @@
 class GPUComputation {
 	constructor(problems, glsl) {
-		this.problems = problems;
-		this.glsl = GLSLPrecompiler.compile(glsl)
-
-		{ // extract input/output sizes
-			const result = this.glsl.match(/int\s*\[\s*(\d+)\s*\]\s*compute\s*\(\s*int\s*\[\s*(\d+)\s*\]/);
-			const [_, outputs, inputs] = result.map(num => parseInt(num));
-			this.inputBytes = inputs;
-			this.outputBytes = outputs;
-			this.inputPixels = Math.ceil(this.inputBytes / 4);
-			this.outputPixels = Math.ceil(this.outputBytes / 4);
-			this.totalInputPixels = Math.ceil(this.inputBytes * problems / 4);
-		};
-
 		{ // build context
+			if (!Window.WebGL2RenderingContext) exit("GPUComputations are not supported");
+			
 			this.canvas = new_OffscreenCanvas(1, 1);
 			this.gl = this.canvas.getContext("webgl2", {
 				depth: false,
 				stencil: false
 			});
+			
+
 			this.hasContext = true;
 			this.canvas.addEventListener("webglcontextlost", event => {
 				event.preventDefault();
@@ -32,14 +23,39 @@ class GPUComputation {
 				this.compile();
 			});
 			this.MAX_TEXTURE_SIZE = this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE);
-
-			window.lc = this.gl.getExtension("WEBGL_lose_context");
-
 		};
+
+		this._problems = problems;
+		this._glsl = glsl;
 
 		this.compile();
 	}
+	set problems(a) {
+		this._problems = a;
+		this.compile();
+	}
+	get problems() {
+		return this._problems;
+	}
+	set glsl(a) {
+		this._glsl = a;
+		this.compile();
+	}
+	get glsl() {
+		return this._glsl;
+	}
 	compile() {
+		this._glsl = GLSLPrecompiler.compile(this.glsl);
+
+		{ // extract input/output sizes
+			const result = this.glsl.match(/int\s*\[\s*(\d+)\s*\]\s*compute\s*\(\s*int\s*\[\s*(\d+)\s*\]/);
+			const [_, outputs, inputs] = result.map(num => parseInt(num));
+			this.inputBytes = inputs;
+			this.outputBytes = outputs;
+			this.inputPixels = Math.ceil(this.inputBytes / 4);
+			this.outputPixels = Math.ceil(this.outputBytes / 4);
+			this.totalInputPixels = Math.ceil(this.inputBytes * this.problems / 4);
+		};
 
 		{ // program
 			const { gl } = this;
@@ -187,6 +203,11 @@ ${Array.dim(this.outputPixels)
 			outputBytes, outputTextureSize
 		} = this;
 
+		const { pointer } = input;
+		input.pointer = 0;
+		input.alloc(this.inputTexture.data.length);
+		input.pointer = pointer;
+
 		inputTexture.set(input.data);
 		gl.viewport(0, 0, outputTextureSize, outputTextureSize);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -207,6 +228,8 @@ ${Array.dim(this.outputPixels)
 				output.data[output.pointer++] = byte;
 			}
 		}
+
+		output.pointer = 0;
 
 		return output;
 	}

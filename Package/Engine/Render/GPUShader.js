@@ -1,26 +1,19 @@
 class GLSLPrecompiler {
 	static compile(glsl) {
 		// remove comments
+		glsl = glsl
+			.replace(/\/\/(.*?)(\n|$)/g, "$2") // single line
+			.replace(/\/\*((.|\n)*?)\*\//g, ""); // multiline
 
-		//single line
-		glsl = glsl.replace(/\/\/(.*?)(\n|$)/g, "$2");
-		
-		//multiline
-		glsl = glsl.replace(/\/\*((.|\n)*?)\*\//g, "");
+		return glsl;
+	}
+	compileVS(glsl) {
+		glsl = GLSLPrecompiler.compile(glsl);
 
-		// find and replace #defines
-		let preDefineMatches = [...glsl.matchAll(/#define (\w+) (.*?)(?:\n|$)/g)];
-
-		glsl = glsl.replace(/[\t ]*#define (\w+) (.*?)(?:\n|$)/g, "");
-
-		for (let i = 0; i < preDefineMatches.length; i++) {
-			let match = preDefineMatches[i];
-			let name = match[1];
-			let value = match[2];
-			let regex = new RegExp("\\b" + name + "\\b", "g");
-
-			glsl = glsl.replace(regex, value);
-		}
+		return glsl;
+	}
+	compileFS(glsl) {
+		glsl = GLSLPrecompiler.compile(glsl);
 
 		return glsl;
 	}
@@ -441,7 +434,6 @@ class GLSLProgram {
 class GPUShader extends ImageType {
 	constructor(width, height, glsl, pixelRatio = 1) {
 		super(width, height);
-		this.glsl = glsl;
 		this.shadeRects = [new Rect(0, 0, width, height)];
 		this.compiled = false;
 		this.image = new_OffscreenCanvas(width * pixelRatio, height * pixelRatio);
@@ -467,16 +459,14 @@ class GPUShader extends ImageType {
 		this.amountVertices = 4;
 		this.loaded = false;
 
+		this.glsl = glsl;
+	}
+	set glsl(a) {
+		this._glsl = a;
 		this.compile();
 	}
-	set compiled(a) {
-		this._compiled = a;
-	}
-	get compiled() {
-		if (!this._compiled) {
-			exit("Didn't compile GPUShader", this.compileState.error);
-			return null;
-		} return this._compiled;
+	get glsl() {
+		return this._glsl;
 	}
 	setShadeRects(rects) {
 		if (this.gl.isContextLost()) return;
@@ -571,7 +561,7 @@ class GPUShader extends ImageType {
 					position = vec2((vertexPosition.x + 1.0) * halfWidth, (1.0 - vertexPosition.y) * halfHeight);
 				}
 		`;
-		this.glsl = GLSLPrecompiler.compile(this.glsl);
+		this._glsl = GLSLPrecompiler.compile(this.glsl);
 
 		const prefix = `#version 300 es
 precision highp float;
@@ -614,7 +604,6 @@ void main() {
 
 		this.loaded = false;
 
-		this.compileState = { compiled: true };
 		return true;
 	}
 	argumentExists(arg) {

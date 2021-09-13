@@ -575,4 +575,4 @@ class FastFrame extends ImageType {
 	}
 }
 
-if (!window.WebGL2RenderingContext || new_OffscreenCanvas(1, 1).getContext("webgl", { failIfMajorPerformanceCaveat: true }) === null) FastFrame = Frame;
+if (!window.WebGLRenderingContext || new_OffscreenCanvas(1, 1).getContext("webgl", { failIfMajorPerformanceCaveat: true }) === null) FastFrame = Frame;

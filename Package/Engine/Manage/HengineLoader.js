@@ -381,6 +381,7 @@ HengineLoader.engineResources = [
 		"Math/PhysicsAPI",
 		"Math/Random",
 		"Math/Interpolation",
+		"Math/GPUComputation",
 		
 		"Render/Frame",
 		"Render/Gradient",
@@ -402,7 +403,6 @@ HengineLoader.engineResources = [
 		"Render/Color",
 		
 		"Math/Vector",
-		"Math/GPUComputation",
 		
 		"Render/Font",
 		"Render/Shapes",

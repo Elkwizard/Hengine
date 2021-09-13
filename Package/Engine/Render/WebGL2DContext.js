@@ -179,13 +179,42 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			glState.MAX_SPRITE_SHEETS = glState.MAX_TEXTURE_SLOTS * 30;
 			const TEXTURE_SLOT_PIXEL_SIZE = 1 / glState.TEXTURE_SLOT_SIZE;
 			const debugSlots = 0//glState.MAX_TEXTURE_SLOTS;
+			
+			const webgl2 = !!window.WebGL2RenderingContext;
+			const macros = `
+				#define rshift(a, b) ${webgl2 ? "(a >> b)" : "(a / int(pow(2.0, float(b))))"}
+				${webgl2 ? "#define and(a, b) (a & b)" : `
+				int and(int a, int b) {
+					int result = 0;
+					for (int i = 0; i < 23; i++) {
+						if (a == 0 && b == 0) return result;
+						float fA = mod(float(a), 2.0);
+						float fB = mod(float(b), 2.0);
+						a /= 2;
+						b /= 2;
+						result += int(pow(2.0, float(i)) * fA * fB);
+					}
+					return result;
+				}
+			`}
+				#define boolean(b) (and(iBooleans, b) != 0)
+			`;
+
+			const textureSelector = webgl2 ? `						switch (iTextureIndex) {
+${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
+   `							case ${i}: pixelColor = texture(textures[${i}], tuv); break;`
+).join("\n")}
+						}` : new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
+			`						${i ? "else " : ""}if (iTextureIndex == ${i}) pixelColor = texture(textures[${i}], tuv);`
+).join("\n");
+
 			const vs = `#version 300 es
 				precision highp float;
 				precision highp sampler2D;
 
 				uniform vec2 resolution;
 				
-				in float vertex;
+				in float vertexID;
 				in float vertexColor;
 				in float vertexAlpha;
 				in float vertexLineWidth;
@@ -208,11 +237,13 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				out vec2 textureCoordMax;
 				out float booleans;
 
-				#define boolean(b) ((iBooleans & b) != 0)
+				${macros}
 
 				void main() {
-					vertex;
-					vec2 vertexPosition = vec2(gl_VertexID % 2, gl_VertexID / 2); // generate vertices for square
+					vec2 vertexPosition = vec2(
+						mod(vertexID, 2.0),
+						floor(vertexID / 2.0)
+					); // generate vertices for square
 					mat3 transform = mat3(
 						vertexTransformRow1.x, vertexTransformRow2.x, 0.0,
 						vertexTransformRow1.y, vertexTransformRow2.y, 0.0,
@@ -226,7 +257,11 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 
 					gl_Position = vec4(position, 0.0, 1.0);
 					int iColor = int(vertexColor);
-					color = vec3(iColor >> 16, (iColor >> 8) & 255, iColor & 255) / 255.0;
+					color = vec3(
+						rshift(iColor, 16),
+						mod(float(rshift(iColor, 8)), 256.0),
+						mod(float(iColor), 256.0) 
+					) / 255.0;
 					alpha = vertexAlpha;
 
 					uv = vertexPosition;
@@ -254,7 +289,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				precision highp float;
 				precision highp sampler2D;
 
-				uniform sampler2D[${glState.MAX_TEXTURE_SLOTS}] textures;
+				uniform sampler2D textures[${glState.MAX_TEXTURE_SLOTS}];
 				uniform int renderPass;
 				
 				in vec2 uv;
@@ -272,8 +307,9 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				out vec4 finalColor;
 
 				#define SQRT_2 1.41421356237
-				#define boolean(b) ((iBooleans & b) != 0)
 				
+				${macros}
+
 				void main() {
 					int iBooleans = int(booleans);
 
@@ -316,8 +352,8 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 						if (d > SQRT_2 + px) discard;
 						antialias *= smoothstep(SQRT_2 + px, SQRT_2, d);
 					} else if (boolean(${BOOLS.LINE_SEGMENT})) {
-						int lineCap = (iBooleans >> ${LINE_CAP_START_BIT}) & ${0b11};
-						int lineJoin = (iBooleans >> ${LINE_JOIN_START_BIT}) & ${0b11};
+						int lineCap = and(rshift(iBooleans, ${LINE_CAP_START_BIT}), ${0b11});
+						int lineJoin = and(rshift(iBooleans, ${LINE_JOIN_START_BIT}), ${0b11});
 						
 						bool lineCapLeft = boolean(${BOOLS.LEFT_LINE_CAP});
 						bool lineCapRight = boolean(${BOOLS.RIGHT_LINE_CAP});
@@ -358,11 +394,8 @@ function defineWebGL2DContext(bound = {}, debug = false) {
  					if (boolean(${BOOLS.TEXTURED})) {
 						vec2 tuv = clamp(textureCoord, textureCoordMin, textureCoordMax);
 						if (boolean(${BOOLS.PIXELATED})) tuv = (floor(tuv / ${TEXTURE_SLOT_PIXEL_SIZE.toFixed(10)}) + 0.5) * ${TEXTURE_SLOT_PIXEL_SIZE.toFixed(10)};
- 						switch (int(textureIndex)) {
-${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
-				`							case ${i}: pixelColor = texture(textures[${i}], tuv); break;`
-			).join("\n")}
- 						}
+ 						int iTextureIndex = int(textureIndex);
+${textureSelector}
  					} else {
 ${new Array(debugSlots).fill(0).map((_, i) =>
 				`						{
@@ -399,9 +432,9 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			const vLog = gl.getShaderInfoLog(vShader);
 			const fLog = gl.getShaderInfoLog(fShader);
 			const pLog = gl.getProgramInfoLog(glState.program);
-			if (vLog) console.log("vertex error: " + vLog);
-			if (fLog) console.log("fragment error: " + fLog);
-			if (pLog) console.log("linking error: " + pLog);
+			if (vLog) console.log("vertex error: \n" + vLog);
+			if (fLog) console.log("fragment error: \n" + fLog);
+			if (pLog) console.log("linking error: \n" + pLog);
 
 			if (!pLog) gl.useProgram(glState.program);
 		};
@@ -484,7 +517,7 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 				this.changed = true;
 			}
 
-			const position = attribute("vertex", 1, false, putSize1, new Float32Array([0, 0, 0, 0]));
+			const position = attribute("vertexID", 1, false, putSize1, new Float32Array([0, 1, 2, 3]));
 			glState.vertexCount = position.data.length / position.size;
 
 			const color = attribute("vertexColor", 1, true, putSize1);

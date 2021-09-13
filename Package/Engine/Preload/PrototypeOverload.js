@@ -64,6 +64,68 @@ Object.defineProperty(window, "title", {
 		}
 	]);
 
+	{ // webgl
+		function overrideGetContext(CanvasType) {
+			const defaultGetContext = CanvasType.prototype.getContext;
+
+			const defaultCreateShader = WebGLRenderingContext.prototype.createShader;
+			const defaultShaderSource = WebGLRenderingContext.prototype.shaderSource;
+
+			proto(CanvasType.prototype, "getContext", function (name, options) {
+				if (name === "webgl2" && !window.WebGL2RenderingContext) {
+					const context = defaultGetContext.call(this, "webgl", options);
+
+					// instancing
+					const instancing = context.getExtension("ANGLE_instanced_arrays");
+					proto(context, "vertexAttribDivisor", instancing.vertexAttribDivisorANGLE.bind(instancing));
+					proto(context, "drawArraysInstanced", instancing.drawArraysInstancedANGLE.bind(instancing));
+					proto(context, "drawElementsInstanced", instancing.drawElementsInstancedANGLE.bind(instancing));
+
+					// shader transpilation
+					proto(context, "createShader", function (type) {
+						const shader = defaultCreateShader.call(this, type);
+						shader.__type = type;
+						return shader;
+					});
+					proto(context, "shaderSource", function (shader, source) {
+						const { __type } = shader;
+
+						source = source
+							.replace(/\/\/(.*?)(\n|$)/g, "$2") // single line comments
+							.replace(/\/\*((.|\n)*?)\*\//g, "") // multiline comments
+							.replace(/\#version 300 es/g, "")
+							.replace(/\btexture\b/g, "texture2D");
+
+						if (__type === context.VERTEX_SHADER) { // vs
+							source = source
+								.replace(/\bin\b/g, "attribute")
+								.replace(/\bout\b/g, "varying");
+						} else { // fs
+							source = source.replace(/\bin\b/g, "varying");
+
+							const outRegex = /\bout\b(?:\s*\w+)*\s*(\w+);/g;
+							const outputName = source
+								.match(outRegex)[0]
+								.split(" ").last
+								.slice(0, -1);
+
+							const outputNameRegex = new RegExp(String.raw`\b${outputName}\b`, "g");
+							source = source
+								.replace(outRegex, "")
+								.replace(outputNameRegex, "gl_FragColor");
+						}
+
+						return defaultShaderSource.call(this, shader, source);
+					});
+
+					return context;
+				} else return defaultGetContext.call(this, name, options);
+			});
+		}
+		overrideGetContext(HTMLCanvasElement);
+		if (window.OffscreenCanvas) overrideGetContext(OffscreenCanvas);
+	}
+
 
 	//Function
 	proto(Function.prototype, "param", function (...args) {
