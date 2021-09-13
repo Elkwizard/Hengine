@@ -8,12 +8,12 @@ window.__devicePixelRatio = devicePixelRatio;
 
 Object.defineProperty(window, "title", {
 	get() {
-		let tag = document.getElementsByTagName("title")[0];
+		const tag = document.querySelector("title");
 		if (!tag) return "";
 		return tag.innerText;
 	},
 	set(a) {
-		let tag = document.getElementsByTagName("title")[0];
+		let tag = document.querySelector("title");
 		if (!tag) {
 			tag = document.createElement("title");
 			document.head.appendChild(tag);
