@@ -18,7 +18,7 @@ class TEXT_AREA extends ElementScript {
 		this.selectionEnd = 0;
 
 		this.padding = paddingEM * this.font.size;
-		this.scrollBarSize = 20;
+		this.scrollBarSize = 15;
 		this.scrollSpeed = 20;
 		this.scrollOffset = Vector2.origin;
 		this.updateTextBoundingBox();
@@ -58,6 +58,7 @@ class TEXT_AREA extends ElementScript {
 		return this.value;
 	}
 	setValue(obj, value) {
+		value += "";
 		this.value = "";
 		for (let i = 0; i < value.length; i++) {
 			this.processKey(value[i]);
@@ -67,7 +68,6 @@ class TEXT_AREA extends ElementScript {
 	}
 	blurOthers(obj) {
 		const elements = obj.engine.scene.main.getElementsWithScript(TEXT_AREA);
-
 		for (let i = 0; i < elements.length; i++) elements[i].scripts.TEXT_AREA.blur();
 	}
 	focus(obj) {
@@ -87,23 +87,29 @@ class TEXT_AREA extends ElementScript {
 		this.selectionEnd = max;
 	}
 	getCharacterIndex(obj, p) {
-		let index = 0;
 		let hitboxGroups = this.value.split("\n");
-		hitboxGroups[0] = { array: hitboxGroups[0], startInx: 0 };
-		for (let i = 1; i < hitboxGroups.length; i++) {
-			hitboxGroups[i] = { array: hitboxGroups[i], startInx: hitboxGroups[i - 1].startInx + hitboxGroups[i - 1].array.length + 1 };
-		}
+		hitboxGroups[0] = {
+			array: hitboxGroups[0],
+			startInx: 0
+		};
+		for (let i = 1; i < hitboxGroups.length; i++)
+			hitboxGroups[i] = {
+				array: hitboxGroups[i],
+				startInx: hitboxGroups[i - 1].startInx + hitboxGroups[i - 1].array.length + 1
+			};
 
-		let yRow = Math.floor((p.y - this.relativeTextViewBox.y) / this.font.lineHeight);
+			
+		let index = 0;
+		const yRow = Math.floor((p.y - this.relativeTextViewBox.y) / this.font.lineHeight);
 		if (yRow >= hitboxGroups.length) index = this.value.length;
 		else if (yRow >= 0) {
 			let { startInx, array } = hitboxGroups[yRow];
 			array = array.split("").map((char, i) => this.getCharacterHitbox(i + startInx));
-			index = (p.x - this.relativeTextViewBox.x < 0) ? startInx : startInx + array.length;
+			index = (p.x < this.relativeTextViewBox.x) ? startInx : startInx + array.length;
 			for (let i = 0; i < array.length; i++) {
-				let rect = array[i];
+				const rect = array[i];
 				if (Geometry.pointInsideRect(p, rect)) {
-					let rx = (p.x - rect.x) / rect.width;
+					const rx = (p.x - rect.x) / rect.width;
 					return startInx + i + Math.round(rx);
 				}
 			}
@@ -133,7 +139,6 @@ class TEXT_AREA extends ElementScript {
 		return pos;
 	}
 	processKey(obj, key) {
-		if (key === "\n" && !this.multiline) return;
 		//adding characters
 		let modified = true;
 
@@ -166,10 +171,11 @@ class TEXT_AREA extends ElementScript {
 				} else {
 					if (copy || cut) this.clipboard.write(this.value.slice(start, end));
 					if (!copy) {
-						if (paste) {
-							newChar = this.clipboard.read();
-						}
+						if (paste) newChar = this.clipboard.read();
 						if (cut) newChar = "";
+
+						newChar = this.multiline ? newChar : newChar.replace(/[\n\r]/g, ""); // sanitize (remove line breaks in single line TEXT_AREAs)
+
 						let listValue = this.value.split("");
 						listValue.splice(start, end - start, newChar);
 						this.value = listValue.join("");
@@ -259,14 +265,21 @@ class TEXT_AREA extends ElementScript {
 		return modified;
 	}
 	clampScrollOffset(obj) {
-		this.scrollOffset = Vector2.clamp(this.scrollOffset, Vector2.origin, this.relativeTextBoundingBox.max.minus(this.relativeTextViewBox.max));
+		this.scrollOffset = Vector2.clamp(
+			this.scrollOffset,
+			Vector2.origin,
+			this.relativeTextBoundingBox.max.minus(this.relativeTextViewBox.max)
+		);
+	}
+	getDimensions(obj) {
+		return obj.defaultShape.getBoundingBox();
 	}
 	updateTextBoundingBox(obj) {
-		let { width, height } = obj;
-		let relativeTextViewBox = new Rect(-width / 2 + this.padding, -height / 2 + this.padding, width - this.padding - this.scrollBarSize, height - this.padding - this.scrollBarSize);
-		let relativeTextBoundingBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, this.font.getTextWidth(this.value), this.font.getTextHeight(this.value));
-		let rightOffset = (this.multiline && relativeTextViewBox.height < relativeTextBoundingBox.height) ? this.scrollBarSize : 0;
-		let bottomOffset = (this.multiline && relativeTextViewBox.width < relativeTextBoundingBox.width) ? this.scrollBarSize : 0;
+		const { width, height } = this.getDimensions();
+		const relativeTextViewBox = new Rect(-width / 2 + this.padding, -height / 2 + this.padding, width - this.padding - this.scrollBarSize, height - this.padding - this.scrollBarSize);
+		const relativeTextBoundingBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, this.font.getTextWidth(this.value), this.font.getTextHeight(this.value));
+		const rightOffset = (this.multiline && relativeTextViewBox.height < relativeTextBoundingBox.height) ? this.scrollBarSize : 0;
+		const bottomOffset = (this.multiline && relativeTextViewBox.width < relativeTextBoundingBox.width) ? this.scrollBarSize : 0;
 		this.relativeTextViewBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, width - this.padding * 2 - rightOffset, height - this.padding * 2 - bottomOffset);
 		this.relativeTextBoundingBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, this.font.getTextWidth(this.value) + this.renderTextOffset.x, this.font.getTextHeight(this.value) + this.renderTextOffset.y);
 		this.clampScrollOffset();
@@ -276,18 +289,16 @@ class TEXT_AREA extends ElementScript {
 		this.focused = true;
 		this.keyTimer = 0;
 		let lp = obj.transform.globalSpaceToLocalSpace(p);
-		let rtvb = this.relativeTextViewBox;
-		let textAreaHitbox = (type === "start") ?
+		const rtvb = this.relativeTextViewBox;
+		const textAreaHitbox = (type === "start") ?
 			rtvb :
 			new Rect(rtvb.x - this.padding, rtvb.y - this.padding, rtvb.width + this.padding * 2, rtvb.height + this.padding * 2);
 		if (Geometry.pointInsideRect(lp, textAreaHitbox) || type === "move") {
-			if (type === "move") {
-				lp.x = Number.clamp(lp.x, textAreaHitbox.x, textAreaHitbox.x + textAreaHitbox.width);
-				lp.y = Number.clamp(lp.y, textAreaHitbox.y, textAreaHitbox.y + textAreaHitbox.height);
-			}
-			let inx = this.getCharacterIndex(lp.plus(this.scrollOffset).minus(this.renderTextOffset));
-			let preStart = this.selectionStart;
-			let preEnd = this.selectionEnd;
+			if (type === "move")
+				lp = Vector2.clamp(lp, textAreaHitbox.min, textAreaHitbox.max);
+			const inx = this.getCharacterIndex(lp.plus(this.scrollOffset).minus(this.renderTextOffset));
+			const preStart = this.selectionStart;
+			const preEnd = this.selectionEnd;
 			if (type === "start") this.selectionStart = this.selectionEnd = inx;
 			else this.selectionEnd = inx;
 			this.updateTextBoundingBox();
@@ -320,7 +331,7 @@ class TEXT_AREA extends ElementScript {
 		return this.keyboard.pressed("Shift") || this.highlighting;
 	}
 	getMousePosition(obj) {
-		return (obj instanceof UIObject) ? mouse.screen : mouse.world;
+		return (obj instanceof UIObject) ? this.mouse.screen : this.mouse.world;
 	}
 	getSelectableSegments(obj) {
 		const segments = [];
@@ -345,13 +356,22 @@ class TEXT_AREA extends ElementScript {
 
 		return segments;
 	}
+	adjustCursor(obj) {
+		const { anyTextAreaHovered } = TEXT_AREA;
+		if (!anyTextAreaHovered && this.canvas.cursor === "text") this.canvas.cursor = "default";
+		if (anyTextAreaHovered) this.canvas.cursor = "text";
+	}
 	beforeUpdate(obj) {
 		TEXT_AREA.anyTextAreaHovered = false;
 	}
 	afterUpdate(obj) {
-		const { anyTextAreaHovered } = TEXT_AREA;
-		if (!anyTextAreaHovered && this.canvas.cursor === "text") this.canvas.cursor = "default";
-		if (anyTextAreaHovered) this.canvas.cursor = "text";
+		this.adjustCursor();
+	}
+	cleanUp() {
+		this.adjustCursor();
+	}
+	deactivate() {
+		this.adjustCursor();
 	}
 	update(obj) {
 		let inTextArea = Geometry.pointInsideRect(obj.transform.globalSpaceToLocalSpace(this.getMousePosition()), this.relativeTextViewBox);
@@ -370,18 +390,17 @@ class TEXT_AREA extends ElementScript {
 
 		if (this.mouse.pressed("Left") && this.highlighting) {
 			const selection = this.select(this.getMousePosition(), "move");
-			if (selection && selection.changed) {
-				let relativeMousePosition = obj.transform.globalSpaceToLocalSpace(this.getMousePosition());
-				if (relativeMousePosition.x > this.relativeTextViewBox.max.x) this.scrollOffset.x += this.scrollSpeed / 4;
-				if (relativeMousePosition.y > this.relativeTextViewBox.max.y) this.scrollOffset.y += this.scrollSpeed / 4;
-				if (relativeMousePosition.x < this.relativeTextViewBox.min.x) this.scrollOffset.x -= this.scrollSpeed / 4;
-				if (relativeMousePosition.y < this.relativeTextViewBox.min.y) this.scrollOffset.y -= this.scrollSpeed / 4;
+			if (selection && !selection.changed) {
+				const relativeMousePosition = obj.transform.globalSpaceToLocalSpace(this.getMousePosition());
+				if (relativeMousePosition.x > this.relativeTextViewBox.max.x) this.scrollOffset.x += this.scrollSpeed;
+				if (relativeMousePosition.y > this.relativeTextViewBox.max.y) this.scrollOffset.y += this.scrollSpeed;
+				if (relativeMousePosition.x < this.relativeTextViewBox.min.x) this.scrollOffset.x -= this.scrollSpeed;
+				if (relativeMousePosition.y < this.relativeTextViewBox.min.y) this.scrollOffset.y -= this.scrollSpeed;
 			}
 		}
 		if (this.mouse.released("Left")) this.highlighting = false;
 
 		if (doubleClick && this.selectionEnd === lastSelection) {
-
 			const segments = this.getSelectableSegments();
 			let index = 0;
 			for (let i = 0; i < segments.length; i++) {
@@ -507,20 +526,19 @@ class TEXT_AREA extends ElementScript {
 		this.renderer.unclip();
 
 
-		//X Bar Values
-		let xFullSize = this.relativeTextBoundingBox.width;
-		let xViewSize = this.relativeTextViewBox.width;
-		let xRatio = xViewSize / xFullSize;
+		// x bar Values
+		const xFullSize = this.relativeTextBoundingBox.width;
+		const xViewSize = this.relativeTextViewBox.width;
+		const xRatio = xViewSize / xFullSize;
 
 
-		// Y Bar Values
-		let yFullSize = this.relativeTextBoundingBox.height;
-		let yViewSize = this.relativeTextViewBox.height;
-		let yRatio = yViewSize / yFullSize;
-		let { width, height } = obj;
-
-		//fullDims
-
+		// y bar Values
+		const yFullSize = this.relativeTextBoundingBox.height;
+		const yViewSize = this.relativeTextViewBox.height;
+		const yRatio = yViewSize / yFullSize;
+		
+		// full dimensions
+		const { width, height } = this.getDimensions();
 		let fullScrollWidth = width - this.scrollBarSize;
 		let fullScrollHeight = height - this.scrollBarSize;
 
