@@ -70,7 +70,7 @@ Object.defineProperty(window, "title", {
 
 			proto(CanvasType.prototype, "getContext", function (name, options) {
 				if (name === "webgl2" && !window.WebGL2RenderingContext) {
-					const context = getContext.call(this, "webgl", options);
+					const context = getContext.call(this, "webgl", options) ?? getContext.call(this, "experimental-webgl", options);
 
 					// instancing
 					const instancing = context.getExtension("ANGLE_instanced_arrays");
