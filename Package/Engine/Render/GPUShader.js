@@ -18,25 +18,32 @@ class GLSLPrecompiler {
 		return glsl;
 	}
 }
-class GLSLError {
-	constructor(rawString, prefixLength) {
-		const string = rawString.cut(":")[1];
-		let [lineStr, descStr] = string.cut(":");
-		lineStr = lineStr.trim();
-		this.line = parseInt(lineStr) - prefixLength;
-		this.desc = descStr.trim();
-		if (isNaN(this.line)) {
-			this.line = 0;
-			this.desc = rawString;
-		}
+class GLSLError extends Error {
+	constructor(line, desc) {
+		super(`${desc}\n\tat shaderSource.glsl:${line}`);
+		this.name = "GLSLError";
+
 	}
 	toString() {
 		return `line ${this.line}: ${this.desc}`;
 	}
-	static format(string, prefixLength) {
+	static process(string, prefixLength) {
 		let errors = string.split("ERROR: ");
 		errors.shift();
-		return errors.map(string => new GLSLError(string, prefixLength));
+		for (let i = 0; i < errors.length; i++) {
+			 // parse
+			const rawString = errors[i];
+			const string = rawString.cut(":")[1];
+			let [lineStr, descStr] = string.cut(":");
+			lineStr = lineStr.trim();
+			let line = parseInt(lineStr) - prefixLength;
+			let desc = descStr.trim();
+			if (isNaN(line)) {
+				line = 0;
+				desc = rawString;
+			}
+			throw new GLSLError(line, desc);
+		}
 	}
 }
 class GLSLProgram {
@@ -586,10 +593,8 @@ void main() {
 
 		//shader programs
 		this.program = new GLSLProgram(gl, vertexSource, pixelSource, (type, message) => {
-			if (type === "FRAGMENT_SHADER") {
-				const errors = GLSLError.format(message, prefixLength);
-				exit("Compilation Error", errors);
-			} else console.warn(message);
+			if (type === "FRAGMENT_SHADER") GLSLError.process(message, prefixLength);
+			else console.warn(message);
 		});
 		this.program.use();
 

@@ -128,10 +128,8 @@ ${Array.dim(this.outputPixels)
 			`;
 
 			this.program = new GLSLProgram(gl, this.vertexShaderSource, this.fragmentShaderSource, (type, message) => {
-				if (type === "FRAGMENT_SHADER") {
-					const errors = GLSLError.format(message, prefixLength);
-					console.warn("Compilation Error", errors);
-				}
+				if (type === "FRAGMENT_SHADER") GLSLError.process(message, prefixLength);
+				else console.warn(message);
 			});
 
 			this.program.use();

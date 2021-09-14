@@ -87,7 +87,6 @@ vec4 shader() {
 		renderer.textMode = TextMode.BOTTOM_LEFT;
 		renderer.draw(Color.RED).textLine(Font.Monospace40, hengine.intervals.fps, 10, height - 10);
 		renderer.textMode = TextMode.TOP_LEFT;
-		if (shader.compileState.error) renderer.draw(Color.RED).text(Font.Monospace30, shader.compileState.error.map(e => e.toString()).join("\n\n"), 10, 10, shader.width - 20);
 	}, IntervalFunction.UPDATE);
 </script>
 
