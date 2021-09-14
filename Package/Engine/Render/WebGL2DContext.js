@@ -432,9 +432,9 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			const vLog = gl.getShaderInfoLog(vShader);
 			const fLog = gl.getShaderInfoLog(fShader);
 			const pLog = gl.getProgramInfoLog(glState.program);
-			if (vLog) console.log("vertex error: \n" + vLog);
-			if (fLog) console.log("fragment error: \n" + fLog);
-			if (pLog) console.log("linking error: \n" + pLog);
+			if (vLog) console.log(`vertex error: \n${vLog}`);
+			if (fLog) console.log(`fragment error: \n${fLog}`);
+			if (pLog) console.log(`linking error(${pLog.length}): \n${pLog}`);
 
 			if (!pLog) gl.useProgram(glState.program);
 		};
