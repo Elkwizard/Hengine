@@ -1,7 +1,7 @@
 class GPUComputation {
 	constructor(problems, glsl) {
 		{ // build context
-			if (!Window.WebGL2RenderingContext) exit("GPUComputations are not supported");
+			if (!Window.WebGL2RenderingContext) throw new GLSLError(1, "GPUComputations are not supported");
 			
 			this.canvas = new_OffscreenCanvas(1, 1);
 			this.gl = this.canvas.getContext("webgl2", {
