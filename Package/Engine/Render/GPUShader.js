@@ -440,7 +440,7 @@ class GLSLProgram {
 }
 class GPUShader extends ImageType {
 	constructor(width, height, glsl, pixelRatio = 1) {
-		super(width, height);
+		super(width, height, pixelRatio);
 		this.shadeRects = [new Rect(0, 0, width, height)];
 		this.compiled = false;
 		this.image = new_OffscreenCanvas(width * pixelRatio, height * pixelRatio);
@@ -532,8 +532,6 @@ class GPUShader extends ImageType {
 		height = Math.max(1, Math.abs(Math.ceil(height)));
 		this.image.width = width * this.pixelRatio;
 		this.image.height = height * this.pixelRatio;
-		this.width = width;
-		this.height = height;
 		this.updateResolutionUniforms();
 		this.loaded = false;
 	}

@@ -530,7 +530,7 @@ class WebGLArtist {
 
 class FastFrame extends ImageType {
 	constructor(width, height, pixelRatio = __devicePixelRatio) {
-		super(width, height);
+		super(width, height, pixelRatio);
 		this.image = new_OffscreenCanvas(this.width * pixelRatio, this.height * pixelRatio);
 		this.renderer = new WebGLArtist(this.image, this.width, this.height, this, pixelRatio);
 	}
