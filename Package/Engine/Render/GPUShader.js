@@ -22,6 +22,8 @@ class GLSLError extends Error {
 	constructor(line, desc) {
 		super(`${desc}\n\tat shaderSource.glsl:${line}`);
 		this.name = "GLSLError";
+		this.line = line;
+		this.desc = desc;
 
 	}
 	toString() {
