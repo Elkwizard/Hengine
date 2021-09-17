@@ -244,6 +244,7 @@ ${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
 						mod(vertexID, 2.0),
 						floor(vertexID / 2.0)
 					); // generate vertices for square
+
 					mat3 transform = mat3(
 						vertexTransformRow1.x, vertexTransformRow2.x, 0.0,
 						vertexTransformRow1.y, vertexTransformRow2.y, 0.0,
@@ -260,7 +261,7 @@ ${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
 					color = vec3(
 						rshift(iColor, 16),
 						mod(float(rshift(iColor, 8)), 256.0),
-						mod(float(iColor), 256.0) 
+						mod(float(iColor), 256.0)
 					) / 255.0;
 					alpha = vertexAlpha;
 
