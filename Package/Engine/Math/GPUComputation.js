@@ -1,7 +1,7 @@
 class GPUComputation {
 	constructor(problems, glsl) {
 		{ // build context
-			if (!Window.WebGL2RenderingContext) exit("GPUComputations are not supported");
+			if (!window.WebGL2RenderingContext) throw new GLSLError(1, "GPUComputations are not supported");
 			
 			this.canvas = new_OffscreenCanvas(1, 1);
 			this.gl = this.canvas.getContext("webgl2", {
@@ -128,10 +128,8 @@ ${Array.dim(this.outputPixels)
 			`;
 
 			this.program = new GLSLProgram(gl, this.vertexShaderSource, this.fragmentShaderSource, (type, message) => {
-				if (type === "FRAGMENT_SHADER") {
-					const errors = GLSLError.format(message, prefixLength);
-					console.warn("Compilation Error", errors);
-				}
+				if (type === "FRAGMENT_SHADER") GLSLError.process(message, prefixLength);
+				else console.warn(message);
 			});
 
 			this.program.use();

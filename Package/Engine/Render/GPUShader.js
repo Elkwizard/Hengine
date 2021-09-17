@@ -18,25 +18,34 @@ class GLSLPrecompiler {
 		return glsl;
 	}
 }
-class GLSLError {
-	constructor(rawString, prefixLength) {
-		const string = rawString.cut(":")[1];
-		let [lineStr, descStr] = string.cut(":");
-		lineStr = lineStr.trim();
-		this.line = parseInt(lineStr) - prefixLength;
-		this.desc = descStr.trim();
-		if (isNaN(this.line)) {
-			this.line = 0;
-			this.desc = rawString;
-		}
+class GLSLError extends Error {
+	constructor(line, desc) {
+		super(`${desc}\n\tat shaderSource.glsl:${line}`);
+		this.name = "GLSLError";
+		this.line = line;
+		this.desc = desc;
+
 	}
 	toString() {
 		return `line ${this.line}: ${this.desc}`;
 	}
-	static format(string, prefixLength) {
+	static process(string, prefixLength) {
 		let errors = string.split("ERROR: ");
 		errors.shift();
-		return errors.map(string => new GLSLError(string, prefixLength));
+		for (let i = 0; i < errors.length; i++) {
+			 // parse
+			const rawString = errors[i];
+			const string = rawString.cut(":")[1];
+			let [lineStr, descStr] = string.cut(":");
+			lineStr = lineStr.trim();
+			let line = parseInt(lineStr) - prefixLength;
+			let desc = descStr.trim();
+			if (isNaN(line)) {
+				line = 0;
+				desc = rawString;
+			}
+			throw new GLSLError(line, desc);
+		}
 	}
 }
 class GLSLProgram {
@@ -433,7 +442,7 @@ class GLSLProgram {
 }
 class GPUShader extends ImageType {
 	constructor(width, height, glsl, pixelRatio = 1) {
-		super(width, height);
+		super(width, height, pixelRatio);
 		this.shadeRects = [new Rect(0, 0, width, height)];
 		this.compiled = false;
 		this.image = new_OffscreenCanvas(width * pixelRatio, height * pixelRatio);
@@ -525,8 +534,6 @@ class GPUShader extends ImageType {
 		height = Math.max(1, Math.abs(Math.ceil(height)));
 		this.image.width = width * this.pixelRatio;
 		this.image.height = height * this.pixelRatio;
-		this.width = width;
-		this.height = height;
 		this.updateResolutionUniforms();
 		this.loaded = false;
 	}
@@ -586,10 +593,8 @@ void main() {
 
 		//shader programs
 		this.program = new GLSLProgram(gl, vertexSource, pixelSource, (type, message) => {
-			if (type === "FRAGMENT_SHADER") {
-				const errors = GLSLError.format(message, prefixLength);
-				exit("Compilation Error", errors);
-			} else console.warn(message);
+			if (type === "FRAGMENT_SHADER") GLSLError.process(message, prefixLength);
+			else console.warn(message);
 		});
 		this.program.use();
 

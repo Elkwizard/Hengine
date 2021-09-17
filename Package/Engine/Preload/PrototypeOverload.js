@@ -66,14 +66,11 @@ Object.defineProperty(window, "title", {
 
 	{ // webgl
 		function overrideGetContext(CanvasType) {
-			const defaultGetContext = CanvasType.prototype.getContext;
-
-			const defaultCreateShader = WebGLRenderingContext.prototype.createShader;
-			const defaultShaderSource = WebGLRenderingContext.prototype.shaderSource;
+			const { getContext } = CanvasType.prototype;
 
 			proto(CanvasType.prototype, "getContext", function (name, options) {
 				if (name === "webgl2" && !window.WebGL2RenderingContext) {
-					const context = defaultGetContext.call(this, "webgl", options);
+					const context = getContext.call(this, "webgl", options) ?? getContext.call(this, "experimental-webgl", options);
 
 					// instancing
 					const instancing = context.getExtension("ANGLE_instanced_arrays");
@@ -82,8 +79,9 @@ Object.defineProperty(window, "title", {
 					proto(context, "drawElementsInstanced", instancing.drawElementsInstancedANGLE.bind(instancing));
 
 					// shader transpilation
+					const { createShader, shaderSource } = WebGLRenderingContext.prototype;
 					proto(context, "createShader", function (type) {
-						const shader = defaultCreateShader.call(this, type);
+						const shader = createShader.call(this, type);
 						shader.__type = type;
 						return shader;
 					});
@@ -115,11 +113,11 @@ Object.defineProperty(window, "title", {
 								.replace(outputNameRegex, "gl_FragColor");
 						}
 
-						return defaultShaderSource.call(this, shader, source);
+						return shaderSource.call(this, shader, source);
 					});
 
 					return context;
-				} else return defaultGetContext.call(this, name, options);
+				} else return getContext.call(this, name, options);
 			});
 		}
 		overrideGetContext(HTMLCanvasElement);

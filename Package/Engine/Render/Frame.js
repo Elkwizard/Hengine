@@ -25,10 +25,16 @@ function new_OffscreenCanvas(width, height) {
 }
 
 class ImageType {
-	constructor(width = 1, height = 1) {
+	constructor(width = 1, height = 1, pixelRatio = null) {
 		this._width = Math.max(1, Math.ceil(width));
 		this._height = Math.max(1, Math.ceil(height));
 		this.loaded = true;
+		if (pixelRatio !== null) {
+			delete this.pixelRatio;
+			Object.defineProperty(this, "pixelRatio", {
+				get: () => pixelRatio
+			});
+		}
 	}
 	set width(a) {
 		const prev = this._width;
@@ -102,7 +108,7 @@ class HImage extends ImageType {
 }
 class Frame extends ImageType {
 	constructor(width, height, pixelRatio = __devicePixelRatio) {
-		super(width, height);
+		super(width, height, pixelRatio);
 		this.image = new_OffscreenCanvas(this.width * pixelRatio, this.height * pixelRatio);
 		this.renderer = new Artist(this.image, this.width, this.height, this, pixelRatio);
 	}

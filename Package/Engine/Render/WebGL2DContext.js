@@ -430,14 +430,10 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			gl.deleteShader(vShader);
 			gl.deleteShader(fShader);
 
-			const vLog = gl.getShaderInfoLog(vShader);
-			const fLog = gl.getShaderInfoLog(fShader);
-			const pLog = gl.getProgramInfoLog(glState.program);
-			if (vLog) console.log("vertex error: \n" + vLog);
-			if (fLog) console.log("fragment error: \n" + fLog);
-			if (pLog) console.log("linking error: \n" + pLog);
-
-			if (!pLog) gl.useProgram(glState.program);
+			if (!gl.getShaderParameter(vShader, gl.COMPILE_STATUS)) console.log(`vertex error: \n${gl.getShaderInfoLog(vShader)}`);
+			if (!gl.getShaderParameter(fShader, gl.COMPILE_STATUS)) console.log(`fragment error: \n${gl.getShaderInfoLog(fShader)}`);
+			if (!gl.getProgramParameter(glState.program, gl.LINK_STATUS)) console.log(`linking error: \n${gl.getShaderInfoLog(glState.program)}`);
+			else gl.useProgram(glState.program);
 		};
 		{ // uniforms
 			for (const name of ["resolution", "textures", "renderPass"]) uniforms[name] = gl.getUniformLocation(glState.program, name);
