@@ -528,10 +528,12 @@ class GPUShader extends ImageType {
 		gl.viewport(0, 0, this.image.width, this.image.height);
 	}
 	resize(width, height) {
+		width *= this.pixelRatio;
+		height *= this.pixelRatio;
 		width = Math.max(1, Math.abs(Math.ceil(width)));
 		height = Math.max(1, Math.abs(Math.ceil(height)));
-		this.image.width = width * this.pixelRatio;
-		this.image.height = height * this.pixelRatio;
+		this.image.width = width;
+		this.image.height = height;
 		this.updateResolutionUniforms();
 		this.loaded = false;
 	}
@@ -597,8 +599,8 @@ void main() {
 		this.program.use();
 
 		gl.clearColor(0, 0, 0, 0);
-		gl.enable(gl.BLEND);
-		gl.blendFunc(gl.ONE, gl.ZERO);
+		// gl.enable(gl.BLEND);
+		// gl.blendFunc(gl.ONE, gl.ZERO);
 
 		this.compiled = true;
 
