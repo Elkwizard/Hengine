@@ -181,6 +181,7 @@ class GLSLProgram {
 						const indices = new Int32Array(length).map((_, index) => index + textureUnit);
 						if (array) gl[setFunctionName](location, indices);
 						else gl[setFunctionName](location, indices[0]);
+						
 						for (let i = 0; i < length; i++) {
 							const texture = gl.createTexture();
 							const textureIndex = indices[i];
@@ -192,11 +193,12 @@ class GLSLProgram {
 							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 						}
+
 						let pixelated = false;
 						function writeImage(image, index = 0) {
 							if (index >= length) return;
 							const imagePixelated = image instanceof Texture;
-							const imageCIS = imagePixelated ? image.updateImageData() : image.makeImage();
+							const imageCIS = imagePixelated ? image.imageData : image.makeImage();
 							GL.activeTexture(gl.TEXTURE0 + indices[index]);
 							if (imagePixelated !== pixelated) {
 								pixelated = imagePixelated;
@@ -262,10 +264,6 @@ class GLSLProgram {
 		};
 
 		gl.useProgram(originalProgram);
-	}
-	gl_dot(method, ...args) {
-		if (this.gl.isContextLost()) this.queuedCalls.push({ method, args });
-		else this.gl[method](...args);
 	}
 	error(type, error) {
 		this.onerror(type, error);
@@ -447,14 +445,17 @@ class GPUShader extends ImageType {
 		this.compiled = false;
 		this.image = new_OffscreenCanvas(width * pixelRatio, height * pixelRatio);
 		this.gl = this.image.getContext("webgl2");
-		if (this.gl === null) return console.warn("Your browser doesn't support WebGL.");
+		if (this.gl === null) throw new ReferenceError("Your browser doesn't support WebGL");
+		this.hasContext = true;
 		this.image.addEventListener("webglcontextlost", event => {
 			event.preventDefault();
 			console.warn("WebGL Context Lost");
+			this.hasContext = false;
 		});
 		this.image.addEventListener("webglcontextrestored", event => {
 			event.preventDefault();
 			console.warn("WebGL Context Restored");
+			this.hasContext = true;
 			this.compile();
 			this.setShadeRects(this.shadeRects);
 			this.setArguments(this.args);
@@ -478,7 +479,7 @@ class GPUShader extends ImageType {
 		return this._glsl;
 	}
 	setShadeRects(rects) {
-		if (this.gl.isContextLost()) return;
+		if (!this.hasContext) return;
 
 		this.shadeRects = rects;
 		let a = Vector2.origin;
@@ -509,7 +510,7 @@ class GPUShader extends ImageType {
 		this.loaded = false;
 	}
 	updatePositionBuffer() {
-		if (this.gl.isContextLost()) return;
+		if (!this.hasContext) return;
 
 		const { gl, program } = this;
 		const positionBuffer = gl.createBuffer();
@@ -520,8 +521,7 @@ class GPUShader extends ImageType {
 		program.setAttributes(positionBuffer);
 	}
 	updateResolutionUniforms() {
-		if (!this.compiled) return;
-		if (this.gl.isContextLost()) return;
+		if (!this.hasContext) return;
 
 		const { gl, program } = this;
 		program.setUniform("halfWidth", this.width / 2);
@@ -538,8 +538,7 @@ class GPUShader extends ImageType {
 		this.loaded = false;
 	}
 	shade() {
-		if (this.gl.isContextLost()) return;
-		if (!this.compiled) return;
+		if (!this.hasContext) return;
 
 		const { gl } = this;
 
@@ -549,7 +548,7 @@ class GPUShader extends ImageType {
 		gl.flush();
 	}
 	compile() {
-		if (this.gl.isContextLost()) return;
+		if (!this.hasContext) return;
 
 		//init
 		const { gl } = this;

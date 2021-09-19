@@ -2,15 +2,38 @@ class Operable {
     constructor() {
 
     }
+    set(...values) {
+        if (values[0] instanceof this.constructor) return values[0].get(this);
+        const { modValues } = this.constructor;
+        for (let i = 0; i < modValues.length; i++) {
+            const field = modValues[i];
+            this[field] = values[i];
+        }
+        return this;
+    }
     get(result = this.constructor.empty) {
-        for (let x of this.constructor.modValues) result[x] = this[x];
+        const { modValues } = this.constructor;
+        for (let i = 0; i < modValues.length; i++) {
+            const field = modValues[i];
+            result[field] = this[field];
+        }
         return result;
     }
+    at(index) {
+        return this[this.constructor.modValues[index]];
+    }
     op(v, fn) {
+        const { modValues } = this.constructor;
         if (typeof v === "number") {
-            for (let x of this.constructor.modValues) this[x] = fn(this[x], v);
+            for (let i = 0; i < modValues.length; i++) {
+                const field = modValues[i];
+                this[field] = fn(this[field], v);
+            }
         } else {
-            for (let x of this.constructor.modValues) this[x] = fn(this[x], v[x]);
+            for (let i = 0; i < modValues.length; i++) {
+                const field = modValues[i];
+                this[field] = fn(this[field], v[field]);
+            }
         }
         return this;
     }
@@ -43,23 +66,23 @@ class Operable {
     }
     map(fn) {
         const result = this.get();
-        for (let x of this.constructor.modValues) result[x] = fn(result[x]);
+        for (let i = 0; i < this.constructor.modValues.length; i++) result[x] = fn(result.at(i));
         return result;
     }
     total() {
         let sum = 0;
-        for (let x of this.constructor.modValues) sum += Math.abs(this[x]);
+        for (let i = 0; i < this.constructor.modValues.length; i++) sum += Math.abs(this.at(i));
         return sum;
     }
     equals(v) {
         return this.minus(v).total() < this.constructor.EPSILON * this.constructor.modValues.length;
     }
     static get empty() {
-        return new this(...this.modValues.map(name => 0));
+        return new this(...[...this.modValues].fill(0));
     }
     static defineReference(obj, key, value) {
-        let mod = value.constructor.modValues;
-        let len = mod.length;
+        const mod = value.constructor.modValues;
+        const len = mod.length;
         delete obj[key];
         Object.defineProperty(obj, key, {
             set(a) {
@@ -95,7 +118,7 @@ class Operable {
         return a.gop(b, Math.max);
     }
     static pow(a, power) {
-        return a.gob(power, Math.pow);    
+        return a.gob(power, Math.pow);
     }
     static lerp(a, b, t) {
         return a.gop(b, (A, B) => A * (1 - t) + B * t);

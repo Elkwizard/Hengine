@@ -301,7 +301,7 @@ class Artist {
 				this.c.stroke();
 			},
 			line(x, y, x1, y1) {
-				if (typeof x == "object") {
+				if (typeof x === "object") {
 					if (!x) return;
 					if (x instanceof Line) {
 						x1 = x.b.x;
@@ -321,7 +321,7 @@ class Artist {
 				this.c.stroke()
 			},
 			measure(font, text, x, y, x1, y1) {
-				if (typeof x == "object") {
+				if (typeof x === "object") {
 					if (x instanceof Line) {
 						x1 = x.b.x;
 						y1 = x.b.y;
@@ -774,14 +774,14 @@ class Artist {
 		this.scale(1, -1);
 	}
 	translate(x, y) {
-		if (typeof x == "object") {
+		if (typeof x === "object") {
 			y = x.y;
 			x = x.x;
 		}
 		this.c.translate(x, y);
 	}
 	scale(x, y = x) {
-		if (typeof x == "object") {
+		if (typeof x === "object") {
 			y = x.y;
 			x = x.x;
 		}

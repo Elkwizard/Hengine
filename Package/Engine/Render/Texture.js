@@ -1,78 +1,137 @@
 class Texture extends ImageType {
 	constructor(width, height) {
 		super(width, height);
-		this.pixels = Array.dim(this.width, this.height);
-		for (let i = 0; i < this.pixels.length; i++) for (let j = 0; j < this.pixels[0].length; j++) this.pixels[i][j] = new Color(0, 0, 0, 0);
 		this.image = new_OffscreenCanvas(width, height);
 		this.c = this.image.getContext("2d");
 
 		//init image data
-		let array = new Uint8ClampedArray(4 * this.width * this.height);
+		const array = new Uint8ClampedArray(4 * this.width * this.height);
 		for (let i = 0; i < array.length; i++) array[i] = 0;
 		this.imageData = new ImageData(array, this.width, this.height);
+		this.data = new ByteBuffer(this.imageData.data.buffer);
+
+		this._getPixel = new Color(0, 0, 0, 0);
+		this.shaderBackBuffer = new Uint8ClampedArray(4 * this.width * this.height);
 
 		this.loops = false;
 	}
 	get brightness() {
-		return this.pixels.map(col => col.brightness);
+		const { width, height } = this;
+		const result = Array.dim(width, height);
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++)
+			result[i][j] = this.getPixel(i, j, true).brightness;
+		return result;
 	}
 	get red() {
-		return this.pixels.map(col => col.red);
+		const { width, height, imageData: { data } } = this;
+		const result = Array.dim(width, height);
+		let inx = 0;
+		for (let j = 0; j < height; j++) for (let i = 0; i < width; i++) {
+			result[i][j] = data[inx];
+			inx += 4;
+		}
+		return result;
 	}
 	get green() {
-		return this.pixels.map(col => col.green);
+		const { width, height, imageData: { data } } = this;
+		const result = Array.dim(width, height);
+		let inx = 0;
+		for (let j = 0; j < height; j++) for (let i = 0; i < width; i++) {
+			result[i][j] = data[inx + 1];
+			inx += 4;
+		}
+		return result;
 	}
 	get blue() {
-		return this.pixels.map(col => col.blue);
+		const { width, height, imageData: { data } } = this;
+		const result = Array.dim(width, height);
+		let inx = 0;
+		for (let j = 0; j < height; j++) for (let i = 0; i < width; i++) {
+			result[i][j] = data[inx + 2];
+			inx += 4;
+		}
+		return result;
 	}
 	get alpha() {
-		return this.pixels.map(col => col.alpha);
+		const { width, height, imageData: { data } } = this;
+		const result = Array.dim(width, height);
+		let inx = 0;
+		for (let j = 0; j < height; j++) for (let i = 0; i < width; i++) {
+			result[i][j] = data[inx + 3] / 255;
+			inx += 4;
+		}
+		return result;
 	}
 	*[Symbol.iterator]() {
-		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) yield this.pixels[i][j];
+		const { width, height } = this;
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) yield this.getPixel(i, j, true);
 	}
 	clear() {
-		let height = this.pixels[0].length;
-		let width = this.pixels.length;
-		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.setPixelInternal(i, j, Color.BLANK);
+		const { width, height } = this;
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) this.setPixel(i, j, Color.BLANK, true);
 	}
-	getPixel(x, y) {
-		if (x in this.pixels && y in this.pixels[x]) return this.pixels[x][y];
-		else if (!this.loops) return new Color(0, 0, 0, 0);
-		else {
-			x = (x % this.pixels.length + this.pixels.length) % this.pixels.length;
-			y = (y % this.pixels[0].length + this.pixels[0].length) % this.pixels[0].length;
-			return this.pixels[x][y];
+	validPixel(x, y) {
+		return x >= 0 && x < this.width && y >= 0 && y < this.height;
+	}
+	getPixel(x, y, valid = false) {
+		const { _getPixel } = this;
+
+		if (valid || this.validPixel(x, y)) {
+			const { data } = this.imageData;
+			const inx = (y * this.width + x) * 4;
+			_getPixel.red = data[inx];
+			_getPixel.green = data[inx + 1];
+			_getPixel.blue = data[inx + 2];
+			_getPixel.alpha = data[inx + 3] / 255;
+			return _getPixel;
+		} else if (!this.loops) {
+			_getPixel.red = _getPixel.green = _getPixel.blue = _getPixel.alpha = 0;
+			return _getPixel;
+		} else {
+			const { width, height } = this;
+			return this.getPixel(
+				(x % width + width) % width,
+				(y % height + height) % height,
+				true
+			);
 		}
 	}
 	shader(fn) {
-		let coms = [];
-		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) coms.push([i, j, fn(i, j)]);
-		for (let i = 0; i < coms.length; i++) this.shaderSetPixel(coms[i][0], coms[i][1], coms[i][2]);
+		const dest = new Color(0, 0, 0, 0);
+
+		const { width, height, shaderBackBuffer, imageData: { data } } = this;
+
+		let inx = 0;
+		for (let j = 0; j < height; j++) for (let i = 0; i < width; i++) {
+			fn(i, j, dest);
+			shaderBackBuffer[inx] = dest.red;
+			shaderBackBuffer[inx + 1] = dest.green;
+			shaderBackBuffer[inx + 2] = dest.blue;
+			shaderBackBuffer[inx + 3] = dest.alpha * 255;
+			inx += 4;
+		}
+
+		for (let i = 0; i < data.length; i++) data[i] = shaderBackBuffer[i];
+
 		this.loaded = false;
 		return this;
 	}
-	getPixelInternal(x, y) {
-		return this.pixels[x][y];
-	}
 	shaderSetPixel(x, y, clr) {
-		this.pixels[x][y] = clr;
-		let inx = (y * this.width + x) * 4;
-		let data = this.imageData.data;
+		const { data } = this.imageData;
+		const inx = (y * this.width + x) * 4;
 		data[inx] = clr.red;
 		data[inx + 1] = clr.green;
 		data[inx + 2] = clr.blue;
 		data[inx + 3] = clr.alpha * 255;
 	}
-	setPixelInternal(x, y, clr) {
-		this.loaded = false;
-		this.shaderSetPixel(x, y, clr);
-	}
-	setPixel(x, y, clr) {
-		if (x in this.pixels && y in this.pixels[x]) this.setPixelInternal(x, y, clr);
+	setPixel(x, y, clr, valid = false) {
+		if (valid || this.validPixel(x, y)) {
+			this.loaded = false;
+			this.shaderSetPixel(x, y, clr);
+		}
 	}
 	blur(amount = 1) {
-		let newPixels = this.pixels.map((col, x, y) => {
+		return this.shader((x, y, dest) => {
 			let r = 0;
 			let g = 0;
 			let b = 0;
@@ -88,54 +147,17 @@ class Texture extends ImageType {
 			g /= 9;
 			b /= 9;
 			a /= 9;
-			return new Color(r, g, b, a);
+			dest.set(r, g, b, a);
 		});
-		this.pixels = newPixels;
-		this.updateImageData();
-	}
-	updateImageData() {
-		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
-			let inx = 4 * (j * this.width + i);
-			let { red, green, blue, alpha } = this.pixels[i][j];
-			this.imageData.data[inx] = red;
-			this.imageData.data[inx + 1] = green;
-			this.imageData.data[inx + 2] = blue;
-			this.imageData.data[inx + 3] = alpha * 255;
-		}
-		this.loaded = false;
-		return this.imageData;
 	}
 	stretch(w, h) {
-		w = Math.round(w);
-		h = Math.round(h);
-		let r = new Texture(w, h);
-		let w_f = this.width / w;
-		let h_f = this.height / h;
-		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
-			let x = Math.floor(i * w_f);
-			let y = Math.floor(j * h_f);
-			let tx = (i * w_f) % 1;
-			let ty = (j * h_f) % 1;
-			let a = this.pixels[x][y];
-			let b, c, d;
-			if (this.pixels[x + 1]) b = this.pixels[x + 1][y];
-			else b = a;
-			if (this.pixels[x + 1] && this.pixels[x + 1][y + 1]) d = this.pixels[x + 1][y + 1];
-			else d = b;
-			if (this.pixels[x][y + 1]) c = this.pixels[x][y + 1];
-			else c = a;
-			r.shaderSetPixel(i, j, Color.quadLerp(a, b, c, d, tx, ty));
-		}
-		r.loaded = false;
-		return r;
+		// TODO: reimplement
 	}
 	clip(x, y, w, h) {
 		x = Math.round(x);
 		y = Math.round(y);
-		let r = new Texture(w, h);
-		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) r.shaderSetPixel(i, j, this.getPixel(x + i, y + j));
-		r.loaded = false;
-		return r;
+		return new Texture(w, h)
+			.shader((i, j, dest) => dest.set(this.getPixel(x + i, y + j)));
 	}
 	makeImage() {
 		if (!this.loaded) {
@@ -146,8 +168,11 @@ class Texture extends ImageType {
 	}
 	get(tex = new Texture(this.width, this.height)) {
 		if (tex.width !== this.width || tex.height !== this.height) return null;
-		tex.pixels = this.pixels.map(v => v.get());
-		tex.updateImageData();
+		tex.imageData = new ImageData(
+			this.imageData.data.map(channel => channel),
+			this.imageData.width,
+			this.imageData.height
+		);
 		tex.loaded = false;
 		return tex;
 	}
@@ -191,10 +216,18 @@ class Texture extends ImageType {
 		return tex;
 	}
 	static grayScale(bright) {
-		return (new Texture(bright.length, bright[0].length)).shader((x, y) => Color.grayScale(bright[x][y]));
+		return new Texture(bright.length, bright[0].length)
+			.shader((x, y, dest) => {
+				const b = bright[x][y];
+				dest.set(b * 255, b * 255, b * 255, 1);
+			});
 	}
 	static colorScale(col, bright) {
-		return (new Texture(bright.length, bright[0].length)).shader((x, y) => Color.colorScale(col, bright[x][y]));
+		return new Texture(bright.length, bright[0].length)
+			.shader((x, y, dest) => {
+				const b = bright[x][y];
+				dest.set(b * col.red, b * col.green, b * col.blue, col.alpha);
+			});
 	}
 	static async fromDataURI(uri, w_o, h_o) {
 		let img = new Image();
@@ -235,14 +268,8 @@ class Texture extends ImageType {
 		buffer.write.uint32(this.width);
 		buffer.write.uint32(this.height);
 
-		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) {
-			const pixel = this.pixels[i][j];
-			
-			buffer.write.uint8(pixel.red);
-			buffer.write.uint8(pixel.green);
-			buffer.write.uint8(pixel.blue);
-			buffer.write.uint8(pixel.alpha * 255);
-		}
+		const { data } = texture.imageData;
+		for (let i = 0; i < data.length; i++) buffer.write.uint8(data[i]);
 
 		buffer.finalize();
 
@@ -256,15 +283,8 @@ class Texture extends ImageType {
 
 		const texture = new Texture(width, height);
 
-		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) {
-			const pixel = texture.pixels[i][j];
-			pixel.red = buffer.read.uint8();
-			pixel.green = buffer.read.uint8();
-			pixel.blue = buffer.read.uint8();
-			pixel.alpha = buffer.read.uint8() / 255;
-		}
-
-		texture.updateImageData();
+		const { data } = texture.imageData;
+		for (let i = 0; i < data.length; i++) data[i] = buffer.read.uint8();
 
 		return texture;
 	}
