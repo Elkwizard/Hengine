@@ -340,8 +340,12 @@ ${Array.dim(this.outputPixels)
 				.split(";")
 				.map(line => line.trim())
 				.filter(line => line.length)
-				.map(field => field.split(" "))
-				.map(([type, name]) => ({ type, name }));
+				.map(field => {
+					let [type, names] = field.cut(" ");
+					names = names.split(" , ");
+					return names.map(name => ({ type, name }));
+				})
+				.reduce((a, b) => [...a, ...b], []);
 
 			return fields;
 		}
