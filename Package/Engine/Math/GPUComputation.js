@@ -76,6 +76,8 @@ class GPUComputation {
 				uniform int _inputTextureWidth;
 				uniform int _outputTextureWidth;
 
+				#define problem (int(gl_FragCoord.y) * _outputTextureWidth + int(gl_FragCoord.x))
+
 				ivec4 _fetchPixel(int index) {
 					ivec2 texel = ivec2(
 						index % _inputTextureWidth,
@@ -84,8 +86,6 @@ class GPUComputation {
 					vec4 pixel = texelFetch(_byteBuffer, texel, 0);
 					return ivec4(pixel * 255.0);
 				}
-
-				#define gl_ProblemID
 			`;
 			const prefixLength = prefix.split("\n").length;
 
@@ -98,8 +98,7 @@ ${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) ou
 					int[${this.inputBytes}] _inputs;
 
 					ivec2 startIndex = ivec2(gl_FragCoord.xy);
-					int problemIndex = startIndex.y * _outputTextureWidth + startIndex.x;
-					int firstByteIndex = problemIndex * ${this.inputBytes};
+					int firstByteIndex = problem * ${this.inputBytes};
 					int lastByteIndex = firstByteIndex + ${this.inputBytes};
 					int firstPixelIndex = firstByteIndex / 4;
 					int lastPixelIndex = int(ceil(float(lastByteIndex) / 4.0));
@@ -243,18 +242,34 @@ ${Array.dim(this.outputPixels)
 
 		output.pointer = 0;
 		output.alloc(problems * outputBytes);
+		const outputData = output.data;
 
-		for (let i = 0; i < problems; i++) {
-			for (let j = 0; j < outputBytes; j++) {
-				const byte = outputDataArrays[j >> 2][i * 4 + j % 4];
-				output.data[output.pointer++] = byte;
+		// output data array major
+		const problems4 = problems * 4;
+		for (let i = 0; i < outputDataArrays.length; i++) {
+			const array = outputDataArrays[i];
+			const bytes = Math.min(4, outputBytes - i * 4);
+
+			let problemOffset = i * 4;
+			for (let j = 0; j < problems4; j += 4) {
+				for (let k = 0; k < bytes; k++)
+					outputData[problemOffset + k] = array[j + k];
+				problemOffset += outputBytes
 			}
 		}
 
-		output.pointer = 0;
+		// problem major
+		// let pointer = 0;
+		// for (let i = 0; i < problems; i++) {
+		// 	for (let j = 0; j < outputBytes; j++) {
+		// 		const byte = outputDataArrays[j >> 2][i * 4 + j % 4];
+		// 		output.data[pointer++] = byte;
+		// 	}
+		// }
 
 		return output;
 	}
+	
 	// arguments (from GPUShader)
 	argumentExists(arg) {
 		return this.program.hasUniform(arg);
