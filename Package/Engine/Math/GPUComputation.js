@@ -341,9 +341,36 @@ ${Array.dim(this.outputPixels)
 				.map(line => line.trim())
 				.filter(line => line.length)
 				.map(field => {
-					let [type, names] = field.cut(" ");
-					names = names.split(" , ");
-					return names.map(name => ({ type, name }));
+					const array = field.indexOf("[") > -1;
+					let arrayLength;
+
+					field = field.split(" ");
+					const type = field[0];
+					if (field[1] === "[") {
+						arrayLength = parseInt(field[2]);
+						field = field.slice(4);
+					} else field = field.slice(1);
+
+					const names = field
+						.join("")
+						.split(",")
+						.map(name => {
+							if (array) {
+								let length = arrayLength;
+								if (length === undefined) {
+									const index = name.indexOf("[");
+									length = parseInt(name.slice(index + 1));
+									name = name.slice(0, index);
+								}
+								
+								return new Array(length).fill(0).map((_, i) => ({ type, name: `${name}[${i}]`}));
+							}
+
+							return [{ type, name }];
+						})
+						.reduce((a, b) => [...a, ...b], []);
+
+					return names;
 				})
 				.reduce((a, b) => [...a, ...b], []);
 
@@ -380,7 +407,7 @@ ${Array.dim(this.outputPixels)
 		}
 
 		const ifields = fields(inputStruct);
-		const ofields = fields(outputStruct);
+		const ofields = (inputStruct === outputStruct) ? ifields : fields(outputStruct);
 
 		const inputBytes = getByteOffset(ifields);
 		const outputBytes = getByteOffset(ofields);
