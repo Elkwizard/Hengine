@@ -1,7 +1,7 @@
 (async function () {
     //locate self
     let script = document.currentScript;
-    let title = script.title || "Hengine Project";
+    let title = script.getAttribute("title") || "Hengine Project";
     let scripts = (script.getAttribute("scripts") || "").replace(/\.js/g, "").split(" ").filter(str => str.length);
 
     //process filesystem
@@ -22,7 +22,6 @@
 
     await load(hengineLoaderSrc);
     await HengineLoader.load(scripts.map(src => new HengineScriptResource(src)));
-
 
     window.title = title;
 

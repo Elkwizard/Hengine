@@ -218,26 +218,11 @@ class HengineLoader {
 					return new Vector2(hengine.hengine.canvas.width / 2, hengine.hengine.canvas.height / 2);
 				}
 			});
-			Object.defineProperty(window, "width", {
-				set(a) {
-					hengine.hengine.canvas.width = a;
-				},
-				get() {
-					return hengine.hengine.canvas.width;
-				}
-			});
-			Object.defineProperty(window, "height", {
-				set(a) {
-					hengine.hengine.canvas.height = a;
-				},
-				get() {
-					return hengine.hengine.canvas.height;
-				}
-			});
+			Object.shortcut(window, hengine.hengine.canvas, "width");
+			Object.shortcut(window, hengine.hengine.canvas, "height");
 		}
 
 		window.loadResource = this.loadResource.bind(this);
-		window.addResource = this.addResource.bind(this);
 
 		this.resources = new Map();
 
@@ -283,7 +268,7 @@ class HengineLoader {
 
 				// find yourself
 				const allScripts = Array.from(document.getElementsByTagName("script"));
-				const scriptSrc = allScripts.find(script => script.src.indexOf("Engine/Manage/HengineLoader.js")).src;
+				const scriptSrc = allScripts.find(script => script.src.indexOf("Engine/Manage/HengineLoader.js") > -1).src;
 				const rootSrc = scriptSrc
 					.split("/")
 					.slice(0, -3)
@@ -295,7 +280,6 @@ class HengineLoader {
 				const engineSrc = rootSrc + "/Engine";
 				console.log(`EXTRACTING FROM ROOT [${engineSrc}]`);
 	
-				
 				for (let i = 0; i < HengineLoader.engineResources.length; i++) {
 					const block = HengineLoader.engineResources[i];
 					const promises = [];
