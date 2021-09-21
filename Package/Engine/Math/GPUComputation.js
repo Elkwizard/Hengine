@@ -334,8 +334,8 @@ ${Array.dim(this.outputPixels)
 		};
 
 		function fields(name) {
-			const regexp = new RegExp(`struct ${name} { ([^\}]*?) }`, "g");
-			const contents = [...glsl.matchAll(regexp)][0][1];
+			const regexp = new RegExp(`struct ${name} { ([^\}]*?) }`);
+			const contents = glsl.match(regexp)[1];
 			const fields = contents
 				.split(";")
 				.map(line => line.trim())
