@@ -12,12 +12,16 @@ class ByteBuffer {
 		return this.data.length;
 	}
 	alloc(amount) {
-		if (this.shouldResize) while (this.pointer + amount >= this.data.length) {
-			const newData = new Uint8Array(this.data.length * 2);
+		const end = this.pointer + amount;
+		if (this.shouldResize && end > this.data.length) {
+			const newData = new Uint8Array(1 << Math.ceil(Math.log2(end)));
 			newData.set(this.data);
 			this.data = newData;
 			this.view = new DataView(this.data.buffer);
 		}
+	}
+	advance(amount) {
+		this.pointer += amount;
 	}
 	clear() {
 		this.pointer = 0;

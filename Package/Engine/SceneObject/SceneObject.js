@@ -14,7 +14,7 @@ class Controls {
 		let res = [];
 		function j(cont) {
 			if (this[cont]) {
-				if (typeof this[cont] == "string") {
+				if (typeof this[cont] === "string") {
 					res.push('"' + this[cont] + '"');
 				} else {
 					res.push(this[cont]);

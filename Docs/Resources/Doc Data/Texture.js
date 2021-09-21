@@ -20,7 +20,7 @@ load(String.raw`
 	(/p)
 	(2)Properties(/2)
 	(p)
-		(prop:pixels $Color[][]$readonly)A 2D array, indexed with *[x][y]*, storing the pixel data of the Texture.(/prop)
+		(prop:data $ByteBuffer$readonly)All the image data of the Texture, stored in row major order.(/prop)
 		(prop:loops $Boolean$)Whether or not *.getPixel* calls will loop to the other side of the Texture if they overflow.(/prop)
 		(prop:red $Number[][]$readonly)A 2D array, indexed with *[x][y]*, storing the *.red* channel of each #Color# in the Texture.(/prop)
 		(prop:green $Number[][]$readonly)A 2D array, indexed with *[x][y]*, storing the *.green* channel of each #Color# in the Texture.(/prop)
@@ -61,10 +61,12 @@ load(String.raw`
 				(param:region $Rect$)A #Rect# object containing the rectangular region.(/param)
 			(/p2)
 		(/method)
-		(method:stretch@width, height@$Texture$)
-			Returns a Texture representation of the Texture after being rescaled.
-			(param:width $Number$)The width of the rescaled Texture.(/param)
-			(param:height $Number$)The height of the rescaled Texture.(/param)
+		(method:shader@main@$Texture$)
+			Modifies the Texture by executing a given shader function for every pixel. Returns the Texture.
+			(param:main $Function$)
+				The main function takes three arguments, *x*, *y*, and *dest*.
+				(*x*, *y*) are the coordinates of the pixel, and the channels of *dest* will be the new value of the pixel when the function is complete.
+			(/param)
 		(/method)
 		(method:get@@$Texture$) 
 			Returns a copy of the Texture.

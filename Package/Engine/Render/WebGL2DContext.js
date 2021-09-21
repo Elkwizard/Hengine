@@ -107,11 +107,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			powerPreference: "low-power"
 		});
 
-		if (gl === null) {
-			if (window.WebGL2RenderingContext); // exit("WebGL failed to initialize. Please reload");
-			else; // exit("Your browser doesn't support WebGL");
-			return;
-		}
+		if (gl === null) throw new ReferenceError("Your browser doesn't support WebGL");
 
 		// lost context listener
 		canvas.addEventListener("webglcontextlost", event => {

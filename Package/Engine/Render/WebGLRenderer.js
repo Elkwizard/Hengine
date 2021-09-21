@@ -152,7 +152,7 @@ class WebGLArtist {
 				this.gl.lineSegments(vertices, this.currentLineWidth, this.currentLineCap, this.currentLineJoin, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha, false, false, false);
 			},
 			line(x, y, x1, y1) {
-				if (typeof x == "object") {
+				if (typeof x === "object") {
 					if (!x) return;
 					if (x instanceof Line) {
 						x1 = x.b.x;
@@ -433,7 +433,7 @@ class WebGLArtist {
 		this.scale(1, -1);
 	}
 	translate(x, y) {
-		if (typeof x == "object") {
+		if (typeof x === "object") {
 			y = x.y;
 			x = x.x;
 		}
@@ -447,7 +447,7 @@ class WebGLArtist {
 		this.gl.setTransform(this.currentTransform);
 	}
 	scale(x, y = x) {
-		if (typeof x == "object") {
+		if (typeof x === "object") {
 			y = x.y;
 			x = x.x;
 		}

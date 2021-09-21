@@ -194,6 +194,10 @@ class HengineBinaryResource extends HengineResource {
 
 class HengineLoader {
 	constructor() {
+		// window setup
+		document.body.style.width = "100vw";
+		document.body.style.height = "100vh";
+
 		this.hengine = new Hengine();
 
 		//window
@@ -214,23 +218,10 @@ class HengineLoader {
 					return new Vector2(hengine.hengine.canvas.width / 2, hengine.hengine.canvas.height / 2);
 				}
 			});
-			Object.defineProperty(window, "width", {
-				set(a) {
-					hengine.hengine.canvas.width = a;
-				},
-				get() {
-					return hengine.hengine.canvas.width;
-				}
-			});
-			Object.defineProperty(window, "height", {
-				set(a) {
-					hengine.hengine.canvas.height = a;
-				},
-				get() {
-					return hengine.hengine.canvas.height;
-				}
-			});
+			Object.shortcut(window, hengine.hengine.canvas, "width");
+			Object.shortcut(window, hengine.hengine.canvas, "height");
 		}
+
 		window.loadResource = this.loadResource.bind(this);
 
 		this.resources = new Map();
@@ -247,6 +238,15 @@ class HengineLoader {
 
 		window.title = ti;
 	}
+	addResourceSync(wrapper, resource) {
+		const { src } = wrapper;
+		if (resource) console.log(`LOADED RESOURCE [${src}]`);
+		else console.warn(`LOADING FAILED FOR RESOURCE [${src}]`);
+		this.resources.set(src, resource);
+	}
+	async addResource(wrapper) {
+		this.addResourceSync(wrapper, await wrapper.load());
+	}
 	loadResource(src) {
 		if (PathManager.isRoot(src)) {
 			return this.resources.get(src) ?? null;
@@ -255,107 +255,87 @@ class HengineLoader {
 			const processed2 = src.replace(/[/\\]/g, "\\").replace(/([\.\\])/g, "\\$1");
 			const regex = new RegExp(processed + "$");
 			const regex2 = new RegExp(processed2 + "$");
-			for (let [path, resource] of this.resources) {
+			for (const [path, resource] of this.resources) {
 				if (path.match(regex) || path.match(regex2)) return resource;
 			}
 			return null;
 		}
 	}
-	static load(userResources, engineLoaded = false) {
+	static load(userResources = []) {
 		async function loadResources() {
-			let scriptHome = document.querySelectorAll("script"); //find yourself
-			for (let el of scriptHome) {
-				if (el.src.indexOf("Engine/Manage/Hengine") > -1) {
-					scriptHome = el;
-					break;
+			if (HengineLoader.loader === null) {
+				console.time("loading engine");
+
+				// find yourself
+				const allScripts = Array.from(document.getElementsByTagName("script"));
+				const scriptSrc = allScripts.find(script => script.src.indexOf("Engine/Manage/HengineLoader.js") > -1).src;
+				const rootSrc = scriptSrc
+					.split("/")
+					.slice(0, -3)
+					.join("/");
+	
+				//icon
+				document.head.innerHTML += `<link rel="icon" href="${rootSrc}/favicon.ico" type="image/x-icon"></link>`;
+	
+				const engineSrc = rootSrc + "/Engine";
+				console.log(`EXTRACTING FROM ROOT [${engineSrc}]`);
+	
+				for (let i = 0; i < HengineLoader.engineResources.length; i++) {
+					const block = HengineLoader.engineResources[i];
+					const promises = [];
+					for (let i = 0; i < block.length; i++) {
+						const path = block[i];
+						const src = PathManager.join([engineSrc, path + ".js"]);
+						const script = new HengineScriptResource(src);
+						promises.push(script.load());
+					}
+					await Promise.all(promises);
 				}
-			}
-			let pathSRC = scriptHome.src.split("/");
-			pathSRC.pop();
-			pathSRC.pop();
-			pathSRC.pop();
-			let rootSrc = pathSRC.join("/");
 
-			//icon
-			document.head.innerHTML += `<link rel="icon" href="${rootSrc}/favicon.ico" type="image/x-icon"></link>`;
+				HengineLoader.loader = new HengineLoader();
 
-			rootSrc += "/Engine";
-			console.log(`EXTRACTING FROM ROOT [${rootSrc}]`);
-
-			console.time("loading engine");
-			
-			if (!engineLoaded) for (let i = 0; i < HengineLoader.engineResources.length; i++) {
-				const block = HengineLoader.engineResources[i];
-				const promises = [];
-				for (let i = 0; i < block.length; i++) {
-					const path = block[i];
-					const script = new HengineScriptResource(PathManager.join([rootSrc, path + ".js"]));
-					promises.push(script.load());
-				}
-				await Promise.all(promises);
+				console.timeEnd("loading engine");
 			}
 
-			console.timeEnd("loading engine");
-
-
-			document.body.style.width = "100vw";
-			document.body.style.height = "100vh";
-			const hengineLoader = new HengineLoader();
-			window.hengineLoader = hengineLoader;
+			const hengineLoader = HengineLoader.loader;
 
 			let nonScriptPromiseAcc = [];
-			let nonScriptSourceAcc = [];
-
-			const loadSuccess = src => console.log(`LOADED RESOURCE [${src}]`);
-			const loadFailure = src => console.warn(`LOADING FAILED FOR RESOURCE [${src}]`);
+			let nonScriptAcc = [];
 
 			console.time("loading user resources");
 
 			for (let i = 0; i < userResources.length; i++) {
 				const userResource = userResources[i];
 
-				if (userResources[i] instanceof HengineScriptResource) {
-					const resources = await Promise.all(nonScriptPromiseAcc);
-					for (let i = 0; i < resources.length; i++) {
-						const src = nonScriptSourceAcc[i];
-						const resource = resources[i];
+				const loadBlocking = userResource instanceof HengineScriptResource;
+				const loadAllInParallel = loadBlocking || i === userResources.length - 1;
+				const accumulateLoading = !loadBlocking;
 
-						if (resource) loadSuccess(src);
-						else loadFailure(src);
-
-						hengineLoader.resources.set(src, resource);
-					}
-					nonScriptPromiseAcc = [];
-					nonScriptSourceAcc = [];
-
-					// console.log([...hengineLoader.resources.entries()].toString(1))
-
-					const scriptResource = await userResource.load();
-					if (scriptResource) loadSuccess(userResource.src);
-					else loadFailure(userResource.src);
-					hengineLoader.resources.set(userResource.src, scriptResource);
-				} else {
-					const promise = userResource.load();
-					nonScriptPromiseAcc.push(promise);
-					nonScriptSourceAcc.push(userResource.src);
+				if (accumulateLoading) {
+					nonScriptPromiseAcc.push(userResource.load());
+					nonScriptAcc.push(userResource);
 				}
+
+				if (loadAllInParallel && nonScriptPromiseAcc.length > 0) {
+					const resources = await Promise.all(nonScriptPromiseAcc);
+					for (let i = 0; i < resources.length; i++)
+						hengineLoader.addResourceSync(nonScriptAcc[i], resources[i]);
+					nonScriptPromiseAcc = [];
+					nonScriptAcc = [];
+				}
+
+				if (loadBlocking) await hengineLoader.addResource(userResource);
 			}
 
 			console.timeEnd("loading user resources");
 
-			//450ms;
+			return hengineLoader;
 		}
 		if (document.body && document.head) return loadResources();
-		else {
-			return new Promise(function (resolve) {
-				window.addEventListener("load", async function () {
-					await loadResources();
-					resolve();
-				});
-			});
-		}
+		else return new Promise(resolve => addEventListener("load", () => loadResources().then(resolve)));
 	}
 }
+HengineLoader.loader = null;
 
 HengineLoader.engineResources = [
 	[ // no dependencies

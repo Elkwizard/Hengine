@@ -1,14 +1,14 @@
 class GPUComputation {
 	constructor(problems, glsl) {
 		{ // build context
-			if (!window.WebGL2RenderingContext) throw new GLSLError(1, "GPUComputations are not supported");
-			
+			if (!window.WebGL2RenderingContext) throw new ReferenceError("Your browser doesn't support WebGL");
+
 			this.canvas = new_OffscreenCanvas(1, 1);
 			this.gl = this.canvas.getContext("webgl2", {
 				depth: false,
 				stencil: false
 			});
-			
+
 
 			this.hasContext = true;
 			this.canvas.addEventListener("webglcontextlost", event => {
@@ -52,7 +52,6 @@ class GPUComputation {
 			const [_, outputs, inputs] = result.map(num => parseInt(num));
 			this.inputBytes = inputs;
 			this.outputBytes = outputs;
-			this.inputPixels = Math.ceil(this.inputBytes / 4);
 			this.outputPixels = Math.ceil(this.outputBytes / 4);
 			this.totalInputPixels = Math.ceil(this.inputBytes * this.problems / 4);
 		};
@@ -74,12 +73,15 @@ class GPUComputation {
 				precision highp sampler2D;
 				
 				uniform sampler2D _byteBuffer;
-				uniform int _textureWidth;
+				uniform int _inputTextureWidth;
+				uniform int _outputTextureWidth;
+
+				#define problem (int(gl_FragCoord.y) * _outputTextureWidth + int(gl_FragCoord.x))
 
 				ivec4 _fetchPixel(int index) {
 					ivec2 texel = ivec2(
-						index % _textureWidth,
-						index / _textureWidth
+						index % _inputTextureWidth,
+						index / _inputTextureWidth
 					);
 					vec4 pixel = texelFetch(_byteBuffer, texel, 0);
 					return ivec4(pixel * 255.0);
@@ -96,8 +98,7 @@ ${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) ou
 					int[${this.inputBytes}] _inputs;
 
 					ivec2 startIndex = ivec2(gl_FragCoord.xy);
-					int problemIndex = startIndex.y * _textureWidth + startIndex.x;
-					int firstByteIndex = problemIndex * ${this.inputBytes};
+					int firstByteIndex = problem * ${this.inputBytes};
 					int lastByteIndex = firstByteIndex + ${this.inputBytes};
 					int firstPixelIndex = firstByteIndex / 4;
 					int lastPixelIndex = int(ceil(float(lastByteIndex) / 4.0));
@@ -111,7 +112,6 @@ ${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) ou
 								_inputs[inputIndex++] = pixelColor[j];
 					}
 
-					ivec4 v = _fetchPixel(firstPixelIndex);
 					int[${this.outputBytes}] _outputs = compute(_inputs);
 
 ${Array.dim(this.outputPixels)
@@ -155,18 +155,45 @@ ${Array.dim(this.outputPixels)
 				const size = getSize(count);
 				const data = new Uint8Array(size * size * 4);
 				const texture = gl.createTexture();
+
+				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, texture);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
 				return {
 					size, texture, data, index,
 					set: value => {
-						const buffer = new Uint8Array(value.buffer, 0, data.length);
+						const { byteLength, buffer } = value;
+						const pxLength = Math.floor(byteLength / 4);
+						const completeRows = Math.floor(pxLength / size);
+						const lastRowWidth = pxLength % size;
+						const pxLeft = byteLength % 4;
+						
+						gl.activeTexture(gl.TEXTURE0);
 						gl.bindTexture(gl.TEXTURE_2D, texture);
-						gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, size, size, gl.RGBA, gl.UNSIGNED_BYTE, buffer);
+						
+						let nextX = 0;
+						let nextY = completeRows;
+
+						const completeRowsBuffer = new Uint8Array(buffer, 0, completeRows * size * 4);
+						gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, size, completeRows, gl.RGBA, gl.UNSIGNED_BYTE, completeRowsBuffer);
+
+						if (lastRowWidth) {
+							const lastRowBuffer = new Uint8Array(buffer, completeRows * size * 4, lastRowWidth * 4);
+							gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, completeRows, lastRowWidth, 1, gl.RGBA, gl.UNSIGNED_BYTE, lastRowBuffer);
+							nextX = lastRowWidth;
+						}
+
+						if (pxLeft) {
+							const lastPixelBuffer = new Uint8Array(4);
+							const lastPixelData = new Uint8Array(buffer, pxLength * 4);
+							lastPixelBuffer.set(lastPixelData);
+							gl.texSubImage2D(gl.TEXTURE_2D, 0, nextX, nextY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, lastPixelBuffer);
+						}
 					},
 					get: () => {
 						gl.readBuffer(gl.COLOR_ATTACHMENT0 + index);
@@ -189,7 +216,8 @@ ${Array.dim(this.outputPixels)
 
 			gl.drawBuffers(this.outputTextures.map((_, i) => gl.COLOR_ATTACHMENT0 + i));
 
-			this.program.setUniform("_textureWidth", this.inputTexture.size);
+			this.program.setUniform("_inputTextureWidth", this.inputTexture.size);
+			this.program.setUniform("_outputTextureWidth", this.outputTextureSize);
 		};
 	}
 	compute(input, output = new ByteBuffer()) {
@@ -200,11 +228,6 @@ ${Array.dim(this.outputPixels)
 			outputTextures, problems,
 			outputBytes, outputTextureSize
 		} = this;
-
-		const { pointer } = input;
-		input.pointer = 0;
-		input.alloc(this.inputTexture.data.length);
-		input.pointer = pointer;
 
 		inputTexture.set(input.data);
 		gl.viewport(0, 0, outputTextureSize, outputTextureSize);
@@ -219,18 +242,34 @@ ${Array.dim(this.outputPixels)
 
 		output.pointer = 0;
 		output.alloc(problems * outputBytes);
-		
-		for (let i = 0; i < problems; i++) {
-			for (let j = 0; j < outputBytes; j++) {
-				const byte = outputDataArrays[j >> 2][i * 4 + j % 4];
-				output.data[output.pointer++] = byte;
+		const outputData = output.data;
+
+		// output data array major
+		const problems4 = problems * 4;
+		for (let i = 0; i < outputDataArrays.length; i++) {
+			const array = outputDataArrays[i];
+			const bytes = Math.min(4, outputBytes - i * 4);
+
+			let problemOffset = i * 4;
+			for (let j = 0; j < problems4; j += 4) {
+				for (let k = 0; k < bytes; k++)
+					outputData[problemOffset + k] = array[j + k];
+				problemOffset += outputBytes
 			}
 		}
 
-		output.pointer = 0;
+		// problem major
+		// let pointer = 0;
+		// for (let i = 0; i < problems; i++) {
+		// 	for (let j = 0; j < outputBytes; j++) {
+		// 		const byte = outputDataArrays[j >> 2][i * 4 + j % 4];
+		// 		output.data[pointer++] = byte;
+		// 	}
+		// }
 
 		return output;
 	}
+	
 	// arguments (from GPUShader)
 	argumentExists(arg) {
 		return this.program.hasUniform(arg);
@@ -244,5 +283,158 @@ ${Array.dim(this.outputPixels)
 	setArguments(uniformData = {}) {
 		for (const key in uniformData) this.program.setUniform(key, uniformData[key]);
 		this.loaded = false;
+	}
+	static destructure(glsl) {
+		const originalGLSL = glsl;
+
+		glsl = GLSLPrecompiler.compile(glsl);
+		glsl = glsl
+			.replace(/\s+/g, " ")
+			.split(/\b/g)
+			.map(token => token.trim())
+			.filter(token => token)
+			.join(" ");
+
+		const signature = glsl
+			.match(/(\w+?) compute \( (\w+?) /g);
+
+		if (signature === null) throw new GLSLError(1, "There is no compute() function");
+
+		const [outputStruct, , , inputStruct] = signature[0].split(" ");
+
+		const size = {
+			float: 4,
+			int: 4,
+			bool: 1
+		};
+
+		const read = {
+			float: `intBitsToFloat(ib[ip] << 24 | ib[ip + 1] << 16 | ib[ip + 2] << 8 | ib[ip + 3])`,
+			int: `ib[ip] << 24 | ib[ip + 1] << 16 | ib[ip + 2] << 8 | ib[ip + 3]`,
+			bool: `ib[ip] == 1`
+		};
+
+		const write = {
+			float: `
+			int bits = floatBitsToInt(value);
+			ob[op] = (bits >> 24) & 255;
+			ob[op + 1] = (bits >> 16) & 255;
+			ob[op + 2] = (bits >> 8) & 255;
+			ob[op + 3] = bits & 255;
+		  `,
+			int: `
+			ob[op] = (value >> 24) & 255;
+			ob[op + 1] = (value >> 16) & 255;
+			ob[op + 2] = (value >> 8) & 255;
+			ob[op + 3] = value & 255;
+		  `,
+			bool: `
+			ob[op] = value ? 1 : 0;
+		  `
+		};
+
+		function fields(name) {
+			const regexp = new RegExp(`struct ${name} { ([^\}]*?) }`, "g");
+			const contents = [...glsl.matchAll(regexp)][0][1];
+			const fields = contents
+				.split(";")
+				.map(line => line.trim())
+				.filter(line => line.length)
+				.map(field => {
+					const array = field.indexOf("[") > -1;
+					let arrayLength;
+
+					field = field.split(" ");
+					const type = field[0];
+					if (field[1] === "[") {
+						arrayLength = parseInt(field[2]);
+						field = field.slice(4);
+					} else field = field.slice(1);
+
+					const names = field
+						.join("")
+						.split(",")
+						.map(name => {
+							if (array) {
+								let length = arrayLength;
+								if (length === undefined) {
+									const index = name.indexOf("[");
+									length = parseInt(name.slice(index + 1));
+									name = name.slice(0, index);
+								}
+								
+								return new Array(length).fill(0).map((_, i) => ({ type, name: `${name}[${i}]`}));
+							}
+
+							return [{ type, name }];
+						})
+						.reduce((a, b) => [...a, ...b], []);
+
+					return names;
+				})
+				.reduce((a, b) => [...a, ...b], []);
+
+			return fields;
+		}
+
+		function getByteOffset(fields, index = fields.length) {
+			let offset = 0;
+			for (let i = 0; i < index; i++) {
+				const { type } = fields[i];
+				if (type in size) offset += size[type];
+				else throw new GLSLError(1, `Fields of type '${type}' are not supported`);
+			}
+			return offset;
+		}
+
+		function makeReader({ type, name }, byteOffset) {
+			if (type in read) return `
+			ip = ${byteOffset};
+			i.${name} = ${read[type]};
+		  `;
+			else throw new GLSLError(1, `Input fields of type '${type}' are not supported`);
+		}
+
+		function makeWriter({ type, name }, byteOffset) {
+			if (type in write) return `
+			op = ${byteOffset};
+			{
+			  ${type} value = o.${name};
+			  ${write[type]}
+			};
+		  `;
+			else throw new GLSLError(1, `Output fields of type '${type}' are not supported`);
+		}
+
+		const ifields = fields(inputStruct);
+		const ofields = (inputStruct === outputStruct) ? ifields : fields(outputStruct);
+
+		const inputBytes = getByteOffset(ifields);
+		const outputBytes = getByteOffset(ofields);
+
+		const userGLSL = originalGLSL.replace(/\bcompute\b/g, "_compute");
+
+		const finalGLSL = `${userGLSL}
+	
+		  int[${outputBytes}] compute(int[${inputBytes}] ib) {
+			// return ib;
+			${inputStruct} i;
+			int ip = 0;
+	
+			// read from input buffer
+	${ifields.map((field, index) => makeReader(field, getByteOffset(ifields, index))).join("\n")}
+			
+			int ob[${outputBytes}];
+			${outputStruct} o = _compute(i);
+			int op = 0;
+	
+			// write to output buffer
+	${ofields.map((field, index) => makeWriter(field, getByteOffset(ofields, index))).join("\n")}
+			
+			return ob;
+		  }
+		`;
+
+		return finalGLSL;
 	}
 }

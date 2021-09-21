@@ -2,7 +2,7 @@ class Color extends Operable {
 	constructor(r, g, b, a) {
 		super();
 		this.limited = true;
-		if (b === undefined && g === undefined && typeof r == "string") {
+		if (b === undefined && g === undefined && typeof r === "string") {
 			if (r.match(/[\(#]/g)) {
 				// explicit
 				let rgb = r;
@@ -52,6 +52,22 @@ class Color extends Operable {
 	}
 	toString() {
 		return this.getRGBA();
+	}
+	get(result = new Color(0, 0, 0, 0)) {
+		result.red = this.red;
+		result.green = this.green;
+		result.blue = this.blue;
+		result.alpha = this.alpha;
+		return result;
+	}
+	set(r, g, b, a) {
+		if (typeof r === "number") {
+			this.red = r;
+			this.green = g;
+			this.blue = b;
+			this.alpha = a;
+		} else r.get(this);
+		return this;
 	}
 	op(fn, v) {
 		super.op(fn, v);
@@ -115,21 +131,17 @@ class Color extends Operable {
 		return number;
 	}
 	static parseRGBA(str, destination) {
-		let rgba = "";
-		let state = false;
-		for (let char of str) {
-			if (char == ")" || char == "(") {
-				state = !state;
-			}
-			else if (state) {
-				rgba += char;
-			}
-		}
-		let rgbaList = rgba.split(",");
-		let red = Color.parseNum(rgbaList[0], 255);
-		let green = Color.parseNum(rgbaList[1], 255);
-		let blue = Color.parseNum(rgbaList[2], 255);
-		let alpha = (rgbaList.length > 3) ? Color.parseNum(rgbaList[3], 1) : 1;
+		const rgba = str.slice(
+			str.indexOf("(") + 1,
+			str.indexOf(")")
+		);
+
+		const [red, green, blue, alpha = 255] = rgba
+			.split(",")
+			.map((piece, index) => Color.parseNum(
+				piece.trim(),
+				(index === 3) ? 1 : 255
+			));
 
 		destination.red = red;
 		destination.green = green;
