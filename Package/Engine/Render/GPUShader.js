@@ -39,12 +39,12 @@ class GLSLError extends Error {
 			let [lineStr, descStr] = string.cut(":");
 			lineStr = lineStr.trim();
 			let line = parseInt(lineStr) - prefixLength;
-			let desc = descStr.trim();
+			let desc = descStr;
 			if (isNaN(line)) {
 				line = 0;
 				desc = rawString;
 			}
-			throw new GLSLError(line, desc);
+			throw new GLSLError(line, desc.trim());
 		}
 	}
 }
