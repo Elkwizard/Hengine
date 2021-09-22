@@ -233,21 +233,14 @@ ${Array.dim(this.outputPixels)
 		gl.viewport(0, 0, outputTextureSize, outputTextureSize);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-		const outputDataArrays = [];
-		for (let i = 0; i < outputTextures.length; i++) {
-			const texture = outputTextures[i];
-			const data = texture.get();
-			outputDataArrays.push(data);
-		}
-
 		output.pointer = 0;
 		output.alloc(problems * outputBytes);
 		const outputData = output.data;
 
 		// output data array major
 		const problems4 = problems * 4;
-		for (let i = 0; i < outputDataArrays.length; i++) {
-			const array = outputDataArrays[i];
+		for (let i = 0; i < outputTextures.length; i++) {
+			const array = outputTextures[i].get();
 			const bytes = Math.min(4, outputBytes - i * 4);
 
 			let problemOffset = i * 4;
@@ -363,7 +356,9 @@ ${Array.dim(this.outputPixels)
 									name = name.slice(0, index);
 								}
 								
-								return new Array(length).fill(0).map((_, i) => ({ type, name: `${name}[${i}]`}));
+								return new Array(length)
+									.fill(0)
+									.map((_, i) => ({ type, name: `${name}[${i}]`}));
 							}
 
 							return [{ type, name }];
