@@ -73,7 +73,9 @@ class ByteBuffer {
 		return base64;
 	}
 	get(buffer = new ByteBuffer()) {
-		buffer.data = this.data.slice(0, this.data.length);
+		const { byteLength } = this;
+		if (buffer.byteLength !== byteLength) buffer.data = this.data.slice();
+		else for (let i = 0; i < byteLength; i++) buffer.data[i] = this.data[i];
 		buffer.pointer = this.pointer;
 		buffer.shouldResize = this.shouldResize;
 		return buffer;
