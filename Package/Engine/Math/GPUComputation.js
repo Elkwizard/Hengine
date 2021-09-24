@@ -23,6 +23,12 @@ class GPUComputation {
 				this.compile();
 			});
 			this.MAX_TEXTURE_SIZE = this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE);
+
+			const { gl } = this;
+
+			this.INTERNAL_FORMAT = gl.RGBA32UI;
+			this.FORMAT = gl.RGBA_INTEGER;
+			this.TYPE = gl.UNSIGNED_INT;
 		};
 
 		this._problems = problems;
@@ -46,18 +52,22 @@ class GPUComputation {
 	}
 	compile() {
 		this._glsl = GLSLPrecompiler.compile(this.glsl);
+		
+		const { ELEMENTS_PER_PIXEL, BYTES_PER_PIXEL, BYTES_PER_CHANNEL, LITTLE_ENDIAN } = GPUComputation;
 
 		{ // extract input/output sizes
 			const result = this.glsl.match(/int\s*\[\s*(\d+)\s*\]\s*compute\s*\(\s*int\s*\[\s*(\d+)\s*\]/);
 			const [_, outputs, inputs] = result.map(num => parseInt(num));
 			this.inputBytes = inputs;
 			this.outputBytes = outputs;
-			this.outputPixels = Math.ceil(this.outputBytes / 4);
-			this.totalInputPixels = Math.ceil(this.inputBytes * this.problems / 4);
+			this.outputPixels = Math.ceil(this.outputBytes / BYTES_PER_PIXEL);
+			this.totalInputPixels = Math.ceil(this.inputBytes * this.problems / BYTES_PER_PIXEL);
 		};
 
 		{ // program
 			const { gl } = this;
+
+			const endian = shift => LITTLE_ENDIAN ? shift : (24 - shift);
 
 			this.vertexShaderSource = `#version 300 es
 				in highp vec2 uv;
@@ -72,19 +82,19 @@ class GPUComputation {
 				precision highp int;
 				precision highp sampler2D;
 				
-				uniform sampler2D _byteBuffer;
+				uniform highp usampler2D _byteBuffer;
 				uniform int _inputTextureWidth;
 				uniform int _outputTextureWidth;
 
 				#define problem (int(gl_FragCoord.y) * _outputTextureWidth + int(gl_FragCoord.x))
 
-				ivec4 _fetchPixel(int index) {
+				uvec4 _fetchPixel(int index) {
 					ivec2 texel = ivec2(
 						index % _inputTextureWidth,
 						index / _inputTextureWidth
 					);
-					vec4 pixel = texelFetch(_byteBuffer, texel, 0);
-					return ivec4(pixel * 255.0);
+					uvec4 pixel = texelFetch(_byteBuffer, texel, 0);
+					return pixel;
 				}
 			`;
 			const prefixLength = prefix.split("\n").length;
@@ -92,7 +102,7 @@ class GPUComputation {
 			this.fragmentShaderSource = `${prefix}
 				${this.glsl}
 
-${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) out vec4 _outputColor${i};`).join("\n")}
+${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`).join("\n")}
 
 				void main() {
 					int[${this.inputBytes}] _inputs;
@@ -100,16 +110,21 @@ ${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) ou
 					ivec2 startIndex = ivec2(gl_FragCoord.xy);
 					int firstByteIndex = problem * ${this.inputBytes};
 					int lastByteIndex = firstByteIndex + ${this.inputBytes};
-					int firstPixelIndex = firstByteIndex / 4;
-					int lastPixelIndex = int(ceil(float(lastByteIndex) / 4.0));
-					int bytesCopied = 0;
+					int firstPixelIndex = firstByteIndex / ${BYTES_PER_PIXEL};
+					int lastPixelIndex = int(ceil(float(lastByteIndex) / ${BYTES_PER_PIXEL}.0));
+					
 					int inputIndex = 0;
 					for (int pixelIndex = firstPixelIndex; pixelIndex < lastPixelIndex; pixelIndex++) {
-						ivec4 pixelColor = _fetchPixel(pixelIndex);
-						int byteIndex = pixelIndex * 4;
-						for (int j = 0; j < 4; j++, byteIndex++)
-							if (byteIndex >= firstByteIndex && byteIndex < lastByteIndex)
-								_inputs[inputIndex++] = pixelColor[j];
+						uvec4 pixelColor = _fetchPixel(pixelIndex);
+						int byteIndex = pixelIndex * ${BYTES_PER_PIXEL};
+						for (int j = 0; j < 4; j++, byteIndex += ${BYTES_PER_CHANNEL}) {
+							if (byteIndex >= lastByteIndex) break;
+							uint channel = pixelColor[j];
+							if (byteIndex + 0 >= firstByteIndex && byteIndex + 0 < lastByteIndex) _inputs[inputIndex++] = int((channel >> ${endian(0)}u) & 255u);
+							if (byteIndex + 1 >= firstByteIndex && byteIndex + 1 < lastByteIndex) _inputs[inputIndex++] = int((channel >> ${endian(8)}u) & 255u);
+							if (byteIndex + 2 >= firstByteIndex && byteIndex + 2 < lastByteIndex) _inputs[inputIndex++] = int((channel >> ${endian(16)}u) & 255u);
+							if (byteIndex + 3 >= firstByteIndex && byteIndex + 3 < lastByteIndex) _inputs[inputIndex++] = int((channel >> ${endian(24)}u) & 255u);
+						}
 					}
 
 					int[${this.outputBytes}] _outputs = compute(_inputs);
@@ -118,9 +133,15 @@ ${Array.dim(this.outputPixels)
 					.map((_, index) => {
 						const startIndex = index * 4;
 						const samples = [];
-						for (let i = startIndex; i < this.outputBytes && i < startIndex + 4; i++) samples.push(`_outputs[${i}]`);
-						for (let i = samples.length; i < 4; i++) samples.push("0.0");
-						return `\t\t\t\t\t_outputColor${index} = vec4(${samples.join(", ")}) / 255.0;`
+						for (let i = startIndex; i < startIndex + 4; i++) {
+							const byteIndex = i * BYTES_PER_CHANNEL;
+							const bytes = Math.min(BYTES_PER_CHANNEL, this.outputBytes - byteIndex);
+							if (bytes <= 0) break;
+							const ors = new Array(bytes).fill(0).map((_, inx) => `clamp(_outputs[${byteIndex + inx}], 0, 255) << ${endian(inx * 8)}`).join(" | ");
+							samples.push(ors);
+						}
+						for (let i = samples.length; i < 4; i++) samples.push("0u");
+						return `\t\t\t\t\t_outputColor${index} = uvec4(${samples.join(", ")});`
 					})
 					.join("\n")
 				}
@@ -153,7 +174,8 @@ ${Array.dim(this.outputPixels)
 
 			const createTexture = (count, index = 0) => {
 				const size = getSize(count);
-				const data = new Uint8Array(size * size * 4);
+				const data = new Uint32Array(size * size * ELEMENTS_PER_PIXEL);
+				const data8 = new Uint8Array(data.buffer);
 				const texture = gl.createTexture();
 
 				gl.activeTexture(gl.TEXTURE0);
@@ -162,16 +184,16 @@ ${Array.dim(this.outputPixels)
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+				gl.texImage2D(gl.TEXTURE_2D, 0, this.INTERNAL_FORMAT, size, size, 0, this.FORMAT, this.TYPE, null);
 
 				return {
-					size, texture, data, index,
+					size, texture, data, data8, index,
 					set: value => {
 						const { byteLength, buffer } = value;
-						const pxLength = Math.floor(byteLength / 4);
+						const pxLength = Math.floor(byteLength / BYTES_PER_PIXEL);
 						const completeRows = Math.floor(pxLength / size);
 						const lastRowWidth = pxLength % size;
-						const pxLeft = byteLength % 4;
+						const pxLeft = byteLength % BYTES_PER_PIXEL;
 						
 						gl.activeTexture(gl.TEXTURE0);
 						gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -179,26 +201,27 @@ ${Array.dim(this.outputPixels)
 						let nextX = 0;
 						let nextY = completeRows;
 
-						const completeRowsBuffer = new Uint8Array(buffer, 0, completeRows * size * 4);
-						gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, size, completeRows, gl.RGBA, gl.UNSIGNED_BYTE, completeRowsBuffer);
+						const completeRowsBuffer = new Uint32Array(buffer, 0, completeRows * size * ELEMENTS_PER_PIXEL);
+						gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, size, completeRows, this.FORMAT, this.TYPE, completeRowsBuffer);
 
 						if (lastRowWidth) {
-							const lastRowBuffer = new Uint8Array(buffer, completeRows * size * 4, lastRowWidth * 4);
-							gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, completeRows, lastRowWidth, 1, gl.RGBA, gl.UNSIGNED_BYTE, lastRowBuffer);
+							const lastRowBuffer = new Uint32Array(buffer, completeRows * size * BYTES_PER_PIXEL, lastRowWidth * ELEMENTS_PER_PIXEL);
+							gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, completeRows, lastRowWidth, 1, this.FORMAT, this.TYPE, lastRowBuffer);
 							nextX = lastRowWidth;
 						}
 
 						if (pxLeft) {
-							const lastPixelBuffer = new Uint8Array(4);
-							const lastPixelData = new Uint8Array(buffer, pxLength * 4);
-							lastPixelBuffer.set(lastPixelData);
-							gl.texSubImage2D(gl.TEXTURE_2D, 0, nextX, nextY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, lastPixelBuffer);
+							const lastPixelBuffer8 = new Uint8Array(buffer, pxLength * BYTES_PER_PIXEL);
+							const lastPixelBuffer = new Uint32Array(ELEMENTS_PER_PIXEL);
+							const lastPixelBufferView8 = new Uint8Array(lastPixelBuffer.buffer);
+							lastPixelBufferView8.set(lastPixelBuffer8);
+							gl.texSubImage2D(gl.TEXTURE_2D, 0, nextX, nextY, 1, 1, this.FORMAT, this.TYPE, lastPixelBuffer);
 						}
 					},
 					get: () => {
 						gl.readBuffer(gl.COLOR_ATTACHMENT0 + index);
-						gl.readPixels(0, 0, size, size, gl.RGBA, gl.UNSIGNED_BYTE, data);
-						return data;
+						gl.readPixels(0, 0, size, size, this.FORMAT, this.TYPE, data);
+						return data8;
 					}
 				};
 			};
@@ -237,17 +260,20 @@ ${Array.dim(this.outputPixels)
 		output.alloc(problems * outputBytes);
 		const outputData = output.data;
 
+		
+		const { BYTES_PER_PIXEL } = GPUComputation;
+
 		// output data array major
-		const problems4 = problems * 4;
+		const outputTextureBytes = problems * BYTES_PER_PIXEL;
 		for (let i = 0; i < outputTextures.length; i++) {
 			const array = outputTextures[i].get();
-			const bytes = Math.min(4, outputBytes - i * 4);
+			const bytes = Math.min(BYTES_PER_PIXEL, outputBytes - i * BYTES_PER_PIXEL);
 
-			let problemOffset = i * 4;
-			for (let j = 0; j < problems4; j += 4) {
+			let problemOffset = i * BYTES_PER_PIXEL;
+			for (let j = 0; j < outputTextureBytes; j += BYTES_PER_PIXEL) {
 				for (let k = 0; k < bytes; k++)
 					outputData[problemOffset + k] = array[j + k];
-				problemOffset += outputBytes
+				problemOffset += outputBytes;
 			}
 		}
 
@@ -433,3 +459,12 @@ ${Array.dim(this.outputPixels)
 		return finalGLSL;
 	}
 }
+GPUComputation.BYTES_PER_PIXEL = 16;
+GPUComputation.BYTES_PER_CHANNEL = 4;
+GPUComputation.ELEMENTS_PER_PIXEL = GPUComputation.BYTES_PER_PIXEL / GPUComputation.BYTES_PER_CHANNEL;
+{
+	const buffer = new Uint16Array(2);
+	const view = new Uint8Array(buffer.buffer);
+	buffer[0] = 1;
+	GPUComputation.LITTLE_ENDIAN = !!view[0];
+};

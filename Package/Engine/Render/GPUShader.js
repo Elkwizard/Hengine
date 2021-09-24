@@ -293,6 +293,8 @@ class GLSLProgram {
 			case gl.FLOAT_MAT4: rows = 4; columns = 4; break;
 
 			case gl.SAMPLER_2D: integer = true; texture = true; break;
+			case gl.INT_SAMPLER_2D: integer = true; texture = true; break;
+			case gl.UNSIGNED_INT_SAMPLER_2D: integer = true; texture = true; break;
 
 			case gl.UNSIGNED_INT: integer = true; signed = false; break;
 			case gl.UNSIGNED_INT_VEC2: integer = true; rows = 2; signed = false; break;
