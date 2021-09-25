@@ -927,13 +927,6 @@ class Artist {
 				break;
 			case "image":
 				let currentImage = drawArgs[0];
-				let [clipX = 0, clipY = 0, clipW = currentImage.width, clipH = currentImage.height] = drawArgs.slice(1);
-				if (clipX instanceof Rect) {
-					clipH = clipX.height;
-					clipW = clipX.width;
-					clipY = clipX.y;
-					clipX = clipX.x;
-				}
 
 				let boundW, boundH, boundX, boundY;
 				if (shape === "rect") {
@@ -966,7 +959,7 @@ class Artist {
 
 				if (shape === "rect") {
 					return function () {
-						this.c.drawImage(img, clipX, clipY, clipW, clipH, boundX, boundY, boundW, boundH);
+						this.c.drawImage(img, boundX, boundY, boundW, boundH);
 					}.bind(this);
 				}
 
@@ -976,7 +969,7 @@ class Artist {
 						this.c.beginPath();
 						this.c.arc(shapeArgs.x, shapeArgs.y, shapeArgs.radius, 0, 6.283185307179586);
 						this.c.clip();
-						this.c.drawImage(img, clipX, clipY, clipW, clipH, boundX, boundY, boundW, boundH);
+						this.c.drawImage(img, boundX, boundY, boundW, boundH);
 						this.restore();
 					}.bind(this);
 				}
@@ -991,7 +984,7 @@ class Artist {
 						this.c.moveTo(v[0].x, v[0].y);
 						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y);
 						this.c.clip();
-						this.c.drawImage(img, clipX, clipY, clipW, clipH, boundX, boundY, boundW, boundH);
+						this.c.drawImage(img, boundX, boundY, boundW, boundH);
 						this.c.restore();
 					}.bind(this);
 				}
