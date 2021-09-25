@@ -418,7 +418,6 @@ class FileSystem { };
 			buffer.write.array("uint32", this.free);
 			buffer.write.array("string", this.files.map(file => file.toString()));
 			buffer.finalize();
-			buffer.pointer = 0;
 			buffer.pointer = buffer.byteLength;
 			return buffer.toString();
 		}

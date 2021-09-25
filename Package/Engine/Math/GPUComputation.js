@@ -325,24 +325,24 @@ ${Array.dim(this.outputPixels)
 		};
 
 		const read = {
-			float: `intBitsToFloat(ib[ip] << 24 | ib[ip + 1] << 16 | ib[ip + 2] << 8 | ib[ip + 3])`,
-			int: `ib[ip] << 24 | ib[ip + 1] << 16 | ib[ip + 2] << 8 | ib[ip + 3]`,
+			float: `intBitsToFloat(ib[ip] | ib[ip + 1] << 8 | ib[ip + 2] << 16 | ib[ip + 3] << 24)`,
+			int: `ib[ip] | ib[ip + 1] << 8 | ib[ip + 2] << 16 | ib[ip + 3] << 24`,
 			bool: `ib[ip] == 1`
 		};
 
 		const write = {
 			float: `
 			int bits = floatBitsToInt(value);
-			ob[op] = (bits >> 24) & 255;
-			ob[op + 1] = (bits >> 16) & 255;
-			ob[op + 2] = (bits >> 8) & 255;
-			ob[op + 3] = bits & 255;
+			ob[op] = bits & 255;
+			ob[op + 1] = (bits >> 8) & 255;
+			ob[op + 2] = (bits >> 16) & 255;
+			ob[op + 3] = (bits >> 24) & 255;
 		  `,
 			int: `
-			ob[op] = (value >> 24) & 255;
-			ob[op + 1] = (value >> 16) & 255;
-			ob[op + 2] = (value >> 8) & 255;
-			ob[op + 3] = value & 255;
+			ob[op] = value & 255;
+			ob[op + 1] = (value >> 8) & 255;
+			ob[op + 2] = (value >> 16) & 255;
+			ob[op + 3] = (value >> 24) & 255;
 		  `,
 			bool: `
 			ob[op] = value ? 1 : 0;

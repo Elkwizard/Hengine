@@ -1,5 +1,5 @@
 class ByteBuffer {
-	constructor(bytes = 2, pointer = 0, littleEndian = false) {
+	constructor(bytes = 2, pointer = 0, littleEndian = true) {
 		this.data = new Uint8Array(bytes);
 		this.view = new DataView(this.data.buffer);
 		this.pointer = pointer;
@@ -34,9 +34,16 @@ class ByteBuffer {
 		return this;
 	}
 	toString() {
-		let result = String.fromCharCode(this.pointer >> 16, this.pointer & 0xFFFF, this.byteLength >> 16, this.byteLength & 0xFFFF);
+		let result = String.fromCharCode(
+			this.pointer >> 16,
+			this.pointer & 0xFFFF,
+			this.byteLength >> 16,
+			this.byteLength & 0xFFFF
+		);
 		for (let i = 0; i < this.data.length; i += 2)
 			result += String.fromCharCode(this.data[i] << 8 | (this.data[i + 1] || 0));
+		
+		if (this.littleEndian) result += "~";
 
 		return result;
 	}
@@ -97,16 +104,16 @@ class ByteBuffer {
 
 			if (base64[i + 2] + base64[i + 3] === "==") {
 				// _==
-				buffer.write.uint8((b0 << 2) | (b1 >> 4));
+				buffer.write.uint8(b0 << 2 | b1 >> 4);
 			} else if (base64[i + 3] === "=") {
 				// __=
-				buffer.write.uint8((b0 << 2) | (b1 >> 4));
-				buffer.write.uint8(((b1 & 0b1111) << 4) | (b2 >> 2));
+				buffer.write.uint8(b0 << 2 | b1 >> 4);
+				buffer.write.uint8((b1 & 0b1111) << 4 | b2 >> 2);
 			} else {
 				// ___
-				buffer.write.uint8((b0 << 2) | (b1 >> 4));
-				buffer.write.uint8(((b1 & 0b1111) << 4) | (b2 >> 2));
-				buffer.write.uint8(((b2 & 0b11) << 6) | b3);
+				buffer.write.uint8(b0 << 2 | b1 >> 4);
+				buffer.write.uint8((b1 & 0b1111) << 4 | b2 >> 2);
+				buffer.write.uint8((b2 & 0b11) << 6 | b3);
 			}
 		}
 
@@ -119,9 +126,15 @@ class ByteBuffer {
 	static fromString(string) {
 		// console.log(string[4].charCodeAt(0));
 		const length = string.charCodeAt(2) << 16 | string.charCodeAt(3);
-		const buffer = new ByteBuffer(length);
+		const stringLength = Math.ceil(length / 2) + 4;
+		const buffer = new ByteBuffer(length, 0, stringLength < string.length);
 		buffer.shouldResize = false;
-		for (let i = 4; i < string.length; i++) buffer.write.uint16(string.charCodeAt(i));
+		for (let i = 0; i < stringLength; i++) {
+			const code = string.charCodeAt(i + 4);
+			const inx = i * 2;
+			buffer.data[inx] = code >> 8;
+			if (inx + 1 < length) buffer.data[inx + 1] = code & 255;
+		}
 		buffer.pointer = string.charCodeAt(0) << 16 | string.charCodeAt(1);
 		buffer.shouldResize = true;
 		return buffer;
@@ -209,6 +222,7 @@ ByteBuffer.Writer = class {
 	byteBuffer(buffer) {
 		this.array("uint8", buffer.data);
 		this.uint32(buffer.pointer);
+		this.bool(buffer.littleEndian);
 	}
 	object(object, objectIDs /* object => id */) {
 		const type = this._getType(object);
@@ -251,11 +265,9 @@ ByteBuffer.Reader = class {
 		const byteNum = this.int32();
 		const bytes = BigInt(Math.abs(byteNum));
 		let result = 0n;
-		for (let i = bytes - 1n; i >= 0n; i--) {
+		for (let i = bytes - 1n; i >= 0n; i--)
 			result |= BigInt(this.uint8()) << (i * 8n);
-		}
-		if (byteNum > 0) return result;
-		return -result;
+		return (byteNum > 0) ? result : -result;
 	}
 	string() {
 		const len = this.uint32();
@@ -286,7 +298,7 @@ ByteBuffer.Reader = class {
 		return result;
 	}
 	byteBuffer() {
-		return new ByteBuffer(this.array("uint8"), this.uint32());
+		return new ByteBuffer(this.array("uint8"), this.uint32(), this.bool());
 	}
 	object(objectIDs /* id => object */) {
 		const type = ByteBuffer.indexToType[this.uint8()];

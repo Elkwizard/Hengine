@@ -66,7 +66,11 @@ class Operable {
     }
     map(fn) {
         const result = this.get();
-        for (let i = 0; i < this.constructor.modValues.length; i++) result[x] = fn(result.at(i));
+        const { modValues } = this.constructor;
+        for (let i = 0; i < modValues.length; i++) {
+            const field = modValues[i];
+            result[field] = fn(result[field]);
+        }
         return result;
     }
     total() {
