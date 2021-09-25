@@ -54,6 +54,7 @@ class GPUComputation {
 		this._glsl = GLSLPrecompiler.compile(this.glsl);
 		
 		const { ELEMENTS_PER_PIXEL, BYTES_PER_PIXEL, BYTES_PER_CHANNEL, LITTLE_ENDIAN } = GPUComputation;
+		const { gl, FORMAT, INTERNAL_FORMAT, TYPE } = this;
 
 		{ // extract input/output sizes
 			const result = this.glsl.match(/int\s*\[\s*(\d+)\s*\]\s*compute\s*\(\s*int\s*\[\s*(\d+)\s*\]/);
@@ -65,8 +66,6 @@ class GPUComputation {
 		};
 
 		{ // program
-			const { gl } = this;
-
 			const endian = shift => LITTLE_ENDIAN ? shift : (24 - shift);
 
 			this.vertexShaderSource = `#version 300 es
@@ -166,8 +165,6 @@ ${Array.dim(this.outputPixels)
 		};
 
 		{ // build gl textures
-			const { gl } = this;
-
 			this.framebuffer = gl.createFramebuffer();
 
 			const getSize = count => Math.ceil(Math.sqrt(count));
@@ -184,7 +181,7 @@ ${Array.dim(this.outputPixels)
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-				gl.texImage2D(gl.TEXTURE_2D, 0, this.INTERNAL_FORMAT, size, size, 0, this.FORMAT, this.TYPE, null);
+				gl.texImage2D(gl.TEXTURE_2D, 0, INTERNAL_FORMAT, size, size, 0, FORMAT, TYPE, null);
 
 				return {
 					size, texture, data, data8, index,
@@ -202,11 +199,11 @@ ${Array.dim(this.outputPixels)
 						let nextY = completeRows;
 
 						const completeRowsBuffer = new Uint32Array(buffer, 0, completeRows * size * ELEMENTS_PER_PIXEL);
-						gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, size, completeRows, this.FORMAT, this.TYPE, completeRowsBuffer);
+						gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, size, completeRows, FORMAT, TYPE, completeRowsBuffer);
 
 						if (lastRowWidth) {
 							const lastRowBuffer = new Uint32Array(buffer, completeRows * size * BYTES_PER_PIXEL, lastRowWidth * ELEMENTS_PER_PIXEL);
-							gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, completeRows, lastRowWidth, 1, this.FORMAT, this.TYPE, lastRowBuffer);
+							gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, completeRows, lastRowWidth, 1, FORMAT, TYPE, lastRowBuffer);
 							nextX = lastRowWidth;
 						}
 
@@ -215,12 +212,12 @@ ${Array.dim(this.outputPixels)
 							const lastPixelBuffer = new Uint32Array(ELEMENTS_PER_PIXEL);
 							const lastPixelBufferView8 = new Uint8Array(lastPixelBuffer.buffer);
 							lastPixelBufferView8.set(lastPixelBuffer8);
-							gl.texSubImage2D(gl.TEXTURE_2D, 0, nextX, nextY, 1, 1, this.FORMAT, this.TYPE, lastPixelBuffer);
+							gl.texSubImage2D(gl.TEXTURE_2D, 0, nextX, nextY, 1, 1, FORMAT, TYPE, lastPixelBuffer);
 						}
 					},
 					get: () => {
 						gl.readBuffer(gl.COLOR_ATTACHMENT0 + index);
-						gl.readPixels(0, 0, size, size, this.FORMAT, this.TYPE, data);
+						gl.readPixels(0, 0, size, size, FORMAT, TYPE, data);
 						return data8;
 					}
 				};

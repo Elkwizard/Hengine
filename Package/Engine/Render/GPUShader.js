@@ -206,6 +206,7 @@ class GLSLProgram {
 								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
 								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
 							}
+							// console.log(imageCIS);
 							GL.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
 						}
 						if (array) set = images => images.forEach(writeImage);
@@ -531,7 +532,7 @@ class GPUShader extends ImageType {
 		program.setUniform("resolution", new Vector2(this.width, this.height));
 		gl.viewport(0, 0, this.image.width, this.image.height);
 	}
-	resize(width, height) {
+	onresize(width, height) {
 		width *= this.pixelRatio;
 		height *= this.pixelRatio;
 		width = Math.max(1, Math.abs(Math.ceil(width)));

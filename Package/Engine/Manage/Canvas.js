@@ -38,7 +38,7 @@ class CanvasImage extends ImageType {
 	get cursor() {
 		return this.canvas.style.cursor;
 	}
-	resize(width, height) {
+	onresize(width, height) {
 		this.renderer.resize(width, height);
 		if (this.engine.scene) this.engine.scene.camera.position = this.renderer.middle;
 		this.updateSize();

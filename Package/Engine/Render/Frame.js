@@ -26,8 +26,7 @@ function new_OffscreenCanvas(width, height) {
 
 class ImageType {
 	constructor(width = 1, height = 1, pixelRatio = null) {
-		this._width = Math.max(1, Math.ceil(width));
-		this._height = Math.max(1, Math.ceil(height));
+		this.resize(width, height, false);
 		this.loaded = true;
 		if (pixelRatio !== null) {
 			delete this.pixelRatio;
@@ -38,16 +37,20 @@ class ImageType {
 	}
 	set width(a) {
 		const prev = this._width;
-		this._width = a;
-		if (prev !== a) this.resize(this._width, this._height);
+		if (prev !== a) {
+			this._width = a;
+			this.onresize(this._width, this._height);
+		}
 	}
 	get width() {
 		return this._width;
 	}
 	set height(a) {
 		const prev = this._height;
-		this._height = a;
-		if (prev !== a) this.resize(this._width, this._height);
+		if (prev !== a) {
+			this._height = a;
+			this.onresize(this._width, this._height);
+		}
 	}
 	get height() {
 		return this._height;
@@ -55,7 +58,18 @@ class ImageType {
 	get pixelRatio() {
 		return this.makeImage().width / this.width;
 	}
-	resize(width, height) { } // virtual
+	onresize(width, height) { } // virtual
+	resize(width, height, notify = true) {
+		width = Math.max(1, Math.ceil(width));
+		height = Math.max(1, Math.ceil(height));
+		const prevWidth = this._width;
+		const prevHeight = this._height;
+		if (prevWidth !== width || prevHeight !== height) {
+			this._width = width;
+			this._height = height;
+			if (notify) this.onresize();
+		}
+	}
 	inferWidth(height) {
 		return this.width * height / this.height;
 	}
@@ -112,7 +126,7 @@ class Frame extends ImageType {
 		this.image = new_OffscreenCanvas(this.width * pixelRatio, this.height * pixelRatio);
 		this.renderer = new Artist(this.image, this.width, this.height, this, pixelRatio);
 	}
-	resize(width, height) {
+	onresize(width, height) {
 		this.renderer.resize(width, height);
 	}
 	stretch(w, h) {

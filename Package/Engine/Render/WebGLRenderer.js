@@ -534,7 +534,7 @@ class FastFrame extends ImageType {
 		this.image = new_OffscreenCanvas(this.width * pixelRatio, this.height * pixelRatio);
 		this.renderer = new WebGLArtist(this.image, this.width, this.height, this, pixelRatio);
 	}
-	resize(width, height) {
+	onresize(width, height) {
 		this.renderer.resize(width, height);
 	}
 	stretch(w, h) {
