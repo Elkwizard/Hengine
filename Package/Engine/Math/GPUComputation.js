@@ -1,7 +1,7 @@
 class GPUComputation {
 	constructor(problems, glsl) {
 		{ // build context
-			if (!window.WebGL2RenderingContext) throw new ReferenceError("Your browser doesn't support WebGL");
+			if (!window.WebGL2RenderingContext) throw new ReferenceError("Your browser doesn't support GPUComputations");
 
 			this.canvas = new_OffscreenCanvas(1, 1);
 			this.gl = this.canvas.getContext("webgl2", {
@@ -85,7 +85,8 @@ class GPUComputation {
 				uniform int _inputTextureWidth;
 				uniform int _outputTextureWidth;
 
-				#define problem (int(gl_FragCoord.y) * _outputTextureWidth + int(gl_FragCoord.x))
+				#define PROBLEM_INDEX (int(gl_FragCoord.y) * _outputTextureWidth + int(gl_FragCoord.x))
+				#define PROBLEMS ${this.problems}
 
 				uvec4 _fetchPixel(int index) {
 					ivec2 texel = ivec2(
@@ -95,19 +96,11 @@ class GPUComputation {
 					uvec4 pixel = texelFetch(_byteBuffer, texel, 0);
 					return pixel;
 				}
-			`;
-			const prefixLength = prefix.split("\n").length;
 
-			this.fragmentShaderSource = `${prefix}
-				${this.glsl}
+				int[${this.inputBytes}] getProblem(int problemIndex) {
+					int[${this.inputBytes}] problemBytes;
 
-${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`).join("\n")}
-
-				void main() {
-					int[${this.inputBytes}] _inputs;
-
-					ivec2 startIndex = ivec2(gl_FragCoord.xy);
-					int firstByteIndex = problem * ${this.inputBytes};
+					int firstByteIndex = problemIndex * ${this.inputBytes};
 					int lastByteIndex = firstByteIndex + ${this.inputBytes};
 					int firstPixelIndex = firstByteIndex / ${BYTES_PER_PIXEL};
 					int lastPixelIndex = int(ceil(float(lastByteIndex) / ${BYTES_PER_PIXEL}.0));
@@ -119,13 +112,25 @@ ${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) ou
 						for (int j = 0; j < 4; j++, byteIndex += ${BYTES_PER_CHANNEL}) {
 							if (byteIndex >= lastByteIndex) break;
 							uint channel = pixelColor[j];
-							if (byteIndex + 0 >= firstByteIndex && byteIndex + 0 < lastByteIndex) _inputs[inputIndex++] = int((channel >> ${endian(0)}u) & 255u);
-							if (byteIndex + 1 >= firstByteIndex && byteIndex + 1 < lastByteIndex) _inputs[inputIndex++] = int((channel >> ${endian(8)}u) & 255u);
-							if (byteIndex + 2 >= firstByteIndex && byteIndex + 2 < lastByteIndex) _inputs[inputIndex++] = int((channel >> ${endian(16)}u) & 255u);
-							if (byteIndex + 3 >= firstByteIndex && byteIndex + 3 < lastByteIndex) _inputs[inputIndex++] = int((channel >> ${endian(24)}u) & 255u);
+							if (byteIndex + 0 >= firstByteIndex && byteIndex + 0 < lastByteIndex) problemBytes[inputIndex++] = int((channel >> ${endian(0)}u) & 255u);
+							if (byteIndex + 1 >= firstByteIndex && byteIndex + 1 < lastByteIndex) problemBytes[inputIndex++] = int((channel >> ${endian(8)}u) & 255u);
+							if (byteIndex + 2 >= firstByteIndex && byteIndex + 2 < lastByteIndex) problemBytes[inputIndex++] = int((channel >> ${endian(16)}u) & 255u);
+							if (byteIndex + 3 >= firstByteIndex && byteIndex + 3 < lastByteIndex) problemBytes[inputIndex++] = int((channel >> ${endian(24)}u) & 255u);
 						}
 					}
 
+					return problemBytes;
+				}
+			`;
+			const prefixLength = prefix.split("\n").length;
+
+			this.fragmentShaderSource = `${prefix}
+				${this.glsl}
+
+${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`).join("\n")}
+
+				void main() {
+					int[${this.inputBytes}] _inputs = getProblem(PROBLEM_INDEX);
 					int[${this.outputBytes}] _outputs = compute(_inputs);
 
 ${Array.dim(this.outputPixels)
@@ -256,7 +261,6 @@ ${Array.dim(this.outputPixels)
 		output.pointer = 0;
 		output.alloc(problems * outputBytes);
 		const outputData = output.data;
-
 		
 		const { BYTES_PER_PIXEL } = GPUComputation;
 
@@ -350,7 +354,7 @@ ${Array.dim(this.outputPixels)
 		};
 
 		function fields(name) {
-			const regexp = new RegExp(`struct ${name} { ([^\}]*?) }`);
+			const regexp = new RegExp(`struct ${name} { ([^\}]*?) };`);
 			const contents = glsl.match(regexp)[1];
 			const fields = contents
 				.split(";")
@@ -429,28 +433,41 @@ ${Array.dim(this.outputPixels)
 
 		const inputBytes = getByteOffset(ifields);
 		const outputBytes = getByteOffset(ofields);
+		
+		const readerGLSL = "int " + ifields.map((field, index) => makeReader(field, getByteOffset(ifields, index))).join("\n");
+		const writerGLSL = "int " + ofields.map((field, index) => makeWriter(field, getByteOffset(ofields, index))).join("\n");
 
-		const userGLSL = originalGLSL.replace(/\bcompute\b/g, "_compute");
+		let userGLSL = originalGLSL
+			.replace(/\bcompute\b/g, "_compute")
+			.replace(/\bgetProblem\b/g, "_getProblem");
+
+		{
+			const regexp = new RegExp(String.raw`struct\s+${inputStruct}\s+\{((.|\n)*?)\};`);
+			const result = userGLSL.match(regexp);
+			const lastIndex = result.index + result[0].length;
+			const infix = `
+				${inputStruct} _getProblem(int problemIndex) {
+					${inputStruct} i;
+					int[${inputBytes}] ib = getProblem(problemIndex);
+					${readerGLSL}
+					return i;
+				}
+			`;
+			userGLSL = userGLSL.slice(0, lastIndex) + infix.replace(/\s+/g, " ") + userGLSL.slice(lastIndex);
+		};
 
 		const finalGLSL = `${userGLSL}
-	
-		  int[${outputBytes}] compute(int[${inputBytes}] ib) {
-			// return ib;
-			${inputStruct} i;
-			int ip = 0;
-	
-			// read from input buffer
-	${ifields.map((field, index) => makeReader(field, getByteOffset(ifields, index))).join("\n")}
-			
-			int ob[${outputBytes}];
-			${outputStruct} o = _compute(i);
-			int op = 0;
-	
-			// write to output buffer
-	${ofields.map((field, index) => makeWriter(field, getByteOffset(ofields, index))).join("\n")}
-			
-			return ob;
-		  }
+
+			int[${outputBytes}] compute(int[${inputBytes}] ib) {
+				${inputStruct} i;
+				${readerGLSL}
+				
+				${outputStruct} o = _compute(i);
+				int ob[${outputBytes}];
+				${writerGLSL}
+				
+				return ob;
+			}
 		`;
 
 		return finalGLSL;
