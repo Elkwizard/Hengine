@@ -17,8 +17,12 @@ class Random {
     static char() {
         return String.fromCharCode(Math.round(Random.random() * 0xFFFF));
     }
-    static color() {
-        return new Color(Random.random() * 255, Random.random() * 255, Random.random() * 255, 1);
+    static color(result = Color.empty) {
+        result.red = Random.random() * 255;
+        result.green = Random.random() * 255;
+        result.blue = Random.random() * 255;
+        result.alpha = 1;
+        return result;
     }
     static choice(arr, percentages = null) {
         if (!Array.isArray(arr)) arr = Array.from(arr);

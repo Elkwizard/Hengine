@@ -1,6 +1,6 @@
 function new_OffscreenCanvas(width, height) {
-	width = Math.ceil(width);
-	height = Math.ceil(height);
+	width = Math.floor(width);
+	height = Math.floor(height);
 
 	let canvas;
 	if (window.OffscreenCanvas) {
@@ -31,14 +31,10 @@ class ImageType {
 	constructor(width = 1, height = 1, pixelRatio = null) {
 		this.resize(width, height, false);
 		this.loaded = true;
-		if (pixelRatio !== null) {
-			delete this.pixelRatio;
-			Object.defineProperty(this, "pixelRatio", {
-				get: () => pixelRatio
-			});
-		}
+		this._pixelRatio = pixelRatio;
 	}
 	set width(a) {
+		a = ImageType.roundDimension(a);
 		const prev = this._width;
 		if (prev !== a) {
 			this._width = a;
@@ -49,6 +45,7 @@ class ImageType {
 		return this._width;
 	}
 	set height(a) {
+		a = ImageType.roundDimension(a);
 		const prev = this._height;
 		if (prev !== a) {
 			this._height = a;
@@ -59,21 +56,21 @@ class ImageType {
 		return this._height;
 	}
 	get pixelRatio() {
-		return this.makeImage().width / this.width;
+		return this._pixelRatio ?? (this.makeImage().width / this.width);
 	}
 	get pixelWidth() {
-		return Math.ceil(this.width * this.pixelRatio);
+		return Math.floor(this.width * this.pixelRatio);
 	}
 	get pixelHeight() {
-		return Math.ceil(this.height * this.pixelRatio);
+		return Math.floor(this.height * this.pixelRatio);
 	}
 	get renderable() {
 		return this.loaded && this.width > 0 && this.height > 0;
 	}
 	onresize(width, height) { } // virtual
 	resize(width, height, notify = true) {
-		width = Math.max(0, Math.ceil(width));
-		height = Math.max(0, Math.ceil(height));
+		width = ImageType.roundDimension(width);
+		height = ImageType.roundDimension(height);
 		const prevWidth = this._width;
 		const prevHeight = this._height;
 		if (prevWidth !== width || prevHeight !== height) {
@@ -105,6 +102,9 @@ class ImageType {
 			a.onclick = () => resolve();
 			a.click();
 		});
+	}
+	static roundDimension(dimension) {
+		return Math.max(0, Math.floor(dimension));
 	}
 }
 class HImage extends ImageType {

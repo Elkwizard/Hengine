@@ -198,7 +198,7 @@ class GLSLProgram {
 						function writeImage(image, index = 0) {
 							if (index >= length) return;
 							const imagePixelated = image instanceof Texture;
-							const imageCIS = imagePixelated ? image.imageData : image.makeImage();
+							const imageCIS = (image instanceof Texture) ? image.imageData : image.makeImage();
 							GL.activeTexture(gl.TEXTURE0 + indices[index]);
 							if (imagePixelated !== pixelated) {
 								pixelated = imagePixelated;

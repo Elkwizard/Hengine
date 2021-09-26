@@ -1002,8 +1002,8 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 	//#endregion
 	//#region large scale canvas changes
 	function resize(width, height) {
-		gl.canvas.width = Math.ceil(width * glState.pixelRatio);
-		gl.canvas.height = Math.ceil(height * glState.pixelRatio);
+		gl.canvas.width = Math.floor(width * glState.pixelRatio);
+		gl.canvas.height = Math.floor(height * glState.pixelRatio);
 
 		if (!glState.hasContext) return;
 		guarenteeWebGLObjects();

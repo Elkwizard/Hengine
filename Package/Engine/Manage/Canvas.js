@@ -49,10 +49,10 @@ class CanvasImage extends ImageType {
 		if (this.scalingMode === ScalingMode.INTEGER_MULTIPLE) {
 			let scale = packed.width / this.width;
 			if (scale < 1) {
-				let newScale = 1 / Math.ceil(1 / scale);
+				const newScale = 1 / Math.ceil(1 / scale);
 				packed = packed.scale(newScale / scale);
 			} else {
-				let newScale = Math.floor(scale);
+				const newScale = Math.floor(scale);
 				packed = packed.scale(newScale / scale);
 			}
 		}

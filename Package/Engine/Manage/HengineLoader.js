@@ -211,15 +211,15 @@ class HengineLoader {
 		window.intervals = this.hengine.intervals;
 		window.canvas = this.hengine.canvas;
 
-		let hengine = this;
+		const hengineLoader = this;
 		if (!(window.width || window.height || window.middle)) {
 			Object.defineProperty(window, "middle", {
 				get() {
-					return new Vector2(hengine.hengine.canvas.width / 2, hengine.hengine.canvas.height / 2);
+					return new Vector2(hengineLoader.hengine.canvas.width / 2, hengineLoader.hengine.canvas.height / 2);
 				}
 			});
-			Object.shortcut(window, hengine.hengine.canvas, "width");
-			Object.shortcut(window, hengine.hengine.canvas, "height");
+			Object.shortcut(window, hengineLoader.hengine.canvas, "width");
+			Object.shortcut(window, hengineLoader.hengine.canvas, "height");
 		}
 
 		window.loadResource = this.loadResource.bind(this);

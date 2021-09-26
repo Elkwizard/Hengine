@@ -189,27 +189,26 @@ class Texture extends ImageType {
 		if (!w) w = image.width;
 		if (!h) h = image.height;
 
-		let img = image.makeImage();
-		
-		let canvas = new_OffscreenCanvas(img.width, img.height);
-		let context = canvas.getContext("2d");
+		const img = image.makeImage();
+		const canvas = new_OffscreenCanvas(img.width, img.height);
+		const context = canvas.getContext("2d");
 		context.drawImage(img, 0, 0);
 
-		const ratio = img.width / image.width;
+		const ratio = image.pixelRatio;
 
 		x *= ratio;
 		y *= ratio;
-		let W = Math.floor(img.width);//Math.floor(w * __devicePixelRatio);
-		let H = Math.floor(img.height);//Math.floor(h * __devicePixelRatio);
-		let imageData = context.getImageData(x, y, W, H);
-		let tex = new Texture(w, h);
-		let data = imageData.data;
+		const W = img.width;//Math.floor(w * __devicePixelRatio);
+		const H = img.height;//Math.floor(h * __devicePixelRatio);
+		const imageData = context.getImageData(x, y, W, H);
+		const tex = new Texture(w, h);
+		const data = imageData.data;
 		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
-			let inx = (Math.round(i * ratio) + Math.round(j * ratio) * W) * 4;
-			let r = data[inx + 0];
-			let g = data[inx + 1];
-			let b = data[inx + 2];
-			let a = data[inx + 3] / 255;
+			const inx = (Math.round(i * ratio) + Math.round(j * ratio) * W) * 4;
+			const r = data[inx + 0];
+			const g = data[inx + 1];
+			const b = data[inx + 2];
+			const a = data[inx + 3] / 255;
 			tex.shaderSetPixel(i, j, new Color(r, g, b, a));
 		}
 		tex.loaded = false;
