@@ -1,4 +1,7 @@
 function new_OffscreenCanvas(width, height) {
+	width = Math.ceil(width);
+	height = Math.ceil(height);
+
 	let canvas;
 	if (window.OffscreenCanvas) {
 		canvas = new OffscreenCanvas(width, height);
@@ -58,10 +61,19 @@ class ImageType {
 	get pixelRatio() {
 		return this.makeImage().width / this.width;
 	}
+	get pixelWidth() {
+		return Math.ceil(this.width * this.pixelRatio);
+	}
+	get pixelHeight() {
+		return Math.ceil(this.height * this.pixelRatio);
+	}
+	get renderable() {
+		return this.loaded && this.width > 0 && this.height > 0;
+	}
 	onresize(width, height) { } // virtual
 	resize(width, height, notify = true) {
-		width = Math.max(1, Math.ceil(width));
-		height = Math.max(1, Math.ceil(height));
+		width = Math.max(0, Math.ceil(width));
+		height = Math.max(0, Math.ceil(height));
 		const prevWidth = this._width;
 		const prevHeight = this._height;
 		if (prevWidth !== width || prevHeight !== height) {
@@ -123,7 +135,7 @@ class HImage extends ImageType {
 class Frame extends ImageType {
 	constructor(width, height, pixelRatio = __devicePixelRatio) {
 		super(width, height, pixelRatio);
-		this.image = new_OffscreenCanvas(this.width * pixelRatio, this.height * pixelRatio);
+		this.image = new_OffscreenCanvas(this.pixelWidth, this.pixelHeight);
 		this.renderer = new Artist(this.image, this.width, this.height, this, pixelRatio);
 	}
 	onresize(width, height) {
@@ -131,7 +143,7 @@ class Frame extends ImageType {
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
-		let f = new Frame(w, h, this.renderer.pixelRatio);
+		let f = new Frame(w, h, this.pixelRatio);
 		f.renderer.c.drawImage(this.image, 0, 0, w, h);
 		return f;
 	}
@@ -141,7 +153,7 @@ class Frame extends ImageType {
 	makeImage() {
 		return this.image;
 	}
-	get(f = new Frame(this.width, this.height, this.renderer.pixelRatio)) {
+	get(f = new Frame(this.width, this.height, this.pixelRatio)) {
 		f.renderer.resize(this.width, this.height);
 		f.renderer.c.drawImage(this.image, 0, 0, this.width, this.height);
 		return f;

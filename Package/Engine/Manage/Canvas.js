@@ -2,7 +2,7 @@ const ScalingMode = defineEnum("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MULT
 
 class CanvasImage extends ImageType {	
 	constructor(canvas, engine) {
-		super(canvas.width, canvas.height);
+		super(canvas.width, canvas.height, __devicePixelRatio);
 		this.canvas = canvas;
 		this.engine = engine;
 

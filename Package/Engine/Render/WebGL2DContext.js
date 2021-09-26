@@ -1002,16 +1002,14 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 	//#endregion
 	//#region large scale canvas changes
 	function resize(width, height) {
-		width *= glState.pixelRatio;
-		height *= glState.pixelRatio;
-		gl.canvas.width = width;
-		gl.canvas.height = height;
+		gl.canvas.width = Math.ceil(width * glState.pixelRatio);
+		gl.canvas.height = Math.ceil(height * glState.pixelRatio);
 
 		if (!glState.hasContext) return;
 		guarenteeWebGLObjects();
 
-		gl.uniform2f(uniforms.resolution, width / glState.pixelRatio, height / glState.pixelRatio);
-		gl.viewport(0, 0, width, height);
+		gl.uniform2f(uniforms.resolution, width, height);
+		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	}
 	function clear() {
 		if (!glState.hasContext) return;

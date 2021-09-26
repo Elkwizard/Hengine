@@ -684,8 +684,8 @@ class Artist {
 		const al = this.alpha;
 		this.width = width;
 		this.height = height;
-		this.canvas.width = width * this.pixelRatio;
-		this.canvas.height = height * this.pixelRatio;
+		this.canvas.width = this.imageType.pixelWidth;
+		this.canvas.height = this.imageType.pixelHeight;
 		this.c.scale(this.pixelRatio, this.pixelRatio);
 		this.alpha = al;
 		this.preservePixelart = px;
@@ -736,7 +736,7 @@ class Artist {
 		return this.strokeObj;
 	}
 	drawImageInternal(x, y, w, h) {
-		if (!this.currentImage.loaded) return;
+		if (!this.currentImage.renderable) return;
 		if (typeof x === "object") {
 			h = x.height;
 			w = x.width;

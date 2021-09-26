@@ -344,8 +344,10 @@ class WebGLArtist {
 				}
 			}
 		};
-		for (let func in this.imageObj) {
+		this.dummyImageObj = { };
+		for (const func in this.imageObj) {
 			this.imageObj[func] = this.imageObj[func].bind(this);
+			this.dummyImageObj[func] = () => undefined;
 		}
 	}
 	get width() {
@@ -412,6 +414,7 @@ class WebGLArtist {
 	image(img, changed = false) {
 		this.currentImage = img;
 		this.currentImageCIS = img.makeImage();
+		if (!this.currentImage.renderable) return this.dummyImageObj;
 		if (changed) this.gl.updateTextureCache(this.currentImageCIS);
 		return this.imageObj;
 	}
@@ -531,7 +534,7 @@ class WebGLArtist {
 class FastFrame extends ImageType {
 	constructor(width, height, pixelRatio = __devicePixelRatio) {
 		super(width, height, pixelRatio);
-		this.image = new_OffscreenCanvas(this.width * pixelRatio, this.height * pixelRatio);
+		this.image = new_OffscreenCanvas(this.pixelWidth, this.pixelHeight);
 		this.renderer = new WebGLArtist(this.image, this.width, this.height, this, pixelRatio);
 	}
 	onresize(width, height) {
@@ -539,7 +542,7 @@ class FastFrame extends ImageType {
 	}
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
-		let f = new FastFrame(w, h, this.renderer.pixelRatio);
+		let f = new FastFrame(w, h, this.pixelRatio);
 		f.renderer.gl.texturedQuad(0, 0, w, h, 0, 0, 1, 1, this.makeImage());
 		return f;
 	}
@@ -550,7 +553,7 @@ class FastFrame extends ImageType {
 		this.renderer.gl.render();
 		return this.image;
 	}
-	get(f = new FastFrame(this.width, this.height, this.renderer.pixelRatio)) {
+	get(f = new FastFrame(this.width, this.height, this.pixelRatio)) {
 		f.renderer.resize(this.width, this.height);
 		f.renderer.gl.texturedQuad(0, 0, this.width, this.height, 0, 0, 1, 1, this.makeImage());
 		return f;
