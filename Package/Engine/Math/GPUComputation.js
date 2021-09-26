@@ -27,6 +27,16 @@ class GPUComputation {
 			const { gl } = this;
 
 			this.INTERNAL_FORMAT = gl.RGBA32UI;
+			/*
+			g l . R G B A 32 U I
+			r i   e r l l b  n n
+			a b   d e u p i  s t
+			p r     e e h t  i e
+			h a     n   a s  g g
+			i r              n e
+			c y              e r
+			s                d 
+			*/
 			this.FORMAT = gl.RGBA_INTEGER;
 			this.TYPE = gl.UNSIGNED_INT;
 		};

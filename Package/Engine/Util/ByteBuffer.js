@@ -41,7 +41,7 @@ class ByteBuffer {
 			this.byteLength & 0xFFFF
 		);
 		for (let i = 0; i < this.data.length; i += 2)
-			result += String.fromCharCode(this.data[i] << 8 | (this.data[i + 1] || 0));
+			result += String.fromCharCode(this.data[i] << 8 | this.data[i + 1]);
 		
 		if (this.littleEndian) result += "~";
 
@@ -126,10 +126,11 @@ class ByteBuffer {
 	static fromString(string) {
 		// console.log(string[4].charCodeAt(0));
 		const length = string.charCodeAt(2) << 16 | string.charCodeAt(3);
-		const stringLength = Math.ceil(length / 2) + 4;
-		const buffer = new ByteBuffer(length, 0, stringLength < string.length);
+		const prefixStringLength = 4;
+		const dataStringLength = Math.ceil(length / 2);
+		const buffer = new ByteBuffer(length, 0, dataStringLength + prefixStringLength < string.length);
 		buffer.shouldResize = false;
-		for (let i = 0; i < stringLength; i++) {
+		for (let i = 0; i < dataStringLength; i++) {
 			const code = string.charCodeAt(i + 4);
 			const inx = i * 2;
 			buffer.data[inx] = code >> 8;
