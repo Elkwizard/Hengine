@@ -8,14 +8,6 @@ load(String.raw`
 	(p)**
 	class IntervalManager { ... }
 	**(/p)
-	(2)Syntax(/2)
-	(p)**
-	new IntervalManager(engine)
-	**(/p)
-	(2)Parameters(/2)
-	(p)
-		(param:engine $Hengine$)The #Hengine# that the IntervalManager should be synchronizing and updating.(/param)
-	(/p)
 	(2)Properties(/2)
 	(p)
 		(prop:fps $Number$readonly)The current amount of frames that are run per second. This value is smoothed, so drastic changes might take around 30 frames to become noticable in this property.(/prop)

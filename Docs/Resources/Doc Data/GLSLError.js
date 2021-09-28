@@ -6,17 +6,8 @@ load(String.raw`
 	(/p)
 	(2)Type(/2)
 	(p)**
-	class GLSLError { ... }
+	class GLSLError extends Error { ... }
 	**(/p)
-	(2)Syntax(/2)
-	(p)**
-	new GLSLError(gl, prefixLength)
-	**(/p)
-	(2)Parameters(/2)
-	(p)
-		(param:gl $String$)The error string directly from WebGL.(/param)
-		(param:prefixLength $Number$)The size of the pre-inserted #GLSL# before the user code.(/param)
-	(/p)
 	(2)Properties(/2)
 	(p)
 		(prop:line $Number$)The line number that the error occurred on.(/prop)

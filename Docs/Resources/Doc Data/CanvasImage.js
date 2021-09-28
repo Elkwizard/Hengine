@@ -8,15 +8,6 @@ load(String.raw`
 	(p)**
 	class CanvasImage extends #ImageType# { ... }
 	**(/p)
-	(2)Syntax(/2)
-	(p)**
-	new CanvasImage(canvas, engine)
-	**(/p)
-	(2)Parameters(/2)
-	(p)
-		(param:canvas $HTMLCanvasElement$)The canvas DOM element that the CanvasImage should manage.(/param)
-		(param:engine $Hengine$)The #Hengine# the canvas belongs to.(/param)
-	(/p)
 	(2)Properties(/2)
 	(p)
 		(prop:canvas $HTMLCanvasElement$readonly)The canvas DOM element that the CanvasImage is managing.(/prop)
