@@ -106,7 +106,6 @@ class ElementContainer extends SceneElement {
 		return n;
 	}
 	initializeSceneObject(sceneObject) {
-		if (this.active) sceneObject.activate();
 		sceneObject.scripts.add(this.defaultScript);
 	}
 	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
