@@ -124,7 +124,6 @@ class ByteBuffer {
 		return buffer;
 	}
 	static fromString(string) {
-		// console.log(string[4].charCodeAt(0));
 		const length = string.charCodeAt(2) << 16 | string.charCodeAt(3);
 		const prefixStringLength = 4;
 		const dataStringLength = Math.ceil(length / 2);
