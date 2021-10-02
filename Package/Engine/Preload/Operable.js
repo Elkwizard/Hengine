@@ -79,7 +79,12 @@ class Operable {
         return sum;
     }
     equals(v) {
-        return this.minus(v).total() < this.constructor.EPSILON * this.constructor.modValues.length;
+        const { modValues, EPSILON } = this.constructor;
+        for (let i = 0; i < modValues.length; i++) {
+            const field = modValues[i];
+            if (Math.abs(this[field] - v[field]) >= EPSILON) return false;
+        }
+        return true;
     }
     static get empty() {
         return new this(...[...this.modValues].fill(0));
