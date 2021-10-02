@@ -1502,7 +1502,7 @@ class PhysicsEngine {
         for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
             let cellsTotal = collisionPairs.get(body);
-            let bodies = grid.query(body, cellsTotal, b => body.collisionFilter(b));
+            let bodies = grid.query(body, cellsTotal, b => body.collisionFilter(b) && b.collisionFilter(body));
             // for (let j = 0; j < bodies.length; j++) {
             //     renderer.stroke(Color.ORANGE, 2).arrow(body.position, bodies[j].position);
             // }

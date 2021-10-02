@@ -69,7 +69,7 @@ class Operable {
         const { modValues } = this.constructor;
         for (let i = 0; i < modValues.length; i++) {
             const field = modValues[i];
-            result[field] = fn(result[field]);
+            result[field] = fn(result[field], field);
         }
         return result;
     }
@@ -115,11 +115,19 @@ class Operable {
     static filled(value) {
         return new this(...this.modValues.fill(value));
     }
-    static min(a, b) {
-        return a.gop(b, Math.min);
+    static min(...values) {
+        return new this(...this.modValues.map(f => {
+            let min = Infinity;
+            for (let i = 0; i < values.length; i++) min = Math.min(min, values[i][f]);
+            return min;
+        }));
     }
-    static max(a, b) {
-        return a.gop(b, Math.max);
+    static max(...values) {
+        return new this(...this.modValues.map(f => {
+            let max = -Infinity;
+            for (let i = 0; i < values.length; i++) max = Math.max(max, values[i][f]);
+            return max;
+        }));
     }
     static pow(a, power) {
         return a.gob(power, Math.pow);

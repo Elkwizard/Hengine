@@ -1,5 +1,7 @@
 :root {
-	--header-height: 12vh;
+	--nav-icon-display: inline-block;
+	--px: max(0.06vw, 0.06vh);
+	--header-height: calc(var(--px) * 100);
 	--navigation-width: 24vw;
 	--foreground: rgb(255, 255, 255);
 	--background: rgb(20, 20, 40);
@@ -7,15 +9,22 @@
 	--highlight: rgb(100, 100, 255);
 	--title: rgb(200, 100, 50);
 	--highlight-2: rgb(255, 150, 150);
-	--subsection-indent: 10px;
+	--subsection-indent: calc(10 * var(--px));
 	--warning: rgb(255, 20, 20);
 	--monospace: 'Consolas', monospace;
 	/* --foreground: rgb(20, 20, 20);
 	--background: rgb(255, 255, 255);
 	--highlight: rgb(100, 100, 255); */
 }
+
+@media only screen and (max-width: 600px) {
+	:root {
+		--nav-icon-display: none;
+	}
+}
+
 * {
-	font-size: 15px;
+	font-size: calc(15 * var(--px));
 	font-weight: normal;
 	margin: 0;
 	padding: 0;
@@ -51,7 +60,7 @@
 	color: var(--highlight);
 	font-weight: bold;
 	font-size: 200%;
-	border-bottom: 1px var(--highlight) solid;
+	border-bottom: var(--px) var(--highlight) solid;
 }
 #header .links {
 	margin-left: auto;
@@ -78,14 +87,14 @@
 	padding: 1.4em;
 }
 ::-webkit-scrollbar {
-	width: 15px;
+	width: min(calc(30 * var(--px)), 15px);
 }
 ::-webkit-scrollbar-track {
 	background: var(--background-2);
 }
 ::-webkit-scrollbar-thumb {
 	background: var(--background);
-	border: 1px var(--background-2) solid;
+	border: var(--px) var(--background-2) solid;
 }
 .nav-section-header, .nav-leaf {
 	display: flex;
@@ -102,9 +111,11 @@
 	margin-right: 0.4em;
 }
 .nav-section-header::before {
+	display: var(--nav-icon-display);
 	background-image: url(../Images/Note.png);
 }
 .nav-leaf::before {
+	display: var(--nav-icon-display);
 	background-image: url(../Images/Class.png);
 }
 .nav-section {
@@ -116,7 +127,7 @@
 .nav-section-item {
 	margin-left: 0.6em;
 	padding-left: 0.6em;
-	border-left: 1px var(--foreground) solid;
+	border-left: var(--px) var(--foreground) solid;
 }
 #content {
 	position: absolute;
@@ -140,20 +151,20 @@
 	color: var(--highlight);
 	font-family: var(--monospace);
 	font-size: 90%;
-	border-left: 1px var(--highlight) solid;
+	border-left: var(--px) var(--highlight) solid;
 	margin-left: 0.3em;
 	padding-right: 0.3em;
 }
 .readonly {
 	color: var(--warning);
 	margin-left: 0.3em;
-	border-left: 1px var(--warning) solid;
+	border-left: var(--px) var(--warning) solid;
 	cursor: not-allowed;
 }
 .async {
 	color: var(--warning);
 	margin-left: 0.3em;
-	border-left: 1px var(--warning) solid;
+	border-left: var(--px) var(--warning) solid;
 	cursor: wait;
 }
 .title {
@@ -163,7 +174,7 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;	
-	border-bottom: 1px var(--title) solid;
+	border-bottom: var(--px) var(--title) solid;
 }
 #content * {
 	/* background: rgba(255, 255, 255, 0.1); */
@@ -209,7 +220,7 @@
 }
 .value {
 	padding-left: 1em !important;
-	box-shadow: -2px 2px 0px var(--background-2);
+	box-shadow: calc(-2 * var(--px)) calc(-2 * var(--px)) 0 var(--background-2);
 	border-radius: 0.3em;
 	margin: 1em 0;
 }
@@ -219,7 +230,7 @@
 	/* padding: 0 !important; */
 }
 table td {
-	border-right: 1px var(--highlight) solid;
-	border-bottom: 1px var(--highlight) solid;
+	border-right: var(--px) var(--highlight) solid;
+	border-bottom: var(--px) var(--highlight) solid;
 	text-align: center;
 }

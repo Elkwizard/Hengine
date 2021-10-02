@@ -23,7 +23,7 @@ vec4 shader() {
 }`);
 	let lastValue = "";
 	const F = 1;
-	let shader = new GPUShader(width / 2 / F, height / F, "");
+	let shader = new GPUShader(width / 2 / F, height / F, codeInput.scripts.TEXT_AREA.getValue(), canvas.pixelRatio);
 	renderer.background = Color.BLACK;
 	codeInput.scripts.TEXT_AREA.alwaysIgnore("Alt");
 	let time = 0;
@@ -82,6 +82,9 @@ vec4 shader() {
 		time++;
 		let args = { time, mouse: mouse.screen };
 		if (shader.argumentExists("webcam")) args.webcam = webcam;
+		for (const key in args) {
+			if (!shader.argumentExists(key)) delete args[key];
+		}
 		shader.setArguments(args);
 		renderer.image(shader).rect(0, 0, width / 2, height);
 		renderer.textMode = TextMode.BOTTOM_LEFT;
