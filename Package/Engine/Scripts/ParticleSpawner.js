@@ -1,9 +1,14 @@
 class PARTICLE_SPAWNER extends ElementScript {
 	init(obj, properties = {}) {
-		this.particles = new Set();
+		this.scene = obj.engine.scene;
+		this.camera = this.scene.camera;
+		this.canvas = obj.engine.canvas;
+		this.renderer = this.canvas.renderer;
+
+		this.particles = [];
 		this.setProperties(properties);
 		const spawner = obj;
-		const { physicsEngine } = obj.engine.scene;
+		const { physicsEngine } = this.scene;
 		const self = this;
 		this.Particle = class Particle {
 			constructor(position, others) {
@@ -21,12 +26,12 @@ class PARTICLE_SPAWNER extends ElementScript {
 				self.particleUpdate(this);
 			}
 		};
-		this.toRemove = new Set();
 
 		this.lastTransform = obj.transform.get();
+		this.anyParticlesRendered = false;
 	}
 	removeAllParticles(obj) {
-		this.particles.clear();
+		this.particles = [];
 	}
 	setProperties(obj, p) {
 		this.init = p.init ?? this.init ?? (() => null);
@@ -39,23 +44,20 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.lifeSpan = p.lifeSpan ?? this.lifeSpan ?? 100;
 		this.delay = p.delay ?? this.delay ?? 1;
 		const imageType = p.imageType ?? FastFrame;
-		if (!(this.frame instanceof imageType)) {
-			this.frame = new imageType(obj.engine.canvas.width, obj.engine.canvas.height);
-			this.gl = this.frame.renderer;
-		}
+		this.frame = PARTICLE_SPAWNER[imageType.name] ?? (PARTICLE_SPAWNER[imageType.name] = new imageType(obj.engine.canvas.width, obj.engine.canvas.height));
+		this.gl = this.frame.renderer;
 	}
-	explode(obj, count) {
-		const pos = obj.transform.position;
+	explode(obj, count, position = obj.transform.position) {
+		const pos = position;
 
 		for (let i = 0; i < count; i++) {
 			const p = new this.Particle(pos.get(), this.particles);
 			this.init(p);
-			this.particles.add(p);
+			this.particles.push(p);
 		}
 	}
 	update(obj) {
 		if (this.active) {
-
 			if ((this.delay > 1 && obj.lifeSpan % Math.ceil(this.delay) === 0) || this.delay <= 1) {
 
 				const pos = obj.transform.position;
@@ -67,13 +69,26 @@ class PARTICLE_SPAWNER extends ElementScript {
 					const p = new this.Particle(Interpolation.lerp(last, pos, t), this.particles);
 					this.init(p);
 					if (!this.active) break;
-					this.particles.add(p);
+					this.particles.push(p);
 				}
 
 			}
 		}
-
 		obj.transform.get(this.lastTransform);
+
+		const { particles } = this;
+		const particlesToKeep = [];
+		const timerIncrement = 1 / this.lifeSpan;
+
+		for (let i = 0; i < particles.length; i++) {
+			const p = particles[i];
+			p.timer += timerIncrement;
+			if (p.timer > 1) continue;
+			p.update();
+			particlesToKeep.push(p);
+		}
+		
+		this.particles = particlesToKeep;
 	}
 	getBoundingBox(obj) {
 		const particlePositions = [];
@@ -82,50 +97,54 @@ class PARTICLE_SPAWNER extends ElementScript {
 	}
 	escapeDraw(obj) {
 		if (obj.hidden) return;
-		const { gl, frame } = this;
 
-		gl.clear();
+		const { gl, frame, particles } = this;
 
-		gl.transform = renderer.transform;
+		gl.transform = this.renderer.transform;
 
-		frame.width = obj.engine.canvas.width;
-		frame.height = obj.engine.canvas.height;
+		frame.width = this.canvas.width;
+		frame.height = this.canvas.height;
 
-		const screen = scene.camera.screen.get();
+		const screen = this.camera.screen.get();
 		if (obj instanceof UIObject) screen.x = screen.y = 0;
 		screen.x -= this.radius;
 		screen.y -= this.radius;
 		screen.width += this.radius * 2;
 		screen.height += this.radius * 2;
 
-		const timerIncrement = 1 / this.lifeSpan;
+		let anyParticlesRendered = false;
 
-		let renderedParticles = false;
-
-		for (const p of this.particles) {
-			p.timer += timerIncrement
-			if (p.timer > 1) {
-				this.toRemove.add(p);
-				continue;
-			}
-
-			p.update();
-
+		for (let i = 0; i < particles.length; i++) {
+			const p = particles[i];
 			if (Geometry.pointInsideRect(p.position, screen)) {
 				this.particleDraw(gl, p);
-				renderedParticles = true;
+				anyParticlesRendered = true;
 			}
 		}
 
-		for (const p of this.toRemove) this.particles.delete(p);
-		this.toRemove.clear();
+		PARTICLE_SPAWNER.anyParticlesRendered ||= anyParticlesRendered;
 
-		if (renderedParticles) {
-			if (obj instanceof UIObject) renderer.image(frame).default(0, 0);
-			else obj.engine.scene.camera.drawInScreenSpace(() => {
-				renderer.image(frame).default(0, 0);
-			});
+		this.anyParticlesRendered = anyParticlesRendered;
+
+		if (PARTICLE_SPAWNER.anyParticlesRendered) {
+			// is next renderable a particle spawner
+			const elements = this.scene.main.sceneObjectArray;
+			for (let i = 0; i < elements.length - 1; i++) {
+				const element = elements[i];
+				const next = elements[i + 1];
+				if (element === obj) {
+					if (next.scripts.has(PARTICLE_SPAWNER)) return;
+					break;
+				}
+			}
+
+			if (obj instanceof UIObject) this.renderer.image(frame).default(0, 0);
+			else this.camera.drawInScreenSpace(() => this.renderer.image(frame).default(0, 0));
+			gl.clear();
+			PARTICLE_SPAWNER.anyParticlesRendered = false;
 		}
-
 	}
 }
+PARTICLE_SPAWNER.anyParticlesRendered = false;
+PARTICLE_SPAWNER.Frame = null;
+PARTICLE_SPAWNER.FastFrame = null;
