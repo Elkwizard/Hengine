@@ -1,28 +1,27 @@
 class PARTICLE_SPAWNER extends ElementScript {
 	init(obj, properties = {}) {
+		// built-in caches
 		this.scene = obj.engine.scene;
 		this.camera = this.scene.camera;
 		this.canvas = obj.engine.canvas;
 		this.renderer = this.canvas.renderer;
+		this.physicsEngine = this.scene.physicsEngine;
 
 		this.particles = [];
 		this.setProperties(properties);
-		const spawner = obj;
-		const { physicsEngine } = this.scene;
-		const self = this;
 		this.Particle = class Particle {
-			constructor(position, others) {
+			constructor(position, spawner) {
 				this.position = position;
 				this.velocity = Vector2.origin;
-				this.others = others;
 				this.timer = 0;
 				this.data = {};
 				this.spawner = spawner;
 			}
 			update() {
-				if (self.falls) this.velocity.add(physicsEngine.gravity);
-				if (self.slows) this.velocity.mul(1 - physicsEngine.drag);
-				this.position.add(this.velocity);
+				const self = this.spawner;
+				if (self.falls) this.velocity.Vadd(self.physicsEngine.gravity);
+				if (self.slows) this.velocity.Nmul(1 - self.physicsEngine.drag);
+				this.position.Vadd(this.velocity);
 				self.particleUpdate(this);
 			}
 		};
@@ -51,7 +50,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		const pos = position;
 
 		for (let i = 0; i < count; i++) {
-			const p = new this.Particle(pos.get(), this.particles);
+			const p = new this.Particle(pos.get(), this);
 			this.init(p);
 			this.particles.push(p);
 		}
@@ -66,7 +65,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 				for (let i = 0; i < count; i++) {
 					const t = (i + 1) / count;
-					const p = new this.Particle(Interpolation.lerp(last, pos, t), this.particles);
+					const p = new this.Particle(Interpolation.lerp(last, pos, t), this);
 					this.init(p);
 					if (!this.active) break;
 					this.particles.push(p);
@@ -98,25 +97,33 @@ class PARTICLE_SPAWNER extends ElementScript {
 	escapeDraw(obj) {
 		if (obj.hidden) return;
 
-		const { gl, frame, particles } = this;
+		const { gl, frame, particles, radius } = this;
 
 		gl.transform = this.renderer.transform;
+		frame.resize(this.canvas.width, this.canvas.height);
 
-		frame.width = this.canvas.width;
-		frame.height = this.canvas.height;
-
-		const screen = this.camera.screen.get();
-		if (obj instanceof UIObject) screen.x = screen.y = 0;
-		screen.x -= this.radius;
-		screen.y -= this.radius;
-		screen.width += this.radius * 2;
-		screen.height += this.radius * 2;
+		let { x, y, width, height } = this.camera.screen;
+		if (obj instanceof UIObject) x = y = 0;
+		x -= radius;
+		y -= radius;
+		width += radius * 2;
+		height += radius * 2;
+		const minX = x;
+		const minY = y;
+		const maxX = x + width;
+		const maxY = y + height;
 
 		let anyParticlesRendered = false;
 
 		for (let i = 0; i < particles.length; i++) {
 			const p = particles[i];
-			if (Geometry.pointInsideRect(p.position, screen)) {
+			const { x, y } = p.position;
+			if (
+				x >= minX &&
+				y >= minY &&
+				x <= maxX &&
+				y <= maxY
+			) {
 				this.particleDraw(gl, p);
 				anyParticlesRendered = true;
 			}
