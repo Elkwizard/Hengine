@@ -32,13 +32,6 @@ class TEXT_AREA extends ElementScript {
 		this.ignoredRemoval = [];
 		this.alwaysIgnored = [];
 		this.versions = [];
-
-		this.mouse.onScroll.listen(dy => {
-			if (obj.hovered) {
-				this.scrollOffset.y += Math.sign(dy) * this.scrollSpeed;
-				this.clampScrollOffset();
-			}
-		});
 	}
 	saveVersion(obj) {
 		this.versions.push({ start: this.selectionStart, end: this.selectionEnd, value: this.value });
@@ -98,7 +91,7 @@ class TEXT_AREA extends ElementScript {
 				startInx: hitboxGroups[i - 1].startInx + hitboxGroups[i - 1].array.length + 1
 			};
 
-			
+
 		let index = 0;
 		const yRow = Math.floor((p.y - this.relativeTextViewBox.y) / this.font.lineHeight);
 		if (yRow >= hitboxGroups.length) index = this.value.length;
@@ -341,7 +334,7 @@ class TEXT_AREA extends ElementScript {
 			if (char === "\n") return 0;
 			if (char.match(/\s/g)) return 1;
 			if (char.match(/\W/g)) return 2;
-			return 3; 
+			return 3;
 		}
 
 		for (let i = 0; i < this.value.length; i++) {
@@ -374,12 +367,19 @@ class TEXT_AREA extends ElementScript {
 		this.adjustCursor();
 	}
 	update(obj) {
-		let inTextArea = Geometry.pointInsideRect(obj.transform.globalSpaceToLocalSpace(this.getMousePosition()), this.relativeTextViewBox);
+		// scroll wheel
+		if (this.mouse.wheelDelta !== 0) {
+			if (obj.hovered) {
+				this.scrollOffset.y += Math.sign(this.mouse.wheelDelta) * this.scrollSpeed;
+				this.clampScrollOffset();
+			}
+		}
 
+		let inTextArea = Geometry.pointInsideRect(obj.transform.globalSpaceToLocalSpace(this.getMousePosition()), this.relativeTextViewBox);
 		if (inTextArea) TEXT_AREA.anyTextAreaHovered = true;
 
 		const doubleClick = this.mouse.justPressed("Left") && this.clickTimer < 15 && inTextArea;
-	
+
 		const lastSelection = this.selectionEnd;
 
 		if (this.mouse.justPressed("Left")) {
@@ -536,7 +536,7 @@ class TEXT_AREA extends ElementScript {
 		const yFullSize = this.relativeTextBoundingBox.height;
 		const yViewSize = this.relativeTextViewBox.height;
 		const yRatio = yViewSize / yFullSize;
-		
+
 		// full dimensions
 		const { width, height } = this.getDimensions();
 		let fullScrollWidth = width - this.scrollBarSize;
