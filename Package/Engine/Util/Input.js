@@ -46,9 +46,8 @@ class InputHandler {
 				if (this.keys.get(key)) return true;
 			}
 			return false;
-		} else {
-			return !!this.keys.get(keys);
 		}
+		return !!this.keys.get(keys);
 	}
 	released(keys) {
 		if (Array.isArray(keys)) {
@@ -57,9 +56,8 @@ class InputHandler {
 				if (!this.keys.get(key)) return true;
 			}
 			return false;
-		} else {
-			return !this.keys.get(keys);
 		}
+		return !this.keys.get(keys);
 	}
 	justPressed(keys) {
 		if (Array.isArray(keys)) {
@@ -68,9 +66,8 @@ class InputHandler {
 				if (this.keyDownCounts.get(key) === 1) return true;
 			}
 			return false;
-		} else {
-			return this.keyDownCounts.get(keys) === 1;
 		}
+		return this.keyDownCounts.get(keys) === 1;
 	}
 	justReleased(keys) {
 		if (Array.isArray(keys)) {
@@ -79,13 +76,13 @@ class InputHandler {
 				if (this.keyUpCounts.get(key) === 1) return true;
 			}
 			return false;
-		} else {
-			return this.keyUpCounts.get(keys) === 1;
 		}
+		return this.keyUpCounts.get(keys) === 1;
 	}
 	update() {
 		// activate keys
-		for (const key of this.keysToActivate) this.keys.set(key, true);
+		for (const key of this.keysToActivate)
+			this.keys.set(key, true);
 		this.keysToActivate.clear();
 
 		this.totalCount++;
@@ -103,7 +100,7 @@ class InputHandler {
 	afterUpdate() {
 		// deactivate keys
 		for (const key of this.keysToDeactivate) {
-			if (this.keys.get(key)) {
+			if (this.keys.get(key) || !this.keysToActivate.has(key)) {
 				this.keys.set(key, false);
 				this.keysToDeactivate.delete(key);
 			}
