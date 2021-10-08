@@ -5,6 +5,7 @@ class InputHandler {
 		this.keyUpCounts = new Map();
 		this.totalCount = 0;
 		this.keysToDeactivate = new Set();
+		this.keysToActivate = new Set();
 	}
 	get allPressed() {
 		const result = [];
@@ -27,7 +28,7 @@ class InputHandler {
 		return result;
 	}
 	activateKey(key) {
-		this.keys.set(key, true);
+		this.keysToActivate.add(key);
 	}
 	deactivateKey(key) {
 		this.keysToDeactivate.add(key);
@@ -83,6 +84,10 @@ class InputHandler {
 		}
 	}
 	update() {
+		// activate keys
+		for (const key of this.keysToActivate) this.keys.set(key, true);
+		this.keysToActivate.clear();
+
 		this.totalCount++;
 		for (const [key, pressed] of this.keys) {
 			if (!this.keyDownCounts.has(key)) this.keyDownCounts.set(key, 0);
@@ -94,11 +99,15 @@ class InputHandler {
 				this.keyDownCounts.set(key, 0);
 			}
 		}
-		for (const key of this.keysToDeactivate) this.keys.set(key, false);
-		this.keysToDeactivate.clear();
 	}
 	afterUpdate() {
-
+		// deactivate keys
+		for (const key of this.keysToDeactivate) {
+			if (this.keys.get(key)) {
+				this.keys.set(key, false);
+				this.keysToDeactivate.delete(key);
+			}
+		}
 	}
 }
 class KeyboardHandler extends InputHandler {
