@@ -56,7 +56,13 @@ vec4 shader() {
 		if (startTabs) {
 			startTabs = startTabs[0].length;
 			let tabWidth = font.getTextWidth("\t");
-			for (let i = 0; i < startTabs; i++) renderer.stroke(Color.GRAY).line(i * tabWidth + pos.x + l.renderTextOffset.x, pos.y + l.renderTextOffset.y, i * tabWidth + pos.x + l.renderTextOffset.x, pos.y + l.renderTextOffset.y + font.lineHeight);
+			for (let i = 0; i < startTabs; i++)
+				renderer.stroke(Color.GRAY).line(
+					i * tabWidth + pos.x + l.renderTextOffset.x,
+					pos.y + l.renderTextOffset.y,
+					i * tabWidth + pos.x + l.renderTextOffset.x,
+					pos.y + l.renderTextOffset.y + font.lineHeight
+				);
 		}
 		let functionRegex = String.raw`\b(?:(?:a?(?:sin|cos|tan))|length|dot|cross|texture|clamp|normalize|min|max|ceil|smoothstep|round|floor|mod|sqrt|mix|pow|abs|float|int|sampler2D|mat[234]|(?:(?:i|b|)vec[234]))\b`;
 		let keywordRegex = String.raw`\b(?:return|struct|void|in|out|(?:low|medium|high)p|uniform|position|resolution|shader|for|continue|break|if|else|define)\b`;

@@ -77,24 +77,48 @@ class IntervalManager {
 			new Graph("FPS", () => this.averageFps, 0, 60, Color.LIME, 1)
 		], 400);
 
-		IntervalManager.intervals.push(this.update.bind(this));
+		// deal with system frame length
+		let lastFrameTime = performance.now();
+		let timeSinceLastFrame = 0;
+		IntervalManager.intervals.push(() => {
+			const targetFrameLength = 1000 / this.targetFPS;
+			const now = performance.now();
+
+			timeSinceLastFrame += now - lastFrameTime;
+			lastFrameTime = now;
+			
+			while (timeSinceLastFrame > targetFrameLength) {
+				timeSinceLastFrame -= targetFrameLength;
+				this.update();
+				if (performance.now() - now > targetFrameLength) break;
+			}
+		});
+	}
+	set fps(a) {
+		this.targetFPS = a;
+	}
+	get fps() {
+		return this._fps;
+	}
+	updatePerformanceData() {
+		if (!this.performanceData) return;
+
+		this.currentTime = performance.now();
+		//fps
+		this.frameLengths.push(this.currentTime - this.lastTime);
+		this.lastTime = this.currentTime;
+		if (this.frameLengths.length > IntervalManager.FPS_FRAMES_TO_COUNT) this.frameLengths.shift();
+		const getFPSRange = n => {
+			let arr = this.frameLengths.slice(Math.max(0, this.frameLengths.length - n));
+			return arr.length * 1000 / arr.reduce((a, b) => a + b);
+		}
+		this.averageFps = getFPSRange(IntervalManager.FPS_FRAMES_TO_COUNT);
+		this.rawFps = getFPSRange(1);
+		this._fps = Math.floor(Number.clamp(this.averageFps, 0, this.targetFPS));
 	}
 	update() {
-		if (this.performanceData) {
-			this.currentTime = performance.now();
-			//fps
-			this.frameLengths.push(this.currentTime - this.lastTime);
-			this.lastTime = this.currentTime;
-			if (this.frameLengths.length > IntervalManager.FPS_FRAMES_TO_COUNT) this.frameLengths.shift();
-			const getFPSRange = n => {
-				let arr = this.frameLengths.slice(Math.max(0, this.frameLengths.length - n));
-				return arr.length * 1000 / arr.reduce((a, b) => a + b);
-			}
-			this.averageFps = getFPSRange(IntervalManager.FPS_FRAMES_TO_COUNT);
-			this.rawFps = getFPSRange(1);
-			this.fps = Math.floor(Number.clamp(this.averageFps, 0, 60));
-		}
-		
+		this.updatePerformanceData();
+
 		//input is necessary
 		this.engine.keyboard.update();
 		this.engine.mouse.update();
