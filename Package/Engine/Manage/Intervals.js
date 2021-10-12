@@ -92,6 +92,8 @@ class IntervalManager {
 				this.update();
 				if (performance.now() - now > targetFrameLength) break;
 			}
+
+			timeSinceLastFrame %= targetFrameLength;
 		});
 	}
 	set fps(a) {
