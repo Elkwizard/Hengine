@@ -104,7 +104,14 @@ function getListHTML(name, obj) {
 		values.push(key);
 	}
 	if (!values.length) return `<span class="nav-leaf">${getLink(name)}</span>`;
-	else return `<div class="nav-section"><span class="nav-section-header">${name}</span><ul class="nav-section-list">${values.map(k => `<li class="nav-section-item">${getListHTML(k, obj[k])}</li>`).join("")}</ul></div>`;
+	else return `
+		<div class="nav-section">
+			<span class="nav-section-header">${name}</span>
+			<ul class="nav-section-list">
+				${values.map(k => `<li class="nav-section-item">${getListHTML(k, obj[k])}</li>`).join("")}
+			</ul>
+		</div>
+	`;
 }
 document.getElementById("navigation").innerHTML = getListHTML("Navigation", DOCS);
 loadPage("Operable");

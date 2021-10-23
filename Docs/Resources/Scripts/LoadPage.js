@@ -33,9 +33,9 @@ function getLink(name) {
 }
 function loadPage(js) {
 	document.querySelector("title").innerText = `Hengine Docs - ${js}`;
-	let currentPage = document.getElementById("currentPage");
+	const currentPage = document.getElementById("currentPage");
 	if (currentPage) currentPage.remove();
-	let page = document.createElement("script");
+	const page = document.createElement("script");
 	page.src = `./Resources/Doc Data/${js}.js`;
 	page.id = "currentPage";
 	document.body.appendChild(page);
