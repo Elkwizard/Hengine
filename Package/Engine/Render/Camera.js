@@ -80,6 +80,29 @@ class Camera extends Matrix3 {
 		let dif = point.Vminus(cameraPoint).Ntimes(ferocity);
 		this.position = cameraPoint.plus(dif);
 	}
+	constrain(x = -Infinity, y = -Infinity, width = Infinity, height = Infinity) {
+		if (typeof x === "object") {
+			height = x.height;
+			width = x.width;
+			y = x.y;
+			x = x.x;
+		}
+
+		const screen = this.cacheScreen();
+		const w2 = screen.width / 2;
+		const h2 = screen.height / 2;
+
+		const minX = x + w2;
+		const minY = y + h2;
+		const maxX = (isFinite(width) ? minX + width : width) - w2;
+		const maxY = (isFinite(height) ? minY + height : height) - h2;
+
+		this.position = Vector2.clamp(
+			this.position,
+			new Vector2(minX, minY),
+			new Vector2(maxX, maxY)
+		);
+	}
 	restoreZoom() {
 		this.zoom = 1;
 	}

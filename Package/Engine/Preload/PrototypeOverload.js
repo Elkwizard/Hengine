@@ -366,15 +366,19 @@ ${contents.join(",\n").indent()}
 	Number.remap = (n, a, b, a2, b2) => (n - a) / (b - a) * (b2 - a2) + a2;
 	Number.min = (a, b) => Math.min(a, b);
 	Number.max = (a, b) => Math.max(a, b);
+	Number.sum = numbers => numbers.reduce((a, b) => a + b, 0);
+	Number.avg = numbers => Number.sum(numbers) / numbers.length;
 	Object.defineProperty(Number.prototype, "mag", {
 		get() {
 			return Math.abs(this);
-		}
+		},
+		enumerable: false
 	});
 	Object.defineProperty(Number.prototype, "sqrMag", {
 		get() {
 			return this ** 2;
-		}
+		},
+		enumerable: false
 	})
 	proto(Number.prototype, "plus", function (n) { return this + n; });
 	proto(Number.prototype, "minus", function (n) { return this - n; });
