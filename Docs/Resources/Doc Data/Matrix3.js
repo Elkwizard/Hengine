@@ -21,10 +21,20 @@ load(String.raw`
 	(/p)
 	(2)Properties(/2)
 	(p)
-		(param:m[R][C] $Number$)The value at the position in the matrix specified by R rows and C columns.(/param)
+		(prop:m[R][C] $Number$)The value at the position in the matrix specified by R rows and C columns.(/prop)
+		(prop:inverse $Matrix3$)The inverse of the matrix if it exists, or *null* if it doesn't.(/prop)
+		(prop:transposed $Matrix3$)The transpose of the matrix.(/prop)
+		(prop:determinant $Number$)The determinant of the matrix.(/prop)
 	(/p)
 	(2)Methods(/2)
 	(p)
+		(method:invert@@$Matrix3$)
+			If the inverse of the matrix exists, the matrix is inverted in place and returned.
+			Otherwise the method returns *null* and the matrix remains unchanged.
+		(/method)
+		(method:transpose@@$Matrix3$)
+			The tranpose of the matrix is copied into the matrix and then returned.
+		(/method)
 		(method:mul@matrix@$Matrix3$)
 			Multiplies the caller and a given matrix, and stores the result in the caller. Returns the caller.
 			(2)Parameters(/2)
@@ -36,7 +46,7 @@ load(String.raw`
 			Returns the product of the caller and a given matrix or vector.
 			(2)Parameters(/2)
 			(p2)
-				(param:b $any$)The Matrix3 or #Vector2# to multiply by.(/param)
+				(param:b $any$)The Matrix3, #Vector2#, or number to multiply by.(/param)
 				(param:result $Matrix3$)An optional matrix for the result to be written to. Default is a new Matrix3.(/param)
 			(/p2)
 		(/method)

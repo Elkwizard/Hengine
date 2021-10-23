@@ -14,9 +14,7 @@ class IntervalFunction {
 			this.done = true;
 		}
 	}
-	respond() {
-
-	}
+	respond() { }
 }
 IntervalFunction.BEFORE_UPDATE = Symbol("BEFORE_UPDATE");
 IntervalFunction.UPDATE = Symbol("UPDATE");

@@ -73,8 +73,7 @@ const DOCS = {
 		"Interpolation": {}
 	},
 	"Physics": {
-		"PhysicsEngine": {},
-		"PhysicsObject": {}
+		"PhysicsEngine": {}
 	},
 	"Input": {
 		"InputHandler": {},
@@ -83,8 +82,6 @@ const DOCS = {
 		"ClipboardHandler": {},
 	},
 	"UI": {
-		"UIComponent": {},
-		"UIContainer": {},
 		"UIObject": {}
 	},
 	"Scripts": {

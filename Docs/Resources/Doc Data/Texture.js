@@ -71,8 +71,9 @@ load(String.raw`
 		(method:get@@$Texture$) 
 			Returns a copy of the Texture.
 		(/method)
-		(method:Texture.fromImageType@imageType, x, y, width, height | renderer, region@$Texture$)
+		(method:Texture.fromImageType@imageType | imageType, x, y, width, height | imageType, region@$Texture$)
 			Returns a Texture representation of the pixels within the specified region in the given #ImageType#.
+			If no region is provided, the entire #ImageType# will be used.
 			(2)Parameters(/2)
 			(p2)
 				(param:imageType $ImageType$)The #ImageType# that the pixels are to be sampled from.(/param)

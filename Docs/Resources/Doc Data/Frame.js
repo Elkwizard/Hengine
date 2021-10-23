@@ -42,8 +42,9 @@ load(String.raw`
 		(method:get@@$Frame$)
 			Returns a copy of the Frame.
 		(/method)
-		(method:Frame.fromImageType@imageType, x, y, width, height | renderer, region@$Frame$)
+		(method:Frame.fromImageType@imageType | imageType, x, y, width, height | imageType, region@$Frame$)
 			Returns a Frame representation of the pixels within the specified region in the given #ImageType#.
+			If no region is provided, the entire #ImageType# will be used.
 			(2)Parameters(/2)
 			(p2)
 				(param:imageType $ImageType$)The #ImageType# that the pixels are to be sampled from.(/param)
@@ -54,13 +55,5 @@ load(String.raw`
 				(param:region $Rect$)A #Rect# object containing the rectangular region.(/param)
 			(/p2)
 		(/method)
-		(method:Frame.fromImageType@imageType@$Frame$)
-			Returns a Frame representation of the given #ImageType#.
-			(2)Parameters(/2)
-			(p2)
-				(param:imageType $ImageType$)The #ImageType# to be reinterpreted.(/param)
-			(/p2)
-		(/method)
-		
 	(/p)
 `);
