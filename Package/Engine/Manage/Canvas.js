@@ -43,6 +43,11 @@ class CanvasImage extends ImageType {
 		if (this.engine.scene) this.engine.scene.camera.position = this.renderer.middle;
 		this.updateSize();
 	}
+	screenSpaceToCanvasSpace(point) {
+		const bound = this.canvas.getBoundingClientRect();
+		const scale = this.width / bound.width;
+		return point.minus(bound).mul(scale);
+	}
 	updateSize() {
 		let packed = new Rect(0, 0, innerWidth, innerHeight).largestWithin(this.width, this.height);
 

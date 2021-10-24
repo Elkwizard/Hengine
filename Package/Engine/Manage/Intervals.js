@@ -122,6 +122,7 @@ class IntervalManager {
 		//input is necessary
 		this.engine.keyboard.update();
 		this.engine.mouse.update();
+		this.engine.touches.update();
 		if (!this.paused) {
 			this.engine.renderer.beforeFrame();
 			this.updateGraphs();
@@ -130,11 +131,12 @@ class IntervalManager {
 			this.updateIntervalCalls(IntervalFunction.UPDATE);
 			this.engine.scene.engineUpdate();
 			this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
-			this.engine.keyboard.afterUpdate();
 			this.engine.scene.updateCaches();
 			this.engine.scene.updatePreviousData();
 		}
+		this.engine.keyboard.afterUpdate();
 		this.engine.mouse.afterUpdate();
+		this.engine.touches.afterUpdate();
 		this.engine.renderer.afterFrame();
 		
 		this.frameCount++;

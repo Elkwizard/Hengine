@@ -112,6 +112,15 @@ class Camera extends Matrix3 {
 	zoomOut(amount) {
 		this.zoom /= 1 + amount;
 	}
+	zoomBy(factor) {
+		this.zoom *= factor;
+	}
+	zoomAbout(center, factor) {
+		const offset = center.minus(this.position);
+		offset.mul(factor - 1);
+		this.position.add(offset);
+		this.zoom *= factor;
+	}
 	cacheScreen() {
 		const { width, height } = this.engine.canvas;
 		return this.screen = Rect.bound([

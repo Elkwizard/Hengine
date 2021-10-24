@@ -115,27 +115,22 @@ class Scene {
 		if (!this.mouseEvents) return;
 
 		const { mouse } = this.engine;
-
 		const adjusted = mouse.world;
-		if (mouse.justPressed(["Left", "Right", "Middle"])) {
-			let key = "";
-			if (mouse.justPressed("Middle")) key = "Middle";
-			if (mouse.justPressed("Right")) key = "Right";
-			if (mouse.justPressed("Left")) key = "Left";
+		const [hover, unhover] = this.collidePointBoth(adjusted, false);
 
-			for (const o of this.collidePoint(adjusted, false).sort((a, b) => b.layer - a.layer)) {
-				o.scripts.run("click", key, adjusted);
-			}
+		const pressed = mouse.allJustPressed;
+		for (let i = 0; i < hover.length; i++) {
+			const object = hover[i];
+			if (!object.hovered) object.scripts.run("hover", adjusted);
+			object.hovered = true;
+			for (let j = 0; j < pressed.length; j++)
+				object.scripts.run("click", pressed[j], adjusted);
 		}
 
-		const collided = this.collidePointBoth(adjusted, false);
-		for (const o of collided[0].sort((a, b) => b.layer - a.layer)) {
-			if (!o.hovered) o.scripts.run("hover", adjusted);
-			o.hovered = true;
-		}
-		for (const o of collided[1].sort((a, b) => b.layer - a.layer)) {
-			if (o.hovered) o.scripts.run("unhover", adjusted);
-			o.hovered = false;
+		for (let i = 0; i < unhover.length; i++) {
+			const object = unhover[i];
+			if (object.hovered) object.scripts.run("unhover", adjusted);
+			object.hovered = false;
 		}
 	}
 	engineUpdate() {

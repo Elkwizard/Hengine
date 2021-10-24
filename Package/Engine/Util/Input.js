@@ -165,8 +165,12 @@ class MouseHandler extends InputHandler {
 		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
 	
 		this.engine = engine;
-		this.listenerRoot = root;
-		this.addListenersTo(this.listenerRoot);
+		this.addListenersTo(root);
+	}
+	get pageLocation() {
+		const bound = this.engine.canvas.canvas.getBoundingClientRect();
+		const scale = this.engine.canvas.width / bound.width;
+		return this.screen.over(scale).plus(new Vector2(bound.x, bound.y));
 	}
 	addListenersTo(el) {
 		this.listenerRoot = el;
@@ -285,16 +289,8 @@ class MouseHandler extends InputHandler {
 		this.world = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
 		this.worldLast = this.engine.scene.camera.screenSpaceToWorldSpace(this.screenLast);
 	}
-	get pageLocation() {
-		const bound = this.engine.canvas.canvas.getBoundingClientRect();
-		const scale = this.engine.canvas.width / bound.width;
-		return this.screen.over(scale).plus(new Vector2(bound.x, bound.y));
-	}
 	updatePosition(e) {
-		const bound = this.engine.canvas.canvas.getBoundingClientRect();
-		const scale = this.engine.canvas.width / bound.width;
-		this.screen.x = (e.x - bound.x) * scale;
-		this.screen.y = (e.y - bound.y) * scale;
+		this.screen = this.engine.canvas.screenSpaceToCanvasSpace(Vector2.fromPoint(e));
 	}
 	allowSave() {
 		if (this.listenerRoot) this.listenerRoot.removeEventListener("contextmenu", this.rightClickListener);
@@ -304,6 +300,173 @@ MouseHandler.Event = class {
 	constructor(button, location) {
 		this.button = button;
 		this.location = location;
+	}
+}
+class TouchState {
+	constructor(handler) {
+		this.handler = handler;
+		this.engine = handler.engine;
+		this.active = false;
+
+		this.targetState = null;
+
+		this.everActive = false;
+
+		// Screen
+		Vector2.defineReference(this, "screen", Vector2.origin);
+		Vector2.defineReference(this, "screenLast", Vector2.origin);
+		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
+		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
+		
+		// World
+		Vector2.defineReference(this, "world", Vector2.origin);
+		Vector2.defineReference(this, "worldLast", Vector2.origin);
+		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
+		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
+	}
+	pressed() {
+		return this.active;
+	}
+	released() {
+		return !this.active;
+	}
+	justPressed() {
+		return this.downCount === 1;
+	}
+	justReleased() {
+		return this.everActive && this.upCount === 1;
+	}
+	pressLength() {
+		return this.downCount;
+	}
+	releasedLength() {
+		return this.everActive ? this.upCount : this.handler.totalCount;
+	}
+	updateState(x, y, targetState) {
+		if (targetState !== null) this.targetState = targetState;
+
+		// valid location
+		const location = this.engine.canvas.screenSpaceToCanvasSpace(new Vector2(x, y));
+		const canvasBounds = new Rect(0, 0, this.engine.canvas.width, this.engine.canvas.height);
+		if (!Geometry.pointInsideRect(location, canvasBounds)) return;
+		
+		this.screen = location;
+		if (targetState !== false) {
+			if (targetState === true) {
+				this.screenLast = this.screen;
+				this.screenDragStart = this.screen;
+				this.worldDragStart = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
+			}
+			this.screenDragEnd = this.screen;
+			this.worldDragEnd = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
+		}
+	}
+	update() {
+		if (this.targetState === true) {
+			this.targetState = null;
+			this.active = true;
+		}
+		this.world = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
+		this.worldLast = this.engine.scene.camera.screenSpaceToWorldSpace(this.screenLast);
+
+		if (this.active) {
+			this.everActive = true;
+			this.upCount = 0;
+			this.downCount++;
+		} else {
+			this.downCount = 0;
+			this.upCount++;
+		}
+	}
+	afterUpdate() {
+		if (this.targetState === false) {
+			this.targetState = null;
+			this.active = false;
+		}
+		this.screenLast = this.screen.get();
+	}
+}
+class TouchHandler {
+	constructor(root, engine) {
+		this.engine = engine;
+
+		this.addListenersTo(root);
+
+		return new Proxy(this, {
+			get(object, key) {
+				if (typeof key === "symbol") return object[key];
+				const index = parseInt(key);
+				if (index + "" !== key) return object[key];
+				return object.touches[index] ?? (object.touches[index] = new TouchState(object));
+			}
+		});
+	}
+	get active() {
+		return this.touches.filter(touch => touch.active);
+	}
+	get length() {
+		return this.touches.length;
+	}
+	*[Symbol.iterator]() {
+		yield* this.touches;
+	}
+	addListenersTo(element) {
+		this.listenerRoot = element;
+		this.totalCount = 0;
+
+		this.touches = [];
+		this.maxTouches = navigator.maxTouchPoints;
+
+		this.touchIndices = new Map();
+		this.firstFree = 0;
+
+		const touchStart = e => {
+			e.preventDefault();
+			this.updateTouches(e.changedTouches, true);
+		};
+		const touchMove = e => {
+			e.preventDefault();
+			this.updateTouches(e.changedTouches, null);
+		};
+		const touchEnd = e => {
+			if (e.cancelable) e.preventDefault();
+			this.updateTouches(e.changedTouches, false);
+		};
+		element.addEventListener("touchstart", touchStart, { passive: false });
+		element.addEventListener("touchmove", touchMove, { passive: false });
+		element.addEventListener("touchend", touchEnd, { passive: false });
+		element.addEventListener("touchcancel", touchEnd, { passive: false });
+	}
+	updateTouches(touches, targetState) {
+		for (let i = 0; i < touches.length; i++) {
+			const { clientX, clientY, identifier } = touches[i];
+
+			if (targetState === true && !this.touchIndices.has(identifier)) {
+				this.touchIndices.set(identifier, this.firstFree);
+				let j = this.firstFree + 1;
+				for (; j < this.touches.length; j++)
+					if (!this.touches[j].pressed) break;
+				this.firstFree = j;
+			}
+			
+			const index = this.touchIndices.get(identifier);
+			if (index >= this.touches.length)
+				this.touches[index] = new TouchState(this);
+			const touch = this.touches[index];
+			touch.updateState(clientX, clientY, targetState);
+			
+			if (targetState === false) {
+				this.touchIndices.delete(identifier);
+				if (identifier < this.firstFree) this.firstFree = identifier;
+			}
+		}
+	}
+	update() {
+		this.totalCount++;
+		for (let i = 0; i < this.touches.length; i++) this.touches[i].update();
+	}
+	afterUpdate() {
+		for (let i = 0; i < this.touches.length; i++) this.touches[i].afterUpdate();
 	}
 }
 class ClipboardHandler {

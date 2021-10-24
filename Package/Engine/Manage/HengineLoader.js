@@ -206,6 +206,7 @@ class HengineLoader {
 		window.renderer = this.hengine.renderer;
 		window.keyboard = this.hengine.keyboard;
 		window.mouse = this.hengine.mouse;
+		window.touches = this.hengine.touches;
 		window.clipboard = this.hengine.clipboard;
 		window.fileSystem = this.hengine.fileSystem;
 		window.intervals = this.hengine.intervals;

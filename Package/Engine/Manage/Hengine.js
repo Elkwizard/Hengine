@@ -16,16 +16,18 @@ class Hengine {
 		
 		wrapper.appendChild(canvas);
 		
-		//Input / Output
+		// input / output
 		this.mouse = new MouseHandler(canvas, this);
+		this.touches = new TouchHandler(canvas, this);
 		this.keyboard = new KeyboardHandler();
 		this.clipboard = new ClipboardHandler();
+
+		// rendering
 		this.canvas = new CanvasImage(canvas, this);
 		this.renderer = this.canvas.renderer;
 		
 		this.scene = new Scene(new Vector2(0, 0.4), this);
-		
-		this.canvas.updateSize();
+		this.canvas.updateSize(); // requires camera, created by scene
 
 		//update loops
 		this.intervals = new IntervalManager(this);
