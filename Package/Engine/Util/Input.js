@@ -151,19 +151,19 @@ class MouseHandler extends InputHandler {
 		this.moveQueue = [];
 		this.upQueue = [];
 		this.wheelDelta = 0;
-		
+
 		// Screen
 		Vector2.defineReference(this, "screen", Vector2.origin);
 		Vector2.defineReference(this, "screenLast", Vector2.origin);
 		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
 		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
-		
+
 		// World
 		Vector2.defineReference(this, "world", Vector2.origin);
 		Vector2.defineReference(this, "worldLast", Vector2.origin);
 		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
 		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
-	
+
 		this.engine = engine;
 		this.addListenersTo(root);
 	}
@@ -185,28 +185,28 @@ class MouseHandler extends InputHandler {
 			this.screenDragEnd = this.screenDragStart.get();
 
 			this.activateKey(this.button);
-			this.downQueue.push(new MouseHandler.Event(this.button, new Vector2(e.x, e.y)));
+			this.downQueue.push(new MouseHandler.Event(this.button, Vector2.fromPoint(e)));
 		};
 		const handleMove = e => {
 			this.updatePosition(e);
-			
+
 			// dragging
 			if (this.pressed(["Left", "Middle", "Right"])) {
 				this.worldDragEnd = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
 				this.screenDragEnd = this.screen.get();
 			}
 
-			this.moveQueue.push(new MouseHandler.Event(this.button, new Vector2(e.x, e.y)));
+			this.moveQueue.push(new MouseHandler.Event(this.button, Vector2.fromPoint(e)));
 		};
 		const handleUp = e => {
 			this.updatePosition(e);
-			
+
 			// dragging
 			this.worldDragEnd = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
 			this.screenDragEnd = this.screen.get();
-			
+
 			for (const [key, value] of this.keys) this.deactivateKey(key);
-			this.upQueue.push(new MouseHandler.Event(this.button, new Vector2(e.x, e.y)));
+			this.upQueue.push(new MouseHandler.Event(this.button, Vector2.fromPoint(e)));
 		};
 
 		//pointers and touch
@@ -216,40 +216,42 @@ class MouseHandler extends InputHandler {
 			if (e.type === "move") handleMove(e);
 		};
 		const mouseHandle = e => {
+			e.preventDefault();
 			if (e.type === "mouseout") handle({
 				x: this.pageLocation.x,
 				y: this.pageLocation.y,
 				button: 0,
-				type: "up"
+				type: "up",
+				mouse: true
 			});
 			else handle({
 				x: e.x,
 				y: e.y,
 				button: e.button,
-				type: e.type.slice(5)
+				type: e.type.slice(5),
+				mouse: true
 			});
 		};
 		const touchHandle = e => {
 			e.preventDefault();
-			let p = e.targetTouches[0];
-			if (!p) handle({
-				x: this.pageLocation.x,
-				y: this.pageLocation.y,
+			const touch = e.changedTouches[0];
+
+			const type = {
+				start: "down",
+				end: "up",
+				move: "move"
+			}[e.type.slice(5)];
+
+			handle({
+				x: touch.pageX,
+				y: touch.pageY,
 				button: 0,
-				type: "up"
+				type
 			});
-			else {
-				let type = { start: "down", end: "up", move: "move" }[e.type.slice(5)];
-				handle({
-					x: p.pageX,
-					y: p.pageY,
-					button: 0,
-					type
-				});
-				if (type === "down") {
-					this.screenLast = this.screen.get();
-					this.worldLast = this.world.get();
-				}
+
+			if (type === "down") {
+				this.screenLast = this.screen.get();
+				this.worldLast = this.world.get();
 			}
 		};
 
@@ -269,6 +271,7 @@ class MouseHandler extends InputHandler {
 		};
 		el.addEventListener("contextmenu", this.rightClickListener);
 		el.addEventListener("wheel", e => {
+			e.preventDefault();
 			if (e.deltaY < 0) this.keys.set("WheelUp", true);
 			else if (e.deltaY > 0) this.keys.set("WheelDown", true);
 			this.wheelDelta += e.deltaY;
@@ -290,7 +293,11 @@ class MouseHandler extends InputHandler {
 		this.worldLast = this.engine.scene.camera.screenSpaceToWorldSpace(this.screenLast);
 	}
 	updatePosition(e) {
-		this.screen = this.engine.canvas.screenSpaceToCanvasSpace(Vector2.fromPoint(e));
+		const location = this.engine.canvas.screenSpaceToCanvasSpace(Vector2.fromPoint(e));
+		const canvasBounds = new Rect(0, 0, this.engine.canvas.width, this.engine.canvas.height);
+		if (!Geometry.pointInsideRect(location, canvasBounds))
+			for (const [key, value] of this.keys) this.deactivateKey(key);
+		else this.screen = location;
 	}
 	allowSave() {
 		if (this.listenerRoot) this.listenerRoot.removeEventListener("contextmenu", this.rightClickListener);
@@ -317,7 +324,7 @@ class TouchState {
 		Vector2.defineReference(this, "screenLast", Vector2.origin);
 		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
 		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
-		
+
 		// World
 		Vector2.defineReference(this, "world", Vector2.origin);
 		Vector2.defineReference(this, "worldLast", Vector2.origin);
@@ -349,7 +356,7 @@ class TouchState {
 		const location = this.engine.canvas.screenSpaceToCanvasSpace(new Vector2(x, y));
 		const canvasBounds = new Rect(0, 0, this.engine.canvas.width, this.engine.canvas.height);
 		if (!Geometry.pointInsideRect(location, canvasBounds)) return;
-		
+
 		this.screen = location;
 		if (targetState !== false) {
 			if (targetState === true) {
@@ -448,13 +455,13 @@ class TouchHandler {
 					if (!this.touches[j].pressed) break;
 				this.firstFree = j;
 			}
-			
+
 			const index = this.touchIndices.get(identifier);
 			if (index >= this.touches.length)
 				this.touches[index] = new TouchState(this);
 			const touch = this.touches[index];
 			touch.updateState(clientX, clientY, targetState);
-			
+
 			if (targetState === false) {
 				this.touchIndices.delete(identifier);
 				if (identifier < this.firstFree) this.firstFree = identifier;
