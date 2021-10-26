@@ -1,451 +1,277 @@
 class InputHandler {
-	constructor() {
-		this.keys = new Map();
-		this.keyDownCounts = new Map();
-		this.keyUpCounts = new Map();
-		this.totalCount = 0;
-		this.keysToDeactivate = new Set();
-		this.keysToActivate = new Set();
-	}
-	get allPressed() {
-		const result = [];
-		for (let [key, pressed] of this.keys) if (pressed) result.push(key);
-		return result;
-	}
-	get allReleased() {
-		const result = [];
-		for (let [key, pressed] of this.keys) if (!pressed) result.push(key);
-		return result;
-	}
-	get allJustPressed() {
-		const result = [];
-		for (let [key, count] of this.keyDownCounts) if (count === 1) result.push(key);
-		return result;
-	}
-	get allJustReleased() {
-		const result = [];
-		for (let [key, count] of this.keyUpCounts) if (count === 1) result.push(key);
-		return result;
-	}
-	activateKey(key) {
-		this.keysToActivate.add(key);
-	}
-	deactivateKey(key) {
-		this.keysToDeactivate.add(key);
-	}
-	pressLength(key) {
-		return this.keyDownCounts.get(key) ?? 0;
-	}
-	releaseLength(key) {
-		return this.keyUpCounts.get(key) ?? this.totalCount;
-	}
-	pressed(keys) {
-		if (Array.isArray(keys)) {
-			for (let i = 0; i < keys.length; i++) {
-				const key = keys[i];
-				if (this.keys.get(key)) return true;
-			}
-			return false;
-		}
-		return !!this.keys.get(keys);
-	}
-	released(keys) {
-		if (Array.isArray(keys)) {
-			for (let i = 0; i < keys.length; i++) {
-				const key = keys[i];
-				if (!this.keys.get(key)) return true;
-			}
-			return false;
-		}
-		return !this.keys.get(keys);
-	}
-	justPressed(keys) {
-		if (Array.isArray(keys)) {
-			for (let i = 0; i < keys.length; i++) {
-				const key = keys[i];
-				if (this.keyDownCounts.get(key) === 1) return true;
-			}
-			return false;
-		}
-		return this.keyDownCounts.get(keys) === 1;
-	}
-	justReleased(keys) {
-		if (Array.isArray(keys)) {
-			for (let i = 0; i < keys.length; i++) {
-				const key = keys[i];
-				if (this.keyUpCounts.get(key) === 1) return true;
-			}
-			return false;
-		}
-		return this.keyUpCounts.get(keys) === 1;
-	}
-	update() {
-		// activate keys
-		for (const key of this.keysToActivate)
-			this.keys.set(key, true);
-		this.keysToActivate.clear();
-
-		this.totalCount++;
-		for (const [key, pressed] of this.keys) {
-			if (!this.keyDownCounts.has(key)) this.keyDownCounts.set(key, 0);
-			if (pressed) {
-				this.keyDownCounts.set(key, this.keyDownCounts.get(key) + 1);
-				this.keyUpCounts.set(key, 0);
-			} else {
-				this.keyUpCounts.set(key, this.keyUpCounts.get(key) + 1);
-				this.keyDownCounts.set(key, 0);
-			}
-		}
-	}
-	afterUpdate() {
-		// deactivate keys
-		for (const key of this.keysToDeactivate) {
-			if (this.keys.get(key) || !this.keysToActivate.has(key)) {
-				this.keys.set(key, false);
-				this.keysToDeactivate.delete(key);
-			}
-		}
-	}
-}
-class KeyboardHandler extends InputHandler {
-	constructor() {
-		super();
-		this.downQueue = [];
-		this.upQueue = [];
-		document.addEventListener("keydown", e => {
-			if (e.key === "Tab") e.preventDefault();
-			const sig = this.getKeySignature(e.key);
-			this.activateKey(sig);
-			this.downQueue.push(new KeyboardHandler.Event(sig, e.key));
-		});
-		document.addEventListener("keyup", e => {
-			const sig = this.getKeySignature(e.key);
-			this.deactivateKey(sig);
-			this.upQueue.push(new KeyboardHandler.Event(sig, e.key));
-		});
-		document.body.onblur = () => {
-			for (const [key, value] of this.keys) this.deactivateKey(key);
-		};
-	}
-	afterUpdate() {
-		super.afterUpdate();
-		this.downQueue = [];
-		this.upQueue = [];
-	}
-	getKeySignature(key) {
-		return (key.length === 1) ? key.toLowerCase() : key;
-	}
-}
-KeyboardHandler.Event = class {
-	constructor(key, text) {
-		this.key = key;
-		this.text = text;
-	}
-}
-class MouseHandler extends InputHandler {
-	constructor(root, engine) {
-		super();
-		this.mouseMap = ["Left", "Middle", "Right"];
-		this.button = "Left";
-		this.downQueue = [];
-		this.moveQueue = [];
-		this.upQueue = [];
-		this.wheelDelta = 0;
-
-		// Screen
-		Vector2.defineReference(this, "screen", Vector2.origin);
-		Vector2.defineReference(this, "screenLast", Vector2.origin);
-		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
-		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
-
-		// World
-		Vector2.defineReference(this, "world", Vector2.origin);
-		Vector2.defineReference(this, "worldLast", Vector2.origin);
-		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
-		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
-
+	constructor(engine) {
 		this.engine = engine;
-		this.addListenersTo(root);
-	}
-	get pageLocation() {
-		const bound = this.engine.canvas.canvas.getBoundingClientRect();
-		const scale = this.engine.canvas.width / bound.width;
-		return this.screen.over(scale).plus(new Vector2(bound.x, bound.y));
-	}
-	addListenersTo(el) {
-		this.listenerRoot = el;
-		const handleDown = e => {
-			this.button = this.mouseMap[e.button];
-			this.updatePosition(e);
-
-			// dragging
-			this.worldDragStart = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
-			this.worldDragEnd = this.worldDragStart.get();
-			this.screenDragStart = this.screen.get();
-			this.screenDragEnd = this.screenDragStart.get();
-
-			this.activateKey(this.button);
-			this.downQueue.push(new MouseHandler.Event(this.button, Vector2.fromPoint(e)));
-		};
-		const handleMove = e => {
-			this.updatePosition(e);
-
-			// dragging
-			if (this.pressed(["Left", "Middle", "Right"])) {
-				this.worldDragEnd = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
-				this.screenDragEnd = this.screen.get();
-			}
-
-			this.moveQueue.push(new MouseHandler.Event(this.button, Vector2.fromPoint(e)));
-		};
-		const handleUp = e => {
-			this.updatePosition(e);
-
-			// dragging
-			this.worldDragEnd = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
-			this.screenDragEnd = this.screen.get();
-
-			for (const [key, value] of this.keys) this.deactivateKey(key);
-			this.upQueue.push(new MouseHandler.Event(this.button, Vector2.fromPoint(e)));
-		};
-
-		//pointers and touch
-		const handle = e => {
-			if (e.type === "down") handleDown(e);
-			if (e.type === "up") handleUp(e);
-			if (e.type === "move") handleMove(e);
-		};
-		const mouseHandle = e => {
-			e.preventDefault();
-			if (e.type === "mouseout") handle({
-				x: this.pageLocation.x,
-				y: this.pageLocation.y,
-				button: 0,
-				type: "up",
-				mouse: true
-			});
-			else handle({
-				x: e.x,
-				y: e.y,
-				button: e.button,
-				type: e.type.slice(5),
-				mouse: true
-			});
-		};
-		const touchHandle = e => {
-			e.preventDefault();
-			const touch = e.changedTouches[0];
-
-			const type = {
-				start: "down",
-				end: "up",
-				move: "move"
-			}[e.type.slice(5)];
-
-			handle({
-				x: touch.pageX,
-				y: touch.pageY,
-				button: 0,
-				type
-			});
-
-			if (type === "down") {
-				this.screenLast = this.screen.get();
-				this.worldLast = this.world.get();
-			}
-		};
-
-		el.addEventListener("mousedown", mouseHandle);
-		el.addEventListener("mousemove", mouseHandle);
-		el.addEventListener("mouseup", mouseHandle);
-		el.addEventListener("mouseout", mouseHandle);
-		el.addEventListener("touchstart", touchHandle);
-		el.addEventListener("touchmove", touchHandle);
-		el.addEventListener("touchend", touchHandle);
-		el.addEventListener("touchcancel", touchHandle);
-
-		// non positional listeners
-		this.rightClickListener = e => {
-			e.preventDefault();
-			handleDown(e);
-		};
-		el.addEventListener("contextmenu", this.rightClickListener);
-		el.addEventListener("wheel", e => {
-			e.preventDefault();
-			if (e.deltaY < 0) this.keys.set("WheelUp", true);
-			else if (e.deltaY > 0) this.keys.set("WheelDown", true);
-			this.wheelDelta += e.deltaY;
+		this.totalCount = 0;
+		this.states = new Map();
+		document.addEventListener("visibilitychange", () => {
+			if (document.visibilityState === "hidden")
+				this.targetAll(false);
 		});
+		this.addListeners();
+	}
+	addListeners() {
+
+	}
+	preprocess(name) {
+		return name;
+	}
+	get(name) {
+		name = this.preprocess(name);
+		if (!this.states.has(name))
+			this.states.set(name, new this.constructor.State(this, name));
+		return this.states.get(name);
+	}
+	set(name, key, value) {
+		const state = this.get(name);
+		state[key] = value;
+		return state;
+	}
+	target(name, state) {
+		return this.set(name, "targetState", state);
+	}
+	check(arg, state, signal = InputHandler.or) {
+		if (Array.isArray(arg)) {
+			let acc;
+			for (let i = 0; i < arg.length; i++) {
+				const value = this.get(arg[i])[state];
+				if (value === signal) return signal;
+				if (value !== !!value) {
+					acc = [value];
+					break;
+				}
+			}
+			if (acc !== undefined) {
+				for (let i = 1; i < arg.length; i++) {
+					const value = this.get(arg[i])[state];
+					acc.push(value);
+				}
+				return acc;
+			}
+			return !signal;
+		} else return this.get(arg)[state];
+	}
+	targetAll(target) {
+		for (const [_, state] of this.states) state.targetState = target;
+	}
+	beforeUpdate() {
+		this.totalCount++;
+		for (const [_, state] of this.states) state.beforeUpdate();
 	}
 	afterUpdate() {
-		super.afterUpdate();
-		this.screenLast = this.screen.get();
-		this.downQueue = [];
-		this.moveQueue = [];
-		this.upQueue = [];
-		this.keys.set("WheelUp", false);
-		this.keys.set("WheelDown", false);
-		this.wheelDelta = 0;
+		for (const [_, state] of this.states) state.afterUpdate();
 	}
-	update() {
-		super.update();
-		this.world = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
-		this.worldLast = this.engine.scene.camera.screenSpaceToWorldSpace(this.screenLast);
-	}
-	updatePosition(e) {
-		const location = this.engine.canvas.screenSpaceToCanvasSpace(Vector2.fromPoint(e));
-		const canvasBounds = new Rect(0, 0, this.engine.canvas.width, this.engine.canvas.height);
-		if (!Geometry.pointInsideRect(location, canvasBounds))
-			for (const [key, value] of this.keys) this.deactivateKey(key);
-		else this.screen = location;
-	}
-	allowSave() {
-		if (this.listenerRoot) this.listenerRoot.removeEventListener("contextmenu", this.rightClickListener);
+	static addChecks(keys = []) {
+		for (let i = 0; i < keys.length; i++) {
+			const key = keys[i];
+			this.prototype[key] = function (arg, signal) {
+				return this.check(arg, key, signal);
+			};
+		};
 	}
 }
-MouseHandler.Event = class {
-	constructor(button, location) {
-		this.button = button;
-		this.location = location;
-	}
-}
-class TouchState {
-	constructor(handler, index) {
+InputHandler.or = true;
+InputHandler.and = false;
+
+InputHandler.State = class State {
+	constructor(handler, name) {
 		this.handler = handler;
-		this.index = index;
-		this.engine = handler.engine;
-		this.active = false;
+		this.name = name;
 
 		this.targetState = null;
 
-		this.everActive = false;
-		this.upCount = 0;
+		this.pressed = false;
 		this.downCount = 0;
-
-		// Screen
-		Vector2.defineReference(this, "screen", Vector2.origin);
-		Vector2.defineReference(this, "screenLast", Vector2.origin);
-		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
-		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
-
-		// World
-		Vector2.defineReference(this, "world", Vector2.origin);
-		Vector2.defineReference(this, "worldLast", Vector2.origin);
-		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
-		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
+		this.upCount = 0;
+	}
+	set pressed(a) {
+		this._pressed = a;
+		this.everPressed ||= a;
 	}
 	get pressed() {
-		return this.active;
+		return this._pressed;
 	}
 	get released() {
-		return !this.active;
+		return !this.pressed;
 	}
 	get justPressed() {
 		return this.downCount === 1;
 	}
 	get justReleased() {
-		return this.everActive && this.upCount === 1;
+		return this.everPressed && this.upCount === 1;
 	}
 	get pressLength() {
 		return this.downCount;
 	}
-	get releasedLength() {
-		return this.everActive ? this.upCount : this.handler.totalCount;
+	get releaseLength() {
+		return this.everPressed ? this.upCount : this.handler.totalCount;
 	}
-	updateState(x, y, targetState) {
-		if (targetState !== null) this.targetState = targetState;
-
-		// valid location
-		const location = this.engine.canvas.screenSpaceToCanvasSpace(new Vector2(x, y));
-		const canvasBounds = new Rect(0, 0, this.engine.canvas.width, this.engine.canvas.height);
-		if (!Geometry.pointInsideRect(location, canvasBounds)) return;
-
-		this.screen = location;
-		if (targetState !== false) {
-			if (targetState === true) {
-				this.screenLast = this.screen;
-				this.screenDragStart = this.screen;
-				this.worldDragStart = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
-			}
-			this.screenDragEnd = this.screen;
-			this.worldDragEnd = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
-		}
-	}
-	update() {
+	beforeUpdate() {
 		if (this.targetState === true) {
+			this.pressed = true;
 			this.targetState = null;
-			this.active = true;
 		}
-		this.world = this.engine.scene.camera.screenSpaceToWorldSpace(this.screen);
-		this.worldLast = this.engine.scene.camera.screenSpaceToWorldSpace(this.screenLast);
 
-		if (this.active) {
-			this.everActive = true;
-			this.upCount = 0;
+		if (this.pressed) {
 			this.downCount++;
+			this.upCount = 0;
 		} else {
-			this.downCount = 0;
 			this.upCount++;
+			this.downCount = 0;
 		}
 	}
 	afterUpdate() {
 		if (this.targetState === false) {
+			this.pressed = false;
 			this.targetState = null;
-			this.active = false;
 		}
-		this.screenLast = this.screen.get();
+	}
+};
+
+{
+	const checks = [];
+	const descs = Object.getOwnPropertyDescriptors(InputHandler.State.prototype);
+	for (const key in descs)
+		if ("get" in descs[key]) checks.push(key);
+	InputHandler.addChecks(checks);
+};
+
+class KeyboardHandler extends InputHandler {
+	constructor(engine) {
+		super(engine);
+	}
+	preprocess(name) {
+		name += "";
+		return (name.length === 1) ? name.toLowerCase() : name;
+	}
+	addListeners() {
+		document.body.onblur = () => void this.targetAll(false);
+		document.addEventListener("keydown", event => void this.target(event.key, true));
+		document.addEventListener("keyup", event => void this.target(event.key, false));
 	}
 }
-class TouchHandler {
-	constructor(root, engine) {
-		this.engine = engine;
 
-		this.addListenersTo(root);
-
-		return new Proxy(this, {
-			get(object, key) {
-				if (typeof key === "symbol") return object[key];
-				const index = parseInt(key);
-				if (index + "" !== key) return object[key];
-				return object.touches[index] ?? (object.touches[index] = new TouchState(object, index));
+class MouseHandler extends InputHandler {
+	constructor(engine) {
+		super(engine);
+		this.mouseMap = new Map([
+			[0, "Left"],
+			[1, "Middle"],
+			[2, "Right"]
+		]);
+		
+		this.wheelDelta = 0;
+		Vector2.defineReference(this, "screen", Vector2.origin);
+		Vector2.defineReference(this, "screenLast", Vector2.origin);
+		Vector2.defineReference(this, "world", Vector2.origin);
+		Vector2.defineReference(this, "worldLast", Vector2.origin);
+	}
+	preprocess(name) {
+		if (typeof name === "number") return this.mouseMap.get(name);
+		return name;
+	}
+	addListeners() {
+		document.addEventListener("mousedown", event => {
+			const state = this.target(event.button, true);
+			const pos = this.getEventPosition(event);
+			if (pos) {
+				state.screenDragStart = pos;
+				state.screenDragEnd = pos;
+				const wpos = this.getWorldPosition(pos);
+				state.worldDragStart = wpos;
+				state.worldDragEnd = wpos;
+				
+				this.screen = pos;
+				this.screenLast = pos;
 			}
 		});
-	}
-	get active() {
-		return this.touches.filter(touch => touch.active);
-	}
-	get length() {
-		return this.touches.length;
-	}
-	*[Symbol.iterator]() {
-		yield* this.touches;
-	}
-	addListenersTo(element) {
-		this.listenerRoot = element;
-		this.totalCount = 0;
+		document.addEventListener("mousemove", event => {
+			const pos = this.getEventPosition(event);
+			if (pos) {
+				this.screen = pos;
 
-		this.touches = [];
+				const wpos = this.getWorldPosition(pos);
+				for (const [_, state] of this.states) {
+					if (state.pressed) {
+						state.screenDragEnd = pos;
+						state.worldDragEnd = wpos;
+					}
+				}
+			}
+		});
+		document.addEventListener("mouseup", event => {
+			this.target(event.button, false);
+			const pos = this.getEventPosition(event);
+			if (pos) this.screen = pos;
+		});
+		document.addEventListener("mouseout", () => this.targetAll(false));
+		document.addEventListener("contextmenu", event => event.preventDefault());
+		document.addEventListener("wheel", event => {
+			this.wheelDelta += event.deltaY;
+		});
+	}
+	getWorldPosition(point) {
+		return this.engine.scene.camera.screenSpaceToWorldSpace(point);
+	}
+	getEventPosition(event) {
+		const location = this.engine.canvas.screenSpaceToCanvasSpace(
+			new Vector2(event.clientX, event.clientY)
+		);
+		return this.engine.canvas.contains(location) ? location : null;
+	}
+	beforeUpdate() {
+		super.beforeUpdate();
+		this.world = this.getWorldPosition(this.screen);
+		this.worldLast = this.getWorldPosition(this.screenLast);
+	}
+	afterUpdate() {
+		super.afterUpdate();
+		
+		// post frame
+		this.screenLast = this.screen;
+		this.wheelDelta = 0;
+	}
+}
+
+MouseHandler.State = class ButtonState extends InputHandler.State {
+	constructor(handler, name) {
+		super(handler, name);
+
+		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
+		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
+		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
+		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
+	}
+};
+
+MouseHandler.addChecks([
+	"screenDragStart",
+	"screenDragEnd",
+	"worldDragStart",
+	"worldDragEnd",
+]);
+
+class TouchHandler extends InputHandler {
+	constructor(engine) {
+		super(engine);
 		this.maxTouches = navigator.maxTouchPoints;
-
 		this.touchIndices = new Map();
 		this.firstFree = 0;
+	}
+	addListeners() {
+		document.addEventListener("touchstart", event => {
+			event.preventDefault();
+			this.updateTouches(event.changedTouches, true);
+		}, { passive: false });
 
-		const touchStart = e => {
-			e.preventDefault();
-			this.updateTouches(e.changedTouches, true);
-		};
-		const touchMove = e => {
-			e.preventDefault();
-			this.updateTouches(e.changedTouches, null);
-		};
-		const touchEnd = e => {
-			if (e.cancelable) e.preventDefault();
-			this.updateTouches(e.changedTouches, false);
-		};
-		element.addEventListener("touchstart", touchStart, { passive: false });
-		element.addEventListener("touchmove", touchMove, { passive: false });
-		element.addEventListener("touchend", touchEnd, { passive: false });
-		element.addEventListener("touchcancel", touchEnd, { passive: false });
+		document.addEventListener("touchmove", event => {
+			event.preventDefault();
+			this.updateTouches(event.changedTouches, null);
+		}, { passive: false });
+		
+		document.addEventListener("touchend", event => {
+			if (event.cancelable) event.preventDefault();
+			this.updateTouches(event.changedTouches, false);
+		});
 	}
 	updateTouches(touches, targetState) {
 		for (let i = 0; i < touches.length; i++) {
@@ -460,9 +286,10 @@ class TouchHandler {
 			}
 
 			const index = this.touchIndices.get(identifier);
-			if (index >= this.touches.length)
-				this.touches[index] = new TouchState(this, index);
-			const touch = this.touches[index];
+			
+			const touch = this.get(index);
+			// touch.targetState = targetState;
+			// touch.
 			touch.updateState(clientX, clientY, targetState);
 
 			if (targetState === false) {
@@ -471,14 +298,32 @@ class TouchHandler {
 			}
 		}
 	}
-	update() {
-		this.totalCount++;
-		for (let i = 0; i < this.touches.length; i++) this.touches[i].update();
-	}
-	afterUpdate() {
-		for (let i = 0; i < this.touches.length; i++) this.touches[i].afterUpdate();
-	}
 }
+
+TouchHandler.State = class TouchState extends InputHandler.State {
+	constructor(handler, name) {
+		super(handler, name);
+		
+		Vector2.defineReference(this, "screen", Vector2.origin);
+		Vector2.defineReference(this, "screenLast", Vector2.origin);
+		Vector2.defineReference(this, "world", Vector2.origin);
+		Vector2.defineReference(this, "worldLast", Vector2.origin);
+		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
+		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
+		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
+		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
+	}
+};
+
+TouchHandler.addChecks([
+	"screen", "screenLast",
+	"world", "worldLast",
+	"screenDragStart",
+	"screenDragEnd",
+	"worldDragStart",
+	"worldDragEnd",
+]);
+
 class ClipboardHandler {
 	constructor() {
 		this.data = "";

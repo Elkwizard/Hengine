@@ -120,9 +120,9 @@ class IntervalManager {
 		this.updatePerformanceData();
 
 		//input is necessary
-		this.engine.keyboard.update();
-		this.engine.mouse.update();
-		this.engine.touches.update();
+		this.engine.keyboard.beforeUpdate();
+		this.engine.mouse.beforeUpdate();
+		this.engine.touches.beforeUpdate();
 		if (!this.paused) {
 			this.engine.renderer.beforeFrame();
 			this.updateGraphs();

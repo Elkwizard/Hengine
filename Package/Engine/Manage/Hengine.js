@@ -17,8 +17,8 @@ class Hengine {
 		wrapper.appendChild(canvas);
 		
 		// input / output
-		this.mouse = new MouseHandler(canvas, this);
-		this.touches = new TouchHandler(canvas, this);
+		this.mouse = new MouseHandler(this);
+		this.touches = new TouchHandler(this);
 		this.keyboard = new KeyboardHandler();
 		this.clipboard = new ClipboardHandler();
 

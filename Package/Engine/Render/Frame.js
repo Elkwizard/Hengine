@@ -79,6 +79,13 @@ class ImageType {
 			if (notify) this.onresize();
 		}
 	}
+	contains(x, y) {
+		if (typeof x === "object") {
+			y = x.y;
+			x = x.x;
+		}
+		return x >= 0 && y >= 0 && x <= this.width && y <= this.height;
+	}
 	inferWidth(height) {
 		return this.width * height / this.height;
 	}

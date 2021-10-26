@@ -24,6 +24,23 @@ load(String.raw`
 		(method:makeImage@@$CanvasImageSource$)
 			Returns the CanvasImageSource representation of the ImageType. Used for rendering to the underlying canvas API.
 		(/method)
+		(method:resize@width, height@$void$)
+			Resizes the ImageType with the given dimensions.
+			(2)Parameters(/2)
+			(p2)
+				(param:width$Number$)The new width of the ImageType.(/param)
+				(param:height$Number$)The new height of the ImageType.(/param)
+			(/p2)
+		(/method)
+		(method:contains@x, y | point@$Boolean$)
+			Returns whether or not the given point is within the inclusive bounds of the ImageType.
+			(2)Parameters(/2)
+			(p2)
+				(param:x$Number$)The x coordinate of the point to check.(/param)
+				(param:y$Number$)The y coordinate of the point to check.(/param)
+				(param:point$Vector2$)The coordinates of the point to check.(/param)
+			(/p2)
+		(/method)
 		(method:inferWidth@height@$Number$)
 			Returns the width of the image if the height was the provided number and the aspect ratio was constant.
 			(2)Parameters(/2)
