@@ -310,14 +310,17 @@ MouseHandler.Event = class {
 	}
 }
 class TouchState {
-	constructor(handler) {
+	constructor(handler, index) {
 		this.handler = handler;
+		this.index = index;
 		this.engine = handler.engine;
 		this.active = false;
 
 		this.targetState = null;
 
 		this.everActive = false;
+		this.upCount = 0;
+		this.downCount = 0;
 
 		// Screen
 		Vector2.defineReference(this, "screen", Vector2.origin);
@@ -331,22 +334,22 @@ class TouchState {
 		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
 		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
 	}
-	pressed() {
+	get pressed() {
 		return this.active;
 	}
-	released() {
+	get released() {
 		return !this.active;
 	}
-	justPressed() {
+	get justPressed() {
 		return this.downCount === 1;
 	}
-	justReleased() {
+	get justReleased() {
 		return this.everActive && this.upCount === 1;
 	}
-	pressLength() {
+	get pressLength() {
 		return this.downCount;
 	}
-	releasedLength() {
+	get releasedLength() {
 		return this.everActive ? this.upCount : this.handler.totalCount;
 	}
 	updateState(x, y, targetState) {
@@ -404,7 +407,7 @@ class TouchHandler {
 				if (typeof key === "symbol") return object[key];
 				const index = parseInt(key);
 				if (index + "" !== key) return object[key];
-				return object.touches[index] ?? (object.touches[index] = new TouchState(object));
+				return object.touches[index] ?? (object.touches[index] = new TouchState(object, index));
 			}
 		});
 	}
@@ -458,7 +461,7 @@ class TouchHandler {
 
 			const index = this.touchIndices.get(identifier);
 			if (index >= this.touches.length)
-				this.touches[index] = new TouchState(this);
+				this.touches[index] = new TouchState(this, index);
 			const touch = this.touches[index];
 			touch.updateState(clientX, clientY, targetState);
 
