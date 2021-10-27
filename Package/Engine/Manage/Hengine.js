@@ -19,7 +19,7 @@ class Hengine {
 		// input / output
 		this.mouse = new MouseHandler(this);
 		this.touches = new TouchHandler(this);
-		this.keyboard = new KeyboardHandler();
+		this.keyboard = new KeyboardHandler(this);
 		this.clipboard = new ClipboardHandler();
 
 		// rendering

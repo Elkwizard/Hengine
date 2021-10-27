@@ -9,6 +9,12 @@ class InputHandler {
 		});
 		this.addListeners();
 	}
+	get length() {
+		return this.states.size;
+	}
+	get all() {
+		return Array.from(this.states.keys());
+	}
 	addListeners() {
 
 	}
@@ -35,7 +41,7 @@ class InputHandler {
 			const value = obj[state];
 			if (value === !!value) {
 				if (value) result.push(name);
-			} else result.push(value);
+			} else return;
 		}
 		return result;
 	}
@@ -73,10 +79,11 @@ class InputHandler {
 	static addChecks(keys = []) {
 		for (let i = 0; i < keys.length; i++) {
 			const key = keys[i];
+			if (key.indexOf("Length") > -1) continue;
 			this.prototype[key] = function (arg, signal) {
 				return this.check(arg, key, signal);
 			};
-			Object.defineProperty(this.prototype, key, {
+			Object.defineProperty(this.prototype, "all" + key.capitalize(), {
 				get() {
 					return this.checkAll(key);
 				}
@@ -92,11 +99,21 @@ InputHandler.State = class State {
 		this.handler = handler;
 		this.name = name;
 
-		this.targetState = null;
+		this.turnOff = false;
+		this.turnOn = false;
 
 		this.pressed = false;
 		this.downCount = 0;
 		this.upCount = 0;
+	}
+	set targetState(a) {
+		if (a === true) {
+			this.turnOn = true;
+			console.log(`activate ${this.name}`);
+		} else if (a === false) {
+			this.turnOff = true;
+			console.log(`deactivate ${this.name}`);
+		}
 	}
 	set pressed(a) {
 		this._pressed = a;
@@ -121,9 +138,9 @@ InputHandler.State = class State {
 		return this.everPressed ? this.upCount : this.handler.totalCount;
 	}
 	beforeUpdate() {
-		if (this.targetState === true) {
+		if (this.turnOn) {
+			this.turnOn = false;
 			this.pressed = true;
-			this.targetState = null;
 		}
 
 		if (this.pressed) {
@@ -135,9 +152,9 @@ InputHandler.State = class State {
 		}
 	}
 	afterUpdate() {
-		if (this.targetState === false) {
+		if (this.turnOff) {
+			this.turnOff = false;
 			this.pressed = false;
-			this.targetState = null;
 		}
 	}
 };
@@ -153,17 +170,27 @@ InputHandler.State = class State {
 class KeyboardHandler extends InputHandler {
 	constructor(engine) {
 		super(engine);
+		this.downQueue = [];
 	}
 	preprocess(name) {
 		name += "";
 		return (name.length === 1) ? name.toLowerCase() : name;
 	}
 	addListeners() {
-		document.body.onblur = () => void this.targetAll(false);
-		document.addEventListener("keydown", event => void this.target(event.key, true));
+		document.body.onblur = () => this.targetAll(false);
+		document.addEventListener("keydown", event => {
+			void this.target(event.key, true);
+			this.downQueue.push(event.key);
+		});
 		document.addEventListener("keyup", event => void this.target(event.key, false));
 	}
+	afterUpdate() {
+		super.afterUpdate();
+		this.downQueue = [];
+	}
 }
+
+KeyboardHandler.State = class KeyState extends InputHandler.State { };
 
 class MouseHandler extends InputHandler {
 	constructor(engine) {
@@ -173,7 +200,7 @@ class MouseHandler extends InputHandler {
 			[1, "Middle"],
 			[2, "Right"]
 		]);
-		
+
 		this.wheelDelta = 0;
 		Vector2.defineReference(this, "screen", Vector2.origin);
 		Vector2.defineReference(this, "screenLast", Vector2.origin);
@@ -186,6 +213,7 @@ class MouseHandler extends InputHandler {
 	}
 	addListeners() {
 		document.addEventListener("mousedown", event => {
+			event.preventDefault();
 			const state = this.target(event.button, true);
 			const pos = this.getEventPosition(event);
 			if (pos) {
@@ -194,7 +222,7 @@ class MouseHandler extends InputHandler {
 				const wpos = this.getWorldPosition(pos);
 				state.worldDragStart = wpos;
 				state.worldDragEnd = wpos;
-				
+
 				this.screen = pos;
 				this.screenLast = pos;
 			}
@@ -240,7 +268,7 @@ class MouseHandler extends InputHandler {
 	}
 	afterUpdate() {
 		super.afterUpdate();
-		
+
 		// post frame
 		this.screenLast = this.screen;
 		this.wheelDelta = 0;
@@ -274,15 +302,15 @@ class TouchHandler extends InputHandler {
 	}
 	addListeners() {
 		document.addEventListener("touchstart", event => {
-			event.preventDefault();
+			if (event.cancelable) event.preventDefault();
 			this.updateTouches(event.changedTouches, true);
 		}, { passive: false });
 
 		document.addEventListener("touchmove", event => {
-			event.preventDefault();
+			if (event.cancelable) event.preventDefault();
 			this.updateTouches(event.changedTouches, null);
 		}, { passive: false });
-		
+
 		document.addEventListener("touchend", event => {
 			if (event.cancelable) event.preventDefault();
 			this.updateTouches(event.changedTouches, false);
@@ -299,33 +327,40 @@ class TouchHandler extends InputHandler {
 	}
 	updateTouches(touches, targetState) {
 		for (let i = 0; i < touches.length; i++) {
-			const { clientX, clientY, identifier } = touches[i];
+			const { identifier } = touches[i];
 
-			if (targetState === true && !this.touchIndices.has(identifier)) {
-				this.touchIndices.set(identifier, this.firstFree);
-				let j = this.firstFree + 1;
-				for (; j < this.touches.length; j++)
-					if (!this.touches[j].pressed) break;
-				this.firstFree = j;
-			}
+			// if (targetState === true && !this.touchIndices.has(identifier)) {
+			// 	this.touchIndices.set(identifier, this.firstFree);
+			// 	let j = this.firstFree + 1;
+			// 	const states = this.states.values();
+			// 	for (; j < states.length; j++) {
+			// 		const state = states[j];
+			// 		if (!state.pressed && !state.turnOn) break;
+			// 	}
+			// 	this.firstFree = j;
+			// }
 
-			const index = this.touchIndices.get(identifier);
 			
+
+			const index = identifier//this.touchIndices.get(identifier);
 			const touch = this.get(index);
 			touch.targetState = targetState;
-			touch.screen = this.getEventPosition(touches[i]);
-			
+
 			if (targetState === false) {
-				this.touchIndices.delete(identifier);
-				if (identifier < this.firstFree) this.firstFree = identifier;
+				// if (index < this.firstFree) this.firstFree = index;
+				// this.touchIndices.delete(identifier);
 			} else {
-				if (targetState === true) {
-					touch.screenLast = touch.screen;
-					touch.screenDragStart = touch.screen;
-					touch.worldDragStart = touch.getWorldPosition(touch.screen);
+				const location = this.getEventPosition(touches[i]);
+				if (location) {
+					touch.screen = location;
+					if (targetState === true) {
+						touch.screenLast = touch.screen;
+						touch.screenDragStart = touch.screen;
+						touch.worldDragStart = this.getWorldPosition(touch.screen);
+					}
+					touch.screenDragEnd = touch.screen;
+					touch.worldDragEnd = this.getWorldPosition(touch.screen);
 				}
-				touch.screenDragEnd = touch.screen;
-				touch.worldDragEnd = this.getWorldPosition(touch.screen);
 			}
 		}
 	}
@@ -334,17 +369,19 @@ class TouchHandler extends InputHandler {
 TouchHandler.State = class TouchState extends MouseHandler.State {
 	constructor(handler, name) {
 		super(handler, name);
-		
+
 		Vector2.defineReference(this, "screen", Vector2.origin);
 		Vector2.defineReference(this, "screenLast", Vector2.origin);
 		Vector2.defineReference(this, "world", Vector2.origin);
 		Vector2.defineReference(this, "worldLast", Vector2.origin);
 	}
 	beforeUpdate() {
+		super.beforeUpdate();
 		this.world = this.handler.getWorldPosition(this.screen);
 		this.worldLast = this.handler.getWorldPosition(this.screenLast);
 	}
 	afterUpdate() {
+		super.afterUpdate();
 		this.screenLast = this.screen;
 	}
 };

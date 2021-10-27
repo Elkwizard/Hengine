@@ -418,10 +418,10 @@ class TEXT_AREA extends ElementScript {
 		if (this.mouse.justPressed("Left") && !doubleClick) this.clickTimer = 0;
 		this.clickTimer++;
 
-		if (this.focused && this.keyboard.downQueue.length) {
+		const queue = this.keyboard.downQueue;
+		if (this.focused && queue.length) {
 			this.keyTimer = 0;
-			for (let key of this.keyboard.downQueue) {
-				key = key.text;
+			for (let key of queue) {
 
 				if (key === "Control" || key === "Shift") continue;
 				if (keyboard.pressed("Control") && !this.keyboardShortcuts.includes(key.toLowerCase())) continue;
