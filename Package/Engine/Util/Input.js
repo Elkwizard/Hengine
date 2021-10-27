@@ -29,6 +29,16 @@ class InputHandler {
 	target(name, state) {
 		return this.set(name, "targetState", state);
 	}
+	checkAll(state) {
+		const result = [];
+		for (const [name, obj] of this.states) {
+			const value = obj[state];
+			if (value === !!value) {
+				if (value) result.push(name);
+			} else result.push(value);
+		}
+		return result;
+	}
 	check(arg, state, signal = InputHandler.or) {
 		if (Array.isArray(arg)) {
 			let acc;
@@ -66,6 +76,11 @@ class InputHandler {
 			this.prototype[key] = function (arg, signal) {
 				return this.check(arg, key, signal);
 			};
+			Object.defineProperty(this.prototype, key, {
+				get() {
+					return this.checkAll(key);
+				}
+			});
 		};
 	}
 }
@@ -247,7 +262,7 @@ MouseHandler.addChecks([
 	"screenDragStart",
 	"screenDragEnd",
 	"worldDragStart",
-	"worldDragEnd",
+	"worldDragEnd"
 ]);
 
 class TouchHandler extends InputHandler {
@@ -273,6 +288,15 @@ class TouchHandler extends InputHandler {
 			this.updateTouches(event.changedTouches, false);
 		});
 	}
+	getWorldPosition(point) {
+		return this.engine.scene.camera.screenSpaceToWorldSpace(point);
+	}
+	getEventPosition(event) {
+		const location = this.engine.canvas.screenSpaceToCanvasSpace(
+			new Vector2(event.clientX, event.clientY)
+		);
+		return this.engine.canvas.contains(location) ? location : null;
+	}
 	updateTouches(touches, targetState) {
 		for (let i = 0; i < touches.length; i++) {
 			const { clientX, clientY, identifier } = touches[i];
@@ -288,19 +312,26 @@ class TouchHandler extends InputHandler {
 			const index = this.touchIndices.get(identifier);
 			
 			const touch = this.get(index);
-			// touch.targetState = targetState;
-			// touch.
-			touch.updateState(clientX, clientY, targetState);
-
+			touch.targetState = targetState;
+			touch.screen = this.getEventPosition(touches[i]);
+			
 			if (targetState === false) {
 				this.touchIndices.delete(identifier);
 				if (identifier < this.firstFree) this.firstFree = identifier;
+			} else {
+				if (targetState === true) {
+					touch.screenLast = touch.screen;
+					touch.screenDragStart = touch.screen;
+					touch.worldDragStart = touch.getWorldPosition(touch.screen);
+				}
+				touch.screenDragEnd = touch.screen;
+				touch.worldDragEnd = this.getWorldPosition(touch.screen);
 			}
 		}
 	}
 }
 
-TouchHandler.State = class TouchState extends InputHandler.State {
+TouchHandler.State = class TouchState extends MouseHandler.State {
 	constructor(handler, name) {
 		super(handler, name);
 		
@@ -308,10 +339,13 @@ TouchHandler.State = class TouchState extends InputHandler.State {
 		Vector2.defineReference(this, "screenLast", Vector2.origin);
 		Vector2.defineReference(this, "world", Vector2.origin);
 		Vector2.defineReference(this, "worldLast", Vector2.origin);
-		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
-		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
-		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
-		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
+	}
+	beforeUpdate() {
+		this.world = this.handler.getWorldPosition(this.screen);
+		this.worldLast = this.handler.getWorldPosition(this.screenLast);
+	}
+	afterUpdate() {
+		this.screenLast = this.screen;
 	}
 };
 
@@ -321,14 +355,14 @@ TouchHandler.addChecks([
 	"screenDragStart",
 	"screenDragEnd",
 	"worldDragStart",
-	"worldDragEnd",
+	"worldDragEnd"
 ]);
 
 class ClipboardHandler {
 	constructor() {
 		this.data = "";
-		document.body.addEventListener("paste", e => {
-			this.data = e.clipboardData.getData("text/plain");
+		document.body.addEventListener("paste", event => {
+			this.data = event.clipboardData.getData("text/plain");
 		});
 	}
 	write(value) {
