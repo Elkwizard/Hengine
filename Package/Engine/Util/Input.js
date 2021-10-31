@@ -105,15 +105,20 @@ InputHandler.State = class State {
 		this.pressed = false;
 		this.downCount = 0;
 		this.upCount = 0;
+
+		this._targetState = false;
 	}
 	set targetState(a) {
-		if (a === true) {
+		if (a === null) return;
+		this._targetState = a;
+		if (a) {
 			this.turnOn = true;
-			console.log(`activate ${this.name}`);
-		} else if (a === false) {
+			this.turnOff = false;
+		} else
 			this.turnOff = true;
-			console.log(`deactivate ${this.name}`);
-		}
+	}
+	get targetState() {
+		return this._targetState;
 	}
 	set pressed(a) {
 		this._pressed = a;
@@ -179,6 +184,7 @@ class KeyboardHandler extends InputHandler {
 	addListeners() {
 		document.body.onblur = () => this.targetAll(false);
 		document.addEventListener("keydown", event => {
+			if (event.key === "Tab") event.preventDefault();
 			void this.target(event.key, true);
 			this.downQueue.push(event.key);
 		});
@@ -212,8 +218,10 @@ class MouseHandler extends InputHandler {
 		return name;
 	}
 	addListeners() {
-		document.addEventListener("mousedown", event => {
+		document.addEventListener("pointerdown", event => {
 			event.preventDefault();
+			if (!event.isPrimary) return;
+			
 			const state = this.target(event.button, true);
 			const pos = this.getEventPosition(event);
 			if (pos) {
@@ -227,7 +235,9 @@ class MouseHandler extends InputHandler {
 				this.screenLast = pos;
 			}
 		});
-		document.addEventListener("mousemove", event => {
+		document.addEventListener("pointermove", event => {
+			if (!event.isPrimary) return;
+
 			const pos = this.getEventPosition(event);
 			if (pos) {
 				this.screen = pos;
@@ -241,7 +251,9 @@ class MouseHandler extends InputHandler {
 				}
 			}
 		});
-		document.addEventListener("mouseup", event => {
+		document.addEventListener("pointerup", event => {
+			if (!event.isPrimary) return;
+
 			this.target(event.button, false);
 			const pos = this.getEventPosition(event);
 			if (pos) this.screen = pos;
@@ -296,6 +308,7 @@ MouseHandler.addChecks([
 class TouchHandler extends InputHandler {
 	constructor(engine) {
 		super(engine);
+		this.count = 0;
 		this.maxTouches = navigator.maxTouchPoints;
 		this.touchIndices = new Map();
 		this.firstFree = 0;
@@ -329,26 +342,19 @@ class TouchHandler extends InputHandler {
 		for (let i = 0; i < touches.length; i++) {
 			const { identifier } = touches[i];
 
-			// if (targetState === true && !this.touchIndices.has(identifier)) {
-			// 	this.touchIndices.set(identifier, this.firstFree);
-			// 	let j = this.firstFree + 1;
-			// 	const states = this.states.values();
-			// 	for (; j < states.length; j++) {
-			// 		const state = states[j];
-			// 		if (!state.pressed && !state.turnOn) break;
-			// 	}
-			// 	this.firstFree = j;
-			// }
+			if (targetState === true) {
+				this.touchIndices.set(identifier, this.firstFree);
+				const states = [...this.states.values()];
+				while (states[++this.firstFree]?.targetState);
+			}
 
-			
-
-			const index = identifier//this.touchIndices.get(identifier);
+			const index = this.touchIndices.get(identifier);
 			const touch = this.get(index);
 			touch.targetState = targetState;
 
 			if (targetState === false) {
-				// if (index < this.firstFree) this.firstFree = index;
-				// this.touchIndices.delete(identifier);
+				if (index < this.firstFree) this.firstFree = index;
+				this.touchIndices.delete(identifier);
 			} else {
 				const location = this.getEventPosition(touches[i]);
 				if (location) {
