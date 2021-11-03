@@ -48,7 +48,7 @@ class Artist {
 					if (x.radius !== undefined) ({ x, y, radius } = x);
 					else {
 						radius = y;
-						({ x, y }) = x;
+						({ x, y } = x);
 					}
 				}
 				radius = Math.abs(radius);
@@ -564,25 +564,19 @@ class Artist {
 				if (typeof x === "object") ({ x, y } = x);
 				this.drawImageInternal(x, y, this.currentImage.width, this.currentImage.height);
 			},
-			inferHeight(x, y, w) {
+			inferHeight(x, y, width) {
 				if (typeof x === "object") {
-					w = y;
+					width = y;
 					({ x, y } = x);
 				}
-				let h = this.currentImage.height;
-				if (w !== undefined) h *= w / this.currentImage.width;
-				else w = this.currentImage.width;
-				this.drawImageInternal(x, y, w, h);
+				this.drawImageInternal(x, y, width, this.currentImage.inferHeight(width));
 			},
-			inferWidth(x, y, h) {
+			inferWidth(x, y, height) {
 				if (typeof x === "object") {
-					h = y;
+					height = y;
 					({ x, y } = x);
 				}
-				let w = this.currentImage.width;
-				if (h !== undefined) w *= h / this.currentImage.height;
-				else h = this.currentImage.height;
-				this.drawImageInternal(x, y, w, h);
+				this.drawImageInternal(x, y, this.currentImage.inferWidth(height), height);
 			},
 			rect(x, y, width, height) {
 				this.drawImageInternal(x, y, width, height);
@@ -717,10 +711,10 @@ class Artist {
 		this.c.lineWidth = lineWidth;
 		return this.strokeObj;
 	}
-	drawImageInternal(x, y, w, h) {
+	drawImageInternal(x, y, width, height) {
 		if (!this.currentImage.renderable) return;
 		if (typeof x === "object") ({ x, y, width, height } = x);
-		this.c.drawImage(this.currentImageCIS, x, y, w, h);
+		this.c.drawImage(this.currentImageCIS, x, y, width, height);
 	}
 	image(img) {
 		this.currentImageCIS = img.makeImage();
@@ -772,9 +766,9 @@ class Artist {
 		this.c.restore();
 		this._alpha = this.c.globalAlpha;
 	}
-	clearRect(x, y, w, h) {
+	clearRect(x, y, width, height) {
 		if (typeof x === "object") ({ x, y, width, height } = x);
-		this.c.clearRect(x, y, w, h);
+		this.c.clearRect(x, y, width, height);
 	}
 	clear() {
 		this.c.save();

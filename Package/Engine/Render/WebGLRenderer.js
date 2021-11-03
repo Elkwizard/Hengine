@@ -282,19 +282,19 @@ class WebGLArtist {
 				if (typeof x === "object") ({ x, y } = x);
 				this.gl.texturedQuad(x, y, this.currentImage.width, this.currentImage.height, 0, 0, 1, 1, this.currentImageCIS);
 			},
-			inferHeight(x, y, w) {
+			inferHeight(x, y, width) {
 				if (typeof x === "object") {
-					w = y;
+					width = y;
 					({ x, y } = x);
 				}
-				this.gl.texturedQuad(x, y, w, this.currentImage.inferHeight(w), 0, 0, 1, 1, this.currentImageCIS);
+				this.gl.texturedQuad(x, y, width, this.currentImage.inferHeight(width), 0, 0, 1, 1, this.currentImageCIS);
 			},
-			inferWidth(x, y, h) {
+			inferWidth(x, y, height) {
 				if (typeof x === "object") {
-					h = y;
+					height = y;
 					({ x, y } = x);
 				}
-				this.gl.texturedQuad(x, y, this.currentImage.inferWidth(h), h, 0, 0, 1, 1, this.currentImageCIS);
+				this.gl.texturedQuad(x, y, this.currentImage.inferWidth(height), height, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			infer(obj) {
 				if (obj.radius !== undefined) {
@@ -503,8 +503,8 @@ class FastFrame extends ImageType {
 		f.renderer.gl.texturedQuad(0, 0, w, h, 0, 0, 1, 1, this.makeImage());
 		return f;
 	}
-	clip(x, y, w, h) {
-		return FastFrame.fromImageType(this, x, y, w, h);
+	clip(x, y, width, height) {
+		return FastFrame.fromImageType(this, x, y, width, height);
 	}
 	makeImage() {
 		this.renderer.gl.render();

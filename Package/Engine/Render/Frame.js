@@ -151,8 +151,8 @@ class Frame extends ImageType {
 		f.renderer.c.drawImage(this.image, 0, 0, w, h);
 		return f;
 	}
-	clip(x, y, w, h) {
-		return Frame.fromImageType(this, x, y, w, h);
+	clip(x, y, width, height) {
+		return Frame.fromImageType(this, x, y, width, height);
 	}
 	makeImage() {
 		return this.image;

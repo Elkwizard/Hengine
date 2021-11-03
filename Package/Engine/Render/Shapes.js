@@ -246,20 +246,20 @@ class Polygon extends Shape {
 }
 Polygon.modValues = [];
 class Rect extends Polygon {
-	constructor(x, y, w, h) {
+	constructor(x, y, width, height) {
 		super([]);
-		if (w < 0) {
-			w *= -1;
-			x -= w;
+		if (width < 0) {
+			width *= -1;
+			x -= width;
 		}
-		if (h < 0) {
-			h *= -1;
-			y -= h;
+		if (height < 0) {
+			height *= -1;
+			y -= height;
 		}
 		this.x = x;
 		this.y = y;
-		this.width = w;
-		this.height = h;
+		this.width = width;
+		this.height = height;
 		this.area = this.width * this.height;
 	}
 	get min() {
