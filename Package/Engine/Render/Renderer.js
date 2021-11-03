@@ -45,14 +45,10 @@ class Artist {
 		let pathObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					if (x.radius !== undefined) {
-						radius = x.radius;
-						y = x.y;
-						x = x.x;
-					} else {
+					if (x.radius !== undefined) ({ x, y, radius } = x);
+					else {
 						radius = y;
-						y = x.y;
-						x = x.x;
+						({ x, y }) = x;
 					}
 				}
 				radius = Math.abs(radius);
@@ -65,8 +61,7 @@ class Artist {
 					ea = sa;
 					sa = radius;
 					radius = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				radius = Math.abs(radius);
 				this.c.beginPath();
@@ -78,8 +73,7 @@ class Artist {
 					ea = sa;
 					sa = radius;
 					radius = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				radius = Math.abs(radius);
 				this.c.beginPath();
@@ -95,12 +89,9 @@ class Artist {
 				this.c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
 			},
 			rect(x, y, width, height) {
+				if (typeof x === "object") ({ x, y, width, height } = x);
 				this.c.beginPath();
-				if (typeof x === "object") {
-					this.c.rect(x.x, x.y, x.width, x.height);
-				} else {
-					this.c.rect(x, y, width, height);
-				}
+				this.c.rect(x, y, width, height);
 			},
 			triangle(v1, v2, v3) {
 				this.c.beginPath();
@@ -136,9 +127,8 @@ class Artist {
 			},
 			text(font, text, x, y, pack = false) {
 				if (typeof x === "object") {
-					pack = y || false;
-					y = x.y;
-					x = x.x;
+					pack = y ?? false;
+					({ x, y } = x);
 				}
 				text = font.processString(text);
 				if (pack) text = font.packText(text, pack);
@@ -304,15 +294,14 @@ class Artist {
 				if (typeof x === "object") {
 					if (!x) return;
 					if (x instanceof Line) {
-						x1 = x.b.x;
-						y1 = x.b.y;
-						y = x.a.y;
-						x = x.a.x;
+						const { a, b } = x;
+						x1 = b.x;
+						y1 = b.y;
+						y = a.y;
+						x = a.x;
 					} else {
-						x1 = y.x;
-						y1 = y.y;
-						y = x.y;
-						x = x.x;
+						({ x: x1, y: y1 } = y);
+						({ x, y } = x);
 					}
 				}
 				this.c.beginPath();
@@ -323,15 +312,14 @@ class Artist {
 			measure(font, text, x, y, x1, y1) {
 				if (typeof x === "object") {
 					if (x instanceof Line) {
-						x1 = x.b.x;
-						y1 = x.b.y;
-						y = x.a.y;
-						x = x.a.x;
+						const { a, b } = x;
+						x1 = b.x;
+						y1 = b.y;
+						y = a.y;
+						x = a.x;
 					} else {
-						x1 = y.x;
-						y1 = y.y;
-						y = x.y;
-						x = x.x;
+						({ x: x1, y: y1 } = y);
+						({ x, y } = x);
 					}
 				}
 
@@ -396,8 +384,7 @@ class Artist {
 					ea = sa;
 					sa = radius;
 					radius = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				this.c.beginPath();
 				this.c.arc(x, y, radius, sa, ea, counterClockwise);
@@ -574,17 +561,13 @@ class Artist {
 				this.unclip();
 			},
 			default(x, y) {
-				if (typeof x === "object") {
-					y = x.y;
-					x = x.x;
-				}
+				if (typeof x === "object") ({ x, y } = x);
 				this.drawImageInternal(x, y, this.currentImage.width, this.currentImage.height);
 			},
 			inferHeight(x, y, w) {
 				if (typeof x === "object") {
 					w = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				let h = this.currentImage.height;
 				if (w !== undefined) h *= w / this.currentImage.width;
@@ -594,8 +577,7 @@ class Artist {
 			inferWidth(x, y, h) {
 				if (typeof x === "object") {
 					h = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				let w = this.currentImage.width;
 				if (h !== undefined) w *= h / this.currentImage.height;
@@ -737,12 +719,7 @@ class Artist {
 	}
 	drawImageInternal(x, y, w, h) {
 		if (!this.currentImage.renderable) return;
-		if (typeof x === "object") {
-			h = x.height;
-			w = x.width;
-			y = x.y;
-			x = x.x;
-		}
+		if (typeof x === "object") ({ x, y, width, height } = x);
 		this.c.drawImage(this.currentImageCIS, x, y, w, h);
 	}
 	image(img) {
@@ -774,17 +751,11 @@ class Artist {
 		this.scale(1, -1);
 	}
 	translate(x, y) {
-		if (typeof x === "object") {
-			y = x.y;
-			x = x.x;
-		}
+		if (typeof x === "object") ({ x, y } = x);
 		this.c.translate(x, y);
 	}
 	scale(x, y = x) {
-		if (typeof x === "object") {
-			y = x.y;
-			x = x.x;
-		}
+		if (typeof x === "object") ({ x, y } = x);
 		this.c.scale(x, y);
 	}
 	rotate(a) {
@@ -802,12 +773,7 @@ class Artist {
 		this._alpha = this.c.globalAlpha;
 	}
 	clearRect(x, y, w, h) {
-		if (typeof x === "object") {
-			h = x.height;
-			w = x.width;
-			y = x.y;
-			x = x.x;
-		}
+		if (typeof x === "object") ({ x, y, width, height } = x);
 		this.c.clearRect(x, y, w, h);
 	}
 	clear() {

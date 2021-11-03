@@ -40,14 +40,10 @@ class WebGLArtist {
 		this.drawObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					if (x.radius !== undefined) {
-						radius = x.radius;
-						y = x.y;
-						x = x.x;
-					} else {
+					if (x.radius !== undefined) ({ x, y, radius } = x);
+					else {
 						radius = y;
-						y = x.y;
-						x = x.x;
+						({ x, y } = x);
 					}
 				}
 				this.gl.coloredEllipse(x, y, radius, radius, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
@@ -56,18 +52,12 @@ class WebGLArtist {
 				if (typeof x === "object") {
 					ry = rx;
 					rx = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				this.gl.coloredEllipse(x, y, rx, ry, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			rect(x, y, width, height) {
-				if (typeof x === "object") {
-					height = x.height;
-					width = x.width;
-					y = x.y;
-					x = x.x;
-				}
+				if (typeof x === "object") ({ x, y, width, height } = x);
 				this.gl.coloredQuad(x, y, width, height, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			triangle(v1, v2, v3) {
@@ -99,14 +89,10 @@ class WebGLArtist {
 		this.strokeObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					if (x.radius !== undefined) {
-						radius = x.radius;
-						y = x.y;
-						x = x.x;
-					} else {
+					if (x.radius !== undefined) ({ x, y, radius } = x);
+					else {
 						radius = y;
-						y = x.y;
-						x = x.x;
+						({ x, y } = x);
 					}
 				}
 				this.gl.outlinedEllipse(x, y, radius, radius, this.currentLineWidth, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
@@ -115,18 +101,12 @@ class WebGLArtist {
 				if (typeof x === "object") {
 					ry = rx;
 					rx = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				this.gl.outlinedEllipse(x, y, rx, ry, this.currentLineWidth, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			rect(x, y, width, height) {
-				if (typeof x === "object") {
-					height = x.height;
-					width = x.width;
-					y = x.y;
-					x = x.x;
-				}
+				if (typeof x === "object") ({ x, y, width, height } = x);
 				this.gl.outlinedQuad(x, y, width, height, this.currentLineWidth, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 			},
 			triangle(v1, v2, v3) {
@@ -153,17 +133,15 @@ class WebGLArtist {
 			},
 			line(x, y, x1, y1) {
 				if (typeof x === "object") {
-					if (!x) return;
 					if (x instanceof Line) {
-						x1 = x.b.x;
-						y1 = x.b.y;
-						y = x.a.y;
-						x = x.a.x;
+						const { a, b } = x;
+						x1 = b.x;
+						y1 = b.y;
+						y = a.y;
+						x = a.x;
 					} else {
-						x1 = y.x;
-						y1 = y.y;
-						y = x.y;
-						x = x.x;
+						({ x: x1, y: y1 } = y);
+						({ x, y } = x);
 					}
 				}
 				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentLineCap, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
@@ -171,15 +149,14 @@ class WebGLArtist {
 			arrow(x, y, x1, y1) {
 				if (typeof x === "object") {
 					if (x instanceof Line) {
-						x1 = x.b.x;
-						y1 = x.b.y;
-						y = x.a.y;
-						x = x.a.x;
+						const { a, b } = x;
+						x1 = b.x;
+						y1 = b.y;
+						y = a.y;
+						x = a.x;
 					} else {
-						x1 = y.x;
-						y1 = y.y;
-						y = x.y;
-						x = x.x;
+						({ x: x1, y: y1 } = y);
+						({ x, y } = x);
 					}
 				}
 				let v_x = x1 - x;
@@ -232,14 +209,10 @@ class WebGLArtist {
 		this.imageObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					if (x.radius !== undefined) {
-						radius = x.radius;
-						y = x.y;
-						x = x.x;
-					} else {
+					if (x.radius !== undefined) ({ x, y, radius } = x);
+					else {
 						radius = y;
-						y = x.y;
-						x = x.x;
+						({ x, y } = x);
 					}
 				}
 				this.gl.texturedEllipse(x, y, radius, radius, 0, 0, 1, 1, this.currentImageCIS);
@@ -248,18 +221,12 @@ class WebGLArtist {
 				if (typeof x === "object") {
 					ry = rx;
 					rx = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				this.gl.texturedEllipse(x, y, rx, ry, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			rect(x, y, width, height) {
-				if (typeof x === "object") {
-					height = x.height;
-					width = x.width;
-					y = x.y;
-					x = x.x;
-				}
+				if (typeof x === "object") ({ x, y, width, height } = x);
 				this.gl.texturedQuad(x, y, width, height, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			triangle(v1, v2, v3) {
@@ -312,25 +279,20 @@ class WebGLArtist {
 				}
 			},
 			default(x, y) {
-				if (typeof x === "object") {
-					y = x.y;
-					x = x.x;
-				}
+				if (typeof x === "object") ({ x, y } = x);
 				this.gl.texturedQuad(x, y, this.currentImage.width, this.currentImage.height, 0, 0, 1, 1, this.currentImageCIS);
 			},
 			inferHeight(x, y, w) {
 				if (typeof x === "object") {
 					w = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				this.gl.texturedQuad(x, y, w, this.currentImage.inferHeight(w), 0, 0, 1, 1, this.currentImageCIS);
 			},
 			inferWidth(x, y, h) {
 				if (typeof x === "object") {
 					h = y;
-					y = x.y;
-					x = x.x;
+					({ x, y } = x);
 				}
 				this.gl.texturedQuad(x, y, this.currentImage.inferWidth(h), h, 0, 0, 1, 1, this.currentImageCIS);
 			},
@@ -436,10 +398,8 @@ class WebGLArtist {
 		this.scale(1, -1);
 	}
 	translate(x, y) {
-		if (typeof x === "object") {
-			y = x.y;
-			x = x.x;
-		}
+		if (typeof x === "object") ({ x, y } = x);
+
 		// do translate
 		const ct = this.currentTransform;
 
@@ -450,10 +410,7 @@ class WebGLArtist {
 		this.gl.setTransform(this.currentTransform);
 	}
 	scale(x, y = x) {
-		if (typeof x === "object") {
-			y = x.y;
-			x = x.x;
-		}
+		if (typeof x === "object") ({ x, y } = x);
 
 		// do scale
 

@@ -81,12 +81,7 @@ class Camera extends Matrix3 {
 		this.position = cameraPoint.plus(dif);
 	}
 	constrain(x = -Infinity, y = -Infinity, width = Infinity, height = Infinity) {
-		if (typeof x === "object") {
-			height = x.height;
-			width = x.width;
-			y = x.y;
-			x = x.x;
-		}
+		if (typeof x === "object") ({ x, y, width, height } = x);
 
 		const screen = this.cacheScreen();
 		const w2 = screen.width / 2;

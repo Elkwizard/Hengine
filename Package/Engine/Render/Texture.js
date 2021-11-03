@@ -177,18 +177,13 @@ class Texture extends ImageType {
 		tex.loaded = false;
 		return tex;
 	}
-	static fromImageType(image, x, y, w, h) {
-		if (typeof x === "object") {
-			h = x.height;
-			w = x.width;
-			y = x.y;
-			x = x.x;
-		}
-		
-		if (!x) x = 0;
-		if (!y) y = 0;
-		if (!w) w = image.width;
-		if (!h) h = image.height;
+	static fromImageType(image, x, y, width, height) {
+		if (typeof x === "object") ({ x, y, width, height } = x);
+
+		x ??= 0;
+		y ??= 0;
+		width ??= image.width;
+		height ??= image.height
 
 		const img = image.makeImage();
 		const canvas = new_OffscreenCanvas(img.width, img.height);
@@ -202,9 +197,9 @@ class Texture extends ImageType {
 		const W = img.width;//Math.floor(w * __devicePixelRatio);
 		const H = img.height;//Math.floor(h * __devicePixelRatio);
 		const imageData = context.getImageData(x, y, W, H);
-		const tex = new Texture(w, h);
+		const tex = new Texture(width, height);
 		const data = imageData.data;
-		for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) {
 			const inx = (Math.round(i * ratio) + Math.round(j * ratio) * W) * 4;
 			const r = data[inx + 0];
 			const g = data[inx + 1];
