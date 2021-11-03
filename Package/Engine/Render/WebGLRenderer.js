@@ -558,23 +558,18 @@ class FastFrame extends ImageType {
 		f.renderer.gl.texturedQuad(0, 0, this.width, this.height, 0, 0, 1, 1, this.makeImage());
 		return f;
 	}
-	static fromImageType(img, x, y, w, h) {
-		if (typeof x === "object") {
-			h = x.height;
-			w = x.width;
-			y = x.y;
-			x = x.x;
-		}
+	static fromImageType(img, x, y, width, height) {
+		if (typeof x === "object") ({ x, y, width, height } = x);
 
-		if (!x) x = 0;
-		if (!y) y = 0;
-		if (!w) w = img.width;
-		if (!h) h = img.height;
+		x ??= 0;
+		y ??= 0;
+		width ??= img.width;
+		height ??= img.height;
 
 		const offscreen = img.makeImage();
-		let f = new FastFrame(w, h, offscreen.width / img.width);
-		f.renderer.gl.texturedQuad(0, 0, w, h, x / img.width, y / img.height, w / img.width, h / img.height, offscreen);
-		return f;
+		const frame = new FastFrame(width, height, offscreen.width / img.width);
+		frame.renderer.gl.texturedQuad(0, 0, width, height, x / img.width, y / img.height, width / img.width, height / img.height, offscreen);
+		return frame;
 	}
 }
 

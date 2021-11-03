@@ -153,10 +153,11 @@ class Texture extends ImageType {
 	stretch(w, h) {
 		// TODO: reimplement
 	}
-	clip(x, y, w, h) {
+	clip(x, y, width, height) {
+		if (typeof x === "object") ({ x, y, width, height } = x);
 		x = Math.round(x);
 		y = Math.round(y);
-		return new Texture(w, h)
+		return new Texture(width, height)
 			.shader((i, j, dest) => dest.set(this.getPixel(x + i, y + j)));
 	}
 	makeImage() {

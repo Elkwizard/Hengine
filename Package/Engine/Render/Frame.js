@@ -165,23 +165,18 @@ class Frame extends ImageType {
 		f.renderer.c.drawImage(this.image, 0, 0, this.width, this.height);
 		return f;
 	}
-	static fromImageType(img, x, y, w, h) {
-		if (typeof x === "object") {
-			h = x.height;
-			w = x.width;
-			y = x.y;
-			x = x.x;
-		}
+	static fromImageType(img, x, y, width, height) {
+		if (typeof x === "object") ({ x, y, width, height } = x);
 
-		if (!x) x = 0;
-		if (!y) y = 0;
-		if (!w) w = img.width;
-		if (!h) h = img.height;
+		x ??= 0;
+		y ??= 0;
+		width ??= img.width;
+		height ??= img.height;
 		
-		let offscreen = img.makeImage();
+		const offscreen = img.makeImage();
 		const pixelRatio = offscreen.width / img.width;
-		let f = new Frame(w, h, pixelRatio);
-		f.renderer.c.drawImage(offscreen, x * pixelRatio, y * pixelRatio, w * pixelRatio, h * pixelRatio, 0, 0, w, h);
-		return f;
+		const frame = new Frame(width, height, pixelRatio);
+		frame.renderer.c.drawImage(offscreen, x * pixelRatio, y * pixelRatio, width * pixelRatio, height * pixelRatio, 0, 0, width, height);
+		return frame;
 	}
 }	
