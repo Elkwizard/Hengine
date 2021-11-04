@@ -89,8 +89,8 @@ class Camera extends Matrix3 {
 
 		const minX = x + w2;
 		const minY = y + h2;
-		const maxX = (isFinite(width) ? minX + width : width) - w2;
-		const maxY = (isFinite(height) ? minY + height : height) - h2;
+		const maxX = (isFinite(width) ? x + width : width) - w2;
+		const maxY = (isFinite(height) ? y + height : height) - h2;
 
 		this.position = Vector2.clamp(
 			this.position,
