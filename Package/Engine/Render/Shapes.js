@@ -212,7 +212,7 @@ class Polygon extends Shape {
 		return this.getModel(new Transform(0, 0, angle));
 	}
 	get(result = new Polygon([])) {
-		result.vertices = this.vertices;
+		result.vertices = this.vertices.map(vert => vert.get());
 		result.area = this.area;
 		return result;
 	}
@@ -230,7 +230,7 @@ class Polygon extends Shape {
 		return new Polygon(v, true);
 	}
 	static removeDuplicates(verts) {
-		let vertices = [];
+		const vertices = [];
 
 		mainLoop: for (let i = 0; i < verts.length; i++) {
 			let v = verts[i];
@@ -310,6 +310,76 @@ class Rect extends Polygon {
 
 		return new Rect(this.width / 2 - w / 2 + this.x, this.height / 2 - h / 2 + this.y, w, h);
 	}
+	pack(rects) {
+		rects.sort((a, b) => b.height - a.height);
+
+		const spaces = [
+			new Rect(this.x, this.y, this.width, Infinity)
+		];
+
+		for (let i = 0; i < rects.length; i++) {
+			const rect = rects[i];
+
+			for (let j = spaces.length - 1; j >= 0; j--) { // reverse loop
+				const space = spaces[j];
+
+				if (rect.width > space.width || rect.height > space.height) continue; // too big
+
+				// insert
+				rect.x = space.x;
+				rect.y = space.y;
+
+				// different possible positions
+				if (rect.width === space.width && rect.height === space.height) { // delete space
+					const lastSpace = spaces.pop();
+					if (j < spaces.length) spaces[j] = lastSpace;
+				} else if (rect.width === space.width) {
+					space.y += rect.height;
+					space.height -= rect.height;
+				} else if (rect.height === space.height) {
+					space.x += rect.width;
+					space.width -= rect.width;
+				} else {
+					spaces.push(new Rect(
+						space.x + rect.width,
+						space.y,
+						space.width - rect.width,
+						rect.height
+					));
+					space.y += rect.height;
+					space.height -= rect.height;
+				}
+
+				break;
+			}
+		}
+
+		return rects;
+	}
+	packInOrder(rects) {
+		const { x, y, width: totalWidth } = this;
+		let ox = 0;
+		let oy = 0;
+		let lineHeight = 0;
+		
+		for (let i = 0; i < rects.length; i++) {
+			const { width, height } = rects[i];
+			if (height > lineHeight) lineHeight = height;
+			
+			// handle overflow
+			if (ox + width > totalWidth) {
+				oy += lineHeight;
+				ox = 0;
+			}
+
+			rects[i].x = x + ox;
+			rects[i].y = y + oy;
+
+			ox += width;
+		}
+
+		return rects;
+	}
 	clip(rect) {
 		let xRange = this.xRange.clip(rect.xRange);
 		let yRange = this.yRange.clip(rect.yRange);
@@ -354,6 +424,7 @@ class Rect extends Polygon {
 		result.y = this.y;
 		result.width = this.width;
 		result.height = this.height;
+		result.area = this.area;
 		return result;
 	}
 	static fromMinMax(min, max) {
@@ -444,12 +515,6 @@ class Circle extends Shape {
 	}
 	getBoundingBox() {
 		return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
-	}
-	get(result = new Circle(0, 0, 0)) {
-		result.x = this.x;
-		result.y = this.y;
-		result.radius = this.radius;
-		return result;
 	}
 	toPhysicsShape() {
 		return new CircleCollider(this.x, this.y, this.radius);
