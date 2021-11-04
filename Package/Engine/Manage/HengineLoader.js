@@ -228,9 +228,7 @@ class HengineLoader {
 		this.resources = new Map();
 
 		//title
-		let script = document.createElement("script");
-		script.src = "./fake.js";
-		let t = script.src;
+		let t = location.toString();
 		let st = t.split("/");
 		let ti = st[st.length - 2];
 		if (ti) {
