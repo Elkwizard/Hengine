@@ -45,6 +45,22 @@ load(String.raw`
 				(param:bound $Rect$) The maximum possible size of the rectangle regardless of aspect ratio.(/param)
 			(/p2)
 		(/method)
+		(method:packInOrder@rects@$Rect[]$)
+			Mutates the position of the given rectangles to fit them in order (left to right, top to bottom) into the caller, ignoring the height boundary.
+			Returns the argument.
+			(2)Parameters(/2)
+			(p2)
+				(param:rects $Rect[]$) The rects to be packed.(/param)
+			(/p2)
+		(/method)
+		(method:pack@rects@$Rect[]$)
+			Mutats the position of the given rectangles to fit them optimally into the caller, ignoring the height boundary.
+			Returns the argument.
+			(2)Parameters(/2)
+			(p2)
+				(param:rects $Rect[]$) The rects to be packed.(/param)
+			(/p2)
+		(/method)
 		(method:Rect.fromMinMax@min, max@$Rect$)
 			Returns a rectangle with a given upper left and lower right corner.
 			(2)Parameters(/2)
