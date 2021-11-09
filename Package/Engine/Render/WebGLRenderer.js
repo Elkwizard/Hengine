@@ -239,7 +239,7 @@ class WebGLArtist {
 						[ax, ay, bx, by, cx, cy, dx, dy] = [ax.x, ax.y, ay.x, ay.y, bx.x, bx.y, by.x, by.y];
 					}
 				}
-				
+
 				this.gl.texturedTriangle(ax, ay, bx, by, cx, cy, 0, 0, 1, 0, 1, 1, this.currentImageCIS);
 				this.gl.texturedTriangle(ax, ay, dx, dy, cx, cy, 0, 0, 0, 1, 1, 1, this.currentImageCIS);
 			},
@@ -306,7 +306,7 @@ class WebGLArtist {
 				}
 			}
 		};
-		this.dummyImageObj = { };
+		this.dummyImageObj = {};
 		for (const func in this.imageObj) {
 			this.imageObj[func] = this.imageObj[func].bind(this);
 			this.dummyImageObj[func] = () => undefined;
@@ -415,7 +415,7 @@ class WebGLArtist {
 		// do scale
 
 		// optimized matrix multiplication	
-		
+
 		const ct = this.currentTransform;
 		ct[0] *= x;
 		ct[1] *= x;
@@ -432,14 +432,14 @@ class WebGLArtist {
 		const s = Math.sin(a);
 
 		const ct = this.currentTransform;
-		
+
 		const m0 = ct[0];
 		const m1 = ct[1];
 		const m2 = ct[2];
 		const m3 = ct[3];
 		const m4 = ct[4];
 		const m5 = ct[5];
-		
+
 		ct[0] = m0 * c + m3 * s;
 		ct[1] = m1 * c + m4 * s;
 		ct[2] = m2 * c + m5 * s;

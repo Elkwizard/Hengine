@@ -137,28 +137,36 @@ class GPUComputation {
 			this.fragmentShaderSource = `${prefix}
 				${this.glsl}
 
-${Array.dim(this.outputPixels).map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`).join("\n")}
+${Array
+	.dim(this.outputPixels)
+	.map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`)
+	.join("\n")
+}
 
 				void main() {
 					int[${this.inputBytes}] _inputs = getProblem(PROBLEM_INDEX);
 					int[${this.outputBytes}] _outputs = compute(_inputs);
 
-${Array.dim(this.outputPixels)
-					.map((_, index) => {
-						const startIndex = index * 4;
-						const samples = [];
-						for (let i = startIndex; i < startIndex + 4; i++) {
-							const byteIndex = i * BYTES_PER_CHANNEL;
-							const bytes = Math.min(BYTES_PER_CHANNEL, this.outputBytes - byteIndex);
-							if (bytes <= 0) break;
-							const ors = new Array(bytes).fill(0).map((_, inx) => `clamp(_outputs[${byteIndex + inx}], 0, 255) << ${endian(inx * 8)}`).join(" | ");
-							samples.push(ors);
-						}
-						for (let i = samples.length; i < 4; i++) samples.push("0u");
-						return `\t\t\t\t\t_outputColor${index} = uvec4(${samples.join(", ")});`
-					})
-					.join("\n")
-				}
+${Array
+	.dim(this.outputPixels)
+	.map((_, index) => {
+		const startIndex = index * 4;
+		const samples = [];
+		for (let i = startIndex; i < startIndex + 4; i++) {
+			const byteIndex = i * BYTES_PER_CHANNEL;
+			const bytes = Math.min(BYTES_PER_CHANNEL, this.outputBytes - byteIndex);
+			if (bytes <= 0) break;
+			const ors = new Array(bytes)
+				.fill(0)
+				.map((_, inx) => `clamp(_outputs[${byteIndex + inx}], 0, 255) << ${endian(inx * 8)}`)
+				.join(" | ");
+			samples.push(ors);
+		}
+		for (let i = samples.length; i < 4; i++) samples.push("0");
+		return `\t\t\t\t\t_outputColor${index} = uvec4(${samples.join(", ")});`;
+	})	
+	.join("\n")
+}
 				}
 			`;
 
