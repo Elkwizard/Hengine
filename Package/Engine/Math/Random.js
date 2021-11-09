@@ -44,6 +44,7 @@ class Random {
     }
     static sample(arr, quantity) {
         if (!Array.isArray(arr)) arr = Array.from(arr);
+        if (quantity >= arr.length) return [...arr];
         const result = [];
         while (result.length < quantity)
             result.push(arr[Math.floor(Random.random() * arr.length)]);
@@ -51,13 +52,13 @@ class Random {
     }
     static sampleWithoutReplacement(arr, quantity) {
         if (!Array.isArray(arr)) arr = Array.from(arr);
-        const sampled = [];
+        const sampled = new Set();
         const result = [];
         while (result.length < quantity) {
             const index = Math.floor(Random.random() * arr.length);
-            if (index in sampled) continue;
+            if (samples.has(index)) continue;
             result.push(arr[index]);
-            sampled[index] = true;
+            sampled.add(index);
         }
         return result;
     }
