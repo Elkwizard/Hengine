@@ -218,10 +218,7 @@ class MouseHandler extends InputHandler {
 		return name;
 	}
 	addListeners() {
-		document.addEventListener("pointerdown", event => {
-			event.preventDefault();
-			if (!event.isPrimary) return;
-			
+		const handleDown = event => {
 			const state = this.target(event.button, true);
 			const pos = this.getEventPosition(event);
 			if (pos) {
@@ -234,10 +231,8 @@ class MouseHandler extends InputHandler {
 				this.screen = pos;
 				this.screenLast = pos;
 			}
-		});
-		document.addEventListener("pointermove", event => {
-			if (!event.isPrimary) return;
-
+		};
+		const handleMove = event => {
 			const pos = this.getEventPosition(event);
 			if (pos) {
 				this.screen = pos;
@@ -250,14 +245,27 @@ class MouseHandler extends InputHandler {
 					}
 				}
 			}
-		});
-		document.addEventListener("pointerup", event => {
-			if (!event.isPrimary) return;
-
+		};
+		const handleUp = event => {
 			this.target(event.button, false);
 			const pos = this.getEventPosition(event);
 			if (pos) this.screen = pos;
-		});
+		};
+
+		function ifPrimary(handle) {
+			return event => {
+				if (event.isPrimary) handle(event);
+			};
+		}
+
+		document.addEventListener("mousedown", handleDown);
+		document.addEventListener("mousemove", handleMove);
+		document.addEventListener("mouseup", handleUp);
+		
+		document.addEventListener("pointerdown", ifPrimary(handleDown));
+		document.addEventListener("pointermove", ifPrimary(handleMove));
+		document.addEventListener("pointerup", ifPrimary(handleUp));
+
 		document.addEventListener("mouseout", () => this.targetAll(false));
 		document.addEventListener("contextmenu", event => event.preventDefault());
 		document.addEventListener("wheel", event => {
