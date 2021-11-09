@@ -9,7 +9,6 @@ class GPUComputation {
 				stencil: false
 			});
 
-
 			this.hasContext = true;
 			this.canvas.addEventListener("webglcontextlost", event => {
 				event.preventDefault();
