@@ -5,6 +5,9 @@ class Random {
     static random() {
         return Random.seedRand(Random.seed++);
     }
+    static randInt(min, max) {
+        return Math.floor(Random.random() * (max - min + 1) + min);
+    }
     static bool(chance = 0.5) {
         return Random.random() < chance;
     }
@@ -38,6 +41,26 @@ class Random {
             }
             return arr.last;
         }
+    }
+    static sample(arr, quantity) {
+        if (!Array.isArray(arr)) arr = Array.from(arr);
+        if (quantity >= arr.length) return [...arr];
+        const result = [];
+        while (result.length < quantity)
+            result.push(arr[Math.floor(Random.random() * arr.length)]);
+        return result;
+    }
+    static sampleWithoutReplacement(arr, quantity) {
+        if (!Array.isArray(arr)) arr = Array.from(arr);
+        const sampled = new Set();
+        const result = [];
+        while (result.length < quantity) {
+            const index = Math.floor(Random.random() * arr.length);
+            if (samples.has(index)) continue;
+            result.push(arr[index]);
+            sampled.add(index);
+        }
+        return result;
     }
     static octave(oc, alg, ...sampleAndFreq) {
         const freq = sampleAndFreq.pop();
