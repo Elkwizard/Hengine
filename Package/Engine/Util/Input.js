@@ -322,17 +322,17 @@ class TouchHandler extends InputHandler {
 		this.firstFree = 0;
 	}
 	addListeners() {
-		document.addEventListener("touchstart", event => {
+		document.addEventListener("pointerdown", event => {
 			if (event.cancelable) event.preventDefault();
 			this.updateTouches(event.changedTouches, true);
 		}, { passive: false });
 
-		document.addEventListener("touchmove", event => {
+		document.addEventListener("pointermove", event => {
 			if (event.cancelable) event.preventDefault();
 			this.updateTouches(event.changedTouches, null);
 		}, { passive: false });
 
-		document.addEventListener("touchend", event => {
+		document.addEventListener("pointerup", event => {
 			if (event.cancelable) event.preventDefault();
 			this.updateTouches(event.changedTouches, false);
 		});
@@ -348,21 +348,21 @@ class TouchHandler extends InputHandler {
 	}
 	updateTouches(touches, targetState) {
 		for (let i = 0; i < touches.length; i++) {
-			const { identifier } = touches[i];
+			const { pointerId } = touches[i];
 
 			if (targetState === true) {
-				this.touchIndices.set(identifier, this.firstFree);
+				this.touchIndices.set(pointerId, this.firstFree);
 				const states = [...this.states.values()];
 				while (states[++this.firstFree]?.targetState);
 			}
 
-			const index = this.touchIndices.get(identifier);
+			const index = this.touchIndices.get(pointerId);
 			const touch = this.get(index);
 			touch.targetState = targetState;
 
 			if (targetState === false) {
 				if (index < this.firstFree) this.firstFree = index;
-				this.touchIndices.delete(identifier);
+				this.touchIndices.delete(pointerId);
 			} else {
 				const location = this.getEventPosition(touches[i]);
 				if (location) {
