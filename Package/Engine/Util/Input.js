@@ -261,7 +261,7 @@ class MouseHandler extends InputHandler {
 		document.addEventListener("mousedown", handleDown);
 		document.addEventListener("mousemove", handleMove);
 		document.addEventListener("mouseup", handleUp);
-		
+
 		document.addEventListener("pointerdown", ifPrimary(handleDown));
 		document.addEventListener("pointermove", ifPrimary(handleMove));
 		document.addEventListener("pointerup", ifPrimary(handleUp));
@@ -324,17 +324,17 @@ class TouchHandler extends InputHandler {
 	addListeners() {
 		document.addEventListener("pointerdown", event => {
 			if (event.cancelable) event.preventDefault();
-			this.updateTouches(event.changedTouches, true);
+			this.updateTouch(event, true);
 		}, { passive: false });
 
 		document.addEventListener("pointermove", event => {
 			if (event.cancelable) event.preventDefault();
-			this.updateTouches(event.changedTouches, null);
+			this.updateTouch(event, null);
 		}, { passive: false });
 
 		document.addEventListener("pointerup", event => {
 			if (event.cancelable) event.preventDefault();
-			this.updateTouches(event.changedTouches, false);
+			this.updateTouch(event, false);
 		});
 	}
 	getWorldPosition(point) {
@@ -346,35 +346,33 @@ class TouchHandler extends InputHandler {
 		);
 		return this.engine.canvas.contains(location) ? location : null;
 	}
-	updateTouches(touches, targetState) {
-		for (let i = 0; i < touches.length; i++) {
-			const { pointerId } = touches[i];
+	updateTouch(event, targetState) {
+		const { pointerId } = event;
 
-			if (targetState === true) {
-				this.touchIndices.set(pointerId, this.firstFree);
-				const states = [...this.states.values()];
-				while (states[++this.firstFree]?.targetState);
-			}
+		if (targetState === true) {
+			this.touchIndices.set(pointerId, this.firstFree);
+			const states = [...this.states.values()];
+			while (states[++this.firstFree]?.targetState);
+		}
 
-			const index = this.touchIndices.get(pointerId);
-			const touch = this.get(index);
-			touch.targetState = targetState;
+		const index = this.touchIndices.get(pointerId);
+		const touch = this.get(index);
+		touch.targetState = targetState;
 
-			if (targetState === false) {
-				if (index < this.firstFree) this.firstFree = index;
-				this.touchIndices.delete(pointerId);
-			} else {
-				const location = this.getEventPosition(touches[i]);
-				if (location) {
-					touch.screen = location;
-					if (targetState === true) {
-						touch.screenLast = touch.screen;
-						touch.screenDragStart = touch.screen;
-						touch.worldDragStart = this.getWorldPosition(touch.screen);
-					}
-					touch.screenDragEnd = touch.screen;
-					touch.worldDragEnd = this.getWorldPosition(touch.screen);
+		if (targetState === false) {
+			if (index < this.firstFree) this.firstFree = index;
+			this.touchIndices.delete(pointerId);
+		} else {
+			const location = this.getEventPosition(event);
+			if (location) {
+				touch.screen = location;
+				if (targetState === true) {
+					touch.screenLast = touch.screen;
+					touch.screenDragStart = touch.screen;
+					touch.worldDragStart = this.getWorldPosition(touch.screen);
 				}
+				touch.screenDragEnd = touch.screen;
+				touch.worldDragEnd = this.getWorldPosition(touch.screen);
 			}
 		}
 	}
