@@ -136,24 +136,61 @@ class HengineAnimationResource extends HengineResource {
 }
 class HengineFontResource extends HengineResource {
 	load() {
-		return new Promise(async resolve => {
-			const style = document.createElement("style");
+		// return null;
+		// const style = document.createElement("style");
+		// style.innerHTML = `@import url(${JSON.stringify(this.src)})`;
 
-			const firstFontIndex = document.fonts.size;
-			
-			style.onload = async () => {
-				const allFonts = [...document.fonts];
-				const { family } = allFonts[allFonts.length - 1];
-				await Promise.all(allFonts
-					.slice(firstFontIndex)
-					.filter(font => font.family === family)
-					.map(font => font.load()));
+		// return new Promise(async resolve => {
+		// 	style.onload = () => {
+		// 		const { family } = [...document.fonts][document.fonts.size - 1];
+		// 		const testCSS = `20px ${JSON.stringify(family)}`;
+		// 		document.fonts.load(testCSS, HengineFontResource.TEST_STRING).then(() => resolve(family));
+		// 	};
+		// 	style.onerror = () => resolve(null);
+		// 	document.head.appendChild(style);
+		// });
+		return new Promise(async resolve => {
+			const handleCSS = css => {
+				const style = document.createElement("style");
+
+				const firstFontIndex = document.fonts.size;
 				
-				resolve(family);
+				style.onload = async () => {
+					const allFonts = [...document.fonts];
+					const { family } = allFonts[allFonts.length - 1];
+					await Promise.all(allFonts
+						.slice(firstFontIndex)
+						.filter(font => font.family === family)
+						.map(font => font.load()));
+					
+					resolve(family);
+				};
+
+				style.innerHTML = css;
+				document.head.appendChild(style);
 			};
 
-			style.innerHTML = `@import url(${JSON.stringify(this.src)})`;
-			document.head.appendChild(style);
+			try {
+				const http = /^http(s?):/g;
+				if (this.src.match(http) || location.protocol.match(http)) {
+					const response = await fetch(this.src);
+					const [contentType] = response.headers.get("Content-Type").split(";");
+					if (contentType === "text/css") handleCSS(await response.text());
+					else resolve(null);
+				} else {
+					const xhr = new XMLHttpRequest();
+					xhr.open("GET", this.src);
+					xhr.onreadystatechange = () => {
+						if (xhr.readyState === XMLHttpRequest.DONE) {
+							if (xhr.status === 0 || xhr.status === 200) handleCSS(xhr.responseText);
+							else resolve(null);
+						}
+					};
+					xhr.send();
+				}
+			} catch (err) {
+				resolve(null);
+			}
 		});
 	}
 }
