@@ -246,9 +246,7 @@ class Geometry {
                 }
             }
             clearRect(currentRect);
-            // while (validRect(currentRect)) currentRect.height++;
-
-
+            currentRect.area = currentRect.width * currentRect.height;
 
             result.push(currentRect);
         }

@@ -136,19 +136,6 @@ class HengineAnimationResource extends HengineResource {
 }
 class HengineFontResource extends HengineResource {
 	load() {
-		// return null;
-		// const style = document.createElement("style");
-		// style.innerHTML = `@import url(${JSON.stringify(this.src)})`;
-
-		// return new Promise(async resolve => {
-		// 	style.onload = () => {
-		// 		const { family } = [...document.fonts][document.fonts.size - 1];
-		// 		const testCSS = `20px ${JSON.stringify(family)}`;
-		// 		document.fonts.load(testCSS, HengineFontResource.TEST_STRING).then(() => resolve(family));
-		// 	};
-		// 	style.onerror = () => resolve(null);
-		// 	document.head.appendChild(style);
-		// });
 		return new Promise(async resolve => {
 			const handleCSS = css => {
 				const style = document.createElement("style");
