@@ -46,14 +46,17 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.frame = PARTICLE_SPAWNER[imageType.name] ?? (PARTICLE_SPAWNER[imageType.name] = new imageType(obj.engine.canvas.width, obj.engine.canvas.height));
 		this.gl = this.frame.renderer;
 	}
+	addParticle(obj, position) {
+		const particle = new this.Particle(position, this);
+		this.init(particle);
+		if (particle.timer >= 1) return;
+		this.particles.push(particle);
+	}
 	explode(obj, count, position = obj.transform.position) {
 		const pos = position;
 
-		for (let i = 0; i < count; i++) {
-			const p = new this.Particle(pos.get(), this);
-			this.init(p);
-			this.particles.push(p);
-		}
+		for (let i = 0; i < count; i++)
+			this.addParticle(pos.get());
 	}
 	update(obj) {
 		if (this.active) {
@@ -65,10 +68,8 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 				for (let i = 0; i < count; i++) {
 					const t = (i + 1) / count;
-					const p = new this.Particle(Interpolation.lerp(last, pos, t), this);
-					this.init(p);
+					this.addParticle(Interpolation.lerp(last, pos, t));
 					if (!this.active) break;
-					this.particles.push(p);
 				}
 
 			}
