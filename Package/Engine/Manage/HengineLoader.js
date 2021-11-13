@@ -136,21 +136,29 @@ class HengineAnimationResource extends HengineResource {
 }
 class HengineFontResource extends HengineResource {
 	load() {
-		const style = document.createElement("style");
-		style.innerHTML = `@import url(${JSON.stringify(this.src)})`;
-
 		return new Promise(async resolve => {
-			style.onload = () => {
-				const { family } = [...document.fonts][document.fonts.size - 1];
-				const testCSS = `20px '${family}'`;
-				document.fonts.load(testCSS, HengineFontResource.TEST_STRING).then(() => resolve(family));
+			const style = document.createElement("style");
+
+			const firstFontIndex = document.fonts.size;
+			
+			style.onload = async () => {
+				const allFonts = [...document.fonts];
+				const { family } = allFonts[allFonts.length - 1];
+				await Promise.all(allFonts
+					.slice(firstFontIndex)
+					.filter(font => font.family === family)
+					.map(font => font.load()));
+				
+				resolve(family);
 			};
-			style.onerror = () => resolve(null);
+
+			style.innerHTML = `@import url(${JSON.stringify(this.src)})`;
 			document.head.appendChild(style);
 		});
 	}
 }
 HengineFontResource.TEST_STRING = String.fromCharCode(...new Array(255).fill(0).map((_, code) => code));
+
 class HengineTextResource extends HengineResource {
 	load() {
 		return new Promise(async resolve => {
@@ -272,13 +280,13 @@ class HengineLoader {
 					.split("/")
 					.slice(0, -3)
 					.join("/");
-	
+
 				//icon
 				document.head.innerHTML += `<link rel="icon" href="${rootSrc}/favicon.ico" type="image/x-icon"></link>`;
-	
+
 				const engineSrc = rootSrc + "/Engine";
 				console.log(`EXTRACTING FROM ROOT [${engineSrc}]`);
-	
+
 				for (let i = 0; i < HengineLoader.engineResources.length; i++) {
 					const block = HengineLoader.engineResources[i];
 					const promises = [];
@@ -341,18 +349,18 @@ HengineLoader.engineResources = [
 		"Preload/PrototypeOverload",
 		"Preload/Lazy",
 		"Preload/Operable",
-		
+
 		"SceneObject/SceneElement",
 		"SceneObject/Scripts",
-		
+
 		"Manage/Scenes",
 		"Manage/Hengine",
 		"Manage/Intervals",
-		
+
 		"Util/ByteBuffer",
 		"Util/FileSystem",
 		"Util/Sound",
-		
+
 		"Math/Matrix",
 		"Math/Geometry",
 		"Math/Physics",
@@ -360,11 +368,11 @@ HengineLoader.engineResources = [
 		"Math/Random",
 		"Math/Interpolation",
 		"Math/GPUComputation",
-		
+
 		"Render/Frame",
 		"Render/Gradient",
 		"Render/Spline",
-		"Render/WebGL2DContext",	
+		"Render/WebGL2DContext",
 		"Render/GrayMap"
 	],
 	[ // basic dependencies
@@ -372,18 +380,18 @@ HengineLoader.engineResources = [
 
 		"Manage/Canvas",
 		"Manage/ElementContainer",
-		
+
 		"Scripts/Draggable",
 		"Scripts/ParticleSpawner",
 		"Scripts/Physics",
 		"Scripts/PlayerMovement",
 		"Scripts/TextArea",
-		
+
 		"SceneObject/SceneObject",
 		"Render/Color",
-		
+
 		"Math/Vector",
-		
+
 		"Render/Font",
 		"Render/Shapes",
 		"Render/Animation",

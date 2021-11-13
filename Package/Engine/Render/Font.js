@@ -120,7 +120,8 @@ class Font {
 		return str.split("\n").length * this.lineHeight;
 	}
 	toString() {
-		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${this.keywordFamily ? this.family : `'${this.family}'`}`;
+		const familyString = this.keywordFamily ? this.family : JSON.stringify(this.family);
+		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${familyString}`;
 	}
 	get(font = new Font(0, "serif", false, false)) {
 		font.size = this.size;
