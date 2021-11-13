@@ -322,20 +322,20 @@ class TouchHandler extends InputHandler {
 		this.firstFree = 0;
 	}
 	addListeners() {
-		document.addEventListener("pointerdown", event => {
-			if (event.cancelable) event.preventDefault();
-			this.updateTouch(event, true);
-		}, { passive: false });
+		const addHandler = (eventName, target) => {
+			document.addEventListener(eventName, event => {
+				if (event.cancelable) event.preventDefault();
+				this.updateTouch(event, target);
+			}, { passive: false });
+		};
 
-		document.addEventListener("pointermove", event => {
-			if (event.cancelable) event.preventDefault();
-			this.updateTouch(event, null);
-		}, { passive: false });
-
-		document.addEventListener("pointerup", event => {
-			if (event.cancelable) event.preventDefault();
-			this.updateTouch(event, false);
-		});
+		addHandler("touchstart", true);
+		addHandler("touchmove", null);
+		addHandler("touchend", false);
+		
+		addHandler("pointerdown", true);
+		addHandler("pointermove", null);
+		addHandler("pointerup", false);
 	}
 	getWorldPosition(point) {
 		return this.engine.scene.camera.screenSpaceToWorldSpace(point);
@@ -348,6 +348,7 @@ class TouchHandler extends InputHandler {
 	}
 	updateTouch(event, targetState) {
 		const { pointerId } = event;
+		if (pointerId === undefined) return;
 
 		if (targetState === true) {
 			this.touchIndices.set(pointerId, this.firstFree);

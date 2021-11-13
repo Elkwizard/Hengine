@@ -350,7 +350,6 @@ HengineLoader.engineResources = [
 		"Manage/Intervals",
 		
 		"Util/ByteBuffer",
-		"Util/Input",
 		"Util/FileSystem",
 		"Util/Sound",
 		
@@ -369,6 +368,8 @@ HengineLoader.engineResources = [
 		"Render/GrayMap"
 	],
 	[ // basic dependencies
+		"Util/Input",
+
 		"Manage/Canvas",
 		"Manage/ElementContainer",
 		
