@@ -2,18 +2,25 @@ class Color extends Operable {
 	constructor(r, g, b, a) {
 		super();
 		this.limited = true;
-		if (b === undefined && g === undefined && typeof r === "string") {
-			if (r.match(/[\(#]/g)) {
-				// explicit
-				let rgb = r;
-				if (!r.match(/rgba?/g)) {
-					Color.span.style.color = r;
-					rgb = Color.span.style.color;
+		if (b === undefined && g === undefined) {
+			if (typeof r === "string") {
+				if (r.match(/[\(#]/g)) {
+					// explicit
+					let rgb = r;
+					if (!r.match(/rgba?/g)) {
+						Color.span.style.color = r;
+						rgb = Color.span.style.color;
+					}
+					Color.parseRGBA(rgb, this);
+				} else {
+					// implicit
+					Color.CSSColor(r, this);
 				}
-				Color.parseRGBA(rgb, this);
-			} else {
-				// implicit
-				Color.CSSColor(r, this);
+			} else if (typeof r === "number") { // hexidecimal (6-digit)
+				this.red = r >> 24;
+				this.green = (r >> 16) & 255;
+				this.blue = (r >> 8) & 255;
+				this.alpha = (r & 255) || 1;
 			}
 		} else {
 			this.red = r ?? 0;
@@ -45,7 +52,7 @@ class Color extends Operable {
 		return "rgba(" + Math.floor(this.red) + ", " + Math.floor(this.green) + ", " + Math.floor(this.blue) + ", " + this.alpha + ")";
 	}
 	getHex() {
-		return "#" + Color.numToHex(this.red) + Color.numToHex(this.green) + Color.numToHex(this.blue);
+		return "#" + Color.numToHex(this.red) + Color.numToHex(this.green) + Color.numToHex(this.blue) + Color.numToHex(this.alpha * 255);
 	}
 	getGLSL() {
 		return `vec4(${this.red / 255}, ${this.green / 255}, ${this.blue / 255}, ${this.alpha})`;
@@ -120,10 +127,7 @@ class Color extends Operable {
 		destination.alpha = color.alpha;
 	}
 	static numToHex(num) {
-		let a = Math.floor(num / 16);
-		let b = Math.floor(num % 16);
-		let hexAry = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
-		return hexAry[a] + hexAry[b];
+		return Math.floor(num / 16).toString(16) + Math.floor(num % 16).toString(16);
 	}
 	static parseNum(str, limit) {
 		const number = parseFloat(str);
