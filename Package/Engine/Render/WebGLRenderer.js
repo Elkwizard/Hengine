@@ -235,15 +235,25 @@ class WebGLArtist {
 			warp(ax, ay, bx, by, cx, cy, dx, dy) {
 				if (typeof ax === "object") {
 					if (ax.vertices) [{ x: ax, y: ay }, { x: bx, y: by }, { x: cx, y: cy }, { x: dx, y: dy }] = ax.vertices;
-					else {
-						[ax, ay, bx, by, cx, cy, dx, dy] = [ax.x, ax.y, ay.x, ay.y, bx.x, bx.y, by.x, by.y];
-					}
+					else [ax, ay, bx, by, cx, cy, dx, dy] = [ax.x, ax.y, ay.x, ay.y, bx.x, bx.y, by.x, by.y];
 				}
 
 				this.gl.texturedTriangle(ax, ay, bx, by, cx, cy, 0, 0, 1, 0, 1, 1, this.currentImageCIS);
 				this.gl.texturedTriangle(ax, ay, dx, dy, cx, cy, 0, 0, 0, 1, 1, 1, this.currentImageCIS);
 			},
 			warpRegion(ax, ay, bx, by, cx, cy, dx, dy, tx, ty, tw, th) {
+				if (typeof ax === "object") {
+					if (ax.vertices) {
+						({ x: tx, y: ty, width: tw, height: th } = ay);
+						[{ x: ax, y: ay }, { x: bx, y: by }, { x: cx, y: cy }, { x: dx, y: dy }] = ax.vertices;
+					} else {
+						[tx, ty, tw, th] = [cx, cy, dx, dy];
+						[ax, ay, bx, by, cx, cy, dx, dy] = [ax.x, ax.y, ay.x, ay.y, bx.x, bx.y, by.x, by.y];
+					}
+				}
+
+				console.log()
+
 				const pixelRatio = this.currentImageCIS.width / this.currentImage.width;
 				tx /= this.currentImageCIS.width / pixelRatio;
 				ty /= this.currentImageCIS.height / pixelRatio;

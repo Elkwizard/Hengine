@@ -173,7 +173,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			glState.MAX_TEXTURE_SLOTS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 			glState.TEXTURE_SLOT_SIZE = Math.min(2048, gl.getParameter(gl.MAX_TEXTURE_SIZE));
 			glState.MAX_SPRITE_SHEETS = glState.MAX_TEXTURE_SLOTS * 30;
-			const TEXTURE_SLOT_PIXEL_SIZE = 1 / glState.TEXTURE_SLOT_SIZE;
+			glState.TEXTURE_SLOT_PIXEL_SIZE = 1 / glState.TEXTURE_SLOT_SIZE;
 			const debugSlots = 0//glState.MAX_TEXTURE_SLOTS;
 			
 			const webgl2 = !!window.WebGL2RenderingContext;
@@ -270,14 +270,35 @@ ${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
 
 					int iBooleans = int(booleans);
 					if (boolean(${BOOLS.TEXTURED})) {
+						textureIndex = vertexTextureIndex;
+
 						vec2 vertexTextureXAxis = vec2(vertexColor, vertexLineWidth);
 						textureCoord = vertexPosition.x * vertexTextureXAxis + vertexPosition.y * vertexTextureYAxis + vertexTextureZAxis;
 						bool pixelated = boolean(${BOOLS.PIXELATED});
 						
-						textureCoordMin = vertexTextureZAxis + (pixelated ? 0.0 : ${(0.5 * TEXTURE_SLOT_PIXEL_SIZE).toFixed(10)});
-						textureCoordMax = vertexTextureXAxis + vertexTextureYAxis + vertexTextureZAxis - (pixelated ? 0.0 : ${(0.5 * TEXTURE_SLOT_PIXEL_SIZE).toFixed(10)});
+						vec2 tmin = vertexTextureZAxis;
+						
+						if (boolean(${BOOLS.TRIANGLE})) {
+							vec2 tmax1 = vertexTextureZAxis + vertexTextureXAxis;
+							vec2 tmax2 = vertexTextureZAxis + vertexTextureYAxis;
+							textureCoordMin = min(tmin, min(tmax1, tmax2));
+							textureCoordMax = max(tmin, max(tmax1, tmax2));
+						} else {
+							vec2 tmax = vertexTextureXAxis + vertexTextureYAxis + vertexTextureZAxis;
 
-						textureIndex = vertexTextureIndex;
+							textureCoordMin = min(tmin, tmax);
+							textureCoordMax = max(tmin, tmax);
+						}
+						
+						float inset = (pixelated ? 0.0000001 : 0.5) * ${glState.TEXTURE_SLOT_PIXEL_SIZE};
+						textureCoordMin += inset;
+						textureCoordMax -= inset;
+						
+						if (min(textureCoordMin, textureCoordMax) != textureCoordMin) { // sub pixel
+							vec2 pixelf = (textureCoordMin + textureCoordMax) * 0.5;
+							vec2 pixeli = (floor(pixelf / ${glState.TEXTURE_SLOT_PIXEL_SIZE}) + 0.5) * ${glState.TEXTURE_SLOT_PIXEL_SIZE};
+							textureCoordMin = textureCoordMax = pixeli;
+						}
 					}
 
 				}
@@ -390,10 +411,10 @@ ${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
 					vec4 pixelColor = vec4(color, 1.0);
  					if (boolean(${BOOLS.TEXTURED})) {
 						vec2 tuv = clamp(textureCoord, textureCoordMin, textureCoordMax);
-						if (boolean(${BOOLS.PIXELATED})) tuv = (floor(tuv / ${TEXTURE_SLOT_PIXEL_SIZE.toFixed(10)}) + 0.5) * ${TEXTURE_SLOT_PIXEL_SIZE.toFixed(10)};
+						if (boolean(${BOOLS.PIXELATED})) tuv = (floor(tuv / ${glState.TEXTURE_SLOT_PIXEL_SIZE}) + 0.5) * ${glState.TEXTURE_SLOT_PIXEL_SIZE};
  						int iTextureIndex = int(textureIndex);
 ${textureSelector}
- 					} else {
+					} else {
 ${new Array(debugSlots).fill(0).map((_, i) =>
 				`						{
 							float minX = ${(i / debugSlots).toFixed(10)};
