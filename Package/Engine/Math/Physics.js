@@ -558,6 +558,7 @@ class RigidBody {
         // booleans
         this.canRotate = true;
         this.isTrigger = false;
+        this.canCollide = true;
         this.gravity = true;
         this.airResistance = true;
         this.simulated = true;
@@ -1246,20 +1247,32 @@ class PhysicsConstraint2 {
         const dynamicB = bodyB.dynamic;
 
         if (dynamicA || dynamicB) {
-            const [a, b] = this.ends;
+            const { ends } = this;
+            const a = ends[0];
+            const b = ends[1];
 
             // velocity
             const rA = a.minus(bodyA.position);
             const rB = b.minus(bodyB.position);
             const mA = dynamicA ? 1 / bodyA.mass : 0;
             const mB = dynamicB ? 1 / bodyB.mass : 0;
+            const mAB = mA + mB;
             const iA = (dynamicA && bodyA.canRotate) ? 1 / bodyA.inertia : 0;
             const iB = (dynamicB && bodyB.canRotate) ? 1 / bodyB.inertia : 0;
 
-            forceToError.a = mA + iA * rA.y ** 2 + mB + iB * rB.y ** 2;
-            forceToError.b = -iA * rA.x * rA.y - iB * rB.x * rB.y;
+            // // correct equation
+            // forceToError.a = mA + iA * rA.y ** 2 + mB + iB * rB.y ** 2;
+            // forceToError.b = -iA * rA.x * rA.y - iB * rB.x * rB.y;
+            // forceToError.c = forceToError.b;
+            // forceToError.d = mA + iA * rA.x ** 2 + mB + iB * rB.x ** 2;
+            
+            // optimized
+            forceToError.a = mAB + (iA * rA.y * rA.y) + (iB * rB.y * rB.y);
+            forceToError.b = (-iA * rA.x * rA.y) - (iB * rB.x * rB.y);
             forceToError.c = forceToError.b;
-            forceToError.d = mA + iA * rA.x ** 2 + mB + iB * rB.x ** 2;
+            forceToError.d = mAB + (iA * rA.x * rA.x) + (iB * rB.x * rB.x);
+
+
 
             const force = forceToError.applyInverseTo(this.error);
 
@@ -1449,15 +1462,17 @@ class PhysicsEngine {
         body.canMoveThisStep = false;
     }
     collisions(dynBodies, collisionPairs, order) {
-        dynBodies.sort(order);
+        const colBodies = dynBodies.filter(body => body.canCollide);
+        colBodies.sort(order);
 
         // for (let i = 0; i < dynBodies.length; i++) {
         //     renderer.draw(Color.RED).text(Font.Serif25, i + 1, dynBodies[i].position);
         // }
 
         //collisions
-        for (let i = 0; i < dynBodies.length; i++) {
-            const body = dynBodies[i];
+        for (let i = 0; i < colBodies.length; i++) {
+            const body = colBodies[i];
+
             const asleep = this.isAsleep(body);
 
             //mobilize
@@ -1476,6 +1491,7 @@ class PhysicsEngine {
         }
     }
     createGrid(dynBodies) {
+
         let cellsize = 100;
         if (this.bodies.length) {
             let meanSize = 0;
@@ -1490,6 +1506,8 @@ class PhysicsEngine {
         const collisionPairs = new Map();
         for (let i = 0; i < this.bodies.length; i++) {
             let body = this.bodies[i];
+            if (!body.canCollide) continue;
+
             let cellsTotal = [];
             const { shapes } = body;
             for (let j = 0; j < shapes.length; j++) {
@@ -1500,7 +1518,9 @@ class PhysicsEngine {
             collisionPairs.set(body, cellsTotal);
         }
         for (let i = 0; i < dynBodies.length; i++) {
-            let body = dynBodies[i];
+            let body = dynBodies[i];            
+            if (!body.canCollide) continue;
+
             let cellsTotal = collisionPairs.get(body);
             let bodies = grid.query(body, cellsTotal, b => body.collisionFilter(b) && b.collisionFilter(body));
             // for (let j = 0; j < bodies.length; j++) {

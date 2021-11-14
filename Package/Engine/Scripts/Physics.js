@@ -49,6 +49,7 @@ class PHYSICS extends ElementScript {
 
 		Object.shortcut(this, body, "simulated");
 		Object.shortcut(this, body, "isTrigger");
+		Object.shortcut(this, body, "canCollide");
 		Object.shortcut(this, body, "canRotate");
 		Object.shortcut(this, body, "gravity");
 		Object.shortcut(this, body, "friction");
