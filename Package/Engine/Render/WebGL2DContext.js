@@ -290,7 +290,7 @@ ${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
 							textureCoordMax = max(tmin, tmax);
 						}
 						
-						float inset = (pixelated ? 0.0000001 : 0.5) * ${glState.TEXTURE_SLOT_PIXEL_SIZE};
+						float inset = (pixelated ? 0.0001 : 0.5) * ${glState.TEXTURE_SLOT_PIXEL_SIZE};
 						textureCoordMin += inset;
 						textureCoordMax -= inset;
 						
