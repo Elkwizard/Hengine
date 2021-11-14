@@ -9,7 +9,7 @@ class Font {
 		this.lineHeight = this.size;
 		this.refont();
 		this.tabReplacement = "    ";
-		this.memorizedWidths = { };
+		this.memorizedWidths = {};
 	}
 	set family(a) {
 		this._family = a;
@@ -66,7 +66,7 @@ class Font {
 		return this._size;
 	}
 	refont() {
-		this.memorizedWidths = { };
+		this.memorizedWidths = {};
 		this.c.font = this.toString();
 	}
 	processString(str) {
@@ -78,21 +78,29 @@ class Font {
 		this.memorizedWidths[str] = width;
 		return width;
 	}
-	packText(str, pack) {
-		let text = this.processString(str);
-		let words = text.split(" ");
-		let lines = [""];
-		for (let i = 0; i < words.length; i++) {
-			let word = words[i];
-			let prevLen = lines[lines.length - 1].length;
-			lines[lines.length - 1] += (i ? " " : "") + word;
-			if (this.getWidthCRC2D(lines[lines.length - 1]) > pack) {
-				lines[lines.length - 1] = lines[lines.length - 1].slice(0, prevLen);
-				lines.push(word);
-			}
-			if (word === "\n") lines.push("");
-		}
-		return lines.join("\n");
+	packText(str, maxWidth) {
+		str = this.processString(str);
+		return str
+			.split("\n")
+			.map(line => {
+				let lineStart = false;
+				const words = line.split(" ");
+				const lines = [];
+				let acc = "";
+				for (let i = 0; i < words.length; i++) {
+					const word = words[i];
+					if (this.getWidthCRC2D(acc + (lineStart ? "" : " ") + word) > maxWidth) {
+						lines.push(acc);
+						acc = "";
+						lineStart = true;
+					}
+					acc += (lineStart ? "" : " ") + word;
+					lineStart = false;
+				}
+				if (acc) lines.push(acc);
+				return lines.join("\n");
+			})
+			.join("\n");
 	}
 	getTextBounds(str, pack) {
 		str = this.processString(str);
