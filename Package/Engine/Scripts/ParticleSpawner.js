@@ -33,7 +33,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.particles = [];
 	}
 	setProperties(obj, p) {
-		this.init = p.init ?? this.init ?? (() => null);
+		this.particleInit = p.init ?? this.particleInit ?? (() => null);
 		this.particleUpdate = p.update ?? this.particleUpdate ?? (() => null);
 		this.particleDraw = p.draw ?? this.particleDraw ?? (() => null);
 		this.falls = p.falls ?? this.falls ?? false;
@@ -48,7 +48,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 	}
 	addParticle(obj, position) {
 		const particle = new this.Particle(position, this);
-		this.init(particle);
+		this.particleInit(particle);
 		if (particle.timer >= 1) return;
 		this.particles.push(particle);
 	}
@@ -82,8 +82,8 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 		for (let i = 0; i < particles.length; i++) {
 			const p = particles[i];
+			if (p.timer >= 1) continue;
 			p.timer += timerIncrement;
-			if (p.timer > 1) continue;
 			p.update();
 			particlesToKeep.push(p);
 		}
