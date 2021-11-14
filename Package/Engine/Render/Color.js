@@ -17,11 +17,10 @@ class Color extends Operable {
 					Color.CSSColor(r, this);
 				}
 			} else if (typeof r === "number") { // hexidecimal (6-digit)
-				if (r >> 24 === 0) r <<= 8;
-				this.red = r >> 24;
-				this.green = (r >> 16) & 255;
-				this.blue = (r >> 8) & 255;
-				this.alpha = (r & 255) || 1;
+				this.red = r >> 16;
+				this.green = (r >> 8) & 255;
+				this.blue = r & 255;
+				this.alpha = 1;
 			}
 		} else {
 			this.red = r ?? 0;
