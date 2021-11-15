@@ -16,13 +16,13 @@ class Line {
 		let ay = (this.a.y + this.b.y) / 2;
 		return new Vector2(ax, ay);
 	}
-	get vector() {
-		return this.b.Vminus(this.a).normalize();
-	}
 	set vector(v) {
 		let mag = this.length;
 		let nB = this.a.Vplus(v.get().normalize().Ntimes(mag));
 		this.b = nB;
+	}
+	get vector() {
+		return this.b.Vminus(this.a).normalize();
 	}
 	get slope() {
 		let dx = this.b.x - this.a.x;

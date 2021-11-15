@@ -523,14 +523,18 @@ class PhysicsGrid {
 //rigidbodies
 class RigidBody {
     constructor(x, y, dynamic) {
+        // general
         this.userData = {};
         this.shapes = [];
+        this.constraints = [];
         this.dynamic = dynamic;
         this.id = RigidBody.nextID++;
+
         //linear
         this.position = new PhysicsVector(x, y);
         this.lastPosition = new PhysicsVector(x, y);
         this.velocity = new PhysicsVector(0, 0);
+
         //angular
         this.angle = 0;
         this.lastAngle = 0;
@@ -928,7 +932,7 @@ CollisionDetector.Collision = class {
         this.contacts = contacts;
         this.penetration = penetration;
     }
-}
+};
 CollisionDetector.jumpTable = {
     [PolygonCollider.SYMBOL]: {
         [PolygonCollider.SYMBOL]: CollisionDetector.PolygonModel_PolygonModel,
@@ -997,7 +1001,7 @@ class CollisionResolver {
         forceToDV.b = nx * (C1 * rB2y - C2 * rA2y + C3 * rB2y - C4 * rA2y - mABx) + ny * (-C1 * rB2x + C2 * rA2x - C3 * rB2x + C4 * rA2x - mABy);
         forceToDV.c = nx * (C1_2 * rB1y - C2_2 * rA1y + C3_2 * rB1y - C4_2 * rA1y - mABx) + ny * (-C1_2 * rB1x + C2_2 * rA1x - C3_2 * rB1x + C4_2 * rA1x - mABy);
         forceToDV.d = nx * (C1_2 * rB2y - C2_2 * rA2y + C3_2 * rB2y - C4_2 * rA2y - mABx) + ny * (-C1_2 * rB2x + C2_2 * rA2x - C3_2 * rB2x + C4_2 * rA2x - mABy);
- 
+
         const dvFactor = -(1 + e);
         const dv1 = dvFactor * vAB1;
         const dv2 = dvFactor * vAB2;
@@ -1018,7 +1022,7 @@ class CollisionResolver {
         const mB = dynamic ? 1 / bodyB.mass : 0;
         const iB = (dynamic && bodyB.canRotate) ? 1 / bodyB.inertia : 0;
         const GTE_EPSILON = -0.0001;
-        
+
         const solve1 = contact => {
             // radii
             const rAx = contact.x - bodyA.position.x;
@@ -1039,12 +1043,12 @@ class CollisionResolver {
 
             bodyA.applyImpulse(contact, normal, normalImpulse);
             bodyA.applyImpulse(contact, tangent, tangentImpulse);
-            
+
             if (dynamic) {
                 bodyB.applyImpulse(contact, normal, -normalImpulse);
                 bodyB.applyImpulse(contact, tangent, -tangentImpulse);
             }
-            
+
             // renderer.draw(Color.BLUE).circle(contact, 1);
             // const middle = contact;
             // renderer.stroke(Color.YELLOW, 0.4).line(middle.plus(normal.times(4)), middle.plus(normal.times(-4)));
@@ -1057,7 +1061,7 @@ class CollisionResolver {
             const rA1y = contact1.y - bodyA.position.y;
             const rB1x = contact1.x - bodyB.position.x;
             const rB1y = contact1.y - bodyB.position.y;
-            
+
             const rA2x = contact2.x - bodyA.position.x;
             const rA2y = contact2.y - bodyA.position.y;
             const rB2x = contact2.x - bodyB.position.x;
@@ -1066,13 +1070,13 @@ class CollisionResolver {
             // normal force
             const vAB1n = this.vAB(contact1, bodyA, bodyB, normal);
             const vAB2n = this.vAB(contact2, bodyA, bodyB, normal);
-            
+
             if (vAB1n >= GTE_EPSILON || vAB2n >= GTE_EPSILON) return false;
             const normalImpulses = this.normalImpulses(vAB1n, vAB2n, mA, mB, iA, iB, e, normal, rA1x, rA1y, rB1x, rB1y, rA2x, rA2y, rB2x, rB2y); // normal impulses are down the inverse normal
             if (normalImpulses === null) return false;
             const { x: normalImpulse1, y: normalImpulse2 } = normalImpulses;
             if (normalImpulse1 >= GTE_EPSILON || normalImpulse2 >= GTE_EPSILON) return false;
-          
+
             // friction (solved individually)
             const vAB1t = this.vAB(contact1, bodyA, bodyB, tangent);
             const vAB2t = this.vAB(contact2, bodyA, bodyB, tangent);
@@ -1080,14 +1084,14 @@ class CollisionResolver {
             const jt2 = this.normalImpulse(vAB2t, mA, mB, iA, iB, 0, tangent, rA2x, rA2y, rB2x, rB2y);
             const tangentImpulse1 = (Math.abs(jt1) < -normalImpulse1 * staticFriction) ? jt1 : Math.sign(jt1) * -normalImpulse1 * kineticFriction;
             const tangentImpulse2 = (Math.abs(jt2) < -normalImpulse2 * staticFriction) ? jt2 : Math.sign(jt2) * -normalImpulse2 * kineticFriction;
-            
+
             // apply impulses
             bodyA.applyImpulse(contact1, normal, normalImpulse1);
             bodyA.applyImpulse(contact2, normal, normalImpulse2);
 
             bodyA.applyImpulse(contact1, tangent, tangentImpulse1);
             bodyA.applyImpulse(contact2, tangent, tangentImpulse2);
-            
+
             if (dynamic) {
                 bodyB.applyImpulse(contact1, normal, -normalImpulse1);
                 bodyB.applyImpulse(contact2, normal, -normalImpulse2);
@@ -1129,8 +1133,16 @@ class CollisionResolver {
     }
 }
 //constraints
-class PhysicsConstraint1 {
+class PhysicsConstraint {
+    constructor() {
+        this.id = PhysicsConstraint.nextID++;
+    }
+}
+PhysicsConstraint.nextID = 0;
+
+class PhysicsConstraint1 extends PhysicsConstraint {
     constructor(body, offset, point) {
+        super();
         this.body = body;
         this.offset = offset;
         this.point = point;
@@ -1159,6 +1171,9 @@ class PhysicsConstraint1 {
         this._endB.y = this.point.y;
 
         return this._ends;
+    }
+    add() {
+        this.bodyA.constraints.push(this);
     }
     hasBody(b) {
         return this.body === b;
@@ -1192,8 +1207,10 @@ class PhysicsConstraint1 {
     }
 }
 PhysicsConstraint1.INTENSITY = 0.1;
-class PhysicsConstraint2 {
+
+class PhysicsConstraint2 extends PhysicsConstraint {
     constructor(a, b, aOff, bOff) {
+        super();
         this.bodyA = a;
         this.bodyB = b;
         this.offsetA = aOff;
@@ -1237,6 +1254,10 @@ class PhysicsConstraint2 {
 
         return this._ends;
     }
+    add() {
+        this.bodyA.constraints.push(this);
+        this.bodyB.constraints.push(this);
+    }
     hasBody(b) {
         return this.bodyA === b || this.bodyB === b;
     }
@@ -1265,7 +1286,7 @@ class PhysicsConstraint2 {
             // forceToError.b = -iA * rA.x * rA.y - iB * rB.x * rB.y;
             // forceToError.c = forceToError.b;
             // forceToError.d = mA + iA * rA.x ** 2 + mB + iB * rB.x ** 2;
-            
+
             // optimized
             forceToError.a = mAB + (iA * rA.y * rA.y) + (iB * rB.y * rB.y);
             forceToError.b = (-iA * rA.x * rA.y) - (iB * rB.x * rB.y);
@@ -1356,11 +1377,11 @@ PhysicsConstraint1.Position = class extends PhysicsConstraint1 {
 class PhysicsEngine {
     constructor(gravity = new PhysicsVector(0, 0.2)) {
         this.gravity = gravity;
-        this.bodies = [];
+        this.bodyMap = new Map();
         this.collisionResolver = new CollisionResolver(this);
         this.drag = 0.005;
         this.friction = 0.5;
-        this.constraints = [];
+        this.constraintMap = new Map();
         this.constraintIterations = 5;
         this.onCollide = (a, b, dir, contacts) => null;
         this.iterations = 10;
@@ -1378,6 +1399,12 @@ class PhysicsEngine {
             }
         };
     }
+    get bodies() {
+        return [...this.bodyMap.values()].filter(body => body.simulated);
+    }
+    get constraints() {
+        return [...this.constraintMap.values()];
+    }
     getSleepDuration() {
         return this.sleepDuration * this.iterations;
     }
@@ -1392,18 +1419,11 @@ class PhysicsEngine {
         }
     }
     addConstraint(constraint) {
-        this.constraints.push(constraint);
-    }
-    getConstraints(id) {
-        let constraints = [];
-        for (let i = 0; i < this.constraints.length; i++) {
-            let con = this.constraints[i];
-            if (con.bodyA.id === id || con.bodyB.id === id) constraints.push(con);
-        }
-        return constraints;
+        constraint.add();
+        this.constraintMap.set(constraint.id, constraint);
     }
     solveConstraints() {
-        const cons = [...this.constraints];
+        const cons = this.constraints;
         while (cons.length)
             cons.splice(Math.floor(this.constraintOrderGenerator.next() * cons.length), 1)[0].solve();
     }
@@ -1491,7 +1511,6 @@ class PhysicsEngine {
         }
     }
     createGrid(dynBodies) {
-
         let cellsize = 100;
         if (this.bodies.length) {
             let meanSize = 0;
@@ -1518,7 +1537,7 @@ class PhysicsEngine {
             collisionPairs.set(body, cellsTotal);
         }
         for (let i = 0; i < dynBodies.length; i++) {
-            let body = dynBodies[i];            
+            let body = dynBodies[i];
             if (!body.canCollide) continue;
 
             let cellsTotal = collisionPairs.get(body);
@@ -1589,10 +1608,6 @@ class PhysicsEngine {
         }
     }
     run() {
-        //remove unsimulated
-        const backupBodies = this.bodies;
-        this.bodies = this.bodies.filter(body => body.simulated);
-
         const dynBodies = this.bodies.filter(body => body.dynamic);
 
         // approximate where they'll be at the end of the frame
@@ -1622,9 +1637,6 @@ class PhysicsEngine {
             //     renderer.stroke(Color.ORANGE).arrow(body.position, body.position.plus(body.velocity));
             // }
         }
-
-        //add back unsimulated
-        this.bodies = backupBodies;
     }
     getBody(id) {
         for (let i = 0; i < this.bodies.length; i++) {
@@ -1635,28 +1647,28 @@ class PhysicsEngine {
     addBody(b) {
         b.engine = this;
         if (b.friction === null) b.friction = this.friction;
-        this.bodies.push(b);
+        this.bodyMap.set(b.id, b);
     }
     removeBody(id) {
-        let inx = null;
-        for (let i = 0; i < this.bodies.length; i++) {
-            if (this.bodies[i].id === id) {
-                inx = i;
-                break;
-            }
+        const body = this.bodyMap.get(id);
+        // found it!
+        body.wake();
+        for (let i = 0; i < body.constraints.length; i++) {
+            const con = constraints[i];
+            this.removeConstraint(con.id);
         }
 
-        if (inx !== null) {
-            let body = this.bodies[inx];
-            body.wake();
-            let validConstraints = [];
-            for (let i = 0; i < this.constraints.length; i++) {
-                let con = this.constraints[i];
-                if (!con.hasBody(body)) validConstraints.push(con);
-            }
-            this.constraints = validConstraints;
-            this.bodies.splice(inx, 1);
-        }
+        this.bodyMap.delete(id);
+    }
+    removeConstraint(id) {
+        const con = this.constraintMap.get(id);
+        // found it!
+        const constraintsA = con.bodyA.constraints;
+        const constraintsB = con.bodyB.constraints;
+        constraintsA.splice(constraintsA.indexOf(con), 1);
+        constraintsB.splice(constraintsB.indexOf(con), 1);
+
+        this.constraintMap.delete(id);
     }
 }
 

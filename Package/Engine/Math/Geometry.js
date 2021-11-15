@@ -548,19 +548,17 @@ class Geometry {
         return result;
     }
     static overlapLineLine(l1, l2) {
-        let dirs = [
-            Vector2.fromAngle(l1.b.Vminus(l1.a).getAngle() + Math.PI / 2),
-            Vector2.fromAngle(l2.b.Vminus(l2.a).getAngle() + Math.PI / 2),
-        ];
-        for (const dir of dirs) {
-            let a = l1.a.dot(dir);
-            let b = l1.b.dot(dir);
-            let a2 = l2.a.dot(dir);
-            let b2 = l2.b.dot(dir);
-            if (b < a) [a, b] = [b, a];
-            if (b2 < a2) [a2, b2] = [b2, a2];
-            if (!(b > a2 && a < b2)) return false;
-        }
+        const check = l => {
+            const dir = l.b.Vminus(l.a).normal;
+            const a = l1.a.dot(dir);
+            const b = l1.b.dot(dir);
+            const a2 = l2.a.dot(dir);
+            const b2 = l2.b.dot(dir);
+            const r1 = new Range(a, b);
+            const r2 = new Range(a2, b2);
+            return r1.intersect(r2);
+        };
+        if (!check(l1) || !check(l2)) return false;
         return true;
     }
     static overlapShapes(r1, r2) {

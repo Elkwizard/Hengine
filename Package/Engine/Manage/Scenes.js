@@ -9,6 +9,9 @@ class Scene {
 		this.collisionEvents = true;
 		this.camera = new Camera(this.engine.canvas.width / 2, this.engine.canvas.height / 2, 0, 1, engine);
 	}
+	get constraints() {
+		return this.physicsEngine.constraints.map(con => new Constraint(con, this.engine));
+	}
 	handleCollisionEvent(a, b, direction, contacts) {
 		let A = a.userData.sceneObject;
 		let B = b.userData.sceneObject;
@@ -65,6 +68,7 @@ class Scene {
 			con.length = Vector2.dist(Vector2.fromPhysicsVector(ends[0]), Vector2.fromPhysicsVector(ends[1]));
 		}
 		this.physicsEngine.addConstraint(con);
+		return new Constraint(con, this.engine);
 	}
 	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null) {
 		const con = new PhysicsConstraint1.Length(a.scripts.PHYSICS.body, offset.toPhysicsVector(), point ? point.toPhysicsVector() : null, length);
@@ -74,15 +78,18 @@ class Scene {
 			con.length = Vector2.dist(Vector2.fromPhysicsVector(ends[0]), Vector2.fromPhysicsVector(ends[1]));
 		}
 		this.physicsEngine.addConstraint(con);
+		return new Constraint(con, this.engine);
 	}
 	constrainPosition(a, b, ap = Vector2.origin, bp = Vector2.origin) {
 		const con = new PhysicsConstraint2.Position(a.scripts.PHYSICS.body, b.scripts.PHYSICS.body, ap.toPhysicsVector(), bp.toPhysicsVector());
 		this.physicsEngine.addConstraint(con);
+		return new Constraint(con, this.engine);
 	}
 	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
 		point ??= a.transform.localSpaceToGlobalSpace(offset);
 		const con = new PhysicsConstraint1.Position(a.scripts.PHYSICS.body, offset.toPhysicsVector(), point);
 		this.physicsEngine.addConstraint(con);
+		return new Constraint(con, this.engine);
 	}
 	updateCaches() {
 		for (const el of this.main.sceneObjectArray) el.updateCaches();

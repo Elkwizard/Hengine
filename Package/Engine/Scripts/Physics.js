@@ -55,6 +55,9 @@ class PHYSICS extends ElementScript {
 		Object.shortcut(this, body, "friction");
 		Object.shortcut(this, body, "airResistance");
 	}
+	get constraints() {
+		return this.body.constraints.map(con => new Constraint(con, this.sceneObject.engine));
+	}
 	set velocity(a) {
 		const { body } = this;
 		body.velocity.x = a.x;
@@ -182,6 +185,15 @@ class PHYSICS extends ElementScript {
 		for (let i = 0; i < scripts.length; i++)
 			if (!scripts[i].collideRule(element)) return false;
 		return true;
+	}
+	constrainedTo(obj, body) {
+		body = body.scripts.PHYSICS.body;
+		const { constraints } = this.body;
+		for (let i = 0; i < constraints.length; i++) {
+			const constraint = constraints[i];
+			if (constraint.hasBody(body)) return true;
+		}
+		return false;
 	}
 }
 PHYSICS.directions = [

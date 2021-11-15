@@ -4,6 +4,25 @@ function physicsAPICollideShapes(shape, shape2) {
         shape2.toPhysicsShape(), new PhysicsVector(0, 0), 1, 0
     );
 }
+class Constraint {
+    constructor(physicsConstraint, engine) {
+        this.physicsConstraint = physicsConstraint;
+        this.engine = engine;
+    }
+    get ends() {
+        return this.physicsConstraint.ends.map(Vector2.fromPhysicsVector);
+    }
+    get bodyA() {
+        return this.physicsConstraint.bodyA.userData.sceneObject;
+    }
+    get bodyB() {
+        return this.physicsConstraint.bodyB?.userData?.sceneObject;
+    }
+    remove() {
+        const { physicsEngine } = this.engine.scene;
+        physicsEngine.removeConstraint(this.physicsConstraint.id);
+    }
+}
 class CollisionData {
     constructor(element, direction, contacts) {
         this.element = element;
