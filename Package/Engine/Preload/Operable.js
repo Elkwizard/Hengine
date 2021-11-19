@@ -103,8 +103,7 @@ class Operable {
         });
     }
     static sum(v) {
-        let construct = v.length ? v[0].constructor : this;
-        let acc = construct.empty;
+        const acc = this.empty;
         for (let i = 0; i < v.length; i++) acc.add(v[i]);
         return acc;
     }
@@ -112,27 +111,26 @@ class Operable {
         return this.sum(v).over(v.length);
     }
     static remap(n, a, b, a2, b2) {
-        return new this(...this.modValues.map(x => (n[x] - a[x]) / (b[x] - a[x]) * (b2[x] - a2[x]) + a2[x]));
+        return n.minus(a).div(b.minus(a)).mul(b2.minus(a2)).add(a2);
     }
     static clamp(n, a, b) {
-        return new this(...this.modValues.map(x => Math.max(a[x], Math.min(b[x], n[x]))));
+        return this.max(a, this.min(b, n));
     }
     static filled(value) {
-        return new this(...this.modValues.fill(value));
+        return new this(...this.modValues.map(() => value));
     }
     static min(...values) {
-        return new this(...this.modValues.map(f => {
-            let min = Infinity;
-            for (let i = 0; i < values.length; i++) min = Math.min(min, values[i][f]);
-            return min;
-        }));
+        const acc = this.filled(Infinity);
+        for (let i = 0; i < values.length; i++) 
+            acc.op(values[i], Math.min);
+        return acc;
     }
     static max(...values) {
-        return new this(...this.modValues.map(f => {
-            let max = -Infinity;
-            for (let i = 0; i < values.length; i++) max = Math.max(max, values[i][f]);
-            return max;
-        }));
+        const acc = this.filled(-Infinity);
+        for (let i = 0; i < values.length; i++) {
+            acc.op(values[i], Math.max);
+        }
+        return acc;
     }
     static pow(a, power) {
         return a.gob(power, Math.pow);

@@ -117,19 +117,6 @@ class Vector extends Operable {
 	static sqrDist(a, b) {
 		return a.minus(b).sqrMag;
 	}
-	static prohibitDirections(proDirs, dir) {
-		let remove = [];
-		let mag = dir.mag;
-		for (let proDir of proDirs) {
-			let dot = proDir.dot(dir);
-			if (dot > 0) {
-				let bad = dir.times(dot / mag);
-				remove.push(bad);
-			}
-		}
-		let wrong = remove.length ? Vector.avg(remove) : new dir.constructor(0, 0, 0, 0);
-		return dir.minus(wrong);
-	}
 }
 Vector.modValues = [];
 class Vector2 extends Vector {

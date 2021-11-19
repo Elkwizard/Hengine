@@ -79,10 +79,10 @@ class InputHandler {
 	static addChecks(keys = []) {
 		for (let i = 0; i < keys.length; i++) {
 			const key = keys[i];
-			if (key.indexOf("Length") > -1) continue;
 			this.prototype[key] = function (arg, signal) {
 				return this.check(arg, key, signal);
 			};
+			if (key.indexOf("Length") > -1) continue;
 			Object.defineProperty(this.prototype, "all" + key.capitalize(), {
 				get() {
 					return this.checkAll(key);
