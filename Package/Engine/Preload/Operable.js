@@ -2,6 +2,9 @@ class Operable {
     constructor() {
 
     }
+    get values() {
+        return this.constructor.modValues.map(field => this[field]);
+    }
     set(...values) {
         if (values[0] instanceof this.constructor) return values[0].get(this);
         const { modValues } = this.constructor;
@@ -85,6 +88,21 @@ class Operable {
             if (Math.abs(this[field] - v[field]) >= EPSILON) return false;
         }
         return true;
+    }
+    toByteBuffer() {
+        const buffer = new ByteBuffer();
+        const { modValues } = this.constructor;
+        for (let i = 0; i < modValues.length; i++)
+            buffer.write.float64(this[modValues[i]]);
+        return buffer;
+    }
+    static fromByteBuffer(buffer) {
+        buffer.pointer = 0;
+        const result = this.empty;
+        const { modValues } = this;
+        for (let i = 0; i < modValues.length; i++)
+            result[modValues[i]] = buffer.read.float64();
+        return result;
     }
     static get empty() {
         return new this(...[...this.modValues].fill(0));

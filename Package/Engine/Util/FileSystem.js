@@ -159,6 +159,12 @@ class FileSystem { };
 			this.createFileType(Object);
 			this.createFileType(GrayMap);
 			this.createFileType(Texture);
+			this.createFileType(Rect);
+			this.createFileType(Circle);
+			this.createFileType(Vector2);
+			this.createFileType(Vector3);
+			this.createFileType(Vector4);
+			this.createFileType(Color);
 		}
 		get directory() {
 			const array = [];
