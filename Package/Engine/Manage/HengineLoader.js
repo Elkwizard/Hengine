@@ -229,6 +229,7 @@ class HengineLoader {
 		// window setup
 		document.body.style.width = "100vw";
 		document.body.style.height = "100vh";
+		document.body.style.backgroundColor = "#000";
 
 		this.hengine = new Hengine();
 
