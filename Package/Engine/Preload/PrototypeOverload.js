@@ -55,14 +55,7 @@ Object.defineProperty(window, "title", {
 	addByteBufferConversions(String, "string");
 	addByteBufferConversions(Number, "float64");
 	addByteBufferConversions(Boolean, "bool");
-	addByteBufferConversions(Object, [
-		function (object, buffer) {
-			buffer.write.string(JSON.stringify(object));
-		},
-		function (buffer) {
-			return JSON.parse(buffer.read.string());
-		}
-	]);
+	addByteBufferConversions(Object, "object");
 
 	{ // webgl
 		function overrideGetContext(CanvasType) {
@@ -398,7 +391,7 @@ ${contents.join(",\n").indent()}
 		buffer.finalize();
 		const uri = `data:application/octet-stream;base64,` + buffer.toBase64();
 		a.setAttribute("href", uri);
-		a.setAttribute("download", file + ".backup");
+		a.setAttribute("download", file + " " + new Date() + ".backup");
 		a.click();
 	});
 	proto(Storage.prototype, "clear", function (file) {
