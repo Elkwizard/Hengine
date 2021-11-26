@@ -92,15 +92,22 @@ class ImageType {
 	makeImage() {
 		return null;
 	}
-	async download(name) {
-		let canvas = document.createElement("canvas");
-		let img = this.makeImage();
-		if (!img) return;
-		canvas.width = img.width;
-		canvas.height = img.height;
-		canvas.getContext("2d").drawImage(img, 0, 0);
-		let a = document.createElement("a");
-		a.href = canvas.toDataURL();
+	toDataURL() {
+		const canvas = document.createElement("canvas");
+		const img = this.makeImage();
+		if (img !== null) {
+			canvas.width = img.width;
+			canvas.height = img.height;
+			canvas.getContext("2d").drawImage(img, 0, 0);
+		} else {
+			canvas.width = 0;
+			canvas.height = 0;	
+		}
+		return canvas.toDataURL();
+	}
+	download(name) {
+		const a = document.createElement("a");
+		a.href = this.toDataURL();
 		a.download = name + ".png";
 		return new Promise(resolve => {
 			a.onclick = () => resolve();
