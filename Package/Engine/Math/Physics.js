@@ -635,8 +635,8 @@ class RigidBody {
             // don't just subtract shape's mass and inertia in case mass was changed elsewhere
             this.mass = 0
             this.inertia = 0;
-            for (let i = 0; i < shapes.length; i++) {
-                const shape = shapes[i];
+            for (let i = 0; i < this.shapes.length; i++) {
+                const shape = this.shapes[i];
                 this.mass += shape.mass;
                 this.inertia += shape.inertia;
             }
