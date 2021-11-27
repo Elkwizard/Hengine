@@ -1,39 +1,42 @@
 class Random {
-    static seedRand(seed) {
-        return Random.distribution(seed);
+    constructor() {
+        this.constructor.apply(this, arguments); // I have no clue why this does anything at all
     }
-    static random() {
-        return Random.seedRand(Random.seed++);
+    seedRand(seed) {
+        return this.distribution(seed);
     }
-    static randInt(min, max) {
-        return Math.floor(Random.random() * (max - min + 1) + min);
+    random() {
+        return this.seedRand(this.seed++);
     }
-    static bool(chance = 0.5) {
-        return Random.random() < chance;
+    randInt(min, max) {
+        return Math.floor(this.random() * (max - min + 1) + min);
     }
-    static range(min = 0, max = 1) {
-        return Random.random() * (max - min) + min;
+    bool(chance = 0.5) {
+        return this.random() < chance;
     }
-    static angle() {
-        return Random.random() * 2 * Math.PI;
+    range(min = 0, max = 1) {
+        return this.random() * (max - min) + min;
     }
-    static char() {
-        return String.fromCharCode(Math.round(Random.random() * 0xFFFF));
+    angle() {
+        return this.random() * 2 * Math.PI;
     }
-    static color(result = Color.empty) {
-        result.red = Random.random() * 255;
-        result.green = Random.random() * 255;
-        result.blue = Random.random() * 255;
+    char() {
+        return String.fromCharCode(Math.round(this.random() * 0xFFFF));
+    }
+    color(result = Color.empty) {
+        result.red = this.random() * 255;
+        result.green = this.random() * 255;
+        result.blue = this.random() * 255;
         result.alpha = 1;
         return result;
     }
-    static choice(arr, percentages = null) {
+    choice(arr, percentages = null) {
         if (!Array.isArray(arr)) arr = Array.from(arr);
         if (percentages === null) {
-            return arr[Math.floor(Random.random() * arr.length)];
+            return arr[Math.floor(this.random() * arr.length)];
         } else {
             let min = 0;
-            let random = Random.random();
+            let random = this.random();
             for (let i = 0; i < percentages.length; i++) {
                 const percent = percentages[i];
                 if (random >= min && random < min + percent) return arr[i];
@@ -42,34 +45,34 @@ class Random {
             return arr.last;
         }
     }
-    static sample(arr, quantity) {
+    sample(arr, quantity) {
         if (!Array.isArray(arr)) arr = Array.from(arr);
         if (quantity >= arr.length) return [...arr];
         const result = [];
         while (result.length < quantity)
-            result.push(arr[Math.floor(Random.random() * arr.length)]);
+            result.push(arr[Math.floor(this.random() * arr.length)]);
         return result;
     }
-    static sampleWithoutReplacement(arr, quantity) {
+    sampleWithoutReplacement(arr, quantity) {
         if (!Array.isArray(arr)) arr = Array.from(arr);
         const sampled = new Set();
         const result = [];
         while (result.length < quantity) {
-            const index = Math.floor(Random.random() * arr.length);
+            const index = Math.floor(this.random() * arr.length);
             if (samples.has(index)) continue;
             result.push(arr[index]);
             sampled.add(index);
         }
         return result;
     }
-    static octave(oc, alg, ...sampleAndFreq) {
+    octave(oc, alg, ...sampleAndFreq) {
         const freq = sampleAndFreq.pop();
         let sample = sampleAndFreq;
 
         let n = 0;
         let scl = 0;
         let len = alg.length + 1;
-        let seed = Random.sampleSeed;
+        let seed = this.sampleSeed;
         if (len === sample.length) {
             seed = sample[sample.length - 1];
             sample.length = alg.length;
@@ -80,10 +83,10 @@ class Random {
         }
         return n / scl;
     }
-    static perlin(x, f = 1, seed = Random.sampleSeed) {
+    perlin(x, f = 1, seed = this.sampleSeed) {
         x *= f;
         x += seed;
-        const s_0 = n => Random.seedRand(Math.floor(n));
+        const s_0 = n => this.seedRand(Math.floor(n));
         let xt = x % 1;
         if (xt < 0) xt++;
         return Interpolation.smoothLerp(
@@ -91,12 +94,12 @@ class Random {
             xt
         );
     }
-    static perlin2D(x, y, f = 1, seed = Random.sampleSeed) {
+    perlin2D(x, y, f = 1, seed = this.sampleSeed) {
         x *= f;
         y *= f;
         x += seed;
         y += seed;
-        const s_p = (x, y) => Random.seedRand(Math.floor(x) + Math.floor(y) * 2000);
+        const s_p = (x, y) => this.seedRand(Math.floor(x) + Math.floor(y) * 2000);
         let xt = x % 1;
         let yt = y % 1;
         if (xt < 0) xt++;
@@ -106,14 +109,14 @@ class Random {
             xt, yt
         );
     }
-    static perlin3D(x, y, z, f = 1, seed = Random.sampleSeed) {
+    perlin3D(x, y, z, f = 1, seed = this.sampleSeed) {
         x *= f;
         y *= f;
         z *= f;
         x += seed;
         y += seed;
         z += seed;
-        const s_p = (x, y, z) => Random.seedRand(Random.seedRand(Math.floor(x)) + Random.seedRand(Math.floor(y) * 2000) + Random.seedRand(Math.floor(z) * 2000000));
+        const s_p = (x, y, z) => this.seedRand(this.seedRand(Math.floor(x)) + this.seedRand(Math.floor(y) * 2000) + this.seedRand(Math.floor(z) * 2000000));
         let xt = x % 1;
         let yt = y % 1;
         let zt = z % 1;
@@ -126,47 +129,47 @@ class Random {
             xt, yt, zt
         );
     }
-    static getVoronoiCell(x) {
-        return { x: Math.floor(x) + Random.seedRand(Math.floor(x)) };
+    getVoronoiCell(x) {
+        return { x: Math.floor(x) + this.seedRand(Math.floor(x)) };
     }
-    static voronoi(x, f = 1, seed = Random.sampleSeed) {
+    voronoi(x, f = 1, seed = this.sampleSeed) {
         x *= f;
         x += seed;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) {
-            let cell = Random.getVoronoiCell(x + i);
+            let cell = this.getVoronoiCell(x + i);
             let dist = (cell.x - x) ** 2;
             if (dist < bestDist) bestDist = dist;
         }
         return bestDist;
     }
-    static getVoronoiCell2D(x, y) {
+    getVoronoiCell2D(x, y) {
         return {
-            x: Math.floor(x) + Random.seedRand(Math.floor(x) + Math.floor(y) * 1000),
-            y: Math.floor(y) + Random.seedRand(Math.floor(y) + Math.floor(x) * 10000)
+            x: Math.floor(x) + this.seedRand(Math.floor(x) + Math.floor(y) * 1000),
+            y: Math.floor(y) + this.seedRand(Math.floor(y) + Math.floor(x) * 10000)
         };
     }
-    static voronoi2D(x, y, f = 1, seed = Random.sampleSeed) {
+    voronoi2D(x, y, f = 1, seed = this.sampleSeed) {
         x *= f;
         y *= f;
         x += seed;
         y += seed;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) {
-            let cell = Random.getVoronoiCell2D(x + i, y + j);
+            let cell = this.getVoronoiCell2D(x + i, y + j);
             let dist = (cell.x - x) ** 2 + (cell.y - y) ** 2;
             if (dist < bestDist) bestDist = dist;
         }
         return bestDist;
     }
-    static getVoronoiCell3D(x, y, z) {
+    getVoronoiCell3D(x, y, z) {
         return {
-            x: Math.floor(x) + Random.seedRand(Math.floor(x) + Math.floor(y) * 1000 + Math.floor(z) * 10000),
-            y: Math.floor(y) + Random.seedRand(Math.floor(y) + Math.floor(x) * 1000000 + Math.floor(z) * 900),
-            z: Math.floor(z) + Random.seedRand(Math.floor(y) * 10000 + Math.floor(x) * 100 + Math.floor(z) * 90000)
+            x: Math.floor(x) + this.seedRand(Math.floor(x) + Math.floor(y) * 1000 + Math.floor(z) * 10000),
+            y: Math.floor(y) + this.seedRand(Math.floor(y) + Math.floor(x) * 1000000 + Math.floor(z) * 900),
+            z: Math.floor(z) + this.seedRand(Math.floor(y) * 10000 + Math.floor(x) * 100 + Math.floor(z) * 90000)
         };
     }
-    static voronoi3D(x, y, z, f = 1, seed = Random.sampleSeed) {
+    voronoi3D(x, y, z, f = 1, seed = this.sampleSeed) {
         x *= f;
         y *= f;
         z *= f;
@@ -175,26 +178,51 @@ class Random {
         z += seed;
         let bestDist = Infinity;
         for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) for (let k = -1; k < 2; k++) {
-            let cell = Random.getVoronoiCell3D(x + i, y + j, z + k);
+            let cell = this.getVoronoiCell3D(x + i, y + j, z + k);
             let dist = (cell.x - x) ** 2 + (cell.y - y) ** 2 + (cell.z - z) ** 2;
             if (dist < bestDist) bestDist = dist;
         }
         return bestDist;
     }
-    static reSeed() {
-        Random.seed = Math.random() * 1000;
-        Random.sampleSeed = Math.random() * 1000;
+    reSeed() {
+        this.seed = Math.random() * 1000;
+        this.sampleSeed = Math.random() * 1000;
+    }
+    static uniform(seed) {
+        seed += 1e5;
+        let a = (seed * 638835776.12849) % 8.7890975;
+        let b = (a * 256783945.4758903) % 2.567890;
+        let r = Math.abs(a * b * 382749.294873597) % 1;
+        return r;
+    }
+    static normal(seed) {
+        return (Random.uniform(seed) + Random.uniform(seed + 1000) + Random.uniform(seed + 2000)) / 3;
     }
 }
-Random.reSeed();
-Random.uniform = function (seed) {
-    seed += 1e5;
-    let a = (seed * 638835776.12849) % 8.7890975;
-    let b = (a * 256783945.4758903) % 2.567890;
-    let r = Math.abs(a * b * 382749.294873597) % 1;
-    return r;
+{
+    function construct(seed, sampleSeed, distribution = Random.uniform) {
+        if (typeof seed === "function") {
+            distribution = seed;
+            seed = undefined;
+        } else if (typeof sampleSeed === "function") {
+            distribution = sampleSeed;
+            sampleSeed = undefined;
+        }
+        this.reSeed();
+        if (seed !== undefined) this.seed = seed;
+        if (sampleSeed !== undefined) this.sampleSeed = sampleSeed;
+        this.distribution = distribution;
+    }
+    
+    const names = Object.getOwnPropertyNames(Random.prototype);
+    for (let i = 0; i < names.length; i++) {
+        const name = names[i];
+        if (name === "constructor") continue;
+        const fn = Random.prototype[name];
+        Random[name] = fn.bind(Random);
+    }
+
+    // setup
+    construct.call(Random);
+    Random.prototype.constructor = construct;
 };
-Random.normal = function (seed) {
-    return (Random.uniform(seed) + Random.uniform(seed + 1000) + Random.uniform(seed + 2000)) / 3;
-};
-Random.distribution = Random.uniform;
