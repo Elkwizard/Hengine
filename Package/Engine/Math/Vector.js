@@ -200,12 +200,12 @@ class Vector2 extends Vector {
 	cross(v) {
 		return this.x * v.y - this.y * v.x;
 	}
-	projectOnto(v) {
+	projectOnto(v, result) {
 		let u = this;
 		let dot = u.x * v.x + u.y * v.y;
 		let mag2 = v.x ** 2 + v.y ** 2;
 		let k = dot / mag2;
-		return new Vector2(v.x * k, v.y * k);
+		return v.times(k, result);
 	}
 	normalize() {
 		let m = this.mag;
@@ -328,9 +328,12 @@ class Vector3 extends Vector {
 		this.y = y;
 		this.z = z;
 	}
-	cross(v) {
+	cross(v, result = new Vector3()) {
 		const u = this;
-		return new Vector3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
+		result.x = u.y * v.z - u.z * v.y;
+		result.y = u.z * v.x - u.x * v.z;
+		result.z = u.x * v.y - u.y * v.x;
+		return result;
 	}
 	rotateAboutAxis(axis, angle) {
 		const randomVectorX = (axis.x === 0 && axis.y === 0 && axis.z !== 0) ? 1 : 0;
@@ -375,8 +378,8 @@ class Vector3 extends Vector {
 
 		return this;
 	}
-	rotatedAboutAxis(axis, angle) {
-		return this.get().rotateAboutAxis(axis, angle);
+	rotatedAboutAxis(axis, angle, result) {
+		return this.get(result).rotateAboutAxis(axis, angle);
 	}
 	static get left() {
 		return new Vector3(-1, 0, 0);
@@ -478,7 +481,7 @@ Vector4.modValues = ["x", "y", "z", "w"];
 
 
 (function () {
-	// angles
+	// angles for Vector3 and Vector4
 
 	const combinations = [
 		["x", "y"],
