@@ -52,10 +52,7 @@ class TEXT_AREA extends ElementScript {
 	}
 	setValue(obj, value) {
 		value += "";
-		this.value = "";
-		for (let i = 0; i < value.length; i++) {
-			this.processKey(value[i]);
-		}
+		this.value = value;
 		this.updateTextBoundingBox();
 		this.saveVersion();
 	}
@@ -422,7 +419,6 @@ class TEXT_AREA extends ElementScript {
 		if (this.focused && queue.length) {
 			this.keyTimer = 0;
 			for (let key of queue) {
-
 				if (key === "Control" || key === "Shift") continue;
 				if (keyboard.pressed("Control") && !this.keyboardShortcuts.includes(key.toLowerCase())) continue;
 
