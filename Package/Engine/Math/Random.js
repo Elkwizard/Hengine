@@ -8,11 +8,14 @@ class Random {
     random() {
         return this.seedRand(this.seed++);
     }
-    randInt(min, max) {
+    int(min, max) {
         return Math.floor(this.random() * (max - min + 1) + min);
     }
     bool(chance = 0.5) {
         return this.random() < chance;
+    }
+    sign() {
+        return (this.random() < 0.5) ? -1 : 1;
     }
     range(min = 0, max = 1) {
         return this.random() * (max - min) + min;
