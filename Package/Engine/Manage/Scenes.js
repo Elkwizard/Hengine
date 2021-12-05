@@ -23,20 +23,21 @@ class Scene {
 		}
 	}
 	rayCast(origin, ray, mask = () => true) {
-		let shapes = this.main.updateArray().filter(el => mask(el));
-		shapes = shapes.filter(shape => !(shape instanceof UIObject));
+		const elements = this.main.updateArray()
+			.filter(el => !(shape instanceof UIObject) && mask(el));
 		let bestDist = Infinity;
 		let hitShape = null;
 		let hit = null;
-		for (const shape of shapes) {
-			let models = shape.getAllModels();
-			let result = Geometry.rayCast(origin, ray, models);
+		for (let i = 0; i < elements.length; i++) {
+			const element = elements[i];
+			const models = element.getAllModels();
+			const result = Geometry.rayCast(origin, ray, models);
 			if (result.hitPoint) {
-				let hp = result.hitPoint;
-				let dist = (hp.x - origin.x) ** 2 + (hp.y - origin.y) ** 2;
+				const hp = result.hitPoint;
+				const dist = (hp.x - origin.x) ** 2 + (hp.y - origin.y) ** 2;
 				if (dist < bestDist) {
 					bestDist = dist;
-					hitShape = shape;
+					hitShape = element;
 					hit = hp;
 				}
 			}
@@ -44,22 +45,25 @@ class Scene {
 		return { hitPoint: hit, hitShape };
 	}
 	collidePoint(point, override = true) {
-		let collideAry = [];
-		let options = this.main.updateArray().filter(e => e.onScreen || override);
-		for (const hitbox of options) {
-			let p = (hitbox instanceof UIObject) ? this.camera.worldSpaceToScreenSpace(point) : point;
-			let shapes = hitbox.getAllConvexModels();
-			let colliding = false;
-			for (const shape of shapes) if (Geometry.overlapPoint(p, shape)) colliding = true;
-			if (colliding) {
-				collideAry.push(hitbox);
-			}
+		const collideAry = [];
+		const options = this.main.updateArray()
+			.filter(e => e.onScreen || override);
+		for (let i = 0; i < options.length; i++) {
+			const element = options[i];
+			const p = (element instanceof UIObject) ? this.camera.worldSpaceToScreenSpace(point) : point;
+			const models = element.getAllConvexModels();
+			for (let j = 0; j < models.length; j++)
+				if (Geometry.overlapPoint(p, models[j])) {
+					collideAry.push(element);
+					break;
+				}
 		}
 		return collideAry;
 	}
 	collidePointBoth(point, override = true) {
 		const collideAry = this.collidePoint(point, override);
-		return [collideAry, this.main.sceneObjectArray.filter(e => !collideAry.includes(e))];
+		const collideSet = new Set(collideAry);
+		return [collideAry, this.main.sceneObjectArray.filter(e => !collideSet.has(e))];
 	}
 	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null) {
 		const con = new PhysicsConstraint2.Length(a.scripts.PHYSICS.body, b.scripts.PHYSICS.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length);

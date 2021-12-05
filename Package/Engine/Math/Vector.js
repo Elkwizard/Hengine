@@ -6,89 +6,46 @@ class Vector extends Operable {
 		this.mag = Math.sqrt(a);
 	}
 	get sqrMag() {
-		let sum = 0;
-		for (let x of this.constructor.modValues) {
-			if (typeof this[x] !== "number") continue;
-			let i = 0;
-			let j = this[x];
-			let dif = i - j;
-			sum += dif ** 2;
-		}
-		let dist = sum;
-		return dist;
+		return this.dot(this);
 	}
 	set mag(m) {
-		this.normalize();
-		this.mul(m);
-		return this;
+		return this.mul(m / this.mag);
 	}
 	get mag() {
-		let sum = 0;
-		for (let x of this.constructor.modValues) {
-			if (typeof this[x] !== "number") continue;
-			let i = 0;
-			let j = this[x];
-			let dif = i - j;
-			sum += dif ** 2;
-		}
-		let dist = Math.sqrt(sum);
-		return dist;
+		return Math.sqrt(this.sqrMag);
 	}
 	set normalized(a) {
-		let m = this.mag;
-		this.x = a.x * m;
-		this.y = a.y * m;
+		a.times(this.mag, this);
 	}
 	get normalized() {
 		return this.get().normalize();
 	}
 	set inverse(a) {
-		a.inverse.get(this);
+		this.set(a).invert();
 	}
 	get inverse() {
 		return this.times(-1);
-	}
-	op(v, e) {
-		if (typeof v === "number") {
-			for (let x of this.constructor.modValues) {
-				this[x] = e(this[x], v);
-			}
-		} else if (v instanceof Vector) {
-			for (let x of this.constructor.modValues) {
-				this[x] = e(this[x], v[x] || 0);
-			}
-		}
-		return this;
 	}
 	invert() {
 		return this.mul(-1);
 	}
 	compare(v1, v2) {
-		if (v1.dot(this) > v2.dot(this)) return v1;
-		return v2;
+		return (v1.dot(this) > v2.dot(this)) ? v1 : v2;
 	}
 	normalize() {
-		let sum = 0;
-		for (let x of this.constructor.modValues) {
-			if (typeof this[x] !== "number") continue;
-			let i = 0;
-			let j = this[x];
-			let dif = i - j;
-			sum += dif ** 2;
-		}
-		let dist = Math.sqrt(sum);
-		if (dist <= 0) {
-			return this;
-		}
-		for (let x of this.constructor.modValues) {
-			if (typeof this[x] !== "number") continue;
-			this[x] /= dist;
-		}
+		const { mag } = this;
+		if (mag > 0) return this.div(mag);
 		return this;
 	}
 	dot(v) {
+		const { modValues } = this.constructor;
+
 		let result = 0;
-		for (let x of this.constructor.modValues) result += this[x] * v[x];
+		for (let i = 0; i < modValues.length; i++) {
+			const field = modValues[i];
+			result += this[field] * v[field];
+		}
+
 		return result;
 	}
 	projectOnto(v) {
@@ -101,9 +58,7 @@ class Vector extends Operable {
 		else return this.get();
 	}
 	toString() {
-		let ary = [];
-		for (let n of this.constructor.modValues) ary.push(this[n]);
-		return "\u27e8 " + ary.join(", ") + " \u27e9";
+		return `\u27e8 ${this.values.join(", ")} \u27e9`;
 	}
 	toFixed(digits) {
 		return this.map(v => v.toFixed(digits)).toString();

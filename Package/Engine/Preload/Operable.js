@@ -35,7 +35,7 @@ class Operable {
         } else {
             for (let i = 0; i < modValues.length; i++) {
                 const field = modValues[i];
-                this[field] = fn(this[field], v[field]);
+                this[field] = fn(this[field], v[field] ?? 0);
             }
         }
         return this;

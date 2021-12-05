@@ -109,10 +109,12 @@ class FileSystem { };
 
 	function getReferenced(fs, address) {
 		const entries = getDirectoryEntries(fs, address);
-		let referenced = new Set([address]);
+		const referenced = new Set([address]);
 		for (const [name, fileAddress] of entries) {
 			if (name !== "...dir" && name !== "..dir") {
-				if (getFileExt(name) === "dir") for (const address of getReferenced(fs, fileAddress)) referenced.add(address);
+				if (getFileExt(name) === "dir")
+					for (const address of getReferenced(fs, fileAddress))
+						referenced.add(address);
 				else referenced.add(fileAddress);
 			}
 		}

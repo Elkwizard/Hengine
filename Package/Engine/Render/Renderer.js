@@ -125,7 +125,7 @@ class Artist {
 				}
 				return { text, x, y }
 			},
-			text(font, text, x, y, pack = false) {
+			text(drawText, font, text, x, y, pack = false) {
 				if (typeof x === "object") {
 					pack = y ?? false;
 					({ x, y } = x);
@@ -158,7 +158,7 @@ class Artist {
 						}
 					}
 
-					textRequests.push({ text: blocks[i], x: ax, y: ay });
+					drawText(blocks[i], ax, ay);
 				}
 				return textRequests
 			},
@@ -212,10 +212,7 @@ class Artist {
 				this.c.fill();
 			},
 			text(font, text, x, y, pack) {
-				let req = pathObj.text(font, text, x, y, pack);
-				for (let r of req) {
-					this.c.fillText(r.text, r.x, r.y);
-				}
+				pathObj.text(this.c.fillText.bind(this.c), font, text, x, y, pack);
 			},
 			textLine(font, text, x, y) {
 				let req = pathObj.textLine(font, text, x, y);
@@ -264,10 +261,7 @@ class Artist {
 				this.c.stroke();
 			},
 			text(font, text, x, y, pack) {
-				let req = pathObj.text(font, text, x, y, pack);
-				for (let r of req) {
-					this.c.strokeText(r.text, r.x, r.y);
-				}
+				pathObj.text(this.c.strokeText.bind(this.c), font, text, x, y, pack);
 			},
 			textLine(font, text, x, y) {
 				let req = pathObj.textLine(font, text, x, y);

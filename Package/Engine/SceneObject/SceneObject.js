@@ -222,19 +222,22 @@ class SceneObject extends SceneElement {
 		const pos = Vector2.origin;
 		const entries = [];
 		for (let entry of this.shapes) entries.push(entry);
-		for (let i = 0; i < entries.length; i++) this.addShape(entries[i][0], entries[i][1].scaleAbout(pos, factor));
+		for (let i = 0; i < entries.length; i++)
+			this.addShape(entries[i][0], entries[i][1].scaleAbout(pos, factor));
 		this.cacheDimensions();
 	}
 	scaleX(factor) {
 		let entries = [];
 		for (let entry of this.shapes) entries.push(entry);
-		for (let i = 0; i < entries.length; i++) this.addShape(entries[i][0], entries[i][1].scaleXAbout(0, factor));
+		for (let i = 0; i < entries.length; i++)
+			this.addShape(entries[i][0], entries[i][1].scaleXAbout(0, factor));
 		this.cacheDimensions();
 	}
 	scaleY(factor) {
 		let entries = [];
 		for (let entry of this.shapes) entries.push(entry);
-		for (let i = 0; i < entries.length; i++) this.addShape(entries[i][0], entries[i][1].scaleYAbout(0, factor));
+		for (let i = 0; i < entries.length; i++)
+			this.addShape(entries[i][0], entries[i][1].scaleYAbout(0, factor));
 		this.cacheDimensions();
 	}
 	hide() {
