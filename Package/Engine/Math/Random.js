@@ -20,6 +20,9 @@ class Random {
     range(min = 0, max = 1) {
         return this.random() * (max - min) + min;
     }
+    lerp(a, b) {
+        return Interpolation.lerp(a, b, this.random());
+    }
     angle() {
         return this.random() * 2 * Math.PI;
     }
