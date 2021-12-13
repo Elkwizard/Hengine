@@ -386,16 +386,10 @@ class Geometry {
         return { hitPoint: hit, hitShape };
     }
     static closestPointOnLine(p, l) {
-        return p.Vminus(l.a).projectOnto(l.b.Vminus(l.a)).Vplus(l.a);
-    }
-    static closestPointOnLineLimited(p, l) {
-        let outOfBounds = false;
-        let onLine = Geometry.closestPointOnLine(p, l);
-        let xRange = new Range(l.a.x, l.b.x);
-        let yRange = new Range(l.a.y, l.b.y);
-        if (!xRange.includes(onLine.x)) outOfBounds = true;
-        else if (!yRange.includes(onLine.y)) outOfBounds = true;
-        return { result: new Vector2(X, Y), outOfBounds };
+        const v = l.b.Vminus(l.a);
+        const { sqrMag } = v;
+        const t = p.Vminus(l.a).dot(v) / sqrMag;
+        return v.Vtimes(Number.clamp(t, 0, 1)).Vplus(l.a);
     }
     static subdividePolygonList(vertices) {
         vertices = [...vertices];
