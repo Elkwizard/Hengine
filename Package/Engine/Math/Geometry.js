@@ -389,7 +389,7 @@ class Geometry {
         const v = l.b.Vminus(l.a);
         const { sqrMag } = v;
         const t = p.Vminus(l.a).dot(v) / sqrMag;
-        return v.Vtimes(Number.clamp(t, 0, 1)).Vplus(l.a);
+        return v.Ntimes(Number.clamp(t, 0, 1)).Vplus(l.a);
     }
     static subdividePolygonList(vertices) {
         vertices = [...vertices];
