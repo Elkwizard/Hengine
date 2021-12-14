@@ -8,6 +8,10 @@ class Random {
     random() {
         return this.seedRand(this.seed++);
     }
+    normalZ(mu = 0, sd = 1) {
+        const area = this.random();
+        return mu + sd * Math.log(1 / area - 1) / -1.8;
+    }
     int(min, max) {
         return Math.floor(this.random() * (max - min + 1) + min);
     }
@@ -201,10 +205,23 @@ class Random {
         let r = Math.abs(a * b * 382749.294873597) % 1;
         return r;
     }
-    static normal(seed) {
-        return (Random.uniform(seed) + Random.uniform(seed + 1000) + Random.uniform(seed + 2000)) / 3;
-    }
 }
+
+{ // normal distribution
+    
+    const mu = 0.5;
+    const sd = 0.2;
+    const normalcdf = x => 1 / (1 + Math.exp(-1.8 * (x - mu) / sd));
+    const invnorm = area => mu + sd * Math.log(1 / area - 1) / -1.8;
+    const area0 = normalcdf(0);
+    const area1 = normalcdf(1);
+    
+    Random.normal = function (seed) {
+		const area = Random.uniform(seed) * (area1 - area0) + area0;
+		return invnorm(area);
+    }
+};
+
 {
     function construct(seed, sampleSeed, distribution = Random.uniform) {
         if (typeof seed === "function") {
