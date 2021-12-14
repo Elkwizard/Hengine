@@ -575,21 +575,20 @@ class Geometry {
         return dif;
     }
     static closestPointOnPolygon(point, polygon) {
-        let toB = polygon.middle.Vminus(point);
-        let edges = polygon.getEdges().filter(e => {
-            let v = e.b.Vminus(e.a).normal;
-            return v.dot(toB) > 0;
-        })
         let bestPoint = null;
         let bestDist = Infinity;
-        for (const edge of edges) {
-            let p = Geometry.closestPointOnLine(point, edge);
-            let dist = Vector2.sqrDist(p, point);
+
+        const edges = polygon.getEdges();
+        for (let i = 0; i < edges.length; i++) {
+            const edge = edges[i];
+            const closest = Geometry.closestPointOnLine(point, edge);
+            const dist = Vector2.sqrDist(point, closest);
             if (dist < bestDist) {
                 bestDist = dist;
-                bestPoint = p;
+                bestPoint = closest;
             }
         }
+
         return bestPoint;
     }
     // dist
