@@ -83,7 +83,7 @@ class Font {
 		return str
 			.split("\n")
 			.map(line => {
-				let lineStart = false;
+				let lineStart = true;
 				const words = line.split(" ");
 				const lines = [];
 				let acc = "";
