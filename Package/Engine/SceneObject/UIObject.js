@@ -9,4 +9,8 @@ class UIObject extends SceneObject {
             this.scripts.run("escapeDraw");
         });
     }
+    collidePoint(point) {
+        point = this.engine.scene.camera.worldSpaceToScreenSpace(point);
+        return super.collidePoint(point);
+    }
 }

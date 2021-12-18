@@ -240,6 +240,12 @@ class SceneObject extends SceneElement {
 			this.addShape(entries[i][0], entries[i][1].scaleYAbout(0, factor));
 		this.cacheDimensions();
 	}
+	collidePoint(point) {
+		const models = this.getAllConvexModels();
+		for (let j = 0; j < models.length; j++)
+			if (Geometry.overlapPoint(point, models[j])) return true;
+		return false;
+	}
 	hide() {
 		this.hidden = true;
 		this.logMod(function () {

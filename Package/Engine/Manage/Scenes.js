@@ -45,20 +45,8 @@ class Scene {
 		return { hitPoint: hit, hitShape };
 	}
 	collidePoint(point, override = true) {
-		const collideAry = [];
-		const options = this.main.updateArray()
-			.filter(e => e.onScreen || override);
-		for (let i = 0; i < options.length; i++) {
-			const element = options[i];
-			const p = (element instanceof UIObject) ? this.camera.worldSpaceToScreenSpace(point) : point;
-			const models = element.getAllConvexModels();
-			for (let j = 0; j < models.length; j++)
-				if (Geometry.overlapPoint(p, models[j])) {
-					collideAry.push(element);
-					break;
-				}
-		}
-		return collideAry;
+		return this.main.updateArray()
+			.filter(e => (e.onScreen || override) && e.collidePoint(point));
 	}
 	collidePointBoth(point, override = true) {
 		const collideAry = this.collidePoint(point, override);
