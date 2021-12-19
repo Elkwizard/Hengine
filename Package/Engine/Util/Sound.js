@@ -1,60 +1,81 @@
 class SynthChannel {
     constructor(synth) {
         this.synth = synth;
-        this.osc = synth.c.createOscillator();
-        this.gain = synth.c.createGain();
+        this.osc = new OscillatorNode(synth.c);
+        this.gain = new GainNode(synth.c, {
+            gain: 0
+        });
         this.osc.connect(this.gain);
-        this.gain.connect(synth.destination);
-        this.gain.gain.setValueAtTime(0, this.synth.time);
+        
         this.osc.start();
 
         this.playing = false;
+        this.fadeOut = 0;
     }
-    setVolume(volume, time = this.synth.time) {
-        this.gain.gain.setTargetAtTime(volume, time, SynthChannel.BUFFER_S);
+    setVolume(volume, time = this.synth.time, extraBuffer = 0) {
+        this.synth.adjustGain(time, SynthChannel.BUFFER + extraBuffer);
+        this.gain.gain.setTargetAtTime(
+            volume, // target
+            time / 1000, // start time
+            (SynthChannel.BUFFER + extraBuffer) / 1000 // time constant
+        );
     }
     start({
         note,
         octave,
         frequency = Synth.noteToHertz(note, octave),
         volume = 1,
-        wave = "sine"
+        wave = "sine",
+        fadeOut = 0,
     }) {
+        this.playing = true;
+        this.gain.connect(this.synth.destination);
         this.osc.frequency.value = frequency;
         this.osc.type = wave;
+
+        // adjust synth gain
+        this.synth.active++;
         this.setVolume(volume);
-        this.playing = true;
+
+        this.fadeOut = fadeOut;
     }
     stop(wait = 0) {
-        const endTime = this.synth.time + wait / 1000;
+        const endTime = this.synth.time + wait;
 
-        this.setVolume(0, endTime);
+        // adjust synth gain
+        this.synth.active--;
+        this.setVolume(0, endTime, this.fadeOut);
 
         setTimeout(() => {
+            this.gain.disco
             this.playing = false;
-        }, wait + 5 * SynthChannel.BUFFER_MS);
+        }, wait + 5 * (this.fadeOut + SynthChannel.BUFFER));
 
         return new Promise(resolve => setTimeout(resolve, wait));
     }
 }
-SynthChannel.BUFFER_S = 0.005;
-SynthChannel.BUFFER_MS = SynthChannel.BUFFER_S * 1000;
+SynthChannel.BUFFER = 15;
 
 class Synth {
     constructor() {
         this.c = new (window.AudioContext ?? window.webkitAudioContext)({
-            sampleRate: 48000
+            sampleRate: 44100
         });
         this.channels = new Set();
-        this.destination = this.c.createDynamicsCompressor();
+        this.active = 0;
+        this.destination = new GainNode(this.c);
         this.destination.connect(this.c.destination);
     }
     get time() {
-        return this.c.currentTime;
+        return this.c.currentTime * 1000;
     }
-    async playSequence(all, globals = {}) {
-        for (const info of all)
-            await this.play({ ...globals, ...info });
+    adjustGain(time, buffer) {
+        const active = 2 + this.active;
+        this.destination.gain.setTargetAtTime(
+            1 / active,
+            time / 1000,
+            buffer / 1000
+        );
     }
     play(info) {
         if (info.duration !== undefined && info.volume === 0)
@@ -79,6 +100,10 @@ class Synth {
     }
     pause(duration) {
         return new Promise(resolve => setTimeout(resolve, duration));
+    }
+    async playSequence(all, globals = {}) {
+        for (const info of all)
+            await this.play({ ...globals, ...info });
     }
     static noteToHertz(note = "A", octave = 4) {
         return Synth.EXP_FACTOR * Synth.EXP_BASE ** (Synth.NOTE_INDEX_MAP[note[0].toUpperCase() + note.slice(1).toLowerCase()] + octave * 12);
