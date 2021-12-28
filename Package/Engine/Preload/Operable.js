@@ -6,7 +6,8 @@ class Operable {
         return this.constructor.modValues.map(field => this[field]);
     }
     set(...values) {
-        if (values[0] instanceof this.constructor) return values[0].get(this);
+        if (values[0] instanceof this.constructor)
+            return values[0].get(this);
         const { modValues } = this.constructor;
         for (let i = 0; i < modValues.length; i++) {
             const field = modValues[i];
@@ -105,7 +106,10 @@ class Operable {
         return result;
     }
     static get empty() {
-        return new this(...[...this.modValues].fill(0));
+        // return new this(...[...this.modValues].fill(0));
+        return new (this.emptyConstructor ??= this.bind(
+            null, ...new Uint8Array(this.modValues.length)
+        ));
     }
     static defineReference(obj, key, value) {
         const mod = value.constructor.modValues;
@@ -187,6 +191,7 @@ class Operable {
 
 Operable.EPSILON = 0.000001;
 Operable.modValues = [];
+Operable.emptyConstructor = null;
 Operable.addFunc = (a, b) => a + b;
 Operable.subFunc = (a, b) => a - b;
 Operable.mulFunc = (a, b) => a * b;
