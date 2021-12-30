@@ -708,6 +708,7 @@ class Artist {
 	drawImageInternal(x, y, width, height) {
 		if (!this.currentImage.renderable) return;
 		if (typeof x === "object") ({ x, y, width, height } = x);
+		if (width * height === 0) return;
 		this.c.drawImage(this.currentImageCIS, x, y, width, height);
 	}
 	image(img) {
@@ -721,11 +722,6 @@ class Artist {
 	}
 	unclip() {
 		this.restore();
-	}
-	contentToFrame() {
-		let n = new Frame(this.width, this.height);
-		n.c.drawImage(this.canvas, 0, 0);
-		return n;
 	}
 	sigmoid(x) {
 		return 1 / (1 + (Math.E ** -x));

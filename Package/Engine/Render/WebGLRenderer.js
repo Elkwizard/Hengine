@@ -390,11 +390,6 @@ class WebGLArtist {
 		if (changed) this.gl.updateTextureCache(this.currentImageCIS);
 		return this.imageObj;
 	}
-	contentToFrame() {
-		let n = new Frame(this.width, this.height);
-		n.c.drawImage(this.canvas, 0, 0);
-		return n;
-	}
 	clearTransformations() {
 		this.gl.setTransform(Matrix3.identity(this.currentTransform));
 		this.scale(this.pixelRatio);
