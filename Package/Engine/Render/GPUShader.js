@@ -87,14 +87,9 @@ class GLSLProgram {
 			activeCache: {}
 		}, {
 			get(object, method) {
-				const lost = gl.isContextLost();
-				if (lost) {
-					if (method in object.lostCache) return object.lostCache[method];
-					return object.lostCache[method] = (...args) => queuedCalls.push({ method, args });
-				} else {
-					if (method in object.activeCache) return object.activeCache[method];
-					return object.activeCache[method] = (...args) => gl[method](...args);
-				}
+				return gl.isContextLost() ? 
+					object.lostCache[method] ??= (...args) => queuedCalls.push({ method, args })
+					: object.activeCache[method] ??= (...args) => gl[method](...args);
 			}
 		});
 		
@@ -198,7 +193,7 @@ class GLSLProgram {
 						function writeImage(image, index = 0) {
 							if (index >= length) return;
 							const imagePixelated = image instanceof Texture;
-							const imageCIS = (image instanceof Texture) ? image.imageData : image.makeImage();
+							const imageCIS = (image instanceof Texture) ? image.imageData : image.makeWebGLImage();
 							GL.activeTexture(gl.TEXTURE0 + indices[index]);
 							if (imagePixelated !== pixelated) {
 								pixelated = imagePixelated;
@@ -206,7 +201,6 @@ class GLSLProgram {
 								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
 								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
 							}
-							// console.log(imageCIS);
 							GL.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
 						}
 						if (array) set = images => images.forEach(writeImage);
@@ -441,6 +435,7 @@ class GLSLProgram {
 		} else this.error("ATTRIBUTE_SET", `No attributes with vertex divisor '${divisor}' exist`);
 	}
 }
+
 class GPUShader extends ImageType {
 	constructor(width, height, glsl, pixelRatio = 1) {
 		super(width, height, pixelRatio);
@@ -621,7 +616,8 @@ void main() {
 		this.setArguments({ [arg]: value });
 	}
 	setArguments(uniformData = {}) {
-		for (const key in uniformData) this.program.setUniform(key, uniformData[key]);
+		for (const key in uniformData)
+			this.program.setUniform(key, uniformData[key]);
 		this.loaded = false;
 	}
 	makeImage() {

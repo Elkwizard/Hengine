@@ -33,6 +33,14 @@ class ImageType {
 		this.loaded = true;
 		this._pixelRatio = pixelRatio;
 	}
+	set loaded(a) {
+		this._loaded = a;
+		if (this.needsWebGLProxy && a === false)
+			this.webGLImageLoaded = false;
+	}
+	get loaded() {
+		return this._loaded;
+	}
 	set width(a) {
 		a = ImageType.roundDimension(a);
 		const prev = this._width;
@@ -91,6 +99,43 @@ class ImageType {
 	}
 	makeImage() {
 		return null;
+	}
+	makeWebGLImage() { // acquire a version of the image which can be used in webgl
+		const image = this.makeImage();
+
+		this.needsWebGLProxy ??= ( // chrome os doesn't allow webgl canvases as texImage2d arguments
+			navigator.appVersion.indexOf("CrOS") > -1 &&
+			(
+				image instanceof HTMLCanvasElement ||
+				(
+					"OffscreenCanvas" in window &&
+					image instanceof window.OffscreenCanvas
+				)
+			) &&
+			image.getContext("webgl2") !== null
+		);
+
+		if (this.needsWebGLProxy) {
+			const { width, height } = image;
+			this.webGLImage ??= new_OffscreenCanvas(width, height);
+			this.webGLImageContext ??= this.webGLImage.getContext("2d");
+			
+			// resize if necessary
+			if (this.webGLImage.width !== width)
+				this.webGLImage.width = width;
+			if (this.webGLImage.height !== height)
+				this.webGLImage.height = height;
+			
+			if (this.webGLImageLoaded !== true) {
+				this.webGLImageContext.clearRect(0, 0, width, height);
+				this.webGLImageContext.drawImage(image, 0, 0);
+				if (this.webGLImageLoaded === false)
+					this.webGLImageLoaded = true;
+			}
+
+			return this.webGLImage;
+		}
+		return image;
 	}
 	toDataURL() {
 		const canvas = document.createElement("canvas");

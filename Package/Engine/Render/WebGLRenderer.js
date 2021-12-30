@@ -385,7 +385,7 @@ class WebGLArtist {
 	}
 	image(img, changed = false) {
 		this.currentImage = img;
-		this.currentImageCIS = img.makeImage();
+		this.currentImageCIS = img.makeWebGLImage();
 		if (!this.currentImage.renderable) return this.dummyImageObj;
 		if (changed) this.gl.updateTextureCache(this.currentImageCIS);
 		return this.imageObj;
@@ -510,7 +510,7 @@ class FastFrame extends ImageType {
 	stretch(w, h) {
 		if (!h) h = this.inferHeight(w);
 		let f = new FastFrame(w, h, this.pixelRatio);
-		f.renderer.gl.texturedQuad(0, 0, w, h, 0, 0, 1, 1, this.makeImage());
+		f.renderer.gl.texturedQuad(0, 0, w, h, 0, 0, 1, 1, this.makeWebGLImage());
 		return f;
 	}
 	clip(x, y, width, height) {
@@ -522,7 +522,7 @@ class FastFrame extends ImageType {
 	}
 	get(f = new FastFrame(this.width, this.height, this.pixelRatio)) {
 		f.renderer.resize(this.width, this.height);
-		f.renderer.gl.texturedQuad(0, 0, this.width, this.height, 0, 0, 1, 1, this.makeImage());
+		f.renderer.gl.texturedQuad(0, 0, this.width, this.height, 0, 0, 1, 1, this.makeWebGLImage());
 		return f;
 	}
 	static fromImageType(img, x, y, width, height) {
@@ -533,7 +533,7 @@ class FastFrame extends ImageType {
 		width ??= img.width;
 		height ??= img.height;
 
-		const offscreen = img.makeImage();
+		const offscreen = img.makeWebGLImage();
 		const frame = new FastFrame(width, height, offscreen.width / img.width);
 		frame.renderer.gl.texturedQuad(0, 0, width, height, x / img.width, y / img.height, width / img.width, height / img.height, offscreen);
 		return frame;
