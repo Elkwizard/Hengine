@@ -324,7 +324,7 @@ class TouchHandler extends InputHandler {
 	addListeners() {
 		const addHandler = (eventName, target) => {
 			document.addEventListener(eventName, event => {
-				if (event.cancelable) event.preventDefault();
+				if (eventName !== "pointerdown" && event.cancelable) event.preventDefault();
 				this.updateTouch(event, target);
 			}, { passive: false });
 		};

@@ -96,48 +96,41 @@ class Random {
     perlin(x, f = 1, seed = this.sampleSeed) {
         x *= f;
         x += seed;
-        const s_0 = n => this.seedRand(Math.floor(n));
+
         let xt = x % 1;
         if (xt < 0) xt++;
-        return Interpolation.smoothLerp(
-            s_0(x), s_0(x + 1), 
-            xt
-        );
+		xt = Interpolation.smooth(xt);
+		x = ~~x;
+        
+		return this.seedRand(x) * (1 - xt) + this.seedRand(x + 1) * xt;
     }
     perlin2D(x, y, f = 1, seed = this.sampleSeed) {
-        x *= f;
         y *= f;
-        x += seed;
         y += seed;
-        const s_p = (x, y) => this.seedRand(Math.floor(x) + Math.floor(y) * 2000);
-        let xt = x % 1;
+
         let yt = y % 1;
-        if (xt < 0) xt++;
         if (yt < 0) yt++;
-        return Interpolation.smoothQuadLerp(
-            s_p(x, y), s_p(x + 1, y), s_p(x, y + 1), s_p(x + 1, y + 1), 
-            xt, yt
-        );
+		yt = Interpolation.smooth(yt);
+		y = ~~y;
+
+		const top = this.perlin(x + y * 2000, f, seed);
+		const bottom = this.perlin(x + (y + 1) * 2000, f, seed);
+
+		return top * (1 - yt) + bottom * yt;
     }
     perlin3D(x, y, z, f = 1, seed = this.sampleSeed) {
-        x *= f;
-        y *= f;
-        z *= f;
-        x += seed;
-        y += seed;
+		z *= f;
         z += seed;
-        const s_p = (x, y, z) => this.seedRand(this.seedRand(Math.floor(x)) + this.seedRand(Math.floor(y) * 2000) + this.seedRand(Math.floor(z) * 2000000));
-        let xt = x % 1;
-        let yt = y % 1;
+
         let zt = z % 1;
-        if (xt < 0) xt++;
-        if (yt < 0) yt++;
         if (zt < 0) zt++;
-        return Interpolation.smoothCubeLerp(
-            s_p(x, y, z), s_p(x + 1, y, z), s_p(x, y + 1, z), s_p(x + 1, y + 1, z),
-            s_p(x, y, z + 1), s_p(x + 1, y, z + 1), s_p(x, y + 1, z + 1), s_p(x + 1, y + 1, z + 1),
-            xt, yt, zt
-        );
+		zt = Interpolation.smooth(zt);
+		z = ~~z;
+
+		const front = this.perlin2D(x, y + z * 200000, f, seed);
+		const back = this.perlin2D(x, y + (z + 1) * 200000, f, seed);
+
+		return front * (1 - zt) + back * zt;
     }
     getVoronoiCell(x) {
         return { x: Math.floor(x) + this.seedRand(Math.floor(x)) };

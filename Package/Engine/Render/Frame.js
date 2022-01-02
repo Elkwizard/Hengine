@@ -67,10 +67,10 @@ class ImageType {
 		return this._pixelRatio ?? (this.makeImage().width / this.width);
 	}
 	get pixelWidth() {
-		return Math.floor(this.width * this.pixelRatio);
+		return ImageType.roundDimension(this.width * this.pixelRatio);
 	}
 	get pixelHeight() {
-		return Math.floor(this.height * this.pixelRatio);
+		return ImageType.roundDimension(this.height * this.pixelRatio);
 	}
 	get renderable() {
 		return this.loaded && this.width > 0 && this.height > 0;
