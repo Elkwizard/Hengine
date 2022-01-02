@@ -298,21 +298,21 @@ class Vector3 extends Vector {
 		let xAxisY = axis.z * randomVectorX - axis.x * randomVectorZ;
 		let xAxisZ = -axis.y * randomVectorX;
 
-		const xAxisMagnitude = Math.sqrt(xAxisX ** 2 + xAxisY ** 2 + xAxisZ ** 2);
+		const iXAxisMagnitude = 1 / Math.sqrt(xAxisX ** 2 + xAxisY ** 2 + xAxisZ ** 2);
 
-		xAxisX /= xAxisMagnitude;
-		xAxisY /= xAxisMagnitude;
-		xAxisZ /= xAxisMagnitude;
+		xAxisX *= iXAxisMagnitude;
+		xAxisY *= iXAxisMagnitude;
+		xAxisZ *= iXAxisMagnitude;
 
 		let yAxisX = axis.y * xAxisZ - axis.z * xAxisY;
 		let yAxisY = axis.z * xAxisX - axis.x * xAxisZ;
 		let yAxisZ = axis.x * xAxisY - axis.y * xAxisX;
 
-		const yAxisMagnitude = Math.sqrt(yAxisX ** 2 + yAxisY ** 2 + yAxisZ ** 2);
+		const iYAxisMagnitude = 1 / Math.sqrt(yAxisX ** 2 + yAxisY ** 2 + yAxisZ ** 2);
 
-		yAxisX /= yAxisMagnitude;
-		yAxisY /= yAxisMagnitude;
-		yAxisZ /= yAxisMagnitude;
+		yAxisX *= iYAxisMagnitude;
+		yAxisY *= iYAxisMagnitude;
+		yAxisZ *= iYAxisMagnitude;
 
 		const x = xAxisX * this.x + xAxisY * this.y + xAxisZ * this.z;
 		const y = yAxisX * this.x + yAxisY * this.y + yAxisZ * this.z;

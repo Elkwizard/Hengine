@@ -24,12 +24,12 @@ class ElementScript {
 
 		for (let i = 0; i < props.length; i++) {
 			const prop = props[i];
-			const method = this[prop].bind(this);
-			this[prop] = (...args) => method(sceneObject, ...args);
+			this[prop] = this[prop].bind(this, sceneObject);
 		}
 
 		const placeholder = () => true;
-		for (const flag of ElementScript.flags) if (!(flag in this)) this[flag] = placeholder;
+		for (const flag of ElementScript.flags)
+			if (!(flag in this)) this[flag] = placeholder;
 
 		this.sceneObject = sceneObject;
 		this.scriptNumber = 0;
