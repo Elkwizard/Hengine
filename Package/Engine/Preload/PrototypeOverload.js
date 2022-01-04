@@ -199,10 +199,6 @@ Object.defineProperty(window, "title", {
 		}
 		return ary;
 	};
-	proto(Array.prototype, "test", function (test) {
-		for (let i = 0; i < this.length; i++) if (test(this[i])) return true;
-		return false;
-	});
 	proto(Array.prototype, "randomize", function () {
 		const result = [];
 		const copy = [...this];
@@ -210,9 +206,6 @@ Object.defineProperty(window, "title", {
 			result.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
 		}
 		return result;
-	});
-	proto(Array.prototype, "total", function () {
-		return this.reduce((a, b) => a + b);
 	});
 	//Number
 	proto(Number.prototype, "toDegrees", function () {
@@ -226,7 +219,7 @@ Object.defineProperty(window, "title", {
 		return this + dir;
 	});
 	proto(Number.prototype, "toMaxed", function (digits) {
-		return Math.round(this * 10 ** digits) / 10 ** digits + "";
+		return String(Math.round(this * 10 ** digits) / 10 ** digits);
 	});
 	//String
 	proto(String.prototype, "capitalize", function () {
@@ -271,7 +264,7 @@ Object.defineProperty(window, "title", {
 			if (acc.length) {
 				let match = [acc];
 				match.index = startIndex;
-				match.input = this + "";
+				match.input = String(this);
 				match.groups = undefined;
 				result.push(match);
 			}
@@ -291,7 +284,7 @@ Object.defineProperty(window, "title", {
 		function string(value, depth) {
 			if (value === null) return "null";
 			if (typeof value === "string") return JSON.stringify(value);
-			if (typeof value === "number") return value + "";
+			if (typeof value === "number") return String(value);
 			if (typeof value === "bigint") return value + "n";
 			if (typeof value === "function") {
 				value += "";

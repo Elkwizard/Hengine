@@ -58,7 +58,7 @@ class Transform extends Matrix3 {
 		transf.rotation = this.rotation;
 		return transf;
 	}
-	dif(transf) {
+	diff(transf) {
 		const EPSILON = 0.001;
 		let dx = Math.abs(this.position.x - transf.position.x);
 		let dy = Math.abs(this.position.y - transf.position.y);

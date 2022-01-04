@@ -89,7 +89,7 @@ class Color extends Operable {
 			this.alpha = Number.clamp(this.alpha, 0, 1);
 		}
 	}
-	dif(color) {
+	diff(color) {
 		return Color.modValues.map(ch => Math.abs(this[ch] - color[ch])).total();
 	}
 	static get empty() {

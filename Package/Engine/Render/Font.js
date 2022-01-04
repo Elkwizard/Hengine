@@ -70,7 +70,7 @@ class Font {
 		this.c.font = this.toString();
 	}
 	processString(str) {
-		return (str + "").replace(/\r/g, "").replace(/\t/g, this.tabReplacement);
+		return String(str).replace(/\r/g, "").replace(/\t/g, this.tabReplacement);
 	}
 	getWidthCRC2D(str) {
 		if (str in this.memorizedWidths) return this.memorizedWidths[str];

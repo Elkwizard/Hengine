@@ -428,7 +428,8 @@ HengineLoader.engineResources = [
 		"Render/VideoView",
 		"Render/WebGLRenderer",
 		"Render/Renderer",
-		"Render/GPUShader"
+		"Render/GPUShader",
+		"Render/StaticImage"
 	],
 	[ // high level dependencies
 		"SceneObject/UIObject"

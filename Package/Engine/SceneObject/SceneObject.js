@@ -288,7 +288,7 @@ class SceneObject extends SceneElement {
 		this.scripts.run("escapeDraw");
 	}
 	hasMoved() {
-		return this.transform.dif(this.lastTransform);
+		return this.transform.diff(this.lastTransform);
 	}
 	updateCaches() {
 		if (this.hasMoved()) this.cacheBoundingBoxes();
