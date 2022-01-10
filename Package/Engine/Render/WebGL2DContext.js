@@ -399,7 +399,7 @@ ${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
 						}
 					} else { // quad
 						if (boolean(${BOOLS.OUTLINED})) {
-							vec2 d = (lineWidth - 0.6) * scaleFactor / size;
+							vec2 d = lineWidth * scaleFactor / size;
 							vec2 dist = 0.5 - abs(uv - 0.5);
 							vec2 px = 1.0 / size;
 							if (dist.x > d.x + px.x && dist.y > d.y + px.y) discard;

@@ -90,7 +90,10 @@ class Color extends Operable {
 		}
 	}
 	diff(color) {
-		return Color.modValues.map(ch => Math.abs(this[ch] - color[ch])).total();
+		const red = Math.abs(this.red - color.red);
+		const green = Math.abs(this.green - color.green);
+		const blue = Math.abs(this.blue - color.blue);
+		return red + green + blue;
 	}
 	static get empty() {
 		return new Color(0, 0, 0, 0);
