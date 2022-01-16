@@ -317,7 +317,8 @@ class Geometry {
 		let hitShape = null;
 		let bestDist = Infinity;
 		const EPSILON = 0.0001;
-		for (const shape of shapes) {
+		for (let i = 0; i < shapes.length; i++) {
+			const shape = shapes[i];
 			let nHit = null;
 			if (shape instanceof Circle) {
 				let normal = r.normal;
@@ -344,7 +345,8 @@ class Geometry {
 				let dx = r.x;
 				let dy = r.y || EPSILON;
 				let b = p.y - p.x * dy / dx;
-				for (const edge of edges) {
+				for (let j = 0; j < edges.length; j++) {
+					const edge = edges[j];
 					let proj_P = normal.dot(p);
 					let proj_A = normal.dot(edge.a);
 					let proj_B = normal.dot(edge.b);
