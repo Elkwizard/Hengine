@@ -243,7 +243,7 @@ class SceneObject extends SceneElement {
 	collidePoint(point) {
 		const models = this.getAllConvexModels();
 		for (let j = 0; j < models.length; j++)
-			if (Geometry.overlapPoint(point, models[j])) return true;
+			if (models[j].containsPoint(point)) return true;
 		return false;
 	}
 	hide() {
@@ -276,7 +276,7 @@ class SceneObject extends SceneElement {
 		}, this.engine.renderer);
 	}
 	determineOnScreen(screen) {
-		this.onScreen = !this.cullGraphics || Geometry.overlapRectRect(this.graphicalBoundingBox ?? this.__boundingBox, screen);
+		this.onScreen = !this.cullGraphics || screen.intersectSameType(this.graphicalBoundingBox ?? this.__boundingBox);
 		return this.onScreen;
 	}
 	engineDraw(screen) {

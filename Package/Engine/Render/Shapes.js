@@ -1,33 +1,3 @@
-class Line {
-	constructor(x, y, x2, y2) {
-		if (typeof x === "object") {
-			this.a = new Vector2(x.x, x.y);
-			this.b = new Vector2(y.x, y.y);
-		} else {
-			this.a = new Vector2(x, y);
-			this.b = new Vector2(x2, y2);
-		}
-	}
-	get length() {
-		return Vector2.dist(this.a, this.b);
-	}
-	get middle() {
-		return a.Vplus(b).Nmul(0.5);
-	}
-	set vector(v) {
-		this.b = this.a.Vplus(v.normalized.Nmul(this.length));
-	}
-	get vector() {
-		return this.b.Vminus(this.a).normalize();
-	}
-	get slope() {
-		const { a, b } = this;
-		return (b.y - a.y) / (b.x - a.x);
-	}
-	evaluate(x) {
-		return this.slope * (x - this.a.x) + this.a.y;
-	}
-}
 class Range {
 	constructor(min, max) {
 		this._max = Infinity;
@@ -107,22 +77,158 @@ class Shape {
 	constructor() {
 		this.area = 0;
 	}
-	get middle() { }
+	get middle() {
+		return new Vector2(0, 0);
+	}
+	center(pos) {
+		return this.move(pos.minus(this.middle));
+	}
 	getModel(transf) { }
-	center(pos) { }
-	scale(factor) { }
-	scaleX(factor) { }
-	scaleY(factor) { }
+	scale(factor) {
+		this.scaleAbout(this.middle, factor);
+	}
+	scaleX(factor) {
+		this.scaleXAbout(this.middle.x, factor);
+	}
+	scaleY(factor) {
+		this.scaleYAbout(this.middle.y, factor);
+	}
 	scaleAbout(pos, factor) { }
 	scaleXAbout(pos, factor) { }
 	scaleYAbout(pos, factor) { }
 	move(dir) { }
 	getBoundingBox() { }
 	equals(shape) { }
+	intersectSameType() { }
+	intersect(shape) {
+		if (!shape) return false;
+		if (shape instanceof this.constructor)
+			return this.intersectSameType(shape);
+		return !!physicsAPICollideShapes(this, shape);
+	}
+	closestPointTo(point) { }
+	distanceTo(point) {
+		return Vector2.dist(point, this.closestPointTo(point));
+	}
+	containsPoint(point) {
+		return this.closestPointTo(point).equals(point);
+	}
 	get(result = new Shape()) { }
 	toPhysicsShape() { }
 	static fromPhysicsShape(sh) { }
 }
+
+class Line extends Shape {
+	constructor(x, y, x2, y2) {
+		super();
+		if (typeof x === "object") {
+			this.a = new Vector2(x.x, x.y);
+			this.b = new Vector2(y.x, y.y);
+		} else {
+			this.a = new Vector2(x, y);
+			this.b = new Vector2(x2, y2);
+		}
+		this.area = 0;
+	}
+	get length() {
+		return Vector2.dist(this.a, this.b);
+	}
+	get middle() {
+		return a.Vplus(b).Nmul(0.5);
+	}
+	set vector(v) {
+		this.b = this.a.Vplus(v.normalized.Nmul(this.length));
+	}
+	get vector() {
+		return this.b.Vminus(this.a).normalize();
+	}
+	get slope() {
+		const { a, b } = this;
+		return (b.y - a.y) / (b.x - a.x);
+	}
+	evaluate(x) {
+		return this.slope * (x - this.a.x) + this.a.y;
+	}
+	getModel(transf) {
+		const pos = transf.position;
+		const cos = transf.cosRotation;
+		const sin = transf.sinRotation;
+		
+		const { a, b } = this;
+
+		return new Line(
+			a.x * cos - a.y * sin + pos.x,
+			a.x * sin + a.y * cos + pos.y,
+			
+			b.x * cos - b.y * sin + pos.x,
+			b.x * sin + b.y * cos + pos.y
+		);
+	}
+	center(pos) {
+		return this.move(pos.Vminus(this.middle));
+	}
+	scaleAbout(pos, factor) {
+		return new Line(
+			this.a.minus(pos).mul(factor).add(pos),
+			this.b.minus(pos).mul(factor).add(pos)
+		);
+	}
+	scaleXAbout(x, factor) {
+		return new Line(
+			(this.a.x - x) * factor + x, this.a.y,
+			(this.b.x - x) * factor + x, this.b.y
+		);
+	}
+	scaleYAbout(y, factor) {
+		return new Line(
+			this.a.x, (this.a.y - y) * factor + y,
+			this.b.x, (this.b.y - y) * factor + y
+		);
+	}
+	move(dir) {
+		return new Line(
+			this.a.plus(dir),
+			this.b.plus(dir)
+		);
+	}
+	getBoundingBox() {
+		const { a, b } = this;
+		const minX = Math.min(a.x, b.x);
+		const maxX = Math.max(a.x, b.x);
+		const minY = Math.min(a.y, b.y);
+		const maxY = Math.max(a.y, b.y);
+		return new Rect(minX, minY, maxX - minX, maxY - minY);
+	}
+	equals(line) {
+		if (!(line instanceof Line)) return false;
+		return line.a.equals(this.a) && line.b.equals(this.b);
+	}
+	intersectSameType(line) {
+		const check = l => {
+			const dir = l.b.Vminus(l.a);
+			const a = this.a.cross(dir);
+			const b = this.b.cross(dir);
+			const a2 = line.a.cross(dir);
+			const b2 = line.b.cross(dir);
+			const r1 = new Range(a, b);
+			const r2 = new Range(a2, b2);
+			return r1.intersect(r2);
+		};
+		return check(this) && check(line);
+	}
+	closestPointTo(point) {
+		const v = l.b.Vminus(l.a);
+		const { sqrMag } = v;
+		const t = p.Vminus(l.a).dot(v) / sqrMag;
+		return v.Ntimes(Number.clamp(t, 0, 1)).Vplus(l.a);
+	}
+	get(line = new Line(0, 0, 0, 0)) {
+		line.a.set(this.a);
+		line.b.set(this.b);
+		return line;
+	}
+}
+
 
 class Polygon extends Shape {
 	constructor(vertices) {
@@ -175,22 +281,6 @@ class Polygon extends Shape {
 		}
 		return edges;
 	}
-	center(pos) {
-		let offset = pos.Vminus(this.middle);
-		return new Polygon(this.vertices.map(e => e.Vplus(offset)));
-	}
-	scale(factor) {
-		let middle = this.middle;
-		return new Polygon(this.vertices.map(e => middle.Vplus(e.Vminus(middle).Ntimes(factor))));
-	}
-	scaleX(factor) {
-		let middle = this.middle.x;
-		return new Polygon(this.vertices.map(e => new Vector2((e.x - middle) * factor + middle, e.y)));
-	}
-	scaleY(factor) {
-		let middle = this.middle.y;
-		return new Polygon(this.vertices.map(e => new Vector2(e.x, (e.y - middle) * factor + middle)));
-	}
 	scaleAbout(pos, factor) {
 		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))));
 	}
@@ -213,6 +303,41 @@ class Polygon extends Shape {
 		for (let i = 0; i < this.vertices.length; i++)
 			if (!this.vertices[i].equals(shape.vertices[i])) return false;
 		return true;
+	}
+	intersectSameType(polygon) {
+		return !!physicsAPICollideShapes(this, polygon);
+	}
+	closestPointTo(point) {
+		let bestPoint = null;
+		let bestDist = Infinity;
+
+		const edges = this.getEdges();
+		for (let i = 0; i < edges.length; i++) {
+			const edge = edges[i];
+			const closest = Geometry.closestPointOnLine(point, edge);
+			const dist = Vector2.sqrDist(point, closest);
+			if (dist < bestDist) {
+				bestDist = dist;
+				bestPoint = closest;
+			}
+		}
+
+		return bestPoint;
+	}
+	containsPoint(point) {
+		const axes = [];
+		const poly = this.vertices;
+		for (let i = 0; i < poly.length; i++) {
+			axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normal.normalize());
+		}
+		for (let i = 0; i < axes.length; i++) {
+			const axis = axes[i];
+			const range = Range.fromValues(poly.map(v => v.dot(axis)));
+			const proj = point.dot(axis);
+			if (!range.includes(proj)) return false;
+		}
+		return true;
+	
 	}
 	get(result = new Polygon([])) {
 		result.vertices = this.vertices.map(vert => vert.get());
@@ -429,6 +554,15 @@ class Rect extends Polygon {
 				this.width.equals(shape.width) &&
 				this.height.equals(shape.height);
 	}
+	intersectSameType(rect) {
+		return rect.x < this.x + this.width && rect.x + rect.width > this.x && rect.y < this.y + this.height && rect.y + rect.height > this.y;
+	}
+	closestPointTo(point) {
+		return Vector2.clamp(point, this.min, this.max);
+	}
+	containsPoint(point) {
+		return point.x > this.x && point.y > this.y && point.x < this.x + this.width && point.y < this.y + this.height;
+	}
 	get(result = new Rect(0, 0, 0, 0)) {
 		result.x = this.x;
 		result.y = this.y;
@@ -532,6 +666,21 @@ class Circle extends Shape {
 		return 	this.x.equals(shape.x) &&
 				this.y.equals(shape.y) &&
 				this.radius.equals(shape.radius);
+	}	
+	intersectSameType(circle) {
+		return Vector2.sqrDist(circle, this) < (circle.radius + this.radius) ** 2;
+	}
+	closestPointTo(point) {
+		const dif = new Vector2(point.x - this.x, point.y - this.y);
+		dif.mag = this.radius;
+		dif.add(this);
+		return dif;
+	}
+	distanceTo(point) {
+		return Vector2.dist(point, this.middle) - this.radius;
+	}
+	containsPoint(point) {
+		return Vector2.sqrDist(point, this.middle) < this.radius ** 2;
 	}
 	get(shape = new Circle(0, 0, 0)) {
 		shape.x = this.x;

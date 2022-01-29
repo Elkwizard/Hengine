@@ -94,11 +94,13 @@ class TEXT_AREA extends ElementScript {
 		if (yRow >= hitboxGroups.length) index = this.value.length;
 		else if (yRow >= 0) {
 			let { startInx, array } = hitboxGroups[yRow];
-			array = array.split("").map((char, i) => this.getCharacterHitbox(i + startInx));
+			array = array
+				.split("")
+				.map((char, i) => this.getCharacterHitbox(i + startInx));
 			index = (p.x < this.relativeTextViewBox.x) ? startInx : startInx + array.length;
 			for (let i = 0; i < array.length; i++) {
 				const rect = array[i];
-				if (Geometry.pointInsideRect(p, rect)) {
+				if (rect.containsPoint(p)) {
 					const rx = (p.x - rect.x) / rect.width;
 					return startInx + i + Math.round(rx);
 				}
@@ -283,7 +285,7 @@ class TEXT_AREA extends ElementScript {
 		const textAreaHitbox = (type === "start") ?
 			rtvb :
 			new Rect(rtvb.x - this.padding, rtvb.y - this.padding, rtvb.width + this.padding * 2, rtvb.height + this.padding * 2);
-		if (Geometry.pointInsideRect(lp, textAreaHitbox) || type === "move") {
+		if (textAreaHitbox.containsPoint(lp) || type === "move") {
 			if (type === "move")
 				lp = Vector2.clamp(lp, textAreaHitbox.min, textAreaHitbox.max);
 			const inx = this.getCharacterIndex(lp.plus(this.scrollOffset).minus(this.renderTextOffset));
@@ -372,7 +374,7 @@ class TEXT_AREA extends ElementScript {
 			}
 		}
 
-		let inTextArea = Geometry.pointInsideRect(obj.transform.globalSpaceToLocalSpace(this.getMousePosition()), this.relativeTextViewBox);
+		let inTextArea = this.relativeTextViewBox.containsPoint(obj.transform.globalSpaceToLocalSpace(this.getMousePosition()));
 		if (inTextArea) TEXT_AREA.anyTextAreaHovered = true;
 
 		const doubleClick = this.mouse.justPressed("Left") && this.clickTimer < 15 && inTextArea;
@@ -551,7 +553,7 @@ class TEXT_AREA extends ElementScript {
 				//X Bar Drag
 				let thumbX = new Rect(-width / 2 + fullScrollWidth * this.scrollOffset.x / xFullSize, height / 2 - this.scrollBarSize, fullScrollWidth * xRatio, this.scrollBarSize);
 				let barX = new Rect(-width / 2, height / 2 - this.scrollBarSize, fullScrollWidth, this.scrollBarSize);
-				if (!this.highlighting && this.mouse.pressed("Left") && Geometry.pointInsideRect(localMouse, barX)) {
+				if (!this.highlighting && this.mouse.pressed("Left") && barX.containsPoint(localMouse)) {
 					this.scrollOffset.x = Number.clamp(xFullSize * (localMouse.x - thumbX.width / 2 + width / 2) / fullScrollWidth, 0, xFullSize - xViewSize);
 				}
 				this.renderer.draw(Color.LIGHT_GRAY).rect(barX);
@@ -565,7 +567,7 @@ class TEXT_AREA extends ElementScript {
 				//Y Bar Drag
 				let thumbY = new Rect(width / 2 - this.scrollBarSize, -height / 2 + fullScrollHeight * this.scrollOffset.y / yFullSize, this.scrollBarSize, fullScrollHeight * yRatio);
 				let barY = new Rect(width / 2 - this.scrollBarSize, -height / 2, this.scrollBarSize, fullScrollHeight);
-				if (!this.highlighting && this.mouse.pressed("Left") && Geometry.pointInsideRect(localMouse, barY)) {
+				if (!this.highlighting && this.mouse.pressed("Left") && barY.containsPoint(localMouse)) {
 					this.scrollOffset.y = Number.clamp(yFullSize * (localMouse.y - thumbY.height / 2 + height / 2) / fullScrollHeight, 0, yFullSize - yViewSize);
 				}
 

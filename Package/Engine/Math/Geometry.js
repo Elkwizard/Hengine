@@ -256,10 +256,6 @@ class Geometry {
 
 		return result;
 	}
-	static distToLine(p, l) {
-		let cp = Geometry.closestPointOnLine(p, l);
-		return Vector2.dist(p, cp);
-	}
 	static closest(p, points) {
 		let bestDist = Infinity;
 		let best = null;
@@ -389,12 +385,6 @@ class Geometry {
 		}
 		return { hitPoint: hit, hitShape };
 	}
-	static closestPointOnLine(p, l) {
-		const v = l.b.Vminus(l.a);
-		const { sqrMag } = v;
-		const t = p.Vminus(l.a).dot(v) / sqrMag;
-		return v.Ntimes(Number.clamp(t, 0, 1)).Vplus(l.a);
-	}
 	static subdividePolygonList(vertices) {
 		vertices = Polygon.removeDuplicates(vertices);
 
@@ -447,7 +437,7 @@ class Geometry {
 				const result = intersect(i, ro, rd);
 
 				if (!result) // concave vertex doesn't point to to anything?
-					throw new Error("Poorly formed Polygon");
+					continue;// throw new Error("Poorly formed Polygon");
 
 				const [index, point] = result;
 
@@ -462,7 +452,10 @@ class Geometry {
 				sideB.push(sideA[0]);
 				sideA.push(point);
 
-				return [...subdivide(sideA), ...subdivide(sideB)];
+				return [
+					...Geometry.subdividePolygonList(sideA),
+					...Geometry.subdividePolygonList(sideB)
+				];
 
 			}
 		}
@@ -513,97 +506,5 @@ class Geometry {
 		}
 		if (result && result.minus(o).dot(r) <= 0) result = null;
 		return result;
-	}
-	static overlapLineLine(l1, l2) {
-		const check = l => {
-			const dir = l.b.Vminus(l.a);
-			const a = l1.a.cross(dir);
-			const b = l1.b.cross(dir);
-			const a2 = l2.a.cross(dir);
-			const b2 = l2.b.cross(dir);
-			const r1 = new Range(a, b);
-			const r2 = new Range(a2, b2);
-			return r1.intersect(r2);
-		};
-		if (!check(l1) || !check(l2)) return false;
-		return true;
-	}
-	static overlapShapes(r1, r2) {
-		return physicsAPICollideShapes(r1, r2);
-	}
-	static overlapPoint(p, shape) {
-		if (shape instanceof Circle) return Geometry.pointInsideCircle(p, shape);
-		else return Geometry.pointInsidePolygon(p, shape);
-	}
-	// basic shapes
-
-	// closest point
-	static closestPointOnRect(point, rect) {
-		return Vector2.clamp(point, rect.min, rect.max);
-	}
-	static closestPointOnCircle(point, circle) {
-		let dif = new Vector2(point.x - circle.x, point.y - circle.y);
-		dif.mag = circle.radius;
-		dif.add(circle);
-		return dif;
-	}
-	static closestPointOnPolygon(point, polygon) {
-		let bestPoint = null;
-		let bestDist = Infinity;
-
-		const edges = polygon.getEdges();
-		for (let i = 0; i < edges.length; i++) {
-			const edge = edges[i];
-			const closest = Geometry.closestPointOnLine(point, edge);
-			const dist = Vector2.sqrDist(point, closest);
-			if (dist < bestDist) {
-				bestDist = dist;
-				bestPoint = closest;
-			}
-		}
-
-		return bestPoint;
-	}
-	// dist
-	static distToRect(point, rect) {
-		return Vector2.dist(point, Geometry.closestPointOnRect(point, rect));
-	}
-	static distToCircle(point, circle) {
-		return Vector2.dist(point, circle.middle) - radius;
-	}
-	static distToPolygon(point, polygon) {
-		return Vector2.dist(point, Geometry.closestPointOnPolygon(point, polygon));
-	}
-	// point inside
-	static pointInsideRect(point, rect) {
-		return point.x > rect.x && point.y > rect.y && point.x < rect.x + rect.width && point.y < rect.y + rect.height;
-	}
-	static pointInsideCircle(point, circle) {
-		return Vector2.sqrDist(point, circle) < circle.radius ** 2;
-	}
-	static pointInsidePolygon(point, polygon) {
-		let axes = [];
-		let poly = polygon.vertices;
-		for (let i = 0; i < poly.length; i++) {
-			axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normal.normalize());
-		}
-		for (let i = 0; i < axes.length; i++) {
-			let axis = axes[i];
-			let range = Range.fromValues(poly.map(v => v.dot(axis)));
-			let proj = point.dot(axis);
-			if (!range.includes(proj)) return false;
-		}
-		return true;
-	}
-	// overlap
-	static overlapPolygonPolygon(polygon, polygon2) {
-		return physicsAPICollideShapes(polygon, polygon2);
-	}
-	static overlapRectRect(rect, rect2) {
-		if (!rect || !rect2) return false;
-		return rect.x < rect2.x + rect2.width && rect.x + rect.width > rect2.x && rect.y < rect2.y + rect2.height && rect.y + rect.height > rect2.y;
-	}
-	static overlapCircleCircle(circle, circle2) {
-		return Vector2.sqrDist(circle, circle2) < (circle.radius + circle2.radius) ** 2;
 	}
 }
