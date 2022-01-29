@@ -1,33 +1,32 @@
 (async function () {
-    //locate self
-    let script = document.currentScript;
-    let title = script.getAttribute("title") || "Hengine Project";
-    let scripts = (script.getAttribute("scripts") || "").replace(/\.js/g, "").split(" ").filter(str => str.length);
+    // locate self
+    const script = document.currentScript;
+    const title = script.getAttribute("title") || "Hengine Project";
+    const scripts = (script.getAttribute("scripts") || "")
+		.replace(/\.js/g, "")
+		.split(" ")
+		.filter(str => str.length);
 
-    //process filesystem
-    let src = script.src.split("/");
+    // process URL
+    const src = script.src.split("/");
     src.pop();
-    let hengineLoaderSrc = src.join("/") + "/Package/Engine/Manage/HengineLoader.js";
+    const hengineLoaderSrc = src.join("/") + "/Package/Engine/Manage/HengineLoader.js";
  
     function load(src) {
         const script = document.createElement("script");
         script.src = src;
         document.head.appendChild(script);
-        return new Promise(function (resolve) {
-            script.onload = function () {
-                resolve(script);
-            }
-        });
+        return new Promise(resolve => script.onload = () => resolve(script));
     }
 
+	// load resources
     await load(hengineLoaderSrc);
     await HengineLoader.load(scripts.map(src => new HengineScriptResource(src)));
 
     window.title = title;
 
-    let code = script.innerHTML;
-
+	// inject script contents into new, runnable script tag
     let nScript = document.createElement("script");
-    nScript.innerHTML = code;
+    nScript.innerHTML = script.innerHTML;
     (script.parentNode ?? document.querySelector("html")).appendChild(nScript);
 })();

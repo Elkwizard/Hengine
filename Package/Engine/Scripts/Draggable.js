@@ -25,7 +25,7 @@ class DRAGGABLE extends ElementScript {
 			const positionToBox = obj.transform.position.minus(obj.__boundingBox.max);
 			const { bounds } = this;
 			const { min, max } = bounds;
-			const newPosition = Vector2.clamp(obj.transform.position, min.plus(boxToPosition), max.plus(positionToBox));;
+			const newPosition = Vector2.clamp(obj.transform.position, min.plus(boxToPosition), max.plus(positionToBox));
 			if (!newPosition.equals(obj.transform.position) && obj.scripts.has(PHYSICS)) obj.scripts.PHYSICS.stop();
 			obj.transform.position = newPosition;
 		}

@@ -288,12 +288,12 @@ class Geometry {
 		const pi2 = 2 * Math.PI;
 		r1 = (r1 < 0) ? r1 % pi2 + pi2 : r1 % pi2;
 		r2 = (r2 < 0) ? r2 % pi2 + pi2 : r2 % pi2;
-		
+
 		let dif = (r2 < r1) ? r1 - r2 : r2 - r1;
-		
+
 		if (Math.abs(dif - pi2) < Math.abs(dif))
 			dif -= pi2;
-		
+
 		return (r2 < r1) ? dif : -dif;
 	}
 	static farthestInDirection(corners, dir) {
@@ -396,119 +396,88 @@ class Geometry {
 		return v.Ntimes(Number.clamp(t, 0, 1)).Vplus(l.a);
 	}
 	static subdividePolygonList(vertices) {
-		vertices = [...vertices];
-		//edges
-		let vectors = [];
-		let edges = [];
-		let middle = Vector2.origin;
+		vertices = Polygon.removeDuplicates(vertices);
+
+		const getIndex = i => ((i % vertices.length) + vertices.length) % vertices.length;
+		const get = i => vertices[getIndex(i)];
+
+		const normals = new Array(vertices.length);
+		const getNormal = i => normals[getIndex(i)];
 		for (let i = 0; i < vertices.length; i++) {
-			const A = vertices[i];
-			const B = vertices[(i + 1) % vertices.length];
-			vectors.push(B.minus(A).normalize());
-			edges.push(new Line(A, B));
-			middle.add(A);
+			const a = get(i - 1);
+			const b = get(i);
+			normals[i] = a.minus(b).normal.normalize();
 		}
 
-		//direction
-		middle.div(vertices.length);
 
-		const INDEX_DATA = [];
-		const CONVEX = [];
+		const edges = new Array(vertices.length);
+		const getEdge = i => edges[getIndex(i)];
+		for (let i = 0; i < vertices.length; i++)
+			edges[i] = new Line(get(i - 1), get(i));
 
-		for (let i = 0; i < edges.length; i++) {
-			const INX = i;
-			const NEXT_INX = (i + 1) % edges.length;
-			const A = edges[INX];
-			const B = edges[NEXT_INX];
-			const VEC_A = vectors[INX];
-			const VEC_B = vectors[NEXT_INX];
-			const VERT_A = vertices[INX];
-			const VERT_B = vertices[NEXT_INX];
 
-			let angle = Math.abs(VEC_B.angle - VEC_A.angle);
-			if (VEC_B.angle < VEC_A.angle) angle = Math.PI * 2 - angle;
+		function intersect(sourceIndex, ro, rd) {
+			let best = null;
+			let bestDist = Infinity;
 
-			let convex = angle <= Math.PI || !angle;
-
-			INDEX_DATA.push({ INX, NEXT_INX, A, B, VEC_A, VEC_B, VERT_A, VERT_B, convex });
-			CONVEX.push(convex);
-		}
-
-		if (CONVEX.includes(false)) {
-			const CONCAVE_INX = CONVEX.indexOf(false);
-			const { INX, NEXT_INX, A, B, VEC_A, VEC_B, VERT_A, VERT_B, convex } = INDEX_DATA[CONCAVE_INX];
-
-			const VERTEX = VERT_B;
-
-			const AWAY = VEC_A.minus(VEC_B).normalize();
-
-			const SEGMENTS = [];
 			for (let i = 0; i < edges.length; i++) {
-				if (i === INX) continue;
-				if (i === NEXT_INX) continue;
-				const EDGE = edges[i];
-				const TO_MIDDLE_A = EDGE.a.minus(VERTEX);
-				const TO_MIDDLE_B = EDGE.b.minus(VERTEX);
-				if (TO_MIDDLE_A.dot(AWAY) < 0 && TO_MIDDLE_B.dot(AWAY) < 0) continue;
-				SEGMENTS.push(edges[i]);
-			}
-			if (!SEGMENTS.length) return [vertices];
+				if (i === sourceIndex || i === sourceIndex + 1) continue;
+				const hit = Geometry.intersectRayLine(ro, rd, edges[i]);
+				if (hit === null) continue;
 
-			const EPSILON = 0.00001;
-
-			const dx = AWAY.x || EPSILON;
-			const dy = AWAY.y || EPSILON;
-			const b = VERTEX.y - dy / dx * VERTEX.x;
-
-			let intersects = [];
-			for (let i = 0; i < SEGMENTS.length; i++) {
-				const SEG = SEGMENTS[i];
-				const SEG_LENGTH = SEG.length;
-				const INTERSECT = Geometry.intersectRayLine(VERTEX, AWAY, SEG);
-				if (!INTERSECT) continue;
-				const DOT = INTERSECT.minus(SEG.a).dot(SEG.vector);
-
-				if (DOT >= 0 && DOT <= SEG_LENGTH) intersects.push({ point: INTERSECT, segment: SEG });
-			}
-			if (intersects.length) {
-				const INTERSECT = intersects.sort((a, b) => a.point.minus(VERTEX).sqrMag - b.point.minus(VERTEX).sqrMag)[0];
-				const INX = edges.indexOf(INTERSECT.segment);
-				const INX_A = INX;
-				const INX_B = (INX + 1) % vertices.length;
-				vertices.splice(INX_B, 0, INTERSECT.point);
-
-				const NEW_INX = vertices.indexOf(INTERSECT.point);
-				const VERTEX_INX = vertices.indexOf(VERTEX);
-
-				let polyA = [];
-				let polyB = [];
-				if (NEW_INX < VERTEX_INX) {
-					polyA = [...vertices.slice(VERTEX_INX), ...vertices.slice(0, NEW_INX + 1)];
-					polyB = vertices.slice(NEW_INX, VERTEX_INX + 1);
-				} else {
-					polyA = vertices.slice(VERTEX_INX, NEW_INX + 1);
-					polyB = [...vertices.slice(NEW_INX), ...vertices.slice(0, VERTEX_INX + 1)];
+				const dist = Vector2.sqrDist(hit, ro);
+				if (dist < bestDist) {
+					bestDist = dist;
+					best = [i, hit];
 				}
+			}
 
-				try {
-					let polysA = Geometry.subdividePolygonList(polyA);
-					let polysB = Geometry.subdividePolygonList(polyB);
-					return [...polysA, ...polysB];
-				} catch (e) {
-					return [polyB, polyB];
-				}
-			} else return [vertices];
+			return best;
+		}
 
-		} else return [vertices];
+		for (let i = 0; i < vertices.length; i++) {
+			const v1 = getNormal(i);
+			const v2 = getNormal(i + 1);
+			const crs = v1.cross(v2);
+			const convex = crs >= 0;
+			if (!convex) { // shape isn't convex
+
+				const ro = get(i);
+				const rd = Vector2.avg([v1, v2]).invert();
+				const result = intersect(i, ro, rd);
+
+				if (!result) // concave vertex doesn't point to to anything?
+					throw new Error("Poorly formed Polygon");
+
+				const [index, point] = result;
+
+				const sideA = [];
+				for (let j = i; j !== index; j = getIndex(j + 1))
+					sideA.push(get(j));
+
+				const sideB = [point];
+				for (let j = index; j !== i; j = getIndex(j + 1))
+					sideB.push(get(j));
+
+				sideB.push(sideA[0]);
+				sideA.push(point);
+
+				return [...subdivide(sideA), ...subdivide(sideB)];
+
+			}
+		}
+
+		return [vertices]; // already convex, go home
 	}
 	static subdividePolygon(poly) {
-		return Geometry.subdividePolygonList(poly.vertices).map(v => new Polygon(v));
+		return Geometry.subdividePolygonList(poly.vertices)
+			.map(v => new Polygon(v));
 	}
 	static intersectRayLine(o, r, l) {
 		let result = null;
 		const EPSILON = 0.0001;
 		if (Math.abs(l.a.x - l.b.x) < EPSILON) {
-			if (r.x) {
+			if (Math.abs(r.x) > EPSILON) {
 				let dx = r.x;
 				let dy = r.y;
 				let b = o.y - dy / dx * o.x;
@@ -518,7 +487,7 @@ class Geometry {
 				let maxY = Math.max(l.a.y, l.b.y);
 				if (y >= minY && y <= maxY) result = new Vector2(x, y);
 			} else {
-				if (o.x === l.a.x) result = new Vector2(o.x, Number.clamp(o.y, Math.min(l.a.y, l.b.y), Math.max(l.a.y, l.b.y)));
+				if (Math.abs(o.x - l.a.x) <= EPSILON) result = new Vector2(o.x, Number.clamp(o.y, Math.min(l.a.y, l.b.y), Math.max(l.a.y, l.b.y)));
 			}
 		} else {
 			if (Math.abs(r.x) > EPSILON) {
@@ -531,7 +500,7 @@ class Geometry {
 				let x = (b2 - b) / (dy / dx - dy2 / dx2);
 				let minX = Math.min(l.a.x, l.b.x);
 				let maxX = Math.max(l.a.x, l.b.x);
-				if (x >= minX && x <= maxX) result = new Vector2(x, dy / dx * x + b);
+				if (x >= minX - EPSILON && x <= maxX + EPSILON) result = new Vector2(x, dy / dx * x + b);
 			} else {
 				let dx2 = l.b.x - l.a.x;
 				let dy2 = l.b.y - l.a.y;
@@ -539,7 +508,7 @@ class Geometry {
 				let x = o.x;
 				let minX = Math.min(l.a.x, l.b.x);
 				let maxX = Math.max(l.a.x, l.b.x);
-				if (x >= minX && x <= maxX) result = new Vector2(x, dy2 / dx2 * x + b2);
+				if (x >= minX - EPSILON && x <= maxX + EPSILON) result = new Vector2(x, dy2 / dx2 * x + b2);
 			}
 		}
 		if (result && result.minus(o).dot(r) <= 0) result = null;
@@ -547,11 +516,11 @@ class Geometry {
 	}
 	static overlapLineLine(l1, l2) {
 		const check = l => {
-			const dir = l.b.Vminus(l.a).normal;
-			const a = l1.a.dot(dir);
-			const b = l1.b.dot(dir);
-			const a2 = l2.a.dot(dir);
-			const b2 = l2.b.dot(dir);
+			const dir = l.b.Vminus(l.a);
+			const a = l1.a.cross(dir);
+			const b = l1.b.cross(dir);
+			const a2 = l2.a.cross(dir);
+			const b2 = l2.b.cross(dir);
 			const r1 = new Range(a, b);
 			const r2 = new Range(a2, b2);
 			return r1.intersect(r2);

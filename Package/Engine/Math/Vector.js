@@ -122,8 +122,11 @@ class Vector2 extends Vector {
 		result.y = this.y;
 		return result;
 	}
-	equals(v, t = 0.00001) {
-		return Math.abs(this.x - v.x) < t && Math.abs(this.y - v.y) < t;
+	equals(v) {
+		if (this === v) return true;
+		if (v === undefined || v.constructor !== Vector2) return false;
+		const { EPSILON } = Operable;
+		return Math.abs(this.x - v.x) < EPSILON && Math.abs(this.y - v.y) < EPSILON;
 	}
 	op(v, e) {
 		if (typeof v === "number") {

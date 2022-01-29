@@ -9,25 +9,20 @@ class Line {
 		}
 	}
 	get length() {
-		return this.b.Vminus(this.a).mag;
+		return Vector2.dist(this.a, this.b);
 	}
 	get middle() {
-		let ax = (this.a.x + this.b.x) / 2;
-		let ay = (this.a.y + this.b.y) / 2;
-		return new Vector2(ax, ay);
+		return a.Vplus(b).Nmul(0.5);
 	}
 	set vector(v) {
-		let mag = this.length;
-		let nB = this.a.Vplus(v.get().normalize().Ntimes(mag));
-		this.b = nB;
+		this.b = this.a.Vplus(v.normalized.Nmul(this.length));
 	}
 	get vector() {
 		return this.b.Vminus(this.a).normalize();
 	}
 	get slope() {
-		let dx = this.b.x - this.a.x;
-		let dy = this.b.y - this.a.y;
-		return dy / dx;
+		const { a, b } = this;
+		return (b.y - a.y) / (b.x - a.x);
 	}
 	evaluate(x) {
 		return this.slope * (x - this.a.x) + this.a.y;
@@ -108,9 +103,8 @@ class Range {
 		return new Range(min, max);
 	}
 }
-class Shape extends Operable {
+class Shape {
 	constructor() {
-		super();
 		this.area = 0;
 	}
 	get middle() { }
@@ -124,11 +118,12 @@ class Shape extends Operable {
 	scaleYAbout(pos, factor) { }
 	move(dir) { }
 	getBoundingBox() { }
-	get(result = new Circle(0, 0, 0)) { }
+	equals(shape) { }
+	get(result = new Shape()) { }
 	toPhysicsShape() { }
 	static fromPhysicsShape(sh) { }
 }
-Shape.modValues = [];
+
 class Polygon extends Shape {
 	constructor(vertices) {
 		super();
@@ -211,6 +206,14 @@ class Polygon extends Shape {
 	rotate(angle) {
 		return this.getModel(new Transform(0, 0, angle));
 	}
+	equals(shape) {
+		if (!(shape instanceof Polygon)) return false;
+		if (shape.vertices.length !== this.vertices.length) return false;
+		if (!shape.area.equals(this.area)) return false;
+		for (let i = 0; i < this.vertices.length; i++)
+			if (!this.vertices[i].equals(shape.vertices[i])) return false;
+		return true;
+	}
 	get(result = new Polygon([])) {
 		result.vertices = this.vertices.map(vert => vert.get());
 		result.area = this.area;
@@ -244,7 +247,6 @@ class Polygon extends Shape {
 		return vertices;
 	}
 }
-Polygon.modValues = [];
 class Rect extends Polygon {
 	constructor(x, y, width, height) {
 		super([]);
@@ -419,6 +421,14 @@ class Rect extends Polygon {
 	move(dir) {
 		return new Rect(this.x + dir.x, this.y + dir.y, this.width, this.height);
 	}
+	equals(shape) {
+		if (!(shape instanceof Rect)) return false;
+		if (!shape.area.equals(this.area)) return false;
+		return 	this.x.equals(shape.x) &&
+				this.y.equals(shape.y) &&
+				this.width.equals(shape.width) &&
+				this.height.equals(shape.height);
+	}
 	get(result = new Rect(0, 0, 0, 0)) {
 		result.x = this.x;
 		result.y = this.y;
@@ -465,7 +475,7 @@ class Rect extends Polygon {
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
 }
-Rect.modValues = ["x", "y", "width", "height"];
+
 class Circle extends Shape {
 	constructor(x, y, radius) {
 		super();
@@ -516,6 +526,20 @@ class Circle extends Shape {
 	getBoundingBox() {
 		return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
 	}
+	equals(shape) {
+		if (!(shape instanceof Circle)) return false;
+		if (!shape.area.equals(this.area)) return false;
+		return 	this.x.equals(shape.x) &&
+				this.y.equals(shape.y) &&
+				this.radius.equals(shape.radius);
+	}
+	get(shape = new Circle(0, 0, 0)) {
+		shape.x = this.x;
+		shape.y = this.y;
+		shape.radius = this.radius;
+		shape.area = this.area;
+		return shape;
+	}
 	toPhysicsShape() {
 		return new CircleCollider(this.x, this.y, this.radius);
 	}
@@ -523,4 +547,3 @@ class Circle extends Shape {
 		return new Circle(sh.position.x, sh.position.y, sh.radius);
 	}
 }
-Circle.modValues = ["x", "y", "radius"];

@@ -83,6 +83,9 @@ class Operable {
         return sum;
     }
     equals(v) {
+		if (this === v) return true;
+		if (v === undefined || v.constructor !== this.constructor) return false;
+
         const { modValues, EPSILON } = this.constructor;
         for (let i = 0; i < modValues.length; i++) {
             const field = modValues[i];
