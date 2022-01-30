@@ -257,9 +257,7 @@ class Texture extends ImageType {
 			}
 		});
 	}
-	toByteBuffer() {
-		const buffer = new ByteBuffer();
-
+	toByteBuffer(buffer = new ByteBuffer()) {
 		buffer.write.uint32(this.width);
 		buffer.write.uint32(this.height);
 
@@ -271,8 +269,6 @@ class Texture extends ImageType {
 		return buffer;
 	}
 	static fromByteBuffer(buffer) {
-		buffer.pointer = 0;
-
 		const width = buffer.read.uint32();
 		const height = buffer.read.uint32();
 

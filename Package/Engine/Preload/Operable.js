@@ -93,15 +93,13 @@ class Operable {
         }
         return true;
     }
-    toByteBuffer() {
-        const buffer = new ByteBuffer();
+    toByteBuffer(buffer = new ByteBuffer()) {
         const { modValues } = this.constructor;
         for (let i = 0; i < modValues.length; i++)
             buffer.write.float64(this[modValues[i]]);
         return buffer;
     }
     static fromByteBuffer(buffer) {
-        buffer.pointer = 0;
         const result = this.empty;
         const { modValues } = this;
         for (let i = 0; i < modValues.length; i++)
@@ -109,7 +107,6 @@ class Operable {
         return result;
     }
     static get empty() {
-        // return new this(...[...this.modValues].fill(0));
         return new (this.emptyConstructor ??= this.bind(
             null, ...new Uint8Array(this.modValues.length)
         ));

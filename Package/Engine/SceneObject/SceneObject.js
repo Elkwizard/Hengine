@@ -167,17 +167,21 @@ class SceneObject extends SceneElement {
 	}
 	getAllConvexShapes() {
 		let shapes = [];
-		for (let [shape, convexShapes] of this.convexShapes) shapes.pushArray(convexShapes);
+		for (let [shape, convexShapes] of this.convexShapes)
+			shapes.pushArray(convexShapes);
 		return shapes;
 	}
 	getAllModels() {
 		const models = [];
-		for (const [name, shape] of this.shapes) models.push(shape.getModel(this.transform));
+		for (const [name, shape] of this.shapes)
+			models.push(shape.getModel(this.transform));
 		return models;
 	}
 	getAllConvexModels() {
 		const models = [];
-		for (const [shape, shapes] of this.convexShapes) for (let i = 0; i < shapes.length; i++) models.push(shapes[i].getModel(this.transform));
+		for (const [shape, shapes] of this.convexShapes)
+			for (let i = 0; i < shapes.length; i++)
+				models.push(shapes[i].getModel(this.transform));
 		return models;
 	}
 	centerShapes() {
@@ -193,14 +197,16 @@ class SceneObject extends SceneElement {
 			shapes.push(shape);
 		}
 		center.Ndiv(totalArea);
-		let dif = center.inverse;
-		for (let i = 0; i < names.length; i++) this.addShape(names[i], shapes[i].move(dif));
+		const diff = center.inverse;
+		for (let i = 0; i < names.length; i++)
+			this.addShape(names[i], shapes[i].move(diff));
 	}
 	removeAllShapes() {
 		let names = [];
 		for (let [name, shape] of this.shapes) names.push(name);
 		let shapes = [];
-		for (let i = 0; i < names.length; i++) shapes.push(this.removeShape(names[i]));
+		for (let i = 0; i < names.length; i++)
+			shapes.push(this.removeShape(names[i]));
 		return shapes;
 	}
 	getShape(name) {
@@ -215,7 +221,8 @@ class SceneObject extends SceneElement {
 	getConvexModels(name) {
 		const models = [];
 		const shapes = this.convexShapes.get(this.shapes.get(name));
-		for (let i = 0; i < shapes.length; i++) models.push(shapes[i].getModel(this.transform));
+		for (let i = 0; i < shapes.length; i++)
+			models.push(shapes[i].getModel(this.transform));
 		return models;
 	}
 	scale(factor) {
@@ -276,7 +283,8 @@ class SceneObject extends SceneElement {
 		}, this.engine.renderer);
 	}
 	determineOnScreen(screen) {
-		this.onScreen = !this.cullGraphics || screen.intersectSameType(this.graphicalBoundingBox ?? this.__boundingBox);
+		const graphicalBoundingBox = this.graphicalBoundingBox ?? this.__boundingBox;
+		this.onScreen = !this.cullGraphics || (graphicalBoundingBox && screen.intersectSameType(graphicalBoundingBox));
 		return this.onScreen;
 	}
 	engineDraw(screen) {

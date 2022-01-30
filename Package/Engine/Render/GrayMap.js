@@ -11,9 +11,7 @@ class GrayMap {
 		if (x in this.data && y in this.data[x]) return this.data[x][y];
 		return -1;
 	}
-	toByteBuffer() {
-		const buffer = new ByteBuffer();
-
+	toByteBuffer(buffer = new ByteBuffer()) {
 		buffer.write.uint32(this.width);
 		buffer.write.uint32(this.height);
 
@@ -22,8 +20,6 @@ class GrayMap {
 		return buffer;
 	}
 	static fromByteBuffer(buffer) {
-		buffer.pointer = 0;
-
 		const width = buffer.read.uint32();
 		const height = buffer.read.uint32();
 

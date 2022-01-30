@@ -27,9 +27,9 @@
 			obj.layer = +this.thrown;
 			if (this.thrown) {
 				const pos = obj.transform.localSpaceToGlobalSpace(this.offset);
-				let dif = mouse.world.minus(pos);
-				dif.div(100);
-				obj.scripts.PHYSICS.applyImpulseMass(pos, dif);
+				const diff = mouse.world.minus(pos);
+				diff.div(100);
+				obj.scripts.PHYSICS.applyImpulseMass(pos, diff);
 			}
 		}
 		escapeDraw(obj) {

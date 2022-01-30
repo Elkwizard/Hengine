@@ -101,7 +101,6 @@ class Shape {
 	equals(shape) { }
 	intersectSameType() { }
 	intersect(shape) {
-		if (!shape) return false;
 		if (shape instanceof this.constructor)
 			return this.intersectSameType(shape);
 		return !!physicsAPICollideShapes(this, shape);
@@ -671,10 +670,10 @@ class Circle extends Shape {
 		return Vector2.sqrDist(circle, this) < (circle.radius + this.radius) ** 2;
 	}
 	closestPointTo(point) {
-		const dif = new Vector2(point.x - this.x, point.y - this.y);
-		dif.mag = this.radius;
-		dif.add(this);
-		return dif;
+		const diff = new Vector2(point.x - this.x, point.y - this.y);
+		diff.mag = this.radius;
+		diff.add(this);
+		return diff;
 	}
 	distanceTo(point) {
 		return Vector2.dist(point, this.middle) - this.radius;

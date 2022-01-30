@@ -31,23 +31,19 @@ Object.defineProperty(window, "title", {
 	// types
 	function addByteBufferConversions(type, bufferType) {
 		if (typeof bufferType === "string") {
-			proto(type.prototype, "toByteBuffer", function () {
-				const buffer = new ByteBuffer();
+			proto(type.prototype, "toByteBuffer", function (buffer = new ByteBuffer()) {
 				buffer.write[bufferType](this);
 				return buffer;
 			});
 			proto(type, "fromByteBuffer", function (buffer) {
-				buffer.pointer = 0;
 				return buffer.read[bufferType]();
 			});
 		} else {
-			proto(type.prototype, "toByteBuffer", function () {
-				const buffer = new ByteBuffer();
+			proto(type.prototype, "toByteBuffer", function (buffer = new ByteBuffer()) {
 				bufferType[0](this, buffer);
 				return buffer;
 			});
 			proto(type, "fromByteBuffer", function (buffer) {
-				buffer.pointer = 0;
 				return bufferType[1](buffer);
 			});
 		}

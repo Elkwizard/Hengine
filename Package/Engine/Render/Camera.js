@@ -72,13 +72,13 @@ class Camera extends Matrix3 {
 		this.updateTranslationMatrix();
 	}
 	rotateTowards(rotation, ferocity = 0.1) {
-		let dif = Geometry.signedAngularDist(rotation, this.rotation);
-		this.rotation += dif * ferocity;
+		const diff = Geometry.signedAngularDist(rotation, this.rotation);
+		this.rotation += diff * ferocity;
 	}
 	moveTowards(point, ferocity = 0.1) {
 		const cameraPoint = this.position;
-		let dif = point.Vminus(cameraPoint).Ntimes(ferocity);
-		this.position = cameraPoint.plus(dif);
+		const diff = point.Vminus(cameraPoint).Ntimes(ferocity);
+		this.position = cameraPoint.plus(diff);
 	}
 	constrain(x = -Infinity, y = -Infinity, width = Infinity, height = Infinity) {
 		if (typeof x === "object") ({ x, y, width, height } = x);

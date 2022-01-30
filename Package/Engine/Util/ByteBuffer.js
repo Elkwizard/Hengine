@@ -5,6 +5,7 @@ class ByteBuffer {
 		this.pointer = pointer;
 		this.write = new ByteBuffer.Writer(this);
 		this.read = new ByteBuffer.Reader(this);
+		this.measure = new ByteBuffer.Measurer(this);
 		this.shouldResize = true;
 		this.littleEndian = littleEndian;
 	}
@@ -30,8 +31,9 @@ class ByteBuffer {
 	finalize() {
 		this.data = this.data.slice(0, this.pointer);
 	}
-	toByteBuffer() {
-		return this;
+	toByteBuffer(buffer = new ByteBuffer()) {
+		buffer.write.byteBuffer(buffer);
+		return buffer;
 	}
 	toString() {
 		let result = String.fromCharCode(
@@ -140,7 +142,7 @@ class ByteBuffer {
 		return buffer;
 	}
 	static fromByteBuffer(buffer) {
-		return buffer.get();
+		return buffer.read.byteBuffer();
 	}
 }
 ByteBuffer.arrayTypes = ["Float32", "Float64", "Int8", "Int16", "Int32", "Uint8", "Uint16", "Uint32"];
@@ -257,6 +259,15 @@ ByteBuffer.Writer = class {
 		} else this[type](object);
 	}
 };
+ByteBuffer.Measurer = class extends ByteBuffer.Writer {
+	constructor(buffer) {
+		super(buffer);
+		this.reset();
+	}
+	reset() {
+		this.size = 0;
+	}
+}
 ByteBuffer.Reader = class {
 	constructor(buffer) {
 		this.buffer = buffer;
@@ -341,6 +352,9 @@ for (let i = 0; i < ByteBuffer.arrayTypes.length; i++) {
 	const getViewMethod = "get" + type;
 	const { BYTES_PER_ELEMENT } = window[type + "Array"];
 
+	ByteBuffer.Measurer.prototype[method] = function (value) {
+		this.size += BYTES_PER_ELEMENT;
+	};
 	ByteBuffer.Writer.prototype[method] = function (value) {
 		const { buffer } = this;
 		buffer.alloc(BYTES_PER_ELEMENT);

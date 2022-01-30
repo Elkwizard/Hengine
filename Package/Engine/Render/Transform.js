@@ -66,10 +66,10 @@ class Transform extends Matrix3 {
 		return dx > EPSILON || dy > EPSILON || dr > EPSILON;
 	}
 	rotateAround(point, rotation) {
-		let dif = this.position.Vminus(point);
-		dif.rotate(rotation);
-		dif.add(point);
-		this.position = dif;
+		const diff = this.position.Vminus(point);
+		diff.rotate(rotation);
+		diff.add(point);
+		this.position = diff;
 		this.rotation += rotation;
 	}
 	globalSpaceToLocalSpace(v) {

@@ -285,12 +285,12 @@ class Geometry {
 		r1 = (r1 < 0) ? r1 % pi2 + pi2 : r1 % pi2;
 		r2 = (r2 < 0) ? r2 % pi2 + pi2 : r2 % pi2;
 
-		let dif = (r2 < r1) ? r1 - r2 : r2 - r1;
+		let diff = (r2 < r1) ? r1 - r2 : r2 - r1;
 
-		if (Math.abs(dif - pi2) < Math.abs(dif))
-			dif -= pi2;
+		if (Math.abs(diff - pi2) < Math.abs(diff))
+			diff -= pi2;
 
-		return (r2 < r1) ? dif : -dif;
+		return (r2 < r1) ? diff : -diff;
 	}
 	static farthestInDirection(corners, dir) {
 		let farthest = corners[0];

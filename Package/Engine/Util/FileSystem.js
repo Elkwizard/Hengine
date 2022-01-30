@@ -217,7 +217,6 @@ class FileSystem { };
 				}
 
 				result.push(newSection);
-
 			}
 
 			return result.join("\n");
@@ -348,6 +347,7 @@ class FileSystem { };
 			const ext = getFileExt(path);
 			if (!raw && ext !== "dir" && ext in this.fileTypes) {
 				const { pointer } = file;
+				file.pointer = 0;
 				const result = this.fileTypes[ext].fromByteBuffer(file);
 				file.pointer = pointer;
 				return result;
