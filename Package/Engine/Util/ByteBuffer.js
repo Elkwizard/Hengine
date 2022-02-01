@@ -32,7 +32,7 @@ class ByteBuffer {
 		this.data = this.data.slice(0, this.pointer);
 	}
 	toByteBuffer(buffer = new ByteBuffer()) {
-		buffer.write.byteBuffer(buffer);
+		buffer.write.byteBuffer(this);
 		return buffer;
 	}
 	toString() {
