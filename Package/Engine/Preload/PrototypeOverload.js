@@ -373,14 +373,11 @@ ${contents.join(",\n").indent()}
 
 	// overload localStorage.clear()
 	const localStorageClear = localStorage.clear.bind(localStorage);
-	proto(Storage.prototype, "downloadBackup", function (file = "localStorage") {
+	proto(Storage.prototype, "downloadBackup", function (file = "backup") {
 		const a = document.createElement("a");
-		const buffer = new ByteBuffer();
-		buffer.write.object(this);
-		buffer.finalize();
-		const uri = `data:application/octet-stream;base64,` + buffer.toBase64();
+		const uri = `data:text/json;charset=UTF-8,${encodeURIComponent(JSON.stringify(this))}`;
 		a.setAttribute("href", uri);
-		a.setAttribute("download", file + " " + new Date() + ".backup");
+		a.setAttribute("download", `${file} (localStorage backup on ${new Date().toDateString()}).json`);
 		a.click();
 	});
 	proto(Storage.prototype, "clear", function (file) {
@@ -400,16 +397,15 @@ ${contents.join(",\n").indent()}
 				const file = input.files[0];
 				const reader = new FileReader();
 				reader.onload = () => {
-					const arrayBuffer = reader.result;
-					const buffer = new ByteBuffer(arrayBuffer);
-					const parsedObject = buffer.read.object();
+					const text = reader.result;
+					const parsedObject = JSON.parse(text);
 					for (const key in parsedObject) {
 						const value = parsedObject[key];
 						if (typeof value === "string") this[key] = value;
 					}
 					resolve();
 				};
-				reader.readAsArrayBuffer(file);
+				reader.readAsText(file);
 			};
 			input.click();
 		});
