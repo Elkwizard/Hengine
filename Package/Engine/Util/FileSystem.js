@@ -155,14 +155,13 @@ class FileSystem { };
 			this.free = [];
 
 			this.fileTypes = { dir: class Directory { } };
+			this.createFileType(ByteBuffer, [""]);
 			this.createFileType(Number);
 			this.createFileType(String);
 			this.createFileType(Boolean);
 			this.createFileType(Object);
 			this.createFileType(GrayMap);
 			this.createFileType(Texture);
-			this.createFileType(Rect);
-			this.createFileType(Circle);
 			this.createFileType(Vector2);
 			this.createFileType(Vector3);
 			this.createFileType(Vector4);
@@ -227,8 +226,8 @@ class FileSystem { };
 		directoryExists(path) {
 			return this.fileExists(`${path}.dir`);
 		}
-		writeFile(path, contents = new ByteBuffer()) {
-			contents = contents.toByteBuffer();
+		writeFile(path, contents = new ByteBuffer(), raw = false) {
+			if (!raw) contents = contents.toByteBuffer();
 
 			const pieces = path.split("/").filter(reflect);
 			const pathPieces = pieces.slice(0, pieces.length - 1);
@@ -331,17 +330,17 @@ class FileSystem { };
 				this.directoryAddress = directoryAddress;
 				return null;
 			}
-			
+
 			// get file
 			const entries = getDirectoryEntries(this, this.directoryAddress);
 			const file = getFile(this, entries.get(name));
-			
+
 			if (!file) {
 				if (!existenceCheck) error(`file '${name}' does not exist in '${this.directory}'`);
 				this.directoryAddress = directoryAddress;
 				return null;
 			}
-			
+
 			this.directoryAddress = directoryAddress;
 
 			const ext = getFileExt(path);
@@ -412,7 +411,7 @@ class FileSystem { };
 						const { result } = reader;
 						const buffer = new ByteBuffer(result);
 						buffer.pointer = result.byteLength;
-						this.writeFile(path || file.name, buffer);
+						this.writeFile(path ?? file.name, buffer, true);
 					}
 				}
 			};
