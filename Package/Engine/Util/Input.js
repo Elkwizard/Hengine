@@ -184,8 +184,8 @@ class KeyboardHandler extends InputHandler {
 	addListeners() {
 		document.body.onblur = () => this.targetAll(false);
 		document.addEventListener("keydown", event => {
-			if (event.key === "Tab") event.preventDefault();
-			void this.target(event.key, true);
+			event.preventDefault();
+			this.target(event.key, true);
 			this.downQueue.push(event.key);
 		});
 		document.addEventListener("keyup", event => void this.target(event.key, false));
