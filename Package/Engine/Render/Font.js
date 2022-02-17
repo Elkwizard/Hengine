@@ -23,6 +23,10 @@ class Font {
 			l === "system-ui"
 		);
 		this.refont();
+		if (a.match(/mono|consolas/g)) {
+			const charWidth = this.getWidthCRC2D("m");
+			this.getWidthCRC2D = text => text.length * charWidth;
+		}
 	}
 	get family() {
 		return this._family;

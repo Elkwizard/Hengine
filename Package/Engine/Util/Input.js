@@ -184,7 +184,8 @@ class KeyboardHandler extends InputHandler {
 	addListeners() {
 		document.body.onblur = () => this.targetAll(false);
 		document.addEventListener("keydown", event => {
-			event.preventDefault();
+			if (event.key !== "v" || !event.ctrlKey)
+				event.preventDefault();
 			this.target(event.key, true);
 			this.downQueue.push(event.key);
 		});
