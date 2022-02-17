@@ -97,8 +97,8 @@ vec4 shader() {
 		}
 		shader.setArguments(args);
 		renderer.image(shader).rect(0, 0, width / 2, height);
-		renderer.textMode = TextMode.BOTTOM_LEFT;
 		if (error) renderer.draw(Color.RED).textLine(Font.Monospace20, error, 10, 10);
+		renderer.textMode = TextMode.BOTTOM_LEFT;
 		renderer.draw(Color.RED).textLine(Font.Monospace40, hengine.intervals.fps, 10, height - 10);
 		renderer.textMode = TextMode.TOP_LEFT;
 	}, IntervalFunction.UPDATE);
