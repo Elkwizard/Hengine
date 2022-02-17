@@ -184,8 +184,8 @@ class KeyboardHandler extends InputHandler {
 	addListeners() {
 		document.body.onblur = () => this.targetAll(false);
 		document.addEventListener("keydown", event => {
-			// ctrl-r and ctrl-v must be allowed for convenience and functionality
-			if ((event.key !== "v" && event.key !== "r") || !event.ctrlKey)
+			// don't cancel fancy keyboard shortcuts
+			if (!event.ctrlKey)
 				event.preventDefault();
 			this.target(event.key, true);
 			this.downQueue.push(event.key);

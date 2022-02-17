@@ -77,11 +77,15 @@ vec4 shader() {
 		highlight(text, boldFont, Color.GREEN, new RegExp(commentRegex, "g"), false, getLoc);
 		highlight(text, font, Color.LIGHT_GRAY, new RegExp(`(${[commentRegex, symbolRegex, primitiveRegex, keywordRegex, functionRegex].join("|")})`, "g"), true, getLoc);
 	};
+	let error = null;
 	hengine.intervals.continuous(function () {
 		if (!shader.glsl || (keyboard.pressed("Alt") && keyboard.justPressed("Enter"))) {
 			if (keyboard.justPressed("Enter")) codeInput.scripts.TEXT_AREA.ignore("Enter");
-			shader.glsl = codeInput.scripts.TEXT_AREA.getValue();
-			shader.compile();
+			try {
+				shader.glsl = codeInput.scripts.TEXT_AREA.getValue();
+			} catch (err) {
+				error = err;
+			}
 			time = 0;
 		}
 		if (shader.argumentExists("webcam") && !webcam) webcam = new WebcamCapture();
@@ -94,6 +98,7 @@ vec4 shader() {
 		shader.setArguments(args);
 		renderer.image(shader).rect(0, 0, width / 2, height);
 		renderer.textMode = TextMode.BOTTOM_LEFT;
+		if (error) renderer.draw(Color.RED).textLine(Font.Monospace20, error, 10, 10);
 		renderer.draw(Color.RED).textLine(Font.Monospace40, hengine.intervals.fps, 10, height - 10);
 		renderer.textMode = TextMode.TOP_LEFT;
 	}, IntervalFunction.UPDATE);
