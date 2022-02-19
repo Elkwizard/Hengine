@@ -13,9 +13,6 @@ class Font {
 	}
 	set family(a) {
 		this._family = a;
-		if (a.toLowerCase().match(/(mono|consolas)/g)) {
-			this.getWidthCRC2D = str => str.length * 0.5498046875 * this.size;
-		};
 		const l = a.toLowerCase();
 		this.keywordFamily = (
 			l === "monospace" ||
@@ -26,6 +23,10 @@ class Font {
 			l === "system-ui"
 		);
 		this.refont();
+		if (a.match(/mono|consolas/g)) {
+			const charWidth = this.getWidthCRC2D("m");
+			this.getWidthCRC2D = text => text.length * charWidth;
+		}
 	}
 	get family() {
 		return this._family;
