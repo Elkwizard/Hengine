@@ -47,6 +47,10 @@ class PhysicsVector {
         this.y /= b;
         return this;
     }
+	accumulate(vector) {
+		const diff = this.projectOnto(vector);
+		this.add(vector.minus(diff));
+	}
     normalize() {
         const m = this.mag;
         if (m) {
@@ -56,7 +60,9 @@ class PhysicsVector {
         return this;
     }
     projectOnto(v) {
-        return v.times(this.dot(v) / v.sqrMag);
+		const { sqrMag } = v;
+		if (!sqrMag) return new PhysicsVector(0, 0);
+        return v.times(this.dot(v) / sqrMag);
     }
     equals(v) {
         return Math.abs(this.x - v.x) < 0.0001 && Math.abs(this.y - v.y) < 0.0001;
@@ -426,9 +432,6 @@ class PolygonCollider extends BaseCollider {
             this.inertia = 1 / 12 * (width ** 3 * height + height ** 3 * width);
         };
     }
-    size() {
-        return Math.sqrt(this.mass);
-    }
 }
 PolygonCollider.SYMBOL = Symbol("POLYGON");
 
@@ -461,16 +464,14 @@ class CircleCollider extends BaseCollider {
         this.mass = this.radius ** 2 * Math.PI;
         this.inertia = this.position.sqrMag + 1.25 * this.radius ** 2 * this.mass;
     }
-    size() {
-        return this.radius * 2;
-    }
 }
 CircleCollider.SYMBOL = Symbol("CIRCLE");
 
 //grid
 class PhysicsGrid {
-    constructor(cellsize) {
-        this.cellsize = cellsize;
+    constructor(cellSize) {
+        this.cellSize = cellSize;
+		this.inverseCellSize = 1 / cellSize;
         this.cells = new Map();
         this.queryFoundMap = new Map();
     }
@@ -480,43 +481,67 @@ class PhysicsGrid {
         if (!column.has(y)) column.set(y, []);
         column.get(y).push(body);
     }
-    query(body, cells, filter) {
+    query(body, filter) {
         let bodies = [];
         let found = [];
         found[body.id] = true;
-        for (let i = 0; i < cells.length; i++) {
-            // expansion of: bodies.push(...this.cells[cl.x][cl.y].filter(b => (!found[b.id] && filter(b)) ? found[b.id] = true : false));
-            let cl = cells[i];
-            let cellBodies = this.cells.get(cl.x).get(cl.y);
-            for (let j = 0; j < cellBodies.length; j++) {
-                const b = cellBodies[j];
-                const id = b.id;
-                if (!(id in found)) {
-                    found[id] = true;
-                    if (filter(b)) bodies.push(b);
-                }
-            }
-        }
+
+        const { position: { x, y }, boundingRadius } = body;
+
+        const startX = this.getCell(x - boundingRadius);
+        const startY = this.getCell(y - boundingRadius);
+
+        const endX = this.getCell(x + boundingRadius);
+        const endY = this.getCell(y + boundingRadius);
+
+        for (let i = startX; i <= endX; i++) {
+			const column = this.cells.get(i);
+			for (let j = startY; j <= endY; j++) {
+				const cellBodies = column.get(j);
+				for (let k = 0; k < cellBodies.length; k++) {
+					const b = cellBodies[k];
+					const id = b.id;
+					if (found[id] === undefined) {
+						found[id] = true;
+						if (filter(b)) bodies.push(b);
+					}
+				}
+			}
+		}
+
+
+        // for (let i = 0; i < cells.length; i++) {
+        //     // expansion of: bodies.push(...this.cells[cl.x][cl.y].filter(b => (!found[b.id] && filter(b)) ? found[b.id] = true : false));
+        //     let cl = cells[i];
+        //     let cellBodies = this.cells.get(cl.x).get(cl.y);
+        //     for (let j = 0; j < cellBodies.length; j++) {
+        //         const b = cellBodies[j];
+        //         const id = b.id;
+        //         if (!(id in found)) {
+        //             found[id] = true;
+        //             if (filter(b)) bodies.push(b);
+        //         }
+        //     }
+        // }
 
         return bodies;
+
+
     }
-    cellsBounds(body, radius) {
-        const { x, y } = body.position;
+	getCell(value) {
+		return ~~(value * this.inverseCellSize);
+	}
+    cellsBounds(body) {
+        const { position: { x, y }, boundingRadius } = body;
 
-        let cells = [];
-        let startX = Math.floor((x - radius) / this.cellsize);
-        let startY = Math.floor((y - radius) / this.cellsize);
+        const startX = this.getCell(x - boundingRadius);
+        const startY = this.getCell(y - boundingRadius);
 
-        let endX = Math.floor((x + radius) / this.cellsize);
-        let endY = Math.floor((y + radius) / this.cellsize);
+        const endX = this.getCell(x + boundingRadius);
+        const endY = this.getCell(y + boundingRadius);
 
-        let rx = endX - startX;
-        let ry = endY - startY;
-        for (let i = 0; i <= rx; i++) for (let j = 0; j <= ry; j++) {
-            this.addBody(startX + i, startY + j, body);
-            cells.push({ x: startX + i, y: startY + j });
-        }
-        return cells;
+        for (let i = startX; i <= endX; i++) for (let j = startY; j <= endY; j++)
+            this.addBody(i, j, body);
     }
 }
 
@@ -543,7 +568,7 @@ class RigidBody {
         this.angularVelocity = 0;
 
         // size
-        this.size = 0;
+		this.boundingRadius = 0;
         this.mass = 0;
         this.inertia = 0;
 
@@ -635,13 +660,14 @@ class RigidBody {
             // don't just subtract shape's mass and inertia in case mass was changed elsewhere
             this.mass = 0
             this.inertia = 0;
+			this.boundingRadius = 0;
             for (let i = 0; i < this.shapes.length; i++) {
                 const shape = this.shapes[i];
                 this.mass += shape.mass;
                 this.inertia += shape.inertia;
+				if (shape.boundingRadius > this.boundingRadius)
+					this.boundingRadius = shape.boundingRadius;
             }
-
-            this.size -= sh.size();
         }
     }
     addShape(sh) {
@@ -649,14 +675,18 @@ class RigidBody {
         sh.computeMatterData();
         this.mass += sh.mass;
         this.inertia += sh.inertia;
-        this.size += sh.size();
-        this.invalidateModels();
-        this.wakeCollidingBodies();
-        return sh;
+		if (sh.boundingRadius > this.boundingRadius)
+			this.boundingRadius = sh.boundingRadius;
+		this.invalidateModels();
+		this.wakeCollidingBodies();	
+		return sh;
     }
     integrate(intensity) {
         this.displace(this.velocity.times(intensity));
         if (this.canRotate) this.angle += this.angularVelocity * intensity;
+    }
+    integratePosition(intensity) { // does not move models, only use for grid
+    	this.position.add(this.velocity.times(intensity));
     }
     stop() {
         this.velocity.mul(0);
@@ -676,21 +706,24 @@ class RigidBody {
         if (!this.dynamic || this.mass === 0) return;
         // renderer.stroke(Color.ORANGE).arrow(pos, pos.plus(imp.over(1000)));
 
-        const impx = imp.x * factor;
-        const impy = imp.y * factor;
+        const impX = imp.x * factor;
+        const impY = imp.y * factor;
 
         //linear
-        this.velocity.x += impx / this.mass;
-        this.velocity.y += impy / this.mass;
+        this.velocity.x += impX / this.mass;
+        this.velocity.y += impY / this.mass;
 
         //angular
         if (this.canRotate) {
-            const cross = (pos.x - this.position.x) * impy - (pos.y - this.position.y) * impx;
+            const cross = (pos.x - this.position.x) * impY - (pos.y - this.position.y) * impX;
             if (cross) this.angularVelocity += cross / this.inertia;
         }
     }
     accumulateImpulse(pos, imp, factor = 1) {
-        if (!this.dynamic || this.mass === 0) return;
+		// this.applyImpulse(pos, imp, factor);
+		// return;
+        
+		if (!this.dynamic || this.mass === 0) return;
 
         const impx = imp.x * factor;
         const impy = imp.y * factor;
@@ -704,6 +737,12 @@ class RigidBody {
             if (cross) this.angularAccelerationAccumulator.append(cross / this.inertia);
         }
     }
+	applyAccumulatedImpulses() {
+		this.velocity.add(this.accelerationAccumulator.value);
+		this.angularVelocity += this.angularAccelerationAccumulator.value.x;
+		this.accelerationAccumulator.reset();
+		this.angularAccelerationAccumulator.reset();
+	}
     static fromPolygon(vertices, dynamic = true) {
         const position = vertices.reduce((a, b) => a.plus(b));
         position.div(vertices.length);
@@ -860,9 +899,13 @@ class CollisionDetector {
         let between = b.position.minus(a.position);
         let sqrMag = between.sqrMag;
         if (sqrMag < (a.radius + b.radius) ** 2) {
-            let axis = between.normalize();
-            let point = new PhysicsVector((axis.x * a.radius + a.position.x + axis.x * -b.radius + b.position.x) / 2, (axis.y * a.radius + a.position.y + axis.y * -b.radius + b.position.y) / 2);
-            return new CollisionDetector.Collision(axis, [point], a.radius + b.radius - Math.sqrt(sqrMag));
+			const mag = Math.sqrt(sqrMag);
+            const axis = between.times(1 / mag);
+            const point = new PhysicsVector(
+				(axis.x * a.radius + a.position.x + axis.x * -b.radius + b.position.x) * 0.5,
+				(axis.y * a.radius + a.position.y + axis.y * -b.radius + b.position.y) * 0.5
+			);
+            return new CollisionDetector.Collision(axis, [point], a.radius + b.radius - mag);
         }
         return null;
     }
@@ -1051,15 +1094,15 @@ class CollisionResolver {
             const jt = this.normalImpulse(vABt, mA, mB, iA, iB, 0, tangent, rAx, rAy, rBx, rBy);
             const tangentImpulse = (Math.abs(jt) < -normalImpulse * staticFriction) ? jt : Math.sign(jt) * -normalImpulse * kineticFriction; // normal impulses negated for absolute value
 
-            bodyA.applyImpulse(contact, normal, normalImpulse);
+            bodyA.accumulateImpulse(contact, normal, normalImpulse);
             bodyA.applyImpulse(contact, tangent, tangentImpulse);
 
             if (dynamic) {
-                bodyB.applyImpulse(contact, normal, -normalImpulse);
+                bodyB.accumulateImpulse(contact, normal, -normalImpulse);
                 bodyB.applyImpulse(contact, tangent, -tangentImpulse);
             }
 
-            // renderer.draw(Color.BLUE).circle(contact, 1);
+            // renderer.draw(Color.BLUE).circle(contact, 2);
             // const middle = contact;
             // renderer.stroke(Color.YELLOW, 0.4).line(middle.plus(normal.times(4)), middle.plus(normal.times(-4)));
 
@@ -1096,20 +1139,20 @@ class CollisionResolver {
             const tangentImpulse2 = (Math.abs(jt2) < -normalImpulse2 * staticFriction) ? jt2 : Math.sign(jt2) * -normalImpulse2 * kineticFriction;
 
             // apply impulses
-            bodyA.applyImpulse(contact1, normal, normalImpulse1);
-            bodyA.applyImpulse(contact2, normal, normalImpulse2);
+            bodyA.accumulateImpulse(contact1, normal, normalImpulse1);
+            bodyA.accumulateImpulse(contact2, normal, normalImpulse2);
 
             bodyA.applyImpulse(contact1, tangent, tangentImpulse1);
             bodyA.applyImpulse(contact2, tangent, tangentImpulse2);
 
             if (dynamic) {
-                bodyB.applyImpulse(contact1, normal, -normalImpulse1);
-                bodyB.applyImpulse(contact2, normal, -normalImpulse2);
+                bodyB.accumulateImpulse(contact1, normal, -normalImpulse1);
+                bodyB.accumulateImpulse(contact2, normal, -normalImpulse2);
                 bodyB.applyImpulse(contact1, tangent, -tangentImpulse1);
                 bodyB.applyImpulse(contact2, tangent, -tangentImpulse2);
             }
 
-            // renderer.stroke(Color.RED, 2, LineCap.ROUND).line(contact1, contact2);
+            // renderer.stroke(Color.RED, 4, LineCap.ROUND).line(contact1, contact2);
             // const middle = contact1.plus(contact2).over(2);
             // renderer.stroke(Color.YELLOW, 0.4).line(middle.plus(normal.times(4)), middle.plus(normal.times(-4)));
 
@@ -1127,19 +1170,31 @@ class CollisionResolver {
             }
         }
     }
-    resolve(dynamic, bodyA, bodyB, direction, penetration, contacts) {
-        if (dynamic) {
-            const portionA = bodyB.mass / (bodyA.mass + bodyB.mass);
-            const moveA = direction.times(-portionA * penetration);
-            const moveB = direction.times((1 - portionA) * penetration);
-            bodyA.displace(moveA);
-            if (bodyB.canMoveThisStep || this.engine.iterations > 2) bodyB.displace(moveB);
-        } else {
-            const move = direction.times(-penetration);
-            bodyA.displace(move);
-        }
+    resolve(dynamic, prohibited, bodyA, bodyB, direction, penetration, contacts) {
+		// penetration *= 0.2;
+		const SLOP = 1;
+		
+		dynamic &&= !prohibited;
 
-        this.resolveContacts(dynamic, bodyA, bodyB, direction, contacts);
+		if (penetration > SLOP) {
+			penetration -= SLOP;
+			if (dynamic) {
+				const portionA = bodyB.mass / (bodyA.mass + bodyB.mass);
+				const portionB = (1 - portionA);
+				const moveA = direction.times(-portionA * penetration);
+				const moveB = direction.times(portionB * penetration);
+				
+				bodyA.displace(moveA);
+				if (bodyB.canMoveThisStep || this.engine.iterations > 2) {
+					bodyB.displace(moveB);
+				}
+			} else {
+				const move = direction.times(-penetration);
+				bodyA.displace(move);
+			}
+		}
+
+		this.resolveContacts(dynamic, bodyA, bodyB, direction, contacts);
     }
 }
 //constraints
@@ -1398,7 +1453,7 @@ class PhysicsEngine {
         this.sleepDuration = 200;
         this.sleepingActivityThreshold = 0.2;
 
-        this.constraintOrderGenerator = {
+        this.orderGenerator = {
             seed: 123456,
             next() {
                 this.seed++;
@@ -1423,8 +1478,9 @@ class PhysicsEngine {
     }
     clearCollidingBodies() {
         const filter = body => body.dynamic && this.isAsleep(body);
-        for (let i = 0; i < this.bodies.length; i++) {
-            let body = this.bodies[i];
+		const { bodies } = this;
+        for (let i = 0; i < bodies.length; i++) {
+            let body = bodies[i];
             if (!filter(body)) body.collidingBodies = body.collidingBodies.filter(filter);
         }
     }
@@ -1435,7 +1491,7 @@ class PhysicsEngine {
     solveConstraints() {
         const cons = this.constraints;
         while (cons.length)
-            cons.splice(Math.floor(this.constraintOrderGenerator.next() * cons.length), 1)[0].solve();
+            cons.splice(Math.floor(this.orderGenerator.next() * cons.length), 1)[0].solve();
     }
     applyForces(dynBodies, intensity) {
         const dragFactor = (1 - this.drag) ** intensity;
@@ -1459,6 +1515,13 @@ class PhysicsEngine {
             body.integrate(intensity);
         }
     }
+	integratePosition(dynBodies, intensity) { // doesn't move models, only use for grid
+        for (let i = 0; i < dynBodies.length; i++) {
+            let body = dynBodies[i];
+            if (this.isAsleep(body)) continue;
+            body.integratePosition(intensity);
+        }
+	}
     resolve(body, body2, col) {
         let collisionDirection = col.direction;
         let maxPenetration = col.penetration;
@@ -1472,21 +1535,23 @@ class PhysicsEngine {
 
         if (body.isTrigger || body2.isTrigger) return;
 
-        let STATIC = !body2.dynamic;
+        let dynamic = body2.dynamic;
+		let prohibited = false;
 
-        if (!STATIC && (body.sleeping || body2.sleeping) && (!this.lowActivity(body) || !this.lowActivity(body2))) body2.wake();
+        if (dynamic && (body.sleeping || body2.sleeping) && (!this.lowActivity(body) || !this.lowActivity(body2))) body2.wake();
 
-        if (!STATIC) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
+        if (dynamic) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
             let dot = body2.prohibitedDirections[i].dot(collisionDirection);
             if (dot > 0.8) {
-                STATIC = true;
+                prohibited = true;
                 break;
             }
         }
-        if (STATIC) {
+        if (!dynamic || prohibited) {
             body.prohibitedDirections.push(collisionDirection);
+			// renderer.stroke(Color.RED).arrow(body.position, body.position.plus(collisionDirection.times(20)));
         }
-        this.collisionResolver.resolve(!STATIC, body, body2, collisionDirection, maxPenetration, contacts);
+        this.collisionResolver.resolve(dynamic, prohibited, body, body2, collisionDirection, maxPenetration, contacts);
 
         //immobilize
         body.canMoveThisStep = false;
@@ -1495,8 +1560,8 @@ class PhysicsEngine {
         const colBodies = dynBodies.filter(body => body.canCollide);
         colBodies.sort(order);
 
-        // for (let i = 0; i < dynBodies.length; i++) {
-        //     renderer.draw(Color.RED).text(Font.Serif25, i + 1, dynBodies[i].position);
+        // for (let i = 0; i < colBodies.length; i++) {
+        //     renderer.draw(Color.RED).textLine(Font.Serif100, i + 1, colBodies[i].position);
         // }
 
         //collisions
@@ -1511,58 +1576,57 @@ class PhysicsEngine {
 
             const others = collisionPairs.get(body);
             const vel = body.velocity;
-            const collidable = others.filter(b => !(this.isAsleep(b) && asleep)).sort((a, b) => (a.position.x - b.position.x) * vel.x + (a.position.y - b.position.y) * vel.y);
+            const collidable = others
+				.filter(b => !(this.isAsleep(b) && asleep))
+				.sort((a, b) => (a.position.x - b.position.x) * vel.x + (a.position.y - b.position.y) * vel.y);
 
             for (let j = 0; j < collidable.length; j++) {
                 const body2 = collidable[j];
+				// if (this.isAsleep(body2) && asleep) continue;
                 const collision = CollisionDetector.collideBodies(body, body2);
                 if (collision !== null) this.resolve(body, body2, collision);
+
             }
         }
     }
     createGrid(dynBodies) {
-        let cellsize = 100;
-        if (this.bodies.length) {
-            let meanSize = 0;
-            for (let i = 0; i < this.bodies.length; i++) meanSize += this.bodies[i].size;
-            meanSize /= this.bodies.length;
-            if (meanSize) cellsize = meanSize;
+		const { bodies } = this;
+
+        let cellSize = 50;
+        if (bodies.length) {
+            let meanRadius = 0;
+            for (let i = 0; i < bodies.length; i++) meanRadius += bodies[i].boundingRadius;
+            meanRadius /= bodies.length;
+            if (meanRadius)
+				cellSize = meanRadius;
         }
 
-        const grid = new PhysicsGrid(cellsize);
+        const grid = new PhysicsGrid(cellSize);
 
         //create grid
-        const collisionPairs = new Map();
-        for (let i = 0; i < this.bodies.length; i++) {
-            let body = this.bodies[i];
+        for (let i = 0; i < bodies.length; i++) {
+            let body = bodies[i];
             if (!body.canCollide) continue;
 
-            let cellsTotal = [];
-            const { shapes } = body;
-            for (let j = 0; j < shapes.length; j++) {
-                const shape = shapes[j];
-                let cells = grid.cellsBounds(body, shape.boundingRadius);
-                for (let ii = 0; ii < cells.length; ii++) cellsTotal.push(cells[ii]);
-            }
-            collisionPairs.set(body, cellsTotal);
-        }
+			grid.cellsBounds(body);
+		}
+
+		const collisionPairs = new Map();
+
         for (let i = 0; i < dynBodies.length; i++) {
             let body = dynBodies[i];
             if (!body.canCollide) continue;
 
-            let cellsTotal = collisionPairs.get(body);
-            let bodies = grid.query(body, cellsTotal, b => body.collisionFilter(b) && b.collisionFilter(body));
-            // for (let j = 0; j < bodies.length; j++) {
-            //     renderer.stroke(Color.ORANGE, 2).arrow(body.position, bodies[j].position);
-            // }
-            collisionPairs.set(body, bodies);
+            const bodies = grid.query(body, b => body.collisionFilter(b) && b.collisionFilter(body));
+            
+			collisionPairs.set(body, bodies);
         }
 
         // scene.camera.drawInWorldSpace(() => {
-        //     const LINE_WIDTH = 1 / scene.camera.zoom;
-        //     for (let [x, column] of grid.cells) for (let [y, cell] of column) {
-        //         renderer.stroke(Color.RED, LINE_WIDTH).rect(x * cellsize, y * cellsize, cellsize, cellsize);
-        //     }
+            // const LINE_WIDTH = 1 / scene.camera.zoom;
+            // for (let [x, column] of grid.cells) for (let [y, cell] of column) {
+            //     renderer.stroke(Color.RED, LINE_WIDTH).rect(x * cellSize, y * cellSize, cellSize, cellSize);
+            // }
         // });
         return collisionPairs;
     }
@@ -1591,8 +1655,10 @@ class PhysicsEngine {
 
         const sleepDuration = this.sleepDuration * this.iterations;
 
-        for (let i = 0; i < this.bodies.length; i++) {
-            const body = this.bodies[i];
+		const { bodies } = this;
+
+        for (let i = 0; i < bodies.length; i++) {
+            const body = bodies[i];
             if (this.lowActivity(body)) {
                 body.sleeping++;
             } else if (body.sleeping) body.wake();
@@ -1611,19 +1677,16 @@ class PhysicsEngine {
     applyAccumulatedImpulses(dynBodies) {
         for (let i = 0; i < dynBodies.length; i++) {
             const body = dynBodies[i];
-            body.velocity.add(body.accelerationAccumulator.value);
-            body.angularVelocity += body.angularAccelerationAccumulator.value.x;
-            body.accelerationAccumulator.reset();
-            body.angularAccelerationAccumulator.reset();
-        }
+			body.applyAccumulatedImpulses();
+		}
     }
     run() {
         const dynBodies = this.bodies.filter(body => body.dynamic);
 
         // approximate where they'll be at the end of the frame
-        this.integrate(dynBodies, 1);
+        this.integratePosition(dynBodies, 1);
         const collisionPairs = this.createGrid(dynBodies);
-        this.integrate(dynBodies, -1);
+        this.integratePosition(dynBodies, -1);
 
         const intensity = 1 / (this.iterations * this.constraintIterations);
 
@@ -1649,10 +1712,7 @@ class PhysicsEngine {
         }
     }
     getBody(id) {
-        for (let i = 0; i < this.bodies.length; i++) {
-            if (this.bodies[i].id === id) return this.bodies[i];
-        }
-        return null;
+		return this.bodyMap.get(id);
     }
     addBody(b) {
         b.engine = this;
