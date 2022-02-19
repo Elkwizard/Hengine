@@ -64,7 +64,7 @@ vec4 shader() {
 					pos.y + l.renderTextOffset.y + font.lineHeight
 				);
 		}
-		let functionRegex = String.raw`\b(?:(?:a?(?:sin|cos|tan))|length|dot|cross|texture|clamp|normalize|min|max|ceil|smoothstep|round|floor|mod|sqrt|mix|pow|abs|float|int|sampler2D|mat[234]|(?:(?:i|b|)vec[234]))\b`;
+		let functionRegex = String.raw`\b(?:(?:a?(?:sin|cos|tan))|length|dot|cross|texture|clamp|normalize|min|max|ceil|smoothstep|round|floor|mod|sqrt|mix|pow|abs|float|int|bool|sampler2D|mat[234]|(?:(?:i|b|)vec[234]))\b`;
 		let keywordRegex = String.raw`\b(?:return|struct|void|in|out|(?:low|medium|high)p|uniform|position|resolution|shader|for|continue|break|if|else|define)\b`;
 		let primitiveRegex = String.raw`\b((?:\d+(?:\.\d+)?)|(?:true|false))\b`;
 		let symbolRegex = String.raw`(?:[^\w\s]+)`;
@@ -83,6 +83,7 @@ vec4 shader() {
 			if (keyboard.justPressed("Enter")) codeInput.scripts.TEXT_AREA.ignore("Enter");
 			try {
 				shader.glsl = codeInput.scripts.TEXT_AREA.getValue();
+				error = null;
 			} catch (err) {
 				error = err;
 			}
