@@ -195,14 +195,6 @@ Object.defineProperty(window, "title", {
 		}
 		return ary;
 	};
-	proto(Array.prototype, "randomize", function () {
-		const result = [];
-		const copy = [...this];
-		while (copy.length) {
-			result.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
-		}
-		return result;
-	});
 	//Number
 	proto(Number.prototype, "toDegrees", function () {
 		return this * (180 / Math.PI);

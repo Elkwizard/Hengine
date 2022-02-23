@@ -1259,8 +1259,10 @@ class CollisionResolver {
 
 		let anySolved = false;
 
-		for (let i = 0; i < contactsA.length; i += 2) {
-			if (i + 1 < contactsA.length) {
+		const contacts = contactsA.length;
+
+		for (let i = 0; i < contacts; i += 2) {
+			if (i + 1 < contacts) {
 				const rA1 = contactsA[i];
 				const rB1 = contactsB[i];
 				const rA2 = contactsA[i + 1];
@@ -1268,10 +1270,10 @@ class CollisionResolver {
 				if (!solve2(rA1, rB1, rA2, rB2)) {
 					anySolved ||= solve1(rA1, rB1);
 					anySolved ||= solve1(rA2, rB2);
-				} else if (contactsA.length === 2) return false;
+				} else if (contacts === 2) return false;
 			} else {
 				anySolved ||= solve1(contactsA[i], contactsB[i]);
-				if (contactsA.length === 1) return false;
+				if (contacts === 1) return false;
 			}
 		}
 
@@ -1281,6 +1283,9 @@ class CollisionResolver {
 		const { dynamicCollisions, staticCollisions } = this;
 
 		for (let i = 0; i < this.engine.contactIterations; i++) {
+			this.engine.orderGenerator.shuffle(dynamicCollisions);
+			this.engine.orderGenerator.shuffle(staticCollisions);
+			
 			for (let j = 0; j < dynamicCollisions.length; j++)
 				this.resolveContacts(true, dynamicCollisions[j]);
 
@@ -1559,6 +1564,27 @@ PhysicsConstraint1.Position = class extends PhysicsConstraint1 {
     }
 }
 
+class PhysicsOrderGenerator {
+	constructor(seed) {
+		this.seed = seed;
+	}
+	next() {
+		this.seed++;
+		let a = (this.seed * 638835776.12849) % 8.7890975;
+		let b = (a * 256783945.4758903) % 2.567890;
+		let r = Math.abs(a * b * 382749.294873597) % 1;
+		return r;
+	}
+	shuffle(arr) {
+		for (let i = 0; i < arr.length; i++) {
+			const inx = ~~(this.next() * arr.length);
+			const temp = arr[inx];
+			arr[inx] = arr[0];
+			arr[0] = temp;
+		}
+	}
+}
+
 //engine
 class PhysicsEngine {
     constructor(gravity = new PhysicsVector(0, 0.2)) {
@@ -1578,16 +1604,7 @@ class PhysicsEngine {
 		
         this.onCollide = (a, b, dir, contacts) => null;
 
-        this.orderGenerator = {
-            seed: 123456,
-            next() {
-                this.seed++;
-                let a = (this.seed * 638835776.12849) % 8.7890975;
-                let b = (a * 256783945.4758903) % 2.567890;
-                let r = Math.abs(a * b * 382749.294873597) % 1;
-                return r;
-            }
-        };
+        this.orderGenerator = new PhysicsOrderGenerator(123456);
     }
     get bodies() {
         return [...this.bodyMap.values()].filter(body => body.simulated);
@@ -1614,10 +1631,11 @@ class PhysicsEngine {
         this.constraintMap.set(constraint.id, constraint);
     }
     solveConstraints() {
-        const cons = this.constraints;
-        while (cons.length)
-            cons.splice(Math.floor(this.orderGenerator.next() * cons.length), 1)[0].solve();
-    }
+		const { constraints } = this;
+		this.orderGenerator.shuffle(constraints);
+		for (let i = 0; i < constraints.length; i++)
+			constraints[i].solve();
+	}
     applyForces(dynBodies, intensity) {
         const dragFactor = (1 - this.drag) ** intensity;
         const gravitationalAcceleration = this.gravity.times(intensity);
