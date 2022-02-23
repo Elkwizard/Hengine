@@ -47,10 +47,6 @@ class PhysicsVector {
         this.y /= b;
         return this;
     }
-	accumulate(vector) {
-		const diff = this.projectOnto(vector);
-		this.add(vector.minus(diff));
-	}
     normalize() {
         const m = this.mag;
         if (m) {
@@ -704,7 +700,8 @@ class RigidBody {
     }
     applyImpulse(pos, imp, factor = 1) {
         if (!this.dynamic || this.mass === 0) return;
-        // renderer.stroke(Color.ORANGE).arrow(pos, pos.plus(imp.over(1000)));
+        
+		// if (this.engine.step === 0) renderer.stroke(Color.ORANGE, 5).arrow(pos, pos.plus(imp.over(0.02)));
 
         const impX = imp.x * factor;
         const impY = imp.y * factor;
@@ -719,9 +716,12 @@ class RigidBody {
             if (cross) this.angularVelocity += cross / this.inertia;
         }
     }
+	applyRelativeImpulse(pos, imp, factor = 1) {
+		this.applyImpulse(pos.plus(this.position), imp, factor);
+	}
     accumulateImpulse(pos, imp, factor = 1) {
-		// this.applyImpulse(pos, imp, factor);
-		// return;
+		this.applyImpulse(pos, imp, factor);
+		return;
         
 		if (!this.dynamic || this.mass === 0) return;
 
@@ -772,17 +772,22 @@ RigidBody.nextID = 0;
 //detection
 class CollisionDetector {
     static collideBodies(bodyA, bodyB) {
-        if (bodyA.shapes.length === 1 && bodyB.shapes.length === 1) {
-            return CollisionDetector.collide(
+		if (bodyA.shapes.length === 1 && bodyB.shapes.length === 1) {
+            const collision = CollisionDetector.collide(
                 bodyA.shapes[0], bodyA.position, bodyA.cosAngle, bodyA.sinAngle,
                 bodyB.shapes[0], bodyB.position, bodyB.cosAngle, bodyB.sinAngle
             );
+			if (collision !== null) { 
+				collision.setBodies(bodyA, bodyB);
+			}
+
+			return collision;
         } else {
             const collisions = [];
-            for (let sI = 0; sI < bodyA.shapes.length; sI++) for (let sJ = 0; sJ < bodyB.shapes.length; sJ++) {
+            for (let i = 0; i < bodyA.shapes.length; i++) for (let j = 0; j < bodyB.shapes.length; j++) {
                 const col = CollisionDetector.collide(
-                    bodyA.shapes[sI], bodyA.position, bodyA.cosAngle, bodyA.sinAngle,
-                    bodyB.shapes[sJ], bodyB.position, bodyB.cosAngle, bodyB.sinAngle
+                    bodyA.shapes[i], bodyA.position, bodyA.cosAngle, bodyA.sinAngle,
+                    bodyB.shapes[j], bodyB.position, bodyB.cosAngle, bodyB.sinAngle
                 );
                 if (col !== null) collisions.push(col);
             }
@@ -791,9 +796,9 @@ class CollisionDetector {
             let dir = new PhysicsVector(0, 0);
             let penetration = -Infinity;
             let best = null;
-            for (let cI = 0; cI < collisions.length; cI++) dir.add(collisions[cI].direction);
-            for (let cI = 0; cI < collisions.length; cI++) {
-                let col = collisions[cI];
+            for (let i = 0; i < collisions.length; i++) dir.add(collisions[i].direction);
+            for (let i = 0; i < collisions.length; i++) {
+                let col = collisions[i];
                 if (col.direction.dot(dir) < 0) continue;
                 contacts.push(...col.contacts);
                 if (col.penetration > penetration) {
@@ -807,6 +812,9 @@ class CollisionDetector {
             const dot = best.direction.dot(dir);
             best.penetration *= dot;
             best.direction = dir;
+
+			// assign bodies
+			best.setBodies(bodyA, bodyB);
             return best;
         }
     }
@@ -978,13 +986,99 @@ class CollisionDetector {
 
         return new CollisionDetector.Collision(bestAxis, contacts, minOverlap);
     }
+	static _PolygonModel_PolygonModel(a, b) {
+		const toB = b.position.minus(a.position);
+
+        const axes = [];
+        for (let i = 0; i < a.axes.length; i++) {
+            const ax = a.axes[i];
+            if (ax.dot(toB) <= 0) axes.push(ax.inverse);
+        }
+        for (let i = 0; i < b.axes.length; i++) {
+            const ax = b.axes[i];
+            if (ax.dot(toB) > 0) axes.push(ax);
+        }
+        if (!axes.length) return null;
+        let minOverlap = Infinity;
+        let bestAxis = null;
+
+		const aVertices = a.vertices;
+		const bVertices = b.vertices;
+
+		const aInside = aVertices.map(() => true);
+		const bInside = bVertices.map(() => true);
+
+        for (let i = 0; i < axes.length; i++) {
+            let axis = axes[i];
+            let aMin = Infinity;
+            let aMax = -Infinity;
+            let bMin = Infinity;
+            let bMax = -Infinity;
+            for (let j = 0; j < aVertices.length; j++) {
+                let dot = aVertices[j].dot(axis);
+                if (dot < aMin) aMin = dot;
+                if (dot > aMax) aMax = dot;
+            }
+            
+			for (let j = 0; j < bVertices.length; j++) {
+                let dot = bVertices[j].dot(axis);
+                if (dot < bMin) bMin = dot;
+                if (dot > bMax) bMax = dot;
+
+				// check B contacts
+				if (bInside[j] && (dot < aMin || dot > aMax))
+					bInside[j] = false;
+            }
+
+            if (aMax < bMin || aMin > bMax) {
+                return null;
+            }
+
+			// check A contacts
+			for (let j = 0; j < aVertices.length; j++) {
+                let dot = aVertices[j].dot(axis);
+                
+				if (aInside[j] && (dot < bMin || dot > bMax))
+					aInside[j] = false;
+            }
+
+            let overlap = ((aMin + aMax) / 2 < (bMin + bMax) / 2) ? aMax - bMin : bMax - aMin;
+            if (overlap < minOverlap) {
+                minOverlap = overlap;
+                bestAxis = axis;
+            }
+        }
+        if (!bestAxis) return null;
+
+		const contacts = [];
+		for (let i = 0; i < aVertices.length; i++)
+			if (aInside[i]) contacts.push(aVertices[i]);
+
+		for (let i = 0; i < bVertices.length; i++)
+			if (bInside[i]) contacts.push(bVertices[i]);
+
+        return new CollisionDetector.Collision(bestAxis, contacts, minOverlap);
+	}
 }
 CollisionDetector.Collision = class {
     constructor(direction, contacts, penetration) {
-        this.direction = direction;
-        this.contacts = contacts;
+        this.bodyA = null;
+		this.bodyB = null;
+		this.direction = direction;
+		this.contacts = contacts;
         this.penetration = penetration;
     }
+	setBodies(bodyA, bodyB) {
+		this.bodyA = bodyA;
+		this.bodyB = bodyB;
+		const { contacts } = this;
+        this.contactsA = new Array(contacts.length);;
+		this.contactsB = new Array(contacts.length);
+		for (let i = 0; i < contacts.length; i++) {
+			this.contactsA[i] = contacts[i].minus(this.bodyA.position);
+			this.contactsB[i] = contacts[i].minus(this.bodyB.position);
+		}
+	}
 };
 CollisionDetector.jumpTable = {
     [PolygonCollider.SYMBOL]: {
@@ -1005,12 +1099,18 @@ class CollisionResolver {
             null, null,
             null, null
         );
+		this.dynamicCollisions = [];
+		this.staticCollisions = [];
     }
-    vAB(point, bodyA, bodyB, normal) {
-        const rAx = point.x - bodyA.position.x;
-        const rAy = point.y - bodyA.position.y;
-        const rBx = point.x - bodyB.position.x;
-        const rBy = point.y - bodyB.position.y;
+    vAB(rA, rB, bodyA, bodyB, normal) {
+
+		const { x: rAx, y: rAy } = rA;
+		const { x: rBx, y: rBy } = rB;
+
+        // const rAx = point.x - bodyA.position.x;
+        // const rAy = point.y - bodyA.position.y;
+        // const rBx = point.x - bodyB.position.x;
+        // const rBy = point.y - bodyB.position.y;
         if (bodyB.dynamic) {
             const vABx = (-rBy * bodyB.angularVelocity + bodyB.velocity.x) - (-rAy * bodyA.angularVelocity + bodyA.velocity.x);
             const vABy = (rBx * bodyB.angularVelocity + bodyB.velocity.y) - (rAx * bodyA.angularVelocity + bodyA.velocity.y);
@@ -1062,7 +1162,9 @@ class CollisionResolver {
 
         return forceToDV.applyInverseTo(dvs);
     }
-    resolveContacts(dynamic, bodyA, bodyB, normal, contacts) {
+    resolveContacts(dynamic, collision) {
+		const { bodyA, bodyB, direction: normal, contactsA, contactsB } = collision;
+
         const tangent = normal.normal;
 
         const staticFriction = bodyA.friction * bodyB.friction;
@@ -1076,105 +1178,128 @@ class CollisionResolver {
         const iB = (dynamic && bodyB.canRotate) ? 1 / bodyB.inertia : 0;
         const GTE_EPSILON = -0.0001;
 
-        const solve1 = contact => {
+        const solve1 = (rA, rB) => {
             // radii
-            const rAx = contact.x - bodyA.position.x;
-            const rAy = contact.y - bodyA.position.y;
-            const rBx = contact.x - bodyB.position.x;
-            const rBy = contact.y - bodyB.position.y;
+			const { x: rAx, y: rAy } = rA;
+			const { x: rBx, y: rBy } = rB;
 
             // normal force
-            const vABn = this.vAB(contact, bodyA, bodyB, normal);
+            const vABn = this.vAB(rA, rB, bodyA, bodyB, normal);
             if (vABn >= GTE_EPSILON) return false;
             const normalImpulse = this.normalImpulse(vABn, mA, mB, iA, iB, e, normal, rAx, rAy, rBx, rBy); // normal impulses are down the inverse normal
             if (normalImpulse >= GTE_EPSILON) return false;
 
             // friction
-            const vABt = this.vAB(contact, bodyA, bodyB, tangent);
+            const vABt = this.vAB(rA, rB, bodyA, bodyB, tangent);
             const jt = this.normalImpulse(vABt, mA, mB, iA, iB, 0, tangent, rAx, rAy, rBx, rBy);
             const tangentImpulse = (Math.abs(jt) < -normalImpulse * staticFriction) ? jt : Math.sign(jt) * -normalImpulse * kineticFriction; // normal impulses negated for absolute value
 
-            bodyA.accumulateImpulse(contact, normal, normalImpulse);
-            bodyA.applyImpulse(contact, tangent, tangentImpulse);
+            bodyA.applyRelativeImpulse(rA, normal, normalImpulse);
+            bodyA.applyRelativeImpulse(rA, tangent, tangentImpulse);
 
             if (dynamic) {
-                bodyB.accumulateImpulse(contact, normal, -normalImpulse);
-                bodyB.applyImpulse(contact, tangent, -tangentImpulse);
+                bodyB.applyRelativeImpulse(rB, normal, -normalImpulse);
+                bodyB.applyRelativeImpulse(rB, tangent, -tangentImpulse);
             }
 
-            // renderer.draw(Color.BLUE).circle(contact, 2);
+            // renderer.draw(Color.BLUE).circle(rA.plus(bodyA.position), 10);
+            // renderer.draw(Color.BLUE).circle(rB.plus(bodyB.position), 10);
             // const middle = contact;
             // renderer.stroke(Color.YELLOW, 0.4).line(middle.plus(normal.times(4)), middle.plus(normal.times(-4)));
 
             return true;
         };
 
-        const solve2 = (contact1, contact2) => {
-            const rA1x = contact1.x - bodyA.position.x;
-            const rA1y = contact1.y - bodyA.position.y;
-            const rB1x = contact1.x - bodyB.position.x;
-            const rB1y = contact1.y - bodyB.position.y;
-
-            const rA2x = contact2.x - bodyA.position.x;
-            const rA2y = contact2.y - bodyA.position.y;
-            const rB2x = contact2.x - bodyB.position.x;
-            const rB2y = contact2.y - bodyB.position.y;
+        const solve2 = (rA1, rB1, rA2, rB2) => {
+			const { x: rA1x, y: rA1y } = rA1;
+			const { x: rB1x, y: rB1y } = rB1;
+			
+			const { x: rA2x, y: rA2y } = rA2;
+			const { x: rB2x, y: rB2y } = rB2;
 
             // normal force
-            const vAB1n = this.vAB(contact1, bodyA, bodyB, normal);
-            const vAB2n = this.vAB(contact2, bodyA, bodyB, normal);
+            const vAB1n = this.vAB(rA1, rB1, bodyA, bodyB, normal);
+            const vAB2n = this.vAB(rA2, rB2, bodyA, bodyB, normal);
 
             if (vAB1n >= GTE_EPSILON || vAB2n >= GTE_EPSILON) return false;
             const normalImpulses = this.normalImpulses(vAB1n, vAB2n, mA, mB, iA, iB, e, normal, rA1x, rA1y, rB1x, rB1y, rA2x, rA2y, rB2x, rB2y); // normal impulses are down the inverse normal
             if (normalImpulses === null) return false;
             const { x: normalImpulse1, y: normalImpulse2 } = normalImpulses;
-            if (normalImpulse1 >= GTE_EPSILON || normalImpulse2 >= GTE_EPSILON) return false;
+			if (normalImpulse1 >= GTE_EPSILON || normalImpulse2 >= GTE_EPSILON) return false;
 
             // friction (solved individually)
-            const vAB1t = this.vAB(contact1, bodyA, bodyB, tangent);
-            const vAB2t = this.vAB(contact2, bodyA, bodyB, tangent);
+            const vAB1t = this.vAB(rA1, rB1, bodyA, bodyB, tangent);
+            const vAB2t = this.vAB(rA2, rB2, bodyA, bodyB, tangent);
             const jt1 = this.normalImpulse(vAB1t, mA, mB, iA, iB, 0, tangent, rA1x, rA1y, rB1x, rB1y);
             const jt2 = this.normalImpulse(vAB2t, mA, mB, iA, iB, 0, tangent, rA2x, rA2y, rB2x, rB2y);
             const tangentImpulse1 = (Math.abs(jt1) < -normalImpulse1 * staticFriction) ? jt1 : Math.sign(jt1) * -normalImpulse1 * kineticFriction;
             const tangentImpulse2 = (Math.abs(jt2) < -normalImpulse2 * staticFriction) ? jt2 : Math.sign(jt2) * -normalImpulse2 * kineticFriction;
 
             // apply impulses
-            bodyA.accumulateImpulse(contact1, normal, normalImpulse1);
-            bodyA.accumulateImpulse(contact2, normal, normalImpulse2);
+            bodyA.applyRelativeImpulse(rA1, normal, normalImpulse1);
+            bodyA.applyRelativeImpulse(rA2, normal, normalImpulse2);
 
-            bodyA.applyImpulse(contact1, tangent, tangentImpulse1);
-            bodyA.applyImpulse(contact2, tangent, tangentImpulse2);
+            bodyA.applyRelativeImpulse(rA1, tangent, tangentImpulse1);
+            bodyA.applyRelativeImpulse(rA2, tangent, tangentImpulse2);
 
             if (dynamic) {
-                bodyB.accumulateImpulse(contact1, normal, -normalImpulse1);
-                bodyB.accumulateImpulse(contact2, normal, -normalImpulse2);
-                bodyB.applyImpulse(contact1, tangent, -tangentImpulse1);
-                bodyB.applyImpulse(contact2, tangent, -tangentImpulse2);
+                bodyB.applyRelativeImpulse(rB1, normal, -normalImpulse1);
+                bodyB.applyRelativeImpulse(rB2, normal, -normalImpulse2);
+                bodyB.applyRelativeImpulse(rB1, tangent, -tangentImpulse1);
+                bodyB.applyRelativeImpulse(rB2, tangent, -tangentImpulse2);
             }
 
-            // renderer.stroke(Color.RED, 4, LineCap.ROUND).line(contact1, contact2);
+            // renderer.stroke(Color.RED, 20, LineCap.ROUND).line(rA1.plus(bodyA.position), rA2.plus(bodyA.position));
+            // renderer.stroke(Color.RED, 20, LineCap.ROUND).line(rB1.plus(bodyB.position), rB2.plus(bodyB.position));
             // const middle = contact1.plus(contact2).over(2);
             // renderer.stroke(Color.YELLOW, 0.4).line(middle.plus(normal.times(4)), middle.plus(normal.times(-4)));
 
             return true;
         };
 
-        for (let i = 0; i < contacts.length; i += 2) {
-            if (i + 1 < contacts.length) {
-                if (!solve2(contacts[i], contacts[i + 1])) {
-                    solve1(contacts[i]);
-                    solve1(contacts[i + 1]);
-                }
-            } else {
-                solve1(contacts[i]);
-            }
-        }
+		let anySolved = false;
+
+		for (let i = 0; i < contactsA.length; i += 2) {
+			if (i + 1 < contactsA.length) {
+				const rA1 = contactsA[i];
+				const rB1 = contactsB[i];
+				const rA2 = contactsA[i + 1];
+				const rB2 = contactsB[i + 1];
+				if (!solve2(rA1, rB1, rA2, rB2)) {
+					anySolved ||= solve1(rA1, rB1);
+					anySolved ||= solve1(rA2, rB2);
+				} else if (contactsA.length === 2) return false;
+			} else {
+				anySolved ||= solve1(contactsA[i], contactsB[i]);
+				if (contactsA.length === 1) return false;
+			}
+		}
+
+		return anySolved;
     }
-    resolve(dynamic, prohibited, bodyA, bodyB, direction, penetration, contacts) {
+	resolveAllContacts() {
+		const { dynamicCollisions, staticCollisions } = this;
+
+		for (let i = 0; i < this.engine.contactIterations; i++) {
+			for (let j = 0; j < dynamicCollisions.length; j++)
+				this.resolveContacts(true, dynamicCollisions[j]);
+
+			for (let j = 0; j < staticCollisions.length; j++)
+				this.resolveContacts(false, staticCollisions[j]);
+		}
+
+		this.dynamicCollisions = [];
+		this.staticCollisions = [];
+	}
+    resolve(dynamic, prohibited, collision) {
+		let { bodyA, bodyB, direction, penetration } = collision;
+
 		// penetration *= 0.2;
-		const SLOP = 1;
+		const SLOP = 0.05;
 		
 		dynamic &&= !prohibited;
+
+		(dynamic ? this.dynamicCollisions : this.staticCollisions).push(collision);
 
 		if (penetration > SLOP) {
 			penetration -= SLOP;
@@ -1185,16 +1310,12 @@ class CollisionResolver {
 				const moveB = direction.times(portionB * penetration);
 				
 				bodyA.displace(moveA);
-				if (bodyB.canMoveThisStep || this.engine.iterations > 2) {
-					bodyB.displace(moveB);
-				}
+				bodyB.displace(moveB);
 			} else {
 				const move = direction.times(-penetration);
 				bodyA.displace(move);
 			}
 		}
-
-		this.resolveContacts(dynamic, bodyA, bodyB, direction, contacts);
     }
 }
 //constraints
@@ -1448,10 +1569,14 @@ class PhysicsEngine {
         this.friction = 0.5;
         this.constraintMap = new Map();
         this.constraintIterations = 5;
-        this.onCollide = (a, b, dir, contacts) => null;
-        this.iterations = 10;
+        this.iterations = 5;
+		this.contactIterations = 8;
+
+		// sleeping
         this.sleepDuration = 200;
         this.sleepingActivityThreshold = 0.2;
+		
+        this.onCollide = (a, b, dir, contacts) => null;
 
         this.orderGenerator = {
             seed: 123456,
@@ -1522,39 +1647,38 @@ class PhysicsEngine {
             body.integratePosition(intensity);
         }
 	}
-    resolve(body, body2, col) {
-        let collisionDirection = col.direction;
-        let maxPenetration = col.penetration;
-        let contacts = col.contacts;
+    resolve(col) {
+        const { bodyA, bodyB, direction, contacts, penetration } = col;
 
-        body2.addCollidingBody(body);
-        body.addCollidingBody(body2);
+        bodyB.addCollidingBody(bodyA);
+        bodyA.addCollidingBody(bodyB);
 
-        if (!maxPenetration || maxPenetration < 0.01) return;
-        this.onCollide(body, body2, collisionDirection, contacts);
+        if (!penetration) return;
 
-        if (body.isTrigger || body2.isTrigger) return;
+        this.onCollide(bodyA, bodyB, direction, contacts);
 
-        let dynamic = body2.dynamic;
+        if (bodyA.isTrigger || bodyB.isTrigger) return;
+
+        let dynamic = bodyB.dynamic;
 		let prohibited = false;
 
-        if (dynamic && (body.sleeping || body2.sleeping) && (!this.lowActivity(body) || !this.lowActivity(body2))) body2.wake();
+        if (dynamic && (bodyA.sleeping || bodyB.sleeping) && (!this.lowActivity(bodyA) || !this.lowActivity(bodyB))) bodyB.wake();
 
-        if (dynamic) for (let i = 0; i < body2.prohibitedDirections.length; i++) {
-            let dot = body2.prohibitedDirections[i].dot(collisionDirection);
+        if (dynamic) for (let i = 0; i < bodyB.prohibitedDirections.length; i++) {
+            let dot = bodyB.prohibitedDirections[i].dot(direction);
             if (dot > 0.8) {
                 prohibited = true;
                 break;
             }
         }
         if (!dynamic || prohibited) {
-            body.prohibitedDirections.push(collisionDirection);
+            bodyA.prohibitedDirections.push(direction);
 			// renderer.stroke(Color.RED).arrow(body.position, body.position.plus(collisionDirection.times(20)));
         }
-        this.collisionResolver.resolve(dynamic, prohibited, body, body2, collisionDirection, maxPenetration, contacts);
+        this.collisionResolver.resolve(dynamic, prohibited, col);
 
         //immobilize
-        body.canMoveThisStep = false;
+        bodyA.canMoveThisStep = false;
     }
     collisions(dynBodies, collisionPairs, order) {
         const colBodies = dynBodies.filter(body => body.canCollide);
@@ -1584,10 +1708,12 @@ class PhysicsEngine {
                 const body2 = collidable[j];
 				// if (this.isAsleep(body2) && asleep) continue;
                 const collision = CollisionDetector.collideBodies(body, body2);
-                if (collision !== null) this.resolve(body, body2, collision);
+                if (collision !== null) this.resolve(collision);
 
             }
         }
+
+		this.collisionResolver.resolveAllContacts();
     }
     createGrid(dynBodies) {
 		const { bodies } = this;
