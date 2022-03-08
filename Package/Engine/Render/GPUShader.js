@@ -100,6 +100,15 @@ class GLSLProgram {
 				gl[call.method](...call.args);
 			}
 		});
+		
+		{ // focus
+			this.focused = false;
+			const useProgram = gl.useProgram.bind(gl);
+			gl.useProgram = (program) => {
+				this.focused = program === this.program;
+				useProgram(program);
+			};
+		};
 
 		{ // uniforms
 			const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
@@ -345,7 +354,7 @@ class GLSLProgram {
 		this.gl.useProgram(this.program);
 	}
 	focus() {
-		if (this.gl.getParameter(this.gl.CURRENT_PROGRAM) !== this.program) this.use();
+		if (!this.focused) this.use();
 	}
 	setUniform(name, value, location = this.uniforms) {
 		if (name in location) {
