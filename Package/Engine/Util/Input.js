@@ -185,7 +185,7 @@ class KeyboardHandler extends InputHandler {
 		document.body.onblur = () => this.targetAll(false);
 		document.addEventListener("keydown", event => {
 			// don't cancel fancy keyboard shortcuts
-			if (!event.ctrlKey)
+			if (!event.ctrlKey && !(event.key[0] === "F" && event.key.length > 1))
 				event.preventDefault();
 			this.target(event.key, true);
 			this.downQueue.push(event.key);
