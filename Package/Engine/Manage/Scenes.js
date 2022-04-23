@@ -117,6 +117,7 @@ class Scene {
 		const adjusted = mouse.world;
 		const [hover, unhover] = this.collidePointBoth(adjusted, false);
 
+		
 		const pressed = mouse.allJustPressed;
 		for (let i = 0; i < hover.length; i++) {
 			const object = hover[i];
@@ -152,5 +153,8 @@ class Scene {
 
 		this.script("afterUpdate");
 		this.main.endUpdate();
+	}
+	destroy() {
+		this.main.removeAllElements();
 	}
 }

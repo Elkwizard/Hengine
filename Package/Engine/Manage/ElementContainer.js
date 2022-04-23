@@ -183,7 +183,7 @@ class ElementContainer extends SceneElement {
 		for (let i = 0; i < elements.length; i++) this.removeElement(elements[i]);
 	}
 	removeAllElements() {
-		for (const [name, element] of this.elements) this.removeElement(element);
+		this.removeElements(this.getAllElements());
 	}
 	get(name) {
 		return this.elements.get(name);

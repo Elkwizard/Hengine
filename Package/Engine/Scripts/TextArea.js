@@ -32,6 +32,8 @@ class TEXT_AREA extends ElementScript {
 		this.ignoredRemoval = [];
 		this.alwaysIgnored = [];
 		this.versions = [];
+
+		this.saveVersion();
 	}
 	saveVersion(obj) {
 		this.versions.push({ start: this.selectionStart, end: this.selectionEnd, value: this.value });
