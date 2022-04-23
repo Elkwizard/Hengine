@@ -368,6 +368,8 @@ class TEXT_AREA extends ElementScript {
 		this.adjustCursor();
 	}
 	update(obj) {
+		if (obj.hidden) return;
+
 		// scroll wheel
 		if (this.mouse.wheelDelta !== 0) {
 			if (obj.hovered) {
