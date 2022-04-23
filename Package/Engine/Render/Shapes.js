@@ -85,13 +85,13 @@ class Shape {
 	}
 	getModel(transf) { }
 	scale(factor) {
-		this.scaleAbout(this.middle, factor);
+		return this.scaleAbout(this.middle, factor);
 	}
 	scaleX(factor) {
-		this.scaleXAbout(this.middle.x, factor);
+		return this.scaleXAbout(this.middle.x, factor);
 	}
 	scaleY(factor) {
-		this.scaleYAbout(this.middle.y, factor);
+		return this.scaleYAbout(this.middle.y, factor);
 	}
 	scaleAbout(pos, factor) { }
 	scaleXAbout(pos, factor) { }
@@ -133,7 +133,7 @@ class Line extends Shape {
 		return Vector2.dist(this.a, this.b);
 	}
 	get middle() {
-		return a.Vplus(b).Nmul(0.5);
+		return this.a.Vplus(this.b).Nmul(0.5);
 	}
 	set vector(v) {
 		this.b = this.a.Vplus(v.normalized.Nmul(this.length));
@@ -216,10 +216,10 @@ class Line extends Shape {
 		return check(this) && check(line);
 	}
 	closestPointTo(point) {
-		const v = l.b.Vminus(l.a);
+		const v = this.b.Vminus(this.a);
 		const { sqrMag } = v;
-		const t = p.Vminus(l.a).dot(v) / sqrMag;
-		return v.Ntimes(Number.clamp(t, 0, 1)).Vplus(l.a);
+		const t = point.Vminus(this.a).dot(v) / sqrMag;
+		return v.Ntimes(Number.clamp(t, 0, 1)).Vplus(this.a);
 	}
 	get(line = new Line(0, 0, 0, 0)) {
 		line.a.set(this.a);
