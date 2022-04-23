@@ -44,7 +44,6 @@ class SceneObject extends SceneElement {
 		this.tag = tag;
 		this.controls = controls;
 		this.hidden = false;
-		this.onScreen = false;
 		this.hovered = false;
 		this.layer = 0;
 		this.lifeSpan = 0;
