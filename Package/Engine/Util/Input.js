@@ -418,7 +418,21 @@ class ClipboardHandler {
 		});
 	}
 	write(value) {
-		navigator.clipboard.writeText(value);
+		if (value instanceof ImageType) {
+			const canvas = new_OffscreenCanvas(value.width, value.height);
+			canvas
+				.getContext("2d")
+				.drawImage(value.makeImage(), 0, 0, value.width, value.height);
+			
+			canvas.toBlob(blob => {
+				navigator.clipboard.write([
+					new ClipboardItem({
+						"image/png": blob
+					})
+				]);
+			});
+		} else
+			navigator.clipboard.writeText(value);
 	}
 	read() {
 		return this.data;

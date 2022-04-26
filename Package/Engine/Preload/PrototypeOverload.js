@@ -48,6 +48,7 @@ Object.defineProperty(window, "title", {
 			});
 		}
 	}
+	
 	addByteBufferConversions(String, "string");
 	addByteBufferConversions(Number, "float64");
 	addByteBufferConversions(Boolean, "bool");

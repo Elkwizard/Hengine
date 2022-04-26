@@ -5,11 +5,15 @@ function new_OffscreenCanvas(width, height) {
 	let canvas;
 	if (window.OffscreenCanvas) {
 		canvas = new OffscreenCanvas(width, height);
+		canvas.toBlob = function (callback, type, quality) {
+			callback(canvas.convertToBlob({ type, quality }));
+		};
 	} else {
 		canvas = document.createElement("canvas");
 		canvas.width = width;
 		canvas.height = height;
 	}
+
 	canvas.style = {
 		set width(a) {
 			canvas.width = parseInt(a);
@@ -24,6 +28,7 @@ function new_OffscreenCanvas(width, height) {
 			return canvas.height;
 		}
 	};
+
 	return canvas;
 }
 
