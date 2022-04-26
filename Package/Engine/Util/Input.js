@@ -419,10 +419,13 @@ class ClipboardHandler {
 	}
 	write(value) {
 		if (value instanceof ImageType) {
-			const canvas = new_OffscreenCanvas(value.width, value.height);
-			canvas
-				.getContext("2d")
-				.drawImage(value.makeImage(), 0, 0, value.width, value.height);
+			const image = value.makeImage();
+			let canvas = image;
+			if (!(image instanceof HTMLCanvasElement || image instanceof OffscreenCanvas)) {
+				canvas = new_OffscreenCanvas(value.width, value.height)
+					.getContext("2d")
+					.drawImage(image, 0, 0, value.width, value.height);
+			}
 			
 			canvas.toBlob(blob => {
 				navigator.clipboard.write([
