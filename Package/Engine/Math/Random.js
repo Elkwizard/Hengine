@@ -69,7 +69,7 @@ class Random {
         const result = [];
         while (result.length < quantity) {
             const index = Math.floor(this.random() * arr.length);
-            if (samples.has(index)) continue;
+            if (sampled.has(index)) continue;
             result.push(arr[index]);
             sampled.add(index);
         }
