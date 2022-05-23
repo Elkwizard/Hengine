@@ -76,11 +76,12 @@ class Random {
         return result;
     }
     octave(oc, alg, ...sampleAndFreq) {
-        let seed;
+        let seed, freq = 1;
+
 		if (sampleAndFreq.length === alg.length + 2)
 			seed = sampleAndFreq.pop();
-		
-		const freq = sampleAndFreq.pop();
+		if (sampleAndFreq.length === alg.length + 1)
+			freq = sampleAndFreq.pop();
 
         for (let i = 1; i < 1 + oc; i++) {
             scl += 1 / i;
