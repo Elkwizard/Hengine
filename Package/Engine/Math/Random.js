@@ -76,20 +76,15 @@ class Random {
         return result;
     }
     octave(oc, alg, ...sampleAndFreq) {
-        const freq = sampleAndFreq.pop();
-        let sample = sampleAndFreq;
+        let seed;
+		if (sampleAndFreq.length === alg.length + 2)
+			seed = sampleAndFreq.pop();
+		
+		const freq = sampleAndFreq.pop();
 
-        let n = 0;
-        let scl = 0;
-        let len = alg.length + 1;
-        let seed = this.sampleSeed;
-        if (len === sample.length) {
-            seed = sample[sample.length - 1];
-            sample.length = alg.length;
-        }
         for (let i = 1; i < 1 + oc; i++) {
             scl += 1 / i;
-            n += alg(...sample, freq * i, seed) / i;
+            n += alg(...sampleAndFreq, freq * i, seed) / i;
         }
         return n / scl;
     }
