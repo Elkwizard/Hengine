@@ -83,6 +83,8 @@ class Random {
 		if (sampleAndFreq.length === alg.length + 1)
 			freq = sampleAndFreq.pop();
 
+		let n = 0, scl = 0;
+
         for (let i = 1; i < 1 + oc; i++) {
             scl += 1 / i;
             n += alg(...sampleAndFreq, freq * i, seed) / i;
