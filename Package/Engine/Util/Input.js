@@ -271,6 +271,7 @@ class MouseHandler extends InputHandler {
 		document.addEventListener("mouseout", () => this.targetAll(false));
 		document.addEventListener("contextmenu", event => event.preventDefault());
 		document.addEventListener("wheel", event => {
+			event.preventDefault();
 			this.wheelDelta += event.deltaY;
 		});
 	}
