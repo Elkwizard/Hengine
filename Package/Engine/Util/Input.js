@@ -273,7 +273,7 @@ class MouseHandler extends InputHandler {
 		document.addEventListener("wheel", event => {
 			event.preventDefault();
 			this.wheelDelta += event.deltaY;
-		});
+		}, { passive: false });
 	}
 	getWorldPosition(point) {
 		return this.engine.scene.camera.screenSpaceToWorldSpace(point);
