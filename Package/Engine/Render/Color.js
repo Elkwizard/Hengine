@@ -306,7 +306,8 @@ Color.CSSColors = {
 	white: new Color(255, 255, 255),
 	whitesmoke: new Color(245, 245, 245),
 	yellow: new Color(255, 255, 0),
-}
+};
+
 Color.span = document.createElement("span");
 Color.RED = new Color("#f00");
 Color.BLUE = new Color("#00f");
