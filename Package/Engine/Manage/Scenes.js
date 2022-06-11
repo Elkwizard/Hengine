@@ -46,7 +46,7 @@ class Scene {
 	}
 	collidePoint(point, override = true) {
 		return this.main.updateArray()
-			.filter(e => (e.onScreen || override) && e.collidePoint(point));
+			.filter(e => ((e.onScreen && !e.hidden) || override) && e.collidePoint(point));
 	}
 	collidePointBoth(point, override = true) {
 		const collideAry = this.collidePoint(point, override);
@@ -117,7 +117,6 @@ class Scene {
 		const adjusted = mouse.world;
 		const [hover, unhover] = this.collidePointBoth(adjusted, false);
 
-		
 		const pressed = mouse.allJustPressed;
 		for (let i = 0; i < hover.length; i++) {
 			const object = hover[i];

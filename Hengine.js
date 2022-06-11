@@ -14,8 +14,9 @@
  
     function load(src) {
         const script = document.createElement("script");
+		script.setAttribute("charset", "UTF-8");
         script.src = src;
-        document.head.appendChild(script);
+		document.head.appendChild(script);
         return new Promise(resolve => script.onload = () => resolve(script));
     }
 

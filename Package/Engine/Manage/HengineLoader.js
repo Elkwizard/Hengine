@@ -48,6 +48,7 @@ class HengineResource {
 class HengineScriptResource extends HengineResource {
 	load() {
 		const script = document.createElement("script");
+		script.setAttribute("charset", "UTF-8");
 		script.src = this.src;
 		document.head.appendChild(script);
 		return new Promise(resolve => {

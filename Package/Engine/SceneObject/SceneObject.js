@@ -283,15 +283,11 @@ class SceneObject extends SceneElement {
 	}
 	determineOnScreen(screen) {
 		const graphicalBoundingBox = this.graphicalBoundingBox ?? this.__boundingBox;
-		this.onScreen = !this.cullGraphics || (graphicalBoundingBox && screen.intersectSameType(graphicalBoundingBox));
-		return this.onScreen;
+		return this.onScreen = !this.cullGraphics || (graphicalBoundingBox && screen.intersectSameType(graphicalBoundingBox));
 	}
 	engineDraw(screen) {
-		this.determineOnScreen(screen);
-		if (!this.hidden && this.onScreen) {
+		if (!this.hidden && this.determineOnScreen(screen))
 			this.runDraw();
-			this.onScreen = true;
-		} else this.onScreen = false;
 		this.scripts.run("escapeDraw");
 	}
 	hasMoved() {
