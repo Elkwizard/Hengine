@@ -3,7 +3,6 @@
     const script = document.currentScript;
     const title = script.getAttribute("title") || "Hengine Project";
     const scripts = (script.getAttribute("scripts") || "")
-		.replace(/\.js/g, "")
 		.split(" ")
 		.filter(str => str.length);
 
