@@ -8,15 +8,19 @@ class Constraint {
     constructor(physicsConstraint, engine) {
         this.physicsConstraint = physicsConstraint;
         this.engine = engine;
+		this.multibody = physicsConstraint instanceof PhysicsConstraint1;
     }
     get ends() {
         return this.physicsConstraint.ends.map(Vector2.fromPhysicsVector);
     }
+	get body() {
+		return this.physicsConstraint.body.userData.sceneObject;
+	}
     get bodyA() {
         return this.physicsConstraint.bodyA.userData.sceneObject;
     }
     get bodyB() {
-        return this.physicsConstraint.bodyB?.userData?.sceneObject;
+        return this.physicsConstraint.bodyB.userData.sceneObject;
     }
     remove() {
         const { physicsEngine } = this.engine.scene;

@@ -53,6 +53,7 @@ class PHYSICS extends ElementScript {
 		Object.shortcut(this, body, "canRotate");
 		Object.shortcut(this, body, "gravity");
 		Object.shortcut(this, body, "friction");
+		Object.shortcut(this, body, "density");
 		Object.shortcut(this, body, "airResistance");
 	}
 	get constraints() {

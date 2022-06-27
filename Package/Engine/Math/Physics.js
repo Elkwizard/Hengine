@@ -567,6 +567,7 @@ class RigidBody {
 		this.boundingRadius = 0;
         this.mass = 0;
         this.inertia = 0;
+		this._density = 1;
 
         this.restitution = 0;
         this.friction = null;
@@ -591,6 +592,15 @@ class RigidBody {
         this.accelerationAccumulator = new PhysicsVectorAccumulator();
         this.angularAccelerationAccumulator = new PhysicsVectorAccumulator();
     }
+	set density(a) {
+		const f = a / this._density;
+		this.mass *= f;
+		this.inertia *= f;
+		this._density = f;
+	}
+	get density() {
+		return this._density;
+	}
     set angle(a) {
         this._angle = a;
         this.cosAngle = Math.cos(a);
@@ -659,8 +669,8 @@ class RigidBody {
 			this.boundingRadius = 0;
             for (let i = 0; i < this.shapes.length; i++) {
                 const shape = this.shapes[i];
-                this.mass += shape.mass;
-                this.inertia += shape.inertia;
+                this.mass += shape.mass * this.density;
+                this.inertia += shape.inertia * this.density;
 				if (shape.boundingRadius > this.boundingRadius)
 					this.boundingRadius = shape.boundingRadius;
             }
@@ -669,8 +679,8 @@ class RigidBody {
     addShape(sh) {
         this.shapes.push(sh);
         sh.computeMatterData();
-        this.mass += sh.mass;
-        this.inertia += sh.inertia;
+        this.mass += sh.mass * this.density;
+        this.inertia += sh.inertia * this.density;
 		if (sh.boundingRadius > this.boundingRadius)
 			this.boundingRadius = sh.boundingRadius;
 		this.invalidateModels();
@@ -1364,7 +1374,7 @@ class PhysicsConstraint1 extends PhysicsConstraint {
         return this._ends;
     }
     add() {
-        this.bodyA.constraints.push(this);
+        this.body.constraints.push(this);
     }
     hasBody(b) {
         return this.body === b;
@@ -1868,7 +1878,7 @@ class PhysicsEngine {
         // found it!
         body.wake();
         for (let i = 0; i < body.constraints.length; i++) {
-            const con = constraints[i];
+            const con = body.constraints[i];
             this.removeConstraint(con.id);
         }
 
@@ -1876,11 +1886,16 @@ class PhysicsEngine {
     }
     removeConstraint(id) {
         const con = this.constraintMap.get(id);
-        // found it!
-        const constraintsA = con.bodyA.constraints;
-        const constraintsB = con.bodyB.constraints;
-        constraintsA.splice(constraintsA.indexOf(con), 1);
-        constraintsB.splice(constraintsB.indexOf(con), 1);
+		
+		if (con instanceof PhysicsConstraint2) {
+			const constraintsA = con.bodyA.constraints;
+			const constraintsB = con.bodyB.constraints;
+			constraintsA.splice(constraintsA.indexOf(con), 1);
+			constraintsB.splice(constraintsB.indexOf(con), 1);
+		} else {
+			const { constraints } = con.body;
+			constraints.splice(constraints.indexOf(con), 1);
+		}
 
         this.constraintMap.delete(id);
     }
