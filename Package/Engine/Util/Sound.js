@@ -87,7 +87,13 @@ class Synth {
                 channel = ch;
                 break;
             }
+
         if (!channel) {
+			if (this.channels.size >= Synth.MAX_CHANNELS) { // too many
+				const stop = duration => this.pause(duration);
+				if (info.duration !== undefined) return stop(info.duration);
+				return stop;
+			} 
             channel = new SynthChannel(this);
             this.channels.add(channel);
         }
@@ -116,6 +122,7 @@ class Synth {
     }
 }
 
+Synth.MAX_CHANNELS = 400;
 Synth.EXP_BASE = 2 ** (1 / 12);
 Synth.EXP_FACTOR = 16.35;
 Synth.EXP_BASE_LOG = Math.log(Synth.EXP_BASE);

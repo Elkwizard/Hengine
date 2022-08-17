@@ -94,7 +94,7 @@ class ImageType {
 	}
 	contains(x, y) {
 		if (typeof x === "object") ({ x, y } = x);
-		return x >= 0 && y >= 0 && x <= this.width && y <= this.height;
+		return x >= 0 && y >= 0 && x < this.width && y < this.height;
 	}
 	inferWidth(height) {
 		return this.width * height / this.height;

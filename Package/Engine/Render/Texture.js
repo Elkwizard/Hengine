@@ -136,17 +136,19 @@ class Texture extends ImageType {
 			let g = 0;
 			let b = 0;
 			let a = 0;
+			let count = 0;
 			for (let i = -amount; i <= amount; i++) for (let j = -amount; j <= amount; j++) {
 				let col = this.getPixel(x + i, y + j);
 				r += col.red;
 				g += col.green;
 				b += col.blue;
 				a += col.alpha;
+				count++;
 			}
-			r /= 9;
-			g /= 9;
-			b /= 9;
-			a /= 9;
+			r /= count;
+			g /= count;
+			b /= count;
+			a /= count;
 			dest.set(r, g, b, a);
 		});
 	}
