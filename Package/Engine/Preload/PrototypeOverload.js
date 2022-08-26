@@ -147,6 +147,16 @@ Object.defineProperty(window, "title", {
 	proto(Array.prototype, "forEach", function (fn, ...coords) {
 		for (let i = 0; i < this.length; i++) fn(this[i], ...coords, i);
 	});
+	proto(Array.prototype, "some", function (fn, ...coords) {
+		for (let i = 0; i < this.length; i++)
+			if (fn(this[i], ...coords, i)) return true;
+		return false;
+	});
+	proto(Array.prototype, "every", function (fn, ...coords) {
+		for (let i = 0; i < this.length; i++)
+			if (!fn(this[i], ...coords, i)) return false;
+		return true;
+	});
 	proto(Array.prototype, "flatten", function () {
 		return this;
 	});
@@ -175,15 +185,25 @@ Object.defineProperty(window, "title", {
 			for (let i = 0; i < this.length; i++) this[i].forEach(fn, ...coords, i);
 		}.bind(arr));
 		proto(arr, "map", function (fn, ...coords) {
-			let result = [];
-			Array.makeMultidimensional(result);
+			const result = Array.makeMultidimensional([]);
 			for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...coords, i));
 			return result;
+		}.bind(arr));
+		proto(arr, "some", function (fn, ...coords) {
+			for (let i = 0; i < this.length; i++)
+				if (this[i].some(fn, ...coords, i)) return true;
+			return false;
+		}.bind(arr));
+		proto(arr, "every", function (fn, ...coords) {
+			for (let i = 0; i < this.length; i++)
+				if (!this[i].every(fn, ...coords, i)) return false;
+			return true;
 		}.bind(arr));
 		proto(arr, "fill", function (value) {
 			for (let i = 0; i < this.length; i++) this[i].fill(value);
 			return this;
 		}.bind(arr));
+		return arr;
 	}
 	Array.dim = function (...dims) {
 		let ary = [];
