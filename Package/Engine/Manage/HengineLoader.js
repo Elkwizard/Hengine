@@ -135,6 +135,7 @@ class HengineAnimationResource extends HengineResource {
 		});
 	}
 }
+
 class HengineFontResource extends HengineResource {
 	load() {
 		return new Promise(async resolve => {
@@ -430,7 +431,8 @@ HengineLoader.engineResources = [
 		"Render/WebGLRenderer",
 		"Render/Renderer",
 		"Render/GPUShader",
-		"Render/StaticImage"
+		"Render/StaticImage",
+		"Render/TileMap"
 	],
 	[ // high level dependencies
 		"SceneObject/UIObject"
