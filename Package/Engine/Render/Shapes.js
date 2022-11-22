@@ -313,7 +313,7 @@ class Polygon extends Shape {
 		const edges = this.getEdges();
 		for (let i = 0; i < edges.length; i++) {
 			const edge = edges[i];
-			const closest = Geometry.closestPointOnLine(point, edge);
+			const closest = edge.closestPointTo(point);
 			const dist = Vector2.sqrDist(point, closest);
 			if (dist < bestDist) {
 				bestDist = dist;
