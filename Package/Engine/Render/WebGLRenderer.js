@@ -359,6 +359,12 @@ class WebGLArtist {
 	get transform() {
 		return this.currentTransform.get();
 	}
+	drawThrough(transform, draw) {
+		this.save();
+		this.transform = transform;
+		draw();
+		this.restore();
+	}
 	resize(width, height) {
 		this.gl.resize(width, height);
 	}
@@ -472,7 +478,6 @@ class WebGLArtist {
 	}
 	beforeFrame() {
 		this.clearTransformations();
-		this.scale(this.pixelRatio, this.pixelRatio);
 	}
 	afterFrame() {
 

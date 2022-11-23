@@ -223,13 +223,12 @@ class Artist {
 				this.c.fill();
 			},
 			infer(obj) {
-				if (obj.radius !== undefined) {
+				if (obj.radius !== undefined)
 					this.drawObj.circle(obj);
-				} else if (obj.width !== undefined) {
+				else if (obj.width !== undefined)
 					this.drawObj.rect(obj);
-				} else if (obj.vertices !== undefined) {
+				else if (obj.vertices !== undefined)
 					this.drawObj.shape(obj.vertices);
-				}
 			}
 		}
 		for (let func in this.drawObj) {
@@ -468,17 +467,16 @@ class Artist {
 				this.c.stroke();
 			},
 			infer(obj) {
-				if (obj.radius !== undefined) {
+				if (obj.radius !== undefined)
 					this.strokeObj.circle(obj);
-				} else if (obj.radius !== undefined) {
+				else if (obj.radius !== undefined)
 					this.strokeObj.rect(obj);
-				} else if (obj.vertices !== undefined) {
+				else if (obj.vertices !== undefined)
 					this.strokeObj.shape(obj.vertices);
-				} else if (obj instanceof Line) {
+				else if (obj instanceof Line)
 					this.strokeObj.line(obj);
-				} else if (obj instanceof Spline) {
+				else if (obj instanceof Spline)
 					this.strokeObj.spline(obj);
-				}
 			}
 		}
 		for (let func in this.strokeObj) {
@@ -514,13 +512,12 @@ class Artist {
 				this.c.clip();
 			},
 			infer(obj) {
-				if (obj.radius !== undefined) {
+				if (obj.radius !== undefined)
 					this.clipObj.circle(obj);
-				} else if (obj.width !== undefined) {
+				else if (obj.width !== undefined)
 					this.clipObj.rect(obj);
-				} else if (obj.vertices !== undefined) {
+				else if (obj.vertices !== undefined)
 					this.clipObj.shape(obj.vertices);
-				}
 			}
 		}
 		for (let func in this.clipObj) {
@@ -590,13 +587,12 @@ class Artist {
 				this.unclip();
 			},
 			infer(obj) {
-				if (obj.radius !== undefined) {
+				if (obj.radius !== undefined)
 					this.imageObj.circle(obj);
-				} else if (obj.width !== undefined) {
+				else if (obj.width !== undefined)
 					this.imageObj.rect(obj);
-				} else if (obj.vertices !== undefined) {
+				else if (obj.vertices !== undefined)
 					this.imageObj.shape(obj.vertices);
-				}
 			}
 
 		};
@@ -648,6 +644,12 @@ class Artist {
 			b * ratio, d * ratio, f * ratio,
 			0, 0, 1
 		);
+	}
+	drawThrough(transform, draw) {
+		this.save();
+		this.transform = transform;
+		draw();
+		this.restore();
 	}
 	resize(width, height) {
 		const px = this.preservePixelart;
