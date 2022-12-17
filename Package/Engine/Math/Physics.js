@@ -727,6 +727,8 @@ class RigidBody {
         }
     }
 	applyRelativeImpulse(pos, imp, factor = 1) {
+		// const S = 0.01;
+		// renderer.stroke(Color.RED, 2).arrow(pos.plus(this.position), pos.plus(this.position).plus(imp.times(factor*S)));
 		this.applyImpulse(pos.plus(this.position), imp, factor);
 	}
     accumulateImpulse(pos, imp, factor = 1) {
@@ -1202,6 +1204,7 @@ class CollisionResolver {
             // friction
             const vABt = this.vAB(rA, rB, bodyA, bodyB, tangent);
             const jt = this.normalImpulse(vABt, mA, mB, iA, iB, 0, tangent, rAx, rAy, rBx, rBy);
+			// this is wrong, but fairly close given precision-related compromises
             const tangentImpulse = (Math.abs(jt) < -normalImpulse * staticFriction) ? jt : Math.sign(jt) * -normalImpulse * kineticFriction; // normal impulses negated for absolute value
 
             bodyA.applyRelativeImpulse(rA, normal, normalImpulse);
@@ -1214,8 +1217,14 @@ class CollisionResolver {
 
             // renderer.draw(Color.BLUE).circle(rA.plus(bodyA.position), 10);
             // renderer.draw(Color.BLUE).circle(rB.plus(bodyB.position), 10);
-            // const middle = contact;
-            // renderer.stroke(Color.YELLOW, 0.4).line(middle.plus(normal.times(4)), middle.plus(normal.times(-4)));
+			// const S = 0.01;
+            // const middle = bodyA.position.plus(rA);
+            // // renderer.stroke(Color.YELLOW, 0.4).line(middle.plus(normal.times(4)), middle.plus(normal.times(-4)));
+			// renderer.stroke(Color.RED, 2).arrow(middle, middle.plus(tangent.times(jt*S)));
+			// renderer.stroke(Color.RED, 2).arrow(middle, middle.minus(tangent.times(jt*S)));
+
+			// renderer.stroke(Color.RED).arrow(middle, middle.plus(normal.times(normalImpulse).plus(tangent.times(tangentImpulse)).times(S)));
+			// renderer.stroke(Color.BLUE).arrow(middle, middle.minus(normal.times(normalImpulse).plus(tangent.times(tangentImpulse)).times(S)));
 
             return true;
         };
