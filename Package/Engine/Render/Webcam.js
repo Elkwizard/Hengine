@@ -16,6 +16,8 @@ class WebcamCapture extends ImageType {
 		videoHTML.oncanplay = () => {
 			console.log("Webcam Streaming");
 			this.video = videoHTML;
+			this.width = this.height = Math.min(this.video.videoWidth, this.video.videoHeight);
+				
 		};
 		videoHTML.play();
 	}
@@ -39,10 +41,7 @@ class WebcamCapture extends ImageType {
 				let mwidth = Math.min(v.videoWidth, v.videoHeight);
 				let ox = (v.videoHeight < v.videoWidth) ? (v.videoWidth - mwidth) / 2 : 0;
 				let oy = (v.videoHeight > v.videoWidth) ? (v.videoHeight - mwidth) / 2 : 0;
-				this.width = mwidth;
-				this.height = mwidth;
-				this.image.width = mwidth;
-				this.image.height = mwidth;
+				this.width = this.height = this.image.width = this.image.height = mwidth;
 				this.c.drawImage(this.video, ox, oy, mwidth, mwidth, 0, 0, mwidth, mwidth);
 				this.lastCaptureTime = performance.now();
 			}
