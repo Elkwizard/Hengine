@@ -47,7 +47,7 @@ class SynthChannel {
         this.setVolume(0, endTime, this.fadeOut);
 
         setTimeout(() => {
-            this.gain.disco
+            this.gain.disconnect(this.synth.destination);
             this.playing = false;
         }, wait + 5 * (this.fadeOut + SynthChannel.BUFFER));
 
