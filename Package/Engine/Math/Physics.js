@@ -413,31 +413,6 @@ class PolygonCollider extends BaseCollider {
         };
 		
 		// inertia
-		
-		if (true) {
-		
-		const G = (R, Q, A, B) => {
-			const m = (B.y - A.y) / (B.x - A.x); // slope
-			const b = A.y - A.x * m; // intercept
-			// integral from R to Q with respect to u of (integral from 0 to mu + b with respect to v of (u ^ 2 + v ^ 2))
-			const segment = (power, coef) => coef * (R ** power - Q ** power) / power;
-			return 	segment(4, m * (1 + m ** 2 / 3)) +
-					segment(3, b * (1 + m ** 2)) +
-					segment(2, m * b ** 2) +
-					segment(1, b ** 3 / 3)
-		};
-
-		/*
-		mBA * (1 + mBA ** 2 / 3) * A.x ** 4 / 4
-		
-		Q = A.x
-		R = C.x
-		segment = (power, coef) => coef * (R ** power - Q ** power) / power
-		segment(4, m * (1 + m ** 2 / 3)) +
-		segment(3, b * (1 + m ** 2)) +
-		segment(2, m * b ** 2) +
-		segment(1, b ** 3 / 3)
-		*/
 
 		const validOrder = (A, B, C) => {
 			const v = C.minus(B);
@@ -450,15 +425,9 @@ class PolygonCollider extends BaseCollider {
 
 		for (let i = 0; i < vertices.length; i++) {
 			// construct triangle from 
-			const a = vertices[i];
-			const b = vertices[(i + 1) % vertices.length];
-			const c = position;
-
-			// order such that A is between B and C
-			let A, B, C;
-			if (validOrder(a, b, c)) [A, B, C] = [a, b, c];
-			else if (validOrder(b, c, a)) [A, B, C] = [b, c, a];
-			else [A, B, C] = [c, a, b];
+			const A = vertices[i];
+			const B = vertices[(i + 1) % vertices.length];
+			const C = position;
 
 			// transform from global xy to local uv
 			const uAxis = C.minus(B).normalize();
@@ -466,94 +435,31 @@ class PolygonCollider extends BaseCollider {
 			const v = p => p.minus(B).cross(uAxis);
 			const toUV = p => new PhysicsVector(u(p), v(p));
 			const Auv = toUV(A);
-			const Buv = toUV(B);
 			const Cuv = toUV(C);
 
 			// find moment of inertia of left right triangle about B
 			const G0 = rightInertia(Auv.x, Auv.y);
 
-			// find moment of inertia of right right triangle about B
+			// find moment of inertia of right right triangle about C
 			const rightSideInertia = rightInertia(Cuv.x - Auv.x, Auv.y);
+
+			// transform MoI about C into MoI about B
 			const rightSideMass = (Cuv.x - Auv.x) * Auv.y / 2;
 			const rightSideCenter = new PhysicsVector((Cuv.x + 2 * Auv.x) / 3, Auv.y / 3);
 			const G1 = rightSideInertia + rightSideMass * (rightSideCenter.sqrMag - Cuv.minus(rightSideCenter).sqrMag);
+			
+			// find total moment of inertia about (u,v) = (0,0)
 			const I_zuv = Math.abs(G0 + G1);
-			// console.log(rightInertia(Auv.x, Auv.y), G(0, Auv.x, Buv, Auv));
 
 			// transform inertia about B to inertia about the origin
 			const M = A.plus(B).add(C).div(3);
 			const m = Math.abs(Cuv.x * Auv.y) / 2;
-			
-			const d0 = M.minus(B).mag; // distance from B to centroid
-			const d1 = M.mag; // distance from origin to centroid
 
-			const I_z = I_zuv + m * (d1 ** 2 - d0 ** 2);
+			const I_z = I_zuv + m * (M.sqrMag - M.minus(B).sqrMag);
 
 			// accumulate to running total
 			this.inertia += I_z;
 		}
-		} else if (true) {
-			const EPS = 0.00001;
-			
-			const int = (a, b, f) => {
-				if (Math.abs(a - b) < EPS) return 0;
-				if (b < a) return -int(b, a, f);
-				let sum = 0;
-				let dx = 0.1;
-				for (let x = a; x <= b; x += dx)
-					sum += f(x) * dx;
-				return sum;
-			};
-
-			const G = (a, b, m0, b0, m1, b1) => {
-				if (Math.abs(b - a) < EPS) return 0;
-				
-				const line = (mk, bk) => (mk ? ((mk * b + bk) ** 4 - (mk * a + bk) ** 4) / (4 * mk) : (b - a) * bk ** 3) / 3;
-				
-				let g = 0;
-				g += (m1 - m0) / 4 * (b ** 4 - a ** 4) + (b1 - b0) / 3 * (b ** 3 - a ** 3);
-				g += line(m1, b1) - line(m0, b0);
-
-				return g;
-			};
-
-			const m = (A, B) => (B.y - A.y) / (B.x - A.x);
-			const b = (A, m) => A.y - A.x * m;
-
-			this.inertia = 0;
-
-			for (let i = 0; i < vertices.length; i++) {
-				const A = vertices[i];
-				const B = vertices[(i + 1) % vertices.length];
-				const C = position;
-				const [L, M, R] = [A, B, C].sort((a, b) => a.x - b.x);
-				const mLR = m(L, R);
-				const bLR = b(L, mLR);
-				const mLM = m(L, M);
-				const bLM = b(L, mLM);
-				const mMR = m(M, R);
-				const bMR = b(M, mMR);
-				const G0 = G(L.x, M.x, mLR, bLR, mLM, bLM);
-				const G1 = G(M.x, R.x, mLR, bLR, mMR, bMR);
-				const triangleInertia = Math.abs(G0) + Math.abs(G1);
-				this.inertia += triangleInertia;
-			}
-		} else {
-            let minX = Infinity;
-            let minY = Infinity;
-            let maxX = -Infinity;
-            let maxY = -Infinity;
-            for (let i = 0; i < vertices.length; i++) {
-                const { x, y } = vertices[i];
-                if (x < minX) minX = x;
-                if (y < minY) minY = y;
-                if (x > maxX) maxX = x;
-                if (y > maxY) maxY = y;
-            }
-            const width = maxX - minX;
-            const height = maxY - minY;
-            this.inertia = 1 / 12 * (width ** 3 * height + height ** 3 * width);
-        };
     }
 }
 PolygonCollider.SYMBOL = Symbol("POLYGON");
