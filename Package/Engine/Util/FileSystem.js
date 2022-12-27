@@ -402,20 +402,24 @@ class FileSystem { };
 		uploadFile(path = null) {
 			const fi = document.createElement("input");
 			fi.type = "file";
-			fi.onchange = () => {
-				const file = fi.files[0];
-				if (file) {
-					const reader = new FileReader();
-					reader.readAsArrayBuffer(file);
-					reader.onload = () => {
-						const { result } = reader;
-						const buffer = new ByteBuffer(result);
-						buffer.pointer = result.byteLength;
-						this.writeFile(path ?? file.name, buffer, true);
+			return new Promise(resolve => {
+				fi.onchange = () => {
+					const file = fi.files[0];
+					if (file) {
+						path ??= file.name;
+						const reader = new FileReader();
+						reader.readAsArrayBuffer(file);
+						reader.onload = () => {
+							const { result } = reader;
+							const buffer = new ByteBuffer(result);
+							buffer.pointer = result.byteLength;
+							this.writeFile(path, buffer, true);
+							resolve(path);
+						}
 					}
-				}
-			};
-			fi.click();
+				};
+				fi.click();
+			});
 		}
 		toString() {
 			for (const file of this.files)

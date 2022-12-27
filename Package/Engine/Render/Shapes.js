@@ -145,8 +145,11 @@ class Line extends Shape {
 		const { a, b } = this;
 		return (b.y - a.y) / (b.x - a.x);
 	}
+	get intercept() {
+		return this.a.y - this.a.x * this.slope;
+	}
 	evaluate(x) {
-		return this.slope * (x - this.a.x) + this.a.y;
+		return this.slope * x + this.intercept;
 	}
 	getModel(transf) {
 		const pos = transf.position;
@@ -281,13 +284,13 @@ class Polygon extends Shape {
 		return edges;
 	}
 	scaleAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => pos.Vplus(e.Vminus(pos).Ntimes(factor))));
+		return new Polygon(this.vertices.map(e => e.Vminus(pos).Nmul(factor).Vadd(pos)));
 	}
 	scaleXAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => new Vector2(pos + (pos - e.x) * factor, e.y)));
+		return new Polygon(this.vertices.map(e => new Vector2(pos + (e.x - pos) * factor, e.y)));
 	}
 	scaleYAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => new Vector2(e.x, pos + (pos - e.y) * factor)));
+		return new Polygon(this.vertices.map(e => new Vector2(e.x, pos + (e.y - pos) * factor)));
 	}
 	move(dir) {
 		return new Polygon(this.vertices.map(vert => vert.plus(dir)));
