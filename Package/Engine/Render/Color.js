@@ -131,17 +131,33 @@ class Color extends Operable {
 		return Math.floor(num / 16).toString(16) + Math.floor(num % 16).toString(16);
 	}
 	static parseHex(str, destination) {
-		str = str.slice(1);
-		if (str.length <= 4) { // rgb(a?): double-up each letter
-			destination.red = parseInt(str[0], 16) * 17;
-			destination.green = parseInt(str[1], 16) * 17;
-			destination.blue = parseInt(str[2], 16) * 17;
-			destination.alpha = (str.length === 3) ? 1 : parseInt(str[3], 16) * 17 / 255;
-		} else { // rrggbb(aa?): use as is
-			destination.red = parseInt(str.slice(0, 2), 16);
-			destination.green = parseInt(str.slice(2, 4), 16);
-			destination.blue = parseInt(str.slice(4, 6), 16);
-			destination.alpha = (str.length === 6) ? 1 : parseInt(str.slice(6, 8), 16) / 255;
+		const num = parseInt(str.slice(1), 16);
+
+		switch (str.length) {
+			case 3: // rgb
+				destination.red = 17 * (num >> 8) & 0xF;
+				destination.green = 17 * (num >> 4) & 0xF;
+				destination.blue = 17 * num & 0xF;
+				destination.alpha = 1;
+				break;
+			case 4: // rgba
+				destination.red = 17 * ((num >> 24) & 0xFF);
+				destination.green = 17 * ((num >> 16) & 0xFF);
+				destination.blue = 17 * ((num >> 8) & 0xFF);
+				destination.alpha = 17 * (num & 0xFF) / 255;
+				break;
+			case 6: // rrggbb
+				destination.red = (num >> 16) & 0xFF;
+				destination.green = (num >> 8) & 0xFF;
+				destination.blue = num & 0xFF;
+				destination.alpha = 1;
+				break;
+			case 8: // rrggbbaa
+				destination.red = (num >> 24) & 0xFF;
+				destination.green = (num >> 16) & 0xFF;
+				destination.blue = (num >> 8) & 0xFF;
+				destination.alpha = (num & 0xFF) / 255;
+				break;
 		}
 	}
 	static parseNum(str, limit) {
