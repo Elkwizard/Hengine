@@ -2,16 +2,19 @@ class Color extends Operable {
 	constructor(r, g, b, a) {
 		super();
 		this.limited = true;
-		if (b === undefined && g === undefined) {
+		if (g === undefined) {
 			if (typeof r === "string") {
-				if (r.match(/[\(#]/g)) {
+				if (r[0] === "#" || r[r.length - 1] === ")") {
 					// explicit
-					let rgb = r;
-					if (!r.match(/rgba?/g)) {
+					let col = r;
+					if (col[0] === "#")
+						Color.parseHex(col, this);
+					else if (col.startsWith("rgb"))
+						Color.parseRGBA(col, this);
+					else {
 						Color.span.style.color = r;
-						rgb = Color.span.style.color;
+						Color.parseRGBA(Color.span.style.color, this);
 					}
-					Color.parseRGBA(rgb, this);
 				} else {
 					// implicit
 					Color.CSSColor(r, this);
@@ -122,15 +125,24 @@ class Color extends Operable {
 		return new Color(r, g, b, 1);
 	}
 	static CSSColor(word, destination) {
-		//processed
-		const color = Color.CSSColors[word.toLowerCase()];
-		destination.red = color.red;
-		destination.green = color.green;
-		destination.blue = color.blue;
-		destination.alpha = color.alpha;
+		destination.set(Color.CSSColors[word.toLowerCase()]);
 	}
 	static numToHex(num) {
 		return Math.floor(num / 16).toString(16) + Math.floor(num % 16).toString(16);
+	}
+	static parseHex(str, destination) {
+		str = str.slice(1);
+		if (str.length <= 4) { // rgb(a?): double-up each letter
+			destination.red = parseInt(str[0], 16) * 17;
+			destination.green = parseInt(str[1], 16) * 17;
+			destination.blue = parseInt(str[2], 16) * 17;
+			destination.alpha = (str.length === 3) ? 1 : parseInt(str[3], 16) * 17 / 255;
+		} else { // rrggbb(aa?): use as is
+			destination.red = parseInt(str.slice(0, 2), 16);
+			destination.green = parseInt(str.slice(2, 4), 16);
+			destination.blue = parseInt(str.slice(4, 6), 16);
+			destination.alpha = (str.length === 6) ? 1 : parseInt(str.slice(6, 8), 16) / 255;
+		}
 	}
 	static parseNum(str, limit) {
 		const number = parseFloat(str);
@@ -139,21 +151,20 @@ class Color extends Operable {
 	}
 	static parseRGBA(str, destination) {
 		const rgba = str.slice(
-			str.indexOf("(") + 1,
-			str.indexOf(")")
+			str.indexOf("(", 3) + 1,
+			str.length - 1
 		);
 
-		const [red, green, blue, alpha = 255] = rgba
-			.split(",")
-			.map((piece, index) => Color.parseNum(
-				piece.trim(),
-				(index === 3) ? 1 : 255
-			));
+		const rInx = rgba.indexOf(",", 1);
+		destination.red = Color.parseNum(rgba.slice(0, rInx));
 
-		destination.red = red;
-		destination.green = green;
-		destination.blue = blue;
-		destination.alpha = alpha;
+		const gInx = rgba.indexOf(",", rInx + 2);
+		destination.green = Color.parseNum(rgba.slice(rInx + 1, gInx));
+		
+		const bInx = rgba.indexOf(",", gInx + 2);
+		destination.blue = Color.parseNum(rgba.slice(gInx + 1, (bInx >= 0) ? bInx : rgba.length));
+
+		destination.alpha = (bInx >= 0) ? Color.parseNum(rgba.slice(bInx + 1)) : 1;
 	}
 }
 Color.modValues = ["red", "green", "blue", "alpha"];
