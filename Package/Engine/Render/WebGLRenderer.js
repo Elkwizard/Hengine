@@ -161,6 +161,7 @@ class WebGLArtist {
 						({ x, y } = x);
 					}
 				}
+				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentLineCap, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 				let v_x = x1 - x;
 				let v_y = y1 - y;
 				let mag = Math.sqrt(v_x ** 2 + v_y ** 2);
@@ -168,7 +169,6 @@ class WebGLArtist {
 				v_y /= mag;
 				let n_x = -v_y;
 				let n_y = v_x;
-				this.gl.lineSegment(x, y, x1, y1, this.currentLineWidth, this.currentLineCap, this.currentColor.red, this.currentColor.green, this.currentColor.blue, this.currentColor.alpha);
 				let l2 = this.currentLineWidth * 2;
 				x1 -= v_x * l2;
 				y1 -= v_y * l2;
@@ -253,8 +253,6 @@ class WebGLArtist {
 						[ax, ay, bx, by, cx, cy, dx, dy] = [ax.x, ax.y, ay.x, ay.y, bx.x, bx.y, by.x, by.y];
 					}
 				}
-
-				console.log()
 
 				const pixelRatio = this.currentImageCIS.width / this.currentImage.width;
 				tx /= this.currentImageCIS.width / pixelRatio;
@@ -428,7 +426,6 @@ class WebGLArtist {
 		// do scale
 
 		// optimized matrix multiplication	
-
 		const ct = this.currentTransform;
 		ct[0] *= x;
 		ct[1] *= x;
