@@ -8,9 +8,6 @@ class WebGLArtist {
 
 		this.imageType = imageType;
 
-		this.preservePixelart = true;
-		this.alpha = 1;
-
 		this.currentColor = Color.BLANK;
 		this.currentLineWidth = 1;
 		this.currentLineCap = this.gl.LINE_CAP_FLAT;
@@ -30,6 +27,11 @@ class WebGLArtist {
 			[BlendMode.COMBINE, this.gl.BLEND_MODE_COMBINE],
 			[BlendMode.ADD, this.gl.BLEND_MODE_ADD]
 		]);
+
+		this.preservePixelart = true;
+		this.alpha = 1;
+		this.blendMode = BlendMode.COMBINE;
+
 		this.currentTransform = Matrix3.identity();
 		this.transformStackPointer = 0;
 		this.transformStack = [];

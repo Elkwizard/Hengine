@@ -39,6 +39,7 @@ class Artist {
 		this.c.imageSmoothingQuality = "high";
 		this.alpha = 1;
 		this.textMode = TextMode.TOP_LEFT;
+		this.blendMode = BlendMode.COMBINE;
 
 		this.resize(width, height);
 
