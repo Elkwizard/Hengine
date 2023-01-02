@@ -135,9 +135,9 @@ class Color extends Operable {
 		
 		switch (str.length - 1) {
 			case 3: // rgb
-				destination.red = 17 * (num >> 8) & 0xF;
-				destination.green = 17 * (num >> 4) & 0xF;
-				destination.blue = 17 * num & 0xF;
+				destination.red = 17 * ((num >> 8) & 0xF);
+				destination.green = 17 * ((num >> 4) & 0xF);
+				destination.blue = 17 * (num & 0xF);
 				destination.alpha = 1;
 				break;
 			case 4: // rgba
