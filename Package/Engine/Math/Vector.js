@@ -49,7 +49,7 @@ class Vector extends Operable {
 		return result;
 	}
 	projectOnto(v) {
-		return v.times(this.dot(v) / (v.mag ** 2));
+		return v.times(this.dot(v) / v.sqrMag);
 	}
 	bestFit(v) {
 		let d1 = this.dot(v);

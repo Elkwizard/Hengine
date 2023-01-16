@@ -30,6 +30,22 @@ class Geometry {
 
 		return new Polygon(result);
 	}
+	static joinEdges(polygon, dtheta) {
+		const edges = polygon.getEdges();
+		let finalEdges = [];
+		let lastAngle;
+		for (let i = 0; i < edges.length; i++) {
+			const edge = edges[i];
+			if (!finalEdges.length || Math.abs(Geometry.signedAngularDist(edge.vector.angle, lastAngle)) > dtheta) {
+				lastAngle = edge.vector.angle;
+				finalEdges.push(edge);
+			} else {
+				const extend = finalEdges.last;
+				extend.b = edge.b.minus(extend.a).projectOnto(extend.vector).plus(extend.a);
+			}
+		}
+		return new Polygon(finalEdges.map(edge => edge.a));
+	}
 	static triangulate(shape) {
 		let vertices = shape.vertices;
 		const result = [];
