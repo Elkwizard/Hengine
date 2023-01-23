@@ -1791,8 +1791,13 @@ class PhysicsEngine {
         let cellSize = 50;
         if (bodies.length) {
             let meanRadius = 0;
-            for (let i = 0; i < bodies.length; i++) meanRadius += bodies[i].boundingRadius;
-            meanRadius /= bodies.length;
+            let total = 0;
+			for (let i = 0; i < bodies.length; i++) {
+				const { boundingRadius } = bodies[i];
+				meanRadius += boundingRadius;
+				if (boundingRadius) total++;
+			}
+            meanRadius /= total;
             if (meanRadius)
 				cellSize = meanRadius;
         }
