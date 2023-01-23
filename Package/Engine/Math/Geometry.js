@@ -61,6 +61,80 @@ class Geometry {
 		if (vertices.length % 2 === 1) result.pop();
 		return result;
 	}
+	static gridToExactPolygons(sourceGrid, cellSize) {
+		const grid = Array.dim(sourceGrid.length + 2, sourceGrid[0].length + 2);
+	
+		for (let i = 0; i < sourceGrid.length; i++)
+		for (let j = 0; j < sourceGrid[0].length; j++)
+			grid[i + 1][j + 1] = sourceGrid[i][j];
+
+		const paths = Array.dim(grid.length, grid[0].length)
+			.fill(null);
+		
+		for (let i = 1; i <= sourceGrid.length; i++)
+		for (let j = 1; j <= sourceGrid[0].length; j++) {
+			if (!grid[i][j]) continue;
+			if (!grid[i][j - 1])
+				paths[i][j] = Vector2.right;
+			if (!grid[i][j + 1])
+				paths[i + 1][j + 1] = Vector2.left;
+			if (!grid[i - 1][j])
+				paths[i][j + 1] = Vector2.up;
+			if (!grid[i + 1][j])
+				paths[i + 1][j] = Vector2.down;
+		}
+
+		for (let i = 0; i < sourceGrid.length; i++)
+		for (let j = 0; j < sourceGrid[0].length; j++) {
+			const a = grid[i][j];
+			const b = grid[i + 1][j];
+			const c = grid[i][j + 1];
+			const d = grid[i + 1][j + 1];
+			if (a !== b && a === d && b === c) {
+				paths[i + 1][j + 1] = null;
+			}
+		}
+
+		const polygons = [];
+
+		for (let i = 0; i < paths.length; i++) 
+		for (let j = 0; j < paths[0].length; j++) {
+			if (!paths[i][j]) continue;
+
+			const poly = [new Vector2(i, j)];
+
+			let lastDir = null;
+			let ii = 0;
+			while (true) {
+				const { last } = poly;
+				const { x, y } = last;
+				let path = paths[x][y];
+				let next;
+				if (paths[x][y]) {
+					next = last.plus(path);
+					paths[x][y] = null;
+				} else {
+					path = lastDir.normal;
+					next = last.plus(path);
+				}
+				if (next.equals(poly[0])) break;
+				else poly.push(next);
+
+				ii++;
+				lastDir = path;
+			}
+
+			for (let n = 0; n < poly.length; n++)
+				poly[n].sub(1);
+
+			polygons.push(poly);
+		}
+
+		return polygons
+			.map(poly => new Polygon(poly).scaleAbout(
+				Vector2.origin, cellSize
+			));
+	}
 	static gridToPolygons(srcGrid, CELL_SIZE) {
 
 		let grid = srcGrid.map(v => v);
