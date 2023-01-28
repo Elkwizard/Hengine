@@ -362,13 +362,13 @@ class Polygon extends Shape {
 	static removeDuplicates(verts) {
 		const vertices = [];
 
-		mainLoop: for (let i = 0; i < verts.length; i++) {
-			let v = verts[i];
-			for (let j = 0; j < vertices.length; j++) {
-				let v2 = vertices[j];
-				if (v.equals(v2)) continue mainLoop;
-			}
-			vertices.push(v);
+		let last = verts.last;
+
+		for (let i = 0; i < verts.length; i++) {
+			const v = verts[i];
+			if (!v.equals(last))
+				vertices.push(v);
+			last = v;
 		}
 
 		return vertices;
