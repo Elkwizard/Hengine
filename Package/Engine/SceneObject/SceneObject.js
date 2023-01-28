@@ -43,6 +43,7 @@ class SceneObject extends SceneElement {
 		this.engine = engine;
 		this.tag = tag;
 		this.controls = controls;
+		this.mouseEvents = true;
 		this.hidden = false;
 		this.hovered = false;
 		this.layer = 0;
@@ -52,7 +53,6 @@ class SceneObject extends SceneElement {
 		this.cullGraphics = true;
 		this.beingUpdated = false;
 		this.scripts = new ScriptContainer(this);
-		this.__scripts;
 		this.__width = 0;
 		this.__height = 0;
 

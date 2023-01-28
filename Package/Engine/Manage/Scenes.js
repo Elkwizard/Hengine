@@ -44,12 +44,12 @@ class Scene {
 		}	
 		return { hitPoint: hit, hitShape };
 	}
-	collidePoint(point, override = true) {
+	collidePoint(point, mouse = false) {
 		return this.main.updateArray()
-			.filter(e => ((e.onScreen && !e.hidden) || override) && e.collidePoint(point));
+			.filter(e => (!mouse || (e.mouseEvents && e.onScreen && !e.hidden)) && e.collidePoint(point));
 	}
-	collidePointBoth(point, override = true) {
-		const collideAry = this.collidePoint(point, override);
+	collidePointBoth(point, mouse = false) {
+		const collideAry = this.collidePoint(point, mouse);
 		const collideSet = new Set(collideAry);
 		return [collideAry, this.main.sceneObjectArray.filter(e => !collideSet.has(e))];
 	}
@@ -115,7 +115,7 @@ class Scene {
 
 		const { mouse } = this.engine;
 		const adjusted = mouse.world;
-		const [hover, unhover] = this.collidePointBoth(adjusted, false);
+		const [hover, unhover] = this.collidePointBoth(adjusted, true);
 
 		const pressed = mouse.allJustPressed;
 		for (let i = 0; i < hover.length; i++) {

@@ -30,6 +30,30 @@ class Geometry {
 
 		return new Polygon(result);
 	}
+	static simplify(polygon, percent) {
+		const period = Math.round(1 / percent);
+		const vertices = [];
+		for (let i = 0; i < polygon.vertices.length; i++)
+			if (i % period === 0)
+				vertices.push(polygon.vertices[i].get());
+		return new Polygon(vertices);
+	}
+	static inflate(polygon, distance) {
+		const edgeNormals = polygon
+			.getEdges()
+			.map(edge => edge.vector.normal.normalize());
+		const vertices = [];
+		const { length } = polygon.vertices;
+		for (let i = 0; i < length; i++) {
+			const left = edgeNormals[(i + length) % length];
+			const right = edgeNormals[i];
+			const inset = left.plus(right);
+			if (inset.sqrMag) inset.mag = distance;
+			const v = polygon.vertices[i].minus(inset);
+			vertices.push(v);
+		}
+		return new Polygon(vertices);
+	}
 	static joinEdges(polygon, dtheta) {
 		const edges = polygon.getEdges();
 		let finalEdges = [];
@@ -104,7 +128,6 @@ class Geometry {
 			const poly = [new Vector2(i, j)];
 
 			let lastDir = null;
-			let ii = 0;
 			while (true) {
 				const { last } = poly;
 				const { x, y } = last;
@@ -120,7 +143,6 @@ class Geometry {
 				if (next.equals(poly[0])) break;
 				else poly.push(next);
 
-				ii++;
 				lastDir = path;
 			}
 
@@ -131,9 +153,20 @@ class Geometry {
 		}
 
 		return polygons
+			.filter(Geometry.isListClockwise)
 			.map(poly => new Polygon(poly).scaleAbout(
 				Vector2.origin, cellSize
 			));
+	}
+	static isListClockwise(vertices) {
+		let signedArea = 0;
+		let length = vertices.length;
+		for (let i = 0; i < length; i++) {
+			let a = vertices[i];
+			let b = vertices[(i + 1) % length];
+			signedArea += (b.x - a.x) * (a.y + b.y);
+		}
+		return signedArea < 0;;
 	}
 	static gridToPolygons(srcGrid, CELL_SIZE) {
 
@@ -276,17 +309,9 @@ class Geometry {
 		}
 
 		// for (let points of polygons) renderer.stroke(Color.PURPLE, 2).shape(...points);
-		return polygons.filter(vertices => {
-			// is clockwise ?
-			let signedArea = 0;
-			let length = vertices.length;
-			for (let i = 0; i < length; i++) {
-				let a = vertices[i];
-				let b = vertices[(i + 1) % length];
-				signedArea += (b.x - a.x) * (a.y + b.y);
-			}
-			return signedArea < 0;
-		}).map(vertices => new Polygon(vertices));
+		return polygons
+			.filter(Geometry.isListClockwise)
+			.map(vertices => new Polygon(vertices));
 	}
 	static gridToRects(srcGrid, CELL_SIZE) {
 		let grid = [];
