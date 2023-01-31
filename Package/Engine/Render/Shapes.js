@@ -229,6 +229,12 @@ class Line extends Shape {
 		line.b.set(this.b);
 		return line;
 	}
+	static fromSlopeIntercept(m, b) {
+		return new Line(
+			0, b,
+			1, b + m
+		);
+	}
 }
 
 

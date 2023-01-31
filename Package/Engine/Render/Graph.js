@@ -53,7 +53,7 @@ class Graph {
     update(t) {
         this.data.push(this.y(t));
         if (this.data.length > this.plane.frameLimit) this.data.shift();
-    }
+	}
 }
 class GraphPlane extends Frame {
     constructor(graphs, frameLimit) {

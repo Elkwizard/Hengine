@@ -70,7 +70,8 @@ class Matrix3 extends Float64Array {
 
 				return a * d - b * c;
 			};
-			for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) minors[getIndex(r, c)] = getMinor(r, c);
+			for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++)
+				minors[getIndex(r, c)] = getMinor(r, c);
 
 			// cofactors
 			for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++)
@@ -87,7 +88,14 @@ class Matrix3 extends Float64Array {
 		return this.times(M1, this);
 	}
 	times(M1, result = null) {
-		if (M1 instanceof Matrix3) {
+		if (M1 instanceof Vector2) {
+			result ??= new Vector2(0);
+			const x = this[0] * M1.x + this[3] * M1.y + this[6];
+			const y = this[1] * M1.x + this[4] * M1.y + this[7];
+			result.x = x;
+			result.y = y;
+			return result;	
+		} else if (M1 instanceof Matrix3) {
 			const m00 = this[0] * M1[0] + this[3] * M1[1] + this[6] * M1[2];
 			const m01 = this[0] * M1[3] + this[3] * M1[4] + this[6] * M1[5];
 			const m02 = this[0] * M1[6] + this[3] * M1[7] + this[6] * M1[8];
@@ -110,13 +118,6 @@ class Matrix3 extends Float64Array {
 				this[2] * M1, this[5] * M1, this[8] * M1,
 				result ?? new Matrix3()
 			);
-		} else {
-			result ??= new Vector2(0);
-			const x = this[0] * M1.x + this[3] * M1.y + this[6];
-			const y = this[1] * M1.x + this[4] * M1.y + this[7];
-			result.x = x;
-			result.y = y;
-			return result;	
 		}
 	}
 	get(result = new Matrix3()) {
@@ -146,7 +147,7 @@ class Matrix3 extends Float64Array {
 		result[8] = m22;
 		return result;
 	}
-	static identity(result = new Matrix3()) {
+	static identity(result) {
 		return Matrix3.create(
 			1, 0, 0,
 			0, 1, 0,
@@ -154,7 +155,7 @@ class Matrix3 extends Float64Array {
 			result
 		);
 	}
-	static rotation(t, result = new Matrix3()) {
+	static rotation(t, result) {
 		const c = Math.cos(t);
 		const s = Math.sin(t);
 		return Matrix3.create(
@@ -164,7 +165,15 @@ class Matrix3 extends Float64Array {
 			result
 		);
 	}
-	static scale(x, y, result = new Matrix3()) {
+	static scale(x, y, result) {
+		if (typeof y === "object" || y === undefined)
+			return Matrix3.create(
+				x, 0, 0,
+				0, x, 0,
+				0, 0, 1,
+				y
+			);
+		
 		return Matrix3.create(
 			x, 0, 0,
 			0, y, 0,
@@ -172,7 +181,15 @@ class Matrix3 extends Float64Array {
 			result
 		);
 	}
-	static translation(x, y, result = new Matrix3()) {
+	static translation(x, y, result) {
+		if (typeof x === "object") {
+			return Matrix3.create(
+				1, 0, x.x,
+				0, 1, x.y,
+				0, 0, 1,
+				y
+			)
+		}
 		return Matrix3.create(
 			1, 0, x,
 			0, 1, y,
