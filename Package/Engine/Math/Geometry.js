@@ -395,6 +395,10 @@ class Geometry {
 		}
 		return best;
 	}
+	static normalizeAngle(theta) {
+		const pi2 = 2 * Math.PI;
+		return (theta % pi2 + pi2) % pi2;
+	}
 	static signedAngularDist(r1, r2) {
 		const pi2 = 2 * Math.PI;
 		r1 = (r1 < 0) ? r1 % pi2 + pi2 : r1 % pi2;
