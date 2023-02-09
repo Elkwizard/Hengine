@@ -147,44 +147,75 @@ Synth.NOTE_INDEX_MAP = {
 };
 Synth.INDEX_NOTE_MAP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
+class SoundInstance {
+    constructor(channel, volume) {
+        this.channel = channel;
+        this.isDone = false;
+        this._volume = volume;
+        this.channel.play(volume);
+        this.done = this.channel.done.then(() => {
+            this.isDone = true;
+        });
+    }
+    get volume() {
+        return this._volume;
+    }
+    set volume(v) {
+        if (!this.isDone) this.channel.volume = v; 
+        this._volume = v; 
+    }
+    stop() {
+        this.channel.stop();
+    }
+}
+
+class SoundChannel {
+	constructor(src) {
+		this.audio = new Audio(src);
+		this.resolve = null;
+		this.done = null;
+		this.playing = false;
+	}
+	set volume(v) {
+		this.audio.volume = v;
+	}
+	get volume() {
+		return this.audio.volume;
+	}
+	stop() {
+		this.resolve?.();
+	}
+	play(volume) {
+		this.done = new Promise(resolve => {
+			this.resolve = value => {
+				this.playing = false;
+				this.resolve = null;
+				this.audio.pause();
+				resolve(value);
+			};
+
+			this.audio.onended = this.resolve;
+		
+			this.playing = true;
+			this.volume = volume;
+			this.audio.currentTime = 0;
+			this.audio.play();
+		});
+	}
+}
+
 class Sound {
     constructor(src) {
         this.src = src;
-        this.audioStates = new Map();
-        this.addAudio();
-    }
-    get audio() {
-        return [...this.audioStates.keys()][0];
-    }
-    addAudio() {
-        const audio = new Audio(this.src);
-        this.audioStates.set(audio, false);
-        return audio;
+		this.channels = [];
     }
     play(volume = 1) {
-        return new Promise(resolve => {
-            let amountPlaying = 0;
-            let audio;
-            for (const [aud, playing] of this.audioStates) {
-                if (playing) amountPlaying++;
-                else audio = aud;
-            }
-
-            if (amountPlaying >= this.audioStates.size - 1)
-                this.addAudio();
-
-            if (!audio)
-                audio = this.addAudio();
-
-            this.audioStates.set(audio, true);
-            audio.onended = () => {
-                this.audioStates.set(audio, false);
-                resolve();
-            };
-
-            // play
-            audio.volume = volume;
-            audio.play();
-        });
+		let channel = this.channels
+			.find(channel => !channel.playing);
+		if (!channel) {
+			channel = new SoundChannel(this.src)
+			this.channels.push(channel);
+		}
+        return new SoundInstance(channel, volume);
     }
 }
