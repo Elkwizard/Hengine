@@ -149,14 +149,18 @@ Synth.INDEX_NOTE_MAP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A
 
 class SoundInstance {
     constructor(channel, volume) {
-        this.channel = channel;
+		this.channel = channel;
         this.isDone = false;
         this._volume = volume;
         this.channel.play(volume);
         this.done = this.channel.done.then(() => {
             this.isDone = true;
+			this.finalTime = this.time;
         });
     }
+	get time() {
+		return this.finalTime ?? this.channel.time;
+	}
     get volume() {
         return this._volume;
     }
@@ -175,6 +179,9 @@ class SoundChannel {
 		this.resolve = null;
 		this.done = null;
 		this.playing = false;
+	}
+	get time() {
+		return this.audio.currentTime * 1000;
 	}
 	set volume(v) {
 		this.audio.volume = v;
@@ -207,7 +214,11 @@ class SoundChannel {
 class Sound {
     constructor(src) {
         this.src = src;
-		this.channels = [];
+		this.channels = [new SoundChannel(this.src)];
+		this.duration = 0;
+		this.channels[0].audio.addEventListener("loadeddata", () => {
+			this.duration = this.channels[0].audio.duration * 1000;
+		});
     }
     play(volume = 1) {
 		let channel = this.channels
