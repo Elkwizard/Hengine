@@ -197,7 +197,9 @@ class SoundChannel {
 			this.resolve = value => {
 				this.playing = false;
 				this.resolve = null;
-				this.audio.pause();
+				try {
+					this.audio.pause();
+				} catch (err) { } // ignore
 				resolve(value);
 			};
 
