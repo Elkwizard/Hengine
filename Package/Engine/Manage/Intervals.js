@@ -25,7 +25,7 @@ class DelayedFunction extends IntervalFunction {
 		super(fn, wait, type);
 	}
 	respond() {
-		if (this.timer === this.interval) this.fn();
+		if (this.timer === Math.round(this.interval)) this.fn();
 	}
 }
 class TransitionFunction extends IntervalFunction {
