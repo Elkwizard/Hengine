@@ -197,9 +197,7 @@ class SoundChannel {
 			this.resolve = value => {
 				this.playing = false;
 				this.resolve = null;
-				try {
-					this.audio.pause();
-				} catch (err) { } // ignore
+				this.audio.pause();
 				resolve(value);
 			};
 
@@ -208,7 +206,7 @@ class SoundChannel {
 			this.playing = true;
 			this.volume = volume;
 			this.audio.currentTime = 0;
-			this.audio.play();
+			this.audio.play().catch(() => null); // ignore
 		});
 	}
 }
