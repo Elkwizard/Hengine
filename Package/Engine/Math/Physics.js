@@ -1921,13 +1921,11 @@ class PhysicsEngine {
         this.bodyMap.set(b.id, b);
     }
     removeBody(id) {
-        const body = this.bodyMap.get(id);
-        // found it!
-        body.wake();
-        for (let i = 0; i < body.constraints.length; i++) {
-            const con = body.constraints[i];
-            this.removeConstraint(con.id);
-        }
+		const body = this.bodyMap.get(id);
+		
+		body.wake();
+        while (body.constraints.length)
+            this.removeConstraint(body.constraints[0].id);
 
         this.bodyMap.delete(id);
     }

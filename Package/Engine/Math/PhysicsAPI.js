@@ -8,7 +8,7 @@ class Constraint {
     constructor(physicsConstraint, engine) {
         this.physicsConstraint = physicsConstraint;
         this.engine = engine;
-		this.multibody = physicsConstraint instanceof PhysicsConstraint1;
+		this.multibody = physicsConstraint instanceof PhysicsConstraint2;
     }
     get ends() {
         return this.physicsConstraint.ends.map(Vector2.fromPhysicsVector);
