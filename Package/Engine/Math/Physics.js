@@ -1889,8 +1889,6 @@ class PhysicsEngine {
         const collisionPairs = this.createGrid(dynBodies);
         this.integratePosition(dynBodies, -1);
 
-        const intensity = 1 / (this.iterations * this.constraintIterations);
-
         //sorts
         const { x: gx, y: gy } = this.gravity;
         const gravitySort = (a, b) => (b.position.x - a.position.x) * gx + (b.position.y - a.position.y) * gy;
@@ -1903,7 +1901,8 @@ class PhysicsEngine {
             //step
             this.integrate(dynBodies, 1 / this.iterations);
             this.applyForces(dynBodies, 1 / this.iterations);
-            this.solveConstraints();
+            for (let i = 0; i < this.constraintIterations; i++)
+				this.solveConstraints();
             this.collisions(dynBodies, collisionPairs, gravitySort);
             this.applyAccumulatedImpulses(dynBodies);
             // this.handleSleep(dynBodies);
