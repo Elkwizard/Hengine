@@ -24,7 +24,7 @@ class Scene {
 	}
 	rayCast(origin, ray, mask = () => true) {
 		const elements = this.main.updateArray()
-			.filter(el => !(shape instanceof UIObject) && mask(el));
+			.filter(el => !(el instanceof UIObject) && mask(el));
 		let bestDist = Infinity;
 		let hitShape = null;
 		let hit = null;
@@ -32,7 +32,7 @@ class Scene {
 			const element = elements[i];
 			const models = element.getAllModels();
 			const result = Geometry.rayCast(origin, ray, models);
-			if (result.hitPoint) {
+			if (result) {
 				const hp = result.hitPoint;
 				const dist = (hp.x - origin.x) ** 2 + (hp.y - origin.y) ** 2;
 				if (dist < bestDist) {
@@ -41,7 +41,11 @@ class Scene {
 					hit = hp;
 				}
 			}
-		}	
+		}
+		
+		if (!hit)
+			return null;
+
 		return { hitPoint: hit, hitShape };
 	}
 	collidePoint(point, mouse = false) {

@@ -502,6 +502,10 @@ class Geometry {
 				}
 			}
 		}
+		
+		if (!hit)
+			return null;
+		
 		return { hitPoint: hit, hitShape };
 	}
 	static subdividePolygonList(vertices) {
