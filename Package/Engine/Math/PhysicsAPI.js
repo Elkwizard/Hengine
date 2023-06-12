@@ -72,12 +72,14 @@ class CollisionMonitor {
     }
     get(monitor = new CollisionMonitor()) {
         monitor.clear();
-        for (const [element, data] of this.elements) monitor.add(element, data.direction, data.contacts);
+        for (const [element, data] of this.elements)
+			monitor.add(element, data.direction, data.contacts);
         return monitor;
     }
     removeDead() {
         const newElements = new Map();
-        for (const [element, data] of this.elements) if (!element.removed) newElements.set(element, data);
+        for (const [element, data] of this.elements)
+			if (!element.removed) newElements.set(element, data);
         this.elements = newElements;
     }
     clear() {

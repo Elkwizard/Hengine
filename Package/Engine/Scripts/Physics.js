@@ -130,7 +130,13 @@ class PHYSICS extends ElementScript {
 	beforePhysics(obj) {
 		// clear collisions
 		this.colliding.removeDead();
-		if (!(this.physicsEngine.isAsleep(this.body) && this.mobile)) this.colliding.clear();
+		
+		if (!(this.physicsEngine.isAsleep(this.body) && this.mobile)) {
+			// update last colliding
+			this.colliding.get(this.lastColliding);
+		
+			this.colliding.clear();	
+		}
 
 		// sync position
 		const { position, rotation } = obj.transform;
@@ -152,13 +158,16 @@ class PHYSICS extends ElementScript {
 		if (this.scene.collisionEvents) {
 			const { directions } = PHYSICS;
 			const { lastColliding, colliding } = this;
+			const lastCollidingCache = lastColliding.get();
+
 			for (let i = 0; i < directions.length; i++) {
 				const direction = directions[i][0];
 				const now = colliding[direction];
 				if (now) {
 					const last = new Set();
-					const lastArray = lastColliding[direction];
-					if (lastArray) for (let j = 0; j < lastArray.length; j++) last.add(lastArray[j].element);
+					const lastArray = lastCollidingCache[direction];
+					if (lastArray) for (let j = 0; j < lastArray.length; j++)
+						last.add(lastArray[j].element);
 					for (let j = 0; j < now.length; j++) {
 						const data = now[j];
 						if (!last.has(data.element))
@@ -166,7 +175,6 @@ class PHYSICS extends ElementScript {
 					}
 				}
 			}
-			colliding.get(lastColliding);
 		}
 	}
 	// custom methods
