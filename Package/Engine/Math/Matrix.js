@@ -111,6 +111,15 @@ class Matrix3 extends Float64Array {
 				m20, m21, m22,
 				result ?? new Matrix3()
 			);
+		} else if (M1 instanceof Vector3) {
+			result ??= new Vector3(0);
+			const x = this[0] * M1.x + this[3] * M1.y + this[6] * M1.z;
+			const y = this[1] * M1.x + this[4] * M1.y + this[7] * M1.z;
+			const z = this[2] * M1.x + this[5] * M1.y + this[8] * M1.z;	
+			result.x = x;
+			result.y = y;
+			result.z = z;
+			return result;
 		} else if (typeof M1 === "number") {
 			return Matrix3.create(
 				this[0] * M1, this[3] * M1, this[6] * M1,
