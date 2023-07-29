@@ -43,3 +43,34 @@ class Interpolation {
         return 1 - (1 - t) ** 2;
     }
 }
+
+class Animatable {
+	constructor(initial, duration, easing = Interpolation.linear) {
+		this.duration = duration;
+		this.value = initial;
+		this.easing = easing;
+	}
+
+	set target(target) {
+		if (this._target !== undefined && target.equals(this._target)) return;
+		this.timer = 0;
+		this._target = target.get();
+		this.start = this.current.get();
+	}
+
+	get target() {
+		return this._target;
+	}
+
+	set value(value) {
+		this.current = value.get();
+		this.target = value.get();
+	}
+
+	get value() {
+		this.timer++;
+		const t = Number.clamp(this.timer / this.duration, 0, 1);
+		this.current = Interpolation.lerp(this.start, this.target, this.easing(t));
+		return this.current;
+	}
+}
