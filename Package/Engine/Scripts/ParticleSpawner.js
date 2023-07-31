@@ -61,7 +61,6 @@ class PARTICLE_SPAWNER extends ElementScript {
 	update(obj) {
 		if (this.active) {
 			if ((this.delay > 1 && obj.lifeSpan % Math.ceil(this.delay) === 0) || this.delay <= 1) {
-
 				const pos = obj.transform.position;
 				const last = this.lastTransform.position;
 				const count = Math.max(1, 1 / this.delay);
@@ -71,7 +70,6 @@ class PARTICLE_SPAWNER extends ElementScript {
 					this.addParticle(Interpolation.lerp(last, pos, t));
 					if (!this.active) break;
 				}
-
 			}
 		}
 		obj.transform.get(this.lastTransform);
@@ -141,7 +139,10 @@ class PARTICLE_SPAWNER extends ElementScript {
 				const element = elements[i];
 				const next = elements[i + 1];
 				if (element === obj) {
-					if (next.scripts.has(PARTICLE_SPAWNER)) return;
+					if (
+						next.scripts.has(PARTICLE_SPAWNER) &&
+						next.scripts.PARTICLE_SPAWNER.frame.constructor === frame.constructor
+					) return;
 					break;
 				}
 			}
