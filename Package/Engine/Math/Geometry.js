@@ -414,18 +414,15 @@ class Geometry {
 	static farthestInDirection(corners, dir) {
 		let farthest = corners[0];
 		let farthestDist = -Infinity;
-		let result = { index: 0, corner: farthest }
-		for (let i = 0; i < corners.length; i++) {
-			let corner = corners[i];
-			let dist = corner.x * dir.x + corner.y * dir.y;
+		for (let i = 1; i < corners.length; i++) {
+			const corner = corners[i];
+			const dist = corner.x * dir.x + corner.y * dir.y;
 			if (dist > farthestDist) {
 				farthest = corner;
 				farthestDist = dist;
-				result.index = i;
 			}
 		}
-		result.corner = farthest;
-		return result;
+		return farthest;
 	}
 	static rayCast(p, r, shapes) {
 		let hit = null;
@@ -437,40 +434,40 @@ class Geometry {
 			let nHit = null;
 			if (shape instanceof Circle) {
 				let normal = r.normal;
-				let proj_P = normal.dot(p);
-				let proj_C = normal.dot(shape);
-				if (Math.abs(proj_P - proj_C) < shape.radius && p.minus(shape).dot(r) <= 0) {
-					let t = (proj_C + shape.radius - proj_P) / (shape.radius * 2);
-					let upVec = r.times(-1);
-					let crossVec = upVec.normal;
-					let baseP = shape.middle.sub(crossVec.times(shape.radius)).add(crossVec.times(t * shape.radius * 2));
-					let y = Math.sqrt(1 - (2 * t - 1) ** 2);
+				const projP = normal.dot(p);
+				const projC = normal.dot(shape);
+				if (Math.abs(projP - projC) < shape.radius && p.minus(shape).dot(r) <= 0) {
+					const t = (projC + shape.radius - projP) / (shape.radius * 2);
+					const upVec = r.inverse;
+					const crossVec = upVec.normal;
+					const baseP = shape.middle.sub(crossVec.times(shape.radius)).add(crossVec.times(t * shape.radius * 2));
+					const y = Math.sqrt(1 - (2 * t - 1) ** 2);
 					baseP.add(upVec.times(y * shape.radius));
 					if (baseP.minus(p).dot(r) >= 0) nHit = baseP;
 				}
 			} else if (shape instanceof Polygon) {
-				let edges = shape.getEdges();
 				let bestDist = Infinity;
 				let bestPoint = null;
-				edges = edges.filter(edge => {
+				const edges = shape.getEdges().filter(edge => {
 					let n = edge.vector.normal;
 					return n.dot(r) >= 0 && Math.max(edge.a.minus(p).dot(r), edge.b.minus(p).dot(r)) > 0;
 				});
-				let normal = r.normal;
-				let dx = r.x;
-				let dy = r.y || EPSILON;
-				let b = p.y - p.x * dy / dx;
+				const { normal } = r;
+				const dx = r.x;
+				const dy = r.y || EPSILON;
+				const b = p.y - p.x * dy / dx;
 				for (let j = 0; j < edges.length; j++) {
 					const edge = edges[j];
-					let proj_P = normal.dot(p);
-					let proj_A = normal.dot(edge.a);
-					let proj_B = normal.dot(edge.b);
-					[proj_A, proj_B] = [Math.min(proj_A, proj_B), Math.max(proj_A, proj_B)];
-					if (proj_P >= proj_A && proj_P <= proj_B) {
-						let vec = edge.vector;
-						let dx2 = vec.x || EPSILON;
-						let dy2 = vec.y || EPSILON;
-						let b2 = edge.a.y - edge.a.x * dy2 / dx2;
+					const projP = normal.dot(p);
+					let projA = normal.dot(edge.a);
+					let projB = normal.dot(edge.b);
+					if (projB < projA)
+						[projA, projB] = [projB, projA];
+					if (projP >= projA && projP <= projB) {
+						const vec = edge.vector;
+						const dx2 = vec.x || EPSILON;
+						const dy2 = vec.y || EPSILON;
+						const b2 = edge.a.y - edge.a.x * dy2 / dx2;
 						let x, y;
 						if (Math.abs(dx) > EPSILON) {
 							// dy / dx * x + b = dy2 / dx2 * x + b2
@@ -483,7 +480,7 @@ class Geometry {
 							x = p.x;
 							y = dy2 / dx2 * x + b2;
 						}
-						let dist = (x - p.x) ** 2 + (y - p.y) ** 2;
+						const dist = (x - p.x) ** 2 + (y - p.y) ** 2;
 						if (dist < bestDist) {
 							bestDist = dist;
 							bestPoint = new Vector2(x, y);
@@ -494,7 +491,7 @@ class Geometry {
 				}
 			}
 			if (nHit) {
-				let nDist = (nHit.x - p.x) ** 2 + (nHit.y - p.y) ** 2;
+				const nDist = (nHit.x - p.x) ** 2 + (nHit.y - p.y) ** 2;
 				if (nDist < bestDist && nHit.minus(p).dot(r) >= 0) {
 					hit = nHit;
 					bestDist = nDist;
