@@ -21,6 +21,8 @@ class PHYSICS extends ElementScript {
 
 		this.physicsShapes = new Map();
 
+		this.addBody = true;
+
 		// update things that should have already been done
 		if (obj.active) this.activate();
 		for (const [name, shape] of obj.shapes) this.addShape(name, shape);
@@ -116,7 +118,7 @@ class PHYSICS extends ElementScript {
 		return shape;
 	}
 	activate(obj) {
-        this.physicsEngine.addBody(this.body);
+		this.addBody = true;
 	}
 	deactivate(obj) {
         this.physicsEngine.removeBody(this.body.id);
@@ -128,6 +130,11 @@ class PHYSICS extends ElementScript {
 		if (script.implements("collideRule")) this.hasCollideRule = true;
 	}
 	beforePhysics(obj) {
+		if (this.addBody) {
+			this.addBody = false;
+			this.physicsEngine.addBody(this.body);
+		}
+
 		// clear collisions
 		this.colliding.removeDead();
 		
