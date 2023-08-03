@@ -29,6 +29,9 @@ class Animation extends ImageType {
 		this.totalTime = this.frames.length * this.delay;
 		promise.then(this.forceLoad.bind(this));
 	}
+	get done() {
+		return this.timer === this.totalTime - 1;
+	}
 	forceLoad() {
 		this.width = this.image.width;
 		this.height = this.image.height;
@@ -40,7 +43,7 @@ class Animation extends ImageType {
 				this.timer = this.loops ? 0 : this.totalTime - 1;
 				this.onEnd();
 			}
-			let index = Math.floor(this.timer / this.delay);
+			const index = Math.floor(this.timer / this.delay);
 			this.image = this.frames[index];
 			this.width = this.image.width;
 			this.height = this.image.height;
@@ -77,5 +80,38 @@ class Animation extends ImageType {
 			frameImgs.push(img);
 		}
 		return new Animation(frameImgs, delay, loops, onEnd);
+	}
+}
+
+class AnimationStateMachine {
+	constructor(stateAnimations, initialState) {
+		this.stateAnimations = stateAnimations;
+		this.transitions = new Map();
+		this.state = initialState;
+		this.transition = null;
+	}
+	addTransition(a, b, animation) {
+		if (!this.transitions.has(a))
+			this.transitions.set(a, new Map());
+		this.transitions.get(a).set(b, animation);
+	}
+	setState(state) {
+		if (state !== this.state) {
+			if (
+				this.transitions.has(this.state) &&
+				this.transitions.get(this.state).has(state)
+			) this.transition = this.transitions.get(this.state).get(state);
+			this.state = state;
+		}
+	}
+	getFrame() {
+		if (this.transition) {
+			const image = this.transition.makeImage();
+			if (!(this.transition instanceof Animation) || this.transition.done)
+				this.transition = null;
+			return image;
+		}
+		
+		return this.stateAnimations.get(this.state).makeImage();
 	}
 }

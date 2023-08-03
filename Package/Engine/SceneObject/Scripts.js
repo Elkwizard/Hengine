@@ -75,6 +75,7 @@ class ScriptContainer {
 		return this.sceneObject.container.defaultScript;
 	}
 	add(script, ...args) {
+		if (this.has(script)) return null;
 		const instance = new script(this.sceneObject);
 		this[script.name] = instance;
 		for (const method of script.implementedMethods) this.implementedMethods.add(method);
