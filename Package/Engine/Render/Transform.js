@@ -26,6 +26,10 @@ class Transform extends Matrix3 {
 			}
 		});
 	}
+	get inverse() {
+		const pos = this.position.inverse.rotate(-this.rotation);
+		return new Transform(pos.x, pos.y, -this.rotation);
+	}
 	set position(vec) {
 		this[6] = vec.x;
 		this[7] = vec.y;
