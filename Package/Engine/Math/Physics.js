@@ -603,7 +603,7 @@ class RigidBody {
 		this._density = 1;
 
         this.restitution = 0;
-        this.friction = null;
+        this.friction = 0.5;
         this.canMoveThisStep = true;
         this.prohibitedDirections = [];
 
@@ -1423,6 +1423,8 @@ class PhysicsConstraint1 extends PhysicsConstraint {
     }
     solve() {
         const { body, forceToError } = this;
+		
+		if (!body.engine) return;
 
         if (body.dynamic) {
             const a = this.ends[0];
@@ -1506,6 +1508,8 @@ class PhysicsConstraint2 extends PhysicsConstraint {
     }
     solve() {
         const { bodyA, bodyB, forceToError } = this;
+
+		if (!bodyA.engine || !bodyB.engine) return;
 
         const dynamicA = bodyA.dynamic;
         const dynamicB = bodyB.dynamic;
@@ -1644,7 +1648,6 @@ class PhysicsEngine {
         this.bodyMap = new Map();
         this.collisionResolver = new CollisionResolver(this);
         this.drag = 0.005;
-        this.friction = 0.5;
         this.constraintMap = new Map();
         this.constraintIterations = 5;
         this.iterations = 5;
@@ -1911,12 +1914,14 @@ class PhysicsEngine {
             // }
         }
     }
+	hasBody(id) {
+		return this.bodyMap.has(id);
+	}
     getBody(id) {
 		return this.bodyMap.get(id);
     }
     addBody(b) {
         b.engine = this;
-        if (b.friction === null) b.friction = this.friction;
         this.bodyMap.set(b.id, b);
     }
     removeBody(id) {
@@ -1927,6 +1932,8 @@ class PhysicsEngine {
             this.removeConstraint(body.constraints[0].id);
 
         this.bodyMap.delete(id);
+
+		body.engine = null;
     }
     removeConstraint(id) {
         const con = this.constraintMap.get(id);
