@@ -373,8 +373,13 @@ class Geometry {
 		}
 
 
-		for (let i = 0; i < result.length; i++)
-			result[i].scaleAbout(Vector2.origin, CELL_SIZE);
+		for (let i = 0; i < result.length; i++) {
+			const rect = result[i];
+			rect.x *= CELL_SIZE;
+			rect.y *= CELL_SIZE;
+			rect.width *= CELL_SIZE;
+			rect.height *= CELL_SIZE;
+		}
 
 		return result;
 	}
