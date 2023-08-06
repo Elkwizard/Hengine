@@ -325,15 +325,21 @@ class Geometry {
 			return x in grid && y in grid[x] && grid[x][y];
 		}
 		function set(x, y, v) {
-			if (x in grid && y in grid[x]) grid[x][y] = v;
+			if (x in grid && y in grid[x])
+				grid[x][y] = v;
 		}
 
 		function validRect(r) {
-			for (let i = 0; i < r.width; i++) for (let j = 0; j < r.height; j++) if (!sample(r.x + i, r.y + j)) return false;
+			for (let i = 0; i < r.width; i++)
+			for (let j = 0; j < r.height; j++)
+				if (!sample(r.x + i, r.y + j))
+					return false;
 			return true;
 		}
 		function clearRect(r) {
-			for (let i = 0; i < r.width; i++) for (let j = 0; j < r.height; j++) set(r.x + i, r.y + j, false);
+			for (let i = 0; i < r.width; i++)
+			for (let j = 0; j < r.height; j++)
+				set(r.x + i, r.y + j, false);
 		}
 
 		for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
@@ -367,7 +373,8 @@ class Geometry {
 		}
 
 
-		for (let i = 0; i < result.length; i++) result[i].mul(CELL_SIZE);
+		for (let i = 0; i < result.length; i++)
+			result[i].scaleAbout(Vector2.origin, CELL_SIZE);
 
 		return result;
 	}
