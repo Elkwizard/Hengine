@@ -33,10 +33,13 @@ class CanvasImage extends ImageType {
 		return this._scalingMode;
 	}
 	set cursor(a) {
-		this.canvas.style.cursor = a;
+		this._cursor = a;
+		if (a instanceof ImageType) {
+			this.canvas.style.cursor = `url('${a.toDataURL()}') ${a.pixelWidth / 2} ${a.pixelHeight / 2}, auto`;
+		} else this.canvas.style.cursor = a;
 	}
 	get cursor() {
-		return this.canvas.style.cursor;
+		return this._cursor;
 	}
 	onresize(width, height) {
 		this.renderer.resize(width, height);
