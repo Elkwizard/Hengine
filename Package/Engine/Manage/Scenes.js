@@ -1,7 +1,7 @@
 class Scene {
 	constructor(gravity, engine) {
 		this.engine = engine;
-		this.main = new ElementContainer("Main", true, null, this.engine);
+		this.main = new ElementContainer("Main", null, this.engine);
 		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
 		this.physicsEngine.onCollide = this.handleCollisionEvent.bind(this);
 		this.cullGraphics = true;
@@ -137,11 +137,15 @@ class Scene {
 		}
 	}
 	engineUpdate() {
-		this.handleMouseEvents();
+		for (let i = 0; i < this.main.sceneObjectArray.length; i++)
+			this.main.sceneObjectArray[i].runSynced();
 
 		this.main.startUpdate();
-		this.script("beforeUpdate");
+		
+		this.handleMouseEvents();
 
+		this.script("beforeUpdate");
+		
 		// update
 		this.script("update");
 

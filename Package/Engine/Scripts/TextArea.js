@@ -364,9 +364,6 @@ class TEXT_AREA extends ElementScript {
 	cleanUp() {
 		this.adjustCursor();
 	}
-	deactivate() {
-		this.adjustCursor();
-	}
 	update(obj) {
 		if (obj.hidden) return;
 

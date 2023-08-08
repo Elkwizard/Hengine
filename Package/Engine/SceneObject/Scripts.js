@@ -33,6 +33,7 @@ class ElementScript {
 
 		this.sceneObject = sceneObject;
 		this.scriptNumber = 0;
+		this.scriptSynced = !sceneObject.beingUpdated;
 	}
 }
 
@@ -57,8 +58,6 @@ ElementScript.flags = new Set([
 	"message",
 	"remove",
 	"cleanUp",
-	"activate",
-	"deactivate",
 	"addShape",
 	"removeShape",
 	"addScript"
@@ -106,10 +105,17 @@ class ScriptContainer {
 	implements(method) {
 		return this.implementedMethods.has(method);
 	}
+	sync() {
+		for (let i = 0; i < this.sortedScriptInstances.length; i++)
+			this.sortedScriptInstances[i].scriptSynced = true;
+	}
 	run(method, ...args) {
-		if (this.sceneObject.removed && method !== "remove" && method !== "deactivate") return;
+		if (this.sceneObject.removed && method !== "remove" && method !== "cleanUp") return;
 		if (this.implementedMethods.has(method))
-			for (let i = 0; i < this.sortedScriptInstances.length; i++)
-				this.sortedScriptInstances[i][method](...args);
+			for (let i = 0; i < this.sortedScriptInstances.length; i++) {
+				const script = this.sortedScriptInstances[i];
+				if (script.scriptSynced)
+					script[method](...args);
+			}
 	}
 }

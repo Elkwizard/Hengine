@@ -48,6 +48,7 @@ class SceneObject extends SceneElement {
 		this.hovered = false;
 		this.layer = 0;
 		this.lifeSpan = 0;
+		this.synced = [];
 		this.log = [];
 		this.onScreen = true;
 		this.cullGraphics = true;
@@ -55,8 +56,6 @@ class SceneObject extends SceneElement {
 		this.scripts = new ScriptContainer(this);
 		this.__width = 0;
 		this.__height = 0;
-
-		this.active = container.active;
 	}
 	set defaultShape(a) {
 		this.addShape("default", a);
@@ -78,11 +77,16 @@ class SceneObject extends SceneElement {
 	get height() {
 		return this.__height;
 	}
-	activate() {
-		this.scripts.run("activate");
+	runSynced() {
+		this.scripts.sync();
+		for (let i = 0; i < this.synced.length; i++)
+			this.synced[i](this);
+		this.synced = [];
 	}
-	deactivate() {
-		this.scripts.run("deactivate");
+	sync(fn) {
+		if (!this.beingUpdated)
+			fn(this);
+		else this.synced.push(fn);
 	}
 	updatePreviousData() {
 		this.transform.get(this.lastTransform);

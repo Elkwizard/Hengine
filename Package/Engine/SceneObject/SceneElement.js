@@ -14,18 +14,6 @@ class SceneElement {
 	get name() {
 		return this._name;
 	}
-	set active(a) {
-		if (this._active !== a) {
-			if (a) this.activate();
-			else if (this._active !== undefined) this.deactivate();
-		}
-		this._active = a;
-	}
-	get active() {
-		return this._active;
-	}
-	activate() { }
-	deactivate() { }
 	remove() {
 		this.removed = true;
 	}

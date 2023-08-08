@@ -21,12 +21,6 @@ class PHYSICS extends ElementScript {
 
 		this.physicsShapes = new Map();
 
-		this.addBody = true;
-
-		// update things that should have already been done
-		if (obj.active) this.activate();
-		for (const [name, shape] of obj.shapes) this.addShape(name, shape);
-
 		// links/shortcuts
 		this._velocity = new Vector2();
 		delete this._velocity.x;
@@ -57,6 +51,13 @@ class PHYSICS extends ElementScript {
 		Object.shortcut(this, body, "friction");
 		Object.shortcut(this, body, "density");
 		Object.shortcut(this, body, "airResistance");
+
+		obj.sync(() => {
+			// update things that should have already been done
+			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
+
+			this.physicsEngine.addBody(this.body);
+		});
 	}
 	get constraints() {
 		return this.body.constraints.map(con => new Constraint(con, this.sceneObject.engine));
@@ -117,24 +118,13 @@ class PHYSICS extends ElementScript {
 		this.physicsShapes.delete(shape);
 		return shape;
 	}
-	activate(obj) {
-		this.addBody = true;
-	}
-	deactivate(obj) {
-        this.physicsEngine.removeBody(this.body.id);
-	}
 	cleanUp(obj) {
-		this.deactivate();
+	    this.physicsEngine.removeBody(this.body.id);
 	}
 	addScript(obj, script) {
 		if (script.implements("collideRule")) this.hasCollideRule = true;
 	}
 	beforePhysics(obj) {
-		if (this.addBody) {
-			this.addBody = false;
-			this.physicsEngine.addBody(this.body);
-		}
-
 		// clear collisions
 		this.colliding.removeDead();
 		

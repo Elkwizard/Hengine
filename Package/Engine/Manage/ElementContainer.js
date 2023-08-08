@@ -1,5 +1,5 @@
 class ElementContainer extends SceneElement {
-	constructor(name = "container", active, container, engine) {
+	constructor(name = "container", container, engine) {
 		super(name, container);
 		this.elements = new Map();
 		this.engine = engine;
@@ -38,20 +38,11 @@ class ElementContainer extends SceneElement {
 				obj.engine.renderer.stroke(this.outline, 1).infer(shape);
 			}
 		};
-		this.active = active;
-	}
-	activate() {
-		this.updateArray();
-		for (const [name, element] of this.elements) if (!element.active) element.activate();
-	}
-	deactivate() {
-		this.updateArray();
-		for (const [name, element] of this.elements) if (element.active) element.deactivate();
 	}
 	updateArray() {
 		this.sceneObjectArray = [];
 		for (const [name, element] of this.elements) {
-			if (!element.active || element.removed) continue;
+			if (element.removed) continue;
 			if (element instanceof ElementContainer) this.sceneObjectArray.pushArray(element.updateArray());
 			else this.sceneObjectArray.push(element);
 		}
@@ -59,21 +50,21 @@ class ElementContainer extends SceneElement {
 	}
 	startUpdate() {
 		this.updateArray();
-		//remove queued
-		for (const [name, element] of this.elements) {
+
+		// remove queued
+		for (const [name, element] of this.elements)
 			if (element.removed) this.removeElement(element);
 			else element.beingUpdated = true;
-		}
-		//recurse
+		
+		// recurse
 		for (const [name, element] of this.elements) if (element instanceof ElementContainer) element.startUpdate();
 	}
 	endUpdate() {
-		//remove queued
-		for (const [name, element] of this.elements) {
-			if (element.removed) this.removeElement(element);
-			else element.beingUpdated = false;
-		}
-		//recurse
+		// remove queued
+		for (const [name, element] of this.elements)
+			element.beingUpdated = false;
+		
+		// recurse
 		for (const [name, element] of this.elements) if (element instanceof ElementContainer) element.endUpdate();
 	}
 	copy(el) {
@@ -165,22 +156,28 @@ class ElementContainer extends SceneElement {
 		this.elements.set(name, n);
 		return n;
 	}
-	addContainer(name, active = true) {
+	addContainer(name) {
 		name = this.genName(this.elements, name);
-		let x = new ElementContainer(name, active, this, this.engine);
+		let x = new ElementContainer(name, this, this.engine);
 		this.elements.set(name, x);
 		return x;
 	}
 	removeElement(element) {
 		if (element.container === this) {
-			if (element.active) element.deactivate();
 			element.removed = true;
-			if (element instanceof SceneObject) element.scripts.run("remove");
+			if (element instanceof SceneObject) {
+				element.scripts.run("cleanUp");
+				element.scripts.run("remove");
+			} else {
+				const objects = element.updateArray();
+				for (let i = 0; i < objects.length; i++)
+					element.removeElement(objects[i]);
+			}
 			this.elements.delete(element.name);
 		}
 	}
 	removeElements(elements) {
-		for (let i = 0; i < elements.length; i++) this.removeElement(elements[i]);
+		for (let i = 0; i < elements.length; i++) elements[i].remove();
 	}
 	removeAllElements() {
 		this.removeElements(this.getAllElements());
@@ -189,19 +186,10 @@ class ElementContainer extends SceneElement {
 		return this.elements.get(name);
 	}
 	getAllElements() {
-		const array = [];
-		for (const [name, element] of this.elements) {
-			if (element.removed) continue;
-			if (element instanceof ElementContainer) array.pushArray(element.getAllElements());
-			else array.push(element);
-		}
-		return array;
+		return this.updateArray();
 	}
 	getElementsMatch(fn) {
 		return this.updateArray().filter(fn);
-	}
-	getActiveElements() {
-		return this.updateArray();
 	}
 	getUIElements() {
 		return this.getElementsMatch(element => element instanceof UIObject);
