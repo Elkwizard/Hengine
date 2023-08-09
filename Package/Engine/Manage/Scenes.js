@@ -8,6 +8,7 @@ class Scene {
 		this.mouseEvents = true;
 		this.collisionEvents = true;
 		this.camera = new Camera(this.engine.canvas.width / 2, this.engine.canvas.height / 2, 0, 1, engine);
+		this.updating = false;
 	}
 	get constraints() {
 		return this.physicsEngine.constraints.map(con => new Constraint(con, this.engine));
@@ -137,10 +138,13 @@ class Scene {
 		}
 	}
 	engineUpdate() {
+		this.main.updateArray();
+
 		for (let i = 0; i < this.main.sceneObjectArray.length; i++)
 			this.main.sceneObjectArray[i].runSynced();
 
 		this.main.startUpdate();
+		this.updating = true;
 		
 		this.handleMouseEvents();
 
@@ -159,7 +163,8 @@ class Scene {
 		this.renderCamera();
 
 		this.script("afterUpdate");
-		this.main.endUpdate();
+
+		this.updating = false;
 	}
 	destroy() {
 		this.main.removeAllElements();

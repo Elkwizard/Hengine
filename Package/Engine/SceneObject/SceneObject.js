@@ -52,7 +52,6 @@ class SceneObject extends SceneElement {
 		this.log = [];
 		this.onScreen = true;
 		this.cullGraphics = true;
-		this.beingUpdated = false;
 		this.scripts = new ScriptContainer(this);
 		this.__width = 0;
 		this.__height = 0;
@@ -84,7 +83,7 @@ class SceneObject extends SceneElement {
 		this.synced = [];
 	}
 	sync(fn) {
-		if (!this.beingUpdated)
+		if (!this.engine.scene.updating)
 			fn(this);
 		else this.synced.push(fn);
 	}

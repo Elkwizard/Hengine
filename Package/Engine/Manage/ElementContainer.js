@@ -42,30 +42,22 @@ class ElementContainer extends SceneElement {
 	updateArray() {
 		this.sceneObjectArray = [];
 		for (const [name, element] of this.elements) {
-			if (element.removed) continue;
+			// if (element.removed) continue;
 			if (element instanceof ElementContainer) this.sceneObjectArray.pushArray(element.updateArray());
 			else this.sceneObjectArray.push(element);
 		}
 		return this.sceneObjectArray;
 	}
 	startUpdate() {
-		this.updateArray();
-
 		// remove queued
 		for (const [name, element] of this.elements)
 			if (element.removed) this.removeElement(element);
-			else element.beingUpdated = true;
 		
 		// recurse
-		for (const [name, element] of this.elements) if (element instanceof ElementContainer) element.startUpdate();
-	}
-	endUpdate() {
-		// remove queued
 		for (const [name, element] of this.elements)
-			element.beingUpdated = false;
-		
-		// recurse
-		for (const [name, element] of this.elements) if (element instanceof ElementContainer) element.endUpdate();
+			if (element instanceof ElementContainer) element.startUpdate();
+	
+		this.updateArray();
 	}
 	copy(el) {
 		let n;
@@ -164,7 +156,6 @@ class ElementContainer extends SceneElement {
 	}
 	removeElement(element) {
 		if (element.container === this) {
-			element.removed = true;
 			if (element instanceof SceneObject) {
 				element.scripts.run("cleanUp");
 				element.scripts.run("remove");

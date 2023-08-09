@@ -33,7 +33,7 @@ class ElementScript {
 
 		this.sceneObject = sceneObject;
 		this.scriptNumber = 0;
-		this.scriptSynced = !sceneObject.beingUpdated;
+		this.scriptSynced = !sceneObject.engine.scene.updating;
 	}
 }
 
@@ -110,7 +110,7 @@ class ScriptContainer {
 			this.sortedScriptInstances[i].scriptSynced = true;
 	}
 	run(method, ...args) {
-		if (this.sceneObject.removed && method !== "remove" && method !== "cleanUp") return;
+		// if (this.sceneObject.removed && method !== "remove" && method !== "cleanUp") return;
 		if (this.implementedMethods.has(method))
 			for (let i = 0; i < this.sortedScriptInstances.length; i++) {
 				const script = this.sortedScriptInstances[i];
