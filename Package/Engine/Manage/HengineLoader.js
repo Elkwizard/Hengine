@@ -62,11 +62,15 @@ class HengineScriptResource extends HengineResource {
 	}
 }
 class HengineSoundResource extends HengineResource {
+	constructor(src, loops) {
+		super(src);
+		this.loops = loops;
+	}
 	load() {
-		const audio = new Audio(this.src);
+		const audio = new Audio(this.src, this.loops);
 		return new Promise(resolve => {
 			audio.addEventListener("canplaythrough", function () {
-				resolve(new Sound(this.src));
+				resolve(new Sound(this.src, this.loops));
 			});
 			audio.addEventListener("error", function () {
 				resolve(null);

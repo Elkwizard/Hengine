@@ -174,8 +174,9 @@ class SoundInstance {
 }
 
 class SoundChannel {
-	constructor(src) {
+	constructor(src, loops) {
 		this.audio = new Audio(src);
+		this.audio.loop = loops;
 		this.resolve = null;
 		this.done = null;
 		this.playing = false;
@@ -212,9 +213,10 @@ class SoundChannel {
 }
 
 class Sound {
-    constructor(src) {
+    constructor(src, loops = false) {
         this.src = src;
-		this.channels = [new SoundChannel(this.src)];
+		this.loops = loops;
+		this.channels = [new SoundChannel(this.src, this.loops)];
 		this.duration = 0;
 		this.channels[0].audio.addEventListener("loadeddata", () => {
 			this.duration = this.channels[0].audio.duration * 1000;
@@ -224,7 +226,7 @@ class Sound {
 		let channel = this.channels
 			.find(channel => !channel.playing);
 		if (!channel) {
-			channel = new SoundChannel(this.src)
+			channel = new SoundChannel(this.src, this.loops);
 			this.channels.push(channel);
 		}
         return new SoundInstance(channel, volume);
