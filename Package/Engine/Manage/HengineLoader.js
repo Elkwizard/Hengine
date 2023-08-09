@@ -67,7 +67,7 @@ class HengineSoundResource extends HengineResource {
 		this.loops = loops;
 	}
 	load() {
-		const audio = new Audio(this.src, this.loops);
+		const audio = new Audio(this.src);
 		return new Promise(resolve => {
 			audio.addEventListener("canplaythrough", function () {
 				resolve(new Sound(this.src, this.loops));
