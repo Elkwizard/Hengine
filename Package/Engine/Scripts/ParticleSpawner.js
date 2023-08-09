@@ -29,6 +29,15 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.lastTransform = obj.transform.get();
 		this.anyParticlesRendered = false;
 	}
+	set particleCount(count) {
+		if (count === this.particles.length) return;
+		if (count < this.particles.length)
+			this.particles.length = count;
+		else this.explode(count - this.particles.length);
+	}
+	get particleCount() {
+		return this.particles.length;
+	}
 	removeAllParticles(obj) {
 		this.particles = [];
 	}
