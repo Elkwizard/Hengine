@@ -177,6 +177,7 @@ class SoundChannel {
 	constructor(src, loops) {
 		this.audio = new Audio(src);
 		this.audio.loop = loops;
+		this.loops = loops;
 		this.resolve = null;
 		this.done = null;
 		this.playing = false;
@@ -202,7 +203,7 @@ class SoundChannel {
 				resolve(value);
 			};
 
-			this.audio.onended = this.resolve;
+			if (!this.loops) this.audio.onended = this.resolve;
 		
 			this.playing = true;
 			this.volume = volume;
