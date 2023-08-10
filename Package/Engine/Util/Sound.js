@@ -208,10 +208,23 @@ class SoundChannel {
 			this.playing = true;
 			this.volume = volume;
 			this.audio.currentTime = 0;
-			this.audio.play().catch(() => null); // ignore
+
+			const play = () => this.audio.play().catch(() => null); // ignore
+			if (!SoundChannel.canPlay) SoundChannel.delayed.push(play);
+			else play();
 		});
 	}
 }
+
+SoundChannel.canPlay = false;
+SoundChannel.delayed = [];
+
+window.addEventListener("click", () => {
+	if (!SoundChannel.canPlay) {
+		SoundChannel.canPlay = true;
+		SoundChannel.delayed.forEach(play => play());
+	}
+})
 
 class Sound {
     constructor(src, loops = false) {
