@@ -9,11 +9,17 @@ class PHYSICS extends ElementScript {
 		// collide rule
 		this.body.userData.sceneObject = obj;
         this.body.collisionFilter = body => {
-            const { sceneObject } = body.userData;
-			const success = (!this.hasCollideRule || this.collideBasedOnRule(sceneObject)) && (!sceneObject.hasCollideRule || sceneObject.scripts.PHYSICS.collideBasedOnRule(obj));
+            let { sceneObject } = body.userData;
+			const success = (
+				!this.hasCollideRule ||
+				this.collideBasedOnRule(sceneObject)
+			) && (
+				!sceneObject.scripts.PHYSICS.hasCollideRule ||
+				sceneObject.scripts.PHYSICS.collideBasedOnRule(obj)
+			);
+
 			return success;
         };
-		this.hasCollideRule = obj.scripts.implements("collideRule");
 
 		// monitors
         this.colliding = new CollisionMonitor();
@@ -54,6 +60,8 @@ class PHYSICS extends ElementScript {
 
 		obj.sync(() => {
 			// update things that should have already been done
+			this.hasCollideRule = obj.scripts.implements("collideRule");
+		
 			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
 
 			this.physicsEngine.addBody(this.body);
@@ -188,8 +196,11 @@ class PHYSICS extends ElementScript {
 	}
 	collideBasedOnRule(obj, element) {
 		const scripts = obj.scripts.sortedScriptInstances;
-		for (let i = 0; i < scripts.length; i++)
-			if (!scripts[i].collideRule(element)) return false;
+		for (let i = 0; i < scripts.length; i++) {
+			const script = scripts[i];
+			if (script.scriptSynced && !scripts[i].collideRule(element))
+				return false;
+		}
 		return true;
 	}
 	constrainedTo(obj, body) {
