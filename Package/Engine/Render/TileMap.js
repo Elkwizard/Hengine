@@ -7,7 +7,7 @@ class TileMap {
 			this.tiles.set(name, Frame.fromImageType(image, area));
 		}
 	}
-	getTile(tileType) {
+	get(tileType) {
 		return this.tiles.get(tileType);
 	}
 	static regular(image, tileWidth, tileHeight, names) {
