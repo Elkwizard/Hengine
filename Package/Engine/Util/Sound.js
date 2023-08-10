@@ -203,7 +203,7 @@ class SoundChannel {
 				resolve(value);
 			};
 
-			if (!this.loops) this.audio.onended = this.resolve;
+			this.audio.onended = this.loops ? null : this.resolve;
 		
 			this.playing = true;
 			this.volume = volume;
