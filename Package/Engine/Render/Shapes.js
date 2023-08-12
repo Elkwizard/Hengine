@@ -1,9 +1,17 @@
 class Range {
 	constructor(min, max) {
-		this._max = Infinity;
-		this._min = -Infinity;
-		this.min = min;
-		this.max = max;
+		if (min !== undefined && max !== undefined) {
+			if (min < max) {
+				this._min = min;
+				this._max = max;
+			} else {
+				this._min = max;
+				this._max = min;
+			}
+		} else {
+			this._max = -Infinity;
+			this._min = Infinity;
+		}
 	}
 	get middle() {
 		return (this.min + this.max) / 2;
