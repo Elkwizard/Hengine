@@ -33,7 +33,7 @@ class ElementScript {
 
 		this.sceneObject = sceneObject;
 		this.scriptNumber = 0;
-		this.scriptSynced = !sceneObject.engine.scene.updating;
+		this.scriptSynced = false;
 	}
 }
 

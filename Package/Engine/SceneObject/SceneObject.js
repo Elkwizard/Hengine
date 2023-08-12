@@ -83,9 +83,7 @@ class SceneObject extends SceneElement {
 		this.synced = [];
 	}
 	sync(fn) {
-		if (!this.engine.scene.updating)
-			fn(this);
-		else this.synced.push(fn);
+		this.synced.push(fn);
 	}
 	updatePreviousData() {
 		this.transform.get(this.lastTransform);
