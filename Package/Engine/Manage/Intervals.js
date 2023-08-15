@@ -74,7 +74,14 @@ class IntervalManager {
 		this.fpsGraph = this.makeGraphPlane([
 			new Graph("FPS", () => this.averageFps, 0, 60, Color.LIME, 1)
 		], 400);
-
+	}
+	set fps(a) {
+		this.targetFPS = a;
+	}
+	get fps() {
+		return this._fps;
+	}
+	start() {
 		// deal with system frame length
 		let lastFrameTime = performance.now();
 		let timeSinceLastFrame = 0;
@@ -93,12 +100,6 @@ class IntervalManager {
 
 			timeSinceLastFrame %= targetFrameLength * 2;
 		});
-	}
-	set fps(a) {
-		this.targetFPS = a;
-	}
-	get fps() {
-		return this._fps;
 	}
 	updatePerformanceData() {
 		if (!this.performanceData) return;

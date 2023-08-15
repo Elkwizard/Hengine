@@ -298,7 +298,8 @@ class HengineLoader {
 	}
 	static load(userResources = []) {
 		async function loadResources() {
-			if (HengineLoader.loader === null) {
+			const newHengine = HengineLoader.loader === null;
+			if (newHengine) {
 				console.time("loading engine");
 
 				// find yourself
@@ -363,6 +364,8 @@ class HengineLoader {
 			}
 
 			console.timeEnd("loading user resources");
+
+			if (newHengine) hengineLoader.hengine.intervals.start();
 
 			return hengineLoader;
 		}
