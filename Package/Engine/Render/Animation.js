@@ -79,11 +79,16 @@ class Animation extends ImageType {
 	}
 }
 
-class AnimationStateMachine {
+class AnimationStateMachine extends ImageType {
 	constructor(stateAnimations, initialState) {
+		super(
+			stateAnimations.get(initialState).width,
+			stateAnimations.get(initialState).height,
+			stateAnimations.get(initialState).pixelRatio,
+		);
 		this.stateAnimations = stateAnimations;
 		this.transitions = new Map();
-		this.state = initialState;
+		this._state = initialState;
 		this.transition = null;
 	}
 	addTransition(a, b, animation) {
@@ -91,19 +96,26 @@ class AnimationStateMachine {
 			this.transitions.set(a, new Map());
 		this.transitions.get(a).set(b, animation);
 	}
-	setState(state) {
+	get state() {
+		return this._state;
+	}
+	set state(state) {
 		if (state !== this.state) {
 			if (
 				this.transitions.has(this.state) &&
 				this.transitions.get(this.state).has(state)
-			) this.transition = this.transitions.get(this.state).get(state);
-			this.state = state;
+			) {
+				this.transition = this.transitions.get(this.state).get(state);
+				this.transition.reset();
+			}
+			this.stateAnimations.get(state).reset();
+			this._state = state;
 		}
 	}
-	getFrame() {
+	makeImage() {
 		if (this.transition) {
 			const image = this.transition.makeImage();
-			if (!(this.transition instanceof Animation) || this.transition.done)
+			if (this.transition.done)
 				this.transition = null;
 			return image;
 		}

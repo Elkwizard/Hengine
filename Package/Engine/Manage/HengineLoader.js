@@ -37,6 +37,7 @@ class PathManager {
 		return a;
 	}
 }
+
 class HengineResource {
 	constructor(src) {
 		this.src = src;
@@ -45,6 +46,7 @@ class HengineResource {
 
 	}
 }
+
 class HengineScriptResource extends HengineResource {
 	load() {
 		const script = document.createElement("script");
@@ -61,6 +63,7 @@ class HengineScriptResource extends HengineResource {
 		});
 	}
 }
+
 class HengineSoundResource extends HengineResource {
 	constructor(src, loops) {
 		super(src);
@@ -78,6 +81,7 @@ class HengineSoundResource extends HengineResource {
 		});
 	}
 }
+
 class HengineImageResource extends HengineResource {
 	load() {
 		const image = new HImage(this.src);
@@ -93,6 +97,7 @@ class HengineImageResource extends HengineResource {
 		});
 	}
 }
+
 class HengineVideoResource extends HengineResource {
 	constructor(src, loops) {
 		super(src);
@@ -108,6 +113,7 @@ class HengineVideoResource extends HengineResource {
 		});
 	}
 }
+
 class HengineAnimationResource extends HengineResource {
 	constructor(src, frames, delay, loops) {
 		super(src);
@@ -208,6 +214,7 @@ class HengineTextResource extends HengineResource {
 		});
 	}
 }
+
 class HengineBinaryResource extends HengineResource {
 	load() {
 		return new Promise(async resolve => {
@@ -287,12 +294,25 @@ class HengineLoader {
 	}
 	loadResource(src) {
 		if (PathManager.isRoot(src)) {
-			return this.resources.get(src) ?? null;
+			const resource = this.resources.get(src);
+			if (resource) {
+				if ("get" in resource) return resource.get();
+				return resource;
+			}
+
+			return null;
 		} else {
 			const processed = src.replace(/\\/g, "/");
 			for (const [path, resource] of this.resources)
-				if (path.replace(/\\/g, "/").endsWith(processed))
-					return resource;
+				if (path.replace(/\\/g, "/").endsWith(processed)) {
+					const resource = this.resources.get(path);
+					if (resource) {
+						if ("get" in resource) return resource.get();
+						return resource;
+					}
+		
+					return null;
+				}
 			return null;
 		}
 	}
