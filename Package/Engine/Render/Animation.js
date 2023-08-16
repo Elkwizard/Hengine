@@ -62,13 +62,6 @@ class Animation extends ImageType {
 		this.timer = -1;
 		this.advance();
 	}
-	get(animation = new Animation([], 0, false, () => null)) {
-		animation.frames = this.frames;
-		animation.delay = this.delay;
-		animation.loops = this.loops;
-		animation.onEnd = this.onEnd;
-		return animation;
-	}
 	makeImage() {
 		this.advance();
 		return this.image.image;
