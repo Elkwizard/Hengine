@@ -32,6 +32,9 @@ class Animation extends ImageType {
 	get done() {
 		return this.timer === this.totalTime - 1;
 	}
+	get() {
+		return new Animation(this.frames, this.delay, this.loops, this.onEnd);
+	}
 	forceLoad() {
 		this.width = this.image.width;
 		this.height = this.image.height;
