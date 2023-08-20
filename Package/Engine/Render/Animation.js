@@ -86,8 +86,8 @@ class AnimationStateMachine extends ImageType {
 		);
 		this.stateAnimations = stateAnimations;
 		this.transitions = new Map();
-		this._state = initialState;
 		this.transition = null;
+		this.stateStack = [initialState];
 	}
 	addTransition(a, b, animation) {
 		if (!this.transitions.has(a))
@@ -95,10 +95,18 @@ class AnimationStateMachine extends ImageType {
 		this.transitions.get(a).set(b, animation);
 	}
 	get state() {
-		return this._state;
+		return this.stateStack.last;
 	}
 	set state(state) {
 		if (state !== this.state) {
+			const animation = this.stateAnimations.get(state);
+			if (animation.loops)
+				this.stateStack = [state];
+			else {
+				animation.reset();
+				this.stateStack.push(state);
+			}
+			
 			if (
 				this.transitions.has(this.state) &&
 				this.transitions.get(this.state).has(state)
@@ -106,8 +114,6 @@ class AnimationStateMachine extends ImageType {
 				this.transition = this.transitions.get(this.state).get(state);
 				this.transition.reset();
 			}
-			this.stateAnimations.get(state).reset();
-			this._state = state;
 		}
 	}
 	makeImage() {
@@ -117,7 +123,11 @@ class AnimationStateMachine extends ImageType {
 				this.transition = null;
 			return image;
 		}
+
+		const animation = this.stateAnimations.get(this.state);
+		const image = animation.makeImage();
+		if (animation.done) this.stateStack.pop();
 		
-		return this.stateAnimations.get(this.state).makeImage();
+		return image;
 	}
 }
