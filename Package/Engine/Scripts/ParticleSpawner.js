@@ -51,7 +51,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.radius = p.radius ?? this.radius ?? 10;
 		this.lifeSpan = p.lifeSpan ?? this.lifeSpan ?? 100;
 		this.delay = p.delay ?? this.delay ?? 1;
-		const imageType = p.imageType ?? FastFrame;
+		const imageType = p.imageType ?? this.frame?.constructor ?? FastFrame;
 		this.frame = PARTICLE_SPAWNER[imageType.name] ?? (PARTICLE_SPAWNER[imageType.name] = new imageType(obj.engine.canvas.width, obj.engine.canvas.height));
 		this.gl = this.frame.renderer;
 	}
