@@ -28,7 +28,7 @@ class Animation extends ImageType {
 		this.forceLoad();
 	}
 	get done() {
-		return this.timer === this.totalTime - 1;
+		return !this.loops && this.timer === this.totalTime - 1;
 	}
 	get() {
 		return new Animation(this.frames, this.delay, this.loops, this.onEnd);
