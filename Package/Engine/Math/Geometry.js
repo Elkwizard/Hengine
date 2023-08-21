@@ -1,3 +1,5 @@
+const RectPriority = defineEnum("SQUARE", "HORIZONTAL", "VERTICAL");
+
 class Geometry {
 	static smoothConnector(path) {
 		let result = [path[0]];
@@ -313,75 +315,82 @@ class Geometry {
 			.filter(Geometry.isListClockwise)
 			.map(vertices => new Polygon(vertices));
 	}
-	static gridToRects(srcGrid, CELL_SIZE) {
-		let grid = [];
+	static gridToRects(srcGrid, cellSize, priority = RectPriority.SQUARE) {
+		const grid = [];
 		for (let i = 0; i < srcGrid.length; i++) {
 			grid.push([]);
 			for (let j = 0; j < srcGrid[0].length; j++) grid[i].push(srcGrid[i][j]);
 		}
-		let result = [];
+		
+		const rects = [];
 
-		function sample(x, y) {
-			return x in grid && y in grid[x] && grid[x][y];
-		}
-		function set(x, y, v) {
-			if (x in grid && y in grid[x])
-				grid[x][y] = v;
-		}
-
-		function validRect(r) {
-			for (let i = 0; i < r.width; i++)
-			for (let j = 0; j < r.height; j++)
-				if (!sample(r.x + i, r.y + j))
-					return false;
+		const validRect = (minX, minY, maxX, maxY) => {
+			for (let i = minX; i <= maxX; i++)
+			for (let j = minY; j <= maxY; j++)
+				if (!grid[i]?.[j]) return false;
 			return true;
-		}
-		function clearRect(r) {
-			for (let i = 0; i < r.width; i++)
-			for (let j = 0; j < r.height; j++)
-				set(r.x + i, r.y + j, false);
-		}
+		};
 
-		for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
-			if (!grid[i][j]) continue;
-			let currentRect = new Rect(i, j, 1, 1);
-			while (validRect(currentRect)) {
-				currentRect.width++;
-				currentRect.height++;
-			}
-			currentRect.width--;
-			if (validRect(currentRect)) {
-				// width is too big
-				while (validRect(currentRect)) currentRect.height++;
-				currentRect.height--;
-			} else {
-				currentRect.width++;
-				currentRect.height--;
-				if (validRect(currentRect)) {
-					// height is too big
-					while (validRect(currentRect)) currentRect.width++;
-					currentRect.width--;
-				} else {
-					// square
-					currentRect.width--;
+		const finishRect = (minX, minY, maxX, maxY) => {
+			for (let ii = minX; ii <= maxX; ii++)
+			for (let jj = minY; jj <= maxY; jj++)
+				grid[ii][jj] = false;
+
+			rects.push(new Rect(minX, minY, maxX - minX + 1, maxY - minY + 1));
+		};
+	
+
+		switch (priority) {
+			case RectPriority.HORIZONTAL:
+			case RectPriority.SQUARE: {
+				for (let i = 0; i < grid.length; i++)
+				for (let j = 0; j < grid[0].length; j++) {
+					if (grid[i][j]) {
+						let maxX = i;
+						let maxY = j;
+			
+						switch (priority) {
+							case RectPriority.HORIZONTAL: {
+								while (validRect(i, j, maxX, maxY)) maxX++;
+								maxX--;
+			
+								while (validRect(i, j, maxX, maxY)) maxY++;
+								maxY--;
+							}; break;
+							case RectPriority.SQUARE: {
+								let change = 0;
+								while (validRect(i, j, maxX, maxY)) {
+									if (++change % 2) maxX++;
+									else maxY++;
+								}
+								if (change % 2) maxX--;
+								else maxY--;
+							}; break;
+						}
+						
+						finishRect(i, j, maxX, maxY);
+					}
 				}
-			}
-			clearRect(currentRect);
-			currentRect.area = currentRect.width * currentRect.height;
+			}; break;
+			case RectPriority.VERTICAL: {
+				for (let j = 0; j < grid[0].length; j++)
+				for (let i = 0; i < grid.length; i++) {
+					if (grid[i][j]) {
+						let maxX = i;
+						let maxY = j;
+						while (validRect(i, j, maxX, maxY)) maxY++;
+						maxY--;
+						
+						while (validRect(i, j, maxX, maxY)) maxX++;
+						maxX--;
 
-			result.push(currentRect);
+						finishRect(i, j, maxX, maxY);
+					}
+				}
+			}; break;
 		}
-
-
-		for (let i = 0; i < result.length; i++) {
-			const rect = result[i];
-			rect.x *= CELL_SIZE;
-			rect.y *= CELL_SIZE;
-			rect.width *= CELL_SIZE;
-			rect.height *= CELL_SIZE;
-		}
-
-		return result;
+	
+		return rects.map(rect => rect.scaleAbout(Vector2.origin, cellSize));
 	}
 	static closest(p, points) {
 		let bestDist = Infinity;
