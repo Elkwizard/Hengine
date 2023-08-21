@@ -413,7 +413,6 @@ HengineLoader.engineResources = [
 		"Util/Sound",
 
 		"Math/Matrix",
-		"Math/Geometry",
 		"Math/Physics",
 		"Math/PhysicsAPI",
 		"Math/Random",
@@ -442,6 +441,7 @@ HengineLoader.engineResources = [
 		"Render/Color",
 
 		"Math/Vector",
+		"Math/Geometry",
 
 		"Render/Font",
 		"Render/Shapes",
