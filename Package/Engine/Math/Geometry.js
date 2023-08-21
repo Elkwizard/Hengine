@@ -339,57 +339,50 @@ class Geometry {
 			rects.push(new Rect(minX, minY, maxX - minX + 1, maxY - minY + 1));
 		};
 	
-
-		switch (priority) {
-			case RectPriority.HORIZONTAL:
-			case RectPriority.SQUARE: {
-				for (let i = 0; i < grid.length; i++)
-				for (let j = 0; j < grid[0].length; j++) {
-					if (grid[i][j]) {
-						let maxX = i;
-						let maxY = j;
-			
-						switch (priority) {
-							case RectPriority.HORIZONTAL: {
-								while (validRect(i, j, maxX, maxY)) maxX++;
-								maxX--;
-			
-								while (validRect(i, j, maxX, maxY)) maxY++;
-								maxY--;
-							}; break;
-							case RectPriority.SQUARE: {
-								let change = 0;
-								while (validRect(i, j, maxX, maxY)) {
-									if (++change % 2) maxX++;
-									else maxY++;
-								}
-								if (change % 2) maxX--;
-								else maxY--;
-							}; break;
-						}
-						
-						finishRect(i, j, maxX, maxY);
-					}
-				}
-			}; break;
-			case RectPriority.VERTICAL: {
-				for (let j = 0; j < grid[0].length; j++)
-				for (let i = 0; i < grid.length; i++) {
-					if (grid[i][j]) {
-						let maxX = i;
-						let maxY = j;
+		for (let i = 0; i < grid.length; i++)
+		for (let j = 0; j < grid[0].length; j++) {
+			if (grid[i][j]) {
+				let maxX = i;
+				let maxY = j;
+	
+				switch (priority) {
+					case RectPriority.HORIZONTAL: {
+						while (validRect(i, j, maxX, maxY)) maxX++;
+						maxX--;
+	
+						while (
+							validRect(i, j, maxX, maxY) &&
+							!grid[i - 1]?.[maxY] &&
+							!grid[maxX + 1]?.[maxY]
+						) maxY++;
+						maxY--;
+					}; break;
+					case RectPriority.VERTICAL: {
 						while (validRect(i, j, maxX, maxY)) maxY++;
 						maxY--;
 						
-						while (validRect(i, j, maxX, maxY)) maxX++;
+						while (
+							validRect(i, j, maxX, maxY) &&
+							!grid[maxX]?.[j - 1] &&
+							!grid[maxX]?.[maxY + 1]
+						) maxX++;
 						maxX--;
-
-						finishRect(i, j, maxX, maxY);
-					}
+					}; break;
+					case RectPriority.SQUARE: {
+						let change = 0;
+						while (validRect(i, j, maxX, maxY)) {
+							if (++change % 2) maxX++;
+							else maxY++;
+						}
+						if (change % 2) maxX--;
+						else maxY--;
+					}; break;
 				}
-			}; break;
+				
+				finishRect(i, j, maxX, maxY);
+			}
 		}
-	
+		
 		return rects.map(rect => rect.scaleAbout(Vector2.origin, cellSize));
 	}
 	static closest(p, points) {
