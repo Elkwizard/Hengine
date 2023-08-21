@@ -26,7 +26,6 @@ class PARTICLE_SPAWNER extends ElementScript {
 			}
 		};
 
-		this.lastTransform = obj.transform.get();
 		this.anyParticlesRendered = false;
 	}
 	set particleCount(count) {
@@ -71,7 +70,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		if (this.active) {
 			if ((this.delay > 1 && obj.lifeSpan % Math.ceil(this.delay) === 0) || this.delay <= 1) {
 				const pos = obj.transform.position;
-				const last = this.lastTransform.position;
+				const last = obj.lastTransform.position;
 				const count = Math.max(1, 1 / this.delay);
 
 				for (let i = 0; i < count; i++) {
@@ -81,7 +80,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 				}
 			}
 		}
-		obj.transform.get(this.lastTransform);
+		obj.transform.get(obj.lastTransform);
 
 		const { particles } = this;
 		const particlesToKeep = [];
