@@ -127,7 +127,7 @@ class PHYSICS extends ElementScript {
 		return shape;
 	}
 	cleanUp(obj) {
-	    this.physicsEngine.removeBody(this.body.id);
+		this.physicsEngine.removeBody(this.body.id);
 	}
 	addScript(obj, script) {
 		if (script.implements("collideRule")) this.hasCollideRule = true;
