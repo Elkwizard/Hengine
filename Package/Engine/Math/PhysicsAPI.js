@@ -9,6 +9,8 @@ class Constraint {
         this.physicsConstraint = physicsConstraint;
         this.engine = engine;
 		this.multibody = physicsConstraint instanceof PhysicsConstraint2;
+		Object.shortcut(this, this.physicsConstraint, "staticA");
+		Object.shortcut(this, this.physicsConstraint, "staticB");
     }
     get ends() {
         return this.physicsConstraint.ends.map(Vector2.fromPhysicsVector);

@@ -1458,6 +1458,8 @@ class PhysicsConstraint2 extends PhysicsConstraint {
         super();
         this.bodyA = a;
         this.bodyB = b;
+		this.staticA = false;
+		this.staticB = false;
         this.offsetA = aOff;
         this.offsetB = bOff;
         this._ends = [
@@ -1465,8 +1467,7 @@ class PhysicsConstraint2 extends PhysicsConstraint {
             this._endB = new PhysicsVector(0, 0)
         ];
 
-        const dynamicA = a.dynamic;
-        const dynamicB = b.dynamic;
+        const { dynamicA, dynamicB } = this;
         const mA = dynamicA ? 1 / a.mass : 0;
         const mB = dynamicB ? 1 / b.mass : 0;
         this.forceToError = new PhysicsMatrix(
@@ -1474,6 +1475,12 @@ class PhysicsConstraint2 extends PhysicsConstraint {
             null, mA + mB
         );
     }
+	get dynamicA() {
+		return !this.staticA && this.bodyA.dynamic;
+	}
+	get dynamicB() {
+		return !this.staticB && this.bodyB.dynamic;
+	}
     get error() {
         return new PhysicsVector(0, 0);
     }
@@ -1511,8 +1518,7 @@ class PhysicsConstraint2 extends PhysicsConstraint {
 
 		if (!bodyA.engine || !bodyB.engine) return;
 
-        const dynamicA = bodyA.dynamic;
-        const dynamicB = bodyB.dynamic;
+        const { dynamicA, dynamicB } = this;
 
         if (dynamicA || dynamicB) {
             const { ends } = this;
