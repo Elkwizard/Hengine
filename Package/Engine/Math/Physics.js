@@ -1932,7 +1932,8 @@ class PhysicsEngine {
     }
     removeBody(id) {
 		const body = this.bodyMap.get(id);
-		
+		if (!body) return;
+
 		body.wake();
         while (body.constraints.length)
             this.removeConstraint(body.constraints[0].id);
@@ -1943,6 +1944,7 @@ class PhysicsEngine {
     }
     removeConstraint(id) {
         const con = this.constraintMap.get(id);
+		if (!con) return;
 		
 		if (con instanceof PhysicsConstraint2) {
 			const constraintsA = con.bodyA.constraints;
