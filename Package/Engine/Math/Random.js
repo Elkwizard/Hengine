@@ -45,10 +45,15 @@ class Random {
         if (percentages === null) {
             return arr[Math.floor(this.random() * arr.length)];
         } else {
-            let min = 0;
+            let sum = 0;
+			for (let i = 0; i < percentages.length; i++)
+				sum += percentages[i];
+			const isum = 1 / sum;
+			
+			let min = 0;
             let random = this.random();
             for (let i = 0; i < percentages.length; i++) {
-                const percent = percentages[i];
+                const percent = percentages[i] * isum;
                 if (random >= min && random < min + percent) return arr[i];
                 min += percent;
             }
