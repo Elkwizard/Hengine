@@ -203,6 +203,10 @@ class PHYSICS extends ElementScript {
 		}
 		return true;
 	}
+	canCollideWith(obj, element) {
+		const rb = element.scripts.PHYSICS;
+		return this.canCollide && rb.canCollide && this.collideBasedOnRule(element) && rb.collideBasedOnRule(obj);
+	}
 	constrainedTo(obj, body) {
 		body = body.scripts.PHYSICS.body;
 		const { constraints } = this.body;
