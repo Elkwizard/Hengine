@@ -109,7 +109,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 		const { gl, frame, particles, radius } = this;
 
-		if (!this.separateFrame) {
+		if (this.separateFrame) {
 			frame.resize(this.canvas.width, this.canvas.height);
 			gl.transform = this.renderer.transform;
 		}
