@@ -141,8 +141,8 @@ class Matrix3 extends Float64Array {
 		result[8] = this[8];
 		return result;
 	}
-	toString() {
-		
+	toCSS() {
+		return `matrix(${this[0]}, ${this[1]}, ${this[3]}, ${this[4]}, ${this[6]}, ${this[7]})`;
 	}
 	static create(m00, m01, m02, m10, m11, m12, m20, m21, m22, result = new Matrix3()) {
 		result[0] = m00;
