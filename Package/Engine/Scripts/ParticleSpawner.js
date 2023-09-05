@@ -51,7 +51,10 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.lifeSpan = p.lifeSpan ?? this.lifeSpan ?? 100;
 		this.delay = p.delay ?? this.delay ?? 1;
 		const imageType = p.imageType ?? this.frame?.constructor ?? FastFrame;
-		this.frame = PARTICLE_SPAWNER[imageType.name] ?? (PARTICLE_SPAWNER[imageType.name] = new imageType(obj.engine.canvas.width, obj.engine.canvas.height));
+		this.separateFrame = imageType === FastFrame;
+		if (this.separateFrame)
+			this.frame = PARTICLE_SPAWNER[imageType.name] ?? (PARTICLE_SPAWNER[imageType.name] = new imageType(obj.engine.canvas.width, obj.engine.canvas.height));
+		else this.frame = this.canvas;
 		this.gl = this.frame.renderer;
 	}
 	addParticle(obj, position) {
@@ -106,8 +109,10 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 		const { gl, frame, particles, radius } = this;
 
-		gl.transform = this.renderer.transform;
-		frame.resize(this.canvas.width, this.canvas.height);
+		if (!this.separateFrame) {
+			frame.resize(this.canvas.width, this.canvas.height);
+			gl.transform = this.renderer.transform;
+		}
 
 		let { x, y, width, height } = this.camera.screen;
 		if (obj instanceof UIObject) x = y = 0;
@@ -121,6 +126,8 @@ class PARTICLE_SPAWNER extends ElementScript {
 		const maxY = y + height;
 
 		let anyParticlesRendered = false;
+
+		gl.save();
 
 		for (let i = 0; i < particles.length; i++) {
 			const p = particles[i];
@@ -136,11 +143,13 @@ class PARTICLE_SPAWNER extends ElementScript {
 			}
 		}
 
+		gl.restore();
+
 		PARTICLE_SPAWNER.anyParticlesRendered ||= anyParticlesRendered;
 
 		this.anyParticlesRendered = anyParticlesRendered;
 
-		if (PARTICLE_SPAWNER.anyParticlesRendered) {
+		if (PARTICLE_SPAWNER.anyParticlesRendered && this.separateFrame) {
 			// is next renderable a particle spawner
 			const elements = this.scene.main.sceneObjectArray;
 			for (let i = 0; i < elements.length - 1; i++) {
