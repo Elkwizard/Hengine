@@ -1368,6 +1368,7 @@ class CollisionResolver {
 				
 				bodyA.displace(moveA);
 				bodyB.displace(moveB);
+				// renderer.stroke(Color.PURPLE, 2).shape(bodyA.getModel(0));
 			} else {
 				const move = direction.times(-penetration);
 				bodyA.displace(move);
@@ -1732,7 +1733,7 @@ class PhysicsEngine {
         bodyB.addCollidingBody(bodyA);
         bodyA.addCollidingBody(bodyB);
 
-        if (!penetration) return;
+		if (!penetration) return;
 
         this.onCollide(bodyA, bodyB, direction, contacts);
 
@@ -1818,6 +1819,8 @@ class PhysicsEngine {
             let body = bodies[i];
             if (!body.canCollide) continue;
 
+			// renderer.stroke(Color.BLUE, 1).circle(body.position.x, body.position.y, body.boundingRadius);
+
 			grid.cellsBounds(body);
 		}
 
@@ -1832,13 +1835,12 @@ class PhysicsEngine {
 			collisionPairs.set(body, bodies);
         }
 
-        // scene.camera.drawInWorldSpace(() => {
-            // const LINE_WIDTH = 1 / scene.camera.zoom;
-            // for (let [x, column] of grid.cells) for (let [y, cell] of column) {
-            //     renderer.stroke(Color.RED, LINE_WIDTH).rect(x * cellSize, y * cellSize, cellSize, cellSize);
-            // }
-        // });
-        return collisionPairs;
+        // const LINE_WIDTH = 1 / scene.camera.zoom;
+		// for (let [x, column] of grid.cells) for (let [y, cell] of column) {
+		// 	renderer.stroke(Color.RED, LINE_WIDTH).rect(x * cellSize, y * cellSize, cellSize, cellSize);
+		// }
+        
+		return collisionPairs;
     }
     lowActivity(body) {
         if (!body.dynamic) return true;
@@ -1906,7 +1908,6 @@ class PhysicsEngine {
 
         // solve
         for (this.step = 0; this.step < this.iterations; this.step++) {
-
             //step
             this.integrate(dynBodies, 1 / this.iterations);
             this.applyForces(dynBodies, 1 / this.iterations);
