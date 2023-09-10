@@ -55,8 +55,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		if (this.separateFrame)
 		this.frame = PARTICLE_SPAWNER[imageType.name] ?? (PARTICLE_SPAWNER[imageType.name] = new imageType(obj.engine.canvas.width, obj.engine.canvas.height));
 		else this.frame = this.canvas;
-		if (p.data) this.data = this.data ? { ...this.data, ...p.data } : { ...p.data };
-		else this.data = { };
+		this.data = { ...this.data, ...p.data };
 		this.gl = this.frame.renderer;
 	}
 	addParticle(obj, position) {
