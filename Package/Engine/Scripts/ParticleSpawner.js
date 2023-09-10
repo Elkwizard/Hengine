@@ -154,17 +154,12 @@ class PARTICLE_SPAWNER extends ElementScript {
 		if (PARTICLE_SPAWNER.anyParticlesRendered && this.separateFrame) {
 			// is next renderable a particle spawner
 			const elements = this.scene.main.sceneObjectArray;
-			for (let i = 0; i < elements.length - 1; i++) {
-				const element = elements[i];
-				const next = elements[i + 1];
-				if (element === obj) {
-					if (
-						next.scripts.has(PARTICLE_SPAWNER) &&
-						next.scripts.PARTICLE_SPAWNER.frame.constructor === frame.constructor
-					) return;
-					break;
-				}
-			}
+			const index = elements.indexOf(obj);
+			const next = elements[index + 1];
+			if (
+				next && next.scripts.has(PARTICLE_SPAWNER) &&
+				next.scripts.PARTICLE_SPAWNER.frame.constructor === frame.constructor
+			) return;
 
 			if (obj instanceof UIObject) this.renderer.image(frame).default(0, 0);
 			else this.camera.drawInScreenSpace(() => this.renderer.image(frame).default(0, 0));
