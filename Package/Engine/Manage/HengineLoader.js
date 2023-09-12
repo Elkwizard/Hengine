@@ -316,7 +316,7 @@ class HengineLoader {
 			return null;
 		}
 	}
-	static load(userResources = []) {
+	static load(userResources = [], done = true) {
 		async function loadResources() {
 			const newHengine = HengineLoader.loader === null;
 			if (newHengine) {
@@ -385,7 +385,7 @@ class HengineLoader {
 
 			console.timeEnd("loading user resources");
 
-			if (newHengine) hengineLoader.hengine.intervals.start();
+			if (done) hengineLoader.hengine.intervals.start();
 
 			return hengineLoader;
 		}
