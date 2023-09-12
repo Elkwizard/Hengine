@@ -53,6 +53,7 @@ class HengineScriptResource extends HengineResource {
 	load() {
 		const script = document.createElement("script");
 		script.setAttribute("charset", "UTF-8");
+		script.type = "text/javascript";
 		script.src = this.src;
 		document.head.appendChild(script);
 		return new Promise(resolve => {
@@ -275,6 +276,9 @@ class HengineLoadingStructure {
 	}
 	binary(src) {
 		return this.add(new HengineBinaryResource(this.absSrc(src)));
+	}
+	text(src) {
+		return this.add(new HengineTextResource(this.absSrc(src)));
 	}
 	image(src) {
 		return this.add(new HengineImageResource(this.absSrc(src)));
