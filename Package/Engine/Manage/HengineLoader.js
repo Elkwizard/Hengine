@@ -237,6 +237,80 @@ class HengineBinaryResource extends HengineResource {
 	}
 }
 
+class HengineLoadingStructure {
+	constructor() {
+		this.context = [];
+		this.resources = [];
+	}
+
+	load(done) {
+		return HengineLoader.load(this.resources, done);
+	}
+
+	absSrc(src) {
+		return PathManager.join([...this.context, src]);
+	}
+
+	add(resource) {
+		this.resources.push(resource);
+		return this;
+	}
+
+	from(structure) {
+		this.resources.push(...structure.resources.map(res => {
+			const copy = new res.constructor(this.absSrc(res.src));
+			for (const key in res)
+				if (key !== "src")
+					copy[key] = res[key];
+			return copy;
+		}));
+		return this;
+	}
+
+	folder(name, fn) {
+		this.context.push(name);
+		fn(this);
+		this.context.pop();
+		return this;
+	}
+
+	script(src) {
+		return this.add(new HengineScriptResource(this.absSrc(src)));
+	}
+
+	binary(src) {
+		return this.add(new HengineBinaryResource(this.absSrc(src)));
+	}
+
+	image(src) {
+		return this.add(new HengineImageResource(this.absSrc(src)));
+	}
+
+	font(src) {
+		return this.add(new HengineFontResource(this.absSrc(src)));
+	}
+
+	animation(src, {
+		frames = 1,
+		delay = 1,
+		loops = true
+	} = {}) {
+		return this.add(new HengineAnimationResource(this.absSrc(src), frames, delay, loops));
+	}
+
+	video(src, {
+		loops = true
+	} = {}) {
+		return this.add(new HengineVideoResource(this.absSrc(src), loops));
+	}
+
+	sound(src, {
+		loops = true
+	} = {}) {
+		return this.add(new HengineSoundResource(this.absSrc(src)), loops);
+	}
+}
+
 class HengineLoader {
 	constructor() {
 		// window setup
