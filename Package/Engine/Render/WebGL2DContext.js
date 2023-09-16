@@ -172,9 +172,8 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			}
 			glState.MAX_TEXTURE_SLOTS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 			glState.TEXTURE_SLOT_SIZE = Math.min(2048, gl.getParameter(gl.MAX_TEXTURE_SIZE));
-			glState.MAX_SPRITE_SHEETS = glState.MAX_TEXTURE_SLOTS * 30;
 			glState.TEXTURE_SLOT_PIXEL_SIZE = 1 / glState.TEXTURE_SLOT_SIZE;
-			const debugSlots = 0//glState.MAX_TEXTURE_SLOTS;
+			const debugSlots = glState.MAX_TEXTURE_SLOTS;
 			
 			const webgl2 = !!window.WebGL2RenderingContext;
 			const macros = `
@@ -476,35 +475,55 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 
 			// textures
 			if (glState.spriteSheets) {
-				const { TEXTURE_SLOT_SIZE } = glState;
 				const { sheets } = glState.spriteSheets;
-				for (let i = 0; i < sheets.length; i++) {
-					const sheet = sheets[i];
-					sheet.createTexture();
-					for (let j = 0; j < sheet.rects.length; j++) {
-						const rect = sheet.rects[j];
-						gl.texSubImage2D(gl.TEXTURE_2D, 0, rect.x * TEXTURE_SLOT_SIZE, rect.y * TEXTURE_SLOT_SIZE, gl.RGBA, gl.UNSIGNED_BYTE, rect.texture);
-					}
-				}
+				for (let i = 0; i < sheets.length; i++)
+					sheets[i].createTexture();
 			} else glState.spriteSheets = {
-				// permanent
 				sheets: [],
-				textureLocations: new Map(),
-				// per batch
-				activeTextureIndex: 0,
-				activeSpriteSheets: new Set(),
-				reset() {
-					this.activeSpriteSheets.clear();
-					this.activeTextureIndex = 0;
-				},
-				getLocation(texture) {
-					const sheet = this.textureLocations.get(texture);
-					if (!this.activeSpriteSheets.has(sheet)) {
-						if (this.activeTextureIndex === glState.MAX_TEXTURE_SLOTS) return null;
-						sheet.setTextureUnit(this.activeTextureIndex++);
-						this.activeSpriteSheets.add(sheet);
+				locations: new Map(),
+				generation: 0,
+			
+				evict() {
+					let oldestIndex = 0;
+					let oldestTime = Infinity;
+					for (let i = 0; i < this.sheets.length; i++) {
+						const sheet = this.sheets[i];
+						if (sheet.lastUse < oldestTime) {
+							oldestTime = sheet.lastUse;
+							oldestIndex = i;
+						}
 					}
-					return sheet;
+					this.sheets[oldestIndex].clear();
+				},
+
+				update(image) {
+					if (this.locations.has(image)) {
+						const location = this.locations.get(image);
+						const { sheet, width, height } = location;
+						if (width === image.width && height === image.height) // overwrite
+							sheet.write(image, location);
+						else this.locations.delete(image);
+					}
+				},
+			
+				place(image) {
+					if (this.locations.has(image)) {
+						const location = this.locations.get(image);
+						location.sheet.use(this.generation++);
+						return location;
+					}
+			
+					for (let i = 0; i < glState.MAX_TEXTURE_SLOTS; i++) {
+						if (i >= this.sheets.length)
+							this.sheets.push(new SpriteSheet(glState.TEXTURE_SLOT_SIZE, i, this.locations));
+						const location = this.sheets[i].place(image);
+						if (location) {
+							location.sheet.use(this.generation++);
+							return location;
+						}
+					}
+			
+					return null;
 				}
 			};
 		};
@@ -1068,31 +1087,41 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		glState.renderedInstances += instances;
 		glState.drawCalls++;
 	}
-	// let ID = 65;
+	
+
+	class SpriteLocation {
+		constructor(image, sheet, x, y) {
+			this.sheet = sheet;
+			this.x = x;
+			this.y = y;
+			this.width = image.width;
+			this.height = image.height;
+			this.tx = x / sheet.size;
+			this.ty = y / sheet.size;
+			this.tw = image.width / sheet.size;
+			this.th = image.height / sheet.size;
+		}
+	}
+
 	class SpriteSheet {
-		constructor(textureSlotSize, spriteSheets) {
-			// this.id = String.fromCharCode(ID++);
-			this.textureUnit = -1;
-			this.textureSlotSize = textureSlotSize;
+		constructor(size, unit, locations) {
+			this.size = size;
+			this.images = [];
+			this.unit = unit;
+			this.locations = locations;
+			this.lastUse = -Infinity;
+			this.clear();
 
-			// create initial spaces
-			this.spaces = [{ x: 0, y: 0, width: 1, height: 1 }];
-			this.rects = [];
-
-			// create storage for textures
-			this.textureLocations = new Map();
 			this.createTexture();
-
-			// pack sprites
-			this.complete = false;
-
-			this.spriteSheets = spriteSheets;
-			this.spriteSheets.sheets.push(this);
+		}
+		use(time) {
+			this.lastUse = time;
 		}
 		createTexture() {
-			const { textureSlotSize } = this;
+			const { size } = this;
 
 			this.texture = gl.createTexture();
+			gl.activeTexture(gl.TEXTURE0 + this.unit);
 			gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
 			// initialize
@@ -1100,136 +1129,82 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureSlotSize, textureSlotSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-		}
-		createSpace(x, y, width, height) {
-			this.spaces.push({ x, y, width, height });
-		}
-		rectSort(a, b) {
-			return b.height - a.height;
-		}
-		pack(rects) {
-			// clear
-			gl.bindTexture(gl.TEXTURE_2D, this.texture);
-			this.spaces = [{ x: 0, y: 0, width: 1, height: 1 }];
-
-			// destructure
-			const { spaces, spriteSheets, textureSlotSize } = this;
-
-			// setup
-			for (let i = 0; i < this.rects.length; i++) rects.push(this.rects[i]);
-			this.rects = [];
-
-			rects.sort(this.rectSort);
-			for (let i = 0; i < rects.length; i++) {
-				const rect = rects[i];
-
-				let placed = false;
-				let alreadyCorrect = false;
-				for (let j = spaces.length - 1; j >= 0; j--) { // reverse loop
-					const space = spaces[j];
-
-					if (rect.width > space.width || rect.height > space.height) continue; // too big
-
-					// insert
-					alreadyCorrect = rect.x === space.x && rect.y === space.y;
-					rect.x = space.x;
-					rect.y = space.y;
-
-					// different possible positions
-					if (rect.width === space.width && rect.height === space.height) { // delete space
-						const lastSpace = spaces.pop();
-						if (j < spaces.length) spaces[j] = lastSpace;
-					} else if (rect.width === space.width) {
-						space.y += rect.height;
-						space.height -= rect.height;
-					} else if (rect.height === space.height) {
-						space.x += rect.width;
-						space.width -= rect.width;
-					} else {
-						this.createSpace(space.x + rect.width, space.y, space.width - rect.width, rect.height);
-						space.y += rect.height;
-						space.height -= rect.height;
-					}
-
-					placed = true;
-					break;
-				}
-
-				if (placed) { // found spot for texture
-					this.rects.push(rect);
-					spriteSheets.textureLocations.set(rect.texture, this);
-					this.textureLocations.set(rect.texture, rect);
-					if (!alreadyCorrect || rect.spriteSheet !== this) gl.texSubImage2D(gl.TEXTURE_2D, 0, rect.x * textureSlotSize, rect.y * textureSlotSize, gl.RGBA, gl.UNSIGNED_BYTE, rect.texture);
-					rect.spriteSheet = this;
-				} else {
-					this.complete = true;
-					return rects.slice(i, rects.length);
-				}
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+		
+			for (let i = 0; i < this.images.length; i++) {
+				const image = this.images[i];
+				this.write(image, this.locations.get(image));
 			}
+		}
+		write(image, location) {
+			gl.activeTexture(gl.TEXTURE0 + this.unit);
+			gl.texSubImage2D(gl.TEXTURE_2D, 0, location.x, location.y, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		}
+		clear() {
+			for (let i = 0; i < this.images.length; i++)
+				this.locations.delete(this.images[i]);
+			this.images = [];
+			this.spaces = [new Rect(0, 0, this.size, this.size)];
+			this.maxArea = Infinity;
+		}
+		add(image, x, y) {
+			this.images.push(image);
+			const location = new SpriteLocation(image, this, x, y);
+			this.locations.set(image, location);
+			this.write(image, location);
+			return location;
+		}
+		place(image) {
+			const { spaces } = this;
 
-			return [];
-		}
-		setTextureUnit(unit) {
-			// console.log(unit);
-			this.textureUnit = unit;
-			gl.activeTexture(gl.TEXTURE0 + unit);
-			gl.bindTexture(gl.TEXTURE_2D, this.texture);
-		}
-		free() {
-			const { texture, rects } = this;
-			const { textureLocations } = glState.spriteSheets;
-			gl.deleteTexture(texture);
-			for (let i = 0; i < rects.length; i++) textureLocations.delete(rects[i].texture);
-		}
-		static createLocationRects(textures, TEXTURE_SLOT_SIZE) {
-			const rects = [];
-			for (const texture of textures) rects.push({
-				texture,
-				width: texture.width / TEXTURE_SLOT_SIZE,
-				height: texture.height / TEXTURE_SLOT_SIZE,
-				x: -1,
-				y: -1
-			});
-			return rects;
+			if (this.maxArea < image.width * image.height)
+				return null;
+
+			this.maxArea = Math.max(...spaces.map(space => space.width * space.height));
+
+			for (let j = spaces.length - 1; j >= 0; j--) {
+				const space = spaces[j];
+				if (space.width < image.width || space.height < image.height)
+					continue;
+
+				const matchWidth = space.width === image.width;
+				const matchHeight = space.height === image.height;
+				const { x, y } = space;
+				if (matchWidth && matchHeight) {
+					spaces.splice(j, 1);
+					return this.add(image, x, y);
+				} else if (matchWidth) {
+					space.y += image.height;
+					space.height -= image.height;
+					return this.add(image, x, y);
+				} else if (matchHeight) {
+					space.x += image.width;
+					space.width -= image.width;
+					return this.add(image, x, y);
+				} else {
+					if ((space.width - image.width) * space.height > (space.height - image.height) * space.width) {
+						spaces.push(new Rect(space.x, space.y + image.height, image.width, space.height - image.height));
+						space.x += image.width;
+						space.width -= image.width;
+					} else {
+						spaces.push(new Rect(space.x + image.width, space.y, space.width - image.width, image.height));
+						space.y += image.height;
+						space.height -= image.height;
+					}
+					return this.add(image, x, y);
+				}
+
+			}
+			
+			return null;
 		}
 	}
+
 	function updateTextureCache(texture) {
-		const { spriteSheets, TEXTURE_SLOT_SIZE } = glState;
-		if (spriteSheets.textureLocations.has(texture)) {
-			const sheet = spriteSheets.textureLocations.get(texture);
-			const location = sheet.textureLocations.get(texture);
-			const width = location.width * TEXTURE_SLOT_SIZE;
-			const height = location.height * TEXTURE_SLOT_SIZE;
-			if (width === texture.width && height === texture.height) { // overwrite
-				gl.bindTexture(gl.TEXTURE_2D, sheet.texture);
-				gl.texSubImage2D(gl.TEXTURE_2D, 0, location.x * TEXTURE_SLOT_SIZE, location.y * TEXTURE_SLOT_SIZE, gl.RGBA, gl.UNSIGNED_BYTE, texture);
-			} else {
-				sheet.complete = false;
-				sheet.rects.splice(sheet.rects.indexOf(location), 1);
-			}
-		}
+		glState.spriteSheets.update(texture);
 	}
 	function flush() {
-		const { spriteSheets, TEXTURE_SLOT_SIZE, MAX_SPRITE_SHEETS } = glState;
-
-		const { sheets } = spriteSheets;
-		while (sheets.length > MAX_SPRITE_SHEETS) sheets.shift().free();
-
-		const unknownTextures = new Set();
-		for (let i = 0; i < glState.texturedInstanceListPointer; i++) {
-			const instance = glState.texturedInstanceList[i];
-			if (!spriteSheets.textureLocations.has(instance.texture)) unknownTextures.add(instance.texture);
-		}
-
-		let locationRects = SpriteSheet.createLocationRects(unknownTextures, TEXTURE_SLOT_SIZE);
-		for (let i = 0; i < sheets.length && locationRects.length; i++) {
-			const sheet = sheets[i];
-			if (!sheet.complete) locationRects = sheet.pack(locationRects);
-		}
-
-		while (locationRects.length)
-			locationRects = new SpriteSheet(TEXTURE_SLOT_SIZE, spriteSheets).pack(locationRects);
+		const { spriteSheets } = glState;
 
 		const {
 			vertexTextureIndex,
@@ -1241,24 +1216,23 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 
 		let start = 0;
 		let end = 0;
-		spriteSheets.reset();
 
 		// window.batchSizes = [];
 		// window.batchUnits = [];
 
 		for (let i = 0; i < glState.texturedInstanceListPointer; i++) {
 			const { index, texture, tx, ty, txx, txy, tyx, tyy } = glState.texturedInstanceList[i];
-			let sheet = spriteSheets.getLocation(texture);
-			if (sheet === null) {
+			let location = spriteSheets.place(texture);
+			if (location === null) {
 				renderRange(start, end);
-				spriteSheets.reset();
+				spriteSheets.evict();
 				start = end;
-				sheet = spriteSheets.getLocation(texture);
+				location = spriteSheets.place(texture);
 			}
 
 			// set attribute data
-			const { x, y, width, height } = sheet.textureLocations.get(texture);
-			vertexTextureIndex.put(index, sheet.textureUnit);
+			const { tx: x, ty: y, tw: width, th: height, sheet: { unit } } = location;
+			vertexTextureIndex.put(index, unit);
 			vertexColor.put(index, txx * width);
 			vertexLineWidth.put(index, txy * height);
 			vertexTextureYAxis.put(index, tyx * width, tyy * height);
