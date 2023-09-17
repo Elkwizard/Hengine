@@ -171,7 +171,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				return shader;
 			}
 			glState.MAX_TEXTURE_SLOTS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-			glState.TEXTURE_SLOT_SIZE = Math.min(2048, gl.getParameter(gl.MAX_TEXTURE_SIZE));
+			glState.TEXTURE_SLOT_SIZE = Math.min(4096, gl.getParameter(gl.MAX_TEXTURE_SIZE));
 			glState.TEXTURE_SLOT_PIXEL_SIZE = 1 / glState.TEXTURE_SLOT_SIZE;
 			const debugSlots = 0;//glState.MAX_TEXTURE_SLOTS;
 			
