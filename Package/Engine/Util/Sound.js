@@ -211,16 +211,20 @@ class SoundChannel {
 
 			if (SoundChannel.canPlay) this.audio.play().catch(() => null);
 			else {
-				const startTime = performance.now();
+				this.audio.play().then(() => {
+					SoundChannel.canPlay = true;
+				}).catch(() => {
+					const startTime = performance.now();
 
-				SoundChannel.delayed.push(() => {
-					let time = (performance.now() - startTime) / 1000;
-					if (this.loops) time %= this.audio.duration;
-	
-					if (time < this.audio.duration) {
-						this.audio.currentTime = time;
-						this.audio.play().catch(() => null); // ignore
-					} else this.resolve();
+					SoundChannel.delayed.push(() => {
+						let time = (performance.now() - startTime) / 1000;
+						if (this.loops) time %= this.audio.duration;
+		
+						if (time < this.audio.duration) {
+							this.audio.currentTime = time;
+							this.audio.play().catch(() => null); // ignore
+						} else this.resolve();
+					});
 				});
 			}
 		});
