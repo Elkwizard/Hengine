@@ -294,12 +294,12 @@ class HengineLoadingStructure {
 		return this.add(new HengineAnimationResource(this.absSrc(src), frames, delay, loops));
 	}
 	video(src, {
-		loops = true
+		loops = false
 	} = {}) {
 		return this.add(new HengineVideoResource(this.absSrc(src), loops));
 	}
 	sound(src, {
-		loops = true
+		loops = false
 	} = {}) {
 		return this.add(new HengineSoundResource(this.absSrc(src)), loops);
 	}
