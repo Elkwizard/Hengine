@@ -301,7 +301,7 @@ class HengineLoadingStructure {
 	sound(src, {
 		loops = false
 	} = {}) {
-		return this.add(new HengineSoundResource(this.absSrc(src)), loops);
+		return this.add(new HengineSoundResource(this.absSrc(src), loops));
 	}
 }
 
