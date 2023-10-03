@@ -5,7 +5,7 @@ load(String.raw`
 	(/p)
 	(2)Type(/2)
 	(p)**
-	class Shape extends #Operable# { ... }
+	class Shape { ... }
 	**(/p)
 	(2)Properties(/2)
 	(p)
@@ -82,6 +82,34 @@ load(String.raw`
 		(/method)
 		(method:getBoundingBox@@$Rect$)
 			Returns the minumum sized bounding box that contains the entire Shape.
+		(/method)
+		(method:intersects@other@$Boolean$)
+			Returns the whether or not the Shape intersects with another given Shape.
+			(2)Parameters(/2)
+			(p2)
+				(param:other $Shape$)The Shape to check.(/param)
+			(/p2)
+		(/method)
+		(method:closestPointTo@point@$Number$)
+			Returns the point on the Shape closest to another given point.
+			(2)Parameters(/2)
+			(p2)
+				(param:point $Vector2$)The point to minimize the distance to.(/param)
+			(/p2)
+		(/method)
+		(method:distanceTo@point@$Boolean$)
+			Returns the distance from a given point to the Shape.
+			(2)Parameters(/2)
+			(p2)
+				(param:point $Vector2$)The point to find the distance to.(/param)
+			(/p2)
+		(/method)
+		(method:containsPoint@point@$Vector2$)
+			Returns whether or not a given point is contained within the Shape.
+			(2)Parameters(/2)
+			(p2)
+				(param:point $Vector2$)The point to check.(/param)
+			(/p2)
 		(/method)
 		(method:get@@$Shape$)
 			Returns a copy of the shape.

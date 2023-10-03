@@ -5,7 +5,7 @@ load(String.raw`
 	(/p)
 	(2)Type(/2)
 	(p)**
-	class HengineAnimationResource extends HengineResource { ... }
+	class HengineAnimationResource extends #HengineResource# { ... }
 	**(/p)
 	(2)Syntax(/2)
 	(p)**

@@ -3,6 +3,7 @@ const DOCS = {
 		"Hengine": {},
 		"HengineLoader": {},
 		"HengineResource": {
+			"HengineLoadingStructure": {},
 			"HengineResource": {},
 			"HengineImageResource": {},
 			"HengineAnimationResource": {},

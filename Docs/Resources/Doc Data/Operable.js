@@ -10,7 +10,7 @@ load(String.raw`
 	**(/p)
 	(2)Subclasses(/2)
 	(p)
-		#Vector#, #Color#, #Shape#.
+		#Vector#, #Color#.
 	(/p)
 	(2)Properties(/2)
 	(p)

@@ -5,7 +5,7 @@ load(String.raw`
 	(/p)
 	(2)Type(/2)
 	(p)**
-	class HengineFontResource extends HengineResource { ... }
+	class HengineFontResource extends #HengineResource# { ... }
 	**(/p)
 	(2)Syntax(/2)
 	(p)**
