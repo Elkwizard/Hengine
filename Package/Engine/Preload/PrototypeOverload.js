@@ -69,14 +69,9 @@ Object.defineProperty(window, "title", {
 					proto(context, "drawElementsInstanced", instancing.drawElementsInstancedANGLE.bind(instancing));
 
 					// shader transpilation
-					const { createShader, shaderSource } = WebGLRenderingContext.prototype;
-					proto(context, "createShader", function (type) {
-						const shader = createShader.call(this, type);
-						shader.__type = type;
-						return shader;
-					});
+					const { shaderSource } = WebGLRenderingContext.prototype;
 					proto(context, "shaderSource", function (shader, source) {
-						const { __type } = shader;
+						const type = this.getShaderParameter(shader, this.SHADER_TYPE);
 
 						source = source
 							.replace(/\/\/(.*?)(\n|$)/g, "$2") // single line comments
@@ -84,7 +79,7 @@ Object.defineProperty(window, "title", {
 							.replace(/\#version 300 es/g, "")
 							.replace(/\btexture\b/g, "texture2D");
 
-						if (__type === context.VERTEX_SHADER) { // vs
+						if (type === this.VERTEX_SHADER) { // vs
 							source = source
 								.replace(/\bin\b/g, "attribute")
 								.replace(/\bout\b/g, "varying");
@@ -122,12 +117,12 @@ Object.defineProperty(window, "title", {
 		};
 	});
 	proto(Function.prototype, "performance", function (iter, ...args) {
-		const t_1 = performance.now();
+		const start = performance.now();
 		for (let i = 0; i < iter; i++) {
 			this(...args);
 		}
-		const t_2 = performance.now();
-		return (t_2 - t_1) / iter;
+		const end = performance.now();
+		return (end - start) / iter;
 	});
 	//Array
 	protoGetSet(Array.prototype, "last", function () {
@@ -136,11 +131,11 @@ Object.defineProperty(window, "title", {
 		if (this.length) this[this.length - 1] = value;
 	});
 	proto(Array.prototype, "pushArray", function (arr) {
-		let len = arr.length;
+		const len = arr.length;
 		for (let i = 0; i < len; i++) this.push(arr[i]);
 	});
 	proto(Array.prototype, "map", function (fn, ...coords) {
-		let result = [];
+		const result = [];
 		for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
 		return result;
 	});
@@ -167,18 +162,18 @@ Object.defineProperty(window, "title", {
 	Array.makeMultidimensional = function (arr) {
 		proto(arr, "multiDimensional", true);
 		proto(arr, "sample", function (...indices) {
-			let index = indices[0];
+			const index = indices[0];
 			indices.shift();
 			if (index in this) return this[index].sample(...indices);
 			return null;
 		}.bind(arr));
 		proto(arr, "flatten", function () {
-			let result = [];
+			const result = [];
 			for (let i = 0; i < this.length; i++) result.pushArray(this[i].flatten());
 			return result;
 		}.bind(arr));
 		proto(arr, Symbol.iterator, function* () {
-			let all = this.flatten();
+			const all = this.flatten();
 			for (let i = 0; i < all.length; i++) yield all[i];
 		}.bind(arr));
 		proto(arr, "forEach", function (fn, ...coords) {
@@ -206,15 +201,15 @@ Object.defineProperty(window, "title", {
 		return arr;
 	}
 	Array.dim = function (...dims) {
-		let ary = [];
+		const arr = [];
 		if (dims.length > 1) {
-			let dim = dims.shift();
-			Array.makeMultidimensional(ary);
-			for (let i = 0; i < dim; i++) ary.push(Array.dim(...dims));
+			const dim = dims.shift();
+			Array.makeMultidimensional(arr);
+			for (let i = 0; i < dim; i++) arr.push(Array.dim(...dims));
 		} else {
-			for (let i = 0; i < dims[0]; i++) ary.push(null);
+			for (let i = 0; i < dims[0]; i++) arr.push(null);
 		}
-		return ary;
+		return arr;
 	};
 	//Number
 	proto(Number.prototype, "toDegrees", function () {
@@ -224,7 +219,7 @@ Object.defineProperty(window, "title", {
 		return this * (Math.PI / 180);
 	});
 	proto(Number.prototype, "movedTowards", function (value, ferocity) {
-		let dir = ferocity * (value - this) * 2;
+		const dir = ferocity * (value - this) * 2;
 		return this + dir;
 	});
 	proto(Number.prototype, "toMaxed", function (digits) {
