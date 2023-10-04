@@ -1,7 +1,16 @@
 function defineEnum(...values) {
 	const obj = {};
 	for (let i = 0; i < values.length; i++) obj[values[i]] = Symbol(values[i]);
-	return obj;
+	return new Proxy(obj, {
+		get(target, key) {
+			if (!(key in target))
+				throw new ReferenceError(`Enum value '${key}' does not exist`);
+			return target[key];
+		},
+		set(target, key, value) {
+			throw new Error(`Cannot add new enum values`);
+		}
+	});
 }
 
 window.__devicePixelRatio = devicePixelRatio;
