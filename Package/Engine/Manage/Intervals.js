@@ -81,6 +81,12 @@ class IntervalManager {
 	get fps() {
 		return this._fps;
 	}
+	set paused(a) {
+		this.pausedLevel = a ? 1 : 0;
+	}
+	get paused() {
+		return this.pauseLevel > 0;
+	}
 	start() {
 		// deal with system frame length
 		let lastFrameTime = performance.now();
@@ -151,10 +157,10 @@ class IntervalManager {
 		for (let i = 0; i < this.graphs.length; i++) this.graphs[i].update();
 	}
 	pause() {
-		this.paused = true
+		this.pauseLevel++;
 	}
 	play() {
-		this.paused = false
+		this.pauseLevel--;
 	}
 	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
 		this.functions.push(new ContinuousFunction(fn, type));
