@@ -34,8 +34,8 @@ load(String.raw`
 			Runs the GPUComputation's operation on the provided buffer. The output will be stored in the buffer afterwards.
 			(2)Parameters(/2)
 			(p2)
-				(param:inputBuffer $ByteBuffer[]$)The buffer to compute. The current contents of the buffer will be used as input, and the output will be written to *outputBuffer*.(/param)
-				(param:outputBuffer $ByteBuffer[]$)The buffer to put the computation results in. The default value is a new #ByteBuffer#.(/param)
+				(param:inputBuffer $ByteBuffer$)The buffer to compute. The current contents of the buffer will be used as input, and the output will be written to *outputBuffer*.(/param)
+				(param:outputBuffer $ByteBuffer$)The buffer to put the computation results in. The default value is a new #ByteBuffer#.(/param)
 			(/p2)
 		(/method)
 		(method:getArgument@arg@$any$)
