@@ -82,7 +82,7 @@ class IntervalManager {
 		return this._fps;
 	}
 	set paused(a) {
-		this.pausedLevel = a ? 1 : 0;
+		this.pauseLevel = a ? 1 : 0;
 	}
 	get paused() {
 		return this.pauseLevel > 0;
