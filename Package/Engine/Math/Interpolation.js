@@ -58,8 +58,8 @@ class Animatable {
 			(this.copyTarget ? target.equals(this._target) : target === this._target)
 		) return;
 		this.timer = 0;
+		this.start = this._target === undefined ? target.get() : this.current;
 		this._target = this.copyTarget ? target.get() : target;
-		this.start = this.current;
 	}
 
 	get target() {
