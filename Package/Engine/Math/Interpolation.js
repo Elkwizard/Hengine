@@ -55,10 +55,10 @@ class Animatable {
 	set target(target) {
 		if (
 			this._target !== undefined &&
-			(copyTarget ? target.equals(this._target) : target === this._target)
+			(this.copyTarget ? target.equals(this._target) : target === this._target)
 		) return;
 		this.timer = 0;
-		this._target = copyTarget ? target.get() : target;
+		this._target = this.copyTarget ? target.get() : target;
 		this.start = this.current;
 	}
 
