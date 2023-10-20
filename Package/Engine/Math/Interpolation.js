@@ -67,8 +67,8 @@ class Animatable {
 	}
 
 	set value(value) {
-		this.start = value.get();
 		this.target = this.copyTarget ? value.get() : value;
+		this.start = value.get();
 	}
 
 	get value() {
