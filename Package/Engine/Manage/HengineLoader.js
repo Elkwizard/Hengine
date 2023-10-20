@@ -159,7 +159,13 @@ class HengineFontResource extends HengineResource {
 				
 				style.onload = async () => {
 					const allFonts = [...document.fonts];
-					const { family } = allFonts[allFonts.length - 1];
+					const lastFont = allFonts[allFonts.length - 1];
+					if (!lastFont) {
+						resolve(null);
+						return;
+					}
+					
+					const { family } = lastFont;
 					await Promise.all(allFonts
 						.slice(firstFontIndex)
 						.filter(font => font.family === family)

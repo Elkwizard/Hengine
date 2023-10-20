@@ -57,9 +57,9 @@ class Animatable {
 			this._target !== undefined &&
 			(this.copyTarget ? target.equals(this._target) : target === this._target)
 		) return;
-		this.timer = 0;
 		this.start = this._target === undefined ? target.get() : this.current;
 		this._target = this.copyTarget ? target.get() : target;
+		this.timer = 0;
 	}
 
 	get target() {
@@ -68,7 +68,7 @@ class Animatable {
 
 	set value(value) {
 		this.start = value.get();
-		this.target = value.get();
+		this.target = this.copyTarget ? value.get() : value;
 	}
 
 	get value() {
