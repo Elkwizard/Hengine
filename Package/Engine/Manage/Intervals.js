@@ -160,7 +160,8 @@ class IntervalManager {
 		this.pauseLevel++;
 	}
 	play() {
-		this.pauseLevel--;
+		if (this.pauseLevel > 0)
+			this.pauseLevel--;
 	}
 	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
 		this.functions.push(new ContinuousFunction(fn, type));
