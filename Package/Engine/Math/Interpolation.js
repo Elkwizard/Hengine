@@ -45,17 +45,21 @@ class Interpolation {
 }
 
 class Animatable {
-	constructor(initial, duration, easing = Interpolation.linear) {
+	constructor(initial, duration, easing = Interpolation.linear, copyTarget = true) {
 		this.duration = duration;
 		this.value = initial;
 		this.easing = easing;
+		this.copyTarget = copyTarget;
 	}
 
 	set target(target) {
-		if (this._target !== undefined && target.equals(this._target)) return;
+		if (
+			this._target !== undefined &&
+			(copyTarget ? target.equals(this._target) : target === this._target)
+		) return;
 		this.timer = 0;
-		this._target = target.get();
-		this.start = this.current.get();
+		this._target = copyTarget ? target.get() : target;
+		this.start = this.current;
 	}
 
 	get target() {
@@ -63,15 +67,17 @@ class Animatable {
 	}
 
 	set value(value) {
-		this.current = value.get();
 		this.target = value.get();
 		this.start = value.get();
 	}
 
 	get value() {
 		this.timer++;
-		const t = Number.clamp(this.timer / this.duration, 0, 1);
-		this.current = Interpolation.lerp(this.start, this.target, this.easing(t));
 		return this.current;
+	}
+
+	get current() {
+		const t = Number.clamp(this.timer / this.duration, 0, 1);
+		return Interpolation.lerp(this.start, this.target, this.easing(t));
 	}
 }
