@@ -47,9 +47,9 @@ class Interpolation {
 class Animatable {
 	constructor(initial, duration, easing = Interpolation.linear, copyTarget = true) {
 		this.duration = duration;
-		this.value = initial;
 		this.easing = easing;
 		this.copyTarget = copyTarget;
+		this.value = initial;
 	}
 
 	set target(target) {
