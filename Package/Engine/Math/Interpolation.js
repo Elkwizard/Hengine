@@ -67,8 +67,8 @@ class Animatable {
 	}
 
 	set value(value) {
-		this.target = value.get();
 		this.start = value.get();
+		this.target = value.get();
 	}
 
 	get value() {
