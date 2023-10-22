@@ -438,75 +438,51 @@ class Geometry {
 		}
 		return farthest;
 	}
-	static rayCast(p, r, shapes) {
+	static rayCast(ro, rd, shapes) {
 		let hit = null;
 		let hitShape = null;
 		let bestDist = Infinity;
-		const EPSILON = 0.0001;
 		for (let i = 0; i < shapes.length; i++) {
 			const shape = shapes[i];
 			let nHit = null;
 			if (shape instanceof Circle) {
-				let normal = r.normal;
-				const projP = normal.dot(p);
+				let normal = rd.normal;
+				const projP = normal.dot(ro);
 				const projC = normal.dot(shape);
-				if (Math.abs(projP - projC) < shape.radius && p.minus(shape).dot(r) <= 0) {
+				if (Math.abs(projP - projC) < shape.radius && ro.minus(shape).dot(rd) <= 0) {
 					const t = (projC + shape.radius - projP) / (shape.radius * 2);
-					const upVec = r.inverse;
+					const upVec = rd.inverse;
 					const crossVec = upVec.normal;
 					const baseP = shape.middle.sub(crossVec.times(shape.radius)).add(crossVec.times(t * shape.radius * 2));
 					const y = Math.sqrt(1 - (2 * t - 1) ** 2);
 					baseP.add(upVec.times(y * shape.radius));
-					if (baseP.minus(p).dot(r) >= 0) nHit = baseP;
+					if (baseP.minus(ro).dot(rd) >= 0) nHit = baseP;
 				}
 			} else if (shape instanceof Polygon) {
 				let bestDist = Infinity;
 				let bestPoint = null;
 				const edges = shape.getEdges().filter(edge => {
 					let n = edge.vector.normal;
-					return n.dot(r) >= 0 && Math.max(edge.a.minus(p).dot(r), edge.b.minus(p).dot(r)) > 0;
+					return n.dot(rd) >= 0 && Math.max(edge.a.minus(ro).dot(rd), edge.b.minus(ro).dot(rd)) > 0;
 				});
-				const { normal } = r;
-				const dx = r.x;
-				const dy = r.y || EPSILON;
-				const b = p.y - p.x * dy / dx;
 				for (let j = 0; j < edges.length; j++) {
-					const edge = edges[j];
-					const projP = normal.dot(p);
-					let projA = normal.dot(edge.a);
-					let projB = normal.dot(edge.b);
-					if (projB < projA)
-						[projA, projB] = [projB, projA];
-					if (projP >= projA && projP <= projB) {
-						const vec = edge.vector;
-						const dx2 = vec.x || EPSILON;
-						const dy2 = vec.y || EPSILON;
-						const b2 = edge.a.y - edge.a.x * dy2 / dx2;
-						let x, y;
-						if (Math.abs(dx) > EPSILON) {
-							// dy / dx * x + b = dy2 / dx2 * x + b2
-							// dy / dx * x - dy2 / dx2 * x = b2 - b
-							// (dy / dx - dy2 / dx2) * x = b2 - b
-							// x = (b2 - b) / (dy / dx - dy2 / dx2)
-							x = (b2 - b) / (dy / dx - dy2 / dx2);
-							y = dy / dx * x + b;
-						} else {
-							x = p.x;
-							y = dy2 / dx2 * x + b2;
-						}
-						const dist = (x - p.x) ** 2 + (y - p.y) ** 2;
+					const intersect = Geometry.intersectRayLine(ro, rd, edges[j]);
+					
+					if (intersect) {
+						const { x, y } = intersect;
+						const dist = (x - ro.x) ** 2 + (y - ro.y) ** 2;
 						if (dist < bestDist) {
 							bestDist = dist;
 							bestPoint = new Vector2(x, y);
 						}
-
 					}
+
 					nHit = bestPoint;
 				}
 			}
 			if (nHit) {
-				const nDist = (nHit.x - p.x) ** 2 + (nHit.y - p.y) ** 2;
-				if (nDist < bestDist && nHit.minus(p).dot(r) >= 0) {
+				const nDist = (nHit.x - ro.x) ** 2 + (nHit.y - ro.y) ** 2;
+				if (nDist < bestDist && nHit.minus(ro).dot(rd) >= 0) {
 					hit = nHit;
 					bestDist = nDist;
 					hitShape = shape;
@@ -600,45 +576,24 @@ class Geometry {
 		return Geometry.subdividePolygonList(poly.vertices)
 			.map(v => new Polygon(v));
 	}
-	static intersectRayLine(o, r, l) {
-		let result = null;
+	static intersectRayLine(ro, rd, line) {
 		const EPSILON = 0.0001;
-		if (Math.abs(l.a.x - l.b.x) < EPSILON) {
-			if (Math.abs(r.x) > EPSILON) {
-				let dx = r.x;
-				let dy = r.y;
-				let b = o.y - dy / dx * o.x;
-				let x = l.a.x;
-				let y = dy / dx * x + b;
-				let minY = Math.min(l.a.y, l.b.y);
-				let maxY = Math.max(l.a.y, l.b.y);
-				if (y >= minY && y <= maxY) result = new Vector2(x, y);
-			} else {
-				if (Math.abs(o.x - l.a.x) <= EPSILON) result = new Vector2(o.x, Number.clamp(o.y, Math.min(l.a.y, l.b.y), Math.max(l.a.y, l.b.y)));
-			}
-		} else {
-			if (Math.abs(r.x) > EPSILON) {
-				let dx = r.x;
-				let dy = r.y;
-				let b = o.y - dy / dx * o.x;
-				let dx2 = l.b.x - l.a.x;
-				let dy2 = l.b.y - l.a.y;
-				let b2 = l.a.y - dy2 / dx2 * l.a.x;
-				let x = (b2 - b) / (dy / dx - dy2 / dx2);
-				let minX = Math.min(l.a.x, l.b.x);
-				let maxX = Math.max(l.a.x, l.b.x);
-				if (x >= minX - EPSILON && x <= maxX + EPSILON) result = new Vector2(x, dy / dx * x + b);
-			} else {
-				let dx2 = l.b.x - l.a.x;
-				let dy2 = l.b.y - l.a.y;
-				let b2 = l.a.y - dy2 / dx2 * l.a.x;
-				let x = o.x;
-				let minX = Math.min(l.a.x, l.b.x);
-				let maxX = Math.max(l.a.x, l.b.x);
-				if (x >= minX - EPSILON && x <= maxX + EPSILON) result = new Vector2(x, dy2 / dx2 * x + b2);
-			}
-		}
-		if (result && result.minus(o).dot(r) <= 0) result = null;
-		return result;
+		const rayOrigin = ro;
+		const rayVector = rd;
+		const lineOrigin = line.a;
+		const lineVector = line.b.minus(line.a);
+		const a = rayVector.x;
+		const b = lineVector.x;
+		const c = rayVector.y;
+		const d = lineVector.y;
+		const det = a * d - b * c;
+		if (!det) return null;
+		const invDet = 1 / det;
+		const diff = lineOrigin.minus(rayOrigin);
+		const t = invDet * (d * diff.x - b * diff.y);
+		const s = invDet * (c * diff.x - a * diff.y);
+		if (t < -EPSILON) return null;
+		if (s < -EPSILON || s > 1 + EPSILON) return null;
+		return lineVector.times(s).add(lineOrigin);
 	}
 }
