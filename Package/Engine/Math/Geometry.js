@@ -596,4 +596,72 @@ class Geometry {
 		if (s < -EPSILON || s > 1 + EPSILON) return null;
 		return lineVector.times(s).add(lineOrigin);
 	}
+	static intersectLineLine(lineA, lineB) {
+		const EPSILON = 0.0001;
+		const aOrigin = lineA.a;
+		const aVector = lineA.b.minus(lineA.a);
+		const bOrigin = lineB.a;
+		const bVector = lineB.b.minus(lineB.a);
+		const a = aVector.x;
+		const b = bVector.x;
+		const c = aVector.y;
+		const d = bVector.y;
+		const det = a * d - b * c;
+		if (!det) return null;
+		const invDet = 1 / det;
+		const diff = bOrigin.minus(aOrigin);
+		const t = invDet * (d * diff.x - b * diff.y);
+		const s = invDet * (c * diff.x - a * diff.y);
+		if (t < -EPSILON || t > 1 + EPSILON) return null;
+		if (s < -EPSILON || s > 1 + EPSILON) return null;
+		return aVector.times(t).add(aOrigin);
+	}
+	static intersectPolygonPolygon(a, b) {
+		const getOverlapFrom = (a, b, i) => {
+			let aEdges = a.getEdges();
+			let bEdges = b.getEdges();
+			let aVerts = a.vertices;
+			let bVerts = b.vertices;
+			
+			const vertices = [];
+			let lastIntersect = null;
+			traverseLoop: do {			
+				if (!lastIntersect) vertices.push(aVerts[i]);
+	
+				const edge = new Line(vertices.last, aEdges[i].b);
+				for (let j = 0; j < bVerts.length; j++) {
+					const bEdge = bEdges[j];
+					if (bEdge === lastIntersect) continue;
+					const vec = Geometry.intersectLineLine(edge, bEdge);
+					if (vec) {
+						lastIntersect = aEdges[i];
+						[aVerts, bVerts] = [bVerts, aVerts];
+						[aEdges, bEdges] = [bEdges, aEdges];
+						[a, b] = [b, a];
+						i = j;
+						vertices.push(vec);
+						continue traverseLoop;
+					}
+				}
+	
+				lastIntersect = null;
+				
+				i = (i + 1) % aVerts.length;
+	
+			} while (aVerts[i] !== vertices[0]);
+	
+			return new Polygon(vertices);
+		};
+	
+		for (let i = 0; i < a.vertices.length; i++)
+			if (b.containsPoint(a.vertices[i]))
+				return getOverlapFrom(a, b, i);
+	
+		for (let i = 0; i < b.vertices.length; i++)
+			if (a.containsPoint(b.vertices[i]))
+				return getOverlapFrom(b, a, i);
+		
+		return null;
+	}
+	
 }
