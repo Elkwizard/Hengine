@@ -27,7 +27,7 @@ class ElementScript {
 			this[prop] = this[prop].bind(this, sceneObject);
 		}
 
-		const placeholder = () => true;
+		const placeholder = () => undefined;
 		for (const flag of ElementScript.flags)
 			if (!(flag in this)) this[flag] = placeholder;
 
@@ -47,6 +47,7 @@ ElementScript.flags = new Set([
 	"draw",
 	"escapeDraw",
 	"collideRule",
+	"triggerRule",
 	"collideGeneral",
 	"collideTop",
 	"collideBottom",

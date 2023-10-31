@@ -608,6 +608,7 @@ class RigidBody {
         this.prohibitedDirections = [];
 
         this.collisionFilter = body => true;
+		this.triggerFilter = body => false;
         this.engine = null;
 
         //sleep
@@ -1737,7 +1738,12 @@ class PhysicsEngine {
 
         this.onCollide(bodyA, bodyB, direction, contacts);
 
-        if (bodyA.isTrigger || bodyB.isTrigger) return;
+		if (
+			bodyA.isTrigger ||
+			bodyB.isTrigger ||
+			bodyA.triggerFilter(bodyB) ||
+			bodyB.triggerFilter(bodyA)
+		) return;
 
         let dynamic = bodyB.dynamic;
 		let prohibited = false;

@@ -9,7 +9,7 @@ class PHYSICS extends ElementScript {
 		// collide rule
 		this.body.userData.sceneObject = obj;
         this.body.collisionFilter = body => {
-            let { sceneObject } = body.userData;
+            const { sceneObject } = body.userData;
 			const success = (
 				!this.hasCollideRule ||
 				this.collideBasedOnRule(sceneObject)
@@ -20,6 +20,16 @@ class PHYSICS extends ElementScript {
 
 			return success;
         };
+		this.body.triggerFilter = body => {
+			const { sceneObject } = body.userData;
+			const success = (
+				this.hasTriggerRule ? this.triggerBasedOnRule(sceneObject) : false
+			) || (
+				sceneObject.scripts.PHYSICS.hasTriggerRule ? sceneObject.scripts.PHYSICS.triggerBasedOnRule(obj) : false
+			);
+
+			return success;
+		};
 
 		// monitors
         this.colliding = new CollisionMonitor();
@@ -61,6 +71,7 @@ class PHYSICS extends ElementScript {
 		obj.sync(() => {
 			// update things that should have already been done
 			this.hasCollideRule = obj.scripts.implements("collideRule");
+			this.hasTriggerRule = obj.scripts.implements("triggerRule");
 		
 			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
 
@@ -130,7 +141,8 @@ class PHYSICS extends ElementScript {
 		this.physicsEngine.removeBody(this.body.id);
 	}
 	addScript(obj, script) {
-		if (script.implements("collideRule")) this.hasCollideRule = true;
+		this.hasCollideRule ||= script.implements("collideRule");
+		this.hasTriggerRule ||= script.implements("triggerRule");
 	}
 	beforePhysics(obj) {
 		// clear collisions
@@ -198,10 +210,21 @@ class PHYSICS extends ElementScript {
 		const scripts = obj.scripts.sortedScriptInstances;
 		for (let i = 0; i < scripts.length; i++) {
 			const script = scripts[i];
-			if (script.scriptSynced && !scripts[i].collideRule(element))
+			if (script.scriptSynced && scripts[i].collideRule(element) === false)
 				return false;
 		}
+
 		return true;
+	}
+	triggerBasedOnRule(obj, element) {
+		const scripts = obj.scripts.sortedScriptInstances;
+		for (let i = 0; i < scripts.length; i++) {
+			const script = scripts[i];
+			if (script.scriptSynced && scripts[i].triggerRule(element) === true)
+				return true;
+		}
+
+		return false;
 	}
 	canCollideWith(obj, element) {
 		const rb = element.scripts.PHYSICS;
