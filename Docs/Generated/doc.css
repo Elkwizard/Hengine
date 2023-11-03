@@ -1,0 +1,129 @@
+body {
+	background-color: var(--background);
+	width: 100vw;
+	overflow-x: hidden;
+}
+
+span {
+	display: inline-block;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	font-style: italic;
+	font-size: 1em;
+}
+
+.class-name, .function-name, .prop-name {
+	color: var(--accent-1);
+}
+
+.prop-name, .function-name {
+	font-weight: bold;
+}
+
+.type {
+	color: var(--accent-2);
+}
+
+.type {
+	border-left: 1px currentColor solid;
+	padding: 0.2em 0.5em;
+	margin-left: 0.5em;
+	/* margin-right: 0.5em; */
+}
+
+.param {
+	color: var(--accent-1);
+}
+
+.function-header .param {
+	color: white;
+}
+
+.keyword {
+	color: var(--accent-2);
+}
+
+.aux {
+	color: var(--accent-2);
+	white-space: pre;
+}
+
+.function-wrapper, .prop-wrapper {
+	padding: 0.8em;
+	margin-bottom: 1em;
+	padding-left: 1.3em;
+}
+
+.class-wrapper {
+	padding: 2em;
+}
+
+.class-wrapper .function-wrapper, .param-wrapper, .prop-wrapper {
+	border: 2px var(--accent-3) solid;
+	border-right: none;
+	border-bottom: none;
+	border-top-left-radius: 0.3em;
+}
+
+.member {
+	margin-bottom: 0.6em;
+	font-size: 1.4em;
+	overflow-wrap: break-word;
+}
+
+.class-header {
+	margin-bottom: 0.5em;
+	font-size: 2em;
+}
+
+.function-header {
+	color: white;
+}
+
+.param-name {
+	margin-bottom: 0.3em;
+	font-size: 1.2em;
+}
+
+.param-wrapper {
+	padding: 0.5em;
+	padding-left: 1em;
+	margin: 0.8em 0;
+}
+
+.function-signature::before, .header {
+	display: inline-block;
+	color: var(--accent-1);
+	margin-top: 0.7em;
+	margin-bottom: 0.5em;
+	font-family: var(--text-font);
+}
+
+.function-wrapper .header {
+	font-size: 1.1em;
+}
+
+.header {
+	font-size: 1.5em;
+	border-bottom: 1px var(--accent-1) solid;
+}
+
+.code {
+	color: black;
+	background: #ccc;
+	padding: 0.2em;
+	border-radius: 0.1em;
+}
+
+.desc {
+	font-family: var(--text-font);
+	font-size: 1.23rem;
+	color: white;
+}
+
+.subclass {
+	font-size: 1.2em;
+}
