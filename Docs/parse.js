@@ -63,11 +63,10 @@ function parse(content, path) {
 				case "subclass": {
 					line.elements = line.content.split(",").map(e => e.trim());
 				}; break;
-				case "name": {
-					match.name = processName(line.content.trim());
-				}; break;
+				case "name":
 				case "group": {
 					line.elements = line.content.split(",").map(e => processName(e.trim()));
+					match.name = line.elements[0];
 				}; break;
 				case "return": {
 					line.type = line.content;

@@ -69,7 +69,12 @@ function document(doc, topLevelIDs, file) {
 		const subclass = (doc.lines.find(line => line.category === "subclass")?.elements ?? [])
 			.map(cls => `<span class="class-name">${cls}</span>`)
 			.join(", ");
-		const memberFunctions = doc.members.map(member => documentFunction(member, doc.name.base)).join("");
+		const memberFunctions = [...doc.members]
+			.sort((a, b) => (b.name.isSetter || b.name.isGetter) - (a.name.isSetter || a.name.isGetter))
+			.sort((a, b) => b.name.isSetter - a.name.isSetter)
+			.sort((a, b) => a.name.isStatic - b.name.isStatic)
+			.map(member => documentFunction(member, doc.name.base))
+			.join("");
 		const memberProperties = doc.lines
 			.filter(line => line.category?.indexOf("prop") > -1)
 			.map(line => `
