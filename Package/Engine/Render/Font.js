@@ -1,4 +1,22 @@
+/**
+ * Represents a font, including family, side, and styling.
+ * Fonts can be used in the text rendering functions of Artist.
+ * @prop Number size | The size of the font in CSS pixels
+ * @prop String family | The string identifier for the font family
+ * @prop Boolean bold | Whether the font is bold
+ * @prop Boolean italic | Whether the font is italic
+ * @prop Number lineHeight | The height of a line of text in the font. This determines spacing between multiline strings
+ * @prop Number tabSize | The number of spaces a tab is equivalent to for this font
+ * @static_prop Font [FAMILY][SIZE] | These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+ */
 class Font {
+	/**
+	 * Creates a new font. This operation is fairly expensive and thus should not be done every frame unless necessary.
+	 * @param Number size | The size of the font
+	 * @param String family | The font family
+	 * @param Boolean bold? | Whether the font is bold, default is false
+	 * @param Boolean italic? | Whether the font is italic, default is false
+	 */
 	constructor(size = 15, family = "Arial", bold = false, italic = false) {
 		let canvas = new_OffscreenCanvas(1, 1);
 		this.c = canvas.getContext("2d");
@@ -79,6 +97,12 @@ class Font {
 		this.memorizedWidths[str] = width;
 		return width;
 	}
+	/**
+	 * Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
+	 * @param String text | The text to pack 
+	 * @param Number maxWidth | The maximum width of a single line in the output text 
+	 * @return String
+	 */
 	packText(str, maxWidth) {
 		str = this.processString(str);
 		return str
@@ -103,6 +127,13 @@ class Font {
 			})
 			.join("\n");
 	}
+	/**
+	 * Returns the width and height of a string of text, optionally after being packed into a fixed max width.
+	 * The return value contains `width` and `height` properties, both of which are Numbers.
+	 * @param String text | The text to be measured
+	 * @param Number maxWidth? | The maximum width of a single line, default is Infinity
+	 * @returns Object
+	 */
 	getTextBounds(str, pack) {
 		str = this.processString(str);
 		if (pack) str = this.packText(str, pack);
@@ -111,27 +142,58 @@ class Font {
 		let height = spl.length * this.lineHeight;
 		return { width, height };
 	}
+	/**
+	 * Returns the width of a single line of text. This method is faster than getTextWidth.
+	 * @param String textLine | A single line string of text to measure 
+	 * @return Number
+	 */
 	getTextLineWidth(str) {
 		str = this.processString(str);
 		return this.getWidthCRC2D(str);
 	}
+	/**
+	 * Returns the height of a single line of text. This method is faster than getTextHeight.
+	 * @param String textLine | A single line string of text to measure
+	 * @return Number
+	 */
 	getTextLineHeight(str) {
 		return this.lineHeight;
 	}
+	/**
+	 * Returns the width of a string of text.
+	 * @param String text | The text to measure 
+	 * @return Number
+	 */
 	getTextWidth(str) {
 		str = this.processString(str);
 		let spl = str.split("\n");
 		return Math.max(...spl.map(l => this.getWidthCRC2D(l)));
 	}
+	/**
+	 * Returns the height of a string of text.
+	 * @param String text | The text to measure 
+	 * @return Number
+	 */
 	getTextHeight(str, pack) {
 		str = this.processString(str);
 		if (pack) str = this.packText(str, pack);
 		return str.split("\n").length * this.lineHeight;
 	}
+	/**
+	 * Converts the Font to a valid CSS font string.
+	 * @return String
+	 */
 	toString() {
 		const familyString = this.keywordFamily ? this.family : JSON.stringify(this.family);
 		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${familyString}`;
 	}
+	/**
+	 * Copies the font into an optional destination font. If no destination is provided, a new Font is created to hold the copy.
+	 * @signature
+	 * @signature
+	 * @param Font destination | The destination to be copied into
+	 * @return Font
+	 */
 	get(font = new Font(0, "serif", false, false)) {
 		font.size = this.size;
 		font.family = this.family;

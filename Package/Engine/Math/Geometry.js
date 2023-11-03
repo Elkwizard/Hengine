@@ -1,6 +1,15 @@
 const RectPriority = defineEnum("SQUARE", "HORIZONTAL", "VERTICAL");
 
+/**
+ * Provides a collection of 2D geometric algorithms that operate on Shapes and Vectors.
+ * All methods of this class are static and do not mutate their arguments.
+ */
 class Geometry {
+	/**
+	 * Applies a single smoothing step to a connected sequence of line segments.
+	 * @param Vector2[] path | The path to be smoothed
+	 * @return Vector2[]
+	 */
 	static smoothConnector(path) {
 		let result = [path[0]];
 		for (let i = 0; i < path.length - 2; i++) {
@@ -16,6 +25,11 @@ class Geometry {
 
 		return result;
 	}
+	/**
+	 * Applies a single smoothing step to a Polygon.
+	 * @param Polygon shape | The shape to be smoothed
+	 * @return Polygon
+	 */
 	static smoothPolygon(shape) {
 		let vertices = shape.vertices;
 		if (vertices.length <= 2) return shape.get();
@@ -32,6 +46,12 @@ class Geometry {
 
 		return new Polygon(result);
 	}
+	/**
+	 * Simplifies a Polygon by removing a specified proportion of the vertices.
+	 * @param Polygon polygon | The polygon to simplify
+	 * @param Number percent | The percentage of vertices to remove
+	 * @return Polygon
+	 */
 	static simplify(polygon, percent) {
 		const period = Math.round(1 / percent);
 		const vertices = [];
@@ -40,6 +60,12 @@ class Geometry {
 				vertices.push(polygon.vertices[i].get());
 		return new Polygon(vertices);
 	}
+	/**
+	 * Inflates a Polygon along its normals by a specified distance.
+	 * @param Polygon polygon | The Polygon to inflate
+	 * @param Number distance | The distance to extrude by
+	 * @return Polygon
+	 */
 	static inflate(polygon, distance) {
 		const edgeNormals = polygon
 			.getEdges()
@@ -56,6 +82,12 @@ class Geometry {
 		}
 		return new Polygon(vertices);
 	}
+	/**
+	 * Simplifies a Polygon by combining adjacent edges that are nearly colinear. 
+	 * @param Polygon polygon | The polygon to simplify
+	 * @param Number dtheta | The maximum angular difference in direction between two consecutive edges where they will be combined 
+	 * @return Polygon
+	 */
 	static joinEdges(polygon, dtheta) {
 		const edges = polygon.getEdges();
 		let finalEdges = [];
@@ -72,6 +104,12 @@ class Geometry {
 		}
 		return new Polygon(finalEdges.map(edge => edge.a));
 	}
+	/**
+	 * Creates a triangular decomposition of the provided convex Polygon.
+	 * The triangles are returned as arrays of three Vector2s. 
+	 * @param Polygon shape | The convex Polygon to decompose 
+	 * @return Vector2[3][]
+	 */
 	static triangulate(shape) {
 		let vertices = shape.vertices;
 		const result = [];
@@ -160,6 +198,11 @@ class Geometry {
 				Vector2.origin, cellSize
 			));
 	}
+	/**
+	 * Checks whether a list of points are in clockwise order.
+	 * @param Vector2[] vertices | The points to check 
+	 * @return Boolean
+	 */
 	static isListClockwise(vertices) {
 		let signedArea = 0;
 		let length = vertices.length;
@@ -385,6 +428,12 @@ class Geometry {
 		
 		return rects.map(rect => rect.scaleAbout(Vector2.origin, cellSize));
 	}
+	/**
+	 * Finds the closest point from a list of points to a given point.
+	 * @param Vector2 target | The point distances are checked from
+	 * @param Vector2[] points | The points to compare
+	 * @return Vector2
+	 */
 	static closest(p, points) {
 		let bestDist = Infinity;
 		let best = null;
@@ -397,6 +446,12 @@ class Geometry {
 		}
 		return best;
 	}
+	/**
+	 * Finds the farthest point from a list of points to a given point.
+	 * @param Vector2 target | The point distances are checked from
+	 * @param Vector2[] points | The points to compare
+	 * @return Vector2
+	 */
 	static farthest(p, points) {
 		let bestDist = -Infinity;
 		let best = null;
@@ -409,10 +464,21 @@ class Geometry {
 		}
 		return best;
 	}
+	/**
+	 * Normalizes an angle to be on the interval [0, 2π).
+	 * @param Number theta | The angle to normalize
+	 * @return Number
+	 */
 	static normalizeAngle(theta) {
 		const pi2 = 2 * Math.PI;
 		return (theta % pi2 + pi2) % pi2;
 	}
+	/**
+	 * Finds the shortest angular displacement between two angles.
+	 * @param Number a | The first angle
+	 * @param Number b | The second angle
+	 * @return Number
+	 */
 	static signedAngularDist(r1, r2) {
 		const pi2 = 2 * Math.PI;
 		r1 = (r1 < 0) ? r1 % pi2 + pi2 : r1 % pi2;
@@ -438,6 +504,15 @@ class Geometry {
 		}
 		return farthest;
 	}
+	/**
+	 * Returns the closest intersection of a ray with a collection of shapes.
+	 * The return value is either null (if the raycast misses) or an object with two properties:
+	 * a hitPoint property containing the location of the ray intersection, and a hitShape property containing the shape that the ray intersected. 
+	 * @param Vector2 rayOrigin | The starting point of the ray 
+	 * @param Vector2 rayDirection | The direction of the ray
+	 * @param Shape[] shapes | The Shapes to raycast against
+	 * @return Object/null
+	 */
 	static rayCast(ro, rd, shapes) {
 		let hit = null;
 		let hitShape = null;
@@ -572,10 +647,22 @@ class Geometry {
 
 		return [vertices]; // already convex, go home
 	}
+	/**
+	 * Decomposes any Polygon into a collection of convex Polygons that occupy the same space.
+	 * @param Polygon polygon | The polygon to subdivide
+	 * @return Polygon[]
+	 */
 	static subdividePolygon(poly) {
 		return Geometry.subdividePolygonList(poly.vertices)
 			.map(v => new Polygon(v));
 	}
+	/**
+	 * Returns the point of intersection between a Line segment and a ray, or null if they don't intersect
+	 * @param Vector2 rayOrigin | The origin of the ray
+	 * @param Vector2 rayDirection | The direction of the ray
+	 * @param Line line | The Line
+	 * @return Vector2/null
+	 */
 	static intersectRayLine(ro, rd, line) {
 		const EPSILON = 0.0001;
 		const rayOrigin = ro;
@@ -596,6 +683,12 @@ class Geometry {
 		if (s < -EPSILON || s > 1 + EPSILON) return null;
 		return lineVector.times(s).add(lineOrigin);
 	}
+	/**
+	 * Returns the point of intersection between two Line segments, or null if they don't intersect
+	 * @param Line a | The first Line
+	 * @param Line b | The second Line
+	 * @return Vector2/null
+	 */
 	static intersectLineLine(lineA, lineB) {
 		const EPSILON = 0.0001;
 		const aOrigin = lineA.a;
@@ -616,6 +709,12 @@ class Geometry {
 		if (s < -EPSILON || s > 1 + EPSILON) return null;
 		return aVector.times(t).add(aOrigin);
 	}
+	/**
+	 * Returns the region of intersection between two Polygons, or null if they don't intersect.
+	 * @param Polygon a | The first Polygon
+	 * @param Polygon b | The second Polygon
+	 * @return Polygon/null
+	 */
 	static intersectPolygonPolygon(a, b) {
 		const getOverlapFrom = (a, b, i) => {
 			let aEdges = a.getEdges();

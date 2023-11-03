@@ -134,11 +134,21 @@ Object.defineProperty(window, "title", {
 		return (end - start) / iter;
 	});
 	//Array
+	/**
+	 * @name class Array
+	 * The built-in Array class has some additional quality-of-life methods in the Hengine.
+	 * @prop Any last | The last element of the array
+	 */
 	protoGetSet(Array.prototype, "last", function () {
 		return this[this.length - 1];
 	}, function (value) {
 		if (this.length) this[this.length - 1] = value;
 	});
+	/**
+	 * @name pushArray
+	 * Pushes each element in an array to the end of the caller.
+	 * @param Array array | The array to add to the end
+	 */
 	proto(Array.prototype, "pushArray", function (arr) {
 		const len = arr.length;
 		for (let i = 0; i < len; i++) this.push(arr[i]);
@@ -208,7 +218,15 @@ Object.defineProperty(window, "title", {
 			return this;
 		}.bind(arr));
 		return arr;
-	}
+	};
+
+	/**
+	 * @name static dim
+	 * Creates a multidimensional array, on which standard array operations can be performed with additional arguments.
+	 * e.g. `arr.map((value, i, j) => ...)` for a 2D array.
+	 * @param Number[] ...dims | The sizes of the each dimension of the array.
+	 * @return Array 
+	 */
 	Array.dim = function (...dims) {
 		const arr = [];
 		if (dims.length > 1) {
@@ -378,7 +396,7 @@ ${contents.join(",\n").indent()}
 			return this ** 2;
 		},
 		enumerable: false
-	})
+	});
 	proto(Number.prototype, "plus", function (n) { return this + n; });
 	proto(Number.prototype, "minus", function (n) { return this - n; });
 	proto(Number.prototype, "times", function (n) { return this * n; });
