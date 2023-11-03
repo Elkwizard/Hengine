@@ -41,6 +41,12 @@ const docs = generate(parse, sourcePath).flatMap(batch => batch);
 
 const pathToDocumentation = { };
 
+for (const doc of docs)
+	if (doc.name.baseClass)
+		for (const superDoc of docs)
+			if (doc.name.baseClass === superDoc.name.base)
+				(superDoc.subclasses ??= []).push(doc);
+
 for (let i = 0; i < docs.length; i++) {
 	const doc = docs[i];
 	const path = nameToPath[doc.name.base];

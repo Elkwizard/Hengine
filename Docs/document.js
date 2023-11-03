@@ -66,8 +66,8 @@ function document(doc, topLevelIDs, file) {
 	if (doc.name.isClass) {
 		const name = documentName(doc.name);
 		const description = doc.lines.find(line => line.category === null)?.content ?? "";
-		const subclass = (doc.lines.find(line => line.category === "subclass")?.elements ?? [])
-			.map(cls => `<span class="class-name">${cls}</span>`)
+		const subclass = (doc.subclasses ?? [])
+			.map(cls => `<span class="class-name">${cls.name.base}</span>`)
 			.join(", ");
 		const memberFunctions = [...doc.members]
 			.sort((a, b) => (b.name.isSetter || b.name.isGetter) - (a.name.isSetter || a.name.isGetter))

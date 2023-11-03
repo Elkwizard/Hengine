@@ -60,9 +60,6 @@ function parse(content, path) {
 
 		for (const line of lines) {
 			switch (line.category) {
-				case "subclass": {
-					line.elements = line.content.split(",").map(e => e.trim());
-				}; break;
 				case "name":
 				case "group": {
 					line.elements = line.content.split(",").map(e => processName(e.trim()));

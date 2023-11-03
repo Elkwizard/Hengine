@@ -13,11 +13,13 @@
 				"HengineFontResource": null
 			},
 			"Intervals": {
-				"IntervalFunction": null,
-				"DelayedFunction": null,
-				"TransitionFunction": null,
-				"ContinuousFunction": null,
-				"WaitUntilFunction": null,
+				"IntervalFunction": [
+					"IntervalFunction",
+					"DelayedFunction",
+					"TransitionFunction",
+					"ContinuousFunction",
+					"WaitUntilFunction"
+				],
 				"IntervalManager": null
 			}
 		},
@@ -97,7 +99,7 @@
 			"GPUComputation": null,
 			"FileSystem": null,
 			"Random": null,
-			"Array": ["Array", "Array.dim", "O"]
+			"Array": ["Array", "Array.dim"]
 		}
 	}
 }

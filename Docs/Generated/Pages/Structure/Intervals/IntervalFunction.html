@@ -1,0 +1,151 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="IntervalFunction">
+				<div class="class-header">
+					<span class="keyword">class</span> <span class="class-name">IntervalFunction</span>
+				</div>
+				<div class="class desc">
+				A wrapper for operations that happen over time or after a time. These can generally be created by methods of <a href="../../../Pages/Structure/Intervals/IntervalManager.html#IntervalManager">IntervalManager</a>.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#DelayedFunction">DelayedFunction</a></span>, <span class="class-name"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#TransitionFunction">TransitionFunction</a></span>, <span class="class-name"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#ContinuousFunction">ContinuousFunction</a></span>, <span class="class-name"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#WaitUntilFunction">WaitUntilFunction</a></span></div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">fn</span><span class="type">Function</span>
+					</div>
+					<div class="prop desc">The function to call during the operation</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">type</span><span class="type">Symbol</span>
+					</div>
+					<div class="prop desc">When during the update cycle the function updates</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">promise</span><span class="type">Promise</span>
+					</div>
+					<div class="prop desc">A promise which resolves when the operation completes</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">done</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Indicates whether the operation has completed</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">timer</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The amount of frames the IntervalFunction has existed for</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">interval</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The total duration of the operation. The operation will complete after the timer exceeds this value</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">IntervalFunction.BEFORE_UPDATE</span><span class="type">Symbol</span>
+					</div>
+					<div class="prop desc">This symbol indicates that the operation should take place before the screen is cleared</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">IntervalFunction.UPDATE</span><span class="type">Symbol</span>
+					</div>
+					<div class="prop desc">This symbol indicates that the operation should take place immediately before the main engine update</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">IntervalFunction.AFTER_UPDATE</span><span class="type">Symbol</span>
+					</div>
+					<div class="prop desc">This symbol indicates that the operation should take place immediately after the main engine update</div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="DelayedFunction">
+				<div class="class-header">
+					<span class="keyword">class</span> <span class="class-name">DelayedFunction</span> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a></span>
+				</div>
+				<div class="class desc">
+				This <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a> executes an operation once after a specified delay.
+				</div>
+				
+				
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="TransitionFunction">
+				<div class="class-header">
+					<span class="keyword">class</span> <span class="class-name">TransitionFunction</span> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a></span>
+				</div>
+				<div class="class desc">
+				This <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a> executes an operation every frame over a duration and is passed a completion percentage.
+				</div>
+				
+				
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="ContinuousFunction">
+				<div class="class-header">
+					<span class="keyword">class</span> <span class="class-name">ContinuousFunction</span> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a></span>
+				</div>
+				<div class="class desc">
+				This <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a> executes an operation once every frame forever.
+				</div>
+				
+				
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="WaitUntilFunction">
+				<div class="class-header">
+					<span class="keyword">class</span> <span class="class-name">WaitUntilFunction</span> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a></span>
+				</div>
+				<div class="class desc">
+				This <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a> executes an operation once after a provided condition is met. After the condition is met, the WaitUntilFunction finishes.
+				</div>
+				
+				
+				
+				
+				
+			</div>
+		
+			</body>
+		</html>
+	
