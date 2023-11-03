@@ -1,1 +1,1 @@
-node generate.js ../Package/Engine ./Generated/ ./structure.json
+node ./Docs/generate.js ./Package/Engine ./Docs/Generated/ ./Docs/structure.json
