@@ -1,0 +1,535 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Operable">
+				<div class="class-header">
+					<span class="keyword">class</span> <span class="class-name">Operable</span>
+				</div>
+				<div class="class desc">
+				Represents a composite mathematical object which element-wise operations can be performed on. Many mathematical operations (plus, minus, times, over) can be performed on Operables of any type, allowing for convenient polymorphism. Operable is an abstract superclass, and should not be constructed. All immutable methods, including static methods, are available on Numbers.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a></span>, <span class="class-name"><a href="../../Pages/Rendering/Color.html#Color">Color</a></span></div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">Operable.modValues</span><span class="type">String[]</span>
+					</div>
+					<div class="prop desc">The names of the elements in the Operable. The order of this array also determines the order of the elements (e.g. <span class="code">["x", "y"]</span> for <a href="../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a>)</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <span class="function-name">values</span><span class="type">Number[]</span>
+			</div>
+			<div class="function desc">
+				Produces a list of all the elements of the Operable.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">set</span>(<span class="param">other</span><span class="aux"> | </span><span class="param">...elements</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Sets all elements of the Operable, either by copying from another Operable of the same type, or by using a list of numeric values. Returns the caller.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">other</span><span class="type">Operable</span>
+				</div>
+				<div class="param desc">
+					The Operable to copy values from
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">elements</span><span class="type">Number[]</span>
+				</div>
+				<div class="param desc">
+					The new element values
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">get</span>(<span class="param">void</span><span class="aux"> | </span><span class="param">destination</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Copies the Operable into an optional destination (if not provided, a new Operable will be created). Returns the copy.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">destination</span><span class="type">Operable</span>
+				</div>
+				<div class="param desc">
+					The result for the copy operation.
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">at</span>(<span class="param">index</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Retrieves a single element value from the Operable.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">index</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The element index
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">add</span><span class="aux">/</span><span class="function-name">sub</span><span class="aux">/</span><span class="function-name">mul</span><span class="aux">/</span><span class="function-name">div</span>(<span class="param">operable</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Performs an in-place element-wise arithmetic operation between the caller and another Operable or Number. Returns the caller.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">operable</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The right hand operand of the operation
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">plus</span><span class="aux">/</span><span class="function-name">minus</span><span class="aux">/</span><span class="function-name">times</span><span class="aux">/</span><span class="function-name">over</span>(<span class="param">operable</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Performs an immutable element-wise arithmetic operation between the caller and another Operable or Number. Returns the result of the operation, leaving the operands unchanged.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">operable</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The right hand operand of the operation
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">total</span>()<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Computes the sum of all the elements of the Operable.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">equals</span>(<span class="param">other</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks equality between the Operable and another Operable of the same type.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">other</span><span class="type">Operable</span>
+				</div>
+				<div class="param desc">
+					The Operable to compare to
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">toByteBuffer</span>(<span class="param">void</span><span class="aux"> | </span><span class="param">destination</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Writes the Operable to a ByteBuffer, which can either be created or passed as an optional destination.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">destination</span><span class="type">ByteBuffer</span>
+				</div>
+				<div class="param desc">
+					The destination for the write operation
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.fromByteBuffer</span>(<span class="param">buffer</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Reads an Operable from the ByteBuffer, and returns it.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">buffer</span><span class="type">ByteBuffer</span>
+				</div>
+				<div class="param desc">
+					The source buffer to read from
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <span class="function-name">Operable.empty</span><span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Produces an Operable with 0 for all element values.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.sum</span>(<span class="param">operables</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Computes the element-wise sum of a list of Operables.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">operables</span><span class="type">Operable/Number[]</span>
+				</div>
+				<div class="param desc">
+					The values to sum
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.avg</span>(<span class="param">operables</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Computes the element-wise average of a list of Operables.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">operables</span><span class="type">Operable/Number[]</span>
+				</div>
+				<div class="param desc">
+					The values to average
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.remap</span>(<span class="param">value</span>, <span class="param">initialMin</span>, <span class="param">initialMax</span>, <span class="param">finalMin</span>, <span class="param">finalMax</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Remaps an Operable from one range to another range.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">value</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The Operable to be remapped
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">initialMin</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The minimum of the range the value is in
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">initialMax</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The maximum of the range the value is in
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">finalMin</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The minimum of the desired range
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">finalMax</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The maximum of the desired range
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.clamp</span>(<span class="param">value</span>, <span class="param">min</span>, <span class="param">max</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Returns an Operable clamped element-wise between two bounds. Equivalent to <span class="code">Operable.max(min, Operable.min(max, value))</span>.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">value</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The value to clamp
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">min</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The lower bound for the result
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">max</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The upper bound for the result
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.filled</span>(<span class="param">value</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Produces an Operable with all elements equal to a single value.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">value</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The value that will be used for all elements
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.min</span>(<span class="param">...values</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Finds and returns the element-wise minimum of a series of values.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">values</span><span class="type">Operable/Number[]</span>
+				</div>
+				<div class="param desc">
+					The values to compare
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.max</span>(<span class="param">...values</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Finds and returns the element-wise maximum of a series of values.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">values</span><span class="type">Operable/Number[]</span>
+				</div>
+				<div class="param desc">
+					The values to compare
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.pow</span>(<span class="param">base</span>, <span class="param">power</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Performs an element-wise exponentiation.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">base</span><span class="type">Operable</span>
+				</div>
+				<div class="param desc">
+					The base of the exponentiation
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">power</span><span class="type">Operable/Number</span>
+				</div>
+				<div class="param desc">
+					The power of the exponentiation
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Operable.round</span><span class="aux">/</span><span class="function-name">Operable.floor</span><span class="aux">/</span><span class="function-name">Operable.ceil</span><span class="aux">/</span><span class="function-name">Operable.trunc</span><span class="aux">/</span><span class="function-name">Operable.abs</span><span class="aux">/</span><span class="function-name">Operable.sqrt</span><span class="aux">/</span><span class="function-name">Operable.log</span><span class="aux">/</span><span class="function-name">Operable.log2</span><span class="aux">/</span><span class="function-name">Operable.log10</span><span class="aux">/</span><span class="function-name">Operable.sin</span><span class="aux">/</span><span class="function-name">Operable.cos</span><span class="aux">/</span><span class="function-name">Operable.tan</span><span class="aux">/</span><span class="function-name">Operable.sinh</span><span class="aux">/</span><span class="function-name">Operable.cosh</span><span class="aux">/</span><span class="function-name">Operable.tanh</span><span class="aux">/</span><span class="function-name">Operable.asin</span><span class="aux">/</span><span class="function-name">Operable.acos</span><span class="aux">/</span><span class="function-name">Operable.atan</span><span class="aux">/</span><span class="function-name">Operable.asinh</span><span class="aux">/</span><span class="function-name">Operable.acosh</span><span class="aux">/</span><span class="function-name">Operable.atanh</span><span class="aux">/</span><span class="function-name">Operable.sign</span>(<span class="param">value</span>)<span class="type">Operable</span>
+			</div>
+			<div class="function desc">
+				Performs a built-in unary Math operation element-wise on an Operable.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">value</span><span class="type">Operable</span>
+				</div>
+				<div class="param desc">
+					The Operable to operate on
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

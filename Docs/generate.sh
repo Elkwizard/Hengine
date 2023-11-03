@@ -1,0 +1,1 @@
+node generate.js ../Package/Engine ./Generated/ ./structure.json

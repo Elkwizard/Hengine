@@ -1,0 +1,320 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Font">
+				<div class="class-header">
+					<span class="keyword">class</span> <span class="class-name">Font</span>
+				</div>
+				<div class="class desc">
+				Represents a font, including family, side, and styling. Fonts can be used in the text rendering functions of <a href="../../Pages/Rendering/Artist.html#Artist">Artist</a>.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">size</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The size of the font in CSS pixels</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">family</span><span class="type">String</span>
+					</div>
+					<div class="prop desc">The string identifier for the font family</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">bold</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether the font is bold</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">italic</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether the font is italic</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">lineHeight</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The height of a line of text in the font. This determines spacing between multiline strings</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">tabSize</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The number of spaces a tab is equivalent to for this font</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">Font.[FAMILY][SIZE]</span><span class="type">Font</span>
+					</div>
+					<div class="prop desc">These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. <span class="code">Font.Arial10</span>, or <span class="code">Font.Monospace95</span></div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">constructor</span>(<span class="param">size</span>, <span class="param">family</span>, <span class="param">bold?</span>, <span class="param">italic?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Creates a new font. This operation is fairly expensive and thus should not be done every frame unless necessary.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">size</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The size of the font
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">family</span><span class="type">String</span>
+				</div>
+				<div class="param desc">
+					The font family
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">bold</span><span class="type">Boolean</span>
+				</div>
+				<div class="param desc">
+					Whether the font is bold, default is false
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">italic</span><span class="type">Boolean</span>
+				</div>
+				<div class="param desc">
+					Whether the font is italic, default is false
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">packText</span>(<span class="param">text</span>, <span class="param">maxWidth</span>)<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">text</span><span class="type">String</span>
+				</div>
+				<div class="param desc">
+					The text to pack
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">maxWidth</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The maximum width of a single line in the output text
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">getTextBounds</span>(<span class="param">text</span>, <span class="param">maxWidth?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Returns the width and height of a string of text, optionally after being packed into a fixed max width. The return value contains <span class="code">width</span> and <span class="code">height</span> properties, both of which are Numbers.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">text</span><span class="type">String</span>
+				</div>
+				<div class="param desc">
+					The text to be measured
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">maxWidth</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The maximum width of a single line, default is Infinity
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">getTextLineWidth</span>(<span class="param">textLine</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the width of a single line of text. This method is faster than getTextWidth.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">textLine</span><span class="type">String</span>
+				</div>
+				<div class="param desc">
+					A single line string of text to measure
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">getTextLineHeight</span>(<span class="param">textLine</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the height of a single line of text. This method is faster than getTextHeight.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">textLine</span><span class="type">String</span>
+				</div>
+				<div class="param desc">
+					A single line string of text to measure
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">getTextWidth</span>(<span class="param">text</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the width of a string of text.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">text</span><span class="type">String</span>
+				</div>
+				<div class="param desc">
+					The text to measure
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">getTextHeight</span>(<span class="param">text</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the height of a string of text.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">text</span><span class="type">String</span>
+				</div>
+				<div class="param desc">
+					The text to measure
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">toString</span>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Converts the Font to a valid CSS font string.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">get</span>(<span class="param">void</span><span class="aux"> | </span><span class="param">destination</span>)<span class="type">Font</span>
+			</div>
+			<div class="function desc">
+				Copies the font into an optional destination font. If no destination is provided, a new Font is created to hold the copy.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">destination</span><span class="type">Font</span>
+				</div>
+				<div class="param desc">
+					The destination to be copied into
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	
