@@ -1,0 +1,243 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Vector2">
+				<div class="class-header">
+					<span class="keyword">class</span> <span class="class-name">Vector2</span> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a></span>
+				</div>
+				<div class="class desc">
+				Represents a 2D <a href="../../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a>.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">angle</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The clockwise (in screen space) angle of the Vector2 from the horizontal</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">normal</span><span class="type">Vector2</span>
+					</div>
+					<div class="prop desc">The Vector2 with the same magnitude but perpendicular direction. Right-handed (in screen space)</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">Vector2.modValues</span><span class="type">String[]</span>
+					</div>
+					<div class="prop desc">The modifiable elements of the Vector2, <span class="code">["x", "y"]</span></div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">constructor</span>(<span class="param">x</span>, <span class="param">y</span>)
+			</div>
+			<div class="function desc">
+				Creates a new Vector2.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">x</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The x component
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">y</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The y component
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">rotate</span>(<span class="param">angle</span>)<span class="type">Vector2</span>
+			</div>
+			<div class="function desc">
+				Rotates the Vector2 clockwise (in screen space). This operation is in-place and returns the caller.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">angle</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The amount (in radians) to rotate by
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">rotated</span>(<span class="param">angle</span>)<span class="type">Vector2</span>
+			</div>
+			<div class="function desc">
+				Returns a copy of the Vector2 rotated clockwise (in screen space) by a specified angle.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">angle</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The amount (in radians) to rotate by
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">cross</span>(<span class="param">v</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the 2D "cross product" (x1 * y2 - y1 * x2) between the caller and another Vector2.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">v</span><span class="type">Vector2</span>
+				</div>
+				<div class="param desc">
+					The second Vector2 in the product
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <span class="function-name">Vector2.left</span><span class="aux">/</span><span class="keyword">get</span> <span class="function-name">Vector2.right</span><span class="aux">/</span><span class="keyword">get</span> <span class="function-name">Vector2.up</span><span class="aux">/</span><span class="keyword">get</span> <span class="function-name">Vector2.down</span><span class="type">Vector2</span>
+			</div>
+			<div class="function desc">
+				Returns a new unit Vector2 pointing in a specified direction (in screen space).
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <span class="function-name">Vector2.origin</span><span class="type">Vector2</span>
+			</div>
+			<div class="function desc">
+				Returns a new Vector2 with both components initialized to 0.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Vector2.x</span>(<span class="param">x</span>)<span class="type">Vector2</span>
+			</div>
+			<div class="function desc">
+				Creates a Vector2 with a specified x component and a y component of 0.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">x</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The x coordinate
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Vector2.y</span>(<span class="param">y</span>)<span class="type">Vector2</span>
+			</div>
+			<div class="function desc">
+				Creates a Vector2 with a specified y component and a x component of 0.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">y</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The y coordinate
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Vector2.fromAngle</span>(<span class="param">angle</span>)<span class="type">Vector2</span>
+			</div>
+			<div class="function desc">
+				Creates a unit Vector2 with a specified clockwise (in screen space) angle from the horizontal.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">angle</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The angle of the Vector2
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

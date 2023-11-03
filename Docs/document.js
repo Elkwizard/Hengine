@@ -28,7 +28,7 @@ function documentFunction(fn, wrapperClass) {
 
 			return "";
 		}).join(`<span class="aux"> | </span>`);
-	const header = `${name}${fn.name.isGetter ? "" : `(${parameters})`}<span class="type">${returnType}</span>`;
+	const header = `${name}${fn.name.isGetter ? "" : `(${parameters})`}${fn.name.base === "constructor" ? "" : `<span class="type">${returnType}</span>`}`;
 	const parameterDescriptions = signatures
 		.flatMap(signature => signature)
 		.map(param => `

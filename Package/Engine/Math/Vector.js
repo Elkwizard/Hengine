@@ -117,7 +117,18 @@ class Vector extends Operable {
 	}
 }
 Vector.modValues = [];
+/**
+ * Represents a 2D Vector.
+ * @prop Number angle | The clockwise (in screen space) angle of the Vector2 from the horizontal
+ * @prop Vector2 normal | The Vector2 with the same magnitude but perpendicular direction. Right-handed (in screen space)
+ * @static_prop String[] modValues | The modifiable elements of the Vector2, `["x", "y"]`
+ */
 class Vector2 extends Vector {
+	/**
+	 * Creates a new Vector2.
+	 * @param Number x | The x component
+	 * @param Number y | The y component
+	 */
 	constructor(x, y = x) {
 		super();
 		this.x = x;
@@ -181,6 +192,11 @@ class Vector2 extends Vector {
 		}
 		return this;
 	}
+	/**
+	 * Rotates the Vector2 clockwise (in screen space). This operation is in-place and returns the caller.
+	 * @param Number angle | The amount (in radians) to rotate by
+	 * @return Vector2
+	 */
 	rotate(angle) {
 		let cos = Math.cos(angle);
 		let sin = Math.sin(angle);
@@ -190,6 +206,11 @@ class Vector2 extends Vector {
 		this.y = t_x * sin + t_y * cos;
 		return this;
 	}
+	/**
+	 * Returns a copy of the Vector2 rotated clockwise (in screen space) by a specified angle.
+	 * @param Number angle | The amount (in radians) to rotate by 
+	 * @return Vector2
+	 */
 	rotated(angle) {
 		let cos = Math.cos(angle);
 		let sin = Math.sin(angle);
@@ -198,6 +219,11 @@ class Vector2 extends Vector {
 	dot(v) {
 		return this.x * v.x + this.y * v.y;
 	}
+	/**
+	 * Returns the 2D "cross product" (x1 * y2 - y1 * x2) between the caller and another Vector2.
+	 * @param Vector2 v | The second Vector2 in the product 
+	 * @return Number
+	 */
 	cross(v) {
 		return this.x * v.y - this.y * v.x;
 	}
@@ -291,6 +317,11 @@ class Vector2 extends Vector {
 	static fromPhysicsVector(v) {
 		return new Vector2(v.x, v.y);
 	}
+	/**
+	 * @group static get left, static get right, static get up, static get down
+	 * Returns a new unit Vector2 pointing in a specified direction (in screen space).
+	 * @return Vector2
+	 */
 	static get left() {
 		return new Vector2(-1, 0);
 	}
@@ -303,15 +334,34 @@ class Vector2 extends Vector {
 	static get down() {
 		return new Vector2(0, 1);
 	}
+	/**
+	 * Returns a new Vector2 with both components initialized to 0.
+	 * @return Vector2
+	 */
 	static get origin() {
 		return new Vector2(0, 0);
 	}
+	/**
+	 * Creates a Vector2 with a specified x component and a y component of 0.
+	 * @param Number x | The x coordinate
+	 * @return Vector2
+	 */
 	static x(x) {
 		return new Vector2(x, 0);
 	}
+	/**
+	 * Creates a Vector2 with a specified y component and a x component of 0.
+	 * @param Number y | The y coordinate
+	 * @return Vector2
+	 */
 	static y(y) {
 		return new Vector2(0, y);
 	}
+	/**
+	 * Creates a unit Vector2 with a specified clockwise (in screen space) angle from the horizontal.
+	 * @param Number angle | The angle of the Vector2
+	 * @return Vector2
+	 */
 	static fromAngle(a) {
 		let x = Math.cos(a);
 		let y = Math.sin(a);
@@ -322,13 +372,30 @@ class Vector2 extends Vector {
 	}
 }
 Vector2.modValues = ["x", "y"];
+
+/**
+ * Represents a 3D Vector.
+ * @prop Number angle[UV] | The counter-clockwise angle of the Vector3 from the horizontal on the U-V plane. e.g. `vec.angleXY` or `vec.angleYZ`
+ * @static_prop String[] modValues | The modifiable elements of the Vector3, `["x", "y", "z"]`
+ */
 class Vector3 extends Vector {
+	/**
+	 * Creates a new Vector3.
+	 * @param Number x | The x component
+	 * @param Number y | The y component
+	 * @param Number z | The z component
+	 */
 	constructor(x, y = x, z = x) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
+	/**
+	 * Returns the cross product between the caller and another Vector3.
+	 * @param Vector3 v | The second Vector3 in the product 
+	 * @return Number
+	 */
 	cross(v, result = new Vector3()) {
 		const u = this;
 		result.x = u.y * v.z - u.z * v.y;
@@ -336,6 +403,26 @@ class Vector3 extends Vector {
 		result.z = u.x * v.y - u.y * v.x;
 		return result;
 	}
+	/**
+	 * @name rotate[UV]
+	 * Rotates the Vector3 counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
+	 * e.g. `vec.rotateYZ(0.1)`
+	 * @param Number angle | The amount (in radians) to rotate by
+	 * @return Vector3
+	 */
+	/**
+	 * @name rotated[UV]
+	 * Returns a copy of the Vector3 rotated counter-clockwise on the U-V plane.
+	 * @param Number angle | The amount (in radians) to rotate by
+	 * @return Vector3
+	 */
+	/**
+	 * Rotates the Vector3 counter-clockwise in-place about a specified axis.
+	 * Returns the caller.
+	 * @param Vector3 axis | The axis to rotate about
+	 * @param Number angle | The angle to rotate by 
+	 * @return Vector3
+	 */
 	rotateAboutAxis(axis, angle) {
 		const randomVectorX = (axis.x === 0 && axis.y === 0 && axis.z !== 0) ? 1 : 0;
 		const randomVectorZ = 1 - randomVectorX;
@@ -379,9 +466,20 @@ class Vector3 extends Vector {
 
 		return this;
 	}
+	/**
+	 * Returns a copy of the Vector3 rotated counter-clockwise about a specified axis.
+	 * @param Vector3 axis | The axis to rotate about
+	 * @param Number angle | The angle to rotate by 
+	 * @return Vector3
+	 */
 	rotatedAboutAxis(axis, angle, result) {
 		return this.get(result).rotateAboutAxis(axis, angle);
 	}
+	/**
+	 * @group static get left, static get right, static get up, static get down, static get forward, static get backward
+	 * Returns a new unit Vector3 pointing in the specified direction.
+	 * @return Vector3
+	 */
 	static get left() {
 		return new Vector3(-1, 0, 0);
 	}
@@ -400,17 +498,36 @@ class Vector3 extends Vector {
 	static get backward() {
 		return new Vector3(0, 0, -1);
 	}
+	/**
+	 * Returns a new Vector3 with all components equal to 0.
+	 * @return Vector3
+	 */
 	static get origin() {
 		return new Vector3(0, 0, 0);
 	}
+	/**
+	 * Creates a Vector3 with a specified x component and a y and z component of 0.
+	 * @param Number x | The x coordinate
+	 * @return Vector3
+	 */
 	static x(x) {
-		return new Vector3(x, 0, 0);
+		return new Vector4(x, 0, 0);
 	}
+	/**
+	 * Creates a Vector3 with a specified y component and an x and z component of 0.
+	 * @param Number y | The y coordinate
+	 * @return Vector3
+	 */
 	static y(y) {
-		return new Vector3(0, y, 0);
+		return new Vector4(0, y, 0);
 	}
+	/**
+	 * Creates a Vector3 with a specified z component and an x and z component of 0.
+	 * @param Number z | The z coordinate
+	 * @return Vector3
+	 */
 	static z(z) {
-		return new Vector3(0, 0, z);
+		return new Vector4(0, 0, z);
 	}
 	static fromPoint(p) {
 		return new Vector3(p.x || 0, p.y || 0, p.z || 0);
@@ -418,7 +535,20 @@ class Vector3 extends Vector {
 }
 
 Vector3.modValues = ["x", "y", "z"];
+
+/**
+ * Represents a 4D Vector.
+ * @prop Number angle[UV] | The counter-clockwise angle of the Vector3 from the horizontal on the U-V plane. e.g. `vec.angleYZ` or `vec.angleYW`
+ * @static_prop String[] modValues | The modifiable elements of the Vector4, `["x", "y", "z", "w"]`
+ */
 class Vector4 extends Vector {
+	/**
+	 * Creates a new Vector4.
+	 * @param Number x | The x component
+	 * @param Number y | The y component
+	 * @param Number z | The z component
+	 * @param Number w | The w component
+	 */
 	constructor(x, y = x, z = x, w = x) {
 		super();
 		this.x = x;
@@ -426,6 +556,26 @@ class Vector4 extends Vector {
 		this.z = z;
 		this.w = w;
 	}
+	
+	/**
+	 * @name rotate[UV]
+	 * Rotates the Vector4 counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
+	 * e.g. `vec.rotateZW(0.3)`
+	 * @param Number angle | The amount (in radians) to rotate by
+	 * @return Vector4
+	 */
+	/**
+	 * @name rotated[UV]
+	 * Returns a copy of the Vector4 rotated counter-clockwise on the U-V plane.
+	 * @param Number angle | The amount (in radians) to rotate by
+	 * @return Vector4
+	 */
+
+	/**
+	 * @group static get left, static get right, static get up, static get down, static get forward, static get backward, static get before, static get after
+	 * Returns a new unit Vector4 pointing in the specified direction.
+	 * @return Vector4
+	 */
 	static get left() {
 		return new Vector4(-1, 0, 0, 0);
 	}
@@ -450,18 +600,42 @@ class Vector4 extends Vector {
 	static get after() {
 		return new Vector4(0, 0, 0, 1);
 	}
+	/**
+	 * Returns a new Vector4 with all components equal to 0.
+	 * @return Vector4
+	 */
 	static get origin() {
 		return new Vector4(0, 0, 0, 0);
 	}
+	/**
+	 * Creates a Vector4 with a specified x component and a y, z, and w component of 0.
+	 * @param Number x | The x coordinate
+	 * @return Vector4
+	 */
 	static x(x) {
 		return new Vector4(x, 0, 0, 0);
 	}
+	/**
+	 * Creates a Vector4 with a specified y component and an x, z, and w component of 0.
+	 * @param Number y | The y coordinate
+	 * @return Vector4
+	 */
 	static y(y) {
 		return new Vector4(0, y, 0, 0);
 	}
+	/**
+	 * Creates a Vector4 with a specified z component and an x, z, and w component of 0.
+	 * @param Number z | The z coordinate
+	 * @return Vector4
+	 */
 	static z(z) {
 		return new Vector4(0, 0, z, 0);
 	}
+	/**
+	 * Creates a Vector4 with a specified w component and an x, y, and z component of 0.
+	 * @param Number w | The w coordinate
+	 * @return Vector4
+	 */
 	static w(w) {
 		return new Vector4(0, 0, 0, w);
 	}
