@@ -12,12 +12,186 @@
 					<span class="keyword">class</span> <span class="class-name">Vector</span> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Superclasses/Operable.html#Operable">Operable</a></span>
 				</div>
 				<div class="class desc">
-				
+				Represents a multidimensional Vector. This class is abstract and should not be constructed.
 				</div>
 				
 				
 				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">mag</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The magnitude of the Vector</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">sqrMag</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The squared magnitude of the Vector</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">normalized</span><span class="type">Vector</span>
+					</div>
+					<div class="prop desc">The unit Vector in the same direction of the Vector</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">inverse</span><span class="type">Vector</span>
+					</div>
+					<div class="prop desc">The Vector in the opposite direction with the same magnitude</div>
+				</div>
+			</div>
 				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">invert</span>()<span class="type">Vector</span>
+			</div>
+			<div class="function desc">
+				Inverts the Vector in-place and returns the caller.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">normalize</span>()<span class="type">Vector</span>
+			</div>
+			<div class="function desc">
+				Normalizes the Vector in-place and returns the caller.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">dot</span>(<span class="param">other</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Computes the dot product between the caller and another Vector.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">other</span><span class="type">Vector</span>
+				</div>
+				<div class="param desc">
+					The Vector to take the dot product with
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">projectOnto</span>(<span class="param">other</span>)<span class="type">Vector</span>
+			</div>
+			<div class="function desc">
+				Computes the projection of the caller onto another Vector. Doesn't mutate the caller.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">other</span><span class="type">Vector</span>
+				</div>
+				<div class="param desc">
+					The Vector to project the caller onto
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">toString</span>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Converts the Vector to a human readable String representation.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Vector.dist</span>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Computes the distance between two Vectors.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">a</span><span class="type">Vector</span>
+				</div>
+				<div class="param desc">
+					The first Vector
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">b</span><span class="type">Vector</span>
+				</div>
+				<div class="param desc">
+					The second Vector
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Vector.sqrDist</span>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Computes the squared distance between two Vectors.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">a</span><span class="type">Vector</span>
+				</div>
+				<div class="param desc">
+					The first Vector
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">b</span><span class="type">Vector</span>
+				</div>
+				<div class="param desc">
+					The second Vector
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	</div>
 				
 			</div>
 		

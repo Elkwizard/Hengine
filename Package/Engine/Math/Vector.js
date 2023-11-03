@@ -1,3 +1,11 @@
+/**
+ * Represents a multidimensional Vector.
+ * This class is abstract and should not be constructed.
+ * @prop Number mag | The magnitude of the Vector
+ * @prop Number sqrMag | The squared magnitude of the Vector
+ * @prop Vector normalized | The unit Vector in the same direction of the Vector
+ * @prop Vector inverse | The Vector in the opposite direction with the same magnitude
+ */
 class Vector extends Operable {
 	constructor() {
 		super();
@@ -26,17 +34,30 @@ class Vector extends Operable {
 	get inverse() {
 		return this.times(-1);
 	}
+	/**
+	 * Inverts the Vector in-place and returns the caller.
+	 * @return Vector
+	 */
 	invert() {
 		return this.mul(-1);
 	}
 	compare(v1, v2) {
 		return (v1.dot(this) > v2.dot(this)) ? v1 : v2;
 	}
+	/**
+	 * Normalizes the Vector in-place and returns the caller.
+	 * @return Vector
+	 */
 	normalize() {
 		const { mag } = this;
 		if (mag > 0) return this.div(mag);
 		return this;
 	}
+	/**
+	 * Computes the dot product between the caller and another Vector.
+	 * @param Vector other | The Vector to take the dot product with 
+	 * @return Number
+	 */
 	dot(v) {
 		const { modValues } = this.constructor;
 
@@ -48,6 +69,12 @@ class Vector extends Operable {
 
 		return result;
 	}
+	/**
+	 * Computes the projection of the caller onto another Vector.
+	 * Doesn't mutate the caller.
+	 * @param Vector other | The Vector to project the caller onto
+	 * @return Vector
+	 */
 	projectOnto(v) {
 		return v.times(this.dot(v) / v.sqrMag);
 	}
@@ -57,6 +84,10 @@ class Vector extends Operable {
 		if (d2 < d1) return this.inverse;
 		else return this.get();
 	}
+	/**
+	 * Converts the Vector to a human readable String representation.
+	 * @return String
+	 */
 	toString() {
 		return `\u27e8 ${this.values.join(", ")} \u27e9`;
 	}
@@ -66,9 +97,21 @@ class Vector extends Operable {
 	toMaxed(digits) {
 		return this.map(v => v.toMaxed(digits)).toString();
 	}
+	/**
+	 * Computes the distance between two Vectors. 
+	 * @param Vector a | The first Vector
+	 * @param Vector b | The second Vector
+	 * @return Number
+	 */
 	static dist(a, b) {
 		return a.minus(b).mag;
 	}
+	/**
+	 * Computes the squared distance between two Vectors. 
+	 * @param Vector a | The first Vector
+	 * @param Vector b | The second Vector
+	 * @return Number
+	 */
 	static sqrDist(a, b) {
 		return a.minus(b).sqrMag;
 	}
