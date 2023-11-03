@@ -1,8 +1,9 @@
 /**
  * Represents a composite mathematical object which element-wise operations can be performed on.
  * Many mathematical operations (plus, minus, times, over) can be performed on Operables of any type, allowing for convenient polymorphism.
- * Operable is an abstract superclass, and should not be constructed. All immutable methods, including static methods, are available on Numbers.
- * @subclass Vector, Color
+ * Operable is an abstract superclass, and should not be constructed.
+ * All immutable methods, including static methods, are available on Numbers.
+ * This means that Number can largely be considered a subclass of Operable and can be used for Operable-typed arguments.
  * @static_prop String[] modValues | The names of the elements in the Operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector)
  */
 class Operable {

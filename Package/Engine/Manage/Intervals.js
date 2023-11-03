@@ -1,3 +1,16 @@
+/**
+ * A wrapper for operations that happen over time or after a time.
+ * These can generally be created by methods of IntervalManager.
+ * @prop Function fn | The function to call during the operation
+ * @prop Symbol type | When during the update cycle the function updates
+ * @prop Promise promise | A promise which resolves when the operation completes
+ * @prop Boolean done | Indicates whether the operation has completed
+ * @prop Number timer | The amount of frames the IntervalFunction has existed for
+ * @prop Number interval | The total duration of the operation. The operation will complete after the timer exceeds this value
+ * @static_prop Symbol BEFORE_UPDATE | This symbol indicates that the operation should take place before the screen is cleared
+ * @static_prop Symbol UPDATE | This symbol indicates that the operation should take place immediately before the main engine update
+ * @static_prop Symbol AFTER_UPDATE | This symbol indicates that the operation should take place immediately after the main engine update
+ */
 class IntervalFunction {
 	constructor(fn, len, type) {
 		this.fn = fn;
@@ -20,6 +33,9 @@ IntervalFunction.BEFORE_UPDATE = Symbol("BEFORE_UPDATE");
 IntervalFunction.UPDATE = Symbol("UPDATE");
 IntervalFunction.AFTER_UPDATE = Symbol("AFTER_UPDATE");
 
+/**
+ * This IntervalFunction executes an operation once after a specified delay.
+ */
 class DelayedFunction extends IntervalFunction {
 	constructor(fn, wait, type) {
 		super(fn, wait, type);
@@ -28,6 +44,10 @@ class DelayedFunction extends IntervalFunction {
 		if (this.timer === Math.round(this.interval)) this.fn();
 	}
 }
+
+/**
+ * This IntervalFunction executes an operation every frame over a duration and is passed a completion percentage.
+ */
 class TransitionFunction extends IntervalFunction {
 	constructor(fn, wait, type) {
 		super(fn, wait, type);
@@ -36,6 +56,10 @@ class TransitionFunction extends IntervalFunction {
 		this.fn(this.timer / this.interval);
 	}
 }
+
+/**
+ * This IntervalFunction executes an operation once every frame forever.
+ */
 class ContinuousFunction extends IntervalFunction {
 	constructor(fn, type) {
 		super(fn, Infinity, type);
@@ -44,6 +68,11 @@ class ContinuousFunction extends IntervalFunction {
 		this.fn(this.timer);
 	}
 }
+
+/**
+ * This IntervalFunction executes an operation once after a provided condition is met.
+ * After the condition is met, the WaitUntilFunction finishes.
+ */
 class WaitUntilFunction extends IntervalFunction {
 	constructor(fn, event, type) {
 		super(fn, Infinity, type);
