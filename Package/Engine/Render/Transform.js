@@ -1,6 +1,13 @@
 /**
  * Represents an 2D affine transformation with no scaling.
  * It is composed of a rotation about the origin followed by a translation.
+ * ```js
+ * const obj = scene.main.addElement("my first object", 0, 0);
+ * console.log(obj.transform); // { position: (0, 0), rotation: 0 }
+ * 
+ * obj.transform.rotateAbout(new Vector2(0, 100), Math.PI);
+ * console.log(obj.transform); // { position: (0, 200), rotation: Math.PI }
+ * ```
  * @prop Vector2 position | The translation of the transform
  * @prop Number rotation | The angle of rotation (in radians) of the transform
  * @prop Vector2 direction | The unit direction the transform is facing in (alternate access method for rotation)

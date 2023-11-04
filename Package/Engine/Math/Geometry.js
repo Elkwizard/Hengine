@@ -507,7 +507,7 @@ class Geometry {
 	/**
 	 * Returns the closest intersection of a ray with a collection of shapes.
 	 * The return value is either null (if the raycast misses) or an object with two properties:
-	 * a .hitPoint property containing the location of the ray intersection, and a .hitShape property containing the shape that the ray intersected. 
+	 * a `.hitPoint` property containing the location of the ray intersection, and a `.hitShape` property containing the shape that the ray intersected. 
 	 * @param Vector2 rayOrigin | The starting point of the ray 
 	 * @param Vector2 rayDirection | The direction of the ray
 	 * @param Shape[] shapes | The Shapes to raycast against

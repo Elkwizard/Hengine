@@ -95,7 +95,7 @@ class HengineScriptResource extends HengineResource {
  */
 class HengineSoundResource extends HengineResource {
 	/**
-	 * Creates a new HengineSoundResource
+	 * Creates a new HengineSoundResource.
 	 * @param String src | The path to the sound
 	 * @param Boolean loops | Whether or not the sound loops
 	 */
@@ -143,7 +143,7 @@ class HengineImageResource extends HengineResource {
  */
 class HengineVideoResource extends HengineResource {
 	/**
-	 * Creates a new HengineVideoResource
+	 * Creates a new HengineVideoResource.
 	 * @param String src | The path to the video
 	 * @param Boolean loops | Whether or not the video loops
 	 */
@@ -320,7 +320,7 @@ class HengineBinaryResource extends HengineResource {
 }
 
 /**
- * Represents a batch of HengineResources to be loaded in a row, and can be used as a more streamlined approach to constructing HengineResources by directly.
+ * Represents a batch of HengineResources to be loaded in a row, and can be used as a more streamlined approach compared to constructing HengineResources directly.
  * It contains an internal list of resources to load, and many of its methods simply add to this list, which can eventually be flushed and loaded, though only once per instance.
  * These methods also return the caller, which allows for convenient chaining.
  * ```js
