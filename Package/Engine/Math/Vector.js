@@ -1,10 +1,10 @@
 /**
- * Represents a multidimensional Vector.
+ * Represents a multidimensional vector.
  * This class is abstract and should not be constructed.
- * @prop Number mag | The magnitude of the Vector
- * @prop Number sqrMag | The squared magnitude of the Vector
- * @prop Vector normalized | The unit Vector in the same direction of the Vector
- * @prop Vector inverse | The Vector in the opposite direction with the same magnitude
+ * @prop Number mag | The magnitude of the vector
+ * @prop Number sqrMag | The squared magnitude of the vector
+ * @prop Vector normalized | The unit vector in the same direction of the vector
+ * @prop Vector inverse | The vector in the opposite direction with the same magnitude
  */
 class Vector extends Operable {
 	constructor() {
@@ -35,7 +35,7 @@ class Vector extends Operable {
 		return this.times(-1);
 	}
 	/**
-	 * Inverts the Vector in-place and returns the caller.
+	 * Inverts the vector in-place and returns the caller.
 	 * @return Vector
 	 */
 	invert() {
@@ -45,7 +45,7 @@ class Vector extends Operable {
 		return (v1.dot(this) > v2.dot(this)) ? v1 : v2;
 	}
 	/**
-	 * Normalizes the Vector in-place and returns the caller.
+	 * Normalizes the vector in-place and returns the caller.
 	 * @return Vector
 	 */
 	normalize() {
@@ -54,8 +54,8 @@ class Vector extends Operable {
 		return this;
 	}
 	/**
-	 * Computes the dot product between the caller and another Vector.
-	 * @param Vector other | The Vector to take the dot product with 
+	 * Computes the dot product between the caller and another vector.
+	 * @param Vector other | The vector to take the dot product with 
 	 * @return Number
 	 */
 	dot(v) {
@@ -70,9 +70,9 @@ class Vector extends Operable {
 		return result;
 	}
 	/**
-	 * Computes the projection of the caller onto another Vector.
+	 * Computes the projection of the caller onto another vector.
 	 * Doesn't mutate the caller.
-	 * @param Vector other | The Vector to project the caller onto
+	 * @param Vector other | The vector to project the caller onto
 	 * @return Vector
 	 */
 	projectOnto(v) {
@@ -85,7 +85,7 @@ class Vector extends Operable {
 		else return this.get();
 	}
 	/**
-	 * Converts the Vector to a human readable String representation.
+	 * Converts the vector to a human readable String representation.
 	 * @return String
 	 */
 	toString() {
@@ -98,18 +98,18 @@ class Vector extends Operable {
 		return this.map(v => v.toMaxed(digits)).toString();
 	}
 	/**
-	 * Computes the distance between two Vectors. 
-	 * @param Vector a | The first Vector
-	 * @param Vector b | The second Vector
+	 * Computes the distance between two vectors. 
+	 * @param Vector a | The first vector
+	 * @param Vector b | The second vector
 	 * @return Number
 	 */
 	static dist(a, b) {
 		return a.minus(b).mag;
 	}
 	/**
-	 * Computes the squared distance between two Vectors. 
-	 * @param Vector a | The first Vector
-	 * @param Vector b | The second Vector
+	 * Computes the squared distance between two vectors. 
+	 * @param Vector a | The first vector
+	 * @param Vector b | The second vector
 	 * @return Number
 	 */
 	static sqrDist(a, b) {
@@ -118,7 +118,7 @@ class Vector extends Operable {
 }
 Vector.modValues = [];
 /**
- * Represents a 2D Vector.
+ * Represents a 2D vector.
  * @prop Number angle | The clockwise (in screen space) angle of the vector from the horizontal
  * @prop Vector2 normal | The vector with the same magnitude but perpendicular direction. Right-handed (in screen space)
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y"]`
@@ -374,7 +374,7 @@ class Vector2 extends Vector {
 Vector2.modValues = ["x", "y"];
 
 /**
- * Represents a 3D Vector.
+ * Represents a 3D vector.
  * @prop Number angle[UV] | The counter-clockwise angle of the vector from the horizontal on the U-V plane. e.g. `vec.angleXY` or `vec.angleYZ`
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y", "z"]`
  */
@@ -537,7 +537,7 @@ class Vector3 extends Vector {
 Vector3.modValues = ["x", "y", "z"];
 
 /**
- * Represents a 4D Vector.
+ * Represents a 4D vector.
  * @prop Number angle[UV] | The counter-clockwise angle of the vector from the horizontal on the U-V plane. e.g. `vec.angleYZ` or `vec.angleYW`
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y", "z", "w"]`
  */

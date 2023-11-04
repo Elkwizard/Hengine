@@ -30,6 +30,7 @@ const populatePathMap = (structure, file = ".") => {
 populatePathMap(structure);
 
 function writeFile(fileName, content) {
+	content = content.replaceAll("\n", "\r\n");
 	fileName = path.join(dstPath, fileName);
 	const dir = path.dirname(fileName);
 	if (!fs.existsSync(dir))
