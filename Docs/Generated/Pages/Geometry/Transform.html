@@ -12,7 +12,8 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Transform.js?#L8" class="class-name source-link">Transform</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Geometry/Matrix3.html#Matrix3">Matrix3</a></span>
 				</div>
 				<div class="class desc">
-				Represents an 2D affine transformation with no scaling. It is composed of a rotation about the origin followed by a translation.
+				Represents an 2D affine transformation with no scaling.
+It is composed of a rotation about the origin followed by a translation.
 				</div>
 				
 				
@@ -162,7 +163,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Transform.js?#L112" class="function-name source-link">globalSpaceToLocalSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
-				Transforms a given point by applying the inverse of the caller to it. This translates the point by the inverse of the transform's position and then rotates it counter-clockwise (in screen space) about the origin by the transform's rotation.
+				Transforms a given point by applying the inverse of the caller to it.
+This translates the point by the inverse of the transform's position and then rotates it counter-clockwise (in screen space) about the origin by the transform's rotation.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -186,7 +188,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Transform.js?#L121" class="function-name source-link">localSpaceToGlobalSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
-				Transforms a given point by applying the caller to it. This rotates the point clockwise (in screen space) about the origin by the transform's rotation and then translates it by the transform's position.
+				Transforms a given point by applying the caller to it.
+This rotates the point clockwise (in screen space) about the origin by the transform's rotation and then translates it by the transform's position.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -207,10 +210,15 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Transform.js?#L158" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Transform.js?#L164" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform which has the same effect as applying two transformations in a row.
+<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">const</span><span style="color: #88d"> a</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> Transform</span><span style="color: #f8f">(</span><span style="color: #fd1">10</span><span style="color: #f8f">,</span><span style="color: #fd1"> 10</span><span style="color: #f8f">,</span><span style="color: #fd1"> 0</span><span style="color: #f8f">);</span><span style="color: #a5a">
+const</span><span style="color: #88d"> b</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> Transform</span><span style="color: #f8f">(</span><span style="color: #fd1">20</span><span style="color: #f8f">,</span><span style="color: #fd1"> 20</span><span style="color: #f8f">, </span><span style="color: #ddd">Math</span><span style="color: #f8f">.</span><span style="color: #88d">PI</span><span style="color: #f8f"> /</span><span style="color: #fd1"> 2</span><span style="color: #f8f">);</span><span style="color: #a5a">
+const</span><span style="color: #88d"> composedTransf</span><span style="color: #f8f"> = </span><span style="color: #ddd">Transform</span><span style="color: #f8f">.</span><span style="color: #88d">combine</span><span style="color: #f8f">(</span><span style="color: #ddd">a</span><span style="color: #f8f">, </span><span style="color: #ddd">b</span><span style="color: #f8f">);
+</span><span style="color: #ddd">console</span><span style="color: #f8f">.</span><span style="color: #88d">log</span><span style="color: #f8f">(</span><span style="color: #ddd">composedTransf</span><span style="color: #f8f">); </span><span style="color: #444">// -&gt; { position: (30, 30), rotation: Math.PI / 2 }</span><span style="color: #f8f">
+</span></code>
 			</div>
 			
 			<div class="header">Parameters</div>

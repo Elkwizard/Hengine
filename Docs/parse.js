@@ -105,7 +105,7 @@ function parse(content, file) {
 				resultLines.push(line);
 			} else if (line.category === null) {
 				while (lines[++i]?.category === null)
-					line.content += " " + lines[i].content;
+					line.content += "\n" + lines[i].content;
 				i--;
 				resultLines.push(line);
 			} else resultLines.push(line);

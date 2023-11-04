@@ -12,7 +12,11 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L9" class="class-name source-link">Operable</a>
 				</div>
 				<div class="class desc">
-				Represents a composite mathematical object which element-wise operations can be performed on. Many mathematical operations (plus, minus, times, over) can be performed on operables of any subclass type, allowing for convenient polymorphism. Operable is an abstract superclass, and should not be constructed. All immutable methods, including static methods, are available on Number. This means that Number can largely be considered a subclass of operable and can be used for operable-typed arguments.
+				Represents a composite mathematical object which element-wise operations can be performed on.
+Many mathematical operations (plus, minus, times, over) can be performed on operables of any subclass type, allowing for convenient polymorphism.
+Operable is an abstract superclass, and should not be constructed.
+All immutable methods, including static methods, are available on Number.
+This means that Number can largely be considered a subclass of operable and can be used for operable-typed arguments.
 				</div>
 				
 					<div class="header">Subclasses</div>
@@ -26,7 +30,7 @@
 					<div class="prop-header member">
 						<span class="prop-name">Operable.modValues</span><span class="type">String[]</span>
 					</div>
-					<div class="prop desc">The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. <span class="code">["x", "y"]</span> for <a href="../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a>)</div>
+					<div class="prop desc">The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. <code>["x", "y"]</code> for <a href="../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a>)</div>
 				</div>
 			</div>
 				
@@ -49,7 +53,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L29" class="function-name source-link">set</a>(<span class="param">other</span><span class="aux"> | </span><span class="param">...elements</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Sets all elements of the operable, either by copying from another operable of the same type, or by using a list of numeric values. Returns the caller.
+				Sets all elements of the operable, either by copying from another operable of the same type, or by using a list of numeric values.
+Returns the caller.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -131,7 +136,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L85" class="function-name source-link">add</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L85" class="function-name source-link">sub</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L85" class="function-name source-link">mul</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L85" class="function-name source-link">div</a>(<span class="param">operable</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Performs an in-place element-wise arithmetic operation between the caller and another operable or Number. Returns the caller.
+				Performs an in-place element-wise arithmetic operation between the caller and another operable or Number.
+Returns the caller.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -155,7 +161,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L104" class="function-name source-link">plus</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L104" class="function-name source-link">minus</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L104" class="function-name source-link">times</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L104" class="function-name source-link">over</a>(<span class="param">operable</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Performs an immutable element-wise arithmetic operation between the caller and another operable or Number. Returns the result of the operation, leaving the operands unchanged.
+				Performs an immutable element-wise arithmetic operation between the caller and another operable or Number.
+Returns the result of the operation, leaving the operands unchanged.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -383,7 +390,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L234" class="function-name source-link">Operable.clamp</a>(<span class="param">value</span>, <span class="param">min</span>, <span class="param">max</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Returns an operable clamped element-wise between two bounds. Equivalent to <span class="code">Operable.max(min, operable.min(max, value))</span>.
+				Returns an operable clamped element-wise between two bounds.
+Equivalent to <code>Operable.max(min, operable.min(max, value))</code>.
 			</div>
 			
 			<div class="header">Parameters</div>

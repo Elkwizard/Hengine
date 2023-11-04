@@ -99,7 +99,7 @@ a:not(.source-link) {
 .param-wrapper {
 	padding: 0.5em;
 	padding-left: 1em;
-	margin: 0.8em 0;
+	margin: 0.3em 0;
 }
 
 .function-signature::before, .header {
@@ -111,19 +111,53 @@ a:not(.source-link) {
 }
 
 .function-wrapper .header {
-	font-size: 1.1em;
+	font-size: 1.4em;
 }
 
 .header {
-	font-size: 1.5em;
+	font-size: 2em;
 	border-bottom: 1px var(--accent-1) solid;
 }
 
-.code {
-	color: black;
-	background: #ccc;
+code {
+	width: 100%;
+	white-space: pre;
+	tab-size: 4ch;
+	color: white;
+	background: #112;
 	padding: 0.2em;
 	border-radius: 0.1em;
+}
+
+code.block {
+	display: block;
+	padding: 1em;
+	border-radius: 0.5em;
+	margin: 0.8em;
+	margin-left: 0;
+	position: relative;
+}
+
+code.block span {
+	display: inline;
+}
+
+code.block button {
+	position: absolute;
+	background: none;
+	border: none;
+	color: white;
+	font-weight: bold;
+	font-size: 2em;
+	right: 0.5em;
+	top: 0.3em;
+	cursor: pointer;
+	transition: opacity 0.3s;
+	opacity: 0;
+}
+
+code.block button:hover {
+	opacity: 1;
 }
 
 .desc {

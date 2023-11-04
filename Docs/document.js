@@ -1,4 +1,6 @@
 const path = require("path");
+const { highlight, highlighters, palettes } = require("./highlight");
+
 
 function sourceLink(doc) {
 	return `https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/${doc.source.file}?#L${doc.source.line}`;
@@ -117,9 +119,16 @@ function document(doc, topLevelIDs, file) {
 		`;
 	} else result = documentFunction(doc);
 
-	const toRoot = path.relative(path.dirname(file), ".");
-	result = result.replace(/`(.*?)`/g, `<span class="code">$1</span>`);
 	console.log(`documenting ${doc.name.base}`);
+
+	// highlight and transform code blocks
+	result = result.replace(/```(\w+?)\n([\w\W]*?)```/g, (_, language, code) => {
+		return highlight(code, highlighters[language], palettes.dark, true);
+	});
+	result = result.replace(/`(.*?)`/g, `<code>$1</code>`);
+	
+	// add automatic links to other doc pages
+	const toRoot = path.relative(path.dirname(file), ".");
 	for (const [id, filePath] of Object.entries(topLevelIDs)) {
 		if (file === filePath) continue;
 		const regex = new RegExp(String.raw`(?<!href="([^"\n]*?))\b(${id}(s|es)?)\b`, "g");

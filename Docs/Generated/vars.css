@@ -1,10 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
+@font-face {
+	font-family: "Cascadia Code";
+	src: url(./CascadiaCode.ttf);
+}
+
+:root {
+	--accent-1: #c86432;
+	--accent-2: #6464ff;
+	--accent-3: rgb(50, 50, 100);
+	--background: rgb(20, 20, 40);
+	--text-font: "Open Sans", "Arial", sans-serif;
+	--code-font: "Cascadia Code", Consolas, monospace;
+}
+
+html {
+	font-size: 13px;
+}
+
 * {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	font-family: monospace;
+	font-family: var(--code-font);
 	font-size: 1em;
 }
 
@@ -17,12 +35,4 @@
 
 ::-webkit-scrollbar-thumb {
 	background: var(--accent-3);
-}
-
-:root {
-	--accent-1: #c86432;
-	--accent-2: #6464ff;
-	--accent-3: rgb(50, 50, 100);
-	--background: rgb(20, 20, 40);
-	--text-font: "Open Sans", Arial, sans-serif;
 }

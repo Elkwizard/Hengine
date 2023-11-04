@@ -12,7 +12,8 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Matrix.js?#L6" class="class-name source-link">Matrix3</a> <span class="keyword">extends</span> <span class="class-name">Float64Array</span>
 				</div>
 				<div class="class desc">
-				Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates. Due to its use with 2D vectors, the last row of the matrix is not used and will always be [ 1 0 0 ].
+				Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates.
+Due to its use with 2D vectors, the last row of the matrix is not used and will always be [ 1 0 0 ].
 				</div>
 				
 					<div class="header">Subclasses</div>
@@ -39,7 +40,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Matrix.js?#L20" class="function-name source-link">constructor</a>(<span class="param">m00?</span>, <span class="param">m01?</span>, <span class="param">m02?</span>, <span class="param">m10?</span>, <span class="param">m11?</span>, <span class="param">m12?</span>, <span class="param">m20?</span>, <span class="param">m21?</span>, <span class="param">m22?</span>)
 			</div>
 			<div class="function desc">
-				Creates a new Matrix3. All arguments are optional and default to their values for an identity matrix.
+				Creates a new Matrix3.
+All arguments are optional and default to their values for an identity matrix.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -183,7 +185,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Matrix.js?#L93" class="function-name source-link">invert</a>()<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
-				Inverts the matrix in-place and returns it. If the matrix isn't invertible, the caller is unchanged and null is returned.
+				Inverts the matrix in-place and returns it.
+If the matrix isn't invertible, the caller is unchanged and null is returned.
 			</div>
 			
 		</div>
@@ -237,7 +240,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Matrix.js?#L153" class="function-name source-link">times</a>(<span class="param">matrix</span>, <span class="param">destination?</span><span class="aux"> | </span><span class="param">vector</span>, <span class="param">destination?</span><span class="aux"> | </span><span class="param">scale</span>, <span class="param">destination?</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
-				Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination. If no destination is provided, one will be created.
+				Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
+If no destination is provided, one will be created.
 			</div>
 			
 			<div class="header">Parameters</div>
