@@ -121,7 +121,7 @@ function document(doc, topLevelIDs, file) {
 	result = result.replace(/`(.*?)`/g, `<span class="code">$1</span>`);
 	console.log(`documenting ${doc.name.base}`);
 	for (const [id, filePath] of Object.entries(topLevelIDs)) {
-		if (id === doc.name.base) continue;
+		if (file === filePath) continue;
 		const regex = new RegExp(String.raw`(?<!href="([^"\n]*?))\b(${id}(s|es)?)\b`, "g");
 		const link = `<a href=${JSON.stringify(
 			path.join(toRoot, filePath)
