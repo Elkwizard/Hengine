@@ -1,4 +1,17 @@
+/**
+ * Represents an 2D affine transformation with no scaling.
+ * It is composed of a rotation about the origin followed by a translation.
+ * @prop Vector2 position | The translation of the transform
+ * @prop Number rotation | The angle of rotation (in radians) of the transform
+ * @prop Vector2 direction | The unit direction the transform is facing in (alternate access method for rotation)
+ */
 class Transform extends Matrix3 {
+	/**
+	 * Creates a new Transform.
+	 * @param Number x | The initial x translation
+	 * @param Number y | The initial y translation
+	 * @param Number rotation | The initial rotation of the  
+	 */
 	constructor(x, y, rotation) {
 		super(
 			1, 0, x,
@@ -26,6 +39,10 @@ class Transform extends Matrix3 {
 			}
 		});
 	}
+	/**
+	 * Returns a transform that, when composed with the caller, will produce no offset and no rotation.
+	 * @return Transform
+	 */
 	get inverse() {
 		const pos = this.position.inverse.rotate(-this.rotation);
 		return new Transform(pos.x, pos.y, -this.rotation);
@@ -57,6 +74,11 @@ class Transform extends Matrix3 {
 	get direction() {
 		return new Vector2(this.cosRotation, this.sinRotation);
 	}
+	/**
+	 * Creates a copy of the transform and optionally stores it in a provided destination.
+	 * @param Transform destination? | The destination to copy the transform into.
+	 * @return Transform
+	 */
 	get(transf = new Transform(0, 0, 0)) {
 		transf.position = this.position;
 		transf.rotation = this.rotation;
@@ -69,6 +91,11 @@ class Transform extends Matrix3 {
 		let dr = Math.abs(this.rotation - transf.rotation);
 		return dx > EPSILON || dy > EPSILON || dr > EPSILON;
 	}
+	/**
+	 * Adds a clockwise (in screen space) rotation in-place about a specific point to the existing transformation. 
+	 * @param Vector2 point | The center to rotate about
+	 * @param Number rotation | The angle (in radians) to rotate by
+	 */
 	rotateAround(point, rotation) {
 		const diff = this.position.Vminus(point);
 		diff.rotate(rotation);
@@ -76,9 +103,21 @@ class Transform extends Matrix3 {
 		this.position = diff;
 		this.rotation += rotation;
 	}
+	/**
+	 * Transforms a given point by applying the inverse of the caller to it.
+	 * This translates the point by the inverse of the transform's position and then rotates it counter-clockwise (in screen space) about the origin by the transform's rotation.
+	 * @param Vector2 point | The point to transform
+	 * @return Vector2
+	 */
 	globalSpaceToLocalSpace(v) {
 		return v.Vminus(this.position).rotate(-this.rotation);
 	}
+	/**
+	 * Transforms a given point by applying the caller to it.
+	 * This rotates the point clockwise (in screen space) about the origin by the transform's rotation and then translates it by the transform's position.
+	 * @param Vector2 point | The point to transform
+	 * @return Vector2
+	 */
 	localSpaceToGlobalSpace(v) {
 		return v.rotated(this.rotation).Vadd(this.position);
 	}
@@ -110,6 +149,12 @@ class Transform extends Matrix3 {
 		artist();
 		if (r) renderer.rotate(r);
 	}
+	/**
+	 * Returns a transform which has the same effect as applying two transformations in a row.
+	 * @param Transform a | The first transformation
+	 * @param Transform b | The second transformation
+	 * @return Transform
+	 */
 	static combine(a, b) {
 		let tx = a.position.x;
 		let ty = a.position.y;

@@ -1,7 +1,7 @@
 const RectPriority = defineEnum("SQUARE", "HORIZONTAL", "VERTICAL");
 
 /**
- * Provides a collection of 2D geometric algorithms that operate on Shapes and Vectors.
+ * Provides a collection of 2D geometric algorithms that operate on shapes and vectors.
  * All methods of this class are static and do not mutate their arguments.
  */
 class Geometry {
@@ -26,7 +26,7 @@ class Geometry {
 		return result;
 	}
 	/**
-	 * Applies a single smoothing step to a Polygon.
+	 * Applies a single smoothing step to a polygon.
 	 * @param Polygon shape | The shape to be smoothed
 	 * @return Polygon
 	 */
@@ -47,7 +47,7 @@ class Geometry {
 		return new Polygon(result);
 	}
 	/**
-	 * Simplifies a Polygon by removing a specified proportion of the vertices.
+	 * Simplifies a polygon by removing a specified proportion of the vertices.
 	 * @param Polygon polygon | The polygon to simplify
 	 * @param Number percent | The percentage of vertices to remove
 	 * @return Polygon
@@ -61,8 +61,8 @@ class Geometry {
 		return new Polygon(vertices);
 	}
 	/**
-	 * Inflates a Polygon along its normals by a specified distance.
-	 * @param Polygon polygon | The Polygon to inflate
+	 * Inflates a polygon along its normals by a specified distance.
+	 * @param Polygon polygon | The polygon to inflate
 	 * @param Number distance | The distance to extrude by
 	 * @return Polygon
 	 */
@@ -83,7 +83,7 @@ class Geometry {
 		return new Polygon(vertices);
 	}
 	/**
-	 * Simplifies a Polygon by combining adjacent edges that are nearly colinear. 
+	 * Simplifies a polygon by combining adjacent edges that are nearly colinear. 
 	 * @param Polygon polygon | The polygon to simplify
 	 * @param Number dtheta | The maximum angular difference in direction between two consecutive edges where they will be combined 
 	 * @return Polygon
@@ -105,9 +105,9 @@ class Geometry {
 		return new Polygon(finalEdges.map(edge => edge.a));
 	}
 	/**
-	 * Creates a triangular decomposition of the provided convex Polygon.
-	 * The triangles are returned as arrays of three Vector2s. 
-	 * @param Polygon shape | The convex Polygon to decompose 
+	 * Creates a triangular decomposition of the provided convex polygon.
+	 * The triangles are returned as arrays of three vectors. 
+	 * @param Polygon shape | The convex polygon to decompose 
 	 * @return Vector2[3][]
 	 */
 	static triangulate(shape) {
@@ -648,7 +648,7 @@ class Geometry {
 		return [vertices]; // already convex, go home
 	}
 	/**
-	 * Decomposes any Polygon into a collection of convex Polygons that occupy the same space.
+	 * Decomposes any polygon into a collection of convex polygons that occupy the same space.
 	 * @param Polygon polygon | The polygon to subdivide
 	 * @return Polygon[]
 	 */
@@ -657,10 +657,10 @@ class Geometry {
 			.map(v => new Polygon(v));
 	}
 	/**
-	 * Returns the point of intersection between a Line segment and a ray, or null if they don't intersect
+	 * Returns the point of intersection between a line segment and a ray, or null if they don't intersect
 	 * @param Vector2 rayOrigin | The origin of the ray
 	 * @param Vector2 rayDirection | The direction of the ray
-	 * @param Line line | The Line
+	 * @param Line line | The line
 	 * @return Vector2/null
 	 */
 	static intersectRayLine(ro, rd, line) {
@@ -684,9 +684,9 @@ class Geometry {
 		return lineVector.times(s).add(lineOrigin);
 	}
 	/**
-	 * Returns the point of intersection between two Line segments, or null if they don't intersect
-	 * @param Line a | The first Line
-	 * @param Line b | The second Line
+	 * Returns the point of intersection between two line segments, or null if they don't intersect
+	 * @param Line a | The first line
+	 * @param Line b | The second line
 	 * @return Vector2/null
 	 */
 	static intersectLineLine(lineA, lineB) {
@@ -710,9 +710,9 @@ class Geometry {
 		return aVector.times(t).add(aOrigin);
 	}
 	/**
-	 * Returns the region of intersection between two Polygons, or null if they don't intersect.
-	 * @param Polygon a | The first Polygon
-	 * @param Polygon b | The second Polygon
+	 * Returns the region of intersection between two polygons, or null if they don't intersect.
+	 * @param Polygon a | The first polygon
+	 * @param Polygon b | The second polygon
 	 * @return Polygon/null
 	 */
 	static intersectPolygonPolygon(a, b) {

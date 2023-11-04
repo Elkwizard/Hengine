@@ -1,0 +1,236 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Range">
+				<div class="class-header">
+					<span class="keyword">class</span> <span class="class-name">Range</span>
+				</div>
+				<div class="class desc">
+				Represents an inclusive interval.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">min</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The lower bound of the interval</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">max</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The upper bound of the interval</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">constructor</span>(<span class="param">void</span><span class="aux"> | </span><span class="param">min</span>, <span class="param">max</span>)
+			</div>
+			<div class="function desc">
+				Creates a new interval, optionally with a specific min and max. If no arguments are provided, the interval will be empty.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">min</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The lower bound
+				</div>
+			</div>
+		
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">max</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The upper bound
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <span class="function-name">middle</span><span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the mean value of the range.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <span class="function-name">length</span><span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the size of the interval represented by the range.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">clip</span>(<span class="param">range</span>)<span class="type">Range</span>
+			</div>
+			<div class="function desc">
+				Returns the set intersection between the caller and another range.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">range</span><span class="type">Range</span>
+				</div>
+				<div class="param desc">
+					The range to clip against
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">getDepth</span>(<span class="param">value</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the distance from a specified value to the closest bound of the range. If the value is inside the range, the distance will be positive, otherwise, it will be negative.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">value</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The value to check the depth of
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">includes</span>(<span class="param">value</span>)<span class="type">Range</span>
+			</div>
+			<div class="function desc">
+				Checks whether a value is within the current bounds of the range.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">value</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The value to check
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">include</span>(<span class="param">value</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Expands the Range to include a specified value.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">value</span><span class="type">Number</span>
+				</div>
+				<div class="param desc">
+					The value to include
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">intersect</span>(<span class="param">range</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks if there is any overlap between the caller and another range.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">range</span><span class="type">Range</span>
+				</div>
+				<div class="param desc">
+					The range to check against
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="function-name">Range.fromValues</span>(<span class="param">values</span>)<span class="type">Range</span>
+			</div>
+			<div class="function desc">
+				Returns the smallest range that contains every one of a collection of values.
+			</div>
+			
+			<div class="header">Parameters</div>
+			<div class="function-signature">
+				
+			<div class="param-wrapper">
+				<div class="param-name">
+					<span class="param">values</span><span class="type">Number[]</span>
+				</div>
+				<div class="param desc">
+					The set of values to bound
+				</div>
+			</div>
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

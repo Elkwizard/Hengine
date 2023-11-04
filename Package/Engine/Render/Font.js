@@ -188,10 +188,8 @@ class Font {
 		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${familyString}`;
 	}
 	/**
-	 * Copies the font into an optional destination font. If no destination is provided, a new Font is created to hold the copy.
-	 * @signature
-	 * @signature
-	 * @param Font destination | The destination to be copied into
+	 * Creates a copy of the font and optionally stores it in a provided destination.
+	 * @param Font destination? | The destination to copy the font into.
 	 * @return Font
 	 */
 	get(font = new Font(0, "serif", false, false)) {

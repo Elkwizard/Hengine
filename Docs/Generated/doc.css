@@ -61,7 +61,7 @@ a {
 	padding: 2em;
 }
 
-.class-wrapper .function-wrapper, .param-wrapper, .prop-wrapper {
+.class-wrapper .function-wrapper, .prop-wrapper {
 	border: 2px var(--accent-3) solid;
 	border-right: none;
 	border-bottom: none;

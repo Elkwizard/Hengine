@@ -1,4 +1,22 @@
+/**
+ * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates.
+ * Due to its use with 2D vectors, the last row of the matrix is not used and will always be [ 1 0 0 ]. 
+ * @prop Number m[R][C] | The matrix element in row R and column C (0-indexed).
+ */
 class Matrix3 extends Float64Array {
+	/**
+	 * Creates a new Matrix3.
+	 * All arguments are optional and default to their values for an identity matrix.
+	 * @param Number m00? | The matrix element in row 0 and column 0  
+	 * @param Number m01? | The matrix element in row 0 and column 1  
+	 * @param Number m02? | The matrix element in row 0 and column 2  
+	 * @param Number m10? | The matrix element in row 1 and column 0  
+	 * @param Number m11? | The matrix element in row 1 and column 1  
+	 * @param Number m12? | The matrix element in row 1 and column 2  
+	 * @param Number m20? | The matrix element in row 2 and column 0  
+	 * @param Number m21? | The matrix element in row 2 and column 1  
+	 * @param Number m22? | The matrix element in row 2 and column 2  
+	 */
 	constructor(
 		m00 = 1, m01 = 0, m02 = 0,
 		m10 = 0, m11 = 1, m12 = 0,
@@ -33,6 +51,10 @@ class Matrix3 extends Float64Array {
 	get m21() { return this[5]; } 
 	set m22(a) { this[8] = a; } 
 	get m22() { return this[8]; } 
+	/**
+	 * Returns the determinant of the matrix.
+	 * @return Number
+	 */
 	get determinant() {
 		const [
 			a, d, g,
@@ -42,15 +64,32 @@ class Matrix3 extends Float64Array {
 
 		return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
 	}
+	/**
+	 * Returns a matrix which is the transpose of the caller.
+	 * @return Matrix3
+	 */
 	get transposed() {
 		return this.get().transpose();
 	}
+	/**
+	 * Returns a matrix which is the inverse of the caller, or null if there is none.
+	 * @return Matrix3/null
+	 */
 	get inverse() {
 		return this.get().invert();
 	}
+	/**
+	 * Transposes the matrix in-place and returns it.
+	 * @return Matrix3
+	 */
 	transpose() {
 		return Matrix3.create(...this, this);
 	}
+	/**
+	 * Inverts the matrix in-place and returns it.
+	 * If the matrix isn't invertible, the caller is unchanged and null is returned.
+	 * @return Matrix3
+	 */
 	invert() {
 		const { determinant } = this;
 		if (determinant) {
@@ -81,12 +120,36 @@ class Matrix3 extends Float64Array {
 			minors.transpose();
 
 			// downscale
-			return minors.times(1 / determinant);
+			return minors.times(1 / determinant, this);
 		} else return null;
 	}
+	/**
+	 * Multiplies the matrix in-place by another mathematical object on the right side.
+	 * @signature
+	 * @param Matrix3 matrix | Another matrix to multiply with
+	 * @signature
+	 * @param Vector2 vector | A vector to be transformed by the matrix. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
+	 * @signature
+	 * @param Number scale | A number to scale the matrix by.
+	 * @return Matrix3/Vector2
+	 */
 	mul(M1) {
 		return this.times(M1, this);
 	}
+	/**
+	 * Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
+	 * If no destination is provided, one will be created.
+	 * @signature
+	 * @param Matrix3 matrix | Another matrix to multiply with
+	 * @param Matrix3 destination? | The destination for the operation
+	 * @signature
+	 * @param Vector2 vector | A vector to be transformed by the Matrix3. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
+	 * @param Vector2 destination? | The destination for the operation
+	 * @signature
+	 * @param Number scale | A number to scale the matrix by.
+	 * @param Matrix3 destination? | The destination for the operation
+	 * @return Matrix3
+	 */
 	times(M1, result = null) {
 		if (M1 instanceof Vector2) {
 			result ??= new Vector2(0);
@@ -129,6 +192,11 @@ class Matrix3 extends Float64Array {
 			);
 		}
 	}
+	/**
+	 * Creates a copy of the matrix and optionally stores it in a provided destination.
+	 * @param Matrix3 destination? | The destination to copy the matrix into.
+	 * @return Matrix3
+	 */
 	get(result = new Matrix3()) {
 		result[0] = this[0];
 		result[1] = this[1];
@@ -141,6 +209,10 @@ class Matrix3 extends Float64Array {
 		result[8] = this[8];
 		return result;
 	}
+	/**
+	 * Converts the matrix to a CSS matrix string.
+	 * @return String
+	 */
 	toCSS() {
 		return `matrix(${this[0]}, ${this[1]}, ${this[3]}, ${this[4]}, ${this[6]}, ${this[7]})`;
 	}
@@ -156,6 +228,11 @@ class Matrix3 extends Float64Array {
 		result[8] = m22;
 		return result;
 	}
+	/**
+	 * Creates an identity matrix and optionally stores it in a provided destination.
+	 * @param Matrix3 destination? | The matrix to copy the identity matrix into 
+	 * @return Matrix3
+	 */
 	static identity(result) {
 		return Matrix3.create(
 			1, 0, 0,
@@ -164,6 +241,12 @@ class Matrix3 extends Float64Array {
 			result
 		);
 	}
+	/**
+	 * Creates a 2D rotation matrix and optionally stores it in a provided destination.
+	 * @param Number theta | The clockwise (in screen space) angle (in radians) to rotate by  
+	 * @param Matrix3 result? | The matrix to copy the rotation matrix into
+	 * @return Matrix3
+	 */
 	static rotation(t, result) {
 		const c = Math.cos(t);
 		const s = Math.sin(t);
@@ -174,6 +257,17 @@ class Matrix3 extends Float64Array {
 			result
 		);
 	}
+	/**
+	 * Creates a 2D scaling matrix and optionally stores it in a provided a destination.
+	 * @signature
+	 * @param Number x | The scale factor on the x axis
+	 * @param Number y | The scale factor on the y axis
+	 * @param Matrix3 result? | The matrix to copy the scaling matrix into 
+	 * @signature
+	 * @param Vector2 vector | A vector containing the scale factors for both axes
+	 * @param Matrix3 result? | The matrix to copy the scaling matrix into 
+	 * @return Matrix3
+	 */
 	static scale(x, y, result) {
 		if (typeof y === "object" || y === undefined)
 			return Matrix3.create(
@@ -190,6 +284,17 @@ class Matrix3 extends Float64Array {
 			result
 		);
 	}
+	/**
+	 * Creates a 2D translation matrix and optionally stores it in a provided a destination.
+	 * @signature
+	 * @param Number x | The x coordinate to translate by
+	 * @param Number y | The y coordinate to translate by
+	 * @param Matrix3 result? | The matrix to copy the translation matrix into 
+	 * @signature
+	 * @param Vector2 vector | The vector to translate by
+	 * @param Matrix3 result? | The matrix to copy the translation matrix into 
+	 * @return Matrix3
+	 */
 	static translation(x, y, result) {
 		if (typeof x === "object") {
 			return Matrix3.create(
@@ -206,6 +311,12 @@ class Matrix3 extends Float64Array {
 			result
 		);
 	}
+	/**
+	 * Multiplies a series of matrices together and optionally stores it in a provided destination.
+	 * @param Matrix3[] matrices | The matrices to multiply together. Order matters for this argument
+	 * @param Matrix3 result? | The matrix to copy the result into
+	 * @return Matrix3
+	 */
 	static mulMatrices(matrices, result = new Matrix3()) {
 		if (matrices.length === 1) return matrices[0].get(result);
 		matrices[matrices.length - 2].times(matrices[matrices.length - 1], result);

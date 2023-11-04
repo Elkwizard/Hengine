@@ -1,27 +1,27 @@
 /**
  * Represents a composite mathematical object which element-wise operations can be performed on.
- * Many mathematical operations (plus, minus, times, over) can be performed on Operables of any type, allowing for convenient polymorphism.
+ * Many mathematical operations (plus, minus, times, over) can be performed on operables of any subclass type, allowing for convenient polymorphism.
  * Operable is an abstract superclass, and should not be constructed.
- * All immutable methods, including static methods, are available on Numbers.
- * This means that Number can largely be considered a subclass of Operable and can be used for Operable-typed arguments.
- * @static_prop String[] modValues | The names of the elements in the Operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector)
+ * All immutable methods, including static methods, are available on Number.
+ * This means that Number can largely be considered a subclass of operable and can be used for operable-typed arguments.
+ * @static_prop String[] modValues | The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector)
  */
 class Operable {
     constructor() {
 
     }
 	/**
-	 * Produces a list of all the elements of the Operable.
+	 * Produces a list of all the elements of the operable.
 	 * @return Number[]
 	 */
     get values() {
         return this.constructor.modValues.map(field => this[field]);
     }
 	/**
-	 * Sets all elements of the Operable, either by copying from another Operable of the same type, or by using a list of numeric values.
+	 * Sets all elements of the operable, either by copying from another operable of the same type, or by using a list of numeric values.
 	 * Returns the caller.
 	 * @signature
-	 * @param Operable other | The Operable to copy values from
+	 * @param Operable other | The operable to copy values from
 	 * @signature
 	 * @param Number[] ...elements | The new element values
 	 * @return Operable
@@ -37,11 +37,8 @@ class Operable {
         return this;
     }
 	/**
-	 * Copies the Operable into an optional destination (if not provided, a new Operable will be created).
-	 * Returns the copy.
-	 * @signature
-	 * @signature
-	 * @param Operable destination | The result for the copy operation.
+	 * Creates a copy of the operable and optionally stores it in a provided destination.
+	 * @param Operable destination? | The destination to copy the operable into.
 	 * @return Operable
 	 */
     get(result = this.constructor.empty) {
@@ -53,7 +50,7 @@ class Operable {
         return result;
     }
 	/**
-	 * Retrieves a single element value from the Operable.
+	 * Retrieves a single element value from the operable.
 	 * @param Number index | The element index
 	 * @return Number
 	 */
@@ -80,7 +77,7 @@ class Operable {
     }
 	/**
 	 * @group add, sub, mul, div
-	 * Performs an in-place element-wise arithmetic operation between the caller and another Operable or Number.
+	 * Performs an in-place element-wise arithmetic operation between the caller and another operable or Number.
 	 * Returns the caller.
 	 * @param Operable/Number operable | The right hand operand of the operation
 	 * @return Operable
@@ -99,7 +96,7 @@ class Operable {
     }
 	/**
 	 * @group plus, minus, times, over
-	 * Performs an immutable element-wise arithmetic operation between the caller and another Operable or Number.
+	 * Performs an immutable element-wise arithmetic operation between the caller and another operable or Number.
 	 * Returns the result of the operation, leaving the operands unchanged.
 	 * @param Operable/Number operable | The right hand operand of the operation
 	 * @return Operable
@@ -126,7 +123,7 @@ class Operable {
         return result;
     }
 	/**
-	 * Computes the sum of all the elements of the Operable.
+	 * Computes the sum of all the elements of the operable.
 	 * @return Number
 	 */
     total() {
@@ -135,8 +132,8 @@ class Operable {
         return sum;
     }
 	/**
-	 * Checks equality between the Operable and another Operable of the same type.
-	 * @param Operable other | The Operable to compare to
+	 * Checks equality between the operable and another operable of the same type.
+	 * @param Operable other | The operable to compare to
 	 * @return Boolean
 	 */
     equals(v) {
@@ -151,7 +148,7 @@ class Operable {
         return true;
     }
 	/**
-	 * Writes the Operable to a ByteBuffer, which can either be created or passed as an optional destination.
+	 * Writes the operable to a ByteBuffer, which can either be created or passed as an optional destination.
 	 * @signature
 	 * @signature
 	 * @param ByteBuffer destination | The destination for the write operation
@@ -163,7 +160,7 @@ class Operable {
         return buffer;
     }
 	/**
-	 * Reads an Operable from the ByteBuffer, and returns it.
+	 * Reads an operable from the ByteBuffer, and returns it.
 	 * @param ByteBuffer buffer | The source buffer to read from
 	 * @return Operable
 	 */
@@ -175,7 +172,7 @@ class Operable {
         return result;
     }
 	/**
-	 * Produces an Operable with 0 for all element values.
+	 * Produces an operable with 0 for all element values.
 	 * @return Operable
 	 */
     static get empty() {
@@ -197,7 +194,7 @@ class Operable {
         });
     }
 	/**
-	 * Computes the element-wise sum of a list of Operables.
+	 * Computes the element-wise sum of a list of operables.
 	 * @param Operable/Number[] operables | The values to sum 
 	 * @return Operable
 	 */
@@ -207,7 +204,7 @@ class Operable {
         return acc;
     }
 	/**
-	 * Computes the element-wise average of a list of Operables.
+	 * Computes the element-wise average of a list of operables.
 	 * @param Operable/Number[] operables | The values to average 
 	 * @return Operable
 	 */
@@ -215,8 +212,8 @@ class Operable {
         return this.sum(v).over(v.length);
     }
 	/**
-	 * Remaps an Operable from one range to another range.
-	 * @param Operable/Number value | The Operable to be remapped
+	 * Remaps an operable from one range to another range.
+	 * @param Operable/Number value | The operable to be remapped
 	 * @param Operable/Number initialMin | The minimum of the range the value is in
 	 * @param Operable/Number initialMax | The maximum of the range the value is in
 	 * @param Operable/Number finalMin | The minimum of the desired range
@@ -227,8 +224,8 @@ class Operable {
         return n.minus(a).div(b.minus(a)).mul(b2.minus(a2)).add(a2);
     }
 	/**
-	 * Returns an Operable clamped element-wise between two bounds.
-	 * Equivalent to `Operable.max(min, Operable.min(max, value))`.
+	 * Returns an operable clamped element-wise between two bounds.
+	 * Equivalent to `Operable.max(min, operable.min(max, value))`.
 	 * @param Operable/Number value | The value to clamp
 	 * @param Operable/Number min | The lower bound for the result
 	 * @param Operable/Number max | The upper bound for the result
@@ -238,7 +235,7 @@ class Operable {
         return this.max(a, this.min(b, n));
     }
 	/**
-	 * Produces an Operable with all elements equal to a single value.
+	 * Produces an operable with all elements equal to a single value.
 	 * @param Number value | The value that will be used for all elements
 	 * @return Operable
 	 */
@@ -282,8 +279,8 @@ class Operable {
     }
 	/**
 	 * @group static round, static floor, static ceil, static trunc, static abs, static sqrt, static log, static log2, static log10, static sin, static cos, static tan, static sinh, static cosh, static tanh, static asin, static acos, static atan, static asinh, static acosh, static atanh, static sign
-	 * Performs a built-in unary Math operation element-wise on an Operable.
-	 * @param Operable value | The Operable to operate on
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param Operable value | The operable to operate on
 	 * @return Operable
 	 */
 }

@@ -1,4 +1,17 @@
+/**
+ * Represents an inclusive interval.
+ * @prop Number min | The lower bound of the interval
+ * @prop Number max | The upper bound of the interval
+ */
 class Range {
+	/**
+	 * Creates a new interval, optionally with a specific min and max.
+	 * If no arguments are provided, the interval will be empty. 
+	 * @signature
+	 * @signature
+	 * @param Number min | The lower bound 
+	 * @param Number max | The upper bound
+	 */
 	constructor(min, max) {
 		if (min !== undefined && max !== undefined) {
 			if (min < max) {
@@ -13,6 +26,10 @@ class Range {
 			this._min = Infinity;
 		}
 	}
+	/**
+	 * Returns the mean value of the range.
+	 * @return Number
+	 */
 	get middle() {
 		return (this.min + this.max) / 2;
 	}
@@ -42,9 +59,18 @@ class Range {
 	get max() {
 		return this._max;
 	}
+	/**
+	 * Returns the size of the interval represented by the range.
+	 * @return Number
+	 */
 	get length() {
 		return this.max - this.min;
 	}
+	/**
+	 * Returns the set intersection between the caller and another range.
+	 * @param Range range | The range to clip against 
+	 * @return Range
+	 */
 	clip(range) {
 		return new Range(
 			Number.clamp(this.min, range.min, range.max),
@@ -57,19 +83,44 @@ class Range {
 	toIntervalValue(value) {
 		return (value - this.min) / (this.max - this.min);
 	}
+	/**
+	 * Returns the distance from a specified value to the closest bound of the range.
+	 * If the value is inside the range, the distance will be positive, otherwise, it will be negative.
+	 * @param Number value | The value to check the depth of
+	 * @return Number
+	 */
 	getDepth(value) {
 		return (this.max - this.min) / 2 - Math.abs(value - (this.min + this.max) / 2);
 	}
+	/**
+	 * Checks whether a value is within the current bounds of the range.
+	 * @param Number value | The value to check
+	 * @return Range
+	 */
 	includes(value) {
 		return value >= this.min && value <= this.max;
 	}
+	/**
+	 * Expands the Range to include a specified value.
+	 * @param Number value | The value to include 
+	 */
 	include(value) {
 		if (value < this.min) this._min = value;
 		if (value > this.max) this._max = value;
 	}
+	/**
+	 * Checks if there is any overlap between the caller and another range.
+	 * @param Range range | The range to check against 
+	 * @return Boolean
+	 */
 	intersect(r) {
 		return this.max >= r.min && r.max >= this.min;
 	}
+	/**
+	 * Returns the smallest range that contains every one of a collection of values.
+	 * @param Number[] values | The set of values to bound 
+	 * @return Range
+	 */
 	static fromValues(values) {
 		let min = Infinity;
 		let max = -Infinity;
@@ -81,51 +132,159 @@ class Range {
 		return new Range(min, max);
 	}
 }
+
+/**
+ * Represents an 2D Shape. This is an abstract base class and should not be constructed.
+ * @prop Number area | The area of the shape
+ */
 class Shape {
 	constructor() {
 		this.area = 0;
 	}
+	/**
+	 * Returns the geometric center of the shape
+	 * @return Vector2
+	 */
 	get middle() {
 		return new Vector2(0, 0);
 	}
+	/**
+	 * Returns a copy of the shape centered at a specified location
+	 * @param Vector2 newCenter | The location of the new center 
+	 * @return Shape
+	 */
 	center(pos) {
 		return this.move(pos.minus(this.middle));
 	}
+	/**
+	 * Returns a copy of the shape after a certain transformation is applied to all its points.
+	 * @param Transform transform | The transformation to apply to the shape 
+	 * @return Shape
+	 */
 	getModel(transf) { }
+	/**
+	 * Returns a copy of the shape uniformly scaled about its center.
+	 * @param Number factor | The scale factor
+	 * @return Shape
+	 */
 	scale(factor) {
 		return this.scaleAbout(this.middle, factor);
 	}
+	/**
+	 * Returns a copy of the shape scaled about its center along the x axis.
+	 * @param Number factor | The scale factor
+	 * @return Shape
+	 */
 	scaleX(factor) {
 		return this.scaleXAbout(this.middle.x, factor);
 	}
+	/**
+	 * Returns a copy of the shape scaled about its center along the y axis.
+	 * @param Number factor | The scale factor
+	 * @return Shape
+	 */
 	scaleY(factor) {
 		return this.scaleYAbout(this.middle.y, factor);
 	}
+	/**
+	 * Returns a copy of the shape uniformly scaled about a specified point.
+	 * @param Vector2 position | The scaling center
+	 * @param Number factor | The scale factor
+	 * @return Shape
+	 */
 	scaleAbout(pos, factor) { }
+	/**
+	 * Returns a copy of the shape scaled about a specified point along the x axis.
+	 * @param Vector2 position | The scaling center
+	 * @param Number factor | The scale factor
+	 * @return Shape
+	 */
 	scaleXAbout(pos, factor) { }
+	/**
+	 * Returns a copy of the shape scaled about a specified point along the y axis.
+	 * @param Vector2 position | The scaling center
+	 * @param Number factor | The scale factor
+	 * @return Shape
+	 */
 	scaleYAbout(pos, factor) { }
+	/**
+	 * Returns a copy of the shape translated by a specified amount.
+	 * @param Vector2 displacement | The amount to displace the shape by
+	 * @return Shape 
+	 */
 	move(dir) { }
+	/**
+	 * Returns the smallest axis-aligned Rect that contains the entire shape.
+	 * @return Rect
+	 */
 	getBoundingBox() { }
+	/**
+	 * Checks if two shapes are congruent.
+	 * @param Shape other | The Shape to compare against
+	 * @return Boolean 
+	 */
 	equals(shape) { }
 	intersectSameType() { }
+	/**
+	 * Checks if two shapes intersect
+	 * @param Shape shape | The Shape to check intersections with
+	 * @return Boolean
+	 */
 	intersect(shape) {
 		if (shape instanceof this.constructor)
 			return this.intersectSameType(shape);
 		return !!physicsAPICollideShapes(this, shape);
 	}
+	/**
+	 * Returns the closest point on the shape to a specified other point.
+	 * @param Vector2 point | The target point
+	 * @return Vector2 
+	 */
 	closestPointTo(point) { }
+	/**
+	 * Returns the distance from a specified point to the interior of the shape.
+	 * @param Vector2 point | The target point 
+	 * @return Number
+	 */
 	distanceTo(point) {
 		return Vector2.dist(point, this.closestPointTo(point));
 	}
+	/**
+	 * Checks if a point is inside the shape.
+	 * @param Vector2 point | The point to check 
+	 * @return Boolean
+	 */
 	containsPoint(point) {
 		return this.closestPointTo(point).equals(point);
 	}
+	/**
+	 * Creates a copy of the shape and optionally stores it in a provided destination.
+	 * @param Shape destination? | The destination to copy the shape into.
+	 * @return Shape
+	 */
 	get(result = new Shape()) { }
 	toPhysicsShape() { }
 	static fromPhysicsShape(sh) { }
 }
 
+/**
+ * Represents a line segment.
+ * @prop Vector2 a | The start point of the line segment
+ * @prop Vector2 b | The end point of the line segment
+ * @prop Vector2 vector | A vector from the start point of the line segment to the end point.
+ */
 class Line extends Shape {
+	/**
+	 * Creates a new Line.
+	 * @signature
+	 * @param Number x | The x coordinate of the start point of the line segment
+	 * @param Number y | The y coordinate of the start point of the line segment
+	 * @param Number x2 | The x coordinate of the end point of the line segment
+	 * @param Number y2 | The y coordinate of the end point of the line segment
+	 * @signature
+	 * @param Vector2 start | The start point of the line segment
+	 * @param Vector2 end | The end point of the line segment
+	 */
 	constructor(x, y, x2, y2) {
 		super();
 		if (typeof x === "object") {
@@ -137,9 +296,17 @@ class Line extends Shape {
 		}
 		this.area = 0;
 	}
+	/**
+	 * Returns the length of the line segment.
+	 * @return Number
+	 */
 	get length() {
 		return Vector2.dist(this.a, this.b);
 	}
+	/**
+	 * Returns the midpoint of the line segment.
+	 * @return Number
+	 */
 	get middle() {
 		return this.a.Vplus(this.b).Nmul(0.5);
 	}
@@ -149,13 +316,26 @@ class Line extends Shape {
 	get vector() {
 		return this.b.Vminus(this.a).normalize();
 	}
+	/**
+	 * Returns the slope of the line segment. If the line segment is vertical, this is Infinity.
+	 * @return Number
+	 */
 	get slope() {
 		const { a, b } = this;
 		return (b.y - a.y) / (b.x - a.x);
 	}
+	/**
+	 * Returns the y-intercept of the line segment. This is calculated as if it were a line, rather than a line segment.
+	 * @return Number
+	 */
 	get intercept() {
 		return this.a.y - this.a.x * this.slope;
 	}
+	/**
+	 * Computes the y coordinate on the line for a given x coordinate. This is calculated as if it were a line, rather than a line segment.
+	 * @param Number x | The x coordinate to calculate the y at.
+	 * @return Number
+	 */
 	evaluate(x) {
 		return this.slope * x + this.intercept;
 	}
@@ -237,6 +417,13 @@ class Line extends Shape {
 		line.b.set(this.b);
 		return line;
 	}
+	/**
+	 * Creates a new line segment with a specified slope and intercept.
+	 * The start point is at the y-intercept, and the end point is at x = 1.
+	 * @param Number m | The slope of the line segment
+	 * @param Number b | The y-intercept of the line segment
+	 * @return Line
+	 */
 	static fromSlopeIntercept(m, b) {
 		return new Line(
 			0, b,
@@ -245,8 +432,15 @@ class Line extends Shape {
 	}
 }
 
-
+/**
+ * Represents a contiguous 2D polygon.
+ * @prop Vector2[] vertices | The vertices of the border of the polygon, they are in a clockwise order.
+ */
 class Polygon extends Shape {
+	/**
+	 * Creates a new Polygon.
+	 * @param Vector2[] vertices | The vertices for the new polygon. They can be ordered either clockwise or counter-clockwise
+	 */
 	constructor(vertices) {
 		super();
 		if (vertices.length) {
@@ -287,6 +481,10 @@ class Polygon extends Shape {
 			)
 		), true);
 	}
+	/**
+	 * Returns the edges of the polygon.
+	 * @return Line[]
+	 */
 	getEdges() {
 		let edges = [];
 		let verts = this.vertices;
@@ -309,6 +507,11 @@ class Polygon extends Shape {
 	move(dir) {
 		return new Polygon(this.vertices.map(vert => vert.plus(dir)));
 	}
+	/**
+	 * Returns a copy of the polygon rotated clockwise (in screen space) by a specified angle.
+	 * @param Number angle | The angle to rotate by (in radians)
+	 * @return Polygon 
+	 */
 	rotate(angle) {
 		return this.getModel(new Transform(0, 0, angle));
 	}
@@ -366,6 +569,12 @@ class Polygon extends Shape {
 	static fromPhysicsShape(sh) {
 		return new Polygon(sh.vertices.map(v => Vector2.fromPhysicsVector(v)));
 	}
+	/**
+	 * Returns a new regular polygon centered at the origin with a specified amount of sides and radius.
+	 * @param Number sides | The number of sides of the polygon
+	 * @param Number radius | The distance from the center to each vertex
+	 * @return Polygon
+	 */
 	static regular(sides, radius) {
 		let v = [];
 		let o = Math.PI / sides;
@@ -388,7 +597,22 @@ class Polygon extends Shape {
 		return vertices;
 	}
 }
+
+/**
+ * Represents an axis-aligned rectangle.
+ * @prop Number x | The x coordinate of the upper-left corner of the rectangle.
+ * @prop Number y | The y coordinate of the upper-left corner of the rectangle.
+ * @prop Number width | The width of the rectangle.
+ * @prop Number height | The height of the rectangle.
+ */
 class Rect extends Polygon {
+	/**
+	 * Creates a new Rect. The width and height can be negative and will extend the rectangle to the left and top respectively.
+	 * @param Number x | The x coordinate of the upper-left corner of the rectangle.
+	 * @param Number y | The y coordinate of the upper-left corner of the rectangle.
+	 * @param Number width | The width of the rectangle.
+	 * @param Number height | The height of the rectangle.
+	 */
 	constructor(x, y, width, height) {
 		super([]);
 		if (width < 0) {
@@ -405,21 +629,41 @@ class Rect extends Polygon {
 		this.height = height;
 		this.area = this.width * this.height;
 	}
+	/**
+	 * Returns the upper-left corner of the rectangle. Modifying this point will not change the rectangle.
+	 * @return Vector2
+	 */
 	get min() {
 		return new Vector2(this.x, this.y);
 	}
+	/**
+	 * Returns the lower-right corner of the rectangle. Modifying this point will not change the rectangle.
+	 * @return Vector2
+	 */
 	get max() {
 		return new Vector2(this.x + this.width, this.y + this.height);
 	}
+	/**
+	 * Returns the horizontal interval that contains all the rectangle's points. Modifying this Range will not change the rectangle.
+	 * @return Range
+	 */
 	get xRange() {
 		return new Range(this.x, this.x + this.width);
 	}
+	/**
+	 * Returns the vertical interval that contains all the rectangle's points. Modifying this Range will not change the rectangle.
+	 * @return Range
+	 */
 	get yRange() {
 		return new Range(this.y, this.y + this.height);
 	}
 	get middle() {
 		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
 	}
+	/**
+	 * Returns the vertices of the rectangle. Modifying elements of the return value will not change the rectangle.
+	 * @return Vector2[] 
+	 */
 	get vertices() {
 		return [
 			new Vector2(this.x, this.y),
@@ -428,6 +672,11 @@ class Rect extends Polygon {
 			new Vector2(this.x, this.y + this.height)
 		];
 	}
+	/**
+	 * Sets the vertices of the rectangle.
+	 * @param Vector2[] newVertices | The new vertices.
+	 * These must be in the correct shape and order, where the first element is the upper-left corner and the vertices are ordered clockwise.
+	 */
 	set vertices(a) {
 		if (a.length === 4) {
 			let min = a[0];
@@ -523,6 +772,11 @@ class Rect extends Polygon {
 
 		return rects;
 	}
+	/**
+	 * Returns the region of intersection between the caller and another rectangle.
+	 * @param Rect rect | The rectangle to intersect with  
+	 * @return Rect
+	 */
 	clip(rect) {
 		let xRange = this.xRange.clip(rect.xRange);
 		let yRange = this.yRange.clip(rect.yRange);
@@ -587,12 +841,29 @@ class Rect extends Polygon {
 		result.area = this.area;
 		return result;
 	}
+	/**
+	 * Returns a new Rect with the specified minimum and maximum coordinates.
+	 * @param Vector2 min | The upper-left corner of the Rect 
+	 * @param Vector2 max | The lower-right corner of the Rect 
+	 * @return Rect
+	 */
 	static fromMinMax(min, max) {
 		return new Rect(min.x, min.y, max.x - min.x, max.y - min.y);
 	}
+	/**
+	 * Returns a new rectangle with the specified vertical and horizontal spans.
+	 * @param Range xRange | The horizontal span of the rectangle
+	 * @param Range yRange | The vertical span of the rectangle
+	 * @return Rect
+	 */
 	static fromRanges(xRange, yRange) {
 		return new Rect(xRange.min, yRange.min, xRange.length, yRange.length);
 	}
+	/**
+	 * Returns the smallest bounding rectangle around a collection of points.
+	 * @param Vector2[] points | The points to create a bounding box for
+	 * @return Rect
+	 */
 	static bound(points) {
 		if (!points.length) return new Rect(0, 0, 0, 0);
 
@@ -609,6 +880,11 @@ class Rect extends Polygon {
 		}
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
+	/**
+	 * Returns the smallest bounding Rect around a collection of rectangles.
+	 * @param Rect[] boxes | The rectangles to create a bounding box for 
+	 * @return Rect
+	 */
 	static composeBoundingBoxes(boxes) {
 		if (boxes.length === 1) return boxes[0];
 		let minX = Infinity;
@@ -626,7 +902,19 @@ class Rect extends Polygon {
 	}
 }
 
+/**
+ * Represents a circle.
+ * @prop Number x | The x coordinate of the center of the circle
+ * @prop Number y | The y coordinate of the center of the circle
+ * @prop Number radius | The radius of the circle
+ */
 class Circle extends Shape {
+	/**
+	 * Creates a new Circle.
+	 * @param Number x | The x coordinate of the center 
+	 * @param Number y | The y coordinate of the center 
+	 * @param Number radius | The radius of the circle 
+	 */
 	constructor(x, y, radius) {
 		super();
 		this.x = x;
@@ -654,9 +942,19 @@ class Circle extends Shape {
 	scale(factor) {
 		return new Circle(this.x, this.y, this.radius * factor)
 	}
+	/**
+	 * Since there is no representation for an ellipse, this scales uniformly instead of the behavior for Shape.
+	 * @param Number factor | The scale factor 
+	 * @return Circle
+	 */
 	scaleX(factor) {
 		return this.scale(factor);	
 	}
+	/**
+	 * Since there is no representation for an ellipse, this scales uniformly instead of the behavior for Shape.
+	 * @param Number factor | The scale factor 
+	 * @return Circle
+	 */
 	scaleY(factor) {
 		return this.scale(factor);
 	}

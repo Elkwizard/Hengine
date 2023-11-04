@@ -12,7 +12,7 @@
 					<span class="keyword">class</span> <span class="class-name">Operable</span>
 				</div>
 				<div class="class desc">
-				Represents a composite mathematical object which element-wise operations can be performed on. Many mathematical operations (plus, minus, times, over) can be performed on Operables of any type, allowing for convenient polymorphism. Operable is an abstract superclass, and should not be constructed. All immutable methods, including static methods, are available on Numbers. This means that Number can largely be considered a subclass of Operable and can be used for Operable-typed arguments.
+				Represents a composite mathematical object which element-wise operations can be performed on. Many mathematical operations (plus, minus, times, over) can be performed on operables of any subclass type, allowing for convenient polymorphism. Operable is an abstract superclass, and should not be constructed. All immutable methods, including static methods, are available on Number. This means that Number can largely be considered a subclass of operable and can be used for operable-typed arguments.
 				</div>
 				
 					<div class="header">Subclasses</div>
@@ -26,7 +26,7 @@
 					<div class="prop-header member">
 						<span class="prop-name">Operable.modValues</span><span class="type">String[]</span>
 					</div>
-					<div class="prop desc">The names of the elements in the Operable. The order of this array also determines the order of the elements (e.g. <span class="code">["x", "y"]</span> for <a href="../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a>)</div>
+					<div class="prop desc">The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. <span class="code">["x", "y"]</span> for <a href="../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a>)</div>
 				</div>
 			</div>
 				
@@ -39,7 +39,7 @@
 				<span class="keyword">get</span> <span class="function-name">values</span><span class="type">Number[]</span>
 			</div>
 			<div class="function desc">
-				Produces a list of all the elements of the Operable.
+				Produces a list of all the elements of the operable.
 			</div>
 			
 		</div>
@@ -49,7 +49,7 @@
 				<span class="function-name">set</span>(<span class="param">other</span><span class="aux"> | </span><span class="param">...elements</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Sets all elements of the Operable, either by copying from another Operable of the same type, or by using a list of numeric values. Returns the caller.
+				Sets all elements of the operable, either by copying from another operable of the same type, or by using a list of numeric values. Returns the caller.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -60,7 +60,7 @@
 					<span class="param">other</span><span class="type">Operable</span>
 				</div>
 				<div class="param desc">
-					The Operable to copy values from
+					The operable to copy values from
 				</div>
 			</div>
 		
@@ -78,10 +78,10 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">get</span>(<span class="param">void</span><span class="aux"> | </span><span class="param">destination</span>)<span class="type">Operable</span>
+				<span class="function-name">get</span>(<span class="param">destination?</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Copies the Operable into an optional destination (if not provided, a new Operable will be created). Returns the copy.
+				Creates a copy of the operable and optionally stores it in a provided destination.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -92,7 +92,7 @@
 					<span class="param">destination</span><span class="type">Operable</span>
 				</div>
 				<div class="param desc">
-					The result for the copy operation.
+					The destination to copy the operable into.
 				</div>
 			</div>
 		
@@ -104,7 +104,7 @@
 				<span class="function-name">at</span>(<span class="param">index</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
-				Retrieves a single element value from the Operable.
+				Retrieves a single element value from the operable.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -127,7 +127,7 @@
 				<span class="function-name">add</span><span class="aux">/</span><span class="function-name">sub</span><span class="aux">/</span><span class="function-name">mul</span><span class="aux">/</span><span class="function-name">div</span>(<span class="param">operable</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Performs an in-place element-wise arithmetic operation between the caller and another Operable or Number. Returns the caller.
+				Performs an in-place element-wise arithmetic operation between the caller and another operable or Number. Returns the caller.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -150,7 +150,7 @@
 				<span class="function-name">plus</span><span class="aux">/</span><span class="function-name">minus</span><span class="aux">/</span><span class="function-name">times</span><span class="aux">/</span><span class="function-name">over</span>(<span class="param">operable</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Performs an immutable element-wise arithmetic operation between the caller and another Operable or Number. Returns the result of the operation, leaving the operands unchanged.
+				Performs an immutable element-wise arithmetic operation between the caller and another operable or Number. Returns the result of the operation, leaving the operands unchanged.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -173,7 +173,7 @@
 				<span class="function-name">total</span>()<span class="type">Number</span>
 			</div>
 			<div class="function desc">
-				Computes the sum of all the elements of the Operable.
+				Computes the sum of all the elements of the operable.
 			</div>
 			
 		</div>
@@ -183,7 +183,7 @@
 				<span class="function-name">equals</span>(<span class="param">other</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				Checks equality between the Operable and another Operable of the same type.
+				Checks equality between the operable and another operable of the same type.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -194,7 +194,7 @@
 					<span class="param">other</span><span class="type">Operable</span>
 				</div>
 				<div class="param desc">
-					The Operable to compare to
+					The operable to compare to
 				</div>
 			</div>
 		
@@ -206,7 +206,7 @@
 				<span class="function-name">toByteBuffer</span>(<span class="param">void</span><span class="aux"> | </span><span class="param">destination</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Writes the Operable to a ByteBuffer, which can either be created or passed as an optional destination.
+				Writes the operable to a ByteBuffer, which can either be created or passed as an optional destination.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -229,7 +229,7 @@
 				<span class="keyword">get</span> <span class="function-name">Operable.empty</span><span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Produces an Operable with 0 for all element values.
+				Produces an operable with 0 for all element values.
 			</div>
 			
 		</div>
@@ -239,7 +239,7 @@
 				<span class="function-name">Operable.fromByteBuffer</span>(<span class="param">buffer</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Reads an Operable from the ByteBuffer, and returns it.
+				Reads an operable from the ByteBuffer, and returns it.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -262,7 +262,7 @@
 				<span class="function-name">Operable.sum</span>(<span class="param">operables</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Computes the element-wise sum of a list of Operables.
+				Computes the element-wise sum of a list of operables.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -285,7 +285,7 @@
 				<span class="function-name">Operable.avg</span>(<span class="param">operables</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Computes the element-wise average of a list of Operables.
+				Computes the element-wise average of a list of operables.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -308,7 +308,7 @@
 				<span class="function-name">Operable.remap</span>(<span class="param">value</span>, <span class="param">initialMin</span>, <span class="param">initialMax</span>, <span class="param">finalMin</span>, <span class="param">finalMax</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Remaps an Operable from one range to another range.
+				Remaps an operable from one range to another range.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -319,7 +319,7 @@
 					<span class="param">value</span><span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
-					The Operable to be remapped
+					The operable to be remapped
 				</div>
 			</div>
 		
@@ -367,7 +367,7 @@
 				<span class="function-name">Operable.clamp</span>(<span class="param">value</span>, <span class="param">min</span>, <span class="param">max</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Returns an Operable clamped element-wise between two bounds. Equivalent to <span class="code">Operable.max(min, Operable.min(max, value))</span>.
+				Returns an operable clamped element-wise between two bounds. Equivalent to <span class="code">Operable.max(min, operable.min(max, value))</span>.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -408,7 +408,7 @@
 				<span class="function-name">Operable.filled</span>(<span class="param">value</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Produces an Operable with all elements equal to a single value.
+				Produces an operable with all elements equal to a single value.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -509,7 +509,7 @@
 				<span class="function-name">Operable.round</span><span class="aux">/</span><span class="function-name">Operable.floor</span><span class="aux">/</span><span class="function-name">Operable.ceil</span><span class="aux">/</span><span class="function-name">Operable.trunc</span><span class="aux">/</span><span class="function-name">Operable.abs</span><span class="aux">/</span><span class="function-name">Operable.sqrt</span><span class="aux">/</span><span class="function-name">Operable.log</span><span class="aux">/</span><span class="function-name">Operable.log2</span><span class="aux">/</span><span class="function-name">Operable.log10</span><span class="aux">/</span><span class="function-name">Operable.sin</span><span class="aux">/</span><span class="function-name">Operable.cos</span><span class="aux">/</span><span class="function-name">Operable.tan</span><span class="aux">/</span><span class="function-name">Operable.sinh</span><span class="aux">/</span><span class="function-name">Operable.cosh</span><span class="aux">/</span><span class="function-name">Operable.tanh</span><span class="aux">/</span><span class="function-name">Operable.asin</span><span class="aux">/</span><span class="function-name">Operable.acos</span><span class="aux">/</span><span class="function-name">Operable.atan</span><span class="aux">/</span><span class="function-name">Operable.asinh</span><span class="aux">/</span><span class="function-name">Operable.acosh</span><span class="aux">/</span><span class="function-name">Operable.atanh</span><span class="aux">/</span><span class="function-name">Operable.sign</span>(<span class="param">value</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Performs a built-in unary Math operation element-wise on an Operable.
+				Performs a built-in unary Math operation element-wise on an operable.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -520,7 +520,7 @@
 					<span class="param">value</span><span class="type">Operable</span>
 				</div>
 				<div class="param desc">
-					The Operable to operate on
+					The operable to operate on
 				</div>
 			</div>
 		

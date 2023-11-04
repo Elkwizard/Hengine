@@ -12,7 +12,7 @@
 					<span class="keyword">class</span> <span class="class-name">Geometry</span>
 				</div>
 				<div class="class desc">
-				Provides a collection of 2D geometric algorithms that operate on <a href="../../Pages/Geometry/Shapes/Shape.html#Shape">Shapes</a> and <a href="../../Pages/Geometry/Vector/Vector.html#Vector">Vectors</a>. All methods of this class are static and do not mutate their arguments.
+				Provides a collection of 2D geometric algorithms that operate on shapes and vectors. All methods of this class are static and do not mutate their arguments.
 				</div>
 				
 				
@@ -49,7 +49,7 @@
 				<span class="function-name">Geometry.smoothPolygon</span>(<span class="param">shape</span>)<span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a></span>
 			</div>
 			<div class="function desc">
-				Applies a single smoothing step to a <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a>.
+				Applies a single smoothing step to a polygon.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -72,7 +72,7 @@
 				<span class="function-name">Geometry.simplify</span>(<span class="param">polygon</span>, <span class="param">percent</span>)<span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a></span>
 			</div>
 			<div class="function desc">
-				Simplifies a <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a> by removing a specified proportion of the vertices.
+				Simplifies a polygon by removing a specified proportion of the vertices.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -104,7 +104,7 @@
 				<span class="function-name">Geometry.inflate</span>(<span class="param">polygon</span>, <span class="param">distance</span>)<span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a></span>
 			</div>
 			<div class="function desc">
-				Inflates a <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a> along its normals by a specified distance.
+				Inflates a polygon along its normals by a specified distance.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -115,7 +115,7 @@
 					<span class="param">polygon</span><span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a></span>
 				</div>
 				<div class="param desc">
-					The <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a> to inflate
+					The polygon to inflate
 				</div>
 			</div>
 		
@@ -136,7 +136,7 @@
 				<span class="function-name">Geometry.joinEdges</span>(<span class="param">polygon</span>, <span class="param">dtheta</span>)<span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a></span>
 			</div>
 			<div class="function desc">
-				Simplifies a <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a> by combining adjacent edges that are nearly colinear.
+				Simplifies a polygon by combining adjacent edges that are nearly colinear.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -168,7 +168,7 @@
 				<span class="function-name">Geometry.triangulate</span>(<span class="param">shape</span>)<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a>[3][]</span>
 			</div>
 			<div class="function desc">
-				Creates a triangular decomposition of the provided convex <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a>. The triangles are returned as arrays of three <a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2s</a>.
+				Creates a triangular decomposition of the provided convex polygon. The triangles are returned as arrays of three vectors.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -179,7 +179,7 @@
 					<span class="param">shape</span><span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a></span>
 				</div>
 				<div class="param desc">
-					The convex <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a> to decompose
+					The convex polygon to decompose
 				</div>
 			</div>
 		
@@ -374,7 +374,7 @@
 				<span class="function-name">Geometry.subdividePolygon</span>(<span class="param">polygon</span>)<span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a>[]</span>
 			</div>
 			<div class="function desc">
-				Decomposes any <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a> into a collection of convex <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygons</a> that occupy the same space.
+				Decomposes any polygon into a collection of convex polygons that occupy the same space.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -397,7 +397,7 @@
 				<span class="function-name">Geometry.intersectRayLine</span>(<span class="param">rayOrigin</span>, <span class="param">rayDirection</span>, <span class="param">line</span>)<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a>/null</span>
 			</div>
 			<div class="function desc">
-				Returns the point of intersection between a <a href="../../Pages/Geometry/Shapes/Line.html#Line">Line</a> segment and a ray, or null if they don't intersect
+				Returns the point of intersection between a line segment and a ray, or null if they don't intersect
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -426,7 +426,7 @@
 					<span class="param">line</span><span class="type"><a href="../../Pages/Geometry/Shapes/Line.html#Line">Line</a></span>
 				</div>
 				<div class="param desc">
-					The <a href="../../Pages/Geometry/Shapes/Line.html#Line">Line</a>
+					The line
 				</div>
 			</div>
 		
@@ -438,7 +438,7 @@
 				<span class="function-name">Geometry.intersectLineLine</span>(<span class="param">a</span>, <span class="param">b</span>)<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a>/null</span>
 			</div>
 			<div class="function desc">
-				Returns the point of intersection between two <a href="../../Pages/Geometry/Shapes/Line.html#Line">Line</a> segments, or null if they don't intersect
+				Returns the point of intersection between two line segments, or null if they don't intersect
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -449,7 +449,7 @@
 					<span class="param">a</span><span class="type"><a href="../../Pages/Geometry/Shapes/Line.html#Line">Line</a></span>
 				</div>
 				<div class="param desc">
-					The first <a href="../../Pages/Geometry/Shapes/Line.html#Line">Line</a>
+					The first line
 				</div>
 			</div>
 		
@@ -458,7 +458,7 @@
 					<span class="param">b</span><span class="type"><a href="../../Pages/Geometry/Shapes/Line.html#Line">Line</a></span>
 				</div>
 				<div class="param desc">
-					The second <a href="../../Pages/Geometry/Shapes/Line.html#Line">Line</a>
+					The second line
 				</div>
 			</div>
 		
@@ -470,7 +470,7 @@
 				<span class="function-name">Geometry.intersectPolygonPolygon</span>(<span class="param">a</span>, <span class="param">b</span>)<span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a>/null</span>
 			</div>
 			<div class="function desc">
-				Returns the region of intersection between two <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygons</a>, or null if they don't intersect.
+				Returns the region of intersection between two polygons, or null if they don't intersect.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -481,7 +481,7 @@
 					<span class="param">a</span><span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a></span>
 				</div>
 				<div class="param desc">
-					The first <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a>
+					The first polygon
 				</div>
 			</div>
 		
@@ -490,7 +490,7 @@
 					<span class="param">b</span><span class="type"><a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a></span>
 				</div>
 				<div class="param desc">
-					The second <a href="../../Pages/Geometry/Shapes/Polygon.html#Polygon">Polygon</a>
+					The second polygon
 				</div>
 			</div>
 		
