@@ -271,7 +271,7 @@ class Shape {
  * Represents a line segment.
  * @prop Vector2 a | The start point of the line segment
  * @prop Vector2 b | The end point of the line segment
- * @prop Vector2 vector | A vector from the start point of the line segment to the end point.
+ * @prop Vector2 vector | A vector from the start point of the line segment to the end point
  */
 class Line extends Shape {
 	/**

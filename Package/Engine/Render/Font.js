@@ -129,7 +129,7 @@ class Font {
 	}
 	/**
 	 * Returns the width and height of a string of text, optionally after being packed into a fixed max width.
-	 * The return value contains `width` and `height` properties, both of which are Numbers.
+	 * The return value contains `.width` and `.height` properties, both of which are Numbers.
 	 * @param String text | The text to be measured
 	 * @param Number maxWidth? | The maximum width of a single line, default is Infinity
 	 * @return Object
@@ -143,7 +143,7 @@ class Font {
 		return { width, height };
 	}
 	/**
-	 * Returns the width of a single line of text. This method is faster than .getTextWidth().
+	 * Returns the width of a single line of text. This method is faster than `.getTextWidth()`.
 	 * @param String textLine | A single line string of text to measure 
 	 * @return Number
 	 */
@@ -152,7 +152,7 @@ class Font {
 		return this.getWidthCRC2D(str);
 	}
 	/**
-	 * Returns the height of a single line of text. This method is faster than .getTextHeight().
+	 * Returns the height of a single line of text. This method is faster than `.getTextHeight()`.
 	 * @param String textLine | A single line string of text to measure
 	 * @return Number
 	 */

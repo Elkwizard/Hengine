@@ -5,12 +5,17 @@
 			"HengineLoader": null,
 			"HengineResource": {
 				"HengineLoadingStructure": null,
-				"HengineResource": null,
-				"HengineImageResource": null,
-				"HengineAnimationResource": null,
-				"HengineVideoResource": null,
-				"HengineScriptResource": null,
-				"HengineFontResource": null
+				"HengineResource": [
+					"HengineResource",
+					"HengineScriptResource",
+					"HengineImageResource",
+					"HengineTextResource",
+					"HengineBinaryResource",
+					"HengineFontResource",
+					"HengineAnimationResource",
+					"HengineSoundResource",
+					"HengineVideoResource"
+				]
 			},
 			"Intervals": {
 				"IntervalFunction": [

@@ -22,9 +22,7 @@ function parse(content, file) {
 					.trim()
 					.split("\n")
 					.map(line => {
-						line = line
-							.replace(/^\s*\*/g, "")
-							.trim();
+						line = line.replace(/^\s*\* /g, "");
 						if (line.startsWith("@")) {
 							const inx = line.indexOf(" ");
 							const category = line.slice(1, inx > -1 ? inx : line.length);

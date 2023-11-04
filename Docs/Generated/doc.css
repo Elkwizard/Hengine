@@ -37,6 +37,10 @@ a:not(.source-link) {
 	/* margin-right: 0.5em; */
 }
 
+.param-wrapper .type {
+	margin-left: 0;
+}
+
 .param {
 	color: var(--accent-1);
 }

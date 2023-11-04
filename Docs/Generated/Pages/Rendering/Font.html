@@ -12,8 +12,8 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L12" class="class-name source-link">Font</a>
 				</div>
 				<div class="class desc">
-				Represents a font, including family, side, and styling.
-Fonts can be used in the text rendering functions of <a href="../../Pages/Rendering/Artist.html#Artist">Artist</a>.
+				Represents a font, including family, side, and styling.
+Fonts can be used in the text rendering functions of <a href="../../Pages/Rendering/Artist.html#Artist">Artist</a>.
 				</div>
 				
 				
@@ -79,7 +79,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L20" class="function-name source-link">constructor</a>(<span class="param">size</span>, <span class="param">family</span>, <span class="param">bold?</span>, <span class="param">italic?</span>)
 			</div>
 			<div class="function desc">
-				Creates a new font. This operation is fairly expensive and thus should not be done every frame unless necessary.
+				Creates a new font. This operation is fairly expensive and thus should not be done every frame unless necessary.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -133,7 +133,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L106" class="function-name source-link">packText</a>(<span class="param">text</span>, <span class="param">maxWidth</span>)<span class="type">String</span>
 			</div>
 			<div class="function desc">
-				Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
+				Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -167,8 +167,8 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L137" class="function-name source-link">getTextBounds</a>(<span class="param">text</span>, <span class="param">maxWidth?</span>)<span class="type">Object</span>
 			</div>
 			<div class="function desc">
-				Returns the width and height of a string of text, optionally after being packed into a fixed max width.
-The return value contains <code>width</code> and <code>height</code> properties, both of which are Numbers.
+				Returns the width and height of a string of text, optionally after being packed into a fixed max width.
+The return value contains <code>.width</code> and <code>.height</code> properties, both of which are Numbers.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -202,7 +202,7 @@ The return value contains <code>width</code> and <code>height</code> properties,
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L150" class="function-name source-link">getTextLineWidth</a>(<span class="param">textLine</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
-				Returns the width of a single line of text. This method is faster than .getTextWidth().
+				Returns the width of a single line of text. This method is faster than <code>.getTextWidth()</code>.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -226,7 +226,7 @@ The return value contains <code>width</code> and <code>height</code> properties,
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L159" class="function-name source-link">getTextLineHeight</a>(<span class="param">textLine</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
-				Returns the height of a single line of text. This method is faster than .getTextHeight().
+				Returns the height of a single line of text. This method is faster than <code>.getTextHeight()</code>.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -250,7 +250,7 @@ The return value contains <code>width</code> and <code>height</code> properties,
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L167" class="function-name source-link">getTextWidth</a>(<span class="param">text</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
-				Returns the width of a string of text.
+				Returns the width of a string of text.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -274,7 +274,7 @@ The return value contains <code>width</code> and <code>height</code> properties,
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L177" class="function-name source-link">getTextHeight</a>(<span class="param">text</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
-				Returns the height of a string of text.
+				Returns the height of a string of text.
 			</div>
 			
 			<div class="header">Parameters</div>
@@ -298,7 +298,7 @@ The return value contains <code>width</code> and <code>height</code> properties,
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L186" class="function-name source-link">toString</a>()<span class="type">String</span>
 			</div>
 			<div class="function desc">
-				Converts the Font to a valid CSS font string.
+				Converts the Font to a valid CSS font string.
 			</div>
 			
 		</div>
@@ -308,7 +308,7 @@ The return value contains <code>width</code> and <code>height</code> properties,
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L195" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Font</span>
 			</div>
 			<div class="function desc">
-				Creates a copy of the font and optionally stores it in a provided destination.
+				Creates a copy of the font and optionally stores it in a provided destination.
 			</div>
 			
 			<div class="header">Parameters</div>

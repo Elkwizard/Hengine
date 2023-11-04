@@ -40,15 +40,27 @@ class PathManager {
 	}
 }
 
+/**
+ * Represents an external resource to be loaded by the Hengine.
+ * @prop String src | The path to the resource
+ */
 class HengineResource {
 	constructor(src) {
 		this.src = src;
 	}
+	/**
+	 * Begins the loading of the resource, and returns a Promise. The Promise resolves to the final resource value when the loading is completed, or null if it fails.
+	 * @return Promise 
+	 */
 	load() {
 
 	}
 }
 
+/**
+ * Represents an external script to be loaded.
+ * When this resource loads, it will run the loaded script and resolve to the HTMLScriptElement.
+ */
 class HengineScriptResource extends HengineResource {
 	load() {
 		const script = document.createElement("script");
@@ -67,7 +79,17 @@ class HengineScriptResource extends HengineResource {
 	}
 }
 
+/**
+ * Represents an external sound to be loaded.
+ * When this resource loads, it will resolve to a Sound.
+ * @prop Boolean loops | Whether or not the sound loops after completing
+ */
 class HengineSoundResource extends HengineResource {
+	/**
+	 * Creates a new HengineSoundResource
+	 * @param String src | The path to the sound
+	 * @param Boolean loops | Whether or not the sound loops
+	 */
 	constructor(src, loops) {
 		super(src);
 		this.loops = loops;
@@ -85,6 +107,10 @@ class HengineSoundResource extends HengineResource {
 	}
 }
 
+/**
+ * Represents an external image to be loaded.
+ * When this resource loads, it will resolve to an HImage.
+ */
 class HengineImageResource extends HengineResource {
 	load() {
 		const image = new HImage(this.src);
@@ -101,7 +127,17 @@ class HengineImageResource extends HengineResource {
 	}
 }
 
+/**
+ * Represents an external video to be loaded.
+ * When this resource loads, it will resolve to a VideoView.
+ * @prop Boolean loops | Whether or not the video loops after completing
+ */
 class HengineVideoResource extends HengineResource {
+	/**
+	 * Creates a new HengineVideoResource
+	 * @param String src | The path to the video
+	 * @param Boolean loops | Whether or not the video loops
+	 */
 	constructor(src, loops) {
 		super(src);
 		this.loops = loops;
@@ -117,7 +153,22 @@ class HengineVideoResource extends HengineResource {
 	}
 }
 
+/**
+ * Represents an external animation to be loaded.
+ * When this resource loads, it will resolve to an Animation.
+ * @prop String src | The path to a folder containing all the animation frames, named `1.png` to `n.png`
+ * @prop Number frames | The number of frames in the animation
+ * @prop Number delay | The number of runtime frames to display each frame for
+ * @prop Boolean loops | Whether or not the animation loops after completing
+ */
 class HengineAnimationResource extends HengineResource {
+	/**
+	 * Creates a new HengineAnimationResource.
+	 * @param String src | The path to a folder containing the animation frames
+	 * @param Number frames | The number of frames in the animation
+	 * @param Number delay | The number of runtime frames to display each frame for
+	 * @param Boolean loops | Whether or not the animation loops
+	 */
 	constructor(src, frames, delay, loops) {
 		super(src);
 		this.frames = frames;
@@ -149,6 +200,11 @@ class HengineAnimationResource extends HengineResource {
 	}
 }
 
+/**
+ * Represents an external Font to be loaded.
+ * When this resource loads, it will resolve to the name of the font family.
+ * @prop String src | The path to a CSS stylesheet containing the @font-face rule(s).
+ */
 class HengineFontResource extends HengineResource {
 	load() {
 		return new Promise(async resolve => {
@@ -204,6 +260,10 @@ class HengineFontResource extends HengineResource {
 }
 HengineFontResource.TEST_STRING = String.fromCharCode(...new Array(255).fill(0).map((_, code) => code));
 
+/**
+ * Represents an external text file to be loaded.
+ * When this resource is loaded, it resolves to the text content of the file.
+ */
 class HengineTextResource extends HengineResource {
 	load() {
 		return new Promise(async resolve => {
@@ -224,6 +284,10 @@ class HengineTextResource extends HengineResource {
 	}
 }
 
+/**
+ * Represents an external binary file to be loaded.
+ * When this resource is loaded, it resolves to a ByteBuffer containing the file content, with the pointer at 0.
+ */
 class HengineBinaryResource extends HengineResource {
 	load() {
 		return new Promise(async resolve => {
@@ -246,11 +310,31 @@ class HengineBinaryResource extends HengineResource {
 	}
 }
 
+/**
+ * Represents a batch of HengineResources to be loaded in a row, and can be used as a more streamlined approach to constructing HengineResources by directly.
+ * It contains an internal list of resources to load, and many of its methods simply add to this list, which can eventually be flushed and loaded, though only once per instance.
+ * These methods also return the caller, which allows for convenient chaining.
+ * ```js
+ * new HengineLoadingStructure()
+ * 	.image("cat.png")
+ * 	.image("dog.png")
+ * 	.folder("renderers", structure => structure
+ * 		.script("catRenderer.js")
+ * 		.script("dogRenderer.js")
+ * 	)
+ * 	.script("index.js")
+ * ```
+ */
 class HengineLoadingStructure {
 	constructor() {
 		this.context = [];
 		this.resources = [];
 	}
+	/**
+	 * Loads all the queued resources, and returns the HengineLoader instance that contains them.
+	 * @param Boolean done | Whether or not the HengineLoader should start the update loop after these resources finish loading
+	 * @return HengineLoader
+	 */
 	load(done) {
 		return HengineLoader.load(this.resources, done);
 	}
@@ -261,6 +345,12 @@ class HengineLoadingStructure {
 		this.resources.push(resource);
 		return this;
 	}
+	/**
+	 * Adds all the queued resources from another HengineLoadingStructure to the caller's queue.
+	 * Returns the caller.
+	 * @param HengineLoadingStructure structure | The structure to get the queue from
+	 * @return HengineLoadingStructure
+	 */
 	from(structure) {
 		this.resources.push(...structure.resources.map(res => {
 			const copy = new res.constructor(this.absSrc(res.src));
@@ -271,27 +361,66 @@ class HengineLoadingStructure {
 		}));
 		return this;
 	}
+	/**
+	 * Puts the loading structure in the context of a specified folder, calls a specific function, and then exits the context.
+	 * Calls to this function while inside a call to this function will stack the contexts together, allowing nesting of folder scopes.
+	 * Returns the caller.
+	 * @param String path | The relative path to the folder to add to the context stack
+	 * @param Function fn | The function to call while in the context
+	 * @return HengineLoadingStructure
+	 */
 	folder(name, fn) {
 		this.context.push(name);
 		fn(this);
 		this.context.pop();
 		return this;
 	}
+	/**
+	 * Adds a HengineScriptResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @return HengineLoadingStructure
+	 */
 	script(src) {
 		return this.add(new HengineScriptResource(this.absSrc(src)));
 	}
+	/**
+	 * Adds a HengineBinaryResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @return HengineLoadingStructure
+	 */
 	binary(src) {
 		return this.add(new HengineBinaryResource(this.absSrc(src)));
 	}
+	/**
+	 * Adds a HengineTextResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @return HengineLoadingStructure
+	 */
 	text(src) {
 		return this.add(new HengineTextResource(this.absSrc(src)));
 	}
+	/**
+	 * Adds a HengineImageResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @return HengineLoadingStructure
+	 */
 	image(src) {
 		return this.add(new HengineImageResource(this.absSrc(src)));
 	}
+	/**
+	 * Adds a HengineFontResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @return HengineLoadingStructure
+	 */
 	font(src) {
 		return this.add(new HengineFontResource(this.absSrc(src)));
 	}
+	/**
+	 * Adds a HengineAnimationResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @param Object options? | An object containing `.frames`, `.delay`, and `.loops` properties that will be passed to the HengineAnimationResource constructor. These values have defaults of 1, 1, and true, respectively
+	 * @return HengineLoadingStructure
+	 */
 	animation(src, {
 		frames = 1,
 		delay = 1,
@@ -299,11 +428,23 @@ class HengineLoadingStructure {
 	} = {}) {
 		return this.add(new HengineAnimationResource(this.absSrc(src), frames, delay, loops));
 	}
+	/**
+	 * Adds a HengineVideoResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @param Object options? | An object containing a `.loops` properties that will be passed to the HengineVideoResource constructor. The default value is true
+	 * @return HengineLoadingStructure
+	 */
 	video(src, {
 		loops = false
 	} = {}) {
 		return this.add(new HengineVideoResource(this.absSrc(src), loops));
 	}
+	/**
+	 * Adds a HengineSoundResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @param Object options? | An object containing a `.loops` properties that will be passed to the HengineSoundResource constructor. The default value is true
+	 * @return HengineLoadingStructure
+	 */
 	sound(src, {
 		loops = false
 	} = {}) {

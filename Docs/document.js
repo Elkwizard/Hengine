@@ -122,7 +122,7 @@ function document(doc, topLevelIDs, file) {
 	console.log(`documenting ${doc.name.base}`);
 
 	// highlight and transform code blocks
-	result = result.replace(/```(\w+?)\n([\w\W]*?)```/g, (_, language, code) => {
+	result = result.replace(/```(\w+?)\s*\n([\w\W]*?)```/g, (_, language, code) => {
 		return highlight(code, highlighters[language], palettes.dark, true);
 	});
 	result = result.replace(/`(.*?)`/g, `<code>$1</code>`);

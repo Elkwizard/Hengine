@@ -114,7 +114,7 @@ class Interpolation {
     }
 	/**
 	 * A linear easing function. Can be used to adjust animation timing.
-	 * @prop Number t | The input parameter value, on [0, 1]
+	 * @param Number t | The input parameter value, on [0, 1]
 	 * @return Number
 	 */
     static linear(t) {
@@ -122,7 +122,7 @@ class Interpolation {
     }
 	/**
 	 * A smoothed easing function. Can be used to adjust animation timing.
-	 * @prop Number t | The input parameter value, on [0, 1]
+	 * @param Number t | The input parameter value, on [0, 1]
 	 * @return Number
 	 */
     static smooth(t) {
@@ -130,7 +130,7 @@ class Interpolation {
     }
 	/**
 	 * A increasing-speed easing function. Can be used to adjust animation timing.
-	 * @prop Number t | The input parameter value, on [0, 1]
+	 * @param Number t | The input parameter value, on [0, 1]
 	 * @return Number
 	 */
     static increasing(t) {
@@ -138,7 +138,7 @@ class Interpolation {
     }
 	/**
 	 * A decreasing-speed easing function. Can be used to adjust animation timing.
-	 * @prop Number t | The input parameter value, on [0, 1]
+	 * @param Number t | The input parameter value, on [0, 1]
 	 * @return Number
 	 */
     static decreasing(t) {

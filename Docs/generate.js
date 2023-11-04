@@ -51,6 +51,7 @@ for (const doc of docs)
 for (let i = 0; i < docs.length; i++) {
 	const doc = docs[i];
 	const path = nameToPath[doc.name.base];
+	if (!path) console.log(`${doc.name.base} doesn't exist!`); 
 	// console.log(doc.name.base, path);
 	pathToDocumentation[path] = (pathToDocumentation[path] ?? "") + document(doc, nameToPath, path);
 }
