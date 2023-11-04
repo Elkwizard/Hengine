@@ -9,11 +9,27 @@
 				
 			<div class="class-wrapper" id="IntervalFunction">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L14" class="class-name source-link">IntervalFunction</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L31" class="class-name source-link">IntervalFunction</a>
 				</div>
 				<div class="class desc">
 				A wrapper for operations that happen over time or after a time.
 These can generally be created by methods of <a href="../../../Pages/Structure/Intervals/IntervalManager.html#IntervalManager">IntervalManager</a>.
+<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">const</span><span style="color: #88d"> transitionFunction</span><span style="color: #f8f"> = </span><span style="color: #ddd">intervals</span><span style="color: #f8f">.</span><span style="color: #88d">transition</span><span style="color: #f8f">(</span><span style="color: #ddd">t</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{
+	</span><span style="color: #ddd">console</span><span style="color: #f8f">.</span><span style="color: #88d">log</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;Progress: &quot;</span><span style="color: #f8f"> + </span><span style="color: #ddd">t</span><span style="color: #f8f">);
+},</span><span style="color: #fd1"> 5</span><span style="color: #f8f">);
+
+</span><span style="color: #ddd">transitionFunction</span><span style="color: #f8f">.</span><span style="color: #aad">done</span><span style="color: #f8f">.</span><span style="color: #88d">then</span><span style="color: #f8f">(()</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{
+	</span><span style="color: #ddd">console</span><span style="color: #f8f">.</span><span style="color: #88d">log</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;The transition has completed&quot;</span><span style="color: #f8f">);
+});
+
+</span><span style="color: #444">// Progress: 0</span><span style="color: #f8f">
+</span><span style="color: #444">// Progress: 0.2</span><span style="color: #f8f">
+</span><span style="color: #444">// Progress: 0.4</span><span style="color: #f8f">
+</span><span style="color: #444">// Progress: 0.6</span><span style="color: #f8f">
+</span><span style="color: #444">// Progress: 0.8</span><span style="color: #f8f">
+</span><span style="color: #444">// Progress: 1</span><span style="color: #f8f">
+</span><span style="color: #444">// The transition has completed</span><span style="color: #f8f">
+</span></code>
 				</div>
 				
 					<div class="header">Subclasses</div>
@@ -93,7 +109,7 @@ These can generally be created by methods of <a href="../../../Pages/Structure/I
 		
 			<div class="class-wrapper" id="DelayedFunction">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L39" class="class-name source-link">DelayedFunction</a> <span class="keyword">extends</span> <span class="class-name">IntervalFunction</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L56" class="class-name source-link">DelayedFunction</a> <span class="keyword">extends</span> <span class="class-name">IntervalFunction</span>
 				</div>
 				<div class="class desc">
 				This IntervalFunction executes an operation once after a specified delay.
@@ -107,7 +123,7 @@ These can generally be created by methods of <a href="../../../Pages/Structure/I
 		
 			<div class="class-wrapper" id="TransitionFunction">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L51" class="class-name source-link">TransitionFunction</a> <span class="keyword">extends</span> <span class="class-name">IntervalFunction</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L68" class="class-name source-link">TransitionFunction</a> <span class="keyword">extends</span> <span class="class-name">IntervalFunction</span>
 				</div>
 				<div class="class desc">
 				This IntervalFunction executes an operation every frame over a duration and is passed a completion percentage.
@@ -121,7 +137,7 @@ These can generally be created by methods of <a href="../../../Pages/Structure/I
 		
 			<div class="class-wrapper" id="ContinuousFunction">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L63" class="class-name source-link">ContinuousFunction</a> <span class="keyword">extends</span> <span class="class-name">IntervalFunction</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L80" class="class-name source-link">ContinuousFunction</a> <span class="keyword">extends</span> <span class="class-name">IntervalFunction</span>
 				</div>
 				<div class="class desc">
 				This IntervalFunction executes an operation once every frame forever.
@@ -135,7 +151,7 @@ These can generally be created by methods of <a href="../../../Pages/Structure/I
 		
 			<div class="class-wrapper" id="WaitUntilFunction">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L76" class="class-name source-link">WaitUntilFunction</a> <span class="keyword">extends</span> <span class="class-name">IntervalFunction</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L93" class="class-name source-link">WaitUntilFunction</a> <span class="keyword">extends</span> <span class="class-name">IntervalFunction</span>
 				</div>
 				<div class="class desc">
 				This IntervalFunction executes an operation once after a provided condition is met.

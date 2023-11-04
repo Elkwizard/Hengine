@@ -42,6 +42,15 @@ class PathManager {
 
 /**
  * Represents an external resource to be loaded by the Hengine.
+ * ```js
+ * HengineLoader.load([
+ * 	new HengineImageResource("cat.png"),
+ * 	new HengineImageResource("dog.png"),
+ * 	new HengineScriptResource("renderers/catRenderer.js"),
+ * 	new HengineScriptResource("renderers/dogRenderer.js"),
+ * 	new HengineScriptResource("index.js")
+ * ]);
+ * ```
  * @prop String src | The path to the resource
  */
 class HengineResource {
@@ -323,6 +332,7 @@ class HengineBinaryResource extends HengineResource {
  * 		.script("dogRenderer.js")
  * 	)
  * 	.script("index.js")
+ * 	.load()
  * ```
  */
 class HengineLoadingStructure {
@@ -366,7 +376,7 @@ class HengineLoadingStructure {
 	 * Calls to this function while inside a call to this function will stack the contexts together, allowing nesting of folder scopes.
 	 * Returns the caller.
 	 * @param String path | The relative path to the folder to add to the context stack
-	 * @param Function fn | The function to call while in the context
+	 * @param Function fn | The function to call while in the context. This function is passed the caller as an argument
 	 * @return HengineLoadingStructure
 	 */
 	folder(name, fn) {

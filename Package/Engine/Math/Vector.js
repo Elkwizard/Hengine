@@ -119,6 +119,13 @@ class Vector extends Operable {
 Vector.modValues = [];
 /**
  * Represents a 2D vector.
+ * ```js
+ * const i = new Vector2(1, 0);
+ * const j = new Vector2(0, 1);
+ * console.log(i.dot(j)); // 0
+ * console.log(i.cross(j)); // 1
+ * console.log(i.plus(j).normalize()) // (1/√2, 1/√2)
+ * ```
  * @prop Number angle | The clockwise (in screen space) angle of the vector from the horizontal
  * @prop Vector2 normal | The vector with the same magnitude but perpendicular direction. Right-handed (in screen space)
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y"]`

@@ -1,6 +1,23 @@
 /**
  * A wrapper for operations that happen over time or after a time.
  * These can generally be created by methods of IntervalManager.
+ * ```js
+ * const transitionFunction = intervals.transition(t => {
+ * 	console.log("Progress: " + t);
+ * }, 5);
+ * 
+ * transitionFunction.done.then(() => {
+ * 	console.log("The transition has completed");
+ * });
+ * 
+ * // Progress: 0
+ * // Progress: 0.2
+ * // Progress: 0.4
+ * // Progress: 0.6
+ * // Progress: 0.8
+ * // Progress: 1
+ * // The transition has completed
+ * ```
  * @prop Function fn | The function to call during the operation
  * @prop Symbol type | When during the update cycle the function updates
  * @prop Promise promise | A promise which resolves when the operation completes

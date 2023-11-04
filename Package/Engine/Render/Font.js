@@ -1,6 +1,11 @@
 /**
  * Represents a font, including family, side, and styling.
  * Fonts can be used in the text rendering functions of Artist.
+ * ```js
+ * const font = new Font(15, "Consolas", false, true); // italic 15px Consolas
+ * 
+ * renderer.draw(Color.BLACK).text(font, "Hello World!", 0, 0);
+ * ```
  * @prop Number size | The size of the font in CSS pixels
  * @prop String family | The string identifier for the font family
  * @prop Boolean bold | Whether the font is bold

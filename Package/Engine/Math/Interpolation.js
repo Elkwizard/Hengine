@@ -1,6 +1,11 @@
 /**
  * Provides a collection of interpolation algorithms that operate on operables and numbers.
  * All methods of this class are static and do not mutate their arguments.
+ * ```js
+ * Interpolation.lerp(new Color("red"), new Color("blue"), 0.5); // dark purple
+ * Interpolation.lerp(new Vector2(0, 0), new Vector2(10, 0), 0.3); // (3, 0)
+ * Interpolation.lerp(0, 10, 0.8) // 8
+ * ```
  */
 class Interpolation {
 	/**

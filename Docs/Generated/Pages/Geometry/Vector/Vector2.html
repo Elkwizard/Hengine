@@ -9,10 +9,16 @@
 				
 			<div class="class-wrapper" id="Vector2">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L126" class="class-name source-link">Vector2</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L133" class="class-name source-link">Vector2</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Geometry/Vector/Vector.html#Vector">Vector</a></span>
 				</div>
 				<div class="class desc">
 				Represents a 2D vector.
+<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">const</span><span style="color: #88d"> i</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> Vector2</span><span style="color: #f8f">(</span><span style="color: #fd1">1</span><span style="color: #f8f">,</span><span style="color: #fd1"> 0</span><span style="color: #f8f">);</span><span style="color: #a5a">
+const</span><span style="color: #88d"> j</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> Vector2</span><span style="color: #f8f">(</span><span style="color: #fd1">0</span><span style="color: #f8f">,</span><span style="color: #fd1"> 1</span><span style="color: #f8f">);
+</span><span style="color: #ddd">console</span><span style="color: #f8f">.</span><span style="color: #88d">log</span><span style="color: #f8f">(</span><span style="color: #ddd">i</span><span style="color: #f8f">.</span><span style="color: #88d">dot</span><span style="color: #f8f">(</span><span style="color: #ddd">j</span><span style="color: #f8f">)); </span><span style="color: #444">// 0</span><span style="color: #f8f">
+</span><span style="color: #ddd">console</span><span style="color: #f8f">.</span><span style="color: #88d">log</span><span style="color: #f8f">(</span><span style="color: #ddd">i</span><span style="color: #f8f">.</span><span style="color: #88d">cross</span><span style="color: #f8f">(</span><span style="color: #ddd">j</span><span style="color: #f8f">)); </span><span style="color: #444">// 1</span><span style="color: #f8f">
+</span><span style="color: #ddd">console</span><span style="color: #f8f">.</span><span style="color: #88d">log</span><span style="color: #f8f">(</span><span style="color: #ddd">i</span><span style="color: #f8f">.</span><span style="color: #88d">plus</span><span style="color: #f8f">(</span><span style="color: #ddd">j</span><span style="color: #f8f">).</span><span style="color: #88d">normalize</span><span style="color: #f8f">()) </span><span style="color: #444">// (1/√2, 1/√2)</span><span style="color: #f8f">
+</span></code>
 				</div>
 				
 				
@@ -47,7 +53,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L132" class="function-name source-link">constructor</a>(<span class="param">x</span>, <span class="param">y</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L139" class="function-name source-link">constructor</a>(<span class="param">x</span>, <span class="param">y</span>)
 			</div>
 			<div class="function desc">
 				Creates a new Vector2.
@@ -81,7 +87,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L200" class="function-name source-link">rotate</a>(<span class="param">angle</span>)<span class="type">Vector2</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L207" class="function-name source-link">rotate</a>(<span class="param">angle</span>)<span class="type">Vector2</span>
 			</div>
 			<div class="function desc">
 				Rotates the vector clockwise (in screen space). This operation is in-place and returns the caller.
@@ -105,7 +111,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L214" class="function-name source-link">rotated</a>(<span class="param">angle</span>)<span class="type">Vector2</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L221" class="function-name source-link">rotated</a>(<span class="param">angle</span>)<span class="type">Vector2</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the vector rotated clockwise (in screen space) by a specified angle.
@@ -129,7 +135,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L227" class="function-name source-link">cross</a>(<span class="param">v</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L234" class="function-name source-link">cross</a>(<span class="param">v</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the 2D "cross product" (x1 * y2 - y1 * x2) between the caller and another vector.
@@ -153,7 +159,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L325" class="function-name source-link">Vector2.left</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L325" class="function-name source-link">Vector2.right</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L325" class="function-name source-link">Vector2.up</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L325" class="function-name source-link">Vector2.down</a><span class="type">Vector2</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L332" class="function-name source-link">Vector2.left</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L332" class="function-name source-link">Vector2.right</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L332" class="function-name source-link">Vector2.up</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L332" class="function-name source-link">Vector2.down</a><span class="type">Vector2</span>
 			</div>
 			<div class="function desc">
 				Returns a new unit vector pointing in a specified direction (in screen space).
@@ -163,7 +169,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L341" class="function-name source-link">Vector2.origin</a><span class="type">Vector2</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L348" class="function-name source-link">Vector2.origin</a><span class="type">Vector2</span>
 			</div>
 			<div class="function desc">
 				Returns a new vector with both components initialized to 0.
@@ -173,7 +179,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L349" class="function-name source-link">Vector2.x</a>(<span class="param">x</span>)<span class="type">Vector2</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L356" class="function-name source-link">Vector2.x</a>(<span class="param">x</span>)<span class="type">Vector2</span>
 			</div>
 			<div class="function desc">
 				Creates a vector with a specified x component and a y component of 0.
@@ -197,7 +203,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L357" class="function-name source-link">Vector2.y</a>(<span class="param">y</span>)<span class="type">Vector2</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L364" class="function-name source-link">Vector2.y</a>(<span class="param">y</span>)<span class="type">Vector2</span>
 			</div>
 			<div class="function desc">
 				Creates a vector with a specified y component and a x component of 0.
@@ -221,7 +227,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L365" class="function-name source-link">Vector2.fromAngle</a>(<span class="param">angle</span>)<span class="type">Vector2</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Vector.js?#L372" class="function-name source-link">Vector2.fromAngle</a>(<span class="param">angle</span>)<span class="type">Vector2</span>
 			</div>
 			<div class="function desc">
 				Creates a unit vector with a specified clockwise (in screen space) angle from the horizontal.

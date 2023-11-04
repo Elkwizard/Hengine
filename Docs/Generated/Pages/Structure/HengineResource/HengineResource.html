@@ -9,10 +9,18 @@
 				
 			<div class="class-wrapper" id="HengineResource">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L47" class="class-name source-link">HengineResource</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L56" class="class-name source-link">HengineResource</a>
 				</div>
 				<div class="class desc">
 				Represents an external resource to be loaded by the <a href="../../../Pages/Structure/Hengine.html#Hengine">Hengine</a>.
+<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #ddd"><a href="../../../Pages/Structure/HengineLoader.html#HengineLoader">HengineLoader</a></span><span style="color: #f8f">.</span><span style="color: #88d">load</span><span style="color: #f8f">([
+</span><span style="color: #a5a">	new</span><span style="color: #88d"> HengineImageResource</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;cat.png&quot;</span><span style="color: #f8f">),
+</span><span style="color: #a5a">	new</span><span style="color: #88d"> HengineImageResource</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;dog.png&quot;</span><span style="color: #f8f">),
+</span><span style="color: #a5a">	new</span><span style="color: #88d"> HengineScriptResource</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;renderers/catRenderer.js&quot;</span><span style="color: #f8f">),
+</span><span style="color: #a5a">	new</span><span style="color: #88d"> HengineScriptResource</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;renderers/dogRenderer.js&quot;</span><span style="color: #f8f">),
+</span><span style="color: #a5a">	new</span><span style="color: #88d"> HengineScriptResource</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;index.js&quot;</span><span style="color: #f8f">)
+]);
+</span></code>
 				</div>
 				
 					<div class="header">Subclasses</div>
@@ -36,7 +44,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L55" class="function-name source-link">load</a>()<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L64" class="function-name source-link">load</a>()<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Begins the loading of the resource, and returns a Promise. The Promise resolves to the final resource value when the loading is completed, or null if it fails.
@@ -49,7 +57,7 @@
 		
 			<div class="class-wrapper" id="HengineScriptResource">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L64" class="class-name source-link">HengineScriptResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L73" class="class-name source-link">HengineScriptResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
 				</div>
 				<div class="class desc">
 				Represents an external script to be loaded.
@@ -64,7 +72,7 @@ When this resource loads, it will run the loaded script and resolve to the HTMLS
 		
 			<div class="class-wrapper" id="HengineSoundResource">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L87" class="class-name source-link">HengineSoundResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L96" class="class-name source-link">HengineSoundResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
 				</div>
 				<div class="class desc">
 				Represents an external sound to be loaded.
@@ -89,7 +97,7 @@ When this resource loads, it will resolve to a Sound.
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L93" class="function-name source-link">constructor</a>(<span class="param">src</span>, <span class="param">loops</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L102" class="function-name source-link">constructor</a>(<span class="param">src</span>, <span class="param">loops</span>)
 			</div>
 			<div class="function desc">
 				Creates a new HengineSoundResource
@@ -126,7 +134,7 @@ When this resource loads, it will resolve to a Sound.
 		
 			<div class="class-wrapper" id="HengineImageResource">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L114" class="class-name source-link">HengineImageResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L123" class="class-name source-link">HengineImageResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
 				</div>
 				<div class="class desc">
 				Represents an external image to be loaded.
@@ -141,7 +149,7 @@ When this resource loads, it will resolve to an <a href="../../../Pages/Renderin
 		
 			<div class="class-wrapper" id="HengineVideoResource">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L135" class="class-name source-link">HengineVideoResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L144" class="class-name source-link">HengineVideoResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
 				</div>
 				<div class="class desc">
 				Represents an external video to be loaded.
@@ -166,7 +174,7 @@ When this resource loads, it will resolve to a <a href="../../../Pages/Rendering
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L141" class="function-name source-link">constructor</a>(<span class="param">src</span>, <span class="param">loops</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L150" class="function-name source-link">constructor</a>(<span class="param">src</span>, <span class="param">loops</span>)
 			</div>
 			<div class="function desc">
 				Creates a new HengineVideoResource
@@ -203,7 +211,7 @@ When this resource loads, it will resolve to a <a href="../../../Pages/Rendering
 		
 			<div class="class-wrapper" id="HengineAnimationResource">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L164" class="class-name source-link">HengineAnimationResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L173" class="class-name source-link">HengineAnimationResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
 				</div>
 				<div class="class desc">
 				Represents an external animation to be loaded.
@@ -249,7 +257,7 @@ When this resource loads, it will resolve to an <a href="../../../Pages/Renderin
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L172" class="function-name source-link">constructor</a>(<span class="param">src</span>, <span class="param">frames</span>, <span class="param">delay</span>, <span class="param">loops</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L181" class="function-name source-link">constructor</a>(<span class="param">src</span>, <span class="param">frames</span>, <span class="param">delay</span>, <span class="param">loops</span>)
 			</div>
 			<div class="function desc">
 				Creates a new HengineAnimationResource.
@@ -306,7 +314,7 @@ When this resource loads, it will resolve to an <a href="../../../Pages/Renderin
 		
 			<div class="class-wrapper" id="HengineFontResource">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L208" class="class-name source-link">HengineFontResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L217" class="class-name source-link">HengineFontResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
 				</div>
 				<div class="class desc">
 				Represents an external <a href="../../../Pages/Rendering/Font.html#Font">Font</a> to be loaded.
@@ -331,7 +339,7 @@ When this resource loads, it will resolve to the name of the font family.
 		
 			<div class="class-wrapper" id="HengineTextResource">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L267" class="class-name source-link">HengineTextResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L276" class="class-name source-link">HengineTextResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
 				</div>
 				<div class="class desc">
 				Represents an external text file to be loaded.
@@ -346,7 +354,7 @@ When this resource is loaded, it resolves to the text content of the file.
 		
 			<div class="class-wrapper" id="HengineBinaryResource">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L291" class="class-name source-link">HengineBinaryResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\HengineLoader.js?#L300" class="class-name source-link">HengineBinaryResource</a> <span class="keyword">extends</span> <span class="class-name">HengineResource</span>
 				</div>
 				<div class="class desc">
 				Represents an external binary file to be loaded.

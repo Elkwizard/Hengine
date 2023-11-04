@@ -1,5 +1,17 @@
 /**
  * Facilitates the creation of lazily-evaluated expressions.
+ * ```js
+ * const object = { };
+ * Lazy.define(object, "lazy", () => { // an expensive operation
+ * 	let result = 0;
+ * 	for (let i = 0; i < 1e6; i++)
+ * 		result += Math.random();
+ * 	return result;
+ * });
+ * 
+ * console.log(object.lazy); // takes a while
+ * console.log(object.lazy); // cheap from now on
+ * ```
  */
 class Lazy {
 	/**

@@ -1,6 +1,20 @@
 /**
  * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates.
- * Due to its use with 2D vectors, the last row of the matrix is not used and will always be [ 1 0 0 ]. 
+ * Due to its use with 2D vectors, the last row of the matrix is not used and will always be [ 1 0 0 ].
+ * ```js
+ * const transformation = Matrix3.mulMatrices([
+ * 	Matrix3.translation(10, 5),
+ * 	Matrix3.rotate(Math.PI)
+ * ]);
+ * 
+ * const initialPoint = new Vector2(10, 20);
+ * 
+ * const finalPoint = transformation.times(initialPoint);
+ * console.log(finalPoint); // (0, -15)
+ * 
+ * const initialAgain = transformation.inverse.times(finalPoint);
+ * console.log(initialAgain); // (10, 20)
+ * ```
  * @prop Number m[R][C] | The matrix element in row R and column C (0-indexed).
  */
 class Matrix3 extends Float64Array {
