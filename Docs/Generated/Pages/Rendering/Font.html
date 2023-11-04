@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="Font">
 				<div class="class-header">
-					<span class="keyword">class</span> <span class="class-name">Font</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L12" class="class-name source-link">Font</a>
 				</div>
 				<div class="class desc">
 				Represents a font, including family, side, and styling. Fonts can be used in the text rendering functions of <a href="../../Pages/Rendering/Artist.html#Artist">Artist</a>.
@@ -75,7 +75,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">constructor</span>(<span class="param">size</span>, <span class="param">family</span>, <span class="param">bold?</span>, <span class="param">italic?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L20" class="function-name source-link">constructor</a>(<span class="param">size</span>, <span class="param">family</span>, <span class="param">bold?</span>, <span class="param">italic?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new font. This operation is fairly expensive and thus should not be done every frame unless necessary.
@@ -86,7 +86,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">size</span><span class="type">Number</span>
+					<span class="param">size</span>
+					<span class="type">Number</span>
 				</div>
 				<div class="param desc">
 					The size of the font
@@ -95,7 +96,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">family</span><span class="type">String</span>
+					<span class="param">family</span>
+					<span class="type">String</span>
 				</div>
 				<div class="param desc">
 					The font family
@@ -104,7 +106,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">bold</span><span class="type">Boolean</span>
+					<span class="param">bold</span>
+					<span class="type">Boolean</span>
 				</div>
 				<div class="param desc">
 					Whether the font is bold, default is false
@@ -113,7 +116,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">italic</span><span class="type">Boolean</span>
+					<span class="param">italic</span>
+					<span class="type">Boolean</span>
 				</div>
 				<div class="param desc">
 					Whether the font is italic, default is false
@@ -125,7 +129,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">packText</span>(<span class="param">text</span>, <span class="param">maxWidth</span>)<span class="type">String</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L106" class="function-name source-link">packText</a>(<span class="param">text</span>, <span class="param">maxWidth</span>)<span class="type">String</span>
 			</div>
 			<div class="function desc">
 				Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
@@ -136,7 +140,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">text</span><span class="type">String</span>
+					<span class="param">text</span>
+					<span class="type">String</span>
 				</div>
 				<div class="param desc">
 					The text to pack
@@ -145,7 +150,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">maxWidth</span><span class="type">Number</span>
+					<span class="param">maxWidth</span>
+					<span class="type">Number</span>
 				</div>
 				<div class="param desc">
 					The maximum width of a single line in the output text
@@ -157,7 +163,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">getTextBounds</span>(<span class="param">text</span>, <span class="param">maxWidth?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L137" class="function-name source-link">getTextBounds</a>(<span class="param">text</span>, <span class="param">maxWidth?</span>)<span class="type">Object</span>
 			</div>
 			<div class="function desc">
 				Returns the width and height of a string of text, optionally after being packed into a fixed max width. The return value contains <span class="code">width</span> and <span class="code">height</span> properties, both of which are Numbers.
@@ -168,7 +174,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">text</span><span class="type">String</span>
+					<span class="param">text</span>
+					<span class="type">String</span>
 				</div>
 				<div class="param desc">
 					The text to be measured
@@ -177,7 +184,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">maxWidth</span><span class="type">Number</span>
+					<span class="param">maxWidth</span>
+					<span class="type">Number</span>
 				</div>
 				<div class="param desc">
 					The maximum width of a single line, default is Infinity
@@ -189,7 +197,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">getTextLineWidth</span>(<span class="param">textLine</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L150" class="function-name source-link">getTextLineWidth</a>(<span class="param">textLine</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the width of a single line of text. This method is faster than .getTextWidth().
@@ -200,7 +208,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">textLine</span><span class="type">String</span>
+					<span class="param">textLine</span>
+					<span class="type">String</span>
 				</div>
 				<div class="param desc">
 					A single line string of text to measure
@@ -212,7 +221,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">getTextLineHeight</span>(<span class="param">textLine</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L159" class="function-name source-link">getTextLineHeight</a>(<span class="param">textLine</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the height of a single line of text. This method is faster than .getTextHeight().
@@ -223,7 +232,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">textLine</span><span class="type">String</span>
+					<span class="param">textLine</span>
+					<span class="type">String</span>
 				</div>
 				<div class="param desc">
 					A single line string of text to measure
@@ -235,7 +245,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">getTextWidth</span>(<span class="param">text</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L167" class="function-name source-link">getTextWidth</a>(<span class="param">text</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the width of a string of text.
@@ -246,7 +256,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">text</span><span class="type">String</span>
+					<span class="param">text</span>
+					<span class="type">String</span>
 				</div>
 				<div class="param desc">
 					The text to measure
@@ -258,7 +269,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">getTextHeight</span>(<span class="param">text</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L177" class="function-name source-link">getTextHeight</a>(<span class="param">text</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the height of a string of text.
@@ -269,7 +280,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">text</span><span class="type">String</span>
+					<span class="param">text</span>
+					<span class="type">String</span>
 				</div>
 				<div class="param desc">
 					The text to measure
@@ -281,7 +293,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">toString</span>()<span class="type">String</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L186" class="function-name source-link">toString</a>()<span class="type">String</span>
 			</div>
 			<div class="function desc">
 				Converts the Font to a valid CSS font string.
@@ -291,7 +303,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">get</span>(<span class="param">destination?</span>)<span class="type">Font</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Font.js?#L195" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Font</span>
 			</div>
 			<div class="function desc">
 				Creates a copy of the font and optionally stores it in a provided destination.
@@ -302,7 +314,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">destination</span><span class="type">Font</span>
+					<span class="param">destination</span>
+					<span class="type">Font</span>
 				</div>
 				<div class="param desc">
 					The destination to copy the font into.

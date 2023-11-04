@@ -11,8 +11,11 @@ span {
 a {
 	color: inherit;
 	text-decoration: none;
-	font-style: italic;
 	font-size: 1em;
+}
+
+a:not(.source-link) {
+	font-style: italic;
 }
 
 .class-name, .function-name, .prop-name {
@@ -48,6 +51,11 @@ a {
 
 .aux {
 	color: var(--accent-2);
+	white-space: pre;
+}
+
+.syntax {
+	color: white;
 	white-space: pre;
 }
 

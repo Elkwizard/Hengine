@@ -1,9 +1,13 @@
 const path = require("path");
 
-function documentName(name, wrapperClass) {
+function sourceLink(doc) {
+	return `https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/${doc.source.file}?#L${doc.source.line}`;
+}
+
+function documentName(name, doc, wrapperClass) {
 	let result = name.base;
 	if (name.isStatic) result = `${wrapperClass}.${result}`;
-	result = `<span class="${name.isClass ? "class-name" : "function-name"}">${result}</span>`;
+	result = `<a href="${sourceLink(doc)}" class="${name.isClass ? "class-name" : "function-name"} source-link">${result}</a>`;
 	if (name.isGetter) result = `<span class="keyword">get</span> ${result}`;
 	if (name.isSetter) result = `<span class="keyword">set</span> ${result}`;
 	if (name.baseClass) result += ` <span class="keyword">extends</span> <span class="class-name">${name.baseClass}</span>`
@@ -12,7 +16,7 @@ function documentName(name, wrapperClass) {
 
 function documentFunction(fn, wrapperClass) {
 	const names = fn.lines.find(line => line.category === "group")?.elements;
-	const name = names ? `${names.map(name => documentName(name, wrapperClass)).join(`<span class="aux">/</span>`)}` : documentName(fn.name, wrapperClass);
+	const name = names ? `${names.map(name => documentName(name, fn, wrapperClass)).join(`<span class="aux">/</span>`)}` : documentName(fn.name, fn, wrapperClass);
 	const signatures = fn.lines
 		.filter(line => line.category === "signature").map(line => line.parameters);
 	const returnType = fn.lines.find(line => line.category === "return")?.type ?? "void";
@@ -34,7 +38,8 @@ function documentFunction(fn, wrapperClass) {
 		.map(param => `
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">${param.name.replace(/\W/g, "")}</span><span class="type">${param.type}</span>
+					<span class="param">${param.name.replace(/\W/g, "")}</span>
+					<span class="type">${param.type}</span>
 				</div>
 				<div class="param desc">
 					${param.description}
@@ -64,7 +69,7 @@ function documentFunction(fn, wrapperClass) {
 function document(doc, topLevelIDs, file) {
 	let result;
 	if (doc.name.isClass) {
-		const name = documentName(doc.name);
+		const name = documentName(doc.name, doc);
 		const description = doc.lines.find(line => line.category === null)?.content ?? "";
 		const subclass = (doc.subclasses ?? [])
 			.map(cls => `<span class="class-name">${cls.name.base}</span>`)

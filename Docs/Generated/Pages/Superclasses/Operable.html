@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="Operable">
 				<div class="class-header">
-					<span class="keyword">class</span> <span class="class-name">Operable</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L9" class="class-name source-link">Operable</a>
 				</div>
 				<div class="class desc">
 				Represents a composite mathematical object which element-wise operations can be performed on. Many mathematical operations (plus, minus, times, over) can be performed on operables of any subclass type, allowing for convenient polymorphism. Operable is an abstract superclass, and should not be constructed. All immutable methods, including static methods, are available on Number. This means that Number can largely be considered a subclass of operable and can be used for operable-typed arguments.
@@ -36,7 +36,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <span class="function-name">values</span><span class="type">Number[]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L17" class="function-name source-link">values</a><span class="type">Number[]</span>
 			</div>
 			<div class="function desc">
 				Produces a list of all the elements of the operable.
@@ -46,7 +46,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">set</span>(<span class="param">other</span><span class="aux"> | </span><span class="param">...elements</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L29" class="function-name source-link">set</a>(<span class="param">other</span><span class="aux"> | </span><span class="param">...elements</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Sets all elements of the operable, either by copying from another operable of the same type, or by using a list of numeric values. Returns the caller.
@@ -57,7 +57,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">other</span><span class="type">Operable</span>
+					<span class="param">other</span>
+					<span class="type">Operable</span>
 				</div>
 				<div class="param desc">
 					The operable to copy values from
@@ -66,7 +67,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">elements</span><span class="type">Number[]</span>
+					<span class="param">elements</span>
+					<span class="type">Number[]</span>
 				</div>
 				<div class="param desc">
 					The new element values
@@ -78,7 +80,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">get</span>(<span class="param">destination?</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L44" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Creates a copy of the operable and optionally stores it in a provided destination.
@@ -89,7 +91,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">destination</span><span class="type">Operable</span>
+					<span class="param">destination</span>
+					<span class="type">Operable</span>
 				</div>
 				<div class="param desc">
 					The destination to copy the operable into.
@@ -101,7 +104,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">at</span>(<span class="param">index</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L57" class="function-name source-link">at</a>(<span class="param">index</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Retrieves a single element value from the operable.
@@ -112,7 +115,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">index</span><span class="type">Number</span>
+					<span class="param">index</span>
+					<span class="type">Number</span>
 				</div>
 				<div class="param desc">
 					The element index
@@ -124,7 +128,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">add</span><span class="aux">/</span><span class="function-name">sub</span><span class="aux">/</span><span class="function-name">mul</span><span class="aux">/</span><span class="function-name">div</span>(<span class="param">operable</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L85" class="function-name source-link">add</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L85" class="function-name source-link">sub</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L85" class="function-name source-link">mul</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L85" class="function-name source-link">div</a>(<span class="param">operable</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Performs an in-place element-wise arithmetic operation between the caller and another operable or Number. Returns the caller.
@@ -135,7 +139,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">operable</span><span class="type">Operable/Number</span>
+					<span class="param">operable</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The right hand operand of the operation
@@ -147,7 +152,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">plus</span><span class="aux">/</span><span class="function-name">minus</span><span class="aux">/</span><span class="function-name">times</span><span class="aux">/</span><span class="function-name">over</span>(<span class="param">operable</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L104" class="function-name source-link">plus</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L104" class="function-name source-link">minus</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L104" class="function-name source-link">times</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L104" class="function-name source-link">over</a>(<span class="param">operable</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Performs an immutable element-wise arithmetic operation between the caller and another operable or Number. Returns the result of the operation, leaving the operands unchanged.
@@ -158,7 +163,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">operable</span><span class="type">Operable/Number</span>
+					<span class="param">operable</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The right hand operand of the operation
@@ -170,7 +176,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">total</span>()<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L129" class="function-name source-link">total</a>()<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Computes the sum of all the elements of the operable.
@@ -180,7 +186,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">equals</span>(<span class="param">other</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L139" class="function-name source-link">equals</a>(<span class="param">other</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks equality between the operable and another operable of the same type.
@@ -191,7 +197,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">other</span><span class="type">Operable</span>
+					<span class="param">other</span>
+					<span class="type">Operable</span>
 				</div>
 				<div class="param desc">
 					The operable to compare to
@@ -203,7 +210,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">toByteBuffer</span>(<span class="param">void</span><span class="aux"> | </span><span class="param">destination</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L156" class="function-name source-link">toByteBuffer</a>(<span class="param">void</span><span class="aux"> | </span><span class="param">destination</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Writes the operable to a ByteBuffer, which can either be created or passed as an optional destination.
@@ -214,7 +221,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">destination</span><span class="type">ByteBuffer</span>
+					<span class="param">destination</span>
+					<span class="type">ByteBuffer</span>
 				</div>
 				<div class="param desc">
 					The destination for the write operation
@@ -226,7 +234,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <span class="function-name">Operable.empty</span><span class="type">Operable</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L178" class="function-name source-link">Operable.empty</a><span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Produces an operable with 0 for all element values.
@@ -236,7 +244,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.fromByteBuffer</span>(<span class="param">buffer</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L167" class="function-name source-link">Operable.fromByteBuffer</a>(<span class="param">buffer</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Reads an operable from the ByteBuffer, and returns it.
@@ -247,7 +255,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">buffer</span><span class="type">ByteBuffer</span>
+					<span class="param">buffer</span>
+					<span class="type">ByteBuffer</span>
 				</div>
 				<div class="param desc">
 					The source buffer to read from
@@ -259,7 +268,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.sum</span>(<span class="param">operables</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L201" class="function-name source-link">Operable.sum</a>(<span class="param">operables</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Computes the element-wise sum of a list of operables.
@@ -270,7 +279,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">operables</span><span class="type">Operable/Number[]</span>
+					<span class="param">operables</span>
+					<span class="type">Operable/Number[]</span>
 				</div>
 				<div class="param desc">
 					The values to sum
@@ -282,7 +292,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.avg</span>(<span class="param">operables</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L211" class="function-name source-link">Operable.avg</a>(<span class="param">operables</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Computes the element-wise average of a list of operables.
@@ -293,7 +303,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">operables</span><span class="type">Operable/Number[]</span>
+					<span class="param">operables</span>
+					<span class="type">Operable/Number[]</span>
 				</div>
 				<div class="param desc">
 					The values to average
@@ -305,7 +316,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.remap</span>(<span class="param">value</span>, <span class="param">initialMin</span>, <span class="param">initialMax</span>, <span class="param">finalMin</span>, <span class="param">finalMax</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L223" class="function-name source-link">Operable.remap</a>(<span class="param">value</span>, <span class="param">initialMin</span>, <span class="param">initialMax</span>, <span class="param">finalMin</span>, <span class="param">finalMax</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Remaps an operable from one range to another range.
@@ -316,7 +327,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">value</span><span class="type">Operable/Number</span>
+					<span class="param">value</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The operable to be remapped
@@ -325,7 +337,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">initialMin</span><span class="type">Operable/Number</span>
+					<span class="param">initialMin</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The minimum of the range the value is in
@@ -334,7 +347,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">initialMax</span><span class="type">Operable/Number</span>
+					<span class="param">initialMax</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The maximum of the range the value is in
@@ -343,7 +357,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">finalMin</span><span class="type">Operable/Number</span>
+					<span class="param">finalMin</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The minimum of the desired range
@@ -352,7 +367,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">finalMax</span><span class="type">Operable/Number</span>
+					<span class="param">finalMax</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The maximum of the desired range
@@ -364,7 +380,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.clamp</span>(<span class="param">value</span>, <span class="param">min</span>, <span class="param">max</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L234" class="function-name source-link">Operable.clamp</a>(<span class="param">value</span>, <span class="param">min</span>, <span class="param">max</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Returns an operable clamped element-wise between two bounds. Equivalent to <span class="code">Operable.max(min, operable.min(max, value))</span>.
@@ -375,7 +391,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">value</span><span class="type">Operable/Number</span>
+					<span class="param">value</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The value to clamp
@@ -384,7 +401,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">min</span><span class="type">Operable/Number</span>
+					<span class="param">min</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The lower bound for the result
@@ -393,7 +411,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">max</span><span class="type">Operable/Number</span>
+					<span class="param">max</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The upper bound for the result
@@ -405,7 +424,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.filled</span>(<span class="param">value</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L242" class="function-name source-link">Operable.filled</a>(<span class="param">value</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Produces an operable with all elements equal to a single value.
@@ -416,7 +435,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">value</span><span class="type">Number</span>
+					<span class="param">value</span>
+					<span class="type">Number</span>
 				</div>
 				<div class="param desc">
 					The value that will be used for all elements
@@ -428,7 +448,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.min</span>(<span class="param">...values</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L250" class="function-name source-link">Operable.min</a>(<span class="param">...values</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Finds and returns the element-wise minimum of a series of values.
@@ -439,7 +459,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">values</span><span class="type">Operable/Number[]</span>
+					<span class="param">values</span>
+					<span class="type">Operable/Number[]</span>
 				</div>
 				<div class="param desc">
 					The values to compare
@@ -451,7 +472,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.max</span>(<span class="param">...values</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L261" class="function-name source-link">Operable.max</a>(<span class="param">...values</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Finds and returns the element-wise maximum of a series of values.
@@ -462,7 +483,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">values</span><span class="type">Operable/Number[]</span>
+					<span class="param">values</span>
+					<span class="type">Operable/Number[]</span>
 				</div>
 				<div class="param desc">
 					The values to compare
@@ -474,7 +496,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.pow</span>(<span class="param">base</span>, <span class="param">power</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L274" class="function-name source-link">Operable.pow</a>(<span class="param">base</span>, <span class="param">power</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Performs an element-wise exponentiation.
@@ -485,7 +507,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">base</span><span class="type">Operable</span>
+					<span class="param">base</span>
+					<span class="type">Operable</span>
 				</div>
 				<div class="param desc">
 					The base of the exponentiation
@@ -494,7 +517,8 @@
 		
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">power</span><span class="type">Operable/Number</span>
+					<span class="param">power</span>
+					<span class="type">Operable/Number</span>
 				</div>
 				<div class="param desc">
 					The power of the exponentiation
@@ -506,7 +530,7 @@
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="function-name">Operable.round</span><span class="aux">/</span><span class="function-name">Operable.floor</span><span class="aux">/</span><span class="function-name">Operable.ceil</span><span class="aux">/</span><span class="function-name">Operable.trunc</span><span class="aux">/</span><span class="function-name">Operable.abs</span><span class="aux">/</span><span class="function-name">Operable.sqrt</span><span class="aux">/</span><span class="function-name">Operable.log</span><span class="aux">/</span><span class="function-name">Operable.log2</span><span class="aux">/</span><span class="function-name">Operable.log10</span><span class="aux">/</span><span class="function-name">Operable.sin</span><span class="aux">/</span><span class="function-name">Operable.cos</span><span class="aux">/</span><span class="function-name">Operable.tan</span><span class="aux">/</span><span class="function-name">Operable.sinh</span><span class="aux">/</span><span class="function-name">Operable.cosh</span><span class="aux">/</span><span class="function-name">Operable.tanh</span><span class="aux">/</span><span class="function-name">Operable.asin</span><span class="aux">/</span><span class="function-name">Operable.acos</span><span class="aux">/</span><span class="function-name">Operable.atan</span><span class="aux">/</span><span class="function-name">Operable.asinh</span><span class="aux">/</span><span class="function-name">Operable.acosh</span><span class="aux">/</span><span class="function-name">Operable.atanh</span><span class="aux">/</span><span class="function-name">Operable.sign</span>(<span class="param">value</span>)<span class="type">Operable</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.round</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.floor</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.ceil</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.trunc</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.abs</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.sqrt</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.log</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.log2</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.log10</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.sin</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.cos</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.tan</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.sinh</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.cosh</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.tanh</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.asin</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.acos</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.atan</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.asinh</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.acosh</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.atanh</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L286" class="function-name source-link">Operable.sign</a>(<span class="param">value</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
 				Performs a built-in unary Math operation element-wise on an operable.
@@ -517,7 +541,8 @@
 				
 			<div class="param-wrapper">
 				<div class="param-name">
-					<span class="param">value</span><span class="type">Operable</span>
+					<span class="param">value</span>
+					<span class="type">Operable</span>
 				</div>
 				<div class="param desc">
 					The operable to operate on

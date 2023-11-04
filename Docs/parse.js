@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-function parse(content, path) {
+function parse(content, file) {
 	const docRegex = /(?:\/\*\*([\w\W]*?)\*\/)|\n}/g;
 	const matches = [...content.matchAll(docRegex)]
 		.map(m => {
@@ -11,6 +11,12 @@ function parse(content, path) {
 			name = name.slice(0, name.indexOf(startChar))
 				.trim();
 			return {
+				source: {
+					file,
+					line: 1 + content
+						.slice(0, startIndex)
+						.split("\n").length
+				},
 				name,
 				lines: m[1]
 					.trim()
