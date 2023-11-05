@@ -1,4 +1,12 @@
+/**
+ * Represents a parameterized gradient between a series of different values.
+ * These values can be of any Operable type.
+ */
 class Gradient {
+	/**
+	 * Creates a new Gradient.
+	 * @param Object[] valueStops | A list of specified values at specified points. Each value stop is an object with a `.value` property indicating value at that stop, and a `.start` property indicating the parameter value at which the gradient reaches the full intensity of that stop
+	 */
 	constructor(valueStops) {
 		this.valueStops = valueStops;
 		this.processRanges();
@@ -6,10 +14,19 @@ class Gradient {
 	processRanges() {
 		this.valueStops.sort((a, b) => b.start - a.start);
 	}
+	/**
+	 * Adds an additional value stop.
+	 * @param Object valueStop | The value stop to add. This argument has the same structure as the argument passed to the constructor.
+	 */
 	addValueStop(valueStop) {
 		this.valueStops.push(valueStop);
 		this.processRanges();
 	}
+	/**
+	 * Samples the gradient at a specific value of the parameter
+	 * @param Number t | The parameter value to sample at
+	 * @return Operable/Number
+	 */
 	sample(v) {
 		let valueStop = null;
 		for (let stop of this.valueStops) {

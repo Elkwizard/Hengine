@@ -49,6 +49,7 @@
 				"AnimationStateMachine": null,
 				"Texture": null,
 				"WebcamCapture": null,
+				"StaticImage": null,
 				"GPUShader": ["GPUShader", "GLSLError"],
 				"GraphPlane": ["GraphPlane", "Graph"]
 			},
@@ -100,10 +101,20 @@
 			"TEXT_AREA": null,
 			"PARTICLE_SPAWNER": null
 		},
+		"Sound": {
+			"Sound": ["SoundInstance", "Sound"],
+			"Synth": null
+		},
 		"Miscellaneous": {
 			"GPUComputation": null,
 			"FileSystem": null,
 			"Random": null,
+			"ByteBuffer": [
+				"ByteBuffer",
+				"ByteBuffer.Writer",
+				"ByteBuffer.Reader",
+				"ByteBuffer.Measurer"
+			],
 			"Array": ["Array", "Array.dim"]
 		}
 	}

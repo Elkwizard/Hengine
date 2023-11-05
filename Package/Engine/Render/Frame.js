@@ -40,12 +40,6 @@ function new_OffscreenCanvas(width, height) {
  * @prop Number pixelRatio | The ratio of the number of pixels in a row to the natural width of the image. An image with a pixelRatio of 2, rendered at twice its natural size, will retain clarity 
  */
 class ImageType {
-	/**
-	 * Creates a new ImageType.
-	 * @param Number width? | The natural rendered width of the image. The default is 1
-	 * @param Number height? | The natural rendered height of the image. The default is 1
-	 * @param Number pixelRatio? | The ratio of the number of pixels to the natural size of the image. The default is 1
-	 */
 	constructor(width = 1, height = 1, pixelRatio = null) {
 		this.resize(width, height, false);
 		this.loaded = true;

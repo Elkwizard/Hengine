@@ -1,0 +1,772 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="ByteBuffer">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L9" class="class-name source-link">ByteBuffer</a>
+				</div>
+				<div class="class desc">
+				Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer. 
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">write</span><span class="type">ByteBuffer.Writer</span>
+					</div>
+					<div class="prop desc">The writing API of the buffer</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">read</span><span class="type">ByteBuffer.Reader</span>
+					</div>
+					<div class="prop desc">The reading API of the buffer</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">measure</span><span class="type">ByteBuffer.Measurer</span>
+					</div>
+					<div class="prop desc">The measuring API of the buffer</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">pointer</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The offset into the buffer where reading and writing occur</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">littleEndian</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">The endianness of the buffer</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L21" class="function-name source-link">constructor</a>(<span class="param">bytes?</span>, <span class="param">pointer?</span>, <span class="param">littleEndian?</span><span class="aux"> | </span><span class="param">bytes</span>, <span class="param">pointer?</span>, <span class="param">littleEndian?</span>)
+			</div>
+			<div class="function desc">
+				Creates a new ByteBuffer.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">bytes</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The number of bytes (0 initialized) in the buffer. Default is 2
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">pointer</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The offset into the buffer where operations occur. Default is 0
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">littleEndian</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								The endianness of the buffer. Default is true
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">bytes</span>
+								<span class="type">ArrayBuffer</span>
+							</div>
+							<div class="param desc">
+								A buffer containing the bytes for the new buffer
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">pointer</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The offset into the buffer where operations occur. Default is 0
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">littleEndian</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								The endianness of the buffer. Default is true
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L35" class="function-name source-link">byteLength</a><span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the number of bytes in the buffer.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L51" class="function-name source-link">advance</a>(<span class="param">amount</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Advances the pointer by a specified amount.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">amount</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The amount of bytes to increment by
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L57" class="function-name source-link">clear</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Resets the pointer to the beginning of the buffer and sets all the bytes in the buffer to 0.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L64" class="function-name source-link">finalize</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Trims the size of the buffer to only include up to (but not including) the current pointer.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L73" class="function-name source-link">toByteBuffer</a>(<span class="param">buffer?</span>)<span class="type">ByteBuffer</span>
+			</div>
+			<div class="function desc">
+				Copies the data of the buffer into a buffer.
+If no destination is specified one will be created.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">buffer</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The destination for the copy. The data will be written to the end of the buffer
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L81" class="function-name source-link">toString</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Converts the buffer to a sequence of 16-bit unicode characters.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L99" class="function-name source-link">toBase64</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Converts the buffer to a base-64 string.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L136" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">ByteBuffer</span>
+			</div>
+			<div class="function desc">
+				Creates a copy of the buffer and optionally stores it in a provided destination.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">destination</span>
+								<span class="type">ByteBuffer</span>
+							</div>
+							<div class="param desc">
+								The destination to copy the buffer into.
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L148" class="function-name source-link">ByteBuffer.fromBase64</a>()<span class="type">ByteBuffer</span>
+			</div>
+			<div class="function desc">
+				Converts a base-64 string to a new buffer.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L189" class="function-name source-link">ByteBuffer.fromString</a>(<span class="param">string</span>)<span class="type">ByteBuffer</span>
+			</div>
+			<div class="function desc">
+				Converts a series of 16-bit unicode characters into a new buffer.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">string</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The string of data
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L210" class="function-name source-link">ByteBuffer.fromByteBuffer</a>(<span class="param">buffer</span>)<span class="type">ByteBuffer</span>
+			</div>
+			<div class="function desc">
+				Reads a buffer from a buffer, and returns it.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">buffer</span>
+								<span class="type">ByteBuffer</span>
+							</div>
+							<div class="param desc">
+								The buffer to read the data from
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="ByteBuffer.Writer">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L231" class="class-name source-link">ByteBuffer.Writer</a>
+				</div>
+				<div class="class desc">
+				The writing API for a ByteBuffer.
+Every method of this class increments the associated buffer's pointer to after the written data.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L270" class="function-name source-link">int[S]</a>(<span class="param">integer</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Writes an S-byte integer to the buffer. S can be 8, 16, or 32.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">integer</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The integer to write
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L277" class="function-name source-link">uint[S]</a>(<span class="param">integer</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Reads an S-byte unsigned integer from the buffer. S can be 8, 16, or 32.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">integer</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The unsigned integer to write
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L284" class="function-name source-link">float[S]</a>(<span class="param">float</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Reads an S-byte float from the buffer. S can be 32 or 64.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">float</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The floating point value to write
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L289" class="function-name source-link">bigInt</a>(<span class="param">bigint</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Writes a bigint to the buffer.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">bigint</span>
+								<span class="type">BigInt</span>
+							</div>
+							<div class="param desc">
+								The value to write
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L309" class="function-name source-link">string</a>(<span class="param">string</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Writes a string to the buffer.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">string</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The value to write
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L318" class="function-name source-link">bool</a>(<span class="param">bool</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Writes a boolean to the buffer.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">bool</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								The value to write
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L329" class="function-name source-link">array</a>(<span class="param">type</span>, <span class="param">data</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Writes an array of values to the buffer.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">type</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of another method of this class that can be used to write each element of the array
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">data</span>
+								<span class="type"><a href="../../Pages/Miscellaneous/Array.html#Array">Array</a></span>
+							</div>
+							<div class="param desc">
+								The single-type array to write
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L338" class="function-name source-link">byteBuffer</a>(<span class="param">buffer</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Writes a buffer to the buffer.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">buffer</span>
+								<span class="type">ByteBuffer</span>
+							</div>
+							<div class="param desc">
+								The value to write to the buffer
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L348" class="function-name source-link">object</a>(<span class="param">object</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Writes an arbitrary, potentially cyclic object to the buffer.
+This operation does not preserve the classes of the objects.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">object</span>
+								<span class="type">Object</span>
+							</div>
+							<div class="param desc">
+								The object to write
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="ByteBuffer.Reader">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L405" class="class-name source-link">ByteBuffer.Reader</a>
+				</div>
+				<div class="class desc">
+				The reading API for a Bytebuffer.
+Every method of this class increments the associated buffer's pointer to after the read data.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L414" class="function-name source-link">int[S]</a>()<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Reads an S-byte integer from the buffer. S can be 8, 16, or 32.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L420" class="function-name source-link">uint[S]</a>()<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Reads an S-byte unsigned integer from the buffer. S can be 8, 16, or 32.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L426" class="function-name source-link">float[S]</a>()<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Reads an S-byte float from the buffer. S can be 32 or 64.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L431" class="function-name source-link">bigInt</a>()<span class="type">BigInt</span>
+			</div>
+			<div class="function desc">
+				Reads a bigint from the buffer.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L443" class="function-name source-link">string</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Reads a string from the buffer.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L453" class="function-name source-link">bool</a>()<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Reads a boolean from the buffer.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L475" class="function-name source-link">array</a>(<span class="param">type</span>, <span class="param">count?</span>)<span class="type"><a href="../../Pages/Miscellaneous/Array.html#Array">Array</a></span>
+			</div>
+			<div class="function desc">
+				Reads an array of values of a single type from the buffer.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">type</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of another method of this class that can be used for reading each element
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">count</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								If specified, this value will be used as the length of the array. This allows for reading sequences of values not prefixed with a length, but not those produced by <code>ByteBuffer.Writer.prototype.array()</code>
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L485" class="function-name source-link">byteBuffer</a>()<span class="type">ByteBuffer</span>
+			</div>
+			<div class="function desc">
+				Reads a buffer from the buffer
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L492" class="function-name source-link">object</a>()<span class="type">Object</span>
+			</div>
+			<div class="function desc">
+				Reads an object from the buffer.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="ByteBuffer.Measurer">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L387" class="class-name source-link">ByteBuffer.Measurer</a>
+				</div>
+				<div class="class desc">
+				The measuring API for a ByteBuffer.
+This can be used to measure the length of a sequence of writes or reads.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">size</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The number of bytes operated on since the last reset</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\ByteBuffer.js?#L395" class="function-name source-link">reset</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Resets the current size to 0.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

@@ -1,0 +1,108 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Gradient">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Gradient.js?#L5" class="class-name source-link">Gradient</a>
+				</div>
+				<div class="class desc">
+				Represents a parameterized gradient between a series of different values.
+These values can be of any <a href="../../Pages/Superclasses/Operable.html#Operable">Operable</a> type.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Gradient.js?#L10" class="function-name source-link">constructor</a>(<span class="param">valueStops</span>)
+			</div>
+			<div class="function desc">
+				Creates a new Gradient.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">valueStops</span>
+								<span class="type">Object[]</span>
+							</div>
+							<div class="param desc">
+								A list of specified values at specified points. Each value stop is an object with a <code>.value</code> property indicating value at that stop, and a <code>.start</code> property indicating the parameter value at which the gradient reaches the full intensity of that stop
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Gradient.js?#L21" class="function-name source-link">addValueStop</a>(<span class="param">valueStop</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Adds an additional value stop.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">valueStop</span>
+								<span class="type">Object</span>
+							</div>
+							<div class="param desc">
+								The value stop to add. This argument has the same structure as the argument passed to the constructor.
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Gradient.js?#L30" class="function-name source-link">sample</a>(<span class="param">t</span>)<span class="type"><a href="../../Pages/Superclasses/Operable.html#Operable">Operable</a>/Number</span>
+			</div>
+			<div class="function desc">
+				Samples the gradient at a specific value of the parameter
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">t</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The parameter value to sample at
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

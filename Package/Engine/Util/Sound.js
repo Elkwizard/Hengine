@@ -147,6 +147,10 @@ Synth.NOTE_INDEX_MAP = {
 };
 Synth.INDEX_NOTE_MAP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
+/**
+ * Represents an ongoing playback of a Sound.
+ * @prop Number volume | The volume of the playback on [0, 1]
+ */
 class SoundInstance {
     constructor(channel, volume) {
 		this.channel = channel;
@@ -158,6 +162,10 @@ class SoundInstance {
 			this.finalTime = this.time;
         });
     }
+	/**
+	 * Returns the current time in milliseconds since playback began.
+	 * @return Number
+	 */
 	get time() {
 		return this.finalTime ?? this.channel.time;
 	}
@@ -168,6 +176,9 @@ class SoundInstance {
         if (!this.isDone) this.channel.volume = v; 
         this._volume = v; 
     }
+	/**
+	 * Stops playback of the sound.
+	 */
     stop() {
         this.channel.stop();
     }
@@ -241,6 +252,12 @@ window.addEventListener("mousedown", () => {
 	}
 });
 
+/**
+ * Represents an external sound clip.
+ * These should be loaded using HengineSoundResource and not constructed directly.
+ * @prop Boolean loops | Whether or not the sound loops upon completion. This value is read-only
+ * @prop Number duration | The length, in milliseconds, of the sound
+ */
 class Sound {
     constructor(src, loops = false) {
         this.src = src;
@@ -251,6 +268,12 @@ class Sound {
 			this.duration = this.channels[0].audio.duration * 1000;
 		});
     }
+	/**
+	 * Starts playback of the sound in a new instance, which is returned.
+	 * Multiple sound instances can play at once.
+	 * @param Number volume | The volume of the playback on [0, 1]
+	 * @return SoundInstance
+	 */
     play(volume = 1) {
 		let channel = this.channels
 			.find(channel => !channel.playing);

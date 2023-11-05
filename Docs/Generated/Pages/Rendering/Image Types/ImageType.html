@@ -17,7 +17,7 @@ This is an abstract class and should not be constructed.
 				</div>
 				
 					<div class="header">Subclasses</div>
-					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Rendering/Image Types/Animation.html#Animation">Animation</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/HImage.html#HImage">HImage</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/Frame.html#Frame">Frame</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/GPUShader.html#GPUShader">GPUShader</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/Texture.html#Texture">Texture</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/VideoView.html#VideoView">VideoView</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/WebcamCapture.html#WebcamCapture">WebcamCapture</a></span></div>
+					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Rendering/Image Types/Animation.html#Animation">Animation</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/HImage.html#HImage">HImage</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/Frame.html#Frame">Frame</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/GPUShader.html#GPUShader">GPUShader</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/StaticImage.html#StaticImage">StaticImage</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/Texture.html#Texture">Texture</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/VideoView.html#VideoView">VideoView</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/WebcamCapture.html#WebcamCapture">WebcamCapture</a></span></div>
 				
 				
 				
@@ -51,53 +51,7 @@ This is an abstract class and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L49" class="function-name source-link">constructor</a>(<span class="param">width?</span>, <span class="param">height?</span>, <span class="param">pixelRatio?</span>)
-			</div>
-			<div class="function desc">
-				Creates a new ImageType.
-			</div>
-			
-			<div class="function-signature">
-				
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper">
-							<div class="param-name">
-								<span class="param">width</span>
-								<span class="type">Number</span>
-							</div>
-							<div class="param desc">
-								The natural rendered width of the image. The default is 1
-							</div>
-						</div>
-					
-						<div class="param-wrapper">
-							<div class="param-name">
-								<span class="param">height</span>
-								<span class="type">Number</span>
-							</div>
-							<div class="param desc">
-								The natural rendered height of the image. The default is 1
-							</div>
-						</div>
-					
-						<div class="param-wrapper">
-							<div class="param-name">
-								<span class="param">pixelRatio</span>
-								<span class="type">Number</span>
-							</div>
-							<div class="param desc">
-								The ratio of the number of pixels to the natural size of the image. The default is 1
-							</div>
-						</div>
-					
-		
-			</div>
-		</div>
-	
-		<div class="function-wrapper">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L103" class="function-name source-link">resize</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L97" class="function-name source-link">resize</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Simultaneously updates the width and height of the image.
@@ -134,7 +88,7 @@ Updates that occur on image resizing will only happen once with a call to this m
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L124" class="function-name source-link">contains</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L118" class="function-name source-link">contains</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
@@ -184,7 +138,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L178" class="function-name source-link">toDataURL</a>()<span class="type">String</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L172" class="function-name source-link">toDataURL</a>()<span class="type">String</span>
 			</div>
 			<div class="function desc">
 				Converts the content of the image to a data: url.
@@ -194,7 +148,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L197" class="function-name source-link">download</a>(<span class="param">name</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L191" class="function-name source-link">download</a>(<span class="param">name</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Downloads the image as a PNG, with a specified name.

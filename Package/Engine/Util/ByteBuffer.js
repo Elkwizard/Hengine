@@ -1,4 +1,23 @@
+/**
+ * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer. 
+ * @prop ByteBuffer.Writer write | The writing API of the buffer
+ * @prop ByteBuffer.Reader read | The reading API of the buffer
+ * @prop ByteBuffer.Measurer measure | The measuring API of the buffer
+ * @prop Number pointer | The offset into the buffer where reading and writing occur
+ * @prop Boolean littleEndian | The endianness of the buffer
+ */
 class ByteBuffer {
+	/**
+	 * Creates a new ByteBuffer.
+	 * @signature
+	 * @param Number bytes? | The number of bytes (0 initialized) in the buffer. Default is 2
+	 * @param Number pointer? | The offset into the buffer where operations occur. Default is 0
+	 * @param Boolean littleEndian? | The endianness of the buffer. Default is true
+	 * @signature
+	 * @param ArrayBuffer bytes | A buffer containing the bytes for the new buffer
+	 * @param Number pointer? | The offset into the buffer where operations occur. Default is 0
+	 * @param Boolean littleEndian? | The endianness of the buffer. Default is true
+	 */
 	constructor(bytes = 2, pointer = 0, littleEndian = true) {
 		this.data = new Uint8Array(bytes);
 		this.view = new DataView(this.data.buffer);
@@ -9,6 +28,10 @@ class ByteBuffer {
 		this.shouldResize = true;
 		this.littleEndian = littleEndian;
 	}
+	/**
+	 * Returns the number of bytes in the buffer.
+	 * @return Number
+	 */
 	get byteLength() {
 		return this.data.length;
 	}
@@ -21,13 +44,23 @@ class ByteBuffer {
 			this.view = new DataView(this.data.buffer);
 		}
 	}
+	/**
+	 * Advances the pointer by a specified amount.
+	 * @param Number amount | The amount of bytes to increment by
+	 */
 	advance(amount) {
 		this.pointer += amount;
 	}
+	/**
+	 * Resets the pointer to the beginning of the buffer and sets all the bytes in the buffer to 0.
+	 */
 	clear() {
 		this.pointer = 0;
 		this.data.fill(0);
 	}
+	/**
+	 * Trims the size of the buffer to only include up to (but not including) the current pointer.
+	 */
 	finalize() {
 		this.data = this.data.slice(0, this.pointer);
 	}
@@ -41,6 +74,10 @@ class ByteBuffer {
 		buffer.write.byteBuffer(this);
 		return buffer;
 	}
+	/**
+	 * Converts the buffer to a sequence of 16-bit unicode characters.
+	 * @return String
+	 */
 	toString() {
 		let result = String.fromCharCode(
 			this.pointer >> 16,
@@ -55,6 +92,10 @@ class ByteBuffer {
 
 		return result;
 	}
+	/**
+	 * Converts the buffer to a base-64 string.
+	 * @return String
+	 */
 	toBase64() {
 		const binary = this.data;
 		const base64Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -87,6 +128,11 @@ class ByteBuffer {
 
 		return base64;
 	}
+	/**
+	 * Creates a copy of the buffer and optionally stores it in a provided destination.
+	 * @param ByteBuffer destination? | The destination to copy the buffer into.
+	 * @return ByteBuffer
+	 */
 	get(buffer = new ByteBuffer()) {
 		const { byteLength } = this;
 		if (buffer.byteLength !== byteLength) buffer.data = this.data.slice();
@@ -95,6 +141,10 @@ class ByteBuffer {
 		buffer.shouldResize = this.shouldResize;
 		return buffer;
 	}
+	/**
+	 * Converts a base-64 string to a new buffer.
+	 * @return ByteBuffer
+	 */
 	static fromBase64(base64) {
 		const base64Table = Object.fromEntries(
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
@@ -131,6 +181,11 @@ class ByteBuffer {
 
 		return buffer;
 	}
+	/**
+	 * Converts a series of 16-bit unicode characters into a new buffer.
+	 * @param String string | The string of data
+	 * @return ByteBuffer
+	 */
 	static fromString(string) {
 		const length = string.charCodeAt(2) << 16 | string.charCodeAt(3);
 		const prefixStringLength = 4;
@@ -168,6 +223,11 @@ ByteBuffer.objectTypes = [
 	"bool",
 	...ByteBuffer.arrayTypes.map(type => type.toLowerCase())
 ];
+/**
+ * @name class ByteBuffer.Writer
+ * The writing API for a ByteBuffer.
+ * Every method of this class increments the associated buffer's pointer to after the written data.
+ */
 ByteBuffer.Writer = class {
 	constructor(buffer) {
 		this.buffer = buffer;
@@ -200,6 +260,32 @@ ByteBuffer.Writer = class {
 		if (type === "bigint") return "bigInt";
 		return "null";
 	}
+	
+	/**
+	 * @name int[S]
+	 * Writes an S-byte integer to the buffer. S can be 8, 16, or 32.
+	 * @param Number integer | The integer to write
+	 * @return Number
+	 */
+	
+	/**
+	 * @name uint[S]
+	 * Reads an S-byte unsigned integer from the buffer. S can be 8, 16, or 32.
+	 * @param Number integer | The unsigned integer to write
+	 * @return Number
+	 */
+	
+	/**
+	 * @name float[S]
+	 * Reads an S-byte float from the buffer. S can be 32 or 64.
+	 * @param Number float | The floating point value to write
+	 * @return Number
+	 */
+
+	/**
+	 * Writes a bigint to the buffer.
+	 * @param BigInt bigint | The value to write
+	 */
 	bigInt(bigint) {
 		let bytes = 0n;
 		let value = 1n;
@@ -216,27 +302,49 @@ ByteBuffer.Writer = class {
 			this.uint8(Number(bigint >> (i * 8n) & byteSize));
 		}
 	}
+	/**
+	 * Writes a string to the buffer.
+	 * @param String string | The value to write
+	 */
 	string(string) {
 		const len = string.length;
 		this.uint32(len);
 		for (let i = 0; i < len; i++) this.uint16(string.charCodeAt(i));
 	}
+	/**
+	 * Writes a boolean to the buffer.
+	 * @param Boolean bool | The value to write 
+	 */
 	bool(bool) {
 		this.uint8(+bool);
 	}
 	bool8(a, b, c, d, e, f, g, h) {
 		this.uint8(+a << 7 | +b << 6 | +c << 5 | +d << 4 | +e << 3 | +f << 2 | +g << 1 | +h);
 	}
+	/**
+	 * Writes an array of values to the buffer.
+	 * @param String type | The name of another method of this class that can be used to write each element of the array
+	 * @param Array data | The single-type array to write
+	 */
 	array(type, data) {
 		const { length } = data;
 		this.uint32(length);
 		for (let i = 0; i < length; i++) this[type](data[i]);
 	}
+	/**
+	 * Writes a buffer to the buffer.
+	 * @param ByteBuffer buffer | The value to write to the buffer
+	 */
 	byteBuffer(buffer) {
 		this.array("uint8", buffer.data);
 		this.uint32(buffer.pointer);
 		this.bool(buffer.littleEndian);
 	}
+	/**
+	 * Writes an arbitrary, potentially cyclic object to the buffer.
+	 * This operation does not preserve the classes of the objects.
+	 * @param Object object | The object to write 
+	 */
 	object(object, objectIDs /* object => id */) {
 		const type = this._getType(object);
 		const typeIndex = ByteBuffer.typeToIndex[type];
@@ -270,19 +378,56 @@ ByteBuffer.Writer = class {
 		} else this[type](object);
 	}
 };
+/**
+ * @name class ByteBuffer.Measurer
+ * The measuring API for a ByteBuffer.
+ * This can be used to measure the length of a sequence of writes or reads.
+ * @prop Number size | The number of bytes operated on since the last reset 
+ */
 ByteBuffer.Measurer = class extends ByteBuffer.Writer {
 	constructor(buffer) {
 		super(buffer);
 		this.reset();
 	}
+	/**
+	 * Resets the current size to 0.
+	 */
 	reset() {
 		this.size = 0;
 	}
 }
+
+/**
+ * @name class ByteBuffer.Reader
+ * The reading API for a Bytebuffer.
+ * Every method of this class increments the associated buffer's pointer to after the read data.
+ */
 ByteBuffer.Reader = class {
 	constructor(buffer) {
 		this.buffer = buffer;
 	}
+	/**
+	 * @name int[S]
+	 * Reads an S-byte integer from the buffer. S can be 8, 16, or 32.
+	 * @return Number
+	 */
+	
+	/**
+	 * @name uint[S]
+	 * Reads an S-byte unsigned integer from the buffer. S can be 8, 16, or 32.
+	 * @return Number
+	 */
+	
+	/**
+	 * @name float[S]
+	 * Reads an S-byte float from the buffer. S can be 32 or 64.
+	 * @return Number
+	 */
+
+	/**
+	 * Reads a bigint from the buffer.
+	 * @return BigInt
+	 */
 	bigInt() {
 		const byteNum = this.int32();
 		const bytes = BigInt(Math.abs(byteNum));
@@ -291,12 +436,20 @@ ByteBuffer.Reader = class {
 			result |= BigInt(this.uint8()) << (i * 8n);
 		return (byteNum > 0) ? result : -result;
 	}
+	/**
+	 * Reads a string from the buffer.
+	 * @return String
+	 */
 	string() {
 		const len = this.uint32();
 		let result = "";
 		for (let i = 0; i < len; i++) result += String.fromCharCode(this.uint16());
 		return result;
 	}
+	/**
+	 * Reads a boolean from the buffer.
+	 * @return Boolean
+	 */
 	bool() {
 		return !!this.uint8();
 	}
@@ -313,15 +466,29 @@ ByteBuffer.Reader = class {
 			!!(int & 1)
 		];
 	}
+	/**
+	 * Reads an array of values of a single type from the buffer.
+	 * @param String type | The name of another method of this class that can be used for reading each element 
+	 * @param Number count? | If specified, this value will be used as the length of the array. This allows for reading sequences of values not prefixed with a length, but not those produced by `ByteBuffer.Writer.prototype.array()`
+	 * @return Array
+	 */
 	array(type, count = null) {
 		const length = count ?? this.uint32();
 		const result = new Array(length);
 		for (let i = 0; i < length; i++) result[i] = this[type]();
 		return result;
 	}
+	/**
+	 * Reads a buffer from the buffer
+	 * @return ByteBuffer
+	 */
 	byteBuffer() {
 		return new ByteBuffer(this.array("uint8"), this.uint32(), this.bool());
 	}
+	/**
+	 * Reads an object from the buffer.
+	 * @return Object
+	 */
 	object(objectIDs /* id => object */) {
 		const type = ByteBuffer.indexToType[this.uint8()];
 		if (type === "undefined") return undefined;
