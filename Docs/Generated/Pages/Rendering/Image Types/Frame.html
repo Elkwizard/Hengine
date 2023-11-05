@@ -1,0 +1,329 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Frame">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L266" class="class-name source-link">Frame</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+				</div>
+				<div class="class desc">
+				Represents an offscreen drawing surface that can be rendered as an image.
+<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">const</span><span style="color: #88d"> frame</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> Frame</span><span style="color: #f8f">(</span><span style="color: #fd1">100</span><span style="color: #f8f">,</span><span style="color: #fd1"> 200</span><span style="color: #f8f">);
+
+</span><span style="color: #444">// add shapes to the frame</span><span style="color: #f8f">
+</span><span style="color: #ddd">frame</span><span style="color: #f8f">.</span><span style="color: #aad">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">stroke</span><span style="color: #f8f">(</span><span style="color: #a5a">new</span><span style="color: #88d"> <a href="../../../Pages/Rendering/Color.html#Color">Color</a></span><span style="color: #f8f">(</span><span style="color: #aea">&quot;blue&quot;</span><span style="color: #f8f">),</span><span style="color: #fd1"> 2</span><span style="color: #f8f">).</span><span style="color: #88d">rect</span><span style="color: #f8f">(</span><span style="color: #fd1">10</span><span style="color: #f8f">,</span><span style="color: #fd1"> 10</span><span style="color: #f8f">,</span><span style="color: #fd1"> 20</span><span style="color: #f8f">,</span><span style="color: #fd1"> 20</span><span style="color: #f8f">);
+</span><span style="color: #ddd">frame</span><span style="color: #f8f">.</span><span style="color: #aad">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">draw</span><span style="color: #f8f">(</span><span style="color: #a5a">new</span><span style="color: #88d"> <a href="../../../Pages/Rendering/Color.html#Color">Color</a></span><span style="color: #f8f">(</span><span style="color: #aea">&quot;red&quot;</span><span style="color: #f8f">)).</span><span style="color: #88d">circle</span><span style="color: #f8f">(</span><span style="color: #fd1">30</span><span style="color: #f8f">,</span><span style="color: #fd1"> 100</span><span style="color: #f8f">,</span><span style="color: #fd1"> 50</span><span style="color: #f8f">);
+
+</span><span style="color: #444">// render the frame to the screen</span><span style="color: #f8f">
+</span><span style="color: #ddd">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">image</span><span style="color: #f8f">(</span><span style="color: #ddd">frame</span><span style="color: #f8f">).</span><span style="color: #88d">default</span><span style="color: #f8f">(</span><span style="color: #fd1">0</span><span style="color: #f8f">,</span><span style="color: #fd1"> 0</span><span style="color: #f8f">);
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Artist.html#Artist">Artist</a></span>
+					</div>
+					<div class="prop desc">The renderer local to the frame that can be used to modify its contents</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L273" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">pixelRatio?</span>)
+			</div>
+			<div class="function desc">
+				Creates a new Frame.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The natural width of the frame
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The natural height of the frame
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">pixelRatio</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The pixel ratio for the frame. The default is <code>window.devicePixelRatio</code>
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L287" class="function-name source-link">stretch</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
+			</div>
+			<div class="function desc">
+				Returns a copy of the frame stretched to a new set of dimensions.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The width of the stretched image
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The height of the stretched image
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L304" class="function-name source-link">clip</a>(<span class="param">region</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
+			</div>
+			<div class="function desc">
+				Returns a frame containing rectangular region of the caller. 
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">region</span>
+								<span class="type"><a href="../../../Pages/Geometry/Shapes/Rect.html#Rect">Rect</a></span>
+							</div>
+							<div class="param desc">
+								The region to extract
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the upper-left corner of the region.
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the upper-left corner of the region.
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The width of the region
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The height of the region
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L315" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Frame</span>
+			</div>
+			<div class="function desc">
+				Creates a copy of the frame and optionally stores it in a provided destination.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">destination</span>
+								<span class="type">Frame</span>
+							</div>
+							<div class="param desc">
+								The destination to copy the frame into.
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L337" class="function-name source-link">Frame.fromImageType</a>(<span class="param">image</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">region</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
+			</div>
+			<div class="function desc">
+				Returns a frame containing the (optionally clipped) contents of an image.
+If no clipping parameters are provided, the whole image will be copied.
+The copy will have the same pixel ratio as the original image.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">image</span>
+								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+							</div>
+							<div class="param desc">
+								The image to copy data from
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">image</span>
+								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+							</div>
+							<div class="param desc">
+								The image to copy data from
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">region</span>
+								<span class="type"><a href="../../../Pages/Geometry/Shapes/Rect.html#Rect">Rect</a></span>
+							</div>
+							<div class="param desc">
+								The region to extract
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">image</span>
+								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+							</div>
+							<div class="param desc">
+								The image to copy data from
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the upper-left corner of the region.
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the upper-left corner of the region.
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The width of the region
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The height of the region
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

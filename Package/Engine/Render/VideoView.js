@@ -1,3 +1,8 @@
+/**
+ * Represents a video that can have the current frame rendered.
+ * These should be loaded using HengineVideoResource and not constructed directly.
+ * @prop Boolean loops | Whether or not the video loops.
+ */
 class VideoView extends ImageType {
 	constructor(src, loops = false) {
 		super(1, 1);
@@ -32,16 +37,31 @@ class VideoView extends ImageType {
 		this.image.width = this.video.videoWidth;
 		this.image.height = this.video.videoHeight;	
 	}
+	/**
+	 * Returns a copy of the current frame of the video.
+	 * @return Frame
+	 */
 	getFrame() {
 		let image = this.makeImage();
 		let frame = new Frame(image.width, image.height);
 		frame.renderer.c.drawImage(image, 0, 0);
 		return frame;
 	}
+	/**
+	 * @name get playing
+	 * Returns whether or not the video is currently playing.
+	 * @return Boolean
+	 */
+	/**
+	 * Pauses playback of the video.
+	 */
 	pause() {
 		this.playing = false;
 		this.video.pause();
 	}
+	/**
+	 * Resumes playback of the video.
+	 */
 	play() {
 		this.playing = true;
 		this.video.play();

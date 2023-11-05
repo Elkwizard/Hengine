@@ -48,9 +48,14 @@ for (const doc of docs)
 			if (doc.name.baseClass === superDoc.name.base)
 				(superDoc.subclasses ??= []).push(doc);
 
-for (let i = 0; i < docs.length; i++) {
-	const doc = docs[i];
-	const path = nameToPath[doc.name.base];
+const nameToDoc = { };
+for (const doc of docs)
+	nameToDoc[doc.name.base] = doc;
+
+for (const name in nameToPath) {
+	const doc = nameToDoc[name];
+	const path = nameToPath[name];
+	if (!doc) continue;
 	if (!path) console.log(`${doc.name.base} doesn't exist!`); 
 	// console.log(doc.name.base, path);
 	pathToDocumentation[path] = (pathToDocumentation[path] ?? "") + document(doc, nameToPath, path);

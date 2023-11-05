@@ -36,17 +36,22 @@ function documentFunction(fn, wrapperClass) {
 		}).join(`<span class="aux"> | </span>`);
 	const header = `${name}${fn.name.isGetter ? "" : `(${parameters})`}${fn.name.base === "constructor" ? "" : `<span class="type">${returnType}</span>`}`;
 	const parameterDescriptions = signatures
-		.flatMap(signature => signature)
-		.map(param => `
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">${param.name.replace(/\W/g, "")}</span>
-					<span class="type">${param.type}</span>
-				</div>
-				<div class="param desc">
-					${param.description}
-				</div>
-			</div>
+		.map(signature => `
+			<div class="header">Parameters</div>
+			${
+				signature
+					.map(param => `
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">${param.name.replace(/\W/g, "")}</span>
+								<span class="type">${param.type}</span>
+							</div>
+							<div class="param desc">
+								${param.description}
+							</div>
+						</div>
+					`).join("")
+			}
 		`).join("");
 
 	const description = fn.lines.find(line => line.category === null)?.content ?? "";
@@ -60,7 +65,6 @@ function documentFunction(fn, wrapperClass) {
 				${description}
 			</div>
 			${signatures.length ? `
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				${parameterDescriptions}
 			</div>` : ""}

@@ -16,7 +16,7 @@
 Fonts can be used in the text rendering functions of <a href="../../Pages/Rendering/Artist.html#Artist">Artist</a>.
 <code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">const</span><span style="color: #88d"> font</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> Font</span><span style="color: #f8f">(</span><span style="color: #fd1">15</span><span style="color: #f8f">, </span><span style="color: #aea">&quot;Consolas&quot;</span><span style="color: #f8f">,</span><span style="color: #d6b"> false</span><span style="color: #f8f">,</span><span style="color: #d6b"> true</span><span style="color: #f8f">); </span><span style="color: #444">// italic 15px Consolas</span><span style="color: #f8f">
 
-</span><span style="color: #ddd">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">draw</span><span style="color: #f8f">(</span><span style="color: #ddd"><a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span style="color: #f8f">.</span><span style="color: #88d">BLACK</span><span style="color: #f8f">).</span><span style="color: #88d">text</span><span style="color: #f8f">(</span><span style="color: #ddd">font</span><span style="color: #f8f">, </span><span style="color: #aea">&quot;Hello World!&quot;</span><span style="color: #f8f">,</span><span style="color: #fd1"> 0</span><span style="color: #f8f">,</span><span style="color: #fd1"> 0</span><span style="color: #f8f">);
+</span><span style="color: #ddd">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">draw</span><span style="color: #f8f">(</span><span style="color: #a5a">new</span><span style="color: #88d"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span style="color: #f8f">(</span><span style="color: #aea">&quot;black&quot;</span><span style="color: #f8f">)).</span><span style="color: #88d">text</span><span style="color: #f8f">(</span><span style="color: #ddd">font</span><span style="color: #f8f">, </span><span style="color: #aea">&quot;Hello World!&quot;</span><span style="color: #f8f">,</span><span style="color: #fd1"> 0</span><span style="color: #f8f">,</span><span style="color: #fd1"> 0</span><span style="color: #f8f">);
 </span></code>
 				</div>
 				
@@ -86,48 +86,50 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 				Creates a new font. This operation is fairly expensive and thus should not be done every frame unless necessary.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">size</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The size of the font
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">family</span>
-					<span class="type">String</span>
-				</div>
-				<div class="param desc">
-					The font family
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">bold</span>
-					<span class="type">Boolean</span>
-				</div>
-				<div class="param desc">
-					Whether the font is bold, default is false
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">italic</span>
-					<span class="type">Boolean</span>
-				</div>
-				<div class="param desc">
-					Whether the font is italic, default is false
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">size</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The size of the font
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">family</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The font family
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">bold</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the font is bold, default is false
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">italic</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the font is italic, default is false
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -140,28 +142,30 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 				Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">text</span>
-					<span class="type">String</span>
-				</div>
-				<div class="param desc">
-					The text to pack
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">maxWidth</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The maximum width of a single line in the output text
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">text</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The text to pack
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">maxWidth</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The maximum width of a single line in the output text
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -175,28 +179,30 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 The return value contains <code>.width</code> and <code>.height</code> properties, both of which are Numbers.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">text</span>
-					<span class="type">String</span>
-				</div>
-				<div class="param desc">
-					The text to be measured
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">maxWidth</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The maximum width of a single line, default is Infinity
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">text</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The text to be measured
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">maxWidth</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The maximum width of a single line, default is Infinity
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -209,18 +215,20 @@ The return value contains <code>.width</code> and <code>.height</code> propertie
 				Returns the width of a single line of text. This method is faster than <code>.getTextWidth()</code>.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">textLine</span>
-					<span class="type">String</span>
-				</div>
-				<div class="param desc">
-					A single line string of text to measure
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">textLine</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								A single line string of text to measure
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -233,18 +241,20 @@ The return value contains <code>.width</code> and <code>.height</code> propertie
 				Returns the height of a single line of text. This method is faster than <code>.getTextHeight()</code>.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">textLine</span>
-					<span class="type">String</span>
-				</div>
-				<div class="param desc">
-					A single line string of text to measure
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">textLine</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								A single line string of text to measure
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -257,18 +267,20 @@ The return value contains <code>.width</code> and <code>.height</code> propertie
 				Returns the width of a string of text.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">text</span>
-					<span class="type">String</span>
-				</div>
-				<div class="param desc">
-					The text to measure
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">text</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The text to measure
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -281,18 +293,20 @@ The return value contains <code>.width</code> and <code>.height</code> propertie
 				Returns the height of a string of text.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">text</span>
-					<span class="type">String</span>
-				</div>
-				<div class="param desc">
-					The text to measure
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">text</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The text to measure
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -315,18 +329,20 @@ The return value contains <code>.width</code> and <code>.height</code> propertie
 				Creates a copy of the font and optionally stores it in a provided destination.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">destination</span>
-					<span class="type">Font</span>
-				</div>
-				<div class="param desc">
-					The destination to copy the font into.
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">destination</span>
+								<span class="type">Font</span>
+							</div>
+							<div class="param desc">
+								The destination to copy the font into.
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>

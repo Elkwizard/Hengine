@@ -1,0 +1,317 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Color">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L13" class="class-name source-link">Color</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Superclasses/Operable.html#Operable">Operable</a></span>
+				</div>
+				<div class="class desc">
+				Represents a color to be used in rendering.
+It is stored as an RGB triple.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">red</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The red component of the color, on [0, 255]</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">green</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The green component of the color, on [0, 255]</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">blue</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The blue component of the color, on [0, 255]</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">alpha</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The alpha (opacity) component of the color, on [0, 1]</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">limited</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not all the color's channels will be clamped within their respective bounds after all operations. This starts as true</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">brightness</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The grayscale intensity of the color, on [0, 1]</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">Color.modValues</span><span class="type">String[]</span>
+					</div>
+					<div class="prop desc">The numeric components of the color, <code>["red", "green", "blue", "alpha"]</code></div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">Color.EPSILON</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The smallest visually meaningful change in alpha, 1/255.</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L24" class="function-name source-link">constructor</a>(<span class="param">color</span><span class="aux"> | </span><span class="param">red</span>, <span class="param">green</span>, <span class="param">blue</span>, <span class="param">alpha?</span>)
+			</div>
+			<div class="function desc">
+				Creates a new Color.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">color</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								Any valid CSS color representation
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">red</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The red component of the color, on [0, 255]
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">green</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The green component of the color, on [0, 255]
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">blue</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The blue component of the color, on [0, 255]
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">alpha</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The alpha (opacity) component of the color, on [0, 1]. Default is 1
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L72" class="function-name source-link">opaque</a><span class="type">Color</span>
+			</div>
+			<div class="function desc">
+				Returns a copy of the color with an alpha of 1.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L80" class="function-name source-link">inverse</a><span class="type">Color</span>
+			</div>
+			<div class="function desc">
+				Returns the inverse of the caller, with the same alpha as the caller.
+The inverse is defined as white minus the caller.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L89" class="function-name source-link">getRGBA</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Returns the CSS rgba color string representing the color. 
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L96" class="function-name source-link">getHex</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Returns the CSS hex color string representing the color. 
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L103" class="function-name source-link">getGLSL</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Returns the glsl vec4 string representing the color. 
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L110" class="function-name source-link">toString</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Returns a valid CSS string representation of the color.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L160" class="function-name source-link">Color.alpha</a>(<span class="param">color</span>, <span class="param">alpha</span>)<span class="type">Color</span>
+			</div>
+			<div class="function desc">
+				Returns a copy of a specified color with a specified alpha.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">color</span>
+								<span class="type">Color</span>
+							</div>
+							<div class="param desc">
+								The color to use for the RGB portion of the result
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">alpha</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The new alpha value
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L176" class="function-name source-link">Color.saturate</a>(<span class="param">color</span>, <span class="param">factor</span>)<span class="type">Color</span>
+			</div>
+			<div class="function desc">
+				Returns a copy of a color with a specified change in saturation.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">color</span>
+								<span class="type">Color</span>
+							</div>
+							<div class="param desc">
+								The base color
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">factor</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The multiplier on the current saturation of the color
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Color.js?#L185" class="function-name source-link">Color.grayScale</a>(<span class="param">intensity</span>)<span class="type">Color</span>
+			</div>
+			<div class="function desc">
+				Returns a new grayscale color with a specified brightness.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">intensity</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The grayscale intensity on [0, 1]
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

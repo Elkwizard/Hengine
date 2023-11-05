@@ -98,7 +98,9 @@ class Operable {
 	 * @group plus, minus, times, over
 	 * Performs an immutable element-wise arithmetic operation between the caller and another operable or Number.
 	 * Returns the result of the operation, leaving the operands unchanged.
+	 * A destination can be provided for the operation, in which case no new operable will be created.
 	 * @param Operable/Number operable | The right hand operand of the operation
+	 * @param Operable destination? | The destination for the operation
 	 * @return Operable
 	 */
     plus(v, result) {

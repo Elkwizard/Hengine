@@ -1,0 +1,227 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="ImageType">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L42" class="class-name source-link">ImageType</a>
+				</div>
+				<div class="class desc">
+				Represents an image that can be rendered.
+This is an abstract class and should not be constructed.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Rendering/Image Types/HImage.html#HImage">HImage</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/Frame.html#Frame">Frame</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/VideoView.html#VideoView">VideoView</a></span></div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">width</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The natural rendered width of the image</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">height</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The natural rendered height of the image</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">pixelRatio</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The ratio of the number of pixels in a row to the natural width of the image. An image with a pixelRatio of 2, rendered at twice its natural size, will retain clarity</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L49" class="function-name source-link">constructor</a>(<span class="param">width?</span>, <span class="param">height?</span>, <span class="param">pixelRatio?</span>)
+			</div>
+			<div class="function desc">
+				Creates a new ImageType.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The natural rendered width of the image. The default is 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The natural rendered height of the image. The default is 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">pixelRatio</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The ratio of the number of pixels to the natural size of the image. The default is 1
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L103" class="function-name source-link">resize</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Simultaneously updates the width and height of the image.
+Updates that occur on image resizing will only happen once with a call to this method, which can improve performance as opposed to simply assigning to <code>.width</code> and <code>.height</code> in a row.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The new natural width of the image
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The new natural height of the image
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L124" class="function-name source-link">contains</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
+This operation is inclusive on the lower bound and exclusive on the upper bound.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The point to check
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the point to check
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the point to check
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L178" class="function-name source-link">toDataURL</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Converts the content of the image to a data: url.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Frame.js?#L197" class="function-name source-link">download</a>(<span class="param">name</span>)<span class="type">Promise</span>
+			</div>
+			<div class="function desc">
+				Downloads the image as a PNG, with a specified name.
+Returns a promise that resolves when the image downloads.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the downloaded image, without the extension
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

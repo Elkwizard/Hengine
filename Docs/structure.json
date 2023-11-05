@@ -12,9 +12,9 @@
 					"HengineTextResource",
 					"HengineBinaryResource",
 					"HengineFontResource",
-					"HengineAnimationResource",
 					"HengineSoundResource",
-					"HengineVideoResource"
+					"HengineVideoResource",
+					"HengineAnimationResource"
 				]
 			},
 			"Intervals": {
@@ -46,12 +46,11 @@
 				"HImage": null,
 				"VideoView": null,
 				"Animation": null,
+				"AnimationStateMachine": null,
 				"Texture": null,
 				"WebcamCapture": null,
-				"GPUShader": null,
-				"GLSLError": null,
-				"GraphPlane": null,
-				"Graph": null
+				"GPUShader": ["GPUShader", "GLSLError"],
+				"GraphPlane": ["GraphPlane", "Graph"]
 			},
 			"Font": null,
 			"Artist": null,

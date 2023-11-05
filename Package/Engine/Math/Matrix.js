@@ -4,7 +4,7 @@
  * ```js
  * const transformation = Matrix3.mulMatrices([
  * 	Matrix3.translation(10, 5),
- * 	Matrix3.rotate(Math.PI)
+ * 	Matrix3.rotation(Math.PI)
  * ]);
  * 
  * const initialPoint = new Vector2(10, 20);

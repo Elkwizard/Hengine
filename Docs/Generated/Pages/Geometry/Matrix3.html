@@ -16,7 +16,7 @@
 Due to its use with 2D vectors, the last row of the matrix is not used and will always be [ 1 0 0 ].
 <code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">const</span><span style="color: #88d"> transformation</span><span style="color: #f8f"> = </span><span style="color: #ddd">Matrix3</span><span style="color: #f8f">.</span><span style="color: #88d">mulMatrices</span><span style="color: #f8f">([
 	</span><span style="color: #ddd">Matrix3</span><span style="color: #f8f">.</span><span style="color: #88d">translation</span><span style="color: #f8f">(</span><span style="color: #fd1">10</span><span style="color: #f8f">,</span><span style="color: #fd1"> 5</span><span style="color: #f8f">),
-	</span><span style="color: #ddd">Matrix3</span><span style="color: #f8f">.</span><span style="color: #88d">rotate</span><span style="color: #f8f">(</span><span style="color: #ddd">Math</span><span style="color: #f8f">.</span><span style="color: #88d">PI</span><span style="color: #f8f">)
+	</span><span style="color: #ddd">Matrix3</span><span style="color: #f8f">.</span><span style="color: #88d">rotation</span><span style="color: #f8f">(</span><span style="color: #ddd">Math</span><span style="color: #f8f">.</span><span style="color: #88d">PI</span><span style="color: #f8f">)
 ]);
 </span><span style="color: #a5a">
 const</span><span style="color: #88d"> initialPoint</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> <a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span><span style="color: #f8f">(</span><span style="color: #fd1">10</span><span style="color: #f8f">,</span><span style="color: #fd1"> 20</span><span style="color: #f8f">);
@@ -57,98 +57,100 @@ const</span><span style="color: #88d"> initialAgain</span><span style="color: #f
 All arguments are optional and default to their values for an identity matrix.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">m00</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The matrix element in row 0 and column 0
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">m01</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The matrix element in row 0 and column 1
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">m02</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The matrix element in row 0 and column 2
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">m10</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The matrix element in row 1 and column 0
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">m11</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The matrix element in row 1 and column 1
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">m12</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The matrix element in row 1 and column 2
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">m20</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The matrix element in row 2 and column 0
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">m21</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The matrix element in row 2 and column 1
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">m22</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The matrix element in row 2 and column 2
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">m00</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The matrix element in row 0 and column 0
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">m01</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The matrix element in row 0 and column 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">m02</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The matrix element in row 0 and column 2
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">m10</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The matrix element in row 1 and column 0
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">m11</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The matrix element in row 1 and column 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">m12</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The matrix element in row 1 and column 2
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">m20</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The matrix element in row 2 and column 0
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">m21</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The matrix element in row 2 and column 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">m22</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The matrix element in row 2 and column 2
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -212,38 +214,46 @@ If the matrix isn't invertible, the caller is unchanged and null is returned.
 				Multiplies the matrix in-place by another mathematical object on the right side.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">matrix</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					Another matrix to multiply with
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">matrix</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								Another matrix to multiply with
+							</div>
+						</div>
+					
 		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">vector</span>
-					<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
-				</div>
-				<div class="param desc">
-					A vector to be transformed by the matrix. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">vector</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								A vector to be transformed by the matrix. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
+							</div>
+						</div>
+					
 		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">scale</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					A number to scale the matrix by.
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">scale</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								A number to scale the matrix by.
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -257,68 +267,76 @@ If the matrix isn't invertible, the caller is unchanged and null is returned.
 If no destination is provided, one will be created.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">matrix</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					Another matrix to multiply with
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">matrix</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								Another matrix to multiply with
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">destination</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The destination for the operation
+							</div>
+						</div>
+					
 		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">destination</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The destination for the operation
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">vector</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								A vector to be transformed by the Matrix3. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">destination</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The destination for the operation
+							</div>
+						</div>
+					
 		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">vector</span>
-					<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
-				</div>
-				<div class="param desc">
-					A vector to be transformed by the Matrix3. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">destination</span>
-					<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
-				</div>
-				<div class="param desc">
-					The destination for the operation
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">scale</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					A number to scale the matrix by.
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">destination</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The destination for the operation
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">scale</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								A number to scale the matrix by.
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">destination</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The destination for the operation
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -331,18 +349,20 @@ If no destination is provided, one will be created.
 				Creates a copy of the matrix and optionally stores it in a provided destination.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">destination</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The destination to copy the matrix into.
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">destination</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The destination to copy the matrix into.
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -365,18 +385,20 @@ If no destination is provided, one will be created.
 				Creates an identity matrix and optionally stores it in a provided destination.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">destination</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The matrix to copy the identity matrix into
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">destination</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The matrix to copy the identity matrix into
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -389,28 +411,30 @@ If no destination is provided, one will be created.
 				Creates a 2D rotation matrix and optionally stores it in a provided destination.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">theta</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The clockwise (in screen space) angle (in radians) to rotate by
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">result</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The matrix to copy the rotation matrix into
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">theta</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The clockwise (in screen space) angle (in radians) to rotate by
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The matrix to copy the rotation matrix into
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -423,58 +447,63 @@ If no destination is provided, one will be created.
 				Creates a 2D scaling matrix and optionally stores it in a provided a destination.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">x</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The scale factor on the x axis
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The scale factor on the x axis
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The scale factor on the y axis
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The matrix to copy the scaling matrix into
+							</div>
+						</div>
+					
 		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">y</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The scale factor on the y axis
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">result</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The matrix to copy the scaling matrix into
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">vector</span>
-					<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
-				</div>
-				<div class="param desc">
-					A vector containing the scale factors for both axes
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">result</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The matrix to copy the scaling matrix into
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">vector</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								A vector containing the scale factors for both axes
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The matrix to copy the scaling matrix into
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -487,58 +516,63 @@ If no destination is provided, one will be created.
 				Creates a 2D translation matrix and optionally stores it in a provided a destination.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">x</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The x coordinate to translate by
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate to translate by
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate to translate by
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The matrix to copy the translation matrix into
+							</div>
+						</div>
+					
 		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">y</span>
-					<span class="type">Number</span>
-				</div>
-				<div class="param desc">
-					The y coordinate to translate by
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">result</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The matrix to copy the translation matrix into
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">vector</span>
-					<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
-				</div>
-				<div class="param desc">
-					The vector to translate by
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">result</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The matrix to copy the translation matrix into
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">vector</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The vector to translate by
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The matrix to copy the translation matrix into
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>
@@ -551,28 +585,30 @@ If no destination is provided, one will be created.
 				Multiplies a series of matrices together and optionally stores it in a provided destination.
 			</div>
 			
-			<div class="header">Parameters</div>
 			<div class="function-signature">
 				
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">matrices</span>
-					<span class="type">Matrix3[]</span>
-				</div>
-				<div class="param desc">
-					The matrices to multiply together. Order matters for this argument
-				</div>
-			</div>
-		
-			<div class="param-wrapper">
-				<div class="param-name">
-					<span class="param">result</span>
-					<span class="type">Matrix3</span>
-				</div>
-				<div class="param desc">
-					The matrix to copy the result into
-				</div>
-			</div>
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">matrices</span>
+								<span class="type">Matrix3[]</span>
+							</div>
+							<div class="param desc">
+								The matrices to multiply together. Order matters for this argument
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type">Matrix3</span>
+							</div>
+							<div class="param desc">
+								The matrix to copy the result into
+							</div>
+						</div>
+					
 		
 			</div>
 		</div>

@@ -357,7 +357,7 @@ class Vector2 extends Vector {
 		return new Vector2(x, 0);
 	}
 	/**
-	 * Creates a vector with a specified y component and a x component of 0.
+	 * Creates a vector with a specified y component and an x component of 0.
 	 * @param Number y | The y coordinate
 	 * @return Vector2
 	 */

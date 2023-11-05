@@ -1,4 +1,26 @@
+/**
+ * Represents a color to be used in rendering.
+ * It is stored as an RGB triple.
+ * @prop Number red | The red component of the color, on [0, 255]
+ * @prop Number green | The green component of the color, on [0, 255]
+ * @prop Number blue | The blue component of the color, on [0, 255]
+ * @prop Number alpha | The alpha (opacity) component of the color, on [0, 1]
+ * @prop Boolean limited | Whether or not all the color's channels will be clamped within their respective bounds after all operations. This starts as true
+ * @prop Number brightness | The grayscale intensity of the color, on [0, 1]
+ * @static_prop String[] modValues | The numeric components of the color, `["red", "green", "blue", "alpha"]`
+ * @static_prop Number EPSILON | The smallest visually meaningful change in alpha, 1/255.
+ */
 class Color extends Operable {
+	/**
+	 * Creates a new Color.
+	 * @signature
+	 * @param String color | Any valid CSS color representation
+	 * @signature
+	 * @param Number red | The red component of the color, on [0, 255]
+	 * @param Number green | The green component of the color, on [0, 255]
+	 * @param Number blue | The blue component of the color, on [0, 255]
+	 * @param Number alpha? | The alpha (opacity) component of the color, on [0, 1]. Default is 1
+	 */
 	constructor(r, g, b, a) {
 		super();
 		this.limited = true;
@@ -43,23 +65,48 @@ class Color extends Operable {
 	get brightness() {
 		return (this.red + this.blue + this.green) / (3 * 255);
 	}
+	/**
+	 * Returns a copy of the color with an alpha of 1.
+	 * @return Color
+	 */
 	get opaque() {
 		return new Color(this.red, this.green, this.blue, 1);
 	}
+	/**
+	 * Returns the inverse of the caller, with the same alpha as the caller.
+	 * The inverse is defined as white minus the caller.
+	 * @return Color
+	 */
 	get inverse() {
 		let n = (new Color(255, 255, 255, 1)).sub(this);
 		n.alpha = this.alpha;
 		return n;
 	}
+	/**
+	 * Returns the CSS rgba color string representing the color. 
+	 * @return String
+	 */
 	getRGBA() {
 		return "rgba(" + Math.floor(this.red) + ", " + Math.floor(this.green) + ", " + Math.floor(this.blue) + ", " + this.alpha + ")";
 	}
+	/**
+	 * Returns the CSS hex color string representing the color. 
+	 * @return String
+	 */
 	getHex() {
 		return "#" + Color.numToHex(this.red) + Color.numToHex(this.green) + Color.numToHex(this.blue) + Color.numToHex(this.alpha * 255);
 	}
+	/**
+	 * Returns the glsl vec4 string representing the color. 
+	 * @return String
+	 */
 	getGLSL() {
 		return `vec4(${this.red / 255}, ${this.green / 255}, ${this.blue / 255}, ${this.alpha})`;
 	}
+	/**
+	 * Returns a valid CSS string representation of the color.
+	 * @return String
+	 */
 	toString() {
 		return this.getRGBA();
 	}
@@ -104,6 +151,12 @@ class Color extends Operable {
 	static quadLerp(a, b, c, d, tx, ty) {
 		return Color.empty.map((value, channel) => Interpolation.quadLerp(a[channel], b[channel], c[channel], d[channel], tx, ty));
 	}
+	/**
+	 * Returns a copy of a specified color with a specified alpha.
+	 * @param Color color | The color to use for the RGB portion of the result
+	 * @param Number alpha | The new alpha value
+	 * @return Color
+	 */
 	static alpha(col, alpha) {
 		let cl = col.get();
 		cl.alpha = alpha;
@@ -114,10 +167,21 @@ class Color extends Operable {
 		cl.alpha = col.alpha;
 		return cl;
 	}
+	/**
+	 * Returns a copy of a color with a specified change in saturation.
+	 * @param Color color | The base color
+	 * @param Number factor | The multiplier on the current saturation of the color
+	 * @return Color
+	 */
 	static saturate(col, a) {
 		let b = col.brightness * 255;
 		return new Color(b + (col.red - b) * a, b + (col.green - b) * a, b + (col.blue - b) * a, col.alpha);
 	}
+	/**
+	 * Returns a new grayscale color with a specified brightness.
+	 * @param Number intensity | The grayscale intensity on [0, 1]
+	 * @return Color
+	 */
 	static grayScale(per) {
 		let r = 255 * per;
 		let g = 255 * per;
