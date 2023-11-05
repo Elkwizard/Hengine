@@ -1,0 +1,225 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Animation">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L19" class="class-name source-link">Animation</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+				</div>
+				<div class="class desc">
+				Represents a frame-by-frame animation.
+These should be loaded using <a href="../../../Pages/Structure/HengineResource/HengineResource.html#HengineAnimationResource">HengineAnimationResource</a> and should not be constructed directly.
+For the purposes of the animation, a frame elapses each time the animation is drawn.
+<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">const</span><span style="color: #88d"> catKnead</span><span style="color: #f8f"> = </span><span style="color: #88d">loadResource</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;catKnead&quot;</span><span style="color: #f8f">); </span><span style="color: #444">// load the Animation</span><span style="color: #f8f">
+
+</span><span style="color: #ddd">intervals</span><span style="color: #f8f">.</span><span style="color: #88d">continuous</span><span style="color: #f8f">(()</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{
+	</span><span style="color: #ddd">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">image</span><span style="color: #f8f">(</span><span style="color: #ddd">catKnead</span><span style="color: #f8f">).</span><span style="color: #88d">default</span><span style="color: #f8f">(</span><span style="color: #fd1">0</span><span style="color: #f8f">,</span><span style="color: #fd1"> 0</span><span style="color: #f8f">); </span><span style="color: #444">// the animation will advance</span><span style="color: #f8f">
+});
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">frames</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a>[]</span>
+					</div>
+					<div class="prop desc">The images that make up the animation</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">loops</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not the animation will reset to the beginning after completing</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">delay</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The number of frames each animation frame will be visible for</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">timer</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The current progress (in frames) of the animation</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">totalTime</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The total amount of frames it will take the animation to complete</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">onEnd</span><span class="type">Function</span>
+					</div>
+					<div class="prop desc">A function to be called when the animation completes (this will be called even if the animation loops)</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L53" class="function-name source-link">done</a><span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Returns whether or not the animation has completed.
+If the animation loops, this will always return false.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L61" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Animation</span>
+			</div>
+			<div class="function desc">
+				Creates a copy of the animation and optionally stores it in a provided destination.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">destination</span>
+								<span class="type">Animation</span>
+							</div>
+							<div class="param desc">
+								The destination to copy the animation into.
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L84" class="function-name source-link">stop</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Pauses playback of the animation.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L90" class="function-name source-link">start</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Resumes playback of the animation.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L96" class="function-name source-link">reset</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Restarts the animation.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L114" class="function-name source-link">Animation.fromImage</a>(<span class="param">spritesheet</span>, <span class="param">imgWidth</span>, <span class="param">imgHeight</span>, <span class="param">delay</span>, <span class="param">loops?</span>, <span class="param">onEnd?</span>)<span class="type">Animation</span>
+			</div>
+			<div class="function desc">
+				Creates a new animation based on a horizontal sprite sheet containing the frames directly next to each other.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">spritesheet</span>
+								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+							</div>
+							<div class="param desc">
+								The image containing all the frames
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">imgWidth</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The width (in pixels) of each frame
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">imgHeight</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The height (in pixels) of each frame
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">delay</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The amount of frames each animation frame is visible for
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">loops</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether or not the animation loops. Default is true
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">onEnd</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								A function to execute when the animation completes. Default is a no-op
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

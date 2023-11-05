@@ -31,6 +31,12 @@ class ByteBuffer {
 	finalize() {
 		this.data = this.data.slice(0, this.pointer);
 	}
+	/**
+	* Copies the data of the buffer into a buffer.
+	* If no destination is specified one will be created.
+	* @param Number buffer? | The destination for the copy. The data will be written to the end of the buffer
+	* @return ByteBuffer
+	*/
 	toByteBuffer(buffer = new ByteBuffer()) {
 		buffer.write.byteBuffer(this);
 		return buffer;
@@ -141,6 +147,11 @@ class ByteBuffer {
 		buffer.shouldResize = true;
 		return buffer;
 	}
+	/**
+	 * Reads a buffer from a buffer, and returns it.
+	 * @param ByteBuffer buffer | The buffer to read the data from
+	 * @return ByteBuffer
+	 */
 	static fromByteBuffer(buffer) {
 		return buffer.read.byteBuffer();
 	}

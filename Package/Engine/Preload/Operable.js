@@ -150,11 +150,11 @@ class Operable {
         return true;
     }
 	/**
-	 * Writes the operable to a ByteBuffer, which can either be created or passed as an optional destination.
-	 * @signature
-	 * @signature
-	 * @param ByteBuffer destination | The destination for the write operation
-	 */
+	* Copies the data of the operable into a buffer.
+	* If no destination is specified one will be created.
+	* @param Number buffer? | The destination for the copy. The data will be written to the end of the buffer
+	* @return ByteBuffer
+	*/
     toByteBuffer(buffer = new ByteBuffer()) {
         const { modValues } = this.constructor;
         for (let i = 0; i < modValues.length; i++)
@@ -162,8 +162,8 @@ class Operable {
         return buffer;
     }
 	/**
-	 * Reads an operable from the ByteBuffer, and returns it.
-	 * @param ByteBuffer buffer | The source buffer to read from
+	 * Reads a operable from a buffer, and returns it.
+	 * @param ByteBuffer buffer | The buffer to read the data from
 	 * @return Operable
 	 */
     static fromByteBuffer(buffer) {

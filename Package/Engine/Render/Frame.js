@@ -291,7 +291,7 @@ class Frame extends ImageType {
 		return f;
 	}
 	/**
-	 * Returns a frame containing rectangular region of the caller. 
+	 * Returns a frame containing a rectangular region of the caller. 
 	 * @signature
 	 * @param Rect region | The region to extract
 	 * @signature

@@ -243,10 +243,11 @@ A destination can be provided for the operation, in which case no new operable w
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L158" class="function-name source-link">toByteBuffer</a>(<span class="param">destination</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L158" class="function-name source-link">toByteBuffer</a>(<span class="param">buffer?</span>)<span class="type">ByteBuffer</span>
 			</div>
 			<div class="function desc">
-				Writes the operable to a ByteBuffer, which can either be created or passed as an optional destination.
+				Copies the data of the operable into a buffer.
+If no destination is specified one will be created.
 			</div>
 			
 			<div class="function-signature">
@@ -255,11 +256,11 @@ A destination can be provided for the operation, in which case no new operable w
 			
 						<div class="param-wrapper">
 							<div class="param-name">
-								<span class="param">destination</span>
-								<span class="type">ByteBuffer</span>
+								<span class="param">buffer</span>
+								<span class="type">Number</span>
 							</div>
 							<div class="param desc">
-								The destination for the write operation
+								The destination for the copy. The data will be written to the end of the buffer
 							</div>
 						</div>
 					
@@ -282,7 +283,7 @@ A destination can be provided for the operation, in which case no new operable w
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Preload\Operable.js?#L169" class="function-name source-link">Operable.fromByteBuffer</a>(<span class="param">buffer</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Reads an operable from the ByteBuffer, and returns it.
+				Reads a operable from a buffer, and returns it.
 			</div>
 			
 			<div class="function-signature">
@@ -295,7 +296,7 @@ A destination can be provided for the operation, in which case no new operable w
 								<span class="type">ByteBuffer</span>
 							</div>
 							<div class="param desc">
-								The source buffer to read from
+								The buffer to read the data from
 							</div>
 						</div>
 					

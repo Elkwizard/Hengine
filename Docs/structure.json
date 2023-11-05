@@ -57,7 +57,8 @@
 			"Camera": null,
 			"Color": null,
 			"Gradient": null,
-			"GrayMap": null
+			"GrayMap": null,
+			"TileMap": null
 		},
 		"Geometry": {
 			"Shapes": {

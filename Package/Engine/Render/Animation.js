@@ -1,3 +1,21 @@
+/**
+ * Represents a frame-by-frame animation.
+ * These should be loaded using HengineAnimationResource and should not be constructed directly.
+ * For the purposes of the animation, a frame elapses each time the animation is drawn.
+ * ```js
+ * const catKnead = loadResource("catKnead"); // load the Animation
+ * 
+ * intervals.continuous(() => {
+ * 	renderer.image(catKnead).default(0, 0); // the animation will advance
+ * });
+ * ```
+ * @prop ImageType[] frames | The images that make up the animation
+ * @prop Boolean loops | Whether or not the animation will reset to the beginning after completing
+ * @prop Number delay | The number of frames each animation frame will be visible for
+ * @prop Number timer | The current progress (in frames) of the animation
+ * @prop Number totalTime | The total amount of frames it will take the animation to complete
+ * @prop Function onEnd | A function to be called when the animation completes (this will be called even if the animation loops)
+ */
 class Animation extends ImageType {
 	constructor(src = "", frames = 1, delay = 0, loops = false, onEnd = () => null) {
 		super(1, 1);
@@ -27,9 +45,19 @@ class Animation extends ImageType {
 		this.totalTime = this.frames.length * this.delay;
 		this.forceLoad();
 	}
+	/**
+	 * Returns whether or not the animation has completed.
+	 * If the animation loops, this will always return false.
+	 * @return Boolean
+	 */
 	get done() {
 		return !this.loops && this.timer === this.totalTime - 1;
 	}
+	/**
+	 * Creates a copy of the animation and optionally stores it in a provided destination.
+	 * @param Animation destination? | The destination to copy the animation into.
+	 * @return Animation
+	 */
 	get() {
 		return new Animation(this.frames, this.delay, this.loops, this.onEnd);
 	}
@@ -50,12 +78,21 @@ class Animation extends ImageType {
 			this.height = this.image.height;
 		}
 	}
+	/**
+	 * Pauses playback of the animation.
+	 */
 	stop() {
 		this.stopped = true;
 	}
+	/**
+	 * Resumes playback of the animation.
+	 */
 	start() {
 		this.stopped = false;
 	}
+	/**
+	 * Restarts the animation. 
+	 */
 	reset() {
 		this.timer = -1;
 		this.advance();
@@ -64,6 +101,16 @@ class Animation extends ImageType {
 		this.advance();
 		return this.image.image;
 	}
+	/**
+	 * Creates a new animation based on a horizontal sprite sheet containing the frames directly next to each other.
+	 * @param ImageType spritesheet | The image containing all the frames
+	 * @param Number imgWidth | The width (in pixels) of each frame
+	 * @param Number imgHeight | The height (in pixels) of each frame
+	 * @param Number delay | The amount of frames each animation frame is visible for
+	 * @param Boolean loops? | Whether or not the animation loops. Default is true 
+	 * @param Function onEnd? | A function to execute when the animation completes. Default is a no-op
+	 * @return Animation
+	 */
 	static fromImage(frame, imgWidth, imgHeight, delay = 0, loops = true, onEnd = () => null) {
 		const frames = frame.width / imgWidth;
 		const frameImg = frame.makeImage();
