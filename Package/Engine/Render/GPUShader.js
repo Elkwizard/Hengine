@@ -18,6 +18,13 @@ class GLSLPrecompiler {
 		return glsl;
 	}
 }
+
+/**
+ * Represents an error in a GLSL program.
+ * These are constructed by GPUShader and GPUComputation but should not be directly constructed.
+ * @prop Number line | The line on which the error occured
+ * @prop String desc | The description of the error
+ */
 class GLSLError extends Error {
 	constructor(line, desc) {
 		super(`${desc}\n\tat shaderSource.glsl:${line}`);
@@ -26,6 +33,10 @@ class GLSLError extends Error {
 		this.desc = desc;
 
 	}
+	/**
+	 * Converts the error to a string representation.
+	 * @return String
+	 */
 	toString() {
 		return `line ${this.line}: ${this.desc}`;
 	}
@@ -445,7 +456,59 @@ class GLSLProgram {
 	}
 }
 
+/**
+ * Represents the renderable result of a GLSL (version 3.0 ES) fragment shader invoked for every pixel in a rectangular region. The entry point for the shader is a function with of the form:
+ * ```glsl
+ * vec4 shader() {
+ * 	// your main code here
+ * }
+ * ```
+ * Several engine-provided uniforms are given, specifically:
+ * ```glsl
+ * uniform vec2 position; // the pixel-space coordinates of the pixel, with (0, 0) in the top-left corner
+ * uniform vec2 resolution; // the width and height of the image, in pixels
+ * ```
+ * Uniform variables can be set from javascript, and the type equivalence is laid out in the table below:
+ * <table>
+ * 	<tr><th>GLSL Type</th><th>JS Type</th></tr>
+ * 	<tr><td>int, uint, float</td><td>Number</td></tr>
+ * 	<tr><td>bool</td><td>Boolean</td></tr>
+ * 	<tr><td>gvec2, gvec3</td><td>Vector2, Vector3</td></tr>
+ * 	<tr><td>ivec4, uvec4</td><td>Vector4</td></tr>
+ * 	<tr><td>vec4</td><td>Vector4, Color</td></tr>
+ * 	<tr><td>sampler2D</td><td>ImageType</td></tr>
+ * 	<tr><td>struct</td><td>Object</td></tr>
+ * 	<tr><td>array</td><td>Array</td></tr>
+ * </table>
+ * ```js
+ * // grayscale shader
+ * const shader = new GPUShader(300, 300, `
+ * 	uniform sampler2D image;
+ * 
+ * 	vec4 shader() {
+ * 		vec2 uv = position / resolution;
+ * 		vec3 color = texture(image, uv);
+ * 		float brightness = (color.r + color.g + color.b) / 3.0;
+ * 		return vec4(vec3(brightness), 1.0);
+ * 	}
+ * `);
+ * 
+ * const cat = loadResource("cat.png");
+ * 
+ * shader.setArgument("image", cat); // put image in shader
+ * 
+ * renderer.image(shader).default(0, 0); // draw grayscale cat
+ * ```
+ * @prop String glsl | The GLSL source code of the shader
+ */
 class GPUShader extends ImageType {
+	/**
+	 * Creates a new GPUShader.
+	 * @param Number width | The width of the rectangle on which the shader is invoked
+	 * @param Number height | The height of the rectangle on which the shader is invoked
+	 * @param String glsl | The GLSL source code of the shader 
+	 * @param Number pixelRatio? | The pixel ratio of the shader. Higher values will result in more shader invocations. Default is 1 
+	 */
 	constructor(width, height, glsl, pixelRatio = 1) {
 		super(width, height, pixelRatio);
 		this.shadeRects = [new Rect(0, 0, width, height)];
@@ -575,24 +638,25 @@ class GPUShader extends ImageType {
 		this._glsl = GLSLPrecompiler.compile(this.glsl);
 
 		const prefix = `#version 300 es
-precision highp float;
-precision highp int;
-precision highp sampler2D;
+			precision highp float;
+			precision highp int;
+			precision highp sampler2D;
 
-uniform vec2 resolution;
+			uniform vec2 resolution;
 
-in vec2 position;`;
+			in vec2 position;
+		`;
 		const pixelSource = `${prefix}
-${this.glsl}
+			${this.glsl}
 
-out highp vec4 pixelColor;
+			out highp vec4 pixelColor;
 
-void main() {
-	resolution; // guarentee reference
-	pixelColor = shader();
-	pixelColor.rgb *= clamp(pixelColor.a, 0.0, 1.0);
-}
-`;
+			void main() {
+				resolution; // guarentee reference
+				pixelColor = shader();
+				pixelColor.rgb *= clamp(pixelColor.a, 0.0, 1.0);
+			}
+		`;
 		let prefixLength = prefix.split("\n").length + 1;
 
 		//shader programs
@@ -615,15 +679,34 @@ void main() {
 
 		return true;
 	}
+	/**
+	 * Returns whether or not the shader contains a given uniform.
+	 * @param String name | The name of the uniform to check 
+	 * @return Boolean
+	 */
 	argumentExists(arg) {
 		return this.program.hasUniform(arg);
 	}
+	/**
+	 * Returns the current value of a given uniform.
+	 * @param String name | The name of the uniform to retrieve
+	 * @return Any
+	 */
 	getArgument(arg) {
 		return this.program.getUniform(arg);
 	}
+	/**
+	 * Sets the value of a given uniform.
+	 * @param String name | The name of the uniform to set
+	 * @param Any value | The new value for the uniform.
+	 */
 	setArgument(arg, value) {
 		this.setArguments({ [arg]: value });
 	}
+	/**
+	 * Sets the value of one or more uniforms. 
+	 * @param Object uniforms | A collection of key-value pairs, where the key is the name of the uniform to set, and the value is the new value for that uniform
+	 */
 	setArguments(uniformData = {}) {
 		for (const key in uniformData)
 			this.program.setUniform(key, uniformData[key]);

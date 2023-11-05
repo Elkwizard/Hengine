@@ -173,3 +173,21 @@ code.block button:hover {
 .subclass {
 	font-size: 1.2em;
 }
+
+td, th {
+	text-align: center;
+	margin: 0;
+	padding: 0.4em 0.6em;
+	border: 1px white solid;
+}
+
+th {
+	font-weight: bold;
+	color: var(--accent-1);
+}
+
+table {
+	border-collapse: collapse;
+	margin-top: 0.6em;
+	margin-bottom: 0.4em;
+}

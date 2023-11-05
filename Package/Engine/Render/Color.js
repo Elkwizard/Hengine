@@ -97,7 +97,7 @@ class Color extends Operable {
 		return "#" + Color.numToHex(this.red) + Color.numToHex(this.green) + Color.numToHex(this.blue) + Color.numToHex(this.alpha * 255);
 	}
 	/**
-	 * Returns the glsl vec4 string representing the color. 
+	 * Returns the GLSL vec4 string representing the color. 
 	 * @return String
 	 */
 	getGLSL() {

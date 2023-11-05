@@ -842,9 +842,9 @@ class Rect extends Polygon {
 		return result;
 	}
 	/**
-	 * Returns a new Rect with the specified minimum and maximum coordinates.
-	 * @param Vector2 min | The upper-left corner of the Rect 
-	 * @param Vector2 max | The lower-right corner of the Rect 
+	 * Returns a new rectangle with the specified minimum and maximum coordinates.
+	 * @param Vector2 min | The upper-left corner of the rectangle 
+	 * @param Vector2 max | The lower-right corner of the rectangle 
 	 * @return Rect
 	 */
 	static fromMinMax(min, max) {
@@ -881,7 +881,7 @@ class Rect extends Polygon {
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
 	/**
-	 * Returns the smallest bounding Rect around a collection of rectangles.
+	 * Returns the smallest bounding rectangle around a collection of rectangles.
 	 * @param Rect[] boxes | The rectangles to create a bounding box for 
 	 * @return Rect
 	 */
