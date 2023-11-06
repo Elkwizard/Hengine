@@ -34,7 +34,7 @@ function new_OffscreenCanvas(width, height) {
 
 /**
  * Represents an image that can be rendered.
- * This is an abstract class and should not be constructed.
+ * @abstract
  * @prop Number width | The natural rendered width of the image
  * @prop Number height | The natural rendered height of the image
  * @prop Number pixelRatio | The ratio of the number of pixels in a row to the natural width of the image. An image with a pixelRatio of 2, rendered at twice its natural size, will retain clarity 

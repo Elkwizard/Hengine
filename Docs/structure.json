@@ -86,9 +86,10 @@
 			"PhysicsEngine": null
 		},
 		"Input": {
-			"InputHandler": null,
+			"InputHandler": ["InputHandler", "InputHandler.State"],
 			"KeyboardHandler": null,
-			"MouseHandler": null,
+			"MouseHandler": ["MouseHandler", "MouseHandler.State"],
+			"TouchHandler": ["TouchHandler", "TouchHandler.State"],
 			"ClipboardHandler": null
 		},
 		"UI": {
@@ -115,7 +116,7 @@
 				"ByteBuffer.Reader",
 				"ByteBuffer.Measurer"
 			],
-			"Array": ["Array", "Array.dim"]
+			"Array": null
 		}
 	}
 }

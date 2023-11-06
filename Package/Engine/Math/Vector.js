@@ -1,6 +1,6 @@
 /**
  * Represents a multidimensional vector.
- * This class is abstract and should not be constructed.
+ * @abstract
  * @prop Number mag | The magnitude of the vector
  * @prop Number sqrMag | The squared magnitude of the vector
  * @prop Vector normalized | The unit vector in the same direction of the vector

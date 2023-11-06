@@ -76,6 +76,12 @@ function document(doc, topLevelIDs, file) {
 	let result;
 	if (doc.name.isClass) {
 		const name = documentName(doc.name, doc);
+		const classQualifiers = [];
+		// if (doc.lines.some(line => line.category === "abstract"))
+		// 	classQualifiers.push("abstract");
+		// if (doc.lines.some(line => line.category === "readonly"))
+		// 	classQualifiers.push("readonly");
+
 		const description = doc.lines.find(line => line.category === null)?.content ?? "";
 		const subclass = (doc.subclasses ?? [])
 			.map(cls => `<span class="class-name">${cls.name.base}</span>`)
@@ -100,7 +106,7 @@ function document(doc, topLevelIDs, file) {
 		result = `
 			<div class="class-wrapper" id="${doc.name.base}">
 				<div class="class-header">
-					<span class="keyword">class</span> ${name}
+					<span class="keyword">${[...classQualifiers, "class"].join(" ")}</span> ${name}
 				</div>
 				<div class="class desc">
 				${description}

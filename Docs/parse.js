@@ -25,7 +25,9 @@ function parse(content, file) {
 						line = line.replace(/^\s*\* /g, "");
 						if (line.startsWith("@")) {
 							const inx = line.indexOf(" ");
-							const category = line.slice(1, inx > -1 ? inx : line.length);
+							const category = line
+								.slice(1, inx > -1 ? inx : line.length)
+								.trim();
 							line = line.slice(category.length + 1).trim();
 							return { category, content: line };
 						}
@@ -71,6 +73,14 @@ function parse(content, file) {
 				}; break;
 				case "return": {
 					line.type = line.content;
+				}; break;
+				case "readonly": {
+					line.content = "All properties of this class are read-only.";
+					line.category = null;
+				}; break;
+				case "abstract": {
+					line.content = "This is an abstract superclass and should not be constructed.";
+					line.category = null;
 				}; break;
 				case "prop":
 				case "static_prop":

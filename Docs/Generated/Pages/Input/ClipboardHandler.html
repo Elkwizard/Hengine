@@ -1,0 +1,86 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="ClipboardHandler">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L569" class="class-name source-link">ClipboardHandler</a>
+				</div>
+				<div class="class desc">
+				Represents the API for interacting with the user's clipboard.
+This class should not be constructed directly, and can be accessed from the <code>.clipboard</code> property of both the global object and <a href="../../Pages/Structure/HengineLoader.html#HengineLoader">HengineLoader</a>.
+<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #ddd">intervals</span><span style="color: #f8f">.</span><span style="color: #88d">continuous</span><span style="color: #f8f">(()</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{
+</span><span style="color: #a5a">	if</span><span style="color: #f8f"> (</span><span style="color: #ddd">mouse</span><span style="color: #f8f">.</span><span style="color: #88d">justPressed</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;Middle&quot;</span><span style="color: #f8f">)) { </span><span style="color: #444">// copies a message when middle clicking</span><span style="color: #f8f">
+		</span><span style="color: #ddd">clipboard</span><span style="color: #f8f">.</span><span style="color: #88d">write</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;Hello World!&quot;</span><span style="color: #f8f">);
+	}
+});
+</span></code>
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L583" class="function-name source-link">write</a>(<span class="param">text</span><span class="aux"> | </span><span class="param">image</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Writes a value to the clipboard.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">text</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The text to write to the clipboard
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">image</span>
+								<span class="type"><a href="../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+							</div>
+							<div class="param desc">
+								The image to write to the clipboard
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L608" class="function-name source-link">read</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Returns the text content of the clipboard.
+This value only updates after paste operations.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

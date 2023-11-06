@@ -1,0 +1,223 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="InputHandler">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L5" class="class-name source-link">InputHandler</a>
+				</div>
+				<div class="class desc">
+				Provides an API for interacting with a key-based input device (mouse, keyboard).
+This is an abstract superclass and should not be constructed.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Input/KeyboardHandler.html#KeyboardHandler">KeyboardHandler</a></span>, <span class="class-name"><a href="../../Pages/Input/MouseHandler.html#MouseHandler">MouseHandler</a></span>, <span class="class-name"><a href="../../Pages/Input/TouchHandler.html#TouchHandler">TouchHandler</a></span></div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L106" class="function-name source-link">allPressed</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L106" class="function-name source-link">allJustPressed</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L106" class="function-name source-link">allJustReleased</a><span class="type">String[]/null</span>
+			</div>
+			<div class="function desc">
+				Returns the names of all keys that meet the specified requirement.
+If no keys meet the requirement, null is returned instead.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L33" class="function-name source-link">get</a>(<span class="param">name</span>)<span class="type">InputHandler.State</span>
+			</div>
+			<div class="function desc">
+				Returns the current state of specific key.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the key to check
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L94" class="function-name source-link">pressed</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L94" class="function-name source-link">released</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L94" class="function-name source-link">justPressed</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L94" class="function-name source-link">justReleased</a>(<span class="param">name</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks whether a key is in a specific state.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the key to check
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L100" class="function-name source-link">pressLength</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L100" class="function-name source-link">releaseLength</a>(<span class="param">name</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the specified timing statistic about a specific key.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the key to check
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="InputHandler.State">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L132" class="class-name source-link">InputHandler.State</a>
+				</div>
+				<div class="class desc">
+				Represents the current state of a key on an input device.
+This is an abstract superclass and should not be constructed.
+All properties of this class are read-only.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Input/MouseHandler.html#MouseHandler">MouseHandler</a>.State</span></div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">handler</span><span class="type">InputHandler</span>
+					</div>
+					<div class="prop desc">The handler associated with the input device.</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">name</span><span class="type">String</span>
+					</div>
+					<div class="prop desc">The name of the associated key.</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L166" class="function-name source-link">pressed</a><span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Returns whether the key is currently pressed.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L173" class="function-name source-link">released</a><span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Returns whether the key is not currently pressed.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L180" class="function-name source-link">justPressed</a><span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Returns whether the key became pressed within the last frame.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L187" class="function-name source-link">justReleased</a><span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Returns whether the key stopped being pressed within the last frame.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L195" class="function-name source-link">pressLength</a><span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the duration of the current press of the key.
+If the key is not currently pressed, this returns 0.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L203" class="function-name source-link">releaseLength</a><span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the amount of frames since the key was released.
+If the key is currently pressed, this returns 0.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

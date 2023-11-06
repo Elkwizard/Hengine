@@ -1,0 +1,150 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="MouseHandler">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L292" class="class-name source-link">MouseHandler</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#InputHandler">InputHandler</a></span>
+				</div>
+				<div class="class desc">
+				Represents the API for interacting with the user's mouse.
+The names of keys for the mouse are Left, Middle, and Right, for the associated buttons.
+This class is available via the <code>.mouse</code> property of both the global object and <a href="../../Pages/Structure/HengineLoader.html#HengineLoader">HengineLoader</a>.
+All properties of this class are read-only.
+<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #ddd">intervals</span><span style="color: #f8f">.</span><span style="color: #88d">continuous</span><span style="color: #f8f">(()</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{ </span><span style="color: #444">// display a circle at the cursor position when pressing the left mouse button</span><span style="color: #f8f">
+</span><span style="color: #a5a">	if</span><span style="color: #f8f"> (</span><span style="color: #ddd">mouse</span><span style="color: #f8f">.</span><span style="color: #88d">pressed</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;Left&quot;</span><span style="color: #f8f">))
+		</span><span style="color: #ddd">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">draw</span><span style="color: #f8f">(</span><span style="color: #a5a">new</span><span style="color: #88d"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span style="color: #f8f">(</span><span style="color: #aea">&quot;red&quot;</span><span style="color: #f8f">)).</span><span style="color: #88d">circle</span><span style="color: #f8f">(</span><span style="color: #ddd">mouse</span><span style="color: #f8f">.</span><span style="color: #aad">screen</span><span style="color: #f8f">,</span><span style="color: #fd1"> 10</span><span style="color: #f8f">).
+});
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">wheelDelta</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The scroll displacement (in pixels) from the mouse wheel during the last frame.</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">screen</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The current cursor position, in screen space</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">screenLast</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The cursor position last frame, in screen space</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">world</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The current cursor position, in world space</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">worldLast</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The cursor position last frame, in world space</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L394" class="function-name source-link">screenDragState</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L394" class="function-name source-link">screenDragEnd</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L394" class="function-name source-link">worldDragStart</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L394" class="function-name source-link">worldDragEnd</a>(<span class="param">name</span>)<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+			</div>
+			<div class="function desc">
+				Returns a location associated with a given key.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the key to check
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="MouseHandler.State">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L405" class="class-name source-link">MouseHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#InputHandler">InputHandler</a>.State</span>
+				</div>
+				<div class="class desc">
+				The state of a given key on a mouse.
+All properties of this class are read-only.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Input/TouchHandler.html#TouchHandler">TouchHandler</a>.State</span></div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">screenDragStart</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The beginning of the most recent click-and-drag motion with this key, in screen space</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">screenDragEnd</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The end of the most recent click-and-drag motion with this key, in screen space. If such a gesture is ongoing, this will be the current cursor position</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">worldDragStart</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The beginning of the most recent click-and-drag motion with this key, in world space</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">worldDragEnd</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The end of the most recent click-and-drag motion with this key, in world space. If such a gesture is ongoing, this will be the current cursor position</div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			</body>
+		</html>
+	

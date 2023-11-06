@@ -134,7 +134,8 @@ class Range {
 }
 
 /**
- * Represents an 2D Shape. This is an abstract base class and should not be constructed.
+ * Represents an 2D Shape.
+ * @abstract
  * @prop Number area | The area of the shape
  */
 class Shape {

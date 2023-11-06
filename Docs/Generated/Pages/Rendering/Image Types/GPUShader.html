@@ -34,7 +34,7 @@ Uniform variables can be set from javascript, and the type equivalence is laid o
 	<tr><td>array</td><td><a href="../../../Pages/Miscellaneous/Array.html#Array">Array</a></td></tr>
 </table>
 <code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #444">// grayscale shader</span><span style="color: #a5a">
-const</span><span style="color: #88d"> shader</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> GPUShader</span><span style="color: #f8f">(</span><span style="color: #fd1">300</span><span style="color: #f8f">,</span><span style="color: #fd1"> 300</span><span style="color: #f8f">, </span><span style="color: #aea">`
+const</span><span style="color: #88d"> shader</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> GPUShader</span><span style="color: #f8f">(</span><span style="color: #fd1">300</span><span style="color: #f8f">,</span><span style="color: #fd1"> 300</span><span style="color: #f8f">, </span><span style="color: #aea">&#96;
 	uniform sampler2D image;
 
 	vec4 shader() {
@@ -43,7 +43,7 @@ const</span><span style="color: #88d"> shader</span><span style="color: #f8f"> =
 		float brightness = (color.r + color.g + color.b) / 3.0;
 		return vec4(vec3(brightness), 1.0);
 	}
-`</span><span style="color: #f8f">);
+&#96;</span><span style="color: #f8f">);
 </span><span style="color: #a5a">
 const</span><span style="color: #88d"> cat</span><span style="color: #f8f"> = </span><span style="color: #88d">loadResource</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;cat.png&quot;</span><span style="color: #f8f">);
 

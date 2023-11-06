@@ -22,9 +22,10 @@ const highlight = (source, highlighter, palette, copy = false) => {
 		"<": "&lt;",
 		">": "&gt;",
 		"\"": "&quot;",
-		"&": "&amp;"
+		"&": "&amp;",
+		"`": "&#96;"
 	};
-	
+
 	for (let i = 0; i < source.length; i++) {
 		const color = colors[i];
 		if (color && color !== currentColor) {

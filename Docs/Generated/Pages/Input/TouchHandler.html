@@ -1,0 +1,122 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="TouchHandler">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L448" class="class-name source-link">TouchHandler</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#InputHandler">InputHandler</a></span>
+				</div>
+				<div class="class desc">
+				Represents the API for interacting with the user's touch screen.
+This class is available via the <code>.touches</code> property of both the global object and <a href="../../Pages/Structure/HengineLoader.html#HengineLoader">HengineLoader</a>.
+The names for keys in this API are arbitrary numbers, rather than Strings.
+Getting these key names should be done with the <code>.allPressed</code>, <code>.allJustPressed</code>, and <code>.allJustReleased</code> getters, rather than specifying them directly.
+All properties of this class are read-only.
+<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #ddd">intervals</span><span style="color: #f8f">.</span><span style="color: #88d">continuous</span><span style="color: #f8f">(()</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{
+</span><span style="color: #a5a">	const</span><span style="color: #88d"> activeTouches</span><span style="color: #f8f"> = </span><span style="color: #ddd">touches</span><span style="color: #f8f">.</span><span style="color: #aad">allPressed</span><span style="color: #f8f">;
+</span><span style="color: #a5a">	if</span><span style="color: #f8f"> (</span><span style="color: #ddd">activeTouches</span><span style="color: #f8f">.</span><span style="color: #aad">length</span><span style="color: #f8f"> &gt;=</span><span style="color: #fd1"> 2</span><span style="color: #f8f">) {
+		</span><span style="color: #444">// retrieve the positions of the first two touches</span><span style="color: #f8f">
+	</span><span style="color: #a5a">	const</span><span style="color: #88d"> a</span><span style="color: #f8f"> = </span><span style="color: #ddd">touches</span><span style="color: #f8f">.</span><span style="color: #88d">get</span><span style="color: #f8f">(</span><span style="color: #ddd">activeTouches</span><span style="color: #f8f">[</span><span style="color: #fd1">0</span><span style="color: #f8f">]).</span><span style="color: #aad">screen</span><span style="color: #f8f">;
+	</span><span style="color: #a5a">	const</span><span style="color: #88d"> b</span><span style="color: #f8f"> = </span><span style="color: #ddd">touches</span><span style="color: #f8f">.</span><span style="color: #88d">get</span><span style="color: #f8f">(</span><span style="color: #ddd">activeTouches</span><span style="color: #f8f">[</span><span style="color: #fd1">1</span><span style="color: #f8f">]).</span><span style="color: #aad">screen</span><span style="color: #f8f">;
+	</span><span style="color: #a5a">	const</span><span style="color: #88d"> dist</span><span style="color: #f8f"> = </span><span style="color: #ddd"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span><span style="color: #f8f">.</span><span style="color: #88d">dist</span><span style="color: #f8f">(</span><span style="color: #ddd">a</span><span style="color: #f8f">, </span><span style="color: #ddd">b</span><span style="color: #f8f">);
+		
+		</span><span style="color: #444">// shows the distance between the them</span><span style="color: #f8f">
+		</span><span style="color: #ddd">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">stroke</span><span style="color: #f8f">(</span><span style="color: #a5a">new</span><span style="color: #88d"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span style="color: #f8f">(</span><span style="color: #aea">&quot;black&quot;</span><span style="color: #f8f">),</span><span style="color: #fd1"> 3</span><span style="color: #f8f">).</span><span style="color: #88d">measure</span><span style="color: #f8f">(
+			</span><span style="color: #ddd"><a href="../../Pages/Rendering/Font.html#Font">Font</a></span><span style="color: #f8f">.</span><span style="color: #aad">Arial15</span><span style="color: #f8f">, </span><span style="color: #aea">&#96;Distance: </span><span style="color: #f8f">${</span><span style="color: #ddd">Math</span><span style="color: #f8f">.</span><span style="color: #88d">round</span><span style="color: #f8f">(</span><span style="color: #ddd">dist</span><span style="color: #f8f">)}</span><span style="color: #aea"> px&#96;</span><span style="color: #f8f">, </span><span style="color: #ddd">a</span><span style="color: #f8f">, </span><span style="color: #ddd">b</span><span style="color: #f8f">
+		);
+	}
+});
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">maxTouches</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The maximum number of simultaneous touch points supported by the touch screen</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">count</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The number of currently active touches</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L518" class="function-name source-link">allPressed</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L518" class="function-name source-link">allJustPressed</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L518" class="function-name source-link">allJustReleased</a><span class="type">Number[]/null</span>
+			</div>
+			<div class="function desc">
+				Returns the names of each touch meeting a specific requirement.
+If none meet the requirement, this returns null.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="TouchHandler.State">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L529" class="class-name source-link">TouchHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/MouseHandler.html#MouseHandler">MouseHandler</a>.State</span>
+				</div>
+				<div class="class desc">
+				The state of a specific touch on the user's screen.
+All properties of this class are read-only.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">screen</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The current position of the touch, in screen space</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">screenLast</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The position of the touch last frame, in screen space</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">world</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The current position of the touch, in world space</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">worldLast</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The position of the touch last frame, in world space</div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			</body>
+		</html>
+	
