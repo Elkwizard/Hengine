@@ -14,11 +14,11 @@
 				<div class="class desc">
 				Represents the API for interacting with the user's mouse.
 The names of keys for the mouse are Left, Middle, and Right, for the associated buttons.
-This class is available via the <code>.mouse</code> property of both the global object and <a href="../../Pages/Structure/HengineLoader.html#HengineLoader">HengineLoader</a>.
+This class is available via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">mouse</span></code> property of both the global object and <a href="../../Pages/Structure/Hengine.html#Hengine">Hengine</a>.
 All properties of this class are read-only.
-<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #ddd">intervals</span><span style="color: #f8f">.</span><span style="color: #88d">continuous</span><span style="color: #f8f">(()</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{ </span><span style="color: #444">// display a circle at the cursor position when pressing the left mouse button</span><span style="color: #f8f">
-</span><span style="color: #a5a">	if</span><span style="color: #f8f"> (</span><span style="color: #ddd">mouse</span><span style="color: #f8f">.</span><span style="color: #88d">pressed</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;Left&quot;</span><span style="color: #f8f">))
-		</span><span style="color: #ddd">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">draw</span><span style="color: #f8f">(</span><span style="color: #a5a">new</span><span style="color: #88d"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span style="color: #f8f">(</span><span style="color: #aea">&quot;red&quot;</span><span style="color: #f8f">)).</span><span style="color: #88d">circle</span><span style="color: #f8f">(</span><span style="color: #ddd">mouse</span><span style="color: #f8f">.</span><span style="color: #aad">screen</span><span style="color: #f8f">,</span><span style="color: #fd1"> 10</span><span style="color: #f8f">).
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{ </span><span class="highlight-COMMENT">// display a circle at the cursor position when pressing the left mouse button</span><span class="highlight-SYMBOL">
+</span><span class="highlight-KEYWORD">	if</span><span class="highlight-SYMBOL"> (</span><span class="highlight-IDENTIFIER">mouse</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">pressed</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Left&quot;</span><span class="highlight-SYMBOL">))
+		</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">mouse</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">).
 });
 </span></code>
 				</div>
@@ -98,7 +98,7 @@ All properties of this class are read-only.
 		
 			<div class="class-wrapper" id="MouseHandler.State">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L405" class="class-name source-link">MouseHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#InputHandler">InputHandler</a>.State</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Util\Input.js?#L405" class="class-name source-link">MouseHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#InputHandler.State">InputHandler.State</a></span>
 				</div>
 				<div class="class desc">
 				The state of a given key on a mouse.
@@ -106,7 +106,7 @@ All properties of this class are read-only.
 				</div>
 				
 					<div class="header">Subclasses</div>
-					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Input/TouchHandler.html#TouchHandler">TouchHandler</a>.State</span></div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Input/TouchHandler.html#TouchHandler.State">TouchHandler.State</a></span></div>
 				
 				
 				

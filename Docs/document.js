@@ -1,5 +1,5 @@
 const path = require("path");
-const { highlight, highlighters, palettes } = require("./highlight");
+const { highlight, highlighters, inferLanguage } = require("./highlight");
 
 
 function sourceLink(doc) {
@@ -8,6 +8,7 @@ function sourceLink(doc) {
 
 function documentName(name, doc, wrapperClass) {
 	let result = name.base;
+	if (name.isPage) return `<span class="page-name">${result}</span>`
 	if (name.isStatic) result = `${wrapperClass}.${result}`;
 	result = `<a href="${sourceLink(doc)}" class="${name.isClass ? "class-name" : "function-name"} source-link">${result}</a>`;
 	if (name.isGetter) result = `<span class="keyword">get</span> ${result}`;
@@ -74,7 +75,24 @@ function documentFunction(fn, wrapperClass) {
 
 function document(doc, topLevelIDs, file) {
 	let result;
-	if (doc.name.isClass) {
+	if (doc.name.isPage) {
+		const name = documentName(doc.name, doc);
+		const description = doc.lines.find(line => line.category === null)?.content ?? "";
+
+		result = `
+			<div class="page-wrapper">
+				<div class="page-header">
+					${name}
+				</div>
+
+				<div class="page desc">
+					${description}
+				</div>
+
+			</div>
+		`;
+
+	} else if (doc.name.isClass) {
 		const name = documentName(doc.name, doc);
 		const classQualifiers = [];
 		// if (doc.lines.some(line => line.category === "abstract"))
@@ -106,7 +124,7 @@ function document(doc, topLevelIDs, file) {
 		result = `
 			<div class="class-wrapper" id="${doc.name.base}">
 				<div class="class-header">
-					<span class="keyword">${[...classQualifiers, "class"].join(" ")}</span> ${name}
+					<span class="keyword">${[...classQualifiers, doc.name.isEnum ? "enum" : "class"].join(" ")}</span> ${name}
 				</div>
 				<div class="class desc">
 				${description}
@@ -133,15 +151,22 @@ function document(doc, topLevelIDs, file) {
 
 	// highlight and transform code blocks
 	result = result.replace(/```(\w+?)\s*\n([\w\W]*?)```/g, (_, language, code) => {
-		return highlight(code, highlighters[language], palettes.dark, true);
+		return highlight(code, highlighters[language], true, "block");
 	});
-	result = result.replace(/`(.*?)`/g, `<code>$1</code>`);
-	
+	result = result.replace(/`(.*?)`/g, (_, code) => {
+		return highlight(code, highlighters[inferLanguage(code)]);
+	});
+	result = result.replace(/`(.*?)`/g, (_, code) => {
+		return highlight(code, highlighters.js);
+	});
+
 	// add automatic links to other doc pages
 	const toRoot = path.relative(path.dirname(file), ".");
-	for (const [id, filePath] of Object.entries(topLevelIDs)) {
+	const entries = Object.entries(topLevelIDs)
+		.sort((a, b) => b[0].length - a[0].length);
+	for (const [id, filePath] of entries) {
 		if (file === filePath) continue;
-		const regex = new RegExp(String.raw`(?<!href="([^"\n]*?))\b(${id}(s|es)?)\b`, "g");
+		const regex = new RegExp(String.raw`(?<! href="([^"]*?))\b(${id.replaceAll(".", "\\.")}(s|es)?)\b(?!([^<]*?)<\/a>)`, "g");
 		const link = `<a href=${JSON.stringify(
 			path.join(toRoot, filePath)
 				.replace(/\\/g, "/") + "#" + id

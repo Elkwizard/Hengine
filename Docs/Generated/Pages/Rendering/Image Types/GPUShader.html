@@ -9,32 +9,20 @@
 				
 			<div class="class-wrapper" id="GPUShader">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L504" class="class-name source-link">GPUShader</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L510" class="class-name source-link">GPUShader</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
 				</div>
 				<div class="class desc">
-				Represents the renderable result of a GLSL (version 3.0 ES) fragment shader invoked for every pixel in a rectangular region. The entry point for the shader is a function with of the form:
-<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">vec4</span><span style="color: #88d"> </span><span style="color: #88d">shader</span><span style="color: #f8f">() {
-	</span><span style="color: #444">// your main code here</span><span style="color: #f8f">
+				Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region. The entry point for the shader is a function of the form:
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">vec4</span><span class="highlight-CLASS"> </span><span class="highlight-FUNCTION">shader</span><span class="highlight-SYMBOL">() {
+	</span><span class="highlight-COMMENT">// your main code here</span><span class="highlight-SYMBOL">
 }
 </span></code>
 Several engine-provided uniforms are given, specifically:
-<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">uniform vec2</span><span style="color: #88d"> </span><span style="color: #ddd">position</span><span style="color: #f8f">; </span><span style="color: #444">// the pixel-space coordinates of the pixel, with (0, 0) in the top-left corner</span><span style="color: #a5a">
-uniform vec2</span><span style="color: #88d"> </span><span style="color: #ddd">resolution</span><span style="color: #f8f">; </span><span style="color: #444">// the width and height of the image, in pixels</span><span style="color: #f8f">
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">uniform vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// the pixel-space coordinates of the pixel, with (0, 0) in the top-left corner</span><span class="highlight-KEYWORD">
+uniform vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">resolution</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// the width and height of the image, in pixels</span><span class="highlight-SYMBOL">
 </span></code>
-Uniform variables can be set from javascript, and the type equivalence is laid out in the table below:
-<table>
-	<tr><th>GLSL Type</th><th>JS Type</th></tr>
-	<tr><td>int, uint, float</td><td>Number</td></tr>
-	<tr><td>bool</td><td>Boolean</td></tr>
-	<tr><td>gvec2, gvec3</td><td><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a>, <a href="../../../Pages/Geometry/Vector/Vector3.html#Vector3">Vector3</a></td></tr>
-	<tr><td>ivec4, uvec4</td><td><a href="../../../Pages/Geometry/Vector/Vector4.html#Vector4">Vector4</a></td></tr>
-	<tr><td>vec4</td><td><a href="../../../Pages/Geometry/Vector/Vector4.html#Vector4">Vector4</a>, <a href="../../../Pages/Rendering/Color.html#Color">Color</a></td></tr>
-	<tr><td>sampler2D</td><td><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></td></tr>
-	<tr><td>struct</td><td>Object</td></tr>
-	<tr><td>array</td><td><a href="../../../Pages/Miscellaneous/Array.html#Array">Array</a></td></tr>
-</table>
-<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #444">// grayscale shader</span><span style="color: #a5a">
-const</span><span style="color: #88d"> shader</span><span style="color: #f8f"> =</span><span style="color: #a5a"> new</span><span style="color: #88d"> GPUShader</span><span style="color: #f8f">(</span><span style="color: #fd1">300</span><span style="color: #f8f">,</span><span style="color: #fd1"> 300</span><span style="color: #f8f">, </span><span style="color: #aea">&#96;
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// grayscale shader</span><span class="highlight-KEYWORD">
+const</span><span class="highlight-CONSTANT"> shader</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CONSTANT"> GPUShader</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">300</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 300</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&#96;
 	uniform sampler2D image;
 
 	vec4 shader() {
@@ -43,13 +31,13 @@ const</span><span style="color: #88d"> shader</span><span style="color: #f8f"> =
 		float brightness = (color.r + color.g + color.b) / 3.0;
 		return vec4(vec3(brightness), 1.0);
 	}
-&#96;</span><span style="color: #f8f">);
-</span><span style="color: #a5a">
-const</span><span style="color: #88d"> cat</span><span style="color: #f8f"> = </span><span style="color: #88d">loadResource</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;cat.png&quot;</span><span style="color: #f8f">);
+&#96;</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-KEYWORD">
+const</span><span class="highlight-CONSTANT"> cat</span><span class="highlight-SYMBOL"> = </span><span class="highlight-FUNCTION">loadResource</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;cat.png&quot;</span><span class="highlight-SYMBOL">);
 
-</span><span style="color: #ddd">shader</span><span style="color: #f8f">.</span><span style="color: #88d">setArgument</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;image&quot;</span><span style="color: #f8f">, </span><span style="color: #ddd">cat</span><span style="color: #f8f">); </span><span style="color: #444">// put image in shader</span><span style="color: #f8f">
+</span><span class="highlight-IDENTIFIER">shader</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">setArgument</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;image&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">cat</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// put image in shader</span><span class="highlight-SYMBOL">
 
-</span><span style="color: #ddd">renderer</span><span style="color: #f8f">.</span><span style="color: #88d">image</span><span style="color: #f8f">(</span><span style="color: #ddd">shader</span><span style="color: #f8f">).</span><span style="color: #88d">default</span><span style="color: #f8f">(</span><span style="color: #fd1">0</span><span style="color: #f8f">,</span><span style="color: #fd1"> 0</span><span style="color: #f8f">); </span><span style="color: #444">// draw grayscale cat</span><span style="color: #f8f">
+</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">image</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">shader</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">default</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// draw grayscale cat</span><span class="highlight-SYMBOL">
 </span></code>
 				</div>
 				
@@ -71,7 +59,7 @@ const</span><span style="color: #88d"> cat</span><span style="color: #f8f"> = </
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L512" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">glsl</span>, <span class="param">pixelRatio?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L518" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">glsl</span>, <span class="param">pixelRatio?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new GPUShader.
@@ -127,7 +115,7 @@ const</span><span style="color: #88d"> cat</span><span style="color: #f8f"> = </
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L687" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L693" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether or not the shader contains a given uniform.
@@ -153,10 +141,11 @@ const</span><span style="color: #88d"> cat</span><span style="color: #f8f"> = </
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L695" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L702" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
 				Returns the current value of a given uniform.
+For the return value of this function, see <a href="../../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a>
 			</div>
 			
 			<div class="function-signature">
@@ -179,7 +168,7 @@ const</span><span style="color: #88d"> cat</span><span style="color: #f8f"> = </
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L703" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L710" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of a given uniform.
@@ -205,7 +194,7 @@ const</span><span style="color: #88d"> cat</span><span style="color: #f8f"> = </
 								<span class="type">Any</span>
 							</div>
 							<div class="param desc">
-								The new value for the uniform.
+								The new value for the uniform. For the type of this argument, see <a href="../../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a>
 							</div>
 						</div>
 					
@@ -215,7 +204,7 @@ const</span><span style="color: #88d"> cat</span><span style="color: #f8f"> = </
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L710" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\GPUShader.js?#L717" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of one or more uniforms. 

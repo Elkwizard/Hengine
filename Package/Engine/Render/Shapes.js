@@ -134,7 +134,7 @@ class Range {
 }
 
 /**
- * Represents an 2D Shape.
+ * Represents a 2D Shape.
  * @abstract
  * @prop Number area | The area of the shape
  */

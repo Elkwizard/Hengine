@@ -1,0 +1,152 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="TileMap">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\TileMap.js?#L10" class="class-name source-link">TileMap</a>
+				</div>
+				<div class="class desc">
+				Represents a collection of sprites contained within a single image.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> spriteSheet</span><span class="highlight-SYMBOL"> = </span><span class="highlight-FUNCTION">loadResource</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;sprites.png&quot;</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// 32 x 32</span><span class="highlight-KEYWORD">
+const</span><span class="highlight-CONSTANT"> tileMap</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">TileMap</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">regular</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">spriteSheet</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 16</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 16</span><span class="highlight-SYMBOL">, [</span><span class="highlight-STRING">&quot;cat&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&quot;dog&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&quot;fish&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&quot;creature&quot;</span><span class="highlight-SYMBOL">]); </span><span class="highlight-COMMENT">// extract 4 tiles</span><span class="highlight-SYMBOL">
+
+</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">image</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">tileMap</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">get</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;fish&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">rect</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 64</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 64</span><span class="highlight-SYMBOL">);
+</span></code>
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\TileMap.js?#L16" class="function-name source-link">constructor</a>(<span class="param">image</span>, <span class="param">sections</span>)
+			</div>
+			<div class="function desc">
+				Creates a new TileMap.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">image</span>
+								<span class="type"><a href="../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+							</div>
+							<div class="param desc">
+								The overall sprite sheet
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">sections</span>
+								<span class="type">Object[]</span>
+							</div>
+							<div class="param desc">
+								The regions of the sprite sheet assigned to each sprite. Each entry in this list has a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">name</span></code> property, which is any unique identifier for the sprite, and a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">area</span></code> property, which is a <a href="../../Pages/Geometry/Shapes/Rect.html#Rect">Rect</a> representing the natural region of the sprite sheet assigned to this name
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\TileMap.js?#L29" class="function-name source-link">get</a>(<span class="param">name</span>)<span class="type"><a href="../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+			</div>
+			<div class="function desc">
+				Retrieves a specific sprite from the sprite sheet.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type">Any</span>
+							</div>
+							<div class="param desc">
+								The identifier of a specific sprite
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\TileMap.js?#L40" class="function-name source-link">TileMap.regular</a>(<span class="param">image</span>, <span class="param">tileWidth</span>, <span class="param">tileHeight</span>, <span class="param">names</span>)<span class="type">TileMap</span>
+			</div>
+			<div class="function desc">
+				Creates a tile map based on a series of contiguous, fixed-size, left-to-right, top-to-bottom tiles.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">image</span>
+								<span class="type"><a href="../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+							</div>
+							<div class="param desc">
+								The sprite sheet
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">tileWidth</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The width of each tile
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">tileHeight</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The height of each tile
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">names</span>
+								<span class="type">Any[]</span>
+							</div>
+							<div class="param desc">
+								The list of identifiers for each tile
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

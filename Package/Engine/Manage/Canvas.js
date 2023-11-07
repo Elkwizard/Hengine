@@ -1,5 +1,28 @@
+/**
+ * Represents the way a canvas scales with changes to the window size.
+ * @static_prop Symbol STRETCH | The canvas changes size to fill the entire window
+ * @static_prop Symbol PRESERVE_ASPECT_RATIO | The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio
+ * @static_prop Symbol INTEGER_MULTIPLE | Same as `ScalingMode.PRESERVE_ASPECT_RATIO`, except the scale factor on the size will always be in the form (n) or (1/n), where n is an integer
+ */
 const ScalingMode = defineEnum("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MULTIPLE");
 
+/**
+ * Represents the canvas on which the Hengine is rendered.
+ * The pixel ratio of the canvas is equal to `window.devicePixelRatio`.
+ * The `.width` and `.height` properties of this class are also available on the global object.
+ * A vector with components equal to half the dimensions of the canvas is also available on the global object in the `.middle` property.
+ * ```js
+ * canvas.scalingMode = ScalingMode.STRETCH;
+ * 
+ * intervals.continuous(() => { // render a circle to the middle of the screen
+ * 	renderer.draw(new Color("blue")).circle(middle, 10);
+ * });
+ * ```
+ * @prop Artist renderer | A renderer which can draw to the screen
+ * @prop ImageType/String cursor | The cursor icon. This can be either an image or a CSS cursor name
+ * @prop ScalingMode scalingMode | The way in which the canvas scales when the window is resized. Starts as `ScalingMode.PRESERVE_ASPECT_RATIO`
+ * @prop Function clearScreen | The function that will be called to clear the screen each frame. Starts as `() => renderer.fill(new Color(255, 255, 255))`
+ */
 class CanvasImage extends ImageType {	
 	constructor(canvas, engine) {
 		super(canvas.width, canvas.height, __devicePixelRatio);

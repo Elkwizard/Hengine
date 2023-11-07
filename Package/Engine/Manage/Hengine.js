@@ -1,3 +1,16 @@
+/**
+ * Represents the engine itself. Contains all the main functionality in its properties.
+ * All properties of this class are available as properties of the global object. 
+ * @prop KeyboardHandler keyboard | The keyboard API
+ * @prop MouseHandler mouse | The mouse API
+ * @prop TouchHandler touches | The touch screen API
+ * @prop ClipboardHandler clipboard | The clipboard API
+ * @prop CanvasImage canvas | The canvas associated with the engine
+ * @prop Artist renderer | The renderer associated with the canvas. Draws directly on the screen
+ * @prop Scene scene | The scene containing all the objects currently in the engine
+ * @prop IntervalManager intervals | The interval manager managing the update loop of the engine
+ * @prop FileSystem fileSystem | The file system for the engine. This property persists across reloads and different sessions via `localStorage`
+ */
 class Hengine {
 	constructor() {
 		const wrapper = document.body;
@@ -41,6 +54,9 @@ class Hengine {
 			localStorage[storageKey] = this.fileSystem;
 		});
 	}
+	/**
+	 * Destroys the engine instance and removes the canvas.
+	 */
 	end() {
 		exit("Hengine.end()");
 		let canvas = document.getElementById(this.renderer.canvas.id);

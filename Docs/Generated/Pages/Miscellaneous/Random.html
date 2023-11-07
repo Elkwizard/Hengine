@@ -1,0 +1,876 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Random">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L24" class="class-name source-link">Random</a>
+				</div>
+				<div class="class desc">
+				Represents a seeded random number generator.
+All instance methods of this class are available statically, so <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">)</span></code> is valid and uses statically stored state of the class itself.
+The random number generation functions of this class are organized into two categories: stable and unstable.
+Stable functions will produce the same value when called with the same arguments.
+Unstable functions don't take any seeding parameters and change their return value on each call.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">;</span><span class="highlight-KEYWORD">
+let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">;
+
+</span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
+	</span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> += </span><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// generate a random value each frame</span><span class="highlight-SYMBOL">
+	</span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL">++;
+</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> mean</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> / </span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// compute the mean of the random values</span><span class="highlight-SYMBOL">
+	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">text</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER"><a href="../../Pages/Rendering/Font.html#Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">Arial20</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">mean</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
+});
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">seed</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The current seed for the unstable random functions. e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">random</span><span class="highlight-SYMBOL">()</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">angle</span><span class="highlight-SYMBOL">()</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">()</span></code></div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">sampleSeed</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The seed for the stable random functions. e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">perlin3D</span><span class="highlight-SYMBOL">()</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">voronoi</span><span class="highlight-SYMBOL">()</span></code></div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">distribution</span><span class="type">Function</span>
+					</div>
+					<div class="prop desc">The distribution of the numbers generated. This is one of the provided static distribution properties of the Random class (<code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">normal</span></code>)</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">Random.uniform</span><span class="type">Function</span>
+					</div>
+					<div class="prop desc">A uniform distribution</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">Random.normal</span><span class="type">Function</span>
+					</div>
+					<div class="prop desc">A normal distribution</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L37" class="function-name source-link">constructor</a>(<span class="param">seed</span>, <span class="param">sampleSeed</span>, <span class="param">distribution?</span><span class="aux"> | </span><span class="param">seed</span>, <span class="param">distribution?</span><span class="aux"> | </span><span class="param">distribution</span>)
+			</div>
+			<div class="function desc">
+				Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to 0.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">seed</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The initial seed for the unstable random functions.
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">sampleSeed</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The seed used for the stable random functions.
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">distribution</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The initial distribution for the numbers generated. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">seed</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The initial seed for unstable functions
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">distribution</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The initial distribution. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">distribution</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The initial distribution
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L47" class="function-name source-link">random</a>()<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns a random number on [0, 1). Unstable.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L56" class="function-name source-link">normalZ</a>(<span class="param">mu?</span>, <span class="param">sd?</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns a random value in an unbounded normal distribution. Unstable
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">mu</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The mean return value. Default is 0
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">sd</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The standard deviation of possible return values. Default is 1
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L66" class="function-name source-link">int</a>(<span class="param">min</span>, <span class="param">max</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns a random integer on [min, max]. Unstable.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">min</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The lower bound
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">max</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The upper bound
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L74" class="function-name source-link">bool</a>(<span class="param">chance?</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Returns a random boolean value. Unstable.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">chance</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The probability that the return value is true. Default is 0.5
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L81" class="function-name source-link">sign</a>()<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns a random sign, with a 50/50 chance to be -1 or 1. Unstable.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L90" class="function-name source-link">range</a>(<span class="param">min</span>, <span class="param">max</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns a random floating-point value on [min, max). Unstable.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">min</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The lower bound
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">max</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The upper bound
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L100" class="function-name source-link">angle</a>()<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns a random angle in radians on [0, 2π). Unstable.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L107" class="function-name source-link">char</a>()<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Returns a random single character utf-16 string. Unstable.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L115" class="function-name source-link">color</a>(<span class="param">result?</span>)<span class="type"><a href="../../Pages/Rendering/Color.html#Color">Color</a></span>
+			</div>
+			<div class="function desc">
+				Returns a random opaque color. Unstable.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type"><a href="../../Pages/Rendering/Color.html#Color">Color</a></span>
+							</div>
+							<div class="param desc">
+								The destination for the color. Default is a new color.
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L131" class="function-name source-link">choice</a>(<span class="param">values</span><span class="aux"> | </span><span class="param">values</span>, <span class="param">percentages</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Chooses an (optionally weighted) random element from an array. Unstable.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">values</span>
+								<span class="type">Iterable</span>
+							</div>
+							<div class="param desc">
+								The values to choose from
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">values</span>
+								<span class="type">Iterable</span>
+							</div>
+							<div class="param desc">
+								The values to choose from
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">percentages</span>
+								<span class="type">Number[]</span>
+							</div>
+							<div class="param desc">
+								The weight of each value. These can be multiplied by any constant factor
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L157" class="function-name source-link">sample</a>(<span class="param">values</span>, <span class="param">quantity</span>)<span class="type"><a href="../../Pages/Miscellaneous/Array.html#Array">Array</a></span>
+			</div>
+			<div class="function desc">
+				Randomly selects a sample (with replacement) from a given collection of values. Unstable.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">values</span>
+								<span class="type">Iterable</span>
+							</div>
+							<div class="param desc">
+								The values to sample from
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">quantity</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The size of the sample
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L171" class="function-name source-link">sampleWithoutReplacement</a>(<span class="param">values</span>, <span class="param">quantity</span>)<span class="type"><a href="../../Pages/Miscellaneous/Array.html#Array">Array</a></span>
+			</div>
+			<div class="function desc">
+				Randomly selects a sample (without replacement) from a given collection of values. Unstable.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">values</span>
+								<span class="type">Iterable</span>
+							</div>
+							<div class="param desc">
+								The values to sample from
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">quantity</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The size of the sample
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L190" class="function-name source-link">octave</a>(<span class="param">octaves</span>, <span class="param">algorithm</span>, <span class="param">...noiseArgs</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the sum of a specified number of octaves of a specified type of noise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">octaves</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The number of octaves
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">algorithm</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The stable algorithm of which octaves are being generated
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">noiseArgs</span>
+								<span class="type">Number[]</span>
+							</div>
+							<div class="param desc">
+								The arguments to the noise function
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L213" class="function-name source-link">perlin</a>(<span class="param">x</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Samples 1D Perlin noise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">f</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The frequency of the Perlin noise. Default is 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">seed</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The seed for the noise. Default is sampleSeed
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L232" class="function-name source-link">perlin2D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Samples 2D Perlin noise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's x coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's y coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">f</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The frequency of the Perlin noise. Default is 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">seed</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The seed for the noise. Default is sampleSeed
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L255" class="function-name source-link">perlin3D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">z</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Samples 3D Perlin noise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's x coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's y coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">z</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's z coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">f</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The frequency of the Perlin noise. Default is 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">seed</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The seed for the noise. Default is sampleSeed
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L279" class="function-name source-link">voronoi</a>(<span class="param">x</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Samples 1D Voronoi noise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">f</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The frequency of the Voronoi noise. Default is 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">seed</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The seed for the noise. Default is sampleSeed
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L304" class="function-name source-link">voronoi2D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Samples 2D Voronoi noise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's x coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's y coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">f</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The frequency of the Voronoi noise. Default is 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">seed</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The seed for the noise. Default is sampleSeed
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L333" class="function-name source-link">voronoi3D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">z</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Samples 3D Voronoi noise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's x coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's y coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">z</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The sample location's z coordinate
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">f</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The frequency of the Voronoi noise. Default is 1
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">seed</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The seed for the noise. Default is sampleSeed
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\Random.js?#L351" class="function-name source-link">reSeed</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Chooses a new random seed and sampleSeed for the random number generator.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

@@ -13,10 +13,10 @@
 				</div>
 				<div class="class desc">
 				Represents the API for interacting with the user's clipboard.
-This class should not be constructed directly, and can be accessed from the <code>.clipboard</code> property of both the global object and <a href="../../Pages/Structure/HengineLoader.html#HengineLoader">HengineLoader</a>.
-<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #ddd">intervals</span><span style="color: #f8f">.</span><span style="color: #88d">continuous</span><span style="color: #f8f">(()</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{
-</span><span style="color: #a5a">	if</span><span style="color: #f8f"> (</span><span style="color: #ddd">mouse</span><span style="color: #f8f">.</span><span style="color: #88d">justPressed</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;Middle&quot;</span><span style="color: #f8f">)) { </span><span style="color: #444">// copies a message when middle clicking</span><span style="color: #f8f">
-		</span><span style="color: #ddd">clipboard</span><span style="color: #f8f">.</span><span style="color: #88d">write</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;Hello World!&quot;</span><span style="color: #f8f">);
+This class should not be constructed directly, and can be accessed from the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">clipboard</span></code> property of both the global object and <a href="../../Pages/Structure/Hengine.html#Hengine">Hengine</a>.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
+</span><span class="highlight-KEYWORD">	if</span><span class="highlight-SYMBOL"> (</span><span class="highlight-IDENTIFIER">mouse</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">justPressed</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Middle&quot;</span><span class="highlight-SYMBOL">)) { </span><span class="highlight-COMMENT">// copies a message when middle clicking</span><span class="highlight-SYMBOL">
+		</span><span class="highlight-IDENTIFIER">clipboard</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">write</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Hello World!&quot;</span><span class="highlight-SYMBOL">);
 	}
 });
 </span></code>

@@ -1,4 +1,4 @@
-const highlight = (source, highlighter, palette, copy = false) => {
+const highlight = (source, highlighter, copy = false, className = "") => {
 	source = source.replaceAll("\r", "");
 	const colors = new Array(source.length).fill(null);
 	for (const [regex, color, antiregex = null] of highlighter) {
@@ -30,7 +30,7 @@ const highlight = (source, highlighter, palette, copy = false) => {
 		const color = colors[i];
 		if (color && color !== currentColor) {
 			if (currentColor) result += "</span>";
-			result += `<span style="color: ${palette[color]}">`;
+			result += `<span class="highlight-${color}">`;
 			currentColor = color;
 		}
 
@@ -46,8 +46,14 @@ const highlight = (source, highlighter, palette, copy = false) => {
 		result = button + result;
 	}
 
-	return `<code class="block">${result}</code>`;
+	return `<code class="${className} highlight-BACKGROUND">${result}</code>`;
 };
+
+const inferLanguage = source => {
+	if (/^\s*\w+\:($|\/\/)/.test(source)) return "url";
+	return "js";
+};
+
 
 const COMMENT_MATCH = [
 	[/\/\/(.*?)$/gm, "COMMENT"],
@@ -79,14 +85,16 @@ const STRING_MATCH = [
 	[/(["'`])((\\\1|[\w\W])*?)\1/g, "STRING", /(?<=`([^`]*?))\$\{([\w\W]*?)\}(?=([^`]*?)`)/g],
 ];
 
-const JS_HIGHLIGHTER = [
+const highlighters = { };
+
+highlighters.js = [
 	...MAIN_MATCH,
 	...PROPERTY_MATCH,
 	...FUNCTION_MATCH,
 	[/\b(class|instanceof|extends)\s+(\w+?)\b/g, "CLASS"],
 	[/\b(const|new)\s+(\w+?)\b/g, "CONSTANT"],
 	[/\b([A-Z_]+?)\b/g, "CONSTANT"],
-	...WORD_MATCH("KEYWORD", "throw", "in", "of", "extends", "switch", "case", "delete", "typeof", "instanceof", "class", "const", "let", "var", "static", "return", "if", "else", "break", "continue", "for", "while", "do", "new", "constructor", "function", "=>", "async"),
+	...WORD_MATCH("KEYWORD", "throw", "in", "of", "extends", "switch", "case", "delete", "typeof", "instanceof", "class", "const", "let", "var", "static", "return", "if", "else", "break", "continue", "for", "while", "do", "new", "constructor", "function\\*", "function", "=>", "async", "await", "yield\\*", "yield"),
 	[/\b(get|set)\b(?!\s*?\()/g, "KEYWORD"],
 	...NUMBER_MATCH,
 	...WORD_MATCH("LANG_VAR", "this", "true", "false", "null", "undefined"),
@@ -94,7 +102,7 @@ const JS_HIGHLIGHTER = [
 	...COMMENT_MATCH
 ];
 
-const GLSL_HIGHLIGHTER = [
+highlighters.glsl = [
 	...MAIN_MATCH,
 	...PROPERTY_MATCH,
 	...FUNCTION_MATCH,
@@ -105,33 +113,17 @@ const GLSL_HIGHLIGHTER = [
 	...NUMBER_MATCH,
 	...WORD_MATCH("LANG_VAR", "true", "false"),
 	[/(?<=#define)\s+(\w+?)\b/g, "CONSTANT"],
-	...COMMENT_MATCH,
-	
+	...COMMENT_MATCH
 ];
 
-const DARK_PALETTE = {
-	DEFAULT: "#fff",
-	SYMBOL: "#f8f",
-	IDENTIFIER: "#ddd",
-	FUNCTION: "#88d",
-	CLASS: "#88d",
-	CONSTANT: "#88d",
-	PROPERTY: "#aad",
-	KEYWORD: "#a5a",
-	LANG_VAR: "#d6b",
-	NUMBER: "#fd1",
-	STRING: "#aea",
-	COMMENT: "#444",
-	UNIQUE: "#0f0"
-};
+highlighters.url = [
+	[/.*/g, "DEFAULT"],
+	[/\/(.*?)\s*$/g, "PROPERTY"],
+	[/^\s*(\w+)\:\/*/g, "CLASS"]
+];
 
 module.exports = {
 	highlight,
-	highlighters: {
-		js: JS_HIGHLIGHTER,
-		glsl: GLSL_HIGHLIGHTER
-	},
-	palettes: {
-		dark: DARK_PALETTE
-	}
+	inferLanguage,
+	highlighters
 };

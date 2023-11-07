@@ -1,0 +1,104 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="CanvasImage">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Canvas.js?#L26" class="class-name source-link">CanvasImage</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+				</div>
+				<div class="class desc">
+				Represents the canvas on which the <a href="../../Pages/Structure/Hengine.html#Hengine">Hengine</a> is rendered.
+The pixel ratio of the canvas is equal to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">window</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">devicePixelRatio</span></code>.
+The <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">width</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">height</span></code> properties of this class are also available on the global object.
+A vector with components equal to half the dimensions of the canvas is also available on the global object in the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">middle</span></code> property.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">canvas</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scalingMode</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">ScalingMode</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">STRETCH</span><span class="highlight-SYMBOL">;
+
+</span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{ </span><span class="highlight-COMMENT">// render a circle to the middle of the screen</span><span class="highlight-SYMBOL">
+	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;blue&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">middle</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
+});
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">renderer</span><span class="type"><a href="../../Pages/Rendering/Renderer.html#Artist">Artist</a></span>
+					</div>
+					<div class="prop desc">A renderer which can draw to the screen</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">cursor</span><span class="type"><a href="../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a>/String</span>
+					</div>
+					<div class="prop desc">The cursor icon. This can be either an image or a CSS cursor name</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">scalingMode</span><span class="type">ScalingMode</span>
+					</div>
+					<div class="prop desc">The way in which the canvas scales when the window is resized. Starts as <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">ScalingMode</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">PRESERVE_ASPECT_RATIO</span></code></div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">clearScreen</span><span class="type">Function</span>
+					</div>
+					<div class="prop desc">The function that will be called to clear the screen each frame. Starts as <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fill</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">255</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 255</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 255</span><span class="highlight-SYMBOL">))</span></code></div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="ScalingMode">
+				<div class="class-header">
+					<span class="keyword">enum</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Canvas.js?#L7" class="class-name source-link">ScalingMode</a>
+				</div>
+				<div class="class desc">
+				Represents the way a canvas scales with changes to the window size.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">ScalingMode.STRETCH</span><span class="type">Symbol</span>
+					</div>
+					<div class="prop desc">The canvas changes size to fill the entire window</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">ScalingMode.PRESERVE_ASPECT_RATIO</span><span class="type">Symbol</span>
+					</div>
+					<div class="prop desc">The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">ScalingMode.INTEGER_MULTIPLE</span><span class="type">Symbol</span>
+					</div>
+					<div class="prop desc">Same as <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">ScalingMode</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">PRESERVE_ASPECT_RATIO</span></code>, except the scale factor on the size will always be in the form (n) or (1/n), where n is an integer</div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			</body>
+		</html>
+	

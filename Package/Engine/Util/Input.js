@@ -236,7 +236,7 @@ InputHandler.State = class State {
 /**
  * Represents the API for interacting with the user's keyboard.
  * The names of letter keys should always be lowercase, and the names of special keys are same as the identifiers used for <a href="https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values">KeyboardEvent.key</a>.
- * This class is available via the `.keyboard` property of both the global object and HengineLoader.
+ * This class is available via the `.keyboard` property of both the global object and Hengine.
  * ```js
  * intervals.continuous(() => { // change circle color based on whether the space bar is pressed
  * 	const color = keyboard.pressed(" ") ? new Color("red") : new Color("blue");
@@ -275,7 +275,7 @@ KeyboardHandler.State = class KeyState extends InputHandler.State { };
 /**
  * Represents the API for interacting with the user's mouse.
  * The names of keys for the mouse are Left, Middle, and Right, for the associated buttons.
- * This class is available via the `.mouse` property of both the global object and HengineLoader.
+ * This class is available via the `.mouse` property of both the global object and Hengine.
  * @readonly
  * ```js
  * intervals.continuous(() => { // display a circle at the cursor position when pressing the left mouse button
@@ -422,7 +422,7 @@ MouseHandler.addChecks([
 
 /**
  * Represents the API for interacting with the user's touch screen.
- * This class is available via the `.touches` property of both the global object and HengineLoader.
+ * This class is available via the `.touches` property of both the global object and Hengine.
  * The names for keys in this API are arbitrary numbers, rather than Strings.
  * Getting these key names should be done with the `.allPressed`, `.allJustPressed`, and `.allJustReleased` getters, rather than specifying them directly.
  * @readonly
@@ -557,7 +557,7 @@ TouchHandler.addChecks([
 
 /**
  * Represents the API for interacting with the user's clipboard.
- * This class should not be constructed directly, and can be accessed from the `.clipboard` property of both the global object and HengineLoader.
+ * This class should not be constructed directly, and can be accessed from the `.clipboard` property of both the global object and Hengine.
  * ```js
  * intervals.continuous(() => {
  * 	if (mouse.justPressed("Middle")) { // copies a message when middle clicking

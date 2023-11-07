@@ -14,11 +14,19 @@ a {
 	font-size: 1em;
 }
 
+.desc .class-name a, .desc code a {
+	text-decoration: none;
+}
+
+.desc a {
+	text-decoration: underline;
+}
+
 a:not(.source-link) {
 	font-style: italic;
 }
 
-.class-name, .function-name, .prop-name {
+.class-name, .function-name, .prop-name, .page-name {
 	color: var(--accent-1);
 }
 
@@ -46,7 +54,7 @@ a:not(.source-link) {
 }
 
 .function-header .param {
-	color: white;
+	color: var(--text-color);
 }
 
 .keyword {
@@ -59,7 +67,7 @@ a:not(.source-link) {
 }
 
 .syntax {
-	color: white;
+	color: var(--text-color);
 	white-space: pre;
 }
 
@@ -69,7 +77,7 @@ a:not(.source-link) {
 	padding-left: 1.3em;
 }
 
-.class-wrapper {
+.class-wrapper, .page-wrapper {
 	padding: 2em;
 }
 
@@ -86,13 +94,13 @@ a:not(.source-link) {
 	overflow-wrap: break-word;
 }
 
-.class-header {
+.class-header, .page-header {
 	margin-bottom: 0.5em;
 	font-size: 2em;
 }
 
 .function-header {
-	color: white;
+	color: var(--text-color);
 }
 
 .param-name {
@@ -127,8 +135,7 @@ code {
 	width: 100%;
 	white-space: pre;
 	tab-size: 4ch;
-	color: white;
-	background: #112;
+	color: var(--text-color);
 	padding: 0.2em;
 	border-radius: 0.1em;
 }
@@ -150,7 +157,7 @@ code.block button {
 	position: absolute;
 	background: none;
 	border: none;
-	color: white;
+	color: var(--text-color);
 	font-weight: bold;
 	font-size: 2em;
 	right: 0.5em;
@@ -167,7 +174,7 @@ code.block button:hover {
 .desc {
 	font-family: var(--text-font);
 	font-size: 1.23rem;
-	color: white;
+	color: var(--text-color);
 }
 
 .subclass {
@@ -178,7 +185,7 @@ td, th {
 	text-align: center;
 	margin: 0;
 	padding: 0.4em 0.6em;
-	border: 1px white solid;
+	border: 1px var(--text-color) solid;
 }
 
 th {
@@ -191,3 +198,36 @@ table {
 	margin-top: 0.6em;
 	margin-bottom: 0.4em;
 }
+
+/* highlighting */
+.highlight-DEFAULT { color: #fff; }
+.highlight-SYMBOL { color: #f8f; }
+.highlight-IDENTIFIER { color: #ddd; }
+.highlight-FUNCTION { color: #88d; }
+.highlight-CLASS { color: #88d; }
+.highlight-CONSTANT { color: #88d; }
+.highlight-PROPERTY { color: #aad; }
+.highlight-KEYWORD { color: #a5a; }
+.highlight-LANG_VAR { color: #d6b; }
+.highlight-NUMBER { color: #fd1; }
+.highlight-STRING { color: #aea; }
+.highlight-COMMENT { color: #444; }
+.highlight-UNIQUE { color: #0f0; }
+.highlight-BACKGROUND { background-color: #112; }
+
+@media (prefers-color-scheme: light) {
+	.highlight-DEFAULT { color: #000; }
+	.highlight-SYMBOL { color: #878; }
+	.highlight-IDENTIFIER { color: #333; }
+	.highlight-FUNCTION { color: #558; }
+	.highlight-CLASS { color: #558; }
+	.highlight-CONSTANT { color: #558; }
+	.highlight-PROPERTY { color: #669; }
+	.highlight-KEYWORD { color: #848; }
+	.highlight-LANG_VAR { color: #c71; }
+	.highlight-NUMBER { color: #b73; }
+	.highlight-STRING { color: #575; }
+	.highlight-COMMENT { color: #aba; }
+	.highlight-UNIQUE { color: #0f0; }
+	.highlight-BACKGROUND { background-color: #f5f5f5; }
+};

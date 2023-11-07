@@ -39,19 +39,32 @@ function parse(content, file) {
 
 	const processName = name => {
 		name = name.replace(/\s+/g, " ");
+		
 		const isGlobalFunction = /\bfunction\b/.test(name);
+		
+		let isClass = name.startsWith("class ");
+		
 		let baseClass = null;
-		const baseIndex = name.indexOf(" extends ");
-		if (baseIndex > -1) {
-			baseClass = name.slice(name.lastIndexOf(" ") + 1);
-			name = name.slice(0, baseIndex);
+		if (isClass) {
+			const baseIndex = name.indexOf(" extends ");
+			if (baseIndex > -1) {
+				baseClass = name.slice(name.lastIndexOf(" ") + 1);
+				name = name.slice(0, baseIndex);
+			}
 		}
+
+		let base = name.slice(name.lastIndexOf(" ") + 1);
+
+		const isEnum = name.endsWith("= defineEnum");
+		if (isEnum) {
+			isClass = true;
+			base = name.match(/\b(\w+?)(?=\s*=\s*defineEnum)/g)[0];
+		}
+
 		return {
-			raw: name,
-			base: name.slice(name.lastIndexOf(" ") + 1),
-			baseClass,
+			raw: name, base,
+			isEnum, isClass, baseClass,
 			isGlobalFunction,
-			isClass: name.startsWith("class "),
 			isStatic: name.startsWith("static "),
 			isGetter: name.indexOf("get ") > -1,
 			isSetter: name.indexOf("set ") > -1
@@ -66,6 +79,11 @@ function parse(content, file) {
 
 		for (const line of lines) {
 			switch (line.category) {
+				case "page": {
+					match.name = processName("_");
+					match.name.base = line.content.trim();
+					match.name.isPage = true;
+				}; break;
 				case "name":
 				case "group": {
 					line.elements = line.content.split(",").map(e => processName(e.trim()));

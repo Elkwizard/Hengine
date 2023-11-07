@@ -143,6 +143,7 @@ class ByteBuffer {
 	}
 	/**
 	 * Converts a base-64 string to a new buffer.
+	 * @param String base64 | The base-64 string to convert
 	 * @return ByteBuffer
 	 */
 	static fromBase64(base64) {
@@ -263,21 +264,21 @@ ByteBuffer.Writer = class {
 	
 	/**
 	 * @name int[S]
-	 * Writes an S-byte integer to the buffer. S can be 8, 16, or 32.
+	 * Writes an S-bit integer to the buffer. S can be 8, 16, or 32.
 	 * @param Number integer | The integer to write
 	 * @return Number
 	 */
 	
 	/**
 	 * @name uint[S]
-	 * Reads an S-byte unsigned integer from the buffer. S can be 8, 16, or 32.
+	 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
 	 * @param Number integer | The unsigned integer to write
 	 * @return Number
 	 */
 	
 	/**
 	 * @name float[S]
-	 * Reads an S-byte float from the buffer. S can be 32 or 64.
+	 * Reads an S-bit float from the buffer. S can be 32 or 64.
 	 * @param Number float | The floating point value to write
 	 * @return Number
 	 */
@@ -408,19 +409,19 @@ ByteBuffer.Reader = class {
 	}
 	/**
 	 * @name int[S]
-	 * Reads an S-byte integer from the buffer. S can be 8, 16, or 32.
+	 * Reads an S-bit integer from the buffer. S can be 8, 16, or 32.
 	 * @return Number
 	 */
 	
 	/**
 	 * @name uint[S]
-	 * Reads an S-byte unsigned integer from the buffer. S can be 8, 16, or 32.
+	 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
 	 * @return Number
 	 */
 	
 	/**
 	 * @name float[S]
-	 * Reads an S-byte float from the buffer. S can be 32 or 64.
+	 * Reads an S-bit float from the buffer. S can be 32 or 64.
 	 * @return Number
 	 */
 

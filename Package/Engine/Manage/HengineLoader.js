@@ -462,6 +462,31 @@ class HengineLoadingStructure {
 	}
 }
 
+/**
+ * Allows for the loading of both the rest of the Hengine and additional external files.
+ * The file containing this class `HengineLoader.js` is the only file that needs to be loaded directly to use the Hengine.
+ * Other files can be loaded via the HengineLoader's API.
+ * The web url for this file is:
+ * ```url
+ * https://elkwizard.github.io/Hengine/Package/Engine/Manage/HengineLoader.js
+ * ```
+ * This class is a singleton, and the single instance can be accessed via a static property.
+ * ```js
+ * async function load() {
+ * 	// choose which file to load based on an external file
+ * 	await HengineLoader.load([
+ * 		new HengineTextResource("whichToLoad.txt")
+ * 	], false);
+ * 
+ * 	// load the selected script
+ * 	const fileName = loadResource("whichToLoad.txt");
+ * 	await HengineLoader.load([
+ * 		new HengineScriptResource(`${fileName}.js`)
+ * 	]);
+ * }
+ * ```
+ * @static_prop HengineLoader loader | The singleton instance
+ */
 class HengineLoader {
 	constructor() {
 		// window setup
@@ -517,6 +542,14 @@ class HengineLoader {
 	async addResource(wrapper) {
 		this.addResourceSync(wrapper, await wrapper.load());
 	}
+	/**
+	 * Retrieves a specific resource.
+	 * If the resource failed to load, this returns null.
+	 * This method is also available on the global object.
+	 * If the resource has internal mutable state, like an Animation, a new copy of the resource will be returned with each call to this function.
+	 * @param String src | An arbitrarily-lengthed tail end of the source of the resource. This can be as few characters as are needed to be unambiguous, or may be the entire path 
+	 * @return Any/null
+	 */
 	loadResource(src) {
 		if (PathManager.isRoot(src)) {
 			const resource = this.resources.get(src);
@@ -541,6 +574,14 @@ class HengineLoader {
 			return null;
 		}
 	}
+	/**
+	 * Loads a series of resources, and optionally starts the update loop after the loading completes.
+	 * If the rest of the Hengine has yet to be loaded, it will be loaded before any of the resources passed to this function.
+	 * Returns a promise that resolves to the HengineLoader instance when all the resources are loaded.
+	 * @param HengineResource[] userResources | The resources to load
+	 * @param Boolean done? | Whether or not the update loop should start after the resources are loaded. Default is true
+	 * @return Promise 
+	 */
 	static load(userResources = [], done = true) {
 		async function loadResources() {
 			const newHengine = HengineLoader.loader === null;

@@ -14,21 +14,21 @@
 				<div class="class desc">
 				A wrapper for operations that happen over time or after a time.
 These can generally be created by methods of <a href="../../../Pages/Structure/Intervals/IntervalManager.html#IntervalManager">IntervalManager</a>.
-<code class="block"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span style="color: #a5a">const</span><span style="color: #88d"> transitionFunction</span><span style="color: #f8f"> = </span><span style="color: #ddd">intervals</span><span style="color: #f8f">.</span><span style="color: #88d">transition</span><span style="color: #f8f">(</span><span style="color: #ddd">t</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{
-	</span><span style="color: #ddd">console</span><span style="color: #f8f">.</span><span style="color: #88d">log</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;Progress: &quot;</span><span style="color: #f8f"> + </span><span style="color: #ddd">t</span><span style="color: #f8f">);
-},</span><span style="color: #fd1"> 5</span><span style="color: #f8f">);
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> transitionFunction</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">transition</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">t</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
+	</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Progress: &quot;</span><span class="highlight-SYMBOL"> + </span><span class="highlight-IDENTIFIER">t</span><span class="highlight-SYMBOL">);
+},</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">);
 
-</span><span style="color: #ddd">transitionFunction</span><span style="color: #f8f">.</span><span style="color: #aad">done</span><span style="color: #f8f">.</span><span style="color: #88d">then</span><span style="color: #f8f">(()</span><span style="color: #a5a"> =&gt; </span><span style="color: #f8f">{
-	</span><span style="color: #ddd">console</span><span style="color: #f8f">.</span><span style="color: #88d">log</span><span style="color: #f8f">(</span><span style="color: #aea">&quot;The transition has completed&quot;</span><span style="color: #f8f">);
+</span><span class="highlight-IDENTIFIER">transitionFunction</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">done</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">then</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
+	</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;The transition has completed&quot;</span><span class="highlight-SYMBOL">);
 });
 
-</span><span style="color: #444">// Progress: 0</span><span style="color: #f8f">
-</span><span style="color: #444">// Progress: 0.2</span><span style="color: #f8f">
-</span><span style="color: #444">// Progress: 0.4</span><span style="color: #f8f">
-</span><span style="color: #444">// Progress: 0.6</span><span style="color: #f8f">
-</span><span style="color: #444">// Progress: 0.8</span><span style="color: #f8f">
-</span><span style="color: #444">// Progress: 1</span><span style="color: #f8f">
-</span><span style="color: #444">// The transition has completed</span><span style="color: #f8f">
+</span><span class="highlight-COMMENT">// Progress: 0</span><span class="highlight-SYMBOL">
+</span><span class="highlight-COMMENT">// Progress: 0.2</span><span class="highlight-SYMBOL">
+</span><span class="highlight-COMMENT">// Progress: 0.4</span><span class="highlight-SYMBOL">
+</span><span class="highlight-COMMENT">// Progress: 0.6</span><span class="highlight-SYMBOL">
+</span><span class="highlight-COMMENT">// Progress: 0.8</span><span class="highlight-SYMBOL">
+</span><span class="highlight-COMMENT">// Progress: 1</span><span class="highlight-SYMBOL">
+</span><span class="highlight-COMMENT">// The transition has completed</span><span class="highlight-SYMBOL">
 </span></code>
 				</div>
 				

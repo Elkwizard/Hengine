@@ -1,6 +1,6 @@
 /**
  * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates.
- * Due to its use with 2D vectors, the last row of the matrix is not used and will always be [ 1 0 0 ].
+ * Due to its use with 2D vectors, the last row of the matrix is unused and will always be [ 0 0 1 ].
  * ```js
  * const transformation = Matrix3.mulMatrices([
  * 	Matrix3.translation(10, 5),

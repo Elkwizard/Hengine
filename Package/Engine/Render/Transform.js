@@ -1,5 +1,5 @@
 /**
- * Represents an 2D affine transformation with no scaling.
+ * Represents a 2D affine transformation with no scaling.
  * It is composed of a rotation about the origin followed by a translation.
  * ```js
  * const obj = scene.main.addElement("my first object", 0, 0);

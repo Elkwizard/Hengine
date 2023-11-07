@@ -1,6 +1,24 @@
 /**
  * Represents a parameterized gradient between a series of different values.
  * These values can be of any Operable type.
+ * ```js
+ * // color of daylight at different times
+ * const daylightGradient = new Gradient([
+ * 	{ start: 0, value: new Color("black") },
+ * 	{ start: 7, value: new Color("purple") },
+ * 	{ start: 8, value: new Color("orange") },
+ * 	{ start: 12, value: new Color("yellow") },
+ * 	{ start: 20, value: new Color("red") },
+ * 	{ start: 24, value: new Color("black") }
+ * ]);
+ * 
+ * intervals.continuous(() => {
+ * 	const hourMS = 1000 * 60 * 60;
+ * 	const hour = (Date.now() % (hourMS * 24)) / hourMS;
+ * 	const color = daylightGradient.sample(hour);
+ * 	renderer.fill(color);
+ * });
+ * ```
  */
 class Gradient {
 	/**

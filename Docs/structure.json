@@ -39,7 +39,8 @@
 			"Lazy": null
 		},
 		"Rendering": {
-			"CanvasImage": null,
+			"GLSL API": null,
+			"CanvasImage": ["CanvasImage", "ScalingMode"],
 			"Image Types": {
 				"ImageType": null,
 				"Frame": null,
@@ -54,7 +55,7 @@
 				"GraphPlane": ["GraphPlane", "Graph"]
 			},
 			"Font": null,
-			"Artist": null,
+			"Renderer": ["Artist", "LineCap", "LineJoin"],
 			"Camera": null,
 			"Color": null,
 			"Gradient": null,
@@ -80,7 +81,8 @@
 			"Matrix3": null,
 			"Transform": null,
 			"Geometry": null,
-			"Interpolation": null
+			"Interpolation": null,
+			"Animatable": null
 		},
 		"Physics": {
 			"PhysicsEngine": null
@@ -97,6 +99,7 @@
 		},
 		"Scripts": {
 			"ElementScript": null,
+			"PHYSICS": null,
 			"PLAYER_MOVEMENT": null,
 			"DRAGGABLE": null,
 			"TEXT_AREA": null,

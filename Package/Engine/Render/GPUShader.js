@@ -457,7 +457,25 @@ class GLSLProgram {
 }
 
 /**
- * Represents the renderable result of a GLSL (version 3.0 ES) fragment shader invoked for every pixel in a rectangular region. The entry point for the shader is a function with of the form:
+ * @page GLSL API
+ * The version of GLSL used in the Hengine is GLSL ES 3.0.
+ * Interactions between GLSL and javascript (such as GPUShader and GPUComputation) require associations between types in both the languages. These associations are laid out in the following table:
+ * <table>
+ * 	<tr><th>GLSL Type</th><th>JS Type</th></tr>
+ * 	<tr><td>int, uint, float</td><td>Number</td></tr>
+ * 	<tr><td>bool</td><td>Boolean</td></tr>
+ * 	<tr><td>vec2, ivec2, uvec2</td><td>Vector2</td></tr>
+ * 	<tr><td>vec3, ivec3, uvec3</td><td>Vector3</td></tr>
+ * 	<tr><td>ivec4, uvec4</td><td>Vector4</td></tr>
+ * 	<tr><td>vec4</td><td>Vector4, Color</td></tr>
+ * 	<tr><td>sampler2D</td><td>ImageType</td></tr>
+ * 	<tr><td>struct</td><td>Object</td></tr>
+ * 	<tr><td>array</td><td>Array</td></tr>
+ * </table>
+ */
+
+/**
+ * Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region. The entry point for the shader is a function of the form:
  * ```glsl
  * vec4 shader() {
  * 	// your main code here
@@ -468,18 +486,6 @@ class GLSLProgram {
  * uniform vec2 position; // the pixel-space coordinates of the pixel, with (0, 0) in the top-left corner
  * uniform vec2 resolution; // the width and height of the image, in pixels
  * ```
- * Uniform variables can be set from javascript, and the type equivalence is laid out in the table below:
- * <table>
- * 	<tr><th>GLSL Type</th><th>JS Type</th></tr>
- * 	<tr><td>int, uint, float</td><td>Number</td></tr>
- * 	<tr><td>bool</td><td>Boolean</td></tr>
- * 	<tr><td>gvec2, gvec3</td><td>Vector2, Vector3</td></tr>
- * 	<tr><td>ivec4, uvec4</td><td>Vector4</td></tr>
- * 	<tr><td>vec4</td><td>Vector4, Color</td></tr>
- * 	<tr><td>sampler2D</td><td>ImageType</td></tr>
- * 	<tr><td>struct</td><td>Object</td></tr>
- * 	<tr><td>array</td><td>Array</td></tr>
- * </table>
  * ```js
  * // grayscale shader
  * const shader = new GPUShader(300, 300, `
@@ -689,6 +695,7 @@ class GPUShader extends ImageType {
 	}
 	/**
 	 * Returns the current value of a given uniform.
+	 * For the return value of this function, see GLSL API
 	 * @param String name | The name of the uniform to retrieve
 	 * @return Any
 	 */
@@ -698,7 +705,7 @@ class GPUShader extends ImageType {
 	/**
 	 * Sets the value of a given uniform.
 	 * @param String name | The name of the uniform to set
-	 * @param Any value | The new value for the uniform.
+	 * @param Any value | The new value for the uniform. For the type of this argument, see GLSL API
 	 */
 	setArgument(arg, value) {
 		this.setArguments({ [arg]: value });

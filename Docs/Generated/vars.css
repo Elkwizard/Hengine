@@ -6,6 +6,7 @@
 }
 
 :root {
+	--text-color: white;
 	--accent-1: #c86432;
 	--accent-2: #6464ff;
 	--accent-3: rgb(50, 50, 100);
@@ -13,6 +14,17 @@
 	--text-font: "Open Sans", "Arial", sans-serif;
 	--code-font: "Cascadia Code", Consolas, monospace;
 }
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--text-color: black;
+		--accent-1: rgb(78, 45, 28);
+		--accent-2: rgb(80, 80, 160);
+		--accent-3: #c8c8e4;
+		--background: rgb(255, 255, 255);
+	}
+}
+
 
 html {
 	font-size: 13px;

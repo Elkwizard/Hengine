@@ -52,9 +52,14 @@ const nameToDoc = { };
 for (const doc of docs)
 	nameToDoc[doc.name.base] = doc;
 
+const completeness = { };
+
 for (const name in nameToPath) {
 	const doc = nameToDoc[name];
 	const path = nameToPath[name];
+	if (!(path in completeness))
+		completeness[path] = !!doc;
+	else completeness[path] &&= !!doc;
 	if (!doc) continue;
 	if (!path) console.log(`${doc.name.base} doesn't exist!`); 
 	// console.log(doc.name.base, path);
@@ -79,6 +84,6 @@ for (const file in pathToDocumentation) {
 	writeFile(file, documentation);
 }
 
-writeFile("index.js", `const paths = ${JSON.stringify(structure)}`);
+writeFile("index.js", `const paths = ${JSON.stringify(structure)}; const completeness = ${JSON.stringify(completeness)};`);
 
 // console.log(docs);

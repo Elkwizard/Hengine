@@ -1,3 +1,11 @@
+/**
+ * Represents the camera in a scene.
+ * This class should be constructed and is available via the `.camera` property of Scene.
+ * The transformation represented by this matrix is from screen space to world space.
+ * @prop Vector2 position | The current center of the camera's view. This starts as `new Vector2(width / 2, height / 2)`
+ * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
+ * @prop Number zoom | The zoom factor of the camera. Starts at 1
+ */
 class Camera extends Matrix3 {
 	constructor(x, y, rotation = 0, zoom = 1, engine) {
 		super();	
@@ -71,15 +79,36 @@ class Camera extends Matrix3 {
 		this[4] = c * z;
 		this.updateTranslationMatrix();
 	}
+	/**
+	 * Smoothly moves the camera toward a new rotation value.
+	 * @param Number angle | The new rotation to move toward (in radians)
+	 * @param Number ferocity | The degree to which the camera should move toward the new position, on [0, 1]
+	 */
 	rotateTowards(rotation, ferocity = 0.1) {
 		const diff = Geometry.signedAngularDist(rotation, this.rotation);
 		this.rotation += diff * ferocity;
 	}
+	/**
+	 * Smoothly moves the camera toward a new position value.
+	 * @param Vector2 point | The new position to move toward
+	 * @param Number ferocity | The degree to which the camera should move toward the new position, on [0, 1]
+	 */
 	moveTowards(point, ferocity = 0.1) {
 		const cameraPoint = this.position;
 		const diff = point.Vminus(cameraPoint).Ntimes(ferocity);
 		this.position = cameraPoint.plus(diff);
 	}
+	/**
+	 * Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.
+	 * If the boundary is smaller than the viewport, the behavior is undefined.
+	 * @signature
+	 * @param Rect boundary | The boundary in which the camera's viewport must exist
+	 * @signature
+	 * @param Number x | The x coordinate of the upper-left corner of the boundary
+	 * @param Number y | The y coordinate of the upper-left corner of the boundary
+	 * @param Number width | The width of the boundary 
+	 * @param Number height | The height of the boundary 
+	 */
 	constrain(x = -Infinity, y = -Infinity, width = Infinity, height = Infinity) {
 		if (typeof x === "object") ({ x, y, width, height } = x);
 
@@ -98,24 +127,49 @@ class Camera extends Matrix3 {
 			new Vector2(maxX, maxY)
 		);
 	}
+	/**
+	 * Sets the zoom to 1.
+	 */
 	restoreZoom() {
 		this.zoom = 1;
 	}
+	/**
+	 * Zooms in by a specified amount.
+	 * @param Number amount | The amount to zoom in by
+	 */
 	zoomIn(amount) {
 		this.zoom *= 1 + amount;
 	}
+	/**
+	 * Zooms out by a specified amount.
+	 * @param Number amount | The amount to zoom out by
+	 */
 	zoomOut(amount) {
 		this.zoom /= 1 + amount;
 	}
+	/**
+	 * Multiplies the current zoom value.
+	 * @param Number factor | The amount to multiply the current zoom
+	 */
 	zoomBy(factor) {
 		this.zoom *= factor;
 	}
+	/**
+	 * Zooms in/out about a specific point (in world space) by a specific factor.
+	 * @param Vector2 center | The zoom center
+	 * @param Number factor | The zoom multiplier
+	 */
 	zoomAbout(center, factor) {
 		const offset = center.minus(this.position);
 		offset.mul(factor - 1);
 		this.position.add(offset);
 		this.zoom *= factor;
 	}
+	/**
+	 * @name get screen
+	 * Returns the axis-aligned bounding box of the current viewport.
+	 * @return Rect
+	 */
 	cacheScreen() {
 		const { width, height } = this.engine.canvas;
 		return this.screen = Rect.bound([
@@ -125,6 +179,10 @@ class Camera extends Matrix3 {
 			new Vector2(-width / 2, -height / 2)
 		].map(v => v.rotate(this.rotation).Ndiv(this.zoom).Vadd(this.position)));
 	}
+	/**
+	 * Assuming the renderer is currently in screen space, transforms to world space, calls a rendering function, and then transforms back to screen space.
+	 * @param Function render | The function to call while in the world space context
+	 */
 	drawInWorldSpace(artist) {
 		let renderer = this.engine.renderer;
 		renderer.save();
@@ -132,6 +190,10 @@ class Camera extends Matrix3 {
 		artist();
 		renderer.restore();
 	}
+	/**
+	 * Assuming the renderer is currently in world space, transforms to screen space, calls a rendering function, and then transforms back to world space.
+	 * @param Function render | The function to call while in the screen space context
+	 */
 	drawInScreenSpace(artist) {
 		let renderer = this.engine.renderer;
 		renderer.save();
@@ -153,9 +215,19 @@ class Camera extends Matrix3 {
 		renderer.rotate(-this.rotation);
 		renderer.translate(renderer.middle.inverse);
 	}
+	/**
+	 * Maps a given point from screen space to world space.
+	 * @param Vector2 point | The point to transform
+	 * @return Vector2
+	 */
 	screenSpaceToWorldSpace(point) {
 		return point.Vminus(this.engine.renderer.middle).rotate(-this.rotation).Ndiv(this.zoom).Vadd(this.position);
 	}
+	/**
+	 * Maps a given point from world space to screen space.
+	 * @param Vector2 point | The point to transform
+	 * @return Vector2
+	 */
 	worldSpaceToScreenSpace(point) {
 		return point.Vminus(this.position).Nmul(this.zoom).rotate(this.rotation).Vadd(this.engine.renderer.middle);
 	}
