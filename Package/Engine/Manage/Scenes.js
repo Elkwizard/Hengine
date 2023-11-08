@@ -122,7 +122,7 @@ class Scene {
 	 * @param Vector2 aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
 	 * @param Vector2 bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
-	 * @return Constraint
+	 * @return Constraint2
 	 */
 	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null) {
 		const con = new PhysicsConstraint2.Length(a.scripts.PHYSICS.body, b.scripts.PHYSICS.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length);
@@ -139,7 +139,7 @@ class Scene {
 	 * @param Vector2 offset? | The local object-space point where the constraint will attach to the object. Default is no offset
 	 * @param Vector2 point? | The location to constrain the length to. Default is the current location of the constrained point
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
-	 * @return Constraint
+	 * @return Constraint1
 	 */
 	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null) {
 		point ??= a.transform.localSpaceToGlobalSpace(offset);
@@ -157,7 +157,7 @@ class Scene {
 	 * @param SceneObject b | The second object to constrain. Must have the PHYSICS script
 	 * @param Vector2 aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
 	 * @param Vector2 bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
-	 * @return Constraint
+	 * @return Constraint2
 	 */
 	constrainPosition(a, b, ap = Vector2.origin, bp = Vector2.origin) {
 		const con = new PhysicsConstraint2.Position(a.scripts.PHYSICS.body, b.scripts.PHYSICS.body, ap.toPhysicsVector(), bp.toPhysicsVector());
@@ -169,7 +169,7 @@ class Scene {
 	 * @param SceneObject object | The object to constrain. Must have the PHYSICS script
 	 * @param Vector2 offset? | The local object-space point where the constraint will attach to the object. Default is no offset
 	 * @param Vector2 point? | The location to constrain the length to. Default is the current location of the constrained point
-	 * @return Constraint
+	 * @return Constraint1
 	 */
 	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
 		point ??= a.transform.localSpaceToGlobalSpace(offset);
