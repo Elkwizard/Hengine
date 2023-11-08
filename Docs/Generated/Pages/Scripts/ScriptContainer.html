@@ -58,11 +58,12 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L258" class="function-name source-link">add</a>(<span class="param">script</span>, <span class="param">...args</span>)<span class="type">Any</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L259" class="function-name source-link">add</a>(<span class="param">script</span>, <span class="param">...args</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
 				Adds a new script to the object. Returns the result of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">()</span></code> listener.
 This also defines a property with the name of the script (e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">MY_SCRIPT</span></code> for a script defined as <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">class</span><span class="highlight-CLASS"> </span><span class="highlight-CONSTANT">MY_SCRIPT</span><span class="highlight-KEYWORD"> extends</span><span class="highlight-CLASS"> <a href="../../Pages/Scripts/ElementScript.html#ElementScript">ElementScript</a></span><span class="highlight-SYMBOL"> { ... }</span></code>) containing the script instance.
+None of the listeners on this script will be called until the next frame.
 			</div>
 			
 				<div class="function-signature">
@@ -96,7 +97,7 @@ This also defines a property with the name of the script (e.g. <code class=" hig
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L273" class="function-name source-link">removeDefault</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L274" class="function-name source-link">removeDefault</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Removes the scene's default script from the object.
@@ -106,7 +107,7 @@ This also defines a property with the name of the script (e.g. <code class=" hig
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L280" class="function-name source-link">remove</a>(<span class="param">script</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L281" class="function-name source-link">remove</a>(<span class="param">script</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Removes a specific script from the object. This calls the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">cleanUp</span><span class="highlight-SYMBOL">()</span></code> listener.
@@ -133,7 +134,7 @@ This also defines a property with the name of the script (e.g. <code class=" hig
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L296" class="function-name source-link">has</a>(<span class="param">script</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L297" class="function-name source-link">has</a>(<span class="param">script</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether the object has a specific script.
@@ -160,7 +161,7 @@ This also defines a property with the name of the script (e.g. <code class=" hig
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L304" class="function-name source-link">implements</a>(<span class="param">method</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L305" class="function-name source-link">implements</a>(<span class="param">method</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether the object has any scripts listening for a specific event.
