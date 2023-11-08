@@ -8,6 +8,10 @@ span {
 	display: inline-block;
 }
 
+a:not(.source-link) {
+	font-style: italic;
+}
+
 a {
 	color: inherit;
 	text-decoration: none;
@@ -16,14 +20,12 @@ a {
 
 .desc .class-name a, .desc code a {
 	text-decoration: none;
+	font-style: italic;
 }
 
 .desc a {
 	text-decoration: underline;
-}
-
-a:not(.source-link) {
-	font-style: italic;
+	font-style: normal;
 }
 
 .class-name, .function-name, .prop-name, .page-name {

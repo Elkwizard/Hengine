@@ -99,7 +99,7 @@ class Transform extends Matrix3 {
 		return dx > EPSILON || dy > EPSILON || dr > EPSILON;
 	}
 	/**
-	 * Adds a clockwise (in screen space) rotation in-place about a specific point to the existing transformation. 
+	 * Adds a clockwise (in screen-space) rotation in-place about a specific point to the existing transformation. 
 	 * @param Vector2 point | The center to rotate about
 	 * @param Number rotation | The angle (in radians) to rotate by
 	 */
@@ -112,7 +112,7 @@ class Transform extends Matrix3 {
 	}
 	/**
 	 * Transforms a given point by applying the inverse of the caller to it.
-	 * This translates the point by the inverse of the transform's position and then rotates it counter-clockwise (in screen space) about the origin by the transform's rotation.
+	 * This translates the point by the inverse of the transform's position and then rotates it counter-clockwise (in screen-space) about the origin by the transform's rotation.
 	 * @param Vector2 point | The point to transform
 	 * @return Vector2
 	 */
@@ -121,7 +121,7 @@ class Transform extends Matrix3 {
 	}
 	/**
 	 * Transforms a given point by applying the caller to it.
-	 * This rotates the point clockwise (in screen space) about the origin by the transform's rotation and then translates it by the transform's position.
+	 * This rotates the point clockwise (in screen-space) about the origin by the transform's rotation and then translates it by the transform's position.
 	 * @param Vector2 point | The point to transform
 	 * @return Vector2
 	 */

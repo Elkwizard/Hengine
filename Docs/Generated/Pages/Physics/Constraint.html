@@ -1,0 +1,134 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="Constraint">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L12" class="class-name source-link">Constraint</a>
+				</div>
+				<div class="class desc">
+				Represents a physical constraint between one or more <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObjects</a>.
+This is an abstract superclass and should not be constructed.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name">Constraint1</span>, <span class="class-name">Constraint2</span></div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L22" class="function-name source-link">ends</a><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a>[2]</span>
+			</div>
+			<div class="function desc">
+				Returns the world-space location of the constrained points.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L29" class="function-name source-link">remove</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Removes the constraint from the simulation.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="Constraint1">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L38" class="class-name source-link">Constraint1</a> <span class="keyword">extends</span> <span class="class-name">Constraint</span>
+				</div>
+				<div class="class desc">
+				Represents a physical constraint between a <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a> and a fixed point.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L46" class="function-name source-link">body</a><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a></span>
+			</div>
+			<div class="function desc">
+				Returns the object in the constraint.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="Constraint2">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L56" class="class-name source-link">Constraint2</a> <span class="keyword">extends</span> <span class="class-name">Constraint</span>
+				</div>
+				<div class="class desc">
+				Represents a physical constraint between two <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObjects</a>.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">staticA</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not the first object should be considered static by the constraint</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">staticB</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not the second object should be considered static by the constraint</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L66" class="function-name source-link">bodyA</a><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a></span>
+			</div>
+			<div class="function desc">
+				Returns the first object in the constraint.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L73" class="function-name source-link">bodyB</a><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a></span>
+			</div>
+			<div class="function desc">
+				Returns the second object in the constraint.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

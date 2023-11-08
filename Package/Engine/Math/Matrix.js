@@ -257,7 +257,7 @@ class Matrix3 extends Float64Array {
 	}
 	/**
 	 * Creates a 2D rotation matrix and optionally stores it in a provided destination.
-	 * @param Number theta | The clockwise (in screen space) angle (in radians) to rotate by  
+	 * @param Number theta | The clockwise (in screen-space) angle (in radians) to rotate by  
 	 * @param Matrix3 result? | The matrix to copy the rotation matrix into
 	 * @return Matrix3
 	 */

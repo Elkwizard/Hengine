@@ -105,7 +105,7 @@ class Font {
 	/**
 	 * Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
 	 * @param String text | The text to pack 
-	 * @param Number maxWidth | The maximum width of a single line in the output text 
+	 * @param Number maxWidth | The maximum allowed width of a single line in the output text 
 	 * @return String
 	 */
 	packText(str, maxWidth) {
@@ -136,7 +136,7 @@ class Font {
 	 * Returns the width and height of a string of text, optionally after being packed into a fixed max width.
 	 * The return value contains `.width` and `.height` properties, both of which are Numbers.
 	 * @param String text | The text to be measured
-	 * @param Number maxWidth? | The maximum width of a single line, default is Infinity
+	 * @param Number maxWidth? | The maximum allowed width of a single line, default is Infinity
 	 * @return Object
 	 */
 	getTextBounds(str, pack) {
@@ -149,7 +149,7 @@ class Font {
 	}
 	/**
 	 * Returns the width of a single line of text. This method is faster than `.getTextWidth()`.
-	 * @param String textLine | A single line string of text to measure 
+	 * @param String textLine | A single-line string of text to measure 
 	 * @return Number
 	 */
 	getTextLineWidth(str) {
@@ -158,7 +158,7 @@ class Font {
 	}
 	/**
 	 * Returns the height of a single line of text. This method is faster than `.getTextHeight()`.
-	 * @param String textLine | A single line string of text to measure
+	 * @param String textLine | A single-line string of text to measure
 	 * @return Number
 	 */
 	getTextLineHeight(str) {

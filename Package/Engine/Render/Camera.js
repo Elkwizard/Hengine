@@ -1,7 +1,7 @@
 /**
  * Represents the camera in a scene.
  * This class should be constructed and is available via the `.camera` property of Scene.
- * The transformation represented by this matrix is from screen space to world space.
+ * The transformation represented by this matrix is from screen-space to world-space.
  * @prop Vector2 position | The current center of the camera's view. This starts as `new Vector2(width / 2, height / 2)`
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
  * @prop Number zoom | The zoom factor of the camera. Starts at 1
@@ -155,7 +155,7 @@ class Camera extends Matrix3 {
 		this.zoom *= factor;
 	}
 	/**
-	 * Zooms in/out about a specific point (in world space) by a specific factor.
+	 * Zooms in/out about a specific point (in world-space) by a specific factor.
 	 * @param Vector2 center | The zoom center
 	 * @param Number factor | The zoom multiplier
 	 */
@@ -180,8 +180,8 @@ class Camera extends Matrix3 {
 		].map(v => v.rotate(this.rotation).Ndiv(this.zoom).Vadd(this.position)));
 	}
 	/**
-	 * Assuming the renderer is currently in screen space, transforms to world space, calls a rendering function, and then transforms back to screen space.
-	 * @param Function render | The function to call while in the world space context
+	 * Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
+	 * @param Function render | The function to call while in the world-space context
 	 */
 	drawInWorldSpace(artist) {
 		let renderer = this.engine.renderer;
@@ -191,8 +191,8 @@ class Camera extends Matrix3 {
 		renderer.restore();
 	}
 	/**
-	 * Assuming the renderer is currently in world space, transforms to screen space, calls a rendering function, and then transforms back to world space.
-	 * @param Function render | The function to call while in the screen space context
+	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
+	 * @param Function render | The function to call while in the screen-space context
 	 */
 	drawInScreenSpace(artist) {
 		let renderer = this.engine.renderer;
@@ -216,7 +216,7 @@ class Camera extends Matrix3 {
 		renderer.translate(renderer.middle.inverse);
 	}
 	/**
-	 * Maps a given point from screen space to world space.
+	 * Maps a given point from screen-space to world-space.
 	 * @param Vector2 point | The point to transform
 	 * @return Vector2
 	 */
@@ -224,7 +224,7 @@ class Camera extends Matrix3 {
 		return point.Vminus(this.engine.renderer.middle).rotate(-this.rotation).Ndiv(this.zoom).Vadd(this.position);
 	}
 	/**
-	 * Maps a given point from world space to screen space.
+	 * Maps a given point from world-space to screen-space.
 	 * @param Vector2 point | The point to transform
 	 * @return Vector2
 	 */

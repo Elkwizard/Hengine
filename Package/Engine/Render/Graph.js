@@ -1,4 +1,23 @@
+/**
+ * Represents a single variable that can be graphed on a GraphPlane.
+ * @prop String name | The displayed name of the variable
+ * @prop Function y | A function which returns the current value of the variable
+ * @prop Number minY | The minimum displayed value of the variable. This is the lower bound of the vertical axis
+ * @prop Number maxY | The maximum displayed value of the variable. This is the upper bound of the vertical axis
+ * @prop Color color | The color of the graph of this variable
+ * @prop Number decimalPlaces | The number of decimal places to display for the value of this variable
+ * @prop GraphPlane plane | The plane on which this graph is displayed
+ */
 class Graph {
+	/**
+	 * Creates a new Graph.
+	 * @param String name | The displayed name of the variable
+	 * @param Function y | A function which returns the current value of the variable
+	 * @param Number minY | The minimum displayed value of the variable
+	 * @param Number maxY | The maximum displayed value of the variable
+	 * @param Color color | The color of the graph of this variable
+	 * @param Number decimalPlaces? | The number of decimal places to display for the value of this variable. Default is 2
+	 */
     constructor(name, y, minY, maxY, color, decimalPlaces = 2) {
         this.name = name;
         this.y = y;
@@ -55,6 +74,27 @@ class Graph {
         if (this.data.length > this.plane.frameLimit) this.data.shift();
 	}
 }
+
+/**
+ * Represents a renderable, updating graph of one or more variables.
+ * This class is to be used for debugging or technical visualization purposes, rather than in games or tools.
+ * This class should not be constructed and should instead be created using `IntervalManager.prototype.makeGraphPlane()`.
+ * ```js
+ * // graph the value of perlin noise
+ * const graph = intervals.makeGraphPlane([
+ * 	new Graph("Perlin", () => {
+ * 		const time = intervals.frameCount;
+ * 		return Random.perlin(time, 0.01);
+ * 	}, 0, 1, new Color("white"))
+ * ]);
+ * 
+ * intervals.continuous(() => {
+ * 	renderer.image(graph).default(10, 10);
+ * });
+ * ```
+ * @prop Graph[] graphs | The graphs displayed on this plane
+ * @prop Number frameLimit | The total number of frames displayed on the graph plane
+ */
 class GraphPlane extends Frame {
     constructor(graphs, frameLimit) {
         super(300, 200);

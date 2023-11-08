@@ -35,7 +35,7 @@ function documentFunction(fn, wrapperClass) {
 
 			return "";
 		}).join(`<span class="aux"> | </span>`);
-	const header = `${name}${fn.name.isGetter ? "" : `(${parameters})`}${fn.name.base === "constructor" ? "" : `<span class="type">${returnType}</span>`}`;
+	const header = `${name}${fn.name.isGetter ? "" : `(${parameters})`}${fn.name.base === "constructor" || fn.name.isSetter ? "" : `<span class="type">${returnType}</span>`}`;
 	const parameterDescriptions = signatures
 		.map(signature => `
 			<div class="header">Parameters</div>
@@ -104,10 +104,11 @@ function document(doc, topLevelIDs, file) {
 		const subclass = (doc.subclasses ?? [])
 			.map(cls => `<span class="class-name">${cls.name.base}</span>`)
 			.join(", ");
+		const firstFunction = /^(constructor|init)$/
 		const memberFunctions = [...doc.members]
 			.sort((a, b) => (b.name.isSetter || b.name.isGetter) - (a.name.isSetter || a.name.isGetter))
 			.sort((a, b) => a.name.isStatic - b.name.isStatic)
-			.sort((a, b) => (b.name.base === "constructor") - (a.name.base === "constructor"))
+			.sort((a, b) => firstFunction.test(b.name.base) - firstFunction.test(a.name.base))
 			.map(member => documentFunction(member, doc.name.base))
 			.join("");
 		const memberProperties = doc.lines

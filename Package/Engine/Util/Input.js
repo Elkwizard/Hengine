@@ -284,10 +284,10 @@ KeyboardHandler.State = class KeyState extends InputHandler.State { };
  * });
  * ```
  * @prop Number wheelDelta | The scroll displacement (in pixels) from the mouse wheel during the last frame.
- * @prop Vector2 screen | The current cursor position, in screen space
- * @prop Vector2 screenLast | The cursor position last frame, in screen space
- * @prop Vector2 world | The current cursor position, in world space
- * @prop Vector2 worldLast | The cursor position last frame, in world space
+ * @prop Vector2 screen | The current cursor position, in screen-space
+ * @prop Vector2 screenLast | The cursor position last frame, in screen-space
+ * @prop Vector2 world | The current cursor position, in world-space
+ * @prop Vector2 worldLast | The cursor position last frame, in world-space
  */
 class MouseHandler extends InputHandler {
 	constructor(engine) {
@@ -397,10 +397,10 @@ class MouseHandler extends InputHandler {
  * @name class MouseHandler.State extends InputHandler.State
  * The state of a given key on a mouse.
  * @readonly
- * @prop Vector2 screenDragStart | The beginning of the most recent click-and-drag motion with this key, in screen space
- * @prop Vector2 screenDragEnd | The end of the most recent click-and-drag motion with this key, in screen space. If such a gesture is ongoing, this will be the current cursor position
- * @prop Vector2 worldDragStart | The beginning of the most recent click-and-drag motion with this key, in world space
- * @prop Vector2 worldDragEnd | The end of the most recent click-and-drag motion with this key, in world space. If such a gesture is ongoing, this will be the current cursor position
+ * @prop Vector2 screenDragStart | The beginning of the most recent click-and-drag motion with this key, in screen-space
+ * @prop Vector2 screenDragEnd | The end of the most recent click-and-drag motion with this key, in screen-space. If such a gesture is ongoing, this will be the current cursor position
+ * @prop Vector2 worldDragStart | The beginning of the most recent click-and-drag motion with this key, in world-space
+ * @prop Vector2 worldDragEnd | The end of the most recent click-and-drag motion with this key, in world-space. If such a gesture is ongoing, this will be the current cursor position
  */
 MouseHandler.State = class ButtonState extends InputHandler.State {
 	constructor(handler, name) {
@@ -521,10 +521,10 @@ class TouchHandler extends InputHandler {
  * @name class TouchHandler.State extends MouseHandler.State
  * The state of a specific touch on the user's screen.
  * @readonly
- * @prop Vector2 screen | The current position of the touch, in screen space
- * @prop Vector2 screenLast | The position of the touch last frame, in screen space
- * @prop Vector2 world | The current position of the touch, in world space
- * @prop Vector2 worldLast | The position of the touch last frame, in world space
+ * @prop Vector2 screen | The current position of the touch, in screen-space
+ * @prop Vector2 screenLast | The position of the touch last frame, in screen-space
+ * @prop Vector2 world | The current position of the touch, in world-space
+ * @prop Vector2 worldLast | The position of the touch last frame, in world-space
  */
 TouchHandler.State = class TouchState extends MouseHandler.State {
 	constructor(handler, name) {

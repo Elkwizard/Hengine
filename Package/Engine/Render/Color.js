@@ -1,6 +1,6 @@
 /**
  * Represents a color to be used in rendering.
- * It is stored as an RGB triple.
+ * It is stored as an RGB triple with an additional opacity component.
  * @prop Number red | The red component of the color, on [0, 255]
  * @prop Number green | The green component of the color, on [0, 255]
  * @prop Number blue | The blue component of the color, on [0, 255]

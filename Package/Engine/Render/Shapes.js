@@ -434,7 +434,7 @@ class Line extends Shape {
 }
 
 /**
- * Represents a contiguous 2D polygon.
+ * Represents a contiguous 2D polygon with no holes.
  * @prop Vector2[] vertices | The vertices of the border of the polygon, they are in a clockwise order.
  */
 class Polygon extends Shape {
@@ -509,7 +509,7 @@ class Polygon extends Shape {
 		return new Polygon(this.vertices.map(vert => vert.plus(dir)));
 	}
 	/**
-	 * Returns a copy of the polygon rotated clockwise (in screen space) by a specified angle.
+	 * Returns a copy of the polygon rotated clockwise (in screen-space) by a specified angle.
 	 * @param Number angle | The angle to rotate by (in radians)
 	 * @return Polygon 
 	 */

@@ -1,0 +1,197 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="CollisionMonitor">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L95" class="class-name source-link">CollisionMonitor</a>
+				</div>
+				<div class="class desc">
+				Represents a collection of collisions that a <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a> is undergoing.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L103" class="function-name source-link">general</a><span class="type">CollisionData[]/null</span>
+			</div>
+			<div class="function desc">
+				Returns all collisions. If there are no collisions, this returns null.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L115" class="function-name source-link">left</a><span class="type">CollisionData[]/null</span>
+			</div>
+			<div class="function desc">
+				Returns all collisions on the left side of the object. If there are no collisions, this returns null.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L125" class="function-name source-link">right</a><span class="type">CollisionData[]/null</span>
+			</div>
+			<div class="function desc">
+				Returns all collisions on the right side of the object. If there are no collisions, this returns null.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L135" class="function-name source-link">top</a><span class="type">CollisionData[]/null</span>
+			</div>
+			<div class="function desc">
+				Returns all collisions with the top edge of the object. If there are no collisions, this returns null.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L145" class="function-name source-link">bottom</a><span class="type">CollisionData[]/null</span>
+			</div>
+			<div class="function desc">
+				Returns all collisions with the bottom edge of the object. If there are no collisions, this returns null.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L174" class="function-name source-link">has</a>(<span class="param">object</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks whether there is a collision with a specific object.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">object</span>
+								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a></span>
+							</div>
+							<div class="param desc">
+								The object to check
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L183" class="function-name source-link">direction</a>(<span class="param">direction</span>)<span class="type">CollisionData[]/null</span>
+			</div>
+			<div class="function desc">
+				Returns all collisions where the collision is in a specific direction.
+If there are no such collisions, this returns null.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">direction</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								A unit vector representing the direction to check. This will be interpreted as pointing toward the other object, rather than away
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L193" class="function-name source-link">test</a>(<span class="param">mask</span>)<span class="type">CollisionData[]/null</span>
+			</div>
+			<div class="function desc">
+				Returns all collisions meeting a specific requirement.
+If there are no such collisions, this returns null.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">mask</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The function that will be passed each collision to determine its eligibility
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="CollisionData">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\PhysicsAPI.js?#L84" class="class-name source-link">CollisionData</a>
+				</div>
+				<div class="class desc">
+				Represents a collision with another <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a>.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">element</span><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a></span>
+					</div>
+					<div class="prop desc">The object that is being collided with</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">direction</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">A unit vector along the collision normal pointing toward the other object</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">contacts</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a>[]</span>
+					</div>
+					<div class="prop desc">A list of world-space contact points between the two objects</div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			</body>
+		</html>
+	

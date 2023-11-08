@@ -497,6 +497,11 @@ class WebGLArtist {
 	}
 }
 
+/**
+ * This class has the same behavior as Frame, except that the renderer for this class cannot render text.
+ * Creating instances of this class is drastically more expensive than creating a Frame, but after it's created, it is generally 10x-100x faster than Frame.
+ * Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
+ */
 class FastFrame extends ImageType {
 	constructor(width, height, pixelRatio = __devicePixelRatio) {
 		super(width, height, pixelRatio);

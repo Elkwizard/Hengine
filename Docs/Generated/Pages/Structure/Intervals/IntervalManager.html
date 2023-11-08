@@ -1,0 +1,445 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="IntervalManager">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L120" class="class-name source-link">IntervalManager</a>
+				</div>
+				<div class="class desc">
+				Manages the update loop of the <a href="../../../Pages/Structure/Hengine.html#Hengine">Hengine</a>.
+This class is available via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">intervals</span></code> property of the global object.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// display FPS data</span><span class="highlight-SYMBOL">
+</span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
+	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">image</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">fpsGraph</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">default</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
+});
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">rawFps</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The FPS based only on the duration of the last frame. This value is read-only</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">fpsGraph</span><span class="type"><a href="../../../Pages/Rendering/Image Types/GraphPlane.html#GraphPlane">GraphPlane</a></span>
+					</div>
+					<div class="prop desc">A graph of the FPS for the last 400 frames. This value is read-only</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">frameCount</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The total number of frames that have elapsed thusfar. This value is read-only</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">performanceData</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not the interval manager should collect performance data (<code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">fps</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">fpsGraph</span></code>, etc.)</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L143" class="function-name source-link">fps</a>(<span class="param">fps</span>)
+			</div>
+			<div class="function desc">
+				Sets the target/maximum update cycles per second.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">fps</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The new target FPS
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L150" class="function-name source-link">fps</a><span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the current number of update cycles per second.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L160" class="function-name source-link">paused</a><span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Returns whether or not the update loop is currently paused.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L230" class="function-name source-link">makeGraphPlane</a>(<span class="param">graphs</span>, <span class="param">frameLimit?</span>)<span class="type"><a href="../../../Pages/Rendering/Image Types/GraphPlane.html#GraphPlane">GraphPlane</a></span>
+			</div>
+			<div class="function desc">
+				Creates a new <a href="../../../Pages/Rendering/Image Types/GraphPlane.html#GraphPlane">GraphPlane</a>.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">graphs</span>
+								<span class="type"><a href="../../../Pages/Rendering/Image Types/GraphPlane.html#Graph">Graph</a>[]</span>
+							</div>
+							<div class="param desc">
+								The graphs to display on the plane
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">frameLimit</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The number of frames to be graphed at once. Default is 400
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L241" class="function-name source-link">pause</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Stops the update loop.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L247" class="function-name source-link">play</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Resumes the update loop if this function has been called as many times as <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">pause</span><span class="highlight-SYMBOL">()</span></code>.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L256" class="function-name source-link">continuous</a>(<span class="param">fn</span>, <span class="param">type?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#ContinuousFunction">ContinuousFunction</a>.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">fn</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The function to be executed every frame
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">type</span>
+								<span class="type">Symbol</span>
+							</div>
+							<div class="param desc">
+								When during the update cycle to execute the function. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">AFTER_UPDATE</span></code>
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L267" class="function-name source-link">transition</a>(<span class="param">fn</span>, <span class="param">frames</span>, <span class="param">type</span>)<span class="type">Promise</span>
+			</div>
+			<div class="function desc">
+				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#TransitionFunction">TransitionFunction</a>. Returns its <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">done</span></code> promise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">fn</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The function to execute over the duration. This function will be passed the completion proportion
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">frames</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The duration of the transition
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">type</span>
+								<span class="type">Symbol</span>
+							</div>
+							<div class="param desc">
+								When during the update cycle to execute the function. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">BEFORE_UPDATE</span></code>
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L282" class="function-name source-link">animate</a>(<span class="param">object</span>, <span class="param">property</span>, <span class="param">finalValue</span>, <span class="param">duration</span>, <span class="param">curve?</span>, <span class="param">type?</span>)<span class="type">Promise</span>
+			</div>
+			<div class="function desc">
+				Animates the value of a <a href="../../../Pages/Superclasses/Operable.html#Operable">Operable</a> or Number property from its current value to another over a specified interval.
+Returns a promise that resolves when the animation completes.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">object</span>
+								<span class="type">Object</span>
+							</div>
+							<div class="param desc">
+								The object which has the animated property
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">property</span>
+								<span class="type">String/Symbol</span>
+							</div>
+							<div class="param desc">
+								The key of the animated property
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">finalValue</span>
+								<span class="type"><a href="../../../Pages/Superclasses/Operable.html#Operable">Operable</a>/Number</span>
+							</div>
+							<div class="param desc">
+								The value to animate to
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">duration</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The duration of the animation
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">curve</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The easing function. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../../Pages/Geometry/Interpolation.html#Interpolation">Interpolation</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">linear</span></code>
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">type</span>
+								<span class="type">Symbol</span>
+							</div>
+							<div class="param desc">
+								When during the update cycle to update the animation. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">BEFORE_UPDATE</span></code>
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L295" class="function-name source-link">delay</a>(<span class="param">fn</span>, <span class="param">frames</span>, <span class="param">type</span>)<span class="type">Promise</span>
+			</div>
+			<div class="function desc">
+				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#DelayedFunction">DelayedFunction</a>. Returns its <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">done</span></code> promise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">fn</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The function to execute after the delay
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">frames</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The length of the delay
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">type</span>
+								<span class="type">Symbol</span>
+							</div>
+							<div class="param desc">
+								When during the update cycle to execute the function. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">BEFORE_UPDATE</span></code>
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L306" class="function-name source-link">waitUntil</a>(<span class="param">fn</span>, <span class="param">event</span>, <span class="param">type</span>)<span class="type">Promise</span>
+			</div>
+			<div class="function desc">
+				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#WaitUntilFunction">WaitUntilFunction</a>. Returns its <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">done</span></code> promise.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">fn</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The function to execute when the event occurs
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">event</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								The event function. When this function returns true, the function will execute
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">type</span>
+								<span class="type">Symbol</span>
+							</div>
+							<div class="param desc">
+								When during the update cycle to execute the function. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../../Pages/Structure/Intervals/IntervalFunction.html#IntervalFunction">IntervalFunction</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">BEFORE_UPDATE</span></code>
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Manage\Intervals.js?#L334" class="function-name source-link">exit</a>(<span class="param">...messages</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Instantly crashes the engine and logs something to the console.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">messages</span>
+								<span class="type"><a href="../../../Pages/Miscellaneous/Array.html#Array">Array</a></span>
+							</div>
+							<div class="param desc">
+								Data to be logged
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+			</body>
+		</html>
+	

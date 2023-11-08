@@ -1,4 +1,26 @@
+/**
+ * Adds rigidbody physics to a SceneObject.
+ * @prop Vector2 velocity | The velocity of the object per frame
+ * @prop Number angularVelocity | The angular velocity of the object in radians per frame
+ * @prop Boolean mobile | Whether or not the object can move or rotate
+ * @prop Boolean simulated | Whether or not the object should participate in the simulation at all
+ * @prop Boolean gravity | Whether or not gravity should be applied to the object
+ * @prop Boolean airResistance | Whether or not air resistance should be applied to the object
+ * @prop Boolean canRotate | Whether or not the object can rotate
+ * @prop Number mass | The mass of the object
+ * @prop Number density | The density of the object. Starts at 1
+ * @prop Number friction | The coefficient of friction for the object
+ * @prop Number snuzzlement | The proportion of object's velocity lost in a collision
+ * @prop Boolean canCollide | Whether the object can collide with any others
+ * @prop Boolean isTrigger | Whether the object should cancel all collision resolution, but not detection
+ * @prop CollisionMonitor colliding | All of the objects currently colliding with the object
+ * @prop CollisionMonitor lastColliding | All of the objects that were colliding with the object last frame
+ */
 class PHYSICS extends ElementScript {
+	/**
+	 * Adds rigidbody physics to an object.
+	 * @param Boolean mobile | Whether the object should be able to move/rotate 
+	 */
 	init(obj, gravity) {
 		this.engine = obj.container.engine;
 		this.scene = this.engine.scene;
@@ -78,8 +100,12 @@ class PHYSICS extends ElementScript {
 			this.physicsEngine.addBody(this.body);
 		});
 	}
+	/**
+	 * Retrieves a list of copies of all the constraints on the object.
+	 * @return Constraint[]
+	 */
 	get constraints() {
-		return this.body.constraints.map(con => new Constraint(con, this.sceneObject.engine));
+		return this.body.constraints.map(con => Constraint.fromPhysicsConstraint(con, this.sceneObject.engine));
 	}
 	set velocity(a) {
 		const { body } = this;
@@ -195,13 +221,27 @@ class PHYSICS extends ElementScript {
 		}
 	}
 	// custom methods
+	/**
+	 * Applies an impulse to a specific point on the object.
+	 * @param Vector2 point | The world-space point at which the impulse should be applied
+	 * @param Vector2 impulse | The impulse to apply
+	 */
 	applyImpulse(obj, point, force) {
         this.body.applyImpulse(point.toPhysicsVector(), force.toPhysicsVector());
         this.body.wake();
 	}
+	/**
+	 * Applies an impulse to a specific point on the object.
+	 * The impulse will be scaled by the mass of the object.
+	 * @param Vector2 point | The world-space point at which the impulse should be applied
+	 * @param Vector2 impulse | The impulse to apply, which will be scaled
+	 */
 	applyImpulseMass(obj, point, force) {
         this.applyImpulse(point, force.times(this.body.mass));
 	}
+	/**
+	 * Stops the object in place. It remains mobile, though it loses all velocity.
+	 */
 	stop(obj) {
 		this.body.stop();
 		this.body.wake();
@@ -226,10 +266,20 @@ class PHYSICS extends ElementScript {
 
 		return false;
 	}
+	/**
+	 * Checks whether the object and another given object could collide if they intersected.
+	 * @param SceneObject element | The object to check. Must have PHYSICS
+	 * @return Boolean
+	 */
 	canCollideWith(obj, element) {
 		const rb = element.scripts.PHYSICS;
 		return this.canCollide && rb.canCollide && this.collideBasedOnRule(element) && rb.collideBasedOnRule(obj);
 	}
+	/**
+	 * Checks whether there are any constraints between the object and another given object
+	 * @param SceneObject other | The object to check. Must have PHYSICS
+	 * @return Boolean
+	 */
 	constrainedTo(obj, body) {
 		body = body.scripts.PHYSICS.body;
 		const { constraints } = this.body;

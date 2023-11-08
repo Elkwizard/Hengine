@@ -102,6 +102,21 @@ class WaitUntilFunction extends IntervalFunction {
 		}
 	}
 }
+
+/**
+ * Manages the update loop of the Hengine.
+ * This class is available via the `.intervals` property of the global object.
+ * ```js
+ * // display FPS data
+ * intervals.continuous(() => {
+ * 	renderer.image(intervals.fpsGraph).default(10, 10);
+ * });
+ * ```
+ * @prop Number rawFps | The FPS based only on the duration of the last frame. This value is read-only
+ * @prop GraphPlane fpsGraph | A graph of the FPS for the last 400 frames. This value is read-only
+ * @prop Number frameCount | The total number of frames that have elapsed thusfar. This value is read-only
+ * @prop Boolean performanceData | Whether or not the interval manager should collect performance data (`.fps`, `.fpsGraph`, etc.)
+ */
 class IntervalManager {
 	constructor(engine) {
 		this.engine = engine;
@@ -121,15 +136,27 @@ class IntervalManager {
 			new Graph("FPS", () => this.averageFps, 0, 60, Color.LIME, 1)
 		], 400);
 	}
+	/**
+	 * Sets the target/maximum update cycles per second.
+	 * @param Number fps | The new target FPS
+	 */
 	set fps(a) {
 		this.targetFPS = a;
 	}
+	/**
+	 * Returns the current number of update cycles per second.
+	 * @return Number 
+	 */
 	get fps() {
 		return this._fps;
 	}
 	set paused(a) {
 		this.pauseLevel = a ? 1 : 0;
 	}
+	/**
+	 * Returns whether or not the update loop is currently paused.
+	 * @return Boolean
+	 */
 	get paused() {
 		return this.pauseLevel > 0;
 	}
@@ -194,6 +221,12 @@ class IntervalManager {
 		
 		this.frameCount++;
 	}
+	/**
+	 * Creates a new GraphPlane.
+	 * @param Graph[] graphs | The graphs to display on the plane
+	 * @param Number frameLimit? | The number of frames to be graphed at once. Default is 400 
+	 * @return GraphPlane 
+	 */
 	makeGraphPlane(graphs, frameLimit = 400) {
 		let f = new GraphPlane(graphs, frameLimit);
 		this.graphs.push(f);
@@ -202,31 +235,74 @@ class IntervalManager {
 	updateGraphs() {
 		for (let i = 0; i < this.graphs.length; i++) this.graphs[i].update();
 	}
+	/**
+	 * Stops the update loop.
+	 */
 	pause() {
 		this.pauseLevel++;
 	}
+	/**
+	 * Resumes the update loop if this function has been called as many times as `.pause()`.  
+	 */
 	play() {
 		if (this.pauseLevel > 0)
 			this.pauseLevel--;
 	}
+	/**
+	 * Creates a new ContinuousFunction.
+	 * @param Function fn | The function to be executed every frame
+	 * @param Symbol type? | When during the update cycle to execute the function. Default is `IntervalFunction.AFTER_UPDATE`
+	 */
 	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
 		this.functions.push(new ContinuousFunction(fn, type));
 		return this.functions.last.promise;
 	}
+	/**
+	 * Creates a new TransitionFunction. Returns its `.done` promise.
+	 * @param Function fn | The function to execute over the duration. This function will be passed the completion proportion
+	 * @param Number frames | The duration of the transition
+	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
+	 * @return Promise
+	 */
 	transition(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new TransitionFunction(fn, frames, type));
 		return this.functions.last.promise;
 	}
+	/**
+	 * Animates the value of a Operable or Number property from its current value to another over a specified interval.
+	 * Returns a promise that resolves when the animation completes.
+	 * @param Object object | The object which has the animated property
+	 * @param String/Symbol property | The key of the animated property
+	 * @param Operable/Number finalValue | The value to animate to
+	 * @param Number duration | The duration of the animation
+	 * @param Function curve? | The easing function. Default is `Interpolation.linear`
+	 * @param Symbol type? | When during the update cycle to update the animation. Default is `IntervalFunction.BEFORE_UPDATE`
+	 * @return Promise
+	 */
 	animate(object, property, value, time, curve = Interpolation.linear, type = IntervalFunction.BEFORE_UPDATE) {
 		const start = object[property].get();
 		return this.transition(t => {
 			object[property] = Interpolation.lerp(start, value, curve(t));
 		}, time, type);
 	}
+	/**
+	 * Creates a new DelayedFunction. Returns its `.done` promise.
+	 * @param Function fn | The function to execute after the delay
+	 * @param Number frames | The length of the delay
+	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
+	 * @return Promise
+	 */
 	delay(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new DelayedFunction(fn, frames, type));
 		return this.functions.last.promise;
 	}
+	/**
+	 * Creates a new WaitUntilFunction. Returns its `.done` promise.
+	 * @param Function fn | The function to execute when the event occurs
+	 * @param Function event | The event function. When this function returns true, the function will execute
+	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
+	 * @return Promise
+	 */
 	waitUntil(fn, event, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new WaitUntilFunction(fn, event, type));
 		return this.functions.last.promise;
@@ -250,6 +326,11 @@ class ExitError {
 		this.message = message;
 	}
 }
+
+/**
+ * Instantly crashes the engine and logs something to the console.
+ * @param Array ...messages | Data to be logged
+ */
 function exit(...msg) {
 	IntervalManager.intervals = [];
 	if (IntervalManager.inInterval) throw new ExitError(msg);

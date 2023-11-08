@@ -15,9 +15,9 @@
  * 	renderer.draw(new Color("black")).text(Font.Arial20, mean, 10, 10);
  * });
  * ```
- * @prop Number seed | The current seed for the unstable random functions. e.g. `.random()`, `.angle()`, `.range()`
- * @prop Number sampleSeed | The seed for the stable random functions. e.g. `.perlin3D()`, `.voronoi()`
- * @prop Function distribution | The distribution of the numbers generated. This is one of the provided static distribution properties of the Random class (`.uniform`, `.normal`)
+ * @prop Number seed | The current seed for the unstable random functions. e.g. `.random()`, `.angle()`, `.range()`, etc.
+ * @prop Number sampleSeed | The seed for the stable random functions. e.g. `.perlin3D()`, `.voronoi()`, etc.
+ * @prop Function distribution | The distribution of the numbers generated. This is one of the provided static distribution properties of the Random class (`.uniform`, `.normal`, etc.)
  * @static_prop Function uniform | A uniform distribution
  * @static_prop Function normal | A normal distribution
  */

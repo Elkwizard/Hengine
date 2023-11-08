@@ -1,0 +1,189 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="ScriptContainer">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/SceneObject\Scripts.js?#L237" class="class-name source-link">ScriptContainer</a>
+				</div>
+				<div class="class desc">
+				Represents the collection of behaviors on a <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a>.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// create a script which holds an action</span><span class="highlight-KEYWORD">
+class</span><span class="highlight-CLASS"> </span><span class="highlight-CONSTANT">ACTION</span><span class="highlight-KEYWORD"> extends</span><span class="highlight-CLASS"> <a href="../../Pages/Scripts/ElementScript.html#ElementScript">ElementScript</a></span><span class="highlight-SYMBOL"> {
+	</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">action</span><span class="highlight-SYMBOL">) {
+	</span><span class="highlight-LANG_VAR">	this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">action</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">action</span><span class="highlight-SYMBOL">;
+	}
+}
+</span><span class="highlight-KEYWORD">
+const</span><span class="highlight-CONSTANT"> object</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;hello&quot;</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">object</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">ACTION</span><span class="highlight-SYMBOL">, ()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
+	</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Hello World!&quot;</span><span class="highlight-SYMBOL">);
+});
+
+</span><span class="highlight-COMMENT">// call the function from the defined property</span><span class="highlight-SYMBOL">
+</span><span class="highlight-IDENTIFIER">object</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">ACTION</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">action</span><span class="highlight-SYMBOL">(); </span><span class="highlight-COMMENT">// Hello World!</span><span class="highlight-SYMBOL">
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">sceneObject</span><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a></span>
+					</div>
+					<div class="prop desc">The associated object</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/SceneObject\Scripts.js?#L248" class="function-name source-link">defaultScript</a><span class="type">Class</span>
+			</div>
+			<div class="function desc">
+				Returns the default script (<code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../Pages/Management/Scene.html#Scene">Scene</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">defaultScript</span></code>) of the object's scene.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/SceneObject\Scripts.js?#L258" class="function-name source-link">add</a>(<span class="param">script</span>, <span class="param">...args</span>)<span class="type">Any</span>
+			</div>
+			<div class="function desc">
+				Adds a new script to the object. Returns the result of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">()</span></code> listener.
+This also defines a property with the name of the script (e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">MY_SCRIPT</span></code> for a script defined as <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">class</span><span class="highlight-CLASS"> </span><span class="highlight-CONSTANT">MY_SCRIPT</span><span class="highlight-KEYWORD"> extends</span><span class="highlight-CLASS"> <a href="../../Pages/Scripts/ElementScript.html#ElementScript">ElementScript</a></span><span class="highlight-SYMBOL"> { ... }</span></code>) containing the script instance.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">script</span>
+								<span class="type">Class</span>
+							</div>
+							<div class="param desc">
+								The script to add
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">args</span>
+								<span class="type"><a href="../../Pages/Miscellaneous/Array.html#Array">Array</a></span>
+							</div>
+							<div class="param desc">
+								The initialization arguments to pass to the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">()</span></code> listener.
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/SceneObject\Scripts.js?#L273" class="function-name source-link">removeDefault</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Removes the scene's default script from the object.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/SceneObject\Scripts.js?#L280" class="function-name source-link">remove</a>(<span class="param">script</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Removes a specific script from the object. This calls the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">cleanUp</span><span class="highlight-SYMBOL">()</span></code> listener.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">script</span>
+								<span class="type">Class</span>
+							</div>
+							<div class="param desc">
+								The class of the script instance to remove
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/SceneObject\Scripts.js?#L296" class="function-name source-link">has</a>(<span class="param">script</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks whether the object has a specific script.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">script</span>
+								<span class="type">Class</span>
+							</div>
+							<div class="param desc">
+								The script to check
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/SceneObject\Scripts.js?#L304" class="function-name source-link">implements</a>(<span class="param">method</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks whether the object has any scripts listening for a specific event.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">method</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the listener to check for
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

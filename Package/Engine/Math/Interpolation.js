@@ -151,7 +151,31 @@ class Interpolation {
     }
 }
 
+/**
+ * Represents a Operable- or Number-valued variable that smoothly moves between values.
+ * If a transition between states is interrupted by setting a new target, the new transition will begin immediately and will begin from the current position.
+ * ```js
+ * const point = new Animatable(middle, 100, Interpolation.smooth);
+ * 
+ * intervals.continuous(() => {
+ * 	if (mouse.justPressed("Left"))
+ * 		point.target = mouse.screen;
+ * 	renderer.draw(new Color("black")).circle(point.value, 10);
+ * });
+ * ```
+ * @prop Operable/Number target | The current target value of the animatable
+ * @prop Number duration | The length of each transition, in frames
+ * @prop Function easing | The easing function for the transitions
+ * @prop Boolean copyTarget | Whether or not target values should be copied. If this value is false, changing the value passed into target will change the trajectory of the value, even if the value is not passed in again
+ */
 class Animatable {
+	/**
+	 * Creates a new Animatable.
+	 * @param Operable/Number initial | The initial value
+	 * @param Number duration | The length of each transition, in frames
+	 * @param Function easing | The easing function to use. Default is `Interpolation.linear`
+	 * @param Boolean copyTarget | Whether or not target values should be copied. Default is true
+	 */
 	constructor(initial, duration, easing = Interpolation.linear, copyTarget = true) {
 		this.duration = duration;
 		this.easing = easing;
@@ -173,16 +197,28 @@ class Animatable {
 		return this._target;
 	}
 
+	/**
+	 * Sets the value immediately. This will not involve a transition.
+	 * @param Operable/Number value | The new value
+	 */
 	set value(value) {
 		this.target = this.copyTarget ? value.get() : value;
 		this.start = value.get();
 	}
 
+	/**
+	 * Returns the current value of the animatable and advances one frame in the transition.
+	 * @return Operable/Number
+	 */
 	get value() {
 		this.timer++;
 		return this.current;
 	}
 
+	/**
+	 * Returns the current value of the animatable and doesn't advance the transition
+	 * @return Operable/Number
+	 */
 	get current() {
 		const t = Number.clamp(this.timer / this.duration, 0, 1);
 		return Interpolation.lerp(this.start, this.target, this.easing(t));

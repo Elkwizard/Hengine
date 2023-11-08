@@ -1,3 +1,8 @@
+/**
+ * Represents a non-leaf node in the element tree, and can contain SceneObjects or additional ElementContainers.
+ * All methods on this class that add SceneObjects only take effect at the end of the update cycle.
+ * @prop Class defaultScript | The default element script applied to all SceneObjects in the container upon creation
+ */
 class ElementContainer extends SceneElement {
 	constructor(name = "container", container, engine) {
 		super(name, container);
@@ -91,6 +96,15 @@ class ElementContainer extends SceneElement {
 	initializeSceneObject(sceneObject) {
 		sceneObject.scripts.add(this.defaultScript);
 	}
+	/**
+	 * Adds a new SceneObject with a single rectangle shape to the container.
+	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the SceneObject
+	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * @param Number width | The width of the rectangle shape
+	 * @param Number height | The height of the rectangle shape
+	 * @return SceneObject
+	 */
 	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
@@ -99,6 +113,14 @@ class ElementContainer extends SceneElement {
 		this.elements.set(name, n);
 		return n;
 	}
+	/**
+	 * Adds a new SceneObject with a single circle shape to the container.
+	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the SceneObject
+	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * @param Number radius | The radius of the circle shape
+	 * @return SceneObject
+	 */
 	addCircleElement(name, x, y, radius, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
@@ -107,6 +129,13 @@ class ElementContainer extends SceneElement {
 		this.elements.set(name, n);
 		return n;
 	}
+	/**
+	 * Adds a new SceneObject to the container.
+	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the SceneObject
+	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * @return SceneObject
+	 */
 	addElement(name, x, y, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
@@ -114,6 +143,14 @@ class ElementContainer extends SceneElement {
 		this.elements.set(name, n);
 		return n;
 	}
+	/**
+	 * Adds a new SceneObject to the container. This SceneObject will have the PHYSICS script added.
+	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the SceneObject
+	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
+	 * @return SceneObject
+	 */
 	addPhysicsElement(name, x, y, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		const n = new SceneObject(name, x, y, controls, tag, this, this.engine);
@@ -122,6 +159,16 @@ class ElementContainer extends SceneElement {
 		n.scripts.add(PHYSICS, gravity);
 		return n;
 	}
+	/**
+	 * Adds a new SceneObject with a single rectangle shape to the container. This SceneObject will have the PHYSICS script added.
+	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the SceneObject
+	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * @param Number width | The width of the rectangle shape
+	 * @param Number height | The height of the rectangle shape
+	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
+	 * @return SceneObject
+	 */
 	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		const n = new SceneObject(name, x, y, controls, tag, this, this.engine);
@@ -131,6 +178,15 @@ class ElementContainer extends SceneElement {
 		n.scripts.add(PHYSICS, gravity);
 		return n;
 	}
+	/**
+	 * Adds a new SceneObject with a single circle shape to the container. This SceneObject will have the PHYSICS script added.
+	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the SceneObject
+	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * @param Number radius | The radius of the circle shape
+	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
+	 * @return SceneObject
+	 */
 	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls(), tag = "") {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
@@ -140,6 +196,15 @@ class ElementContainer extends SceneElement {
 		n.scripts.add(PHYSICS, gravity);
 		return n;
 	}
+	/**
+	 * Adds a new UIObject with a single rectangle shape to the container.
+	 * @param String name | The name of the UIObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the UIObject
+	 * @param Number y | The y coordinate of the center of the UIObject
+	 * @param Number width | The width of the rectangle shape
+	 * @param Number height | The height of the rectangle shape
+	 * @return UIObject
+	 */
 	addUIElement(name, x, y, width, height) {
 		name = this.genName(this.elements, name);
 		let n = new UIObject(name, x, y, this, this.engine);
@@ -148,6 +213,11 @@ class ElementContainer extends SceneElement {
 		this.elements.set(name, n);
 		return n;
 	}
+	/**
+	 * Adds a new ElementContainer to the container.
+	 * @param String name | The name of the new container. If this is not unique, it will be replaced with a similar but unique name
+	 * @return ElementContainer
+	 */
 	addContainer(name) {
 		name = this.genName(this.elements, name);
 		let x = new ElementContainer(name, this, this.engine);
@@ -167,30 +237,64 @@ class ElementContainer extends SceneElement {
 			this.elements.delete(element.name);
 		}
 	}
+	/**
+	 * Removes a collection of elements from the container
+	 * @param SceneElement[] elements | The elements to remove from the container
+	 */
 	removeElements(elements) {
 		for (let i = 0; i < elements.length; i++) elements[i].remove();
 	}
+	/**
+	 * Removes all the elements from the container.
+	 */
 	removeAllElements() {
 		this.removeElements(this.getAllElements());
 	}
+	/**
+	 * Retrieves an element from the container by name.
+	 * @param String name | The name of the SceneElement to retrieve
+	 * @return SceneElement
+	 */
 	get(name) {
 		return this.elements.get(name);
 	}
+	/**
+	 * Returns all of the leaf nodes within the container.
+	 * @return SceneObject[]
+	 */
 	getAllElements() {
 		return this.updateArray();
 	}
+	/**
+	 * Returns a conditional subset of all the leaf nodes within the container. 
+	 * @param Function mask | The function used to check which elements should be returned 
+	 * @return SceneObject[]
+	 */
 	getElementsMatch(fn) {
 		return this.updateArray().filter(fn);
 	}
+	/**
+	 * Returns all of the UIObject leaf nodes within the container.
+	 * @return UIObject[]
+	 */
 	getUIElements() {
 		return this.getElementsMatch(element => element instanceof UIObject);
 	}
+	/**
+	 * Returns all of the on-screen leaf nodes within the container.
+	 * @return SceneObject[]
+	 */
 	getOnScreenElements() {
 		return this.getElementsMatch(element => element.onScreen);
 	}
 	getElementsWithTag(tag) {
 		return this.getElementsMatch(element => element.tag === tag);
 	}
+	/**
+	 * Returns all of the leaf nodes within the container that have a specific ElementScript.
+	 * @param Class script | The class of the ElementScript to check for
+	 * @return SceneObject[]
+	 */
 	getElementsWithScript(script) {
 		return this.getElementsMatch(element => element.scripts.has(script));
 	}

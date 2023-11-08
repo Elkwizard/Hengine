@@ -1,0 +1,313 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="PARTICLE_SPAWNER">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\ParticleSpawner.js?#L40" class="class-name source-link">PARTICLE_SPAWNER</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Scripts/ElementScript.html#ElementScript">ElementScript</a></span>
+				</div>
+				<div class="class desc">
+				Adds particle emitting functionality to a <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a>.
+All properties of this class are read-only.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> particles</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;particles&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">particles</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">PARTICLE_SPAWNER</span><span class="highlight-SYMBOL">, {
+	</span><span class="highlight-IDENTIFIER">delay</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 1</span><span class="highlight-SYMBOL">,
+	</span><span class="highlight-IDENTIFIER">lifeSpan</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">,
+	</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">) {
+		</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">velocity</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromAngle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER"><a href="../../Pages/Miscellaneous/Random.html#Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">angle</span><span class="highlight-SYMBOL">()).</span><span class="highlight-FUNCTION">times</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER"><a href="../../Pages/Miscellaneous/Random.html#Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">));
+		</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">data</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">size</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER"><a href="../../Pages/Miscellaneous/Random.html#Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">);
+	},
+	</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">) {
+		</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">position</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">data</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">size</span><span class="highlight-SYMBOL">);
+	}
+});
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">particleInit</span><span class="type">Function</span>
+					</div>
+					<div class="prop desc">The function that is called to initialize particles. This will be passed the particle object for each particle created. This uses the alternate key <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">init</span></code> when provided in a parameter. Default is a no-op</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">particleUpdate</span><span class="type">Function</span>
+					</div>
+					<div class="prop desc">The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This uses the alternate key <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">update</span></code> when provided in a parameter. Default is a no-op</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">particleDraw</span><span class="type">Function</span>
+					</div>
+					<div class="prop desc">The function that is called to render particles each frame. This will be passed an <a href="../../Pages/Rendering/Renderer.html#Artist">Artist</a> and a particle object for each particle object on-screen each frame. This uses the alternate key <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">draw</span></code> when provided in a parameter. Default is a no-op</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">slows</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not particles will have air resistance applied. Default is false</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">falls</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not particles will have gravity applied. Default is false</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">active</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not particles will be spawned passively over time. Default is true</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">delay</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The delay (in frames) between particle spawns. This can be less than 1. Default is 1</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">lifeSpan</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The duration (in frames) of each particle's lifetime. Default is 100</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">radius</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">imageType</span><span class="type">Class</span>
+					</div>
+					<div class="prop desc">This specifies how particles should be rendered. If this is <a href="../../Pages/Rendering/Image Types/Frame.html#FastFrame">FastFrame</a>, they will be rendered on a separate surface and then be copied over. If this is <a href="../../Pages/Rendering/CanvasImage.html#CanvasImage">CanvasImage</a>, they will be rendered directly to the screen. This is not an actual property and can only be specified as a property of a <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span></code> argument. Default is <a href="../../Pages/Rendering/Image Types/Frame.html#FastFrame">FastFrame</a></div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\ParticleSpawner.js?#L45" class="function-name source-link">init</a>(<span class="param">properties</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Makes an object a particle system.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">properties</span>
+								<span class="type">Object</span>
+							</div>
+							<div class="param desc">
+								A collection of settings for the object. The keys of this object can be any of the properties of PARTICLE_SPAWNER. They are all optional
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\ParticleSpawner.js?#L78" class="function-name source-link">particleCount</a>(<span class="param">count</span>)
+			</div>
+			<div class="function desc">
+				Sets the number of particles in the system.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">count</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The new amount of particles
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\ParticleSpawner.js?#L88" class="function-name source-link">particleCount</a><span class="type">Number</span>
+			</div>
+			<div class="function desc">
+				Returns the current number of particles in the system.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\ParticleSpawner.js?#L94" class="function-name source-link">removeAllParticles</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Removes all of the particles from the system
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\ParticleSpawner.js?#L101" class="function-name source-link">setProperties</a>(<span class="param">properties</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Sets an inclusive subset of the properties of the system.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">properties</span>
+								<span class="type">Object</span>
+							</div>
+							<div class="param desc">
+								A collection of new setting values. These can be any of the properties of PARTICLE_SPAWNER. They are all optional
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\ParticleSpawner.js?#L130" class="function-name source-link">explode</a>(<span class="param">count</span>, <span class="param">position?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Creates a collection of particles at once.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">count</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The number of particles to create
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">position</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The location to create the particles at. Default is the location of the spawner
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\ParticleSpawner.js?#L170" class="function-name source-link">getBoundingBox</a>()<span class="type"><a href="../../Pages/Geometry/Shapes/Rect.html#Rect">Rect</a></span>
+			</div>
+			<div class="function desc">
+				Returns the smallest axis-aligned world-space rectangle that contains all of the particles in the system.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="Particle">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\ParticleSpawner.js?#L11" class="class-name source-link">Particle</a>
+				</div>
+				<div class="class desc">
+				Every instance of PARTICLE_SPAWNER has a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">Particle</span></code> member class with an identical structure.
+This represents a single particle in a particle system.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">position</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The world-space position of the particle</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">velocity</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The velocity per frame of the particle</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">timer</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The proportion of the particle's lifespan that has elapsed. Setting this to 1 will remove the particle</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">data</span><span class="type">Object</span>
+					</div>
+					<div class="prop desc">This object is not used by the engine, and can be modified in any way to represent particle-specific data</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">spawner</span><span class="type">PARTICLE_SPAWNER</span>
+					</div>
+					<div class="prop desc">The particle system that created the particle</div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			</body>
+		</html>
+	

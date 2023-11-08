@@ -25,7 +25,7 @@
 					"ContinuousFunction",
 					"WaitUntilFunction"
 				],
-				"IntervalManager": null
+				"IntervalManager": ["IntervalManager", "exit"]
 			}
 		},
 		"Management": {
@@ -43,7 +43,7 @@
 			"CanvasImage": ["CanvasImage", "ScalingMode"],
 			"Image Types": {
 				"ImageType": null,
-				"Frame": null,
+				"Frame": ["Frame", "FastFrame"],
 				"HImage": null,
 				"VideoView": null,
 				"Animation": null,
@@ -84,9 +84,6 @@
 			"Interpolation": null,
 			"Animatable": null
 		},
-		"Physics": {
-			"PhysicsEngine": null
-		},
 		"Input": {
 			"InputHandler": ["InputHandler", "InputHandler.State"],
 			"KeyboardHandler": null,
@@ -95,21 +92,25 @@
 			"ClipboardHandler": null
 		},
 		"UI": {
-			"UIObject": null
+			"UIObject": null,
+			"DRAGGABLE": null,
+			"TEXT_AREA": null
+		},
+		"Physics": {
+			"PHYSICS": null,
+			"Constraint": ["Constraint", "Constraint1", "Constraint2"],
+			"CollisionMonitor": ["CollisionMonitor", "CollisionData"]
 		},
 		"Scripts": {
 			"ElementScript": null,
-			"PHYSICS": null,
-			"PLAYER_MOVEMENT": null,
-			"DRAGGABLE": null,
-			"TEXT_AREA": null,
-			"PARTICLE_SPAWNER": null
+			"ScriptContainer": null
 		},
 		"Sound": {
-			"Sound": ["SoundInstance", "Sound"],
+			"Sound": ["Sound", "SoundInstance"],
 			"Synth": null
 		},
 		"Miscellaneous": {
+			"PARTICLE_SPAWNER": ["PARTICLE_SPAWNER", "Particle"],
 			"GPUComputation": null,
 			"FileSystem": null,
 			"Random": null,

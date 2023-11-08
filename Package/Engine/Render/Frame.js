@@ -342,4 +342,4 @@ class Frame extends ImageType {
 		frame.renderer.c.drawImage(offscreen, x * pixelRatio, y * pixelRatio, width * pixelRatio, height * pixelRatio, 0, 0, width, height);
 		return frame;
 	}
-}	
+}

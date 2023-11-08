@@ -1,0 +1,308 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="PHYSICS">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\Physics.js?#L19" class="class-name source-link">PHYSICS</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Scripts/ElementScript.html#ElementScript">ElementScript</a></span>
+				</div>
+				<div class="class desc">
+				Adds rigidbody physics to a <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a>.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">velocity</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The velocity of the object per frame</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">angularVelocity</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The angular velocity of the object in radians per frame</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">mobile</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not the object can move or rotate</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">simulated</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not the object should participate in the simulation at all</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">gravity</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not gravity should be applied to the object</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">airResistance</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not air resistance should be applied to the object</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">canRotate</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether or not the object can rotate</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">mass</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The mass of the object</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">density</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The density of the object. Starts at 1</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">friction</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The coefficient of friction for the object</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">snuzzlement</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The proportion of object's velocity lost in a collision</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">canCollide</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether the object can collide with any others</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">isTrigger</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether the object should cancel all collision resolution, but not detection</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">colliding</span><span class="type"><a href="../../Pages/Physics/CollisionMonitor.html#CollisionMonitor">CollisionMonitor</a></span>
+					</div>
+					<div class="prop desc">All of the objects currently colliding with the object</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">lastColliding</span><span class="type"><a href="../../Pages/Physics/CollisionMonitor.html#CollisionMonitor">CollisionMonitor</a></span>
+					</div>
+					<div class="prop desc">All of the objects that were colliding with the object last frame</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\Physics.js?#L24" class="function-name source-link">init</a>(<span class="param">mobile</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Adds rigidbody physics to an object.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">mobile</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the object should be able to move/rotate
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\Physics.js?#L107" class="function-name source-link">constraints</a><span class="type"><a href="../../Pages/Physics/Constraint.html#Constraint">Constraint</a>[]</span>
+			</div>
+			<div class="function desc">
+				Retrieves a list of copies of all the constraints on the object.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\Physics.js?#L229" class="function-name source-link">applyImpulse</a>(<span class="param">point</span>, <span class="param">impulse</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Applies an impulse to a specific point on the object.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The world-space point at which the impulse should be applied
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">impulse</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The impulse to apply
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\Physics.js?#L239" class="function-name source-link">applyImpulseMass</a>(<span class="param">point</span>, <span class="param">impulse</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Applies an impulse to a specific point on the object.
+The impulse will be scaled by the mass of the object.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The world-space point at which the impulse should be applied
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">impulse</span>
+								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The impulse to apply, which will be scaled
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\Physics.js?#L245" class="function-name source-link">stop</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Stops the object in place. It remains mobile, though it loses all velocity.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\Physics.js?#L274" class="function-name source-link">canCollideWith</a>(<span class="param">element</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks whether the object and another given object could collide if they intersected.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">element</span>
+								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a></span>
+							</div>
+							<div class="param desc">
+								The object to check. Must have PHYSICS
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\Physics.js?#L283" class="function-name source-link">constrainedTo</a>(<span class="param">other</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks whether there are any constraints between the object and another given object
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">other</span>
+								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a></span>
+							</div>
+							<div class="param desc">
+								The object to check. Must have PHYSICS
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	
