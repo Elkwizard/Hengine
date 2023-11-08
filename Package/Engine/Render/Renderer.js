@@ -886,7 +886,7 @@ class Artist {
 	rotateAround(x, y, r) {
 		if (typeof x === "object") {
 			r = y;
-			({ x, y }) = x;
+			({ x, y } = x);
 		}
 		this.translate(x, y);
 		this.rotate(r);
