@@ -41,7 +41,7 @@ function parse(content, file) {
 		name = name.replace(/\s+/g, " ");
 		
 		const isGlobalFunction = /\bfunction\b/.test(name);
-		
+
 		let isClass = name.startsWith("class ");
 		
 		let baseClass = null;
@@ -65,6 +65,7 @@ function parse(content, file) {
 			raw: name, base,
 			isEnum, isClass, baseClass,
 			isGlobalFunction,
+			isAsync: /\basync\b/.test(name),
 			isStatic: name.startsWith("static "),
 			isGetter: name.indexOf("get ") > -1,
 			isSetter: name.indexOf("set ") > -1

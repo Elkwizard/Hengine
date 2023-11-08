@@ -1,0 +1,258 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="TEXT_AREA">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\TextArea.js?#L28" class="class-name source-link">TEXT_AREA</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Scripts/ElementScript.html#ElementScript">ElementScript</a></span>
+				</div>
+				<div class="class desc">
+				Makes a <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a> into a text editor.
+Since the entire screen is a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">&lt;</span><span class="highlight-IDENTIFIER">canvas</span><span class="highlight-SYMBOL">&gt;</span></code> in the <a href="../../Pages/Structure/Hengine.html#Hengine">Hengine</a>, this serves as an alternative to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">&lt;</span><span class="highlight-IDENTIFIER">textarea</span><span class="highlight-SYMBOL">&gt;</span></code>.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// single line text-box</span><span class="highlight-KEYWORD">
+const</span><span class="highlight-CONSTANT"> textbox</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addUIElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;textbox&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 500</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 50</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">textbox</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">TEXT_AREA</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER"><a href="../../Pages/Rendering/Font.html#Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">Arial40</span><span class="highlight-SYMBOL">,</span><span class="highlight-LANG_VAR"> false</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">textbox</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">TEXT_AREA</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">alwaysIgnore</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Enter&quot;</span><span class="highlight-SYMBOL">);
+
+</span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
+</span><span class="highlight-KEYWORD">	if</span><span class="highlight-SYMBOL"> (</span><span class="highlight-IDENTIFIER">keyboard</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">justPressed</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Enter&quot;</span><span class="highlight-SYMBOL">))
+		</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">textbox</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">TEXT_AREA</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">value</span><span class="highlight-SYMBOL">);
+});
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">value</span><span class="type">String</span>
+					</div>
+					<div class="prop desc">The current content of the text area. This value is read-only</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">selectionStart</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The initial index of the selected text</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">selectionEnd</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The first index not in the selected text. If nothing is selected, this will be equal to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">selectionStart</span></code></div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">multiline</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether the text area should allow new lines and scrolling</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">focused</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether this is the currently focused text area</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">font</span><span class="type"><a href="../../Pages/Rendering/Font.html#Font">Font</a></span>
+					</div>
+					<div class="prop desc">The font used to display the text area</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">caretColor</span><span class="type"><a href="../../Pages/Rendering/Color.html#Color">Color</a></span>
+					</div>
+					<div class="prop desc">The color of the caret. Starts as black</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">highlightColor</span><span class="type"><a href="../../Pages/Rendering/Color.html#Color">Color</a></span>
+					</div>
+					<div class="prop desc">The semi-transparent background color of selected text</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">padding</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The interior padding of the text area, measured as a proportion of the font size</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">scrollBarSize</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The width of the scroll bars of a multiline text area</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">scrollSpeed</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The speed (in pixels per frame) of the scroll bars of a multiline text area</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">scrollOffset</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The translation of the visible area of the text area due to scrolling</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\TextArea.js?#L36" class="function-name source-link">init</a>(<span class="param">font</span>, <span class="param">paddingEM?</span>, <span class="param">multiline?</span>, <span class="param">renderText?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Adds a text editor to a <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a>.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">font</span>
+								<span class="type"><a href="../../Pages/Rendering/Font.html#Font">Font</a></span>
+							</div>
+							<div class="param desc">
+								The font used for rendering the text
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">paddingEM</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The interior padding of the text area, measured as a proportion of the font size. Default is 0.5
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">multiline</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the text area can have multiple lines and scrolling. Default is true
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">renderText</span>
+								<span class="type">Function</span>
+							</div>
+							<div class="param desc">
+								A function used to render the text. The default renders the text in place with a black color
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\TextArea.js?#L87" class="function-name source-link">alwaysIgnore</a>(<span class="param">key</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Forces the text area to ignore a specific key input.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">key</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the key to ignore
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\TextArea.js?#L97" class="function-name source-link">setValue</a>(<span class="param">value</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Sets the content of the text area.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">value</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The new content for the text area
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\TextArea.js?#L110" class="function-name source-link">focus</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Forcibly focuses the text area.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Scripts\TextArea.js?#L120" class="function-name source-link">blur</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Forcibly un-focuses the text area, without focusing a different one.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

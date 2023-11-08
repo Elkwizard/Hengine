@@ -1,3 +1,9 @@
+/**
+ * Represents the way in which dimensions are prioritized in `Geometry.gridToRects()`.
+ * @static_prop Symbol SQUARE | The rectangles should be approximately square, with a difference in dimensions of at most one tile
+ * @static_prop Symbol HORIZONTAL | The rectangles should become as wide as possible, and then grow vertically
+ * @static_prop Symbol VERTICAL | The rectangles should become as tall as possible, and then grow horizontally
+ */
 const RectPriority = defineEnum("SQUARE", "HORIZONTAL", "VERTICAL");
 
 /**
@@ -125,6 +131,106 @@ class Geometry {
 		if (vertices.length % 2 === 1) result.pop();
 		return result;
 	}
+	/**
+	 * Checks whether a list of points are in clockwise order.
+	 * @param Vector2[] vertices | The points to check 
+	 * @return Boolean
+	 */
+	static isListClockwise(vertices) {
+		let signedArea = 0;
+		let length = vertices.length;
+		for (let i = 0; i < length; i++) {
+			let a = vertices[i];
+			let b = vertices[(i + 1) % length];
+			signedArea += (b.x - a.x) * (a.y + b.y);
+		}
+		return signedArea < 0;;
+	}
+	/**
+	 * Combines a set of grid-aligned squares into the minimum number of rectangles occupying the same space.
+	 * These are then scaled by a certain factor about the origin of the grid.
+	 * @param Boolean[][] srcGrid | A grid of booleans representing the squares. The first index of the boolean is the x coordinate, the second index is the y, and the value of the boolean determines whether or not a square exists in that space
+	 * @param Number cellSize | The factor to scale the result by
+	 * @param RectPriority priority? | How the dimensions of the rectangles should be prioritized in the greedy algorithm. Default is `RectPriority.SQUARE`
+	 * @return Rect[]
+	 */
+	static gridToRects(srcGrid, cellSize, priority = RectPriority.SQUARE) {
+		const grid = [];
+		for (let i = 0; i < srcGrid.length; i++) {
+			grid.push([]);
+			for (let j = 0; j < srcGrid[0].length; j++) grid[i].push(srcGrid[i][j]);
+		}
+		
+		const rects = [];
+
+		const validRect = (minX, minY, maxX, maxY) => {
+			for (let i = minX; i <= maxX; i++)
+			for (let j = minY; j <= maxY; j++)
+				if (!grid[i]?.[j]) return false;
+			return true;
+		};
+
+		const finishRect = (minX, minY, maxX, maxY) => {
+			for (let ii = minX; ii <= maxX; ii++)
+			for (let jj = minY; jj <= maxY; jj++)
+				grid[ii][jj] = false;
+
+			rects.push(new Rect(minX, minY, maxX - minX + 1, maxY - minY + 1));
+		};
+	
+		for (let i = 0; i < grid.length; i++)
+		for (let j = 0; j < grid[0].length; j++) {
+			if (grid[i][j]) {
+				let maxX = i;
+				let maxY = j;
+	
+				switch (priority) {
+					case RectPriority.HORIZONTAL: {
+						while (validRect(i, j, maxX, maxY)) maxX++;
+						maxX--;
+	
+						while (
+							validRect(i, j, maxX, maxY) &&
+							!grid[i - 1]?.[maxY] &&
+							!grid[maxX + 1]?.[maxY]
+						) maxY++;
+						maxY--;
+					}; break;
+					case RectPriority.VERTICAL: {
+						while (validRect(i, j, maxX, maxY)) maxY++;
+						maxY--;
+						
+						while (
+							validRect(i, j, maxX, maxY) &&
+							!grid[maxX]?.[j - 1] &&
+							!grid[maxX]?.[maxY + 1]
+						) maxX++;
+						maxX--;
+					}; break;
+					case RectPriority.SQUARE: {
+						let change = 0;
+						while (validRect(i, j, maxX, maxY)) {
+							if (++change % 2) maxX++;
+							else maxY++;
+						}
+						if (change % 2) maxX--;
+						else maxY--;
+					}; break;
+				}
+				
+				finishRect(i, j, maxX, maxY);
+			}
+		}
+		
+		return rects.map(rect => rect.scaleAbout(Vector2.origin, cellSize));
+	}
+	/**
+	 * Combines a set of grid-aligned squares into the minimum number of polygons occupying the same space.
+	 * These are then scaled by a certain factor about the origin of the grid. Holes within groups of squares will be removed.
+	 * @param Boolean[][] srcGrid | A grid of booleans representing the squares. The first index of the boolean is the x coordinate, the second index is the y, and the value of the boolean determines whether or not a square exists in that space
+	 * @param Number cellSize | The factor to scale the result by
+	 * @return Polygon[]
+	 */
 	static gridToExactPolygons(sourceGrid, cellSize) {
 		const grid = Array.dim(sourceGrid.length + 2, sourceGrid[0].length + 2);
 	
@@ -199,20 +305,11 @@ class Geometry {
 			));
 	}
 	/**
-	 * Checks whether a list of points are in clockwise order.
-	 * @param Vector2[] vertices | The points to check 
-	 * @return Boolean
+	 * Same as `.gridToExactPolygons()`, except that the returned Polygons have their concave vertices removed. Note that this filtering step only happens once, so the result may have still have concave vertices.
+	 * @param Boolean[][] srcGrid | A boolean grid representing the squares
+	 * @param Number cellSize | The factor to scale the result by
+	 * @return Polygon[]
 	 */
-	static isListClockwise(vertices) {
-		let signedArea = 0;
-		let length = vertices.length;
-		for (let i = 0; i < length; i++) {
-			let a = vertices[i];
-			let b = vertices[(i + 1) % length];
-			signedArea += (b.x - a.x) * (a.y + b.y);
-		}
-		return signedArea < 0;;
-	}
 	static gridToPolygons(srcGrid, CELL_SIZE) {
 
 		let grid = srcGrid.map(v => v);
@@ -357,76 +454,6 @@ class Geometry {
 		return polygons
 			.filter(Geometry.isListClockwise)
 			.map(vertices => new Polygon(vertices));
-	}
-	static gridToRects(srcGrid, cellSize, priority = RectPriority.SQUARE) {
-		const grid = [];
-		for (let i = 0; i < srcGrid.length; i++) {
-			grid.push([]);
-			for (let j = 0; j < srcGrid[0].length; j++) grid[i].push(srcGrid[i][j]);
-		}
-		
-		const rects = [];
-
-		const validRect = (minX, minY, maxX, maxY) => {
-			for (let i = minX; i <= maxX; i++)
-			for (let j = minY; j <= maxY; j++)
-				if (!grid[i]?.[j]) return false;
-			return true;
-		};
-
-		const finishRect = (minX, minY, maxX, maxY) => {
-			for (let ii = minX; ii <= maxX; ii++)
-			for (let jj = minY; jj <= maxY; jj++)
-				grid[ii][jj] = false;
-
-			rects.push(new Rect(minX, minY, maxX - minX + 1, maxY - minY + 1));
-		};
-	
-		for (let i = 0; i < grid.length; i++)
-		for (let j = 0; j < grid[0].length; j++) {
-			if (grid[i][j]) {
-				let maxX = i;
-				let maxY = j;
-	
-				switch (priority) {
-					case RectPriority.HORIZONTAL: {
-						while (validRect(i, j, maxX, maxY)) maxX++;
-						maxX--;
-	
-						while (
-							validRect(i, j, maxX, maxY) &&
-							!grid[i - 1]?.[maxY] &&
-							!grid[maxX + 1]?.[maxY]
-						) maxY++;
-						maxY--;
-					}; break;
-					case RectPriority.VERTICAL: {
-						while (validRect(i, j, maxX, maxY)) maxY++;
-						maxY--;
-						
-						while (
-							validRect(i, j, maxX, maxY) &&
-							!grid[maxX]?.[j - 1] &&
-							!grid[maxX]?.[maxY + 1]
-						) maxX++;
-						maxX--;
-					}; break;
-					case RectPriority.SQUARE: {
-						let change = 0;
-						while (validRect(i, j, maxX, maxY)) {
-							if (++change % 2) maxX++;
-							else maxY++;
-						}
-						if (change % 2) maxX--;
-						else maxY--;
-					}; break;
-				}
-				
-				finishRect(i, j, maxX, maxY);
-			}
-		}
-		
-		return rects.map(rect => rect.scaleAbout(Vector2.origin, cellSize));
 	}
 	/**
 	 * Finds the closest point from a list of points to a given point.

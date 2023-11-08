@@ -1,4 +1,29 @@
+/**
+ * Represents an operation that can be executed in parallel with itself on the GPU.
+ * The main entry point is:
+ * ```glsl
+ * int[OUTPUT_BYTES] compute(int[INPUT_BYTES] inputs) {
+ * 	// your main code here
+ * }
+ * ```
+ * Where `INPUT_BYTES` and `OUTPUT_BYTES` are the sizes of the inputs and outputs of the operation.
+ * There are some helper variables and functions provided, specifically:
+ * ```glsl
+ * #define PROBLEM_INDEX // the index of the operation in the batch
+ * #define PROBLEMS // the size of the batch
+ * 
+ * // returns the input data for a specific operation in the batch
+ * int[INPUT_BYTES] getProblem(int index);
+ * ```
+ * @prop Number problems | The amount of operations to be evaluated in each batch
+ * @prop String glsl | The source code of the operation. See the GLSL API
+ */
 class GPUComputation {
+	/**
+	 * Creates a new GPUComputation.
+	 * @param Number problems | The amount of operations in each batch
+	 * @param String glsl | The source code of the operation
+	 */
 	constructor(problems, glsl) {
 		{ // build context
 			if (!window.WebGL2RenderingContext) throw new ReferenceError("Your browser doesn't support GPUComputations");
@@ -136,36 +161,36 @@ class GPUComputation {
 			this.fragmentShaderSource = `${prefix}
 				${this.glsl}
 
-${Array
-	.dim(this.outputPixels)
-	.map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`)
-	.join("\n")
-}
+	${Array
+		.dim(this.outputPixels)
+		.map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`)
+		.join("\n")
+	}
 
 				void main() {
 					int[${this.inputBytes}] _inputs = getProblem(PROBLEM_INDEX);
 					int[${this.outputBytes}] _outputs = compute(_inputs);
 
-${Array
-	.dim(this.outputPixels)
-	.map((_, index) => {
-		const startIndex = index * 4;
-		const samples = [];
-		for (let i = startIndex; i < startIndex + 4; i++) {
-			const byteIndex = i * BYTES_PER_CHANNEL;
-			const bytes = Math.min(BYTES_PER_CHANNEL, this.outputBytes - byteIndex);
-			if (bytes <= 0) break;
-			const ors = new Array(bytes)
-				.fill(0)
-				.map((_, inx) => `clamp(_outputs[${byteIndex + inx}], 0, 255) << ${endian(inx * 8)}`)
-				.join(" | ");
-			samples.push(ors);
-		}
-		for (let i = samples.length; i < 4; i++) samples.push("0");
-		return `\t\t\t\t\t_outputColor${index} = uvec4(${samples.join(", ")});`;
-	})	
-	.join("\n")
-}
+	${Array
+		.dim(this.outputPixels)
+		.map((_, index) => {
+			const startIndex = index * 4;
+			const samples = [];
+			for (let i = startIndex; i < startIndex + 4; i++) {
+				const byteIndex = i * BYTES_PER_CHANNEL;
+				const bytes = Math.min(BYTES_PER_CHANNEL, this.outputBytes - byteIndex);
+				if (bytes <= 0) break;
+				const ors = new Array(bytes)
+					.fill(0)
+					.map((_, inx) => `clamp(_outputs[${byteIndex + inx}], 0, 255) << ${endian(inx * 8)}`)
+					.join(" | ");
+				samples.push(ors);
+			}
+			for (let i = samples.length; i < 4; i++) samples.push("0");
+			return `\t\t\t\t\t_outputColor${index} = uvec4(${samples.join(", ")});`;
+		})	
+		.join("\n")
+	}
 				}
 			`;
 
@@ -262,6 +287,13 @@ ${Array
 			this.program.setUniform("_outputTextureWidth", this.outputTextureSize);
 		};
 	}
+	/**
+	 * Evaluates the operation on a batch of inputs simultaneously.
+	 * Returns the outputs in a contiguous buffer in the same order as the inputs.
+	 * @param ByteBuffer input | The buffer containing the inputs of all the operations. These should be directly contiguous
+	 * @param ByteBuffer output? | The buffer to write the output of the operations to. It will be packed contiguously. If not specified, this will be a newly created buffer
+	 * @return ByteBuffer
+	 */
 	compute(input, output = new ByteBuffer()) {
 		if (!this.hasContext) return output;
 
@@ -307,20 +339,47 @@ ${Array
 		return output;
 	}
 	
-	// arguments (from GPUShader)
+	/**
+	 * Returns whether or not the shader contains a given uniform.
+	 * @param String name | The name of the uniform to check 
+	 * @return Boolean
+	 */
 	argumentExists(arg) {
 		return this.program.hasUniform(arg);
 	}
+	/**
+	 * Returns the current value of a given uniform.
+	 * For the return value of this function, see the GLSL API
+	 * @param String name | The name of the uniform to retrieve
+	 * @return Any
+	 */
 	getArgument(arg) {
 		return this.program.getUniform(arg);
 	}
+	/**
+	 * Sets the value of a given uniform.
+	 * @param String name | The name of the uniform to set
+	 * @param Any value | The new value for the uniform. For the type of this argument, see the GLSL API
+	 */
 	setArgument(arg, value) {
-		this.program.setUniform(arg, value);
+		this.setArguments({ [arg]: value });
 	}
+	/**
+	 * Sets the value of one or more uniforms. 
+	 * @param Object uniforms | A collection of key-value pairs, where the key is the name of the uniform to set, and the value is the new value for that uniform
+	 */
 	setArguments(uniformData = {}) {
-		for (const key in uniformData) this.program.setUniform(key, uniformData[key]);
+		for (const key in uniformData)
+			this.program.setUniform(key, uniformData[key]);
 		this.loaded = false;
 	}
+	/**
+	 * Converts GLSL which uses `struct`s for the parameter and return value of the `compute()` function to GLSL that can be used in the GPUComputation constructor.
+	 * The order of the `struct` data in the input and output buffers is the same as the declaration order of their fields.
+	 * When using this, `getProblem()` will return the correct `struct` type.
+	 * @param String glsl | The GLSL source code using `struct`s for the input and output of the `compute()` function
+	 * @return String
+	 */
 	static destructure(glsl) {
 		const originalGLSL = glsl;
 

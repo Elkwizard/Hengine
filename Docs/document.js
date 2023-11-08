@@ -10,6 +10,7 @@ function documentName(name, doc, wrapperClass) {
 	let result = name.base;
 	if (name.isPage) return `<span class="page-name">${result}</span>`
 	if (name.isStatic) result = `${wrapperClass}.${result}`;
+	if (name.isAsync) result = `<span class="keyword">async</span> ${result}`;
 	result = `<a href="${sourceLink(doc)}" class="${name.isClass ? "class-name" : "function-name"} source-link">${result}</a>`;
 	if (name.isGetter) result = `<span class="keyword">get</span> ${result}`;
 	if (name.isSetter) result = `<span class="keyword">set</span> ${result}`;
@@ -66,9 +67,10 @@ function documentFunction(fn, wrapperClass) {
 				${description}
 			</div>
 			${signatures.length ? `
-			<div class="function-signature">
-				${parameterDescriptions}
-			</div>` : ""}
+				<div class="function-signature">
+					${parameterDescriptions}
+				</div>
+			` : ""}
 		</div>
 	`;
 }

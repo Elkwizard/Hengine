@@ -1,4 +1,38 @@
+/**
+ * Makes a SceneObject into a text editor.
+ * Since the entire screen is a `<canvas>` in the Hengine, this serves as an alternative to `<textarea>`.
+ * ```js
+ * // single line text-box
+ * const textbox = scene.main.addUIElement("textbox", width / 2, height / 2, 500, 50);
+ * textbox.scripts.add(TEXT_AREA, Font.Arial40, false);
+ * textbox.scripts.TEXT_AREA.alwaysIgnore("Enter");
+ * 
+ * intervals.continuous(() => {
+ * 	if (keyboard.justPressed("Enter"))
+ * 		console.log(textbox.scripts.TEXT_AREA.value);
+ * });
+ * ```
+ * @prop String value | The current content of the text area. This value is read-only
+ * @prop Number selectionStart | The initial index of the selected text
+ * @prop Number selectionEnd | The first index not in the selected text. If nothing is selected, this will be equal to `.selectionStart`
+ * @prop Boolean multiline | Whether the text area should allow new lines and scrolling
+ * @prop Boolean focused | Whether this is the currently focused text area
+ * @prop Font font | The font used to display the text area
+ * @prop Color caretColor | The color of the caret. Starts as black
+ * @prop Color highlightColor | The semi-transparent background color of selected text
+ * @prop Number padding | The interior padding of the text area, measured as a proportion of the font size
+ * @prop Number scrollBarSize | The width of the scroll bars of a multiline text area
+ * @prop Number scrollSpeed | The speed (in pixels per frame) of the scroll bars of a multiline text area
+ * @prop Vector2 scrollOffset | The translation of the visible area of the text area due to scrolling
+ */
 class TEXT_AREA extends ElementScript {
+	/**
+	 * Adds a text editor to a SceneObject.
+	 * @param Font font | The font used for rendering the text
+	 * @param Number paddingEM? | The interior padding of the text area, measured as a proportion of the font size. Default is 0.5
+	 * @param Boolean multiline? | Whether the text area can have multiple lines and scrolling. Default is true
+	 * @param Function renderText? | A function used to render the text. The default renders the text in place with a black color
+	 */
 	init(obj, font, paddingEM = 0.5, multiline = true, renderText = (text, font, pos, getLoc, lineIndex) => this.renderer.draw(Color.BLACK).text(font, text, pos)) {
 		obj.engine.scene.mouseEvents = true;
 		this.renderer = obj.engine.renderer;
@@ -46,12 +80,20 @@ class TEXT_AREA extends ElementScript {
 		this.ignored.push(key);
 		this.ignoredRemoval.push(false);
 	}
+	/**
+	 * Forces the text area to ignore a specific key input.
+	 * @param String key | The name of the key to ignore
+	 */
 	alwaysIgnore(obj, key) {
 		this.alwaysIgnored.push(key);
 	}
 	getValue(obj) {
 		return this.value;
 	}
+	/**
+	 * Sets the content of the text area.
+	 * @param String value | The new content for the text area
+	 */
 	setValue(obj, value) {
 		value += "";
 		this.value = value;
@@ -62,6 +104,9 @@ class TEXT_AREA extends ElementScript {
 		const elements = obj.engine.scene.main.getElementsWithScript(TEXT_AREA);
 		for (let i = 0; i < elements.length; i++) elements[i].scripts.TEXT_AREA.blur();
 	}
+	/**
+	 * Forcibly focuses the text area.
+	 */
 	focus(obj) {
 		this.blurOthers();
 
@@ -69,6 +114,9 @@ class TEXT_AREA extends ElementScript {
 		this.selectionStart = this.value.length;
 		this.selectionEnd = this.value.length;
 	}
+	/**
+	 * Forcibly un-focuses the text area, without focusing a different one.
+	 */
 	blur(obj) {
 		this.focused = false;
 	}

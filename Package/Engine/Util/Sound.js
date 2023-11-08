@@ -1,3 +1,6 @@
+/**
+ * Represents a channel on which tones can be played.
+ */
 class SynthChannel {
     constructor(synth) {
         this.synth = synth;
@@ -39,6 +42,12 @@ class SynthChannel {
 
         this.fadeOut = fadeOut;
     }
+	/**
+	 * Stops the tone from playing, optionally after a delay.
+	 * Returns a promise that resolves when the tone stops.
+	 * @param Number wait? | The interval (in milliseconds) to wait before stopping the sound. Default is 0
+	 * @return Promise
+	 */
     stop(wait = 0) {
         const endTime = this.synth.time + wait;
 
@@ -56,7 +65,32 @@ class SynthChannel {
 }
 SynthChannel.BUFFER = 15;
 
+/**
+ * @name class Tone
+ * This is not an actual class, but rather an interface for tone specifications.
+ * @prop Number duration? | The duration (in milliseconds) of the tone. If not specified, the tone can be stopped at will
+ * @prop Number frequency? | The frequency of the tone in Hertz. If not specified, `.note` must be
+ * @prop String note? | The letter name of the the note, optionally with a "#" appended for sharp or a "b" for flat. If not specified, `.frequency` must be
+ * @prop Number octave? | Which octave on a piano the note would appear in. Default is 4. This is ignored if `.frequency` is specified
+ * @prop Number volume? | The volume of the tone on [0, 1]. Default is 1
+ * @prop String wave? | The name of the waveform for the tone. This is one of (`"sine"`, `"sawtooth"`, `"triangle"`, `"square"`). Default is `"sine"`
+ */
+
+/**
+ * Represents a synthesizer which can create pure tones.
+ * ```js
+ * const synth = new Synth();
+ * synth.playSequence([
+ * 	{ frequency: 440, duration: 1000 }, // one second A note
+ * 	{ duration: 500, volume: 0 } // half second pause
+ * 	{ note: "A", duration: 1000 } // one second A note
+ * ]);
+ * ```
+ */
 class Synth {
+	/**
+	 * Creates a new Synth.
+	 */
     constructor() {
         this.c = new (window.AudioContext ?? window.webkitAudioContext)({
             sampleRate: 44100
@@ -77,6 +111,11 @@ class Synth {
             buffer / 1000
         );
     }
+	/**
+	 * Plays a tone. If the tone has a specified duration, this returns a promise that resolves when it completes. Otherwise, this returns the `.stop()` method of the SynthChannel playing this tone.
+	 * @param Tone tone | The specification of the tone to play.
+	 * @return Function/Promise
+	 */
     play(info) {
         if (info.duration !== undefined && info.volume === 0)
             return this.pause(info.duration);
@@ -107,6 +146,11 @@ class Synth {
     pause(duration) {
         return new Promise(resolve => setTimeout(resolve, duration));
     }
+	/**
+	 * Plays a sequence of tones with specified durations. Returns a promise that resolves when they have all completed.
+	 * @param Tone[] all | The specifications of the tones to play. See the class description
+	 * @param Tone globals? | All the properties of this object will be used as defaults for the properties of tones specified in `all`. Default is `{ }`
+	 */
     async playSequence(all, globals = {}) {
         for (const info of all)
             await this.play({ ...globals, ...info });

@@ -98,7 +98,7 @@
 			},
 			"Matrix3": null,
 			"Transform": null,
-			"Geometry": null,
+			"Geometry": ["Geometry", "RectPriority"],
 			"Interpolation": null,
 			"Animatable": null
 		},
@@ -121,7 +121,7 @@
 		},
 		"Sound": {
 			"Sound": ["Sound", "SoundInstance"],
-			"Synth": null
+			"Synth": ["Synth", "Tone", "SynthChannel"]
 		},
 		"Miscellaneous": {
 			"PARTICLE_SPAWNER": ["PARTICLE_SPAWNER", "Particle"],

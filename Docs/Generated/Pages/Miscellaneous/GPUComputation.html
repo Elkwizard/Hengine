@@ -1,0 +1,282 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="GPUComputation">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\GPUComputation.js?#L21" class="class-name source-link">GPUComputation</a>
+				</div>
+				<div class="class desc">
+				Represents an operation that can be executed in parallel with itself on the GPU.
+The main entry point is:
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">int</span><span class="highlight-SYMBOL">[</span><span class="highlight-CONSTANT">OUTPUT_BYTES</span><span class="highlight-SYMBOL">] </span><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">int</span><span class="highlight-SYMBOL">[</span><span class="highlight-CONSTANT">INPUT_BYTES</span><span class="highlight-SYMBOL">] </span><span class="highlight-IDENTIFIER">inputs</span><span class="highlight-SYMBOL">) {
+	</span><span class="highlight-COMMENT">// your main code here</span><span class="highlight-SYMBOL">
+}
+</span></code>
+Where <code class=" highlight-BACKGROUND"><span class="highlight-CONSTANT">INPUT_BYTES</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-CONSTANT">OUTPUT_BYTES</span></code> are the sizes of the inputs and outputs of the operation.
+There are some helper variables and functions provided, specifically:
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">#define</span><span class="highlight-CONSTANT"> PROBLEM_INDEX</span><span class="highlight-SYMBOL"> </span><span class="highlight-COMMENT">// the index of the operation in the batch</span><span class="highlight-KEYWORD">
+#define</span><span class="highlight-CONSTANT"> PROBLEMS</span><span class="highlight-SYMBOL"> </span><span class="highlight-COMMENT">// the size of the batch</span><span class="highlight-SYMBOL">
+
+</span><span class="highlight-COMMENT">// returns the input data for a specific operation in the batch</span><span class="highlight-KEYWORD">
+int</span><span class="highlight-SYMBOL">[</span><span class="highlight-CONSTANT">INPUT_BYTES</span><span class="highlight-SYMBOL">] </span><span class="highlight-FUNCTION">getProblem</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">int</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">index</span><span class="highlight-SYMBOL">);
+</span></code>
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">problems</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The amount of operations to be evaluated in each batch</div>
+				</div>
+			
+				<div class="prop-wrapper">
+					<div class="prop-header member">
+						<span class="prop-name">glsl</span><span class="type">String</span>
+					</div>
+					<div class="prop desc">The source code of the operation. See the <a href="../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a></div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\GPUComputation.js?#L27" class="function-name source-link">constructor</a>(<span class="param">problems</span>, <span class="param">glsl</span>)
+			</div>
+			<div class="function desc">
+				Creates a new GPUComputation.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">problems</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The amount of operations in each batch
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">glsl</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The source code of the operation
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\GPUComputation.js?#L297" class="function-name source-link">compute</a>(<span class="param">input</span>, <span class="param">output?</span>)<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#ByteBuffer">ByteBuffer</a></span>
+			</div>
+			<div class="function desc">
+				Evaluates the operation on a batch of inputs simultaneously.
+Returns the outputs in a contiguous buffer in the same order as the inputs.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">input</span>
+								<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#ByteBuffer">ByteBuffer</a></span>
+							</div>
+							<div class="param desc">
+								The buffer containing the inputs of all the operations. These should be directly contiguous
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">output</span>
+								<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#ByteBuffer">ByteBuffer</a></span>
+							</div>
+							<div class="param desc">
+								The buffer to write the output of the operations to. It will be packed contiguously. If not specified, this will be a newly created buffer
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\GPUComputation.js?#L347" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Returns whether or not the shader contains a given uniform.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the uniform to check
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\GPUComputation.js?#L356" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
+			</div>
+			<div class="function desc">
+				Returns the current value of a given uniform.
+For the return value of this function, see the <a href="../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a>
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the uniform to retrieve
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\GPUComputation.js?#L364" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Sets the value of a given uniform.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The name of the uniform to set
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">value</span>
+								<span class="type">Any</span>
+							</div>
+							<div class="param desc">
+								The new value for the uniform. For the type of this argument, see the <a href="../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a>
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\GPUComputation.js?#L371" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Sets the value of one or more uniforms. 
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">uniforms</span>
+								<span class="type">Object</span>
+							</div>
+							<div class="param desc">
+								A collection of key-value pairs, where the key is the name of the uniform to set, and the value is the new value for that uniform
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Math\GPUComputation.js?#L383" class="function-name source-link">GPUComputation.destructure</a>(<span class="param">glsl</span>)<span class="type">String</span>
+			</div>
+			<div class="function desc">
+				Converts GLSL which uses <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">struct</span></code>s for the parameter and return value of the <code class=" highlight-BACKGROUND"><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">()</span></code> function to GLSL that can be used in the GPUComputation constructor.
+The order of the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">struct</span></code> data in the input and output buffers is the same as the declaration order of their fields.
+When using this, <code class=" highlight-BACKGROUND"><span class="highlight-FUNCTION">getProblem</span><span class="highlight-SYMBOL">()</span></code> will return the correct <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">struct</span></code> type.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">glsl</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The GLSL source code using <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">struct</span></code>s for the input and output of the <code class=" highlight-BACKGROUND"><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">()</span></code> function
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

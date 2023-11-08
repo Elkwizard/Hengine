@@ -1,0 +1,153 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="AnimationStateMachine">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L132" class="class-name source-link">AnimationStateMachine</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+				</div>
+				<div class="class desc">
+				Represents a collection of animations that play at different times.
+This is modelled using a collection of states (which can be of any type(s)), that can have different associated animations.
+This also allows for transition animations between states.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L138" class="function-name source-link">constructor</a>(<span class="param">stateAnimations</span>, <span class="param">initialState</span>)
+			</div>
+			<div class="function desc">
+				Creates a new AnimationStateMachine.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">stateAnimations</span>
+								<span class="type">Map</span>
+							</div>
+							<div class="param desc">
+								The <a href="../../../Pages/Rendering/Image Types/Animation.html#Animation">Animations</a> corresponding to each state.
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">initialState</span>
+								<span class="type">Any</span>
+							</div>
+							<div class="param desc">
+								The initial state
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L164" class="function-name source-link">state</a><span class="type">Any</span>
+			</div>
+			<div class="function desc">
+				Returns the current state of the state machine.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L172" class="function-name source-link">state</a>(<span class="param">state</span>)
+			</div>
+			<div class="function desc">
+				Sets the state of the state machine.
+If the specified state's animation doesn't loop, then the state will revert back after the animation completes.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">state</span>
+								<span class="type">Any</span>
+							</div>
+							<div class="param desc">
+								The new state of the state machine
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Animation.js?#L155" class="function-name source-link">addTransition</a>(<span class="param">initial</span>, <span class="param">final</span>, <span class="param">animation</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Adds an animation to be played when transitioning between two specified states.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">initial</span>
+								<span class="type">Any</span>
+							</div>
+							<div class="param desc">
+								The state being transitioned from
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">final</span>
+								<span class="type">Any</span>
+							</div>
+							<div class="param desc">
+								The state being transitioned to
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">animation</span>
+								<span class="type"><a href="../../../Pages/Rendering/Image Types/Animation.html#Animation">Animation</a></span>
+							</div>
+							<div class="param desc">
+								The animation to play during this time. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">loops</span></code> must be false
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

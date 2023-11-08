@@ -695,7 +695,7 @@ class GPUShader extends ImageType {
 	}
 	/**
 	 * Returns the current value of a given uniform.
-	 * For the return value of this function, see GLSL API
+	 * For the return value of this function, see the GLSL API
 	 * @param String name | The name of the uniform to retrieve
 	 * @return Any
 	 */
@@ -705,7 +705,7 @@ class GPUShader extends ImageType {
 	/**
 	 * Sets the value of a given uniform.
 	 * @param String name | The name of the uniform to set
-	 * @param Any value | The new value for the uniform. For the type of this argument, see GLSL API
+	 * @param Any value | The new value for the uniform. For the type of this argument, see the GLSL API
 	 */
 	setArgument(arg, value) {
 		this.setArguments({ [arg]: value });

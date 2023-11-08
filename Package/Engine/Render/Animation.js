@@ -124,7 +124,17 @@ class Animation extends ImageType {
 	}
 }
 
+/**
+ * Represents a collection of animations that play at different times.
+ * This is modelled using a collection of states (which can be of any type(s)), that can have different associated animations.
+ * This also allows for transition animations between states.
+ */
 class AnimationStateMachine extends ImageType {
+	/**
+	 * Creates a new AnimationStateMachine.
+	 * @param Map stateAnimations | The Animations corresponding to each state.
+	 * @param Any initialState | The initial state
+	 */
 	constructor(stateAnimations, initialState) {
 		super(
 			stateAnimations.get(initialState).width,
@@ -136,14 +146,29 @@ class AnimationStateMachine extends ImageType {
 		this.transition = null;
 		this.stateStack = [initialState];
 	}
+	/**
+	 * Adds an animation to be played when transitioning between two specified states.
+	 * @param Any initial | The state being transitioned from 
+	 * @param Any final | The state being transitioned to
+	 * @param Animation animation | The animation to play during this time. `.loops` must be false
+	 */
 	addTransition(a, b, animation) {
 		if (!this.transitions.has(a))
 			this.transitions.set(a, new Map());
 		this.transitions.get(a).set(b, animation);
 	}
+	/**
+	 * Returns the current state of the state machine.
+	 * @return Any
+	 */
 	get state() {
 		return this.stateStack.last;
 	}
+	/**
+	 * Sets the state of the state machine.
+	 * If the specified state's animation doesn't loop, then the state will revert back after the animation completes.
+	 * @param Any state | The new state of the state machine
+	 */
 	set state(state) {
 		if (state !== this.state) {
 			if (

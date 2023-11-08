@@ -1,4 +1,22 @@
+/**
+ * Makes a SceneObject draggable with the mouse.
+ * If the object has PHYSICS, then it will become stationary while being dragged.
+ * This forces the object to accept mouse events.
+ * ```js
+ * // create a draggable object with no bounds
+ * const object = scene.main.addUIElement("box", width / 2, height / 2, 200, 100);
+ * object.scripts.add(DRAGGABLE, "Left");
+ * ```
+ * @prop String key | The mouse button that can be used for dragging
+ * @prop Boolean dragged | Whether the object is currently being dragged
+ * @prop Rect/null bounds | The bounds in which the object can be dragged
+ */
 class DRAGGABLE extends ElementScript {
+	/**
+	 * Makes the object draggable with the mouse.
+	 * @param String key | The mouse button that can be used to drag the object
+	 * @param Rect bounds? | The bounds in which the object can be dragged. Default is null
+	 */
 	init(obj, key = "Left", bounds = null) {
 		this.mouse = obj.engine.mouse;
 		this.dragged = false;
