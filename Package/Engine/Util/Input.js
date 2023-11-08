@@ -243,6 +243,7 @@ InputHandler.State = class State {
  * 	renderer.draw(color).circle(width / 2, height / 2, 50);
  * });
  * ```
+ * @prop String[] downQueue | A list of all the key presses that in the last frame. Unlike the normal key identifiers, these will include capital letters if a capital letter was typed, and the order will match the order in which the keys were pressed
  */
 class KeyboardHandler extends InputHandler {
 	constructor(engine) {

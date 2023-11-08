@@ -86,4 +86,4 @@ for (const file in pathToDocumentation) {
 
 writeFile("index.js", `const paths = ${JSON.stringify(structure)}; const completeness = ${JSON.stringify(completeness)};`);
 
-console.log("Documentation Statistics: ", stats);
+console.log("Documentation Statistics:", stats);

@@ -3,8 +3,16 @@ const { highlight, highlighters, inferLanguage } = require("./highlight");
 
 const stats = {
 	classes: 0,
-	functions: 0
+	functions: 0,
+	words: 0,
+	parameters: 0,
+	properties: 0
 };
+
+function wordCount(text) {
+	stats.words += text.trim().replace(/\W+/, " ").split(" ").length;
+	return text;
+}
 
 function sourceLink(doc) {
 	return `https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/${doc.source.file}?#L${doc.source.line}`;
@@ -33,6 +41,7 @@ function documentFunction(fn, wrapperClass) {
 	const returnType = fn.lines.find(line => line.category === "return")?.type ?? "void";
 	const parameters = signatures
 		.map(params => {
+			stats.parameters += params.length;
 			if (params.length)
 				return params
 					.map(param => `<span class="param">${param.name}</span>`)
@@ -56,7 +65,7 @@ function documentFunction(fn, wrapperClass) {
 								<span class="type">${param.type}</span>
 							</div>
 							<div class="param desc">
-								${param.description}
+								${wordCount(param.description)}
 							</div>
 						</div>
 					`).join("")
@@ -71,7 +80,7 @@ function documentFunction(fn, wrapperClass) {
 				${header}
 			</div>
 			<div class="function desc">
-				${description}
+				${wordCount(description)}
 			</div>
 			${signatures.length ? `
 				<div class="function-signature">
@@ -95,7 +104,7 @@ function document(doc, topLevelIDs, file) {
 				</div>
 
 				<div class="page desc">
-					${description}
+					${wordCount(description)}
 				</div>
 
 			</div>
@@ -122,14 +131,14 @@ function document(doc, topLevelIDs, file) {
 			.join("");
 		const memberProperties = doc.lines
 			.filter(line => line.category?.indexOf("prop") > -1)
-			.map(line => `
+			.map(line => (stats.properties++, `
 				<div class="prop-wrapper">
 					<div class="prop-header member">
 						<span class="prop-name">${line.name}</span><span class="type">${line.type}</span>
 					</div>
 					<div class="prop desc">${line.description}</div>
 				</div>
-			`)
+			`))
 			.join("");
 		result = `
 			<div class="class-wrapper" id="${doc.name.base}">
@@ -137,7 +146,7 @@ function document(doc, topLevelIDs, file) {
 					<span class="keyword">${[...classQualifiers, doc.name.isEnum ? "enum" : "class"].join(" ")}</span> ${name}
 				</div>
 				<div class="class desc">
-				${description}
+					${wordCount(description)}
 				</div>
 				${subclass ? `
 					<div class="header">Subclasses</div>

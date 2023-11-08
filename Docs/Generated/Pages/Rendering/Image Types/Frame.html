@@ -12,7 +12,7 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L260" class="class-name source-link">Frame</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
 				</div>
 				<div class="class desc">
-				Represents an offscreen drawing surface that can be rendered as an image.
+					Represents an offscreen drawing surface that can be rendered as an image.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> frame</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CONSTANT"> Frame</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">);
 
 </span><span class="highlight-COMMENT">// add shapes to the frame</span><span class="highlight-SYMBOL">
@@ -337,7 +337,7 @@ The copy will have the same pixel ratio as the original image.
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\WebGLRenderer.js?#L505" class="class-name source-link">FastFrame</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
 				</div>
 				<div class="class desc">
-				This class has the same behavior as Frame, except that the renderer for this class cannot render text or concave polygons.
+					This class has the same behavior as Frame, except that the renderer for this class cannot render text or concave polygons.
 Creating instances of this class is drastically more expensive than creating a Frame, but after it's created, it is generally 10x-100x faster than Frame.
 Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
 				</div>
