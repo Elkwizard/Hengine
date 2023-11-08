@@ -63,4 +63,4 @@ Before using the Hengine, it must be included in your HTML file in one of two po
 
 ## Documentation
 
-The documentation for the Hengine can be found [here](https://elkwizard.github.io/Hengine/Docs/Generated/Pages/index.html).
+The documentation for the Hengine can be found [here](https://elkwizard.github.io/Hengine/Docs/Generated/index.html).
