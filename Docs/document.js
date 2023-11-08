@@ -3,7 +3,7 @@ const { highlight, highlighters, inferLanguage } = require("./highlight");
 
 
 function sourceLink(doc) {
-	return `https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/${doc.source.file}?#L${doc.source.line}`;
+	return `https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/${doc.source.file}?#L${doc.source.line}`;
 }
 
 function documentName(name, doc, wrapperClass) {
