@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { parse } = require("./parse.js");
-const { document } = require("./document.js");
+const { document, stats } = require("./document.js");
 
 const generate = (transf, srcFile, srcRoot = srcFile) => {
 	if (fs.lstatSync(srcFile).isDirectory())
@@ -86,4 +86,4 @@ for (const file in pathToDocumentation) {
 
 writeFile("index.js", `const paths = ${JSON.stringify(structure)}; const completeness = ${JSON.stringify(completeness)};`);
 
-// console.log(docs);
+console.log("Documentation Statistics: ", stats);

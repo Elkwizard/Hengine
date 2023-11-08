@@ -1,12 +1,19 @@
 const path = require("path");
 const { highlight, highlighters, inferLanguage } = require("./highlight");
 
+const stats = {
+	classes: 0,
+	functions: 0
+};
 
 function sourceLink(doc) {
 	return `https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/${doc.source.file}?#L${doc.source.line}`;
 }
 
 function documentName(name, doc, wrapperClass) {
+	if (name.isClass) stats.classes++;
+	else stats.functions++;
+
 	let result = name.base;
 	if (name.isPage) return `<span class="page-name">${result}</span>`
 	if (name.isStatic) result = `${wrapperClass}.${result}`;
@@ -180,4 +187,4 @@ function document(doc, topLevelIDs, file) {
 	return result;
 }
 
-module.exports = { document };
+module.exports = { document, stats };
