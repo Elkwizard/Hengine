@@ -30,6 +30,10 @@ class Constraint {
         const { physicsEngine } = this.engine.scene;
         physicsEngine.removeConstraint(this.physicsConstraint.id);
     }
+
+	static fromPhysicsConstraint(constraint, engine) {
+		return new (constraint instanceof PhysicsConstraint2 ? Constraint2 : Constraint1)(constraint, engine);
+	}
 }
 
 /**
