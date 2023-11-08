@@ -38,11 +38,36 @@
 			"Operable": null,
 			"Lazy": null
 		},
+		"Scripts": {
+			"ElementScript": null,
+			"ScriptContainer": null
+		},
 		"Rendering": {
 			"GLSL API": null,
-			"CanvasImage": ["CanvasImage", "ScalingMode"],
+			"Font": null,
+			"Camera": null,
+			"Color": null,
+			"Gradient": null,
+			"GrayMap": null,
+			"TileMap": null,
+			"Renderer": {
+				"Artist": [
+					"Artist",
+					"TextMode",
+					"LineCap",
+					"LineJoin"
+				],
+				"PathRenderer": null,
+				"Renderers": [
+					"DrawRenderer",
+					"StrokeRenderer",
+					"ClipRenderer",
+					"ImageRenderer"
+				]
+			},
 			"Image Types": {
 				"ImageType": null,
+				"CanvasImage": ["CanvasImage", "ScalingMode"],
 				"Frame": ["Frame", "FastFrame"],
 				"HImage": null,
 				"VideoView": null,
@@ -53,14 +78,7 @@
 				"StaticImage": null,
 				"GPUShader": ["GPUShader", "GLSLError"],
 				"GraphPlane": ["GraphPlane", "Graph"]
-			},
-			"Font": null,
-			"Renderer": ["Artist", "LineCap", "LineJoin"],
-			"Camera": null,
-			"Color": null,
-			"Gradient": null,
-			"GrayMap": null,
-			"TileMap": null
+			}
 		},
 		"Geometry": {
 			"Shapes": {
@@ -100,10 +118,6 @@
 			"PHYSICS": null,
 			"Constraint": ["Constraint", "Constraint1", "Constraint2"],
 			"CollisionMonitor": ["CollisionMonitor", "CollisionData"]
-		},
-		"Scripts": {
-			"ElementScript": null,
-			"ScriptContainer": null
 		},
 		"Sound": {
 			"Sound": ["Sound", "SoundInstance"],

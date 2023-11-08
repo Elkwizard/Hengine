@@ -1,0 +1,692 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="DrawRenderer">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1239" class="class-name source-link">DrawRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#PathRenderer">PathRenderer</a></span>
+				</div>
+				<div class="class desc">
+				Represents the draw API of an <a href="../../../Pages/Rendering/Renderer/Artist.html#Artist">Artist</a>.
+This fills various paths.
+				</div>
+				
+				
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="StrokeRenderer">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1245" class="class-name source-link">StrokeRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#PathRenderer">PathRenderer</a></span>
+				</div>
+				<div class="class desc">
+				Represents the stroke API of an <a href="../../../Pages/Rendering/Renderer/Artist.html#Artist">Artist</a>.
+This outlines various paths.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1251" class="function-name source-link">connector</a>(<span class="param">points</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders a series of connected line segments.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">points</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a>[]</span>
+							</div>
+							<div class="param desc">
+								The points to connect
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1257" class="function-name source-link">spline/splineArrow</a>(<span class="param">spline</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders a quartic spline. For <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">splineArrow</span><span class="highlight-SYMBOL">()</span></code>, there is also an arrow-head at the end.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">spline</span>
+								<span class="type"><a href="../../../Pages/Geometry/Shapes/Spline.html#Spline">Spline</a></span>
+							</div>
+							<div class="param desc">
+								The spline to render
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1272" class="function-name source-link">line/arrow</a>(<span class="param">line</span><span class="aux"> | </span><span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders a line segment. For <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">arrow</span><span class="highlight-SYMBOL">()</span></code>, there is also an arrow-head at the end.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">line</span>
+								<span class="type"><a href="../../../Pages/Geometry/Shapes/Line.html#Line">Line</a></span>
+							</div>
+							<div class="param desc">
+								The line segment
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">a</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The first point
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">b</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The second point
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x1</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the first point
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y1</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the first point
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x2</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the second point
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y2</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the second point
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1293" class="function-name source-link">measure</a>(<span class="param">font</span>, <span class="param">text</span>, <span class="param">line</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders a line segment with a line of text displayed in its center.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">font</span>
+								<span class="type"><a href="../../../Pages/Rendering/Font.html#Font">Font</a></span>
+							</div>
+							<div class="param desc">
+								The font to use for the text
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">text</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The text to render
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">line</span>
+								<span class="type"><a href="../../../Pages/Geometry/Shapes/Line.html#Line">Line</a></span>
+							</div>
+							<div class="param desc">
+								The line segment
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">font</span>
+								<span class="type"><a href="../../../Pages/Rendering/Font.html#Font">Font</a></span>
+							</div>
+							<div class="param desc">
+								The font to use for the text
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">text</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The text to render
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">a</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The first point
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">b</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The second point
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">font</span>
+								<span class="type"><a href="../../../Pages/Rendering/Font.html#Font">Font</a></span>
+							</div>
+							<div class="param desc">
+								The font to use for the text
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">text</span>
+								<span class="type">String</span>
+							</div>
+							<div class="param desc">
+								The text to render
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x1</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the first point
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y1</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the first point
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x2</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the second point
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y2</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the second point
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1311" class="function-name source-link">arcArrow</a>(<span class="param">center</span>, <span class="param">radius</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">radius</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders an arrow-head at the end of an arc on a circle.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">center</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The center of the circle
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">radius</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The radius of the circle
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">begin</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The initial clockwise angle (in radians) from the horizontal of the arc
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">end</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The final clockwise angle (in radians) from the horizontal of the arc
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">counterClockwise</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the path from the initial to final angle should be counter-clockwise. Default is false
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the circle's center
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the circle's center
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">radius</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The radius of the circle
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">begin</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The initial clockwise angle (in radians) from the horizontal of the arc
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">end</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The final clockwise angle (in radians) from the horizontal of the arc
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">counterClockwise</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the path from the initial to final angle should be counter-clockwise. Default is false
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="ClipRenderer">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1359" class="class-name source-link">ClipRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#PathRenderer">PathRenderer</a></span>
+				</div>
+				<div class="class desc">
+				Represents the clipping API of an <a href="../../../Pages/Rendering/Renderer/Artist.html#Artist">Artist</a>.
+This adds various shapes to the current clipping mask.
+Each path created will be added to the current clipping state, which means that future draw calls will be able to modify the pixels outside the current clipped area.
+				</div>
+				
+				
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="ImageRenderer">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1318" class="class-name source-link">ImageRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#PathRenderer">PathRenderer</a></span>
+				</div>
+				<div class="class desc">
+				Represents the image drawing API of an <a href="../../../Pages/Rendering/Renderer/Artist.html#Artist">Artist</a>.
+This draws images in various paths. 
+For non-rectangular shapes, the image is scaled to be the size of the shape's bounding box, and then only the portion of the image inside the shape is shown.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1328" class="function-name source-link">default</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders an image at its natural dimensions.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The upper-left corner of the image
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the upper-left corner of the image
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the upper-left corner of the image
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1340" class="function-name source-link">inferWidth</a>(<span class="param">point</span>, <span class="param">height</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">height</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders an image with a specified height, while still maintaining its natural aspect ratio.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The upper-left corner of the image
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The height of the image
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the upper-left corner of the image
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the upper-left corner of the image
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The height of the image
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\Renderer.js?#L1352" class="function-name source-link">inferHeight</a>(<span class="param">point</span>, <span class="param">width</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders an image with a specified width, while still maintaining its natural aspect ratio.
+			</div>
+			
+			<div class="function-signature">
+				
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The upper-left corner of the image
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The width of the image
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the upper-left corner of the image
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the upper-left corner of the image
+							</div>
+						</div>
+					
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type">Number</span>
+							</div>
+							<div class="param desc">
+								The width of the image
+							</div>
+						</div>
+					
+		
+			</div>
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

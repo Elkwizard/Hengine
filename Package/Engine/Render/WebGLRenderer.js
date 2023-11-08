@@ -498,7 +498,7 @@ class WebGLArtist {
 }
 
 /**
- * This class has the same behavior as Frame, except that the renderer for this class cannot render text.
+ * This class has the same behavior as Frame, except that the renderer for this class cannot render text or concave polygons.
  * Creating instances of this class is drastically more expensive than creating a Frame, but after it's created, it is generally 10x-100x faster than Frame.
  * Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
  */

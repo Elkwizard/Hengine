@@ -2,15 +2,58 @@
 const TextModeX = defineEnum("LEFT", "CENTER", "RIGHT");
 const TextModeY = defineEnum("TOP", "CENTER", "BOTTOM");
 
+/**
+ * @name const TextMode = defineEnum
+ * Specifies where on a string of text should be considered its origin.
+ * @static_prop Symbol [HORIZONTAL]_[VERTICAL] | Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
+ */
 const TextMode = {};
 for (let x in TextModeX) for (let y in TextModeY) {
 	TextMode[y + "_" + x] = [TextModeX[x], TextModeY[y]];
 }
 
+/**
+ * Represents the way in which colors being added to a surface should interact with those already there.
+ * @static_prop Symbol ADD | New colors should be component-wise added to the existing colors
+ * @static_prop Symbol COMBINE | New colors should be blended with old colors based on opacity
+ */
 const BlendMode = defineEnum("ADD", "COMBINE");
+/**
+ * Represents the way in which consecutive line segments should connect.
+ * @static_prop Symbol MITER | The edges of the lines will be extended until they meet
+ * @static_prop Symbol BEVEL | The edges of the lines will be connected straight across
+ * @static_prop Symbol ROUND | The gap between the lines will be filled with an arc
+ */
 const LineJoin = defineEnum("MITER", "BEVEL", "ROUND");
+/**
+ * Represents the way the ends of line segments will be displayed.
+ * @static_prop Symbol FLAT | The lines will have square ends that extend just to the end of the line
+ * @static_prop Symbol SQUARE | The lines will have square ends that extend half their side length past the end of the line
+ * @static_prop Symbol ROUND | The lines will end with half-circles
+ */
 const LineCap = defineEnum("FLAT", "SQUARE", "ROUND");
 
+/**
+ * Represents a renderer for a graphical surface.
+ * ```js
+ * renderer.draw(new Color("blue")).shape(Polygon.regular(5, 100).move(middle));
+ * renderer.stroke(new Color("red"), 20, LineCap.SQUARE, LineJoin.ROUND).connector([
+ * 	new Vector2(0, 0),
+ * 	new Vector2(50, 100),
+ * 	new Vector2(150, 200),
+ * 	new Vector2(300, 100)
+ * ]);
+ * 
+ * renderer.clip().circle(0, 0, 100);
+ * renderer.draw(new Color("lime")).rect(0, 0, 80, 80);
+ * renderer.unclip();
+ * ```
+ * @prop ImageType imageType | The surface on which the renderer renders
+ * @prop TextMode textMode | The current text-alignment mode. Starts as `TextMode.TOP_LEFT`
+ * @prop BlendMode blendMode | The current color-blending mode. Starts as `BlendMode.COMBINE`
+ * @prop Number alpha | The current global alpha. This will multiply the alpha of all other drawing calls. Starts as 1
+ * @prop Boolean preservePixelart | Whether or not image smoothing will be prevented when upscaling. Starts as true
+ */
 class Artist {
 	constructor(canvas, width, height, imageType, pixelRatio) {
 		this.canvas = canvas;
@@ -633,10 +676,18 @@ class Artist {
 	get alpha() {
 		return this._alpha;
 	}
+	/**
+	 * Sets the current coordinate transform of the renderer.
+	 * @param Matrix3 transform | The new transform
+	 */
 	set transform(a) {
 		const m = a;
 		this.c.setTransform(m[0] * this.pixelRatio, m[1] * this.pixelRatio, m[3] * this.pixelRatio, m[4] * this.pixelRatio, m[6] * this.pixelRatio, m[7] * this.pixelRatio);
 	}
+	/**
+	 * Returns the current coordinate transform of the renderer.
+	 * @return Matrix3
+	 */
 	get transform() {
 		const { a, b, c, d, e, f } = this.c.getTransform();
 		const ratio = 1 / this.pixelRatio;
@@ -646,6 +697,11 @@ class Artist {
 			0, 0, 1
 		);
 	}
+	/**
+	 * Calls a function while using a specified coordinate transform
+	 * @param Matrix3 transform | The specific global coordinate transform to use
+	 * @param Function draw | The function that will be called while using the specified transform
+	 */
 	drawThrough(transform, draw) {
 		this.save();
 		this.transform = transform;
@@ -663,17 +719,26 @@ class Artist {
 		this.alpha = al;
 		this.preservePixelart = px;
 	}
-	multiplyTransform(newTransform) {
-		this.c.transform(newTransform[0], newTransform[1], newTransform[3], newTransform[4], newTransform[6], newTransform[7]);
-	}
 	setCursor(cursor) {
 		let style = this.canvas.style;
 		if ("cursor" in style) style.cursor = cursor;
 	}
+	/**
+	 * Returns the color of a specific pixel in natural-space.
+	 * @param Number x | The x coordinate of the pixel
+	 * @param Number y | The y coordinate of the pixel
+	 * @return Color
+	 */
 	getPixel(x, y) {
 		let d = this.c.getImageData(x * this.pixelRatio, y * this.pixelRatio, 1, 1).data;
 		return new Color(d[0], d[1], d[2], d[3] / 255);
 	}
+	/**
+	 * Sets the color of a specific pixel in natural-space.
+	 * @param Number x | The x coordinate of the pixel
+	 * @param Number y | The y coordinate of the pixel
+	 * @param Color color | The new color for the pixel 
+	 */
 	setPixel(x, y, col) {
 		let data = new Uint8ClampedArray(4);
 		data[0] = col.red;
@@ -697,10 +762,23 @@ class Artist {
 		if (color instanceof Color) c = color.getRGBA();
 		return c;
 	}
+	/**
+	 * Returns a drawing API that uses a specified color.
+	 * @param Color color | The fill color
+	 * @return DrawRenderer
+	 */
 	draw(color) {
 		this.c.fillStyle = this.getContextColor(color);
 		return this.drawObj;
 	}
+	/**
+	 * Returns a stroke API that uses specific settings.
+	 * @param Color color | The outline color
+	 * @param Number lineWidth? | The width of the outline in pixels. Default is 1
+	 * @param LineCap lineCap? | The line cap to use. Default is `LineCap.FLAT`
+	 * @param LineJoin lineJoin? | The line join to use for connected segments. Default is `LineJoin.BEVEL`
+	 * @return DrawRenderer
+	 */
 	stroke(color, lineWidth = 1, lineCap = LineCap.FLAT, lineJoin = LineJoin.BEVEL) {
 		this.c.strokeStyle = this.getContextColor(color);
 		this.c.lineJoin = this.lineJoinMap.get(lineJoin);
@@ -714,55 +792,144 @@ class Artist {
 		if (width * height === 0) return;
 		this.c.drawImage(this.currentImageCIS, x, y, width, height);
 	}
+	/**
+	 * Returns an image rendering API that uses a specified image.
+	 * @param ImageType image | The image to render
+	 * @return ImageRenderer
+	 */
 	image(img) {
 		this.currentImageCIS = img.makeImage();
 		this.currentImage = img;
 		return this.imageObj;
 	}
+	/**
+	 * Returns a clipping API.
+	 * @return ClipRenderer
+	 */
 	clip() {
 		this.save();
 		return this.clipObj;
 	}
+	/**
+	 * Undoes the last clipping operation performed in the current state stack.
+	 */
 	unclip() {
 		this.restore();
 	}
 	sigmoid(x) {
 		return 1 / (1 + (Math.E ** -x));
 	}
+	/**
+	 * Multiplies the current coordinate transform in-place by a matrix on the right side.
+	 * @param Matrix3 newTransform | The matrix to multiply the current transform by
+	 */
+	multiplyTransform(newTransform) {
+		this.c.transform(newTransform[0], newTransform[1], newTransform[3], newTransform[4], newTransform[6], newTransform[7]);
+	}
+	/**
+	 * In a transform with no translation, rotation, or scaling, this flips the x axis about the middle of the screen.
+	 */
 	invertX() {
 		this.translate(this.width, 0);
 		this.scale(-1, 1);
 	}
+	/**
+	 * In a transform with no translation rotation, or scaling, this flips the y axis about the middle of the screen.
+	 */
 	invertY() {
 		this.translate(0, this.height);
 		this.scale(1, -1);
 	}
+	/**
+	 * Changes the coordinate transform by displacing it.
+	 * @signature
+	 * @param Vector2 displacement | The displacement
+	 * @signature
+	 * @param Number x | The displacement along the x axis
+	 * @param Number y | The displacement along the y axis
+	 */
 	translate(x, y) {
 		if (typeof x === "object") ({ x, y } = x);
 		this.c.translate(x, y);
 	}
+	/**
+	 * Changes the coordinate transform by scaling it.
+	 * @signature
+	 * @param Vector2 factors | The scaling factors for both axes
+	 * @signature
+	 * @param Number x | The scaling along the x axis
+	 * @param Number y | The scaling along the y axis.
+	 * @signature
+	 * @param Number factor | The scaling factor for both axes
+	 */
 	scale(x, y = x) {
 		if (typeof x === "object") ({ x, y } = x);
 		this.c.scale(x, y);
 	}
+	/**
+	 * Changes the coordinate transform by rotating it clockwise by a specified angle.
+	 * @param Number angle | The amount to rotate by, in radians
+	 */
 	rotate(a) {
 		this.c.rotate(a);
 	}
+	/**
+	 * Changes the coordinate transform by rotating it clockwise about a specified point.
+	 * @signature
+	 * @param Vector2 point | The point to rotate about
+	 * @param Number angle | The angle to rotate by
+	 * @signature
+	 * @param Number x | The x coordinate to rotate about
+	 * @param Number y | The y coordinate to rotate about
+	 * @param Number angle | The angle to rotate by
+	 */
+	rotateAround(x, y, r) {
+		if (typeof x === "object") {
+			r = y;
+			({ x, y }) = x;
+		}
+		this.translate(x, y);
+		this.rotate(r);
+		this.translate(-x, -y);
+	}
+	/**
+	 * Returns the renderer to the identity coordinate transform.
+	 */
 	clearTransformations() {
 		this.c.resetTransform();
 		this.scale(this.pixelRatio);
 	}
+	/**
+	 * Pushes the current rendering state onto the state stack.
+	 * This state includes `.alpha` and `.transform`, 
+	 */
 	save() {
 		this.c.save();
 	}
+	/**
+	 * Puts the renderer into the state on top of the state stack, then removes it from the stack.
+	 */
 	restore() {
 		this.c.restore();
 		this._alpha = this.c.globalAlpha;
 	}
+	/**
+	 * Clears a rectangular region of the surface to transparent black.
+	 * @signature
+	 * @param Rect region | The region to clear
+	 * @signature
+	 * @param Number x | The x coordinate of the region to clear
+	 * @param Number y | The y coordinate of the region to clear
+	 * @param Number width | The width of the region to clear 
+	 * @param Number height | The height of the region to clear 
+	 */
 	clearRect(x, y, width, height) {
 		if (typeof x === "object") ({ x, y, width, height } = x);
 		this.c.clearRect(x, y, width, height);
 	}
+	/**
+	 * Clears the rendering surface to transparent black.
+	 */
 	clear() {
 		this.c.save();
 		this.c.resetTransform();
@@ -775,14 +942,13 @@ class Artist {
 	afterFrame() {
 
 	}
+	/**
+	 * Assuming that the current transform is the identity transformation, this fills the surface with a single color. If the color is transparent, it will simply layer on top of the current content.
+	 * @param Color color | The color to fill with
+	 */
 	fill(color) {
 		this.c.fillStyle = this.getContextColor(color);
 		this.c.fillRect(0, 0, this.width, this.height);
-	}
-	rotateAround(x, y, r) {
-		this.translate(x, y)
-		this.rotate(r);
-		this.translate(-x, -y);
 	}
 	drawWithAlpha(a, shape) {
 		const prev = this.alpha;
@@ -947,3 +1113,246 @@ class Artist {
 		return function () { };
 	}
 }
+
+/**
+ * @name class PathRenderer
+ * Represents a generic drawing API of an Artist.
+ * The exact operation used to render the paths is specified in subclasses, but this class which shapes are possible and how they are specified.
+ * @abstract
+ */
+
+/**
+ * @name circle
+ * Creates a circular path.
+ * @signature
+ * @param Circle circle | The shape of the circle
+ * @signature
+ * @param Vector2 center | The center of the circle
+ * @param Number radius | The radius of the circle
+ * @signature
+ * @param Number x | The x coordinate of the circle's center
+ * @param Number y | The y coordinate of the circle's center
+ * @param Number radius | The radius of the circle
+ */
+
+/**
+ * @name ellipse
+ * Creates an elliptical path.
+ * @param Number x | The x coordinate of the ellipse's center
+ * @param Number y | The y coordinate of the ellipse's center
+ * @param Number radiusX | The x-axis radius of the ellipse
+ * @param Number radiusY | The y-axis radius of the ellipse
+ */
+
+/**
+ * @name rect
+ * Creates a rectangular path.
+ * @signature
+ * @param Rect rectangle | The shape of the rectangle
+ * @signature
+ * @param Number x | The x coordinate of the rectangle's upper-left corner
+ * @param Number y | The y coordinate of the rectangle's upper-left corner
+ * @param Number width | The width of the rectangle
+ * @param Number height | The height of the rectangle
+ */
+
+/**
+ * @name triangle
+ * Creates a triangular path.
+ * @signature
+ * @param Polygon triangle | The shape of the path
+ * @signature
+ * @param Vector2 a | The first point of the triangle
+ * @param Vector2 b | The second point of the triangle
+ * @param Vector2 c | The last point of the triangle
+ */
+
+/**
+ * @name shape
+ * Creates a polygonal path.
+ * @signature
+ * @param Vector2[] vertices | The vertices of the polygon
+ * @signature
+ * @param Polygon polygon | The shape of the polygon
+ */
+
+/**
+ * @name infer
+ * Creates a path with a shape based on the type of its argument.
+ * @param Shape shape | The shape to render
+ */
+
+/**
+ * @name text
+ * Creates a path in the shape of a sequence of characters.
+ * @signature
+ * @param Font font | The font to use in rendering the text
+ * @param String text | The text to render
+ * @param Vector2 origin | The location of the text's origin. How this is interpreted depends on the current text-alignment mode.
+ * @param Number? packWidth | The maximum allowed width of a single line of the text. Specifying this parameter will cause the newlines to be added to enforce this requirement. If this parameter is not specified, the text will not be packed
+ * @signature
+ * @param Font font | The font to use in rendering the text
+ * @param String text | The text to render
+ * @param Number x | The x coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
+ * @param Number y | The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
+ * @param Number? packWidth | The maximum allowed width of a single line of the text. Not specifying this will prevent packing
+ */
+
+/**
+ * @name textLine
+ * Creates a path in the shape of a single-line sequence of characters.
+ * This method is faster than `.text()`.
+ * @signature
+ * @param Font font | The font to use in rendering the text
+ * @param String text | The text to render
+ * @param Vector2 origin | The location of the text's origin. How this is interpreted depends on the current text-alignment mode.
+ * @signature
+ * @param Font font | The font to use in rendering the text
+ * @param String text | The text to render
+ * @param Number x | The x coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
+ * @param Number y | The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
+ */
+
+/**
+ * @group sector, arc
+ * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
+ * @signature
+ * @param Vector2 center | The center of the circle
+ * @param Number radius | The radius of the circle
+ * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the section
+ * @param Number end | The final clockwise angle (in radians) from the horizontal of the section
+ * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
+ * @signature
+ * @param Number x | The x coordinate of the circle's center
+ * @param Number y | The y coordinate of the circle's center
+ * @param Number radius | The radius of the circle
+ * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the section
+ * @param Number end | The final clockwise angle (in radians) from the horizontal of the section
+ * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
+ */
+
+/**
+ * @name class DrawRenderer extends PathRenderer
+ * Represents the draw API of an Artist.
+ * This fills various paths.
+ */
+
+/**
+ * @name class StrokeRenderer extends PathRenderer
+ * Represents the stroke API of an Artist.
+ * This outlines various paths.
+ */
+
+/**
+ * @name connector
+ * Renders a series of connected line segments.
+ * @param Vector2[] points | The points to connect
+ */
+
+/**
+ * @name spline/splineArrow
+ * Renders a quartic spline. For `.splineArrow()`, there is also an arrow-head at the end.
+ * @param Spline spline | The spline to render
+ */
+
+/**
+ * @name line/arrow
+ * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
+ * @signature
+ * @param Line line | The line segment
+ * @signature
+ * @param Vector2 a | The first point
+ * @param Vector2 b | The second point
+ * @signature
+ * @param Number x1 | The x coordinate of the first point
+ * @param Number y1 | The y coordinate of the first point
+ * @param Number x2 | The x coordinate of the second point
+ * @param Number y2 | The y coordinate of the second point
+ */
+
+/**
+ * @name measure
+ * Renders a line segment with a line of text displayed in its center.
+ * @signature
+ * @param Font font | The font to use for the text
+ * @param String text | The text to render
+ * @param Line line | The line segment
+ * @signature
+ * @param Font font | The font to use for the text
+ * @param String text | The text to render
+ * @param Vector2 a | The first point
+ * @param Vector2 b | The second point
+ * @signature
+ * @param Font font | The font to use for the text
+ * @param String text | The text to render
+ * @param Number x1 | The x coordinate of the first point
+ * @param Number y1 | The y coordinate of the first point
+ * @param Number x2 | The x coordinate of the second point
+ * @param Number y2 | The y coordinate of the second point
+ */
+
+/**
+ * @name arcArrow
+ * Renders an arrow-head at the end of an arc on a circle.
+ * @signature
+ * @param Vector2 center | The center of the circle
+ * @param Number radius | The radius of the circle
+ * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the arc
+ * @param Number end | The final clockwise angle (in radians) from the horizontal of the arc
+ * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
+ * @signature
+ * @param Number x | The x coordinate of the circle's center
+ * @param Number y | The y coordinate of the circle's center
+ * @param Number radius | The radius of the circle
+ * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the arc
+ * @param Number end | The final clockwise angle (in radians) from the horizontal of the arc
+ * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
+ */
+
+/**
+ * @name class ImageRenderer extends PathRenderer
+ * Represents the image drawing API of an Artist.
+ * This draws images in various paths. 
+ * For non-rectangular shapes, the image is scaled to be the size of the shape's bounding box, and then only the portion of the image inside the shape is shown.
+ */
+
+/**
+ * @name default
+ * Renders an image at its natural dimensions.
+ * @signature
+ * @param Vector2 point | The upper-left corner of the image
+ * @signature
+ * @param Number x | The x coordinate of the upper-left corner of the image
+ * @param Number y | The y coordinate of the upper-left corner of the image
+ */
+
+/**
+ * @name inferWidth
+ * Renders an image with a specified height, while still maintaining its natural aspect ratio.
+ * @signature
+ * @param Vector2 point | The upper-left corner of the image
+ * @param Number height | The height of the image
+ * @signature
+ * @param Number x | The x coordinate of the upper-left corner of the image
+ * @param Number y | The y coordinate of the upper-left corner of the image
+ * @param Number height | The height of the image
+ */
+
+/**
+ * @name inferHeight
+ * Renders an image with a specified width, while still maintaining its natural aspect ratio.
+ * @signature
+ * @param Vector2 point | The upper-left corner of the image
+ * @param Number width | The width of the image
+ * @signature
+ * @param Number x | The x coordinate of the upper-left corner of the image
+ * @param Number y | The y coordinate of the upper-left corner of the image
+ * @param Number width | The width of the image
+ */
+
+/**
+ * @name class ClipRenderer extends PathRenderer
+ * Represents the clipping API of an Artist.
+ * This adds various shapes to the current clipping mask.
+ * Each path created will be added to the current clipping state, which means that future draw calls will be able to modify the pixels outside the current clipped area.
+ */

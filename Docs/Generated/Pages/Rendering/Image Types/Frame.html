@@ -33,7 +33,7 @@
 					<div class="class-properties">
 				<div class="prop-wrapper">
 					<div class="prop-header member">
-						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Renderer.html#Artist">Artist</a></span>
+						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Renderer/Artist.html#Artist">Artist</a></span>
 					</div>
 					<div class="prop desc">The renderer local to the frame that can be used to modify its contents</div>
 				</div>
@@ -332,7 +332,7 @@ The copy will have the same pixel ratio as the original image.
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/new-documentation/Package/Engine/Render\WebGLRenderer.js?#L505" class="class-name source-link">FastFrame</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
 				</div>
 				<div class="class desc">
-				This class has the same behavior as Frame, except that the renderer for this class cannot render text.
+				This class has the same behavior as Frame, except that the renderer for this class cannot render text or concave polygons.
 Creating instances of this class is drastically more expensive than creating a Frame, but after it's created, it is generally 10x-100x faster than Frame.
 Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
 				</div>
