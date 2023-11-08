@@ -251,6 +251,7 @@ class ScriptContainer {
 	/**
 	 * Adds a new script to the object. Returns the result of the `.init()` listener.
 	 * This also defines a property with the name of the script (e.g. `.MY_SCRIPT` for a script defined as `class MY_SCRIPT extends ElementScript { ... }`) containing the script instance.
+	 * None of the listeners on this script will be called until the next frame.
 	 * @param Class script | The script to add
 	 * @param  Array ...args | The initialization arguments to pass to the `.init()` listener.
 	 * @return Any
