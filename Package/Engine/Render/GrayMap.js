@@ -14,7 +14,7 @@ class GrayMap {
 	 * Creates a new GrayMap based on an intensity function.
 	 * @param Number width | The width of the map 
 	 * @param Number height | The height of the map 
-	 * @param Function rule | A function to be called for each coordinate pair to generate the intensity values
+	 * @param (Number, Number) => Number rule | A function to be called for each coordinate pair to generate the intensity values
 	 */
 	constructor(w, h, rule = null) {
 		w = Math.floor(w);

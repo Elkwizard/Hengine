@@ -85,7 +85,7 @@ class ElementScript {
 	 * This is called when the script is added to the object.
 	 * The non-initial arguments to `ScriptContainer.scripts.add()` are passed to this event.
 	 * The return value of this function will be returned from `ScriptContainer.scripts.add()`.
-	 * @param Array ...args | The initialization arguments
+	 * @param Any[] ...args | The initialization arguments
 	 * @return Any
 	 */
 	/**
@@ -184,7 +184,7 @@ class ElementScript {
 	 * @name addScript
 	 * This is called when a script (including this one) is added to the object.
 	 * @param Class script | The script being added
-	 * @param Array ...args | The initialization arguments for the script
+	 * @param Any[] ...args | The initialization arguments for the script
 	 */
 }
 

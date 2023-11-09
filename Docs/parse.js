@@ -105,8 +105,11 @@ function parse(content, file) {
 				case "static_prop":
 				case "param": {
 					const index = line.content.indexOf("|");
-					[line.type, line.name] = line.content.slice(0, index).split(" ");
 					line.description = line.content.slice(index + 1).trim();
+					const signature = line.content.slice(0, index).trim();
+					const spaceIndex = signature.lastIndexOf(" ");
+					line.name = signature.slice(spaceIndex + 1);
+					line.type = signature.slice(0, spaceIndex);
 
 					if (line.category === "static_prop")
 						line.name = `${match.name.base}.${line.name}`;

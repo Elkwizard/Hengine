@@ -250,7 +250,7 @@ class IntervalManager {
 	}
 	/**
 	 * Creates a new ContinuousFunction.
-	 * @param Function fn | The function to be executed every frame
+	 * @param () => void fn | The function to be executed every frame
 	 * @param Symbol type? | When during the update cycle to execute the function. Default is `IntervalFunction.AFTER_UPDATE`
 	 */
 	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
@@ -259,7 +259,7 @@ class IntervalManager {
 	}
 	/**
 	 * Creates a new TransitionFunction. Returns its `.done` promise.
-	 * @param Function fn | The function to execute over the duration. This function will be passed the completion proportion
+	 * @param Number => void fn | The function to execute over the duration. This function will be passed the completion proportion
 	 * @param Number frames | The duration of the transition
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
 	 * @return Promise
@@ -275,7 +275,7 @@ class IntervalManager {
 	 * @param String/Symbol property | The key of the animated property
 	 * @param Operable/Number finalValue | The value to animate to
 	 * @param Number duration | The duration of the animation
-	 * @param Function curve? | The easing function. Default is `Interpolation.linear`
+	 * @param Number => Number curve? | The easing function. Default is `Interpolation.linear`
 	 * @param Symbol type? | When during the update cycle to update the animation. Default is `IntervalFunction.BEFORE_UPDATE`
 	 * @return Promise
 	 */
@@ -287,7 +287,7 @@ class IntervalManager {
 	}
 	/**
 	 * Creates a new DelayedFunction. Returns its `.done` promise.
-	 * @param Function fn | The function to execute after the delay
+	 * @param () => void fn | The function to execute after the delay
 	 * @param Number frames | The length of the delay
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
 	 * @return Promise
@@ -298,8 +298,8 @@ class IntervalManager {
 	}
 	/**
 	 * Creates a new WaitUntilFunction. Returns its `.done` promise.
-	 * @param Function fn | The function to execute when the event occurs
-	 * @param Function event | The event function. When this function returns true, the function will execute
+	 * @param () => void fn | The function to execute when the event occurs
+	 * @param () => Boolean event | The event function. When this function returns true, the function will execute
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
 	 * @return Promise
 	 */
@@ -329,7 +329,7 @@ class ExitError {
 
 /**
  * Instantly crashes the engine and logs something to the console.
- * @param Array ...messages | Data to be logged
+ * @param Any[] ...messages | Data to be logged
  */
 function exit(...msg) {
 	IntervalManager.intervals = [];

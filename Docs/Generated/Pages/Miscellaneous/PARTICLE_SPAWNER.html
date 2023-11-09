@@ -35,21 +35,21 @@ All properties of this class are read-only.
 					<div class="class-properties">
 				<div class="prop-wrapper">
 					<div class="prop-header member">
-						<span class="prop-name">particleInit</span><span class="type">Function</span>
+						<span class="prop-name">particleInit</span><span class="type">Particle => void</span>
 					</div>
 					<div class="prop desc">The function that is called to initialize particles. This will be passed the particle object for each particle created. This uses the alternate key <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">init</span></code> when provided in a parameter. Default is a no-op</div>
 				</div>
 			
 				<div class="prop-wrapper">
 					<div class="prop-header member">
-						<span class="prop-name">particleUpdate</span><span class="type">Function</span>
+						<span class="prop-name">particleUpdate</span><span class="type">Particle => void</span>
 					</div>
 					<div class="prop desc">The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This uses the alternate key <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">update</span></code> when provided in a parameter. Default is a no-op</div>
 				</div>
 			
 				<div class="prop-wrapper">
 					<div class="prop-header member">
-						<span class="prop-name">particleDraw</span><span class="type">Function</span>
+						<span class="prop-name">particleDraw</span><span class="type">(<a href="../../Pages/Rendering/Renderer/Artist.html#Artist">Artist</a>, Particle) => void</span>
 					</div>
 					<div class="prop desc">The function that is called to render particles each frame. This will be passed an <a href="../../Pages/Rendering/Renderer/Artist.html#Artist">Artist</a> and a particle object for each particle object on-screen each frame. This uses the alternate key <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">draw</span></code> when provided in a parameter. Default is a no-op</div>
 				</div>

@@ -465,7 +465,7 @@ class FileSystem { };
 		 * Creates a new file if it doesn't exist.
 		 * Returns the content of the file.
 		 * @param String path | The file to write to
-		 * @param Function create | The function used to initially create the file content
+		 * @param () => Any create | The function used to initially create the file content
 		 * @return Any
 		 */
 		createFile(path, create) {

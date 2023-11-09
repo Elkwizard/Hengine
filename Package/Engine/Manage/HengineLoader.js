@@ -376,7 +376,7 @@ class HengineLoadingStructure {
 	 * Calls to this function while inside a call to this function will stack the contexts together, allowing nesting of folder scopes.
 	 * Returns the caller.
 	 * @param String path | The relative path to the folder to add to the context stack
-	 * @param Function fn | The function to call while in the context. This function is passed the caller as an argument
+	 * @param () => void fn | The function to call while in the context. This function is passed the caller as an argument
 	 * @return HengineLoadingStructure
 	 */
 	folder(name, fn) {
@@ -428,7 +428,7 @@ class HengineLoadingStructure {
 	/**
 	 * Adds a HengineAnimationResource to the queue with a specified source.
 	 * @param String src | The path to the resource
-	 * @param Object options? | An object containing `.frames`, `.delay`, and `.loops` properties that will be passed to the HengineAnimationResource constructor. These values have defaults of 1, 1, and true, respectively
+	 * @param { frames: Number, delay: Number, loops: Boolean } options? | An object containing `.frames`, `.delay`, and `.loops` properties that will be passed to the HengineAnimationResource constructor. These values have defaults of 1, 1, and true, respectively
 	 * @return HengineLoadingStructure
 	 */
 	animation(src, {
@@ -441,7 +441,7 @@ class HengineLoadingStructure {
 	/**
 	 * Adds a HengineVideoResource to the queue with a specified source.
 	 * @param String src | The path to the resource
-	 * @param Object options? | An object containing a `.loops` properties that will be passed to the HengineVideoResource constructor. The default value is true
+	 * @param { loops: Boolean } options? | An object containing a `.loops` properties that will be passed to the HengineVideoResource constructor. The default value is true
 	 * @return HengineLoadingStructure
 	 */
 	video(src, {
@@ -452,7 +452,7 @@ class HengineLoadingStructure {
 	/**
 	 * Adds a HengineSoundResource to the queue with a specified source.
 	 * @param String src | The path to the resource
-	 * @param Object options? | An object containing a `.loops` properties that will be passed to the HengineSoundResource constructor. The default value is true
+	 * @param { loops: Boolean } options? | An object containing a `.loops` properties that will be passed to the HengineSoundResource constructor. The default value is true
 	 * @return HengineLoadingStructure
 	 */
 	sound(src, {

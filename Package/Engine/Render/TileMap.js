@@ -11,7 +11,7 @@ class TileMap {
 	/**
 	 * Creates a new TileMap.
 	 * @param ImageType image | The overall sprite sheet
-	 * @param Object[] sections | The regions of the sprite sheet assigned to each sprite. Each entry in this list has a `.name` property, which is any unique identifier for the sprite, and a `.area` property, which is a Rect representing the natural region of the sprite sheet assigned to this name
+	 * @param { name: Any, area: Rect }[] sections | The regions of the sprite sheet assigned to each sprite. Each entry in this list has a `.name` property, which is any unique identifier for the sprite, and a `.area` property representing the natural region of the sprite sheet assigned to this name
 	 */
 	constructor(image, sections) {
 		this.image = image;

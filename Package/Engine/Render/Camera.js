@@ -181,7 +181,7 @@ class Camera extends Matrix3 {
 	}
 	/**
 	 * Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
-	 * @param Function render | The function to call while in the world-space context
+	 * @param () => void render | The function to call while in the world-space context
 	 */
 	drawInWorldSpace(artist) {
 		let renderer = this.engine.renderer;
@@ -192,7 +192,7 @@ class Camera extends Matrix3 {
 	}
 	/**
 	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
-	 * @param Function render | The function to call while in the screen-space context
+	 * @param () => void render | The function to call while in the screen-space context
 	 */
 	drawInScreenSpace(artist) {
 		let renderer = this.engine.renderer;

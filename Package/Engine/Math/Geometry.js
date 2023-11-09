@@ -538,7 +538,7 @@ class Geometry {
 	 * @param Vector2 rayOrigin | The starting point of the ray 
 	 * @param Vector2 rayDirection | The direction of the ray
 	 * @param Shape[] shapes | The Shapes to ray-cast against
-	 * @return Object/null
+	 * @return { hitShape: Shape, hitPoint: Vector2 }/null
 	 */
 	static rayCast(ro, rd, shapes) {
 		let hit = null;

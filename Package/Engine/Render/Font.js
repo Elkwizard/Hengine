@@ -137,7 +137,7 @@ class Font {
 	 * The return value contains `.width` and `.height` properties, both of which are Numbers.
 	 * @param String text | The text to be measured
 	 * @param Number maxWidth? | The maximum allowed width of a single line, default is Infinity
-	 * @return Object
+	 * @return { width: Number, height: Number }
 	 */
 	getTextBounds(str, pack) {
 		str = this.processString(str);

@@ -325,7 +325,7 @@ ByteBuffer.Writer = class {
 	/**
 	 * Writes an array of values to the buffer.
 	 * @param String type | The name of another method of this class that can be used to write each element of the array
-	 * @param Array data | The single-type array to write
+	 * @param Any[] data | The single-type array to write
 	 */
 	array(type, data) {
 		const { length } = data;
@@ -471,7 +471,7 @@ ByteBuffer.Reader = class {
 	 * Reads an array of values of a single type from the buffer.
 	 * @param String type | The name of another method of this class that can be used for reading each element 
 	 * @param Number count? | If specified, this value will be used as the length of the array. This allows for reading sequences of values not prefixed with a length, but not those produced by `ByteBuffer.Writer.prototype.array()`
-	 * @return Array
+	 * @return Any[]
 	 */
 	array(type, count = null) {
 		const length = count ?? this.uint32();

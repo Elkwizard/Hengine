@@ -1,7 +1,7 @@
 /**
  * Represents a single variable that can be graphed on a GraphPlane.
  * @prop String name | The displayed name of the variable
- * @prop Function y | A function which returns the current value of the variable
+ * @prop () => Number y | A function which returns the current value of the variable
  * @prop Number minY | The minimum displayed value of the variable. This is the lower bound of the vertical axis
  * @prop Number maxY | The maximum displayed value of the variable. This is the upper bound of the vertical axis
  * @prop Color color | The color of the graph of this variable
@@ -12,7 +12,7 @@ class Graph {
 	/**
 	 * Creates a new Graph.
 	 * @param String name | The displayed name of the variable
-	 * @param Function y | A function which returns the current value of the variable
+	 * @param () => Number y | A function which returns the current value of the variable
 	 * @param Number minY | The minimum displayed value of the variable
 	 * @param Number maxY | The maximum displayed value of the variable
 	 * @param Color color | The color of the graph of this variable

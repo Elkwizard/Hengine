@@ -72,8 +72,8 @@ class Scene {
 	 * Otherwise returns an object with a `.hitShape` property specifying which SceneObject was hit, and a `.hitPoint` property containing the point of intersection between the ray and the SceneObject.
 	 * @param Vector2 rayOrigin | The origin point of the ray
 	 * @param Vector2 rayDirection | The direction of the ray
-	 * @param Function mask? | A filter for which SceneObjects should be considered in the ray-cast. Default is `(object) => true`
-	 * @return Object
+	 * @param SceneObject => Boolean mask? | A filter for which SceneObjects should be considered in the ray-cast. Default is `(object) => true`
+	 * @return { hitShape: SceneObject, hitPoint: Vector2 }/null
 	 */
 	rayCast(origin, ray, mask = () => true) {
 		const elements = this.main.updateArray()

@@ -267,7 +267,7 @@ class ElementContainer extends SceneElement {
 	}
 	/**
 	 * Returns a conditional subset of all the leaf nodes within the container. 
-	 * @param Function mask | The function used to check which elements should be returned 
+	 * @param SceneObject => Boolean mask | The function used to check which elements should be returned 
 	 * @return SceneObject[]
 	 */
 	getElementsMatch(fn) {

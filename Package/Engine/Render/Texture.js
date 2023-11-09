@@ -156,7 +156,7 @@ class Texture extends ImageType {
 	}
 	/**
 	 * Applies an in-place mapping to every pixel in the texture. Returns the caller.
-	 * @param Function mapping | A shader function called for every pixel. The return value of this function, but it takes in three arguments: the x and y coordinates of the pixel, and the pixel color. Modifying the state of the pixel color argument will change the pixel color in the texture
+	 * @param (Number, Number, Color) => void mapping | A shader function called for every pixel. The return value of this function, but it takes in three arguments: the x and y coordinates of the pixel, and the pixel color. Modifying the state of the pixel color argument will change the pixel color in the texture
 	 * @return Texture
 	 */
 	shader(fn) {

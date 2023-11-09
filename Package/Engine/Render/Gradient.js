@@ -1,4 +1,12 @@
 /**
+ * @name class ValueStop
+ * This is not an actual class, but rather an interface for values passed to functions of Gradient.
+ * Represents a point along a gradient with a specific value.
+ * @prop Number start | The parameter value at which this stop's value reaches full intensity
+ * @prop Operable/Number value | The gradient value at this stop
+ */
+
+/**
  * Represents a parameterized gradient between a series of different values.
  * These values can be of any Operable type.
  * ```js
@@ -23,7 +31,7 @@
 class Gradient {
 	/**
 	 * Creates a new Gradient.
-	 * @param Object[] valueStops | A list of specified values at specified points. Each value stop is an object with a `.value` property indicating value at that stop, and a `.start` property indicating the parameter value at which the gradient reaches the full intensity of that stop
+	 * @param ValueStop[] valueStops | A list of specified values at specified points.
 	 */
 	constructor(valueStops) {
 		this.valueStops = valueStops;
@@ -34,7 +42,7 @@ class Gradient {
 	}
 	/**
 	 * Adds an additional value stop.
-	 * @param Object valueStop | The value stop to add. This argument has the same structure as the argument passed to the constructor.
+	 * @param ValueStop valueStop | The value stop to add.
 	 */
 	addValueStop(valueStop) {
 		this.valueStops.push(valueStop);

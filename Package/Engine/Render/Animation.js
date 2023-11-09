@@ -14,7 +14,7 @@
  * @prop Number delay | The number of frames each animation frame will be visible for
  * @prop Number timer | The current progress (in frames) of the animation
  * @prop Number totalTime | The total amount of frames it will take the animation to complete
- * @prop Function onEnd | A function to be called when the animation completes (this will be called even if the animation loops)
+ * @prop () => void onEnd | A function to be called when the animation completes (this will be called even if the animation loops)
  */
 class Animation extends ImageType {
 	constructor(src = "", frames = 1, delay = 0, loops = false, onEnd = () => null) {
@@ -108,7 +108,7 @@ class Animation extends ImageType {
 	 * @param Number imgHeight | The height (in pixels) of each frame
 	 * @param Number delay | The amount of frames each animation frame is visible for
 	 * @param Boolean loops? | Whether or not the animation loops. Default is true 
-	 * @param Function onEnd? | A function to execute when the animation completes. Default is a no-op
+	 * @param () => void onEnd? | A function to execute when the animation completes. Default is a no-op
 	 * @return Animation
 	 */
 	static fromImage(frame, imgWidth, imgHeight, delay = 0, loops = true, onEnd = () => null) {

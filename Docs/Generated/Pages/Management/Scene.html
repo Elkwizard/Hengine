@@ -130,7 +130,7 @@ This is initially <code class=" highlight-BACKGROUND"><span class="highlight-KEY
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L78" class="function-name source-link">rayCast</a>(<span class="param">rayOrigin</span>, <span class="param">rayDirection</span>, <span class="param">mask?</span>)<span class="type">Object</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L78" class="function-name source-link">rayCast</a>(<span class="param">rayOrigin</span>, <span class="param">rayDirection</span>, <span class="param">mask?</span>)<span class="type">{ hitShape: <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a>, hitPoint: <a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a> }/null</span>
 			</div>
 			<div class="function desc">
 				Performs a ray-cast against some or all of the <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObjects</a> in the scene.
@@ -165,7 +165,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper">
 							<div class="param-name">
 								<span class="param">mask</span>
-								<span class="type">Function</span>
+								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObject</a> => Boolean</span>
 							</div>
 							<div class="param desc">
 								A filter for which <a href="../../Pages/Superclasses/SceneObject.html#SceneObject">SceneObjects</a> should be considered in the ray-cast. Default is <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">object</span><span class="highlight-SYMBOL">)</span><span class="highlight-KEYWORD"> =&gt;</span><span class="highlight-LANG_VAR"> true</span></code>

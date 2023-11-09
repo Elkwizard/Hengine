@@ -700,7 +700,7 @@ class Artist {
 	/**
 	 * Calls a function while using a specified coordinate transform
 	 * @param Matrix3 transform | The specific global coordinate transform to use
-	 * @param Function draw | The function that will be called while using the specified transform
+	 * @param () => void draw | The function that will be called while using the specified transform
 	 */
 	drawThrough(transform, draw) {
 		this.save();

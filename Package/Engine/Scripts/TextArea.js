@@ -31,7 +31,7 @@ class TEXT_AREA extends ElementScript {
 	 * @param Font font | The font used for rendering the text
 	 * @param Number paddingEM? | The interior padding of the text area, measured as a proportion of the font size. Default is 0.5
 	 * @param Boolean multiline? | Whether the text area can have multiple lines and scrolling. Default is true
-	 * @param Function renderText? | A function used to render the text. The default renders the text in place with a black color
+	 * @param (String, Font, Vector2, Number => Vector2, Number) => void renderText? | A function used to render the text. The default renders the text in place with a black color
 	 */
 	init(obj, font, paddingEM = 0.5, multiline = true, renderText = (text, font, pos, getLoc, lineIndex) => this.renderer.draw(Color.BLACK).text(font, text, pos)) {
 		obj.engine.scene.mouseEvents = true;

@@ -147,7 +147,7 @@ Object.defineProperty(window, "title", {
 	/**
 	 * @name pushArray
 	 * Pushes each element in an array to the end of the caller.
-	 * @param Array array | The array to add to the end
+	 * @param Any[] array | The array to add to the end
 	 */
 	proto(Array.prototype, "pushArray", function (arr) {
 		const len = arr.length;

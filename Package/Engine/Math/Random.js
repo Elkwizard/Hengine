@@ -152,7 +152,7 @@ class Random {
 	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
 	 * @param Iterable values | The values to sample from 
 	 * @param Number quantity | The size of the sample
-	 * @return Array
+	 * @return Any[]
 	 */
     sample(arr, quantity) {
         if (!Array.isArray(arr)) arr = Array.from(arr);
@@ -166,7 +166,7 @@ class Random {
 	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
 	 * @param Iterable values | The values to sample from 
 	 * @param Number quantity | The size of the sample
-	 * @return Array
+	 * @return Any[]
 	 */
     sampleWithoutReplacement(arr, quantity) {
         if (!Array.isArray(arr)) arr = Array.from(arr);
