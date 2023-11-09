@@ -173,8 +173,8 @@ class Animatable {
 	 * Creates a new Animatable.
 	 * @param Operable/Number initial | The initial value
 	 * @param Number duration | The length of each transition, in frames
-	 * @param Number => Number easing | The easing function to use. Default is `Interpolation.linear`
-	 * @param Boolean copyTarget | Whether or not target values should be copied. Default is true
+	 * @param Number => Number easing? | The easing function to use. Default is `Interpolation.linear`
+	 * @param Boolean copyTarget? | Whether or not target values should be copied. Default is true
 	 */
 	constructor(initial, duration, easing = Interpolation.linear, copyTarget = true) {
 		this.duration = duration;
