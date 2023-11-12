@@ -223,7 +223,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 			const index = elements.indexOf(obj);
 			const next = elements[index + 1];
 			if (
-				next && next.scripts.has(PARTICLE_SPAWNER) &&
+				next && !next.hidden && next.scripts.has(PARTICLE_SPAWNER) &&
 				next.scripts.PARTICLE_SPAWNER.frame.constructor === frame.constructor
 			) return;
 
