@@ -209,6 +209,11 @@ InputHandler.State = class State {
 			this.pressed = true;
 		}
 
+		if (this.turnOff && this.downCount) {
+			this.pressed = false;
+			this.turnOff = false;
+		}
+
 		if (this.pressed) {
 			this.downCount++;
 			this.upCount = 0;
