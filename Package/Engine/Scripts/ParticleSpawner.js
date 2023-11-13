@@ -201,10 +201,8 @@ class PARTICLE_SPAWNER extends ElementScript {
 			const p = particles[i];
 			const { x, y } = p.position;
 			if (
-				x >= minX &&
-				y >= minY &&
-				x <= maxX &&
-				y <= maxY
+				x >= minX && y >= minY &&
+				x <= maxX && y <= maxY
 			) {
 				this.particleDraw(gl, p);
 				anyParticlesRendered = true;
@@ -219,14 +217,15 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 		if (PARTICLE_SPAWNER.anyParticlesRendered && this.separateFrame) {
 			// is next renderable a particle spawner
-			const elements = this.scene.main.sceneObjectArray;
+			const elements = this.scene.renderOrder;
 			const index = elements.indexOf(obj);
 			const next = elements[index + 1];
+
 			if (
 				next && !next.hidden && next.scripts.has(PARTICLE_SPAWNER) &&
 				next.scripts.PARTICLE_SPAWNER.frame.constructor === frame.constructor
 			) return;
-
+			
 			if (obj instanceof UIObject) this.renderer.image(frame).default(0, 0);
 			else this.camera.drawInScreenSpace(() => this.renderer.image(frame).default(0, 0));
 			gl.clear();

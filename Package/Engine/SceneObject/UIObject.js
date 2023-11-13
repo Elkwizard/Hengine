@@ -8,7 +8,7 @@ class UIObject extends SceneObject {
         super(name, x, y, null, "UI", container, engine);
     }
     engineDraw() {
-        this.onScreen = true;
+		this.onScreen = true;
         this.engine.scene.camera.drawInScreenSpace(() => {
             if (!this.hidden) this.runDraw();
             this.scripts.run("escapeDraw");

@@ -21,6 +21,7 @@
  * @prop Boolean cullGraphics | Whether or not SceneObject graphics will ever be culled. If this is true, specific SceneObjects can still opt out, but not vice-versa
  * @prop Boolean collisionEvents | Whether or not collision events will be detected
  * @prop Boolean updating | Whether the scene is in the process of updating the SceneObjects
+ * @prop SceneObject[] renderOrder | A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame. This property is read-only.
  */
 class Scene {
 	constructor(gravity, engine) {
@@ -33,6 +34,7 @@ class Scene {
 		this.collisionEvents = true;
 		this.camera = new Camera(this.engine.canvas.width / 2, this.engine.canvas.height / 2, 0, 1, engine);
 		this.updating = false;
+		this.renderOrder = [];
 	}
 	/**
 	 * Sets the gravitational acceleration for the physics engine.
@@ -190,9 +192,11 @@ class Scene {
 		this.engine.renderer.save();
 		this.camera.transformToWorld(this.engine.renderer);
 
-		const objects = this.main.sceneObjectArray;
-		for (let i = 0; i < objects.length; i++) {
-			const object = objects[i];
+		this.renderOrder = [...this.main.sceneObjectArray]
+			.sort((a, b) => a.layer - b.layer);
+		
+		for (let i = 0; i < this.renderOrder.length; i++) {
+			const object = this.renderOrder[i];
 			object.engineDraw(screen);
 			object.lifeSpan++;
 		}
@@ -248,7 +252,6 @@ class Scene {
 		this.script("afterPhysics");
 
 		//draw
-		this.main.sceneObjectArray.sort((a, b) => a.layer - b.layer);
 		this.renderCamera();
 
 		this.script("afterUpdate");

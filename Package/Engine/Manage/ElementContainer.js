@@ -85,11 +85,11 @@ class ElementContainer extends SceneElement {
 	genName(database, name) {
 		let num = 0;
 		let n = name;
-		function check() {
+		const check = () => {
 			n = name;
 			if (num) n += " (" + num + ")";
 			return n;
-		}
+		};
 		while (database.has(check())) num++;
 		return n;
 	}
