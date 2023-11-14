@@ -158,7 +158,7 @@ All properties of this class are read-only.
 					<div class="class-methods">
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L166" class="function-name source-link">pressed</a><span class="type">Boolean</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L167" class="function-name source-link">pressed</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether the key is currently pressed.
@@ -168,7 +168,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L173" class="function-name source-link">released</a><span class="type">Boolean</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L174" class="function-name source-link">released</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether the key is not currently pressed.
@@ -178,7 +178,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L180" class="function-name source-link">justPressed</a><span class="type">Boolean</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L181" class="function-name source-link">justPressed</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether the key became pressed within the last frame.
@@ -188,7 +188,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L187" class="function-name source-link">justReleased</a><span class="type">Boolean</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L188" class="function-name source-link">justReleased</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether the key stopped being pressed within the last frame.
@@ -198,22 +198,22 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L195" class="function-name source-link">pressLength</a><span class="type">Number</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L196" class="function-name source-link">pressLength</a><span class="type">Number</span>
 			</div>
 			<div class="function desc">
-				Returns the duration of the current press of the key.
-If the key is not currently pressed, this returns 0.
+				Returns the duration of the most recent press of the key.
+If the key is currently pressed, this returns the time since the key was pressed.
 			</div>
 			
 		</div>
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L203" class="function-name source-link">releaseLength</a><span class="type">Number</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L204" class="function-name source-link">releaseLength</a><span class="type">Number</span>
 			</div>
 			<div class="function desc">
-				Returns the amount of frames since the key was released.
-If the key is currently pressed, this returns 0.
+				Returns the duration of the most recent period in which the key was released.
+If the key is not currently pressed, this returns the time since the key was released.
 			</div>
 			
 		</div>
