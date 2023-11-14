@@ -147,10 +147,11 @@ InputHandler.State = class State {
 		if (a === null) return;
 		this._targetState = a;
 		if (a) {
-			this.turnOn = true;
 			this.turnOff = false;
-		} else
-			this.turnOff = true;
+			this.turnOn ||= !this.pressed;
+		} else {
+			this.turnOff ||= this.pressed;
+		}
 	}
 	get targetState() {
 		return this._targetState;
@@ -188,16 +189,16 @@ InputHandler.State = class State {
 		return this.everPressed && this.upCount === 1;
 	}
 	/**
-	 * Returns the duration of the current press of the key.
-	 * If the key is not currently pressed, this returns 0.
+	 * Returns the duration of the most recent press of the key.
+	 * If the key is currently pressed, this returns the time since the key was pressed.
 	 * @return Number
 	 */
 	get pressLength() {
 		return this.downCount;
 	}
 	/**
-	 * Returns the amount of frames since the key was released.
-	 * If the key is currently pressed, this returns 0.
+	 * Returns the duration of the most recent period in which the key was released.
+	 * If the key is not currently pressed, this returns the time since the key was released.
 	 * @return Number
 	 */
 	get releaseLength() {
@@ -207,25 +208,23 @@ InputHandler.State = class State {
 		if (this.turnOn) {
 			this.turnOn = false;
 			this.pressed = true;
+			this.downCount = 0;
 		}
 
 		if (this.turnOff && this.downCount) {
 			this.pressed = false;
 			this.turnOff = false;
+			this.upCount = 0;
 		}
 
-		if (this.pressed) {
-			this.downCount++;
-			this.upCount = 0;
-		} else {
-			this.upCount++;
-			this.downCount = 0;
-		}
+		if (this.pressed) this.downCount++;
+		else this.upCount++;
 	}
 	afterUpdate() {
 		if (this.turnOff) {
 			this.turnOff = false;
 			this.pressed = false;
+			this.upCount = 0;
 		}
 	}
 };
