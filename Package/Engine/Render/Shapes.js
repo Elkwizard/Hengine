@@ -237,13 +237,13 @@ class Shape {
 		return !!physicsAPICollideShapes(this, shape);
 	}
 	/**
-	 * Returns the closest point on the shape to a specified other point.
+	 * Returns the closest point on the shape's boundary to a specified other point.
 	 * @param Vector2 point | The target point
 	 * @return Vector2 
 	 */
 	closestPointTo(point) { }
 	/**
-	 * Returns the distance from a specified point to the interior of the shape.
+	 * Returns the distance from a specified point to the boundary of the shape.
 	 * @param Vector2 point | The target point 
 	 * @return Number
 	 */
@@ -251,7 +251,7 @@ class Shape {
 		return Vector2.dist(point, this.closestPointTo(point));
 	}
 	/**
-	 * Checks if a point is inside the shape.
+	 * Checks if a point is inside the shape, including points on the boundary.
 	 * @param Vector2 point | The point to check 
 	 * @return Boolean
 	 */
@@ -544,6 +544,12 @@ class Polygon extends Shape {
 
 		return bestPoint;
 	}
+	/**
+	 * Checks whether a given point is inside the polygon (including the boundary).
+	 * The behavior of this method is undefined if the polygon is concave.
+	 * @param Vector2 point | The point to check
+	 * @return Boolean
+	 */
 	containsPoint(point) {
 		const axes = [];
 		const poly = this.vertices;
@@ -829,6 +835,15 @@ class Rect extends Polygon {
 		return rect.x < this.x + this.width && rect.x + rect.width > this.x && rect.y < this.y + this.height && rect.y + rect.height > this.y;
 	}
 	closestPointTo(point) {
+		if (this.containsPoint(point)) {
+			const { x, y, width, height } = this;
+			const dx = width / 2 - Math.abs(point.x - (x + width / 2));
+			const dy = height / 2 - Math.abs(point.y - (y + height / 2));
+			if (dx < dy)
+				return new Vector2(x + Math.round((point.x - x) / width) * width, point.y);
+			return new Vector2(point.x, y + Math.round((point.y - y) / height) * height);
+		}
+
 		return Vector2.clamp(point, this.min, this.max);
 	}
 	containsPoint(point) {
