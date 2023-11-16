@@ -150,7 +150,7 @@ InputHandler.State = class State {
 			this.turnOff = false;
 			this.turnOn ||= !this.pressed;
 		} else {
-			this.turnOff ||= this.pressed;
+			this.turnOff ||= this.turnOn || this.pressed;
 		}
 	}
 	get targetState() {
@@ -179,14 +179,14 @@ InputHandler.State = class State {
 	 * @return Boolean
 	 */
 	get justPressed() {
-		return this.downCount === 1;
+		return this.pressed && this.downCount === 1;
 	}
 	/**
 	 * Returns whether the key stopped being pressed within the last frame.
 	 * @return Boolean
 	 */
 	get justReleased() {
-		return this.everPressed && this.upCount === 1;
+		return this.everPressed && this.released && this.upCount === 1;
 	}
 	/**
 	 * Returns the duration of the most recent press of the key.
