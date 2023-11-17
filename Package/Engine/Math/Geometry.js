@@ -691,7 +691,6 @@ class Geometry {
 	 * @return Vector2/null
 	 */
 	static intersectRayLine(ro, rd, line) {
-		const EPSILON = 0.0001;
 		const rayOrigin = ro;
 		const rayVector = rd;
 		const lineOrigin = line.a;
@@ -706,8 +705,13 @@ class Geometry {
 		const diff = lineOrigin.minus(rayOrigin);
 		const t = invDet * (d * diff.x - b * diff.y);
 		const s = invDet * (c * diff.x - a * diff.y);
-		if (t < -EPSILON) return null;
-		if (s < -EPSILON || s > 1 + EPSILON) return null;
+		
+		const EPSILON_T = Geometry.EPSILON / rayVector.mag;
+		if (t < -EPSILON_T) return null;
+		
+		const EPSILON_S = Geometry.EPSILON / lineVector.mag;
+		if (s < -EPSILON_S || s > 1 + EPSILON_S) return null;
+
 		return lineVector.times(s).add(lineOrigin);
 	}
 	/**
@@ -717,7 +721,6 @@ class Geometry {
 	 * @return Vector2/null
 	 */
 	static intersectLineLine(lineA, lineB) {
-		const EPSILON = 0.0001;
 		const aOrigin = lineA.a;
 		const aVector = lineA.b.minus(lineA.a);
 		const bOrigin = lineB.a;
@@ -732,8 +735,13 @@ class Geometry {
 		const diff = bOrigin.minus(aOrigin);
 		const t = invDet * (d * diff.x - b * diff.y);
 		const s = invDet * (c * diff.x - a * diff.y);
-		if (t < -EPSILON || t > 1 + EPSILON) return null;
-		if (s < -EPSILON || s > 1 + EPSILON) return null;
+		
+		const EPSILON_T = Geometry.EPSILON / aVector.mag;
+		if (t < -EPSILON_T || t > 1 + EPSILON_T) return null;
+		
+		const EPSILON_S = Geometry.EPSILON / bVector.mag;
+		if (s < -EPSILON_S || s > 1 + EPSILON_S) return null;
+
 		return aVector.times(t).add(aOrigin);
 	}
 	/**
@@ -751,15 +759,19 @@ class Geometry {
 			
 			const vertices = [];
 			let lastIntersect = null;
+
 			traverseLoop: do {			
 				if (!lastIntersect) vertices.push(aVerts[i]);
-	
+
 				const edge = new Line(vertices.last, aEdges[i].b);
 				for (let j = 0; j < bVerts.length; j++) {
 					const bEdge = bEdges[j];
 					if (bEdge === lastIntersect) continue;
 					const vec = Geometry.intersectLineLine(edge, bEdge);
-					if (vec) {
+					if (vec && (
+						bEdges[(j - 1 + bEdges.length) % bEdges.length] !== lastIntersect ||
+						Vector2.sqrDist(vertices.last, vec) >= Geometry.EPSILON
+					)) {
 						lastIntersect = aEdges[i];
 						[aVerts, bVerts] = [bVerts, aVerts];
 						[aEdges, bEdges] = [bEdges, aEdges];
@@ -791,3 +803,4 @@ class Geometry {
 	}
 	
 }
+Geometry.EPSILON = 0.0001;
