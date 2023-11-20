@@ -139,7 +139,9 @@ class Random {
 		if (region instanceof Polygon) {
 			const triangles = Geometry.triangulate(region);
 			const areas = triangles
-				.map(([a, b, c]) => b.Vminus(a).cross(c.Vminus(a)) / 2);
+				.map(([a, b, c]) => Math.abs(
+					(b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
+				));
 			const [a, b, c] = Random.choice(triangles, areas);
 			let px = Random.range(0, 1);
 			let py = Random.range(0, 1);
