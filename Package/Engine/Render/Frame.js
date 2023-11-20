@@ -119,9 +119,19 @@ class ImageType {
 		if (typeof x === "object") ({ x, y } = x);
 		return x >= 0 && y >= 0 && x < this.width && y < this.height;
 	}
+	/**
+	 * Returns the width of the image required for a given height to maintain the aspect ratio.
+	 * @param Number height | The potential height of the image
+	 * @return Number
+	 */
 	inferWidth(height) {
 		return this.width * height / this.height;
 	}
+	/**
+	 * Returns the height of the image required for a given width to maintain the aspect ratio.
+	 * @param Number width | The potential width of the image
+	 * @return Number
+	 */
 	inferHeight(width) {
 		return this.height * width / this.width;
 	}
