@@ -114,7 +114,7 @@ class Geometry {
 	 * Creates a triangular decomposition of the provided convex polygon.
 	 * The triangles are returned as arrays of three vectors. 
 	 * @param Polygon shape | The convex polygon to decompose 
-	 * @return Vector2[3][]
+	 * @return Vector2[][3]
 	 */
 	static triangulate(shape) {
 		let vertices = shape.vertices;

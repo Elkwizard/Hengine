@@ -120,6 +120,40 @@ class Random {
         return result;
     }
 	/**
+	 * Returns a random point within a given convex shape.
+	 * This method only works with `.distribution` being `Random.uniform`.
+	 * Unstable.
+	 * @param Shape region | The region within which to generate the point
+	 * @return Vector2
+	 */
+	inShape(region) {
+		if (region instanceof Circle)
+			return Vector2.fromAngle(Random.angle())
+				.mul(region.radius * Math.sqrt(Random.range(0, 1)))
+				.add(region.middle);
+		if (region instanceof Rect)
+			return new Vector2(
+				Random.range(region.x, region.x + region.width),
+				Random.range(region.y, region.y + region.height)
+			);
+		if (region instanceof Polygon) {
+			const triangles = Geometry.triangulate(region);
+			const areas = triangles
+				.map(([a, b, c]) => b.Vminus(a).cross(c.Vminus(a)) / 2);
+			const [a, b, c] = Random.choice(triangles, areas);
+			let px = Random.range(0, 1);
+			let py = Random.range(0, 1);
+			if (py > 1 - px) {
+				px = 1 - px;
+				py = 1 - py;
+			}
+			return	c.Vminus(a).Nmul(px)
+					.Vadd(b.Vminus(a).Nmul(py))
+					.Vadd(a);
+		}
+		return region.middle;
+	}
+	/**
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @signature
 	 * @param Iterable values | The values to choose from

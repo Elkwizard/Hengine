@@ -363,7 +363,36 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L131" class="function-name source-link">choice</a>(<span class="param">values</span><span class="aux"> | </span><span class="param">values</span>, <span class="param">percentages</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L129" class="function-name source-link">inShape</a>(<span class="param">region</span>)<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#Vector2">Vector2</a></span>
+			</div>
+			<div class="function desc">
+				Returns a random point within a given convex shape.
+This method only works with <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">distribution</span></code> being <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>.
+Unstable.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper">
+							<div class="param-name">
+								<span class="param">region</span>
+								<span class="type"><a href="../../Pages/Geometry/Shapes/Shape.html#Shape">Shape</a></span>
+							</div>
+							<div class="param desc">
+								The region within which to generate the point
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L165" class="function-name source-link">choice</a>(<span class="param">values</span><span class="aux"> | </span><span class="param">values</span>, <span class="param">percentages</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Chooses an (optionally weighted) random element from an array. Unstable.
@@ -413,7 +442,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L157" class="function-name source-link">sample</a>(<span class="param">values</span>, <span class="param">quantity</span>)<span class="type">Any[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L191" class="function-name source-link">sample</a>(<span class="param">values</span>, <span class="param">quantity</span>)<span class="type">Any[]</span>
 			</div>
 			<div class="function desc">
 				Randomly selects a sample (with replacement) from a given collection of values. Unstable.
@@ -450,7 +479,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L171" class="function-name source-link">sampleWithoutReplacement</a>(<span class="param">values</span>, <span class="param">quantity</span>)<span class="type">Any[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L205" class="function-name source-link">sampleWithoutReplacement</a>(<span class="param">values</span>, <span class="param">quantity</span>)<span class="type">Any[]</span>
 			</div>
 			<div class="function desc">
 				Randomly selects a sample (without replacement) from a given collection of values. Unstable.
@@ -487,7 +516,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L190" class="function-name source-link">octave</a>(<span class="param">octaves</span>, <span class="param">algorithm</span>, <span class="param">...noiseArgs</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L224" class="function-name source-link">octave</a>(<span class="param">octaves</span>, <span class="param">algorithm</span>, <span class="param">...noiseArgs</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the sum of a specified number of octaves of a specified type of noise.
@@ -534,7 +563,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L213" class="function-name source-link">perlin</a>(<span class="param">x</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L247" class="function-name source-link">perlin</a>(<span class="param">x</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Samples 1D Perlin noise.
@@ -581,7 +610,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L232" class="function-name source-link">perlin2D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L266" class="function-name source-link">perlin2D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Samples 2D Perlin noise.
@@ -638,7 +667,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L255" class="function-name source-link">perlin3D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">z</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L289" class="function-name source-link">perlin3D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">z</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Samples 3D Perlin noise.
@@ -705,7 +734,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L279" class="function-name source-link">voronoi</a>(<span class="param">x</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L313" class="function-name source-link">voronoi</a>(<span class="param">x</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Samples 1D Voronoi noise.
@@ -752,7 +781,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L304" class="function-name source-link">voronoi2D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L338" class="function-name source-link">voronoi2D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Samples 2D Voronoi noise.
@@ -809,7 +838,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L333" class="function-name source-link">voronoi3D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">z</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L367" class="function-name source-link">voronoi3D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">z</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Samples 3D Voronoi noise.
@@ -876,7 +905,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 	
 		<div class="function-wrapper">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L351" class="function-name source-link">reSeed</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L385" class="function-name source-link">reSeed</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Chooses a new random seed and sampleSeed for the random number generator.
