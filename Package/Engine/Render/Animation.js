@@ -10,6 +10,7 @@
  * });
  * ```
  * @prop ImageType[] frames | The images that make up the animation
+ * @prop Boolean autoAdvance | Whether or not the animation will advance to the next frame when drawn. Starts as true
  * @prop Boolean loops | Whether or not the animation will reset to the beginning after completing
  * @prop Number delay | The number of frames each animation frame will be visible for
  * @prop Number timer | The current progress (in frames) of the animation
@@ -20,6 +21,7 @@ class Animation extends ImageType {
 	constructor(src = "", frames = 1, delay = 0, loops = false, onEnd = () => null) {
 		super(1, 1);
 		this.stopped = false;
+		this.autoAdvance = true;
 		if (!Array.isArray(src)) {
 			this.frameCount = frames;
 			this.frames = [];
@@ -65,6 +67,9 @@ class Animation extends ImageType {
 		this.width = this.image.width;
 		this.height = this.image.height;
 	}
+	/**
+	 * Advances the animation by one update cycle.
+	 */
 	advance() {
 		if (!this.stopped) {
 			this.timer++;
@@ -98,7 +103,7 @@ class Animation extends ImageType {
 		this.advance();
 	}
 	makeImage() {
-		this.advance();
+		if (this.autoAdvance) this.advance();
 		return this.image.image;
 	}
 	/**
