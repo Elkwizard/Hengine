@@ -1,10 +1,10 @@
 /**
  * Represents the way in which dimensions are prioritized in `Geometry.gridToRects()`.
- * @static_prop Symbol SQUARE | The rectangles should be approximately square, with a difference in dimensions of at most one tile
- * @static_prop Symbol HORIZONTAL | The rectangles should become as wide as possible, and then grow vertically
- * @static_prop Symbol VERTICAL | The rectangles should become as tall as possible, and then grow horizontally
+ * @static_prop RectPriority SQUARE | The rectangles should be approximately square, with a difference in dimensions of at most one tile
+ * @static_prop RectPriority HORIZONTAL | The rectangles should become as wide as possible, and then grow vertically
+ * @static_prop RectPriority VERTICAL | The rectangles should become as tall as possible, and then grow horizontally
  */
-const RectPriority = defineEnum("SQUARE", "HORIZONTAL", "VERTICAL");
+const RectPriority = Enum.define("SQUARE", "HORIZONTAL", "VERTICAL");
 
 /**
  * Provides a collection of 2D geometric algorithms that operate on shapes and vectors.

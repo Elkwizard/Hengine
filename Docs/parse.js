@@ -55,10 +55,10 @@ function parse(content, file) {
 
 		let base = name.slice(name.lastIndexOf(" ") + 1);
 
-		const isEnum = name.endsWith("= defineEnum");
+		const isEnum = name.endsWith("= Enum.define");
 		if (isEnum) {
 			isClass = true;
-			base = name.match(/\b(\w+?)(?=\s*=\s*defineEnum)/g)[0];
+			base = name.match(/\b(\w+?)(?=\s*=\s*Enum\.define)/g)[0];
 		}
 
 		return {

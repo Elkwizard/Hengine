@@ -1,10 +1,10 @@
 /**
  * Represents the way a canvas scales with changes to the window size.
- * @static_prop Symbol STRETCH | The canvas changes size to fill the entire window
- * @static_prop Symbol PRESERVE_ASPECT_RATIO | The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio
- * @static_prop Symbol INTEGER_MULTIPLE | Same as `ScalingMode.PRESERVE_ASPECT_RATIO`, except the scale factor on the size will always be in the form (n) or (1/n), where n is an integer
+ * @static_prop ScalingMode STRETCH | The canvas changes size to fill the entire window
+ * @static_prop ScalingMode PRESERVE_ASPECT_RATIO | The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio
+ * @static_prop ScalingMode INTEGER_MULTIPLE | Same as `ScalingMode.PRESERVE_ASPECT_RATIO`, except the scale factor on the size will always be in the form (n) or (1/n), where n is an integer
  */
-const ScalingMode = defineEnum("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MULTIPLE");
+const ScalingMode = Enum.define("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MULTIPLE");
 
 /**
  * Represents the canvas on which the Hengine is rendered.

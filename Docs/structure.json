@@ -134,7 +134,8 @@
 				"ByteBuffer.Reader",
 				"ByteBuffer.Measurer"
 			],
-			"Array": null
+			"Array": null,
+			"Enum": null
 		}
 	}
 }

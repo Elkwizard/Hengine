@@ -1,11 +1,11 @@
 // Text Modes
-const TextModeX = defineEnum("LEFT", "CENTER", "RIGHT");
-const TextModeY = defineEnum("TOP", "CENTER", "BOTTOM");
+const TextModeX = Enum.define("LEFT", "CENTER", "RIGHT");
+const TextModeY = Enum.define("TOP", "CENTER", "BOTTOM");
 
 /**
- * @name const TextMode = defineEnum
+ * @name const TextMode = Enum.define
  * Specifies where on a string of text should be considered its origin.
- * @static_prop Symbol [HORIZONTAL]_[VERTICAL] | Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
+ * @static_prop TextMode [HORIZONTAL]_[VERTICAL] | Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
  */
 const TextMode = {};
 for (let x in TextModeX) for (let y in TextModeY) {
@@ -14,24 +14,24 @@ for (let x in TextModeX) for (let y in TextModeY) {
 
 /**
  * Represents the way in which colors being added to a surface should interact with those already there.
- * @static_prop Symbol ADD | New colors should be component-wise added to the existing colors
- * @static_prop Symbol COMBINE | New colors should be blended with old colors based on opacity
+ * @static_prop BlendMode ADD | New colors should be component-wise added to the existing colors
+ * @static_prop BlendMode COMBINE | New colors should be blended with old colors based on opacity
  */
-const BlendMode = defineEnum("ADD", "COMBINE");
+const BlendMode = Enum.define("ADD", "COMBINE");
 /**
  * Represents the way in which consecutive line segments should connect.
- * @static_prop Symbol MITER | The edges of the lines will be extended until they meet
- * @static_prop Symbol BEVEL | The edges of the lines will be connected straight across
- * @static_prop Symbol ROUND | The gap between the lines will be filled with an arc
+ * @static_prop LineJoin MITER | The edges of the lines will be extended until they meet
+ * @static_prop LineJoin BEVEL | The edges of the lines will be connected straight across
+ * @static_prop LineJoin ROUND | The gap between the lines will be filled with an arc
  */
-const LineJoin = defineEnum("MITER", "BEVEL", "ROUND");
+const LineJoin = Enum.define("MITER", "BEVEL", "ROUND");
 /**
  * Represents the way the ends of line segments will be displayed.
- * @static_prop Symbol FLAT | The lines will have square ends that extend just to the end of the line
- * @static_prop Symbol SQUARE | The lines will have square ends that extend half their side length past the end of the line
- * @static_prop Symbol ROUND | The lines will end with half-circles
+ * @static_prop LineCap FLAT | The lines will have square ends that extend just to the end of the line
+ * @static_prop LineCap SQUARE | The lines will have square ends that extend half their side length past the end of the line
+ * @static_prop LineCap ROUND | The lines will end with half-circles
  */
-const LineCap = defineEnum("FLAT", "SQUARE", "ROUND");
+const LineCap = Enum.define("FLAT", "SQUARE", "ROUND");
 
 /**
  * Represents a renderer for a graphical surface.

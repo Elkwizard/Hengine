@@ -1,16 +1,45 @@
-function defineEnum(...values) {
-	const obj = {};
-	for (let i = 0; i < values.length; i++) obj[values[i]] = Symbol(values[i]);
-	return new Proxy(obj, {
-		get(target, key) {
-			if (!(key in target))
-				throw new ReferenceError(`Enum value '${key}' does not exist`);
-			return target[key];
-		},
-		set(target, key, value) {
-			throw new Error(`Cannot add new enum values`);
-		}
-	});
+/**
+ * Subclasses of this class represent a set of unique symbolic values.
+ * ```js
+ * const Options = Enum.define("YES", "NO", "MAYBE");
+ * const answer = Options.YES;
+ * ```
+ * @prop String name | The name of the symbol
+ */
+class Enum {
+	constructor(name) {
+		this.name = name;
+	}
+
+	/**
+	 * Returns the name of the symbolic value.
+	 * @return String
+	 */
+	toString() {
+		return this.name;
+	}
+
+	/**
+	 * Creates a new subclass of Enum based on a specific set of unique names.
+	 * Static properties with these names will be defined on the return value and will contain the associated symbolic values.
+	 * @param  String[] ...names | The names for the symbolic values
+	 * @return Class
+	 */
+	static define(...names) {
+		const enumeration = class extends Enum { };
+		for (let i = 0; i < names.length; i++)
+			enumeration[names[i]] = new enumeration(names[i]);
+		return new Proxy(enumeration, {
+			get(target, key) {
+				if (!(key in target))
+					throw new ReferenceError(`Enum value '${key}' does not exist`);
+				return target[key];
+			},
+			set() {
+				throw new Error("Cannot add new enum values");
+			}
+		});
+	}
 }
 
 window.__devicePixelRatio = devicePixelRatio;
