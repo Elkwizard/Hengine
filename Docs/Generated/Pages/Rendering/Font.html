@@ -7,16 +7,16 @@
 			</head>
 			<body>
 				
-			<div class="class-wrapper" id="Font">
+			<div class="class-wrapper" id="class Font">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L17" class="class-name source-link">Font</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L17" target="_blank" class="class-name source-link">Font</a>
 				</div>
 				<div class="class desc">
 					Represents a font, including family, side, and styling.
-Fonts can be used in the text rendering functions of <a href="../../Pages/Rendering/Renderer/Artist.html#Artist">Artist</a>.
+Fonts can be used in the text rendering functions of <a href="../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a>.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> font</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CONSTANT"> Font</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">15</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&quot;Consolas&quot;</span><span class="highlight-SYMBOL">,</span><span class="highlight-LANG_VAR"> false</span><span class="highlight-SYMBOL">,</span><span class="highlight-LANG_VAR"> true</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// italic 15px Consolas</span><span class="highlight-SYMBOL">
 
-</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Rendering/Color.html#Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">text</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">font</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&quot;Hello World!&quot;</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">text</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">font</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&quot;Hello World!&quot;</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">);
 </span></code>
 				</div>
 				
@@ -24,49 +24,49 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Font.size">
 					<div class="prop-header member">
 						<span class="prop-name">size</span><span class="type">Number</span>
 					</div>
 					<div class="prop desc">The size of the font in CSS pixels</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Font.family">
 					<div class="prop-header member">
 						<span class="prop-name">family</span><span class="type">String</span>
 					</div>
 					<div class="prop desc">The string identifier for the font family</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Font.bold">
 					<div class="prop-header member">
 						<span class="prop-name">bold</span><span class="type">Boolean</span>
 					</div>
 					<div class="prop desc">Whether the font is bold</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Font.italic">
 					<div class="prop-header member">
 						<span class="prop-name">italic</span><span class="type">Boolean</span>
 					</div>
 					<div class="prop desc">Whether the font is italic</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Font.lineHeight">
 					<div class="prop-header member">
 						<span class="prop-name">lineHeight</span><span class="type">Number</span>
 					</div>
 					<div class="prop desc">The height of a line of text in the font. This determines spacing between multiline strings</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Font.tabSize">
 					<div class="prop-header member">
 						<span class="prop-name">tabSize</span><span class="type">Number</span>
 					</div>
 					<div class="prop desc">The number of spaces a tab is equivalent to for this font</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="static Font.[FAMILY][SIZE]">
 					<div class="prop-header member">
 						<span class="prop-name">Font.[FAMILY][SIZE]</span><span class="type">Font</span>
 					</div>
@@ -78,9 +78,9 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Font.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L25" class="function-name source-link">constructor</a>(<span class="param">size</span>, <span class="param">family</span>, <span class="param">bold?</span>, <span class="param">italic?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L25" target="_blank" class="function-name source-link">constructor</a>(<span class="param">size</span>, <span class="param">family</span>, <span class="param">bold?</span>, <span class="param">italic?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new font. This operation is fairly expensive and thus should not be done every frame unless necessary.
@@ -90,7 +90,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.constructor():size">
 							<div class="param-name">
 								<span class="param">size</span>
 								<span class="type">Number</span>
@@ -100,7 +100,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 							</div>
 						</div>
 					
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.constructor():family">
 							<div class="param-name">
 								<span class="param">family</span>
 								<span class="type">String</span>
@@ -110,7 +110,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 							</div>
 						</div>
 					
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.constructor():bold?">
 							<div class="param-name">
 								<span class="param">bold</span>
 								<span class="type">Boolean</span>
@@ -120,7 +120,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 							</div>
 						</div>
 					
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.constructor():italic?">
 							<div class="param-name">
 								<span class="param">italic</span>
 								<span class="type">Boolean</span>
@@ -135,9 +135,9 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Font.prototype.packText()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L111" class="function-name source-link">packText</a>(<span class="param">text</span>, <span class="param">maxWidth</span>)<span class="type">String</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L111" target="_blank" class="function-name source-link">packText</a>(<span class="param">text</span>, <span class="param">maxWidth</span>)<span class="type">String</span>
 			</div>
 			<div class="function desc">
 				Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
@@ -147,7 +147,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.packText():text">
 							<div class="param-name">
 								<span class="param">text</span>
 								<span class="type">String</span>
@@ -157,7 +157,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 							</div>
 						</div>
 					
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.packText():maxWidth">
 							<div class="param-name">
 								<span class="param">maxWidth</span>
 								<span class="type">Number</span>
@@ -172,9 +172,9 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Font.prototype.getTextBounds()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L142" class="function-name source-link">getTextBounds</a>(<span class="param">text</span>, <span class="param">maxWidth?</span>)<span class="type">{ width: Number, height: Number }</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L142" target="_blank" class="function-name source-link">getTextBounds</a>(<span class="param">text</span>, <span class="param">maxWidth?</span>)<span class="type">{ width: Number, height: Number }</span>
 			</div>
 			<div class="function desc">
 				Returns the width and height of a string of text, optionally after being packed into a fixed max width.
@@ -185,7 +185,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.getTextBounds():text">
 							<div class="param-name">
 								<span class="param">text</span>
 								<span class="type">String</span>
@@ -195,7 +195,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 							</div>
 						</div>
 					
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.getTextBounds():maxWidth?">
 							<div class="param-name">
 								<span class="param">maxWidth</span>
 								<span class="type">Number</span>
@@ -210,9 +210,9 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Font.prototype.getTextLineWidth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L155" class="function-name source-link">getTextLineWidth</a>(<span class="param">textLine</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L155" target="_blank" class="function-name source-link">getTextLineWidth</a>(<span class="param">textLine</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the width of a single line of text. This method is faster than <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getTextWidth</span><span class="highlight-SYMBOL">()</span></code>.
@@ -222,7 +222,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.getTextLineWidth():textLine">
 							<div class="param-name">
 								<span class="param">textLine</span>
 								<span class="type">String</span>
@@ -237,9 +237,9 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Font.prototype.getTextLineHeight()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L164" class="function-name source-link">getTextLineHeight</a>(<span class="param">textLine</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L164" target="_blank" class="function-name source-link">getTextLineHeight</a>(<span class="param">textLine</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the height of a single line of text. This method is faster than <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getTextHeight</span><span class="highlight-SYMBOL">()</span></code>.
@@ -249,7 +249,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.getTextLineHeight():textLine">
 							<div class="param-name">
 								<span class="param">textLine</span>
 								<span class="type">String</span>
@@ -264,9 +264,9 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Font.prototype.getTextWidth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L172" class="function-name source-link">getTextWidth</a>(<span class="param">text</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L172" target="_blank" class="function-name source-link">getTextWidth</a>(<span class="param">text</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the width of a string of text.
@@ -276,7 +276,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.getTextWidth():text">
 							<div class="param-name">
 								<span class="param">text</span>
 								<span class="type">String</span>
@@ -291,9 +291,9 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Font.prototype.getTextHeight()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L182" class="function-name source-link">getTextHeight</a>(<span class="param">text</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L182" target="_blank" class="function-name source-link">getTextHeight</a>(<span class="param">text</span>)<span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the height of a string of text.
@@ -303,7 +303,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.getTextHeight():text">
 							<div class="param-name">
 								<span class="param">text</span>
 								<span class="type">String</span>
@@ -318,9 +318,9 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Font.prototype.toString()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L191" class="function-name source-link">toString</a>()<span class="type">String</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L191" target="_blank" class="function-name source-link">toString</a>()<span class="type">String</span>
 			</div>
 			<div class="function desc">
 				Converts the Font to a valid CSS font string.
@@ -328,9 +328,9 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Font.prototype.get()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L200" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Font</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L200" target="_blank" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Font</span>
 			</div>
 			<div class="function desc">
 				Creates a copy of the font and optionally stores it in a provided destination.
@@ -340,7 +340,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Font.prototype.get():destination?">
 							<div class="param-name">
 								<span class="param">destination</span>
 								<span class="type">Font</span>

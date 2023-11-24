@@ -163,4 +163,12 @@ function parse(content, file) {
 	return topLevels;
 }
 
-module.exports = { parse };
+function addInheritance(classes) {
+	for (const doc of classes)
+		if (doc.name.baseClass)
+			for (const superDoc of classes)
+				if (doc.name.baseClass === superDoc.name.base)
+					(superDoc.subclasses ??= []).push(doc);
+}
+
+module.exports = { parse, addInheritance };

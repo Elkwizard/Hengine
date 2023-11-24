@@ -7,19 +7,19 @@
 			</head>
 			<body>
 				
-			<div class="class-wrapper" id="CanvasImage">
+			<div class="class-wrapper" id="class CanvasImage">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Canvas.js?#L26" class="class-name source-link">CanvasImage</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Canvas.js?#L26" target="_blank" class="class-name source-link">CanvasImage</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 				</div>
 				<div class="class desc">
-					Represents the canvas on which the <a href="../../../Pages/Structure/Hengine.html#Hengine">Hengine</a> is rendered.
+					Represents the canvas on which the <a href="../../../Pages/Structure/Hengine.html#class Hengine">Hengine</a> is rendered.
 The pixel ratio of the canvas is equal to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">window</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">devicePixelRatio</span></code>.
 The <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">width</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">height</span></code> properties of this class are also available on the global object.
 A vector with components equal to half the dimensions of the canvas is also available on the global object in the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">middle</span></code> property.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">canvas</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scalingMode</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">ScalingMode</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">STRETCH</span><span class="highlight-SYMBOL">;
 
 </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{ </span><span class="highlight-COMMENT">// render a circle to the middle of the screen</span><span class="highlight-SYMBOL">
-	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../../Pages/Rendering/Color.html#Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;blue&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">middle</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
+	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;blue&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">middle</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
 });
 </span></code>
 				</div>
@@ -28,32 +28,32 @@ A vector with components equal to half the dimensions of the canvas is also avai
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="CanvasImage.renderer">
 					<div class="prop-header member">
-						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Renderer/Artist.html#Artist">Artist</a></span>
+						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a></span>
 					</div>
 					<div class="prop desc">A renderer which can draw to the screen</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="CanvasImage.cursor">
 					<div class="prop-header member">
-						<span class="prop-name">cursor</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#ImageType">ImageType</a>/String</span>
+						<span class="prop-name">cursor</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/String</span>
 					</div>
 					<div class="prop desc">The cursor icon. This can be either an image or a CSS cursor name</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="CanvasImage.scalingMode">
 					<div class="prop-header member">
 						<span class="prop-name">scalingMode</span><span class="type">ScalingMode</span>
 					</div>
 					<div class="prop desc">The way in which the canvas scales when the window is resized. Starts as <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">ScalingMode</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">PRESERVE_ASPECT_RATIO</span></code></div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="CanvasImage.clearScreen">
 					<div class="prop-header member">
 						<span class="prop-name">clearScreen</span><span class="type">() => void</span>
 					</div>
-					<div class="prop desc">The function that will be called to clear the screen each frame. Starts as <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fill</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../../Pages/Rendering/Color.html#Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">255</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 255</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 255</span><span class="highlight-SYMBOL">))</span></code></div>
+					<div class="prop desc">The function that will be called to clear the screen each frame. Starts as <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fill</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">255</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 255</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 255</span><span class="highlight-SYMBOL">))</span></code></div>
 				</div>
 			</div>
 				
@@ -61,9 +61,9 @@ A vector with components equal to half the dimensions of the canvas is also avai
 				
 			</div>
 		
-			<div class="class-wrapper" id="ScalingMode">
+			<div class="class-wrapper" id="enum ScalingMode">
 				<div class="class-header">
-					<span class="keyword">enum</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Canvas.js?#L7" class="class-name source-link">ScalingMode</a>
+					<span class="keyword">enum</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Canvas.js?#L7" target="_blank" class="class-name source-link">ScalingMode</a>
 				</div>
 				<div class="class desc">
 					Represents the way a canvas scales with changes to the window size.
@@ -73,21 +73,21 @@ A vector with components equal to half the dimensions of the canvas is also avai
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="static ScalingMode.STRETCH">
 					<div class="prop-header member">
 						<span class="prop-name">ScalingMode.STRETCH</span><span class="type">ScalingMode</span>
 					</div>
 					<div class="prop desc">The canvas changes size to fill the entire window</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="static ScalingMode.PRESERVE_ASPECT_RATIO">
 					<div class="prop-header member">
 						<span class="prop-name">ScalingMode.PRESERVE_ASPECT_RATIO</span><span class="type">ScalingMode</span>
 					</div>
 					<div class="prop desc">The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="static ScalingMode.INTEGER_MULTIPLE">
 					<div class="prop-header member">
 						<span class="prop-name">ScalingMode.INTEGER_MULTIPLE</span><span class="type">ScalingMode</span>
 					</div>

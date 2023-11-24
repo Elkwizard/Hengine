@@ -11,34 +11,6 @@
 			--nav-width: 28rem;
 			--header-height: 7rem;
 		}
-
-		#header {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			padding: 1rem;
-			padding-left: 2rem;
-			height: var(--header-height);
-			border-bottom: 3px var(--accent-3) solid;
-		}
-
-		#title {
-			font-size: 4em;
-			color: var(--text-color);
-			font-weight: bold;
-			margin-right: auto;
-		}
-
-		#header a {
-			background: var(--accent-2);
-			text-decoration: none;
-			font-size: 1.2rem;
-			border-radius: 0.5em;
-			padding: 1em 2.5em;
-			color: var(--text-color);
-			margin: 1em;
-			font-family: var(--text-font);
-		}
 		
 		@media (prefers-color-scheme: light) {
 			li::before {
@@ -61,7 +33,13 @@
 		body {
 			background-color: var(--background);
 		}
+		
+		#panel {
+			width: calc(100vw - var(--nav-width));
+			border: none;
+		}
 
+		/* nav styles */
 		#nav {
 			padding-top: 1em;
 			padding-left: 2em;
@@ -88,7 +66,7 @@
 			display: inline-block;
 			width: 1.3em;
 			aspect-ratio: 1/1;
-			background-image: url(./Category.png);
+			background-image: url(./category.png);
 			background-size: cover;
 			position: absolute;
 			image-rendering: pixelated;
@@ -96,7 +74,7 @@
 		}
 
 		li[data-leaf="true"]::before {
-			background-image: url(./Document.png);
+			background-image: url(./document.png);
 			transform: translate(-140%, -7%);
 		}
 
@@ -141,15 +119,140 @@
 			border-left: 1px var(--text-color) solid;
 		}
 
-		#panel {
-			width: calc(100vw - var(--nav-width));
+		/* header styles */
+		#header {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			padding: 1rem;
+			padding-left: 2rem;
+			height: var(--header-height);
+			border-bottom: 3px var(--accent-3) solid;
+		}
+
+		#title {
+			font-size: 4em;
+			color: var(--text-color);
+			font-weight: bold;
+			margin-right: auto;
+		}
+
+		#header > a {
+			background: var(--accent-2);
+			text-decoration: none;
+			font-size: 1.2rem;
+			border-radius: 0.5em;
+			padding: 1.2rem 3em;
+			color: var(--text-color);
+			font-family: var(--text-font);
+		}
+
+		#header > a, #searchBarWrapper {
+			margin: 1em;
+		}
+
+		/* search styles */
+		#searchBarWrapper {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			border-radius: 0.5rem;
+			padding: 1.2rem;
+			border: 1px black solid;
+			background: white;
+		}
+
+		#searchBar {
+			background: transparent;
+			font-size: 1.2rem;
+			height: 1.54rem;
+			border: none;
+			outline: none;
+			margin-left: 0.3rem;
+		}
+
+		#searchIcon {
+			height: 1.2rem;
+			aspect-ratio: 1/1;
+			image-rendering: pixelated;
+			filter: invert();
+			transform: scale(1.5);
+		}
+
+		#searchWrapper {
+			position: relative;
+		}
+
+		#searchResults {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			transform: translateY(100%);
+			background: white;
+			max-height: 50vh;
+			overflow: auto;
+			border-radius: 0.5rem;
+			padding: 0.5rem;
+			display: block;
+		}
+
+		#searchResults:empty {
+			display: none;
+		}
+		
+		#searchResults::-webkit-scrollbar {
+			width: 1rem;
+			background: white;
+			border: none;
+			border-top-right-radius: 0.5rem;
+			border-bottom-right-radius: 0.5rem;
+		}
+
+		#searchResults::-webkit-scrollbar-thumb {
+			background: rgb(100, 100, 100);
+			border-radius: 0.5rem;
+		}
+		
+		.search-result {
+			display: block;
+			border-bottom: 1px black solid;
+			padding: 0.5rem;
+			cursor: pointer;
+			text-decoration: none;
+			color: black;
+		}
+
+		.search-record {
+			color: var(--accent-1);
+		}
+
+		.search-matches {
+			font-family: var(--text-font);
+		}
+
+		.search-result:last-child {
 			border: none;
 		}
+
+		.search-match {
+			display: inline;
+			background-color: rgba(100, 100, 255, 0.5);
+			border-radius: 0.2rem;
+		}
 	</style>
+	<script src="searchCache.js"></script>
+	<script src="search.js"></script>
 </head>
 <body>
 	<div id="header">
 		<span id="title">Hengine Docs</span>
+		<div id="searchWrapper" tabindex="0">
+			<div id="searchBarWrapper">
+				<input type="text" id="searchBar">
+				<img id="searchIcon" src="./search.png">
+			</div>
+			<div id="searchResults"></div>
+		</div>
 		<a href="https://www.github.com/Elkwizard/Hengine">GitHub</a>
 		<a href="https://www.github.com/Elkwizard/Hengine/archive/master.zip">Download</a>
 	</div>
@@ -159,6 +262,7 @@
 	</div>
 	<script src="index.js"></script>
 	<script>
+		// populate navigation
 		const nav = document.getElementById("nav");
 		const panel = document.getElementById("panel");
 		const generateNav = (structure, file = ".") => `<ul>${
@@ -167,10 +271,10 @@
 					const dst = file + "/" + name;
 					if (Array.isArray(value) || value === null) {
 						const docPath = dst.slice(2).replaceAll("/", "\\") + ".html";
-						const complete = completeness[docPath];
+						const complete = COMPLETENESS[docPath];
 						return `
 							<li data-leaf="true">
-								<button class="${complete ? "" : "incomplete"}" onclick="changePage('${name}', '${dst}.html')">${name}</button>
+								<button class="${complete ? "" : "incomplete"}" onclick="changePage('${dst}.html')">${name}</button>
 							</li>
 						`;
 					} return `<li>${name}${generateNav(value, dst)}</li>`;
@@ -178,14 +282,82 @@
 				.join("")
 		}</ul>`;
 
-		const changePage = (name, path) => {
+		const changePage = path => {
 			panel.src = path;
+			const name = path.match(/\/([^/]*?)\.html(#(.*?))?$/)[1];
 			document.title = `Hengine Docs - ${name}`;
 		};
 
-		changePage("Operable", "Pages/Structure/Hengine.html");
+		changePage("Pages/Structure/Hengine.html");
 
-		nav.innerHTML = generateNav(paths);
+		nav.innerHTML = generateNav(STRUCTURE);
+
+		// searching
+		const searchBar = document.getElementById("searchBar");
+		const searchResults = document.getElementById("searchResults");
+		const searchWrapper = document.getElementById("searchWrapper");
+		searchBar.oninput = searchBar.onfocus = () => {
+			const startTime = performance.now();
+			const results = query(searchBar.value, SEARCH_CACHE, 2)
+				.sort((a, b) => a.distance - b.distance);
+			const duration = performance.now() - startTime;
+
+			const distances = results
+					.flatMap(result => result.matches)
+					.map(match => match.distance);
+			const minDist = Math.min(...distances);
+			const distThreshold = minDist + 0.3;
+			
+			searchResults.innerHTML = results
+				.filter(({ matches }) => matches.some(match => match.distance <= distThreshold))
+				.map(({ record, matches }) => {
+					const matchMap = new Map();
+					for (const match of matches)
+						if (match.distance <= distThreshold)
+							matchMap.set(match.index, match);
+					
+					const tokens = SEARCH_CACHE.recordCache[record].tokens;
+					const matchIndices = new Set();
+					let output = [];
+					for (let i = 0; i < tokens.length; i++) {
+						if (matchMap.has(i)) {
+							const match = matchMap.get(i);
+							matchIndices.add(output.length);
+							output.push(`<div class="search-match" data-distance="${match.distance.toFixed(2)}">${match.tokens.join(" ")}</div>`);
+							i += match.tokens.length - 1;
+						} else output.push(tokens[i]);
+					}
+					
+					let lastMatchIndex = -Infinity;
+					const present = new Array(output.length).fill(false);
+					for (let i = 0; i < output.length * 2; i++) {
+						const inx = i < output.length ? i : output.length * 2 - 1 - i;
+						
+						if (matchIndices.has(inx))
+							lastMatchIndex = inx;
+
+						if (Math.abs(inx - lastMatchIndex) < 5)
+							present[inx] = true;
+					}
+
+					const text = present
+						.map((v, i) => v ? output[i] : null)
+						.reduce((a, b) => b === null ? a.endsWith("...") ? a : `${a} ...` : `${a} ${b}`, "");
+
+					return `
+						<a class="search-result" onclick="changePage('${
+							SEARCH_ID_TO_PATH[record].replaceAll("\\", "/")
+						}#${record}'); searchResults.innerHTML = ''">
+							<div class="search-record">
+								${record}
+							</div>
+							<div class="search-matches">
+								${text}
+							</div>
+						</a>
+					`;
+				}).join("");
+		};
 	</script>
 </body>
 </html>

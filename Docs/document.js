@@ -26,7 +26,7 @@ function documentName(name, doc, wrapperClass) {
 	if (name.isPage) return `<span class="page-name">${result}</span>`
 	if (name.isStatic) result = `${wrapperClass}.${result}`;
 	if (name.isAsync) result = `<span class="keyword">async</span> ${result}`;
-	result = `<a href="${sourceLink(doc)}" class="${name.isClass ? "class-name" : "function-name"} source-link">${result}</a>`;
+	result = `<a href="${sourceLink(doc)}" target="_blank" class="${name.isClass ? "class-name" : "function-name"} source-link">${result}</a>`;
 	if (name.isGetter) result = `<span class="keyword">get</span> ${result}`;
 	if (name.isSetter) result = `<span class="keyword">set</span> ${result}`;
 	if (name.baseClass) result += ` <span class="keyword">extends</span> <span class="class-name">${name.baseClass}</span>`
@@ -59,7 +59,7 @@ function documentFunction(fn, wrapperClass) {
 			${
 				signature
 					.map(param => `
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="${param.searchID}">
 							<div class="param-name">
 								<span class="param">${param.name.replace(/\W/g, "")}</span>
 								<span class="type">${param.type}</span>
@@ -75,7 +75,7 @@ function documentFunction(fn, wrapperClass) {
 	const description = fn.lines.find(line => line.category === null)?.content ?? "";
 
 	return `
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="${fn.searchID}">
 			<div class="function-header member">
 				${header}
 			</div>
@@ -132,7 +132,7 @@ function document(doc, topLevelIDs, file) {
 		const memberProperties = doc.lines
 			.filter(line => line.category?.indexOf("prop") > -1)
 			.map(line => (stats.properties++, `
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="${line.searchID}">
 					<div class="prop-header member">
 						<span class="prop-name">${line.name}</span><span class="type">${line.type}</span>
 					</div>
@@ -141,7 +141,7 @@ function document(doc, topLevelIDs, file) {
 			`))
 			.join("");
 		result = `
-			<div class="class-wrapper" id="${doc.name.base}">
+			<div class="class-wrapper" id="${doc.searchID}">
 				<div class="class-header">
 					<span class="keyword">${[...classQualifiers, doc.name.isEnum ? "enum" : "class"].join(" ")}</span> ${name}
 				</div>
@@ -181,14 +181,14 @@ function document(doc, topLevelIDs, file) {
 
 	// add automatic links to other doc pages
 	const toRoot = path.relative(path.dirname(file), ".");
-	const entries = Object.entries(topLevelIDs)
-		.sort((a, b) => b[0].length - a[0].length);
-	for (const [id, filePath] of entries) {
+	const entries = [...topLevelIDs]
+		.sort((a, b) => b[0].name.base.length - a[0].name.base.length);
+	for (const [doc, filePath] of entries) {
 		if (file === filePath) continue;
-		const regex = new RegExp(String.raw`(?<! href="([^"]*?))\b(${id.replaceAll(".", "\\.")}(s|es)?)\b(?!([^<]*?)<\/a>)`, "g");
+		const regex = new RegExp(String.raw`(?<! href="([^"]*?))\b(${doc.name.base.replaceAll(".", "\\.")}(s|es)?)\b(?!([^<]*?)<\/a>)`, "g");
 		const link = `<a href=${JSON.stringify(
 			path.join(toRoot, filePath)
-				.replace(/\\/g, "/") + "#" + id
+				.replace(/\\/g, "/") + "#" + doc.searchID
 		)}>$2</a>`;
 		result = result.replace(regex, link);
 	}

@@ -47,13 +47,14 @@
 			"Font": null,
 			"Camera": null,
 			"Color": null,
-			"Gradient": null,
+			"Gradient": ["Gradient", "ValueStop"],
 			"GrayMap": null,
 			"TileMap": null,
 			"Renderer": {
 				"Artist": [
 					"Artist",
 					"TextMode",
+					"BlendMode",
 					"LineCap",
 					"LineJoin"
 				],

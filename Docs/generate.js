@@ -1,20 +1,23 @@
 const fs = require("fs");
 const path = require("path");
-const { parse } = require("./parse.js");
+const { parse, addInheritance } = require("./parse.js");
 const { document, stats } = require("./document.js");
-
-const generate = (transf, srcFile, srcRoot = srcFile) => {
-	if (fs.lstatSync(srcFile).isDirectory())
-		return fs.readdirSync(srcFile)
-			.map(p => path.join(srcFile, p))
-			.flatMap(p => generate(transf, p, srcRoot));
-	else return [transf(fs.readFileSync(srcFile, "utf-8"), path.relative(srcRoot, srcFile))];
-};
+const { makeSearchCache, addSearchData } = require("./searchPreprocess.js")
 
 const [_node, _this, sourcePath, dstPath, structurePath] = process.argv;
 
+function writeFile(fileName, content) {
+	content = content.replaceAll("\n", "\r\n");
+	fileName = path.join(dstPath, fileName);
+	const dir = path.dirname(fileName);
+	if (!fs.existsSync(dir))
+		fs.mkdirSync(dir, { recursive: true });
+	fs.writeFileSync(fileName, content, "utf-8");
+}
+
+// create path map
 const structure = JSON.parse(fs.readFileSync(structurePath, "utf-8"));
-const nameToPath = {};
+const nameToPath = { };
 
 const populatePathMap = (structure, file = ".") => {
 	for (const key in structure) {
@@ -29,43 +32,56 @@ const populatePathMap = (structure, file = ".") => {
 
 populatePathMap(structure);
 
-function writeFile(fileName, content) {
-	content = content.replaceAll("\n", "\r\n");
-	fileName = path.join(dstPath, fileName);
-	const dir = path.dirname(fileName);
-	if (!fs.existsSync(dir))
-		fs.mkdirSync(dir, { recursive: true });
-	fs.writeFileSync(fileName, content, "utf-8");
-}
+// parse source files
+const transformFiles = (transf, srcFile, srcRoot = srcFile) => {
+	if (fs.lstatSync(srcFile).isDirectory())
+		return fs.readdirSync(srcFile)
+			.map(p => path.join(srcFile, p))
+			.flatMap(p => transformFiles(transf, p, srcRoot));
+	else return [transf(fs.readFileSync(srcFile, "utf-8"), path.relative(srcRoot, srcFile))];
+};
 
-const docs = generate(parse, sourcePath).flatMap(batch => batch);
-
-const pathToDocumentation = { };
-
-for (const doc of docs)
-	if (doc.name.baseClass)
-		for (const superDoc of docs)
-			if (doc.name.baseClass === superDoc.name.base)
-				(superDoc.subclasses ??= []).push(doc);
+const docs = transformFiles(parse, sourcePath).flatMap(batch => batch);
+addInheritance(docs);
 
 const nameToDoc = { };
 for (const doc of docs)
 	nameToDoc[doc.name.base] = doc;
 
-const completeness = { };
-
+// create top level doc to path map
+const docToPath = new Map();
 for (const name in nameToPath) {
 	const doc = nameToDoc[name];
-	const path = nameToPath[name];
+	const path = nameToPath[doc.name.base];
+	if (!path) console.log(`${doc.name.base} doesn't exist!`);
+	docToPath.set(doc, path);
+}
+
+// preprocess search cache
+const searchIdToDoc = { };
+const searchRecords = addSearchData(docs, searchIdToDoc);
+const searchIdToPath = { };
+for (const id in searchIdToDoc)
+	searchIdToPath[id] = docToPath.get(searchIdToDoc[id]);
+const SEARCH_CACHE = makeSearchCache(searchRecords);
+writeFile("searchCache.js", `
+const SEARCH_CACHE = ${JSON.stringify(SEARCH_CACHE)};
+const SEARCH_ID_TO_PATH = ${JSON.stringify(searchIdToPath)};
+`);
+
+// create documentation and organize into files
+const pathToDocumentation = { };
+const completeness = { };
+
+for (const [doc, path] of docToPath) {
 	if (!(path in completeness))
 		completeness[path] = !!doc;
 	else completeness[path] &&= !!doc;
 	if (!doc) continue;
-	if (!path) console.log(`${doc.name.base} doesn't exist!`); 
-	// console.log(doc.name.base, path);
-	pathToDocumentation[path] = (pathToDocumentation[path] ?? "") + document(doc, nameToPath, path);
+	pathToDocumentation[path] = (pathToDocumentation[path] ?? "") + document(doc, docToPath, path);
 }
 
+// write documentation files to disk
 for (const file in pathToDocumentation) {
 	if (!pathToDocumentation[file]) continue;
 	const toRoot = path.relative(path.dirname(file), ".");
@@ -84,6 +100,9 @@ for (const file in pathToDocumentation) {
 	writeFile(file, documentation);
 }
 
-writeFile("index.js", `const paths = ${JSON.stringify(structure)}; const completeness = ${JSON.stringify(completeness)};`);
+writeFile("index.js", `
+	const STRUCTURE = ${JSON.stringify(structure)};
+	const COMPLETENESS = ${JSON.stringify(completeness)};
+`);
 
 console.log("Documentation Statistics:", stats);

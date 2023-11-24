@@ -7,9 +7,9 @@
 			</head>
 			<body>
 				
-			<div class="class-wrapper" id="Synth">
+			<div class="class-wrapper" id="class Synth">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L90" class="class-name source-link">Synth</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L90" target="_blank" class="class-name source-link">Synth</a>
 				</div>
 				<div class="class desc">
 					Represents a synthesizer which can create pure tones.
@@ -28,9 +28,9 @@
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Synth.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L94" class="function-name source-link">constructor</a>()
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L94" target="_blank" class="function-name source-link">constructor</a>()
 			</div>
 			<div class="function desc">
 				Creates a new Synth.
@@ -38,9 +38,9 @@
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Synth.prototype.play()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L119" class="function-name source-link">play</a>(<span class="param">tone</span>)<span class="type">(Number => void)/Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L119" target="_blank" class="function-name source-link">play</a>(<span class="param">tone</span>)<span class="type">(Number => void)/Promise</span>
 			</div>
 			<div class="function desc">
 				Plays a tone. If the tone has a specified duration, this returns a promise that resolves when it completes. Otherwise, this returns the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">stop</span><span class="highlight-SYMBOL">()</span></code> method of the SynthChannel playing this tone.
@@ -50,7 +50,7 @@
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Synth.prototype.play():tone">
 							<div class="param-name">
 								<span class="param">tone</span>
 								<span class="type">Tone</span>
@@ -65,9 +65,9 @@
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="Synth.prototype.playSequence()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L154" class="function-name source-link"><span class="keyword">async</span> playSequence</a>(<span class="param">all</span>, <span class="param">globals?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L154" target="_blank" class="function-name source-link"><span class="keyword">async</span> playSequence</a>(<span class="param">all</span>, <span class="param">globals?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Plays a sequence of tones with specified durations. Returns a promise that resolves when they have all completed.
@@ -77,7 +77,7 @@
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Synth.prototype.playSequence():all">
 							<div class="param-name">
 								<span class="param">all</span>
 								<span class="type">Tone[]</span>
@@ -87,7 +87,7 @@
 							</div>
 						</div>
 					
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="Synth.prototype.playSequence():globals?">
 							<div class="param-name">
 								<span class="param">globals</span>
 								<span class="type">Tone</span>
@@ -105,9 +105,9 @@
 				
 			</div>
 		
-			<div class="class-wrapper" id="Tone">
+			<div class="class-wrapper" id="class Tone">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L78" class="class-name source-link">Tone</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L78" target="_blank" class="class-name source-link">Tone</a>
 				</div>
 				<div class="class desc">
 					This is not an actual class, but rather an interface for tone specifications.
@@ -117,42 +117,42 @@
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Tone.duration?">
 					<div class="prop-header member">
 						<span class="prop-name">duration?</span><span class="type">Number</span>
 					</div>
 					<div class="prop desc">The duration (in milliseconds) of the tone. If not specified, the tone can be stopped at will</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Tone.frequency?">
 					<div class="prop-header member">
 						<span class="prop-name">frequency?</span><span class="type">Number</span>
 					</div>
 					<div class="prop desc">The frequency of the tone in Hertz. If not specified, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">note</span></code> must be</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Tone.note?">
 					<div class="prop-header member">
 						<span class="prop-name">note?</span><span class="type">String</span>
 					</div>
 					<div class="prop desc">The letter name of the the note, optionally with a "#" appended for sharp or a "b" for flat. If not specified, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frequency</span></code> must be</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Tone.octave?">
 					<div class="prop-header member">
 						<span class="prop-name">octave?</span><span class="type">Number</span>
 					</div>
 					<div class="prop desc">Which octave on a piano the note would appear in. Default is 4. This is ignored if <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frequency</span></code> is specified</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Tone.volume?">
 					<div class="prop-header member">
 						<span class="prop-name">volume?</span><span class="type">Number</span>
 					</div>
 					<div class="prop desc">The volume of the tone on [0, 1]. Default is 1</div>
 				</div>
 			
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="Tone.wave?">
 					<div class="prop-header member">
 						<span class="prop-name">wave?</span><span class="type">String</span>
 					</div>
@@ -164,9 +164,9 @@
 				
 			</div>
 		
-			<div class="class-wrapper" id="SynthChannel">
+			<div class="class-wrapper" id="class SynthChannel">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L4" class="class-name source-link">SynthChannel</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L4" target="_blank" class="class-name source-link">SynthChannel</a>
 				</div>
 				<div class="class desc">
 					Represents a channel on which tones can be played.
@@ -178,9 +178,9 @@
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="SynthChannel.prototype.stop()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L51" class="function-name source-link">stop</a>(<span class="param">wait?</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L51" target="_blank" class="function-name source-link">stop</a>(<span class="param">wait?</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Stops the tone from playing, optionally after a delay.
@@ -191,7 +191,7 @@ Returns a promise that resolves when the tone stops.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="SynthChannel.prototype.stop():wait?">
 							<div class="param-name">
 								<span class="param">wait</span>
 								<span class="type">Number</span>

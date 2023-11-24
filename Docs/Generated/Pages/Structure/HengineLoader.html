@@ -7,28 +7,28 @@
 			</head>
 			<body>
 				
-			<div class="class-wrapper" id="HengineLoader">
+			<div class="class-wrapper" id="class HengineLoader">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L490" class="class-name source-link">HengineLoader</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L490" target="_blank" class="class-name source-link">HengineLoader</a>
 				</div>
 				<div class="class desc">
-					Allows for the loading of both the rest of the <a href="../../Pages/Structure/Hengine.html#Hengine">Hengine</a> and additional external files.
-The file containing this class <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">HengineLoader</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">js</span></code> is the only file that needs to be loaded directly to use the <a href="../../Pages/Structure/Hengine.html#Hengine">Hengine</a>.
+					Allows for the loading of both the rest of the <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a> and additional external files.
+The file containing this class <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">HengineLoader</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">js</span></code> is the only file that needs to be loaded directly to use the <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a>.
 Other files can be loaded via the HengineLoader's API.
 The web url for this file is:
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-CLASS">https://</span><span class="highlight-PROPERTY">elkwizard.github.io/<a href="../../Pages/Structure/Hengine.html#Hengine">Hengine</a>/Package/Engine/Manage/HengineLoader.js
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-CLASS">https://</span><span class="highlight-PROPERTY">elkwizard.github.io/<a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a>/Package/Engine/Manage/HengineLoader.js
 </span></code>
 This class is a singleton, and the single instance can be accessed via a static property.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">async function</span><span class="highlight-SYMBOL"> </span><span class="highlight-FUNCTION">load</span><span class="highlight-SYMBOL">() {
 	</span><span class="highlight-COMMENT">// choose which file to load based on an external file</span><span class="highlight-SYMBOL">
 </span><span class="highlight-KEYWORD">	await</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">HengineLoader</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">load</span><span class="highlight-SYMBOL">([
-	</span><span class="highlight-KEYWORD">	new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Structure/HengineResource/HengineResource.html#HengineTextResource">HengineTextResource</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;whichToLoad.txt&quot;</span><span class="highlight-SYMBOL">)
+	</span><span class="highlight-KEYWORD">	new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Structure/HengineResource/HengineResource.html#class HengineTextResource">HengineTextResource</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;whichToLoad.txt&quot;</span><span class="highlight-SYMBOL">)
 	],</span><span class="highlight-LANG_VAR"> false</span><span class="highlight-SYMBOL">);
 
 	</span><span class="highlight-COMMENT">// load the selected script</span><span class="highlight-SYMBOL">
 </span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> fileName</span><span class="highlight-SYMBOL"> = </span><span class="highlight-FUNCTION">loadResource</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;whichToLoad.txt&quot;</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-KEYWORD">	await</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">HengineLoader</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">load</span><span class="highlight-SYMBOL">([
-	</span><span class="highlight-KEYWORD">	new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Structure/HengineResource/HengineResource.html#HengineScriptResource">HengineScriptResource</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&#96;</span><span class="highlight-SYMBOL">${</span><span class="highlight-IDENTIFIER">fileName</span><span class="highlight-SYMBOL">}</span><span class="highlight-STRING">.js&#96;</span><span class="highlight-SYMBOL">)
+	</span><span class="highlight-KEYWORD">	new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Structure/HengineResource/HengineResource.html#class HengineScriptResource">HengineScriptResource</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&#96;</span><span class="highlight-SYMBOL">${</span><span class="highlight-IDENTIFIER">fileName</span><span class="highlight-SYMBOL">}</span><span class="highlight-STRING">.js&#96;</span><span class="highlight-SYMBOL">)
 	]);
 }
 </span></code>
@@ -38,7 +38,7 @@ This class is a singleton, and the single instance can be accessed via a static 
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper">
+				<div class="prop-wrapper" id="static HengineLoader.loader">
 					<div class="prop-header member">
 						<span class="prop-name">HengineLoader.loader</span><span class="type">HengineLoader</span>
 					</div>
@@ -50,22 +50,22 @@ This class is a singleton, and the single instance can be accessed via a static 
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="HengineLoader.prototype.loadResource()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L553" class="function-name source-link">loadResource</a>(<span class="param">src</span>)<span class="type">Any/null</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L553" target="_blank" class="function-name source-link">loadResource</a>(<span class="param">src</span>)<span class="type">Any/null</span>
 			</div>
 			<div class="function desc">
 				Retrieves a specific resource.
 If the resource failed to load, this returns null.
 This method is also available on the global object.
-If the resource has internal mutable state, like an <a href="../../Pages/Rendering/Image Types/Animation.html#Animation">Animation</a>, a new copy of the resource will be returned with each call to this function.
+If the resource has internal mutable state, like an <a href="../../Pages/Rendering/Image Types/Animation.html#class Animation">Animation</a>, a new copy of the resource will be returned with each call to this function.
 			</div>
 			
 				<div class="function-signature">
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="HengineLoader.prototype.loadResource():src">
 							<div class="param-name">
 								<span class="param">src</span>
 								<span class="type">String</span>
@@ -80,13 +80,13 @@ If the resource has internal mutable state, like an <a href="../../Pages/Renderi
 			
 		</div>
 	
-		<div class="function-wrapper">
+		<div class="function-wrapper" id="HengineLoader.load()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L585" class="function-name source-link">HengineLoader.load</a>(<span class="param">userResources</span>, <span class="param">done?</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L585" target="_blank" class="function-name source-link">HengineLoader.load</a>(<span class="param">userResources</span>, <span class="param">done?</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Loads a series of resources, and optionally starts the update loop after the loading completes.
-If the rest of the <a href="../../Pages/Structure/Hengine.html#Hengine">Hengine</a> has yet to be loaded, it will be loaded before any of the resources passed to this function.
+If the rest of the <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a> has yet to be loaded, it will be loaded before any of the resources passed to this function.
 Returns a promise that resolves to the HengineLoader instance when all the resources are loaded.
 			</div>
 			
@@ -94,17 +94,17 @@ Returns a promise that resolves to the HengineLoader instance when all the resou
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="HengineLoader.load():userResources">
 							<div class="param-name">
 								<span class="param">userResources</span>
-								<span class="type"><a href="../../Pages/Structure/HengineResource/HengineResource.html#HengineResource">HengineResource</a>[]</span>
+								<span class="type"><a href="../../Pages/Structure/HengineResource/HengineResource.html#class HengineResource">HengineResource</a>[]</span>
 							</div>
 							<div class="param desc">
 								The resources to load
 							</div>
 						</div>
 					
-						<div class="param-wrapper">
+						<div class="param-wrapper" id="HengineLoader.load():done?">
 							<div class="param-name">
 								<span class="param">done</span>
 								<span class="type">Boolean</span>
