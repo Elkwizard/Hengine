@@ -1,15 +1,16 @@
-const crypto = require("crypto");
-
 function tokenize(text) {
-	return text
-		.replace(/\W+/g, " ")
+	const rawTokens = text
 		.trim()
-		.toLowerCase()
-		.split(" ");
+		.split(/(?<=\W)(?=\w)/g);
+
+	const tokens = rawTokens
+		.map(tok => tok.toLowerCase().replace(/\W/g, ""));
+		
+	return { rawTokens, tokens };
 }
 
 function makeRecord(text, tokenFrequency) {
-	const tokens = tokenize(text);
+	const { rawTokens, tokens } = tokenize(text);
 	const tokenMap = {};
 	for (let i = 0; i < tokens.length; i++) {
 		const tok = tokens[i];
@@ -18,7 +19,7 @@ function makeRecord(text, tokenFrequency) {
 		(tokenMap["_" + tok] ??= []).push(i);
 	}
 
-	return { tokens, tokenMap };
+	return { tokens, rawTokens, tokenMap };
 }
 
 function makeSearchCache(records) {

@@ -203,10 +203,10 @@ table {
 
 /* highlighting */
 .highlight-DEFAULT { color: #fff; }
-.highlight-SYMBOL { color: #f8f; }
+.highlight-SYMBOL { color: #faf; }
 .highlight-IDENTIFIER { color: #ddd; }
 .highlight-FUNCTION { color: #88d; }
-.highlight-CLASS { color: #88d; }
+.highlight-CLASS { color: #c8d; }
 .highlight-CONSTANT { color: #88d; }
 .highlight-PROPERTY { color: #aad; }
 .highlight-KEYWORD { color: #a5a; }

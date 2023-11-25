@@ -50,7 +50,7 @@ function queryRecord(record, search, tokenFrequency, maxDist) {
 						return null;
 					}
 				}
-				return { distance, index, tokens };
+				return { distance, index, length: tokens.length };
 			})
 			.filter(match => match !== null);
 

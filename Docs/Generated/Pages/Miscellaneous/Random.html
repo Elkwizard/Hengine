@@ -13,7 +13,7 @@
 				</div>
 				<div class="class desc">
 					Represents a seeded random number generator.
-All instance methods of this class are available statically, so <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">)</span></code> is valid and uses statically stored state of the class itself.
+All instance methods of this class are available statically, so <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">)</span></code> is valid and uses statically stored state of the class itself.
 The random number generation functions of this class are organized into two categories: stable and unstable.
 Stable functions will produce the same value when called with the same arguments.
 Unstable functions don't take any seeding parameters and change their return value on each call.
@@ -21,10 +21,10 @@ Unstable functions don't take any seeding parameters and change their return val
 let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">;
 
 </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
-	</span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> += </span><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// generate a random value each frame</span><span class="highlight-SYMBOL">
+	</span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> += </span><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// generate a random value each frame</span><span class="highlight-SYMBOL">
 	</span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL">++;
 </span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> mean</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> / </span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// compute the mean of the random values</span><span class="highlight-SYMBOL">
-	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CONSTANT"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">text</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER"><a href="../../Pages/Rendering/Font.html#class Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">Arial20</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">mean</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
+	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">text</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../Pages/Rendering/Font.html#class Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CLASS">Arial20</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">mean</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
 });
 </span></code>
 				</div>
@@ -111,7 +111,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 								<span class="type">Function</span>
 							</div>
 							<div class="param desc">
-								The initial distribution for the numbers generated. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>
+								The initial distribution for the numbers generated. Default is <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>
 							</div>
 						</div>
 					
@@ -134,7 +134,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 								<span class="type">Function</span>
 							</div>
 							<div class="param desc">
-								The initial distribution. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>
+								The initial distribution. Default is <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>
 							</div>
 						</div>
 					
@@ -367,7 +367,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 			</div>
 			<div class="function desc">
 				Returns a random point within a given convex shape.
-This method only works with <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">distribution</span></code> being <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>.
+This method only works with <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">distribution</span></code> being <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>.
 Unstable.
 			</div>
 			

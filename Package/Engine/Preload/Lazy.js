@@ -5,7 +5,7 @@
  * Lazy.define(object, "lazy", () => { // an expensive operation
  * 	let result = 0;
  * 	for (let i = 0; i < 1e6; i++)
- * 		result += Math.random();
+ * 		result += Random.random();
  * 	return result;
  * });
  * 

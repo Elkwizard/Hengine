@@ -22,7 +22,7 @@ Several engine-provided uniforms are given, specifically:
 uniform vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">resolution</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// the width and height of the image, in pixels</span><span class="highlight-SYMBOL">
 </span></code>
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// grayscale shader</span><span class="highlight-KEYWORD">
-const</span><span class="highlight-CONSTANT"> shader</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CONSTANT"> GPUShader</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">300</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 300</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&#96;
+const</span><span class="highlight-CONSTANT"> shader</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> GPUShader</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">300</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 300</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&#96;
 	uniform sampler2D image;
 
 	vec4 shader() {

@@ -14,12 +14,20 @@
 		
 		@media (prefers-color-scheme: light) {
 			li::before {
-				filter: invert();
+				filter: none !important;
 			}
 
-			#header a {
-				background: none;
+			#header > a {
+				background: none !important;
+				border: 2px var(--accent-2) solid !important;
+			}
+
+			#searchBarWrapper {
 				border: 2px var(--accent-2) solid;
+			}
+
+			#searchResults {
+				border: 1px var(--accent-2) solid;
 			}
 		}
 
@@ -66,15 +74,15 @@
 			display: inline-block;
 			width: 1.3em;
 			aspect-ratio: 1/1;
-			background-image: url(./category.png);
+			background-image: url(./category.svg);
 			background-size: cover;
 			position: absolute;
-			image-rendering: pixelated;
 			transform: translate(-140%, 5%);
+			filter: invert();
 		}
 
 		li[data-leaf="true"]::before {
-			background-image: url(./document.png);
+			background-image: url(./document.svg);
 			transform: translate(-140%, -7%);
 		}
 
@@ -158,7 +166,6 @@
 			align-items: center;
 			border-radius: 0.5rem;
 			padding: 1.2rem;
-			border: 1px black solid;
 			background: white;
 		}
 
@@ -174,8 +181,6 @@
 		#searchIcon {
 			height: 1.2rem;
 			aspect-ratio: 1/1;
-			image-rendering: pixelated;
-			filter: invert();
 			transform: scale(1.5);
 		}
 
@@ -196,8 +201,13 @@
 			display: block;
 		}
 
+		
 		#searchResults:empty {
 			display: none;
+		}
+
+		#searchResults::before {
+			content: attr(data-stats);
 		}
 		
 		#searchResults::-webkit-scrollbar {
@@ -238,6 +248,12 @@
 			display: inline;
 			background-color: rgba(100, 100, 255, 0.5);
 			border-radius: 0.2rem;
+			font-family: var(--text-font);
+		}
+
+		.ellipses {
+			display: inline;
+			color: rgb(150, 150, 150);
 		}
 	</style>
 	<script src="searchCache.js"></script>
@@ -249,7 +265,7 @@
 		<div id="searchWrapper" tabindex="0">
 			<div id="searchBarWrapper">
 				<input type="text" id="searchBar">
-				<img id="searchIcon" src="./search.png">
+				<img id="searchIcon" src="./search.svg">
 			</div>
 			<div id="searchResults"></div>
 		</div>
@@ -296,6 +312,11 @@
 		const searchBar = document.getElementById("searchBar");
 		const searchResults = document.getElementById("searchResults");
 		const searchWrapper = document.getElementById("searchWrapper");
+		const searchStats = document.getElementById("searchStats");
+		searchBar.focus();
+		searchWrapper.addEventListener("focusout", () => {
+			searchResults.style.display = "none";
+		});
 		searchBar.oninput = searchBar.onfocus = () => {
 			const startTime = performance.now();
 			const results = query(searchBar.value, SEARCH_CACHE, 2)
@@ -307,25 +328,42 @@
 					.map(match => match.distance);
 			const minDist = Math.min(...distances);
 			const distThreshold = minDist + 0.3;
+
+			const passingResults = results
+				.filter(({ matches }) => matches.some(match => match.distance <= distThreshold));
+
+			searchResults.dataset.stats = `Found ${passingResults.length} result${results.length === 1 ? "" : "s"} in ${duration.toFixed(1)} ms`;
 			
-			searchResults.innerHTML = results
-				.filter(({ matches }) => matches.some(match => match.distance <= distThreshold))
+
+			searchResults.style.display = "";
+			searchResults.innerHTML = passingResults
 				.map(({ record, matches }) => {
 					const matchMap = new Map();
 					for (const match of matches)
 						if (match.distance <= distThreshold)
 							matchMap.set(match.index, match);
 					
-					const tokens = SEARCH_CACHE.recordCache[record].tokens;
+					const sanitationDiv = document.createElement("div");
+
+					const sanitize = text => {
+						sanitationDiv.innerText = text.replace(/\s+/g, " ");
+						return sanitationDiv.innerHTML;
+					};
+
+					const tokens = SEARCH_CACHE.recordCache[record].rawTokens;
 					const matchIndices = new Set();
 					let output = [];
 					for (let i = 0; i < tokens.length; i++) {
 						if (matchMap.has(i)) {
 							const match = matchMap.get(i);
 							matchIndices.add(output.length);
-							output.push(`<div class="search-match" data-distance="${match.distance.toFixed(2)}">${match.tokens.join(" ")}</div>`);
-							i += match.tokens.length - 1;
-						} else output.push(tokens[i]);
+							const matchString = tokens.slice(match.index, match.index + match.length).join("")
+							const postSymbols = /\W*$/g;
+							output.push(`<div class="search-match" data-distance="${match.distance.toFixed(2)}">${
+								sanitize(matchString.replace(postSymbols, ""))
+							}</div>${sanitize(matchString.match(postSymbols)[0])}`);
+							i += match.length - 1;
+						} else output.push(sanitize(tokens[i]));
 					}
 					
 					let lastMatchIndex = -Infinity;
@@ -340,12 +378,21 @@
 							present[inx] = true;
 					}
 
-					const text = present
-						.map((v, i) => v ? output[i] : null)
-						.reduce((a, b) => b === null ? a.endsWith("...") ? a : `${a} ...` : `${a} ${b}`, "");
+					let text = "";
+					let ellipses = false;
+					for (let i = 0; i < output.length; i++) {
+						const exists = present[i];
+						if (exists) {
+							ellipses = false;
+							text += output[i];
+						} else if (!ellipses) {
+							ellipses = true;
+							text += ` <div class="ellipses">...</div> `;
+						}
+					}
 
 					return `
-						<a class="search-result" onclick="changePage('${
+						<a class="search-result" onmousedown="changePage('${
 							SEARCH_ID_TO_PATH[record].replaceAll("\\", "/")
 						}#${record}'); searchResults.innerHTML = ''">
 							<div class="search-record">
