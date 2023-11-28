@@ -42,8 +42,6 @@ class Animation extends ImageType {
 			this.loops = delay;
 			this.onEnd = loops || function () { };
 		}
-		this.image = this.frames[0];
-		this.timer = 0;
 		this.totalTime = this.frames.length * this.delay;
 		this.forceLoad();
 	}
@@ -53,7 +51,7 @@ class Animation extends ImageType {
 			this._timer = this.loops ? a % this.totalTime : this.totalTime - 1;
 			this.onEnd();
 		}
-		this.image = this.frames[Math.floor(this.timer / this.delay)];
+		this.image = this.frames[Math.floor(this._timer / this.delay)];
 		this.resize(this.image.width, this.image.height);
 	}
 	get timer() {
@@ -76,8 +74,7 @@ class Animation extends ImageType {
 		return new Animation(this.frames, this.delay, this.loops, this.onEnd);
 	}
 	forceLoad() {
-		this.width = this.image.width;
-		this.height = this.image.height;
+		this.timer = 0;
 	}
 	/**
 	 * Advances the animation by one update cycle.
@@ -101,8 +98,7 @@ class Animation extends ImageType {
 	 * Restarts the animation. 
 	 */
 	reset() {
-		this.timer = -1;
-		this.advance();
+		this.timer = 0;
 	}
 	makeImage() {
 		if (this.autoAdvance && !this.stopped) this.advance();
