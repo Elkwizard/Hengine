@@ -90,7 +90,7 @@ class ElementScript {
 	/**
 	 * @name init
 	 * This is called when the script is added to the object.
-	 * The non-initial arguments to `ScriptContainer.scripts.add()` are passed to this event.
+	 * The non-initial arguments to `ScriptContainer.scripts.add()` are passed to this listener.
 	 * The return value of this function will be returned from `ScriptContainer.scripts.add()`.
 	 * @param Any[] ...args | The initialization arguments
 	 * @return Any
@@ -247,6 +247,20 @@ class ScriptContainer {
 		this.sortedScriptInstances = [];
 		this.implementedMethods = new Set();
 		this.scripts = new Map();
+	}
+	/**
+	 * Returns the highest `.scriptNumber` of all scripts in the container.
+	 * @return Number
+	 */
+	get maxScriptNumber() {
+		return this.sortedScriptInstances.last.scriptNumber;
+	}
+	/**
+	 * Returns the lowest `.scriptNumber` of all scripts in the container.
+	 * @return Number
+	 */
+	get minScriptNumber() {
+		return this.sortedScriptInstances[0].scriptNumber;
 	}
 	/**
 	 * Returns the default script (`Scene.defaultScript`) of the object's scene.
