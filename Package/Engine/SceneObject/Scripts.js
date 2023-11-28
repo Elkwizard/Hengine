@@ -71,8 +71,15 @@ class ElementScript {
 			if (!(flag in this)) this[flag] = placeholder;
 
 		this.sceneObject = sceneObject;
-		this.scriptNumber = 0;
+		this._scriptNumber = 0;
 		this.scriptSynced = false;
+	}
+	set scriptNumber(a) {
+		this._scriptNumber = a;
+		this.sceneObject.scripts.sort();
+	}
+	get scriptNumber() {
+		return this._scriptNumber;
 	}
 	/**
 	 * @name static implements
@@ -248,6 +255,9 @@ class ScriptContainer {
 	get defaultScript() {
 		return this.sceneObject.container.defaultScript;
 	}
+	sort() {
+		this.sortedScriptInstances.sort((a, b) => a.scriptNumber - b.scriptNumber);
+	}
 	/**
 	 * Adds a new script to the object. Returns the result of the `.init()` listener.
 	 * This also defines a property with the name of the script (e.g. `.MY_SCRIPT` for a script defined as `class MY_SCRIPT extends ElementScript { ... }`) containing the script instance.
@@ -265,7 +275,7 @@ class ScriptContainer {
 		const returnValue = instance.init(...args);
 		this.run("addScript", script, ...args);
 		this.sortedScriptInstances.push(instance);
-		this.sortedScriptInstances.sort((a, b) => a.scriptNumber - b.scriptNumber);
+		this.sort();
 		return returnValue;
 	}
 	/**
