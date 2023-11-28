@@ -101,7 +101,8 @@ class Animation extends ImageType {
 		this.timer = 0;
 	}
 	makeImage() {
-		if (this.autoAdvance && !this.stopped) this.advance();
+		if (this.autoAdvance && !this.stopped && !this.done)
+			this.advance();
 		return this.image.image;
 	}
 	/**
