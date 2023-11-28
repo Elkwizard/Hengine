@@ -47,6 +47,18 @@ class Animation extends ImageType {
 		this.totalTime = this.frames.length * this.delay;
 		this.forceLoad();
 	}
+	set timer(a) {
+		this._timer = a;
+		if (a >= this.totalTime - 1) {
+			this._timer = this.loops ? a % this.totalTime : this.totalTime - 1;
+			this.onEnd();
+		}
+		this.image = this.frames[Math.floor(this.timer / this.delay)];
+		this.resize(this.image.width, this.image.height);
+	}
+	get timer() {
+		return this._timer;
+	}
 	/**
 	 * Returns whether or not the animation has completed.
 	 * If the animation loops, this will always return false.
@@ -71,17 +83,7 @@ class Animation extends ImageType {
 	 * Advances the animation by one update cycle.
 	 */
 	advance() {
-		if (!this.stopped) {
-			this.timer++;
-			if (this.timer >= this.totalTime - 1) {
-				this.timer = this.loops ? 0 : this.totalTime - 1;
-				this.onEnd();
-			}
-			const index = Math.floor(this.timer / this.delay);
-			this.image = this.frames[index];
-			this.width = this.image.width;
-			this.height = this.image.height;
-		}
+		this.timer++;
 	}
 	/**
 	 * Pauses playback of the animation.
@@ -103,7 +105,7 @@ class Animation extends ImageType {
 		this.advance();
 	}
 	makeImage() {
-		if (this.autoAdvance) this.advance();
+		if (this.autoAdvance && !this.stopped) this.advance();
 		return this.image.image;
 	}
 	/**
