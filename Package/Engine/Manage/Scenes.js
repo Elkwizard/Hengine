@@ -58,14 +58,14 @@ class Scene {
 	get constraints() {
 		return this.physicsEngine.constraints.map(con => Constraint.fromPhysicsConstraint(con, this.engine));
 	}
-	handleCollisionEvent(a, b, direction, contacts) {
+	handleCollisionEvent(a, b, direction, contacts, isTrigger) {
 		let A = a.userData.sceneObject;
 		let B = b.userData.sceneObject;
 		if (A && B && this.collisionEvents) {
 			contacts = contacts.map(v => Vector2.fromPhysicsVector(v));
 			direction = Vector2.fromPhysicsVector(direction);
-			A.scripts.PHYSICS.colliding.add(B, direction, contacts);
-			B.scripts.PHYSICS.colliding.add(A, direction.inverse, contacts);
+			A.scripts.PHYSICS.colliding.add(B, direction, contacts, isTrigger);
+			B.scripts.PHYSICS.colliding.add(A, direction.inverse, contacts, isTrigger);
 		}
 	}
 	/**

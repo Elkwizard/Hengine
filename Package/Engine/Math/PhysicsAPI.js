@@ -84,12 +84,14 @@ class Constraint2 extends Constraint {
  * @prop SceneObject element | The object that is being collided with
  * @prop Vector2 direction | A unit vector along the collision normal pointing toward the other object
  * @prop Vector2[] contacts | A list of world-space contact points between the two objects
+ * @prop Boolean isTrigger | Indicates whether the collision was resolved. If this is true, the collision was not resolved, just detected
  */
 class CollisionData {
-    constructor(element, direction, contacts) {
+    constructor(element, direction, contacts, isTrigger) {
         this.element = element;
         this.direction = direction;
         this.contacts = contacts;
+		this.isTrigger = isTrigger;
     }
 }
 
@@ -167,8 +169,8 @@ class CollisionMonitor {
     clear() {
         this.elements.clear();
     }
-    add(element, dir, contacts) {
-        this.elements.set(element, new CollisionData(element, dir, contacts));
+    add(element, dir, contacts, isTrigger) {
+        this.elements.set(element, new CollisionData(element, dir, contacts, isTrigger));
     }
 	/**
 	 * Checks whether there is a collision with a specific object.
