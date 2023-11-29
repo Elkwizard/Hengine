@@ -267,6 +267,16 @@ class PHYSICS extends ElementScript {
 		return false;
 	}
 	/**
+	 * Checks whether the object and another given object would have a trigger collision if they collided.
+	 * A trigger collision is not resolved, just detected.
+	 * @param SceneObject element | The object to check. Must have PHYSICS
+	 * @return Boolean
+	 */
+	isTriggerWith(obj, element) {
+		const rb = element.scripts.PHYSICS;
+		return this.isTrigger || rb.isTrigger || this.triggerBasedOnRule(element) || rb.triggerBasedOnRule(obj);
+	}
+	/**
 	 * Checks whether the object and another given object could collide if they intersected.
 	 * @param SceneObject element | The object to check. Must have PHYSICS
 	 * @return Boolean
