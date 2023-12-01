@@ -76,7 +76,7 @@ class Operable {
         return this.get().op(v, fn);
     }
 	/**
-	 * @group add, sub, mul, div
+	 * @group add, sub, mul, div, mod
 	 * Performs an in-place element-wise arithmetic operation between the caller and another operable or Number.
 	 * Returns the caller.
 	 * @param Operable/Number operable | The right hand operand of the operation
@@ -94,8 +94,11 @@ class Operable {
     div(v) {
         return this.op(v, Operable.divFunc);
     }
+	mod(v) {
+		return this.op(v, Operable.modFunc);
+	}
 	/**
-	 * @group plus, minus, times, over
+	 * @group plus, minus, times, over, modBy
 	 * Performs an immutable element-wise arithmetic operation between the caller and another operable or Number.
 	 * Returns the result of the operation, leaving the operands unchanged.
 	 * A destination can be provided for the operation, in which case no new operable will be created.
@@ -115,6 +118,9 @@ class Operable {
     over(v, result) {
         return this.get(result).div(v);
     }
+	modBy(v, result) {
+		return this.get(result).mod(v);
+	}
     map(fn) {
         const result = this.get();
         const { modValues } = this.constructor;
@@ -321,3 +327,4 @@ Operable.addFunc = (a, b) => a + b;
 Operable.subFunc = (a, b) => a - b;
 Operable.mulFunc = (a, b) => a * b;
 Operable.divFunc = (a, b) => a / b;
+Operable.modFunc = (a, b) => a % b;

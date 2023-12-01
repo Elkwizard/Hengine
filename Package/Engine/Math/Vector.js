@@ -266,6 +266,9 @@ class Vector2 extends Vector {
 	Vover(v) {
 		return new Vector2(this.x / v.x, this.y / v.y);
 	}
+	VmodBy(v) {
+		return new Vector2(this.x % v.x, this.y % v.y);
+	}
 	Nplus(v) {
 		return new Vector2(this.x + v, this.y + v);
 	}
@@ -277,6 +280,9 @@ class Vector2 extends Vector {
 	}
 	Nover(v) {
 		return new Vector2(this.x / v, this.y / v);
+	}
+	NmodBy(v) {
+		return new Vector2(this.x % v, this.y % v);
 	}
 	Vadd(v) {
 		this.x += v.x;
@@ -298,6 +304,11 @@ class Vector2 extends Vector {
 		this.y /= v.y;
 		return this;
 	}
+	Vmod(v) {
+		this.x %= v.x;
+		this.y %= v.y;
+		return this;
+	}
 	Nadd(v) {
 		this.x += v;
 		this.y += v;
@@ -316,6 +327,11 @@ class Vector2 extends Vector {
 	Ndiv(v) {
 		this.x /= v;
 		this.y /= v;
+		return this;
+	}
+	Nmod(v) {
+		this.x %= v;
+		this.y %= v;
 		return this;
 	}
 	toPhysicsVector() {
