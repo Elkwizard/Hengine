@@ -84,7 +84,7 @@ class Constraint2 extends Constraint {
  * @prop SceneObject element | The object that is being collided with
  * @prop Vector2 direction | A unit vector along the collision normal pointing toward the other object
  * @prop Vector2[] contacts | A list of world-space contact points between the two objects
- * @prop Boolean isTrigger | Indicates whether the collision was resolved. If this is true, the collision was not resolved, just detected
+ * @prop Boolean isTrigger | Indicates whether the object being collided with requested that the collision be a trigger collision. A trigger collision is not resolved
  */
 class CollisionData {
     constructor(element, direction, contacts, isTrigger) {

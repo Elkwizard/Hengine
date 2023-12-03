@@ -28,30 +28,14 @@ class PHYSICS extends ElementScript {
 		
 		this.body = new RigidBody(obj.transform.position.x, obj.transform.position.y, gravity);
         
-		// collide rule
 		this.body.userData.sceneObject = obj;
-        this.body.collisionFilter = body => {
-            const { sceneObject } = body.userData;
-			const success = (
-				!this.hasCollideRule ||
-				this.collideBasedOnRule(sceneObject)
-			) && (
-				!sceneObject.scripts.PHYSICS.hasCollideRule ||
-				sceneObject.scripts.PHYSICS.collideBasedOnRule(obj)
-			);
-
-			return success;
-        };
-		this.body.triggerFilter = body => {
-			const { sceneObject } = body.userData;
-			const success = (
-				this.hasTriggerRule ? this.triggerBasedOnRule(sceneObject) : false
-			) || (
-				sceneObject.scripts.PHYSICS.hasTriggerRule ? sceneObject.scripts.PHYSICS.triggerBasedOnRule(obj) : false
-			);
-
-			return success;
-		};
+		
+		// collision rules
+        this.body.collisionFilter = body => !this.hasCollideRule ||
+			this.collideBasedOnRule(body.userData.sceneObject);
+		
+		this.body.triggerFilter = body => this.hasTriggerRule &&
+			this.triggerBasedOnRule(body.userData.sceneObject);
 
 		// monitors
         this.colliding = new CollisionMonitor();

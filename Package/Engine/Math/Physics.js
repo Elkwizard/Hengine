@@ -1736,14 +1736,12 @@ class PhysicsEngine {
 
 		if (!penetration) return;
 
-		const isTrigger = bodyA.isTrigger ||
-			bodyB.isTrigger ||
-			bodyA.triggerFilter(bodyB) ||
-			bodyB.triggerFilter(bodyA);
+		const isTriggerA = bodyA.isTrigger || bodyA.triggerFilter(bodyB);
+		const isTriggerB = bodyB.isTrigger || bodyB.triggerFilter(bodyA);
 
-        this.onCollide(bodyA, bodyB, direction, contacts, isTrigger);
+        this.onCollide(bodyA, bodyB, direction, contacts, isTriggerA, isTriggerB);
 
-		if (isTrigger) return;
+		if (isTriggerA || isTriggerB) return;
 
         let dynamic = bodyB.dynamic;
 		let prohibited = false;
