@@ -74,17 +74,21 @@ class PHYSICS extends ElementScript {
 		Object.shortcut(this, body, "density");
 		Object.shortcut(this, body, "airResistance");
 
+		this.synchronized = false;
+
 		obj.sync(() => {
 			// update things that should have already been done
 			this.hasCollideRule = obj.scripts.implements("collideRule");
 			this.hasTriggerRule = obj.scripts.implements("triggerRule");
 		
 			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
+
+			this.physicsEngine.addBody(this.body);
+			
+			this.synchronized = true;
 			
 			if (this._mass !== undefined)
 				this.mass = this._mass;
-
-			this.physicsEngine.addBody(this.body);
 		});
 	}
 	/**
@@ -120,15 +124,15 @@ class PHYSICS extends ElementScript {
 		return this.body.dynamic;
 	}
 	set mass(a) {
-		const { body } = this;
-		if (body) {
+		if (this.synchronized) {
+			const { body } = this;
 			const scale = a / body.mass;
 			body.mass *= scale;
 			body.inertia *= scale;
 		} else this._mass = a;
 	}
 	get mass() {
-		return this.body?.mass ?? this._mass;
+		return this.synchronized ? this.body.mass : this._mass;
 	}
 	set snuzzlement(a) {
 		this.body.restitution = 1 - a;
