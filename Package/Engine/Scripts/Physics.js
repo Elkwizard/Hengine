@@ -80,6 +80,9 @@ class PHYSICS extends ElementScript {
 			this.hasTriggerRule = obj.scripts.implements("triggerRule");
 		
 			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
+			
+			if (this._mass !== undefined)
+				this.mass = this._mass;
 
 			this.physicsEngine.addBody(this.body);
 		});
@@ -118,12 +121,14 @@ class PHYSICS extends ElementScript {
 	}
 	set mass(a) {
 		const { body } = this;
-        const scale = a / body.mass;
-        body.mass *= scale;
-        body.inertia *= scale;
+		if (body) {
+			const scale = a / body.mass;
+			body.mass *= scale;
+			body.inertia *= scale;
+		} else this._mass = a;
 	}
 	get mass() {
-		return this.body.mass;
+		return this.body?.mass ?? this._mass;
 	}
 	set snuzzlement(a) {
 		this.body.restitution = 1 - a;
