@@ -209,10 +209,10 @@ If the matrix isn't invertible, the caller is unchanged and null is returned.
 	
 		<div class="function-wrapper" id="Matrix3.prototype.mul()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L150" target="_blank" class="function-name source-link">mul</a>(<span class="param">matrix</span><span class="aux"> | </span><span class="param">vector</span><span class="aux"> | </span><span class="param">scale</span>)<span class="type">Matrix3/<a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L148" target="_blank" class="function-name source-link">mul</a>(<span class="param">matrix</span><span class="aux"> | </span><span class="param">scale</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
-				Multiplies the matrix in-place by another mathematical object on the right side.
+				Multiplies the matrix in-place by another mathematical object on the right side. Returns the caller.
 			</div>
 			
 				<div class="function-signature">
@@ -226,19 +226,6 @@ If the matrix isn't invertible, the caller is unchanged and null is returned.
 							</div>
 							<div class="param desc">
 								Another matrix to multiply with
-							</div>
-						</div>
-					
-		
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Matrix3.prototype.mul():vector">
-							<div class="param-name">
-								<span class="param">vector</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
-							</div>
-							<div class="param desc">
-								A vector to be transformed by the matrix. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
 							</div>
 						</div>
 					
@@ -262,7 +249,7 @@ If the matrix isn't invertible, the caller is unchanged and null is returned.
 	
 		<div class="function-wrapper" id="Matrix3.prototype.times()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L167" target="_blank" class="function-name source-link">times</a>(<span class="param">matrix</span>, <span class="param">destination?</span><span class="aux"> | </span><span class="param">vector</span>, <span class="param">destination?</span><span class="aux"> | </span><span class="param">scale</span>, <span class="param">destination?</span>)<span class="type">Matrix3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L165" target="_blank" class="function-name source-link">times</a>(<span class="param">matrix</span>, <span class="param">destination?</span><span class="aux"> | </span><span class="param">vector</span>, <span class="param">destination?</span><span class="aux"> | </span><span class="param">scale</span>, <span class="param">destination?</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
@@ -346,7 +333,7 @@ If no destination is provided, one will be created.
 	
 		<div class="function-wrapper" id="Matrix3.prototype.get()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L214" target="_blank" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Matrix3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L212" target="_blank" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
 				Creates a copy of the matrix and optionally stores it in a provided destination.
@@ -373,7 +360,7 @@ If no destination is provided, one will be created.
 	
 		<div class="function-wrapper" id="Matrix3.prototype.toCSS()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L230" target="_blank" class="function-name source-link">toCSS</a>()<span class="type">String</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L228" target="_blank" class="function-name source-link">toCSS</a>()<span class="type">String</span>
 			</div>
 			<div class="function desc">
 				Converts the matrix to a CSS matrix string.
@@ -383,7 +370,7 @@ If no destination is provided, one will be created.
 	
 		<div class="function-wrapper" id="Matrix3.identity()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L250" target="_blank" class="function-name source-link">Matrix3.identity</a>(<span class="param">destination?</span>)<span class="type">Matrix3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L248" target="_blank" class="function-name source-link">Matrix3.identity</a>(<span class="param">destination?</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
 				Creates an identity matrix and optionally stores it in a provided destination.
@@ -410,7 +397,7 @@ If no destination is provided, one will be created.
 	
 		<div class="function-wrapper" id="Matrix3.rotation()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L264" target="_blank" class="function-name source-link">Matrix3.rotation</a>(<span class="param">theta</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L262" target="_blank" class="function-name source-link">Matrix3.rotation</a>(<span class="param">theta</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
 				Creates a 2D rotation matrix and optionally stores it in a provided destination.
@@ -447,7 +434,7 @@ If no destination is provided, one will be created.
 	
 		<div class="function-wrapper" id="Matrix3.scale()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L285" target="_blank" class="function-name source-link">Matrix3.scale</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">result?</span><span class="aux"> | </span><span class="param">vector</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L283" target="_blank" class="function-name source-link">Matrix3.scale</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">result?</span><span class="aux"> | </span><span class="param">vector</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
 				Creates a 2D scaling matrix and optionally stores it in a provided a destination.
@@ -517,7 +504,7 @@ If no destination is provided, one will be created.
 	
 		<div class="function-wrapper" id="Matrix3.translation()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L312" target="_blank" class="function-name source-link">Matrix3.translation</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">result?</span><span class="aux"> | </span><span class="param">vector</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L310" target="_blank" class="function-name source-link">Matrix3.translation</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">result?</span><span class="aux"> | </span><span class="param">vector</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
 				Creates a 2D translation matrix and optionally stores it in a provided a destination.
@@ -587,7 +574,7 @@ If no destination is provided, one will be created.
 	
 		<div class="function-wrapper" id="Matrix3.mulMatrices()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L334" target="_blank" class="function-name source-link">Matrix3.mulMatrices</a>(<span class="param">matrices</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L332" target="_blank" class="function-name source-link">Matrix3.mulMatrices</a>(<span class="param">matrices</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
 				Multiplies a series of matrices together and optionally stores it in a provided destination.

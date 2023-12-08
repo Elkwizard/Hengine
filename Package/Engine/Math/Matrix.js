@@ -138,14 +138,12 @@ class Matrix3 extends Float64Array {
 		} else return null;
 	}
 	/**
-	 * Multiplies the matrix in-place by another mathematical object on the right side.
+	 * Multiplies the matrix in-place by another mathematical object on the right side. Returns the caller.
 	 * @signature
 	 * @param Matrix3 matrix | Another matrix to multiply with
 	 * @signature
-	 * @param Vector2 vector | A vector to be transformed by the matrix. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
-	 * @signature
 	 * @param Number scale | A number to scale the matrix by.
-	 * @return Matrix3/Vector2
+	 * @return Matrix3
 	 */
 	mul(M1) {
 		return this.times(M1, this);
