@@ -184,9 +184,10 @@ class AnimationStateMachine extends ImageType {
 			}
 
 			const animation = this.stateAnimations.get(state);
-			if (animation.loops)
+			if (animation.loops) {
+				animation.reset();
 				this.stateStack = [state];
-			else {
+			} else {
 				animation.reset();
 				this.stateStack.push(state);
 			}
