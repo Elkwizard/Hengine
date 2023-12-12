@@ -148,7 +148,7 @@ class AnimationStateMachine extends ImageType {
 		this.stateAnimations = stateAnimations;
 		this.transitions = new Map();
 		this.transition = null;
-		this.stateStack = [initialState];
+		this.state = initialState;
 	}
 	/**
 	 * Adds an animation to be played when transitioning between two specified states.
@@ -166,7 +166,7 @@ class AnimationStateMachine extends ImageType {
 	 * @return Any
 	 */
 	get state() {
-		return this.stateStack.last;
+		return this._state;
 	}
 	/**
 	 * Sets the state of the state machine.
@@ -174,7 +174,7 @@ class AnimationStateMachine extends ImageType {
 	 * @param Any state | The new state of the state machine
 	 */
 	set state(state) {
-		if (state !== this.state) {
+		if (state !== this._state) {
 			if (
 				this.transitions.has(this.state) &&
 				this.transitions.get(this.state).has(state)
@@ -184,13 +184,9 @@ class AnimationStateMachine extends ImageType {
 			}
 
 			const animation = this.stateAnimations.get(state);
-			if (animation.loops) {
-				animation.reset();
-				this.stateStack = [state];
-			} else {
-				animation.reset();
-				this.stateStack.push(state);
-			}
+			animation.reset();
+			
+			this._state = state;
 		}
 	}
 	makeImage() {
@@ -202,9 +198,6 @@ class AnimationStateMachine extends ImageType {
 		}
 
 		const animation = this.stateAnimations.get(this.state);
-		const image = animation.makeImage();
-		if (animation.done) this.stateStack.pop();
-		
-		return image;
+		return animation.makeImage();
 	}
 }
