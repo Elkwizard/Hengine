@@ -1,3 +1,31 @@
+physics.imports.js_log = console.log;
+
+physics.imports.onCollide = (engine, a, b, direction, contacts, triggerA, triggerB) => {
+	a = PHYSICS.bodyToSceneObject.get(new physics.exports.RigidBody(a).id);
+	const { scene } = a.engine;
+	if (!scene.collisionEvents) return;
+	
+	engine = new physics.exports.PhysicsEngine(engine);
+	b = PHYSICS.bodyToSceneObject.get(new physics.exports.RigidBody(b).id);
+	direction = Vector2.fromPhysicsVector(new physics.exports.Vector(direction));
+	contacts = new physics.exports.NativeVectorArray(contacts);
+	contacts = new Array(contacts.length).map((_, i) => Vector2.fromPhysicsVector(contacts.get(i)));
+
+	scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
+};
+
+physics.imports.collideRule = (a, b) => {
+	a = PHYSICS.bodyToSceneObject.get(new physics.exports.RigidBody(a).id);
+	b = PHYSICS.bodyToSceneObject.get(new physics.exports.RigidBody(b).id);
+	return a.scripts.PHYSICS.collisionFilter(b);
+};
+
+physics.imports.triggerRule = (a, b) => {
+	a = PHYSICS.bodyToSceneObject.get(new physics.exports.RigidBody(a).id);
+	b = PHYSICS.bodyToSceneObject.get(new physics.exports.RigidBody(b).id);
+	return a.scripts.PHYSICS.triggerFilter(b);
+};
+
 /**
  * Adds rigidbody physics to a SceneObject.
  * @prop Vector2 velocity | The velocity of the object per frame
@@ -17,6 +45,7 @@
  * @prop CollisionMonitor lastColliding | All of the objects that were colliding with the object last frame
  */
 class PHYSICS extends ElementScript {
+	static bodyToSceneObject = new Map();
 	/**
 	 * Adds rigidbody physics to an object.
 	 * @param Boolean mobile | Whether the object should be able to move/rotate 
@@ -26,16 +55,15 @@ class PHYSICS extends ElementScript {
 		this.scene = this.engine.scene;
 		this.physicsEngine = this.scene.physicsEngine;
 		
-		this.body = new RigidBody(obj.transform.position.x, obj.transform.position.y, gravity);
-        
-		this.body.userData.sceneObject = obj;
+		this.body = physics.exports.RigidBody.construct(
+			obj.transform.position.x, obj.transform.position.y, gravity
+		);
+		PHYSICS.bodyToSceneObject.set(this.body.id, obj);
 		
 		// collision rules
-        this.body.collisionFilter = body => !this.hasCollideRule ||
-			this.collideBasedOnRule(body.userData.sceneObject);
+        this.collisionFilter = body => !this.hasCollideRule || this.collideBasedOnRule(body);
 		
-		this.body.triggerFilter = body => this.hasTriggerRule &&
-			this.triggerBasedOnRule(body.userData.sceneObject);
+		this.triggerFilter = body => this.hasTriggerRule && this.triggerBasedOnRule(body);
 
 		// monitors
         this.colliding = new CollisionMonitor();
@@ -52,14 +80,12 @@ class PHYSICS extends ElementScript {
 			x: {
 				set(a) {
 					body.velocity.x = a;
-					body.wake();
 				},
 				get: () => body.velocity.x
 			},
 			y: {
 				set(a) {
 					body.velocity.y = a;
-					body.wake();
 				},
 				get: () => body.velocity.y
 			}
@@ -102,7 +128,6 @@ class PHYSICS extends ElementScript {
 		const { body } = this;
 		body.velocity.x = a.x;
 		body.velocity.y = a.y;
-		body.wake();
 	}
 	get velocity() {
 		return this._velocity;
@@ -110,7 +135,6 @@ class PHYSICS extends ElementScript {
 	set angularVelocity(a) {
 		const { body } = this;
 		body.angularVelocity = a;
-		body.wake();
 	}
 	get angularVelocity() {
 		return this.body.angularVelocity;
@@ -118,7 +142,6 @@ class PHYSICS extends ElementScript {
 	set mobile(a) {
 		const { body } = this;
         body.dynamic = !!a;
-        if (a) body.wake();
 	}
 	get mobile() {
 		return this.body.dynamic;
@@ -157,6 +180,7 @@ class PHYSICS extends ElementScript {
 		return shape;
 	}
 	cleanUp(obj) {
+		PHYSICS.bodyToSceneObject.delete(this.body.id);
 		this.physicsEngine.removeBody(this.body.id);
 	}
 	addScript(obj, script) {
@@ -167,12 +191,9 @@ class PHYSICS extends ElementScript {
 		// clear collisions
 		this.colliding.removeDead();
 		
-		if (!(this.physicsEngine.isAsleep(this.body) && this.mobile)) {
-			// update last colliding
-			this.colliding.get(this.lastColliding);
-		
-			this.colliding.clear();	
-		}
+		// update last colliding
+		this.colliding.get(this.lastColliding);
+		this.colliding.clear();	
 
 		// sync position
 		const { position, rotation } = obj.transform;
@@ -221,7 +242,6 @@ class PHYSICS extends ElementScript {
 	 */
 	applyImpulse(obj, point, force) {
         this.body.applyImpulse(point.toPhysicsVector(), force.toPhysicsVector());
-        this.body.wake();
 	}
 	/**
 	 * Applies an impulse to a specific point on the object.
@@ -237,7 +257,6 @@ class PHYSICS extends ElementScript {
 	 */
 	stop(obj) {
 		this.body.stop();
-		this.body.wake();
 	}
 	collideBasedOnRule(obj, element) {
 		const scripts = obj.scripts.sortedScriptInstances;

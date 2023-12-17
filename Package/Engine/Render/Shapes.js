@@ -265,7 +265,6 @@ class Shape {
 	 */
 	get(result = new Shape()) { }
 	toPhysicsShape() { }
-	static fromPhysicsShape(sh) { }
 }
 
 /**
@@ -571,10 +570,11 @@ class Polygon extends Shape {
 		return result;
 	}
 	toPhysicsShape() {
-		return new PolygonCollider(this.vertices.map(v => v.toPhysicsVector()));
-	}
-	static fromPhysicsShape(sh) {
-		return new Polygon(sh.vertices.map(v => Vector2.fromPhysicsVector(v)));
+		const arr = physics.exports.NativeVectorArray.construct(this.vertices.length).own();
+		for (let i = 0; i < this.vertices.length; i++)
+			arr.set(i, this.vertices[i].toPhysicsVector());
+
+		return physics.exports.PolygonCollider.construct(arr);
 	}
 	/**
 	 * Returns a new regular polygon centered at the origin with a specified amount of sides and radius.
@@ -1020,9 +1020,6 @@ class Circle extends Shape {
 		return shape;
 	}
 	toPhysicsShape() {
-		return new CircleCollider(this.x, this.y, this.radius);
-	}
-	static fromPhysicsShape(sh) {
-		return new Circle(sh.position.x, sh.position.y, sh.radius);
+		return physics.exports.CircleCollider.construct(this.x, this.y, this.radius);
 	}
 }
