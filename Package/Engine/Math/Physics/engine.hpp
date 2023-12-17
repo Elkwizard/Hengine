@@ -65,6 +65,7 @@ FREE(PhysicsEngine)
 
 FN(PhysicsEngine, addBody, void)(PhysicsEngine* engine, RigidBody* body) { engine->addBody(*body); }
 FN(PhysicsEngine, hasBody, bool)(PhysicsEngine* engine, ID id) { return engine->hasBody(id); }
+FN(PhysicsEngine, removeBody, void)(PhysicsEngine* engine, ID id) { engine->removeBody(id); }
 OBJECT_FN(PhysicsEngine, getBody, RigidBody)(PhysicsEngine* engine, ID id) { return &engine->getBody(id); }
 OBJECT_FN(PhysicsEngine, getBodies, NativeRigidBodyArray)(PhysicsEngine* engine) { return new NativeRigidBodyArray(engine->getBodies()); }
 
