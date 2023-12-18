@@ -19,6 +19,10 @@ class Vector {
 			y = v;
 		}
 
+		Vector(std::nullptr_t) {
+			x = y = NAN;
+		}
+
 		Vector() {
 			x = 0.0;
 			y = 0.0;
@@ -30,6 +34,10 @@ class Vector {
 
 		bool operator !=(const Vector& other) const {
 			return !(*this == other);
+		}
+
+		operator bool() const {
+			return !isnan(x);
 		}
 
 		double cross(const Vector& other) const {

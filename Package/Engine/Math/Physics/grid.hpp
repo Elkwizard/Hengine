@@ -23,16 +23,19 @@ class Coord {
 
 template <>
 class std::hash<Coord> {
+	private:
+		std::hash<int> hash { };
+
 	public:
-		size_t operator()(const Coord& c) const {
-			return (1478611 * c.x) ^ (8689987 * c.y);
-		}
+		size_t operator()(const Coord& coord) const {
+			return hash(coord.x) ^ hash(coord.y);
+		} 
 };
 
 class Grid {
 	private:
 		double cellSize, inverseCellSize;
-		std::unordered_map<Coord, Bodies> cells;
+		std::unordered_map<Coord, std::vector<RigidBody*>> cells;
 
 	public:
 		Grid(double _cellSize) {
@@ -40,22 +43,31 @@ class Grid {
 			inverseCellSize = 1.0 / cellSize;
 		}
 
-		void addBody(const Coord& c, RigidBody& body) {
+		void addBody(Coord c, RigidBody& body) {
 			cells[c].push_back(&body);
 		}
 
-		Bodies query(RigidBody& body, const RigidBody::Filter& filter) {
-			Bodies bodies { };
+		std::vector<RigidBody*> query(RigidBody& body, RigidBody::Filter filter) {
+			std::vector<RigidBody*> bodies { };
 			std::unordered_set<RigidBody*> found { };
 
 			found.insert(&body);
 
-			for (int i = body.bounds.minX; i <= body.bounds.maxX; i++)
-			for (int j = body.bounds.minY; j <= body.bounds.maxY; j++) {
+			auto [x, y] = body.position;
+			double radius = body.boundingRadius;
+
+			int startX = getCell(x - radius);
+			int startY = getCell(y - radius);
+
+			int endX = getCell(x + radius);
+			int endY = getCell(y + radius);
+
+			for (int i = startX; i <= endX; i++)
+			for (int j = startY; j <= endY; j++) {
 				Coord c = { i, j };
 				if (!cells.count(c)) continue;
 
-				Bodies& cellBodies = cells.at(c);
+				std::vector<RigidBody*>& cellBodies = cells.at(c);
 
 				for (RigidBody* b : cellBodies)
 					if (!found.count(b)) {
@@ -75,13 +87,14 @@ class Grid {
 			auto [x, y] = body.position;
 			int radius = body.boundingRadius;
 
-			body.bounds = {
-				getCell(x - radius), getCell(y - radius),
-				getCell(x + radius), getCell(y + radius)
-			};
+			int startX = getCell(x - radius);
+			int startY = getCell(y - radius);
 
-			for (int i = body.bounds.minX; i <= body.bounds.maxX; i++)
-			for (int j = body.bounds.minY; j <= body.bounds.maxY; j++)
+			int endX = getCell(x + radius);
+			int endY = getCell(y + radius);
+
+			for (int i = startX; i <= endX; i++)
+			for (int j = startY; j <= endY; j++)
 				addBody({ i, j }, body);
 		}
 };
