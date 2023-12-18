@@ -34,6 +34,7 @@ class RigidBody {
 
 		using Filter = std::function<bool (const RigidBody&)>;
 
+		bool trivialCollisionFilter, trivialTriggerFilter;
 		Filter collisionFilter, triggerFilter;
 
 		std::vector<Vector> prohibitedDirections { };
@@ -45,6 +46,8 @@ class RigidBody {
 		RigidBody(double x, double y, bool _dynamic);
 		~RigidBody();
 
+		bool canCollideWith(const RigidBody& body) const;
+		bool isTriggerWith(const RigidBody& body) const;
 		void setDensity(double a);
 		void setAngle(double a);
 		void updateLastData();
@@ -70,6 +73,8 @@ class RigidBody {
 		static RigidBody* fromCircle(double x, double y, double r, bool dynamic = true);
 };
 
+using Bodies = std::vector<RigidBody*>;
+
 CONSTRUCT(RigidBody)(double x, double y, bool dynamic) { return new RigidBody(x, y, dynamic); }
 FREE(RigidBody);
 
@@ -81,7 +86,7 @@ FN(RigidBody, applyImpulse, void)(RigidBody* body, double px, double py, double 
 	body->applyImpulse({ px, py }, { ix, iy });
 }
 
-ACCESS(RigidBody, id, size_t)
+ACCESS(RigidBody, id, int)
 
 ACCESS(RigidBody, dynamic, bool)
 ACCESS(RigidBody, canRotate, bool)
@@ -90,6 +95,9 @@ ACCESS(RigidBody, simulated, bool)
 ACCESS(RigidBody, airResistance, bool)
 ACCESS(RigidBody, gravity, bool)
 ACCESS(RigidBody, isTrigger, bool)
+
+ACCESS(RigidBody, trivialCollisionFilter, bool)
+ACCESS(RigidBody, trivialTriggerFilter, bool)
 
 ACCESS(RigidBody, boundingRadius, double)
 ACCESS(RigidBody, mass, double)

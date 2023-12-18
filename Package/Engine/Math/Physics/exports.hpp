@@ -24,7 +24,7 @@ extern "C" void js_log(int);
 #define CONSTRUCT(class) EXPORT class* class##$##construct
 #define FREE(class) EXPORT void class##$free(class* obj) { delete obj; }
 
-using ID = int;
+using ID = unsigned int;
 
 ID nextID() {
 	static ID next = 0;

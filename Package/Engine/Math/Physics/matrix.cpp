@@ -7,6 +7,13 @@ Matrix::Matrix(double _a, double _b, double _c, double _d) {
 	d = _d;
 }
 
+Matrix::Matrix(const Vector& c0, const Vector& c1) {
+	a = c0.x;
+	b = c1.x;
+	c = c0.y;
+	d = c1.y;
+}
+
 Matrix::Matrix() {
 	a = 1.0;
 	b = 0.0;

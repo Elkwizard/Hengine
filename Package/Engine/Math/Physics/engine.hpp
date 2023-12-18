@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <unordered_set>
 
 class PhysicsEngine;
 
@@ -19,10 +20,17 @@ class PhysicsEngine {
 		std::unordered_map<ID, Constraint*> constraintMap { };
 		CollisionResolver collisionResolver;
 
-		using Bodies = std::vector<RigidBody*>;
+		std::unordered_set<uint64_t> noticedCollisions { };
+
 		using CollisionPairs = std::unordered_map<RigidBody*, std::vector<RigidBody*>>;
-		using Order = std::function<bool(RigidBody*, RigidBody*)>;
-		using Constraints = std::vector<Constraint*>;
+		
+		void solveConstraints();
+		void applyForces(Bodies& dynBodies, double intensity);
+		void integrate(Bodies& dynBodies, double intensity);
+		void integratePosition(Bodies& dynBodies, double intensity);
+		void resolve(std::unique_ptr<Collision>& col);
+		void collisions(CollisionPairs& collisionPairs);
+		CollisionPairs createGrid(Bodies& dynBodies);
 
 	public:
 		int step;
@@ -42,18 +50,13 @@ class PhysicsEngine {
 		PhysicsEngine(const Vector& gravity);
 		~PhysicsEngine();
 		
-		Bodies getBodies() const;
+		void run();
+		
 		Constraints getConstraints() const;
 		void addConstraint(Constraint& constraint);
 		void removeConstraint(ID id);
-		void solveConstraints();
-		void applyForces(Bodies& dynBodies, double intensity);
-		void integrate(Bodies& dynBodies, double intensity);
-		void integratePosition(Bodies& dynBodies, double intensity);
-		void resolve(std::unique_ptr<Collision>& col);
-		void collisions(Bodies& dynBodies, CollisionPairs& collisionPairs, const Order& order);
-		CollisionPairs createGrid(Bodies& dynBodies);
-		void run();
+		
+		Bodies getBodies() const;
 		bool hasBody(ID id) const;
 		RigidBody& getBody(ID id) const;
 		void addBody(RigidBody& body);

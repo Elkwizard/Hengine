@@ -126,6 +126,10 @@ CONSTRUCT(Vector)(double x, double y) { return new Vector(x, y); }
 FREE(Vector);
 ACCESS(Vector, x, double)
 ACCESS(Vector, y, double)
+FN(Vector, set, void)(Vector* v, double x, double y) {
+	v->x = x;
+	v->y = y;
+}
 
 using NativeVectorArray = NativeArray<Vector>;
 

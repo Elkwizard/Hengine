@@ -3,18 +3,14 @@
 CollisionResolver::CollisionResolver(PhysicsEngine& _engine) : engine(_engine) { }
 
 double CollisionResolver::vAB(const Vector& rA, const Vector& rB, RigidBody& bodyA, RigidBody& bodyB, const Vector& normal) {
-	auto [rAx, rAy] = rA;
-	auto [rBx, rBy] = rB;
-
 	if (bodyB.dynamic) {
-		double vABx = (-rBy * bodyB.angularVelocity + bodyB.velocity.x) - (-rAy * bodyA.angularVelocity + bodyA.velocity.x);
-		double vABy = (rBx * bodyB.angularVelocity + bodyB.velocity.y) - (rAx * bodyA.angularVelocity + bodyA.velocity.y);
-		return vABx * normal.x + vABy * normal.y;
+		return normal.dot(
+			(rB.normal() * bodyB.angularVelocity + bodyB.velocity) -
+			(rA.normal() * bodyA.angularVelocity + bodyA.velocity)
+		);
 	}
 
-	double vABx = rAy * bodyA.angularVelocity - bodyA.velocity.x;
-	double vABy = -rAx * bodyA.angularVelocity - bodyA.velocity.y;
-	return vABx * normal.x + vABy * normal.y;
+	return -normal.dot(rA.normal() * bodyA.angularVelocity + bodyA.velocity);
 }
 
 double CollisionResolver::normalImpulse(double vAB, double mA, double mB, double iA, double iB, double e, const Vector& n, double rAx, double rAy, double rBx, double rBy) {
@@ -171,11 +167,10 @@ bool CollisionResolver::resolveContacts(bool dynamic, Collision& collision) {
 void CollisionResolver::resolveAllContacts() {
 	for (int i = 0; i < engine.contactIterations; i++) {
 		engine.orderGenerator.shuffle(dynamicCollisions);
-		engine.orderGenerator.shuffle(staticCollisions);
-		
 		for (std::unique_ptr<Collision>& collision : dynamicCollisions)
 			resolveContacts(true, *collision);
-			
+		
+		engine.orderGenerator.shuffle(staticCollisions);
 		for (std::unique_ptr<Collision>& collision : staticCollisions)
 			resolveContacts(true, *collision);
 	}

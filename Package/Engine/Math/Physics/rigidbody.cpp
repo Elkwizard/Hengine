@@ -30,9 +30,11 @@ RigidBody::RigidBody(double x, double y, bool _dynamic) {
 	friction = 0.5;
 	canMoveThisStep = true;
 
+	trivialCollisionFilter = true;
 	collisionFilter = [&](const RigidBody& body) {
 		return ::collideRule(this, (RigidBody*)&body);
 	};
+	trivialTriggerFilter = true;
 	triggerFilter = [&](const RigidBody& body) {
 		return ::triggerRule(this, (RigidBody*)&body);
 	};
@@ -50,6 +52,14 @@ RigidBody::RigidBody(double x, double y, bool _dynamic) {
 RigidBody::~RigidBody() {
 	for (BaseCollider* collider : shapes)
 		delete collider;
+}
+
+bool RigidBody::canCollideWith(const RigidBody& body) const {
+	return trivialCollisionFilter || collisionFilter(body);
+}
+
+bool RigidBody::isTriggerWith(const RigidBody& body) const {
+	return !trivialTriggerFilter && triggerFilter(body);
 }
 
 void RigidBody::setDensity(double a) {

@@ -372,18 +372,22 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 		}
 
 		const finalizationRegistry = new FinalizationRegistry(free => free());
-		
+
 		const native = Symbol("native");
+		
+		const clean = value => value && typeof value === "object" && value.constructor[native] ? value.pointer : value;
+		const cast = (value, type) => {
+			if (type in classes) return new classes[type](value);
+			if (type === "bool") return !!value;
+			return value;
+		};
+		const cleanArgs = args => {
+			for (let i = 0; i < args.length; i++)
+				args[i] = clean(args[i]);
+		};
 
 		for (const cls in classes) {
 			const entries = classes[cls];
-			
-			const clean = value => value && typeof value === "object" && value.constructor[native] ? value.pointer : value;
-			const cast = (value, type) => {
-				if (type in classes) return new classes[type](value);
-				if (type === "bool") return !!value;
-				return value;
-			};
 
 			const NativeClass = class {
 				constructor(pointer) {
@@ -410,7 +414,8 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 				}
 
 				static construct(...args) {
-					return new NativeClass(entries?.construct?.(...args.map(clean)));
+					cleanArgs(args);
+					return new NativeClass(entries.construct(...args));
 				}
 			};
 
@@ -446,7 +451,7 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 						}
 					} else Object.defineProperty(isStatic ? NativeClass : NativeClass.prototype, key, {
 						value: function (...args) {
-							args = args.map(clean);
+							cleanArgs(args);
 							const result = isStatic ? fn(...args) : fn(this.pointer, ...args);
 							return cast(result, returnType);
 						},
