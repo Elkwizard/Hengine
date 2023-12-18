@@ -7,33 +7,37 @@
 
 class PhysicsMath {
 	public:
-		static Vector intersectLine(const Vector& a0, const Vector& b0, const Vector& a1, const Vector& b1) {
+		static std::optional<Vector> intersectLine(
+			const Vector& a0, const Vector& b0,
+			const Vector& a1, const Vector& b1
+		) {
 			Vector o0 = a0;
 			Vector v0 = b0 - a0;
 			Vector o1 = a1;
 			Vector v1 = b1 - a1;
 			Matrix mat { v0, -v1 };
-			Vector ts = mat.applyInverseTo(o1 - o0);
+			std::optional<Vector> ts = mat.applyInverseTo(o1 - o0);
 
-			if (!ts) return nullptr;
+			if (!ts) return { };
 
-			auto [t, s] = ts;
+			auto [t, s] = *ts;
 
-			if (t < 0.0 || t > 1.0) return nullptr;
-			if (s < 0.0 || s > 1.0) return nullptr;
+			if (t < 0.0 || t > 1.0) return { };
+			if (s < 0.0 || s > 1.0) return { };
 
 			return o0 + v0 * t;
 		}
+
 		static std::vector<Vector> intersectPolygon(const std::vector<Vector>& a, const std::vector<Vector>& b) {
 			std::vector<Vector> points { };
 
 			for (int i = 0; i < a.size(); i++)
 			for (int j = 0; j < b.size(); j++) {
-				Vector p = intersectLine(
+				std::optional<Vector> p = intersectLine(
 					a[i], a[(i + 1) % a.size()],
 					b[j], b[(j + 1) % b.size()]
 				);
-				if (p) points.push_back(p);
+				if (p) points.push_back(*p);
 			}
 
 			return points;
@@ -149,7 +153,7 @@ class CollisionDetector {
 			PolygonModel& b = *(PolygonModel*)_b;
 
 			double bestDist = INFINITY;
-			Vector bestPoint = nullptr;
+			std::optional<Vector> bestPoint;
 			
 			Vector pA = a.position;
 
@@ -167,8 +171,9 @@ class CollisionDetector {
 					bestPoint = submission;
 				}
 			}
+			
 			if (bestPoint) {
-				Vector between = bestPoint - a.position;
+				Vector between = *bestPoint - a.position;
 				bestDist = sqrt(bestDist);
 				Vector axis = between.normalized();
 
@@ -183,7 +188,7 @@ class CollisionDetector {
 				} else bestDist = a.radius - bestDist;
 
 				if (!bestDist) return nullptr;
-				return std::make_unique<Collision>(axis, std::vector<Vector>({ bestPoint }), bestDist);
+				return std::make_unique<Collision>(axis, std::vector<Vector>({ *bestPoint }), bestDist);
 			}
 
 			return nullptr;
@@ -226,26 +231,28 @@ class CollisionDetector {
 			if (axes.empty()) return nullptr;
 
 			double minOverlap = INFINITY;
-			Vector bestAxis = nullptr;
+			std::optional<Vector> bestAxis;
 
 			for (const Vector& axis : axes) {
 				double aMin = INFINITY;
 				double aMax = -INFINITY;
 				double bMin = INFINITY;
 				double bMax = -INFINITY;
+
 				for (const Vector& p : a.vertices) {
 					double dot = p.dot(axis);
 					if (dot < aMin) aMin = dot;
 					if (dot > aMax) aMax = dot;
 				}
+
 				for (const Vector& p : b.vertices) {
 					double dot = p.dot(axis);
 					if (dot < bMin) bMin = dot;
 					if (dot > bMax) bMax = dot;
 				}
-				if (aMax < bMin || aMin > bMax) {
+
+				if (aMax < bMin || aMin > bMax)
 					return nullptr;
-				}
 
 				double overlap = ((aMin + aMax) * 0.5 < (bMin + bMax) * 0.5) ? aMax - bMin : bMax - aMin;
 				if (overlap < minOverlap) {
@@ -271,7 +278,7 @@ class CollisionDetector {
 				}
 			}
 
-			return std::make_unique<Collision>(bestAxis, contacts, minOverlap);
+			return std::make_unique<Collision>(*bestAxis, contacts, minOverlap);
 		}
 };
 

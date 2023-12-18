@@ -23,7 +23,7 @@ double CollisionResolver::normalImpulse(double vAB, double mA, double mB, double
 	return j;
 }
 
-Vector CollisionResolver::normalImpulses(double vAB1, double vAB2, double mA, double mB, double iA, double iB, double e, const Vector& n, double rA1x, double rA1y, double rB1x, double rB1y, double rA2x, double rA2y, double rB2x, double rB2y) {
+std::optional<Vector> CollisionResolver::normalImpulses(double vAB1, double vAB2, double mA, double mB, double iA, double iB, double e, const Vector& n, double rA1x, double rA1y, double rB1x, double rB1y, double rA2x, double rA2y, double rB2x, double rB2y) {
 	double nx = n.x;
 	double ny = n.y;
 
@@ -111,9 +111,9 @@ bool CollisionResolver::resolveContacts(bool dynamic, Collision& collision) {
 		double vAB2n = vAB(rA2, rB2, bodyA, bodyB, normal);
 
 		if (vAB1n >= GTE_EPSILON || vAB2n >= GTE_EPSILON) return false;
-		Vector normalImpulses = this->normalImpulses(vAB1n, vAB2n, mA, mB, iA, iB, e, normal, rA1x, rA1y, rB1x, rB1y, rA2x, rA2y, rB2x, rB2y); // normal impulses are down the inverse normal
+		std::optional<Vector> normalImpulses = this->normalImpulses(vAB1n, vAB2n, mA, mB, iA, iB, e, normal, rA1x, rA1y, rB1x, rB1y, rA2x, rA2y, rB2x, rB2y); // normal impulses are down the inverse normal
 		if (!normalImpulses) return false;
-		auto [normalImpulse1, normalImpulse2] = normalImpulses;
+		auto [normalImpulse1, normalImpulse2] = *normalImpulses;
 		if (normalImpulse1 >= GTE_EPSILON || normalImpulse2 >= GTE_EPSILON) return false;
 
 		// friction (solved individually)

@@ -60,11 +60,11 @@ void Constraint1::solve() {
 		forceToError.c = forceToError.b;
 		forceToError.d = mA + iA * pow(rA.x, 2);
 
-		Vector force = forceToError.applyInverseTo(getError());
+		std::optional<Vector> force = forceToError.applyInverseTo(getError());
 
 		if (!force) return;
 
-		body.applyImpulse(a, force);
+		body.applyImpulse(a, *force);
 	}
 }
 
@@ -165,12 +165,12 @@ void Constraint2::solve() {
 		forceToError.c = forceToError.b;
 		forceToError.d = mAB + (iA * rA.x * rA.x) + (iB * rB.x * rB.x);
 
-		Vector force = forceToError.applyInverseTo(getError());
+		std::optional<Vector> force = forceToError.applyInverseTo(getError());
 
 		if (!force) return;
 
-		if (dynamicA) bodyA.applyImpulse(a, force);
-		if (dynamicB) bodyB.applyImpulse(b, -force);
+		if (dynamicA) bodyA.applyImpulse(a, *force);
+		if (dynamicB) bodyB.applyImpulse(b, -*force);
 	}
 }
 

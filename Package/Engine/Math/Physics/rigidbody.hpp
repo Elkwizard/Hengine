@@ -12,6 +12,29 @@ class RigidBody;
 extern "C" bool collideRule(RigidBody*, RigidBody*);
 extern "C" bool triggerRule(RigidBody*, RigidBody*);
 
+template <>
+class std::hash<RigidBody*> {
+	public:
+		size_t operator()(RigidBody* ptr) const {
+			return 1478611 * (size_t)ptr;
+		}
+};
+
+class Bounds {
+	public:
+		int minX, minY;
+		int maxX, maxY;
+
+		Bounds() { }
+
+		Bounds(int _minX, int _minY, int _maxX, int _maxY) {
+			minX = _minX;
+			minY = _minY;
+			maxX = _maxX;
+			maxY = _maxY;
+		}
+};
+
 class RigidBody {
 	public:
 		ID id;
@@ -25,6 +48,8 @@ class RigidBody {
 
 		double mass, inertia, density;
 		double boundingRadius;
+		Bounds bounds;
+
 		double restitution;
 		double friction;
 

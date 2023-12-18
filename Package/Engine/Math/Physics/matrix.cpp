@@ -21,22 +21,14 @@ Matrix::Matrix() {
 	d = 1.0;
 }
 
-Matrix::Matrix(std::nullptr_t) {
-	a = b = c = d = NAN;
-}
-
-Matrix::operator bool() const {
-	return isnan(a);
-}
-
-Matrix Matrix::inverse() const {
+std::optional<Matrix> Matrix::inverse() const {
 	double det = determinant();
-	if (!det) return nullptr;
+	if (!det) return { };
 	double invDeterminant = 1.0 / det;
-	return {
+	return Matrix(
 		invDeterminant * d, invDeterminant * -b,
 		invDeterminant * -c, invDeterminant * a
-	};
+	);
 }
 
 double Matrix::determinant() const {
@@ -54,20 +46,20 @@ Vector Matrix::operator *(const Vector& v) const {
 	return { a * v.x + b * v.y, c * v.x + d * v.y };
 }
 
-Vector Matrix::applyInverseTo(const Vector& vector) const {
+std::optional<Vector> Matrix::applyInverseTo(const Vector& vector) const {
 	double det = determinant();
-	if (!det) return nullptr;
+	if (!det) return { };
 
-	double invDeterminant = 1 / det;
+	double invDeterminant = 1.0 / det;
 	double a = this->d;
 	double b = -this->b;
 	double c = -this->c;
 	double d = this->a;
 
-	return {
+	return Vector(
 		invDeterminant * (a * vector.x + b * vector.y),
 		invDeterminant * (c * vector.x + d * vector.y)
-	};
+	);
 }
 
 Vector Matrix::force1ToZero(const RigidBody& body, const Vector& point) {
