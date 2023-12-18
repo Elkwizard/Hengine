@@ -25,14 +25,14 @@ PhysicsEngine::~PhysicsEngine() {
 		removeConstraint(con->id);
 }
 
-Bodies PhysicsEngine::getBodies() const {
+PhysicsEngine::Bodies PhysicsEngine::getBodies() const {
 	Bodies result { };
 	for (const auto& entry : bodyMap)
 		result.push_back(entry.second);
 	return result;
 }
 
-Constraints PhysicsEngine::getConstraints() const {
+PhysicsEngine::Constraints PhysicsEngine::getConstraints() const {
 	Constraints result { };
 	for (const auto& entry : constraintMap)
 		result.push_back(entry.second);
@@ -100,21 +100,10 @@ void PhysicsEngine::resolve(std::unique_ptr<Collision>& col) {
 
 	if (!penetration) return;
 
-	bool isTriggerA = bodyA.isTrigger || bodyA.isTriggerWith(bodyB);
-	bool isTriggerB = bodyB.isTrigger || bodyB.isTriggerWith(bodyA);
+	bool isTriggerA = bodyA.isTrigger || bodyA.triggerFilter(bodyB);
+	bool isTriggerB = bodyB.isTrigger || bodyB.triggerFilter(bodyA);
 
-	{ // detect first collision per pair
-		uint64_t aID = bodyA.id;
-		uint64_t bID = bodyB.id;
-		if (bID < aID) std::swap(aID, bID);
-
-		uint64_t key = aID << 16 | bID;
-		
-		if (!noticedCollisions.count(key)) {
-			noticedCollisions.insert(key);
-			onCollide(bodyA, bodyB, direction, contacts, isTriggerA, isTriggerB);
-		}
-	}
+	onCollide(bodyA, bodyB, direction, contacts, isTriggerA, isTriggerB);
 
 	if (isTriggerA || isTriggerB) return;
 
@@ -137,23 +126,28 @@ void PhysicsEngine::resolve(std::unique_ptr<Collision>& col) {
 	bodyA.canMoveThisStep = false;
 }
 
-void PhysicsEngine::collisions(CollisionPairs& collisionPairs) {
-	//collisions
-	for (auto& entry : collisionPairs) {
-		RigidBody& body = *entry.first;
-		Bodies& collidable = entry.second;
+void PhysicsEngine::collisions(Bodies& dynBodies, CollisionPairs& collisionPairs, const Order& order) {
+	Bodies colBodies { };
+	for (RigidBody* body : dynBodies)
+		if (body->canCollide) colBodies.push_back(body);
+	
+	std::sort(colBodies.begin(), colBodies.end(), order);
 
+	//collisions
+	for (RigidBody* body : colBodies) {
 		//mobilize
-		body.canMoveThisStep = true;
-		body.prohibitedDirections.clear();
+		body->canMoveThisStep = true;
+		body->prohibitedDirections.clear();
+
+		Bodies& collidable = collisionPairs.at(body);
 		
-		Vector& vel = body.velocity;
+		Vector& vel = body->velocity;
 		std::sort(collidable.begin(), collidable.end(), [&](RigidBody* a, RigidBody* b) {
 			return (a->position - b->position).dot(vel) < 0.0;
 		});
 
 		for (RigidBody* body2 : collidable) {
-			std::unique_ptr<Collision> collision = CollisionDetector::collideBodies(body, *body2);
+			std::unique_ptr<Collision> collision = CollisionDetector::collideBodies(*body, *body2);
 			if (collision) resolve(collision);
 		}
 	}
@@ -192,11 +186,10 @@ PhysicsEngine::CollisionPairs PhysicsEngine::createGrid(Bodies& dynBodies) {
 		if (!body->canCollide) continue;
 
 		Bodies bodies = grid.query(*body, [&](const RigidBody& b) {
-			return body->canCollideWith(b) && b.canCollideWith(*body);
+			return body->collisionFilter(b) && b.collisionFilter(*body);
 		});
 		
-		if (bodies.size())
-			collisionPairs[body] = bodies;
+		collisionPairs[body] = bodies;
 	}
 	
 	return collisionPairs;
@@ -206,17 +199,16 @@ void PhysicsEngine::run() {
 	Bodies dynBodies { };
 	for (RigidBody* body : getBodies())
 		if (body->dynamic) dynBodies.push_back(body);
-	
-	std::sort(dynBodies.begin(), dynBodies.end(), [&](RigidBody* a, RigidBody* b) {
-		return (b->position - a->position).dot(gravity) < 0.0;
-	});
 
 	// approximate where they'll be at the end of the frame
 	integratePosition(dynBodies, 1);
 	CollisionPairs collisionPairs = createGrid(dynBodies);
 	integratePosition(dynBodies, -1);
 
-	noticedCollisions.clear();
+	//sorts
+	Order gravitySort = [&](RigidBody* a, RigidBody* b) {
+		return (b->position - a->position).dot(gravity) < 0.0;
+	};
 
 	double intensity = 1.0 / iterations;
 
@@ -226,7 +218,7 @@ void PhysicsEngine::run() {
 		applyForces(dynBodies, intensity);
 		for (int i = 0; i < constraintIterations; i++)
 			solveConstraints();
-		collisions(collisionPairs);
+		collisions(dynBodies, collisionPairs, gravitySort);
 	}
 }
 

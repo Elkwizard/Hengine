@@ -7,32 +7,50 @@
 
 class PhysicsMath {
 	public:
-		static Vector intersectLine(const Vector& a0, const Vector& b0, const Vector& a1, const Vector& b1) {
-			Vector o0 = a0;
-			Vector v0 = b0 - a0;
-			Vector o1 = a1;
-			Vector v1 = b1 - a1;
-			Matrix mat { v0, -v1 };
-			Vector ts = mat.applyInverseTo(o1 - o0);
+		static Vector intersectLine(const Vector& A, const Vector& A1, const Vector& B, const Vector& B1) {
+			constexpr double INF = 1e13;
 
-			if (!ts) return nullptr;
+			double m_A = (A1.y - A.y) / (A1.x - A.x);
+			double b_A = A.y - m_A * A.x;
+			double m_B = (B1.y - B.y) / (B1.x - B.x);
+			double b_B = B.y - m_B * B.x;
 
-			auto [t, s] = ts;
+			if (m_A == m_B || (abs(m_A) > INF && abs(m_B) > INF)) return nullptr;
 
-			if (t < 0.0 || t > 1.0) return nullptr;
-			if (s < 0.0 || s > 1.0) return nullptr;
+			double x = (b_B - b_A) / (m_A - m_B);
+			if (abs(m_A) > INF) {
+				double x = A.x;
+				double y = m_B * x + b_B;
+				if (x < min(B.x, B1.x)) return nullptr;
+				if (x > max(B.x, B1.x)) return nullptr;
+				if (y < min(A.y, A1.y)) return nullptr;
+				if (y > max(A.y, A1.y)) return nullptr;
+				return { x, y };
+			}
 
-			return o0 + v0 * t;
+			if (abs(m_B) > INF) {
+				double x = B.x;
+				double y = m_A * x + b_A;
+				if (x < min(A.x, A1.x)) return nullptr;
+				if (x > max(A.x, A1.x)) return nullptr;
+				if (y < min(B.y, B1.y)) return nullptr;
+				if (y > max(B.y, B1.y)) return nullptr;
+				return { x, y };
+			}
+			if (x < min(A.x, A1.x)) return nullptr;
+			if (x > max(A.x, A1.x)) return nullptr;
+			if (x < min(B.x, B1.x)) return nullptr;
+			if (x > max(B.x, B1.x)) return nullptr;
+
+			double y = m_A * x + b_A;
+			return { x, y };
 		}
 		static std::vector<Vector> intersectPolygon(const std::vector<Vector>& a, const std::vector<Vector>& b) {
 			std::vector<Vector> points { };
 
 			for (int i = 0; i < a.size(); i++)
 			for (int j = 0; j < b.size(); j++) {
-				Vector p = intersectLine(
-					a[i], a[(i + 1) % a.size()],
-					b[j], b[(j + 1) % b.size()]
-				);
+				Vector p = intersectLine(a[i], a[(i + 1) % a.size()], b[j], b[(j + 1) % b.size()]);
 				if (p) points.push_back(p);
 			}
 
@@ -204,7 +222,10 @@ class CollisionDetector {
 			if (sqrMag < pow(a.radius + b.radius, 2)) {
 				double mag = sqrt(sqrMag);
 				Vector axis = between / mag;
-				Vector point = (a.position + b.position + axis * (a.radius - b.radius)) * 0.5;
+				Vector point {
+					(axis.x * a.radius + a.position.x + axis.x * -b.radius + b.position.x) * 0.5,
+					(axis.y * a.radius + a.position.y + axis.y * -b.radius + b.position.y) * 0.5
+				};
 				return std::make_unique<Collision>(axis, std::vector<Vector>({ point }), a.radius + b.radius - mag);
 			}
 			return nullptr;
@@ -247,7 +268,7 @@ class CollisionDetector {
 					return nullptr;
 				}
 
-				double overlap = ((aMin + aMax) * 0.5 < (bMin + bMax) * 0.5) ? aMax - bMin : bMax - aMin;
+				double overlap = ((aMin + aMax) / 2 < (bMin + bMax) / 2) ? aMax - bMin : bMax - aMin;
 				if (overlap < minOverlap) {
 					minOverlap = overlap;
 					bestAxis = axis;

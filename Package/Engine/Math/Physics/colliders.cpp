@@ -131,7 +131,7 @@ void PolygonModel::displace(const Vector& v) {
 CircleCollider::CircleCollider(double x, double y, double _radius) : BaseCollider(CIRCLE) {
 	position = { x, y };
 	radius = _radius;
-	boundingRadius = position.mag() + radius;
+	boundingRadius = position.mag() + _radius;
 	model = std::unique_ptr<BaseModel>(new CircleModel(*this));
 }
 

@@ -51,7 +51,7 @@ class Constraint1 extends Constraint {
 	 * @return SceneObject
 	 */
     get body() {
-		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.body.pointer);
+		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.body.id);
 	}
 }
 
@@ -71,14 +71,14 @@ class Constraint2 extends Constraint {
 	 * @return SceneObject
 	 */
     get bodyA() {
-		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.bodyA.pointer);
+		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.bodyA.id);
     }
 	/**
 	 * Returns the second object in the constraint.
 	 * @return SceneObject
 	 */
     get bodyB() {
-		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.bodyB.pointer);
+		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.bodyB.id);
     }
 }
 

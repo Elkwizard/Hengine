@@ -28,8 +28,6 @@ class Constraint {
 		virtual void remove() = 0;
 };
 
-using Constraints = std::vector<Constraint*>;
-
 EXPORT int Constraint$int$get_type(Constraint* con) {
 	return con->type;
 }

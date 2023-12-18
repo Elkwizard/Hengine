@@ -8,8 +8,9 @@ class Matrix {
 		double a, b, c, d;
 
 		Matrix(double _a, double _b, double _c, double _d);
-		Matrix(const Vector& c0, const Vector& c1);
+
 		Matrix();
+
 		Matrix(std::nullptr_t);
 
 		operator bool() const;
