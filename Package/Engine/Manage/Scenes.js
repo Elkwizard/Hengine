@@ -27,7 +27,8 @@ class Scene {
 	constructor(gravity, engine) {
 		this.engine = engine;
 		this.main = new ElementContainer("Main", null, this.engine);
-		this.physicsEngine = physics.exports.PhysicsEngine.construct(gravity.toPhysicsVector()).own();
+		this.physicsEngine = new PhysicsEngine(gravity.toPhysicsVector());
+		this.physicsEngine.onCollide = this.handleCollisionEvent.bind(this);
 		this.cullGraphics = true;
 		this.mouseEvents = true;
 		this.collisionEvents = true;
@@ -55,17 +56,16 @@ class Scene {
 	 * @return Constraint[]
 	 */
 	get constraints() {
-		let constraints = this.physicsEngine.getConstraints();
-		constraints = new Array(constraints.length)
-			.map((_, i) => Constraint.fromPhysicsConstraint(constraints.get(i), this.engine));
-		return constraints;
+		return this.physicsEngine.constraints.map(con => Constraint.fromPhysicsConstraint(con, this.engine));
 	}
 	handleCollisionEvent(a, b, direction, contacts, isTriggerA, isTriggerB) {
-		if (a && b) {
+		let A = a.userData.sceneObject;
+		let B = b.userData.sceneObject;
+		if (A && B && this.collisionEvents) {
 			contacts = contacts.map(v => Vector2.fromPhysicsVector(v));
 			direction = Vector2.fromPhysicsVector(direction);
-			a.scripts.PHYSICS.colliding.add(b, direction, contacts, isTriggerB);
-			b.scripts.PHYSICS.colliding.add(a, direction.inverse, contacts, isTriggerA);
+			A.scripts.PHYSICS.colliding.add(B, direction, contacts, isTriggerB);
+			B.scripts.PHYSICS.colliding.add(A, direction.inverse, contacts, isTriggerA);
 		}
 	}
 	/**
@@ -127,16 +127,10 @@ class Scene {
 	 * @return Constraint2
 	 */
 	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null) {
-		const con = physics.exports.LengthConstraint2.construct(
-			a.scripts.PHYSICS.body, b.scripts.PHYSICS.body,
-			ap.toPhysicsVector(), bp.toPhysicsVector(), length
-		);
+		const con = new PhysicsConstraint2.Length(a.scripts.PHYSICS.body, b.scripts.PHYSICS.body, ap.toPhysicsVector(), bp.toPhysicsVector(), length);
 		if (length === null) {
-			const { a, b } = con.as(physics.exports.Constraint);
-			con.length = Vector2.dist(
-				Vector2.fromPhysicsVector(a),
-				Vector2.fromPhysicsVector(b)
-			);
+			const { ends } = con;
+			con.length = Vector2.dist(Vector2.fromPhysicsVector(ends[0]), Vector2.fromPhysicsVector(ends[1]));
 		}
 		this.physicsEngine.addConstraint(con);
 		return new Constraint2(con, this.engine);
@@ -151,15 +145,10 @@ class Scene {
 	 */
 	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null) {
 		point ??= a.transform.localSpaceToGlobalSpace(offset);
-		const con = physics.exports.LengthConstraint1.construct(
-			a.scripts.PHYSICS.body, offset.toPhysicsVector(), point.toPhysicsVector(), length
-		);
+		const con = new PhysicsConstraint1.Length(a.scripts.PHYSICS.body, offset.toPhysicsVector(), point.toPhysicsVector(), length);
 		if (length === null) {
-			const { a, b } = con.as(physics.exports.Constraint);
-			con.length = Vector2.dist(
-				Vector2.fromPhysicsVector(a),
-				Vector2.fromPhysicsVector(b)
-			);
+			const { ends } = con;
+			con.length = Vector2.dist(Vector2.fromPhysicsVector(ends[0]), Vector2.fromPhysicsVector(ends[1]));
 		}
 		this.physicsEngine.addConstraint(con);
 		return new Constraint1(con, this.engine);
@@ -173,11 +162,7 @@ class Scene {
 	 * @return Constraint2
 	 */
 	constrainPosition(a, b, ap = Vector2.origin, bp = Vector2.origin) {
-		const con = physics.exports.PositionConstraint2.construct(
-			a.scripts.PHYSICS.body, b.scripts.PHYSICS.body,
-			ap.toPhysicsVector(),
-			bp.toPhysicsVector()
-		);
+		const con = new PhysicsConstraint2.Position(a.scripts.PHYSICS.body, b.scripts.PHYSICS.body, ap.toPhysicsVector(), bp.toPhysicsVector());
 		this.physicsEngine.addConstraint(con);
 		return new Constraint2(con, this.engine);
 	}
@@ -190,10 +175,7 @@ class Scene {
 	 */
 	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
 		point ??= a.transform.localSpaceToGlobalSpace(offset);
-		const con = physics.exports.PositionConstraint1.construct(
-			a.scripts.PHYSICS.body,
-			offset.toPhysicsVector(), point.toPhysicsVector()
-		);
+		const con = new PhysicsConstraint1.Position(a.scripts.PHYSICS.body, offset.toPhysicsVector(), point.toPhysicsVector());
 		this.physicsEngine.addConstraint(con);
 		return new Constraint1(con, this.engine);
 	}

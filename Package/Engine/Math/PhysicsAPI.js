@@ -1,10 +1,8 @@
-function physicsAPICollideShapes(a, b) {
-    a = a.toPhysicsShape();
-	b = b.toPhysicsShape();
-	const result = physics.exports.CollisionDetector.collide(a, b);
-	a.free();
-	b.free();
-	return result;
+function physicsAPICollideShapes(shape, shape2) {
+    return !!CollisionDetector.collide(
+        shape.toPhysicsShape(), new PhysicsVector(0, 0), 1, 0,
+        shape2.toPhysicsShape(), new PhysicsVector(0, 0), 1, 0
+    );
 }
 
 /**
@@ -22,8 +20,7 @@ class Constraint {
 	 * @return Vector2[2]
 	 */
 	get ends() {
-		const { a, b } = this.physicsConstraint.as(physics.exports.Constraint);
-		return [Vector2.fromPhysicsVector(a), Vector2.fromPhysicsVector(b)];
+        return this.physicsConstraint.ends.map(Vector2.fromPhysicsVector);
     }
 	
 	/**
@@ -31,11 +28,11 @@ class Constraint {
 	 */
     remove() {
         const { physicsEngine } = this.engine.scene;
-        physicsEngine.removeConstraint(this.physicsConstraint.as(physics.exports.Constraint).id);
+        physicsEngine.removeConstraint(this.physicsConstraint.id);
     }
 
 	static fromPhysicsConstraint(constraint, engine) {
-		return new [Constraint1, Constraint2, Constraint1, Constraint2][constraint.type](constraint, engine);
+		return new (constraint instanceof PhysicsConstraint2 ? Constraint2 : Constraint1)(constraint, engine);
 	}
 }
 
@@ -44,14 +41,14 @@ class Constraint {
  */
 class Constraint1 extends Constraint {
     constructor(physicsConstraint, engine) {
-		super(physicsConstraint.as(physics.exports.Constraint1), engine);
+		super(physicsConstraint, engine);
     }
 	/**
 	 * Returns the object in the constraint.
 	 * @return SceneObject
 	 */
     get body() {
-		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.body.id);
+		return this.physicsConstraint.body.userData.sceneObject;
 	}
 }
 
@@ -62,7 +59,7 @@ class Constraint1 extends Constraint {
  */
 class Constraint2 extends Constraint {
     constructor(physicsConstraint, engine) {
-		super(physicsConstraint.as(physics.exports.Constraint2), engine);
+		super(physicsConstraint, engine);
 		Object.shortcut(this, this.physicsConstraint, "staticA");
 		Object.shortcut(this, this.physicsConstraint, "staticB");
     }
@@ -71,14 +68,14 @@ class Constraint2 extends Constraint {
 	 * @return SceneObject
 	 */
     get bodyA() {
-		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.bodyA.id);
+        return this.physicsConstraint.bodyA.userData.sceneObject;
     }
 	/**
 	 * Returns the second object in the constraint.
 	 * @return SceneObject
 	 */
     get bodyB() {
-		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.bodyB.id);
+        return this.physicsConstraint.bodyB.userData.sceneObject;
     }
 }
 
