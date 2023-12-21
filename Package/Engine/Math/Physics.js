@@ -265,48 +265,35 @@ class PhysicsVectorAccumulator {
 
 //geometry
 class PhysicsMath {
-    static intersectLine(A, A1, B, B1) {
+    static intersectLine(a0, b0, a1, b1) {
+		const o0 = a0;
+		const v0 = b0.minus(a0);
+		const o1 = a1;
+		const v1 = b1.minus(a1);
+		const a = v0.x;
+		const b = v1.x;
+		const c = v0.y;
+		const d = v1.y;
+		const det = a * d - b * c;
+		if (!det) return null;
+		const invDet = 1 / det;
+		const diff = o1.minus(o0);
+		const t = invDet * (d * diff.x - b * diff.y);
+		const s = invDet * (c * diff.x - a * diff.y);
+		
+		if (t < 0 || t > 1) return null;
+		if (s < 0 || s > 1) return null;
 
-        let m_A = (A1.y - A.y) / (A1.x - A.x);
-        let b_A = A.y - m_A * A.x;
-        let m_B = (B1.y - B.y) / (B1.x - B.x);
-        let b_B = B.y - m_B * B.x;
-
-        if (m_A === m_B || (Math.abs(m_A) > INFINITY && Math.abs(m_B) > INFINITY)) return null;
-
-        let x = (b_B - b_A) / (m_A - m_B);
-        if (Math.abs(m_A) > INFINITY) {
-            let x = A.x;
-            let y = m_B * x + b_B;
-            if (x < Math.min(B.x, B1.x)) return null;
-            if (x > Math.max(B.x, B1.x)) return null;
-            if (y < Math.min(A.y, A1.y)) return null;
-            if (y > Math.max(A.y, A1.y)) return null;
-            return new PhysicsVector(x, y);
-        }
-
-        if (Math.abs(m_B) > INFINITY) {
-            let x = B.x;
-            let y = m_A * x + b_A;
-            if (x < Math.min(A.x, A1.x)) return null;
-            if (x > Math.max(A.x, A1.x)) return null;
-            if (y < Math.min(B.y, B1.y)) return null;
-            if (y > Math.max(B.y, B1.y)) return null;
-            return new PhysicsVector(x, y);
-        }
-        if (x < Math.min(A.x, A1.x)) return null;
-        if (x > Math.max(A.x, A1.x)) return null;
-        if (x < Math.min(B.x, B1.x)) return null;
-        if (x > Math.max(B.x, B1.x)) return null;
-
-        let y = m_A * x + b_A;
-        return new PhysicsVector(x, y);
+		return v0.times(t).add(o0);
     }
     static intersectPolygon(a, b) {
         let points = [];
 
         for (let i = 0; i < a.length; i++) for (let j = 0; j < b.length; j++) {
-            let p = PhysicsMath.intersectLine(a[i], a[(i + 1) % a.length], b[j], b[(j + 1) % b.length]);
+            let p = PhysicsMath.intersectLine(
+				a[i], a[(i + 1) % a.length],
+				b[j], b[(j + 1) % b.length]
+			);
             if (p) points.push(p);
         }
 
@@ -875,46 +862,16 @@ class CollisionDetector {
     static CircleModel_PolygonModel(a, b) {
         let bestDist = Infinity;
         let bestPoint = null;
-        let ax = a.position.x;
-        let ay = a.position.y;
+
         for (let i = 0; i < b.vertices.length; i++) {
             let start = b.vertices[i];
             let end = b.vertices[(i + 1) % b.vertices.length];
 
-            let submission;
-            if (Math.abs(end.x - start.x) < 0.0001) {
-                let min_ = Math.min(start.y, end.y);
-                let max_ = Math.max(start.y, end.y);
-                submission = new PhysicsVector(start.x, ay);
-                if (ay < min_) submission.y = min_;
-                if (ay > max_) submission.y = max_;
-            } else if (Math.abs(end.y - start.y) < 0.0001) {
-                let min_ = Math.min(start.x, end.x);
-                let max_ = Math.max(start.x, end.x);
-                submission = new PhysicsVector(ax, start.y);
-                if (ax < min_) submission.x = min_;
-                if (ax > max_) submission.x = max_;
-            } else {
-                let dx = end.x - start.x;
-                let dy = end.y - start.y;
-                let n_x = -dy;
-                let n_y = dx;
-                let m = n_y / n_x;
-                let b = ay - m * ax;
-                let m_n = dy / dx;
-                let b_n = start.y - start.x * m_n;
-                //m_n * x + b_n = m * x + b
-                //(m_n - m) * x = b - b_n
-                //x = (b - b_n) / (m_n - m)
-                let x = (b - b_n) / (m_n - m);
-                let min_ = Math.min(start.x, end.x);
-                let max_ = Math.max(start.x, end.x);
-                if (x < min_) x = min_;
-                if (x > max_) x = max_;
-                let y = m_n * x + b_n;
-                submission = new PhysicsVector(x, y);
-            }
-            let dist = (submission.x - ax) ** 2 + (submission.y - ay) ** 2;
+			const v = end.minus(start);
+			const t = v.dot(a.position.minus(start)) / v.sqrMag;
+            const submission = start.plus(v.times(Math.max(0, Math.min(1, t))));
+
+            const dist = submission.minus(a.position).sqrMag;
             if (dist < bestDist) {
                 bestDist = dist;
                 bestPoint = submission;
@@ -1632,16 +1589,16 @@ class PhysicsOrderGenerator {
 	constructor(seed) {
 		this.seed = seed;
 	}
-	next() {
+	next(length) {
 		this.seed++;
 		let a = (this.seed * 638835776.12849) % 8.7890975;
 		let b = (a * 256783945.4758903) % 2.567890;
 		let r = Math.abs(a * b * 382749.294873597) % 1;
-		return r;
+		return ~~(length * r);
 	}
 	shuffle(arr) {
 		for (let i = 0; i < arr.length; i++) {
-			const inx = ~~(this.next() * arr.length);
+			const inx = this.next(arr.length);
 			const temp = arr[inx];
 			arr[inx] = arr[0];
 			arr[0] = temp;
