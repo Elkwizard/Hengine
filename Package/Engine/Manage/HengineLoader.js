@@ -319,6 +319,161 @@ class HengineBinaryResource extends HengineResource {
 	}
 }
 
+class HengineWASMResource extends HengineResource { // emscripten-only, uses specific API/naming convention, really only for internal Hengine use
+	static files = { };
+	
+	constructor(src) {
+		super(src);
+	}
+
+	async load() {
+		const script = await new HengineScriptResource(
+			this.src.replace(/\.wasm$/g, ".js")
+		).load();
+		if (!script) return null;
+	
+		const { imports, buffer } = HengineWASMResource.files[script.src];
+
+		const importImplementations = { };
+
+		const env = { };
+		for (const name of imports)
+			env[name] = (...args) => importImplementations[name]?.(...args);
+
+		const { instance: { exports } } = await WebAssembly.instantiate(buffer, {
+			env,
+			wasi_snapshot_preview1: {
+				proc_exit(code) {
+					throw new Error("Exited with code " + code);
+				},
+				fd_close: () => null,
+				fd_write: () => null,
+				fd_seek: () => null
+			}
+		});
+
+		exports._initialize();
+		
+		const keys = Object.keys(exports)
+			.filter(key => key.match(/\$/));
+		
+		const classes = { };
+		for (const key of keys) {
+			const inx = key.indexOf("$");
+			const cls = key.slice(0, inx);
+			const prop = key.slice(inx + 1);
+			const typeInx = prop.indexOf("$");
+			if (typeInx > -1) {
+				const type = prop.slice(0, typeInx);
+				if (type.match(/[A-Z]/))
+					classes[type] ??= { };
+			}
+			(classes[cls] ??= { })[prop] = exports[key];
+		}
+
+		const finalizationRegistry = new FinalizationRegistry(free => free());
+
+		const native = Symbol("native");
+		
+		const clean = value => value && typeof value === "object" && value.constructor[native] ? value.pointer : value;
+		const cast = (value, type) => {
+			if (type in classes) return new classes[type](value);
+			if (type === "bool") return !!value;
+			return value;
+		};
+		const cleanArgs = args => {
+			for (let i = 0; i < args.length; i++)
+				args[i] = clean(args[i]);
+		};
+
+		for (const cls in classes) {
+			const entries = classes[cls];
+
+			const NativeClass = class {
+				constructor(pointer) {
+					this.pointer = pointer;
+					this.owned = false;
+				}
+				
+				own() {
+					if (!this.owned) {
+						this.owned = true;
+						const { pointer } = this;
+						finalizationRegistry.register(this, () => entries?.free?.(pointer));
+					}
+
+					return this;
+				}
+
+				as(type) {
+					return new type(this.pointer);
+				}
+
+				free() {
+					entries?.free?.(this.pointer);
+				}
+
+				static construct(...args) {
+					cleanArgs(args);
+					return new NativeClass(entries.construct(...args));
+				}
+			};
+
+			NativeClass[native] = true;
+			
+			Object.defineProperty(NativeClass, "name", { value: cls });
+
+			for (let key in entries) {
+				const fn = entries[key];
+				if (key !== "construct" && key !== "free") {
+					const typeInx = key.indexOf("$");
+					const returnType = key.slice(0, typeInx);
+					key = key.slice(typeInx + 1);
+
+					const staticInx = key.indexOf("$");
+					const isStatic = staticInx > -1;
+					if (isStatic) key = key.slice(0, staticInx);
+
+					if (key.indexOf("_") > -1) {
+						const name = key.slice(key.indexOf("_") + 1);
+						const getter = entries[`${returnType}$get_${name}`];
+						const setter = entries[`void$set_${name}`];
+						if (!(name in NativeClass.prototype)) {
+							Object.defineProperty(NativeClass.prototype, name, {
+								get: getter ? function () {
+									return cast(getter(this.pointer), returnType);
+								} : undefined,
+								set: setter ? function (value) {
+									setter(this.pointer, clean(value));
+								} : undefined,
+								enumerable: true
+							});
+						}
+					} else Object.defineProperty(isStatic ? NativeClass : NativeClass.prototype, key, {
+						value: function (...args) {
+							cleanArgs(args);
+							const result = isStatic ? fn(...args) : fn(this.pointer, ...args);
+							return cast(result, returnType);
+						},
+						enumerable: false
+					});
+				}
+			}
+
+			classes[cls] = NativeClass;
+		}
+
+		const name = this.src
+			.replace(/^.*\//g, "")
+			.replace(/\.[^.]*?$/g, "");
+		
+		window[name] = {
+			exports: classes,
+			imports: importImplementations
+		};
+	}
+}
+
 /**
  * Represents a batch of HengineResources to be loaded in a row, and can be used as a more streamlined approach compared to constructing HengineResources directly.
  * It contains an internal list of resources to load, and many of its methods simply add to this list, which can eventually be flushed and loaded, though only once per instance.
@@ -607,8 +762,8 @@ class HengineLoader {
 					const promises = [];
 					for (let i = 0; i < block.length; i++) {
 						const path = block[i];
-						const src = PathManager.join([engineSrc, path + ".js"]);
-						const script = new HengineScriptResource(src);
+						const src = PathManager.join([engineSrc, path]);
+						const script = src.endsWith(".js") ? new HengineScriptResource(src) : new HengineWASMResource(src);
 						promises.push(script.load());
 					}
 					await Promise.all(promises);
@@ -663,68 +818,68 @@ HengineLoader.loader = null;
 
 HengineLoader.engineResources = [
 	[ // no dependencies
-		"Preload/PrototypeOverload",
-		"Preload/Lazy",
-		"Preload/Operable",
+		"Preload/PrototypeOverload.js",
+		"Preload/Lazy.js",
+		"Preload/Operable.js",
 
-		"SceneObject/SceneElement",
-		"SceneObject/Scripts",
+		"SceneObject/SceneElement.js",
+		"SceneObject/Scripts.js",
 
-		"Manage/Scenes",
-		"Manage/Hengine",
-		"Manage/Intervals",
+		"Manage/Scenes.js",
+		"Manage/Hengine.js",
+		"Manage/Intervals.js",
 
-		"Util/ByteBuffer",
-		"Util/FileSystem",
-		"Util/Sound",
+		"Util/ByteBuffer.js",
+		"Util/FileSystem.js",
+		"Util/Sound.js",
 
-		"Math/Matrix",
-		"Math/Physics",
-		"Math/PhysicsAPI",
-		"Math/Random",
-		"Math/Interpolation",
-		"Math/GPUComputation",
+		"Math/Matrix.js",
+		"Math/Physics/physics.wasm",
+		"Math/PhysicsAPI.js",
+		"Math/Random.js",
+		"Math/Interpolation.js",
+		"Math/GPUComputation.js",
 
-		"Render/Frame",
-		"Render/Gradient",
-		"Render/Spline",
-		"Render/WebGL2DContext",
-		"Render/GrayMap"
+		"Render/Frame.js",
+		"Render/Gradient.js",
+		"Render/Spline.js",
+		"Render/WebGL2DContext.js",
+		"Render/GrayMap.js"
 	],
 	[ // basic dependencies
-		"Util/Input",
+		"Util/Input.js",
 
-		"Manage/Canvas",
-		"Manage/ElementContainer",
+		"Manage/Canvas.js",
+		"Manage/ElementContainer.js",
 
-		"Scripts/Draggable",
-		"Scripts/ParticleSpawner",
-		"Scripts/Physics",
-		"Scripts/PlayerMovement",
-		"Scripts/TextArea",
+		"Scripts/Draggable.js",
+		"Scripts/ParticleSpawner.js",
+		"Scripts/Physics.js",
+		"Scripts/PlayerMovement.js",
+		"Scripts/TextArea.js",
 
-		"SceneObject/SceneObject",
-		"Render/Color",
+		"SceneObject/SceneObject.js",
+		"Render/Color.js",
 
-		"Math/Vector",
-		"Math/Geometry",
+		"Math/Vector.js",
+		"Math/Geometry.js",
 
-		"Render/Font",
-		"Render/Shapes",
-		"Render/Animation",
-		"Render/Transform",
-		"Render/Camera",
-		"Render/Webcam",
-		"Render/Graph",
-		"Render/Texture",
-		"Render/VideoView",
-		"Render/WebGLRenderer",
-		"Render/Renderer",
-		"Render/GPUShader",
-		"Render/StaticImage",
-		"Render/TileMap"
+		"Render/Font.js",
+		"Render/Shapes.js",
+		"Render/Animation.js",
+		"Render/Transform.js",
+		"Render/Camera.js",
+		"Render/Webcam.js",
+		"Render/Graph.js",
+		"Render/Texture.js",
+		"Render/VideoView.js",
+		"Render/WebGLRenderer.js",
+		"Render/Renderer.js",
+		"Render/GPUShader.js",
+		"Render/StaticImage.js",
+		"Render/TileMap.js"
 	],
 	[ // high level dependencies
-		"SceneObject/UIObject"
+		"SceneObject/UIObject.js"
 	]
 ];

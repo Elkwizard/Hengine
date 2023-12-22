@@ -1,3 +1,31 @@
+physics.imports.js_log = console.log;
+
+physics.imports.onCollide = (engine, a, b, direction, contacts, triggerA, triggerB) => {
+	a = PHYSICS.bodyToSceneObject.get(a);
+	const { scene } = a.engine;
+	if (!scene.collisionEvents) return;
+	
+	engine = new physics.exports.PhysicsEngine(engine);
+	b = PHYSICS.bodyToSceneObject.get(b);
+	direction = Vector2.fromPhysicsVector(new physics.exports.Vector(direction));
+	contacts = new physics.exports.NativeVectorArray(contacts);
+	contacts = new Array(contacts.length).map((_, i) => Vector2.fromPhysicsVector(contacts.get(i)));
+
+	scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
+};
+
+physics.imports.collideRule = (a, b) => {
+	a = PHYSICS.bodyToSceneObject.get(a);
+	b = PHYSICS.bodyToSceneObject.get(b);
+	return a.scripts.PHYSICS.collisionFilter(b);
+};
+
+physics.imports.triggerRule = (a, b) => {
+	a = PHYSICS.bodyToSceneObject.get(a);
+	b = PHYSICS.bodyToSceneObject.get(b);
+	return a.scripts.PHYSICS.triggerFilter(b);
+};
+
 /**
  * Adds rigidbody physics to a SceneObject.
  * @prop Vector2 velocity | The velocity of the object per frame
@@ -17,6 +45,7 @@
  * @prop CollisionMonitor lastColliding | All of the objects that were colliding with the object last frame
  */
 class PHYSICS extends ElementScript {
+	static bodyToSceneObject = new Map();
 	/**
 	 * Adds rigidbody physics to an object.
 	 * @param Boolean mobile | Whether the object should be able to move/rotate 
@@ -26,16 +55,15 @@ class PHYSICS extends ElementScript {
 		this.scene = this.engine.scene;
 		this.physicsEngine = this.scene.physicsEngine;
 		
-		this.body = new RigidBody(obj.transform.position.x, obj.transform.position.y, gravity);
-        
-		this.body.userData.sceneObject = obj;
+		this.body = physics.exports.RigidBody.construct(
+			obj.transform.position.x, obj.transform.position.y, gravity
+		);
+		PHYSICS.bodyToSceneObject.set(this.body.pointer, obj);
 		
 		// collision rules
-        this.body.collisionFilter = body => !this.hasCollideRule ||
-			this.collideBasedOnRule(body.userData.sceneObject);
+        this.collisionFilter = body => this.collideBasedOnRule(body);
 		
-		this.body.triggerFilter = body => this.hasTriggerRule &&
-			this.triggerBasedOnRule(body.userData.sceneObject);
+		this.triggerFilter = body => this.triggerBasedOnRule(body);
 
 		// monitors
         this.colliding = new CollisionMonitor();
@@ -48,20 +76,15 @@ class PHYSICS extends ElementScript {
 		delete this._velocity.x;
 		delete this._velocity.y;
 		const { body } = this;
+		const { velocity } = body;
 		Object.defineProperties(this._velocity, {
 			x: {
-				set(a) {
-					body.velocity.x = a;
-					body.wake();
-				},
-				get: () => body.velocity.x
+				set: a => velocity.x = a,
+				get: () => velocity.x
 			},
 			y: {
-				set(a) {
-					body.velocity.y = a;
-					body.wake();
-				},
-				get: () => body.velocity.y
+				set: a => velocity.y = a,
+				get: () => velocity.y
 			}
 		});
 
@@ -78,8 +101,10 @@ class PHYSICS extends ElementScript {
 
 		obj.sync(() => {
 			// update things that should have already been done
-			this.hasCollideRule = obj.scripts.implements("collideRule");
-			this.hasTriggerRule = obj.scripts.implements("triggerRule");
+			if (obj.scripts.implements("collideRule"))
+				body.trivialCollisionFilter = false;
+			if (obj.scripts.implements("triggerRule"))
+				body.trivialTriggerFilter = false;
 		
 			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
 
@@ -99,18 +124,13 @@ class PHYSICS extends ElementScript {
 		return this.body.constraints.map(con => Constraint.fromPhysicsConstraint(con, this.sceneObject.engine));
 	}
 	set velocity(a) {
-		const { body } = this;
-		body.velocity.x = a.x;
-		body.velocity.y = a.y;
-		body.wake();
+		this.body.velocity.set(a.x, a.y);
 	}
 	get velocity() {
 		return this._velocity;
 	}
 	set angularVelocity(a) {
-		const { body } = this;
-		body.angularVelocity = a;
-		body.wake();
+		this.body.angularVelocity = a;
 	}
 	get angularVelocity() {
 		return this.body.angularVelocity;
@@ -118,7 +138,6 @@ class PHYSICS extends ElementScript {
 	set mobile(a) {
 		const { body } = this;
         body.dynamic = !!a;
-        if (a) body.wake();
 	}
 	get mobile() {
 		return this.body.dynamic;
@@ -157,37 +176,36 @@ class PHYSICS extends ElementScript {
 		return shape;
 	}
 	cleanUp(obj) {
+		PHYSICS.bodyToSceneObject.delete(this.body.pointer);
 		this.physicsEngine.removeBody(this.body.id);
 	}
 	addScript(obj, script) {
-		this.hasCollideRule ||= script.implements("collideRule");
-		this.hasTriggerRule ||= script.implements("triggerRule");
+		if (script.implements("collideRule"))
+			this.body.trivialCollisionFilter = false;
+		if (script.implements("triggerRule"))
+			this.body.trivialTriggerFilter = false;
 	}
 	beforePhysics(obj) {
 		// clear collisions
 		this.colliding.removeDead();
 		
-		if (!(this.physicsEngine.isAsleep(this.body) && this.mobile)) {
-			// update last colliding
-			this.colliding.get(this.lastColliding);
-		
-			this.colliding.clear();	
-		}
+		// update last colliding
+		this.colliding.get(this.lastColliding);
+		this.colliding.clear();	
 
 		// sync position
 		const { position, rotation } = obj.transform;
-        const dx = !this.body.position.x.equals(position.x);
-        const dy = !this.body.position.y.equals(position.y);
-        const dtheta = !this.body.angle.equals(rotation);
-        if (dx) this.body.position.x = position.x;
-        if (dy) this.body.position.y = position.y;
-        if (dtheta) this.body.angle = rotation;
-        if (dx || dy || dtheta) this.body.invalidateModels();
+        this.body.position.set(position.x, position.y);
+        this.body.angle = rotation;
+        
+		if (obj.transform.diff(obj.lastTransform))
+			this.body.invalidateModels();
 	}
 	afterPhysics(obj) {
 		const { position } = obj.transform;
-        position.x = this.body.position.x;
-        position.y = this.body.position.y;
+		const { x, y } = this.body.position;
+        position.x = x;
+        position.y = y;
         obj.transform.rotation = this.body.angle;
         obj.updateCaches();
 
@@ -221,7 +239,6 @@ class PHYSICS extends ElementScript {
 	 */
 	applyImpulse(obj, point, force) {
         this.body.applyImpulse(point.toPhysicsVector(), force.toPhysicsVector());
-        this.body.wake();
 	}
 	/**
 	 * Applies an impulse to a specific point on the object.
@@ -237,7 +254,6 @@ class PHYSICS extends ElementScript {
 	 */
 	stop(obj) {
 		this.body.stop();
-		this.body.wake();
 	}
 	collideBasedOnRule(obj, element) {
 		const scripts = obj.scripts.sortedScriptInstances;
