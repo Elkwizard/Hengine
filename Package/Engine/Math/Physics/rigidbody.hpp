@@ -121,6 +121,9 @@ ACCESS(RigidBody, airResistance, bool)
 ACCESS(RigidBody, gravity, bool)
 ACCESS(RigidBody, isTrigger, bool)
 
+ACCESS(RigidBody, friction, double)
+ACCESS(RigidBody, restitution, double)
+
 ACCESS(RigidBody, trivialCollisionFilter, bool)
 ACCESS(RigidBody, trivialTriggerFilter, bool)
 
