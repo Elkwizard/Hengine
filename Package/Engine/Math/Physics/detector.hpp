@@ -28,8 +28,14 @@ class PhysicsMath {
 			return o0 + v0 * t;
 		}
 
-		static std::vector<Vector> intersectPolygon(const std::vector<Vector>& a, const std::vector<Vector>& b) {
+		static std::vector<Vector> intersectPolygon(
+			const std::vector<Vector>& a,
+			const std::vector<Vector>& b,
+			int maxMatches = std::numeric_limits<int>::max()
+		) {
 			std::vector<Vector> points { };
+
+			Vector last = { NAN, NAN };
 
 			for (int i = 0; i < a.size(); i++)
 			for (int j = 0; j < b.size(); j++) {
@@ -37,7 +43,12 @@ class PhysicsMath {
 					a[i], a[(i + 1) % a.size()],
 					b[j], b[(j + 1) % b.size()]
 				);
-				if (p) points.push_back(*p);
+				if (p && *p != last) {
+					last = *p;
+					points.push_back(last);
+					if (points.size() == maxMatches)
+						return points;
+				}
 			}
 
 			return points;
@@ -263,20 +274,7 @@ class CollisionDetector {
 
 			if (!bestAxis) return nullptr;
 
-			std::vector<Vector> intersections = PhysicsMath::intersectPolygon(a.vertices, b.vertices);
-
-			std::vector<Vector> contacts { };
-
-			if (intersections.size() > 0) {
-				Vector firstIntersection = intersections[0];
-				contacts.push_back(firstIntersection);
-				int next = 1;
-				while (contacts.size() < 2 && next < intersections.size()) {
-					if (firstIntersection != intersections[next])
-						contacts.push_back(intersections[next]);
-					next++;
-				}
-			}
+			std::vector<Vector> contacts = PhysicsMath::intersectPolygon(a.vertices, b.vertices, 2);
 
 			return std::make_unique<Collision>(*bestAxis, contacts, minOverlap);
 		}

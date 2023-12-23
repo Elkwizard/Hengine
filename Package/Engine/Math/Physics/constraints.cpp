@@ -61,7 +61,7 @@ void Constraint1::solve() {
 		forceToError.d = mA + iA * pow(rA.x, 2);
 
 		std::optional<Vector> force = forceToError.applyInverseTo(getError());
-
+		
 		if (!force) return;
 
 		body.applyImpulse(a, *force);

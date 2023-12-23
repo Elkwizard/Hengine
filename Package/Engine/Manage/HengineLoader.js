@@ -334,7 +334,19 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 	
 		const { imports, buffer } = HengineWASMResource.files[script.src];
 
-		const importImplementations = { };
+		let printBuffer = [];
+		const importImplementations = {
+			printInt: int => printBuffer.push(int),
+			printFloat: float => printBuffer.push(float),
+			printLn: () => {
+				console.log(...printBuffer);
+				printBuffer = [];
+			},
+			fullExit: () => exit("Exited via WASM exit()")
+		};
+
+		for (const name in importImplementations)
+			imports.push(name);
 
 		const env = { };
 		for (const name of imports)
@@ -344,7 +356,7 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 			env,
 			wasi_snapshot_preview1: {
 				proc_exit(code) {
-					throw new Error("Exited with code " + code);
+					exit("WASM exited with code " + code);
 				},
 				fd_close: () => null,
 				fd_write: () => null,

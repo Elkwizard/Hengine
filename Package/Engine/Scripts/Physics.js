@@ -1,5 +1,3 @@
-physics.imports.js_log = console.log;
-
 physics.imports.onCollide = (engine, a, b, direction, contacts, triggerA, triggerB) => {
 	a = PHYSICS.bodyToSceneObject.get(a);
 	const { scene } = a.engine;

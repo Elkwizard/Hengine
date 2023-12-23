@@ -2,7 +2,7 @@
 
 CollisionResolver::CollisionResolver(PhysicsEngine& _engine) : engine(_engine) { }
 
-double CollisionResolver::vAB(const Vector& rA, const Vector& rB, RigidBody& bodyA, RigidBody& bodyB, const Vector& normal) {
+double CollisionResolver::vAB(const Vector& rA, const Vector& rB, const RigidBody& bodyA, const RigidBody& bodyB, const Vector& normal) {
 	if (bodyB.dynamic) {
 		return normal.dot(
 			(rB.normal() * bodyB.angularVelocity + bodyB.velocity) -
@@ -156,7 +156,7 @@ bool CollisionResolver::resolveContacts(bool dynamic, Collision& collision) {
 				if (!anySolved) anySolved = solve1(rA2, rB2);
 			} else if (contacts == 2) return false;
 		} else {
-			if (!anySolved)	anySolved = solve1(contactsA[i], contactsB[i]);
+			if (!anySolved) anySolved = solve1(contactsA[i], contactsB[i]);
 			if (contacts == 1) return false;
 		}
 	}
@@ -172,7 +172,7 @@ void CollisionResolver::resolveAllContacts() {
 		
 		engine.orderGenerator.shuffle(staticCollisions);
 		for (std::unique_ptr<Collision>& collision : staticCollisions)
-			resolveContacts(true, *collision);
+			resolveContacts(false, *collision);
 	}
 
 	dynamicCollisions.clear();
@@ -196,7 +196,7 @@ void CollisionResolver::resolve(bool dynamic, bool prohibited, std::unique_ptr<C
 		penetration -= SLOP;
 		if (dynamic) {
 			double portionA = bodyB.mass / (bodyA.mass + bodyB.mass);
-			double portionB = (1 - portionA);
+			double portionB = (1.0 - portionA);
 			Vector moveA = direction * (-portionA * penetration);
 			Vector moveB = direction * (portionB * penetration);
 			

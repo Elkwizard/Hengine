@@ -2,7 +2,28 @@
 
 #include "emscripten.h"
 
-extern "C" void js_log(int);
+extern "C" void printInt(long);
+extern "C" void printFloat(double);
+extern "C" void printLn();
+extern "C" void fullExit();
+
+template <typename T>
+void printElement(T value) requires std::integral<T> {
+	printInt(value);
+}
+
+template <typename T>
+void printElement(T value) requires std::floating_point<T> {
+	printFloat(value);
+}
+
+template <typename F, typename... T>
+void print(F first, T... rest) {
+	printElement(first);
+	if constexpr (sizeof...(T) > 0)
+		print(rest...);
+	printLn();
+}
 
 #ifdef __INTELLISENSE__
 	#define EMSCRIPTEN_KEEPALIVE 
