@@ -39,11 +39,9 @@
  */
 class ElementScript {
 	constructor(sceneObject) {
-		let props;
-		if ("functionNames" in this.constructor) props = this.constructor.functionNames;
-		else {
+		if (!("functionNames" in this.constructor)) {
 			const prototype = Object.getPrototypeOf(this);
-			props = Object.getOwnPropertyNames(prototype)
+			const props = Object.getOwnPropertyNames(prototype)
 				.filter(prop => {
 					if (prop === "constructor") return false;
 					const descriptor = Object.getOwnPropertyDescriptor(prototype, prop);
@@ -57,18 +55,22 @@ class ElementScript {
 				if (ElementScript.flags.has(prop)) implementedMethods.add(prop);
 			}
 
+			const placeholder = () => undefined;
+			for (const flag of ElementScript.flags)
+				if (!(flag in this))
+					this.constructor.prototype[flag] = placeholder;
+				
+
 			this.constructor.implementedMethods = implementedMethods;
 			this.constructor.implements = method => implementedMethods.has(method);
 		}
+
+		const props = this.constructor.functionNames;
 
 		for (let i = 0; i < props.length; i++) {
 			const prop = props[i];
 			this[prop] = this[prop].bind(this, sceneObject);
 		}
-
-		const placeholder = () => undefined;
-		for (const flag of ElementScript.flags)
-			if (!(flag in this)) this[flag] = placeholder;
 
 		this.sceneObject = sceneObject;
 		this._scriptNumber = 0;
