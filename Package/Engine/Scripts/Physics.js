@@ -174,8 +174,10 @@ class PHYSICS extends ElementScript {
 		return shape;
 	}
 	cleanUp(obj) {
-		PHYSICS.bodyToSceneObject.delete(this.body.pointer);
-		this.physicsEngine.removeBody(this.body.id);
+		obj.sync(() => {
+			PHYSICS.bodyToSceneObject.delete(this.body.pointer);
+			this.physicsEngine.removeBody(this.body.id);
+		});
 	}
 	addScript(obj, script) {
 		if (script.implements("collideRule"))
