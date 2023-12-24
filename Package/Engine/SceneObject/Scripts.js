@@ -321,6 +321,8 @@ class ScriptContainer {
 				this.implementedMethods.clear();
 				for (const [script, instance] of this.scripts)
 					for (const method of script.implementedMethods) this.implementedMethods.add(method);
+			
+				delete this[script.name];
 			});
 		}
 	}
