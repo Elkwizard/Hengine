@@ -75,6 +75,7 @@ class ElementScript {
 		this.sceneObject = sceneObject;
 		this._scriptNumber = 0;
 		this.scriptSynced = false;
+		this.removed = false;
 	}
 	set scriptNumber(a) {
 		this._scriptNumber = a;
@@ -301,19 +302,27 @@ class ScriptContainer {
 		this.remove(this.defaultScript);
 	}
 	/**
-	 * Removes a specific script from the object. This calls the `.cleanUp()` listener.
+	 * Removes a specific script from the object.
+	 * This removal is synchronized, and will only take effect at the end of the frame.
+	 * When the script is removed, the `.cleanUp()` listener is called.
 	 * @param Class script | The class of the script instance to remove
 	 */
 	remove(script) {
 		if (!this.has(script)) return;
 		const instance = this.scripts.get(script);
-		instance.cleanUp();
-		this.scripts.delete(script);
-		this.sortedScriptInstances.splice(this.sortedScriptInstances.indexOf(instance), 1);
+		if (!instance.removed) {
+			instance.removed = true;
+			
+			this.sceneObject.sync(() => {
+				instance.cleanUp();
+				this.scripts.delete(script);
+				this.sortedScriptInstances.splice(this.sortedScriptInstances.indexOf(instance), 1);
 
-		this.implementedMethods.clear();
-		for (const [script, instance] of this.scripts)
-			for (const method of script.implementedMethods) this.implementedMethods.add(method);
+				this.implementedMethods.clear();
+				for (const [script, instance] of this.scripts)
+					for (const method of script.implementedMethods) this.implementedMethods.add(method);
+			});
+		}
 	}
 	/**
 	 * Checks whether the object has a specific script.
