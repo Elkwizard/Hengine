@@ -179,7 +179,7 @@ void CollisionResolver::resolveAllContacts() {
 	staticCollisions.clear();
 }
 
-void CollisionResolver::resolve(bool dynamic, bool prohibited, std::unique_ptr<Collision>& collision) {
+void CollisionResolver::resolve(bool dynamic, std::unique_ptr<Collision>& collision) {
 	RigidBody& bodyA = *collision->bodyA;
 	RigidBody& bodyB = *collision->bodyB;
 	Vector direction = collision->direction;
@@ -187,8 +187,6 @@ void CollisionResolver::resolve(bool dynamic, bool prohibited, std::unique_ptr<C
 	
 	// penetration *= 0.2;
 	constexpr double SLOP = 0.05;
-	
-	dynamic = dynamic && !prohibited;
 
 	(dynamic ? dynamicCollisions : staticCollisions).push_back(std::move(collision));
 

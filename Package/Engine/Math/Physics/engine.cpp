@@ -12,8 +12,8 @@ PhysicsEngine::PhysicsEngine(const Vector& _gravity) : orderGenerator(123456), c
 	contactIterations = 8;
 
 	onCollide = [&](RigidBody& a, RigidBody& b, const Vector& dir, const std::vector<Vector>& contacts, bool triggerA, bool triggerB) {
-		std::unique_ptr<NativeVectorArray> arr = std::make_unique<NativeVectorArray>(contacts);
-		::onCollide(this, &a, &b, (Vector*)&dir, arr.get(), triggerA, triggerB);
+		NativeVectorArray arr = contacts;
+		::onCollide(this, &a, &b, (Vector*)&dir, &arr, triggerA, triggerB);
 	};
 }
 
@@ -108,7 +108,7 @@ void PhysicsEngine::resolve(std::unique_ptr<Collision>& col) {
 		uint64_t bID = bodyB.id;
 		if (bID < aID) std::swap(aID, bID);
 
-		uint64_t key = aID << 16 | bID;
+		uint64_t key = aID << 32 | bID;
 		
 		if (!noticedCollisions.count(key)) {
 			noticedCollisions.insert(key);
@@ -118,23 +118,10 @@ void PhysicsEngine::resolve(std::unique_ptr<Collision>& col) {
 
 	if (isTriggerA || isTriggerB) return;
 
-	bool dynamic = bodyB.dynamic;
-	bool prohibited = false;
-
-	if (dynamic) for (int i = 0; i < bodyB.prohibitedDirections.size(); i++) {
-		double dot = bodyB.prohibitedDirections[i].dot(direction);
-		if (dot > 0.8) {
-			prohibited = true;
-			break;
-		}
-	}
-	if (!dynamic || prohibited)
-		bodyA.prohibitedDirections.push_back(direction);
-		
-	collisionResolver.resolve(dynamic, prohibited, col);
-
-	//immobilize
-	bodyA.canMoveThisStep = false;
+	bool dynamic = bodyB.dynamic && !bodyB.isProhibited(direction);
+	if (!dynamic) bodyA.prohibit(direction);
+	
+	collisionResolver.resolve(dynamic, col);
 }
 
 void PhysicsEngine::collisions(CollisionPairs& collisionPairs) {
@@ -144,7 +131,6 @@ void PhysicsEngine::collisions(CollisionPairs& collisionPairs) {
 		Bodies& collidable = entry.second;
 
 		//mobilize
-		body.canMoveThisStep = true;
 		body.prohibitedDirections.clear();
 		
 		Vector& vel = body.velocity;

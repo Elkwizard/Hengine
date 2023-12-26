@@ -63,7 +63,6 @@ class RigidBody {
 		Filter collisionFilter, triggerFilter;
 
 		std::vector<Vector> prohibitedDirections { };
-		bool canMoveThisStep;
 
 		std::vector<BaseCollider*> shapes { };
 		std::vector<Constraint*> constraints { };
@@ -73,6 +72,8 @@ class RigidBody {
 
 		bool canCollideWith(const RigidBody& body) const;
 		bool isTriggerWith(const RigidBody& body) const;
+		bool isProhibited(const Vector& direction) const;
+		void prohibit(const Vector& direction);
 		void setDensity(double a);
 		void setAngle(double a);
 		void updateLastData();
@@ -92,7 +93,7 @@ class RigidBody {
 		Vector pointForce(const Vector& p) const;
 		void applyImpulse(const Vector& pos, const Vector& imp, double factor = 1.0);
 		void applyRelativeImpulse(const Vector& pos, const Vector& imp, double factor = 1.0);
-		
+
 		static RigidBody* fromPolygon(std::vector<Vector> vertices, bool dynamic = true);
 		static RigidBody* fromRect(double x, double y, double w, double h, bool dynamic = true);
 		static RigidBody* fromCircle(double x, double y, double r, bool dynamic = true);

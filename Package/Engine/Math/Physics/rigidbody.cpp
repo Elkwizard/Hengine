@@ -28,7 +28,6 @@ RigidBody::RigidBody(double x, double y, bool _dynamic) {
 
 	restitution = 0.0;
 	friction = 0.5;
-	canMoveThisStep = true;
 
 	trivialCollisionFilter = true;
 	collisionFilter = [&](const RigidBody& body) {
@@ -60,6 +59,18 @@ bool RigidBody::canCollideWith(const RigidBody& body) const {
 
 bool RigidBody::isTriggerWith(const RigidBody& body) const {
 	return !trivialTriggerFilter && triggerFilter(body);
+}
+
+bool RigidBody::isProhibited(const Vector& direction) const {
+	for (const Vector& dir : prohibitedDirections)
+		if (dir.dot(direction) > 0.8)
+			return true;
+
+	return false;
+}
+
+void RigidBody::prohibit(const Vector& direction) {
+	prohibitedDirections.push_back(direction);
 }
 
 void RigidBody::setDensity(double a) {

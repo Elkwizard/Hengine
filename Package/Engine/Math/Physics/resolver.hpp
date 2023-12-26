@@ -19,5 +19,5 @@ class CollisionResolver {
 		CollisionResolver(PhysicsEngine& _engine);
 
 		void resolveAllContacts();
-		void resolve(bool dynamic, bool prohibited, std::unique_ptr<Collision>& collision);
+		void resolve(bool dynamic, std::unique_ptr<Collision>& collision);
 };
