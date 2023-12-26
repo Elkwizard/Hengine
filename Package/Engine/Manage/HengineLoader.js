@@ -702,8 +702,11 @@ class HengineLoader {
 	}
 	addResourceSync(wrapper, resource) {
 		const { src } = wrapper;
-		if (resource) console.log(`LOADED RESOURCE [${src}]`);
-		else console.warn(`LOADING FAILED FOR RESOURCE [${src}]`);
+		const name = wrapper.constructor.name.match(
+			/Hengine(\w*?)Resource/
+		)?.[1]?.toUpperCase() ?? "RESOURCE";
+		if (resource) console.log(`LOADED ${name} [${src}]`);
+		else console.warn(`LOADING FAILED FOR ${name} [${src}]`);
 		this.resources.set(src, resource);
 	}
 	async addResource(wrapper) {
