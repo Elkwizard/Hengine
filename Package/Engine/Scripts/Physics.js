@@ -3,13 +3,15 @@ physics.imports.onCollide = (engine, a, b, direction, contacts, triggerA, trigge
 	const { scene } = a.engine;
 	if (!scene.collisionEvents) return;
 	
-	engine = new physics.exports.PhysicsEngine(engine);
 	b = PHYSICS.bodyToSceneObject.get(b);
 	direction = Vector2.fromPhysicsVector(new physics.exports.Vector(direction));
+	
 	contacts = new physics.exports.NativeVectorArray(contacts);
-	contacts = new Array(contacts.length).map((_, i) => Vector2.fromPhysicsVector(contacts.get(i)));
+	const jsContacts = new Array(contacts.length);
+	for (let i = 0; i < jsContacts.length; i++)
+		jsContacts[i] = Vector2.fromPhysicsVector(contacts.get(i));
 
-	scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
+	scene.handleCollisionEvent(a, b, direction, jsContacts, triggerA, triggerB);
 };
 
 physics.imports.collideRule = (a, b) => {
