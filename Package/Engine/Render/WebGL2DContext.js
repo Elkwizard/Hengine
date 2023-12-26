@@ -785,7 +785,11 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		);
 	}
 
+	const ELLIPSE_ANTIALIAS_BUFFER = Math.SQRT1_2;
+
 	function coloredEllipse(x, y, rx, ry, r, g, b, a) {
+		rx += ELLIPSE_ANTIALIAS_BUFFER;
+		ry += ELLIPSE_ANTIALIAS_BUFFER;
 		coloredInstance(
 			rx * 2, 0, x - rx,
 			0, ry * 2, y - ry,
@@ -830,6 +834,8 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		);
 	}
 	function outlinedEllipse(x, y, rx, ry, lineWidth, r, g, b, a) {
+		rx += ELLIPSE_ANTIALIAS_BUFFER;
+		ry += ELLIPSE_ANTIALIAS_BUFFER;
 		const lw2 = lineWidth * 0.5;
 		outlinedInstance(
 			rx * 2 + lineWidth, 0, x - rx - lw2,
@@ -956,6 +962,8 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		);
 	}
 	function texturedEllipse(x, y, rx, ry, tx, ty, tw, th, image) {
+		rx += ELLIPSE_ANTIALIAS_BUFFER;
+		ry += ELLIPSE_ANTIALIAS_BUFFER;
 		texturedInstance(
 			rx * 2, 0, x - rx,
 			0, ry * 2, y - ry,
