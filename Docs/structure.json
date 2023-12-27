@@ -77,7 +77,7 @@
 				"Texture": null,
 				"WebcamCapture": null,
 				"StaticImage": null,
-				"GPUShader": ["GPUShader", "GLSLError"],
+				"GPUShader": null,
 				"GraphPlane": ["GraphPlane", "Graph"]
 			}
 		},

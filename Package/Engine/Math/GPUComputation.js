@@ -195,7 +195,8 @@ class GPUComputation {
 			`;
 
 			this.program = new GLSLProgram(gl, this.vertexShaderSource, this.fragmentShaderSource, (type, message) => {
-				if (type === "FRAGMENT_SHADER") GLSLError.process(message, prefixLength);
+				if (type === "FRAGMENT_SHADER")
+					GLSLError.process(this.glsl, message, prefixLength);
 				else console.warn(message);
 			});
 

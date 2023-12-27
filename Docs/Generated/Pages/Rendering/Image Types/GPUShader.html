@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class GPUShader">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L510" target="_blank" class="class-name source-link">GPUShader</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L503" target="_blank" class="class-name source-link">GPUShader</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 				</div>
 				<div class="class desc">
 					Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region. The entry point for the shader is a function of the form:
@@ -59,7 +59,7 @@ const</span><span class="highlight-CONSTANT"> cat</span><span class="highlight-S
 					<div class="class-methods">
 		<div class="function-wrapper" id="GPUShader.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L518" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">glsl</span>, <span class="param">pixelRatio?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L511" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">glsl</span>, <span class="param">pixelRatio?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new GPUShader.
@@ -116,7 +116,7 @@ const</span><span class="highlight-CONSTANT"> cat</span><span class="highlight-S
 	
 		<div class="function-wrapper" id="GPUShader.prototype.argumentExists()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L693" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L687" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether or not the shader contains a given uniform.
@@ -143,7 +143,7 @@ const</span><span class="highlight-CONSTANT"> cat</span><span class="highlight-S
 	
 		<div class="function-wrapper" id="GPUShader.prototype.getArgument()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L702" target="_blank" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L696" target="_blank" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
 				Returns the current value of a given uniform.
@@ -171,7 +171,7 @@ For the return value of this function, see the <a href="../../../Pages/Rendering
 	
 		<div class="function-wrapper" id="GPUShader.prototype.setArgument()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L710" target="_blank" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L704" target="_blank" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of a given uniform.
@@ -208,7 +208,7 @@ For the return value of this function, see the <a href="../../../Pages/Rendering
 	
 		<div class="function-wrapper" id="GPUShader.prototype.setArguments()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L717" target="_blank" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L711" target="_blank" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of one or more uniforms. 
@@ -230,51 +230,6 @@ For the return value of this function, see the <a href="../../../Pages/Rendering
 					
 		
 				</div>
-			
-		</div>
-	</div>
-				
-			</div>
-		
-			<div class="class-wrapper" id="class GLSLError">
-				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L28" target="_blank" class="class-name source-link">GLSLError</a> <span class="keyword">extends</span> <span class="class-name">Error</span>
-				</div>
-				<div class="class desc">
-					Represents an error in a GLSL program.
-These are constructed by GPUShader and <a href="../../../Pages/Miscellaneous/GPUComputation.html#class GPUComputation">GPUComputation</a> but should not be directly constructed.
-				</div>
-				
-				
-				
-					<div class="header">Properties</div>
-					<div class="class-properties">
-				<div class="prop-wrapper" id="GLSLError.line">
-					<div class="prop-header member">
-						<span class="prop-name">line</span><span class="type">Number</span>
-					</div>
-					<div class="prop desc">The line on which the error occured</div>
-				</div>
-			
-				<div class="prop-wrapper" id="GLSLError.desc">
-					<div class="prop-header member">
-						<span class="prop-name">desc</span><span class="type">String</span>
-					</div>
-					<div class="prop desc">The description of the error</div>
-				</div>
-			</div>
-				
-				
-				
-					<div class="header">Methods</div>
-					<div class="class-methods">
-		<div class="function-wrapper" id="GLSLError.prototype.toString()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L40" target="_blank" class="function-name source-link">toString</a>()<span class="type">String</span>
-			</div>
-			<div class="function desc">
-				Converts the error to a string representation.
-			</div>
 			
 		</div>
 	</div>

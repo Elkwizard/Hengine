@@ -19,32 +19,25 @@ class GLSLPrecompiler {
 	}
 }
 
-/**
- * Represents an error in a GLSL program.
- * These are constructed by GPUShader and GPUComputation but should not be directly constructed.
- * @prop Number line | The line on which the error occured
- * @prop String desc | The description of the error
- */
 class GLSLError extends Error {
-	constructor(line, desc) {
-		super(`${desc}\n\tat shaderSource.glsl:${line}`);
+	constructor(source, line, desc) {
+		super(`${desc}\n\t» ${source.trim()}\n\n\tat shaderSource.glsl:${line}`);
 		this.name = "GLSLError";
 		this.line = line;
 		this.desc = desc;
+		this.source = source;
 
 	}
-	/**
-	 * Converts the error to a string representation.
-	 * @return String
-	 */
 	toString() {
 		return `line ${this.line}: ${this.desc}`;
 	}
-	static process(string, prefixLength) {
+	static process(source, string, prefixLength) {
+		const sourceLines = source.split("\n");
+		
 		let errors = string.split("ERROR: ");
 		errors.shift();
 		for (let i = 0; i < errors.length; i++) {
-			 // parse
+			// parse
 			const rawString = errors[i];
 			const string = rawString.cut(":")[1];
 			let [lineStr, descStr] = string.cut(":");
@@ -55,7 +48,7 @@ class GLSLError extends Error {
 				line = 0;
 				desc = rawString;
 			}
-			throw new GLSLError(line, desc.trim());
+			throw new GLSLError(sourceLines[line], line, desc.trim());
 		}
 	}
 }
@@ -667,7 +660,8 @@ class GPUShader extends ImageType {
 
 		//shader programs
 		this.program = new GLSLProgram(gl, vertexSource, pixelSource, (type, message) => {
-			if (type === "FRAGMENT_SHADER") GLSLError.process(message, prefixLength);
+			if (type === "FRAGMENT_SHADER")
+				GLSLError.process(this.glsl, message, prefixLength);
 			else console.warn(message);
 		});
 		this.program.use();
