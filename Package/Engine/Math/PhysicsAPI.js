@@ -59,13 +59,13 @@ class Constraint1 extends Constraint {
 		this.physicsConstraint.offset.set(a.x, a.y);
 	}
 	get offset() {
-		return Vector2.fromPhysicsVector(this.physicsConstraint.offset);
+		return Vector2.fromPhysicsVectorReference(this.physicsConstraint.offset);
 	}
 	set point(a) {
 		this.physicsConstraint.point.set(a.x, a.y);
 	}
 	get point() {
-		return Vector2.fromPhysicsVector(this.physicsConstraint.point);
+		return Vector2.fromPhysicsVectorReference(this.physicsConstraint.point);
 	}
 	/**
 	 * Returns the object in the constraint.
@@ -100,13 +100,13 @@ class Constraint2 extends Constraint {
 		this.physicsConstraint.offsetA.set(a.x, a.y);
 	}
 	get offsetA() {
-		return Vector2.fromPhysicsVector(this.physicsConstraint.offsetA);
+		return Vector2.fromPhysicsVectorReference(this.physicsConstraint.offsetA);
 	}
 	set offsetB(a) {
 		this.physicsConstraint.offsetB.set(a.x, a.y);
 	}
 	get offsetB() {
-		return Vector2.fromPhysicsVector(this.physicsConstraint.offsetB);
+		return Vector2.fromPhysicsVectorReference(this.physicsConstraint.offsetB);
 	}
 	/**
 	 * Returns the first object in the constraint.

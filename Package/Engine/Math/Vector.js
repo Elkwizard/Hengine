@@ -340,6 +340,22 @@ class Vector2 extends Vector {
 	static fromPhysicsVector(v) {
 		return new Vector2(v.x, v.y);
 	}
+	static fromPhysicsVectorReference(v) {
+		const vec = new Vector2();
+
+		Object.defineProperties(vec, {
+			x: {
+				get: () => v.x,
+				set: a => v.x = a
+			},
+			y: {
+				get: () => v.y,
+				set: a => v.y = a
+			}
+		});
+
+		return vec;
+	}
 	/**
 	 * @group static get left, static get right, static get up, static get down
 	 * Returns a new unit vector pointing in a specified direction (in screen-space).
