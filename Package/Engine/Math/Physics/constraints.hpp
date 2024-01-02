@@ -98,10 +98,10 @@ class Constraint2 : public Constraint {
 };
 
 
-EXPORT RigidBody* Constraint1$RigidBody$get_bodyA(Constraint2* con) {
+EXPORT RigidBody* Constraint2$RigidBody$get_bodyA(Constraint2* con) {
 	return &con->bodyA;
 }
-EXPORT RigidBody* Constraint1$RigidBody$get_bodyB(Constraint2* con) {
+EXPORT RigidBody* Constraint2$RigidBody$get_bodyB(Constraint2* con) {
 	return &con->bodyB;
 }
 OBJECT_ACCESS(Constraint2, offsetA, Vector)

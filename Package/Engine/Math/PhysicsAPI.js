@@ -41,11 +41,32 @@ class Constraint {
 
 /**
  * Represents a physical constraint between a SceneObject and a fixed point.
+ * @prop Vector2 offset | The local-space offset of the constrained point on the object
+ * @prop Vector2 point | The fixed point in the constraint
+ * @prop Number length | The desired distance between the two constrained points. This is only defined for length constraints
  */
 class Constraint1 extends Constraint {
     constructor(physicsConstraint, engine) {
 		super(physicsConstraint.as(physics.exports.Constraint1), engine);
     }
+	set length(a) {
+		this.physicsConstraint.as(physics.exports.LengthConstraint1).length = a;
+	}
+	get length() {
+		return this.physicsConstraint.as(physics.exports.LengthConstraint1).length;
+	}
+	set offset(a) {
+		this.physicsConstraint.offset.set(a.x, a.y);
+	}
+	get offset() {
+		return Vector2.fromPhysicsVector(this.physicsConstraint.offset);
+	}
+	set point(a) {
+		this.physicsConstraint.point.set(a.x, a.y);
+	}
+	get point() {
+		return Vector2.fromPhysicsVector(this.physicsConstraint.point);
+	}
 	/**
 	 * Returns the object in the constraint.
 	 * @return SceneObject
@@ -57,8 +78,11 @@ class Constraint1 extends Constraint {
 
 /**
  * Represents a physical constraint between two SceneObjects.
+ * @prop Vector2 offsetA | The local-space offset of the constrained point on the first object
+ * @prop Vector2 offsetB | The local-space offset of the constrained point on the second object
  * @prop Boolean staticA | Whether or not the first object should be considered static by the constraint
  * @prop Boolean staticB | Whether or not the second object should be considered static by the constraint
+ * @prop Number length | The desired distance between the two constrained points. This is only defined for length constraints
  */
 class Constraint2 extends Constraint {
     constructor(physicsConstraint, engine) {
@@ -66,6 +90,24 @@ class Constraint2 extends Constraint {
 		Object.shortcut(this, this.physicsConstraint, "staticA");
 		Object.shortcut(this, this.physicsConstraint, "staticB");
     }
+	set length(a) {
+		this.physicsConstraint.as(physics.exports.LengthConstraint2).length = a;
+	}
+	get length() {
+		return this.physicsConstraint.as(physics.exports.LengthConstraint2).length;
+	}
+	set offsetA(a) {
+		this.physicsConstraint.offsetA.set(a.x, a.y);
+	}
+	get offsetA() {
+		return Vector2.fromPhysicsVector(this.physicsConstraint.offsetA);
+	}
+	set offsetB(a) {
+		this.physicsConstraint.offsetB.set(a.x, a.y);
+	}
+	get offsetB() {
+		return Vector2.fromPhysicsVector(this.physicsConstraint.offsetB);
+	}
 	/**
 	 * Returns the first object in the constraint.
 	 * @return SceneObject

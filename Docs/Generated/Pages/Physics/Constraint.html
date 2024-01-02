@@ -50,13 +50,37 @@ This is an abstract superclass and should not be constructed.
 		
 			<div class="class-wrapper" id="class Constraint1">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L45" target="_blank" class="class-name source-link">Constraint1</a> <span class="keyword">extends</span> <span class="class-name">Constraint</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L48" target="_blank" class="class-name source-link">Constraint1</a> <span class="keyword">extends</span> <span class="class-name">Constraint</span>
 				</div>
 				<div class="class desc">
-					Represents a physical constraint between a <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a> and a fixed point.
+					Represents a physical constraint between a <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a> and a fixed point.
 				</div>
 				
 				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Constraint1.offset">
+					<div class="prop-header member">
+						<span class="prop-name">offset</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The local-space offset of the constrained point on the object</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Constraint1.point">
+					<div class="prop-header member">
+						<span class="prop-name">point</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The fixed point in the constraint</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Constraint1.length">
+					<div class="prop-header member">
+						<span class="prop-name">length</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The desired distance between the two constrained points. This is only defined for length constraints</div>
+				</div>
+			</div>
 				
 				
 				
@@ -64,7 +88,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="get Constraint1.prototype.body()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L53" target="_blank" class="function-name source-link">body</a><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L74" target="_blank" class="function-name source-link">body</a><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
 			</div>
 			<div class="function desc">
 				Returns the object in the constraint.
@@ -77,7 +101,7 @@ This is an abstract superclass and should not be constructed.
 		
 			<div class="class-wrapper" id="class Constraint2">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L63" target="_blank" class="class-name source-link">Constraint2</a> <span class="keyword">extends</span> <span class="class-name">Constraint</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L87" target="_blank" class="class-name source-link">Constraint2</a> <span class="keyword">extends</span> <span class="class-name">Constraint</span>
 				</div>
 				<div class="class desc">
 					Represents a physical constraint between two <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a>.
@@ -87,6 +111,20 @@ This is an abstract superclass and should not be constructed.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
+				<div class="prop-wrapper" id="Constraint2.offsetA">
+					<div class="prop-header member">
+						<span class="prop-name">offsetA</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The local-space offset of the constrained point on the first object</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Constraint2.offsetB">
+					<div class="prop-header member">
+						<span class="prop-name">offsetB</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The local-space offset of the constrained point on the second object</div>
+				</div>
+			
 				<div class="prop-wrapper" id="Constraint2.staticA">
 					<div class="prop-header member">
 						<span class="prop-name">staticA</span><span class="type">Boolean</span>
@@ -100,6 +138,13 @@ This is an abstract superclass and should not be constructed.
 					</div>
 					<div class="prop desc">Whether or not the second object should be considered static by the constraint</div>
 				</div>
+			
+				<div class="prop-wrapper" id="Constraint2.length">
+					<div class="prop-header member">
+						<span class="prop-name">length</span><span class="type">Number</span>
+					</div>
+					<div class="prop desc">The desired distance between the two constrained points. This is only defined for length constraints</div>
+				</div>
 			</div>
 				
 				
@@ -108,7 +153,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="get Constraint2.prototype.bodyA()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L73" target="_blank" class="function-name source-link">bodyA</a><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L115" target="_blank" class="function-name source-link">bodyA</a><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
 			</div>
 			<div class="function desc">
 				Returns the first object in the constraint.
@@ -118,7 +163,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get Constraint2.prototype.bodyB()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L80" target="_blank" class="function-name source-link">bodyB</a><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L122" target="_blank" class="function-name source-link">bodyB</a><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
 			</div>
 			<div class="function desc">
 				Returns the second object in the constraint.
