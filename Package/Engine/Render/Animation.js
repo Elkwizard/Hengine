@@ -153,7 +153,7 @@ class AnimationStateMachine extends ImageType {
 	}
 	/**
 	 * Makes a state exit when its animation completes. This will only work if the animation doesn't loop.
-	 * @prop Any state | The state that will exit
+	 * @param Any state | The state that will exit
 	 */
 	exitOnDone(state) {
 		this.stackable.add(state);
