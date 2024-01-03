@@ -148,7 +148,15 @@ class AnimationStateMachine extends ImageType {
 		this.stateAnimations = stateAnimations;
 		this.transitions = new Map();
 		this.transition = null;
-		this.state = initialState;
+		this.stackable = new Set();
+		this.stack = [initialState];
+	}
+	/**
+	 * Makes a state exit when its animation completes. This will only work if the animation doesn't loop.
+	 * @prop Any state | The state that will exit
+	 */
+	exitOnDone(state) {
+		this.stackable.add(state);
 	}
 	/**
 	 * Adds an animation to be played when transitioning between two specified states.
@@ -166,26 +174,29 @@ class AnimationStateMachine extends ImageType {
 	 * @return Any
 	 */
 	get state() {
-		return this._state;
+		return this.stack.last;
 	}
 	/**
 	 * Sets the state of the state machine.
 	 * @param Any state | The new state of the state machine
 	 */
 	set state(state) {
-		if (state !== this._state) {
+		const { state: current } = this;
+		if (state !== current) {
 			if (
-				this.transitions.has(this.state) &&
-				this.transitions.get(this.state).has(state)
+				this.transitions.has(current) &&
+				this.transitions.get(current).has(state)
 			) {
-				this.transition = this.transitions.get(this.state).get(state);
+				this.transition = this.transitions.get(current).get(state);
 				this.transition.reset();
 			}
 
-			const animation = this.stateAnimations.get(state);
-			animation.reset();
+			this.stateAnimations.get(state).reset();
+
+			if (this.stackable.has(state))
+				this.stack.push(state);
+			else this.stack = [state];
 			
-			this._state = state;
 		}
 	}
 	makeImage() {
@@ -197,6 +208,8 @@ class AnimationStateMachine extends ImageType {
 		}
 
 		const animation = this.stateAnimations.get(this.state);
+		if (animation.done && this.stackable.has(this.state))
+			this.stack.pop();
 		return animation.makeImage();
 	}
 }
