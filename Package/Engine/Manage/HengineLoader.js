@@ -332,7 +332,30 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 		).load();
 		if (!script) return null;
 	
-		const { imports, buffer } = HengineWASMResource.files[script.src];
+		let { imports, buffer } = HengineWASMResource.files[script.src];
+
+		{ // decode buffer
+			buffer = new Uint8Array(
+				buffer
+					.toString()
+					.split(/\r?\n/g)
+					.slice(1, -1)
+					.flatMap((line, i) => {
+						line = line.slice(2);
+
+						const bytes = line
+							.slice(line.indexOf("//") + 2)
+							.split("")
+							.map(char => char.charCodeAt(0));
+
+						if (i) bytes.unshift(
+							+line.slice(0, line.indexOf("/"))
+						);
+
+						return bytes;
+					})
+			);
+		};
 
 		let printBuffer = [];
 		const importImplementations = {
