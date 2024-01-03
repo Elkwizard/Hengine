@@ -170,7 +170,6 @@ class AnimationStateMachine extends ImageType {
 	}
 	/**
 	 * Sets the state of the state machine.
-	 * If the specified state's animation doesn't loop, then the state will revert back after the animation completes.
 	 * @param Any state | The new state of the state machine
 	 */
 	set state(state) {
