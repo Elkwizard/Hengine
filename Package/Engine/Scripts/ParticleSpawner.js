@@ -70,6 +70,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		};
 
 		this.anyParticlesRendered = false;
+		this.accumulatedTime = 0;
 	}
 	/**
 	 * Sets the number of particles in the system.
@@ -135,16 +136,17 @@ class PARTICLE_SPAWNER extends ElementScript {
 	}
 	update(obj) {
 		if (this.active) {
-			if ((this.delay > 1 && obj.lifeSpan % Math.ceil(this.delay) === 0) || this.delay <= 1) {
-				const pos = obj.transform.position;
-				const last = obj.lastTransform.position;
-				const count = Math.max(1, 1 / this.delay);
+			const count = Math.floor(this.accumulatedTime / this.delay) || 0;
+			if (isFinite(this.delay)) this.accumulatedTime -= count * this.delay;
+			this.accumulatedTime++;
 
-				for (let i = 0; i < count; i++) {
-					const t = (i + 1) / count;
-					this.addParticle(Interpolation.lerp(last, pos, t));
-					if (!this.active) break;
-				}
+			const pos = obj.transform.position;
+			const last = obj.lastTransform.position;
+
+			for (let i = 0; i < count; i++) {
+				const t = (i + 1) / count;
+				this.addParticle(Interpolation.lerp(last, pos, t));
+				if (!this.active) break;
 			}
 		}
 		obj.transform.get(obj.lastTransform);
