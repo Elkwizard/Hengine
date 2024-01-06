@@ -209,19 +209,6 @@
 			content: attr(data-stats);
 		}
 		
-		#searchResults::-webkit-scrollbar {
-			width: 1rem;
-			background: white;
-			border: none;
-			border-top-right-radius: 0.5rem;
-			border-bottom-right-radius: 0.5rem;
-		}
-
-		#searchResults::-webkit-scrollbar-thumb {
-			background: rgb(100, 100, 100);
-			border-radius: 0.5rem;
-		}
-		
 		.search-result {
 			display: block;
 			border-bottom: 1px black solid;
@@ -259,6 +246,10 @@
 		.mobile {
 			font-size: 12px;
 			--header-height: 4rem;
+		}
+
+		.mobile ::-webkit-scrollbar {
+			display: none;
 		}
 
 		#openNav {
@@ -337,15 +328,20 @@
 		}
 
 		.mobile #searchBar {
-			width: 1.54em;
+			width: 100%;
 			height: 1.54em;
-			transition: width 0.2s;
+			opacity: 0;
+		}
+
+		.mobile #searchBar:focus {
+			opacity: 1;
 		}
 
 		.mobile #searchWrapper {
 			position: absolute;
 			right: 1rem;
 			top: 0.7rem;
+			left: calc(100vw - 3.5rem);
 			transition: left 0.2s;
 		}
 
@@ -353,8 +349,8 @@
 			left: 1rem;
 		}
 
-		.mobile #searchBar:focus {
-			width: 5em;
+		.mobile #searchResults {
+			left: 0;
 		}
 
 		.mobile #title {
