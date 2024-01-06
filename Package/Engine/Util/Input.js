@@ -590,9 +590,10 @@ class ClipboardHandler {
 			const image = value.makeImage();
 			let canvas = image;
 			if (!(image instanceof HTMLCanvasElement || image instanceof OffscreenCanvas)) {
-				canvas = new_OffscreenCanvas(value.width, value.height)
-					.getContext("2d")
-					.drawImage(image, 0, 0, value.width, value.height);
+				canvas = new_OffscreenCanvas(value.width, value.height);
+				canvas.getContext("2d").drawImage(
+					image, 0, 0, value.width, value.height
+				);
 			}
 			
 			canvas.toBlob(blob => {
