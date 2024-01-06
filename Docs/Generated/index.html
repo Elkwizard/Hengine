@@ -10,6 +10,7 @@
 		:root {
 			--nav-width: 28rem;
 			--header-height: 7rem;
+			--full-height: 100vh;
 		}
 		
 		@media (prefers-color-scheme: light) {
@@ -32,14 +33,16 @@
 		}
 
 		#wrapper {
+			margin-top: 0px;
 			display: flex;
 			flex-direction: row;
 			width: 100vw;
-			height: calc(100vh - var(--header-height));
+			height: calc(var(--full-height) - var(--header-height));
 		}
 
 		body {
 			background-color: var(--background);
+			overflow: hidden;
 		}
 		
 		#panel {
@@ -382,11 +385,13 @@
 	<script src="index.js"></script>
 	<script>
 		// mobile
-		const html = document.querySelector("html");
+		const html = document.documentElement;
 		const mobile = innerWidth < 900 || innerHeight < 900; 
 		if (mobile) {
 			html.classList.add("mobile");
 			html.classList.add("nav-hidden");
+
+			html.style.setProperty("--full-height", innerHeight + "px");
 
 			// navigation hiding
 			const openNav = document.createElement("button");
