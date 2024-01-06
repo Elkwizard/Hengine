@@ -436,7 +436,7 @@
 		const searchResults = document.getElementById("searchResults");
 		const searchWrapper = document.getElementById("searchWrapper");
 		const searchStats = document.getElementById("searchStats");
-		searchBar.focus();
+		if (!mobile) searchBar.focus();
 		searchWrapper.addEventListener("focusout", () => {
 			searchResults.style.display = "none";
 		});
