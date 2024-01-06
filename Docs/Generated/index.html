@@ -332,17 +332,29 @@
 			transition: opacity 0.2s;
 		}
 
-		#searchBar:focus + #searchIcon {
+		.mobile #searchBar:focus + #searchIcon {
 			opacity: 0;
 		}
 
 		.mobile #searchBar {
-			aspect-ratio: 1/1;
-			transition: aspect-ratio 0.2s;
+			width: 1.54em;
+			height: 1.54em;
+			transition: width 0.2s;
+		}
+
+		.mobile #searchWrapper {
+			position: absolute;
+			right: 1rem;
+			top: 0.7rem;
+			transition: left 0.2s;
+		}
+
+		.mobile #searchWrapper:focus-within {
+			left: 1rem;
 		}
 
 		.mobile #searchBar:focus {
-			aspect-ratio: 5/1;
+			width: 5em;
 		}
 
 		.mobile #title {
