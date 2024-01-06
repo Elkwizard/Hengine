@@ -4,6 +4,20 @@ body {
 	overflow-x: hidden;
 }
 
+@media only screen and (max-width: 800px) {
+	html {
+		font-size: 10px;
+	}
+
+	code.block {
+		overflow-x: auto;
+	}
+
+	::-webkit-scrollbar {
+		display: none;
+	}
+}
+
 span {
 	display: inline-block;
 }

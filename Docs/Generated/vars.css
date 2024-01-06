@@ -25,7 +25,6 @@
 	}
 }
 
-
 html {
 	font-size: 13px;
 }
@@ -41,10 +40,15 @@ html {
 ::-webkit-scrollbar {
 	background: var(--background);
 	border: 1px var(--accent-3) solid;
-	border-top: none;
-	border-bottom: none;
 }
 
 ::-webkit-scrollbar-thumb {
 	background: var(--accent-3);
+}
+
+::-webkit-scrollbar-corner {
+	background: var(--background);
+	border: 1px var(--accent-3) solid;
+	border-right: none;
+	border-bottom: none;
 }
