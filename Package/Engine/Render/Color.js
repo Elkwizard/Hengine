@@ -236,15 +236,15 @@ class Color extends Operable {
 		);
 
 		const rInx = rgba.indexOf(",", 1);
-		destination.red = Color.parseNum(rgba.slice(0, rInx));
+		destination.red = Color.parseNum(rgba.slice(0, rInx), 255);
 
 		const gInx = rgba.indexOf(",", rInx + 2);
-		destination.green = Color.parseNum(rgba.slice(rInx + 1, gInx));
+		destination.green = Color.parseNum(rgba.slice(rInx + 1, gInx), 255);
 		
 		const bInx = rgba.indexOf(",", gInx + 2);
-		destination.blue = Color.parseNum(rgba.slice(gInx + 1, (bInx >= 0) ? bInx : rgba.length));
+		destination.blue = Color.parseNum(rgba.slice(gInx + 1, (bInx >= 0) ? bInx : rgba.length), 255);
 
-		destination.alpha = (bInx >= 0) ? Color.parseNum(rgba.slice(bInx + 1)) : 1;
+		destination.alpha = (bInx >= 0) ? Color.parseNum(rgba.slice(bInx + 1), 1) : 1;
 	}
 }
 Color.modValues = ["red", "green", "blue", "alpha"];
