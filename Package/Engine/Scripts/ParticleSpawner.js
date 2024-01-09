@@ -135,9 +135,11 @@ class PARTICLE_SPAWNER extends ElementScript {
 			this.addParticle(pos.get());
 	}
 	update(obj) {
-		if (this.active) {
+		if (this.active && isFinite(this.delay)) {
+			if (this.accumulatedTime > this.delay)
+				this.accumulatedTime = this.delay;
 			const count = Math.floor(this.accumulatedTime / this.delay) || 0;
-			if (isFinite(this.delay)) this.accumulatedTime -= count * this.delay;
+			this.accumulatedTime -= count * this.delay;
 			this.accumulatedTime++;
 
 			const pos = obj.transform.position;
