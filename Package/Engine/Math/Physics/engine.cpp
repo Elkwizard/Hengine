@@ -155,7 +155,7 @@ PhysicsEngine::CollisionPairs PhysicsEngine::createGrid(Bodies& dynBodies) {
 		double meanRadius = 0;
 		double total = 0;
 		for (RigidBody* body : bodies) {
-			meanRadius += body->boundingRadius;;
+			meanRadius += body->boundingRadius;
 			if (body->boundingRadius) total++;
 		}
 		meanRadius /= total;

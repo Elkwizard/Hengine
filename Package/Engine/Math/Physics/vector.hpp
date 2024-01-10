@@ -1,7 +1,8 @@
 #pragma once
 
-#include "exports.hpp"
 #include <cmath>
+
+#include "exports.hpp"
 
 // Vector
 class Vector {

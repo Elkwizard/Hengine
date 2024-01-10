@@ -1,6 +1,11 @@
 #pragma once
 
-#include "emscripten.h"
+
+#ifdef __INTELLISENSE__
+	#define EMSCRIPTEN_KEEPALIVE 
+#else
+	#include "emscripten.h"
+#endif
 
 extern "C" void printInt(long);
 extern "C" void printFloat(double);
@@ -24,10 +29,6 @@ void print(F first, T... rest) {
 		print(rest...);
 	printLn();
 }
-
-#ifdef __INTELLISENSE__
-	#define EMSCRIPTEN_KEEPALIVE 
-#endif
 
 #define EXPORT extern "C" EMSCRIPTEN_KEEPALIVE
 

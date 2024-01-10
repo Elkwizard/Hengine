@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "vector.hpp"
 #include "rigidbody.hpp"
 

@@ -365,7 +365,8 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 				console.log(...printBuffer);
 				printBuffer = [];
 			},
-			fullExit: () => exit("Exited via WASM exit()")
+			fullExit: () => exit("Exited via WASM exit()"),
+			emscripten_notify_memory_growth: () => null
 		};
 
 		for (const name in importImplementations)
