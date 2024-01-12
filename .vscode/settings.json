@@ -2,6 +2,8 @@
 	"files.associations": {
 		"*.txt": "pipelang",
 		"unordered_map": "cpp",
-		"xhash": "cpp"
+		"xhash": "cpp",
+		"vector": "cpp",
+		"xstring": "cpp"
 	}
 }

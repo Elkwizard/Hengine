@@ -128,7 +128,7 @@ using NativeVectorArray = NativeArray<Vector>;
 
 CONSTRUCT(NativeVectorArray)(int size) { return new NativeVectorArray(size); }
 FREE(NativeVectorArray)
-EXPORT int NativeVectorArray$int$get_length(NativeVectorArray* arr) { return arr->getLength(); }
+GETTER(NativeVectorArray, length, int) { return object->getLength(); }
 OBJECT_FN(NativeVectorArray, get, Vector)(NativeVectorArray* arr, int index) {
 	return &arr->get(index);
 }

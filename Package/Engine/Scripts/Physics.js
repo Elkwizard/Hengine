@@ -238,7 +238,11 @@ class PHYSICS extends ElementScript {
 	 * @param Vector2 impulse | The impulse to apply
 	 */
 	applyImpulse(obj, point, force) {
-        this.body.applyImpulse(point.toPhysicsVector(), force.toPhysicsVector());
+		const pointPhysics = point.toPhysicsVector();
+		const forcePhysics = force.toPhysicsVector();
+        this.body.applyImpulse(pointPhysics, forcePhysics);
+		pointPhysics.free();
+		forcePhysics.free();
 	}
 	/**
 	 * Applies an impulse to a specific point on the object.

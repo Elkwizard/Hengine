@@ -27,7 +27,9 @@ class Scene {
 	constructor(gravity, engine) {
 		this.engine = engine;
 		this.main = new ElementContainer("Main", null, this.engine);
-		this.physicsEngine = physics.exports.PhysicsEngine.construct(gravity.toPhysicsVector()).own();
+		const gravityPhysics = gravity.toPhysicsVector();
+		this.physicsEngine = physics.exports.PhysicsEngine.construct(gravityPhysics).own();
+		gravityPhysics.free();
 		this.cullGraphics = true;
 		this.mouseEvents = true;
 		this.collisionEvents = true;
@@ -40,7 +42,7 @@ class Scene {
 	 * @param Vector2 gravity | The new gravitational acceleration
 	 */
 	set gravity(a) {
-		this.physicsEngine.gravity = a.toPhysicsVector();
+		this.physicsEngine.gravity.set(a.x, a.y);
 	}
 	/**
 	 * Returns the current gravitational acceleration for the physics engine.
@@ -127,10 +129,14 @@ class Scene {
 	 * @return Constraint2
 	 */
 	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null) {
+		const apPhysics = ap.toPhysicsVector();
+		const bpPhysics = bp.toPhysicsVector();
 		const con = physics.exports.LengthConstraint2.construct(
 			a.scripts.PHYSICS.body, b.scripts.PHYSICS.body,
-			ap.toPhysicsVector(), bp.toPhysicsVector(), length
+			apPhysics, bpPhysics, length
 		);
+		apPhysics.free();
+		bpPhysics.free();
 		if (length === null) {
 			const { a, b } = con.as(physics.exports.Constraint);
 			con.length = Vector2.dist(
@@ -151,9 +157,13 @@ class Scene {
 	 */
 	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null) {
 		point ??= a.transform.localSpaceToGlobalSpace(offset);
+		const offsetPhysics = offset.toPhysicsVector();
+		const pointPhysics = point.toPhysicsVector();
 		const con = physics.exports.LengthConstraint1.construct(
-			a.scripts.PHYSICS.body, offset.toPhysicsVector(), point.toPhysicsVector(), length
+			a.scripts.PHYSICS.body, offsetPhysics, pointPhysics, length
 		);
+		offsetPhysics.free();
+		pointPhysics.free();
 		if (length === null) {
 			const { a, b } = con.as(physics.exports.Constraint);
 			con.length = Vector2.dist(
@@ -173,11 +183,15 @@ class Scene {
 	 * @return Constraint2
 	 */
 	constrainPosition(a, b, ap = Vector2.origin, bp = Vector2.origin) {
+		const apPhysics = ap.toPhysicsVector();
+		const bpPhysics = bp.toPhysicsVector();
 		const con = physics.exports.PositionConstraint2.construct(
 			a.scripts.PHYSICS.body, b.scripts.PHYSICS.body,
-			ap.toPhysicsVector(),
-			bp.toPhysicsVector()
+			apPhysics,
+			bpPhysics
 		);
+		apPhysics.free();
+		bpPhysics.free();
 		this.physicsEngine.addConstraint(con);
 		return new Constraint2(con, this.engine);
 	}
@@ -190,10 +204,14 @@ class Scene {
 	 */
 	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
 		point ??= a.transform.localSpaceToGlobalSpace(offset);
+		const offsetPhysics = offset.toPhysicsVector();
+		const pointPhysics = point.toPhysicsVector();
 		const con = physics.exports.PositionConstraint1.construct(
 			a.scripts.PHYSICS.body,
-			offset.toPhysicsVector(), point.toPhysicsVector()
+			offsetPhysics, pointPhysics
 		);
+		offsetPhysics.free();
+		pointPhysics.free();
 		this.physicsEngine.addConstraint(con);
 		return new Constraint1(con, this.engine);
 	}

@@ -30,16 +30,10 @@ class Constraint {
 
 using Constraints = std::vector<Constraint*>;
 
-EXPORT int Constraint$int$get_type(Constraint* con) {
-	return con->type;
-}
+GETTER(Constraint, type, int) { return object->type; }
 ACCESS(Constraint, id, int)
-EXPORT Vector* Constraint$Vector$get_a(Constraint* con) {
-	return &con->getA();
-}
-EXPORT Vector* Constraint$Vector$get_b(Constraint* con) {
-	return &con->getB();
-}
+OBJECT_GETTER(Constraint, a, Vector) { return &object->getA(); }
+OBJECT_GETTER(Constraint, b, Vector) { return &object->getB(); }
 FN(Constraint, hasBody, bool)(Constraint* con, RigidBody* body) {
 	return con->hasBody(*body);
 }
@@ -66,9 +60,7 @@ class Constraint1 : public Constraint {
 		void remove() override;
 };
 
-EXPORT RigidBody* Constraint1$RigidBody$get_body(Constraint1* con) {
-	return &con->body;
-}
+OBJECT_GETTER(Constraint1, body, RigidBody) { return &object->body; }
 OBJECT_ACCESS(Constraint1, offset, Vector)
 OBJECT_ACCESS(Constraint1, point, Vector)
 
@@ -98,12 +90,8 @@ class Constraint2 : public Constraint {
 };
 
 
-EXPORT RigidBody* Constraint2$RigidBody$get_bodyA(Constraint2* con) {
-	return &con->bodyA;
-}
-EXPORT RigidBody* Constraint2$RigidBody$get_bodyB(Constraint2* con) {
-	return &con->bodyB;
-}
+OBJECT_GETTER(Constraint2, bodyA, RigidBody) { return &object->bodyA; }
+OBJECT_GETTER(Constraint2, bodyB, RigidBody) { return &object->bodyB; }
 OBJECT_ACCESS(Constraint2, offsetA, Vector)
 OBJECT_ACCESS(Constraint2, offsetB, Vector)
 ACCESS(Constraint2, staticA, bool)
@@ -113,6 +101,6 @@ using NativeConstraintArray = NativeArray<Constraint*>;
 
 CONSTRUCT(NativeConstraintArray)(int length) { return new NativeConstraintArray(length); }
 FREE(NativeConstraintArray)
-EXPORT int NativeConstraintArray$int$get_length(NativeConstraintArray* arr) { return arr->getLength(); }
+GETTER(NativeConstraintArray, length, int) { return object->getLength(); }
 OBJECT_FN(NativeConstraintArray, get, Constraint)(NativeConstraintArray* arr, int index) { return arr->get(index); }
 FN(NativeConstraintArray, set, void)(NativeConstraintArray* arr, int index, Constraint* body) { arr->set(index, body); }

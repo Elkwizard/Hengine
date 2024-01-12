@@ -131,12 +131,12 @@ ACCESS(RigidBody, trivialTriggerFilter, bool)
 ACCESS(RigidBody, boundingRadius, double)
 ACCESS(RigidBody, mass, double)
 ACCESS(RigidBody, inertia, double)
-EXPORT double RigidBody$double$get_density(RigidBody* b) { return b->density; }
-EXPORT void RigidBody$void$set_density(RigidBody* b, double a) { return b->setDensity(a); }
+GETTER(RigidBody, density, double) { return object->density; }
+SETTER(RigidBody, density, double) { object->setDensity(value); }
 
 ACCESS(RigidBody, angularVelocity, double)
-EXPORT double RigidBody$double$get_angle(RigidBody* b) { return b->angle; }
-EXPORT void RigidBody$void$set_angle(RigidBody* b, double a) { return b->setAngle(a); }
+GETTER(RigidBody, angle, double) { return object->angle; }
+SETTER(RigidBody, angle, double) { object->setAngle(value); }
 OBJECT_ACCESS(RigidBody, velocity, Vector)
 OBJECT_ACCESS(RigidBody, position, Vector)
 
@@ -156,6 +156,6 @@ using NativeRigidBodyArray = NativeArray<RigidBody*>;
 
 CONSTRUCT(NativeRigidBodyArray)(int length) { return new NativeRigidBodyArray(length); }
 FREE(NativeRigidBodyArray);
-EXPORT int NativeRigidBodyArray$int$get_length(NativeRigidBodyArray* arr) { return arr->getLength(); }
+GETTER(NativeRigidBodyArray, length, int) { return object->getLength(); }
 OBJECT_FN(NativeRigidBodyArray, get, RigidBody)(NativeRigidBodyArray* arr, int index) { return arr->get(index); }
 FN(NativeRigidBodyArray, set, void)(NativeRigidBodyArray* arr, int index, RigidBody* body) { arr->set(index, body); }

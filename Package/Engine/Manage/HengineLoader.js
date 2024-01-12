@@ -441,17 +441,8 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 					return this;
 				}
 
-				as(type) {
-					return new type(this.pointer);
-				}
-
-				free() {
-					entries?.free?.(this.pointer);
-				}
-
-				static construct(...args) {
-					cleanArgs(args);
-					return new NativeClass(entries.construct(...args));
+				as(Type) {
+					return new Type(this.pointer);
 				}
 			};
 
@@ -461,39 +452,37 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 
 			for (let key in entries) {
 				const fn = entries[key];
-				if (key !== "construct" && key !== "free") {
-					const typeInx = key.indexOf("$");
-					const returnType = key.slice(0, typeInx);
-					key = key.slice(typeInx + 1);
+				const typeInx = key.indexOf("$");
+				const returnType = key.slice(0, typeInx);
+				key = key.slice(typeInx + 1);
 
-					const staticInx = key.indexOf("$");
-					const isStatic = staticInx > -1;
-					if (isStatic) key = key.slice(0, staticInx);
+				const staticInx = key.indexOf("$");
+				const isStatic = staticInx > -1;
+				if (isStatic) key = key.slice(0, staticInx);
 
-					if (key.indexOf("_") > -1) {
-						const name = key.slice(key.indexOf("_") + 1);
-						const getter = entries[`${returnType}$get_${name}`];
-						const setter = entries[`void$set_${name}`];
-						if (!(name in NativeClass.prototype)) {
-							Object.defineProperty(NativeClass.prototype, name, {
-								get: getter ? function () {
-									return cast(getter(this.pointer), returnType);
-								} : undefined,
-								set: setter ? function (value) {
-									setter(this.pointer, clean(value));
-								} : undefined,
-								enumerable: true
-							});
-						}
-					} else Object.defineProperty(isStatic ? NativeClass : NativeClass.prototype, key, {
-						value: function (...args) {
-							cleanArgs(args);
-							const result = isStatic ? fn(...args) : fn(this.pointer, ...args);
-							return cast(result, returnType);
-						},
-						enumerable: false
-					});
-				}
+				if (key.indexOf("_") > -1) {
+					const name = key.slice(key.indexOf("_") + 1);
+					const getter = entries[`${returnType}$get_${name}`];
+					const setter = entries[`void$set_${name}`];
+					if (!(name in NativeClass.prototype)) {
+						Object.defineProperty(NativeClass.prototype, name, {
+							get: getter ? function () {
+								return cast(getter(this.pointer), returnType);
+							} : undefined,
+							set: setter ? function (value) {
+								setter(this.pointer, clean(value));
+							} : undefined,
+							enumerable: true
+						});
+					}
+				} else Object.defineProperty(isStatic ? NativeClass : NativeClass.prototype, key, {
+					value: function (...args) {
+						cleanArgs(args);
+						const result = isStatic ? fn(...args) : fn(this.pointer, ...args);
+						return cast(result, returnType);
+					},
+					enumerable: false
+				});
 			}
 
 			classes[cls] = NativeClass;

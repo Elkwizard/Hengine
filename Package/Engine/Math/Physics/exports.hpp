@@ -37,14 +37,20 @@ void print(F first, T... rest) {
 								  EXPORT void class##$void$set_##prop(class* obj, type value) { obj->prop = value; }
 #define OBJECT_ACCESS(class, prop, type) EXPORT type* class##$##type##$get_##prop(class* obj) { return &obj->prop; }\
 										 EXPORT void class##$void$set_##prop(class *obj, type* value) { obj->prop = *value; }
+
 #define FN(class, prop, type) EXPORT type class##$##type##$##prop
 #define OBJECT_FN(class, prop, type) EXPORT type* class##$##type##$##prop
 #define STATIC_FN(class, prop, type) EXPORT type class##$##type##$##prop##$##static
 #define STATIC_OBJECT_FN(class, prop, type) EXPORT type* class##$##type##$##prop##$##static
 #define FN_NO(class, prop) EXPORT void class##$void$##prop(class* obj) { obj->prop(); }
 
-#define CONSTRUCT(class) EXPORT class* class##$##construct
-#define FREE(class) EXPORT void class##$free(class* obj) { delete obj; }
+#define GETTER(class, prop, type) FN(class, get_##prop, type)(class* object)
+#define SETTER(class, prop, type) FN(class, set_##prop, void)(class* object, type value)
+#define OBJECT_GETTER(class, prop, type) OBJECT_FN(class, get_##prop, type)(class* object)
+#define OBJECT_SETTER(class, prop, type) OBJECT_FN(class, set_##prop, void)(class* object, type value)
+
+#define CONSTRUCT(class) STATIC_OBJECT_FN(class, construct, class)
+#define FREE(class) FN(class, free, void)(class* obj) { delete obj; }
 
 using ID = unsigned int;
 

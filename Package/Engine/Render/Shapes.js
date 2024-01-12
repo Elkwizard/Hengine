@@ -570,11 +570,18 @@ class Polygon extends Shape {
 		return result;
 	}
 	toPhysicsShape() {
-		const arr = physics.exports.NativeVectorArray.construct(this.vertices.length).own();
-		for (let i = 0; i < this.vertices.length; i++)
-			arr.set(i, this.vertices[i].toPhysicsVector());
+		const arr = physics.exports.NativeVectorArray.construct(this.vertices.length);//.own();
+		for (let i = 0; i < this.vertices.length; i++) {
+			const physicsVertex = this.vertices[i].toPhysicsVector();
+			arr.set(i, physicsVertex);
+			physicsVertex.free();
+		}
 
-		return physics.exports.PolygonCollider.construct(arr);
+		const collider = physics.exports.PolygonCollider.construct(arr);
+	
+		arr.free();
+
+		return collider;
 	}
 	/**
 	 * Returns a new regular polygon centered at the origin with a specified amount of sides and radius.

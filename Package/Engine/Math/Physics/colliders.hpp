@@ -36,7 +36,6 @@ class BaseCollider {
 		}
 
 		virtual ~BaseCollider() { }
-
 		virtual void computeMatterData() = 0;
 
 		void invalidateCache() {
