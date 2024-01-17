@@ -136,7 +136,7 @@ class Range {
 /**
  * Represents a 2D Shape.
  * @abstract
- * @prop Number area | The area of the shape
+ * @prop Number area | The area of the shape at the time of construction. This variable is read-only
  */
 class Shape {
 	constructor() {

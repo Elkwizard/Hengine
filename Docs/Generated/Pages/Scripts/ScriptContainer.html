@@ -48,7 +48,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 					<div class="class-methods">
 		<div class="function-wrapper" id="get ScriptContainer.prototype.maxScriptNumber()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L258" target="_blank" class="function-name source-link">maxScriptNumber</a><span class="type">Number</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L259" target="_blank" class="function-name source-link">maxScriptNumber</a><span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the highest <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scriptNumber</span></code> of all scripts in the container.
@@ -58,7 +58,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 	
 		<div class="function-wrapper" id="get ScriptContainer.prototype.minScriptNumber()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L265" target="_blank" class="function-name source-link">minScriptNumber</a><span class="type">Number</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L266" target="_blank" class="function-name source-link">minScriptNumber</a><span class="type">Number</span>
 			</div>
 			<div class="function desc">
 				Returns the lowest <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scriptNumber</span></code> of all scripts in the container.
@@ -68,7 +68,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 	
 		<div class="function-wrapper" id="get ScriptContainer.prototype.defaultScript()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L272" target="_blank" class="function-name source-link">defaultScript</a><span class="type">Class</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L273" target="_blank" class="function-name source-link">defaultScript</a><span class="type">Class</span>
 			</div>
 			<div class="function desc">
 				Returns the default script (<code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../../Pages/Management/Scene.html#class Scene">Scene</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">defaultScript</span></code>) of the object's scene.
@@ -76,14 +76,25 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 			
 		</div>
 	
+		<div class="function-wrapper" id="ScriptContainer.prototype.removeAllScripts()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L282" target="_blank" class="function-name source-link">removeAllScripts</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Removes every script from the object.
+			</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="ScriptContainer.prototype.add()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L286" target="_blank" class="function-name source-link">add</a>(<span class="param">script</span>, <span class="param">...args</span>)<span class="type">Any</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L296" target="_blank" class="function-name source-link">add</a>(<span class="param">script</span>, <span class="param">...args</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
 				Adds a new script to the object. Returns the result of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">()</span></code> listener.
 This also defines a property with the name of the script (e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">MY_SCRIPT</span></code> for a script defined as <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">class</span><span class="highlight-CLASS"> </span><span class="highlight-CONSTANT">MY_SCRIPT</span><span class="highlight-KEYWORD"> extends</span><span class="highlight-CLASS"> <a href="../../Pages/Scripts/ElementScript.html#class ElementScript">ElementScript</a></span><span class="highlight-SYMBOL"> { ... }</span></code>) containing the script instance.
 None of the listeners on this script will be called until the next frame.
+If an instance of the script was already on the object, it will be removed.
 			</div>
 			
 				<div class="function-signature">
@@ -117,7 +128,7 @@ None of the listeners on this script will be called until the next frame.
 	
 		<div class="function-wrapper" id="ScriptContainer.prototype.removeDefault()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L301" target="_blank" class="function-name source-link">removeDefault</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L312" target="_blank" class="function-name source-link">removeDefault</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Removes the scene's default script from the object.
@@ -127,7 +138,7 @@ None of the listeners on this script will be called until the next frame.
 	
 		<div class="function-wrapper" id="ScriptContainer.prototype.remove()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L310" target="_blank" class="function-name source-link">remove</a>(<span class="param">script</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L321" target="_blank" class="function-name source-link">remove</a>(<span class="param">script</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Removes a specific script from the object.
@@ -156,7 +167,7 @@ When the script is removed, the <code class=" highlight-BACKGROUND"><span class=
 	
 		<div class="function-wrapper" id="ScriptContainer.prototype.has()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L334" target="_blank" class="function-name source-link">has</a>(<span class="param">script</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L356" target="_blank" class="function-name source-link">has</a>(<span class="param">script</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether the object has a specific script.
@@ -183,7 +194,7 @@ When the script is removed, the <code class=" highlight-BACKGROUND"><span class=
 	
 		<div class="function-wrapper" id="ScriptContainer.prototype.implements()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L342" target="_blank" class="function-name source-link">implements</a>(<span class="param">method</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L364" target="_blank" class="function-name source-link">implements</a>(<span class="param">method</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether the object has any scripts listening for a specific event.

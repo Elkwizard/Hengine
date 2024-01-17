@@ -94,6 +94,9 @@ class SceneObject extends SceneElement {
 	get height() {
 		return this.__height;
 	}
+	remove() {
+		super.remove();
+	}
 	runSynced() {
 		this.scripts.sync();
 		for (let i = 0; i < this.synced.length; i++)

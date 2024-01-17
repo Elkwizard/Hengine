@@ -384,7 +384,11 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 				},
 				fd_close: () => null,
 				fd_write: () => null,
-				fd_seek: () => null
+				fd_seek: () => null,
+				fd_read: () => null,
+				environ_sizes_get: () => 0,
+				environ_get: () => null,
+				clock_time_get: () => Date.now()
 			}
 		});
 

@@ -77,7 +77,7 @@ void RigidBody::setDensity(double a) {
 	double f = a / density;
 	mass *= f;
 	inertia *= f;
-	density = f;
+	density = a;
 }
 
 void RigidBody::setAngle(double a) {
@@ -107,7 +107,6 @@ void RigidBody::displace(const Vector& v) {
 	for (BaseCollider* collider : shapes)
 		collider->displaceCache(v);
 }
-		
 
 void RigidBody::invalidateModels() {
 	for (BaseCollider* collider : shapes)
@@ -195,22 +194,20 @@ Vector RigidBody::pointForce(const Vector& p) const {
 }
 
 void RigidBody::applyImpulse(const Vector& pos, const Vector& imp, double factor) {
-	if (!dynamic || mass == 0.0) return;
-	
-	Vector scaled = imp * factor;
-
-	//linear
-	velocity += scaled / mass;
-
-	//angular
-	if (canRotate) {
-		double cross = (pos - position).cross(scaled);
-		if (cross) angularVelocity += cross / inertia;
-	}
+	applyRelativeImpulse(pos - position, imp, factor);
 }
 
-void RigidBody::applyRelativeImpulse(const Vector& pos, const Vector& imp, double factor) {
-	applyImpulse(pos + position, imp, factor);
+void RigidBody::applyRelativeImpulse(const Vector& offset, const Vector& imp, double factor) {
+	if (!dynamic || !mass) return;
+
+	Vector scaled = imp * factor;
+
+	velocity += scaled / mass;
+
+	if (canRotate) {
+		double cross = offset.cross(scaled);
+		if (cross) angularVelocity += cross / inertia;
+	}
 }
 
 RigidBody* RigidBody::fromPolygon(std::vector<Vector> vertices, bool dynamic) {

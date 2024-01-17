@@ -250,6 +250,7 @@ class ScriptContainer {
 		this.sortedScriptInstances = [];
 		this.implementedMethods = new Set();
 		this.scripts = new Map();
+		this.toRemove = [];
 	}
 	/**
 	 * Returns the highest `.scriptNumber` of all scripts in the container.
@@ -276,18 +277,28 @@ class ScriptContainer {
 		this.sortedScriptInstances.sort((a, b) => a.scriptNumber - b.scriptNumber);
 	}
 	/**
+	 * Removes every script from the object.
+	 */
+	removeAllScripts() {
+		const instances = [...this.sortedScriptInstances];
+		for (let i = 0; i < instances.length; i++)
+			this.remove(instances[i].constructor);
+	}
+	/**
 	 * Adds a new script to the object. Returns the result of the `.init()` listener.
 	 * This also defines a property with the name of the script (e.g. `.MY_SCRIPT` for a script defined as `class MY_SCRIPT extends ElementScript { ... }`) containing the script instance.
 	 * None of the listeners on this script will be called until the next frame.
+	 * If an instance of the script was already on the object, it will be removed.
 	 * @param Class script | The script to add
 	 * @param  Array ...args | The initialization arguments to pass to the `.init()` listener.
 	 * @return Any
 	 */
 	add(script, ...args) {
-		if (this.has(script)) return null;
+		if (this.has(script)) this.remove(script);
 		const instance = new script(this.sceneObject);
 		this[script.name] = instance;
-		for (const method of script.implementedMethods) this.implementedMethods.add(method);
+		for (const method of script.implementedMethods)
+			this.implementedMethods.add(method);
 		this.scripts.set(script, instance);
 		const returnValue = instance.init(...args);
 		this.run("addScript", script, ...args);
@@ -312,19 +323,30 @@ class ScriptContainer {
 		const instance = this.scripts.get(script);
 		if (!instance.removed) {
 			instance.removed = true;
+			this.toRemove.push(instance);
+		}
+	}
+	removeQueued() {
+		for (let i = 0; i < this.toRemove.length; i++) {
+			const instance = this.toRemove[i];
+			instance.cleanUp();
 			
-			this.sceneObject.sync(() => {
-				instance.cleanUp();
+			const script = instance.constructor;
+			if (this.scripts.get(script).removed) { // in case it was re-added
+				const instance = this.scripts.get(script);
 				this.scripts.delete(script);
-				this.sortedScriptInstances.splice(this.sortedScriptInstances.indexOf(instance), 1);
+				this.sortedScriptInstances.splice(
+					this.sortedScriptInstances.indexOf(instance), 1
+				);
 
 				this.implementedMethods.clear();
 				for (const [script, instance] of this.scripts)
 					for (const method of script.implementedMethods) this.implementedMethods.add(method);
 			
 				delete this[script.name];
-			});
+			}
 		}
+		this.toRemove = [];
 	}
 	/**
 	 * Checks whether the object has a specific script.
@@ -347,7 +369,6 @@ class ScriptContainer {
 			this.sortedScriptInstances[i].scriptSynced = true;
 	}
 	run(method, ...args) {
-		// if (this.sceneObject.removed && method !== "remove" && method !== "cleanUp") return;
 		if (this.implementedMethods.has(method))
 			for (let i = 0; i < this.sortedScriptInstances.length; i++) {
 				const script = this.sortedScriptInstances[i];

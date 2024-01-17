@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class SceneElement">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneElement.js?#L8" target="_blank" class="class-name source-link">SceneElement</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneElement.js?#L9" target="_blank" class="class-name source-link">SceneElement</a>
 				</div>
 				<div class="class desc">
 					Represents a node of the scene tree.
@@ -41,7 +41,14 @@ This is an abstract superclass and should not be constructed.
 					<div class="prop-header member">
 						<span class="prop-name">removed</span><span class="type">Boolean</span>
 					</div>
-					<div class="prop desc">Whether or not this element exists in the scene. Changes to this variable will only remove the object at the end of the update cycle, so it is possible for this to be true while the element still exists. This cannot be set back to true once it is false</div>
+					<div class="prop desc">Whether or not this element has been removed from the scene. Changes to this variable will only remove the object at the end of the update cycle, so it is possible for this to be true while the element still exists. This variable is read-only</div>
+				</div>
+			
+				<div class="prop-wrapper" id="SceneElement.inScene">
+					<div class="prop-header member">
+						<span class="prop-name">inScene</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether this element is in the scene tree. This is only false if the object is not in the scene, and will still be true while the object is marked for removal but still present. This variable is read-only</div>
 				</div>
 			</div>
 				
@@ -51,7 +58,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="SceneElement.prototype.remove()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneElement.js?#L27" target="_blank" class="function-name source-link">remove</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneElement.js?#L29" target="_blank" class="function-name source-link">remove</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Removes the element from the parent element. This will take until the end of the update cycle to take effect.

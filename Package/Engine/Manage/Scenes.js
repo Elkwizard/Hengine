@@ -50,7 +50,7 @@ class Scene {
 	 * @return Vector2
 	 */
 	get gravity() {
-		return Vector2.fromPhysicsVector(this.physicsEngine.gravity);
+		return Vector2.fromPhysicsVectorReference(this.physicsEngine.gravity);
 	}
 	/**
 	 * Returns all the active constraints in the scene.

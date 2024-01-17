@@ -47,7 +47,6 @@ class ElementContainer extends SceneElement {
 	updateArray() {
 		this.sceneObjectArray = [];
 		for (const [name, element] of this.elements) {
-			// if (element.removed) continue;
 			if (element instanceof ElementContainer) this.sceneObjectArray.pushArray(element.updateArray());
 			else this.sceneObjectArray.push(element);
 		}
@@ -55,8 +54,11 @@ class ElementContainer extends SceneElement {
 	}
 	startUpdate() {
 		// remove queued
-		for (const [name, element] of this.elements)
+		for (const [name, element] of this.elements) {
 			if (element.removed) this.removeElement(element);
+			if (element instanceof SceneObject)
+				element.scripts.removeQueued();
+		}
 		
 		// recurse
 		for (const [name, element] of this.elements)
@@ -227,14 +229,15 @@ class ElementContainer extends SceneElement {
 	removeElement(element) {
 		if (element.container === this) {
 			if (element instanceof SceneObject) {
-				element.scripts.run("cleanUp");
 				element.scripts.run("remove");
+				element.scripts.removeAllScripts();
 			} else {
 				const objects = element.updateArray();
 				for (let i = 0; i < objects.length; i++)
 					element.removeElement(objects[i]);
 			}
 			this.elements.delete(element.name);
+			element.inScene = false;
 		}
 	}
 	/**

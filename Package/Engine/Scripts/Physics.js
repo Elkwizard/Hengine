@@ -176,6 +176,7 @@ class PHYSICS extends ElementScript {
 		return shape;
 	}
 	cleanUp(obj) {
+		this.cleanedUp = true;
 		PHYSICS.bodyToSceneObject.delete(this.body.pointer);
 		this.physicsEngine.removeBody(this.body.id);
 	}
@@ -191,7 +192,7 @@ class PHYSICS extends ElementScript {
 		
 		// update last colliding
 		this.colliding.get(this.lastColliding);
-		this.colliding.clear();	
+		this.colliding.clear();
 
 		// sync position
 		const { position, rotation } = obj.transform;
