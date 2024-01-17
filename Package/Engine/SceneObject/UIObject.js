@@ -5,7 +5,7 @@
  */
 class UIObject extends SceneObject {
     constructor(name, x, y, container, engine) {
-        super(name, x, y, null, "UI", container, engine);
+        super(name, x, y, null, container, engine);
     }
     engineDraw() {
 		this.onScreen = true;

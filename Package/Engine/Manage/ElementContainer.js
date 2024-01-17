@@ -9,7 +9,6 @@ class ElementContainer extends SceneElement {
 		this.elements = new Map();
 		this.engine = engine;
 		this.sceneObjectArray = [];
-		this.removeQueue = [];
 		this.defaultScript = class DEFAULT extends ElementScript {
 			init(obj) {
 				let fill;
@@ -66,24 +65,6 @@ class ElementContainer extends SceneElement {
 	
 		this.updateArray();
 	}
-	copy(el) {
-		let n;
-		if (el instanceof UIObject) {
-			n = this.addUI(el.name + " - copy", 0, 0, el.width, el.height);
-		} else if (el.scripts.has(PHYSICS)) {
-			n = this.addPhysicsElement(el.name + " - copy", 0, 0, el.scripts.PHYSICS.mobile, { ...el.controls }, el.tag);
-			n.rotation = el.rotation;
-		} else {
-			n = this.addElement(el.name + " - copy", 0, 0, { ...el.controls }, el.tag);
-		}
-		n.transform = el.transform.get();
-		n.lastTransform = el.lastTransform.get(n.lastTransform);
-		let ser = el.serializeShapes();
-		n.parseShapes(ser);
-		el.runLog(n);
-
-		return n;
-	}
 	genName(database, name) {
 		let num = 0;
 		let n = name;
@@ -107,9 +88,9 @@ class ElementContainer extends SceneElement {
 	 * @param Number height | The height of the rectangle shape
 	 * @return SceneObject
 	 */
-	addRectElement(name, x, y, width, height, controls = new Controls(), tag = "") {
+	addRectElement(name, x, y, width, height, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
+		let n = new SceneObject(name, x, y, controls, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -123,9 +104,9 @@ class ElementContainer extends SceneElement {
 	 * @param Number radius | The radius of the circle shape
 	 * @return SceneObject
 	 */
-	addCircleElement(name, x, y, radius, controls = new Controls(), tag = "") {
+	addCircleElement(name, x, y, radius, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
+		let n = new SceneObject(name, x, y, controls, this, this.engine);
 		n.addShape("default", new Circle(0, 0, radius));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -138,9 +119,9 @@ class ElementContainer extends SceneElement {
 	 * @param Number y | The y coordinate of the center of the SceneObject
 	 * @return SceneObject
 	 */
-	addElement(name, x, y, controls = new Controls(), tag = "") {
+	addElement(name, x, y, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
+		let n = new SceneObject(name, x, y, controls, this, this.engine);
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		return n;
@@ -153,9 +134,9 @@ class ElementContainer extends SceneElement {
 	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
 	 * @return SceneObject
 	 */
-	addPhysicsElement(name, x, y, gravity, controls = new Controls(), tag = "") {
+	addPhysicsElement(name, x, y, gravity, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		const n = new SceneObject(name, x, y, controls, tag, this, this.engine);
+		const n = new SceneObject(name, x, y, controls, this, this.engine);
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		n.scripts.add(PHYSICS, gravity);
@@ -171,9 +152,9 @@ class ElementContainer extends SceneElement {
 	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
 	 * @return SceneObject
 	 */
-	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls(), tag = "") {
+	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		const n = new SceneObject(name, x, y, controls, tag, this, this.engine);
+		const n = new SceneObject(name, x, y, controls, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -189,9 +170,9 @@ class ElementContainer extends SceneElement {
 	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
 	 * @return SceneObject
 	 */
-	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls(), tag = "") {
+	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, tag, this, this.engine);
+		let n = new SceneObject(name, x, y, controls, this, this.engine);
 		n.addShape("default", new Circle(0, 0, radius));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -289,9 +270,6 @@ class ElementContainer extends SceneElement {
 	 */
 	getOnScreenElements() {
 		return this.getElementsMatch(element => element.onScreen);
-	}
-	getElementsWithTag(tag) {
-		return this.getElementsMatch(element => element.tag === tag);
 	}
 	/**
 	 * Returns all of the leaf nodes within the container that have a specific ElementScript.

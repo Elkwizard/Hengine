@@ -7,29 +7,6 @@ class Controls {
 		this.interact1 = interact1;
 		this.interact2 = interact2;
 	}
-	toString2() {
-		return this.up + ", " + this.down + ", " + this.left + ", " + this.right + ", " + this.interact1 + ", " + this.interact2
-	}
-	toString() {
-		let res = [];
-		function j(cont) {
-			if (this[cont]) {
-				if (typeof this[cont] === "string") {
-					res.push('"' + this[cont] + '"');
-				} else {
-					res.push(this[cont]);
-				}
-			}
-		}
-		j = j.bind(this);
-		j("up");
-		j("down");
-		j("left");
-		j("right");
-		j("interact1");
-		j("interact2");
-		return res.join(", ");
-	}
 }
 
 /**
@@ -51,7 +28,7 @@ class Controls {
  * @prop Number lifeSpan | The amount of frames that the object has existed for
  */
 class SceneObject extends SceneElement {
-	constructor(name, x, y, controls, tag, container, engine) {
+	constructor(name, x, y, controls, container, engine) {
 		super(name, container);
 		this.transform = new Transform(x, y, 0);
 		this.lastTransform = this.transform.get();
@@ -59,7 +36,6 @@ class SceneObject extends SceneElement {
 		this.convexShapes = new Map();
 		this.graphicalBoundingBox = null;
 		this.engine = engine;
-		this.tag = tag;
 		this.controls = controls;
 		this.mouseEvents = true;
 		this.hidden = false;
@@ -113,43 +89,6 @@ class SceneObject extends SceneElement {
 	}
 	updatePreviousData() {
 		this.transform.get(this.lastTransform);
-	}
-	serializeShapes() {
-		let shapes = this.getAllShapes();
-		let result = [];
-		for (let shape of shapes) {
-			let term = "";
-			if (shape instanceof Circle) {
-				term = "C " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.radius.toFixed(0);
-			} else if (shape instanceof Rect) {
-				term = "R " + shape.x.toFixed(0) + " " + shape.y.toFixed(0) + " " + shape.width.toFixed(0) + " " + shape.height.toFixed(0);
-			} else if (shape instanceof Polygon) {
-				term = "P " + shape.vertices.map(e => e.x.toFixed(0) + "|" + e.y.toFixed(0)).join(" ");
-			}
-			result.push(term);
-		}
-		return result.join(", ");
-	}
-	parseShapes(str) {
-		let shapes = str.split(", ");
-		let result = [];
-		for (let shape of shapes) {
-			let args = shape.split(" ").slice(1).map(e => parseFloat(e));
-			switch (shape[0]) {
-				case "C":
-					result.push(new Circle(args[0], args[1], args[2]));
-					break;
-				case "R":
-					result.push(new Rect(args[0], args[1], args[2], args[3]));
-					break;
-				case "P":
-					result.push(new Polygon(shape.split(" ").slice(1).map(e => new Vector2(parseFloat(e.split("|")[0]), parseFloat(e.split("|")[1])))))
-					break;
-			}
-		}
-		let num = 0;
-		for (let shape of result) this.addShape(`Shape #${num++}`, shape);
-		return result;
 	}
 	cacheDimensions() {
 		let shapes = this.getAllShapes();
@@ -367,29 +306,12 @@ class SceneObject extends SceneElement {
 	 */
 	hide() {
 		this.hidden = true;
-		this.logMod(function () {
-			this.hide();
-		});
 	}
 	/**
 	 * Shows the object. Un-does `.hide()`.
 	 */
 	show() {
 		this.hidden = false;
-		this.logMod(function () {
-			this.show();
-		});
-	}
-	logMod(func) {
-		this.log.push(func);
-	}
-	mod(func) {
-		func.bind(this)();
-		this.logMod(func);
-	}
-	runLog(el) {
-		for (let x of this.log) x.bind(el)();
-		return el;
 	}
 	runDraw() {
 		if (this.scripts.implements("draw")) this.transform.drawInLocalSpace(() => {
