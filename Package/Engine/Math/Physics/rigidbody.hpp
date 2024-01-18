@@ -111,6 +111,9 @@ FN_NO(RigidBody, invalidateModels)
 FN(RigidBody, applyImpulse, void)(RigidBody* body, Vector* point, Vector* impulse) {
 	body->applyImpulse(*point, *impulse);
 }
+OBJECT_FN(RigidBody, getConstraints, NativeConstraintArray)(RigidBody* body) {
+	return new NativeConstraintArray(body->constraints);
+}
 
 ACCESS(RigidBody, id, int)
 

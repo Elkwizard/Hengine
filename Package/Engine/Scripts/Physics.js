@@ -121,7 +121,16 @@ class PHYSICS extends ElementScript {
 	 * @return Constraint[]
 	 */
 	get constraints() {
-		return this.body.constraints.map(con => Constraint.fromPhysicsConstraint(con, this.sceneObject.engine));
+		const physicsConstraints = this.physicsEngine.getConstraints();
+		const constraints = [];
+		for (let i = 0; i < physicsConstraints.length; i++)
+			constraints.push(Constraint.fromPhysicsConstraint(
+				physicsConstraints.get(i), this.sceneObject.engine
+			));
+
+		physicsConstraints.free();
+		
+		return constraints;
 	}
 	set velocity(a) {
 		this.body.velocity.set(a.x, a.y);

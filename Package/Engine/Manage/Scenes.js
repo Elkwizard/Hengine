@@ -57,9 +57,15 @@ class Scene {
 	 * @return Constraint[]
 	 */
 	get constraints() {
-		let constraints = this.physicsEngine.getConstraints();
-		constraints = new Array(constraints.length)
-			.map((_, i) => Constraint.fromPhysicsConstraint(constraints.get(i), this.engine));
+		const physicsConstraints = this.body.getConstraints();
+		const constraints = [];
+		for (let i = 0; i < physicsConstraints.length; i++)
+			constraints.push(Constraint.fromPhysicsConstraint(
+				physicsConstraints.get(i), this.engine
+			));
+
+		physicsConstraints.free();
+		
 		return constraints;
 	}
 	handleCollisionEvent(a, b, direction, contacts, isTriggerA, isTriggerB) {
