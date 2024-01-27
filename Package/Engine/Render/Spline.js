@@ -25,6 +25,11 @@ class Spline {
 	 * @return Vector2
 	 */
     evaluate(t) {
-        return Vector2.lerp(Vector2.lerp(Vector2.lerp(this.a, this.b, t), Vector2.lerp(this.b, this.c, t), t), Vector2.lerp(Vector2.lerp(this.b, this.c, t), Vector2.lerp(this.c, this.d, t), t), t);
+		const ab = Vector2.lerp(this.a, this.b, t);
+		const bc = Vector2.lerp(this.b, this.c, t);
+		const cd = Vector2.lerp(this.c, this.d, t);
+        return Vector2.lerp(
+			Vector2.lerp(ab, bc, t), Vector2.lerp(bc, cd, t), t
+		);
     }
 }
