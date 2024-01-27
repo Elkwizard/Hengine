@@ -372,7 +372,6 @@ class GPUComputation {
 	setArguments(uniformData = {}) {
 		for (const key in uniformData)
 			this.program.setUniform(key, uniformData[key]);
-		this.loaded = false;
 	}
 	/**
 	 * Converts GLSL which uses `struct`s for the parameter and return value of the `compute()` function to GLSL that can be used in the GPUComputation constructor.

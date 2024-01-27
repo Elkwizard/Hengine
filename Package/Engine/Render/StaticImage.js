@@ -9,13 +9,13 @@ class StaticImage extends ImageType {
 	 */
 	constructor(image) {
 		super(image.width, image.height, image.pixelRatio);
-		this.bitmap = null;
-		this.loaded = false;
-		createImageBitmap(image.makeImage(), {
+		const cis = image.makeImage();
+		this.bitmap = new_OffscreenCanvas(cis.width, cis.height);
+		this.bitmap.getContext("2d").drawImage(cis, 0, 0);
+		createImageBitmap(cis, {
 			premultiplyAlpha: "none"
 		}).then(bmp => {
 			this.bitmap = bmp;
-			this.loaded = true;
 		});
 	}
 	makeImage() {
