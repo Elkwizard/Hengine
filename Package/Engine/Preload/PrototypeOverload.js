@@ -160,7 +160,7 @@ Object.defineProperty(window, "title", {
 		const end = performance.now();
 		return (end - start) / iter;
 	});
-	//Array
+	
 	/**
 	 * @name class Array
 	 * The built-in Array class has some additional quality-of-life methods in the Hengine.
@@ -265,10 +265,24 @@ Object.defineProperty(window, "title", {
 		}
 		return arr;
 	};
-	//Number
+	/**
+	 * @name class Number extends Operable
+	 * The built-in Number class has some additional utility methods in the Hengine.
+	 * The class extends Operable only in the sense that it has all of the same methods, excluding those that modify the caller in-place.
+	 */
+	/**
+	 * @name toDegrees
+	 * Returns the caller (interpreted as radians) converted to degrees.
+	 * @return Number 
+	 */
 	proto(Number.prototype, "toDegrees", function () {
 		return this * (180 / Math.PI);
 	});
+	/**
+	 * @name toRadians
+	 * Returns the caller (interpreted as degrees) converted to radians.
+	 * @return Number
+	 */
 	proto(Number.prototype, "toRadians", function () {
 		return this * (Math.PI / 180);
 	});
@@ -276,10 +290,24 @@ Object.defineProperty(window, "title", {
 		const dir = ferocity * (value - this) * 2;
 		return this + dir;
 	});
+	/**
+	 * @name toMaxed
+	 * Converts the number to a string with a specified maximum number of digits.
+	 * Trailing zeros will be discarded.
+	 * @return Number
+	 */
 	proto(Number.prototype, "toMaxed", function (digits) {
 		return String(Math.round(this * 10 ** digits) / 10 ** digits);
 	});
-	//String
+	/**
+	 * @name class String
+	 * The built-in String class has some additional utility methods in the Hengine.
+	 */
+	/**
+	 * @name capitalize
+	 * Returns a copy of the caller with the first character capitalized.
+	 * @return String
+	 */
 	proto(String.prototype, "capitalize", function () {
 		return this[0].toUpperCase() + this.slice(1);
 	});
@@ -297,6 +325,11 @@ Object.defineProperty(window, "title", {
 	proto(String.prototype, "padRight", function (size) {
 		return this + " ".repeat(size - this.length);
 	});
+	/**
+	 * @name indent
+	 * Returns the caller with each line indented by a single tab character.
+	 * @return String
+	 */
 	proto(String.prototype, "indent", function () {
 		return this.split("\n").map(str => "\t" + str).join("\n");
 	});

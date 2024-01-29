@@ -124,6 +124,11 @@
 			"Sound": ["Sound", "SoundInstance"],
 			"Synth": ["Synth", "Tone", "SynthChannel"]
 		},
+		"Built-Ins": {
+			"Array": null,
+			"String": null,
+			"Number": null
+		},
 		"Miscellaneous": {
 			"PARTICLE_SPAWNER": ["PARTICLE_SPAWNER", "Particle"],
 			"GPUComputation": null,
@@ -135,7 +140,6 @@
 				"ByteBuffer.Reader",
 				"ByteBuffer.Measurer"
 			],
-			"Array": null,
 			"Enum": null
 		}
 	}

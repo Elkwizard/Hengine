@@ -14,13 +14,13 @@
 				<div class="class desc">
 					Represents a composite mathematical object which element-wise operations can be performed on.
 Many mathematical operations (plus, minus, times, over) can be performed on operables of any subclass type, allowing for convenient polymorphism.
-All immutable methods, including static methods, are available on Number.
-This means that Number can largely be considered a subclass of operable and can be used for operable-typed arguments.
+All immutable methods, including static methods, are available on <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>.
+This means that <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a> can largely be considered a subclass of operable and can be used for operable-typed arguments.
 This is an abstract superclass and should not be constructed.
 				</div>
 				
 					<div class="header">Subclasses</div>
-					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Geometry/Vector/Vector.html#class Vector">Vector</a></span>, <span class="class-name"><a href="../../Pages/Rendering/Color.html#class Color">Color</a></span></div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Geometry/Vector/Vector.html#class Vector">Vector</a></span>, <span class="class-name"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>, <span class="class-name"><a href="../../Pages/Rendering/Color.html#class Color">Color</a></span></div>
 				
 				
 				
@@ -28,7 +28,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="static Operable.modValues">
 					<div class="prop-header member">
-						<span class="prop-name">Operable.modValues</span><span class="type">String[]</span>
+						<span class="prop-name">Operable.modValues</span><span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a>[]</span>
 					</div>
 					<div class="prop desc">The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">[</span><span class="highlight-STRING">&quot;x&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&quot;y&quot;</span><span class="highlight-SYMBOL">]</span></code> for <a href="../../Pages/Geometry/Vector/Vector.html#class Vector">Vector</a>)</div>
 				</div>
@@ -40,7 +40,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="get Operable.prototype.values()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L17" target="_blank" class="function-name source-link">values</a><span class="type">Number[]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L17" target="_blank" class="function-name source-link">values</a><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>[]</span>
 			</div>
 			<div class="function desc">
 				Produces a list of all the elements of the operable.
@@ -77,7 +77,7 @@ Returns the caller.
 						<div class="param-wrapper" id="Operable.prototype.set():...elements">
 							<div class="param-name">
 								<span class="param">elements</span>
-								<span class="type">Number[]</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>[]</span>
 							</div>
 							<div class="param desc">
 								The new element values
@@ -118,7 +118,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="Operable.prototype.at()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L57" target="_blank" class="function-name source-link">at</a>(<span class="param">index</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L57" target="_blank" class="function-name source-link">at</a>(<span class="param">index</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Retrieves a single element value from the operable.
@@ -131,7 +131,7 @@ Returns the caller.
 						<div class="param-wrapper" id="Operable.prototype.at():index">
 							<div class="param-name">
 								<span class="param">index</span>
-								<span class="type">Number</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The element index
@@ -148,7 +148,7 @@ Returns the caller.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L85" target="_blank" class="function-name source-link">add</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L85" target="_blank" class="function-name source-link">sub</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L85" target="_blank" class="function-name source-link">mul</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L85" target="_blank" class="function-name source-link">div</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L85" target="_blank" class="function-name source-link">mod</a>(<span class="param">operable</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Performs an in-place element-wise arithmetic operation between the caller and another operable or Number.
+				Performs an in-place element-wise arithmetic operation between the caller and another operable or <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>.
 Returns the caller.
 			</div>
 			
@@ -159,7 +159,7 @@ Returns the caller.
 						<div class="param-wrapper" id="Operable.prototype.add():operable">
 							<div class="param-name">
 								<span class="param">operable</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The right hand operand of the operation
@@ -176,7 +176,7 @@ Returns the caller.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L109" target="_blank" class="function-name source-link">plus</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L109" target="_blank" class="function-name source-link">minus</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L109" target="_blank" class="function-name source-link">times</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L109" target="_blank" class="function-name source-link">over</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L109" target="_blank" class="function-name source-link">modBy</a>(<span class="param">operable</span>, <span class="param">destination?</span>)<span class="type">Operable</span>
 			</div>
 			<div class="function desc">
-				Performs an immutable element-wise arithmetic operation between the caller and another operable or Number.
+				Performs an immutable element-wise arithmetic operation between the caller and another operable or <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>.
 Returns the result of the operation, leaving the operands unchanged.
 A destination can be provided for the operation, in which case no new operable will be created.
 			</div>
@@ -188,7 +188,7 @@ A destination can be provided for the operation, in which case no new operable w
 						<div class="param-wrapper" id="Operable.prototype.plus():operable">
 							<div class="param-name">
 								<span class="param">operable</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The right hand operand of the operation
@@ -212,7 +212,7 @@ A destination can be provided for the operation, in which case no new operable w
 	
 		<div class="function-wrapper" id="Operable.prototype.total()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L137" target="_blank" class="function-name source-link">total</a>()<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L137" target="_blank" class="function-name source-link">total</a>()<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Computes the sum of all the elements of the operable.
@@ -263,7 +263,7 @@ If no destination is specified one will be created.
 						<div class="param-wrapper" id="Operable.prototype.toByteBuffer():buffer?">
 							<div class="param-name">
 								<span class="param">buffer</span>
-								<span class="type">Number</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The destination for the copy. The data will be written to the end of the buffer
@@ -327,7 +327,7 @@ If no destination is specified one will be created.
 						<div class="param-wrapper" id="Operable.sum():operables">
 							<div class="param-name">
 								<span class="param">operables</span>
-								<span class="type">Operable/Number[]</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>[]</span>
 							</div>
 							<div class="param desc">
 								The values to sum
@@ -354,7 +354,7 @@ If no destination is specified one will be created.
 						<div class="param-wrapper" id="Operable.avg():operables">
 							<div class="param-name">
 								<span class="param">operables</span>
-								<span class="type">Operable/Number[]</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>[]</span>
 							</div>
 							<div class="param desc">
 								The values to average
@@ -381,7 +381,7 @@ If no destination is specified one will be created.
 						<div class="param-wrapper" id="Operable.remap():value">
 							<div class="param-name">
 								<span class="param">value</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The operable to be remapped
@@ -391,7 +391,7 @@ If no destination is specified one will be created.
 						<div class="param-wrapper" id="Operable.remap():initialMin">
 							<div class="param-name">
 								<span class="param">initialMin</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The minimum of the range the value is in
@@ -401,7 +401,7 @@ If no destination is specified one will be created.
 						<div class="param-wrapper" id="Operable.remap():initialMax">
 							<div class="param-name">
 								<span class="param">initialMax</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The maximum of the range the value is in
@@ -411,7 +411,7 @@ If no destination is specified one will be created.
 						<div class="param-wrapper" id="Operable.remap():finalMin">
 							<div class="param-name">
 								<span class="param">finalMin</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The minimum of the desired range
@@ -421,7 +421,7 @@ If no destination is specified one will be created.
 						<div class="param-wrapper" id="Operable.remap():finalMax">
 							<div class="param-name">
 								<span class="param">finalMax</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The maximum of the desired range
@@ -449,7 +449,7 @@ Equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">
 						<div class="param-wrapper" id="Operable.clamp():value">
 							<div class="param-name">
 								<span class="param">value</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The value to clamp
@@ -459,7 +459,7 @@ Equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">
 						<div class="param-wrapper" id="Operable.clamp():min">
 							<div class="param-name">
 								<span class="param">min</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The lower bound for the result
@@ -469,7 +469,7 @@ Equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">
 						<div class="param-wrapper" id="Operable.clamp():max">
 							<div class="param-name">
 								<span class="param">max</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The upper bound for the result
@@ -496,7 +496,7 @@ Equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">
 						<div class="param-wrapper" id="Operable.filled():value">
 							<div class="param-name">
 								<span class="param">value</span>
-								<span class="type">Number</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The value that will be used for all elements
@@ -523,7 +523,7 @@ Equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">
 						<div class="param-wrapper" id="Operable.min():...values">
 							<div class="param-name">
 								<span class="param">values</span>
-								<span class="type">Operable/Number[]</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>[]</span>
 							</div>
 							<div class="param desc">
 								The values to compare
@@ -550,7 +550,7 @@ Equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">
 						<div class="param-wrapper" id="Operable.max():...values">
 							<div class="param-name">
 								<span class="param">values</span>
-								<span class="type">Operable/Number[]</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>[]</span>
 							</div>
 							<div class="param desc">
 								The values to compare
@@ -587,7 +587,7 @@ Equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">
 						<div class="param-wrapper" id="Operable.pow():power">
 							<div class="param-name">
 								<span class="param">power</span>
-								<span class="type">Operable/Number</span>
+								<span class="type">Operable/<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The power of the exponentiation

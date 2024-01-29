@@ -15,7 +15,7 @@
 					Represents a serializable file system that can be modified with a command-line-like interface.
 File paths in this system are similar to those used in Windows, except that they use a forward slash "/" separator, and the base drive is <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">h:</span></code> rather than <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">C:</span></code>.
 Various file types can be specified, such that complex classes can be written to the file system and retrieved.
-The classes with this behavior built in are: Number, String, Boolean, Object, <a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a>, <a href="../../Pages/Rendering/GrayMap.html#class GrayMap">GrayMap</a>, <a href="../../Pages/Rendering/Image Types/Texture.html#class Texture">Texture</a>, <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a>, <a href="../../Pages/Geometry/Vector/Vector3.html#class Vector3">Vector3</a>, <a href="../../Pages/Geometry/Vector/Vector4.html#class Vector4">Vector4</a>, and <a href="../../Pages/Rendering/Color.html#class Color">Color</a>.
+The classes with this behavior built in are: <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>, <a href="../../Pages/Built-Ins/String.html#class String">String</a>, Boolean, Object, <a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a>, <a href="../../Pages/Rendering/GrayMap.html#class GrayMap">GrayMap</a>, <a href="../../Pages/Rendering/Image Types/Texture.html#class Texture">Texture</a>, <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a>, <a href="../../Pages/Geometry/Vector/Vector3.html#class Vector3">Vector3</a>, <a href="../../Pages/Geometry/Vector/Vector4.html#class Vector4">Vector4</a>, and <a href="../../Pages/Rendering/Color.html#class Color">Color</a>.
 This class is primarily used in the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">fileSystem</span></code> property of both the global object and <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a>.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// the file type class</span><span class="highlight-KEYWORD">
 class</span><span class="highlight-SYMBOL"> </span><span class="highlight-CLASS">Triple</span><span class="highlight-SYMBOL"> {
@@ -70,7 +70,7 @@ const</span><span class="highlight-CONSTANT"> readValue</span><span class="highl
 	
 		<div class="function-wrapper" id="get FileSystem.prototype.directory()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L219" target="_blank" class="function-name source-link">directory</a><span class="type">String</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L219" target="_blank" class="function-name source-link">directory</a><span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Returns the current active directory.
@@ -104,7 +104,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 						<div class="param-wrapper" id="FileSystem.prototype.createFileType():extensions?">
 							<div class="param-name">
 								<span class="param">extensions</span>
-								<span class="type">String[]</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a>[]</span>
 							</div>
 							<div class="param desc">
 								A list of file name extensions that will have this type applied. Default is the name of the type
@@ -118,7 +118,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 	
 		<div class="function-wrapper" id="FileSystem.prototype.listFiles()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L250" target="_blank" class="function-name source-link">listFiles</a>(<span class="param">all?</span>)<span class="type">String[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L250" target="_blank" class="function-name source-link">listFiles</a>(<span class="param">all?</span>)<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a>[]</span>
 			</div>
 			<div class="function desc">
 				Returns the names of all the files in the current directory.
@@ -145,7 +145,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 	
 		<div class="function-wrapper" id="FileSystem.prototype.tree()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L262" target="_blank" class="function-name source-link">tree</a>()<span class="type">String</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L262" target="_blank" class="function-name source-link">tree</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Returns a human-readable file tree of the current directory.
@@ -168,7 +168,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 						<div class="param-wrapper" id="FileSystem.prototype.fileExists():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The file path to check
@@ -195,7 +195,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 						<div class="param-wrapper" id="FileSystem.prototype.directoryExists():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The directory path to check
@@ -223,7 +223,7 @@ Returns whether the it succeeded.
 						<div class="param-wrapper" id="FileSystem.prototype.writeFile():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The file path to write to
@@ -271,7 +271,7 @@ Returns whether it succeeded.
 						<div class="param-wrapper" id="FileSystem.prototype.deleteFile():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The file path to delete
@@ -299,7 +299,7 @@ Returns whether it succeeded.
 						<div class="param-wrapper" id="FileSystem.prototype.deleteDirectory():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The directory path to delete
@@ -327,7 +327,7 @@ Returns whether it succeeded.
 						<div class="param-wrapper" id="FileSystem.prototype.createDirectory():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path to create the directory at
@@ -355,7 +355,7 @@ Returns null if it fails.
 						<div class="param-wrapper" id="FileSystem.prototype.readFile():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The file path to read
@@ -393,7 +393,7 @@ Returns the content of the file.
 						<div class="param-wrapper" id="FileSystem.prototype.createFile():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The file to write to
@@ -417,7 +417,7 @@ Returns the content of the file.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.getFileSize()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L480" target="_blank" class="function-name source-link">getFileSize</a>(<span class="param">path</span>)<span class="type">Number</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L480" target="_blank" class="function-name source-link">getFileSize</a>(<span class="param">path</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Checks the file size of a specified file.
@@ -430,7 +430,7 @@ Returns the content of the file.
 						<div class="param-wrapper" id="FileSystem.prototype.getFileSize():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The file path to check
@@ -458,7 +458,7 @@ Returns whether it succeeded.
 						<div class="param-wrapper" id="FileSystem.prototype.changeDirectory():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path of the new directory
@@ -486,7 +486,7 @@ Returns a promise which resolves when the download occurs.
 						<div class="param-wrapper" id="FileSystem.prototype.downloadFile():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The file to download
@@ -514,7 +514,7 @@ Returns a promise which resolves when the file is uploaded.
 						<div class="param-wrapper" id="FileSystem.prototype.uploadFile():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The destination path for the file
@@ -528,7 +528,7 @@ Returns a promise which resolves when the file is uploaded.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.toString()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L565" target="_blank" class="function-name source-link">toString</a>()<span class="type">String</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L565" target="_blank" class="function-name source-link">toString</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Serializes the file system to a data string.
@@ -551,7 +551,7 @@ Returns a promise which resolves when the file is uploaded.
 						<div class="param-wrapper" id="FileSystem.fromString():string">
 							<div class="param-name">
 								<span class="param">string</span>
-								<span class="type">String</span>
+								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The data string to deserialize
