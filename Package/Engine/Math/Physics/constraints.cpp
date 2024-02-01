@@ -7,11 +7,11 @@ Constraint::Constraint(Type _type) {
 	type = _type;
 }
 
-Vector Constraint1::combineError(const Vector &positionError, const Vector &velocityError) {
+Vector Constraint1::combineError(const Vector& positionError, const Vector& velocityError) {
 	return (positionError + velocityError) * INTENSITY;
 }
 
-Constraint1::Constraint1(Type _type, RigidBody &_body, const Vector &_offset, const Vector &_point) : Constraint(_type), body(_body) {
+Constraint1::Constraint1(Type _type, RigidBody& _body, const Vector& _offset, const Vector& _point) : Constraint(_type), body(_body) {
 	offset = _offset;
 	point = _point;
 }
@@ -24,22 +24,18 @@ Vector& Constraint1::getA() {
 	double t_ax = ax * ac - ay * as;
 	double t_ay = ax * as + ay * ac;
 
-	a = body.position + Vector(t_ax, t_ay);
-
-	return a;
+	return a = body.position + Vector(t_ax, t_ay);
 }
 
 Vector& Constraint1::getB() {
-	b = point;
-
-	return b;
+	return b = point;
 }
 
 void Constraint1::add() {
 	body.constraints.push_back(this);
 }
 
-bool Constraint1::hasBody(const RigidBody &b) const {
+bool Constraint1::hasBody(const RigidBody& b) const {
 	return body.id == b.id;
 }
 
@@ -73,11 +69,11 @@ void Constraint1::remove() {
 	constraints.erase(std::find(constraints.begin(), constraints.end(), this));
 }
 
-Vector Constraint2::combineError(const Vector &positionError, const Vector &velocityError) {
+Vector Constraint2::combineError(const Vector& positionError, const Vector& velocityError) {
 	return (positionError + velocityError) * INTENSITY;
 }
 
-Constraint2::Constraint2(Type _type, RigidBody &a, RigidBody &b, const Vector &aOff, const Vector &bOff) : Constraint(_type), bodyA(a), bodyB(b) {
+Constraint2::Constraint2(Type _type, RigidBody& a, RigidBody& b, const Vector& aOff, const Vector& bOff) : Constraint(_type), bodyA(a), bodyB(b) {
 	staticA = false;
 	staticB = false;
 	offsetA = aOff;
@@ -130,7 +126,7 @@ void Constraint2::add() {
 	bodyB.constraints.push_back(this);
 }
 
-bool Constraint2::hasBody(const RigidBody &b) const {
+bool Constraint2::hasBody(const RigidBody& b) const {
 	return bodyA.id == b.id || bodyB.id == b.id;
 }
 
