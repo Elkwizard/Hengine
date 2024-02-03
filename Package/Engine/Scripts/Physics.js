@@ -11,7 +11,7 @@ physics.imports.onCollide = (engine, a, b, direction, contacts, triggerA, trigge
 	for (let i = 0; i < jsContacts.length; i++)
 		jsContacts[i] = Vector2.fromPhysicsVector(contacts.get(i));
 
-	scene.handleCollisionEvent(a, b, direction, jsContacts, triggerA, triggerB);
+	scene.handleCollisionEvent(a, b, direction, jsContacts, !!triggerA, !!triggerB);
 };
 
 physics.imports.collideRule = (a, b) => {
