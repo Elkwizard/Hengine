@@ -122,13 +122,13 @@ class SceneObject extends SceneElement {
 	 * Adds a new shape with a specified name.
 	 * If a shape with that name already exists, it will be removed.
 	 * @param String name | The name corresponding to the new shape
-	 * @param Shape shape | The shape to add
+	 * @param Circle/Polygon shape | The shape to add
 	 * @param Boolean convex? | Whether the shape is known to be convex. Default is false
 	 */
 	addShape(name, shape, convex = false) {
 		if (this.shapes.has(name)) this.removeShape(name);
 		this.shapes.set(name, shape);
-		if (shape instanceof Rect || shape instanceof Circle) convex = true;
+		convex ||= shape instanceof Rect || shape instanceof Circle;
 		this.convexShapes.set(shape, convex ? [shape] : Geometry.subdividePolygon(shape));
 		this.cacheDimensions();
 		this.scripts.run("addShape", name, shape);

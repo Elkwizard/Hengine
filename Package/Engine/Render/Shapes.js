@@ -701,6 +701,12 @@ class Rect extends Polygon {
 			this.height = max.y - min.y;
 		}
 	}
+	/**
+	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller. 
+	 * @param Number width | The width of the hypothetical rectangle from which to determine the aspect ratio 
+	 * @param Number height | The height of the hypothetical rectangle from which to determine the aspect ratio
+	 * @return Rect
+	 */
 	largestWithin(width, height) {
 		let m = height / width;
 
