@@ -612,7 +612,7 @@ class HengineLoadingStructure {
 	/**
 	 * Adds a HengineAnimationResource to the queue with a specified source.
 	 * @param String src | The path to the resource
-	 * @param { frames: Number, delay: Number, loops: Boolean } options? | An object containing `.frames`, `.delay`, and `.loops` properties that will be passed to the HengineAnimationResource constructor. These values have defaults of 1, 1, and true, respectively
+	 * @param { frames?: Number, delay?: Number, loops?: Boolean } options? | An object containing `.frames`, `.delay`, and `.loops` properties that will be passed to the HengineAnimationResource constructor. These values have defaults of 1, 1, and true, respectively
 	 * @return HengineLoadingStructure
 	 */
 	animation(src, {
@@ -625,7 +625,7 @@ class HengineLoadingStructure {
 	/**
 	 * Adds a HengineVideoResource to the queue with a specified source.
 	 * @param String src | The path to the resource
-	 * @param { loops: Boolean } options? | An object containing a `.loops` properties that will be passed to the HengineVideoResource constructor. The default value is true
+	 * @param { loops?: Boolean } options? | An object containing a `.loops` properties that will be passed to the HengineVideoResource constructor. The default value is false
 	 * @return HengineLoadingStructure
 	 */
 	video(src, {
@@ -636,7 +636,7 @@ class HengineLoadingStructure {
 	/**
 	 * Adds a HengineSoundResource to the queue with a specified source.
 	 * @param String src | The path to the resource
-	 * @param { loops: Boolean } options? | An object containing a `.loops` properties that will be passed to the HengineSoundResource constructor. The default value is true
+	 * @param { loops?: Boolean } options? | An object containing a `.loops` properties that will be passed to the HengineSoundResource constructor. The default value is false
 	 * @return HengineLoadingStructure
 	 */
 	sound(src, {

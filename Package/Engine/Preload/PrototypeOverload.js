@@ -294,6 +294,7 @@ Object.defineProperty(window, "title", {
 	 * @name toMaxed
 	 * Converts the number to a string with a specified maximum number of digits.
 	 * Trailing zeros will be discarded.
+	 * @param Number digits | The maximum number of digits past the decimal point
 	 * @return Number
 	 */
 	proto(Number.prototype, "toMaxed", function (digits) {
