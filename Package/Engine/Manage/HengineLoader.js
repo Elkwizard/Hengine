@@ -415,7 +415,7 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 
 		const native = Symbol("native");
 		
-		const clean = value => value && typeof value === "object" && value.constructor[native] ? value.pointer : value;
+		const clean = value => (value && typeof value === "object" && value.constructor[native]) ? value.pointer : value;
 		const cast = (value, type) => {
 			if (type in classes) return new classes[type](value);
 			if (type === "bool") return !!value;
