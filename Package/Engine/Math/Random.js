@@ -23,7 +23,7 @@
  */
 class Random {
 	/**
-	 * Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to 0.
+	 * Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to random numbers.
 	 * @signature
 	 * @param Number seed | The initial seed for the unstable random functions.
 	 * @param Number sampleSeed | The seed used for the stable random functions.
@@ -34,8 +34,18 @@ class Random {
 	 * @signature
 	 * @param Function distribution | The initial distribution
 	 */
-    constructor() {
-        this.constructor.apply(this, arguments); // I have no clue why this does anything at all
+    constructor(seed, sampleSeed, distribution = Random.uniform) {
+        if (typeof seed === "function") {
+            distribution = seed;
+            seed = undefined;
+        } else if (typeof sampleSeed === "function") {
+            distribution = sampleSeed;
+            sampleSeed = undefined;
+        }
+        this.reSeed();
+        if (seed !== undefined) this.seed = seed;
+        if (sampleSeed !== undefined) this.sampleSeed = sampleSeed;
+        this.distribution = distribution;
     }
     seedRand(seed) {
         return this.distribution(seed);
@@ -412,21 +422,7 @@ class Random {
     }
 };
 
-{
-    function construct(seed, sampleSeed, distribution = Random.uniform) {
-        if (typeof seed === "function") {
-            distribution = seed;
-            seed = undefined;
-        } else if (typeof sampleSeed === "function") {
-            distribution = sampleSeed;
-            sampleSeed = undefined;
-        }
-        this.reSeed();
-        if (seed !== undefined) this.seed = seed;
-        if (sampleSeed !== undefined) this.sampleSeed = sampleSeed;
-        this.distribution = distribution;
-    }
-    
+{   
     const names = Object.getOwnPropertyNames(Random.prototype);
     for (let i = 0; i < names.length; i++) {
         const name = names[i];
@@ -435,7 +431,6 @@ class Random {
         Random[name] = fn.bind(Random);
     }
 
-    // setup
-    construct.call(Random);
-    Random.prototype.constructor = construct;
+	Random.reSeed();
+	Random.distribution = Random.uniform;
 };
