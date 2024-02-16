@@ -687,21 +687,6 @@ class Rect extends Polygon {
 		];
 	}
 	/**
-	 * Sets the vertices of the rectangle.
-	 * @param Vector2[] newVertices | The new vertices.
-	 * These must be in the correct shape and order, where the first element is the upper-left corner and the vertices are ordered clockwise.
-	 */
-	set vertices(a) {
-		if (a.length === 4) {
-			let min = a[0];
-			let max = a[2];
-			this.x = min.x;
-			this.y = min.y;
-			this.width = max.x - min.x;
-			this.height = max.y - min.y;
-		}
-	}
-	/**
 	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller. 
 	 * @param Number width | The width of the hypothetical rectangle from which to determine the aspect ratio 
 	 * @param Number height | The height of the hypothetical rectangle from which to determine the aspect ratio
