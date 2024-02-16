@@ -127,7 +127,8 @@
 		"Built-Ins": {
 			"Array": null,
 			"String": null,
-			"Number": null
+			"Number": null,
+			"Storage": null
 		},
 		"Miscellaneous": {
 			"PARTICLE_SPAWNER": ["PARTICLE_SPAWNER", "Particle"],

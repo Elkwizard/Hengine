@@ -312,19 +312,19 @@ Object.defineProperty(window, "title", {
 	proto(String.prototype, "capitalize", function () {
 		return this[0].toUpperCase() + this.slice(1);
 	});
+	/**
+	 * @name cut
+	 * Returns the caller split along the first instance of a substring.
+	 * If the substring is not found, it will return an array containing the caller as the first element and the empty string as the second.
+	 * @return String[2]
+	 */
 	proto(String.prototype, "cut", function (char) {
 		const inx = this.indexOf(char);
 		if (inx === -1) return [this, ""];
 		return [
 			this.slice(0, inx),
-			this.slice(inx + 1)
+			this.slice(inx + char.length)
 		];
-	});
-	proto(String.prototype, "pad", function (size) {
-		return " ".repeat(size - this.length) + this;
-	});
-	proto(String.prototype, "padRight", function (size) {
-		return this + " ".repeat(size - this.length);
 	});
 	/**
 	 * @name indent
@@ -467,8 +467,16 @@ ${contents.join(",\n").indent()}
 
 	Number.empty = 0;
 
-	// overload localStorage.clear()
-	const localStorageClear = localStorage.clear.bind(localStorage);
+	/**
+	 * @name class Storage
+	 * The storage class has some additional quality-of-life methods in the Hengine designed to promote safe usage.
+	 */
+	const defaultStorageClear = Storage.prototype.clear;
+	/**
+	 * @name downloadBackup
+	 * Downloads a JSON backup of the storage object.
+	 * @param file? | The base name of the backup file. The default is `"backup"`
+	 */
 	proto(Storage.prototype, "downloadBackup", function (file = "backup") {
 		const a = document.createElement("a");
 		const uri = `data:text/json;charset=UTF-8,${encodeURIComponent(JSON.stringify(this))}`;
@@ -476,12 +484,27 @@ ${contents.join(",\n").indent()}
 		a.setAttribute("download", `${file} (localStorage backup on ${new Date().toDateString()}).json`);
 		a.click();
 	});
+	/**
+	 * @name clear
+	 * Clears the storage object after asking permission from the user.
+	 * If permission is given, a backup will be downloaded before the storage object is cleared.
+	 * Returns whether or not the clearing succeeded.
+	 * @param file? | The base name of the backup file. The default is `"backup"`
+	 * @return Boolean
+	 */
 	proto(Storage.prototype, "clear", function (file) {
-		if (!confirm("Do you truly, absolutely seriously, accepting ALL of the consequences, want to clear localStorage?")) return false;
+		if (!confirm(`Do you truly, absolutely seriously, accepting ALL of the consequences, want to clear localStorage?`))
+			return false;
+		
 		this.downloadBackup(file);
-		localStorageClear();
+		defaultStorageClear.call(this);
 		return true;
 	});
+	/**
+	 * @name uploadBackup
+	 * Replaces the current content of the storage object with a user-selected JSON backup.
+	 * Before the file dialog is opened, this will call `.clear()`, which will ask permission and download a backup. If permission is not given, the entire upload operation will be canceled.
+	 */
 	proto(Storage.prototype, "uploadBackup", function () {
 		if (!this.clear()) return;
 
