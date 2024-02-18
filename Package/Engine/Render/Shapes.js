@@ -686,6 +686,7 @@ class Rect extends Polygon {
 			new Vector2(this.x, this.y + this.height)
 		];
 	}
+	set vertices(a) { } // this does nothing and exists to make the Polygon constructor not crash
 	/**
 	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller. 
 	 * @param Number width | The width of the hypothetical rectangle from which to determine the aspect ratio 
