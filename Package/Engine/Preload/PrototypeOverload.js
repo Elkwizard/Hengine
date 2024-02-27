@@ -316,6 +316,7 @@ Object.defineProperty(window, "title", {
 	 * @name cut
 	 * Returns the caller split along the first instance of a substring.
 	 * If the substring is not found, it will return an array containing the caller as the first element and the empty string as the second.
+	 * @param String boundary | The substring to split on
 	 * @return String[2]
 	 */
 	proto(String.prototype, "cut", function (char) {
