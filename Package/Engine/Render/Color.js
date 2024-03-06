@@ -416,7 +416,6 @@ Color.CYAN = new Color(0, 255, 255, 1);
 Color.GRAY = new Color(128, 128, 128, 1);
 Color.DARK_GRAY = new Color("#222");
 Color.LIGHT_GRAY = new Color("#ccc");
-Color.RAZZMATAZZ = new Color("#e3256b");
 Color.CREAM = new Color("#fff185");
 Color.LIME = new Color(0, 255, 0, 1);
 Color.BROWN = new Color("#7d5314");
