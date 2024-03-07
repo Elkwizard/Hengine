@@ -427,3 +427,4 @@ Color.MAX = new Color("#161616");
 Color.MOLLY = new Color("#8b8");
 Color.SAND = new Color("#d6c692");
 Color.LAVENDER = new Color("#b36cb8");
+Color.PERIWINKLE = new Color("#78e");
