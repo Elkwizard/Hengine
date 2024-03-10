@@ -32,6 +32,14 @@ Bodies PhysicsEngine::getBodies() const {
 	return result;
 }
 
+Bodies PhysicsEngine::getSimulatedBodies() const {
+	Bodies result { };
+	for (const auto& entry : bodyMap)
+		if (entry.second->simulated)
+			result.push_back(entry.second);
+	return result;
+}
+
 Constraints PhysicsEngine::getConstraints() const {
 	Constraints result { };
 	for (const auto& entry : constraintMap)
@@ -148,7 +156,7 @@ void PhysicsEngine::collisions(CollisionPairs& collisionPairs) {
 }
 
 PhysicsEngine::CollisionPairs PhysicsEngine::createGrid(Bodies& dynBodies) {
-	Bodies bodies = getBodies();
+	Bodies bodies = getSimulatedBodies();
 
 	double cellSize = 50.0;
 	if (bodies.size()) {
@@ -190,7 +198,7 @@ PhysicsEngine::CollisionPairs PhysicsEngine::createGrid(Bodies& dynBodies) {
 
 void PhysicsEngine::run() {
 	Bodies dynBodies { };
-	for (RigidBody* body : getBodies())
+	for (RigidBody* body : getSimulatedBodies())
 		if (body->dynamic) dynBodies.push_back(body);
 	
 	std::sort(dynBodies.begin(), dynBodies.end(), [&](RigidBody* a, RigidBody* b) {

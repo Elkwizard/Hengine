@@ -31,6 +31,7 @@ class PhysicsEngine {
 		void resolve(std::unique_ptr<Collision>& col);
 		void collisions(CollisionPairs& collisionPairs);
 		CollisionPairs createGrid(Bodies& dynBodies);
+		Bodies getSimulatedBodies() const;
 
 	public:
 		int step;
