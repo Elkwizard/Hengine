@@ -463,6 +463,7 @@ ${contents.join(",\n").indent()}
 	proto(Number.prototype, "minus", function (n) { return this - n; });
 	proto(Number.prototype, "times", function (n) { return this * n; });
 	proto(Number.prototype, "over", function (n) { return this / n; });
+	proto(Number.prototype, "mod", function (n) { return this % n; });
 	proto(Number.prototype, "get", function () { return this; });
 	proto(Number.prototype, "equals", function (n) { return this === n || Math.abs(this - n) < Operable.EPSILON; });
 
