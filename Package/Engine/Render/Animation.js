@@ -47,7 +47,7 @@ class Animation extends ImageType {
 			this.frameCount = this.frames.length;
 			this.delay = frames;
 			this.loops = delay;
-			this.onEnd = loops ?? (() => null);
+			this.onEnd = loops || (() => null);
 		}
 		this.totalTime = this.frames.length * this.delay;
 		this.forceLoad();
