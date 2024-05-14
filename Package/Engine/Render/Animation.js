@@ -18,6 +18,13 @@
  * @prop () => void onEnd | A function to be called when the animation completes (this will be called even if the animation loops)
  */
 class Animation extends ImageType {
+	/**
+	 * Creates a new animation from a given set of frames.
+	 * @param ImageType[] frames | The frames of the animation
+	 * @param Number delay | The delay (in frames) between each frame
+	 * @param boolean loops | Whether or not the animation loops
+	 * @param () => void onEnd? | A function to be called when the animation completes. Default is a no-op
+	 */
 	constructor(src = "", frames = 1, delay = 0, loops = false, onEnd = () => null) {
 		super(1, 1);
 		this.stopped = false;
@@ -40,7 +47,7 @@ class Animation extends ImageType {
 			this.frameCount = this.frames.length;
 			this.delay = frames;
 			this.loops = delay;
-			this.onEnd = loops || function () { };
+			this.onEnd = loops ?? (() => null);
 		}
 		this.totalTime = this.frames.length * this.delay;
 		this.forceLoad();

@@ -81,9 +81,66 @@ For the purposes of the animation, a frame elapses each time the animation is dr
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
+		<div class="function-wrapper" id="Animation.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L28" target="_blank" class="function-name source-link">constructor</a>(<span class="param">frames</span>, <span class="param">delay</span>, <span class="param">loops</span>, <span class="param">onEnd?</span>)
+			</div>
+			<div class="function desc">
+				Creates a new animation from a given set of frames.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Animation.prototype.constructor():frames">
+							<div class="param-name">
+								<span class="param">frames</span>
+								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>[]</span>
+							</div>
+							<div class="param desc">
+								The frames of the animation
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Animation.prototype.constructor():delay">
+							<div class="param-name">
+								<span class="param">delay</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The delay (in frames) between each frame
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Animation.prototype.constructor():loops">
+							<div class="param-name">
+								<span class="param">loops</span>
+								<span class="type">boolean</span>
+							</div>
+							<div class="param desc">
+								Whether or not the animation loops
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Animation.prototype.constructor():onEnd?">
+							<div class="param-name">
+								<span class="param">onEnd</span>
+								<span class="type">() => void</span>
+							</div>
+							<div class="param desc">
+								A function to be called when the animation completes. Default is a no-op
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="get Animation.prototype.done()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L65" target="_blank" class="function-name source-link">done</a><span class="type">Boolean</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L72" target="_blank" class="function-name source-link">done</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether or not the animation has completed.
@@ -94,7 +151,7 @@ If the animation loops, this will always return false.
 	
 		<div class="function-wrapper" id="Animation.prototype.get()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L73" target="_blank" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Animation</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L80" target="_blank" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Animation</span>
 			</div>
 			<div class="function desc">
 				Creates a copy of the animation and optionally stores it in a provided destination.
@@ -121,7 +178,7 @@ If the animation loops, this will always return false.
 	
 		<div class="function-wrapper" id="Animation.prototype.advance()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L82" target="_blank" class="function-name source-link">advance</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L89" target="_blank" class="function-name source-link">advance</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Advances the animation by one update cycle.
@@ -131,7 +188,7 @@ If the animation loops, this will always return false.
 	
 		<div class="function-wrapper" id="Animation.prototype.stop()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L88" target="_blank" class="function-name source-link">stop</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L95" target="_blank" class="function-name source-link">stop</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Pauses playback of the animation.
@@ -141,7 +198,7 @@ If the animation loops, this will always return false.
 	
 		<div class="function-wrapper" id="Animation.prototype.start()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L94" target="_blank" class="function-name source-link">start</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L101" target="_blank" class="function-name source-link">start</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Resumes playback of the animation.
@@ -151,7 +208,7 @@ If the animation loops, this will always return false.
 	
 		<div class="function-wrapper" id="Animation.prototype.reset()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L100" target="_blank" class="function-name source-link">reset</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L107" target="_blank" class="function-name source-link">reset</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Restarts the animation.
@@ -161,7 +218,7 @@ If the animation loops, this will always return false.
 	
 		<div class="function-wrapper" id="Animation.fromImage()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L118" target="_blank" class="function-name source-link">Animation.fromImage</a>(<span class="param">spritesheet</span>, <span class="param">imgWidth</span>, <span class="param">imgHeight</span>, <span class="param">delay</span>, <span class="param">loops?</span>, <span class="param">onEnd?</span>)<span class="type">Animation</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L125" target="_blank" class="function-name source-link">Animation.fromImage</a>(<span class="param">spritesheet</span>, <span class="param">imgWidth</span>, <span class="param">imgHeight</span>, <span class="param">delay</span>, <span class="param">loops?</span>, <span class="param">onEnd?</span>)<span class="type">Animation</span>
 			</div>
 			<div class="function desc">
 				Creates a new animation based on a horizontal sprite sheet containing the frames directly next to each other.
