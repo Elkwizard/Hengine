@@ -366,7 +366,7 @@ class MouseHandler extends InputHandler {
 		document.addEventListener("contextmenu", event => event.preventDefault());
 		document.addEventListener("wheel", event => {
 			event.preventDefault();
-			this.wheelDelta += event.deltaY * [0, 16, innerHeight][event.deltaMode];
+			this.wheelDelta += event.deltaY * [1, 16, innerHeight][event.deltaMode];
 		}, { passive: false });
 	}
 	getWorldPosition(point) {
