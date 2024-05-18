@@ -348,11 +348,9 @@ class MouseHandler extends InputHandler {
 			if (pos) this.screen = pos;
 		};
 
-		function ifPrimary(handle) {
-			return event => {
-				if (event.isPrimary) handle(event);
-			};
-		}
+		const ifPrimary = handle => event => {
+			if (event.isPrimary) handle(event);
+		};
 
 		document.addEventListener("mousedown", handleDown);
 		document.addEventListener("mousemove", handleMove);
