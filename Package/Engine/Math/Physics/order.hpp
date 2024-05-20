@@ -32,6 +32,6 @@ class OrderGenerator {
 		template <typename T>
 		void shuffle(std::vector<T>& arr) {
 			for (int i = 0; i < arr.size(); i++)
-				std::swap(arr[next(arr.size())], arr[0]);
+				std::swap(arr[next(arr.size())], arr[i]);
 		}
 };
