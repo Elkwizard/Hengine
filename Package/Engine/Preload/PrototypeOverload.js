@@ -477,7 +477,7 @@ ${contents.join(",\n").indent()}
 	/**
 	 * @name downloadBackup
 	 * Downloads a JSON backup of the storage object.
-	 * @param file? | The base name of the backup file. The default is `"backup"`
+	 * @param String file? | The base name of the backup file. The default is `"backup"`
 	 */
 	proto(Storage.prototype, "downloadBackup", function (file = "backup") {
 		const a = document.createElement("a");
@@ -491,7 +491,7 @@ ${contents.join(",\n").indent()}
 	 * Clears the storage object after asking permission from the user.
 	 * If permission is given, a backup will be downloaded before the storage object is cleared.
 	 * Returns whether or not the clearing succeeded.
-	 * @param file? | The base name of the backup file. The default is `"backup"`
+	 * @param String file? | The base name of the backup file. The default is `"backup"`
 	 * @return Boolean
 	 */
 	proto(Storage.prototype, "clear", function (file) {
