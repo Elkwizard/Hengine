@@ -102,7 +102,7 @@ class ImageType {
 		if (prevWidth !== width || prevHeight !== height) {
 			this._width = width;
 			this._height = height;
-			if (notify) this.onresize();
+			if (notify) this.onresize(width, height);
 		}
 	}
 	/**
