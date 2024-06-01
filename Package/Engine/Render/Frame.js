@@ -37,7 +37,6 @@ function new_OffscreenCanvas(width, height) {
  * @abstract
  * @prop Number width | The natural rendered width of the image
  * @prop Number height | The natural rendered height of the image
- * @prop Number pixelRatio | The ratio of the number of pixels in a row to the natural width of the image. An image with a pixelRatio of 2, rendered at twice its natural size, will retain clarity 
  */
 class ImageType {
 	constructor(width = 1, height = 1, pixelRatio = null) {
@@ -75,12 +74,24 @@ class ImageType {
 	get height() {
 		return this._height;
 	}
+	/**
+	 * Returns the pixel density of the image, measured as the ratio of the number of pixels in a row of the image to the natural width of the image.
+	 * @return Number
+	 */
 	get pixelRatio() {
 		return this._pixelRatio ?? (this.makeImage().width / this.width);
 	}
+	/**
+	 * Returns the width of the image in actual pixels, accounting for the pixel density of the image.
+	 * @return Number
+	 */
 	get pixelWidth() {
 		return ImageType.roundDimension(this.width * this.pixelRatio);
 	}
+	/**
+	 * Returns the height of the image in actual pixels, accounting for the pixel density of the image.
+	 * @return Number
+	 */
 	get pixelHeight() {
 		return ImageType.roundDimension(this.height * this.pixelRatio);
 	}
