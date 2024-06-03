@@ -219,7 +219,7 @@ class IntervalManager {
 		this.engine.touches.afterUpdate();
 		this.engine.renderer.afterFrame();
 		
-		this.frameCount++;
+		if (!this.paused) this.frameCount++;
 	}
 	/**
 	 * Creates a new GraphPlane.
