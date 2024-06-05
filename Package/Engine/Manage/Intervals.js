@@ -2,11 +2,11 @@
  * A wrapper for operations that happen over time or after a time.
  * These can generally be created by methods of IntervalManager.
  * ```js
- * const transitionFunction = intervals.transition(t => {
+ * const transitionDone = intervals.transition(t => {
  * 	console.log("Progress: " + t);
  * }, 5);
  * 
- * transitionFunction.done.then(() => {
+ * transitionDone.then(() => {
  * 	console.log("The transition has completed");
  * });
  * 
@@ -255,10 +255,9 @@ class IntervalManager {
 	 */
 	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
 		this.functions.push(new ContinuousFunction(fn, type));
-		return this.functions.last.promise;
 	}
 	/**
-	 * Creates a new TransitionFunction. Returns its `.done` promise.
+	 * Creates a new TransitionFunction. Returns a promise that resolves when the transition completes.
 	 * @param Number => void fn | The function to execute over the duration. This function will be passed the completion proportion
 	 * @param Number frames | The duration of the transition
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
@@ -286,7 +285,8 @@ class IntervalManager {
 		}, time, type);
 	}
 	/**
-	 * Creates a new DelayedFunction. Returns its `.done` promise.
+	 * Creates a new DelayedFunction.
+	 * Returns a promise that resolves when the function executes.
 	 * @param () => void fn | The function to execute after the delay
 	 * @param Number frames | The length of the delay
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
@@ -297,7 +297,8 @@ class IntervalManager {
 		return this.functions.last.promise;
 	}
 	/**
-	 * Creates a new WaitUntilFunction. Returns its `.done` promise.
+	 * Creates a new WaitUntilFunction.
+	 * Returns a promise that resolves when the function executes.
 	 * @param () => void fn | The function to execute when the event occurs
 	 * @param () => Boolean event | The event function. When this function returns true, the function will execute
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
@@ -311,9 +312,8 @@ class IntervalManager {
 		let remaining = [];
 		for (let i = 0; i < this.functions.length; i++) {
 			const fn = this.functions[i];
-			if (fn.type === type) {
+			if (fn.type === type)
 				fn.increment();
-			}
 			if (fn.done) fn.resolve();
 			else remaining.push(fn);
 		}
