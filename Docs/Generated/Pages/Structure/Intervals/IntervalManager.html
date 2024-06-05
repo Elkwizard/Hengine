@@ -201,10 +201,10 @@ This class is available via the <code class=" highlight-BACKGROUND"><span class=
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.transition()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L267" target="_blank" class="function-name source-link">transition</a>(<span class="param">fn</span>, <span class="param">frames</span>, <span class="param">type</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L266" target="_blank" class="function-name source-link">transition</a>(<span class="param">fn</span>, <span class="param">frames</span>, <span class="param">type</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
-				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#class TransitionFunction">TransitionFunction</a>. Returns its <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">done</span></code> promise.
+				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#class TransitionFunction">TransitionFunction</a>. Returns a promise that resolves when the transition completes.
 			</div>
 			
 				<div class="function-signature">
@@ -248,7 +248,7 @@ This class is available via the <code class=" highlight-BACKGROUND"><span class=
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.animate()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L282" target="_blank" class="function-name source-link">animate</a>(<span class="param">object</span>, <span class="param">property</span>, <span class="param">finalValue</span>, <span class="param">duration</span>, <span class="param">curve?</span>, <span class="param">type?</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L281" target="_blank" class="function-name source-link">animate</a>(<span class="param">object</span>, <span class="param">property</span>, <span class="param">finalValue</span>, <span class="param">duration</span>, <span class="param">curve?</span>, <span class="param">type?</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Animates the value of a <a href="../../../Pages/Superclasses/Operable.html#class Operable">Operable</a> or <a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a> property from its current value to another over a specified interval.
@@ -329,7 +329,8 @@ Returns a promise that resolves when the animation completes.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L295" target="_blank" class="function-name source-link">delay</a>(<span class="param">fn</span>, <span class="param">frames</span>, <span class="param">type</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
-				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#class DelayedFunction">DelayedFunction</a>. Returns its <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">done</span></code> promise.
+				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#class DelayedFunction">DelayedFunction</a>.
+Returns a promise that resolves when the function executes.
 			</div>
 			
 				<div class="function-signature">
@@ -373,10 +374,11 @@ Returns a promise that resolves when the animation completes.
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.waitUntil()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L306" target="_blank" class="function-name source-link">waitUntil</a>(<span class="param">fn</span>, <span class="param">event</span>, <span class="param">type</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L307" target="_blank" class="function-name source-link">waitUntil</a>(<span class="param">fn</span>, <span class="param">event</span>, <span class="param">type</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
-				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#class WaitUntilFunction">WaitUntilFunction</a>. Returns its <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">done</span></code> promise.
+				Creates a new <a href="../../../Pages/Structure/Intervals/IntervalFunction.html#class WaitUntilFunction">WaitUntilFunction</a>.
+Returns a promise that resolves when the function executes.
 			</div>
 			
 				<div class="function-signature">
