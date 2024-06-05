@@ -172,7 +172,7 @@ class Random {
 	 * @signature
 	 * @param Iterable values | The values to choose from
 	 * @param Number[] percentages | The weight of each value. These can be multiplied by any constant factor
-	 * @returns 
+	 * @return Any
 	 */
     choice(arr, percentages = null) {
         if (!Array.isArray(arr)) arr = Array.from(arr);

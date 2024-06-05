@@ -566,7 +566,7 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 	 * The output parameter is returned.
 	 * @param Object[] input | The data to use as the input to the computation. If this is omitted, the data already in the input buffer will be used
 	 * @param Object[] output | The location to place the output data. If this is omitted, the result will be placed into the input buffer. This parameter can only be omitted when the GLSL input and output structs are the same
-	 * @returns Object[]/void
+	 * @return Object[]/void
 	 */
 	compute(input, output = input) {
 		if (input !== undefined)
