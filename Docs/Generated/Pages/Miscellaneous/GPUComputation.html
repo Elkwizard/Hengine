@@ -334,7 +334,7 @@ InputStruct </span><span class="highlight-FUNCTION">getProblem</span><span class
 	
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.writeInput()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L468" target="_blank" class="function-name source-link">writeInput</a>(<span class="param">input</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L500" target="_blank" class="function-name source-link">writeInput</a>(<span class="param">input</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Writes an array of objects into the input buffer of the computation.
@@ -360,9 +360,37 @@ The objects' structure must correspond to the structure of the GLSL input struct
 			
 		</div>
 	
+		<div class="function-wrapper" id="GPUComputation.Structured.prototype.appendInput()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L518" target="_blank" class="function-name source-link">appendInput</a>(<span class="param">input</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Appends an array of objects after the existing input data.
+The objects' structure must correspond to the structure the GLSL input struct.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.appendInput():input">
+							<div class="param-name">
+								<span class="param">input</span>
+								<span class="type">Object[]</span>
+							</div>
+							<div class="param desc">
+								The objects to read the data from
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.readOutput()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L518" target="_blank" class="function-name source-link">readOutput</a>(<span class="param">output</span>)<span class="type">Object[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L568" target="_blank" class="function-name source-link">readOutput</a>(<span class="param">output</span>)<span class="type">Object[]</span>
 			</div>
 			<div class="function desc">
 				Reads the output buffer into an array of objects, where the structure of the objects corresponds to the structure of the GLSL output struct.
@@ -390,7 +418,7 @@ Returns the passed array.
 	
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.compute()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L571" target="_blank" class="function-name source-link">compute</a>(<span class="param">input</span>, <span class="param">output</span>)<span class="type">Object[]/void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L590" target="_blank" class="function-name source-link">compute</a>(<span class="param">input</span>, <span class="param">output</span>)<span class="type">Object[]/void</span>
 			</div>
 			<div class="function desc">
 				Runs the computation on a given input array and writes the result to a given output array.

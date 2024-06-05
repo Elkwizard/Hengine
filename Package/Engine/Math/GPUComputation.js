@@ -460,6 +460,38 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 		super.compile();
 		this.writeFunction = this.readFunction = null;
 	}
+	guaranteeWrite(input) {
+		if (this.writeFunction) return;
+			
+		const types = {
+			float: [["float32", ""]],
+			int: [["int32", ""]],
+			bool: [["bool", ""]]
+		};
+
+		for (const type in GPUComputation.Structured.VECTORS) {
+			const vecName = GPUComputation.Structured.VECTORS[type];
+			const elType = types[type][0][0];
+			for (let n = 2; n <= 4; n++) {
+				const name = vecName + n;
+				const inxs = Array.dim(n).map((_, i) => i);
+				types[name] = [
+					inxs.map(i => [elType, `.${Vector4.modValues[i]}`]),
+					inxs.map(i => [elType, `.${Color.modValues[i]}${i === 3 ? "" : " / 255"}`])
+				];
+			}
+		}
+
+		const source = this.inputFields.flatMap(({ name, type }) => {
+			let pieces = types[type];
+			const value = input[0][name];
+			if (typeof value === "object")
+				pieces = value instanceof Color ? pieces[1] : pieces[0];
+			return pieces.map(([write, suffix]) => `write.${write}(obj.${name}${suffix});`);
+		}).join("\n");
+
+		this.writeFunction = new Function("obj", "write", source);
+	}
 	/**
 	 * Writes an array of objects into the input buffer of the computation.
 	 * The objects' structure must correspond to the structure of the GLSL input struct.
@@ -467,39 +499,8 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 	 */
 	writeInput(input) {
 		this.problems = input.length;
-		
 		if (!this.problems) return;
-		
-		if (!this.writeFunction) {
-			const types = {
-				float: [["float32", ""]],
-				int: [["int32", ""]],
-				bool: [["bool", ""]]
-			};
-
-			for (const type in GPUComputation.Structured.VECTORS) {
-				const vecName = GPUComputation.Structured.VECTORS[type];
-				const elType = types[type][0][0];
-				for (let n = 2; n <= 4; n++) {
-					const name = vecName + n;
-					const inxs = Array.dim(n).map((_, i) => i);
-					types[name] = [
-						inxs.map(i => [elType, `.${Vector4.modValues[i]}`]),
-						inxs.map(i => [elType, `.${Color.modValues[i]}${i === 3 ? "" : " / 255"}`])
-					];
-				}
-			}
-
-			const source = this.inputFields.flatMap(({ name, type }) => {
-				let pieces = types[type];
-				const value = input[0][name];
-				if (typeof value === "object")
-					pieces = value instanceof Color ? pieces[1] : pieces[0];
-				return pieces.map(([write, suffix]) => `write.${write}(obj.${name}${suffix});`);
-			}).join("\n");
-
-			this.writeFunction = new Function("obj", "write", source);
-		}
+		this.guaranteeWrite(input);
 
 		const { writeFunction } = this;
 		const { write } = this.inputBuffer;
@@ -510,6 +511,55 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 			writeFunction(input[i], write);
 	}
 	/**
+	 * Appends an array of objects after the existing input data.
+	 * The objects' structure must correspond to the structure the GLSL input struct.
+	 * @param Object[] input | The objects to read the data from
+	 */
+	appendInput(input) {
+		this.guaranteeWrite(input);
+		
+		const { writeFunction } = this;
+		const { write } = this.inputBuffer;
+		const { length } = input;
+
+		this.inputBuffer.pointer = this.problems * this.inputBytes;
+		for (let i = 0; i < length; i++)
+			writeFunction(input[i], write);
+		this.problems += length;
+	}
+	guaranteeRead(output) {
+		if (this.readFunction) return;
+
+		const types = {
+			float: [["", "float32", ""]],
+			int: [["", "int32", ""]],
+			bool: [["", "bool", ""]]
+		};
+
+		for (const type in GPUComputation.Structured.VECTORS) {
+			const vecName = GPUComputation.Structured.VECTORS[type];
+			const elType = types[type][0][1];
+			for (let n = 2; n <= 4; n++) {
+				const name = vecName + n;
+				const inxs = Array.dim(n).map((_, i) => i);
+				types[name] = [
+					inxs.map(i => [`.${Vector4.modValues[i]}`, elType, ""]),
+					inxs.map(i => [`.${Color.modValues[i]}`, elType, i === 3 ? "" : " * 255"])
+				];
+			}
+		}
+
+		const source = this.outputFields.flatMap(({ name, type }) => {
+			let pieces = types[type];
+			const value = output[0][name];
+			if (typeof value === "object")
+				pieces = value instanceof Color ? pieces[1] : pieces[0];
+			return pieces.map(([prop, read, suffix]) => `obj.${name}${prop} = read.${read}()${suffix};`);
+		}).join("\n");
+
+		this.readFunction = new Function("obj", "read", source);
+	}
+	/**
 	 * Reads the output buffer into an array of objects, where the structure of the objects corresponds to the structure of the GLSL output struct.
 	 * Returns the passed array.
 	 * @param Object[] output | The objects to write the output to
@@ -517,39 +567,8 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 	 */
 	readOutput(output) {
 		this.problems = output.length;
-
 		if (!output.length) return;
-
-		if (!this.readFunction) {
-			const types = {
-				float: [["", "float32", ""]],
-				int: [["", "int32", ""]],
-				bool: [["", "bool", ""]]
-			};
-
-			for (const type in GPUComputation.Structured.VECTORS) {
-				const vecName = GPUComputation.Structured.VECTORS[type];
-				const elType = types[type][0][1];
-				for (let n = 2; n <= 4; n++) {
-					const name = vecName + n;
-					const inxs = Array.dim(n).map((_, i) => i);
-					types[name] = [
-						inxs.map(i => [`.${Vector4.modValues[i]}`, elType, ""]),
-						inxs.map(i => [`.${Color.modValues[i]}`, elType, i === 3 ? "" : " * 255"])
-					];
-				}
-			}
-
-			const source = this.outputFields.flatMap(({ name, type }) => {
-				let pieces = types[type];
-				const value = output[0][name];
-				if (typeof value === "object")
-					pieces = value instanceof Color ? pieces[1] : pieces[0];
-				return pieces.map(([prop, read, suffix]) => `obj.${name}${prop} = read.${read}()${suffix};`);
-			}).join("\n");
-
-			this.readFunction = new Function("obj", "read", source);
-		}
+		this.guaranteeRead(output);
 
 		const { readFunction } = this;
 		const { read } = this.outputBuffer;
