@@ -1,5 +1,6 @@
 /**
  * Represents an operation that can be executed in parallel with itself on the GPU.
+ * The operation's inputs and outputs are represented in as fixed-length arrays of bytes.
  * The main entry point is:
  * ```glsl
  * int[OUTPUT_BYTES] compute(int[INPUT_BYTES] inputs) {
@@ -15,16 +16,14 @@
  * // returns the input data for a specific operation in the batch
  * int[INPUT_BYTES] getProblem(int index);
  * ```
- * @prop Number problems | The amount of operations to be evaluated in each batch
  * @prop String glsl | The source code of the operation. See the GLSL API
  */
 class GPUComputation {
 	/**
 	 * Creates a new GPUComputation.
-	 * @param Number problems | The amount of operations in each batch
 	 * @param String glsl | The source code of the operation
 	 */
-	constructor(problems, glsl) {
+	constructor(glsl) {
 		{ // build context
 			if (!window.WebGL2RenderingContext) throw new ReferenceError("Your browser doesn't support GPUComputations");
 
@@ -65,30 +64,117 @@ class GPUComputation {
 			this.TYPE = gl.UNSIGNED_INT;
 		};
 
-		this._problems = problems;
-		this._glsl = glsl;
-
-		this.compile();
+		this._capacity = 1;
+		this.glsl = glsl;
 	}
-	set problems(a) {
-		this._problems = a;
-		this.compile();
+	set capacity(a) {
+		this._capacity = a;
+		this.setupTextures();
 	}
-	get problems() {
-		return this._problems;
+	get capacity() {
+		return this._capacity;
 	}
 	set glsl(a) {
 		this._glsl = a;
+		this.processGLSL();
 		this.compile();
 	}
 	get glsl() {
 		return this._glsl;
 	}
-	compile() {
+	processGLSL() {
 		this._glsl = GLSLPrecompiler.compile(this.glsl);
-		
-		const { ELEMENTS_PER_PIXEL, BYTES_PER_PIXEL, BYTES_PER_CHANNEL, LITTLE_ENDIAN } = GPUComputation;
+	}
+	setupTextures() {
+		const { ELEMENTS_PER_PIXEL, BYTES_PER_PIXEL } = GPUComputation;
 		const { gl, FORMAT, INTERNAL_FORMAT, TYPE } = this;
+		
+		if (this.inputTexture) { // clean up
+			this.inputTexture.delete();
+			for (let i = 0; i < this.outputTextures.length; i++)
+				this.outputTextures[i].delete();
+			gl.deleteFramebuffer(this.framebuffer);
+		}
+
+		this.framebuffer = gl.createFramebuffer();
+
+		const getSize = count => Math.ceil(Math.sqrt(count));
+
+		const createTexture = (count, index = 0) => {
+			const size = getSize(count);
+			const data = new Uint32Array(size * size * ELEMENTS_PER_PIXEL);
+			const data8 = new Uint8Array(data.buffer);
+			const texture = gl.createTexture();
+
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			gl.texImage2D(gl.TEXTURE_2D, 0, INTERNAL_FORMAT, size, size, 0, FORMAT, TYPE, null);
+
+			return {
+				size, texture, data, data8, index,
+				set: (buffer, byteLength) => {
+					const pxLength = Math.floor(byteLength / BYTES_PER_PIXEL);
+					const completeRows = Math.floor(pxLength / size);
+					const lastRowWidth = pxLength % size;
+					const pxLeft = byteLength % BYTES_PER_PIXEL;
+
+					gl.activeTexture(gl.TEXTURE0);
+					gl.bindTexture(gl.TEXTURE_2D, texture);
+					
+					let nextX = 0;
+					let nextY = completeRows;
+
+					const completeRowsBuffer = new Uint32Array(buffer, 0, completeRows * size * ELEMENTS_PER_PIXEL);
+					gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, size, completeRows, FORMAT, TYPE, completeRowsBuffer);
+
+					if (lastRowWidth) {
+						const lastRowBuffer = new Uint32Array(buffer, completeRows * size * BYTES_PER_PIXEL, lastRowWidth * ELEMENTS_PER_PIXEL);
+						gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, completeRows, lastRowWidth, 1, FORMAT, TYPE, lastRowBuffer);
+						nextX = lastRowWidth;
+					}
+
+					if (pxLeft) {
+						const lastPixelBuffer8 = new Uint8Array(buffer, pxLength * BYTES_PER_PIXEL, pxLeft);
+						const lastPixelBuffer = new Uint32Array(ELEMENTS_PER_PIXEL);
+						const lastPixelBufferView8 = new Uint8Array(lastPixelBuffer.buffer);
+						lastPixelBufferView8.set(lastPixelBuffer8);
+						gl.texSubImage2D(gl.TEXTURE_2D, 0, nextX, nextY, 1, 1, FORMAT, TYPE, lastPixelBuffer);
+					}
+				},
+				get: () => {
+					gl.readBuffer(gl.COLOR_ATTACHMENT0 + index);
+					gl.readPixels(0, 0, size, size, FORMAT, TYPE, data);
+					return data8;
+				},
+				delete: () => gl.deleteTexture(texture)
+			};
+		};
+
+		
+		const totalInputPixels = Math.ceil(this.inputBytes * this.capacity / BYTES_PER_PIXEL);
+		this.inputTexture = createTexture(totalInputPixels);
+		this.outputTextureSize = getSize(this.capacity);
+		this.outputTextures = Array.dim(this.outputPixels).map((_, i) => createTexture(this.capacity, i));
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+		for (let i = 0; i < this.outputTextures.length; i++) {
+			const { texture } = this.outputTextures[i];
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, texture, 0);
+		}
+
+		gl.drawBuffers(this.outputTextures.map((_, i) => gl.COLOR_ATTACHMENT0 + i));
+
+		this.program.setUniform("_inputTextureWidth", this.inputTexture.size);
+		this.program.setUniform("_outputTextureWidth", this.outputTextureSize);
+	}
+	compile() {
+		const { BYTES_PER_PIXEL, BYTES_PER_CHANNEL, LITTLE_ENDIAN } = GPUComputation;
+		const { gl } = this;
 
 		{ // extract input/output sizes
 			const result = this.glsl.match(/int\s*\[\s*(\d+)\s*\]\s*compute\s*\(\s*int\s*\[\s*(\d+)\s*\]/);
@@ -96,7 +182,6 @@ class GPUComputation {
 			this.inputBytes = inputs;
 			this.outputBytes = outputs;
 			this.outputPixels = Math.ceil(this.outputBytes / BYTES_PER_PIXEL);
-			this.totalInputPixels = Math.ceil(this.inputBytes * this.problems / BYTES_PER_PIXEL);
 		};
 
 		{ // program
@@ -118,9 +203,10 @@ class GPUComputation {
 				uniform highp usampler2D _byteBuffer;
 				uniform int _inputTextureWidth;
 				uniform int _outputTextureWidth;
+				uniform int _problems;
 
 				#define PROBLEM_INDEX (int(gl_FragCoord.y) * _outputTextureWidth + int(gl_FragCoord.x))
-				#define PROBLEMS ${this.problems}
+				#define PROBLEMS _problems
 
 				uvec4 _fetchPixel(int index) {
 					ivec2 texel = ivec2(
@@ -161,36 +247,37 @@ class GPUComputation {
 			this.fragmentShaderSource = `${prefix}
 				${this.glsl}
 
-	${Array
-		.dim(this.outputPixels)
-		.map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`)
-		.join("\n")
-	}
+				${Array
+					.dim(this.outputPixels)
+					.map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`)
+					.join("\n")
+				}
 
 				void main() {
-					int[${this.inputBytes}] _inputs = getProblem(PROBLEM_INDEX);
-					int[${this.outputBytes}] _outputs = compute(_inputs);
+					int problemIndex = PROBLEM_INDEX;
+					if (problemIndex >= PROBLEMS) return;
+					int[${this.inputBytes}] inputs = getProblem(problemIndex);
+					int[${this.outputBytes}] outputs = compute(inputs);
 
-	${Array
-		.dim(this.outputPixels)
-		.map((_, index) => {
-			const startIndex = index * 4;
-			const samples = [];
-			for (let i = startIndex; i < startIndex + 4; i++) {
-				const byteIndex = i * BYTES_PER_CHANNEL;
-				const bytes = Math.min(BYTES_PER_CHANNEL, this.outputBytes - byteIndex);
-				if (bytes <= 0) break;
-				const ors = new Array(bytes)
-					.fill(0)
-					.map((_, inx) => `clamp(_outputs[${byteIndex + inx}], 0, 255) << ${endian(inx * 8)}`)
-					.join(" | ");
-				samples.push(ors);
-			}
-			for (let i = samples.length; i < 4; i++) samples.push("0");
-			return `\t\t\t\t\t_outputColor${index} = uvec4(${samples.join(", ")});`;
-		})	
-		.join("\n")
-	}
+					${Array
+						.dim(this.outputPixels)
+						.map((_, index) => {
+							const startIndex = index * 4;
+							const samples = [];
+							for (let i = startIndex; i < startIndex + 4; i++) {
+								const byteIndex = i * BYTES_PER_CHANNEL;
+								const bytes = Math.min(BYTES_PER_CHANNEL, this.outputBytes - byteIndex);
+								if (bytes <= 0) break;
+								const ors = Array.dim(bytes)
+									.map((_, inx) => `clamp(outputs[${byteIndex + inx}], 0, 255) << ${endian(inx * 8)}`)
+									.join(" | ");
+								samples.push(ors);
+							}
+							for (let i = samples.length; i < 4; i++) samples.push("0");
+							return `\t\t\t\t\t_outputColor${index} = uvec4(${samples.join(", ")});`;
+						})	
+						.join("\n")
+					}
 				}
 			`;
 
@@ -212,99 +299,41 @@ class GPUComputation {
 			this.program.setAttributes(vertexBuffer, 0);
 		};
 
-		{ // build gl textures
-			this.framebuffer = gl.createFramebuffer();
-
-			const getSize = count => Math.ceil(Math.sqrt(count));
-
-			const createTexture = (count, index = 0) => {
-				const size = getSize(count);
-				const data = new Uint32Array(size * size * ELEMENTS_PER_PIXEL);
-				const data8 = new Uint8Array(data.buffer);
-				const texture = gl.createTexture();
-
-				gl.activeTexture(gl.TEXTURE0);
-				gl.bindTexture(gl.TEXTURE_2D, texture);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-				gl.texImage2D(gl.TEXTURE_2D, 0, INTERNAL_FORMAT, size, size, 0, FORMAT, TYPE, null);
-
-				return {
-					size, texture, data, data8, index,
-					set: value => {
-						const { byteLength, buffer } = value;
-						const pxLength = Math.floor(byteLength / BYTES_PER_PIXEL);
-						const completeRows = Math.floor(pxLength / size);
-						const lastRowWidth = pxLength % size;
-						const pxLeft = byteLength % BYTES_PER_PIXEL;
-						
-						gl.activeTexture(gl.TEXTURE0);
-						gl.bindTexture(gl.TEXTURE_2D, texture);
-						
-						let nextX = 0;
-						let nextY = completeRows;
-
-						const completeRowsBuffer = new Uint32Array(buffer, 0, completeRows * size * ELEMENTS_PER_PIXEL);
-						gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, size, completeRows, FORMAT, TYPE, completeRowsBuffer);
-
-						if (lastRowWidth) {
-							const lastRowBuffer = new Uint32Array(buffer, completeRows * size * BYTES_PER_PIXEL, lastRowWidth * ELEMENTS_PER_PIXEL);
-							gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, completeRows, lastRowWidth, 1, FORMAT, TYPE, lastRowBuffer);
-							nextX = lastRowWidth;
-						}
-
-						if (pxLeft) {
-							const lastPixelBuffer8 = new Uint8Array(buffer, pxLength * BYTES_PER_PIXEL);
-							const lastPixelBuffer = new Uint32Array(ELEMENTS_PER_PIXEL);
-							const lastPixelBufferView8 = new Uint8Array(lastPixelBuffer.buffer);
-							lastPixelBufferView8.set(lastPixelBuffer8);
-							gl.texSubImage2D(gl.TEXTURE_2D, 0, nextX, nextY, 1, 1, FORMAT, TYPE, lastPixelBuffer);
-						}
-					},
-					get: () => {
-						gl.readBuffer(gl.COLOR_ATTACHMENT0 + index);
-						gl.readPixels(0, 0, size, size, FORMAT, TYPE, data);
-						return data8;
-					}
-				};
-			};
-
-			this.inputTexture = createTexture(this.totalInputPixels);
-			this.outputTextureSize = getSize(this.problems);
-			this.outputTextures = Array.dim(this.outputPixels).map((_, i) => createTexture(this.problems, i));
-
-			gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
-			for (let i = 0; i < this.outputTextures.length; i++) {
-				const { texture } = this.outputTextures[i];
-				gl.bindTexture(gl.TEXTURE_2D, texture);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, texture, 0);
-			}
-
-			gl.drawBuffers(this.outputTextures.map((_, i) => gl.COLOR_ATTACHMENT0 + i));
-
-			this.program.setUniform("_inputTextureWidth", this.inputTexture.size);
-			this.program.setUniform("_outputTextureWidth", this.outputTextureSize);
-		};
+		this.setupTextures();
+	}
+	reserve(length) {
+		if (this._capacity === undefined) {
+			this._capacity = length;
+			this.glsl = this._glsl;
+		} else if (length > this._capacity) {
+			let newProblems = this._capacity;
+			while (newProblems < length)
+				newProblems = Math.ceil(newProblems * 1.5 + 1);
+			this.capacity = newProblems;
+		}
 	}
 	/**
 	 * Evaluates the operation on a batch of inputs simultaneously.
 	 * Returns the outputs in a contiguous buffer in the same order as the inputs.
 	 * @param ByteBuffer input | The buffer containing the inputs of all the operations. These should be directly contiguous
 	 * @param ByteBuffer output? | The buffer to write the output of the operations to. It will be packed contiguously. If not specified, this will be a newly created buffer
+	 * @param Number problems? | The number of problems in the batch. This will be based on the size of the input buffer if not specified
 	 * @return ByteBuffer
 	 */
-	compute(input, output = new ByteBuffer()) {
+	compute(input, output = new ByteBuffer(), problems = input.byteLength / this.inputBytes) {
 		if (!this.hasContext) return output;
+
+		this.reserve(problems);
+		this.program.setUniform("_problems", problems);
 
 		const {
 			gl, inputTexture,
-			outputTextures, problems,
-			outputBytes, outputTextureSize
+			outputTextures,
+			outputBytes,
+			outputTextureSize
 		} = this;
 
-		inputTexture.set(input.data);
+		inputTexture.set(input.data.buffer, problems * this.inputBytes);
 		gl.viewport(0, 0, outputTextureSize, outputTextureSize);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
@@ -328,18 +357,8 @@ class GPUComputation {
 			}
 		}
 
-		// problem major
-		// let pointer = 0;
-		// for (let i = 0; i < problems; i++) {
-		// 	for (let j = 0; j < outputBytes; j++) {
-		// 		const byte = outputDataArrays[j >> 2][i * 4 + j % 4];
-		// 		output.data[pointer++] = byte;
-		// 	}
-		// }
-
 		return output;
 	}
-	
 	/**
 	 * Returns whether or not the shader contains a given uniform.
 	 * @param String name | The name of the uniform to check 
@@ -373,13 +392,194 @@ class GPUComputation {
 		for (const key in uniformData)
 			this.program.setUniform(key, uniformData[key]);
 	}
+	static destructure(glsl) {
+		return GPUComputation.Structured.destructure(glsl).glsl;
+	}
+}
+GPUComputation.BYTES_PER_PIXEL = 16;
+GPUComputation.BYTES_PER_CHANNEL = GPUComputation.BYTES_PER_PIXEL / 4;
+GPUComputation.ELEMENTS_PER_PIXEL = GPUComputation.BYTES_PER_PIXEL / GPUComputation.BYTES_PER_CHANNEL;
+{
+	const buffer = new Uint16Array(2);
+	const view = new Uint8Array(buffer.buffer);
+	buffer[0] = 1;
+	GPUComputation.LITTLE_ENDIAN = !!view[0];
+};
+
+/**
+ * @name class GPUComputation.Structured extends GPUComputation
+ * Represents an operation that can be executed in parallel with itself on the GPU.
+ * This behaves much like GPUComputation except that the input and output of the operation are GLSL structs.
+ * The values of the input and output structs are represented in JavaScript as objects, whose properties must be in the same order as the fields on the GLSL structs. 
+ * The main entry point is:
+ * ```glsl
+ * OutputStruct compute(InputStruct input) {
+ * 	// your main code here
+ * }
+ * ```
+ * The input and output structs may have arbitrary names, and your GLSL must include the declarations of these structs.
+ * ```glsl
+ * struct InputStruct {
+ * 	// your input fields
+ * };
+ * struct OutputStruct {
+ * 	// your output fields
+ * };
+ * ```
+ * The helper functions and variables from GPUComputation are also present, specifically:
+ * ```glsl
+ * #define PROBLEM_INDEX // the index of the operation in the batch
+ * #define PROBLEMS // the size of the batch
+ * 
+ * // returns the input data for a specific operation in the batch
+ * InputStruct getProblem(int index);
+ * ```
+ * @prop String glsl | The source code of the operation. See the GLSL API
+ * @prop ByteBuffer inputBuffer | A buffer containing all of the current input data. This can be freely written to
+ * @prop ByteBuffer outputBuffer | A buffer containing the output of the most recent computation. This can be freely read from
+ */
+GPUComputation.Structured = class StructuredGPUComputation extends GPUComputation {
 	/**
-	 * Converts GLSL which uses `struct`s for the parameter and return value of the `compute()` function to GLSL that can be used in the GPUComputation constructor.
-	 * The order of the `struct` data in the input and output buffers is the same as the declaration order of their fields.
-	 * When using this, `getProblem()` will return the correct `struct` type.
-	 * @param String glsl | The GLSL source code using `struct`s for the input and output of the `compute()` function
-	 * @return String
+	 * Creates a new structured GPU Computation.
+	 * @param String glsl | The source code for the operation
 	 */
+	constructor(glsl) {
+		super(glsl);
+		this.inputBuffer = new ByteBuffer();
+		this.outputBuffer = new ByteBuffer();
+	}
+	processGLSL() {
+		({
+			glsl: this._glsl,
+			inputFields: this.inputFields,
+			outputFields: this.outputFields
+		} = GPUComputation.Structured.destructure(this.glsl));
+		super.processGLSL();
+	}
+	compile() {
+		super.compile();
+		this.writeFunction = this.readFunction = null;
+	}
+	/**
+	 * Writes an array of objects into the input buffer of the computation.
+	 * The objects' structure must correspond to the structure of the GLSL input struct.
+	 * @param Object[] input | The objects to read the data from
+	 */
+	writeInput(input) {
+		this.problems = input.length;
+		
+		if (!this.problems) return;
+		
+		if (!this.writeFunction) {
+			const types = {
+				float: [["float32", ""]],
+				int: [["int32", ""]],
+				bool: [["bool", ""]]
+			};
+
+			for (const type in GPUComputation.Structured.VECTORS) {
+				const vecName = GPUComputation.Structured.VECTORS[type];
+				const elType = types[type][0][0];
+				for (let n = 2; n <= 4; n++) {
+					const name = vecName + n;
+					const inxs = Array.dim(n).map((_, i) => i);
+					types[name] = [
+						inxs.map(i => [elType, `.${Vector4.modValues[i]}`]),
+						inxs.map(i => [elType, `.${Color.modValues[i]}${i === 3 ? "" : " / 255"}`])
+					];
+				}
+			}
+
+			const source = this.inputFields.flatMap(({ name, type }) => {
+				let pieces = types[type];
+				const value = input[0][name];
+				if (typeof value === "object")
+					pieces = value instanceof Color ? pieces[1] : pieces[0];
+				return pieces.map(([write, suffix]) => `write.${write}(obj.${name}${suffix});`);
+			}).join("\n");
+
+			this.writeFunction = new Function("obj", "write", source);
+		}
+
+		const { writeFunction } = this;
+		const { write } = this.inputBuffer;
+		const { length } = input;
+
+		this.inputBuffer.pointer = 0;
+		for (let i = 0; i < length; i++)
+			writeFunction(input[i], write);
+	}
+	/**
+	 * Reads the output buffer into an array of objects, where the structure of the objects corresponds to the structure of the GLSL output struct.
+	 * Returns the passed array.
+	 * @param Object[] output | The objects to write the output to
+	 * @return Object[]
+	 */
+	readOutput(output) {
+		this.problems = output.length;
+
+		if (!output.length) return;
+
+		if (!this.readFunction) {
+			const types = {
+				float: [["", "float32", ""]],
+				int: [["", "int32", ""]],
+				bool: [["", "bool", ""]]
+			};
+
+			for (const type in GPUComputation.Structured.VECTORS) {
+				const vecName = GPUComputation.Structured.VECTORS[type];
+				const elType = types[type][0][1];
+				for (let n = 2; n <= 4; n++) {
+					const name = vecName + n;
+					const inxs = Array.dim(n).map((_, i) => i);
+					types[name] = [
+						inxs.map(i => [`.${Vector4.modValues[i]}`, elType, ""]),
+						inxs.map(i => [`.${Color.modValues[i]}`, elType, i === 3 ? "" : " * 255"])
+					];
+				}
+			}
+
+			const source = this.outputFields.flatMap(({ name, type }) => {
+				let pieces = types[type];
+				const value = output[0][name];
+				if (typeof value === "object")
+					pieces = value instanceof Color ? pieces[1] : pieces[0];
+				return pieces.map(([prop, read, suffix]) => `obj.${name}${prop} = read.${read}()${suffix};`);
+			}).join("\n");
+
+			this.readFunction = new Function("obj", "read", source);
+		}
+
+		const { readFunction } = this;
+		const { read } = this.outputBuffer;
+		const { length } = output;
+		
+		this.outputBuffer.pointer = 0;
+		for (let i = 0; i < length; i++)
+			readFunction(output[i], read);
+
+		return output;
+	}
+	/**
+	 * Runs the computation on a given input array and writes the result to a given output array.
+	 * The output parameter is returned.
+	 * @param Object[] input | The data to use as the input to the computation. If this is omitted, the data already in the input buffer will be used
+	 * @param Object[] output | The location to place the output data. If this is omitted, the result will be placed into the input buffer. This parameter can only be omitted when the GLSL input and output structs are the same
+	 * @returns Object[]/void
+	 */
+	compute(input, output = input) {
+		if (input !== undefined)
+			this.writeInput(input);
+		
+		super.compute(this.inputBuffer, this.outputBuffer, this.problems);
+
+		if (output === undefined)
+			this.outputBuffer.get(this.inputBuffer);
+		else this.readOutput(output);
+
+		return output;
+	}
 	static destructure(glsl) {
 		const originalGLSL = glsl;
 
@@ -412,22 +612,45 @@ class GPUComputation {
 
 		const write = {
 			float: `
-			int bits = floatBitsToInt(value);
-			ob[op] = bits & 255;
-			ob[op + 1] = (bits >> 8) & 255;
-			ob[op + 2] = (bits >> 16) & 255;
-			ob[op + 3] = (bits >> 24) & 255;
-		  `,
+				int bits = floatBitsToInt(value);
+				ob[op] = bits & 255;
+				ob[op + 1] = (bits >> 8) & 255;
+				ob[op + 2] = (bits >> 16) & 255;
+				ob[op + 3] = (bits >> 24) & 255;
+		    `,
 			int: `
-			ob[op] = value & 255;
-			ob[op + 1] = (value >> 8) & 255;
-			ob[op + 2] = (value >> 16) & 255;
-			ob[op + 3] = (value >> 24) & 255;
-		  `,
+				ob[op] = value & 255;
+				ob[op + 1] = (value >> 8) & 255;
+				ob[op + 2] = (value >> 16) & 255;
+				ob[op + 3] = (value >> 24) & 255;
+		  	`,
 			bool: `
-			ob[op] = value ? 1 : 0;
-		  `
+				ob[op] = value ? 1 : 0;
+		  	`
 		};
+
+		for (const type in GPUComputation.Structured.VECTORS) {
+			const vecName = GPUComputation.Structured.VECTORS[type];
+			const elSize = size[type];
+			const readEl = read[type];
+			const writeEl = write[type];
+			for (let n = 2; n <= 4; n++) {
+				const name = vecName + n;
+				size[name] = elSize * n;
+				read[name] = `${name}(${
+					Array.dim(n)
+						.map((_, i) => readEl.replaceAll("ip", `ip + ${i * elSize}`))
+						.join(", ")
+				})`;
+				write[name] = Array.dim(n)
+					.map((_, i) => {
+						return "{" + writeEl
+							.replaceAll("op", `op + ${i * elSize}`)
+							.replace("value", `value[${i}]`) + "}";
+					})
+					.join("\n");
+			}
+		}
 
 		function fields(name) {
 			const regexp = new RegExp(`struct ${name} { ([^\}]*?) };`);
@@ -459,8 +682,7 @@ class GPUComputation {
 									name = name.slice(0, index);
 								}
 								
-								return new Array(length)
-									.fill(0)
+								return Array.dim(length)
 									.map((_, i) => ({ type, name: `${name}[${i}]`}));
 							}
 
@@ -546,15 +768,15 @@ class GPUComputation {
 			}
 		`;
 
-		return finalGLSL;
+		return {
+			glsl: finalGLSL,
+			inputFields: ifields,
+			outputFields: ofields
+		};
 	}
 }
-GPUComputation.BYTES_PER_PIXEL = 16;
-GPUComputation.BYTES_PER_CHANNEL = 4;
-GPUComputation.ELEMENTS_PER_PIXEL = GPUComputation.BYTES_PER_PIXEL / GPUComputation.BYTES_PER_CHANNEL;
-{
-	const buffer = new Uint16Array(2);
-	const view = new Uint8Array(buffer.buffer);
-	buffer[0] = 1;
-	GPUComputation.LITTLE_ENDIAN = !!view[0];
+GPUComputation.Structured.VECTORS = {
+	"float": "vec",
+	"int": "ivec",
+	"bool": "bvec"
 };

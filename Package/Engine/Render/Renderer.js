@@ -48,7 +48,7 @@ const LineCap = Enum.define("FLAT", "SQUARE", "ROUND");
  * renderer.draw(new Color("lime")).rect(0, 0, 80, 80);
  * renderer.unclip();
  * ```
- * @prop ImageType imageType | The surface on which the renderer renders
+ * @prop ImageType imageType | The surface on which the renderer renders. This property is read-only
  * @prop TextMode textMode | The current text-alignment mode. Starts as `TextMode.TOP_LEFT`
  * @prop BlendMode blendMode | The current color-blending mode. Starts as `BlendMode.COMBINE`
  * @prop Number alpha | The current global alpha. This will multiply the alpha of all other drawing calls. Starts as 1

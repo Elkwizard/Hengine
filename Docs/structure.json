@@ -132,7 +132,7 @@
 		},
 		"Miscellaneous": {
 			"PARTICLE_SPAWNER": ["PARTICLE_SPAWNER", "Particle"],
-			"GPUComputation": null,
+			"GPUComputation": ["GPUComputation", "GPUComputation.Structured"],
 			"FileSystem": null,
 			"Random": null,
 			"ByteBuffer": [

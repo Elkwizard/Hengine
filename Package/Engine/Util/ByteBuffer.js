@@ -5,6 +5,7 @@
  * @prop ByteBuffer.Measurer measure | The measuring API of the buffer
  * @prop Number pointer | The offset into the buffer where reading and writing occur
  * @prop Boolean littleEndian | The endianness of the buffer
+ * @prop Number byteLength | The number of bytes in the buffer. This property is read-only
  */
 class ByteBuffer {
 	/**
@@ -27,13 +28,10 @@ class ByteBuffer {
 		this.measure = new ByteBuffer.Measurer(this);
 		this.shouldResize = true;
 		this.littleEndian = littleEndian;
+		this.byteLength = this.data.length;
 	}
-	/**
-	 * Returns the number of bytes in the buffer.
-	 * @return Number
-	 */
-	get byteLength() {
-		return this.data.length;
+	reserve(length) {
+		this.alloc(length - this.pointer);
 	}
 	alloc(amount) {
 		const end = this.pointer + amount;
@@ -43,6 +41,7 @@ class ByteBuffer {
 			this.data = newData;
 			this.view = new DataView(this.data.buffer);
 		}
+		this.byteLength = end;
 	}
 	/**
 	 * Advances the pointer by a specified amount.
@@ -135,8 +134,8 @@ class ByteBuffer {
 	 */
 	get(buffer = new ByteBuffer()) {
 		const { byteLength } = this;
-		if (buffer.byteLength !== byteLength) buffer.data = this.data.slice();
-		else for (let i = 0; i < byteLength; i++) buffer.data[i] = this.data[i];
+		if (buffer.byteLength === byteLength) buffer.data.set(this.data, 0);
+		else buffer.data = this.data.slice();
 		buffer.pointer = this.pointer;
 		buffer.shouldResize = this.shouldResize;
 		return buffer;
