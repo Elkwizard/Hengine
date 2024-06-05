@@ -16,15 +16,13 @@
  */
 class Font {
 	/**
-	 * Creates a new font. This operation is fairly expensive and thus should not be done every frame unless necessary.
+	 * Creates a new font.
 	 * @param Number size | The size of the font
 	 * @param String family | The font family
 	 * @param Boolean bold? | Whether the font is bold, default is false
 	 * @param Boolean italic? | Whether the font is italic, default is false
 	 */
 	constructor(size = 15, family = "Arial", bold = false, italic = false) {
-		let canvas = new_OffscreenCanvas(1, 1);
-		this.c = canvas.getContext("2d");
 		this.size = size;
 		this.family = family;
 		this.bold = bold;
@@ -37,14 +35,7 @@ class Font {
 	set family(a) {
 		this._family = a;
 		const l = a.toLowerCase();
-		this.keywordFamily = (
-			l === "monospace" ||
-			l === "sans-serif" ||
-			l === "serif" ||
-			l === "cursive" ||
-			l === "fantasy" ||
-			l === "system-ui"
-		);
+		this.keywordFamily = Font.keywordFamilies.includes(l);
 		this.refont();
 		if (a.match(/mono|consolas/g)) {
 			const charWidth = this.getWidthCRC2D("m");
@@ -90,15 +81,17 @@ class Font {
 		return this._size;
 	}
 	refont() {
-		this.memorizedWidths = {};
-		this.c.font = this.toString();
+		this.memorizedWidths = { };
+		const familyString = this.keywordFamily ? this.family : JSON.stringify(this.family);
+		this.fontString = `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${familyString}`;
 	}
 	processString(str) {
 		return String(str).replace(/\r/g, "").replace(/\t/g, this.tabReplacement);
 	}
 	getWidthCRC2D(str) {
 		if (str in this.memorizedWidths) return this.memorizedWidths[str];
-		const width = this.c.measureText(str).width;
+		Font.context.font = this.fontString;
+		const width = Font.context.measureText(str).width;
 		this.memorizedWidths[str] = width;
 		return width;
 	}
@@ -189,8 +182,7 @@ class Font {
 	 * @return String
 	 */
 	toString() {
-		const familyString = this.keywordFamily ? this.family : JSON.stringify(this.family);
-		return `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${familyString}`;
+		return this.fontString;
 	}
 	/**
 	 * Creates a copy of the font and optionally stores it in a provided destination.
@@ -207,6 +199,8 @@ class Font {
 	}
 }
 // setup
+Font.context = new_OffscreenCanvas(1, 1).getContext("2d");
+Font.keywordFamilies = ["monospace", "sans-serif", "serif", "cursive", "fantasy", "system-ui"];
 Font.defaultFamilies = ["Serif", "Arial", "Cursive", "Monospace"];
 Font.defaultSizes = [];
 for (let i = 0; i < 20; i++) Font.defaultSizes.push((i + 1) * 5);
