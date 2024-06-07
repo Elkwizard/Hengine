@@ -247,12 +247,13 @@ For the return value of this function, see the <a href="../../Pages/Rendering/GL
 		
 			<div class="class-wrapper" id="class GPUComputation.Structured">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L441" target="_blank" class="class-name source-link">GPUComputation.Structured</a> <span class="keyword">extends</span> <span class="class-name">GPUComputation</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L442" target="_blank" class="class-name source-link">GPUComputation.Structured</a> <span class="keyword">extends</span> <span class="class-name">GPUComputation</span>
 				</div>
 				<div class="class desc">
 					Represents an operation that can be executed in parallel with itself on the GPU.
 This behaves much like GPUComputation except that the input and output of the operation are GLSL structs.
-The values of the input and output structs are represented in JavaScript as objects, whose properties must be in the same order as the fields on the GLSL structs. 
+The values of the input and output structs are represented in JavaScript as objects, whose properties have the same names as those of the GLSL struct.
+The structs/objects may be nested, and the types of fields must be associated in accordance with the <a href="../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a>.
 The main entry point is:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-CLASS">OutputStruct </span><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS">InputStruct </span><span class="highlight-IDENTIFIER">input</span><span class="highlight-SYMBOL">) {
 	</span><span class="highlight-COMMENT">// your main code here</span><span class="highlight-SYMBOL">
@@ -307,7 +308,7 @@ InputStruct </span><span class="highlight-FUNCTION">getProblem</span><span class
 					<div class="class-methods">
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L446" target="_blank" class="function-name source-link">constructor</a>(<span class="param">glsl</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L447" target="_blank" class="function-name source-link">constructor</a>(<span class="param">glsl</span>)
 			</div>
 			<div class="function desc">
 				Creates a new structured GPU Computation.
@@ -334,7 +335,7 @@ InputStruct </span><span class="highlight-FUNCTION">getProblem</span><span class
 	
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.writeInput()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L500" target="_blank" class="function-name source-link">writeInput</a>(<span class="param">input</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L501" target="_blank" class="function-name source-link">writeInput</a>(<span class="param">input</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Writes an array of objects into the input buffer of the computation.
@@ -362,7 +363,7 @@ The objects' structure must correspond to the structure of the GLSL input struct
 	
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.appendInput()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L518" target="_blank" class="function-name source-link">appendInput</a>(<span class="param">input</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L519" target="_blank" class="function-name source-link">appendInput</a>(<span class="param">input</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Appends an array of objects after the existing input data.
@@ -390,7 +391,7 @@ The objects' structure must correspond to the structure the GLSL input struct.
 	
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.readOutput()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L568" target="_blank" class="function-name source-link">readOutput</a>(<span class="param">output</span>)<span class="type">Object[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L569" target="_blank" class="function-name source-link">readOutput</a>(<span class="param">output</span>)<span class="type">Object[]</span>
 			</div>
 			<div class="function desc">
 				Reads the output buffer into an array of objects, where the structure of the objects corresponds to the structure of the GLSL output struct.
@@ -418,7 +419,7 @@ Returns the passed array.
 	
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.compute()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L590" target="_blank" class="function-name source-link">compute</a>(<span class="param">input</span>, <span class="param">output</span>)<span class="type">Object[]/void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L591" target="_blank" class="function-name source-link">compute</a>(<span class="param">input</span>, <span class="param">output</span>)<span class="type">Object[]/void</span>
 			</div>
 			<div class="function desc">
 				Runs the computation on a given input array and writes the result to a given output array.

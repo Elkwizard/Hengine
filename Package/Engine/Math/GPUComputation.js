@@ -410,7 +410,8 @@ GPUComputation.ELEMENTS_PER_PIXEL = GPUComputation.BYTES_PER_PIXEL / GPUComputat
  * @name class GPUComputation.Structured extends GPUComputation
  * Represents an operation that can be executed in parallel with itself on the GPU.
  * This behaves much like GPUComputation except that the input and output of the operation are GLSL structs.
- * The values of the input and output structs are represented in JavaScript as objects, whose properties must be in the same order as the fields on the GLSL structs. 
+ * The values of the input and output structs are represented in JavaScript as objects, whose properties have the same names as those of the GLSL struct.
+ * The structs/objects may be nested, and the types of fields must be associated in accordance with the GLSL API.
  * The main entry point is:
  * ```glsl
  * OutputStruct compute(InputStruct input) {
