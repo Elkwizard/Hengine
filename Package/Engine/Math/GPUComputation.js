@@ -672,9 +672,13 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 		}
 
 		function fields(name) {
-			const regexp = new RegExp(`struct ${name} { ([^\}]*?) };`);
-			const contents = glsl.match(regexp)[1];
-			const fields = contents
+			const regexp = new RegExp(String.raw`struct\s+${name}\s+{(.*?)};`);
+			const match = glsl.match(regexp);
+			if (match === null)
+				throw new GLSLError("", 1, `Fields of type ${name} are not supported`);
+
+			const contents = match[1];
+			const result = contents
 				.split(";")
 				.map(line => line.trim())
 				.filter(line => line.length)
@@ -713,36 +717,35 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 				})
 				.reduce((a, b) => [...a, ...b], []);
 
-			return fields;
+			return result.flatMap(field => {
+				if (field.type in size) return [field];
+				return fields(field.type)
+					.map(({ type, name }) => ({ type, name: `${field.name}.${name}`}));
+			});
 		}
 
 		function getByteOffset(fields, index = fields.length) {
 			let offset = 0;
-			for (let i = 0; i < index; i++) {
-				const { type } = fields[i];
-				if (type in size) offset += size[type];
-				else throw new GLSLError(1, `Fields of type '${type}' are not supported`);
-			}
+			for (let i = 0; i < index; i++)
+				offset += size[fields[i].type];
 			return offset;
 		}
 
 		function makeReader({ type, name }, byteOffset) {
-			if (type in read) return `
-			ip = ${byteOffset};
-			i.${name} = ${read[type]};
-		  `;
-			else throw new GLSLError(1, `Input fields of type '${type}' are not supported`);
+			return `
+				ip = ${byteOffset};
+				i.${name} = ${read[type]};
+			`;
 		}
 
 		function makeWriter({ type, name }, byteOffset) {
-			if (type in write) return `
-			op = ${byteOffset};
-			{
-			  ${type} value = o.${name};
-			  ${write[type]}
-			};
-		  `;
-			else throw new GLSLError(1, `Output fields of type '${type}' are not supported`);
+			return `
+				op = ${byteOffset};
+				{
+					${type} value = o.${name};
+					${write[type]}
+				};
+		  	`;
 		}
 
 		const ifields = fields(inputStruct);
