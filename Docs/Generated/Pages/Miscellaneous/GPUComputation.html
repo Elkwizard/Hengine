@@ -333,13 +333,43 @@ InputStruct </span><span class="highlight-FUNCTION">getProblem</span><span class
 			
 		</div>
 	
-		<div class="function-wrapper" id="GPUComputation.Structured.prototype.writeInput()">
+		<div class="function-wrapper" id="GPUComputation.Structured.prototype.setInput()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L501" target="_blank" class="function-name source-link">writeInput</a>(<span class="param">input</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L502" target="_blank" class="function-name source-link">setInput</a>(<span class="param">input</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Writes an array of objects into the input buffer of the computation.
+				Writes an array of objects into the input buffer of the computation at a given index.
+This replaces all the existing input data.
 The objects' structure must correspond to the structure of the GLSL input struct.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.setInput():input">
+							<div class="param-name">
+								<span class="param">input</span>
+								<span class="type">Object[]</span>
+							</div>
+							<div class="param desc">
+								The objects to read the data from
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="GPUComputation.Structured.prototype.writeInput()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L525" target="_blank" class="function-name source-link">writeInput</a>(<span class="param">input</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">srcOffset?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Overwrites a portion of the input data.
+This can increase the size of the input data.
+The objects' structure must correspond to the structure the GLSL input struct.
 			</div>
 			
 				<div class="function-signature">
@@ -356,31 +386,33 @@ The objects' structure must correspond to the structure of the GLSL input struct
 							</div>
 						</div>
 					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.Structured.prototype.appendInput()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L519" target="_blank" class="function-name source-link">appendInput</a>(<span class="param">input</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Appends an array of objects after the existing input data.
-The objects' structure must correspond to the structure the GLSL input struct.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.appendInput():input">
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.writeInput():offset?">
 							<div class="param-name">
-								<span class="param">input</span>
-								<span class="type">Object[]</span>
+								<span class="param">offset</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The objects to read the data from
+								The index of the first input to overwrite. The default value is the length of the current input data
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.writeInput():length?">
+							<div class="param-name">
+								<span class="param">length</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount of objects to write. Default is the maximum possible amount
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.writeInput():srcOffset?">
+							<div class="param-name">
+								<span class="param">srcOffset</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The first index of the provided <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">input</span></code> array to read from. Default is 0
 							</div>
 						</div>
 					
@@ -391,7 +423,7 @@ The objects' structure must correspond to the structure the GLSL input struct.
 	
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.readOutput()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L569" target="_blank" class="function-name source-link">readOutput</a>(<span class="param">output</span>)<span class="type">Object[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L583" target="_blank" class="function-name source-link">readOutput</a>(<span class="param">output</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">dstOffset?</span>)<span class="type">Object[]</span>
 			</div>
 			<div class="function desc">
 				Reads the output buffer into an array of objects, where the structure of the objects corresponds to the structure of the GLSL output struct.
@@ -412,6 +444,36 @@ Returns the passed array.
 							</div>
 						</div>
 					
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.readOutput():offset?">
+							<div class="param-name">
+								<span class="param">offset</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The index of the first output to read. Default is 0
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.readOutput():length?">
+							<div class="param-name">
+								<span class="param">length</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount of objects to read. Default is the maximum possible amount
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.readOutput():dstOffset?">
+							<div class="param-name">
+								<span class="param">dstOffset</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The first index of the provided <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">output</span></code> array to write to. Default is 0
+							</div>
+						</div>
+					
 		
 				</div>
 			
@@ -419,7 +481,7 @@ Returns the passed array.
 	
 		<div class="function-wrapper" id="GPUComputation.Structured.prototype.compute()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L591" target="_blank" class="function-name source-link">compute</a>(<span class="param">input</span>, <span class="param">output</span>)<span class="type">Object[]/void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L607" target="_blank" class="function-name source-link">compute</a>(<span class="param">input?</span>, <span class="param">output?</span>, <span class="param">problems?</span>)<span class="type">Object[]/void</span>
 			</div>
 			<div class="function desc">
 				Runs the computation on a given input array and writes the result to a given output array.
@@ -430,7 +492,7 @@ The output parameter is returned.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.compute():input">
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.compute():input?">
 							<div class="param-name">
 								<span class="param">input</span>
 								<span class="type">Object[]</span>
@@ -440,18 +502,39 @@ The output parameter is returned.
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.compute():output">
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.compute():output?">
 							<div class="param-name">
 								<span class="param">output</span>
 								<span class="type">Object[]</span>
 							</div>
 							<div class="param desc">
-								The location to place the output data. If this is omitted, the result will be placed into the input buffer. This parameter can only be omitted when the GLSL input and output structs are the same
+								The location to place the output data. Whether or not this parameter is specified, the data will be written to the output buffer and can be read later
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="GPUComputation.Structured.prototype.compute():problems?">
+							<div class="param-name">
+								<span class="param">problems</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The number of problems in the batch. This will be based on the size of the most recently specified batch size (either via <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">setInput</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">writeInput</span></code>, the first argument to this function, or this argument in a previous call)
 							</div>
 						</div>
 					
 		
 				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="GPUComputation.Structured.prototype.readback()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L618" target="_blank" class="function-name source-link">readback</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Moves the data in the output buffer into the input buffer.
+This function is only usable if the GLSL input and output structs are the same.
+			</div>
 			
 		</div>
 	</div>

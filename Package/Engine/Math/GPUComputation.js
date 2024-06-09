@@ -494,13 +494,15 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 		this.writeFunction = new Function("obj", "write", source);
 	}
 	/**
-	 * Writes an array of objects into the input buffer of the computation.
+	 * Writes an array of objects into the input buffer of the computation at a given index.
+	 * This replaces all the existing input data.
 	 * The objects' structure must correspond to the structure of the GLSL input struct.
 	 * @param Object[] input | The objects to read the data from
 	 */
-	writeInput(input) {
+	setInput(input) {
 		this.problems = input.length;
 		if (!this.problems) return;
+
 		this.guaranteeWrite(input);
 
 		const { writeFunction } = this;
@@ -512,21 +514,30 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 			writeFunction(input[i], write);
 	}
 	/**
-	 * Appends an array of objects after the existing input data.
+	 * Overwrites a portion of the input data.
+	 * This can increase the size of the input data.
 	 * The objects' structure must correspond to the structure the GLSL input struct.
 	 * @param Object[] input | The objects to read the data from
+	 * @param Number offset? | The index of the first input to overwrite. The default value is the length of the current input data
+	 * @param Number length? | The amount of objects to write. Default is the maximum possible amount
+	 * @param Number srcOffset? | The first index of the provided `input` array to read from. Default is 0
 	 */
-	appendInput(input) {
+	writeInput(input, offset = this.problems, length, srcOffset = 0) {
+		length ??= input.length - srcOffset;
+		if (!length) return;
+		
 		this.guaranteeWrite(input);
 		
 		const { writeFunction } = this;
 		const { write } = this.inputBuffer;
-		const { length } = input;
-
-		this.inputBuffer.pointer = this.problems * this.inputBytes;
-		for (let i = 0; i < length; i++)
+		
+		this.inputBuffer.pointer = offset * this.inputBytes;
+		
+		const end = srcOffset + length;
+		for (let i = srcOffset; i < end; i++)
 			writeFunction(input[i], write);
-		this.problems += length;
+		
+		this.problems = Math.max(this.problems, offset + length);
 	}
 	guaranteeRead(output) {
 		if (this.readFunction) return;
@@ -564,19 +575,23 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 	 * Reads the output buffer into an array of objects, where the structure of the objects corresponds to the structure of the GLSL output struct.
 	 * Returns the passed array.
 	 * @param Object[] output | The objects to write the output to
+	 * @param Number offset? | The index of the first output to read. Default is 0
+	 * @param Number length? | The amount of objects to read. Default is the maximum possible amount
+	 * @param Number dstOffset? | The first index of the provided `output` array to write to. Default is 0
 	 * @return Object[]
 	 */
-	readOutput(output) {
-		this.problems = output.length;
-		if (!output.length) return;
+	readOutput(output, offset = 0, length, dstOffset = 0) {
+		length ??= Math.min(output.length - dstOffset, this.problems - offset);
+		if (!length) return;
 		this.guaranteeRead(output);
 
 		const { readFunction } = this;
 		const { read } = this.outputBuffer;
-		const { length } = output;
 		
-		this.outputBuffer.pointer = 0;
-		for (let i = 0; i < length; i++)
+		this.outputBuffer.pointer = offset * this.outputBytes;
+
+		const end = dstOffset + length;
+		for (let i = dstOffset; i < end; i++)
 			readFunction(output[i], read);
 
 		return output;
@@ -584,21 +599,24 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 	/**
 	 * Runs the computation on a given input array and writes the result to a given output array.
 	 * The output parameter is returned.
-	 * @param Object[] input | The data to use as the input to the computation. If this is omitted, the data already in the input buffer will be used
-	 * @param Object[] output | The location to place the output data. If this is omitted, the result will be placed into the input buffer. This parameter can only be omitted when the GLSL input and output structs are the same
+	 * @param Object[] input? | The data to use as the input to the computation. If this is omitted, the data already in the input buffer will be used
+	 * @param Object[] output? | The location to place the output data. Whether or not this parameter is specified, the data will be written to the output buffer and can be read later
+	 * @param Number problems? | The number of problems in the batch. This will be based on the size of the most recently specified batch size (either via `setInput`, `writeInput`, the first argument to this function, or this argument in a previous call)
 	 * @return Object[]/void
 	 */
-	compute(input, output = input) {
-		if (input !== undefined)
-			this.writeInput(input);
-		
+	compute(input, output, problems) {
+		if (input) this.setInput(input);
+		if (problems !== undefined) this.problems = problems;
 		super.compute(this.inputBuffer, this.outputBuffer, this.problems);
-
-		if (output === undefined)
-			this.outputBuffer.get(this.inputBuffer);
-		else this.readOutput(output);
-
+		if (output) this.readOutput(output);
 		return output;
+	}
+	/**
+	 * Moves the data in the output buffer into the input buffer.
+	 * This function is only usable if the GLSL input and output structs are the same.
+	 */
+	readback() {
+		this.outputBuffer.get(this.inputBuffer);
 	}
 	static destructure(glsl) {
 		const originalGLSL = glsl;

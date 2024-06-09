@@ -35,13 +35,15 @@ class ByteBuffer {
 	}
 	alloc(amount) {
 		const end = this.pointer + amount;
-		if (this.shouldResize && end > this.data.length) {
-			const newData = new Uint8Array(1 << Math.ceil(Math.log2(end)));
-			newData.set(this.data);
-			this.data = newData;
-			this.view = new DataView(this.data.buffer);
+		if (this.shouldResize && end > this.byteLength) {
+			if (end > this.data.length) {
+				const newData = new Uint8Array(1 << Math.ceil(Math.log2(end)));
+				newData.set(this.data);
+				this.data = newData;
+				this.view = new DataView(this.data.buffer);
+			}
+			this.byteLength = end;
 		}
-		this.byteLength = end;
 	}
 	/**
 	 * Advances the pointer by a specified amount.
@@ -133,11 +135,11 @@ class ByteBuffer {
 	 * @return ByteBuffer
 	 */
 	get(buffer = new ByteBuffer()) {
-		const { byteLength } = this;
-		if (buffer.byteLength === byteLength) buffer.data.set(this.data, 0);
+		if (buffer.data.length >= this.data.length) buffer.data.set(this.data, 0);
 		else buffer.data = this.data.slice();
 		buffer.pointer = this.pointer;
 		buffer.shouldResize = this.shouldResize;
+		buffer.byteLength = this.byteLength;
 		return buffer;
 	}
 	/**

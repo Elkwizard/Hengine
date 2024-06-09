@@ -27,7 +27,7 @@
  * });
  * ```
  * @prop Particle => void particleInit | The function that is called to initialize particles. This will be passed the particle object for each particle created. This uses the alternate key `properties.init` when provided in a parameter. Default is a no-op
- * @prop Particle => void particleUpdate | The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This uses the alternate key `properties.update` when provided in a parameter. Default is a no-op
+ * @prop Particle => void particleUpdate | The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This uses the alternate key `properties.update` when provided in a parameter. Default is a no-op. This property may instead be a String, which contains the source code for a GPUComputation.Structured that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system. If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way. Setting this property to a function will remove the computation.
  * @prop (Artist, Particle) => void particleDraw | The function that is called to render particles each frame. This will be passed an Artist and a particle object for each particle object on-screen each frame. This uses the alternate key `properties.draw` when provided in a parameter. Default is a no-op
  * @prop Boolean slows | Whether or not particles will have air resistance applied. Default is false
  * @prop Boolean falls | Whether or not particles will have gravity applied. Default is false
@@ -101,7 +101,6 @@ class PARTICLE_SPAWNER extends ElementScript {
 	 */
 	setProperties(obj, p) {
 		this.particleInit = p.init ?? this.particleInit ?? (() => null);
-		this.particleUpdate = p.update ?? this.particleUpdate ?? (() => null);
 		this.particleDraw = p.draw ?? this.particleDraw ?? (() => null);
 		this.falls = p.falls ?? this.falls ?? false;
 		this.slows = p.slows ?? this.slows ?? false;
@@ -116,9 +115,21 @@ class PARTICLE_SPAWNER extends ElementScript {
 		else this.frame = this.canvas;
 		this.data = { ...this.data, ...p.data };
 		this.gl = this.frame.renderer;
+		
+		if ("update" in p) {
+			const { update } = p;
+			if (typeof update === "function") {
+				this.particleUpdate = update;
+				this.computation = null;
+			} else {
+				this.computation = new GPUComputation.Structured(update);
+				this.computation.setInput(this.particles);
+			}
+		} else this.particleUpdate ??= () => null;
 	}
 	addParticle(obj, position) {
 		const particle = new this.Particle(position, this);
+		particle.id = Math.random().toString(36).slice(2);
 		this.particleInit(particle);
 		if (particle.timer >= 1) return;
 		this.particles.push(particle);
@@ -131,8 +142,13 @@ class PARTICLE_SPAWNER extends ElementScript {
 	explode(obj, count, position = obj.transform.position) {
 		const pos = position;
 
+		const initial = this.particles.length;
+
 		for (let i = 0; i < count; i++)
 			this.addParticle(pos.get());
+
+		if (this.computation)
+			this.computation.writeInput(this.particles.slice(initial));
 	}
 	update(obj) {
 		if (this.active && isFinite(this.delay)) {
@@ -145,27 +161,51 @@ class PARTICLE_SPAWNER extends ElementScript {
 			const pos = obj.transform.position;
 			const last = obj.lastTransform.position;
 
-			for (let i = 0; i < count; i++) {
-				const t = (i + 1) / count;
+			const initial = this.particles.length;
+
+			for (let i = 1; i <= count; i++) {
+				const t = i / count;
 				this.addParticle(Interpolation.lerp(last, pos, t));
 				if (!this.active) break;
 			}
+
+			if (this.computation)
+				this.computation.writeInput(this.particles.slice(initial));
 		}
 		obj.transform.get(obj.lastTransform);
 
 		const { particles } = this;
-		const particlesToKeep = [];
 		const timerIncrement = 1 / this.lifeSpan;
 
-		for (let i = 0; i < particles.length; i++) {
-			const p = particles[i];
-			if (p.timer >= 1) continue;
-			p.timer += timerIncrement;
-			p.update();
-			particlesToKeep.push(p);
+		let end = particles.length - 1;
+
+		if (this.computation) {
+			loop: for (let i = 0; i <= end; i++) {
+				while (particles[i].timer >= 1) {
+					particles[i] = particles[end--];
+					this.computation.writeInput(particles, i, 1, i);
+					if (i > end) continue loop;
+				}
+				particles[i].timer += timerIncrement;
+			}
+		} else {
+			loop: for (let i = 0; i <= end; i++) {
+				while (particles[i].timer >= 1) {
+					particles[i] = particles[end--];
+					if (i > end) continue loop;
+				}
+				const p = particles[i];
+				p.timer += timerIncrement;
+				p.update();
+			}
 		}
 		
-		this.particles = particlesToKeep;
+		particles.length = end + 1;
+		
+		if (this.computation) {
+			this.computation.compute(undefined, particles, particles.length);
+			this.computation.readback();
+		}
 	}
 	/**
 	 * Returns the smallest axis-aligned world-space rectangle that contains all of the particles in the system.
@@ -188,14 +228,10 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 		let { x, y, width, height } = this.camera.screen;
 		if (obj instanceof UIObject) x = y = 0;
-		x -= radius;
-		y -= radius;
-		width += radius * 2;
-		height += radius * 2;
-		const minX = x;
-		const minY = y;
-		const maxX = x + width;
-		const maxY = y + height;
+		const minX = x - radius;
+		const minY = y - radius;
+		const maxX = x + width + radius * 2;
+		const maxY = y + height + radius * 2;
 
 		let anyParticlesRendered = false;
 
