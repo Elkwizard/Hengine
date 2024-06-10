@@ -5,6 +5,7 @@ const TextModeY = Enum.define("TOP", "CENTER", "BOTTOM");
 /**
  * @name const TextMode = Enum.define
  * Specifies where on a string of text should be considered its origin.
+ * @name_subs HORIZONTAL: LEFT, CENTER, RIGHT; VERTICAL: TOP, CENTER, BOTTOM
  * @static_prop TextMode [HORIZONTAL]_[VERTICAL] | Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
  */
 const TextMode = {};
@@ -777,7 +778,7 @@ class Artist {
 	 * @param Number lineWidth? | The width of the outline in pixels. Default is 1
 	 * @param LineCap lineCap? | The line cap to use. Default is `LineCap.FLAT`
 	 * @param LineJoin lineJoin? | The line join to use for connected segments. Default is `LineJoin.BEVEL`
-	 * @return DrawRenderer
+	 * @return StrokeRenderer
 	 */
 	stroke(color, lineWidth = 1, lineCap = LineCap.FLAT, lineJoin = LineJoin.BEVEL) {
 		this.c.strokeStyle = this.getContextColor(color);

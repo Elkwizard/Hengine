@@ -125,7 +125,7 @@ class Animation extends ImageType {
 class AnimationStateMachine extends ImageType {
 	/**
 	 * Creates a new AnimationStateMachine.
-	 * @param Map stateAnimations | The Animations corresponding to each state.
+	 * @param Map<Any, Animation> stateAnimations | The Animations corresponding to each state.
 	 * @param Any initialState | The initial state
 	 */
 	constructor(stateAnimations, initialState) {

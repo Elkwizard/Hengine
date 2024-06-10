@@ -101,6 +101,22 @@ function parse(content, file) {
 					line.content = "This is an abstract superclass and should not be constructed.";
 					line.category = null;
 				}; break;
+				case "name_subs": {
+					line.substitutions = Object.fromEntries(
+						line.content
+							.split(";")
+							.map(segment => segment
+								.split(":")
+								.map(side => side.trim())
+							)
+							.map(([key, values]) => [
+								key,
+								values
+									.split(",")
+									.map(val => val.trim())
+							])
+					);
+				}; break;
 				case "prop":
 				case "static_prop":
 				case "param": {
@@ -142,6 +158,19 @@ function parse(content, file) {
 		}
 
 		match.lines = resultLines;
+		match.description = match.lines.find(line => line.category === null)?.content ?? "";
+		
+		if (match.name.isClass) {
+			match.properties = match.lines.filter(line => line.category?.indexOf("prop") > -1);
+		} else {
+			match.signatures = match.lines
+				.filter(line => line.category === "signature")
+				.map(line => line.parameters);
+		}
+
+		match.settings = { };
+		for (const line of match.lines)
+			match.settings[line.category] = line;
 	}
 
 	const topLevels = [];

@@ -1,4 +1,5 @@
 /**
+ * @own_instance
  * Represents a seeded random number generator.
  * All instance methods of this class are available statically, so `Random.int(3, 5)` is valid and uses statically stored state of the class itself.
  * The random number generation functions of this class are organized into two categories: stable and unstable.

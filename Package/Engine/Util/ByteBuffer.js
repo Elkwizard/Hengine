@@ -265,23 +265,23 @@ ByteBuffer.Writer = class {
 	
 	/**
 	 * @name int[S]
+	 * @name_subs S: 8, 16, 32
 	 * Writes an S-bit integer to the buffer. S can be 8, 16, or 32.
 	 * @param Number integer | The integer to write
-	 * @return Number
 	 */
 	
 	/**
 	 * @name uint[S]
+	 * @name_subs S: 8, 16, 32
 	 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
 	 * @param Number integer | The unsigned integer to write
-	 * @return Number
 	 */
 	
 	/**
 	 * @name float[S]
+	 * @name_subs S: 32, 64
 	 * Reads an S-bit float from the buffer. S can be 32 or 64.
 	 * @param Number float | The floating point value to write
-	 * @return Number
 	 */
 
 	/**
@@ -410,18 +410,21 @@ ByteBuffer.Reader = class {
 	}
 	/**
 	 * @name int[S]
+	 * @name_subs S: 8, 16, 32
 	 * Reads an S-bit integer from the buffer. S can be 8, 16, or 32.
 	 * @return Number
 	 */
 	
 	/**
 	 * @name uint[S]
+	 * @name_subs S: 8, 16, 32
 	 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
 	 * @return Number
 	 */
 	
 	/**
 	 * @name float[S]
+	 * @name_subs S: 32, 64
 	 * Reads an S-bit float from the buffer. S can be 32 or 64.
 	 * @return Number
 	 */

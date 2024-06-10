@@ -1,1 +1,1 @@
-node ./Docs/generate.js ./Package/Engine ./Docs/Generated/ ./Docs/structure.json
+node ./Docs/generate.js ./Package/Engine ./Docs/Generated/ ./Docs/structure.json ./Package/Hengine.d.ts

@@ -342,7 +342,7 @@ class Texture extends ImageType {
 	/**
 	 * Returns a promise resolving to a new texture containing the image data from a data: url.
 	 * @param String url | The data: url
-	 * @return Promise
+	 * @return Promise<Texture>
 	 */
 	static fromDataURI(uri, width, height) {
 		return new Promise(resolve => {

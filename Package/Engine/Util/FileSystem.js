@@ -534,7 +534,7 @@ class FileSystem { };
 		 * Lets the user upload a file from their computer to a specified location.
 		 * Returns a promise which resolves when the file is uploaded.
 		 * @param String path | The destination path for the file
-		 * @return Promise
+		 * @return Promise<String>
 		 */
 		uploadFile(path = null) {
 			const fi = document.createElement("input");

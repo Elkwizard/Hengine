@@ -2,9 +2,10 @@ const fs = require("fs");
 const path = require("path");
 const { parse, addInheritance } = require("./parse.js");
 const { document, stats } = require("./document.js");
-const { makeSearchCache, addSearchData } = require("./searchPreprocess.js")
+const { makeSearchCache, addSearchData } = require("./searchPreprocess.js");
+const createTypeSpecification = require("./typeSpecification.js");
 
-const [_node, _this, sourcePath, dstPath, structurePath] = process.argv;
+const [_node, _this, sourcePath, dstPath, structurePath, typeFile] = process.argv;
 
 function writeFile(fileName, content) {
 	content = content.replaceAll("\n", "\r\n");
@@ -38,11 +39,15 @@ const transformFiles = (transf, srcFile, srcRoot = srcFile) => {
 		return fs.readdirSync(srcFile)
 			.map(p => path.join(srcFile, p))
 			.flatMap(p => transformFiles(transf, p, srcRoot));
-	else return [transf(fs.readFileSync(srcFile, "utf-8"), path.relative(srcRoot, srcFile))];
+	else return [transf(
+		fs.readFileSync(srcFile, "utf-8"),
+		path.relative(srcRoot, srcFile)
+	)];
 };
 
 const docs = transformFiles(parse, sourcePath).flatMap(batch => batch);
 addInheritance(docs);
+fs.writeFileSync(typeFile, createTypeSpecification(docs), "utf-8");
 
 const nameToDoc = { };
 for (const doc of docs)

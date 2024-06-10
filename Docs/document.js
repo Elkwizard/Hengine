@@ -34,11 +34,10 @@ function documentName(name, doc, wrapperClass) {
 }
 
 function documentFunction(fn, wrapperClass) {
-	const names = fn.lines.find(line => line.category === "group")?.elements;
+	const names = fn.settings.group?.elements;
 	const name = names ? `${names.map(name => documentName(name, fn, wrapperClass)).join(`<span class="aux">/</span>`)}` : documentName(fn.name, fn, wrapperClass);
-	const signatures = fn.lines
-		.filter(line => line.category === "signature").map(line => line.parameters);
-	const returnType = fn.lines.find(line => line.category === "return")?.type ?? "void";
+	const { signatures } = fn;
+	const returnType = fn.settings.return?.type ?? "void";
 	const parameters = signatures
 		.map(params => {
 			stats.parameters += params.length;
@@ -72,15 +71,13 @@ function documentFunction(fn, wrapperClass) {
 			}
 		`).join("");
 
-	const description = fn.lines.find(line => line.category === null)?.content ?? "";
-
 	return `
 		<div class="function-wrapper" id="${fn.searchID}">
 			<div class="function-header member">
 				${header}
 			</div>
 			<div class="function desc">
-				${wordCount(description)}
+				${wordCount(fn.description)}
 			</div>
 			${signatures.length ? `
 				<div class="function-signature">
@@ -95,8 +92,6 @@ function document(doc, topLevelIDs, file) {
 	let result;
 	if (doc.name.isPage) {
 		const name = documentName(doc.name, doc);
-		const description = doc.lines.find(line => line.category === null)?.content ?? "";
-
 		result = `
 			<div class="page-wrapper">
 				<div class="page-header">
@@ -104,7 +99,7 @@ function document(doc, topLevelIDs, file) {
 				</div>
 
 				<div class="page desc">
-					${wordCount(description)}
+					${wordCount(doc.description)}
 				</div>
 
 			</div>
@@ -113,12 +108,11 @@ function document(doc, topLevelIDs, file) {
 	} else if (doc.name.isClass) {
 		const name = documentName(doc.name, doc);
 		const classQualifiers = [];
-		// if (doc.lines.some(line => line.category === "abstract"))
+		// if (doc.settings.abstract)
 		// 	classQualifiers.push("abstract");
-		// if (doc.lines.some(line => line.category === "readonly"))
+		// if (doc.settings.readonly)
 		// 	classQualifiers.push("readonly");
 
-		const description = doc.lines.find(line => line.category === null)?.content ?? "";
 		const subclass = (doc.subclasses ?? [])
 			.map(cls => `<span class="class-name">${cls.name.base}</span>`)
 			.join(", ");
@@ -129,8 +123,7 @@ function document(doc, topLevelIDs, file) {
 			.sort((a, b) => firstFunction.test(b.name.base) - firstFunction.test(a.name.base))
 			.map(member => documentFunction(member, doc.name.base))
 			.join("");
-		const memberProperties = doc.lines
-			.filter(line => line.category?.indexOf("prop") > -1)
+		const memberProperties = doc.properties
 			.map(line => (stats.properties++, `
 				<div class="prop-wrapper" id="${line.searchID}">
 					<div class="prop-header member">
@@ -146,7 +139,7 @@ function document(doc, topLevelIDs, file) {
 					<span class="keyword">${[...classQualifiers, doc.name.isEnum ? "enum" : "class"].join(" ")}</span> ${name}
 				</div>
 				<div class="class desc">
-					${wordCount(description)}
+					${wordCount(doc.description)}
 				</div>
 				${subclass ? `
 					<div class="header">Subclasses</div>

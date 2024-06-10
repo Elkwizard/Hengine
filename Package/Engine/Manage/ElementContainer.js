@@ -1,7 +1,7 @@
 /**
  * Represents a non-leaf node in the element tree, and can contain SceneObjects or additional ElementContainers.
  * All methods on this class that add SceneObjects only take effect at the end of the update cycle.
- * @prop Class defaultScript | The default element script applied to all SceneObjects in the container upon creation
+ * @prop Class extends ElementScript defaultScript | The default element script applied to all SceneObjects in the container upon creation
  */
 class ElementContainer extends SceneElement {
 	constructor(name = "container", container, engine) {
@@ -251,7 +251,7 @@ class ElementContainer extends SceneElement {
 	}
 	/**
 	 * Returns a conditional subset of all the leaf nodes within the container. 
-	 * @param SceneObject => Boolean mask | The function used to check which elements should be returned 
+	 * @param (SceneObject) => Boolean mask | The function used to check which elements should be returned 
 	 * @return SceneObject[]
 	 */
 	getElementsMatch(fn) {
@@ -273,7 +273,7 @@ class ElementContainer extends SceneElement {
 	}
 	/**
 	 * Returns all of the leaf nodes within the container that have a specific ElementScript.
-	 * @param Class script | The class of the ElementScript to check for
+	 * @param Class extends ElementScript script | The class of the ElementScript to check for
 	 * @return SceneObject[]
 	 */
 	getElementsWithScript(script) {

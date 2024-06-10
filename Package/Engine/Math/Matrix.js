@@ -15,6 +15,7 @@
  * const initialAgain = transformation.inverse.times(finalPoint);
  * console.log(initialAgain); // (10, 20)
  * ```
+ * @name_subs R: 0, 1, 2; C: 0, 1, 2
  * @prop Number m[R][C] | The matrix element in row R and column C (0-indexed).
  */
 class Matrix3 extends Float64Array {

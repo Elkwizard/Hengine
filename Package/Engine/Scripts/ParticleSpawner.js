@@ -26,8 +26,8 @@
  * 	}
  * });
  * ```
- * @prop Particle => void particleInit | The function that is called to initialize particles. This will be passed the particle object for each particle created. This uses the alternate key `properties.init` when provided in a parameter. Default is a no-op
- * @prop Particle => void particleUpdate | The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This uses the alternate key `properties.update` when provided in a parameter. Default is a no-op. This property may instead be a String, which contains the source code for a GPUComputation.Structured that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system. If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way. Setting this property to a function will remove the computation.
+ * @prop (Particle) => void particleInit | The function that is called to initialize particles. This will be passed the particle object for each particle created. This uses the alternate key `properties.init` when provided in a parameter. Default is a no-op
+ * @prop (Particle) => void particleUpdate | The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This uses the alternate key `properties.update` when provided in a parameter. Default is a no-op. This property may instead be a String, which contains the source code for a GPUComputation.Structured that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system. If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way. Setting this property to a function will remove the computation.
  * @prop (Artist, Particle) => void particleDraw | The function that is called to render particles each frame. This will be passed an Artist and a particle object for each particle object on-screen each frame. This uses the alternate key `properties.draw` when provided in a parameter. Default is a no-op
  * @prop Boolean slows | Whether or not particles will have air resistance applied. Default is false
  * @prop Boolean falls | Whether or not particles will have gravity applied. Default is false
@@ -35,7 +35,7 @@
  * @prop Number delay | The delay (in frames) between particle spawns. This can be less than 1. Default is 1
  * @prop Number lifeSpan | The duration (in frames) of each particle's lifetime. Default is 100
  * @prop Number radius | The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10
- * @prop Class imageType | This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen. This is not an actual property and can only be specified as a property of a `properties` argument. Default is FastFrame
+ * @prop Class extends ImageType imageType | This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen. This is not an actual property and can only be specified as a property of a `properties` argument. Default is FastFrame
  */
 class PARTICLE_SPAWNER extends ElementScript {
 	/**

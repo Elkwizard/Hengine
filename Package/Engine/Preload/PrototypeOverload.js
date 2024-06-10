@@ -24,7 +24,7 @@ class Enum {
 	 * Creates a new subclass of Enum based on a specific set of unique names.
 	 * Static properties with these names will be defined on the return value and will contain the associated symbolic values.
 	 * @param String[] ...names | The names for the symbolic values
-	 * @return Class
+	 * @return Class extends Enum
 	 */
 	static define(...names) {
 		const enumeration = class extends Enum { };
@@ -163,6 +163,7 @@ Object.defineProperty(window, "title", {
 	
 	/**
 	 * @name class Array
+	 * @interface
 	 * The built-in Array class has some additional quality-of-life methods in the Hengine.
 	 * @prop Any last | The last element of the array
 	 */
@@ -267,6 +268,7 @@ Object.defineProperty(window, "title", {
 	};
 	/**
 	 * @name class Number extends Operable
+	 * @interface
 	 * The built-in Number class has some additional utility methods in the Hengine.
 	 * The class extends Operable only in the sense that it has all of the same methods, excluding those that modify the caller in-place.
 	 */
@@ -302,6 +304,7 @@ Object.defineProperty(window, "title", {
 	});
 	/**
 	 * @name class String
+	 * @interface
 	 * The built-in String class has some additional utility methods in the Hengine.
 	 */
 	/**
@@ -471,6 +474,7 @@ ${contents.join(",\n").indent()}
 
 	/**
 	 * @name class Storage
+	 * @interface
 	 * The storage class has some additional quality-of-life methods in the Hengine designed to promote safe usage.
 	 */
 	const defaultStorageClear = Storage.prototype.clear;

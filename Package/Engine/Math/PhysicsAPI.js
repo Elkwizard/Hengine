@@ -238,7 +238,7 @@ class CollisionMonitor {
 	/**
 	 * Returns all collisions meeting a specific requirement.
 	 * If there are no such collisions, this returns null.
-	 * @param CollisionData => Boolean mask | The function that will be passed each collision to determine its eligibility
+	 * @param (CollisionData) => Boolean mask | The function that will be passed each collision to determine its eligibility
 	 * @return CollisionData[]/null
 	 */
     test(test) {

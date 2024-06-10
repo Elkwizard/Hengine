@@ -250,7 +250,7 @@ class IntervalManager {
 	}
 	/**
 	 * Creates a new ContinuousFunction.
-	 * @param () => void fn | The function to be executed every frame
+	 * @param (Number) => void fn | The function to be executed every frame. This function will be passed the number of frames since it started being called
 	 * @param Symbol type? | When during the update cycle to execute the function. Default is `IntervalFunction.AFTER_UPDATE`
 	 */
 	continuous(fn, type = IntervalFunction.AFTER_UPDATE) {
@@ -258,7 +258,7 @@ class IntervalManager {
 	}
 	/**
 	 * Creates a new TransitionFunction. Returns a promise that resolves when the transition completes.
-	 * @param Number => void fn | The function to execute over the duration. This function will be passed the completion proportion
+	 * @param (Number) => void fn | The function to execute over the duration. This function will be passed the completion proportion
 	 * @param Number frames | The duration of the transition
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
 	 * @return Promise
@@ -274,7 +274,7 @@ class IntervalManager {
 	 * @param String/Symbol property | The key of the animated property
 	 * @param Operable/Number finalValue | The value to animate to
 	 * @param Number duration | The duration of the animation
-	 * @param Number => Number curve? | The easing function. Default is `Interpolation.linear`
+	 * @param (Number) => Number curve? | The easing function. Default is `Interpolation.linear`
 	 * @param Symbol type? | When during the update cycle to update the animation. Default is `IntervalFunction.BEFORE_UPDATE`
 	 * @return Promise
 	 */

@@ -59,7 +59,7 @@ class HengineResource {
 	}
 	/**
 	 * Begins the loading of the resource, and returns a Promise. The Promise resolves to the final resource value when the loading is completed, or null if it fails.
-	 * @return Promise 
+	 * @return Promise
 	 */
 	load() {
 
@@ -561,7 +561,7 @@ class HengineLoadingStructure {
 	 * Calls to this function while inside a call to this function will stack the contexts together, allowing nesting of folder scopes.
 	 * Returns the caller.
 	 * @param String path | The relative path to the folder to add to the context stack
-	 * @param () => void fn | The function to call while in the context. This function is passed the caller as an argument
+	 * @param (HengineLoadingStructure) => void fn | The function to call while in the context. This function is passed the caller as an argument
 	 * @return HengineLoadingStructure
 	 */
 	folder(name, fn) {
@@ -730,7 +730,7 @@ class HengineLoader {
 		const { src } = wrapper;
 		const name = wrapper.constructor.name.match(
 			/Hengine(\w*?)Resource/
-		)?.[1]?.toUpperCase() ?? "RESOURCE";
+		)?.[1]?.toUpperCase() || "RESOURCE";
 		if (resource) console.log(`LOADED ${name} [${src}]`);
 		else console.warn(`LOADING FAILED FOR ${name} [${src}]`);
 		this.resources.set(src, resource);
@@ -776,7 +776,7 @@ class HengineLoader {
 	 * Returns a promise that resolves to the HengineLoader instance when all the resources are loaded.
 	 * @param HengineResource[] userResources | The resources to load
 	 * @param Boolean done? | Whether or not the update loop should start after the resources are loaded. Default is true
-	 * @return Promise 
+	 * @return Promise
 	 */
 	static load(userResources = [], done = true) {
 		async function loadResources() {
@@ -924,3 +924,32 @@ HengineLoader.engineResources = [
 		"SceneObject/UIObject.js"
 	]
 ];
+
+/**
+ * @name class Window
+ * @interface
+ * 
+ * @prop KeyboardHandler keyboard | The keyboard input API for the Hengine
+ * @prop MouseHandler mouse | The mouse input API for the Hengine
+ * @prop TouchHandler touches | The touchscreen input API for the Hengine
+ * @prop ClipboardHandler clipboard | The clipboard I/O API for the Hengine
+ * @prop CanvasImage canvas | The canvas on which rendering occurs
+ * @prop Artist renderer | The renderer that affects the screen
+ * @prop Scene scene | The scene that contains all SceneElements
+ * @prop IntervalManager intervals | The timing and scheduling API for the Hengine
+ * @prop FileSystem fileSystem | The built-in, localStorage-based file system API
+ * @prop Vector2 middle | The coordinates of the center of the screen, in screen space
+ * @prop Number width | The width of the screen
+ * @prop Number height | The height of the screen
+ * @prop String title | The name of the current browser tab
+ */
+
+/**
+ * @name function loadResource
+ * Retrieves a specific resource.
+ * If the resource failed to load, this returns null.
+ * This method is also available on the global object.
+ * If the resource has internal mutable state, like an Animation, a new copy of the resource will be returned with each call to this function.
+ * @param String src | An arbitrarily-lengthed tail end of the source of the resource. This can be as few characters as are needed to be unambiguous, or may be the entire path 
+ * @return Any/null
+ */

@@ -193,7 +193,7 @@ class ElementScript {
 	/**
 	 * @name addScript
 	 * This is called when a script (including this one) is added to the object.
-	 * @param Class script | The script being added
+	 * @param Class extends ElementScript script | The script being added
 	 * @param Any[] ...args | The initialization arguments for the script
 	 */
 }
@@ -268,7 +268,7 @@ class ScriptContainer {
 	}
 	/**
 	 * Returns the default script (`Scene.defaultScript`) of the object's scene.
-	 * @return Class
+	 * @return Class extends ElementScript
 	 */
 	get defaultScript() {
 		return this.sceneObject.container.defaultScript;
@@ -289,7 +289,7 @@ class ScriptContainer {
 	 * This also defines a property with the name of the script (e.g. `.MY_SCRIPT` for a script defined as `class MY_SCRIPT extends ElementScript { ... }`) containing the script instance.
 	 * None of the listeners on this script will be called until the next frame.
 	 * If an instance of the script was already on the object, it will be removed.
-	 * @param Class script | The script to add
+	 * @param Class extends ElementScript script | The script to add
 	 * @param  Array ...args | The initialization arguments to pass to the `.init()` listener.
 	 * @return Any
 	 */
@@ -316,7 +316,7 @@ class ScriptContainer {
 	 * Removes a specific script from the object.
 	 * This removal is synchronized, and will only take effect at the end of the frame.
 	 * When the script is removed, the `.cleanUp()` listener is called.
-	 * @param Class script | The class of the script instance to remove
+	 * @param Class extends ElementScript script | The class of the script instance to remove
 	 */
 	remove(script) {
 		if (!this.has(script)) return;
@@ -350,7 +350,7 @@ class ScriptContainer {
 	}
 	/**
 	 * Checks whether the object has a specific script.
-	 * @param Class script | The script to check
+	 * @param Class extends ElementScript script | The script to check
 	 * @return Boolean
 	 */
 	has(script) {

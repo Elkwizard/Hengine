@@ -67,6 +67,7 @@ SynthChannel.BUFFER = 15;
 
 /**
  * @name class Tone
+ * @interface
  * This is not an actual class, but rather an interface for tone specifications.
  * @prop Number duration? | The duration (in milliseconds) of the tone. If not specified, the tone can be stopped at will
  * @prop Number frequency? | The frequency of the tone in Hertz. If not specified, `.note` must be
@@ -114,7 +115,7 @@ class Synth {
 	/**
 	 * Plays a tone. If the tone has a specified duration, this returns a promise that resolves when it completes. Otherwise, this returns the `.stop()` method of the SynthChannel playing this tone.
 	 * @param Tone tone | The specification of the tone to play.
-	 * @return (Number => void)/Promise
+	 * @return ((Number) => void)/Promise
 	 */
     play(info) {
         if (info.duration !== undefined && info.volume === 0)

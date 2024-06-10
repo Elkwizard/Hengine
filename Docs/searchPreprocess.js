@@ -43,7 +43,7 @@ function addSearchData(docs, idToDoc) {
 	const addDescriptionData = (doc, id, topLevel) => addData(doc, id, doc.description, topLevel);
 	
 	const addTextData = (doc, id, topLevel) => addData(
-		doc, id, doc.lines.find(line => line.category === null)?.content ?? "", topLevel
+		doc, id, doc.description, topLevel
 	);
 
 	const addFunctionData = (doc, wrapperClass = null, topLevel = doc) => {
@@ -55,8 +55,8 @@ function addSearchData(docs, idToDoc) {
 		if (doc.name.isSetter) id = `set ${id}`;
 		addTextData(doc, id, topLevel);
 
-		for (const signature of doc.lines.filter(line => line.category === "signature")) {
-			for (const param of signature.parameters)
+		for (const signature of doc.signatures) {
+			for (const param of signature)
 				addDescriptionData(param, `${id}:${param.name}`, topLevel);
 		}
 	};
@@ -67,7 +67,7 @@ function addSearchData(docs, idToDoc) {
 		} else if (doc.name.isClass) {
 			let id = `${doc.name.isEnum ? "enum" : "class"} ${doc.name.base}`;
 			addTextData(doc, id, doc);
-			for (const property of doc.lines.filter(line => line.category?.indexOf("prop") > -1)) {
+			for (const property of doc.properties) {
 				let id = property.name;
 				if (property.category === "static_prop") id = `static ${id}`;
 				else id = `${doc.name.base}.${id}`;

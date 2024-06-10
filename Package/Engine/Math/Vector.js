@@ -414,6 +414,7 @@ Vector2.modValues = ["x", "y"];
 
 /**
  * Represents a 3D vector.
+ * @name_subs UV: XY, XZ, YZ
  * @prop Number angle[UV] | The counter-clockwise angle of the vector from the horizontal on the U-V plane. e.g. `vec.angleXY` or `vec.angleYZ`
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y", "z"]`
  */
@@ -444,6 +445,7 @@ class Vector3 extends Vector {
 	}
 	/**
 	 * @name rotate[UV]
+	 * @name_subs UV: XY, XZ, YZ
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateYZ(0.1)`
 	 * @param Number angle | The amount (in radians) to rotate by
@@ -451,6 +453,7 @@ class Vector3 extends Vector {
 	 */
 	/**
 	 * @name rotated[UV]
+	 * @name_subs UV: XY, XZ, YZ
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param Number angle | The amount (in radians) to rotate by
 	 * @return Vector3
@@ -577,6 +580,7 @@ Vector3.modValues = ["x", "y", "z"];
 
 /**
  * Represents a 4D vector.
+ * @name_subs UV: XY, XZ, XW, YZ, YW, ZW
  * @prop Number angle[UV] | The counter-clockwise angle of the vector from the horizontal on the U-V plane. e.g. `vec.angleYZ` or `vec.angleYW`
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y", "z", "w"]`
  */
@@ -598,6 +602,7 @@ class Vector4 extends Vector {
 	
 	/**
 	 * @name rotate[UV]
+	 * @name_subs UV: XY, XZ, XW, YZ, YW, ZW
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateZW(0.3)`
 	 * @param Number angle | The amount (in radians) to rotate by
@@ -605,6 +610,7 @@ class Vector4 extends Vector {
 	 */
 	/**
 	 * @name rotated[UV]
+	 * @name_subs UV: XY, XZ, XW, YZ, YW, ZW
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param Number angle | The amount (in radians) to rotate by
 	 * @return Vector4

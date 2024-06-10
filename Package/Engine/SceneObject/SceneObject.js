@@ -82,7 +82,7 @@ class SceneObject extends SceneElement {
 	/**
 	 * Schedules a function to be called immediately after additions and removals from the scene take effect.
 	 * It will be passed the object when called.
-	 * @param SceneObject => void fn | The function to be called
+	 * @param (SceneObject) => void fn | The function to be called
 	 */
 	sync(fn) {
 		this.synced.push(fn);

@@ -35,14 +35,14 @@ All properties of this class are read-only.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="PARTICLE_SPAWNER.particleInit">
 					<div class="prop-header member">
-						<span class="prop-name">particleInit</span><span class="type">Particle => void</span>
+						<span class="prop-name">particleInit</span><span class="type">(Particle) => void</span>
 					</div>
 					<div class="prop desc">The function that is called to initialize particles. This will be passed the particle object for each particle created. This uses the alternate key <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">init</span></code> when provided in a parameter. Default is a no-op</div>
 				</div>
 			
 				<div class="prop-wrapper" id="PARTICLE_SPAWNER.particleUpdate">
 					<div class="prop-header member">
-						<span class="prop-name">particleUpdate</span><span class="type">Particle => void</span>
+						<span class="prop-name">particleUpdate</span><span class="type">(Particle) => void</span>
 					</div>
 					<div class="prop desc">The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This uses the alternate key <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">update</span></code> when provided in a parameter. Default is a no-op. This property may instead be a <a href="../../Pages/Built-Ins/String.html#class String">String</a>, which contains the source code for a <a href="../../Pages/Miscellaneous/GPUComputation.html#class GPUComputation.Structured">GPUComputation.Structured</a> that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system. If this property is set to a <a href="../../Pages/Built-Ins/String.html#class String">String</a>, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way. Setting this property to a function will remove the computation.</div>
 				</div>
@@ -98,7 +98,7 @@ All properties of this class are read-only.
 			
 				<div class="prop-wrapper" id="PARTICLE_SPAWNER.imageType">
 					<div class="prop-header member">
-						<span class="prop-name">imageType</span><span class="type">Class</span>
+						<span class="prop-name">imageType</span><span class="type">Class extends <a href="../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 					</div>
 					<div class="prop desc">This specifies how particles should be rendered. If this is <a href="../../Pages/Rendering/Image Types/Frame.html#class FastFrame">FastFrame</a>, they will be rendered on a separate surface and then be copied over. If this is <a href="../../Pages/Rendering/Image Types/CanvasImage.html#class CanvasImage">CanvasImage</a>, they will be rendered directly to the screen. This is not an actual property and can only be specified as a property of a <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">properties</span></code> argument. Default is <a href="../../Pages/Rendering/Image Types/Frame.html#class FastFrame">FastFrame</a></div>
 				</div>

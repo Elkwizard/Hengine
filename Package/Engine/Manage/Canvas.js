@@ -11,6 +11,7 @@ const ScalingMode = Enum.define("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MUL
  * The pixel ratio of the canvas is equal to `window.devicePixelRatio`.
  * The `.width` and `.height` properties of this class are also available on the global object.
  * A vector with components equal to half the dimensions of the canvas is also available on the global object in the `.middle` property.
+ * This class is available via the `.canvas` property of both the global object and Hengine.
  * ```js
  * canvas.scalingMode = ScalingMode.STRETCH;
  * 
