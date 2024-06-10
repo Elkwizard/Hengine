@@ -1,5 +1,5 @@
 <script src="../Hengine.js" title="Shader Editor">
-	hengine.scalingMode = ScalingMode.PRESERVE_ASPECT_RATIO;
+	canvas.scalingMode = ScalingMode.PRESERVE_ASPECT_RATIO;
 	class CODE_INPUT extends ElementScript {
 		init(obj) {
 			obj.scripts.removeDefault();
@@ -14,7 +14,7 @@
 	const codeInput = scene.main.addUIElement("codeInput", width * 0.75, height / 2, width / 2, height);
 	codeInput.scripts.add(CODE_INPUT);
 
-codeInput.scripts.TEXT_AREA.setValue(`uniform float time;
+	codeInput.scripts.TEXT_AREA.setValue(`uniform float time;
 uniform vec2 mouse;
 
 vec4 shader() {
@@ -89,7 +89,10 @@ vec4 shader() {
 			}
 			time = 0;
 		}
-		if (shader.argumentExists("webcam") && !webcam) webcam = new WebcamCapture();
+		if (shader.argumentExists("webcam") && !webcam) {
+			webcam = new Frame(1, 1, 1);
+			new HengineWebcamResource("wc").load().then(wc => webcam = wc);
+		}
 		time++;
 		let args = { time, mouse: mouse.screen };
 		if (shader.argumentExists("webcam")) args.webcam = webcam;
