@@ -5,12 +5,17 @@
  */
 class WebcamCapture extends ImageType {
 	constructor(video) {
-		super(video.videoWidth, video.videoHeight);
+		const minDim = Math.min(video.videoWidth, video.videoHeight);
+		super(minDim, minDim);
 		this.video = video;
 		this.lastCaptureTime = -20;
 		this.recording = true;
-		this.image = new_OffscreenCanvas(this.width, this.height);
+
+		this.image = new_OffscreenCanvas(minDim, minDim);
 		this.c = this.image.getContext("2d");
+
+		this.offsetX = (video.videoWidth - minDim) / 2;
+		this.offsetY = (video.videoHeight - minDim) / 2;
 	}
 	/**
 	 * Returns a copy of the current view from the webcam.
@@ -36,12 +41,8 @@ class WebcamCapture extends ImageType {
 	}
 	makeImage() {
 		if ((this.recording && performance.now() - this.lastCaptureTime > 16)) {
-			const v = this.video;
-			const mwidth = Math.min(v.videoWidth, v.videoHeight);
-			const ox = (v.videoHeight < v.videoWidth) ? (v.videoWidth - mwidth) / 2 : 0;
-			const oy = (v.videoHeight > v.videoWidth) ? (v.videoHeight - mwidth) / 2 : 0;
-			this.width = this.height = this.image.width = this.image.height = mwidth;
-			this.c.drawImage(this.video, ox, oy, mwidth, mwidth, 0, 0, mwidth, mwidth);
+			const size = this.width;
+			this.c.drawImage(this.video, this.offsetX, this.offsetY, size, size, 0, 0, size, size);
 			this.lastCaptureTime = performance.now();
 		}
 
