@@ -6566,7 +6566,7 @@ declare class Synth {
 	 * Plays a tone. If the tone has a specified duration, this returns a promise that resolves when it completes. Otherwise, this returns the `.stop()` method of the SynthChannel playing this tone.
 	 * @param tone - The specification of the tone to play.
 	 */
-	play(tone: Tone): ((arg0: number) => void) | Promise;
+	play(tone: Tone): ((arg0: number) => void) | Promise<void>;
 	/**
 	 * Plays a sequence of tones with specified durations. Returns a promise that resolves when they have all completed.
 	 * @param all - The specifications of the tones to play. See the class description
