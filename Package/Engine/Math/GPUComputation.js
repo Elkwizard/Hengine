@@ -461,6 +461,11 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 		super.compile();
 		this.writeFunction = this.readFunction = null;
 	}
+	getValue(object, property) {
+		return property
+			.split(".")
+			.reduce((a, b) => a[b], object);
+	}
 	guaranteeWrite(input) {
 		if (this.writeFunction) return;
 			
@@ -485,7 +490,7 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 
 		const source = this.inputFields.flatMap(({ name, type }) => {
 			let pieces = types[type];
-			const value = input[0][name];
+			const value = this.getValue(input[0], name);
 			if (typeof value === "object")
 				pieces = value instanceof Color ? pieces[1] : pieces[0];
 			return pieces.map(([write, suffix]) => `write.${write}(obj.${name}${suffix});`);
@@ -563,7 +568,7 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 
 		const source = this.outputFields.flatMap(({ name, type }) => {
 			let pieces = types[type];
-			const value = output[0][name];
+			const value = this.getValue(output[0], name);
 			if (typeof value === "object")
 				pieces = value instanceof Color ? pieces[1] : pieces[0];
 			return pieces.map(([prop, read, suffix]) => `obj.${name}${prop} = read.${read}()${suffix};`);
