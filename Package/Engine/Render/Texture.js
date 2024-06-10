@@ -344,37 +344,34 @@ class Texture extends ImageType {
 	 * @param String url | The data: url
 	 * @return Promise
 	 */
-	static async fromDataURI(uri, w_o, h_o) {
-		let img = new Image();
-		img.src = uri;
-		let tex;
-		return await new Promise(resolve => {
-			img.onload = function () {
-				let canvas = document.createElement("canvas");
-				document.body.appendChild(img);
-				let style = getComputedStyle(img);
-				let w = w_o ? w_o : parseInt(style.width);
-				if (w_o && !h_o) h_o = Math.floor(parseInt(style.height) * w_o / parseInt(style.width));
-				let h = h_o ? h_o : parseInt(style.height);
-				tex = new Texture(w, h);
-				canvas.width = w;
-				canvas.height = h;
-				let ctx = canvas.getContext("2d");
+	static fromDataURI(uri, width, height) {
+		return new Promise(resolve => {
+			const img = new Image();
+			img.src = uri;
+			img.addEventListener("load", () => {
+				const w = width ?? img.width;
+				if (width && !height) height = Math.floor(width * img.height / img.width);
+				const h = height ?? style.height;
+				const tex = new Texture(w, h);
+				
+				const canvas = new_OffscreenCanvas(w, h);
+				const ctx = canvas.getContext("2d");
 				ctx.imageSmoothingEnabled = false;
 				ctx.drawImage(img, 0, 0, w, h);
-				let data = ctx.getImageData(0, 0, w, h).data;
-				for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) {
-					let inx = (j * w + i) * 4;
-					let red = data[inx];
-					let green = data[inx + 1];
-					let blue = data[inx + 2];
-					let alpha = data[inx + 3] / 255;
-					let col = new Color(red, green, blue, alpha);
-					tex.setPixel(i, j, col);
+
+				const { data } = ctx.getImageData(0, 0, w, h);
+				for (let i = 0; i < w; i++)
+				for (let j = 0; j < h; j++) {
+					const inx = (j * w + i) * 4;
+					tex.setPixel(i, j, new Color(
+						data[inx],
+						data[inx + 1],
+						data[inx + 2],
+						data[inx + 3] / 255
+					));
 				}
-				img.remove();
 				resolve(tex);
-			}
+			});
 		});
 	}
 	/**
@@ -387,7 +384,7 @@ class Texture extends ImageType {
 		buffer.write.uint32(this.width);
 		buffer.write.uint32(this.height);
 
-		const { data } = texture.imageData;
+		const { data } = this.imageData;
 		for (let i = 0; i < data.length; i++) buffer.write.uint8(data[i]);
 
 		buffer.finalize();

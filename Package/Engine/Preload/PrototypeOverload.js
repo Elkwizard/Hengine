@@ -514,10 +514,10 @@ ${contents.join(",\n").indent()}
 		const input = document.createElement("input");
 		input.type = "file";
 		return new Promise(resolve => {
-			input.onchange = event => {
+			input.addEventListener("change",  event => {
 				const file = input.files[0];
 				const reader = new FileReader();
-				reader.onload = () => {
+				reader.addEventListener("load", () => {
 					const text = reader.result;
 					const parsedObject = JSON.parse(text);
 					for (const key in parsedObject) {
@@ -525,9 +525,9 @@ ${contents.join(",\n").indent()}
 						if (typeof value === "string") this[key] = value;
 					}
 					resolve();
-				};
+				});
 				reader.readAsText(file);
-			};
+			});
 			input.click();
 		});
 	});

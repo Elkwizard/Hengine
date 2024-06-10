@@ -16,7 +16,9 @@
 		script.setAttribute("charset", "UTF-8");
         script.src = src;
 		document.head.appendChild(script);
-        return new Promise(resolve => script.onload = () => resolve(script));
+        return new Promise(resolve => {
+			script.addEventListener("load", () => resolve(script));
+		});
     }
 
 	// load resources

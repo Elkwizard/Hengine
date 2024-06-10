@@ -78,12 +78,8 @@ class HengineScriptResource extends HengineResource {
 		script.src = this.src;
 		document.head.appendChild(script);
 		return new Promise(resolve => {
-			script.onload = function () {
-				resolve(script);
-			}
-			script.onerror = function () {
-				resolve(null);
-			}
+			script.addEventListener("load", () => resolve(script));
+			script.addEventListener("error", () => resolve(null));
 		});
 	}
 }
@@ -109,9 +105,7 @@ class HengineSoundResource extends HengineResource {
 			audio.addEventListener("canplaythrough", () => {
 				resolve(new Sound(this.src, this.loops));
 			});
-			audio.addEventListener("error", function () {
-				resolve(null);
-			});
+			audio.addEventListener("error", () => resolve(null));
 		});
 	}
 }
@@ -122,16 +116,10 @@ class HengineSoundResource extends HengineResource {
  */
 class HengineImageResource extends HengineResource {
 	load() {
-		const image = new HImage(this.src);
+		const image = new Image(this.src);
 		return new Promise(resolve => {
-			image.image.addEventListener("load", function () {
-				// update dimensions in interim
-				image.forceLoad();
-				resolve(image);
-			});
-			image.image.addEventListener("error", function () {
-				resolve(null);
-			});
+			image.addEventListener("load", () => resolve(new HImage(image)));
+			image.addEventListener("error", () => resolve(null));
 		});
 	}
 }
@@ -152,12 +140,11 @@ class HengineVideoResource extends HengineResource {
 		this.loops = loops;
 	}
 	load() {
-		const video = new VideoView(this.src, this.loops);
+		const video = document.createElement("video");
+		video.src = this.src;
 		return new Promise(resolve => {
-			video.video.addEventListener("canplay", () => {
-				video.forceLoad();
-				resolve(video);
-			});
+			video.addEventListener("canplay", () => resolve(new VideoView(video, this.loops)));
+			video.addEventListener("error", () => resolve(null));
 		});
 	}
 }
@@ -184,28 +171,17 @@ class HengineAnimationResource extends HengineResource {
 		this.delay = delay;
 		this.loops = loops;
 	}
-	load() {
-		const animation = new Animation(this.src, this.frames, this.delay, this.loops);
-		const promises = [];
-		for (let i = 0; i < animation.frames.length; i++) {
-			const image = animation.frames[i];
-			if (image instanceof HImage) {
-				promises.push(new Promise(function (resolve) {
-					image.image.addEventListener("load", function () {
-						// update dimensions in interim
-						resolve(animation);
-					});
-					image.image.addEventListener("error", function () {
-						resolve(null);
-					});
-				}));
-			}
+	async load() {
+		try {
+			const frames = await Promise.all(
+				new Array(this.frames.length)
+					.fill(null)
+					.map((_, i) => new HengineImageResource(`${this.src}/${i + 1}.png`).load())
+			);
+			return new Animation(frames, this.delay, this.loops);
+		} catch (err) {
+			return null;
 		}
-		return new Promise(async resolve => {
-			await Promise.all(promises);
-			animation.forceLoad();
-			resolve(animation);
-		});
 	}
 }
 
@@ -222,7 +198,7 @@ class HengineFontResource extends HengineResource {
 
 				const firstFontIndex = document.fonts.size;
 				
-				style.onload = async () => {
+				style.addEventListener("load", async () => {
 					const allFonts = [...document.fonts];
 					const lastFont = allFonts[allFonts.length - 1];
 					if (!lastFont) {
@@ -237,7 +213,7 @@ class HengineFontResource extends HengineResource {
 						.map(font => font.load()));
 					
 					resolve(family);
-				};
+				});
 
 				style.innerHTML = css;
 				document.head.appendChild(style);
@@ -253,12 +229,12 @@ class HengineFontResource extends HengineResource {
 				} else {
 					const xhr = new XMLHttpRequest();
 					xhr.open("GET", this.src);
-					xhr.onreadystatechange = () => {
+					xhr.addEventListener("readystatechange", () => {
 						if (xhr.readyState === XMLHttpRequest.DONE) {
 							if (xhr.status === 0 || xhr.status === 200) handleCSS(xhr.responseText);
 							else resolve(null);
 						}
-					};
+					});
 					xhr.send();
 				}
 			} catch (err) {
@@ -279,12 +255,12 @@ class HengineTextResource extends HengineResource {
 			try {
 				const xhr = new XMLHttpRequest();
 				xhr.open("GET", this.src);
-				xhr.onreadystatechange = () => {
+				xhr.addEventListener("readystatechange", () => {
 					if (xhr.readyState === XMLHttpRequest.DONE) {
 						if (xhr.status === 0 || xhr.status === 200) resolve(xhr.responseText);
 						else resolve(null);
 					}
-				};
+				});
 				xhr.send();
 			} catch (err) {
 				resolve(null);
@@ -305,12 +281,12 @@ class HengineBinaryResource extends HengineResource {
 				xhr.open("GET", this.src);
 				xhr.setRequestHeader("Content-Type", "application/octet-stream");
 				xhr.responseType = "arraybuffer";
-				xhr.onreadystatechange = () => {
+				xhr.addEventListener("readystatechange", () => {
 					if (xhr.readyState === XMLHttpRequest.DONE) {
 						if (xhr.status === 0 || xhr.status === 200) resolve(new ByteBuffer(xhr.response));
 						else resolve(null);
 					}
-				};
+				});
 				xhr.send();
 			} catch (err) {
 				resolve(null);
@@ -320,12 +296,6 @@ class HengineBinaryResource extends HengineResource {
 }
 
 class HengineWASMResource extends HengineResource { // emscripten-only, uses specific API/naming convention, really only for internal Hengine use
-	static files = { };
-	
-	constructor(src) {
-		super(src);
-	}
-
 	async load() {
 		const script = await new HengineScriptResource(
 			this.src.replace(/\.wasm$/g, ".js")
@@ -502,6 +472,37 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 		};
 	}
 }
+HengineWASMResource.files = { };
+
+/**
+ * Represents a request for access to the user's webcam.
+ * When this resource is loaded, it resolves to a WebcamCapture that is actively streaming.
+ */
+class HengineWebcamResource extends HengineResource {
+	/**
+	 * @name constructor
+	 * Creates a new HengineWebcamResource.
+	 * @param String name | A unique identifier for the webcam. This can be passed to `loadResource()` to retrieve it once loaded 
+	 */
+
+	async load() {
+		try {
+			const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+			const video = document.createElement("video");
+			video.srcObject = mediaStream;
+			return new Promise(resolve => {
+				video.addEventListener("canplay", () => {
+					console.log("Webcam Streaming");
+					resolve(new WebcamCapture(video));
+				});
+				video.addEventListener("error", () => resolve(null));
+				video.play();
+			});
+		} catch (err) {
+			return null;
+		}
+	}
+}
 
 /**
  * Represents a batch of HengineResources to be loaded in a row, and can be used as a more streamlined approach compared to constructing HengineResources directly.
@@ -584,6 +585,14 @@ class HengineLoadingStructure {
 	 */
 	binary(src) {
 		return this.add(new HengineBinaryResource(this.absSrc(src)));
+	}
+	/**
+	 * Adds a HengineWebcamResource to the queue with a specified name.
+	 * @param String name | The name of the resource
+	 * @return HengineLoadingStructure
+	 */
+	webcam(name) {
+		return this.add(new HengineWebcamResource(name));
 	}
 	/**
 	 * Adds a HengineTextResource to the queue with a specified source.

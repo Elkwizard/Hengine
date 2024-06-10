@@ -214,7 +214,7 @@ class ImageType {
 		a.href = this.toDataURL();
 		a.download = name + ".png";
 		return new Promise(resolve => {
-			a.onclick = () => resolve();
+			a.addEventListener("click", () => resolve());
 			a.click();
 		});
 	}
@@ -233,17 +233,9 @@ class ImageType {
  * ```
  */
 class HImage extends ImageType {
-	constructor(src) {
-		super(1, 1);
-		this.image = new Image();
-		this.image.src = src;
-		this.loaded = false;
-		this.image.addEventListener("load", this.forceLoad.bind(this));
-	}
-	forceLoad() {
-		this.width = this.image.width;
-		this.height = this.image.height;
-		this.loaded = true;
+	constructor(image) {
+		super(image.width, image.height);
+		this.image = image;
 	}
 	makeImage() {
 		return this.image;
@@ -254,13 +246,8 @@ class HImage extends ImageType {
 	 * @param String src | The file path to check
 	 * @return Promise
 	 */
-	static imageExists(src) {
-		const img = new Image();
-		img.src = src;
-		return new Promise(resolve => {
-			img.onerror = () => resolve(false);
-			img.onload = () => resolve(true);
-		});
+	static async imageExists(src) {
+		return await new HengineImageResource(src).load() !== null;
 	}
 }
 

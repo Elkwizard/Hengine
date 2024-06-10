@@ -259,7 +259,7 @@ class KeyboardHandler extends InputHandler {
 		return (name.length === 1) ? name.toLowerCase() : name;
 	}
 	addListeners() {
-		document.body.onblur = () => this.targetAll(false);
+		document.body.addEventListener("blur", () => this.targetAll(false));
 		document.addEventListener("keydown", event => {
 			// don't cancel fancy keyboard shortcuts
 			if (!(event.ctrlKey || (event.key[0] === "F" && event.key.length > 1)))

@@ -526,7 +526,7 @@ class FileSystem { };
 			const name = pathPieces[pathPieces.length - 1];
 			a.setAttribute("download", name);
 			return new Promise(resolve => {
-				a.onclick = () => resolve();
+				a.addEventListener("click", () => resolve());
 				a.click();
 			});
 		}
@@ -540,21 +540,21 @@ class FileSystem { };
 			const fi = document.createElement("input");
 			fi.type = "file";
 			return new Promise(resolve => {
-				fi.onchange = () => {
+				fi.addEventListener("change", () => {
 					const file = fi.files[0];
 					if (file) {
 						path ??= file.name;
 						const reader = new FileReader();
 						reader.readAsArrayBuffer(file);
-						reader.onload = () => {
+						reader.addEventListener("load", () => {
 							const { result } = reader;
 							const buffer = new ByteBuffer(result);
 							buffer.pointer = result.byteLength;
 							this.writeFile(path, buffer, true);
 							resolve(path);
-						}
+						});
 					}
-				};
+				});
 				fi.click();
 			});
 		}

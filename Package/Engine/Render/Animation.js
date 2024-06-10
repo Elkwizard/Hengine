@@ -25,32 +25,17 @@ class Animation extends ImageType {
 	 * @param boolean loops | Whether or not the animation loops
 	 * @param () => void onEnd? | A function to be called when the animation completes. Default is a no-op
 	 */
-	constructor(src = "", frames = 1, delay = 0, loops = false, onEnd = () => null) {
+	constructor(frames = 1, delay = 0, loops = false, onEnd = () => null) {
 		super(1, 1);
 		this.stopped = false;
 		this.autoAdvance = true;
-		if (!Array.isArray(src)) {
-			this.frameCount = frames;
-			this.frames = [];
-
-			for (let i = 0; i < frames; i++) {
-				this.frames.push(new HImage(`${src}/${i + 1}.png`));
-			}
-			this.loops = loops;
-			this.onEnd = onEnd;
-			this.delay = delay;
-			Promise.all(this.frames.map(frame => new Promise(resolve => {
-				frame.image.addEventListener("load", () => resolve(frame));
-			}))).then(() => this.forceLoad());
-		} else {
-			this.frames = src;
-			this.frameCount = this.frames.length;
-			this.delay = frames;
-			this.loops = delay;
-			this.onEnd = loops || (() => null);
-		}
+		this.frames = frames;
+		this.frameCount = this.frames.length;
+		this.delay = delay;
+		this.loops = loops;
+		this.onEnd = onEnd;
 		this.totalTime = this.frames.length * this.delay;
-		this.forceLoad();
+		this.timer = 0;
 	}
 	set timer(a) {
 		this._timer = a;
@@ -79,9 +64,6 @@ class Animation extends ImageType {
 	 */
 	get() {
 		return new Animation(this.frames, this.delay, this.loops, this.onEnd);
-	}
-	forceLoad() {
-		this.timer = 0;
 	}
 	/**
 	 * Advances the animation by one update cycle.

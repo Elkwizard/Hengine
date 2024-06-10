@@ -14,7 +14,8 @@
 					"HengineFontResource",
 					"HengineSoundResource",
 					"HengineVideoResource",
-					"HengineAnimationResource"
+					"HengineAnimationResource",
+					"HengineWebcamResource"
 				]
 			},
 			"Intervals": {

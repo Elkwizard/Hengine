@@ -5,16 +5,13 @@
  * @prop Boolean playing | Whether or not the video is currently playing. This value is read-only
  */
 class VideoView extends ImageType {
-	constructor(src, loops = false) {
-		super(1, 1);
-		this.src = src;
-		this.video = null;
-		this.getVideo();
+	constructor(video, loops = false) {
+		super(video.videoWidth / __devicePixelRatio, video.videoHeight / __devicePixelRatio);
+		this.video = video;
 		this.loops = loops;
-		this.loaded = false;
 		this.lastCaptureTime = -20;
 		this.playing = true;
-		this.image = new_OffscreenCanvas(this.width, this.height);
+		this.image = new_OffscreenCanvas(video.videoWidth, video.videoHeight);
 		this.c = this.image.getContext("2d");
 	}
 	set loops(a) {
@@ -23,20 +20,6 @@ class VideoView extends ImageType {
 	}
 	get loops() {
 		return this._loops;
-	}
-	getVideo() {
-		this.video = document.createElement("video");;
-		this.video.src = this.src;
-		this.video.muted = true;
-		this.video.addEventListener("canplay", this.forceLoad.bind(this));
-		this.video.play();
-	}
-	forceLoad() {
-		this.loaded = true;
-		this.width = this.video.videoWidth / __devicePixelRatio;
-		this.height = this.video.videoHeight / __devicePixelRatio;
-		this.image.width = this.video.videoWidth;
-		this.image.height = this.video.videoHeight;	
 	}
 	/**
 	 * Returns a copy of the current frame of the video.
@@ -63,12 +46,11 @@ class VideoView extends ImageType {
 		this.video.play();
 	}
 	makeImage() {
-		if (this.loaded) {
-			if ((this.playing && performance.now() - this.lastCaptureTime > 16)) {
-				this.c.drawImage(this.video, 0, 0, this.image.width, this.image.height);
-				this.lastCaptureTime = performance.now();
-			}
+		if ((this.playing && performance.now() - this.lastCaptureTime > 16)) {
+			this.c.drawImage(this.video, 0, 0, this.image.width, this.image.height);
+			this.lastCaptureTime = performance.now();
 		}
+		
 		return this.image;
 	}
 }
