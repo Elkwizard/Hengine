@@ -290,7 +290,7 @@ class ScriptContainer {
 	 * None of the listeners on this script will be called until the next frame.
 	 * If an instance of the script was already on the object, it will be removed.
 	 * @param Class extends ElementScript script | The script to add
-	 * @param  Array ...args | The initialization arguments to pass to the `.init()` listener.
+	 * @param Any[] ...args | The initialization arguments to pass to the `.init()` listener.
 	 * @return Any
 	 */
 	add(script, ...args) {

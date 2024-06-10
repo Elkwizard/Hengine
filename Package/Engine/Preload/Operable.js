@@ -203,7 +203,7 @@ class Operable {
     }
 	/**
 	 * Computes the element-wise sum of a list of operables.
-	 * @param Operable/Number[] operables | The values to sum 
+	 * @param Operable[]/Number[] operables | The values to sum 
 	 * @return Operable
 	 */
     static sum(v) {
@@ -213,7 +213,7 @@ class Operable {
     }
 	/**
 	 * Computes the element-wise average of a list of operables.
-	 * @param Operable/Number[] operables | The values to average 
+	 * @param Operable[]/Number[] operables | The values to average 
 	 * @return Operable
 	 */
     static avg(v) {
@@ -252,7 +252,7 @@ class Operable {
     }
 	/**
 	 * Finds and returns the element-wise minimum of a series of values.
-	 * @param Operable/Number[] ...values | The values to compare
+	 * @param Operable[]/Number[] ...values | The values to compare
 	 * @return Operable
 	 */
     static min(...values) {
@@ -263,7 +263,7 @@ class Operable {
     }
 	/**
 	 * Finds and returns the element-wise maximum of a series of values.
-	 * @param Operable/Number[] ...values | The values to compare
+	 * @param Operable[]/Number[] ...values | The values to compare
 	 * @return Operable
 	 */
     static max(...values) {

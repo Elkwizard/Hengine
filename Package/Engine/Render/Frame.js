@@ -207,7 +207,7 @@ class ImageType {
 	 * Downloads the image as a PNG, with a specified name.
 	 * Returns a promise that resolves when the image downloads.
 	 * @param String name | The name of the downloaded image, without the extension
-	 * @return Promise
+	 * @return Promise<void>
 	 */
 	download(name) {
 		const a = document.createElement("a");
@@ -244,7 +244,7 @@ class HImage extends ImageType {
 	 * Checks whether an image exists at a specified file path.
 	 * Returns a promise that resolves to whether the image exists.
 	 * @param String src | The file path to check
-	 * @return Promise
+	 * @return boolean
 	 */
 	static async imageExists(src) {
 		return await new HengineImageResource(src).load() !== null;

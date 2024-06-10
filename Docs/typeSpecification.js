@@ -113,21 +113,25 @@ function createClassSpecification(doc) {
 }
 
 function createOverloadSpecification(name, parameters, doc) {
-	const returnType = doc.settings.return?.type ?? "void";
+	let returnType = doc.settings.return?.type ?? "void";
+	if (doc.name.isAsync) returnType = `Promise<${returnType}>`;
 
 	const paramString = parameters
 		.map(param => `${param.name}: ${formatType(param.type)}`)
 		.join(", ");
 
-	let result = `${name}(${paramString})`;
+	let result = "";
+
+	if (doc.name.isStatic) result += "static ";
+	if (doc.name.isGlobalFunction) result += "function ";
+	if (doc.name.isSetter) result += "set ";
+	if (doc.name.isGetter) result += "get ";
 	
-	if (name !== "constructor") result = `${result}: ${formatType(returnType)}`;
+	result += `${name}(${paramString})`;
+
+	if (name !== "constructor" && !doc.name.isSetter)
+		result += `: ${formatType(returnType)}`;
 	result += ";";
-	if (doc.name.isGetter) result = `get ${result}`;
-	if (doc.name.isSetter) result = `set ${result}`;
-	if (doc.name.isGlobalFunction) result = `function ${result}`;
-	if (doc.name.isAsync) result = `async ${result}`;
-	if (doc.name.isStatic) result = `static ${result}`;
 
 	result = createTSDoc([
 		...doc.description.split("\n"),

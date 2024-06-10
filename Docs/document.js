@@ -171,6 +171,9 @@ function document(doc, topLevelIDs, file) {
 	result = result.replace(/`(.*?)`/g, (_, code) => {
 		return highlight(code, highlighters.js);
 	});
+	result = result.replace(/(?<=<span class=\"type\">)(.*?)(?=<\/span>)/g, match => {
+		return match.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+	});
 
 	// add automatic links to other doc pages
 	const toRoot = path.relative(path.dirname(file), ".");

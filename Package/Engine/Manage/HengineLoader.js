@@ -59,7 +59,7 @@ class HengineResource {
 	}
 	/**
 	 * Begins the loading of the resource, and returns a Promise. The Promise resolves to the final resource value when the loading is completed, or null if it fails.
-	 * @return Promise
+	 * @return Promise<Any/null>
 	 */
 	load() {
 
@@ -776,7 +776,7 @@ class HengineLoader {
 	 * Returns a promise that resolves to the HengineLoader instance when all the resources are loaded.
 	 * @param HengineResource[] userResources | The resources to load
 	 * @param Boolean done? | Whether or not the update loop should start after the resources are loaded. Default is true
-	 * @return Promise
+	 * @return Promise<void>
 	 */
 	static load(userResources = [], done = true) {
 		async function loadResources() {

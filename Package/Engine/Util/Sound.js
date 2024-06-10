@@ -46,7 +46,7 @@ class SynthChannel {
 	 * Stops the tone from playing, optionally after a delay.
 	 * Returns a promise that resolves when the tone stops.
 	 * @param Number wait? | The interval (in milliseconds) to wait before stopping the sound. Default is 0
-	 * @return Promise
+	 * @return Promise<void>
 	 */
     stop(wait = 0) {
         const endTime = this.synth.time + wait;

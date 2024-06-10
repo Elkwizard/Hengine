@@ -513,7 +513,7 @@ class FileSystem { };
 		 * Downloads a file onto the user's computer.
 		 * Returns a promise which resolves when the download occurs.
 		 * @param String path | The file to download
-		 * @return Promise
+		 * @return Promise<void>
 		 */
 		downloadFile(path) {
 			const buffer = this.readFile(path, true).get();

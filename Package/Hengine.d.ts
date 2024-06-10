@@ -232,7 +232,7 @@ declare class HengineResource {
 	/**
 	 * Begins the loading of the resource, and returns a Promise. The Promise resolves to the final resource value when the loading is completed, or null if it fails.
 	 */
-	load(): Promise;
+	load(): Promise<any | null>;
 }
 
 /**
@@ -485,7 +485,7 @@ declare class HengineLoader {
 	 * @param userResources - The resources to load
 	 * @param done - Whether or not the update loop should start after the resources are loaded. Default is true
 	 */
-	static load(userResources: HengineResource[], done?: boolean): Promise;
+	static load(userResources: HengineResource[], done?: boolean): Promise<void>;
 }
 
 /**
@@ -595,7 +595,7 @@ declare class IntervalFunction {
 	/**
 	 * A promise which resolves when the operation completes
 	 */
-	promise: Promise;
+	promise: Promise<void>;
 	/**
 	 * Indicates whether the operation has completed
 	 */
@@ -682,7 +682,7 @@ declare class IntervalManager {
 	 * Sets the target/maximum update cycles per second.
 	 * @param fps - The new target FPS
 	 */
-	set fps(fps: number): void;
+	set fps(fps: number);
 	/**
 	 * Returns the current number of update cycles per second.
 	 */
@@ -717,7 +717,7 @@ declare class IntervalManager {
 	 * @param frames - The duration of the transition
 	 * @param type - When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
 	 */
-	transition(fn: (arg0: number) => void, frames: number, type: symbol): Promise;
+	transition(fn: (arg0: number) => void, frames: number, type: symbol): Promise<void>;
 	/**
 	 * Animates the value of a Operable or Number property from its current value to another over a specified interval.
 	 * Returns a promise that resolves when the animation completes.
@@ -728,7 +728,7 @@ declare class IntervalManager {
 	 * @param curve - The easing function. Default is `Interpolation.linear`
 	 * @param type - When during the update cycle to update the animation. Default is `IntervalFunction.BEFORE_UPDATE`
 	 */
-	animate(object: object, property: string | symbol, finalValue: Operable | number, duration: number, curve?: (arg0: number) => number, type?: symbol): Promise;
+	animate(object: object, property: string | symbol, finalValue: Operable | number, duration: number, curve?: (arg0: number) => number, type?: symbol): Promise<void>;
 	/**
 	 * Creates a new DelayedFunction.
 	 * Returns a promise that resolves when the function executes.
@@ -736,7 +736,7 @@ declare class IntervalManager {
 	 * @param frames - The length of the delay
 	 * @param type - When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
 	 */
-	delay(fn: () => void, frames: number, type: symbol): Promise;
+	delay(fn: () => void, frames: number, type: symbol): Promise<void>;
 	/**
 	 * Creates a new WaitUntilFunction.
 	 * Returns a promise that resolves when the function executes.
@@ -744,7 +744,7 @@ declare class IntervalManager {
 	 * @param event - The event function. When this function returns true, the function will execute
 	 * @param type - When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
 	 */
-	waitUntil(fn: () => void, event: () => boolean, type: symbol): Promise;
+	waitUntil(fn: () => void, event: () => boolean, type: symbol): Promise<void>;
 }
 
 /**
@@ -804,7 +804,7 @@ declare class Scene {
 	 * Sets the gravitational acceleration for the physics engine.
 	 * @param gravity - The new gravitational acceleration
 	 */
-	set gravity(gravity: Vector2): void;
+	set gravity(gravity: Vector2);
 	/**
 	 * Returns the current gravitational acceleration for the physics engine.
 	 * This is initially `new Vector2(0, 0.4)`.
@@ -1325,7 +1325,7 @@ declare class Animatable {
 	 * Sets the value immediately. This will not involve a transition.
 	 * @param value - The new value
 	 */
-	set value(value: Operable | number): void;
+	set value(value: Operable | number);
 	/**
 	 * Returns the current value of the animatable and advances one frame in the transition.
 	 */
@@ -1759,25 +1759,25 @@ declare class Random {
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @param values - The values to choose from
 	 */
-	choice(values: Iterable): any;
+	choice(values: Iterable<any>): any;
 	/**
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @param values - The values to choose from
 	 * @param percentages - The weight of each value. These can be multiplied by any constant factor
 	 */
-	choice(values: Iterable, percentages: number[]): any;
+	choice(values: Iterable<any>, percentages: number[]): any;
 	/**
 	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
 	 * @param values - The values to sample from
 	 * @param quantity - The size of the sample
 	 */
-	sample(values: Iterable, quantity: number): any[];
+	sample(values: Iterable<any>, quantity: number): any[];
 	/**
 	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
 	 * @param values - The values to sample from
 	 * @param quantity - The size of the sample
 	 */
-	sampleWithoutReplacement(values: Iterable, quantity: number): any[];
+	sampleWithoutReplacement(values: Iterable<any>, quantity: number): any[];
 	/**
 	 * Returns the sum of a specified number of octaves of a specified type of noise.
 	 * @param octaves - The number of octaves
@@ -1900,25 +1900,25 @@ declare class Random {
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @param values - The values to choose from
 	 */
-	static choice(values: Iterable): any;
+	static choice(values: Iterable<any>): any;
 	/**
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @param values - The values to choose from
 	 * @param percentages - The weight of each value. These can be multiplied by any constant factor
 	 */
-	static choice(values: Iterable, percentages: number[]): any;
+	static choice(values: Iterable<any>, percentages: number[]): any;
 	/**
 	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
 	 * @param values - The values to sample from
 	 * @param quantity - The size of the sample
 	 */
-	static sample(values: Iterable, quantity: number): any[];
+	static sample(values: Iterable<any>, quantity: number): any[];
 	/**
 	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
 	 * @param values - The values to sample from
 	 * @param quantity - The size of the sample
 	 */
-	static sampleWithoutReplacement(values: Iterable, quantity: number): any[];
+	static sampleWithoutReplacement(values: Iterable<any>, quantity: number): any[];
 	/**
 	 * Returns the sum of a specified number of octaves of a specified type of noise.
 	 * @param octaves - The number of octaves
@@ -2452,12 +2452,12 @@ declare class Operable {
 	 * Computes the element-wise sum of a list of operables.
 	 * @param operables - The values to sum
 	 */
-	static sum(operables: Operable | number[]): Operable;
+	static sum(operables: Operable[] | number[]): Operable;
 	/**
 	 * Computes the element-wise average of a list of operables.
 	 * @param operables - The values to average
 	 */
-	static avg(operables: Operable | number[]): Operable;
+	static avg(operables: Operable[] | number[]): Operable;
 	/**
 	 * Remaps an operable from one range to another range.
 	 * @param value - The operable to be remapped
@@ -2484,12 +2484,12 @@ declare class Operable {
 	 * Finds and returns the element-wise minimum of a series of values.
 	 * @param values - The values to compare
 	 */
-	static min(...values: Operable | number[]): Operable;
+	static min(...values: Operable[] | number[]): Operable;
 	/**
 	 * Finds and returns the element-wise maximum of a series of values.
 	 * @param values - The values to compare
 	 */
-	static max(...values: Operable | number[]): Operable;
+	static max(...values: Operable[] | number[]): Operable;
 	/**
 	 * Performs an element-wise exponentiation.
 	 * @param base - The base of the exponentiation
@@ -2732,7 +2732,7 @@ declare class AnimationStateMachine extends ImageType {
 	 * Sets the state of the state machine.
 	 * @param state - The new state of the state machine
 	 */
-	set state(state: any): void;
+	set state(state: any);
 }
 
 /**
@@ -3395,7 +3395,7 @@ declare class ImageType {
 	 * Returns a promise that resolves when the image downloads.
 	 * @param name - The name of the downloaded image, without the extension
 	 */
-	download(name: string): Promise;
+	download(name: string): Promise<void>;
 }
 
 /**
@@ -3413,7 +3413,7 @@ declare class HImage extends ImageType {
 	 * Returns a promise that resolves to whether the image exists.
 	 * @param src - The file path to check
 	 */
-	static async imageExists(src: string): Promise;
+	static imageExists(src: string): Promise<boolean>;
 }
 
 /**
@@ -3870,7 +3870,7 @@ declare class Artist {
 	 * Sets the current coordinate transform of the renderer.
 	 * @param transform - The new transform
 	 */
-	set transform(transform: Matrix3): void;
+	set transform(transform: Matrix3);
 	/**
 	 * Returns the current coordinate transform of the renderer.
 	 */
@@ -5428,7 +5428,7 @@ declare class ScriptContainer {
 	 * @param script - The script to add
 	 * @param args - The initialization arguments to pass to the `.init()` listener.
 	 */
-	add(script: Class<ElementScript>, ...args: Array): any;
+	add(script: Class<ElementScript>, ...args: any[]): any;
 	/**
 	 * Removes the scene's default script from the object.
 	 */
@@ -5587,7 +5587,7 @@ declare class PARTICLE_SPAWNER extends ElementScript {
 	 * Sets the number of particles in the system.
 	 * @param count - The new amount of particles
 	 */
-	set particleCount(count: number): void;
+	set particleCount(count: number);
 	/**
 	 * Returns the current number of particles in the system.
 	 */
@@ -6200,7 +6200,7 @@ declare class FileSystem {
 	 * Returns a promise which resolves when the download occurs.
 	 * @param path - The file to download
 	 */
-	downloadFile(path: string): Promise;
+	downloadFile(path: string): Promise<void>;
 	/**
 	 * Lets the user upload a file from their computer to a specified location.
 	 * Returns a promise which resolves when the file is uploaded.
@@ -6513,7 +6513,7 @@ declare class SynthChannel {
 	 * Returns a promise that resolves when the tone stops.
 	 * @param wait - The interval (in milliseconds) to wait before stopping the sound. Default is 0
 	 */
-	stop(wait?: number): Promise;
+	stop(wait?: number): Promise<void>;
 }
 
 /**
@@ -6572,7 +6572,7 @@ declare class Synth {
 	 * @param all - The specifications of the tones to play. See the class description
 	 * @param globals - All the properties of this object will be used as defaults for the properties of tones specified in `all`. Default is `{ }`
 	 */
-	async playSequence(all: Tone[], globals?: Tone): void;
+	playSequence(all: Tone[], globals?: Tone): Promise<void>;
 }
 
 /**
