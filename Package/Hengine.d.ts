@@ -5127,11 +5127,11 @@ declare class SceneObject extends SceneElement {
 	 */
 	sync(fn: (arg0: SceneObject) => void): void;
 	/**
-	 * Returns the world-space bounding rectangle that contains the all the shapes of the object
+	 * Returns the world-space bounding rectangle that contains the all the shapes of the object.
 	 */
 	getBoundingBox(): Rect;
 	/**
-	 * Checks whether there is a shape on the object with a specific name
+	 * Checks whether there is a shape on the object with a specific name.
 	 * @param name - The name of the shape
 	 */
 	hasShape(name: string): boolean;

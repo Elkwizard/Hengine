@@ -102,7 +102,7 @@ class SceneObject extends SceneElement {
 		this.__boundingBox = this.getBoundingBox();
 	}
 	/**
-	 * Returns the world-space bounding rectangle that contains the all the shapes of the object
+	 * Returns the world-space bounding rectangle that contains the all the shapes of the object.
 	 * @return Rect
 	 */
 	getBoundingBox() {
@@ -111,7 +111,7 @@ class SceneObject extends SceneElement {
 		return Rect.composeBoundingBoxes(boxes);
 	}
 	/**
-	 * Checks whether there is a shape on the object with a specific name
+	 * Checks whether there is a shape on the object with a specific name.
 	 * @param String name | The name of the shape
 	 * @return Boolean
 	 */
