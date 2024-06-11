@@ -22,6 +22,7 @@ function formatType(type) {
 	type = type.replace(/\//g, " | ");
 	type = type.replace(/\bClass extends (\w+?)\b/g, "Class<$1>");
 	type = type.replace(/\bClass\b(?!\<)/g, "Class<any>");
+	type = type.replace(/\[\d+?\]/g, "[]");
 
 	// add parameter names
 	let index = 0;

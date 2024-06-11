@@ -918,7 +918,7 @@ declare class Geometry {
 	 * The triangles are returned as arrays of three vectors. 
 	 * @param shape - The convex polygon to decompose
 	 */
-	static triangulate(shape: Polygon): Vector2[][3];
+	static triangulate(shape: Polygon): Vector2[][];
 	/**
 	 * Checks whether a list of points are in clockwise order.
 	 * @param vertices - The points to check
@@ -1519,7 +1519,7 @@ declare class Constraint {
 	/**
 	 * Returns the world-space location of the constrained points.
 	 */
-	get ends(): Vector2[2];
+	get ends(): Vector2[];
 	/**
 	 * Removes the constraint from the simulation.
 	 */
@@ -2583,7 +2583,7 @@ declare interface String {
 	 * If the substring is not found, it will return an array containing the caller as the first element and the empty string as the second.
 	 * @param boundary - The substring to split on
 	 */
-	cut(boundary: string): string[2];
+	cut(boundary: string): string[];
 	/**
 	 * Returns the caller with each line indented by a single tab character.
 	 */
