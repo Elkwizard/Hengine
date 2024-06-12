@@ -253,7 +253,7 @@ Object.defineProperty(window, "title", {
 	 * Creates a multidimensional array, on which standard array operations can be performed with additional arguments.
 	 * e.g. `arr.map((value, i, j) => ...)` for a 2D array.
 	 * @param Number[] ...dims | The sizes of the each dimension of the array.
-	 * @return Array 
+	 * @return Any[]
 	 */
 	Array.dim = function (...dims) {
 		const arr = [];

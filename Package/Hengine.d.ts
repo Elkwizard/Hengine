@@ -2546,7 +2546,7 @@ declare interface Array {
 	 * e.g. `arr.map((value, i, j) => ...)` for a 2D array.
 	 * @param dims - The sizes of the each dimension of the array.
 	 */
-	static dim(...dims: number[]): Array;
+	static dim(...dims: number[]): any[];
 }
 
 /**

@@ -637,7 +637,7 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 		const signature = glsl
 			.match(/(\w+?) compute \( (\w+?) /g);
 
-		if (signature === null) throw new GLSLError(1, "There is no compute() function");
+		if (signature === null) throw new GLSLError("", 1, "There is no compute() function");
 
 		const [outputStruct, , , inputStruct] = signature[0].split(" ");
 
