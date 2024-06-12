@@ -132,7 +132,7 @@
 			"Storage": null
 		},
 		"Miscellaneous": {
-			"PARTICLE_SPAWNER": ["PARTICLE_SPAWNER", "Particle"],
+			"PARTICLE_SPAWNER": ["PARTICLE_SPAWNER", "Particle", "SpawnerProperties"],
 			"GPUComputation": ["GPUComputation", "GPUComputation.Structured"],
 			"FileSystem": null,
 			"Random": null,

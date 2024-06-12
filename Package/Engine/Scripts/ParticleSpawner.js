@@ -10,6 +10,43 @@
  */
 
 /**
+ * @name class SpawnerProperties
+ * @interface
+ * This is not a real class, but rather an interface for the parameters to various property-setting functions on PARTICLE_SPAWNER.
+ * @prop Boolean slows? | Whether or not particles will have air resistance applied
+ * @prop Boolean falls? | Whether or not particles will have gravity applied
+ * @prop Boolean active? | Whether or not particles will be spawned passively over time
+ * @prop Number delay? | The delay (in frames) between particle spawns. This can be less than 1
+ * @prop Number lifeSpan? | The duration (in frames) of each particle's lifetime
+ * @prop Number radius? | The effective radius of each particle used to compute culling. This does not affect the appearance of the particles
+ * @prop Class extends ImageType imageType? | This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen
+ */
+
+/**
+ * @name init?
+ * The function that is called to initialize particles.
+ * @param Particle particle | The particle to initialize
+ */
+
+/**
+ * @name update?
+ * The function that is called to update particles each frame.
+ * Since this function is not culled, all non-rendering logic should be here.
+ * This property may instead be a String containing the source code for a GPUComputation.Structured that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system.
+ * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way.
+ * Setting this property to a function will remove the computation.
+ * @param Particle particle | The particle being updated
+ */
+
+/**
+ * @name draw?
+ * The function that is called to render particles each frame.
+ * This function should minimize side effects and, if possible, should be pure.
+ * @param Artist renderer | The renderer to draw the particle to. Its transform will be in world-space, unless the spawner is a UIObject
+ * @param Particle particle | The particle to render
+ */
+
+/**
  * Adds particle emitting functionality to a SceneObject.
  * @readonly
  * ```js
@@ -26,21 +63,20 @@
  * 	}
  * });
  * ```
- * @prop (Particle) => void particleInit | The function that is called to initialize particles. This will be passed the particle object for each particle created. This uses the alternate key `properties.init` when provided in a parameter. Default is a no-op
- * @prop (Particle) => void particleUpdate | The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This uses the alternate key `properties.update` when provided in a parameter. Default is a no-op. This property may instead be a String, which contains the source code for a GPUComputation.Structured that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system. If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way. Setting this property to a function will remove the computation.
- * @prop (Artist, Particle) => void particleDraw | The function that is called to render particles each frame. This will be passed an Artist and a particle object for each particle object on-screen each frame. This uses the alternate key `properties.draw` when provided in a parameter. Default is a no-op
+ * @prop (Particle) => void particleInit | The function that is called to initialize particles. This will be passed the particle object for each particle created. Default is a no-op
+ * @prop (Particle) => void particleUpdate | The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This function will not run if the spawner has an active GPU computation. Default is a no-op.
+ * @prop (Artist, Particle) => void particleDraw | The function that is called to render particles each frame. This will be passed an Artist and a particle object for each particle object on-screen each frame. Default is a no-op
  * @prop Boolean slows | Whether or not particles will have air resistance applied. Default is false
  * @prop Boolean falls | Whether or not particles will have gravity applied. Default is false
  * @prop Boolean active | Whether or not particles will be spawned passively over time. Default is true
  * @prop Number delay | The delay (in frames) between particle spawns. This can be less than 1. Default is 1
  * @prop Number lifeSpan | The duration (in frames) of each particle's lifetime. Default is 100
  * @prop Number radius | The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10
- * @prop Class extends ImageType imageType | This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen. This is not an actual property and can only be specified as a property of a `properties` argument. Default is FastFrame
  */
 class PARTICLE_SPAWNER extends ElementScript {
 	/**
 	 * Makes an object a particle system.
-	 * @param Object properties | A collection of settings for the object. The keys of this object can be any of the properties of PARTICLE_SPAWNER. They are all optional
+	 * @param SpawnerProperties properties | The settings to specify on the spawner. Those not specified will retain their default values
 	 */
 	init(obj, properties = {}) {
 		// built-in caches
@@ -97,7 +133,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 	}
 	/**
 	 * Sets an inclusive subset of the properties of the system.
-	 * @param Object properties | A collection of new setting values. These can be any of the properties of PARTICLE_SPAWNER. They are all optional
+	 * @param SpawnerProperties properties | A collection of new setting values. Any settings not specified will be left as they were previously
 	 */
 	setProperties(obj, p) {
 		this.particleInit = p.init ?? this.particleInit ?? (() => null);

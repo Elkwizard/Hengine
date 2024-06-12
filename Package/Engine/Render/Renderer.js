@@ -138,6 +138,19 @@ class Artist {
 				this.c.beginPath();
 				this.c.rect(x, y, width, height);
 			},
+			roundRect(x, y, width, height, tl, tr, br, bl) {
+				if (typeof x === "object") {
+					tr = width;
+					br = height;
+					bl = tl;
+					tl = y;
+					({ x, y, width, height } = x);
+				}
+
+				this.c.beginPath();
+				if (tr === undefined) this.c.roundRect(x, y, width, height, tl);
+				else this.c.roundRect(x, y, width, height, [tl, tr, br, bl]);
+			},
 			triangle(v1, v2, v3) {
 				this.c.beginPath();
 				if (v1 && v1.vertices) {
@@ -252,6 +265,10 @@ class Artist {
 				pathObj.rect(x, y, width, height);
 				this.c.fill();
 			},
+			roundRect(x, y, width, height, tl, tr, br, bl) {
+				pathObj.roundRect(x, y, width, height, tl, tr, br, bl);
+				this.c.fill();
+			},
 			triangle(v1, v2, v3) {
 				pathObj.triangle(v1, v2, v3);
 				this.c.fill();
@@ -298,6 +315,10 @@ class Artist {
 			},
 			rect(x, y, width, height) {
 				pathObj.rect(x, y, width, height);
+				this.c.stroke();
+			},
+			roundRect(x, y, width, height, tl, tr, br, bl) {
+				pathObj.roundRect(x, y, width, height, tl, tr, br, bl);
 				this.c.stroke();
 			},
 			triangle(v1, v2, v3) {
@@ -548,6 +569,10 @@ class Artist {
 				pathObj.rect(x, y, width, height);
 				this.c.clip();
 			},
+			roundRect(x, y, width, height, tl, tr, br, bl) {
+				pathObj.roundRect(x, y, width, height, tl, tr, br, bl);
+				this.c.clip();
+			},
 			triangle(v1, v2, v3) {
 				pathObj.triangle(v1, v2, v3);
 				this.c.clip();
@@ -616,6 +641,11 @@ class Artist {
 			},
 			rect(x, y, width, height) {
 				this.drawImageInternal(x, y, width, height);
+			},
+			roundRect(x, y, width, height, tl, tr, br, bl) {
+				this.clip().roundRect(x, y, width, height, tl, tr, br, bl);
+				this.drawImageInternal(x, y, width, height);
+				this.unclip();
 			},
 			triangle(v1, v2, v3) {
 				this.clip().triangle(v1, v2, v3);
@@ -1155,6 +1185,26 @@ class Artist {
  * @param Number y | The y coordinate of the rectangle's upper-left corner
  * @param Number width | The width of the rectangle
  * @param Number height | The height of the rectangle
+ */
+
+/**
+ * @name roundRect
+ * Creates a rectangular path with rounded corners.
+ * @signature
+ * @param Rect rectangle | The shape of the rectangle
+ * @param Number topLeft | The radius of the top-left corner
+ * @param Number topRight? | The radius of the top-right corner. Defaults to be the same as the top-left
+ * @param Number bottomRight? | The radius of the bottom-right corner. Defaults to be the same as the top-left
+ * @param Number bottomLeft? | The radius of the bottom-left corner. Defaults to be the same as the top-left
+ * @signature
+ * @param Number x | The x coordinate of the rectangle's upper-left corner
+ * @param Number y | The y coordinate of the rectangle's upper-left corner
+ * @param Number width | The width of the rectangle
+ * @param Number height | The height of the rectangle
+ * @param Number topLeft | The radius of the top-left corner
+ * @param Number topRight? | The radius of the top-right corner. Defaults to be the same as the top-left
+ * @param Number bottomRight? | The radius of the bottom-right corner. Defaults to be the same as the top-left
+ * @param Number bottomLeft? | The radius of the bottom-left corner. Defaults to be the same as the top-left
  */
 
 /**

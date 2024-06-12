@@ -4061,6 +4061,27 @@ declare class PathRenderer {
 	 */
 	rect(x: number, y: number, width: number, height: number): void;
 	/**
+	 * Creates a rectangular path with rounded corners.
+	 * @param rectangle - The shape of the rectangle
+	 * @param topLeft - The radius of the top-left corner
+	 * @param topRight - The radius of the top-right corner. Defaults to be the same as the top-left
+	 * @param bottomRight - The radius of the bottom-right corner. Defaults to be the same as the top-left
+	 * @param bottomLeft - The radius of the bottom-left corner. Defaults to be the same as the top-left
+	 */
+	roundRect(rectangle: Rect, topLeft: number, topRight?: number, bottomRight?: number, bottomLeft?: number): void;
+	/**
+	 * Creates a rectangular path with rounded corners.
+	 * @param x - The x coordinate of the rectangle's upper-left corner
+	 * @param y - The y coordinate of the rectangle's upper-left corner
+	 * @param width - The width of the rectangle
+	 * @param height - The height of the rectangle
+	 * @param topLeft - The radius of the top-left corner
+	 * @param topRight - The radius of the top-right corner. Defaults to be the same as the top-left
+	 * @param bottomRight - The radius of the bottom-right corner. Defaults to be the same as the top-left
+	 * @param bottomLeft - The radius of the bottom-left corner. Defaults to be the same as the top-left
+	 */
+	roundRect(x: number, y: number, width: number, height: number, topLeft: number, topRight?: number, bottomRight?: number, bottomLeft?: number): void;
+	/**
 	 * Creates a triangular path.
 	 * @param triangle - The shape of the path
 	 */
@@ -5520,6 +5541,61 @@ declare class Particle {
 }
 
 /**
+ * This is not a real class, but rather an interface for the parameters to various property-setting functions on PARTICLE_SPAWNER.
+ */
+declare interface SpawnerProperties {
+	/**
+	 * Whether or not particles will have air resistance applied
+	 */
+	slows?: boolean;
+	/**
+	 * Whether or not particles will have gravity applied
+	 */
+	falls?: boolean;
+	/**
+	 * Whether or not particles will be spawned passively over time
+	 */
+	active?: boolean;
+	/**
+	 * The delay (in frames) between particle spawns. This can be less than 1
+	 */
+	delay?: number;
+	/**
+	 * The duration (in frames) of each particle's lifetime
+	 */
+	lifeSpan?: number;
+	/**
+	 * The effective radius of each particle used to compute culling. This does not affect the appearance of the particles
+	 */
+	radius?: number;
+	/**
+	 * This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen
+	 */
+	imageType?: Class<ImageType>;
+	/**
+	 * The function that is called to initialize particles.
+	 * @param particle - The particle to initialize
+	 */
+	init?(particle: Particle): void;
+	/**
+	 * The function that is called to update particles each frame.
+	 * Since this function is not culled, all non-rendering logic should be here.
+	 * This property may instead be a String containing the source code for a GPUComputation.Structured that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system.
+	 * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way.
+	 * Setting this property to a function will remove the computation.
+	 * @param particle - The particle being updated
+	 */
+	update?(particle: Particle): void;
+	/**
+	 * The function that is called to render particles each frame.
+	 * This function should minimize side effects and, if possible, should be pure.
+	 * @param renderer - The renderer to draw the particle to. Its transform will be in world-space, unless the spawner is a UIObject
+	 * @param particle - The particle to render
+	 */
+	draw?(renderer: Artist, particle: Particle): void;
+}
+
+/**
  * Adds particle emitting functionality to a SceneObject.
  * All properties of this class are read-only.
  * ```js
@@ -5539,15 +5615,15 @@ declare class Particle {
  */
 declare class PARTICLE_SPAWNER extends ElementScript {
 	/**
-	 * The function that is called to initialize particles. This will be passed the particle object for each particle created. This uses the alternate key `properties.init` when provided in a parameter. Default is a no-op
+	 * The function that is called to initialize particles. This will be passed the particle object for each particle created. Default is a no-op
 	 */
 	particleInit: (arg0: Particle) => void;
 	/**
-	 * The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This uses the alternate key `properties.update` when provided in a parameter. Default is a no-op. This property may instead be a String, which contains the source code for a GPUComputation.Structured that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system. If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way. Setting this property to a function will remove the computation.
+	 * The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This function will not run if the spawner has an active GPU computation. Default is a no-op.
 	 */
 	particleUpdate: (arg0: Particle) => void;
 	/**
-	 * The function that is called to render particles each frame. This will be passed an Artist and a particle object for each particle object on-screen each frame. This uses the alternate key `properties.draw` when provided in a parameter. Default is a no-op
+	 * The function that is called to render particles each frame. This will be passed an Artist and a particle object for each particle object on-screen each frame. Default is a no-op
 	 */
 	particleDraw: (arg0: Artist, arg1: Particle) => void;
 	/**
@@ -5575,14 +5651,10 @@ declare class PARTICLE_SPAWNER extends ElementScript {
 	 */
 	radius: number;
 	/**
-	 * This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen. This is not an actual property and can only be specified as a property of a `properties` argument. Default is FastFrame
-	 */
-	imageType: Class<ImageType>;
-	/**
 	 * Makes an object a particle system.
-	 * @param properties - A collection of settings for the object. The keys of this object can be any of the properties of PARTICLE_SPAWNER. They are all optional
+	 * @param properties - The settings to specify on the spawner. Those not specified will retain their default values
 	 */
-	init(properties: object): void;
+	init(properties: SpawnerProperties): void;
 	/**
 	 * Sets the number of particles in the system.
 	 * @param count - The new amount of particles
@@ -5598,9 +5670,9 @@ declare class PARTICLE_SPAWNER extends ElementScript {
 	removeAllParticles(): void;
 	/**
 	 * Sets an inclusive subset of the properties of the system.
-	 * @param properties - A collection of new setting values. These can be any of the properties of PARTICLE_SPAWNER. They are all optional
+	 * @param properties - A collection of new setting values. Any settings not specified will be left as they were previously
 	 */
-	setProperties(properties: object): void;
+	setProperties(properties: SpawnerProperties): void;
 	/**
 	 * Creates a collection of particles at once.
 	 * @param count - The number of particles to create
