@@ -669,6 +669,10 @@ declare class IntervalManager {
 	 */
 	rawFps: number;
 	/**
+	 * The current target/maximum amount of update cycles per second
+	 */
+	targetFPS: number;
+	/**
 	 * A graph of the FPS for the last 400 frames. This value is read-only
 	 */
 	fpsGraph: GraphPlane;

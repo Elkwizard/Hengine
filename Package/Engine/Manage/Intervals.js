@@ -113,6 +113,7 @@ class WaitUntilFunction extends IntervalFunction {
  * });
  * ```
  * @prop Number rawFps | The FPS based only on the duration of the last frame. This value is read-only
+ * @prop Number targetFPS | The current target/maximum amount of update cycles per second
  * @prop GraphPlane fpsGraph | A graph of the FPS for the last 400 frames. This value is read-only
  * @prop Number frameCount | The total number of frames that have elapsed thusfar. This value is read-only
  * @prop Boolean performanceData | Whether or not the interval manager should collect performance data (`.fps`, `.fpsGraph`, etc.)
