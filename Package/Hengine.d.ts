@@ -2,6 +2,8 @@ declare interface Class<T> extends Function {
 	new (...args: any[]): T;
 }
 
+type RemainingParams<T> = T extends (first: any, ...remaining: infer P) => any ? P : never;
+
 /**
  * Represents the way a canvas scales with changes to the window size.
  */
@@ -2713,6 +2715,15 @@ declare class AnimationStateMachine extends ImageType {
 	 */
 	constructor(stateAnimations: Map<any, Animation>, initialState: any);
 	/**
+	 * Sets the state of the state machine.
+	 * @param state - The new state of the state machine
+	 */
+	set state(state: any);
+	/**
+	 * Returns the current state of the state machine.
+	 */
+	get state(): any;
+	/**
 	 * Makes a state exit when its animation completes. This will only work if the animation doesn't loop.
 	 * @param state - The state that will exit
 	 */
@@ -2724,15 +2735,6 @@ declare class AnimationStateMachine extends ImageType {
 	 * @param animation - The animation to play during this time. `.loops` must be false
 	 */
 	addTransition(initial: any, final: any, animation: Animation): void;
-	/**
-	 * Returns the current state of the state machine.
-	 */
-	get state(): any;
-	/**
-	 * Sets the state of the state machine.
-	 * @param state - The new state of the state machine
-	 */
-	set state(state: any);
 }
 
 /**
@@ -3744,19 +3746,19 @@ declare class TextMode {
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static LEFT_TOP: TextMode;
+	static TOP_LEFT: TextMode;
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static LEFT_CENTER: TextMode;
+	static CENTER_LEFT: TextMode;
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static LEFT_BOTTOM: TextMode;
+	static BOTTOM_LEFT: TextMode;
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static CENTER_TOP: TextMode;
+	static TOP_CENTER: TextMode;
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
@@ -3764,19 +3766,19 @@ declare class TextMode {
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static CENTER_BOTTOM: TextMode;
+	static BOTTOM_CENTER: TextMode;
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static RIGHT_TOP: TextMode;
+	static TOP_RIGHT: TextMode;
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static RIGHT_CENTER: TextMode;
+	static CENTER_RIGHT: TextMode;
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static RIGHT_BOTTOM: TextMode;
+	static BOTTOM_RIGHT: TextMode;
 }
 
 /**
@@ -4115,7 +4117,7 @@ declare class PathRenderer {
 	 * @param origin - The location of the text's origin. How this is interpreted depends on the current text-alignment mode.
 	 * @param packWidth - The maximum allowed width of a single line of the text. Specifying this parameter will cause the newlines to be added to enforce this requirement. If this parameter is not specified, the text will not be packed
 	 */
-	text(font: Font, text: string, origin: Vector2, packWidth: number?): void;
+	text(font: Font, text: string, origin: Vector2, packWidth?: number): void;
 	/**
 	 * Creates a path in the shape of a sequence of characters.
 	 * @param font - The font to use in rendering the text
@@ -4124,7 +4126,7 @@ declare class PathRenderer {
 	 * @param y - The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
 	 * @param packWidth - The maximum allowed width of a single line of the text. Not specifying this will prevent packing
 	 */
-	text(font: Font, text: string, x: number, y: number, packWidth: number?): void;
+	text(font: Font, text: string, x: number, y: number, packWidth?: number): void;
 	/**
 	 * Creates a path in the shape of a single-line sequence of characters.
 	 * This method is faster than `.text()`.
@@ -5302,7 +5304,7 @@ declare class ElementScript {
 	 * The return value of this function will be returned from `ScriptContainer.scripts.add()`.
 	 * @param args - The initialization arguments
 	 */
-	init(...args: any[]): any;
+	init(obj: SceneObject, ...args: any[]): any;
 	/**
 	 * This called each frame during the main update cycle.
 	 */
@@ -5398,7 +5400,7 @@ declare class ElementScript {
 	 * @param script - The script being added
 	 * @param args - The initialization arguments for the script
 	 */
-	addScript(script: Class<ElementScript>, ...args: any[]): void;
+	addScript<T extends ElementScript>(script: Class<T>, ...args: RemainingParams<T["init"]>): void;
 }
 
 /**
@@ -5417,10 +5419,10 @@ declare class ElementScript {
  * });
  * 
  * // call the function from the defined property
- * object.scripts.ACTION.action(); // Hello World!
+ * object.scripts(ACTION).action(); // Hello World!
  * ```
  */
-declare class ScriptContainer {
+declare type ScriptContainer = {
 	/**
 	 * The associated object
 	 */
@@ -5449,7 +5451,7 @@ declare class ScriptContainer {
 	 * @param script - The script to add
 	 * @param args - The initialization arguments to pass to the `.init()` listener.
 	 */
-	add(script: Class<ElementScript>, ...args: any[]): any;
+	add<T extends ElementScript>(script: Class<T>, ...args: RemainingParams<T["init"]>): ReturnType<T["init"]>;
 	/**
 	 * Removes the scene's default script from the object.
 	 */
@@ -5471,6 +5473,12 @@ declare class ScriptContainer {
 	 * @param method - The name of the listener to check for
 	 */
 	implements(method: string): boolean;
+	/**
+	 * This function is called when the container is called as a function.
+	 * It returns the instance of a given script, if present.
+	 * @param script - The script to return the instance of
+	 */
+	<T extends ElementScript>(script: Class<T>): T;
 }
 
 /**
@@ -5510,7 +5518,7 @@ declare class DRAGGABLE extends ElementScript {
 	 * @param key - The mouse button that can be used to drag the object
 	 * @param bounds - The bounds in which the object can be dragged. Default is null
 	 */
-	init(key: string, bounds?: Rect): void;
+	init(obj: SceneObject, key: string, bounds?: Rect): void;
 }
 
 /**
@@ -5654,7 +5662,7 @@ declare class PARTICLE_SPAWNER extends ElementScript {
 	 * Makes an object a particle system.
 	 * @param properties - The settings to specify on the spawner. Those not specified will retain their default values
 	 */
-	init(properties: SpawnerProperties): void;
+	init(obj: SceneObject, properties: SpawnerProperties): void;
 	/**
 	 * Sets the number of particles in the system.
 	 * @param count - The new amount of particles
@@ -5753,7 +5761,7 @@ declare class PHYSICS extends ElementScript {
 	 * Adds rigidbody physics to an object.
 	 * @param mobile - Whether the object should be able to move/rotate
 	 */
-	init(mobile: boolean): void;
+	init(obj: SceneObject, mobile: boolean): void;
 	/**
 	 * Retrieves a list of copies of all the constraints on the object.
 	 */
@@ -5864,7 +5872,7 @@ declare class TEXT_AREA extends ElementScript {
 	 * @param multiline - Whether the text area can have multiple lines and scrolling. Default is true
 	 * @param renderText - A function used to render the text. The default renders the text in place with a black color
 	 */
-	init(font: Font, paddingEM?: number, multiline?: boolean, renderText?: (arg0: string, arg1: Font, arg2: Vector2, arg3: (arg4: number) => Vector2, arg5: number) => void): void;
+	init(obj: SceneObject, font: Font, paddingEM?: number, multiline?: boolean, renderText?: (arg0: string, arg1: Font, arg2: Vector2, arg3: (arg4: number) => Vector2, arg5: number) => void): void;
 	/**
 	 * Forces the text area to ignore a specific key input.
 	 * @param key - The name of the key to ignore
@@ -5945,7 +5953,7 @@ declare class ByteBuffer {
 	 * If no destination is specified one will be created.
 	 * @param buffer - The destination for the copy. The data will be written to the end of the buffer
 	 */
-	toByteBuffer(buffer?: number): ByteBuffer;
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
 	/**
 	 * Converts the buffer to a sequence of 16-bit unicode characters.
 	 */

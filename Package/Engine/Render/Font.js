@@ -85,6 +85,11 @@ class Font {
 		this.memorizedWidths = { };
 		const familyString = this.keywordFamily ? this.family : JSON.stringify(this.family);
 		this.fontString = `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${familyString}`;
+		
+		// measure font placement
+		Font.context.font = this.fontString;
+		const metrics = Font.context.measureText("0");
+		this.renderOffsetY = metrics.fontBoundingBoxAscent;
 	}
 	processString(str) {
 		return String(str).replace(/\r/g, "").replace(/\t/g, this.tabReplacement);

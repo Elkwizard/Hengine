@@ -141,31 +141,6 @@ class AnimationStateMachine extends ImageType {
 		this.stack = [initialState];
 	}
 	/**
-	 * Makes a state exit when its animation completes. This will only work if the animation doesn't loop.
-	 * @param Any state | The state that will exit
-	 */
-	exitOnDone(state) {
-		this.stackable.add(state);
-	}
-	/**
-	 * Adds an animation to be played when transitioning between two specified states.
-	 * @param Any initial | The state being transitioned from 
-	 * @param Any final | The state being transitioned to
-	 * @param Animation animation | The animation to play during this time. `.loops` must be false
-	 */
-	addTransition(a, b, animation) {
-		if (!this.transitions.has(a))
-			this.transitions.set(a, new Map());
-		this.transitions.get(a).set(b, animation);
-	}
-	/**
-	 * Returns the current state of the state machine.
-	 * @return Any
-	 */
-	get state() {
-		return this.stack.last;
-	}
-	/**
 	 * Sets the state of the state machine.
 	 * @param Any state | The new state of the state machine
 	 */
@@ -187,6 +162,31 @@ class AnimationStateMachine extends ImageType {
 			else this.stack = [state];
 			
 		}
+	}
+	/**
+	 * Returns the current state of the state machine.
+	 * @return Any
+	 */
+	get state() {
+		return this.stack.last;
+	}
+	/**
+	 * Makes a state exit when its animation completes. This will only work if the animation doesn't loop.
+	 * @param Any state | The state that will exit
+	 */
+	exitOnDone(state) {
+		this.stackable.add(state);
+	}
+	/**
+	 * Adds an animation to be played when transitioning between two specified states.
+	 * @param Any initial | The state being transitioned from 
+	 * @param Any final | The state being transitioned to
+	 * @param Animation animation | The animation to play during this time. `.loops` must be false
+	 */
+	addTransition(a, b, animation) {
+		if (!this.transitions.has(a))
+			this.transitions.set(a, new Map());
+		this.transitions.get(a).set(b, animation);
 	}
 	makeImage() {
 		if (this.transition) {

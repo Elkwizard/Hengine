@@ -96,7 +96,8 @@ function createClassSpecification(doc) {
 
 	if (isWindow) return members;
 
-	const cls = `${documentation}${isInterface ? "interface" : "class"} ${name} {\n${
+	const kind = isInterface ? "interface" : doc.settings.type ? "type" : "class";
+	const cls = `${documentation}${kind} ${name + (doc.settings.type ? " =" : "")} {\n${
 		indent(members.join("\n"))
 	}\n}`;
 
@@ -117,22 +118,30 @@ function createOverloadSpecification(name, parameters, doc) {
 	let returnType = doc.settings.return?.type ?? "void";
 	if (doc.name.isAsync) returnType = `Promise<${returnType}>`;
 
-	const paramString = parameters
+	let paramString = parameters
 		.map(param => `${param.name}: ${formatType(param.type)}`)
 		.join(", ");
 
-	let result = "";
+	if (name === "init")
+		paramString = "obj: SceneObject, " + paramString;
 
-	if (doc.name.isStatic) result += "static ";
-	if (doc.name.isGlobalFunction) result += "function ";
-	if (doc.name.isSetter) result += "set ";
-	if (doc.name.isGetter) result += "get ";
-	
-	result += `${name}(${paramString})`;
+	let result;
 
-	if (name !== "constructor" && !doc.name.isSetter)
-		result += `: ${formatType(returnType)}`;
-	result += ";";
+	if (doc.settings.type) {
+		result = doc.settings.type.content;
+	} else {
+		result = "";
+		if (doc.name.isStatic) result += "static ";
+		if (doc.name.isGlobalFunction) result += "function ";
+		if (doc.name.isSetter) result += "set ";
+		if (doc.name.isGetter) result += "get ";
+		
+		result += `${name}(${paramString})`;
+
+		if (name !== "constructor" && !doc.name.isSetter)
+			result += `: ${formatType(returnType)}`;
+		result += ";";
+	}
 
 	result = createTSDoc([
 		...doc.description.split("\n"),
@@ -191,9 +200,15 @@ module.exports = function createTypeSpecification(docs) {
 		}
 	}
 
-	const classInterface = "declare interface Class<T> extends Function {\n\tnew (...args: any[]): T;\n}\n\n";
+	const classInterface = `
+declare interface Class<T> extends Function {
+	new (...args: any[]): T;
+}
+
+type RemainingParams<T> = T extends (first: any, ...remaining: infer P) => any ? P : never;
+`.trim();
 	
-	return classInterface + docs
+	return classInterface + "\n\n" + docs
 		.flatMap(createSpecification)
 		.map(spec => prefix(spec, "declare "))
 		.join("\n\n");

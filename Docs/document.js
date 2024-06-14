@@ -18,11 +18,15 @@ function sourceLink(doc) {
 	return `https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/${doc.source.file}?#L${doc.source.line}`;
 }
 
+function escapeHTML(match) {
+	return match.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+}
+
 function documentName(name, doc, wrapperClass) {
 	if (name.isClass) stats.classes++;
 	else stats.functions++;
 
-	let result = name.base;
+	let result = escapeHTML(name.base);
 	if (name.isPage) return `<span class="page-name">${result}</span>`
 	if (name.isStatic) result = `${wrapperClass}.${result}`;
 	if (name.isAsync) result = `<span class="keyword">async</span> ${result}`;
@@ -108,10 +112,6 @@ function document(doc, topLevelIDs, file) {
 	} else if (doc.name.isClass) {
 		const name = documentName(doc.name, doc);
 		const classQualifiers = [];
-		// if (doc.settings.abstract)
-		// 	classQualifiers.push("abstract");
-		// if (doc.settings.readonly)
-		// 	classQualifiers.push("readonly");
 
 		const subclass = (doc.subclasses ?? [])
 			.map(cls => `<span class="class-name">${cls.name.base}</span>`)
@@ -171,9 +171,7 @@ function document(doc, topLevelIDs, file) {
 	result = result.replace(/`(.*?)`/g, (_, code) => {
 		return highlight(code, highlighters.js);
 	});
-	result = result.replace(/(?<=<span class=\"type\">)(.*?)(?=<\/span>)/g, match => {
-		return match.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-	});
+	result = result.replace(/(?<=<span class=\"type\">)(.*?)(?=<\/span>)/g, escapeHTML);
 
 	// add automatic links to other doc pages
 	const toRoot = path.relative(path.dirname(file), ".");

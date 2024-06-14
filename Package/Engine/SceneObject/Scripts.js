@@ -192,6 +192,7 @@ class ElementScript {
 	 */
 	/**
 	 * @name addScript
+	 * @type addScript<T extends ElementScript>(script: Class<T>, ...args: RemainingParams<T["init"]>): void;
 	 * This is called when a script (including this one) is added to the object.
 	 * @param Class extends ElementScript script | The script being added
 	 * @param Any[] ...args | The initialization arguments for the script
@@ -225,6 +226,7 @@ ElementScript.flags = new Set([
 ]);
 
 /**
+ * @type
  * Represents the collection of behaviors on a SceneObject.
  * ```js
  * // create a script which holds an action
@@ -240,17 +242,20 @@ ElementScript.flags = new Set([
  * });
  * 
  * // call the function from the defined property
- * object.scripts.ACTION.action(); // Hello World!
+ * object.scripts(ACTION).action(); // Hello World!
  * ```
  * @prop SceneObject sceneObject | The associated object
  */
 class ScriptContainer {
 	constructor(sceneObject) {
-		this.sceneObject = sceneObject;
-		this.sortedScriptInstances = [];
-		this.implementedMethods = new Set();
-		this.scripts = new Map();
-		this.toRemove = [];
+		const self = script => self[script.name];
+		self.sceneObject = sceneObject;
+		self.sortedScriptInstances = [];
+		self.implementedMethods = new Set();
+		self.scripts = new Map();
+		self.toRemove = [];
+		Object.defineProperties(self, Object.getOwnPropertyDescriptors(ScriptContainer.prototype));
+		return self;
 	}
 	/**
 	 * Returns the highest `.scriptNumber` of all scripts in the container.
@@ -285,6 +290,7 @@ class ScriptContainer {
 			this.remove(instances[i].constructor);
 	}
 	/**
+	 * @type add<T extends ElementScript>(script: Class<T>, ...args: RemainingParams<T["init"]>): ReturnType<T["init"]>;
 	 * Adds a new script to the object. Returns the result of the `.init()` listener.
 	 * This also defines a property with the name of the script (e.g. `.MY_SCRIPT` for a script defined as `class MY_SCRIPT extends ElementScript { ... }`) containing the script instance.
 	 * None of the listeners on this script will be called until the next frame.
@@ -376,4 +382,12 @@ class ScriptContainer {
 					script[method](...args);
 			}
 	}
+	/**
+	 * @name 
+	 * @type <T extends ElementScript>(script: Class<T>): T;
+	 * This function is called when the container is called as a function.
+	 * It returns the instance of a given script, if present.
+	 * @param Class extends ElementScript script | The script to return the instance of
+	 * @return Class extends ElementScript/undefined
+	 */
 }

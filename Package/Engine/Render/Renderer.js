@@ -6,7 +6,7 @@ const TextModeY = Enum.define("TOP", "CENTER", "BOTTOM");
  * @name const TextMode = Enum.define
  * Specifies where on a string of text should be considered its origin.
  * @name_subs HORIZONTAL: LEFT, CENTER, RIGHT; VERTICAL: TOP, CENTER, BOTTOM
- * @static_prop TextMode [HORIZONTAL]_[VERTICAL] | Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
+ * @static_prop TextMode [VERTICAL]_[HORIZONTAL] | Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
  */
 const TextMode = {};
 for (let x in TextModeX) for (let y in TextModeY) {
@@ -168,57 +168,45 @@ class Artist {
 					y = x.y;
 					x = x.x;
 				}
+
 				this.c.font = font.toString();
 				text = font.processString(text);
 
-				if (this.textModeX !== TextModeX.LEFT) {
-					let w = this.c.measureText(text).width;
-					if (this.textModeX === TextModeX.RIGHT) x -= w;
-					else x -= w / 2;
-				}
-				y += font.size * 0.24 - font.lineHeight / 2;
-				if (this.textModeY !== TextModeY.BOTTOM) {
-					if (this.textModeY === TextModeY.TOP) y += font.lineHeight;
-					else y += font.lineHeight / 2;
-				}
-				return { text, x, y }
+				if (this.textModeX !== TextModeX.LEFT)
+					x -= this.c.measureText(text).width * ((this.textModeX === TextModeX.CENTER) ? 0.5 : 1);
+
+				y += font.renderOffsetY;
+				if (this.textModeY !== TextModeY.TOP)
+					y -= font.getTextHeight(text) * ((this.textModeY === TextModeY.CENTER) ? 0.5 : 1);
+
+				return { text, x, y };
 			},
 			text(drawText, font, text, x, y, pack = false) {
 				if (typeof x === "object") {
 					pack = y ?? false;
 					({ x, y } = x);
 				}
+				
 				text = font.processString(text);
 				if (pack) text = font.packText(text, pack);
-				this.c.font = font.toString();
-				const tmh = font.getTextHeight(text);
 				const blocks = text.split("\n");
-				let textRequests = [];
-				const yOffset = font.size * .24 - font.lineHeight / 2;
+				
+				y += font.renderOffsetY;
+				if (this.textModeY !== TextModeY.TOP)
+					y -= font.getTextHeight(text) * ((this.textModeY === TextModeY.CENTER) ? 0.5 : 1);
+
+				let widthOffsetFactor = 0;
+				if (this.textModeX !== TextModeX.LEFT)
+					widthOffsetFactor = (this.textModeX === TextModeX.CENTER) ? 0.5 : 1;
+
+				this.c.font = font;
 				for (let i = 0; i < blocks.length; i++) {
 					let ax = x;
-					let ay = y + (i + 1) * font.lineHeight + yOffset;
-					if (this.textModeX !== TextModeX.LEFT) {
-						let tmw = this.c.measureText(blocks[i]).width;
+					if (widthOffsetFactor)
+						ax -= this.c.measureText(blocks[i]).width * widthOffsetFactor;
 
-						if (this.textModeX === TextModeX.CENTER) {
-							ax -= tmw / 2;
-						} else if (this.textModeX === TextModeX.RIGHT) {
-							ax -= tmw;
-						}
-					}
-
-					if (this.textModeY !== TextModeY.TOP) {
-						if (this.textModeY === TextModeY.CENTER) {
-							ay -= tmh / 2;
-						} else if (this.textModeY === TextModeY.BOTTOM) {
-							ay -= tmh;
-						}
-					}
-
-					drawText(blocks[i], ax, ay);
+					drawText(blocks[i], ax, y + i * font.lineHeight);
 				}
-				return textRequests
 			},
 			shape(v) {
 				if (v.vertices) v = v.vertices;
@@ -277,7 +265,7 @@ class Artist {
 				pathObj.text(this.c.fillText.bind(this.c), font, text, x, y, pack);
 			},
 			textLine(font, text, x, y) {
-				let req = pathObj.textLine(font, text, x, y);
+				const req = pathObj.textLine(font, text, x, y);
 				this.c.fillText(req.text, req.x, req.y);
 			},
 			shape(v) {
@@ -1240,13 +1228,13 @@ class Artist {
  * @param Font font | The font to use in rendering the text
  * @param String text | The text to render
  * @param Vector2 origin | The location of the text's origin. How this is interpreted depends on the current text-alignment mode.
- * @param Number? packWidth | The maximum allowed width of a single line of the text. Specifying this parameter will cause the newlines to be added to enforce this requirement. If this parameter is not specified, the text will not be packed
+ * @param Number packWidth? | The maximum allowed width of a single line of the text. Specifying this parameter will cause the newlines to be added to enforce this requirement. If this parameter is not specified, the text will not be packed
  * @signature
  * @param Font font | The font to use in rendering the text
  * @param String text | The text to render
  * @param Number x | The x coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
  * @param Number y | The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
- * @param Number? packWidth | The maximum allowed width of a single line of the text. Not specifying this will prevent packing
+ * @param Number packWidth? | The maximum allowed width of a single line of the text. Not specifying this will prevent packing
  */
 
 /**

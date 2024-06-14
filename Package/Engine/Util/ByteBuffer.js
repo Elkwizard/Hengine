@@ -68,7 +68,7 @@ class ByteBuffer {
 	/**
 	* Copies the data of the buffer into a buffer.
 	* If no destination is specified one will be created.
-	* @param Number buffer? | The destination for the copy. The data will be written to the end of the buffer
+	* @param ByteBuffer buffer? | The destination for the copy. The data will be written to the end of the buffer
 	* @return ByteBuffer
 	*/
 	toByteBuffer(buffer = new ByteBuffer()) {
