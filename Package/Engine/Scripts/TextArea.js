@@ -478,8 +478,7 @@ class TEXT_AREA extends ElementScript {
 					this.ignoredRemoval[inx] = true;
 					continue;
 				}
-				let inx2 = this.alwaysIgnored.indexOf(key);
-				if (inx2 > -1) continue;
+				if (this.alwaysIgnored.includes(key)) continue;
 				if (key === "Enter") key = "\n";
 				if (key === "Tab") key = "\t";
 

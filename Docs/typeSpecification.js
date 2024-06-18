@@ -50,7 +50,7 @@ function applySubstitutions(name, subs) {
 
 	return names.flatMap(name => {
 		const present = Object.keys(subs)
-			.filter(key => name.indexOf(`[${key}]`) > -1);
+			.filter(key => name.includes(`[${key}]`));
 		return substitute(name, present);
 	});
 }
@@ -89,7 +89,7 @@ function createClassSpecification(doc) {
 
 	if (doc.settings.own_instance) {
 		const instance = members
-			.filter(member => member.indexOf("static ") === -1 && member.indexOf("constructor") === -1)
+			.filter(member => !member.includes("static ") && !member.includes("constructor"))
 			.map(member => prefix(member, "static "));
 		members.push(...instance);
 	}
@@ -191,7 +191,7 @@ module.exports = function createTypeSpecification(docs) {
 		nameToDoc[doc.name.base] = doc;
 	for (let i = 0; i < docs.length; i++) {
 		const doc = docs[i];
-		if (doc.name.base.indexOf(".") > -1) {
+		if (doc.name.base.includes(".")) {
 			const pieces = doc.name.base.split(".");
 			doc.name.base = pieces[1];
 			const parent = nameToDoc[pieces[0]];

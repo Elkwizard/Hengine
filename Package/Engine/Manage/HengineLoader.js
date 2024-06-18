@@ -434,7 +434,7 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 				const isStatic = staticInx > -1;
 				if (isStatic) key = key.slice(0, staticInx);
 
-				if (key.indexOf("_") > -1) {
+				if (key.includes("_")) {
 					const name = key.slice(key.indexOf("_") + 1);
 					const getter = entries[`${returnType}$get_${name}`];
 					const setter = entries[`void$set_${name}`];
@@ -786,7 +786,7 @@ class HengineLoader {
 
 				// find yourself
 				const allScripts = Array.from(document.getElementsByTagName("script"));
-				const scriptSrc = allScripts.find(script => script.src.indexOf("Engine/Manage/HengineLoader.js") > -1).src;
+				const scriptSrc = allScripts.find(script => script.src.includes("Engine/Manage/HengineLoader.js")).src;
 				const rootSrc = scriptSrc
 					.split("/")
 					.slice(0, -3)

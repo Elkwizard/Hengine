@@ -707,7 +707,7 @@ GPUComputation.Structured = class StructuredGPUComputation extends GPUComputatio
 				.map(line => line.trim())
 				.filter(line => line.length)
 				.map(field => {
-					const array = field.indexOf("[") > -1;
+					const array = field.includes("[");
 					let arrayLength;
 
 					field = field.split(" ");

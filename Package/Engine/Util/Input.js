@@ -109,7 +109,7 @@ class InputHandler {
 			this.prototype[key] = function (arg, signal) {
 				return this.check(arg, key, signal);
 			};
-			if (key.indexOf("Length") > -1) continue;
+			if (key.includes("Length")) continue;
 			Object.defineProperty(this.prototype, "all" + key.capitalize(), {
 				get() {
 					return this.checkAll(key);

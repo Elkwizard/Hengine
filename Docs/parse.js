@@ -67,8 +67,8 @@ function parse(content, file) {
 			isGlobalFunction,
 			isAsync: /\basync\b/.test(name),
 			isStatic: name.startsWith("static "),
-			isGetter: name.indexOf("get ") > -1,
-			isSetter: name.indexOf("set ") > -1
+			isGetter: name.includes("get "),
+			isSetter: name.includes("set ")
 		};
 	};
 	
@@ -161,7 +161,7 @@ function parse(content, file) {
 		match.description = match.lines.find(line => line.category === null)?.content ?? "";
 		
 		if (match.name.isClass) {
-			match.properties = match.lines.filter(line => line.category?.indexOf("prop") > -1);
+			match.properties = match.lines.filter(line => line.category?.includes?.("prop"));
 		} else {
 			match.signatures = match.lines
 				.filter(line => line.category === "signature")

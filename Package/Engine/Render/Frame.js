@@ -153,7 +153,7 @@ class ImageType {
 		const image = this.makeImage();
 
 		this.needsWebGLProxy ??= ( // chrome os doesn't allow webgl canvases as texImage2d arguments
-			navigator.appVersion.indexOf("CrOS") > -1 &&
+			navigator.appVersion.includes("CrOS") &&
 			(
 				image instanceof HTMLCanvasElement ||
 				(
