@@ -6,9 +6,13 @@
 
 class Constraint {
 	protected:
+		struct Error {
+			Vector position, velocity;
+		};
+
 		Matrix forceToError;
 
-		virtual Vector getError() = 0;
+		virtual Error getError() = 0;
 		Vector a, b;
 		
 	public:
@@ -43,7 +47,7 @@ class Constraint1 : public Constraint {
 		static constexpr double INTENSITY = 0.1;
 
 	protected:
-		static Vector combineError(const Vector& positionError, const Vector& velocityError);
+		static Error combineError(const Vector& positionError, const Vector& velocityError);
 
     public:
 		RigidBody& body;
@@ -69,7 +73,7 @@ class Constraint2 : public Constraint {
 		static constexpr double INTENSITY = 0.9;
 
 	protected:
-		static Vector combineError(const Vector& positionError, const Vector& velocityError);
+		static Error combineError(const Vector& positionError, const Vector& velocityError);
 
 	public:
 		RigidBody& bodyA;

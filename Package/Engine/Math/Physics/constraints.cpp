@@ -7,8 +7,8 @@ Constraint::Constraint(Type _type) {
 	type = _type;
 }
 
-Vector Constraint1::combineError(const Vector& positionError, const Vector& velocityError) {
-	return (positionError + velocityError) * INTENSITY;
+Constraint::Error Constraint1::combineError(const Vector& positionError, const Vector& velocityError) {
+	return { positionError * INTENSITY, velocityError * INTENSITY };
 }
 
 Constraint1::Constraint1(Type _type, RigidBody& _body, const Vector& _offset, const Vector& _point) : Constraint(_type), body(_body) {
@@ -56,11 +56,12 @@ void Constraint1::solve() {
 		forceToError.c = forceToError.b;
 		forceToError.d = mA + iA * pow(rA.x, 2);
 
-		std::optional<Vector> force = forceToError.applyInverseTo(getError());
-		
-		if (!force) return;
+		Error error = getError();
 
-		body.applyImpulse(a, *force);
+		std::optional<Vector> force = forceToError.applyInverseTo(error.velocity);
+
+		body.displace(error.position);
+		if (force) body.applyImpulse(a, *force);
 	}
 }
 
@@ -69,8 +70,8 @@ void Constraint1::remove() {
 	constraints.erase(std::find(constraints.begin(), constraints.end(), this));
 }
 
-Vector Constraint2::combineError(const Vector& positionError, const Vector& velocityError) {
-	return (positionError + velocityError) * INTENSITY;
+Constraint::Error Constraint2::combineError(const Vector& positionError, const Vector& velocityError) {
+	return { positionError * INTENSITY, velocityError * INTENSITY };
 }
 
 Constraint2::Constraint2(Type _type, RigidBody& a, RigidBody& b, const Vector& aOff, const Vector& bOff) : Constraint(_type), bodyA(a), bodyB(b) {
@@ -161,12 +162,18 @@ void Constraint2::solve() {
 		forceToError.c = forceToError.b;
 		forceToError.d = mAB + (iA * rA.x * rA.x) + (iB * rB.x * rB.x);
 
-		std::optional<Vector> force = forceToError.applyInverseTo(getError());
+		Error error = getError();
 
-		if (!force) return;
+		std::optional<Vector> force = forceToError.applyInverseTo(error.velocity);
+		Vector displacement = error.position * 0.5;
 
-		if (dynamicA) bodyA.applyImpulse(a, *force);
-		if (dynamicB) bodyB.applyImpulse(b, -*force);
+		if (dynamicA) bodyA.displace(displacement);
+		if (dynamicB) bodyB.displace(-displacement);
+
+		if (force) {
+			if (dynamicA) bodyA.applyImpulse(a, *force);
+			if (dynamicB) bodyB.applyImpulse(b, -*force);
+		}
 	}
 }
 
@@ -183,7 +190,7 @@ class LengthConstraint2 : public Constraint2 {
 		double length;
 
 	protected:
-		Vector getError() override {
+		Error getError() override {
 			Vector n = b - a;
 			double mag = n.mag();
 			if (!mag) return { };
@@ -204,12 +211,13 @@ class LengthConstraint2 : public Constraint2 {
 CONSTRUCT(LengthConstraint2)(RigidBody* a, RigidBody* b, Vector* ao, Vector* bo, double l) {
 	return new LengthConstraint2(*a, *b, *ao, *bo, l);
 }
+FREE(LengthConstraint2)
 
-ACCESS(LengthConstraint2, length, double);
+ACCESS(LengthConstraint2, length, double)
 
 class PositionConstraint2 : public Constraint2 {
 	protected:
-		Vector getError() override {
+		Error getError() override {
 			Vector currentVelocityError = bodyB.pointVelocity(b) - bodyA.pointVelocity(a);
 			Vector currentPositionError = b - a;
 			return Constraint2::combineError(currentPositionError, currentVelocityError);
@@ -229,7 +237,7 @@ class LengthConstraint1 : public Constraint1 {
 		double length;
 
     protected:
-		Vector getError() override {
+		Error getError() override {
 			Vector n = b - a;
 			double mag = n.mag();
 			if (!mag) return { };
@@ -255,7 +263,7 @@ ACCESS(LengthConstraint1, length, double)
 
 class PositionConstraint1 : public Constraint1 {
 	protected:
-		Vector getError() override {
+		Error getError() override {
 			Vector currentVelocityError = -body.pointVelocity(a);
 			Vector currentPositionError = b - a;
 			return Constraint1::combineError(currentPositionError, currentVelocityError);
