@@ -1,828 +1,1276 @@
 /**
- * Represents an operation that can be executed in parallel with itself on the GPU.
- * The operation's inputs and outputs are represented in as fixed-length arrays of bytes.
- * The main entry point is:
- * ```glsl
- * int[OUTPUT_BYTES] compute(int[INPUT_BYTES] inputs) {
- * 	// your main code here
- * }
- * ```
- * Where `INPUT_BYTES` and `OUTPUT_BYTES` are the sizes of the inputs and outputs of the operation.
- * There are some helper variables and functions provided, specifically:
- * ```glsl
- * #define PROBLEM_INDEX // the index of the operation in the batch
- * #define PROBLEMS // the size of the batch
+ * @page GLSL API
+ * The version of GLSL used in the Hengine is GLSL ES 3.0.
+ * Interactions between GLSL and javascript via GPUInterfaces require associations between types in both the languages.
+ * These associations are laid out in the following table:
+ * <table>
+ * 	<tr><th>GLSL Type</th><th>JS Type</th></tr>
+ * 	<tr><td>int, uint, float</td><td>Number</td></tr>
+ * 	<tr><td>bool</td><td>Boolean</td></tr>
+ * 	<tr><td>vec2, ivec2, uvec2</td><td>Vector2</td></tr>
+ * 	<tr><td>vec3, ivec3, uvec3</td><td>Vector3</td></tr>
+ * 	<tr><td>ivec4, uvec4</td><td>Vector4</td></tr>
+ * 	<tr><td>vec4</td><td>Vector4, Color</td></tr>
+ * 	<tr><td>sampler2D</td><td>ImageType</td></tr>
+ * 	<tr><td>struct</td><td>Object</td></tr>
+ * 	<tr><td>fixed-length array</td><td>Array</td></tr>
+ *  <tr><td>dynamic-length array</td><td>GPUArray</td></tr>
+ * </table>
  * 
- * // returns the input data for a specific operation in the batch
- * int[INPUT_BYTES] getProblem(int index);
+ * Though they are not present in any GLSL language standard, the GPUInterface supports dynamic-length, global, uniform struct arrays. 
+ * hese are specified by omitting the length when declaring the array.
+ * Though they can be used like normal arrays (indexed with `array[index]` and measured with `array.length()`), they cannot be cast to normal arrays.
+ * Dynamic-length arrays' elements do not count toward the uniform limit, and can freely contain millions of elements on most platforms.
+ * 
+ * ```glsl
+ * struct Line {
+ * 	vec2 start, end;
+ * };
+ * 
+ * uniform Line[] linesA; // dynamic length
+ * uniform Line[100] linesB; // fixed length
  * ```
- * @prop String glsl | The source code of the operation. See the GLSL API
+ * Dynamic-length arrays are represented by GPUArrays, which are pre-set as the values for these uniforms. These arrays cannot be replaced, only modified. As such, calling `GPUInterface.prototype.setArgument()` on a dynamic-length uniform is equivalent to calling `GPUArray.prototype.set()` on the retrieved array.
+ * ```js
+ * // gpu is a GPUInterface. The following two lines are equivalent if "linesA" is a dynamic-length array uniform.
+ * gpu.setArgument("linesA", lines);
+ * gpu.getArgument("linesA").set(lines);
+ * ```
  */
-class GPUComputation {
-	/**
-	 * Creates a new GPUComputation.
-	 * @param String glsl | The source code of the operation
-	 */
-	constructor(glsl) {
-		{ // build context
-			if (!window.WebGL2RenderingContext) throw new ReferenceError("Your browser doesn't support GPUComputations");
 
-			this.canvas = new_OffscreenCanvas(1, 1);
-			this.gl = this.canvas.getContext("webgl2", {
-				depth: false,
-				stencil: false
-			});
-
-			this.hasContext = true;
-			this.canvas.addEventListener("webglcontextlost", event => {
-				event.preventDefault();
-				console.warn("WebGL Context Lost");
-				this.hasContext = false;
-			});
-			this.canvas.addEventListener("webglcontextrestored", event => {
-				event.preventDefault();
-				console.warn("WebGL Context Restored");
-				this.hasContext = true;
-				this.compile();
-			});
-			this.MAX_TEXTURE_SIZE = this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE);
-
-			const { gl } = this;
-
-			this.INTERNAL_FORMAT = gl.RGBA32UI;
-			/*
-			g l . R G B A 32 U I
-			r i   e r l l b  n n
-			a b   d e u p i  s t
-			p r     e e h t  i e
-			h a     n   a s  g g
-			i r              n e
-			c y              e r
-			s                d 
-			*/
-			this.FORMAT = gl.RGBA_INTEGER;
-			this.TYPE = gl.UNSIGNED_INT;
-		};
-
-		this._capacity = 1;
+class GLSL {
+	constructor(glsl, {
+		comments = true,
+		uniforms = true,
+		structs = true,
+		dynamicArrays = true,
+		methods = true
+	} = { }) {
 		this.glsl = glsl;
+		if (comments) this.removeComments();
+		if (structs) this.parseStructs();
+		if (uniforms) this.parseUniforms();
+		if (dynamicArrays) this.compileDynamicArrays();
+		if (methods) this.parseMethods();
 	}
-	set capacity(a) {
-		this._capacity = a;
-		this.setupTextures();
+	parseMethods() {
+		this.methods = new Map(
+			[...this.glsl.matchAll(/(\w+(\s*\[\s*\d+\s*\])?)\s*\b(\w+)\s*\((.*?)\)/g)]
+				.map(([, returnType,, name, args]) => {
+					const signature = this.parseDeclaration(`${returnType} ${name}`);
+					args = args.split(",").map(arg => this.parseDeclaration(arg));
+					return [signature.name, { signature, args }];
+				})
+		);
 	}
-	get capacity() {
-		return this._capacity;
+	normalizeString(str) {
+		return str
+			.replace(/\b/g, " ")
+			.replace(/\s+/g, " ")
+			.replace("[]", "[ 0 ]")
+			.trim();
 	}
-	set glsl(a) {
-		this._glsl = a;
-		this.processGLSL();
-		this.compile();
-	}
-	get glsl() {
-		return this._glsl;
-	}
-	processGLSL() {
-		this._glsl = GLSLPrecompiler.compile(this.glsl);
-	}
-	setupTextures() {
-		const { ELEMENTS_PER_PIXEL, BYTES_PER_PIXEL } = GPUComputation;
-		const { gl, FORMAT, INTERNAL_FORMAT, TYPE } = this;
-		
-		if (this.inputTexture) { // clean up
-			this.inputTexture.delete();
-			for (let i = 0; i < this.outputTextures.length; i++)
-				this.outputTextures[i].delete();
-			gl.deleteFramebuffer(this.framebuffer);
+	parseDeclaration(str) {
+		str = this.normalizeString(str);
+			
+		const pieces = str.split(" ");
+
+		if (pieces.length === 5) {
+			if (pieces[2] === "[")  pieces.splice(1, 0, ...pieces.splice(2, 3));
+			const [type,, dim,, name] = pieces;
+			return { type, name, length: +dim };
 		}
+		
+		const [type, name] = pieces;
+		return { type, name };
+	}
+	parseDeclarations(str) {
+		const decls = str.split(",").map(decl => this.normalizeString(decl));
+		decls[0] = this.parseDeclaration(decls[0]);
 
-		this.framebuffer = gl.createFramebuffer();
+		for (let i = 1; i < decls.length; i++) {
+			const pieces = decls[i].split(" ");
+			if (pieces.length === 1) {
+				decls[i] = { type: decls[0].type, name: pieces[0], length: decls[0].length };
+			} else {
+				const [name,, dim] = pieces;
+				decls[i] = { type: decls[0].type, name, length: +dim };
+			}
+		}
+		
+		return decls;
+	}
+	parseUniforms() {
+		this.uniforms = [];
+		this.glsl = this.glsl.replace(/\buniform\b(.*?);/g, (_, decl) => {
+			const declarations = this.parseDeclarations(decl);
+			this.uniforms.pushArray(declarations);
+			return declarations
+				.map(({ type, name, length }) => `uniform ${type}${length ? `[${length}]` : ""} ${name};`)
+				.join("\n");
+		});
+		this.uniforms = new Map(this.uniforms.map(decl => [decl.name, decl]));
+	}
+	removeComments() {
+		this.glsl = this.glsl
+			.replace(/\/\/(.*?)(\n|$)/g, "$2") // single line
+			.replace(/\/\*((.|\n)*?)\*\//g, ""); // multiline
+	}
+	compileDynamicArrays() {
+		this.dynamicArrays = new Map();
+		for (const [name, uniform] of this.uniforms)
+			if (uniform.length === 0) {
+				this.dynamicArrays.set(name, uniform);
+				this.compileDynamicArray(uniform);
+			}
+	}
+	compileDynamicArray({ type, name }) {
+		const struct = this.structs.get(type);
 
-		const getSize = count => Math.ceil(Math.sqrt(count));
+		const bytes = struct.size;
+		const { VECTORS, SIZE } = GLSL;
+		const { PIXEL_BYTES, CHANNEL_BYTES, LITTLE_ENDIAN } = GPUDataTexture;
+		const channels = Vector4.modValues;
 
-		const createTexture = (count, index = 0) => {
-			const size = getSize(count);
-			const data = new Uint32Array(size * size * ELEMENTS_PER_PIXEL);
-			const data8 = new Uint8Array(data.buffer);
-			const texture = gl.createTexture();
-
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, texture);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-			gl.texImage2D(gl.TEXTURE_2D, 0, INTERNAL_FORMAT, size, size, 0, FORMAT, TYPE, null);
-
-			return {
-				size, texture, data, data8, index,
-				set: (buffer, byteLength) => {
-					const pxLength = Math.floor(byteLength / BYTES_PER_PIXEL);
-					const completeRows = Math.floor(pxLength / size);
-					const lastRowWidth = pxLength % size;
-					const pxLeft = byteLength % BYTES_PER_PIXEL;
-
-					gl.activeTexture(gl.TEXTURE0);
-					gl.bindTexture(gl.TEXTURE_2D, texture);
-					
-					let nextX = 0;
-					let nextY = completeRows;
-
-					const completeRowsBuffer = new Uint32Array(buffer, 0, completeRows * size * ELEMENTS_PER_PIXEL);
-					gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, size, completeRows, FORMAT, TYPE, completeRowsBuffer);
-
-					if (lastRowWidth) {
-						const lastRowBuffer = new Uint32Array(buffer, completeRows * size * BYTES_PER_PIXEL, lastRowWidth * ELEMENTS_PER_PIXEL);
-						gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, completeRows, lastRowWidth, 1, FORMAT, TYPE, lastRowBuffer);
-						nextX = lastRowWidth;
-					}
-
-					if (pxLeft) {
-						const lastPixelBuffer8 = new Uint8Array(buffer, pxLength * BYTES_PER_PIXEL, pxLeft);
-						const lastPixelBuffer = new Uint32Array(ELEMENTS_PER_PIXEL);
-						const lastPixelBufferView8 = new Uint8Array(lastPixelBuffer.buffer);
-						lastPixelBufferView8.set(lastPixelBuffer8);
-						gl.texSubImage2D(gl.TEXTURE_2D, 0, nextX, nextY, 1, 1, FORMAT, TYPE, lastPixelBuffer);
-					}
-				},
-				get: () => {
-					gl.readBuffer(gl.COLOR_ATTACHMENT0 + index);
-					gl.readPixels(0, 0, size, size, FORMAT, TYPE, data);
-					return data8;
-				},
-				delete: () => gl.deleteTexture(texture)
-			};
+		const READ = {
+			"bool": index => `bool(bytes[${index}])`,
+			"int": index => `bytes[${index}] | bytes[${index + 1}] << 8 | bytes[${index + 2}] << 16 | bytes[${index + 3}] << 24`,
+			"float": index => `intBitsToFloat(${READ.int(index)})`
 		};
 
-		
-		const totalInputPixels = Math.ceil(this.inputBytes * this.capacity / BYTES_PER_PIXEL);
-		this.inputTexture = createTexture(totalInputPixels);
-		this.outputTextureSize = getSize(this.capacity);
-		this.outputTextures = Array.dim(this.outputPixels).map((_, i) => createTexture(this.capacity, i));
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
-		for (let i = 0; i < this.outputTextures.length; i++) {
-			const { texture } = this.outputTextures[i];
-			gl.bindTexture(gl.TEXTURE_2D, texture);
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, texture, 0);
-		}
-
-		gl.drawBuffers(this.outputTextures.map((_, i) => gl.COLOR_ATTACHMENT0 + i));
-
-		this.program.setUniform("_inputTextureWidth", this.inputTexture.size);
-		this.program.setUniform("_outputTextureWidth", this.outputTextureSize);
-	}
-	compile() {
-		const { BYTES_PER_PIXEL, BYTES_PER_CHANNEL, LITTLE_ENDIAN } = GPUComputation;
-		const { gl } = this;
-
-		{ // extract input/output sizes
-			const result = this.glsl.match(/int\s*\[\s*(\d+)\s*\]\s*compute\s*\(\s*int\s*\[\s*(\d+)\s*\]/);
-			const [_, outputs, inputs] = result.map(num => parseInt(num));
-			this.inputBytes = inputs;
-			this.outputBytes = outputs;
-			this.outputPixels = Math.ceil(this.outputBytes / BYTES_PER_PIXEL);
-		};
-
-		{ // program
-			const endian = shift => LITTLE_ENDIAN ? shift : (24 - shift);
-
-			this.vertexShaderSource = `#version 300 es
-				in highp vec2 uv;
-
-				void main() {
-					gl_Position = vec4(uv, 0.0, 1.0);
-				}
-			`;
-
-			const prefix = `#version 300 es
-				precision highp float;
-				precision highp int;
-				precision highp sampler2D;
-				
-				uniform highp usampler2D _byteBuffer;
-				uniform int _inputTextureWidth;
-				uniform int _outputTextureWidth;
-				uniform int _problems;
-
-				#define PROBLEM_INDEX (int(gl_FragCoord.y) * _outputTextureWidth + int(gl_FragCoord.x))
-				#define PROBLEMS _problems
-
-				uvec4 _fetchPixel(int index) {
-					ivec2 texel = ivec2(
-						index % _inputTextureWidth,
-						index / _inputTextureWidth
-					);
-					uvec4 pixel = texelFetch(_byteBuffer, texel, 0);
-					return pixel;
-				}
-
-				int[${this.inputBytes}] getProblem(int problemIndex) {
-					int[${this.inputBytes}] problemBytes;
-
-					int firstByteIndex = problemIndex * ${this.inputBytes};
-					int lastByteIndex = firstByteIndex + ${this.inputBytes};
-					int firstPixelIndex = firstByteIndex / ${BYTES_PER_PIXEL};
-					int lastPixelIndex = int(ceil(float(lastByteIndex) / ${BYTES_PER_PIXEL}.0));
-					
-					int inputIndex = 0;
-					for (int pixelIndex = firstPixelIndex; pixelIndex < lastPixelIndex; pixelIndex++) {
-						uvec4 pixelColor = _fetchPixel(pixelIndex);
-						int byteIndex = pixelIndex * ${BYTES_PER_PIXEL};
-						for (int j = 0; j < 4; j++, byteIndex += ${BYTES_PER_CHANNEL}) {
-							if (byteIndex >= lastByteIndex) break;
-							uint channel = pixelColor[j];
-							if (byteIndex + 0 >= firstByteIndex && byteIndex + 0 < lastByteIndex) problemBytes[inputIndex++] = int((channel >> ${endian(0)}u) & 255u);
-							if (byteIndex + 1 >= firstByteIndex && byteIndex + 1 < lastByteIndex) problemBytes[inputIndex++] = int((channel >> ${endian(8)}u) & 255u);
-							if (byteIndex + 2 >= firstByteIndex && byteIndex + 2 < lastByteIndex) problemBytes[inputIndex++] = int((channel >> ${endian(16)}u) & 255u);
-							if (byteIndex + 3 >= firstByteIndex && byteIndex + 3 < lastByteIndex) problemBytes[inputIndex++] = int((channel >> ${endian(24)}u) & 255u);
-						}
-					}
-
-					return problemBytes;
-				}
-			`;
-			const prefixLength = prefix.split("\n").length;
-
-			this.fragmentShaderSource = `${prefix}
-				${this.glsl}
-
-				${Array
-					.dim(this.outputPixels)
-					.map((_, i) => `\t\t\t\tlayout(location = ${i}) out uvec4 _outputColor${i};`)
-					.join("\n")
-				}
-
-				void main() {
-					int problemIndex = PROBLEM_INDEX;
-					if (problemIndex >= PROBLEMS) return;
-					int[${this.inputBytes}] inputs = getProblem(problemIndex);
-					int[${this.outputBytes}] outputs = compute(inputs);
-
-					${Array
-						.dim(this.outputPixels)
-						.map((_, index) => {
-							const startIndex = index * 4;
-							const samples = [];
-							for (let i = startIndex; i < startIndex + 4; i++) {
-								const byteIndex = i * BYTES_PER_CHANNEL;
-								const bytes = Math.min(BYTES_PER_CHANNEL, this.outputBytes - byteIndex);
-								if (bytes <= 0) break;
-								const ors = Array.dim(bytes)
-									.map((_, inx) => `clamp(outputs[${byteIndex + inx}], 0, 255) << ${endian(inx * 8)}`)
-									.join(" | ");
-								samples.push(ors);
-							}
-							for (let i = samples.length; i < 4; i++) samples.push("0");
-							return `\t\t\t\t\t_outputColor${index} = uvec4(${samples.join(", ")});`;
-						})	
-						.join("\n")
-					}
-				}
-			`;
-
-			this.program = new GLSLProgram(gl, this.vertexShaderSource, this.fragmentShaderSource, (type, message) => {
-				if (type === "FRAGMENT_SHADER")
-					GLSLError.process(this.glsl, message, prefixLength);
-				else console.warn(message);
-			});
-
-			this.program.use();
-			const vertexBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-				-1, 1,
-				1, 1,
-				-1, -1,
-				1, -1
-			]), gl.STATIC_DRAW);
-			this.program.setAttributes(vertexBuffer, 0);
-		};
-
-		this.setupTextures();
-	}
-	reserve(length) {
-		if (this._capacity === undefined) {
-			this._capacity = length;
-			this.glsl = this._glsl;
-		} else if (length > this._capacity) {
-			let newProblems = this._capacity;
-			while (newProblems < length)
-				newProblems = Math.ceil(newProblems * 1.5 + 1);
-			this.capacity = newProblems;
-		}
-	}
-	/**
-	 * Evaluates the operation on a batch of inputs simultaneously.
-	 * Returns the outputs in a contiguous buffer in the same order as the inputs.
-	 * @param ByteBuffer input | The buffer containing the inputs of all the operations. These should be directly contiguous
-	 * @param ByteBuffer output? | The buffer to write the output of the operations to. It will be packed contiguously. If not specified, this will be a newly created buffer
-	 * @param Number problems? | The number of problems in the batch. This will be based on the size of the input buffer if not specified
-	 * @return ByteBuffer
-	 */
-	compute(input, output = new ByteBuffer(), problems = input.byteLength / this.inputBytes) {
-		if (!this.hasContext) return output;
-
-		this.reserve(problems);
-		this.program.setUniform("_problems", problems);
-
-		const {
-			gl, inputTexture,
-			outputTextures,
-			outputBytes,
-			outputTextureSize
-		} = this;
-
-		inputTexture.set(input.data.buffer, problems * this.inputBytes);
-		gl.viewport(0, 0, outputTextureSize, outputTextureSize);
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-		output.pointer = 0;
-		output.alloc(problems * outputBytes);
-		const outputData = output.data;
-		
-		const { BYTES_PER_PIXEL } = GPUComputation;
-
-		// output data array major
-		const outputTextureBytes = problems * BYTES_PER_PIXEL;
-		for (let i = 0; i < outputTextures.length; i++) {
-			const array = outputTextures[i].get();
-			const bytes = Math.min(BYTES_PER_PIXEL, outputBytes - i * BYTES_PER_PIXEL);
-
-			let problemOffset = i * BYTES_PER_PIXEL;
-			for (let j = 0; j < outputTextureBytes; j += BYTES_PER_PIXEL) {
-				for (let k = 0; k < bytes; k++)
-					outputData[problemOffset + k] = array[j + k];
-				problemOffset += outputBytes;
+		for (const key in READ) {
+			const vecName = VECTORS[key];
+			const elSize = SIZE[key];
+			const read = READ[key];
+			for (let i = 2; i <= 4; i++) {
+				const name = vecName + i;
+				READ[name] = index => `${name}(${
+					Array.dim(i)
+						.map((_, i) => read(index + i * elSize))
+						.join(", ")
+				})`;
 			}
 		}
 
-		return output;
-	}
-	/**
-	 * Returns whether or not the shader contains a given uniform.
-	 * @param String name | The name of the uniform to check 
-	 * @return Boolean
-	 */
-	argumentExists(arg) {
-		return this.program.hasUniform(arg);
-	}
-	/**
-	 * Returns the current value of a given uniform.
-	 * For the return value of this function, see the GLSL API
-	 * @param String name | The name of the uniform to retrieve
-	 * @return Any
-	 */
-	getArgument(arg) {
-		return this.program.getUniform(arg);
-	}
-	/**
-	 * Sets the value of a given uniform.
-	 * @param String name | The name of the uniform to set
-	 * @param Any value | The new value for the uniform. For the type of this argument, see the GLSL API
-	 */
-	setArgument(arg, value) {
-		this.setArguments({ [arg]: value });
-	}
-	/**
-	 * Sets the value of one or more uniforms. 
-	 * @param Object uniforms | A collection of key-value pairs, where the key is the name of the uniform to set, and the value is the new value for that uniform
-	 */
-	setArguments(uniformData = {}) {
-		for (const key in uniformData)
-			this.program.setUniform(key, uniformData[key]);
-	}
-	static destructure(glsl) {
-		return GPUComputation.Structured.destructure(glsl).glsl;
-	}
-}
-GPUComputation.BYTES_PER_PIXEL = 16;
-GPUComputation.BYTES_PER_CHANNEL = GPUComputation.BYTES_PER_PIXEL / 4;
-GPUComputation.ELEMENTS_PER_PIXEL = GPUComputation.BYTES_PER_PIXEL / GPUComputation.BYTES_PER_CHANNEL;
-{
-	const buffer = new Uint16Array(2);
-	const view = new Uint8Array(buffer.buffer);
-	buffer[0] = 1;
-	GPUComputation.LITTLE_ENDIAN = !!view[0];
-};
+		let offset = 0;
+		const reads = [];
+		for (let i = 0; i < struct.fields.length; i++) {
+			const { name, type } = struct.fields[i];
+			reads.push(`result.${name} = ${READ[type](offset)};`);
+			offset += SIZE[type];
+		}
 
-/**
- * @name class GPUComputation.Structured extends GPUComputation
- * Represents an operation that can be executed in parallel with itself on the GPU.
- * This behaves much like GPUComputation except that the input and output of the operation are GLSL structs.
- * The values of the input and output structs are represented in JavaScript as objects, whose properties have the same names as those of the GLSL struct.
- * The structs/objects may be nested, and the types of fields must be associated in accordance with the GLSL API.
- * The main entry point is:
- * ```glsl
- * OutputStruct compute(InputStruct input) {
- * 	// your main code here
- * }
- * ```
- * The input and output structs may have arbitrary names, and your GLSL must include the declarations of these structs.
- * ```glsl
- * struct InputStruct {
- * 	// your input fields
- * };
- * struct OutputStruct {
- * 	// your output fields
- * };
- * ```
- * The helper functions and variables from GPUComputation are also present, specifically:
- * ```glsl
- * #define PROBLEM_INDEX // the index of the operation in the batch
- * #define PROBLEMS // the size of the batch
- * 
- * // returns the input data for a specific operation in the batch
- * InputStruct getProblem(int index);
- * ```
- * @prop String glsl | The source code of the operation. See the GLSL API
- * @prop ByteBuffer inputBuffer | A buffer containing all of the current input data. This can be freely written to
- * @prop ByteBuffer outputBuffer | A buffer containing the output of the most recent computation. This can be freely read from
- */
-GPUComputation.Structured = class StructuredGPUComputation extends GPUComputation {
-	/**
-	 * Creates a new structured GPU Computation.
-	 * @param String glsl | The source code for the operation
-	 */
-	constructor(glsl) {
-		super(glsl);
-		this.inputBuffer = new ByteBuffer();
-		this.outputBuffer = new ByteBuffer();
-	}
-	processGLSL() {
-		({
-			glsl: this._glsl,
-			inputFields: this.inputFields,
-			outputFields: this.outputFields
-		} = GPUComputation.Structured.destructure(this.glsl));
-		super.processGLSL();
-	}
-	compile() {
-		super.compile();
-		this.writeFunction = this.readFunction = null;
-	}
-	getValue(object, property) {
-		return property
-			.split(".")
-			.reduce((a, b) => a[b], object);
-	}
-	guaranteeWrite(input) {
-		if (this.writeFunction) return;
+		const identifiers = GPUInputArray.getNames(name);
+
+		const replacement = `
+			uniform highp usampler2D ${identifiers.texture};
+			uniform int ${identifiers.length};
+
+			${struct.name} ${identifiers.read}(int index) {
+				int firstByte = index * ${bytes};
+				int pixelIndex = firstByte / ${PIXEL_BYTES};
+				int endPixelIndex = (firstByte + ${bytes - 1}) / ${PIXEL_BYTES};
+				int width = textureSize(${name}, 0).x;
+				int[${(Math.ceil(bytes / PIXEL_BYTES) + 1) * PIXEL_BYTES}] paddedBytes;
+				for (int i = pixelIndex; i <= endPixelIndex; i++) {
+					uvec4 pixel = texelFetch(${identifiers.texture}, ivec2(i % width, i / width), 0);
+					int byte = (i - pixelIndex) * ${PIXEL_BYTES};\n${
+						channels
+							.map((key, i) => {
+								const channel = `pixel.${key}`;
+								const baseIndex = i * CHANNEL_BYTES;
+								const maxOffset = (CHANNEL_BYTES - 1) * 8;
+								return Array.dim(CHANNEL_BYTES)
+									.map((_, i) => {
+										let offset = i * 8;
+										if (!LITTLE_ENDIAN) offset = maxOffset - offset;
+										let expr = channel;
+										if (offset) expr += ` >> ${offset}u`;
+										if (offset < maxOffset) expr += " & 255u";
+										return `paddedBytes[byte + ${baseIndex + i}] = int(${expr});`;
+									})
+									.join("\n");
+							})
+							.join("\n")
+					}
+				}
+				
+				int[${bytes}] bytes;
+				int startIndex = firstByte - pixelIndex * ${PIXEL_BYTES};
+				for (int i = 0; i < ${bytes}; i++)
+					bytes[i] = paddedBytes[i + startIndex];
+
+				${struct.name} result;\n${reads.join("\n")}
+
+				return result;
+			}
+		`;
+
+		this.glsl = this.glsl.replace(`uniform ${type} ${name};`, replacement);
+		
+		const lengthRegex = new RegExp(String.raw`\b${name}\s*\.\s*length\s*\(\s*\)`, "g");
+		this.glsl = this.glsl.replace(lengthRegex, identifiers.length);
+
+		const arrayIndex = ` ${identifiers.read}[`;
+		this.glsl = this.glsl.replace(new RegExp(String.raw`\b${name}\s*\[`, "g"), arrayIndex);
+
+		while (this.glsl.includes(arrayIndex)) {
+			const index = this.glsl.indexOf(arrayIndex);
+			const startIndex = index + arrayIndex.length;
+			let depth = 1;
+			let content = "";
+			for (let i = startIndex; i < this.glsl.length && depth; i++) {
+				const char = this.glsl[i];
+				if (char === "[") depth++;
+				else if (char === "]") depth--;
+				content += char;
+			}
 			
-		const types = {
+			this.glsl = this.glsl.set(startIndex - 1, "(");
+			this.glsl = this.glsl.set(startIndex + content.length - 1, ")");
+		}
+	}
+	parseStructs() {
+		this.structs = new Map(
+			[...this.glsl.matchAll(/struct(.*?)\{(.*?)\}/gs)]
+				.map(([, name, fields]) => {
+					name = name.trim();
+					fields = fields
+						.trim()
+						.slice(0, -1)
+						.split(";")
+						.flatMap(line => this.parseDeclarations(line));
+					return [name, { name, fields }];
+				})
+		);
+
+		// resolve nested structs
+		let expanded = false;
+		do {
+			expanded = false;
+			for (const [, struct] of this.structs) {
+				struct.fields = struct.fields.flatMap(field => {
+					if (this.structs.has(field.type)) {
+						expanded = true;
+						return this.structs.get(field.type).fields
+							.map(f => ({ type: f.type, name: field.name + "." + f.name }));
+					}
+					return [field];
+				});
+			}
+		} while (expanded);
+
+		const operations = {
 			float: [["float32", ""]],
 			int: [["int32", ""]],
 			bool: [["bool", ""]]
 		};
 
-		for (const type in GPUComputation.Structured.VECTORS) {
-			const vecName = GPUComputation.Structured.VECTORS[type];
-			const elType = types[type][0][0];
+		for (const key in GLSL.VECTORS) {
+			const vecName = GLSL.VECTORS[key];
+			const op = operations[key];
 			for (let n = 2; n <= 4; n++) {
 				const name = vecName + n;
-				const inxs = Array.dim(n).map((_, i) => i);
-				types[name] = [
-					inxs.map(i => [elType, `.${Vector4.modValues[i]}`]),
-					inxs.map(i => [elType, `.${Color.modValues[i]}${i === 3 ? "" : " / 255"}`])
-				];
+				operations[name] = Array.dim(n).map((_, i) => [op[0][0], "." + Vector4.modValues[i]]);
 			}
 		}
 
-		const source = this.inputFields.flatMap(({ name, type }) => {
-			let pieces = types[type];
-			const value = this.getValue(input[0], name);
-			if (typeof value === "object")
-				pieces = value instanceof Color ? pieces[1] : pieces[0];
-			return pieces.map(([write, suffix]) => `write.${write}(obj.${name}${suffix});`);
-		}).join("\n");
+		for (const [, struct] of this.structs) {
+			const { fields } = struct;
+			struct.write = new Function("value", "write", fields.flatMap(field => {
+				return operations[field.type].map(([op, suffix]) => {
+					return `write.${op}(value.${field.name}${suffix});`;
+				});
+			}).join("\n"));
+			struct.read = new Function("value", "read", fields.flatMap(field => {
+				return operations[field.type].map(([op, suffix]) => {
+					return `value.${field.name}${suffix} = read.${op}();`;
+				});
+			}).join("\n"));
+			struct.size = Number.sum(fields.map(field => GLSL.SIZE[field.type]));
+		}
+	}
+	toString() {
+		return this.glsl;
+	}
+}
+GLSL.SIZE = {
+	float: 4,
+	int: 4,
+	bool: 1
+};
+GLSL.VECTORS = {
+	float: "vec",
+	int: "ivec",
+	bool: "bvec"
+};
+for (const key in GLSL.VECTORS) {
+	const vecName = GLSL.VECTORS[key];
+	const elSize = GLSL.SIZE[key];
+	for (let n = 2; n <= 4; n++)
+		GLSL.SIZE[vecName + n] = elSize * n;
+}
 
-		this.writeFunction = new Function("obj", "write", source);
+class GLSLError extends Error {
+	constructor(source, line, desc) {
+		super(`${desc}\n\t» ${source.trim()}\n\n\tat shaderSource.glsl:${line}`);
+		this.name = "GLSLError";
+		this.line = line;
+		this.desc = desc;
+		this.source = source;
+
+	}
+	toString() {
+		return `line ${this.line}: ${this.desc}`;
+	}
+	static process(source, string, prefixLength) {
+		const sourceLines = source.split("\n");
+		
+		let errors = string.split("ERROR: ");
+		errors.shift();
+		for (let i = 0; i < errors.length; i++) {
+			// parse
+			const rawString = errors[i];
+			const string = rawString.cut(":")[1];
+			let [lineStr, descStr] = string.cut(":");
+			lineStr = lineStr.trim();
+			let line = parseInt(lineStr) - prefixLength;
+			let desc = descStr;
+			if (isNaN(line)) {
+				line = 0;
+				desc = rawString;
+			}
+			throw new GLSLError(sourceLines[line], line, desc.trim());
+		}
+	}
+}
+
+class GPUDataTexture {
+	constructor(gl) {
+		this.gl = gl;
+	}
+	set bytes(count) {
+		if (count <= this.bytes) return;
+		const { INTERNAL_FORMAT, FORMAT, TYPE, PIXEL_BYTES } = GPUDataTexture;
+		const { gl } = this;
+		this.size = Math.ceil(Math.sqrt(count / PIXEL_BYTES));
+		gl.texImage2D(
+			gl.TEXTURE_2D, 0, gl[INTERNAL_FORMAT],
+			this.size, this.size, 0,
+			gl[FORMAT], gl[TYPE], null
+		);
+	}
+	get bytes() {
+		return GPUDataTexture.PIXEL_BYTES * this.size ** 2;
+	}
+	bind(unit) {
+		const { gl } = this;
+		if (unit !== undefined) gl.activeTexture(gl.TEXTURE0 + unit);
+		
+		if (this.texture) gl.bindTexture(gl.TEXTURE_2D, this.texture);
+		else {
+			this.texture = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, this.texture);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		}
+
+		return this.texture;
+	}
+}
+GPUDataTexture.TypedArray = Uint32Array;
+GPUDataTexture.INTERNAL_FORMAT = "RGBA32UI";
+GPUDataTexture.FORMAT = "RGBA_INTEGER";
+GPUDataTexture.TYPE = "UNSIGNED_INT";
+GPUDataTexture.CHANNEL_BYTES = GPUDataTexture.TypedArray.BYTES_PER_ELEMENT;
+GPUDataTexture.PIXEL_BYTES = GPUDataTexture.CHANNEL_BYTES * 4;
+GPUDataTexture.LITTLE_ENDIAN = !!new Uint8Array(new Uint32Array([1]).buffer)[0];
+
+/**
+ * Represents an array of GLSL structs.
+ * These structs may be nested.
+ * These are used to represent GLSL dynamic-length array uniforms and the output of GPUComputations, but should not be constructed directly.
+ * For a struct such as:
+ * ```glsl
+ * struct Circle {
+ * 	vec2 position;
+ * 	float radius;
+ * 	vec3 color;
+ * };
+ * ```
+ * A GPUArray could be used as follows:
+ * ```js
+ * // gpu is a GPUInterface
+ * const circle = { position: new Vector2(100, 200), radius: 22.5, color: new Color("magenta") };
+ * gpu.getArgument("circles").append(circle);
+ * ```
+ * @prop ByteBuffer buffer | A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to
+ */
+class GPUArray {
+	constructor(struct) {
+		this.struct = struct;
+		this.buffer = new ByteBuffer();
+		this.set([]);
+	}
+	set length(length) {
+		this._length = length;
+		this.buffer.reserve(length * this.struct.size);
+		this.changed = true;
 	}
 	/**
-	 * Writes an array of objects into the input buffer of the computation at a given index.
-	 * This replaces all the existing input data.
-	 * The objects' structure must correspond to the structure of the GLSL input struct.
-	 * @param Object[] input | The objects to read the data from
+	 * Retrieves the number of structs in the array.
+	 * @return Number
 	 */
-	setInput(input) {
-		this.problems = input.length;
-		if (!this.problems) return;
-
-		this.guaranteeWrite(input);
-
-		const { writeFunction } = this;
-		const { write } = this.inputBuffer;
-		const { length } = input;
-
-		this.inputBuffer.pointer = 0;
-		for (let i = 0; i < length; i++)
-			writeFunction(input[i], write);
+	get length() {
+		return this._length;
 	}
 	/**
-	 * Overwrites a portion of the input data.
-	 * This can increase the size of the input data.
-	 * The objects' structure must correspond to the structure the GLSL input struct.
-	 * @param Object[] input | The objects to read the data from
-	 * @param Number offset? | The index of the first input to overwrite. The default value is the length of the current input data
-	 * @param Number length? | The amount of objects to write. Default is the maximum possible amount
-	 * @param Number srcOffset? | The first index of the provided `input` array to read from. Default is 0
+	 * Sets the value of the array and returns the caller.
+	 * This will overwrite all previous data.
+	 * @signature
+	 * @param Object[] value | An array of objects with the same structure as the struct
+	 * @signature
+	 * @param GPUArray value | Another GPU array to copy from. This must represent the same type of structs. Using this signature is faster, and should be done whenever possible
+	 * @return GPUArray
 	 */
-	writeInput(input, offset = this.problems, length, srcOffset = 0) {
-		length ??= input.length - srcOffset;
-		if (!length) return;
+	set(value) {
+		if (value instanceof GPUArray) {
+			this.changed = true;
+			value.buffer.get(this.buffer);
+			this.length = value.length;
+		} else {
+			this.length = 0;
+			this.write(value);
+		}
+		return this;
+	}
+	/**
+	 * Appends a struct to the end of the array and returns the caller.
+	 * @param Object value | An object with the same structure as the struct
+	 * @return GPUArray
+	 */
+	append(value) {
+		return this.write([value], this.length, 1, 0);
+	}
+	/**
+	 * Writes to a specified location in the array and returns the caller.
+	 * This may increase the size of the array, but cannot be used to create holes.
+	 * @param Object[] data | An array of objects with the same structure as the struct
+	 * @param Number offset? | The first index to write to in the array. Default is 0
+	 * @param Number length? | The amount of elements to write. If not specified, this will be as many as possible
+	 * @param Number srcOffset? | The first index to read from the data argument. If not specified, this will be the same as the offset argument
+	 * @return GPUArray
+	 */
+	write(data, offset = 0, length, srcOffset = offset) {
+		length ??= data.length - srcOffset;
+
+		const { write } = this.buffer;
+		const writeFunction = this.struct.write;
 		
-		this.guaranteeWrite(input);
-		
-		const { writeFunction } = this;
-		const { write } = this.inputBuffer;
-		
-		this.inputBuffer.pointer = offset * this.inputBytes;
+		this.buffer.pointer = offset * this.struct.size;
 		
 		const end = srcOffset + length;
 		for (let i = srcOffset; i < end; i++)
-			writeFunction(input[i], write);
+			writeFunction(data[i], write);
 		
-		this.problems = Math.max(this.problems, offset + length);
-	}
-	guaranteeRead(output) {
-		if (this.readFunction) return;
+		this.length = Math.max(this.length, offset + length);
 
-		const types = {
-			float: [["", "float32", ""]],
-			int: [["", "int32", ""]],
-			bool: [["", "bool", ""]]
-		};
-
-		for (const type in GPUComputation.Structured.VECTORS) {
-			const vecName = GPUComputation.Structured.VECTORS[type];
-			const elType = types[type][0][1];
-			for (let n = 2; n <= 4; n++) {
-				const name = vecName + n;
-				const inxs = Array.dim(n).map((_, i) => i);
-				types[name] = [
-					inxs.map(i => [`.${Vector4.modValues[i]}`, elType, ""]),
-					inxs.map(i => [`.${Color.modValues[i]}`, elType, i === 3 ? "" : " * 255"])
-				];
-			}
-		}
-
-		const source = this.outputFields.flatMap(({ name, type }) => {
-			let pieces = types[type];
-			const value = this.getValue(output[0], name);
-			if (typeof value === "object")
-				pieces = value instanceof Color ? pieces[1] : pieces[0];
-			return pieces.map(([prop, read, suffix]) => `obj.${name}${prop} = read.${read}()${suffix};`);
-		}).join("\n");
-
-		this.readFunction = new Function("obj", "read", source);
+		return this;
 	}
 	/**
-	 * Reads the output buffer into an array of objects, where the structure of the objects corresponds to the structure of the GLSL output struct.
-	 * Returns the passed array.
-	 * @param Object[] output | The objects to write the output to
-	 * @param Number offset? | The index of the first output to read. Default is 0
-	 * @param Number length? | The amount of objects to read. Default is the maximum possible amount
-	 * @param Number dstOffset? | The first index of the provided `output` array to write to. Default is 0
+	 * Reads from a specified location in the array into a provided array of objects, and returns the destination array.
+	 * @param Object[] data | An array of objects with the same structure as the struct
+	 * @param Number offset? | The first index to read from in the array. Default is 0
+	 * @param Number length? | The amount of elements to read. If not specified, this will be as many as possible
+	 * @param Number dstOffset? | The first index to write to in the data argument. If not specified, this will be the same as the offset argument
 	 * @return Object[]
 	 */
-	readOutput(output, offset = 0, length, dstOffset = 0) {
-		length ??= Math.min(output.length - dstOffset, this.problems - offset);
-		if (!length) return;
-		this.guaranteeRead(output);
-
-		const { readFunction } = this;
-		const { read } = this.outputBuffer;
+	read(data, offset = 0, length, dstOffset = offset) {
+		length ??= data.length - dstOffset;
 		
-		this.outputBuffer.pointer = offset * this.outputBytes;
+		const { read } = this.buffer;
+		const readFunction = this.struct.read;
+		
+		this.buffer.pointer = offset * this.struct.size;
 
 		const end = dstOffset + length;
 		for (let i = dstOffset; i < end; i++)
-			readFunction(output[i], read);
+			readFunction(data[i], read);
+		
+		return data;
+	}
+}
 
-		return output;
+class GPUInputArray extends GPUArray {
+	constructor(gl, program, name, unit, struct) {
+		super(struct);
+		this.gl = gl;
+		this.unit = unit;
+		this.struct = struct;
+		this.lengthLocation = gl.getUniformLocation(program, GPUInputArray.getNames(name).length);
+		this.texture = new GPUDataTexture(gl);
+	}
+	commit() {
+		if (this.changed) {
+			this.changed = false;
+			this.gl.uniform1i(this.lengthLocation, this.length);
+			this.writeTexture();
+		}
+	}
+	writeTexture() {
+		if (!this.length) return;
+		
+		const { PIXEL_BYTES, CHANNEL_BYTES, FORMAT, TYPE, TypedArray } = GPUDataTexture;
+		const { gl } = this;
+
+		const bytes = this.length * this.struct.size;
+		
+		this.texture.bind(this.unit);		
+		this.texture.bytes = bytes;
+
+		const ROW_BYTES = this.texture.size * PIXEL_BYTES;
+
+		const writeRect = (x, y, width, height) => {
+			const byteOffset = x * PIXEL_BYTES + y * ROW_BYTES;
+			const byteLength = width * height * PIXEL_BYTES;
+			const paddedByteLength = Math.ceil(byteLength / PIXEL_BYTES) * PIXEL_BYTES;
+			const data = new Uint8Array(this.buffer.data.buffer, byteOffset, paddedByteLength);
+			const typedArray = new TypedArray(
+				data.buffer, data.byteOffset,
+				data.byteLength / CHANNEL_BYTES
+			);
+			gl.texSubImage2D(
+				gl.TEXTURE_2D, 0,
+				x, y, width, height,
+				gl[FORMAT], gl[TYPE],
+				typedArray
+			);
+		};
+
+		const completeRows = Math.floor(bytes / ROW_BYTES);
+		const completePixels = Math.floor((bytes % ROW_BYTES) / PIXEL_BYTES);
+		const remainder = bytes % PIXEL_BYTES;
+
+		if (completeRows) writeRect(0, 0, this.texture.size, completeRows);
+		if (completePixels) writeRect(0, completeRows, completePixels, 1);
+		if (remainder) writeRect(completePixels, completeRows, 1, 1);		
+	}
+	static getNames(name) {
+		return {
+			length: `_length_${name}`,
+			read: `_read_${name}`,
+			texture: name
+		};
+	}
+}
+
+class GLSLProgram {
+	constructor(gl, glsl, vs, fs, onerror = () => null) {
+		this.onerror = onerror;
+		this.gl = gl;
+		this.vs = vs;
+		this.fs = fs;
+		this.lockedValues = new Set(glsl.dynamicArrays.keys());
+
+		this.program = gl.createProgram();
+
+		// vertex shader
+		const vertex = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(vertex, vs);
+		gl.compileShader(vertex);
+		gl.attachShader(this.program, vertex);
+
+		// fragment shader
+		const fragment = gl.createShader(gl.FRAGMENT_SHADER);
+		gl.shaderSource(fragment, fs);
+		gl.compileShader(fragment);
+		gl.attachShader(this.program, fragment);
+
+		// linking
+		gl.linkProgram(this.program);
+		gl.deleteShader(vertex);
+		gl.deleteShader(fragment);
+
+		if (!gl.getShaderParameter(vertex, gl.COMPILE_STATUS)) this.error("VERTEX_SHADER", gl.getShaderInfoLog(vertex));
+		if (!gl.getShaderParameter(fragment, gl.COMPILE_STATUS)) this.error("FRAGMENT_SHADER", gl.getShaderInfoLog(fragment));
+		if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) this.error("LINKING", gl.getProgramInfoLog(this.program));
+
+		const originalProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+		this.use();
+
+		const queuedCalls = [];
+		const GL = new Proxy(gl, {
+			get(gl, method) {
+				if (typeof gl[method] === "function")
+					return gl.isContextLost() ? (...args) => queuedCalls.push({ method, args }) : gl[method].bind(gl);
+				return gl[method];
+			}
+		});
+		
+		gl.canvas.addEventListener("webglcontextrestored", event => {
+			event.preventDefault();
+			while (queuedCalls.length) {
+				const call = queuedCalls.pop();
+				gl[call.method](...call.args);
+			}
+		});
+		
+		{ // focus
+			this.focused = false;
+			const useProgram = gl.useProgram.bind(gl);
+			gl.useProgram = (program) => {
+				this.focused = program === this.program;
+				useProgram(program);
+			};
+		};
+
+		{ // uniforms
+			const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
+
+			this.uniforms = {};
+			this.uniformValues = {};
+			this.uniformsSet = false;
+
+			let nextTextureUnit = 0;
+			const maxTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+			
+			this.dynamicArrays = [];
+			for (const [name, array] of glsl.dynamicArrays) {
+				const gpuArray = new GPUInputArray(GL, this.program, name, nextTextureUnit++, glsl.structs.get(array.type));
+				this.uniformValues[name] = gpuArray;
+				this.dynamicArrays.push(gpuArray);
+			}
+
+			for (let i = 0; i < uniformCount; i++) {
+				const { size: length, type, name } = gl.getActiveUniform(this.program, i);
+
+				const { integer, signed, rows, columns, texture } = this.getTypeInformation(type);
+
+				const processedName = name.replace(/\[(\d+)\]/g, ".$1");
+				const propertyPath = processedName.split(".");
+				if (propertyPath.last === "0") propertyPath.pop();
+
+				const array = name.endsWith("[0]");
+				const matrix = columns !== 1;
+
+				let setFunctionName = "uniform";
+				if (matrix) {
+					setFunctionName += "Matrix";
+					if (rows !== columns) setFunctionName += rows + "x" + columns;
+					else setFunctionName += rows;
+				} else setFunctionName += rows;
+
+				if (!signed) setFunctionName += "u";
+				setFunctionName += integer ? "i" : "f";
+
+				const setWithArrayType = array || matrix;
+				let dataArray = null;
+
+				if (setWithArrayType) {
+					setFunctionName += "v";
+
+					const arrayLength = rows * columns * length;
+					if (integer) {
+						if (signed) dataArray = new Int32Array(arrayLength);
+						else dataArray = new Uint32Array(arrayLength);
+					} else dataArray = new Float32Array(arrayLength);
+				}
+
+				const location = gl.getUniformLocation(this.program, name);
+
+				let set;
+				if (array && (rows !== 1 || columns !== 1)) { // an array of not single values
+					const size = rows * columns;
+
+					if (matrix) set = values => {
+						for (let i = 0; i < values.length; i++)
+							dataArray.set(values[i], i * size);
+						GL[setFunctionName](location, false, dataArray);
+					};
+					else set = values => {
+						for (let i = 0; i < values.length; i++) {
+							const baseIndex = i * size;
+							this.getVectorComponents(values[i]);
+							for (let j = 0; j < size; j++) dataArray[baseIndex + j] = this.vectorBuffer[j];
+						}
+						GL[setFunctionName](location, dataArray);
+					};
+				} else {
+					if (matrix) {
+						set = value => {
+							dataArray.set(value, 0);
+							GL[setFunctionName](location, false, dataArray);
+						};
+					} else if (glsl.dynamicArrays.has(name)) {
+						const gpuArray = this.uniformValues[name];
+						gl[setFunctionName](location, gpuArray.unit);
+
+						set = array => gpuArray.set(array);
+					} else if (texture) {
+						const textureUnit = nextTextureUnit;
+						const indices = new Int32Array(length).map((_, index) => index + textureUnit);
+						if (array) gl[setFunctionName](location, indices);
+						else gl[setFunctionName](location, indices[0]);
+						
+						for (let i = 0; i < length; i++) {
+							const texture = gl.createTexture();
+							const textureIndex = indices[i];
+							gl.activeTexture(gl.TEXTURE0 + textureIndex);
+							gl.bindTexture(gl.TEXTURE_2D, texture);
+
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+						}
+
+						let pixelated = false;
+						const writeImage = (image, index = 0) => {
+							if (index >= length) return;
+							const imagePixelated = image instanceof Texture;
+							const imageCIS = (image instanceof Texture) ? image.imageData : image.makeWebGLImage();
+							GL.activeTexture(gl.TEXTURE0 + indices[index]);
+							if (imagePixelated !== pixelated) {
+								pixelated = imagePixelated;
+								const param = pixelated ? gl.NEAREST : gl.LINEAR;
+								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
+								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
+							}
+							GL.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
+						}
+						if (array) set = images => images.forEach(writeImage);
+						else set = image => writeImage(image);
+						if (nextTextureUnit + length > maxTextureUnits) this.error("TEXTURE", "Too many texture uniforms");
+						nextTextureUnit += length;
+					} else {
+						if (setWithArrayType) set = value => {
+							dataArray.set(value, 0);
+							GL[setFunctionName](location, dataArray);
+						};
+						else set = (...values) => GL[setFunctionName](location, ...values);
+					}
+				}
+
+				const descriptor = { usesDataArray: !!dataArray, set };
+
+				let currentStruct = this.uniforms;
+				for (let i = 0; i < propertyPath.length; i++) {
+					const property = propertyPath[i];
+					const last = i === propertyPath.length - 1;
+
+					if (last) {
+						currentStruct[property] = descriptor;
+					} else {
+						if (!(property in currentStruct)) currentStruct[property] = {};
+						currentStruct = currentStruct[property];
+					}
+				}
+			}
+
+			this.vectorBuffer = new Float32Array(4);
+		};
+
+		{ // attributes
+			this.attributes = {};
+			this.divisors = {};
+
+			const attributeCount = gl.getProgramParameter(this.program, gl.ACTIVE_ATTRIBUTES);
+			for (let i = 0; i < attributeCount; i++) {
+				const { type, name } = gl.getActiveAttrib(this.program, i);
+				const { rows, columns } = this.getTypeInformation(type);
+				const location = gl.getAttribLocation(this.program, name);
+				this.attributes[name] = {
+					name, location, rows, columns,
+					enabled: false, divisor: -1, isFiller: false
+				};
+				this.setDivisor(name, 0);
+			}
+		};
+
+		gl.useProgram(originalProgram);
+	}
+	get uniformsChanged() {
+		return this.uniformsSet || this.dynamicArrays.some(array => array.changed);
+	}
+	commitUniforms() {
+		this.uniformsSet = false;
+		for (let i = 0; i < this.dynamicArrays.length; i++)
+			this.dynamicArrays[i].commit();
+	}
+	error(type, error) {
+		this.onerror(type, error);
+	}
+	getTypeInformation(type) {
+		const { gl } = this;
+
+		let integer = false, signed = true, rows = 1, columns = 1, texture = false, dynamicArray = false;
+		switch (type) {
+			case gl.FLOAT: break;
+			case gl.FLOAT_VEC2: rows = 2; break;
+			case gl.FLOAT_VEC3: rows = 3; break;
+			case gl.FLOAT_VEC4: rows = 4; break;
+
+			case gl.INT: integer = true; break;
+			case gl.INT_VEC2: integer = true; rows = 2; break;
+			case gl.INT_VEC3: integer = true; rows = 3; break;
+			case gl.INT_VEC4: integer = true; rows = 4; break;
+
+			case gl.BOOL: integer = true; break;
+			case gl.BOOL_VEC2: integer = true; break;
+			case gl.BOOL_VEC3: integer = true; break;
+			case gl.BOOL_VEC4: integer = true; break;
+
+			case gl.FLOAT_MAT2: rows = 2; columns = 2; break;
+			case gl.FLOAT_MAT3: rows = 3; columns = 3; break;
+			case gl.FLOAT_MAT4: rows = 4; columns = 4; break;
+
+			case gl.SAMPLER_2D: integer = true; texture = true; break;
+			case gl.INT_SAMPLER_2D: integer = true; texture = true; break;
+			case gl.UNSIGNED_INT_SAMPLER_2D: integer = true; texture = true; dynamicArray = true; break;
+
+			case gl.UNSIGNED_INT: integer = true; signed = false; break;
+			case gl.UNSIGNED_INT_VEC2: integer = true; rows = 2; signed = false; break;
+			case gl.UNSIGNED_INT_VEC3: integer = true; rows = 3; signed = false; break;
+			case gl.UNSIGNED_INT_VEC4: integer = true; rows = 4; signed = false; break;
+
+			case gl.FLOAT_MAT2x3: rows = 2; columns = 3; break;
+			case gl.FLOAT_MAT2x4: rows = 2; columns = 4; break;
+			case gl.FLOAT_MAT3x2: rows = 3; columns = 2; break;
+			case gl.FLOAT_MAT3x4: rows = 3; columns = 4; break;
+			case gl.FLOAT_MAT4x2: rows = 4; columns = 2; break;
+			case gl.FLOAT_MAT4x3: rows = 4; columns = 3; break;
+		}
+
+		return { integer, signed, rows, columns, texture, dynamicArray };
+	}
+	getVectorComponents(value) {
+		const keys = Vector4.modValues;
+		for (let i = 0; i < keys.length; i++)
+			this.vectorBuffer[i] = value[keys[i]];
+	}
+	layoutAttributes(layout, divisor = 0) {
+		const currentAttributesList = this.divisors[divisor].attributes;
+		const currentAttributes = {};
+		for (let i = 0; i < currentAttributesList.length; i++) {
+			const attribute = currentAttributesList[i];
+			if (!attribute.isFiller) currentAttributes[attribute.name] = attribute;
+		}
+
+		const attributes = [];
+		let stride = 0;
+		for (let i = 0; i < layout.length; i++) {
+			const segment = layout[i];
+			const attribute = (typeof segment === "number") ? { rows: segment, columns: 1, isFiller: true } : currentAttributes[segment];
+			attributes.push(attribute);
+			stride += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
+		}
+
+		this.divisors[divisor].attributes = attributes;
+		this.divisors[divisor].stride = stride;
+	}
+	use() {
+		this.gl.useProgram(this.program);
+	}
+	focus() {
+		if (!this.focused) this.use();
+	}
+	setUniform(name, value, force = true, location = this.uniforms) {
+		if (name in location) {
+			if (location === this.uniforms && !this.lockedValues.has(name))
+				this.uniformValues[name] = value;
+			const child = location[name];
+			if (typeof child.set === "function") { // reached leaf
+				this.focus(); // need to be the gl.CURRENT_PROGRAM
+				this.uniformsSet = true;
+				if (value instanceof Operable) {
+					this.getVectorComponents(value);
+					child.set(...this.vectorBuffer);
+				} else child.set(value);
+			} else {
+				const keys = Object.getOwnPropertyNames(child);
+				for (let i = 0; i < keys.length; i++) {
+					const key = keys[i];
+					if (key in value) this.setUniform(key, value[key], force, child); // more steps needed
+				}
+			}
+		} else if (location === this.uniforms && force) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
+	}
+	getUniform(name) {
+		if (this.hasUniform(name)) return this.uniformValues[name];
+		else this.error("UNIFORM_GET", `Uniform '${name}' doesn't exist`);
+	}
+	hasUniform(name) {
+		return name in this.uniforms;
+	}
+	setDivisor(name, divisor) {
+		this.focus();
+		if (name in this.attributes) {
+			const attribute = this.attributes[name];
+
+			if (attribute.divisor in this.divisors) { // remove from previous
+				const previousAttributes = this.divisors[attribute.divisor];
+				previousAttributes.attributes.splice(previousAttributes.attributes.indexOf(attribute), 1);
+				previousAttributes.stride -= attribute.rows * attribute.columns * 4 /* bytes of GLFloat */;
+			}
+
+			if (!(divisor in this.divisors)) { // create divisor
+				this.divisors[divisor] = {
+					attributes: [],
+					stride: 0
+				};
+			}
+
+			const currentAttributes = this.divisors[divisor];
+
+			currentAttributes.attributes.push(attribute);
+			currentAttributes.attributes.sort((a, b) => a.location - b.location);
+			currentAttributes.stride += attribute.rows * attribute.columns * 4 /* bytes of GLFloat */;
+
+			this.focus(); // need to be the gl.CURRENT_PROGRAM
+			attribute.divisor = divisor;
+			for (let i = 0; i < attribute.columns; i++) this.gl.vertexAttribDivisor(attribute.location + i, divisor);
+		} else this.error(`Vertex attribute '${name}' doesn't exist`);
+	}
+	setAttributes(buffer, divisor = 0) {
+		if (divisor in this.divisors) {
+			const { gl } = this;
+			
+			this.focus(); // need to be the gl.CURRENT_PROGRAM
+			
+			const { attributes, stride } = this.divisors[divisor];
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+				
+			let offset = 0;
+			for (let i = 0; i < attributes.length; i++) {
+				const attribute = attributes[i];
+				if (attribute.isFiller) offset += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
+				else {
+					const enablingNeeded = !attribute.enabled;
+					if (enablingNeeded) attribute.enabled = true;
+					for (let j = 0; j < attribute.columns; j++) {
+						const pointer = attribute.location + j;
+						gl.vertexAttribPointer(pointer, attribute.rows, gl.FLOAT, false, stride, offset);
+						if (enablingNeeded) gl.enableVertexAttribArray(pointer);
+						offset += attribute.rows * 4 /* bytes per GLFloat */;
+					}
+				}
+			}
+		} else this.error("ATTRIBUTE_SET", `No attributes with vertex divisor '${divisor}' exist`);
+	}
+}
+
+/**
+ * @type interface GPUInterface
+ * Represents a GLSL program.
+ * @abstract
+ * @prop String glsl | The source code of the program
+ */
+class GPUInterface {
+	constructor(glsl, width, height) {
+		this.image = new_OffscreenCanvas(width, height);
+		this.gl = this.image.getContext("webgl2");
+		if (!this.gl)
+			throw new Error("Your browser doesn't support WebGL");
+		this.image.addEventListener("webglcontextlost", event => {
+			event.preventDefault();
+			console.warn("WebGL Context Lost");
+		});
+		this.image.addEventListener("webglcontextrestored", event => {
+			event.preventDefault();
+			console.warn("WebGL Context Restored");
+			this.compile();
+		});
+
+		this.glsl = glsl;
+	}
+	set glsl(a) {
+		this._glsl = a;
+		this.parsedGLSL = new GLSL(a);
+		this.compile();
+	}
+	get glsl() {
+		return this._glsl;
+	}
+	get prefix() {
+		return "";
+	}
+	set vertexData(data) {
+		const { gl } = this;
+		const vertexBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+		this.program.setAttributes(vertexBuffer, 0);
+	}
+	compile() {
+		const { vertexShader, prefix, fragmentShader } = this;
+		const version = "#version 300 es";
+		const glsl = this.parsedGLSL.toString();
+		const vs = version + vertexShader;
+		const fs = version + prefix + glsl + fragmentShader;
+		this.program = new GLSLProgram(this.gl, this.parsedGLSL, vs, fs, (type, message) => {
+			if (type === "FRAGMENT_SHADER")
+				GLSLError.process(glsl, message, prefix.split("\n").length);
+			else console.warn(message);
+		});
+		this.program.use();
 	}
 	/**
-	 * Runs the computation on a given input array and writes the result to a given output array.
-	 * The output parameter is returned.
-	 * @param Object[] input? | The data to use as the input to the computation. If this is omitted, the data already in the input buffer will be used
-	 * @param Object[] output? | The location to place the output data. Whether or not this parameter is specified, the data will be written to the output buffer and can be read later
-	 * @param Number problems? | The number of problems in the batch. This will be based on the size of the most recently specified batch size (either via `setInput`, `writeInput`, the first argument to this function, or this argument in a previous call)
-	 * @return Object[]/void
+	 * Sets the value of a uniform in the program.
+	 * @param String name | The name of the uniform
+	 * @param Any value | The new value for the uniform. For the type of this argument, see the GLSL API
 	 */
-	compute(input, output, problems) {
-		if (input) this.setInput(input);
-		if (problems !== undefined) this.problems = problems;
-		super.compute(this.inputBuffer, this.outputBuffer, this.problems);
-		if (output) this.readOutput(output);
-		return output;
+	setArgument(name, value) {
+		this.program.setUniform(name, value);
 	}
 	/**
-	 * Moves the data in the output buffer into the input buffer.
-	 * This function is only usable if the GLSL input and output structs are the same.
+	 * Sets the value of many uniforms at once.
+	 * @param Object uniforms | A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
 	 */
-	readback() {
-		this.outputBuffer.get(this.inputBuffer);
+	setArguments(args) {
+		for (const key in args)
+			this.setArgument(key, args[key]);
 	}
-	static destructure(glsl) {
-		const originalGLSL = glsl;
+	/**
+	 * Retrieves the current value of a given uniform.
+	 * For the return type of this function, see the GLSL API.
+	 * @param String name | The name of the uniform
+	 * @return Any
+	 */
+	getArgument(name) {
+		return this.program.getUniform(name);
+	}
+	/**
+	 * Checks whether a given uniform exists.
+	 * @param String name | The name of the uniform to check
+	 * @return Boolean
+	 */
+	argumentExists(name) {
+		return this.program.hasUniform(name);
+	}
+}
 
-		glsl = GLSLPrecompiler.compile(glsl);
-		glsl = glsl
-			.replace(/\s+/g, " ")
-			.split(/\b/g)
-			.map(token => token.trim())
-			.filter(token => token)
-			.join(" ");
+/**
+ * @type class GPUComputation implements GPUInterface
+ * @implements GPUInterface
+ * Represents a GLSL operation that can be run in parallel on the GPU.
+ * The entry point for the GLSL operation is the `compute` function, which returns any struct type and takes no arguments.
+ * ```glsl
+ * SomeStruct compute() { ... }
+ * ```
+ * The returned value is considered the output of the operation, and some global variables are provided as the input:
+ * ```glsl
+ * uniform int problems; // the total number of operations in the current batch
+ * int problemIndex; // the index of the current operation in the batch
+ * ```
+ * Commonly, one or more dynamic array uniforms can be used to store complex input data, as shown in the following example.
+ * ```js
+ * // computation to move circles toward the middle of the screen
+ * const computation = new GPUComputation(`
+ * 	struct Circle {
+ * 		vec2 position;
+ * 		float radius;
+ * 	};
+ * 
+ * 	uniform Circle[] circles;
+ * 	uniform vec2 middle;
+ * 
+ * 	Circle compute() {
+ * 		Circle circle = circles[problemIndex];
+ * 		circle.position = mix(circle.position, middle, 0.01);
+ * 		return circle;
+ * 	}
+ * `);
+ * 
+ * const circles = Array.dim(1000).map(() => {
+ * 	return { position: Random.inShape(scene.camera.screen), radius: 10 };
+ * });
+ * 
+ * // write, compute, and readback circle data
+ * computation.setArguments({ circles, middle });
+ * computation.compute(circles.length);
+ * computation.output.read(circles);
+ * ```
+ * @prop GPUArray output | An array storing the output of the most recent batch of operations
+ */
+class GPUComputation extends GPUInterface {
+	constructor(glsl) {
+		super(glsl, 1, 1);
+		if (this.gl instanceof WebGLRenderingContext)
+			throw new Error("Your browser doesn't support WebGL2");
+	}
+	get prefixLength() {
+		return 0;
+	}
+	get vertexShader() {
+		return `
+			in highp vec2 uv;
 
-		const signature = glsl
-			.match(/(\w+?) compute \( (\w+?) /g);
+			void main() {
+				gl_Position = vec4(uv, 0, 1);
+			}
+		`;
+	}
+	get prefix() {
+		return `
+			precision highp float;
+			precision highp int;
+			precision highp sampler2D;
 
-		if (signature === null) throw new GLSLError("", 1, "There is no compute() function");
+			uniform int problems;
+			uniform int _width;
 
-		const [outputStruct, , , inputStruct] = signature[0].split(" ");
+			int problemIndex;
+		`;
+	}
+	get fragmentShader() {
+		const { SIZE, VECTORS } = GLSL;
+		const { PIXEL_BYTES, CHANNEL_BYTES, LITTLE_ENDIAN } = GPUDataTexture;
+		const pixels = Math.ceil(this.struct.size / PIXEL_BYTES);
+		const outColors = Array.dim(pixels).map((_, i) => `_output${i}`);
+		const channels = Color.modValues.map(key => key[0]);
 
-		const size = {
-			float: 4,
-			int: 4,
-			bool: 1
+		const WRITE = {
+			"bool": (expr, index) => `bytes[${index}] = int(${expr})`,
+			"int": (expr, index) => `{ int val = ${expr}; bytes[${index}] = val & 255; bytes[${index + 1}] = (val >> 8) & 255; bytes[${index + 2}] = (val >> 16) & 255; bytes[${index + 3}] = (val >> 24) & 255; }`,
+			"float": (expr, index) => WRITE.int(`floatBitsToInt(${expr})`, index)
 		};
 
-		const read = {
-			float: `intBitsToFloat(ib[ip] | ib[ip + 1] << 8 | ib[ip + 2] << 16 | ib[ip + 3] << 24)`,
-			int: `ib[ip] | ib[ip + 1] << 8 | ib[ip + 2] << 16 | ib[ip + 3] << 24`,
-			bool: `ib[ip] == 1`
-		};
-
-		const write = {
-			float: `
-				int bits = floatBitsToInt(value);
-				ob[op] = bits & 255;
-				ob[op + 1] = (bits >> 8) & 255;
-				ob[op + 2] = (bits >> 16) & 255;
-				ob[op + 3] = (bits >> 24) & 255;
-		    `,
-			int: `
-				ob[op] = value & 255;
-				ob[op + 1] = (value >> 8) & 255;
-				ob[op + 2] = (value >> 16) & 255;
-				ob[op + 3] = (value >> 24) & 255;
-		  	`,
-			bool: `
-				ob[op] = value ? 1 : 0;
-		  	`
-		};
-
-		for (const type in GPUComputation.Structured.VECTORS) {
-			const vecName = GPUComputation.Structured.VECTORS[type];
-			const elSize = size[type];
-			const readEl = read[type];
-			const writeEl = write[type];
-			for (let n = 2; n <= 4; n++) {
-				const name = vecName + n;
-				size[name] = elSize * n;
-				read[name] = `${name}(${
-					Array.dim(n)
-						.map((_, i) => readEl.replaceAll("ip", `ip + ${i * elSize}`))
-						.join(", ")
-				})`;
-				write[name] = Array.dim(n)
-					.map((_, i) => {
-						return "{" + writeEl
-							.replaceAll("op", `op + ${i * elSize}`)
-							.replace("value", `value[${i}]`) + "}";
-					})
+		for (const key in WRITE) {
+			const vecName = VECTORS[key];
+			const elSize = SIZE[key];
+			const write = WRITE[key];
+			for (let i = 2; i <= 4; i++) {
+				const name = vecName + i;
+				WRITE[name] = (expr, index) => Array.dim(i)
+					.map((_, i) => write(`${expr}.${Vector4.modValues[i]}`, index + i * elSize))
 					.join("\n");
 			}
 		}
 
-		function fields(name) {
-			const regexp = new RegExp(String.raw`struct\s+${name}\s+{(.*?)};`);
-			const match = glsl.match(regexp);
-			if (match === null)
-				throw new GLSLError("", 1, `Fields of type ${name} are not supported`);
+		let offset = 0;
+		const writes = [];
+		for (let i = 0; i < this.struct.fields.length; i++) {
+			const { name, type } = this.struct.fields[i];
+			writes.push(`${WRITE[type](`value.${name}`, offset)};`);
+			offset += SIZE[type];
+		}
 
-			const contents = match[1];
-			const result = contents
-				.split(";")
-				.map(line => line.trim())
-				.filter(line => line.length)
-				.map(field => {
-					const array = field.includes("[");
-					let arrayLength;
+		return `
+			${outColors.map((color, i) => `layout (location = ${i}) out uvec4 ${color};`).join("\n")}
 
-					field = field.split(" ");
-					const type = field[0];
-					if (field[1] === "[") {
-						arrayLength = parseInt(field[2]);
-						field = field.slice(4);
-					} else field = field.slice(1);
+			void main() {
+				problemIndex = int(gl_FragCoord.x) + int(gl_FragCoord.y) * _width;
+				if (problemIndex >= problems) return;
+				${this.struct.name} value = compute();
 
-					const names = field
-						.join("")
-						.split(",")
-						.map(name => {
-							if (array) {
-								let length = arrayLength;
-								if (length === undefined) {
-									const index = name.indexOf("[");
-									length = parseInt(name.slice(index + 1));
-									name = name.slice(0, index);
-								}
-								
-								return Array.dim(length)
-									.map((_, i) => ({ type, name: `${name}[${i}]`}));
-							}
+				int[${this.struct.size}] bytes;
+				${writes.join("\n")}
+				${
+					Array.dim(Math.ceil(this.struct.size / CHANNEL_BYTES))
+						.map((_, i) => {
+							const color = outColors[Math.floor(i / channels.length)];
+							const channel = channels[i % channels.length];
+							const maxOffset = (CHANNEL_BYTES - 1) * 8;
+							const end = Math.min(4, this.struct.size - i * CHANNEL_BYTES);
+							const pieces = Array.dim(end)
+								.map((_, j) => {
+									let offset = j * 8;
+									if (!LITTLE_ENDIAN) offset = maxOffset - offset;
+									return `bytes[${i * CHANNEL_BYTES + j}]${offset ? ` << ${offset}` : ""}`;
+								});
 
-							return [{ type, name }];
+							return `${color}.${channel} = uint(${pieces.join(" | ")});`;
 						})
-						.reduce((a, b) => [...a, ...b], []);
-
-					return names;
-				})
-				.reduce((a, b) => [...a, ...b], []);
-
-			return result.flatMap(field => {
-				if (field.type in size) return [field];
-				return fields(field.type)
-					.map(({ type, name }) => ({ type, name: `${field.name}.${name}`}));
-			});
-		}
-
-		function getByteOffset(fields, index = fields.length) {
-			let offset = 0;
-			for (let i = 0; i < index; i++)
-				offset += size[fields[i].type];
-			return offset;
-		}
-
-		function makeReader({ type, name }, byteOffset) {
-			return `
-				ip = ${byteOffset};
-				i.${name} = ${read[type]};
-			`;
-		}
-
-		function makeWriter({ type, name }, byteOffset) {
-			return `
-				op = ${byteOffset};
-				{
-					${type} value = o.${name};
-					${write[type]}
-				};
-		  	`;
-		}
-
-		const ifields = fields(inputStruct);
-		const ofields = (inputStruct === outputStruct) ? ifields : fields(outputStruct);
-
-		const inputBytes = getByteOffset(ifields);
-		const outputBytes = getByteOffset(ofields);
-		
-		const readerGLSL = "int " + ifields.map((field, index) => makeReader(field, getByteOffset(ifields, index))).join("\n");
-		const writerGLSL = "int " + ofields.map((field, index) => makeWriter(field, getByteOffset(ofields, index))).join("\n");
-
-		let userGLSL = originalGLSL
-			.replace(/\bcompute\b/g, "_compute")
-			.replace(/\bgetProblem\b/g, "_getProblem");
-
-		{
-			const regexp = new RegExp(String.raw`struct\s+${inputStruct}\s+\{((.|\n)*?)\};`);
-			const result = userGLSL.match(regexp);
-			const lastIndex = result.index + result[0].length;
-			const infix = `
-				${inputStruct} _getProblem(int problemIndex) {
-					${inputStruct} i;
-					int[${inputBytes}] ib = getProblem(problemIndex);
-					${readerGLSL}
-					return i;
+						.join("\n")
 				}
-			`;
-			userGLSL = userGLSL.slice(0, lastIndex) + infix.replace(/\s+/g, " ") + userGLSL.slice(lastIndex);
-		};
-
-		const finalGLSL = `${userGLSL}
-
-			int[${outputBytes}] compute(int[${inputBytes}] ib) {
-				${inputStruct} i;
-				${readerGLSL}
-				
-				${outputStruct} o = _compute(i);
-				int ob[${outputBytes}];
-				${writerGLSL}
-				
-				return ob;
 			}
 		`;
-
-		return {
-			glsl: finalGLSL,
-			inputFields: ifields,
-			outputFields: ofields
-		};
 	}
-}
-GPUComputation.Structured.VECTORS = {
-	"float": "vec",
-	"int": "ivec",
-	"bool": "bvec"
+	compile() {
+		this.struct = this.parsedGLSL.structs.get(
+			this.parsedGLSL.methods.get("compute").signature.type
+		);
+		this.output = new GPUArray(this.struct);
+		
+		super.compile();
+		
+		this.vertexData = [
+			-1, 1,
+			1, 1,
+			-1, -1,
+			1, -1
+		];
+
+		const { gl } = this;
+		this.framebuffer = gl.createFramebuffer();
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+
+		const previousTexture = gl.getParameter(gl.TEXTURE_BINDING_2D);
+
+		const { PIXEL_BYTES } = GPUDataTexture;
+		this.textures = Array.dim(Math.ceil(this.struct.size / PIXEL_BYTES))
+			.map((_, i) => {
+				const texture = new GPUDataTexture(gl);
+				texture.bind();
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, texture.texture, 0);
+				return { texture, attachment: i };
+			});
+
+		gl.drawBuffers(this.textures.map((_, i) => gl.COLOR_ATTACHMENT0 + i));
+
+		gl.bindTexture(gl.TEXTURE_2D, previousTexture);
+	}
+	/**
+	 * Runs a batch of operations.
+	 * @param Number problems | The number of operations to run
+	 */
+	compute(length) {
+		if (!this.program.uniformsChanged) return;
+
+		const { gl, textures } = this;
+		const { PIXEL_BYTES, FORMAT, TYPE, TypedArray } = GPUDataTexture;
+
+		const previousTexture = gl.getParameter(gl.TEXTURE_BINDING_2D);
+		for (let i = 0; i < textures.length; i++) {
+			const tex = textures[i];
+			tex.texture.bind();
+			tex.texture.bytes = PIXEL_BYTES * length;
+			if (tex.data8?.length !== tex.texture.bytes) {
+				tex.data8 = new Uint8Array(tex.texture.bytes);
+				tex.data = new TypedArray(tex.data8.buffer);
+			}
+		}
+		gl.bindTexture(gl.TEXTURE_2D, previousTexture);
+
+		const textureSize = this.textures[0].texture.size;
+		
+		this.program.setUniform("_width", textureSize);
+		this.program.setUniform("problems", length);
+		this.program.commitUniforms();
+		gl.viewport(0, 0, textureSize, textureSize);
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+		const outputBytes = this.struct.size;
+		const outputTextureBytes = length * PIXEL_BYTES;
+		this.output.length = length;
+		const outputData = this.output.buffer.data;
+		
+		// output data array major
+		for (let i = 0; i < textures.length; i++) {
+			const texture = textures[i];
+			gl.readBuffer(gl.COLOR_ATTACHMENT0 + texture.attachment);
+			gl.readPixels(0, 0, textureSize, textureSize, gl[FORMAT], gl[TYPE], texture.data);
+			const array = texture.data8;
+			const bytes = Math.min(PIXEL_BYTES, outputBytes - i * PIXEL_BYTES);
+
+			let problemOffset = i * PIXEL_BYTES;
+			for (let j = 0; j < outputTextureBytes; j += PIXEL_BYTES) {
+				for (let k = 0; k < bytes; k++)
+					outputData[problemOffset + k] = array[j + k];
+				problemOffset += outputBytes;
+			}
+		}
+	}
 };

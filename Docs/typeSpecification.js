@@ -10,7 +10,7 @@ function createTSDoc(lines) {
 		if (Array.isArray(line))
 			line = `@${line[0]} ${line[1].replace(/\W/g, "")} - ${line[2]}`;
 		return ` * ${line}`;
-}).join("\n")}\n */\n`;
+	}).join("\n")}\n */\n`;
 }
 
 function prefix(documented, prefix) {
@@ -65,18 +65,10 @@ function createPropSpecification(name, prop, isWindow) {
 	return createTSDoc([prop.description]) + result;
 }
 
-function createClassSpecification(doc) {
-	const documentation = createTSDoc(doc.description.split("\n"));
-
-	let name = doc.name.base;
-	if (doc.name.baseClass) name += ` extends ${doc.name.baseClass}`;
-	
+function getClassMembers(doc) {
 	const subs = doc.settings.name_subs?.substitutions;
+	const isWindow = doc.name.base === "Window";
 	
-	const isInterface = doc.settings.interface;
-
-	const isWindow = isInterface && doc.name.base === "Window";
-
 	const members = [
 		...doc.properties
 			.flatMap(prop => {
@@ -94,12 +86,25 @@ function createClassSpecification(doc) {
 		members.push(...instance);
 	}
 
-	if (isWindow) return members;
+	if (doc.settings.implements)
+		members.push(...getClassMembers(doc.settings.implements.info));
 
-	const kind = isInterface ? "interface" : doc.settings.type ? "type" : "class";
-	const cls = `${documentation}${kind} ${name + (doc.settings.type ? " =" : "")} {\n${
-		indent(members.join("\n"))
-	}\n}`;
+	return members;
+}
+
+function createClassSpecification(doc) {
+	const documentation = createTSDoc(doc.description.split("\n"));
+
+	let name = doc.name.base;
+	if (doc.name.baseClass) name += ` extends ${doc.name.baseClass}`;
+	
+	const members = getClassMembers(doc);
+	if (doc.name.base === "Window") return members;
+
+	const header = doc.settings.type?.content ?? "class " + name;
+	const body = indent(members.join("\n"));
+
+	const cls = `${documentation}${header} {\n${body}\n}`;
 
 	if (doc.classes) {
 		const int = `${documentation}namespace ${doc.name.base} {\n${indent(
@@ -173,15 +178,23 @@ function createSpecification(doc) {
 	return createFunctionSpecification(doc);
 }
 
-function deepCopy(object) {
+function deepCopy(object, found = new Map()) {
 	if (typeof object !== "object" || object === null)
 		return object;
-	if (Array.isArray(object))
-		return object.map(deepCopy);
-	return Object.fromEntries(
-		Object.entries(object)
-			.map(([key, value]) => [key, deepCopy(value)])
-	);
+	if (found.has(object)) return found.get(object);
+
+	if (Array.isArray(object)) {
+		const result = [];
+		found.set(object, result);
+		for (const el of object) result.push(deepCopy(el, found));
+		return result;
+	}
+
+	const result = { };
+	found.set(object, result);
+	for (const key in object)
+		result[key] = deepCopy(object[key], found);
+	return result;
 }
 
 module.exports = function createTypeSpecification(docs) {

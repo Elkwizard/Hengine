@@ -226,7 +226,7 @@ ElementScript.flags = new Set([
 ]);
 
 /**
- * @type
+ * @type type ScriptContainer = 
  * Represents the collection of behaviors on a SceneObject.
  * ```js
  * // create a script which holds an action

@@ -11,7 +11,7 @@
 
 /**
  * @name class SpawnerProperties
- * @interface
+ * @type interface SpawnerProperties
  * This is not a real class, but rather an interface for the parameters to various property-setting functions on PARTICLE_SPAWNER.
  * @prop Boolean slows? | Whether or not particles will have air resistance applied
  * @prop Boolean falls? | Whether or not particles will have gravity applied
@@ -32,7 +32,7 @@
  * @name update?
  * The function that is called to update particles each frame.
  * Since this function is not culled, all non-rendering logic should be here.
- * This property may instead be a String containing the source code for a GPUComputation.Structured that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system.
+ * This property may instead be a String containing the source code for a GPUComputation that outputs a struct matching any inclusive subset of the structure of a Particle in the system. The source code also must include a `particles[]` uniform whose type is the same as the output of the computation. This uniform will reflect the state of the particles in the system.
  * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way.
  * Setting this property to a function will remove the computation.
  * @param Particle particle | The particle being updated
@@ -158,8 +158,9 @@ class PARTICLE_SPAWNER extends ElementScript {
 				this.particleUpdate = update;
 				this.computation = null;
 			} else {
-				this.computation = new GPUComputation.Structured(update);
-				this.computation.setInput(this.particles);
+				this.computation = new GPUComputation(update);
+				this.computation.output = this.computation.getArgument("particles");
+				this.computation.setArgument("particles", this.particles);
 			}
 		} else this.particleUpdate ??= () => null;
 	}
@@ -184,7 +185,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 			this.addParticle(pos.get());
 
 		if (this.computation)
-			this.computation.writeInput(this.particles.slice(initial));
+			this.computation.getArgument("particles").write(this.particles, initial);
 	}
 	update(obj) {
 		if (this.active && isFinite(this.delay)) {
@@ -206,7 +207,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 			}
 
 			if (this.computation)
-				this.computation.writeInput(this.particles.slice(initial));
+				this.computation.getArgument("particles").write(this.particles, initial);
 		}
 		obj.transform.get(obj.lastTransform);
 
@@ -216,10 +217,11 @@ class PARTICLE_SPAWNER extends ElementScript {
 		let end = particles.length - 1;
 
 		if (this.computation) {
+			const array = this.computation.getArgument("particles");
 			loop: for (let i = 0; i <= end; i++) {
 				while (particles[i].timer >= 1) {
 					particles[i] = particles[end--];
-					this.computation.writeInput(particles, i, 1, i);
+					array.write(particles, i, 1);
 					if (i > end) continue loop;
 				}
 				particles[i].timer += timerIncrement;
@@ -239,8 +241,8 @@ class PARTICLE_SPAWNER extends ElementScript {
 		particles.length = end + 1;
 		
 		if (this.computation) {
-			this.computation.compute(undefined, particles, particles.length);
-			this.computation.readback();
+			this.computation.compute(particles.length);
+			this.computation.output.read(particles);
 		}
 	}
 	/**

@@ -927,7 +927,7 @@ HengineLoader.engineResources = [
 
 /**
  * @name class Window
- * @interface
+ * @type interface Window
  * 
  * @prop KeyboardHandler keyboard | The keyboard input API for the Hengine
  * @prop MouseHandler mouse | The mouse input API for the Hengine

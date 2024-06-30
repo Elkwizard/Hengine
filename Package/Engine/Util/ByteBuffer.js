@@ -19,7 +19,7 @@ class ByteBuffer {
 	 * @param Number pointer? | The offset into the buffer where operations occur. Default is 0
 	 * @param Boolean littleEndian? | The endianness of the buffer. Default is true
 	 */
-	constructor(bytes = 2, pointer = 0, littleEndian = true) {
+	constructor(bytes = 0, pointer = 0, littleEndian = true) {
 		this.data = new Uint8Array(bytes);
 		this.view = new DataView(this.data.buffer);
 		this.pointer = pointer;
@@ -297,7 +297,8 @@ ByteBuffer.Writer = class {
 			value *= 256n;
 			bytes++;
 		}
-		const byteSize = BigInt("0xFF");
+		
+		const byteSize = 255n;
 
 		this.int32(Number(bytes * sign));
 		for (let i = bytes - 1n; i >= 0n; i--) {

@@ -1,5 +1,6 @@
 /**
  * @name class ValueStop
+ * @type interface ValueStop
  * This is not an actual class, but rather an interface for values passed to functions of Gradient.
  * Represents a point along a gradient with a specific value.
  * @prop Number start | The parameter value at which this stop's value reaches full intensity

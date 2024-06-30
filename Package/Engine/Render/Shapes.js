@@ -227,7 +227,7 @@ class Shape {
 	equals(shape) { }
 	intersectSameType() { }
 	/**
-	 * Checks if two shapes intersect
+	 * Checks if two shapes intersect.
 	 * @param Shape shape | The Shape to check intersections with
 	 * @return Boolean
 	 */

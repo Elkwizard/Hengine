@@ -1,5 +1,3 @@
-const fs = require("fs");
-
 function parse(content, file) {
 	const docRegex = /(?:\/\*\*([\w\W]*?)\*\/)|\n}/g;
 	const matches = [...content.matchAll(docRegex)]
@@ -48,7 +46,7 @@ function parse(content, file) {
 		if (isClass) {
 			const baseIndex = name.indexOf(" extends ");
 			if (baseIndex > -1) {
-				baseClass = name.slice(name.lastIndexOf(" ") + 1);
+				baseClass = name.slice(name.lastIndexOf(" ") + 1).split("/");
 				name = name.slice(0, baseIndex);
 			}
 		}
@@ -193,11 +191,16 @@ function parse(content, file) {
 }
 
 function addInheritance(classes) {
-	for (const doc of classes)
+	for (const doc of classes) {
+		if (doc.settings.implements) {
+			const name = doc.settings.implements.content;
+			doc.settings.implements.info = classes.find(cls => cls.name.base === name);
+		}
 		if (doc.name.baseClass)
 			for (const superDoc of classes)
-				if (doc.name.baseClass === superDoc.name.base)
+				if (doc.name.baseClass.includes(superDoc.name.base))
 					(superDoc.subclasses ??= []).push(doc);
+	}
 }
 
 module.exports = { parse, addInheritance };

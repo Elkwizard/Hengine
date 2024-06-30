@@ -402,10 +402,18 @@ class Vector2 extends Vector {
 	 * @return Vector2
 	 */
 	static fromAngle(a) {
-		let x = Math.cos(a);
-		let y = Math.sin(a);
-		return new Vector2(x, y);
+		return Vector2.polar(a);
 	}
+	/**
+	 * Creates a cartesian vector from a given set of polar coordinates .
+	 * @param Number θ | The clockwise (in screen-space) angle from the horizontal
+	 * @param Number r? | The distance from the origin. Default is 1 
+	 * @return Vector2 
+	 */
+	static polar(θ, r = 1) {
+		return new Vector2(Math.cos(θ) * r, Math.sin(θ) * r);
+	}
+
 	static fromPoint(p) {
 		return new Vector2(p.x || 0, p.y || 0);
 	}

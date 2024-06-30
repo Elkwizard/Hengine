@@ -9,38 +9,55 @@
 				
 			<div class="class-wrapper" id="class GPUComputation">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L21" target="_blank" class="class-name source-link">GPUComputation</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1097" target="_blank" class="class-name source-link">GPUComputation</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Rendering/GLSL API.html#class GPUInterface">GPUInterface</a></span>
 				</div>
 				<div class="class desc">
-					Represents an operation that can be executed in parallel with itself on the GPU.
-The operation's inputs and outputs are represented in as fixed-length arrays of bytes.
-The main entry point is:
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">int</span><span class="highlight-SYMBOL">[</span><span class="highlight-CONSTANT">OUTPUT_BYTES</span><span class="highlight-SYMBOL">] </span><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">int</span><span class="highlight-SYMBOL">[</span><span class="highlight-CONSTANT">INPUT_BYTES</span><span class="highlight-SYMBOL">] </span><span class="highlight-IDENTIFIER">inputs</span><span class="highlight-SYMBOL">) {
-	</span><span class="highlight-COMMENT">// your main code here</span><span class="highlight-SYMBOL">
-}
+					Represents a GLSL operation that can be run in parallel on the GPU.
+The entry point for the GLSL operation is the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">compute</span></code> function, which returns any struct type and takes no arguments.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-CLASS">SomeStruct </span><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">() { ... }
 </span></code>
-Where <code class=" highlight-BACKGROUND"><span class="highlight-CONSTANT">INPUT_BYTES</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-CONSTANT">OUTPUT_BYTES</span></code> are the sizes of the inputs and outputs of the operation.
-There are some helper variables and functions provided, specifically:
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">#define</span><span class="highlight-CONSTANT"> PROBLEM_INDEX</span><span class="highlight-SYMBOL"> </span><span class="highlight-COMMENT">// the index of the operation in the batch</span><span class="highlight-KEYWORD">
-#define</span><span class="highlight-CONSTANT"> PROBLEMS</span><span class="highlight-SYMBOL"> </span><span class="highlight-COMMENT">// the size of the batch</span><span class="highlight-SYMBOL">
+The returned value is considered the output of the operation, and some global variables are provided as the input:
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">uniform int</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">problems</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// the total number of operations in the current batch</span><span class="highlight-KEYWORD">
+int</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">problemIndex</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// the index of the current operation in the batch</span><span class="highlight-SYMBOL">
+</span></code>
+Commonly, one or more dynamic array uniforms can be used to store complex input data, as shown in the following example.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// computation to move circles toward the middle of the screen</span><span class="highlight-KEYWORD">
+const</span><span class="highlight-CONSTANT"> computation</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> GPUComputation</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&#96;
+	struct <a href="../../Pages/Geometry/Shapes/Circle.html#class Circle">Circle</a> {
+		vec2 position;
+		float radius;
+	};
 
-</span><span class="highlight-COMMENT">// returns the input data for a specific operation in the batch</span><span class="highlight-KEYWORD">
-int</span><span class="highlight-SYMBOL">[</span><span class="highlight-CONSTANT">INPUT_BYTES</span><span class="highlight-SYMBOL">] </span><span class="highlight-FUNCTION">getProblem</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">int</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">index</span><span class="highlight-SYMBOL">);
+	uniform <a href="../../Pages/Geometry/Shapes/Circle.html#class Circle">Circle</a>[] circles;
+	uniform vec2 middle;
+
+	<a href="../../Pages/Geometry/Shapes/Circle.html#class Circle">Circle</a> compute() {
+		<a href="../../Pages/Geometry/Shapes/Circle.html#class Circle">Circle</a> circle = circles[problemIndex];
+		circle.position = mix(circle.position, middle, 0.01);
+		return circle;
+	}
+&#96;</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-KEYWORD">
+const</span><span class="highlight-CONSTANT"> circles</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../../Pages/Built-Ins/Array.html#class Array">Array</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">dim</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">1000</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">map</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
+</span><span class="highlight-KEYWORD">	return</span><span class="highlight-SYMBOL"> { </span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">: </span><span class="highlight-CLASS"><a href="../../Pages/Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">inShape</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">camera</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span><span class="highlight-SYMBOL">), </span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL"> };
+});
+
+</span><span class="highlight-COMMENT">// write, compute, and readback circle data</span><span class="highlight-SYMBOL">
+</span><span class="highlight-IDENTIFIER">computation</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">setArguments</span><span class="highlight-SYMBOL">({ </span><span class="highlight-IDENTIFIER">circles</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">middle</span><span class="highlight-SYMBOL"> });
+</span><span class="highlight-IDENTIFIER">computation</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circles</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">length</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">computation</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">output</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">read</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circles</span><span class="highlight-SYMBOL">);
 </span></code>
 				</div>
-				
-					<div class="header">Subclasses</div>
-					<div class="subclass desc"><span class="class-name">GPUComputation.Structured</span></div>
 				
 				
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="GPUComputation.glsl">
+				<div class="prop-wrapper" id="GPUComputation.output">
 					<div class="prop-header member">
-						<span class="prop-name">glsl</span><span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+						<span class="prop-name">output</span><span class="type"><a href="../../Pages/Rendering/GLSL API.html#class GPUArray">GPUArray</a></span>
 					</div>
-					<div class="prop desc">The source code of the operation. See the <a href="../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a></div>
+					<div class="prop desc">An array storing the output of the most recent batch of operations</div>
 				</div>
 			</div>
 				
@@ -48,493 +65,30 @@ int</span><span class="highlight-SYMBOL">[</span><span class="highlight-CONSTANT
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="GPUComputation.prototype.constructor()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L26" target="_blank" class="function-name source-link">constructor</a>(<span class="param">glsl</span>)
-			</div>
-			<div class="function desc">
-				Creates a new GPUComputation.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.prototype.constructor():glsl">
-							<div class="param-name">
-								<span class="param">glsl</span>
-								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
-							</div>
-							<div class="param desc">
-								The source code of the operation
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="GPUComputation.prototype.compute()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L323" target="_blank" class="function-name source-link">compute</a>(<span class="param">input</span>, <span class="param">output?</span>, <span class="param">problems?</span>)<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1229" target="_blank" class="function-name source-link">compute</a>(<span class="param">problems</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Evaluates the operation on a batch of inputs simultaneously.
-Returns the outputs in a contiguous buffer in the same order as the inputs.
+				Runs a batch of operations.
 			</div>
 			
 				<div class="function-signature">
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="GPUComputation.prototype.compute():input">
-							<div class="param-name">
-								<span class="param">input</span>
-								<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
-							</div>
-							<div class="param desc">
-								The buffer containing the inputs of all the operations. These should be directly contiguous
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.prototype.compute():output?">
-							<div class="param-name">
-								<span class="param">output</span>
-								<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
-							</div>
-							<div class="param desc">
-								The buffer to write the output of the operations to. It will be packed contiguously. If not specified, this will be a newly created buffer
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.prototype.compute():problems?">
+						<div class="param-wrapper" id="GPUComputation.prototype.compute():problems">
 							<div class="param-name">
 								<span class="param">problems</span>
 								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The number of problems in the batch. This will be based on the size of the input buffer if not specified
+								The number of operations to run
 							</div>
 						</div>
 					
 		
 				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.prototype.argumentExists()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L367" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
-			</div>
-			<div class="function desc">
-				Returns whether or not the shader contains a given uniform.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.prototype.argumentExists():name">
-							<div class="param-name">
-								<span class="param">name</span>
-								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
-							</div>
-							<div class="param desc">
-								The name of the uniform to check
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.prototype.getArgument()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L376" target="_blank" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
-			</div>
-			<div class="function desc">
-				Returns the current value of a given uniform.
-For the return value of this function, see the <a href="../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a>
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.prototype.getArgument():name">
-							<div class="param-name">
-								<span class="param">name</span>
-								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
-							</div>
-							<div class="param desc">
-								The name of the uniform to retrieve
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.prototype.setArgument()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L384" target="_blank" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Sets the value of a given uniform.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.prototype.setArgument():name">
-							<div class="param-name">
-								<span class="param">name</span>
-								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
-							</div>
-							<div class="param desc">
-								The name of the uniform to set
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.prototype.setArgument():value">
-							<div class="param-name">
-								<span class="param">value</span>
-								<span class="type">Any</span>
-							</div>
-							<div class="param desc">
-								The new value for the uniform. For the type of this argument, see the <a href="../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a>
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.prototype.setArguments()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L391" target="_blank" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Sets the value of one or more uniforms. 
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.prototype.setArguments():uniforms">
-							<div class="param-name">
-								<span class="param">uniforms</span>
-								<span class="type">Object</span>
-							</div>
-							<div class="param desc">
-								A collection of key-value pairs, where the key is the name of the uniform to set, and the value is the new value for that uniform
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	</div>
-				
-			</div>
-		
-			<div class="class-wrapper" id="class GPUComputation.Structured">
-				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L442" target="_blank" class="class-name source-link">GPUComputation.Structured</a> <span class="keyword">extends</span> <span class="class-name">GPUComputation</span>
-				</div>
-				<div class="class desc">
-					Represents an operation that can be executed in parallel with itself on the GPU.
-This behaves much like GPUComputation except that the input and output of the operation are GLSL structs.
-The values of the input and output structs are represented in JavaScript as objects, whose properties have the same names as those of the GLSL struct.
-The structs/objects may be nested, and the types of fields must be associated in accordance with the <a href="../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a>.
-The main entry point is:
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-CLASS">OutputStruct </span><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS">InputStruct </span><span class="highlight-IDENTIFIER">input</span><span class="highlight-SYMBOL">) {
-	</span><span class="highlight-COMMENT">// your main code here</span><span class="highlight-SYMBOL">
-}
-</span></code>
-The input and output structs may have arbitrary names, and your GLSL must include the declarations of these structs.
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">struct</span><span class="highlight-CLASS"> InputStruct</span><span class="highlight-SYMBOL"> {
-	</span><span class="highlight-COMMENT">// your input fields</span><span class="highlight-SYMBOL">
-};</span><span class="highlight-KEYWORD">
-struct</span><span class="highlight-CLASS"> OutputStruct</span><span class="highlight-SYMBOL"> {
-	</span><span class="highlight-COMMENT">// your output fields</span><span class="highlight-SYMBOL">
-};
-</span></code>
-The helper functions and variables from GPUComputation are also present, specifically:
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">#define</span><span class="highlight-CONSTANT"> PROBLEM_INDEX</span><span class="highlight-SYMBOL"> </span><span class="highlight-COMMENT">// the index of the operation in the batch</span><span class="highlight-KEYWORD">
-#define</span><span class="highlight-CONSTANT"> PROBLEMS</span><span class="highlight-SYMBOL"> </span><span class="highlight-COMMENT">// the size of the batch</span><span class="highlight-SYMBOL">
-
-</span><span class="highlight-COMMENT">// returns the input data for a specific operation in the batch</span><span class="highlight-CLASS">
-InputStruct </span><span class="highlight-FUNCTION">getProblem</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">int</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">index</span><span class="highlight-SYMBOL">);
-</span></code>
-				</div>
-				
-				
-				
-					<div class="header">Properties</div>
-					<div class="class-properties">
-				<div class="prop-wrapper" id="GPUComputation.Structured.glsl">
-					<div class="prop-header member">
-						<span class="prop-name">glsl</span><span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
-					</div>
-					<div class="prop desc">The source code of the operation. See the <a href="../../Pages/Rendering/GLSL API.html#GLSL API">GLSL API</a></div>
-				</div>
-			
-				<div class="prop-wrapper" id="GPUComputation.Structured.inputBuffer">
-					<div class="prop-header member">
-						<span class="prop-name">inputBuffer</span><span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
-					</div>
-					<div class="prop desc">A buffer containing all of the current input data. This can be freely written to</div>
-				</div>
-			
-				<div class="prop-wrapper" id="GPUComputation.Structured.outputBuffer">
-					<div class="prop-header member">
-						<span class="prop-name">outputBuffer</span><span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
-					</div>
-					<div class="prop desc">A buffer containing the output of the most recent computation. This can be freely read from</div>
-				</div>
-			</div>
-				
-				
-				
-					<div class="header">Methods</div>
-					<div class="class-methods">
-		<div class="function-wrapper" id="GPUComputation.Structured.prototype.constructor()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L447" target="_blank" class="function-name source-link">constructor</a>(<span class="param">glsl</span>)
-			</div>
-			<div class="function desc">
-				Creates a new structured GPU Computation.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.constructor():glsl">
-							<div class="param-name">
-								<span class="param">glsl</span>
-								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
-							</div>
-							<div class="param desc">
-								The source code for the operation
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.Structured.prototype.setInput()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L507" target="_blank" class="function-name source-link">setInput</a>(<span class="param">input</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Writes an array of objects into the input buffer of the computation at a given index.
-This replaces all the existing input data.
-The objects' structure must correspond to the structure of the GLSL input struct.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.setInput():input">
-							<div class="param-name">
-								<span class="param">input</span>
-								<span class="type">Object[]</span>
-							</div>
-							<div class="param desc">
-								The objects to read the data from
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.Structured.prototype.writeInput()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L530" target="_blank" class="function-name source-link">writeInput</a>(<span class="param">input</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">srcOffset?</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Overwrites a portion of the input data.
-This can increase the size of the input data.
-The objects' structure must correspond to the structure the GLSL input struct.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.writeInput():input">
-							<div class="param-name">
-								<span class="param">input</span>
-								<span class="type">Object[]</span>
-							</div>
-							<div class="param desc">
-								The objects to read the data from
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.writeInput():offset?">
-							<div class="param-name">
-								<span class="param">offset</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The index of the first input to overwrite. The default value is the length of the current input data
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.writeInput():length?">
-							<div class="param-name">
-								<span class="param">length</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The amount of objects to write. Default is the maximum possible amount
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.writeInput():srcOffset?">
-							<div class="param-name">
-								<span class="param">srcOffset</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The first index of the provided <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">input</span></code> array to read from. Default is 0
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.Structured.prototype.readOutput()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L588" target="_blank" class="function-name source-link">readOutput</a>(<span class="param">output</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">dstOffset?</span>)<span class="type">Object[]</span>
-			</div>
-			<div class="function desc">
-				Reads the output buffer into an array of objects, where the structure of the objects corresponds to the structure of the GLSL output struct.
-Returns the passed array.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.readOutput():output">
-							<div class="param-name">
-								<span class="param">output</span>
-								<span class="type">Object[]</span>
-							</div>
-							<div class="param desc">
-								The objects to write the output to
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.readOutput():offset?">
-							<div class="param-name">
-								<span class="param">offset</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The index of the first output to read. Default is 0
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.readOutput():length?">
-							<div class="param-name">
-								<span class="param">length</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The amount of objects to read. Default is the maximum possible amount
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.readOutput():dstOffset?">
-							<div class="param-name">
-								<span class="param">dstOffset</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The first index of the provided <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">output</span></code> array to write to. Default is 0
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.Structured.prototype.compute()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L612" target="_blank" class="function-name source-link">compute</a>(<span class="param">input?</span>, <span class="param">output?</span>, <span class="param">problems?</span>)<span class="type">Object[]/void</span>
-			</div>
-			<div class="function desc">
-				Runs the computation on a given input array and writes the result to a given output array.
-The output parameter is returned.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.compute():input?">
-							<div class="param-name">
-								<span class="param">input</span>
-								<span class="type">Object[]</span>
-							</div>
-							<div class="param desc">
-								The data to use as the input to the computation. If this is omitted, the data already in the input buffer will be used
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.compute():output?">
-							<div class="param-name">
-								<span class="param">output</span>
-								<span class="type">Object[]</span>
-							</div>
-							<div class="param desc">
-								The location to place the output data. Whether or not this parameter is specified, the data will be written to the output buffer and can be read later
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="GPUComputation.Structured.prototype.compute():problems?">
-							<div class="param-name">
-								<span class="param">problems</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The number of problems in the batch. This will be based on the size of the most recently specified batch size (either via <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">setInput</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">writeInput</span></code>, the first argument to this function, or this argument in a previous call)
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GPUComputation.Structured.prototype.readback()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L623" target="_blank" class="function-name source-link">readback</a>()<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Moves the data in the output buffer into the input buffer.
-This function is only usable if the GLSL input and output structs are the same.
-			</div>
 			
 		</div>
 	</div>

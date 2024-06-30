@@ -44,7 +44,7 @@
 			"ScriptContainer": null
 		},
 		"Rendering": {
-			"GLSL API": null,
+			"GLSL API": ["GLSL API", "GPUInterface", "GPUArray"],
 			"Font": null,
 			"Camera": null,
 			"Color": null,
@@ -133,7 +133,7 @@
 		},
 		"Miscellaneous": {
 			"PARTICLE_SPAWNER": ["PARTICLE_SPAWNER", "Particle", "SpawnerProperties"],
-			"GPUComputation": ["GPUComputation", "GPUComputation.Structured"],
+			"GPUComputation": null,
 			"FileSystem": null,
 			"Random": null,
 			"ByteBuffer": [

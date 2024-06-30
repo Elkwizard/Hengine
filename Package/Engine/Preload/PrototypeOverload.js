@@ -163,7 +163,7 @@ Object.defineProperty(window, "title", {
 	
 	/**
 	 * @name class Array
-	 * @interface
+	 * @type interface Array
 	 * The built-in Array class has some additional quality-of-life methods in the Hengine.
 	 * @prop Any last | The last element of the array
 	 */
@@ -268,7 +268,7 @@ Object.defineProperty(window, "title", {
 	};
 	/**
 	 * @name class Number extends Operable
-	 * @interface
+	 * @type interface Number extends Operable
 	 * The built-in Number class has some additional utility methods in the Hengine.
 	 * The class extends Operable only in the sense that it has all of the same methods, excluding those that modify the caller in-place.
 	 */
@@ -304,7 +304,7 @@ Object.defineProperty(window, "title", {
 	});
 	/**
 	 * @name class String
-	 * @interface
+	 * @type interface String
 	 * The built-in String class has some additional utility methods in the Hengine.
 	 */
 	/**
@@ -329,6 +329,18 @@ Object.defineProperty(window, "title", {
 			this.slice(0, inx),
 			this.slice(inx + char.length)
 		];
+	});
+	proto(String.prototype, "trimIndentation", function () {
+		const lines = this.split("\n");
+		const indent = Math.min(
+			...lines
+				.filter(line => /\S/.test(line))
+				.map(line => line.match(/^\t*/)[0].length)
+		);
+		return lines.map(line => line.slice(indent)).join("\n");
+	});
+	proto(String.prototype, "set", function (index, character) {
+		return this.slice(0, index) + character + this.slice(index + 1);
 	});
 	/**
 	 * @name indent
@@ -474,7 +486,7 @@ ${contents.join(",\n").indent()}
 
 	/**
 	 * @name class Storage
-	 * @interface
+	 * @type interface Storage
 	 * The storage class has some additional quality-of-life methods in the Hengine designed to promote safe usage.
 	 */
 	const defaultStorageClear = Storage.prototype.clear;

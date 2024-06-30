@@ -1010,173 +1010,178 @@ declare class Geometry {
 }
 
 /**
- * Represents an operation that can be executed in parallel with itself on the GPU.
- * The operation's inputs and outputs are represented in as fixed-length arrays of bytes.
- * The main entry point is:
+ * Represents an array of GLSL structs.
+ * These structs may be nested.
+ * These are used to represent GLSL dynamic-length array uniforms and the output of GPUComputations, but should not be constructed directly.
+ * For a struct such as:
  * ```glsl
- * int[OUTPUT_BYTES] compute(int[INPUT_BYTES] inputs) {
- * 	// your main code here
- * }
+ * struct Circle {
+ * 	vec2 position;
+ * 	float radius;
+ * 	vec3 color;
+ * };
  * ```
- * Where `INPUT_BYTES` and `OUTPUT_BYTES` are the sizes of the inputs and outputs of the operation.
- * There are some helper variables and functions provided, specifically:
- * ```glsl
- * #define PROBLEM_INDEX // the index of the operation in the batch
- * #define PROBLEMS // the size of the batch
- * 
- * // returns the input data for a specific operation in the batch
- * int[INPUT_BYTES] getProblem(int index);
+ * A GPUArray could be used as follows:
+ * ```js
+ * // gpu is a GPUInterface
+ * const circle = { position: new Vector2(100, 200), radius: 22.5, color: new Color("magenta") };
+ * gpu.getArgument("circles").append(circle);
  * ```
  */
-declare class GPUComputation {
+declare class GPUArray {
 	/**
-	 * The source code of the operation. See the GLSL API
+	 * A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to
+	 */
+	buffer: ByteBuffer;
+	/**
+	 * Retrieves the number of structs in the array.
+	 */
+	get length(): number;
+	/**
+	 * Sets the value of the array and returns the caller.
+	 * This will overwrite all previous data.
+	 * @param value - An array of objects with the same structure as the struct
+	 */
+	set(value: object[]): GPUArray;
+	/**
+	 * Sets the value of the array and returns the caller.
+	 * This will overwrite all previous data.
+	 * @param value - Another GPU array to copy from. This must represent the same type of structs. Using this signature is faster, and should be done whenever possible
+	 */
+	set(value: GPUArray): GPUArray;
+	/**
+	 * Appends a struct to the end of the array and returns the caller.
+	 * @param value - An object with the same structure as the struct
+	 */
+	append(value: object): GPUArray;
+	/**
+	 * Writes to a specified location in the array and returns the caller.
+	 * This may increase the size of the array, but cannot be used to create holes.
+	 * @param data - An array of objects with the same structure as the struct
+	 * @param offset - The first index to write to in the array. Default is 0
+	 * @param length - The amount of elements to write. If not specified, this will be as many as possible
+	 * @param srcOffset - The first index to read from the data argument. If not specified, this will be the same as the offset argument
+	 */
+	write(data: object[], offset?: number, length?: number, srcOffset?: number): GPUArray;
+	/**
+	 * Reads from a specified location in the array into a provided array of objects, and returns the destination array.
+	 * @param data - An array of objects with the same structure as the struct
+	 * @param offset - The first index to read from in the array. Default is 0
+	 * @param length - The amount of elements to read. If not specified, this will be as many as possible
+	 * @param dstOffset - The first index to write to in the data argument. If not specified, this will be the same as the offset argument
+	 */
+	read(data: object[], offset?: number, length?: number, dstOffset?: number): object[];
+}
+
+/**
+ * Represents a GLSL program.
+ * This is an abstract superclass and should not be constructed.
+ */
+declare interface GPUInterface {
+	/**
+	 * The source code of the program
 	 */
 	glsl: string;
 	/**
-	 * Creates a new GPUComputation.
-	 * @param glsl - The source code of the operation
-	 */
-	constructor(glsl: string);
-	/**
-	 * Evaluates the operation on a batch of inputs simultaneously.
-	 * Returns the outputs in a contiguous buffer in the same order as the inputs.
-	 * @param input - The buffer containing the inputs of all the operations. These should be directly contiguous
-	 * @param output - The buffer to write the output of the operations to. It will be packed contiguously. If not specified, this will be a newly created buffer
-	 * @param problems - The number of problems in the batch. This will be based on the size of the input buffer if not specified
-	 */
-	compute(input: ByteBuffer, output?: ByteBuffer, problems?: number): ByteBuffer;
-	/**
-	 * Returns whether or not the shader contains a given uniform.
-	 * @param name - The name of the uniform to check
-	 */
-	argumentExists(name: string): boolean;
-	/**
-	 * Returns the current value of a given uniform.
-	 * For the return value of this function, see the GLSL API
-	 * @param name - The name of the uniform to retrieve
-	 */
-	getArgument(name: string): any;
-	/**
-	 * Sets the value of a given uniform.
-	 * @param name - The name of the uniform to set
+	 * Sets the value of a uniform in the program.
+	 * @param name - The name of the uniform
 	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
 	 */
 	setArgument(name: string, value: any): void;
 	/**
-	 * Sets the value of one or more uniforms. 
-	 * @param uniforms - A collection of key-value pairs, where the key is the name of the uniform to set, and the value is the new value for that uniform
+	 * Sets the value of many uniforms at once.
+	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
 	 */
 	setArguments(uniforms: object): void;
+	/**
+	 * Retrieves the current value of a given uniform.
+	 * For the return type of this function, see the GLSL API.
+	 * @param name - The name of the uniform
+	 */
+	getArgument(name: string): any;
+	/**
+	 * Checks whether a given uniform exists.
+	 * @param name - The name of the uniform to check
+	 */
+	argumentExists(name: string): boolean;
 }
 
 /**
- * Represents an operation that can be executed in parallel with itself on the GPU.
- * The operation's inputs and outputs are represented in as fixed-length arrays of bytes.
- * The main entry point is:
+ * Represents a GLSL operation that can be run in parallel on the GPU.
+ * The entry point for the GLSL operation is the `compute` function, which returns any struct type and takes no arguments.
  * ```glsl
- * int[OUTPUT_BYTES] compute(int[INPUT_BYTES] inputs) {
- * 	// your main code here
- * }
+ * SomeStruct compute() { ... }
  * ```
- * Where `INPUT_BYTES` and `OUTPUT_BYTES` are the sizes of the inputs and outputs of the operation.
- * There are some helper variables and functions provided, specifically:
+ * The returned value is considered the output of the operation, and some global variables are provided as the input:
  * ```glsl
- * #define PROBLEM_INDEX // the index of the operation in the batch
- * #define PROBLEMS // the size of the batch
+ * uniform int problems; // the total number of operations in the current batch
+ * int problemIndex; // the index of the current operation in the batch
+ * ```
+ * Commonly, one or more dynamic array uniforms can be used to store complex input data, as shown in the following example.
+ * ```js
+ * // computation to move circles toward the middle of the screen
+ * const computation = new GPUComputation(`
+ * 	struct Circle {
+ * 		vec2 position;
+ * 		float radius;
+ * 	};
  * 
- * // returns the input data for a specific operation in the batch
- * int[INPUT_BYTES] getProblem(int index);
+ * 	uniform Circle[] circles;
+ * 	uniform vec2 middle;
+ * 
+ * 	Circle compute() {
+ * 		Circle circle = circles[problemIndex];
+ * 		circle.position = mix(circle.position, middle, 0.01);
+ * 		return circle;
+ * 	}
+ * `);
+ * 
+ * const circles = Array.dim(1000).map(() => {
+ * 	return { position: Random.inShape(scene.camera.screen), radius: 10 };
+ * });
+ * 
+ * // write, compute, and readback circle data
+ * computation.setArguments({ circles, middle });
+ * computation.compute(circles.length);
+ * computation.output.read(circles);
  * ```
  */
-declare namespace GPUComputation {
+declare class GPUComputation implements GPUInterface {
 	/**
-	 * Represents an operation that can be executed in parallel with itself on the GPU.
-	 * This behaves much like GPUComputation except that the input and output of the operation are GLSL structs.
-	 * The values of the input and output structs are represented in JavaScript as objects, whose properties have the same names as those of the GLSL struct.
-	 * The structs/objects may be nested, and the types of fields must be associated in accordance with the GLSL API.
-	 * The main entry point is:
-	 * ```glsl
-	 * OutputStruct compute(InputStruct input) {
-	 * 	// your main code here
-	 * }
-	 * ```
-	 * The input and output structs may have arbitrary names, and your GLSL must include the declarations of these structs.
-	 * ```glsl
-	 * struct InputStruct {
-	 * 	// your input fields
-	 * };
-	 * struct OutputStruct {
-	 * 	// your output fields
-	 * };
-	 * ```
-	 * The helper functions and variables from GPUComputation are also present, specifically:
-	 * ```glsl
-	 * #define PROBLEM_INDEX // the index of the operation in the batch
-	 * #define PROBLEMS // the size of the batch
-	 * 
-	 * // returns the input data for a specific operation in the batch
-	 * InputStruct getProblem(int index);
-	 * ```
+	 * An array storing the output of the most recent batch of operations
 	 */
-	class Structured extends GPUComputation {
-		/**
-		 * The source code of the operation. See the GLSL API
-		 */
-		glsl: string;
-		/**
-		 * A buffer containing all of the current input data. This can be freely written to
-		 */
-		inputBuffer: ByteBuffer;
-		/**
-		 * A buffer containing the output of the most recent computation. This can be freely read from
-		 */
-		outputBuffer: ByteBuffer;
-		/**
-		 * Creates a new structured GPU Computation.
-		 * @param glsl - The source code for the operation
-		 */
-		constructor(glsl: string);
-		/**
-		 * Writes an array of objects into the input buffer of the computation at a given index.
-		 * This replaces all the existing input data.
-		 * The objects' structure must correspond to the structure of the GLSL input struct.
-		 * @param input - The objects to read the data from
-		 */
-		setInput(input: object[]): void;
-		/**
-		 * Overwrites a portion of the input data.
-		 * This can increase the size of the input data.
-		 * The objects' structure must correspond to the structure the GLSL input struct.
-		 * @param input - The objects to read the data from
-		 * @param offset - The index of the first input to overwrite. The default value is the length of the current input data
-		 * @param length - The amount of objects to write. Default is the maximum possible amount
-		 * @param srcOffset - The first index of the provided `input` array to read from. Default is 0
-		 */
-		writeInput(input: object[], offset?: number, length?: number, srcOffset?: number): void;
-		/**
-		 * Reads the output buffer into an array of objects, where the structure of the objects corresponds to the structure of the GLSL output struct.
-		 * Returns the passed array.
-		 * @param output - The objects to write the output to
-		 * @param offset - The index of the first output to read. Default is 0
-		 * @param length - The amount of objects to read. Default is the maximum possible amount
-		 * @param dstOffset - The first index of the provided `output` array to write to. Default is 0
-		 */
-		readOutput(output: object[], offset?: number, length?: number, dstOffset?: number): object[];
-		/**
-		 * Runs the computation on a given input array and writes the result to a given output array.
-		 * The output parameter is returned.
-		 * @param input - The data to use as the input to the computation. If this is omitted, the data already in the input buffer will be used
-		 * @param output - The location to place the output data. Whether or not this parameter is specified, the data will be written to the output buffer and can be read later
-		 * @param problems - The number of problems in the batch. This will be based on the size of the most recently specified batch size (either via `setInput`, `writeInput`, the first argument to this function, or this argument in a previous call)
-		 */
-		compute(input?: object[], output?: object[], problems?: number): object[] | void;
-		/**
-		 * Moves the data in the output buffer into the input buffer.
-		 * This function is only usable if the GLSL input and output structs are the same.
-		 */
-		readback(): void;
-	}
+	output: GPUArray;
+	/**
+	 * Runs a batch of operations.
+	 * @param problems - The number of operations to run
+	 */
+	compute(problems: number): void;
+	/**
+	 * The source code of the program
+	 */
+	glsl: string;
+	/**
+	 * Sets the value of a uniform in the program.
+	 * @param name - The name of the uniform
+	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
+	 */
+	setArgument(name: string, value: any): void;
+	/**
+	 * Sets the value of many uniforms at once.
+	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
+	 */
+	setArguments(uniforms: object): void;
+	/**
+	 * Retrieves the current value of a given uniform.
+	 * For the return type of this function, see the GLSL API.
+	 * @param name - The name of the uniform
+	 */
+	getArgument(name: string): any;
+	/**
+	 * Checks whether a given uniform exists.
+	 * @param name - The name of the uniform to check
+	 */
+	argumentExists(name: string): boolean;
 }
 
 /**
@@ -2111,6 +2116,12 @@ declare class Vector2 extends Vector {
 	 * @param angle - The angle of the vector
 	 */
 	static fromAngle(angle: number): Vector2;
+	/**
+	 * Creates a cartesian vector from a given set of polar coordinates .
+	 * @param  - The clockwise (in screen-space) angle from the horizontal
+	 * @param r - The distance from the origin. Default is 1
+	 */
+	static polar(θ: number, r?: number): Vector2;
 }
 
 /**
@@ -3500,11 +3511,11 @@ declare class Frame extends ImageType {
 }
 
 /**
- * Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region. The entry point for the shader is a function of the form:
+ * Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region.
+ * Due to language limitations `new GPUShader(...) instanceof GPUInterface` is false.
+ * The entry point for the shader is a function of the form:
  * ```glsl
- * vec4 shader() {
- * 	// your main code here
- * }
+ * vec4 shader() { ... }
  * ```
  * Several engine-provided uniforms are given, specifically:
  * ```glsl
@@ -3531,11 +3542,7 @@ declare class Frame extends ImageType {
  * renderer.image(shader).default(0, 0); // draw grayscale cat
  * ```
  */
-declare class GPUShader extends ImageType {
-	/**
-	 * The GLSL source code of the shader
-	 */
-	glsl: string;
+declare class GPUShader extends ImageType implements GPUInterface {
 	/**
 	 * Creates a new GPUShader.
 	 * @param width - The width of the rectangle on which the shader is invoked
@@ -3545,34 +3552,38 @@ declare class GPUShader extends ImageType {
 	 */
 	constructor(width: number, height: number, glsl: string, pixelRatio?: number);
 	/**
-	 * Returns whether or not the shader contains a given uniform.
-	 * @param name - The name of the uniform to check
+	 * The source code of the program
 	 */
-	argumentExists(name: string): boolean;
+	glsl: string;
 	/**
-	 * Returns the current value of a given uniform.
-	 * For the return value of this function, see the GLSL API
-	 * @param name - The name of the uniform to retrieve
-	 */
-	getArgument(name: string): any;
-	/**
-	 * Sets the value of a given uniform.
-	 * @param name - The name of the uniform to set
+	 * Sets the value of a uniform in the program.
+	 * @param name - The name of the uniform
 	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
 	 */
 	setArgument(name: string, value: any): void;
 	/**
-	 * Sets the value of one or more uniforms. 
-	 * @param uniforms - A collection of key-value pairs, where the key is the name of the uniform to set, and the value is the new value for that uniform
+	 * Sets the value of many uniforms at once.
+	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
 	 */
 	setArguments(uniforms: object): void;
+	/**
+	 * Retrieves the current value of a given uniform.
+	 * For the return type of this function, see the GLSL API.
+	 * @param name - The name of the uniform
+	 */
+	getArgument(name: string): any;
+	/**
+	 * Checks whether a given uniform exists.
+	 * @param name - The name of the uniform to check
+	 */
+	argumentExists(name: string): boolean;
 }
 
 /**
  * This is not an actual class, but rather an interface for values passed to functions of Gradient.
  * Represents a point along a gradient with a specific value.
  */
-declare class ValueStop {
+declare interface ValueStop {
 	/**
 	 * The parameter value at which this stop's value reaches full intensity
 	 */
@@ -4471,7 +4482,7 @@ declare class Shape {
 	 */
 	equals(other: Shape): boolean;
 	/**
-	 * Checks if two shapes intersect
+	 * Checks if two shapes intersect.
 	 * @param shape - The Shape to check intersections with
 	 */
 	intersect(shape: Shape): boolean;
@@ -5592,7 +5603,7 @@ declare interface SpawnerProperties {
 	/**
 	 * The function that is called to update particles each frame.
 	 * Since this function is not culled, all non-rendering logic should be here.
-	 * This property may instead be a String containing the source code for a GPUComputation.Structured that inputs and outputs the same type of struct, with that struct matching any inclusive subset of the structure of a Particle in the system.
+	 * This property may instead be a String containing the source code for a GPUComputation that outputs a struct matching any inclusive subset of the structure of a Particle in the system. The source code also must include a `particles[]` uniform whose type is the same as the output of the computation. This uniform will reflect the state of the particles in the system.
 	 * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way.
 	 * Setting this property to a function will remove the computation.
 	 * @param particle - The particle being updated

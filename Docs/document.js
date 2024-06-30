@@ -33,7 +33,7 @@ function documentName(name, doc, wrapperClass) {
 	result = `<a href="${sourceLink(doc)}" target="_blank" class="${name.isClass ? "class-name" : "function-name"} source-link">${result}</a>`;
 	if (name.isGetter) result = `<span class="keyword">get</span> ${result}`;
 	if (name.isSetter) result = `<span class="keyword">set</span> ${result}`;
-	if (name.baseClass) result += ` <span class="keyword">extends</span> <span class="class-name">${name.baseClass}</span>`
+	if (name.baseClass) result += ` <span class="keyword">extends</span> <span class="class-name">${name.baseClass.join(", ")}</span>`
 	return result;
 }
 
@@ -121,6 +121,7 @@ function document(doc, topLevelIDs, file) {
 			.sort((a, b) => (b.name.isSetter || b.name.isGetter) - (a.name.isSetter || a.name.isGetter))
 			.sort((a, b) => a.name.isStatic - b.name.isStatic)
 			.sort((a, b) => firstFunction.test(b.name.base) - firstFunction.test(a.name.base))
+			.filter(fn => !fn.settings.hide)
 			.map(member => documentFunction(member, doc.name.base))
 			.join("");
 		const memberProperties = doc.properties

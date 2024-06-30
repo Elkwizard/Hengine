@@ -55,6 +55,14 @@ class Color extends Operable {
 		}
 		this.constrain();
 	}
+	set x(a) { this.red = a * 255; }
+	get x() { return this.red / 255; }
+	set y(a) { this.green = a * 255; }
+	get y() { return this.green / 255; }
+	set z(a) { this.blue = a * 255; }
+	get z() { return this.blue / 255; }
+	set w(a) { this.alpha = a; }
+	get w() { return this.alpha; }
 	set brightness(n) {
 		let scale = n / this.brightness;
 		this.red *= scale;
