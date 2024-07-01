@@ -15,7 +15,7 @@
 					Represents a serializable file system that can be modified with a command-line-like interface.
 File paths in this system are similar to those used in Windows, except that they use a forward slash "/" separator, and the base drive is <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">h:</span></code> rather than <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">C:</span></code>.
 Various file types can be specified, such that complex classes can be written to the file system and retrieved.
-The classes with this behavior built in are: <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>, <a href="../../Pages/Built-Ins/String.html#class String">String</a>, Boolean, Object, <a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a>, <a href="../../Pages/Rendering/GrayMap.html#class GrayMap">GrayMap</a>, <a href="../../Pages/Rendering/Image Types/Texture.html#class Texture">Texture</a>, <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a>, <a href="../../Pages/Geometry/Vector/Vector3.html#class Vector3">Vector3</a>, <a href="../../Pages/Geometry/Vector/Vector4.html#class Vector4">Vector4</a>, and <a href="../../Pages/Rendering/Color.html#class Color">Color</a>.
+All built-in Serializable objects can be written to the file system, with their extensions being the lowercase version of their names (e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">string</span></code> for <a href="../../Pages/Built-Ins/String.html#class String">String</a>).
 This class is primarily used in the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">fileSystem</span></code> property of both the global object and <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a>.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// the file type class</span><span class="highlight-KEYWORD">
 class</span><span class="highlight-SYMBOL"> </span><span class="highlight-CLASS">Triple</span><span class="highlight-SYMBOL"> {
@@ -80,7 +80,7 @@ const</span><span class="highlight-CONSTANT"> readValue</span><span class="highl
 	
 		<div class="function-wrapper" id="FileSystem.prototype.createFileType()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L236" target="_blank" class="function-name source-link">createFileType</a>(<span class="param">type</span>, <span class="param">extensions?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L237" target="_blank" class="function-name source-link">createFileType</a>(<span class="param">type</span>, <span class="param">extensions?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Registers a new file type.
@@ -94,7 +94,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 						<div class="param-wrapper" id="FileSystem.prototype.createFileType():type">
 							<div class="param-name">
 								<span class="param">type</span>
-								<span class="type">Class</span>
+								<span class="type">Class implements Serializable</span>
 							</div>
 							<div class="param desc">
 								The data type that can be written and read to and from the file system
@@ -118,7 +118,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 	
 		<div class="function-wrapper" id="FileSystem.prototype.listFiles()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L250" target="_blank" class="function-name source-link">listFiles</a>(<span class="param">all?</span>)<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a>[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L251" target="_blank" class="function-name source-link">listFiles</a>(<span class="param">all?</span>)<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a>[]</span>
 			</div>
 			<div class="function desc">
 				Returns the names of all the files in the current directory.
@@ -145,7 +145,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 	
 		<div class="function-wrapper" id="FileSystem.prototype.tree()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L262" target="_blank" class="function-name source-link">tree</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L263" target="_blank" class="function-name source-link">tree</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Returns a human-readable file tree of the current directory.
@@ -155,7 +155,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 	
 		<div class="function-wrapper" id="FileSystem.prototype.fileExists()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L292" target="_blank" class="function-name source-link">fileExists</a>(<span class="param">path</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L293" target="_blank" class="function-name source-link">fileExists</a>(<span class="param">path</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether or not a file exists.
@@ -182,7 +182,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 	
 		<div class="function-wrapper" id="FileSystem.prototype.directoryExists()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L300" target="_blank" class="function-name source-link">directoryExists</a>(<span class="param">path</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L301" target="_blank" class="function-name source-link">directoryExists</a>(<span class="param">path</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether or not a directory exists.
@@ -209,7 +209,7 @@ The instance method <code class=" highlight-BACKGROUND"><span class="highlight-S
 	
 		<div class="function-wrapper" id="FileSystem.prototype.writeFile()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L311" target="_blank" class="function-name source-link">writeFile</a>(<span class="param">path</span>, <span class="param">contents</span>, <span class="param">raw?</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L312" target="_blank" class="function-name source-link">writeFile</a>(<span class="param">path</span>, <span class="param">contents</span>, <span class="param">raw?</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Writes a file to a specified path.
@@ -257,7 +257,7 @@ Returns whether the it succeeded.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.deleteFile()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L338" target="_blank" class="function-name source-link">deleteFile</a>(<span class="param">path</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L339" target="_blank" class="function-name source-link">deleteFile</a>(<span class="param">path</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Deletes a file at a specified path.
@@ -285,7 +285,7 @@ Returns whether it succeeded.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.deleteDirectory()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L383" target="_blank" class="function-name source-link">deleteDirectory</a>(<span class="param">path</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L384" target="_blank" class="function-name source-link">deleteDirectory</a>(<span class="param">path</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Deletes a directory at a specified path.
@@ -313,7 +313,7 @@ Returns whether it succeeded.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.createDirectory()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L394" target="_blank" class="function-name source-link">createDirectory</a>(<span class="param">path</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L395" target="_blank" class="function-name source-link">createDirectory</a>(<span class="param">path</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Creates a new directory at a specified path.
@@ -341,7 +341,7 @@ Returns whether it succeeded.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.readFile()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L430" target="_blank" class="function-name source-link">readFile</a>(<span class="param">path</span>, <span class="param">raw?</span>)<span class="type">Any/null</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L431" target="_blank" class="function-name source-link">readFile</a>(<span class="param">path</span>, <span class="param">raw?</span>)<span class="type">Any/null</span>
 			</div>
 			<div class="function desc">
 				Reads a file from a specified path.
@@ -379,7 +379,7 @@ Returns null if it fails.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.createFile()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L471" target="_blank" class="function-name source-link">createFile</a>(<span class="param">path</span>, <span class="param">create</span>)<span class="type">Any</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L472" target="_blank" class="function-name source-link">createFile</a>(<span class="param">path</span>, <span class="param">create</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
 				Creates a new file if it doesn't exist.
@@ -417,7 +417,7 @@ Returns the content of the file.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.getFileSize()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L480" target="_blank" class="function-name source-link">getFileSize</a>(<span class="param">path</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L481" target="_blank" class="function-name source-link">getFileSize</a>(<span class="param">path</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Checks the file size of a specified file.
@@ -444,7 +444,7 @@ Returns the content of the file.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.changeDirectory()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L491" target="_blank" class="function-name source-link">changeDirectory</a>(<span class="param">path</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L492" target="_blank" class="function-name source-link">changeDirectory</a>(<span class="param">path</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Changes the current directory.
@@ -472,7 +472,7 @@ Returns whether it succeeded.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.downloadFile()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L518" target="_blank" class="function-name source-link">downloadFile</a>(<span class="param">path</span>)<span class="type">Promise&lt;void&gt;</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L519" target="_blank" class="function-name source-link">downloadFile</a>(<span class="param">path</span>)<span class="type">Promise&lt;void&gt;</span>
 			</div>
 			<div class="function desc">
 				Downloads a file onto the user's computer.
@@ -500,7 +500,7 @@ Returns a promise which resolves when the download occurs.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.uploadFile()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L539" target="_blank" class="function-name source-link">uploadFile</a>(<span class="param">path</span>)<span class="type">Promise&lt;<a href="../../Pages/Built-Ins/String.html#class String">String</a>&gt;</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L540" target="_blank" class="function-name source-link">uploadFile</a>(<span class="param">path</span>)<span class="type">Promise&lt;<a href="../../Pages/Built-Ins/String.html#class String">String</a>&gt;</span>
 			</div>
 			<div class="function desc">
 				Lets the user upload a file from their computer to a specified location.
@@ -528,7 +528,7 @@ Returns a promise which resolves when the file is uploaded.
 	
 		<div class="function-wrapper" id="FileSystem.prototype.toString()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L565" target="_blank" class="function-name source-link">toString</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L566" target="_blank" class="function-name source-link">toString</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Serializes the file system to a data string.
@@ -538,7 +538,7 @@ Returns a promise which resolves when the file is uploaded.
 	
 		<div class="function-wrapper" id="FileSystem.fromString()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L581" target="_blank" class="function-name source-link">FileSystem.fromString</a>(<span class="param">string</span>)<span class="type">FileSystem</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\FileSystem.js?#L582" target="_blank" class="function-name source-link">FileSystem.fromString</a>(<span class="param">string</span>)<span class="type">FileSystem</span>
 			</div>
 			<div class="function desc">
 				Deserializes a file system from a data string.
@@ -555,6 +555,81 @@ Returns a promise which resolves when the file is uploaded.
 							</div>
 							<div class="param desc">
 								The data string to deserialize
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Serializable">
+				<div class="class-header">
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\ByteBuffer.js?#L555" target="_blank" class="class-name source-link">Serializable</a>
+				</div>
+				<div class="class desc">
+					Classes implementing this interface can be written to and read back from a <a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a> with perfect fidelity.
+This interface is used to ensure objects can be read from and written to the FileSystem.
+				</div>
+				
+					<div class="header">Implementers</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Superclasses/Operable.html#class Operable">Operable</a></span>, <span class="class-name">Boolean</span>, <span class="class-name">Object</span>, <span class="class-name"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>, <span class="class-name"><a href="../../Pages/Rendering/GrayMap.html#class GrayMap">GrayMap</a></span>, <span class="class-name"><a href="../../Pages/Rendering/Image Types/Texture.html#class Texture">Texture</a></span>, <span class="class-name"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span></div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Serializable.prototype.toByteBuffer()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\ByteBuffer.js?#L562" target="_blank" class="function-name source-link">toByteBuffer</a>(<span class="param">buffer?</span>)<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
+			</div>
+			<div class="function desc">
+				Writes the object to a buffer and returns it.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Serializable.prototype.toByteBuffer():buffer?">
+							<div class="param-name">
+								<span class="param">buffer</span>
+								<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
+							</div>
+							<div class="param desc">
+								A destination buffer to write the result to. If not specified, a new buffer will be created
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Serializable.fromByteBuffer()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\ByteBuffer.js?#L569" target="_blank" class="function-name source-link">Serializable.fromByteBuffer</a>(<span class="param">buffer</span>)<span class="type">Serializable</span>
+			</div>
+			<div class="function desc">
+				Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Serializable.fromByteBuffer():buffer">
+							<div class="param-name">
+								<span class="param">buffer</span>
+								<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
+							</div>
+							<div class="param desc">
+								A source buffer to read the data from
 							</div>
 						</div>
 					

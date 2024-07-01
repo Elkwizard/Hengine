@@ -134,7 +134,7 @@
 		"Miscellaneous": {
 			"PARTICLE_SPAWNER": ["PARTICLE_SPAWNER", "Particle", "SpawnerProperties"],
 			"GPUComputation": null,
-			"FileSystem": null,
+			"FileSystem": ["FileSystem", "Serializable"],
 			"Random": null,
 			"ByteBuffer": [
 				"ByteBuffer",
@@ -142,6 +142,7 @@
 				"ByteBuffer.Reader",
 				"ByteBuffer.Measurer"
 			],
+			"Copyable": null,
 			"Enum": null
 		}
 	}

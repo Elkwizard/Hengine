@@ -1,4 +1,5 @@
 /**
+ * @implements Copyable
  * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates.
  * Due to its use with 2D vectors, the last row of the matrix is unused and will always be [ 0 0 1 ].
  * ```js
@@ -205,11 +206,6 @@ class Matrix3 extends Float64Array {
 			);
 		}
 	}
-	/**
-	 * Creates a copy of the matrix and optionally stores it in a provided destination.
-	 * @param Matrix3 destination? | The destination to copy the matrix into.
-	 * @return Matrix3
-	 */
 	get(result = new Matrix3()) {
 		result[0] = this[0];
 		result[1] = this[1];

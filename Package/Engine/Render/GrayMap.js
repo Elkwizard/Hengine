@@ -1,4 +1,5 @@
 /**
+ * @implements Serializable
  * Represents a 2D grid of grayscale values.
  * ```js
  * const perlinMap = new GrayMap(100, 100, (x, y) => {
@@ -22,7 +23,7 @@ class GrayMap {
 		this.width = w;
 		this.height = h;
 		this.data = Array.dim(w, h);
-		if (rule !== null) this.data = this.data.map((v, x, y) => rule(x, y));
+		if (rule !== null) this.data = this.data.map((_, x, y) => rule(x, y));
 	}
 	/**
 	 * Returns the grayscale value at a specified point, or -1 if the point is out of bounds.
@@ -34,12 +35,6 @@ class GrayMap {
 		if (x in this.data && y in this.data[x]) return this.data[x][y];
 		return -1;
 	}
-	/**
-	* Copies the data of the map into a buffer.
-	* If no destination is specified one will be created.
-	* @param Number buffer? | The destination for the copy. The data will be written to the end of the buffer
-	* @return ByteBuffer
-	*/
 	toByteBuffer(buffer = new ByteBuffer()) {
 		buffer.write.uint32(this.width);
 		buffer.write.uint32(this.height);
@@ -48,11 +43,6 @@ class GrayMap {
 		
 		return buffer;
 	}
-	/**
-	 * Reads a map from a buffer, and returns it.
-	 * @param ByteBuffer buffer | The buffer to read the data from
-	 * @return GrayMap
-	 */
 	static fromByteBuffer(buffer) {
 		const width = buffer.read.uint32();
 		const height = buffer.read.uint32();

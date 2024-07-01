@@ -1,4 +1,5 @@
 /**
+ * @implements Copyable, Serializable
  * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer. 
  * @prop ByteBuffer.Writer write | The writing API of the buffer
  * @prop ByteBuffer.Reader read | The reading API of the buffer
@@ -65,12 +66,6 @@ class ByteBuffer {
 	finalize() {
 		this.data = this.data.slice(0, this.pointer);
 	}
-	/**
-	* Copies the data of the buffer into a buffer.
-	* If no destination is specified one will be created.
-	* @param ByteBuffer buffer? | The destination for the copy. The data will be written to the end of the buffer
-	* @return ByteBuffer
-	*/
 	toByteBuffer(buffer = new ByteBuffer()) {
 		buffer.write.byteBuffer(this);
 		return buffer;
@@ -129,11 +124,6 @@ class ByteBuffer {
 
 		return base64;
 	}
-	/**
-	 * Creates a copy of the buffer and optionally stores it in a provided destination.
-	 * @param ByteBuffer destination? | The destination to copy the buffer into.
-	 * @return ByteBuffer
-	 */
 	get(buffer = new ByteBuffer()) {
 		if (buffer.data.length >= this.data.length) buffer.data.set(this.data, 0);
 		else buffer.data = this.data.slice();
@@ -204,11 +194,6 @@ class ByteBuffer {
 		buffer.shouldResize = true;
 		return buffer;
 	}
-	/**
-	 * Reads a buffer from a buffer, and returns it.
-	 * @param ByteBuffer buffer | The buffer to read the data from
-	 * @return ByteBuffer
-	 */
 	static fromByteBuffer(buffer) {
 		return buffer.read.byteBuffer();
 	}
@@ -560,3 +545,24 @@ ByteBuffer.indexToType = Object.fromEntries(
 	ByteBuffer.objectTypes
 		.map((type, index) => [index, type])
 );
+
+/** 
+ * @name class Serializable
+ * @interface
+ * Classes implementing this interface can be written to and read back from a ByteBuffer with perfect fidelity.
+ * This interface is used to ensure objects can be read from and written to the FileSystem.
+ */
+
+/**
+ * @name toByteBuffer
+ * Writes the object to a buffer and returns it.
+ * @param ByteBuffer buffer? | A destination buffer to write the result to. If not specified, a new buffer will be created
+ * @return ByteBuffer
+ */
+
+/**
+ * @name static fromByteBuffer
+ * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+ * @param ByteBuffer buffer | A source buffer to read the data from
+ * @return Serializable
+ */

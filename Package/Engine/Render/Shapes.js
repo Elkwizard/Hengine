@@ -134,6 +134,7 @@ class Range {
 }
 
 /**
+ * @implements Copyable
  * Represents a 2D Shape.
  * @abstract
  * @prop Number area | The area of the shape at the time of construction. This variable is read-only
@@ -258,11 +259,6 @@ class Shape {
 	containsPoint(point) {
 		return this.closestPointTo(point).equals(point);
 	}
-	/**
-	 * Creates a copy of the shape and optionally stores it in a provided destination.
-	 * @param Shape destination? | The destination to copy the shape into.
-	 * @return Shape
-	 */
 	get(result = new Shape()) { }
 	toPhysicsShape() { }
 }

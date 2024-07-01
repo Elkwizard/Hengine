@@ -11,8 +11,8 @@
 
 /**
  * @name class SpawnerProperties
- * @type interface SpawnerProperties
- * This is not a real class, but rather an interface for the parameters to various property-setting functions on PARTICLE_SPAWNER.
+ * @interface
+ * This is an interface for the parameters to various property-setting methods on PARTICLE_SPAWNER.
  * @prop Boolean slows? | Whether or not particles will have air resistance applied
  * @prop Boolean falls? | Whether or not particles will have gravity applied
  * @prop Boolean active? | Whether or not particles will be spawned passively over time

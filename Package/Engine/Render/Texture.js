@@ -1,4 +1,5 @@
 /**
+ * @implements Copyable, Serializable
  * Represents a 2D grid of pixels which can be directly accessed and modified.
  * ```js
  * const texture = new Texture(300, 300);
@@ -255,11 +256,6 @@ class Texture extends ImageType {
 		}
 		return this.image;
 	}
-	/**
-	 * Creates a copy of the texture and optionally stores it in a provided destination.
-	 * @param Texture destination? | The destination to copy the texture into.
-	 * @return Texture
-	 */
 	get(tex = new Texture(this.width, this.height)) {
 		if (tex.width !== this.width || tex.height !== this.height) return null;
 		tex.imageData = new ImageData(
@@ -374,12 +370,6 @@ class Texture extends ImageType {
 			});
 		});
 	}
-	/**
-	* Copies the data of the texture into a buffer.
-	* If no destination is specified one will be created.
-	* @param Number buffer? | The destination for the copy. The data will be written to the end of the buffer
-	* @return ByteBuffer
-	*/
 	toByteBuffer(buffer = new ByteBuffer()) {
 		buffer.write.uint32(this.width);
 		buffer.write.uint32(this.height);
@@ -391,11 +381,6 @@ class Texture extends ImageType {
 
 		return buffer;
 	}
-	/**
-	 * Reads a texture from a buffer, and returns it.
-	 * @param ByteBuffer buffer | The buffer to read the data from
-	 * @return Texture
-	 */
 	static fromByteBuffer(buffer) {
 		const width = buffer.read.uint32();
 		const height = buffer.read.uint32();

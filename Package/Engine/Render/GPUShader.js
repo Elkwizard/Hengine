@@ -1,9 +1,7 @@
 /**
- * @name class GPUShader extends ImageType/GPUInterface
- * @type class GPUShader extends ImageType implements GPUInterface
+ * @name class GPUShader extends ImageType
  * @implements GPUInterface
  * Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region.
- * Due to language limitations `new GPUShader(...) instanceof GPUInterface` is false.
  * The entry point for the shader is a function of the form:
  * ```glsl
  * vec4 shader() { ... }

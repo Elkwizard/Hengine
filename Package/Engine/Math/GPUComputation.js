@@ -1056,7 +1056,6 @@ class GPUInterface {
 }
 
 /**
- * @type class GPUComputation implements GPUInterface
  * @implements GPUInterface
  * Represents a GLSL operation that can be run in parallel on the GPU.
  * The entry point for the GLSL operation is the `compute` function, which returns any struct type and takes no arguments.

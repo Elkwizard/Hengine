@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class Font">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L18" target="_blank" class="class-name source-link">Font</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L19" target="_blank" class="class-name source-link">Font</a> <span class="keyword">implements</span> <span class="class-name"><a href="../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
 				</div>
 				<div class="class desc">
 					Represents a font, including family, side, and styling.
@@ -80,7 +80,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 					<div class="class-methods">
 		<div class="function-wrapper" id="Font.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L26" target="_blank" class="function-name source-link">constructor</a>(<span class="param">size</span>, <span class="param">family</span>, <span class="param">bold?</span>, <span class="param">italic?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L27" target="_blank" class="function-name source-link">constructor</a>(<span class="param">size</span>, <span class="param">family</span>, <span class="param">bold?</span>, <span class="param">italic?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new font.
@@ -137,7 +137,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 	
 		<div class="function-wrapper" id="Font.prototype.packText()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L110" target="_blank" class="function-name source-link">packText</a>(<span class="param">text</span>, <span class="param">maxWidth</span>)<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L111" target="_blank" class="function-name source-link">packText</a>(<span class="param">text</span>, <span class="param">maxWidth</span>)<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
@@ -174,7 +174,7 @@ Fonts can be used in the text rendering functions of <a href="../../Pages/Render
 	
 		<div class="function-wrapper" id="Font.prototype.getTextBounds()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L141" target="_blank" class="function-name source-link">getTextBounds</a>(<span class="param">text</span>, <span class="param">maxWidth?</span>)<span class="type">{ width: <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>, height: <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a> }</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L142" target="_blank" class="function-name source-link">getTextBounds</a>(<span class="param">text</span>, <span class="param">maxWidth?</span>)<span class="type">{ width: <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>, height: <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a> }</span>
 			</div>
 			<div class="function desc">
 				Returns the width and height of a string of text, optionally after being packed into a fixed max width.
@@ -212,7 +212,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 	
 		<div class="function-wrapper" id="Font.prototype.getTextLineWidth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L154" target="_blank" class="function-name source-link">getTextLineWidth</a>(<span class="param">textLine</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L155" target="_blank" class="function-name source-link">getTextLineWidth</a>(<span class="param">textLine</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the width of a single line of text. This method is faster than <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getTextWidth</span><span class="highlight-SYMBOL">()</span></code>.
@@ -239,7 +239,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 	
 		<div class="function-wrapper" id="Font.prototype.getTextLineHeight()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L163" target="_blank" class="function-name source-link">getTextLineHeight</a>(<span class="param">textLine</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L164" target="_blank" class="function-name source-link">getTextLineHeight</a>(<span class="param">textLine</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the height of a single line of text. This method is faster than <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getTextHeight</span><span class="highlight-SYMBOL">()</span></code>.
@@ -266,7 +266,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 	
 		<div class="function-wrapper" id="Font.prototype.getTextWidth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L171" target="_blank" class="function-name source-link">getTextWidth</a>(<span class="param">text</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L172" target="_blank" class="function-name source-link">getTextWidth</a>(<span class="param">text</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the width of a string of text.
@@ -293,7 +293,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 	
 		<div class="function-wrapper" id="Font.prototype.getTextHeight()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L181" target="_blank" class="function-name source-link">getTextHeight</a>(<span class="param">text</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L182" target="_blank" class="function-name source-link">getTextHeight</a>(<span class="param">text</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the height of a string of text.
@@ -320,38 +320,11 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 	
 		<div class="function-wrapper" id="Font.prototype.toString()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L190" target="_blank" class="function-name source-link">toString</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L191" target="_blank" class="function-name source-link">toString</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Converts the Font to a valid CSS font string.
 			</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Font.prototype.get()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L198" target="_blank" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Font</span>
-			</div>
-			<div class="function desc">
-				Creates a copy of the font and optionally stores it in a provided destination.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Font.prototype.get():destination?">
-							<div class="param-name">
-								<span class="param">destination</span>
-								<span class="type">Font</span>
-							</div>
-							<div class="param desc">
-								The destination to copy the font into.
-							</div>
-						</div>
-					
-		
-				</div>
 			
 		</div>
 	</div>

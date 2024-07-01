@@ -1,4 +1,5 @@
 /**
+ * @implements Copyable
  * Represents a 2D affine transformation with no scaling.
  * It is composed of a rotation about the origin followed by a translation.
  * ```js
@@ -81,11 +82,6 @@ class Transform extends Matrix3 {
 	get direction() {
 		return new Vector2(this.cosRotation, this.sinRotation);
 	}
-	/**
-	 * Creates a copy of the transform and optionally stores it in a provided destination.
-	 * @param Transform destination? | The destination to copy the transform into.
-	 * @return Transform
-	 */
 	get(transf = new Transform(0, 0, 0)) {
 		transf.position = this.position;
 		transf.rotation = this.rotation;

@@ -17,12 +17,14 @@ function prefix(documented, prefix) {
 	return documented.replace(/(\*\/\s+)/, `$1${prefix}`);
 }
 
-function formatType(type) {
+function formatType(type, className) {
 	type = type.replace(/\b(Number|String|Boolean|BigInt|Symbol|Object|Any)\b/g, match => match.toLowerCase());
 	type = type.replace(/\//g, " | ");
-	type = type.replace(/\bClass extends (\w+?)\b/g, "Class<$1>");
+	type = type.replace(/\bClass extends (\w+)/g, "Class<$1>");
 	type = type.replace(/\bClass\b(?!\<)/g, "Class<any>");
 	type = type.replace(/\[\d+?\]/g, "[]");
+
+	if (className) type = type.replace(new RegExp(String.raw`\b${className}\b(?!\.)`), "this");
 
 	// add parameter names
 	let index = 0;
@@ -55,10 +57,10 @@ function applySubstitutions(name, subs) {
 	});
 }
 
-function createPropSpecification(name, prop, isWindow) {
-	let result = `${name}: ${formatType(prop.type)};`;
+function createPropSpecification(className, name, prop, isWindow) {
+	let result = `${name}: ${formatType(prop.type, className)};`;
 	if (prop.category === "static_prop")
-		result = `static ${result.replace(/\b\w+./, "")}`;
+		result = `static ${result.replace(/.*\./, "")}`;
 	else if (isWindow)
 		result = `const ${result}`;
 
@@ -73,10 +75,10 @@ function getClassMembers(doc) {
 		...doc.properties
 			.flatMap(prop => {
 				return applySubstitutions(prop.name, subs)
-					.map(name => createPropSpecification(name, prop, isWindow));
+					.map(name => createPropSpecification(doc.name.base, name, prop, isWindow));
 			}),
 		...doc.members
-			.flatMap(createSpecification)
+			.flatMap(fn => createSpecification(fn, doc.name.base))
 	];
 
 	if (doc.settings.own_instance) {
@@ -87,7 +89,7 @@ function getClassMembers(doc) {
 	}
 
 	if (doc.settings.implements)
-		members.push(...getClassMembers(doc.settings.implements.info));
+		members.push(...doc.settings.implements.interfaces.flatMap(getClassMembers));
 
 	return members;
 }
@@ -97,11 +99,13 @@ function createClassSpecification(doc) {
 
 	let name = doc.name.base;
 	if (doc.name.baseClass) name += ` extends ${doc.name.baseClass}`;
+	if (doc.settings.implements) name += ` implements ${doc.settings.implements.interfaces.map(int => int.name.base).join(", ")}`;
 	
 	const members = getClassMembers(doc);
 	if (doc.name.base === "Window") return members;
 
-	const header = doc.settings.type?.content ?? "class " + name;
+	const isInterface = doc.settings.interface;
+	const header = doc.settings.type?.content ?? `${isInterface ? "interface" : "class"} ${name}`;
 	const body = indent(members.join("\n"));
 
 	const cls = `${documentation}${header} {\n${body}\n}`;
@@ -119,12 +123,12 @@ function createClassSpecification(doc) {
 	return [cls];
 }
 
-function createOverloadSpecification(name, parameters, doc) {
+function createOverloadSpecification(name, parameters, doc, className) {
 	let returnType = doc.settings.return?.type ?? "void";
 	if (doc.name.isAsync) returnType = `Promise<${returnType}>`;
 
 	let paramString = parameters
-		.map(param => `${param.name}: ${formatType(param.type)}`)
+		.map(param => `${param.name}: ${formatType(param.type, className)}`)
 		.join(", ");
 
 	if (name === "init")
@@ -144,7 +148,7 @@ function createOverloadSpecification(name, parameters, doc) {
 		result += `${name}(${paramString})`;
 
 		if (name !== "constructor" && !doc.name.isSetter)
-			result += `: ${formatType(returnType)}`;
+			result += `: ${formatType(returnType, className)}`;
 		result += ";";
 	}
 
@@ -156,7 +160,7 @@ function createOverloadSpecification(name, parameters, doc) {
 	return result;
 }
 
-function createFunctionSpecification(doc) {
+function createFunctionSpecification(doc, className) {
 	const signatures = doc.signatures.length ? doc.signatures : [[]];
 	
 	const subs = doc.settings.name_subs?.substitutions;
@@ -164,18 +168,28 @@ function createFunctionSpecification(doc) {
 	return applySubstitutions(doc.name.base, subs)
 		.flatMap(name => {
 			return signatures
-				.map(params => createOverloadSpecification(name, params, doc));
+				.map(params => createOverloadSpecification(name, params, doc, className));
 		});
 }
 
 function createEnumSpecification(doc) {
-	return [`enum ${doc.name.base} { }`];
+	const documentation = createTSDoc(doc.description.split("\n"));
+	const subs = doc.settings.name_subs?.substitutions;
+	const members = doc.properties
+		.flatMap(member => {
+			return applySubstitutions(member.name.replace(/.*\./, ""), subs)
+				.map(name => {
+					return createTSDoc([member.description]) + name;
+				});
+		});
+	const body = members.join(",\n");
+	return [`${documentation}enum ${doc.name.base} {\n${indent(body)}\n}`];
 }
 
-function createSpecification(doc) {
-	if (doc.name.isClass) return createClassSpecification(doc);
+function createSpecification(doc, className) {
 	if (doc.name.isEnum) return createEnumSpecification(doc);
-	return createFunctionSpecification(doc);
+	if (doc.name.isClass) return createClassSpecification(doc);
+	return createFunctionSpecification(doc, className);
 }
 
 function deepCopy(object, found = new Map()) {

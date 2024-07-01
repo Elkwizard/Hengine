@@ -7,19 +7,19 @@ type RemainingParams<T> = T extends (first: any, ...remaining: infer P) => any ?
 /**
  * Represents the way a canvas scales with changes to the window size.
  */
-declare class ScalingMode {
+declare enum ScalingMode {
 	/**
 	 * The canvas changes size to fill the entire window
 	 */
-	static STRETCH: ScalingMode;
+	STRETCH,
 	/**
 	 * The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio
 	 */
-	static PRESERVE_ASPECT_RATIO: ScalingMode;
+	PRESERVE_ASPECT_RATIO,
 	/**
 	 * Same as `ScalingMode.PRESERVE_ASPECT_RATIO`, except the scale factor on the size will always be in the form (n) or (1/n), where n is an integer
 	 */
-	static INTEGER_MULTIPLE: ScalingMode;
+	INTEGER_MULTIPLE
 }
 
 /**
@@ -128,7 +128,7 @@ declare class ElementContainer extends SceneElement {
 	 * Adds a new ElementContainer to the container.
 	 * @param name - The name of the new container. If this is not unique, it will be replaced with a similar but unique name
 	 */
-	addContainer(name: string): ElementContainer;
+	addContainer(name: string): this;
 	/**
 	 * Removes a collection of elements from the container
 	 * @param elements - The elements to remove from the container
@@ -384,7 +384,7 @@ declare class HengineLoadingStructure {
 	 * Returns the caller.
 	 * @param structure - The structure to get the queue from
 	 */
-	from(structure: HengineLoadingStructure): HengineLoadingStructure;
+	from(structure: this): this;
 	/**
 	 * Puts the loading structure in the context of a specified folder, calls a specific function, and then exits the context.
 	 * Calls to this function while inside a call to this function will stack the contexts together, allowing nesting of folder scopes.
@@ -392,55 +392,55 @@ declare class HengineLoadingStructure {
 	 * @param path - The relative path to the folder to add to the context stack
 	 * @param fn - The function to call while in the context. This function is passed the caller as an argument
 	 */
-	folder(path: string, fn: (arg0: HengineLoadingStructure) => void): HengineLoadingStructure;
+	folder(path: string, fn: (arg0: this) => void): this;
 	/**
 	 * Adds a HengineScriptResource to the queue with a specified source.
 	 * @param src - The path to the resource
 	 */
-	script(src: string): HengineLoadingStructure;
+	script(src: string): this;
 	/**
 	 * Adds a HengineBinaryResource to the queue with a specified source.
 	 * @param src - The path to the resource
 	 */
-	binary(src: string): HengineLoadingStructure;
+	binary(src: string): this;
 	/**
 	 * Adds a HengineWebcamResource to the queue with a specified name.
 	 * @param name - The name of the resource
 	 */
-	webcam(name: string): HengineLoadingStructure;
+	webcam(name: string): this;
 	/**
 	 * Adds a HengineTextResource to the queue with a specified source.
 	 * @param src - The path to the resource
 	 */
-	text(src: string): HengineLoadingStructure;
+	text(src: string): this;
 	/**
 	 * Adds a HengineImageResource to the queue with a specified source.
 	 * @param src - The path to the resource
 	 */
-	image(src: string): HengineLoadingStructure;
+	image(src: string): this;
 	/**
 	 * Adds a HengineFontResource to the queue with a specified source.
 	 * @param src - The path to the resource
 	 */
-	font(src: string): HengineLoadingStructure;
+	font(src: string): this;
 	/**
 	 * Adds a HengineAnimationResource to the queue with a specified source.
 	 * @param src - The path to the resource
 	 * @param options - An object containing `.frames`, `.delay`, and `.loops` properties that will be passed to the HengineAnimationResource constructor. These values have defaults of 1, 1, and true, respectively
 	 */
-	animation(src: string, options?: { frames?: number, delay?: number, loops?: boolean }): HengineLoadingStructure;
+	animation(src: string, options?: { frames?: number, delay?: number, loops?: boolean }): this;
 	/**
 	 * Adds a HengineVideoResource to the queue with a specified source.
 	 * @param src - The path to the resource
 	 * @param options - An object containing a `.loops` properties that will be passed to the HengineVideoResource constructor. The default value is false
 	 */
-	video(src: string, options?: { loops?: boolean }): HengineLoadingStructure;
+	video(src: string, options?: { loops?: boolean }): this;
 	/**
 	 * Adds a HengineSoundResource to the queue with a specified source.
 	 * @param src - The path to the resource
 	 * @param options - An object containing a `.loops` properties that will be passed to the HengineSoundResource constructor. The default value is false
 	 */
-	sound(src: string, options?: { loops?: boolean }): HengineLoadingStructure;
+	sound(src: string, options?: { loops?: boolean }): this;
 }
 
 /**
@@ -471,7 +471,7 @@ declare class HengineLoader {
 	/**
 	 * The singleton instance
 	 */
-	static loader: HengineLoader;
+	static loader: this;
 	/**
 	 * Retrieves a specific resource.
 	 * If the resource failed to load, this returns null.
@@ -871,19 +871,19 @@ declare class Scene {
 /**
  * Represents the way in which dimensions are prioritized in `Geometry.gridToRects()`.
  */
-declare class RectPriority {
+declare enum RectPriority {
 	/**
 	 * The rectangles should be approximately square, with a difference in dimensions of at most one tile
 	 */
-	static SQUARE: RectPriority;
+	SQUARE,
 	/**
 	 * The rectangles should become as wide as possible, and then grow vertically
 	 */
-	static HORIZONTAL: RectPriority;
+	HORIZONTAL,
 	/**
 	 * The rectangles should become as tall as possible, and then grow horizontally
 	 */
-	static VERTICAL: RectPriority;
+	VERTICAL
 }
 
 /**
@@ -1046,18 +1046,18 @@ declare class GPUArray {
 	 * This will overwrite all previous data.
 	 * @param value - An array of objects with the same structure as the struct
 	 */
-	set(value: object[]): GPUArray;
+	set(value: object[]): this;
 	/**
 	 * Sets the value of the array and returns the caller.
 	 * This will overwrite all previous data.
 	 * @param value - Another GPU array to copy from. This must represent the same type of structs. Using this signature is faster, and should be done whenever possible
 	 */
-	set(value: GPUArray): GPUArray;
+	set(value: this): this;
 	/**
 	 * Appends a struct to the end of the array and returns the caller.
 	 * @param value - An object with the same structure as the struct
 	 */
-	append(value: object): GPUArray;
+	append(value: object): this;
 	/**
 	 * Writes to a specified location in the array and returns the caller.
 	 * This may increase the size of the array, but cannot be used to create holes.
@@ -1066,7 +1066,7 @@ declare class GPUArray {
 	 * @param length - The amount of elements to write. If not specified, this will be as many as possible
 	 * @param srcOffset - The first index to read from the data argument. If not specified, this will be the same as the offset argument
 	 */
-	write(data: object[], offset?: number, length?: number, srcOffset?: number): GPUArray;
+	write(data: object[], offset?: number, length?: number, srcOffset?: number): this;
 	/**
 	 * Reads from a specified location in the array into a provided array of objects, and returns the destination array.
 	 * @param data - An array of objects with the same structure as the struct
@@ -1369,7 +1369,7 @@ declare class Animatable {
  * console.log(initialAgain); // (10, 20)
  * ```
  */
-declare class Matrix3 extends Float64Array {
+declare class Matrix3 extends Float64Array implements Copyable {
 	/**
 	 * The matrix element in row R and column C (0-indexed).
 	 */
@@ -1427,56 +1427,51 @@ declare class Matrix3 extends Float64Array {
 	/**
 	 * Returns a matrix which is the transpose of the caller.
 	 */
-	get transposed(): Matrix3;
+	get transposed(): this;
 	/**
 	 * Returns a matrix which is the inverse of the caller, or null if there is none.
 	 */
-	get inverse(): Matrix3 | null;
+	get inverse(): this | null;
 	/**
 	 * Transposes the matrix in-place and returns it.
 	 */
-	transpose(): Matrix3;
+	transpose(): this;
 	/**
 	 * Inverts the matrix in-place and returns it.
 	 * If the matrix isn't invertible, the caller is unchanged and null is returned.
 	 */
-	invert(): Matrix3;
+	invert(): this;
 	/**
 	 * Multiplies the matrix in-place by another mathematical object on the right side. Returns the caller.
 	 * @param matrix - Another matrix to multiply with
 	 */
-	mul(matrix: Matrix3): Matrix3;
+	mul(matrix: this): this;
 	/**
 	 * Multiplies the matrix in-place by another mathematical object on the right side. Returns the caller.
 	 * @param scale - A number to scale the matrix by.
 	 */
-	mul(scale: number): Matrix3;
+	mul(scale: number): this;
 	/**
 	 * Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
 	 * If no destination is provided, one will be created.
 	 * @param matrix - Another matrix to multiply with
 	 * @param destination - The destination for the operation
 	 */
-	times(matrix: Matrix3, destination?: Matrix3): Matrix3;
+	times(matrix: this, destination?: this): this;
 	/**
 	 * Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
 	 * If no destination is provided, one will be created.
 	 * @param vector - A vector to be transformed by the Matrix3. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
 	 * @param destination - The destination for the operation
 	 */
-	times(vector: Vector2, destination?: Vector2): Matrix3;
+	times(vector: Vector2, destination?: Vector2): this;
 	/**
 	 * Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
 	 * If no destination is provided, one will be created.
 	 * @param scale - A number to scale the matrix by.
 	 * @param destination - The destination for the operation
 	 */
-	times(scale: number, destination?: Matrix3): Matrix3;
-	/**
-	 * Creates a copy of the matrix and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the matrix into.
-	 */
-	get(destination?: Matrix3): Matrix3;
+	times(scale: number, destination?: this): this;
 	/**
 	 * Converts the matrix to a CSS matrix string.
 	 */
@@ -1485,45 +1480,50 @@ declare class Matrix3 extends Float64Array {
 	 * Creates an identity matrix and optionally stores it in a provided destination.
 	 * @param destination - The matrix to copy the identity matrix into
 	 */
-	static identity(destination?: Matrix3): Matrix3;
+	static identity(destination?: this): this;
 	/**
 	 * Creates a 2D rotation matrix and optionally stores it in a provided destination.
 	 * @param theta - The clockwise (in screen-space) angle (in radians) to rotate by
 	 * @param result - The matrix to copy the rotation matrix into
 	 */
-	static rotation(theta: number, result?: Matrix3): Matrix3;
+	static rotation(theta: number, result?: this): this;
 	/**
 	 * Creates a 2D scaling matrix and optionally stores it in a provided a destination.
 	 * @param x - The scale factor on the x axis
 	 * @param y - The scale factor on the y axis
 	 * @param result - The matrix to copy the scaling matrix into
 	 */
-	static scale(x: number, y: number, result?: Matrix3): Matrix3;
+	static scale(x: number, y: number, result?: this): this;
 	/**
 	 * Creates a 2D scaling matrix and optionally stores it in a provided a destination.
 	 * @param vector - A vector containing the scale factors for both axes
 	 * @param result - The matrix to copy the scaling matrix into
 	 */
-	static scale(vector: Vector2, result?: Matrix3): Matrix3;
+	static scale(vector: Vector2, result?: this): this;
 	/**
 	 * Creates a 2D translation matrix and optionally stores it in a provided a destination.
 	 * @param x - The x coordinate to translate by
 	 * @param y - The y coordinate to translate by
 	 * @param result - The matrix to copy the translation matrix into
 	 */
-	static translation(x: number, y: number, result?: Matrix3): Matrix3;
+	static translation(x: number, y: number, result?: this): this;
 	/**
 	 * Creates a 2D translation matrix and optionally stores it in a provided a destination.
 	 * @param vector - The vector to translate by
 	 * @param result - The matrix to copy the translation matrix into
 	 */
-	static translation(vector: Vector2, result?: Matrix3): Matrix3;
+	static translation(vector: Vector2, result?: this): this;
 	/**
 	 * Multiplies a series of matrices together and optionally stores it in a provided destination.
 	 * @param matrices - The matrices to multiply together. Order matters for this argument
 	 * @param result - The matrix to copy the result into
 	 */
-	static mulMatrices(matrices: Matrix3[], result?: Matrix3): Matrix3;
+	static mulMatrices(matrices: this[], result?: this): this;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
 }
 
 /**
@@ -2011,30 +2011,30 @@ declare class Vector extends Operable {
 	/**
 	 * The unit vector in the same direction of the vector
 	 */
-	normalized: Vector;
+	normalized: this;
 	/**
 	 * The vector in the opposite direction with the same magnitude
 	 */
-	inverse: Vector;
+	inverse: this;
 	/**
 	 * Inverts the vector in-place and returns the caller.
 	 */
-	invert(): Vector;
+	invert(): this;
 	/**
 	 * Normalizes the vector in-place and returns the caller.
 	 */
-	normalize(): Vector;
+	normalize(): this;
 	/**
 	 * Computes the dot product between the caller and another vector.
 	 * @param other - The vector to take the dot product with
 	 */
-	dot(other: Vector): number;
+	dot(other: this): number;
 	/**
 	 * Computes the projection of the caller onto another vector.
 	 * Doesn't mutate the caller.
 	 * @param other - The vector to project the caller onto
 	 */
-	projectOnto(other: Vector): Vector;
+	projectOnto(other: this): this;
 	/**
 	 * Converts the vector to a human readable String representation.
 	 */
@@ -2044,13 +2044,13 @@ declare class Vector extends Operable {
 	 * @param a - The first vector
 	 * @param b - The second vector
 	 */
-	static dist(a: Vector, b: Vector): number;
+	static dist(a: this, b: this): number;
 	/**
 	 * Computes the squared distance between two vectors. 
 	 * @param a - The first vector
 	 * @param b - The second vector
 	 */
-	static sqrDist(a: Vector, b: Vector): number;
+	static sqrDist(a: this, b: this): number;
 }
 
 /**
@@ -2071,7 +2071,7 @@ declare class Vector2 extends Vector {
 	/**
 	 * The vector with the same magnitude but perpendicular direction. Right-handed (in screen-space)
 	 */
-	normal: Vector2;
+	normal: this;
 	/**
 	 * The modifiable elements of the vector, `["x", "y"]`
 	 */
@@ -2086,46 +2086,46 @@ declare class Vector2 extends Vector {
 	 * Rotates the vector clockwise (in screen-space). This operation is in-place and returns the caller.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotate(angle: number): Vector2;
+	rotate(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated clockwise (in screen-space) by a specified angle.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotated(angle: number): Vector2;
+	rotated(angle: number): this;
 	/**
 	 * Returns the 2D "cross product" (x1 * y2 - y1 * x2) between the caller and another vector.
 	 * @param v - The second vector in the product
 	 */
-	cross(v: Vector2): number;
+	cross(v: this): number;
 	/**
 	 * Returns a new unit vector pointing in a specified direction (in screen-space).
 	 */
-	static get left(): Vector2;
+	static get left(): this;
 	/**
 	 * Returns a new vector with both components initialized to 0.
 	 */
-	static get origin(): Vector2;
+	static get origin(): this;
 	/**
 	 * Creates a vector with a specified x component and a y component of 0.
 	 * @param x - The x coordinate
 	 */
-	static x(x: number): Vector2;
+	static x(x: number): this;
 	/**
 	 * Creates a vector with a specified y component and an x component of 0.
 	 * @param y - The y coordinate
 	 */
-	static y(y: number): Vector2;
+	static y(y: number): this;
 	/**
 	 * Creates a unit vector with a specified clockwise (in screen-space) angle from the horizontal.
 	 * @param angle - The angle of the vector
 	 */
-	static fromAngle(angle: number): Vector2;
+	static fromAngle(angle: number): this;
 	/**
 	 * Creates a cartesian vector from a given set of polar coordinates .
 	 * @param  - The clockwise (in screen-space) angle from the horizontal
 	 * @param r - The distance from the origin. Default is 1
 	 */
-	static polar(θ: number, r?: number): Vector2;
+	static polar(θ: number, r?: number): this;
 }
 
 /**
@@ -2159,76 +2159,76 @@ declare class Vector3 extends Vector {
 	 * Returns the cross product between the caller and another vector.
 	 * @param v - The second vector in the product
 	 */
-	cross(v: Vector3): number;
+	cross(v: this): number;
 	/**
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateYZ(0.1)`
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotateXY(angle: number): Vector3;
+	rotateXY(angle: number): this;
 	/**
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateYZ(0.1)`
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotateXZ(angle: number): Vector3;
+	rotateXZ(angle: number): this;
 	/**
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateYZ(0.1)`
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotateYZ(angle: number): Vector3;
+	rotateYZ(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotatedXY(angle: number): Vector3;
+	rotatedXY(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotatedXZ(angle: number): Vector3;
+	rotatedXZ(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotatedYZ(angle: number): Vector3;
+	rotatedYZ(angle: number): this;
 	/**
 	 * Rotates the vector counter-clockwise in-place about a specified axis.
 	 * Returns the caller.
 	 * @param axis - The axis to rotate about
 	 * @param angle - The angle to rotate by
 	 */
-	rotateAboutAxis(axis: Vector3, angle: number): Vector3;
+	rotateAboutAxis(axis: this, angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise about a specified axis.
 	 * @param axis - The axis to rotate about
 	 * @param angle - The angle to rotate by
 	 */
-	rotatedAboutAxis(axis: Vector3, angle: number): Vector3;
+	rotatedAboutAxis(axis: this, angle: number): this;
 	/**
 	 * Returns a new unit vector pointing in the specified direction.
 	 */
-	static get left(): Vector3;
+	static get left(): this;
 	/**
 	 * Returns a new vector with all components equal to 0.
 	 */
-	static get origin(): Vector3;
+	static get origin(): this;
 	/**
 	 * Creates a vector with a specified x component and a y and z component of 0.
 	 * @param x - The x coordinate
 	 */
-	static x(x: number): Vector3;
+	static x(x: number): this;
 	/**
 	 * Creates a vector with a specified y component and an x and z component of 0.
 	 * @param y - The y coordinate
 	 */
-	static y(y: number): Vector3;
+	static y(y: number): this;
 	/**
 	 * Creates a vector with a specified z component and an x and z component of 0.
 	 * @param z - The z coordinate
 	 */
-	static z(z: number): Vector3;
+	static z(z: number): this;
 }
 
 /**
@@ -2276,95 +2276,95 @@ declare class Vector4 extends Vector {
 	 * e.g. `vec.rotateZW(0.3)`
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotateXY(angle: number): Vector4;
+	rotateXY(angle: number): this;
 	/**
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateZW(0.3)`
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotateXZ(angle: number): Vector4;
+	rotateXZ(angle: number): this;
 	/**
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateZW(0.3)`
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotateXW(angle: number): Vector4;
+	rotateXW(angle: number): this;
 	/**
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateZW(0.3)`
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotateYZ(angle: number): Vector4;
+	rotateYZ(angle: number): this;
 	/**
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateZW(0.3)`
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotateYW(angle: number): Vector4;
+	rotateYW(angle: number): this;
 	/**
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateZW(0.3)`
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotateZW(angle: number): Vector4;
+	rotateZW(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotatedXY(angle: number): Vector4;
+	rotatedXY(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotatedXZ(angle: number): Vector4;
+	rotatedXZ(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotatedXW(angle: number): Vector4;
+	rotatedXW(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotatedYZ(angle: number): Vector4;
+	rotatedYZ(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotatedYW(angle: number): Vector4;
+	rotatedYW(angle: number): this;
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise on the U-V plane.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
-	rotatedZW(angle: number): Vector4;
+	rotatedZW(angle: number): this;
 	/**
 	 * Returns a new unit vector pointing in the specified direction.
 	 */
-	static get left(): Vector4;
+	static get left(): this;
 	/**
 	 * Returns a new vector with all components equal to 0.
 	 */
-	static get origin(): Vector4;
+	static get origin(): this;
 	/**
 	 * Creates a vector with a specified x component and a y, z, and w component of 0.
 	 * @param x - The x coordinate
 	 */
-	static x(x: number): Vector4;
+	static x(x: number): this;
 	/**
 	 * Creates a vector with a specified y component and an x, z, and w component of 0.
 	 * @param y - The y coordinate
 	 */
-	static y(y: number): Vector4;
+	static y(y: number): this;
 	/**
 	 * Creates a vector with a specified z component and an x, z, and w component of 0.
 	 * @param z - The z coordinate
 	 */
-	static z(z: number): Vector4;
+	static z(z: number): this;
 	/**
 	 * Creates a vector with a specified w component and an x, y, and z component of 0.
 	 * @param w - The w coordinate
 	 */
-	static w(w: number): Vector4;
+	static w(w: number): this;
 }
 
 /**
@@ -2400,7 +2400,7 @@ declare class Lazy {
  * This means that Number can largely be considered a subclass of operable and can be used for operable-typed arguments.
  * This is an abstract superclass and should not be constructed.
  */
-declare class Operable {
+declare class Operable implements Copyable, Serializable {
 	/**
 	 * The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector)
 	 */
@@ -2414,18 +2414,13 @@ declare class Operable {
 	 * Returns the caller.
 	 * @param other - The operable to copy values from
 	 */
-	set(other: Operable): Operable;
+	set(other: this): this;
 	/**
 	 * Sets all elements of the operable, either by copying from another operable of the same type, or by using a list of numeric values.
 	 * Returns the caller.
 	 * @param elements - The new element values
 	 */
-	set(...elements: number[]): Operable;
-	/**
-	 * Creates a copy of the operable and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the operable into.
-	 */
-	get(destination?: Operable): Operable;
+	set(...elements: number[]): this;
 	/**
 	 * Retrieves a single element value from the operable.
 	 * @param index - The element index
@@ -2436,7 +2431,7 @@ declare class Operable {
 	 * Returns the caller.
 	 * @param operable - The right hand operand of the operation
 	 */
-	add(operable: Operable | number): Operable;
+	add(operable: this | number): this;
 	/**
 	 * Performs an immutable element-wise arithmetic operation between the caller and another operable or Number.
 	 * Returns the result of the operation, leaving the operands unchanged.
@@ -2444,7 +2439,7 @@ declare class Operable {
 	 * @param operable - The right hand operand of the operation
 	 * @param destination - The destination for the operation
 	 */
-	plus(operable: Operable | number, destination?: Operable): Operable;
+	plus(operable: this | number, destination?: this): this;
 	/**
 	 * Computes the sum of all the elements of the operable.
 	 */
@@ -2453,32 +2448,21 @@ declare class Operable {
 	 * Checks equality between the operable and another operable of the same type.
 	 * @param other - The operable to compare to
 	 */
-	equals(other: Operable): boolean;
-	/**
-	 * Copies the data of the operable into a buffer.
-	 * If no destination is specified one will be created.
-	 * @param buffer - The destination for the copy. The data will be written to the end of the buffer
-	 */
-	toByteBuffer(buffer?: number): ByteBuffer;
-	/**
-	 * Reads a operable from a buffer, and returns it.
-	 * @param buffer - The buffer to read the data from
-	 */
-	static fromByteBuffer(buffer: ByteBuffer): Operable;
+	equals(other: this): boolean;
 	/**
 	 * Produces an operable with 0 for all element values.
 	 */
-	static get empty(): Operable;
+	static get empty(): this;
 	/**
 	 * Computes the element-wise sum of a list of operables.
 	 * @param operables - The values to sum
 	 */
-	static sum(operables: Operable[] | number[]): Operable;
+	static sum(operables: this[] | number[]): this;
 	/**
 	 * Computes the element-wise average of a list of operables.
 	 * @param operables - The values to average
 	 */
-	static avg(operables: Operable[] | number[]): Operable;
+	static avg(operables: this[] | number[]): this;
 	/**
 	 * Remaps an operable from one range to another range.
 	 * @param value - The operable to be remapped
@@ -2487,7 +2471,7 @@ declare class Operable {
 	 * @param finalMin - The minimum of the desired range
 	 * @param finalMax - The maximum of the desired range
 	 */
-	static remap(value: Operable | number, initialMin: Operable | number, initialMax: Operable | number, finalMin: Operable | number, finalMax: Operable | number): Operable;
+	static remap(value: this | number, initialMin: this | number, initialMax: this | number, finalMin: this | number, finalMax: this | number): this;
 	/**
 	 * Returns an operable clamped element-wise between two bounds.
 	 * Equivalent to `Operable.max(min, operable.min(max, value))`.
@@ -2495,33 +2479,48 @@ declare class Operable {
 	 * @param min - The lower bound for the result
 	 * @param max - The upper bound for the result
 	 */
-	static clamp(value: Operable | number, min: Operable | number, max: Operable | number): Operable;
+	static clamp(value: this | number, min: this | number, max: this | number): this;
 	/**
 	 * Produces an operable with all elements equal to a single value.
 	 * @param value - The value that will be used for all elements
 	 */
-	static filled(value: number): Operable;
+	static filled(value: number): this;
 	/**
 	 * Finds and returns the element-wise minimum of a series of values.
 	 * @param values - The values to compare
 	 */
-	static min(...values: Operable[] | number[]): Operable;
+	static min(...values: this[] | number[]): this;
 	/**
 	 * Finds and returns the element-wise maximum of a series of values.
 	 * @param values - The values to compare
 	 */
-	static max(...values: Operable[] | number[]): Operable;
+	static max(...values: this[] | number[]): this;
 	/**
 	 * Performs an element-wise exponentiation.
 	 * @param base - The base of the exponentiation
 	 * @param power - The power of the exponentiation
 	 */
-	static pow(base: Operable, power: Operable | number): Operable;
+	static pow(base: this, power: this | number): this;
 	/**
 	 * Performs a built-in unary Math operation element-wise on an operable.
 	 * @param value - The operable to operate on
 	 */
-	static round(value: Operable): Operable;
+	static round(value: this): this;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): this;
 }
 
 /**
@@ -2546,7 +2545,50 @@ declare class Enum {
 	 * Static properties with these names will be defined on the return value and will contain the associated symbolic values.
 	 * @param names - The names for the symbolic values
 	 */
-	static define(...names: string[]): Class<Enum>;
+	static define(...names: string[]): Class<this>;
+}
+
+/**
+ * Classes that implement this interface can be copied with perfect fidelity.
+ */
+declare interface Copyable {
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+}
+
+/**
+ * 
+ */
+declare class Boolean implements Serializable {
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): this;
+}
+
+/**
+ * 
+ */
+declare class Object implements Serializable {
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): this;
 }
 
 /**
@@ -2594,7 +2636,7 @@ declare interface Number extends Operable {
 /**
  * The built-in String class has some additional utility methods in the Hengine.
  */
-declare interface String {
+declare interface String implements Serializable {
 	/**
 	 * Returns a copy of the caller with the first character capitalized.
 	 */
@@ -2609,6 +2651,16 @@ declare interface String {
 	 * Returns the caller with each line indented by a single tab character.
 	 */
 	indent(): string;
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): this;
 }
 
 /**
@@ -2646,7 +2698,7 @@ declare interface Storage {
  * });
  * ```
  */
-declare class Animation extends ImageType {
+declare class Animation extends ImageType implements Copyable {
 	/**
 	 * The images that make up the animation
 	 */
@@ -2689,11 +2741,6 @@ declare class Animation extends ImageType {
 	 */
 	get done(): boolean;
 	/**
-	 * Creates a copy of the animation and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the animation into.
-	 */
-	get(destination?: Animation): Animation;
-	/**
 	 * Advances the animation by one update cycle.
 	 */
 	advance(): void;
@@ -2718,7 +2765,12 @@ declare class Animation extends ImageType {
 	 * @param loops - Whether or not the animation loops. Default is true
 	 * @param onEnd - A function to execute when the animation completes. Default is a no-op
 	 */
-	static fromImage(spritesheet: ImageType, imgWidth: number, imgHeight: number, delay: number, loops?: boolean, onEnd?: () => void): Animation;
+	static fromImage(spritesheet: ImageType, imgWidth: number, imgHeight: number, delay: number, loops?: boolean, onEnd?: () => void): this;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
 }
 
 /**
@@ -2905,12 +2957,12 @@ declare class Color extends Operable {
 	/**
 	 * Returns a copy of the color with an alpha of 1.
 	 */
-	get opaque(): Color;
+	get opaque(): this;
 	/**
 	 * Returns the inverse of the caller, with the same alpha as the caller.
 	 * The inverse is defined as white minus the caller.
 	 */
-	get inverse(): Color;
+	get inverse(): this;
 	/**
 	 * Returns the CSS rgba color string representing the color. 
 	 */
@@ -2932,18 +2984,18 @@ declare class Color extends Operable {
 	 * @param color - The color to use for the RGB portion of the result
 	 * @param alpha - The new alpha value
 	 */
-	static alpha(color: Color, alpha: number): Color;
+	static alpha(color: this, alpha: number): this;
 	/**
 	 * Returns a copy of a color with a specified change in saturation.
 	 * @param color - The base color
 	 * @param factor - The multiplier on the current saturation of the color
 	 */
-	static saturate(color: Color, factor: number): Color;
+	static saturate(color: this, factor: number): this;
 	/**
 	 * Returns a new grayscale color with a specified brightness.
 	 * @param intensity - The grayscale intensity on [0, 1]
 	 */
-	static grayScale(intensity: number): Color;
+	static grayScale(intensity: number): this;
 }
 
 /**
@@ -2955,7 +3007,7 @@ declare class Color extends Operable {
  * renderer.draw(new Color("black")).text(font, "Hello World!", 0, 0);
  * ```
  */
-declare class Font {
+declare class Font implements Copyable {
 	/**
 	 * The size of the font in CSS pixels
 	 */
@@ -2983,323 +3035,323 @@ declare class Font {
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif5: Font;
+	static Serif5: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif10: Font;
+	static Serif10: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif15: Font;
+	static Serif15: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif20: Font;
+	static Serif20: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif25: Font;
+	static Serif25: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif30: Font;
+	static Serif30: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif35: Font;
+	static Serif35: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif40: Font;
+	static Serif40: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif45: Font;
+	static Serif45: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif50: Font;
+	static Serif50: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif55: Font;
+	static Serif55: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif60: Font;
+	static Serif60: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif65: Font;
+	static Serif65: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif70: Font;
+	static Serif70: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif75: Font;
+	static Serif75: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif80: Font;
+	static Serif80: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif85: Font;
+	static Serif85: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif90: Font;
+	static Serif90: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif95: Font;
+	static Serif95: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif100: Font;
+	static Serif100: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial5: Font;
+	static Arial5: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial10: Font;
+	static Arial10: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial15: Font;
+	static Arial15: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial20: Font;
+	static Arial20: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial25: Font;
+	static Arial25: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial30: Font;
+	static Arial30: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial35: Font;
+	static Arial35: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial40: Font;
+	static Arial40: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial45: Font;
+	static Arial45: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial50: Font;
+	static Arial50: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial55: Font;
+	static Arial55: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial60: Font;
+	static Arial60: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial65: Font;
+	static Arial65: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial70: Font;
+	static Arial70: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial75: Font;
+	static Arial75: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial80: Font;
+	static Arial80: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial85: Font;
+	static Arial85: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial90: Font;
+	static Arial90: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial95: Font;
+	static Arial95: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial100: Font;
+	static Arial100: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive5: Font;
+	static Cursive5: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive10: Font;
+	static Cursive10: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive15: Font;
+	static Cursive15: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive20: Font;
+	static Cursive20: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive25: Font;
+	static Cursive25: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive30: Font;
+	static Cursive30: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive35: Font;
+	static Cursive35: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive40: Font;
+	static Cursive40: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive45: Font;
+	static Cursive45: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive50: Font;
+	static Cursive50: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive55: Font;
+	static Cursive55: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive60: Font;
+	static Cursive60: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive65: Font;
+	static Cursive65: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive70: Font;
+	static Cursive70: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive75: Font;
+	static Cursive75: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive80: Font;
+	static Cursive80: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive85: Font;
+	static Cursive85: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive90: Font;
+	static Cursive90: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive95: Font;
+	static Cursive95: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive100: Font;
+	static Cursive100: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace5: Font;
+	static Monospace5: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace10: Font;
+	static Monospace10: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace15: Font;
+	static Monospace15: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace20: Font;
+	static Monospace20: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace25: Font;
+	static Monospace25: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace30: Font;
+	static Monospace30: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace35: Font;
+	static Monospace35: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace40: Font;
+	static Monospace40: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace45: Font;
+	static Monospace45: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace50: Font;
+	static Monospace50: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace55: Font;
+	static Monospace55: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace60: Font;
+	static Monospace60: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace65: Font;
+	static Monospace65: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace70: Font;
+	static Monospace70: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace75: Font;
+	static Monospace75: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace80: Font;
+	static Monospace80: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace85: Font;
+	static Monospace85: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace90: Font;
+	static Monospace90: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace95: Font;
+	static Monospace95: this;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace100: Font;
+	static Monospace100: this;
 	/**
 	 * Creates a new font.
 	 * @param size - The size of the font
@@ -3346,10 +3398,10 @@ declare class Font {
 	 */
 	toString(): string;
 	/**
-	 * Creates a copy of the font and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the font into.
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
 	 */
-	get(destination?: Font): Font;
+	get(destination?: this): this;
 }
 
 /**
@@ -3450,7 +3502,7 @@ declare class HImage extends ImageType {
  * renderer.image(frame).default(0, 0);
  * ```
  */
-declare class Frame extends ImageType {
+declare class Frame extends ImageType implements Copyable {
 	/**
 	 * The renderer local to the frame that can be used to modify its contents
 	 */
@@ -3467,12 +3519,12 @@ declare class Frame extends ImageType {
 	 * @param width - The width of the stretched image
 	 * @param height - The height of the stretched image
 	 */
-	stretch(width: number, height: number): Frame;
+	stretch(width: number, height: number): this;
 	/**
 	 * Returns a frame containing a rectangular region of the caller. 
 	 * @param region - The region to extract
 	 */
-	clip(region: Rect): Frame;
+	clip(region: Rect): this;
 	/**
 	 * Returns a frame containing a rectangular region of the caller. 
 	 * @param x - The x coordinate of the upper-left corner of the region.
@@ -3480,19 +3532,14 @@ declare class Frame extends ImageType {
 	 * @param width - The width of the region
 	 * @param height - The height of the region
 	 */
-	clip(x: number, y: number, width: number, height: number): Frame;
-	/**
-	 * Creates a copy of the frame and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the frame into.
-	 */
-	get(destination?: Frame): Frame;
+	clip(x: number, y: number, width: number, height: number): this;
 	/**
 	 * Returns a frame containing the (optionally clipped) contents of an image.
 	 * If no clipping parameters are provided, the whole image will be copied.
 	 * The copy will have the same pixel ratio as the original image.
 	 * @param image - The image to copy data from
 	 */
-	static fromImageType(image: ImageType): Frame;
+	static fromImageType(image: ImageType): this;
 	/**
 	 * Returns a frame containing the (optionally clipped) contents of an image.
 	 * If no clipping parameters are provided, the whole image will be copied.
@@ -3500,7 +3547,7 @@ declare class Frame extends ImageType {
 	 * @param image - The image to copy data from
 	 * @param region - The region to extract
 	 */
-	static fromImageType(image: ImageType, region: Rect): Frame;
+	static fromImageType(image: ImageType, region: Rect): this;
 	/**
 	 * Returns a frame containing the (optionally clipped) contents of an image.
 	 * If no clipping parameters are provided, the whole image will be copied.
@@ -3511,12 +3558,16 @@ declare class Frame extends ImageType {
 	 * @param width - The width of the region
 	 * @param height - The height of the region
 	 */
-	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): Frame;
+	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): this;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
 }
 
 /**
  * Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region.
- * Due to language limitations `new GPUShader(...) instanceof GPUInterface` is false.
  * The entry point for the shader is a function of the form:
  * ```glsl
  * vec4 shader() { ... }
@@ -3584,7 +3635,7 @@ declare class GPUShader extends ImageType implements GPUInterface {
 }
 
 /**
- * This is not an actual class, but rather an interface for values passed to functions of Gradient.
+ * This is an interface for values passed to methods of Gradient.
  * Represents a point along a gradient with a specific value.
  */
 declare interface ValueStop {
@@ -3719,7 +3770,7 @@ declare class GraphPlane extends Frame {
  * });
  * ```
  */
-declare class GrayMap {
+declare class GrayMap implements Serializable {
 	/**
 	 * The width of the map
 	 */
@@ -3746,108 +3797,107 @@ declare class GrayMap {
 	 */
 	get(x: number, y: number): number;
 	/**
-	 * Copies the data of the map into a buffer.
-	 * If no destination is specified one will be created.
-	 * @param buffer - The destination for the copy. The data will be written to the end of the buffer
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
 	 */
-	toByteBuffer(buffer?: number): ByteBuffer;
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
 	/**
-	 * Reads a map from a buffer, and returns it.
-	 * @param buffer - The buffer to read the data from
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): GrayMap;
+	static fromByteBuffer(buffer: ByteBuffer): this;
 }
 
 /**
  * Specifies where on a string of text should be considered its origin.
  */
-declare class TextMode {
+declare enum TextMode {
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static TOP_LEFT: TextMode;
+	TOP_LEFT,
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static CENTER_LEFT: TextMode;
+	CENTER_LEFT,
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static BOTTOM_LEFT: TextMode;
+	BOTTOM_LEFT,
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static TOP_CENTER: TextMode;
+	TOP_CENTER,
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static CENTER_CENTER: TextMode;
+	CENTER_CENTER,
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static BOTTOM_CENTER: TextMode;
+	BOTTOM_CENTER,
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static TOP_RIGHT: TextMode;
+	TOP_RIGHT,
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static CENTER_RIGHT: TextMode;
+	CENTER_RIGHT,
 	/**
 	 * Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
 	 */
-	static BOTTOM_RIGHT: TextMode;
+	BOTTOM_RIGHT
 }
 
 /**
  * Represents the way in which colors being added to a surface should interact with those already there.
  */
-declare class BlendMode {
+declare enum BlendMode {
 	/**
 	 * New colors should be component-wise added to the existing colors
 	 */
-	static ADD: BlendMode;
+	ADD,
 	/**
 	 * New colors should be blended with old colors based on opacity
 	 */
-	static COMBINE: BlendMode;
+	COMBINE
 }
 
 /**
  * Represents the way in which consecutive line segments should connect.
  */
-declare class LineJoin {
+declare enum LineJoin {
 	/**
 	 * The edges of the lines will be extended until they meet
 	 */
-	static MITER: LineJoin;
+	MITER,
 	/**
 	 * The edges of the lines will be connected straight across
 	 */
-	static BEVEL: LineJoin;
+	BEVEL,
 	/**
 	 * The gap between the lines will be filled with an arc
 	 */
-	static ROUND: LineJoin;
+	ROUND
 }
 
 /**
  * Represents the way the ends of line segments will be displayed.
  */
-declare class LineCap {
+declare enum LineCap {
 	/**
 	 * The lines will have square ends that extend just to the end of the line
 	 */
-	static FLAT: LineCap;
+	FLAT,
 	/**
 	 * The lines will have square ends that extend half their side length past the end of the line
 	 */
-	static SQUARE: LineCap;
+	SQUARE,
 	/**
 	 * The lines will end with half-circles
 	 */
-	static ROUND: LineCap;
+	ROUND
 }
 
 /**
@@ -4386,7 +4436,7 @@ declare class Range {
 	 * Returns the set intersection between the caller and another range.
 	 * @param range - The range to clip against
 	 */
-	clip(range: Range): Range;
+	clip(range: this): this;
 	/**
 	 * Returns the distance from a specified value to the closest bound of the range.
 	 * If the value is inside the range, the distance will be positive, otherwise, it will be negative.
@@ -4397,7 +4447,7 @@ declare class Range {
 	 * Checks whether a value is within the current bounds of the range.
 	 * @param value - The value to check
 	 */
-	includes(value: number): Range;
+	includes(value: number): this;
 	/**
 	 * Expands the Range to include a specified value.
 	 * @param value - The value to include
@@ -4407,19 +4457,19 @@ declare class Range {
 	 * Checks if there is any overlap between the caller and another range.
 	 * @param range - The range to check against
 	 */
-	intersect(range: Range): boolean;
+	intersect(range: this): boolean;
 	/**
 	 * Returns the smallest range that contains every one of a collection of values.
 	 * @param values - The set of values to bound
 	 */
-	static fromValues(values: number[]): Range;
+	static fromValues(values: number[]): this;
 }
 
 /**
  * Represents a 2D Shape.
  * This is an abstract superclass and should not be constructed.
  */
-declare class Shape {
+declare class Shape implements Copyable {
 	/**
 	 * The area of the shape at the time of construction. This variable is read-only
 	 */
@@ -4432,50 +4482,50 @@ declare class Shape {
 	 * Returns a copy of the shape centered at a specified location
 	 * @param newCenter - The location of the new center
 	 */
-	center(newCenter: Vector2): Shape;
+	center(newCenter: Vector2): this;
 	/**
 	 * Returns a copy of the shape after a certain transformation is applied to all its points.
 	 * @param transform - The transformation to apply to the shape
 	 */
-	getModel(transform: Transform): Shape;
+	getModel(transform: Transform): this;
 	/**
 	 * Returns a copy of the shape uniformly scaled about its center.
 	 * @param factor - The scale factor
 	 */
-	scale(factor: number): Shape;
+	scale(factor: number): this;
 	/**
 	 * Returns a copy of the shape scaled about its center along the x axis.
 	 * @param factor - The scale factor
 	 */
-	scaleX(factor: number): Shape;
+	scaleX(factor: number): this;
 	/**
 	 * Returns a copy of the shape scaled about its center along the y axis.
 	 * @param factor - The scale factor
 	 */
-	scaleY(factor: number): Shape;
+	scaleY(factor: number): this;
 	/**
 	 * Returns a copy of the shape uniformly scaled about a specified point.
 	 * @param position - The scaling center
 	 * @param factor - The scale factor
 	 */
-	scaleAbout(position: Vector2, factor: number): Shape;
+	scaleAbout(position: Vector2, factor: number): this;
 	/**
 	 * Returns a copy of the shape scaled about a specified point along the x axis.
 	 * @param position - The scaling center
 	 * @param factor - The scale factor
 	 */
-	scaleXAbout(position: Vector2, factor: number): Shape;
+	scaleXAbout(position: Vector2, factor: number): this;
 	/**
 	 * Returns a copy of the shape scaled about a specified point along the y axis.
 	 * @param position - The scaling center
 	 * @param factor - The scale factor
 	 */
-	scaleYAbout(position: Vector2, factor: number): Shape;
+	scaleYAbout(position: Vector2, factor: number): this;
 	/**
 	 * Returns a copy of the shape translated by a specified amount.
 	 * @param displacement - The amount to displace the shape by
 	 */
-	move(displacement: Vector2): Shape;
+	move(displacement: Vector2): this;
 	/**
 	 * Returns the smallest axis-aligned Rect that contains the entire shape.
 	 */
@@ -4484,12 +4534,12 @@ declare class Shape {
 	 * Checks if two shapes are congruent.
 	 * @param other - The Shape to compare against
 	 */
-	equals(other: Shape): boolean;
+	equals(other: this): boolean;
 	/**
 	 * Checks if two shapes intersect.
 	 * @param shape - The Shape to check intersections with
 	 */
-	intersect(shape: Shape): boolean;
+	intersect(shape: this): boolean;
 	/**
 	 * Returns the closest point on the shape's boundary to a specified other point.
 	 * @param point - The target point
@@ -4506,10 +4556,10 @@ declare class Shape {
 	 */
 	containsPoint(point: Vector2): boolean;
 	/**
-	 * Creates a copy of the shape and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the shape into.
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
 	 */
-	get(destination?: Shape): Shape;
+	get(destination?: this): this;
 }
 
 /**
@@ -4569,7 +4619,7 @@ declare class Line extends Shape {
 	 * @param m - The slope of the line segment
 	 * @param b - The y-intercept of the line segment
 	 */
-	static fromSlopeIntercept(m: number, b: number): Line;
+	static fromSlopeIntercept(m: number, b: number): this;
 }
 
 /**
@@ -4593,7 +4643,7 @@ declare class Polygon extends Shape {
 	 * Returns a copy of the polygon rotated clockwise (in screen-space) by a specified angle.
 	 * @param angle - The angle to rotate by (in radians)
 	 */
-	rotate(angle: number): Polygon;
+	rotate(angle: number): this;
 	/**
 	 * Checks whether a given point is inside the polygon (including the boundary).
 	 * The behavior of this method is undefined if the polygon is concave.
@@ -4605,7 +4655,7 @@ declare class Polygon extends Shape {
 	 * @param sides - The number of sides of the polygon
 	 * @param radius - The distance from the center to each vertex
 	 */
-	static regular(sides: number, radius: number): Polygon;
+	static regular(sides: number, radius: number): this;
 }
 
 /**
@@ -4661,34 +4711,34 @@ declare class Rect extends Polygon {
 	 * @param width - The width of the hypothetical rectangle from which to determine the aspect ratio
 	 * @param height - The height of the hypothetical rectangle from which to determine the aspect ratio
 	 */
-	largestWithin(width: number, height: number): Rect;
+	largestWithin(width: number, height: number): this;
 	/**
 	 * Returns the region of intersection between the caller and another rectangle.
 	 * @param rect - The rectangle to intersect with
 	 */
-	clip(rect: Rect): Rect;
+	clip(rect: this): this;
 	/**
 	 * Returns a new rectangle with the specified minimum and maximum coordinates.
 	 * @param min - The upper-left corner of the rectangle
 	 * @param max - The lower-right corner of the rectangle
 	 */
-	static fromMinMax(min: Vector2, max: Vector2): Rect;
+	static fromMinMax(min: Vector2, max: Vector2): this;
 	/**
 	 * Returns a new rectangle with the specified vertical and horizontal spans.
 	 * @param xRange - The horizontal span of the rectangle
 	 * @param yRange - The vertical span of the rectangle
 	 */
-	static fromRanges(xRange: Range, yRange: Range): Rect;
+	static fromRanges(xRange: Range, yRange: Range): this;
 	/**
 	 * Returns the smallest bounding rectangle around a collection of points.
 	 * @param points - The points to create a bounding box for
 	 */
-	static bound(points: Vector2[]): Rect;
+	static bound(points: Vector2[]): this;
 	/**
 	 * Returns the smallest bounding rectangle around a collection of rectangles.
 	 * @param boxes - The rectangles to create a bounding box for
 	 */
-	static composeBoundingBoxes(boxes: Rect[]): Rect;
+	static composeBoundingBoxes(boxes: this[]): this;
 }
 
 /**
@@ -4718,12 +4768,12 @@ declare class Circle extends Shape {
 	 * Since there is no representation for an ellipse, this scales uniformly instead of the behavior for Shape.
 	 * @param factor - The scale factor
 	 */
-	scaleX(factor: number): Circle;
+	scaleX(factor: number): this;
 	/**
 	 * Since there is no representation for an ellipse, this scales uniformly instead of the behavior for Shape.
 	 * @param factor - The scale factor
 	 */
-	scaleY(factor: number): Circle;
+	scaleY(factor: number): this;
 }
 
 /**
@@ -4785,7 +4835,7 @@ declare class StaticImage extends ImageType {
  * });
  * ```
  */
-declare class Texture extends ImageType {
+declare class Texture extends ImageType implements Copyable, Serializable {
 	/**
 	 * The pixel data of the texture. Modifying this buffer will modify the texture
 	 */
@@ -4843,7 +4893,7 @@ declare class Texture extends ImageType {
 	 * Applies an in-place mapping to every pixel in the texture. Returns the caller.
 	 * @param mapping - A shader function called for every pixel. The return value of this function, but it takes in three arguments: the x and y coordinates of the pixel, and the pixel color. Modifying the state of the pixel color argument will change the pixel color in the texture
 	 */
-	shader(mapping: (arg0: number, arg1: number, arg2: Color) => void): Texture;
+	shader(mapping: (arg0: number, arg1: number, arg2: Color) => void): this;
 	/**
 	 * Changes the color of a specified pixel in the texture.
 	 * @param x - The x coordinate of the pixel
@@ -4856,12 +4906,12 @@ declare class Texture extends ImageType {
 	 * Applies an in-place box blur with a specified radius to the texture. Returns the caller.
 	 * @param radius - The radius of the box blur
 	 */
-	blur(radius: number): Texture;
+	blur(radius: number): this;
 	/**
 	 * Returns a texture containing a rectangular region of the caller. 
 	 * @param region - The region to extract
 	 */
-	clip(region: Rect): Texture;
+	clip(region: Rect): this;
 	/**
 	 * Returns a texture containing a rectangular region of the caller. 
 	 * @param x - The x coordinate of the upper-left corner of the region.
@@ -4869,12 +4919,7 @@ declare class Texture extends ImageType {
 	 * @param width - The width of the region
 	 * @param height - The height of the region
 	 */
-	clip(x: number, y: number, width: number, height: number): Texture;
-	/**
-	 * Creates a copy of the texture and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the texture into.
-	 */
-	get(destination?: Texture): Texture;
+	clip(x: number, y: number, width: number, height: number): this;
 	/**
 	 * Returns a texture containing the (optionally clipped) contents of an image.
 	 * If no clipping parameters are provided, the whole image will be copied.
@@ -4905,23 +4950,27 @@ declare class Texture extends ImageType {
 	 * Creates a new grayscale texture based on a 2D grid of brightness values.
 	 * @param brightness - The brightness values for each pixel in the texture. The first index is the x coordinate, the second the y
 	 */
-	static grayScale(brightness: number[][]): Texture;
+	static grayScale(brightness: number[][]): this;
 	/**
 	 * Returns a promise resolving to a new texture containing the image data from a data: url.
 	 * @param url - The data: url
 	 */
-	static fromDataURI(url: string): Promise<Texture>;
+	static fromDataURI(url: string): Promise<this>;
 	/**
-	 * Copies the data of the texture into a buffer.
-	 * If no destination is specified one will be created.
-	 * @param buffer - The destination for the copy. The data will be written to the end of the buffer
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
 	 */
-	toByteBuffer(buffer?: number): ByteBuffer;
+	get(destination?: this): this;
 	/**
-	 * Reads a texture from a buffer, and returns it.
-	 * @param buffer - The buffer to read the data from
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): Texture;
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): this;
 }
 
 /**
@@ -4952,7 +5001,7 @@ declare class TileMap {
 	 * @param tileHeight - The height of each tile
 	 * @param names - The list of identifiers for each tile
 	 */
-	static regular(image: ImageType, tileWidth: number, tileHeight: number, names: any[]): TileMap;
+	static regular(image: ImageType, tileWidth: number, tileHeight: number, names: any[]): this;
 }
 
 /**
@@ -4966,7 +5015,7 @@ declare class TileMap {
  * console.log(obj.transform); // { position: (0, 200), rotation: Math.PI }
  * ```
  */
-declare class Transform extends Matrix3 {
+declare class Transform extends Matrix3 implements Copyable {
 	/**
 	 * The translation of the transform
 	 */
@@ -4989,12 +5038,7 @@ declare class Transform extends Matrix3 {
 	/**
 	 * Returns a transform that, when composed with the caller, will produce no offset and no rotation.
 	 */
-	get inverse(): Transform;
-	/**
-	 * Creates a copy of the transform and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the transform into.
-	 */
-	get(destination?: Transform): Transform;
+	get inverse(): this;
 	/**
 	 * Adds a clockwise (in screen-space) rotation in-place about a specific point to the existing transformation. 
 	 * @param point - The center to rotate about
@@ -5018,7 +5062,12 @@ declare class Transform extends Matrix3 {
 	 * @param a - The first transformation
 	 * @param b - The second transformation
 	 */
-	static combine(a: Transform, b: Transform): Transform;
+	static combine(a: this, b: this): this;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
 }
 
 /**
@@ -5088,7 +5137,7 @@ declare class SceneElement {
 	/**
 	 * The parent node of this element
 	 */
-	container: SceneElement | null;
+	container: this | null;
 	/**
 	 * The name of this element. This can be anything, but no two children of the same node may have the same name
 	 */
@@ -5167,7 +5216,7 @@ declare class SceneObject extends SceneElement {
 	 * It will be passed the object when called.
 	 * @param fn - The function to be called
 	 */
-	sync(fn: (arg0: SceneObject) => void): void;
+	sync(fn: (arg0: this) => void): void;
 	/**
 	 * Returns the world-space bounding rectangle that contains the all the shapes of the object.
 	 */
@@ -5568,7 +5617,7 @@ declare class Particle {
 }
 
 /**
- * This is not a real class, but rather an interface for the parameters to various property-setting functions on PARTICLE_SPAWNER.
+ * This is an interface for the parameters to various property-setting methods on PARTICLE_SPAWNER.
  */
 declare interface SpawnerProperties {
 	/**
@@ -5915,7 +5964,7 @@ declare class TEXT_AREA extends ElementScript {
 /**
  * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer. 
  */
-declare class ByteBuffer {
+declare class ByteBuffer implements Copyable, Serializable {
 	/**
 	 * The writing API of the buffer
 	 */
@@ -5968,12 +6017,6 @@ declare class ByteBuffer {
 	 */
 	finalize(): void;
 	/**
-	 * Copies the data of the buffer into a buffer.
-	 * If no destination is specified one will be created.
-	 * @param buffer - The destination for the copy. The data will be written to the end of the buffer
-	 */
-	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
-	/**
 	 * Converts the buffer to a sequence of 16-bit unicode characters.
 	 */
 	toString(): string;
@@ -5982,25 +6025,30 @@ declare class ByteBuffer {
 	 */
 	toBase64(): string;
 	/**
-	 * Creates a copy of the buffer and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the buffer into.
-	 */
-	get(destination?: ByteBuffer): ByteBuffer;
-	/**
 	 * Converts a base-64 string to a new buffer.
 	 * @param base64 - The base-64 string to convert
 	 */
-	static fromBase64(base64: string): ByteBuffer;
+	static fromBase64(base64: string): this;
 	/**
 	 * Converts a series of 16-bit unicode characters into a new buffer.
 	 * @param string - The string of data
 	 */
-	static fromString(string: string): ByteBuffer;
+	static fromString(string: string): this;
 	/**
-	 * Reads a buffer from a buffer, and returns it.
-	 * @param buffer - The buffer to read the data from
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): ByteBuffer;
+	get(destination?: this): this;
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): this;
 }
 
 /**
@@ -6168,10 +6216,27 @@ declare namespace ByteBuffer {
 }
 
 /**
+ * Classes implementing this interface can be written to and read back from a ByteBuffer with perfect fidelity.
+ * This interface is used to ensure objects can be read from and written to the FileSystem.
+ */
+declare interface Serializable {
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): this;
+}
+
+/**
  * Represents a serializable file system that can be modified with a command-line-like interface.
  * File paths in this system are similar to those used in Windows, except that they use a forward slash "/" separator, and the base drive is `h:` rather than `C:`.
  * Various file types can be specified, such that complex classes can be written to the file system and retrieved.
- * The classes with this behavior built in are: Number, String, Boolean, Object, ByteBuffer, GrayMap, Texture, Vector2, Vector3, Vector4, and Color.
+ * All built-in Serializable objects can be written to the file system, with their extensions being the lowercase version of their names (e.g. `.string` for String).
  * This class is primarily used in the `.fileSystem` property of both the global object and Hengine.
  * ```js
  * // the file type class
@@ -6223,7 +6288,7 @@ declare class FileSystem {
 	 * @param type - The data type that can be written and read to and from the file system
 	 * @param extensions - A list of file name extensions that will have this type applied. Default is the name of the type
 	 */
-	createFileType(type: Class<any>, extensions?: string[]): void;
+	createFileType<T extends Serializable>(type: Class<T>, extensions?: string[]): void;
 	/**
 	 * Returns the names of all the files in the current directory.
 	 * @param all - Whether or not files beginning with "." should be included. Default is false
@@ -6314,7 +6379,7 @@ declare class FileSystem {
 	 * Deserializes a file system from a data string.
 	 * @param string - The data string to deserialize
 	 */
-	static fromString(string: string): FileSystem;
+	static fromString(string: string): this;
 }
 
 /**
@@ -6616,7 +6681,7 @@ declare class SynthChannel {
 }
 
 /**
- * This is not an actual class, but rather an interface for tone specifications.
+ * This is an interface for tone specifications.
  */
 declare interface Tone {
 	/**

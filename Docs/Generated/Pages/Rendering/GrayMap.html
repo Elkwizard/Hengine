@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class GrayMap">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GrayMap.js?#L12" target="_blank" class="class-name source-link">GrayMap</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GrayMap.js?#L13" target="_blank" class="class-name source-link">GrayMap</a> <span class="keyword">implements</span> <span class="class-name"><a href="../../Pages/Miscellaneous/FileSystem.html#class Serializable">Serializable</a></span>
 				</div>
 				<div class="class desc">
 					Represents a 2D grid of grayscale values.
@@ -51,7 +51,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="GrayMap.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GrayMap.js?#L19" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">rule</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GrayMap.js?#L20" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">rule</span>)
 			</div>
 			<div class="function desc">
 				Creates a new GrayMap based on an intensity function.
@@ -98,7 +98,7 @@
 	
 		<div class="function-wrapper" id="GrayMap.prototype.get()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GrayMap.js?#L33" target="_blank" class="function-name source-link">get</a>(<span class="param">x</span>, <span class="param">y</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GrayMap.js?#L34" target="_blank" class="function-name source-link">get</a>(<span class="param">x</span>, <span class="param">y</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the grayscale value at a specified point, or -1 if the point is out of bounds.
@@ -125,61 +125,6 @@
 							</div>
 							<div class="param desc">
 								The y coordinate of the sample point
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GrayMap.prototype.toByteBuffer()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GrayMap.js?#L43" target="_blank" class="function-name source-link">toByteBuffer</a>(<span class="param">buffer?</span>)<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
-			</div>
-			<div class="function desc">
-				Copies the data of the map into a buffer.
-If no destination is specified one will be created.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GrayMap.prototype.toByteBuffer():buffer?">
-							<div class="param-name">
-								<span class="param">buffer</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The destination for the copy. The data will be written to the end of the buffer
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="GrayMap.fromByteBuffer()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GrayMap.js?#L56" target="_blank" class="function-name source-link">GrayMap.fromByteBuffer</a>(<span class="param">buffer</span>)<span class="type">GrayMap</span>
-			</div>
-			<div class="function desc">
-				Reads a map from a buffer, and returns it.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="GrayMap.fromByteBuffer():buffer">
-							<div class="param-name">
-								<span class="param">buffer</span>
-								<span class="type"><a href="../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
-							</div>
-							<div class="param desc">
-								The buffer to read the data from
 							</div>
 						</div>
 					

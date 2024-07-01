@@ -40,6 +40,18 @@ class Enum {
 	}
 }
 
+/**
+ * @name class Copyable
+ * @interface
+ * Classes that implement this interface can be copied with perfect fidelity.
+ */
+/**
+ * @name get
+ * Creates a copy of the object and optionally stores it in a provided destination.
+ * @param Copyable destination? | The destination to copy the object into. This must be the same type as the caller
+ * @return Copyable
+ */
+
 window.__devicePixelRatio = devicePixelRatio;
 
 Object.defineProperty(window, "title", {
@@ -89,6 +101,15 @@ Object.defineProperty(window, "title", {
 	addByteBufferConversions(Number, "float64");
 	addByteBufferConversions(Boolean, "bool");
 	addByteBufferConversions(Object, "object");
+	
+	/**
+	 * @name class Boolean
+	 * @implements Serializable
+	 */
+	/**
+	 * @name class Object
+	 * @implements Serializable
+	 */
 
 	{ // webgl
 		function overrideGetContext(CanvasType) {
@@ -304,7 +325,8 @@ Object.defineProperty(window, "title", {
 	});
 	/**
 	 * @name class String
-	 * @type interface String
+	 * @type interface String implements Serializable
+	 * @implements Serializable
 	 * The built-in String class has some additional utility methods in the Hengine.
 	 */
 	/**

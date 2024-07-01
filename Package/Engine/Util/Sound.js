@@ -67,8 +67,8 @@ SynthChannel.BUFFER = 15;
 
 /**
  * @name class Tone
- * @type interface Tone
- * This is not an actual class, but rather an interface for tone specifications.
+ * @interface
+ * This is an interface for tone specifications.
  * @prop Number duration? | The duration (in milliseconds) of the tone. If not specified, the tone can be stopped at will
  * @prop Number frequency? | The frequency of the tone in Hertz. If not specified, `.note` must be
  * @prop String note? | The letter name of the the note, optionally with a "#" appended for sharp or a "b" for flat. If not specified, `.frequency` must be

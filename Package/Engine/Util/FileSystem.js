@@ -153,7 +153,7 @@ class FileSystem { };
 	 * Represents a serializable file system that can be modified with a command-line-like interface.
 	 * File paths in this system are similar to those used in Windows, except that they use a forward slash "/" separator, and the base drive is `h:` rather than `C:`.
 	 * Various file types can be specified, such that complex classes can be written to the file system and retrieved.
-	 * The classes with this behavior built in are: Number, String, Boolean, Object, ByteBuffer, GrayMap, Texture, Vector2, Vector3, Vector4, and Color.
+	 * All built-in Serializable objects can be written to the file system, with their extensions being the lowercase version of their names (e.g. `.string` for String).
 	 * This class is primarily used in the `.fileSystem` property of both the global object and Hengine.
 	 * ```js
 	 * // the file type class
@@ -228,9 +228,10 @@ class FileSystem { };
 			return `h:/${array.reverse().join("/")}`;
 		}
 		/**
+		 * @type createFileType<T extends Serializable>(type: Class<T>, extensions?: string[]): void;
 		 * Registers a new file type.
 		 * The instance method `.toByteBuffer()` will be invoked when the type is written to the file system, and the static method `.fromByteBuffer()` will be invoked when reading.
-		 * @param Class type | The data type that can be written and read to and from the file system
+		 * @param Class implements Serializable type | The data type that can be written and read to and from the file system
 		 * @param String[] extensions? | A list of file name extensions that will have this type applied. Default is the name of the type
 		 */
 		createFileType(type, exts = [type.name.toLowerCase()]) {

@@ -1,4 +1,5 @@
 /**
+ * @implements Copyable, Serializable
  * Represents a composite mathematical object which element-wise operations can be performed on.
  * Many mathematical operations (plus, minus, times, over) can be performed on operables of any subclass type, allowing for convenient polymorphism.
  * All immutable methods, including static methods, are available on Number.
@@ -36,11 +37,6 @@ class Operable {
         }
         return this;
     }
-	/**
-	 * Creates a copy of the operable and optionally stores it in a provided destination.
-	 * @param Operable destination? | The destination to copy the operable into.
-	 * @return Operable
-	 */
     get(result = this.constructor.empty) {
         const { modValues } = this.constructor;
         for (let i = 0; i < modValues.length; i++) {
@@ -155,23 +151,12 @@ class Operable {
         }
         return true;
     }
-	/**
-	* Copies the data of the operable into a buffer.
-	* If no destination is specified one will be created.
-	* @param Number buffer? | The destination for the copy. The data will be written to the end of the buffer
-	* @return ByteBuffer
-	*/
     toByteBuffer(buffer = new ByteBuffer()) {
         const { modValues } = this.constructor;
         for (let i = 0; i < modValues.length; i++)
             buffer.write.float64(this[modValues[i]]);
         return buffer;
     }
-	/**
-	 * Reads a operable from a buffer, and returns it.
-	 * @param ByteBuffer buffer | The buffer to read the data from
-	 * @return Operable
-	 */
     static fromByteBuffer(buffer) {
         const result = this.empty;
         const { modValues } = this;

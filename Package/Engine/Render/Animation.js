@@ -1,4 +1,5 @@
 /**
+ * @implements Copyable
  * Represents a frame-by-frame animation.
  * These should be loaded using HengineAnimationResource and should not be constructed directly.
  * For the purposes of the animation, a frame elapses each time the animation is drawn.
@@ -57,11 +58,6 @@ class Animation extends ImageType {
 	get done() {
 		return !this.loops && this.timer === this.totalTime - 1;
 	}
-	/**
-	 * Creates a copy of the animation and optionally stores it in a provided destination.
-	 * @param Animation destination? | The destination to copy the animation into.
-	 * @return Animation
-	 */
 	get() {
 		return new Animation(this.frames, this.delay, this.loops, this.onEnd);
 	}

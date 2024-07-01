@@ -33,7 +33,8 @@ function documentName(name, doc, wrapperClass) {
 	result = `<a href="${sourceLink(doc)}" target="_blank" class="${name.isClass ? "class-name" : "function-name"} source-link">${result}</a>`;
 	if (name.isGetter) result = `<span class="keyword">get</span> ${result}`;
 	if (name.isSetter) result = `<span class="keyword">set</span> ${result}`;
-	if (name.baseClass) result += ` <span class="keyword">extends</span> <span class="class-name">${name.baseClass.join(", ")}</span>`
+	if (name.baseClass) result += ` <span class="keyword">extends</span> <span class="class-name">${name.baseClass}</span>`;
+	if (doc.settings.implements) result += ` <span class="keyword">implements</span> <span class="class-name">${doc.settings.implements.interfaces.map(int => int.name.base).join(", ")}</span>`;
 	return result;
 }
 
@@ -112,6 +113,7 @@ function document(doc, topLevelIDs, file) {
 	} else if (doc.name.isClass) {
 		const name = documentName(doc.name, doc);
 		const classQualifiers = [];
+		let keyword = name.isEnum ? "enum" : doc.settings.interface ? "interface" : "class";
 
 		const subclass = (doc.subclasses ?? [])
 			.map(cls => `<span class="class-name">${cls.name.base}</span>`)
@@ -137,13 +139,13 @@ function document(doc, topLevelIDs, file) {
 		result = `
 			<div class="class-wrapper" id="${doc.searchID}">
 				<div class="class-header">
-					<span class="keyword">${[...classQualifiers, doc.name.isEnum ? "enum" : "class"].join(" ")}</span> ${name}
+					<span class="keyword">${[...classQualifiers, keyword].join(" ")}</span> ${name}
 				</div>
 				<div class="class desc">
 					${wordCount(doc.description)}
 				</div>
 				${subclass ? `
-					<div class="header">Subclasses</div>
+					<div class="header">${doc.settings.interface ? "Implementers" : "Subclasses"}</div>
 					<div class="subclass desc">${subclass}</div>
 				` : ""}
 				

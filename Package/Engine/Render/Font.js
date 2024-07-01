@@ -1,4 +1,5 @@
 /**
+ * @implements Copyable
  * Represents a font, including family, side, and styling.
  * Fonts can be used in the text rendering functions of Artist.
  * ```js
@@ -190,11 +191,6 @@ class Font {
 	toString() {
 		return this.fontString;
 	}
-	/**
-	 * Creates a copy of the font and optionally stores it in a provided destination.
-	 * @param Font destination? | The destination to copy the font into.
-	 * @return Font
-	 */
 	get(font = new Font(0, "serif", false, false)) {
 		font.size = this.size;
 		font.family = this.family;

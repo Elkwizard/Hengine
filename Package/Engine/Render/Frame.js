@@ -252,6 +252,7 @@ class HImage extends ImageType {
 }
 
 /**
+ * @implements Copyable
  * Represents an offscreen drawing surface that can be rendered as an image.
  * ```js
  * const frame = new Frame(100, 200);
@@ -309,11 +310,6 @@ class Frame extends ImageType {
 	makeImage() {
 		return this.image;
 	}
-	/**
-	 * Creates a copy of the frame and optionally stores it in a provided destination.
-	 * @param Frame destination? | The destination to copy the frame into.
-	 * @return Frame
-	 */
 	get(f = new Frame(this.width, this.height, this.pixelRatio)) {
 		f.renderer.resize(this.width, this.height);
 		f.renderer.c.drawImage(this.image, 0, 0, this.width, this.height);

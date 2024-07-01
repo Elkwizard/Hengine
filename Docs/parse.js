@@ -46,7 +46,7 @@ function parse(content, file) {
 		if (isClass) {
 			const baseIndex = name.indexOf(" extends ");
 			if (baseIndex > -1) {
-				baseClass = name.slice(name.lastIndexOf(" ") + 1).split("/");
+				baseClass = name.slice(name.lastIndexOf(" ") + 1);
 				name = name.slice(0, baseIndex);
 			}
 		}
@@ -87,6 +87,11 @@ function parse(content, file) {
 				case "group": {
 					line.elements = line.content.split(",").map(e => processName(e.trim()));
 					match.name = line.elements[0];
+				}; break;
+				case "implements": {
+					line.interfaces = line.content.split(",").map(e => e.trim());
+					if (line.interfaces.includes(match.name.baseClass))
+						match.name.baseClass = null;
 				}; break;
 				case "return": {
 					line.type = line.content;
@@ -193,13 +198,20 @@ function parse(content, file) {
 function addInheritance(classes) {
 	for (const doc of classes) {
 		if (doc.settings.implements) {
-			const name = doc.settings.implements.content;
-			doc.settings.implements.info = classes.find(cls => cls.name.base === name);
+			const impl = doc.settings.implements;
+			impl.interfaces = classes.filter(cls => impl.interfaces.includes(cls.name.base));
 		}
-		if (doc.name.baseClass)
-			for (const superDoc of classes)
-				if (doc.name.baseClass.includes(superDoc.name.base))
+		
+		const { baseClass } = doc.name;
+		const interfaces = (doc.settings.implements?.interfaces ?? []).map(int => int.name.base);
+		
+		if (baseClass || interfaces.length) {
+			for (const superDoc of classes) {
+				const name = superDoc.name.base;
+				if (baseClass === name || interfaces.includes(name))
 					(superDoc.subclasses ??= []).push(doc);
+			}
+		}
 	}
 }
 

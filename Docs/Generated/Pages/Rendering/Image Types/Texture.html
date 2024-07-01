@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class Texture">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L15" target="_blank" class="class-name source-link">Texture</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L16" target="_blank" class="class-name source-link">Texture</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a>, <a href="../../../Pages/Miscellaneous/FileSystem.html#class Serializable">Serializable</a></span>
 				</div>
 				<div class="class desc">
 					Represents a 2D grid of pixels which can be directly accessed and modified.
@@ -48,7 +48,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="get Texture.prototype.brightness()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L37" target="_blank" class="function-name source-link">brightness</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L38" target="_blank" class="function-name source-link">brightness</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the brightness values for all pixels in the texture.
@@ -59,7 +59,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="get Texture.prototype.red()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L49" target="_blank" class="function-name source-link">red</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L50" target="_blank" class="function-name source-link">red</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the red channel values for all pixels in the texture.
@@ -70,7 +70,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="get Texture.prototype.green()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L64" target="_blank" class="function-name source-link">green</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L65" target="_blank" class="function-name source-link">green</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the green channel values for all pixels in the texture.
@@ -81,7 +81,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="get Texture.prototype.blue()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L79" target="_blank" class="function-name source-link">blue</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L80" target="_blank" class="function-name source-link">blue</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the blue channel values for all pixels in the texture.
@@ -92,7 +92,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="get Texture.prototype.alpha()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L94" target="_blank" class="function-name source-link">alpha</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L95" target="_blank" class="function-name source-link">alpha</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the alpha channel values for all pixels in the texture.
@@ -103,7 +103,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="Texture.prototype.clear()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L111" target="_blank" class="function-name source-link">clear</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L112" target="_blank" class="function-name source-link">clear</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Clears the texture to contain only transparent black pixels.
@@ -113,7 +113,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="Texture.prototype.validPixel()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L122" target="_blank" class="function-name source-link">validPixel</a>(<span class="param">x</span>, <span class="param">y</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L123" target="_blank" class="function-name source-link">validPixel</a>(<span class="param">x</span>, <span class="param">y</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether the given coordinates are valid pixel coordinates.
@@ -151,7 +151,7 @@ This method ignores potential coordinate wrapping.
 	
 		<div class="function-wrapper" id="Texture.prototype.getPixel()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L134" target="_blank" class="function-name source-link">getPixel</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">valid?</span>)<span class="type"><a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L135" target="_blank" class="function-name source-link">getPixel</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">valid?</span>)<span class="type"><a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span>
 			</div>
 			<div class="function desc">
 				Returns a reference to the color of the pixel at a specific location.
@@ -200,7 +200,7 @@ If the color data is needed more permanently, create a copy of the return value.
 	
 		<div class="function-wrapper" id="Texture.prototype.shader()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L162" target="_blank" class="function-name source-link">shader</a>(<span class="param">mapping</span>)<span class="type">Texture</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L163" target="_blank" class="function-name source-link">shader</a>(<span class="param">mapping</span>)<span class="type">Texture</span>
 			</div>
 			<div class="function desc">
 				Applies an in-place mapping to every pixel in the texture. Returns the caller.
@@ -227,7 +227,7 @@ If the color data is needed more permanently, create a copy of the return value.
 	
 		<div class="function-wrapper" id="Texture.prototype.setPixel()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L197" target="_blank" class="function-name source-link">setPixel</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">color</span>, <span class="param">valid?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L198" target="_blank" class="function-name source-link">setPixel</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">color</span>, <span class="param">valid?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Changes the color of a specified pixel in the texture.
@@ -284,7 +284,7 @@ If the color data is needed more permanently, create a copy of the return value.
 	
 		<div class="function-wrapper" id="Texture.prototype.blur()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L208" target="_blank" class="function-name source-link">blur</a>(<span class="param">radius</span>)<span class="type">Texture</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L209" target="_blank" class="function-name source-link">blur</a>(<span class="param">radius</span>)<span class="type">Texture</span>
 			</div>
 			<div class="function desc">
 				Applies an in-place box blur with a specified radius to the texture. Returns the caller.
@@ -311,7 +311,7 @@ If the color data is needed more permanently, create a copy of the return value.
 	
 		<div class="function-wrapper" id="Texture.prototype.clip()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L244" target="_blank" class="function-name source-link">clip</a>(<span class="param">region</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Texture</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L245" target="_blank" class="function-name source-link">clip</a>(<span class="param">region</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Texture</span>
 			</div>
 			<div class="function desc">
 				Returns a texture containing a rectangular region of the caller. 
@@ -379,64 +379,9 @@ If the color data is needed more permanently, create a copy of the return value.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Texture.prototype.get()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L263" target="_blank" class="function-name source-link">get</a>(<span class="param">destination?</span>)<span class="type">Texture</span>
-			</div>
-			<div class="function desc">
-				Creates a copy of the texture and optionally stores it in a provided destination.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Texture.prototype.get():destination?">
-							<div class="param-name">
-								<span class="param">destination</span>
-								<span class="type">Texture</span>
-							</div>
-							<div class="param desc">
-								The destination to copy the texture into.
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Texture.prototype.toByteBuffer()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L383" target="_blank" class="function-name source-link">toByteBuffer</a>(<span class="param">buffer?</span>)<span class="type"><a href="../../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
-			</div>
-			<div class="function desc">
-				Copies the data of the texture into a buffer.
-If no destination is specified one will be created.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Texture.prototype.toByteBuffer():buffer?">
-							<div class="param-name">
-								<span class="param">buffer</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The destination for the copy. The data will be written to the end of the buffer
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="Texture.fromImageType()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L290" target="_blank" class="function-name source-link">Texture.fromImageType</a>(<span class="param">image</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">region</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type"><a href="../../../Pages/Rendering/Image Types/Frame.html#class Frame">Frame</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L286" target="_blank" class="function-name source-link">Texture.fromImageType</a>(<span class="param">image</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">region</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type"><a href="../../../Pages/Rendering/Image Types/Frame.html#class Frame">Frame</a></span>
 			</div>
 			<div class="function desc">
 				Returns a texture containing the (optionally clipped) contents of an image.
@@ -541,7 +486,7 @@ The copy will have the same dimensions as the original, so if the original has a
 	
 		<div class="function-wrapper" id="Texture.grayScale()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L328" target="_blank" class="function-name source-link">Texture.grayScale</a>(<span class="param">brightness</span>)<span class="type">Texture</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L324" target="_blank" class="function-name source-link">Texture.grayScale</a>(<span class="param">brightness</span>)<span class="type">Texture</span>
 			</div>
 			<div class="function desc">
 				Creates a new grayscale texture based on a 2D grid of brightness values.
@@ -568,7 +513,7 @@ The copy will have the same dimensions as the original, so if the original has a
 	
 		<div class="function-wrapper" id="Texture.fromDataURI()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L347" target="_blank" class="function-name source-link">Texture.fromDataURI</a>(<span class="param">url</span>)<span class="type">Promise&lt;Texture&gt;</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L343" target="_blank" class="function-name source-link">Texture.fromDataURI</a>(<span class="param">url</span>)<span class="type">Promise&lt;Texture&gt;</span>
 			</div>
 			<div class="function desc">
 				Returns a promise resolving to a new texture containing the image data from a data: url.
@@ -585,33 +530,6 @@ The copy will have the same dimensions as the original, so if the original has a
 							</div>
 							<div class="param desc">
 								The data: url
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Texture.fromByteBuffer()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L399" target="_blank" class="function-name source-link">Texture.fromByteBuffer</a>(<span class="param">buffer</span>)<span class="type">Texture</span>
-			</div>
-			<div class="function desc">
-				Reads a texture from a buffer, and returns it.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Texture.fromByteBuffer():buffer">
-							<div class="param-name">
-								<span class="param">buffer</span>
-								<span class="type"><a href="../../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
-							</div>
-							<div class="param desc">
-								The buffer to read the data from
 							</div>
 						</div>
 					
