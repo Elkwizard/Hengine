@@ -64,7 +64,7 @@ function documentFunction(fn, wrapperClass) {
 					.map(param => `
 						<div class="param-wrapper" id="${param.searchID}">
 							<div class="param-name">
-								<span class="param">${param.name.replace(/\W/g, "")}</span>
+								<span class="param">${param.name.replace(/\.\.\.|\?/g, "")}</span>
 								<span class="type">${param.type}</span>
 							</div>
 							<div class="param desc">

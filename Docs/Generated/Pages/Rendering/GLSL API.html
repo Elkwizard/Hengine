@@ -53,7 +53,7 @@ Dynamic-length arrays are represented by GPUArrays, which are pre-set as the val
 		
 			<div class="class-wrapper" id="class GPUInterface">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L970" target="_blank" class="class-name source-link">GPUInterface</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L974" target="_blank" class="class-name source-link">GPUInterface</a>
 				</div>
 				<div class="class desc">
 					Represents a GLSL program.
@@ -81,7 +81,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="GPUInterface.prototype.setArgument()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1024" target="_blank" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1028" target="_blank" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of a uniform in the program.
@@ -118,7 +118,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="GPUInterface.prototype.setArguments()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1031" target="_blank" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1035" target="_blank" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of many uniforms at once.
@@ -145,7 +145,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="GPUInterface.prototype.getArgument()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1041" target="_blank" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1045" target="_blank" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
 				Retrieves the current value of a given uniform.
@@ -173,7 +173,7 @@ For the return type of this function, see the GLSL API.
 	
 		<div class="function-wrapper" id="GPUInterface.prototype.argumentExists()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1049" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L1053" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether a given uniform exists.
@@ -203,7 +203,7 @@ For the return type of this function, see the GLSL API.
 		
 			<div class="class-wrapper" id="class GPUArray">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L411" target="_blank" class="class-name source-link">GPUArray</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L415" target="_blank" class="class-name source-link">GPUArray</a>
 				</div>
 				<div class="class desc">
 					Represents an array of GLSL structs.
@@ -218,7 +218,11 @@ For a struct such as:
 </span></code>
 A GPUArray could be used as follows:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// gpu is a GPUInterface</span><span class="highlight-KEYWORD">
-const</span><span class="highlight-CONSTANT"> circle</span><span class="highlight-SYMBOL"> = { </span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">), </span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 22.5</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;magenta&quot;</span><span class="highlight-SYMBOL">) };
+const</span><span class="highlight-CONSTANT"> circle</span><span class="highlight-SYMBOL"> = {
+	</span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">),
+	</span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 22.5</span><span class="highlight-SYMBOL">,
+	</span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;magenta&quot;</span><span class="highlight-SYMBOL">)
+};
 </span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getArgument</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;circles&quot;</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">append</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circle</span><span class="highlight-SYMBOL">);
 </span></code>
 				</div>
@@ -241,7 +245,7 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 					<div class="class-methods">
 		<div class="function-wrapper" id="get GPUArray.prototype.length()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L426" target="_blank" class="function-name source-link">length</a><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L430" target="_blank" class="function-name source-link">length</a><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Retrieves the number of structs in the array.
@@ -251,7 +255,7 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 	
 		<div class="function-wrapper" id="GPUArray.prototype.set()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L438" target="_blank" class="function-name source-link">set</a>(<span class="param">value</span><span class="aux"> | </span><span class="param">value</span>)<span class="type">GPUArray</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L442" target="_blank" class="function-name source-link">set</a>(<span class="param">value</span><span class="aux"> | </span><span class="param">value</span>)<span class="type">GPUArray</span>
 			</div>
 			<div class="function desc">
 				Sets the value of the array and returns the caller.
@@ -292,7 +296,7 @@ This will overwrite all previous data.
 	
 		<div class="function-wrapper" id="GPUArray.prototype.append()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L454" target="_blank" class="function-name source-link">append</a>(<span class="param">value</span>)<span class="type">GPUArray</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L458" target="_blank" class="function-name source-link">append</a>(<span class="param">value</span>)<span class="type">GPUArray</span>
 			</div>
 			<div class="function desc">
 				Appends a struct to the end of the array and returns the caller.
@@ -319,7 +323,7 @@ This will overwrite all previous data.
 	
 		<div class="function-wrapper" id="GPUArray.prototype.write()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L466" target="_blank" class="function-name source-link">write</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">srcOffset?</span>)<span class="type">GPUArray</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L470" target="_blank" class="function-name source-link">write</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">srcOffset?</span>)<span class="type">GPUArray</span>
 			</div>
 			<div class="function desc">
 				Writes to a specified location in the array and returns the caller.
@@ -377,7 +381,7 @@ This may increase the size of the array, but cannot be used to create holes.
 	
 		<div class="function-wrapper" id="GPUArray.prototype.read()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L490" target="_blank" class="function-name source-link">read</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">dstOffset?</span>)<span class="type">Object[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L494" target="_blank" class="function-name source-link">read</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">dstOffset?</span>)<span class="type">Object[]</span>
 			</div>
 			<div class="function desc">
 				Reads from a specified location in the array into a provided array of objects, and returns the destination array.

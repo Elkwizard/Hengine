@@ -1024,7 +1024,11 @@ declare class Geometry {
  * A GPUArray could be used as follows:
  * ```js
  * // gpu is a GPUInterface
- * const circle = { position: new Vector2(100, 200), radius: 22.5, color: new Color("magenta") };
+ * const circle = {
+ * 	position: new Vector2(100, 200),
+ * 	radius: 22.5,
+ * 	color: new Color("magenta")
+ * };
  * gpu.getArgument("circles").append(circle);
  * ```
  */

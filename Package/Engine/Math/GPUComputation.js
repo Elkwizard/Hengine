@@ -403,7 +403,11 @@ GPUDataTexture.LITTLE_ENDIAN = !!new Uint8Array(new Uint32Array([1]).buffer)[0];
  * A GPUArray could be used as follows:
  * ```js
  * // gpu is a GPUInterface
- * const circle = { position: new Vector2(100, 200), radius: 22.5, color: new Color("magenta") };
+ * const circle = {
+ * 	position: new Vector2(100, 200),
+ * 	radius: 22.5,
+ * 	color: new Color("magenta")
+ * };
  * gpu.getArgument("circles").append(circle);
  * ```
  * @prop ByteBuffer buffer | A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to

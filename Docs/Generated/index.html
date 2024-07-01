@@ -419,7 +419,8 @@
 								<button class="${complete ? "" : "incomplete"}" onclick="changePage('${dst}.html')">${name}</button>
 							</li>
 						`;
-					} return `<li>${name}${generateNav(value, dst)}</li>`;
+					}
+					return `<li>${name}${generateNav(value, dst)}</li>`;
 				})
 				.join("")
 		}</ul>`;
@@ -427,12 +428,17 @@
 		const changePage = path => {
 			panel.src = path;
 			const name = path.match(/\/([^/]*?)\.html(#(.*?))?$/)[1];
-			document.title = `Hengine Docs - ${name}`;
-
 			if (mobile) html.classList.add("nav-hidden");
 		};
 
-		changePage("Pages/Structure/Hengine.html");
+		panel.addEventListener("load", () => {
+			const { location } = panel.contentWindow;
+			const title = decodeURI(location.href).match(/([\w ]*?)\.html/)[1];
+			document.title = `Hengine Docs - ${title}`;
+			localStorage.page = location.pathname.replace(/^(.*?)Generated./, "");
+		});
+
+		changePage(localStorage.page ?? "Pages/Structure/Hengine.html");
 
 		nav.innerHTML = generateNav(STRUCTURE);
 
