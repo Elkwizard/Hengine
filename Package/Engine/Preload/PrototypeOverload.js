@@ -104,10 +104,12 @@ Object.defineProperty(window, "title", {
 	
 	/**
 	 * @name class Boolean
+	 * @type interface Boolean extends Serializable
 	 * @implements Serializable
 	 */
 	/**
 	 * @name class Object
+	 * @type interface Object extends Serializable
 	 * @implements Serializable
 	 */
 
@@ -184,7 +186,7 @@ Object.defineProperty(window, "title", {
 	
 	/**
 	 * @name class Array
-	 * @type interface Array
+	 * @type interface Array<T>
 	 * The built-in Array class has some additional quality-of-life methods in the Hengine.
 	 * @prop Any last | The last element of the array
 	 */
@@ -325,7 +327,7 @@ Object.defineProperty(window, "title", {
 	});
 	/**
 	 * @name class String
-	 * @type interface String implements Serializable
+	 * @type interface String extends Serializable
 	 * @implements Serializable
 	 * The built-in String class has some additional utility methods in the Hengine.
 	 */

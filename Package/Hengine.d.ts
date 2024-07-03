@@ -471,7 +471,7 @@ declare class HengineLoader {
 	/**
 	 * The singleton instance
 	 */
-	static loader: this;
+	static loader: HengineLoader;
 	/**
 	 * Retrieves a specific resource.
 	 * If the resource failed to load, this returns null.
@@ -1480,45 +1480,45 @@ declare class Matrix3 extends Float64Array implements Copyable {
 	 * Creates an identity matrix and optionally stores it in a provided destination.
 	 * @param destination - The matrix to copy the identity matrix into
 	 */
-	static identity(destination?: this): this;
+	static identity(destination?: Matrix3): Matrix3;
 	/**
 	 * Creates a 2D rotation matrix and optionally stores it in a provided destination.
 	 * @param theta - The clockwise (in screen-space) angle (in radians) to rotate by
 	 * @param result - The matrix to copy the rotation matrix into
 	 */
-	static rotation(theta: number, result?: this): this;
+	static rotation(theta: number, result?: Matrix3): Matrix3;
 	/**
 	 * Creates a 2D scaling matrix and optionally stores it in a provided a destination.
 	 * @param x - The scale factor on the x axis
 	 * @param y - The scale factor on the y axis
 	 * @param result - The matrix to copy the scaling matrix into
 	 */
-	static scale(x: number, y: number, result?: this): this;
+	static scale(x: number, y: number, result?: Matrix3): Matrix3;
 	/**
 	 * Creates a 2D scaling matrix and optionally stores it in a provided a destination.
 	 * @param vector - A vector containing the scale factors for both axes
 	 * @param result - The matrix to copy the scaling matrix into
 	 */
-	static scale(vector: Vector2, result?: this): this;
+	static scale(vector: Vector2, result?: Matrix3): Matrix3;
 	/**
 	 * Creates a 2D translation matrix and optionally stores it in a provided a destination.
 	 * @param x - The x coordinate to translate by
 	 * @param y - The y coordinate to translate by
 	 * @param result - The matrix to copy the translation matrix into
 	 */
-	static translation(x: number, y: number, result?: this): this;
+	static translation(x: number, y: number, result?: Matrix3): Matrix3;
 	/**
 	 * Creates a 2D translation matrix and optionally stores it in a provided a destination.
 	 * @param vector - The vector to translate by
 	 * @param result - The matrix to copy the translation matrix into
 	 */
-	static translation(vector: Vector2, result?: this): this;
+	static translation(vector: Vector2, result?: Matrix3): Matrix3;
 	/**
 	 * Multiplies a series of matrices together and optionally stores it in a provided destination.
 	 * @param matrices - The matrices to multiply together. Order matters for this argument
 	 * @param result - The matrix to copy the result into
 	 */
-	static mulMatrices(matrices: this[], result?: this): this;
+	static mulMatrices(matrices: Matrix3[], result?: Matrix3): Matrix3;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -2044,13 +2044,13 @@ declare class Vector extends Operable {
 	 * @param a - The first vector
 	 * @param b - The second vector
 	 */
-	static dist(a: this, b: this): number;
+	static dist(a: Vector, b: Vector): number;
 	/**
 	 * Computes the squared distance between two vectors. 
 	 * @param a - The first vector
 	 * @param b - The second vector
 	 */
-	static sqrDist(a: this, b: this): number;
+	static sqrDist(a: Vector, b: Vector): number;
 }
 
 /**
@@ -2100,32 +2100,32 @@ declare class Vector2 extends Vector {
 	/**
 	 * Returns a new unit vector pointing in a specified direction (in screen-space).
 	 */
-	static get left(): this;
+	static get left(): Vector2;
 	/**
 	 * Returns a new vector with both components initialized to 0.
 	 */
-	static get origin(): this;
+	static get origin(): Vector2;
 	/**
 	 * Creates a vector with a specified x component and a y component of 0.
 	 * @param x - The x coordinate
 	 */
-	static x(x: number): this;
+	static x(x: number): Vector2;
 	/**
 	 * Creates a vector with a specified y component and an x component of 0.
 	 * @param y - The y coordinate
 	 */
-	static y(y: number): this;
+	static y(y: number): Vector2;
 	/**
 	 * Creates a unit vector with a specified clockwise (in screen-space) angle from the horizontal.
 	 * @param angle - The angle of the vector
 	 */
-	static fromAngle(angle: number): this;
+	static fromAngle(angle: number): Vector2;
 	/**
 	 * Creates a cartesian vector from a given set of polar coordinates .
 	 * @param  - The clockwise (in screen-space) angle from the horizontal
 	 * @param r - The distance from the origin. Default is 1
 	 */
-	static polar(θ: number, r?: number): this;
+	static polar(θ: number, r?: number): Vector2;
 }
 
 /**
@@ -2209,26 +2209,26 @@ declare class Vector3 extends Vector {
 	/**
 	 * Returns a new unit vector pointing in the specified direction.
 	 */
-	static get left(): this;
+	static get left(): Vector3;
 	/**
 	 * Returns a new vector with all components equal to 0.
 	 */
-	static get origin(): this;
+	static get origin(): Vector3;
 	/**
 	 * Creates a vector with a specified x component and a y and z component of 0.
 	 * @param x - The x coordinate
 	 */
-	static x(x: number): this;
+	static x(x: number): Vector3;
 	/**
 	 * Creates a vector with a specified y component and an x and z component of 0.
 	 * @param y - The y coordinate
 	 */
-	static y(y: number): this;
+	static y(y: number): Vector3;
 	/**
 	 * Creates a vector with a specified z component and an x and z component of 0.
 	 * @param z - The z coordinate
 	 */
-	static z(z: number): this;
+	static z(z: number): Vector3;
 }
 
 /**
@@ -2340,31 +2340,31 @@ declare class Vector4 extends Vector {
 	/**
 	 * Returns a new unit vector pointing in the specified direction.
 	 */
-	static get left(): this;
+	static get left(): Vector4;
 	/**
 	 * Returns a new vector with all components equal to 0.
 	 */
-	static get origin(): this;
+	static get origin(): Vector4;
 	/**
 	 * Creates a vector with a specified x component and a y, z, and w component of 0.
 	 * @param x - The x coordinate
 	 */
-	static x(x: number): this;
+	static x(x: number): Vector4;
 	/**
 	 * Creates a vector with a specified y component and an x, z, and w component of 0.
 	 * @param y - The y coordinate
 	 */
-	static y(y: number): this;
+	static y(y: number): Vector4;
 	/**
 	 * Creates a vector with a specified z component and an x, z, and w component of 0.
 	 * @param z - The z coordinate
 	 */
-	static z(z: number): this;
+	static z(z: number): Vector4;
 	/**
 	 * Creates a vector with a specified w component and an x, y, and z component of 0.
 	 * @param w - The w coordinate
 	 */
-	static w(w: number): this;
+	static w(w: number): Vector4;
 }
 
 /**
@@ -2452,17 +2452,17 @@ declare class Operable implements Copyable, Serializable {
 	/**
 	 * Produces an operable with 0 for all element values.
 	 */
-	static get empty(): this;
+	static get empty(): Operable;
 	/**
 	 * Computes the element-wise sum of a list of operables.
 	 * @param operables - The values to sum
 	 */
-	static sum(operables: this[] | number[]): this;
+	static sum(operables: Operable[] | number[]): Operable;
 	/**
 	 * Computes the element-wise average of a list of operables.
 	 * @param operables - The values to average
 	 */
-	static avg(operables: this[] | number[]): this;
+	static avg(operables: Operable[] | number[]): Operable;
 	/**
 	 * Remaps an operable from one range to another range.
 	 * @param value - The operable to be remapped
@@ -2471,7 +2471,7 @@ declare class Operable implements Copyable, Serializable {
 	 * @param finalMin - The minimum of the desired range
 	 * @param finalMax - The maximum of the desired range
 	 */
-	static remap(value: this | number, initialMin: this | number, initialMax: this | number, finalMin: this | number, finalMax: this | number): this;
+	static remap(value: Operable | number, initialMin: Operable | number, initialMax: Operable | number, finalMin: Operable | number, finalMax: Operable | number): Operable;
 	/**
 	 * Returns an operable clamped element-wise between two bounds.
 	 * Equivalent to `Operable.max(min, operable.min(max, value))`.
@@ -2479,33 +2479,33 @@ declare class Operable implements Copyable, Serializable {
 	 * @param min - The lower bound for the result
 	 * @param max - The upper bound for the result
 	 */
-	static clamp(value: this | number, min: this | number, max: this | number): this;
+	static clamp(value: Operable | number, min: Operable | number, max: Operable | number): Operable;
 	/**
 	 * Produces an operable with all elements equal to a single value.
 	 * @param value - The value that will be used for all elements
 	 */
-	static filled(value: number): this;
+	static filled(value: number): Operable;
 	/**
 	 * Finds and returns the element-wise minimum of a series of values.
 	 * @param values - The values to compare
 	 */
-	static min(...values: this[] | number[]): this;
+	static min(...values: Operable[] | number[]): Operable;
 	/**
 	 * Finds and returns the element-wise maximum of a series of values.
 	 * @param values - The values to compare
 	 */
-	static max(...values: this[] | number[]): this;
+	static max(...values: Operable[] | number[]): Operable;
 	/**
 	 * Performs an element-wise exponentiation.
 	 * @param base - The base of the exponentiation
 	 * @param power - The power of the exponentiation
 	 */
-	static pow(base: this, power: this | number): this;
+	static pow(base: Operable, power: Operable | number): Operable;
 	/**
 	 * Performs a built-in unary Math operation element-wise on an operable.
 	 * @param value - The operable to operate on
 	 */
-	static round(value: this): this;
+	static round(value: Operable): Operable;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -2520,7 +2520,7 @@ declare class Operable implements Copyable, Serializable {
 	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
 	 * @param buffer - A source buffer to read the data from
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): this;
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
@@ -2545,7 +2545,7 @@ declare class Enum {
 	 * Static properties with these names will be defined on the return value and will contain the associated symbolic values.
 	 * @param names - The names for the symbolic values
 	 */
-	static define(...names: string[]): Class<this>;
+	static define(...names: string[]): Class<Enum>;
 }
 
 /**
@@ -2562,7 +2562,7 @@ declare interface Copyable {
 /**
  * 
  */
-declare class Boolean implements Serializable {
+declare interface Boolean extends Serializable {
 	/**
 	 * Writes the object to a buffer and returns it.
 	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
@@ -2572,13 +2572,13 @@ declare class Boolean implements Serializable {
 	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
 	 * @param buffer - A source buffer to read the data from
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): this;
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
  * 
  */
-declare class Object implements Serializable {
+declare interface Object extends Serializable {
 	/**
 	 * Writes the object to a buffer and returns it.
 	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
@@ -2588,13 +2588,13 @@ declare class Object implements Serializable {
 	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
 	 * @param buffer - A source buffer to read the data from
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): this;
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
  * The built-in Array class has some additional quality-of-life methods in the Hengine.
  */
-declare interface Array {
+declare interface Array<T> {
 	/**
 	 * The last element of the array
 	 */
@@ -2636,7 +2636,7 @@ declare interface Number extends Operable {
 /**
  * The built-in String class has some additional utility methods in the Hengine.
  */
-declare interface String implements Serializable {
+declare interface String extends Serializable {
 	/**
 	 * Returns a copy of the caller with the first character capitalized.
 	 */
@@ -2660,7 +2660,7 @@ declare interface String implements Serializable {
 	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
 	 * @param buffer - A source buffer to read the data from
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): this;
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
@@ -2765,7 +2765,7 @@ declare class Animation extends ImageType implements Copyable {
 	 * @param loops - Whether or not the animation loops. Default is true
 	 * @param onEnd - A function to execute when the animation completes. Default is a no-op
 	 */
-	static fromImage(spritesheet: ImageType, imgWidth: number, imgHeight: number, delay: number, loops?: boolean, onEnd?: () => void): this;
+	static fromImage(spritesheet: ImageType, imgWidth: number, imgHeight: number, delay: number, loops?: boolean, onEnd?: () => void): Animation;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -2984,18 +2984,18 @@ declare class Color extends Operable {
 	 * @param color - The color to use for the RGB portion of the result
 	 * @param alpha - The new alpha value
 	 */
-	static alpha(color: this, alpha: number): this;
+	static alpha(color: Color, alpha: number): Color;
 	/**
 	 * Returns a copy of a color with a specified change in saturation.
 	 * @param color - The base color
 	 * @param factor - The multiplier on the current saturation of the color
 	 */
-	static saturate(color: this, factor: number): this;
+	static saturate(color: Color, factor: number): Color;
 	/**
 	 * Returns a new grayscale color with a specified brightness.
 	 * @param intensity - The grayscale intensity on [0, 1]
 	 */
-	static grayScale(intensity: number): this;
+	static grayScale(intensity: number): Color;
 }
 
 /**
@@ -3035,323 +3035,323 @@ declare class Font implements Copyable {
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif5: this;
+	static Serif5: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif10: this;
+	static Serif10: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif15: this;
+	static Serif15: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif20: this;
+	static Serif20: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif25: this;
+	static Serif25: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif30: this;
+	static Serif30: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif35: this;
+	static Serif35: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif40: this;
+	static Serif40: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif45: this;
+	static Serif45: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif50: this;
+	static Serif50: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif55: this;
+	static Serif55: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif60: this;
+	static Serif60: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif65: this;
+	static Serif65: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif70: this;
+	static Serif70: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif75: this;
+	static Serif75: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif80: this;
+	static Serif80: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif85: this;
+	static Serif85: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif90: this;
+	static Serif90: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif95: this;
+	static Serif95: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Serif100: this;
+	static Serif100: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial5: this;
+	static Arial5: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial10: this;
+	static Arial10: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial15: this;
+	static Arial15: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial20: this;
+	static Arial20: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial25: this;
+	static Arial25: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial30: this;
+	static Arial30: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial35: this;
+	static Arial35: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial40: this;
+	static Arial40: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial45: this;
+	static Arial45: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial50: this;
+	static Arial50: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial55: this;
+	static Arial55: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial60: this;
+	static Arial60: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial65: this;
+	static Arial65: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial70: this;
+	static Arial70: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial75: this;
+	static Arial75: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial80: this;
+	static Arial80: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial85: this;
+	static Arial85: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial90: this;
+	static Arial90: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial95: this;
+	static Arial95: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Arial100: this;
+	static Arial100: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive5: this;
+	static Cursive5: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive10: this;
+	static Cursive10: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive15: this;
+	static Cursive15: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive20: this;
+	static Cursive20: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive25: this;
+	static Cursive25: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive30: this;
+	static Cursive30: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive35: this;
+	static Cursive35: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive40: this;
+	static Cursive40: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive45: this;
+	static Cursive45: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive50: this;
+	static Cursive50: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive55: this;
+	static Cursive55: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive60: this;
+	static Cursive60: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive65: this;
+	static Cursive65: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive70: this;
+	static Cursive70: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive75: this;
+	static Cursive75: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive80: this;
+	static Cursive80: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive85: this;
+	static Cursive85: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive90: this;
+	static Cursive90: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive95: this;
+	static Cursive95: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Cursive100: this;
+	static Cursive100: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace5: this;
+	static Monospace5: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace10: this;
+	static Monospace10: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace15: this;
+	static Monospace15: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace20: this;
+	static Monospace20: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace25: this;
+	static Monospace25: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace30: this;
+	static Monospace30: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace35: this;
+	static Monospace35: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace40: this;
+	static Monospace40: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace45: this;
+	static Monospace45: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace50: this;
+	static Monospace50: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace55: this;
+	static Monospace55: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace60: this;
+	static Monospace60: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace65: this;
+	static Monospace65: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace70: this;
+	static Monospace70: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace75: this;
+	static Monospace75: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace80: this;
+	static Monospace80: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace85: this;
+	static Monospace85: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace90: this;
+	static Monospace90: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace95: this;
+	static Monospace95: Font;
 	/**
 	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
-	static Monospace100: this;
+	static Monospace100: Font;
 	/**
 	 * Creates a new font.
 	 * @param size - The size of the font
@@ -3539,7 +3539,7 @@ declare class Frame extends ImageType implements Copyable {
 	 * The copy will have the same pixel ratio as the original image.
 	 * @param image - The image to copy data from
 	 */
-	static fromImageType(image: ImageType): this;
+	static fromImageType(image: ImageType): Frame;
 	/**
 	 * Returns a frame containing the (optionally clipped) contents of an image.
 	 * If no clipping parameters are provided, the whole image will be copied.
@@ -3547,7 +3547,7 @@ declare class Frame extends ImageType implements Copyable {
 	 * @param image - The image to copy data from
 	 * @param region - The region to extract
 	 */
-	static fromImageType(image: ImageType, region: Rect): this;
+	static fromImageType(image: ImageType, region: Rect): Frame;
 	/**
 	 * Returns a frame containing the (optionally clipped) contents of an image.
 	 * If no clipping parameters are provided, the whole image will be copied.
@@ -3558,7 +3558,7 @@ declare class Frame extends ImageType implements Copyable {
 	 * @param width - The width of the region
 	 * @param height - The height of the region
 	 */
-	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): this;
+	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): Frame;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -3805,7 +3805,7 @@ declare class GrayMap implements Serializable {
 	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
 	 * @param buffer - A source buffer to read the data from
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): this;
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
@@ -4462,7 +4462,7 @@ declare class Range {
 	 * Returns the smallest range that contains every one of a collection of values.
 	 * @param values - The set of values to bound
 	 */
-	static fromValues(values: number[]): this;
+	static fromValues(values: number[]): Range;
 }
 
 /**
@@ -4619,7 +4619,7 @@ declare class Line extends Shape {
 	 * @param m - The slope of the line segment
 	 * @param b - The y-intercept of the line segment
 	 */
-	static fromSlopeIntercept(m: number, b: number): this;
+	static fromSlopeIntercept(m: number, b: number): Line;
 }
 
 /**
@@ -4655,7 +4655,7 @@ declare class Polygon extends Shape {
 	 * @param sides - The number of sides of the polygon
 	 * @param radius - The distance from the center to each vertex
 	 */
-	static regular(sides: number, radius: number): this;
+	static regular(sides: number, radius: number): Polygon;
 }
 
 /**
@@ -4722,23 +4722,23 @@ declare class Rect extends Polygon {
 	 * @param min - The upper-left corner of the rectangle
 	 * @param max - The lower-right corner of the rectangle
 	 */
-	static fromMinMax(min: Vector2, max: Vector2): this;
+	static fromMinMax(min: Vector2, max: Vector2): Rect;
 	/**
 	 * Returns a new rectangle with the specified vertical and horizontal spans.
 	 * @param xRange - The horizontal span of the rectangle
 	 * @param yRange - The vertical span of the rectangle
 	 */
-	static fromRanges(xRange: Range, yRange: Range): this;
+	static fromRanges(xRange: Range, yRange: Range): Rect;
 	/**
 	 * Returns the smallest bounding rectangle around a collection of points.
 	 * @param points - The points to create a bounding box for
 	 */
-	static bound(points: Vector2[]): this;
+	static bound(points: Vector2[]): Rect;
 	/**
 	 * Returns the smallest bounding rectangle around a collection of rectangles.
 	 * @param boxes - The rectangles to create a bounding box for
 	 */
-	static composeBoundingBoxes(boxes: this[]): this;
+	static composeBoundingBoxes(boxes: Rect[]): Rect;
 }
 
 /**
@@ -4950,12 +4950,12 @@ declare class Texture extends ImageType implements Copyable, Serializable {
 	 * Creates a new grayscale texture based on a 2D grid of brightness values.
 	 * @param brightness - The brightness values for each pixel in the texture. The first index is the x coordinate, the second the y
 	 */
-	static grayScale(brightness: number[][]): this;
+	static grayScale(brightness: number[][]): Texture;
 	/**
 	 * Returns a promise resolving to a new texture containing the image data from a data: url.
 	 * @param url - The data: url
 	 */
-	static fromDataURI(url: string): Promise<this>;
+	static fromDataURI(url: string): Promise<Texture>;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -4970,7 +4970,7 @@ declare class Texture extends ImageType implements Copyable, Serializable {
 	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
 	 * @param buffer - A source buffer to read the data from
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): this;
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
@@ -5001,7 +5001,7 @@ declare class TileMap {
 	 * @param tileHeight - The height of each tile
 	 * @param names - The list of identifiers for each tile
 	 */
-	static regular(image: ImageType, tileWidth: number, tileHeight: number, names: any[]): this;
+	static regular(image: ImageType, tileWidth: number, tileHeight: number, names: any[]): TileMap;
 }
 
 /**
@@ -5062,7 +5062,7 @@ declare class Transform extends Matrix3 implements Copyable {
 	 * @param a - The first transformation
 	 * @param b - The second transformation
 	 */
-	static combine(a: this, b: this): this;
+	static combine(a: Transform, b: Transform): Transform;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -6028,12 +6028,12 @@ declare class ByteBuffer implements Copyable, Serializable {
 	 * Converts a base-64 string to a new buffer.
 	 * @param base64 - The base-64 string to convert
 	 */
-	static fromBase64(base64: string): this;
+	static fromBase64(base64: string): ByteBuffer;
 	/**
 	 * Converts a series of 16-bit unicode characters into a new buffer.
 	 * @param string - The string of data
 	 */
-	static fromString(string: string): this;
+	static fromString(string: string): ByteBuffer;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -6048,7 +6048,7 @@ declare class ByteBuffer implements Copyable, Serializable {
 	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
 	 * @param buffer - A source buffer to read the data from
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): this;
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
@@ -6229,7 +6229,7 @@ declare interface Serializable {
 	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
 	 * @param buffer - A source buffer to read the data from
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): this;
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
@@ -6379,7 +6379,7 @@ declare class FileSystem {
 	 * Deserializes a file system from a data string.
 	 * @param string - The data string to deserialize
 	 */
-	static fromString(string: string): this;
+	static fromString(string: string): FileSystem;
 }
 
 /**

@@ -58,8 +58,9 @@ function applySubstitutions(name, subs) {
 }
 
 function createPropSpecification(className, name, prop, isWindow) {
-	let result = `${name}: ${formatType(prop.type, className)};`;
-	if (prop.category === "static_prop")
+	const isStatic = prop.category === "static_prop";
+	let result = `${name}: ${formatType(prop.type, !isStatic && className)};`;
+	if (isStatic)
 		result = `static ${result.replace(/.*\./, "")}`;
 	else if (isWindow)
 		result = `const ${result}`;
@@ -124,6 +125,8 @@ function createClassSpecification(doc) {
 }
 
 function createOverloadSpecification(name, parameters, doc, className) {
+	className = !doc.name.isStatic && className;
+
 	let returnType = doc.settings.return?.type ?? "void";
 	if (doc.name.isAsync) returnType = `Promise<${returnType}>`;
 
