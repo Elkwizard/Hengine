@@ -87,7 +87,7 @@ class Collision {
 
 class CollisionDetector {
 	public:
-		using JumpTable = std::unordered_map<BaseCollider::Type, std::unordered_map<BaseCollider::Type, std::function<std::unique_ptr<Collision>(BaseModel*, BaseModel*)>>>;
+		using JumpTable = std::unordered_map<Collider::Type, std::unordered_map<Collider::Type, std::function<std::unique_ptr<Collision>(Model*, Model*)>>>;
 		static JumpTable jumpTable;
 
 		static std::unique_ptr<Collision> collideBodies(RigidBody& bodyA, RigidBody& bodyB) {
@@ -146,8 +146,8 @@ class CollisionDetector {
 		}
 
 		static std::unique_ptr<Collision> collide(
-			BaseCollider* shapeA, const Vector& posA, double cosA, double sinA,
-			BaseCollider* shapeB, const Vector& posB, double cosB, double sinB
+			Collider* shapeA, const Vector& posA, double cosA, double sinA,
+			Collider* shapeB, const Vector& posB, double cosB, double sinB
 		) {
 			Vector d = posB - posA;
 			if (d.sqrMag() > pow(shapeA->boundingRadius + shapeB->boundingRadius, 2))
@@ -159,7 +159,7 @@ class CollisionDetector {
 			);
 		}
 
-		static std::unique_ptr<Collision> CircleModel_PolygonModel(BaseModel* _a, BaseModel* _b) {
+		static std::unique_ptr<Collision> CircleModel_PolygonModel(Model* _a, Model* _b) {
 			CircleModel& a = *(CircleModel*)_a;
 			PolygonModel& b = *(PolygonModel*)_b;
 
@@ -205,13 +205,13 @@ class CollisionDetector {
 			return nullptr;
 		}
 
-		static std::unique_ptr<Collision> PolygonModel_CircleModel(BaseModel* a, BaseModel* b) {
+		static std::unique_ptr<Collision> PolygonModel_CircleModel(Model* a, Model* b) {
 			std::unique_ptr<Collision> col = CollisionDetector::CircleModel_PolygonModel(b, a);
 			if (col) col->direction = -col->direction;
 			return col;
 		}
 
-		static std::unique_ptr<Collision> CircleModel_CircleModel(BaseModel* _a, BaseModel* _b) {
+		static std::unique_ptr<Collision> CircleModel_CircleModel(Model* _a, Model* _b) {
 			CircleModel& a = *(CircleModel*)_a;
 			CircleModel& b = *(CircleModel*)_b;
 
@@ -226,7 +226,7 @@ class CollisionDetector {
 			return nullptr;
 		}
 
-		static std::unique_ptr<Collision> PolygonModel_PolygonModel(BaseModel* _a, BaseModel* _b) {
+		static std::unique_ptr<Collision> PolygonModel_PolygonModel(Model* _a, Model* _b) {
 			PolygonModel& a = *(PolygonModel*)_a;
 			PolygonModel& b = *(PolygonModel*)_b;
 
@@ -265,7 +265,7 @@ class CollisionDetector {
 				if (aMax < bMin || aMin > bMax)
 					return nullptr;
 
-				double overlap = ((aMin + aMax) * 0.5 < (bMin + bMax) * 0.5) ? aMax - bMin : bMax - aMin;
+				double overlap = (aMin + aMax < bMin + bMax) ? aMax - bMin : bMax - aMin;
 				if (overlap < minOverlap) {
 					minOverlap = overlap;
 					bestAxis = axis;
@@ -281,16 +281,16 @@ class CollisionDetector {
 };
 
 CollisionDetector::JumpTable CollisionDetector::jumpTable {
-    { BaseCollider::POLYGON, {
-        { BaseCollider::POLYGON, CollisionDetector::PolygonModel_PolygonModel },
-        { BaseCollider::CIRCLE, CollisionDetector::PolygonModel_CircleModel }
+    { Collider::POLYGON, {
+        { Collider::POLYGON, CollisionDetector::PolygonModel_PolygonModel },
+        { Collider::CIRCLE, CollisionDetector::PolygonModel_CircleModel }
     } },
-    { BaseCollider::CIRCLE, {
-        { BaseCollider::POLYGON, CollisionDetector::CircleModel_PolygonModel },
-        { BaseCollider::CIRCLE, CollisionDetector::CircleModel_CircleModel }
+    { Collider::CIRCLE, {
+        { Collider::POLYGON, CollisionDetector::CircleModel_PolygonModel },
+        { Collider::CIRCLE, CollisionDetector::CircleModel_CircleModel }
     } }
 };
 
-STATIC_FN(CollisionDetector, collide, bool)(BaseCollider* a, BaseCollider* b) {
+STATIC_FN(CollisionDetector, collide, bool)(Collider* a, Collider* b) {
 	return (bool)CollisionDetector::collide(a, { }, 1.0, 0.0, b, { }, 1.0, 0.0);
 }

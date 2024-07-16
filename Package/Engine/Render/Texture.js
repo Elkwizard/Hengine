@@ -31,6 +31,18 @@ class Texture extends ImageType {
 		this.loops = false;
 	}
 	/**
+	 * Returns a 2D array of the colors for all pixels in the texture.
+	 * The first index is the x coordinate, the second the y
+	 * @return Color[][]
+	 */
+	get pixels() {
+		const { width, height } = this;
+		const result = Array.dim(width, height);
+		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++)
+			result[i][j] = this.getPixel(i, j, true).get();
+		return result;
+	}
+	/**
 	 * Returns a 2D array of the brightness values for all pixels in the texture.
 	 * The first index is the x coordinate, the second the y.
 	 * @return Number[][]
@@ -281,7 +293,7 @@ class Texture extends ImageType {
 	 * @param Number y | The y coordinate of the upper-left corner of the region.
 	 * @param Number width | The width of the region
 	 * @param Number height | The height of the region
-	 * @return Frame
+	 * @return Texture
 	 */
 	static fromImageType(image, x, y, width, height) {
 		if (typeof x === "object") ({ x, y, width, height } = x);

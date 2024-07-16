@@ -64,7 +64,7 @@ class RigidBody {
 
 		std::vector<Vector> prohibitedDirections { };
 
-		std::vector<BaseCollider*> shapes { };
+		std::vector<Collider*> shapes { };
 		std::vector<Constraint*> constraints { };
 
 		RigidBody(double x, double y, bool _dynamic);
@@ -79,13 +79,13 @@ class RigidBody {
 		void updateLastData();
 		void displace(const Vector& v);
 		void invalidateModels();
-		BaseModel* getModel(int i);
-		std::vector<BaseModel*> getModels();
-		BaseModel* cacheModel(int i);
-		std::vector<BaseModel*> cacheModels();
+		Model* getModel(int i);
+		std::vector<Model*> getModels();
+		Model* cacheModel(int i);
+		std::vector<Model*> cacheModels();
 		void clearShapes();
-		void removeShape(BaseCollider* shape);
-		void addShape(BaseCollider* shape);
+		void removeShape(Collider* shape);
+		void addShape(Collider* shape);
 		void integrate(double intensity);
 		void integratePosition(double intensity);
 		void stop();
@@ -104,8 +104,8 @@ using Bodies = std::vector<RigidBody*>;
 CONSTRUCT(RigidBody)(double x, double y, bool dynamic) { return new RigidBody(x, y, dynamic); }
 FREE(RigidBody);
 
-FN(RigidBody, addShape, void)(RigidBody* body, BaseCollider* shape) { body->addShape(shape); }
-FN(RigidBody, removeShape, void)(RigidBody* body, BaseCollider* shape) { body->removeShape(shape); }
+FN(RigidBody, addShape, void)(RigidBody* body, Collider* shape) { body->addShape(shape); }
+FN(RigidBody, removeShape, void)(RigidBody* body, Collider* shape) { body->removeShape(shape); }
 FN_NO(RigidBody, stop)
 FN_NO(RigidBody, invalidateModels)
 FN(RigidBody, applyImpulse, void)(RigidBody* body, Vector* point, Vector* impulse) {

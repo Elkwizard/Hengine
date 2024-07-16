@@ -49,7 +49,7 @@ RigidBody::RigidBody(double x, double y, bool _dynamic) {
 }
 
 RigidBody::~RigidBody() {
-	for (BaseCollider* collider : shapes)
+	for (Collider* collider : shapes)
 		delete collider;
 }
 
@@ -104,40 +104,40 @@ void RigidBody::integratePosition(double intensity) { // does not move models, o
 void RigidBody::displace(const Vector& v) {
 	if (!dynamic) return;
 	position += v;
-	for (BaseCollider* collider : shapes)
+	for (Collider* collider : shapes)
 		collider->displaceCache(v);
 }
 
 void RigidBody::invalidateModels() {
-	for (BaseCollider* collider : shapes)
+	for (Collider* collider : shapes)
 		collider->invalidateCache();
 }
 
-BaseModel* RigidBody::getModel(int i) {
-	BaseCollider* shape = shapes[i];
+Model* RigidBody::getModel(int i) {
+	Collider* shape = shapes[i];
 	shape->invalidateCache();
 	return shape->cacheModel(position, cosAngle, sinAngle);
 }
 
-std::vector<BaseModel*> RigidBody::getModels() {
-	std::vector<BaseModel*> models { };
+std::vector<Model*> RigidBody::getModels() {
+	std::vector<Model*> models { };
 	for (int i = 0; i < shapes.size(); i++)
 		models.push_back(getModel(i));
 	return models;
 }
 
-BaseModel* RigidBody::cacheModel(int i) {
+Model* RigidBody::cacheModel(int i) {
 	return shapes[i]->cacheModel(position, cosAngle, sinAngle);
 }
 
-std::vector<BaseModel*> RigidBody::cacheModels() {
-	std::vector<BaseModel*> models { };
+std::vector<Model*> RigidBody::cacheModels() {
+	std::vector<Model*> models { };
 	for (int i = 0; i < shapes.size(); i++)
 		models.push_back(cacheModel(i));
 	return models;
 }
 
-void RigidBody::addShape(BaseCollider* sh) {
+void RigidBody::addShape(Collider* sh) {
 	shapes.push_back(sh);
 	sh->computeMatterData();
 	mass += sh->mass * density;
@@ -147,7 +147,7 @@ void RigidBody::addShape(BaseCollider* sh) {
 	invalidateModels();
 }
 
-void RigidBody::removeShape(BaseCollider* sh) {
+void RigidBody::removeShape(Collider* sh) {
 	auto it = std::find(shapes.begin(), shapes.end(), sh);
 	if (it != shapes.end()) {
 		shapes.erase(it);
@@ -159,7 +159,7 @@ void RigidBody::removeShape(BaseCollider* sh) {
 		mass = 0.0;
 		inertia = 0.0;
 		boundingRadius = 0.0;
-		for (BaseCollider* shape : shapes) {
+		for (Collider* shape : shapes) {
 			mass += shape->mass * density;
 			inertia += shape->inertia * density;
 			if (shape->boundingRadius > boundingRadius)
@@ -169,7 +169,7 @@ void RigidBody::removeShape(BaseCollider* sh) {
 }
 
 void RigidBody::clearShapes() {
-	for (BaseCollider* collider : shapes)
+	for (Collider* collider : shapes)
 		delete collider;
 	shapes.clear();
 	invalidateModels();

@@ -6,7 +6,7 @@
 #define PI 3.14159265358979323846
 
 // PolygonCollider
-PolygonCollider::PolygonCollider(const std::vector<Vector>& _vertices) : BaseCollider(POLYGON) {
+PolygonCollider::PolygonCollider(const std::vector<Vector>& _vertices) : Collider(POLYGON) {
 	vertices = _vertices;
 	position = { };
 	for (const Vector& vec : vertices)
@@ -33,7 +33,7 @@ PolygonCollider::PolygonCollider(const std::vector<Vector>& _vertices) : BaseCol
 	};
 
 	// models
-	model = std::unique_ptr<BaseModel>(new PolygonModel(*this));
+	model = std::unique_ptr<Model>(new PolygonModel(*this));
 }
 
 void PolygonCollider::computeMatterData() {
@@ -93,7 +93,7 @@ void PolygonCollider::computeMatterData() {
 	}
 }
 
-PolygonModel::PolygonModel(const PolygonCollider& _collider) : BaseModel(_collider) {
+PolygonModel::PolygonModel(const PolygonCollider& _collider) : Model(_collider) {
 	const PolygonCollider& col = (const PolygonCollider&)collider;
 	vertices.resize(col.vertices.size());
 	axes.resize(col.axes.size());
@@ -128,11 +128,11 @@ void PolygonModel::displace(const Vector& v) {
 }
 
 // CircleCollider
-CircleCollider::CircleCollider(double x, double y, double _radius) : BaseCollider(CIRCLE) {
+CircleCollider::CircleCollider(double x, double y, double _radius) : Collider(CIRCLE) {
 	position = { x, y };
 	radius = _radius;
 	boundingRadius = position.mag() + radius;
-	model = std::unique_ptr<BaseModel>(new CircleModel(*this));
+	model = std::unique_ptr<Model>(new CircleModel(*this));
 }
 
 void CircleCollider::computeMatterData() {
@@ -140,7 +140,7 @@ void CircleCollider::computeMatterData() {
 	inertia = position.sqrMag() + 1.25 * pow(radius, 2) * mass;
 }
 
-CircleModel::CircleModel(const CircleCollider& _collider) : BaseModel(_collider) {
+CircleModel::CircleModel(const CircleCollider& _collider) : Model(_collider) {
 	position = { };
 	radius = 0.0;
 }

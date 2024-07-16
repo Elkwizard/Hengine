@@ -5,44 +5,44 @@
 
 #include "vector.hpp"
 
-class BaseCollider;
+class Collider;
 
-class BaseModel {
+class Model {
 	protected:
-		const BaseCollider& collider;
+		const Collider& collider;
 
 	public:
-		BaseModel(const BaseCollider& _collider) : collider(_collider) { }
+		Model(const Collider& _collider) : collider(_collider) { }
 
-		virtual ~BaseModel() { }
+		virtual ~Model() { }
 		virtual void update(const Vector& pos, double cos, double sin) = 0;
 		virtual void displace(const Vector& displacement) = 0;
 };
 
-class BaseCollider {
+class Collider {
 	public:
 		enum Type { POLYGON, CIRCLE };
 
 		Type type;
 		bool cacheValid;
-		std::unique_ptr<BaseModel> model;
+		std::unique_ptr<Model> model;
 		
 		double mass, inertia;
 		double boundingRadius;
 
-		BaseCollider(Type _type) {
+		Collider(Type _type) {
 			type = _type;
 			cacheValid = false;
 		}
 
-		virtual ~BaseCollider() { }
+		virtual ~Collider() { }
 		virtual void computeMatterData() = 0;
 
 		void invalidateCache() {
 			cacheValid = false;
 		}
 
-		BaseModel* cacheModel(const Vector& pos, double cos, double sin) {
+		Model* cacheModel(const Vector& pos, double cos, double sin) {
 			if (cacheValid) return model.get();
 			else {
 				cacheValid = true;
@@ -56,7 +56,7 @@ class BaseCollider {
 		}
 };
 
-class PolygonCollider : public BaseCollider {
+class PolygonCollider : public Collider {
     public:
 		std::vector<Vector> vertices;
 		std::vector<Vector> axes;
@@ -71,7 +71,7 @@ CONSTRUCT(PolygonCollider)(NativeVectorArray* vertices) {
 }
 FREE(PolygonCollider)
 
-class PolygonModel : public BaseModel {
+class PolygonModel : public Model {
 	public:
 		std::vector<Vector> vertices;
 		std::vector<Vector> axes;
@@ -83,7 +83,7 @@ class PolygonModel : public BaseModel {
 		void displace(const Vector& v) override;
 };
 
-class CircleCollider : public BaseCollider {
+class CircleCollider : public Collider {
     public:
 		Vector position;
 		double radius;
@@ -97,7 +97,7 @@ CONSTRUCT(CircleCollider)(double x, double y, double radius) {
 }
 FREE(CircleCollider)
 
-class CircleModel : public BaseModel {
+class CircleModel : public Model {
     public:
 		Vector position;
 		double radius;

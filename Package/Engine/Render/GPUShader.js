@@ -45,6 +45,12 @@ class GPUShader extends ImageType {
 		Object.shortcut(this, this.gpu, "glsl");
 		this.loaded = false;
 	}
+	onresize() {
+		const { image } = this.gpu;
+		image.width = this.pixelWidth;
+		image.height = this.pixelHeight;
+		this.loaded = false;
+	}
 	makeImage() {
 		if (!this.loaded || this.gpu.program.uniformsChanged) {
 			this.loaded = true;
@@ -99,12 +105,6 @@ GPUShader.Interface = class GPUShaderInterface extends GPUInterface {
 			}	
 		`;
 	}
-	onresize() {
-		const { image } = this.gpu;
-		image.width = this.pixelWidth;
-		image.height = this.pixelHeight;
-		this.loaded = false;
-	}
 	compile() {
 		super.compile();
 
@@ -126,6 +126,7 @@ GPUShader.Interface = class GPUShaderInterface extends GPUInterface {
 		
 		const { gl } = this;
 
+		gl.viewport(0, 0, this.image.width, this.image.height);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		gl.flush();

@@ -4845,6 +4845,11 @@ declare class Texture extends ImageType implements Copyable, Serializable {
 	 */
 	loops: boolean;
 	/**
+	 * Returns a 2D array of the colors for all pixels in the texture.
+	 * The first index is the x coordinate, the second the y
+	 */
+	get pixels(): Color[][];
+	/**
 	 * Returns a 2D array of the brightness values for all pixels in the texture.
 	 * The first index is the x coordinate, the second the y.
 	 */

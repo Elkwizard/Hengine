@@ -18,7 +18,7 @@
  * </table>
  * 
  * Though they are not present in any GLSL language standard, the GPUInterface supports dynamic-length, global, uniform struct arrays. 
- * hese are specified by omitting the length when declaring the array.
+ * These are specified by omitting the length when declaring the array.
  * Though they can be used like normal arrays (indexed with `array[index]` and measured with `array.length()`), they cannot be cast to normal arrays.
  * Dynamic-length arrays' elements do not count toward the uniform limit, and can freely contain millions of elements on most platforms.
  * 

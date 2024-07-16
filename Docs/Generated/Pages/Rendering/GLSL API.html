@@ -31,7 +31,7 @@ These associations are laid out in the following table:
 </table>
 
 Though they are not present in any GLSL language standard, the GPUInterface supports dynamic-length, global, uniform struct arrays. 
-hese are specified by omitting the length when declaring the array.
+These are specified by omitting the length when declaring the array.
 Though they can be used like normal arrays (indexed with <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">array</span><span class="highlight-SYMBOL">[</span><span class="highlight-IDENTIFIER">index</span><span class="highlight-SYMBOL">]</span></code> and measured with <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">array</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">length</span><span class="highlight-SYMBOL">()</span></code>), they cannot be cast to normal arrays.
 Dynamic-length arrays' elements do not count toward the uniform limit, and can freely contain millions of elements on most platforms.
 
