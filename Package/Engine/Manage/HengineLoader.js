@@ -116,7 +116,8 @@ class HengineSoundResource extends HengineResource {
  */
 class HengineImageResource extends HengineResource {
 	load() {
-		const image = new Image(this.src);
+		const image = new Image();
+		image.src = this.src;
 		return new Promise(resolve => {
 			image.addEventListener("load", () => resolve(new HImage(image)));
 			image.addEventListener("error", () => resolve(null));
