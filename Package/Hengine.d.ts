@@ -4926,7 +4926,7 @@ declare class Texture extends ImageType implements Copyable, Serializable {
 	 * The copy will have the same dimensions as the original, so if the original has a pixel ratio greater than 1, this operation will result in a loss of detail.
 	 * @param image - The image to copy data from
 	 */
-	static fromImageType(image: ImageType): Frame;
+	static fromImageType(image: ImageType): Texture;
 	/**
 	 * Returns a texture containing the (optionally clipped) contents of an image.
 	 * If no clipping parameters are provided, the whole image will be copied.
@@ -4934,7 +4934,7 @@ declare class Texture extends ImageType implements Copyable, Serializable {
 	 * @param image - The image to copy data from
 	 * @param region - The region to extract
 	 */
-	static fromImageType(image: ImageType, region: Rect): Frame;
+	static fromImageType(image: ImageType, region: Rect): Texture;
 	/**
 	 * Returns a texture containing the (optionally clipped) contents of an image.
 	 * If no clipping parameters are provided, the whole image will be copied.
@@ -4945,7 +4945,7 @@ declare class Texture extends ImageType implements Copyable, Serializable {
 	 * @param width - The width of the region
 	 * @param height - The height of the region
 	 */
-	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): Frame;
+	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): Texture;
 	/**
 	 * Creates a new grayscale texture based on a 2D grid of brightness values.
 	 * @param brightness - The brightness values for each pixel in the texture. The first index is the x coordinate, the second the y
