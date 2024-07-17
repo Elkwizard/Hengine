@@ -40,10 +40,11 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="Range.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L15" target="_blank" class="function-name source-link">constructor</a>(<span class="param">void</span><span class="aux"> | </span><span class="param">min</span>, <span class="param">max</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L16" target="_blank" class="function-name source-link">constructor</a>(<span class="param">void</span><span class="aux"> | </span><span class="param">min</span>, <span class="param">max</span>)
 			</div>
 			<div class="function desc">
 				Creates a new interval, optionally with a specific min and max.
+If the arguments are not in ascending order, they will be reversed.
 If no arguments are provided, the interval will be empty. 
 			</div>
 			
@@ -81,7 +82,7 @@ If no arguments are provided, the interval will be empty.
 	
 		<div class="function-wrapper" id="get Range.prototype.middle()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L33" target="_blank" class="function-name source-link">middle</a><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L34" target="_blank" class="function-name source-link">middle</a><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the mean value of the range.
@@ -91,7 +92,7 @@ If no arguments are provided, the interval will be empty.
 	
 		<div class="function-wrapper" id="get Range.prototype.length()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L66" target="_blank" class="function-name source-link">length</a><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L67" target="_blank" class="function-name source-link">length</a><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the size of the interval represented by the range.
@@ -101,7 +102,7 @@ If no arguments are provided, the interval will be empty.
 	
 		<div class="function-wrapper" id="Range.prototype.clip()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L74" target="_blank" class="function-name source-link">clip</a>(<span class="param">range</span>)<span class="type">Range</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L75" target="_blank" class="function-name source-link">clip</a>(<span class="param">range</span>)<span class="type">Range</span>
 			</div>
 			<div class="function desc">
 				Returns the set intersection between the caller and another range.
@@ -128,7 +129,7 @@ If no arguments are provided, the interval will be empty.
 	
 		<div class="function-wrapper" id="Range.prototype.getDepth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L92" target="_blank" class="function-name source-link">getDepth</a>(<span class="param">value</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L93" target="_blank" class="function-name source-link">getDepth</a>(<span class="param">value</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the distance from a specified value to the closest bound of the range.
@@ -156,7 +157,7 @@ If the value is inside the range, the distance will be positive, otherwise, it w
 	
 		<div class="function-wrapper" id="Range.prototype.includes()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L100" target="_blank" class="function-name source-link">includes</a>(<span class="param">value</span>)<span class="type">Range</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L101" target="_blank" class="function-name source-link">includes</a>(<span class="param">value</span>)<span class="type">Range</span>
 			</div>
 			<div class="function desc">
 				Checks whether a value is within the current bounds of the range.
@@ -183,7 +184,7 @@ If the value is inside the range, the distance will be positive, otherwise, it w
 	
 		<div class="function-wrapper" id="Range.prototype.include()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L107" target="_blank" class="function-name source-link">include</a>(<span class="param">value</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L108" target="_blank" class="function-name source-link">include</a>(<span class="param">value</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Expands the Range to include a specified value.
@@ -210,7 +211,7 @@ If the value is inside the range, the distance will be positive, otherwise, it w
 	
 		<div class="function-wrapper" id="Range.prototype.intersect()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L116" target="_blank" class="function-name source-link">intersect</a>(<span class="param">range</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L117" target="_blank" class="function-name source-link">intersect</a>(<span class="param">range</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks if there is any overlap between the caller and another range.
@@ -237,7 +238,7 @@ If the value is inside the range, the distance will be positive, otherwise, it w
 	
 		<div class="function-wrapper" id="Range.fromValues()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L124" target="_blank" class="function-name source-link">Range.fromValues</a>(<span class="param">values</span>)<span class="type">Range</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L125" target="_blank" class="function-name source-link">Range.fromValues</a>(<span class="param">values</span>)<span class="type">Range</span>
 			</div>
 			<div class="function desc">
 				Returns the smallest range that contains every one of a collection of values.

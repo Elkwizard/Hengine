@@ -389,7 +389,7 @@ class MouseHandler extends InputHandler {
 		this.wheelDelta = 0;
 	}
 	/**
-	 * @group screenDragState, screenDragEnd, worldDragStart, worldDragEnd
+	 * @group screenDragStart, screenDragEnd, worldDragStart, worldDragEnd
 	 * Returns a location associated with a given key.
 	 * @param String name | The name of the key to check
 	 * @return Vector2

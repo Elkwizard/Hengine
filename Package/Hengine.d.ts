@@ -4414,11 +4414,13 @@ declare class Range {
 	max: number;
 	/**
 	 * Creates a new interval, optionally with a specific min and max.
+	 * If the arguments are not in ascending order, they will be reversed.
 	 * If no arguments are provided, the interval will be empty. 
 	 */
 	constructor();
 	/**
 	 * Creates a new interval, optionally with a specific min and max.
+	 * If the arguments are not in ascending order, they will be reversed.
 	 * If no arguments are provided, the interval will be empty. 
 	 * @param min - The lower bound
 	 * @param max - The upper bound
@@ -6517,7 +6519,7 @@ declare class MouseHandler extends InputHandler {
 	 * Returns a location associated with a given key.
 	 * @param name - The name of the key to check
 	 */
-	screenDragState(name: string): Vector2;
+	screenDragStart(name: string): Vector2;
 }
 
 /**

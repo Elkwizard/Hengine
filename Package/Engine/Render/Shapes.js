@@ -6,6 +6,7 @@
 class Range {
 	/**
 	 * Creates a new interval, optionally with a specific min and max.
+	 * If the arguments are not in ascending order, they will be reversed.
 	 * If no arguments are provided, the interval will be empty. 
 	 * @signature
 	 * @signature
