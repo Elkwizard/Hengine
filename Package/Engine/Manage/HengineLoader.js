@@ -751,7 +751,7 @@ class HengineLoader {
 		if (PathManager.isRoot(src)) {
 			const resource = this.resources.get(src);
 			if (resource) {
-				if ("get" in resource) return resource.get();
+				if (resource.get) return resource.get();
 				return resource;
 			}
 
@@ -762,7 +762,7 @@ class HengineLoader {
 				if (path.replace(/\\/g, "/").endsWith(processed)) {
 					const resource = this.resources.get(path);
 					if (resource) {
-						if ("get" in resource) return resource.get();
+						if (resource.get) return resource.get();
 						return resource;
 					}
 		
