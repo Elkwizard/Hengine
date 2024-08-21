@@ -5862,6 +5862,11 @@ declare class PHYSICS extends ElementScript {
 	 */
 	get constraints(): Constraint[];
 	/**
+	 * Retrieves the moment of inertia for the object.
+	 * This will return null if used during the frame the PHYSICS script was added.
+	 */
+	get inertia(): number | null;
+	/**
 	 * Applies an impulse to a specific point on the object.
 	 * @param point - The world-space point at which the impulse should be applied
 	 * @param impulse - The impulse to apply

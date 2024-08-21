@@ -162,6 +162,14 @@ class PHYSICS extends ElementScript {
 	get mass() {
 		return this.synchronized ? this.body.mass : this._mass;
 	}
+	/**
+	 * Retrieves the moment of inertia for the object.
+	 * This will return null if used during the frame the PHYSICS script was added.
+	 * @return Number/null
+	 */
+	get inertia() {
+		return this.synchronized ? this.body.inertia : null;
+	}
 	set snuzzlement(a) {
 		this.body.restitution = 1 - a;
 	}
