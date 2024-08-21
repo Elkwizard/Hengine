@@ -105,6 +105,14 @@ class Random {
         return Interpolation.lerp(a, b, this.random());
     }
 	/**
+	 * Returns a random valid index for a given array. Unstable.
+	 * @param Any[] arr | The array to choose an index for
+	 * @return Number
+	 */
+	index(arr) {
+		return this.int(0, arr.length - 1);
+	}
+	/**
 	 * Returns a random angle in radians on [0, 2π). Unstable.
 	 * @return Number
 	 */
@@ -167,11 +175,26 @@ class Random {
 		return region.middle;
 	}
 	/**
+	 * Randomly orders an array in-place. Unstable.
+	 * @param Any[] arr | The array to reorder
+	 * @return Any[]
+	 */
+	shuffle(arr) {
+		for (let i = 0; i < arr.length; i++) {
+			const inx = this.index(arr);
+			const t = arr[i];
+			arr[i] = arr[inx];
+			arr[inx] = t;
+		}
+
+		return arr;
+	}
+	/**
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @signature
-	 * @param Iterable<Any> values | The values to choose from
+	 * @param Iterable values | The values to choose from
 	 * @signature
-	 * @param Iterable<Any> values | The values to choose from
+	 * @param Iterable values | The values to choose from
 	 * @param Number[] percentages | The weight of each value. These can be multiplied by any constant factor
 	 * @return Any
 	 */
@@ -197,7 +220,7 @@ class Random {
     }
 	/**
 	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
-	 * @param Iterable<Any> values | The values to sample from 
+	 * @param Iterable values | The values to sample from 
 	 * @param Number quantity | The size of the sample
 	 * @return Any[]
 	 */
@@ -211,7 +234,7 @@ class Random {
     }
 	/**
 	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
-	 * @param Iterable<Any> values | The values to sample from 
+	 * @param Iterable values | The values to sample from 
 	 * @param Number quantity | The size of the sample
 	 * @return Any[]
 	 */

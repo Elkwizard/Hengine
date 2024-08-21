@@ -1751,6 +1751,11 @@ declare class Random {
 	 */
 	range(min: number, max: number): number;
 	/**
+	 * Returns a random valid index for a given array. Unstable.
+	 * @param arr - The array to choose an index for
+	 */
+	index(arr: any[]): number;
+	/**
 	 * Returns a random angle in radians on [0, 2π). Unstable.
 	 */
 	angle(): number;
@@ -1771,28 +1776,33 @@ declare class Random {
 	 */
 	inShape(region: Shape): Vector2;
 	/**
+	 * Randomly orders an array in-place. Unstable.
+	 * @param arr - The array to reorder
+	 */
+	shuffle(arr: any[]): any[];
+	/**
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @param values - The values to choose from
 	 */
-	choice(values: Iterable<any>): any;
+	choice(values: Iterable): any;
 	/**
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @param values - The values to choose from
 	 * @param percentages - The weight of each value. These can be multiplied by any constant factor
 	 */
-	choice(values: Iterable<any>, percentages: number[]): any;
+	choice(values: Iterable, percentages: number[]): any;
 	/**
 	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
 	 * @param values - The values to sample from
 	 * @param quantity - The size of the sample
 	 */
-	sample(values: Iterable<any>, quantity: number): any[];
+	sample(values: Iterable, quantity: number): any[];
 	/**
 	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
 	 * @param values - The values to sample from
 	 * @param quantity - The size of the sample
 	 */
-	sampleWithoutReplacement(values: Iterable<any>, quantity: number): any[];
+	sampleWithoutReplacement(values: Iterable, quantity: number): any[];
 	/**
 	 * Returns the sum of a specified number of octaves of a specified type of noise.
 	 * @param octaves - The number of octaves
@@ -1892,6 +1902,11 @@ declare class Random {
 	 */
 	static range(min: number, max: number): number;
 	/**
+	 * Returns a random valid index for a given array. Unstable.
+	 * @param arr - The array to choose an index for
+	 */
+	static index(arr: any[]): number;
+	/**
 	 * Returns a random angle in radians on [0, 2π). Unstable.
 	 */
 	static angle(): number;
@@ -1912,28 +1927,33 @@ declare class Random {
 	 */
 	static inShape(region: Shape): Vector2;
 	/**
+	 * Randomly orders an array in-place. Unstable.
+	 * @param arr - The array to reorder
+	 */
+	static shuffle(arr: any[]): any[];
+	/**
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @param values - The values to choose from
 	 */
-	static choice(values: Iterable<any>): any;
+	static choice(values: Iterable): any;
 	/**
 	 * Chooses an (optionally weighted) random element from an array. Unstable.
 	 * @param values - The values to choose from
 	 * @param percentages - The weight of each value. These can be multiplied by any constant factor
 	 */
-	static choice(values: Iterable<any>, percentages: number[]): any;
+	static choice(values: Iterable, percentages: number[]): any;
 	/**
 	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
 	 * @param values - The values to sample from
 	 * @param quantity - The size of the sample
 	 */
-	static sample(values: Iterable<any>, quantity: number): any[];
+	static sample(values: Iterable, quantity: number): any[];
 	/**
 	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
 	 * @param values - The values to sample from
 	 * @param quantity - The size of the sample
 	 */
-	static sampleWithoutReplacement(values: Iterable<any>, quantity: number): any[];
+	static sampleWithoutReplacement(values: Iterable, quantity: number): any[];
 	/**
 	 * Returns the sum of a specified number of octaves of a specified type of noise.
 	 * @param octaves - The number of octaves
