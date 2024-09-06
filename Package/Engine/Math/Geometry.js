@@ -683,6 +683,39 @@ class Geometry {
 		return Geometry.subdividePolygonList(poly.vertices)
 			.map(v => new Polygon(v));
 	}
+	static clipPolygon(polygon, normal, distance) {
+		const result = this.clipPolygonList([...polygon.vertices], normal, distance);
+		return result ? new Polygon(result) : null;
+	}
+	static clipPolygonList(list, normal, distance) {
+		let remain = false;
+		for (let i = 0; i < list.length; i++) {
+			const a = list[i];
+			const dotA = a.dot(normal);
+			const remA = dotA <= distance;
+
+			remain ||= dotA <= distance;
+			
+			const b = list[(i + 1) % list.length];
+			const dotB = b.dot(normal);
+			const remB = dotB <= distance;
+
+			if (remA !== remB) {
+				const vec = b.minus(a);
+				const rate = vec.dot(normal);
+				const t = (distance - dotA) / rate;
+				const p = a.plus(vec.times(t));
+				list.splice(++i, 0, p);
+			}
+		}
+
+		distance += Geometry.EPSILON;
+		for (let i = 0; i < list.length; i++)
+			if (list[i].dot(normal) > distance)
+				list.splice(i--, 1);
+
+		return remain ? list : null;
+	}
 	/**
 	 * Returns the point of intersection between a line segment and a ray, or null if they don't intersect
 	 * @param Vector2 rayOrigin | The origin of the ray
@@ -745,61 +778,23 @@ class Geometry {
 		return aVector.times(t).add(aOrigin);
 	}
 	/**
-	 * Returns the region of intersection between two polygons, or null if they don't intersect.
+	 * Returns the region of intersection between two convex polygons, or null if they don't intersect.
 	 * @param Polygon a | The first polygon
 	 * @param Polygon b | The second polygon
 	 * @return Polygon/null
 	 */
 	static intersectPolygonPolygon(a, b) {
-		const getOverlapFrom = (a, b, i) => {
-			let aEdges = a.getEdges();
-			let bEdges = b.getEdges();
-			let aVerts = a.vertices;
-			let bVerts = b.vertices;
-			
-			const vertices = [];
-			let lastIntersect = null;
+		const result = [...a.vertices];
+		const clips = b.getEdges();
 
-			traverseLoop: do {			
-				if (!lastIntersect) vertices.push(aVerts[i]);
+		for (let i = 0; i < clips.length; i++) {
+			const edge = clips[i];
+			const { normal } = edge.vector;
+			if (!Geometry.clipPolygonList(result, normal, normal.dot(edge.a)))
+				return null;
+		}
 
-				const edge = new Line(vertices.last, aEdges[i].b);
-				for (let j = 0; j < bVerts.length; j++) {
-					const bEdge = bEdges[j];
-					if (bEdge === lastIntersect) continue;
-					const vec = Geometry.intersectLineLine(edge, bEdge);
-					if (vec && (
-						bEdges[(j - 1 + bEdges.length) % bEdges.length] !== lastIntersect ||
-						Vector2.sqrDist(vertices.last, vec) >= Geometry.EPSILON
-					)) {
-						lastIntersect = aEdges[i];
-						[aVerts, bVerts] = [bVerts, aVerts];
-						[aEdges, bEdges] = [bEdges, aEdges];
-						[a, b] = [b, a];
-						i = j;
-						vertices.push(vec);
-						continue traverseLoop;
-					}
-				}
-	
-				lastIntersect = null;
-				
-				i = (i + 1) % aVerts.length;
-	
-			} while (aVerts[i] !== vertices[0]);
-	
-			return new Polygon(vertices);
-		};
-	
-		for (let i = 0; i < a.vertices.length; i++)
-			if (b.containsPoint(a.vertices[i]))
-				return getOverlapFrom(a, b, i);
-	
-		for (let i = 0; i < b.vertices.length; i++)
-			if (a.containsPoint(b.vertices[i]))
-				return getOverlapFrom(b, a, i);
-		
-		return null;
+		return new Polygon(result);
 	}
 	
 }

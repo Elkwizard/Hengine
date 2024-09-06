@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifdef __INTELLISENSE__
 	#define EMSCRIPTEN_KEEPALIVE 
 #else
@@ -12,13 +11,13 @@ extern "C" void printFloat(double);
 extern "C" void printLn();
 extern "C" void fullExit();
 
-template <typename T>
-void printElement(T value) requires std::integral<T> {
+template <std::integral T>
+void printElement(T value) {
 	printInt(value);
 }
 
-template <typename T>
-void printElement(T value) requires std::floating_point<T> {
+template <std::floating_point T>
+void printElement(T value) {
 	printFloat(value);
 }
 
