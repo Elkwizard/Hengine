@@ -40,7 +40,7 @@ class WebcamCapture extends ImageType {
 		this.recording = true;
 	}
 	makeImage() {
-		if ((this.recording && performance.now() - this.lastCaptureTime > 16)) {
+		if ((this.recording && performance.now() - this.lastCaptureTime > 15)) {
 			const size = this.width;
 			this.c.drawImage(this.video, this.offsetX, this.offsetY, size, size, 0, 0, size, size);
 			this.lastCaptureTime = performance.now();

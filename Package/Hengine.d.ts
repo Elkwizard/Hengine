@@ -1002,7 +1002,7 @@ declare class Geometry {
 	 */
 	static intersectLineLine(a: Line, b: Line): Vector2 | null;
 	/**
-	 * Returns the region of intersection between two polygons, or null if they don't intersect.
+	 * Returns the region of intersection between two convex polygons, or null if they don't intersect.
 	 * @param a - The first polygon
 	 * @param b - The second polygon
 	 */
