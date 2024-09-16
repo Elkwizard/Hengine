@@ -880,13 +880,13 @@ HengineLoader.engineResources = [
 		"Math/PhysicsAPI.js",
 		"Math/Random.js",
 		"Math/Interpolation.js",
-		"Math/GPUComputation.js",
 
 		"Render/Frame.js",
 		"Render/Gradient.js",
 		"Render/Spline.js",
 		"Render/WebGL2DContext.js",
-		"Render/GrayMap.js"
+		"Render/GrayMap.js",
+		"Render/GPUInterface.js"
 	],
 	[ // basic dependencies
 		"Util/Input.js",
@@ -905,6 +905,7 @@ HengineLoader.engineResources = [
 
 		"Math/Vector.js",
 		"Math/Geometry.js",
+		"Math/GPUComputation.js",
 
 		"Render/Font.js",
 		"Render/Shapes.js",

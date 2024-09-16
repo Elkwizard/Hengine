@@ -1010,107 +1010,6 @@ declare class Geometry {
 }
 
 /**
- * Represents an array of GLSL structs.
- * These structs may be nested.
- * These are used to represent GLSL dynamic-length array uniforms and the output of GPUComputations, but should not be constructed directly.
- * For a struct such as:
- * ```glsl
- * struct Circle {
- * 	vec2 position;
- * 	float radius;
- * 	vec3 color;
- * };
- * ```
- * A GPUArray could be used as follows:
- * ```js
- * // gpu is a GPUInterface
- * const circle = {
- * 	position: new Vector2(100, 200),
- * 	radius: 22.5,
- * 	color: new Color("magenta")
- * };
- * gpu.getArgument("circles").append(circle);
- * ```
- */
-declare class GPUArray {
-	/**
-	 * A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to
-	 */
-	buffer: ByteBuffer;
-	/**
-	 * Retrieves the number of structs in the array.
-	 */
-	get length(): number;
-	/**
-	 * Sets the value of the array and returns the caller.
-	 * This will overwrite all previous data.
-	 * @param value - An array of objects with the same structure as the struct
-	 */
-	set(value: object[]): this;
-	/**
-	 * Sets the value of the array and returns the caller.
-	 * This will overwrite all previous data.
-	 * @param value - Another GPU array to copy from. This must represent the same type of structs. Using this signature is faster, and should be done whenever possible
-	 */
-	set(value: this): this;
-	/**
-	 * Appends a struct to the end of the array and returns the caller.
-	 * @param value - An object with the same structure as the struct
-	 */
-	append(value: object): this;
-	/**
-	 * Writes to a specified location in the array and returns the caller.
-	 * This may increase the size of the array, but cannot be used to create holes.
-	 * @param data - An array of objects with the same structure as the struct
-	 * @param offset - The first index to write to in the array. Default is 0
-	 * @param length - The amount of elements to write. If not specified, this will be as many as possible
-	 * @param srcOffset - The first index to read from the data argument. If not specified, this will be the same as the offset argument
-	 */
-	write(data: object[], offset?: number, length?: number, srcOffset?: number): this;
-	/**
-	 * Reads from a specified location in the array into a provided array of objects, and returns the destination array.
-	 * @param data - An array of objects with the same structure as the struct
-	 * @param offset - The first index to read from in the array. Default is 0
-	 * @param length - The amount of elements to read. If not specified, this will be as many as possible
-	 * @param dstOffset - The first index to write to in the data argument. If not specified, this will be the same as the offset argument
-	 */
-	read(data: object[], offset?: number, length?: number, dstOffset?: number): object[];
-}
-
-/**
- * Represents a GLSL program.
- * This is an abstract superclass and should not be constructed.
- */
-declare interface GPUInterface {
-	/**
-	 * The source code of the program
-	 */
-	glsl: string;
-	/**
-	 * Sets the value of a uniform in the program.
-	 * @param name - The name of the uniform
-	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
-	 */
-	setArgument(name: string, value: any): void;
-	/**
-	 * Sets the value of many uniforms at once.
-	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
-	 */
-	setArguments(uniforms: object): void;
-	/**
-	 * Retrieves the current value of a given uniform.
-	 * For the return type of this function, see the GLSL API.
-	 * @param name - The name of the uniform
-	 */
-	getArgument(name: string): any;
-	/**
-	 * Checks whether a given uniform exists.
-	 * @param name - The name of the uniform to check
-	 */
-	argumentExists(name: string): boolean;
-}
-
-/**
  * Represents a GLSL operation that can be run in parallel on the GPU.
  * The entry point for the GLSL operation is the `compute` function, which returns any struct type and takes no arguments.
  * ```glsl
@@ -5154,6 +5053,107 @@ declare class WebcamCapture extends ImageType {
  */
 declare class FastFrame extends Frame {
 	
+}
+
+/**
+ * Represents an array of GLSL structs.
+ * These structs may be nested.
+ * These are used to represent GLSL dynamic-length array uniforms and the output of GPUComputations, but should not be constructed directly.
+ * For a struct such as:
+ * ```glsl
+ * struct Circle {
+ * 	vec2 position;
+ * 	float radius;
+ * 	vec3 color;
+ * };
+ * ```
+ * A GPUArray could be used as follows:
+ * ```js
+ * // gpu is a GPUInterface
+ * const circle = {
+ * 	position: new Vector2(100, 200),
+ * 	radius: 22.5,
+ * 	color: new Color("magenta")
+ * };
+ * gpu.getArgument("circles").append(circle);
+ * ```
+ */
+declare class GPUArray {
+	/**
+	 * A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to
+	 */
+	buffer: ByteBuffer;
+	/**
+	 * Retrieves the number of structs in the array.
+	 */
+	get length(): number;
+	/**
+	 * Sets the value of the array and returns the caller.
+	 * This will overwrite all previous data.
+	 * @param value - An array of objects with the same structure as the struct
+	 */
+	set(value: object[]): this;
+	/**
+	 * Sets the value of the array and returns the caller.
+	 * This will overwrite all previous data.
+	 * @param value - Another GPU array to copy from. This must represent the same type of structs. Using this signature is faster, and should be done whenever possible
+	 */
+	set(value: this): this;
+	/**
+	 * Appends a struct to the end of the array and returns the caller.
+	 * @param value - An object with the same structure as the struct
+	 */
+	append(value: object): this;
+	/**
+	 * Writes to a specified location in the array and returns the caller.
+	 * This may increase the size of the array, but cannot be used to create holes.
+	 * @param data - An array of objects with the same structure as the struct
+	 * @param offset - The first index to write to in the array. Default is 0
+	 * @param length - The amount of elements to write. If not specified, this will be as many as possible
+	 * @param srcOffset - The first index to read from the data argument. If not specified, this will be the same as the offset argument
+	 */
+	write(data: object[], offset?: number, length?: number, srcOffset?: number): this;
+	/**
+	 * Reads from a specified location in the array into a provided array of objects, and returns the destination array.
+	 * @param data - An array of objects with the same structure as the struct
+	 * @param offset - The first index to read from in the array. Default is 0
+	 * @param length - The amount of elements to read. If not specified, this will be as many as possible
+	 * @param dstOffset - The first index to write to in the data argument. If not specified, this will be the same as the offset argument
+	 */
+	read(data: object[], offset?: number, length?: number, dstOffset?: number): object[];
+}
+
+/**
+ * Represents a GLSL program.
+ * This is an abstract superclass and should not be constructed.
+ */
+declare interface GPUInterface {
+	/**
+	 * The source code of the program
+	 */
+	glsl: string;
+	/**
+	 * Sets the value of a uniform in the program.
+	 * @param name - The name of the uniform
+	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
+	 */
+	setArgument(name: string, value: any): void;
+	/**
+	 * Sets the value of many uniforms at once.
+	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
+	 */
+	setArguments(uniforms: object): void;
+	/**
+	 * Retrieves the current value of a given uniform.
+	 * For the return type of this function, see the GLSL API.
+	 * @param name - The name of the uniform
+	 */
+	getArgument(name: string): any;
+	/**
+	 * Checks whether a given uniform exists.
+	 * @param name - The name of the uniform to check
+	 */
+	argumentExists(name: string): boolean;
 }
 
 /**
