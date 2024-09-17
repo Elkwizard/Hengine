@@ -106,8 +106,6 @@ GPUShader.Interface = class GPUShaderInterface extends GPUInterface {
 		`;
 	}
 	compile() {
-		super.compile();
-
 		this.vertexData = [
 			-1, 1,
 			1, 1,

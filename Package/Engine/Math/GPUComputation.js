@@ -134,14 +134,14 @@ class GPUComputation extends GPUInterface {
 			}
 		`;
 	}
-	compile() {
+	setup() {
 		this.struct = this.parsedGLSL.structs.get(
 			this.parsedGLSL.methods.get("compute").signature.type
 		);
 		this.output = new GPUArray(this.struct);
-		
-		super.compile();
-		
+		super.setup();
+	}
+	compile() {
 		this.vertexData = [
 			-1, 1,
 			1, 1,

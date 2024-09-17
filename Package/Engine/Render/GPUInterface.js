@@ -508,13 +508,17 @@ class GPUArray {
 }
 
 class GPUInputArray extends GPUArray {
-	constructor(gl, program, name, unit, struct) {
+	constructor(gl, name, unit, struct) {
 		super(struct);
 		this.gl = gl;
 		this.unit = unit;
 		this.struct = struct;
-		this.lengthLocation = gl.getUniformLocation(program, GPUInputArray.getNames(name).length);
-		this.texture = new GPUDataTexture(gl);
+		this.name = name;
+	}
+	setup(program) {
+		this.lengthLocation = this.gl.getUniformLocation(program, GPUInputArray.getNames(this.name).length);
+		this.texture = new GPUDataTexture(this.gl);
+		this.changed = true;
 	}
 	commit() {
 		if (this.changed) {
@@ -577,58 +581,25 @@ class GLSLProgram {
 		this.vs = vs;
 		this.fs = fs;
 		this.lockedValues = new Set(glsl.dynamicArrays.keys());
-
-		this.program = gl.createProgram();
-
-		// vertex shader
-		const vertex = gl.createShader(gl.VERTEX_SHADER);
-		gl.shaderSource(vertex, vs);
-		gl.compileShader(vertex);
-		gl.attachShader(this.program, vertex);
-
-		// fragment shader
-		const fragment = gl.createShader(gl.FRAGMENT_SHADER);
-		gl.shaderSource(fragment, fs);
-		gl.compileShader(fragment);
-		gl.attachShader(this.program, fragment);
-
-		// linking
-		gl.linkProgram(this.program);
-		gl.deleteShader(vertex);
-		gl.deleteShader(fragment);
-
-		if (!gl.getShaderParameter(vertex, gl.COMPILE_STATUS)) this.error("VERTEX_SHADER", gl.getShaderInfoLog(vertex));
-		if (!gl.getShaderParameter(fragment, gl.COMPILE_STATUS)) this.error("FRAGMENT_SHADER", gl.getShaderInfoLog(fragment));
-		if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) this.error("LINKING", gl.getProgramInfoLog(this.program));
-
-		const originalProgram = gl.getParameter(gl.CURRENT_PROGRAM);
-		this.use();
-
-		const queuedCalls = [];
-		const GL = new Proxy(gl, {
-			get(gl, method) {
-				if (typeof gl[method] === "function")
-					return gl.isContextLost() ? (...args) => queuedCalls.push({ method, args }) : gl[method].bind(gl);
-				return gl[method];
-			}
-		});
-		
-		gl.canvas.addEventListener("webglcontextrestored", event => {
-			event.preventDefault();
-			while (queuedCalls.length) {
-				const call = queuedCalls.pop();
-				gl[call.method](...call.args);
-			}
-		});
 		
 		{ // focus
 			this.focused = false;
 			const useProgram = gl.useProgram.bind(gl);
-			gl.useProgram = (program) => {
+			gl.useProgram = program => {
+				if (gl.isContextLost()) return;
 				this.focused = program === this.program;
 				useProgram(program);
 			};
+			gl.canvas.addEventListener("webglcontextlost", event => {
+				event.preventDefault();
+				this.focused = false;
+			});
 		};
+		
+		this.compileProgram();
+
+		const originalProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+		this.use();
 
 		{ // uniforms
 			const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
@@ -636,13 +607,16 @@ class GLSLProgram {
 			this.uniforms = {};
 			this.uniformValues = {};
 			this.uniformsSet = false;
+			this.allUniforms = [];
 
 			let nextTextureUnit = 0;
-			const maxTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-			
+			this.maxTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+
 			this.dynamicArrays = [];
 			for (const [name, array] of glsl.dynamicArrays) {
-				const gpuArray = new GPUInputArray(GL, this.program, name, nextTextureUnit++, glsl.structs.get(array.type));
+				const unit = nextTextureUnit++;
+				this.checkTextureUnit(unit);
+				const gpuArray = new GPUInputArray(gl, name, unit, glsl.structs.get(array.type));
 				this.uniformValues[name] = gpuArray;
 				this.dynamicArrays.push(gpuArray);
 			}
@@ -682,53 +656,71 @@ class GLSLProgram {
 					} else dataArray = new Float32Array(arrayLength);
 				}
 
-				const location = gl.getUniformLocation(this.program, name);
+				const self = this;
 
-				let set;
+				const desc = {
+					getLocation() {
+						this.location = gl.getUniformLocation(self.program, name);
+					},
+					setup() { },
+					setUniform(...args) {
+						if (gl.isContextLost()) return;
+						gl[setFunctionName](this.location, ...args);
+					},
+					set(value) { }
+				};
+
 				if (array && (rows !== 1 || columns !== 1)) { // an array of not single values
 					const size = rows * columns;
 
-					if (matrix) set = values => {
+					if (matrix) desc.set = function (values) {
 						for (let i = 0; i < values.length; i++)
 							dataArray.set(values[i], i * size);
-						GL[setFunctionName](location, false, dataArray);
+						this.setUniform(false, dataArray);
 					};
-					else set = values => {
+					else desc.set = function (values) {
 						for (let i = 0; i < values.length; i++) {
 							const baseIndex = i * size;
-							this.getVectorComponents(values[i]);
-							for (let j = 0; j < size; j++) dataArray[baseIndex + j] = this.vectorBuffer[j];
+							self.getVectorComponents(values[i]);
+							for (let j = 0; j < size; j++) dataArray[baseIndex + j] = self.vectorBuffer[j];
 						}
-						GL[setFunctionName](location, dataArray);
+						this.setUniform(dataArray);
 					};
 				} else {
 					if (matrix) {
-						set = value => {
+						desc.set = function (value) {
 							dataArray.set(value, 0);
-							GL[setFunctionName](location, false, dataArray);
+							this.setUniform(false, dataArray);
 						};
 					} else if (glsl.dynamicArrays.has(name)) {
 						const gpuArray = this.uniformValues[name];
-						gl[setFunctionName](location, gpuArray.unit);
+						desc.setup = function () {
+							gpuArray.setup(self.program);
+							this.setUniform(gpuArray.unit);
+						};
 
-						set = array => gpuArray.set(array);
+						desc.set = array => gpuArray.set(array);
 					} else if (texture) {
 						const textureUnit = nextTextureUnit;
 						const indices = new Int32Array(length).map((_, index) => index + textureUnit);
-						if (array) gl[setFunctionName](location, indices);
-						else gl[setFunctionName](location, indices[0]);
-						
-						for (let i = 0; i < length; i++) {
-							const texture = gl.createTexture();
-							const textureIndex = indices[i];
-							gl.activeTexture(gl.TEXTURE0 + textureIndex);
-							gl.bindTexture(gl.TEXTURE_2D, texture);
+						this.checkTextureUnit(textureUnit + length - 1);
 
-							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-							gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-						}
+						desc.setup = function () {
+							for (let i = 0; i < length; i++) {
+								const texture = gl.createTexture();
+								const textureIndex = indices[i];
+								gl.activeTexture(gl.TEXTURE0 + textureIndex);
+								gl.bindTexture(gl.TEXTURE_2D, texture);
+	
+								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+							}
+
+							if (array) this.setUniform(indices);
+							else this.setUniform(indices[0]);
+						};	
 
 						let pixelated = false;
 						const writeImage = (image, index = 0) => {
@@ -744,20 +736,24 @@ class GLSLProgram {
 							}
 							GL.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
 						}
-						if (array) set = images => images.forEach(writeImage);
-						else set = image => writeImage(image);
-						if (nextTextureUnit + length > maxTextureUnits) this.error("TEXTURE", "Too many texture uniforms");
+						if (array) desc.set = images => images.forEach(writeImage);
+						else desc.set = image => writeImage(image);
 						nextTextureUnit += length;
 					} else {
-						if (setWithArrayType) set = value => {
+						if (setWithArrayType) desc.set = function (value) {
 							dataArray.set(value, 0);
-							GL[setFunctionName](location, dataArray);
+							this.setUniform(dataArray);
 						};
-						else set = (...values) => GL[setFunctionName](location, ...values);
+						else if (rows !== 1) {
+							desc.set = function (value) {
+								self.getVectorComponents(value);
+								this.setUniform(...self.vectorBuffer);
+							};
+						} else desc.set = function (value) {
+							this.setUniform(value);
+						};
 					}
 				}
-
-				const descriptor = { usesDataArray: !!dataArray, set };
 
 				let currentStruct = this.uniforms;
 				for (let i = 0; i < propertyPath.length; i++) {
@@ -765,12 +761,13 @@ class GLSLProgram {
 					const last = i === propertyPath.length - 1;
 
 					if (last) {
-						currentStruct[property] = descriptor;
+						currentStruct[property] = desc;
 					} else {
 						if (!(property in currentStruct)) currentStruct[property] = {};
 						currentStruct = currentStruct[property];
 					}
 				}
+				this.allUniforms.push(desc);
 			}
 
 			this.vectorBuffer = new Float32Array(4);
@@ -794,9 +791,63 @@ class GLSLProgram {
 		};
 
 		gl.useProgram(originalProgram);
+
+		this.initialize();
+		
+		gl.canvas.addEventListener("webglcontextrestored", event => {
+			event.preventDefault();
+			this.compileProgram();
+			this.initialize();
+		});
 	}
 	get uniformsChanged() {
 		return this.uniformsSet || this.dynamicArrays.some(array => array.changed);
+	}
+	checkTextureUnit(unit) {
+		if (unit >= this.maxTextureUnits)
+			this.error("TEXTURE", "Too many texture uniforms");
+	}
+	compileProgram() {
+		const { gl } = this;
+
+		this.program = gl.createProgram();
+
+		// vertex shader
+		const vertex = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(vertex, this.vs);
+		gl.compileShader(vertex);
+		gl.attachShader(this.program, vertex);
+
+		// fragment shader
+		const fragment = gl.createShader(gl.FRAGMENT_SHADER);
+		gl.shaderSource(fragment, this.fs);
+		gl.compileShader(fragment);
+		gl.attachShader(this.program, fragment);
+
+		// linking
+		gl.linkProgram(this.program);
+		gl.deleteShader(vertex);
+		gl.deleteShader(fragment);
+
+		if (!gl.getShaderParameter(vertex, gl.COMPILE_STATUS)) this.error("VERTEX_SHADER", gl.getShaderInfoLog(vertex));
+		if (!gl.getShaderParameter(fragment, gl.COMPILE_STATUS)) this.error("FRAGMENT_SHADER", gl.getShaderInfoLog(fragment));
+		if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) this.error("LINKING", gl.getProgramInfoLog(this.program));
+	}
+	initialize() {
+		this.focus();
+
+		// uniforms
+		this.uniformsSet = true;
+		for (let i = 0; i < this.allUniforms.length; i++) {
+			const desc = this.allUniforms[i];
+			desc.getLocation();
+			desc.setup();
+			if (desc.value) desc.set(desc.value);
+		}
+
+		// attributes
+		for (const key in this.attributes)
+			this.attributes[key].enabled = false;
 	}
 	commitUniforms() {
 		this.uniformsSet = false;
@@ -888,10 +939,8 @@ class GLSLProgram {
 			if (typeof child.set === "function") { // reached leaf
 				this.focus(); // need to be the gl.CURRENT_PROGRAM
 				this.uniformsSet = true;
-				if (value instanceof Operable) {
-					this.getVectorComponents(value);
-					child.set(...this.vectorBuffer);
-				} else child.set(value);
+				child.set(value);
+				child.value = typeof value === "object" ? value.get?.() ?? value : value;
 			} else {
 				const keys = Object.getOwnPropertyNames(child);
 				for (let i = 0; i < keys.length; i++) {
@@ -977,6 +1026,9 @@ class GPUInterface {
 		this.gl = this.image.getContext("webgl2");
 		if (!this.gl)
 			throw new Error("Your browser doesn't support WebGL");
+		
+		this.glsl = glsl;
+		
 		this.image.addEventListener("webglcontextlost", event => {
 			event.preventDefault();
 			console.warn("WebGL Context Lost");
@@ -986,12 +1038,11 @@ class GPUInterface {
 			console.warn("WebGL Context Restored");
 			this.compile();
 		});
-
-		this.glsl = glsl;
 	}
 	set glsl(a) {
 		this._glsl = a;
 		this.parsedGLSL = new GLSL(a);
+		this.setup();
 		this.compile();
 	}
 	get glsl() {
@@ -1007,7 +1058,7 @@ class GPUInterface {
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
 		this.program.setAttributes(vertexBuffer, 0);
 	}
-	compile() {
+	setup() {
 		const { vertexShader, prefix, fragmentShader } = this;
 		const version = "#version 300 es";
 		const glsl = this.parsedGLSL.toString();
@@ -1019,6 +1070,9 @@ class GPUInterface {
 			else console.warn(message);
 		});
 		this.program.use();
+	}
+	compile() {
+
 	}
 	/**
 	 * Sets the value of a uniform in the program.
