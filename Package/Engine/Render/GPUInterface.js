@@ -790,9 +790,9 @@ class GLSLProgram {
 			}
 		};
 
-		gl.useProgram(originalProgram);
-
 		this.initialize();
+
+		gl.useProgram(originalProgram);
 		
 		gl.canvas.addEventListener("webglcontextrestored", event => {
 			event.preventDefault();
@@ -834,6 +834,9 @@ class GLSLProgram {
 		if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) this.error("LINKING", gl.getProgramInfoLog(this.program));
 	}
 	initialize() {
+		const { gl } = this;
+		const originalProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+		
 		this.focus();
 
 		// uniforms
@@ -846,8 +849,14 @@ class GLSLProgram {
 		}
 
 		// attributes
-		for (const key in this.attributes)
-			this.attributes[key].enabled = false;
+		for (const key in this.attributes) {
+			const attrib = this.attributes[key];
+			attrib.enabled = false;
+			for (let i = 0; i < attrib.columns; i++)
+				gl.vertexAttribDivisor(attrib.location + i, attrib.divisor);
+		}
+
+		gl.useProgram(originalProgram);
 	}
 	commitUniforms() {
 		this.uniformsSet = false;
@@ -994,7 +1003,7 @@ class GLSLProgram {
 			
 			const { attributes, stride } = this.divisors[divisor];
 			gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-				
+			
 			let offset = 0;
 			for (let i = 0; i < attributes.length; i++) {
 				const attribute = attributes[i];
