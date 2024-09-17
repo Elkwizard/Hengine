@@ -40,7 +40,8 @@ function new_OffscreenCanvas(width, height) {
  */
 class ImageType {
 	constructor(width = 1, height = 1, pixelRatio = null) {
-		this.resize(width, height, false);
+		this._width = ImageType.roundDimension(width);
+		this._height = ImageType.roundDimension(height);
 		this.loaded = true;
 		this._pixelRatio = pixelRatio;
 	}
@@ -53,23 +54,13 @@ class ImageType {
 		return this._loaded;
 	}
 	set width(a) {
-		a = ImageType.roundDimension(a);
-		const prev = this._width;
-		if (prev !== a) {
-			this._width = a;
-			this.onresize(this._width, this._height);
-		}
+		this.resize(a, this.height);
 	}
 	get width() {
 		return this._width;
 	}
 	set height(a) {
-		a = ImageType.roundDimension(a);
-		const prev = this._height;
-		if (prev !== a) {
-			this._height = a;
-			this.onresize(this._width, this._height);
-		}
+		this.resize(this.width, a);
 	}
 	get height() {
 		return this._height;
@@ -105,7 +96,7 @@ class ImageType {
 	 * @param Number width | The new natural width of the image
 	 * @param Number height | The new natural height of the image
 	 */
-	resize(width, height, notify = true) {
+	resize(width, height) {
 		width = ImageType.roundDimension(width);
 		height = ImageType.roundDimension(height);
 		const prevWidth = this._width;
@@ -113,7 +104,7 @@ class ImageType {
 		if (prevWidth !== width || prevHeight !== height) {
 			this._width = width;
 			this._height = height;
-			if (notify) this.onresize(width, height);
+			this.onresize(width, height);
 		}
 	}
 	/**
