@@ -20,10 +20,10 @@ These associations are laid out in the following table:
 	<tr><th>GLSL Type</th><th>JS Type</th></tr>
 	<tr><td>int, uint, float</td><td><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></td></tr>
 	<tr><td>bool</td><td>Boolean</td></tr>
-	<tr><td>vec2, ivec2, uvec2</td><td><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></td></tr>
-	<tr><td>vec3, ivec3, uvec3</td><td><a href="../../Pages/Geometry/Vector/Vector3.html#class Vector3">Vector3</a></td></tr>
-	<tr><td>ivec4, uvec4</td><td><a href="../../Pages/Geometry/Vector/Vector4.html#class Vector4">Vector4</a></td></tr>
-	<tr><td>vec4</td><td><a href="../../Pages/Geometry/Vector/Vector4.html#class Vector4">Vector4</a>, <a href="../../Pages/Rendering/Color.html#class Color">Color</a></td></tr>
+	<tr><td>vec2, ivec2, uvec2</td><td><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></td></tr>
+	<tr><td>vec3, ivec3, uvec3</td><td><a href="../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
+	<tr><td>ivec4, uvec4</td><td><a href="../../Pages/Geometry/Vectors/Vector4.html#class Vector4">Vector4</a></td></tr>
+	<tr><td>vec4</td><td><a href="../../Pages/Geometry/Vectors/Vector4.html#class Vector4">Vector4</a>, <a href="../../Pages/Rendering/Color.html#class Color">Color</a></td></tr>
 	<tr><td>sampler2D</td><td><a href="../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></td></tr>
 	<tr><td>struct</td><td>Object</td></tr>
 	<tr><td>fixed-length array</td><td><a href="../../Pages/Built-Ins/Array.html#class Array">Array</a></td></tr>
@@ -53,7 +53,7 @@ Dynamic-length arrays are represented by GPUArrays, which are pre-set as the val
 		
 			<div class="class-wrapper" id="class GPUInterface">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1023" target="_blank" class="class-name source-link">GPUInterface</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1032" target="_blank" class="class-name source-link">GPUInterface</a>
 				</div>
 				<div class="class desc">
 					Represents a GLSL program.
@@ -81,7 +81,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="GPUInterface.prototype.setArgument()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1082" target="_blank" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1091" target="_blank" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of a uniform in the program.
@@ -118,7 +118,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="GPUInterface.prototype.setArguments()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1089" target="_blank" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1098" target="_blank" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of many uniforms at once.
@@ -145,7 +145,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="GPUInterface.prototype.getArgument()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1099" target="_blank" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1108" target="_blank" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
 				Retrieves the current value of a given uniform.
@@ -173,7 +173,7 @@ For the return type of this function, see the GLSL API.
 	
 		<div class="function-wrapper" id="GPUInterface.prototype.argumentExists()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1107" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1116" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether a given uniform exists.
@@ -219,7 +219,7 @@ For a struct such as:
 A GPUArray could be used as follows:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// gpu is a GPUInterface</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> circle</span><span class="highlight-SYMBOL"> = {
-	</span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">),
+	</span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">),
 	</span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 22.5</span><span class="highlight-SYMBOL">,
 	</span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;magenta&quot;</span><span class="highlight-SYMBOL">)
 };

@@ -689,7 +689,7 @@ class GLSLProgram {
 				} else {
 					if (matrix) {
 						desc.set = function (value) {
-							dataArray.set(value, 0);
+							dataArray.set(value);
 							this.setUniform(false, dataArray);
 						};
 					} else if (glsl.dynamicArrays.has(name)) {
@@ -741,7 +741,7 @@ class GLSLProgram {
 						nextTextureUnit += length;
 					} else {
 						if (setWithArrayType) desc.set = function (value) {
-							dataArray.set(value, 0);
+							dataArray.set(value);
 							this.setUniform(dataArray);
 						};
 						else if (rows !== 1) {

@@ -1251,8 +1251,150 @@ declare class Animatable {
 }
 
 /**
- * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates.
- * Due to its use with 2D vectors, the last row of the matrix is unused and will always be [ 0 0 1 ].
+ * Represents an N by N square matrix which can be used to transform vectors of dimension N or (N - 1) via homogenous coordinates.
+ * This is an abstract superclass and should not be constructed.
+ */
+declare class Matrix extends Float64Array implements Copyable, Serializable {
+	/**
+	 * Creates a new Matrix. Since this class is abstract, this constructor can only be used via its subclasses.
+	 * @param elements - The elements of the matrix, in row-major object
+	 */
+	constructor(...elements: number[]);
+	/**
+	 * Creates a new Matrix. Since this class is abstract, this constructor can only be used via its subclasses.
+	 * @param columns - The columns of the matrix
+	 */
+	constructor(...columns: Vector[]);
+	/**
+	 * Creates a new Matrix. Since this class is abstract, this constructor can only be used via its subclasses.
+	 */
+	constructor();
+	/**
+	 * Transposes the matrix in-place (swapping rows with columns) and returns it.
+	 */
+	transpose(): this;
+	/**
+	 * If the caller is invertible, this inverts the caller in-place and returns it, otherwise returns null.
+	 */
+	invert(): this | null;
+	/**
+	 * Retrieves an element from the caller at a given position.
+	 * @param row - The 0-based row index
+	 * @param column - The 0-based column index
+	 */
+	at(row: number, column: number): number;
+	/**
+	 * Replaces an element of the caller at a given position with a new value.
+	 * @param row - The 0-based row index
+	 * @param column - The 0-based column index
+	 * @param value - The new element value
+	 */
+	update(row: number, column: number, value: number): void;
+	/**
+	 * Retrieves a column of the caller.
+	 * @param column - The 0-based column index
+	 */
+	column(column: number): Vector;
+	/**
+	 * Retrieves a row of the caller.
+	 * @param row - The 0-based row index
+	 */
+	row(row: number): Vector;
+	/**
+	 * Computes the sum or difference between the caller and a given object, and returns the result.
+	 * @param other - The right-hand operand of the sum
+	 * @param result - A matrix to optionally store the result in. If not specified, a new matrix will be created
+	 */
+	plus(other: this | number, result?: this): this;
+	/**
+	 * Computes the sum or difference between the caller and a given object, and returns the result.
+	 * @param other - The right-hand operand of the sum
+	 * @param result - A matrix to optionally store the result in. If not specified, a new matrix will be created
+	 */
+	minus(other: this | number, result?: this): this;
+	/**
+	 * Adds or subtracts a given object from the caller in-place and returns it.
+	 * @param other - The right-hand operand of the sum
+	 */
+	add(other: this | number): this;
+	/**
+	 * Adds or subtracts a given object from the caller in-place and returns it.
+	 * @param other - The right-hand operand of the sum
+	 */
+	sub(other: this | number): this;
+	/**
+	 * Multiplies the caller in-place with another object.
+	 * Returns the caller.
+	 * @param other - The right-hand operand of the product
+	 */
+	mul(other: this | number): this;
+	/**
+	 * Computes the product of the caller and another object and returns the result.
+	 * @param other - The right-hand side of the product. If this is a vector of dimension N - 1, it will be converted to and from homogenous coordinates to facilitate the multiplication
+	 * @param result - A destination to optionally store the result in. If not specified, the result will be a new vector or matrix
+	 */
+	times(other: this | Vector | number, result?: this | Vector): this | Vector | number;
+	/**
+	 * Creates an N or N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * @param axes - The scale factor along each of the axes
+	 * @param result - The matrix to copy the scaling matrix into
+	 */
+	static scale(...axes: number[], result?: Matrix): Matrix;
+	/**
+	 * Creates an N or N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * @param vector - A vector where each component specifies the scale factor on its corresponding axis
+	 * @param result - The matrix to copy the scaling matrix into
+	 */
+	static scale(vector: Vector, result?: Matrix): Matrix;
+	/**
+	 * Creates a N - 1 dimensional homogenous translation matrix and optionally stores it in a provided destination.
+	 * @param axes - The translation along each of the N - 1 axes
+	 * @param result - The matrix to copy the translation matrix into
+	 */
+	static translation(...axes: number[], result?: Matrix): Matrix;
+	/**
+	 * Creates a N - 1 dimensional homogenous translation matrix and optionally stores it in a provided destination.
+	 * @param vector - The N - 1 dimensional vector to translate by
+	 * @param result - The matrix to copy the translation matrix into
+	 */
+	static translation(vector: Vector, result?: Matrix): Matrix;
+	/**
+	 * Creates an identity matrix and optionally stores it in a provided destination.
+	 * @param destination - The matrix to copy the identity matrix into
+	 */
+	static identity(destination?: Matrix): Matrix;
+	/**
+	 * Multiplies a series of matrices together and optionally stores it in a provided destination.
+	 * @param matrices - The matrices to multiply together. Order matters for this argument
+	 * @param result - The matrix to copy the result into
+	 */
+	static mulMatrices(matrices: Matrix3[], result?: Matrix3): Matrix3;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
+}
+
+/**
+ * Represents a 2 by 2 matrix for use with 2D vectors.
+ */
+declare class Matrix2 extends Matrix {
+	
+}
+
+/**
+ * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates or 3D vectors in standard coordinates.
  * ```js
  * const transformation = Matrix3.mulMatrices([
  * 	Matrix3.translation(10, 5),
@@ -1268,161 +1410,24 @@ declare class Animatable {
  * console.log(initialAgain); // (10, 20)
  * ```
  */
-declare class Matrix3 extends Float64Array implements Copyable {
-	/**
-	 * The matrix element in row R and column C (0-indexed).
-	 */
-	m00: number;
-	/**
-	 * The matrix element in row R and column C (0-indexed).
-	 */
-	m01: number;
-	/**
-	 * The matrix element in row R and column C (0-indexed).
-	 */
-	m02: number;
-	/**
-	 * The matrix element in row R and column C (0-indexed).
-	 */
-	m10: number;
-	/**
-	 * The matrix element in row R and column C (0-indexed).
-	 */
-	m11: number;
-	/**
-	 * The matrix element in row R and column C (0-indexed).
-	 */
-	m12: number;
-	/**
-	 * The matrix element in row R and column C (0-indexed).
-	 */
-	m20: number;
-	/**
-	 * The matrix element in row R and column C (0-indexed).
-	 */
-	m21: number;
-	/**
-	 * The matrix element in row R and column C (0-indexed).
-	 */
-	m22: number;
-	/**
-	 * Creates a new Matrix3.
-	 * All arguments are optional and default to their values for an identity matrix.
-	 * @param m00 - The matrix element in row 0 and column 0
-	 * @param m01 - The matrix element in row 0 and column 1
-	 * @param m02 - The matrix element in row 0 and column 2
-	 * @param m10 - The matrix element in row 1 and column 0
-	 * @param m11 - The matrix element in row 1 and column 1
-	 * @param m12 - The matrix element in row 1 and column 2
-	 * @param m20 - The matrix element in row 2 and column 0
-	 * @param m21 - The matrix element in row 2 and column 1
-	 * @param m22 - The matrix element in row 2 and column 2
-	 */
-	constructor(m00?: number, m01?: number, m02?: number, m10?: number, m11?: number, m12?: number, m20?: number, m21?: number, m22?: number);
-	/**
-	 * Returns the determinant of the matrix.
-	 */
-	get determinant(): number;
-	/**
-	 * Returns a matrix which is the transpose of the caller.
-	 */
-	get transposed(): this;
-	/**
-	 * Returns a matrix which is the inverse of the caller, or null if there is none.
-	 */
-	get inverse(): this | null;
-	/**
-	 * Transposes the matrix in-place and returns it.
-	 */
-	transpose(): this;
-	/**
-	 * Inverts the matrix in-place and returns it.
-	 * If the matrix isn't invertible, the caller is unchanged and null is returned.
-	 */
-	invert(): this;
-	/**
-	 * Multiplies the matrix in-place by another mathematical object on the right side. Returns the caller.
-	 * @param matrix - Another matrix to multiply with
-	 */
-	mul(matrix: this): this;
-	/**
-	 * Multiplies the matrix in-place by another mathematical object on the right side. Returns the caller.
-	 * @param scale - A number to scale the matrix by.
-	 */
-	mul(scale: number): this;
-	/**
-	 * Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
-	 * If no destination is provided, one will be created.
-	 * @param matrix - Another matrix to multiply with
-	 * @param destination - The destination for the operation
-	 */
-	times(matrix: this, destination?: this): this;
-	/**
-	 * Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
-	 * If no destination is provided, one will be created.
-	 * @param vector - A vector to be transformed by the Matrix3. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
-	 * @param destination - The destination for the operation
-	 */
-	times(vector: Vector2, destination?: Vector2): this;
-	/**
-	 * Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
-	 * If no destination is provided, one will be created.
-	 * @param scale - A number to scale the matrix by.
-	 * @param destination - The destination for the operation
-	 */
-	times(scale: number, destination?: this): this;
+declare class Matrix3 extends Matrix {
 	/**
 	 * Converts the matrix to a CSS matrix string.
 	 */
 	toCSS(): string;
-	/**
-	 * Creates an identity matrix and optionally stores it in a provided destination.
-	 * @param destination - The matrix to copy the identity matrix into
-	 */
-	static identity(destination?: Matrix3): Matrix3;
 	/**
 	 * Creates a 2D rotation matrix and optionally stores it in a provided destination.
 	 * @param theta - The clockwise (in screen-space) angle (in radians) to rotate by
 	 * @param result - The matrix to copy the rotation matrix into
 	 */
 	static rotation(theta: number, result?: Matrix3): Matrix3;
-	/**
-	 * Creates a 2D scaling matrix and optionally stores it in a provided a destination.
-	 * @param x - The scale factor on the x axis
-	 * @param y - The scale factor on the y axis
-	 * @param result - The matrix to copy the scaling matrix into
-	 */
-	static scale(x: number, y: number, result?: Matrix3): Matrix3;
-	/**
-	 * Creates a 2D scaling matrix and optionally stores it in a provided a destination.
-	 * @param vector - A vector containing the scale factors for both axes
-	 * @param result - The matrix to copy the scaling matrix into
-	 */
-	static scale(vector: Vector2, result?: Matrix3): Matrix3;
-	/**
-	 * Creates a 2D translation matrix and optionally stores it in a provided a destination.
-	 * @param x - The x coordinate to translate by
-	 * @param y - The y coordinate to translate by
-	 * @param result - The matrix to copy the translation matrix into
-	 */
-	static translation(x: number, y: number, result?: Matrix3): Matrix3;
-	/**
-	 * Creates a 2D translation matrix and optionally stores it in a provided a destination.
-	 * @param vector - The vector to translate by
-	 * @param result - The matrix to copy the translation matrix into
-	 */
-	static translation(vector: Vector2, result?: Matrix3): Matrix3;
-	/**
-	 * Multiplies a series of matrices together and optionally stores it in a provided destination.
-	 * @param matrices - The matrices to multiply together. Order matters for this argument
-	 * @param result - The matrix to copy the result into
-	 */
-	static mulMatrices(matrices: Matrix3[], result?: Matrix3): Matrix3;
-	/**
-	 * Creates a copy of the object and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the object into. This must be the same type as the caller
-	 */
-	get(destination?: this): this;
+}
+
+/**
+ * Represents a 4 by 4 matrix for use with 3D vectors in homogenous coordinates or 4D vectors in standard coordinates.
+ */
+declare class Matrix4 extends Matrix {
+	
 }
 
 /**

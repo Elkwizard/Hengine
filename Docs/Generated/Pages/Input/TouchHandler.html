@@ -23,7 +23,7 @@ All properties of this class are read-only.
 		</span><span class="highlight-COMMENT">// retrieve the positions of the first two touches</span><span class="highlight-SYMBOL">
 	</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> a</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">touches</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">get</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">activeTouches</span><span class="highlight-SYMBOL">[</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">]).</span><span class="highlight-PROPERTY">screen</span><span class="highlight-SYMBOL">;
 	</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> b</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">touches</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">get</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">activeTouches</span><span class="highlight-SYMBOL">[</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">]).</span><span class="highlight-PROPERTY">screen</span><span class="highlight-SYMBOL">;
-	</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> dist</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">dist</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">);
+	</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> dist</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">dist</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">);
 		
 		</span><span class="highlight-COMMENT">// shows the distance between the them</span><span class="highlight-SYMBOL">
 		</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">stroke</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 3</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">measure</span><span class="highlight-SYMBOL">(
@@ -86,28 +86,28 @@ All properties of this class are read-only.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="TouchHandler.State.screen">
 					<div class="prop-header member">
-						<span class="prop-name">screen</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">screen</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The current position of the touch, in screen-space</div>
 				</div>
 			
 				<div class="prop-wrapper" id="TouchHandler.State.screenLast">
 					<div class="prop-header member">
-						<span class="prop-name">screenLast</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">screenLast</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The position of the touch last frame, in screen-space</div>
 				</div>
 			
 				<div class="prop-wrapper" id="TouchHandler.State.world">
 					<div class="prop-header member">
-						<span class="prop-name">world</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">world</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The current position of the touch, in world-space</div>
 				</div>
 			
 				<div class="prop-wrapper" id="TouchHandler.State.worldLast">
 					<div class="prop-header member">
-						<span class="prop-name">worldLast</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">worldLast</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The position of the touch last frame, in world-space</div>
 				</div>

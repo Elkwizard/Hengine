@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class Camera">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L9" target="_blank" class="class-name source-link">Camera</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Geometry/Matrix3.html#class Matrix3">Matrix3</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L9" target="_blank" class="class-name source-link">Camera</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Geometry/Matrices.html#class Matrix3">Matrix3</a></span>
 				</div>
 				<div class="class desc">
 					Represents the camera in a scene.
@@ -23,9 +23,9 @@ The transformation represented by this matrix is from screen-space to world-spac
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Camera.position">
 					<div class="prop-header member">
-						<span class="prop-name">position</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">position</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
-					<div class="prop desc">The current center of the camera's view. This starts as <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">)</span></code></div>
+					<div class="prop desc">The current center of the camera's view. This starts as <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">)</span></code></div>
 				</div>
 			
 				<div class="prop-wrapper" id="Camera.rotation">
@@ -109,7 +109,7 @@ The transformation represented by this matrix is from screen-space to world-spac
 						<div class="param-wrapper" id="Camera.prototype.moveTowards():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The new position to move toward
@@ -308,7 +308,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 						<div class="param-wrapper" id="Camera.prototype.zoomAbout():center">
 							<div class="param-name">
 								<span class="param">center</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The zoom center
@@ -386,7 +386,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 	
 		<div class="function-wrapper" id="Camera.prototype.screenSpaceToWorldSpace()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L223" target="_blank" class="function-name source-link">screenSpaceToWorldSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L223" target="_blank" class="function-name source-link">screenSpaceToWorldSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Maps a given point from screen-space to world-space.
@@ -399,7 +399,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 						<div class="param-wrapper" id="Camera.prototype.screenSpaceToWorldSpace():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The point to transform
@@ -413,7 +413,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 	
 		<div class="function-wrapper" id="Camera.prototype.worldSpaceToScreenSpace()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L231" target="_blank" class="function-name source-link">worldSpaceToScreenSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L231" target="_blank" class="function-name source-link">worldSpaceToScreenSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Maps a given point from world-space to screen-space.
@@ -426,7 +426,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 						<div class="param-wrapper" id="Camera.prototype.worldSpaceToScreenSpace():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The point to transform

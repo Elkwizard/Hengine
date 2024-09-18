@@ -15,7 +15,7 @@
 					Manages the creation, persistence, and deletion of <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a> in the <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a>.
 It also manages the physics engine.
 This class should not be constructed, and can be accessed via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scene</span></code> property of both the global object and <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a>.
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">gravity</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.1</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// low gravity</span><span class="highlight-KEYWORD">
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">gravity</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.1</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// low gravity</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> floor</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addPhysicsRectElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;floor&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 50</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> BLOCK_SIZE</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 30</span><span class="highlight-SYMBOL">;</span><span class="highlight-KEYWORD">
@@ -102,7 +102,7 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 						<div class="param-wrapper" id="set Scene.prototype.gravity():gravity">
 							<div class="param-name">
 								<span class="param">gravity</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The new gravitational acceleration
@@ -116,11 +116,11 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 	
 		<div class="function-wrapper" id="get Scene.prototype.gravity()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L52" target="_blank" class="function-name source-link">gravity</a><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L52" target="_blank" class="function-name source-link">gravity</a><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Returns the current gravitational acceleration for the physics engine.
-This is initially <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.4</span><span class="highlight-SYMBOL">)</span></code>.
+This is initially <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.4</span><span class="highlight-SYMBOL">)</span></code>.
 			</div>
 			
 		</div>
@@ -137,7 +137,7 @@ This is initially <code class=" highlight-BACKGROUND"><span class="highlight-KEY
 	
 		<div class="function-wrapper" id="Scene.prototype.rayCast()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L88" target="_blank" class="function-name source-link">rayCast</a>(<span class="param">rayOrigin</span>, <span class="param">rayDirection</span>, <span class="param">mask?</span>)<span class="type">{ hitShape: <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a>, hitPoint: <a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a> }/null</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L88" target="_blank" class="function-name source-link">rayCast</a>(<span class="param">rayOrigin</span>, <span class="param">rayDirection</span>, <span class="param">mask?</span>)<span class="type">{ hitShape: <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a>, hitPoint: <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a> }/null</span>
 			</div>
 			<div class="function desc">
 				Performs a ray-cast against some or all of the <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a> in the scene.
@@ -152,7 +152,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.rayCast():rayOrigin">
 							<div class="param-name">
 								<span class="param">rayOrigin</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The origin point of the ray
@@ -162,7 +162,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.rayCast():rayDirection">
 							<div class="param-name">
 								<span class="param">rayDirection</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The direction of the ray
@@ -199,7 +199,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.collidePoint():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The world-space point to check
@@ -246,7 +246,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLength():aOffset?">
 							<div class="param-name">
 								<span class="param">aOffset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The local a-space point where the constraint will attach to the first object. Default is no offset
@@ -256,7 +256,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLength():bOffset?">
 							<div class="param-name">
 								<span class="param">bOffset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The local b-space point where the constraint will attach to the second object. Default is no offset
@@ -303,7 +303,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():offset?">
 							<div class="param-name">
 								<span class="param">offset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The local object-space point where the constraint will attach to the object. Default is no offset
@@ -313,7 +313,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():point?">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The location to constrain the length to. Default is the current location of the constrained point
@@ -370,7 +370,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainPosition():aOffset?">
 							<div class="param-name">
 								<span class="param">aOffset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The local a-space point where the constraint will attach to the first object. Default is no offset
@@ -380,7 +380,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainPosition():bOffset?">
 							<div class="param-name">
 								<span class="param">bOffset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The local b-space point where the constraint will attach to the second object. Default is no offset
@@ -417,7 +417,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainPositionToPoint():offset?">
 							<div class="param-name">
 								<span class="param">offset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The local object-space point where the constraint will attach to the object. Default is no offset
@@ -427,7 +427,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainPositionToPoint():point?">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The location to constrain the length to. Default is the current location of the constrained point

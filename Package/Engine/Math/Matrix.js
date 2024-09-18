@@ -1,7 +1,335 @@
 /**
- * @implements Copyable
- * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates.
- * Due to its use with 2D vectors, the last row of the matrix is unused and will always be [ 0 0 1 ].
+ * @implements Copyable, Serializable
+ * Represents an N by N square matrix which can be used to transform vectors of dimension N or (N - 1) via homogenous coordinates.
+ * @abstract
+ */
+class Matrix extends Float64Array {
+	/**
+	 * Creates a new Matrix. Since this class is abstract, this constructor can only be used via its subclasses.
+	 * @signature
+	 * @param Number[] ...elements | The elements of the matrix, in row-major object
+	 * @signature
+	 * @param Vector[] ...columns | The columns of the matrix
+	 * @signature
+	 */
+	constructor(size, args) {
+		super(size * size);
+		if (args.length === this.length)
+			for (let i = 0; i < size; i++)
+				for (let j = 0; j < size; j++)
+					this[i * size + j] = args[j * size + i];
+		else if (args.length) {
+			const { modValues } = args[0].constructor;
+			for (let i = 0; i < size; i++)
+				for (let j = 0; j < size; j++)
+					this[i * size + j] = args[i]?.[modValues[j]] ?? +(i === j);
+		} else for (let i = 0; i < size; i++)
+			this[i + i * size] = 1;
+	}
+	get transposed() {
+		return this.get().transpose();
+	}
+	get inverse() {
+		return this.get().invert();
+	}
+	get determinant() {
+		return 0;
+	}
+	get(result = new this.constructor()) {
+		result.set(this);
+		return result;
+	}
+	/**
+	 * Transposes the matrix in-place (swapping rows with columns) and returns it.
+	 * @return Matrix
+	 */
+	transpose() {
+		return this.constructor.create(...this, this);
+	}
+	/**
+	 * If the caller is invertible, this inverts the caller in-place and returns it, otherwise returns null.
+	 * @return Matrix/null
+	 */
+	invert() {
+		return null;
+	}
+	/**
+	 * Retrieves an element from the caller at a given position.
+	 * @param Number row | The 0-based row index
+	 * @param Number column | The 0-based column index
+	 * @return Number
+	 */
+	at(row, column) {
+		return this[column * this.constructor.size + row];
+	}
+	/**
+	 * Replaces an element of the caller at a given position with a new value.
+	 * @param Number row | The 0-based row index
+	 * @param Number column | The 0-based column index
+	 * @param Number value | The new element value
+	 */
+	update(row, column, value) {
+		this[column * this.constructor.size + row] = value;
+	}
+	/**
+	 * Retrieves a column of the caller.
+	 * @param Number column | The 0-based column index
+	 * @return Vector
+	 */
+	column(column) {
+		const { size, Vector } = this.constructor;
+		const result = new Vector();
+		const { modValues } = Vector;
+		for (let i = 0; i < size; i++)
+			result[modValues[i]] = this[column * size + i];
+		return result;
+	}
+	/**
+	 * Retrieves a row of the caller.
+	 * @param Number row | The 0-based row index
+	 * @return Vector
+	 */
+	row(row) {
+		const { size, Vector } = this.constructor;
+		const result = new Vector();
+		const { modValues } = Vector;
+		for (let i = 0; i < size; i++)
+			result[modValues[i]] = this[i * size + row];
+		return result;
+	}
+	op(other, op, dst = new this.constructor()) {
+		if (typeof other === "number")
+			for (let i = 0; i < this.length; i++)
+				dst[i] = op(this[i], other);
+		else for (let i = 0; i < this.length; i++)
+			dst[i] = op(this[i], other[i]);
+		return dst;
+	}
+	/**
+	 * @group plus/minus
+	 * Computes the sum or difference between the caller and a given object, and returns the result.
+	 * @param Matrix/Number other | The right-hand operand of the sum
+	 * @param Matrix result? | A matrix to optionally store the result in. If not specified, a new matrix will be created
+	 * @return Matrix
+	 */
+	plus(other, dst) {
+		return this.op(other, Operable.addFunc, dst);
+	}
+	minus(other, dst) {
+		return this.op(other, Operable.subFunc, dst);
+	}
+	/**
+	 * @group add/sub
+	 * Adds or subtracts a given object from the caller in-place and returns it.
+	 * @param Matrix/Number other | The right-hand operand of the sum
+	 * @return Matrix
+	 */
+	add(other) {
+		return this.plus(other, this);
+	}
+	sub(other) {
+		return this.minus(other, this);
+	}
+	/**
+	 * Multiplies the caller in-place with another object.
+	 * Returns the caller.
+	 * @param Matrix/Number other | The right-hand operand of the product
+	 * @return Matrix
+	 */
+	mul(other) {
+		return this.times(other, this);
+	}
+	timesNumber(number, dst) {
+		for (let i = 0; i < this.length; i++)
+			dst[i] = this[i] * number;
+	}
+	timesVector(vector, dst) {
+		const { size } = this.constructor;
+		const { modValues } = vector.constructor;
+		const result = new vector.constructor();
+		for (let i = 0; i < modValues.length; i++) {
+			let sum = 0;
+			for (let j = 0; j < size; j++)
+				sum += (vector[modValues[j]] ?? 1) * this[j * size + i];
+			result[modValues[i]] = sum;
+		}
+		result.get(dst);
+	}
+	timesMatrix(matrix, dst) {
+		const { size } = this.constructor;
+		const result = new matrix.constructor();
+		for (let c = 0; c < size; c++)
+		for (let r = 0; r < size; r++) {
+			let sum = 0;
+			for (let k = 0; k < size; k++)
+				sum += this[k * size + r] * matrix[c * size + k];
+			result[c * size + r] = sum;
+		}
+		result.get(dst);
+	}
+	/**
+	 * Computes the product of the caller and another object and returns the result.
+	 * @param Matrix/Vector/Number other | The right-hand side of the product. If this is a vector of dimension N - 1, it will be converted to and from homogenous coordinates to facilitate the multiplication 
+	 * @param Matrix/Vector result? | A destination to optionally store the result in. If not specified, the result will be a new vector or matrix
+	 * @return Matrix/Vector/Number
+	 */
+	times(other, dst) {
+		if (other instanceof Vector) {
+			dst ??= new other.constructor();
+			this.timesVector(other, dst);
+		} else {
+			dst ??= new this.constructor();
+			if (other instanceof Matrix)
+				this.timesMatrix(other, dst);
+			else this.timesNumber(other, dst);
+		}
+		return dst;
+	}
+	toByteBuffer(buffer = new ByteBuffer()) {
+		for (let i = 0; i < this.length; i++)
+			buffer.write.float64(this[i]);
+		return buffer;
+	}
+	fromByteBuffer(buffer) {
+		const result = new this();
+		for (let i = 0; i < result.length; i++)
+			result[i] = buffer.read.float64();
+		return result;
+	}
+	/**
+	 * Creates an N or N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * @signature
+	 * @param Number[] ...axes | The scale factor along each of the axes 
+	 * @param Matrix result? | The matrix to copy the scaling matrix into 
+	 * @signature
+	 * @param Vector vector | A vector where each component specifies the scale factor on its corresponding axis
+	 * @param Matrix result? | The matrix to copy the scaling matrix into 
+	 * @return Matrix
+	 */
+	static scale(...axes) {
+		const result = axes.last instanceof this ? this.identity(axes.pop()) : new this();
+		if (axes[0] instanceof Vector)
+			axes = axes[0].values;
+
+		const { size } = this;
+		for (let i = 0; i < size; i++)
+			result[i * size + i] = axes[i];
+		return result;
+	}
+	/**
+	 * Creates a N - 1 dimensional homogenous translation matrix and optionally stores it in a provided destination.
+	 * @signature
+	 * @param Number[] ...axes | The translation along each of the N - 1 axes 
+	 * @param Matrix result? | The matrix to copy the translation matrix into 
+	 * @signature
+	 * @param Vector vector | The N - 1 dimensional vector to translate by
+	 * @param Matrix result? | The matrix to copy the translation matrix into 
+	 * @return Matrix
+	 */
+	static translation(...axes) {
+		const result = axes.last instanceof this ? this.identity(axes.pop()) : new this();
+		if (axes[0] instanceof Vector)
+			axes = axes[0].values;
+
+		const { size } = this;
+		result.set(axes, size * (size - 1));
+		return result;
+	}
+	/**
+	 * Creates an identity matrix and optionally stores it in a provided destination.
+	 * @param Matrix destination? | The matrix to copy the identity matrix into 
+	 * @return Matrix
+	 */
+	static identity(result = new this()) {
+		const { size } = this;
+		for (let i = 0; i < size; i++)
+		for (let j = 0; j < size; j++)
+			result[i * size + j] = +(i === j);
+		return result;
+	}
+	static create() {
+		const { size } = this;
+		const dst = arguments[size * size] ?? new this();
+		for (let i = 0; i < size; i++)
+		for (let j = 0; j < size; j++)
+			dst[i * size + j] = arguments[j * size + i];
+		return dst;
+	}
+	/**
+	 * Multiplies a series of matrices together and optionally stores it in a provided destination.
+	 * @param Matrix3[] matrices | The matrices to multiply together. Order matters for this argument
+	 * @param Matrix3 result? | The matrix to copy the result into
+	 * @return Matrix3
+	 */
+	static mulMatrices(matrices, result = new this()) {
+		if (matrices.length === 1) return matrices[0].get(result);
+		matrices[matrices.length - 2].times(matrices[matrices.length - 1], result);
+		for (let i = matrices.length - 3; i >= 0; i--) matrices[i].times(result, result);
+		return result;
+	}
+}
+
+{ // toString
+	const methods = ["toString", "toFixed", "toMaxed"];
+	for (let i = 0; i < methods.length; i++) {
+		const method = methods[i];
+		Matrix.prototype[method] = function (arg) {
+			const { size } = this.constructor;
+			const strs = [...this].map(num => num[method](arg));
+			const columns = Array.dim(size)
+				.map((_, i) => {
+					const start = i * size;
+					return strs.slice(start, start + size);
+				});
+			const widths = columns.map(column => Math.max(...column.map(str => str.length)));
+			const contentWidth = Number.sum(widths) + widths.length + 1;
+			const spaces = " ".repeat(contentWidth);
+			const rows = Array.dim(size)
+				.map((_, r) => {
+					return `│ ${
+						Array.dim(size)
+							.map((_, c) => columns[c][r].padStart(widths[c], " "))
+							.join(" ")
+					} │`;
+				})
+				.join("\n");
+			return `┌${spaces}┐\n${rows}\n└${spaces}┘`;
+		};
+	}
+}
+
+/**
+ * Represents a 2 by 2 matrix for use with 2D vectors.
+ */
+class Matrix2 extends Matrix {
+	constructor() {
+		super(Matrix2.size, arguments);
+	}
+	get determinant() {
+		return this[0] * this[3] - this[1] * this[2];
+	}
+	invert() {
+		const { determinant } = this;
+		if (!determinant) return null;
+
+		const idet = 1 / determinant;
+		const a = this[0];
+		const d = this[3];
+		this[0] = d * idet;
+		this[1] *= -idet;
+		this[2] *= -idet;
+		this[3] = a * idet;
+
+		return this;
+	}
+	static get Vector() {
+		return Vector2;
+	}
+}
+Matrix2.size = 2;
+
+/**
+ * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates or 3D vectors in standard coordinates.
  * ```js
  * const transformation = Matrix3.mulMatrices([
  * 	Matrix3.translation(10, 5),
@@ -16,207 +344,93 @@
  * const initialAgain = transformation.inverse.times(finalPoint);
  * console.log(initialAgain); // (10, 20)
  * ```
- * @name_subs R: 0, 1, 2; C: 0, 1, 2
- * @prop Number m[R][C] | The matrix element in row R and column C (0-indexed).
  */
-class Matrix3 extends Float64Array {
-	/**
-	 * Creates a new Matrix3.
-	 * All arguments are optional and default to their values for an identity matrix.
-	 * @param Number m00? | The matrix element in row 0 and column 0  
-	 * @param Number m01? | The matrix element in row 0 and column 1  
-	 * @param Number m02? | The matrix element in row 0 and column 2  
-	 * @param Number m10? | The matrix element in row 1 and column 0  
-	 * @param Number m11? | The matrix element in row 1 and column 1  
-	 * @param Number m12? | The matrix element in row 1 and column 2  
-	 * @param Number m20? | The matrix element in row 2 and column 0  
-	 * @param Number m21? | The matrix element in row 2 and column 1  
-	 * @param Number m22? | The matrix element in row 2 and column 2  
-	 */
-	constructor(
-		m00 = 1, m01 = 0, m02 = 0,
-		m10 = 0, m11 = 1, m12 = 0,
-		m20 = 0, m21 = 0, m22 = 1
-	) {
-		super(9);
-		this[0] = m00;
-		this[3] = m01;
-		this[6] = m02;
-		this[1] = m10;
-		this[4] = m11;
-		this[7] = m12;
-		this[2] = m20;
-		this[5] = m21;
-		this[8] = m22;
+class Matrix3 extends Matrix {
+	constructor() {
+		super(Matrix3.size, arguments);
 	}
-	set m00(a) { this[0] = a; }
-	get m00() { return this[0]; } 
-	set m01(a) { this[3] = a; } 
-	get m01() { return this[3]; } 
-	set m02(a) { this[6] = a; } 
-	get m02() { return this[6]; } 
-	set m10(a) { this[1] = a; } 
-	get m10() { return this[1]; } 
-	set m11(a) { this[4] = a; } 
-	get m11() { return this[4]; } 
-	set m12(a) { this[7] = a; } 
-	get m12() { return this[7]; } 
-	set m20(a) { this[2] = a; } 
-	get m20() { return this[2]; } 
-	set m21(a) { this[5] = a; } 
-	get m21() { return this[5]; } 
-	set m22(a) { this[8] = a; } 
-	get m22() { return this[8]; } 
-	/**
-	 * Returns the determinant of the matrix.
-	 * @return Number
-	 */
 	get determinant() {
 		const [
 			a, d, g,
 			b, e, h,
-			c, f, i
+			c, f, i,
 		] = this;
 
-		return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
+		const co0 = e * i - f * h,
+			co1 = d * i - f * g,
+			co2 = d * h - e * g;
+		
+		return a * co0 - b * co1 + c * co2;
 	}
-	/**
-	 * Returns a matrix which is the transpose of the caller.
-	 * @return Matrix3
-	 */
-	get transposed() {
-		return this.get().transpose();
+	get(dst = new Matrix3()) {
+		return super.get(dst);
 	}
-	/**
-	 * Returns a matrix which is the inverse of the caller, or null if there is none.
-	 * @return Matrix3/null
-	 */
-	get inverse() {
-		return this.get().invert();
-	}
-	/**
-	 * Transposes the matrix in-place and returns it.
-	 * @return Matrix3
-	 */
-	transpose() {
-		return Matrix3.create(...this, this);
-	}
-	/**
-	 * Inverts the matrix in-place and returns it.
-	 * If the matrix isn't invertible, the caller is unchanged and null is returned.
-	 * @return Matrix3
-	 */
 	invert() {
-		const { determinant } = this;
-		if (determinant) {
+		const [
+			a, d, g,
+			b, e, h,
+			c, f, i,
+		] = this;
 
-			// minors
-			const minors = new Matrix3();
-			const getIndex = (row, column) => column * 3 + row;
-			const getMinor = (row, column) => {
-				const firstRow = row ? 0 : 1;
-				const firstColumn = column ? 0 : 1;
-				const lastRow = (row === 2) ? 1 : 2;
-				const lastColumn = (column === 2) ? 1 : 2;
-				const a = this[getIndex(firstRow, firstColumn)];
-				const b = this[getIndex(firstRow, lastColumn)];
-				const c = this[getIndex(lastRow, firstColumn)];
-				const d = this[getIndex(lastRow, lastColumn)];
+		const co0 = e * i - f * h,
+			co1 = f * g - d * i,
+			co2 = d * h - e * g;
+		
+		const det = a * co0 + b * co1 + c * co2;
+		if (!det) return null;
 
-				return a * d - b * c;
-			};
-			for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++)
-				minors[getIndex(r, c)] = getMinor(r, c);
+		const co3 = c * h - b * i,
+			co4 = a * i - c * g,
+			co5 = b * g - a * h,
+			co6 = b * f - c * e,
+			co7 = c * d - a * f,
+			co8 = a * e - b * d;
 
-			// cofactors
-			for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++)
-				if ((r + (c % 2)) % 2 === 1) minors[getIndex(r, c)] *= -1;
+		const idet = 1 / det;
 
-			// adjugate
-			minors.transpose();
+		this[0] = co0 * idet;
+		this[1] = co1 * idet;
+		this[2] = co2 * idet;
+		this[3] = co3 * idet;
+		this[4] = co4 * idet;
+		this[5] = co5 * idet;
+		this[6] = co6 * idet;
+		this[7] = co7 * idet;
+		this[8] = co8 * idet;
 
-			// downscale
-			return minors.times(1 / determinant, this);
-		} else return null;
+		return this;	
 	}
-	/**
-	 * Multiplies the matrix in-place by another mathematical object on the right side. Returns the caller.
-	 * @signature
-	 * @param Matrix3 matrix | Another matrix to multiply with
-	 * @signature
-	 * @param Number scale | A number to scale the matrix by.
-	 * @return Matrix3
-	 */
-	mul(M1) {
-		return this.times(M1, this);
-	}
-	/**
-	 * Returns a copy of the matrix multiplied by another mathematical object optionally copied into a specific destination.
-	 * If no destination is provided, one will be created.
-	 * @signature
-	 * @param Matrix3 matrix | Another matrix to multiply with
-	 * @param Matrix3 destination? | The destination for the operation
-	 * @signature
-	 * @param Vector2 vector | A vector to be transformed by the Matrix3. To make this multiplication possible, the vector has a 1 added as the last component prior to the multiplication, and after, the last component is removed
-	 * @param Vector2 destination? | The destination for the operation
-	 * @signature
-	 * @param Number scale | A number to scale the matrix by.
-	 * @param Matrix3 destination? | The destination for the operation
-	 * @return Matrix3
-	 */
-	times(M1, result = null) {
-		if (M1 instanceof Vector2) {
-			result ??= new Vector2(0);
-			const x = this[0] * M1.x + this[3] * M1.y + this[6];
-			const y = this[1] * M1.x + this[4] * M1.y + this[7];
-			result.x = x;
-			result.y = y;
-			return result;	
-		} else if (M1 instanceof Matrix3) {
-			const m00 = this[0] * M1[0] + this[3] * M1[1] + this[6] * M1[2];
-			const m01 = this[0] * M1[3] + this[3] * M1[4] + this[6] * M1[5];
-			const m02 = this[0] * M1[6] + this[3] * M1[7] + this[6] * M1[8];
-			const m10 = this[1] * M1[0] + this[4] * M1[1] + this[7] * M1[2];
-			const m11 = this[1] * M1[3] + this[4] * M1[4] + this[7] * M1[5];
-			const m12 = this[1] * M1[6] + this[4] * M1[7] + this[7] * M1[8];
-			const m20 = this[2] * M1[0] + this[5] * M1[1] + this[8] * M1[2];
-			const m21 = this[2] * M1[3] + this[5] * M1[4] + this[8] * M1[5];
-			const m22 = this[2] * M1[6] + this[5] * M1[7] + this[8] * M1[8];
-			return Matrix3.create(
-				m00, m01, m02,
-				m10, m11, m12,
-				m20, m21, m22,
-				result ?? new Matrix3()
-			);
-		} else if (M1 instanceof Vector3) {
-			result ??= new Vector3(0);
-			const x = this[0] * M1.x + this[3] * M1.y + this[6] * M1.z;
-			const y = this[1] * M1.x + this[4] * M1.y + this[7] * M1.z;
-			const z = this[2] * M1.x + this[5] * M1.y + this[8] * M1.z;	
-			result.x = x;
-			result.y = y;
-			result.z = z;
-			return result;
-		} else if (typeof M1 === "number") {
-			return Matrix3.create(
-				this[0] * M1, this[3] * M1, this[6] * M1,
-				this[1] * M1, this[4] * M1, this[7] * M1,
-				this[2] * M1, this[5] * M1, this[8] * M1,
-				result ?? new Matrix3()
-			);
+	timesVector(vector, dst) {
+		if (vector instanceof Vector2) {
+			const x = this[0] * vector.x + this[3] * vector.y + this[6];
+			const y = this[1] * vector.x + this[4] * vector.y + this[7];
+			dst.x = x;
+			dst.y = y;
+		} else {
+			const x = this[0] * vector.x + this[3] * vector.y + this[6] * vector.z;
+			const y = this[1] * vector.x + this[4] * vector.y + this[7] * vector.z;
+			const z = this[2] * vector.x + this[5] * vector.y + this[8] * vector.z;
+			dst.x = x;
+			dst.y = y;
+			dst.z = z;
 		}
 	}
-	get(result = new Matrix3()) {
-		result[0] = this[0];
-		result[1] = this[1];
-		result[2] = this[2];
-		result[3] = this[3];
-		result[4] = this[4];
-		result[5] = this[5];
-		result[6] = this[6];
-		result[7] = this[7];
-		result[8] = this[8];
-		return result;
+	timesMatrix(matrix, dst) {
+		const m00 = this[0] * matrix[0] + this[3] * matrix[1] + this[6] * matrix[2];
+		const m01 = this[0] * matrix[3] + this[3] * matrix[4] + this[6] * matrix[5];
+		const m02 = this[0] * matrix[6] + this[3] * matrix[7] + this[6] * matrix[8];
+		const m10 = this[1] * matrix[0] + this[4] * matrix[1] + this[7] * matrix[2];
+		const m11 = this[1] * matrix[3] + this[4] * matrix[4] + this[7] * matrix[5];
+		const m12 = this[1] * matrix[6] + this[4] * matrix[7] + this[7] * matrix[8];
+		const m20 = this[2] * matrix[0] + this[5] * matrix[1] + this[8] * matrix[2];
+		const m21 = this[2] * matrix[3] + this[5] * matrix[4] + this[8] * matrix[5];
+		const m22 = this[2] * matrix[6] + this[5] * matrix[7] + this[8] * matrix[8];
+		Matrix3.create(
+			m00, m01, m02,
+			m10, m11, m12,
+			m20, m21, m22,
+			dst
+		);
 	}
 	/**
 	 * Converts the matrix to a CSS matrix string.
@@ -224,31 +438,6 @@ class Matrix3 extends Float64Array {
 	 */
 	toCSS() {
 		return `matrix(${this[0]}, ${this[1]}, ${this[3]}, ${this[4]}, ${this[6]}, ${this[7]})`;
-	}
-	static create(m00, m01, m02, m10, m11, m12, m20, m21, m22, result = new Matrix3()) {
-		result[0] = m00;
-		result[3] = m01;
-		result[6] = m02;
-		result[1] = m10;
-		result[4] = m11;
-		result[7] = m12;
-		result[2] = m20;
-		result[5] = m21;
-		result[8] = m22;
-		return result;
-	}
-	/**
-	 * Creates an identity matrix and optionally stores it in a provided destination.
-	 * @param Matrix3 destination? | The matrix to copy the identity matrix into 
-	 * @return Matrix3
-	 */
-	static identity(result) {
-		return Matrix3.create(
-			1, 0, 0,
-			0, 1, 0,
-			0, 0, 1,
-			result
-		);
 	}
 	/**
 	 * Creates a 2D rotation matrix and optionally stores it in a provided destination.
@@ -266,102 +455,160 @@ class Matrix3 extends Float64Array {
 			result
 		);
 	}
-	/**
-	 * Creates a 2D scaling matrix and optionally stores it in a provided a destination.
-	 * @signature
-	 * @param Number x | The scale factor on the x axis
-	 * @param Number y | The scale factor on the y axis
-	 * @param Matrix3 result? | The matrix to copy the scaling matrix into 
-	 * @signature
-	 * @param Vector2 vector | A vector containing the scale factors for both axes
-	 * @param Matrix3 result? | The matrix to copy the scaling matrix into 
-	 * @return Matrix3
-	 */
-	static scale(x, y, result) {
-		if (typeof y === "object" || y === undefined)
-			return Matrix3.create(
-				x, 0, 0,
-				0, x, 0,
-				0, 0, 1,
-				y
-			);
-		
-		return Matrix3.create(
-			x, 0, 0,
-			0, y, 0,
-			0, 0, 1,
-			result
-		);
-	}
-	/**
-	 * Creates a 2D translation matrix and optionally stores it in a provided a destination.
-	 * @signature
-	 * @param Number x | The x coordinate to translate by
-	 * @param Number y | The y coordinate to translate by
-	 * @param Matrix3 result? | The matrix to copy the translation matrix into 
-	 * @signature
-	 * @param Vector2 vector | The vector to translate by
-	 * @param Matrix3 result? | The matrix to copy the translation matrix into 
-	 * @return Matrix3
-	 */
-	static translation(x, y, result) {
-		if (typeof x === "object") {
-			return Matrix3.create(
-				1, 0, x.x,
-				0, 1, x.y,
-				0, 0, 1,
-				y
-			)
-		}
-		return Matrix3.create(
-			1, 0, x,
-			0, 1, y,
-			0, 0, 1,
-			result
-		);
-	}
-	/**
-	 * Multiplies a series of matrices together and optionally stores it in a provided destination.
-	 * @param Matrix3[] matrices | The matrices to multiply together. Order matters for this argument
-	 * @param Matrix3 result? | The matrix to copy the result into
-	 * @return Matrix3
-	 */
-	static mulMatrices(matrices, result = new Matrix3()) {
-		if (matrices.length === 1) return matrices[0].get(result);
-		matrices[matrices.length - 2].times(matrices[matrices.length - 1], result);
-		for (let i = matrices.length - 3; i >= 0; i--) matrices[i].times(result, result);
-		return result;
+	static get Vector() {
+		return Vector3;
 	}
 }
-{ // create toString methods
-	const methods = ["toString", "toFixed", "toMaxed"];
-	for (let i = 0; i < methods.length; i++) {
-		const method = methods[i];
-		Matrix3.prototype[method] = function (count) {
-			if (method === "toString") count = 10;
-			const n = [...this].map(v => v[method](count));
-			const max0 = Math.max(n[0].length, n[1].length, n[2].length);
-			const max1 = Math.max(n[3].length, n[4].length, n[5].length);
-			const max2 = Math.max(n[6].length, n[7].length, n[8].length);
-			const fullspan = max0 + max1 + max2 + 6;
-			const pad = (string, length) => {
-				const empty = length - string.length;
-				const left = Math.ceil(empty / 2);
-				const right = empty - left;
-				return " ".repeat(left) + string + " ".repeat(right);
-			};
-			return `
-┌${                 " ".repeat(fullspan)                    }┐
-│ ${pad(n[0], max0)}  ${pad(n[3], max1)}  ${pad(n[6], max2)} │
-│ ${pad(n[1], max0)}  ${pad(n[4], max1)}  ${pad(n[7], max2)} │
-│ ${pad(n[2], max0)}  ${pad(n[5], max1)}  ${pad(n[8], max2)} │
-└${                " ".repeat(fullspan)                     }┘
-`.trim();
-		};
+Matrix3.size = 3;
+
+/**
+ * Represents a 4 by 4 matrix for use with 3D vectors in homogenous coordinates or 4D vectors in standard coordinates.
+ */
+class Matrix4 extends Matrix {
+	constructor() {
+		super(Matrix4.size, arguments);
 	}
-};
-Matrix3.temp = [
-	Matrix3.identity(),
-	Matrix3.identity(),
-	Matrix3.identity()
-];
+	get determinant() {
+		const [
+			a, e, i, m,
+			b, f, j, n,
+			c, g, k, o,
+			d, h, l, p
+		] = this;
+
+		const mult0 = k * p,
+			mult1 = l * o,
+			mult2 = j * p,
+			mult3 = l * n,
+			mult4 = j * o,
+			mult5 = k * n,
+			mult6 = i * p,
+			mult7 = l * m,
+			mult8 = i * o,
+			mult9 = k * m,
+			mult10 = i * n,
+			mult11 = j * m;
+		const det0 = mult0 - mult1,
+			det1 = mult2 - mult3,
+			det2 = mult4 - mult5,
+			det3 = mult6 - mult7,
+			det4 = mult8 - mult9,
+			det5 = mult10 - mult11;
+		const co0 = f * det0 - g * det1 + h * det2,
+			co1 = e * det0 - g * det3 + h * det4,
+			co2 = e * det1 - f * det3 + h * det5,
+			co3 = e * det2 - f * det4 + g * det5;
+		
+		return a * co0 - b * co1 + c * co2 - d * co3;
+	}
+	get(dst = new Matrix4()) {
+		return super.get(dst);
+	}
+	invert() {
+		const [
+			a, e, i, m,
+			b, f, j, n,
+			c, g, k, o,
+			d, h, l, p
+		] = this;
+
+		const mult0 = k * p,
+			mult1 = l * o,
+			mult2 = j * p,
+			mult3 = l * n,
+			mult4 = j * o,
+			mult5 = k * n,
+			mult6 = i * p,
+			mult7 = l * m,
+			mult8 = i * o,
+			mult9 = k * m,
+			mult10 = i * n,
+			mult11 = j * m,
+			mult12 = g * p,
+			mult13 = h * o,
+			mult14 = f * p,
+			mult15 = h * n,
+			mult16 = f * o,
+			mult17 = g * n,
+			mult18 = e * p,
+			mult19 = h * m,
+			mult20 = e * o,
+			mult21 = g * m,
+			mult22 = e * n,
+			mult23 = f * m,
+			mult24 = g * l,
+			mult25 = h * k,
+			mult26 = f * l,
+			mult27 = h * j,
+			mult28 = f * k,
+			mult29 = g * j,
+			mult30 = e * l,
+			mult31 = h * i,
+			mult32 = e * k,
+			mult33 = g * i,
+			mult34 = e * j,
+			mult35 = f * i;
+		const det0 = mult0 - mult1,
+			det1 = mult2 - mult3,
+			det2 = mult4 - mult5,
+			det3 = mult6 - mult7,
+			det4 = mult8 - mult9,
+			det5 = mult10 - mult11,
+			det6 = mult12 - mult13,
+			det7 = mult14 - mult15,
+			det8 = mult16 - mult17,
+			det9 = mult18 - mult19,
+			det10 = mult20 - mult21,
+			det11 = mult22 - mult23,
+			det12 = mult24 - mult25,
+			det13 = mult26 - mult27,
+			det14 = mult28 - mult29,
+			det15 = mult30 - mult31,
+			det16 = mult32 - mult33,
+			det17 = mult34 - mult35;
+		const co0 = f * det0 - g * det1 + h * det2,
+			co1 = e * det0 - g * det3 + h * det4,
+			co2 = e * det1 - f * det3 + h * det5,
+			co3 = e * det2 - f * det4 + g * det5,
+			co4 = b * det0 - c * det1 + d * det2,
+			co5 = a * det0 - c * det3 + d * det4,
+			co6 = a * det1 - b * det3 + d * det5,
+			co7 = a * det2 - b * det4 + c * det5,
+			co8 = b * det6 - c * det7 + d * det8,
+			co9 = a * det6 - c * det9 + d * det10,
+			co10 = a * det7 - b * det9 + d * det11,
+			co11 = a * det8 - b * det10 + c * det11,
+			co12 = b * det12 - c * det13 + d * det14,
+			co13 = a * det12 - c * det15 + d * det16,
+			co14 = a * det13 - b * det15 + d * det17,
+			co15 = a * det14 - b * det16 + c * det17;
+		
+		const det = a * co0 - b * co1 + c * co2 - d * co3;
+		if (!det) return null;
+
+		const idet = 1 / det;
+
+		this[0] = co0 * idet;
+		this[1] = -co1 * idet;
+		this[2] = co2 * idet;
+		this[3] = -co3 * idet;
+		this[4] = -co4 * idet;
+		this[5] = co5 * idet;
+		this[6] = -co6 * idet;
+		this[7] = co7 * idet;
+		this[8] = co8 * idet;
+		this[9] = -co9 * idet;
+		this[10] = co10 * idet;
+		this[11] = -co11 * idet;
+		this[12] = -co12 * idet;
+		this[13] = co13 * idet;
+		this[14] = -co14 * idet;
+		this[15] = co15 * idet;
+
+		return this;
+	}
+	static get Vector() {
+		return Vector4;
+	}
+}
+Matrix4.size = 4;

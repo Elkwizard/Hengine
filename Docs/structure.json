@@ -92,13 +92,13 @@
 				"Spline": null
 			},
 			"Range": null,
-			"Vector": {
+			"Vectors": {
 				"Vector": null,
 				"Vector2": null,
 				"Vector3": null,
 				"Vector4": null
 			},
-			"Matrix3": null,
+			"Matrices": ["Matrix", "Matrix2", "Matrix3", "Matrix4"],
 			"Transform": null,
 			"Geometry": ["Geometry", "RectPriority"],
 			"Interpolation": null,

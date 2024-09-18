@@ -19,7 +19,7 @@ All properties of this class are read-only.
 	</span><span class="highlight-IDENTIFIER">delay</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 1</span><span class="highlight-SYMBOL">,
 	</span><span class="highlight-IDENTIFIER">lifeSpan</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">,
 	</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">) {
-		</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">velocity</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromAngle</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../Pages/Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">angle</span><span class="highlight-SYMBOL">()).</span><span class="highlight-FUNCTION">times</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../Pages/Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">));
+		</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">velocity</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromAngle</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../Pages/Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">angle</span><span class="highlight-SYMBOL">()).</span><span class="highlight-FUNCTION">times</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../Pages/Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">));
 		</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">data</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">size</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../../Pages/Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">);
 	},
 	</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">) {
@@ -227,7 +227,7 @@ All properties of this class are read-only.
 						<div class="param-wrapper" id="PARTICLE_SPAWNER.prototype.explode():position?">
 							<div class="param-name">
 								<span class="param">position</span>
-								<span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The location to create the particles at. Default is the location of the spawner
@@ -267,14 +267,14 @@ This represents a single particle in a particle system.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Particle.position">
 					<div class="prop-header member">
-						<span class="prop-name">position</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">position</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The world-space position of the particle</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Particle.velocity">
 					<div class="prop-header member">
-						<span class="prop-name">velocity</span><span class="type"><a href="../../Pages/Geometry/Vector/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">velocity</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The velocity per frame of the particle</div>
 				</div>
