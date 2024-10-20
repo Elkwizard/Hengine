@@ -76,9 +76,9 @@ class GLSL {
 		const pieces = str.split(" ");
 
 		if (pieces.length === 5) {
-			if (pieces[2] === "[")  pieces.splice(1, 0, ...pieces.splice(2, 3));
+			if (pieces[2] === "[") pieces.splice(1, 0, ...pieces.splice(2, 3));
 			const [type,, dim,, name] = pieces;
-			return { type, name, length: +dim };
+			return { type, name, length: dim };
 		}
 		
 		const [type, name] = pieces;
@@ -94,7 +94,7 @@ class GLSL {
 				decls[i] = { type: decls[0].type, name: pieces[0], length: decls[0].length };
 			} else {
 				const [name,, dim] = pieces;
-				decls[i] = { type: decls[0].type, name, length: +dim };
+				decls[i] = { type: decls[0].type, name, length: dim };
 			}
 		}
 		
@@ -119,7 +119,7 @@ class GLSL {
 	compileDynamicArrays() {
 		this.dynamicArrays = new Map();
 		for (const [name, uniform] of this.uniforms)
-			if (uniform.length === 0) {
+			if (uniform.length === "0") {
 				this.dynamicArrays.set(name, uniform);
 				this.compileDynamicArray(uniform);
 			}
@@ -206,7 +206,7 @@ class GLSL {
 			}
 		`;
 
-		this.glsl = this.glsl.replace(`uniform ${type} ${name};`, replacement);
+		this.glsl = this.glsl.replace(`uniform ${type}[0] ${name};`, replacement);
 		
 		const lengthRegex = new RegExp(String.raw`\b${name}\s*\.\s*length\s*\(\s*\)`, "g");
 		this.glsl = this.glsl.replace(lengthRegex, identifiers.length);
@@ -727,14 +727,14 @@ class GLSLProgram {
 							if (index >= length) return;
 							const imagePixelated = image instanceof Texture;
 							const imageCIS = (image instanceof Texture) ? image.imageData : image.makeWebGLImage();
-							GL.activeTexture(gl.TEXTURE0 + indices[index]);
+							gl.activeTexture(gl.TEXTURE0 + indices[index]);
 							if (imagePixelated !== pixelated) {
 								pixelated = imagePixelated;
 								const param = pixelated ? gl.NEAREST : gl.LINEAR;
-								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
-								GL.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
+								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
+								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
 							}
-							GL.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
+							gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
 						}
 						if (array) desc.set = images => images.forEach(writeImage);
 						else desc.set = image => writeImage(image);

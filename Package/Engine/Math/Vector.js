@@ -4,7 +4,6 @@
  * @prop Number mag | The magnitude of the vector
  * @prop Number sqrMag | The squared magnitude of the vector
  * @prop Vector normalized | The unit vector in the same direction of the vector
- * @prop Vector inverse | The vector in the opposite direction with the same magnitude
  */
 class Vector extends Operable {
 	constructor() {
@@ -28,19 +27,6 @@ class Vector extends Operable {
 	get normalized() {
 		return this.get().normalize();
 	}
-	set inverse(a) {
-		this.set(a).invert();
-	}
-	get inverse() {
-		return this.times(-1);
-	}
-	/**
-	 * Inverts the vector in-place and returns the caller.
-	 * @return Vector
-	 */
-	invert() {
-		return this.mul(-1);
-	}
 	compare(v1, v2) {
 		return (v1.dot(this) > v2.dot(this)) ? v1 : v2;
 	}
@@ -50,8 +36,7 @@ class Vector extends Operable {
 	 */
 	normalize() {
 		const { mag } = this;
-		if (mag > 0) return this.div(mag);
-		return this;
+		return this.div(mag || 1);
 	}
 	/**
 	 * Computes the dot product between the caller and another vector.
@@ -84,10 +69,6 @@ class Vector extends Operable {
 		if (d2 < d1) return this.inverse;
 		else return this.get();
 	}
-	/**
-	 * Converts the vector to a human readable String representation.
-	 * @return String
-	 */
 	toString() {
 		return `\u27e8 ${this.values.join(", ")} \u27e9`;
 	}
@@ -117,6 +98,46 @@ class Vector extends Operable {
 	}
 }
 Vector.modValues = [];
+
+{
+	const proto = (key, value) => Object.defineProperty(Number.prototype, key, { value, enumerable: false });
+
+	// Make Number behave like Vector
+	Object.defineProperty(Number.prototype, "mag", {
+		get() {
+			return Math.abs(this);
+		},
+		enumerable: false
+	});
+	Object.defineProperty(Number.prototype, "sqrMag", {
+		get() {
+			return this ** 2;
+		},
+		enumerable: false
+	});
+
+	Number.filled = n => n;
+	proto("op", function (v, fn) { return fn(this, v); });
+	proto("map", function (fn) { return fn(this); });
+	proto("dot", function (n) { return this * n; });
+	proto("plus", function (n) { return this + n; });
+	proto("minus", function (n) { return this - n; });
+	proto("times", function (n) { return this * n; });
+	proto("over", function (n) { return this / n; });
+	proto("modBy", function (n) { return this % n; });
+	proto("pow", function (n) { return this ** n; });
+	proto("get", function () { return +this; });
+	proto("equals", function (n) { return this === n || Math.abs(this - n) < MathObject.EPSILON; });
+	proto("total", function () { return this; });
+	proto("toMaxed", function (digits) {
+		return String(Math.round(this * 10 ** digits) / 10 ** digits);
+	});
+
+	Number.zero = 0;
+
+	Object.inherit(Number, Vector);
+}
+
 /**
  * Represents a 2D vector.
  * ```js
@@ -186,18 +207,18 @@ class Vector2 extends Vector {
 	equals(v) {
 		if (this === v) return true;
 		if (v === undefined || v.constructor !== Vector2) return false;
-		const { EPSILON } = Operable;
+		const { EPSILON } = MathObject;
 		return Math.abs(this.x - v.x) < EPSILON && Math.abs(this.y - v.y) < EPSILON;
 	}
-	op(v, e) {
+	op(v, fn, dst = new Vector2()) {
 		if (typeof v === "number") {
-			this.x = e(this.x, v);
-			this.y = e(this.y, v);
+			dst.x = fn(this.x, v);
+			dst.y = fn(this.y, v);
 		} else {
-			this.x = e(this.x, v.x);
-			this.y = e(this.y, v.y);
+			dst.x = fn(this.x, v.x);
+			dst.y = fn(this.y, v.y);
 		}
-		return this;
+		return dst;
 	}
 	/**
 	 * Rotates the vector clockwise (in screen-space). This operation is in-place and returns the caller.
@@ -242,11 +263,9 @@ class Vector2 extends Vector {
 		return v.times(k, result);
 	}
 	normalize() {
-		let m = this.mag;
-		if (m) {
-			this.x /= m;
-			this.y /= m;
-		}
+		const f = 1 / (this.mag || 1);
+		this.x *= f;
+		this.y *= f;
 		return this;
 	}
 	invert() {
@@ -450,6 +469,20 @@ class Vector3 extends Vector {
 		result.y = u.z * v.x - u.x * v.z;
 		result.z = u.x * v.y - u.y * v.x;
 		return result;
+	}
+	/**
+	 * Returns a matrix such that for Vector3s `u` and `v`, `u.crossMatrix().times(v)` is the same as `u.cross(v)`. 
+	 * @param Matrix3 result | The destination to store the resulting matrix in. If this is not specified, a new matrix will be created
+	 * @return Matrix3
+	 */
+	crossMatrix(result = new Matrix3()) {
+		const { x, y, z } = this;
+		return Matrix3.create(
+			0, -z, y,
+			z, 0, -x,
+			-y, x, 0,
+			result
+		);
 	}
 	/**
 	 * @name rotate[UV]

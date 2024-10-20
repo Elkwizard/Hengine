@@ -1,16 +1,152 @@
 /**
- * @implements Copyable, Serializable
+ * @name class MathObject
+ * @type interface MathObject implements Copyable
+ * @implements Copyable
+ * Represents a mathematical object, on which operations (+, -, *, /, %, **) can be performed.
+ * The operations are provided as two sets of methods, one which mutates the caller, and one which creates a new object to hold the result.
+ * ```js
+ * new Complex(3, 6).over(3) // 1 + 2i
+ * new Vector3(1, 2, 3).plus(3) // (4, 5, 6)
+ * Quaternion.fromRotation(Vector3.up, Math.PI) // 0 + 0i + -1j + 0k
+ * ```
+ * @abstract
+ */
+class MathObject {
+	/**
+	 * Returns the reciprocal of the caller.
+	 * @return MathObject
+	 */
+	get reciprocal() {
+		return this.get().flip();
+	}
+	/**
+	 * Returns the inverse of the caller.
+	 * @return MathObject
+	 */
+	get inverse() {
+		return this.get().invert();
+	}
+	/**
+	 * @group plus/minus/times/over/modBy/pow
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param MathObject other | The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param MathObject result? | The destination to store the resulting object in. If not specified, a new object will be created
+	 * @return MathObject
+	 */
+	minus(other, dst = this.constructor.zero) {
+		return this.plus(other.inverse, dst);
+	}
+	over(other, dst = this.constructor.zero) {
+		return this.times(other.reciprocal, dst);
+	}
+	/**
+	 * @group add/sub/mul/div/mod/exp
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param MathObject other | The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @return MathObject
+	 */
+    add(other) {
+		return this.plus(other, this);
+    }
+    sub(other) {
+		return this.minus(other, this);
+    }
+    mul(other) {
+		return this.times(other, this);
+    }
+    div(other) {
+		return this.over(other, this);
+    }
+	mod(other) {
+		return this.modBy(other, this);
+	}
+	exp(other) {
+		return this.pow(other, this);
+	}
+	/**
+	 * Replaces the caller with its reciprocal and returns it.
+	 * @return MathObject
+	 */
+	flip() {
+		return this.exp(-1);
+	}
+	/**
+	 * Negates the caller and returns it.
+	 * @return MathObject
+	 */
+	invert() {
+		return this.mul(-1);
+	}
+	/**
+	 * Replaces the content of the caller with that of a given MathObject of the same type, then returns the caller.
+	 * @param MathObject source | The object from which to copy the data
+	 * @return MathObject
+	 */
+	set(other) {
+		return other.get(this);
+	}
+	/**
+	 * @name equals
+	 * Returns whether the caller is equal, within a small tolerance, to another given object of the same type.
+	 * @param MathObject other | The object to compare to
+	 * @return Boolean
+	 */
+	/**
+	 * @name toFixed
+	 * Returns a string representation of the object with a specified level of precision for included numbers.
+	 * @param Number digits | The number of digits of precision
+	 * @return String
+	 */
+	/**
+	 * @name toMaxed
+	 * Returns a string representation of the object with a specified maximum level of precision for included numbers.
+	 * @param Number max | The maximum number of digits of precision. The displayed amount of digits may be less, since trailing zeroes are discarded
+	 * @return String
+	 */
+	/**
+	 * @name static get zero
+	 * Returns a value such that for any MathObject `a`, `a.plus(a.constructor.zero).equals(a)` is true.
+	 * @return MathObject
+	 */
+	/**
+	 * Computes the sum of a collection of MathObjects of the same type.
+	 * @param MathObject[] values | The values to sum
+	 * @param MathObject result? | The destination to store the resulting object in. If not specified, a new object will be created
+	 * @return MathObject
+	 */
+    static sum(values, result = this.zero) {
+		result = result.mul(0);
+		for (let i = 0; i < values.length; i++)
+			result = result.add(values[i]);
+        return result;
+    }
+	/**
+	 * Computes the average of a collection of MathObjects of the same type.
+	 * @param MathObject[] values | The values to average.
+	 * @param MathObject result? | The destination to store the resulting object in. If not specified, a new object will be created
+	 * @return MathObject
+	 */
+	static avg(values, result) {
+		return this.sum(values, result).div(values.length);
+	}
+	static lerp(a, b, t, result = this.zero) {
+		return a.times((1 - t) / t, result).add(b).mul(t);
+	}
+}
+MathObject.EPSILON = 0.000001;
+MathObject.add = (a, b) => a + b;
+MathObject.sub = (a, b) => a - b;
+MathObject.mul = (a, b) => a * b;
+MathObject.div = (a, b) => a / b;
+MathObject.pow = (a, b) => a ** b;
+
+/**
+ * @implements MathObject, Serializable
  * Represents a composite mathematical object which element-wise operations can be performed on.
- * Many mathematical operations (plus, minus, times, over) can be performed on operables of any subclass type, allowing for convenient polymorphism.
- * All immutable methods, including static methods, are available on Number.
- * This means that Number can largely be considered a subclass of operable and can be used for operable-typed arguments.
  * @abstract
  * @static_prop String[] modValues | The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector)
  */
-class Operable {
-    constructor() {
-
-    }
+class Operable extends MathObject {
 	/**
 	 * Produces a list of all the elements of the operable.
 	 * @return Number[]
@@ -37,7 +173,7 @@ class Operable {
         }
         return this;
     }
-    get(result = this.constructor.empty) {
+    get(result = this.constructor.zero) {
         const { modValues } = this.constructor;
         for (let i = 0; i < modValues.length; i++) {
             const field = modValues[i];
@@ -53,69 +189,38 @@ class Operable {
     at(index) {
         return this[this.constructor.modValues[index]];
     }
-    op(v, fn) {
+    op(v, fn, dst = this.constructor.zero) {
         const { modValues } = this.constructor;
         if (typeof v === "number") {
             for (let i = 0; i < modValues.length; i++) {
                 const field = modValues[i];
-                this[field] = fn(this[field], v);
+                dst[field] = fn(this[field], v);
             }
         } else {
             for (let i = 0; i < modValues.length; i++) {
                 const field = modValues[i];
-                this[field] = fn(this[field], v[field] ?? 0);
+                dst[field] = fn(this[field], v[field] ?? 0);
             }
         }
-        return this;
+        return dst;
     }
-    gop(v, fn) {
-        return this.get().op(v, fn);
-    }
-	/**
-	 * @group add, sub, mul, div, mod
-	 * Performs an in-place element-wise arithmetic operation between the caller and another operable or Number.
-	 * Returns the caller.
-	 * @param Operable/Number operable | The right hand operand of the operation
-	 * @return Operable
-	 */
-    add(v) {
-        return this.op(v, Operable.addFunc);
-    }
-    sub(v) {
-        return this.op(v, Operable.subFunc);
-    }
-    mul(v) {
-        return this.op(v, Operable.mulFunc);
-    }
-    div(v) {
-        return this.op(v, Operable.divFunc);
-    }
-	mod(v) {
-		return this.op(v, Operable.modFunc);
-	}
-	/**
-	 * @group plus, minus, times, over, modBy
-	 * Performs an immutable element-wise arithmetic operation between the caller and another operable or Number.
-	 * Returns the result of the operation, leaving the operands unchanged.
-	 * A destination can be provided for the operation, in which case no new operable will be created.
-	 * @param Operable/Number operable | The right hand operand of the operation
-	 * @param Operable destination? | The destination for the operation
-	 * @return Operable
-	 */
     plus(v, result) {
-        return this.get(result).add(v);
+		return this.op(v, Operable.addFunc, result);
     }
     minus(v, result) {
-        return this.get(result).sub(v);
+		return this.op(v, Operable.subFunc, result);
     }
     times(v, result) {
-        return this.get(result).mul(v);
+		return this.op(v, Operable.mulFunc, result);
     }
     over(v, result) {
-        return this.get(result).div(v);
+		return this.op(v, Operable.divFunc, result);
     }
 	modBy(v, result) {
-		return this.get(result).mod(v);
+		return this.op(v, Operable.modFunc, result);
+	}
+	pow(v, result) {
+		return this.op(v, Math.pow, result);
 	}
     map(fn) {
         const result = this.get();
@@ -144,7 +249,7 @@ class Operable {
 		if (this === v) return true;
 		if (v === undefined || v.constructor !== this.constructor) return false;
 
-        const { modValues, EPSILON } = this.constructor;
+        const { modValues, EPSILON = MathObject.EPSILON } = this.constructor;
         for (let i = 0; i < modValues.length; i++) {
             const field = modValues[i];
             if (Math.abs(this[field] - v[field]) >= EPSILON) return false;
@@ -158,18 +263,14 @@ class Operable {
         return buffer;
     }
     static fromByteBuffer(buffer) {
-        const result = this.empty;
+        const result = this.zero;
         const { modValues } = this;
         for (let i = 0; i < modValues.length; i++)
             result[modValues[i]] = buffer.read.float64();
         return result;
     }
-	/**
-	 * Produces an operable with 0 for all element values.
-	 * @return Operable
-	 */
-    static get empty() {
-        return new (this.emptyConstructor ??= this.bind(
+    static get zero() {
+        return new (this.zeroConstructor ??= this.bind(
             null, ...new Uint8Array(this.modValues.length)
         ));
     }
@@ -187,30 +288,12 @@ class Operable {
         });
     }
 	/**
-	 * Computes the element-wise sum of a list of operables.
-	 * @param Operable[]/Number[] operables | The values to sum 
-	 * @return Operable
-	 */
-    static sum(v) {
-        const acc = this.empty;
-        for (let i = 0; i < v.length; i++) acc.add(v[i]);
-        return acc;
-    }
-	/**
-	 * Computes the element-wise average of a list of operables.
-	 * @param Operable[]/Number[] operables | The values to average 
-	 * @return Operable
-	 */
-    static avg(v) {
-        return this.sum(v).over(v.length);
-    }
-	/**
 	 * Remaps an operable from one range to another range.
-	 * @param Operable/Number value | The operable to be remapped
-	 * @param Operable/Number initialMin | The minimum of the range the value is in
-	 * @param Operable/Number initialMax | The maximum of the range the value is in
-	 * @param Operable/Number finalMin | The minimum of the desired range
-	 * @param Operable/Number finalMax | The maximum of the desired range
+	 * @param Operable value | The operable to be remapped
+	 * @param Operable initialMin | The minimum of the range the value is in
+	 * @param Operable initialMax | The maximum of the range the value is in
+	 * @param Operable finalMin | The minimum of the desired range
+	 * @param Operable finalMax | The maximum of the desired range
 	 * @return Operable
 	 */
     static remap(n, a, b, a2, b2) {
@@ -219,9 +302,9 @@ class Operable {
 	/**
 	 * Returns an operable clamped element-wise between two bounds.
 	 * Equivalent to `Operable.max(min, operable.min(max, value))`.
-	 * @param Operable/Number value | The value to clamp
-	 * @param Operable/Number min | The lower bound for the result
-	 * @param Operable/Number max | The upper bound for the result
+	 * @param Operable value | The value to clamp
+	 * @param Operable min | The lower bound for the result
+	 * @param Operable max | The upper bound for the result
 	 * @return Operable
 	 */
     static clamp(n, a, b) {
@@ -241,9 +324,9 @@ class Operable {
 	 * @return Operable
 	 */
     static min(...values) {
-        const acc = this.filled(Infinity);
+        let acc = this.filled(Infinity);
         for (let i = 0; i < values.length; i++) 
-            acc.op(values[i], Math.min);
+            acc = acc.op(values[i], Math.min, acc);
         return acc;
     }
 	/**
@@ -252,23 +335,10 @@ class Operable {
 	 * @return Operable
 	 */
     static max(...values) {
-        const acc = this.filled(-Infinity);
-        for (let i = 0; i < values.length; i++) {
-            acc.op(values[i], Math.max);
-        }
+        let acc = this.filled(-Infinity);
+        for (let i = 0; i < values.length; i++)
+            acc = acc.op(values[i], Math.max, acc);
         return acc;
-    }
-	/**
-	 * Performs an element-wise exponentiation.
-	 * @param Operable base | The base of the exponentiation
-	 * @param Operable/Number power | The power of the exponentiation
-	 * @return Operable
-	 */
-    static pow(a, power) {
-        return a.gob(power, Math.pow);
-    }
-    static lerp(a, b, t) {
-        return a.gop(b, (A, B) => A * (1 - t) + B * t);
     }
 	/**
 	 * @group static round, static floor, static ceil, static trunc, static abs, static sqrt, static log, static log2, static log10, static sin, static cos, static tan, static sinh, static cosh, static tanh, static asin, static acos, static atan, static asinh, static acosh, static atanh, static sign
@@ -296,18 +366,13 @@ class Operable {
         const fn = Math[fnName].bind(Math);
 
         Object.defineProperty(Operable, fnName, {
-            value: function (arg) {
-                return arg.map(fn);
-            },
+            value: arg => arg.map(fn),
             enumerable: false
         });
     }
-
 })();
 
-Operable.EPSILON = 0.000001;
 Operable.modValues = [];
-Operable.emptyConstructor = null;
 Operable.addFunc = (a, b) => a + b;
 Operable.subFunc = (a, b) => a - b;
 Operable.mulFunc = (a, b) => a * b;

@@ -71,7 +71,7 @@ function createPropSpecification(className, name, prop, isWindow) {
 function getClassMembers(doc) {
 	const subs = doc.settings.name_subs?.substitutions;
 	const isWindow = doc.name.base === "Window";
-	
+
 	const members = [
 		...doc.properties
 			.flatMap(prop => {

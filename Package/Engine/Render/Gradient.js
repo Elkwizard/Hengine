@@ -4,7 +4,7 @@
  * This is an interface for values passed to methods of Gradient.
  * Represents a point along a gradient with a specific value.
  * @prop Number start | The parameter value at which this stop's value reaches full intensity
- * @prop Operable/Number value | The gradient value at this stop
+ * @prop Operable value | The gradient value at this stop
  */
 
 /**
@@ -52,7 +52,7 @@ class Gradient {
 	/**
 	 * Samples the gradient at a specific value of the parameter
 	 * @param Number t | The parameter value to sample at
-	 * @return Operable/Number
+	 * @return Operable
 	 */
 	sample(v) {
 		let valueStop = null;

@@ -131,7 +131,7 @@ class Random {
 	 * @param Color result? | The destination for the color. Default is a new color.
 	 * @return Color
 	 */
-    color(result = Color.empty) {
+    color(result = Color.zero) {
         result.red = this.random() * 255;
         result.green = this.random() * 255;
         result.blue = this.random() * 255;

@@ -279,21 +279,22 @@ Object.defineProperty(window, "title", {
 	 * @return Any[]
 	 */
 	Array.dim = function (...dims) {
-		const arr = [];
-		if (dims.length > 1) {
-			const dim = dims.shift();
-			Array.makeMultidimensional(arr);
+		const dim = dims.shift();
+
+		if (dims.length) {
+			const arr = [];
 			for (let i = 0; i < dim; i++) arr.push(Array.dim(...dims));
-		} else {
-			for (let i = 0; i < dims[0]; i++) arr.push(null);
+			Array.makeMultidimensional(arr);
+			return arr;
 		}
-		return arr;
+
+		return new Array(Math.floor(dim)).fill(null);
 	};
 	/**
-	 * @name class Number extends Operable
-	 * @type interface Number extends Operable
+	 * @name class Number extends Vector
+	 * @type interface Number extends MathObject
 	 * The built-in Number class has some additional utility methods in the Hengine.
-	 * The class extends Operable only in the sense that it has all of the same methods, excluding those that modify the caller in-place.
+	 * Numbers are Vectors in the sense that they have all the same methods, except that those which modify the caller in-place are not defined.
 	 */
 	/**
 	 * @name toDegrees
@@ -310,20 +311,6 @@ Object.defineProperty(window, "title", {
 	 */
 	proto(Number.prototype, "toRadians", function () {
 		return this * (Math.PI / 180);
-	});
-	proto(Number.prototype, "movedTowards", function (value, ferocity) {
-		const dir = ferocity * (value - this) * 2;
-		return this + dir;
-	});
-	/**
-	 * @name toMaxed
-	 * Converts the number to a string with a specified maximum number of digits.
-	 * Trailing zeros will be discarded.
-	 * @param Number digits | The maximum number of digits past the decimal point
-	 * @return Number
-	 */
-	proto(Number.prototype, "toMaxed", function (digits) {
-		return String(Math.round(this * 10 ** digits) / 10 ** digits);
 	});
 	/**
 	 * @name class String
@@ -447,9 +434,7 @@ Object.defineProperty(window, "title", {
 				contents.push(statement);
 			}
 			if (!contents.length) return cls(this) + "(0) { }";
-			return `${cls(this)}(${contents.length}) { 
-${contents.join(",\n").indent()}
-}`.replace(/\t/g, "   ");
+			return `${cls(this)}(${contents.length}) {\n${contents.join(",\n").indent()}\n}`.replace(/\t/g, "   ");
 		});
 	})();
 	proto(Array.prototype, "toString", Object.prototype.toString);
@@ -476,37 +461,19 @@ ${contents.join(",\n").indent()}
 			get: () => objectB[key]
 		});
 	};
-
-	//Make Number behave like Operable
-	Number.abs = n => Math.abs(n);
-	Number.clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-	Number.lerp = (a, b, t) => a * (1 - t) + b * t;
-	Number.remap = (n, a, b, a2, b2) => (n - a) / (b - a) * (b2 - a2) + a2;
-	Number.min = (a, b) => Math.min(a, b);
-	Number.max = (a, b) => Math.max(a, b);
-	Number.sum = numbers => numbers.reduce((a, b) => a + b, 0);
-	Number.avg = numbers => Number.sum(numbers) / numbers.length;
-	Object.defineProperty(Number.prototype, "mag", {
-		get() {
-			return Math.abs(this);
-		},
-		enumerable: false
-	});
-	Object.defineProperty(Number.prototype, "sqrMag", {
-		get() {
-			return this ** 2;
-		},
-		enumerable: false
-	});
-	proto(Number.prototype, "plus", function (n) { return this + n; });
-	proto(Number.prototype, "minus", function (n) { return this - n; });
-	proto(Number.prototype, "times", function (n) { return this * n; });
-	proto(Number.prototype, "over", function (n) { return this / n; });
-	proto(Number.prototype, "mod", function (n) { return this % n; });
-	proto(Number.prototype, "get", function () { return this; });
-	proto(Number.prototype, "equals", function (n) { return this === n || Math.abs(this - n) < Operable.EPSILON; });
-
-	Number.empty = 0;
+	Object.inherit = function (child, parent) {
+		const copy = (src, dst) => {
+			if (!src) return;
+			const descriptors = Object.getOwnPropertyDescriptors(src);
+			for (const key in descriptors)
+				if (!(key in dst)) {
+					Object.defineProperty(dst, key, descriptors[key]);
+				}
+			copy(Object.getPrototypeOf(src), dst);
+		}
+		copy(parent, child);
+		copy(parent.prototype, child.prototype);
+	};
 
 	/**
 	 * @name class Storage

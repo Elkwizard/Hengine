@@ -734,7 +734,7 @@ declare class IntervalManager {
 	 * @param curve - The easing function. Default is `Interpolation.linear`
 	 * @param type - When during the update cycle to update the animation. Default is `IntervalFunction.BEFORE_UPDATE`
 	 */
-	animate(object: object, property: string | symbol, finalValue: Operable | number, duration: number, curve?: (arg0: number) => number, type?: symbol): Promise<void>;
+	animate(object: object, property: string | symbol, finalValue: Operable, duration: number, curve?: (arg0: number) => number, type?: symbol): Promise<void>;
 	/**
 	 * Creates a new DelayedFunction.
 	 * Returns a promise that resolves when the function executes.
@@ -1088,7 +1088,7 @@ declare class GPUComputation implements GPUInterface {
 }
 
 /**
- * Provides a collection of interpolation algorithms that operate on operables and numbers.
+ * Provides a collection of interpolation algorithms that operate on math objects.
  * All methods of this class are static and do not mutate their arguments.
  * ```js
  * Interpolation.lerp(new Color("red"), new Color("blue"), 0.5); // dark purple
@@ -1103,14 +1103,14 @@ declare class Interpolation {
 	 * @param b - The final value
 	 * @param t - The progress proportion from the initial value to the final value, on the interval [0, 1]
 	 */
-	static lerp(a: Operable | number, b: Operable | number, t: number): Operable | number;
+	static lerp(a: MathObject, b: MathObject, t: number): MathObject;
 	/**
 	 * Smoothly interpolates between two values. (Uses the Interpolation.smooth easing function)
 	 * @param a - The initial value
 	 * @param b - The final value
 	 * @param t - The progress proportion from the initial value to the final value, on the interval [0, 1]
 	 */
-	static smoothLerp(a: Operable | number, b: Operable | number, t: number): Operable | number;
+	static smoothLerp(a: MathObject, b: MathObject, t: number): MathObject;
 	/**
 	 * Linearly interpolates between four values in a square formation.
 	 * @param a - The value in the upper-left corner
@@ -1120,7 +1120,7 @@ declare class Interpolation {
 	 * @param tx - The horizontal progress proportion
 	 * @param ty - The vertical progress proportion
 	 */
-	static quadLerp(a: Operable | number, b: Operable | number, c: Operable | number, d: Operable | number, tx: number, ty: number): Operable | number;
+	static quadLerp(a: MathObject, b: MathObject, c: MathObject, d: MathObject, tx: number, ty: number): MathObject;
 	/**
 	 * Smoothly interpolates between four values in a square formation. (Uses the Interpolation.smooth easing function)
 	 * @param a - The value in the upper-left corner
@@ -1130,7 +1130,7 @@ declare class Interpolation {
 	 * @param tx - The horizontal progress proportion
 	 * @param ty - The vertical progress proportion
 	 */
-	static smoothQuadLerp(a: Operable | number, b: Operable | number, c: Operable | number, d: Operable | number, tx: number, ty: number): Operable | number;
+	static smoothQuadLerp(a: MathObject, b: MathObject, c: MathObject, d: MathObject, tx: number, ty: number): MathObject;
 	/**
 	 * Linearly interpolates between eight values in a cube formation.
 	 * @param a - The value in the front-upper-left corner
@@ -1145,7 +1145,7 @@ declare class Interpolation {
 	 * @param ty - The vertical progress proportion
 	 * @param tz - The depth progress proportion
 	 */
-	static cubeLerp(a: Operable | number, b: Operable | number, c: Operable | number, d: Operable | number, a2: Operable | number, b2: Operable | number, c2: Operable | number, d2: Operable | number, tx: number, ty: number, tz: number): Operable | number;
+	static cubeLerp(a: MathObject, b: MathObject, c: MathObject, d: MathObject, a2: MathObject, b2: MathObject, c2: MathObject, d2: MathObject, tx: number, ty: number, tz: number): MathObject;
 	/**
 	 * Smoothly interpolates between eight values in a cube formation. (Uses the Interpolation.smooth easing function)
 	 * @param a - The value in the front-upper-left corner
@@ -1160,7 +1160,7 @@ declare class Interpolation {
 	 * @param ty - The vertical progress proportion
 	 * @param tz - The depth progress proportion
 	 */
-	static smoothCubeLerp(a: Operable | number, b: Operable | number, c: Operable | number, d: Operable | number, a2: Operable | number, b2: Operable | number, c2: Operable | number, d2: Operable | number, tx: number, ty: number, tz: number): Operable | number;
+	static smoothCubeLerp(a: MathObject, b: MathObject, c: MathObject, d: MathObject, a2: MathObject, b2: MathObject, c2: MathObject, d2: MathObject, tx: number, ty: number, tz: number): MathObject;
 	/**
 	 * Computes the smooth minimum between two numbers.
 	 * @param a - The first argument to the minimum
@@ -1198,7 +1198,7 @@ declare class Interpolation {
 }
 
 /**
- * Represents a Operable- or Number-valued variable that smoothly moves between values.
+ * Represents a MathObject-valued variable that smoothly moves between values.
  * If a transition between states is interrupted by setting a new target, the new transition will begin immediately and will begin from the current position.
  * ```js
  * const point = new Animatable(middle, 100, Interpolation.smooth);
@@ -1214,7 +1214,7 @@ declare class Animatable {
 	/**
 	 * The current target value of the animatable
 	 */
-	target: Operable | number;
+	target: Operable;
 	/**
 	 * The length of each transition, in frames
 	 */
@@ -1234,20 +1234,20 @@ declare class Animatable {
 	 * @param easing - The easing function to use. Default is `Interpolation.linear`
 	 * @param copyTarget - Whether or not target values should be copied. Default is true
 	 */
-	constructor(initial: Operable | number, duration: number, easing?: (arg0: number) => number, copyTarget?: boolean);
+	constructor(initial: MathObject, duration: number, easing?: (arg0: number) => number, copyTarget?: boolean);
 	/**
 	 * Sets the value immediately. This will not involve a transition.
 	 * @param value - The new value
 	 */
-	set value(value: Operable | number);
+	set value(value: MathObject);
 	/**
 	 * Returns the current value of the animatable and advances one frame in the transition.
 	 */
-	get value(): Operable | number;
+	get value(): MathObject;
 	/**
 	 * Returns the current value of the animatable and doesn't advance the transition
 	 */
-	get current(): Operable | number;
+	get current(): MathObject;
 }
 
 /**
@@ -1267,8 +1267,9 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	constructor(...columns: Vector[]);
 	/**
 	 * Creates a new Matrix. Since this class is abstract, this constructor can only be used via its subclasses.
+	 * @param base - A matrix of less or equal dimension. If specified, the constructed matrix will be an identity matrix with the elements of this argument superimposed on it from the upper-left. Otherwise, the constructed matrix will be an unaltered identity matrix
 	 */
-	constructor();
+	constructor(base?: this);
 	/**
 	 * Transposes the matrix in-place (swapping rows with columns) and returns it.
 	 */
@@ -1364,7 +1365,7 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 */
 	static identity(destination?: Matrix): Matrix;
 	/**
-	 * Multiplies a series of matrices together and optionally stores it in a provided destination.
+	 * Multiplies a series of matrices together and optionally stores the result in a provided destination.
 	 * @param matrices - The matrices to multiply together. Order matters for this argument
 	 * @param result - The matrix to copy the result into
 	 */
@@ -1937,14 +1938,6 @@ declare class Vector extends Operable {
 	 */
 	normalized: this;
 	/**
-	 * The vector in the opposite direction with the same magnitude
-	 */
-	inverse: this;
-	/**
-	 * Inverts the vector in-place and returns the caller.
-	 */
-	invert(): this;
-	/**
 	 * Normalizes the vector in-place and returns the caller.
 	 */
 	normalize(): this;
@@ -1959,10 +1952,6 @@ declare class Vector extends Operable {
 	 * @param other - The vector to project the caller onto
 	 */
 	projectOnto(other: this): this;
-	/**
-	 * Converts the vector to a human readable String representation.
-	 */
-	toString(): string;
 	/**
 	 * Computes the distance between two vectors. 
 	 * @param a - The first vector
@@ -2084,6 +2073,11 @@ declare class Vector3 extends Vector {
 	 * @param v - The second vector in the product
 	 */
 	cross(v: this): number;
+	/**
+	 * Returns a matrix such that for Vector3s `u` and `v`, `u.crossMatrix().times(v)` is the same as `u.cross(v)`. 
+	 * @param result - The destination to store the resulting matrix in. If this is not specified, a new matrix will be created
+	 */
+	crossMatrix(result: Matrix3): Matrix3;
 	/**
 	 * Rotates the vector counter-clockwise on the U-V plane. This operation is in-place and returns the caller.
 	 * e.g. `vec.rotateYZ(0.1)`
@@ -2292,6 +2286,263 @@ declare class Vector4 extends Vector {
 }
 
 /**
+ * Represents a complex number of the form a + bi, where a and b are real numbers.
+ * Multiplication and division (`times`, `over`, `mul`, `div`) are defined as they typically are for complex numbers, rather than the element-wise version provided by Operable.
+ */
+declare class Complex implements MathObject {
+	/**
+	 * The real component of the number (a)
+	 */
+	real: number;
+	/**
+	 * The imaginary component of the number (b)
+	 */
+	imaginary: number;
+	/**
+	 * The argument of the number
+	 */
+	angle: number;
+	/**
+	 * The length of the number
+	 */
+	norm: number;
+	/**
+	 * The squared length of the number
+	 */
+	sqrNorm: number;
+	/**
+	 * Creates a new complex number.
+	 * @param real - The real component of the number
+	 * @param imaginary - The imaginary component of the number. Default is 0
+	 */
+	constructor(real: number, imaginary?: number);
+	/**
+	 * Returns the complex conjugate of the number. For a number a + bi, the conjugate would be a - bi.
+	 */
+	get conjugate(): this;
+	/**
+	 * Rotates a vector by the argument of the caller, and then multiplies it by the length of the caller.
+	 * @param vector - The vector to rotate
+	 * @param dst - The destination to store the resulting vector in. If this is not specified, a new vector will be created
+	 */
+	rotate(vector: Vector2, dst?: Vector2): Vector2;
+	/**
+	 * Returns a matrix such that for a Complex `z` and Vector2 `v`, `z.rotate(v)` is the same as `z.toMatrix().times(v)`.
+	 * @param result - The destination to store the resulting matrix in. If this is not specified, a new matrix will be created
+	 */
+	toMatrix(result?: Matrix2): Matrix2;
+	/**
+	 * Returns a unit complex number with a given angle to the real axis.
+	 * @param angle - The argument of the number to create
+	 */
+	static fromRotation(angle: number): Complex;
+	/**
+	 * Returns the imaginary unit, i.
+	 */
+	static get i(): Complex;
+	/**
+	 * Computes the complex logarithm of a given value.
+	 * @param value - The value to take the complex logarithm of
+	 */
+	static log(value: Complex): Complex;
+	/**
+	 * Computes the result of raising E to a given power.
+	 * @param exponent - The power to raise E to
+	 */
+	static exp(exponent: Complex): Complex;
+	/**
+	 * Creates a complex number of the form re<sup>iθ</sup>.
+	 * @param  - The argument (angle) of the complex number
+	 * @param r - The length of the complex number. Default is 1
+	 */
+	static polar(θ: number, r?: number): Complex;
+	/**
+	 * Returns the reciprocal of the caller.
+	 */
+	get reciprocal(): this;
+	/**
+	 * Returns the inverse of the caller.
+	 */
+	get inverse(): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	plus(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	minus(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	times(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	over(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	modBy(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	pow(other: this, result?: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	add(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	sub(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	mul(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	div(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	mod(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	exp(other: this): this;
+	/**
+	 * Replaces the caller with its reciprocal and returns it.
+	 */
+	flip(): this;
+	/**
+	 * Negates the caller and returns it.
+	 */
+	invert(): this;
+	/**
+	 * Replaces the content of the caller with that of a given MathObject of the same type, then returns the caller.
+	 * @param source - The object from which to copy the data
+	 */
+	set(source: this): this;
+	/**
+	 * Returns whether the caller is equal, within a small tolerance, to another given object of the same type.
+	 * @param other - The object to compare to
+	 */
+	equals(other: this): boolean;
+	/**
+	 * Returns a string representation of the object with a specified level of precision for included numbers.
+	 * @param digits - The number of digits of precision
+	 */
+	toFixed(digits: number): string;
+	/**
+	 * Returns a string representation of the object with a specified maximum level of precision for included numbers.
+	 * @param max - The maximum number of digits of precision. The displayed amount of digits may be less, since trailing zeroes are discarded
+	 */
+	toMaxed(max: number): string;
+	/**
+	 * Returns a value such that for any MathObject `a`, `a.plus(a.constructor.zero).equals(a)` is true.
+	 */
+	static get zero(): MathObject;
+	/**
+	 * Computes the sum of a collection of MathObjects of the same type.
+	 * @param values - The values to sum
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	static sum(values: MathObject[], result?: MathObject): MathObject;
+	/**
+	 * Computes the average of a collection of MathObjects of the same type.
+	 * @param values - The values to average.
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	static avg(values: MathObject[], result?: MathObject): MathObject;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+}
+
+/**
+ * Represents a quaternion, a 4D extension of the imaginary numbers.
+ * Each quaternion is a number of the form a + bi + cj + dk.
+ * These can be used to represent 3D rotations via `Quaternion.fromRotation()` and `Quaternion.prototype.rotate()`.
+ */
+declare class Quaternion extends Complex {
+	/**
+	 * The real component of the quaternion
+	 */
+	real: number;
+	/**
+	 * The imaginary components of the quaternion. Each element of this vector corresponds to a coefficient on one of the imaginary units
+	 */
+	imaginary: Vector3;
+	/**
+	 * The quaternion's axis of rotation multiplied by its angle of rotation. Only defined for rotation-representing quaternions
+	 */
+	angle: Vector3;
+	/**
+	 * Creates a new quaternion.
+	 * @param real - The real component of the quaternion.
+	 * @param imaginary - The imaginary components of the quaternion. Default is (0, 0, 1).
+	 */
+	constructor(real: number, imaginary?: Vector3);
+	/**
+	 * Returns the imaginary components of the product of the caller, the provided vector, and the caller's conjugate (q(0, v)q*).
+	 * For quaternions created with `Quaternion.fromRotation()`, this corresponds to a 3D rotation.
+	 * @param vector - The vector to rotate
+	 * @param dst - The destination to store the resulting vector in. If this is not specified, a new vector will be created
+	 */
+	rotate(vector: Vector3, dst?: Vector3): Vector3;
+	/**
+	 * Returns a matrix such that for a Quaternion `q` and Vector3 `v`, `q.rotate(v)` is the same as `q.toMatrix().times(v)`.
+	 * @param result - The destination to store the resulting matrix in. If this is not specified, a new matrix will be created
+	 */
+	toMatrix(result?: Matrix3): Matrix3;
+	/**
+	 * Returns the first quaternion unit, i.
+	 */
+	static get i(): Quaternion;
+	/**
+	 * Returns the second quaternion unit, j.
+	 */
+	static get j(): Quaternion;
+	/**
+	 * Returns the third quaternion unit, k.
+	 */
+	static get k(): Quaternion;
+	/**
+	 * Returns a unit quaternion `q` such that for a Vector3 `v`, `q.rotate(v)` refers to `v` rotated counter-clockwise about the given axis by the given angle.
+	 * @param axis - The normalized axis of rotation
+	 * @param angle - The counter-clockwise angle of rotation
+	 */
+	static fromRotation(axis: Vector3, angle: number): Quaternion;
+	/**
+	 * Returns a unit quaternion `q` such that for a Vector3 `v`, `q.rotate(v)` refers to `v` rotated counter-clockwise about the given axis by the given angle.
+	 * @param rotation - A vector with length equal to the angle of rotation and direction equal to the axis of rotation
+	 */
+	static fromRotation(rotation: Vector3): Quaternion;
+}
+
+/**
  * Facilitates the creation of lazily-evaluated expressions.
  * ```js
  * const object = { };
@@ -2318,13 +2569,146 @@ declare class Lazy {
 }
 
 /**
- * Represents a composite mathematical object which element-wise operations can be performed on.
- * Many mathematical operations (plus, minus, times, over) can be performed on operables of any subclass type, allowing for convenient polymorphism.
- * All immutable methods, including static methods, are available on Number.
- * This means that Number can largely be considered a subclass of operable and can be used for operable-typed arguments.
+ * Represents a mathematical object, on which operations (+, -, *, /, %, **) can be performed.
+ * The operations are provided as two sets of methods, one which mutates the caller, and one which creates a new object to hold the result.
+ * ```js
+ * new Complex(3, 6).over(3) // 1 + 2i
+ * new Vector3(1, 2, 3).plus(3) // (4, 5, 6)
+ * Quaternion.fromRotation(Vector3.up, Math.PI) // 0 + 0i + -1j + 0k
+ * ```
  * This is an abstract superclass and should not be constructed.
  */
-declare class Operable implements Copyable, Serializable {
+declare interface MathObject implements Copyable {
+	/**
+	 * Returns the reciprocal of the caller.
+	 */
+	get reciprocal(): this;
+	/**
+	 * Returns the inverse of the caller.
+	 */
+	get inverse(): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	plus(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	minus(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	times(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	over(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	modBy(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	pow(other: this, result?: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	add(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	sub(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	mul(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	div(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	mod(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	exp(other: this): this;
+	/**
+	 * Replaces the caller with its reciprocal and returns it.
+	 */
+	flip(): this;
+	/**
+	 * Negates the caller and returns it.
+	 */
+	invert(): this;
+	/**
+	 * Replaces the content of the caller with that of a given MathObject of the same type, then returns the caller.
+	 * @param source - The object from which to copy the data
+	 */
+	set(source: this): this;
+	/**
+	 * Returns whether the caller is equal, within a small tolerance, to another given object of the same type.
+	 * @param other - The object to compare to
+	 */
+	equals(other: this): boolean;
+	/**
+	 * Returns a string representation of the object with a specified level of precision for included numbers.
+	 * @param digits - The number of digits of precision
+	 */
+	toFixed(digits: number): string;
+	/**
+	 * Returns a string representation of the object with a specified maximum level of precision for included numbers.
+	 * @param max - The maximum number of digits of precision. The displayed amount of digits may be less, since trailing zeroes are discarded
+	 */
+	toMaxed(max: number): string;
+	/**
+	 * Returns a value such that for any MathObject `a`, `a.plus(a.constructor.zero).equals(a)` is true.
+	 */
+	static get zero(): MathObject;
+	/**
+	 * Computes the sum of a collection of MathObjects of the same type.
+	 * @param values - The values to sum
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	static sum(values: MathObject[], result?: MathObject): MathObject;
+	/**
+	 * Computes the average of a collection of MathObjects of the same type.
+	 * @param values - The values to average.
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	static avg(values: MathObject[], result?: MathObject): MathObject;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+}
+
+/**
+ * Represents a composite mathematical object which element-wise operations can be performed on.
+ * This is an abstract superclass and should not be constructed.
+ */
+declare class Operable implements MathObject, Serializable {
 	/**
 	 * The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector)
 	 */
@@ -2351,20 +2735,6 @@ declare class Operable implements Copyable, Serializable {
 	 */
 	at(index: number): number;
 	/**
-	 * Performs an in-place element-wise arithmetic operation between the caller and another operable or Number.
-	 * Returns the caller.
-	 * @param operable - The right hand operand of the operation
-	 */
-	add(operable: this | number): this;
-	/**
-	 * Performs an immutable element-wise arithmetic operation between the caller and another operable or Number.
-	 * Returns the result of the operation, leaving the operands unchanged.
-	 * A destination can be provided for the operation, in which case no new operable will be created.
-	 * @param operable - The right hand operand of the operation
-	 * @param destination - The destination for the operation
-	 */
-	plus(operable: this | number, destination?: this): this;
-	/**
 	 * Computes the sum of all the elements of the operable.
 	 */
 	total(): number;
@@ -2374,20 +2744,6 @@ declare class Operable implements Copyable, Serializable {
 	 */
 	equals(other: this): boolean;
 	/**
-	 * Produces an operable with 0 for all element values.
-	 */
-	static get empty(): Operable;
-	/**
-	 * Computes the element-wise sum of a list of operables.
-	 * @param operables - The values to sum
-	 */
-	static sum(operables: Operable[] | number[]): Operable;
-	/**
-	 * Computes the element-wise average of a list of operables.
-	 * @param operables - The values to average
-	 */
-	static avg(operables: Operable[] | number[]): Operable;
-	/**
 	 * Remaps an operable from one range to another range.
 	 * @param value - The operable to be remapped
 	 * @param initialMin - The minimum of the range the value is in
@@ -2395,7 +2751,7 @@ declare class Operable implements Copyable, Serializable {
 	 * @param finalMin - The minimum of the desired range
 	 * @param finalMax - The maximum of the desired range
 	 */
-	static remap(value: Operable | number, initialMin: Operable | number, initialMax: Operable | number, finalMin: Operable | number, finalMax: Operable | number): Operable;
+	static remap(value: Operable, initialMin: Operable, initialMax: Operable, finalMin: Operable, finalMax: Operable): Operable;
 	/**
 	 * Returns an operable clamped element-wise between two bounds.
 	 * Equivalent to `Operable.max(min, operable.min(max, value))`.
@@ -2403,7 +2759,7 @@ declare class Operable implements Copyable, Serializable {
 	 * @param min - The lower bound for the result
 	 * @param max - The upper bound for the result
 	 */
-	static clamp(value: Operable | number, min: Operable | number, max: Operable | number): Operable;
+	static clamp(value: Operable, min: Operable, max: Operable): Operable;
 	/**
 	 * Produces an operable with all elements equal to a single value.
 	 * @param value - The value that will be used for all elements
@@ -2420,16 +2776,128 @@ declare class Operable implements Copyable, Serializable {
 	 */
 	static max(...values: Operable[] | number[]): Operable;
 	/**
-	 * Performs an element-wise exponentiation.
-	 * @param base - The base of the exponentiation
-	 * @param power - The power of the exponentiation
-	 */
-	static pow(base: Operable, power: Operable | number): Operable;
-	/**
 	 * Performs a built-in unary Math operation element-wise on an operable.
 	 * @param value - The operable to operate on
 	 */
 	static round(value: Operable): Operable;
+	/**
+	 * Returns the reciprocal of the caller.
+	 */
+	get reciprocal(): this;
+	/**
+	 * Returns the inverse of the caller.
+	 */
+	get inverse(): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	plus(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	minus(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	times(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	over(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	modBy(other: this, result?: this): this;
+	/**
+	 * Performs an operation between the caller and another object, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	pow(other: this, result?: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	add(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	sub(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	mul(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	div(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	mod(other: this): this;
+	/**
+	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+	 * @param other - The right-hand side of the operation. This must be either the same type as the caller or a number
+	 */
+	exp(other: this): this;
+	/**
+	 * Replaces the caller with its reciprocal and returns it.
+	 */
+	flip(): this;
+	/**
+	 * Negates the caller and returns it.
+	 */
+	invert(): this;
+	/**
+	 * Replaces the content of the caller with that of a given MathObject of the same type, then returns the caller.
+	 * @param source - The object from which to copy the data
+	 */
+	set(source: this): this;
+	/**
+	 * Returns whether the caller is equal, within a small tolerance, to another given object of the same type.
+	 * @param other - The object to compare to
+	 */
+	equals(other: this): boolean;
+	/**
+	 * Returns a string representation of the object with a specified level of precision for included numbers.
+	 * @param digits - The number of digits of precision
+	 */
+	toFixed(digits: number): string;
+	/**
+	 * Returns a string representation of the object with a specified maximum level of precision for included numbers.
+	 * @param max - The maximum number of digits of precision. The displayed amount of digits may be less, since trailing zeroes are discarded
+	 */
+	toMaxed(max: number): string;
+	/**
+	 * Returns a value such that for any MathObject `a`, `a.plus(a.constructor.zero).equals(a)` is true.
+	 */
+	static get zero(): MathObject;
+	/**
+	 * Computes the sum of a collection of MathObjects of the same type.
+	 * @param values - The values to sum
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	static sum(values: MathObject[], result?: MathObject): MathObject;
+	/**
+	 * Computes the average of a collection of MathObjects of the same type.
+	 * @param values - The values to average.
+	 * @param result - The destination to store the resulting object in. If not specified, a new object will be created
+	 */
+	static avg(values: MathObject[], result?: MathObject): MathObject;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -2538,9 +3006,9 @@ declare interface Array<T> {
 
 /**
  * The built-in Number class has some additional utility methods in the Hengine.
- * The class extends Operable only in the sense that it has all of the same methods, excluding those that modify the caller in-place.
+ * Numbers are Vectors in the sense that they have all the same methods, except that those which modify the caller in-place are not defined.
  */
-declare interface Number extends Operable {
+declare interface Number extends MathObject {
 	/**
 	 * Returns the caller (interpreted as radians) converted to degrees.
 	 */
@@ -2549,12 +3017,6 @@ declare interface Number extends Operable {
 	 * Returns the caller (interpreted as degrees) converted to radians.
 	 */
 	toRadians(): number;
-	/**
-	 * Converts the number to a string with a specified maximum number of digits.
-	 * Trailing zeros will be discarded.
-	 * @param digits - The maximum number of digits past the decimal point
-	 */
-	toMaxed(digits: number): number;
 }
 
 /**
@@ -3570,7 +4032,7 @@ declare interface ValueStop {
 	/**
 	 * The gradient value at this stop
 	 */
-	value: Operable | number;
+	value: Operable;
 }
 
 /**
@@ -3610,7 +4072,7 @@ declare class Gradient {
 	 * Samples the gradient at a specific value of the parameter
 	 * @param t - The parameter value to sample at
 	 */
-	sample(t: number): Operable | number;
+	sample(t: number): Operable;
 }
 
 /**

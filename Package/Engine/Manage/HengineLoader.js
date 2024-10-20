@@ -175,7 +175,7 @@ class HengineAnimationResource extends HengineResource {
 	async load() {
 		try {
 			const frames = await Promise.all(
-				new Array(this.frames.length)
+				new Array(this.frames)
 					.fill(null)
 					.map((_, i) => new HengineImageResource(`${this.src}/${i + 1}.png`).load())
 			);
@@ -901,9 +901,9 @@ HengineLoader.engineResources = [
 		"Scripts/TextArea.js",
 
 		"SceneObject/SceneObject.js",
-		"Render/Color.js",
 
 		"Math/Vector.js",
+		"Math/Complex.js",
 		"Math/Geometry.js",
 		"Math/GPUComputation.js",
 
@@ -923,6 +923,7 @@ HengineLoader.engineResources = [
 		"Render/TileMap.js"
 	],
 	[ // high level dependencies
+		"Render/Color.js",
 		"SceneObject/UIObject.js"
 	]
 ];

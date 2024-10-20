@@ -157,7 +157,7 @@ class Color extends Operable {
 		return new Color(0, 0, 0, 0);
 	}
 	static quadLerp(a, b, c, d, tx, ty) {
-		return Color.empty.map((value, channel) => Interpolation.quadLerp(a[channel], b[channel], c[channel], d[channel], tx, ty));
+		return Color.zero.map((value, channel) => Interpolation.quadLerp(a[channel], b[channel], c[channel], d[channel], tx, ty));
 	}
 	/**
 	 * Returns a copy of a specified color with a specified alpha.

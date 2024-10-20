@@ -11,6 +11,7 @@ class Matrix extends Float64Array {
 	 * @signature
 	 * @param Vector[] ...columns | The columns of the matrix
 	 * @signature
+	 * @param Matrix base? | A matrix of less or equal dimension. If specified, the constructed matrix will be an identity matrix with the elements of this argument superimposed on it from the upper-left. Otherwise, the constructed matrix will be an unaltered identity matrix
 	 */
 	constructor(size, args) {
 		super(size * size);
@@ -18,20 +19,42 @@ class Matrix extends Float64Array {
 			for (let i = 0; i < size; i++)
 				for (let j = 0; j < size; j++)
 					this[i * size + j] = args[j * size + i];
-		else if (args.length) {
+		else if (args.length > 1) {
 			const { modValues } = args[0].constructor;
 			for (let i = 0; i < size; i++)
 				for (let j = 0; j < size; j++)
 					this[i * size + j] = args[i]?.[modValues[j]] ?? +(i === j);
-		} else for (let i = 0; i < size; i++)
-			this[i + i * size] = 1;
+		} else {
+			for (let i = 0; i < size; i++)
+				this[i + i * size] = 1;
+
+			if (args.length) {
+				const matrix = args[0];
+				const s = matrix.constructor.size;
+				for (let i = 0; i < s; i++)
+				for (let j = 0; j < s; j++)
+					this[i * size + j] = matrix[i * s + j];
+			}
+		}
 	}
+	/**
+	 * Returns a transposed copy of the caller.
+	 * @return Matrix
+	 */
 	get transposed() {
 		return this.get().transpose();
 	}
+	/**
+	 * Returns a inverted copy of the caller, or null if the caller is singular.
+	 * @return Matrix/null
+	 */
 	get inverse() {
 		return this.get().invert();
 	}
+	/**
+	 * Returns the determinant of the caller.
+	 * @return Number
+	 */
 	get determinant() {
 		return 0;
 	}
@@ -256,7 +279,7 @@ class Matrix extends Float64Array {
 		return dst;
 	}
 	/**
-	 * Multiplies a series of matrices together and optionally stores it in a provided destination.
+	 * Multiplies a series of matrices together and optionally stores the result in a provided destination.
 	 * @param Matrix3[] matrices | The matrices to multiply together. Order matters for this argument
 	 * @param Matrix3 result? | The matrix to copy the result into
 	 * @return Matrix3

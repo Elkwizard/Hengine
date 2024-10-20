@@ -1,0 +1,334 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class MathObject">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L14" target="_blank" class="class-name source-link">MathObject</a> <span class="keyword">implements</span> <span class="class-name"><a href="../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
+				</div>
+				<div class="class desc">
+					Represents a mathematical object, on which operations (+, -, *, /, %, **) can be performed.
+The operations are provided as two sets of methods, one which mutates the caller, and one which creates a new object to hold the result.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Complex Numbers/Complex.html#class Complex">Complex</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 6</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">over</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// 1 + 2i</span><span class="highlight-KEYWORD">
+new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 3</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">plus</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// (4, 5, 6)</span><span class="highlight-SYMBOL">
+</span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Complex Numbers/Quaternion.html#class Quaternion">Quaternion</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromRotation</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">up</span><span class="highlight-SYMBOL">, </span><span class="highlight-CLASS">Math</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">PI</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// 0 + 0i + -1j + 0k</span><span class="highlight-SYMBOL">
+</span></code>
+This is an abstract superclass and should not be constructed.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Geometry/Complex Numbers/Complex.html#class Complex">Complex</a></span>, <span class="class-name"><a href="../../Pages/Superclasses/Operable.html#class Operable">Operable</a></span></div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="get MathObject.prototype.reciprocal()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L19" target="_blank" class="function-name source-link">reciprocal</a><span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Returns the reciprocal of the caller.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="get MathObject.prototype.inverse()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L26" target="_blank" class="function-name source-link">inverse</a><span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Returns the inverse of the caller.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.prototype.plus/minus/times/over/modBy/pow()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L36" target="_blank" class="function-name source-link">plus/minus/times/over/modBy/pow</a>(<span class="param">other</span>, <span class="param">result?</span>)<span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Performs an operation between the caller and another object, and returns it.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MathObject.prototype.plus/minus/times/over/modBy/pow():other">
+							<div class="param-name">
+								<span class="param">other</span>
+								<span class="type">MathObject</span>
+							</div>
+							<div class="param desc">
+								The right-hand side of the operation. This must be either the same type as the caller or a number
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="MathObject.prototype.plus/minus/times/over/modBy/pow():result?">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type">MathObject</span>
+							</div>
+							<div class="param desc">
+								The destination to store the resulting object in. If not specified, a new object will be created
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.prototype.add/sub/mul/div/mod/exp()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L48" target="_blank" class="function-name source-link">add/sub/mul/div/mod/exp</a>(<span class="param">other</span>)<span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MathObject.prototype.add/sub/mul/div/mod/exp():other">
+							<div class="param-name">
+								<span class="param">other</span>
+								<span class="type">MathObject</span>
+							</div>
+							<div class="param desc">
+								The right-hand side of the operation. This must be either the same type as the caller or a number
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.prototype.flip()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L70" target="_blank" class="function-name source-link">flip</a>()<span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Replaces the caller with its reciprocal and returns it.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.prototype.invert()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L77" target="_blank" class="function-name source-link">invert</a>()<span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Negates the caller and returns it.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.prototype.set()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L85" target="_blank" class="function-name source-link">set</a>(<span class="param">source</span>)<span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Replaces the content of the caller with that of a given MathObject of the same type, then returns the caller.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MathObject.prototype.set():source">
+							<div class="param-name">
+								<span class="param">source</span>
+								<span class="type">MathObject</span>
+							</div>
+							<div class="param desc">
+								The object from which to copy the data
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.prototype.equals()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L94" target="_blank" class="function-name source-link">equals</a>(<span class="param">other</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Returns whether the caller is equal, within a small tolerance, to another given object of the same type.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MathObject.prototype.equals():other">
+							<div class="param-name">
+								<span class="param">other</span>
+								<span class="type">MathObject</span>
+							</div>
+							<div class="param desc">
+								The object to compare to
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.prototype.toFixed()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L100" target="_blank" class="function-name source-link">toFixed</a>(<span class="param">digits</span>)<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+			</div>
+			<div class="function desc">
+				Returns a string representation of the object with a specified level of precision for included numbers.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MathObject.prototype.toFixed():digits">
+							<div class="param-name">
+								<span class="param">digits</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The number of digits of precision
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.prototype.toMaxed()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L106" target="_blank" class="function-name source-link">toMaxed</a>(<span class="param">max</span>)<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+			</div>
+			<div class="function desc">
+				Returns a string representation of the object with a specified maximum level of precision for included numbers.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MathObject.prototype.toMaxed():max">
+							<div class="param-name">
+								<span class="param">max</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The maximum number of digits of precision. The displayed amount of digits may be less, since trailing zeroes are discarded
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="get MathObject.zero()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L111" target="_blank" class="function-name source-link">MathObject.zero</a><span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Returns a value such that for any MathObject <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">plus</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-KEYWORD">constructor</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">zero</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">equals</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">)</span></code> is true.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.sum()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L117" target="_blank" class="function-name source-link">MathObject.sum</a>(<span class="param">values</span>, <span class="param">result?</span>)<span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Computes the sum of a collection of MathObjects of the same type.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MathObject.sum():values">
+							<div class="param-name">
+								<span class="param">values</span>
+								<span class="type">MathObject[]</span>
+							</div>
+							<div class="param desc">
+								The values to sum
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="MathObject.sum():result?">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type">MathObject</span>
+							</div>
+							<div class="param desc">
+								The destination to store the resulting object in. If not specified, a new object will be created
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MathObject.avg()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L129" target="_blank" class="function-name source-link">MathObject.avg</a>(<span class="param">values</span>, <span class="param">result?</span>)<span class="type">MathObject</span>
+			</div>
+			<div class="function desc">
+				Computes the average of a collection of MathObjects of the same type.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MathObject.avg():values">
+							<div class="param-name">
+								<span class="param">values</span>
+								<span class="type">MathObject[]</span>
+							</div>
+							<div class="param desc">
+								The values to average.
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="MathObject.avg():result?">
+							<div class="param-name">
+								<span class="param">result</span>
+								<span class="type">MathObject</span>
+							</div>
+							<div class="param desc">
+								The destination to store the resulting object in. If not specified, a new object will be created
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

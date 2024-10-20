@@ -36,6 +36,7 @@
 		"Superclasses": {
 			"SceneElement": null,
 			"SceneObject": null,
+			"MathObject": null,
 			"Operable": null,
 			"Lazy": null
 		},
@@ -97,6 +98,10 @@
 				"Vector2": null,
 				"Vector3": null,
 				"Vector4": null
+			},
+			"Complex Numbers": {
+				"Complex": null,
+				"Quaternion": null
 			},
 			"Matrices": ["Matrix", "Matrix2", "Matrix3", "Matrix4"],
 			"Transform": null,

@@ -1,5 +1,5 @@
 /**
- * Provides a collection of interpolation algorithms that operate on operables and numbers.
+ * Provides a collection of interpolation algorithms that operate on math objects.
  * All methods of this class are static and do not mutate their arguments.
  * ```js
  * Interpolation.lerp(new Color("red"), new Color("blue"), 0.5); // dark purple
@@ -10,33 +10,33 @@
 class Interpolation {
 	/**
 	 * Linearly interpolates between two values.
-	 * @param Operable/Number a | The initial value
-	 * @param Operable/Number b | The final value
+	 * @param MathObject a | The initial value
+	 * @param MathObject b | The final value
 	 * @param Number t | The progress proportion from the initial value to the final value, on the interval [0, 1]
-	 * @return Operable/Number
+	 * @return MathObject
 	 */
     static lerp(a, b, t) {
         return a.times(1 - t).plus(b.times(t));
     }
 	/**
 	 * Smoothly interpolates between two values. (Uses the Interpolation.smooth easing function)
-	 * @param Operable/Number a | The initial value
-	 * @param Operable/Number b | The final value
+	 * @param MathObject a | The initial value
+	 * @param MathObject b | The final value
 	 * @param Number t | The progress proportion from the initial value to the final value, on the interval [0, 1]
-	 * @return Operable/Number
+	 * @return MathObject
 	 */
     static smoothLerp(a, b, t) {
         return Interpolation.lerp(a, b, Interpolation.smooth(t));
     }
 	/**
 	 * Linearly interpolates between four values in a square formation.
-	 * @param Operable/Number a | The value in the upper-left corner
-	 * @param Operable/Number b | The value in the upper-right corner
-	 * @param Operable/Number c | The value in the lower-left corner
-	 * @param Operable/Number d | The value in the lower-right corner
+	 * @param MathObject a | The value in the upper-left corner
+	 * @param MathObject b | The value in the upper-right corner
+	 * @param MathObject c | The value in the lower-left corner
+	 * @param MathObject d | The value in the lower-right corner
 	 * @param Number tx | The horizontal progress proportion
 	 * @param Number ty | The vertical progress proportion
-	 * @return Operable/Number
+	 * @return MathObject
 	 */
     static quadLerp(a, b, c, d, tx, ty) {
         const left = Interpolation.lerp(a, c, ty);
@@ -45,31 +45,31 @@ class Interpolation {
     }
 	/**
 	 * Smoothly interpolates between four values in a square formation. (Uses the Interpolation.smooth easing function)
-	 * @param Operable/Number a | The value in the upper-left corner
-	 * @param Operable/Number b | The value in the upper-right corner
-	 * @param Operable/Number c | The value in the lower-left corner
-	 * @param Operable/Number d | The value in the lower-right corner
+	 * @param MathObject a | The value in the upper-left corner
+	 * @param MathObject b | The value in the upper-right corner
+	 * @param MathObject c | The value in the lower-left corner
+	 * @param MathObject d | The value in the lower-right corner
 	 * @param Number tx | The horizontal progress proportion
 	 * @param Number ty | The vertical progress proportion
-	 * @return Operable/Number
+	 * @return MathObject
 	 */
     static smoothQuadLerp(a, b, c, d, tx, ty) {
         return Interpolation.quadLerp(a, b, c, d, Interpolation.smooth(tx), Interpolation.smooth(ty));
     }
 	/**
 	 * Linearly interpolates between eight values in a cube formation.
-	 * @param Operable/Number a | The value in the front-upper-left corner
-	 * @param Operable/Number b | The value in the front-upper-right corner
-	 * @param Operable/Number c | The value in the front-lower-left corner
-	 * @param Operable/Number d | The value in the front-lower-right corner
-	 * @param Operable/Number a2 | The value in the back-upper-left corner
-	 * @param Operable/Number b2 | The value in the back-upper-right corner
-	 * @param Operable/Number c2 | The value in the back-lower-left corner
-	 * @param Operable/Number d2 | The value in the back-lower-right corner
+	 * @param MathObject a | The value in the front-upper-left corner
+	 * @param MathObject b | The value in the front-upper-right corner
+	 * @param MathObject c | The value in the front-lower-left corner
+	 * @param MathObject d | The value in the front-lower-right corner
+	 * @param MathObject a2 | The value in the back-upper-left corner
+	 * @param MathObject b2 | The value in the back-upper-right corner
+	 * @param MathObject c2 | The value in the back-lower-left corner
+	 * @param MathObject d2 | The value in the back-lower-right corner
 	 * @param Number tx | The horizontal progress proportion
 	 * @param Number ty | The vertical progress proportion
 	 * @param Number tz | The depth progress proportion
-	 * @return Operable/Number
+	 * @return MathObject
 	 */
     static cubeLerp(a, b, c, d, a2, b2, c2, d2, tx, ty, tz) {
         const top = Interpolation.quadLerp(a, b, c, d, tx, ty);
@@ -78,18 +78,18 @@ class Interpolation {
     }
 	/**
 	 * Smoothly interpolates between eight values in a cube formation. (Uses the Interpolation.smooth easing function)
-	 * @param Operable/Number a | The value in the front-upper-left corner
-	 * @param Operable/Number b | The value in the front-upper-right corner
-	 * @param Operable/Number c | The value in the front-lower-left corner
-	 * @param Operable/Number d | The value in the front-lower-right corner
-	 * @param Operable/Number a2 | The value in the back-upper-left corner
-	 * @param Operable/Number b2 | The value in the back-upper-right corner
-	 * @param Operable/Number c2 | The value in the back-lower-left corner
-	 * @param Operable/Number d2 | The value in the back-lower-right corner
+	 * @param MathObject a | The value in the front-upper-left corner
+	 * @param MathObject b | The value in the front-upper-right corner
+	 * @param MathObject c | The value in the front-lower-left corner
+	 * @param MathObject d | The value in the front-lower-right corner
+	 * @param MathObject a2 | The value in the back-upper-left corner
+	 * @param MathObject b2 | The value in the back-upper-right corner
+	 * @param MathObject c2 | The value in the back-lower-left corner
+	 * @param MathObject d2 | The value in the back-lower-right corner
 	 * @param Number tx | The horizontal progress proportion
 	 * @param Number ty | The vertical progress proportion
 	 * @param Number tz | The depth progress proportion
-	 * @return Operable/Number
+	 * @return MathObject
 	 */
     static smoothCubeLerp(a, b, c, d, a2, b2, c2, d2, tx, ty, tz) {
         return Interpolation.cubeLerp(a, b, c, d, a2, b2, c2, d2, Interpolation.smooth(tx), Interpolation.smooth(ty), Interpolation.smooth(tz));
@@ -152,7 +152,7 @@ class Interpolation {
 }
 
 /**
- * Represents a Operable- or Number-valued variable that smoothly moves between values.
+ * Represents a MathObject-valued variable that smoothly moves between values.
  * If a transition between states is interrupted by setting a new target, the new transition will begin immediately and will begin from the current position.
  * ```js
  * const point = new Animatable(middle, 100, Interpolation.smooth);
@@ -163,7 +163,7 @@ class Interpolation {
  * 	renderer.draw(new Color("black")).circle(point.value, 10);
  * });
  * ```
- * @prop Operable/Number target | The current target value of the animatable
+ * @prop Operable target | The current target value of the animatable
  * @prop Number duration | The length of each transition, in frames
  * @prop (Number) => Number easing | The easing function for the transitions
  * @prop Boolean copyTarget | Whether or not target values should be copied. If this value is false, changing the value passed into target will change the trajectory of the value, even if the value is not passed in again
@@ -171,7 +171,7 @@ class Interpolation {
 class Animatable {
 	/**
 	 * Creates a new Animatable.
-	 * @param Operable/Number initial | The initial value
+	 * @param MathObject initial | The initial value
 	 * @param Number duration | The length of each transition, in frames
 	 * @param (Number) => Number easing? | The easing function to use. Default is `Interpolation.linear`
 	 * @param Boolean copyTarget? | Whether or not target values should be copied. Default is true
@@ -199,7 +199,7 @@ class Animatable {
 
 	/**
 	 * Sets the value immediately. This will not involve a transition.
-	 * @param Operable/Number value | The new value
+	 * @param MathObject value | The new value
 	 */
 	set value(value) {
 		this.target = this.copyTarget ? value.get() : value;
@@ -208,7 +208,7 @@ class Animatable {
 
 	/**
 	 * Returns the current value of the animatable and advances one frame in the transition.
-	 * @return Operable/Number
+	 * @return MathObject
 	 */
 	get value() {
 		this.timer++;
@@ -217,7 +217,7 @@ class Animatable {
 
 	/**
 	 * Returns the current value of the animatable and doesn't advance the transition
-	 * @return Operable/Number
+	 * @return MathObject
 	 */
 	get current() {
 		const t = Number.clamp(this.timer / this.duration, 0, 1);

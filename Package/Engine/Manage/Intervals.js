@@ -273,7 +273,7 @@ class IntervalManager {
 	 * Returns a promise that resolves when the animation completes.
 	 * @param Object object | The object which has the animated property
 	 * @param String/Symbol property | The key of the animated property
-	 * @param Operable/Number finalValue | The value to animate to
+	 * @param Operable finalValue | The value to animate to
 	 * @param Number duration | The duration of the animation
 	 * @param (Number) => Number curve? | The easing function. Default is `Interpolation.linear`
 	 * @param Symbol type? | When during the update cycle to update the animation. Default is `IntervalFunction.BEFORE_UPDATE`
