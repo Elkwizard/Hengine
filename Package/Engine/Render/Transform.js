@@ -30,22 +30,7 @@ class Transform extends Matrix3 {
 		
 		// create an double bound position object, so (transf.position.x += ...) works
 
-		this._position = Vector2.origin;
-		delete this._position.x;
-		delete this._position.y;
-		const self = this;
-		Object.defineProperties(this._position, {
-			x: {
-				set: value => self[6] = value,
-				get: () => self[6],
-				configurable: true
-			},
-			y: {
-				set: value => self[7] = value,
-				get: () => self[7],
-				configurable: true
-			}
-		});
+		this._position = Vector2.origin.proxy(this, [6, 7]);
 	}
 	/**
 	 * Returns a transform that, when composed with the caller, will produce no offset and no rotation.

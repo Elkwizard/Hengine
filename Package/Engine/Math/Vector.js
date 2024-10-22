@@ -78,6 +78,26 @@ class Vector extends Operable {
 	toMaxed(digits) {
 		return this.map(v => v.toMaxed(digits)).toString();
 	}
+	proxy(handler, outKeys) {
+		const mod = this.constructor.modValues;
+		outKeys ??= mod;
+		for (let i = 0; i < mod.length; i++) {
+			const key = mod[i];
+			const outKey = outKeys[i];
+			delete this[key];
+			Object.defineProperty(this, key, {
+				get: () => handler[outKey],
+				set: value => handler[outKey] = value
+			});
+		}
+		return this;
+	}
+	onChange(handler) {
+		const mod = this.constructor.modValues;
+		for (let i = 0; i < mod.length; i++)
+			Object.onChange(this, mod[i], handler);
+		return this;
+	}
 	/**
 	 * Computes the distance between two vectors. 
 	 * @param Vector a | The first vector
@@ -507,47 +527,7 @@ class Vector3 extends Vector {
 	 * @return Vector3
 	 */
 	rotateAboutAxis(axis, angle) {
-		const randomVectorX = (axis.x === 0 && axis.y === 0 && axis.z !== 0) ? 1 : 0;
-		const randomVectorZ = 1 - randomVectorX;
-
-		let xAxisX = axis.y * randomVectorZ;
-		let xAxisY = axis.z * randomVectorX - axis.x * randomVectorZ;
-		let xAxisZ = -axis.y * randomVectorX;
-
-		const iXAxisMagnitude = 1 / Math.sqrt(xAxisX ** 2 + xAxisY ** 2 + xAxisZ ** 2);
-
-		xAxisX *= iXAxisMagnitude;
-		xAxisY *= iXAxisMagnitude;
-		xAxisZ *= iXAxisMagnitude;
-
-		let yAxisX = axis.y * xAxisZ - axis.z * xAxisY;
-		let yAxisY = axis.z * xAxisX - axis.x * xAxisZ;
-		let yAxisZ = axis.x * xAxisY - axis.y * xAxisX;
-
-		const iYAxisMagnitude = 1 / Math.sqrt(yAxisX ** 2 + yAxisY ** 2 + yAxisZ ** 2);
-
-		yAxisX *= iYAxisMagnitude;
-		yAxisY *= iYAxisMagnitude;
-		yAxisZ *= iYAxisMagnitude;
-
-		const x = xAxisX * this.x + xAxisY * this.y + xAxisZ * this.z;
-		const y = yAxisX * this.x + yAxisY * this.y + yAxisZ * this.z;
-
-		this.x -= xAxisX * x + yAxisX * y;
-		this.y -= xAxisY * x + yAxisY * y;
-		this.z -= xAxisZ * x + yAxisZ * y;
-
-		const c = Math.cos(angle);
-		const s = Math.sin(angle);
-
-		const xPrime = x * c - y * s;
-		const yPrime = x * s + y * c;
-
-		this.x += xAxisX * xPrime + yAxisX * yPrime;
-		this.y += xAxisY * xPrime + yAxisY * yPrime;
-		this.z += xAxisZ * xPrime + yAxisZ * yPrime;
-
-		return this;
+		return Quaternion.fromRotation(axis, angle).rotate(this, this);
 	}
 	/**
 	 * Returns a copy of the vector rotated counter-clockwise about a specified axis.

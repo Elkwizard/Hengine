@@ -176,7 +176,11 @@ class Matrix extends Float64Array {
 				sum += (vector[modValues[j]] ?? 1) * this[j * size + i];
 			result[modValues[i]] = sum;
 		}
-		result.get(dst);
+		
+		for (let i = 0; i < modValues.length; i++) {
+			const key = modValues[i];
+			dst[key] = result[key];
+		}
 	}
 	timesMatrix(matrix, dst) {
 		const { size } = this.constructor;
@@ -290,6 +294,11 @@ class Matrix extends Float64Array {
 		for (let i = matrices.length - 3; i >= 0; i--) matrices[i].times(result, result);
 		return result;
 	}
+	/**
+	 * @name static get Vector
+	 * Returns a vector class which has the same number of elements as the dimension of the caller.
+	 * @return Class extends Vector
+	 */
 }
 
 { // toString
@@ -629,6 +638,26 @@ class Matrix4 extends Matrix {
 		this[15] = co15 * idet;
 
 		return this;
+	}
+	/**
+	 * Creates a perspective projection matrix for use in 3D rendering.
+	 * @param Number aspectRatio | The aspect ratio of the surface on which the rendering will occur (`height / width`)
+	 * @param Number fov | The angular size of the field of view in radians
+	 * @param Number zNear | The near clipping plane
+	 * @param Number zFar | The far clipping plane
+	 * @param Matrix4 result? | The destination to store the resulting matrix in. If not specified, a new matrix will be created
+	 * @return Matrix4
+	 */
+	static perspective(ar, fov, zn, zf, result) {
+		const zs = zf / (zf - zn);
+		const f = 1 / Math.tan(fov / 2);
+		return Matrix4.create(
+			ar * f, 0,	0,	0,
+			0,		f,	0,	0,
+			0,		0,	zs,	-zn * zs,
+			0,		0,	1,	0,
+			result
+		);
 	}
 	static get Vector() {
 		return Vector4;

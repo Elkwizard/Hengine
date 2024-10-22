@@ -7,39 +7,14 @@
  * @prop Number zoom | The zoom factor of the camera. Starts at 1
  */
 class Camera extends Matrix3 {
-	constructor(x, y, rotation = 0, zoom = 1, engine) {
-		super();	
+	constructor(pos, rotation = 0, zoom = 1, engine) {
+		super();
 		this.engine = engine;
-		this._position = Vector2.origin;
-		delete this._position.x;
-		delete this._position.y;
-		const self = this;
-		Object.defineProperties(this._position, {
-			x: {
-				set(a) {
-					x = a;
-					self.updateTranslationMatrix();
-				},
-				get: () => x
-			},
-			y: {
-				set(a) {
-					y = a;
-					self.updateTranslationMatrix();
-				},
-				get: () => y
-			}
-		});
+		Vector2.defineReference(this, "position", pos.get())
+			.onChange(() => this.updateTranslationMatrix());
 		this.zoom = zoom;
 		this.rotation = rotation;
 		this.cacheScreen();
-	}
-	set position(a) {
-		this._position.x = a.x;
-		this._position.y = a.y;
-	}
-	get position() {
-		return this._position;
 	}
 	set rotation(a) {
 		const cos = Math.cos(a);
@@ -60,7 +35,7 @@ class Camera extends Matrix3 {
 		return this._zoom;
 	}
 	updateTranslationMatrix() {
-		const { x, y } = this._position;
+		const { x, y } = this.position;
 		const c = this.cosRotation;
 		const s = this.sinRotation;
 		const z = this.zoom;

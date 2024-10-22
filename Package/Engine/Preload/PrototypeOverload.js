@@ -474,6 +474,17 @@ Object.defineProperty(window, "title", {
 		copy(parent, child);
 		copy(parent.prototype, child.prototype);
 	};
+	Object.onChange = function (object, key, handler) {
+		let value = object[key];
+		delete object[key];
+		Object.defineProperty(object, key, {
+			get: () => value,
+			set: newValue => {
+				value = newValue;
+				handler(key, value);
+			}
+		});
+	};
 
 	/**
 	 * @name class Storage

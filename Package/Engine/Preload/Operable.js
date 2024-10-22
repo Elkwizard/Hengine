@@ -132,6 +132,18 @@ class MathObject {
 	static lerp(a, b, t, result = this.zero) {
 		return a.times((1 - t) / t, result).add(b).mul(t);
 	}
+    static defineReference(obj, key, value = this.zero) {
+        delete obj[key];
+        Object.defineProperty(obj, key, {
+            set(a) {
+				value.set(a);
+            },
+            get() {
+                return value;
+            }
+        });
+		return value;
+    }
 }
 MathObject.EPSILON = 0.000001;
 MathObject.add = (a, b) => a + b;
@@ -273,19 +285,6 @@ class Operable extends MathObject {
         return new (this.zeroConstructor ??= this.bind(
             null, ...new Uint8Array(this.modValues.length)
         ));
-    }
-    static defineReference(obj, key, value) {
-        const mod = value.constructor.modValues;
-        const len = mod.length;
-        delete obj[key];
-        Object.defineProperty(obj, key, {
-            set(a) {
-                for (let i = 0; i < len; i++) value[mod[i]] = a[mod[i]];
-            },
-            get() {
-                return value;
-            }
-        });
     }
 	/**
 	 * Remaps an operable from one range to another range.

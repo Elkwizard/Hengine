@@ -71,22 +71,11 @@ class PHYSICS extends ElementScript {
 
 		this.physicsShapes = new Map();
 
+		const { body } = this;
+		
 		// links/shortcuts
 		this._velocity = new Vector2();
-		delete this._velocity.x;
-		delete this._velocity.y;
-		const { body } = this;
-		const { velocity } = body;
-		Object.defineProperties(this._velocity, {
-			x: {
-				set: a => velocity.x = a,
-				get: () => velocity.x
-			},
-			y: {
-				set: a => velocity.y = a,
-				get: () => velocity.y
-			}
-		});
+		this._velocity.proxy(body.velocity);
 
 		Object.shortcut(this, body, "simulated");
 		Object.shortcut(this, body, "isTrigger");

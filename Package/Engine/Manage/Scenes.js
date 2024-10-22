@@ -33,7 +33,10 @@ class Scene {
 		this.cullGraphics = true;
 		this.mouseEvents = true;
 		this.collisionEvents = true;
-		this.camera = new Camera(this.engine.canvas.width / 2, this.engine.canvas.height / 2, 0, 1, engine);
+		this.camera = new Camera(
+			new Vector2(this.engine.canvas.width / 2, this.engine.canvas.height / 2),
+			0, 1, engine
+		);
 		this.updating = false;
 		this.renderOrder = [];
 	}

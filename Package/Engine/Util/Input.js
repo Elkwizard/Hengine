@@ -304,10 +304,10 @@ class MouseHandler extends InputHandler {
 		]);
 
 		this.wheelDelta = 0;
-		Vector2.defineReference(this, "screen", Vector2.origin);
-		Vector2.defineReference(this, "screenLast", Vector2.origin);
-		Vector2.defineReference(this, "world", Vector2.origin);
-		Vector2.defineReference(this, "worldLast", Vector2.origin);
+		Vector2.defineReference(this, "screen");
+		Vector2.defineReference(this, "screenLast");
+		Vector2.defineReference(this, "world");
+		Vector2.defineReference(this, "worldLast");
 	}
 	preprocess(name) {
 		if (typeof name === "number") return this.mouseMap.get(name);
@@ -409,10 +409,10 @@ MouseHandler.State = class ButtonState extends InputHandler.State {
 	constructor(handler, name) {
 		super(handler, name);
 
-		Vector2.defineReference(this, "screenDragStart", Vector2.origin);
-		Vector2.defineReference(this, "screenDragEnd", Vector2.origin);
-		Vector2.defineReference(this, "worldDragStart", Vector2.origin);
-		Vector2.defineReference(this, "worldDragEnd", Vector2.origin);
+		Vector2.defineReference(this, "screenDragStart");
+		Vector2.defineReference(this, "screenDragEnd");
+		Vector2.defineReference(this, "worldDragStart");
+		Vector2.defineReference(this, "worldDragEnd");
 	}
 };
 
@@ -533,10 +533,10 @@ TouchHandler.State = class TouchState extends MouseHandler.State {
 	constructor(handler, name) {
 		super(handler, name);
 
-		Vector2.defineReference(this, "screen", Vector2.origin);
-		Vector2.defineReference(this, "screenLast", Vector2.origin);
-		Vector2.defineReference(this, "world", Vector2.origin);
-		Vector2.defineReference(this, "worldLast", Vector2.origin);
+		Vector2.defineReference(this, "screen");
+		Vector2.defineReference(this, "screenLast");
+		Vector2.defineReference(this, "world");
+		Vector2.defineReference(this, "worldLast");
 	}
 	beforeUpdate() {
 		super.beforeUpdate();
