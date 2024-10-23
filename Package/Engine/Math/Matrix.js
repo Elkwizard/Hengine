@@ -224,7 +224,10 @@ class Matrix extends Float64Array {
 		return result;
 	}
 	/**
-	 * Creates an N or N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * @signature
+	 * @param Number scale | The scale factor along every axis
+	 * @param Matrix result? | The matrix to copy the scaling matrix into
 	 * @signature
 	 * @param Number[] ...axes | The scale factor along each of the axes 
 	 * @param Matrix result? | The matrix to copy the scaling matrix into 
@@ -235,11 +238,19 @@ class Matrix extends Float64Array {
 	 */
 	static scale(...axes) {
 		const result = axes.last instanceof this ? this.identity(axes.pop()) : new this();
-		if (axes[0] instanceof Vector)
-			axes = axes[0].values;
 
 		const { size } = this;
-		for (let i = 0; i < size; i++)
+		const count = size - 1;
+
+		const first = axes[0];
+		if (axes.length === 1) {
+			if (typeof first === "number")
+				axes = new Array(count).fill(first);
+			else if (first instanceof Vector)
+				axes = first.values;
+		}
+
+		for (let i = 0; i < count; i++)
 			result[i * size + i] = axes[i];
 		return result;
 	}
@@ -289,9 +300,9 @@ class Matrix extends Float64Array {
 	 * @return Matrix3
 	 */
 	static mulMatrices(matrices, result = new this()) {
-		if (matrices.length === 1) return matrices[0].get(result);
-		matrices[matrices.length - 2].times(matrices[matrices.length - 1], result);
-		for (let i = matrices.length - 3; i >= 0; i--) matrices[i].times(result, result);
+		result.set(matrices[0]);
+		for (let i = 1; i < matrices.length; i++)
+			result.mul(matrices[i]);
 		return result;
 	}
 	/**

@@ -130,7 +130,7 @@ class MathObject {
 		return this.sum(values, result).div(values.length);
 	}
 	static lerp(a, b, t, result = this.zero) {
-		return a.times((1 - t) / t, result).add(b).mul(t);
+		return a.times(1 - t, result).add(b.times(t));
 	}
     static defineReference(obj, key, value = this.zero) {
         delete obj[key];

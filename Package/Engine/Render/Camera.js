@@ -1,19 +1,71 @@
 /**
- * Represents the camera in a scene.
- * This class should be constructed and is available via the `.camera` property of Scene.
+ * @interface
+ * Represents a camera in a scene.
+ * This class should not be constructed and is available via the `.camera` property of Scene.
  * The transformation represented by this matrix is from screen-space to world-space.
- * @prop Vector2 position | The current center of the camera's view. This starts as `new Vector2(width / 2, height / 2)`
+ * @prop Number zoom | The magnification level of the camera
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
- * @prop Number zoom | The zoom factor of the camera. Starts at 1
  */
-class Camera extends Matrix3 {
-	constructor(pos, rotation = 0, zoom = 1, engine) {
+class BaseCamera {
+	/**
+	 * Sets the zoom to 1.
+	 */
+	restoreZoom() {
+		this.zoom = 1;
+	}
+	/**
+	 * Zooms in by a specified amount.
+	 * @param Number amount | The amount to zoom in by
+	 */
+	zoomIn(amount) {
+		this.zoom *= 1 + amount;
+	}
+	/**
+	 * Zooms out by a specified amount.
+	 * @param Number amount | The amount to zoom out by
+	 */
+	zoomOut(amount) {
+		this.zoom /= 1 + amount;
+	}
+	/**
+	 * Multiplies the current zoom value.
+	 * @param Number factor | The amount to multiply the current zoom
+	 */
+	zoomBy(factor) {
+		this.zoom *= factor;
+	}
+	/**
+	 * Maps a given point from screen-space to world-space.
+	 * @param Vector2 point | The point to transform
+	 * @return Vector2
+	 */
+	screenSpaceToWorldSpace(point) {
+		return this.times(point);
+	}
+	/**
+	 * Maps a given point from world-space to screen-space.
+	 * @param Vector2 point | The point to transform
+	 * @return Vector2
+	 */
+	worldSpaceToScreenSpace(point) {
+		return this.inverse.times(point);
+	}
+}
+
+/**
+ * @implements BaseCamera
+ * Represents the camera in a 2D scene.
+ * @prop Vector2 position | The current center of the camera's view. This starts as `new Vector2(width / 2, height / 2)`
+ */
+class Camera2D extends Matrix3 {
+	constructor(renderer) {
 		super();
-		this.engine = engine;
-		Vector2.defineReference(this, "position", pos.get())
+		this.renderer = renderer;
+		const { width, height } = this.canvas;
+		Vector2.defineReference(this, "position", new Vector2(width / 2, height / 2))
 			.onChange(() => this.updateTranslationMatrix());
-		this.zoom = zoom;
-		this.rotation = rotation;
+		this.zoom = 1;
+		this.rotation = 0;
 		this.cacheScreen();
 	}
 	set rotation(a) {
@@ -34,13 +86,16 @@ class Camera extends Matrix3 {
 	get zoom() {
 		return this._zoom;
 	}
+	get canvas() {
+		return this.renderer.imageType;
+	}
 	updateTranslationMatrix() {
 		const { x, y } = this.position;
 		const c = this.cosRotation;
 		const s = this.sinRotation;
 		const z = this.zoom;
-		const w = this.engine.canvas.width;
-		const h = this.engine.canvas.height;
+		const w = this.canvas.width;
+		const h = this.canvas.height;
 		this[6] = w / 2 - x * c * z + y * s * z;
 		this[7] = h / 2 - x * s * z - y * c * z;
 	}
@@ -103,33 +158,6 @@ class Camera extends Matrix3 {
 		);
 	}
 	/**
-	 * Sets the zoom to 1.
-	 */
-	restoreZoom() {
-		this.zoom = 1;
-	}
-	/**
-	 * Zooms in by a specified amount.
-	 * @param Number amount | The amount to zoom in by
-	 */
-	zoomIn(amount) {
-		this.zoom *= 1 + amount;
-	}
-	/**
-	 * Zooms out by a specified amount.
-	 * @param Number amount | The amount to zoom out by
-	 */
-	zoomOut(amount) {
-		this.zoom /= 1 + amount;
-	}
-	/**
-	 * Multiplies the current zoom value.
-	 * @param Number factor | The amount to multiply the current zoom
-	 */
-	zoomBy(factor) {
-		this.zoom *= factor;
-	}
-	/**
 	 * Zooms in/out about a specific point (in world-space) by a specific factor.
 	 * @param Vector2 center | The zoom center
 	 * @param Number factor | The zoom multiplier
@@ -146,7 +174,7 @@ class Camera extends Matrix3 {
 	 * @return Rect
 	 */
 	cacheScreen() {
-		const { width, height } = this.engine.canvas;
+		const { width, height } = this.canvas;
 		return this.screen = Rect.bound([
 			new Vector2(width / 2, height / 2),
 			new Vector2(width / 2, -height / 2),
@@ -159,51 +187,79 @@ class Camera extends Matrix3 {
 	 * @param () => void render | The function to call while in the world-space context
 	 */
 	drawInWorldSpace(artist) {
-		let renderer = this.engine.renderer;
-		renderer.save();
-		this.transformToWorld(renderer);
-		artist();
-		renderer.restore();
+		this.renderer.drawThrough(this, artist, false);
 	}
 	/**
 	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
 	 * @param () => void render | The function to call while in the screen-space context
 	 */
 	drawInScreenSpace(artist) {
-		let renderer = this.engine.renderer;
-		renderer.save();
-		this.transformToScreen(renderer);
-		artist();
-		renderer.restore();
+		this.renderer.drawThrough(this.inverse, artist, false);
 	}
 	transformToWorld() {
-		const { renderer } = this.engine;
+		const { renderer } = this;
 		renderer.translate(renderer.middle);
 		renderer.rotate(this.rotation);
 		renderer.scale(this.zoom);
 		renderer.translate(this.position.inverse);
 	}
 	transformToScreen() {
-		const { renderer } = this.engine;
+		const { renderer } = this;
 		renderer.translate(this.position);
 		renderer.scale(1 / this.zoom);
 		renderer.rotate(-this.rotation);
 		renderer.translate(renderer.middle.inverse);
 	}
-	/**
-	 * Maps a given point from screen-space to world-space.
-	 * @param Vector2 point | The point to transform
-	 * @return Vector2
-	 */
-	screenSpaceToWorldSpace(point) {
-		return point.Vminus(this.engine.renderer.middle).rotate(-this.rotation).Ndiv(this.zoom).Vadd(this.position);
+}
+Object.inherit(Camera2D, BaseCamera);
+
+/**
+ * @implements BaseCamera
+ * Represents the camera in a 3D scene.
+ * @prop Vector3 position | The location of the camera, in world-space. Starts at (0, 0, 0)
+ * @prop Vector3 direction | The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
+ */
+class Camera3D extends Matrix4 {
+	constructor(renderer) {
+		super();
+
+		// define parameters
+		this.renderer = renderer;
+		Vector2.defineReference(this, "position", new Vector3(0, 0, 0));
+		Vector2.defineReference(this, "direction", new Vector3(0, 0, 1));
+		this.rotation = 0;
+		this.zoom = 1;
+
+		// change handlers
+		const handle = () => this.updateMatrix();
+		this.position.onChange(handle);
+		this.direction.onChange(handle);
+		Object.onChange(this, "rotation", handle);
+		Object.onChange(this, "zoom", handle);
+		
+		this.updateMatrix();
 	}
-	/**
-	 * Maps a given point from world-space to screen-space.
-	 * @param Vector2 point | The point to transform
-	 * @return Vector2
-	 */
-	worldSpaceToScreenSpace(point) {
-		return point.Vminus(this.position).Nmul(this.zoom).rotate(this.rotation).Vadd(this.engine.renderer.middle);
+	updateMatrix() {
+		const forward = this.direction;
+		const quat = Quaternion.fromRotation(forward, this.rotation);
+		const baseRight = forward.x || forward.z ? new Vector3(forward.z, 0, -forward.x).normalize() : Vector3.right;
+		const right = quat.rotate(baseRight);
+		const up = forward.cross(right);
+
+		const z = 1 / this.zoom;
+
+		const trans = this.position;
+		this.set(new Matrix4(
+			right.times(z), up.times(z),
+			forward.times(z), trans
+		));
+	}
+	look(xAngle, yAngle) {
+		const limit = Math.PI / 2 - MathObject.EPSILON;
+		yAngle = Number.clamp(yAngle, -limit, limit);
+		this.direction = Vector3.forward
+			.rotateAboutAxis(Vector3.right, -yAngle)
+			.rotateAboutAxis(Vector3.up, -xAngle);
 	}
 }
+Object.inherit(Camera3D, BaseCamera);

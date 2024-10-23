@@ -7,39 +7,35 @@
 			</head>
 			<body>
 				
-			<div class="class-wrapper" id="class Camera">
+			<div class="class-wrapper" id="class BaseCamera">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L9" target="_blank" class="class-name source-link">Camera</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Geometry/Matrices.html#class Matrix3">Matrix3</a></span>
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L9" target="_blank" class="class-name source-link">BaseCamera</a>
 				</div>
 				<div class="class desc">
-					Represents the camera in a scene.
-This class should be constructed and is available via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">camera</span></code> property of <a href="../../Pages/Management/Scene.html#class Scene">Scene</a>.
+					Represents a camera in a scene.
+This class should not be constructed and is available via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">camera</span></code> property of <a href="../../Pages/Management/Scene.html#class Scene">Scene</a>.
 The transformation represented by this matrix is from screen-space to world-space.
 				</div>
+				
+					<div class="header">Implementers</div>
+					<div class="subclass desc"><span class="class-name">Camera2D</span>, <span class="class-name">Camera3D</span></div>
 				
 				
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Camera.position">
+				<div class="prop-wrapper" id="BaseCamera.zoom">
 					<div class="prop-header member">
-						<span class="prop-name">position</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">zoom</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
-					<div class="prop desc">The current center of the camera's view. This starts as <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">)</span></code></div>
+					<div class="prop desc">The magnification level of the camera</div>
 				</div>
 			
-				<div class="prop-wrapper" id="Camera.rotation">
+				<div class="prop-wrapper" id="BaseCamera.rotation">
 					<div class="prop-header member">
 						<span class="prop-name">rotation</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The clockwise roll (in radians) of the camera. Starts at 0</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Camera.zoom">
-					<div class="prop-header member">
-						<span class="prop-name">zoom</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The zoom factor of the camera. Starts at 1</div>
 				</div>
 			</div>
 				
@@ -47,164 +43,9 @@ The transformation represented by this matrix is from screen-space to world-spac
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="get Camera.prototype.screen()">
+		<div class="function-wrapper" id="BaseCamera.prototype.restoreZoom()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L173" target="_blank" class="function-name source-link">screen</a><span class="type"><a href="../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
-			</div>
-			<div class="function desc">
-				Returns the axis-aligned bounding box of the current viewport.
-			</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Camera.prototype.rotateTowards()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L87" target="_blank" class="function-name source-link">rotateTowards</a>(<span class="param">angle</span>, <span class="param">ferocity</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Smoothly moves the camera toward a new rotation value.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Camera.prototype.rotateTowards():angle">
-							<div class="param-name">
-								<span class="param">angle</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The new rotation to move toward (in radians)
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Camera.prototype.rotateTowards():ferocity">
-							<div class="param-name">
-								<span class="param">ferocity</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The degree to which the camera should move toward the new position, on [0, 1]
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Camera.prototype.moveTowards()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L96" target="_blank" class="function-name source-link">moveTowards</a>(<span class="param">point</span>, <span class="param">ferocity</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Smoothly moves the camera toward a new position value.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Camera.prototype.moveTowards():point">
-							<div class="param-name">
-								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-							</div>
-							<div class="param desc">
-								The new position to move toward
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Camera.prototype.moveTowards():ferocity">
-							<div class="param-name">
-								<span class="param">ferocity</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The degree to which the camera should move toward the new position, on [0, 1]
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Camera.prototype.constrain()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L112" target="_blank" class="function-name source-link">constrain</a>(<span class="param">boundary</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.
-If the boundary is smaller than the viewport, the behavior is undefined.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Camera.prototype.constrain():boundary">
-							<div class="param-name">
-								<span class="param">boundary</span>
-								<span class="type"><a href="../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
-							</div>
-							<div class="param desc">
-								The boundary in which the camera's viewport must exist
-							</div>
-						</div>
-					
-		
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Camera.prototype.constrain():x">
-							<div class="param-name">
-								<span class="param">x</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The x coordinate of the upper-left corner of the boundary
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Camera.prototype.constrain():y">
-							<div class="param-name">
-								<span class="param">y</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The y coordinate of the upper-left corner of the boundary
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Camera.prototype.constrain():width">
-							<div class="param-name">
-								<span class="param">width</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The width of the boundary
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Camera.prototype.constrain():height">
-							<div class="param-name">
-								<span class="param">height</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The height of the boundary
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Camera.prototype.restoreZoom()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L133" target="_blank" class="function-name source-link">restoreZoom</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L13" target="_blank" class="function-name source-link">restoreZoom</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the zoom to 1.
@@ -212,9 +53,9 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Camera.prototype.zoomIn()">
+		<div class="function-wrapper" id="BaseCamera.prototype.zoomIn()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L140" target="_blank" class="function-name source-link">zoomIn</a>(<span class="param">amount</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L20" target="_blank" class="function-name source-link">zoomIn</a>(<span class="param">amount</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Zooms in by a specified amount.
@@ -224,7 +65,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Camera.prototype.zoomIn():amount">
+						<div class="param-wrapper" id="BaseCamera.prototype.zoomIn():amount">
 							<div class="param-name">
 								<span class="param">amount</span>
 								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
@@ -239,9 +80,9 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Camera.prototype.zoomOut()">
+		<div class="function-wrapper" id="BaseCamera.prototype.zoomOut()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L147" target="_blank" class="function-name source-link">zoomOut</a>(<span class="param">amount</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L27" target="_blank" class="function-name source-link">zoomOut</a>(<span class="param">amount</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Zooms out by a specified amount.
@@ -251,7 +92,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Camera.prototype.zoomOut():amount">
+						<div class="param-wrapper" id="BaseCamera.prototype.zoomOut():amount">
 							<div class="param-name">
 								<span class="param">amount</span>
 								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
@@ -266,9 +107,9 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Camera.prototype.zoomBy()">
+		<div class="function-wrapper" id="BaseCamera.prototype.zoomBy()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L154" target="_blank" class="function-name source-link">zoomBy</a>(<span class="param">factor</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L34" target="_blank" class="function-name source-link">zoomBy</a>(<span class="param">factor</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Multiplies the current zoom value.
@@ -278,7 +119,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Camera.prototype.zoomBy():factor">
+						<div class="param-wrapper" id="BaseCamera.prototype.zoomBy():factor">
 							<div class="param-name">
 								<span class="param">factor</span>
 								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
@@ -293,100 +134,9 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Camera.prototype.zoomAbout()">
+		<div class="function-wrapper" id="BaseCamera.prototype.screenSpaceToWorldSpace()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L162" target="_blank" class="function-name source-link">zoomAbout</a>(<span class="param">center</span>, <span class="param">factor</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Zooms in/out about a specific point (in world-space) by a specific factor.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Camera.prototype.zoomAbout():center">
-							<div class="param-name">
-								<span class="param">center</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-							</div>
-							<div class="param desc">
-								The zoom center
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Camera.prototype.zoomAbout():factor">
-							<div class="param-name">
-								<span class="param">factor</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The zoom multiplier
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Camera.prototype.drawInWorldSpace()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L186" target="_blank" class="function-name source-link">drawInWorldSpace</a>(<span class="param">render</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Camera.prototype.drawInWorldSpace():render">
-							<div class="param-name">
-								<span class="param">render</span>
-								<span class="type">() =&gt; void</span>
-							</div>
-							<div class="param desc">
-								The function to call while in the world-space context
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Camera.prototype.drawInScreenSpace()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L197" target="_blank" class="function-name source-link">drawInScreenSpace</a>(<span class="param">render</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Camera.prototype.drawInScreenSpace():render">
-							<div class="param-name">
-								<span class="param">render</span>
-								<span class="type">() =&gt; void</span>
-							</div>
-							<div class="param desc">
-								The function to call while in the screen-space context
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Camera.prototype.screenSpaceToWorldSpace()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L223" target="_blank" class="function-name source-link">screenSpaceToWorldSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L42" target="_blank" class="function-name source-link">screenSpaceToWorldSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Maps a given point from screen-space to world-space.
@@ -396,7 +146,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Camera.prototype.screenSpaceToWorldSpace():point">
+						<div class="param-wrapper" id="BaseCamera.prototype.screenSpaceToWorldSpace():point">
 							<div class="param-name">
 								<span class="param">point</span>
 								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
@@ -411,9 +161,9 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Camera.prototype.worldSpaceToScreenSpace()">
+		<div class="function-wrapper" id="BaseCamera.prototype.worldSpaceToScreenSpace()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L231" target="_blank" class="function-name source-link">worldSpaceToScreenSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L50" target="_blank" class="function-name source-link">worldSpaceToScreenSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Maps a given point from world-space to screen-space.
@@ -423,7 +173,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Camera.prototype.worldSpaceToScreenSpace():point">
+						<div class="param-wrapper" id="BaseCamera.prototype.worldSpaceToScreenSpace():point">
 							<div class="param-name">
 								<span class="param">point</span>
 								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
@@ -438,6 +188,310 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 			
 		</div>
 	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Camera2D">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L60" target="_blank" class="class-name source-link">Camera2D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Geometry/Matrices.html#class Matrix3">Matrix3</a></span> <span class="keyword">implements</span> <span class="class-name">BaseCamera</span>
+				</div>
+				<div class="class desc">
+					Represents the camera in a 2D scene.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Camera2D.position">
+					<div class="prop-header member">
+						<span class="prop-name">position</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The current center of the camera's view. This starts as <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">)</span></code></div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="get Camera2D.prototype.screen()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L172" target="_blank" class="function-name source-link">screen</a><span class="type"><a href="../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
+			</div>
+			<div class="function desc">
+				Returns the axis-aligned bounding box of the current viewport.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera2D.prototype.rotateTowards()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L113" target="_blank" class="function-name source-link">rotateTowards</a>(<span class="param">angle</span>, <span class="param">ferocity</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Smoothly moves the camera toward a new rotation value.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera2D.prototype.rotateTowards():angle">
+							<div class="param-name">
+								<span class="param">angle</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The new rotation to move toward (in radians)
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Camera2D.prototype.rotateTowards():ferocity">
+							<div class="param-name">
+								<span class="param">ferocity</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The degree to which the camera should move toward the new position, on [0, 1]
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera2D.prototype.moveTowards()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L122" target="_blank" class="function-name source-link">moveTowards</a>(<span class="param">point</span>, <span class="param">ferocity</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Smoothly moves the camera toward a new position value.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera2D.prototype.moveTowards():point">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The new position to move toward
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Camera2D.prototype.moveTowards():ferocity">
+							<div class="param-name">
+								<span class="param">ferocity</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The degree to which the camera should move toward the new position, on [0, 1]
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera2D.prototype.constrain()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L138" target="_blank" class="function-name source-link">constrain</a>(<span class="param">boundary</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.
+If the boundary is smaller than the viewport, the behavior is undefined.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera2D.prototype.constrain():boundary">
+							<div class="param-name">
+								<span class="param">boundary</span>
+								<span class="type"><a href="../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
+							</div>
+							<div class="param desc">
+								The boundary in which the camera's viewport must exist
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera2D.prototype.constrain():x">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the upper-left corner of the boundary
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Camera2D.prototype.constrain():y">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the upper-left corner of the boundary
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Camera2D.prototype.constrain():width">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The width of the boundary
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Camera2D.prototype.constrain():height">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The height of the boundary
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera2D.prototype.zoomAbout()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L161" target="_blank" class="function-name source-link">zoomAbout</a>(<span class="param">center</span>, <span class="param">factor</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Zooms in/out about a specific point (in world-space) by a specific factor.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera2D.prototype.zoomAbout():center">
+							<div class="param-name">
+								<span class="param">center</span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The zoom center
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Camera2D.prototype.zoomAbout():factor">
+							<div class="param-name">
+								<span class="param">factor</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The zoom multiplier
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera2D.prototype.drawInWorldSpace()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L185" target="_blank" class="function-name source-link">drawInWorldSpace</a>(<span class="param">render</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera2D.prototype.drawInWorldSpace():render">
+							<div class="param-name">
+								<span class="param">render</span>
+								<span class="type">() =&gt; void</span>
+							</div>
+							<div class="param desc">
+								The function to call while in the world-space context
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera2D.prototype.drawInScreenSpace()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L192" target="_blank" class="function-name source-link">drawInScreenSpace</a>(<span class="param">render</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera2D.prototype.drawInScreenSpace():render">
+							<div class="param-name">
+								<span class="param">render</span>
+								<span class="type">() =&gt; void</span>
+							</div>
+							<div class="param desc">
+								The function to call while in the screen-space context
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Camera3D">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L218" target="_blank" class="class-name source-link">Camera3D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Geometry/Matrices.html#class Matrix4">Matrix4</a></span> <span class="keyword">implements</span> <span class="class-name">BaseCamera</span>
+				</div>
+				<div class="class desc">
+					Represents the camera in a 3D scene.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Camera3D.position">
+					<div class="prop-header member">
+						<span class="prop-name">position</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+					</div>
+					<div class="prop desc">The location of the camera, in world-space</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Camera3D.direction">
+					<div class="prop-header member">
+						<span class="prop-name">direction</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+					</div>
+					<div class="prop desc">The direction the camera is facing. This must be a unit vector</div>
+				</div>
+			</div>
+				
+				
 				
 			</div>
 		

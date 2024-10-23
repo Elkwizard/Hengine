@@ -101,7 +101,7 @@ It is composed of a rotation about the origin followed by a translation.
 	
 		<div class="function-wrapper" id="get Transform.prototype.inverse()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L54" target="_blank" class="function-name source-link">inverse</a><span class="type">Transform</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L39" target="_blank" class="function-name source-link">inverse</a><span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform that, when composed with the caller, will produce no offset and no rotation.
@@ -111,7 +111,7 @@ It is composed of a rotation about the origin followed by a translation.
 	
 		<div class="function-wrapper" id="Transform.prototype.rotateAround()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L102" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L87" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Adds a clockwise (in screen-space) rotation in-place about a specific point to the existing transformation. 
@@ -148,7 +148,7 @@ It is composed of a rotation about the origin followed by a translation.
 	
 		<div class="function-wrapper" id="Transform.prototype.globalSpaceToLocalSpace()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L115" target="_blank" class="function-name source-link">globalSpaceToLocalSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L100" target="_blank" class="function-name source-link">globalSpaceToLocalSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the inverse of the caller to it.
@@ -176,7 +176,7 @@ This translates the point by the inverse of the transform's position and then ro
 	
 		<div class="function-wrapper" id="Transform.prototype.localSpaceToGlobalSpace()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L124" target="_blank" class="function-name source-link">localSpaceToGlobalSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L109" target="_blank" class="function-name source-link">localSpaceToGlobalSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the caller to it.
@@ -204,7 +204,7 @@ This rotates the point clockwise (in screen-space) about the origin by the trans
 	
 		<div class="function-wrapper" id="Transform.combine()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L161" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L146" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform which has the same effect as applying two transformations in a row.

@@ -717,13 +717,22 @@ class Artist {
 		);
 	}
 	/**
-	 * Calls a function while using a specified coordinate transform
-	 * @param Matrix3 transform | The specific global coordinate transform to use
-	 * @param () => void draw | The function that will be called while using the specified transform
+	 * Manipulates the current coordinate transform. For an Artist `a` and Matrix3 `m`, `a.addTransform(m)` is equivalent to `a.transform = m.times(a.transform)`.
+	 * @param Matrix3 transform | The coordinate transform to compose with the existing transform
 	 */
-	drawThrough(transform, draw) {
+	addTransform(mat) {
+		this.c.transform(mat[0], mat[1], mat[3], mat[4], mat[6], mat[7]);
+	}
+	/**
+	 * Calls a function while using a specified coordinate transform
+	 * @param Matrix3 transform | The specific coordinate transform to use
+	 * @param () => void draw | The function that will be called while using the specified transform
+	 * @param Boolean global? | Whether the transform should be applied in place of all current transforms (true), or composed with the current transform (false). Default is true.
+	 */
+	drawThrough(mat, draw, global = true) {
 		this.save();
-		this.transform = transform;
+		if (global) this.transform = mat;
+		else this.addTransform(mat);
 		draw();
 		this.restore();
 	}
@@ -834,9 +843,6 @@ class Artist {
 	 */
 	unclip() {
 		this.restore();
-	}
-	sigmoid(x) {
-		return 1 / (1 + (Math.E ** -x));
 	}
 	/**
 	 * Multiplies the current coordinate transform in-place by a matrix on the right side.

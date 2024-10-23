@@ -288,7 +288,7 @@ Object.defineProperty(window, "title", {
 			return arr;
 		}
 
-		return new Array(Math.floor(dim)).fill(null);
+		return new Array(Math.ceil(dim)).fill(null);
 	};
 	/**
 	 * @name class Number extends Vector

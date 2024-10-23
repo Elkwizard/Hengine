@@ -47,7 +47,11 @@
 		"Rendering": {
 			"GLSL API": ["GLSL API", "GPUInterface", "GPUArray"],
 			"Font": null,
-			"Camera": null,
+			"Camera": {
+				"BaseCamera": null,
+				"Camera2D": null,
+				"Camera3D": null
+			},
 			"Color": null,
 			"Gradient": ["Gradient", "ValueStop"],
 			"GrayMap": null,

@@ -1271,6 +1271,18 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 */
 	constructor(base?: this);
 	/**
+	 * Returns a transposed copy of the caller.
+	 */
+	get transposed(): this;
+	/**
+	 * Returns a inverted copy of the caller, or null if the caller is singular.
+	 */
+	get inverse(): this | null;
+	/**
+	 * Returns the determinant of the caller.
+	 */
+	get determinant(): number;
+	/**
 	 * Transposes the matrix in-place (swapping rows with columns) and returns it.
 	 */
 	transpose(): this;
@@ -1336,13 +1348,19 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 */
 	times(other: this | Vector | number, result?: this | Vector): this | Vector | number;
 	/**
-	 * Creates an N or N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * @param scale - The scale factor along every axis
+	 * @param result - The matrix to copy the scaling matrix into
+	 */
+	static scale(scale: number, result?: Matrix): Matrix;
+	/**
+	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
 	 * @param axes - The scale factor along each of the axes
 	 * @param result - The matrix to copy the scaling matrix into
 	 */
 	static scale(...axes: number[], result?: Matrix): Matrix;
 	/**
-	 * Creates an N or N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
 	 * @param vector - A vector where each component specifies the scale factor on its corresponding axis
 	 * @param result - The matrix to copy the scaling matrix into
 	 */
@@ -1370,6 +1388,10 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 * @param result - The matrix to copy the result into
 	 */
 	static mulMatrices(matrices: Matrix3[], result?: Matrix3): Matrix3;
+	/**
+	 * Returns a vector class which has the same number of elements as the dimension of the caller.
+	 */
+	static get Vector(): Class<Vector>;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -1428,7 +1450,15 @@ declare class Matrix3 extends Matrix {
  * Represents a 4 by 4 matrix for use with 3D vectors in homogenous coordinates or 4D vectors in standard coordinates.
  */
 declare class Matrix4 extends Matrix {
-	
+	/**
+	 * Creates a perspective projection matrix for use in 3D rendering.
+	 * @param aspectRatio - The aspect ratio of the surface on which the rendering will occur (`height / width`)
+	 * @param fov - The angular size of the field of view in radians
+	 * @param zNear - The near clipping plane
+	 * @param zFar - The far clipping plane
+	 * @param result - The destination to store the resulting matrix in. If not specified, a new matrix will be created
+	 */
+	static perspective(aspectRatio: number, fov: number, zNear: number, zFar: number, result?: Matrix4): Matrix4;
 }
 
 /**
@@ -3195,23 +3225,58 @@ declare class AnimationStateMachine extends ImageType {
 }
 
 /**
- * Represents the camera in a scene.
- * This class should be constructed and is available via the `.camera` property of Scene.
+ * Represents a camera in a scene.
+ * This class should not be constructed and is available via the `.camera` property of Scene.
  * The transformation represented by this matrix is from screen-space to world-space.
  */
-declare class Camera extends Matrix3 {
+declare interface BaseCamera {
 	/**
-	 * The current center of the camera's view. This starts as `new Vector2(width / 2, height / 2)`
+	 * The magnification level of the camera
 	 */
-	position: Vector2;
+	zoom: number;
 	/**
 	 * The clockwise roll (in radians) of the camera. Starts at 0
 	 */
 	rotation: number;
 	/**
-	 * The zoom factor of the camera. Starts at 1
+	 * Sets the zoom to 1.
 	 */
-	zoom: number;
+	restoreZoom(): void;
+	/**
+	 * Zooms in by a specified amount.
+	 * @param amount - The amount to zoom in by
+	 */
+	zoomIn(amount: number): void;
+	/**
+	 * Zooms out by a specified amount.
+	 * @param amount - The amount to zoom out by
+	 */
+	zoomOut(amount: number): void;
+	/**
+	 * Multiplies the current zoom value.
+	 * @param factor - The amount to multiply the current zoom
+	 */
+	zoomBy(factor: number): void;
+	/**
+	 * Maps a given point from screen-space to world-space.
+	 * @param point - The point to transform
+	 */
+	screenSpaceToWorldSpace(point: Vector2): Vector2;
+	/**
+	 * Maps a given point from world-space to screen-space.
+	 * @param point - The point to transform
+	 */
+	worldSpaceToScreenSpace(point: Vector2): Vector2;
+}
+
+/**
+ * Represents the camera in a 2D scene.
+ */
+declare class Camera2D extends Matrix3 implements BaseCamera {
+	/**
+	 * The current center of the camera's view. This starts as `new Vector2(width / 2, height / 2)`
+	 */
+	position: Vector2;
 	/**
 	 * Smoothly moves the camera toward a new rotation value.
 	 * @param angle - The new rotation to move toward (in radians)
@@ -3240,25 +3305,6 @@ declare class Camera extends Matrix3 {
 	 */
 	constrain(x: number, y: number, width: number, height: number): void;
 	/**
-	 * Sets the zoom to 1.
-	 */
-	restoreZoom(): void;
-	/**
-	 * Zooms in by a specified amount.
-	 * @param amount - The amount to zoom in by
-	 */
-	zoomIn(amount: number): void;
-	/**
-	 * Zooms out by a specified amount.
-	 * @param amount - The amount to zoom out by
-	 */
-	zoomOut(amount: number): void;
-	/**
-	 * Multiplies the current zoom value.
-	 * @param factor - The amount to multiply the current zoom
-	 */
-	zoomBy(factor: number): void;
-	/**
 	 * Zooms in/out about a specific point (in world-space) by a specific factor.
 	 * @param center - The zoom center
 	 * @param factor - The zoom multiplier
@@ -3278,6 +3324,84 @@ declare class Camera extends Matrix3 {
 	 * @param render - The function to call while in the screen-space context
 	 */
 	drawInScreenSpace(render: () => void): void;
+	/**
+	 * The magnification level of the camera
+	 */
+	zoom: number;
+	/**
+	 * The clockwise roll (in radians) of the camera. Starts at 0
+	 */
+	rotation: number;
+	/**
+	 * Sets the zoom to 1.
+	 */
+	restoreZoom(): void;
+	/**
+	 * Zooms in by a specified amount.
+	 * @param amount - The amount to zoom in by
+	 */
+	zoomIn(amount: number): void;
+	/**
+	 * Zooms out by a specified amount.
+	 * @param amount - The amount to zoom out by
+	 */
+	zoomOut(amount: number): void;
+	/**
+	 * Multiplies the current zoom value.
+	 * @param factor - The amount to multiply the current zoom
+	 */
+	zoomBy(factor: number): void;
+	/**
+	 * Maps a given point from screen-space to world-space.
+	 * @param point - The point to transform
+	 */
+	screenSpaceToWorldSpace(point: Vector2): Vector2;
+	/**
+	 * Maps a given point from world-space to screen-space.
+	 * @param point - The point to transform
+	 */
+	worldSpaceToScreenSpace(point: Vector2): Vector2;
+}
+
+/**
+ * Represents the camera in a 3D scene.
+ */
+declare class Camera3D extends Matrix4 implements BaseCamera {
+	/**
+	 * The location of the camera, in world-space. Starts at (0, 0, 0)
+	 */
+	position: Vector3;
+	/**
+	 * The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
+	 */
+	direction: Vector3;
+	/**
+	 * The magnification level of the camera
+	 */
+	zoom: number;
+	/**
+	 * The clockwise roll (in radians) of the camera. Starts at 0
+	 */
+	rotation: number;
+	/**
+	 * Sets the zoom to 1.
+	 */
+	restoreZoom(): void;
+	/**
+	 * Zooms in by a specified amount.
+	 * @param amount - The amount to zoom in by
+	 */
+	zoomIn(amount: number): void;
+	/**
+	 * Zooms out by a specified amount.
+	 * @param amount - The amount to zoom out by
+	 */
+	zoomOut(amount: number): void;
+	/**
+	 * Multiplies the current zoom value.
+	 * @param factor - The amount to multiply the current zoom
+	 */
+	zoomBy(factor: number): void;
 	/**
 	 * Maps a given point from screen-space to world-space.
 	 * @param point - The point to transform
@@ -4333,11 +4457,17 @@ declare class Artist {
 	 */
 	get transform(): Matrix3;
 	/**
-	 * Calls a function while using a specified coordinate transform
-	 * @param transform - The specific global coordinate transform to use
-	 * @param draw - The function that will be called while using the specified transform
+	 * Manipulates the current coordinate transform. For an Artist `a` and Matrix3 `m`, `a.addTransform(m)` is equivalent to `a.transform = m.times(a.transform)`.
+	 * @param transform - The coordinate transform to compose with the existing transform
 	 */
-	drawThrough(transform: Matrix3, draw: () => void): void;
+	addTransform(transform: Matrix3): void;
+	/**
+	 * Calls a function while using a specified coordinate transform
+	 * @param transform - The specific coordinate transform to use
+	 * @param draw - The function that will be called while using the specified transform
+	 * @param global - Whether the transform should be applied in place of all current transforms (true), or composed with the current transform (false). Default is true.
+	 */
+	drawThrough(transform: Matrix3, draw: () => void, global?: boolean): void;
 	/**
 	 * Returns the color of a specific pixel in natural-space.
 	 * @param x - The x coordinate of the pixel

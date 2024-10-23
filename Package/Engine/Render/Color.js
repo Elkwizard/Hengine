@@ -134,10 +134,10 @@ class Color extends Operable {
 		} else r.get(this);
 		return this;
 	}
-	op(fn, v) {
-		super.op(fn, v);
-		this.constrain();
-		return this;
+	op(fn, v, dst) {
+		dst = super.op(fn, v, dst);
+		dst.constrain();
+		return dst;
 	}
 	constrain() {
 		if (this.limited) {
