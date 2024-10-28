@@ -267,7 +267,7 @@ class Frame extends ImageType {
 	constructor(width, height, pixelRatio = __devicePixelRatio) {
 		super(width, height, pixelRatio);
 		this.image = new_OffscreenCanvas(this.pixelWidth, this.pixelHeight);
-		this.renderer = new Artist(this.image, this.width, this.height, this, pixelRatio);
+		this.renderer = new Artist(this.image, this);
 	}
 	onresize(width, height) {
 		this.renderer.resize(width, height);

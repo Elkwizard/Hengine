@@ -28,12 +28,12 @@ class DRAGGABLE extends ElementScript {
 	click(obj, key, mouse) {
 		if (key !== this.key) return;
 		this.dragged = true;
-		this.offset = obj.transform.globalSpaceToLocalSpace(this.getMousePosition());
+		this.offset = obj.transform.globalToLocal(this.getMousePosition());
 	}
 	update(obj) {
 		if (this.mouse.justReleased(this.key)) this.dragged = false; 
 		if (this.dragged) {
-			obj.transform.position = this.getMousePosition().minus(obj.transform.localSpaceToGlobalSpace(this.offset).minus(obj.transform.position));
+			obj.transform.position = this.getMousePosition().minus(obj.transform.localToGlobal(this.offset).minus(obj.transform.position));
 			obj.cacheBoundingBoxes();
 			if (obj.scripts.has(PHYSICS)) obj.scripts.PHYSICS.stop();
 		}

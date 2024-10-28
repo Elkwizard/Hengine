@@ -709,8 +709,8 @@ class HengineLoader {
 					return new Vector2(hengineLoader.hengine.canvas.width / 2, hengineLoader.hengine.canvas.height / 2);
 				}
 			});
-			Object.shortcut(window, hengineLoader.hengine.canvas, "width");
-			Object.shortcut(window, hengineLoader.hengine.canvas, "height");
+			objectUtils.shortcut(window, hengineLoader.hengine.canvas, "width");
+			objectUtils.shortcut(window, hengineLoader.hengine.canvas, "height");
 		}
 
 		window.loadResource = this.loadResource.bind(this);
@@ -739,37 +739,28 @@ class HengineLoader {
 	async addResource(wrapper) {
 		this.addResourceSync(wrapper, await wrapper.load());
 	}
+	copyResource(src) {
+		const resource = this.resources.get(src);
+		return resource?.get?.() ?? resource ?? null;
+	}
 	/**
 	 * Retrieves a specific resource.
 	 * If the resource failed to load, this returns null.
 	 * This method is also available on the global object.
-	 * If the resource has internal mutable state, like an Animation, a new copy of the resource will be returned with each call to this function.
+	 * If the resource implements Copyable, a copy of the resource will be returned.
 	 * @param String src | An arbitrarily-lengthed tail end of the source of the resource. This can be as few characters as are needed to be unambiguous, or may be the entire path 
 	 * @return Any/null
 	 */
 	loadResource(src) {
-		if (PathManager.isRoot(src)) {
-			const resource = this.resources.get(src);
-			if (resource) {
-				if (resource.get) return resource.get();
-				return resource;
-			}
+		if (PathManager.isRoot(src))
+			return this.copyResource(src);
 
-			return null;
-		} else {
-			const processed = src.replace(/\\/g, "/");
-			for (const [path, resource] of this.resources)
-				if (path.replace(/\\/g, "/").endsWith(processed)) {
-					const resource = this.resources.get(path);
-					if (resource) {
-						if (resource.get) return resource.get();
-						return resource;
-					}
-		
-					return null;
-				}
-			return null;
-		}
+		const processed = src.replace(/\\/g, "/");
+		for (const [path] of this.resources)
+			if (path.replace(/\\/g, "/").endsWith(processed))
+				return this.copyResource(path);
+
+		return null;
 	}
 	/**
 	 * Loads a series of resources, and optionally starts the update loop after the loading completes.

@@ -56,12 +56,12 @@ const LineCap = Enum.define("FLAT", "SQUARE", "ROUND");
  * @prop Boolean preservePixelart | Whether or not image smoothing will be prevented when upscaling. Starts as true
  */
 class Artist {
-	constructor(canvas, width, height, imageType, pixelRatio) {
+	constructor(canvas, imageType) {
 		this.canvas = canvas;
-		this.c = this.canvas.getContext("2d");
-		this.pixelRatio = pixelRatio;
-		this.width = width;
-		this.height = height;
+		this.c = canvas.getContext("2d");
+		this.pixelRatio = imageType.pixelRatio;
+		this.width = imageType.width;
+		this.height = imageType.height;
 		this.imageType = imageType;
 
 		this.lineJoinMap = new Map([
@@ -85,7 +85,7 @@ class Artist {
 		this.textMode = TextMode.TOP_LEFT;
 		this.blendMode = BlendMode.COMBINE;
 
-		this.resize(width, height);
+		this.resize(this.width, this.height);
 
 		let pathObj = {
 			circle(x, y, radius) {

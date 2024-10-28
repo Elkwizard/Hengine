@@ -99,7 +99,7 @@ vec4 shader() {
 		for (const key in args) {
 			if (!shader.argumentExists(key)) delete args[key];
 		}
-		shader.setArguments(args);
+		shader.setUniforms(args);
 		renderer.image(shader).rect(0, 0, width / 2, height);
 		if (error) renderer.draw(Color.RED).textLine(Font.Monospace20, error, 10, 10);
 		renderer.textMode = TextMode.BOTTOM_LEFT;

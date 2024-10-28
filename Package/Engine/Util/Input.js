@@ -368,7 +368,7 @@ class MouseHandler extends InputHandler {
 		}, { passive: false });
 	}
 	getWorldPosition(point) {
-		return this.engine.scene.camera.screenSpaceToWorldSpace(point);
+		return this.engine.scene.camera.screenToWorld(point);
 	}
 	getEventPosition(event) {
 		const location = this.engine.canvas.screenSpaceToCanvasSpace(
@@ -473,7 +473,7 @@ class TouchHandler extends InputHandler {
 		addHandler("pointerup", false);
 	}
 	getWorldPosition(point) {
-		return this.engine.scene.camera.screenSpaceToWorldSpace(point);
+		return this.engine.scene.camera.screenToWorld(point);
 	}
 	getEventPosition(event) {
 		const location = this.engine.canvas.screenSpaceToCanvasSpace(

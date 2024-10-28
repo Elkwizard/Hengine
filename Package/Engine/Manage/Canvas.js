@@ -30,7 +30,7 @@ class CanvasImage extends ImageType {
 		this.canvas = canvas;
 		this.engine = engine;
 
-		this.renderer = new Artist(this.canvas, this.width, this.height, this, __devicePixelRatio);
+		this.renderer = new Artist(this.canvas, this);
 
 		this.scalingMode = ScalingMode.PRESERVE_ASPECT_RATIO;
 

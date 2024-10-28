@@ -34,7 +34,7 @@
  * });
  * 
  * // write, compute, and readback circle data
- * computation.setArguments({ circles, middle });
+ * computation.setUniforms({ circles, middle });
  * computation.compute(circles.length);
  * computation.output.read(circles);
  * ```

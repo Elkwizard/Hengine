@@ -330,11 +330,12 @@ class TEXT_AREA extends ElementScript {
 		this.blurOthers();
 		this.focused = true;
 		this.keyTimer = 0;
-		let lp = obj.transform.globalSpaceToLocalSpace(p);
+		let lp = obj.transform.globalToLocal(p);
 		const rtvb = this.relativeTextViewBox;
-		const textAreaHitbox = (type === "start") ?
-			rtvb :
-			new Rect(rtvb.x - this.padding, rtvb.y - this.padding, rtvb.width + this.padding * 2, rtvb.height + this.padding * 2);
+		const textAreaHitbox = (type === "start") ? rtvb : new Rect(
+			rtvb.x - this.padding, rtvb.y - this.padding,
+			rtvb.width + this.padding * 2, rtvb.height + this.padding * 2
+		);
 		if (textAreaHitbox.containsPoint(lp) || type === "move") {
 			if (type === "move")
 				lp = Vector2.clamp(lp, textAreaHitbox.min, textAreaHitbox.max);
@@ -423,7 +424,7 @@ class TEXT_AREA extends ElementScript {
 			}
 		}
 
-		let inTextArea = this.relativeTextViewBox.containsPoint(obj.transform.globalSpaceToLocalSpace(this.getMousePosition()));
+		let inTextArea = this.relativeTextViewBox.containsPoint(obj.transform.globalToLocal(this.getMousePosition()));
 		if (inTextArea) TEXT_AREA.anyTextAreaHovered = true;
 
 		const doubleClick = this.mouse.justPressed("Left") && this.clickTimer < 15 && inTextArea;
@@ -439,7 +440,7 @@ class TEXT_AREA extends ElementScript {
 		if (this.mouse.pressed("Left") && this.highlighting) {
 			const selection = this.select(this.getMousePosition(), "move");
 			if (selection && !selection.changed) {
-				const relativeMousePosition = obj.transform.globalSpaceToLocalSpace(this.getMousePosition());
+				const relativeMousePosition = obj.transform.globalToLocal(this.getMousePosition());
 				if (relativeMousePosition.x > this.relativeTextViewBox.max.x) this.scrollOffset.x += this.scrollSpeed;
 				if (relativeMousePosition.y > this.relativeTextViewBox.max.y) this.scrollOffset.y += this.scrollSpeed;
 				if (relativeMousePosition.x < this.relativeTextViewBox.min.x) this.scrollOffset.x -= this.scrollSpeed;
@@ -571,12 +572,10 @@ class TEXT_AREA extends ElementScript {
 		this.renderer.restore();
 		this.renderer.unclip();
 
-
 		// x bar Values
 		const xFullSize = this.relativeTextBoundingBox.width;
 		const xViewSize = this.relativeTextViewBox.width;
 		const xRatio = xViewSize / xFullSize;
-
 
 		// y bar Values
 		const yFullSize = this.relativeTextBoundingBox.height;
@@ -594,7 +593,7 @@ class TEXT_AREA extends ElementScript {
 		if (xs && !ys) fullScrollWidth = width;
 		if (!xs && ys) fullScrollHeight = height;
 
-		let localMouse = obj.transform.globalSpaceToLocalSpace(this.getMousePosition());
+		let localMouse = obj.transform.globalToLocal(this.getMousePosition());
 
 		if (xs) {
 			if (this.multiline) {

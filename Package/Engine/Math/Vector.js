@@ -95,7 +95,7 @@ class Vector extends Operable {
 	onChange(handler) {
 		const mod = this.constructor.modValues;
 		for (let i = 0; i < mod.length; i++)
-			Object.onChange(this, mod[i], handler);
+			objectUtils.onChange(this, mod[i], handler);
 		return this;
 	}
 	/**
@@ -155,7 +155,7 @@ Vector.modValues = [];
 
 	Number.zero = 0;
 
-	Object.inherit(Number, Vector);
+	objectUtils.inherit(Number, Vector);
 }
 
 /**

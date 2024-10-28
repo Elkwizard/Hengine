@@ -26,7 +26,7 @@
  * 
  * const cat = loadResource("cat.png");
  * 
- * shader.setArgument("image", cat); // put image in shader
+ * shader.setUniform("image", cat); // put image in shader
  * 
  * renderer.image(shader).default(0, 0); // draw grayscale cat
  * ```
@@ -42,7 +42,7 @@ class GPUShader extends ImageType {
 	constructor(width, height, glsl, pixelRatio = 1) {
 		super(width, height, pixelRatio);
 		this.gpu = new GPUShader.Interface(glsl, this);
-		Object.shortcut(this, this.gpu, "glsl");
+		objectUtils.shortcut(this, this.gpu, "glsl");
 		this.loaded = false;
 	}
 	onresize() {

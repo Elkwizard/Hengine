@@ -97,8 +97,11 @@ class Transform extends Matrix3 {
 	 * @param Vector2 point | The point to transform
 	 * @return Vector2
 	 */
-	globalSpaceToLocalSpace(v) {
+	globalToLocal(v) {
 		return v.Vminus(this.position).rotate(-this.rotation);
+	}
+	globalSpaceToLocalSpace(v) {
+		return this.globalToLocal(v);
 	}
 	/**
 	 * Transforms a given point by applying the caller to it.
@@ -106,8 +109,11 @@ class Transform extends Matrix3 {
 	 * @param Vector2 point | The point to transform
 	 * @return Vector2
 	 */
-	localSpaceToGlobalSpace(v) {
+	localToGlobal(v) {
 		return v.rotated(this.rotation).Vadd(this.position);
+	}
+	localSpaceToGlobalSpace(v) {
+		return this.localToGlobal(v);
 	}
 	drawInLocalSpace(artist, renderer) {
 		const x = this[6];

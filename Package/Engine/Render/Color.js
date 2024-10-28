@@ -196,6 +196,23 @@ class Color extends Operable {
 		let b = 255 * per;
 		return new Color(r, g, b, 1);
 	}
+	/**
+	 * Creates a new color whose channels aren't clamped within the normal range (`.limited = false`).
+	 * @param Number red? | The red channel of the color on [0, 255]. Default is 0
+	 * @param Number green? | The green channel of the color on [0, 255]. Default is 0
+	 * @param Number blue? | The blue channel of the color on [0, 255]. Default is 0
+	 * @param Number alpha? | The alpha channel of the color on [0, 1]. Default is 1
+	 * @return Color
+	 */
+	static unlimited(red = 0, green = 0, blue = 0, alpha = 1) {
+		const result = new Color();
+		result.limited = false;
+		result.red = red;
+		result.green = green;
+		result.blue = blue;
+		result.alpha = alpha;
+		return result;
+	}
 	static CSSColor(word, destination) {
 		destination.set(Color.CSSColors[word.toLowerCase()]);
 	}

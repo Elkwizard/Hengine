@@ -785,7 +785,7 @@ declare class Scene {
 	/**
 	 * The camera used to render the scene
 	 */
-	camera: Camera;
+	camera: Camera2D;
 	/**
 	 * Whether or not mouse events will ever be checked. If this is true, specific SceneObjects can opt out, but not vice-versa
 	 */

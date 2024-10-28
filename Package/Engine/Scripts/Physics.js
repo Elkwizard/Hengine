@@ -77,14 +77,14 @@ class PHYSICS extends ElementScript {
 		this._velocity = new Vector2();
 		this._velocity.proxy(body.velocity);
 
-		Object.shortcut(this, body, "simulated");
-		Object.shortcut(this, body, "isTrigger");
-		Object.shortcut(this, body, "canCollide");
-		Object.shortcut(this, body, "canRotate");
-		Object.shortcut(this, body, "gravity");
-		Object.shortcut(this, body, "friction");
-		Object.shortcut(this, body, "density");
-		Object.shortcut(this, body, "airResistance");
+		objectUtils.shortcut(this, body, "simulated");
+		objectUtils.shortcut(this, body, "isTrigger");
+		objectUtils.shortcut(this, body, "canCollide");
+		objectUtils.shortcut(this, body, "canRotate");
+		objectUtils.shortcut(this, body, "gravity");
+		objectUtils.shortcut(this, body, "friction");
+		objectUtils.shortcut(this, body, "density");
+		objectUtils.shortcut(this, body, "airResistance");
 
 		this.synchronized = false;
 

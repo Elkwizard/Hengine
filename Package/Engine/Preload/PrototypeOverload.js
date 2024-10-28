@@ -1,3 +1,5 @@
+const objectUtils = { };
+
 /**
  * Subclasses of this class represent a set of unique symbolic values.
  * @abstract
@@ -439,7 +441,7 @@ Object.defineProperty(window, "title", {
 	})();
 	proto(Array.prototype, "toString", Object.prototype.toString);
 
-	Object.generateInterface = function (object, template = {}, found = new Map()) {
+	objectUtils.generateInterface = function (object, template = {}, found = new Map()) {
 		for (const key in object) {
 			const value = object[key];
 			const type = typeof value;
@@ -449,19 +451,19 @@ Object.defineProperty(window, "title", {
 				else {
 					const child = {};
 					found.set(value, child);
-					template[key] = Object.generateInterface(value, child, found);
+					template[key] = objectUtils.generateInterface(value, child, found);
 				}
 			} else if (type !== "function") template[key] = type;
 		}
 		return template;
 	};
-	Object.shortcut = function (objectA, objectB, key) {
+	objectUtils.shortcut = function (objectA, objectB, key) {
 		Object.defineProperty(objectA, key, {
 			set: a => objectB[key] = a,
 			get: () => objectB[key]
 		});
 	};
-	Object.inherit = function (child, parent) {
+	objectUtils.inherit = function (child, parent) {
 		const copy = (src, dst) => {
 			if (!src) return;
 			const descriptors = Object.getOwnPropertyDescriptors(src);
@@ -474,7 +476,7 @@ Object.defineProperty(window, "title", {
 		copy(parent, child);
 		copy(parent.prototype, child.prototype);
 	};
-	Object.onChange = function (object, key, handler) {
+	objectUtils.onChange = function (object, key, handler) {
 		let value = object[key];
 		delete object[key];
 		Object.defineProperty(object, key, {
@@ -482,6 +484,48 @@ Object.defineProperty(window, "title", {
 			set: newValue => {
 				value = newValue;
 				handler(key, value);
+			}
+		});
+	};
+	objectUtils.proxyBuffer = function (object, key, proxyKey, stride, get, set) {
+		const BufferType = object[key].constructor;
+		const length = () => object[key].length / stride;
+		const setLength = len => {
+			const data = new BufferType(len * stride);
+			data.set(object[key].slice(0, data.length));
+			object[key] = data;
+		};
+		const outOfBounds = index => isNaN(index) || index < 0 || index >= length();
+		
+		const proxy = new Proxy({ }, {
+			get: (object, key) => {
+				if (key in object) return Reflect.get(object, key);
+				if (key === "length") return length();
+				const inx = +key;
+				if (outOfBounds(inx)) return undefined;
+
+				return get(inx * stride);
+			},
+			set: (_, key, value) => {
+				if (typeof key === "symbol") return false;
+				if (key === "length") {
+					setLength(+value);
+					return true;
+				}
+				const inx = +key;
+				if (inx >= length()) setLength(inx + 1);
+				if (outOfBounds(inx)) return false;
+
+				set(inx * stride, value);
+				return true;
+			}
+		});
+		Object.defineProperty(object, proxyKey, {
+			get: () => proxy,
+			set: value => {
+				setLength(value.length);
+				for (let i = 0; i < value; i++)
+					proxy[i] = value[i];
 			}
 		});
 	};

@@ -16,7 +16,7 @@
  * 	);
  * ```
  * @prop ElementContainer main | The root of the element tree for the scene
- * @prop Camera camera | The camera used to render the scene
+ * @prop Camera2D camera | The camera used to render the scene
  * @prop Boolean mouseEvents | Whether or not mouse events will ever be checked. If this is true, specific SceneObjects can opt out, but not vice-versa
  * @prop Boolean cullGraphics | Whether or not SceneObject graphics will ever be culled. If this is true, specific SceneObjects can still opt out, but not vice-versa
  * @prop Boolean collisionEvents | Whether or not collision events will be detected
@@ -162,7 +162,7 @@ class Scene {
 	 * @return Constraint1
 	 */
 	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null) {
-		point ??= a.transform.localSpaceToGlobalSpace(offset);
+		point ??= a.transform.localToGlobal(offset);
 		const offsetPhysics = offset.toPhysicsVector();
 		const pointPhysics = point.toPhysicsVector();
 		const con = physics.exports.LengthConstraint1.construct(
@@ -209,7 +209,7 @@ class Scene {
 	 * @return Constraint1
 	 */
 	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
-		point ??= a.transform.localSpaceToGlobalSpace(offset);
+		point ??= a.transform.localToGlobal(offset);
 		const offsetPhysics = offset.toPhysicsVector();
 		const pointPhysics = point.toPhysicsVector();
 		const con = physics.exports.PositionConstraint1.construct(

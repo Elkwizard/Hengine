@@ -159,8 +159,8 @@ class PARTICLE_SPAWNER extends ElementScript {
 				this.computation = null;
 			} else {
 				this.computation = new GPUComputation(update);
-				this.computation.output = this.computation.getArgument("particles");
-				this.computation.setArgument("particles", this.particles);
+				this.computation.output = this.computation.getUniform("particles");
+				this.computation.setUniform("particles", this.particles);
 			}
 		} else this.particleUpdate ??= () => null;
 	}
@@ -185,7 +185,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 			this.addParticle(pos.get());
 
 		if (this.computation)
-			this.computation.getArgument("particles").write(this.particles, initial);
+			this.computation.getUniform("particles").write(this.particles, initial);
 	}
 	update(obj) {
 		if (this.active && isFinite(this.delay)) {
@@ -207,7 +207,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 			}
 
 			if (this.computation)
-				this.computation.getArgument("particles").write(this.particles, initial);
+				this.computation.getUniform("particles").write(this.particles, initial);
 		}
 		obj.transform.get(obj.lastTransform);
 
@@ -217,7 +217,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		let end = particles.length - 1;
 
 		if (this.computation) {
-			const array = this.computation.getArgument("particles");
+			const array = this.computation.getUniform("particles");
 			loop: for (let i = 0; i <= end; i++) {
 				while (particles[i].timer >= 1) {
 					particles[i] = particles[end--];

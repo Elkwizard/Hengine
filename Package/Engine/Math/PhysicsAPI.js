@@ -87,8 +87,8 @@ class Constraint1 extends Constraint {
 class Constraint2 extends Constraint {
     constructor(physicsConstraint, engine) {
 		super(physicsConstraint.as(physics.exports.Constraint2), engine);
-		Object.shortcut(this, this.physicsConstraint, "staticA");
-		Object.shortcut(this, this.physicsConstraint, "staticB");
+		objectUtils.shortcut(this, this.physicsConstraint, "staticA");
+		objectUtils.shortcut(this, this.physicsConstraint, "staticB");
     }
 	set length(a) {
 		this.physicsConstraint.as(physics.exports.LengthConstraint2).length = a;

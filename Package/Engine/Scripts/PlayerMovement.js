@@ -9,7 +9,7 @@ class PLAYER_MOVEMENT extends ElementScript {
 	}
 	update(obj) {
 		const rb = obj.scripts.PHYSICS;
-		const cp = obj.transform.localSpaceToGlobalSpace(this.controlPoint);
+		const cp = obj.transform.localToGlobal(this.controlPoint);
 		if (this.keyboard.pressed(obj.controls.down)) rb.applyImpulseMass(cp, Vector2.y(0.4));
 		if (this.keyboard.pressed(obj.controls.left)) rb.applyImpulseMass(cp, Vector2.x(-0.2));
 		else if (this.keyboard.pressed(obj.controls.right)) rb.applyImpulseMass(cp, Vector2.x(0.2));

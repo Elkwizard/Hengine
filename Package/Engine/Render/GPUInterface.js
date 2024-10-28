@@ -30,11 +30,11 @@
  * uniform Line[] linesA; // dynamic length
  * uniform Line[100] linesB; // fixed length
  * ```
- * Dynamic-length arrays are represented by GPUArrays, which are pre-set as the values for these uniforms. These arrays cannot be replaced, only modified. As such, calling `GPUInterface.prototype.setArgument()` on a dynamic-length uniform is equivalent to calling `GPUArray.prototype.set()` on the retrieved array.
+ * Dynamic-length arrays are represented by GPUArrays, which are pre-set as the values for these uniforms. These arrays cannot be replaced, only modified. As such, calling `GPUInterface.prototype.setUniform()` on a dynamic-length uniform is equivalent to calling `GPUArray.prototype.set()` on the retrieved array.
  * ```js
  * // gpu is a GPUInterface. The following two lines are equivalent if "linesA" is a dynamic-length array uniform.
- * gpu.setArgument("linesA", lines);
- * gpu.getArgument("linesA").set(lines);
+ * gpu.setUniform("linesA", lines);
+ * gpu.getUniform("linesA").set(lines);
  * ```
  */
 
@@ -408,7 +408,7 @@ GPUDataTexture.LITTLE_ENDIAN = !!new Uint8Array(new Uint32Array([1]).buffer)[0];
  * 	radius: 22.5,
  * 	color: new Color("magenta")
  * };
- * gpu.getArgument("circles").append(circle);
+ * gpu.getUniform("circles").append(circle);
  * ```
  * @prop ByteBuffer buffer | A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to
  */
@@ -1088,16 +1088,22 @@ class GPUInterface {
 	 * @param String name | The name of the uniform
 	 * @param Any value | The new value for the uniform. For the type of this argument, see the GLSL API
 	 */
-	setArgument(name, value) {
+	setUniform(name, value) {
 		this.program.setUniform(name, value);
+	}
+	setArgument(name, value) {
+		this.setUniform(name, value);
 	}
 	/**
 	 * Sets the value of many uniforms at once.
 	 * @param Object uniforms | A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
 	 */
-	setArguments(args) {
+	setUniforms(args) {
 		for (const key in args)
 			this.setArgument(key, args[key]);
+	}
+	setArgument(args) {
+		return this.setArgument(args);
 	}
 	/**
 	 * Retrieves the current value of a given uniform.
@@ -1105,8 +1111,11 @@ class GPUInterface {
 	 * @param String name | The name of the uniform
 	 * @return Any
 	 */
-	getArgument(name) {
+	getUniform(name) {
 		return this.program.getUniform(name);
+	}
+	getArgument(name) {
+		return this.getUniform(name);
 	}
 	/**
 	 * Checks whether a given uniform exists.

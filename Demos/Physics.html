@@ -20,13 +20,13 @@
 		}
 		click(obj, key, mouse) {
 			this.thrown = true;
-			this.offset = obj.transform.globalSpaceToLocalSpace(mouse);
+			this.offset = obj.transform.globalToLocal(mouse);
 		}
 		update(obj) {
 			if (mouse.justReleased("Left")) this.thrown = false;
 			obj.layer = +this.thrown;
 			if (this.thrown) {
-				const pos = obj.transform.localSpaceToGlobalSpace(this.offset);
+				const pos = obj.transform.localToGlobal(this.offset);
 				const diff = mouse.world.minus(pos);
 				diff.div(100);
 				obj.scripts.PHYSICS.applyImpulseMass(pos, diff);
@@ -34,7 +34,7 @@
 		}
 		escapeDraw(obj) {
 			if (this.thrown) {
-				const start = obj.transform.localSpaceToGlobalSpace(this.offset);
+				const start = obj.transform.localToGlobal(this.offset);
 				const end = mouse.world.get();
 				renderer.stroke(Color.RED, 2).arrow(start, end);
 			}

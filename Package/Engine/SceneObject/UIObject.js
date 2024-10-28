@@ -15,7 +15,7 @@ class UIObject extends SceneObject {
         });
     }
     collidePoint(point) {
-        point = this.engine.scene.camera.worldSpaceToScreenSpace(point);
+        point = this.engine.scene.camera.worldToScreen(point);
         return super.collidePoint(point);
     }
 }

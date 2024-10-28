@@ -2,7 +2,7 @@
  * @interface
  * Represents a camera in a scene.
  * This class should not be constructed and is available via the `.camera` property of Scene.
- * The transformation represented by this matrix is from screen-space to world-space.
+ * The transformation represented by this matrix is from world-space to screen-space.
  * @prop Number zoom | The magnification level of the camera
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
  */
@@ -39,16 +39,22 @@ class BaseCamera {
 	 * @param Vector2 point | The point to transform
 	 * @return Vector2
 	 */
+	screenToWorld(point) {
+		return this.inverse.times(point);
+	}
 	screenSpaceToWorldSpace(point) {
-		return this.times(point);
+		return this.screenToWorld(point);
 	}
 	/**
 	 * Maps a given point from world-space to screen-space.
 	 * @param Vector2 point | The point to transform
 	 * @return Vector2
 	 */
+	worldToScreen(point) {
+		return this.times(point);
+	}
 	worldSpaceToScreenSpace(point) {
-		return this.inverse.times(point);
+		return this.worldToScreen(point);
 	}
 }
 
@@ -211,7 +217,7 @@ class Camera2D extends Matrix3 {
 		renderer.translate(renderer.middle.inverse);
 	}
 }
-Object.inherit(Camera2D, BaseCamera);
+objectUtils.inherit(Camera2D, BaseCamera);
 
 /**
  * @implements BaseCamera
@@ -234,8 +240,8 @@ class Camera3D extends Matrix4 {
 		const handle = () => this.updateMatrix();
 		this.position.onChange(handle);
 		this.direction.onChange(handle);
-		Object.onChange(this, "rotation", handle);
-		Object.onChange(this, "zoom", handle);
+		objectUtils.onChange(this, "rotation", handle);
+		objectUtils.onChange(this, "zoom", handle);
 		
 		this.updateMatrix();
 	}
@@ -243,16 +249,16 @@ class Camera3D extends Matrix4 {
 		const forward = this.direction;
 		const quat = Quaternion.fromRotation(forward, this.rotation);
 		const baseRight = forward.x || forward.z ? new Vector3(forward.z, 0, -forward.x).normalize() : Vector3.right;
-		const right = quat.rotate(baseRight);
-		const up = forward.cross(right);
+		this.right = quat.rotate(baseRight);
+		this.up = forward.cross(this.right);
 
-		const z = 1 / this.zoom;
+		const trans = Matrix4.translation(this.position.inverse);
+		
+		const rotate = new Matrix3(
+			this.right, this.up, forward
+		).transpose().times(this.zoom);
 
-		const trans = this.position;
-		this.set(new Matrix4(
-			right.times(z), up.times(z),
-			forward.times(z), trans
-		));
+		new Matrix4(rotate).times(trans, this);
 	}
 	look(xAngle, yAngle) {
 		const limit = Math.PI / 2 - MathObject.EPSILON;
@@ -262,4 +268,4 @@ class Camera3D extends Matrix4 {
 			.rotateAboutAxis(Vector3.up, -xAngle);
 	}
 }
-Object.inherit(Camera3D, BaseCamera);
+objectUtils.inherit(Camera3D, BaseCamera);
