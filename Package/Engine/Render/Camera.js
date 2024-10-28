@@ -6,7 +6,7 @@
  * @prop Number zoom | The magnification level of the camera
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
  */
-class BaseCamera {
+class Camera {
 	/**
 	 * Sets the zoom to 1.
 	 */
@@ -59,7 +59,7 @@ class BaseCamera {
 }
 
 /**
- * @implements BaseCamera
+ * @implements Camera
  * Represents the camera in a 2D scene.
  * @prop Vector2 position | The current center of the camera's view. This starts as `new Vector2(width / 2, height / 2)`
  */
@@ -217,10 +217,10 @@ class Camera2D extends Matrix3 {
 		renderer.translate(renderer.middle.inverse);
 	}
 }
-objectUtils.inherit(Camera2D, BaseCamera);
+objectUtils.inherit(Camera2D, Camera);
 
 /**
- * @implements BaseCamera
+ * @implements Camera
  * Represents the camera in a 3D scene.
  * @prop Vector3 position | The location of the camera, in world-space. Starts at (0, 0, 0)
  * @prop Vector3 direction | The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
@@ -268,4 +268,4 @@ class Camera3D extends Matrix4 {
 			.rotateAboutAxis(Vector3.up, -xAngle);
 	}
 }
-objectUtils.inherit(Camera3D, BaseCamera);
+objectUtils.inherit(Camera3D, Camera);

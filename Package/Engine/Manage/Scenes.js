@@ -229,7 +229,7 @@ class Scene {
 		for (let i = 0; i < objects.length; i++) objects[i].updatePreviousData();
 	}
 	renderCamera() {
-		const screen = this.camera.cacheScreen();
+		this.camera.cacheScreen();
 
 		this.engine.renderer.save();
 		this.camera.transformToWorld(this.engine.renderer);
@@ -239,7 +239,7 @@ class Scene {
 		
 		for (let i = 0; i < this.renderOrder.length; i++) {
 			const object = this.renderOrder[i];
-			object.engineDraw(screen);
+			object.engineDraw(this.camera);
 			object.lifeSpan++;
 		}
 

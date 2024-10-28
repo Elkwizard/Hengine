@@ -103,6 +103,13 @@ class ElementScript {
 	 * This called each frame during the main update cycle.
 	 */
 	/**
+	 * @name drawRule
+	 * This is called prior to rendering to determine whether an object should be rendered on a given camera.
+	 * If this is not specified, the object will be rendered for all cameras.
+	 * @param Camera camera | The camera to test against
+	 * @return Boolean
+	 */
+	/**
 	 * @name draw
 	 * This is called once per shape of the object each frame during rendering.
 	 * When this is called, the renderer is in the local-space of the object.
@@ -206,6 +213,7 @@ ElementScript.flags = new Set([
 	"afterUpdate",
 	"beforePhysics",
 	"afterPhysics",
+	"drawRule",
 	"draw",
 	"escapeDraw",
 	"collideRule",
@@ -375,12 +383,27 @@ class ScriptContainer {
 			this.sortedScriptInstances[i].scriptSynced = true;
 	}
 	run(method, ...args) {
-		if (this.implementedMethods.has(method))
-			for (let i = 0; i < this.sortedScriptInstances.length; i++) {
-				const script = this.sortedScriptInstances[i];
-				if (script.scriptSynced)
-					script[method](...args);
-			}
+		if (!this.implementedMethods.has(method)) return;
+
+		const sorted = this.sortedScriptInstances;
+		for (let i = 0; i < sorted.length; i++) {
+			const script = sorted[i];
+			if (script.scriptSynced)
+				script[method](...args);
+		}
+	}
+	check(goal, method, ...args) {
+		if (!this.implementedMethods.has(method)) return goal;
+
+		const fail = !goal;
+		const sorted = this.sortedScriptInstances;
+		for (let i = 0; i < sorted.length; i++) {
+			const script = sorted[i];
+			if (script.scriptSynced && script[method](...args) === fail)
+				return fail;
+		}
+
+		return goal;
 	}
 	/**
 	 * @name 

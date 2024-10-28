@@ -323,9 +323,12 @@ class SceneObject extends SceneElement {
 		const graphicalBoundingBox = this.graphicalBoundingBox ?? this.__boundingBox;
 		return this.onScreen = !this.cullGraphics || (graphicalBoundingBox && screen.intersectSameType(graphicalBoundingBox));
 	}
-	engineDraw(screen) {
-		if (!this.hidden && this.determineOnScreen(screen))
-			this.runDraw();
+	engineDraw(camera) {
+		if (
+			!this.hidden &&
+			this.scripts.check(true, "drawRule", camera) &&
+			this.determineOnScreen(camera.screen)
+		) this.runDraw();
 		this.scripts.run("escapeDraw");
 	}
 	hasMoved() {

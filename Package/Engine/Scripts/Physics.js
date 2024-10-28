@@ -267,24 +267,10 @@ class PHYSICS extends ElementScript {
 		this.body.stop();
 	}
 	collideBasedOnRule(obj, element) {
-		const scripts = obj.scripts.sortedScriptInstances;
-		for (let i = 0; i < scripts.length; i++) {
-			const script = scripts[i];
-			if (script.scriptSynced && scripts[i].collideRule(element) === false)
-				return false;
-		}
-
-		return true;
+		return obj.scripts.check(true, "collideRule", element);
 	}
 	triggerBasedOnRule(obj, element) {
-		const scripts = obj.scripts.sortedScriptInstances;
-		for (let i = 0; i < scripts.length; i++) {
-			const script = scripts[i];
-			if (script.scriptSynced && scripts[i].triggerRule(element) === true)
-				return true;
-		}
-
-		return false;
+		return obj.scripts.check(false, "triggerRule", element);
 	}
 	/**
 	 * Checks whether the object and another given object would have a trigger collision if they collided.
