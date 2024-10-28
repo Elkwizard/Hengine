@@ -228,22 +228,27 @@ class Scene {
 		const objects = this.main.sceneObjectArray;
 		for (let i = 0; i < objects.length; i++) objects[i].updatePreviousData();
 	}
-	renderCamera() {
-		this.camera.cacheScreen();
+	/**
+	 * Renders the contents of the scene to a given camera.
+	 * The result will appear on the `.renderer` property of the argument.
+	 * @param Camera camera | The camera to render
+	 */
+	render(camera) {
+		camera.cacheScreen();
 
-		this.engine.renderer.save();
-		this.camera.transformToWorld(this.engine.renderer);
+		camera.renderer.save();
+		camera.transformToWorld(camera.renderer);
 
 		this.renderOrder = [...this.main.sceneObjectArray]
 			.sort((a, b) => a.layer - b.layer);
 		
 		for (let i = 0; i < this.renderOrder.length; i++) {
 			const object = this.renderOrder[i];
-			object.engineDraw(this.camera);
+			object.engineDraw(camera);
 			object.lifeSpan++;
 		}
 
-		this.engine.renderer.restore();
+		camera.renderer.restore();
 	}
 	script(type, ...args) {
 		const objects = this.main.sceneObjectArray;
@@ -294,7 +299,7 @@ class Scene {
 		this.script("afterPhysics");
 
 		//draw
-		this.renderCamera();
+		this.render(this.camera);
 
 		this.script("afterUpdate");
 

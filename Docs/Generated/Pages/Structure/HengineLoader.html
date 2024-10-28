@@ -52,13 +52,13 @@ This class is a singleton, and the single instance can be accessed via a static 
 					<div class="class-methods">
 		<div class="function-wrapper" id="HengineLoader.prototype.loadResource()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L750" target="_blank" class="function-name source-link">loadResource</a>(<span class="param">src</span>)<span class="type">Any/null</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L754" target="_blank" class="function-name source-link">loadResource</a>(<span class="param">src</span>)<span class="type">Any/null</span>
 			</div>
 			<div class="function desc">
 				Retrieves a specific resource.
 If the resource failed to load, this returns null.
 This method is also available on the global object.
-If the resource has internal mutable state, like an <a href="../../Pages/Rendering/Image Types/Animation.html#class Animation">Animation</a>, a new copy of the resource will be returned with each call to this function.
+If the resource implements <a href="../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a>, a copy of the resource will be returned.
 			</div>
 			
 				<div class="function-signature">
@@ -82,7 +82,7 @@ If the resource has internal mutable state, like an <a href="../../Pages/Renderi
 	
 		<div class="function-wrapper" id="HengineLoader.load()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L782" target="_blank" class="function-name source-link">HengineLoader.load</a>(<span class="param">userResources</span>, <span class="param">done?</span>)<span class="type">Promise&lt;void&gt;</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L773" target="_blank" class="function-name source-link">HengineLoader.load</a>(<span class="param">userResources</span>, <span class="param">done?</span>)<span class="type">Promise&lt;void&gt;</span>
 			</div>
 			<div class="function desc">
 				Loads a series of resources, and optionally starts the update loop after the loading completes.

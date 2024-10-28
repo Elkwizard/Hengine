@@ -1,7 +1,7 @@
 /**
+ * @name class Camera extends Matrix
  * @interface
- * Represents a camera in a scene.
- * This class should not be constructed and is available via the `.camera` property of Scene.
+ * Represents a camera in a scene targeting a specific rendering surface.
  * The transformation represented by this matrix is from world-space to screen-space.
  * @prop Number zoom | The magnification level of the camera
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
@@ -61,9 +61,13 @@ class Camera {
 /**
  * @implements Camera
  * Represents the camera in a 2D scene.
- * @prop Vector2 position | The current center of the camera's view. This starts as `new Vector2(width / 2, height / 2)`
+ * @prop Vector2 position | The current center of the camera's view.
  */
 class Camera2D extends Matrix3 {
+	/**
+	 * Creates a new camera pointing to the middle of the provided renderer.
+	 * @param Artist renderer | The renderer to target
+	 */
 	constructor(renderer) {
 		super();
 		this.renderer = renderer;
@@ -226,6 +230,10 @@ objectUtils.inherit(Camera2D, Camera);
  * @prop Vector3 direction | The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
  */
 class Camera3D extends Matrix4 {
+	/**
+	 * Creates a new camera at (0, 0, 0).
+	 * @param Artist3D renderer | The renderer to target
+	 */
 	constructor(renderer) {
 		super();
 

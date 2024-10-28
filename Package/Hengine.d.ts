@@ -476,7 +476,7 @@ declare class HengineLoader {
 	 * Retrieves a specific resource.
 	 * If the resource failed to load, this returns null.
 	 * This method is also available on the global object.
-	 * If the resource has internal mutable state, like an Animation, a new copy of the resource will be returned with each call to this function.
+	 * If the resource implements Copyable, a copy of the resource will be returned.
 	 * @param src - An arbitrarily-lengthed tail end of the source of the resource. This can be as few characters as are needed to be unambiguous, or may be the entire path
 	 */
 	loadResource(src: string): any | null;
@@ -866,6 +866,12 @@ declare class Scene {
 	 * @param point - The location to constrain the length to. Default is the current location of the constrained point
 	 */
 	constrainPositionToPoint(object: SceneObject, offset?: Vector2, point?: Vector2): Constraint1;
+	/**
+	 * Renders the contents of the scene to a given camera.
+	 * The result will appear on the `.renderer` property of the argument.
+	 * @param camera - The camera to render
+	 */
+	render(camera: Camera): void;
 }
 
 /**
@@ -1044,7 +1050,7 @@ declare class Geometry {
  * });
  * 
  * // write, compute, and readback circle data
- * computation.setArguments({ circles, middle });
+ * computation.setUniforms({ circles, middle });
  * computation.compute(circles.length);
  * computation.output.read(circles);
  * ```
@@ -1068,18 +1074,18 @@ declare class GPUComputation implements GPUInterface {
 	 * @param name - The name of the uniform
 	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
 	 */
-	setArgument(name: string, value: any): void;
+	setUniform(name: string, value: any): void;
 	/**
 	 * Sets the value of many uniforms at once.
 	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
 	 */
-	setArguments(uniforms: object): void;
+	setUniforms(uniforms: object): void;
 	/**
 	 * Retrieves the current value of a given uniform.
 	 * For the return type of this function, see the GLSL API.
 	 * @param name - The name of the uniform
 	 */
-	getArgument(name: string): any;
+	getUniform(name: string): any;
 	/**
 	 * Checks whether a given uniform exists.
 	 * @param name - The name of the uniform to check
@@ -3225,11 +3231,10 @@ declare class AnimationStateMachine extends ImageType {
 }
 
 /**
- * Represents a camera in a scene.
- * This class should not be constructed and is available via the `.camera` property of Scene.
- * The transformation represented by this matrix is from screen-space to world-space.
+ * Represents a camera in a scene targeting a specific rendering surface.
+ * The transformation represented by this matrix is from world-space to screen-space.
  */
-declare interface BaseCamera {
+declare interface Camera extends Matrix {
 	/**
 	 * The magnification level of the camera
 	 */
@@ -3261,22 +3266,27 @@ declare interface BaseCamera {
 	 * Maps a given point from screen-space to world-space.
 	 * @param point - The point to transform
 	 */
-	screenSpaceToWorldSpace(point: Vector2): Vector2;
+	screenToWorld(point: Vector2): Vector2;
 	/**
 	 * Maps a given point from world-space to screen-space.
 	 * @param point - The point to transform
 	 */
-	worldSpaceToScreenSpace(point: Vector2): Vector2;
+	worldToScreen(point: Vector2): Vector2;
 }
 
 /**
  * Represents the camera in a 2D scene.
  */
-declare class Camera2D extends Matrix3 implements BaseCamera {
+declare class Camera2D extends Matrix3 implements Camera {
 	/**
-	 * The current center of the camera's view. This starts as `new Vector2(width / 2, height / 2)`
+	 * The current center of the camera's view.
 	 */
 	position: Vector2;
+	/**
+	 * Creates a new camera pointing to the middle of the provided renderer.
+	 * @param renderer - The renderer to target
+	 */
+	constructor(renderer: Artist);
 	/**
 	 * Smoothly moves the camera toward a new rotation value.
 	 * @param angle - The new rotation to move toward (in radians)
@@ -3355,18 +3365,18 @@ declare class Camera2D extends Matrix3 implements BaseCamera {
 	 * Maps a given point from screen-space to world-space.
 	 * @param point - The point to transform
 	 */
-	screenSpaceToWorldSpace(point: Vector2): Vector2;
+	screenToWorld(point: Vector2): Vector2;
 	/**
 	 * Maps a given point from world-space to screen-space.
 	 * @param point - The point to transform
 	 */
-	worldSpaceToScreenSpace(point: Vector2): Vector2;
+	worldToScreen(point: Vector2): Vector2;
 }
 
 /**
  * Represents the camera in a 3D scene.
  */
-declare class Camera3D extends Matrix4 implements BaseCamera {
+declare class Camera3D extends Matrix4 implements Camera {
 	/**
 	 * The location of the camera, in world-space. Starts at (0, 0, 0)
 	 */
@@ -3375,6 +3385,11 @@ declare class Camera3D extends Matrix4 implements BaseCamera {
 	 * The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
 	 */
 	direction: Vector3;
+	/**
+	 * Creates a new camera at (0, 0, 0).
+	 * @param renderer - The renderer to target
+	 */
+	constructor(renderer: Artist3D);
 	/**
 	 * The magnification level of the camera
 	 */
@@ -3406,12 +3421,12 @@ declare class Camera3D extends Matrix4 implements BaseCamera {
 	 * Maps a given point from screen-space to world-space.
 	 * @param point - The point to transform
 	 */
-	screenSpaceToWorldSpace(point: Vector2): Vector2;
+	screenToWorld(point: Vector2): Vector2;
 	/**
 	 * Maps a given point from world-space to screen-space.
 	 * @param point - The point to transform
 	 */
-	worldSpaceToScreenSpace(point: Vector2): Vector2;
+	worldToScreen(point: Vector2): Vector2;
 }
 
 /**
@@ -3506,6 +3521,14 @@ declare class Color extends Operable {
 	 * @param intensity - The grayscale intensity on [0, 1]
 	 */
 	static grayScale(intensity: number): Color;
+	/**
+	 * Creates a new color whose channels aren't clamped within the normal range (`.limited = false`).
+	 * @param red - The red channel of the color on [0, 255]. Default is 0
+	 * @param green - The green channel of the color on [0, 255]. Default is 0
+	 * @param blue - The blue channel of the color on [0, 255]. Default is 0
+	 * @param alpha - The alpha channel of the color on [0, 1]. Default is 1
+	 */
+	static unlimited(red?: number, green?: number, blue?: number, alpha?: number): Color;
 }
 
 /**
@@ -4102,7 +4125,7 @@ declare class Frame extends ImageType implements Copyable {
  * 
  * const cat = loadResource("cat.png");
  * 
- * shader.setArgument("image", cat); // put image in shader
+ * shader.setUniform("image", cat); // put image in shader
  * 
  * renderer.image(shader).default(0, 0); // draw grayscale cat
  * ```
@@ -4125,18 +4148,18 @@ declare class GPUShader extends ImageType implements GPUInterface {
 	 * @param name - The name of the uniform
 	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
 	 */
-	setArgument(name: string, value: any): void;
+	setUniform(name: string, value: any): void;
 	/**
 	 * Sets the value of many uniforms at once.
 	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
 	 */
-	setArguments(uniforms: object): void;
+	setUniforms(uniforms: object): void;
 	/**
 	 * Retrieves the current value of a given uniform.
 	 * For the return type of this function, see the GLSL API.
 	 * @param name - The name of the uniform
 	 */
-	getArgument(name: string): any;
+	getUniform(name: string): any;
 	/**
 	 * Checks whether a given uniform exists.
 	 * @param name - The name of the uniform to check
@@ -5573,13 +5596,13 @@ declare class Transform extends Matrix3 implements Copyable {
 	 * This translates the point by the inverse of the transform's position and then rotates it counter-clockwise (in screen-space) about the origin by the transform's rotation.
 	 * @param point - The point to transform
 	 */
-	globalSpaceToLocalSpace(point: Vector2): Vector2;
+	globalToLocal(point: Vector2): Vector2;
 	/**
 	 * Transforms a given point by applying the caller to it.
 	 * This rotates the point clockwise (in screen-space) about the origin by the transform's rotation and then translates it by the transform's position.
 	 * @param point - The point to transform
 	 */
-	localSpaceToGlobalSpace(point: Vector2): Vector2;
+	localToGlobal(point: Vector2): Vector2;
 	/**
 	 * Returns a transform which has the same effect as applying two transformations in a row.
 	 * @param a - The first transformation
@@ -5672,7 +5695,7 @@ declare class FastFrame extends Frame {
  * 	radius: 22.5,
  * 	color: new Color("magenta")
  * };
- * gpu.getArgument("circles").append(circle);
+ * gpu.getUniform("circles").append(circle);
  * ```
  */
 declare class GPUArray {
@@ -5734,18 +5757,18 @@ declare interface GPUInterface {
 	 * @param name - The name of the uniform
 	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
 	 */
-	setArgument(name: string, value: any): void;
+	setUniform(name: string, value: any): void;
 	/**
 	 * Sets the value of many uniforms at once.
 	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
 	 */
-	setArguments(uniforms: object): void;
+	setUniforms(uniforms: object): void;
 	/**
 	 * Retrieves the current value of a given uniform.
 	 * For the return type of this function, see the GLSL API.
 	 * @param name - The name of the uniform
 	 */
-	getArgument(name: string): any;
+	getUniform(name: string): any;
 	/**
 	 * Checks whether a given uniform exists.
 	 * @param name - The name of the uniform to check
@@ -6001,6 +6024,12 @@ declare class ElementScript {
 	 * This called each frame during the main update cycle.
 	 */
 	update(): void;
+	/**
+	 * This is called prior to rendering to determine whether an object should be rendered on a given camera.
+	 * If this is not specified, the object will be rendered for all cameras.
+	 * @param camera - The camera to test against
+	 */
+	drawRule(camera: Camera): boolean;
 	/**
 	 * This is called once per shape of the object each frame during rendering.
 	 * When this is called, the renderer is in the local-space of the object.

@@ -42,10 +42,10 @@ Dynamic-length arrays' elements do not count toward the uniform limit, and can f
 uniform</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER"><a href="../../Pages/Geometry/Shapes/Line.html#class Line">Line</a></span><span class="highlight-SYMBOL">[] </span><span class="highlight-IDENTIFIER">linesA</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// dynamic length</span><span class="highlight-KEYWORD">
 uniform</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER"><a href="../../Pages/Geometry/Shapes/Line.html#class Line">Line</a></span><span class="highlight-SYMBOL">[</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">] </span><span class="highlight-IDENTIFIER">linesB</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// fixed length</span><span class="highlight-SYMBOL">
 </span></code>
-Dynamic-length arrays are represented by GPUArrays, which are pre-set as the values for these uniforms. These arrays cannot be replaced, only modified. As such, calling <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">GPUInterface</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">setArgument</span><span class="highlight-SYMBOL">()</span></code> on a dynamic-length uniform is equivalent to calling <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">GPUArray</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">set</span><span class="highlight-SYMBOL">()</span></code> on the retrieved array.
+Dynamic-length arrays are represented by GPUArrays, which are pre-set as the values for these uniforms. These arrays cannot be replaced, only modified. As such, calling <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">GPUInterface</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">setUniform</span><span class="highlight-SYMBOL">()</span></code> on a dynamic-length uniform is equivalent to calling <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">GPUArray</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">set</span><span class="highlight-SYMBOL">()</span></code> on the retrieved array.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// gpu is a GPUInterface. The following two lines are equivalent if &quot;linesA&quot; is a dynamic-length array uniform.</span><span class="highlight-SYMBOL">
-</span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">setArgument</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;linesA&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">lines</span><span class="highlight-SYMBOL">);
-</span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getArgument</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;linesA&quot;</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">set</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">lines</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">setUniform</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;linesA&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">lines</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getUniform</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;linesA&quot;</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">set</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">lines</span><span class="highlight-SYMBOL">);
 </span></code>
 				</div>
 
@@ -79,9 +79,9 @@ This is an abstract superclass and should not be constructed.
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="GPUInterface.prototype.setArgument()">
+		<div class="function-wrapper" id="GPUInterface.prototype.setUniform()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1091" target="_blank" class="function-name source-link">setArgument</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1091" target="_blank" class="function-name source-link">setUniform</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of a uniform in the program.
@@ -91,7 +91,7 @@ This is an abstract superclass and should not be constructed.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="GPUInterface.prototype.setArgument():name">
+						<div class="param-wrapper" id="GPUInterface.prototype.setUniform():name">
 							<div class="param-name">
 								<span class="param">name</span>
 								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
@@ -101,7 +101,7 @@ This is an abstract superclass and should not be constructed.
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="GPUInterface.prototype.setArgument():value">
+						<div class="param-wrapper" id="GPUInterface.prototype.setUniform():value">
 							<div class="param-name">
 								<span class="param">value</span>
 								<span class="type">Any</span>
@@ -116,9 +116,9 @@ This is an abstract superclass and should not be constructed.
 			
 		</div>
 	
-		<div class="function-wrapper" id="GPUInterface.prototype.setArguments()">
+		<div class="function-wrapper" id="GPUInterface.prototype.setUniforms()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1098" target="_blank" class="function-name source-link">setArguments</a>(<span class="param">uniforms</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1101" target="_blank" class="function-name source-link">setUniforms</a>(<span class="param">uniforms</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the value of many uniforms at once.
@@ -128,7 +128,7 @@ This is an abstract superclass and should not be constructed.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="GPUInterface.prototype.setArguments():uniforms">
+						<div class="param-wrapper" id="GPUInterface.prototype.setUniforms():uniforms">
 							<div class="param-name">
 								<span class="param">uniforms</span>
 								<span class="type">Object</span>
@@ -143,9 +143,9 @@ This is an abstract superclass and should not be constructed.
 			
 		</div>
 	
-		<div class="function-wrapper" id="GPUInterface.prototype.getArgument()">
+		<div class="function-wrapper" id="GPUInterface.prototype.getUniform()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1108" target="_blank" class="function-name source-link">getArgument</a>(<span class="param">name</span>)<span class="type">Any</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1114" target="_blank" class="function-name source-link">getUniform</a>(<span class="param">name</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
 				Retrieves the current value of a given uniform.
@@ -156,7 +156,7 @@ For the return type of this function, see the GLSL API.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="GPUInterface.prototype.getArgument():name">
+						<div class="param-wrapper" id="GPUInterface.prototype.getUniform():name">
 							<div class="param-name">
 								<span class="param">name</span>
 								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
@@ -173,7 +173,7 @@ For the return type of this function, see the GLSL API.
 	
 		<div class="function-wrapper" id="GPUInterface.prototype.argumentExists()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1116" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1125" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether a given uniform exists.
@@ -223,7 +223,7 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 	</span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 22.5</span><span class="highlight-SYMBOL">,
 	</span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;magenta&quot;</span><span class="highlight-SYMBOL">)
 };
-</span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getArgument</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;circles&quot;</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">append</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circle</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getUniform</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;circles&quot;</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">append</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circle</span><span class="highlight-SYMBOL">);
 </span></code>
 				</div>
 				

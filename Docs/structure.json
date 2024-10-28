@@ -48,7 +48,7 @@
 			"GLSL API": ["GLSL API", "GPUInterface", "GPUArray"],
 			"Font": null,
 			"Camera": {
-				"BaseCamera": null,
+				"Camera": null,
 				"Camera2D": null,
 				"Camera3D": null
 			},

@@ -146,9 +146,9 @@ It is composed of a rotation about the origin followed by a translation.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Transform.prototype.globalSpaceToLocalSpace()">
+		<div class="function-wrapper" id="Transform.prototype.globalToLocal()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L100" target="_blank" class="function-name source-link">globalSpaceToLocalSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L100" target="_blank" class="function-name source-link">globalToLocal</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the inverse of the caller to it.
@@ -159,7 +159,7 @@ This translates the point by the inverse of the transform's position and then ro
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Transform.prototype.globalSpaceToLocalSpace():point">
+						<div class="param-wrapper" id="Transform.prototype.globalToLocal():point">
 							<div class="param-name">
 								<span class="param">point</span>
 								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
@@ -174,9 +174,9 @@ This translates the point by the inverse of the transform's position and then ro
 			
 		</div>
 	
-		<div class="function-wrapper" id="Transform.prototype.localSpaceToGlobalSpace()">
+		<div class="function-wrapper" id="Transform.prototype.localToGlobal()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L109" target="_blank" class="function-name source-link">localSpaceToGlobalSpace</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L112" target="_blank" class="function-name source-link">localToGlobal</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the caller to it.
@@ -187,7 +187,7 @@ This rotates the point clockwise (in screen-space) about the origin by the trans
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Transform.prototype.localSpaceToGlobalSpace():point">
+						<div class="param-wrapper" id="Transform.prototype.localToGlobal():point">
 							<div class="param-name">
 								<span class="param">point</span>
 								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
@@ -204,7 +204,7 @@ This rotates the point clockwise (in screen-space) about the origin by the trans
 	
 		<div class="function-wrapper" id="Transform.combine()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L146" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L152" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform which has the same effect as applying two transformations in a row.

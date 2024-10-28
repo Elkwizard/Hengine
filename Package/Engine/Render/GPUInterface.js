@@ -1102,8 +1102,8 @@ class GPUInterface {
 		for (const key in args)
 			this.setArgument(key, args[key]);
 	}
-	setArgument(args) {
-		return this.setArgument(args);
+	setArguments(args) {
+		return this.setUniforms(args);
 	}
 	/**
 	 * Retrieves the current value of a given uniform.
