@@ -1,5 +1,13 @@
-class WebGLArtist {
+/**
+ * Represents a 2D renderer based on the WebGL API.
+ * This renderer cannot render text or concave polygons.
+ * Creating instances of this class is drastically more expensive than creating a CanvasArtist2D, but after it's created, it is generally 10x-100x faster than CanvasArtist2D.
+ * Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
+ * This should not be constructed directly, and should instead be used in conjunction with FastFrame.
+ */
+class WebGLArtist2D extends Artist2D {
 	constructor(canvas, width, height, imageType, pixelRatio) {
+		super();
 		this.canvas = canvas;
 		this.pixelRatio = pixelRatio;
 
@@ -359,21 +367,8 @@ class WebGLArtist {
 	get transform() {
 		return this.currentTransform.get();
 	}
-	drawThrough(transform, draw) {
-		this.save();
-		this.transform = transform;
-		draw();
-		this.restore();
-	}
 	resize(width, height) {
 		this.gl.resize(width, height);
-	}
-	multiplyTransform(newTransform) {
-		this.gl.setTransform(this.currentTransform.times(newTransform, this.currentTransform));
-	}
-	setCursor(cursor) {
-		const { style } = this.canvas;
-		if ("cursor" in style) style.cursor = cursor;
 	}
 	useColor(color) {
 		this.currentColor = color;
@@ -400,13 +395,8 @@ class WebGLArtist {
 		this.gl.setTransform(Matrix3.identity(this.currentTransform));
 		this.scale(this.pixelRatio);
 	}
-	invertX() {
-		this.translate(this.width, 0);
-		this.scale(-1, 1);
-	}
-	invertY() {
-		this.translate(0, this.height);
-		this.scale(1, -1);
+	addTransform(mat) {
+		this.gl.setTransform(this.currentTransform.mul(mat));
 	}
 	translate(x, y) {
 		if (typeof x === "object") ({ x, y } = x);
@@ -475,39 +465,21 @@ class WebGLArtist {
 	clear() {
 		this.gl.clear();
 	}
-	beforeFrame() {
-		this.clearTransformations();
-	}
-	afterFrame() {
-
-	}
 	fill(color) {
 		this.gl.coloredQuad(0, 0, this.width, this.height, color.red, color.green, color.blue, color.alpha);
-	}
-	rotateAround(x, y, r) {
-		this.translate(x, y)
-		this.rotate(r);
-		this.translate(-x, -y);
-	}
-	drawWithAlpha(a, shape) {
-		let prev = this.alpha;
-		this.alpha *= a;
-		shape();
-		this.alpha = prev;
 	}
 }
 
 /**
  * @name class FastFrame extends Frame
- * This class has the same behavior as Frame, except that the renderer for this class cannot render text or concave polygons.
- * Creating instances of this class is drastically more expensive than creating a Frame, but after it's created, it is generally 10x-100x faster than Frame.
- * Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
+ * Represents a WebGL-based implementation of Frame.
+ * @prop WebGLArtist2D renderer | The renderer for the frame
  */
 class FastFrame extends ImageType {
 	constructor(width, height, pixelRatio = __devicePixelRatio) {
 		super(width, height, pixelRatio);
 		this.image = new_OffscreenCanvas(this.pixelWidth, this.pixelHeight);
-		this.renderer = new WebGLArtist(this.image, this.width, this.height, this, pixelRatio);
+		this.renderer = new WebGLArtist2D(this.image, this.width, this.height, this, pixelRatio);
 	}
 	onresize(width, height) {
 		this.renderer.resize(width, height);

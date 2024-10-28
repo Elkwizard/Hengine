@@ -57,8 +57,13 @@
 			"GrayMap": null,
 			"TileMap": null,
 			"Renderer": {
-				"Artist": [
-					"Artist",
+				"Artists": {
+					"Artist": null,
+					"Artist2D": null,
+					"CanvasArtist2D": null,
+					"WebGLArtist2D": null
+				},
+				"Configuration": [
 					"TextMode",
 					"BlendMode",
 					"LineCap",

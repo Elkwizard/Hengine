@@ -245,6 +245,7 @@ class HImage extends ImageType {
 /**
  * @implements Copyable
  * Represents an offscreen drawing surface that can be rendered as an image.
+ * It is based on the HTML5 Canvas API.
  * ```js
  * const frame = new Frame(100, 200);
  * 
@@ -255,7 +256,7 @@ class HImage extends ImageType {
  * // render the frame to the screen
  * renderer.image(frame).default(0, 0);
  * ```
- * @prop Artist renderer | The renderer local to the frame that can be used to modify its contents
+ * @prop CanvasArtist2D renderer | The renderer local to the frame that can be used to modify its contents
  */
 class Frame extends ImageType {
 	/**
@@ -267,7 +268,7 @@ class Frame extends ImageType {
 	constructor(width, height, pixelRatio = __devicePixelRatio) {
 		super(width, height, pixelRatio);
 		this.image = new_OffscreenCanvas(this.pixelWidth, this.pixelHeight);
-		this.renderer = new Artist(this.image, this);
+		this.renderer = new CanvasArtist2D(this.image, this);
 	}
 	onresize(width, height) {
 		this.renderer.resize(width, height);

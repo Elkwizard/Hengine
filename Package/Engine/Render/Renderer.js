@@ -1,3 +1,169 @@
+/**
+ * Represents a renderer for a graphical surface.
+ */
+class Artist {
+	/**
+	 * @name clear
+	 * Clears the rendering surface to transparent black.
+	 */
+	/**
+	 * @name fill
+	 * Assuming that the current transform is the identity transformation, this fills the surface with a single color. If the color is transparent, it will simply layer on top of the current content.
+	 * @param Color color | The color to fill with
+	 */
+	/**
+	 * @name addTransform
+	 * Manipulates the current coordinate transform. For an Artist `a` and Matrix `m`, `a.addTransform(m)` is equivalent to `a.transform = m.times(a.transform)`.
+	 * @param Matrix transform | The coordinate transform to compose with the existing transform
+	 */
+	/**
+	 * Calls a function while using a specified coordinate transform
+	 * @param Matrix transform | The specific coordinate transform to use
+	 * @param () => void draw | The function that will be called while using the specified transform
+	 * @param Boolean global? | Whether the transform should be applied in place of all current transforms (true), or composed with the current transform (false). Default is true.
+	 */
+	drawThrough(mat, draw, global = true) {
+		this.save();
+		if (global) this.transform = mat;
+		else this.addTransform(mat);
+		draw();
+		this.restore();
+	}
+	/**
+	 * @name clearTransformations
+	 * Returns the renderer to the identity coordinate transform.
+	 */
+	/**
+	 * @name set transform
+	 * Sets the current coordinate transform of the renderer.
+	 * @param Matrix transform | The new transform
+	 */
+	/**
+	 * @name get transform
+	 * Returns the current coordinate transform of the renderer.
+	 * @return Matrix
+	 */
+	/**
+	 * @name save
+	 * Pushes the current rendering state onto the state stack.
+	 * This state includes `.alpha` and `.transform`, 
+	 */
+	/**
+	 * @name restore
+	 * Puts the renderer into the state on top of the state stack, then removes it from the stack.
+	 */
+}
+
+/**
+ * Represents a 2D renderer for a graphical surface.
+ * All transformation-related matrices for this renderer are of type Matrix3.
+ * ```js
+ * renderer.draw(new Color("blue")).shape(Polygon.regular(5, 100).move(middle));
+ * renderer.stroke(new Color("red"), 20, LineCap.SQUARE, LineJoin.ROUND).connector([
+ * 	new Vector2(0, 0),
+ * 	new Vector2(50, 100),
+ * 	new Vector2(150, 200),
+ * 	new Vector2(300, 100)
+ * ]);
+ *   
+ * renderer.clip().circle(0, 0, 100);
+ * renderer.draw(new Color("lime")).rect(0, 0, 80, 80);
+ * renderer.unclip();
+ * ```
+ * @prop ImageType imageType | The surface on which the renderer renders. This property is read-only
+ * @prop TextMode textMode | The current text-alignment mode. Starts as `TextMode.TOP_LEFT`
+ * @prop BlendMode blendMode | The current color-blending mode. Starts as `BlendMode.COMBINE`
+ * @prop Number alpha | The current global alpha. This will multiply the alpha of all other drawing calls. Starts as 1
+ * @prop Boolean preservePixelart | Whether or not image smoothing will be prevented when upscaling. Starts as true
+ */
+class Artist2D extends Artist {
+	/**
+	 * @name draw
+	 * Returns a drawing API that uses a specified color.
+	 * @param Color color | The fill color
+	 * @return DrawRenderer
+	 */
+	/**
+	 * @name stroke
+	 * Returns a stroke API that uses specific settings.
+	 * @param Color color | The outline color
+	 * @param Number lineWidth? | The width of the outline in pixels. Default is 1
+	 * @param LineCap lineCap? | The line cap to use. Default is `LineCap.FLAT`
+	 * @param LineJoin lineJoin? | The line join to use for connected segments. Default is `LineJoin.BEVEL`
+	 * @return StrokeRenderer
+	 */
+	/**
+	 * @name image
+	 * Returns an image rendering API that uses a specified image.
+	 * @param ImageType image | The image to render
+	 * @return ImageRenderer
+	 */
+	/**
+	 * In a transform with no translation, rotation, or scaling, this flips the x axis about the middle of the screen.
+	 */
+	invertX() {
+		this.translate(this.width, 0);
+		this.scale(-1, 1);
+	}
+	/**
+	 * In a transform with no translation rotation, or scaling, this flips the y axis about the middle of the screen.
+	 */
+	invertY() {
+		this.translate(0, this.height);
+		this.scale(1, -1);
+	}
+	/**
+	 * @name translate
+	 * Changes the coordinate transform by displacing it.
+	 * @signature
+	 * @param Vector2 displacement | The displacement
+	 * @signature
+	 * @param Number x | The displacement along the x axis
+	 * @param Number y | The displacement along the y axis
+	 */
+	/**
+	 * @name scale
+	 * Changes the coordinate transform by scaling it.
+	 * @signature
+	 * @param Vector2 factors | The scaling factors for both axes
+	 * @signature
+	 * @param Number x | The scaling along the x axis
+	 * @param Number y | The scaling along the y axis.
+	 * @signature
+	 * @param Number factor | The scaling factor for both axes
+	 */
+	/**
+	 * @name rotate
+	 * Changes the coordinate transform by rotating it clockwise by a specified angle.
+	 * @param Number angle | The amount to rotate by, in radians
+	 */
+	/**
+	 * Changes the coordinate transform by rotating it clockwise about a specified point.
+	 * @signature
+	 * @param Vector2 point | The point to rotate about
+	 * @param Number angle | The angle to rotate by
+	 * @signature
+	 * @param Number x | The x coordinate to rotate about
+	 * @param Number y | The y coordinate to rotate about
+	 * @param Number angle | The angle to rotate by
+	 */
+	rotateAround(x, y, r) {
+		if (typeof x === "object") {
+			r = y;
+			({ x, y } = x);
+		}
+		this.translate(x, y);
+		this.rotate(r);
+		this.translate(-x, -y);
+	}
+	beforeFrame() {
+		this.clearTransformations();
+	}
+	afterFrame() {
+
+	}
+}
+
 // Text Modes
 const TextModeX = Enum.define("LEFT", "CENTER", "RIGHT");
 const TextModeY = Enum.define("TOP", "CENTER", "BOTTOM");
@@ -35,28 +201,11 @@ const LineJoin = Enum.define("MITER", "BEVEL", "ROUND");
 const LineCap = Enum.define("FLAT", "SQUARE", "ROUND");
 
 /**
- * Represents a renderer for a graphical surface.
- * ```js
- * renderer.draw(new Color("blue")).shape(Polygon.regular(5, 100).move(middle));
- * renderer.stroke(new Color("red"), 20, LineCap.SQUARE, LineJoin.ROUND).connector([
- * 	new Vector2(0, 0),
- * 	new Vector2(50, 100),
- * 	new Vector2(150, 200),
- * 	new Vector2(300, 100)
- * ]);
- * 
- * renderer.clip().circle(0, 0, 100);
- * renderer.draw(new Color("lime")).rect(0, 0, 80, 80);
- * renderer.unclip();
- * ```
- * @prop ImageType imageType | The surface on which the renderer renders. This property is read-only
- * @prop TextMode textMode | The current text-alignment mode. Starts as `TextMode.TOP_LEFT`
- * @prop BlendMode blendMode | The current color-blending mode. Starts as `BlendMode.COMBINE`
- * @prop Number alpha | The current global alpha. This will multiply the alpha of all other drawing calls. Starts as 1
- * @prop Boolean preservePixelart | Whether or not image smoothing will be prevented when upscaling. Starts as true
+ * Represents a 2D renderer based on the HTML5 Canvas API.
  */
-class Artist {
+class CanvasArtist2D extends Artist2D {
 	constructor(canvas, imageType) {
+		super();
 		this.canvas = canvas;
 		this.c = canvas.getContext("2d");
 		this.pixelRatio = imageType.pixelRatio;
@@ -695,18 +844,10 @@ class Artist {
 	get alpha() {
 		return this._alpha;
 	}
-	/**
-	 * Sets the current coordinate transform of the renderer.
-	 * @param Matrix3 transform | The new transform
-	 */
 	set transform(a) {
 		const m = a;
 		this.c.setTransform(m[0] * this.pixelRatio, m[1] * this.pixelRatio, m[3] * this.pixelRatio, m[4] * this.pixelRatio, m[6] * this.pixelRatio, m[7] * this.pixelRatio);
 	}
-	/**
-	 * Returns the current coordinate transform of the renderer.
-	 * @return Matrix3
-	 */
 	get transform() {
 		const { a, b, c, d, e, f } = this.c.getTransform();
 		const ratio = 1 / this.pixelRatio;
@@ -716,25 +857,8 @@ class Artist {
 			0, 0, 1
 		);
 	}
-	/**
-	 * Manipulates the current coordinate transform. For an Artist `a` and Matrix3 `m`, `a.addTransform(m)` is equivalent to `a.transform = m.times(a.transform)`.
-	 * @param Matrix3 transform | The coordinate transform to compose with the existing transform
-	 */
 	addTransform(mat) {
 		this.c.transform(mat[0], mat[1], mat[3], mat[4], mat[6], mat[7]);
-	}
-	/**
-	 * Calls a function while using a specified coordinate transform
-	 * @param Matrix3 transform | The specific coordinate transform to use
-	 * @param () => void draw | The function that will be called while using the specified transform
-	 * @param Boolean global? | Whether the transform should be applied in place of all current transforms (true), or composed with the current transform (false). Default is true.
-	 */
-	drawThrough(mat, draw, global = true) {
-		this.save();
-		if (global) this.transform = mat;
-		else this.addTransform(mat);
-		draw();
-		this.restore();
 	}
 	resize(width, height) {
 		const px = this.preservePixelart;
@@ -746,10 +870,6 @@ class Artist {
 		this.c.scale(this.pixelRatio, this.pixelRatio);
 		this.alpha = al;
 		this.preservePixelart = px;
-	}
-	setCursor(cursor) {
-		let style = this.canvas.style;
-		if ("cursor" in style) style.cursor = cursor;
 	}
 	/**
 	 * Returns the color of a specific pixel in natural-space.
@@ -775,40 +895,12 @@ class Artist {
 		data[3] = col.alpha * 255;
 		this.c.putImageData(new ImageData(data, 1, 1), x * this.pixelRatio, y * this.pixelRatio);
 	}
-	createRadialGradient(x, y, radius, cols) {
-		let grd = this.c.createRadialGradient(x, y, 0.00000001, x, y, radius);
-		for (let i = 0; i < cols.length; i++) grd.addColorStop(i / (cols.length - 1), this.getContextColor(cols[i]));
-		return grd;
-	}
-	createLinearGradient(x, y, x2, y2, cols) {
-		let grd = this.c.createLinearGradient(x, y, x2, y2);
-		for (let i = 0; i < cols.length; i++) grd.addColorStop(i / (cols.length - 1), this.getContextColor(cols[i]));
-		return grd;
-	}
-	getContextColor(color) {
-		let c = color;
-		if (color instanceof Color) c = color.getRGBA();
-		return c;
-	}
-	/**
-	 * Returns a drawing API that uses a specified color.
-	 * @param Color color | The fill color
-	 * @return DrawRenderer
-	 */
 	draw(color) {
-		this.c.fillStyle = this.getContextColor(color);
+		this.c.fillStyle = color;
 		return this.drawObj;
 	}
-	/**
-	 * Returns a stroke API that uses specific settings.
-	 * @param Color color | The outline color
-	 * @param Number lineWidth? | The width of the outline in pixels. Default is 1
-	 * @param LineCap lineCap? | The line cap to use. Default is `LineCap.FLAT`
-	 * @param LineJoin lineJoin? | The line join to use for connected segments. Default is `LineJoin.BEVEL`
-	 * @return StrokeRenderer
-	 */
 	stroke(color, lineWidth = 1, lineCap = LineCap.FLAT, lineJoin = LineJoin.BEVEL) {
-		this.c.strokeStyle = this.getContextColor(color);
+		this.c.strokeStyle = color;
 		this.c.lineJoin = this.lineJoinMap.get(lineJoin);
 		this.c.lineCap = this.lineCapMap.get(lineCap);
 		this.c.lineWidth = lineWidth;
@@ -820,11 +912,6 @@ class Artist {
 		if (width * height === 0) return;
 		this.c.drawImage(this.currentImageCIS, x, y, width, height);
 	}
-	/**
-	 * Returns an image rendering API that uses a specified image.
-	 * @param ImageType image | The image to render
-	 * @return ImageRenderer
-	 */
 	image(img) {
 		this.currentImageCIS = img.makeImage();
 		this.currentImage = img;
@@ -844,96 +931,25 @@ class Artist {
 	unclip() {
 		this.restore();
 	}
-	/**
-	 * Multiplies the current coordinate transform in-place by a matrix on the right side.
-	 * @param Matrix3 newTransform | The matrix to multiply the current transform by
-	 */
-	multiplyTransform(newTransform) {
-		this.c.transform(newTransform[0], newTransform[1], newTransform[3], newTransform[4], newTransform[6], newTransform[7]);
-	}
-	/**
-	 * In a transform with no translation, rotation, or scaling, this flips the x axis about the middle of the screen.
-	 */
-	invertX() {
-		this.translate(this.width, 0);
-		this.scale(-1, 1);
-	}
-	/**
-	 * In a transform with no translation rotation, or scaling, this flips the y axis about the middle of the screen.
-	 */
-	invertY() {
-		this.translate(0, this.height);
-		this.scale(1, -1);
-	}
-	/**
-	 * Changes the coordinate transform by displacing it.
-	 * @signature
-	 * @param Vector2 displacement | The displacement
-	 * @signature
-	 * @param Number x | The displacement along the x axis
-	 * @param Number y | The displacement along the y axis
-	 */
 	translate(x, y) {
 		if (typeof x === "object") ({ x, y } = x);
 		this.c.translate(x, y);
 	}
-	/**
-	 * Changes the coordinate transform by scaling it.
-	 * @signature
-	 * @param Vector2 factors | The scaling factors for both axes
-	 * @signature
-	 * @param Number x | The scaling along the x axis
-	 * @param Number y | The scaling along the y axis.
-	 * @signature
-	 * @param Number factor | The scaling factor for both axes
-	 */
 	scale(x, y = x) {
 		if (typeof x === "object") ({ x, y } = x);
 		this.c.scale(x, y);
 	}
-	/**
-	 * Changes the coordinate transform by rotating it clockwise by a specified angle.
-	 * @param Number angle | The amount to rotate by, in radians
-	 */
 	rotate(a) {
 		this.c.rotate(a);
 	}
-	/**
-	 * Changes the coordinate transform by rotating it clockwise about a specified point.
-	 * @signature
-	 * @param Vector2 point | The point to rotate about
-	 * @param Number angle | The angle to rotate by
-	 * @signature
-	 * @param Number x | The x coordinate to rotate about
-	 * @param Number y | The y coordinate to rotate about
-	 * @param Number angle | The angle to rotate by
-	 */
-	rotateAround(x, y, r) {
-		if (typeof x === "object") {
-			r = y;
-			({ x, y } = x);
-		}
-		this.translate(x, y);
-		this.rotate(r);
-		this.translate(-x, -y);
-	}
-	/**
-	 * Returns the renderer to the identity coordinate transform.
-	 */
+	
 	clearTransformations() {
 		this.c.resetTransform();
 		this.scale(this.pixelRatio);
 	}
-	/**
-	 * Pushes the current rendering state onto the state stack.
-	 * This state includes `.alpha` and `.transform`, 
-	 */
 	save() {
 		this.c.save();
 	}
-	/**
-	 * Puts the renderer into the state on top of the state stack, then removes it from the stack.
-	 */
 	restore() {
 		this.c.restore();
 		this._alpha = this.c.globalAlpha;
@@ -952,196 +968,21 @@ class Artist {
 		if (typeof x === "object") ({ x, y, width, height } = x);
 		this.c.clearRect(x, y, width, height);
 	}
-	/**
-	 * Clears the rendering surface to transparent black.
-	 */
 	clear() {
 		this.c.save();
 		this.c.resetTransform();
 		this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.c.restore();
 	}
-	beforeFrame() {
-		this.clearTransformations();
-	}
-	afterFrame() {
-
-	}
-	/**
-	 * Assuming that the current transform is the identity transformation, this fills the surface with a single color. If the color is transparent, it will simply layer on top of the current content.
-	 * @param Color color | The color to fill with
-	 */
 	fill(color) {
-		this.c.fillStyle = this.getContextColor(color);
+		this.c.fillStyle = color;
 		this.c.fillRect(0, 0, this.width, this.height);
-	}
-	drawWithAlpha(a, shape) {
-		const prev = this.alpha;
-		this.alpha *= a;
-		shape();
-		this.alpha = prev;
-	}
-	compileCommand(drawType, drawArgs, shapeArgs) {
-		let color;
-
-		let shape;
-		if (shapeArgs instanceof Polygon) shape = "shape";
-		if (shapeArgs instanceof Rect) shape = "rect";
-		if (shapeArgs instanceof Circle) shape = "circle";
-
-		switch (drawType) {
-			case "stroke":
-				color = drawArgs[0];
-				if (color instanceof Color) color = color.getRGBA();
-				let lineWidth = drawArgs[1] || 1;
-				let lineCap = drawArgs[2] || "flat";
-				if (lineCap === "flat") lineCap = "butt";
-
-				if (shape === "rect") {
-					return function () {
-						this.c.lineWidth = lineWidth;
-						this.c.lineCap = lineCap;
-						this.c.strokeStyle = color;
-						this.c.strokeRect(shapeArgs.x, shapeArgs.y, shapeArgs.width, shapeArgs.height);
-					}.bind(this);
-				}
-
-				if (shape === "circle") {
-					return function () {
-						this.c.lineWidth = lineWidth;
-						this.c.lineCap = lineCap;
-						this.c.strokeStyle = color;
-						this.c.beginPath();
-						this.c.arc(shapeArgs.x, shapeArgs.y, shapeArgs.radius, 0, 6.283185307179586);
-						this.c.stroke();
-					}.bind(this);
-				}
-
-				if (shape === "shape") {
-					let vert = shapeArgs.vertices;
-					let len = vert.length;
-					let lines = [];
-					for (let i = 0; i < len; i++) lines.push(vert[(i + 1) % len]);
-					return function () {
-						this.c.lineWidth = lineWidth;
-						this.c.lineCap = lineCap;
-						this.c.strokeStyle = color;
-						this.c.beginPath();
-						this.c.moveTo(vert[0].x, vert[0].y);
-						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y);
-						this.c.stroke();
-					}.bind(this);
-				}
-
-				break;
-			case "draw":
-				color = drawArgs[0];
-				if (color instanceof Color) color = color.getRGBA();
-
-				if (shape === "rect") {
-					return function () {
-						this.c.fillStyle = color;
-						this.c.fillRect(shapeArgs.x, shapeArgs.y, shapeArgs.width, shapeArgs.height);
-					}.bind(this);
-				}
-
-				if (shape === "circle") {
-					return function () {
-						this.c.fillStyle = color;
-						this.c.beginPath();
-						this.c.arc(shapeArgs.x, shapeArgs.y, shapeArgs.radius, 0, 6.283185307179586);
-						this.c.fill();
-					}.bind(this);
-				}
-
-				if (shape === "shape") {
-					let vert = shapeArgs.vertices;
-					let len = vert.length;
-					let lines = [];
-					for (let i = 0; i < len; i++) lines.push(vert[(i + 1) % len]);
-					return function () {
-						this.c.fillStyle = color;
-						this.c.beginPath();
-						this.c.moveTo(vert[0].x, vert[0].y);
-						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y);
-						this.c.fill();
-					}.bind(this);
-				}
-
-				break;
-			case "image":
-				let currentImage = drawArgs[0];
-
-				let boundW, boundH, boundX, boundY;
-				if (shape === "rect") {
-					boundW = shapeArgs.width;
-					boundH = shapeArgs.height;
-					boundX = shapeArgs.x;
-					boundY = shapeArgs.y;
-				}
-				if (shape === "circle") {
-					boundW = shapeArgs.radius * 2;
-					boundH = boundW;
-					boundX = shapeArgs.x - boundW / 2;
-					boundY = shapeArgs.y - boundH / 2;
-				}
-				let v;
-				if (shape === "shape") {
-					v = shapeArgs.vertices;
-					let minX = Math.min(...v.map(e => e.x));
-					let maxX = Math.max(...v.map(e => e.x));
-					let minY = Math.min(...v.map(e => e.y));
-					let maxY = Math.max(...v.map(e => e.y));
-					boundX = minX;
-					boundY = minY;
-					boundW = maxX - minX;
-					boundH = maxY - minY;
-				}
-
-				let img = currentImage;
-				if (img instanceof ImageType) img = img.makeImage();
-
-				if (shape === "rect") {
-					return function () {
-						this.c.drawImage(img, boundX, boundY, boundW, boundH);
-					}.bind(this);
-				}
-
-				if (shape === "circle") {
-					return function () {
-						this.c.save();
-						this.c.beginPath();
-						this.c.arc(shapeArgs.x, shapeArgs.y, shapeArgs.radius, 0, 6.283185307179586);
-						this.c.clip();
-						this.c.drawImage(img, boundX, boundY, boundW, boundH);
-						this.restore();
-					}.bind(this);
-				}
-
-				if (shape === "shape") {
-					let len = v.length;
-					let lines = [];
-					for (let i = 0; i < len; i++) lines.push(v[(i + 1) % len]);
-					return function () {
-						this.c.save();
-						this.c.beginPath();
-						this.c.moveTo(v[0].x, v[0].y);
-						for (let i = 0; i < lines.length; i++) this.c.lineTo(lines[i].x, lines[i].y);
-						this.c.clip();
-						this.c.drawImage(img, boundX, boundY, boundW, boundH);
-						this.c.restore();
-					}.bind(this);
-				}
-
-				break;
-		}
-		return function () { };
 	}
 }
 
 /**
  * @name class PathRenderer
- * Represents a generic drawing API of an Artist.
+ * Represents a generic drawing API of an Artist2D.
  * The exact operation used to render the paths is specified in subclasses, but this class which shapes are possible and how they are specified.
  * @abstract
  */
@@ -1278,13 +1119,13 @@ class Artist {
 
 /**
  * @name class DrawRenderer extends PathRenderer
- * Represents the draw API of an Artist.
+ * Represents the draw API of an Artist2D.
  * This fills various paths.
  */
 
 /**
  * @name class StrokeRenderer extends PathRenderer
- * Represents the stroke API of an Artist.
+ * Represents the stroke API of an Artist2D.
  * This outlines various paths.
  */
 
@@ -1356,7 +1197,7 @@ class Artist {
 
 /**
  * @name class ImageRenderer extends PathRenderer
- * Represents the image drawing API of an Artist.
+ * Represents the image drawing API of an Artist2D.
  * This draws images in various paths. 
  * For non-rectangular shapes, the image is scaled to be the size of the shape's bounding box, and then only the portion of the image inside the shape is shown.
  */
@@ -1397,7 +1238,7 @@ class Artist {
 
 /**
  * @name class ClipRenderer extends PathRenderer
- * Represents the clipping API of an Artist.
+ * Represents the clipping API of an Artist2D.
  * This adds various shapes to the current clipping mask.
  * Each path created will be added to the current clipping state, which means that future draw calls will be able to modify the pixels outside the current clipped area.
  */

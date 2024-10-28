@@ -3286,7 +3286,7 @@ declare class Camera2D extends Matrix3 implements Camera {
 	 * Creates a new camera pointing to the middle of the provided renderer.
 	 * @param renderer - The renderer to target
 	 */
-	constructor(renderer: Artist);
+	constructor(renderer: Artist2D);
 	/**
 	 * Smoothly moves the camera toward a new rotation value.
 	 * @param angle - The new rotation to move toward (in radians)
@@ -3390,6 +3390,13 @@ declare class Camera3D extends Matrix4 implements Camera {
 	 * @param renderer - The renderer to target
 	 */
 	constructor(renderer: Artist3D);
+	/**
+	 * Points the camera in a specific direction, with a specified angle from +z on the horizontal and vertical axes.
+	 * The vertical input is clamped to avoid gimbal lock.
+	 * @param xAngle - The angle in radians about the y axis from +z to the camera direction
+	 * @param yAngle - The angle in radians about the x axis from +z to the camera direction
+	 */
+	look(xAngle: number, yAngle: number): void;
 	/**
 	 * The magnification level of the camera
 	 */
@@ -4024,6 +4031,7 @@ declare class HImage extends ImageType {
 
 /**
  * Represents an offscreen drawing surface that can be rendered as an image.
+ * It is based on the HTML5 Canvas API.
  * ```js
  * const frame = new Frame(100, 200);
  * 
@@ -4039,7 +4047,7 @@ declare class Frame extends ImageType implements Copyable {
 	/**
 	 * The renderer local to the frame that can be used to modify its contents
 	 */
-	renderer: Artist;
+	renderer: CanvasArtist2D;
 	/**
 	 * Creates a new Frame.
 	 * @param width - The natural width of the frame
@@ -4342,6 +4350,166 @@ declare class GrayMap implements Serializable {
 }
 
 /**
+ * Represents a renderer for a graphical surface.
+ */
+declare class Artist {
+	/**
+	 * Clears the rendering surface to transparent black.
+	 */
+	clear(): void;
+	/**
+	 * Assuming that the current transform is the identity transformation, this fills the surface with a single color. If the color is transparent, it will simply layer on top of the current content.
+	 * @param color - The color to fill with
+	 */
+	fill(color: Color): void;
+	/**
+	 * Manipulates the current coordinate transform. For an Artist `a` and Matrix `m`, `a.addTransform(m)` is equivalent to `a.transform = m.times(a.transform)`.
+	 * @param transform - The coordinate transform to compose with the existing transform
+	 */
+	addTransform(transform: Matrix): void;
+	/**
+	 * Calls a function while using a specified coordinate transform
+	 * @param transform - The specific coordinate transform to use
+	 * @param draw - The function that will be called while using the specified transform
+	 * @param global - Whether the transform should be applied in place of all current transforms (true), or composed with the current transform (false). Default is true.
+	 */
+	drawThrough(transform: Matrix, draw: () => void, global?: boolean): void;
+	/**
+	 * Returns the renderer to the identity coordinate transform.
+	 */
+	clearTransformations(): void;
+	/**
+	 * Sets the current coordinate transform of the renderer.
+	 * @param transform - The new transform
+	 */
+	set transform(transform: Matrix);
+	/**
+	 * Returns the current coordinate transform of the renderer.
+	 */
+	get transform(): Matrix;
+	/**
+	 * Pushes the current rendering state onto the state stack.
+	 * This state includes `.alpha` and `.transform`,
+	 */
+	save(): void;
+	/**
+	 * Puts the renderer into the state on top of the state stack, then removes it from the stack.
+	 */
+	restore(): void;
+}
+
+/**
+ * Represents a 2D renderer for a graphical surface.
+ * All transformation-related matrices for this renderer are of type Matrix3.
+ * ```js
+ * renderer.draw(new Color("blue")).shape(Polygon.regular(5, 100).move(middle));
+ * renderer.stroke(new Color("red"), 20, LineCap.SQUARE, LineJoin.ROUND).connector([
+ * 	new Vector2(0, 0),
+ * 	new Vector2(50, 100),
+ * 	new Vector2(150, 200),
+ * 	new Vector2(300, 100)
+ * ]);
+ *   
+ * renderer.clip().circle(0, 0, 100);
+ * renderer.draw(new Color("lime")).rect(0, 0, 80, 80);
+ * renderer.unclip();
+ * ```
+ */
+declare class Artist2D extends Artist {
+	/**
+	 * The surface on which the renderer renders. This property is read-only
+	 */
+	imageType: ImageType;
+	/**
+	 * The current text-alignment mode. Starts as `TextMode.TOP_LEFT`
+	 */
+	textMode: TextMode;
+	/**
+	 * The current color-blending mode. Starts as `BlendMode.COMBINE`
+	 */
+	blendMode: BlendMode;
+	/**
+	 * The current global alpha. This will multiply the alpha of all other drawing calls. Starts as 1
+	 */
+	alpha: number;
+	/**
+	 * Whether or not image smoothing will be prevented when upscaling. Starts as true
+	 */
+	preservePixelart: boolean;
+	/**
+	 * Returns a drawing API that uses a specified color.
+	 * @param color - The fill color
+	 */
+	draw(color: Color): DrawRenderer;
+	/**
+	 * Returns a stroke API that uses specific settings.
+	 * @param color - The outline color
+	 * @param lineWidth - The width of the outline in pixels. Default is 1
+	 * @param lineCap - The line cap to use. Default is `LineCap.FLAT`
+	 * @param lineJoin - The line join to use for connected segments. Default is `LineJoin.BEVEL`
+	 */
+	stroke(color: Color, lineWidth?: number, lineCap?: LineCap, lineJoin?: LineJoin): StrokeRenderer;
+	/**
+	 * Returns an image rendering API that uses a specified image.
+	 * @param image - The image to render
+	 */
+	image(image: ImageType): ImageRenderer;
+	/**
+	 * In a transform with no translation, rotation, or scaling, this flips the x axis about the middle of the screen.
+	 */
+	invertX(): void;
+	/**
+	 * In a transform with no translation rotation, or scaling, this flips the y axis about the middle of the screen.
+	 */
+	invertY(): void;
+	/**
+	 * Changes the coordinate transform by displacing it.
+	 * @param displacement - The displacement
+	 */
+	translate(displacement: Vector2): void;
+	/**
+	 * Changes the coordinate transform by displacing it.
+	 * @param x - The displacement along the x axis
+	 * @param y - The displacement along the y axis
+	 */
+	translate(x: number, y: number): void;
+	/**
+	 * Changes the coordinate transform by scaling it.
+	 * @param factors - The scaling factors for both axes
+	 */
+	scale(factors: Vector2): void;
+	/**
+	 * Changes the coordinate transform by scaling it.
+	 * @param x - The scaling along the x axis
+	 * @param y - The scaling along the y axis.
+	 */
+	scale(x: number, y: number): void;
+	/**
+	 * Changes the coordinate transform by scaling it.
+	 * @param factor - The scaling factor for both axes
+	 */
+	scale(factor: number): void;
+	/**
+	 * Changes the coordinate transform by rotating it clockwise by a specified angle.
+	 * @param angle - The amount to rotate by, in radians
+	 */
+	rotate(angle: number): void;
+	/**
+	 * Changes the coordinate transform by rotating it clockwise about a specified point.
+	 * @param point - The point to rotate about
+	 * @param angle - The angle to rotate by
+	 */
+	rotateAround(point: Vector2, angle: number): void;
+	/**
+	 * Changes the coordinate transform by rotating it clockwise about a specified point.
+	 * @param x - The x coordinate to rotate about
+	 * @param y - The y coordinate to rotate about
+	 * @param angle - The angle to rotate by
+	 */
+	rotateAround(x: number, y: number, angle: number): void;
+}
+
+/**
  * Specifies where on a string of text should be considered its origin.
  */
 declare enum TextMode {
@@ -4434,63 +4602,9 @@ declare enum LineCap {
 }
 
 /**
- * Represents a renderer for a graphical surface.
- * ```js
- * renderer.draw(new Color("blue")).shape(Polygon.regular(5, 100).move(middle));
- * renderer.stroke(new Color("red"), 20, LineCap.SQUARE, LineJoin.ROUND).connector([
- * 	new Vector2(0, 0),
- * 	new Vector2(50, 100),
- * 	new Vector2(150, 200),
- * 	new Vector2(300, 100)
- * ]);
- * 
- * renderer.clip().circle(0, 0, 100);
- * renderer.draw(new Color("lime")).rect(0, 0, 80, 80);
- * renderer.unclip();
- * ```
+ * Represents a 2D renderer based on the HTML5 Canvas API.
  */
-declare class Artist {
-	/**
-	 * The surface on which the renderer renders. This property is read-only
-	 */
-	imageType: ImageType;
-	/**
-	 * The current text-alignment mode. Starts as `TextMode.TOP_LEFT`
-	 */
-	textMode: TextMode;
-	/**
-	 * The current color-blending mode. Starts as `BlendMode.COMBINE`
-	 */
-	blendMode: BlendMode;
-	/**
-	 * The current global alpha. This will multiply the alpha of all other drawing calls. Starts as 1
-	 */
-	alpha: number;
-	/**
-	 * Whether or not image smoothing will be prevented when upscaling. Starts as true
-	 */
-	preservePixelart: boolean;
-	/**
-	 * Sets the current coordinate transform of the renderer.
-	 * @param transform - The new transform
-	 */
-	set transform(transform: Matrix3);
-	/**
-	 * Returns the current coordinate transform of the renderer.
-	 */
-	get transform(): Matrix3;
-	/**
-	 * Manipulates the current coordinate transform. For an Artist `a` and Matrix3 `m`, `a.addTransform(m)` is equivalent to `a.transform = m.times(a.transform)`.
-	 * @param transform - The coordinate transform to compose with the existing transform
-	 */
-	addTransform(transform: Matrix3): void;
-	/**
-	 * Calls a function while using a specified coordinate transform
-	 * @param transform - The specific coordinate transform to use
-	 * @param draw - The function that will be called while using the specified transform
-	 * @param global - Whether the transform should be applied in place of all current transforms (true), or composed with the current transform (false). Default is true.
-	 */
-	drawThrough(transform: Matrix3, draw: () => void, global?: boolean): void;
+declare class CanvasArtist2D extends Artist2D {
 	/**
 	 * Returns the color of a specific pixel in natural-space.
 	 * @param x - The x coordinate of the pixel
@@ -4505,24 +4619,6 @@ declare class Artist {
 	 */
 	setPixel(x: number, y: number, color: Color): void;
 	/**
-	 * Returns a drawing API that uses a specified color.
-	 * @param color - The fill color
-	 */
-	draw(color: Color): DrawRenderer;
-	/**
-	 * Returns a stroke API that uses specific settings.
-	 * @param color - The outline color
-	 * @param lineWidth - The width of the outline in pixels. Default is 1
-	 * @param lineCap - The line cap to use. Default is `LineCap.FLAT`
-	 * @param lineJoin - The line join to use for connected segments. Default is `LineJoin.BEVEL`
-	 */
-	stroke(color: Color, lineWidth?: number, lineCap?: LineCap, lineJoin?: LineJoin): StrokeRenderer;
-	/**
-	 * Returns an image rendering API that uses a specified image.
-	 * @param image - The image to render
-	 */
-	image(image: ImageType): ImageRenderer;
-	/**
 	 * Returns a clipping API.
 	 */
 	clip(): ClipRenderer;
@@ -4530,77 +4626,6 @@ declare class Artist {
 	 * Undoes the last clipping operation performed in the current state stack.
 	 */
 	unclip(): void;
-	/**
-	 * Multiplies the current coordinate transform in-place by a matrix on the right side.
-	 * @param newTransform - The matrix to multiply the current transform by
-	 */
-	multiplyTransform(newTransform: Matrix3): void;
-	/**
-	 * In a transform with no translation, rotation, or scaling, this flips the x axis about the middle of the screen.
-	 */
-	invertX(): void;
-	/**
-	 * In a transform with no translation rotation, or scaling, this flips the y axis about the middle of the screen.
-	 */
-	invertY(): void;
-	/**
-	 * Changes the coordinate transform by displacing it.
-	 * @param displacement - The displacement
-	 */
-	translate(displacement: Vector2): void;
-	/**
-	 * Changes the coordinate transform by displacing it.
-	 * @param x - The displacement along the x axis
-	 * @param y - The displacement along the y axis
-	 */
-	translate(x: number, y: number): void;
-	/**
-	 * Changes the coordinate transform by scaling it.
-	 * @param factors - The scaling factors for both axes
-	 */
-	scale(factors: Vector2): void;
-	/**
-	 * Changes the coordinate transform by scaling it.
-	 * @param x - The scaling along the x axis
-	 * @param y - The scaling along the y axis.
-	 */
-	scale(x: number, y: number): void;
-	/**
-	 * Changes the coordinate transform by scaling it.
-	 * @param factor - The scaling factor for both axes
-	 */
-	scale(factor: number): void;
-	/**
-	 * Changes the coordinate transform by rotating it clockwise by a specified angle.
-	 * @param angle - The amount to rotate by, in radians
-	 */
-	rotate(angle: number): void;
-	/**
-	 * Changes the coordinate transform by rotating it clockwise about a specified point.
-	 * @param point - The point to rotate about
-	 * @param angle - The angle to rotate by
-	 */
-	rotateAround(point: Vector2, angle: number): void;
-	/**
-	 * Changes the coordinate transform by rotating it clockwise about a specified point.
-	 * @param x - The x coordinate to rotate about
-	 * @param y - The y coordinate to rotate about
-	 * @param angle - The angle to rotate by
-	 */
-	rotateAround(x: number, y: number, angle: number): void;
-	/**
-	 * Returns the renderer to the identity coordinate transform.
-	 */
-	clearTransformations(): void;
-	/**
-	 * Pushes the current rendering state onto the state stack.
-	 * This state includes `.alpha` and `.transform`,
-	 */
-	save(): void;
-	/**
-	 * Puts the renderer into the state on top of the state stack, then removes it from the stack.
-	 */
-	restore(): void;
 	/**
 	 * Clears a rectangular region of the surface to transparent black.
 	 * @param region - The region to clear
@@ -4614,19 +4639,10 @@ declare class Artist {
 	 * @param height - The height of the region to clear
 	 */
 	clearRect(x: number, y: number, width: number, height: number): void;
-	/**
-	 * Clears the rendering surface to transparent black.
-	 */
-	clear(): void;
-	/**
-	 * Assuming that the current transform is the identity transformation, this fills the surface with a single color. If the color is transparent, it will simply layer on top of the current content.
-	 * @param color - The color to fill with
-	 */
-	fill(color: Color): void;
 }
 
 /**
- * Represents a generic drawing API of an Artist.
+ * Represents a generic drawing API of an Artist2D.
  * The exact operation used to render the paths is specified in subclasses, but this class which shapes are possible and how they are specified.
  * This is an abstract superclass and should not be constructed.
  */
@@ -4774,7 +4790,7 @@ declare class PathRenderer {
 }
 
 /**
- * Represents the draw API of an Artist.
+ * Represents the draw API of an Artist2D.
  * This fills various paths.
  */
 declare class DrawRenderer extends PathRenderer {
@@ -4782,7 +4798,7 @@ declare class DrawRenderer extends PathRenderer {
 }
 
 /**
- * Represents the stroke API of an Artist.
+ * Represents the stroke API of an Artist2D.
  * This outlines various paths.
  */
 declare class StrokeRenderer extends PathRenderer {
@@ -4886,7 +4902,7 @@ declare class StrokeRenderer extends PathRenderer {
 }
 
 /**
- * Represents the image drawing API of an Artist.
+ * Represents the image drawing API of an Artist2D.
  * This draws images in various paths. 
  * For non-rectangular shapes, the image is scaled to be the size of the shape's bounding box, and then only the portion of the image inside the shape is shown.
  */
@@ -4931,7 +4947,7 @@ declare class ImageRenderer extends PathRenderer {
 }
 
 /**
- * Represents the clipping API of an Artist.
+ * Represents the clipping API of an Artist2D.
  * This adds various shapes to the current clipping mask.
  * Each path created will be added to the current clipping state, which means that future draw calls will be able to modify the pixels outside the current clipped area.
  */
@@ -5667,12 +5683,24 @@ declare class WebcamCapture extends ImageType {
 }
 
 /**
- * This class has the same behavior as Frame, except that the renderer for this class cannot render text or concave polygons.
- * Creating instances of this class is drastically more expensive than creating a Frame, but after it's created, it is generally 10x-100x faster than Frame.
+ * Represents a 2D renderer based on the WebGL API.
+ * This renderer cannot render text or concave polygons.
+ * Creating instances of this class is drastically more expensive than creating a CanvasArtist2D, but after it's created, it is generally 10x-100x faster than CanvasArtist2D.
  * Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
+ * This should not be constructed directly, and should instead be used in conjunction with FastFrame.
+ */
+declare class WebGLArtist2D extends Artist2D {
+	
+}
+
+/**
+ * Represents a WebGL-based implementation of Frame.
  */
 declare class FastFrame extends Frame {
-	
+	/**
+	 * The renderer for the frame
+	 */
+	renderer: WebGLArtist2D;
 }
 
 /**

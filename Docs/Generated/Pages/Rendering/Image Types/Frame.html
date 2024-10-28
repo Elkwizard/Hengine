@@ -9,10 +9,11 @@
 				
 			<div class="class-wrapper" id="class Frame">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L260" target="_blank" class="class-name source-link">Frame</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L261" target="_blank" class="class-name source-link">Frame</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
 				</div>
 				<div class="class desc">
 					Represents an offscreen drawing surface that can be rendered as an image.
+It is based on the HTML5 Canvas API.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> frame</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> Frame</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">);
 
 </span><span class="highlight-COMMENT">// add shapes to the frame</span><span class="highlight-SYMBOL">
@@ -33,7 +34,7 @@
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Frame.renderer">
 					<div class="prop-header member">
-						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a></span>
+						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Renderer/Artists/CanvasArtist2D.html#class CanvasArtist2D">CanvasArtist2D</a></span>
 					</div>
 					<div class="prop desc">The renderer local to the frame that can be used to modify its contents</div>
 				</div>
@@ -45,7 +46,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="Frame.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L267" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">pixelRatio?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L268" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">pixelRatio?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new Frame.
@@ -92,7 +93,7 @@
 	
 		<div class="function-wrapper" id="Frame.prototype.stretch()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L281" target="_blank" class="function-name source-link">stretch</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L282" target="_blank" class="function-name source-link">stretch</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the frame stretched to a new set of dimensions.
@@ -129,7 +130,7 @@
 	
 		<div class="function-wrapper" id="Frame.prototype.clip()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L298" target="_blank" class="function-name source-link">clip</a>(<span class="param">region</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L299" target="_blank" class="function-name source-link">clip</a>(<span class="param">region</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
 			</div>
 			<div class="function desc">
 				Returns a frame containing a rectangular region of the caller. 
@@ -199,7 +200,7 @@
 	
 		<div class="function-wrapper" id="Frame.fromImageType()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L326" target="_blank" class="function-name source-link">Frame.fromImageType</a>(<span class="param">image</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">region</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L327" target="_blank" class="function-name source-link">Frame.fromImageType</a>(<span class="param">image</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">region</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
 			</div>
 			<div class="function desc">
 				Returns a frame containing the (optionally clipped) contents of an image.
@@ -307,15 +308,23 @@ The copy will have the same pixel ratio as the original image.
 		
 			<div class="class-wrapper" id="class FastFrame">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\WebGLRenderer.js?#L506" target="_blank" class="class-name source-link">FastFrame</a> <span class="keyword">extends</span> <span class="class-name">Frame</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\WebGLRenderer.js?#L478" target="_blank" class="class-name source-link">FastFrame</a> <span class="keyword">extends</span> <span class="class-name">Frame</span>
 				</div>
 				<div class="class desc">
-					This class has the same behavior as Frame, except that the renderer for this class cannot render text or concave polygons.
-Creating instances of this class is drastically more expensive than creating a Frame, but after it's created, it is generally 10x-100x faster than Frame.
-Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
+					Represents a WebGL-based implementation of Frame.
 				</div>
 				
 				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="FastFrame.renderer">
+					<div class="prop-header member">
+						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Renderer/Artists/WebGLArtist2D.html#class WebGLArtist2D">WebGLArtist2D</a></span>
+					</div>
+					<div class="prop desc">The renderer for the frame</div>
+				</div>
+			</div>
 				
 				
 				

@@ -49,9 +49,9 @@ All properties of this class are read-only.
 			
 				<div class="prop-wrapper" id="PARTICLE_SPAWNER.particleDraw">
 					<div class="prop-header member">
-						<span class="prop-name">particleDraw</span><span class="type">(<a href="../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a>, Particle) =&gt; void</span>
+						<span class="prop-name">particleDraw</span><span class="type">(<a href="../../Pages/Rendering/Renderer/Artists/Artist.html#class Artist">Artist</a>, Particle) =&gt; void</span>
 					</div>
-					<div class="prop desc">The function that is called to render particles each frame. This will be passed an <a href="../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a> and a particle object for each particle object on-screen each frame. Default is a no-op</div>
+					<div class="prop desc">The function that is called to render particles each frame. This will be passed an <a href="../../Pages/Rendering/Renderer/Artists/Artist.html#class Artist">Artist</a> and a particle object for each particle object on-screen each frame. Default is a no-op</div>
 				</div>
 			
 				<div class="prop-wrapper" id="PARTICLE_SPAWNER.slows">
@@ -445,7 +445,7 @@ This function should minimize side effects and, if possible, should be pure.
 						<div class="param-wrapper" id="SpawnerProperties.prototype.draw?():renderer">
 							<div class="param-name">
 								<span class="param">renderer</span>
-								<span class="type"><a href="../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a></span>
+								<span class="type"><a href="../../Pages/Rendering/Renderer/Artists/Artist.html#class Artist">Artist</a></span>
 							</div>
 							<div class="param desc">
 								The renderer to draw the particle to. Its transform will be in world-space, unless the spawner is a <a href="../../Pages/UI/UIObject.html#class UIObject">UIObject</a>

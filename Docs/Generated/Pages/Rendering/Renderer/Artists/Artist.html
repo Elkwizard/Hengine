@@ -1,0 +1,211 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class Artist">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L4" target="_blank" class="class-name source-link">Artist</a>
+				</div>
+				<div class="class desc">
+					Represents a renderer for a graphical surface.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a></span></div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="set Artist.prototype.transform()">
+			<div class="function-header member">
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L41" target="_blank" class="function-name source-link">transform</a>(<span class="param">transform</span>)
+			</div>
+			<div class="function desc">
+				Sets the current coordinate transform of the renderer.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="set Artist.prototype.transform():transform">
+							<div class="param-name">
+								<span class="param">transform</span>
+								<span class="type"><a href="../../../../Pages/Geometry/Matrices.html#class Matrix">Matrix</a></span>
+							</div>
+							<div class="param desc">
+								The new transform
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="get Artist.prototype.transform()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L46" target="_blank" class="function-name source-link">transform</a><span class="type"><a href="../../../../Pages/Geometry/Matrices.html#class Matrix">Matrix</a></span>
+			</div>
+			<div class="function desc">
+				Returns the current coordinate transform of the renderer.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Artist.prototype.clear()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L9" target="_blank" class="function-name source-link">clear</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Clears the rendering surface to transparent black.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Artist.prototype.fill()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L14" target="_blank" class="function-name source-link">fill</a>(<span class="param">color</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Assuming that the current transform is the identity transformation, this fills the surface with a single color. If the color is transparent, it will simply layer on top of the current content.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Artist.prototype.fill():color">
+							<div class="param-name">
+								<span class="param">color</span>
+								<span class="type"><a href="../../../../Pages/Rendering/Color.html#class Color">Color</a></span>
+							</div>
+							<div class="param desc">
+								The color to fill with
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Artist.prototype.addTransform()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L19" target="_blank" class="function-name source-link">addTransform</a>(<span class="param">transform</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Manipulates the current coordinate transform. For an Artist <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span></code> and <a href="../../../../Pages/Geometry/Matrices.html#class Matrix">Matrix</a> <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">m</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addTransform</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">m</span><span class="highlight-SYMBOL">)</span></code> is equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">m</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">times</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL">)</span></code>.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Artist.prototype.addTransform():transform">
+							<div class="param-name">
+								<span class="param">transform</span>
+								<span class="type"><a href="../../../../Pages/Geometry/Matrices.html#class Matrix">Matrix</a></span>
+							</div>
+							<div class="param desc">
+								The coordinate transform to compose with the existing transform
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Artist.prototype.drawThrough()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L25" target="_blank" class="function-name source-link">drawThrough</a>(<span class="param">transform</span>, <span class="param">draw</span>, <span class="param">global?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Calls a function while using a specified coordinate transform
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Artist.prototype.drawThrough():transform">
+							<div class="param-name">
+								<span class="param">transform</span>
+								<span class="type"><a href="../../../../Pages/Geometry/Matrices.html#class Matrix">Matrix</a></span>
+							</div>
+							<div class="param desc">
+								The specific coordinate transform to use
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Artist.prototype.drawThrough():draw">
+							<div class="param-name">
+								<span class="param">draw</span>
+								<span class="type">() =&gt; void</span>
+							</div>
+							<div class="param desc">
+								The function that will be called while using the specified transform
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Artist.prototype.drawThrough():global?">
+							<div class="param-name">
+								<span class="param">global</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the transform should be applied in place of all current transforms (true), or composed with the current transform (false). Default is true.
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Artist.prototype.clearTransformations()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L36" target="_blank" class="function-name source-link">clearTransformations</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Returns the renderer to the identity coordinate transform.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Artist.prototype.save()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L51" target="_blank" class="function-name source-link">save</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Pushes the current rendering state onto the state stack.
+This state includes <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">alpha</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span></code>,
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Artist.prototype.restore()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L55" target="_blank" class="function-name source-link">restore</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Puts the renderer into the state on top of the state stack, then removes it from the stack.
+			</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

@@ -907,7 +907,6 @@ HengineLoader.engineResources = [
 		"Render/Graph.js",
 		"Render/Texture.js",
 		"Render/VideoView.js",
-		"Render/WebGLRenderer.js",
 		"Render/Renderer.js",
 		"Render/GPUShader.js",
 		"Render/StaticImage.js",
@@ -915,7 +914,8 @@ HengineLoader.engineResources = [
 	],
 	[ // high level dependencies
 		"Render/Color.js",
-		"SceneObject/UIObject.js"
+		"SceneObject/UIObject.js",
+		"Render/WebGLRenderer.js",
 	]
 ];
 

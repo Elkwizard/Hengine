@@ -66,7 +66,7 @@ class Camera {
 class Camera2D extends Matrix3 {
 	/**
 	 * Creates a new camera pointing to the middle of the provided renderer.
-	 * @param Artist renderer | The renderer to target
+	 * @param Artist2D renderer | The renderer to target
 	 */
 	constructor(renderer) {
 		super();
@@ -268,6 +268,12 @@ class Camera3D extends Matrix4 {
 
 		new Matrix4(rotate).times(trans, this);
 	}
+	/**
+	 * Points the camera in a specific direction, with a specified angle from +z on the horizontal and vertical axes.
+	 * The vertical input is clamped to avoid gimbal lock.
+	 * @param Number xAngle | The angle in radians about the y axis from +z to the camera direction
+	 * @param Number yAngle | The angle in radians about the x axis from +z to the camera direction
+	 */
 	look(xAngle, yAngle) {
 		const limit = Math.PI / 2 - MathObject.EPSILON;
 		yAngle = Number.clamp(yAngle, -limit, limit);

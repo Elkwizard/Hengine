@@ -9,10 +9,10 @@
 				
 			<div class="class-wrapper" id="class DrawRenderer">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1284" target="_blank" class="class-name source-link">DrawRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1125" target="_blank" class="class-name source-link">DrawRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
 				</div>
 				<div class="class desc">
-					Represents the draw API of an <a href="../../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a>.
+					Represents the draw API of an <a href="../../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a>.
 This fills various paths.
 				</div>
 				
@@ -24,10 +24,10 @@ This fills various paths.
 		
 			<div class="class-wrapper" id="class StrokeRenderer">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1290" target="_blank" class="class-name source-link">StrokeRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1131" target="_blank" class="class-name source-link">StrokeRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
 				</div>
 				<div class="class desc">
-					Represents the stroke API of an <a href="../../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a>.
+					Represents the stroke API of an <a href="../../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a>.
 This outlines various paths.
 				</div>
 				
@@ -39,7 +39,7 @@ This outlines various paths.
 					<div class="class-methods">
 		<div class="function-wrapper" id="StrokeRenderer.prototype.connector()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1296" target="_blank" class="function-name source-link">connector</a>(<span class="param">points</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1137" target="_blank" class="function-name source-link">connector</a>(<span class="param">points</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders a series of connected line segments.
@@ -66,7 +66,7 @@ This outlines various paths.
 	
 		<div class="function-wrapper" id="StrokeRenderer.prototype.spline/splineArrow()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1302" target="_blank" class="function-name source-link">spline/splineArrow</a>(<span class="param">spline</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1143" target="_blank" class="function-name source-link">spline/splineArrow</a>(<span class="param">spline</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders a quartic spline. For <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">splineArrow</span><span class="highlight-SYMBOL">()</span></code>, there is also an arrow-head at the end.
@@ -93,7 +93,7 @@ This outlines various paths.
 	
 		<div class="function-wrapper" id="StrokeRenderer.prototype.line/arrow()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1317" target="_blank" class="function-name source-link">line/arrow</a>(<span class="param">line</span><span class="aux"> | </span><span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1158" target="_blank" class="function-name source-link">line/arrow</a>(<span class="param">line</span><span class="aux"> | </span><span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders a line segment. For <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">arrow</span><span class="highlight-SYMBOL">()</span></code>, there is also an arrow-head at the end.
@@ -186,7 +186,7 @@ This outlines various paths.
 	
 		<div class="function-wrapper" id="StrokeRenderer.prototype.measure()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1338" target="_blank" class="function-name source-link">measure</a>(<span class="param">font</span>, <span class="param">text</span>, <span class="param">line</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1179" target="_blank" class="function-name source-link">measure</a>(<span class="param">font</span>, <span class="param">text</span>, <span class="param">line</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders a line segment with a line of text displayed in its center.
@@ -339,7 +339,7 @@ This outlines various paths.
 	
 		<div class="function-wrapper" id="StrokeRenderer.prototype.arcArrow()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1356" target="_blank" class="function-name source-link">arcArrow</a>(<span class="param">center</span>, <span class="param">radius</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">radius</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1197" target="_blank" class="function-name source-link">arcArrow</a>(<span class="param">center</span>, <span class="param">radius</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">radius</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders an arrow-head at the end of an arc on a circle.
@@ -472,10 +472,10 @@ This outlines various paths.
 		
 			<div class="class-wrapper" id="class ClipRenderer">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1404" target="_blank" class="class-name source-link">ClipRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1245" target="_blank" class="class-name source-link">ClipRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
 				</div>
 				<div class="class desc">
-					Represents the clipping API of an <a href="../../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a>.
+					Represents the clipping API of an <a href="../../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a>.
 This adds various shapes to the current clipping mask.
 Each path created will be added to the current clipping state, which means that future draw calls will be able to modify the pixels outside the current clipped area.
 				</div>
@@ -488,10 +488,10 @@ Each path created will be added to the current clipping state, which means that 
 		
 			<div class="class-wrapper" id="class ImageRenderer">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1363" target="_blank" class="class-name source-link">ImageRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1204" target="_blank" class="class-name source-link">ImageRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
 				</div>
 				<div class="class desc">
-					Represents the image drawing API of an <a href="../../../Pages/Rendering/Renderer/Artist.html#class Artist">Artist</a>.
+					Represents the image drawing API of an <a href="../../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a>.
 This draws images in various paths. 
 For non-rectangular shapes, the image is scaled to be the size of the shape's bounding box, and then only the portion of the image inside the shape is shown.
 				</div>
@@ -504,7 +504,7 @@ For non-rectangular shapes, the image is scaled to be the size of the shape's bo
 					<div class="class-methods">
 		<div class="function-wrapper" id="ImageRenderer.prototype.default()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1373" target="_blank" class="function-name source-link">default</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1214" target="_blank" class="function-name source-link">default</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders an image at its natural dimensions.
@@ -554,7 +554,7 @@ For non-rectangular shapes, the image is scaled to be the size of the shape's bo
 	
 		<div class="function-wrapper" id="ImageRenderer.prototype.inferWidth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1385" target="_blank" class="function-name source-link">inferWidth</a>(<span class="param">point</span>, <span class="param">height</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">height</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1226" target="_blank" class="function-name source-link">inferWidth</a>(<span class="param">point</span>, <span class="param">height</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">height</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders an image with a specified height, while still maintaining its natural aspect ratio.
@@ -624,7 +624,7 @@ For non-rectangular shapes, the image is scaled to be the size of the shape's bo
 	
 		<div class="function-wrapper" id="ImageRenderer.prototype.inferHeight()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1397" target="_blank" class="function-name source-link">inferHeight</a>(<span class="param">point</span>, <span class="param">width</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1238" target="_blank" class="function-name source-link">inferHeight</a>(<span class="param">point</span>, <span class="param">width</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders an image with a specified width, while still maintaining its natural aspect ratio.
