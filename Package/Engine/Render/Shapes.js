@@ -136,7 +136,7 @@ class Range {
 
 /**
  * @implements Copyable
- * Represents a 2D Shape.
+ * Represents a 2D shape.
  * @abstract
  * @readonly
  * @prop Number area | The area of the shape at the time of construction
@@ -150,7 +150,7 @@ class Shape {
 		return new Vector2(0, 0);
 	}
 	/**
-	 * Returns a copy of the shape centered at a specified location
+	 * Returns a copy of the shape centered at a specified location.
 	 * @param Vector2 newCenter | The location of the new center 
 	 * @return Shape
 	 */
@@ -657,11 +657,11 @@ class Rect extends Polygon {
 	 * @return Rect
 	 */
 	largestWithin(width, height) {
-		let m = height / width;
+		const m = height / width;
 
 		let w, h;
 
-		if (m * this.width / 2 < this.height / 2) {
+		if (m < this.height / this.width) {
 			w = this.width;
 			h = m * this.width;
 		} else {
@@ -669,7 +669,11 @@ class Rect extends Polygon {
 			w = this.height / m;
 		}
 
-		return new Rect(this.width / 2 - w / 2 + this.x, this.height / 2 - h / 2 + this.y, w, h);
+		return new Rect(
+			this.width / 2 - w / 2 + this.x,
+			this.height / 2 - h / 2 + this.y,
+			w, h
+		);
 	}
 	pack(rects) {
 		rects.sort((a, b) => b.height - a.height);

@@ -5031,7 +5031,7 @@ declare class Range {
 }
 
 /**
- * Represents a 2D Shape.
+ * Represents a 2D shape.
  * This is an abstract superclass and should not be constructed.
  * All properties of this class are read-only.
  */
@@ -5045,7 +5045,7 @@ declare class Shape implements Copyable {
 	 */
 	middle: Vector2;
 	/**
-	 * Returns a copy of the shape centered at a specified location
+	 * Returns a copy of the shape centered at a specified location.
 	 * @param newCenter - The location of the new center
 	 */
 	center(newCenter: Vector2): this;
