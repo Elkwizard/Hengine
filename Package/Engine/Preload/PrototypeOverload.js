@@ -524,7 +524,7 @@ Object.defineProperty(window, "title", {
 			get: () => proxy,
 			set: value => {
 				setLength(value.length);
-				for (let i = 0; i < value; i++)
+				for (let i = 0; i < value.length; i++)
 					proxy[i] = value[i];
 			}
 		});
