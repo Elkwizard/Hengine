@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class Shape">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L144" target="_blank" class="class-name source-link">Shape</a> <span class="keyword">implements</span> <span class="class-name"><a href="../../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L145" target="_blank" class="class-name source-link">Shape</a> <span class="keyword">implements</span> <span class="class-name"><a href="../../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
 				</div>
 				<div class="class desc">
 					Represents a 2D Shape.
@@ -28,7 +28,14 @@ All properties of this class are read-only.
 					<div class="prop-header member">
 						<span class="prop-name">area</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
-					<div class="prop desc">The area of the shape at the time of construction. This variable is read-only</div>
+					<div class="prop desc">The area of the shape at the time of construction</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Shape.middle">
+					<div class="prop-header member">
+						<span class="prop-name">middle</span><span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The geometric center of the shape</div>
 				</div>
 			</div>
 				
@@ -36,19 +43,9 @@ All properties of this class are read-only.
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="get Shape.prototype.middle()">
-			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L152" target="_blank" class="function-name source-link">middle</a><span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			</div>
-			<div class="function desc">
-				Returns the geometric center of the shape
-			</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="Shape.prototype.center()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L160" target="_blank" class="function-name source-link">center</a>(<span class="param">newCenter</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L157" target="_blank" class="function-name source-link">center</a>(<span class="param">newCenter</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape centered at a specified location
@@ -75,7 +72,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.getModel()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L168" target="_blank" class="function-name source-link">getModel</a>(<span class="param">transform</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L165" target="_blank" class="function-name source-link">getModel</a>(<span class="param">transform</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape after a certain transformation is applied to all its points.
@@ -102,7 +99,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.scale()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L174" target="_blank" class="function-name source-link">scale</a>(<span class="param">factor</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L171" target="_blank" class="function-name source-link">scale</a>(<span class="param">factor</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape uniformly scaled about its center.
@@ -129,7 +126,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.scaleX()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L182" target="_blank" class="function-name source-link">scaleX</a>(<span class="param">factor</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L179" target="_blank" class="function-name source-link">scaleX</a>(<span class="param">factor</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape scaled about its center along the x axis.
@@ -156,7 +153,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.scaleY()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L190" target="_blank" class="function-name source-link">scaleY</a>(<span class="param">factor</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L187" target="_blank" class="function-name source-link">scaleY</a>(<span class="param">factor</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape scaled about its center along the y axis.
@@ -183,7 +180,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.scaleAbout()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L199" target="_blank" class="function-name source-link">scaleAbout</a>(<span class="param">position</span>, <span class="param">factor</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L196" target="_blank" class="function-name source-link">scaleAbout</a>(<span class="param">position</span>, <span class="param">factor</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape uniformly scaled about a specified point.
@@ -220,7 +217,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.scaleXAbout()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L206" target="_blank" class="function-name source-link">scaleXAbout</a>(<span class="param">position</span>, <span class="param">factor</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L203" target="_blank" class="function-name source-link">scaleXAbout</a>(<span class="param">position</span>, <span class="param">factor</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape scaled about a specified point along the x axis.
@@ -257,7 +254,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.scaleYAbout()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L213" target="_blank" class="function-name source-link">scaleYAbout</a>(<span class="param">position</span>, <span class="param">factor</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L210" target="_blank" class="function-name source-link">scaleYAbout</a>(<span class="param">position</span>, <span class="param">factor</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape scaled about a specified point along the y axis.
@@ -294,7 +291,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.move()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L219" target="_blank" class="function-name source-link">move</a>(<span class="param">displacement</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L216" target="_blank" class="function-name source-link">move</a>(<span class="param">displacement</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape translated by a specified amount.
@@ -321,7 +318,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.getBoundingBox()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L224" target="_blank" class="function-name source-link">getBoundingBox</a>()<span class="type"><a href="../../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L221" target="_blank" class="function-name source-link">getBoundingBox</a>()<span class="type"><a href="../../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
 			</div>
 			<div class="function desc">
 				Returns the smallest axis-aligned <a href="../../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a> that contains the entire shape.
@@ -331,7 +328,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.equals()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L230" target="_blank" class="function-name source-link">equals</a>(<span class="param">other</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L227" target="_blank" class="function-name source-link">equals</a>(<span class="param">other</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks if two shapes are congruent.
@@ -358,7 +355,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.intersect()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L237" target="_blank" class="function-name source-link">intersect</a>(<span class="param">shape</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L234" target="_blank" class="function-name source-link">intersect</a>(<span class="param">shape</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks if two shapes intersect.
@@ -385,7 +382,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.closestPointTo()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L247" target="_blank" class="function-name source-link">closestPointTo</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L244" target="_blank" class="function-name source-link">closestPointTo</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Returns the closest point on the shape's boundary to a specified other point.
@@ -412,7 +409,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.distanceTo()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L253" target="_blank" class="function-name source-link">distanceTo</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L250" target="_blank" class="function-name source-link">distanceTo</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the distance from a specified point to the boundary of the shape.
@@ -439,7 +436,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.containsPoint()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L261" target="_blank" class="function-name source-link">containsPoint</a>(<span class="param">point</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L258" target="_blank" class="function-name source-link">containsPoint</a>(<span class="param">point</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks if a point is inside the shape, including points on the boundary.

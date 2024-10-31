@@ -39,6 +39,27 @@
 					</div>
 					<div class="prop desc">A vector from the start point of the line segment to the end point</div>
 				</div>
+			
+				<div class="prop-wrapper" id="Line.length">
+					<div class="prop-header member">
+						<span class="prop-name">length</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">THe length of the line segment</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Line.slope">
+					<div class="prop-header member">
+						<span class="prop-name">slope</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The slope of the line segment. If the line segment is vertical, this is infinite</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Line.intercept">
+					<div class="prop-header member">
+						<span class="prop-name">intercept</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The y-intercept of the line segment if it were extended into a line</div>
+				</div>
 			</div>
 				
 				
@@ -125,49 +146,9 @@
 			
 		</div>
 	
-		<div class="function-wrapper" id="get Line.prototype.length()">
-			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L301" target="_blank" class="function-name source-link">length</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-			</div>
-			<div class="function desc">
-				Returns the length of the line segment.
-			</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="get Line.prototype.middle()">
-			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L308" target="_blank" class="function-name source-link">middle</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-			</div>
-			<div class="function desc">
-				Returns the midpoint of the line segment.
-			</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="get Line.prototype.slope()">
-			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L321" target="_blank" class="function-name source-link">slope</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-			</div>
-			<div class="function desc">
-				Returns the slope of the line segment. If the line segment is vertical, this is Infinity.
-			</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="get Line.prototype.intercept()">
-			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L329" target="_blank" class="function-name source-link">intercept</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-			</div>
-			<div class="function desc">
-				Returns the y-intercept of the line segment. This is calculated as if it were a line, rather than a line segment.
-			</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="Line.prototype.evaluate()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L337" target="_blank" class="function-name source-link">evaluate</a>(<span class="param">x</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L318" target="_blank" class="function-name source-link">evaluate</a>(<span class="param">x</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Computes the y coordinate on the line for a given x coordinate. This is calculated as if it were a line, rather than a line segment.
@@ -194,7 +175,7 @@
 	
 		<div class="function-wrapper" id="Line.fromSlopeIntercept()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L425" target="_blank" class="function-name source-link">Line.fromSlopeIntercept</a>(<span class="param">m</span>, <span class="param">b</span>)<span class="type">Line</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L406" target="_blank" class="function-name source-link">Line.fromSlopeIntercept</a>(<span class="param">m</span>, <span class="param">b</span>)<span class="type">Line</span>
 			</div>
 			<div class="function desc">
 				Creates a new line segment with a specified slope and intercept.

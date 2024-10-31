@@ -139,16 +139,13 @@ class Range {
  * Represents a 2D Shape.
  * @abstract
  * @readonly
- * @prop Number area | The area of the shape at the time of construction. This variable is read-only
+ * @prop Number area | The area of the shape at the time of construction
+ * @prop Vector2 middle | The geometric center of the shape
  */
 class Shape {
 	constructor() {
 		this.area = 0;
 	}
-	/**
-	 * Returns the geometric center of the shape
-	 * @return Vector2
-	 */
 	get middle() {
 		return new Vector2(0, 0);
 	}
@@ -270,6 +267,9 @@ class Shape {
  * @prop Vector2 a | The start point of the line segment
  * @prop Vector2 b | The end point of the line segment
  * @prop Vector2 vector | A vector from the start point of the line segment to the end point
+ * @prop Number length | THe length of the line segment
+ * @prop Number slope | The slope of the line segment. If the line segment is vertical, this is infinite
+ * @prop Number intercept | The y-intercept of the line segment if it were extended into a line
  */
 class Line extends Shape {
 	/**
@@ -294,38 +294,19 @@ class Line extends Shape {
 		}
 		this.area = 0;
 	}
-	/**
-	 * Returns the length of the line segment.
-	 * @return Number
-	 */
 	get length() {
 		return Vector2.dist(this.a, this.b);
 	}
-	/**
-	 * Returns the midpoint of the line segment.
-	 * @return Number
-	 */
 	get middle() {
 		return this.a.Vplus(this.b).Nmul(0.5);
-	}
-	set vector(v) {
-		this.b = this.a.Vplus(v.normalized.Nmul(this.length));
 	}
 	get vector() {
 		return this.b.Vminus(this.a).normalize();
 	}
-	/**
-	 * Returns the slope of the line segment. If the line segment is vertical, this is Infinity.
-	 * @return Number
-	 */
 	get slope() {
 		const { a, b } = this;
 		return (b.y - a.y) / (b.x - a.x);
 	}
-	/**
-	 * Returns the y-intercept of the line segment. This is calculated as if it were a line, rather than a line segment.
-	 * @return Number
-	 */
 	get intercept() {
 		return this.a.y - this.a.x * this.slope;
 	}
@@ -612,18 +593,22 @@ class Polygon extends Shape {
 
 /**
  * Represents an axis-aligned rectangle.
- * @prop Number x | The x coordinate of the upper-left corner of the rectangle.
- * @prop Number y | The y coordinate of the upper-left corner of the rectangle.
- * @prop Number width | The width of the rectangle.
- * @prop Number height | The height of the rectangle.
+ * @prop Number x | The x coordinate of the upper-left corner of the rectangle
+ * @prop Number y | The y coordinate of the upper-left corner of the rectangle
+ * @prop Number width | The width of the rectangle
+ * @prop Number height | The height of the rectangle
+ * @prop Vector2 min | The upper-left corner of the rectangle
+ * @prop Vector2 max | The lower-right corner of the rectangle
+ * @prop Range xRange | The horizontal interval that contains the rectangle
+ * @prop Range yRange | The vertical interval that contains the rectangle
  */
 class Rect extends Polygon {
 	/**
 	 * Creates a new Rect. The width and height can be negative and will extend the rectangle to the left and top respectively.
-	 * @param Number x | The x coordinate of the upper-left corner of the rectangle.
-	 * @param Number y | The y coordinate of the upper-left corner of the rectangle.
-	 * @param Number width | The width of the rectangle.
-	 * @param Number height | The height of the rectangle.
+	 * @param Number x | The x coordinate of the upper-left corner of the rectangle
+	 * @param Number y | The y coordinate of the upper-left corner of the rectangle
+	 * @param Number width | The width of the rectangle
+	 * @param Number height | The height of the rectangle
 	 */
 	constructor(x, y, width, height) {
 		super([]);
@@ -641,41 +626,21 @@ class Rect extends Polygon {
 		this.height = height;
 		this.area = this.width * this.height;
 	}
-	/**
-	 * Returns the upper-left corner of the rectangle. Modifying this point will not change the rectangle.
-	 * @return Vector2
-	 */
 	get min() {
 		return new Vector2(this.x, this.y);
 	}
-	/**
-	 * Returns the lower-right corner of the rectangle. Modifying this point will not change the rectangle.
-	 * @return Vector2
-	 */
 	get max() {
 		return new Vector2(this.x + this.width, this.y + this.height);
 	}
-	/**
-	 * Returns the horizontal interval that contains all the rectangle's points. Modifying this Range will not change the rectangle.
-	 * @return Range
-	 */
 	get xRange() {
 		return new Range(this.x, this.x + this.width);
 	}
-	/**
-	 * Returns the vertical interval that contains all the rectangle's points. Modifying this Range will not change the rectangle.
-	 * @return Range
-	 */
 	get yRange() {
 		return new Range(this.y, this.y + this.height);
 	}
 	get middle() {
 		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
 	}
-	/**
-	 * Returns the vertices of the rectangle. Modifying elements of the return value will not change the rectangle.
-	 * @return Vector2[] 
-	 */
 	get vertices() {
 		return [
 			new Vector2(this.x, this.y),

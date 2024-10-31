@@ -5037,13 +5037,13 @@ declare class Range {
  */
 declare class Shape implements Copyable {
 	/**
-	 * The area of the shape at the time of construction. This variable is read-only
+	 * The area of the shape at the time of construction
 	 */
 	area: number;
 	/**
-	 * Returns the geometric center of the shape
+	 * The geometric center of the shape
 	 */
-	get middle(): Vector2;
+	middle: Vector2;
 	/**
 	 * Returns a copy of the shape centered at a specified location
 	 * @param newCenter - The location of the new center
@@ -5145,6 +5145,18 @@ declare class Line extends Shape {
 	 */
 	vector: Vector2;
 	/**
+	 * THe length of the line segment
+	 */
+	length: number;
+	/**
+	 * The slope of the line segment. If the line segment is vertical, this is infinite
+	 */
+	slope: number;
+	/**
+	 * The y-intercept of the line segment if it were extended into a line
+	 */
+	intercept: number;
+	/**
 	 * Creates a new Line.
 	 * @param x - The x coordinate of the start point of the line segment
 	 * @param y - The y coordinate of the start point of the line segment
@@ -5158,22 +5170,6 @@ declare class Line extends Shape {
 	 * @param end - The end point of the line segment
 	 */
 	constructor(start: Vector2, end: Vector2);
-	/**
-	 * Returns the length of the line segment.
-	 */
-	get length(): number;
-	/**
-	 * Returns the midpoint of the line segment.
-	 */
-	get middle(): number;
-	/**
-	 * Returns the slope of the line segment. If the line segment is vertical, this is Infinity.
-	 */
-	get slope(): number;
-	/**
-	 * Returns the y-intercept of the line segment. This is calculated as if it were a line, rather than a line segment.
-	 */
-	get intercept(): number;
 	/**
 	 * Computes the y coordinate on the line for a given x coordinate. This is calculated as if it were a line, rather than a line segment.
 	 * @param x - The x coordinate to calculate the y at.
@@ -5229,49 +5225,45 @@ declare class Polygon extends Shape {
  */
 declare class Rect extends Polygon {
 	/**
-	 * The x coordinate of the upper-left corner of the rectangle.
+	 * The x coordinate of the upper-left corner of the rectangle
 	 */
 	x: number;
 	/**
-	 * The y coordinate of the upper-left corner of the rectangle.
+	 * The y coordinate of the upper-left corner of the rectangle
 	 */
 	y: number;
 	/**
-	 * The width of the rectangle.
+	 * The width of the rectangle
 	 */
 	width: number;
 	/**
-	 * The height of the rectangle.
+	 * The height of the rectangle
 	 */
 	height: number;
 	/**
+	 * The upper-left corner of the rectangle
+	 */
+	min: Vector2;
+	/**
+	 * The lower-right corner of the rectangle
+	 */
+	max: Vector2;
+	/**
+	 * The horizontal interval that contains the rectangle
+	 */
+	xRange: Range;
+	/**
+	 * The vertical interval that contains the rectangle
+	 */
+	yRange: Range;
+	/**
 	 * Creates a new Rect. The width and height can be negative and will extend the rectangle to the left and top respectively.
-	 * @param x - The x coordinate of the upper-left corner of the rectangle.
-	 * @param y - The y coordinate of the upper-left corner of the rectangle.
-	 * @param width - The width of the rectangle.
-	 * @param height - The height of the rectangle.
+	 * @param x - The x coordinate of the upper-left corner of the rectangle
+	 * @param y - The y coordinate of the upper-left corner of the rectangle
+	 * @param width - The width of the rectangle
+	 * @param height - The height of the rectangle
 	 */
 	constructor(x: number, y: number, width: number, height: number);
-	/**
-	 * Returns the upper-left corner of the rectangle. Modifying this point will not change the rectangle.
-	 */
-	get min(): Vector2;
-	/**
-	 * Returns the lower-right corner of the rectangle. Modifying this point will not change the rectangle.
-	 */
-	get max(): Vector2;
-	/**
-	 * Returns the horizontal interval that contains all the rectangle's points. Modifying this Range will not change the rectangle.
-	 */
-	get xRange(): Range;
-	/**
-	 * Returns the vertical interval that contains all the rectangle's points. Modifying this Range will not change the rectangle.
-	 */
-	get yRange(): Range;
-	/**
-	 * Returns the vertices of the rectangle. Modifying elements of the return value will not change the rectangle.
-	 */
-	get vertices(): Vector2[];
 	/**
 	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller. 
 	 * @param width - The width of the hypothetical rectangle from which to determine the aspect ratio
