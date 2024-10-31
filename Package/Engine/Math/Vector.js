@@ -55,6 +55,15 @@ class Vector extends Operable {
 		return result;
 	}
 	/**
+	 * Computes the reflection of the caller off a provided normal vector.
+	 * Doesn't mutate the caller.
+	 * @param Vector normal | The normal vector to reflect off of
+	 * @return Vector
+	 */
+	reflect(normal) {
+		return this.minus(normal.times(2 * this.dot(normal) / normal.sqrMag));
+	}
+	/**
 	 * Computes the projection of the caller onto another vector.
 	 * Doesn't mutate the caller.
 	 * @param Vector other | The vector to project the caller onto

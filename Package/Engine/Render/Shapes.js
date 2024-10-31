@@ -138,6 +138,7 @@ class Range {
  * @implements Copyable
  * Represents a 2D Shape.
  * @abstract
+ * @readonly
  * @prop Number area | The area of the shape at the time of construction. This variable is read-only
  */
 class Shape {

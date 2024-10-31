@@ -1983,6 +1983,12 @@ declare class Vector extends Operable {
 	 */
 	dot(other: this): number;
 	/**
+	 * Computes the reflection of the caller off a provided normal vector.
+	 * Doesn't mutate the caller.
+	 * @param normal - The normal vector to reflect off of
+	 */
+	reflect(normal: this): this;
+	/**
 	 * Computes the projection of the caller onto another vector.
 	 * Doesn't mutate the caller.
 	 * @param other - The vector to project the caller onto
@@ -4351,6 +4357,7 @@ declare class GrayMap implements Serializable {
 
 /**
  * Represents a renderer for a graphical surface.
+ * This is an abstract superclass and should not be constructed.
  */
 declare class Artist {
 	/**
@@ -4401,6 +4408,7 @@ declare class Artist {
 /**
  * Represents a 2D renderer for a graphical surface.
  * All transformation-related matrices for this renderer are of type Matrix3.
+ * This is an abstract superclass and should not be constructed.
  * ```js
  * renderer.draw(new Color("blue")).shape(Polygon.regular(5, 100).move(middle));
  * renderer.stroke(new Color("red"), 20, LineCap.SQUARE, LineJoin.ROUND).connector([
@@ -5025,6 +5033,7 @@ declare class Range {
 /**
  * Represents a 2D Shape.
  * This is an abstract superclass and should not be constructed.
+ * All properties of this class are read-only.
  */
 declare class Shape implements Copyable {
 	/**

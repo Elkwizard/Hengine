@@ -1,5 +1,6 @@
 /**
  * Represents a renderer for a graphical surface.
+ * @abstract
  */
 class Artist {
 	/**
@@ -57,6 +58,7 @@ class Artist {
 /**
  * Represents a 2D renderer for a graphical surface.
  * All transformation-related matrices for this renderer are of type Matrix3.
+ * @abstract
  * ```js
  * renderer.draw(new Color("blue")).shape(Polygon.regular(5, 100).move(middle));
  * renderer.stroke(new Color("red"), 20, LineCap.SQUARE, LineJoin.ROUND).connector([

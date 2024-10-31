@@ -9,11 +9,12 @@
 				
 			<div class="class-wrapper" id="class Artist2D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L79" target="_blank" class="class-name source-link">Artist2D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../../Pages/Rendering/Renderer/Artists/Artist.html#class Artist">Artist</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L81" target="_blank" class="class-name source-link">Artist2D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../../Pages/Rendering/Renderer/Artists/Artist.html#class Artist">Artist</a></span>
 				</div>
 				<div class="class desc">
 					Represents a 2D renderer for a graphical surface.
 All transformation-related matrices for this renderer are of type <a href="../../../../Pages/Geometry/Matrices.html#class Matrix3">Matrix3</a>.
+This is an abstract superclass and should not be constructed.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;blue&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">shape</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../../../Pages/Geometry/Shapes/Polygon.html#class Polygon">Polygon</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">regular</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">5</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">move</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">middle</span><span class="highlight-SYMBOL">));
 </span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">stroke</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 20</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER"><a href="../../../../Pages/Rendering/Renderer/Configuration.html#enum LineCap">LineCap</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">SQUARE</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER"><a href="../../../../Pages/Rendering/Renderer/Configuration.html#enum LineJoin">LineJoin</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">ROUND</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">connector</span><span class="highlight-SYMBOL">([
 </span><span class="highlight-KEYWORD">	new</span><span class="highlight-CLASS"> <a href="../../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">),
@@ -77,7 +78,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 					<div class="class-methods">
 		<div class="function-wrapper" id="Artist2D.prototype.draw()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L86" target="_blank" class="function-name source-link">draw</a>(<span class="param">color</span>)<span class="type"><a href="../../../../Pages/Rendering/Renderer/Renderers.html#class DrawRenderer">DrawRenderer</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L88" target="_blank" class="function-name source-link">draw</a>(<span class="param">color</span>)<span class="type"><a href="../../../../Pages/Rendering/Renderer/Renderers.html#class DrawRenderer">DrawRenderer</a></span>
 			</div>
 			<div class="function desc">
 				Returns a drawing API that uses a specified color.
@@ -104,7 +105,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 	
 		<div class="function-wrapper" id="Artist2D.prototype.stroke()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L95" target="_blank" class="function-name source-link">stroke</a>(<span class="param">color</span>, <span class="param">lineWidth?</span>, <span class="param">lineCap?</span>, <span class="param">lineJoin?</span>)<span class="type"><a href="../../../../Pages/Rendering/Renderer/Renderers.html#class StrokeRenderer">StrokeRenderer</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L97" target="_blank" class="function-name source-link">stroke</a>(<span class="param">color</span>, <span class="param">lineWidth?</span>, <span class="param">lineCap?</span>, <span class="param">lineJoin?</span>)<span class="type"><a href="../../../../Pages/Rendering/Renderer/Renderers.html#class StrokeRenderer">StrokeRenderer</a></span>
 			</div>
 			<div class="function desc">
 				Returns a stroke API that uses specific settings.
@@ -161,7 +162,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 	
 		<div class="function-wrapper" id="Artist2D.prototype.image()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L101" target="_blank" class="function-name source-link">image</a>(<span class="param">image</span>)<span class="type"><a href="../../../../Pages/Rendering/Renderer/Renderers.html#class ImageRenderer">ImageRenderer</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L103" target="_blank" class="function-name source-link">image</a>(<span class="param">image</span>)<span class="type"><a href="../../../../Pages/Rendering/Renderer/Renderers.html#class ImageRenderer">ImageRenderer</a></span>
 			</div>
 			<div class="function desc">
 				Returns an image rendering API that uses a specified image.
@@ -188,7 +189,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 	
 		<div class="function-wrapper" id="Artist2D.prototype.invertX()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L104" target="_blank" class="function-name source-link">invertX</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L106" target="_blank" class="function-name source-link">invertX</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				In a transform with no translation, rotation, or scaling, this flips the x axis about the middle of the screen.
@@ -198,7 +199,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 	
 		<div class="function-wrapper" id="Artist2D.prototype.invertY()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L111" target="_blank" class="function-name source-link">invertY</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L113" target="_blank" class="function-name source-link">invertY</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				In a transform with no translation rotation, or scaling, this flips the y axis about the middle of the screen.
@@ -208,7 +209,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 	
 		<div class="function-wrapper" id="Artist2D.prototype.translate()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L124" target="_blank" class="function-name source-link">translate</a>(<span class="param">displacement</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L126" target="_blank" class="function-name source-link">translate</a>(<span class="param">displacement</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Changes the coordinate transform by displacing it.
@@ -258,7 +259,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 	
 		<div class="function-wrapper" id="Artist2D.prototype.scale()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L135" target="_blank" class="function-name source-link">scale</a>(<span class="param">factors</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span><span class="aux"> | </span><span class="param">factor</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L137" target="_blank" class="function-name source-link">scale</a>(<span class="param">factors</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span><span class="aux"> | </span><span class="param">factor</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Changes the coordinate transform by scaling it.
@@ -321,7 +322,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 	
 		<div class="function-wrapper" id="Artist2D.prototype.rotate()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L140" target="_blank" class="function-name source-link">rotate</a>(<span class="param">angle</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L142" target="_blank" class="function-name source-link">rotate</a>(<span class="param">angle</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Changes the coordinate transform by rotating it clockwise by a specified angle.
@@ -348,7 +349,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 	
 		<div class="function-wrapper" id="Artist2D.prototype.rotateAround()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L150" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">angle</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">angle</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L152" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">angle</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">angle</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Changes the coordinate transform by rotating it clockwise about a specified point.
