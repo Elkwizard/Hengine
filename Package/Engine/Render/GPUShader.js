@@ -74,9 +74,9 @@ GPUShader.Interface = class GPUShaderInterface extends GPUInterface {
 		return `
 			in highp vec2 vertexPosition;
 
-			uniform highp vec2 _halfResolution;
+			uniform vec2 _halfResolution;
 
-			out highp vec2 position;
+			out vec2 position;
 
 			void main() {
 				gl_Position = vec4(vertexPosition, 0.0, 1.0);
@@ -86,18 +86,14 @@ GPUShader.Interface = class GPUShaderInterface extends GPUInterface {
 	}
 	get prefix() {
 		return `
-			precision highp float;
-			precision highp int;
-			precision highp sampler2D;
-
 			uniform vec2 resolution;
 
 			in vec2 position;
 		`;	
 	}
-	get fragmentShader() {
+	get suffix() {
 		return `
-			out highp vec4 pixelColor;
+			out vec4 pixelColor;
 
 			void main() {
 				pixelColor = shader();

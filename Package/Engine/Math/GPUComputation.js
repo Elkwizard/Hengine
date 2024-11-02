@@ -46,9 +46,6 @@ class GPUComputation extends GPUInterface {
 		if (this.gl instanceof WebGLRenderingContext)
 			throw new Error("Your browser doesn't support WebGL2");
 	}
-	get prefixLength() {
-		return 0;
-	}
 	get vertexShader() {
 		return `
 			in highp vec2 uv;
@@ -60,17 +57,13 @@ class GPUComputation extends GPUInterface {
 	}
 	get prefix() {
 		return `
-			precision highp float;
-			precision highp int;
-			precision highp sampler2D;
-
 			uniform int problems;
 			uniform int _width;
 
 			int problemIndex;
 		`;
 	}
-	get fragmentShader() {
+	get suffix() {
 		const { SIZE, VECTORS } = GLSL;
 		const { PIXEL_BYTES, CHANNEL_BYTES, LITTLE_ENDIAN } = GPUDataTexture;
 		const pixels = Math.ceil(this.struct.size / PIXEL_BYTES);
@@ -135,9 +128,8 @@ class GPUComputation extends GPUInterface {
 		`;
 	}
 	setup() {
-		this.struct = this.parsedGLSL.structs.get(
-			this.parsedGLSL.methods.get("compute").signature.type
-		);
+		const parsed = this.parsedGLSL;
+		this.struct = parsed.structs.get(parsed.methods.get("compute").signature.type);
 		this.output = new GPUArray(this.struct);
 		super.setup();
 	}

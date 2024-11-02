@@ -323,8 +323,8 @@ class GLSLError extends Error {
 	toString() {
 		return `line ${this.line}: ${this.desc}`;
 	}
-	static process(source, string, prefixLength) {
-		const sourceLines = source.split("\n");
+	static process(string, source) {
+		const sourceLines = source.completeSource.split("\n");
 		
 		let errors = string.split("ERROR: ");
 		errors.shift();
@@ -334,7 +334,7 @@ class GLSLError extends Error {
 			const string = rawString.cut(":")[1];
 			let [lineStr, descStr] = string.cut(":");
 			lineStr = lineStr.trim();
-			let line = parseInt(lineStr) - prefixLength;
+			let line = parseInt(lineStr);
 			let desc = descStr;
 			if (isNaN(line)) {
 				line = 0;
@@ -342,6 +342,27 @@ class GLSLError extends Error {
 			}
 			throw new GLSLError(sourceLines[line], line, desc.trim());
 		}
+	}
+}
+
+class ShaderSource {
+	constructor(glsl, prefix = "", suffix = "") {
+		this.glsl = glsl;
+		
+		this.prefix = [
+			"#version 300 es",
+			...["int", "float", "sampler2D"].map(type => `precision highp ${type};`),
+			prefix
+		].join("\n");
+		this.prefixLines = this.prefix.match(/\n/g).length + 1;
+		this.suffix = suffix;
+		this.completeSource = this.prefix + this.glsl + this.suffix;
+	}
+	toString() {
+		return this.completeSource;
+	}
+	static raw(source) {
+		return new ShaderSource(new GLSL(""), source);
 	}
 }
 
@@ -575,12 +596,15 @@ class GPUInputArray extends GPUArray {
 }
 
 class GLSLProgram {
-	constructor(gl, glsl, vs, fs, onerror = () => null) {
-		this.onerror = onerror;
+	constructor(gl, vs, fs) {
 		this.gl = gl;
 		this.vs = vs;
 		this.fs = fs;
-		this.lockedValues = new Set(glsl.dynamicArrays.keys());
+		const dynamicArrayDescriptors = new Map([this.vs, this.fs].flatMap(shader => {
+			return [...shader.glsl.dynamicArrays]
+				.map(([name, desc]) => [name, { ...desc, origin: shader }]);
+		}));
+		this.lockedValues = new Set(dynamicArrayDescriptors.keys());
 		
 		{ // focus
 			this.focused = false;
@@ -613,10 +637,10 @@ class GLSLProgram {
 			this.maxTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 
 			this.dynamicArrays = [];
-			for (const [name, array] of glsl.dynamicArrays) {
+			for (const [name, array] of dynamicArrayDescriptors) {
 				const unit = nextTextureUnit++;
 				this.checkTextureUnit(unit);
-				const gpuArray = new GPUInputArray(gl, name, unit, glsl.structs.get(array.type));
+				const gpuArray = new GPUInputArray(gl, name, unit, array.origin.glsl.structs.get(array.type));
 				this.uniformValues[name] = gpuArray;
 				this.dynamicArrays.push(gpuArray);
 			}
@@ -692,7 +716,7 @@ class GLSLProgram {
 							dataArray.set(value);
 							this.setUniform(false, dataArray);
 						};
-					} else if (glsl.dynamicArrays.has(name)) {
+					} else if (dynamicArrayDescriptors.has(name)) {
 						const gpuArray = this.uniformValues[name];
 						desc.setup = function () {
 							gpuArray.setup(self.program);
@@ -863,8 +887,10 @@ class GLSLProgram {
 		for (let i = 0; i < this.dynamicArrays.length; i++)
 			this.dynamicArrays[i].commit();
 	}
-	error(type, error) {
-		this.onerror(type, error);
+	error(type, message) {
+		if (type.endsWith("_SHADER"))
+			GLSLError.process(message, type.startsWith("FRAGMENT") ? this.fs : this.vs);
+		else console.warn(message);
 	}
 	getTypeInformation(type) {
 		const { gl } = this;
@@ -1036,6 +1062,7 @@ class GPUInterface {
 		if (!this.gl)
 			throw new Error("Your browser doesn't support WebGL");
 		
+		this.vertexSource = ShaderSource.raw(this.vertexShader);
 		this.glsl = glsl;
 		
 		this.image.addEventListener("webglcontextlost", event => {
@@ -1060,6 +1087,9 @@ class GPUInterface {
 	get prefix() {
 		return "";
 	}
+	get suffix() {
+		return "";
+	}
 	set vertexData(data) {
 		const { gl } = this;
 		const vertexBuffer = gl.createBuffer();
@@ -1068,16 +1098,8 @@ class GPUInterface {
 		this.program.setAttributes(vertexBuffer, 0);
 	}
 	setup() {
-		const { vertexShader, prefix, fragmentShader } = this;
-		const version = "#version 300 es";
-		const glsl = this.parsedGLSL.toString();
-		const vs = version + vertexShader;
-		const fs = version + prefix + glsl + fragmentShader;
-		this.program = new GLSLProgram(this.gl, this.parsedGLSL, vs, fs, (type, message) => {
-			if (type === "FRAGMENT_SHADER")
-				GLSLError.process(glsl, message, prefix.split("\n").length);
-			else console.warn(message);
-		});
+		this.fragmentSource = new ShaderSource(this.parsedGLSL, this.prefix, this.suffix);
+		this.program = new GLSLProgram(this.gl, this.vertexSource, this.fragmentSource);
 		this.program.use();
 	}
 	compile() {
