@@ -227,11 +227,11 @@ class Quaternion extends Complex {
 	 * @return Matrix3
 	 */
 	toMatrix(result = new Matrix3()) {
-		return result.set(new Matrix3(
+		return new Matrix3(
 			this.rotate(new Vector3(1, 0, 0)),
 			this.rotate(new Vector3(0, 1, 0)),
 			this.rotate(new Vector3(0, 0, 1))
-		));
+		).get(result);
 	}
 	/**
 	 * Returns the first quaternion unit, i.

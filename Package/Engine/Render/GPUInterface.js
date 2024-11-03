@@ -612,20 +612,6 @@ class GLSLProgram {
 		}));
 		this.lockedValues = new Set(dynamicArrayDescriptors.keys());
 		
-		{ // focus
-			this.focused = false;
-			const useProgram = gl.useProgram.bind(gl);
-			gl.useProgram = program => {
-				if (gl.isContextLost()) return;
-				this.focused = program === this.program;
-				useProgram(program);
-			};
-			gl.canvas.addEventListener("webglcontextlost", event => {
-				event.preventDefault();
-				this.focused = false;
-			});
-		};
-		
 		this.compileProgram();
 
 		const originalProgram = gl.getParameter(gl.CURRENT_PROGRAM);
@@ -814,7 +800,8 @@ class GLSLProgram {
 				const location = gl.getAttribLocation(this.program, name);
 				this.attributes[name] = {
 					name, location, rows, columns,
-					enabled: false, divisor: -1, isFiller: false
+					enabled: false,	targetEnabled: true,
+					divisor: -1, isFiller: false
 				};
 				this.setDivisor(name, 0);
 			}
@@ -879,12 +866,8 @@ class GLSLProgram {
 		}
 
 		// attributes
-		for (const key in this.attributes) {
-			const attrib = this.attributes[key];
-			attrib.enabled = false;
-			for (let i = 0; i < attrib.columns; i++)
-				gl.vertexAttribDivisor(attrib.location + i, attrib.divisor);
-		}
+		for (const key in this.attributes)
+			this.attributes[key].enabled = false;
 
 		gl.useProgram(originalProgram);
 	}
@@ -946,31 +929,13 @@ class GLSLProgram {
 		for (let i = 0; i < keys.length; i++)
 			this.vectorBuffer[i] = value[keys[i]];
 	}
-	layoutAttributes(layout, divisor = 0) {
-		const currentAttributesList = this.divisors[divisor].attributes;
-		const currentAttributes = {};
-		for (let i = 0; i < currentAttributesList.length; i++) {
-			const attribute = currentAttributesList[i];
-			if (!attribute.isFiller) currentAttributes[attribute.name] = attribute;
-		}
-
-		const attributes = [];
-		let stride = 0;
-		for (let i = 0; i < layout.length; i++) {
-			const segment = layout[i];
-			const attribute = (typeof segment === "number") ? { rows: segment, columns: 1, isFiller: true } : currentAttributes[segment];
-			attributes.push(attribute);
-			stride += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
-		}
-
-		this.divisors[divisor].attributes = attributes;
-		this.divisors[divisor].stride = stride;
-	}
 	use() {
 		this.gl.useProgram(this.program);
 	}
 	focus() {
-		if (!this.focused) this.use();
+		const { gl } = this;
+		if (gl.getParameter(gl.CURRENT_PROGRAM) !== this.program)
+			this.use();
 	}
 	setUniform(name, value, force = true, location = this.uniforms) {
 		if (name in location) {
@@ -991,9 +956,9 @@ class GLSLProgram {
 			}
 		} else if (location === this.uniforms && force) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
 	}
-	setUniforms(args) {
+	setUniforms(args, force = true) {
 		for (const key in args)
-			this.setUniform(key, args[key]);
+			this.setUniform(key, args[key], force);
 	}
 	getUniform(name) {
 		if (this.hasUniform(name)) return this.uniformValues[name];
@@ -1031,6 +996,30 @@ class GLSLProgram {
 			for (let i = 0; i < attribute.columns; i++) this.gl.vertexAttribDivisor(attribute.location + i, divisor);
 		} else this.error(`Vertex attribute '${name}' doesn't exist`);
 	}
+	layoutAttributes(layout, divisor = 0) {
+		const currentAttributesList = this.divisors[divisor].attributes;
+		const currentAttributes = {};
+		for (let i = 0; i < currentAttributesList.length; i++) {
+			const attribute = currentAttributesList[i];
+			if (!attribute.isFiller) {
+				attribute.targetEnabled = false;
+				currentAttributes[attribute.name] = attribute;
+			}
+		}
+
+		const attributes = [];
+		let stride = 0;
+		for (let i = 0; i < layout.length; i++) {
+			const segment = layout[i];
+			const attribute = (typeof segment === "number") ? { rows: segment, columns: 1, isFiller: true } : currentAttributes[segment];
+			attribute.targetEnabled = true;
+			attributes.push(attribute);
+			stride += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
+		}
+
+		this.divisors[divisor].attributes = attributes;
+		this.divisors[divisor].stride = stride;
+	}
 	setAttributes(buffer, divisor = 0) {
 		if (divisor in this.divisors) {
 			const { gl } = this;
@@ -1045,13 +1034,16 @@ class GLSLProgram {
 				const attribute = attributes[i];
 				if (attribute.isFiller) offset += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
 				else {
-					const enablingNeeded = !attribute.enabled;
-					if (enablingNeeded) attribute.enabled = true;
+					const change = attribute.enabled !== attribute.targetEnabled;
+					attribute.enabled = attribute.targetEnabled;
 					for (let j = 0; j < attribute.columns; j++) {
 						const pointer = attribute.location + j;
 						gl.vertexAttribPointer(pointer, attribute.rows, gl.FLOAT, false, stride, offset);
-						if (enablingNeeded) gl.enableVertexAttribArray(pointer);
-						offset += attribute.rows * 4 /* bytes per GLFloat */;
+						if (change) {
+							if (attribute.enabled) gl.enableVertexAttribArray(pointer);
+							else gl.disableVertexAttribArray(pointer);
+						}
+						if (attribute.enabled) offset += attribute.rows * 4 /* bytes per GLFloat */;
 					}
 				}
 			}
