@@ -991,6 +991,10 @@ class GLSLProgram {
 			}
 		} else if (location === this.uniforms && force) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
 	}
+	setUniforms(args) {
+		for (const key in args)
+			this.setUniform(key, args[key]);
+	}
 	getUniform(name) {
 		if (this.hasUniform(name)) return this.uniformValues[name];
 		else this.error("UNIFORM_GET", `Uniform '${name}' doesn't exist`);
@@ -1120,8 +1124,7 @@ class GPUInterface {
 	 * @param Object uniforms | A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
 	 */
 	setUniforms(args) {
-		for (const key in args)
-			this.setArgument(key, args[key]);
+		this.program.setUniforms(args);
 	}
 	setArguments(args) {
 		return this.setUniforms(args);
