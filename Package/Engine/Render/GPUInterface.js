@@ -340,7 +340,7 @@ class GLSLError extends Error {
 				line = 0;
 				desc = rawString;
 			}
-			throw new GLSLError(sourceLines[line], line - source.prefixLines, desc.trim());
+			throw new GLSLError(sourceLines[line - 1], line - source.prefixLines, desc.trim());
 		}
 	}
 }
