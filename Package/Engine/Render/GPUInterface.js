@@ -1050,9 +1050,8 @@ class GLSLProgram {
 }
 
 /**
- * @type interface GPUInterface
+ * @interface
  * Represents a GLSL program.
- * @abstract
  * @prop String glsl | The source code of the program
  */
 class GPUInterface {

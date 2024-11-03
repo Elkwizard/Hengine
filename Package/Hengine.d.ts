@@ -5774,7 +5774,6 @@ declare class GPUArray {
 
 /**
  * Represents a GLSL program.
- * This is an abstract superclass and should not be constructed.
  */
 declare interface GPUInterface {
 	/**

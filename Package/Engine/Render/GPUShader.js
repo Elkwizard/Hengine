@@ -1,5 +1,4 @@
 /**
- * @name class GPUShader extends ImageType
  * @implements GPUInterface
  * Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region.
  * The entry point for the shader is a function of the form:
