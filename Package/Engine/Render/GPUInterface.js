@@ -340,7 +340,7 @@ class GLSLError extends Error {
 				line = 0;
 				desc = rawString;
 			}
-			throw new GLSLError(sourceLines[line], line, desc.trim());
+			throw new GLSLError(sourceLines[line], line - source.prefixLines, desc.trim());
 		}
 	}
 }
@@ -363,6 +363,12 @@ class ShaderSource {
 	}
 	static raw(source) {
 		return new ShaderSource(new GLSL(""), source);
+	}
+	static template(strings, ...subs) {
+		const index = subs.findIndex(sub => sub instanceof GLSL);
+		const prefix = String.raw({ raw: strings.slice(0, index + 1) }, ...subs.slice(0, index));
+		const suffix = String.raw({ raw: strings.slice(index + 1) }, ...subs.slice(index + 1));
+		return new ShaderSource(subs[index], prefix, suffix);
 	}
 }
 
@@ -1083,12 +1089,6 @@ class GPUInterface {
 	get glsl() {
 		return this._glsl;
 	}
-	get prefix() {
-		return "";
-	}
-	get suffix() {
-		return "";
-	}
 	set vertexData(data) {
 		const { gl } = this;
 		const vertexBuffer = gl.createBuffer();
@@ -1097,7 +1097,7 @@ class GPUInterface {
 		this.program.setAttributes(vertexBuffer, 0);
 	}
 	setup() {
-		this.fragmentSource = new ShaderSource(this.parsedGLSL, this.prefix, this.suffix);
+		this.fragmentSource = this.fragmentShader(this.parsedGLSL);
 		this.program = new GLSLProgram(this.gl, this.vertexSource, this.fragmentSource);
 		this.program.use();
 	}

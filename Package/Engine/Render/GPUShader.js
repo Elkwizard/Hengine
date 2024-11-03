@@ -83,22 +83,21 @@ GPUShader.Interface = class GPUShaderInterface extends GPUInterface {
 			}
 		`;
 	}
-	get prefix() {
-		return `
+	fragmentShader(glsl) {
+		return ShaderSource.template`
 			uniform vec2 resolution;
 
 			in vec2 position;
-		`;	
-	}
-	get suffix() {
-		return `
+
+			${glsl}
+
 			out vec4 pixelColor;
 
 			void main() {
 				pixelColor = shader();
 				pixelColor.rgb *= clamp(pixelColor.a, 0.0, 1.0);
-			}	
-		`;
+			}
+		`;	
 	}
 	compile() {
 		this.vertexData = [

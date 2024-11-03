@@ -55,15 +55,7 @@ class GPUComputation extends GPUInterface {
 			}
 		`;
 	}
-	get prefix() {
-		return `
-			uniform int problems;
-			uniform int _width;
-
-			int problemIndex;
-		`;
-	}
-	get suffix() {
+	fragmentShader(glsl) {
 		const { SIZE, VECTORS } = GLSL;
 		const { PIXEL_BYTES, CHANNEL_BYTES, LITTLE_ENDIAN } = GPUDataTexture;
 		const pixels = Math.ceil(this.struct.size / PIXEL_BYTES);
@@ -96,7 +88,14 @@ class GPUComputation extends GPUInterface {
 			offset += SIZE[type];
 		}
 
-		return `
+		return ShaderSource.template`
+			uniform int problems;
+			uniform int _width;
+
+			int problemIndex;
+
+			${glsl}
+
 			${outColors.map((color, i) => `layout (location = ${i}) out uvec4 ${color};`).join("\n")}
 
 			void main() {
