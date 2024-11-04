@@ -800,8 +800,8 @@ class GLSLProgram {
 				const location = gl.getAttribLocation(this.program, name);
 				this.attributes[name] = {
 					name, location, rows, columns,
-					enabled: false,	targetEnabled: true,
-					divisor: -1, isFiller: false
+					enabled: false, divisor: -1,
+					isFiller: false
 				};
 				this.setDivisor(name, 0);
 			}
@@ -994,31 +994,34 @@ class GLSLProgram {
 			this.focus(); // need to be the gl.CURRENT_PROGRAM
 			attribute.divisor = divisor;
 			for (let i = 0; i < attribute.columns; i++) this.gl.vertexAttribDivisor(attribute.location + i, divisor);
-		} else this.error(`Vertex attribute '${name}' doesn't exist`);
+		} else this.error("DIVISOR_SET", `Vertex attribute '${name}' doesn't exist`);
 	}
 	layoutAttributes(layout, divisor = 0) {
-		const currentAttributesList = this.divisors[divisor].attributes;
-		const currentAttributes = {};
-		for (let i = 0; i < currentAttributesList.length; i++) {
-			const attribute = currentAttributesList[i];
-			if (!attribute.isFiller) {
-				attribute.targetEnabled = false;
-				currentAttributes[attribute.name] = attribute;
+		if (divisor in this.divisors) {
+			const currentAttributesList = this.divisors[divisor].attributes;
+			const currentAttributes = {};
+			for (let i = 0; i < currentAttributesList.length; i++) {
+				const attribute = currentAttributesList[i];
+				if (!attribute.isFiller) {
+					attribute.enabled = false;
+					currentAttributes[attribute.name] = attribute;
+				}
 			}
-		}
 
-		const attributes = [];
-		let stride = 0;
-		for (let i = 0; i < layout.length; i++) {
-			const segment = layout[i];
-			const attribute = (typeof segment === "number") ? { rows: segment, columns: 1, isFiller: true } : currentAttributes[segment];
-			attribute.targetEnabled = true;
-			attributes.push(attribute);
-			stride += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
-		}
+			const attributes = [];
+			let stride = 0;
+			for (let i = 0; i < layout.length; i++) {
+				const segment = layout[i];
+				const attribute = (typeof segment === "number") ? { rows: segment, columns: 1, isFiller: true } : currentAttributes[segment];
+				if (!attribute) continue;
+				attribute.enabled = true;
+				attributes.push(attribute);
+				stride += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
+			}
 
-		this.divisors[divisor].attributes = attributes;
-		this.divisors[divisor].stride = stride;
+			this.divisors[divisor].attributes = attributes;
+			this.divisors[divisor].stride = stride;
+		} else this.error("ATTRIBUTE_LAYOUT", `No attributes with vertex divisor '${divisor}' exist`);
 	}
 	setAttributes(buffer, divisor = 0) {
 		if (divisor in this.divisors) {
@@ -1034,16 +1037,13 @@ class GLSLProgram {
 				const attribute = attributes[i];
 				if (attribute.isFiller) offset += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
 				else {
-					const change = attribute.enabled !== attribute.targetEnabled;
-					attribute.enabled = attribute.targetEnabled;
 					for (let j = 0; j < attribute.columns; j++) {
 						const pointer = attribute.location + j;
 						gl.vertexAttribPointer(pointer, attribute.rows, gl.FLOAT, false, stride, offset);
-						if (change) {
-							if (attribute.enabled) gl.enableVertexAttribArray(pointer);
-							else gl.disableVertexAttribArray(pointer);
-						}
-						if (attribute.enabled) offset += attribute.rows * 4 /* bytes per GLFloat */;
+						if (attribute.enabled) {
+							gl.enableVertexAttribArray(pointer);
+							offset += attribute.rows * 4 /* bytes per GLFloat */;
+						} else gl.disableVertexAttribArray(pointer);
 					}
 				}
 			}
@@ -1090,7 +1090,7 @@ class GPUInterface {
 		const vertexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
-		this.program.setAttributes(vertexBuffer, 0);
+		this.program.setAttributes(vertexBuffer);
 	}
 	setup() {
 		this.fragmentSource = this.fragmentShader(this.parsedGLSL);
