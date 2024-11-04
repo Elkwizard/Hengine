@@ -291,8 +291,10 @@ KeyboardHandler.State = class KeyState extends InputHandler.State { };
  * @prop Number wheelDelta | The scroll displacement (in pixels) from the mouse wheel during the last frame.
  * @prop Vector2 screen | The current cursor position, in screen-space
  * @prop Vector2 screenLast | The cursor position last frame, in screen-space
+ * @prop Vector2 screenDelta | The change in the cursor's screen-space position over the last frame
  * @prop Vector2 world | The current cursor position, in world-space
  * @prop Vector2 worldLast | The cursor position last frame, in world-space
+ * @prop Vector2 worldDelta | The change in the cursor's world-space position over the last frame
  */
 class MouseHandler extends InputHandler {
 	constructor(engine) {
@@ -303,11 +305,13 @@ class MouseHandler extends InputHandler {
 			[2, "Right"]
 		]);
 
-		this.wheelDelta = 0;
 		Vector2.defineReference(this, "screen");
 		Vector2.defineReference(this, "screenLast");
 		Vector2.defineReference(this, "world");
 		Vector2.defineReference(this, "worldLast");
+		Vector2.defineReference(this, "screenDelta");
+		Vector2.defineReference(this, "worldDelta");
+		this.wheelDelta = 0;
 	}
 	preprocess(name) {
 		if (typeof name === "number") return this.mouseMap.get(name);
@@ -332,6 +336,7 @@ class MouseHandler extends InputHandler {
 			const pos = this.getEventPosition(event);
 			if (pos) {
 				this.screen = pos;
+				this.screenDelta.add(this.getEventMovement(event));
 
 				const wpos = this.getWorldPosition(pos);
 				for (const [_, state] of this.states) {
@@ -367,19 +372,42 @@ class MouseHandler extends InputHandler {
 			this.wheelDelta += event.deltaY * [1, 16, innerHeight][event.deltaMode];
 		}, { passive: false });
 	}
+	/**
+	 * Locks the user's cursor in place and hides it.
+	 * This can only be called after a user gesture.
+	 * Changes in mouse position can still be read via the `.deltaScreen` and `.deltaWorld`.
+	 */
+	lock() {
+		this.engine.canvas.canvas.requestPointerLock({
+			unadjustedMovement: true
+		});
+	}
+	/**
+	 * Unlocks the user's cursor.
+	 * This can only be called after a successful call to `.lock()`.
+	 */
+	unlock() {
+		document.exitPointerLock();
+	}
 	getWorldPosition(point) {
 		return this.engine.scene.camera.screenToWorld(point);
 	}
 	getEventPosition(event) {
-		const location = this.engine.canvas.screenSpaceToCanvasSpace(
+		const location = this.engine.canvas.screenToCanvas(
 			new Vector2(event.clientX, event.clientY)
 		);
 		return this.engine.canvas.contains(location) ? location : null;
+	}
+	getEventMovement(event) {
+		return this.engine.canvas.screenDeltaToCanvas(
+			new Vector2(event.movementX, event.movementY)
+		);
 	}
 	beforeUpdate() {
 		super.beforeUpdate();
 		this.world = this.getWorldPosition(this.screen);
 		this.worldLast = this.getWorldPosition(this.screenLast);
+		this.worldDelta = this.screenDelta.over(this.engine.scene.camera.zoom);
 	}
 	afterUpdate() {
 		super.afterUpdate();
@@ -387,6 +415,8 @@ class MouseHandler extends InputHandler {
 		// post frame
 		this.screenLast = this.screen;
 		this.wheelDelta = 0;
+		this.screenDelta.mul(0);
+		this.worldDelta.mul(0);
 	}
 	/**
 	 * @group screenDragStart, screenDragEnd, worldDragStart, worldDragEnd
@@ -476,7 +506,7 @@ class TouchHandler extends InputHandler {
 		return this.engine.scene.camera.screenToWorld(point);
 	}
 	getEventPosition(event) {
-		const location = this.engine.canvas.screenSpaceToCanvasSpace(
+		const location = this.engine.canvas.screenToCanvas(
 			new Vector2(event.clientX, event.clientY)
 		);
 		return this.engine.canvas.contains(location) ? location : null;

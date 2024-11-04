@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class MouseHandler">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L297" target="_blank" class="class-name source-link">MouseHandler</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#class InputHandler">InputHandler</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L299" target="_blank" class="class-name source-link">MouseHandler</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#class InputHandler">InputHandler</a></span>
 				</div>
 				<div class="class desc">
 					Represents the API for interacting with the user's mouse.
@@ -48,6 +48,13 @@ All properties of this class are read-only.
 					<div class="prop desc">The cursor position last frame, in screen-space</div>
 				</div>
 			
+				<div class="prop-wrapper" id="MouseHandler.screenDelta">
+					<div class="prop-header member">
+						<span class="prop-name">screenDelta</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The change in the cursor's screen-space position over the last frame</div>
+				</div>
+			
 				<div class="prop-wrapper" id="MouseHandler.world">
 					<div class="prop-header member">
 						<span class="prop-name">world</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
@@ -61,15 +68,45 @@ All properties of this class are read-only.
 					</div>
 					<div class="prop desc">The cursor position last frame, in world-space</div>
 				</div>
+			
+				<div class="prop-wrapper" id="MouseHandler.worldDelta">
+					<div class="prop-header member">
+						<span class="prop-name">worldDelta</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The change in the cursor's world-space position over the last frame</div>
+				</div>
 			</div>
 				
 				
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
+		<div class="function-wrapper" id="MouseHandler.prototype.lock()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L380" target="_blank" class="function-name source-link">lock</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Locks the user's cursor in place and hides it.
+This can only be called after a user gesture.
+Changes in mouse position can still be read via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">deltaScreen</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">deltaWorld</span></code>.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MouseHandler.prototype.unlock()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L389" target="_blank" class="function-name source-link">unlock</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Unlocks the user's cursor.
+This can only be called after a successful call to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">lock</span><span class="highlight-SYMBOL">()</span></code>.
+			</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="MouseHandler.prototype.screenDragStart()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L397" target="_blank" class="function-name source-link">screenDragStart</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L397" target="_blank" class="function-name source-link">screenDragEnd</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L397" target="_blank" class="function-name source-link">worldDragStart</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L397" target="_blank" class="function-name source-link">worldDragEnd</a>(<span class="param">name</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L427" target="_blank" class="function-name source-link">screenDragStart</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L427" target="_blank" class="function-name source-link">screenDragEnd</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L427" target="_blank" class="function-name source-link">worldDragStart</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L427" target="_blank" class="function-name source-link">worldDragEnd</a>(<span class="param">name</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Returns a location associated with a given key.
@@ -99,7 +136,7 @@ All properties of this class are read-only.
 		
 			<div class="class-wrapper" id="class MouseHandler.State">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L408" target="_blank" class="class-name source-link">MouseHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#class InputHandler.State">InputHandler.State</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L438" target="_blank" class="class-name source-link">MouseHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#class InputHandler.State">InputHandler.State</a></span>
 				</div>
 				<div class="class desc">
 					The state of a given key on a mouse.

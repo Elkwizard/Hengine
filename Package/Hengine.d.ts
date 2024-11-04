@@ -7187,6 +7187,10 @@ declare class MouseHandler extends InputHandler {
 	 */
 	screenLast: Vector2;
 	/**
+	 * The change in the cursor's screen-space position over the last frame
+	 */
+	screenDelta: Vector2;
+	/**
 	 * The current cursor position, in world-space
 	 */
 	world: Vector2;
@@ -7194,6 +7198,21 @@ declare class MouseHandler extends InputHandler {
 	 * The cursor position last frame, in world-space
 	 */
 	worldLast: Vector2;
+	/**
+	 * The change in the cursor's world-space position over the last frame
+	 */
+	worldDelta: Vector2;
+	/**
+	 * Locks the user's cursor in place and hides it.
+	 * This can only be called after a user gesture.
+	 * Changes in mouse position can still be read via the `.deltaScreen` and `.deltaWorld`.
+	 */
+	lock(): void;
+	/**
+	 * Unlocks the user's cursor.
+	 * This can only be called after a successful call to `.lock()`.
+	 */
+	unlock(): void;
 	/**
 	 * Returns a location associated with a given key.
 	 * @param name - The name of the key to check

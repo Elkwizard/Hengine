@@ -65,15 +65,25 @@ class CanvasImage extends ImageType {
 	get cursor() {
 		return this._cursor;
 	}
+	get screenToCanvasOffset() {
+		const { x, y } = this.canvas.getBoundingClientRect();
+		return new Vector2(-x, -y);
+	}
+	get screenToCanvasScale() {
+		return this.width / this.canvas.getBoundingClientRect().width;
+	}
+	screenDeltaToCanvas(point) {
+		return point.mul(this.screenToCanvasScale);
+	}
+	screenToCanvas(point) {
+		return point
+			.plus(this.screenToCanvasOffset)
+			.mul(this.screenToCanvasScale);
+	}
 	onresize(width, height) {
 		this.renderer.resize(width, height);
 		if (this.engine.scene) this.engine.scene.camera.position = this.renderer.middle;
 		this.updateSize();
-	}
-	screenSpaceToCanvasSpace(point) {
-		const bound = this.canvas.getBoundingClientRect();
-		const scale = this.width / bound.width;
-		return point.minus(bound).mul(scale);
 	}
 	updateSize() {
 		let packed = new Rect(0, 0, innerWidth, innerHeight).largestWithin(this.width, this.height);
