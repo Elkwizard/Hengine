@@ -47,7 +47,7 @@ class Artist {
 	/**
 	 * @name save
 	 * Pushes the current rendering state onto the state stack.
-	 * This state includes `.alpha` and `.transform`, 
+	 * This state includes `.transform`.
 	 */
 	/**
 	 * @name restore
@@ -75,7 +75,7 @@ class Artist {
  * @prop ImageType imageType | The surface on which the renderer renders. This property is read-only
  * @prop TextMode textMode | The current text-alignment mode. Starts as `TextMode.TOP_LEFT`
  * @prop BlendMode blendMode | The current color-blending mode. Starts as `BlendMode.COMBINE`
- * @prop Number alpha | The current global alpha. This will multiply the alpha of all other drawing calls. Starts as 1
+ * @prop Number alpha | The current global alpha. This will multiply the alpha of all other drawing calls. This is included in the save state of `.save()` and `.restore()`. Starts as 1
  * @prop Boolean preservePixelart | Whether or not image smoothing will be prevented when upscaling. Starts as true
  */
 class Artist2D extends Artist {

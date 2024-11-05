@@ -123,18 +123,12 @@ class Color extends Operable {
 		result.green = this.green;
 		result.blue = this.blue;
 		result.alpha = this.alpha;
+		result.limited = this.limited;
 		return result;
 	}
-	set(r, g, b, a) {
-		if (typeof r === "number") {
-			this.red = r;
-			this.green = g;
-			this.blue = b;
-			this.alpha = a;
-		} else r.get(this);
-		return this;
-	}
 	op(fn, v, dst) {
+		dst ??= Color.zero;
+		dst.limited = this.limited && (v.limited ?? true);
 		dst = super.op(fn, v, dst);
 		dst.constrain();
 		return dst;
