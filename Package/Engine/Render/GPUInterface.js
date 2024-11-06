@@ -800,7 +800,7 @@ class GLSLProgram {
 				const location = gl.getAttribLocation(this.program, name);
 				this.attributes[name] = {
 					name, location, rows, columns,
-					enabled: false, divisor: -1,
+					enabled: true, divisor: -1,
 					isFiller: false
 				};
 				this.setDivisor(name, 0);
@@ -864,10 +864,6 @@ class GLSLProgram {
 			desc.setup();
 			if (desc.value) desc.set(desc.value);
 		}
-
-		// attributes
-		for (const key in this.attributes)
-			this.attributes[key].enabled = false;
 
 		gl.useProgram(originalProgram);
 	}
