@@ -299,11 +299,14 @@ class Matrix extends Float64Array {
 	 * @param Matrix3 result? | The matrix to copy the result into
 	 * @return Matrix3
 	 */
-	static mulMatrices(matrices, result = new this()) {
+	static mul(matrices, result = new this()) {
 		result.set(matrices[0]);
 		for (let i = 1; i < matrices.length; i++)
 			result.mul(matrices[i]);
 		return result;
+	}
+	static mulMatrices(matrices, result) {
+		return this.mul(matrices, result);
 	}
 	/**
 	 * @name static get Vector
@@ -374,7 +377,7 @@ Matrix2.size = 2;
 /**
  * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates or 3D vectors in standard coordinates.
  * ```js
- * const transformation = Matrix3.mulMatrices([
+ * const transformation = Matrix3.mul([
  * 	Matrix3.translation(10, 5),
  * 	Matrix3.rotation(Math.PI)
  * ]);
@@ -482,7 +485,13 @@ class Matrix3 extends Matrix {
 	toCSS() {
 		return `matrix(${this[0]}, ${this[1]}, ${this[3]}, ${this[4]}, ${this[6]}, ${this[7]})`;
 	}
-	/**
+	static get Vector() {
+		return Vector3;
+	}
+	static normal(matrix) {
+		return new Matrix3(matrix).invert()?.transpose?.() ?? Matrix3.identity();
+	}
+	/** 
 	 * Creates a 2D rotation matrix and optionally stores it in a provided destination.
 	 * @param Number theta | The clockwise (in screen-space) angle (in radians) to rotate by  
 	 * @param Matrix3 result? | The matrix to copy the rotation matrix into
@@ -497,9 +506,6 @@ class Matrix3 extends Matrix {
 			0, 0, 1,
 			result
 		);
-	}
-	static get Vector() {
-		return Vector3;
 	}
 }
 Matrix3.size = 3;
@@ -650,6 +656,9 @@ class Matrix4 extends Matrix {
 
 		return this;
 	}
+	static get Vector() {
+		return Vector4;
+	}
 	/**
 	 * Creates a perspective projection matrix for use in 3D rendering.
 	 * @param Number aspectRatio | The aspect ratio of the surface on which the rendering will occur (`height / width`)
@@ -670,8 +679,29 @@ class Matrix4 extends Matrix {
 			result
 		);
 	}
-	static get Vector() {
-		return Vector4;
+	/**
+	 * Creates an orthographic projection matrix for use in 3D rendering.
+	 * The x and y range parameters can be specified as numbers to indicate the size of a 0-centered range (e.g. `6` corresponds to `new Range(-3, 3)`).
+	 * @param Range/Number xRange | The range along the x-axis of view space to include in the projection
+	 * @param Range/Number yRange | The range along the y-axis of view space to include in the projection
+	 * @param Range/Number zRange | The range along the z-axis of view space to include in the projection. If this is specified as a number, it represents a range from 0 to the argument (e.g. `6` corresponds to `new Range(0, 6)`)
+	 * @param Matrix4 result? | The destination to store the resulting matrix in. If not specified, a new matrix will be created
+	 * @return Matrix4
+	 */
+	static orthographic(xRange, yRange, zRange, result) {
+		if (typeof xRange === "number") xRange = new Range(-xRange / 2, xRange / 2);
+		if (typeof yRange === "number") yRange = new Range(-yRange / 2, yRange / 2);
+		if (typeof zRange === "number") zRange = new Range(0, zRange);
+		const xScale = 2 / xRange.length;
+		const yScale = 2 / yRange.length;
+		const zScale = 1 / zRange.length;
+		return Matrix4.create(
+			xScale,	0,		0,		-xScale * xRange.min - 1,
+			0,		yScale,	0,		-yScale * yRange.min - 1,
+			0,		0,		zScale,	-zScale * zRange.min,
+			0,		0,		0,		1,
+			result
+		);
 	}
 }
 Matrix4.size = 4;

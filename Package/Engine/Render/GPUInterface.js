@@ -395,14 +395,7 @@ class GPUDataTexture {
 		if (unit !== undefined) gl.activeTexture(gl.TEXTURE0 + unit);
 		
 		if (this.texture) gl.bindTexture(gl.TEXTURE_2D, this.texture);
-		else {
-			this.texture = gl.createTexture();
-			gl.bindTexture(gl.TEXTURE_2D, this.texture);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		}
+		else this.texture = GLUtils.createTexture(gl);
 
 		return this.texture;
 	}
@@ -719,20 +712,15 @@ class GLSLProgram {
 					} else if (texture) {
 						const textureUnit = nextTextureUnit;
 						const indices = new Int32Array(length).map((_, index) => index + textureUnit);
+						const textures = [];
 						this.checkTextureUnit(textureUnit + length - 1);
 
 						desc.setup = function () {
-							for (let i = 0; i < length; i++) {
-								const texture = gl.createTexture();
-								const textureIndex = indices[i];
-								gl.activeTexture(gl.TEXTURE0 + textureIndex);
-								gl.bindTexture(gl.TEXTURE_2D, texture);
-	
-								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-							}
+							for (let i = 0; i < length; i++)
+								textures[i] = GLUtils.createTexture(gl, {
+									unit: indices[i],
+									filter: gl.LINEAR
+								});
 
 							if (array) this.setUniform(indices);
 							else this.setUniform(indices[0]);
@@ -741,16 +729,21 @@ class GLSLProgram {
 						let pixelated = false;
 						const writeImage = (image, index = 0) => {
 							if (index >= length) return;
-							const imagePixelated = image instanceof Texture;
-							const imageCIS = (image instanceof Texture) ? image.imageData : image.makeWebGLImage();
 							gl.activeTexture(gl.TEXTURE0 + indices[index]);
-							if (imagePixelated !== pixelated) {
-								pixelated = imagePixelated;
-								const param = pixelated ? gl.NEAREST : gl.LINEAR;
-								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
-								gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
+							if (image instanceof WebGLTexture) {
+								gl.bindTexture(gl.TEXTURE_2D, image);
+							} else {
+								const imagePixelated = image instanceof Texture;
+								const imageCIS = (image instanceof Texture) ? image.imageData : image.makeWebGLImage();
+								gl.bindTexture(gl.TEXTURE_2D, textures[index]);
+								if (imagePixelated !== pixelated) {
+									pixelated = imagePixelated;
+									const param = pixelated ? gl.NEAREST : gl.LINEAR;
+									gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
+									gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
+								}
+								gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
 							}
-							gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
 						}
 						if (array) desc.set = images => images.forEach(writeImage);
 						else desc.set = image => writeImage(image);
@@ -1047,6 +1040,24 @@ class GLSLProgram {
 	}
 }
 
+class GLUtils {
+	static createTexture(gl, {
+		target = gl.TEXTURE_2D,
+		wrap = gl.CLAMP_TO_EDGE,
+		filter = gl.NEAREST,
+		unit = null,
+	} = { }) {
+		const texture = gl.createTexture();
+		if (unit !== null) gl.activeTexture(gl.TEXTURE0 + unit);
+		gl.bindTexture(target, texture);
+		gl.texParameteri(target, gl.TEXTURE_WRAP_S, wrap);
+		gl.texParameteri(target, gl.TEXTURE_WRAP_T, wrap);
+		gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, filter);
+		gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, filter);
+		return texture;
+	}
+}
+
 /**
  * @interface
  * Represents a GLSL program.
@@ -1058,7 +1069,7 @@ class GPUInterface {
 		this.gl = this.image.getContext("webgl2");
 		if (!this.gl)
 			throw new Error("Your browser doesn't support WebGL");
-		
+
 		this.vertexSource = ShaderSource.raw(this.vertexShader);
 		this.glsl = glsl;
 		

@@ -7,6 +7,9 @@
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
  */
 class Camera {
+	get renderer() {
+		return this.canvas.renderer;
+	}
 	/**
 	 * Sets the zoom to 1.
 	 */
@@ -66,11 +69,11 @@ class Camera {
 class Camera2D extends Matrix3 {
 	/**
 	 * Creates a new camera pointing to the middle of the provided renderer.
-	 * @param Artist2D renderer | The renderer to target
+	 * @param ImageType canvas | The rendering surface to target
 	 */
-	constructor(renderer) {
+	constructor(canvas) {
 		super();
-		this.renderer = renderer;
+		this.canvas = canvas;
 		const { width, height } = this.canvas;
 		Vector2.defineReference(this, "position", new Vector2(width / 2, height / 2))
 			.onChange(() => this.updateTranslationMatrix());
@@ -95,9 +98,6 @@ class Camera2D extends Matrix3 {
 	}
 	get zoom() {
 		return this._zoom;
-	}
-	get canvas() {
-		return this.renderer.imageType;
 	}
 	updateTranslationMatrix() {
 		const { x, y } = this.position;
@@ -232,13 +232,13 @@ objectUtils.inherit(Camera2D, Camera);
 class Camera3D extends Matrix4 {
 	/**
 	 * Creates a new camera at (0, 0, 0).
-	 * @param Artist3D renderer | The renderer to target
+	 * @param ImageType canvas | The surface to target
 	 */
-	constructor(renderer) {
+	constructor(canvas) {
 		super();
 
 		// define parameters
-		this.renderer = renderer;
+		this.canvas = canvas;
 		Vector2.defineReference(this, "position", new Vector3(0, 0, 0));
 		Vector2.defineReference(this, "direction", new Vector3(0, 0, 1));
 		this.rotation = 0;
@@ -252,6 +252,41 @@ class Camera3D extends Matrix4 {
 		objectUtils.onChange(this, "zoom", handle);
 		
 		this.updateMatrix();
+		this.perspective(Math.PI / 2, 0.1, 500);
+	}
+	/**
+	 * Returns the projection matrix of the camera.
+	 * This may vary as the dimensions of the rendering surface change.
+	 * @return Matrix4
+	 */
+	get projection() {
+		const img = this.canvas;
+		return this.createProjection(img.height / img.width);
+	}
+	/**
+	 * Configures the camera to use a custom projection.
+	 * @param Matrix4 projection | The homogenous projection matrix to use
+	 */
+	set projection(a) {
+		a = a.get();
+		this.createProjection = () => a;
+	}
+	/**
+	 * Configures the camera to use a perspective projection.
+	 * @param Number fov | The field of view of the camera in radians
+	 * @param Number zNear | The location of the near clipping plane
+	 * @param Number zFar | The location of the far clipping plane
+	 */
+	perspective(fov, zNear, zFar) {
+		this.createProjection = ar => Matrix4.perspective(ar, fov, zNear, zFar);
+	}
+	/**
+	 * Configures the camera to use a orthographic projection.
+	 * @param Number span | The size of the x and y spans included in the projection
+	 * @param Number depth | The maximum depth included in the projection
+	 */
+	orthographic(span, depth) {
+		this.createProjection = () => Matrix4.orthographic(span, span, depth);
 	}
 	updateMatrix() {
 		const forward = this.direction;
