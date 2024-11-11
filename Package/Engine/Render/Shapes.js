@@ -123,13 +123,7 @@ class Range {
 	 * @return Range
 	 */
 	static fromValues(values) {
-		let min = Infinity;
-		let max = -Infinity;
-		for (let i = 0; i < values.length; i++) {
-			const v = values[i];
-			if (v < min) min = v;
-			if (v > max) max = v;
-		}
+		const { min, max } = Number.bound(values);
 		return new Range(min, max);
 	}
 }
@@ -258,7 +252,6 @@ class Shape {
 	containsPoint(point) {
 		return this.closestPointTo(point).equals(point);
 	}
-	get(result = new Shape()) { }
 	toPhysicsShape() { }
 }
 
@@ -756,7 +749,7 @@ class Rect extends Polygon {
 		return Rect.fromRanges(xRange, yRange);
 	}
 	getBoundingBox() {
-		return new Rect(this.x, this.y, this.width, this.height);
+		return this.get();
 	}
 	center(pos) {
 		return new Rect(pos.x - this.width / 2, pos.y - this.height / 2, this.width, this.height);
@@ -848,19 +841,8 @@ class Rect extends Polygon {
 	 */
 	static bound(points) {
 		if (!points.length) return new Rect(0, 0, 0, 0);
-
-		let minX = Infinity;
-		let minY = Infinity;
-		let maxX = -Infinity;
-		let maxY = -Infinity;
-		for (let i = 0; i < points.length; i++) {
-			let v = points[i]
-			if (v.x < minX) minX = v.x;
-			if (v.y < minY) minY = v.y;
-			if (v.x > maxX) maxX = v.x;
-			if (v.y > maxY) maxY = v.y;
-		}
-		return new Rect(minX, minY, maxX - minX, maxY - minY);
+		const { min, max } = Vector2.bound(points);
+		return Rect.fromMinMax(min, max);
 	}
 	/**
 	 * Returns the smallest bounding rectangle around a collection of rectangles.

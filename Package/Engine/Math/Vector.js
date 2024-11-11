@@ -146,6 +146,20 @@ Vector.modValues = [];
 	});
 
 	Number.filled = n => n;
+	Number.bound = ns => {
+		if (!ns.length)
+			return { min: Infinity, max: -Infinity };
+
+		let min = ns[0];
+		let max = min;
+		for (let i = 1; i < ns.length; i++) {
+			const value = ns[i];
+			if (value < min) min = value;
+			else if (value > max) max = value;
+		}
+
+		return { min, max };
+	};
 	proto("op", function (v, fn) { return fn(this, v); });
 	proto("map", function (fn) { return fn(this); });
 	proto("dot", function (n) { return this * n; });

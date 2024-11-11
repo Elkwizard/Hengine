@@ -339,6 +339,29 @@ class Operable extends MathObject {
             acc = acc.op(values[i], Math.max, acc);
         return acc;
     }
+	static bound(values) {
+		if (!values.length) return {
+			min: this.filled(Infinity),
+			max: this.filled(-Infinity)
+		};
+
+		const { modValues } = this;
+
+		const min = values[0].get();
+		const max = min.get();
+
+		for (let i = 1; i < values.length; i++) {
+			const value = values[i];
+			for (let j = 0; j < modValues.length; j++) {
+				const key = modValues[j];
+				const comp = value[key];
+				if (comp < min[key]) min[key] = comp;
+				else if (comp > max[key]) max[key] = comp;
+			}
+		}
+
+		return { min, max };
+	}
 	/**
 	 * @group static round, static floor, static ceil, static trunc, static abs, static sqrt, static log, static log2, static log10, static sin, static cos, static tan, static sinh, static cosh, static tanh, static asin, static acos, static atan, static asinh, static acosh, static atanh, static sign
 	 * Performs a built-in unary Math operation element-wise on an operable.

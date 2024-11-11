@@ -1393,7 +1393,7 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 * @param matrices - The matrices to multiply together. Order matters for this argument
 	 * @param result - The matrix to copy the result into
 	 */
-	static mulMatrices(matrices: Matrix3[], result?: Matrix3): Matrix3;
+	static mul(matrices: Matrix3[], result?: Matrix3): Matrix3;
 	/**
 	 * Returns a vector class which has the same number of elements as the dimension of the caller.
 	 */
@@ -1425,7 +1425,7 @@ declare class Matrix2 extends Matrix {
 /**
  * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates or 3D vectors in standard coordinates.
  * ```js
- * const transformation = Matrix3.mulMatrices([
+ * const transformation = Matrix3.mul([
  * 	Matrix3.translation(10, 5),
  * 	Matrix3.rotation(Math.PI)
  * ]);
@@ -1465,6 +1465,15 @@ declare class Matrix4 extends Matrix {
 	 * @param result - The destination to store the resulting matrix in. If not specified, a new matrix will be created
 	 */
 	static perspective(aspectRatio: number, fov: number, zNear: number, zFar: number, result?: Matrix4): Matrix4;
+	/**
+	 * Creates an orthographic projection matrix for use in 3D rendering.
+	 * The x and y range parameters can be specified as numbers to indicate the size of a 0-centered range (e.g. `6` corresponds to `new Range(-3, 3)`).
+	 * @param xRange - The range along the x-axis of view space to include in the projection
+	 * @param yRange - The range along the y-axis of view space to include in the projection
+	 * @param zRange - The range along the z-axis of view space to include in the projection. If this is specified as a number, it represents a range from 0 to the argument (e.g. `6` corresponds to `new Range(0, 6)`)
+	 * @param result - The destination to store the resulting matrix in. If not specified, a new matrix will be created
+	 */
+	static orthographic(xRange: Range | number, yRange: Range | number, zRange: Range | number, result?: Matrix4): Matrix4;
 }
 
 /**
@@ -3250,6 +3259,10 @@ declare interface Camera extends Matrix {
 	 */
 	rotation: number;
 	/**
+	 * Returns the caller.
+	 */
+	get matrix(): Matrix;
+	/**
 	 * Sets the zoom to 1.
 	 */
 	restoreZoom(): void;
@@ -3290,9 +3303,9 @@ declare class Camera2D extends Matrix3 implements Camera {
 	position: Vector2;
 	/**
 	 * Creates a new camera pointing to the middle of the provided renderer.
-	 * @param renderer - The renderer to target
+	 * @param canvas - The rendering surface to target
 	 */
-	constructor(renderer: Artist2D);
+	constructor(canvas: ImageType);
 	/**
 	 * Smoothly moves the camera toward a new rotation value.
 	 * @param angle - The new rotation to move toward (in radians)
@@ -3349,6 +3362,10 @@ declare class Camera2D extends Matrix3 implements Camera {
 	 */
 	rotation: number;
 	/**
+	 * Returns the caller.
+	 */
+	get matrix(): Matrix;
+	/**
 	 * Sets the zoom to 1.
 	 */
 	restoreZoom(): void;
@@ -3393,9 +3410,36 @@ declare class Camera3D extends Matrix4 implements Camera {
 	direction: Vector3;
 	/**
 	 * Creates a new camera at (0, 0, 0).
-	 * @param renderer - The renderer to target
+	 * @param canvas - The surface to target
 	 */
-	constructor(renderer: Artist3D);
+	constructor(canvas: ImageType);
+	/**
+	 * Returns the product of the camera's projection matrix and itself, `projection * worldToScreen`.
+	 */
+	get pcMatrix(): Matrix4;
+	/**
+	 * Returns the projection matrix of the camera.
+	 * This may vary as the dimensions of the rendering surface change.
+	 */
+	get projection(): Matrix4;
+	/**
+	 * Configures the camera to use a custom projection.
+	 * @param projection - The homogenous projection matrix to use
+	 */
+	set projection(projection: Matrix4);
+	/**
+	 * Configures the camera to use a perspective projection.
+	 * @param fov - The field of view of the camera in radians
+	 * @param zNear - The location of the near clipping plane
+	 * @param zFar - The location of the far clipping plane
+	 */
+	perspective(fov: number, zNear: number, zFar: number): void;
+	/**
+	 * Configures the camera to use a orthographic projection.
+	 * @param span - The size of the x and y spans included in the projection
+	 * @param depth - The maximum depth included in the projection
+	 */
+	orthographic(span: number, depth: number): void;
 	/**
 	 * Points the camera in a specific direction, with a specified angle from +z on the horizontal and vertical axes.
 	 * The vertical input is clamped to avoid gimbal lock.
@@ -3411,6 +3455,10 @@ declare class Camera3D extends Matrix4 implements Camera {
 	 * The clockwise roll (in radians) of the camera. Starts at 0
 	 */
 	rotation: number;
+	/**
+	 * Returns the caller.
+	 */
+	get matrix(): Matrix;
 	/**
 	 * Sets the zoom to 1.
 	 */
@@ -4396,7 +4444,7 @@ declare class Artist {
 	get transform(): Matrix;
 	/**
 	 * Pushes the current rendering state onto the state stack.
-	 * This state includes `.alpha` and `.transform`,
+	 * This state includes `.transform`.
 	 */
 	save(): void;
 	/**
@@ -4437,7 +4485,7 @@ declare class Artist2D extends Artist {
 	 */
 	blendMode: BlendMode;
 	/**
-	 * The current global alpha. This will multiply the alpha of all other drawing calls. Starts as 1
+	 * The current global alpha. This will multiply the alpha of all other drawing calls. This is included in the save state of `.save()` and `.restore()`. Starts as 1
 	 */
 	alpha: number;
 	/**

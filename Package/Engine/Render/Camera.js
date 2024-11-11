@@ -11,6 +11,13 @@ class Camera {
 		return this.canvas.renderer;
 	}
 	/**
+	 * Returns the caller.
+	 * @return Matrix
+	 */
+	get matrix() {
+		return this;
+	}
+	/**
 	 * Sets the zoom to 1.
 	 */
 	restoreZoom() {
@@ -253,6 +260,13 @@ class Camera3D extends Matrix4 {
 		
 		this.updateMatrix();
 		this.perspective(Math.PI / 2, 0.1, 500);
+	}
+	/**
+	 * Returns the product of the camera's projection matrix and itself, `projection * worldToScreen`.
+	 * @return Matrix4
+	 */
+	get pcMatrix() {
+		return this.projection.times(this);
 	}
 	/**
 	 * Returns the projection matrix of the camera.
