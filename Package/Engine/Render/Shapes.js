@@ -683,20 +683,22 @@ class Rect extends Polygon {
 		return this.get();
 	}
 	move(dir) {
-		return new Rect(this.x + dir.x, this.y + dir.y, this.width, this.height);
+		return Rect.fromMinMax(this.min.add(dir), this.max.add(dir));
 	}
 	equalsSameType(shape) {
 		return	this.min.equals(shape.min) &&
 				this.max.equals(shape.max);
 	}
 	intersectSameType(rect) {
-		return rect.x < this.x + this.width && rect.x + rect.width > this.x && rect.y < this.y + this.height && rect.y + rect.height > this.y;
+		return	this.xRange.intersect(rect.xRange) &&
+				this.yRange.intersect(rect.yRange);
 	}
 	closestPointTo(point) {
-		return point.constructor.clamp(point, this.min, this.max);
+		return Vector.clamp(point, this.min, this.max);
 	}
 	containsPoint(point) {
-		return point.x > this.x && point.y > this.y && point.x < this.x + this.width && point.y < this.y + this.height;
+		return	this.xRange.includes(point.x) &&
+				this.yRange.includes(point.y);
 	}
 	get(result = new Rect(0, 0, 0, 0)) {
 		result.x = this.x;

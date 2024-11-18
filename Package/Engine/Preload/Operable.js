@@ -335,8 +335,10 @@ class Operable extends MathObject {
 	 * @return Operable
 	 */
     static min(...values) {
-        let acc = this.filled(Infinity);
-        for (let i = 0; i < values.length; i++) 
+		if (!values.length) return this.filled(Infinity);
+
+        let acc = values[0].get();
+        for (let i = 1; i < values.length; i++) 
             acc = acc.op(values[i], Math.min, acc);
         return acc;
     }
@@ -346,8 +348,10 @@ class Operable extends MathObject {
 	 * @return Operable
 	 */
     static max(...values) {
-        let acc = this.filled(-Infinity);
-        for (let i = 0; i < values.length; i++)
+		if (!values.length) return this.filled(-Infinity);
+
+        let acc = values[0].get();
+        for (let i = 1; i < values.length; i++) 
             acc = acc.op(values[i], Math.max, acc);
         return acc;
     }
