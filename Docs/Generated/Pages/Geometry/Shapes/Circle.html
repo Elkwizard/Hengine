@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class Circle">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L875" target="_blank" class="class-name source-link">Circle</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Geometry/Shapes/Shape.html#class Shape">Shape</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L764" target="_blank" class="class-name source-link">Circle</a> <span class="keyword">extends</span> <span class="class-name">Shape2D</span>
 				</div>
 				<div class="class desc">
 					Represents a circle.
@@ -19,18 +19,11 @@
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Circle.x">
+				<div class="prop-wrapper" id="Circle.position">
 					<div class="prop-header member">
-						<span class="prop-name">x</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">position</span><span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
-					<div class="prop desc">The x coordinate of the center of the circle</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Circle.y">
-					<div class="prop-header member">
-						<span class="prop-name">y</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The y coordinate of the center of the circle</div>
+					<div class="prop desc">The center of the circle</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Circle.radius">
@@ -47,7 +40,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="Circle.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L882" target="_blank" class="function-name source-link">constructor</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">radius</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L770" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">radius</span>)
 			</div>
 			<div class="function desc">
 				Creates a new Circle.
@@ -57,23 +50,13 @@
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Circle.prototype.constructor():x">
+						<div class="param-wrapper" id="Circle.prototype.constructor():position">
 							<div class="param-name">
-								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="param">position</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
-								The x coordinate of the center
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Circle.prototype.constructor():y">
-							<div class="param-name">
-								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The y coordinate of the center
+								The center of the circle
 							</div>
 						</div>
 					
@@ -84,60 +67,6 @@
 							</div>
 							<div class="param desc">
 								The radius of the circle
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Circle.prototype.scaleX()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L914" target="_blank" class="function-name source-link">scaleX</a>(<span class="param">factor</span>)<span class="type">Circle</span>
-			</div>
-			<div class="function desc">
-				Since there is no representation for an ellipse, this scales uniformly instead of the behavior for <a href="../../../Pages/Geometry/Shapes/Shape.html#class Shape">Shape</a>.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Circle.prototype.scaleX():factor">
-							<div class="param-name">
-								<span class="param">factor</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The scale factor
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Circle.prototype.scaleY()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L922" target="_blank" class="function-name source-link">scaleY</a>(<span class="param">factor</span>)<span class="type">Circle</span>
-			</div>
-			<div class="function desc">
-				Since there is no representation for an ellipse, this scales uniformly instead of the behavior for <a href="../../../Pages/Geometry/Shapes/Shape.html#class Shape">Shape</a>.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Circle.prototype.scaleY():factor">
-							<div class="param-name">
-								<span class="param">factor</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The scale factor
 							</div>
 						</div>
 					

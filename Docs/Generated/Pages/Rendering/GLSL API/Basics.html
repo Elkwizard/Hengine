@@ -1,0 +1,118 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="page-wrapper">
+				<div class="page-header">
+					<span class="page-name">GLSL API</span>
+				</div>
+
+				<div class="page desc">
+					The version of GLSL used in the <a href="../../../Pages/Structure/Hengine.html#class Hengine">Hengine</a> is GLSL ES 3.0.
+Interactions between GLSL and javascript via <a href="../../../Pages/Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterfaces</a> require associations between types in both the languages.
+These associations are laid out in the following table:
+<table>
+	<tr><th>GLSL Type</th><th>JS Type</th></tr>
+	<tr><td>int, uint, float</td><td><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></td></tr>
+	<tr><td>bool</td><td>Boolean</td></tr>
+	<tr><td>vec2, ivec2, uvec2</td><td><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></td></tr>
+	<tr><td>vec3, ivec3, uvec3</td><td><a href="../../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
+	<tr><td>ivec4, uvec4</td><td><a href="../../../Pages/Geometry/Vectors/Vector4.html#class Vector4">Vector4</a></td></tr>
+	<tr><td>vec4</td><td><a href="../../../Pages/Geometry/Vectors/Vector4.html#class Vector4">Vector4</a>, <a href="../../../Pages/Rendering/Color.html#class Color">Color</a></td></tr>
+	<tr><td>sampler2D</td><td><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></td></tr>
+	<tr><td>sampler2DArray</td><td><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>[]</td></tr>
+	<tr><td>samplerCube</td><td>CubeMap</td></tr>
+	<tr><td>struct</td><td>Object</td></tr>
+	<tr><td>fixed-length array</td><td><a href="../../../Pages/Built-Ins/Array.html#class Array">Array</a></td></tr>
+ <tr><td>dynamic-length array</td><td><a href="../../../Pages/Rendering/GLSL API/GPUArray.html#class GPUArray">GPUArray</a></td></tr>
+</table>
+
+Though they are not present in any GLSL language standard, the <a href="../../../Pages/Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a> supports dynamic-length, global, uniform struct arrays. 
+These are specified by omitting the length when declaring the array.
+Though they can be used like normal arrays (indexed with <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">array</span><span class="highlight-SYMBOL">[</span><span class="highlight-IDENTIFIER">index</span><span class="highlight-SYMBOL">]</span></code> and measured with <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">array</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">length</span><span class="highlight-SYMBOL">()</span></code>), they cannot be cast to normal arrays.
+Dynamic-length arrays' elements do not count toward the uniform limit, and can freely contain millions of elements on most platforms.
+
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">struct</span><span class="highlight-CLASS"> <a href="../../../Pages/Geometry/Shapes/Line.html#class Line">Line</a></span><span class="highlight-SYMBOL"> {
+</span><span class="highlight-KEYWORD">	vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">end</span><span class="highlight-SYMBOL">;
+};
+</span><span class="highlight-KEYWORD">
+uniform</span><span class="highlight-CLASS"> <a href="../../../Pages/Geometry/Shapes/Line.html#class Line">Line</a></span><span class="highlight-SYMBOL">[] </span><span class="highlight-IDENTIFIER">linesA</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// dynamic length</span><span class="highlight-KEYWORD">
+uniform</span><span class="highlight-CLASS"> <a href="../../../Pages/Geometry/Shapes/Line.html#class Line">Line</a></span><span class="highlight-SYMBOL">[</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">] </span><span class="highlight-IDENTIFIER">linesB</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// fixed length</span><span class="highlight-SYMBOL">
+</span></code>
+Dynamic-length arrays are represented by <a href="../../../Pages/Rendering/GLSL API/GPUArray.html#class GPUArray">GPUArrays</a>, which are pre-set as the values for these uniforms. These arrays cannot be replaced, only modified. As such, calling <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../../Pages/Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">setUniform</span><span class="highlight-SYMBOL">()</span></code> on a dynamic-length uniform is equivalent to calling <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../../Pages/Rendering/GLSL API/GPUArray.html#class GPUArray">GPUArray</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">set</span><span class="highlight-SYMBOL">()</span></code> on the retrieved array.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// gpu is a <a href="../../../Pages/Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a>. The following two lines are equivalent if &quot;linesA&quot; is a dynamic-length array uniform.</span><span class="highlight-SYMBOL">
+</span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">setUniform</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;linesA&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">lines</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getUniform</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;linesA&quot;</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">set</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">lines</span><span class="highlight-SYMBOL">);
+</span></code>
+				</div>
+
+			</div>
+		
+			<div class="class-wrapper" id="class CubeMap">
+				<div class="class-header">
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L56" target="_blank" class="class-name source-link">CubeMap</a>
+				</div>
+				<div class="class desc">
+					Represents a cube map usable in via a <a href="../../../Pages/Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a>.
+All faces must be square and equal in size.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="CubeMap.posX">
+					<div class="prop-header member">
+						<span class="prop-name">posX</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+					</div>
+					<div class="prop desc">The face of the cube map on the positive x side</div>
+				</div>
+			
+				<div class="prop-wrapper" id="CubeMap.negX">
+					<div class="prop-header member">
+						<span class="prop-name">negX</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+					</div>
+					<div class="prop desc">The face of the cube map on the negative x side</div>
+				</div>
+			
+				<div class="prop-wrapper" id="CubeMap.posY">
+					<div class="prop-header member">
+						<span class="prop-name">posY</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+					</div>
+					<div class="prop desc">The face of the cube map on the positive y side</div>
+				</div>
+			
+				<div class="prop-wrapper" id="CubeMap.negY">
+					<div class="prop-header member">
+						<span class="prop-name">negY</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+					</div>
+					<div class="prop desc">The face of the cube map on the negative y side</div>
+				</div>
+			
+				<div class="prop-wrapper" id="CubeMap.posZ">
+					<div class="prop-header member">
+						<span class="prop-name">posZ</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+					</div>
+					<div class="prop desc">The face of the cube map on the positive z side</div>
+				</div>
+			
+				<div class="prop-wrapper" id="CubeMap.negZ">
+					<div class="prop-header member">
+						<span class="prop-name">negZ</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+					</div>
+					<div class="prop desc">The face of the cube map on the negative z side</div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			</body>
+		</html>
+	

@@ -21,7 +21,7 @@ class DRAGGABLE extends ElementScript {
 		this.mouse = obj.engine.mouse;
 		this.dragged = false;
 		this.key = key;
-		this.offset = Vector2.origin;
+		this.offset = Vector2.zero;
 		this.bounds = bounds;
 		obj.engine.scene.mouseEvents = true;
 	}

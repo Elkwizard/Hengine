@@ -134,7 +134,7 @@ class Scene {
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
 	 * @return Constraint2
 	 */
-	constrainLength(a, b, ap = Vector2.origin, bp = Vector2.origin, length = null) {
+	constrainLength(a, b, ap = Vector2.zero, bp = Vector2.zero, length = null) {
 		const apPhysics = ap.toPhysicsVector();
 		const bpPhysics = bp.toPhysicsVector();
 		const con = physics.exports.LengthConstraint2.construct(
@@ -161,7 +161,7 @@ class Scene {
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
 	 * @return Constraint1
 	 */
-	constrainLengthToPoint(a, offset = Vector2.origin, point = null, length = null) {
+	constrainLengthToPoint(a, offset = Vector2.zero, point = null, length = null) {
 		point ??= a.transform.localToGlobal(offset);
 		const offsetPhysics = offset.toPhysicsVector();
 		const pointPhysics = point.toPhysicsVector();
@@ -188,7 +188,7 @@ class Scene {
 	 * @param Vector2 bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
 	 * @return Constraint2
 	 */
-	constrainPosition(a, b, ap = Vector2.origin, bp = Vector2.origin) {
+	constrainPosition(a, b, ap = Vector2.zero, bp = Vector2.zero) {
 		const apPhysics = ap.toPhysicsVector();
 		const bpPhysics = bp.toPhysicsVector();
 		const con = physics.exports.PositionConstraint2.construct(
@@ -208,7 +208,7 @@ class Scene {
 	 * @param Vector2 point? | The location to constrain the length to. Default is the current location of the constrained point
 	 * @return Constraint1
 	 */
-	constrainPositionToPoint(a, offset = Vector2.origin, point = null) {
+	constrainPositionToPoint(a, offset = Vector2.zero, point = null) {
 		point ??= a.transform.localToGlobal(offset);
 		const offsetPhysics = offset.toPhysicsVector();
 		const pointPhysics = point.toPhysicsVector();

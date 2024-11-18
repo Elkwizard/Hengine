@@ -1,4 +1,97 @@
-const objectUtils = { };
+const objectUtils = {
+	generateInterface(object, template = {}, found = new Map()) {
+		for (const key in object) {
+			const value = object[key];
+			const type = typeof value;
+			if (type === "object") {
+				if (value === null) continue;
+				if (found.has(value)) template[key] = found.get(value);
+				else {
+					const child = {};
+					found.set(value, child);
+					template[key] = objectUtils.generateInterface(value, child, found);
+				}
+			} else if (type !== "function") template[key] = type;
+		}
+		return template;
+	},
+	shortcut(objectA, objectB, key) {
+		Object.defineProperty(objectA, key, {
+			set: a => objectB[key] = a,
+			get: () => objectB[key]
+		});
+	},
+	inherit(child, parent, include) {
+		const copy = (src, dst) => {
+			if (!src) return;
+
+			const keys = include ?? Reflect.ownKeys(src).filter(key => !(key in dst));
+
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i];
+				const desc = Object.getOwnPropertyDescriptor(src, key);
+				if (desc) Object.defineProperty(dst, key, desc);
+			}
+
+			copy(Object.getPrototypeOf(src), dst);
+		}
+		copy(parent, child); // static
+		copy(parent.prototype, child.prototype); // instance
+	},
+	onChange(object, key, handler) {
+		let value = object[key];
+		delete object[key];
+		Object.defineProperty(object, key, {
+			get: () => value,
+			set: newValue => {
+				value = newValue;
+				handler(key, value);
+			}
+		});
+	},
+	proxyBuffer(object, key, proxyKey, stride, get, set) {
+		const BufferType = object[key].constructor;
+		const length = () => object[key].length / stride;
+		const setLength = len => {
+			const data = new BufferType(len * stride);
+			data.set(object[key].slice(0, data.length));
+			object[key] = data;
+		};
+		const outOfBounds = index => isNaN(index) || index < 0 || index >= length();
+		
+		const proxy = new Proxy({ }, {
+			get: (object, key) => {
+				if (key in object) return Reflect.get(object, key);
+				if (key === "length") return length();
+				const inx = +key;
+				if (outOfBounds(inx)) return undefined;
+
+				return get(inx * stride);
+			},
+			set: (_, key, value) => {
+				if (typeof key === "symbol") return false;
+				if (key === "length") {
+					setLength(+value);
+					return true;
+				}
+				const inx = +key;
+				if (inx >= length()) setLength(inx + 1);
+				if (outOfBounds(inx)) return false;
+
+				set(inx * stride, value);
+				return true;
+			}
+		});
+		Object.defineProperty(object, proxyKey, {
+			get: () => proxy,
+			set: value => {
+				setLength(value.length);
+				for (let i = 0; i < value.length; i++)
+					proxy[i] = value[i];
+			}
+		});
+	}
+};
 
 /**
  * Subclasses of this class represent a set of unique symbolic values.
@@ -440,95 +533,6 @@ Object.defineProperty(window, "title", {
 		});
 	})();
 	proto(Array.prototype, "toString", Object.prototype.toString);
-
-	objectUtils.generateInterface = function (object, template = {}, found = new Map()) {
-		for (const key in object) {
-			const value = object[key];
-			const type = typeof value;
-			if (type === "object") {
-				if (value === null) continue;
-				if (found.has(value)) template[key] = found.get(value);
-				else {
-					const child = {};
-					found.set(value, child);
-					template[key] = objectUtils.generateInterface(value, child, found);
-				}
-			} else if (type !== "function") template[key] = type;
-		}
-		return template;
-	};
-	objectUtils.shortcut = function (objectA, objectB, key) {
-		Object.defineProperty(objectA, key, {
-			set: a => objectB[key] = a,
-			get: () => objectB[key]
-		});
-	};
-	objectUtils.inherit = function (child, parent) {
-		const copy = (src, dst) => {
-			if (!src) return;
-			const descriptors = Object.getOwnPropertyDescriptors(src);
-			for (const key in descriptors)
-				if (!(key in dst)) {
-					Object.defineProperty(dst, key, descriptors[key]);
-				}
-			copy(Object.getPrototypeOf(src), dst);
-		}
-		copy(parent, child);
-		copy(parent.prototype, child.prototype);
-	};
-	objectUtils.onChange = function (object, key, handler) {
-		let value = object[key];
-		delete object[key];
-		Object.defineProperty(object, key, {
-			get: () => value,
-			set: newValue => {
-				value = newValue;
-				handler(key, value);
-			}
-		});
-	};
-	objectUtils.proxyBuffer = function (object, key, proxyKey, stride, get, set) {
-		const BufferType = object[key].constructor;
-		const length = () => object[key].length / stride;
-		const setLength = len => {
-			const data = new BufferType(len * stride);
-			data.set(object[key].slice(0, data.length));
-			object[key] = data;
-		};
-		const outOfBounds = index => isNaN(index) || index < 0 || index >= length();
-		
-		const proxy = new Proxy({ }, {
-			get: (object, key) => {
-				if (key in object) return Reflect.get(object, key);
-				if (key === "length") return length();
-				const inx = +key;
-				if (outOfBounds(inx)) return undefined;
-
-				return get(inx * stride);
-			},
-			set: (_, key, value) => {
-				if (typeof key === "symbol") return false;
-				if (key === "length") {
-					setLength(+value);
-					return true;
-				}
-				const inx = +key;
-				if (inx >= length()) setLength(inx + 1);
-				if (outOfBounds(inx)) return false;
-
-				set(inx * stride, value);
-				return true;
-			}
-		});
-		Object.defineProperty(object, proxyKey, {
-			get: () => proxy,
-			set: value => {
-				setLength(value.length);
-				for (let i = 0; i < value.length; i++)
-					proxy[i] = value[i];
-			}
-		});
-	};
 
 	/**
 	 * @name class Storage

@@ -1,5 +1,5 @@
 class PLAYER_MOVEMENT extends ElementScript {
-	init(obj, controlPoint = Vector2.origin) {
+	init(obj, controlPoint = Vector2.zero) {
 		this.controlPoint = controlPoint;
 		this.keyboard = obj.engine.keyboard;
 		if (!obj.controls.up) {

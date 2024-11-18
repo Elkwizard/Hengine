@@ -962,13 +962,13 @@ declare class Geometry {
 	 * @param target - The point distances are checked from
 	 * @param points - The points to compare
 	 */
-	static closest(target: Vector2, points: Vector2[]): Vector2;
+	static closest(target: Vector, points: Vector[]): Vector;
 	/**
 	 * Finds the farthest point from a list of points to a given point.
 	 * @param target - The point distances are checked from
 	 * @param points - The points to compare
 	 */
-	static farthest(target: Vector2, points: Vector2[]): Vector2;
+	static farthest(target: Vector, points: Vector[]): Vector;
 	/**
 	 * Normalizes an angle to be on the interval [0, 2π).
 	 * @param theta - The angle to normalize
@@ -1348,11 +1348,24 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 */
 	mul(other: this | number): this;
 	/**
+	 * Projects a vector of dimension N - 1 by extending it with an additional 1, and dividing by the resulting final component.
+	 * @param vector - The vector to project
+	 * @param result - The destination to store the resulting vector in. If not specified, a new vector will be created
+	 */
+	project(vector: Vector, result?: Vector): Vector;
+	/**
 	 * Computes the product of the caller and another object and returns the result.
 	 * @param other - The right-hand side of the product. If this is a vector of dimension N - 1, it will be converted to and from homogenous coordinates to facilitate the multiplication
 	 * @param result - A destination to optionally store the result in. If not specified, the result will be a new vector or matrix
 	 */
 	times(other: this | Vector | number, result?: this | Vector): this | Vector | number;
+	/**
+	 * Creates an N - 1 dimensional homogenous scaling matrix about a given point and optionally stores it in a provided destination.
+	 * @param scale - The scale factor along every axis. If this is a number, the matrix will scale uniformly on all axes
+	 * @param center - The center to scale about
+	 * @param result - The matrix to copy the scaling matrix into
+	 */
+	static scaleAbout(scale: Vector | number, center: Vector, result?: Matrix): Matrix;
 	/**
 	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
 	 * @param scale - The scale factor along every axis
@@ -1395,9 +1408,10 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 */
 	static mul(matrices: Matrix3[], result?: Matrix3): Matrix3;
 	/**
-	 * Returns a vector class which has the same number of elements as the dimension of the caller.
+	 * Returns a matrix class with a given number of dimensions.
+	 * @param size - The number of dimensions transformed by the returned class. This must be between 2 and 4
 	 */
-	static get Vector(): Class<Vector>;
+	static getMatrix(size: number): Class<Matrix>;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -1468,12 +1482,19 @@ declare class Matrix4 extends Matrix {
 	/**
 	 * Creates an orthographic projection matrix for use in 3D rendering.
 	 * The x and y range parameters can be specified as numbers to indicate the size of a 0-centered range (e.g. `6` corresponds to `new Range(-3, 3)`).
-	 * @param xRange - The range along the x-axis of view space to include in the projection
-	 * @param yRange - The range along the y-axis of view space to include in the projection
-	 * @param zRange - The range along the z-axis of view space to include in the projection. If this is specified as a number, it represents a range from 0 to the argument (e.g. `6` corresponds to `new Range(0, 6)`)
+	 * @param xRange - The range along the x axis of view space to include in the projection
+	 * @param yRange - The range along the y axis of view space to include in the projection
+	 * @param zRange - The range along the z axis of view space to include in the projection. If this is specified as a number, it represents a range from 0 to the argument (e.g. `6` corresponds to `new Range(0, 6)`)
 	 * @param result - The destination to store the resulting matrix in. If not specified, a new matrix will be created
 	 */
 	static orthographic(xRange: Range | number, yRange: Range | number, zRange: Range | number, result?: Matrix4): Matrix4;
+	/**
+	 * Creates an orthographic projection matrix for use in 3D rendering.
+	 * The x and y range parameters can be specified as numbers to indicate the size of a 0-centered range (e.g. `6` corresponds to `new Range(-3, 3)`).
+	 * @param bounds - The range to include in the projection
+	 * @param result - The destination to store the resulting matrix in. If not specified, a new matrix will be created
+	 */
+	static orthographic(bounds: Prism, result?: Matrix4): Matrix4;
 }
 
 /**
@@ -2015,6 +2036,15 @@ declare class Vector extends Operable {
 	 * @param b - The second vector
 	 */
 	static sqrDist(a: Vector, b: Vector): number;
+	/**
+	 * Returns the size of the vector type.
+	 */
+	static get size(): number;
+	/**
+	 * Retrieves a vector class with a specified size.
+	 * @param size - The number of dimensions in the vector. This must be between 2 and 4
+	 */
+	static getVector(size: number): Class<Vector>;
 }
 
 /**
@@ -2769,13 +2799,14 @@ declare class Operable implements MathObject, Serializable {
 	 */
 	get values(): number[];
 	/**
-	 * Sets all elements of the operable, either by copying from another operable of the same type, or by using a list of numeric values.
+	 * Sets all elements of the operable, either by copying from another operable, or by using a list of numeric values.
 	 * Returns the caller.
 	 * @param other - The operable to copy values from
+	 * @param fill - A value to fill missing elements with. Default is 0
 	 */
-	set(other: this): this;
+	set(other: this, fill?: number): this;
 	/**
-	 * Sets all elements of the operable, either by copying from another operable of the same type, or by using a list of numeric values.
+	 * Sets all elements of the operable, either by copying from another operable, or by using a list of numeric values.
 	 * Returns the caller.
 	 * @param elements - The new element values
 	 */
@@ -3353,100 +3384,6 @@ declare class Camera2D extends Matrix3 implements Camera {
 	 * @param render - The function to call while in the screen-space context
 	 */
 	drawInScreenSpace(render: () => void): void;
-	/**
-	 * The magnification level of the camera
-	 */
-	zoom: number;
-	/**
-	 * The clockwise roll (in radians) of the camera. Starts at 0
-	 */
-	rotation: number;
-	/**
-	 * Returns the caller.
-	 */
-	get matrix(): Matrix;
-	/**
-	 * Sets the zoom to 1.
-	 */
-	restoreZoom(): void;
-	/**
-	 * Zooms in by a specified amount.
-	 * @param amount - The amount to zoom in by
-	 */
-	zoomIn(amount: number): void;
-	/**
-	 * Zooms out by a specified amount.
-	 * @param amount - The amount to zoom out by
-	 */
-	zoomOut(amount: number): void;
-	/**
-	 * Multiplies the current zoom value.
-	 * @param factor - The amount to multiply the current zoom
-	 */
-	zoomBy(factor: number): void;
-	/**
-	 * Maps a given point from screen-space to world-space.
-	 * @param point - The point to transform
-	 */
-	screenToWorld(point: Vector2): Vector2;
-	/**
-	 * Maps a given point from world-space to screen-space.
-	 * @param point - The point to transform
-	 */
-	worldToScreen(point: Vector2): Vector2;
-}
-
-/**
- * Represents the camera in a 3D scene.
- */
-declare class Camera3D extends Matrix4 implements Camera {
-	/**
-	 * The location of the camera, in world-space. Starts at (0, 0, 0)
-	 */
-	position: Vector3;
-	/**
-	 * The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
-	 */
-	direction: Vector3;
-	/**
-	 * Creates a new camera at (0, 0, 0).
-	 * @param canvas - The surface to target
-	 */
-	constructor(canvas: ImageType);
-	/**
-	 * Returns the product of the camera's projection matrix and itself, `projection * worldToScreen`.
-	 */
-	get pcMatrix(): Matrix4;
-	/**
-	 * Returns the projection matrix of the camera.
-	 * This may vary as the dimensions of the rendering surface change.
-	 */
-	get projection(): Matrix4;
-	/**
-	 * Configures the camera to use a custom projection.
-	 * @param projection - The homogenous projection matrix to use
-	 */
-	set projection(projection: Matrix4);
-	/**
-	 * Configures the camera to use a perspective projection.
-	 * @param fov - The field of view of the camera in radians
-	 * @param zNear - The location of the near clipping plane
-	 * @param zFar - The location of the far clipping plane
-	 */
-	perspective(fov: number, zNear: number, zFar: number): void;
-	/**
-	 * Configures the camera to use a orthographic projection.
-	 * @param span - The size of the x and y spans included in the projection
-	 * @param depth - The maximum depth included in the projection
-	 */
-	orthographic(span: number, depth: number): void;
-	/**
-	 * Points the camera in a specific direction, with a specified angle from +z on the horizontal and vertical axes.
-	 * The vertical input is clamped to avoid gimbal lock.
-	 * @param xAngle - The angle in radians about the y axis from +z to the camera direction
-	 * @param yAngle - The angle in radians about the x axis from +z to the camera direction
-	 */
-	look(xAngle: number, yAngle: number): void;
 	/**
 	 * The magnification level of the camera
 	 */
@@ -4725,8 +4662,8 @@ declare class PathRenderer {
 	 * Creates an elliptical path.
 	 * @param x - The x coordinate of the ellipse's center
 	 * @param y - The y coordinate of the ellipse's center
-	 * @param radiusX - The x-axis radius of the ellipse
-	 * @param radiusY - The y-axis radius of the ellipse
+	 * @param radiusX - The x axis radius of the ellipse
+	 * @param radiusY - The y axis radius of the ellipse
 	 */
 	ellipse(x: number, y: number, radiusX: number, radiusY: number): void;
 	/**
@@ -5014,7 +4951,7 @@ declare class ClipRenderer extends PathRenderer {
 /**
  * Represents an inclusive interval.
  */
-declare class Range {
+declare class Range implements Copyable {
 	/**
 	 * The lower bound of the interval
 	 */
@@ -5062,7 +4999,7 @@ declare class Range {
 	 */
 	includes(value: number): this;
 	/**
-	 * Expands the Range to include a specified value.
+	 * Expands the range to include a specified value.
 	 * @param value - The value to include
 	 */
 	include(value: number): void;
@@ -5076,74 +5013,44 @@ declare class Range {
 	 * @param values - The set of values to bound
 	 */
 	static fromValues(values: number[]): Range;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
 }
 
 /**
- * Represents a 2D shape.
+ * Represents a shape.
  * This is an abstract superclass and should not be constructed.
  * All properties of this class are read-only.
  */
 declare class Shape implements Copyable {
 	/**
-	 * The area of the shape at the time of construction
-	 */
-	area: number;
-	/**
 	 * The geometric center of the shape
 	 */
-	middle: Vector2;
-	/**
-	 * Returns a copy of the shape centered at a specified location.
-	 * @param newCenter - The location of the new center
-	 */
-	center(newCenter: Vector2): this;
+	middle: Vector;
 	/**
 	 * Returns a copy of the shape after a certain transformation is applied to all its points.
 	 * @param transform - The transformation to apply to the shape
 	 */
 	getModel(transform: Transform): this;
 	/**
-	 * Returns a copy of the shape uniformly scaled about its center.
-	 * @param factor - The scale factor
+	 * Returns a copy of the shape scaled about a specified point.
+	 * @param factor - The scale factor on each axis. If this is a number, it applies to all axes equally
+	 * @param position - The scaling center. Default is the middle of the shape
 	 */
-	scale(factor: number): this;
+	scale(factor: Vector | number, position?: Vector): this;
 	/**
-	 * Returns a copy of the shape scaled about its center along the x axis.
-	 * @param factor - The scale factor
+	 * Returns a copy of the shape centered at a specified location.
+	 * @param newCenter - The location of the new center
 	 */
-	scaleX(factor: number): this;
-	/**
-	 * Returns a copy of the shape scaled about its center along the y axis.
-	 * @param factor - The scale factor
-	 */
-	scaleY(factor: number): this;
-	/**
-	 * Returns a copy of the shape uniformly scaled about a specified point.
-	 * @param position - The scaling center
-	 * @param factor - The scale factor
-	 */
-	scaleAbout(position: Vector2, factor: number): this;
-	/**
-	 * Returns a copy of the shape scaled about a specified point along the x axis.
-	 * @param position - The scaling center
-	 * @param factor - The scale factor
-	 */
-	scaleXAbout(position: Vector2, factor: number): this;
-	/**
-	 * Returns a copy of the shape scaled about a specified point along the y axis.
-	 * @param position - The scaling center
-	 * @param factor - The scale factor
-	 */
-	scaleYAbout(position: Vector2, factor: number): this;
+	center(newCenter: Vector): this;
 	/**
 	 * Returns a copy of the shape translated by a specified amount.
 	 * @param displacement - The amount to displace the shape by
 	 */
-	move(displacement: Vector2): this;
-	/**
-	 * Returns the smallest axis-aligned Rect that contains the entire shape.
-	 */
-	getBoundingBox(): Rect;
+	move(displacement: Vector): this;
 	/**
 	 * Checks if two shapes are congruent.
 	 * @param other - The Shape to compare against
@@ -5155,20 +5062,21 @@ declare class Shape implements Copyable {
 	 */
 	intersect(shape: this): boolean;
 	/**
-	 * Returns the closest point on the shape's boundary to a specified other point.
+	 * Returns the closest point within the shape to a specified other point, including the boundary.
 	 * @param point - The target point
 	 */
-	closestPointTo(point: Vector2): Vector2;
+	closestPointTo(point: Vector): Vector;
 	/**
-	 * Returns the distance from a specified point to the boundary of the shape.
+	 * Returns the distance from a specified point to the shape.
+	 * If the point is inside the shape, this will return 0.
 	 * @param point - The target point
 	 */
-	distanceTo(point: Vector2): number;
+	distanceTo(point: Vector): number;
 	/**
 	 * Checks if a point is inside the shape, including points on the boundary.
 	 * @param point - The point to check
 	 */
-	containsPoint(point: Vector2): boolean;
+	containsPoint(point: Vector): boolean;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -5177,9 +5085,24 @@ declare class Shape implements Copyable {
 }
 
 /**
+ * Represents a 2D shape.
+ * This is an abstract superclass and should not be constructed.
+ */
+declare class Shape2D extends Shape {
+	/**
+	 * The area of the shape at the time of construction
+	 */
+	area: number;
+	/**
+	 * Returns the smallest axis-aligned rectangle that contains the entire shape.
+	 */
+	getBoundingBox(): Rect;
+}
+
+/**
  * Represents a line segment.
  */
-declare class Line extends Shape {
+declare class Line extends Shape2D {
 	/**
 	 * The start point of the line segment
 	 */
@@ -5192,6 +5115,10 @@ declare class Line extends Shape {
 	 * A vector from the start point of the line segment to the end point
 	 */
 	vector: Vector2;
+	/**
+	 * A unit normal vector to the line segment
+	 */
+	normal: Vector2;
 	/**
 	 * THe length of the line segment
 	 */
@@ -5235,7 +5162,7 @@ declare class Line extends Shape {
 /**
  * Represents a contiguous 2D polygon with no holes.
  */
-declare class Polygon extends Shape {
+declare class Polygon extends Shape2D {
 	/**
 	 * The vertices of the border of the polygon, they are in a clockwise order.
 	 */
@@ -5350,36 +5277,21 @@ declare class Rect extends Polygon {
 /**
  * Represents a circle.
  */
-declare class Circle extends Shape {
+declare class Circle extends Shape2D {
 	/**
-	 * The x coordinate of the center of the circle
+	 * The center of the circle
 	 */
-	x: number;
-	/**
-	 * The y coordinate of the center of the circle
-	 */
-	y: number;
+	position: Vector2;
 	/**
 	 * The radius of the circle
 	 */
 	radius: number;
 	/**
 	 * Creates a new Circle.
-	 * @param x - The x coordinate of the center
-	 * @param y - The y coordinate of the center
+	 * @param position - The center of the circle
 	 * @param radius - The radius of the circle
 	 */
-	constructor(x: number, y: number, radius: number);
-	/**
-	 * Since there is no representation for an ellipse, this scales uniformly instead of the behavior for Shape.
-	 * @param factor - The scale factor
-	 */
-	scaleX(factor: number): this;
-	/**
-	 * Since there is no representation for an ellipse, this scales uniformly instead of the behavior for Shape.
-	 * @param factor - The scale factor
-	 */
-	scaleY(factor: number): this;
+	constructor(position: Vector2, radius: number);
 }
 
 /**
@@ -5641,11 +5553,10 @@ declare class Transform extends Matrix3 implements Copyable {
 	direction: Vector2;
 	/**
 	 * Creates a new Transform.
-	 * @param x - The initial x translation
-	 * @param y - The initial y translation
-	 * @param rotation - The initial rotation of the
+	 * @param position - The initial translation of the transform
+	 * @param rotation - The initial rotation of the transform. Default is 0
 	 */
-	constructor(x: number, y: number, rotation: number);
+	constructor(position: Vector2, rotation?: number);
 	/**
 	 * Returns a transform that, when composed with the caller, will produce no offset and no rotation.
 	 */
@@ -5750,6 +5661,37 @@ declare class FastFrame extends Frame {
 	 * The renderer for the frame
 	 */
 	renderer: WebGLArtist2D;
+}
+
+/**
+ * Represents a cube map usable in via a GPUInterface.
+ * All faces must be square and equal in size.
+ */
+declare interface CubeMap {
+	/**
+	 * The face of the cube map on the positive x side
+	 */
+	posX: ImageType;
+	/**
+	 * The face of the cube map on the negative x side
+	 */
+	negX: ImageType;
+	/**
+	 * The face of the cube map on the positive y side
+	 */
+	posY: ImageType;
+	/**
+	 * The face of the cube map on the negative y side
+	 */
+	negY: ImageType;
+	/**
+	 * The face of the cube map on the positive z side
+	 */
+	posZ: ImageType;
+	/**
+	 * The face of the cube map on the negative z side
+	 */
+	negZ: ImageType;
 }
 
 /**

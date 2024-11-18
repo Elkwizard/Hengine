@@ -125,6 +125,27 @@ class Vector extends Operable {
 	static sqrDist(a, b) {
 		return a.minus(b).sqrMag;
 	}
+	/**
+	 * Returns the size of the vector type.
+	 * @return Number
+	 */
+	static get size() {
+		return this.modValues.length;
+	}
+	/**
+	 * Retrieves a vector class with a specified size.
+	 * @param Number size | The number of dimensions in the vector. This must be between 2 and 4 
+	 * @return Class extends Vector
+	 */
+	static getVector(size) {
+		return Vector.vectors[size];
+	}
+	static get Matrix() {
+		return Matrix.getMatrix(this.size);
+	}
+	static get TransformMatrix() {
+		return Matrix.getMatrix(this.size + 1);
+	}
 }
 Vector.modValues = [];
 
@@ -475,7 +496,6 @@ class Vector2 extends Vector {
 	static polar(θ, r = 1) {
 		return new Vector2(Math.cos(θ) * r, Math.sin(θ) * r);
 	}
-
 	static fromPoint(p) {
 		return new Vector2(p.x || 0, p.y || 0);
 	}
@@ -813,3 +833,5 @@ Vector4.modValues = ["x", "y", "z", "w"];
 		}
 	}
 })();
+
+Vector.vectors = [,, Vector2, Vector3, Vector4];

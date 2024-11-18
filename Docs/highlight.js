@@ -107,7 +107,7 @@ highlighters.glsl = [
 	...MAIN_MATCH,
 	...PROPERTY_MATCH,
 	...FUNCTION_MATCH,
-	[/\b(struct)\s+(\w+?)\b/g, "CLASS"],
+	[/\b(struct|uniform|in|out)\s+(\w+?)\b/g, "CLASS"],
 	[/\b(\w+)\s+(?=(\w+?)\b)/g, "CLASS"],
 	[/\b([A-Z_]+?)\b/g, "CONSTANT"],
 	...WORD_MATCH("KEYWORD", "#define", "#version", "struct", "([ui]?sampler[23]D)", "bool", "float", "(u?int)", "highp", "lowp", "mediump", "return", "if", "else", "for", "while", "do", "case", "switch", "case", "break", "continue", "uniform", "in", "out", "inout", "([ui]?vec[234])", "(mat[234])", "(mat[234]x[234])"),

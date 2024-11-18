@@ -241,7 +241,7 @@ class CanvasArtist2D extends Artist2D {
 		let pathObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					if (x.radius !== undefined) ({ x, y, radius } = x);
+					if (x.radius !== undefined) ({ position: { x, y }, radius } = x);
 					else {
 						radius = y;
 						({ x, y } = x);
@@ -674,7 +674,7 @@ class CanvasArtist2D extends Artist2D {
 			infer(obj) {
 				if (obj.radius !== undefined)
 					this.strokeObj.circle(obj);
-				else if (obj.radius !== undefined)
+				else if (obj.width !== undefined)
 					this.strokeObj.rect(obj);
 				else if (obj.vertices !== undefined)
 					this.strokeObj.shape(obj.vertices);
@@ -808,7 +808,6 @@ class CanvasArtist2D extends Artist2D {
 				else if (obj.vertices !== undefined)
 					this.imageObj.shape(obj.vertices);
 			}
-
 		};
 		for (let func in this.imageObj) {
 			this.imageObj[func] = this.imageObj[func].bind(this);
@@ -1008,8 +1007,8 @@ class CanvasArtist2D extends Artist2D {
  * Creates an elliptical path.
  * @param Number x | The x coordinate of the ellipse's center
  * @param Number y | The y coordinate of the ellipse's center
- * @param Number radiusX | The x-axis radius of the ellipse
- * @param Number radiusY | The y-axis radius of the ellipse
+ * @param Number radiusX | The x axis radius of the ellipse
+ * @param Number radiusY | The y axis radius of the ellipse
  */
 
 /**

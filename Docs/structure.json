@@ -45,12 +45,15 @@
 			"ScriptContainer": null
 		},
 		"Rendering": {
-			"GLSL API": ["GLSL API", "GPUInterface", "GPUArray"],
+			"GLSL API": {
+				"Basics": ["GLSL API", "CubeMap"],
+				"GPUInterface": null,
+				"GPUArray": null
+			},
 			"Font": null,
 			"Camera": {
 				"Camera": null,
-				"Camera2D": null,
-				"Camera3D": null
+				"Camera2D": null
 			},
 			"Color": null,
 			"Gradient": ["Gradient", "ValueStop"],
@@ -63,18 +66,18 @@
 					"CanvasArtist2D": null,
 					"WebGLArtist2D": null
 				},
-				"Configuration": [
-					"TextMode",
-					"BlendMode",
-					"LineCap",
-					"LineJoin"
-				],
 				"PathRenderer": null,
 				"Renderers": [
 					"DrawRenderer",
 					"StrokeRenderer",
 					"ClipRenderer",
 					"ImageRenderer"
+				],
+				"Configuration": [
+					"TextMode",
+					"BlendMode",
+					"LineCap",
+					"LineJoin"
 				]
 			},
 			"Image Types": {

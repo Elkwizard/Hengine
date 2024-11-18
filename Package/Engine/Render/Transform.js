@@ -16,21 +16,17 @@
 class Transform extends Matrix3 {
 	/**
 	 * Creates a new Transform.
-	 * @param Number x | The initial x translation
-	 * @param Number y | The initial y translation
-	 * @param Number rotation | The initial rotation of the  
+	 * @param Vector2 position | The initial translation of the transform
+	 * @param Number rotation? | The initial rotation of the transform. Default is 0
 	 */
-	constructor(x, y, rotation) {
+	constructor(position, rotation = 0) {
 		super(
-			1, 0, x,
-			0, 1, y,
+			1, 0, position.x,
+			0, 1, position.y,
 			0, 0, 1
 		);
 		this.rotation = rotation;
-		
-		// create an double bound position object, so (transf.position.x += ...) works
-
-		this._position = Vector2.origin.proxy(this, [6, 7]);
+		this._position = Vector2.zero.proxy(this, [6, 7]);
 	}
 	/**
 	 * Returns a transform that, when composed with the caller, will produce no offset and no rotation.
@@ -38,7 +34,7 @@ class Transform extends Matrix3 {
 	 */
 	get inverse() {
 		const pos = this.position.inverse.rotate(-this.rotation);
-		return new Transform(pos.x, pos.y, -this.rotation);
+		return new Transform(pos, -this.rotation);
 	}
 	set position(vec) {
 		this[6] = vec.x;
@@ -67,7 +63,7 @@ class Transform extends Matrix3 {
 	get direction() {
 		return new Vector2(this.cosRotation, this.sinRotation);
 	}
-	get(transf = new Transform(0, 0, 0)) {
+	get(transf = new Transform(Vector2.zero, 0)) {
 		transf.position = this.position;
 		transf.rotation = this.rotation;
 		return transf;
@@ -155,6 +151,6 @@ class Transform extends Matrix3 {
 		tx += b.position.x * a.cosRotation - b.position.y * a.sinRotation;
 		ty += b.position.x * a.sinRotation + b.position.y * a.cosRotation;
 		const rotation = a.rotation + b.rotation;
-		return new Transform(tx, ty, rotation);
+		return new Transform(new Vector2(tx, ty), rotation);
 	}
 }

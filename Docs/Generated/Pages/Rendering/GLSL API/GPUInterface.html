@@ -1,0 +1,161 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class GPUInterface">
+				<div class="class-header">
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1188" target="_blank" class="class-name source-link">GPUInterface</a>
+				</div>
+				<div class="class desc">
+					Represents a GLSL program.
+				</div>
+				
+					<div class="header">Implementers</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Miscellaneous/GPUComputation.html#class GPUComputation">GPUComputation</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/GPUShader.html#class GPUShader">GPUShader</a></span></div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="GPUInterface.glsl">
+					<div class="prop-header member">
+						<span class="prop-name">glsl</span><span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+					</div>
+					<div class="prop desc">The source code of the program</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="GPUInterface.prototype.setUniform()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1237" target="_blank" class="function-name source-link">setUniform</a>(<span class="param">name</span>, <span class="param">value</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Sets the value of a uniform in the program.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="GPUInterface.prototype.setUniform():name">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+							</div>
+							<div class="param desc">
+								The name of the uniform
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="GPUInterface.prototype.setUniform():value">
+							<div class="param-name">
+								<span class="param">value</span>
+								<span class="type">Any</span>
+							</div>
+							<div class="param desc">
+								The new value for the uniform. For the type of this argument, see the <a href="../../../Pages/Rendering/GLSL API/Basics.html#GLSL API">GLSL API</a>
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="GPUInterface.prototype.setUniforms()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1247" target="_blank" class="function-name source-link">setUniforms</a>(<span class="param">uniforms</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Sets the value of many uniforms at once.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="GPUInterface.prototype.setUniforms():uniforms">
+							<div class="param-name">
+								<span class="param">uniforms</span>
+								<span class="type">Object</span>
+							</div>
+							<div class="param desc">
+								A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="GPUInterface.prototype.getUniform()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1259" target="_blank" class="function-name source-link">getUniform</a>(<span class="param">name</span>)<span class="type">Any</span>
+			</div>
+			<div class="function desc">
+				Retrieves the current value of a given uniform.
+For the return type of this function, see the <a href="../../../Pages/Rendering/GLSL API/Basics.html#GLSL API">GLSL API</a>.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="GPUInterface.prototype.getUniform():name">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+							</div>
+							<div class="param desc">
+								The name of the uniform
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="GPUInterface.prototype.argumentExists()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L1270" target="_blank" class="function-name source-link">argumentExists</a>(<span class="param">name</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks whether a given uniform exists.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="GPUInterface.prototype.argumentExists():name">
+							<div class="param-name">
+								<span class="param">name</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+							</div>
+							<div class="param desc">
+								The name of the uniform to check
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

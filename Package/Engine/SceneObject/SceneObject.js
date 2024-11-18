@@ -30,7 +30,7 @@ class Controls {
 class SceneObject extends SceneElement {
 	constructor(name, x, y, controls, container, engine) {
 		super(name, container);
-		this.transform = new Transform(x, y, 0);
+		this.transform = new Transform(new Vector2(x, y), 0);
 		this.lastTransform = this.transform.get();
 		this.shapes = new Map();
 		this.convexShapes = new Map();
@@ -192,7 +192,7 @@ class SceneObject extends SceneElement {
 	 * Adjusts the location of all of the object's shapes such that the geometric center of all the shapes is (0, 0) in local-space.
 	 */
 	centerShapes() {
-		let center = Vector2.origin;
+		let center = Vector2.zero;
 		let totalArea = 0;
 		let names = [];
 		let shapes = [];
@@ -261,11 +261,11 @@ class SceneObject extends SceneElement {
 	 * @param Number factor | The scale factor
 	 */
 	scale(factor) {
-		const pos = Vector2.origin;
+		const pos = Vector2.zero;
 		const entries = [];
 		for (let entry of this.shapes) entries.push(entry);
 		for (let i = 0; i < entries.length; i++)
-			this.addShape(entries[i][0], entries[i][1].scaleAbout(pos, factor));
+			this.addShape(entries[i][0], entries[i][1].scale(factor, pos));
 		this.cacheDimensions();
 	}
 	/**

@@ -9,31 +9,24 @@
 				
 			<div class="class-wrapper" id="class Shape">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L139" target="_blank" class="class-name source-link">Shape</a> <span class="keyword">implements</span> <span class="class-name"><a href="../../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L144" target="_blank" class="class-name source-link">Shape</a> <span class="keyword">implements</span> <span class="class-name"><a href="../../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
 				</div>
 				<div class="class desc">
-					Represents a 2D shape.
+					Represents a shape.
 This is an abstract superclass and should not be constructed.
 All properties of this class are read-only.
 				</div>
 				
 					<div class="header">Subclasses</div>
-					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Geometry/Shapes/Line.html#class Line">Line</a></span>, <span class="class-name"><a href="../../../Pages/Geometry/Shapes/Polygon.html#class Polygon">Polygon</a></span>, <span class="class-name"><a href="../../../Pages/Geometry/Shapes/Circle.html#class Circle">Circle</a></span></div>
+					<div class="subclass desc"><span class="class-name">Shape2D</span></div>
 				
 				
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Shape.area">
-					<div class="prop-header member">
-						<span class="prop-name">area</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The area of the shape at the time of construction</div>
-				</div>
-			
 				<div class="prop-wrapper" id="Shape.middle">
 					<div class="prop-header member">
-						<span class="prop-name">middle</span><span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">middle</span><span class="type"><a href="../../../Pages/Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 					</div>
 					<div class="prop desc">The geometric center of the shape</div>
 				</div>
@@ -43,36 +36,9 @@ All properties of this class are read-only.
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="Shape.prototype.center()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L151" target="_blank" class="function-name source-link">center</a>(<span class="param">newCenter</span>)<span class="type">Shape</span>
-			</div>
-			<div class="function desc">
-				Returns a copy of the shape centered at a specified location.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Shape.prototype.center():newCenter">
-							<div class="param-name">
-								<span class="param">newCenter</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-							</div>
-							<div class="param desc">
-								The location of the new center
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="Shape.prototype.getModel()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L159" target="_blank" class="function-name source-link">getModel</a>(<span class="param">transform</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L151" target="_blank" class="function-name source-link">getModel</a>(<span class="param">transform</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape after a certain transformation is applied to all its points.
@@ -99,10 +65,10 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.scale()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L165" target="_blank" class="function-name source-link">scale</a>(<span class="param">factor</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L157" target="_blank" class="function-name source-link">scale</a>(<span class="param">factor</span>, <span class="param">position?</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
-				Returns a copy of the shape uniformly scaled about its center.
+				Returns a copy of the shape scaled about a specified point.
 			</div>
 			
 				<div class="function-signature">
@@ -112,101 +78,20 @@ All properties of this class are read-only.
 						<div class="param-wrapper" id="Shape.prototype.scale():factor">
 							<div class="param-name">
 								<span class="param">factor</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector.html#class Vector">Vector</a>/<a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The scale factor
+								The scale factor on each axis. If this is a number, it applies to all axes equally
 							</div>
 						</div>
 					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Shape.prototype.scaleX()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L173" target="_blank" class="function-name source-link">scaleX</a>(<span class="param">factor</span>)<span class="type">Shape</span>
-			</div>
-			<div class="function desc">
-				Returns a copy of the shape scaled about its center along the x axis.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Shape.prototype.scaleX():factor">
-							<div class="param-name">
-								<span class="param">factor</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The scale factor
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Shape.prototype.scaleY()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L181" target="_blank" class="function-name source-link">scaleY</a>(<span class="param">factor</span>)<span class="type">Shape</span>
-			</div>
-			<div class="function desc">
-				Returns a copy of the shape scaled about its center along the y axis.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Shape.prototype.scaleY():factor">
-							<div class="param-name">
-								<span class="param">factor</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The scale factor
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Shape.prototype.scaleAbout()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L190" target="_blank" class="function-name source-link">scaleAbout</a>(<span class="param">position</span>, <span class="param">factor</span>)<span class="type">Shape</span>
-			</div>
-			<div class="function desc">
-				Returns a copy of the shape uniformly scaled about a specified point.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Shape.prototype.scaleAbout():position">
+						<div class="param-wrapper" id="Shape.prototype.scale():position?">
 							<div class="param-name">
 								<span class="param">position</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 							</div>
 							<div class="param desc">
-								The scaling center
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Shape.prototype.scaleAbout():factor">
-							<div class="param-name">
-								<span class="param">factor</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The scale factor
+								The scaling center. Default is the middle of the shape
 							</div>
 						</div>
 					
@@ -215,72 +100,25 @@ All properties of this class are read-only.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Shape.prototype.scaleXAbout()">
+		<div class="function-wrapper" id="Shape.prototype.center()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L197" target="_blank" class="function-name source-link">scaleXAbout</a>(<span class="param">position</span>, <span class="param">factor</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L165" target="_blank" class="function-name source-link">center</a>(<span class="param">newCenter</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
-				Returns a copy of the shape scaled about a specified point along the x axis.
+				Returns a copy of the shape centered at a specified location.
 			</div>
 			
 				<div class="function-signature">
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Shape.prototype.scaleXAbout():position">
+						<div class="param-wrapper" id="Shape.prototype.center():newCenter">
 							<div class="param-name">
-								<span class="param">position</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="param">newCenter</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 							</div>
 							<div class="param desc">
-								The scaling center
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Shape.prototype.scaleXAbout():factor">
-							<div class="param-name">
-								<span class="param">factor</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The scale factor
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Shape.prototype.scaleYAbout()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L204" target="_blank" class="function-name source-link">scaleYAbout</a>(<span class="param">position</span>, <span class="param">factor</span>)<span class="type">Shape</span>
-			</div>
-			<div class="function desc">
-				Returns a copy of the shape scaled about a specified point along the y axis.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Shape.prototype.scaleYAbout():position">
-							<div class="param-name">
-								<span class="param">position</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-							</div>
-							<div class="param desc">
-								The scaling center
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Shape.prototype.scaleYAbout():factor">
-							<div class="param-name">
-								<span class="param">factor</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The scale factor
+								The location of the new center
 							</div>
 						</div>
 					
@@ -291,7 +129,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.move()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L210" target="_blank" class="function-name source-link">move</a>(<span class="param">displacement</span>)<span class="type">Shape</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L173" target="_blank" class="function-name source-link">move</a>(<span class="param">displacement</span>)<span class="type">Shape</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the shape translated by a specified amount.
@@ -304,7 +142,7 @@ All properties of this class are read-only.
 						<div class="param-wrapper" id="Shape.prototype.move():displacement">
 							<div class="param-name">
 								<span class="param">displacement</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 							</div>
 							<div class="param desc">
 								The amount to displace the shape by
@@ -316,19 +154,9 @@ All properties of this class are read-only.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Shape.prototype.getBoundingBox()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L215" target="_blank" class="function-name source-link">getBoundingBox</a>()<span class="type"><a href="../../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
-			</div>
-			<div class="function desc">
-				Returns the smallest axis-aligned <a href="../../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a> that contains the entire shape.
-			</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="Shape.prototype.equals()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L221" target="_blank" class="function-name source-link">equals</a>(<span class="param">other</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L181" target="_blank" class="function-name source-link">equals</a>(<span class="param">other</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks if two shapes are congruent.
@@ -355,7 +183,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.intersect()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L228" target="_blank" class="function-name source-link">intersect</a>(<span class="param">shape</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L190" target="_blank" class="function-name source-link">intersect</a>(<span class="param">shape</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks if two shapes intersect.
@@ -382,10 +210,10 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.closestPointTo()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L238" target="_blank" class="function-name source-link">closestPointTo</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L201" target="_blank" class="function-name source-link">closestPointTo</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 			</div>
 			<div class="function desc">
-				Returns the closest point on the shape's boundary to a specified other point.
+				Returns the closest point within the shape to a specified other point, including the boundary.
 			</div>
 			
 				<div class="function-signature">
@@ -395,7 +223,7 @@ All properties of this class are read-only.
 						<div class="param-wrapper" id="Shape.prototype.closestPointTo():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 							</div>
 							<div class="param desc">
 								The target point
@@ -409,10 +237,11 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.distanceTo()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L244" target="_blank" class="function-name source-link">distanceTo</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L207" target="_blank" class="function-name source-link">distanceTo</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns the distance from a specified point to the boundary of the shape.
+				Returns the distance from a specified point to the shape.
+If the point is inside the shape, this will return 0.
 			</div>
 			
 				<div class="function-signature">
@@ -422,7 +251,7 @@ All properties of this class are read-only.
 						<div class="param-wrapper" id="Shape.prototype.distanceTo():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 							</div>
 							<div class="param desc">
 								The target point
@@ -436,7 +265,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="Shape.prototype.containsPoint()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L252" target="_blank" class="function-name source-link">containsPoint</a>(<span class="param">point</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L215" target="_blank" class="function-name source-link">containsPoint</a>(<span class="param">point</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks if a point is inside the shape, including points on the boundary.
@@ -449,7 +278,7 @@ All properties of this class are read-only.
 						<div class="param-wrapper" id="Shape.prototype.containsPoint():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 							</div>
 							<div class="param desc">
 								The point to check

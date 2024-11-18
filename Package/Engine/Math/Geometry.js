@@ -222,7 +222,8 @@ class Geometry {
 			}
 		}
 		
-		return rects.map(rect => rect.scaleAbout(Vector2.origin, cellSize));
+		const center = Vector2.zero;
+		return rects.map(rect => rect.scale(cellSize, center));
 	}
 	/**
 	 * Combines a set of grid-aligned squares into the minimum number of polygons occupying the same space.
@@ -298,11 +299,10 @@ class Geometry {
 			polygons.push(poly);
 		}
 
+		const center = Vector2.zero;
 		return polygons
 			.filter(Geometry.isListClockwise)
-			.map(poly => new Polygon(poly).scaleAbout(
-				Vector2.origin, cellSize
-			));
+			.map(poly => new Polygon(poly).scale(cellSize, center));
 	}
 	/**
 	 * Same as `.gridToExactPolygons()`, except that the returned Polygons have their concave vertices removed. Note that this filtering step only happens once, so the result may have still have concave vertices.
@@ -457,15 +457,15 @@ class Geometry {
 	}
 	/**
 	 * Finds the closest point from a list of points to a given point.
-	 * @param Vector2 target | The point distances are checked from
-	 * @param Vector2[] points | The points to compare
-	 * @return Vector2
+	 * @param Vector target | The point distances are checked from
+	 * @param Vector[] points | The points to compare
+	 * @return Vector
 	 */
 	static closest(p, points) {
 		let bestDist = Infinity;
 		let best = null;
 		for (let i = 0; i < points.length; i++) {
-			let dist = Vector2.sqrDist(points[i], p);
+			let dist = p.constructor.sqrDist(points[i], p);
 			if (dist < bestDist) {
 				bestDist = dist;
 				best = points[i];
@@ -475,15 +475,15 @@ class Geometry {
 	}
 	/**
 	 * Finds the farthest point from a list of points to a given point.
-	 * @param Vector2 target | The point distances are checked from
-	 * @param Vector2[] points | The points to compare
-	 * @return Vector2
+	 * @param Vector target | The point distances are checked from
+	 * @param Vector[] points | The points to compare
+	 * @return Vector
 	 */
 	static farthest(p, points) {
 		let bestDist = -Infinity;
 		let best = null;
 		for (let i = 0; i < points.length; i++) {
-			let dist = Vector2.sqrDist(points[i], p);
+			let dist = p.constructor.sqrDist(points[i], p);
 			if (dist > bestDist) {
 				bestDist = dist;
 				best = points[i];
@@ -517,19 +517,6 @@ class Geometry {
 			diff -= pi2;
 
 		return (r2 < r1) ? diff : -diff;
-	}
-	static farthestInDirection(corners, dir) {
-		let farthest = corners[0];
-		let farthestDist = -Infinity;
-		for (let i = 1; i < corners.length; i++) {
-			const corner = corners[i];
-			const dist = corner.x * dir.x + corner.y * dir.y;
-			if (dist > farthestDist) {
-				farthest = corner;
-				farthestDist = dist;
-			}
-		}
-		return farthest;
 	}
 	/**
 	 * Returns the closest intersection of a ray with a collection of shapes.
@@ -796,6 +783,5 @@ class Geometry {
 
 		return new Polygon(result);
 	}
-	
 }
 Geometry.EPSILON = 0.0001;

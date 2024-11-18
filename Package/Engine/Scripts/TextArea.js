@@ -47,14 +47,14 @@ class TEXT_AREA extends ElementScript {
 		this.highlightColor = new Color(10, 10, 255, 0.2);
 		this.multiline = multiline;
 		this.renderText = renderText;
-		this.renderTextOffset = Vector2.origin;
+		this.renderTextOffset = Vector2.zero;
 		this.selectionStart = 0;
 		this.selectionEnd = 0;
 
 		this.padding = paddingEM * this.font.size;
 		this.scrollBarSize = 15;
 		this.scrollSpeed = 20;
-		this.scrollOffset = Vector2.origin;
+		this.scrollOffset = Vector2.zero;
 		this.updateTextBoundingBox();
 
 		this.keyboardShortcuts = ["a", "z", "c", "v", "x", "arrowleft", "arrowright"];
@@ -309,7 +309,7 @@ class TEXT_AREA extends ElementScript {
 	clampScrollOffset(obj) {
 		this.scrollOffset = Vector2.clamp(
 			this.scrollOffset,
-			Vector2.origin,
+			Vector2.zero,
 			this.relativeTextBoundingBox.max.minus(this.relativeTextViewBox.max)
 		);
 	}

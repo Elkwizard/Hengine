@@ -50,7 +50,7 @@ class WebGLArtist2D extends Artist2D {
 		this.drawObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					if (x.radius !== undefined) ({ x, y, radius } = x);
+					if (x.radius !== undefined) ({ position: { x, y }, radius } = x);
 					else {
 						radius = y;
 						({ x, y } = x);
@@ -99,7 +99,7 @@ class WebGLArtist2D extends Artist2D {
 		this.strokeObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					if (x.radius !== undefined) ({ x, y, radius } = x);
+					if (x.radius !== undefined) ({ position: { x, y }, radius } = x);
 					else {
 						radius = y;
 						({ x, y } = x);
@@ -200,7 +200,7 @@ class WebGLArtist2D extends Artist2D {
 			infer(obj) {
 				if (obj.radius !== undefined) {
 					this.strokeObj.circle(obj);
-				} else if (obj.radius !== undefined) {
+				} else if (obj.width !== undefined) {
 					this.strokeObj.rect(obj);
 				} else if (obj.vertices !== undefined) {
 					this.strokeObj.shape(obj.vertices);
@@ -219,7 +219,7 @@ class WebGLArtist2D extends Artist2D {
 		this.imageObj = {
 			circle(x, y, radius) {
 				if (typeof x === "object") {
-					if (x.radius !== undefined) ({ x, y, radius } = x);
+					if (x.radius !== undefined) ({ position: { x, y }, radius } = x);
 					else {
 						radius = y;
 						({ x, y } = x);

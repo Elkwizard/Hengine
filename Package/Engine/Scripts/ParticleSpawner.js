@@ -91,7 +91,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.Particle = class Particle {
 			constructor(position, spawner) {
 				this.position = position;
-				this.velocity = Vector2.origin;
+				this.velocity = Vector2.zero;
 				this.timer = 0;
 				this.data = {};
 				this.spawner = spawner;

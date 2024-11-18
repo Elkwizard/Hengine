@@ -52,11 +52,12 @@ class Matrix extends Float64Array {
 		return this.get().invert();
 	}
 	/**
+	 * @name get determinant
 	 * Returns the determinant of the caller.
 	 * @return Number
 	 */
-	get determinant() {
-		return 0;
+	get scale() {
+		return Math.abs(this.determinant) ** (1 / this.constructor.size);
 	}
 	get(result = new this.constructor()) {
 		result.set(this);
@@ -70,12 +71,10 @@ class Matrix extends Float64Array {
 		return this.constructor.create(...this, this);
 	}
 	/**
+	 * @name invert
 	 * If the caller is invertible, this inverts the caller in-place and returns it, otherwise returns null.
 	 * @return Matrix/null
 	 */
-	invert() {
-		return null;
-	}
 	/**
 	 * Retrieves an element from the caller at a given position.
 	 * @param Number row | The 0-based row index
@@ -166,6 +165,19 @@ class Matrix extends Float64Array {
 		for (let i = 0; i < this.length; i++)
 			dst[i] = this[i] * number;
 	}
+	/**
+	 * Projects a vector of dimension N - 1 by extending it with an additional 1, and dividing by the resulting final component.
+	 * @param Vector vector | The vector to project
+	 * @param Vector result? | The destination to store the resulting vector in. If not specified, a new vector will be created 
+	 * @return Vector
+	 */
+	project(vector, dst = new vector.constructor()) {
+		const { Vector } = this.constructor;
+		const h = new Vector().set(vector, 1);
+		this.times(h, h);
+		dst.set(h).div(h[h.constructor.modValues.last]);
+		return dst;
+	}
 	timesVector(vector, dst) {
 		const { size } = this.constructor;
 		const { modValues } = vector.constructor;
@@ -177,14 +189,11 @@ class Matrix extends Float64Array {
 			result[modValues[i]] = sum;
 		}
 		
-		for (let i = 0; i < modValues.length; i++) {
-			const key = modValues[i];
-			dst[key] = result[key];
-		}
+		dst.set(result);
 	}
 	timesMatrix(matrix, dst) {
 		const { size } = this.constructor;
-		const result = new matrix.constructor();
+		const result = new Float64Array(size * size);
 		for (let c = 0; c < size; c++)
 		for (let r = 0; r < size; r++) {
 			let sum = 0;
@@ -192,7 +201,7 @@ class Matrix extends Float64Array {
 				sum += this[k * size + r] * matrix[c * size + k];
 			result[c * size + r] = sum;
 		}
-		result.get(dst);
+		dst.set(result);
 	}
 	/**
 	 * Computes the product of the caller and another object and returns the result.
@@ -222,6 +231,18 @@ class Matrix extends Float64Array {
 		for (let i = 0; i < result.length; i++)
 			result[i] = buffer.read.float64();
 		return result;
+	}
+	/**
+	 * Creates an N - 1 dimensional homogenous scaling matrix about a given point and optionally stores it in a provided destination.
+	 * @param Vector/Number scale | The scale factor along every axis. If this is a number, the matrix will scale uniformly on all axes
+	 * @param Vector center | The center to scale about
+	 * @param Matrix result? | The matrix to copy the scaling matrix into 
+	 * @return Matrix
+	 */
+	static scaleAbout(scale, center, result = new this()) {
+		const translation = this.translation(center.minus(center.times(scale)), result);
+		const scaling = this.scale(scale);
+		return translation.times(scaling, result);
 	}
 	/**
 	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
@@ -309,10 +330,19 @@ class Matrix extends Float64Array {
 		return this.mul(matrices, result);
 	}
 	/**
-	 * @name static get Vector
-	 * Returns a vector class which has the same number of elements as the dimension of the caller.
-	 * @return Class extends Vector
+	 * Returns a matrix class with a given number of dimensions.
+	 * @param Number size | The number of dimensions transformed by the returned class. This must be between 2 and 4
+	 * @return Class extends Matrix
 	 */
+	static getMatrix(size) {
+		return Matrix.matrices[size];
+	}
+	static get Vector() {
+		return Vector.getVector(this.size);
+	}
+	static get TransformVector() {
+		return Vector.getVector(this.size - 1);
+	}
 }
 
 { // toString
@@ -367,9 +397,6 @@ class Matrix2 extends Matrix {
 		this[3] = a * idet;
 
 		return this;
-	}
-	static get Vector() {
-		return Vector2;
 	}
 }
 Matrix2.size = 2;
@@ -484,9 +511,6 @@ class Matrix3 extends Matrix {
 	 */
 	toCSS() {
 		return `matrix(${this[0]}, ${this[1]}, ${this[3]}, ${this[4]}, ${this[6]}, ${this[7]})`;
-	}
-	static get Vector() {
-		return Vector3;
 	}
 	static normal(matrix) {
 		return new Matrix3(matrix).invert()?.transpose?.() ?? Matrix3.identity();
@@ -656,9 +680,6 @@ class Matrix4 extends Matrix {
 
 		return this;
 	}
-	static get Vector() {
-		return Vector4;
-	}
 	/**
 	 * Creates a perspective projection matrix for use in 3D rendering.
 	 * @param Number aspectRatio | The aspect ratio of the surface on which the rendering will occur (`height / width`)
@@ -669,39 +690,48 @@ class Matrix4 extends Matrix {
 	 * @return Matrix4
 	 */
 	static perspective(ar, fov, zn, zf, result) {
-		const zs = zf / (zf - zn);
+		const zr = zf - zn;
 		const f = 1 / Math.tan(fov / 2);
 		return Matrix4.create(
-			ar * f, 0,	0,	0,
-			0,		f,	0,	0,
-			0,		0,	zs,	-zn * zs,
-			0,		0,	1,	0,
+			ar * f, 0,	0,				0,
+			0,		f,	0,				0,
+			0,		0,	(zf + zn) / zr,	-2 * zf * zn / zr,
+			0,		0,	1,				0,
 			result
 		);
 	}
 	/**
 	 * Creates an orthographic projection matrix for use in 3D rendering.
 	 * The x and y range parameters can be specified as numbers to indicate the size of a 0-centered range (e.g. `6` corresponds to `new Range(-3, 3)`).
-	 * @param Range/Number xRange | The range along the x-axis of view space to include in the projection
-	 * @param Range/Number yRange | The range along the y-axis of view space to include in the projection
-	 * @param Range/Number zRange | The range along the z-axis of view space to include in the projection. If this is specified as a number, it represents a range from 0 to the argument (e.g. `6` corresponds to `new Range(0, 6)`)
+	 * @signature
+	 * @param Range/Number xRange | The range along the x axis of view space to include in the projection
+	 * @param Range/Number yRange | The range along the y axis of view space to include in the projection
+	 * @param Range/Number zRange | The range along the z axis of view space to include in the projection. If this is specified as a number, it represents a range from 0 to the argument (e.g. `6` corresponds to `new Range(0, 6)`)
+	 * @param Matrix4 result? | The destination to store the resulting matrix in. If not specified, a new matrix will be created
+	 * @signature
+	 * @param Prism bounds | The range to include in the projection
 	 * @param Matrix4 result? | The destination to store the resulting matrix in. If not specified, a new matrix will be created
 	 * @return Matrix4
 	 */
 	static orthographic(xRange, yRange, zRange, result) {
+		if (xRange instanceof Prism)
+			({ xRange, yRange, zRange } = xRange);
+		
 		if (typeof xRange === "number") xRange = new Range(-xRange / 2, xRange / 2);
 		if (typeof yRange === "number") yRange = new Range(-yRange / 2, yRange / 2);
 		if (typeof zRange === "number") zRange = new Range(0, zRange);
 		const xScale = 2 / xRange.length;
 		const yScale = 2 / yRange.length;
-		const zScale = 1 / zRange.length;
+		const zScale = 2 / zRange.length;
 		return Matrix4.create(
 			xScale,	0,		0,		-xScale * xRange.min - 1,
 			0,		yScale,	0,		-yScale * yRange.min - 1,
-			0,		0,		zScale,	-zScale * zRange.min,
+			0,		0,		zScale,	-zScale * zRange.min - 1,
 			0,		0,		0,		1,
 			result
 		);
 	}
 }
 Matrix4.size = 4;
+
+Matrix.matrices = [,, Matrix2, Matrix3, Matrix4];

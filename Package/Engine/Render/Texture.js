@@ -268,6 +268,9 @@ class Texture extends ImageType {
 		}
 		return this.image;
 	}
+	makeWebGLImage() {
+		return this.imageData;
+	}
 	get(tex = new Texture(this.width, this.height)) {
 		if (tex.width !== this.width || tex.height !== this.height) return null;
 		tex.imageData = new ImageData(

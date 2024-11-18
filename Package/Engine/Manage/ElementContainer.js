@@ -107,7 +107,7 @@ class ElementContainer extends SceneElement {
 	addCircleElement(name, x, y, radius, controls = new Controls()) {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, this, this.engine);
-		n.addShape("default", new Circle(0, 0, radius));
+		n.addShape("default", new Circle(Vector2.zero, radius));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		return n;
@@ -173,7 +173,7 @@ class ElementContainer extends SceneElement {
 	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls()) {
 		name = this.genName(this.elements, name);
 		let n = new SceneObject(name, x, y, controls, this, this.engine);
-		n.addShape("default", new Circle(0, 0, radius));
+		n.addShape("default", new Circle(Vector2.zero, radius));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		n.scripts.add(PHYSICS, gravity);

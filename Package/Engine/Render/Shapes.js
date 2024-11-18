@@ -1,5 +1,6 @@
 /**
  * Represents an inclusive interval.
+ * @implements Copyable
  * @prop Number min | The lower bound of the interval
  * @prop Number max | The upper bound of the interval
  */
@@ -102,7 +103,7 @@ class Range {
 		return value >= this.min && value <= this.max;
 	}
 	/**
-	 * Expands the Range to include a specified value.
+	 * Expands the range to include a specified value.
 	 * @param Number value | The value to include 
 	 */
 	include(value) {
@@ -117,6 +118,11 @@ class Range {
 	intersect(r) {
 		return this.max >= r.min && r.max >= this.min;
 	}
+	get(result = new Range()) {
+		result._min = this.min;
+		result._max = this.max;
+		return result;
+	}
 	/**
 	 * Returns the smallest range that contains every one of a collection of values.
 	 * @param Number[] values | The set of values to bound 
@@ -130,96 +136,52 @@ class Range {
 
 /**
  * @implements Copyable
- * Represents a 2D shape.
+ * Represents a shape.
  * @abstract
  * @readonly
- * @prop Number area | The area of the shape at the time of construction
- * @prop Vector2 middle | The geometric center of the shape
+ * @prop Vector middle | The geometric center of the shape
  */
 class Shape {
-	constructor() {
-		this.area = 0;
-	}
-	get middle() {
-		return new Vector2(0, 0);
+	/**
+	 * @name getModel
+	 * Returns a copy of the shape after a certain transformation is applied to all its points.
+	 * @param Transform transform | The transformation to apply to the shape 
+	 * @return Shape
+	 */
+	/**
+	 * Returns a copy of the shape scaled about a specified point.
+	 * @param Vector/Number factor | The scale factor on each axis. If this is a number, it applies to all axes equally
+	 * @param Vector position? | The scaling center. Default is the middle of the shape
+	 * @return Shape
+	 */
+	scale(factor, position = this.middle) {
+		return this.getModel(position.constructor.TransformMatrix.scaleAbout(factor, position));
 	}
 	/**
 	 * Returns a copy of the shape centered at a specified location.
-	 * @param Vector2 newCenter | The location of the new center 
+	 * @param Vector newCenter | The location of the new center 
 	 * @return Shape
 	 */
 	center(pos) {
 		return this.move(pos.minus(this.middle));
 	}
 	/**
-	 * Returns a copy of the shape after a certain transformation is applied to all its points.
-	 * @param Transform transform | The transformation to apply to the shape 
-	 * @return Shape
-	 */
-	getModel(transf) { }
-	/**
-	 * Returns a copy of the shape uniformly scaled about its center.
-	 * @param Number factor | The scale factor
-	 * @return Shape
-	 */
-	scale(factor) {
-		return this.scaleAbout(this.middle, factor);
-	}
-	/**
-	 * Returns a copy of the shape scaled about its center along the x axis.
-	 * @param Number factor | The scale factor
-	 * @return Shape
-	 */
-	scaleX(factor) {
-		return this.scaleXAbout(this.middle.x, factor);
-	}
-	/**
-	 * Returns a copy of the shape scaled about its center along the y axis.
-	 * @param Number factor | The scale factor
-	 * @return Shape
-	 */
-	scaleY(factor) {
-		return this.scaleYAbout(this.middle.y, factor);
-	}
-	/**
-	 * Returns a copy of the shape uniformly scaled about a specified point.
-	 * @param Vector2 position | The scaling center
-	 * @param Number factor | The scale factor
-	 * @return Shape
-	 */
-	scaleAbout(pos, factor) { }
-	/**
-	 * Returns a copy of the shape scaled about a specified point along the x axis.
-	 * @param Vector2 position | The scaling center
-	 * @param Number factor | The scale factor
-	 * @return Shape
-	 */
-	scaleXAbout(pos, factor) { }
-	/**
-	 * Returns a copy of the shape scaled about a specified point along the y axis.
-	 * @param Vector2 position | The scaling center
-	 * @param Number factor | The scale factor
-	 * @return Shape
-	 */
-	scaleYAbout(pos, factor) { }
-	/**
 	 * Returns a copy of the shape translated by a specified amount.
-	 * @param Vector2 displacement | The amount to displace the shape by
+	 * @param Vector displacement | The amount to displace the shape by
 	 * @return Shape 
 	 */
-	move(dir) { }
-	/**
-	 * Returns the smallest axis-aligned Rect that contains the entire shape.
-	 * @return Rect
-	 */
-	getBoundingBox() { }
+	move(dir) {
+		return this.getModel(dir.constructor.TransformMatrix.translation(dir));
+	}
 	/**
 	 * Checks if two shapes are congruent.
 	 * @param Shape other | The Shape to compare against
 	 * @return Boolean 
 	 */
-	equals(shape) { }
-	intersectSameType() { }
+	equals(shape) {
+		return	shape instanceof this.constructor &&
+				this.equalsSameType(shape)
+	}
 	/**
 	 * Checks if two shapes intersect.
 	 * @param Shape shape | The Shape to check intersections with
@@ -231,28 +193,41 @@ class Shape {
 		return !!physicsAPICollideShapes(this, shape);
 	}
 	/**
-	 * Returns the closest point on the shape's boundary to a specified other point.
-	 * @param Vector2 point | The target point
-	 * @return Vector2 
+	 * @name closestPointTo
+	 * Returns the closest point within the shape to a specified other point, including the boundary.
+	 * @param Vector point | The target point
+	 * @return Vector 
 	 */
-	closestPointTo(point) { }
 	/**
-	 * Returns the distance from a specified point to the boundary of the shape.
-	 * @param Vector2 point | The target point 
+	 * Returns the distance from a specified point to the shape.
+	 * If the point is inside the shape, this will return 0.
+	 * @param Vector point | The target point 
 	 * @return Number
 	 */
 	distanceTo(point) {
-		return Vector2.dist(point, this.closestPointTo(point));
+		return point.constructor.dist(point, this.closestPointTo(point));
 	}
 	/**
 	 * Checks if a point is inside the shape, including points on the boundary.
-	 * @param Vector2 point | The point to check 
+	 * @param Vector point | The point to check 
 	 * @return Boolean
 	 */
 	containsPoint(point) {
 		return this.closestPointTo(point).equals(point);
 	}
-	toPhysicsShape() { }
+}
+
+/**
+ * Represents a 2D shape.
+ * @abstract
+ * @prop Number area | The area of the shape at the time of construction
+ */
+class Shape2D extends Shape {
+	/**
+	 * @name getBoundingBox
+	 * Returns the smallest axis-aligned rectangle that contains the entire shape.
+	 * @return Rect
+	 */
 }
 
 /**
@@ -260,11 +235,12 @@ class Shape {
  * @prop Vector2 a | The start point of the line segment
  * @prop Vector2 b | The end point of the line segment
  * @prop Vector2 vector | A vector from the start point of the line segment to the end point
+ * @prop Vector2 normal | A unit normal vector to the line segment
  * @prop Number length | THe length of the line segment
  * @prop Number slope | The slope of the line segment. If the line segment is vertical, this is infinite
  * @prop Number intercept | The y-intercept of the line segment if it were extended into a line
  */
-class Line extends Shape {
+class Line extends Shape2D {
 	/**
 	 * Creates a new Line.
 	 * @signature
@@ -296,6 +272,9 @@ class Line extends Shape {
 	get vector() {
 		return this.b.Vminus(this.a).normalize();
 	}
+	get normal() {
+		return this.vector.normal;
+	}
 	get slope() {
 		const { a, b } = this;
 		return (b.y - a.y) / (b.x - a.x);
@@ -312,46 +291,7 @@ class Line extends Shape {
 		return this.slope * x + this.intercept;
 	}
 	getModel(transf) {
-		const pos = transf.position;
-		const cos = transf.cosRotation;
-		const sin = transf.sinRotation;
-		
-		const { a, b } = this;
-
-		return new Line(
-			a.x * cos - a.y * sin + pos.x,
-			a.x * sin + a.y * cos + pos.y,
-			
-			b.x * cos - b.y * sin + pos.x,
-			b.x * sin + b.y * cos + pos.y
-		);
-	}
-	center(pos) {
-		return this.move(pos.Vminus(this.middle));
-	}
-	scaleAbout(pos, factor) {
-		return new Line(
-			this.a.minus(pos).mul(factor).add(pos),
-			this.b.minus(pos).mul(factor).add(pos)
-		);
-	}
-	scaleXAbout(x, factor) {
-		return new Line(
-			(this.a.x - x) * factor + x, this.a.y,
-			(this.b.x - x) * factor + x, this.b.y
-		);
-	}
-	scaleYAbout(y, factor) {
-		return new Line(
-			this.a.x, (this.a.y - y) * factor + y,
-			this.b.x, (this.b.y - y) * factor + y
-		);
-	}
-	move(dir) {
-		return new Line(
-			this.a.plus(dir),
-			this.b.plus(dir)
-		);
+		return new Line(transf.times(this.a), transf.times(this.b));
 	}
 	getBoundingBox() {
 		const { a, b } = this;
@@ -361,7 +301,7 @@ class Line extends Shape {
 		const maxY = Math.max(a.y, b.y);
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
-	equals(line) {
+	equalsSameType(line) {
 		if (!(line instanceof Line)) return false;
 		return line.a.equals(this.a) && line.b.equals(this.b);
 	}
@@ -397,10 +337,7 @@ class Line extends Shape {
 	 * @return Line
 	 */
 	static fromSlopeIntercept(m, b) {
-		return new Line(
-			0, b,
-			1, b + m
-		);
+		return new Line(0, b, 1, b + m);
 	}
 }
 
@@ -408,7 +345,7 @@ class Line extends Shape {
  * Represents a contiguous 2D polygon with no holes.
  * @prop Vector2[] vertices | The vertices of the border of the polygon, they are in a clockwise order.
  */
-class Polygon extends Shape {
+class Polygon extends Shape2D {
 	/**
 	 * Creates a new Polygon.
 	 * @param Vector2[] vertices | The vertices for the new polygon. They can be ordered either clockwise or counter-clockwise
@@ -436,22 +373,13 @@ class Polygon extends Shape {
 		}
 	}
 	get middle() {
-		return Vector2.sum(this.vertices).Nover(this.vertices.length);
+		return Vector2.avg(this.vertices);
 	}
 	getBoundingBox() {
 		return Rect.bound(this.vertices);
 	}
 	getModel(transf) {
-		const pos = transf.position;
-		const cos = transf.cosRotation;
-		const sin = transf.sinRotation;
-	
-		return new Polygon(this.vertices
-			.map(vert => new Vector2(
-				vert.x * cos - vert.y * sin + pos.x,
-				vert.x * sin + vert.y * cos + pos.y
-			)
-		), true);
+		return new Polygon(this.vertices.map(v => transf.times(v)), true);
 	}
 	/**
 	 * Returns the edges of the polygon.
@@ -467,33 +395,19 @@ class Polygon extends Shape {
 		}
 		return edges;
 	}
-	scaleAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => e.Vminus(pos).Nmul(factor).Vadd(pos)));
-	}
-	scaleXAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => new Vector2(pos + (e.x - pos) * factor, e.y)));
-	}
-	scaleYAbout(pos, factor) {
-		return new Polygon(this.vertices.map(e => new Vector2(e.x, pos + (e.y - pos) * factor)));
-	}
-	move(dir) {
-		return new Polygon(this.vertices.map(vert => vert.plus(dir)));
-	}
 	/**
 	 * Returns a copy of the polygon rotated clockwise (in screen-space) by a specified angle.
 	 * @param Number angle | The angle to rotate by (in radians)
 	 * @return Polygon 
 	 */
 	rotate(angle) {
-		return this.getModel(new Transform(0, 0, angle));
+		return this.getModel(new Transform(Vector2.zero, angle));
 	}
-	equals(shape) {
-		if (!(shape instanceof Polygon)) return false;
-		if (shape.vertices.length !== this.vertices.length) return false;
-		if (!shape.area.equals(this.area)) return false;
-		for (let i = 0; i < this.vertices.length; i++)
-			if (!this.vertices[i].equals(shape.vertices[i])) return false;
-		return true;
+	equalsSameType(shape) {
+		const v1 = this.vertices;
+		const v2 = shape.vertices;
+		return	v1.length === v2.length &&
+				v1.every((v, i) => v.equals(v2[i]));
 	}
 	intersectSameType(polygon) {
 		return !!physicsAPICollideShapes(this, polygon);
@@ -502,9 +416,15 @@ class Polygon extends Shape {
 		let bestPoint = null;
 		let bestDist = Infinity;
 
+		let inside = true;
+
 		const edges = this.getEdges();
 		for (let i = 0; i < edges.length; i++) {
 			const edge = edges[i];
+			const { normal } = edge;
+			
+			inside &&= normal.dot(point) > normal.dot(edge.a);
+
 			const closest = edge.closestPointTo(point);
 			const dist = Vector2.sqrDist(point, closest);
 			if (dist < bestDist) {
@@ -513,7 +433,7 @@ class Polygon extends Shape {
 			}
 		}
 
-		return bestPoint;
+		return inside ? point.get() : bestPoint;
 	}
 	/**
 	 * Checks whether a given point is inside the polygon (including the boundary).
@@ -668,6 +588,16 @@ class Rect extends Polygon {
 			w, h
 		);
 	}
+	move(dir) {
+		return new Rect(
+			this.x + dir.x, this.y + dir.y,
+			this.width, this.height
+		);
+	}
+	scale(scale, center = this.middle) {
+		const mat = Matrix3.scaleAbout(scale, center);
+		return Rect.fromMinMax(mat.times(this.min), mat.times(this.max));
+	}
 	pack(rects) {
 		rects.sort((a, b) => b.height - a.height);
 
@@ -744,66 +674,26 @@ class Rect extends Polygon {
 	 * @return Rect
 	 */
 	clip(rect) {
-		let xRange = this.xRange.clip(rect.xRange);
-		let yRange = this.yRange.clip(rect.yRange);
-		return Rect.fromRanges(xRange, yRange);
+		return Rect.fromRanges(
+			this.xRange.clip(rect.xRange),
+			this.yRange.clip(rect.yRange)
+		);
 	}
 	getBoundingBox() {
 		return this.get();
 	}
-	center(pos) {
-		return new Rect(pos.x - this.width / 2, pos.y - this.height / 2, this.width, this.height);
-	}
-	scale(factor) {
-		factor -= 1;
-		let dw = this.width * factor;
-		let dh = this.height * factor;
-		return new Rect(this.x - dw / 2, this.y - dh / 2, this.width + dw, this.height + dh);
-	}
-	scaleX(factor) {
-		factor -= 1;
-		let dw = this.width * factor;
-		return new Rect(this.x - dw / 2, this.y, this.width + dw, this.height);
-	}
-	scaleY(factor) {
-		factor -= 1;
-		let dh = this.height * factor;
-		return new Rect(this.x, this.y - dh / 2, this.width, this.height + dh);
-	}
-	scaleAbout(pos, factor) {
-		return new Rect((this.x - pos.x) * factor + pos.x, (this.y - pos.y) * factor + pos.y, this.width * factor, this.height * factor);
-	}
-	scaleXAbout(pos, factor) {
-		return new Rect((this.x - pos) * factor + pos, this.y, this.width * factor, this.height);
-	}
-	scaleYAbout(pos, factor) {
-		return new Rect(this.x, (this.y - pos) * factor + pos, this.width, this.height * factor);
-	}
 	move(dir) {
 		return new Rect(this.x + dir.x, this.y + dir.y, this.width, this.height);
 	}
-	equals(shape) {
-		if (!(shape instanceof Rect)) return false;
-		if (!shape.area.equals(this.area)) return false;
-		return 	this.x.equals(shape.x) &&
-				this.y.equals(shape.y) &&
-				this.width.equals(shape.width) &&
-				this.height.equals(shape.height);
+	equalsSameType(shape) {
+		return	this.min.equals(shape.min) &&
+				this.max.equals(shape.max);
 	}
 	intersectSameType(rect) {
 		return rect.x < this.x + this.width && rect.x + rect.width > this.x && rect.y < this.y + this.height && rect.y + rect.height > this.y;
 	}
 	closestPointTo(point) {
-		if (this.containsPoint(point)) {
-			const { x, y, width, height } = this;
-			const dx = width / 2 - Math.abs(point.x - (x + width / 2));
-			const dy = height / 2 - Math.abs(point.y - (y + height / 2));
-			if (dx < dy)
-				return new Vector2(x + Math.round((point.x - x) / width) * width, point.y);
-			return new Vector2(point.x, y + Math.round((point.y - y) / height) * height);
-		}
-
-		return Vector2.clamp(point, this.min, this.max);
+		return point.constructor.clamp(point, this.min, this.max);
 	}
 	containsPoint(point) {
 		return point.x > this.x && point.y > this.y && point.x < this.x + this.width && point.y < this.y + this.height;
@@ -868,106 +758,65 @@ class Rect extends Polygon {
 
 /**
  * Represents a circle.
- * @prop Number x | The x coordinate of the center of the circle
- * @prop Number y | The y coordinate of the center of the circle
+ * @prop Vector2 position | The center of the circle
  * @prop Number radius | The radius of the circle
  */
-class Circle extends Shape {
+class Circle extends Shape2D {
 	/**
 	 * Creates a new Circle.
-	 * @param Number x | The x coordinate of the center 
-	 * @param Number y | The y coordinate of the center 
+	 * @param Vector2 position | The center of the circle 
 	 * @param Number radius | The radius of the circle 
 	 */
-	constructor(x, y, radius) {
+	constructor(position, radius) {
 		super();
-		this.x = x;
-		this.y = y;
+		this.position = position.get();
 		this.radius = Math.abs(radius);
-		this.area = this.radius ** 2 * Math.PI;
+	}
+	get area() {
+		return Math.PI * this.radius ** 2;
 	}
 	get middle() {
-		return new Vector2(this.x, this.y);
+		return this.position.get();
 	}
 	getModel(transf) {
-		const pos = transf.position;
-		const cos = transf.cosRotation;
-		const sin = transf.sinRotation;
-
-		return new Circle(
-			this.x * cos - this.y * sin + pos.x,
-			this.x * sin + this.y * cos + pos.y,
-			this.radius
+		return new this.constructor(
+			transf.times(this.position),
+			this.radius * transf.scale
 		);
 	}
-	center(pos) {
-		return new Circle(pos.x, pos.y, this.radius);
-	}
-	scale(factor) {
-		return new Circle(this.x, this.y, this.radius * factor)
-	}
-	/**
-	 * Since there is no representation for an ellipse, this scales uniformly instead of the behavior for Shape.
-	 * @param Number factor | The scale factor 
-	 * @return Circle
-	 */
-	scaleX(factor) {
-		return this.scale(factor);	
-	}
-	/**
-	 * Since there is no representation for an ellipse, this scales uniformly instead of the behavior for Shape.
-	 * @param Number factor | The scale factor 
-	 * @return Circle
-	 */
-	scaleY(factor) {
-		return this.scale(factor);
-	}
-	scaleAbout(pos, factor) {
-		let nPos = pos.plus((new Vector2(this.x, this.y)).Vminus(pos).Ntimes(factor));
-		return new Circle(nPos.x, nPos.y, this.radius * factor);
-	}
-	scaleXAbout(pos, factor) {
-		return this.scaleAbout(pos, factor);
-	}
-	scaleYAbout(pos, factor) {
-		return this.scaleAbout(pos, factor);
-	}
-	move(dir) {
-		return new Circle(this.x + dir.x, this.y + dir.y, this.radius);
-	}
 	getBoundingBox() {
-		return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+		return new Rect(
+			this.position.x - this.radius,
+			this.position.y - this.radius,
+			this.radius * 2, this.radius * 2
+		);
 	}
-	equals(shape) {
-		if (!(shape instanceof Circle)) return false;
-		if (!shape.area.equals(this.area)) return false;
-		return 	this.x.equals(shape.x) &&
-				this.y.equals(shape.y) &&
+	equalsSameType(shape) {
+		return	this.position.equals(shape.position) &&
 				this.radius.equals(shape.radius);
-	}	
+	}
 	intersectSameType(circle) {
-		return Vector2.sqrDist(circle, this) < (circle.radius + this.radius) ** 2;
+		return Vector.sqrDist(circle.position, this.position) < (circle.radius + this.radius) ** 2;
 	}
 	closestPointTo(point) {
-		const diff = new Vector2(point.x - this.x, point.y - this.y);
-		diff.mag = this.radius;
-		diff.add(this);
-		return diff;
+		const diff = point.minus(this.position);
+		if (diff.sqrMag > this.radius ** 2)
+			diff.mag = this.radius;
+		return diff.add(this.position);
 	}
 	distanceTo(point) {
-		return Vector2.dist(point, this.middle) - this.radius;
+		return Math.max(0, Vector.dist(point, this.position) - this.radius);
 	}
 	containsPoint(point) {
-		return Vector2.sqrDist(point, this.middle) < this.radius ** 2;
+		return Vector.sqrDist(point, this.position) < this.radius ** 2;
 	}
-	get(shape = new Circle(0, 0, 0)) {
+	get(shape = new Circle(Vector2.zero, 0)) {
 		shape.x = this.x;
 		shape.y = this.y;
 		shape.radius = this.radius;
-		shape.area = this.area;
 		return shape;
 	}
 	toPhysicsShape() {
-		return physics.exports.CircleCollider.construct(this.x, this.y, this.radius);
+		return physics.exports.CircleCollider.construct(this.position.x, this.position.y, this.radius);
 	}
 }

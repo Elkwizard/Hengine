@@ -167,22 +167,34 @@ class Operable extends MathObject {
         return this.constructor.modValues.map(field => this[field]);
     }
 	/**
-	 * Sets all elements of the operable, either by copying from another operable of the same type, or by using a list of numeric values.
+	 * Sets all elements of the operable, either by copying from another operable, or by using a list of numeric values.
 	 * Returns the caller.
 	 * @signature
 	 * @param Operable other | The operable to copy values from
+	 * @param Number fill? | A value to fill missing elements with. Default is 0
 	 * @signature
 	 * @param Number[] ...elements | The new element values
 	 * @return Operable
 	 */
     set(...values) {
-        if (values[0] instanceof this.constructor)
-            return values[0].get(this);
-        const { modValues } = this.constructor;
-        for (let i = 0; i < modValues.length; i++) {
-            const field = modValues[i];
-            this[field] = values[i];
-        }
+		const first = values[0];
+        if (first instanceof this.constructor)
+            return first.get(this);
+       
+		const { modValues } = this.constructor;
+		if (first instanceof Operable) {
+			const fill = values[1] ?? 0;
+			for (let i = 0; i < modValues.length; i++) {
+				const field = modValues[i];
+				this[field] = first[field] ?? fill;
+			}
+		} else {
+			for (let i = 0; i < modValues.length; i++) {
+				const field = modValues[i];
+				this[field] = values[i];
+			}
+		}
+
         return this;
     }
     get(result = this.constructor.zero) {

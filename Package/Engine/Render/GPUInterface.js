@@ -12,6 +12,8 @@
  * 	<tr><td>ivec4, uvec4</td><td>Vector4</td></tr>
  * 	<tr><td>vec4</td><td>Vector4, Color</td></tr>
  * 	<tr><td>sampler2D</td><td>ImageType</td></tr>
+ * 	<tr><td>sampler2DArray</td><td>ImageType[]</td></tr>
+ * 	<tr><td>samplerCube</td><td>CubeMap</td></tr>
  * 	<tr><td>struct</td><td>Object</td></tr>
  * 	<tr><td>fixed-length array</td><td>Array</td></tr>
  *  <tr><td>dynamic-length array</td><td>GPUArray</td></tr>
@@ -36,6 +38,20 @@
  * gpu.setUniform("linesA", lines);
  * gpu.getUniform("linesA").set(lines);
  * ```
+ */
+
+/**
+ * @name class CubeMap
+ * @interface
+ * Represents a cube map usable in via a GPUInterface.
+ * All faces must be square and equal in size.
+ * @name_subs SIDE: negX, posX, negY, posY, negZ, posZ
+ * @prop ImageType posX | The face of the cube map on the positive x side
+ * @prop ImageType negX | The face of the cube map on the negative x side
+ * @prop ImageType posY | The face of the cube map on the positive y side
+ * @prop ImageType negY | The face of the cube map on the negative y side
+ * @prop ImageType posZ | The face of the cube map on the positive z side
+ * @prop ImageType negZ | The face of the cube map on the negative z side 
  */
 
 class GLSL {
@@ -351,7 +367,8 @@ class ShaderSource {
 		
 		this.prefix = [
 			"#version 300 es",
-			...["int", "float", "sampler2D"].map(type => `precision highp ${type};`),
+			...["int", "float", "sampler2D", "samplerCube", "sampler2DArray"]
+				.map(type => `precision highp ${type};`),
 			prefix
 		].join("\n");
 		this.prefixLines = this.prefix.match(/\n/g).length + 1;
@@ -625,7 +642,7 @@ class GLSLProgram {
 			for (const [name, array] of dynamicArrayDescriptors) {
 				const unit = nextTextureUnit++;
 				this.checkTextureUnit(unit);
-				const gpuArray = new GPUInputArray(gl, name, unit, array.origin.glsl.structs.get(array.type));
+				const gpuArray = new GPUInputArray(gl, name, unit, array.zero.glsl.structs.get(array.type));
 				this.uniformValues[name] = gpuArray;
 				this.dynamicArrays.push(gpuArray);
 			}
@@ -711,43 +728,35 @@ class GLSLProgram {
 						desc.set = array => gpuArray.set(array);
 					} else if (texture) {
 						const textureUnit = nextTextureUnit;
-						const indices = new Int32Array(length).map((_, index) => index + textureUnit);
-						const textures = [];
 						this.checkTextureUnit(textureUnit + length - 1);
+						nextTextureUnit += length;
+
+						const target = {
+							array: gl.TEXTURE_2D_ARRAY,
+							cube: gl.TEXTURE_CUBE_MAP,
+							image: gl.TEXTURE_2D
+						}[texture];
+						
+						const textures = [];
 
 						desc.setup = function () {
-							for (let i = 0; i < length; i++)
-								textures[i] = GLUtils.createTexture(gl, {
-									unit: indices[i],
-									filter: gl.LINEAR
+							for (let i = 0; i < length; i++) {
+								const unit = textureUnit + i;
+								const texture = GLUtils.createTexture(gl, {
+									unit, target, filter: gl.LINEAR
 								});
-
-							if (array) this.setUniform(indices);
-							else this.setUniform(indices[0]);
-						};	
-
-						let pixelated = false;
-						const writeImage = (image, index = 0) => {
-							if (index >= length) return;
-							gl.activeTexture(gl.TEXTURE0 + indices[index]);
-							if (image instanceof WebGLTexture) {
-								gl.bindTexture(gl.TEXTURE_2D, image);
-							} else {
-								const imagePixelated = image instanceof Texture;
-								const imageCIS = (image instanceof Texture) ? image.imageData : image.makeWebGLImage();
-								gl.bindTexture(gl.TEXTURE_2D, textures[index]);
-								if (imagePixelated !== pixelated) {
-									pixelated = imagePixelated;
-									const param = pixelated ? gl.NEAREST : gl.LINEAR;
-									gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
-									gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
-								}
-								gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageCIS);
+								textures[i] = { texture, target, unit, smooth: true };
 							}
-						}
-						if (array) desc.set = images => images.forEach(writeImage);
-						else desc.set = image => writeImage(image);
-						nextTextureUnit += length;
+
+							if (array) this.setUniform(textures.map(tex => tex.unit));
+							else this.setUniform(textureUnit);
+						};
+
+						if (array) desc.set = images => {
+							for (let i = 0; i < images.length; i++)
+								if (i < length) this.writeTexture(images[i], textures[i]);
+						};
+						else desc.set = image => this.writeTexture(image, textures[0]);
 					} else {
 						if (setWithArrayType) desc.set = function (value) {
 							dataArray.set(value);
@@ -784,19 +793,25 @@ class GLSLProgram {
 
 		{ // attributes
 			this.attributes = {};
-			this.divisors = {};
+			this.divisors = new Map();
+
+			let offset = 0;
 
 			const attributeCount = gl.getProgramParameter(this.program, gl.ACTIVE_ATTRIBUTES);
 			for (let i = 0; i < attributeCount; i++) {
 				const { type, name } = gl.getActiveAttrib(this.program, i);
 				const { rows, columns } = this.getTypeInformation(type);
 				const location = gl.getAttribLocation(this.program, name);
+				const columnBytes = rows * 4;
+				const bytes = columns * columnBytes;
+			
 				this.attributes[name] = {
 					name, location, rows, columns,
 					enabled: true, divisor: -1,
-					isFiller: false
+					bytes, columnBytes, offset
 				};
 				this.setDivisor(name, 0);
+				offset += bytes;
 			}
 		};
 
@@ -812,6 +827,76 @@ class GLSLProgram {
 	}
 	get uniformsChanged() {
 		return this.uniformsSet || this.dynamicArrays.some(array => array.changed);
+	}
+	writeTexture(image, info) {
+		const { gl } = this;
+
+		const format = gl.RGBA;
+		const type = gl.UNSIGNED_BYTE;
+		const internal = gl.RGBA8;
+		
+		const texImage2D = (binding, image) => {
+			gl.texImage2D(binding, 0, internal, format, type, image.makeWebGLImage());
+		};
+		
+		const { target } = info;
+
+		gl.activeTexture(gl.TEXTURE0 + info.unit);
+		if (image instanceof WebGLTexture) {
+			gl.bindTexture(target, image);
+			return;
+		}
+		
+		gl.bindTexture(target, info.texture);
+			
+		let smooth = false;
+		const isSmooth = image => !(image instanceof Texture);
+
+		switch (target) {
+			case gl.TEXTURE_2D: {
+				smooth = isSmooth(image);
+				texImage2D(gl.TEXTURE_2D, image);
+			}; break;
+			case gl.TEXTURE_CUBE_MAP: {
+				smooth = isSmooth(image.posX);
+
+				let size;
+				for (const key in image) {
+					const face = image[key];
+					if (!size) size = face.width;
+					if (size !== face.width || size !== face.height)
+						this.error("CUBE_MAP", "Cube map faces are non-square or not equal in size");
+				}
+				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, image.posX);
+				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, image.negX);
+				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, image.posY);
+				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, image.negY);
+				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, image.posZ);
+				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, image.negZ);
+			}; break;
+			case gl.TEXTURE_2D_ARRAY: {
+				smooth = isSmooth(image[0]);
+
+				const { pixelWidth, pixelHeight } = image[0];
+				if (!image.every(img => img.pixelWidth === pixelWidth && img.pixelHeight === pixelHeight))
+					this.error("ARRAY_TEXTURE", "Texture array elements are not of equal size");
+
+				gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, internal, pixelWidth, pixelHeight, image.length, 0, format, type, null);
+				for (let i = 0; i < image.length; i++)
+					gl.texSubImage3D(
+						gl.TEXTURE_2D_ARRAY, 0,
+						0, 0, i,
+						pixelWidth, pixelHeight, 1,
+						format, type,
+						image[i].makeWebGLImage()
+					);
+			}; break;
+		}
+		
+		if (smooth !== info.smooth) {
+			info.smooth = smooth;
+			GLUtils.setTextureFilter(gl, target, smooth ? gl.LINEAR : gl.NEAREST);
+		}
 	}
 	checkTextureUnit(unit) {
 		if (unit >= this.maxTextureUnits)
@@ -873,7 +958,13 @@ class GLSLProgram {
 	getTypeInformation(type) {
 		const { gl } = this;
 
-		let integer = false, signed = true, rows = 1, columns = 1, texture = false, dynamicArray = false;
+		let integer = false;
+		let signed = true;
+		let rows = 1;
+		let columns = 1;
+		let texture = false;
+		let dynamicArray = false;
+
 		switch (type) {
 			case gl.FLOAT: break;
 			case gl.FLOAT_VEC2: rows = 2; break;
@@ -894,9 +985,12 @@ class GLSLProgram {
 			case gl.FLOAT_MAT3: rows = 3; columns = 3; break;
 			case gl.FLOAT_MAT4: rows = 4; columns = 4; break;
 
-			case gl.SAMPLER_2D: integer = true; texture = true; break;
-			case gl.INT_SAMPLER_2D: integer = true; texture = true; break;
-			case gl.UNSIGNED_INT_SAMPLER_2D: integer = true; texture = true; dynamicArray = true; break;
+			case gl.SAMPLER_2D: integer = true; texture = "image"; break;
+			case gl.INT_SAMPLER_2D: integer = true; texture = "image"; break;
+			case gl.UNSIGNED_INT_SAMPLER_2D: integer = true; texture = "image"; dynamicArray = true; break;
+
+			case gl.SAMPLER_2D_ARRAY: integer = true; texture = "array"; break;
+			case gl.SAMPLER_CUBE: integer = true; texture = "cube"; break;
 
 			case gl.UNSIGNED_INT: integer = true; signed = false; break;
 			case gl.UNSIGNED_INT_VEC2: integer = true; rows = 2; signed = false; break;
@@ -957,86 +1051,108 @@ class GLSLProgram {
 		return name in this.uniforms;
 	}
 	setDivisor(name, divisor) {
+		const attribute = this.attributes[name];
+		if (!attribute) {
+			this.error("DIVISOR_SET", `Vertex attribute '${name}' doesn't exist`);
+			return;
+		}
+
+		this.divisors.get(attribute.divisor)?.attributes?.delete?.(name);
+		if (!this.divisors.has(divisor)) this.divisors.set(divisor, { attributes: new Map() });
+		const div = this.divisors.get(divisor);
+		div.attributes.set(name, attribute);
+
+		this.layoutDivisor(attribute.divisor);
+		this.layoutDivisor(divisor);
+
+		attribute.divisor = divisor;
+
 		this.focus();
-		if (name in this.attributes) {
-			const attribute = this.attributes[name];
-
-			if (attribute.divisor in this.divisors) { // remove from previous
-				const previousAttributes = this.divisors[attribute.divisor];
-				previousAttributes.attributes.splice(previousAttributes.attributes.indexOf(attribute), 1);
-				previousAttributes.stride -= attribute.rows * attribute.columns * 4 /* bytes of GLFloat */;
-			}
-
-			if (!(divisor in this.divisors)) { // create divisor
-				this.divisors[divisor] = {
-					attributes: [],
-					stride: 0
-				};
-			}
-
-			const currentAttributes = this.divisors[divisor];
-
-			currentAttributes.attributes.push(attribute);
-			currentAttributes.attributes.sort((a, b) => a.location - b.location);
-			currentAttributes.stride += attribute.rows * attribute.columns * 4 /* bytes of GLFloat */;
-
-			this.focus(); // need to be the gl.CURRENT_PROGRAM
-			attribute.divisor = divisor;
-			for (let i = 0; i < attribute.columns; i++) this.gl.vertexAttribDivisor(attribute.location + i, divisor);
-		} else this.error("DIVISOR_SET", `Vertex attribute '${name}' doesn't exist`);
+		for (let i = 0; i < attribute.columns; i++)
+			this.gl.vertexAttribDivisor(attribute.location + i, divisor); 
+	}
+	layoutDivisor(divisor) {
+		if (this.divisors.has(divisor))
+			this.layoutAttributes([...this.divisors.get(divisor).attributes.keys()], divisor);
 	}
 	layoutAttributes(layout, divisor = 0) {
-		if (divisor in this.divisors) {
-			const currentAttributesList = this.divisors[divisor].attributes;
-			const currentAttributes = {};
-			for (let i = 0; i < currentAttributesList.length; i++) {
-				const attribute = currentAttributesList[i];
-				if (!attribute.isFiller) {
-					attribute.enabled = false;
-					currentAttributes[attribute.name] = attribute;
-				}
+		const div = this.divisors.get(divisor);
+		if (!div) {
+			this.error("ATTRIBUTE_LAYOUT", `No attributes with vertex divisor '${divisor}' exist`);
+			return;
+		}
+
+		for (const [_, attribute] of div.attributes)
+			attribute.enabled = false;
+		
+		let offset = 0;
+		for (let i = 0; i < layout.length; i++) {
+			const name = layout[i];
+			if (typeof name === "number") {
+				offset += name;
+				continue;
 			}
 
-			const attributes = [];
-			let stride = 0;
-			for (let i = 0; i < layout.length; i++) {
-				const segment = layout[i];
-				const attribute = (typeof segment === "number") ? { rows: segment, columns: 1, isFiller: true } : currentAttributes[segment];
-				if (!attribute) continue;
-				attribute.enabled = true;
-				attributes.push(attribute);
-				stride += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
-			}
+			const attribute = div.attributes.get(name);
+			attribute.offset = offset;
+			attribute.enabled = true;
+			offset += attribute.bytes;
+		}
 
-			this.divisors[divisor].attributes = attributes;
-			this.divisors[divisor].stride = stride;
-		} else this.error("ATTRIBUTE_LAYOUT", `No attributes with vertex divisor '${divisor}' exist`);
+		div.stride = offset;
+
+			// const currentAttributesList = this.divisors[divisor].attributes;
+			// const currentAttributes = {};
+			// for (let i = 0; i < currentAttributesList.length; i++) {
+			// 	const attribute = currentAttributesList[i];
+			// 	if (!attribute.isFiller) {
+			// 		attribute.enabled = false;
+			// 		currentAttributes[attribute.name] = attribute;
+			// 	}
+			// }
+
+			// const attributes = [];
+			// let stride = 0;
+			// for (let i = 0; i < layout.length; i++) {
+			// 	const segment = layout[i];
+			// 	const attribute = (typeof segment === "number") ? { rows: segment, columns: 1, isFiller: true } : currentAttributes[segment];
+			// 	if (!attribute) continue;
+			// 	attribute.enabled = true;
+			// 	attributes.push(attribute);
+			// 	stride += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
+			// }
+
+			// // TODO: fix!!!
+			// attributes.push(...currentAttributesList.filter(attr => !attr.enabled));
+
+			// this.divisors[divisor].attributes = attributes;
+			// this.divisors[divisor].stride = stride;
 	}
 	setAttributes(buffer, divisor = 0) {
-		if (divisor in this.divisors) {
-			const { gl } = this;
+		const div = this.divisors.get(divisor);
+		if (!div) {
+			this.error("ATTRIBUTE_SET", `No attributes with vertex divisor '${divisor}' exist`);
+			return;
+		}
+		
+		const { gl } = this;
 			
-			this.focus(); // need to be the gl.CURRENT_PROGRAM
+		this.focus();
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+		
+		for (const [_, attribute] of div.attributes) {
 			
-			const { attributes, stride } = this.divisors[divisor];
-			gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-			
-			let offset = 0;
-			for (let i = 0; i < attributes.length; i++) {
-				const attribute = attributes[i];
-				if (attribute.isFiller) offset += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
-				else {
-					for (let j = 0; j < attribute.columns; j++) {
-						const pointer = attribute.location + j;
-						gl.vertexAttribPointer(pointer, attribute.rows, gl.FLOAT, false, stride, offset);
-						if (attribute.enabled) {
-							gl.enableVertexAttribArray(pointer);
-							offset += attribute.rows * 4 /* bytes per GLFloat */;
-						} else gl.disableVertexAttribArray(pointer);
-					}
-				}
+			for (let j = 0; j < attribute.columns; j++) {
+				const pointer = attribute.location + j;
+				gl.vertexAttribPointer(
+					pointer, attribute.rows, gl.FLOAT, false,
+					div.stride, attribute.offset + attribute.columnBytes * j
+				);
+				if (attribute.enabled) gl.enableVertexAttribArray(pointer);
+				else gl.disableVertexAttribArray(pointer);
 			}
-		} else this.error("ATTRIBUTE_SET", `No attributes with vertex divisor '${divisor}' exist`);
+		}
 	}
 }
 
@@ -1050,11 +1166,17 @@ class GLUtils {
 		const texture = gl.createTexture();
 		if (unit !== null) gl.activeTexture(gl.TEXTURE0 + unit);
 		gl.bindTexture(target, texture);
-		gl.texParameteri(target, gl.TEXTURE_WRAP_S, wrap);
-		gl.texParameteri(target, gl.TEXTURE_WRAP_T, wrap);
+		this.setTextureFilter(gl, target, filter);
+		this.setTextureWrap(gl, target, wrap);
+		return texture;
+	}
+	static setTextureFilter(gl, target, filter) {
 		gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, filter);
 		gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, filter);
-		return texture;
+	}
+	static setTextureWrap(gl, target, wrap) {
+		gl.texParameteri(target, gl.TEXTURE_WRAP_S, wrap);
+		gl.texParameteri(target, gl.TEXTURE_WRAP_T, wrap);
 	}
 }
 

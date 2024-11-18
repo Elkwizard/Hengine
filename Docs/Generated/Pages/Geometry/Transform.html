@@ -54,7 +54,7 @@ It is composed of a rotation about the origin followed by a translation.
 					<div class="class-methods">
 		<div class="function-wrapper" id="Transform.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L23" target="_blank" class="function-name source-link">constructor</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">rotation</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L22" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new Transform.
@@ -64,33 +64,23 @@ It is composed of a rotation about the origin followed by a translation.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Transform.prototype.constructor():x">
+						<div class="param-wrapper" id="Transform.prototype.constructor():position">
 							<div class="param-name">
-								<span class="param">x</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="param">position</span>
+								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
-								The initial x translation
+								The initial translation of the transform
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="Transform.prototype.constructor():y">
-							<div class="param-name">
-								<span class="param">y</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The initial y translation
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Transform.prototype.constructor():rotation">
+						<div class="param-wrapper" id="Transform.prototype.constructor():rotation?">
 							<div class="param-name">
 								<span class="param">rotation</span>
 								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The initial rotation of the
+								The initial rotation of the transform. Default is 0
 							</div>
 						</div>
 					
@@ -101,7 +91,7 @@ It is composed of a rotation about the origin followed by a translation.
 	
 		<div class="function-wrapper" id="get Transform.prototype.inverse()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L39" target="_blank" class="function-name source-link">inverse</a><span class="type">Transform</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L35" target="_blank" class="function-name source-link">inverse</a><span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform that, when composed with the caller, will produce no offset and no rotation.
@@ -111,7 +101,7 @@ It is composed of a rotation about the origin followed by a translation.
 	
 		<div class="function-wrapper" id="Transform.prototype.rotateAround()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L87" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L83" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Adds a clockwise (in screen-space) rotation in-place about a specific point to the existing transformation. 
@@ -148,7 +138,7 @@ It is composed of a rotation about the origin followed by a translation.
 	
 		<div class="function-wrapper" id="Transform.prototype.globalToLocal()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L100" target="_blank" class="function-name source-link">globalToLocal</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L96" target="_blank" class="function-name source-link">globalToLocal</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the inverse of the caller to it.
@@ -176,7 +166,7 @@ This translates the point by the inverse of the transform's position and then ro
 	
 		<div class="function-wrapper" id="Transform.prototype.localToGlobal()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L112" target="_blank" class="function-name source-link">localToGlobal</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L108" target="_blank" class="function-name source-link">localToGlobal</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the caller to it.
@@ -204,7 +194,7 @@ This rotates the point clockwise (in screen-space) about the origin by the trans
 	
 		<div class="function-wrapper" id="Transform.combine()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L152" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L148" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform which has the same effect as applying two transformations in a row.
