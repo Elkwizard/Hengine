@@ -533,6 +533,27 @@ Object.defineProperty(window, "title", {
 		});
 	})();
 	proto(Array.prototype, "toString", Object.prototype.toString);
+	
+	Object.defineProperty(Function.prototype, "sizes", {
+		set(sizes) {
+			const keys = Reflect.ownKeys(this);
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i];
+				if (key in this.prototype || key in Function.prototype) continue;
+				Object.defineProperty(this.prototype, key, {
+					get() { return this.constructor[key]; },
+					enumerable: false,
+					configurable: false
+				});
+			}
+			
+			for (let i = 0; i < sizes.length; i++) {
+				const size = sizes[i];
+				if (!size) continue;
+				this[i] = size;
+			}
+		}
+	});
 
 	/**
 	 * @name class Storage

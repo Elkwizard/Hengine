@@ -56,7 +56,7 @@ class Matrix extends Float64Array {
 	 * Returns the determinant of the caller.
 	 * @return Number
 	 */
-	get scale() {
+	get stretch() {
 		return Math.abs(this.determinant) ** (1 / this.constructor.size);
 	}
 	get(result = new this.constructor()) {
@@ -306,19 +306,19 @@ class Matrix extends Float64Array {
 			result[i * size + j] = +(i === j);
 		return result;
 	}
-	static create() {
+	static create(...args) {
 		const { size } = this;
-		const dst = arguments[size * size] ?? new this();
+		const dst = args[size * size] ?? new this();
 		for (let i = 0; i < size; i++)
 		for (let j = 0; j < size; j++)
-			dst[i * size + j] = arguments[j * size + i];
+			dst[i * size + j] = args[j * size + i];
 		return dst;
 	}
 	/**
 	 * Multiplies a series of matrices together and optionally stores the result in a provided destination.
-	 * @param Matrix3[] matrices | The matrices to multiply together. Order matters for this argument
-	 * @param Matrix3 result? | The matrix to copy the result into
-	 * @return Matrix3
+	 * @param Matrix[] matrices | The matrices to multiply together. Order matters for this argument
+	 * @param Matrix result? | The matrix to copy the result into
+	 * @return Matrix
 	 */
 	static mul(matrices, result = new this()) {
 		result.set(matrices[0]);
@@ -329,19 +329,11 @@ class Matrix extends Float64Array {
 	static mulMatrices(matrices, result) {
 		return this.mul(matrices, result);
 	}
-	/**
-	 * Returns a matrix class with a given number of dimensions.
-	 * @param Number size | The number of dimensions transformed by the returned class. This must be between 2 and 4
-	 * @return Class extends Matrix
-	 */
-	static getMatrix(size) {
-		return Matrix.matrices[size];
-	}
 	static get Vector() {
-		return Vector.getVector(this.size);
+		return Vector[this.size];
 	}
 	static get TransformVector() {
-		return Vector.getVector(this.size - 1);
+		return Vector[this.size - 1];
 	}
 }
 
@@ -378,8 +370,8 @@ class Matrix extends Float64Array {
  * Represents a 2 by 2 matrix for use with 2D vectors.
  */
 class Matrix2 extends Matrix {
-	constructor() {
-		super(Matrix2.size, arguments);
+	constructor(...args) {
+		super(Matrix2.size, args);
 	}
 	get determinant() {
 		return this[0] * this[3] - this[1] * this[2];
@@ -419,8 +411,8 @@ Matrix2.size = 2;
  * ```
  */
 class Matrix3 extends Matrix {
-	constructor() {
-		super(Matrix3.size, arguments);
+	constructor(...args) {
+		super(Matrix3.size, args);
 	}
 	get determinant() {
 		const [
@@ -538,8 +530,8 @@ Matrix3.size = 3;
  * Represents a 4 by 4 matrix for use with 3D vectors in homogenous coordinates or 4D vectors in standard coordinates.
  */
 class Matrix4 extends Matrix {
-	constructor() {
-		super(Matrix4.size, arguments);
+	constructor(...args) {
+		super(Matrix4.size, args);
 	}
 	get determinant() {
 		const [
@@ -734,4 +726,4 @@ class Matrix4 extends Matrix {
 }
 Matrix4.size = 4;
 
-Matrix.matrices = [,, Matrix2, Matrix3, Matrix4];
+Matrix.sizes = [,, Matrix2, Matrix3, Matrix4];

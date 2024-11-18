@@ -132,19 +132,11 @@ class Vector extends Operable {
 	static get size() {
 		return this.modValues.length;
 	}
-	/**
-	 * Retrieves a vector class with a specified size.
-	 * @param Number size | The number of dimensions in the vector. This must be between 2 and 4 
-	 * @return Class extends Vector
-	 */
-	static getVector(size) {
-		return Vector.vectors[size];
-	}
 	static get Matrix() {
-		return Matrix.getMatrix(this.size);
+		return Matrix[this.size];
 	}
 	static get TransformMatrix() {
-		return Matrix.getMatrix(this.size + 1);
+		return Matrix[this.size + 1];
 	}
 }
 Vector.modValues = [];
@@ -834,4 +826,4 @@ Vector4.modValues = ["x", "y", "z", "w"];
 	}
 })();
 
-Vector.vectors = [,, Vector2, Vector3, Vector4];
+Vector.sizes = [,, Vector2, Vector3, Vector4];

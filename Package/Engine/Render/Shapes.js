@@ -155,7 +155,7 @@ class Shape {
 	 * @return Shape
 	 */
 	scale(factor, position = this.middle) {
-		return this.getModel(position.constructor.TransformMatrix.scaleAbout(factor, position));
+		return this.getModel(position.TransformMatrix.scaleAbout(factor, position));
 	}
 	/**
 	 * Returns a copy of the shape centered at a specified location.
@@ -171,7 +171,7 @@ class Shape {
 	 * @return Shape 
 	 */
 	move(dir) {
-		return this.getModel(dir.constructor.TransformMatrix.translation(dir));
+		return this.getModel(dir.TransformMatrix.translation(dir));
 	}
 	/**
 	 * Checks if two shapes are congruent.
@@ -783,7 +783,7 @@ class Circle extends Shape2D {
 	getModel(transf) {
 		return new this.constructor(
 			transf.times(this.position),
-			this.radius * transf.scale
+			this.radius * transf.stretch
 		);
 	}
 	getBoundingBox() {

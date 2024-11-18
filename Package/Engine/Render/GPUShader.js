@@ -60,8 +60,8 @@ class GPUShader extends ImageType {
 }
 
 for (const key of Object.getOwnPropertyNames(GPUInterface.prototype))
-	GPUShader.prototype[key] ??= function () {
-		return this.gpu[key].apply(this.gpu, arguments);
+	GPUShader.prototype[key] ??= function (...args) {
+		return this.gpu[key].apply(this.gpu, args);
 	};
 
 GPUShader.Interface = class GPUShaderInterface extends GPUInterface {
