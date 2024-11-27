@@ -1,28 +1,29 @@
-physics.imports.onCollide = (engine, a, b, direction, contacts, triggerA, triggerB) => {
-	a = PHYSICS.bodyToSceneObject.get(a);
+physics.onCollide = (engine, a, b, direction, contacts, triggerA, triggerB) => {
+	a = PHYSICS.bodyToSceneObject.get(a.pointer);
 	const { scene } = a.engine;
 	if (!scene.collisionEvents) return;
 	
-	b = PHYSICS.bodyToSceneObject.get(b);
-	direction = Vector2.fromPhysicsVector(new physics.exports.Vector(direction));
+	b = PHYSICS.bodyToSceneObject.get(b.pointer);
+	direction = Vector2.fromPhysicsVector(direction);
 	
-	contacts = new physics.exports.NativeVectorArray(contacts);
 	const jsContacts = new Array(contacts.length);
-	for (let i = 0; i < jsContacts.length; i++)
-		jsContacts[i] = Vector2.fromPhysicsVector(contacts.get(i));
+	for (let i = 0; i < jsContacts.length; i++) {
+		const physVec = contacts.get(i);
+		jsContacts[i] = new Vector2(physVec.x, physVec.y);
+	}
 
-	scene.handleCollisionEvent(a, b, direction, jsContacts, !!triggerA, !!triggerB);
+	scene.handleCollisionEvent(a, b, direction, jsContacts, triggerA, triggerB);
 };
 
-physics.imports.collideRule = (a, b) => {
-	a = PHYSICS.bodyToSceneObject.get(a);
-	b = PHYSICS.bodyToSceneObject.get(b);
+physics.collideRule = (a, b) => {
+	a = PHYSICS.bodyToSceneObject.get(a.pointer);
+	b = PHYSICS.bodyToSceneObject.get(b.pointer);
 	return a.scripts.PHYSICS.collisionFilter(b);
 };
 
-physics.imports.triggerRule = (a, b) => {
-	a = PHYSICS.bodyToSceneObject.get(a);
-	b = PHYSICS.bodyToSceneObject.get(b);
+physics.triggerRule = (a, b) => {
+	a = PHYSICS.bodyToSceneObject.get(a.pointer);
+	b = PHYSICS.bodyToSceneObject.get(b.pointer);
 	return a.scripts.PHYSICS.triggerFilter(b);
 };
 
@@ -55,7 +56,7 @@ class PHYSICS extends ElementScript {
 		this.scene = this.engine.scene;
 		this.physicsEngine = this.scene.physicsEngine;
 		
-		this.body = physics.exports.RigidBody.construct(
+		this.body = new physics.RigidBody(
 			obj.transform.position.x, obj.transform.position.y, gravity
 		);
 		PHYSICS.bodyToSceneObject.set(this.body.pointer, obj);
@@ -97,7 +98,7 @@ class PHYSICS extends ElementScript {
 		
 			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
 
-			this.physicsEngine.addBody(this.body);
+			this.physicsEngine.addBody(this.body.pointer);
 			
 			this.synchronized = true;
 			
@@ -117,7 +118,7 @@ class PHYSICS extends ElementScript {
 				physicsConstraints.get(i), this.sceneObject.engine
 			));
 
-		physicsConstraints.free();
+		physicsConstraints.delete();
 		
 		return constraints;
 	}
@@ -170,14 +171,14 @@ class PHYSICS extends ElementScript {
         const physicsShapes = [];
 		for (let i = 0; i < convex.length; i++) {
 			const physicsShape = convex[i].toPhysicsShape();
-			this.body.addShape(physicsShape);
+			this.body.addShape(physicsShape.pointer);
 			physicsShapes.push(physicsShape);
 		}
 		this.physicsShapes.set(shape, physicsShapes);
 	}
 	removeShape(obj, name, shape) {
         const physics = this.physicsShapes.get(shape);
-		for (let i = 0; i < physics.length; i++) this.body.removeShape(physics[i]);
+		for (let i = 0; i < physics.length; i++) this.body.removeShape(physics[i].pointer);
 		this.physicsShapes.delete(shape);
 		return shape;
 	}
@@ -247,9 +248,9 @@ class PHYSICS extends ElementScript {
 	applyImpulse(obj, point, force) {
 		const pointPhysics = point.toPhysicsVector();
 		const forcePhysics = force.toPhysicsVector();
-        this.body.applyImpulse(pointPhysics, forcePhysics);
-		pointPhysics.free();
-		forcePhysics.free();
+		this.body.applyImpulse(pointPhysics, forcePhysics, 1);
+		pointPhysics.delete();
+		forcePhysics.delete();
 	}
 	/**
 	 * Applies an impulse to a specific point on the object.

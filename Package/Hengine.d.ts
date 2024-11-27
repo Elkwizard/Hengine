@@ -1406,12 +1406,7 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 * @param matrices - The matrices to multiply together. Order matters for this argument
 	 * @param result - The matrix to copy the result into
 	 */
-	static mul(matrices: Matrix3[], result?: Matrix3): Matrix3;
-	/**
-	 * Returns a matrix class with a given number of dimensions.
-	 * @param size - The number of dimensions transformed by the returned class. This must be between 2 and 4
-	 */
-	static getMatrix(size: number): Class<Matrix>;
+	static mul(matrices: Matrix[], result?: Matrix): Matrix;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -1717,10 +1712,10 @@ declare class Random {
 	sign(): number;
 	/**
 	 * Returns a random floating-point value on [min, max). Unstable.
-	 * @param min - The lower bound
-	 * @param max - The upper bound
+	 * @param min - The lower bound. Default is -1
+	 * @param max - The upper bound. Default is the negative of min
 	 */
-	range(min: number, max: number): number;
+	range(min?: number, max?: number): number;
 	/**
 	 * Returns a random valid index for a given array. Unstable.
 	 * @param arr - The array to choose an index for
@@ -1868,10 +1863,10 @@ declare class Random {
 	static sign(): number;
 	/**
 	 * Returns a random floating-point value on [min, max). Unstable.
-	 * @param min - The lower bound
-	 * @param max - The upper bound
+	 * @param min - The lower bound. Default is -1
+	 * @param max - The upper bound. Default is the negative of min
 	 */
-	static range(min: number, max: number): number;
+	static range(min?: number, max?: number): number;
 	/**
 	 * Returns a random valid index for a given array. Unstable.
 	 * @param arr - The array to choose an index for
@@ -2040,11 +2035,6 @@ declare class Vector extends Operable {
 	 * Returns the size of the vector type.
 	 */
 	static get size(): number;
-	/**
-	 * Retrieves a vector class with a specified size.
-	 * @param size - The number of dimensions in the vector. This must be between 2 and 4
-	 */
-	static getVector(size: number): Class<Vector>;
 }
 
 /**

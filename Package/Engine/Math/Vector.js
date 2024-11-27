@@ -410,7 +410,7 @@ class Vector2 extends Vector {
 		return this;
 	}
 	toPhysicsVector() {
-		return physics.exports.Vector.construct(this.x, this.y);//.own();
+		return new physics.Vector(this.x, this.y);//.own();
 	}
 	static fromPhysicsVector(v) {
 		return new Vector2(v.x, v.y);

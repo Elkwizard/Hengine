@@ -442,16 +442,10 @@ class Polygon extends Shape2D {
 	 * @return Boolean
 	 */
 	containsPoint(point) {
-		const axes = [];
-		const poly = this.vertices;
-		for (let i = 0; i < poly.length; i++) {
-			axes.push(poly[(i + 1) % poly.length].Vminus(poly[i]).normal.normalize());
-		}
-		for (let i = 0; i < axes.length; i++) {
-			const axis = axes[i];
-			const range = Range.fromValues(poly.map(v => v.dot(axis)));
-			const proj = point.dot(axis);
-			if (!range.includes(proj)) return false;
+		const edges = this.getEdges();
+		for (let i = 0; i < edges.length; i++) {
+			const { normal, a } = edges[i];
+			if (normal.dot(point) < normal.dot(a)) return false;
 		}
 		return true;
 	
@@ -462,16 +456,15 @@ class Polygon extends Shape2D {
 		return result;
 	}
 	toPhysicsShape() {
-		const arr = physics.exports.NativeVectorArray.construct(this.vertices.length);//.own();
+		const arr = new physics.Array(physics.Vector, this.vertices.length);
 		for (let i = 0; i < this.vertices.length; i++) {
-			const physicsVertex = this.vertices[i].toPhysicsVector();
-			arr.set(i, physicsVertex);
-			physicsVertex.free();
+			const vector = arr.get(i);
+			this.vertices[i].get(vector);
 		}
 
-		const collider = physics.exports.PolygonCollider.construct(arr);
-	
-		arr.free();
+		const collider = new physics.PolygonCollider(arr);
+
+		arr.delete();
 
 		return collider;
 	}
@@ -819,6 +812,6 @@ class Circle extends Shape2D {
 		return shape;
 	}
 	toPhysicsShape() {
-		return physics.exports.CircleCollider.construct(this.position.x, this.position.y, this.radius);
+		return new physics.CircleCollider(this.position.x, this.position.y, this.radius);
 	}
 }

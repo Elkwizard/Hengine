@@ -94,11 +94,11 @@ class Random {
     }
 	/**
 	 * Returns a random floating-point value on [min, max). Unstable.
-	 * @param Number min | The lower bound
-	 * @param Number max | The upper bound
+	 * @param Number min? | The lower bound. Default is -1
+	 * @param Number max? | The upper bound. Default is the negative of min
 	 * @return Number
 	 */
-    range(min = 0, max = 1) {
+    range(min = -1, max = -min) {
         return this.random() * (max - min) + min;
     }
     lerp(a, b) {

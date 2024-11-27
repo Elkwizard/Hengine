@@ -297,59 +297,70 @@ class HengineBinaryResource extends HengineResource {
 }
 
 class HengineWASMResource extends HengineResource { // emscripten-only, uses specific API/naming convention, really only for internal Hengine use
+	static Binding = class Binding {
+		static registry = new FinalizationRegistry(held => {
+			held.type.prototype.delete.call(held);
+		});
+		constructor(...args) {
+			this.pointer = this.constructor.create(...args);
+		}
+		own() {
+			this.constructor.registry.register(this, {
+				type: this.constructor,
+				pointer: this.pointer
+			});
+			return this;
+		}
+		static cast(type, pointer) {
+			const object = Object.create(type.prototype);
+			object.pointer = pointer;
+			return object;
+		}
+	};
+	static buffers = { };
+	static bindings = { };
+	static imports = { };
 	async load() {
-		const script = await new HengineScriptResource(
-			this.src.replace(/\.wasm$/g, ".js")
+		const moduleName = this.src.match(/(\w+)\.wasm$/)[1];
+
+		const resource = name => new HengineScriptResource(
+			this.src.replace(/.wasm$/g, `/${name}.js`)
 		).load();
-		if (!script) return null;
-	
-		let { imports, buffer } = HengineWASMResource.files[script.src];
 
+		if (!(await resource("bindings") && await resource("buffer")))
+			return null;
+
+		const bufferFn = HengineWASMResource.buffers[moduleName];
+		
+		let buffer;
 		{ // decode buffer
-			buffer = new Uint8Array(
-				buffer
-					.toString()
-					.split(/\r?\n/g)
-					.slice(1, -1)
-					.flatMap((line, i) => {
-						line = line.slice(2);
-
-						const bytes = line
-							.slice(line.indexOf("//") + 2)
-							.split("")
-							.map(char => char.charCodeAt(0));
-
-						if (i) bytes.unshift(
-							+line.slice(0, line.indexOf("/"))
-						);
-
-						return bytes;
-					})
+			const start = "() => {\n//";
+			const end = "\n};";
+			const fnString = bufferFn.toString();
+			const chars = fnString.slice(
+				fnString.indexOf(start) + start.length,
+				1 - end.length
 			);
-		};
+			const offset = "\r".charCodeAt() + 1;
 
-		let printBuffer = [];
-		const importImplementations = {
-			printInt: int => printBuffer.push(int),
-			printFloat: float => printBuffer.push(float),
-			printLn: () => {
-				console.log(...printBuffer);
-				printBuffer = [];
-			},
-			fullExit: () => exit("Exited via WASM exit()"),
+			const size = chars.length;
+			buffer = new Uint8Array(size);
+			for (let i = 0; i < size; i++)
+				buffer[i] = chars.charCodeAt(i) - offset;
+		}
+
+		const env = {
 			emscripten_notify_memory_growth: () => null
 		};
-
-		for (const name in importImplementations)
-			imports.push(name);
-
-		const env = { };
-		for (const name of imports)
-			env[name] = (...args) => importImplementations[name]?.(...args);
+		const imports = { };
+		const importNames = HengineWASMResource.imports[moduleName];
+		for (let i = 0; i < importNames.length; i++) {
+			const name = importNames[i];
+			env[name] = (...args) => imports[name]?.(...args);
+		}
 
 		const { instance: { exports } } = await WebAssembly.instantiate(buffer, {
-			env,
-			wasi_snapshot_preview1: {
+			env, wasi_snapshot_preview1: {
 				proc_exit(code) {
 					exit("WASM exited with code " + code);
 				},
@@ -365,112 +376,45 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 
 		exports._initialize();
 		
-		const keys = Object.keys(exports)
-			.filter(key => key.match(/\$/));
-		
-		const classes = { };
-		for (const key of keys) {
-			const inx = key.indexOf("$");
-			const cls = key.slice(0, inx);
-			const prop = key.slice(inx + 1);
-			const typeInx = prop.indexOf("$");
-			if (typeInx > -1) {
-				const type = prop.slice(0, typeInx);
-				if (type.match(/[A-Z]/))
-					classes[type] ??= { };
+		const module = { };
+		HengineWASMResource.bindings[moduleName](module, imports, exports);
+
+		module.printInt = function (int) {
+			console.log(int);
+		};
+
+		module._exports = exports;
+
+		console.log(exports);
+
+		module.Array = class Array {
+			constructor(type, length, indirect) {
+				if (length instanceof module._Slab) this.slab = length;
+				else this.slab = new module._Slab(type.size, length);
+				this.type = type;
+				this.indirect = indirect;
 			}
-			(classes[cls] ??= { })[prop] = exports[key];
+			get pointer() {
+				return this.slab.pointer;
+			}
+			get length() {
+				return this.slab.length;
+			}
+			*[Symbol.iterator]() {
+				const { length } = this;
+				for (let i = 0; i < length; i++)
+					yield this.get(i);
+			}
+			get(index) {
+				const pointer = this.indirect ? this.slab.getPointer(index) : this.slab.get(index)
+				return HengineWASMResource.Binding.cast(this.type, pointer);
+			}
+			delete() {
+				this.slab.delete();
+			}
 		}
 
-		const finalizationRegistry = new FinalizationRegistry(free => free());
-
-		const native = Symbol("native");
-		
-		const clean = value => (value && typeof value === "object" && value.constructor[native]) ? value.pointer : value;
-		const cast = (value, type) => {
-			if (type in classes) return new classes[type](value);
-			if (type === "bool") return !!value;
-			return value;
-		};
-		const cleanArgs = args => {
-			for (let i = 0; i < args.length; i++)
-				args[i] = clean(args[i]);
-		};
-
-		for (const cls in classes) {
-			const entries = classes[cls];
-
-			const NativeClass = class {
-				constructor(pointer) {
-					this.pointer = pointer;
-					this.owned = false;
-				}
-				
-				own() {
-					if (!this.owned) {
-						this.owned = true;
-						const { pointer } = this;
-						finalizationRegistry.register(this, () => entries?.free?.(pointer));
-					}
-
-					return this;
-				}
-
-				as(Type) {
-					return new Type(this.pointer);
-				}
-			};
-
-			NativeClass[native] = true;
-			
-			Object.defineProperty(NativeClass, "name", { value: cls });
-
-			for (let key in entries) {
-				const fn = entries[key];
-				const typeInx = key.indexOf("$");
-				const returnType = key.slice(0, typeInx);
-				key = key.slice(typeInx + 1);
-
-				const staticInx = key.indexOf("$");
-				const isStatic = staticInx > -1;
-				if (isStatic) key = key.slice(0, staticInx);
-
-				if (key.includes("_")) {
-					const name = key.slice(key.indexOf("_") + 1);
-					const getter = entries[`${returnType}$get_${name}`];
-					const setter = entries[`void$set_${name}`];
-					if (!(name in NativeClass.prototype)) {
-						Object.defineProperty(NativeClass.prototype, name, {
-							get: getter ? function () {
-								return cast(getter(this.pointer), returnType);
-							} : undefined,
-							set: setter ? function (value) {
-								setter(this.pointer, clean(value));
-							} : undefined,
-							enumerable: true
-						});
-					}
-				} else Object.defineProperty(isStatic ? NativeClass : NativeClass.prototype, key, {
-					value: function (...args) {
-						cleanArgs(args);
-						const result = isStatic ? fn(...args) : fn(this.pointer, ...args);
-						return cast(result, returnType);
-					},
-					enumerable: false
-				});
-			}
-
-			classes[cls] = NativeClass;
-		}
-
-		const name = this.src
-			.replace(/^.*\//g, "")
-			.replace(/\.[^.]*?$/g, "");
-		
-		window[name] = {
-			exports: classes,
-			imports: importImplementations
-		};
+		window[moduleName] = module;
 	}
 }
 HengineWASMResource.files = { };

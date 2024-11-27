@@ -2,15 +2,15 @@
 
 #include <cmath>
 
-#include "exports.hpp"
+#include "global.hpp"
 
 // Vector
-class Vector {
+API class Vector {
 	public:
-		double x;
-		double y;
+		API double x;
+		API double y;
 
-		Vector(double _x, double _y) {
+		API Vector(double _x, double _y) {
 			x = _x;
 			y = _y;
 		}
@@ -47,6 +47,11 @@ class Vector {
 
 		double mag() const {
 			return sqrt(sqrMag());
+		}
+
+		API void set(double _x, double _y) {
+			x = _x;
+			y = _y;
 		}
 
 		Vector normal() const {
@@ -113,25 +118,8 @@ class Vector {
 		static Vector crossNV(double a, const Vector& b) {
 			return { -a * b.y, a * b.x };
 		}
+
+		API static double dist(const Vector& a, const Vector& b) {
+			return hypot(b.x - a.x, b.y - a.y);
+		}
 };
-
-CONSTRUCT(Vector)(double x, double y) { return new Vector(x, y); }
-FREE(Vector);
-ACCESS(Vector, x, double)
-ACCESS(Vector, y, double)
-FN(Vector, set, void)(Vector* v, double x, double y) {
-	v->x = x;
-	v->y = y;
-}
-
-using NativeVectorArray = NativeArray<Vector>;
-
-CONSTRUCT(NativeVectorArray)(int size) { return new NativeVectorArray(size); }
-FREE(NativeVectorArray)
-GETTER(NativeVectorArray, length, int) { return object->getLength(); }
-OBJECT_FN(NativeVectorArray, get, Vector)(NativeVectorArray* arr, int index) {
-	return &arr->get(index);
-}
-FN(NativeVectorArray, set, void)(NativeVectorArray* arr, int index, Vector* v) {
-	return arr->set(index, *v);
-}

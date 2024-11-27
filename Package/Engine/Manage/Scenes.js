@@ -27,9 +27,11 @@ class Scene {
 	constructor(gravity, engine) {
 		this.engine = engine;
 		this.main = new ElementContainer("Main", null, this.engine);
+		
 		const gravityPhysics = gravity.toPhysicsVector();
-		this.physicsEngine = physics.exports.PhysicsEngine.construct(gravityPhysics).own();
-		gravityPhysics.free();
+		this.physicsEngine = new physics.PhysicsEngine(gravityPhysics).own();
+		gravityPhysics.delete();
+		
 		this.cullGraphics = true;
 		this.mouseEvents = true;
 		this.collisionEvents = true;
@@ -50,21 +52,21 @@ class Scene {
 	 * @return Vector2
 	 */
 	get gravity() {
-		return Vector2.fromPhysicsVectorReference(this.physicsEngine.gravity);
+		return Vector2.zero.proxy(this.physicsEngine.gravity);
 	}
 	/**
 	 * Returns all the active constraints in the scene.
 	 * @return Constraint[]
 	 */
 	get constraints() {
-		const physicsConstraints = this.physicsEngine.getConstraints();
+		const physicsConstraints = this.physicsEngine.constraints;
 		const constraints = [];
 		for (let i = 0; i < physicsConstraints.length; i++)
 			constraints.push(Constraint.fromPhysicsConstraint(
 				physicsConstraints.get(i), this.engine
 			));
 
-		physicsConstraints.free();
+		physicsConstraints.delete();
 		
 		return constraints;
 	}
@@ -137,20 +139,16 @@ class Scene {
 	constrainLength(a, b, ap = Vector2.zero, bp = Vector2.zero, length = null) {
 		const apPhysics = ap.toPhysicsVector();
 		const bpPhysics = bp.toPhysicsVector();
-		const con = physics.exports.LengthConstraint2.construct(
+		const con = new physics.LengthConstraint2(
 			a.scripts.PHYSICS.body, b.scripts.PHYSICS.body,
 			apPhysics, bpPhysics, length
 		);
-		apPhysics.free();
-		bpPhysics.free();
-		if (length === null) {
-			const { a, b } = con.as(physics.exports.Constraint);
-			con.length = Vector2.dist(
-				Vector2.fromPhysicsVector(a),
-				Vector2.fromPhysicsVector(b)
-			);
-		}
-		this.physicsEngine.addConstraint(con);
+		apPhysics.delete();
+		bpPhysics.delete();
+		if (length === null)
+			con.length = physics.Vector.dist(con.a, con.b);
+		this.physicsEngine.addConstraint(con.pointer);
+		(window.pointers ??= []).push(con.pointer);
 		return new Constraint2(con, this.engine);
 	}
 	/**
@@ -165,19 +163,14 @@ class Scene {
 		point ??= a.transform.localToGlobal(offset);
 		const offsetPhysics = offset.toPhysicsVector();
 		const pointPhysics = point.toPhysicsVector();
-		const con = physics.exports.LengthConstraint1.construct(
+		const con = new physics.LengthConstraint1(
 			a.scripts.PHYSICS.body, offsetPhysics, pointPhysics, length
 		);
-		offsetPhysics.free();
-		pointPhysics.free();
-		if (length === null) {
-			const { a, b } = con.as(physics.exports.Constraint);
-			con.length = Vector2.dist(
-				Vector2.fromPhysicsVector(a),
-				Vector2.fromPhysicsVector(b)
-			);
-		}
-		this.physicsEngine.addConstraint(con);
+		offsetPhysics.delete();
+		pointPhysics.delete();
+		if (length === null)
+			con.length = physics.Vector.dist(con.a, con.b);
+		this.physicsEngine.addConstraint(con.pointer);
 		return new Constraint1(con, this.engine);
 	}
 	/**
@@ -191,14 +184,14 @@ class Scene {
 	constrainPosition(a, b, ap = Vector2.zero, bp = Vector2.zero) {
 		const apPhysics = ap.toPhysicsVector();
 		const bpPhysics = bp.toPhysicsVector();
-		const con = physics.exports.PositionConstraint2.construct(
+		const con = new physics.PositionConstraint2(
 			a.scripts.PHYSICS.body, b.scripts.PHYSICS.body,
 			apPhysics,
 			bpPhysics
 		);
-		apPhysics.free();
-		bpPhysics.free();
-		this.physicsEngine.addConstraint(con);
+		apPhysics.delete();
+		bpPhysics.delete();
+		this.physicsEngine.addConstraint(con.pointer);
 		return new Constraint2(con, this.engine);
 	}
 	/**
@@ -212,13 +205,13 @@ class Scene {
 		point ??= a.transform.localToGlobal(offset);
 		const offsetPhysics = offset.toPhysicsVector();
 		const pointPhysics = point.toPhysicsVector();
-		const con = physics.exports.PositionConstraint1.construct(
+		const con = new physics.PositionConstraint1(
 			a.scripts.PHYSICS.body,
 			offsetPhysics, pointPhysics
 		);
-		offsetPhysics.free();
-		pointPhysics.free();
-		this.physicsEngine.addConstraint(con);
+		offsetPhysics.delete();
+		pointPhysics.delete();
+		this.physicsEngine.addConstraint(con.pointer);
 		return new Constraint1(con, this.engine);
 	}
 	updateCaches() {

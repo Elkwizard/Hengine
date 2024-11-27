@@ -12,8 +12,7 @@ PhysicsEngine::PhysicsEngine(const Vector& _gravity) : orderGenerator(123456), c
 	contactIterations = 8;
 
 	onCollide = [&](RigidBody& a, RigidBody& b, const Vector& dir, const std::vector<Vector>& contacts, bool triggerA, bool triggerB) {
-		NativeVectorArray arr = contacts;
-		::onCollide(this, &a, &b, (Vector*)&dir, &arr, triggerA, triggerB);
+		::onCollide(*this, a, b, dir, contacts, triggerA, triggerB);
 	};
 }
 
@@ -47,9 +46,9 @@ Constraints PhysicsEngine::getConstraints() const {
 	return result;
 }
 
-void PhysicsEngine::addConstraint(Constraint& constraint) {
-	constraint.add();
-	constraintMap.insert_or_assign(constraint.id, &constraint);
+void PhysicsEngine::addConstraint(Constraint* constraint) {
+	constraint->add();
+	constraintMap.insert_or_assign(constraint->id, constraint);
 }
 
 void PhysicsEngine::removeConstraint(ID id) {
@@ -232,9 +231,9 @@ RigidBody& PhysicsEngine::getBody(ID id) const {
 	return *bodyMap.at(id);
 }
 
-void PhysicsEngine::addBody(RigidBody& body) {
-	body.engine = this;
-	bodyMap.insert_or_assign(body.id, &body);
+void PhysicsEngine::addBody(RigidBody* body) {
+	body->engine = this;
+	bodyMap.insert_or_assign(body->id, body);
 }
 
 void PhysicsEngine::removeBody(ID id) {

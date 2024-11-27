@@ -31,11 +31,11 @@ RigidBody::RigidBody(double x, double y, bool _dynamic) {
 
 	trivialCollisionFilter = true;
 	collisionFilter = [&](const RigidBody& body) {
-		return ::collideRule(this, (RigidBody*)&body);
+		return ::collideRule(*this, body);
 	};
 	trivialTriggerFilter = true;
 	triggerFilter = [&](const RigidBody& body) {
-		return ::triggerRule(this, (RigidBody*)&body);
+		return ::triggerRule(*this, body);
 	};
 	engine = nullptr;
 

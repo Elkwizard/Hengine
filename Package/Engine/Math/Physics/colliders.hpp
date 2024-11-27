@@ -19,7 +19,7 @@ class Model {
 		virtual void displace(const Vector& displacement) = 0;
 };
 
-class Collider {
+API class Collider {
 	public:
 		enum Type { POLYGON, CIRCLE };
 
@@ -56,20 +56,15 @@ class Collider {
 		}
 };
 
-class PolygonCollider : public Collider {
+API class PolygonCollider : public Collider {
     public:
 		std::vector<Vector> vertices;
 		std::vector<Vector> axes;
 		Vector position;
 
-		PolygonCollider(const std::vector<Vector>& _vertices);
+		API PolygonCollider(const std::vector<Vector>& _vertices);
 		void computeMatterData() override;
 };
-
-CONSTRUCT(PolygonCollider)(NativeVectorArray* vertices) {
-	return new PolygonCollider(vertices->data);
-}
-FREE(PolygonCollider)
 
 class PolygonModel : public Model {
 	public:
@@ -83,19 +78,14 @@ class PolygonModel : public Model {
 		void displace(const Vector& v) override;
 };
 
-class CircleCollider : public Collider {
+API class CircleCollider : public Collider {
     public:
 		Vector position;
 		double radius;
 
-		CircleCollider(double x, double y, double _radius);
+		API CircleCollider(double x, double y, double _radius);
 		void computeMatterData() override;
 };
-
-CONSTRUCT(CircleCollider)(double x, double y, double radius) {
-	return new CircleCollider(x, y, radius);
-}
-FREE(CircleCollider)
 
 class CircleModel : public Model {
     public:

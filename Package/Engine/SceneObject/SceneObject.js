@@ -43,7 +43,6 @@ class SceneObject extends SceneElement {
 		this.layer = 0;
 		this.lifeSpan = 0;
 		this.synced = [];
-		this.log = [];
 		this.onScreen = true;
 		this.cullGraphics = true;
 		this.scripts = new ScriptContainer(this);

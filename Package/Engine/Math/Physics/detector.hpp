@@ -291,6 +291,6 @@ CollisionDetector::JumpTable CollisionDetector::jumpTable {
     } }
 };
 
-STATIC_FN(CollisionDetector, collide, bool)(Collider* a, Collider* b) {
+API bool collide(Collider* a, Collider* b) {
 	return (bool)CollisionDetector::collide(a, { }, 1.0, 0.0, b, { }, 1.0, 0.0);
 }

@@ -651,7 +651,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="Matrix.mul()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L323" target="_blank" class="function-name source-link">Matrix.mul</a>(<span class="param">matrices</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L323" target="_blank" class="function-name source-link">Matrix.mul</a>(<span class="param">matrices</span>, <span class="param">result?</span>)<span class="type">Matrix</span>
 			</div>
 			<div class="function desc">
 				Multiplies a series of matrices together and optionally stores the result in a provided destination.
@@ -664,7 +664,7 @@ Returns the caller.
 						<div class="param-wrapper" id="Matrix.mul():matrices">
 							<div class="param-name">
 								<span class="param">matrices</span>
-								<span class="type">Matrix3[]</span>
+								<span class="type">Matrix[]</span>
 							</div>
 							<div class="param desc">
 								The matrices to multiply together. Order matters for this argument
@@ -674,37 +674,10 @@ Returns the caller.
 						<div class="param-wrapper" id="Matrix.mul():result?">
 							<div class="param-name">
 								<span class="param">result</span>
-								<span class="type">Matrix3</span>
+								<span class="type">Matrix</span>
 							</div>
 							<div class="param desc">
 								The matrix to copy the result into
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Matrix.getMatrix()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L337" target="_blank" class="function-name source-link">Matrix.getMatrix</a>(<span class="param">size</span>)<span class="type">Class extends Matrix</span>
-			</div>
-			<div class="function desc">
-				Returns a matrix class with a given number of dimensions.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Matrix.getMatrix():size">
-							<div class="param-name">
-								<span class="param">size</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The number of dimensions transformed by the returned class. This must be between 2 and 4
 							</div>
 						</div>
 					
@@ -718,7 +691,7 @@ Returns the caller.
 		
 			<div class="class-wrapper" id="class Matrix2">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L380" target="_blank" class="class-name source-link">Matrix2</a> <span class="keyword">extends</span> <span class="class-name">Matrix</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L372" target="_blank" class="class-name source-link">Matrix2</a> <span class="keyword">extends</span> <span class="class-name">Matrix</span>
 				</div>
 				<div class="class desc">
 					Represents a 2 by 2 matrix for use with 2D vectors.
@@ -732,7 +705,7 @@ Returns the caller.
 		
 			<div class="class-wrapper" id="class Matrix3">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L421" target="_blank" class="class-name source-link">Matrix3</a> <span class="keyword">extends</span> <span class="class-name">Matrix</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L413" target="_blank" class="class-name source-link">Matrix3</a> <span class="keyword">extends</span> <span class="class-name">Matrix</span>
 				</div>
 				<div class="class desc">
 					Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates or 3D vectors in standard coordinates.
@@ -762,7 +735,7 @@ const</span><span class="highlight-CONSTANT"> initialAgain</span><span class="hi
 					<div class="class-methods">
 		<div class="function-wrapper" id="Matrix3.prototype.toCSS()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L512" target="_blank" class="function-name source-link">toCSS</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L504" target="_blank" class="function-name source-link">toCSS</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Converts the matrix to a CSS matrix string.
@@ -772,7 +745,7 @@ const</span><span class="highlight-CONSTANT"> initialAgain</span><span class="hi
 	
 		<div class="function-wrapper" id="Matrix3.rotation()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L524" target="_blank" class="function-name source-link">Matrix3.rotation</a>(<span class="param">theta</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L516" target="_blank" class="function-name source-link">Matrix3.rotation</a>(<span class="param">theta</span>, <span class="param">result?</span>)<span class="type">Matrix3</span>
 			</div>
 			<div class="function desc">
 				Creates a 2D rotation matrix and optionally stores it in a provided destination.
@@ -812,7 +785,7 @@ const</span><span class="highlight-CONSTANT"> initialAgain</span><span class="hi
 		
 			<div class="class-wrapper" id="class Matrix4">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L540" target="_blank" class="class-name source-link">Matrix4</a> <span class="keyword">extends</span> <span class="class-name">Matrix</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L532" target="_blank" class="class-name source-link">Matrix4</a> <span class="keyword">extends</span> <span class="class-name">Matrix</span>
 				</div>
 				<div class="class desc">
 					Represents a 4 by 4 matrix for use with 3D vectors in homogenous coordinates or 4D vectors in standard coordinates.
@@ -826,7 +799,7 @@ const</span><span class="highlight-CONSTANT"> initialAgain</span><span class="hi
 					<div class="class-methods">
 		<div class="function-wrapper" id="Matrix4.perspective()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L692" target="_blank" class="function-name source-link">Matrix4.perspective</a>(<span class="param">aspectRatio</span>, <span class="param">fov</span>, <span class="param">zNear</span>, <span class="param">zFar</span>, <span class="param">result?</span>)<span class="type">Matrix4</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L684" target="_blank" class="function-name source-link">Matrix4.perspective</a>(<span class="param">aspectRatio</span>, <span class="param">fov</span>, <span class="param">zNear</span>, <span class="param">zFar</span>, <span class="param">result?</span>)<span class="type">Matrix4</span>
 			</div>
 			<div class="function desc">
 				Creates a perspective projection matrix for use in 3D rendering.
@@ -893,7 +866,7 @@ const</span><span class="highlight-CONSTANT"> initialAgain</span><span class="hi
 	
 		<div class="function-wrapper" id="Matrix4.orthographic()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L716" target="_blank" class="function-name source-link">Matrix4.orthographic</a>(<span class="param">xRange</span>, <span class="param">yRange</span>, <span class="param">zRange</span>, <span class="param">result?</span><span class="aux"> | </span><span class="param">bounds</span>, <span class="param">result?</span>)<span class="type">Matrix4</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Matrix.js?#L708" target="_blank" class="function-name source-link">Matrix4.orthographic</a>(<span class="param">xRange</span>, <span class="param">yRange</span>, <span class="param">zRange</span>, <span class="param">result?</span><span class="aux"> | </span><span class="param">bounds</span>, <span class="param">result?</span>)<span class="type">Matrix4</span>
 			</div>
 			<div class="function desc">
 				Creates an orthographic projection matrix for use in 3D rendering.

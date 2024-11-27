@@ -274,7 +274,7 @@ class Texture extends ImageType {
 	get(tex = new Texture(this.width, this.height)) {
 		if (tex.width !== this.width || tex.height !== this.height) return null;
 		tex.imageData = new ImageData(
-			this.imageData.data.map(channel => channel),
+			new Uint8ClampedArray(this.imageData.data),
 			this.imageData.width,
 			this.imageData.height
 		);

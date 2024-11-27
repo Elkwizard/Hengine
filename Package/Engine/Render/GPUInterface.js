@@ -642,7 +642,7 @@ class GLSLProgram {
 			for (const [name, array] of dynamicArrayDescriptors) {
 				const unit = nextTextureUnit++;
 				this.checkTextureUnit(unit);
-				const gpuArray = new GPUInputArray(gl, name, unit, array.zero.glsl.structs.get(array.type));
+				const gpuArray = new GPUInputArray(gl, name, unit, array.origin.glsl.structs.get(array.type));
 				this.uniformValues[name] = gpuArray;
 				this.dynamicArrays.push(gpuArray);
 			}
@@ -1021,23 +1021,27 @@ class GLSLProgram {
 			this.use();
 	}
 	setUniform(name, value, force = true, location = this.uniforms) {
-		if (name in location) {
-			if (location === this.uniforms && !this.lockedValues.has(name))
-				this.uniformValues[name] = value;
-			const child = location[name];
-			if (typeof child.set === "function") { // reached leaf
-				this.focus(); // need to be the gl.CURRENT_PROGRAM
-				this.uniformsSet = true;
-				child.set(value);
-				child.value = typeof value === "object" ? value.get?.() ?? value : value;
-			} else {
-				const keys = Object.getOwnPropertyNames(child);
-				for (let i = 0; i < keys.length; i++) {
-					const key = keys[i];
-					if (key in value) this.setUniform(key, value[key], force, child); // more steps needed
-				}
+		const child = location[name];
+		if (!child && location === this.uniforms) {
+			if (force) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
+			return;
+		}
+
+		if (location === this.uniforms && !this.lockedValues.has(name))
+			this.uniformValues[name] = value;
+
+		if (typeof child.set === "function") { // reached leaf
+			this.focus();
+			this.uniformsSet = true;
+			child.set(value);
+			child.value = typeof value === "object" ? value.get?.() ?? value : value;
+		} else {
+			const keys = Object.getOwnPropertyNames(child);
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i];
+				if (key in value) this.setUniform(key, value[key], force, child); // more steps needed
 			}
-		} else if (location === this.uniforms && force) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
+		}
 	}
 	setUniforms(args, force = true) {
 		for (const key in args)
@@ -1100,33 +1104,6 @@ class GLSLProgram {
 		}
 
 		div.stride = offset;
-
-			// const currentAttributesList = this.divisors[divisor].attributes;
-			// const currentAttributes = {};
-			// for (let i = 0; i < currentAttributesList.length; i++) {
-			// 	const attribute = currentAttributesList[i];
-			// 	if (!attribute.isFiller) {
-			// 		attribute.enabled = false;
-			// 		currentAttributes[attribute.name] = attribute;
-			// 	}
-			// }
-
-			// const attributes = [];
-			// let stride = 0;
-			// for (let i = 0; i < layout.length; i++) {
-			// 	const segment = layout[i];
-			// 	const attribute = (typeof segment === "number") ? { rows: segment, columns: 1, isFiller: true } : currentAttributes[segment];
-			// 	if (!attribute) continue;
-			// 	attribute.enabled = true;
-			// 	attributes.push(attribute);
-			// 	stride += attribute.rows * attribute.columns * 4 /* bytes per GLFloat */;
-			// }
-
-			// // TODO: fix!!!
-			// attributes.push(...currentAttributesList.filter(attr => !attr.enabled));
-
-			// this.divisors[divisor].attributes = attributes;
-			// this.divisors[divisor].stride = stride;
 	}
 	setAttributes(buffer, divisor = 0) {
 		const div = this.divisors.get(divisor);

@@ -185,9 +185,9 @@ void Constraint2::remove() {
 	constraintsB.erase(std::find(constraintsB.begin(), constraintsB.end(), this));
 }
 
-class LengthConstraint2 : public Constraint2 {
+API class LengthConstraint2 : public Constraint2 {
 	public:
-		double length;
+		API double length;
 
 	protected:
 		Error getError() override {
@@ -202,20 +202,13 @@ class LengthConstraint2 : public Constraint2 {
 		}
 		
 	public:
-		LengthConstraint2(RigidBody& a, RigidBody& b, const Vector& ao, const Vector& bo, double l) : Constraint2(LENGTH2, a, b, ao, bo) {
+		API LengthConstraint2(RigidBody& a, RigidBody& b, const Vector& ao, const Vector& bo, double l) : Constraint2(LENGTH2, a, b, ao, bo) {
 			length = l;
 		}
     
 };
 
-CONSTRUCT(LengthConstraint2)(RigidBody* a, RigidBody* b, Vector* ao, Vector* bo, double l) {
-	return new LengthConstraint2(*a, *b, *ao, *bo, l);
-}
-FREE(LengthConstraint2)
-
-ACCESS(LengthConstraint2, length, double)
-
-class PositionConstraint2 : public Constraint2 {
+API class PositionConstraint2 : public Constraint2 {
 	protected:
 		Error getError() override {
 			Vector currentVelocityError = bodyB.pointVelocity(b) - bodyA.pointVelocity(a);
@@ -224,17 +217,12 @@ class PositionConstraint2 : public Constraint2 {
 		}
 		
 	public:
-		PositionConstraint2(RigidBody& a, RigidBody& b, const Vector& ao, const Vector& bo) : Constraint2(POSITION2, a, b, ao, bo) { }
+		API PositionConstraint2(RigidBody& a, RigidBody& b, const Vector& ao, const Vector& bo) : Constraint2(POSITION2, a, b, ao, bo) { }
 };
 
-CONSTRUCT(PositionConstraint2)(RigidBody* a, RigidBody* b, Vector* ao, Vector* bo) {
-	return new PositionConstraint2(*a, *b, *ao, *bo);
-}
-FREE(PositionConstraint2)
-
-class LengthConstraint1 : public Constraint1 {
+API class LengthConstraint1 : public Constraint1 {
 	public:
-		double length;
+		API double length;
 
     protected:
 		Error getError() override {
@@ -249,19 +237,12 @@ class LengthConstraint1 : public Constraint1 {
 		}
 
 	public:
-		LengthConstraint1(RigidBody& body, const Vector& offset, const Vector& point, double _length) : Constraint1(LENGTH1, body, offset, point) {
+		API LengthConstraint1(RigidBody& body, const Vector& offset, const Vector& point, double _length) : Constraint1(LENGTH1, body, offset, point) {
 			length = _length;
 		}
 };
 
-CONSTRUCT(LengthConstraint1)(RigidBody* body, Vector* o, Vector* p, double length) {
-	return new LengthConstraint1(*body, *o, *p, length);
-}
-FREE(LengthConstraint1)
-
-ACCESS(LengthConstraint1, length, double)
-
-class PositionConstraint1 : public Constraint1 {
+API class PositionConstraint1 : public Constraint1 {
 	protected:
 		Error getError() override {
 			Vector currentVelocityError = -body.pointVelocity(a);
@@ -270,10 +251,5 @@ class PositionConstraint1 : public Constraint1 {
 		}
 
 	public:
-		PositionConstraint1(RigidBody& body, const Vector& offset, const Vector& point) : Constraint1(POSITION1, body, offset, point) { }
+		API PositionConstraint1(RigidBody& body, const Vector& offset, const Vector& point) : Constraint1(POSITION1, body, offset, point) { }
 };
-
-CONSTRUCT(PositionConstraint1)(RigidBody* body, Vector* o, Vector* p) {
-	return new PositionConstraint1(*body, *o, *p);
-}
-FREE(PositionConstraint1)
