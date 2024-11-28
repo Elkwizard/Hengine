@@ -379,14 +379,6 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 		const module = { };
 		HengineWASMResource.bindings[moduleName](module, imports, exports);
 
-		module.printInt = function (int) {
-			console.log(int);
-		};
-
-		module._exports = exports;
-
-		console.log(exports);
-
 		module.Array = class Array {
 			constructor(type, length, indirect) {
 				if (length instanceof module._Slab) this.slab = length;
