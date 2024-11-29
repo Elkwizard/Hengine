@@ -270,7 +270,7 @@ class Line extends Shape2D {
 		return this.a.Vplus(this.b).Nmul(0.5);
 	}
 	get vector() {
-		return this.b.Vminus(this.a).normalize();
+		return this.b.Vminus(this.a);
 	}
 	get normal() {
 		return this.vector.normal;
