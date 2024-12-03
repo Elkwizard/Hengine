@@ -256,7 +256,7 @@ class KeyboardHandler extends InputHandler {
 	}
 	preprocess(name) {
 		name += "";
-		return (name.length === 1) ? name.toLowerCase() : name;
+		return name.length === 1 ? name.toLowerCase() : name;
 	}
 	addListeners() {
 		document.body.addEventListener("blur", () => this.targetAll(false));

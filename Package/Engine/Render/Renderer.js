@@ -324,11 +324,11 @@ class CanvasArtist2D extends Artist2D {
 				text = font.processString(text);
 
 				if (this.textModeX !== TextModeX.LEFT)
-					x -= this.c.measureText(text).width * ((this.textModeX === TextModeX.CENTER) ? 0.5 : 1);
+					x -= this.c.measureText(text).width * (this.textModeX === TextModeX.CENTER ? 0.5 : 1);
 
 				y += font.renderOffsetY;
 				if (this.textModeY !== TextModeY.TOP)
-					y -= font.getTextHeight(text) * ((this.textModeY === TextModeY.CENTER) ? 0.5 : 1);
+					y -= font.getTextHeight(text) * (this.textModeY === TextModeY.CENTER ? 0.5 : 1);
 
 				return { text, x, y };
 			},
@@ -344,11 +344,11 @@ class CanvasArtist2D extends Artist2D {
 				
 				y += font.renderOffsetY;
 				if (this.textModeY !== TextModeY.TOP)
-					y -= font.getTextHeight(text) * ((this.textModeY === TextModeY.CENTER) ? 0.5 : 1);
+					y -= font.getTextHeight(text) * (this.textModeY === TextModeY.CENTER ? 0.5 : 1);
 
 				let widthOffsetFactor = 0;
 				if (this.textModeX !== TextModeX.LEFT)
-					widthOffsetFactor = (this.textModeX === TextModeX.CENTER) ? 0.5 : 1;
+					widthOffsetFactor = this.textModeX === TextModeX.CENTER ? 0.5 : 1;
 
 				this.c.font = font;
 				for (let i = 0; i < blocks.length; i++) {

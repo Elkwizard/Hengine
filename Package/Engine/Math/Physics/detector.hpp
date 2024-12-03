@@ -265,7 +265,7 @@ class CollisionDetector {
 				if (aMax < bMin || aMin > bMax)
 					return nullptr;
 
-				double overlap = (aMin + aMax < bMin + bMax) ? aMax - bMin : bMax - aMin;
+				double overlap = aMin + aMax < bMin + bMax ? aMax - bMin : bMax - aMin;
 				if (overlap < minOverlap) {
 					minOverlap = overlap;
 					bestAxis = axis;

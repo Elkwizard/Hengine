@@ -147,7 +147,7 @@ class TEXT_AREA extends ElementScript {
 			array = array
 				.split("")
 				.map((char, i) => this.getCharacterHitbox(i + startInx));
-			index = (p.x < this.relativeTextViewBox.x) ? startInx : startInx + array.length;
+			index = p.x < this.relativeTextViewBox.x ? startInx : startInx + array.length;
 			for (let i = 0; i < array.length; i++) {
 				const rect = array[i];
 				if (rect.containsPoint(p)) {
@@ -262,7 +262,7 @@ class TEXT_AREA extends ElementScript {
 			}
 			if (key === "ArrowUp" || key === "ArrowDown") {
 				let p = this.getTextLocation(this.selectionEnd);
-				p.y += ((key === "ArrowUp") ? -0.5 : 1.5) * this.font.lineHeight;
+				p.y += (key === "ArrowUp" ? -0.5 : 1.5) * this.font.lineHeight;
 				p.x += this.font.lineHeight * 0.1;
 				this.selectionEnd = this.getCharacterIndex(p);
 			}
@@ -320,8 +320,8 @@ class TEXT_AREA extends ElementScript {
 		const { width, height } = this.getDimensions();
 		const relativeTextViewBox = new Rect(-width / 2 + this.padding, -height / 2 + this.padding, width - this.padding - this.scrollBarSize, height - this.padding - this.scrollBarSize);
 		const relativeTextBoundingBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, this.font.getTextWidth(this.value), this.font.getTextHeight(this.value));
-		const rightOffset = (this.multiline && relativeTextViewBox.height < relativeTextBoundingBox.height) ? this.scrollBarSize : 0;
-		const bottomOffset = (this.multiline && relativeTextViewBox.width < relativeTextBoundingBox.width) ? this.scrollBarSize : 0;
+		const rightOffset = this.multiline && relativeTextViewBox.height < relativeTextBoundingBox.height ? this.scrollBarSize : 0;
+		const bottomOffset = this.multiline && relativeTextViewBox.width < relativeTextBoundingBox.width ? this.scrollBarSize : 0;
 		this.relativeTextViewBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, width - this.padding * 2 - rightOffset, height - this.padding * 2 - bottomOffset);
 		this.relativeTextBoundingBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, this.font.getTextWidth(this.value) + this.renderTextOffset.x, this.font.getTextHeight(this.value) + this.renderTextOffset.y);
 		this.clampScrollOffset();
@@ -332,7 +332,7 @@ class TEXT_AREA extends ElementScript {
 		this.keyTimer = 0;
 		let lp = obj.transform.globalToLocal(p);
 		const rtvb = this.relativeTextViewBox;
-		const textAreaHitbox = (type === "start") ? rtvb : new Rect(
+		const textAreaHitbox = type === "start" ? rtvb : new Rect(
 			rtvb.x - this.padding, rtvb.y - this.padding,
 			rtvb.width + this.padding * 2, rtvb.height + this.padding * 2
 		);
@@ -374,7 +374,7 @@ class TEXT_AREA extends ElementScript {
 		return this.keyboard.pressed("Shift") || this.highlighting;
 	}
 	getMousePosition(obj) {
-		return (obj instanceof UIObject) ? this.mouse.screen : this.mouse.world;
+		return obj instanceof UIObject ? this.mouse.screen : this.mouse.world;
 	}
 	getSelectableSegments(obj) {
 		const segments = [];

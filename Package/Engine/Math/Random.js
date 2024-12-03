@@ -90,7 +90,7 @@ class Random {
 	 * @return Number
 	 */
     sign() {
-        return (this.random() < 0.5) ? -1 : 1;
+        return this.random() < 0.5 ? -1 : 1;
     }
 	/**
 	 * Returns a random floating-point value on [min, max). Unstable.

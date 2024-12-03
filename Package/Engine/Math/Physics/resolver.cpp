@@ -68,7 +68,7 @@ bool CollisionResolver::resolveContacts(bool dynamic, Collision& collision) {
 	double mA = 1.0 / bodyA.mass;
 	double iA = bodyA.canRotate ? 1.0 / bodyA.inertia : 0.0;
 	double mB = dynamic ? 1.0 / bodyB.mass : 0.0;
-	double iB = (dynamic && bodyB.canRotate) ? 1.0 / bodyB.inertia : 0.0;
+	double iB = dynamic && bodyB.canRotate ? 1.0 / bodyB.inertia : 0.0;
 	constexpr double GTE_EPSILON = -0.0001;
 
 	auto solve1 = [&](const Vector& rA, const Vector& rB) {
@@ -86,7 +86,7 @@ bool CollisionResolver::resolveContacts(bool dynamic, Collision& collision) {
 		double vABt = vAB(rA, rB, bodyA, bodyB, tangent);
 		double jt = this->normalImpulse(vABt, mA, mB, iA, iB, 0.0, tangent, rAx, rAy, rBx, rBy);
 		// this is wrong, but fairly close given precision-related compromises
-		double tangentImpulse = (abs(jt) < -normalImpulse * staticFriction) ? jt : sign(jt) * -normalImpulse * kineticFriction; // normal impulses negated for absolute value
+		double tangentImpulse = abs(jt) < -normalImpulse * staticFriction ? jt : sign(jt) * -normalImpulse * kineticFriction; // normal impulses negated for absolute value
 
 		bodyA.applyRelativeImpulse(rA, normal, normalImpulse);
 		bodyA.applyRelativeImpulse(rA, tangent, tangentImpulse);
@@ -121,8 +121,8 @@ bool CollisionResolver::resolveContacts(bool dynamic, Collision& collision) {
 		double vAB2t = vAB(rA2, rB2, bodyA, bodyB, tangent);
 		double jt1 = this->normalImpulse(vAB1t, mA, mB, iA, iB, 0.0, tangent, rA1x, rA1y, rB1x, rB1y);
 		double jt2 = this->normalImpulse(vAB2t, mA, mB, iA, iB, 0.0, tangent, rA2x, rA2y, rB2x, rB2y);
-		double tangentImpulse1 = (abs(jt1) < -normalImpulse1 * staticFriction) ? jt1 : sign(jt1) * -normalImpulse1 * kineticFriction;
-		double tangentImpulse2 = (abs(jt2) < -normalImpulse2 * staticFriction) ? jt2 : sign(jt2) * -normalImpulse2 * kineticFriction;
+		double tangentImpulse1 = abs(jt1) < -normalImpulse1 * staticFriction ? jt1 : sign(jt1) * -normalImpulse1 * kineticFriction;
+		double tangentImpulse2 = abs(jt2) < -normalImpulse2 * staticFriction ? jt2 : sign(jt2) * -normalImpulse2 * kineticFriction;
 
 		// apply impulses
 		bodyA.applyRelativeImpulse(rA1, normal, normalImpulse1);

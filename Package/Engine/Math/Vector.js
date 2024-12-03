@@ -28,7 +28,7 @@ class Vector extends Operable {
 		return this.get().normalize();
 	}
 	compare(v1, v2) {
-		return (v1.dot(this) > v2.dot(this)) ? v1 : v2;
+		return v1.dot(this) > v2.dot(this) ? v1 : v2;
 	}
 	/**
 	 * Normalizes the vector in-place and returns the caller.

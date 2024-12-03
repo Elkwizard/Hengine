@@ -263,7 +263,7 @@ class FileSystem { };
 		tree(address = this.directoryAddress) {
 			const entries = Array.from(getDirectoryEntries(this, address)).filter(entry => entry[0][0] !== ".");
 
-			let result = (address === this.directoryAddress) ? [this.directory] : [];
+			let result = address === this.directoryAddress ? [this.directory] : [];
 
 			for (let i = 0; i < entries.length; i++) {
 				const [name, address] = entries[i];

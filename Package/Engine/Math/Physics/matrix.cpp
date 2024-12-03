@@ -117,8 +117,8 @@ Vector Matrix::resolveVelocityError(const RigidBody& bodyA, const RigidBody& bod
 	if (dynamicA || dynamicB) {
 		double mA = dynamicA ? 1.0 / bodyA.mass : 0.0;
 		double mB = dynamicB ? 1.0 / bodyB.mass : 0.0;
-		double iA = (dynamicA && bodyA.canRotate) ? 1.0 / bodyA.inertia : 0.0;
-		double iB = (dynamicB && bodyB.canRotate) ? 1.0 / bodyB.inertia : 0.0;
+		double iA = dynamicA && bodyA.canRotate ? 1.0 / bodyA.inertia : 0.0;
+		double iB = dynamicB && bodyB.canRotate ? 1.0 / bodyB.inertia : 0.0;
 		double rAx = point.x - bodyA.position.x;
 		double rAy = point.y - bodyA.position.y;
 		double rBx = point.x - bodyB.position.x;

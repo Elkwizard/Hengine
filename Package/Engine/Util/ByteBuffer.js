@@ -276,7 +276,7 @@ ByteBuffer.Writer = class {
 	bigInt(bigint) {
 		let bytes = 0n;
 		let value = 1n;
-		const sign = (bigint > 0n) ? 1n : -1n;
+		const sign = bigint > 0n ? 1n : -1n;
 		bigint = bigint * sign;
 		while (bigint >= value) {
 			value *= 256n;
@@ -425,7 +425,7 @@ ByteBuffer.Reader = class {
 		let result = 0n;
 		for (let i = bytes - 1n; i >= 0n; i--)
 			result |= BigInt(this.uint8()) << (i * 8n);
-		return (byteNum > 0) ? result : -result;
+		return byteNum > 0 ? result : -result;
 	}
 	/**
 	 * Reads a string from the buffer.
@@ -490,7 +490,7 @@ ByteBuffer.Reader = class {
 			const referenced = this.bool();
 			if (referenced) return objectIDs.get(this.uint32());
 			else {
-				const object = (type === "object") ? {} : [];
+				const object = type === "object" ? {} : [];
 				const id = objectIDs.size;
 				objectIDs.set(id, object);
 
@@ -532,7 +532,7 @@ for (let i = 0; i < ByteBuffer.arrayTypes.length; i++) {
 	};
 	ByteBuffer.Reader.prototype[method] = function () {
 		const { buffer } = this;
-		const value = (buffer.pointer + BYTES_PER_ELEMENT <= buffer.data.length) ? buffer.view[getViewMethod](buffer.pointer, buffer.littleEndian) : 0;
+		const value = buffer.pointer + BYTES_PER_ELEMENT <= buffer.data.length ? buffer.view[getViewMethod](buffer.pointer, buffer.littleEndian) : 0;
 		buffer.pointer += BYTES_PER_ELEMENT;
 		return value;
 	};

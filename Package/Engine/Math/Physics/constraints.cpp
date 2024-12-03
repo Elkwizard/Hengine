@@ -147,8 +147,8 @@ void Constraint2::solve() {
 		double mA = dynamicA ? 1.0 / bodyA.mass : 0.0;
 		double mB = dynamicB ? 1.0 / bodyB.mass : 0.0;
 		double mAB = mA + mB;
-		double iA = (dynamicA && bodyA.canRotate) ? 1.0 / bodyA.inertia : 0.0;
-		double iB = (dynamicB && bodyB.canRotate) ? 1.0 / bodyB.inertia : 0.0;
+		double iA = dynamicA && bodyA.canRotate ? 1.0 / bodyA.inertia : 0.0;
+		double iB = dynamicB && bodyB.canRotate ? 1.0 / bodyB.inertia : 0.0;
 
 		// // correct equation
 		// forceToError.a = mA + iA * rA.y ** 2 + mB + iB * rB.y ** 2;

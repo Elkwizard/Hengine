@@ -508,15 +508,15 @@ class Geometry {
 	 */
 	static signedAngularDist(r1, r2) {
 		const pi2 = 2 * Math.PI;
-		r1 = (r1 < 0) ? r1 % pi2 + pi2 : r1 % pi2;
-		r2 = (r2 < 0) ? r2 % pi2 + pi2 : r2 % pi2;
+		r1 = r1 < 0 ? r1 % pi2 + pi2 : r1 % pi2;
+		r2 = r2 < 0 ? r2 % pi2 + pi2 : r2 % pi2;
 
-		let diff = (r2 < r1) ? r1 - r2 : r2 - r1;
+		let diff = r2 < r1 ? r1 - r2 : r2 - r1;
 
 		if (Math.abs(diff - pi2) < Math.abs(diff))
 			diff -= pi2;
 
-		return (r2 < r1) ? diff : -diff;
+		return r2 < r1 ? diff : -diff;
 	}
 	/**
 	 * Returns the closest intersection of a ray with a collection of shapes.

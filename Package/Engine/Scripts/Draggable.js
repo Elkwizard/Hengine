@@ -49,6 +49,6 @@ class DRAGGABLE extends ElementScript {
 		}
 	}
 	getMousePosition(obj) {
-		return (obj instanceof UIObject) ? this.mouse.screen : this.mouse.world;
+		return obj instanceof UIObject ? this.mouse.screen : this.mouse.world;
 	}
 }

@@ -114,7 +114,7 @@ class GraphPlane extends Frame {
     }
     draw() {
         function formatTime(t) {
-            return t.toString().split("").reverse().map((e, i) => (!(i % 3) && i) ? "," + e : e).join("").split("").reverse().join("");
+            return t.toString().split("").reverse().map((e, i) => !(i % 3) && i ? "," + e : e).join("").split("").reverse().join("");
         }
         let renderer = this.renderer;
         renderer.clear();

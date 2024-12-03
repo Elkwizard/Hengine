@@ -48,7 +48,7 @@ class Hengine {
 		// create file system
 		const segments = location.toString().split("/");
 		const storageKey = `HengineFileSystem://${segments[segments.length - 2] ?? segments[segments.length - 1]}`;
-		this.fileSystem = (storageKey in localStorage) ? FileSystem.fromString(localStorage[storageKey]) : new FileSystem();
+		this.fileSystem = storageKey in localStorage ? FileSystem.fromString(localStorage[storageKey]) : new FileSystem();
 		addEventListener("beforeunload", () => {
 			this.scene.destroy();
 			localStorage[storageKey] = this.fileSystem;
