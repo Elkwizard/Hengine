@@ -101,25 +101,15 @@ class ByteBuffer {
 			let a = binary[i];
 			let b = binary[i + 1];
 			let c = binary[i + 2];
-			if (b === undefined) {
-				// _==
-				const b0 = a >> 2;
-				const b1 = (a & 0b00000011) << 4;
-				base64 += base64Table[b0] + base64Table[b1] + "==";
-			} else if (c === undefined) {
-				// __=
-				const b0 = a >> 2;
-				const b1 = ((a & 0b00000011) << 4) | (b >> 4);
-				const b2 = (b & 0b00001111) << 2;
-				base64 += base64Table[b0] + base64Table[b1] + base64Table[b2] + "=";
-			} else {
-				// ___
-				const b0 = a >> 2;
-				const b1 = ((a & 0b00000011) << 4) | (b >> 4);
-				const b2 = (b & 0b00001111) << 2 | (c >> 6);
-				const b3 = c & 0b00111111;
-				base64 += base64Table[b0] + base64Table[b1] + base64Table[b2] + base64Table[b3];
-			}
+
+			const b0 = a >> 2;
+			const b1 = ((a & 0b00000011) << 4) | (b >> 4);
+			const b2 = (b & 0b00001111) << 2 | (c >> 6);
+			const b3 = c & 0b00111111;
+			
+			base64 += base64Table[b0] + base64Table[b1];
+			base64 += b === undefined ? "=" : base64Table[b2];
+			base64 += c === undefined ? "=" : base64Table[b3];
 		}
 
 		return base64;
@@ -152,18 +142,13 @@ class ByteBuffer {
 			const b2 = base64Table[base64[i + 2]];
 			const b3 = base64Table[base64[i + 3]];
 
-			if (base64[i + 2] + base64[i + 3] === "==") {
-				// _==
-				buffer.write.uint8(b0 << 2 | b1 >> 4);
-			} else if (base64[i + 3] === "=") {
-				// __=
-				buffer.write.uint8(b0 << 2 | b1 >> 4);
+			buffer.write.uint8(b0 << 2 | b1 >> 4);
+
+			if (b2 !== undefined) {
 				buffer.write.uint8((b1 & 0b1111) << 4 | b2 >> 2);
-			} else {
-				// ___
-				buffer.write.uint8(b0 << 2 | b1 >> 4);
-				buffer.write.uint8((b1 & 0b1111) << 4 | b2 >> 2);
-				buffer.write.uint8((b2 & 0b11) << 6 | b3);
+				
+				if (b3 !== undefined)
+					buffer.write.uint8((b2 & 0b11) << 6 | b3);
 			}
 		}
 
