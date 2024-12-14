@@ -119,7 +119,7 @@ class Matrix extends Float64Array {
 			result[modValues[i]] = this[i * size + row];
 		return result;
 	}
-	op(other, op, dst = new this.constructor()) {
+	op(other, op, dst = this.get()) {
 		if (typeof other === "number")
 			for (let i = 0; i < this.length; i++)
 				dst[i] = op(this[i], other);
@@ -171,7 +171,7 @@ class Matrix extends Float64Array {
 	 * @param Vector result? | The destination to store the resulting vector in. If not specified, a new vector will be created 
 	 * @return Vector
 	 */
-	project(vector, dst = new vector.constructor()) {
+	project(vector, dst = vector.constructor.zero) {
 		const { Vector } = this.constructor;
 		const h = new Vector().set(vector, 1);
 		this.times(h, h);
@@ -181,7 +181,7 @@ class Matrix extends Float64Array {
 	timesVector(vector, dst) {
 		const { size } = this.constructor;
 		const { modValues } = vector.constructor;
-		const result = new vector.constructor();
+		const result = vector.constructor.zero;
 		for (let i = 0; i < modValues.length; i++) {
 			let sum = 0;
 			for (let j = 0; j < size; j++)
@@ -211,10 +211,10 @@ class Matrix extends Float64Array {
 	 */
 	times(other, dst) {
 		if (other instanceof Vector) {
-			dst ??= new other.constructor();
+			dst ??= other.constructor.zero;
 			this.timesVector(other, dst);
 		} else {
-			dst ??= new this.constructor();
+			dst ??= this.get();
 			if (other instanceof Matrix)
 				this.timesMatrix(other, dst);
 			else this.timesNumber(other, dst);
