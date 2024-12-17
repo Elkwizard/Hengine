@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class DrawRenderer">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1126" target="_blank" class="class-name source-link">DrawRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L781" target="_blank" class="class-name source-link">DrawRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
 				</div>
 				<div class="class desc">
 					Represents the draw API of an <a href="../../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a>.
@@ -24,7 +24,7 @@ This fills various paths.
 		
 			<div class="class-wrapper" id="class StrokeRenderer">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1132" target="_blank" class="class-name source-link">StrokeRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L799" target="_blank" class="class-name source-link">StrokeRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
 				</div>
 				<div class="class desc">
 					Represents the stroke API of an <a href="../../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a>.
@@ -37,9 +37,102 @@ This outlines various paths.
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
+		<div class="function-wrapper" id="StrokeRenderer.prototype.line()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L850" target="_blank" class="function-name source-link">line</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L850" target="_blank" class="function-name source-link">arrow</a>(<span class="param">line</span><span class="aux"> | </span><span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders a line segment. For <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">arrow</span><span class="highlight-SYMBOL">()</span></code>, there is also an arrow-head at the end.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="StrokeRenderer.prototype.line():line">
+							<div class="param-name">
+								<span class="param">line</span>
+								<span class="type"><a href="../../../Pages/Geometry/Shapes/Line.html#class Line">Line</a></span>
+							</div>
+							<div class="param desc">
+								The line segment
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="StrokeRenderer.prototype.line():a">
+							<div class="param-name">
+								<span class="param">a</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The first point
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.line():b">
+							<div class="param-name">
+								<span class="param">b</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The second point
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="StrokeRenderer.prototype.line():x1">
+							<div class="param-name">
+								<span class="param">x1</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the first point
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.line():y1">
+							<div class="param-name">
+								<span class="param">y1</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the first point
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.line():x2">
+							<div class="param-name">
+								<span class="param">x2</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the second point
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.line():y2">
+							<div class="param-name">
+								<span class="param">y2</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the second point
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="StrokeRenderer.prototype.connector()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1138" target="_blank" class="function-name source-link">connector</a>(<span class="param">points</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L865" target="_blank" class="function-name source-link">connector</a>(<span class="param">points</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders a series of connected line segments.
@@ -64,9 +157,9 @@ This outlines various paths.
 			
 		</div>
 	
-		<div class="function-wrapper" id="StrokeRenderer.prototype.spline/splineArrow()">
+		<div class="function-wrapper" id="StrokeRenderer.prototype.spline()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1144" target="_blank" class="function-name source-link">spline/splineArrow</a>(<span class="param">spline</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L881" target="_blank" class="function-name source-link">spline</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L881" target="_blank" class="function-name source-link">splineArrow</a>(<span class="param">spline</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders a quartic spline. For <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">splineArrow</span><span class="highlight-SYMBOL">()</span></code>, there is also an arrow-head at the end.
@@ -76,7 +169,7 @@ This outlines various paths.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="StrokeRenderer.prototype.spline/splineArrow():spline">
+						<div class="param-wrapper" id="StrokeRenderer.prototype.spline():spline">
 							<div class="param-name">
 								<span class="param">spline</span>
 								<span class="type"><a href="../../../Pages/Geometry/Shapes/Spline.html#class Spline">Spline</a></span>
@@ -91,91 +184,171 @@ This outlines various paths.
 			
 		</div>
 	
-		<div class="function-wrapper" id="StrokeRenderer.prototype.line/arrow()">
+		<div class="function-wrapper" id="StrokeRenderer.prototype.arcArrow()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1159" target="_blank" class="function-name source-link">line/arrow</a>(<span class="param">line</span><span class="aux"> | </span><span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L908" target="_blank" class="function-name source-link">arcArrow</a>(<span class="param">circle</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span><span class="aux"> | </span><span class="param">center</span>, <span class="param">radius</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span>, <span class="param">radius</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Renders a line segment. For <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">arrow</span><span class="highlight-SYMBOL">()</span></code>, there is also an arrow-head at the end.
+				Renders an arrow-head at the end of an arc on a circle.
 			</div>
 			
 				<div class="function-signature">
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="StrokeRenderer.prototype.line/arrow():line">
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():circle">
 							<div class="param-name">
-								<span class="param">line</span>
-								<span class="type"><a href="../../../Pages/Geometry/Shapes/Line.html#class Line">Line</a></span>
+								<span class="param">circle</span>
+								<span class="type"><a href="../../../Pages/Geometry/Shapes/Circle.html#class Circle">Circle</a></span>
 							</div>
 							<div class="param desc">
-								The line segment
+								The circle of which the path is a section
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():begin">
+							<div class="param-name">
+								<span class="param">begin</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The initial clockwise angle (in radians) from the horizontal of the section
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():end">
+							<div class="param-name">
+								<span class="param">end</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The final clockwise angle (in radians) from the horizontal of the section
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():counterClockwise?">
+							<div class="param-name">
+								<span class="param">counterClockwise</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the path from the initial to final angle should be counter-clockwise. Default is false
 							</div>
 						</div>
 					
 		
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="StrokeRenderer.prototype.line/arrow():a">
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():center">
 							<div class="param-name">
-								<span class="param">a</span>
+								<span class="param">center</span>
 								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
-								The first point
+								The center of the circle
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.line/arrow():b">
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():radius">
 							<div class="param-name">
-								<span class="param">b</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="param">radius</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The second point
+								The radius of the circle
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():begin">
+							<div class="param-name">
+								<span class="param">begin</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The initial clockwise angle (in radians) from the horizontal of the section
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():end">
+							<div class="param-name">
+								<span class="param">end</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The final clockwise angle (in radians) from the horizontal of the section
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():counterClockwise?">
+							<div class="param-name">
+								<span class="param">counterClockwise</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the path from the initial to final angle should be counter-clockwise. Default is false
 							</div>
 						</div>
 					
 		
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="StrokeRenderer.prototype.line/arrow():x1">
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():x">
 							<div class="param-name">
-								<span class="param">x1</span>
+								<span class="param">x</span>
 								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The x coordinate of the first point
+								The x coordinate of the circle's center
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.line/arrow():y1">
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():y">
 							<div class="param-name">
-								<span class="param">y1</span>
+								<span class="param">y</span>
 								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The y coordinate of the first point
+								The y coordinate of the circle's center
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.line/arrow():x2">
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():begin">
 							<div class="param-name">
-								<span class="param">x2</span>
+								<span class="param">begin</span>
 								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The x coordinate of the second point
+								The initial clockwise angle (in radians) from the horizontal of the section
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.line/arrow():y2">
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():end">
 							<div class="param-name">
-								<span class="param">y2</span>
+								<span class="param">end</span>
 								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The y coordinate of the second point
+								The final clockwise angle (in radians) from the horizontal of the section
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():counterClockwise?">
+							<div class="param-name">
+								<span class="param">counterClockwise</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether the path from the initial to final angle should be counter-clockwise. Default is false
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():radius">
+							<div class="param-name">
+								<span class="param">radius</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The radius of the circle
 							</div>
 						</div>
 					
@@ -186,7 +359,7 @@ This outlines various paths.
 	
 		<div class="function-wrapper" id="StrokeRenderer.prototype.measure()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1180" target="_blank" class="function-name source-link">measure</a>(<span class="param">font</span>, <span class="param">text</span>, <span class="param">line</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L932" target="_blank" class="function-name source-link">measure</a>(<span class="param">font</span>, <span class="param">text</span>, <span class="param">line</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">a</span>, <span class="param">b</span><span class="aux"> | </span><span class="param">font</span>, <span class="param">text</span>, <span class="param">x1</span>, <span class="param">y1</span>, <span class="param">x2</span>, <span class="param">y2</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders a line segment with a line of text displayed in its center.
@@ -337,128 +510,25 @@ This outlines various paths.
 			
 		</div>
 	
-		<div class="function-wrapper" id="StrokeRenderer.prototype.arcArrow()">
+		<div class="function-wrapper" id="StrokeRenderer.prototype.infer()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1198" target="_blank" class="function-name source-link">arcArrow</a>(<span class="param">center</span>, <span class="param">radius</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">radius</span>, <span class="param">begin</span>, <span class="param">end</span>, <span class="param">counterClockwise?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L998" target="_blank" class="function-name source-link">infer</a>(<span class="param">shape</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Renders an arrow-head at the end of an arc on a circle.
+				Creates a path with a shape based on the type of its argument.
 			</div>
 			
 				<div class="function-signature">
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():center">
+						<div class="param-wrapper" id="StrokeRenderer.prototype.infer():shape">
 							<div class="param-name">
-								<span class="param">center</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="param">shape</span>
+								<span class="type"><a href="../../../Pages/Geometry/Shapes/Shape.html#class Shape">Shape</a>/<a href="../../../Pages/Geometry/Shapes/Line.html#class Line">Line</a>/<a href="../../../Pages/Geometry/Shapes/Spline.html#class Spline">Spline</a></span>
 							</div>
 							<div class="param desc">
-								The center of the circle
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():radius">
-							<div class="param-name">
-								<span class="param">radius</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The radius of the circle
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():begin">
-							<div class="param-name">
-								<span class="param">begin</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The initial clockwise angle (in radians) from the horizontal of the arc
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():end">
-							<div class="param-name">
-								<span class="param">end</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The final clockwise angle (in radians) from the horizontal of the arc
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():counterClockwise?">
-							<div class="param-name">
-								<span class="param">counterClockwise</span>
-								<span class="type">Boolean</span>
-							</div>
-							<div class="param desc">
-								Whether the path from the initial to final angle should be counter-clockwise. Default is false
-							</div>
-						</div>
-					
-		
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():x">
-							<div class="param-name">
-								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The x coordinate of the circle's center
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():y">
-							<div class="param-name">
-								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The y coordinate of the circle's center
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():radius">
-							<div class="param-name">
-								<span class="param">radius</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The radius of the circle
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():begin">
-							<div class="param-name">
-								<span class="param">begin</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The initial clockwise angle (in radians) from the horizontal of the arc
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():end">
-							<div class="param-name">
-								<span class="param">end</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The final clockwise angle (in radians) from the horizontal of the arc
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="StrokeRenderer.prototype.arcArrow():counterClockwise?">
-							<div class="param-name">
-								<span class="param">counterClockwise</span>
-								<span class="type">Boolean</span>
-							</div>
-							<div class="param desc">
-								Whether the path from the initial to final angle should be counter-clockwise. Default is false
+								The shape to render
 							</div>
 						</div>
 					
@@ -472,12 +542,12 @@ This outlines various paths.
 		
 			<div class="class-wrapper" id="class ClipRenderer">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1246" target="_blank" class="class-name source-link">ClipRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1006" target="_blank" class="class-name source-link">ClipRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
 				</div>
 				<div class="class desc">
 					Represents the clipping API of an <a href="../../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a>.
 This adds various shapes to the current clipping mask.
-Each path created will be added to the current clipping state, which means that future draw calls will be able to modify the pixels outside the current clipped area.
+Each path created will be added to the current clipping state in such a way that the final renderable area is the intersection of all active clip paths.
 				</div>
 				
 				
@@ -488,7 +558,7 @@ Each path created will be added to the current clipping state, which means that 
 		
 			<div class="class-wrapper" id="class ImageRenderer">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1205" target="_blank" class="class-name source-link">ImageRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1021" target="_blank" class="class-name source-link">ImageRenderer</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Renderer/PathRenderer.html#class PathRenderer">PathRenderer</a></span>
 				</div>
 				<div class="class desc">
 					Represents the image drawing API of an <a href="../../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a>.
@@ -502,59 +572,9 @@ For non-rectangular shapes, the image is scaled to be the size of the shape's bo
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="ImageRenderer.prototype.default()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1215" target="_blank" class="function-name source-link">default</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Renders an image at its natural dimensions.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="ImageRenderer.prototype.default():point">
-							<div class="param-name">
-								<span class="param">point</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-							</div>
-							<div class="param desc">
-								The upper-left corner of the image
-							</div>
-						</div>
-					
-		
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="ImageRenderer.prototype.default():x">
-							<div class="param-name">
-								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The x coordinate of the upper-left corner of the image
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="ImageRenderer.prototype.default():y">
-							<div class="param-name">
-								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The y coordinate of the upper-left corner of the image
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="ImageRenderer.prototype.inferWidth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1227" target="_blank" class="function-name source-link">inferWidth</a>(<span class="param">point</span>, <span class="param">height</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">height</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1079" target="_blank" class="function-name source-link">inferWidth</a>(<span class="param">point</span>, <span class="param">height</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">height</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders an image with a specified height, while still maintaining its natural aspect ratio.
@@ -624,7 +644,7 @@ For non-rectangular shapes, the image is scaled to be the size of the shape's bo
 	
 		<div class="function-wrapper" id="ImageRenderer.prototype.inferHeight()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1239" target="_blank" class="function-name source-link">inferHeight</a>(<span class="param">point</span>, <span class="param">width</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1092" target="_blank" class="function-name source-link">inferHeight</a>(<span class="param">point</span>, <span class="param">width</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Renders an image with a specified width, while still maintaining its natural aspect ratio.
@@ -684,6 +704,56 @@ For non-rectangular shapes, the image is scaled to be the size of the shape's bo
 							</div>
 							<div class="param desc">
 								The width of the image
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="ImageRenderer.prototype.default()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L1103" target="_blank" class="function-name source-link">default</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Renders an image at its natural dimensions.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="ImageRenderer.prototype.default():point">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The upper-left corner of the image
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="ImageRenderer.prototype.default():x">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the upper-left corner of the image
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="ImageRenderer.prototype.default():y">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the upper-left corner of the image
 							</div>
 						</div>
 					

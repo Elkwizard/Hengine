@@ -72,7 +72,7 @@ function parse(content, file) {
 	
 	for (const match of matches) {
 		if (!match) continue;
-		const { name, lines } = match;
+		let { name, lines } = match;
 
 		match.name = processName(name);
 
@@ -129,12 +129,30 @@ function parse(content, file) {
 					const spaceIndex = signature.lastIndexOf(" ");
 					line.name = signature.slice(spaceIndex + 1);
 					line.type = signature.slice(0, spaceIndex);
+					line.baseName = line.name.match(/(\.\.\.)?(.*?)\??$/)[2];
 
 					if (line.category === "static_prop")
 						line.name = `${match.name.base}.${line.name}`;
 				}; break;
+				case "params": {
+					line.names = line.content.split(",").map(name => name.trim());
+				}; break;
 			}
 		}
+
+		const atparams = lines.find(line => line.category === "params");
+
+		// expand @params references
+		lines = lines.flatMap(line => {
+			if (line.category === "params") {
+				const filtered = lines.filter(p => p.category === "param" && line.names.includes(p.baseName));
+				return filtered;
+			}
+
+			return [line];
+		});
+
+		if (atparams) console.log(lines);
 
 		const resultLines = [];
 		

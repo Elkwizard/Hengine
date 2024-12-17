@@ -4631,32 +4631,6 @@ declare class CanvasArtist2D extends Artist2D {
  */
 declare class PathRenderer {
 	/**
-	 * Creates a circular path.
-	 * @param circle - The shape of the circle
-	 */
-	circle(circle: Circle): void;
-	/**
-	 * Creates a circular path.
-	 * @param center - The center of the circle
-	 * @param radius - The radius of the circle
-	 */
-	circle(center: Vector2, radius: number): void;
-	/**
-	 * Creates a circular path.
-	 * @param x - The x coordinate of the circle's center
-	 * @param y - The y coordinate of the circle's center
-	 * @param radius - The radius of the circle
-	 */
-	circle(x: number, y: number, radius: number): void;
-	/**
-	 * Creates an elliptical path.
-	 * @param x - The x coordinate of the ellipse's center
-	 * @param y - The y coordinate of the ellipse's center
-	 * @param radiusX - The x axis radius of the ellipse
-	 * @param radiusY - The y axis radius of the ellipse
-	 */
-	ellipse(x: number, y: number, radiusX: number, radiusY: number): void;
-	/**
 	 * Creates a rectangular path.
 	 * @param rectangle - The shape of the rectangle
 	 */
@@ -4713,10 +4687,65 @@ declare class PathRenderer {
 	 */
 	shape(polygon: Polygon): void;
 	/**
-	 * Creates a path with a shape based on the type of its argument.
-	 * @param shape - The shape to render
+	 * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
+	 * @param circle - The circle of which the path is a section
+	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
+	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
 	 */
-	infer(shape: Shape): void;
+	sector(circle: Circle, begin: number, end: number, counterClockwise?: boolean): void;
+	/**
+	 * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
+	 * @param center - The center of the circle
+	 * @param radius - The radius of the circle
+	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
+	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 */
+	sector(center: Vector2, radius: number, begin: number, end: number, counterClockwise?: boolean): void;
+	/**
+	 * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
+	 * @param x - The x coordinate of the circle's center
+	 * @param y - The y coordinate of the circle's center
+	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
+	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 * @param radius - The radius of the circle
+	 */
+	sector(x: number, y: number, begin: number, end: number, counterClockwise?: boolean, radius: number): void;
+	/**
+	 * Creates an elliptical path.
+	 * @param center - The center of the ellipse
+	 * @param radiusX - The x axis radius of the ellipse
+	 * @param radiusY - The y axis radius of the ellipse
+	 */
+	ellipse(center: Vector2, radiusX: number, radiusY: number): void;
+	/**
+	 * Creates an elliptical path.
+	 * @param x - The x coordinate of the ellipse's center
+	 * @param y - The y coordinate of the ellipse's center
+	 * @param radiusX - The x axis radius of the ellipse
+	 * @param radiusY - The y axis radius of the ellipse
+	 */
+	ellipse(x: number, y: number, radiusX: number, radiusY: number): void;
+	/**
+	 * Creates a circular path.
+	 * @param circle - The shape of the circle
+	 */
+	circle(circle: Circle): void;
+	/**
+	 * Creates a circular path.
+	 * @param center - The center of the circle
+	 * @param radius - The radius of the circle
+	 */
+	circle(center: Vector2, radius: number): void;
+	/**
+	 * Creates a circular path.
+	 * @param x - The x coordinate of the circle's center
+	 * @param y - The y coordinate of the circle's center
+	 * @param radius - The radius of the circle
+	 */
+	circle(x: number, y: number, radius: number): void;
 	/**
 	 * Creates a path in the shape of a sequence of characters.
 	 * @param font - The font to use in rendering the text
@@ -4735,41 +4764,10 @@ declare class PathRenderer {
 	 */
 	text(font: Font, text: string, x: number, y: number, packWidth?: number): void;
 	/**
-	 * Creates a path in the shape of a single-line sequence of characters.
-	 * This method is faster than `.text()`.
-	 * @param font - The font to use in rendering the text
-	 * @param text - The text to render
-	 * @param origin - The location of the text's origin. How this is interpreted depends on the current text-alignment mode.
+	 * Creates a path with a shape based on the type of its argument.
+	 * @param shape - The shape to render
 	 */
-	textLine(font: Font, text: string, origin: Vector2): void;
-	/**
-	 * Creates a path in the shape of a single-line sequence of characters.
-	 * This method is faster than `.text()`.
-	 * @param font - The font to use in rendering the text
-	 * @param text - The text to render
-	 * @param x - The x coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
-	 * @param y - The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
-	 */
-	textLine(font: Font, text: string, x: number, y: number): void;
-	/**
-	 * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
-	 * @param center - The center of the circle
-	 * @param radius - The radius of the circle
-	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
-	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
-	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
-	 */
-	sector(center: Vector2, radius: number, begin: number, end: number, counterClockwise?: boolean): void;
-	/**
-	 * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
-	 * @param x - The x coordinate of the circle's center
-	 * @param y - The y coordinate of the circle's center
-	 * @param radius - The radius of the circle
-	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
-	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
-	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
-	 */
-	sector(x: number, y: number, radius: number, begin: number, end: number, counterClockwise?: boolean): void;
+	infer(shape: Shape): void;
 }
 
 /**
@@ -4785,21 +4783,6 @@ declare class DrawRenderer extends PathRenderer {
  * This outlines various paths.
  */
 declare class StrokeRenderer extends PathRenderer {
-	/**
-	 * Renders a series of connected line segments.
-	 * @param points - The points to connect
-	 */
-	connector(points: Vector2[]): void;
-	/**
-	 * Renders a quartic spline. For `.splineArrow()`, there is also an arrow-head at the end.
-	 * @param spline - The spline to render
-	 */
-	spline(spline: Spline): void;
-	/**
-	 * Renders a quartic spline. For `.splineArrow()`, there is also an arrow-head at the end.
-	 * @param spline - The spline to render
-	 */
-	splineArrow(spline: Spline): void;
 	/**
 	 * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
 	 * @param line - The line segment
@@ -4820,24 +4803,42 @@ declare class StrokeRenderer extends PathRenderer {
 	 */
 	line(x1: number, y1: number, x2: number, y2: number): void;
 	/**
-	 * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
-	 * @param line - The line segment
+	 * Renders a series of connected line segments.
+	 * @param points - The points to connect
 	 */
-	arrow(line: Line): void;
+	connector(points: Vector2[]): void;
 	/**
-	 * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
-	 * @param a - The first point
-	 * @param b - The second point
+	 * Renders a quartic spline. For `.splineArrow()`, there is also an arrow-head at the end.
+	 * @param spline - The spline to render
 	 */
-	arrow(a: Vector2, b: Vector2): void;
+	spline(spline: Spline): void;
 	/**
-	 * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
-	 * @param x1 - The x coordinate of the first point
-	 * @param y1 - The y coordinate of the first point
-	 * @param x2 - The x coordinate of the second point
-	 * @param y2 - The y coordinate of the second point
+	 * Renders an arrow-head at the end of an arc on a circle.
+	 * @param circle - The circle of which the path is a section
+	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
+	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
 	 */
-	arrow(x1: number, y1: number, x2: number, y2: number): void;
+	arcArrow(circle: Circle, begin: number, end: number, counterClockwise?: boolean): void;
+	/**
+	 * Renders an arrow-head at the end of an arc on a circle.
+	 * @param center - The center of the circle
+	 * @param radius - The radius of the circle
+	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
+	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 */
+	arcArrow(center: Vector2, radius: number, begin: number, end: number, counterClockwise?: boolean): void;
+	/**
+	 * Renders an arrow-head at the end of an arc on a circle.
+	 * @param x - The x coordinate of the circle's center
+	 * @param y - The y coordinate of the circle's center
+	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
+	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 * @param radius - The radius of the circle
+	 */
+	arcArrow(x: number, y: number, begin: number, end: number, counterClockwise?: boolean, radius: number): void;
 	/**
 	 * Renders a line segment with a line of text displayed in its center.
 	 * @param font - The font to use for the text
@@ -4864,24 +4865,19 @@ declare class StrokeRenderer extends PathRenderer {
 	 */
 	measure(font: Font, text: string, x1: number, y1: number, x2: number, y2: number): void;
 	/**
-	 * Renders an arrow-head at the end of an arc on a circle.
-	 * @param center - The center of the circle
-	 * @param radius - The radius of the circle
-	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the arc
-	 * @param end - The final clockwise angle (in radians) from the horizontal of the arc
-	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 * Creates a path with a shape based on the type of its argument.
+	 * @param shape - The shape to render
 	 */
-	arcArrow(center: Vector2, radius: number, begin: number, end: number, counterClockwise?: boolean): void;
-	/**
-	 * Renders an arrow-head at the end of an arc on a circle.
-	 * @param x - The x coordinate of the circle's center
-	 * @param y - The y coordinate of the circle's center
-	 * @param radius - The radius of the circle
-	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the arc
-	 * @param end - The final clockwise angle (in radians) from the horizontal of the arc
-	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
-	 */
-	arcArrow(x: number, y: number, radius: number, begin: number, end: number, counterClockwise?: boolean): void;
+	infer(shape: Shape | Line | Spline): void;
+}
+
+/**
+ * Represents the clipping API of an Artist2D.
+ * This adds various shapes to the current clipping mask.
+ * Each path created will be added to the current clipping state in such a way that the final renderable area is the intersection of all active clip paths.
+ */
+declare class ClipRenderer extends PathRenderer {
+	
 }
 
 /**
@@ -4890,17 +4886,6 @@ declare class StrokeRenderer extends PathRenderer {
  * For non-rectangular shapes, the image is scaled to be the size of the shape's bounding box, and then only the portion of the image inside the shape is shown.
  */
 declare class ImageRenderer extends PathRenderer {
-	/**
-	 * Renders an image at its natural dimensions.
-	 * @param point - The upper-left corner of the image
-	 */
-	default(point: Vector2): void;
-	/**
-	 * Renders an image at its natural dimensions.
-	 * @param x - The x coordinate of the upper-left corner of the image
-	 * @param y - The y coordinate of the upper-left corner of the image
-	 */
-	default(x: number, y: number): void;
 	/**
 	 * Renders an image with a specified height, while still maintaining its natural aspect ratio.
 	 * @param point - The upper-left corner of the image
@@ -4927,15 +4912,17 @@ declare class ImageRenderer extends PathRenderer {
 	 * @param width - The width of the image
 	 */
 	inferHeight(x: number, y: number, width: number): void;
-}
-
-/**
- * Represents the clipping API of an Artist2D.
- * This adds various shapes to the current clipping mask.
- * Each path created will be added to the current clipping state, which means that future draw calls will be able to modify the pixels outside the current clipped area.
- */
-declare class ClipRenderer extends PathRenderer {
-	
+	/**
+	 * Renders an image at its natural dimensions.
+	 * @param point - The upper-left corner of the image
+	 */
+	default(point: Vector2): void;
+	/**
+	 * Renders an image at its natural dimensions.
+	 * @param x - The x coordinate of the upper-left corner of the image
+	 * @param y - The y coordinate of the upper-left corner of the image
+	 */
+	default(x: number, y: number): void;
 }
 
 /**

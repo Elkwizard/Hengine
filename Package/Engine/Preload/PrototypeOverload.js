@@ -1,4 +1,17 @@
 const objectUtils = {
+	keys(object, superclass) {
+		const keys = new Set();
+		let proto = object;
+		while (proto !== null) {
+			const protoKeys = Reflect.ownKeys(proto);
+			for (let i = 0; i < protoKeys.length; i++)
+				keys.add(protoKeys[i]);
+			if (proto === superclass?.prototype)
+				break;
+			proto = Object.getPrototypeOf(proto);
+		}
+		return [...keys];
+	},
 	generateInterface(object, template = {}, found = new Map()) {
 		for (const key in object) {
 			const value = object[key];

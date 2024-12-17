@@ -403,7 +403,7 @@ ${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
 							vec2 px = 1.0 / size;
 							if (dist.x > d.x + px.x && dist.y > d.y + px.y) discard;
 							vec2 aa = smoothstep(d + px, d, dist);
-							antialias *= aa.x + aa.y;
+							antialias *= min(1.0, aa.x + aa.y);
 						}
 					}
 
@@ -432,6 +432,7 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 
 					// pixelColor.a += float(renderPass) / 5.0;
 
+					
 					finalColor = vec4(pixelColor.rgb, pixelColor.a * alpha * antialias);
 					finalColor.a = clamp(finalColor.a, 0.0, 1.0);
 					finalColor.rgb *= finalColor.a;
@@ -805,20 +806,19 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			BOOLS.TRIANGLE
 		);
 	}
-	function coloredPolygon(vertices, r, g, b, a) {
+	function coloredPolygon(vertices, red, green, blue, alpha) {
 		const triangles = vertices.length - 2;
 
-		const x = vertices[0];
-		const y = vertices[1];
+		const { x, y } = vertices[0];
 
 		for (let i = 0; i < triangles; i++) {
-			const inxB = (i + 1) * 2;
-			const inxC = (i + 2) * 2;
+			const b = vertices[i + 1];
+			const c = vertices[i + 2];
 			coloredTriangle(
 				x, y,
-				vertices[inxB], vertices[inxB + 1],
-				vertices[inxC], vertices[inxC + 1],
-				r, g, b, a
+				b.x, b.y,
+				c.x, c.y,
+				red, green, blue, alpha
 			);
 		}
 	}
@@ -856,32 +856,29 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			true, true
 		);
 	}
-	function lineSegments(points, lineWidth, lineCap, lineJoin, r, g, b, a, closed = false, noDuplicates = false, copy = true) {
-		if (closed) points.push(points[0], points[1]);
+	function lineSegments(points, lineWidth, lineCap, lineJoin, red, green, blue, alpha, closed = false, noDuplicates = false, copy = true) {
+		if (closed) points.push(points[0]);
 		if (!noDuplicates) {
-			const newPoints = [points[0], points[1]];
-			for (let i = 0; i < points.length - 2; i += 2) {
-				const dx = points[i + 2] - points[i];
-				const dy = points[i + 3] - points[i + 1];
-				if (dx !== 0 || dy !== 0) newPoints.push(points[i + 2], points[i + 3]);
+			const newPoints = [points[0]];
+			for (let i = 0; i < points.length - 1; i++) {
+				const a = points[i];
+				const b = points[i + 1];
+				if (b.x - a.x || b.y - a.y) newPoints.push(b);
 			}
 			points = newPoints;
 		}
-		if (points.length < 4) return;
-		if (copy && noDuplicates) points = [...points];
-
+		if (points.length < 2) return;
+		if (copy && noDuplicates) points = points.slice();
 
 		const lw2 = lineWidth * 0.5;
 
 		const normals = [];
-		if (lineJoin !== LINE_JOIN_ROUND) for (let i = 0; i < points.length - 2; i += 2) {
-			const ax = points[i + 0];
-			const ay = points[i + 1];
-			const bx = points[i + 2];
-			const by = points[i + 3];
+		if (lineJoin !== LINE_JOIN_ROUND) for (let i = 0; i < points.length - 1; i++) {
+			const a = points[i];
+			const b = points[i + 1];
 
-			const vx = bx - ax;
-			const vy = by - ay;
+			const vx = b.x - a.x;
+			const vy = b.y - a.y;
 			const mag = magnitude(vx, vy);
 			const factor = lw2 / mag;
 			const nx = -vy;
@@ -892,48 +889,46 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 
 		const open = !closed;
 
-		for (let i = 0; i < points.length - 2; i += 2) {
-			const ax = points[i + 0];
-			const ay = points[i + 1];
-			const bx = points[i + 2];
-			const by = points[i + 3];
+		for (let i = 0; i < points.length - 1; i++) {
+			const a = points[i];
+			const b = points[i + 1];
 
 			const leftCap = i === 0;
 			const rightCap = i === points.length - 4;
 
 			// draw segment
-			lineInstance(ax, ay, bx, by, lineWidth, lineCap, lineJoin, r, g, b, a, leftCap && open, rightCap && open);
+			lineInstance(a.x, a.y, b.x, b.y, lineWidth, lineCap, lineJoin, red, green, blue, alpha, leftCap && open, rightCap && open);
 
 			if ((!rightCap || closed) && lineJoin !== LINE_JOIN_ROUND) {
 				// do non round line joins
-				const nx1 = normals[i + 0];
-				const ny1 = normals[i + 1];
+				const nx1 = normals[i * 2 + 0];
+				const ny1 = normals[i * 2 + 1];
 				const atLoopPoint = rightCap && closed;
-				const nx2 = atLoopPoint ? normals[0] : normals[i + 2];
-				const ny2 = atLoopPoint ? normals[1] : normals[i + 3];
+				const nx2 = atLoopPoint ? normals[0] : normals[i * 2 + 2];
+				const ny2 = atLoopPoint ? normals[1] : normals[i * 2 + 3];
 
 				// interestingly, beveling and mitering have the same first step
 				const sign = -Math.sign(cross(nx1, ny1, nx2, ny2));
 
-				const Ax = bx + nx1 * sign;
-				const Ay = by + ny1 * sign;
-				const Cx = bx + nx2 * sign;
-				const Cy = by + ny2 * sign;
+				const Ax = b.x + nx1 * sign;
+				const Ay = b.y + ny1 * sign;
+				const Cx = b.x + nx2 * sign;
+				const Cy = b.y + ny2 * sign;
 				const Dx = (Ax + Cx) * 0.5;
 				const Dy = (Ay + Cy) * 0.5;
 
-				coloredTriangle(Ax, Ay, bx, by, Cx, Cy, r, g, b, a);
+				coloredTriangle(Ax, Ay, b.x, b.y, Cx, Cy, red, green, blue, alpha);
 
 				if (lineJoin === LINE_JOIN_MITER) {
-					const miterNormalX = Dx - bx;
-					const miterNormalY = Dy - by;
+					const miterNormalX = Dx - b.x;
+					const miterNormalY = Dy - b.y;
 					const mag2 = miterNormalX ** 2 + miterNormalY ** 2;
 
 					const factor = (lw2 ** 2) / mag2 - 1;
 					const mnx = miterNormalX * factor;
 					const mny = miterNormalY * factor;
 
-					coloredTriangle(Dx + mnx, Dy + mny, Ax, Ay, Cx, Cy, r, g, b, a);
+					coloredTriangle(Dx + mnx, Dy + mny, Ax, Ay, Cx, Cy, red, green, blue, alpha);
 				}
 			}
 		}
@@ -988,21 +983,21 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 	function texturedPolygon(vertices, textureVertices, image) {
 		const triangles = vertices.length - 2;
 
-		const x = vertices[0];
-		const y = vertices[1];
-		const tx = textureVertices[0];
-		const ty = textureVertices[1];
+		const { x, y } = vertices[0];
+		const { x: tx, y: ty } = textureVertices[0];
 
 		for (let i = 0; i < triangles; i++) {
-			const inxB = (i + 1) * 2;
-			const inxC = (i + 2) * 2;
-			coloredTriangle(
+			const b = vertices[i + 1];
+			const c = vertices[i + 2];
+			const tb = textureVertices[i + 1];
+			const tc = textureVertices[i + 2];
+			texturedTriangle(
 				x, y,
-				vertices[inxB], vertices[inxB + 1],
-				vertices[inxC], vertices[inxC + 1],
+				b.x, b.y,
+				c.x, c.y,
 				tx, ty,
-				textureVertices[inxB], textureVertices[inxB + 1],
-				textureVertices[inxC], textureVertices[inxC + 1],
+				tb.x, tb.y,
+				tc.x, tc.y,
 				image
 			);
 		}

@@ -55,6 +55,15 @@ class Artist {
 	 */
 }
 
+Artist.Renderer = class {
+	constructor(renderer) {
+		this.renderer = renderer;
+	}
+	static create(renderer) {
+		return new this.Dispatcher(new this(renderer));
+	}
+};
+
 /**
  * Represents a 2D renderer for a graphical surface.
  * All transformation-related matrices for this renderer are of type Matrix3.
@@ -166,6 +175,205 @@ class Artist2D extends Artist {
 	}
 }
 
+Artist2D.Dispatcher = class {
+	constructor(impl) {
+		const self = (...args) => {
+			impl.setup(...args);
+			return self;
+		};
+		self.impl = impl;
+		const keys = objectUtils.keys(this.constructor.prototype, Artist2D.Dispatcher);
+		for (let i = 0; i < keys.length; i++) {
+			const key = keys[i];
+			if (key !== "constructor")
+				self[key] = this[key];
+		}
+
+		self.unpacked = { };
+		return self;
+	}
+	unpackArc(x, y, radius, sa, ea, counterClockwise = false) {
+		if (typeof x === "object") {
+			if (x.radius === undefined) {
+				counterClockwise = ea;
+				ea = sa;
+				sa = radius;
+				radius = y;
+				({ x, y } = x);
+			} else {
+				counterClockwise = sa;
+				ea = radius;
+				sa = y;
+				({ x, y, radius } = x);
+			}
+		}
+
+		const u = this.unpacked;
+		u.x = x;
+		u.y = y;
+		u.radius = Math.abs(radius);
+		u.sa = sa;
+		u.ea = ea;
+		u.counterClockwise = counterClockwise;
+	}
+	arc(x, y, radius, sa, ea, counterClockwise) {
+		this.unpackArc(x, y, radius, sa, ea, counterClockwise);
+		const u = this.unpacked;
+		this.impl.arc(u.x, u.y, u.radius, u.sa, u.ea, u.counterClockwise);
+	}
+	sector(x, y, radius, sa, ea, counterClockwise) {
+		this.unpackArc(x, y, radius, sa, ea, counterClockwise);
+		const u = this.unpacked;
+		this.impl.sector(u.x, u.y, u.radius, u.sa, u.ea, u.counterClockwise);
+	}
+	ellipse(x, y, rx, ry) {
+		if (typeof x === "object") {
+			ry = rx;
+			rx = y;
+			({ x, y } = x);
+		}
+
+		this.impl.ellipse(x, y, Math.abs(rx), Math.abs(ry));
+	}
+	circle(x, y, radius) {
+		if (typeof x === "object") {
+			if (x.radius === undefined) {
+				radius = y;
+				({ x, y } = x);
+			} else {
+				({ position: { x, y }, radius } = x);
+			}
+		}
+
+		this.impl.circle(x, y, Math.abs(radius));
+	}
+	rect(x, y, width, height) {
+		if (typeof x === "object")
+			({ x, y, width, height } = x);
+
+		this.impl.rect(x, y, width, height);
+	}
+	roundRect(x, y, width, height, tl, tr, br, bl) {
+		if (typeof x === "object") {
+			tr = width;
+			br = height;
+			bl = tl;
+			tl = y;
+			({ x, y, width, height } = x);
+		}
+
+		if (tr === undefined)
+			tr = br = bl = tl;
+
+		this.impl.roundRect(x, y, width, height, tl, tr, br, bl);
+	}
+	triangle(a, b, c) {
+		this.shape([a, b, c]);
+	}
+	shape(verts) {
+		if (verts.vertices) verts = verts.vertices;
+
+		this.impl.shape(verts);
+	}
+	text(font, text, x, y, pack = false) {
+		if (typeof x === "object") {
+			pack = y ?? false;
+			({ x, y } = x);
+		}
+
+		text = font.processString(text);
+		if (pack) text = font.packText(text, pack);
+		
+		this.impl.text(font, text, x, y);
+	}
+	infer(shape) {
+		if (shape.radius !== undefined) this.circle(shape);
+		else if (shape.width !== undefined) this.rect(shape);
+		else if (shape.vertices || shape.length !== undefined) this.shape(shape);
+		else if (shape.c !== undefined) this.spline(shape);
+		else if (shape.a !== undefined) this.line(shape);
+	}
+}
+
+Artist2D.StrokeDispatcher = class extends Artist2D.Dispatcher {
+	unpackLine(x, y, x1, y1) {
+		if (typeof x === "object") {
+			if (x.a === undefined) {
+				({ x: x1, y: y1 } = y);
+				({ x, y } = x);
+			} else {
+				({ a: { x, y }, b: { x: x1, y: y1 } } = x);
+			}
+		}
+
+		const u = this.unpacked;
+		u.x = x;
+		u.y = y;
+		u.x1 = x1;
+		u.y1 = y1;
+	}
+	line(x, y, x1, y1) {
+		this.unpackLine(x, y, x1, y1);
+		const u = this.unpacked;
+		this.impl.line(u.x, u.y, u.x1, u.y1);
+	}
+	arrow(x, y, x1, y1) {
+		this.unpackLine(x, y, x1, y1);
+		const u = this.unpacked;
+		this.impl.arrow(u.x, u.y, u.x1, u.y1);
+	}
+	measure(font, text, x, y, x1, y1) {
+		this.unpackLine(x, y, x1, y1);
+		const u = this.unpacked;
+		this.impl.measure(font, text, u.x, u.y, u.x1, u.y1);
+	}
+	arcArrow(x, y, radius, sa, ea, counterClockwise) {
+		this.unpackArc(x, y, radius, sa, ea, counterClockwise);
+		const u = this.unpacked;
+		this.impl.arcArrow(u.x, u.y, u.radius, u.sa, u.ea, u.counterClockwise);
+	}
+	connector(points) {
+		this.impl.connector(points);
+	}
+	spline(a, b, c, d) {
+		if (a.a === undefined)
+			a = new Spline(a, b, c, d);
+
+		this.impl.spline(a);
+	}
+	splineArrow(a, b, c, d) {
+		if (a.a === undefined)
+			a = new Spline(a, b, c, d);
+
+		this.impl.splineArrow(a);
+	}
+};
+
+Artist2D.ImageDispatcher = class extends Artist2D.Dispatcher {
+	default(x, y) {
+		if (typeof x === "object")
+			({ x, y } = x);
+
+		this.impl.default(x, y);
+	}
+	inferWidth(x, y, height) {
+		if (typeof x === "object") {
+			height = y;
+			({ x, y } = x);
+		}
+
+		this.impl.inferWidth(x, y, height);
+	}
+	inferHeight(x, y, width) {
+		if (typeof x === "object") {
+			width = y;
+			({ x, y } = x);
+		}
+
+		this.impl.inferWidth(x, y, width);
+	}
+};
+
 // Text Modes
 const TextModeX = Enum.define("LEFT", "CENTER", "RIGHT");
 const TextModeY = Enum.define("TOP", "CENTER", "BOTTOM");
@@ -206,6 +414,15 @@ const LineCap = Enum.define("FLAT", "SQUARE", "ROUND");
  * Represents a 2D renderer based on the HTML5 Canvas API.
  */
 class CanvasArtist2D extends Artist2D {
+	static blendModeMap = new Map([
+		[BlendMode.COMBINE, "source-over"],
+		[BlendMode.ADD, "lighter"]
+	]);
+	static textModeXMap = new Map([
+		[TextModeX.LEFT, "left"],
+		[TextModeX.CENTER, "center"],
+		[TextModeX.RIGHT, "right"]
+	]);
 	constructor(canvas, imageType) {
 		super();
 		this.canvas = canvas;
@@ -215,21 +432,6 @@ class CanvasArtist2D extends Artist2D {
 		this.height = imageType.height;
 		this.imageType = imageType;
 
-		this.lineJoinMap = new Map([
-			[LineJoin.MITER, "miter"],
-			[LineJoin.BEVEL, "bevel"],
-			[LineJoin.ROUND, "round"]
-		]);
-		this.lineCapMap = new Map([
-			[LineCap.FLAT, "butt"],
-			[LineCap.SQUARE, "square"],
-			[LineCap.ROUND, "round"]
-		]);
-		this.blendModeMap = new Map([
-			[BlendMode.COMBINE, "source-over"],
-			[BlendMode.ADD, "lighter"]
-		]);
-
 		this.preservePixelart = true;
 		this.c.imageSmoothingQuality = "high";
 		this.alpha = 1;
@@ -237,581 +439,11 @@ class CanvasArtist2D extends Artist2D {
 		this.blendMode = BlendMode.COMBINE;
 
 		this.resize(this.width, this.height);
-
-		let pathObj = {
-			circle(x, y, radius) {
-				if (typeof x === "object") {
-					if (x.radius !== undefined) ({ position: { x, y }, radius } = x);
-					else {
-						radius = y;
-						({ x, y } = x);
-					}
-				}
-				radius = Math.abs(radius);
-				this.c.beginPath();
-				this.c.arc(x, y, radius, 0, 2 * Math.PI);
-			},
-			arc(x, y, radius, sa, ea, counterClockwise) {
-				if (typeof x === "object") {
-					counterClockwise = ea;
-					ea = sa;
-					sa = radius;
-					radius = y;
-					({ x, y } = x);
-				}
-				radius = Math.abs(radius);
-				this.c.beginPath();
-				this.c.arc(x, y, radius, sa, ea, counterClockwise);
-			},
-			sector(x, y, radius, sa, ea, counterClockwise) {
-				if (typeof x === "object") {
-					counterClockwise = ea;
-					ea = sa;
-					sa = radius;
-					radius = y;
-					({ x, y } = x);
-				}
-				radius = Math.abs(radius);
-				this.c.beginPath();
-				this.c.moveTo(x, y);
-				this.c.lineTo(x + radius * Math.cos(sa), y + radius * Math.sin(sa));
-				this.c.arc(x, y, radius, sa, ea, counterClockwise);
-				this.c.lineTo(x, y);
-			},
-			ellipse(x, y, rx, ry) {
-				rx = Math.abs(rx);
-				ry = Math.abs(ry);
-				this.c.beginPath();
-				this.c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
-			},
-			rect(x, y, width, height) {
-				if (typeof x === "object") ({ x, y, width, height } = x);
-				this.c.beginPath();
-				this.c.rect(x, y, width, height);
-			},
-			roundRect(x, y, width, height, tl, tr, br, bl) {
-				if (typeof x === "object") {
-					tr = width;
-					br = height;
-					bl = tl;
-					tl = y;
-					({ x, y, width, height } = x);
-				}
-
-				this.c.beginPath();
-				if (tr === undefined) this.c.roundRect(x, y, width, height, tl);
-				else this.c.roundRect(x, y, width, height, [tl, tr, br, bl]);
-			},
-			triangle(v1, v2, v3) {
-				this.c.beginPath();
-				if (v1 && v1.vertices) {
-					v2 = v1.vertices[1];
-					v3 = v1.vertices[2];
-					v1 = v1.vertices[0];
-				}
-				this.c.moveTo(v1.x, v1.y);
-				this.c.lineTo(v2.x, v2.y);
-				this.c.lineTo(v3.x, v3.y);
-				this.c.lineTo(v1.x, v1.y);
-			},
-			textLine(font, text, x, y) {
-				if (typeof x === "object") {
-					y = x.y;
-					x = x.x;
-				}
-
-				this.c.font = font.toString();
-				text = font.processString(text);
-
-				if (this.textModeX !== TextModeX.LEFT)
-					x -= this.c.measureText(text).width * (this.textModeX === TextModeX.CENTER ? 0.5 : 1);
-
-				y += font.renderOffsetY;
-				if (this.textModeY !== TextModeY.TOP)
-					y -= font.getTextHeight(text) * (this.textModeY === TextModeY.CENTER ? 0.5 : 1);
-
-				return { text, x, y };
-			},
-			text(drawText, font, text, x, y, pack = false) {
-				if (typeof x === "object") {
-					pack = y ?? false;
-					({ x, y } = x);
-				}
-				
-				text = font.processString(text);
-				if (pack) text = font.packText(text, pack);
-				const blocks = text.split("\n");
-				
-				y += font.renderOffsetY;
-				if (this.textModeY !== TextModeY.TOP)
-					y -= font.getTextHeight(text) * (this.textModeY === TextModeY.CENTER ? 0.5 : 1);
-
-				let widthOffsetFactor = 0;
-				if (this.textModeX !== TextModeX.LEFT)
-					widthOffsetFactor = this.textModeX === TextModeX.CENTER ? 0.5 : 1;
-
-				this.c.font = font;
-				for (let i = 0; i < blocks.length; i++) {
-					let ax = x;
-					if (widthOffsetFactor)
-						ax -= this.c.measureText(blocks[i]).width * widthOffsetFactor;
-
-					drawText(blocks[i], ax, y + i * font.lineHeight);
-				}
-			},
-			shape(v) {
-				if (v.vertices) v = v.vertices;
-				v = this.pathObj.validatePoints(v);
-				this.c.beginPath();
-				if (v.length) {
-					this.c.moveTo(v[0].x, v[0].y);
-					for (let i = 1; i <= v.length; i++) {
-						let index = i % v.length;
-						this.c.lineTo(v[index].x, v[index].y);
-					}
-				}
-			},
-			validatePoints(points) {
-				return points.filter(e => {
-					if (Math.abs(e.x) > 100000) return false;
-					if (Math.abs(e.y) > 100000) return false;
-					return true;
-				});
-			}
-		}
-		this.pathObj = pathObj;
-		for (let func in this.pathObj) {
-			this.pathObj[func] = this.pathObj[func].bind(this);
-		}
-		this.drawObj = {
-			circle(x, y, radius) {
-				pathObj.circle(x, y, radius);
-				this.c.fill();
-			},
-			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.arc(x, y, radius, startAngle, endAngle, counterClockwise);
-				this.c.fill();
-			},
-			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.sector(x, y, radius, startAngle, endAngle, counterClockwise);
-				this.c.fill();
-			},
-			ellipse(x, y, rx, ry) {
-				pathObj.ellipse(x, y, rx, ry);
-				this.c.fill();
-			},
-			rect(x, y, width, height) {
-				pathObj.rect(x, y, width, height);
-				this.c.fill();
-			},
-			roundRect(x, y, width, height, tl, tr, br, bl) {
-				pathObj.roundRect(x, y, width, height, tl, tr, br, bl);
-				this.c.fill();
-			},
-			triangle(v1, v2, v3) {
-				pathObj.triangle(v1, v2, v3);
-				this.c.fill();
-			},
-			text(font, text, x, y, pack) {
-				pathObj.text(this.c.fillText.bind(this.c), font, text, x, y, pack);
-			},
-			textLine(font, text, x, y) {
-				const req = pathObj.textLine(font, text, x, y);
-				this.c.fillText(req.text, req.x, req.y);
-			},
-			shape(v) {
-				pathObj.shape(v);
-				this.c.fill();
-			},
-			infer(obj) {
-				if (obj.radius !== undefined)
-					this.drawObj.circle(obj);
-				else if (obj.width !== undefined)
-					this.drawObj.rect(obj);
-				else if (obj.vertices !== undefined)
-					this.drawObj.shape(obj.vertices);
-			}
-		}
-		for (let func in this.drawObj) {
-			this.drawObj[func] = this.drawObj[func].bind(this);
-		}
-		this.strokeObj = {
-			circle(x, y, radius) {
-				pathObj.circle(x, y, radius);
-				this.c.stroke();
-			},
-			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.arc(x, y, radius, startAngle, endAngle, counterClockwise);
-				this.c.stroke();
-			},
-			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.sector(x, y, radius, startAngle, endAngle, counterClockwise);
-				this.c.stroke();
-			},
-			ellipse(x, y, rx, ry) {
-				pathObj.ellipse(x, y, rx, ry);
-				this.c.stroke();
-			},
-			rect(x, y, width, height) {
-				pathObj.rect(x, y, width, height);
-				this.c.stroke();
-			},
-			roundRect(x, y, width, height, tl, tr, br, bl) {
-				pathObj.roundRect(x, y, width, height, tl, tr, br, bl);
-				this.c.stroke();
-			},
-			triangle(v1, v2, v3) {
-				pathObj.triangle(v1, v2, v3);
-				this.c.stroke();
-			},
-			text(font, text, x, y, pack) {
-				pathObj.text(this.c.strokeText.bind(this.c), font, text, x, y, pack);
-			},
-			textLine(font, text, x, y) {
-				let req = pathObj.textLine(font, text, x, y);
-				this.c.strokeText(req.text, req.x, req.y);
-			},
-			connector(points) {
-				if (points.length) {
-					points = this.pathObj.validatePoints(points);
-					this.c.beginPath();
-					this.c.moveTo(points[0].x, points[0].y);
-					for (let i = 1; i < points.length; i++) {
-						this.c.lineTo(points[i].x, points[i].y);
-					}
-					this.c.stroke();
-				}
-			},
-			spline(spline) {
-				this.c.beginPath();
-				this.c.moveTo(spline.a.x, spline.a.y);
-				this.c.bezierCurveTo(spline.b.x, spline.b.y, spline.c.x, spline.c.y, spline.d.x, spline.d.y);
-				this.c.stroke();
-			},
-			line(x, y, x1, y1) {
-				if (typeof x === "object") {
-					if (!x) return;
-					if (x instanceof Line) {
-						const { a, b } = x;
-						x1 = b.x;
-						y1 = b.y;
-						y = a.y;
-						x = a.x;
-					} else {
-						({ x: x1, y: y1 } = y);
-						({ x, y } = x);
-					}
-				}
-				this.c.beginPath();
-				this.c.moveTo(x, y)
-				this.c.lineTo(x1, y1)
-				this.c.stroke()
-			},
-			measure(font, text, x, y, x1, y1) {
-				if (typeof x === "object") {
-					if (x instanceof Line) {
-						const { a, b } = x;
-						x1 = b.x;
-						y1 = b.y;
-						y = a.y;
-						x = a.x;
-					} else {
-						({ x: x1, y: y1 } = y);
-						({ x, y } = x);
-					}
-				}
-
-				let width = font.getTextWidth(text);
-				let height = font.getTextHeight(text);
-
-				let dx = x1 - x;
-				let dy = y1 - y;
-				let nx = -dy;
-				let ny = dx;
-				let m = Math.sqrt((dx ** 2) + (dy ** 2));
-
-				if (!m) return;
-
-				nx *= height / m / 2;
-				ny *= height / m / 2;
-
-				let length = (m - (width + font.size)) / 2;
-				dx *= length / m;
-				dy *= length / m;
-
-				this.c.beginPath();
-				this.c.moveTo(x, y);
-				this.c.lineTo(x + dx, y + dy);
-				this.c.stroke();
-
-
-				this.c.beginPath();
-				this.c.moveTo(x1, y1);
-				this.c.lineTo(x1 - dx, y1 - dy);
-				this.c.stroke();
-
-				let rot = Math.atan2(dy, dx);
-
-				dx = (x1 - x) / 2;
-				dy = (y1 - y) / 2;
-				this.c.save();
-				this.c.translate(x + dx, y + dy);
-				this.c.rotate(rot);
-				this.c.translate(-width / 2, height / 4);
-				this.c.fillStyle = this.c.strokeStyle;
-				this.c.font = font.toString();
-				this.c.fillText(text, 0, 0);
-				this.c.restore();
-
-				//Left
-				this.c.beginPath();
-				this.c.moveTo(x + nx, y + ny);
-				this.c.lineTo(x - nx, y - ny);
-				this.c.stroke();
-
-				//Right
-				this.c.beginPath();
-				this.c.moveTo(x1 + nx, y1 + ny);
-				this.c.lineTo(x1 - nx, y1 - ny);
-				this.c.stroke();
-
-			},
-			arcArrow(x, y, radius, sa, ea, counterClockwise) {
-				if (typeof x === "object") {
-					counterClockwise = ea;
-					ea = sa;
-					sa = radius;
-					radius = y;
-					({ x, y } = x);
-				}
-				this.c.beginPath();
-				this.c.arc(x, y, radius, sa, ea, counterClockwise);
-				this.c.stroke();
-				this.c.fillStyle = this.c.strokeStyle;
-				let ox = Math.cos(ea);
-				let oy = Math.sin(ea);
-				let px = x + ox * radius;
-				let py = y + oy * radius;
-				let nx = -oy;
-				let ny = ox;
-				if (counterClockwise) {
-					nx *= -1;
-					ny *= -1;
-				}
-				this.c.beginPath();
-				let l2 = this.c.lineWidth * 2;
-				this.c.moveTo(px + nx * l2 * 2, py + ny * l2 * 2);
-				this.c.lineTo(px - ox * l2, py - oy * l2);
-				this.c.lineTo(px + ox * l2, py + oy * l2);
-				this.c.fill();
-			},
-			splineArrow(spline) {
-				let { d: { x: Dx, y: Dy } } = spline;
-				const pointA = spline.evaluate(0.95);
-				const dx = Dx - pointA.x;
-				const dy = Dy - pointA.y;
-				const m = Math.sqrt(dx ** 2 + dy ** 2);
-				const ndx = dx / m;
-				const ndy = dy / m;
-				const nndx = -ndy;
-				const nndy = ndx;
-				const l2 = this.c.lineWidth * 2;
-				Dx -= ndx * l2 * 2;
-				Dy -= ndy * l2 * 2;
-				
-				this.c.beginPath();
-				this.c.moveTo(spline.a.x, spline.a.y);
-				this.c.bezierCurveTo(spline.b.x, spline.b.y, spline.c.x, spline.c.y, Dx + ndx * l2, Dy + ndy * l2);
-				this.c.stroke();
-
-				this.c.fillStyle = this.c.strokeStyle;
-				this.c.beginPath();
-				this.c.moveTo(Dx + nndx * l2, Dy + nndy * l2);
-				this.c.lineTo(Dx - nndx * l2, Dy - nndy * l2);
-				this.c.lineTo(Dx + ndx * l2 * 2, Dy + ndy * l2 * 2);
-				this.c.fill();
-			},
-			arrow(x, y, x1, y1) {
-				if (typeof x === "object") {
-					if (x instanceof Line) {
-						x1 = x.b.x;
-						y1 = x.b.y;
-						y = x.a.y;
-						x = x.a.x;
-					} else {
-						x1 = y.x;
-						y1 = y.y;
-						y = x.y;
-						x = x.x;
-					}
-				}
-				let v_x = x1 - x;
-				let v_y = y1 - y;
-				let mag = Math.sqrt(v_x ** 2 + v_y ** 2);
-				v_x /= mag;
-				v_y /= mag;
-				let n_x = -v_y;
-				let n_y = v_x;
-				this.c.beginPath();
-				this.c.moveTo(x, y);
-				this.c.lineTo(x1, y1);
-				this.c.stroke();
-				this.c.fillStyle = this.c.strokeStyle;
-				let l2 = this.c.lineWidth * 2;
-				this.c.beginPath();
-				x1 -= v_x * l2;
-				y1 -= v_y * l2;
-				this.c.moveTo(x1 + n_x * l2, y1 + n_y * l2);
-				this.c.lineTo(x1 - n_x * l2, y1 - n_y * l2);
-				this.c.lineTo(x1 + v_x * l2 * 2, y1 + v_y * l2 * 2);
-				this.c.lineTo(x1 + n_x * l2, y1 + n_y * l2);
-				this.c.fill();
-			},
-			shape(v) {
-				pathObj.shape(v);
-				this.c.stroke();
-			},
-			infer(obj) {
-				if (obj.radius !== undefined)
-					this.strokeObj.circle(obj);
-				else if (obj.width !== undefined)
-					this.strokeObj.rect(obj);
-				else if (obj.vertices !== undefined)
-					this.strokeObj.shape(obj.vertices);
-				else if (obj instanceof Line)
-					this.strokeObj.line(obj);
-				else if (obj instanceof Spline)
-					this.strokeObj.spline(obj);
-			}
-		}
-		for (let func in this.strokeObj) {
-			this.strokeObj[func] = this.strokeObj[func].bind(this);
-		}
-		this.clipObj = {
-			circle(x, y, radius) {
-				pathObj.circle(x, y, radius);
-				this.c.clip();
-			},
-			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.arc(x, y, radius, startAngle, endAngle, counterClockwise);
-				this.c.clip();
-			},
-			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
-				pathObj.sector(x, y, radius, startAngle, endAngle, counterClockwise);
-				this.c.clip();
-			},
-			ellipse(x, y, rx, ry) {
-				pathObj.ellipse(x, y, rx, ry);
-				this.c.clip();
-			},
-			rect(x, y, width, height) {
-				pathObj.rect(x, y, width, height);
-				this.c.clip();
-			},
-			roundRect(x, y, width, height, tl, tr, br, bl) {
-				pathObj.roundRect(x, y, width, height, tl, tr, br, bl);
-				this.c.clip();
-			},
-			triangle(v1, v2, v3) {
-				pathObj.triangle(v1, v2, v3);
-				this.c.clip();
-			},
-			shape(v) {
-				pathObj.shape(v);
-				this.c.clip();
-			},
-			infer(obj) {
-				if (obj.radius !== undefined)
-					this.clipObj.circle(obj);
-				else if (obj.width !== undefined)
-					this.clipObj.rect(obj);
-				else if (obj.vertices !== undefined)
-					this.clipObj.shape(obj.vertices);
-			}
-		}
-		for (let func in this.clipObj) {
-			this.clipObj[func] = this.clipObj[func].bind(this);
-		}
-		this.currentImage = null;
-		this.currentImageCIS = null;
-		this.imageObj = {
-			circle(x, y, radius) {
-				this.clip().circle(x, y, radius);
-				if (x instanceof Circle) {
-					radius = x.radius;
-					y = x.y;
-					x = x.x;
-				}
-				this.drawImageInternal(x - radius, y - radius, radius * 2, radius * 2);
-				this.unclip();
-			},
-			arc(x, y, radius, startAngle, endAngle, counterClockwise) {
-				this.clip().arc(x, y, radius, startAngle, endAngle, counterClockwise);
-				this.drawImageInternal(x - radius, y - radius, radius * 2, radius * 2);
-				this.unclip();
-			},
-			sector(x, y, radius, startAngle, endAngle, counterClockwise) {
-				this.clip().sector(x, y, radius, startAngle, endAngle, counterClockwise);
-				this.drawImageInternal(x - radius, y - radius, radius * 2, radius * 2);
-				this.unclip();
-			},
-			ellipse(x, y, rx, ry) {
-				this.clip().ellipse(x, y, rx, ry);
-				this.drawImageInternal(x - rx, y - ry, rx * 2, ry * 2);
-				this.unclip();
-			},
-			default(x, y) {
-				if (typeof x === "object") ({ x, y } = x);
-				this.drawImageInternal(x, y, this.currentImage.width, this.currentImage.height);
-			},
-			inferHeight(x, y, width) {
-				if (typeof x === "object") {
-					width = y;
-					({ x, y } = x);
-				}
-				this.drawImageInternal(x, y, width, this.currentImage.inferHeight(width));
-			},
-			inferWidth(x, y, height) {
-				if (typeof x === "object") {
-					height = y;
-					({ x, y } = x);
-				}
-				this.drawImageInternal(x, y, this.currentImage.inferWidth(height), height);
-			},
-			rect(x, y, width, height) {
-				this.drawImageInternal(x, y, width, height);
-			},
-			roundRect(x, y, width, height, tl, tr, br, bl) {
-				this.clip().roundRect(x, y, width, height, tl, tr, br, bl);
-				this.drawImageInternal(x, y, width, height);
-				this.unclip();
-			},
-			triangle(v1, v2, v3) {
-				this.clip().triangle(v1, v2, v3);
-				let v = [v1, v2, v3];
-				let bound = Rect.bound(v);
-				this.drawImageInternal(bound.x, bound.y, bound.width, bound.height);
-				this.unclip();
-			},
-			shape(v) {
-				if (v.vertices) v = v.vertices;
-				this.clip().shape(v);
-				let bound = Rect.bound(v);
-				this.drawImageInternal(bound.x, bound.y, bound.width, bound.height);
-				this.unclip();
-			},
-			infer(obj) {
-				if (obj.radius !== undefined)
-					this.imageObj.circle(obj);
-				else if (obj.width !== undefined)
-					this.imageObj.rect(obj);
-				else if (obj.vertices !== undefined)
-					this.imageObj.shape(obj.vertices);
-			}
-		};
-		for (let func in this.imageObj) {
-			this.imageObj[func] = this.imageObj[func].bind(this);
-		}
+		
+		this.draw = CanvasArtist2D.DrawRenderer.create(this);
+		this.stroke = CanvasArtist2D.StrokeRenderer.create(this);
+		this.clip = CanvasArtist2D.ClipRenderer.create(this);
+		this.image = CanvasArtist2D.ImageRenderer.create(this);
 	}
 	get middle() {
 		return new Vector2(this.width / 2, this.height / 2);
@@ -833,7 +465,7 @@ class CanvasArtist2D extends Artist2D {
 	}
 	set blendMode(a) {
 		this._blendMode = a;
-		this.c.globalCompositeOperation = this.blendModeMap.get(a);
+		this.c.globalCompositeOperation = CanvasArtist2D.blendModeMap.get(a);
 	}
 	get blendMode() {
 		return this._blendMode;
@@ -896,36 +528,17 @@ class CanvasArtist2D extends Artist2D {
 		data[3] = col.alpha * 255;
 		this.c.putImageData(new ImageData(data, 1, 1), x * this.pixelRatio, y * this.pixelRatio);
 	}
-	draw(color) {
-		this.c.fillStyle = color;
-		return this.drawObj;
-	}
-	stroke(color, lineWidth = 1, lineCap = LineCap.FLAT, lineJoin = LineJoin.BEVEL) {
-		this.c.strokeStyle = color;
-		this.c.lineJoin = this.lineJoinMap.get(lineJoin);
-		this.c.lineCap = this.lineCapMap.get(lineCap);
-		this.c.lineWidth = lineWidth;
-		return this.strokeObj;
-	}
 	drawImageInternal(x, y, width, height) {
 		if (!this.currentImage.renderable) return;
 		if (typeof x === "object") ({ x, y, width, height } = x);
 		if (width * height === 0) return;
 		this.c.drawImage(this.currentImageCIS, x, y, width, height);
 	}
-	image(img) {
-		this.currentImageCIS = img.makeImage();
-		this.currentImage = img;
-		return this.imageObj;
-	}
 	/**
+	 * @name clip
 	 * Returns a clipping API.
 	 * @return ClipRenderer
 	 */
-	clip() {
-		this.save();
-		return this.clipObj;
-	}
 	/**
 	 * Undoes the last clipping operation performed in the current state stack.
 	 */
@@ -943,7 +556,6 @@ class CanvasArtist2D extends Artist2D {
 	rotate(a) {
 		this.c.rotate(a);
 	}
-	
 	clearTransformations() {
 		this.c.resetTransform();
 		this.scale(this.pixelRatio);
@@ -987,214 +599,418 @@ class CanvasArtist2D extends Artist2D {
  * The exact operation used to render the paths is specified in subclasses, but this class which shapes are possible and how they are specified.
  * @abstract
  */
+CanvasArtist2D.PathRenderer = class extends Artist.Renderer {
+	constructor(renderer) {
+		super(renderer);
+		this.c = renderer.c;
+	}
+	/**
+	 * Creates a rectangular path.
+	 * @signature
+	 * @param Rect rectangle | The shape of the rectangle
+	 * @signature
+	 * @param Number x | The x coordinate of the rectangle's upper-left corner
+	 * @param Number y | The y coordinate of the rectangle's upper-left corner
+	 * @param Number width | The width of the rectangle
+	 * @param Number height | The height of the rectangle
+	 */
+	rect(x, y, width, height) {
+		this.c.beginPath();
+		this.c.rect(x, y, width, height);
+	}
+	/**
+	 * Creates a rectangular path with rounded corners.
+	 * @signature
+	 * @param Rect rectangle | The shape of the rectangle
+	 * @param Number topLeft | The radius of the top-left corner
+	 * @param Number topRight? | The radius of the top-right corner. Defaults to be the same as the top-left
+	 * @param Number bottomRight? | The radius of the bottom-right corner. Defaults to be the same as the top-left
+	 * @param Number bottomLeft? | The radius of the bottom-left corner. Defaults to be the same as the top-left
+	 * @signature
+	 * @param Number x | The x coordinate of the rectangle's upper-left corner
+	 * @param Number y | The y coordinate of the rectangle's upper-left corner
+	 * @param Number width | The width of the rectangle
+	 * @param Number height | The height of the rectangle
+	 * @params topLeft, topRight, bottomRight, bottomLeft
+	 */
+	roundRect(x, y, width, height, tl, tr, br, bl) {
+		this.c.beginPath();
+		this.c.roundRect(x, y, width, height, [tl, tr, br, bl]);
+	}
+	/**
+	 * @name triangle
+	 * Creates a triangular path.
+	 * @signature
+	 * @param Polygon triangle | The shape of the path
+	 * @signature
+	 * @param Vector2 a | The first point of the triangle
+	 * @param Vector2 b | The second point of the triangle
+	 * @param Vector2 c | The last point of the triangle
+	 */
+	/**
+	 * Creates a polygonal path.
+	 * @signature
+	 * @param Vector2[] vertices | The vertices of the polygon
+	 * @signature
+	 * @param Polygon polygon | The shape of the polygon
+	 */
+	shape(verts) {
+		this.c.beginPath();
+		if (!verts.length) return;
+		this.c.moveTo(verts[0].x, verts[0].y);
+		for (let i = 1; i <= verts.length; i++) {
+			const vert = verts[i % verts.length];
+			this.c.lineTo(vert.x, vert.y);
+		}
+	}
+	/**
+	 * @group sector, arc
+	 * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
+	 * @signature
+	 * @param Circle circle | The circle of which the path is a section
+	 * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param Number end | The final clockwise angle (in radians) from the horizontal of the section
+	 * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 * @signature
+	 * @param Vector2 center | The center of the circle
+	 * @param Number radius | The radius of the circle
+	 * @params begin, end, counterClockwise
+	 * @signature
+	 * @param Number x | The x coordinate of the circle's center
+	 * @param Number y | The y coordinate of the circle's center
+	 * @params radius, begin, end, counterClockwise
+	 */
+	arc(x, y, radius, sa, ea, counterClockwise) {
+		this.c.beginPath();
+		this.c.arc(x, y, radius, sa, ea, counterClockwise);
+	}
+	sector(x, y, radius, sa, ea, counterClockwise) {
+		this.c.beginPath();
+		this.c.moveTo(x, y);
+		this.c.lineTo(x + radius * Math.cos(sa), y + radius * Math.sin(sa));
+		this.c.arc(x, y, radius, sa, ea, counterClockwise);
+		this.c.lineTo(x, y);
+	}
+	/**
+	 * Creates an elliptical path.
+	 * @signature
+	 * @param Vector2 center | The center of the ellipse
+	 * @param Number radiusX | The x axis radius of the ellipse
+	 * @param Number radiusY | The y axis radius of the ellipse
+	 * @signature
+	 * @param Number x | The x coordinate of the ellipse's center
+	 * @param Number y | The y coordinate of the ellipse's center
+	 * @params radiusX, radiusY
+	 */
+	ellipse(x, y, rx, ry) {
+		this.c.beginPath();
+		this.c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+	}
+	/**
+	 * Creates a circular path.
+	 * @signature
+	 * @param Circle circle | The shape of the circle
+	 * @signature
+	 * @param Vector2 center | The center of the circle
+	 * @param Number radius | The radius of the circle
+	 * @signature
+	 * @param Number x | The x coordinate of the circle's center
+	 * @param Number y | The y coordinate of the circle's center
+	 * @params radius
+	 */
+	circle(x, y, radius) {
+		this.c.beginPath();
+		this.c.arc(x, y, radius, 0, Math.PI * 2);
+	}
+	/**
+	 * Creates a path in the shape of a sequence of characters.
+	 * @signature
+	 * @param Font font | The font to use in rendering the text
+	 * @param String text | The text to render
+	 * @param Vector2 origin | The location of the text's origin. How this is interpreted depends on the current text-alignment mode.
+	 * @param Number packWidth? | The maximum allowed width of a single line of the text. Specifying this parameter will cause the newlines to be added to enforce this requirement. If this parameter is not specified, the text will not be packed
+	 * @signature
+	 * @param Font font | The font to use in rendering the text
+	 * @param String text | The text to render
+	 * @param Number x | The x coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
+	 * @param Number y | The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
+	 * @param Number packWidth? | The maximum allowed width of a single line of the text. Not specifying this will prevent packing
+	 */
+	text(font, text, x, y) {
+		const lines = text.split("\n");
 
-/**
- * @name circle
- * Creates a circular path.
- * @signature
- * @param Circle circle | The shape of the circle
- * @signature
- * @param Vector2 center | The center of the circle
- * @param Number radius | The radius of the circle
- * @signature
- * @param Number x | The x coordinate of the circle's center
- * @param Number y | The y coordinate of the circle's center
- * @param Number radius | The radius of the circle
- */
+		const { textModeX, textModeY } = this.renderer;
 
-/**
- * @name ellipse
- * Creates an elliptical path.
- * @param Number x | The x coordinate of the ellipse's center
- * @param Number y | The y coordinate of the ellipse's center
- * @param Number radiusX | The x axis radius of the ellipse
- * @param Number radiusY | The y axis radius of the ellipse
- */
+		y += font.renderOffsetY;
+		if (textModeY !== TextModeY.TOP)
+			y -= font.getTextHeight(text) * (textModeY === TextModeY.CENTER ? 0.5 : 1);
 
-/**
- * @name rect
- * Creates a rectangular path.
- * @signature
- * @param Rect rectangle | The shape of the rectangle
- * @signature
- * @param Number x | The x coordinate of the rectangle's upper-left corner
- * @param Number y | The y coordinate of the rectangle's upper-left corner
- * @param Number width | The width of the rectangle
- * @param Number height | The height of the rectangle
- */
+		this.c.textAlign = CanvasArtist2D.textModeXMap.get(textModeX);
+		this.c.font = font;
 
-/**
- * @name roundRect
- * Creates a rectangular path with rounded corners.
- * @signature
- * @param Rect rectangle | The shape of the rectangle
- * @param Number topLeft | The radius of the top-left corner
- * @param Number topRight? | The radius of the top-right corner. Defaults to be the same as the top-left
- * @param Number bottomRight? | The radius of the bottom-right corner. Defaults to be the same as the top-left
- * @param Number bottomLeft? | The radius of the bottom-left corner. Defaults to be the same as the top-left
- * @signature
- * @param Number x | The x coordinate of the rectangle's upper-left corner
- * @param Number y | The y coordinate of the rectangle's upper-left corner
- * @param Number width | The width of the rectangle
- * @param Number height | The height of the rectangle
- * @param Number topLeft | The radius of the top-left corner
- * @param Number topRight? | The radius of the top-right corner. Defaults to be the same as the top-left
- * @param Number bottomRight? | The radius of the bottom-right corner. Defaults to be the same as the top-left
- * @param Number bottomLeft? | The radius of the bottom-left corner. Defaults to be the same as the top-left
- */
+		for (let i = 0; i < lines.length; i++)
+			this.drawText(lines[i], x, y + i * font.lineHeight);
+		
+		return true;
+	}
+	/**
+	 * @name infer
+	 * Creates a path with a shape based on the type of its argument.
+	 * @param Shape shape | The shape to render
+	 */
+};
 
-/**
- * @name triangle
- * Creates a triangular path.
- * @signature
- * @param Polygon triangle | The shape of the path
- * @signature
- * @param Vector2 a | The first point of the triangle
- * @param Vector2 b | The second point of the triangle
- * @param Vector2 c | The last point of the triangle
- */
-
-/**
- * @name shape
- * Creates a polygonal path.
- * @signature
- * @param Vector2[] vertices | The vertices of the polygon
- * @signature
- * @param Polygon polygon | The shape of the polygon
- */
-
-/**
- * @name infer
- * Creates a path with a shape based on the type of its argument.
- * @param Shape shape | The shape to render
- */
-
-/**
- * @name text
- * Creates a path in the shape of a sequence of characters.
- * @signature
- * @param Font font | The font to use in rendering the text
- * @param String text | The text to render
- * @param Vector2 origin | The location of the text's origin. How this is interpreted depends on the current text-alignment mode.
- * @param Number packWidth? | The maximum allowed width of a single line of the text. Specifying this parameter will cause the newlines to be added to enforce this requirement. If this parameter is not specified, the text will not be packed
- * @signature
- * @param Font font | The font to use in rendering the text
- * @param String text | The text to render
- * @param Number x | The x coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
- * @param Number y | The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
- * @param Number packWidth? | The maximum allowed width of a single line of the text. Not specifying this will prevent packing
- */
-
-/**
- * @name textLine
- * Creates a path in the shape of a single-line sequence of characters.
- * This method is faster than `.text()`.
- * @signature
- * @param Font font | The font to use in rendering the text
- * @param String text | The text to render
- * @param Vector2 origin | The location of the text's origin. How this is interpreted depends on the current text-alignment mode.
- * @signature
- * @param Font font | The font to use in rendering the text
- * @param String text | The text to render
- * @param Number x | The x coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
- * @param Number y | The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
- */
-
-/**
- * @group sector, arc
- * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
- * @signature
- * @param Vector2 center | The center of the circle
- * @param Number radius | The radius of the circle
- * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the section
- * @param Number end | The final clockwise angle (in radians) from the horizontal of the section
- * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
- * @signature
- * @param Number x | The x coordinate of the circle's center
- * @param Number y | The y coordinate of the circle's center
- * @param Number radius | The radius of the circle
- * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the section
- * @param Number end | The final clockwise angle (in radians) from the horizontal of the section
- * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
- */
+CanvasArtist2D.ActionRenderer = class extends CanvasArtist2D.PathRenderer { };
+{
+	const proto = CanvasArtist2D.PathRenderer.prototype;
+	const actions = Reflect.ownKeys(proto);
+	for (let i = 0; i < actions.length; i++) {
+		const key = actions[i];
+		const base = proto[key];
+		CanvasArtist2D.ActionRenderer.prototype[key] = function () {
+			if (!base.apply(this, arguments)) this.action();
+		};
+	}
+}
 
 /**
  * @name class DrawRenderer extends PathRenderer
  * Represents the draw API of an Artist2D.
  * This fills various paths.
  */
+CanvasArtist2D.DrawRenderer = class extends CanvasArtist2D.ActionRenderer {
+	static Dispatcher = Artist2D.Dispatcher;
+	setup(color) {
+		this.c.fillStyle = color;
+	}
+	action() {
+		this.c.fill();
+	}
+	drawText(text, x, y) {
+		this.c.fillText(text, x, y);
+	}
+};
 
 /**
  * @name class StrokeRenderer extends PathRenderer
  * Represents the stroke API of an Artist2D.
  * This outlines various paths.
  */
+CanvasArtist2D.StrokeRenderer = class extends CanvasArtist2D.ActionRenderer {
+	static Dispatcher = Artist2D.StrokeDispatcher;
+	static lineJoinMap = new Map([
+		[LineJoin.MITER, "miter"],
+		[LineJoin.BEVEL, "bevel"],
+		[LineJoin.ROUND, "round"]
+	]);
+	static lineCapMap = new Map([
+		[LineCap.FLAT, "butt"],
+		[LineCap.SQUARE, "square"],
+		[LineCap.ROUND, "round"]
+	]);
+	setup(color, lineWidth = 1, lineCap = LineCap.FLAT, lineJoin = LineJoin.BEVEL) {
+		this.c.strokeStyle = color;
+		this.c.lineWidth = lineWidth;
+		const { lineJoinMap, lineCapMap } = CanvasArtist2D.StrokeRenderer;
+		this.c.lineJoin = lineJoinMap.get(lineJoin);
+		this.c.lineCap = lineCapMap.get(lineCap);
+	}
+	arrowHead(x, y, dx, dy) {
+		const invMag = 1 / Math.hypot(dx, dy);
+		dx *= invMag;
+		dy *= invMag;
+		const nx = -dy;
+		const ny = dx;
+		
+		const l2 = this.c.lineWidth * 2;
+		const ox = x - dx * l2;
+		const oy = y - dy * l2;
+
+		this.c.fillStyle = this.c.strokeStyle;
+		this.c.beginPath();
+		this.c.moveTo(ox - nx * l2, oy - ny * l2);
+		this.c.lineTo(ox + dx * l2 * 2, oy + dy * l2 * 2);
+		this.c.lineTo(ox + nx * l2, oy + ny * l2);
+		this.c.fill();
+	}
+	/**
+	 * @group line, arrow
+	 * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
+	 * @signature
+	 * @param Line line | The line segment
+	 * @signature
+	 * @param Vector2 a | The first point
+	 * @param Vector2 b | The second point
+	 * @signature
+	 * @param Number x1 | The x coordinate of the first point
+	 * @param Number y1 | The y coordinate of the first point
+	 * @param Number x2 | The x coordinate of the second point
+	 * @param Number y2 | The y coordinate of the second point
+	 */
+	line(x, y, x1, y1) {
+		this.c.beginPath();
+		this.c.moveTo(x, y);
+		this.c.lineTo(x1, y1);
+		this.c.stroke();
+	}
+	arrow(x, y, x1, y1) {
+		this.line(x, y, x1, y1);
+		this.arrowHead(x1, y1, x1 - x, y1 - y);
+	}
+	/**
+	 * @name connector
+	 * Renders a series of connected line segments.
+	 * @param Vector2[] points | The points to connect
+	 */
+	connector(points) {
+		if (!points.length) return;
+
+		this.c.beginPath();
+		this.c.moveTo(points[0].x, points[0].y);
+		for (let i = 0; i < points.length; i++) {
+			const point = points[i];
+			this.c.lineTo(point.x, point.y);
+		}
+		this.c.stroke();
+	}
+	/**
+	 * @group spline, splineArrow
+	 * Renders a quartic spline. For `.splineArrow()`, there is also an arrow-head at the end.
+	 * @param Spline spline | The spline to render
+	 */
+	spline({ a, b, c, d }) {
+		this.c.beginPath();
+		this.c.moveTo(a.x, a.y);
+		this.c.bezierCurveTo(b.x, b.y, c.x, c.y, d.x, d.y);
+		this.c.stroke();
+	}
+	splineArrow(spline) {
+		this.spline(spline);
+		const { c, d } = spline;
+		this.arrowHead(d.x, d.y, d.x - c.x, d.y - c.y);
+	}
+	/**
+	 * Renders an arrow-head at the end of an arc on a circle.
+	 * @signature
+	 * @param Circle circle | The circle of which the path is a section
+	 * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param Number end | The final clockwise angle (in radians) from the horizontal of the section
+	 * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 * @signature
+	 * @param Vector2 center | The center of the circle
+	 * @param Number radius | The radius of the circle
+	 * @params begin, end, counterClockwise
+	 * @signature
+	 * @param Number x | The x coordinate of the circle's center
+	 * @param Number y | The y coordinate of the circle's center
+	 * @params radius, begin, end, counterClockwise
+	 */
+	arcArrow(x, y, radius, sa, ea, counterClockwise) {
+		this.arc(x, y, radius, sa, ea, counterClockwise);
+		const cos = Math.cos(ea);
+		const sin = Math.sin(ea);
+		const dir = counterClockwise ? -1 : 1;
+		this.arrowHead(x + cos * radius, y + sin * radius, dir * -sin, dir * cos);
+	}
+	/**
+	 * Renders a line segment with a line of text displayed in its center.
+	 * @signature
+	 * @param Font font | The font to use for the text
+	 * @param String text | The text to render
+	 * @param Line line | The line segment
+	 * @signature
+	 * @params font, text
+	 * @param Vector2 a | The first point
+	 * @param Vector2 b | The second point
+	 * @signature
+	 * @params font, text
+	 * @param Number x1 | The x coordinate of the first point
+	 * @param Number y1 | The y coordinate of the first point
+	 * @param Number x2 | The x coordinate of the second point
+	 * @param Number y2 | The y coordinate of the second point
+	 */
+	measure(font, text, x, y, x1, y1) {
+		const width = font.getTextWidth(text);
+		const height = font.getTextHeight(text);
+
+		let dx = x1 - x;
+		let dy = y1 - y;
+		let nx = -dy;
+		let ny = dx;
+		const mag = magath.hypot(dx, dy);
+
+		if (!mag) return;
+		const invMag = 1 / mag;
+
+		nx *= invMag * height * 0.5;
+		ny *= invMag * height * 0.5;
+
+		let length = (mag - (width + font.size)) / 2;
+		dx *= invMag * length;
+		dy *= invMag * length;
+
+		this.c.beginPath();
+		this.c.moveTo(x, y);
+		this.c.lineTo(x + dx, y + dy);
+		this.c.stroke();
+
+		this.c.beginPath();
+		this.c.moveTo(x1, y1);
+		this.c.lineTo(x1 - dx, y1 - dy);
+		this.c.stroke();
+
+		const angle = Math.atan2(dy, dx);
+
+		dx = (x1 - x) / 2;
+		dy = (y1 - y) / 2;
+		this.c.save();
+		this.c.translate(x + dx, y + dy);
+		this.c.rotate(rot);
+		this.c.translate(-width / 2, height / 4);
+		this.c.fillStyle = this.c.strokeStyle;
+		this.c.font = font.toString();
+		this.c.fillText(text, 0, 0);
+		this.c.restore();
+
+		// start cap
+		this.c.beginPath();
+		this.c.moveTo(x + nx, y + ny);
+		this.c.lineTo(x - nx, y - ny);
+		this.c.stroke();
+
+		// end cap
+		this.c.beginPath();
+		this.c.moveTo(x1 + nx, y1 + ny);
+		this.c.lineTo(x1 - nx, y1 - ny);
+		this.c.stroke();
+	}
+	action() {
+		this.c.stroke();
+	}
+	drawText(text, x, y) {
+		this.c.strokeText(text, x, y);
+	}
+	/**
+	 * @name infer
+	 * Creates a path with a shape based on the type of its argument.
+	 * @param Shape/Line/Spline shape | The shape to render
+	 */
+};
 
 /**
- * @name connector
- * Renders a series of connected line segments.
- * @param Vector2[] points | The points to connect
+ * @name class ClipRenderer extends PathRenderer
+ * Represents the clipping API of an Artist2D.
+ * This adds various shapes to the current clipping mask.
+ * Each path created will be added to the current clipping state in such a way that the final renderable area is the intersection of all active clip paths.
  */
-
-/**
- * @name spline/splineArrow
- * Renders a quartic spline. For `.splineArrow()`, there is also an arrow-head at the end.
- * @param Spline spline | The spline to render
- */
-
-/**
- * @name line/arrow
- * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
- * @signature
- * @param Line line | The line segment
- * @signature
- * @param Vector2 a | The first point
- * @param Vector2 b | The second point
- * @signature
- * @param Number x1 | The x coordinate of the first point
- * @param Number y1 | The y coordinate of the first point
- * @param Number x2 | The x coordinate of the second point
- * @param Number y2 | The y coordinate of the second point
- */
-
-/**
- * @name measure
- * Renders a line segment with a line of text displayed in its center.
- * @signature
- * @param Font font | The font to use for the text
- * @param String text | The text to render
- * @param Line line | The line segment
- * @signature
- * @param Font font | The font to use for the text
- * @param String text | The text to render
- * @param Vector2 a | The first point
- * @param Vector2 b | The second point
- * @signature
- * @param Font font | The font to use for the text
- * @param String text | The text to render
- * @param Number x1 | The x coordinate of the first point
- * @param Number y1 | The y coordinate of the first point
- * @param Number x2 | The x coordinate of the second point
- * @param Number y2 | The y coordinate of the second point
- */
-
-/**
- * @name arcArrow
- * Renders an arrow-head at the end of an arc on a circle.
- * @signature
- * @param Vector2 center | The center of the circle
- * @param Number radius | The radius of the circle
- * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the arc
- * @param Number end | The final clockwise angle (in radians) from the horizontal of the arc
- * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
- * @signature
- * @param Number x | The x coordinate of the circle's center
- * @param Number y | The y coordinate of the circle's center
- * @param Number radius | The radius of the circle
- * @param Number begin | The initial clockwise angle (in radians) from the horizontal of the arc
- * @param Number end | The final clockwise angle (in radians) from the horizontal of the arc
- * @param Boolean counterClockwise? | Whether the path from the initial to final angle should be counter-clockwise. Default is false
- */
+CanvasArtist2D.ClipRenderer = class extends CanvasArtist2D.ActionRenderer {
+	static Dispatcher = Artist2D.Dispatcher;
+	setup() { }
+	action() {
+		this.c.save();
+		this.c.clip();
+	}
+}
 
 /**
  * @name class ImageRenderer extends PathRenderer
@@ -1202,44 +1018,89 @@ class CanvasArtist2D extends Artist2D {
  * This draws images in various paths. 
  * For non-rectangular shapes, the image is scaled to be the size of the shape's bounding box, and then only the portion of the image inside the shape is shown.
  */
-
-/**
- * @name default
- * Renders an image at its natural dimensions.
- * @signature
- * @param Vector2 point | The upper-left corner of the image
- * @signature
- * @param Number x | The x coordinate of the upper-left corner of the image
- * @param Number y | The y coordinate of the upper-left corner of the image
- */
-
-/**
- * @name inferWidth
- * Renders an image with a specified height, while still maintaining its natural aspect ratio.
- * @signature
- * @param Vector2 point | The upper-left corner of the image
- * @param Number height | The height of the image
- * @signature
- * @param Number x | The x coordinate of the upper-left corner of the image
- * @param Number y | The y coordinate of the upper-left corner of the image
- * @param Number height | The height of the image
- */
-
-/**
- * @name inferHeight
- * Renders an image with a specified width, while still maintaining its natural aspect ratio.
- * @signature
- * @param Vector2 point | The upper-left corner of the image
- * @param Number width | The width of the image
- * @signature
- * @param Number x | The x coordinate of the upper-left corner of the image
- * @param Number y | The y coordinate of the upper-left corner of the image
- * @param Number width | The width of the image
- */
-
-/**
- * @name class ClipRenderer extends PathRenderer
- * Represents the clipping API of an Artist2D.
- * This adds various shapes to the current clipping mask.
- * Each path created will be added to the current clipping state, which means that future draw calls will be able to modify the pixels outside the current clipped area.
- */
+CanvasArtist2D.ImageRenderer = class extends CanvasArtist2D.PathRenderer {
+	static Dispatcher = Artist2D.ImageDispatcher;
+	setup(image) {
+		this.image = image;
+		this.canvasImage = image.makeImage();
+	}
+	drawImage(x, y, width, height) {
+		if (!this.image.renderable) return;
+		if (width === 0 || height === 0) return;
+		this.c.drawImage(this.canvasImage, x, y, width, height);
+	}
+	pathImage(x, y, width, height) {
+		this.c.save();
+		this.c.clip();
+		this.drawImage(x, y, width, height);
+		this.c.restore();
+	}
+	arcPathImage(x, y, radius) {
+		this.pathImage(x - radius, y - radius, radius * 2, radius * 2);
+	}
+	arc(x, y, radius, sa, ea, counterClockwise) {
+		super.arc(x, y, radius, sa, ea, counterClockwise);
+		this.arcPathImage(x, y, radius);
+	}
+	sector(x, y, radius, sa, ea, counterClockwise) {
+		super.sector(x, y, radius, sa, ea, counterClockwise);
+		this.arcPathImage(x, y, radius);
+	}
+	ellipse(x, y, rx, ry) {
+		super.ellipse(x, y, rx, ry);
+		this.pathImage(x - rx, y - ry, rx * 2, ry * 2);
+	}
+	shape(vertices) {
+		super.shape(vertices);
+		const { x, y, width, height } = Rect.bound(vertices);
+		this.pathImage(x, y, width, height);
+	}
+	circle(x, y, radius) {
+		super.circle(x, y, radius);	
+		this.arcPathImage(x, y, radius);
+	}
+	rect(x, y, width, height) {
+		this.drawImage(x, y, width, height);
+	}
+	roundRect(x, y, width, height, tl, tr, bl, br) {
+		super.roundRect(x, y, width, height, tl, tr, bl, br);
+		this.pathImage(x, y, width, height);
+	}
+	/**
+	 * Renders an image with a specified height, while still maintaining its natural aspect ratio.
+	 * @signature
+	 * @param Vector2 point | The upper-left corner of the image
+	 * @param Number height | The height of the image
+	 * @signature
+	 * @param Number x | The x coordinate of the upper-left corner of the image
+	 * @param Number y | The y coordinate of the upper-left corner of the image
+	 * @params height
+	 */
+	inferWidth(x, y, height) {
+		this.drawImage(x, y, this.image.inferWidth(height), height);
+	}
+	/**
+	 * Renders an image with a specified width, while still maintaining its natural aspect ratio.
+	 * @signature
+	 * @param Vector2 point | The upper-left corner of the image
+	 * @param Number width | The width of the image
+	 * @signature
+	 * @param Number x | The x coordinate of the upper-left corner of the image
+	 * @param Number y | The y coordinate of the upper-left corner of the image
+	 * @params width
+	 */
+	inferHeight(x, y, width) {
+		this.drawImage(x, y, width, this.image.inferHeight(width));
+	}
+	/**
+	 * Renders an image at its natural dimensions.
+	 * @signature
+	 * @param Vector2 point | The upper-left corner of the image
+	 * @signature
+	 * @param Number x | The x coordinate of the upper-left corner of the image
+	 * @param Number y | The y coordinate of the upper-left corner of the image
+	 */
+	default(x, y) {
+		this.rect(x, y, this.image.width, this.image.height);
+	}
+};

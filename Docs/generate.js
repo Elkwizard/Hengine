@@ -57,6 +57,7 @@ for (const doc of docs)
 const docToPath = new Map();
 for (const name in nameToPath) {
 	const doc = nameToDoc[name];
+	if (!doc) console.log(`${name} isn't documented`);
 	const path = nameToPath[doc.name.base];
 	if (!path) console.log(`${doc.name.base} doesn't exist!`);
 	docToPath.set(doc, path);
