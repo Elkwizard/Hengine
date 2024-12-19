@@ -327,8 +327,8 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 			this.src.replace(/.wasm$/g, `/${name}.js`)
 		).load();
 
-		if (!(await resource("bindings") && await resource("buffer")))
-			return null;
+		const resources = await Promise.all([resource("bindings"), resource("buffer")]);
+		if (!resources.every(Boolean)) return null;
 
 		const bufferFn = HengineWASMResource.buffers[moduleName];
 		
@@ -378,6 +378,16 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 		
 		const module = { };
 		HengineWASMResource.bindings[moduleName](module, imports, exports);
+
+		{ // printing
+			let buffer = [];
+			module.printFloat = module.printInt = v => buffer.push(v);
+			window._buffer = buffer;
+			module.printLn = () => {
+				console.log(...buffer);
+				buffer = [];
+			};
+		}
 
 		module.Array = class Array {
 			constructor(type, length, indirect) {
