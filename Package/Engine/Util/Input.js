@@ -54,24 +54,18 @@ class InputHandler {
 		}
 		return result;
 	}
-	check(arg, state, signal = InputHandler.or) {
+	check(arg, state, signal = InputHandler.OR) {
 		if (Array.isArray(arg)) {
-			let acc;
-			for (let i = 0; i < arg.length; i++) {
-				const value = this.get(arg[i])[state];
-				if (value === signal) return signal;
-				if (value !== !!value) {
-					acc = [value];
-					break;
-				}
-			}
-			if (acc !== undefined) {
-				for (let i = 1; i < arg.length; i++) {
-					const value = this.get(arg[i])[state];
-					acc.push(value);
-				}
+			if (signal === null) {
+				const acc = [];
+				for (let i = 0; i < arg.length; i++)
+					acc.push(this.get(arg[i])[state]);
 				return acc;
 			}
+			
+			for (let i = 0; i < arg.length; i++)
+				if (this.get(arg[i])[state] === signal)
+					return signal;
 			return !signal;
 		} else return this.get(arg)[state];
 	}
@@ -103,10 +97,13 @@ class InputHandler {
 	 * If no keys meet the requirement, null is returned instead.
 	 * @return String[]/null
 	 */
-	static addChecks(keys = []) {
-		for (let i = 0; i < keys.length; i++) {
-			const key = keys[i];
-			this.prototype[key] = function (arg, signal) {
+	static addChecks(keys) {
+		if (Array.isArray(keys))
+			keys = Object.fromEntries(keys.map(key => [key, null]));
+
+		for (const key in keys) {
+			const defaultSignal = keys[key];
+			this.prototype[key] = function (arg, signal = defaultSignal) {
 				return this.check(arg, key, signal);
 			};
 			if (key.includes("Length")) continue;
@@ -118,8 +115,16 @@ class InputHandler {
 		};
 	}
 }
-InputHandler.or = true;
-InputHandler.and = false;
+InputHandler.OR = true;
+InputHandler.AND = false;
+InputHandler.addChecks({
+	pressed: InputHandler.OR,
+	justPressed: InputHandler.OR,
+	released: InputHandler.AND,
+	justReleased: InputHandler.AND,
+	pressLength: null,
+	releaseLength: null
+});
 
 /**
  * @name class InputHandler.State
@@ -227,14 +232,6 @@ InputHandler.State = class State {
 			this.upCount = 0;
 		}
 	}
-};
-
-{
-	const checks = [];
-	const descs = Object.getOwnPropertyDescriptors(InputHandler.State.prototype);
-	for (const key in descs)
-		if ("get" in descs[key]) checks.push(key);
-	InputHandler.addChecks(checks);
 };
 
 /**
