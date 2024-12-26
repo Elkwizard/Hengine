@@ -199,16 +199,16 @@ WebGLArtist2D.DrawRenderer = class extends WebGLArtist2D.Renderer {
 		this.color = color;
 	}
 	circle(x, y, radius) {
-		this.gl.coloredEllipse(x, y, radius, radius, this.color.red, this.color.blue, this.color.green, this.color.alpha);
+		this.gl.coloredEllipse(x, y, radius, radius, this.color.red, this.color.green, this.color.blue, this.color.alpha);
 	}
 	ellipse(x, y, rx, ry) {
-		this.gl.coloredEllipse(x, y, rx, ry, this.color.red, this.color.blue, this.color.green, this.color.alpha);
+		this.gl.coloredEllipse(x, y, rx, ry, this.color.red, this.color.green, this.color.blue, this.color.alpha);
 	}
 	rect(x, y, width, height) {
-		this.gl.coloredQuad(x, y, width, height, this.color.red, this.color.blue, this.color.green, this.color.alpha);
+		this.gl.coloredQuad(x, y, width, height, this.color.red, this.color.green, this.color.blue, this.color.alpha);
 	}
 	shape(vertices) {
-		this.gl.coloredPolygon(vertices, this.color.red, this.color.blue, this.color.green, this.color.alpha);
+		this.gl.coloredPolygon(vertices, this.color.red, this.color.green, this.color.blue, this.color.alpha);
 	}
 };
 
