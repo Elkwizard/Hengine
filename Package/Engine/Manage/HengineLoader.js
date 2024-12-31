@@ -796,11 +796,12 @@ class HengineLoader {
 HengineLoader.loader = null;
 
 HengineLoader.engineResources = [
-	[ // no dependencies
+	[ // preload
 		"Preload/PrototypeOverload.js",
 		"Preload/Lazy.js",
 		"Preload/Operable.js",
-
+	],
+	[ // minimal dependencies
 		"SceneObject/SceneElement.js",
 		"SceneObject/Scripts.js",
 
