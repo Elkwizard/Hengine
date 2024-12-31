@@ -658,10 +658,11 @@ CanvasArtist2D.PathRenderer = class extends Artist.Renderer {
 		this.c.beginPath();
 		if (!verts.length) return;
 		this.c.moveTo(verts[0].x, verts[0].y);
-		for (let i = 1; i <= verts.length; i++) {
-			const vert = verts[i % verts.length];
+		for (let i = 1; i < verts.length; i++) {
+			const vert = verts[i];
 			this.c.lineTo(vert.x, vert.y);
 		}
+		this.c.closePath();
 	}
 	/**
 	 * @group sector, arc
@@ -689,7 +690,7 @@ CanvasArtist2D.PathRenderer = class extends Artist.Renderer {
 		this.c.moveTo(x, y);
 		this.c.lineTo(x + radius * Math.cos(sa), y + radius * Math.sin(sa));
 		this.c.arc(x, y, radius, sa, ea, counterClockwise);
-		this.c.lineTo(x, y);
+		this.c.closePath();
 	}
 	/**
 	 * Creates an elliptical path.
@@ -958,8 +959,6 @@ CanvasArtist2D.StrokeRenderer = class extends CanvasArtist2D.ActionRenderer {
 		this.c.moveTo(x1, y1);
 		this.c.lineTo(x1 - dx, y1 - dy);
 		this.c.stroke();
-
-		const angle = Math.atan2(dy, dx);
 
 		dx = (x1 - x) / 2;
 		dy = (y1 - y) / 2;
