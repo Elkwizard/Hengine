@@ -939,6 +939,7 @@ CanvasArtist2D.StrokeRenderer = class extends CanvasArtist2D.ActionRenderer {
 		let nx = -dy;
 		let ny = dx;
 		const mag = Math.hypot(dx, dy);
+		const rot = Math.atan2(dy, dx);
 
 		if (!mag) return;
 		const invMag = 1 / mag;
