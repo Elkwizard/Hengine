@@ -742,7 +742,7 @@ CanvasArtist2D.PathRenderer = class extends Artist.Renderer {
 
 		const { textModeX, textModeY } = this.renderer;
 
-		y += font.renderOffsetY;
+		y += font.boundingAscent;
 		if (textModeY !== TextModeY.TOP)
 			y -= font.getTextHeight(text) * (textModeY === TextModeY.CENTER ? 0.5 : 1);
 

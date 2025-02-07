@@ -90,7 +90,8 @@ class Font {
 		// measure font placement
 		Font.context.font = this.fontString;
 		const metrics = Font.context.measureText("0");
-		this.renderOffsetY = metrics.fontBoundingBoxAscent;
+		this.boundingAscent = metrics.actualBoundingBoxAscent;
+		this.boundingDescent = metrics.actualBoundingBoxDescent;
 	}
 	processString(str) {
 		return String(str).replace(/\r/g, "").replace(/\t/g, this.tabReplacement);
@@ -182,7 +183,8 @@ class Font {
 	getTextHeight(str, pack) {
 		str = this.processString(str);
 		if (pack) str = this.packText(str, pack);
-		return str.split("\n").length * this.lineHeight;
+		const innerLines = (str.split("\n").length - 1);
+		return this.boundingAscent + this.boundingDescent + innerLines * this.lineHeight;
 	}
 	/**
 	 * Converts the Font to a valid CSS font string.
