@@ -67,7 +67,7 @@ API class RigidBody {
 		std::vector<Vector> prohibitedDirections { };
 
 		std::vector<Collider*> shapes { };
-		std::vector<Constraint*> constraints { };
+		API std::vector<Constraint*> constraints { };
 
 		API RigidBody(double x, double y, bool _dynamic);
 		~RigidBody();

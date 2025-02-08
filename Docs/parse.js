@@ -140,8 +140,6 @@ function parse(content, file) {
 			}
 		}
 
-		const atparams = lines.find(line => line.category === "params");
-
 		// expand @params references
 		lines = lines.flatMap(line => {
 			if (line.category === "params") {
@@ -151,8 +149,6 @@ function parse(content, file) {
 
 			return [line];
 		});
-
-		if (atparams) console.log(lines);
 
 		const resultLines = [];
 		

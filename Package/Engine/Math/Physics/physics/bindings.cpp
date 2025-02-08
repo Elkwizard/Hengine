@@ -97,62 +97,64 @@ extern "C" {
 	EMSCRIPTEN_KEEPALIVE void _set_trivialCollisionFilter86(RigidBody* _0, bool _1) { _0->trivialCollisionFilter = _1; }
 	EMSCRIPTEN_KEEPALIVE bool _get_trivialTriggerFilter87(RigidBody* _0) { return _0->trivialTriggerFilter; }
 	EMSCRIPTEN_KEEPALIVE void _set_trivialTriggerFilter88(RigidBody* _0, bool _1) { _0->trivialTriggerFilter = _1; }
-	EMSCRIPTEN_KEEPALIVE int _get_size89() { return sizeof(RigidBody); }
-	EMSCRIPTEN_KEEPALIVE RigidBody* _create90(double _0, double _1, bool _2) { return new RigidBody(_0, _1, _2); }
-	EMSCRIPTEN_KEEPALIVE void _delete91(RigidBody* _0) { delete _0; }
-	EMSCRIPTEN_KEEPALIVE void _invalidateModels92(RigidBody* _0) { _0->invalidateModels(); }
-	EMSCRIPTEN_KEEPALIVE void _clearShapes93(RigidBody* _0) { _0->clearShapes(); }
-	EMSCRIPTEN_KEEPALIVE void _removeShape94(RigidBody* _0, Collider* _1) { _0->removeShape(_1); }
-	EMSCRIPTEN_KEEPALIVE void _addShape95(RigidBody* _0, Collider* _1) { _0->addShape(_1); }
-	EMSCRIPTEN_KEEPALIVE void _stop96(RigidBody* _0) { _0->stop(); }
-	EMSCRIPTEN_KEEPALIVE void _applyImpulse97(RigidBody* _0, const Vector* _1, const Vector* _2, double _3) { _0->applyImpulse(*_1, *_2, _3); }
-	EMSCRIPTEN_KEEPALIVE void _applyRelativeImpulse98(RigidBody* _0, const Vector* _1, const Vector* _2, double _3) { _0->applyRelativeImpulse(*_1, *_2, _3); }
-	EMSCRIPTEN_KEEPALIVE RigidBody* _fromPolygon99(_Slab* _0, bool _1) { return RigidBody::fromPolygon((std::vector<Vector>)*_0, _1); }
-	EMSCRIPTEN_KEEPALIVE RigidBody* _fromRect100(double _0, double _1, double _2, double _3, bool _4) { return RigidBody::fromRect(_0, _1, _2, _3, _4); }
-	EMSCRIPTEN_KEEPALIVE RigidBody* _fromCircle101(double _0, double _1, double _2, bool _3) { return RigidBody::fromCircle(_0, _1, _2, _3); }
-	EMSCRIPTEN_KEEPALIVE int _get_contactIterations102(PhysicsEngine* _0) { return _0->contactIterations; }
-	EMSCRIPTEN_KEEPALIVE void _set_contactIterations103(PhysicsEngine* _0, int _1) { _0->contactIterations = _1; }
-	EMSCRIPTEN_KEEPALIVE int _get_iterations104(PhysicsEngine* _0) { return _0->iterations; }
-	EMSCRIPTEN_KEEPALIVE void _set_iterations105(PhysicsEngine* _0, int _1) { _0->iterations = _1; }
-	EMSCRIPTEN_KEEPALIVE int _get_constraintIterations106(PhysicsEngine* _0) { return _0->constraintIterations; }
-	EMSCRIPTEN_KEEPALIVE void _set_constraintIterations107(PhysicsEngine* _0, int _1) { _0->constraintIterations = _1; }
-	EMSCRIPTEN_KEEPALIVE Vector* _get_gravity108(PhysicsEngine* _0) { return &_0->gravity; }
-	EMSCRIPTEN_KEEPALIVE void _set_gravity109(PhysicsEngine* _0, Vector* _1) { _0->gravity = *_1; }
-	EMSCRIPTEN_KEEPALIVE double _get_drag110(PhysicsEngine* _0) { return _0->drag; }
-	EMSCRIPTEN_KEEPALIVE void _set_drag111(PhysicsEngine* _0, double _1) { _0->drag = _1; }
-	EMSCRIPTEN_KEEPALIVE _Slab* _get_constraints112(PhysicsEngine* _0) { return new _Slab(_0->getConstraints()); }
-	EMSCRIPTEN_KEEPALIVE _Slab* _get_bodies113(PhysicsEngine* _0) { return new _Slab(_0->getBodies()); }
-	EMSCRIPTEN_KEEPALIVE int _get_size114() { return sizeof(PhysicsEngine); }
-	EMSCRIPTEN_KEEPALIVE PhysicsEngine* _create115(const Vector* _0) { return new PhysicsEngine(*_0); }
-	EMSCRIPTEN_KEEPALIVE void _delete116(PhysicsEngine* _0) { delete _0; }
-	EMSCRIPTEN_KEEPALIVE void _run117(PhysicsEngine* _0) { _0->run(); }
-	EMSCRIPTEN_KEEPALIVE void _addConstraint118(PhysicsEngine* _0, Constraint* _1) { _0->addConstraint(_1); }
-	EMSCRIPTEN_KEEPALIVE void _removeConstraint119(PhysicsEngine* _0, unsigned int _1) { _0->removeConstraint(_1); }
-	EMSCRIPTEN_KEEPALIVE bool _hasBody120(PhysicsEngine* _0, unsigned int _1) { return _0->hasBody(_1); }
-	EMSCRIPTEN_KEEPALIVE RigidBody* _getBody121(PhysicsEngine* _0, unsigned int _1) { return &_0->getBody(_1); }
-	EMSCRIPTEN_KEEPALIVE void _addBody122(PhysicsEngine* _0, RigidBody* _1) { _0->addBody(_1); }
-	EMSCRIPTEN_KEEPALIVE void _removeBody123(PhysicsEngine* _0, unsigned int _1) { _0->removeBody(_1); }
-	EMSCRIPTEN_KEEPALIVE double _get_length124(LengthConstraint2* _0) { return _0->length; }
-	EMSCRIPTEN_KEEPALIVE void _set_length125(LengthConstraint2* _0, double _1) { _0->length = _1; }
-	EMSCRIPTEN_KEEPALIVE int _get_size126() { return sizeof(LengthConstraint2); }
-	EMSCRIPTEN_KEEPALIVE LengthConstraint2* _create127(RigidBody* _0, RigidBody* _1, const Vector* _2, const Vector* _3, double _4) { return new LengthConstraint2(*_0, *_1, *_2, *_3, _4); }
-	EMSCRIPTEN_KEEPALIVE void _delete128(LengthConstraint2* _0) { delete _0; }
-	EMSCRIPTEN_KEEPALIVE int _get_size129() { return sizeof(PositionConstraint2); }
-	EMSCRIPTEN_KEEPALIVE PositionConstraint2* _create130(RigidBody* _0, RigidBody* _1, const Vector* _2, const Vector* _3) { return new PositionConstraint2(*_0, *_1, *_2, *_3); }
-	EMSCRIPTEN_KEEPALIVE void _delete131(PositionConstraint2* _0) { delete _0; }
-	EMSCRIPTEN_KEEPALIVE double _get_length132(LengthConstraint1* _0) { return _0->length; }
-	EMSCRIPTEN_KEEPALIVE void _set_length133(LengthConstraint1* _0, double _1) { _0->length = _1; }
-	EMSCRIPTEN_KEEPALIVE int _get_size134() { return sizeof(LengthConstraint1); }
-	EMSCRIPTEN_KEEPALIVE LengthConstraint1* _create135(RigidBody* _0, const Vector* _1, const Vector* _2, double _3) { return new LengthConstraint1(*_0, *_1, *_2, _3); }
-	EMSCRIPTEN_KEEPALIVE void _delete136(LengthConstraint1* _0) { delete _0; }
-	EMSCRIPTEN_KEEPALIVE int _get_size137() { return sizeof(PositionConstraint1); }
-	EMSCRIPTEN_KEEPALIVE PositionConstraint1* _create138(RigidBody* _0, const Vector* _1, const Vector* _2) { return new PositionConstraint1(*_0, *_1, *_2); }
-	EMSCRIPTEN_KEEPALIVE void _delete139(PositionConstraint1* _0) { delete _0; }
-	EMSCRIPTEN_KEEPALIVE int _get_length140(_Slab* _0) { return _0->length; }
-	EMSCRIPTEN_KEEPALIVE int _get_size141() { return sizeof(_Slab); }
-	EMSCRIPTEN_KEEPALIVE _Slab* _create142(int _0, int _1) { return new _Slab(_0, _1); }
-	EMSCRIPTEN_KEEPALIVE void _delete143(_Slab* _0) { delete _0; }
-	EMSCRIPTEN_KEEPALIVE void* _getPointer144(_Slab* _0, int _1) { return _0->getPointer(_1); }
-	EMSCRIPTEN_KEEPALIVE void _setPointer145(_Slab* _0, int _1, void* _2) { _0->setPointer(_1, _2); }
-	EMSCRIPTEN_KEEPALIVE void* _get146(_Slab* _0, int _1) { return _0->get(_1); }
+	EMSCRIPTEN_KEEPALIVE _Slab* _get_constraints89(RigidBody* _0) { return new _Slab(_0->constraints); }
+	EMSCRIPTEN_KEEPALIVE void _set_constraints90(RigidBody* _0, _Slab* _1) { _0->constraints = (std::vector<Constraint*>)*_1; }
+	EMSCRIPTEN_KEEPALIVE int _get_size91() { return sizeof(RigidBody); }
+	EMSCRIPTEN_KEEPALIVE RigidBody* _create92(double _0, double _1, bool _2) { return new RigidBody(_0, _1, _2); }
+	EMSCRIPTEN_KEEPALIVE void _delete93(RigidBody* _0) { delete _0; }
+	EMSCRIPTEN_KEEPALIVE void _invalidateModels94(RigidBody* _0) { _0->invalidateModels(); }
+	EMSCRIPTEN_KEEPALIVE void _clearShapes95(RigidBody* _0) { _0->clearShapes(); }
+	EMSCRIPTEN_KEEPALIVE void _removeShape96(RigidBody* _0, Collider* _1) { _0->removeShape(_1); }
+	EMSCRIPTEN_KEEPALIVE void _addShape97(RigidBody* _0, Collider* _1) { _0->addShape(_1); }
+	EMSCRIPTEN_KEEPALIVE void _stop98(RigidBody* _0) { _0->stop(); }
+	EMSCRIPTEN_KEEPALIVE void _applyImpulse99(RigidBody* _0, const Vector* _1, const Vector* _2, double _3) { _0->applyImpulse(*_1, *_2, _3); }
+	EMSCRIPTEN_KEEPALIVE void _applyRelativeImpulse100(RigidBody* _0, const Vector* _1, const Vector* _2, double _3) { _0->applyRelativeImpulse(*_1, *_2, _3); }
+	EMSCRIPTEN_KEEPALIVE RigidBody* _fromPolygon101(_Slab* _0, bool _1) { return RigidBody::fromPolygon((std::vector<Vector>)*_0, _1); }
+	EMSCRIPTEN_KEEPALIVE RigidBody* _fromRect102(double _0, double _1, double _2, double _3, bool _4) { return RigidBody::fromRect(_0, _1, _2, _3, _4); }
+	EMSCRIPTEN_KEEPALIVE RigidBody* _fromCircle103(double _0, double _1, double _2, bool _3) { return RigidBody::fromCircle(_0, _1, _2, _3); }
+	EMSCRIPTEN_KEEPALIVE int _get_contactIterations104(PhysicsEngine* _0) { return _0->contactIterations; }
+	EMSCRIPTEN_KEEPALIVE void _set_contactIterations105(PhysicsEngine* _0, int _1) { _0->contactIterations = _1; }
+	EMSCRIPTEN_KEEPALIVE int _get_iterations106(PhysicsEngine* _0) { return _0->iterations; }
+	EMSCRIPTEN_KEEPALIVE void _set_iterations107(PhysicsEngine* _0, int _1) { _0->iterations = _1; }
+	EMSCRIPTEN_KEEPALIVE int _get_constraintIterations108(PhysicsEngine* _0) { return _0->constraintIterations; }
+	EMSCRIPTEN_KEEPALIVE void _set_constraintIterations109(PhysicsEngine* _0, int _1) { _0->constraintIterations = _1; }
+	EMSCRIPTEN_KEEPALIVE Vector* _get_gravity110(PhysicsEngine* _0) { return &_0->gravity; }
+	EMSCRIPTEN_KEEPALIVE void _set_gravity111(PhysicsEngine* _0, Vector* _1) { _0->gravity = *_1; }
+	EMSCRIPTEN_KEEPALIVE double _get_drag112(PhysicsEngine* _0) { return _0->drag; }
+	EMSCRIPTEN_KEEPALIVE void _set_drag113(PhysicsEngine* _0, double _1) { _0->drag = _1; }
+	EMSCRIPTEN_KEEPALIVE _Slab* _get_constraints114(PhysicsEngine* _0) { return new _Slab(_0->getConstraints()); }
+	EMSCRIPTEN_KEEPALIVE _Slab* _get_bodies115(PhysicsEngine* _0) { return new _Slab(_0->getBodies()); }
+	EMSCRIPTEN_KEEPALIVE int _get_size116() { return sizeof(PhysicsEngine); }
+	EMSCRIPTEN_KEEPALIVE PhysicsEngine* _create117(const Vector* _0) { return new PhysicsEngine(*_0); }
+	EMSCRIPTEN_KEEPALIVE void _delete118(PhysicsEngine* _0) { delete _0; }
+	EMSCRIPTEN_KEEPALIVE void _run119(PhysicsEngine* _0) { _0->run(); }
+	EMSCRIPTEN_KEEPALIVE void _addConstraint120(PhysicsEngine* _0, Constraint* _1) { _0->addConstraint(_1); }
+	EMSCRIPTEN_KEEPALIVE void _removeConstraint121(PhysicsEngine* _0, unsigned int _1) { _0->removeConstraint(_1); }
+	EMSCRIPTEN_KEEPALIVE bool _hasBody122(PhysicsEngine* _0, unsigned int _1) { return _0->hasBody(_1); }
+	EMSCRIPTEN_KEEPALIVE RigidBody* _getBody123(PhysicsEngine* _0, unsigned int _1) { return &_0->getBody(_1); }
+	EMSCRIPTEN_KEEPALIVE void _addBody124(PhysicsEngine* _0, RigidBody* _1) { _0->addBody(_1); }
+	EMSCRIPTEN_KEEPALIVE void _removeBody125(PhysicsEngine* _0, unsigned int _1) { _0->removeBody(_1); }
+	EMSCRIPTEN_KEEPALIVE double _get_length126(LengthConstraint2* _0) { return _0->length; }
+	EMSCRIPTEN_KEEPALIVE void _set_length127(LengthConstraint2* _0, double _1) { _0->length = _1; }
+	EMSCRIPTEN_KEEPALIVE int _get_size128() { return sizeof(LengthConstraint2); }
+	EMSCRIPTEN_KEEPALIVE LengthConstraint2* _create129(RigidBody* _0, RigidBody* _1, const Vector* _2, const Vector* _3, double _4) { return new LengthConstraint2(*_0, *_1, *_2, *_3, _4); }
+	EMSCRIPTEN_KEEPALIVE void _delete130(LengthConstraint2* _0) { delete _0; }
+	EMSCRIPTEN_KEEPALIVE int _get_size131() { return sizeof(PositionConstraint2); }
+	EMSCRIPTEN_KEEPALIVE PositionConstraint2* _create132(RigidBody* _0, RigidBody* _1, const Vector* _2, const Vector* _3) { return new PositionConstraint2(*_0, *_1, *_2, *_3); }
+	EMSCRIPTEN_KEEPALIVE void _delete133(PositionConstraint2* _0) { delete _0; }
+	EMSCRIPTEN_KEEPALIVE double _get_length134(LengthConstraint1* _0) { return _0->length; }
+	EMSCRIPTEN_KEEPALIVE void _set_length135(LengthConstraint1* _0, double _1) { _0->length = _1; }
+	EMSCRIPTEN_KEEPALIVE int _get_size136() { return sizeof(LengthConstraint1); }
+	EMSCRIPTEN_KEEPALIVE LengthConstraint1* _create137(RigidBody* _0, const Vector* _1, const Vector* _2, double _3) { return new LengthConstraint1(*_0, *_1, *_2, _3); }
+	EMSCRIPTEN_KEEPALIVE void _delete138(LengthConstraint1* _0) { delete _0; }
+	EMSCRIPTEN_KEEPALIVE int _get_size139() { return sizeof(PositionConstraint1); }
+	EMSCRIPTEN_KEEPALIVE PositionConstraint1* _create140(RigidBody* _0, const Vector* _1, const Vector* _2) { return new PositionConstraint1(*_0, *_1, *_2); }
+	EMSCRIPTEN_KEEPALIVE void _delete141(PositionConstraint1* _0) { delete _0; }
+	EMSCRIPTEN_KEEPALIVE int _get_length142(_Slab* _0) { return _0->length; }
+	EMSCRIPTEN_KEEPALIVE int _get_size143() { return sizeof(_Slab); }
+	EMSCRIPTEN_KEEPALIVE _Slab* _create144(int _0, int _1) { return new _Slab(_0, _1); }
+	EMSCRIPTEN_KEEPALIVE void _delete145(_Slab* _0) { delete _0; }
+	EMSCRIPTEN_KEEPALIVE void* _getPointer146(_Slab* _0, int _1) { return _0->getPointer(_1); }
+	EMSCRIPTEN_KEEPALIVE void _setPointer147(_Slab* _0, int _1, void* _2) { _0->setPointer(_1, _2); }
+	EMSCRIPTEN_KEEPALIVE void* _get148(_Slab* _0, int _1) { return _0->get(_1); }
 }

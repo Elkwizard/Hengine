@@ -144,81 +144,83 @@ HengineWASMResource.bindings["physics"] = (module, imports, exports) => {
 		set trivialCollisionFilter(_0) { return exports._set_trivialCollisionFilter86(this.pointer, !!_0); }
 		get trivialTriggerFilter() { return !!exports._get_trivialTriggerFilter87(this.pointer); }
 		set trivialTriggerFilter(_0) { return exports._set_trivialTriggerFilter88(this.pointer, !!_0); }
-		static get size() { return exports._get_size89(); }
-		static create(_0, _1, _2) { return exports._create90(_0, _1, !!_2); }
-		delete() { return exports._delete91(this.pointer); }
-		invalidateModels() { return exports._invalidateModels92(this.pointer); }
-		clearShapes() { return exports._clearShapes93(this.pointer); }
-		removeShape(_0) { return exports._removeShape94(this.pointer, _0); }
-		addShape(_0) { return exports._addShape95(this.pointer, _0); }
-		stop() { return exports._stop96(this.pointer); }
-		applyImpulse(_0, _1, _2) { return exports._applyImpulse97(this.pointer, _0.pointer, _1.pointer, _2); }
-		applyRelativeImpulse(_0, _1, _2) { return exports._applyRelativeImpulse98(this.pointer, _0.pointer, _1.pointer, _2); }
-		static fromPolygon(_0, _1) { return exports._fromPolygon99(_0.pointer, !!_1); }
-		static fromRect(_0, _1, _2, _3, _4) { return exports._fromRect100(_0, _1, _2, _3, !!_4); }
-		static fromCircle(_0, _1, _2, _3) { return exports._fromCircle101(_0, _1, _2, !!_3); }
+		get constraints() { return new module.Array(module.Constraint, cast(module._Slab, exports._get_constraints89(this.pointer)), true); }
+		set constraints(_0) { return exports._set_constraints90(this.pointer, _0.pointer); }
+		static get size() { return exports._get_size91(); }
+		static create(_0, _1, _2) { return exports._create92(_0, _1, !!_2); }
+		delete() { return exports._delete93(this.pointer); }
+		invalidateModels() { return exports._invalidateModels94(this.pointer); }
+		clearShapes() { return exports._clearShapes95(this.pointer); }
+		removeShape(_0) { return exports._removeShape96(this.pointer, _0); }
+		addShape(_0) { return exports._addShape97(this.pointer, _0); }
+		stop() { return exports._stop98(this.pointer); }
+		applyImpulse(_0, _1, _2) { return exports._applyImpulse99(this.pointer, _0.pointer, _1.pointer, _2); }
+		applyRelativeImpulse(_0, _1, _2) { return exports._applyRelativeImpulse100(this.pointer, _0.pointer, _1.pointer, _2); }
+		static fromPolygon(_0, _1) { return exports._fromPolygon101(_0.pointer, !!_1); }
+		static fromRect(_0, _1, _2, _3, _4) { return exports._fromRect102(_0, _1, _2, _3, !!_4); }
+		static fromCircle(_0, _1, _2, _3) { return exports._fromCircle103(_0, _1, _2, !!_3); }
 	};
 	
 	module.PhysicsEngine = class PhysicsEngine extends Binding {
-		get contactIterations() { return exports._get_contactIterations102(this.pointer); }
-		set contactIterations(_0) { return exports._set_contactIterations103(this.pointer, _0); }
-		get iterations() { return exports._get_iterations104(this.pointer); }
-		set iterations(_0) { return exports._set_iterations105(this.pointer, _0); }
-		get constraintIterations() { return exports._get_constraintIterations106(this.pointer); }
-		set constraintIterations(_0) { return exports._set_constraintIterations107(this.pointer, _0); }
-		get gravity() { return cast(module.Vector, exports._get_gravity108(this.pointer)); }
-		set gravity(_0) { return exports._set_gravity109(this.pointer, _0.pointer); }
-		get drag() { return exports._get_drag110(this.pointer); }
-		set drag(_0) { return exports._set_drag111(this.pointer, _0); }
-		get constraints() { return new module.Array(module.Constraint, cast(module._Slab, exports._get_constraints112(this.pointer)), true); }
-		get bodies() { return new module.Array(module.RigidBody, cast(module._Slab, exports._get_bodies113(this.pointer)), true); }
-		static get size() { return exports._get_size114(); }
-		static create(_0) { return exports._create115(_0.pointer); }
-		delete() { return exports._delete116(this.pointer); }
-		run() { return exports._run117(this.pointer); }
-		addConstraint(_0) { return exports._addConstraint118(this.pointer, _0); }
-		removeConstraint(_0) { return exports._removeConstraint119(this.pointer, _0); }
-		hasBody(_0) { return !!exports._hasBody120(this.pointer, _0); }
-		getBody(_0) { return cast(module.RigidBody, exports._getBody121(this.pointer, _0)); }
-		addBody(_0) { return exports._addBody122(this.pointer, _0); }
-		removeBody(_0) { return exports._removeBody123(this.pointer, _0); }
+		get contactIterations() { return exports._get_contactIterations104(this.pointer); }
+		set contactIterations(_0) { return exports._set_contactIterations105(this.pointer, _0); }
+		get iterations() { return exports._get_iterations106(this.pointer); }
+		set iterations(_0) { return exports._set_iterations107(this.pointer, _0); }
+		get constraintIterations() { return exports._get_constraintIterations108(this.pointer); }
+		set constraintIterations(_0) { return exports._set_constraintIterations109(this.pointer, _0); }
+		get gravity() { return cast(module.Vector, exports._get_gravity110(this.pointer)); }
+		set gravity(_0) { return exports._set_gravity111(this.pointer, _0.pointer); }
+		get drag() { return exports._get_drag112(this.pointer); }
+		set drag(_0) { return exports._set_drag113(this.pointer, _0); }
+		get constraints() { return new module.Array(module.Constraint, cast(module._Slab, exports._get_constraints114(this.pointer)), true); }
+		get bodies() { return new module.Array(module.RigidBody, cast(module._Slab, exports._get_bodies115(this.pointer)), true); }
+		static get size() { return exports._get_size116(); }
+		static create(_0) { return exports._create117(_0.pointer); }
+		delete() { return exports._delete118(this.pointer); }
+		run() { return exports._run119(this.pointer); }
+		addConstraint(_0) { return exports._addConstraint120(this.pointer, _0); }
+		removeConstraint(_0) { return exports._removeConstraint121(this.pointer, _0); }
+		hasBody(_0) { return !!exports._hasBody122(this.pointer, _0); }
+		getBody(_0) { return cast(module.RigidBody, exports._getBody123(this.pointer, _0)); }
+		addBody(_0) { return exports._addBody124(this.pointer, _0); }
+		removeBody(_0) { return exports._removeBody125(this.pointer, _0); }
 	};
 	
 	module.LengthConstraint2 = class LengthConstraint2 extends module.Constraint2 {
-		get length() { return exports._get_length124(this.pointer); }
-		set length(_0) { return exports._set_length125(this.pointer, _0); }
-		static get size() { return exports._get_size126(); }
-		static create(_0, _1, _2, _3, _4) { return exports._create127(_0.pointer, _1.pointer, _2.pointer, _3.pointer, _4); }
-		delete() { return exports._delete128(this.pointer); }
+		get length() { return exports._get_length126(this.pointer); }
+		set length(_0) { return exports._set_length127(this.pointer, _0); }
+		static get size() { return exports._get_size128(); }
+		static create(_0, _1, _2, _3, _4) { return exports._create129(_0.pointer, _1.pointer, _2.pointer, _3.pointer, _4); }
+		delete() { return exports._delete130(this.pointer); }
 	};
 	
 	module.PositionConstraint2 = class PositionConstraint2 extends module.Constraint2 {
-		static get size() { return exports._get_size129(); }
-		static create(_0, _1, _2, _3) { return exports._create130(_0.pointer, _1.pointer, _2.pointer, _3.pointer); }
-		delete() { return exports._delete131(this.pointer); }
+		static get size() { return exports._get_size131(); }
+		static create(_0, _1, _2, _3) { return exports._create132(_0.pointer, _1.pointer, _2.pointer, _3.pointer); }
+		delete() { return exports._delete133(this.pointer); }
 	};
 	
 	module.LengthConstraint1 = class LengthConstraint1 extends module.Constraint1 {
-		get length() { return exports._get_length132(this.pointer); }
-		set length(_0) { return exports._set_length133(this.pointer, _0); }
-		static get size() { return exports._get_size134(); }
-		static create(_0, _1, _2, _3) { return exports._create135(_0.pointer, _1.pointer, _2.pointer, _3); }
-		delete() { return exports._delete136(this.pointer); }
+		get length() { return exports._get_length134(this.pointer); }
+		set length(_0) { return exports._set_length135(this.pointer, _0); }
+		static get size() { return exports._get_size136(); }
+		static create(_0, _1, _2, _3) { return exports._create137(_0.pointer, _1.pointer, _2.pointer, _3); }
+		delete() { return exports._delete138(this.pointer); }
 	};
 	
 	module.PositionConstraint1 = class PositionConstraint1 extends module.Constraint1 {
-		static get size() { return exports._get_size137(); }
-		static create(_0, _1, _2) { return exports._create138(_0.pointer, _1.pointer, _2.pointer); }
-		delete() { return exports._delete139(this.pointer); }
+		static get size() { return exports._get_size139(); }
+		static create(_0, _1, _2) { return exports._create140(_0.pointer, _1.pointer, _2.pointer); }
+		delete() { return exports._delete141(this.pointer); }
 	};
 	
 	module._Slab = class _Slab extends Binding {
-		get length() { return exports._get_length140(this.pointer); }
-		static get size() { return exports._get_size141(); }
-		static create(_0, _1) { return exports._create142(_0, _1); }
-		delete() { return exports._delete143(this.pointer); }
-		getPointer(_0) { return exports._getPointer144(this.pointer, _0); }
-		setPointer(_0, _1) { return exports._setPointer145(this.pointer, _0, _1); }
-		get(_0) { return exports._get146(this.pointer, _0); }
+		get length() { return exports._get_length142(this.pointer); }
+		static get size() { return exports._get_size143(); }
+		static create(_0, _1) { return exports._create144(_0, _1); }
+		delete() { return exports._delete145(this.pointer); }
+		getPointer(_0) { return exports._getPointer146(this.pointer, _0); }
+		setPointer(_0, _1) { return exports._setPointer147(this.pointer, _0, _1); }
+		get(_0) { return exports._get148(this.pointer, _0); }
 	};
 };
