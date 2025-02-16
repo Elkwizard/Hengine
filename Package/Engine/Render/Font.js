@@ -31,7 +31,7 @@ class Font {
 		this.italic = italic;
 		this.lineHeight = this.size;
 		this.refont();
-		this.tabReplacement = "    ";
+		this.tabSize = 4;
 		this.memorizedWidths = {};
 	}
 	set family(a) {
@@ -137,7 +137,7 @@ class Font {
 	 * Returns the width and height of a string of text, optionally after being packed into a fixed max width.
 	 * The return value contains `.width` and `.height` properties, both of which are Numbers.
 	 * @param String text | The text to be measured
-	 * @param Number maxWidth? | The maximum allowed width of a single line, default is Infinity
+	 * @param Number maxWidth? | The maximum allowed width of a single line before wrapping occurs. Default is Infinity
 	 * @return { width: Number, height: Number }
 	 */
 	getTextBounds(str, pack) {
@@ -149,41 +149,32 @@ class Font {
 		return { width, height };
 	}
 	/**
-	 * Returns the width of a single line of text. This method is faster than `.getTextWidth()`.
-	 * @param String textLine | A single-line string of text to measure 
-	 * @return Number
-	 */
-	getTextLineWidth(str) {
-		str = this.processString(str);
-		return this.getWidthCRC2D(str);
-	}
-	/**
-	 * Returns the height of a single line of text. This method is faster than `.getTextHeight()`.
-	 * @param String textLine | A single-line string of text to measure
-	 * @return Number
-	 */
-	getTextLineHeight(str) {
-		return this.lineHeight;
-	}
-	/**
 	 * Returns the width of a string of text.
 	 * @param String text | The text to measure 
 	 * @return Number
 	 */
 	getTextWidth(str) {
 		str = this.processString(str);
-		let spl = str.split("\n");
-		return Math.max(...spl.map(l => this.getWidthCRC2D(l)));
+		if (str.includes("\n")) {
+			const lines = str.split("\n");
+			return Math.max(...lines.map(l => this.getWidthCRC2D(l)));
+		}
+
+		return this.getWidthCRC2D(str);
 	}
 	/**
 	 * Returns the height of a string of text.
-	 * @param String text | The text to measure 
+	 * @param String text | The text to measure
+	 * @param Number packWidth? | The maximum allowed width of a single line before wrapping occurs. Default is Infinity
 	 * @return Number
 	 */
-	getTextHeight(str, pack) {
-		str = this.processString(str);
-		if (pack) str = this.packText(str, pack);
-		const innerLines = (str.split("\n").length - 1);
+	getTextHeight(str, pack = false) {
+		let innerLines = 0;
+		if (str.includes("\n") || pack) {
+			str = this.processString(str);
+			if (pack) str = this.packText(str, pack);
+			innerLines = str.split("\n").length - 1;
+		}
 		return this.boundingAscent + this.boundingDescent + innerLines * this.lineHeight;
 	}
 	/**

@@ -45,13 +45,13 @@ vec4 shader() {
 			let bounds = font.getTextBounds(text);
 			const position = pos.plus(l.renderTextOffset);
 			// renderer.stroke(Color.BLUE).rect(pos.plus(l.renderTextOffset).x, pos.plus(l.renderTextOffset).y, bounds.width, bounds.height);
-			renderer.draw(color).textLine(font, text, position);
+			renderer.draw(color).text(font, text, position);
 		}
 	}
 	l.renderTextOffset = new Vector2(50, 0);
 	l.renderText = (text, font, pos, getLoc, lineIndex) => {
-		//renderer.draw(Color.LIGHT_GRAY).textLine(font, text, pos.plus(l.renderTextOffset)); 
-		renderer.draw(Color.WHITE).textLine(font, lineIndex + 1, pos);
+		//renderer.draw(Color.LIGHT_GRAY).text(font, text, pos.plus(l.renderTextOffset)); 
+		renderer.draw(Color.WHITE).text(font, lineIndex + 1, pos);
 		let startTabs = text.match(/^\t+/g);
 		if (startTabs) {
 			startTabs = startTabs[0].length;
@@ -101,9 +101,9 @@ vec4 shader() {
 		}
 		shader.setUniforms(args);
 		renderer.image(shader).rect(0, 0, width / 2, height);
-		if (error) renderer.draw(Color.RED).textLine(Font.Monospace20, error, 10, 10);
+		if (error) renderer.draw(Color.RED).text(Font.Monospace20, error, 10, 10);
 		renderer.textMode = TextMode.BOTTOM_LEFT;
-		renderer.draw(Color.RED).textLine(Font.Monospace40, hengine.intervals.fps, 10, height - 10);
+		renderer.draw(Color.RED).text(Font.Monospace40, hengine.intervals.fps, 10, height - 10);
 		renderer.textMode = TextMode.TOP_LEFT;
 	}, IntervalFunction.UPDATE);
 </script>

@@ -160,15 +160,15 @@ class TEXT_AREA extends ElementScript {
 	}
 	getCharacterHitbox(obj, index) {
 		let cursorPos = this.getTextLocation(index);
-		let box = new Rect(cursorPos.x, cursorPos.y, this.font.getTextLineWidth(this.value[index]), this.font.lineHeight);
+		let box = new Rect(cursorPos.x, cursorPos.y, this.font.getTextWidth(this.value[index]), this.font.lineHeight);
 		return box;
 	}
 	getTextLocation(obj, index) {
 		let value = this.value.slice(0, index);
 		let lines = value.split("\n");
-		let y = lines.length * this.font.lineHeight;
+		let y = (lines.length - 0.5) * this.font.lineHeight + (this.font.boundingAscent + this.font.boundingDescent) / 2;
 		let line = lines[lines.length - 1];
-		let x = this.font.getTextLineWidth(line);
+		let x = this.font.getTextWidth(line);
 		let pos = new Vector2(x + this.relativeTextViewBox.x, y + this.relativeTextViewBox.y - this.font.lineHeight);
 		return pos;
 	}
@@ -176,7 +176,7 @@ class TEXT_AREA extends ElementScript {
 		let y = this.font.lineHeight * (row + 1);
 		let lines = this.value.split("\n");
 		let line = lines[row].slice(0, column);
-		let x = this.font.getTextLineWidth(line);
+		let x = this.font.getTextWidth(line);
 		let pos = new Vector2(x + this.relativeTextViewBox.x, y + this.relativeTextViewBox.y - this.font.lineHeight);
 		return pos;
 	}
@@ -550,7 +550,6 @@ class TEXT_AREA extends ElementScript {
 
 				let highlight = this.highlightColor;
 				let dy = (endBox.y - startBox.y) / this.font.lineHeight;
-
 
 				if (dy) {
 					const highlightWidth = Math.max(this.relativeTextBoundingBox.width, this.relativeTextViewBox.width);

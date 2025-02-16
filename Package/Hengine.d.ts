@@ -3891,19 +3891,9 @@ declare class Font implements Copyable {
 	 * Returns the width and height of a string of text, optionally after being packed into a fixed max width.
 	 * The return value contains `.width` and `.height` properties, both of which are Numbers.
 	 * @param text - The text to be measured
-	 * @param maxWidth - The maximum allowed width of a single line, default is Infinity
+	 * @param maxWidth - The maximum allowed width of a single line before wrapping occurs. Default is Infinity
 	 */
 	getTextBounds(text: string, maxWidth?: number): { width: number, height: number };
-	/**
-	 * Returns the width of a single line of text. This method is faster than `.getTextWidth()`.
-	 * @param textLine - A single-line string of text to measure
-	 */
-	getTextLineWidth(textLine: string): number;
-	/**
-	 * Returns the height of a single line of text. This method is faster than `.getTextHeight()`.
-	 * @param textLine - A single-line string of text to measure
-	 */
-	getTextLineHeight(textLine: string): number;
 	/**
 	 * Returns the width of a string of text.
 	 * @param text - The text to measure
@@ -3912,8 +3902,9 @@ declare class Font implements Copyable {
 	/**
 	 * Returns the height of a string of text.
 	 * @param text - The text to measure
+	 * @param packWidth - The maximum allowed width of a single line before wrapping occurs. Default is Infinity
 	 */
-	getTextHeight(text: string): number;
+	getTextHeight(text: string, packWidth?: number): number;
 	/**
 	 * Converts the Font to a valid CSS font string.
 	 */
@@ -4750,7 +4741,7 @@ declare class PathRenderer {
 	 * Creates a path in the shape of a sequence of characters.
 	 * @param font - The font to use in rendering the text
 	 * @param text - The text to render
-	 * @param origin - The location of the text's origin. How this is interpreted depends on the current text-alignment mode.
+	 * @param origin - The location of the text's origin. How this is interpreted depends on the current text-alignment mode
 	 * @param packWidth - The maximum allowed width of a single line of the text. Specifying this parameter will cause the newlines to be added to enforce this requirement. If this parameter is not specified, the text will not be packed
 	 */
 	text(font: Font, text: string, origin: Vector2, packWidth?: number): void;
@@ -4758,9 +4749,9 @@ declare class PathRenderer {
 	 * Creates a path in the shape of a sequence of characters.
 	 * @param font - The font to use in rendering the text
 	 * @param text - The text to render
-	 * @param x - The x coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
-	 * @param y - The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode.
-	 * @param packWidth - The maximum allowed width of a single line of the text. Not specifying this will prevent packing
+	 * @param x - The x coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode
+	 * @param y - The y coordinate of the text's origin. How this is interpreted depends on the current text-alignment mode
+	 * @param packWidth - The maximum allowed width of a single line of the text. Specifying this parameter will cause the newlines to be added to enforce this requirement. If this parameter is not specified, the text will not be packed
 	 */
 	text(font: Font, text: string, x: number, y: number, packWidth?: number): void;
 	/**

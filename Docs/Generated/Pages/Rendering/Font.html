@@ -201,61 +201,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The maximum allowed width of a single line, default is Infinity
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Font.prototype.getTextLineWidth()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L156" target="_blank" class="function-name source-link">getTextLineWidth</a>(<span class="param">textLine</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-			</div>
-			<div class="function desc">
-				Returns the width of a single line of text. This method is faster than <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getTextWidth</span><span class="highlight-SYMBOL">()</span></code>.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Font.prototype.getTextLineWidth():textLine">
-							<div class="param-name">
-								<span class="param">textLine</span>
-								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
-							</div>
-							<div class="param desc">
-								A single-line string of text to measure
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Font.prototype.getTextLineHeight()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L165" target="_blank" class="function-name source-link">getTextLineHeight</a>(<span class="param">textLine</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-			</div>
-			<div class="function desc">
-				Returns the height of a single line of text. This method is faster than <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getTextHeight</span><span class="highlight-SYMBOL">()</span></code>.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Font.prototype.getTextLineHeight():textLine">
-							<div class="param-name">
-								<span class="param">textLine</span>
-								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
-							</div>
-							<div class="param desc">
-								A single-line string of text to measure
+								The maximum allowed width of a single line before wrapping occurs. Default is Infinity
 							</div>
 						</div>
 					
@@ -266,7 +212,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 	
 		<div class="function-wrapper" id="Font.prototype.getTextWidth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L173" target="_blank" class="function-name source-link">getTextWidth</a>(<span class="param">text</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L156" target="_blank" class="function-name source-link">getTextWidth</a>(<span class="param">text</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the width of a string of text.
@@ -293,7 +239,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 	
 		<div class="function-wrapper" id="Font.prototype.getTextHeight()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L183" target="_blank" class="function-name source-link">getTextHeight</a>(<span class="param">text</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L171" target="_blank" class="function-name source-link">getTextHeight</a>(<span class="param">text</span>, <span class="param">packWidth?</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the height of a string of text.
@@ -313,6 +259,16 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 							</div>
 						</div>
 					
+						<div class="param-wrapper" id="Font.prototype.getTextHeight():packWidth?">
+							<div class="param-name">
+								<span class="param">packWidth</span>
+								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The maximum allowed width of a single line before wrapping occurs. Default is Infinity
+							</div>
+						</div>
+					
 		
 				</div>
 			
@@ -320,7 +276,7 @@ The return value contains <code class=" highlight-BACKGROUND"><span class="highl
 	
 		<div class="function-wrapper" id="Font.prototype.toString()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L193" target="_blank" class="function-name source-link">toString</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Font.js?#L184" target="_blank" class="function-name source-link">toString</a>()<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Converts the Font to a valid CSS font string.
