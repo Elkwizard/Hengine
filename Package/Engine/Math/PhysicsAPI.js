@@ -1,7 +1,7 @@
 function physicsAPICollideShapes(a, b) {
     a = a.toPhysicsShape();
 	b = b.toPhysicsShape();
-	const result = physics.CollisionDetector.collide(a, b);
+	const result = physics.collide(a, b);
 	a.delete();
 	b.delete();
 	return result;
