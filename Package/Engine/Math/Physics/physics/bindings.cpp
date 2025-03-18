@@ -40,7 +40,7 @@ extern "C" {
 	bool collideRule(const RigidBody& _0, const RigidBody& _1) { return _collideRule4(&_0, &_1); }
 	EMSCRIPTEN_KEEPALIVE bool _triggerRule5(const RigidBody* _0, const RigidBody* _1);
 	bool triggerRule(const RigidBody& _0, const RigidBody& _1) { return _triggerRule5(&_0, &_1); }
-	EMSCRIPTEN_KEEPALIVE bool _collide6(Collider* _0, Collider* _1) { return collide(_0, _1); }
+	EMSCRIPTEN_KEEPALIVE bool _collide6(Collider* _0, Collider* _1) { return collide(*_0, *_1); }
 	EMSCRIPTEN_KEEPALIVE void _onCollide7(PhysicsEngine* _0, RigidBody* _1, RigidBody* _2, const Vector* _3, _Slab* _4, bool _5, bool _6);
 	void onCollide(PhysicsEngine& _0, RigidBody& _1, RigidBody& _2, const Vector& _3, const std::vector<Vector>& _4, bool _5, bool _6) { _onCollide7(&_0, &_1, &_2, &_3, new _Slab(_4), _5, _6); }
 	EMSCRIPTEN_KEEPALIVE double _get_x8(Vector* _0) { return _0->x; }

@@ -291,6 +291,6 @@ CollisionDetector::JumpTable CollisionDetector::jumpTable {
     } }
 };
 
-API bool collide(Collider* a, Collider* b) {
-	return (bool)CollisionDetector::collide(a, { }, 1.0, 0.0, b, { }, 1.0, 0.0);
+API bool collide(Collider& a, Collider& b) {
+	return (bool)CollisionDetector::collide(&a, { }, 1.0, 0.0, &b, { }, 1.0, 0.0);
 }

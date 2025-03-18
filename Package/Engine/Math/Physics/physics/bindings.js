@@ -73,7 +73,7 @@ HengineWASMResource.bindings["physics"] = (module, imports, exports) => {
 			imports._triggerRule5 = (_0, _1) => !!fn(cast(module.RigidBody, _0), cast(module.RigidBody, _1))
 		}
 	});
-	module.collide = function collide(_0, _1) { return !!exports._collide6(_0, _1); };
+	module.collide = function collide(_0, _1) { return !!exports._collide6(_0.pointer, _1.pointer); };
 	Object.defineProperty(module, "onCollide", {
 		set: fn => {
 			imports._onCollide7 = (_0, _1, _2, _3, _4, _5, _6) => fn(cast(module.PhysicsEngine, _0), cast(module.RigidBody, _1), cast(module.RigidBody, _2), cast(module.Vector, _3), new module.Array(module.Vector, cast(module._Slab, _4), false), !!_5, !!_6)
