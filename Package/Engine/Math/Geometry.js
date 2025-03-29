@@ -679,13 +679,13 @@ class Geometry {
 		for (let i = 0; i < list.length; i++) {
 			const a = list[i];
 			const dotA = a.dot(normal);
-			const remA = dotA <= distance;
+			const remA = dotA > distance;
 
-			remain ||= dotA <= distance;
+			remain ||= remA;
 			
 			const b = list[(i + 1) % list.length];
 			const dotB = b.dot(normal);
-			const remB = dotB <= distance;
+			const remB = dotB > distance;
 
 			if (remA !== remB) {
 				const vec = b.minus(a);
@@ -696,9 +696,9 @@ class Geometry {
 			}
 		}
 
-		distance += Geometry.EPSILON;
+		distance -= Geometry.EPSILON;
 		for (let i = 0; i < list.length; i++)
-			if (list[i].dot(normal) > distance)
+			if (list[i].dot(normal) <= distance)
 				list.splice(i--, 1);
 
 		return remain ? list : null;
