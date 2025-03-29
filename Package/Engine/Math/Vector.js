@@ -35,8 +35,7 @@ class Vector extends Operable {
 	 * @return Vector
 	 */
 	normalize() {
-		const { mag } = this;
-		return this.div(mag || 1);
+		return this.div(this.mag || 1);
 	}
 	/**
 	 * Computes the dot product between the caller and another vector.
@@ -219,11 +218,9 @@ class Vector2 extends Vector {
 		this.y = y;
 	}
 	set angle(angle) {
-		const M = this.mag;
-		if (M) {
-			this.x = Math.cos(angle) * M;
-			this.y = Math.sin(angle) * M;
-		}
+		const { mag } = this;
+		this.x = Math.cos(angle) * mag;
+		this.y = Math.sin(angle) * mag;
 	}
 	get angle() {
 		return Math.atan2(this.y, this.x);
@@ -296,8 +293,8 @@ class Vector2 extends Vector {
 	 * @return Vector2
 	 */
 	rotated(angle) {
-		let cos = Math.cos(angle);
-		let sin = Math.sin(angle);
+		const cos = Math.cos(angle);
+		const sin = Math.sin(angle);
 		return new Vector2(this.x * cos - this.y * sin, this.x * sin + this.y * cos);
 	}
 	dot(v) {
@@ -312,10 +309,10 @@ class Vector2 extends Vector {
 		return this.x * v.y - this.y * v.x;
 	}
 	projectOnto(v, result) {
-		let u = this;
-		let dot = u.x * v.x + u.y * v.y;
-		let mag2 = v.x ** 2 + v.y ** 2;
-		let k = dot / mag2;
+		const u = this;
+		const dot = u.x * v.x + u.y * v.y;
+		const mag2 = v.x ** 2 + v.y ** 2;
+		const k = dot / mag2;
 		return v.times(k, result);
 	}
 	normalize() {
