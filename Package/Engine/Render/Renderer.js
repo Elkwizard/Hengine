@@ -289,9 +289,9 @@ Artist2D.Dispatcher = class {
 	infer(shape) {
 		if (shape.radius !== undefined) this.circle(shape);
 		else if (shape.width !== undefined) this.rect(shape);
-		else if (shape.vertices || shape.length !== undefined) this.shape(shape);
 		else if (shape.c !== undefined) this.spline(shape);
 		else if (shape.a !== undefined) this.line(shape);
+		else if (shape.vertices || shape.length !== undefined) this.shape(shape);
 	}
 }
 
