@@ -662,7 +662,7 @@ class GLSLProgram {
 				let setFunctionName = "uniform";
 				if (matrix) {
 					setFunctionName += "Matrix";
-					if (rows !== columns) setFunctionName += rows + "x" + columns;
+					if (rows !== columns) setFunctionName += columns + "x" + rows;
 					else setFunctionName += rows;
 				} else setFunctionName += rows;
 
@@ -984,6 +984,13 @@ class GLSLProgram {
 			case gl.FLOAT_MAT2: rows = 2; columns = 2; break;
 			case gl.FLOAT_MAT3: rows = 3; columns = 3; break;
 			case gl.FLOAT_MAT4: rows = 4; columns = 4; break;
+			
+			case gl.FLOAT_MAT2x3: rows = 3; columns = 2; break;
+			case gl.FLOAT_MAT2x4: rows = 4; columns = 2; break;
+			case gl.FLOAT_MAT3x2: rows = 2; columns = 3; break;
+			case gl.FLOAT_MAT3x4: rows = 4; columns = 3; break;
+			case gl.FLOAT_MAT4x2: rows = 2; columns = 4; break;
+			case gl.FLOAT_MAT4x3: rows = 3; columns = 4; break;
 
 			case gl.SAMPLER_2D: integer = true; texture = "image"; break;
 			case gl.INT_SAMPLER_2D: integer = true; texture = "image"; break;
@@ -996,13 +1003,6 @@ class GLSLProgram {
 			case gl.UNSIGNED_INT_VEC2: integer = true; rows = 2; signed = false; break;
 			case gl.UNSIGNED_INT_VEC3: integer = true; rows = 3; signed = false; break;
 			case gl.UNSIGNED_INT_VEC4: integer = true; rows = 4; signed = false; break;
-
-			case gl.FLOAT_MAT2x3: rows = 2; columns = 3; break;
-			case gl.FLOAT_MAT2x4: rows = 2; columns = 4; break;
-			case gl.FLOAT_MAT3x2: rows = 3; columns = 2; break;
-			case gl.FLOAT_MAT3x4: rows = 3; columns = 4; break;
-			case gl.FLOAT_MAT4x2: rows = 4; columns = 2; break;
-			case gl.FLOAT_MAT4x3: rows = 4; columns = 3; break;
 		}
 
 		return { integer, signed, rows, columns, texture, dynamicArray };
