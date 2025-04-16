@@ -449,6 +449,23 @@ Object.defineProperty(window, "title", {
 			this.slice(inx + char.length)
 		];
 	});
+	/**
+	 * @name download
+	 * Downloads the contents of the string as a `.txt` file.
+	 * Returns a promise that resolves when the file downloads.
+	 * @param String name? | The base name of the file to download. The resulting file with be named by this argument, followed by the extension argument. Default is "string"
+	 * @param String extension? | The extension for the downloaded file. Default is "txt"
+	 * @return Promise<void>
+	 */
+	proto(String.prototype, "download", function (name = "string", ext = "txt") {
+		const a = document.createElement("a");
+		a.download = `${name}.${ext}`;
+		a.href = "data:text/plain;charset=UTF-8," + encodeURIComponent(this);
+		return new Promise(resolve => {
+			a.addEventListener("click", () => resolve());
+			a.click();
+		});
+	});
 	proto(String.prototype, "trimIndentation", function () {
 		const lines = this.split("\n");
 		const indent = Math.min(

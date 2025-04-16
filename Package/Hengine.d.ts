@@ -3106,6 +3106,13 @@ declare interface String extends Serializable {
 	 */
 	cut(boundary: string): string[];
 	/**
+	 * Downloads the contents of the string as a `.txt` file.
+	 * Returns a promise that resolves when the file downloads.
+	 * @param name - The base name of the file to download. The resulting file with be named by this argument, followed by the extension argument. Default is "string"
+	 * @param extension - The extension for the downloaded file. Default is "txt"
+	 */
+	download(name?: string, extension?: string): Promise<void>;
+	/**
 	 * Returns the caller with each line indented by a single tab character.
 	 */
 	indent(): string;
