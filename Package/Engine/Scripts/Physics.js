@@ -1,30 +1,26 @@
-physics.onCollide = (engine, a, b, direction, contacts, triggerA, triggerB) => {
+Physics.onCollide = (a, b, direction, contacts, triggerA, triggerB) => {
 	a = PHYSICS.bodyToSceneObject.get(a.pointer);
 	const { scene } = a.engine;
 	if (!scene.collisionEvents) return;
 	
 	b = PHYSICS.bodyToSceneObject.get(b.pointer);
-	direction = Vector2.fromPhysicsVector(direction);
-	
-	const jsContacts = new Array(contacts.length);
-	for (let i = 0; i < jsContacts.length; i++) {
-		const physVec = contacts.get(i);
-		jsContacts[i] = new Vector2(physVec.x, physVec.y);
-	}
 
-	scene.handleCollisionEvent(a, b, direction, jsContacts, triggerA, triggerB);
+	scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
 };
 
-physics.collideRule = (a, b) => {
-	a = PHYSICS.bodyToSceneObject.get(a.pointer);
-	b = PHYSICS.bodyToSceneObject.get(b.pointer);
-	return a.scripts.PHYSICS.collisionFilter(b);
+Physics.symmetricCollisionRule = (a, b) => {
+	const { bodyToSceneObject } = PHYSICS;
+	a = bodyToSceneObject.get(a.pointer);
+	b = bodyToSceneObject.get(b.pointer);
+	return	a.scripts.PHYSICS.collideBasedOnRule(b) &&
+			b.scripts.PHYSICS.collideBasedOnRule(a);
 };
 
-physics.triggerRule = (a, b) => {
-	a = PHYSICS.bodyToSceneObject.get(a.pointer);
-	b = PHYSICS.bodyToSceneObject.get(b.pointer);
-	return a.scripts.PHYSICS.triggerFilter(b);
+Physics.asymmetricTriggerRule = (a, b) => {
+	const { bodyToSceneObject } = PHYSICS;
+	a = bodyToSceneObject.get(a.pointer);
+	b = bodyToSceneObject.get(b.pointer);
+	return a.scripts.PHYSICS.triggerBasedOnRule(b);
 };
 
 /**
@@ -51,20 +47,14 @@ class PHYSICS extends ElementScript {
 	 * Adds rigidbody physics to an object.
 	 * @param Boolean mobile | Whether the object should be able to move/rotate 
 	 */
-	init(obj, gravity) {
+	init(obj, mobile) {
 		this.engine = obj.container.engine;
 		this.scene = this.engine.scene;
 		this.physicsEngine = this.scene.physicsEngine;
 		
-		this.body = new physics.RigidBody(
-			obj.transform.position.x, obj.transform.position.y, gravity
-		);
+		this.body = new Physics.RigidBody(mobile).solidify();
+		
 		PHYSICS.bodyToSceneObject.set(this.body.pointer, obj);
-		
-		// collision rules
-        this.collisionFilter = body => this.collideBasedOnRule(body);
-		
-		this.triggerFilter = body => this.triggerBasedOnRule(body);
 
 		// monitors
         this.colliding = new CollisionMonitor();
@@ -75,9 +65,10 @@ class PHYSICS extends ElementScript {
 		const { body } = this;
 		
 		// links/shortcuts
-		this._velocity = new Vector2();
-		this._velocity.proxy(body.velocity);
-
+		this._velocity = VectorN.physicsProxy(body.velocity.linear);
+		if (IS_3D)
+			this._angularVelocity = VectorN.physicsProxy(body.velocity.orientation.rotation);
+		
 		objectUtils.shortcut(this, body, "simulated");
 		objectUtils.shortcut(this, body, "isTrigger");
 		objectUtils.shortcut(this, body, "canCollide");
@@ -85,21 +76,23 @@ class PHYSICS extends ElementScript {
 		objectUtils.shortcut(this, body, "gravity");
 		objectUtils.shortcut(this, body, "friction");
 		objectUtils.shortcut(this, body, "density");
-		objectUtils.shortcut(this, body, "airResistance");
+		objectUtils.shortcut(this, body, "airResistance", "drag");
 
 		this.synchronized = false;
+		
+		this.beforePhysics();
 
 		obj.sync(() => {
 			// update things that should have already been done
-			if (obj.scripts.implements("collideRule"))
-				body.trivialCollisionFilter = false;
 			if (obj.scripts.implements("triggerRule"))
-				body.trivialTriggerFilter = false;
+				body.trivialTriggerRule = false;
+			if (obj.scripts.implements("collideRule"))
+				body.trivialCollisionRule = false;
 		
 			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
 
-			this.physicsEngine.addBody(this.body.pointer);
-			
+			this.physicsEngine.addBody(body);
+
 			this.synchronized = true;
 			
 			if (this._mass !== undefined)
@@ -111,7 +104,7 @@ class PHYSICS extends ElementScript {
 	 * @return Constraint[]
 	 */
 	get constraints() {
-		const physicsConstraints = this.body.constraints;
+		const physicsConstraints = this.physicsEngine.getBodyConstraints(this.body);
 		const constraints = [];
 		for (let i = 0; i < physicsConstraints.length; i++)
 			constraints.push(Constraint.fromPhysicsConstraint(
@@ -123,20 +116,27 @@ class PHYSICS extends ElementScript {
 		return constraints;
 	}
 	set velocity(a) {
-		this.body.velocity.set(a.x, a.y);
+		a.toPhysicsVector(this.body.velocity.linear);
 	}
 	get velocity() {
 		return this._velocity;
 	}
 	set angularVelocity(a) {
-		this.body.angularVelocity = a;
+		if (IS_3D) {
+			a.toPhysicsVector(this.body.velocity.orientation.rotation);
+		} else {
+			this.body.velocity.orientation.rotation = a;
+		}
 	}
 	get angularVelocity() {
-		return this.body.angularVelocity;
+		if (IS_3D) {
+			return this._angularVelocity;
+		} else {
+			return this.body.velocity.orientation.rotation;
+		}
 	}
 	set mobile(a) {
-		const { body } = this;
-        body.dynamic = !!a;
+        this.body.dynamic = !!a;
 	}
 	get mobile() {
 		return this.body.dynamic;
@@ -144,10 +144,10 @@ class PHYSICS extends ElementScript {
 	set mass(a) {
 		if (this.synchronized) {
 			const { body } = this;
-			const scale = a / body.mass;
-			body.mass *= scale;
-			body.inertia *= scale;
-		} else this._mass = a;
+			body.density *= a / body.mass;
+		} else {
+			this._mass = a;
+		}
 	}
 	get mass() {
 		return this.synchronized ? this.body.mass : this._mass;
@@ -158,7 +158,9 @@ class PHYSICS extends ElementScript {
 	 * @return Number/null
 	 */
 	get inertia() {
-		return this.synchronized ? this.body.inertia : null;
+		if (!this.synchronized) return null;
+		if (IS_3D) return Matrix3.fromPhysicsMatrix(this.body.inertia);
+		return this.body.inertia;
 	}
 	set snuzzlement(a) {
 		this.body.restitution = 1 - a;
@@ -171,27 +173,28 @@ class PHYSICS extends ElementScript {
         const physicsShapes = [];
 		for (let i = 0; i < convex.length; i++) {
 			const physicsShape = convex[i].toPhysicsShape();
-			this.body.addShape(physicsShape.pointer);
+			this.body.addShape(physicsShape);
 			physicsShapes.push(physicsShape);
 		}
 		this.physicsShapes.set(shape, physicsShapes);
 	}
 	removeShape(obj, name, shape) {
-        const physics = this.physicsShapes.get(shape);
-		for (let i = 0; i < physics.length; i++) this.body.removeShape(physics[i].pointer);
+        const physicsShapes = this.physicsShapes.get(shape);
+		for (let i = 0; i < physicsShapes.length; i++)
+			this.body.removeShape(physicsShapes[i]);
 		this.physicsShapes.delete(shape);
 		return shape;
 	}
 	cleanUp(obj) {
 		this.cleanedUp = true;
 		PHYSICS.bodyToSceneObject.delete(this.body.pointer);
-		this.physicsEngine.removeBody(this.body.id);
+		this.physicsEngine.removeBody(this.body);
 	}
 	addScript(obj, script) {
 		if (script.implements("collideRule"))
-			this.body.trivialCollisionFilter = false;
+			this.body.trivialCollisionRule = false;
 		if (script.implements("triggerRule"))
-			this.body.trivialTriggerFilter = false;
+			this.body.trivialTriggerRule = false;
 	}
 	beforePhysics(obj) {
 		// clear collisions
@@ -202,19 +205,24 @@ class PHYSICS extends ElementScript {
 		this.colliding.clear();
 
 		// sync position
-		const { position, rotation } = obj.transform;
-        this.body.position.set(position.x, position.y);
-        this.body.angle = rotation;
-        
-		if (obj.transform.diff(obj.lastTransform))
-			this.body.invalidateModels();
+		const { linear, orientation } = this.body.position;
+		obj.transform.position.toPhysicsVector(linear);
+		if (IS_3D) {
+			obj.transform.rotation.toPhysicsVector(orientation.rotation);
+		} else {
+			orientation.rotation = obj.transform.rotation;
+		}
 	}
 	afterPhysics(obj) {
 		const { position } = obj.transform;
-		const { x, y } = this.body.position;
-        position.x = x;
-        position.y = y;
-        obj.transform.rotation = this.body.angle;
+
+		const { linear, orientation } = this.body.position;
+		VectorN.fromPhysicsVector(linear, position);
+		if (IS_3D) {
+			VectorN.fromPhysicsVector(orientation.rotation, obj.transform.rotation);
+		} else {
+			obj.transform.rotation = orientation.rotation;
+		}
         obj.updateCaches();
 
 		if (this.scene.collisionEvents) {
@@ -248,7 +256,7 @@ class PHYSICS extends ElementScript {
 	applyImpulse(obj, point, force) {
 		const pointPhysics = point.toPhysicsVector();
 		const forcePhysics = force.toPhysicsVector();
-		this.body.applyImpulse(pointPhysics, forcePhysics, 1);
+		this.body.applyImpulse(pointPhysics, forcePhysics);
 		pointPhysics.delete();
 		forcePhysics.delete();
 	}
@@ -265,7 +273,8 @@ class PHYSICS extends ElementScript {
 	 * Stops the object in place. It remains mobile, though it loses all velocity.
 	 */
 	stop(obj) {
-		this.body.stop();
+		this.velocity = this.velocity.times(0);
+		this.angularVelocity = this.angularVelocity.times(0);
 	}
 	collideBasedOnRule(obj, element) {
 		return obj.scripts.check(true, "collideRule", element);

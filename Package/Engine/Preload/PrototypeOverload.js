@@ -28,10 +28,10 @@ const objectUtils = {
 		}
 		return template;
 	},
-	shortcut(objectA, objectB, key) {
-		Object.defineProperty(objectA, key, {
-			set: a => objectB[key] = a,
-			get: () => objectB[key]
+	shortcut(objectA, objectB, keyA, keyB = keyA) {
+		Object.defineProperty(objectA, keyA, {
+			set: a => objectB[keyB] = a,
+			get: () => objectB[keyB]
 		});
 	},
 	inherit(child, parent, include) {
@@ -579,8 +579,7 @@ Object.defineProperty(window, "title", {
 			
 			for (let i = 0; i < sizes.length; i++) {
 				const size = sizes[i];
-				if (!size) continue;
-				this[i] = size;
+				if (size) this[i] = size;
 			}
 		}
 	});

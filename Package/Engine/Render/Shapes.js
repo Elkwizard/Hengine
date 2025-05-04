@@ -456,17 +456,13 @@ class Polygon extends Shape2D {
 		return result;
 	}
 	toPhysicsShape() {
-		const arr = new physics.Array(physics.Vector, this.vertices.length);
-		for (let i = 0; i < this.vertices.length; i++) {
-			const vector = arr.get(i);
-			this.vertices[i].get(vector);
-		}
+		const vertices = new Physics.Array_VectorN_2__0(this.vertices.length);
+		for (let i = 0; i < this.vertices.length; i++)
+			this.vertices[i].toPhysicsVector(vertices.get(i));
+		const polytope = new Physics.Polytope(vertices);
+		vertices.delete();
 
-		const collider = new physics.PolygonCollider(arr);
-
-		arr.delete();
-
-		return collider;
+		return polytope;
 	}
 	/**
 	 * Returns a new regular polygon centered at the origin with a specified amount of sides and radius.
@@ -812,6 +808,9 @@ class Circle extends Shape2D {
 		return shape;
 	}
 	toPhysicsShape() {
-		return new physics.CircleCollider(this.position.x, this.position.y, this.radius);
+		const center = this.position.toPhysicsVector();
+		const ball = new Physics.Ball(center, this.radius);
+		center.delete();
+		return ball;
 	}
 }

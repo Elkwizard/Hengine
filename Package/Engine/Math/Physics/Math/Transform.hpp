@@ -1,0 +1,52 @@
+#pragma once
+
+#include "Vector.hpp"
+#include "Orientation.hpp"
+
+API class Transform {
+	public:
+		API_CONST Vector linear;
+		API_CONST Orientation orientation;
+
+		Transform(const Vector& _linear, const Orientation& _orientation) {
+			linear = _linear;
+			orientation = _orientation;
+		}
+
+		API Transform()
+		: Transform({ }, { }) { }
+
+		Transform& operator *=(const Transform& other) {
+			linear += orientation * other.linear;
+			orientation *= other.orientation;
+			return *this;
+		}
+
+		Transform operator *(const Transform& other) const {
+			return Transform(*this) *= other;
+		}
+		
+		Vector operator *(const Vector& other) const {
+			return linear + orientation * other;
+		}
+		
+		Transform operator *=(double scale) {
+			linear *= scale;
+			orientation *= scale;
+			return *this;
+		}
+
+		Transform operator *(double other) const {
+			return Transform(*this) *= other;
+		}
+
+		Transform inverse() const {
+			Orientation invOrientation = -orientation;
+			return { invOrientation * -linear, invOrientation };
+		}
+};
+
+std::ostream& operator <<(std::ostream& out, const Transform& transf) {
+	out << "Transform(" << transf.linear << ", " << transf.orientation.getRotation() << ")";
+	return out;
+}

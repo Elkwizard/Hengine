@@ -1,0 +1,33 @@
+API class @name {
+	private:
+		std::unique_ptr<@element[]> elements;
+		
+	public:
+		API_CONST int length;
+
+		API @name(int _length) {
+			length = _length;
+			elements = std::make_unique<@element[]>(length);
+		}
+
+		@name(const std::vector<@element>& items)
+		: @name(items.size()) {
+			for (int i = 0; i < length; i++)
+				elements[i] = items[i];
+		}
+
+		API @getType get(int index) {
+			return elements[index];
+		}
+
+		API void set(int index, @setType value) {
+			elements[index] = value;
+		}
+
+		operator std::vector<@element>() const {
+			std::vector<@element> result (length);
+			for (int i = 0; i < length; i++)
+				result[i] = elements[i];
+			return result;
+		}
+};

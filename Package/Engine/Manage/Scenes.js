@@ -28,9 +28,9 @@ class Scene {
 		this.engine = engine;
 		this.main = new ElementContainer("Main", null, this.engine);
 		
-		const gravityPhysics = gravity.toPhysicsVector();
-		this.physicsEngine = new physics.PhysicsEngine(gravityPhysics).own();
-		gravityPhysics.delete();
+		this.physicsEngine = new Physics.Engine().own();
+		this.gravity = gravity;
+		this.physicsAnchor = new Physics.RigidBody(false).own();
 		
 		this.cullGraphics = true;
 		this.mouseEvents = true;
@@ -44,7 +44,7 @@ class Scene {
 	 * @param Vector2 gravity | The new gravitational acceleration
 	 */
 	set gravity(a) {
-		this.physicsEngine.gravity.set(a.x, a.y);
+		a.toPhysicsVector(this.physicsEngine.gravity);
 	}
 	/**
 	 * Returns the current gravitational acceleration for the physics engine.
@@ -52,7 +52,7 @@ class Scene {
 	 * @return Vector2
 	 */
 	get gravity() {
-		return Vector2.zero.proxy(this.physicsEngine.gravity);
+		return VectorN.physicsProxy(this.physicsEngine.gravity);
 	}
 	/**
 	 * Returns all the active constraints in the scene.
@@ -72,10 +72,14 @@ class Scene {
 	}
 	handleCollisionEvent(a, b, direction, contacts, isTriggerA, isTriggerB) {
 		if (a && b) {
-			contacts = contacts.map(v => Vector2.fromPhysicsVector(v));
 			direction = Vector2.fromPhysicsVector(direction);
-			a.scripts.PHYSICS.colliding.add(b, direction, contacts, isTriggerB);
-			b.scripts.PHYSICS.colliding.add(a, direction.inverse, contacts, isTriggerA);
+	
+			const jsContacts = new Array(contacts.length);
+			for (let i = 0; i < jsContacts.length; i++)
+				jsContacts[i] = VectorN.fromPhysicsVector(contacts.get(i));
+			
+			a.scripts.PHYSICS.colliding.add(b, direction, jsContacts, isTriggerB);
+			b.scripts.PHYSICS.colliding.add(a, direction.inverse, jsContacts, isTriggerA);
 		}
 	}
 	/**
@@ -127,6 +131,13 @@ class Scene {
 		const collideSet = new Set(collideAry);
 		return [collideAry, this.main.sceneObjectArray.filter(e => !collideSet.has(e))];
 	}
+	makeConstrained(offset, body) {
+		const physicsOffset = offset.toPhysicsVector();
+		const physicsBody = body ? body.scripts.PHYSICS.body : this.physicsAnchor;
+		const constrained = new Physics.Constrained(physicsBody, physicsOffset);
+		physicsOffset.delete();
+		return constrained;
+	}
 	/**
 	 * Creates a physical constraint that forces the distance between two points on two objects to remain constant.
 	 * @param SceneObject a | The first object to constrain. Must have the PHYSICS script
@@ -136,20 +147,24 @@ class Scene {
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
 	 * @return Constraint2
 	 */
-	constrainLength(a, b, ap = Vector2.zero, bp = Vector2.zero, length = null) {
-		const apPhysics = ap.toPhysicsVector();
-		const bpPhysics = bp.toPhysicsVector();
-		const con = new physics.LengthConstraint2(
-			a.scripts.PHYSICS.body, b.scripts.PHYSICS.body,
-			apPhysics, bpPhysics, length
-		);
-		apPhysics.delete();
-		bpPhysics.delete();
-		if (length === null)
-			con.length = physics.Vector.dist(con.a, con.b);
-		this.physicsEngine.addConstraint(con.pointer);
-		(window.pointers ??= []).push(con.pointer);
-		return new Constraint2(con, this.engine);
+	constrainLength(bodyA, bodyB, aOffset = Vector2.zero, bOffset = Vector2.zero, length = null) {
+		const a = this.makeConstrained(aOffset, bodyA);
+		const b = this.makeConstrained(bOffset, bodyB);
+
+		const con = new Physics.LengthConstraint2(a, b, length);
+
+		a.delete();
+		b.delete();
+
+		if (length === null) {
+			con.length = VectorN.dist(
+				VectorN.fromPhysicsVector(con.a.anchor),
+				VectorN.fromPhysicsVector(con.b.anchor)
+			);
+		}
+
+		this.physicsEngine.addConstraint(con);
+		return Constraint.fromPhysicsConstraint(con, this.engine);
 	}
 	/**
 	 * Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
@@ -159,19 +174,10 @@ class Scene {
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
 	 * @return Constraint1
 	 */
-	constrainLengthToPoint(a, offset = Vector2.zero, point = null, length = null) {
-		point ??= a.transform.localToGlobal(offset);
-		const offsetPhysics = offset.toPhysicsVector();
-		const pointPhysics = point.toPhysicsVector();
-		const con = new physics.LengthConstraint1(
-			a.scripts.PHYSICS.body, offsetPhysics, pointPhysics, length
-		);
-		offsetPhysics.delete();
-		pointPhysics.delete();
-		if (length === null)
-			con.length = physics.Vector.dist(con.a, con.b);
-		this.physicsEngine.addConstraint(con.pointer);
-		return new Constraint1(con, this.engine);
+	constrainLengthToPoint(body, offset = Vector2.zero, point = null, length = null) {
+		point ??= body.transform.localToGlobal(offset);
+		const constraint = this.constrainLength(null, body, offset, point, length);
+		return new Constraint1(constraint.physicsConstraint, this.engine);
 	}
 	/**
 	 * Creates a physical constraint that forces two points on two objects to be in the same location.
@@ -181,18 +187,17 @@ class Scene {
 	 * @param Vector2 bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
 	 * @return Constraint2
 	 */
-	constrainPosition(a, b, ap = Vector2.zero, bp = Vector2.zero) {
-		const apPhysics = ap.toPhysicsVector();
-		const bpPhysics = bp.toPhysicsVector();
-		const con = new physics.PositionConstraint2(
-			a.scripts.PHYSICS.body, b.scripts.PHYSICS.body,
-			apPhysics,
-			bpPhysics
-		);
-		apPhysics.delete();
-		bpPhysics.delete();
-		this.physicsEngine.addConstraint(con.pointer);
-		return new Constraint2(con, this.engine);
+	constrainPosition(bodyA, bodyB, aOffset = Vector2.zero, bOffset = Vector2.zero) {
+		const a = this.makeConstrained(aOffset, bodyA);
+		const b = this.makeConstrained(bOffset, bodyB);
+
+		const con = new Physics.PositionConstraint2(a, b);
+
+		a.delete();
+		b.delete();
+
+		this.physicsEngine.addConstraint(con);
+		return Constraint.fromPhysicsConstraint(con, this.engine);
 	}
 	/**
 	 * Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
@@ -201,18 +206,9 @@ class Scene {
 	 * @param Vector2 point? | The location to constrain the length to. Default is the current location of the constrained point
 	 * @return Constraint1
 	 */
-	constrainPositionToPoint(a, offset = Vector2.zero, point = null) {
-		point ??= a.transform.localToGlobal(offset);
-		const offsetPhysics = offset.toPhysicsVector();
-		const pointPhysics = point.toPhysicsVector();
-		const con = new physics.PositionConstraint1(
-			a.scripts.PHYSICS.body,
-			offsetPhysics, pointPhysics
-		);
-		offsetPhysics.delete();
-		pointPhysics.delete();
-		this.physicsEngine.addConstraint(con.pointer);
-		return new Constraint1(con, this.engine);
+	constrainPositionToPoint(body, offset = Vector2.zero, point = null) {
+		point ??= body.transform.localToGlobal(offset);
+		return this.constrainPosition(null, body, offset, point);
 	}
 	updateCaches() {
 		for (const el of this.main.sceneObjectArray) el.updateCaches();
@@ -288,7 +284,7 @@ class Scene {
 
 		//physics
 		this.script("beforePhysics");
-		this.physicsEngine.run();
+		this.physicsEngine.run(1);
 		this.script("afterPhysics");
 
 		//draw

@@ -1,0 +1,10 @@
+{
+	"files.associations": {
+		"*.txt": "pipelang",
+		"*.jsc": "javascript",
+		"*.hjs": "javascript",
+		"*.d": "gas",
+		"iosfwd": "cpp",
+		"vector": "cpp"
+	}
+}

@@ -1,11 +1,14 @@
 #pragma once
 
-#ifdef __INTELLISENSE__
-	#define EMSCRIPTEN_KEEPALIVE 
-#else
-	#include "emscripten.h"
+#if !__GEN_BINDINGS__
+	#define API
+	#define API_CONST
+	#define API_TEMPLATE
+	#define API_IMPORT extern "C"
+	
+	#if __EMSCRIPTEN__
+		#include "emscripten.h"
+	#else
+		#define EMSCRIPTEN_KEEPALIVE
+	#endif
 #endif
-
-#define API
-#define API_CONST
-#define API_IMPORT extern "C"

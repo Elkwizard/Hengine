@@ -3,7 +3,7 @@ const path = require("path");
 
 const [,, modulePath] = process.argv;
 
-const data = fs.readFileSync(modulePath + ".wasm");
+const data = fs.readFileSync(path.join(modulePath, "program.wasm"));
 
 const offset = "\r".charCodeAt() + 1;
 const dataString = [...data]

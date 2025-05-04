@@ -1,7 +1,7 @@
 function physicsAPICollideShapes(a, b) {
     a = a.toPhysicsShape();
 	b = b.toPhysicsShape();
-	const result = physics.collide(a, b);
+	const result = Physics.Detector.testCollide(a, b);
 	a.delete();
 	b.delete();
 	return result;
@@ -23,7 +23,10 @@ class Constraint {
 	 */
 	get ends() {
 		const { a, b } = this.physicsConstraint;
-		return [Vector2.fromPhysicsVector(a), Vector2.fromPhysicsVector(b)];
+		return [
+			Vector2.fromPhysicsVector(a.anchor),
+			Vector2.fromPhysicsVector(b.anchor)
+		];
     }
 	
 	/**
@@ -31,11 +34,13 @@ class Constraint {
 	 */
     remove() {
         const { physicsEngine } = this.engine.scene;
-        physicsEngine.removeConstraint(this.physicsConstraint.id);
+        physicsEngine.removeConstraint(this.physicsConstraint);
     }
 
 	static fromPhysicsConstraint(constraint, engine) {
-		return new [Constraint1, Constraint2, Constraint1, Constraint2][constraint.type](constraint, engine);
+		if (constraint.a.body.pointer === engine.scene.physicsAnchor.pointer)
+			return new Constraint1(constraint, engine);
+		return new Constraint2(constraint, engine);
 	}
 }
 
@@ -56,23 +61,23 @@ class Constraint1 extends Constraint {
 		return this.physicsConstraint.length;
 	}
 	set offset(a) {
-		this.physicsConstraint.offset.set(a.x, a.y);
+		a.toPhysicsVector(this.physicsConstraint.b.offset);
 	}
 	get offset() {
-		return Vector2.zero.proxy(this.physicsConstraint.offset);
+		return VectorN.physicsProxy(this.physicsConstraint.offset);
 	}
 	set point(a) {
-		this.physicsConstraint.point.set(a.x, a.y);
+		a.toPhysicsVector(this.physicsConstraint.a.offset);
 	}
 	get point() {
-		return Vector2.zero.proxy(this.physicsConstraint.point);
+		return VectorN.physicsProxy(this.physicsConstraint.point);
 	}
 	/**
 	 * Returns the object in the constraint.
 	 * @return SceneObject
 	 */
     get body() {
-		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.body.pointer);
+		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.b.body.pointer);
 	}
 }
 
@@ -87,9 +92,19 @@ class Constraint1 extends Constraint {
 class Constraint2 extends Constraint {
     constructor(physicsConstraint, engine) {
 		super(physicsConstraint, engine);
-		objectUtils.shortcut(this, this.physicsConstraint, "staticA");
-		objectUtils.shortcut(this, this.physicsConstraint, "staticB");
     }
+	set staticA(a) {
+		this.physicsConstraint.a.isStatic = a;
+	}
+	get staticA() {
+		return this.physicsConstraint.a.isStatic;
+	}
+	set staticB(a) {
+		this.physicsConstraint.b.isStatic = a;
+	}
+	get staticB() {
+		return this.physicsConstraint.b.isStatic;
+	}
 	set length(a) {
 		this.physicsConstraint.length = a;
 	}
@@ -97,30 +112,30 @@ class Constraint2 extends Constraint {
 		return this.physicsConstraint.length;
 	}
 	set offsetA(a) {
-		this.physicsConstraint.offsetA.set(a.x, a.y);
+		a.toPhysicsVector(this.physicsConstraint.a.offset);
 	}
 	get offsetA() {
-		return Vector2.zero.proxy(this.physicsConstraint.offsetA);
+		return VectorN.physicsProxy(this.physicsConstraint.a.offset);
 	}
 	set offsetB(a) {
-		this.physicsConstraint.offsetB.set(a.x, a.y);
+		a.toPhysicsVector(this.physicsConstraint.b.offset);
 	}
 	get offsetB() {
-		return Vector2.zero.proxy(this.physicsConstraint.offsetB);
+		return VectorN.physicsProxy(this.physicsConstraint.offsetB);
 	}
 	/**
 	 * Returns the first object in the constraint.
 	 * @return SceneObject
 	 */
     get bodyA() {
-		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.bodyA.pointer);
+		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.a.body.pointer);
     }
 	/**
 	 * Returns the second object in the constraint.
 	 * @return SceneObject
 	 */
     get bodyB() {
-		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.bodyB.pointer);
+		return PHYSICS.bodyToSceneObject.get(this.physicsConstraint.b.body.pointer);
     }
 }
 

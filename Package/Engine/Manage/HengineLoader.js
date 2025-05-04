@@ -1,3 +1,6 @@
+const IS_3D = new URL(document.currentScript.src).searchParams.has("3d");
+const DIM = IS_3D ? 3 : 2;
+
 class PathManager {
 	static isRoot(path) {
 		return /^((http(s?)|file):\/\/|[A-Z]:\/|file:(\/\/\/|\\\\\\))/g.test(path);
@@ -311,27 +314,42 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 			});
 			return this;
 		}
+		solidify() {
+			const keys = this.constructor.CONST_PROPERTIES;
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i];
+				const value = this[key];
+				delete this[key];
+				Object.defineProperty(this, key, {
+					value: value.solidify()
+				});
+			}
+			return this;
+		}
 		static cast(type, pointer) {
 			const object = Object.create(type.prototype);
 			object.pointer = pointer;
 			return object;
 		}
 	};
-	static buffers = { };
-	static bindings = { };
-	static imports = { };
+	static buffers = {};
+	static bindings = {};
+	static imports = {};
+	constructor(src, exportName) {
+		super(src);
+		this.moduleName = this.src.match(/(\w+)$/)[1];
+		this.exportName = exportName ?? this.moduleName;
+	}
 	async load() {
-		const moduleName = this.src.match(/(\w+)\.wasm$/)[1];
-
-		const resource = name => new HengineScriptResource(
-			this.src.replace(/.wasm$/g, `/${name}.js`)
-		).load();
+		const { moduleName } = this;
+		
+		const resource = name => new HengineScriptResource(`${this.src}/${name}.js`).load();
 
 		const resources = await Promise.all([resource("bindings"), resource("buffer")]);
 		if (!resources.every(Boolean)) return null;
 
 		const bufferFn = HengineWASMResource.buffers[moduleName];
-		
+
 		let buffer;
 		{ // decode buffer
 			const start = "() => {\n//";
@@ -349,10 +367,17 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 				buffer[i] = chars.charCodeAt(i) - offset;
 		}
 
-		const env = {
-			emscripten_notify_memory_growth: () => null
+		const memory = {
+			view: null,
+			refresh() {
+				this.view = new DataView(exports.memory.buffer);
+			}
 		};
-		const imports = { };
+
+		const env = {
+			emscripten_notify_memory_growth: () => memory.refresh()
+		};
+		const imports = {};
 		const importNames = HengineWASMResource.imports[moduleName];
 		for (let i = 0; i < importNames.length; i++) {
 			const name = importNames[i];
@@ -375,51 +400,25 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 		});
 
 		exports._initialize();
-		
-		const module = { };
+		memory.refresh();
+
+		const module = { memory };
 		HengineWASMResource.bindings[moduleName](module, imports, exports);
 
-		{ // printing
-			let buffer = [];
-			module.printFloat = module.printInt = v => buffer.push(v);
-			window._buffer = buffer;
-			module.printLn = () => {
-				console.log(...buffer);
-				buffer = [];
-			};
-		}
+		module.printStringJS = pointer => {
+			let string = "";
+			while (true) {
+				const code = memory.view.getUint8(pointer);
+				if (!code) break;
+				string += String.fromCharCode(code);
+				pointer++;
+			}
+			console.log(string);
+		};
 
-		module.Array = class Array {
-			constructor(type, length, indirect) {
-				if (length instanceof module._Slab) this.slab = length;
-				else this.slab = new module._Slab(type.size, length);
-				this.type = type;
-				this.indirect = indirect;
-			}
-			get pointer() {
-				return this.slab.pointer;
-			}
-			get length() {
-				return this.slab.length;
-			}
-			*[Symbol.iterator]() {
-				const { length } = this;
-				for (let i = 0; i < length; i++)
-					yield this.get(i);
-			}
-			get(index) {
-				const pointer = this.indirect ? this.slab.getPointer(index) : this.slab.get(index)
-				return HengineWASMResource.Binding.cast(this.type, pointer);
-			}
-			delete() {
-				this.slab.delete();
-			}
-		}
-
-		window[moduleName] = module;
+		window[this.exportName] = module;
 	}
 }
-HengineWASMResource.files = { };
 
 /**
  * Represents a request for access to the user's webcam.
@@ -741,9 +740,15 @@ class HengineLoader {
 					const promises = [];
 					for (let i = 0; i < block.length; i++) {
 						const path = block[i];
-						const src = PathManager.join([engineSrc, path]);
-						const script = src.endsWith(".js") ? new HengineScriptResource(src) : new HengineWASMResource(src);
-						promises.push(script.load());
+						
+						let resource;
+						if (path instanceof HengineResource) {
+							resource = path;
+						} else {
+							resource = new HengineScriptResource(path);
+						}
+						resource.src = PathManager.join([engineSrc, resource.src])
+						promises.push(resource.load());
 					}
 					await Promise.all(promises);
 				}
@@ -814,7 +819,7 @@ HengineLoader.engineResources = [
 		"Util/Sound.js",
 
 		"Math/Matrix.js",
-		"Math/Physics/physics.wasm",
+		new HengineWASMResource(`Math/Physics/Physics${DIM}`, "Physics"),
 		"Math/PhysicsAPI.js",
 		"Math/Random.js",
 		"Math/Interpolation.js",

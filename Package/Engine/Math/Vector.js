@@ -106,6 +106,19 @@ class Vector extends Operable {
 			objectUtils.onChange(this, mod[i], handler);
 		return this;
 	}
+	static physicsProxy(v) {
+		const result = this.zero;
+		const mod = this.modValues;
+		for (let i = 0; i < mod.length; i++) {
+			const key = mod[i];
+			delete result[key];
+			Object.defineProperty(result, key, {
+				get: () => v.get(i),
+				set: value => v.set(i, value)
+			});
+		}
+		return result;
+	}
 	/**
 	 * Computes the distance between two vectors. 
 	 * @param Vector a | The first vector
@@ -406,27 +419,14 @@ class Vector2 extends Vector {
 		this.y %= v;
 		return this;
 	}
-	toPhysicsVector() {
-		return new physics.Vector(this.x, this.y);//.own();
+	toPhysicsVector(result = new Physics.VectorN_2_()) {
+		result.setAll(this.x, this.y);
+		return result;
 	}
-	static fromPhysicsVector(v) {
-		return new Vector2(v.x, v.y);
-	}
-	static fromPhysicsVectorReference(v) {
-		const vec = new Vector2();
-
-		Object.defineProperties(vec, {
-			x: {
-				get: () => v.x,
-				set: a => v.x = a
-			},
-			y: {
-				get: () => v.y,
-				set: a => v.y = a
-			}
-		});
-
-		return vec;
+	static fromPhysicsVector(v, result = Vector2.zero) {
+		result.x = v.get(0);
+		result.y = v.get(1);
+		return result;
 	}
 	/**
 	 * @group static get left, static get right, static get up, static get down
@@ -569,6 +569,16 @@ class Vector3 extends Vector {
 	 */
 	rotatedAboutAxis(axis, angle, result) {
 		return this.get(result).rotateAboutAxis(axis, angle);
+	}
+	toPhysicsVector(result = new Physics.VectorN_3_()) {
+		result.setAll(this.x, this.y, this.z);
+		return result;
+	}
+	static fromPhysicsVector(v, result = Vector3.zero) {
+		result.x = v.get(0);
+		result.y = v.get(1);
+		result.z = v.get(2);
+		return result;
 	}
 	/**
 	 * @group static get left, static get right, static get up, static get down, static get forward, static get backward
@@ -824,3 +834,4 @@ Vector4.modValues = ["x", "y", "z", "w"];
 })();
 
 Vector.sizes = [,, Vector2, Vector3, Vector4];
+const VectorN = Vector[DIM];

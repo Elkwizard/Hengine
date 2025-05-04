@@ -1,81 +1,71 @@
 #pragma once
 
-#include "../../../../Wasm/api.hpp"
+#include "Math/Basics.hpp"
 
-API_IMPORT void printInt(long);
-API_IMPORT void printFloat(double);
-API_IMPORT void printLn();
-API_IMPORT void fullExit();
+// Emscripten API
+#include <sstream>
+#include "../../../../Wasm/API.hpp"
+API_IMPORT void printStringJS(size_t pointer);
+#define print(x) do {\
+	std::stringstream stream;\
+	stream << #x << " = " << (x) << std::endl;\
+	printStringJS((size_t)(char*)stream.str().c_str());\
+} while (false)
 
-template <std::integral T>
-void printElement(T value) {
-	printInt(value);
+// Dimension switches
+#if __INTELLISENSE__ && !DIM
+	#define DIM 3
+#endif
+
+#if DIM == 3
+	#define IS_3D true
+	#define IF_3D(a, b) a
+#else
+	#define IS_3D false
+	#define IF_3D(a, b) b
+#endif
+
+#define ONLY_2D(a) IF_3D(,a)
+#define ONLY_3D(a) IF_3D(a,)
+
+bool flag = false;
+
+API void markFlag(bool _flag) {
+	flag = _flag;
 }
 
-template <std::floating_point T>
-void printElement(T value) {
-	printFloat(value);
+// general I/O
+std::ostream& operator>>(std::ostream& out, double value) {
+	if (value == 0.0) out << "0";
+	else if (equals(value, std::round(value), PRINT_EPSILON)) out << std::round(value);
+	else if (equals(1.0 / value, std::round(1.0 / value), PRINT_EPSILON)) out << "1 / " << std::round(1.0 / value);
+	else out << value;
+	return out;
 }
-
-template <typename F, typename... T>
-void print(F first, T... rest) {
-	printElement(first);
-	if constexpr (sizeof...(T) > 0)
-		print(rest...);
-	printLn();
-}
-
-API using ID = unsigned int;
-
-ID nextID() {
-	static ID next = 0;
-	return next++;
-}
-
-#include <vector>
 
 template <typename T>
-class NativeArray {
-	public:
-		std::vector<T> data;
+std::ostream& operator<<(std::ostream& out, const std::vector<T>& list) {
+	out << "[";
 
-		NativeArray(const std::vector<T>& arr) {
-			data = arr;
-		}
+	if (list.size()) {
+		out << list[0];
+		for (int i = 1; i < list.size(); i++)
+			out << ", " << list[i];
+	}
 
-		NativeArray(int length) {
-			data.resize(length);
-		}
+	out << "]";
 
-		int getLength() const {
-			return data.size();
-		}
-
-		void set(int index, const T& value) {
-			data[index] = value;
-		}
-
-		T& get(int index) {
-			return data[index];
-		}
-};
-
-template <typename A, typename B>
-auto min(const A& a, const B& b) {
-	return a < b ? a : b;
+	return out;
 }
 
-template <typename A, typename B>
-auto max(const A& a, const B& b) {
-	return a > b ? a : b;
+template <typename T>
+void erase(std::vector<T>& list, const T& item) {
+	list.erase(std::find(list.begin(), list.end(), item));
 }
 
-template <typename A, typename B, typename C>
-auto clamp(const A& n, const B& a, const C& b) {
-	return max(a, min(b, n));
-}
-
-template <typename A>
-int sign(const A& a) {
-	return (a > 0) - (a < 0);
+template <typename T>
+void erase(std::vector<std::unique_ptr<T>>& list, T* item) {
+	list.erase(std::find_if(list.begin(), list.end(), [=](const std::unique_ptr<T>& ptr) {
+		return ptr.get() == item;
+	}));
 }

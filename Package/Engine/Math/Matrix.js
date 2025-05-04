@@ -504,6 +504,19 @@ class Matrix3 extends Matrix {
 	toCSS() {
 		return `matrix(${this[0]}, ${this[1]}, ${this[3]}, ${this[4]}, ${this[6]}, ${this[7]})`;
 	}
+	toPhysicsMatrix(result = new Physics.MatrixRC_3_()) {
+		for (let r = 0; r < 3; r++)
+		for (let c = 0; c < 3; c++)
+			result.set(r, c, this[c * 3 + r]);
+		return result;
+	}
+	static fromPhysicsMatrix(matrix) {
+		const result = new Matrix3();
+		for (let r = 0; r < 3; r++)
+		for (let c = 0; c < 3; c++)
+			this[c * 3 + r] = matrix.get(r, c);
+		return result;
+	}
 	static normal(matrix) {
 		return new Matrix3(matrix).invert()?.transpose?.() ?? Matrix3.identity();
 	}
@@ -727,3 +740,5 @@ class Matrix4 extends Matrix {
 Matrix4.size = 4;
 
 Matrix.sizes = [,, Matrix2, Matrix3, Matrix4];
+const MatrixN = Matrix[DIM];
+const TMatrixN = Matrix[DIM + 1];
