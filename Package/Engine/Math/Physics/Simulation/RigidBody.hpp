@@ -8,7 +8,8 @@
 
 class RigidBody;
 
-API_IMPORT bool asymmetricTriggerRule(const RigidBody&, const RigidBody&);
+API_IMPORT bool triggerRule(const RigidBody&, const RigidBody&);
+API_IMPORT bool collisionRule(const RigidBody&, const RigidBody&);
 
 template<>
 class std::hash<RigidBody*> {
@@ -56,7 +57,7 @@ class RayHit {
 
 using Derivative = Transform RigidBody::*;
 
-class Constraint2;
+class ConstraintDescriptor;
 
 API class RigidBody {
 	private:
@@ -95,16 +96,19 @@ API class RigidBody {
 					}
 					return *global;
 				}
+
+				friend std::ostream& operator <<(std::ostream& out, const Collider& collider) {
+					out << *collider.local;
+					return out;
+				}
 		};
 		
 		class Prohibited {
 			private:
-				std::vector<Vector> prohibited;
-		
+			
 			public:
-				Prohibited() {
-		
-				}
+			std::vector<Vector> prohibited;
+				Prohibited() { }
 		
 				void clear() {
 					prohibited.clear();
@@ -115,15 +119,21 @@ API class RigidBody {
 				}
 				
 				bool has(const Vector& dir) const {
+					return (bool)match(dir);
+				}
+
+				std::optional<Vector> match(const Vector& dir) const {
 					for (const Vector& wrong : prohibited)
 						if (dot(wrong, dir) > 0.8)
-							return true;
-					return false;
+							return wrong;
+					return { };
 				}
 		};
 	
-		double density = 1.0;
+		bool dynamic;
+		double density = 1;
 		std::vector<Collider> colliders;
+		Transform lastPosition;
 
 		void syncMatter() {
 			if (dynamic && canRotate) {
@@ -139,7 +149,6 @@ API class RigidBody {
 			for (Collider& collider : colliders)
 				collider.invalidate();
 			bounds = localBounds + position.linear;
-			// ctx.stroke(gl::Color::RED).rect(bounds.min, bounds.max);
 		}
 
 	public:
@@ -153,9 +162,8 @@ API class RigidBody {
 		AABB localBounds, bounds;
 		
 		Prohibited prohibited;
-		API_CONST std::vector<Constraint2*> constraints;
+		API_CONST std::vector<ConstraintDescriptor*> constraintDescriptors;
 		
-		API bool dynamic;
 		API bool simulated = true;
 		API bool gravity = true;
 		API bool drag = true;
@@ -181,6 +189,19 @@ API class RigidBody {
 			dynamic = _dynamic;
 		}
 
+		API std::vector<Vector> getProhibitedDirections() const {
+			return prohibited.prohibited;
+		}
+
+		API void setDynamic(bool _dynamic) {
+			dynamic = _dynamic;
+			syncMatter();
+		}
+
+		API bool getDynamic() const {
+			return dynamic;
+		}
+
 		API void setDensity(double _density) {
 			localMatter *= _density / density;
 			syncMatter();
@@ -192,13 +213,11 @@ API class RigidBody {
 		}
 
 		API double getMass() {
-			syncMatter();
-			return matter.mass;
+			return localMatter.mass;
 		}
 
 		API Inertia getInertia() {
-			syncMatter();
-			return matter.inertia;
+			return localMatter.rotate(position.orientation).inertia;
 		}
 
 		API void addShape(Shape* shape) {
@@ -211,8 +230,17 @@ API class RigidBody {
 			erase(colliders, shape);
 		}
 
+		API void removeAllShapes() {
+			localMatter = { };
+			colliders.clear();
+		}
+
 		bool isTriggerWith(const RigidBody& other) const {
-			return !trivialTriggerRule && (isTrigger || asymmetricTriggerRule(*this, other));
+			return !trivialTriggerRule && triggerRule(*this, other);
+		}
+
+		bool canCollideWith(const RigidBody& other) const {
+			return trivialCollisionRule || collisionRule(*this, other);
 		}
 
 		int getShapeCount() const {
@@ -223,20 +251,22 @@ API class RigidBody {
 			return colliders[index].cache(position);
 		}
 		
-		Vector getPointVelocity(const Vector& r) const {
-			if (!dynamic) return { };
+		Vector getPointVelocity(const Vector& offset) const {
+			return velocity.linear + IF_3D(
+				cross(velocity.orientation.getRotation(), offset),
+				offset.normal() * velocity.orientation.getRotation()
+			);
+		}
 
-			return IF_3D(
-				cross(velocity.orientation.getRotation(), r),
-				r.normal() * velocity.orientation.getRotation()
-			) + velocity.linear;
+		void recomputeVelocity(const Vector& offset, const Vector& axis, double dt) {
+			velocity = (position - lastPosition) * (1.0 / dt);
 		}
 
 		template <Derivative D>
 		void applyRelativeImpulse(const Vector& offset, const Vector& imp) {
-			if (!dynamic) return;
-
-			(this->*D).linear += matter.invMass * imp;
+			Vector linearDelta = matter.invMass * imp;
+			
+			(this->*D).linear += linearDelta;
 
 			if (canRotate) {
 				Cross torque = cross(offset, imp);
@@ -245,17 +275,19 @@ API class RigidBody {
 		}
 
 		API void applyImpulse(const Vector& pos, const Vector& imp) {
+			if (!dynamic) return;
 			applyRelativeImpulse<&RigidBody::velocity>(pos - position.linear, imp);
 		}
 
 		void cache() {
 			// update bounds
 			localBounds = { };
-			Transform orientationOnly = { {}, position.orientation };
+			Transform orientationOnly = { { }, position.orientation };
 			for (Collider& collider : colliders) {
 				collider.updateBounds(dynamic, orientationOnly);
 				localBounds.add(collider.bounds);
 			}
+			sync();
 		}
 
 		void sync() {
@@ -264,25 +296,24 @@ API class RigidBody {
 		}
 
 		void integrate(double dt) {
-#if IS_3D
-			Inertia oldInertia = matter.inertia;
-#endif
-
+			lastPosition = position;
+			
 			// motion
-			position.linear += velocity.linear * dt;
-			if (canRotate)
-				position.orientation += velocity.orientation * dt;
-			
-			sync();
-			
-#if IS_3D
-			// precession
 			if (canRotate) {
+#if IS_3D
+				// precession
+				Orientation next = position.orientation + velocity.orientation;
+				Inertia invInertia = localMatter.rotate(next).invInertia;
 				velocity.orientation = Orientation(
-					matter.invInertia * oldInertia * velocity.orientation.getRotation()
+					invInertia * matter.inertia * velocity.orientation.getRotation()
 				);
-			}
 #endif
+			} else {
+				velocity.orientation = { };
+			}
+
+			position += velocity * dt;
+			sync();
 		}
 
 		RayHit raycast(const Ray& ray) const {
@@ -294,5 +325,13 @@ API class RigidBody {
 			}
 
 			return best;
+		}
+
+		friend std::ostream& operator <<(std::ostream& out, const RigidBody& body) {
+			out << "{ position: " << body.position << " | velocity: " << body.velocity << " | shapes: " << body.colliders << " }";
+			return out;
+		} 
+		friend std::ostream& operator <<(std::ostream& out, RigidBody* body) {
+			return out << *body;
 		}
 };

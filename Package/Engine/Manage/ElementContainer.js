@@ -235,12 +235,32 @@ class ElementContainer extends SceneElement {
 		this.removeElements(this.getAllElements());
 	}
 	/**
-	 * Retrieves an element from the container by name.
+	 * Retrieves an element from the container by name, or returns null if no such element exists.
 	 * @param String name | The name of the SceneElement to retrieve
 	 * @return SceneElement
 	 */
 	get(name) {
-		return this.elements.get(name);
+		return this.elements.get(name) ?? null;
+	}
+	/**
+	 * Retrieves an element (or multiple) based on a piece of identifying information.
+	 * @signature
+	 * @param String name | The name of a scene element. Returns that element or null if no element exists with that name
+	 * @signature
+	 * @param class extends ElementScript script | The ElementScript to select for. Returns all elements with an instance of this script
+	 * @signature
+	 * @param (SceneElement) => Boolean mask | A pure function selecting for certain elements. Returns all elements that return true when passed to this function.
+	 * @signature
+	 * @return SceneElement/SceneElement[]
+	 */
+	query(selector) {
+		if (typeof selector === "string")
+			return this.get(selector);
+		
+		if (selector.prototype instanceof ElementScript)
+			return this.getElementsWithScript(selector);
+
+		return this.getElementsMatch(selector);
 	}
 	/**
 	 * Returns all of the leaf nodes within the container.

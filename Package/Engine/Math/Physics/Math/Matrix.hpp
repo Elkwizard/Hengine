@@ -315,6 +315,18 @@ API_TEMPLATE class MatrixRC {
 				-y, x, 0
 			};
 		}
+		
+		friend std::ostream& operator <<(std::ostream& out, const MatrixRC& m) {
+			out << "(\n";
+			for (int r = 0; r < R; r++) {
+				out << "  ";
+				for (int c = 0; c < C; c++)
+					out >> m[r][c] << "\t";
+				out << "\n";
+			}
+			out << ")";
+			return out;
+		}
 };
 
 using Matrix1 = MatrixRC<1>;
@@ -326,17 +338,4 @@ using Matrix = MatrixRC<DIM>;
 template <int R, int C>
 MatrixRC<R, C> operator *(double factor, const MatrixRC<R, C>& mat) {
 	return mat * factor;
-}
-
-template <int R, int C>
-std::ostream& operator <<(std::ostream& out, const MatrixRC<R, C>& m) {
-	out << "(\n";
-	for (int r = 0; r < R; r++) {
-		out << "  ";
-		for (int c = 0; c < C; c++)
-			out >> m[r][c] << "\t";
-		out << "\n";
-	}
-	out << ")";
-	return out;
 }

@@ -139,10 +139,29 @@ declare class ElementContainer extends SceneElement {
 	 */
 	removeAllElements(): void;
 	/**
-	 * Retrieves an element from the container by name.
+	 * Retrieves an element from the container by name, or returns null if no such element exists.
 	 * @param name - The name of the SceneElement to retrieve
 	 */
 	get(name: string): SceneElement;
+	/**
+	 * Retrieves an element (or multiple) based on a piece of identifying information.
+	 * @param name - The name of a scene element. Returns that element or null if no element exists with that name
+	 */
+	query(name: string): SceneElement | SceneElement[];
+	/**
+	 * Retrieves an element (or multiple) based on a piece of identifying information.
+	 * @param script - The ElementScript to select for. Returns all elements with an instance of this script
+	 */
+	query(script: class extends ElementScript): SceneElement | SceneElement[];
+	/**
+	 * Retrieves an element (or multiple) based on a piece of identifying information.
+	 * @param mask - A pure function selecting for certain elements. Returns all elements that return true when passed to this function.
+	 */
+	query(mask: (arg0: SceneElement) => boolean): SceneElement | SceneElement[];
+	/**
+	 * Retrieves an element (or multiple) based on a piece of identifying information.
+	 */
+	query(): SceneElement | SceneElement[];
 	/**
 	 * Returns all of the leaf nodes within the container.
 	 */
@@ -2781,7 +2800,7 @@ declare interface MathObject implements Copyable {
  */
 declare class Operable implements MathObject, Serializable {
 	/**
-	 * The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector)
+	 * The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector2)
 	 */
 	static modValues: string[];
 	/**
@@ -5808,7 +5827,7 @@ declare class SceneObject extends SceneElement {
 	 */
 	transform: Transform;
 	/**
-	 * The location of orientation of the object last frame
+	 * The location and orientation of the object last frame
 	 */
 	lastTransform: Transform;
 	/**
@@ -5840,7 +5859,7 @@ declare class SceneObject extends SceneElement {
 	 */
 	scripts: ScriptContainer;
 	/**
-	 * This is a reference to the shape with the name `"default"`
+	 * A reference to the shape with the name `"default"`
 	 */
 	defaultShape: Shape | null;
 	/**
@@ -6440,7 +6459,7 @@ declare class PHYSICS extends ElementScript {
 	 */
 	canRotate: boolean;
 	/**
-	 * The mass of the object
+	 * The mass of the object. Setting this will change the density
 	 */
 	mass: number;
 	/**
@@ -6482,9 +6501,8 @@ declare class PHYSICS extends ElementScript {
 	get constraints(): Constraint[];
 	/**
 	 * Retrieves the moment of inertia for the object.
-	 * This will return null if used during the frame the PHYSICS script was added.
 	 */
-	get inertia(): number | null;
+	get inertia(): number;
 	/**
 	 * Applies an impulse to a specific point on the object.
 	 * @param point - The world-space point at which the impulse should be applied

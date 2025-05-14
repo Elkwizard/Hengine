@@ -121,7 +121,7 @@ class Constraint2 extends Constraint {
 		a.toPhysicsVector(this.physicsConstraint.b.offset);
 	}
 	get offsetB() {
-		return VectorN.physicsProxy(this.physicsConstraint.offsetB);
+		return VectorN.physicsProxy(this.physicsConstraint.b.offset);
 	}
 	/**
 	 * Returns the first object in the constraint.

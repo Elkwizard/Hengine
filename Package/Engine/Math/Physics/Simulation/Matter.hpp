@@ -91,11 +91,11 @@ class Matter {
 			return *this + Matter(0, vec.sqrMag() * mass);
 #endif
 		}
+
+		friend std::ostream& operator <<(std::ostream& out, const Matter& matter) {
+			out << "Matter(" << matter.mass << ", " << matter.inertia << ")";
+			return out;
+		}
 };
 
 Matter Matter::STATIC { INFINITY, INFINITY };
-
-std::ostream& operator <<(std::ostream& out, const Matter& matter) {
-	out << "Matter(" << matter.mass << ", " << matter.inertia << ")";
-	return out;
-}

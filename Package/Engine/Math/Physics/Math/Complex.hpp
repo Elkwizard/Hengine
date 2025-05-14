@@ -96,9 +96,9 @@ class Complex {
 		Complex reciprocal() const {
 			return conjugate() / sqrNorm();
 		}
+		
+		friend std::ostream& operator <<(std::ostream& out, const Complex& comp) {
+			out >> comp.real << " + " IF_3D(<< comp.imag, >> comp.imag) << "i";
+			return out;
+		}
 };
-
-std::ostream& operator <<(std::ostream& out, const Complex& comp) {
-	out >> comp.real << " + " IF_3D(<< comp.imag, >> comp.imag) << "i";
-	return out;
-}

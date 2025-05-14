@@ -8,8 +8,6 @@
 #include <unordered_set>
 #include <unordered_map>
 
-API_IMPORT bool symmetricCollisionRule(const RigidBody&, const RigidBody&);
-
 class SpatialHash {
 	private:
 		static constexpr int CELLS_PER_ITEM = raiseTo(2, DIM);
@@ -22,8 +20,8 @@ class SpatialHash {
 			return body->bounds + body->velocity.linear * dt;
 		}
 		
-		bool canCollide(const RigidBody& a, const RigidBody& b) {
-			return b.canCollide && ((a.trivialCollisionRule && b.trivialCollisionRule) || symmetricCollisionRule(a, b));
+		static bool canCollide(const RigidBody& a, const RigidBody& b) {
+			return a.canCollideWith(b) && b.canCollideWith(a);
 		}
 
 	public:
@@ -35,24 +33,24 @@ class SpatialHash {
 			wave = 0;
 
 			double total = 0;
-			for (RigidBody* body : container)
-				total += body->bounds.volume();
+			for (RigidBody* body : container) {
+				double volume = body->bounds.volume();
+				if (!isnan(volume)) total += volume;
+			}
 
 			size_t cellCount = container.size() * CELLS_PER_ITEM;
 			cellSize = std::pow(total / cellCount, 1.0 / DIM);
 
 			for (RigidBody* body : container) {
+				if (!body->canCollide) continue;
+
 				body->wave = 0;
 
 				AABB bounds = boundsOf(body);
 				Coord min (bounds.min / cellSize);
 				Coord max (bounds.max / cellSize);
 				ND_LOOP(cell, min, max) {
-	
 					cells[cell].push_back(body);
-
-					// ctx.stroke(gl::Color::CYAN).line(body->position.linear, (Vector(cell) + 0.5) * cellSize);
-					// ctx.stroke(gl::Color::ORANGE).rect(Vector(cell) * cellSize, (Vector(cell) + 1.0) * cellSize);
 				}
 			}
 		}

@@ -223,6 +223,14 @@ API_TEMPLATE class VectorN {
 			return { x, y };
 		}
 #endif
+
+		friend std::ostream& operator <<(std::ostream& out, const VectorN& v) {
+			out << "(" >> v[0];
+			for (int i = 1; i < S; i++)
+				out << ", " >> v[i];
+			out << ")";
+			return out;
+		}
 };
 
 // 1D magnitude optimization
@@ -286,12 +294,3 @@ class std::hash<VectorN<S>> {
 			return result;
 		}
 };
-
-template <int S>
-std::ostream& operator<<(std::ostream& out, const VectorN<S>& v) {
-	out << "(" >> v[0];
-	for (int i = 1; i < S; i++)
-		out << ", " >> v[i];
-	out << ")";
-	return out;
-}

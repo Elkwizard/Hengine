@@ -11,38 +11,35 @@ class ContactConstraint : public Constraint {
 		constexpr static int BLOCK = 2;
 		constexpr static double SLOP = 0.05;
 
-		RigidBody& bodyA;
-		RigidBody& bodyB;
 		std::vector<Interaction> interactions;
 		struct MatrixBlock {
 			std::optional<MatrixRC<BLOCK>> full;
 			Matrix1 diagonal[BLOCK];
 		};
-		Matter matterB;
 		std::vector<MatrixBlock> dvToImpulses;
 		double staticFriction, kineticFriction;
 		double penetration;
 
 		void solveFriction(Interaction interaction, double normalImpulse) {
-			Vector velocity = getInteractionVelocity(bodyA, bodyB, interaction);
+			Vector velocity = getInteractionVelocity(interaction);
 			Vector tangent = velocity.without(interaction.axis);
 			double mag = tangent.mag();
 			if (mag < EPSILON) return;
 			interaction.setAxis(tangent / mag);
 
-			Matrix1 dvToImpulse = *getDeltaToImpulsesMatrix<1>(bodyA.matter, matterB, &interaction);
+			Matrix1 dvToImpulse = *getDeltaToImpulsesMatrix<1>(&interaction);
 			Vector1 delta = dot(velocity, interaction.axis);
 			double impulse = (double)(dvToImpulse * delta);
 
 			if (abs(impulse) > normalImpulse * staticFriction)
 				impulse = sign(impulse) * normalImpulse * kineticFriction;
 
-			applyImpulses<&RigidBody::velocity, 1>(bodyA, bodyB, &interaction, impulse);
+			applyImpulses<&RigidBody::velocity, 1>(&interaction, impulse);
 		}
 
 		template <int N>
 		bool trySolve(const MatrixRC<N>& impulseMatrix, int index) {
-			VectorN<N> delta = getVelocityDelta<N>(bodyA, bodyB, &interactions[index]);
+			VectorN<N> delta = getVelocityDelta<N>(&interactions[index]);
 
 			if (isWasteful(delta)) return true;
 
@@ -54,7 +51,7 @@ class ContactConstraint : public Constraint {
 			for (int i = 0; i < N; i++)
 				if (impulses[i] < EPSILON) return false;
 
-			applyImpulses<&RigidBody::velocity, N>(bodyA, bodyB, &interactions[index], impulses);
+			applyImpulses<&RigidBody::velocity, N>(&interactions[index], impulses);
 
 			// friction
 			for (int i = 0; i < N; i++)
@@ -71,17 +68,16 @@ class ContactConstraint : public Constraint {
 				if (block.full && trySolve<N>(*block.full, index))
 					return;
 
-			int count = std::min((int)(interactions.size() - index), BLOCK);
+			int count = std::min(BLOCK, (int)interactions.size() - index);
 
 			for (int i = 0; i < count; i++)
 				trySolve<1>(block.diagonal[i], index + i);
 		}
 
 	public:
-		ContactConstraint(RigidBody& _bodyA, RigidBody& _bodyB, const Collision& col)
-		: Constraint(col.dynamic), bodyA(_bodyA), bodyB(_bodyB) {
+		ContactConstraint(const DynamicState& _dynamic, RigidBody& _bodyA, RigidBody& _bodyB, const Collision& col)
+		: Constraint(_dynamic, _bodyA, _bodyB) {
 			Vector axis = col.normal;
-			matterB = col.dynamic ? bodyB.matter : Matter::STATIC;
 			double restitution = std::max(bodyA.restitution, bodyB.restitution);
 
 			int count = col.contacts.size();
@@ -101,10 +97,10 @@ class ContactConstraint : public Constraint {
 				int blockSize = std::min(BLOCK, count - i);
 
 				if (blockSize == BLOCK)
-					block.full = getDeltaToImpulsesMatrix<BLOCK>(bodyA.matter, matterB, &interactions[i], restitution);
+					block.full = getDeltaToImpulsesMatrix<BLOCK>(&interactions[i], restitution);
 				
 				for (int j = 0; j < blockSize; j++)
-					block.diagonal[j] = *getDeltaToImpulsesMatrix<1>(bodyA.matter, matterB, &interactions[i + j], restitution);
+					block.diagonal[j] = *getDeltaToImpulsesMatrix<1>(&interactions[i + j], restitution);
 
 				dvToImpulses.push_back(block);
 			}
@@ -114,7 +110,7 @@ class ContactConstraint : public Constraint {
 			penetration = col.penetration - SLOP;
 		}
 
-		void solvePosition() {
+		void solvePosition(double dt) override {
 			if (penetration < EPSILON) return;
 
 			Vector move = interactions[0].axis * penetration;
@@ -132,7 +128,7 @@ class ContactConstraint : public Constraint {
 			bodyA.sync();
 		}
 		
-		void solve() override {
+		void solveVelocity(double dt) override {
 			for (int i = 0; i < interactions.size(); i += BLOCK)
 				solve<BLOCK>(i);
 		}

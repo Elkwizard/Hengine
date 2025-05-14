@@ -156,7 +156,7 @@ MathObject.pow = (a, b) => a ** b;
  * @implements MathObject, Serializable
  * Represents a composite mathematical object which element-wise operations can be performed on.
  * @abstract
- * @static_prop String[] modValues | The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector)
+ * @static_prop String[] modValues | The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector2)
  */
 class Operable extends MathObject {
 	/**

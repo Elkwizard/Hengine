@@ -8,15 +8,14 @@ Physics.onCollide = (a, b, direction, contacts, triggerA, triggerB) => {
 	scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
 };
 
-Physics.symmetricCollisionRule = (a, b) => {
+Physics.collisionRule = (a, b) => {
 	const { bodyToSceneObject } = PHYSICS;
 	a = bodyToSceneObject.get(a.pointer);
 	b = bodyToSceneObject.get(b.pointer);
-	return	a.scripts.PHYSICS.collideBasedOnRule(b) &&
-			b.scripts.PHYSICS.collideBasedOnRule(a);
+	return	a.scripts.PHYSICS.collideBasedOnRule(b);
 };
 
-Physics.asymmetricTriggerRule = (a, b) => {
+Physics.triggerRule = (a, b) => {
 	const { bodyToSceneObject } = PHYSICS;
 	a = bodyToSceneObject.get(a.pointer);
 	b = bodyToSceneObject.get(b.pointer);
@@ -32,7 +31,7 @@ Physics.asymmetricTriggerRule = (a, b) => {
  * @prop Boolean gravity | Whether or not gravity should be applied to the object
  * @prop Boolean airResistance | Whether or not air resistance should be applied to the object
  * @prop Boolean canRotate | Whether or not the object can rotate
- * @prop Number mass | The mass of the object
+ * @prop Number mass | The mass of the object. Setting this will change the density
  * @prop Number density | The density of the object. Starts at 1
  * @prop Number friction | The coefficient of friction for the object
  * @prop Number snuzzlement | The proportion of object's velocity lost in a collision
@@ -53,6 +52,7 @@ class PHYSICS extends ElementScript {
 		this.physicsEngine = this.scene.physicsEngine;
 		
 		this.body = new Physics.RigidBody(mobile).solidify();
+		if (obj.name === "player") this.body.name = 7;
 		
 		PHYSICS.bodyToSceneObject.set(this.body.pointer, obj);
 
@@ -61,6 +61,7 @@ class PHYSICS extends ElementScript {
         this.lastColliding = new CollisionMonitor();
 
 		this.physicsShapes = new Map();
+		for (const [name, shape] of obj.shapes) this.addShape(name, shape);
 
 		const { body } = this;
 		
@@ -77,26 +78,20 @@ class PHYSICS extends ElementScript {
 		objectUtils.shortcut(this, body, "friction");
 		objectUtils.shortcut(this, body, "density");
 		objectUtils.shortcut(this, body, "airResistance", "drag");
-
-		this.synchronized = false;
 		
 		this.beforePhysics();
 
 		obj.sync(() => {
+			this.body.removeAllShapes();
+			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
+
 			// update things that should have already been done
 			if (obj.scripts.implements("triggerRule"))
 				body.trivialTriggerRule = false;
 			if (obj.scripts.implements("collideRule"))
 				body.trivialCollisionRule = false;
-		
-			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
 
 			this.physicsEngine.addBody(body);
-
-			this.synchronized = true;
-			
-			if (this._mass !== undefined)
-				this.mass = this._mass;
 		});
 	}
 	/**
@@ -104,7 +99,7 @@ class PHYSICS extends ElementScript {
 	 * @return Constraint[]
 	 */
 	get constraints() {
-		const physicsConstraints = this.physicsEngine.getBodyConstraints(this.body);
+		const physicsConstraints = this.body.constraintDescriptors;
 		const constraints = [];
 		for (let i = 0; i < physicsConstraints.length; i++)
 			constraints.push(Constraint.fromPhysicsConstraint(
@@ -142,23 +137,17 @@ class PHYSICS extends ElementScript {
 		return this.body.dynamic;
 	}
 	set mass(a) {
-		if (this.synchronized) {
-			const { body } = this;
-			body.density *= a / body.mass;
-		} else {
-			this._mass = a;
-		}
+		const { body } = this;
+		body.density *= a / body.mass;
 	}
 	get mass() {
-		return this.synchronized ? this.body.mass : this._mass;
+		return this.body.mass;
 	}
 	/**
 	 * Retrieves the moment of inertia for the object.
-	 * This will return null if used during the frame the PHYSICS script was added.
-	 * @return Number/null
+	 * @return Number
 	 */
 	get inertia() {
-		if (!this.synchronized) return null;
 		if (IS_3D) return Matrix3.fromPhysicsMatrix(this.body.inertia);
 		return this.body.inertia;
 	}
@@ -308,12 +297,17 @@ class PHYSICS extends ElementScript {
 	 */
 	constrainedTo(obj, body) {
 		body = body.scripts.PHYSICS.body;
-		const { constraints } = this.body;
-		for (let i = 0; i < constraints.length; i++) {
-			const constraint = constraints[i];
-			if (constraint.hasBody(body)) return true;
+		const descriptors = this.body.constraintDescriptors;
+		
+		try {
+			for (let i = 0; i < descriptors.length; i++)
+				if (descriptors.get(i).hasBody(body))
+					return true;
+			
+			return false;
+		} finally {
+			descriptors.delete();		
 		}
-		return false;
 	}
 }
 PHYSICS.directions = [

@@ -7,4 +7,4 @@ function compileDimension {
 }
 
 compileDimension 2
-# compileDimension 3
+compileDimension 3

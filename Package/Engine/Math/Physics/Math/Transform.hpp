@@ -40,13 +40,35 @@ API class Transform {
 			return Transform(*this) *= other;
 		}
 
+		Transform operator +=(const Transform& delta) {
+			linear += delta.linear;
+			orientation += delta.orientation;
+			return *this;
+		}
+
+		Transform operator +(const Transform& delta) const {
+			return Transform(*this) += delta;
+		}
+
+		Transform operator -=(const Transform& delta) {
+			return *this += -delta;
+		}
+
+		Transform operator -(const Transform& delta) const {
+			return Transform(*this) -= delta;
+		}
+
+		Transform operator -() const {
+			return { -linear, -orientation };
+		}
+
 		Transform inverse() const {
 			Orientation invOrientation = -orientation;
 			return { invOrientation * -linear, invOrientation };
 		}
-};
 
-std::ostream& operator <<(std::ostream& out, const Transform& transf) {
-	out << "Transform(" << transf.linear << ", " << transf.orientation.getRotation() << ")";
-	return out;
-}
+		friend std::ostream& operator <<(std::ostream& out, const Transform& transf) {
+			out << "Transform(" << transf.linear << ", " << transf.orientation.getRotation() << ")";
+			return out;
+		}
+};

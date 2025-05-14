@@ -405,7 +405,7 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 		const module = { memory };
 		HengineWASMResource.bindings[moduleName](module, imports, exports);
 
-		module.printStringJS = pointer => {
+		const readString = pointer => {
 			let string = "";
 			while (true) {
 				const code = memory.view.getUint8(pointer);
@@ -413,7 +413,23 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 				string += String.fromCharCode(code);
 				pointer++;
 			}
-			console.log(string);
+			return string;
+		};
+
+		const jsArguments = [];
+		module.sendJSArgument = value => {
+			jsArguments.push(value);
+		};
+
+		module.runJS = pointer => {
+			let string = readString(pointer);
+			while (jsArguments.length) 
+				string = string.replace("$", jsArguments.shift());
+			window.eval(string);
+		};
+
+		module.printStringJS = pointer => {
+			console.log(readString(pointer));
 		};
 
 		window[this.exportName] = module;

@@ -6,11 +6,28 @@
 #include <sstream>
 #include "../../../../Wasm/API.hpp"
 API_IMPORT void printStringJS(size_t pointer);
+API_IMPORT void sendJSArgument(double value);
+API_IMPORT void runJS(size_t pointer);
+
 #define print(x) do {\
 	std::stringstream stream;\
 	stream << #x << " = " << (x) << std::endl;\
-	printStringJS((size_t)(char*)stream.str().c_str());\
+	printString(stream.str());\
 } while (false)
+
+void printString(const std::string& str) {
+	printStringJS((size_t)str.c_str());
+}
+
+void js(const char* format) {
+	runJS((size_t)format);
+}
+
+template <typename U, typename... T>
+void js(const char* format, U value, T... values) {
+	sendJSArgument(value);
+	js(format, values...);
+}
 
 // Dimension switches
 #if __INTELLISENSE__ && !DIM
@@ -28,14 +45,14 @@ API_IMPORT void printStringJS(size_t pointer);
 #define ONLY_2D(a) IF_3D(,a)
 #define ONLY_3D(a) IF_3D(a,)
 
-bool flag = false;
+bool flag = false; // TODO: REMOVE
 
 API void markFlag(bool _flag) {
 	flag = _flag;
 }
 
 // general I/O
-std::ostream& operator>>(std::ostream& out, double value) {
+std::ostream& operator >>(std::ostream& out, double value) {
 	if (value == 0.0) out << "0";
 	else if (equals(value, std::round(value), PRINT_EPSILON)) out << std::round(value);
 	else if (equals(1.0 / value, std::round(1.0 / value), PRINT_EPSILON)) out << "1 / " << std::round(1.0 / value);
@@ -44,7 +61,7 @@ std::ostream& operator>>(std::ostream& out, double value) {
 }
 
 template <typename T>
-std::ostream& operator<<(std::ostream& out, const std::vector<T>& list) {
+std::ostream& operator <<(std::ostream& out, const std::vector<T>& list) {
 	out << "[";
 
 	if (list.size()) {

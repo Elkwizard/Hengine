@@ -15,6 +15,10 @@ API class Orientation {
 			rotation = _rotation;
 		}
 
+		static double normalizeAngle(double angle) {
+			return fmod(angle, 2 * PI);
+		}
+
 	public:
 		Orientation()
 		: Orientation({ 1.0, {} }, Rotation(0.0)) { }
@@ -32,7 +36,7 @@ API class Orientation {
 			if (mag > EPSILON) rotation /= mag;
 #else
 			// rotation = std::atan2(complex.imag, complex.real)
-			rotation += other.rotation;
+			rotation = normalizeAngle(rotation + other.rotation);
 #endif
 			return *this;
 		}

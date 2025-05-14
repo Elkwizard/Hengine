@@ -60,12 +60,12 @@ class Plane {
 			normal = _normal;
 			distance = _distance;
 		}
-};
 
-std::ostream& operator <<(std::ostream& out, const Plane& plane) {
-	out << "p * " << plane.normal << " = " >> plane.distance;
-	return out;
-}
+		friend std::ostream& operator <<(std::ostream& out, const Plane& plane) {
+			out << "p * " << plane.normal << " = " >> plane.distance;
+			return out;
+		}
+};
 
 #if IS_3D
 class Triangle {

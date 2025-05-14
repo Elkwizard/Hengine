@@ -6,21 +6,21 @@
 #include "../Global.hpp"
 #include "../Math/Random.hpp"
 #include "Constraint/Constraint.hpp"
-#include "Constraint/Constraint2.hpp"
 
-template <std::derived_from<Constraint> T, void (T::* S)()>
+template <std::derived_from<Constraint> T>
 class Resolver {
 	private:
-		std::vector<T*> staticConstraints, dynamicConstraints;
+		std::vector<std::unique_ptr<T>> staticConstraints, dynamicConstraints;
 
-		std::vector<T*>& getConstraintList(T* con) {
+		std::vector<std::unique_ptr<T>>& getConstraintList(T* con) {
 			return con->dynamic ? dynamicConstraints : staticConstraints;
 		}
 
-		void solveConstraints(std::vector<T*>& constraints) {
+		template <void (T::* S)(double)>
+		void solveConstraints(std::vector<std::unique_ptr<T>>& constraints, double dt) {
 			rng.shuffle(constraints);
-			for (T* con : constraints)
-				(con->*S)();
+			for (const auto& con : constraints)
+				(con.get()->*S)(dt);
 		}
 
 	public:
@@ -34,14 +34,15 @@ class Resolver {
 		}
 
 		void addConstraint(T* con) {
-			con->cache();
-			getConstraintList(con).push_back(con);
+			if (con == nullptr) return;
+			getConstraintList(con).emplace_back(con);
 		}
 
-		void solve(int count = 1) {
+		template <void (T::* S)(double)>
+		void solve(double dt, int count = 1) {
 			for (int i = 0; i < count; i++) {
-				solveConstraints(dynamicConstraints);
-				solveConstraints(staticConstraints);
+				solveConstraints<S>(dynamicConstraints, dt);
+				solveConstraints<S>(staticConstraints, dt);
 			}
 		}
 };

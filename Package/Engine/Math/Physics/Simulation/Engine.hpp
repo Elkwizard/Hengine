@@ -6,7 +6,7 @@
 #include "Resolver.hpp"
 #include "SpatialHash.hpp"
 #include "Constraint/ContactConstraint.hpp"
-#include "Constraint/Constraint2.hpp"
+#include "ConstraintDescriptor.hpp"
 
 API_IMPORT void onCollide(const RigidBody&, const RigidBody&, const Vector&, const std::vector<Vector>&, bool, bool);
 
@@ -17,10 +17,8 @@ API class Engine {
 		using CollisionPair = std::pair<RigidBody*, std::vector<RigidBody*>>;
 		
 		std::vector<std::unique_ptr<RigidBody>> bodies;
-		std::vector<RigidBody*> simBodies;
-		std::vector<RigidBody*> dynBodies;
-		std::vector<std::unique_ptr<ContactConstraint>> contacts;
-		std::vector<std::unique_ptr<Constraint2>> constraints;
+		std::vector<RigidBody*> simBodies, dynBodies;
+		std::vector<std::unique_ptr<ConstraintDescriptor>> constraintDescriptors;
 		std::unordered_set<std::pair<RigidBody*, RigidBody*>> collisions;
 		SpatialHash hash;
 
@@ -29,10 +27,9 @@ API class Engine {
 			simBodies.clear();
 			for (const auto& body : bodies) {
 				if (!body->simulated) continue;
-				body->sync();
 				body->cache();
 				simBodies.push_back(body.get());
-				if (body->dynamic)
+				if (body->getDynamic())
 					dynBodies.push_back(body.get());
 			}
 		}
@@ -51,51 +48,46 @@ API class Engine {
 				body->integrate(dt);
 		}
 
-		void clearProhibited() {
-			for (RigidBody* body : dynBodies)
-				body->prohibited.clear();
+		void sortBodies(bool highToLow) {
+			std::sort(dynBodies.begin(), dynBodies.end(), [=, this](RigidBody* a, RigidBody* b) {
+				double diff = dot(b->position.linear - a->position.linear, gravity);
+				return highToLow ? diff > 0 : diff < 0;
+			});
+		}
+		
+		Constraint2* tryConstraint(RigidBody& body, ConstraintDescriptor& desc) {
+			bool swap = &desc.b.body == &body;
+			Constrained& a = swap ? desc.b : desc.a;
+			Constrained& b = swap ? desc.a : desc.b;
+
+			if (a.isStatic) return nullptr;
+
+			return desc.makeConstraint(DynamicState(b.isDynamic()), a, b);
 		}
 
-		void collide(const std::vector<CollisionPair>& pairs) {
-			for (const auto& [body, toCollide] : pairs)
-				for (RigidBody* other : toCollide)
-					tryCollide(*body, *other);
-		}
+		Resolver<Constraint2> getConstraintResolver(double dt) {
+			sortBodies(true);
 
-		void tryCollide(RigidBody& a, RigidBody& b) {
-			if (&a == &b) return;
-
-			std::optional<Collision> col = Detector::collideBodies(a, b);
-			
-			if (!col || triggerCollision(&a, &b, *col)) return;
-
-			col->dynamic = b.dynamic && !b.prohibited.has(col->normal);
-			if (!col->dynamic)
-				a.prohibited.add(col->normal);
-
-			ContactConstraint* constraint = new ContactConstraint(a, b, *col);
-			constraint->solvePosition();
-			contacts.emplace_back(constraint);
-		}
-
-		bool triggerCollision(RigidBody* a, RigidBody* b, const Collision& col) {
-			auto collisionKey = a < b ? std::make_pair(a, b) : std::make_pair(b, a);
-
-			bool isTriggerA = a->isTriggerWith(*b);
-			bool isTriggerB = b->isTriggerWith(*a);
-
-			if (!collisions.count(collisionKey)) {
-				collisions.insert(collisionKey);
-				onCollide(*a, *b, col.normal, col.contacts, isTriggerA, isTriggerB);
+			Resolver<Constraint2> resolver;
+			for (RigidBody* body : dynBodies) {
+				for (ConstraintDescriptor* con : body->constraintDescriptors) {
+					resolver.addConstraint(tryConstraint(*body, *con));
+				}
 			}
 
-			return isTriggerA || isTriggerB;
-		}
+			resolver.solve<(void (Constraint2::*)(double))&Constraint::solvePosition>(dt, constraintIterations);
 
+			return resolver;
+		}
+		
+		void solveConstraints(Resolver<Constraint2>& resolver, double dt) {
+			resolver.solve<(void (Constraint2::*)(double))&Constraint::solvePosition>(dt, constraintIterations);
+			resolver.solve<&Constraint2::solveVelocity>(dt);
+		}
+		
 		std::vector<CollisionPair> getCollisionPairs(double dt) {
-			std::sort(dynBodies.begin(), dynBodies.end(), [this](RigidBody* a, RigidBody* b) {
-				return dot(b->position.linear - a->position.linear, gravity) < 0; 
-			});
+			sortBodies(false);
+
 			hash.build(simBodies, dt);
 			std::vector<CollisionPair> collisionPairs;
 			for (RigidBody* body : dynBodies) {
@@ -104,6 +96,48 @@ API class Engine {
 			}
 
 			return collisionPairs;
+		}
+
+		bool triggerCollision(RigidBody* a, RigidBody* b, const Collision& col) {
+			auto collisionKey = a < b ? std::make_pair(a, b) : std::make_pair(b, a);
+
+			bool isTriggerA = a->isTrigger || a->isTriggerWith(*b);
+			bool isTriggerB = b->isTrigger || b->isTriggerWith(*a);
+
+			if (!collisions.count(collisionKey)) {
+				collisions.insert(collisionKey);
+				onCollide(*a, *b, col.normal, col.contacts, isTriggerA, isTriggerB);
+			}
+
+			return isTriggerA || isTriggerB;
+		}
+		
+		ContactConstraint* tryCollision(RigidBody& a, RigidBody& b, double dt) {
+			if (&a == &b) return nullptr;
+
+			std::optional<Collision> col = Detector::collideBodies(a, b);
+			
+			if (!col || triggerCollision(&a, &b, *col)) return nullptr;
+
+			DynamicState dynamic = Constraint::propagateDynamic(a, b, b.getDynamic(), col->normal);
+			
+			ContactConstraint* constraint = new ContactConstraint(dynamic.round(), a, b, *col);
+			constraint->solvePosition(dt);
+			return constraint;
+		}
+
+		void solveCollisions(const std::vector<CollisionPair>& collisionPairs, double dt) {
+			for (RigidBody* body : dynBodies)
+				body->prohibited.clear();
+				
+			Resolver<ContactConstraint> resolver;
+			for (const auto& [body, toCollide] : collisionPairs) {
+				for (RigidBody* other : toCollide) {
+					resolver.addConstraint(tryCollision(*body, *other, dt));
+				}
+			}
+
+			resolver.solve<&ContactConstraint::solveVelocity>(dt, contactIterations);
 		}
 
 	public:
@@ -119,16 +153,9 @@ API class Engine {
 			bodies.emplace_back(body);
 		}
 
-		API std::vector<Constraint2*> getBodyConstraints(RigidBody* body) const {
-			std::vector<Constraint2*> result;
-			for (const auto& constraint : constraints)
-				if (constraint->hasBody(*body))
-					result.push_back(constraint.get());
-			return result;
-		}
-
 		API void removeBody(RigidBody* body) {
-			for (Constraint2* constraint : getBodyConstraints(body))
+			std::vector<ConstraintDescriptor*> descriptors = body->constraintDescriptors;
+			for (ConstraintDescriptor* constraint : descriptors)
 				removeConstraint(constraint);
 			erase(bodies, body);
 		}
@@ -140,19 +167,19 @@ API class Engine {
 			return result;
 		}
 
-		API void addConstraint(Constraint2* constraint) {
-			constraints.emplace_back(constraint);
+		API void addConstraint(ConstraintDescriptor* constraint) {
+			constraintDescriptors.emplace_back(constraint);
 			constraint->add();
 		}
 
-		API void removeConstraint(Constraint2* constraint) {
+		API void removeConstraint(ConstraintDescriptor* constraint) {
 			constraint->remove();
-			erase(constraints, constraint);
+			erase(constraintDescriptors, constraint);
 		}
 
-		API std::vector<Constraint2*> getConstraints() const {
-			std::vector<Constraint2*> result;
-			for (const auto& constraint : constraints)
+		API std::vector<ConstraintDescriptor*> getConstraintDescriptors() const {
+			std::vector<ConstraintDescriptor*> result;
+			for (const auto& constraint : constraintDescriptors)
 				result.push_back(constraint.get());
 			return result;
 		}
@@ -162,31 +189,15 @@ API class Engine {
 
 			collisions.clear();
 			
+			Resolver<Constraint2> constraintResolver = getConstraintResolver(deltaTime);
 			std::vector<CollisionPair> collisionPairs = getCollisionPairs(deltaTime);
 
-			double subDeltaTime = deltaTime / iterations;
+			double dt = deltaTime / iterations;
 			for (int i = 0; i < iterations; i++) {
-				integrate(subDeltaTime);
-				applyForces(subDeltaTime);
-
-				{ // resolve position
-					clearProhibited();
-					Resolver<Constraint2, &Constraint2::solvePosition> resolver;
-					for (const auto& item : constraints)
-						resolver.addConstraint(item.get());
-					resolver.solve(constraintIterations);
-					collide(getCollisionPairs(0));
-				}
-
-				{ // resolve velocity
-					Resolver<Constraint, &Constraint::solve> resolver;
-					for (const auto& item : constraints)
-						resolver.addConstraint(item.get());
-					for (const auto& item : contacts)
-						resolver.addConstraint(item.get());
-					resolver.solve(contactIterations);
-					contacts.clear();
-				}
+				applyForces(dt);
+				integrate(dt);
+				solveConstraints(constraintResolver, dt);
+				solveCollisions(collisionPairs, dt);
 			}
 		}
 
@@ -197,5 +208,16 @@ API class Engine {
 				best.add(body->raycast(ray));
 
 			return best;
+		}
+
+		friend std::ostream& operator <<(std::ostream& out, const Engine& engine) {
+			out << "State(" << engine.simBodies << ", [";
+			for (int i = 0; i < engine.constraintDescriptors.size(); i++) {
+				out << *engine.constraintDescriptors[i];
+				if (i < engine.constraintDescriptors.size() - 1) out << ", ";
+			}
+			out << "])";
+
+			return out;
 		}
 };

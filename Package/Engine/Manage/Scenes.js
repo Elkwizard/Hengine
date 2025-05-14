@@ -59,7 +59,7 @@ class Scene {
 	 * @return Constraint[]
 	 */
 	get constraints() {
-		const physicsConstraints = this.physicsEngine.constraints;
+		const physicsConstraints = this.physicsEngine.constraintDescriptors;
 		const constraints = [];
 		for (let i = 0; i < physicsConstraints.length; i++)
 			constraints.push(Constraint.fromPhysicsConstraint(
@@ -151,17 +151,15 @@ class Scene {
 		const a = this.makeConstrained(aOffset, bodyA);
 		const b = this.makeConstrained(bOffset, bodyB);
 
-		const con = new Physics.LengthConstraint2(a, b, length);
+		length ??= VectorN.dist(
+			bodyA ? bodyA.transform.localSpaceToGlobalSpace(aOffset) : a.anchor,
+			bodyB.transform.localSpaceToGlobalSpace(bOffset)
+		);
+
+		const con = new Physics.LengthConstraintDescriptor(a, b, length);
 
 		a.delete();
 		b.delete();
-
-		if (length === null) {
-			con.length = VectorN.dist(
-				VectorN.fromPhysicsVector(con.a.anchor),
-				VectorN.fromPhysicsVector(con.b.anchor)
-			);
-		}
 
 		this.physicsEngine.addConstraint(con);
 		return Constraint.fromPhysicsConstraint(con, this.engine);
@@ -191,7 +189,7 @@ class Scene {
 		const a = this.makeConstrained(aOffset, bodyA);
 		const b = this.makeConstrained(bOffset, bodyB);
 
-		const con = new Physics.PositionConstraint2(a, b);
+		const con = new Physics.PositionConstraintDescriptor(a, b);
 
 		a.delete();
 		b.delete();
@@ -208,7 +206,7 @@ class Scene {
 	 */
 	constrainPositionToPoint(body, offset = Vector2.zero, point = null) {
 		point ??= body.transform.localToGlobal(offset);
-		return this.constrainPosition(null, body, offset, point);
+		return this.constrainPosition(null, body, point, offset);
 	}
 	updateCaches() {
 		for (const el of this.main.sceneObjectArray) el.updateCaches();
@@ -284,7 +282,9 @@ class Scene {
 
 		//physics
 		this.script("beforePhysics");
-		this.physicsEngine.run(1);
+		this.camera.drawInWorldSpace(() => {
+			this.physicsEngine.run(1);
+		});
 		this.script("afterPhysics");
 
 		//draw

@@ -9,6 +9,9 @@
 #include <unordered_map>
 
 API class Shape {
+	protected:
+		virtual void output(std::ostream& out) const = 0;
+	
 	public:
 		enum Type { BALL, POLYTOPE, COUNT };
 		Type type;
@@ -25,9 +28,19 @@ API class Shape {
 		virtual AABB getBounds() const = 0;
 		virtual AABB getBallBounds() const = 0;
 		virtual double raycast(const Ray& ray) const = 0;
+
+		friend std::ostream& operator <<(std::ostream& out, const Shape& shape) {
+			shape.output(out);
+			return out;
+		}
 };
 
 API class Ball : public Shape {
+	protected:
+		void output(std::ostream& out) const override {
+			out << "Ball(" << position << ", " << radius << ")";
+		}
+
 	public:
 		Vector position;
 		double radius;
@@ -159,6 +172,11 @@ API class Polytope : public Shape {
 #else
 			edges = faces;
 #endif
+		}
+
+	protected:
+		void output(std::ostream& out) const override {
+			out << "Polytope(" << vertices << ")";
 		}
 
 	public:

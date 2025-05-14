@@ -64,9 +64,9 @@ class Shadow {
 			if (value < min) min = value;
 			else if (value > max) max = value;
 		}
-};
 
-std::ostream& operator<<(std::ostream& out, const Shadow& shadow) {
-	out << "[" >> shadow.min << ", " >> shadow.max << "]";
-	return out;
-}
+		friend std::ostream& operator <<(std::ostream& out, const Shadow& shadow) {
+			out << "[" >> shadow.min << ", " >> shadow.max << "]";
+			return out;
+		}
+};
