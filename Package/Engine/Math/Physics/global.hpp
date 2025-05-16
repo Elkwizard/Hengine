@@ -31,7 +31,7 @@ void js(const char* format, U value, T... values) {
 
 // Dimension switches
 #if __INTELLISENSE__ && !DIM
-	#define DIM 3
+	#define DIM 2
 #endif
 
 #if DIM == 3
@@ -44,12 +44,6 @@ void js(const char* format, U value, T... values) {
 
 #define ONLY_2D(a) IF_3D(,a)
 #define ONLY_3D(a) IF_3D(a,)
-
-bool flag = false; // TODO: REMOVE
-
-API void markFlag(bool _flag) {
-	flag = _flag;
-}
 
 // general I/O
 std::ostream& operator >>(std::ostream& out, double value) {

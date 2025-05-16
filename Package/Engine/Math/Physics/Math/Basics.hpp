@@ -18,6 +18,10 @@ T sign(T x) {
 	return (x > T(0)) - (x < T(0));
 }
 
+double mod(double x, double y) {
+	return std::fmod(x, y) + (x < 0 ? y : 0);
+}
+
 constexpr bool equals(double a, double b, double eps = EPSILON) {
 	return std::abs(a - b) < eps;
 }

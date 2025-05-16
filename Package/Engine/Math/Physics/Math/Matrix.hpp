@@ -263,27 +263,6 @@ API_TEMPLATE class MatrixRC {
 			return elements[0];
 		}
 
-#if IS_3D
-		static MatrixRC fromRotation(const Complex& quat) {
-			static_assert(R == 3 && C == 3, "Quaternion rotation matrices must be 3x3");
-			auto [r, v] = quat;
-			MatrixRC scale = (r * r - v.sqrMag()) * MatrixRC();
-			MatrixRC cross = r * MatrixRC::cross(v);
-			MatrixRC dot { v[0] * v, v[1] * v, v[2] * v };
-			return scale + 2.0 * (dot + cross);
-		}
-#else
-		static MatrixRC fromRotation(double theta) {
-			static_assert(R == 2 && C == 2, "Angular rotation matrices must be 2x2");
-			double c = std::cos(theta);
-			double s = std::sin(theta);
-
-			return {
-				c, -s,
-				s, c
-			};
-		}
-#endif
 		static MatrixRC scale(const VectorN<R>& factor) {
 			static_assert(R == C, "Cannot create non-square scaling matrix");
 			MatrixRC result;

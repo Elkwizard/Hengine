@@ -15,6 +15,12 @@ class Engine;
 API class Engine {
 	private:
 		using CollisionPair = std::pair<RigidBody*, std::vector<RigidBody*>>;
+
+		static constexpr double CONSTRAINT_IMPROVEMENT_THRESHOLD = 0.1;
+		static constexpr int CONSTRAINT_CONFUSION_THRESHOLD = 4;
+		static constexpr int CONSTRAINT_BATCH_SIZE = 30;
+		static constexpr int CONSTRAINT_ITERATIONS_THRESHOLD = 100;
+		static constexpr double CONSTRAINT_ERROR_THRESHOLD = 3.0;
 		
 		std::vector<std::unique_ptr<RigidBody>> bodies;
 		std::vector<RigidBody*> simBodies, dynBodies;
@@ -69,20 +75,36 @@ API class Engine {
 			sortBodies(true);
 
 			Resolver<Constraint2> resolver;
-			for (RigidBody* body : dynBodies) {
-				for (ConstraintDescriptor* con : body->constraintDescriptors) {
+			for (RigidBody* body : dynBodies)
+				for (ConstraintDescriptor* con : body->constraintDescriptors)
 					resolver.addConstraint(tryConstraint(*body, *con));
-				}
-			}
 
-			resolver.solve<(void (Constraint2::*)(double))&Constraint::solvePosition>(dt, constraintIterations);
+			// attempt to solve position, until various conditions
+			// occur that suggest convergence has failed
+			double lastError = INFINITY;
+			double error;
+			int confusion = 0;
+			double errorThreshold = CONSTRAINT_ERROR_THRESHOLD / iterations;
+
+			for (int i = 0; i < CONSTRAINT_ITERATIONS_THRESHOLD; i++) {
+				error = resolver.getError();
+				if (error < errorThreshold) break;
+				if (error > lastError - CONSTRAINT_IMPROVEMENT_THRESHOLD) {
+					confusion++;
+					if (confusion > CONSTRAINT_CONFUSION_THRESHOLD)
+						break;
+				}
+				lastError = error;
+				resolver.solve<&Constraint::solvePosition>(dt, CONSTRAINT_BATCH_SIZE);
+			}
 
 			return resolver;
 		}
 		
 		void solveConstraints(Resolver<Constraint2>& resolver, double dt) {
-			resolver.solve<(void (Constraint2::*)(double))&Constraint::solvePosition>(dt, constraintIterations);
-			resolver.solve<&Constraint2::solveVelocity>(dt);
+			resolver.solve<&Constraint::solvePosition>(dt, constraintIterations);
+			resolver.solve<&Constraint2::recomputeVelocity>(dt);
+			resolver.solve<&Constraint::solveVelocity>(dt, constraintIterations);
 		}
 		
 		std::vector<CollisionPair> getCollisionPairs(double dt) {
@@ -90,11 +112,10 @@ API class Engine {
 
 			hash.build(simBodies, dt);
 			std::vector<CollisionPair> collisionPairs;
-			for (RigidBody* body : dynBodies) {
+			for (RigidBody* body : dynBodies)
 				if (body->canCollide)
 					collisionPairs.emplace_back(body, hash.query(body));
-			}
-
+			
 			return collisionPairs;
 		}
 
@@ -129,13 +150,11 @@ API class Engine {
 		void solveCollisions(const std::vector<CollisionPair>& collisionPairs, double dt) {
 			for (RigidBody* body : dynBodies)
 				body->prohibited.clear();
-				
+			
 			Resolver<ContactConstraint> resolver;
-			for (const auto& [body, toCollide] : collisionPairs) {
-				for (RigidBody* other : toCollide) {
+			for (const auto& [body, toCollide] : collisionPairs)
+				for (RigidBody* other : toCollide)
 					resolver.addConstraint(tryCollision(*body, *other, dt));
-				}
-			}
 
 			resolver.solve<&ContactConstraint::solveVelocity>(dt, contactIterations);
 		}
@@ -184,6 +203,14 @@ API class Engine {
 			return result;
 		}
 
+		API double getKineticEnergy() const {
+			double K = 0;
+			for (RigidBody* body : dynBodies)
+				K += body->getKineticEnergy();
+			
+			return K;
+		}
+
 		API void run(double deltaTime) {
 			cacheBodies();
 
@@ -191,7 +218,7 @@ API class Engine {
 			
 			Resolver<Constraint2> constraintResolver = getConstraintResolver(deltaTime);
 			std::vector<CollisionPair> collisionPairs = getCollisionPairs(deltaTime);
-
+			
 			double dt = deltaTime / iterations;
 			for (int i = 0; i < iterations; i++) {
 				applyForces(dt);

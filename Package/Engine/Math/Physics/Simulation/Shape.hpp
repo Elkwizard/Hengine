@@ -61,13 +61,11 @@ API class Ball : public Shape {
 		}
 
 		Matter getMatter() const override {
-#if IS_3D
-			double mass = 4.0 / 3.0 * PI * std::pow(radius, 3);
-			Inertia inertia = 0.4 * mass * std::pow(radius, 2);
-#else
-			double mass = PI * std::pow(radius, 2);
-			Inertia inertia = 1.25 * mass * std::pow(radius, 2);
-#endif
+			double mass = IF_3D(
+				4.0 / 3.0 * PI * std::pow(radius, 3),
+				PI * std::pow(radius, 2)
+			);
+			Inertia inertia = IF_3D(0.4, 0.5) * mass * std::pow(radius, 2);
 			Matter result { mass, inertia };
 			return result.translate(position);
 		}
@@ -107,41 +105,35 @@ API class Polytope : public Shape {
 		std::vector<IndexFace> faces;
 		std::vector<IndexEdge> edges;
 
-#if IS_3D
-		static Matter getComponentMatter(Face tri) {
-			Matrix fromAligned { tri.a, tri.b, tri.c };
-			
-			double mass = fromAligned.determinant() / factorial(DIM);
+		static Matter getComponentMatter(const Face& face) {
+			Matrix fromAligned = IF_3D(
+				Matrix(face.a, face.b, face.c),
+				Matrix(face.start, face.end)
+			);
+
+			double determinant = fromAligned.determinant();
+			double mass = determinant / factorial(DIM);
 			
 			auto product = [&](int xIndex, int yIndex) {
 				Vector x = fromAligned.row(xIndex);
 				Vector y = fromAligned.row(yIndex);
-				return x.sum() * y.sum() + dot(x, y);
+				return x.sum() * y.sum() + x.sqrMag();
 			};
 
-			Matrix inertia = Matrix(
+#if IS_3D
+			Inertia rawInertia {
 				product(1, 1) + product(2, 2), -product(0, 1), -product(0, 2),
 				-product(0, 1), product(0, 0) + product(2, 2), -product(1, 2),
 				-product(0, 2), -product(1, 2), product(0, 0) + product(1, 1)
-			) * (mass / factorial(DIM + 2));
-
-			return { mass, inertia, false };
-		}
-#else
-		static Matter getComponentMatter(Face line) {
-			Matrix fromAligned { line.start, line.end };
-			double mass = fromAligned.determinant() / factorial(DIM);
-
-			auto product = [&](int inx) {
-				Vector x = fromAligned.row(inx);
-				return pow(x.sum(), 2) + x.sqrMag();
 			};
+#else		
 
-			double inertia = (product(0) + product(1)) * (mass / factorial(DIM + 2));
-
-			return { mass, inertia, false };
-		}
+			Inertia rawInertia = product(0, 0) + product(1, 1);
 #endif
+			
+			double coefficient = determinant / factorial(DIM + 2);
+			return { mass, rawInertia * coefficient, false };
+		}
 
 		void computeDependentData() {
 			position = average(vertices);
@@ -246,13 +238,13 @@ API class Polytope : public Shape {
 		}
 
 		Matter getMatter() const override {
-			Matter sum { 0.0, 0.0, false };
+			Matter result;
 
 			for (int i = 0; i < faces.size(); i++)
-				sum += getComponentMatter(getFace(i));
+				result += getComponentMatter(getFace(i));
 			
-			sum.computeInverses();
-			return sum;
+			result.computeInverses();
+			return result;
 		}
 
 		AABB getBounds() const override {

@@ -16,7 +16,8 @@ API class Orientation {
 		}
 
 		static double normalizeAngle(double angle) {
-			return fmod(angle, 2 * PI);
+			// equivalent to std::atan2(std::cos(angle), std::sin(angle));
+			return mod(angle - PI, 2 * PI) - PI;
 		}
 
 	public:
@@ -29,15 +30,16 @@ API class Orientation {
 
 		Orientation& operator *=(const Orientation& other) {
 			complex *= other.complex;
+			
 #if IS_3D
-			double mag = complex.imag.mag();
-			double phi = std::atan2(mag, complex.real);
-			rotation = 2.0 * phi * complex.imag;
-			if (mag > EPSILON) rotation /= mag;
+				double mag = complex.imag.mag();
+				double phi = std::atan2(mag, complex.real);
+				rotation = 2.0 * phi * complex.imag;
+				if (mag > EPSILON) rotation /= mag;
 #else
-			// rotation = std::atan2(complex.imag, complex.real)
-			rotation = normalizeAngle(rotation + other.rotation);
+				rotation = normalizeAngle(rotation + other.rotation);
 #endif
+
 			return *this;
 		}
 

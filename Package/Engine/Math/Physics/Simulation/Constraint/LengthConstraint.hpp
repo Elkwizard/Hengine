@@ -12,6 +12,11 @@ class LengthConstraint : public Constraint2 {
 			length = _length;
 		}
 
+		double getError() const override {
+			Vector diff = b.getAnchor() - a.getAnchor();
+			return std::abs(diff.mag() - length);
+		}
+
 		void solvePosition(double dt) override {
 			generateInteraction();
 
@@ -20,5 +25,12 @@ class LengthConstraint : public Constraint2 {
 
 			Vector1 delta = std::sqrt(sqrMag) - length;
 			applyImpulses<&RigidBody::position, 1>(&interaction, dvToImpulses * delta);
+		}
+
+		void solveVelocity(double dt) override {
+			generateInteraction();
+
+			Vector1 delta = getVelocityDelta<1>(&interaction);
+			applyImpulses<&RigidBody::velocity, 1>(&interaction, dvToImpulses * delta);
 		}
 };

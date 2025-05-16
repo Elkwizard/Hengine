@@ -206,6 +206,12 @@ class ElementScript {
 	 */
 }
 
+ElementScript.stateChangeFlags = new Set([
+	"addScript",
+	"addShape",
+	"removeShape"
+]);
+
 ElementScript.flags = new Set([
 	"init",
 	"update",
@@ -228,9 +234,7 @@ ElementScript.flags = new Set([
 	"unhover",
 	"remove",
 	"cleanUp",
-	"addShape",
-	"removeShape",
-	"addScript"
+	...ElementScript.stateChangeFlags
 ]);
 
 /**
@@ -385,10 +389,12 @@ class ScriptContainer {
 	run(method, ...args) {
 		if (!this.implementedMethods.has(method)) return;
 
+		const stateChange = ElementScript.stateChangeFlags.has(method);
+
 		const sorted = this.sortedScriptInstances;
 		for (let i = 0; i < sorted.length; i++) {
 			const script = sorted[i];
-			if (script.scriptSynced)
+			if (stateChange || script.scriptSynced)
 				script[method](...args);
 		}
 	}

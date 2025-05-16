@@ -42,6 +42,24 @@ class LineN {
 			return dot(start, normal());
 		}
 
+		LineN& operator +=(const Vector& offset) {
+			start += offset;
+			end += offset;
+			return *this;
+		}
+		
+		LineN operator +(const Vector& offset) const {
+			return LineN(*this) += offset;
+		}
+		
+		LineN& operator -=(const Vector& offset) {
+			return *this += -offset;
+		}
+
+		LineN operator -(const Vector& offset) const {
+			return LineN(*this) -= offset;
+		}
+
 		Vector closestPointTo(const Vector& point) const {
 			Vector diff = vector();
 			double t = dot(point - start, diff) / diff.sqrMag();
@@ -95,6 +113,25 @@ class Triangle {
 
 		double distance() const {
 			return dot(a, normal());
+		}
+
+		Triangle& operator +=(const Vector& offset) {
+			a += offset;
+			b += offset;
+			c += offset;
+			return *this;
+		}
+		
+		Triangle& operator -=(const Vector& offset) {
+			return *this += -offset;
+		}
+		
+		Triangle operator +(const Vector& offset) const {
+			return Triangle(*this) += offset;
+		}
+
+		Triangle operator -(const Vector& offset) const {
+			return Triangle(*this) -= offset;
 		}
 
 		Vector closestPointTo(const Vector& point) const {

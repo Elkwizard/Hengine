@@ -44,7 +44,7 @@
 	scene.mouseEvents = true;
 
 	for (let i = 0; i < 50; i++) {
-		const block = scene.main.addPhysicsRectElement("block", width / 2, height - (i + 1) * 40, 40 - i / 100, 40, true, new Controls("w", "s", "a", "d"), "No Tag");
+		const block = scene.main.addPhysicsRectElement("block", width / 2, height - (i + 1) * 40, Random.range(40, 100), 40, true, new Controls("w", "s", "a", "d"), "No Tag");
 		block.scripts.add(BLOCK);
 		block.scripts.add(THROWABLE);
 	}

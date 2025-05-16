@@ -19,5 +19,5 @@ emcc \
 	-sALLOW_MEMORY_GROWTH=1 \
 	--no-entry \
 	-std=c++20 \
-	-O3
+	${@:2}
 node Wasm/genBuffer $1

@@ -100,6 +100,7 @@ class Constraint {
 		virtual ~Constraint() { }
 		virtual void solvePosition(double dt) = 0;
 		virtual void solveVelocity(double dt) = 0;
+		virtual double getError() const { return 0; }
 
 		Vector getInteractionVelocity(const Interaction& interaction) const {
 			Vector velocity = -bodyA.getPointVelocity(interaction.contactA);
@@ -201,8 +202,8 @@ class Constraint2 : public Constraint {
 		Constraint2(const DynamicState& _dynamic, Constrained& _a, Constrained& _b)
 		: Constraint(_dynamic, _a.body, _b.body), a(_a), b(_b) { }
 
-		void solveVelocity(double dt) override {
-			bodyA.recomputeVelocity(a.offset, interaction.axis, dt);
-			if (dynamic) bodyB.recomputeVelocity(b.offset, interaction.axis, dt);
+		void recomputeVelocity(double dt) {
+			bodyA.recomputeVelocity(dt);
+			if (dynamic) bodyB.recomputeVelocity(dt);
 		}
 };

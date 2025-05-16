@@ -82,9 +82,6 @@ class PHYSICS extends ElementScript {
 		this.beforePhysics();
 
 		obj.sync(() => {
-			this.body.removeAllShapes();
-			for (const [name, shape] of obj.shapes) this.addShape(name, shape);
-
 			// update things that should have already been done
 			if (obj.scripts.implements("triggerRule"))
 				body.trivialTriggerRule = false;

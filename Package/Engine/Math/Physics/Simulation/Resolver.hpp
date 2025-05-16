@@ -10,17 +10,27 @@
 template <std::derived_from<Constraint> T>
 class Resolver {
 	private:
+		using Solve = void (T::*)(double);
+
 		std::vector<std::unique_ptr<T>> staticConstraints, dynamicConstraints;
 
 		std::vector<std::unique_ptr<T>>& getConstraintList(T* con) {
 			return con->dynamic ? dynamicConstraints : staticConstraints;
 		}
 
-		template <void (T::* S)(double)>
+		template <Solve S>
 		void solveConstraints(std::vector<std::unique_ptr<T>>& constraints, double dt) {
 			rng.shuffle(constraints);
 			for (const auto& con : constraints)
 				(con.get()->*S)(dt);
+		}
+		
+		template <typename U, void (U::* S)(double)>
+		void solve(double dt, int count) {
+			for (int i = 0; i < count; i++) {
+				solveConstraints<(Solve)S>(dynamicConstraints, dt);
+				solveConstraints<(Solve)S>(staticConstraints, dt);
+			}
 		}
 
 	public:
@@ -37,12 +47,24 @@ class Resolver {
 			if (con == nullptr) return;
 			getConstraintList(con).emplace_back(con);
 		}
+		
+		double getError() const {
+			double result = 0;
+			for (const auto& con : staticConstraints)
+				result += con->getError();
+			for (const auto& con : dynamicConstraints)
+				result += con->getError();
+			return result;	
+		}
 
+		template <void (Constraint::* S)(double)>
+		void solve(double dt, int count = 1) {
+			solve<Constraint, S>(dt, count);
+		}
+		
 		template <void (T::* S)(double)>
 		void solve(double dt, int count = 1) {
-			for (int i = 0; i < count; i++) {
-				solveConstraints<S>(dynamicConstraints, dt);
-				solveConstraints<S>(staticConstraints, dt);
-			}
+			solve<T, S>(dt, count);
 		}
+
 };

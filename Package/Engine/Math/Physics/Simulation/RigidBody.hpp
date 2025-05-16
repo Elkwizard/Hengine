@@ -235,6 +235,19 @@ API class RigidBody {
 			colliders.clear();
 		}
 
+		API double getKineticEnergy() const {
+			double K = 0.5 * localMatter.mass * velocity.linear.sqrMag();
+#if IS_3D
+			Vector rotation = velocity.orientation.getRotation();
+			double omega = rotation.mag();
+			Vector axis = rotation / omega;
+			K += 0.5 * dot(axis, matter.inertia * axis) * std::pow(omega, 2);
+#else
+			K += 0.5 * matter.inertia * std::pow(velocity.orientation.getRotation(), 2);
+#endif
+			return K;
+		}
+
 		bool isTriggerWith(const RigidBody& other) const {
 			return !trivialTriggerRule && triggerRule(*this, other);
 		}
@@ -258,7 +271,7 @@ API class RigidBody {
 			);
 		}
 
-		void recomputeVelocity(const Vector& offset, const Vector& axis, double dt) {
+		void recomputeVelocity(double dt) {
 			velocity = (position - lastPosition) * (1.0 / dt);
 		}
 
