@@ -20,12 +20,12 @@ API class Engine {
 		static constexpr int CONSTRAINT_CONFUSION_THRESHOLD = 4;
 		static constexpr int CONSTRAINT_BATCH_SIZE = 30;
 		static constexpr int CONSTRAINT_ITERATIONS_THRESHOLD = 100;
-		static constexpr double CONSTRAINT_ERROR_THRESHOLD = 3.0;
+		static constexpr double CONSTRAINT_ERROR_THRESHOLD = 1.0;
 		
 		std::vector<std::unique_ptr<RigidBody>> bodies;
 		std::vector<RigidBody*> simBodies, dynBodies;
 		std::vector<std::unique_ptr<ConstraintDescriptor>> constraintDescriptors;
-		std::unordered_set<std::pair<RigidBody*, RigidBody*>> collisions;
+		std::unordered_map<std::pair<RigidBody*, RigidBody*>, bool> triggerCache;
 		SpatialHash hash;
 
 		void cacheBodies() {
@@ -71,6 +71,19 @@ API class Engine {
 			return desc.makeConstraint(b.isDynamic(), a, b);
 		}
 
+		void exploreIsland(RigidBody* body, int island, std::unordered_map<RigidBody*, int>& map) {
+			if (map.count(body)) return;
+
+			map.emplace(std::make_pair(body, island));
+
+			for (ConstraintDescriptor* desc : body->constraintDescriptors) {
+				bool swap = body != &desc->a.body;
+				RigidBody* other = swap ? &desc->a.body : &desc->b.body;
+				bool dynamic = swap ? desc->b.isDynamic() : desc->a.isDynamic();
+				if (dynamic) exploreIsland(other, island, map);
+			}
+		}
+
 		Resolver<Constraint2> getConstraintResolver(double dt) {
 			sortBodies(true);
 
@@ -79,12 +92,23 @@ API class Engine {
 				for (ConstraintDescriptor* con : body->constraintDescriptors)
 					resolver.addConstraint(tryConstraint(*body, *con));
 
+			int islandCount = 0;
+			{ // group the bodies into islands
+				std::unordered_map<RigidBody*, int> map;
+				for (RigidBody* body : simBodies) {
+					if (body->constraintDescriptors.size() > 0 && !map.count(body)) {
+						exploreIsland(body, islandCount, map);
+						islandCount++;
+					}
+				}
+			}
+
 			// attempt to solve position, until various conditions
 			// occur that suggest convergence has failed
 			double lastError = INFINITY;
 			double error;
 			int confusion = 0;
-			double errorThreshold = CONSTRAINT_ERROR_THRESHOLD / iterations;
+			double errorThreshold = CONSTRAINT_ERROR_THRESHOLD * islandCount;
 
 			for (int i = 0; i < CONSTRAINT_ITERATIONS_THRESHOLD; i++) {
 				error = resolver.getError();
@@ -104,7 +128,7 @@ API class Engine {
 		void solveConstraints(Resolver<Constraint2>& resolver, double dt) {
 			resolver.solve<&Constraint::solvePosition>(dt, constraintIterations);
 			resolver.solve<&Constraint2::recomputeVelocity>(dt);
-			resolver.solve<&Constraint::solveVelocity>(dt, constraintIterations);
+			resolver.solve<&Constraint::solveVelocity>(dt);
 		}
 		
 		std::vector<CollisionPair> getCollisionPairs(double dt) {
@@ -122,15 +146,17 @@ API class Engine {
 		bool triggerCollision(RigidBody* a, RigidBody* b, const Collision& col) {
 			auto collisionKey = a < b ? std::make_pair(a, b) : std::make_pair(b, a);
 
-			bool isTriggerA = a->isTrigger || a->isTriggerWith(*b);
-			bool isTriggerB = b->isTrigger || b->isTriggerWith(*a);
-
-			if (!collisions.count(collisionKey)) {
-				collisions.insert(collisionKey);
+			if (!triggerCache.count(collisionKey)) {
+				bool isTriggerA = a->isTrigger || a->isTriggerWith(*b);
+				bool isTriggerB = b->isTrigger || b->isTriggerWith(*a);
+	
 				onCollide(*a, *b, col.normal, col.contacts, isTriggerA, isTriggerB);
+
+				bool isTrigger = isTriggerA || isTriggerB;
+				triggerCache.emplace(std::make_pair(collisionKey, isTrigger));
 			}
 
-			return isTriggerA || isTriggerB;
+			return triggerCache.at(collisionKey);
 		}
 		
 		ContactConstraint* tryCollision(RigidBody& a, RigidBody& b, double dt) {
@@ -214,7 +240,7 @@ API class Engine {
 		API void run(double deltaTime) {
 			cacheBodies();
 
-			collisions.clear();
+			triggerCache.clear();
 			
 			Resolver<Constraint2> constraintResolver = getConstraintResolver(deltaTime);
 			std::vector<CollisionPair> collisionPairs = getCollisionPairs(deltaTime);
