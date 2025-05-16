@@ -26,7 +26,7 @@ API class ConstraintDescriptor {
 			erase(b.body.constraintDescriptors, this);
 		}
 
-		virtual Constraint2* makeConstraint(const DynamicState& prohibited, Constrained& a, Constrained& b) = 0;
+		virtual Constraint2* makeConstraint(bool prohibited, Constrained& a, Constrained& b) = 0;
 
 		friend std::ostream& operator <<(std::ostream& out, const ConstraintDescriptor& desc) {
 			out << "Constraint(" << desc.a.getAnchor() << ", " << desc.b.getAnchor() << ")";
@@ -43,7 +43,7 @@ API class LengthConstraintDescriptor : public ConstraintDescriptor {
 			length = _length;
 		}
 
-		Constraint2* makeConstraint(const DynamicState& dynamic, Constrained& a, Constrained& b) override {
+		Constraint2* makeConstraint(bool dynamic, Constrained& a, Constrained& b) override {
 			return new LengthConstraint(dynamic, a, b, length);
 		}
 };
@@ -53,7 +53,7 @@ API class PositionConstraintDescriptor : public ConstraintDescriptor {
 		API PositionConstraintDescriptor(const Constrained& _a, const Constrained& _b)
 		: ConstraintDescriptor(_a, _b) { }
 
-		Constraint2* makeConstraint(const DynamicState& dynamic, Constrained& a, Constrained& b) override {
+		Constraint2* makeConstraint(bool dynamic, Constrained& a, Constrained& b) override {
 			return new LengthConstraint(dynamic, a, b, 0);
 		}
 };

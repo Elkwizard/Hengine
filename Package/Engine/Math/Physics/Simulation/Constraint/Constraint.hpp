@@ -22,29 +22,6 @@ API class Constrained {
 		}
 };
 
-class DynamicState {
-	public:
-		bool dynamic;
-		std::optional<Vector> prohibited;
-
-		explicit DynamicState(bool _dynamic) {
-			dynamic = _dynamic;
-		}
-
-		explicit DynamicState(const Vector& _prohibited) {
-			dynamic = true;
-			prohibited = _prohibited;
-		}
-
-		DynamicState round() const {
-			return DynamicState(dynamic && !prohibited);
-		}
-
-		operator bool() const {
-			return dynamic;
-		}
-};
-
 class Interaction {
 	public:
 		Cross crossA, crossB;
@@ -88,12 +65,12 @@ class Constraint {
 		}
 
 	public:
-		DynamicState dynamic;
+		bool dynamic;
 		RigidBody& bodyA;
 		RigidBody& bodyB;
 		Matter matterB;
 
-		Constraint(DynamicState _dynamic, RigidBody& _bodyA, RigidBody& _bodyB)
+		Constraint(bool _dynamic, RigidBody& _bodyA, RigidBody& _bodyB)
 		: dynamic(_dynamic), bodyA(_bodyA), bodyB(_bodyB) {
 			matterB = dynamic ? bodyB.matter : Matter::STATIC;
 		}
@@ -159,21 +136,15 @@ class Constraint {
 			return result;
 		}
 
-		static DynamicState propagateDynamic(
+		static bool propagateDynamic(
 			RigidBody& a, RigidBody& b, bool bDynamic, const Vector& normal
 		) {
-			if (!bDynamic) {
+			if (!bDynamic || b.prohibited.has(normal)) {
 				a.prohibited.add(normal);
-				return DynamicState(false);
-			}
-
-			std::optional<Vector> match = b.prohibited.match(normal);
-			if (match) {
-				a.prohibited.add(*match);
-				return DynamicState(*match);
+				return false;
 			}
 			
-			return DynamicState(true);
+			return true;
 		}
 };
 
@@ -199,7 +170,7 @@ class Constraint2 : public Constraint {
 		}
 
 	public:
-		Constraint2(const DynamicState& _dynamic, Constrained& _a, Constrained& _b)
+		Constraint2(bool _dynamic, Constrained& _a, Constrained& _b)
 		: Constraint(_dynamic, _a.body, _b.body), a(_a), b(_b) { }
 
 		void recomputeVelocity(double dt) {

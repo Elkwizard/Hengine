@@ -68,7 +68,7 @@ API class Engine {
 
 			if (a.isStatic) return nullptr;
 
-			return desc.makeConstraint(DynamicState(b.isDynamic()), a, b);
+			return desc.makeConstraint(b.isDynamic(), a, b);
 		}
 
 		Resolver<Constraint2> getConstraintResolver(double dt) {
@@ -140,9 +140,9 @@ API class Engine {
 			
 			if (!col || triggerCollision(&a, &b, *col)) return nullptr;
 
-			DynamicState dynamic = Constraint::propagateDynamic(a, b, b.getDynamic(), col->normal);
+			bool dynamic = Constraint::propagateDynamic(a, b, b.getDynamic(), col->normal);
 			
-			ContactConstraint* constraint = new ContactConstraint(dynamic.round(), a, b, *col);
+			ContactConstraint* constraint = new ContactConstraint(dynamic, a, b, *col);
 			constraint->solvePosition(dt);
 			return constraint;
 		}

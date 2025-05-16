@@ -7,7 +7,7 @@ class LengthConstraint : public Constraint2 {
 		double length;
 
 	public:
-		LengthConstraint(const DynamicState& _dynamic, Constrained& _a, Constrained& _b, double _length)
+		LengthConstraint(bool _dynamic, Constrained& _a, Constrained& _b, double _length)
 		: Constraint2(_dynamic, _a, _b) {
 			length = _length;
 		}

@@ -75,7 +75,7 @@ class ContactConstraint : public Constraint {
 		}
 
 	public:
-		ContactConstraint(const DynamicState& _dynamic, RigidBody& _bodyA, RigidBody& _bodyB, const Collision& col)
+		ContactConstraint(bool _dynamic, RigidBody& _bodyA, RigidBody& _bodyB, const Collision& col)
 		: Constraint(_dynamic, _bodyA, _bodyB) {
 			Vector axis = col.normal;
 			double restitution = std::max(bodyA.restitution, bodyB.restitution);
