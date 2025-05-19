@@ -55,24 +55,18 @@
  */
 
 class GLSL {
-	constructor(glsl, {
-		comments = true,
-		uniforms = true,
-		structs = true,
-		dynamicArrays = true,
-		methods = true
-	} = { }) {
+	constructor(glsl) {
 		this.glsl = glsl;
-		if (comments) this.removeComments();
-		if (structs) this.parseStructs();
-		if (uniforms) this.parseUniforms();
-		if (dynamicArrays) this.compileDynamicArrays();
-		if (methods) this.parseMethods();
+		this.removeComments();
+		this.parseStructs();
+		this.parseUniforms();
+		this.compileDynamicArrays();
+		this.parseMethods();
 	}
 	parseMethods() {
 		this.methods = new Map(
-			[...this.glsl.matchAll(/(\w+(\s*\[\s*\d+\s*\])?)\s*\b(\w+)\s*\((.*?)\)/g)]
-				.map(([, returnType,, name, args]) => {
+			[...this.glsl.matchAll(/(\w+\s*(?:\[\s*\d+\s*\])?)\s*\b(\w+)\s*\((.*?)\)/g)]
+				.map(([, returnType, name, args]) => {
 					const signature = this.parseDeclaration(`${returnType} ${name}`);
 					args = args.split(",").map(arg => this.parseDeclaration(arg));
 					return [signature.name, { signature, args }];
