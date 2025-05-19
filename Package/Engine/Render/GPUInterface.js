@@ -1149,6 +1149,34 @@ class GLUtils {
 		gl.texParameteri(target, gl.TEXTURE_WRAP_S, wrap);
 		gl.texParameteri(target, gl.TEXTURE_WRAP_T, wrap);
 	}
+	static throwErrors(gl) {
+		const getError = gl.getError;
+		const constants = new Map();
+		for (const key of Reflect.ownKeys(WebGL2RenderingContext.prototype)) {
+			const value = gl[key];
+			if (typeof value === "function") {
+				gl[key] = function (...args) {
+					const result = value.apply(this, args);
+					const error = getError.apply(this);
+					if (error) {
+						const argStrings = args.map(arg => {
+							if (arg) {
+								if (typeof arg === "object")
+									return arg.constructor.name;
+								if (arg > 100 && typeof arg === "number" && constants.has(arg))
+									return `gl.${constants.get(arg)} (${arg})`;
+							}
+							return String(arg);	
+						});
+						throw new Error(`${constants.get(error)} from gl.${key}(${argStrings.join(", ")})`);
+					}
+					return result;
+				}
+			} else if (typeof value === "number") {
+				constants.set(value, key);
+			}
+		}
+	}
 }
 
 /**
