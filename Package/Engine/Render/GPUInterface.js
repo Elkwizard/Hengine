@@ -606,7 +606,6 @@ class GPUInputArray extends GPUArray {
 }
 
 class GLSLProgram {
-	static currentProgram = null;
 	constructor(gl, vs, fs) {
 		this.gl = gl;
 		this.vs = vs;
@@ -822,6 +821,9 @@ class GLSLProgram {
 	get uniformsChanged() {
 		return this.uniformsSet || this.dynamicArrays.some(array => array.changed);
 	}
+	get inUse() {
+		return this.gl.getParameter(this.gl.CURRENT_PROGRAM) === this.program;
+	}
 	writeTexture(image, info) {
 		const { gl } = this;
 
@@ -1007,14 +1009,14 @@ class GLSLProgram {
 			this.vectorBuffer[i] = value[keys[i]];
 	}
 	use() {
-		GLSLProgram.currentProgram = this;
 		this.gl.useProgram(this.program);
 	}
 	focus() {
-		if (GLSLProgram.currentProgram !== this)
-			this.use();
+		if (!this.inUse) this.use();
 	}
-	setUniform(name, value, force = true, location = this.uniforms) {
+	setUniform(name, value, force = true, location = this.uniforms, focused = false) {
+		if (!focused) this.focus();
+
 		const child = location[name];
 		if (!child && location === this.uniforms) {
 			if (force) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
@@ -1025,23 +1027,24 @@ class GLSLProgram {
 			this.uniformValues[name] = value;
 
 		if (typeof child.set === "function") { // reached leaf
-			this.focus();
 			this.uniformsSet = true;
 			child.set(value);
 			if (force) child.value = typeof value === "object" ? value.get?.() ?? value : value;
+			intervals.count("GLSLProgram.setUniform()");
 		} else {
 			const keys = Object.getOwnPropertyNames(child);
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
 				const childValue = value[key];
 				if (childValue !== undefined)
-					this.setUniform(key, childValue, force, child); // more steps needed
+					this.setUniform(key, childValue, force, child, true); // more steps needed
 			}
 		}
 	}
 	setUniforms(args, force = true) {
+		this.focus();
 		for (const key in args)
-			this.setUniform(key, args[key], force);
+			this.setUniform(key, args[key], force, this.uniforms, true);
 	}
 	getUniform(name) {
 		if (this.hasUniform(name)) return this.uniformValues[name];
