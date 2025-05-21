@@ -21,7 +21,7 @@ class Color extends Operable {
 	 * @param Number blue | The blue component of the color, on [0, 255]
 	 * @param Number alpha? | The alpha (opacity) component of the color, on [0, 1]. Default is 1
 	 */
-	constructor(r, g, b, a) {
+	constructor(r, g, b, a, constrained = false) {
 		super();
 		this.limited = true;
 		if (g === undefined) {
@@ -53,7 +53,7 @@ class Color extends Operable {
 			this.blue = b ?? 0;
 			this.alpha = a ?? 1;
 		}
-		this.constrain();
+		if (!constrained) this.constrain();
 	}
 	set x(a) { this.red = a * 255; }
 	get x() { return this.red / 255; }
@@ -118,7 +118,7 @@ class Color extends Operable {
 	toString() {
 		return this.getRGBA();
 	}
-	get(result = new Color(0, 0, 0, 0)) {
+	get(result = new Color(0, 0, 0, 0, true)) {
 		result.red = this.red;
 		result.green = this.green;
 		result.blue = this.blue;

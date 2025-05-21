@@ -124,7 +124,7 @@ class GLSL {
 	removeComments() {
 		this.glsl = this.glsl
 			.replace(/\/\/(.*?)(\n|$)/g, "$2") // single line
-			.replace(/\/\*((.|\n)*?)\*\//g, ""); // multiline
+			.replace(/\/\*((.|\n)*?)\*\//g, match => match.replace(/[^\r\n]/g, " ")); // multiline
 	}
 	compileDynamicArrays() {
 		this.dynamicArrays = new Map();
@@ -350,7 +350,7 @@ class GLSLError extends Error {
 				line = 0;
 				desc = rawString;
 			}
-			throw new GLSLError(sourceLines[line - 1], line - source.prefixLines, desc.trim());
+			throw new GLSLError(sourceLines[line - 1] ?? "", line - source.prefixLines, desc.trim());
 		}
 	}
 }
@@ -606,6 +606,7 @@ class GPUInputArray extends GPUArray {
 }
 
 class GLSLProgram {
+	static currentProgram = null;
 	constructor(gl, vs, fs) {
 		this.gl = gl;
 		this.vs = vs;
@@ -684,7 +685,6 @@ class GLSLProgram {
 					},
 					setup() { },
 					setUniform(...args) {
-						if (gl.isContextLost()) return;
 						gl[setFunctionName](this.location, ...args);
 					},
 					set(value) { }
@@ -1007,11 +1007,11 @@ class GLSLProgram {
 			this.vectorBuffer[i] = value[keys[i]];
 	}
 	use() {
+		GLSLProgram.currentProgram = this;
 		this.gl.useProgram(this.program);
 	}
 	focus() {
-		const { gl } = this;
-		if (gl.getParameter(gl.CURRENT_PROGRAM) !== this.program)
+		if (GLSLProgram.currentProgram !== this)
 			this.use();
 	}
 	setUniform(name, value, force = true, location = this.uniforms) {
@@ -1028,12 +1028,14 @@ class GLSLProgram {
 			this.focus();
 			this.uniformsSet = true;
 			child.set(value);
-			child.value = typeof value === "object" ? value.get?.() ?? value : value;
+			if (force) child.value = typeof value === "object" ? value.get?.() ?? value : value;
 		} else {
 			const keys = Object.getOwnPropertyNames(child);
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
-				if (key in value) this.setUniform(key, value[key], force, child); // more steps needed
+				const childValue = value[key];
+				if (childValue !== undefined)
+					this.setUniform(key, childValue, force, child); // more steps needed
 			}
 		}
 	}
@@ -1149,6 +1151,24 @@ class GLUtils {
 		gl.texParameteri(target, gl.TEXTURE_WRAP_S, wrap);
 		gl.texParameteri(target, gl.TEXTURE_WRAP_T, wrap);
 	}
+	static createContext(canvas, options) {
+		const gl = canvas.getContext("webgl2", options);
+		if (!gl)
+			throw new Error("Your browser doesn't support WebGL");
+		
+		canvas.addEventListener("webglcontextlost", event => {
+			event.preventDefault();
+			console.warn("WebGL Context Lost");
+			options.lost?.();
+		});
+		canvas.addEventListener("webglcontextrestored", event => {
+			event.preventDefault();
+			console.warn("WebGL Context Restored");
+			options.restored?.();
+		});
+
+		return gl;
+	}
 	static throwErrors(gl) {
 		const getError = gl.getError;
 		const constants = new Map();
@@ -1187,22 +1207,12 @@ class GLUtils {
 class GPUInterface {
 	constructor(glsl, width, height) {
 		this.image = new_OffscreenCanvas(width, height);
-		this.gl = this.image.getContext("webgl2");
-		if (!this.gl)
-			throw new Error("Your browser doesn't support WebGL");
-
+		this.gl = GLUtils.createContext(this.image, {
+			restored: () => this.compile()
+		});
+		
 		this.vertexSource = ShaderSource.raw(this.vertexShader);
 		this.glsl = glsl;
-		
-		this.image.addEventListener("webglcontextlost", event => {
-			event.preventDefault();
-			console.warn("WebGL Context Lost");
-		});
-		this.image.addEventListener("webglcontextrestored", event => {
-			event.preventDefault();
-			console.warn("WebGL Context Restored");
-			this.compile();
-		});
 	}
 	set glsl(a) {
 		this._glsl = a;

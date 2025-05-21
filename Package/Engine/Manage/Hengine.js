@@ -39,7 +39,7 @@ class Hengine {
 		this.canvas = new CanvasImage(canvas, this);
 		this.renderer = this.canvas.renderer;
 		
-		this.scene = new Scene(new Vector2(0, 0.4), this);
+		this.scene = new Scene(this);
 		this.canvas.updateSize(); // requires camera, created by scene
 
 		//update loops

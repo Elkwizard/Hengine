@@ -315,11 +315,11 @@ API class RigidBody {
 			if (canRotate) {
 #if IS_3D
 				// precession
-				Orientation next = position.orientation + velocity.orientation;
-				Inertia invInertia = localMatter.rotate(next).invInertia;
-				velocity.orientation = Orientation(
-					invInertia * matter.inertia * velocity.orientation.getRotation()
-				);
+				// Orientation next = position.orientation + velocity.orientation;
+				// Inertia invInertia = localMatter.rotate(next).invInertia;
+				// velocity.orientation = Orientation(
+				// 	invInertia * matter.inertia * velocity.orientation.getRotation()
+				// );
 #endif
 			} else {
 				velocity.orientation = { };

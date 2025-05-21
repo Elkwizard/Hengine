@@ -616,7 +616,7 @@ class Vector3 extends Vector {
 	 * @return Vector3
 	 */
 	static x(x) {
-		return new Vector4(x, 0, 0);
+		return new Vector3(x, 0, 0);
 	}
 	/**
 	 * Creates a vector with a specified y component and an x and z component of 0.
@@ -624,7 +624,7 @@ class Vector3 extends Vector {
 	 * @return Vector3
 	 */
 	static y(y) {
-		return new Vector4(0, y, 0);
+		return new Vector3(0, y, 0);
 	}
 	/**
 	 * Creates a vector with a specified z component and an x and z component of 0.
@@ -632,7 +632,7 @@ class Vector3 extends Vector {
 	 * @return Vector3
 	 */
 	static z(z) {
-		return new Vector4(0, 0, z);
+		return new Vector3(0, 0, z);
 	}
 	static fromPoint(p) {
 		return new Vector3(p.x || 0, p.y || 0, p.z || 0);

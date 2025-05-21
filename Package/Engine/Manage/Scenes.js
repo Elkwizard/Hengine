@@ -24,12 +24,12 @@
  * @prop SceneObject[] renderOrder | A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame. This property is read-only.
  */
 class Scene {
-	constructor(gravity, engine) {
+	constructor(engine) {
 		this.engine = engine;
 		this.main = new ElementContainer("Main", null, this.engine);
 		
 		this.physicsEngine = new Physics.Engine().own();
-		this.gravity = gravity;
+		this.gravity = VectorN.y(0.4);
 		this.physicsAnchor = new Physics.RigidBody(false).own();
 		
 		this.cullGraphics = true;

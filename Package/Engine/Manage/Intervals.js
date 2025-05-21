@@ -131,6 +131,7 @@ class IntervalManager {
 		this.lastTime = performance.now();
 		this.currentTime = performance.now();
 		this.frameLengths = [];
+		this.perFrameCounters = new Map();
 
 		this.graphs = [];
 		this.fpsGraph = this.makeGraphPlane([
@@ -184,18 +185,27 @@ class IntervalManager {
 	updatePerformanceData() {
 		if (!this.performanceData) return;
 
+		for (const key of this.perFrameCounters.keys())
+			this.perFrameCounters.set(key, 0);
+
 		this.currentTime = performance.now();
 		//fps
 		this.frameLengths.push(this.currentTime - this.lastTime);
 		this.lastTime = this.currentTime;
 		if (this.frameLengths.length > IntervalManager.FPS_FRAMES_TO_COUNT) this.frameLengths.shift();
 		const getFPSRange = n => {
-			let arr = this.frameLengths.slice(Math.max(0, this.frameLengths.length - n));
-			return arr.length * 1000 / arr.reduce((a, b) => a + b);
+			const arr = this.frameLengths.slice(Math.max(0, this.frameLengths.length - n));
+			return arr.length * 1000 / Number.sum(arr);
 		}
 		this.averageFps = getFPSRange(IntervalManager.FPS_FRAMES_TO_COUNT);
 		this.rawFps = getFPSRange(1);
 		this._fps = Math.floor(Number.clamp(this.averageFps, 0, this.targetFPS));
+	}
+	getCount(key) {
+		return this.perFrameCounters.get(key) ?? 0;
+	}
+	count(key) {
+		this.perFrameCounters.set(key, (this.perFrameCounters.get(key) ?? 0) + 1);
 	}
 	update() {
 		this.updatePerformanceData();

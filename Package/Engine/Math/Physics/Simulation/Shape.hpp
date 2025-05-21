@@ -97,6 +97,17 @@ API class Ball : public Shape {
 		}
 };
 
+template <>
+class std::hash<std::pair<int, int>> {
+	private:
+		std::hash<int> hash;
+
+	public:
+		size_t operator()(const std::pair<int, int>& pair) const {
+			return hash(pair.first) ^ hash(pair.second * 31);
+		}
+};
+
 API class Polytope : public Shape {
 	private:
 		using IndexFace = std::array<int, DIM>;
@@ -144,14 +155,11 @@ API class Polytope : public Shape {
 			}
 
 #if IS_3D
-			std::unordered_map<int, std::unordered_set<int>> discovered;
+			std::unordered_set<std::pair<int, int>> discovered;
 			auto addEdge = [&](int a, int b) {
-				if (b < a) std::swap(a, b);
-				if (!discovered.count(a))
-					discovered.emplace(a, std::unordered_set<int>());
-				std::unordered_set<int>& set = discovered.at(b);
-				if (!set.count(b)) {
-					set.insert(b);
+				std::pair<int, int> key = a < b ? std::make_pair(a, b) : std::make_pair(b, a);
+				if (!discovered.count(key)) {
+					discovered.insert(key);
 					edges.push_back({ a, b });
 				}
 			};
@@ -227,7 +235,7 @@ API class Polytope : public Shape {
 		}
 
 		int getEdgeCount() const {
-			return faces.size() ONLY_3D( * 3);
+			return edges.size();
 		}
 
 		Line getEdge(int index) const {

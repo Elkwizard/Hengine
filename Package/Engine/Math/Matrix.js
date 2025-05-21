@@ -15,11 +15,11 @@ class Matrix extends Float64Array {
 	 */
 	constructor(size, args) {
 		super(size * size);
-		if (args.length === this.length)
+		if (args.length === this.length) {
 			for (let i = 0; i < size; i++)
 				for (let j = 0; j < size; j++)
 					this[i * size + j] = args[j * size + i];
-		else if (args.length > 1) {
+		} else if (args.length > 1) {
 			const { modValues } = args[0].constructor;
 			for (let i = 0; i < size; i++)
 				for (let j = 0; j < size; j++)
@@ -427,8 +427,8 @@ class Matrix3 extends Matrix {
 		
 		return a * co0 - b * co1 + c * co2;
 	}
-	get(dst = new Matrix3()) {
-		return super.get(dst);
+	get(dst = null) {
+		return dst ? super.get(dst) : new Matrix3(this);
 	}
 	invert() {
 		const [
@@ -466,7 +466,7 @@ class Matrix3 extends Matrix {
 		return this;	
 	}
 	timesVector(vector, dst) {
-		if (vector instanceof Vector2) {
+		if (vector.constructor === Vector2) {
 			const x = this[0] * vector.x + this[3] * vector.y + this[6];
 			const y = this[1] * vector.x + this[4] * vector.y + this[7];
 			dst.x = x;
@@ -514,7 +514,7 @@ class Matrix3 extends Matrix {
 		const result = new Matrix3();
 		for (let r = 0; r < 3; r++)
 		for (let c = 0; c < 3; c++)
-			this[c * 3 + r] = matrix.get(r, c);
+			result[c * 3 + r] = matrix.get(r, c);
 		return result;
 	}
 	static normal(matrix) {
@@ -579,8 +579,8 @@ class Matrix4 extends Matrix {
 		
 		return a * co0 - b * co1 + c * co2 - d * co3;
 	}
-	get(dst = new Matrix4()) {
-		return super.get(dst);
+	get(dst = null) {
+		return dst ? super.get(dst) : new Matrix4(this);
 	}
 	invert() {
 		const [

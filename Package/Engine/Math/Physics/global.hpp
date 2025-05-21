@@ -31,7 +31,7 @@ void js(const char* format, U value, T... values) {
 
 // Dimension switches
 #if __INTELLISENSE__ && !DIM
-	#define DIM 2
+	#define DIM 3
 #endif
 
 #if DIM == 3
