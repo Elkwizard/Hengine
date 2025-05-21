@@ -606,6 +606,7 @@ class GPUInputArray extends GPUArray {
 }
 
 class GLSLProgram {
+	static currentPrograms = new WeakMap();
 	constructor(gl, vs, fs) {
 		this.gl = gl;
 		this.vs = vs;
@@ -619,6 +620,16 @@ class GLSLProgram {
 		this.compileProgram();
 
 		const originalProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+		
+		if (!GLSLProgram.currentPrograms.has(gl)) {
+			GLSLProgram.currentPrograms.set(gl, originalProgram);
+			const oldUseProgram = gl.useProgram;
+			gl.useProgram = function (program) {
+				GLSLProgram.currentPrograms.set(gl, program);
+				oldUseProgram.call(this, program);
+			};
+		}
+
 		this.use();
 
 		{ // uniforms
@@ -822,7 +833,7 @@ class GLSLProgram {
 		return this.uniformsSet || this.dynamicArrays.some(array => array.changed);
 	}
 	get inUse() {
-		return this.gl.getParameter(this.gl.CURRENT_PROGRAM) === this.program;
+		return GLSLProgram.currentPrograms.get(this.gl) === this.program;
 	}
 	writeTexture(image, info) {
 		const { gl } = this;
