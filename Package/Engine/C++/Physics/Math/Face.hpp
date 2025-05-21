@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <array>
 
-#include "Matrix.hpp"
-#include "../Math/Ray.hpp"
+#include "../../Math/Matrix.hpp"
+#include "../../Math/Ray.hpp"
 
 template <size_t N>
 class LineN {

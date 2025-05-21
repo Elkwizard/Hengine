@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RigidBody.hpp"
-#include "../Math/Coord.hpp"
+#include "../../Math/Coord.hpp"
 
 #include <concepts>
 #include <vector>

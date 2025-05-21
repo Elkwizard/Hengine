@@ -1,4 +1,4 @@
-physicsPath="Package/Engine/Math/Physics/Physics"
+physicsPath="Package/Engine/C++/Physics/Physics"
 physicsSource="$(cat "$physicsPath.cpp")"
 
 function compileDimension {

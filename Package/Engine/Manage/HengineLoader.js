@@ -835,7 +835,7 @@ HengineLoader.engineResources = [
 		"Util/Sound.js",
 
 		"Math/Matrix.js",
-		new HengineWASMResource(`Math/Physics/Physics${DIM}`, "Physics"),
+		new HengineWASMResource(`C++/Physics/Physics${DIM}`, "Physics"),
 		"Math/PhysicsAPI.js",
 		"Math/Random.js",
 		"Math/Interpolation.js",

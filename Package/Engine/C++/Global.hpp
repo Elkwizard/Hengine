@@ -4,7 +4,7 @@
 
 // Emscripten API
 #include <sstream>
-#include "../../../../Wasm/API.hpp"
+#include "../../../Wasm/API.hpp"
 API_IMPORT void printStringJS(size_t pointer);
 API_IMPORT void sendJSArgument(double value);
 API_IMPORT void runJS(size_t pointer);

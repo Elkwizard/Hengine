@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Vector.hpp"
-#include "Face.hpp"
-#include "../Simulation/Shape.hpp"
 
 class Shadow {
 	public:

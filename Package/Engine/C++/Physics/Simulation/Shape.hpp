@@ -2,8 +2,8 @@
 
 #include "../Math/Face.hpp"
 #include "../Math/Transform.hpp"
-#include "../Math/AABB.hpp"
-#include "../Math/Shadow.hpp"
+#include "../../Math/AABB.hpp"
+#include "../../Math/Shadow.hpp"
 #include "Matter.hpp"
 
 #include <unordered_map>

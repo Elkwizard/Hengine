@@ -3,7 +3,7 @@
 #include <vector>
 #include <concepts>
 
-#include "../Global.hpp"
+#include "../../Global.hpp"
 #include "../Math/Random.hpp"
 #include "Constraint/Constraint.hpp"
 

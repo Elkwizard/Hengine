@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Vector.hpp"
-#include "Orientation.hpp"
+#include "../../Math/Vector.hpp"
+#include "../../Math/Orientation.hpp"
 
 API class Transform {
 	public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Math/Orientation.hpp"
+#include "../../Math/Orientation.hpp"
 
 API using Inertia = IF_3D(Matrix3, double);
 

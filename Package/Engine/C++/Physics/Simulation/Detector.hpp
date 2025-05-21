@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Collision.hpp"
-#include "../Math/Shadow.hpp"
+#include "../../Math/Shadow.hpp"
 #include "RigidBody.hpp"
 
 API class Detector {
