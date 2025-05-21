@@ -312,24 +312,6 @@ Object.defineProperty(window, "title", {
 		const len = arr.length;
 		for (let i = 0; i < len; i++) this.push(arr[i]);
 	});
-	proto(Array.prototype, "map", function (fn, ...coords) {
-		const result = [];
-		for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
-		return result;
-	});
-	proto(Array.prototype, "forEach", function (fn, ...coords) {
-		for (let i = 0; i < this.length; i++) fn(this[i], ...coords, i);
-	});
-	proto(Array.prototype, "some", function (fn, ...coords) {
-		for (let i = 0; i < this.length; i++)
-			if (fn(this[i], ...coords, i)) return true;
-		return false;
-	});
-	proto(Array.prototype, "every", function (fn, ...coords) {
-		for (let i = 0; i < this.length; i++)
-			if (!fn(this[i], ...coords, i)) return false;
-		return true;
-	});
 	proto(Array.prototype, "flatten", function () {
 		return this;
 	});
@@ -337,6 +319,27 @@ Object.defineProperty(window, "title", {
 		if (index in this) return this[index];
 		return null;
 	});
+	Array.makeBaseDimension = function (arr) {
+		proto(arr, "map", function (fn, ...coords) {
+			const result = [];
+			for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
+			return result;
+		});
+		proto(arr, "forEach", function (fn, ...coords) {
+			for (let i = 0; i < this.length; i++) fn(this[i], ...coords, i);
+		});
+		proto(arr, "some", function (fn, ...coords) {
+			for (let i = 0; i < this.length; i++)
+				if (fn(this[i], ...coords, i)) return true;
+			return false;
+		});
+		proto(arr, "every", function (fn, ...coords) {
+			for (let i = 0; i < this.length; i++)
+				if (!fn(this[i], ...coords, i)) return false;
+			return true;
+		});
+		return arr;
+	};
 	Array.makeMultidimensional = function (arr) {
 		proto(arr, "multiDimensional", true);
 		proto(arr, "sample", function (...indices) {
@@ -396,7 +399,7 @@ Object.defineProperty(window, "title", {
 			return arr;
 		}
 
-		return new Array(Math.ceil(dim)).fill(null);
+		return Array.makeBaseDimension(new Array(Math.ceil(dim)).fill(null));
 	};
 	/**
 	 * @name class Number extends Vector
