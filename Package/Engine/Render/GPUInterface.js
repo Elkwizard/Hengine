@@ -611,6 +611,7 @@ class GLSLProgram {
 		this.gl = gl;
 		this.vs = vs;
 		this.fs = fs;
+		
 		const dynamicArrayDescriptors = new Map([this.vs, this.fs].flatMap(shader => {
 			return [...shader.glsl.dynamicArrays]
 				.map(([name, desc]) => [name, { ...desc, origin: shader }]);
@@ -633,191 +634,23 @@ class GLSLProgram {
 		this.use();
 
 		{ // uniforms
-			const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
-
-			this.uniforms = {};
-			this.uniformValues = {};
-			this.uniformsSet = false;
-			this.allUniforms = [];
-
-			let nextTextureUnit = 0;
+			this.nextTextureUnit = 0;
 			this.maxTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 
 			this.dynamicArrays = [];
 			for (const [name, array] of dynamicArrayDescriptors) {
-				const unit = nextTextureUnit++;
+				const unit = this.nextTextureUnit++;
 				this.checkTextureUnit(unit);
 				const gpuArray = new GPUInputArray(gl, name, unit, array.origin.glsl.structs.get(array.type));
 				this.uniformValues[name] = gpuArray;
 				this.dynamicArrays.push(gpuArray);
 			}
 
-			for (let i = 0; i < uniformCount; i++) {
-				const { size: length, type, name } = gl.getActiveUniform(this.program, i);
-
-				const { integer, signed, rows, columns, texture } = this.getTypeInformation(type);
-
-				const processedName = name.replace(/\[(\d+)\]/g, ".$1");
-				const propertyPath = processedName.split(".");
-				if (propertyPath.last === "0") propertyPath.pop();
-
-				const array = name.endsWith("[0]");
-				const matrix = columns !== 1;
-
-				let setFunctionName = "uniform";
-				if (matrix) {
-					setFunctionName += "Matrix";
-					if (rows !== columns) setFunctionName += columns + "x" + rows;
-					else setFunctionName += rows;
-				} else setFunctionName += rows;
-
-				if (!signed) setFunctionName += "u";
-				setFunctionName += integer ? "i" : "f";
-
-				const setWithArrayType = array || matrix;
-				let dataArray = null;
-
-				if (setWithArrayType) {
-					setFunctionName += "v";
-
-					const arrayLength = rows * columns * length;
-					if (integer) {
-						if (signed) dataArray = new Int32Array(arrayLength);
-						else dataArray = new Uint32Array(arrayLength);
-					} else dataArray = new Float32Array(arrayLength);
-				}
-
-				const self = this;
-
-				const desc = {
-					getLocation() {
-						this.location = gl.getUniformLocation(self.program, name);
-					},
-					setup() { },
-					setUniform(...args) {
-						gl[setFunctionName](this.location, ...args);
-					},
-					set(value) { }
-				};
-
-				if (array && (rows !== 1 || columns !== 1)) { // an array of not single values
-					const size = rows * columns;
-
-					if (matrix) desc.set = function (values) {
-						for (let i = 0; i < values.length; i++)
-							dataArray.set(values[i], i * size);
-						this.setUniform(false, dataArray);
-					};
-					else desc.set = function (values) {
-						for (let i = 0; i < values.length; i++) {
-							const baseIndex = i * size;
-							self.getVectorComponents(values[i]);
-							for (let j = 0; j < size; j++) dataArray[baseIndex + j] = self.vectorBuffer[j];
-						}
-						this.setUniform(dataArray);
-					};
-				} else {
-					if (matrix) {
-						desc.set = function (value) {
-							dataArray.set(value);
-							this.setUniform(false, dataArray);
-						};
-					} else if (dynamicArrayDescriptors.has(name)) {
-						const gpuArray = this.uniformValues[name];
-						desc.setup = function () {
-							gpuArray.setup(self.program);
-							this.setUniform(gpuArray.unit);
-						};
-
-						desc.set = array => gpuArray.set(array);
-					} else if (texture) {
-						const textureUnit = nextTextureUnit;
-						this.checkTextureUnit(textureUnit + length - 1);
-						nextTextureUnit += length;
-
-						const target = {
-							array: gl.TEXTURE_2D_ARRAY,
-							cube: gl.TEXTURE_CUBE_MAP,
-							image: gl.TEXTURE_2D
-						}[texture];
-						
-						const textures = [];
-
-						desc.setup = function () {
-							for (let i = 0; i < length; i++) {
-								const unit = textureUnit + i;
-								const texture = GLUtils.createTexture(gl, {
-									unit, target, filter: gl.LINEAR
-								});
-								textures[i] = { texture, target, unit, smooth: true };
-							}
-
-							if (array) this.setUniform(textures.map(tex => tex.unit));
-							else this.setUniform(textureUnit);
-						};
-
-						if (array) desc.set = images => {
-							for (let i = 0; i < images.length; i++)
-								if (i < length) this.writeTexture(images[i], textures[i]);
-						};
-						else desc.set = image => this.writeTexture(image, textures[0]);
-					} else {
-						if (setWithArrayType) desc.set = function (value) {
-							dataArray.set(value);
-							this.setUniform(dataArray);
-						};
-						else if (rows !== 1) {
-							desc.set = function (value) {
-								self.getVectorComponents(value);
-								this.setUniform(...self.vectorBuffer);
-							};
-						} else desc.set = function (value) {
-							this.setUniform(value);
-						};
-					}
-				}
-
-				let currentStruct = this.uniforms;
-				for (let i = 0; i < propertyPath.length; i++) {
-					const property = propertyPath[i];
-					const last = i === propertyPath.length - 1;
-
-					if (last) {
-						currentStruct[property] = desc;
-					} else {
-						if (!(property in currentStruct)) currentStruct[property] = {};
-						currentStruct = currentStruct[property];
-					}
-				}
-				this.allUniforms.push(desc);
-			}
-
-			this.vectorBuffer = new Float32Array(4);
+			this.setupUniformBlocks();
+			this.setupUniforms();
 		};
 
-		{ // attributes
-			this.attributes = {};
-			this.divisors = new Map();
-
-			let offset = 0;
-
-			const attributeCount = gl.getProgramParameter(this.program, gl.ACTIVE_ATTRIBUTES);
-			for (let i = 0; i < attributeCount; i++) {
-				const { type, name } = gl.getActiveAttrib(this.program, i);
-				const { rows, columns } = this.getTypeInformation(type);
-				const location = gl.getAttribLocation(this.program, name);
-				const columnBytes = rows * 4;
-				const bytes = columns * columnBytes;
-			
-				this.attributes[name] = {
-					name, location, rows, columns,
-					enabled: true, divisor: -1,
-					bytes, columnBytes, offset
-				};
-				this.setDivisor(name, 0);
-				offset += bytes;
-			}
-		};
+		this.setupAttributes();
 
 		this.initialize();
 
@@ -834,6 +667,253 @@ class GLSLProgram {
 	}
 	get inUse() {
 		return GLSLProgram.currentPrograms.get(this.gl) === this.program;
+	}
+	setupUniformBlocks() {
+		const self = this;
+		const { gl } = this;
+		
+		const blockCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORM_BLOCKS);
+		const blockOffsets = [];
+		let totalSize = 0;
+		{ // compute aligned offsets
+			const blockAlignment = gl.getParameter(gl.UNIFORM_BUFFER_OFFSET_ALIGNMENT);
+			for (let i = 0; i < blockCount; i++) {
+				const size = gl.getActiveUniformBlockParameter(this.program, i, gl.UNIFORM_BLOCK_DATA_SIZE);
+				blockOffsets.push(totalSize);
+				totalSize += size;
+				totalSize = Math.ceil(totalSize / blockAlignment) * blockAlignment;
+			}
+		}
+
+		this.uniformBlockArray = new ArrayBuffer(totalSize);
+
+		this.uniformBlocks = [];
+		this.blocksByName = { };
+		for (let i = 0; i < blockCount; i++) {
+			const name = gl.getActiveUniformBlockName(this.program, i);
+			const size = gl.getActiveUniformBlockParameter(this.program, i, gl.UNIFORM_BLOCK_DATA_SIZE);
+			const memberIndices = gl.getActiveUniformBlockParameter(this.program, i, gl.UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES);
+			const memberOffsets = gl.getActiveUniforms(this.program, memberIndices, gl.UNIFORM_OFFSET);
+			const offset = blockOffsets[i];
+
+			const layout = { };
+			const subArray = new Uint8Array(this.uniformBlockArray, offset, size);
+			const block = {
+				name, layout,
+				size, index: i,
+				offset,
+				changed: false,
+				commit() {
+					if (this.changed) {
+						this.changed = false;
+						gl.bufferSubData(gl.UNIFORM_BUFFER, this.offset, subArray);
+					}
+				},
+				set(offset, array) {
+					new array.constructor(self.uniformBlockArray, offset).set(array);
+					this.changed = true;
+				}
+			};
+
+			for (let i = 0; i < memberIndices.length; i++) {
+				const index = memberIndices[i];
+				const name = gl.getActiveUniform(this.program, index).name;
+				block.layout[name] = offset + memberOffsets[i];
+				this.blocksByName[name] = block;
+			}
+
+			this.uniformBlocks.push(block);
+		}
+	}
+	setupUniforms() {
+		const self = this;
+		const { gl } = this;
+
+		const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
+
+		this.uniforms = {};
+		this.uniformValues = {};
+		this.uniformsSet = false;
+		this.allUniforms = [];
+
+		for (let i = 0; i < uniformCount; i++) {
+			const { size: length, type, name } = gl.getActiveUniform(this.program, i);
+			const block = this.blocksByName[name];
+
+			const { integer, signed, rows, columns, texture } = this.getTypeInformation(type);
+
+			const scopedName = block && !name.startsWith(block.name + ".") ? `${block.name}.${name}` : name;
+			const processedName = scopedName.replace(/\[(\d+)\]/g, ".$1");
+			const propertyPath = processedName.split(".");
+			if (propertyPath.last === "0") propertyPath.pop();
+
+			const array = name.endsWith("[0]");
+			const matrix = columns !== 1;
+
+			let setFunctionName = "uniform";
+			if (matrix) {
+				setFunctionName += "Matrix";
+				if (rows !== columns) setFunctionName += columns + "x" + rows;
+				else setFunctionName += rows;
+			} else setFunctionName += rows;
+
+			if (!signed) setFunctionName += "u";
+			setFunctionName += integer ? "i" : "f";
+
+			const setWithArrayType = array || matrix;
+			if (setWithArrayType)
+				setFunctionName += "v";
+
+			const arrayLength = rows * columns * length;
+			let dataArray = null;
+			if (integer) {
+				if (signed) dataArray = new Int32Array(arrayLength);
+				else dataArray = new Uint32Array(arrayLength);
+			} else dataArray = new Float32Array(arrayLength);
+
+			const desc = {
+				getLocation() {
+					this.location = gl.getUniformLocation(self.program, name);
+				},
+				setup() { },
+				set(value) { }
+			};
+
+			if (block) {
+				const offset = block.layout[name];
+				desc.setUniform = () => block.set(offset, dataArray);
+			} else {
+				if (matrix) {
+					desc.setUniform = function () {
+						gl[setFunctionName](this.location, false, dataArray);
+					};
+				} else if (setWithArrayType) {
+					desc.setUniform = function () {
+						gl[setFunctionName](this.location, dataArray);
+					};
+				} else {
+					desc.setUniform = function () {
+						gl[setFunctionName](this.location, ...dataArray);
+					};
+				}
+			}
+
+			if (array && (rows !== 1 || columns !== 1)) { // an array of not single values
+				const size = rows * columns;
+
+				if (matrix) desc.set = function (values) {
+					for (let i = 0; i < values.length; i++)
+						dataArray.set(values[i], i * size);
+					this.setUniform();
+				};
+				else desc.set = function (values) {
+					for (let i = 0; i < values.length; i++)
+						GLSLProgram.getVectorComponents(dataArray, values[i], i * size);
+					this.setUniform();
+				};
+			} else {
+				if (matrix) {
+					desc.set = function (value) {
+						dataArray.set(value);
+						this.setUniform();
+					};
+				} else if (this.uniformValues[name] instanceof GPUArray) {
+					const gpuArray = this.uniformValues[name];
+					desc.setup = function () {
+						gpuArray.setup(self.program);
+						dataArray[0] = gpuArray.unit;
+						this.setUniform();
+					};
+
+					desc.set = array => gpuArray.set(array);
+				} else if (texture) {
+					const textureUnit = this.nextTextureUnit;
+					this.checkTextureUnit(textureUnit + length - 1);
+					this.nextTextureUnit += length;
+
+					const target = {
+						array: gl.TEXTURE_2D_ARRAY,
+						cube: gl.TEXTURE_CUBE_MAP,
+						image: gl.TEXTURE_2D
+					}[texture];
+					
+					const textures = [];
+
+					desc.setup = function () {
+						for (let i = 0; i < length; i++) {
+							const unit = textureUnit + i;
+							const texture = GLUtils.createTexture(gl, {
+								unit, target, filter: gl.LINEAR
+							});
+							textures[i] = { texture, target, unit, smooth: true };
+						}
+
+						if (array) dataArray.set(textures.map(tex => tex.unit));
+						else dataArray[0] = textureUnit;
+						this.setUniform();
+					};
+
+					if (array) desc.set = images => {
+						for (let i = 0; i < images.length; i++)
+							if (i < length) this.writeTexture(images[i], textures[i]);
+					};
+					else desc.set = image => this.writeTexture(image, textures[0]);
+				} else {
+					if (setWithArrayType) desc.set = function (value) {
+						dataArray.set(value);
+						this.setUniform();
+					};
+					else if (rows !== 1) {
+						desc.set = function (value) {
+							GLSLProgram.getVectorComponents(dataArray, value);
+							this.setUniform();
+						};
+					} else desc.set = function (value) {
+						dataArray[0] = value;
+						this.setUniform();
+					};
+				}
+			}
+
+			let currentStruct = this.uniforms;
+			for (let i = 0; i < propertyPath.length; i++) {
+				const property = propertyPath[i];
+				const last = i === propertyPath.length - 1;
+
+				if (last) {
+					currentStruct[property] = desc;
+				} else {
+					if (!(property in currentStruct)) currentStruct[property] = {};
+					currentStruct = currentStruct[property];
+				}
+			}
+			this.allUniforms.push(desc);
+		}
+	}
+	setupAttributes() {
+		const { gl } = this;
+
+		this.attributes = {};
+		this.divisors = new Map();
+
+		let offset = 0;
+
+		const attributeCount = gl.getProgramParameter(this.program, gl.ACTIVE_ATTRIBUTES);
+		for (let i = 0; i < attributeCount; i++) {
+			const { type, name } = gl.getActiveAttrib(this.program, i);
+			const { rows, columns } = this.getTypeInformation(type);
+			const location = gl.getAttribLocation(this.program, name);
+			const columnBytes = rows * 4;
+			const bytes = columns * columnBytes;
+		
+			this.attributes[name] = {
+				name, location, rows, columns,
+				enabled: true, divisor: -1,
+				bytes, columnBytes, offset
+			};
+			this.setDivisor(name, 0);
+			offset += bytes;
+		}
 	}
 	writeTexture(image, info) {
 		const { gl } = this;
@@ -950,10 +1030,22 @@ class GLSLProgram {
 			if (desc.value) desc.set(desc.value);
 		}
 
+		// blocks
+		this.uniformBlockBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.UNIFORM_BUFFER, this.uniformBlockBuffer);
+		gl.bufferData(gl.UNIFORM_BUFFER, this.uniformBlockArray, gl.DYNAMIC_DRAW);
+		for (let i = 0; i < this.uniformBlocks.length; i++) {
+			const block = this.uniformBlocks[i];
+			gl.bindBufferRange(gl.UNIFORM_BUFFER, i, this.uniformBlockBuffer, block.offset, block.size);
+			gl.uniformBlockBinding(this.program, block.index, i);
+		}
+
 		gl.useProgram(originalProgram);
 	}
 	commitUniforms() {
 		this.uniformsSet = false;
+		for (let i = 0; i < this.uniformBlocks.length; i++)
+			this.uniformBlocks[i].commit();
 		for (let i = 0; i < this.dynamicArrays.length; i++)
 			this.dynamicArrays[i].commit();
 	}
@@ -1013,11 +1105,6 @@ class GLSLProgram {
 		}
 
 		return { integer, signed, rows, columns, texture, dynamicArray };
-	}
-	getVectorComponents(value) {
-		const keys = Vector4.modValues;
-		for (let i = 0; i < keys.length; i++)
-			this.vectorBuffer[i] = value[keys[i]];
 	}
 	use() {
 		this.gl.useProgram(this.program);
@@ -1138,6 +1225,17 @@ class GLSLProgram {
 				);
 				if (attribute.enabled) gl.enableVertexAttribArray(pointer);
 				else gl.disableVertexAttribArray(pointer);
+			}
+		}
+	}
+	static getVectorComponents(output, value, baseIndex = 0) {
+		const keys = value.constructor.modValues.length;
+		output[baseIndex + 0] = value.x;
+		output[baseIndex + 1] = value.y;
+		if (keys > 2) {
+			output[baseIndex + 2] = value.z;
+			if (keys > 3) {
+				output[baseIndex + 3] = value.w;
 			}
 		}
 	}
