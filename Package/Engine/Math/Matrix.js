@@ -192,16 +192,15 @@ class Matrix extends Float64Array {
 		dst.set(result);
 	}
 	timesMatrix(matrix, dst) {
-		const { size } = this.constructor;
-		const result = new Float64Array(size * size);
+		const { size, temp } = this.constructor;
 		for (let c = 0; c < size; c++)
 		for (let r = 0; r < size; r++) {
 			let sum = 0;
 			for (let k = 0; k < size; k++)
 				sum += this[k * size + r] * matrix[c * size + k];
-			result[c * size + r] = sum;
+			temp[c * size + r] = sum;
 		}
-		dst.set(result);
+		dst.set(temp);
 	}
 	/**
 	 * Computes the product of the caller and another object and returns the result.
@@ -334,6 +333,9 @@ class Matrix extends Float64Array {
 	}
 	static get TransformVector() {
 		return Vector[this.size - 1];
+	}
+	static get temp() {
+		return this._temp ??= new Float64Array(this.size * this.size);
 	}
 }
 
@@ -517,8 +519,12 @@ class Matrix3 extends Matrix {
 			result[c * 3 + r] = matrix.get(r, c);
 		return result;
 	}
-	static normal(matrix) {
-		return new Matrix3(matrix).invert()?.transpose?.() ?? Matrix3.identity();
+	static normal(matrix, dst = new Matrix3()) {
+		const { size } = matrix.constructor;
+		for (let r = 0; r < 3; r++)
+		for (let c = 0; c < 3; c++)
+			dst[c * 3 + r] = matrix[c * size + r];
+		return dst.invert()?.transpose?.() ?? Matrix3.identity(dst);
 	}
 	/** 
 	 * Creates a 2D rotation matrix and optionally stores it in a provided destination.
@@ -684,6 +690,25 @@ class Matrix4 extends Matrix {
 		this[15] = co15 * idet;
 
 		return this;
+	}
+	timesVector(vector, dst) {
+		if (vector.constructor === Vector3) {
+			const x = this[0] * vector.x + this[4] * vector.y + this[8] * vector.z + this[12];
+			const y = this[1] * vector.x + this[5] * vector.y + this[9] * vector.z + this[13];
+			const z = this[2] * vector.x + this[6] * vector.y + this[10] * vector.z + this[14];
+			dst.x = x;
+			dst.y = y;
+			dst.z = z;
+		} else {
+			const x = this[0] * vector.x + this[4] * vector.y + this[8] * vector.z + this[12] * vector.w;
+			const y = this[1] * vector.x + this[5] * vector.y + this[9] * vector.z + this[13] * vector.w;
+			const z = this[2] * vector.x + this[6] * vector.y + this[10] * vector.z + this[14] * vector.w;
+			const w = this[3] * vector.x + this[7] * vector.y + this[11] * vector.z + this[15] * vector.w;
+			dst.x = x;
+			dst.y = y;
+			dst.z = z;
+			dst.w = w;
+		}
 	}
 	/**
 	 * Creates a perspective projection matrix for use in 3D rendering.

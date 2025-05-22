@@ -570,6 +570,9 @@ class Vector3 extends Vector {
 	rotatedAboutAxis(axis, angle, result) {
 		return this.get(result).rotateAboutAxis(axis, angle);
 	}
+	dot(other) {
+		return this.x * other.x + this.y * other.y + this.z * other.z;
+	}
 	toPhysicsVector(result = new Physics.VectorN_3_()) {
 		result.setAll(this.x, this.y, this.z);
 		return result;
