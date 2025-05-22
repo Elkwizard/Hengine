@@ -708,10 +708,6 @@ class GLSLProgram {
 						this.changed = false;
 						gl.bufferSubData(gl.UNIFORM_BUFFER, this.offset, subArray);
 					}
-				},
-				set(offset, array) {
-					new array.constructor(self.uniformBlockArray, offset).set(array);
-					this.changed = true;
 				}
 			};
 
@@ -781,7 +777,11 @@ class GLSLProgram {
 
 			if (block) {
 				const offset = block.layout[name];
-				desc.setUniform = () => block.set(offset, dataArray);
+				const subarray = new dataArray.constructor(this.uniformBlockArray, offset);
+				desc.setUniform = () => {
+					subarray.set(dataArray);
+					block.changed = true;
+				};
 			} else {
 				if (matrix) {
 					desc.setUniform = function () {
