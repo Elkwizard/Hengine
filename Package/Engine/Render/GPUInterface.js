@@ -631,7 +631,7 @@ class GLSLProgram {
 			};
 		}
 
-		this.use();
+		gl.useProgram(this.program);
 
 		{ // uniforms
 			this.nextTextureUnit = 0;
@@ -669,7 +669,6 @@ class GLSLProgram {
 		return GLSLProgram.currentPrograms.get(this.gl) === this.program;
 	}
 	setupUniformBlocks() {
-		const self = this;
 		const { gl } = this;
 		
 		const blockCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORM_BLOCKS);
@@ -694,14 +693,16 @@ class GLSLProgram {
 			const size = gl.getActiveUniformBlockParameter(this.program, i, gl.UNIFORM_BLOCK_DATA_SIZE);
 			const memberIndices = gl.getActiveUniformBlockParameter(this.program, i, gl.UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES);
 			const memberOffsets = gl.getActiveUniforms(this.program, memberIndices, gl.UNIFORM_OFFSET);
+			const memberMatrixStrides = gl.getActiveUniforms(this.program, memberIndices, gl.UNIFORM_MATRIX_STRIDE);
+			const memberArrayStrides = gl.getActiveUniforms(this.program, memberIndices, gl.UNIFORM_ARRAY_STRIDE);
+			
 			const offset = blockOffsets[i];
 
-			const layout = { };
 			const subArray = new Uint8Array(this.uniformBlockArray, offset, size);
 			const block = {
-				name, layout,
-				size, index: i,
-				offset,
+				name, size, offset,
+				layout: { },
+				index: i,
 				changed: false,
 				commit() {
 					if (this.changed) {
@@ -713,8 +714,12 @@ class GLSLProgram {
 
 			for (let i = 0; i < memberIndices.length; i++) {
 				const index = memberIndices[i];
-				const name = gl.getActiveUniform(this.program, index).name;
-				block.layout[name] = offset + memberOffsets[i];
+				const { name } = gl.getActiveUniform(this.program, index);
+				block.layout[name] = {
+					offset: offset + memberOffsets[i],
+					matrixStride: memberMatrixStrides[i],
+					arrayStride: memberArrayStrides[i]
+				};
 				this.blocksByName[name] = block;
 			}
 
@@ -760,12 +765,12 @@ class GLSLProgram {
 			if (setWithArrayType)
 				setFunctionName += "v";
 
-			const arrayLength = rows * columns * length;
-			let dataArray = null;
+			let DataArrayType;
 			if (integer) {
-				if (signed) dataArray = new Int32Array(arrayLength);
-				else dataArray = new Uint32Array(arrayLength);
-			} else dataArray = new Float32Array(arrayLength);
+				DataArrayType = signed ? Int32Array : Uint32Array;
+			} else {
+				DataArrayType = Float32Array;
+			}
 
 			const desc = {
 				getLocation() {
@@ -775,13 +780,39 @@ class GLSLProgram {
 				set(value) { }
 			};
 
+			let dataArray = new DataArrayType(rows * columns * length);
+
 			if (block) {
-				const offset = block.layout[name];
-				const subarray = new dataArray.constructor(this.uniformBlockArray, offset);
-				desc.setUniform = () => {
-					subarray.set(dataArray);
-					block.changed = true;
-				};
+				const dataElementSize = DataArrayType.BYTES_PER_ELEMENT;
+				let { offset, matrixStride, arrayStride } = block.layout[name];
+				matrixStride /= dataElementSize;
+				arrayStride /= dataElementSize;
+
+				const columnLength = matrixStride || rows;
+				const elementLength = arrayStride || (columnLength * columns);
+				const fullLength = elementLength * length;
+
+				const view = new DataArrayType(this.uniformBlockArray, offset, fullLength);
+
+				if (dataArray.length === view.length) {
+					dataArray = view;
+					desc.setUniform = () => {
+						block.changed = true;
+					};
+				} else {
+					desc.setUniform = () => {
+						let dataIndex = 0;
+						for (let i = 0; i < length; i++) {
+							const elementIndex = elementLength * i;
+							for (let c = 0; c < columns; c++) {
+								const columnIndex = elementIndex + c * columnLength;
+								for (let r = 0; r < rows; r++) {
+									view[columnIndex + r] = dataArray[dataIndex++];
+								}
+							}
+						}
+					};
+				}
 			} else {
 				if (matrix) {
 					desc.setUniform = function () {
@@ -798,7 +829,7 @@ class GLSLProgram {
 				}
 			}
 
-			if (array && (rows !== 1 || columns !== 1)) { // an array of not single values
+			if (array && (rows !== 1 || columns !== 1)) { // an array of non-scalars
 				const size = rows * columns;
 
 				if (matrix) desc.set = function (values) {
@@ -814,7 +845,8 @@ class GLSLProgram {
 			} else {
 				if (matrix) {
 					desc.set = function (value) {
-						dataArray.set(value);
+						for (let i = 0; i < value.length; i++)
+							dataArray[i] = value[i];
 						this.setUniform();
 					};
 				} else if (this.uniformValues[name] instanceof GPUArray) {
@@ -883,7 +915,7 @@ class GLSLProgram {
 				if (last) {
 					currentStruct[property] = desc;
 				} else {
-					if (!(property in currentStruct)) currentStruct[property] = {};
+					currentStruct[property] ??= { };
 					currentStruct = currentStruct[property];
 				}
 			}
@@ -1017,7 +1049,8 @@ class GLSLProgram {
 	}
 	initialize() {
 		const { gl } = this;
-		const originalProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+		const oldProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+		const oldUniformBuffer = gl.getParameter(gl.UNIFORM_BUFFER_BINDING);
 		
 		this.focus();
 
@@ -1034,18 +1067,32 @@ class GLSLProgram {
 		this.uniformBlockBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.UNIFORM_BUFFER, this.uniformBlockBuffer);
 		gl.bufferData(gl.UNIFORM_BUFFER, this.uniformBlockArray, gl.DYNAMIC_DRAW);
-		for (let i = 0; i < this.uniformBlocks.length; i++) {
-			const block = this.uniformBlocks[i];
-			gl.bindBufferRange(gl.UNIFORM_BUFFER, i, this.uniformBlockBuffer, block.offset, block.size);
-			gl.uniformBlockBinding(this.program, block.index, i);
-		}
 
-		gl.useProgram(originalProgram);
+		gl.useProgram(oldProgram);
+		gl.bindBuffer(gl.UNIFORM_BUFFER, oldUniformBuffer);
 	}
 	commitUniforms() {
+		const { gl } = this;
+
 		this.uniformsSet = false;
+
+		// commit uniform blocks
+		let changedCount = 0;
 		for (let i = 0; i < this.uniformBlocks.length; i++)
-			this.uniformBlocks[i].commit();
+			if (this.uniformBlocks[i].changed) changedCount++;
+
+		// if more than half have changed, it's probably worth it to just send the whole array over
+		if (changedCount > this.uniformBlocks.length / 2) {
+			gl.bufferData(gl.UNIFORM_BUFFER, this.uniformBlockArray, gl.DYNAMIC_DRAW);
+
+			for (let i = 0; i < this.uniformBlocks.length; i++)
+				this.uniformBlocks[i].changed = false;
+		} else {
+			for (let i = 0; i < this.uniformBlocks.length; i++)
+				this.uniformBlocks[i].commit();
+		}
+
+		// commit dynamic arrays
 		for (let i = 0; i < this.dynamicArrays.length; i++)
 			this.dynamicArrays[i].commit();
 	}
@@ -1107,7 +1154,17 @@ class GLSLProgram {
 		return { integer, signed, rows, columns, texture, dynamicArray };
 	}
 	use() {
-		this.gl.useProgram(this.program);
+		const { gl } = this;
+		gl.useProgram(this.program);
+		
+		// bind uniform buffers
+		gl.bindBuffer(gl.UNIFORM_BUFFER, this.uniformBlockBuffer);
+		for (let i = 0; i < this.uniformBlocks.length; i++) {
+			const block = this.uniformBlocks[i];
+			const bindingPoint = i;
+			gl.bindBufferRange(gl.UNIFORM_BUFFER, bindingPoint, this.uniformBlockBuffer, block.offset, block.size);
+			gl.uniformBlockBinding(this.program, block.index, bindingPoint);
+		}
 	}
 	focus() {
 		if (!this.inUse) this.use();
