@@ -6,6 +6,9 @@ Physics.onCollide = (a, b, direction, contacts, triggerA, triggerB) => {
 	b = PHYSICS.bodyToSceneObject.get(b.pointer);
 
 	scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
+
+	contacts.delete();
+	direction.delete();
 };
 
 Physics.collisionRule = (a, b) => {

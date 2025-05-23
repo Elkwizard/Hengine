@@ -76,7 +76,7 @@ API class Orientation {
 			setRotation(rotation);
 		}
 
-		API Rotation getRotation() const {
+		API const Rotation& getRotation() const {
 			return rotation;
 		}
 

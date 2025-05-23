@@ -147,7 +147,7 @@ extern "C" {
 	EMSCRIPTEN_KEEPALIVE bool collisionRule(const RigidBody& _0, const RigidBody& _1) { return __global_collisionRule4(&_0, &_1); }
 	void __global_onCollide5(const RigidBody*, const RigidBody*, const VectorN<3>*, Array_VectorN_3__0*, bool, bool);
 	EMSCRIPTEN_KEEPALIVE void onCollide(const RigidBody& _0, const RigidBody& _1, const VectorN<3>& _2, const std::vector<VectorN<3>>& _3, bool _4, bool _5) { __global_onCollide5(&_0, &_1, &_2, new Array_VectorN_3__0(_3), _4, _5); }
-	EMSCRIPTEN_KEEPALIVE VectorN<3>* _Orientation_getRotation6(Orientation* _this) { return new VectorN<3>(_this->getRotation()); }
+	EMSCRIPTEN_KEEPALIVE const VectorN<3>* _Orientation_getRotation6(Orientation* _this) { return &_this->getRotation(); }
 	EMSCRIPTEN_KEEPALIVE void _Orientation_setRotation7(Orientation* _this, const VectorN<3>* _rotation) { _this->setRotation(*_rotation); }
 	EMSCRIPTEN_KEEPALIVE VectorN<3>* _get_Transform_linear8(Transform* _this) { return &_this->linear; }
 	EMSCRIPTEN_KEEPALIVE Orientation* _get_Transform_orientation9(Transform* _this) { return &_this->orientation; }
