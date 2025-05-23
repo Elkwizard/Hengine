@@ -1,11 +1,11 @@
 Physics.onCollide = (a, b, direction, contacts, triggerA, triggerB) => {
 	a = PHYSICS.bodyToSceneObject.get(a.pointer);
-	const { scene } = a.engine;
-	if (!scene.collisionEvents) return;
 	
-	b = PHYSICS.bodyToSceneObject.get(b.pointer);
-
-	scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
+	const { scene } = a.engine;
+	if (scene.collisionEvents) {
+		b = PHYSICS.bodyToSceneObject.get(b.pointer);
+		scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
+	}
 
 	contacts.delete();
 	direction.delete();
