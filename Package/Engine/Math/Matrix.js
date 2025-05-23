@@ -68,7 +68,17 @@ class Matrix extends Float64Array {
 	 * @return Matrix
 	 */
 	transpose() {
-		return this.constructor.create(...this, this);
+		const { size } = this.constructor;
+		for (let i = 0; i < size; i++) {
+			for (let j = i + 1; j < size; j++) {
+				const a = i * size + j;
+				const b = j * size + i;
+				const temp = this[a];
+				this[a] = this[b];
+				this[b] = temp;
+			}
+		}
+		return this;
 	}
 	/**
 	 * @name invert
@@ -372,6 +382,7 @@ class Matrix extends Float64Array {
  * Represents a 2 by 2 matrix for use with 2D vectors.
  */
 class Matrix2 extends Matrix {
+	static size = 2;
 	constructor(...args) {
 		super(Matrix2.size, args);
 	}
@@ -393,7 +404,6 @@ class Matrix2 extends Matrix {
 		return this;
 	}
 }
-Matrix2.size = 2;
 
 /**
  * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates or 3D vectors in standard coordinates.
@@ -413,6 +423,7 @@ Matrix2.size = 2;
  * ```
  */
 class Matrix3 extends Matrix {
+	static size = 3;
 	constructor(...args) {
 		super(Matrix3.size, args);
 	}
@@ -543,12 +554,12 @@ class Matrix3 extends Matrix {
 		);
 	}
 }
-Matrix3.size = 3;
 
 /**
  * Represents a 4 by 4 matrix for use with 3D vectors in homogenous coordinates or 4D vectors in standard coordinates.
  */
 class Matrix4 extends Matrix {
+	static size = 4;
 	constructor(...args) {
 		super(Matrix4.size, args);
 	}
@@ -710,6 +721,15 @@ class Matrix4 extends Matrix {
 			dst.w = w;
 		}
 	}
+	column(index) {
+		const base = index * 4;
+		return new Vector4(
+			this[base + 0],
+			this[base + 1],
+			this[base + 2],
+			this[base + 3]
+		);
+	}
 	/**
 	 * Creates a perspective projection matrix for use in 3D rendering.
 	 * @param Number aspectRatio | The aspect ratio of the surface on which the rendering will occur (`height / width`)
@@ -762,7 +782,6 @@ class Matrix4 extends Matrix {
 		);
 	}
 }
-Matrix4.size = 4;
 
 Matrix.sizes = [,, Matrix2, Matrix3, Matrix4];
 const MatrixN = Matrix[DIM];
