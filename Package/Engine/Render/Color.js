@@ -216,26 +216,26 @@ class Color extends Operable {
 	static parseHex(str, destination) {
 		const num = parseInt(str.slice(1), 16);
 		
-		switch (str.length - 1) {
-			case 3: // rgb
+		switch (str.length) {
+			case 4: // #rgb
 				destination.red = 17 * ((num >> 8) & 0xF);
 				destination.green = 17 * ((num >> 4) & 0xF);
 				destination.blue = 17 * (num & 0xF);
 				destination.alpha = 1;
 				break;
-			case 4: // rgba
+			case 5: // #rgba
 				destination.red = 17 * ((num >> 24) & 0xFF);
 				destination.green = 17 * ((num >> 16) & 0xFF);
 				destination.blue = 17 * ((num >> 8) & 0xFF);
 				destination.alpha = 17 * (num & 0xFF) / 255;
 				break;
-			case 6: // rrggbb
+			case 7: // #rrggbb
 				destination.red = (num >> 16) & 0xFF;
 				destination.green = (num >> 8) & 0xFF;
 				destination.blue = num & 0xFF;
 				destination.alpha = 1;
 				break;
-			case 8: // rrggbbaa
+			case 9: // #rrggbbaa
 				destination.red = (num >> 24) & 0xFF;
 				destination.green = (num >> 16) & 0xFF;
 				destination.blue = (num >> 8) & 0xFF;
