@@ -166,6 +166,11 @@ class Operable extends MathObject {
     get values() {
         return this.constructor.modValues.map(field => this[field]);
     }
+	*[Symbol.iterator]() {
+		const { modValues } = this.constructor;
+		for (let i = 0; i < modValues.length; i++)
+			yield this[modValues[i]];
+	}
 	/**
 	 * Sets all elements of the operable, either by copying from another operable, or by using a list of numeric values.
 	 * Returns the caller.
