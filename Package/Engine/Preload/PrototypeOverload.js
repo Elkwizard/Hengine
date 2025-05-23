@@ -321,7 +321,7 @@ Object.defineProperty(window, "title", {
 	});
 	Array.makeBaseDimension = function (arr) {
 		proto(arr, "map", function (fn, ...coords) {
-			const result = [];
+			const result = Array.makeBaseDimension([]);
 			for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
 			return result;
 		});
