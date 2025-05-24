@@ -64,4 +64,9 @@ class AABB {
 
 			return true;
 		}
+
+		friend std::ostream& operator <<(std::ostream& out, const AABB& box) {
+			out << "AABB(" << box.min << ", " << (box.max - box.min) << ")";
+			return out;
+		}
 };

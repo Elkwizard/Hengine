@@ -38,6 +38,21 @@ class Matrix extends Float64Array {
 		}
 	}
 	/**
+	 * Returns the maximum length ratio (`this.times(v).mag / v.mag`) that is possible for a Vector `v` of the same dimension as the caller.
+	 * @return Number
+	 */
+	get maxScaleFactor() {
+		const { size } = this.constructor;
+		let max = 0;
+		for (let c = 0; c < size; c++) {
+			let sqrMag = 0;
+			for (let r = 0; r < size; r++)
+				sqrMag += this[c * size + r] ** 2;
+			if (sqrMag > max) max = sqrMag;
+		}
+		return Math.sqrt(max);
+	}
+	/**
 	 * Returns a transposed copy of the caller.
 	 * @return Matrix
 	 */

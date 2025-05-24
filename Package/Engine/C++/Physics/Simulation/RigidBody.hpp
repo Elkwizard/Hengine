@@ -134,6 +134,7 @@ API class RigidBody {
 		double density = 1;
 		std::vector<Collider> colliders;
 		Transform lastPosition;
+		Orientation lastBoundedOrientation;
 
 		void syncMatter() {
 			if (dynamic && canRotate) {
@@ -149,6 +150,16 @@ API class RigidBody {
 			for (Collider& collider : colliders)
 				collider.invalidate();
 			bounds = localBounds + position.linear;
+		}
+
+		void updateLocalBounds() {
+			lastBoundedOrientation = position.orientation;
+			localBounds = { };
+			Transform orientationOnly = { { }, position.orientation };
+			for (Collider& collider : colliders) {
+				collider.updateBounds(dynamic, orientationOnly);
+				localBounds.add(collider.bounds);
+			}
 		}
 
 	public:
@@ -195,6 +206,7 @@ API class RigidBody {
 
 		API void setDynamic(bool _dynamic) {
 			dynamic = _dynamic;
+			updateLocalBounds();
 			syncMatter();
 		}
 
@@ -223,16 +235,19 @@ API class RigidBody {
 		API void addShape(Shape* shape) {
 			localMatter += shape->getMatter() * density;
 			colliders.emplace_back(shape);
+			updateLocalBounds();
 		}
 
 		API void removeShape(Shape* shape) {
 			localMatter -= shape->getMatter() * density;
 			erase(colliders, shape);
+			updateLocalBounds();
 		}
 
 		API void removeAllShapes() {
 			localMatter = { };
 			colliders.clear();
+			updateLocalBounds();
 		}
 
 		API double getKineticEnergy() const {
@@ -293,13 +308,9 @@ API class RigidBody {
 		}
 
 		void cache() {
-			// update bounds
-			localBounds = { };
-			Transform orientationOnly = { { }, position.orientation };
-			for (Collider& collider : colliders) {
-				collider.updateBounds(dynamic, orientationOnly);
-				localBounds.add(collider.bounds);
-			}
+			if (lastBoundedOrientation != position.orientation && !dynamic)
+				updateLocalBounds();
+			
 			sync();
 		}
 

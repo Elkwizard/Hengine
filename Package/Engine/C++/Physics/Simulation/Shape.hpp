@@ -147,6 +147,34 @@ API class Polytope : public Shape {
 		}
 
 		void computeDependentData() {
+#if IS_3D
+			// de-duplicate
+			std::unordered_map<Vector, int> indexMapping;
+			std::vector<Vector> uniqueVertices;
+			for (const Vector& vertex : vertices) {
+				if (!indexMapping.count(vertex)) {
+					indexMapping.insert(std::make_pair(vertex, uniqueVertices.size()));
+					uniqueVertices.push_back(vertex);
+				}
+			}
+
+			std::vector<IndexFace> uniqueFaces;
+			auto mapIndex = [&](int index) {
+				return indexMapping[vertices[index]];
+			};
+
+			for (const IndexFace& face : faces) {
+				uniqueFaces.push_back({
+					mapIndex(face[0]),
+					mapIndex(face[1]),
+					mapIndex(face[2])
+				});
+			}
+
+			vertices = uniqueVertices;
+			faces = uniqueFaces;
+#endif
+
 			position = average(vertices);
 			
 			for (int i = 0; i < faces.size(); i++) {

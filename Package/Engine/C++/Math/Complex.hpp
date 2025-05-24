@@ -23,6 +23,10 @@ class Complex {
 		Complex()
 		: Complex(0.0) { }
 
+		bool operator ==(const Complex& other) const {
+			return real == other.real && imag == other.imag;
+		}
+
 		Complex operator -() const {
 			return { -real, -imag };
 		}

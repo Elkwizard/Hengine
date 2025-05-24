@@ -1076,21 +1076,21 @@ class GLSLProgram {
 
 		this.uniformsSet = false;
 
-		// commit uniform blocks
-		let changedCount = 0;
-		for (let i = 0; i < this.uniformBlocks.length; i++)
-			if (this.uniformBlocks[i].changed) changedCount++;
+		// // commit uniform blocks
+		// let changedCount = 0;
+		// for (let i = 0; i < this.uniformBlocks.length; i++)
+		// 	if (this.uniformBlocks[i].changed) changedCount++;
 
-		// if more than half have changed, it's probably worth it to just send the whole array over
-		if (changedCount > this.uniformBlocks.length / 2) {
-			gl.bufferData(gl.UNIFORM_BUFFER, this.uniformBlockArray, gl.DYNAMIC_DRAW);
+		// // if more than half have changed, it's probably worth it to just send the whole array over
+		// if (changedCount > this.uniformBlocks.length / 2) {
+		// 	gl.bufferData(gl.UNIFORM_BUFFER, this.uniformBlockArray, gl.DYNAMIC_DRAW);
 
-			for (let i = 0; i < this.uniformBlocks.length; i++)
-				this.uniformBlocks[i].changed = false;
-		} else {
+		// 	for (let i = 0; i < this.uniformBlocks.length; i++)
+		// 		this.uniformBlocks[i].changed = false;
+		// } else {
 			for (let i = 0; i < this.uniformBlocks.length; i++)
 				this.uniformBlocks[i].commit();
-		}
+		// }
 
 		// commit dynamic arrays
 		for (let i = 0; i < this.dynamicArrays.length; i++)

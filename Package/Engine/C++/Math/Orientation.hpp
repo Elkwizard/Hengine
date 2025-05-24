@@ -24,6 +24,10 @@ API class Orientation {
 		Orientation()
 		: Orientation({ 1.0, {} }, Rotation(0.0)) { }
 
+		bool operator ==(const Orientation& other) const {
+			return complex == other.complex;
+		}
+
 		Orientation operator -() const {
 			return { complex.conjugate(), -rotation };
 		}
