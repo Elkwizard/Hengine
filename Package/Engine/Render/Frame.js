@@ -37,8 +37,10 @@ function new_OffscreenCanvas(width, height) {
  * @abstract
  * @prop Number width | The natural rendered width of the image
  * @prop Number height | The natural rendered height of the image
+ * @static_prop Boolean dynamic | Whether the contents of the image can change over time
  */
 class ImageType {
+	static dynamic = true;
 	constructor(width = 1, height = 1, pixelRatio = null) {
 		this._width = ImageType.roundDimension(width);
 		this._height = ImageType.roundDimension(height);
@@ -224,6 +226,7 @@ class ImageType {
  * ```
  */
 class HImage extends ImageType {
+	static dynamic = false;
 	constructor(image) {
 		super(image.width, image.height);
 		this.image = image;

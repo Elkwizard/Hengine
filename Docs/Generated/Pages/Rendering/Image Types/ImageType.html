@@ -9,7 +9,7 @@
 				
 			<div class="class-wrapper" id="class ImageType">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L41" target="_blank" class="class-name source-link">ImageType</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L42" target="_blank" class="class-name source-link">ImageType</a>
 				</div>
 				<div class="class desc">
 					Represents an image that can be rendered.
@@ -36,6 +36,13 @@ This is an abstract superclass and should not be constructed.
 					</div>
 					<div class="prop desc">The natural rendered height of the image</div>
 				</div>
+			
+				<div class="prop-wrapper" id="static ImageType.dynamic">
+					<div class="prop-header member">
+						<span class="prop-name">ImageType.dynamic</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether the contents of the image can change over time</div>
+				</div>
 			</div>
 				
 				
@@ -44,7 +51,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="get ImageType.prototype.pixelRatio()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L72" target="_blank" class="function-name source-link">pixelRatio</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L74" target="_blank" class="function-name source-link">pixelRatio</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the pixel density of the image, measured as the ratio of the number of pixels in a row of the image to the natural width of the image.
@@ -54,7 +61,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get ImageType.prototype.pixelWidth()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L79" target="_blank" class="function-name source-link">pixelWidth</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L81" target="_blank" class="function-name source-link">pixelWidth</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the width of the image in actual pixels, accounting for the pixel density of the image.
@@ -64,7 +71,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get ImageType.prototype.pixelHeight()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L86" target="_blank" class="function-name source-link">pixelHeight</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L88" target="_blank" class="function-name source-link">pixelHeight</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the height of the image in actual pixels, accounting for the pixel density of the image.
@@ -74,7 +81,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="ImageType.prototype.resize()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L99" target="_blank" class="function-name source-link">resize</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L101" target="_blank" class="function-name source-link">resize</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Simultaneously updates the width and height of the image.
@@ -112,7 +119,7 @@ Updates that occur on image resizing will only happen once with a call to this m
 	
 		<div class="function-wrapper" id="ImageType.prototype.contains()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L120" target="_blank" class="function-name source-link">contains</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L122" target="_blank" class="function-name source-link">contains</a>(<span class="param">point</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
@@ -163,7 +170,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper" id="ImageType.prototype.inferWidth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L129" target="_blank" class="function-name source-link">inferWidth</a>(<span class="param">height</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L131" target="_blank" class="function-name source-link">inferWidth</a>(<span class="param">height</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the width of the image required for a given height to maintain the aspect ratio.
@@ -190,7 +197,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper" id="ImageType.prototype.inferHeight()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L137" target="_blank" class="function-name source-link">inferHeight</a>(<span class="param">width</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L139" target="_blank" class="function-name source-link">inferHeight</a>(<span class="param">width</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the height of the image required for a given width to maintain the aspect ratio.
@@ -217,7 +224,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper" id="ImageType.prototype.toDataURL()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L184" target="_blank" class="function-name source-link">toDataURL</a>()<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L186" target="_blank" class="function-name source-link">toDataURL</a>()<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Converts the content of the image to a data: url.
@@ -227,7 +234,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper" id="ImageType.prototype.download()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L203" target="_blank" class="function-name source-link">download</a>(<span class="param">name</span>)<span class="type">Promise&lt;void&gt;</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L205" target="_blank" class="function-name source-link">download</a>(<span class="param">name</span>)<span class="type">Promise&lt;void&gt;</span>
 			</div>
 			<div class="function desc">
 				Downloads the image as a PNG, with a specified name.

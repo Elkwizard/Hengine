@@ -247,7 +247,7 @@ class ElementContainer extends SceneElement {
 	 * @signature
 	 * @param String name | The name of a scene element. Returns that element or null if no element exists with that name
 	 * @signature
-	 * @param class extends ElementScript script | The ElementScript to select for. Returns all elements with an instance of this script
+	 * @param Class extends ElementScript script | The ElementScript to select for. Returns all elements with an instance of this script
 	 * @signature
 	 * @param (SceneElement) => Boolean mask | A pure function selecting for certain elements. Returns all elements that return true when passed to this function.
 	 * @signature

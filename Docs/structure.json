@@ -46,7 +46,7 @@
 		},
 		"Rendering": {
 			"GLSL API": {
-				"Basics": ["GLSL API", "CubeMap"],
+				"Basics": ["GLSL API", "CubeMap", "Sampler", "SamplerSettings", "FilterMode"],
 				"GPUInterface": null,
 				"GPUArray": null
 			},

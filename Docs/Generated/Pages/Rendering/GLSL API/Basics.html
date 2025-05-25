@@ -24,9 +24,9 @@ These associations are laid out in the following table:
 	<tr><td>vec3, ivec3, uvec3</td><td><a href="../../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
 	<tr><td>ivec4, uvec4</td><td><a href="../../../Pages/Geometry/Vectors/Vector4.html#class Vector4">Vector4</a></td></tr>
 	<tr><td>vec4</td><td><a href="../../../Pages/Geometry/Vectors/Vector4.html#class Vector4">Vector4</a>, <a href="../../../Pages/Rendering/Color.html#class Color">Color</a></td></tr>
-	<tr><td>sampler2D</td><td><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></td></tr>
-	<tr><td>sampler2DArray</td><td><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>[]</td></tr>
-	<tr><td>samplerCube</td><td>CubeMap</td></tr>
+	<tr><td>sampler2D</td><td><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/Sampler</td></tr>
+	<tr><td>sampler2DArray</td><td><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>[]/Sampler</td></tr>
+	<tr><td>samplerCube</td><td>CubeMap/Sampler</td></tr>
 	<tr><td>struct</td><td>Object</td></tr>
 	<tr><td>fixed-length array</td><td><a href="../../../Pages/Built-Ins/Array.html#class Array">Array</a></td></tr>
  <tr><td>dynamic-length array</td><td><a href="../../../Pages/Rendering/GLSL API/GPUArray.html#class GPUArray">GPUArray</a></td></tr>
@@ -68,9 +68,9 @@ All faces must be square and equal in size.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="CubeMap.posX">
 					<div class="prop-header member">
-						<span class="prop-name">posX</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+						<span class="prop-name">posX</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/Sampler</span>
 					</div>
-					<div class="prop desc">The face of the cube map on the positive x side</div>
+					<div class="prop desc">The face of the cube map on the positive x side. If this is a Sampler, the sampling strategy will be used on all sides</div>
 				</div>
 			
 				<div class="prop-wrapper" id="CubeMap.negX">
@@ -106,6 +106,124 @@ All faces must be square and equal in size.
 						<span class="prop-name">negZ</span><span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 					</div>
 					<div class="prop desc">The face of the cube map on the negative z side</div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Sampler">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L628" target="_blank" class="class-name source-link">Sampler</a>
+				</div>
+				<div class="class desc">
+					This describes the way in which a GLSL <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">sampler</span><span class="highlight-SYMBOL">*</span></code> reads data from a texture.
+This can be used in place of an <a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a> when specifying a <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">sampler</span><span class="highlight-SYMBOL">*</span></code> uniform.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Sampler.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L633" target="_blank" class="function-name source-link">constructor</a>(<span class="param">image</span>, <span class="param">settings?</span>)
+			</div>
+			<div class="function desc">
+				
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Sampler.prototype.constructor():image">
+							<div class="param-name">
+								<span class="param">image</span>
+								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/<a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>[]/CubeMap</span>
+							</div>
+							<div class="param desc">
+								The image(s) to sample from
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Sampler.prototype.constructor():settings?">
+							<div class="param-name">
+								<span class="param">settings</span>
+								<span class="type">SamplerSettings</span>
+							</div>
+							<div class="param desc">
+								How the sampler should be configured. Default is an empty object
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="class SamplerSettings">
+				<div class="class-header">
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L623" target="_blank" class="class-name source-link">SamplerSettings</a>
+				</div>
+				<div class="class desc">
+					Describes how a Sampler should be constructed.
+All properties of this interface are optional.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="SamplerSettings.wrap?">
+					<div class="prop-header member">
+						<span class="prop-name">wrap?</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether the samples will repeat when out-of-bounds coordinates are used. Default is false</div>
+				</div>
+			
+				<div class="prop-wrapper" id="SamplerSettings.filter?">
+					<div class="prop-header member">
+						<span class="prop-name">filter?</span><span class="type">FilterMode</span>
+					</div>
+					<div class="prop desc">How the samples should be interpolated when sampling from non-integer coordinates. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">FilterMode</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">NEAREST</span></code> for <a href="../../../Pages/Rendering/Image Types/Texture.html#class Texture">Textures</a>, and <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">FilterMode</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">LINEAR</span></code> for all others</div>
+				</div>
+			</div>
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="enum FilterMode">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L613" target="_blank" class="class-name source-link">FilterMode</a>
+				</div>
+				<div class="class desc">
+					Represents the way in which samples of an image are interpolated in GLSL.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="static FilterMode.NEAREST">
+					<div class="prop-header member">
+						<span class="prop-name">FilterMode.NEAREST</span><span class="type">FilterMode</span>
+					</div>
+					<div class="prop desc">The exact value of the nearest texel is used as the sample</div>
+				</div>
+			
+				<div class="prop-wrapper" id="static FilterMode.LINEAR">
+					<div class="prop-header member">
+						<span class="prop-name">FilterMode.LINEAR</span><span class="type">FilterMode</span>
+					</div>
+					<div class="prop desc">The values of the 4 nearest texels are linearly interpolated to produce the sample</div>
 				</div>
 			</div>
 				

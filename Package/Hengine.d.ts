@@ -152,7 +152,7 @@ declare class ElementContainer extends SceneElement {
 	 * Retrieves an element (or multiple) based on a piece of identifying information.
 	 * @param script - The ElementScript to select for. Returns all elements with an instance of this script
 	 */
-	query(script: class extends ElementScript): SceneElement | SceneElement[];
+	query(script: Class<ElementScript>): SceneElement | SceneElement[];
 	/**
 	 * Retrieves an element (or multiple) based on a piece of identifying information.
 	 * @param mask - A pure function selecting for certain elements. Returns all elements that return true when passed to this function.
@@ -3960,6 +3960,10 @@ declare class ImageType {
 	 */
 	height: number;
 	/**
+	 * Whether the contents of the image can change over time
+	 */
+	static dynamic: boolean;
+	/**
 	 * Returns the pixel density of the image, measured as the ratio of the number of pixels in a row of the image to the natural width of the image.
 	 */
 	get pixelRatio(): number;
@@ -5667,9 +5671,9 @@ declare class FastFrame extends Frame {
  */
 declare interface CubeMap {
 	/**
-	 * The face of the cube map on the positive x side
+	 * The face of the cube map on the positive x side. If this is a Sampler, the sampling strategy will be used on all sides
 	 */
-	posX: ImageType;
+	posX: ImageType | Sampler;
 	/**
 	 * The face of the cube map on the negative x side
 	 */
@@ -5758,6 +5762,48 @@ declare class GPUArray {
 	 * @param dstOffset - The first index to write to in the data argument. If not specified, this will be the same as the offset argument
 	 */
 	read(data: object[], offset?: number, length?: number, dstOffset?: number): object[];
+}
+
+/**
+ * Represents the way in which samples of an image are interpolated in GLSL.
+ */
+declare enum FilterMode {
+	/**
+	 * The exact value of the nearest texel is used as the sample
+	 */
+	NEAREST,
+	/**
+	 * The values of the 4 nearest texels are linearly interpolated to produce the sample
+	 */
+	LINEAR
+}
+
+/**
+ * Describes how a Sampler should be constructed.
+ * All properties of this interface are optional.
+ */
+declare interface SamplerSettings {
+	/**
+	 * Whether the samples will repeat when out-of-bounds coordinates are used. Default is false
+	 */
+	wrap?: boolean;
+	/**
+	 * How the samples should be interpolated when sampling from non-integer coordinates. Default is `FilterMode.NEAREST` for Textures, and `FilterMode.LINEAR` for all others
+	 */
+	filter?: FilterMode;
+}
+
+/**
+ * This describes the way in which a GLSL `sampler*` reads data from a texture.
+ * This can be used in place of an ImageType when specifying a `sampler*` uniform.
+ */
+declare class Sampler {
+	/**
+	 * 
+	 * @param image - The image(s) to sample from
+	 * @param settings - How the sampler should be configured. Default is an empty object
+	 */
+	constructor(image: ImageType | ImageType[] | CubeMap, settings?: SamplerSettings);
 }
 
 /**

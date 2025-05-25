@@ -3,6 +3,7 @@
  * This image format is more efficient for rendering than other ImageTypes.
  */
 class StaticImage extends ImageType {
+	static dynamic = false;
 	/**
 	 * Creates a new StaticImage.
 	 * @param ImageType image | The data to use for the static image

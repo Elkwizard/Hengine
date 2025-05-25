@@ -356,7 +356,6 @@ IntervalManager.FPS_FRAMES_TO_COUNT = 30;
 	IntervalManager.intervals = [];
 	IntervalManager.inInterval = false;
 	function animate(now) {
-		requestAnimationFrame(animate);
 		IntervalManager.inInterval = true;
 		try {
 			for (let i = 0; i < IntervalManager.intervals.length; i++)
@@ -366,6 +365,8 @@ IntervalManager.FPS_FRAMES_TO_COUNT = 30;
 			else throw err;
 		}
 		IntervalManager.inInterval = false;
+		
+		requestAnimationFrame(animate);
 	}
 	requestAnimationFrame(animate);
 })();

@@ -11,9 +11,9 @@
  * 	<tr><td>vec3, ivec3, uvec3</td><td>Vector3</td></tr>
  * 	<tr><td>ivec4, uvec4</td><td>Vector4</td></tr>
  * 	<tr><td>vec4</td><td>Vector4, Color</td></tr>
- * 	<tr><td>sampler2D</td><td>ImageType</td></tr>
- * 	<tr><td>sampler2DArray</td><td>ImageType[]</td></tr>
- * 	<tr><td>samplerCube</td><td>CubeMap</td></tr>
+ * 	<tr><td>sampler2D</td><td>ImageType/Sampler</td></tr>
+ * 	<tr><td>sampler2DArray</td><td>ImageType[]/Sampler</td></tr>
+ * 	<tr><td>samplerCube</td><td>CubeMap/Sampler</td></tr>
  * 	<tr><td>struct</td><td>Object</td></tr>
  * 	<tr><td>fixed-length array</td><td>Array</td></tr>
  *  <tr><td>dynamic-length array</td><td>GPUArray</td></tr>
@@ -46,7 +46,7 @@
  * Represents a cube map usable in via a GPUInterface.
  * All faces must be square and equal in size.
  * @name_subs SIDE: negX, posX, negY, posY, negZ, posZ
- * @prop ImageType posX | The face of the cube map on the positive x side
+ * @prop ImageType/Sampler posX | The face of the cube map on the positive x side. If this is a Sampler, the sampling strategy will be used on all sides
  * @prop ImageType negX | The face of the cube map on the negative x side
  * @prop ImageType posY | The face of the cube map on the positive y side
  * @prop ImageType negY | The face of the cube map on the negative y side
@@ -605,6 +605,46 @@ class GPUInputArray extends GPUArray {
 	}
 }
 
+/**
+ * Represents the way in which samples of an image are interpolated in GLSL.
+ * @static_prop FilterMode NEAREST | The exact value of the nearest texel is used as the sample
+ * @static_prop FilterMode LINEAR | The values of the 4 nearest texels are linearly interpolated to produce the sample
+ */
+const FilterMode = Enum.define("NEAREST", "LINEAR");
+
+/**
+ * @name class SamplerSettings
+ * @interface
+ * Describes how a Sampler should be constructed.
+ * All properties of this interface are optional.
+ * @prop Boolean wrap? | Whether the samples will repeat when out-of-bounds coordinates are used. Default is false
+ * @prop FilterMode filter? | How the samples should be interpolated when sampling from non-integer coordinates. Default is `FilterMode.NEAREST` for Textures, and `FilterMode.LINEAR` for all others
+ */
+
+/**
+ * This describes the way in which a GLSL `sampler*` reads data from a texture.
+ * This can be used in place of an ImageType when specifying a `sampler*` uniform.
+ */
+class Sampler {
+	/**
+	 * @param ImageType/ImageType[]/CubeMap image | The image(s) to sample from
+	 * @param SamplerSettings settings? | How the sampler should be configured. Default is an empty object
+	 */
+	constructor(image, settings = { }) {
+		this.image = image;
+		let imageType;
+		if (image instanceof ImageType) {
+			imageType = image.constructor;
+		} else if (Array.isArray(image)) {
+			imageType = image[0].constructor;
+		} else {
+			imageType = image.posX.constructor;
+		}
+		this.filter = settings.filter ?? (imageType === Texture ? FilterMode.NEAREST : FilterMode.LINEAR);
+		this.wrap = settings.wrap ?? false;
+	}
+}
+
 class GLSLProgram {
 	static currentPrograms = new WeakMap();
 	constructor(gl, vs, fs) {
@@ -736,6 +776,7 @@ class GLSLProgram {
 		this.uniformValues = {};
 		this.uniformsSet = false;
 		this.allUniforms = [];
+		this.textures = [];
 
 		for (let i = 0; i < uniformCount; i++) {
 			const { size: length, type, name } = gl.getActiveUniform(this.program, i);
@@ -874,10 +915,12 @@ class GLSLProgram {
 					desc.setup = function () {
 						for (let i = 0; i < length; i++) {
 							const unit = textureUnit + i;
-							const texture = GLUtils.createTexture(gl, {
-								unit, target, filter: gl.LINEAR
-							});
-							textures[i] = { texture, target, unit, smooth: true };
+							const filter = FilterMode.LINEAR;
+							const wrap = false;
+							const texture = GLUtils.createTexture(gl, { unit, target, filter, wrap });
+							const descriptor = { texture, target, unit, filter, wrap };
+							textures[i] = descriptor;
+							self.textures[unit] = descriptor;
 						}
 
 						if (array) dataArray.set(textures.map(tex => tex.unit));
@@ -947,38 +990,54 @@ class GLSLProgram {
 			offset += bytes;
 		}
 	}
-	writeTexture(image, info) {
+	writeTexture(sampler, info) {
 		const { gl } = this;
+		
+		gl.activeTexture(gl.TEXTURE0 + info.unit);
+		if (sampler instanceof WebGLTexture) {
+			gl.bindTexture(info.target, sampler);
+			return;
+		}
+
+		if (!(sampler instanceof Sampler)) {
+			if (!this.defaultSamplerCache.has(sampler))
+				this.defaultSamplerCache.set(sampler, new Sampler(sampler));
+			sampler = this.defaultSamplerCache.get(sampler);
+		}
+
+		const { image } = sampler;
 
 		const format = gl.RGBA;
 		const type = gl.UNSIGNED_BYTE;
-		const internal = gl.RGBA8;
+		const internal = gl.RGBA8;	
 		
 		const texImage2D = (binding, image) => {
 			gl.texImage2D(binding, 0, internal, format, type, image.makeWebGLImage());
 		};
 		
-		const { target } = info;
-
-		gl.activeTexture(gl.TEXTURE0 + info.unit);
-		if (image instanceof WebGLTexture) {
-			gl.bindTexture(target, image);
+		if (info.target === gl.TEXTURE_2D && !image.constructor.dynamic) {
+			if (!this.staticTextureCache.has(image)) {
+				const staticTexture = GLUtils.createTexture(gl, {
+					unit: info.unit,
+					wrap: sampler.wrap,
+					filter: sampler.filter
+				});
+				gl.bindTexture(gl.TEXTURE_2D, staticTexture);
+				texImage2D(gl.TEXTURE_2D, image);
+				this.staticTextureCache.set(image, staticTexture);
+			} else {
+				gl.bindTexture(gl.TEXTURE_2D, this.staticTextureCache.get(image));
+			}
 			return;
 		}
 		
-		gl.bindTexture(target, info.texture);
-			
-		let smooth = false;
-		const isSmooth = image => !(image instanceof Texture);
+		gl.bindTexture(info.target, info.texture);
 
-		switch (target) {
+		switch (info.target) {
 			case gl.TEXTURE_2D: {
-				smooth = isSmooth(image);
 				texImage2D(gl.TEXTURE_2D, image);
 			}; break;
 			case gl.TEXTURE_CUBE_MAP: {
-				smooth = isSmooth(image.posX);
-
 				let size;
 				for (const key in image) {
 					const face = image[key];
@@ -986,16 +1045,14 @@ class GLSLProgram {
 					if (size !== face.width || size !== face.height)
 						this.error("CUBE_MAP", "Cube map faces are non-square or not equal in size");
 				}
-				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, image.posX);
-				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, image.negX);
-				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, image.posY);
-				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, image.negY);
-				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, image.posZ);
-				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, image.negZ);
+				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, sampler.posX);
+				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, sampler.negX);
+				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, sampler.posY);
+				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, sampler.negY);
+				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, sampler.posZ);
+				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, sampler.negZ);
 			}; break;
 			case gl.TEXTURE_2D_ARRAY: {
-				smooth = isSmooth(image[0]);
-
 				const { pixelWidth, pixelHeight } = image[0];
 				if (!image.every(img => img.pixelWidth === pixelWidth && img.pixelHeight === pixelHeight))
 					this.error("ARRAY_TEXTURE", "Texture array elements are not of equal size");
@@ -1012,9 +1069,14 @@ class GLSLProgram {
 			}; break;
 		}
 		
-		if (smooth !== info.smooth) {
-			info.smooth = smooth;
-			GLUtils.setTextureFilter(gl, target, smooth ? gl.LINEAR : gl.NEAREST);
+		if (sampler.filter !== info.filter) {
+			info.filter = sampler.filter;
+			GLUtils.setTextureFilter(gl, info.target, sampler.filter);
+		}
+
+		if (sampler.wrap !== info.wrap) {
+			info.wrap = sampler.wrap;
+			GLUtils.setTextureFilter(gl, info.target, sampler.wrap);
 		}
 	}
 	checkTextureUnit(unit) {
@@ -1055,6 +1117,8 @@ class GLSLProgram {
 		this.focus();
 
 		// uniforms
+		this.staticTextureCache = new WeakMap();
+		this.defaultSamplerCache = new WeakMap();
 		this.uniformsSet = true;
 		for (let i = 0; i < this.allUniforms.length; i++) {
 			const desc = this.allUniforms[i];
@@ -1076,21 +1140,21 @@ class GLSLProgram {
 
 		this.uniformsSet = false;
 
-		// // commit uniform blocks
-		// let changedCount = 0;
-		// for (let i = 0; i < this.uniformBlocks.length; i++)
-		// 	if (this.uniformBlocks[i].changed) changedCount++;
+		// commit uniform blocks
+		let changedCount = 0;
+		for (let i = 0; i < this.uniformBlocks.length; i++)
+			if (this.uniformBlocks[i].changed) changedCount++;
 
-		// // if more than half have changed, it's probably worth it to just send the whole array over
-		// if (changedCount > this.uniformBlocks.length / 2) {
-		// 	gl.bufferData(gl.UNIFORM_BUFFER, this.uniformBlockArray, gl.DYNAMIC_DRAW);
+		// if more than half have changed, it's probably worth it to just send the whole array over
+		if (changedCount > this.uniformBlocks.length / 2) {
+			gl.bufferData(gl.UNIFORM_BUFFER, this.uniformBlockArray, gl.DYNAMIC_DRAW);
 
-		// 	for (let i = 0; i < this.uniformBlocks.length; i++)
-		// 		this.uniformBlocks[i].changed = false;
-		// } else {
+			for (let i = 0; i < this.uniformBlocks.length; i++)
+				this.uniformBlocks[i].changed = false;
+		} else {
 			for (let i = 0; i < this.uniformBlocks.length; i++)
 				this.uniformBlocks[i].commit();
-		// }
+		}
 
 		// commit dynamic arrays
 		for (let i = 0; i < this.dynamicArrays.length; i++)
@@ -1156,6 +1220,12 @@ class GLSLProgram {
 	use() {
 		const { gl } = this;
 		gl.useProgram(this.program);
+
+		// bind textures
+		for (const { unit, target, texture } of this.textures) {
+			gl.activeTexture(gl.TEXTURE0 + unit);
+			gl.bindTexture(target, texture);
+		}
 		
 		// bind uniform buffers
 		gl.bindBuffer(gl.UNIFORM_BUFFER, this.uniformBlockBuffer);
@@ -1198,8 +1268,11 @@ class GLSLProgram {
 	}
 	setUniforms(args, force = true) {
 		this.focus();
-		for (const key in args)
-			this.setUniform(key, args[key], force, this.uniforms, true);
+		for (const key in args) {
+			const value = args[key];
+			if (value !== undefined)
+				this.setUniform(key, value, force, this.uniforms, true);
+		}
 	}
 	getUniform(name) {
 		if (this.hasUniform(name)) return this.uniformValues[name];
@@ -1301,8 +1374,8 @@ class GLSLProgram {
 class GLUtils {
 	static createTexture(gl, {
 		target = gl.TEXTURE_2D,
-		wrap = gl.CLAMP_TO_EDGE,
-		filter = gl.NEAREST,
+		wrap = false,
+		filter = FilterMode.NEAREST,
 		unit = null,
 	} = { }) {
 		const texture = gl.createTexture();
@@ -1313,12 +1386,18 @@ class GLUtils {
 		return texture;
 	}
 	static setTextureFilter(gl, target, filter) {
-		gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, filter);
-		gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, filter);
+		GLUtils.filterMap ??= new Map([
+			[FilterMode.LINEAR, gl.LINEAR],
+			[FilterMode.NEAREST, gl.NEAREST]
+		]);
+		const parameter = GLUtils.filterMap.get(filter);
+		gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, parameter);
+		gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, parameter);
 	}
 	static setTextureWrap(gl, target, wrap) {
-		gl.texParameteri(target, gl.TEXTURE_WRAP_S, wrap);
-		gl.texParameteri(target, gl.TEXTURE_WRAP_T, wrap);
+		const parameter = wrap ? gl.REPEAT : gl.CLAMP_TO_EDGE;
+		gl.texParameteri(target, gl.TEXTURE_WRAP_S, parameter);
+		gl.texParameteri(target, gl.TEXTURE_WRAP_T, parameter);
 	}
 	static createContext(canvas, options) {
 		const gl = canvas.getContext("webgl2", options);
