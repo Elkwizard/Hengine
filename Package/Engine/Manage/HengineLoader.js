@@ -896,7 +896,7 @@ HengineLoader.engineResources = [
  * @prop TouchHandler touches | The touchscreen input API for the Hengine
  * @prop ClipboardHandler clipboard | The clipboard I/O API for the Hengine
  * @prop CanvasImage canvas | The canvas on which rendering occurs
- * @prop Artist renderer | The renderer that affects the screen
+ * @prop Artist2D renderer | The renderer that affects the screen
  * @prop Scene scene | The scene that contains all SceneElements
  * @prop IntervalManager intervals | The timing and scheduling API for the Hengine
  * @prop FileSystem fileSystem | The built-in, localStorage-based file system API

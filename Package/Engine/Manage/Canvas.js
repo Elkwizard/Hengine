@@ -19,7 +19,7 @@ const ScalingMode = Enum.define("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MUL
  * 	renderer.draw(new Color("blue")).circle(middle, 10);
  * });
  * ```
- * @prop Artist renderer | A renderer which can draw to the screen
+ * @prop Artist2D renderer | A renderer which can draw to the screen
  * @prop ImageType/String cursor | The cursor icon. This can be either an image or a CSS cursor name
  * @prop ScalingMode scalingMode | The way in which the canvas scales when the window is resized. Starts as `ScalingMode.PRESERVE_ASPECT_RATIO`
  * @prop () => void clearScreen | The function that will be called to clear the screen each frame. Starts as `() => renderer.fill(new Color(255, 255, 255))`

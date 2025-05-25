@@ -42,7 +42,7 @@
  * @name draw?
  * The function that is called to render particles each frame.
  * This function should minimize side effects and, if possible, should be pure.
- * @param Artist renderer | The renderer to draw the particle to. Its transform will be in world-space, unless the spawner is a UIObject
+ * @param Artist2D renderer | The renderer to draw the particle to. Its transform will be in world-space, unless the spawner is a UIObject
  * @param Particle particle | The particle to render
  */
 

@@ -6,7 +6,7 @@
  * @prop TouchHandler touches | The touch screen API
  * @prop ClipboardHandler clipboard | The clipboard API
  * @prop CanvasImage canvas | The canvas associated with the engine
- * @prop Artist renderer | The renderer associated with the canvas. Draws directly on the screen
+ * @prop Artist2D renderer | The renderer associated with the canvas. Draws directly on the screen
  * @prop Scene scene | The scene containing all the objects currently in the engine
  * @prop IntervalManager intervals | The interval manager managing the update loop of the engine
  * @prop FileSystem fileSystem | The file system for the engine. This property persists across reloads and different sessions via `localStorage`

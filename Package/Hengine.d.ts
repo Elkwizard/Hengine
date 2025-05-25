@@ -40,7 +40,7 @@ declare class CanvasImage extends ImageType {
 	/**
 	 * A renderer which can draw to the screen
 	 */
-	renderer: Artist;
+	renderer: Artist2D;
 	/**
 	 * The cursor icon. This can be either an image or a CSS cursor name
 	 */
@@ -214,7 +214,7 @@ declare class Hengine {
 	/**
 	 * The renderer associated with the canvas. Draws directly on the screen
 	 */
-	renderer: Artist;
+	renderer: Artist2D;
 	/**
 	 * The scene containing all the objects currently in the engine
 	 */
@@ -537,7 +537,7 @@ declare const canvas: CanvasImage;
 /**
  * The renderer that affects the screen
  */
-declare const renderer: Artist;
+declare const renderer: Artist2D;
 
 /**
  * The scene that contains all SceneElements
@@ -1295,6 +1295,10 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 * @param base - A matrix of less or equal dimension. If specified, the constructed matrix will be an identity matrix with the elements of this argument superimposed on it from the upper-left. Otherwise, the constructed matrix will be an unaltered identity matrix
 	 */
 	constructor(base?: this);
+	/**
+	 * Returns the maximum length ratio (`this.times(v).mag / v.mag`) that is possible for a Vector `v` of the same dimension as the caller.
+	 */
+	get maxScaleFactor(): number;
 	/**
 	 * Returns a transposed copy of the caller.
 	 */
@@ -6333,7 +6337,7 @@ declare interface SpawnerProperties {
 	 * @param renderer - The renderer to draw the particle to. Its transform will be in world-space, unless the spawner is a UIObject
 	 * @param particle - The particle to render
 	 */
-	draw?(renderer: Artist, particle: Particle): void;
+	draw?(renderer: Artist2D, particle: Particle): void;
 }
 
 /**
