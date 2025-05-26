@@ -619,6 +619,7 @@ const FilterMode = Enum.define("NEAREST", "LINEAR");
  * All properties of this interface are optional.
  * @prop Boolean wrap? | Whether the samples will repeat when out-of-bounds coordinates are used. Default is false
  * @prop FilterMode filter? | How the samples should be interpolated when sampling from non-integer coordinates. Default is `FilterMode.NEAREST` for Textures, and `FilterMode.LINEAR` for all others
+ * @prop Boolean mipmap? | Whether sampling at shallow angles should be done on down-scaled mipmaps instead of the full-resolution image. Default is false
  */
 
 /**
@@ -642,6 +643,7 @@ class Sampler {
 		}
 		this.filter = settings.filter ?? (imageType === Texture ? FilterMode.NEAREST : FilterMode.LINEAR);
 		this.wrap = settings.wrap ?? false;
+		this.mipmap = settings.mipmap ?? false;
 	}
 }
 
@@ -1024,6 +1026,7 @@ class GLSLProgram {
 				});
 				gl.bindTexture(gl.TEXTURE_2D, staticTexture);
 				texImage2D(gl.TEXTURE_2D, image);
+				if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_2D);
 				this.staticTextureCache.set(image, staticTexture);
 			} else {
 				gl.bindTexture(gl.TEXTURE_2D, this.staticTextureCache.get(image));
@@ -1036,7 +1039,8 @@ class GLSLProgram {
 		switch (info.target) {
 			case gl.TEXTURE_2D: {
 				texImage2D(gl.TEXTURE_2D, image);
-			}; break;
+				if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_2D);
+			} break;
 			case gl.TEXTURE_CUBE_MAP: {
 				let size;
 				for (const key in image) {
@@ -1051,7 +1055,8 @@ class GLSLProgram {
 				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, sampler.negY);
 				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, sampler.posZ);
 				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, sampler.negZ);
-			}; break;
+				if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+			} break;
 			case gl.TEXTURE_2D_ARRAY: {
 				const { pixelWidth, pixelHeight } = image[0];
 				if (!image.every(img => img.pixelWidth === pixelWidth && img.pixelHeight === pixelHeight))
@@ -1066,7 +1071,8 @@ class GLSLProgram {
 						format, type,
 						image[i].makeWebGLImage()
 					);
-			}; break;
+				if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+			} break;
 		}
 		
 		if (sampler.filter !== info.filter) {
@@ -1141,12 +1147,14 @@ class GLSLProgram {
 		this.uniformsSet = false;
 
 		// commit uniform blocks
-		let changedCount = 0;
-		for (let i = 0; i < this.uniformBlocks.length; i++)
-			if (this.uniformBlocks[i].changed) changedCount++;
+		let changedBytes = 0;
+		for (let i = 0; i < this.uniformBlocks.length; i++) {
+			const block = this.uniformBlocks[i];	
+			if (block.changed) changedBytes += block.size;
+		}
 
 		// if more than half have changed, it's probably worth it to just send the whole array over
-		if (changedCount > this.uniformBlocks.length / 2) {
+		if (changedBytes > this.uniformBlockArray.byteLength / 2) {
 			gl.bufferData(gl.UNIFORM_BUFFER, this.uniformBlockArray, gl.DYNAMIC_DRAW);
 
 			for (let i = 0; i < this.uniformBlocks.length; i++)

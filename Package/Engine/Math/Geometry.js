@@ -195,7 +195,7 @@ class Geometry {
 							!grid[maxX + 1]?.[maxY]
 						) maxY++;
 						maxY--;
-					}; break;
+					} break;
 					case RectPriority.VERTICAL: {
 						while (validRect(i, j, maxX, maxY)) maxY++;
 						maxY--;
@@ -206,7 +206,7 @@ class Geometry {
 							!grid[maxX]?.[maxY + 1]
 						) maxX++;
 						maxX--;
-					}; break;
+					} break;
 					case RectPriority.SQUARE: {
 						let change = 0;
 						while (validRect(i, j, maxX, maxY)) {
@@ -215,7 +215,7 @@ class Geometry {
 						}
 						if (change % 2) maxX--;
 						else maxY--;
-					}; break;
+					} break;
 				}
 				
 				finishRect(i, j, maxX, maxY);
