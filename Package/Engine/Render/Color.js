@@ -299,7 +299,8 @@ class Color extends Operable {
 	static SAND = new Color("#d6c692");
 	static LAVENDER = new Color("#b36cb8");
 	static PERIWINKLE = new Color("#78e");
-	
+	static QUINN = new Color("#35063E");
+
 	static CSSColors = {
 		aliceblue: new Color(240, 248, 255),
 		antiquewhite: new Color(250, 235, 215),
