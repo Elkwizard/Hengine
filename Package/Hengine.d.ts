@@ -2109,6 +2109,18 @@ declare class Vector2 extends Vector {
 	 */
 	static get left(): Vector2;
 	/**
+	 * Returns a new unit vector pointing in a specified direction (in screen-space).
+	 */
+	static get right(): Vector2;
+	/**
+	 * Returns a new unit vector pointing in a specified direction (in screen-space).
+	 */
+	static get up(): Vector2;
+	/**
+	 * Returns a new unit vector pointing in a specified direction (in screen-space).
+	 */
+	static get down(): Vector2;
+	/**
 	 * Returns a new vector with both components initialized to 0.
 	 */
 	static get origin(): Vector2;
@@ -2222,6 +2234,26 @@ declare class Vector3 extends Vector {
 	 * Returns a new unit vector pointing in the specified direction.
 	 */
 	static get left(): Vector3;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get right(): Vector3;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get up(): Vector3;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get down(): Vector3;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get forward(): Vector3;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get backward(): Vector3;
 	/**
 	 * Returns a new vector with all components equal to 0.
 	 */
@@ -2353,6 +2385,34 @@ declare class Vector4 extends Vector {
 	 * Returns a new unit vector pointing in the specified direction.
 	 */
 	static get left(): Vector4;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get right(): Vector4;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get up(): Vector4;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get down(): Vector4;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get forward(): Vector4;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get backward(): Vector4;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get before(): Vector4;
+	/**
+	 * Returns a new unit vector pointing in the specified direction.
+	 */
+	static get after(): Vector4;
 	/**
 	 * Returns a new vector with all components equal to 0.
 	 */
@@ -2875,6 +2935,111 @@ declare class Operable implements MathObject, Serializable {
 	 * @param value - The operable to operate on
 	 */
 	static round(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static floor(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static ceil(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static trunc(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static abs(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static sqrt(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static log(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static log2(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static log10(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static sin(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static cos(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static tan(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static sinh(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static cosh(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static tanh(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static asin(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static acos(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static atan(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static asinh(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static acosh(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static atanh(value: Operable): Operable;
+	/**
+	 * Performs a built-in unary Math operation element-wise on an operable.
+	 * @param value - The operable to operate on
+	 */
+	static sign(value: Operable): Operable;
 	/**
 	 * Returns the reciprocal of the caller.
 	 */
@@ -4739,6 +4904,33 @@ declare class PathRenderer {
 	 */
 	sector(x: number, y: number, begin: number, end: number, counterClockwise?: boolean, radius: number): void;
 	/**
+	 * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
+	 * @param circle - The circle of which the path is a section
+	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
+	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 */
+	arc(circle: Circle, begin: number, end: number, counterClockwise?: boolean): void;
+	/**
+	 * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
+	 * @param center - The center of the circle
+	 * @param radius - The radius of the circle
+	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
+	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 */
+	arc(center: Vector2, radius: number, begin: number, end: number, counterClockwise?: boolean): void;
+	/**
+	 * Creates a path in the shape of a section (sector or arc) of a circle. If an arc is filled, it will first have the endpoints connected.
+	 * @param x - The x coordinate of the circle's center
+	 * @param y - The y coordinate of the circle's center
+	 * @param begin - The initial clockwise angle (in radians) from the horizontal of the section
+	 * @param end - The final clockwise angle (in radians) from the horizontal of the section
+	 * @param counterClockwise - Whether the path from the initial to final angle should be counter-clockwise. Default is false
+	 * @param radius - The radius of the circle
+	 */
+	arc(x: number, y: number, begin: number, end: number, counterClockwise?: boolean, radius: number): void;
+	/**
 	 * Creates an elliptical path.
 	 * @param center - The center of the ellipse
 	 * @param radiusX - The x axis radius of the ellipse
@@ -4828,6 +5020,25 @@ declare class StrokeRenderer extends PathRenderer {
 	 */
 	line(x1: number, y1: number, x2: number, y2: number): void;
 	/**
+	 * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
+	 * @param line - The line segment
+	 */
+	arrow(line: Line): void;
+	/**
+	 * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
+	 * @param a - The first point
+	 * @param b - The second point
+	 */
+	arrow(a: Vector2, b: Vector2): void;
+	/**
+	 * Renders a line segment. For `.arrow()`, there is also an arrow-head at the end.
+	 * @param x1 - The x coordinate of the first point
+	 * @param y1 - The y coordinate of the first point
+	 * @param x2 - The x coordinate of the second point
+	 * @param y2 - The y coordinate of the second point
+	 */
+	arrow(x1: number, y1: number, x2: number, y2: number): void;
+	/**
 	 * Renders a series of connected line segments.
 	 * @param points - The points to connect
 	 */
@@ -4837,6 +5048,11 @@ declare class StrokeRenderer extends PathRenderer {
 	 * @param spline - The spline to render
 	 */
 	spline(spline: Spline): void;
+	/**
+	 * Renders a quartic spline. For `.splineArrow()`, there is also an arrow-head at the end.
+	 * @param spline - The spline to render
+	 */
+	splineArrow(spline: Spline): void;
 	/**
 	 * Renders an arrow-head at the end of an arc on a circle.
 	 * @param circle - The circle of which the path is a section
@@ -6171,6 +6387,30 @@ declare class ElementScript {
 	 */
 	collideGeneral(collision: CollisionData): void;
 	/**
+	 * These are called when a collision occurs with the object in a specified direction (or for any direction, for `.collideGeneral()`).
+	 * If the SceneObject doesn't have the PHYSICS script, then this won't be called.
+	 * @param collision - The collision that occurred
+	 */
+	collideLeft(collision: CollisionData): void;
+	/**
+	 * These are called when a collision occurs with the object in a specified direction (or for any direction, for `.collideGeneral()`).
+	 * If the SceneObject doesn't have the PHYSICS script, then this won't be called.
+	 * @param collision - The collision that occurred
+	 */
+	collideRight(collision: CollisionData): void;
+	/**
+	 * These are called when a collision occurs with the object in a specified direction (or for any direction, for `.collideGeneral()`).
+	 * If the SceneObject doesn't have the PHYSICS script, then this won't be called.
+	 * @param collision - The collision that occurred
+	 */
+	collideTop(collision: CollisionData): void;
+	/**
+	 * These are called when a collision occurs with the object in a specified direction (or for any direction, for `.collideGeneral()`).
+	 * If the SceneObject doesn't have the PHYSICS script, then this won't be called.
+	 * @param collision - The collision that occurred
+	 */
+	collideBottom(collision: CollisionData): void;
+	/**
 	 * This is called when a shape is added to the object.
 	 * @param name - The name of the new shape
 	 * @param shape - The new shape being added
@@ -7121,15 +7361,45 @@ declare class InputHandler {
 	 */
 	pressed(name: string): boolean;
 	/**
+	 * Checks whether a key is in a specific state.
+	 * @param name - The name of the key to check
+	 */
+	released(name: string): boolean;
+	/**
+	 * Checks whether a key is in a specific state.
+	 * @param name - The name of the key to check
+	 */
+	justPressed(name: string): boolean;
+	/**
+	 * Checks whether a key is in a specific state.
+	 * @param name - The name of the key to check
+	 */
+	justReleased(name: string): boolean;
+	/**
 	 * Returns the specified timing statistic about a specific key.
 	 * @param name - The name of the key to check
 	 */
 	pressLength(name: string): number;
 	/**
+	 * Returns the specified timing statistic about a specific key.
+	 * @param name - The name of the key to check
+	 */
+	releaseLength(name: string): number;
+	/**
 	 * Returns the names of all keys that meet the specified requirement.
 	 * If no keys meet the requirement, null is returned instead.
 	 */
 	get allPressed(): string[] | null;
+	/**
+	 * Returns the names of all keys that meet the specified requirement.
+	 * If no keys meet the requirement, null is returned instead.
+	 */
+	get allJustPressed(): string[] | null;
+	/**
+	 * Returns the names of all keys that meet the specified requirement.
+	 * If no keys meet the requirement, null is returned instead.
+	 */
+	get allJustReleased(): string[] | null;
 }
 
 /**
@@ -7255,6 +7525,21 @@ declare class MouseHandler extends InputHandler {
 	 * @param name - The name of the key to check
 	 */
 	screenDragStart(name: string): Vector2;
+	/**
+	 * Returns a location associated with a given key.
+	 * @param name - The name of the key to check
+	 */
+	screenDragEnd(name: string): Vector2;
+	/**
+	 * Returns a location associated with a given key.
+	 * @param name - The name of the key to check
+	 */
+	worldDragStart(name: string): Vector2;
+	/**
+	 * Returns a location associated with a given key.
+	 * @param name - The name of the key to check
+	 */
+	worldDragEnd(name: string): Vector2;
 }
 
 /**
@@ -7331,6 +7616,16 @@ declare class TouchHandler extends InputHandler {
 	 * If none meet the requirement, this returns null.
 	 */
 	get allPressed(): number[] | null;
+	/**
+	 * Returns the names of each touch meeting a specific requirement.
+	 * If none meet the requirement, this returns null.
+	 */
+	get allJustPressed(): number[] | null;
+	/**
+	 * Returns the names of each touch meeting a specific requirement.
+	 * If none meet the requirement, this returns null.
+	 */
+	get allJustReleased(): number[] | null;
 }
 
 /**

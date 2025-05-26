@@ -168,7 +168,9 @@ function createFunctionSpecification(doc, className) {
 	
 	const subs = doc.settings.name_subs?.substitutions;
 
-	return applySubstitutions(doc.name.base, subs)
+	const names = doc.settings.group?.elements ?? [doc.name];
+	return names
+		.flatMap(name => applySubstitutions(name.base, subs))
 		.flatMap(name => {
 			return signatures
 				.map(params => createOverloadSpecification(name, params, doc, className));
