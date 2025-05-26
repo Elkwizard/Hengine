@@ -62,8 +62,9 @@ class SynthChannel {
 
         return new Promise(resolve => setTimeout(resolve, wait));
     }
+
+	static BUFFER = 15;
 }
-SynthChannel.BUFFER = 15;
 
 /**
  * @name class Tone
@@ -165,32 +166,32 @@ class Synth {
         const octave = Math.floor(x / 12);
         return { note, octave };
     }
+	
+	static MAX_CHANNELS = 400;
+	static EXP_BASE = 2 ** (1 / 12);
+	static EXP_FACTOR = 16.35;
+	static EXP_BASE_LOG = Math.log(Synth.EXP_BASE);
+	static NOTE_INDEX_MAP = {
+		"C": 0,
+		"C#": 1,
+		"Db": 1,
+		"D": 2,
+		"D#": 3,
+		"Eb": 3,
+		"E": 4,
+		"F": 5,
+		"F#": 6,
+		"Gb": 6,
+		"G": 7,
+		"G#": 8,
+		"Ab": 8,
+		"A": 9,
+		"A#": 10,
+		"Bb": 10,
+		"B": 11,
+	};
+	static INDEX_NOTE_MAP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 }
-
-Synth.MAX_CHANNELS = 400;
-Synth.EXP_BASE = 2 ** (1 / 12);
-Synth.EXP_FACTOR = 16.35;
-Synth.EXP_BASE_LOG = Math.log(Synth.EXP_BASE);
-Synth.NOTE_INDEX_MAP = {
-    "C": 0,
-    "C#": 1,
-    "Db": 1,
-    "D": 2,
-    "D#": 3,
-    "Eb": 3,
-    "E": 4,
-    "F": 5,
-    "F#": 6,
-    "Gb": 6,
-    "G": 7,
-    "G#": 8,
-    "Ab": 8,
-    "A": 9,
-    "A#": 10,
-    "Bb": 10,
-    "B": 11,
-};
-Synth.INDEX_NOTE_MAP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 /**
  * Represents an ongoing playback of a Sound.
@@ -230,6 +231,8 @@ class SoundInstance {
 }
 
 class SoundChannel {
+	static canPlay = false;
+	static delayed = [];
 	constructor(src, loops) {
 		this.audio = new Audio(src);
 		this.audio.loop = loops;
@@ -286,9 +289,6 @@ class SoundChannel {
 		});
 	}
 }
-
-SoundChannel.canPlay = false;
-SoundChannel.delayed = [];
 
 window.addEventListener("mousedown", () => {
 	if (!SoundChannel.canPlay) {

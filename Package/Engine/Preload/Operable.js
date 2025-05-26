@@ -144,13 +144,9 @@ class MathObject {
         });
 		return value;
     }
+	
+	static EPSILON = 0.000001;
 }
-MathObject.EPSILON = 0.000001;
-MathObject.add = (a, b) => a + b;
-MathObject.sub = (a, b) => a - b;
-MathObject.mul = (a, b) => a * b;
-MathObject.div = (a, b) => a / b;
-MathObject.pow = (a, b) => a ** b;
 
 /**
  * @implements MathObject, Serializable
@@ -159,6 +155,7 @@ MathObject.pow = (a, b) => a ** b;
  * @static_prop String[] modValues | The names of the elements in the operable. The order of this array also determines the order of the elements (e.g. `["x", "y"]` for Vector2)
  */
 class Operable extends MathObject {
+	static modValues = [];
 	/**
 	 * Produces a list of all the elements of the operable.
 	 * @return Number[]
@@ -389,6 +386,12 @@ class Operable extends MathObject {
 	 * @param Operable value | The operable to operate on
 	 * @return Operable
 	 */
+	
+	static addFunc = (a, b) => a + b;
+	static subFunc = (a, b) => a - b;
+	static mulFunc = (a, b) => a * b;
+	static divFunc = (a, b) => a / b;
+	static modFunc = (a, b) => a % b;
 }
 
 (function () {
@@ -414,10 +417,3 @@ class Operable extends MathObject {
         });
     }
 })();
-
-Operable.modValues = [];
-Operable.addFunc = (a, b) => a + b;
-Operable.subFunc = (a, b) => a - b;
-Operable.mulFunc = (a, b) => a * b;
-Operable.divFunc = (a, b) => a / b;
-Operable.modFunc = (a, b) => a % b;

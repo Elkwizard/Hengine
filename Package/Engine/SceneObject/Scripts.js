@@ -204,38 +204,38 @@ class ElementScript {
 	 * @param Class extends ElementScript script | The script being added
 	 * @param Any[] ...args | The initialization arguments for the script
 	 */
+	
+	static stateChangeFlags = new Set([
+		"addScript",
+		"addShape",
+		"removeShape"
+	]);
+	
+	static flags = new Set([
+		"init",
+		"update",
+		"beforeUpdate",
+		"afterUpdate",
+		"beforePhysics",
+		"afterPhysics",
+		"drawRule",
+		"draw",
+		"escapeDraw",
+		"collideRule",
+		"triggerRule",
+		"collideGeneral",
+		"collideTop",
+		"collideBottom",
+		"collideLeft",
+		"collideRight",
+		"click",
+		"hover",
+		"unhover",
+		"remove",
+		"cleanUp",
+		...ElementScript.stateChangeFlags
+	]);
 }
-
-ElementScript.stateChangeFlags = new Set([
-	"addScript",
-	"addShape",
-	"removeShape"
-]);
-
-ElementScript.flags = new Set([
-	"init",
-	"update",
-	"beforeUpdate",
-	"afterUpdate",
-	"beforePhysics",
-	"afterPhysics",
-	"drawRule",
-	"draw",
-	"escapeDraw",
-	"collideRule",
-	"triggerRule",
-	"collideGeneral",
-	"collideTop",
-	"collideBottom",
-	"collideLeft",
-	"collideRight",
-	"click",
-	"hover",
-	"unhover",
-	"remove",
-	"cleanUp",
-	...ElementScript.stateChangeFlags
-]);
 
 /**
  * @type type ScriptContainer = 

@@ -45,10 +45,11 @@ class IntervalFunction {
 		}
 	}
 	respond() { }
+	
+	static BEFORE_UPDATE = Symbol("BEFORE_UPDATE");
+	static UPDATE = Symbol("UPDATE");
+	static AFTER_UPDATE = Symbol("AFTER_UPDATE");
 }
-IntervalFunction.BEFORE_UPDATE = Symbol("BEFORE_UPDATE");
-IntervalFunction.UPDATE = Symbol("UPDATE");
-IntervalFunction.AFTER_UPDATE = Symbol("AFTER_UPDATE");
 
 /**
  * This IntervalFunction executes an operation once after a specified delay.
@@ -119,6 +120,8 @@ class WaitUntilFunction extends IntervalFunction {
  * @prop Boolean performanceData | Whether or not the interval manager should collect performance data (`.fps`, `.fpsGraph`, etc.)
  */
 class IntervalManager {
+	static intervals = [];
+	static inInterval = false;
 	constructor(engine) {
 		this.engine = engine;
 		this.paused = false;
@@ -330,6 +333,8 @@ class IntervalManager {
 		}
 		this.functions = remaining;
 	}
+	
+	static FPS_FRAMES_TO_COUNT = 30;
 }
 
 class ExitError {
@@ -351,22 +356,16 @@ function exit(...msg) {
 	}
 }
 
-IntervalManager.FPS_FRAMES_TO_COUNT = 30;
-(function () {
-	IntervalManager.intervals = [];
-	IntervalManager.inInterval = false;
-	function animate(now) {
-		IntervalManager.inInterval = true;
-		try {
-			for (let i = 0; i < IntervalManager.intervals.length; i++)
-				IntervalManager.intervals[i]();
-		} catch (err) {
-			if (err instanceof ExitError) console.warn("EXITED", ...err.message);
-			else throw err;
-		}
-		IntervalManager.inInterval = false;
-		
-		requestAnimationFrame(animate);
+requestAnimationFrame(function animate(now) {
+	IntervalManager.inInterval = true;
+	try {
+		for (let i = 0; i < IntervalManager.intervals.length; i++)
+			IntervalManager.intervals[i]();
+	} catch (err) {
+		if (err instanceof ExitError) console.warn("EXITED", ...err.message);
+		else throw err;
 	}
+	IntervalManager.inInterval = false;
+	
 	requestAnimationFrame(animate);
-})();
+});

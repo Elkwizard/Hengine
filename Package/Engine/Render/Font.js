@@ -192,12 +192,13 @@ class Font {
 		font.lineHeight = this.lineHeight;
 		return font;
 	}
+	
+	static context = new_OffscreenCanvas(1, 1).getContext("2d");
+	static keywordFamilies = ["monospace", "sans-serif", "serif", "cursive", "fantasy", "system-ui"];
+	static defaultFamilies = ["Serif", "Arial", "Cursive", "Monospace"];
+	static defaultSizes = [];
 }
 // setup
-Font.context = new_OffscreenCanvas(1, 1).getContext("2d");
-Font.keywordFamilies = ["monospace", "sans-serif", "serif", "cursive", "fantasy", "system-ui"];
-Font.defaultFamilies = ["Serif", "Arial", "Cursive", "Monospace"];
-Font.defaultSizes = [];
 for (let i = 0; i < 20; i++) Font.defaultSizes.push((i + 1) * 5);
 for (let i = 0; i < Font.defaultSizes.length; i++) {
 	for (let j = 0; j < Font.defaultFamilies.length; j++) {

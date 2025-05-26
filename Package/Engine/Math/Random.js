@@ -446,7 +446,7 @@ class Random {
     }
 };
 
-{   
+{
     const names = Object.getOwnPropertyNames(Random.prototype);
     for (let i = 0; i < names.length; i++) {
         const name = names[i];

@@ -5791,6 +5791,10 @@ declare interface SamplerSettings {
 	 * How the samples should be interpolated when sampling from non-integer coordinates. Default is `FilterMode.NEAREST` for Textures, and `FilterMode.LINEAR` for all others
 	 */
 	filter?: FilterMode;
+	/**
+	 * Whether sampling at shallow angles should be done on down-scaled mipmaps instead of the full-resolution image. Default is false
+	 */
+	mipmap?: boolean;
 }
 
 /**

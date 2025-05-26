@@ -182,19 +182,28 @@ class ByteBuffer {
 	static fromByteBuffer(buffer) {
 		return buffer.read.byteBuffer();
 	}
+	
+	static arrayTypes = ["Float32", "Float64", "Int8", "Int16", "Int32", "Uint8", "Uint16", "Uint32"];;
+	static objectTypes = [
+		"undefined",
+		"null",
+		"function",
+		"object",
+		"array",
+		"bigInt",
+		"string",
+		"bool",
+		...ByteBuffer.arrayTypes.map(type => type.toLowerCase())
+	];
+	static typeToIndex = Object.fromEntries(
+		ByteBuffer.objectTypes
+			.map((type, index) => [type, index])
+	);
+	static indexToType = Object.fromEntries(
+		ByteBuffer.objectTypes
+			.map((type, index) => [index, type])
+	);
 }
-ByteBuffer.arrayTypes = ["Float32", "Float64", "Int8", "Int16", "Int32", "Uint8", "Uint16", "Uint32"];
-ByteBuffer.objectTypes = [
-	"undefined",
-	"null",
-	"function",
-	"object",
-	"array",
-	"bigInt",
-	"string",
-	"bool",
-	...ByteBuffer.arrayTypes.map(type => type.toLowerCase())
-];
 /**
  * @name class ByteBuffer.Writer
  * The writing API for a ByteBuffer.
@@ -326,7 +335,7 @@ ByteBuffer.Writer = class {
 		if (type === "function" || type === "undefined" || type === "null") return;
 
 		if (type === "object" || type === "array") {
-			if (objectIDs === undefined) objectIDs = new Map();
+			objectIDs ??= new Map();
 			const referenced = objectIDs.has(object);
 			this.bool(referenced);
 			if (referenced) this.uint32(objectIDs.get(object));
@@ -471,7 +480,7 @@ ByteBuffer.Reader = class {
 		if (type === "function" || type === "null") return null;
 
 		if (type === "object" || type === "array") {
-			if (objectIDs === undefined) objectIDs = new Map();
+			objectIDs ??= new Map();
 			const referenced = this.bool();
 			if (referenced) return objectIDs.get(this.uint32());
 			else {
@@ -522,14 +531,6 @@ for (let i = 0; i < ByteBuffer.arrayTypes.length; i++) {
 		return value;
 	};
 }
-ByteBuffer.typeToIndex = Object.fromEntries(
-	ByteBuffer.objectTypes
-		.map((type, index) => [type, index])
-);
-ByteBuffer.indexToType = Object.fromEntries(
-	ByteBuffer.objectTypes
-		.map((type, index) => [index, type])
-);
 
 /** 
  * @name class Serializable

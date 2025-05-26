@@ -6,6 +6,7 @@
  * @prop Vector normalized | The unit vector in the same direction of the vector
  */
 class Vector extends Operable {
+	static modValues = [];
 	constructor() {
 		super();
 	}
@@ -151,7 +152,6 @@ class Vector extends Operable {
 		return Matrix[this.size + 1];
 	}
 }
-Vector.modValues = [];
 
 {
 	const proto = (key, value) => Object.defineProperty(Number.prototype, key, { value, enumerable: false });
@@ -220,6 +220,7 @@ Vector.modValues = [];
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y"]`
  */
 class Vector2 extends Vector {
+	static modValues = ["x", "y"];
 	/**
 	 * Creates a new Vector2.
 	 * @param Number x | The x component
@@ -489,7 +490,6 @@ class Vector2 extends Vector {
 		return new Vector2(p.x || 0, p.y || 0);
 	}
 }
-Vector2.modValues = ["x", "y"];
 
 /**
  * Represents a 3D vector.
@@ -498,6 +498,7 @@ Vector2.modValues = ["x", "y"];
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y", "z"]`
  */
 class Vector3 extends Vector {
+	static modValues = ["x", "y", "z"];
 	/**
 	 * Creates a new Vector3.
 	 * @param Number x | The x component
@@ -642,7 +643,6 @@ class Vector3 extends Vector {
 	}
 }
 
-Vector3.modValues = ["x", "y", "z"];
 
 /**
  * Represents a 4D vector.
@@ -651,6 +651,7 @@ Vector3.modValues = ["x", "y", "z"];
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y", "z", "w"]`
  */
 class Vector4 extends Vector {
+	static modValues = ["x", "y", "z", "w"];
 	/**
 	 * Creates a new Vector4.
 	 * @param Number x | The x component
@@ -751,7 +752,7 @@ class Vector4 extends Vector {
 		return new Vector4(0, 0, 0, w);
 	}
 }
-Vector4.modValues = ["x", "y", "z", "w"];
+
 //isNaN
 (function () {
 	const nN = window.isNaN.bind(window);

@@ -115,7 +115,7 @@ All faces must be square and equal in size.
 		
 			<div class="class-wrapper" id="class Sampler">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L628" target="_blank" class="class-name source-link">Sampler</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L629" target="_blank" class="class-name source-link">Sampler</a>
 				</div>
 				<div class="class desc">
 					This describes the way in which a GLSL <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">sampler</span><span class="highlight-SYMBOL">*</span></code> reads data from a texture.
@@ -130,7 +130,7 @@ This can be used in place of an <a href="../../../Pages/Rendering/Image Types/Im
 					<div class="class-methods">
 		<div class="function-wrapper" id="Sampler.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L633" target="_blank" class="function-name source-link">constructor</a>(<span class="param">image</span>, <span class="param">settings?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L634" target="_blank" class="function-name source-link">constructor</a>(<span class="param">image</span>, <span class="param">settings?</span>)
 			</div>
 			<div class="function desc">
 				
@@ -170,7 +170,7 @@ This can be used in place of an <a href="../../../Pages/Rendering/Image Types/Im
 		
 			<div class="class-wrapper" id="class SamplerSettings">
 				<div class="class-header">
-					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L623" target="_blank" class="class-name source-link">SamplerSettings</a>
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L624" target="_blank" class="class-name source-link">SamplerSettings</a>
 				</div>
 				<div class="class desc">
 					Describes how a Sampler should be constructed.
@@ -193,6 +193,13 @@ All properties of this interface are optional.
 						<span class="prop-name">filter?</span><span class="type">FilterMode</span>
 					</div>
 					<div class="prop desc">How the samples should be interpolated when sampling from non-integer coordinates. Default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">FilterMode</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">NEAREST</span></code> for <a href="../../../Pages/Rendering/Image Types/Texture.html#class Texture">Textures</a>, and <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">FilterMode</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">LINEAR</span></code> for all others</div>
+				</div>
+			
+				<div class="prop-wrapper" id="SamplerSettings.mipmap?">
+					<div class="prop-header member">
+						<span class="prop-name">mipmap?</span><span class="type">Boolean</span>
+					</div>
+					<div class="prop desc">Whether sampling at shallow angles should be done on down-scaled mipmaps instead of the full-resolution image. Default is false</div>
 				</div>
 			</div>
 				

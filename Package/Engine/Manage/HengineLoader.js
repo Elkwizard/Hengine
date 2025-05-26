@@ -195,6 +195,7 @@ class HengineAnimationResource extends HengineResource {
  * @prop String src | The path to a CSS stylesheet containing the @font-face rule(s).
  */
 class HengineFontResource extends HengineResource {
+	static TEST_STRING = String.fromCharCode(...new Array(255).fill(0).map((_, code) => code));
 	load() {
 		return new Promise(async resolve => {
 			const handleCSS = css => {
@@ -247,7 +248,6 @@ class HengineFontResource extends HengineResource {
 		});
 	}
 }
-HengineFontResource.TEST_STRING = String.fromCharCode(...new Array(255).fill(0).map((_, code) => code));
 
 /**
  * Represents an external text file to be loaded.
@@ -643,6 +643,7 @@ class HengineLoadingStructure {
  * @static_prop HengineLoader loader | The singleton instance
  */
 class HengineLoader {
+	static loader = null;
 	constructor() {
 		// window setup
 		document.body.style.width = "100vw";
@@ -813,79 +814,77 @@ class HengineLoader {
 		if (document.body && document.head) return loadResources();
 		else return new Promise(resolve => addEventListener("load", () => loadResources().then(resolve)));
 	}
+	static engineResources = [
+		[ // preload
+			"Preload/PrototypeOverload.js",
+			"Preload/Lazy.js",
+			"Preload/Operable.js",
+		],
+		[ // minimal dependencies
+			"SceneObject/SceneElement.js",
+			"SceneObject/Scripts.js",
+
+			"Manage/Scenes.js",
+			"Manage/Hengine.js",
+			"Manage/Intervals.js",
+
+			"Util/ByteBuffer.js",
+			"Util/FileSystem.js",
+			"Util/Sound.js",
+
+			"Math/Matrix.js",
+			new HengineWASMResource(`C++/Physics/Physics${DIM}`, "Physics"),
+			"Math/PhysicsAPI.js",
+			"Math/Random.js",
+			"Math/Interpolation.js",
+
+			"Render/Frame.js",
+			"Render/Gradient.js",
+			"Render/Spline.js",
+			"Render/WebGL2DContext.js",
+			"Render/GrayMap.js",
+			"Render/GPUInterface.js"
+		],
+		[ // basic dependencies
+			"Util/Input.js",
+
+			"Manage/Canvas.js",
+			"Manage/ElementContainer.js",
+
+			"Scripts/Draggable.js",
+			"Scripts/ParticleSpawner.js",
+			"Scripts/Physics.js",
+			"Scripts/PlayerMovement.js",
+			"Scripts/TextArea.js",
+
+			"SceneObject/SceneObject.js",
+
+			"Math/Vector.js",
+			"Math/Complex.js",
+			"Math/Geometry.js",
+			"Math/GPUComputation.js",
+
+			"Render/Font.js",
+			"Render/Shapes.js",
+			"Render/Animation.js",
+			"Render/Transform.js",
+			"Render/Camera.js",
+			"Render/Webcam.js",
+			"Render/Graph.js",
+			"Render/Texture.js",
+			"Render/VideoView.js",
+			"Render/Renderer.js",
+			"Render/GPUShader.js",
+			"Render/StaticImage.js",
+			"Render/TileMap.js"
+		],
+		[ // high level dependencies
+			"Render/Color.js",
+			"SceneObject/UIObject.js",
+			"Render/WebGLRenderer.js",
+		]
+	];
 }
-HengineLoader.loader = null;
-
-HengineLoader.engineResources = [
-	[ // preload
-		"Preload/PrototypeOverload.js",
-		"Preload/Lazy.js",
-		"Preload/Operable.js",
-	],
-	[ // minimal dependencies
-		"SceneObject/SceneElement.js",
-		"SceneObject/Scripts.js",
-
-		"Manage/Scenes.js",
-		"Manage/Hengine.js",
-		"Manage/Intervals.js",
-
-		"Util/ByteBuffer.js",
-		"Util/FileSystem.js",
-		"Util/Sound.js",
-
-		"Math/Matrix.js",
-		new HengineWASMResource(`C++/Physics/Physics${DIM}`, "Physics"),
-		"Math/PhysicsAPI.js",
-		"Math/Random.js",
-		"Math/Interpolation.js",
-
-		"Render/Frame.js",
-		"Render/Gradient.js",
-		"Render/Spline.js",
-		"Render/WebGL2DContext.js",
-		"Render/GrayMap.js",
-		"Render/GPUInterface.js"
-	],
-	[ // basic dependencies
-		"Util/Input.js",
-
-		"Manage/Canvas.js",
-		"Manage/ElementContainer.js",
-
-		"Scripts/Draggable.js",
-		"Scripts/ParticleSpawner.js",
-		"Scripts/Physics.js",
-		"Scripts/PlayerMovement.js",
-		"Scripts/TextArea.js",
-
-		"SceneObject/SceneObject.js",
-
-		"Math/Vector.js",
-		"Math/Complex.js",
-		"Math/Geometry.js",
-		"Math/GPUComputation.js",
-
-		"Render/Font.js",
-		"Render/Shapes.js",
-		"Render/Animation.js",
-		"Render/Transform.js",
-		"Render/Camera.js",
-		"Render/Webcam.js",
-		"Render/Graph.js",
-		"Render/Texture.js",
-		"Render/VideoView.js",
-		"Render/Renderer.js",
-		"Render/GPUShader.js",
-		"Render/StaticImage.js",
-		"Render/TileMap.js"
-	],
-	[ // high level dependencies
-		"Render/Color.js",
-		"SceneObject/UIObject.js",
-		"Render/WebGLRenderer.js",
-	]
-];
 
 /**
  * @name class Window

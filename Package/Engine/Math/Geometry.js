@@ -783,5 +783,6 @@ class Geometry {
 
 		return new Polygon(result);
 	}
+	
+	static EPSILON = 0.0001;
 }
-Geometry.EPSILON = 0.0001;

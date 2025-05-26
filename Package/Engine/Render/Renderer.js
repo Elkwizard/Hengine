@@ -414,15 +414,6 @@ const LineCap = Enum.define("FLAT", "SQUARE", "ROUND");
  * Represents a 2D renderer based on the HTML5 Canvas API.
  */
 class CanvasArtist2D extends Artist2D {
-	static blendModeMap = new Map([
-		[BlendMode.COMBINE, "source-over"],
-		[BlendMode.ADD, "lighter"]
-	]);
-	static textModeXMap = new Map([
-		[TextModeX.LEFT, "left"],
-		[TextModeX.CENTER, "center"],
-		[TextModeX.RIGHT, "right"]
-	]);
 	constructor(canvas, imageType) {
 		super();
 		this.canvas = canvas;
@@ -591,6 +582,16 @@ class CanvasArtist2D extends Artist2D {
 		this.c.fillStyle = color;
 		this.c.fillRect(0, 0, this.width, this.height);
 	}
+
+	static blendModeMap = new Map([
+		[BlendMode.COMBINE, "source-over"],
+		[BlendMode.ADD, "lighter"]
+	]);
+	static textModeXMap = new Map([
+		[TextModeX.LEFT, "left"],
+		[TextModeX.CENTER, "center"],
+		[TextModeX.RIGHT, "right"]
+	]);
 }
 
 /**
@@ -801,16 +802,6 @@ CanvasArtist2D.DrawRenderer = class extends CanvasArtist2D.ActionRenderer {
  */
 CanvasArtist2D.StrokeRenderer = class extends CanvasArtist2D.ActionRenderer {
 	static Dispatcher = Artist2D.StrokeDispatcher;
-	static lineJoinMap = new Map([
-		[LineJoin.MITER, "miter"],
-		[LineJoin.BEVEL, "bevel"],
-		[LineJoin.ROUND, "round"]
-	]);
-	static lineCapMap = new Map([
-		[LineCap.FLAT, "butt"],
-		[LineCap.SQUARE, "square"],
-		[LineCap.ROUND, "round"]
-	]);
 	setup(color, lineWidth = 1, lineCap = LineCap.FLAT, lineJoin = LineJoin.BEVEL) {
 		this.c.strokeStyle = color;
 		this.c.lineWidth = lineWidth;
@@ -997,6 +988,17 @@ CanvasArtist2D.StrokeRenderer = class extends CanvasArtist2D.ActionRenderer {
 	 * Creates a path with a shape based on the type of its argument.
 	 * @param Shape/Line/Spline shape | The shape to render
 	 */
+
+	static lineJoinMap = new Map([
+		[LineJoin.MITER, "miter"],
+		[LineJoin.BEVEL, "bevel"],
+		[LineJoin.ROUND, "round"]
+	]);
+	static lineCapMap = new Map([
+		[LineCap.FLAT, "butt"],
+		[LineCap.SQUARE, "square"],
+		[LineCap.ROUND, "round"]
+	]);
 };
 
 /**
