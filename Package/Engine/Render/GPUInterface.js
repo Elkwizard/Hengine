@@ -285,6 +285,11 @@ class GLSL {
 			}
 		}
 
+		for (const matName in GLSL.MATRIX_DIMENSIONS) {
+			const { rows, columns } = GLSL.MATRIX_DIMENSIONS[matName];
+			operations[matName] = Array.dim(rows * columns).map((_, i) => [operations.float[0][0], `[${i}]`]);
+		}
+
 		for (const [, struct] of this.structs) {
 			const { fields } = struct;
 			struct.write = new Function("value", "write", fields.flatMap(field => {
@@ -303,22 +308,29 @@ class GLSL {
 	toString() {
 		return this.glsl;
 	}
+	static SIZE = {
+		float: 4,
+		int: 4,
+		bool: 1
+	};
+	static VECTORS = {
+		float: "vec",
+		int: "ivec",
+		bool: "bvec"
+	};
+	static MATRIX_DIMENSIONS = { };
 }
-GLSL.SIZE = {
-	float: 4,
-	int: 4,
-	bool: 1
-};
-GLSL.VECTORS = {
-	float: "vec",
-	int: "ivec",
-	bool: "bvec"
-};
 for (const key in GLSL.VECTORS) {
 	const vecName = GLSL.VECTORS[key];
 	const elSize = GLSL.SIZE[key];
 	for (let n = 2; n <= 4; n++)
 		GLSL.SIZE[vecName + n] = elSize * n;
+}
+for (let r = 2; r <= 4; r++)
+for (let c = 2; c <= 4; c++) {
+	const name = `mat${r === c ? r : `${c}x${r}`}`;
+	GLSL.MATRIX_DIMENSIONS[name] = { rows: r, columns: c };
+	GLSL.SIZE[name] = r * c * GLSL.SIZE.float;
 }
 
 class GLSLError extends Error {
@@ -957,6 +969,10 @@ class GLSLProgram {
 				const property = propertyPath[i];
 				const last = i === propertyPath.length - 1;
 
+				currentStruct._keys ??= [];
+				if (!(property in currentStruct))
+					currentStruct._keys.push(property);
+
 				if (last) {
 					currentStruct[property] = desc;
 				} else {
@@ -1155,7 +1171,7 @@ class GLSLProgram {
 
 		// if more than half have changed, it's probably worth it to just send the whole array over
 		if (changedBytes > this.uniformBlockArray.byteLength / 2) {
-			gl.bufferData(gl.UNIFORM_BUFFER, this.uniformBlockArray, gl.DYNAMIC_DRAW);
+			gl.bufferSubData(gl.UNIFORM_BUFFER, 0, this.uniformBlockArray);
 
 			for (let i = 0; i < this.uniformBlocks.length; i++)
 				this.uniformBlocks[i].changed = false;
@@ -1247,16 +1263,17 @@ class GLSLProgram {
 	focus() {
 		if (!this.inUse) this.use();
 	}
-	setUniform(name, value, force = true, location = this.uniforms, focused = false) {
+	setUniform(name, value, force = true, focused = false, location = this.uniforms) {
 		if (!focused) this.focus();
 
 		const child = location[name];
-		if (!child && location === this.uniforms) {
-			if (force) this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
+		if (!child) {
+			if (location === this.uniforms && force)
+				this.error("UNIFORM_SET", `Uniform '${name}' doesn't exist`);
 			return;
 		}
 
-		if (location === this.uniforms && !this.lockedValues.has(name))
+		if (force && location === this.uniforms && !this.lockedValues.has(name))
 			this.uniformValues[name] = value;
 
 		if (typeof child.set === "function") { // reached leaf
@@ -1265,21 +1282,21 @@ class GLSLProgram {
 			if (force) child.value = typeof value === "object" ? value.get?.() ?? value : value;
 			intervals.count("GLSLProgram.setUniform()");
 		} else {
-			const keys = Object.getOwnPropertyNames(child);
+			const keys = child._keys;
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
 				const childValue = value[key];
 				if (childValue !== undefined)
-					this.setUniform(key, childValue, force, child, true); // more steps needed
+					this.setUniform(key, childValue, force, true, child); // more steps needed
 			}
 		}
 	}
-	setUniforms(args, force = true) {
-		this.focus();
+	setUniforms(args, force = true, focused = false) {
+		if (!focused) this.focus();
 		for (const key in args) {
 			const value = args[key];
 			if (value !== undefined)
-				this.setUniform(key, value, force, this.uniforms, true);
+				this.setUniform(key, value, force, true, this.uniforms);
 		}
 	}
 	getUniform(name) {

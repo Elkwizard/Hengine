@@ -511,12 +511,28 @@ class Vector3 extends Vector {
 		this.y = y;
 		this.z = z;
 	}
+	plus(other, result = Vector3.zero) {
+		result.x = this.x + other.x;
+		result.y = this.y + other.y;
+		result.z = this.z + other.z;
+		return result;
+	}
+	minus(other, result = Vector3.zero) {
+		result.x = this.x - other.x;
+		result.y = this.y - other.y;
+		result.z = this.z - other.z;
+		return result;
+	}
+	dot(other) {
+		return this.x * other.x + this.y * other.y + this.z * other.z;
+	}
 	/**
 	 * Returns the cross product between the caller and another vector.
 	 * @param Vector3 v | The second vector in the product 
+	 * @param Vector3 result? | The destination to store the resulting Vector in. If not specified, a new Vector will be created
 	 * @return Number
 	 */
-	cross(v, result = new Vector3()) {
+	cross(v, result = Vector3.zero) {
 		const u = this;
 		result.x = u.y * v.z - u.z * v.y;
 		result.y = u.z * v.x - u.x * v.z;
@@ -525,7 +541,7 @@ class Vector3 extends Vector {
 	}
 	/**
 	 * Returns a matrix such that for Vector3s `u` and `v`, `u.crossMatrix().times(v)` is the same as `u.cross(v)`. 
-	 * @param Matrix3 result | The destination to store the resulting matrix in. If this is not specified, a new matrix will be created
+	 * @param Matrix3 result? | The destination to store the resulting matrix in. If this is not specified, a new matrix will be created
 	 * @return Matrix3
 	 */
 	crossMatrix(result = new Matrix3()) {
@@ -570,9 +586,6 @@ class Vector3 extends Vector {
 	 */
 	rotatedAboutAxis(axis, angle, result) {
 		return this.get(result).rotateAboutAxis(axis, angle);
-	}
-	dot(other) {
-		return this.x * other.x + this.y * other.y + this.z * other.z;
 	}
 	toPhysicsVector(result = new Physics.VectorN_3_()) {
 		result.setAll(this.x, this.y, this.z);
