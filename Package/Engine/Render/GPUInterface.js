@@ -1001,6 +1001,8 @@ class GLSLProgram {
 			const location = gl.getAttribLocation(this.program, name);
 			const columnBytes = rows * 4;
 			const bytes = columns * columnBytes;
+
+			if (location < 0) continue;
 		
 			this.attributes[name] = {
 				name, location, rows, columns,
