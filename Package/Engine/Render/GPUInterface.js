@@ -986,6 +986,9 @@ class GLSLProgram {
 	setupAttributes() {
 		const { gl } = this;
 
+		const oldVertexArray = gl.getParameter(gl.VERTEX_ARRAY_BINDING);
+		gl.bindVertexArray(null);
+
 		this.attributes = {};
 		this.divisors = new Map();
 
@@ -1007,6 +1010,8 @@ class GLSLProgram {
 			this.setDivisor(name, 0);
 			offset += bytes;
 		}
+
+		gl.bindVertexArray(oldVertexArray);
 	}
 	writeTexture(sampler, info) {
 		const { gl } = this;
@@ -1325,7 +1330,7 @@ class GLSLProgram {
 
 		this.focus();
 		for (let i = 0; i < attribute.columns; i++)
-			this.gl.vertexAttribDivisor(attribute.location + i, divisor); 
+			this.gl.vertexAttribDivisor(attribute.location + i, divisor);
 	}
 	layoutDivisor(divisor) {
 		if (this.divisors.has(divisor))
@@ -1371,7 +1376,6 @@ class GLSLProgram {
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 		
 		for (const [_, attribute] of div.attributes) {
-			
 			for (let j = 0; j < attribute.columns; j++) {
 				const pointer = attribute.location + j;
 				gl.vertexAttribPointer(
