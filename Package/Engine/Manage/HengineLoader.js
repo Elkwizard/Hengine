@@ -467,6 +467,188 @@ class HengineWebcamResource extends HengineResource {
 }
 
 /**
+ * Represents an external material file to be loaded.
+ * When this resource is loaded, it resolves to a Map from material names to Material objects.
+ * This resource supports loading `.mtl` files.
+ */
+class HengineMaterialResource extends HengineResource {
+	async load() {
+		const match = this.src.match(/\.\w+$/);
+		if (!match) return null;
+		const type = match[0].slice(1);
+		return await HengineMaterialResource[type]?.(this.src) ?? null;
+	}
+	static async mtl(src) {
+		const text = await new HengineTextResource(src).load();
+		if (!text) return null;
+
+		const lines = text.split(/\r?\n/g);
+		
+		const materials = new Map();
+		let mat = null;
+
+		const ATTR_NAME = {
+			Kd: "albedo",
+			Ks: "specular",
+			Ke: "emission",
+			Ns: "specularExponent",
+			map_Kd: "albedoTexture",
+			map_Ks: "specularTexture",
+			map_Ns: "specularExponentTexture",
+			bump: "bumpTexture",
+			map_bump: "bumpTexture",
+			disp: "displacementTexture",
+			decal: "stencilTexture",
+			Ni: "ior"
+		};
+
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			if (!line || line[0] === "#") continue;
+			const [cmd, ...args] = line.split(" ");
+			if (cmd === "newmtl") {
+				const material = new SimpleMaterial();
+				materials.set(args[0], mat = material);
+			} else if (cmd === "d") {
+				mat.alpha = +args[0];
+			} else if (cmd === "Tr") {
+				mat.alpha = 1 - args[0];
+			} else {
+				const attr = ATTR_NAME[cmd];
+				if (!attr) continue;
+
+				if (cmd[0] === "K") {
+					mat[attr] = Color.unlimited(255 * args[0], 255 * args[1], 255 * args[2]);
+				} else if (cmd[0] === "N" || cmd === "illum") {
+					mat[attr] = +args[0];
+				} else if (cmd.startsWith("map_")) {
+					const path = args.join(" ");
+					const image = await new HengineImageResource(path).load();
+					mat[attr] = new Sampler(image, { wrap: true, mipmap: true });
+				}
+			}
+		}
+
+		return materials;
+	}
+}
+
+/**
+ * Represents an external 3D mesh file to be loaded.
+ * When this resource is loaded, it resolves to a Map from object names to Meshes.
+ * This resource supports loading `.obj` files.
+ */
+class HengineMeshResource extends HengineResource {
+	async load() {
+		const match = this.src.match(/\.\w+$/);
+		if (!match) return null;
+		const type = match[0].slice(1);
+		return await HengineMeshResource[type]?.(this.src) ?? null;
+	}
+	static async obj(src) {
+		const text = await new HengineTextResource(src).load();
+		if (text === null) return null;
+		
+		const lines = text.split("\n");
+		
+		const objects = new Map();
+		let materials = null;
+		let obj = null;
+
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
+
+		const newChunk = material => ({ faces: [], material });
+
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			if (!line || line[0] === "#") continue;
+			const [cmd, ...args] = line.trim().split(" ");
+			switch (cmd) {
+				case "mtllib": {
+					const path = src.replace(/[^\\/]*?$/, args[0]);
+					materials = await new HengineMaterialResource(path).load();
+					if (!materials) return null;
+				}; break;
+				case "o": {
+					obj = {
+						indices: new Map(),
+						data: [],
+						attributes: ["vertexPosition", "vertexUV", "vertexNormal"],
+						chunks: [newChunk(null)]
+					};
+					objects.set(args[0], obj);
+				}; break;
+				case "usemtl": {
+					obj.chunks.push(newChunk(materials.get(args[0])));
+				}; break;
+				case "v": {
+					vertices.push(+args[0], +args[1], +args[2]);
+				}; break;
+				case "vn": {
+					normals.push(+args[0], +args[1], +args[2]);
+				}; break;
+				case "vt": {
+					uvs.push(+args[0], +args[1]);
+				}; break;
+				case "f": {
+					const { indices, data } = obj;
+					const face = [];
+					for (let i = 0; i < args.length; i++) {
+						const arg = args[i];
+						if (!indices.has(arg)) {
+							const base = data.length;
+							indices.set(arg, base / 8);
+							
+							const [vInx, uvInx, nInx] = arg.split("/");
+							const v = (vInx - 1) * 3;
+							const uv = (uvInx - 1) * 2;
+							const n = (nInx - 1) * 3;
+							
+							data[base + 0] = vertices[v + 0] ?? 0;
+							data[base + 1] = vertices[v + 1] ?? 0;
+							data[base + 2] = vertices[v + 2] ?? 0;
+							data[base + 3] = uvs[uv + 0] ?? 0;
+							data[base + 4] = uvs[uv + 1] ?? 0;
+							data[base + 5] = normals[n + 0] ?? 0;
+							data[base + 6] = normals[n + 1] ?? 0;
+							data[base + 7] = normals[n + 2] ?? 0;
+						}
+						face.push(obj.indices.get(arg));
+					}
+					const chunk = obj.chunks.at(-1);
+					for (let i = 2; i < face.length; i++)
+						chunk.faces.push([face[0], face[i - 1], face[i]]);
+				}; break;
+				case "s":
+				case "l": break;
+				default: {
+					throw new TypeError(`No support for ${cmd}`);
+				}; break;
+			}
+		}
+
+		const result = new Map();
+		for (const [name, object] of objects) {
+			const chunks = object.chunks
+				.filter(chunk => chunk.faces.length)
+				.map(chunk => new MeshChunk(chunk.material ?? Material.DEFAULT, chunk.faces));
+			if (!chunks.length) continue;
+			
+			const mesh = new Mesh(
+				["vertexPosition", "vertexUV", "vertexNormal"],
+				new Float32Array(object.data),
+				chunks
+			);
+			result.set(name, mesh);
+		}
+
+		return result;
+	}
+}
+
+/**
  * Represents a batch of HengineResources to be loaded in a row, and can be used as a more streamlined approach compared to constructing HengineResources directly.
  * It contains an internal list of resources to load, and many of its methods simply add to this list, which can eventually be flushed and loaded, though only once per instance.
  * These methods also return the caller, which allows for convenient chaining.
@@ -614,6 +796,22 @@ class HengineLoadingStructure {
 		loops = false
 	} = {}) {
 		return this.add(new HengineSoundResource(this.absSrc(src), loops));
+	}
+	/**
+	 * Adds a HengineMeshResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @return HengineLoadingStructure
+	 */
+	mesh(src) {
+		return this.add(new HengineMeshResource(src));
+	}
+	/**
+	 * Adds a HengineMaterialResource to the queue with a specified source.
+	 * @param String src | The path to the resource
+	 * @return HengineLoadingStructure
+	 */
+	material(src) {
+		return this.add(new HengineMaterialResource(src));
 	}
 }
 
@@ -878,6 +1076,17 @@ class HengineLoader {
 			"Render/StaticImage.js",
 			"Render/TileMap.js"
 		],
+		IS_3D ? [
+			// 3d
+			"Render/Camera3D.js",
+			"Render/Frame3D.js",
+			"Render/Shapes3D.js",
+			"Render/Mesh.js",
+			"Render/Material.js",
+			"Render/Renderer3D.js",
+
+			"Math/Geometry3D.js"
+		] : [],
 		[ // high level dependencies
 			"Render/Color.js",
 			"SceneObject/UIObject.js",
