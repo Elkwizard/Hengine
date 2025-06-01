@@ -14,7 +14,8 @@ class LengthConstraint : public Constraint2 {
 
 		double getError() const override {
 			Vector diff = b.getAnchor() - a.getAnchor();
-			return std::abs(diff.mag() - length);
+			double error = std::abs(diff.mag() - length);
+			return isnan(error) ? 0.0 : error;
 		}
 
 		void solvePosition(double dt) override {

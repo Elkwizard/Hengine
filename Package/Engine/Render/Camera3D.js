@@ -15,8 +15,8 @@ class Camera3D extends Matrix4 {
 
 		// define parameters
 		this.canvas = canvas;
-		Vector2.defineReference(this, "position", new Vector3(0, 0, 0));
-		Vector2.defineReference(this, "direction", new Vector3(0, 0, 1));
+		Vector3.defineReference(this, "position", new Vector3(0, 0, 0));
+		Vector3.defineReference(this, "direction", new Vector3(0, 0, 1));
 		this.rotation = 0;
 		this.zoom = 1;
 
@@ -107,3 +107,5 @@ class Camera3D extends Matrix4 {
 	}
 }
 objectUtils.inherit(Camera3D, Camera);
+
+if (IS_3D) ND.Camera = Camera3D;

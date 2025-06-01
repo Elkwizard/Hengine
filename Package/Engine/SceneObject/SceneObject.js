@@ -14,11 +14,13 @@ class Controls {
  * These can be created by the `.add...Element()` methods of ElementContainer.
  * Every scene object has a collection of local-space shapes that make up its presence.
  * These shapes are used for culling, rendering, and physics hitboxes.
+ * Additionally, each scene object exists in N dimensions.
+ * As such, within the documentation of this class, `Vector`, `Transform`, and `Matrix` refer to the appropriate constructs for those dimensions.
+ * @abstract
+ * 
  * @prop Transform transform | The location and orientation of the object in space
  * @prop Transform lastTransform | The location and orientation of the object last frame
- * @prop Rect/null graphicalBoundingBox | The world-space bounding box to use for graphical culling instead of the shapes of the object
  * @prop Boolean mouseEvents | Whether or not mouse events (hover and click) should be checked for this object. This can be ignored if the scene has disabled mouse events
- * @prop Boolean cullGraphics | Whether or not the graphics should ever be culled. This can be ignored if the scene has disabled graphics culling
  * @prop Boolean hidden | Whether or not the object should be rendered
  * @prop Boolean hovered | Whether or not the mouse cursor is hovering over the shapes of this object. This property is readonly, and won't be accurate if mouse events are disabled
  * @prop Boolean onScreen | Whether or not the object passed the most recent render culling check
@@ -28,13 +30,12 @@ class Controls {
  * @prop Number lifeSpan | The amount of frames that the object has existed for
  */
 class SceneObject extends SceneElement {
-	constructor(name, x, y, controls, container, engine) {
+	constructor(name, transform, controls, container, engine) {
 		super(name, container);
-		this.transform = new Transform(new Vector2(x, y), 0);
+		this.transform = transform;
 		this.lastTransform = this.transform.get();
 		this.shapes = new Map();
 		this.convexShapes = new Map();
-		this.graphicalBoundingBox = null;
 		this.engine = engine;
 		this.controls = controls;
 		this.mouseEvents = true;
@@ -44,30 +45,13 @@ class SceneObject extends SceneElement {
 		this.lifeSpan = 0;
 		this.synced = [];
 		this.onScreen = true;
-		this.cullGraphics = true;
 		this.scripts = new ScriptContainer(this);
-		this.__width = 0;
-		this.__height = 0;
 	}
 	set defaultShape(a) {
 		this.addShape("default", a);
 	}
 	get defaultShape() {
 		return this.getShape("default");
-	}
-	set width(a) {
-		let factor = a / this.width;
-		this.scaleX(factor);
-	}
-	get width() {
-		return this.__width;
-	}
-	set height(a) {
-		let factor = a / this.height;
-		this.scaleY(factor);
-	}
-	get height() {
-		return this.__height;
 	}
 	remove() {
 		super.remove();
@@ -93,8 +77,6 @@ class SceneObject extends SceneElement {
 		let shapes = this.getAllShapes();
 		let boxes = shapes.map(e => e.getBoundingBox());
 		let bounds = Rect.composeBoundingBoxes(boxes);
-		this.__width = bounds.width;
-		this.__height = bounds.height;
 		this.cacheBoundingBoxes();
 	}
 	cacheBoundingBoxes() {
@@ -121,13 +103,17 @@ class SceneObject extends SceneElement {
 	 * Adds a new shape with a specified name.
 	 * If a shape with that name already exists, it will be removed.
 	 * @param String name | The name corresponding to the new shape
-	 * @param Circle/Polygon shape | The shape to add
+	 * @param Circle/Polygon/Sphere/Polyhedron shape | The shape to add. The 3D shapes are only available for WorldObjects in 3D Mode
 	 * @param Boolean convex? | Whether the shape is known to be convex. Default is false
 	 */
 	addShape(name, shape, convex = false) {
 		if (this.shapes.has(name)) this.removeShape(name);
 		this.shapes.set(name, shape);
-		convex ||= shape instanceof Rect || shape instanceof Circle;
+		if (IS_3D) {
+			convex ||= shape instanceof Prism || shape instanceof Sphere || shape instanceof Frustum;
+		} else {
+			convex ||= shape instanceof Rect || shape instanceof Circle;
+		}
 		this.convexShapes.set(shape, convex ? [shape] : Geometry.subdividePolygon(shape));
 		this.cacheDimensions();
 		this.scripts.run("addShape", name, shape);
@@ -173,7 +159,7 @@ class SceneObject extends SceneElement {
 	getAllModels() {
 		const models = [];
 		for (const [name, shape] of this.shapes)
-			models.push(shape.getModel(this.transform));
+			models.push(shape.getModel(this.transform.matrix));
 		return models;
 	}
 	/**
@@ -184,25 +170,25 @@ class SceneObject extends SceneElement {
 		const models = [];
 		for (const [shape, shapes] of this.convexShapes)
 			for (let i = 0; i < shapes.length; i++)
-				models.push(shapes[i].getModel(this.transform));
+				models.push(shapes[i].getModel(this.transform.matrix));
 		return models;
 	}
 	/**
 	 * Adjusts the location of all of the object's shapes such that the geometric center of all the shapes is (0, 0) in local-space.
 	 */
 	centerShapes() {
-		let center = Vector2.zero;
+		let center = this.constructor.Vector.zero;
 		let totalArea = 0;
 		let names = [];
 		let shapes = [];
 		for (let [name, shape] of this.shapes) {
 			let area = shape.area;
 			totalArea += area;
-			center.Vadd(shape.middle.Ntimes(area));
+			center.add(shape.middle.times(area));
 			names.push(name);
 			shapes.push(shape);
 		}
-		center.Ndiv(totalArea);
+		center.div(totalArea);
 		const diff = center.inverse;
 		for (let i = 0; i < names.length; i++)
 			this.addShape(names[i], shapes[i].move(diff));
@@ -241,7 +227,7 @@ class SceneObject extends SceneElement {
 	 * @return Shape
 	 */
 	getModel(name) {
-		return this.shapes.get(name).getModel(this.transform);
+		return this.shapes.get(name).getModel(this.transform.matrix);
 	}
 	/**
 	 * Returns a list of convex shapes in world-space that take up the same region as a specific shape.
@@ -252,7 +238,7 @@ class SceneObject extends SceneElement {
 		const models = [];
 		const shapes = this.convexShapes.get(this.shapes.get(name));
 		for (let i = 0; i < shapes.length; i++)
-			models.push(shapes[i].getModel(this.transform));
+			models.push(shapes[i].getModel(this.transform.matrix));
 		return models;
 	}
 	/**
@@ -268,30 +254,8 @@ class SceneObject extends SceneElement {
 		this.cacheDimensions();
 	}
 	/**
-	 * Horizontally scales the shapes of the object about its center.
-	 * @param Number factor | The scale factor
-	 */
-	scaleX(factor) {
-		let entries = [];
-		for (let entry of this.shapes) entries.push(entry);
-		for (let i = 0; i < entries.length; i++)
-			this.addShape(entries[i][0], entries[i][1].scaleXAbout(0, factor));
-		this.cacheDimensions();
-	}
-	/**
-	 * Vertically scales the shapes of the object about its center.
-	 * @param Number factor | The scale factor
-	 */
-	scaleY(factor) {
-		let entries = [];
-		for (let entry of this.shapes) entries.push(entry);
-		for (let i = 0; i < entries.length; i++)
-			this.addShape(entries[i][0], entries[i][1].scaleYAbout(0, factor));
-		this.cacheDimensions();
-	}
-	/**
 	 * Returns whether a specific world-space point is inside the shapes of the object.
-	 * @param Vector2 point | The point to check
+	 * @param VectorN point | The point to check
 	 * @return Boolean
 	 */
 	collidePoint(point) {
@@ -317,18 +281,6 @@ class SceneObject extends SceneElement {
 			const entries = Array.from(this.shapes.entries());
 			for (const [name, shape] of entries) this.scripts.run("draw", name, shape);
 		}, this.engine.renderer);
-	}
-	determineOnScreen(screen) {
-		const graphicalBoundingBox = this.graphicalBoundingBox ?? this.__boundingBox;
-		return this.onScreen = !this.cullGraphics || (graphicalBoundingBox && screen.intersectSameType(graphicalBoundingBox));
-	}
-	engineDraw(camera) {
-		if (
-			!this.hidden &&
-			this.scripts.check(true, "drawRule", camera) &&
-			this.determineOnScreen(camera.screen)
-		) this.runDraw();
-		this.scripts.run("escapeDraw");
 	}
 	hasMoved() {
 		return this.transform.diff(this.lastTransform);

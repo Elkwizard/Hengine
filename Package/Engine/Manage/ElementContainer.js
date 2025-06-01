@@ -80,81 +80,81 @@ class ElementContainer extends SceneElement {
 		sceneObject.scripts.add(this.defaultScript);
 	}
 	/**
-	 * Adds a new SceneObject with a single rectangle shape to the container.
-	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
-	 * @param Number x | The x coordinate of the center of the SceneObject
-	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * Adds a new WorldObject with a single rectangle shape to the container.
+	 * @param String name | The name of the WorldObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the WorldObject
+	 * @param Number y | The y coordinate of the center of the WorldObject
 	 * @param Number width | The width of the rectangle shape
 	 * @param Number height | The height of the rectangle shape
-	 * @return SceneObject
+	 * @return WorldObject
 	 */
 	addRectElement(name, x, y, width, height, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, this, this.engine);
+		let n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		return n;
 	}
 	/**
-	 * Adds a new SceneObject with a single circle shape to the container.
-	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
-	 * @param Number x | The x coordinate of the center of the SceneObject
-	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * Adds a new WorldObject with a single circle shape to the container.
+	 * @param String name | The name of the WorldObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the WorldObject
+	 * @param Number y | The y coordinate of the center of the WorldObject
 	 * @param Number radius | The radius of the circle shape
-	 * @return SceneObject
+	 * @return WorldObject
 	 */
 	addCircleElement(name, x, y, radius, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, this, this.engine);
+		let n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
 		n.addShape("default", new Circle(Vector2.zero, radius));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		return n;
 	}
 	/**
-	 * Adds a new SceneObject to the container.
-	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
-	 * @param Number x | The x coordinate of the center of the SceneObject
-	 * @param Number y | The y coordinate of the center of the SceneObject
-	 * @return SceneObject
+	 * Adds a new WorldObject to the container.
+	 * @param String name | The name of the WorldObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the WorldObject
+	 * @param Number y | The y coordinate of the center of the WorldObject
+	 * @return WorldObject
 	 */
 	addElement(name, x, y, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, this, this.engine);
+		let n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		return n;
 	}
 	/**
-	 * Adds a new SceneObject to the container. This SceneObject will have the PHYSICS script added.
-	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
-	 * @param Number x | The x coordinate of the center of the SceneObject
-	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * Adds a new WorldObject to the container. This WorldObject will have the PHYSICS script added.
+	 * @param String name | The name of the WorldObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the WorldObject
+	 * @param Number y | The y coordinate of the center of the WorldObject
 	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
-	 * @return SceneObject
+	 * @return WorldObject
 	 */
 	addPhysicsElement(name, x, y, gravity, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		const n = new SceneObject(name, x, y, controls, this, this.engine);
+		const n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		n.scripts.add(PHYSICS, gravity);
 		return n;
 	}
 	/**
-	 * Adds a new SceneObject with a single rectangle shape to the container. This SceneObject will have the PHYSICS script added.
-	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
-	 * @param Number x | The x coordinate of the center of the SceneObject
-	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * Adds a new WorldObject with a single rectangle shape to the container. This WorldObject will have the PHYSICS script added.
+	 * @param String name | The name of the WorldObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the WorldObject
+	 * @param Number y | The y coordinate of the center of the WorldObject
 	 * @param Number width | The width of the rectangle shape
 	 * @param Number height | The height of the rectangle shape
 	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
-	 * @return SceneObject
+	 * @return WorldObject
 	 */
 	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		const n = new SceneObject(name, x, y, controls, this, this.engine);
+		const n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -162,17 +162,17 @@ class ElementContainer extends SceneElement {
 		return n;
 	}
 	/**
-	 * Adds a new SceneObject with a single circle shape to the container. This SceneObject will have the PHYSICS script added.
-	 * @param String name | The name of the SceneObject. If this is not unique, it will be replaced with a similar but unique name
-	 * @param Number x | The x coordinate of the center of the SceneObject
-	 * @param Number y | The y coordinate of the center of the SceneObject
+	 * Adds a new WorldObject with a single circle shape to the container. This WorldObject will have the PHYSICS script added.
+	 * @param String name | The name of the WorldObject. If this is not unique, it will be replaced with a similar but unique name
+	 * @param Number x | The x coordinate of the center of the WorldObject
+	 * @param Number y | The y coordinate of the center of the WorldObject
 	 * @param Number radius | The radius of the circle shape
 	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
-	 * @return SceneObject
+	 * @return WorldObject
 	 */
 	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls()) {
 		name = this.genName(this.elements, name);
-		let n = new SceneObject(name, x, y, controls, this, this.engine);
+		let n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
 		n.addShape("default", new Circle(Vector2.zero, radius));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -190,7 +190,7 @@ class ElementContainer extends SceneElement {
 	 */
 	addUIElement(name, x, y, width, height) {
 		name = this.genName(this.elements, name);
-		let n = new UIObject(name, x, y, this, this.engine);
+		let n = new UIObject(name, new Vector2(x, y), this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);

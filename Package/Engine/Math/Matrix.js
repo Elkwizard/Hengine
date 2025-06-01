@@ -816,5 +816,5 @@ class Matrix4 extends Matrix {
 }
 
 Matrix.sizes = [,, Matrix2, Matrix3, Matrix4];
-const MatrixN = Matrix[DIM];
-const TMatrixN = Matrix[DIM + 1];
+ND.Matrix = Matrix[DIM];
+ND.TransformMatrix = Matrix[DIM + 1];

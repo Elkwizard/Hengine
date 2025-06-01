@@ -1,5 +1,6 @@
 /**
  * Makes a SceneObject into a text editor.
+ * This only works on 2D SceneObjects, which includes only WorldObjects in 2D Mode.
  * Since the entire screen is a `<canvas>` in the Hengine, this serves as an alternative to `<textarea>`.
  * ```js
  * // single line text-box

@@ -452,9 +452,7 @@ class Plane extends Shape3D {
 		return !plane.normal.equals(this.normal) || this.distance.equals(plane.distance);
 	}
 	getModel(transform) {
-		const mat3 = new Matrix3(transform);
-		mat3.invert().transpose();
-		const normal = mat3.times(this.normal);
+		const normal = Matrix3.normal(transform).times(this.normal);
 		const point = this.normal.times(this.distance);
 		const distance = normal.dot(transform.times(point));
 		return new Plane(normal, distance);
@@ -487,6 +485,15 @@ class Frustum extends Polyhedron {
 	}
 	getBoundingBox() {
 		return Prism.bound(this.vertices);
+	}
+	cullBox(box) {
+		for (let i = 0; i < this.planes.length; i++) {
+			const plane = this.planes[i];
+			const min = Math.min(...box.vertices.map(v => v.dot(plane.normal)));
+			if (min > plane.distance)
+				return true;
+		}
+		return false;
 	}
 	cullSphere(sphere) {
 		for (let i = 0; i < this.planes.length; i++) {

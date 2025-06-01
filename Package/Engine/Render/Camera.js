@@ -1,4 +1,8 @@
 /**
+ * @3d CameraN = Camera2D -> Camera3D
+ */
+
+/**
  * @name class Camera extends Matrix
  * @interface
  * Represents a camera in a scene targeting a specific rendering surface.
@@ -229,3 +233,5 @@ class Camera2D extends Matrix3 {
 	}
 }
 objectUtils.inherit(Camera2D, Camera);
+
+if (!IS_3D) ND.Camera = Camera2D;

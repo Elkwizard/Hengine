@@ -1,9 +1,9 @@
 Physics.onCollide = (a, b, direction, contacts, triggerA, triggerB) => {
-	a = PHYSICS.bodyToSceneObject.get(a.pointer);
+	a = PHYSICS.bodyToWorldObject.get(a.pointer);
 	
 	const { scene } = a.engine;
 	if (scene.collisionEvents) {
-		b = PHYSICS.bodyToSceneObject.get(b.pointer);
+		b = PHYSICS.bodyToWorldObject.get(b.pointer);
 		scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
 	}
 
@@ -12,23 +12,27 @@ Physics.onCollide = (a, b, direction, contacts, triggerA, triggerB) => {
 };
 
 Physics.collisionRule = (a, b) => {
-	const { bodyToSceneObject } = PHYSICS;
-	a = bodyToSceneObject.get(a.pointer);
-	b = bodyToSceneObject.get(b.pointer);
+	const { bodyToWorldObject } = PHYSICS;
+	a = bodyToWorldObject.get(a.pointer);
+	b = bodyToWorldObject.get(b.pointer);
 	return	a.scripts.PHYSICS.collideBasedOnRule(b);
 };
 
 Physics.triggerRule = (a, b) => {
-	const { bodyToSceneObject } = PHYSICS;
-	a = bodyToSceneObject.get(a.pointer);
-	b = bodyToSceneObject.get(b.pointer);
+	const { bodyToWorldObject } = PHYSICS;
+	a = bodyToWorldObject.get(a.pointer);
+	b = bodyToWorldObject.get(b.pointer);
 	return a.scripts.PHYSICS.triggerBasedOnRule(b);
 };
 
 /**
- * Adds rigidbody physics to a SceneObject.
- * @prop Vector2 velocity | The velocity of the object per frame
- * @prop Number angularVelocity | The angular velocity of the object in radians per frame
+ * @3d Inertia = Number -> Matrix3
+ */
+
+/**
+ * Adds rigidbody physics to a WorldObject.
+ * @prop VectorN velocity | The velocity of the object per frame
+ * @prop Angle angularVelocity | The angular velocity of the object in radians per frame
  * @prop Boolean mobile | Whether or not the object can move or rotate
  * @prop Boolean simulated | Whether or not the object should participate in the simulation at all
  * @prop Boolean gravity | Whether or not gravity should be applied to the object
@@ -44,7 +48,7 @@ Physics.triggerRule = (a, b) => {
  * @prop CollisionMonitor lastColliding | All of the objects that were colliding with the object last frame
  */
 class PHYSICS extends ElementScript {
-	static bodyToSceneObject = new Map();
+	static bodyToWorldObject = new Map();
 	/**
 	 * Adds rigidbody physics to an object.
 	 * @param Boolean mobile | Whether the object should be able to move/rotate 
@@ -55,9 +59,8 @@ class PHYSICS extends ElementScript {
 		this.physicsEngine = this.scene.physicsEngine;
 		
 		this.body = new Physics.RigidBody(mobile).solidify();
-		if (obj.name === "player") this.body.name = 7;
 		
-		PHYSICS.bodyToSceneObject.set(this.body.pointer, obj);
+		PHYSICS.bodyToWorldObject.set(this.body.pointer, obj);
 
 		// monitors
         this.colliding = new CollisionMonitor();
@@ -69,9 +72,9 @@ class PHYSICS extends ElementScript {
 		const { body } = this;
 		
 		// links/shortcuts
-		this._velocity = VectorN.physicsProxy(body.velocity.linear);
+		this._velocity = ND.Vector.physicsProxy(body.velocity.linear);
 		if (IS_3D)
-			this._angularVelocity = VectorN.physicsProxy(body.velocity.orientation.rotation);
+			this._angularVelocity = ND.Vector.physicsProxy(body.velocity.orientation.rotation);
 		
 		objectUtils.shortcut(this, body, "simulated");
 		objectUtils.shortcut(this, body, "isTrigger");
@@ -145,7 +148,7 @@ class PHYSICS extends ElementScript {
 	}
 	/**
 	 * Retrieves the moment of inertia for the object.
-	 * @return Number
+	 * @return Inertia
 	 */
 	get inertia() {
 		if (IS_3D) return Matrix3.fromPhysicsMatrix(this.body.inertia);
@@ -176,7 +179,7 @@ class PHYSICS extends ElementScript {
 	}
 	cleanUp(obj) {
 		this.cleanedUp = true;
-		PHYSICS.bodyToSceneObject.delete(this.body.pointer);
+		PHYSICS.bodyToWorldObject.delete(this.body.pointer);
 		this.physicsEngine.removeBody(this.body);
 	}
 	addScript(obj, script) {
@@ -206,13 +209,14 @@ class PHYSICS extends ElementScript {
 		const { position } = obj.transform;
 
 		const { linear, orientation } = this.body.position;
-		VectorN.fromPhysicsVector(linear, position);
+		ND.Vector.fromPhysicsVector(linear, position);
 		if (IS_3D) {
-			VectorN.fromPhysicsVector(orientation.rotation, obj.transform.rotation);
+			ND.Vector.fromPhysicsVector(orientation.rotation, obj.transform.rotation);
 		} else {
 			obj.transform.rotation = orientation.rotation;
 		}
         obj.updateCaches();
+
 
 		if (this.scene.collisionEvents) {
 			const { directions } = PHYSICS;
@@ -239,8 +243,8 @@ class PHYSICS extends ElementScript {
 	// custom methods
 	/**
 	 * Applies an impulse to a specific point on the object.
-	 * @param Vector2 point | The world-space point at which the impulse should be applied
-	 * @param Vector2 impulse | The impulse to apply
+	 * @param VectorN point | The world-space point at which the impulse should be applied
+	 * @param VectorN impulse | The impulse to apply
 	 */
 	applyImpulse(obj, point, force) {
 		const pointPhysics = point.toPhysicsVector();
@@ -252,8 +256,8 @@ class PHYSICS extends ElementScript {
 	/**
 	 * Applies an impulse to a specific point on the object.
 	 * The impulse will be scaled by the mass of the object.
-	 * @param Vector2 point | The world-space point at which the impulse should be applied
-	 * @param Vector2 impulse | The impulse to apply, which will be scaled
+	 * @param VectorN point | The world-space point at which the impulse should be applied
+	 * @param VectorN impulse | The impulse to apply, which will be scaled
 	 */
 	applyImpulseMass(obj, point, force) {
         this.applyImpulse(point, force.times(this.body.mass));
@@ -274,7 +278,7 @@ class PHYSICS extends ElementScript {
 	/**
 	 * Checks whether the object and another given object would have a trigger collision if they collided.
 	 * A trigger collision is not resolved, just detected.
-	 * @param SceneObject element | The object to check. Must have PHYSICS
+	 * @param WorldObject element | The object to check. Must have PHYSICS
 	 * @return Boolean
 	 */
 	isTriggerWith(obj, element) {
@@ -283,7 +287,7 @@ class PHYSICS extends ElementScript {
 	}
 	/**
 	 * Checks whether the object and another given object could collide if they intersected.
-	 * @param SceneObject element | The object to check. Must have PHYSICS
+	 * @param WorldObject element | The object to check. Must have PHYSICS
 	 * @return Boolean
 	 */
 	canCollideWith(obj, element) {
@@ -292,7 +296,7 @@ class PHYSICS extends ElementScript {
 	}
 	/**
 	 * Checks whether there are any constraints between the object and another given object
-	 * @param SceneObject other | The object to check. Must have PHYSICS
+	 * @param WorldObject other | The object to check. Must have PHYSICS
 	 * @return Boolean
 	 */
 	constrainedTo(obj, body) {
@@ -315,5 +319,12 @@ PHYSICS.directions = [
 	["right", "collideRight"],
 	["top", "collideTop"],
 	["bottom", "collideBottom"],
-	["general", "collideGeneral"],	
+	["general", "collideGeneral"],
 ];
+
+if (IS_3D) {
+	PHYSICS.directions.push(
+		["front", "collideFront"],
+		["back", "collideBack"]
+	);
+}

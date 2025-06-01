@@ -29,7 +29,7 @@ class Scene {
 		this.main = new ElementContainer("Main", null, this.engine);
 		
 		this.physicsEngine = new Physics.Engine().own();
-		this.gravity = VectorN.y(0.4);
+		this.gravity = ND.Vector.y(0.4);
 		this.physicsAnchor = new Physics.RigidBody(false).own();
 		
 		this.cullGraphics = true;
@@ -41,18 +41,18 @@ class Scene {
 	}
 	/**
 	 * Sets the gravitational acceleration for the physics engine.
-	 * @param Vector2 gravity | The new gravitational acceleration
+	 * @param VectorN gravity | The new gravitational acceleration
 	 */
 	set gravity(a) {
 		a.toPhysicsVector(this.physicsEngine.gravity);
 	}
 	/**
 	 * Returns the current gravitational acceleration for the physics engine.
-	 * This is initially `new Vector2(0, 0.4)`.
-	 * @return Vector2
+	 * This is initially `VectorN.y(0.4)`.
+	 * @return VectorN
 	 */
 	get gravity() {
-		return VectorN.physicsProxy(this.physicsEngine.gravity);
+		return ND.Vector.physicsProxy(this.physicsEngine.gravity);
 	}
 	/**
 	 * Returns all the active constraints in the scene.
@@ -76,20 +76,20 @@ class Scene {
 	
 			const jsContacts = new Array(contacts.length);
 			for (let i = 0; i < jsContacts.length; i++)
-				jsContacts[i] = VectorN.fromPhysicsVector(contacts.get(i));
+				jsContacts[i] = ND.Vector.fromPhysicsVector(contacts.get(i));
 			
 			a.scripts.PHYSICS.colliding.add(b, direction, jsContacts, isTriggerB);
 			b.scripts.PHYSICS.colliding.add(a, direction.inverse, jsContacts, isTriggerA);
 		}
 	}
 	/**
-	 * Performs a ray-cast against some or all of the SceneObjects in the scene.
+	 * Performs a ray-cast against some or all of the WorldObjects in the scene.
 	 * If the ray-cast fails, then null is returned.
-	 * Otherwise returns an object with a `.hitShape` property specifying which SceneObject was hit, and a `.hitPoint` property containing the point of intersection between the ray and the SceneObject.
-	 * @param Vector2 rayOrigin | The origin point of the ray
-	 * @param Vector2 rayDirection | The direction of the ray
-	 * @param (SceneObject) => Boolean mask? | A filter for which SceneObjects should be considered in the ray-cast. Default is `(object) => true`
-	 * @return { hitShape: SceneObject, hitPoint: Vector2 }/null
+	 * Otherwise returns an object with a `.hitShape` property specifying which WorldObject was hit, and a `.hitPoint` property containing the point of intersection between the ray and the WorldObject.
+	 * @param VectorN rayOrigin | The origin point of the ray
+	 * @param VectorN rayDirection | The direction of the ray
+	 * @param (WorldObject) => Boolean mask? | A filter for which WorldObjects should be considered in the ray-cast. Default is `(object) => true`
+	 * @return { hitShape: WorldObject, hitPoint: Vector2 }/null
 	 */
 	rayCast(origin, ray, mask = () => true) {
 		const elements = this.main.updateArray()
@@ -118,7 +118,7 @@ class Scene {
 		return { hitPoint: hit, hitShape };
 	}
 	/**
-	 * Returns a list of all the SceneObjects that contain a specific point.
+	 * Returns a list of all the SceneObjects that contain a specific world-space point.
 	 * @param Vector2 point | The world-space point to check
 	 * @return SceneObject[]
 	 */
@@ -140,10 +140,10 @@ class Scene {
 	}
 	/**
 	 * Creates a physical constraint that forces the distance between two points on two objects to remain constant.
-	 * @param SceneObject a | The first object to constrain. Must have the PHYSICS script
-	 * @param SceneObject b | The second object to constrain. Must have the PHYSICS script
-	 * @param Vector2 aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
-	 * @param Vector2 bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
+	 * @param WorldObject a | The first object to constrain. Must have the PHYSICS script
+	 * @param WorldObject b | The second object to constrain. Must have the PHYSICS script
+	 * @param VectorN aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
+	 * @param VectorN bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
 	 * @return Constraint2
 	 */
@@ -151,7 +151,7 @@ class Scene {
 		const a = this.makeConstrained(aOffset, bodyA);
 		const b = this.makeConstrained(bOffset, bodyB);
 
-		length ??= VectorN.dist(
+		length ??= ND.Vector.dist(
 			bodyA ? bodyA.transform.localSpaceToGlobalSpace(aOffset) : a.anchor,
 			bodyB.transform.localSpaceToGlobalSpace(bOffset)
 		);
@@ -166,9 +166,9 @@ class Scene {
 	}
 	/**
 	 * Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
-	 * @param SceneObject object | The object to constrain. Must have the PHYSICS script
-	 * @param Vector2 offset? | The local object-space point where the constraint will attach to the object. Default is no offset
-	 * @param Vector2 point? | The location to constrain the length to. Default is the current location of the constrained point
+	 * @param WorldObject object | The object to constrain. Must have the PHYSICS script
+	 * @param VectorN offset? | The local object-space point where the constraint will attach to the object. Default is no offset
+	 * @param VectorN point? | The location to constrain the length to. Default is the current location of the constrained point
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
 	 * @return Constraint1
 	 */
@@ -179,10 +179,10 @@ class Scene {
 	}
 	/**
 	 * Creates a physical constraint that forces two points on two objects to be in the same location.
-	 * @param SceneObject a | The first object to constrain. Must have the PHYSICS script
-	 * @param SceneObject b | The second object to constrain. Must have the PHYSICS script
-	 * @param Vector2 aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
-	 * @param Vector2 bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
+	 * @param WorldObject a | The first object to constrain. Must have the PHYSICS script
+	 * @param WorldObject b | The second object to constrain. Must have the PHYSICS script
+	 * @param VectorN aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
+	 * @param VectorN bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
 	 * @return Constraint2
 	 */
 	constrainPosition(bodyA, bodyB, aOffset = Vector2.zero, bOffset = Vector2.zero) {
@@ -199,9 +199,9 @@ class Scene {
 	}
 	/**
 	 * Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
-	 * @param SceneObject object | The object to constrain. Must have the PHYSICS script
-	 * @param Vector2 offset? | The local object-space point where the constraint will attach to the object. Default is no offset
-	 * @param Vector2 point? | The location to constrain the length to. Default is the current location of the constrained point
+	 * @param WorldObject object | The object to constrain. Must have the PHYSICS script
+	 * @param VectorN offset? | The local object-space point where the constraint will attach to the object. Default is no offset
+	 * @param VectorN point? | The location to constrain the length to. Default is the current location of the constrained point
 	 * @return Constraint1
 	 */
 	constrainPositionToPoint(body, offset = Vector2.zero, point = null) {
@@ -218,7 +218,7 @@ class Scene {
 	/**
 	 * Renders the contents of the scene to a given camera.
 	 * The result will appear on the `.renderer` property of the argument.
-	 * @param Camera camera | The camera to render
+	 * @param CameraN camera | The camera to render
 	 */
 	render(camera) {
 		camera.cacheScreen();

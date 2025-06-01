@@ -47,6 +47,9 @@ class Complex extends MathObject {
 	get conjugate() {
 		return new this.constructor(this.real, this.imaginary.inverse);
 	}
+	get inverse() {
+		return this.conjugate;
+	}
 	get(result = this.constructor.zero) {
 		result.real = this.real;
 		result.imaginary = this.imaginary.get();

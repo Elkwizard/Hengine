@@ -136,7 +136,7 @@ class MathObject {
         delete obj[key];
         Object.defineProperty(obj, key, {
             set(a) {
-				value.set(a);
+				value = a.get(value);
             },
             get() {
                 return value;

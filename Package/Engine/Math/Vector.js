@@ -1,4 +1,8 @@
 /**
+ * @3d VectorN = Vector2 -> Vector3
+ */
+
+/**
  * Represents a multidimensional vector.
  * @abstract
  * @prop Number mag | The magnitude of the vector
@@ -511,17 +515,17 @@ class Vector3 extends Vector {
 		this.y = y;
 		this.z = z;
 	}
-	plus(other, result = Vector3.zero) {
-		result.x = this.x + other.x;
-		result.y = this.y + other.y;
-		result.z = this.z + other.z;
-		return result;
-	}
-	minus(other, result = Vector3.zero) {
-		result.x = this.x - other.x;
-		result.y = this.y - other.y;
-		result.z = this.z - other.z;
-		return result;
+	op(v, fn, dst = new Vector3()) {
+		if (typeof v === "number") {
+			dst.x = fn(this.x, v);
+			dst.y = fn(this.y, v);
+			dst.z = fn(this.z, v);
+		} else {
+			dst.x = fn(this.x, v.x);
+			dst.y = fn(this.y, v.y);
+			dst.z = fn(this.z, v.z);
+		}
+		return dst;
 	}
 	dot(other) {
 		return this.x * other.x + this.y * other.y + this.z * other.z;
@@ -552,6 +556,26 @@ class Vector3 extends Vector {
 			-y, x, 0,
 			result
 		);
+	}
+	/**
+	 * @name rotate
+	 * Rotates the vector counter-clockwise about a given axis by a specified angle in-place.
+	 * Returns the caller.
+	 * @param Vector3 angle | The direction of this vector is the axis of rotation, and the magnitude is the angle
+	 * @return Vector3
+	 */
+	rotate(angle) {
+		return Quaternion.fromRotation(angle).rotate(this, this);
+	}
+	/**
+	 * @name rotated
+	 * Rotates a copy of the vector counter-clockwise about a given axis by a specified angle.
+	 * Returns the rotated copy.
+	 * @param Vector3 angle | The direction of this vector is the axis of rotation, and the magnitude is the angle
+	 * @return Vector3
+	 */
+	rotated(angle) {
+		return this.get().rotate(angle);
 	}
 	/**
 	 * @name rotate[UV]
@@ -851,4 +875,4 @@ class Vector4 extends Vector {
 })();
 
 Vector.sizes = [,, Vector2, Vector3, Vector4];
-const VectorN = Vector[DIM];
+ND.Vector = Vector[DIM];

@@ -110,7 +110,8 @@ API class Engine {
 			int confusion = 0;
 			double errorThreshold = CONSTRAINT_ERROR_THRESHOLD * islandCount;
 
-			for (int i = 0; i < CONSTRAINT_ITERATIONS_THRESHOLD; i++) {
+			int i = 0;
+			for (; i < CONSTRAINT_ITERATIONS_THRESHOLD; i++) {
 				error = resolver.getError();
 				if (error < errorThreshold) break;
 				if (error > lastError - CONSTRAINT_IMPROVEMENT_THRESHOLD) {

@@ -1,5 +1,6 @@
 const IS_3D = new URL(document.currentScript.src).searchParams.has("3d");
 const DIM = IS_3D ? 3 : 2;
+const ND = { };
 
 class PathManager {
 	static isRoot(path) {
@@ -1065,7 +1066,6 @@ class HengineLoader {
 			"Render/Font.js",
 			"Render/Shapes.js",
 			"Render/Animation.js",
-			"Render/Transform.js",
 			"Render/Camera.js",
 			"Render/Webcam.js",
 			"Render/Graph.js",
@@ -1089,7 +1089,9 @@ class HengineLoader {
 		] : [],
 		[ // high level dependencies
 			"Render/Color.js",
+			"Render/Transform.js",
 			"SceneObject/UIObject.js",
+			"SceneObject/WorldObject.js",
 			"Render/WebGLRenderer.js",
 		]
 	];

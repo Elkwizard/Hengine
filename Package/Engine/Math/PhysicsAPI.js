@@ -19,13 +19,13 @@ class Constraint {
 	
 	/**
 	 * Returns the world-space location of the constrained points.
-	 * @return Vector2[2]
+	 * @return VectorN[2]
 	 */
 	get ends() {
 		const { a, b } = this.physicsConstraint;
 		return [
-			Vector2.fromPhysicsVector(a.anchor),
-			Vector2.fromPhysicsVector(b.anchor)
+			ND.Vector.fromPhysicsVector(a.anchor),
+			ND.Vector.fromPhysicsVector(b.anchor)
 		];
     }
 	
@@ -46,8 +46,8 @@ class Constraint {
 
 /**
  * Represents a physical constraint between a SceneObject and a fixed point.
- * @prop Vector2 offset | The local-space offset of the constrained point on the object
- * @prop Vector2 point | The fixed point in the constraint
+ * @prop VectorN offset | The local-space offset of the constrained point on the object
+ * @prop VectorN point | The fixed point in the constraint
  * @prop Number length | The desired distance between the two constrained points. This is only defined for length constraints
  */
 class Constraint1 extends Constraint {
@@ -64,13 +64,13 @@ class Constraint1 extends Constraint {
 		a.toPhysicsVector(this.physicsConstraint.b.offset);
 	}
 	get offset() {
-		return VectorN.physicsProxy(this.physicsConstraint.offset);
+		return ND.Vector.physicsProxy(this.physicsConstraint.offset);
 	}
 	set point(a) {
 		a.toPhysicsVector(this.physicsConstraint.a.offset);
 	}
 	get point() {
-		return VectorN.physicsProxy(this.physicsConstraint.point);
+		return ND.Vector.physicsProxy(this.physicsConstraint.point);
 	}
 	/**
 	 * Returns the object in the constraint.
@@ -83,8 +83,8 @@ class Constraint1 extends Constraint {
 
 /**
  * Represents a physical constraint between two SceneObjects.
- * @prop Vector2 offsetA | The local-space offset of the constrained point on the first object
- * @prop Vector2 offsetB | The local-space offset of the constrained point on the second object
+ * @prop VectorN offsetA | The local-space offset of the constrained point on the first object
+ * @prop VectorN offsetB | The local-space offset of the constrained point on the second object
  * @prop Boolean staticA | Whether or not the first object should be considered static by the constraint
  * @prop Boolean staticB | Whether or not the second object should be considered static by the constraint
  * @prop Number length | The desired distance between the two constrained points. This is only defined for length constraints
@@ -115,13 +115,13 @@ class Constraint2 extends Constraint {
 		a.toPhysicsVector(this.physicsConstraint.a.offset);
 	}
 	get offsetA() {
-		return VectorN.physicsProxy(this.physicsConstraint.a.offset);
+		return ND.Vector.physicsProxy(this.physicsConstraint.a.offset);
 	}
 	set offsetB(a) {
 		a.toPhysicsVector(this.physicsConstraint.b.offset);
 	}
 	get offsetB() {
-		return VectorN.physicsProxy(this.physicsConstraint.b.offset);
+		return ND.Vector.physicsProxy(this.physicsConstraint.b.offset);
 	}
 	/**
 	 * Returns the first object in the constraint.
@@ -142,8 +142,8 @@ class Constraint2 extends Constraint {
 /**
  * Represents a collision with another SceneObject.
  * @prop SceneObject element | The object that is being collided with
- * @prop Vector2 direction | A unit vector along the collision normal pointing toward the other object
- * @prop Vector2[] contacts | A list of world-space contact points between the two objects
+ * @prop VectorN direction | A unit vector along the collision normal pointing toward the other object
+ * @prop VectorN[] contacts | A list of world-space contact points between the two objects
  * @prop Boolean isTrigger | Indicates whether the object being collided with requested that the collision be a trigger collision. A trigger collision is not resolved
  */
 class CollisionData {
@@ -214,6 +214,30 @@ class CollisionMonitor {
             if (data.direction.y > 0.2) elements.push(data);
         return elements.length ? elements : null;
     }
+	/**
+	 * Returns all collisions on the front (+Z) side of the object.
+	 * If there are no collisions, this returns null.
+	 * This accessor only works in 3D Mode.
+	 * @return CollisionData[]/null
+	 */
+	get front() {
+		const elements = [];
+		for (const [element, data] of this.elements)
+			if (data.direction.z > 0.2) elements.push(data);
+		return elements.length ? elements : null;
+	}
+	/**
+	 * Returns all collisions on the back (-Z) side of the object.
+	 * If there are no collisions, this returns null.
+	 * This accessor only works in 3D Mode.
+	 * @return CollisionData[]/null
+	 */
+	get back() {
+		const elements = [];
+		for (const [element, data] of this.elements)
+			if (data.direction.z < -0.2) elements.push(data);
+		return elements.length ? elements : null;
+	}
     get(monitor = new CollisionMonitor()) {
         monitor.clear();
         for (const [element, data] of this.elements)
@@ -243,7 +267,7 @@ class CollisionMonitor {
 	/**
 	 * Returns all collisions where the collision is in a specific direction.
 	 * If there are no such collisions, this returns null.
-	 * @param Vector2 direction | A unit vector representing the direction to check. This will be interpreted as pointing toward the other object, rather than away
+	 * @param VectorN direction | A unit vector representing the direction to check. This will be interpreted as pointing toward the other object, rather than away
 	 * @return CollisionData[]/null
 	 */
     direction(d) {

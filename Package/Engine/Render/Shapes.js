@@ -136,7 +136,9 @@ class Range {
 
 /**
  * @implements Copyable
- * Represents a shape.
+ * Represents a solid shape.
+ * Within the documentation of this class, `Vector` refers to either `Vector2` or `Vector3` depending on whether the 2D or 3D subclass is used.
+ * Similarly, `Matrix` refers to either `Matrix3` or `Matrix4`.
  * @abstract
  * @readonly
  * @prop Vector middle | The geometric center of the shape
@@ -145,7 +147,7 @@ class Shape {
 	/**
 	 * @name getModel
 	 * Returns a copy of the shape after a certain transformation is applied to all its points.
-	 * @param Transform transform | The transformation to apply to the shape 
+	 * @param Matrix transform | The transformation to apply to the shape
 	 * @return Shape
 	 */
 	/**
@@ -401,7 +403,7 @@ class Polygon extends Shape2D {
 	 * @return Polygon 
 	 */
 	rotate(angle) {
-		return this.getModel(new Transform(Vector2.zero, angle));
+		return this.getModel(Matrix3.rotation(angle));
 	}
 	equalsSameType(shape) {
 		const v1 = this.vertices;
@@ -576,6 +578,9 @@ class Rect extends Polygon {
 			this.height / 2 - h / 2 + this.y,
 			w, h
 		);
+	}
+	cullBox(box) {
+		return !this.intersectSameType(box);
 	}
 	move(dir) {
 		return new Rect(
@@ -772,7 +777,7 @@ class Circle extends Shape2D {
 	getModel(transf) {
 		return new this.constructor(
 			transf.times(this.position),
-			this.radius * transf.stretch
+			this.radius * transf.maxHomogenousScaleFactor
 		);
 	}
 	getBoundingBox() {

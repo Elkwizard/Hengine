@@ -1,4 +1,8 @@
 /**
+ * @3d ArtistN = Artist2D -> Artist3D
+ */
+
+/**
  * Represents a renderer for a graphical surface.
  * @abstract
  */

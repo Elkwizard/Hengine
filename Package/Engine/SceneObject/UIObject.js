@@ -4,8 +4,10 @@
  * Culling, point-collision checks, and other related operations will all use screen-space coordinates rather than world-space.
  */
 class UIObject extends SceneObject {
-    constructor(name, x, y, container, engine) {
-        super(name, x, y, null, container, engine);
+	static Vector = Vector2;
+	
+    constructor(name, pos, container, engine) {
+        super(name, new Transform2D(pos), null, container, engine);
     }
     engineDraw() {
 		this.onScreen = true;
