@@ -76,6 +76,16 @@ class Vector extends Operable {
 	projectOnto(v) {
 		return v.times(this.dot(v) / v.sqrMag);
 	}
+	/**
+	 * Computes a version of the caller with one coordinate axis replaced with 0.
+	 * This is equivalent to `this.minus(this.projectOnto(axis))` for `axis.mag === 1`.
+	 * Doesn't mutate the caller.  
+	 * @param Vector axis | The unit vector axis to remove from the caller
+	 * @return Vector
+	 */
+	without(v) {
+		return this.minus(v.times(this.dot(v)));
+	}
 	bestFit(v) {
 		let d1 = this.dot(v);
 		let d2 = this.inverse.dot(v);
@@ -327,11 +337,14 @@ class Vector2 extends Vector {
 		return this.x * v.y - this.y * v.x;
 	}
 	projectOnto(v, result) {
-		const u = this;
-		const dot = u.x * v.x + u.y * v.y;
+		const dot = this.x * v.x + this.y * v.y;
 		const mag2 = v.x ** 2 + v.y ** 2;
 		const k = dot / mag2;
 		return v.times(k, result);
+	}
+	without(v) {
+		const dot = this.x * v.x + this.y * v.y;
+		return new Vector2(this.x - v.x * dot, this.y - v.y * dot);
 	}
 	normalize() {
 		const f = 1 / (this.mag || 1);

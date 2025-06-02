@@ -9,7 +9,8 @@
     // process URL
     const src = script.src.split("/");
     src.pop();
-    const hengineLoaderSrc = src.join("/") + "/Package/Engine/Manage/HengineLoader.js";
+	const searchParams = new URL(script.src).searchParams;
+    const hengineLoaderSrc = src.join("/") + "/Package/Engine/Manage/HengineLoader.js" + searchParams;
  
     function load(src) {
         const script = document.createElement("script");

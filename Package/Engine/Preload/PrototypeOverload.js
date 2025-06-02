@@ -103,6 +103,12 @@ const objectUtils = {
 					proxy[i] = value[i];
 			}
 		});
+	},
+	invertMap(map) {
+		const result = new Map();
+		for (const [key, value] of map)
+			result.set(value, key);
+		return result;
 	}
 };
 

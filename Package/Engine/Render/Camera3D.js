@@ -38,7 +38,7 @@ class Camera3D extends Matrix4 {
 	 */
 	cacheScreen() {
 		this.pcMatrix = this.projection.times(this);
-		this.screen = new Frustum(this.pcMatrix);
+		this.screen = this.pcMatrix.determinant ? new Frustum(this.pcMatrix) : null;
 		return this.screen;
 	}
 	/**

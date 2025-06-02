@@ -35,7 +35,7 @@ class Scene {
 		this.cullGraphics = true;
 		this.mouseEvents = true;
 		this.collisionEvents = true;
-		this.camera = new Camera2D(engine.canvas);
+		this.camera = new ND.Camera(engine.canvas.renderer.imageType);
 		this.updating = false;
 		this.renderOrder = [];
 	}
@@ -72,7 +72,7 @@ class Scene {
 	}
 	handleCollisionEvent(a, b, direction, contacts, isTriggerA, isTriggerB) {
 		if (a && b) {
-			direction = Vector2.fromPhysicsVector(direction);
+			direction = ND.Vector.fromPhysicsVector(direction);
 	
 			const jsContacts = new Array(contacts.length);
 			for (let i = 0; i < jsContacts.length; i++)
@@ -87,49 +87,40 @@ class Scene {
 	 * If the ray-cast fails, then null is returned.
 	 * Otherwise returns an object with a `.hitShape` property specifying which WorldObject was hit, and a `.hitPoint` property containing the point of intersection between the ray and the WorldObject.
 	 * @param VectorN rayOrigin | The origin point of the ray
-	 * @param VectorN rayDirection | The direction of the ray
+	 * @param VectorN rayDirection | The unit vector direction of the ray
 	 * @param (WorldObject) => Boolean mask? | A filter for which WorldObjects should be considered in the ray-cast. Default is `(object) => true`
-	 * @return { hitShape: WorldObject, hitPoint: Vector2 }/null
+	 * @return { hitShape: WorldObject, hitPoint: VectorN }/null
 	 */
-	rayCast(origin, ray, mask = () => true) {
+	rayCast(ro, rd, mask = () => true) {
 		const elements = this.main.updateArray()
-			.filter(el => !(el instanceof UIObject) && mask(el));
+			.filter(el => el instanceof WorldObject && mask(el));
+		
 		let bestDist = Infinity;
-		let hitShape = null;
-		let hit = null;
+		let bestShape = null;
+
 		for (let i = 0; i < elements.length; i++) {
 			const element = elements[i];
 			const models = element.getAllModels();
-			const result = Geometry.rayCast(origin, ray, models);
-			if (result) {
-				const hp = result.hitPoint;
-				const dist = (hp.x - origin.x) ** 2 + (hp.y - origin.y) ** 2;
-				if (dist < bestDist) {
-					bestDist = dist;
-					hitShape = element;
-					hit = hp;
-				}
+			const t = Math.min(...models.map(model => model.rayCast(ro, rd, bestDist)));
+			if (t < bestDist) {
+				bestDist = t;
+				bestShape = element;
 			}
 		}
 		
-		if (!hit)
+		if (!isFinite(bestDist))
 			return null;
 
-		return { hitPoint: hit, hitShape };
+		return { hitPoint: rd.times(bestDist).plus(ro), hitShape: bestShape };
 	}
 	/**
-	 * Returns a list of all the SceneObjects that contain a specific world-space point.
-	 * @param Vector2 point | The world-space point to check
-	 * @return SceneObject[]
+	 * Returns a list of all the WorldObjects that contain a specific world-space point.
+	 * @param VectorN point | The world-space point to check
+	 * @return WorldObject[]
 	 */
-	collidePoint(point, mouse = false) {
+	collidePoint(point) {
 		return this.main.updateArray()
-			.filter(e => (!mouse || (e.mouseEvents && e.onScreen && !e.hidden)) && e.collidePoint(point));
-	}
-	collidePointBoth(point, mouse = false) {
-		const collideAry = this.collidePoint(point, mouse);
-		const collideSet = new Set(collideAry);
-		return [collideAry, this.main.sceneObjectArray.filter(e => !collideSet.has(e))];
+			.filter(e => e instanceof WorldObject && e.collidePoint(point));
 	}
 	makeConstrained(offset, body) {
 		const physicsOffset = offset.toPhysicsVector();
@@ -147,7 +138,7 @@ class Scene {
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
 	 * @return Constraint2
 	 */
-	constrainLength(bodyA, bodyB, aOffset = Vector2.zero, bOffset = Vector2.zero, length = null) {
+	constrainLength(bodyA, bodyB, aOffset = ND.Vector.zero, bOffset = ND.Vector.zero, length = null) {
 		const a = this.makeConstrained(aOffset, bodyA);
 		const b = this.makeConstrained(bOffset, bodyB);
 
@@ -172,7 +163,7 @@ class Scene {
 	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
 	 * @return Constraint1
 	 */
-	constrainLengthToPoint(body, offset = Vector2.zero, point = null, length = null) {
+	constrainLengthToPoint(body, offset = ND.Vector.zero, point = null, length = null) {
 		point ??= body.transform.localToGlobal(offset);
 		const constraint = this.constrainLength(null, body, offset, point, length);
 		return new Constraint1(constraint.physicsConstraint, this.engine);
@@ -185,7 +176,7 @@ class Scene {
 	 * @param VectorN bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
 	 * @return Constraint2
 	 */
-	constrainPosition(bodyA, bodyB, aOffset = Vector2.zero, bOffset = Vector2.zero) {
+	constrainPosition(bodyA, bodyB, aOffset = ND.Vector.zero, bOffset = ND.Vector.zero) {
 		const a = this.makeConstrained(aOffset, bodyA);
 		const b = this.makeConstrained(bOffset, bodyB);
 
@@ -204,7 +195,7 @@ class Scene {
 	 * @param VectorN point? | The location to constrain the length to. Default is the current location of the constrained point
 	 * @return Constraint1
 	 */
-	constrainPositionToPoint(body, offset = Vector2.zero, point = null) {
+	constrainPositionToPoint(body, offset = ND.Vector.zero, point = null) {
 		point ??= body.transform.localToGlobal(offset);
 		return this.constrainPosition(null, body, point, offset);
 	}
@@ -215,19 +206,15 @@ class Scene {
 		const objects = this.main.sceneObjectArray;
 		for (let i = 0; i < objects.length; i++) objects[i].updatePreviousData();
 	}
-	/**
-	 * Renders the contents of the scene to a given camera.
-	 * The result will appear on the `.renderer` property of the argument.
-	 * @param CameraN camera | The camera to render
-	 */
 	render(camera) {
 		camera.cacheScreen();
 
 		camera.renderer.save();
-		camera.transformToWorld(camera.renderer);
+		if (!IS_3D) camera.transformToWorld(camera.renderer);
 
 		this.renderOrder = [...this.main.sceneObjectArray]
-			.sort((a, b) => a.layer - b.layer);
+			.sort((a, b) => a.layer - b.layer)
+			.sort((a, b) => (a.constructor === UIObject) - (b.constructor === UIObject));
 		
 		for (let i = 0; i < this.renderOrder.length; i++) {
 			const object = this.renderOrder[i];
@@ -246,21 +233,35 @@ class Scene {
 		if (!this.mouseEvents) return;
 
 		const { mouse } = this.engine;
-		const adjusted = mouse.world;
-		const [hover, unhover] = this.collidePointBoth(adjusted, true);
+		const { screen, world } = mouse;
+
+		const hover = [];
+		const unhover = [];
+		for (let i = 0; i < this.main.sceneObjectArray.length; i++) {
+			const object = this.main.sceneObjectArray[i];
+			if (object instanceof WorldObject && IS_3D) continue;
+			
+			const point = object instanceof UIObject ? screen : world;
+			const hovered = object.onScreen &&
+							!object.hidden &&
+							object.mouseEvents &&
+							object.collidePoint(point);
+
+			(hovered ? hover : unhover).push({ object, point });
+		}
 
 		const pressed = mouse.allJustPressed;
 		for (let i = 0; i < hover.length; i++) {
-			const object = hover[i];
-			if (!object.hovered) object.scripts.run("hover", adjusted);
+			const { object, point } = hover[i];
+			if (!object.hovered) object.scripts.run("hover", point);
 			object.hovered = true;
 			for (let j = 0; j < pressed.length; j++)
-				object.scripts.run("click", pressed[j], adjusted);
+				object.scripts.run("click", pressed[j], point);
 		}
 
 		for (let i = 0; i < unhover.length; i++) {
-			const object = unhover[i];
-			if (object.hovered) object.scripts.run("unhover", adjusted);
+			const { object, point } = unhover[i];
+			if (object.hovered) object.scripts.run("unhover", point);
 			object.hovered = false;
 		}
 	}

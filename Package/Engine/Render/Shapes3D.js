@@ -73,6 +73,9 @@ class Triangle extends Shape3D {
 		result.c = this.c.get();
 		return result;
 	}
+	rayCast(ro, rd) {
+		// TODO: Implement raycasting for triangles
+	}
 	/**
 	 * Returns the plane in which the triangle resides.
 	 * @return Plane
@@ -237,7 +240,7 @@ class Polyhedron extends Shape3D {
 		});
 	}
 }
-objectUtils.inherit(Polyhedron, Polygon, ["closestPointTo"]);
+objectUtils.inherit(Polyhedron, Polygon, ["closestPointTo", "rayCast"]);
 
 /**
  * Represents an axis-aligned rectangular prism.
@@ -457,6 +460,12 @@ class Plane extends Shape3D {
 		const distance = normal.dot(transform.times(point));
 		return new Plane(normal, distance);
 	}
+	rayCast(ro, rd) {
+		const side = ro.dot(this.normal) - this.distance;
+		const dot = this.normal.dot(rd);
+		if (dot * side <= 0) return Infinity;
+		return Math.abs(side) / Math.abs(dot);
+	}
 }
 
 /**
@@ -583,5 +592,5 @@ class Sphere extends Shape3D {
 objectUtils.inherit(Sphere, Circle, [
 	"distanceTo", "closestPointTo", "containsPoint",
 	"intersectSameType", "equalsSameType",
-	"getModel"
+	"getModel", "rayCast"
 ]);

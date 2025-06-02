@@ -7,6 +7,10 @@
 const ScalingMode = Enum.define("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MULTIPLE");
 
 /**
+ * @3d CanvasArtist = CanvasArtist2D -> Artist3D
+ */
+
+/**
  * Represents the canvas on which the Hengine is rendered.
  * The pixel ratio of the canvas is equal to `window.devicePixelRatio`.
  * The `.width` and `.height` properties of this class are also available on the global object.
@@ -19,7 +23,8 @@ const ScalingMode = Enum.define("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MUL
  * 	renderer.draw(new Color("blue")).circle(middle, 10);
  * });
  * ```
- * @prop Artist2D renderer | A renderer which can draw to the screen
+ * @prop CanvasArtist2D ui | A 2D renderer which can draw to the screen. In 3D Mode, rendering to this will act as an overlay for the Scene
+ * @prop CanvasArtist renderer | A 2D or 3D renderer which can draw to the screen. WorldObjects will be drawn to this surface. In 2D Mode, this is the same as `.ui`
  * @prop ImageType/String cursor | The cursor icon. This can be either an image or a CSS cursor name
  * @prop ScalingMode scalingMode | The way in which the canvas scales when the window is resized. Starts as `ScalingMode.PRESERVE_ASPECT_RATIO`
  * @prop () => void clearScreen | The function that will be called to clear the screen each frame. Starts as `() => renderer.fill(new Color(255, 255, 255))`
@@ -30,8 +35,14 @@ class CanvasImage extends ImageType {
 		this.canvas = canvas;
 		this.engine = engine;
 
-		this.renderer = new CanvasArtist2D(this.canvas, this);
-
+		this.ui = new CanvasArtist2D(this.canvas, this);
+		if (IS_3D) {
+			this.frame3D = new Frame3D(this.width, this.height, this.pixelRatio);
+			this.renderer = this.frame3D.renderer;
+		} else {
+			this.renderer = this.ui;
+		}
+		
 		this.scalingMode = ScalingMode.PRESERVE_ASPECT_RATIO;
 
 		window.addEventListener("resize", () => {
@@ -41,7 +52,7 @@ class CanvasImage extends ImageType {
 			} else this.updateSize();
 		});
 
-		this.clearScreen = () => this.renderer.fill(Color.WHITE);
+		this.clearScreen = () => this.ui.fill(Color.WHITE);
 
 		this.cursor = "default";
 	}
@@ -81,8 +92,13 @@ class CanvasImage extends ImageType {
 			.mul(this.screenToCanvasScale);
 	}
 	onresize(width, height) {
-		this.renderer.resize(width, height);
-		if (this.engine.scene) this.engine.scene.camera.position = this.renderer.middle;
+		this.ui.resize(width, height);
+		if (IS_3D) {
+			this.renderer.resize(width, height);
+		} else {
+			if (this.engine.scene)
+				this.engine.scene.camera.position = this.ui.middle;
+		}
 		this.updateSize();
 	}
 	updateSize() {
@@ -104,7 +120,28 @@ class CanvasImage extends ImageType {
 		this.canvas.style.width = packed.width + "px";
 		this.canvas.style.height = packed.height + "px";
 	}
+	startRendering() {
+		this.ui.clearTransformations();
+		if (IS_3D) {
+			this.renderer.clearTransformations();
+			this.ui.clear();
+			this.clearScreen();
+		} else {
+			this.clearScreen();
+		}
+	}
+	endRendering() {
+		if (IS_3D) {
+			this.renderer.render(this.engine.scene.camera);
+			this.ui.save();
+			this.ui.blendMode = BlendMode.BEHIND;
+			this.ui.image(this.frame3D).default(0, 0);
+			this.ui.restore();
+			this.renderer.clear();
+		}
+	}
 	makeImage() {
+		this.endRendering();
 		return this.canvas;
 	}
 }

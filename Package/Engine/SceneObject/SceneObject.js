@@ -30,14 +30,13 @@ class Controls {
  * @prop Number lifeSpan | The amount of frames that the object has existed for
  */
 class SceneObject extends SceneElement {
-	constructor(name, transform, controls, container, engine) {
+	constructor(name, transform, container, engine) {
 		super(name, container);
 		this.transform = transform;
 		this.lastTransform = this.transform.get();
 		this.shapes = new Map();
 		this.convexShapes = new Map();
 		this.engine = engine;
-		this.controls = controls;
 		this.mouseEvents = true;
 		this.hidden = false;
 		this.hovered = false;
@@ -276,11 +275,11 @@ class SceneObject extends SceneElement {
 	show() {
 		this.hidden = false;
 	}
-	runDraw() {
+	runDraw(renderer) {
 		if (this.scripts.implements("draw")) this.transform.drawInLocalSpace(() => {
 			const entries = Array.from(this.shapes.entries());
 			for (const [name, shape] of entries) this.scripts.run("draw", name, shape);
-		}, this.engine.renderer);
+		}, renderer);
 	}
 	hasMoved() {
 		return this.transform.diff(this.lastTransform);

@@ -32,7 +32,7 @@ ShaderMaterial.DEFAULT_VERTEX_SHADER = `
 	uniform float time; 
 
 	vec3 shader() {
-		return vertexPosition;// + vec3(0, sin(vertexPosition.x * 0.5 + time * 0.1) * 2.0, 0);
+		return objectTransform * vec4(vertexPosition, 1);
 	}
 `;
 ShaderMaterial.DEFAULT_FRAGMENT_SHADER = `
@@ -58,6 +58,12 @@ class SimpleMaterial extends Material {
 	 */
 	constructor(settings = { }) {
 		super();
+
+		Color.defineReference(this, "albedo", Color.WHITE.get());
+		Color.defineReference(this, "specular", Color.WHITE.get());
+		Color.defineReference(this, "emission", Color.unlimited(0, 0, 0));
+		this.specularExponent = 0;
+		this.alpha = 1;
 		
 		this.vertexShader = SimpleMaterial.VERTEX_SHADER;
 		this.fragmentShader = SimpleMaterial.FRAGMENT_SHADER;
@@ -66,7 +72,7 @@ class SimpleMaterial extends Material {
 		for (let i = 0; i < textureSettings.length; i++) {
 			objectUtils.onChange(this, textureSettings[i], (key, value) => {
 				const scalar = key.replace("Texture", "");
-				this[scalar] ??= Color.BLACK.get();
+				this[scalar] = Color.BLACK;
 				if (value) {
 					this[scalar].alpha = 0;
 					this.uniforms[key] = value;
@@ -78,13 +84,6 @@ class SimpleMaterial extends Material {
 		}
 
 		Object.assign(this, settings);
-
-		// defaults
-		this.albedo ??= Color.WHITE.get();
-		this.specular ??= Color.WHITE.get();
-		this.emission ??= Color.BLACK.get();
-		this.specularExponent ??= 0;
-		this.alpha ??= 1;
 	}
 	/**
 	 * Sets `.albedo`, `.specular`, and `.emission` to the same value.

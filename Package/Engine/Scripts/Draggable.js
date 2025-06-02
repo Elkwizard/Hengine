@@ -2,6 +2,7 @@
  * Makes a SceneObject draggable with the mouse.
  * If the object has PHYSICS, then it will become stationary while being dragged.
  * This forces the object to accept mouse events.
+ * Only UIObjects can be made draggable in 3D Mode.
  * ```js
  * // create a draggable object with no bounds
  * const object = scene.main.addUIElement("box", width / 2, height / 2, 200, 100);

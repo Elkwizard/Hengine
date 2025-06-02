@@ -763,6 +763,14 @@ class Matrix4 extends Matrix {
 		);
 	}
 	/**
+	 * Creates a counter-clockwise rotation matrix about a specified axis by a specified angle and optionally stores it in a provided destination.
+	 * @param Vector3 angle | The rotation. The direction of this vector is the axis of rotation, and the magnitude is the angle
+	 * @param Matrix4 result? | The destination to store the resulting matrix in. If not specified, a new matrix will be created
+	 */
+	static rotation(angle, dst = new Matrix4()) {
+		return new Matrix4(Quaternion.fromRotation(angle).toMatrix()).get(dst);
+	}
+	/**
 	 * Creates a perspective projection matrix for use in 3D rendering.
 	 * @param Number aspectRatio | The aspect ratio of the surface on which the rendering will occur (`height / width`)
 	 * @param Number fov | The angular size of the field of view in radians

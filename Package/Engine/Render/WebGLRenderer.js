@@ -23,7 +23,8 @@ class WebGLArtist2D extends Artist2D {
 		
 		this.blendModeMap = new Map([
 			[BlendMode.COMBINE, this.gl.BLEND_MODE_COMBINE],
-			[BlendMode.ADD, this.gl.BLEND_MODE_ADD]
+			[BlendMode.ADD, this.gl.BLEND_MODE_ADD],
+			[BlendMode.BEHIND, this.gl.BLEND_MODE_BEHIND]
 		]);
 
 		this.preservePixelart = true;

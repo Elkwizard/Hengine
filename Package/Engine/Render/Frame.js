@@ -259,7 +259,7 @@ class HImage extends ImageType {
  * // render the frame to the screen
  * renderer.image(frame).default(0, 0);
  * ```
- * @prop CanvasArtist2D renderer | The renderer local to the frame that can be used to modify its contents
+ * @prop CanvasArtist2D renderer | The renderer local to the frame that can be used to modify its contents. This property is read-only
  */
 class Frame extends ImageType {
 	/**

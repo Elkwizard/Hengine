@@ -522,67 +522,28 @@ class Geometry {
 	 * Returns the closest intersection of a ray with a collection of shapes.
 	 * The return value is either null (if the ray-cast misses) or an object with two properties:
 	 * a `.hitPoint` property containing the location of the ray intersection, and a `.hitShape` property containing the shape that the ray intersected. 
-	 * @param Vector2 rayOrigin | The starting point of the ray 
-	 * @param Vector2 rayDirection | The direction of the ray
+	 * The dimensionality of the ray specification and the shapes must match, but this function will work for both Vector2/Shape2D and Vector3/Shape3D configurations.
+	 * @param Vector rayOrigin | The starting point of the ray 
+	 * @param Vector rayDirection | The direction of the ray
 	 * @param Shape[] shapes | The Shapes to ray-cast against
-	 * @return { hitShape: Shape, hitPoint: Vector2 }/null
+	 * @return { hitShape: Shape, hitPoint: Vector }/null
 	 */
 	static rayCast(ro, rd, shapes) {
-		let hit = null;
-		let hitShape = null;
+		let bestShape = null;
 		let bestDist = Infinity;
 		for (let i = 0; i < shapes.length; i++) {
 			const shape = shapes[i];
-			let nHit = null;
-			if (shape instanceof Circle) {
-				let normal = rd.normal;
-				const projP = normal.dot(ro);
-				const projC = normal.dot(shape);
-				if (Math.abs(projP - projC) < shape.radius && ro.minus(shape).dot(rd) <= 0) {
-					const t = (projC + shape.radius - projP) / (shape.radius * 2);
-					const upVec = rd.inverse;
-					const crossVec = upVec.normal;
-					const baseP = shape.middle.sub(crossVec.times(shape.radius)).add(crossVec.times(t * shape.radius * 2));
-					const y = Math.sqrt(1 - (2 * t - 1) ** 2);
-					baseP.add(upVec.times(y * shape.radius));
-					if (baseP.minus(ro).dot(rd) >= 0) nHit = baseP;
-				}
-			} else if (shape instanceof Polygon) {
-				let bestDist = Infinity;
-				let bestPoint = null;
-				const edges = shape.getEdges().filter(edge => {
-					let n = edge.vector.normal;
-					return n.dot(rd) >= 0 && Math.max(edge.a.minus(ro).dot(rd), edge.b.minus(ro).dot(rd)) > 0;
-				});
-				for (let j = 0; j < edges.length; j++) {
-					const intersect = Geometry.intersectRayLine(ro, rd, edges[j]);
-					
-					if (intersect) {
-						const { x, y } = intersect;
-						const dist = (x - ro.x) ** 2 + (y - ro.y) ** 2;
-						if (dist < bestDist) {
-							bestDist = dist;
-							bestPoint = new Vector2(x, y);
-						}
-					}
-
-					nHit = bestPoint;
-				}
-			}
-			if (nHit) {
-				const nDist = (nHit.x - ro.x) ** 2 + (nHit.y - ro.y) ** 2;
-				if (nDist < bestDist && nHit.minus(ro).dot(rd) >= 0) {
-					hit = nHit;
-					bestDist = nDist;
-					hitShape = shape;
-				}
+			const t = shape.rayCast(ro, rd, bestDist);
+			if (t < bestDist) {
+				bestDist = t;
+				bestShape = shape;
 			}
 		}
 		
-		if (!hit)
+		if (!isFinite(bestDist))
 			return null;
 		
-		return { hitPoint: hit, hitShape };
+		return { hitPoint: rd.times(bestDist).add(ro), hitShape: bestShape };
 	}
 	static subdividePolygonList(vertices) {
 		vertices = Polygon.removeDuplicates(vertices);
@@ -711,28 +672,9 @@ class Geometry {
 	 * @return Vector2/null
 	 */
 	static intersectRayLine(ro, rd, line) {
-		const rayOrigin = ro;
-		const rayVector = rd;
-		const lineOrigin = line.a;
-		const lineVector = line.b.minus(line.a);
-		const a = rayVector.x;
-		const b = lineVector.x;
-		const c = rayVector.y;
-		const d = lineVector.y;
-		const det = a * d - b * c;
-		if (!det) return null;
-		const invDet = 1 / det;
-		const diff = lineOrigin.minus(rayOrigin);
-		const t = invDet * (d * diff.x - b * diff.y);
-		const s = invDet * (c * diff.x - a * diff.y);
-		
-		const EPSILON_T = Geometry.EPSILON / rayVector.mag;
-		if (t < -EPSILON_T) return null;
-		
-		const EPSILON_S = Geometry.EPSILON / lineVector.mag;
-		if (s < -EPSILON_S || s > 1 + EPSILON_S) return null;
-
-		return lineVector.times(s).add(lineOrigin);
+		rd = rd.normalized;
+		const t = line.rayCast(ro, rd);
+		return isFinite(t) ? rd.times(t).add(ro) : null;
 	}
 	/**
 	 * Returns the point of intersection between two line segments, or null if they don't intersect

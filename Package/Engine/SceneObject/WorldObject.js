@@ -8,21 +8,22 @@
 class WorldObject extends SceneObject {
 	static Vector = ND.Vector;
 
-	constructor(name, pos, controls, container, engine) {
-		super(name, new ND.Transform(pos), controls, container, engine);
+	constructor(name, pos, container, engine) {
+		super(name, new ND.Transform(pos), container, engine);
 		this.graphicalBoundingBox = null;
 		this.cullGraphics = true;
 	}
 	determineOnScreen(screen) {
 		const graphicalBoundingBox = this.graphicalBoundingBox ?? this.__boundingBox;
-		return this.onScreen = !this.cullGraphics || (graphicalBoundingBox && !screen.cullBox(graphicalBoundingBox));
+		this.onScreen = !this.cullGraphics || (graphicalBoundingBox && !screen.cullBox(graphicalBoundingBox));
+		return IS_3D ? true : this.onScreen;
 	}
 	engineDraw(camera) {
 		if (
 			!this.hidden &&
 			this.scripts.check(true, "drawRule", camera) &&
 			this.determineOnScreen(camera.screen)
-		) this.runDraw();
+		) this.runDraw(this.engine.renderer);
 		this.scripts.run("escapeDraw");
 	}
 }

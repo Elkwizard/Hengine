@@ -218,20 +218,19 @@ class IntervalManager {
 		this.engine.mouse.beforeUpdate();
 		this.engine.touches.beforeUpdate();
 		if (!this.paused) {
-			this.engine.renderer.beforeFrame();
 			this.updateGraphs();
 			this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
-			this.engine.canvas.clearScreen();
+			this.engine.canvas.startRendering();
 			this.updateIntervalCalls(IntervalFunction.UPDATE);
 			this.engine.scene.engineUpdate();
 			this.updateIntervalCalls(IntervalFunction.AFTER_UPDATE);
 			this.engine.scene.updateCaches();
 			this.engine.scene.updatePreviousData();
+			this.engine.canvas.endRendering();
 		}
 		this.engine.keyboard.afterUpdate();
 		this.engine.mouse.afterUpdate();
 		this.engine.touches.afterUpdate();
-		this.engine.renderer.afterFrame();
 		
 		if (!this.paused) this.frameCount++;
 	}

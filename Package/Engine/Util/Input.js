@@ -289,9 +289,9 @@ KeyboardHandler.State = class KeyState extends InputHandler.State { };
  * @prop Vector2 screen | The current cursor position, in screen-space
  * @prop Vector2 screenLast | The cursor position last frame, in screen-space
  * @prop Vector2 screenDelta | The change in the cursor's screen-space position over the last frame
- * @prop Vector2 world | The current cursor position, in world-space
- * @prop Vector2 worldLast | The cursor position last frame, in world-space
- * @prop Vector2 worldDelta | The change in the cursor's world-space position over the last frame
+ * @prop Vector2 world | The current cursor position, in world-space. This is only available in 2D Mode
+ * @prop Vector2 worldLast | The cursor position last frame, in world-space.  This is only available in 2D Mode
+ * @prop Vector2 worldDelta | The change in the cursor's world-space position over the last frame. This is only available in 2D Mode
  */
 class MouseHandler extends InputHandler {
 	constructor(engine) {
@@ -304,9 +304,9 @@ class MouseHandler extends InputHandler {
 
 		Vector2.defineReference(this, "screen");
 		Vector2.defineReference(this, "screenLast");
+		Vector2.defineReference(this, "screenDelta");
 		Vector2.defineReference(this, "world");
 		Vector2.defineReference(this, "worldLast");
-		Vector2.defineReference(this, "screenDelta");
 		Vector2.defineReference(this, "worldDelta");
 		this.wheelDelta = 0;
 	}
@@ -321,6 +321,7 @@ class MouseHandler extends InputHandler {
 			if (pos) {
 				state.screenDragStart = pos;
 				state.screenDragEnd = pos;
+
 				const wpos = this.getWorldPosition(pos);
 				state.worldDragStart = wpos;
 				state.worldDragEnd = wpos;
@@ -387,6 +388,7 @@ class MouseHandler extends InputHandler {
 		document.exitPointerLock();
 	}
 	getWorldPosition(point) {
+		if (IS_3D) return point;
 		return this.engine.scene.camera.screenToWorld(point);
 	}
 	getEventPosition(event) {

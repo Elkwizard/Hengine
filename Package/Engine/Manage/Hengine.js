@@ -6,7 +6,8 @@
  * @prop TouchHandler touches | The touch screen API
  * @prop ClipboardHandler clipboard | The clipboard API
  * @prop CanvasImage canvas | The canvas associated with the engine
- * @prop Artist2D renderer | The renderer associated with the canvas. Draws directly on the screen
+ * @prop CanvasArtist2D ui | The 2D overlay renderer associated with the canvas. Draws directly on the screen
+ * @prop CanvasArtist renderer | The 2D or 3D renderer associated with the canvas. Draws directly on the screen
  * @prop Scene scene | The scene containing all the objects currently in the engine
  * @prop IntervalManager intervals | The interval manager managing the update loop of the engine
  * @prop FileSystem fileSystem | The file system for the engine. This property persists across reloads and different sessions via `localStorage`
@@ -38,6 +39,7 @@ class Hengine {
 		// rendering
 		this.canvas = new CanvasImage(canvas, this);
 		this.renderer = this.canvas.renderer;
+		this.ui = this.canvas.ui;
 		
 		this.scene = new Scene(this);
 		this.canvas.updateSize(); // requires camera, created by scene

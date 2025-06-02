@@ -68,8 +68,8 @@ class MeshRenderer {
 	}
 	get meshes() {
 		const result = [];
-		for (const [mesh, transforms] of this.queue)
-			result.push({ mesh, transforms });
+		for (const [mesh, { transforms, castShadows }] of this.queue)
+			result.push({ mesh, transforms, castShadows });
 		return result;
 	}
 	clear() {
@@ -77,35 +77,39 @@ class MeshRenderer {
 		this.matrices.push();
 		this.queue = new Map();
 	}
-	enqueue(transform) {
+	enqueue(transform, castShadows = true) {
 		const { mesh } = this;
-		let transforms = this.queue.get(mesh);
-		if (!transforms) {
-			transforms = [];
-			this.queue.set(mesh, transforms);
+		let meshData = this.queue.get(mesh);
+		if (!meshData) {
+			meshData = { transforms: [], castShadows: false };
+			this.queue.set(mesh, meshData);
 		}
-		transforms.push(transform);
+		meshData.castShadows ||= castShadows;
+		meshData.transforms.push(transform);
 	}
 	/**
 	 * Renders the current mesh at the current transform origin.
+	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
 	 */
-	default() {
-		this.enqueue(this.renderer.transform.get(this.matrices.alloc()));
+	default(castShadows) {
+		this.enqueue(this.renderer.state.transform.get(this.matrices.alloc()), castShadows);
 	}
 	/**
 	 * Renders the current mesh at a given transform relative to the current transform.
 	 * @param Matrix4 transform | The transform at which the mesh will be rendered
+	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
 	 */
-	at(transform) {
-		this.enqueue(this.renderer.transform.times(transform, this.matrices.alloc()));
+	at(transform, castShadows) {
+		this.enqueue(this.renderer.state.transform.times(transform, this.matrices.alloc()), castShadows);
 	}
 	/**
 	 * Renders the current mesh at a variety of different transforms relative to the current transform.
 	 * @param Matrix4[] transforms | The transformations to use for each instance
+	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
 	 */
-	instance(transforms) {
+	instance(transforms, castShadows) {
 		for (const transform of transforms)
-			this.at(transform);
+			this.at(transform, castShadows);
 	}
 }
 
@@ -178,6 +182,7 @@ class Artist3D extends Artist {
 		this.imageType = imageType;
 		this.gl = GLUtils.createContext(canvas, {
 			depth: true,
+			preserveDrawingBuffer: false,
 			restored: () => this.compile()
 		});
 
@@ -188,7 +193,6 @@ class Artist3D extends Artist {
 
 		this.stateStack = [new Artist3D.State()];
 		this.currentStateIndex = 0;
-		this.camera = new Camera3D(canvas);
 		this.lightObj = new LightRenderer(this);
 		this.meshObj = new MeshRenderer(this);
 		this.vector3Pool = new StackAllocator(Vector3);
@@ -334,7 +338,7 @@ class Artist3D extends Artist {
 		this.meshObj.mesh = mesh;
 		return this.meshObj;
 	}
-	pass(camera, meshes, setupMaterial) {
+	pass(camera, meshes, shadowPass, setupMaterial) {
 		/** @type {{ gl: WebGL2RenderingContext }} */
 		const { gl } = this;
 		
@@ -344,7 +348,7 @@ class Artist3D extends Artist {
 		for (let i = 0; i < meshes.length; i++) {
 			const mesh = meshes[i];
 
-			if (!camera.screen.cullSphere(mesh.boundingSphere)) {
+			if (!camera.screen.cullSphere(mesh.boundingSphere) && !(shadowPass && !mesh.castShadows)) {
 				transparent.pushArray(mesh.transparent);
 				chunks.pushArray(mesh.opaque);
 			}
@@ -392,7 +396,7 @@ class Artist3D extends Artist {
 			}
 		}
 	}
-	processMesh({ mesh, transforms }, spheres) {
+	processMesh({ mesh, transforms, castShadows }, spheres) {
 		const { gl } = this;
 
 		if (!this.hasCache(mesh)) {
@@ -403,6 +407,7 @@ class Artist3D extends Artist {
 			const instanceBuffer = gl.createBuffer();
 
 			const bounds = this.getBounds(mesh);
+			
 			const { min, max } = bounds;
 			const localBoundingSphere = new Sphere(
 				min.plus(max).over(2),
@@ -474,23 +479,14 @@ class Artist3D extends Artist {
 			}
 		}
 
-		return { boundingSphere, opaque, transparent };
+		return { boundingSphere, opaque, transparent, castShadows };
 	}
-	/**
-	 * Renders all queued elements (meshes, lights, etc.) and clears the queue.
-	 */
-	flush() {
+	renderQueues(camera, lightQueue, meshQueue) {
 		this.vector3Pool.push();
-
-		/**
-		 * @type WebGL2RenderingContext
-		 */
+		
 		const gl = this.gl;
 		const { SHADOW_RESOLUTION } = Artist3D;
-		const screen = this.camera.cacheScreen();
-
-		const lightQueue = this.lightObj.lights;
-		const meshQueue = this.meshObj.meshes;
+		const screen = camera.cacheScreen();
 
 		const shadowLights = [];
 		for (let i = 0; i < lightQueue.length; i++) {
@@ -517,7 +513,7 @@ class Artist3D extends Artist {
 		const cascadeProps = Array.dim(Artist3D.SHADOW_CASCADE).map((_, i) => 3 ** i);
 		const frusta = Geometry3D.subdivideFrustum(screen, cascadeProps);
 		const shadowCascadeDepths = frusta.map(frustum => Math.max(
-			...frustum.vertices.map(vertex => this.camera.direction.dot(vertex))
+			...frustum.vertices.map(vertex => vertex.dot(camera.direction))
 		));
 		for (let i = 0; i < shadowLights.length; i++) {
 			const light = shadowLights[i];
@@ -538,14 +534,16 @@ class Artist3D extends Artist {
 				camera.direction = light.direction;
 
 				const frustum = frusta[j];
-				const frustumBounds = Prism.bound(frustum.vertices.map(vertex => camera.worldToScreen(vertex)));
+				const frustumBounds = Prism.bound(
+					frustum.vertices.map(vertex => camera.worldToScreen(vertex))
+				);
 				const bounds = Prism.fromRanges(
 					frustumBounds.xRange, frustumBounds.yRange,
 					new Range(nearZ, frustumBounds.max.z)
 				);
 				const { xRange, yRange, zRange } = bounds;
 				camera.projection = Matrix4.orthographic(bounds);
-				camera.cacheScreen();
+				if (!camera.cacheScreen()) continue;
 				
 				const cascade = map.cascades[j];
 				cascade.camera = camera;
@@ -556,7 +554,7 @@ class Artist3D extends Artist {
 				gl.bindFramebuffer(gl.FRAMEBUFFER, cascade.framebuffer);
 				gl.clear(gl.DEPTH_BUFFER_BIT);
 
-				this.pass(camera, meshes, chunk => {
+				this.pass(camera, meshes, true, chunk => {
 					const program = this.getShaderProgram({
 						vertexShader: chunk.material.vertexShader,
 						fragmentShader: Artist3D.SHADOW_FRAGMENT
@@ -574,20 +572,18 @@ class Artist3D extends Artist {
 			}
 		}
 
-		const { camera } = this;
-
 		gl.enable(gl.BLEND);
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 		
 		const passedLights = lightQueue.slice(0, Artist3D.MAX_LIGHTS);
 
-		this.pass(camera, meshes, chunk => {
+		this.pass(camera, meshes, false, chunk => {
 			const program = this.getShaderProgram(chunk.material);
 			if (!program.inUse) {
 				program.use();
 				program.setUniforms({
-					camera,
+					camera: camera,
 					lights: passedLights,
 					lightCount: passedLights.length,
 					time: intervals.frameCount,
@@ -601,6 +597,13 @@ class Artist3D extends Artist {
 		});
 
 		this.vector3Pool.pop();
+	}
+	render(camera) {
+		const lightQueue = this.lightObj.lights;
+		const meshQueue = this.meshObj.meshes;
+
+		if (meshQueue.length)
+			this.renderQueues(camera, lightQueue, meshQueue);
 
 		this.meshObj.clear();
 		this.lightObj.clear();
@@ -628,15 +631,17 @@ class Artist3D extends Artist {
 			out vec3 position;
 			out vec3 _normal;
 
+			mat4x3 objectTransform;
+			
 			${glsl}
 
 			void main() {
-				mat4x3 objectTransform = gl_InstanceID == 0 ? mat4x3(transform) : instanceTransform;
+				objectTransform = gl_InstanceID == 0 ? mat4x3(transform) : instanceTransform;
 				position = objectTransform * vec4(vertexPosition, 1);
 				mat3 normalTransform = transpose(inverse(mat3(objectTransform)));
 				_normal = normalTransform * vertexNormal;
 				uv = vertexUV;
-				gl_Position = camera.pcMatrix * vec4(objectTransform * vec4(shader(), 1), 1);
+				gl_Position = camera.pcMatrix * vec4(shader(), 1);
 				gl_Position.y *= -1.0;
 			}
 		`;
@@ -740,11 +745,11 @@ Artist3D.LIGHTS = `
 	uniform ShadowInfo[MAX_SHADOWS * SHADOW_CASCADE] shadowInfo;
 	uniform sampler2DArray[MAX_SHADOWS] shadowTextures;
 
-	vec3 implicitNormal(vec3 position) {
+	vec3 _implicitNormal(vec3 position) {
 		return normalize(cross(dFdx(position), dFdy(position)));
 	}
 
-	int getCascadeRegion(vec3 position) {
+	int _getCascadeRegion(vec3 position) {
 		float depth = dot(position, camera.direction);
 		for (int i = 0; i < shadowCascadeDepths.length(); i++) {
 			if (depth < shadowCascadeDepths[i]) {
@@ -754,28 +759,28 @@ Artist3D.LIGHTS = `
 		return -1;
 	}
 	
-	float random11(float seed) {
+	float _random11(float seed) {
 		float a = mod(seed * 6.12849, 8.7890975);
 		float b = mod(a * 256745.4758903, 232.567890);
 		return mod(abs(a * b), 1.0);
 	}
 
-	vec2 random32(vec3 seed) {
+	vec2 _random32(vec3 seed) {
 		return vec2(
-			random11(seed.x + seed.y * 9823.1235 + seed.z * 283.2391823),
-			random11(873.21 * seed.x + seed.y + seed.z * 973.12357)
+			_random11(seed.x + seed.y * 9823.1235 + seed.z * 283.2391823),
+			_random11(873.21 * seed.x + seed.y + seed.z * 973.12357)
 		);
 	}
 
 	float sampleShadowMap(Light light, vec3 position, vec3 pixelOffset) {	
-		int cascadeRegion = getCascadeRegion(position);
+		int cascadeRegion = _getCascadeRegion(position);
 		if (cascadeRegion == -1) return 0.0;
 
 		ShadowInfo info = shadowInfo[light.shadowIndex * SHADOW_CASCADE + cascadeRegion];
 		ShadowCamera camera = info.camera;
 
 		// normal bias
-		vec3 n = implicitNormal(position);
+		vec3 n = _implicitNormal(position);
 		float ldn = dot(getLightDirection(position, light), n);
 		float normalBias = info.pixelSize * 0.5 * sqrt(1.0 - ldn * ldn);
 		position += n * normalBias;
@@ -821,7 +826,7 @@ Artist3D.LIGHTS = `
 		for (int j = -S; j <= S; j++) {
 			vec2 off = vec2(i, j) / (0.0001 + float(S)) * 0.5;
 			float weight = exp(-2.0 * dot(off, off));
-			off += random32(position + offToLocal * off + mod(time * 0.01, 10.0)) - 0.5;
+			off += _random32(position + offToLocal * off + mod(time * 0.01, 10.0)) - 0.5;
 			sum += sampleShadowMap(light, position, offToLocal * off) * weight;
 			total += weight;
 		}

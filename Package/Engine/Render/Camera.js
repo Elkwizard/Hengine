@@ -70,6 +70,26 @@ class Camera {
 	worldSpaceToScreenSpace(point) {
 		return this.worldToScreen(point);
 	}
+	/**
+	 * Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
+	 * @param () => void render | The function to call while in the world-space context
+	 */
+	drawInWorldSpace(artist) {
+		this.renderer.drawThrough(this, artist, false);
+	}
+	/**
+	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
+	 * @param () => void render | The function to call while in the screen-space context
+	 */
+	drawInScreenSpace(artist) {
+		this.renderer.drawThrough(this.inverse, artist, false);
+	}
+	transformToWorld() {
+		this.renderer.addTransform(this);
+	}
+	transformToScreen() {
+		this.renderer.addTransform(this.inverse);
+	}
 }
 
 /**
@@ -202,34 +222,6 @@ class Camera2D extends Matrix3 {
 			new Vector2(-width / 2, height / 2),
 			new Vector2(-width / 2, -height / 2)
 		].map(v => v.rotate(this.rotation).Ndiv(this.zoom).Vadd(this.position)));
-	}
-	/**
-	 * Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
-	 * @param () => void render | The function to call while in the world-space context
-	 */
-	drawInWorldSpace(artist) {
-		this.renderer.drawThrough(this, artist, false);
-	}
-	/**
-	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
-	 * @param () => void render | The function to call while in the screen-space context
-	 */
-	drawInScreenSpace(artist) {
-		this.renderer.drawThrough(this.inverse, artist, false);
-	}
-	transformToWorld() {
-		const { renderer } = this;
-		renderer.translate(renderer.middle);
-		renderer.rotate(this.rotation);
-		renderer.scale(this.zoom);
-		renderer.translate(this.position.inverse);
-	}
-	transformToScreen() {
-		const { renderer } = this;
-		renderer.translate(this.position);
-		renderer.scale(1 / this.zoom);
-		renderer.rotate(-this.rotation);
-		renderer.translate(renderer.middle.inverse);
 	}
 }
 objectUtils.inherit(Camera2D, Camera);

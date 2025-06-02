@@ -36,7 +36,7 @@ class TEXT_AREA extends ElementScript {
 	 */
 	init(obj, font, paddingEM = 0.5, multiline = true, renderText = (text, font, pos, getLoc, lineIndex) => this.renderer.draw(Color.BLACK).text(font, text, pos)) {
 		obj.engine.scene.mouseEvents = true;
-		this.renderer = obj.engine.renderer;
+		this.renderer = obj.engine.ui;
 		this.keyboard = obj.engine.keyboard;
 		this.clipboard = obj.engine.clipboard;
 		this.canvas = obj.engine.canvas;

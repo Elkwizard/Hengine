@@ -23,6 +23,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 	// BLEND MODE
 	const BLEND_MODE_COMBINE = 0x00;
 	const BLEND_MODE_ADD = 0x01;
+	const BLEND_MODE_BEHIND = 0x02;
 
 	// LINE JOIN
 	const LINE_JOIN_START_BIT = 8;
@@ -1010,6 +1011,9 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 	function setBlendMode(blendMode) {
 		if (!glState.hasContext) return;
 
+		if (glState.blendMode === blendMode) return;
+		if (glState.blendMode !== undefined) render();
+
 		glState.blendMode = blendMode;
 
 		switch (blendMode) {
@@ -1018,6 +1022,9 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 				break;
 			case BLEND_MODE_COMBINE:
 				gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+				break;
+			case BLEND_MODE_BEHIND:
+				gl.blendFunc(gl.ONE_MINUS_DST_ALPHA, gl.ONE);
 				break;
 		}
 	}
@@ -1266,7 +1273,7 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		texturedQuad, texturedEllipse, texturedTriangle, texturedPolygon, updateTextureCache,
 		setTransform, setBlendMode, setGlobalAlpha, setImageSmoothing,
 		clear, render,
-		BLEND_MODE_ADD, BLEND_MODE_COMBINE,
+		BLEND_MODE_ADD, BLEND_MODE_COMBINE, BLEND_MODE_BEHIND,
 		LINE_JOIN_MITER, LINE_JOIN_BEVEL, LINE_JOIN_ROUND,
 		LINE_CAP_FLAT, LINE_CAP_ROUND, LINE_CAP_SQUARE
 	};

@@ -171,12 +171,6 @@ class Artist2D extends Artist {
 		this.rotate(r);
 		this.translate(-x, -y);
 	}
-	beforeFrame() {
-		this.clearTransformations();
-	}
-	afterFrame() {
-
-	}
 }
 
 Artist2D.Dispatcher = class {
@@ -397,8 +391,9 @@ for (let x in TextModeX) for (let y in TextModeY) {
  * Represents the way in which colors being added to a surface should interact with those already there.
  * @static_prop BlendMode ADD | New colors should be component-wise added to the existing colors
  * @static_prop BlendMode COMBINE | New colors should be blended with old colors based on opacity
+ * @static_prop BlendMode BEHIND | New colors are drawn behind old colors, as if new pixels were rendered first and then combined via `BlendMode.COMBINE`
  */
-const BlendMode = Enum.define("ADD", "COMBINE");
+const BlendMode = Enum.define("ADD", "COMBINE", "BEHIND");
 /**
  * Represents the way in which consecutive line segments should connect.
  * @static_prop LineJoin MITER | The edges of the lines will be extended until they meet
@@ -459,11 +454,10 @@ class CanvasArtist2D extends Artist2D {
 		return this._preservePixelart;
 	}
 	set blendMode(a) {
-		this._blendMode = a;
 		this.c.globalCompositeOperation = CanvasArtist2D.blendModeMap.get(a);
 	}
 	get blendMode() {
-		return this._blendMode;
+		return CanvasArtist2D.invBlendModeMap.get(this.c.globalCompositeOperation);
 	}
 	set alpha(a) {
 		this._alpha = a;
@@ -589,8 +583,10 @@ class CanvasArtist2D extends Artist2D {
 
 	static blendModeMap = new Map([
 		[BlendMode.COMBINE, "source-over"],
-		[BlendMode.ADD, "lighter"]
+		[BlendMode.ADD, "lighter"],
+		[BlendMode.BEHIND, "destination-over"]
 	]);
+	static invBlendModeMap = objectUtils.invertMap(CanvasArtist2D.blendModeMap);
 	static textModeXMap = new Map([
 		[TextModeX.LEFT, "left"],
 		[TextModeX.CENTER, "center"],

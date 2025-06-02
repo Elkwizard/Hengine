@@ -217,6 +217,15 @@ class Shape {
 	containsPoint(point) {
 		return this.closestPointTo(point).equals(point);
 	}
+	/**
+	 * @name rayCast
+	 * Traces a ray until it intersects the caller.
+	 * If the ray misses the shape, returns Infinity.
+	 * If it hits, it returns the distance that the ray traveled prior to intersection.
+	 * @param Vector origin | The starting point of the ray
+	 * @param Vector direction | The unit vector in the direction of the ray
+	 * @return Number
+	 */
 }
 
 /**
@@ -331,6 +340,30 @@ class Line extends Shape2D {
 		line.b.set(this.b);
 		return line;
 	}
+	rayCast(ro, rd) {
+		const rayOrigin = ro;
+		const rayVector = rd;
+		const lineOrigin = this.a;
+		const lineVector = this.b.minus(this.a);
+		const a = rayVector.x;
+		const b = lineVector.x;
+		const c = rayVector.y;
+		const d = lineVector.y;
+		const det = a * d - b * c;
+		if (!det) return Infinity;
+		const invDet = 1 / det;
+		const diff = lineOrigin.minus(rayOrigin);
+		const t = invDet * (d * diff.x - b * diff.y);
+		const s = invDet * (c * diff.x - a * diff.y);
+		
+		const EPSILON_T = Vector2.EPSILON;
+		if (t < -EPSILON_T) return Infinity;
+		
+		const EPSILON_S = Vector2.EPSILON / lineVector.mag;
+		if (s < -EPSILON_S || s > 1 + EPSILON_S) return Infinity;
+
+		return t;
+	}
 	/**
 	 * Creates a new line segment with a specified slope and intercept.
 	 * The start point is at the y-intercept, and the end point is at x = 1.
@@ -384,18 +417,20 @@ class Polygon extends Shape2D {
 		return new Polygon(this.vertices.map(v => transf.times(v)), true);
 	}
 	/**
+	 * @group getEdges/getFaces
 	 * Returns the edges of the polygon.
 	 * @return Line[]
 	 */
 	getEdges() {
 		let edges = [];
-		let verts = this.vertices;
-		for (let i = 0; i < verts.length; i++) {
-			let inx1 = i;
-			let inx2 = (i + 1) % verts.length;
-			edges.push(new Line(verts[inx1], verts[inx2]));
-		}
+		const { vertices } = this;
+		for (let i = 0; i < vertices.length; i++)
+			edges.push(new Line(vertices[i], vertices[(i + 1) % vertices.length]));
+
 		return edges;
+	}
+	getFaces() {
+		return this.getEdges();
 	}
 	/**
 	 * Returns a copy of the polygon rotated clockwise (in screen-space) by a specified angle.
@@ -420,7 +455,7 @@ class Polygon extends Shape2D {
 
 		let inside = true;
 
-		const edges = this.getEdges();
+		const edges = this.getFaces();
 		for (let i = 0; i < edges.length; i++) {
 			const edge = edges[i];
 			const { normal } = edge;
@@ -444,7 +479,7 @@ class Polygon extends Shape2D {
 	 * @return Boolean
 	 */
 	containsPoint(point) {
-		const edges = this.getEdges();
+		const edges = this.getFaces();
 		for (let i = 0; i < edges.length; i++) {
 			const { normal, a } = edges[i];
 			if (normal.dot(point) < normal.dot(a)) return false;
@@ -465,6 +500,23 @@ class Polygon extends Shape2D {
 		vertices.delete();
 
 		return polytope;
+	}
+	rayCast(ro, rd, maxDist = Infinity) {
+		const originDot = ro.dot(rd);
+		if (this.vertices.every(vertex => vertex.dot(rd) < originDot))
+			return Infinity;
+		
+		maxDist += originDot;
+		if (this.vertices.every(vertex => vertex.dot(rd) > maxDist))
+			return Infinity;
+
+		let bestDist = Infinity;
+		const faces = this.getFaces();
+		for (let i = 0; i < faces.length; i++) {
+			const t = faces[i].rayCast(ro, rd);
+			if (t < bestDist) bestDist = t;
+		}
+		return bestDist;
 	}
 	/**
 	 * Returns a new regular polygon centered at the origin with a specified amount of sides and radius.
@@ -546,7 +598,7 @@ class Rect extends Polygon {
 		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
 	}
 	get vertices() {
-		return [
+		return this._vertices ??= [
 			new Vector2(this.x, this.y),
 			new Vector2(this.x + this.width, this.y),
 			new Vector2(this.x + this.width, this.y + this.height),
@@ -811,6 +863,15 @@ class Circle extends Shape2D {
 		shape.y = this.y;
 		shape.radius = this.radius;
 		return shape;
+	}
+	rayCast(ro, rd) {
+		const toCenter = this.position.minus(ro);
+		const centerT = toCenter.dot(rd);
+		if (centerT < 0) return Infinity;
+		const radius = toCenter.without(rd).mag;
+		if (radius > this.radius) return Infinity;
+		const t = centerT - Math.sqrt(this.radius ** 2 - radius ** 2);
+		return t < 0 ? Infinity : t;
 	}
 	toPhysicsShape() {
 		const center = this.position.toPhysicsVector();

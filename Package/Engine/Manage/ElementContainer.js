@@ -15,8 +15,8 @@ class ElementContainer extends SceneElement {
 				let outline;
 
 				switch (obj.constructor) {
-					case SceneObject: 
-						fill = Color.BLACK;
+					case WorldObject: 
+						fill = Color.GRAY;
 						outline = Color.CYAN;
 						break;
 					case UIObject:
@@ -24,22 +24,47 @@ class ElementContainer extends SceneElement {
 						outline = Color.BLACK;
 						break;
 					default:
-						fill = Color.BLACK;
+						fill = Color.GRAY;
 						outline = Color.PURPLE;
 				}
 
 				this.outline = outline;
 				this.fill = fill;
+				this.shapeDrawCommands = new Map();
+
+				for (const [name, shape] of obj.shapes)
+					this.addShape(name, shape);
+			}
+			removeShape(obj, name, shape) {
+				this.shapeDrawCommands.delete(shape);
+			}
+			addShape(obj, name, shape) {
+				let command;
+				if (IS_3D && obj instanceof WorldObject) {
+					const polyhedron = shape instanceof Sphere ? Polyhedron.fromSphere(shape, 3) : shape;
+					const material = new SimpleMaterial();
+					const mesh = Mesh.fromPolyhedron(polyhedron, material);
+					command = () => {
+						material.albedo = this.fill;
+						obj.engine.renderer.mesh(mesh).default();
+					};
+				} else {
+					const renderer = obj instanceof UIObject ? obj.engine.ui : obj.engine.renderer;
+					command = () => {
+						renderer.draw(this.fill).infer(shape);
+						renderer.stroke(this.outline, 1).infer(shape);
+					};
+				}
+				this.shapeDrawCommands.set(shape, command);
 			}
 			addScript(obj, script) {
 				if (script === PHYSICS) {
 					this.outline = Color.RED;
-					this.fill = Color.BLACK;
+					this.fill = Color.GRAY;
 				}
 			}
 			draw(obj, name, shape) {
-				obj.engine.renderer.draw(this.fill).infer(shape);
-				obj.engine.renderer.stroke(this.outline, 1).infer(shape);
+				this.shapeDrawCommands.get(shape)();
 			}
 		};
 	}
@@ -76,6 +101,14 @@ class ElementContainer extends SceneElement {
 		while (database.has(check())) num++;
 		return n;
 	}
+	unpackCreationArgs(args, dim = DIM) {
+		if (typeof args[1] === "number") {
+			const values = args.splice(1, dim);
+			args.splice(1, 0, new Vector[dim](...values));
+		}
+		args[0] = this.genName(this.elements, args[0]);
+		return args;
+	}
 	initializeSceneObject(sceneObject) {
 		sceneObject.scripts.add(this.defaultScript);
 	}
@@ -88,9 +121,9 @@ class ElementContainer extends SceneElement {
 	 * @param Number height | The height of the rectangle shape
 	 * @return WorldObject
 	 */
-	addRectElement(name, x, y, width, height, controls = new Controls()) {
-		name = this.genName(this.elements, name);
-		let n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
+	addRectElement(...args) {
+		const [name, pos, width, height] = this.unpackCreationArgs(args);
+		let n = new WorldObject(name, pos, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -104,9 +137,9 @@ class ElementContainer extends SceneElement {
 	 * @param Number radius | The radius of the circle shape
 	 * @return WorldObject
 	 */
-	addCircleElement(name, x, y, radius, controls = new Controls()) {
-		name = this.genName(this.elements, name);
-		let n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
+	addCircleElement(...args) {
+		const [name, pos, radius] = this.unpackCreationArgs(args);
+		let n = new WorldObject(name, pos, this, this.engine);
 		n.addShape("default", new Circle(Vector2.zero, radius));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -119,9 +152,9 @@ class ElementContainer extends SceneElement {
 	 * @param Number y | The y coordinate of the center of the WorldObject
 	 * @return WorldObject
 	 */
-	addElement(name, x, y, controls = new Controls()) {
-		name = this.genName(this.elements, name);
-		let n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
+	addElement(...args) {
+		const [name, pos] = this.unpackCreationArgs(args);
+		let n = new WorldObject(name, pos, this, this.engine);
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		return n;
@@ -134,9 +167,9 @@ class ElementContainer extends SceneElement {
 	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
 	 * @return WorldObject
 	 */
-	addPhysicsElement(name, x, y, gravity, controls = new Controls()) {
-		name = this.genName(this.elements, name);
-		const n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
+	addPhysicsElement(...args) {
+		const [name, pos, gravity] = this.unpackCreationArgs(args);
+		const n = new WorldObject(name, pos, this, this.engine);
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
 		n.scripts.add(PHYSICS, gravity);
@@ -152,9 +185,9 @@ class ElementContainer extends SceneElement {
 	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
 	 * @return WorldObject
 	 */
-	addPhysicsRectElement(name, x, y, width, height, gravity, controls = new Controls()) {
-		name = this.genName(this.elements, name);
-		const n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
+	addPhysicsRectElement(...args) {
+		const [name, pos, width, height, gravity] = this.unpackCreationArgs(args);
+		const n = new WorldObject(name, pos, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -170,9 +203,9 @@ class ElementContainer extends SceneElement {
 	 * @param Boolean dynamic? | Whether the rigidbody should be physically dynamic. Default is false
 	 * @return WorldObject
 	 */
-	addPhysicsCircleElement(name, x, y, radius, gravity, controls = new Controls()) {
-		name = this.genName(this.elements, name);
-		let n = new WorldObject(name, new Vector2(x, y), controls, this, this.engine);
+	addPhysicsCircleElement(...args) {
+		const [name, pos, radius, gravity] = this.unpackCreationArgs(args);
+		let n = new WorldObject(name, pos, this, this.engine);
 		n.addShape("default", new Circle(Vector2.zero, radius));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -188,9 +221,9 @@ class ElementContainer extends SceneElement {
 	 * @param Number height | The height of the rectangle shape
 	 * @return UIObject
 	 */
-	addUIElement(name, x, y, width, height) {
-		name = this.genName(this.elements, name);
-		let n = new UIObject(name, new Vector2(x, y), this, this.engine);
+	addUIElement(...args) {
+		const [name, pos, width, height] = this.unpackCreationArgs(args, 2);
+		let n = new UIObject(name, pos, this, this.engine);
 		n.addShape("default", new Rect(-width / 2, -height / 2, width, height));
 		this.initializeSceneObject(n);
 		this.elements.set(name, n);
@@ -202,7 +235,6 @@ class ElementContainer extends SceneElement {
 	 * @return ElementContainer
 	 */
 	addContainer(name) {
-		name = this.genName(this.elements, name);
 		let x = new ElementContainer(name, this, this.engine);
 		this.elements.set(name, x);
 		return x;

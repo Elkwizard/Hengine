@@ -855,6 +855,7 @@ class HengineLoader {
 		window.hengine = this.hengine;
 		window.scene = this.hengine.scene;
 		window.renderer = this.hengine.renderer;
+		window.ui = this.hengine.ui;
 		window.keyboard = this.hengine.keyboard;
 		window.mouse = this.hengine.mouse;
 		window.touches = this.hengine.touches;
@@ -1106,7 +1107,8 @@ class HengineLoader {
  * @prop TouchHandler touches | The touchscreen input API for the Hengine
  * @prop ClipboardHandler clipboard | The clipboard I/O API for the Hengine
  * @prop CanvasImage canvas | The canvas on which rendering occurs
- * @prop Artist2D renderer | The renderer that affects the screen
+ * @prop CanvasArtist2D ui | The 2D overlay renderer that affects the screen
+ * @prop CanvasArtist renderer | The 2D or 3D renderer that affects the screen
  * @prop Scene scene | The scene that contains all SceneElements
  * @prop IntervalManager intervals | The timing and scheduling API for the Hengine
  * @prop FileSystem fileSystem | The built-in, localStorage-based file system API
