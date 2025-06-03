@@ -162,6 +162,11 @@ API class RigidBody {
 			}
 		}
 
+		void modifyShapes() {
+			updateLocalBounds();
+			syncMatter();
+		}
+
 	public:
 		API_CONST Transform position;
 		API_CONST Transform velocity;
@@ -235,19 +240,19 @@ API class RigidBody {
 		API void addShape(Shape* shape) {
 			localMatter += shape->getMatter() * density;
 			colliders.emplace_back(shape);
-			updateLocalBounds();
+			modifyShapes();
 		}
-
+		
 		API void removeShape(Shape* shape) {
 			localMatter -= shape->getMatter() * density;
 			erase(colliders, shape);
-			updateLocalBounds();
+			modifyShapes();
 		}
-
+		
 		API void removeAllShapes() {
 			localMatter = { };
 			colliders.clear();
-			updateLocalBounds();
+			modifyShapes();
 		}
 
 		API double getKineticEnergy() const {
