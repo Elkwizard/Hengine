@@ -134,17 +134,20 @@ class ElementScript {
 	/**
 	 * @name click
 	 * This is called when this object is clicked with the mouse.
+	 * This will never be called for 3D objects.
 	 * @param String key | The identifier of the button used to click
 	 * @param Vector2 point | The location of the mouse in world space
 	 */
 	/**
 	 * @name hover
 	 * This is called when this object is initially hovered over by the mouse.
+	 * This will never be called for 3D objects.
 	 * @param Vector2 point | The location of the mouse in world space
 	 */
 	/**
 	 * @name unhover
 	 * This is called when this object stops being hovered over by the mouse.
+	 * This will never be called for 3D objects.
 	 * @param Vector2 point | The location of the mouse in world space
 	 */
 	/**
@@ -180,9 +183,10 @@ class ElementScript {
 	 * @return Boolean
 	 */
 	/**
-	 * @group collideGeneral, collideLeft, collideRight, collideTop, collideBottom
+	 * @group collideGeneral, collideLeft, collideRight, collideTop, collideBottom, collideFront, collideBack
 	 * These are called when a collision occurs with the object in a specified direction (or for any direction, for `.collideGeneral()`).
 	 * If the SceneObject doesn't have the PHYSICS script, then this won't be called.
+	 * The `...Front` and `...Back` variants won't be called in 2D Mode.
 	 * @param CollisionData collision | The collision that occurred
 	 */
 	/**
@@ -228,6 +232,8 @@ class ElementScript {
 		"collideBottom",
 		"collideLeft",
 		"collideRight",
+		"collideFront",
+		"collideBack",
 		"click",
 		"hover",
 		"unhover",

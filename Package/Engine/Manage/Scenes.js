@@ -209,20 +209,26 @@ class Scene {
 	render(camera) {
 		camera.cacheScreen();
 
-		camera.renderer.save();
-		if (!IS_3D) camera.transformToWorld(camera.renderer);
+		camera.transformToWorld(camera.renderer);
 
 		this.renderOrder = [...this.main.sceneObjectArray]
 			.sort((a, b) => a.layer - b.layer)
-			.sort((a, b) => (a.constructor === UIObject) - (b.constructor === UIObject));
+			.sort((a, b) => (a instanceof UIObject) - (b instanceof UIObject));
 		
+		let ui = false;
+
 		for (let i = 0; i < this.renderOrder.length; i++) {
 			const object = this.renderOrder[i];
+			if (!ui && object instanceof UIObject) {
+				ui = true;
+				camera.transformToScreen(camera.renderer);
+			}
 			object.engineDraw(camera);
 			object.lifeSpan++;
 		}
 
-		camera.renderer.restore();
+		if (!ui)
+			camera.transformToScreen(camera.renderer);
 	}
 	script(type, ...args) {
 		const objects = this.main.sceneObjectArray;
@@ -239,12 +245,11 @@ class Scene {
 		const unhover = [];
 		for (let i = 0; i < this.main.sceneObjectArray.length; i++) {
 			const object = this.main.sceneObjectArray[i];
-			if (object instanceof WorldObject && IS_3D) continue;
+			if (!object.mouseEvents || (object instanceof WorldObject && IS_3D)) continue;
 			
 			const point = object instanceof UIObject ? screen : world;
 			const hovered = object.onScreen &&
 							!object.hidden &&
-							object.mouseEvents &&
 							object.collidePoint(point);
 
 			(hovered ? hover : unhover).push({ object, point });

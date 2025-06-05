@@ -118,6 +118,14 @@ class Range {
 	intersect(r) {
 		return this.max >= r.min && r.max >= this.min;
 	}
+	/**
+	 * Increases the size of the range by evenly moving both bounds away from the center.
+	 * @param Number padding | The amount to change each bound by. For example, a padding value of 10 will increase the length of the range by 20
+	 */
+	expand(padding) {
+		this.min -= padding;
+		this.max += padding;
+	}
 	get(result = new Range()) {
 		result._min = this.min;
 		result._max = this.max;

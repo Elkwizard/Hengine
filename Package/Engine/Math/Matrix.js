@@ -773,7 +773,7 @@ class Matrix4 extends Matrix {
 	/**
 	 * Creates a perspective projection matrix for use in 3D rendering.
 	 * @param Number aspectRatio | The aspect ratio of the surface on which the rendering will occur (`height / width`)
-	 * @param Number fov | The angular size of the field of view in radians
+	 * @param Number fov | The angular size of the vertical field of view in radians
 	 * @param Number zNear | The near clipping plane
 	 * @param Number zFar | The far clipping plane
 	 * @param Matrix4 result? | The destination to store the resulting matrix in. If not specified, a new matrix will be created

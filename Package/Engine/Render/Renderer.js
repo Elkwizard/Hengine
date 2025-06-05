@@ -5,8 +5,13 @@
 /**
  * Represents a renderer for a graphical surface.
  * @abstract
+ * 
+ * @prop Boolean inWorldSpace | Whether the renderer is currently in world-space coordinates
  */
 class Artist {
+	constructor() {
+		this.inWorldSpace = false;
+	}
 	/**
 	 * @name clear
 	 * Clears the rendering surface to transparent black.
@@ -57,6 +62,12 @@ class Artist {
 	 * @name restore
 	 * Puts the renderer into the state on top of the state stack, then removes it from the stack.
 	 */
+	enterWorldSpace() {
+		this.inWorldSpace = true;
+	}
+	exitWorldSpace() {
+		this.inWorldSpace = false;
+	}
 }
 
 Artist.Renderer = class {
@@ -170,6 +181,15 @@ class Artist2D extends Artist {
 		this.translate(x, y);
 		this.rotate(r);
 		this.translate(-x, -y);
+	}
+	enterWorldSpace(camera) {
+		super.enterWorldSpace();
+		this.save();
+		this.addTransform(camera);
+	}
+	exitWorldSpace(camera) {
+		super.exitWorldSpace();
+		this.restore();
 	}
 }
 

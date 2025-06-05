@@ -75,20 +75,24 @@ class Camera {
 	 * @param () => void render | The function to call while in the world-space context
 	 */
 	drawInWorldSpace(artist) {
-		this.renderer.drawThrough(this, artist, false);
+		this.transformToWorld();
+		artist();
+		this.transformToScreen();
 	}
 	/**
 	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
 	 * @param () => void render | The function to call while in the screen-space context
 	 */
 	drawInScreenSpace(artist) {
-		this.renderer.drawThrough(this.inverse, artist, false);
+		this.transformToScreen();
+		artist();
+		this.transformToWorld();
 	}
 	transformToWorld() {
-		this.renderer.addTransform(this);
+		this.renderer.enterWorldSpace(this);
 	}
 	transformToScreen() {
-		this.renderer.addTransform(this.inverse);
+		this.renderer.exitWorldSpace(this);
 	}
 }
 

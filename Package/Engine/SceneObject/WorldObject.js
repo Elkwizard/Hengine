@@ -23,7 +23,7 @@ class WorldObject extends SceneObject {
 			!this.hidden &&
 			this.scripts.check(true, "drawRule", camera) &&
 			this.determineOnScreen(camera.screen)
-		) this.runDraw(this.engine.renderer);
+		) this.runDraw();
 		this.scripts.run("escapeDraw");
 	}
 }

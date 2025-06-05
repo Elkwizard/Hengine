@@ -182,7 +182,7 @@ class Artist3D extends Artist {
 		this.imageType = imageType;
 		this.gl = GLUtils.createContext(canvas, {
 			depth: true,
-			preserveDrawingBuffer: false,
+			preserveDrawingBuffer: true,
 			restored: () => this.compile()
 		});
 
@@ -200,6 +200,23 @@ class Artist3D extends Artist {
 		this.compile();
 		
 		this.resize(canvas.width, canvas.height);
+
+		return new Proxy(this, {
+			get: (target, key, receiver) => {
+				if (Artist3D.KEPT_PROPERTIES.has(key)) {
+					// console.log(key, target.constructor.name);
+					const result = Reflect.get(target, key, receiver);
+					if (typeof result === "function")
+						return result.bind(target);
+					return result;
+				}
+				// console.log(key, target.target.constructor.name);
+				return Reflect.get(target.target, key, receiver);
+			},
+			set: (target, key, value, receiver) => {
+				return Reflect.set(target.target, key, value, receiver);
+			}
+		});
 	}
 	get state() {
 		return this.stateStack[this.currentStateIndex];
@@ -221,6 +238,36 @@ class Artist3D extends Artist {
 		this.renderCache = new Map();
 
 		this.instanceData = new GrowableTypedArray(Float32Array);
+
+		{ // setup 2D VAO
+			
+			this.overlayShader = this.create2DProgram(Artist3D.OVERLAY_FRAGMENT);
+			
+			const quadVertices = new Float32Array([
+				1, -1,
+				1, 1,
+				-1, -1,
+				-1, -1,
+				1, 1,
+				-1, 1
+			]);
+
+			const buffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+			gl.bufferData(gl.ARRAY_BUFFER, quadVertices, gl.STATIC_DRAW);
+
+			this.vertexArray2D = gl.createVertexArray();
+			gl.bindVertexArray(this.vertexArray2D);
+			this.overlayShader.setAttributes(buffer);
+			gl.bindVertexArray(null);
+		}
+	}
+	get target() {
+		return this.inWorldSpace ? this : this.overlayRenderer; 
+	}
+	get overlayRenderer() {
+		this.overlay ??= new Frame(this.imageType.width, this.imageType.height, this.imageType.pixelRatio);
+		return this.overlay.renderer;
 	}
 	hasCache(key) {
 		return this.renderCache.has(key);
@@ -233,8 +280,10 @@ class Artist3D extends Artist {
 		key.addRenderer(this);
 	}
 	resize(width, height) {
-		this.canvas.width = width;
-		this.canvas.height = height;
+		this.canvas.width = this.imageType.pixelWidth;
+		this.canvas.height = this.imageType.pixelHeight;
+		if (this.overlay)
+			this.overlay.resize(this.imageType.width, this.imageType.height);
 	}
 	addTransform(transf) {
 		this.state.transform.mul(transf);
@@ -261,6 +310,14 @@ class Artist3D extends Artist {
 		}
 
 		return fsCache.get(fs);
+	}
+	create2DProgram(fragmentShader) {
+		const { gl } = this;
+		const program = new GLSLProgram(
+			gl, Artist3D.SCREEN_VERTEX,
+			Artist3D.fragmentShader2D(fragmentShader)
+		);
+		return program;
 	}
 	clearTransformations() {
 		Matrix4.identity(this.state.transform);
@@ -354,12 +411,21 @@ class Artist3D extends Artist {
 			}
 		}
 
+		const transparentIndex = chunks.length;
+
 		chunks.pushArray(transparent);
 
 		gl.useProgram(null);
+		gl.disable(gl.BLEND);
+		gl.depthMask(true);
 
 		for (let i = 0; i < chunks.length; i++) {
 			const { chunk, mesh, transforms, uniforms } = chunks[i];
+
+			if (!shadowPass && i === transparentIndex) {
+				gl.enable(gl.BLEND);
+				gl.depthMask(false);
+			}
 
 			intervals.count("setupMaterial()");
 
@@ -421,8 +487,6 @@ class Artist3D extends Artist {
 		}
 
 		const cached = this.getCache(mesh);
-		const { min, max } = cached.bounds;
-		const dim = max.minus(min, this.vector3Pool.alloc());
 
 		if (transforms.length >= Artist3D.INSTANCE_THRESHOLD) {
 			const instanceView = this.instanceData.getView(transforms.length * 12);
@@ -507,7 +571,6 @@ class Artist3D extends Artist {
 		const boundingSpheres = [];
 		const meshes = meshQueue.map(req => this.processMesh(req, boundingSpheres));
 		
-		gl.disable(gl.BLEND);
 		gl.viewport(0, 0, SHADOW_RESOLUTION, SHADOW_RESOLUTION);
 
 		const cascadeProps = Array.dim(Artist3D.SHADOW_CASCADE).map((_, i) => 3 ** i);
@@ -526,6 +589,9 @@ class Artist3D extends Artist {
 				if (z < nearZ) nearZ = z;
 			}
 
+			window.testFrusta ??= [];
+			window.testBounds ??= [];
+
 			for (let j = 0; j < frusta.length; j++) {
 				const camera = new Camera3D({
 					width: SHADOW_RESOLUTION,
@@ -534,16 +600,24 @@ class Artist3D extends Artist {
 				camera.direction = light.direction;
 
 				const frustum = frusta[j];
+				window.testFrusta[j] ??= frustum.get();
 				const frustumBounds = Prism.bound(
 					frustum.vertices.map(vertex => camera.worldToScreen(vertex))
 				);
-				const bounds = Prism.fromRanges(
+				const { xRange, yRange, zRange } = Prism.fromRanges(
 					frustumBounds.xRange, frustumBounds.yRange,
-					new Range(nearZ, frustumBounds.max.z)
+					new Range(nearZ, frustumBounds.max.z + 10)
 				);
-				const { xRange, yRange, zRange } = bounds;
-				camera.projection = Matrix4.orthographic(bounds);
+				const padding = Math.SQRT2 * Math.hypot(xRange.length, yRange.length) / (SHADOW_RESOLUTION - Math.SQRT2);
+				xRange.expand(padding);
+				yRange.expand(padding);
+				zRange.expand(padding);
+
+				camera.projection = Matrix4.orthographic(Prism.fromRanges(
+					xRange, yRange, zRange
+				));
 				if (!camera.cacheScreen()) continue;
+				window.testBounds[j] ??= camera.screen.get();
 				
 				const cascade = map.cascades[j];
 				cascade.camera = camera;
@@ -572,9 +646,8 @@ class Artist3D extends Artist {
 			}
 		}
 
-		gl.enable(gl.BLEND);
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+		this.maximizeViewport();
 		
 		const passedLights = lightQueue.slice(0, Artist3D.MAX_LIGHTS);
 
@@ -598,20 +671,43 @@ class Artist3D extends Artist {
 
 		this.vector3Pool.pop();
 	}
+	maximizeViewport() {
+		this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
+	}
+	compositeOverlay(overlay) {
+		const { gl } = this;
+			
+		this.overlayShader.focus();
+		this.overlayShader.setUniform("overlay", overlay);
+		
+		this.maximizeViewport();
+		gl.enable(gl.BLEND);
+		gl.bindVertexArray(this.vertexArray2D);
+		gl.drawArrays(gl.TRIANGLES, 0, 6);
+	}
 	render(camera) {
 		const lightQueue = this.lightObj.lights;
 		const meshQueue = this.meshObj.meshes;
 
-		if (meshQueue.length)
+		if (meshQueue.length) {
 			this.renderQueues(camera, lightQueue, meshQueue);
+		}
 
 		this.meshObj.clear();
 		this.lightObj.clear();
+
+		if (this.overlay) {
+			this.compositeOverlay(this.overlay);
+			this.overlay.renderer.clearTransformations();
+			this.overlay.renderer.clear();
+		}
 	}
 	fill({ x, y, z, w }) {
 		const { gl } = this;
+		gl.depthMask(true);
 		gl.clearColor(x, y, z, w);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		if (this.overlay) this.overlayRenderer.clear();
 	}
 	clear() {
 		this.fill(Color.BLANK);
@@ -637,11 +733,13 @@ class Artist3D extends Artist {
 
 			void main() {
 				objectTransform = gl_InstanceID == 0 ? mat4x3(transform) : instanceTransform;
-				position = objectTransform * vec4(vertexPosition, 1);
 				mat3 normalTransform = transpose(inverse(mat3(objectTransform)));
 				_normal = normalTransform * vertexNormal;
+
+				vec3 objectPosition = shader();
+				position = objectPosition;
 				uv = vertexUV;
-				gl_Position = camera.pcMatrix * vec4(shader(), 1);
+				gl_Position = camera.pcMatrix * vec4(objectPosition, 1);
 				gl_Position.y *= -1.0;
 			}
 		`;
@@ -659,10 +757,24 @@ class Artist3D extends Artist {
 
 			${glsl}
 
-			out highp vec4 pixelColor;	
+			out vec4 pixelColor;	
 
 			void main() {
 				normal = normalize(_normal);
+				pixelColor = shader();
+				pixelColor.rgb *= pixelColor.a;
+			}
+		`;
+	}
+	static fragmentShader2D(glsl) {
+		return ShaderSource.template`
+			in vec2 uv;
+
+			out vec4 pixelColor;
+
+			${glsl}
+
+			void main() {
 				pixelColor = shader();
 				pixelColor.rgb *= pixelColor.a;
 			}
@@ -675,6 +787,10 @@ class Artist3D extends Artist {
 	static SHADOW_BIAS = 0.5;
 	static SHADOW_CASCADE = 4;
 	static INSTANCE_THRESHOLD = 10;
+	static KEPT_PROPERTIES = new Set([
+		"enterWorldSpace", "exitWorldSpace", "imageType",
+		"render", "clear", "fill"
+	]);
 }
 Artist3D.State = class State {
 	constructor() {
@@ -693,6 +809,7 @@ Artist3D.CAMERA = `
 		vec3 up;
 		mat4 pcMatrix;
 		mat4 projection;
+		mat4 inverse;
 	};
 
 	uniform Camera camera;
@@ -795,14 +912,19 @@ Artist3D.LIGHTS = `
 		);
 
 		// depth bias
-		// frag.z -= 1.0 / info.zRange;
+		frag.z -= 0.01 / info.zRange;
+
+		ivec3 shadowPixel = ivec3(
+			uv * vec2(SHADOW_RESOLUTION),
+			cascadeRegion
+		);
 
 		float depth;
 		switch (light.shadowIndex) {${
 			Array.dim(Artist3D.MAX_SHADOWS)
 				.map((_, i) => `
 					case ${i}: {
-						float sampled = texture(shadowTextures[${i}], vec3(uv, cascadeRegion)).r;
+						float sampled = texelFetch(shadowTextures[${i}], shadowPixel, 0).r;
 						depth = sampled * 2.0 - 1.0;
 					} break;
 				`)
@@ -839,5 +961,23 @@ Artist3D.LIGHTS = `
 Artist3D.SHADOW_FRAGMENT = new GLSL(`
 	vec4 shader() {
 		return vec4(0.0);
+	}
+`);
+Artist3D.SCREEN_VERTEX = new ShaderSource(new GLSL(`
+	layout (location = 0) in vec2 position;
+
+	out vec2 uv;
+
+	void main() {
+		uv = position * 0.5 + 0.5;
+		uv.y = 1.0 - uv.y;
+		gl_Position = vec4(position, 0, 1);
+	}
+`));
+Artist3D.OVERLAY_FRAGMENT = new GLSL(`
+	uniform sampler2D overlay;
+
+	vec4 shader() {
+		return texture(overlay, uv);
 	}
 `);

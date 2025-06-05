@@ -157,7 +157,7 @@ SimpleMaterial.FRAGMENT_SHADER = new GLSL(`
 		vec3 light =	specularColor * specular +
 						albedoColor * (diffuse + ambient) +
 						material.emission;
-		
+
 		return vec4(light, material.alpha);
 	}
 `);

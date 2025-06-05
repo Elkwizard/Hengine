@@ -3,6 +3,7 @@
  */
 
 /**
+ * @type class Transform<Vector, Angle>
  * @implements Copyable
  * Represents an affine transformation with no scaling.
  * It is composed of a rotation about the origin followed by a translation.
@@ -174,6 +175,7 @@ class Transform {
 }
 
 /**
+ * @type class Transform2D extends Transform<Vector2, Number>
  * Represents a 2D affine transformation, composed of a translation and a rotation.
  * @prop Vector2 position | The translation of the transform
  * @prop Number rotation | The angle of rotation
@@ -193,8 +195,8 @@ class Transform2D extends Transform {
 	
 	/**
 	 * Adds a clockwise (in screen-space) rotation in-place about a specific point to the existing transformation. 
-	 * @param VectorN point | The center to rotate about
-	 * @param Angle rotation | The angle (in radians) to rotate by
+	 * @param Vector2 point | The center to rotate about
+	 * @param Number rotation | The angle (in radians) to rotate by
 	 */
 	rotateAround(point, rotation) {
 		const diff = this.position.Vminus(point);
@@ -206,6 +208,7 @@ class Transform2D extends Transform {
 }
 
 /**
+ * @type class Transform3D extends Transform<Vector3, Vector3>
  * Represents a 3D affine transformation, composed of a translation and a rotation about an arbitrary axis.
  * @prop Vector3 position | The translation of the transform
  * @prop Vector3 rotation | The angle of rotation, represented as the unit axis of rotation multiplied by the angle of rotation

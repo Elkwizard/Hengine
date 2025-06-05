@@ -22,7 +22,7 @@ class Controls {
  * @prop Transform lastTransform | The location and orientation of the object last frame
  * @prop Boolean mouseEvents | Whether or not mouse events (hover and click) should be checked for this object. This can be ignored if the scene has disabled mouse events
  * @prop Boolean hidden | Whether or not the object should be rendered
- * @prop Boolean hovered | Whether or not the mouse cursor is hovering over the shapes of this object. This property is readonly, and won't be accurate if mouse events are disabled
+ * @prop Boolean hovered | Whether or not the mouse cursor is hovering over the shapes of this object. This property is readonly, and won't be accurate if mouse events are disabled. This property is always false for 3D objects
  * @prop Boolean onScreen | Whether or not the object passed the most recent render culling check
  * @prop ScriptContainer scripts | All of the ElementScripts on the object
  * @prop Shape/null defaultShape | A reference to the shape with the name `"default"`
@@ -275,11 +275,11 @@ class SceneObject extends SceneElement {
 	show() {
 		this.hidden = false;
 	}
-	runDraw(renderer) {
+	runDraw() {
 		if (this.scripts.implements("draw")) this.transform.drawInLocalSpace(() => {
 			const entries = Array.from(this.shapes.entries());
 			for (const [name, shape] of entries) this.scripts.run("draw", name, shape);
-		}, renderer);
+		}, this.engine.renderer);
 	}
 	hasMoved() {
 		return this.transform.diff(this.lastTransform);

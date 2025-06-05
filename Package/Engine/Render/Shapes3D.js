@@ -74,7 +74,20 @@ class Triangle extends Shape3D {
 		return result;
 	}
 	rayCast(ro, rd) {
-		// TODO: Implement raycasting for triangles
+		const t = this.plane.rayCast(ro, rd);
+		if (!isFinite(t)) return Infinity;
+
+		const point = rd.times(t).add(ro);
+
+		const fromA = point.minus(this.a);		
+		const fromB = point.minus(this.b);
+		const fromC = point.minus(this.c);
+
+		if (fromA.cross(fromB).dot(this.normal) < -Vector3.EPSILON) return Infinity;
+		if (fromB.cross(fromC).dot(this.normal) < -Vector3.EPSILON) return Infinity;
+		if (fromC.cross(fromA).dot(this.normal) < -Vector3.EPSILON) return Infinity;
+
+		return t;
 	}
 	/**
 	 * Returns the plane in which the triangle resides.
@@ -226,7 +239,7 @@ class Polyhedron extends Shape3D {
 	 * @return Polyhedron
 	 */
 	static fromTriangles(triangles) {
-		const vertices = triangles.flat();
+		const vertices = triangles.flatMap(tri => [tri.a, tri.b, tri.c]);
 		return new Polyhedron(vertices, vertices.map((_, i) => i));
 	}
 	static fromSphere(sphere, subdivisions = 2) {
@@ -462,9 +475,9 @@ class Plane extends Shape3D {
 	}
 	rayCast(ro, rd) {
 		const side = ro.dot(this.normal) - this.distance;
-		const dot = this.normal.dot(rd);
-		if (dot * side <= 0) return Infinity;
-		return Math.abs(side) / Math.abs(dot);
+		const dot = -this.normal.dot(rd);
+		const t = side / dot;
+		return t > Vector3.EPSILON ? t : Infinity;
 	}
 }
 

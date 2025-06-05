@@ -691,6 +691,7 @@ class GLSLProgram {
 			this.nextTextureUnit = 0;
 			this.maxTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 
+			this.uniformValues = {};
 			this.dynamicArrays = [];
 			for (const [name, array] of dynamicArrayDescriptors) {
 				const unit = this.nextTextureUnit++;
@@ -787,7 +788,6 @@ class GLSLProgram {
 		const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
 
 		this.uniforms = {};
-		this.uniformValues = {};
 		this.uniformsSet = false;
 		this.allUniforms = [];
 		this.textures = [];
