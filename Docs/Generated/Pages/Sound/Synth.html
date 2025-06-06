@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -40,7 +41,7 @@
 	
 		<div class="function-wrapper" id="Synth.prototype.play()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L121" target="_blank" class="function-name source-link">play</a>(<span class="param">tone</span>)<span class="type">((<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>) =&gt; void)/Promise&lt;void&gt;</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L121" target="_blank" class="function-name source-link">play</a>(<span class="param">tone</span>)<span class="type">((<a href="../Built-Ins/Number.html#class Number">Number</a>) =&gt; void)/Promise</span>
 			</div>
 			<div class="function desc">
 				Plays a tone. If the tone has a specified duration, this returns a promise that resolves when it completes. Otherwise, this returns the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">stop</span><span class="highlight-SYMBOL">()</span></code> method of the SynthChannel playing this tone.
@@ -119,42 +120,42 @@
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Tone.duration?">
 					<div class="prop-header member">
-						<span class="prop-name">duration?</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">duration?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The duration (in milliseconds) of the tone. If not specified, the tone can be stopped at will</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Tone.frequency?">
 					<div class="prop-header member">
-						<span class="prop-name">frequency?</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">frequency?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The frequency of the tone in Hertz. If not specified, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">note</span></code> must be</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Tone.note?">
 					<div class="prop-header member">
-						<span class="prop-name">note?</span><span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+						<span class="prop-name">note?</span><span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 					</div>
 					<div class="prop desc">The letter name of the the note, optionally with a "#" appended for sharp or a "b" for flat. If not specified, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frequency</span></code> must be</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Tone.octave?">
 					<div class="prop-header member">
-						<span class="prop-name">octave?</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">octave?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">Which octave on a piano the note would appear in. Default is 4. This is ignored if <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frequency</span></code> is specified</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Tone.volume?">
 					<div class="prop-header member">
-						<span class="prop-name">volume?</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">volume?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The volume of the tone on [0, 1]. Default is 1</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Tone.wave?">
 					<div class="prop-header member">
-						<span class="prop-name">wave?</span><span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+						<span class="prop-name">wave?</span><span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 					</div>
 					<div class="prop desc">The name of the waveform for the tone. This is one of (<code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;sine&quot;</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;sawtooth&quot;</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;triangle&quot;</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;square&quot;</span></code>). Default is <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;sine&quot;</span></code></div>
 				</div>
@@ -180,7 +181,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="SynthChannel.prototype.stop()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L51" target="_blank" class="function-name source-link">stop</a>(<span class="param">wait?</span>)<span class="type">Promise&lt;void&gt;</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Sound.js?#L51" target="_blank" class="function-name source-link">stop</a>(<span class="param">wait?</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Stops the tone from playing, optionally after a delay.
@@ -194,7 +195,7 @@ Returns a promise that resolves when the tone stops.
 						<div class="param-wrapper" id="SynthChannel.prototype.stop():wait?">
 							<div class="param-name">
 								<span class="param">wait</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The interval (in milliseconds) to wait before stopping the sound. Default is 0

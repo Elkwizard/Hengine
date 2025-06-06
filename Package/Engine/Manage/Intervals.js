@@ -20,7 +20,7 @@
  * ```
  * @prop Function fn | The function to call during the operation
  * @prop Symbol type | When during the update cycle the function updates
- * @prop Promise<void> promise | A promise which resolves when the operation completes
+ * @prop Promise promise | A promise which resolves when the operation completes
  * @prop Boolean done | Indicates whether the operation has completed
  * @prop Number timer | The amount of frames the IntervalFunction has existed for
  * @prop Number interval | The total duration of the operation. The operation will complete after the timer exceeds this value
@@ -274,7 +274,7 @@ class IntervalManager {
 	 * @param (Number) => void fn | The function to execute over the duration. This function will be passed the completion proportion
 	 * @param Number frames | The duration of the transition
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
-	 * @return Promise<void>
+	 * @return Promise
 	 */
 	transition(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new TransitionFunction(fn, frames, type));
@@ -289,7 +289,7 @@ class IntervalManager {
 	 * @param Number duration | The duration of the animation
 	 * @param (Number) => Number curve? | The easing function. Default is `Interpolation.linear`
 	 * @param Symbol type? | When during the update cycle to update the animation. Default is `IntervalFunction.BEFORE_UPDATE`
-	 * @return Promise<void>
+	 * @return Promise
 	 */
 	animate(object, property, value, time, curve = Interpolation.linear, type = IntervalFunction.BEFORE_UPDATE) {
 		const start = object[property].get();
@@ -303,7 +303,7 @@ class IntervalManager {
 	 * @param () => void fn | The function to execute after the delay
 	 * @param Number frames | The length of the delay
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
-	 * @return Promise<void>
+	 * @return Promise
 	 */
 	delay(fn, frames, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new DelayedFunction(fn, frames, type));
@@ -315,7 +315,7 @@ class IntervalManager {
 	 * @param () => void fn | The function to execute when the event occurs
 	 * @param () => Boolean event | The event function. When this function returns true, the function will execute
 	 * @param Symbol type | When during the update cycle to execute the function. Default is `IntervalFunction.BEFORE_UPDATE`
-	 * @return Promise<void>
+	 * @return Promise
 	 */
 	waitUntil(fn, event, type = IntervalFunction.BEFORE_UPDATE) {
 		this.functions.push(new WaitUntilFunction(fn, event, type));

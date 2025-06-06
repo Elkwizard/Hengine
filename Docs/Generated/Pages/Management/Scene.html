@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -12,17 +13,17 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L26" target="_blank" class="class-name source-link">Scene</a>
 				</div>
 				<div class="class desc">
-					Manages the creation, persistence, and deletion of <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a> in the <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a>.
+					Manages the creation, persistence, and deletion of <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a> in the <a href="../Structure/Hengine.html#class Hengine">Hengine</a>.
 It also manages the physics engine.
-This class should not be constructed, and can be accessed via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scene</span></code> property of both the global object and <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a>.
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">gravity</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.1</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// low gravity</span><span class="highlight-KEYWORD">
+This class should not be constructed, and can be accessed via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scene</span></code> property of both the global object and <a href="../Structure/Hengine.html#class Hengine">Hengine</a>.
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">gravity</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.1</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// low gravity</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> floor</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addPhysicsRectElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;floor&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 50</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> BLOCK_SIZE</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 30</span><span class="highlight-SYMBOL">;</span><span class="highlight-KEYWORD">
 for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD">let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">; </span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL"> &lt;</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">; </span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL">++) </span><span class="highlight-COMMENT">// generate 10 slightly disorganized blocks that will fall</span><span class="highlight-SYMBOL">
 	</span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addPhysicsRectElement</span><span class="highlight-SYMBOL">(
 		</span><span class="highlight-STRING">&quot;block&quot;</span><span class="highlight-SYMBOL">,
-		</span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL"> + </span><span class="highlight-CLASS"><a href="../../Pages/Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">-10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">),
+		</span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL"> + </span><span class="highlight-CLASS"><a href="../Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">-10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">),
 		</span><span class="highlight-IDENTIFIER">floor</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getBoundingBox</span><span class="highlight-SYMBOL">().</span><span class="highlight-PROPERTY">y</span><span class="highlight-SYMBOL"> - (</span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL"> +</span><span class="highlight-NUMBER"> 0.5</span><span class="highlight-SYMBOL">) * </span><span class="highlight-CONSTANT">BLOCK_SIZE</span><span class="highlight-SYMBOL">,
 		</span><span class="highlight-CONSTANT">BLOCK_SIZE</span><span class="highlight-SYMBOL">, </span><span class="highlight-CONSTANT">BLOCK_SIZE</span><span class="highlight-SYMBOL">,</span><span class="highlight-LANG_VAR"> true</span><span class="highlight-SYMBOL">
 	);
@@ -35,14 +36,18 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Scene.main">
 					<div class="prop-header member">
-						<span class="prop-name">main</span><span class="type"><a href="../../Pages/Management/ElementContainer.html#class ElementContainer">ElementContainer</a></span>
+						<span class="prop-name">main</span><span class="type"><a href="../Management/ElementContainer.html#class ElementContainer">ElementContainer</a></span>
 					</div>
 					<div class="prop desc">The root of the element tree for the scene</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Scene.camera">
 					<div class="prop-header member">
-						<span class="prop-name">camera</span><span class="type"><a href="../../Pages/Rendering/Camera/Camera2D.html#class Camera2D">Camera2D</a></span>
+						<span class="prop-name">camera</span><span class="type"><span class="alias">
+			<span class="alias two"><a href="../Rendering/Camera/Camera2D.html#class Camera2D">Camera2D</a></span>
+			<span class="alias three"><a href="../Rendering/Camera/Camera3D.html#class Camera3D">Camera3D</a></span>
+			<span class="alias general">CameraN</span>
+		</span></span>
 					</div>
 					<div class="prop desc">The camera used to render the scene</div>
 				</div>
@@ -51,14 +56,14 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 					<div class="prop-header member">
 						<span class="prop-name">mouseEvents</span><span class="type">Boolean</span>
 					</div>
-					<div class="prop desc">Whether or not mouse events will ever be checked. If this is true, specific <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a> can opt out, but not vice-versa</div>
+					<div class="prop desc">Whether or not mouse events will ever be checked. If this is true, specific <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a> can opt out, but not vice-versa</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Scene.cullGraphics">
 					<div class="prop-header member">
 						<span class="prop-name">cullGraphics</span><span class="type">Boolean</span>
 					</div>
-					<div class="prop desc">Whether or not <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a> graphics will ever be culled. If this is true, specific <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a> can still opt out, but not vice-versa</div>
+					<div class="prop desc">Whether or not <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a> graphics will ever be culled. If this is true, specific <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a> can still opt out, but not vice-versa</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Scene.collisionEvents">
@@ -72,12 +77,12 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 					<div class="prop-header member">
 						<span class="prop-name">updating</span><span class="type">Boolean</span>
 					</div>
-					<div class="prop desc">Whether the scene is in the process of updating the <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a></div>
+					<div class="prop desc">Whether the scene is in the process of updating the <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a></div>
 				</div>
 			
 				<div class="prop-wrapper" id="Scene.renderOrder">
 					<div class="prop-header member">
-						<span class="prop-name">renderOrder</span><span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a>[]</span>
+						<span class="prop-name">renderOrder</span><span class="type"><a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>[]</span>
 					</div>
 					<div class="prop desc">A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame. This property is read-only.</div>
 				</div>
@@ -102,7 +107,11 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 						<div class="param-wrapper" id="set Scene.prototype.gravity():gravity">
 							<div class="param-name">
 								<span class="param">gravity</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The new gravitational acceleration
@@ -116,18 +125,26 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 	
 		<div class="function-wrapper" id="get Scene.prototype.gravity()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L54" target="_blank" class="function-name source-link">gravity</a><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L54" target="_blank" class="function-name source-link">gravity</a><span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 			</div>
 			<div class="function desc">
 				Returns the current gravitational acceleration for the physics engine.
-This is initially <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.4</span><span class="highlight-SYMBOL">)</span></code>.
+This is initially <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">y</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0.4</span><span class="highlight-SYMBOL">)</span></code>.
 			</div>
 			
 		</div>
 	
 		<div class="function-wrapper" id="get Scene.prototype.constraints()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L61" target="_blank" class="function-name source-link">constraints</a><span class="type"><a href="../../Pages/Physics/Constraint.html#class Constraint">Constraint</a>[]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L61" target="_blank" class="function-name source-link">constraints</a><span class="type"><a href="../Physics/Constraint.html#class Constraint">Constraint</a>[]</span>
 			</div>
 			<div class="function desc">
 				Returns all the active constraints in the scene.
@@ -137,12 +154,16 @@ This is initially <code class=" highlight-BACKGROUND"><span class="highlight-KEY
 	
 		<div class="function-wrapper" id="Scene.prototype.rayCast()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L94" target="_blank" class="function-name source-link">rayCast</a>(<span class="param">rayOrigin</span>, <span class="param">rayDirection</span>, <span class="param">mask?</span>)<span class="type">{ hitShape: <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a>, hitPoint: <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a> }/null</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L94" target="_blank" class="function-name source-link">rayCast</a>(<span class="param">rayOrigin</span>, <span class="param">rayDirection</span>, <span class="param">mask?</span>)<span class="type">{ hitShape: <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>, hitPoint: <span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span> }/null</span>
 			</div>
 			<div class="function desc">
-				Performs a ray-cast against some or all of the <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a> in the scene.
+				Performs a ray-cast against some or all of the <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> in the scene.
 If the ray-cast fails, then null is returned.
-Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">hitShape</span></code> property specifying which <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a> was hit, and a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">hitPoint</span></code> property containing the point of intersection between the ray and the <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a>.
+Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">hitShape</span></code> property specifying which <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a> was hit, and a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">hitPoint</span></code> property containing the point of intersection between the ray and the <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>.
 			</div>
 			
 				<div class="function-signature">
@@ -152,7 +173,11 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.rayCast():rayOrigin">
 							<div class="param-name">
 								<span class="param">rayOrigin</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The origin point of the ray
@@ -162,20 +187,24 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.rayCast():rayDirection">
 							<div class="param-name">
 								<span class="param">rayDirection</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
-								The direction of the ray
+								The unit vector direction of the ray
 							</div>
 						</div>
 					
 						<div class="param-wrapper" id="Scene.prototype.rayCast():mask?">
 							<div class="param-name">
 								<span class="param">mask</span>
-								<span class="type">(<a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a>) =&gt; Boolean</span>
+								<span class="type">(<a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>) =&gt; Boolean</span>
 							</div>
 							<div class="param desc">
-								A filter for which <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a> should be considered in the ray-cast. Default is <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">object</span><span class="highlight-SYMBOL">)</span><span class="highlight-KEYWORD"> =&gt;</span><span class="highlight-LANG_VAR"> true</span></code>
+								A filter for which <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> should be considered in the ray-cast. Default is <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">object</span><span class="highlight-SYMBOL">)</span><span class="highlight-KEYWORD"> =&gt;</span><span class="highlight-LANG_VAR"> true</span></code>
 							</div>
 						</div>
 					
@@ -186,10 +215,10 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 	
 		<div class="function-wrapper" id="Scene.prototype.collidePoint()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L125" target="_blank" class="function-name source-link">collidePoint</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a>[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L121" target="_blank" class="function-name source-link">collidePoint</a>(<span class="param">point</span>)<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>[]</span>
 			</div>
 			<div class="function desc">
-				Returns a list of all the <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObjects</a> that contain a specific point.
+				Returns a list of all the <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> that contain a specific world-space point.
 			</div>
 			
 				<div class="function-signature">
@@ -199,7 +228,11 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.collidePoint():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The world-space point to check
@@ -213,7 +246,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 	
 		<div class="function-wrapper" id="Scene.prototype.constrainLength()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L150" target="_blank" class="function-name source-link">constrainLength</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">aOffset?</span>, <span class="param">bOffset?</span>, <span class="param">length?</span>)<span class="type"><a href="../../Pages/Physics/Constraint.html#class Constraint2">Constraint2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L141" target="_blank" class="function-name source-link">constrainLength</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">aOffset?</span>, <span class="param">bOffset?</span>, <span class="param">length?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint2">Constraint2</a></span>
 			</div>
 			<div class="function desc">
 				Creates a physical constraint that forces the distance between two points on two objects to remain constant.
@@ -226,27 +259,31 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLength():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
 							</div>
 							<div class="param desc">
-								The first object to constrain. Must have the <a href="../../Pages/Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+								The first object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
 							</div>
 						</div>
 					
 						<div class="param-wrapper" id="Scene.prototype.constrainLength():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
 							</div>
 							<div class="param desc">
-								The second object to constrain. Must have the <a href="../../Pages/Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+								The second object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
 							</div>
 						</div>
 					
 						<div class="param-wrapper" id="Scene.prototype.constrainLength():aOffset?">
 							<div class="param-name">
 								<span class="param">aOffset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The local a-space point where the constraint will attach to the first object. Default is no offset
@@ -256,7 +293,11 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLength():bOffset?">
 							<div class="param-name">
 								<span class="param">bOffset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The local b-space point where the constraint will attach to the second object. Default is no offset
@@ -266,7 +307,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLength():length?">
 							<div class="param-name">
 								<span class="param">length</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The distance to enforce between the two points. Default is the current distance between the constrained points
@@ -280,7 +321,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 	
 		<div class="function-wrapper" id="Scene.prototype.constrainLengthToPoint()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L175" target="_blank" class="function-name source-link">constrainLengthToPoint</a>(<span class="param">object</span>, <span class="param">offset?</span>, <span class="param">point?</span>, <span class="param">length?</span>)<span class="type"><a href="../../Pages/Physics/Constraint.html#class Constraint1">Constraint1</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L166" target="_blank" class="function-name source-link">constrainLengthToPoint</a>(<span class="param">object</span>, <span class="param">offset?</span>, <span class="param">point?</span>, <span class="param">length?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint1">Constraint1</a></span>
 			</div>
 			<div class="function desc">
 				Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
@@ -293,17 +334,21 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():object">
 							<div class="param-name">
 								<span class="param">object</span>
-								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
 							</div>
 							<div class="param desc">
-								The object to constrain. Must have the <a href="../../Pages/Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+								The object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
 							</div>
 						</div>
 					
 						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():offset?">
 							<div class="param-name">
 								<span class="param">offset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The local object-space point where the constraint will attach to the object. Default is no offset
@@ -313,7 +358,11 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():point?">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The location to constrain the length to. Default is the current location of the constrained point
@@ -323,7 +372,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():length?">
 							<div class="param-name">
 								<span class="param">length</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The distance to enforce between the two points. Default is the current distance between the constrained points
@@ -337,7 +386,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 	
 		<div class="function-wrapper" id="Scene.prototype.constrainPosition()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L188" target="_blank" class="function-name source-link">constrainPosition</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">aOffset?</span>, <span class="param">bOffset?</span>)<span class="type"><a href="../../Pages/Physics/Constraint.html#class Constraint2">Constraint2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L179" target="_blank" class="function-name source-link">constrainPosition</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">aOffset?</span>, <span class="param">bOffset?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint2">Constraint2</a></span>
 			</div>
 			<div class="function desc">
 				Creates a physical constraint that forces two points on two objects to be in the same location.
@@ -350,27 +399,31 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainPosition():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
 							</div>
 							<div class="param desc">
-								The first object to constrain. Must have the <a href="../../Pages/Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+								The first object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
 							</div>
 						</div>
 					
 						<div class="param-wrapper" id="Scene.prototype.constrainPosition():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
 							</div>
 							<div class="param desc">
-								The second object to constrain. Must have the <a href="../../Pages/Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+								The second object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
 							</div>
 						</div>
 					
 						<div class="param-wrapper" id="Scene.prototype.constrainPosition():aOffset?">
 							<div class="param-name">
 								<span class="param">aOffset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The local a-space point where the constraint will attach to the first object. Default is no offset
@@ -380,7 +433,11 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainPosition():bOffset?">
 							<div class="param-name">
 								<span class="param">bOffset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The local b-space point where the constraint will attach to the second object. Default is no offset
@@ -394,7 +451,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 	
 		<div class="function-wrapper" id="Scene.prototype.constrainPositionToPoint()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L207" target="_blank" class="function-name source-link">constrainPositionToPoint</a>(<span class="param">object</span>, <span class="param">offset?</span>, <span class="param">point?</span>)<span class="type"><a href="../../Pages/Physics/Constraint.html#class Constraint1">Constraint1</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L198" target="_blank" class="function-name source-link">constrainPositionToPoint</a>(<span class="param">object</span>, <span class="param">offset?</span>, <span class="param">point?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint1">Constraint1</a></span>
 			</div>
 			<div class="function desc">
 				Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
@@ -407,17 +464,21 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainPositionToPoint():object">
 							<div class="param-name">
 								<span class="param">object</span>
-								<span class="type"><a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a></span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
 							</div>
 							<div class="param desc">
-								The object to constrain. Must have the <a href="../../Pages/Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+								The object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
 							</div>
 						</div>
 					
 						<div class="param-wrapper" id="Scene.prototype.constrainPositionToPoint():offset?">
 							<div class="param-name">
 								<span class="param">offset</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The local object-space point where the constraint will attach to the object. Default is no offset
@@ -427,38 +488,14 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 						<div class="param-wrapper" id="Scene.prototype.constrainPositionToPoint():point?">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
 							</div>
 							<div class="param desc">
 								The location to constrain the length to. Default is the current location of the constrained point
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Scene.prototype.render()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L223" target="_blank" class="function-name source-link">render</a>(<span class="param">camera</span>)<span class="type">void</span>
-			</div>
-			<div class="function desc">
-				Renders the contents of the scene to a given camera.
-The result will appear on the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">renderer</span></code> property of the argument.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Scene.prototype.render():camera">
-							<div class="param-name">
-								<span class="param">camera</span>
-								<span class="type"><a href="../../Pages/Rendering/Camera/Camera.html#class Camera">Camera</a></span>
-							</div>
-							<div class="param desc">
-								The camera to render
 							</div>
 						</div>
 					

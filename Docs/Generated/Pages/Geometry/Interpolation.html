@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -14,8 +15,8 @@
 				<div class="class desc">
 					Provides a collection of interpolation algorithms that operate on math objects.
 All methods of this class are static and do not mutate their arguments.
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-CLASS">Interpolation</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">lerp</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;blue&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 0.5</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// dark purple</span><span class="highlight-SYMBOL">
-</span><span class="highlight-CLASS">Interpolation</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">lerp</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">),</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 0.3</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// (3, 0)</span><span class="highlight-SYMBOL">
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-CLASS">Interpolation</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">lerp</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;blue&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 0.5</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// dark purple</span><span class="highlight-SYMBOL">
+</span><span class="highlight-CLASS">Interpolation</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">lerp</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">),</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 0.3</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// (3, 0)</span><span class="highlight-SYMBOL">
 </span><span class="highlight-CLASS">Interpolation</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">lerp</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.8</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// 8</span><span class="highlight-SYMBOL">
 </span></code>
 				</div>
@@ -28,7 +29,7 @@ All methods of this class are static and do not mutate their arguments.
 					<div class="class-methods">
 		<div class="function-wrapper" id="Interpolation.lerp()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L18" target="_blank" class="function-name source-link">Interpolation.lerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">t</span>)<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L18" target="_blank" class="function-name source-link">Interpolation.lerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">t</span>)<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 			</div>
 			<div class="function desc">
 				Linearly interpolates between two values.
@@ -41,7 +42,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.lerp():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The initial value
@@ -51,7 +52,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.lerp():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The final value
@@ -61,7 +62,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.lerp():t">
 							<div class="param-name">
 								<span class="param">t</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The progress proportion from the initial value to the final value, on the interval [0, 1]
@@ -75,7 +76,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.smoothLerp()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L28" target="_blank" class="function-name source-link">Interpolation.smoothLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">t</span>)<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L28" target="_blank" class="function-name source-link">Interpolation.smoothLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">t</span>)<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 			</div>
 			<div class="function desc">
 				Smoothly interpolates between two values. (Uses the Interpolation.smooth easing function)
@@ -88,7 +89,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothLerp():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The initial value
@@ -98,7 +99,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothLerp():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The final value
@@ -108,7 +109,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothLerp():t">
 							<div class="param-name">
 								<span class="param">t</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The progress proportion from the initial value to the final value, on the interval [0, 1]
@@ -122,7 +123,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.quadLerp()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L41" target="_blank" class="function-name source-link">Interpolation.quadLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">c</span>, <span class="param">d</span>, <span class="param">tx</span>, <span class="param">ty</span>)<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L41" target="_blank" class="function-name source-link">Interpolation.quadLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">c</span>, <span class="param">d</span>, <span class="param">tx</span>, <span class="param">ty</span>)<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 			</div>
 			<div class="function desc">
 				Linearly interpolates between four values in a square formation.
@@ -135,7 +136,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.quadLerp():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the upper-left corner
@@ -145,7 +146,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.quadLerp():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the upper-right corner
@@ -155,7 +156,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.quadLerp():c">
 							<div class="param-name">
 								<span class="param">c</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the lower-left corner
@@ -165,7 +166,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.quadLerp():d">
 							<div class="param-name">
 								<span class="param">d</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the lower-right corner
@@ -175,7 +176,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.quadLerp():tx">
 							<div class="param-name">
 								<span class="param">tx</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The horizontal progress proportion
@@ -185,7 +186,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.quadLerp():ty">
 							<div class="param-name">
 								<span class="param">ty</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The vertical progress proportion
@@ -199,7 +200,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.smoothQuadLerp()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L56" target="_blank" class="function-name source-link">Interpolation.smoothQuadLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">c</span>, <span class="param">d</span>, <span class="param">tx</span>, <span class="param">ty</span>)<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L56" target="_blank" class="function-name source-link">Interpolation.smoothQuadLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">c</span>, <span class="param">d</span>, <span class="param">tx</span>, <span class="param">ty</span>)<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 			</div>
 			<div class="function desc">
 				Smoothly interpolates between four values in a square formation. (Uses the Interpolation.smooth easing function)
@@ -212,7 +213,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothQuadLerp():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the upper-left corner
@@ -222,7 +223,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothQuadLerp():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the upper-right corner
@@ -232,7 +233,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothQuadLerp():c">
 							<div class="param-name">
 								<span class="param">c</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the lower-left corner
@@ -242,7 +243,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothQuadLerp():d">
 							<div class="param-name">
 								<span class="param">d</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the lower-right corner
@@ -252,7 +253,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothQuadLerp():tx">
 							<div class="param-name">
 								<span class="param">tx</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The horizontal progress proportion
@@ -262,7 +263,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothQuadLerp():ty">
 							<div class="param-name">
 								<span class="param">ty</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The vertical progress proportion
@@ -276,7 +277,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.cubeLerp()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L74" target="_blank" class="function-name source-link">Interpolation.cubeLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">c</span>, <span class="param">d</span>, <span class="param">a2</span>, <span class="param">b2</span>, <span class="param">c2</span>, <span class="param">d2</span>, <span class="param">tx</span>, <span class="param">ty</span>, <span class="param">tz</span>)<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L74" target="_blank" class="function-name source-link">Interpolation.cubeLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">c</span>, <span class="param">d</span>, <span class="param">a2</span>, <span class="param">b2</span>, <span class="param">c2</span>, <span class="param">d2</span>, <span class="param">tx</span>, <span class="param">ty</span>, <span class="param">tz</span>)<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 			</div>
 			<div class="function desc">
 				Linearly interpolates between eight values in a cube formation.
@@ -289,7 +290,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the front-upper-left corner
@@ -299,7 +300,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the front-upper-right corner
@@ -309,7 +310,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():c">
 							<div class="param-name">
 								<span class="param">c</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the front-lower-left corner
@@ -319,7 +320,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():d">
 							<div class="param-name">
 								<span class="param">d</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the front-lower-right corner
@@ -329,7 +330,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():a2">
 							<div class="param-name">
 								<span class="param">a2</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the back-upper-left corner
@@ -339,7 +340,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():b2">
 							<div class="param-name">
 								<span class="param">b2</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the back-upper-right corner
@@ -349,7 +350,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():c2">
 							<div class="param-name">
 								<span class="param">c2</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the back-lower-left corner
@@ -359,7 +360,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():d2">
 							<div class="param-name">
 								<span class="param">d2</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the back-lower-right corner
@@ -369,7 +370,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():tx">
 							<div class="param-name">
 								<span class="param">tx</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The horizontal progress proportion
@@ -379,7 +380,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():ty">
 							<div class="param-name">
 								<span class="param">ty</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The vertical progress proportion
@@ -389,7 +390,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.cubeLerp():tz">
 							<div class="param-name">
 								<span class="param">tz</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The depth progress proportion
@@ -403,7 +404,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.smoothCubeLerp()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L94" target="_blank" class="function-name source-link">Interpolation.smoothCubeLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">c</span>, <span class="param">d</span>, <span class="param">a2</span>, <span class="param">b2</span>, <span class="param">c2</span>, <span class="param">d2</span>, <span class="param">tx</span>, <span class="param">ty</span>, <span class="param">tz</span>)<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L94" target="_blank" class="function-name source-link">Interpolation.smoothCubeLerp</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">c</span>, <span class="param">d</span>, <span class="param">a2</span>, <span class="param">b2</span>, <span class="param">c2</span>, <span class="param">d2</span>, <span class="param">tx</span>, <span class="param">ty</span>, <span class="param">tz</span>)<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 			</div>
 			<div class="function desc">
 				Smoothly interpolates between eight values in a cube formation. (Uses the Interpolation.smooth easing function)
@@ -416,7 +417,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the front-upper-left corner
@@ -426,7 +427,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the front-upper-right corner
@@ -436,7 +437,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():c">
 							<div class="param-name">
 								<span class="param">c</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the front-lower-left corner
@@ -446,7 +447,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():d">
 							<div class="param-name">
 								<span class="param">d</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the front-lower-right corner
@@ -456,7 +457,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():a2">
 							<div class="param-name">
 								<span class="param">a2</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the back-upper-left corner
@@ -466,7 +467,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():b2">
 							<div class="param-name">
 								<span class="param">b2</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the back-upper-right corner
@@ -476,7 +477,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():c2">
 							<div class="param-name">
 								<span class="param">c2</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the back-lower-left corner
@@ -486,7 +487,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():d2">
 							<div class="param-name">
 								<span class="param">d2</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The value in the back-lower-right corner
@@ -496,7 +497,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():tx">
 							<div class="param-name">
 								<span class="param">tx</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The horizontal progress proportion
@@ -506,7 +507,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():ty">
 							<div class="param-name">
 								<span class="param">ty</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The vertical progress proportion
@@ -516,7 +517,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothCubeLerp():tz">
 							<div class="param-name">
 								<span class="param">tz</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The depth progress proportion
@@ -530,7 +531,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.smoothMin()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L104" target="_blank" class="function-name source-link">Interpolation.smoothMin</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">k?</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L104" target="_blank" class="function-name source-link">Interpolation.smoothMin</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">k?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Computes the smooth minimum between two numbers.
@@ -543,7 +544,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothMin():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The first argument to the minimum
@@ -553,7 +554,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothMin():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The second argument to the minimum
@@ -563,7 +564,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothMin():k?">
 							<div class="param-name">
 								<span class="param">k</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The smoothing parameter. Default is 1
@@ -577,7 +578,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.smoothMax()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L117" target="_blank" class="function-name source-link">Interpolation.smoothMax</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">k?</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L117" target="_blank" class="function-name source-link">Interpolation.smoothMax</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">k?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Computes the smooth maximum between two numbers.
@@ -590,7 +591,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothMax():a">
 							<div class="param-name">
 								<span class="param">a</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The first argument to the maximum
@@ -600,7 +601,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothMax():b">
 							<div class="param-name">
 								<span class="param">b</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The second argument to the maximum
@@ -610,7 +611,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smoothMax():k?">
 							<div class="param-name">
 								<span class="param">k</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The smoothing parameter. Default is 1
@@ -624,7 +625,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.linear()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L125" target="_blank" class="function-name source-link">Interpolation.linear</a>(<span class="param">t</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L125" target="_blank" class="function-name source-link">Interpolation.linear</a>(<span class="param">t</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				A linear easing function. Can be used to adjust animation timing.
@@ -637,7 +638,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.linear():t">
 							<div class="param-name">
 								<span class="param">t</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The input parameter value, on [0, 1]
@@ -651,7 +652,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.smooth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L133" target="_blank" class="function-name source-link">Interpolation.smooth</a>(<span class="param">t</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L133" target="_blank" class="function-name source-link">Interpolation.smooth</a>(<span class="param">t</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				A smoothed easing function. Can be used to adjust animation timing.
@@ -664,7 +665,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.smooth():t">
 							<div class="param-name">
 								<span class="param">t</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The input parameter value, on [0, 1]
@@ -678,7 +679,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.increasing()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L141" target="_blank" class="function-name source-link">Interpolation.increasing</a>(<span class="param">t</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L141" target="_blank" class="function-name source-link">Interpolation.increasing</a>(<span class="param">t</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				A increasing-speed easing function. Can be used to adjust animation timing.
@@ -691,7 +692,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.increasing():t">
 							<div class="param-name">
 								<span class="param">t</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The input parameter value, on [0, 1]
@@ -705,7 +706,7 @@ All methods of this class are static and do not mutate their arguments.
 	
 		<div class="function-wrapper" id="Interpolation.decreasing()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L149" target="_blank" class="function-name source-link">Interpolation.decreasing</a>(<span class="param">t</span>)<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L149" target="_blank" class="function-name source-link">Interpolation.decreasing</a>(<span class="param">t</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				A decreasing-speed easing function. Can be used to adjust animation timing.
@@ -718,7 +719,7 @@ All methods of this class are static and do not mutate their arguments.
 						<div class="param-wrapper" id="Interpolation.decreasing():t">
 							<div class="param-name">
 								<span class="param">t</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The input parameter value, on [0, 1]

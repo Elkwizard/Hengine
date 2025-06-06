@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -12,14 +13,14 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L171" target="_blank" class="class-name source-link">Animatable</a>
 				</div>
 				<div class="class desc">
-					Represents a <a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a>-valued variable that smoothly moves between values.
+					Represents a <a href="../Superclasses/MathObject.html#class MathObject">MathObject</a>-valued variable that smoothly moves between values.
 If a transition between states is interrupted by setting a new target, the new transition will begin immediately and will begin from the current position.
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> point</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> Animatable</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">middle</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">, </span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Interpolation.html#class Interpolation">Interpolation</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">smooth</span><span class="highlight-SYMBOL">);
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> point</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> Animatable</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">middle</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">, </span><span class="highlight-CLASS"><a href="../Geometry/Interpolation.html#class Interpolation">Interpolation</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">smooth</span><span class="highlight-SYMBOL">);
 
 </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
 </span><span class="highlight-KEYWORD">	if</span><span class="highlight-SYMBOL"> (</span><span class="highlight-IDENTIFIER">mouse</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">justPressed</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Left&quot;</span><span class="highlight-SYMBOL">))
 		</span><span class="highlight-IDENTIFIER">point</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">target</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">mouse</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span><span class="highlight-SYMBOL">;
-	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">point</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">value</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
+	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">point</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">value</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
 });
 </span></code>
 				</div>
@@ -30,21 +31,21 @@ If a transition between states is interrupted by setting a new target, the new t
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Animatable.target">
 					<div class="prop-header member">
-						<span class="prop-name">target</span><span class="type"><a href="../../Pages/Superclasses/Operable.html#class Operable">Operable</a></span>
+						<span class="prop-name">target</span><span class="type"><a href="../Superclasses/Operable.html#class Operable">Operable</a></span>
 					</div>
 					<div class="prop desc">The current target value of the animatable</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Animatable.duration">
 					<div class="prop-header member">
-						<span class="prop-name">duration</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">duration</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The length of each transition, in frames</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Animatable.easing">
 					<div class="prop-header member">
-						<span class="prop-name">easing</span><span class="type">(<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>) =&gt; <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">easing</span><span class="type">(<a href="../Built-Ins/Number.html#class Number">Number</a>) =&gt; <a href="../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The easing function for the transitions</div>
 				</div>
@@ -76,7 +77,7 @@ If a transition between states is interrupted by setting a new target, the new t
 						<div class="param-wrapper" id="Animatable.prototype.constructor():initial">
 							<div class="param-name">
 								<span class="param">initial</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The initial value
@@ -86,7 +87,7 @@ If a transition between states is interrupted by setting a new target, the new t
 						<div class="param-wrapper" id="Animatable.prototype.constructor():duration">
 							<div class="param-name">
 								<span class="param">duration</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The length of each transition, in frames
@@ -96,10 +97,10 @@ If a transition between states is interrupted by setting a new target, the new t
 						<div class="param-wrapper" id="Animatable.prototype.constructor():easing?">
 							<div class="param-name">
 								<span class="param">easing</span>
-								<span class="type">(<a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>) =&gt; <a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type">(<a href="../Built-Ins/Number.html#class Number">Number</a>) =&gt; <a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The easing function to use. Default is <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../../Pages/Geometry/Interpolation.html#class Interpolation">Interpolation</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">linear</span></code>
+								The easing function to use. Default is <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Interpolation.html#class Interpolation">Interpolation</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">linear</span></code>
 							</div>
 						</div>
 					
@@ -133,7 +134,7 @@ If a transition between states is interrupted by setting a new target, the new t
 						<div class="param-wrapper" id="set Animatable.prototype.value():value">
 							<div class="param-name">
 								<span class="param">value</span>
-								<span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+								<span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 							</div>
 							<div class="param desc">
 								The new value
@@ -147,7 +148,7 @@ If a transition between states is interrupted by setting a new target, the new t
 	
 		<div class="function-wrapper" id="get Animatable.prototype.value()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L213" target="_blank" class="function-name source-link">value</a><span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L213" target="_blank" class="function-name source-link">value</a><span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 			</div>
 			<div class="function desc">
 				Returns the current value of the animatable and advances one frame in the transition.
@@ -157,7 +158,7 @@ If a transition between states is interrupted by setting a new target, the new t
 	
 		<div class="function-wrapper" id="get Animatable.prototype.current()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L222" target="_blank" class="function-name source-link">current</a><span class="type"><a href="../../Pages/Superclasses/MathObject.html#class MathObject">MathObject</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Interpolation.js?#L222" target="_blank" class="function-name source-link">current</a><span class="type"><a href="../Superclasses/MathObject.html#class MathObject">MathObject</a></span>
 			</div>
 			<div class="function desc">
 				Returns the current value of the animatable and doesn't advance the transition

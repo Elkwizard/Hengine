@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,12 +10,13 @@
 				
 			<div class="class-wrapper" id="class DRAGGABLE">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Draggable.js?#L14" target="_blank" class="class-name source-link">DRAGGABLE</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Scripts/ElementScript.html#class ElementScript">ElementScript</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Draggable.js?#L15" target="_blank" class="class-name source-link">DRAGGABLE</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span>
 				</div>
 				<div class="class desc">
-					Makes a <a href="../../Pages/Superclasses/SceneObject.html#class SceneObject">SceneObject</a> draggable with the mouse.
-If the object has <a href="../../Pages/Physics/PHYSICS.html#class PHYSICS">PHYSICS</a>, then it will become stationary while being dragged.
+					Makes a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a> draggable with the mouse.
+If the object has <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a>, then it will become stationary while being dragged.
 This forces the object to accept mouse events.
+Only <a href="../Management/SceneObject.html#class UIObject">UIObjects</a> can be made draggable in 3D Mode.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// create a draggable object with no bounds</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> object</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addUIElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;box&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-IDENTIFIER">object</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">DRAGGABLE</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&quot;Left&quot;</span><span class="highlight-SYMBOL">);
@@ -27,7 +29,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 					<div class="class-properties">
 				<div class="prop-wrapper" id="DRAGGABLE.key">
 					<div class="prop-header member">
-						<span class="prop-name">key</span><span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+						<span class="prop-name">key</span><span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 					</div>
 					<div class="prop desc">The mouse button that can be used for dragging</div>
 				</div>
@@ -41,7 +43,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 			
 				<div class="prop-wrapper" id="DRAGGABLE.bounds">
 					<div class="prop-header member">
-						<span class="prop-name">bounds</span><span class="type"><a href="../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a>/null</span>
+						<span class="prop-name">bounds</span><span class="type"><a href="../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a>/null</span>
 					</div>
 					<div class="prop desc">The bounds in which the object can be dragged</div>
 				</div>
@@ -53,7 +55,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 					<div class="class-methods">
 		<div class="function-wrapper" id="DRAGGABLE.prototype.init()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Draggable.js?#L20" target="_blank" class="function-name source-link">init</a>(<span class="param">key</span>, <span class="param">bounds?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Draggable.js?#L21" target="_blank" class="function-name source-link">init</a>(<span class="param">key</span>, <span class="param">bounds?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Makes the object draggable with the mouse.
@@ -66,7 +68,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 						<div class="param-wrapper" id="DRAGGABLE.prototype.init():key">
 							<div class="param-name">
 								<span class="param">key</span>
-								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The mouse button that can be used to drag the object
@@ -76,7 +78,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 						<div class="param-wrapper" id="DRAGGABLE.prototype.init():bounds?">
 							<div class="param-name">
 								<span class="param">bounds</span>
-								<span class="type"><a href="../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
+								<span class="type"><a href="../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
 							</div>
 							<div class="param desc">
 								The bounds in which the object can be dragged. Default is null

@@ -144,6 +144,7 @@ class Range {
 
 /**
  * @implements Copyable
+ * @type class Shape<Matrix = any, Vector = any>
  * Represents a solid shape.
  * Within the documentation of this class, `Vector` refers to either `Vector2` or `Vector3` depending on whether the 2D or 3D subclass is used.
  * Similarly, `Matrix` refers to either `Matrix3` or `Matrix4`.
@@ -238,6 +239,7 @@ class Shape {
 
 /**
  * Represents a 2D shape.
+ * @type class Shape2D extends Shape<Matrix3, Vector2>
  * @abstract
  * @prop Number area | The area of the shape at the time of construction
  */

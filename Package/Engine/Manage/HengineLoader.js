@@ -63,7 +63,7 @@ class HengineResource {
 	}
 	/**
 	 * Begins the loading of the resource, and returns a Promise. The Promise resolves to the final resource value when the loading is completed, or null if it fails.
-	 * @return Promise<Any/null>
+	 * @return Promise
 	 */
 	load() {
 
@@ -571,7 +571,7 @@ class HengineMeshResource extends HengineResource {
 					const path = src.replace(/[^\\/]*?$/, args[0]);
 					materials = await new HengineMaterialResource(path).load();
 					if (!materials) return null;
-				}; break;
+				} break;
 				case "o": {
 					obj = {
 						indices: new Map(),
@@ -580,19 +580,19 @@ class HengineMeshResource extends HengineResource {
 						chunks: [newChunk(null)]
 					};
 					objects.set(args[0], obj);
-				}; break;
+				} break;
 				case "usemtl": {
 					obj.chunks.push(newChunk(materials.get(args[0])));
-				}; break;
+				} break;
 				case "v": {
 					vertices.push(+args[0], +args[1], +args[2]);
-				}; break;
+				} break;
 				case "vn": {
 					normals.push(+args[0], +args[1], +args[2]);
-				}; break;
+				} break;
 				case "vt": {
 					uvs.push(+args[0], +args[1]);
-				}; break;
+				} break;
 				case "f": {
 					const { indices, data } = obj;
 					const face = [];
@@ -621,12 +621,12 @@ class HengineMeshResource extends HengineResource {
 					const chunk = obj.chunks.at(-1);
 					for (let i = 2; i < face.length; i++)
 						chunk.faces.push([face[0], face[i - 1], face[i]]);
-				}; break;
+				} break;
 				case "s":
 				case "l": break;
 				default: {
 					throw new TypeError(`No support for ${cmd}`);
-				}; break;
+				} break;
 			}
 		}
 
@@ -929,7 +929,7 @@ class HengineLoader {
 	 * Returns a promise that resolves to the HengineLoader instance when all the resources are loaded.
 	 * @param HengineResource[] userResources | The resources to load
 	 * @param Boolean done? | Whether or not the update loop should start after the resources are loaded. Default is true
-	 * @return Promise<void>
+	 * @return Promise
 	 */
 	static load(userResources = [], done = true) {
 		async function loadResources() {
@@ -1028,7 +1028,7 @@ class HengineLoader {
 			"Manage/Intervals.js",
 
 			"Util/ByteBuffer.js",
-			"Util/FileSystem.js",
+			"Util/Files.js",
 			"Util/Sound.js",
 
 			"Math/Matrix.js",
@@ -1109,7 +1109,7 @@ class HengineLoader {
  * @prop CanvasArtist renderer | The 2D (and 3D, in 3D Mode) renderer that affects the screen
  * @prop Scene scene | The scene that contains all SceneElements
  * @prop IntervalManager intervals | The timing and scheduling API for the Hengine
- * @prop FileSystem fileSystem | The built-in, localStorage-based file system API
+ * @prop Files fileSystem | The built-in, localStorage-based file system API
  * @prop Vector2 middle | The coordinates of the center of the screen, in screen space
  * @prop Number width | The width of the screen
  * @prop Number height | The height of the screen

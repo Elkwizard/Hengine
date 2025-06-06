@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Vector">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L8" target="_blank" class="class-name source-link">Vector</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Superclasses/Operable.html#class Operable">Operable</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L12" target="_blank" class="class-name source-link">Vector</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Superclasses/Operable.html#class Operable">Operable</a></span>
 				</div>
 				<div class="class desc">
 					Represents a multidimensional vector.
@@ -17,7 +18,7 @@ This is an abstract superclass and should not be constructed.
 				</div>
 				
 					<div class="header">Subclasses</div>
-					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>, <span class="class-name"><a href="../../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>, <span class="class-name"><a href="../../../Pages/Geometry/Vectors/Vector4.html#class Vector4">Vector4</a></span>, <span class="class-name"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span></div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>, <span class="class-name"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>, <span class="class-name"><a href="../../Geometry/Vectors/Vector4.html#class Vector4">Vector4</a></span>, <span class="class-name"><a href="../../Built-Ins/Number.html#class Number">Number</a></span></div>
 				
 				
 				
@@ -25,14 +26,14 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Vector.mag">
 					<div class="prop-header member">
-						<span class="prop-name">mag</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">mag</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The magnitude of the vector</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Vector.sqrMag">
 					<div class="prop-header member">
-						<span class="prop-name">sqrMag</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">sqrMag</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The squared magnitude of the vector</div>
 				</div>
@@ -51,7 +52,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="Vector.prototype.normalize()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L38" target="_blank" class="function-name source-link">normalize</a>()<span class="type">Vector</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L42" target="_blank" class="function-name source-link">normalize</a>()<span class="type">Vector</span>
 			</div>
 			<div class="function desc">
 				Normalizes the vector in-place and returns the caller.
@@ -61,7 +62,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="Vector.prototype.dot()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L46" target="_blank" class="function-name source-link">dot</a>(<span class="param">other</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L50" target="_blank" class="function-name source-link">dot</a>(<span class="param">other</span>)<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Computes the dot product between the caller and another vector.
@@ -88,7 +89,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="Vector.prototype.reflect()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L63" target="_blank" class="function-name source-link">reflect</a>(<span class="param">normal</span>)<span class="type">Vector</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L67" target="_blank" class="function-name source-link">reflect</a>(<span class="param">normal</span>)<span class="type">Vector</span>
 			</div>
 			<div class="function desc">
 				Computes the reflection of the caller off a provided normal vector.
@@ -116,7 +117,7 @@ Doesn't mutate the caller.
 	
 		<div class="function-wrapper" id="Vector.prototype.projectOnto()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L72" target="_blank" class="function-name source-link">projectOnto</a>(<span class="param">other</span>)<span class="type">Vector</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L76" target="_blank" class="function-name source-link">projectOnto</a>(<span class="param">other</span>)<span class="type">Vector</span>
 			</div>
 			<div class="function desc">
 				Computes the projection of the caller onto another vector.
@@ -142,9 +143,38 @@ Doesn't mutate the caller.
 			
 		</div>
 	
+		<div class="function-wrapper" id="Vector.prototype.without()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L86" target="_blank" class="function-name source-link">without</a>(<span class="param">axis</span>)<span class="type">Vector</span>
+			</div>
+			<div class="function desc">
+				Computes a version of the caller with one coordinate axis replaced with 0.
+This is equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">minus</span><span class="highlight-SYMBOL">(</span><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">projectOnto</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">axis</span><span class="highlight-SYMBOL">))</span></code> for <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">axis</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">mag</span><span class="highlight-SYMBOL"> ===</span><span class="highlight-NUMBER"> 1</span></code>.
+Doesn't mutate the caller.  
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Vector.prototype.without():axis">
+							<div class="param-name">
+								<span class="param">axis</span>
+								<span class="type">Vector</span>
+							</div>
+							<div class="param desc">
+								The unit vector axis to remove from the caller
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="get Vector.size()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L145" target="_blank" class="function-name source-link">Vector.size</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L159" target="_blank" class="function-name source-link">Vector.size</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the size of the vector type.
@@ -154,7 +184,7 @@ Doesn't mutate the caller.
 	
 		<div class="function-wrapper" id="Vector.dist()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L129" target="_blank" class="function-name source-link">Vector.dist</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L143" target="_blank" class="function-name source-link">Vector.dist</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Computes the distance between two vectors. 
@@ -191,7 +221,7 @@ Doesn't mutate the caller.
 	
 		<div class="function-wrapper" id="Vector.sqrDist()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L138" target="_blank" class="function-name source-link">Vector.sqrDist</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L152" target="_blank" class="function-name source-link">Vector.sqrDist</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Computes the squared distance between two vectors. 

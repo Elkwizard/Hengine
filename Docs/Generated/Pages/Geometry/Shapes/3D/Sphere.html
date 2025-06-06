@@ -1,0 +1,112 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class Sphere">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L553" target="_blank" class="class-name source-link">Sphere</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Geometry/Shapes/3D/Shape3D.html#class Shape3D">Shape3D</a></span>
+				</div>
+				<div class="class desc">
+					Represents a 3D sphere, the collection of points within a given distance of a center.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Sphere.position">
+					<div class="prop-header member">
+						<span class="prop-name">position</span><span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+					</div>
+					<div class="prop desc">The center of the sphere</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Sphere.radius">
+					<div class="prop-header member">
+						<span class="prop-name">radius</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The maximum distance from the center of the sphere to its bounds</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Sphere.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L559" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">radius</span>)
+			</div>
+			<div class="function desc">
+				Creates a new sphere.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Sphere.prototype.constructor():position">
+							<div class="param-name">
+								<span class="param">position</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+							</div>
+							<div class="param desc">
+								The center of the sphere
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Sphere.prototype.constructor():radius">
+							<div class="param-name">
+								<span class="param">radius</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The radius of the sphere
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Sphere.composeBoundingSpheres()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L590" target="_blank" class="function-name source-link">Sphere.composeBoundingSpheres</a>(<span class="param">spheres</span>)<span class="type">Sphere</span>
+			</div>
+			<div class="function desc">
+				Returns a sphere which contains all of the given spheres.
+It is not guaranteed to be a newly allocated sphere, nor is it guaranteed to be the smallest possible bounding sphere.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Sphere.composeBoundingSpheres():spheres">
+							<div class="param-name">
+								<span class="param">spheres</span>
+								<span class="type">Sphere[]</span>
+							</div>
+							<div class="param desc">
+								The bounding spheres to compose together. This must include at least one sphere
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

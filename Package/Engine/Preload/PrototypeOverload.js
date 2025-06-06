@@ -464,7 +464,7 @@ Object.defineProperty(window, "title", {
 	 * Returns a promise that resolves when the file downloads.
 	 * @param String name? | The base name of the file to download. The resulting file with be named by this argument, followed by the extension argument. Default is "string"
 	 * @param String extension? | The extension for the downloaded file. Default is "txt"
-	 * @return Promise<void>
+	 * @return Promise
 	 */
 	proto(String.prototype, "download", function (name = "string", ext = "txt") {
 		const a = document.createElement("a");

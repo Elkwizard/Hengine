@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,18 +10,24 @@
 				
 			<div class="class-wrapper" id="class Transform">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L16" target="_blank" class="class-name source-link">Transform</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Geometry/Matrices.html#class Matrix3">Matrix3</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L23" target="_blank" class="class-name source-link">Transform</a> <span class="keyword">implements</span> <span class="class-name"><a href="../Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
 				</div>
 				<div class="class desc">
-					Represents a 2D affine transformation with no scaling.
+					Represents an affine transformation with no scaling.
 It is composed of a rotation about the origin followed by a translation.
+Within the documentation for this class, <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Angle</span></code> refers to either <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Built-Ins/Number.html#class Number">Number</a></span></code> or <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span></code> depending on whether the 2D or 3D subclass is being used.
+Similarly, <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span></code> refers to either <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span></code> or <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Matrices.html#class Matrix">Matrix</a></span></code> refers to either <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Matrices.html#class Matrix3">Matrix3</a></span></code> or <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Matrices.html#class Matrix4">Matrix4</a></span></code> depending on the dimension used.
+This is an abstract superclass and should not be constructed.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> obj</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;my first object&quot;</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// { position: (0, 0), rotation: 0 }</span><span class="highlight-SYMBOL">
 
-</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">rotateAbout</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">), </span><span class="highlight-CLASS">Math</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">PI</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">rotateAbout</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">), </span><span class="highlight-CLASS">Math</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">PI</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// { position: (0, 200), rotation: Math.PI }</span><span class="highlight-SYMBOL">
 </span></code>
 				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name">Transform2D</span>, <span class="class-name">Transform3D</span></div>
 				
 				
 				
@@ -28,23 +35,16 @@ It is composed of a rotation about the origin followed by a translation.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Transform.position">
 					<div class="prop-header member">
-						<span class="prop-name">position</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">position</span><span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 					</div>
 					<div class="prop desc">The translation of the transform</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Transform.rotation">
 					<div class="prop-header member">
-						<span class="prop-name">rotation</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">rotation</span><span class="type">Angle</span>
 					</div>
 					<div class="prop desc">The angle of rotation (in radians) of the transform</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Transform.direction">
-					<div class="prop-header member">
-						<span class="prop-name">direction</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The unit direction the transform is facing in (alternate access method for rotation)</div>
 				</div>
 			</div>
 				
@@ -52,46 +52,9 @@ It is composed of a rotation about the origin followed by a translation.
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="Transform.prototype.constructor()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L22" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
-			</div>
-			<div class="function desc">
-				Creates a new Transform.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Transform.prototype.constructor():position">
-							<div class="param-name">
-								<span class="param">position</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-							</div>
-							<div class="param desc">
-								The initial translation of the transform
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Transform.prototype.constructor():rotation?">
-							<div class="param-name">
-								<span class="param">rotation</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The initial rotation of the transform. Default is 0
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="get Transform.prototype.inverse()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L35" target="_blank" class="function-name source-link">inverse</a><span class="type">Transform</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L55" target="_blank" class="function-name source-link">inverse</a><span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform that, when composed with the caller, will produce no offset and no rotation.
@@ -99,46 +62,39 @@ It is composed of a rotation about the origin followed by a translation.
 			
 		</div>
 	
-		<div class="function-wrapper" id="Transform.prototype.rotateAround()">
+		<div class="function-wrapper" id="get Transform.prototype.matrix()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L83" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L63" target="_blank" class="function-name source-link">matrix</a><span class="type"><a href="../Geometry/Matrices.html#class Matrix">Matrix</a></span>
 			</div>
 			<div class="function desc">
-				Adds a clockwise (in screen-space) rotation in-place about a specific point to the existing transformation. 
+				Returns a matrix representing the current transformation from local to global space.
 			</div>
 			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
+		</div>
+	
+		<div class="function-wrapper" id="get Transform.prototype.invMatrix()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L87" target="_blank" class="function-name source-link">invMatrix</a><span class="type"><a href="../Geometry/Matrices.html#class Matrix">Matrix</a></span>
+			</div>
+			<div class="function desc">
+				Returns a matrix representing the current transformation from global to local space.
+			</div>
 			
-						<div class="param-wrapper" id="Transform.prototype.rotateAround():point">
-							<div class="param-name">
-								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-							</div>
-							<div class="param desc">
-								The center to rotate about
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Transform.prototype.rotateAround():rotation">
-							<div class="param-name">
-								<span class="param">rotation</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The angle (in radians) to rotate by
-							</div>
-						</div>
-					
-		
-				</div>
+		</div>
+	
+		<div class="function-wrapper" id="get Transform.prototype.direction()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L99" target="_blank" class="function-name source-link">direction</a><span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+			</div>
+			<div class="function desc">
+				Returns a unit vector in the direction of the x axis in local space.
+			</div>
 			
 		</div>
 	
 		<div class="function-wrapper" id="Transform.prototype.globalToLocal()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L96" target="_blank" class="function-name source-link">globalToLocal</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L120" target="_blank" class="function-name source-link">globalToLocal</a>(<span class="param">point</span>)<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the inverse of the caller to it.
@@ -152,7 +108,7 @@ This translates the point by the inverse of the transform's position and then ro
 						<div class="param-wrapper" id="Transform.prototype.globalToLocal():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 							</div>
 							<div class="param desc">
 								The point to transform
@@ -166,7 +122,7 @@ This translates the point by the inverse of the transform's position and then ro
 	
 		<div class="function-wrapper" id="Transform.prototype.localToGlobal()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L108" target="_blank" class="function-name source-link">localToGlobal</a>(<span class="param">point</span>)<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L132" target="_blank" class="function-name source-link">localToGlobal</a>(<span class="param">point</span>)<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the caller to it.
@@ -180,7 +136,7 @@ This rotates the point clockwise (in screen-space) about the origin by the trans
 						<div class="param-wrapper" id="Transform.prototype.localToGlobal():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 							</div>
 							<div class="param desc">
 								The point to transform
@@ -194,7 +150,7 @@ This rotates the point clockwise (in screen-space) about the origin by the trans
 	
 		<div class="function-wrapper" id="Transform.combine()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L148" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L170" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform which has the same effect as applying two transformations in a row.
@@ -221,6 +177,185 @@ This rotates the point clockwise (in screen-space) about the origin by the trans
 							</div>
 							<div class="param desc">
 								The second transformation
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Transform2D">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L183" target="_blank" class="class-name source-link">Transform2D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
+				</div>
+				<div class="class desc">
+					Represents a 2D affine transformation, composed of a translation and a rotation.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Transform2D.position">
+					<div class="prop-header member">
+						<span class="prop-name">position</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The translation of the transform</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Transform2D.rotation">
+					<div class="prop-header member">
+						<span class="prop-name">rotation</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The angle of rotation</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Transform2D.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L192" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
+			</div>
+			<div class="function desc">
+				Creates a new 2D transform.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Transform2D.prototype.constructor():position">
+							<div class="param-name">
+								<span class="param">position</span>
+								<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The translation of the transform
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Transform2D.prototype.constructor():rotation?">
+							<div class="param-name">
+								<span class="param">rotation</span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The angle of rotation. Default is 0
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Transform2D.prototype.rotateAround()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L201" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Adds a clockwise (in screen-space) rotation in-place about a specific point to the existing transformation. 
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Transform2D.prototype.rotateAround():point">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The center to rotate about
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Transform2D.prototype.rotateAround():rotation">
+							<div class="param-name">
+								<span class="param">rotation</span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The angle (in radians) to rotate by
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Transform3D">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L216" target="_blank" class="class-name source-link">Transform3D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
+				</div>
+				<div class="class desc">
+					Represents a 3D affine transformation, composed of a translation and a rotation about an arbitrary axis.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Transform3D.position">
+					<div class="prop-header member">
+						<span class="prop-name">position</span><span class="type"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+					</div>
+					<div class="prop desc">The translation of the transform</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Transform3D.rotation">
+					<div class="prop-header member">
+						<span class="prop-name">rotation</span><span class="type"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+					</div>
+					<div class="prop desc">The angle of rotation, represented as the unit axis of rotation multiplied by the angle of rotation</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Transform3D.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L225" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
+			</div>
+			<div class="function desc">
+				Creates a new 3D transform.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Transform3D.prototype.constructor():position">
+							<div class="param-name">
+								<span class="param">position</span>
+								<span class="type"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+							</div>
+							<div class="param desc">
+								The translation of the transform
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Transform3D.prototype.constructor():rotation?">
+							<div class="param-name">
+								<span class="param">rotation</span>
+								<span class="type"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+							</div>
+							<div class="param desc">
+								The angle of rotation. Default is no rotation
 							</div>
 						</div>
 					

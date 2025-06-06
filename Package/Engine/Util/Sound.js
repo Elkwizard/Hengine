@@ -46,7 +46,7 @@ class SynthChannel {
 	 * Stops the tone from playing, optionally after a delay.
 	 * Returns a promise that resolves when the tone stops.
 	 * @param Number wait? | The interval (in milliseconds) to wait before stopping the sound. Default is 0
-	 * @return Promise<void>
+	 * @return Promise
 	 */
     stop(wait = 0) {
         const endTime = this.synth.time + wait;
@@ -116,7 +116,7 @@ class Synth {
 	/**
 	 * Plays a tone. If the tone has a specified duration, this returns a promise that resolves when it completes. Otherwise, this returns the `.stop()` method of the SynthChannel playing this tone.
 	 * @param Tone tone | The specification of the tone to play.
-	 * @return ((Number) => void)/Promise<void>
+	 * @return ((Number) => void)/Promise
 	 */
     play(info) {
         if (info.duration !== undefined && info.volume === 0)

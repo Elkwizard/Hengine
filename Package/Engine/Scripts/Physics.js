@@ -26,13 +26,14 @@ Physics.triggerRule = (a, b) => {
 };
 
 /**
- * @3d Inertia = Number -> Matrix3
+ * @3d InertiaN = Number -> Matrix3
+ * @3d AngleN = Number -> Vector3
  */
 
 /**
  * Adds rigidbody physics to a WorldObject.
  * @prop VectorN velocity | The velocity of the object per frame
- * @prop Angle angularVelocity | The angular velocity of the object in radians per frame
+ * @prop AngleN angularVelocity | The angular velocity of the object in radians per frame
  * @prop Boolean mobile | Whether or not the object can move or rotate
  * @prop Boolean simulated | Whether or not the object should participate in the simulation at all
  * @prop Boolean gravity | Whether or not gravity should be applied to the object
@@ -148,7 +149,7 @@ class PHYSICS extends ElementScript {
 	}
 	/**
 	 * Retrieves the moment of inertia for the object.
-	 * @return Inertia
+	 * @return InertiaN
 	 */
 	get inertia() {
 		if (IS_3D) return Matrix3.fromPhysicsMatrix(this.body.inertia);

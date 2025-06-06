@@ -1,4 +1,5 @@
 /**
+ * @type class Spline<Vector = any>
  * Represents a quartic spline with four control points.
  * @prop Vector a | The first control point
  * @prop Vector b | The second control point

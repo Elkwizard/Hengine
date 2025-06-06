@@ -1,0 +1,115 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class Polyhedron">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L107" target="_blank" class="class-name source-link">Polyhedron</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Geometry/Shapes/3D/Shape3D.html#class Shape3D">Shape3D</a></span>
+				</div>
+				<div class="class desc">
+					Represents a closed 3D polyhedron as a collection of contiguous triangles.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../../Geometry/Shapes/3D/Prism.html#class Prism">Prism</a></span>, <span class="class-name">Frustum</span></div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Polyhedron.vertices">
+					<div class="prop-header member">
+						<span class="prop-name">vertices</span><span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
+					</div>
+					<div class="prop desc">The vertices of the polyhedron</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Polyhedron.indices">
+					<div class="prop-header member">
+						<span class="prop-name">indices</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a>[]</span>
+					</div>
+					<div class="prop desc">An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">vertices</span></code> array which make up a triangle</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Polyhedron.prototype.getFaces()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L147" target="_blank" class="function-name source-link">getFaces</a>()<span class="type"><a href="../../../Geometry/Shapes/3D/Triangle.html#class Triangle">Triangle</a>[]</span>
+			</div>
+			<div class="function desc">
+				Returns a set of triangles making up the surface of the polyhedron.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polyhedron.prototype.subdivide()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L197" target="_blank" class="function-name source-link">subdivide</a>(<span class="param">count?</span>)<span class="type">Polyhedron</span>
+			</div>
+			<div class="function desc">
+				Subdivides each triangle in the polyhedron into a power of 4 number of additional triangles.
+The subdivided mesh is a copy and is returned.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polyhedron.prototype.subdivide():count?">
+							<div class="param-name">
+								<span class="param">count</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The power of 4 to multiply the triangle count by. Default is 1
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polyhedron.fromTriangles()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L242" target="_blank" class="function-name source-link">Polyhedron.fromTriangles</a>(<span class="param">triangles</span>)<span class="type">Polyhedron</span>
+			</div>
+			<div class="function desc">
+				Creates a new polyhedron from a list of triangles which form a closed surface.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polyhedron.fromTriangles():triangles">
+							<div class="param-name">
+								<span class="param">triangles</span>
+								<span class="type"><a href="../../../Geometry/Shapes/3D/Triangle.html#class Triangle">Triangle</a>[]</span>
+							</div>
+							<div class="param desc">
+								The triangles to use as the surface
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

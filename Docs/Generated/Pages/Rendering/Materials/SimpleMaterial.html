@@ -1,0 +1,136 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class SimpleMaterial">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L54" target="_blank" class="class-name source-link">SimpleMaterial</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Materials/Material.html#class Material">Material</a></span>
+				</div>
+				<div class="class desc">
+					Represents a basic parameterized material based on the Blinn-Phong Shading Model.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="SimpleMaterial.albedo">
+					<div class="prop-header member">
+						<span class="prop-name">albedo</span><span class="type"><a href="../../Rendering/Color.html#class Color">Color</a></span>
+					</div>
+					<div class="prop desc">The base color of the material, against which ambient and diffuse lighting are calculated. Starts as white</div>
+				</div>
+			
+				<div class="prop-wrapper" id="SimpleMaterial.emission">
+					<div class="prop-header member">
+						<span class="prop-name">emission</span><span class="type"><a href="../../Rendering/Color.html#class Color">Color</a></span>
+					</div>
+					<div class="prop desc">The color of light emitted from the material. Starts as black</div>
+				</div>
+			
+				<div class="prop-wrapper" id="SimpleMaterial.specular">
+					<div class="prop-header member">
+						<span class="prop-name">specular</span><span class="type"><a href="../../Rendering/Color.html#class Color">Color</a></span>
+					</div>
+					<div class="prop desc">The color of specular highlights on the material. Starts as white</div>
+				</div>
+			
+				<div class="prop-wrapper" id="SimpleMaterial.albedoTexture">
+					<div class="prop-header member">
+						<span class="prop-name">albedoTexture</span><span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/<a href="../../Rendering/GLSL API/Basics.html#class Sampler">Sampler</a></span>
+					</div>
+					<div class="prop desc">The texture to use in in place of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">albedo</span></code> color. It will sampled according to the mesh's UVs</div>
+				</div>
+			
+				<div class="prop-wrapper" id="SimpleMaterial.specularTexture">
+					<div class="prop-header member">
+						<span class="prop-name">specularTexture</span><span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/<a href="../../Rendering/GLSL API/Basics.html#class Sampler">Sampler</a></span>
+					</div>
+					<div class="prop desc">The texture to use in in place of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">specular</span></code> color. It will sampled according to the mesh's UVs</div>
+				</div>
+			
+				<div class="prop-wrapper" id="SimpleMaterial.specularExponent">
+					<div class="prop-header member">
+						<span class="prop-name">specularExponent</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The exponent applied during specular highlight calculation. Higher values correspond to sharper highlights. Starts as 0</div>
+				</div>
+			
+				<div class="prop-wrapper" id="SimpleMaterial.alpha">
+					<div class="prop-header member">
+						<span class="prop-name">alpha</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The opacity of the material. Starts as 1</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="SimpleMaterial.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L59" target="_blank" class="function-name source-link">constructor</a>(<span class="param">settings</span>)
+			</div>
+			<div class="function desc">
+				Creates a new material based on certain surface settings.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="SimpleMaterial.prototype.constructor():settings">
+							<div class="param-name">
+								<span class="param">settings</span>
+								<span class="type">Object</span>
+							</div>
+							<div class="param desc">
+								An object where each entry corresponds to a property of SimpleMaterial
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="set SimpleMaterial.prototype.color()">
+			<div class="function-header member">
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L92" target="_blank" class="function-name source-link">color</a>(<span class="param">color</span>)
+			</div>
+			<div class="function desc">
+				Sets <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">albedo</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">specular</span></code>, and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">emission</span></code> to the same value.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="set SimpleMaterial.prototype.color():color">
+							<div class="param-name">
+								<span class="param">color</span>
+								<span class="type"><a href="../../Rendering/Color.html#class Color">Color</a></span>
+							</div>
+							<div class="param desc">
+								The new color value
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

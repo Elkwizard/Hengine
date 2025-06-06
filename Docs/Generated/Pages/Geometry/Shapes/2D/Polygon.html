@@ -1,0 +1,172 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class Polygon">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L393" target="_blank" class="class-name source-link">Polygon</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Geometry/Shapes/2D/Shape2D.html#class Shape2D">Shape2D</a></span>
+				</div>
+				<div class="class desc">
+					Represents a contiguous 2D polygon with no holes.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span></div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Polygon.vertices">
+					<div class="prop-header member">
+						<span class="prop-name">vertices</span><span class="type"><a href="../../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a>[]</span>
+					</div>
+					<div class="prop desc">The vertices of the border of the polygon, they are in a clockwise order.</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Polygon.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L398" target="_blank" class="function-name source-link">constructor</a>(<span class="param">vertices</span>)
+			</div>
+			<div class="function desc">
+				Creates a new Polygon.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polygon.prototype.constructor():vertices">
+							<div class="param-name">
+								<span class="param">vertices</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a>[]</span>
+							</div>
+							<div class="param desc">
+								The vertices for the new polygon. They can be ordered either clockwise or counter-clockwise
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polygon.prototype.getEdges/getFaces()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L434" target="_blank" class="function-name source-link">getEdges/getFaces</a>()<span class="type"><a href="../../../Geometry/Shapes/2D/Line.html#class Line">Line</a>[]</span>
+			</div>
+			<div class="function desc">
+				Returns the edges of the polygon.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polygon.prototype.rotate()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L450" target="_blank" class="function-name source-link">rotate</a>(<span class="param">angle</span>)<span class="type">Polygon</span>
+			</div>
+			<div class="function desc">
+				Returns a copy of the polygon rotated clockwise (in screen-space) by a specified angle.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polygon.prototype.rotate():angle">
+							<div class="param-name">
+								<span class="param">angle</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The angle to rotate by (in radians)
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polygon.prototype.containsPoint()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L491" target="_blank" class="function-name source-link">containsPoint</a>(<span class="param">point</span>)<span class="type">Boolean</span>
+			</div>
+			<div class="function desc">
+				Checks whether a given point is inside the polygon (including the boundary).
+The behavior of this method is undefined if the polygon is concave.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polygon.prototype.containsPoint():point">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The point to check
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polygon.regular()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L537" target="_blank" class="function-name source-link">Polygon.regular</a>(<span class="param">sides</span>, <span class="param">radius</span>)<span class="type">Polygon</span>
+			</div>
+			<div class="function desc">
+				Returns a new regular polygon centered at the origin with a specified amount of sides and radius.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polygon.regular():sides">
+							<div class="param-name">
+								<span class="param">sides</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The number of sides of the polygon
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Polygon.regular():radius">
+							<div class="param-name">
+								<span class="param">radius</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The distance from the center to each vertex
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

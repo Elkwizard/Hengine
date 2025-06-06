@@ -1,3 +1,7 @@
+/**
+ * Contains a collection of useful static methods for manipulating 3D shapes and figures.
+ * This class cannot be constructed.
+ */
 class Geometry3D {
 	/**
 	 * Subdivides a frustum along the z axis.

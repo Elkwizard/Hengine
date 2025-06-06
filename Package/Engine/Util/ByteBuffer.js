@@ -536,7 +536,7 @@ for (let i = 0; i < ByteBuffer.arrayTypes.length; i++) {
  * @name class Serializable
  * @interface
  * Classes implementing this interface can be written to and read back from a ByteBuffer with perfect fidelity.
- * This interface is used to ensure objects can be read from and written to the FileSystem.
+ * This interface is used to ensure objects can be read from and written to the Files.
  */
 
 /**

@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -22,63 +23,67 @@ All properties of this class are available as properties of the global object.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Hengine.keyboard">
 					<div class="prop-header member">
-						<span class="prop-name">keyboard</span><span class="type"><a href="../../Pages/Input/KeyboardHandler.html#class KeyboardHandler">KeyboardHandler</a></span>
+						<span class="prop-name">keyboard</span><span class="type"><a href="../Input/KeyboardHandler.html#class KeyboardHandler">KeyboardHandler</a></span>
 					</div>
 					<div class="prop desc">The keyboard API</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Hengine.mouse">
 					<div class="prop-header member">
-						<span class="prop-name">mouse</span><span class="type"><a href="../../Pages/Input/MouseHandler.html#class MouseHandler">MouseHandler</a></span>
+						<span class="prop-name">mouse</span><span class="type"><a href="../Input/MouseHandler.html#class MouseHandler">MouseHandler</a></span>
 					</div>
 					<div class="prop desc">The mouse API</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Hengine.touches">
 					<div class="prop-header member">
-						<span class="prop-name">touches</span><span class="type"><a href="../../Pages/Input/TouchHandler.html#class TouchHandler">TouchHandler</a></span>
+						<span class="prop-name">touches</span><span class="type"><a href="../Input/TouchHandler.html#class TouchHandler">TouchHandler</a></span>
 					</div>
 					<div class="prop desc">The touch screen API</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Hengine.clipboard">
 					<div class="prop-header member">
-						<span class="prop-name">clipboard</span><span class="type"><a href="../../Pages/Input/ClipboardHandler.html#class ClipboardHandler">ClipboardHandler</a></span>
+						<span class="prop-name">clipboard</span><span class="type"><a href="../Input/ClipboardHandler.html#class ClipboardHandler">ClipboardHandler</a></span>
 					</div>
 					<div class="prop desc">The clipboard API</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Hengine.canvas">
 					<div class="prop-header member">
-						<span class="prop-name">canvas</span><span class="type"><a href="../../Pages/Rendering/Image Types/CanvasImage.html#class CanvasImage">CanvasImage</a></span>
+						<span class="prop-name">canvas</span><span class="type"><a href="../Rendering/Image Types/CanvasImage.html#class CanvasImage">CanvasImage</a></span>
 					</div>
 					<div class="prop desc">The canvas associated with the engine</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Hengine.renderer">
 					<div class="prop-header member">
-						<span class="prop-name">renderer</span><span class="type"><a href="../../Pages/Rendering/Renderer/Artists/Artist2D.html#class Artist2D">Artist2D</a></span>
+						<span class="prop-name">renderer</span><span class="type"><span class="alias">
+			<span class="alias two"><a href="../Rendering/Renderer/2D/Artists/CanvasArtist2D.html#class CanvasArtist2D">CanvasArtist2D</a></span>
+			<span class="alias three"><a href="../Rendering/Renderer/3D/Artist3D.html#class Artist3D">Artist3D</a></span>
+			<span class="alias general">CanvasArtist</span>
+		</span></span>
 					</div>
-					<div class="prop desc">The renderer associated with the canvas. Draws directly on the screen</div>
+					<div class="prop desc">The 2D (and 3D, in 3D Mode) renderer associated with the canvas. Draws directly on the screen</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Hengine.scene">
 					<div class="prop-header member">
-						<span class="prop-name">scene</span><span class="type"><a href="../../Pages/Management/Scene.html#class Scene">Scene</a></span>
+						<span class="prop-name">scene</span><span class="type"><a href="../Management/Scene.html#class Scene">Scene</a></span>
 					</div>
 					<div class="prop desc">The scene containing all the objects currently in the engine</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Hengine.intervals">
 					<div class="prop-header member">
-						<span class="prop-name">intervals</span><span class="type"><a href="../../Pages/Structure/Intervals/IntervalManager.html#class IntervalManager">IntervalManager</a></span>
+						<span class="prop-name">intervals</span><span class="type"><a href="../Structure/Intervals/IntervalManager.html#class IntervalManager">IntervalManager</a></span>
 					</div>
 					<div class="prop desc">The interval manager managing the update loop of the engine</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Hengine.fileSystem">
 					<div class="prop-header member">
-						<span class="prop-name">fileSystem</span><span class="type"><a href="../../Pages/Miscellaneous/FileSystem.html#class FileSystem">FileSystem</a></span>
+						<span class="prop-name">fileSystem</span><span class="type"><a href="../Miscellaneous/Files.html#class Files">Files</a></span>
 					</div>
 					<div class="prop desc">The file system for the engine. This property persists across reloads and different sessions via <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">localStorage</span></code></div>
 				</div>

@@ -1,5 +1,6 @@
 /**
  * Represents a 3D shape.
+ * @type class Shape3D extends Shape<Matrix4, Vector3>
  * @abstract
  * @prop Number volume | The amount of space contained within the shape
  */

@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -17,7 +18,7 @@
 </span><span class="highlight-CLASS">Lazy</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">define</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">object</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&quot;lazy&quot;</span><span class="highlight-SYMBOL">, ()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{ </span><span class="highlight-COMMENT">// an expensive operation</span><span class="highlight-SYMBOL">
 </span><span class="highlight-KEYWORD">	let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">result</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">;
 </span><span class="highlight-KEYWORD">	for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD">let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">; </span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL"> &lt;</span><span class="highlight-NUMBER"> 1e6</span><span class="highlight-SYMBOL">; </span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL">++)
-		</span><span class="highlight-IDENTIFIER">result</span><span class="highlight-SYMBOL"> += </span><span class="highlight-CLASS"><a href="../../Pages/Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">random</span><span class="highlight-SYMBOL">();
+		</span><span class="highlight-IDENTIFIER">result</span><span class="highlight-SYMBOL"> += </span><span class="highlight-CLASS"><a href="../Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">random</span><span class="highlight-SYMBOL">();
 </span><span class="highlight-KEYWORD">	return</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">result</span><span class="highlight-SYMBOL">;
 });
 
@@ -58,7 +59,7 @@ The first access to the property will calculate the result, which will be cached
 						<div class="param-wrapper" id="Lazy.define():name">
 							<div class="param-name">
 								<span class="param">name</span>
-								<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The key for the property

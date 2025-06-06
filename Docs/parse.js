@@ -63,12 +63,16 @@ function parse(content, file) {
 			raw: name, base,
 			isEnum, isClass, baseClass,
 			isGlobalFunction,
+			isGlobal: isClass || isGlobalFunction,
 			isAsync: /\basync\b/.test(name),
 			isStatic: name.startsWith("static "),
 			isGetter: name.includes("get "),
 			isSetter: name.includes("set ")
 		};
 	};
+
+	const resultingMatches = [];
+	const aliases = { };
 	
 	for (const match of matches) {
 		if (!match) continue;
@@ -76,34 +80,46 @@ function parse(content, file) {
 
 		match.name = processName(name);
 
+		let alias = false;
+
 		for (const line of lines) {
 			switch (line.category) {
 				case "page": {
 					match.name = processName("_");
 					match.name.base = line.content.trim();
 					match.name.isPage = true;
-				}; break;
+				} break;
 				case "name":
 				case "group": {
 					line.elements = line.content.split(",").map(e => processName(e.trim()));
 					match.name = line.elements[0];
-				}; break;
+				} break;
+				case "3d": {
+					const [, name, two, three] = line.content.match(/(\w+) = (\w+) -> (\w+)/);
+					aliases[name] = { 2: two, 3: three };
+					alias = true;
+				} break;
+				case "alias": {
+					const [, name, source] = line.content.match(/(\w+) = (\w+)/);
+					aliases[name] = source;
+					alias = true;
+				} break;
 				case "implements": {
 					line.interfaces = line.content.split(",").map(e => e.trim());
 					if (line.interfaces.includes(match.name.baseClass))
 						match.name.baseClass = null;
-				}; break;
+				} break;
 				case "return": {
 					line.type = line.content;
-				}; break;
+				} break;
 				case "readonly": {
 					line.content = "All properties of this class are read-only.";
 					line.category = null;
-				}; break;
+				} break;
 				case "abstract": {
 					line.content = "This is an abstract superclass and should not be constructed.";
 					line.category = null;
-				}; break;
+				} break;
 				case "name_subs": {
 					line.substitutions = Object.fromEntries(
 						line.content
@@ -119,7 +135,7 @@ function parse(content, file) {
 									.map(val => val.trim())
 							])
 					);
-				}; break;
+				} break;
 				case "prop":
 				case "static_prop":
 				case "param": {
@@ -133,17 +149,19 @@ function parse(content, file) {
 
 					if (line.category === "static_prop")
 						line.name = `${match.name.base}.${line.name}`;
-				}; break;
+				} break;
 				case "params": {
 					line.names = line.content.split(",").map(name => name.trim());
-				}; break;
+				} break;
 			}
 		}
+
+		if (alias) continue;
 
 		// expand @params references
 		lines = lines.flatMap(line => {
 			if (line.category === "params") {
-				const filtered = lines.filter(p => p.category === "param" && line.names.includes(p.baseName));
+				const filtered = line.names.map(name => lines.find(p => p.category === "param" && p.baseName === name));
 				return filtered;
 			}
 
@@ -188,17 +206,18 @@ function parse(content, file) {
 		match.settings = { };
 		for (const line of match.lines)
 			match.settings[line.category] = line;
+
+		resultingMatches.push(match);
 	}
 
 	const topLevels = [];
 
-	for (let i = 0; i < matches.length; i++) {
-		const match = matches[i];
-		if (!match) continue;
+	for (let i = 0; i < resultingMatches.length; i++) {
+		const match = resultingMatches[i];
 		if (match.name.isClass) {
 			const members = [];
-			while (matches[++i] && !matches[i].name.isClass)
-				members.push(matches[i]);
+			while (resultingMatches[++i] && !resultingMatches[i].name.isGlobal)
+				members.push(resultingMatches[i]);
 			i--;
 			match.members = members;
 		}
@@ -206,7 +225,7 @@ function parse(content, file) {
 		topLevels.push(match);
 	}
 
-	return topLevels;
+	return { topLevels, aliases };
 }
 
 function addInheritance(classes) {

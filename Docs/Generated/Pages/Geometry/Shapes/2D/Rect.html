@@ -1,0 +1,338 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class Rect">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L571" target="_blank" class="class-name source-link">Rect</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Geometry/Shapes/2D/Polygon.html#class Polygon">Polygon</a></span>
+				</div>
+				<div class="class desc">
+					Represents an axis-aligned rectangle.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Rect.x">
+					<div class="prop-header member">
+						<span class="prop-name">x</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The x coordinate of the upper-left corner of the rectangle</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Rect.y">
+					<div class="prop-header member">
+						<span class="prop-name">y</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The y coordinate of the upper-left corner of the rectangle</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Rect.width">
+					<div class="prop-header member">
+						<span class="prop-name">width</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The width of the rectangle</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Rect.height">
+					<div class="prop-header member">
+						<span class="prop-name">height</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The height of the rectangle</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Rect.min">
+					<div class="prop-header member">
+						<span class="prop-name">min</span><span class="type"><a href="../../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The upper-left corner of the rectangle</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Rect.max">
+					<div class="prop-header member">
+						<span class="prop-name">max</span><span class="type"><a href="../../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+					</div>
+					<div class="prop desc">The lower-right corner of the rectangle</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Rect.xRange">
+					<div class="prop-header member">
+						<span class="prop-name">xRange</span><span class="type"><a href="../../../Geometry/Range.html#class Range">Range</a></span>
+					</div>
+					<div class="prop desc">The horizontal interval that contains the rectangle</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Rect.yRange">
+					<div class="prop-header member">
+						<span class="prop-name">yRange</span><span class="type"><a href="../../../Geometry/Range.html#class Range">Range</a></span>
+					</div>
+					<div class="prop desc">The vertical interval that contains the rectangle</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Rect.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L579" target="_blank" class="function-name source-link">constructor</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)
+			</div>
+			<div class="function desc">
+				Creates a new Rect. The width and height can be negative and will extend the rectangle to the left and top respectively.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Rect.prototype.constructor():x">
+							<div class="param-name">
+								<span class="param">x</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The x coordinate of the upper-left corner of the rectangle
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Rect.prototype.constructor():y">
+							<div class="param-name">
+								<span class="param">y</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The y coordinate of the upper-left corner of the rectangle
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Rect.prototype.constructor():width">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The width of the rectangle
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Rect.prototype.constructor():height">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The height of the rectangle
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Rect.prototype.largestWithin()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L625" target="_blank" class="function-name source-link">largestWithin</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">Rect</span>
+			</div>
+			<div class="function desc">
+				Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller. 
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Rect.prototype.largestWithin():width">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The width of the hypothetical rectangle from which to determine the aspect ratio
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Rect.prototype.largestWithin():height">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The height of the hypothetical rectangle from which to determine the aspect ratio
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Rect.prototype.clip()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L732" target="_blank" class="function-name source-link">clip</a>(<span class="param">rect</span>)<span class="type">Rect</span>
+			</div>
+			<div class="function desc">
+				Returns the region of intersection between the caller and another rectangle.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Rect.prototype.clip():rect">
+							<div class="param-name">
+								<span class="param">rect</span>
+								<span class="type">Rect</span>
+							</div>
+							<div class="param desc">
+								The rectangle to intersect with
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Rect.fromMinMax()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L773" target="_blank" class="function-name source-link">Rect.fromMinMax</a>(<span class="param">min</span>, <span class="param">max</span>)<span class="type">Rect</span>
+			</div>
+			<div class="function desc">
+				Returns a new rectangle with the specified minimum and maximum coordinates.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Rect.fromMinMax():min">
+							<div class="param-name">
+								<span class="param">min</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The upper-left corner of the rectangle
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Rect.fromMinMax():max">
+							<div class="param-name">
+								<span class="param">max</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The lower-right corner of the rectangle
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Rect.fromRanges()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L782" target="_blank" class="function-name source-link">Rect.fromRanges</a>(<span class="param">xRange</span>, <span class="param">yRange</span>)<span class="type">Rect</span>
+			</div>
+			<div class="function desc">
+				Returns a new rectangle with the specified vertical and horizontal spans.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Rect.fromRanges():xRange">
+							<div class="param-name">
+								<span class="param">xRange</span>
+								<span class="type"><a href="../../../Geometry/Range.html#class Range">Range</a></span>
+							</div>
+							<div class="param desc">
+								The horizontal span of the rectangle
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Rect.fromRanges():yRange">
+							<div class="param-name">
+								<span class="param">yRange</span>
+								<span class="type"><a href="../../../Geometry/Range.html#class Range">Range</a></span>
+							</div>
+							<div class="param desc">
+								The vertical span of the rectangle
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Rect.bound()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L790" target="_blank" class="function-name source-link">Rect.bound</a>(<span class="param">points</span>)<span class="type">Rect</span>
+			</div>
+			<div class="function desc">
+				Returns the smallest bounding rectangle around a collection of points.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Rect.bound():points">
+							<div class="param-name">
+								<span class="param">points</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a>[]</span>
+							</div>
+							<div class="param desc">
+								The points to create a bounding box for
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Rect.composeBoundingBoxes()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes.js?#L800" target="_blank" class="function-name source-link">Rect.composeBoundingBoxes</a>(<span class="param">boxes</span>)<span class="type">Rect</span>
+			</div>
+			<div class="function desc">
+				Returns the smallest bounding rectangle around a collection of rectangles.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Rect.composeBoundingBoxes():boxes">
+							<div class="param-name">
+								<span class="param">boxes</span>
+								<span class="type">Rect[]</span>
+							</div>
+							<div class="param desc">
+								The rectangles to create a bounding box for
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

@@ -59,7 +59,7 @@ function applySubstitutions(name, subs) {
 
 function createPropSpecification(className, name, prop, isWindow) {
 	const isStatic = prop.category === "static_prop";
-	let result = `${name}: ${formatType(prop.type, !isStatic && className)};`;
+	let result = `${name}: ${formatType(prop.type, isStatic ? null : className)};`;
 	if (isStatic)
 		result = `static ${result.replace(/.*\./, "")}`;
 	else if (isWindow)
@@ -145,13 +145,20 @@ function createOverloadSpecification(name, parameters, doc, className) {
 		result = "";
 		if (doc.name.isStatic) result += "static ";
 		if (doc.name.isGlobalFunction) result += "function ";
-		if (doc.name.isSetter) result += "set ";
-		if (doc.name.isGetter) result += "get ";
-		
-		result += `${name}(${paramString})`;
+		if (doc.name.isGetter && doc.name.isStatic) {
+			result += `${name}: ${formatType(returnType, className)}`;
+		} else if (doc.name.isSetter && doc.name.isStatic) {
+			result += `${name}: ${formatType(parameters[0].type, className)}`;
+		} else {
+			if (doc.name.isSetter) result += "set ";
+			if (doc.name.isGetter) result += "get ";
+			
+			result += `${name}(${paramString})`;
 
-		if (name !== "constructor" && !doc.name.isSetter)
-			result += `: ${formatType(returnType, className)}`;
+			if (name !== "constructor" && !doc.name.isSetter)
+				result += `: ${formatType(returnType, className)}`;
+		}
+
 		result += ";";
 	}
 
@@ -216,7 +223,7 @@ function deepCopy(object, found = new Map()) {
 	return result;
 }
 
-module.exports = function createTypeSpecification(docs) {
+module.exports = function createTypeSpecification(docs, aliases, dimension) {
 	docs = deepCopy(docs.filter(doc => !doc.name.isPage));
 	const nameToDoc = { };
 	for (const doc of docs)
@@ -238,6 +245,15 @@ declare interface Class<T> extends Function {
 }
 
 type RemainingParams<T> = T extends (first: any, ...remaining: infer P) => any ? P : never;
+
+${
+	Object.entries(aliases)
+		.map(([name, source]) => {
+			if (typeof source !== "string") source = source[dimension];
+			return `type ${name} = ${source};`;
+		})
+		.join("\n")
+}
 `.trim();
 	
 	return classInterface + "\n\n" + docs

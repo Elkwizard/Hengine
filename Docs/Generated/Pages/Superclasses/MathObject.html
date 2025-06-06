@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,20 +10,20 @@
 				
 			<div class="class-wrapper" id="class MathObject">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L14" target="_blank" class="class-name source-link">MathObject</a> <span class="keyword">implements</span> <span class="class-name"><a href="../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L14" target="_blank" class="class-name source-link">MathObject</a> <span class="keyword">implements</span> <span class="class-name"><a href="../Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
 				</div>
 				<div class="class desc">
 					Represents a mathematical object, on which operations (+, -, *, /, %, **) can be performed.
 The operations are provided as two sets of methods, one which mutates the caller, and one which creates a new object to hold the result.
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Complex Numbers/Complex.html#class Complex">Complex</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 6</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">over</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// 1 + 2i</span><span class="highlight-KEYWORD">
-new</span><span class="highlight-CLASS"> <a href="../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 3</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">plus</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// (4, 5, 6)</span><span class="highlight-SYMBOL">
-</span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Complex Numbers/Quaternion.html#class Quaternion">Quaternion</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromRotation</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">up</span><span class="highlight-SYMBOL">, </span><span class="highlight-CLASS">Math</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">PI</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// 0 + 0i + -1j + 0k</span><span class="highlight-SYMBOL">
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Geometry/Complex Numbers/Complex.html#class Complex">Complex</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 6</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">over</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// 1 + 2i</span><span class="highlight-KEYWORD">
+new</span><span class="highlight-CLASS"> <a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 3</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">plus</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// (4, 5, 6)</span><span class="highlight-SYMBOL">
+</span><span class="highlight-CLASS"><a href="../Geometry/Complex Numbers/Quaternion.html#class Quaternion">Quaternion</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromRotation</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">up</span><span class="highlight-SYMBOL">, </span><span class="highlight-CLASS">Math</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">PI</span><span class="highlight-SYMBOL">) </span><span class="highlight-COMMENT">// 0 + 0i + -1j + 0k</span><span class="highlight-SYMBOL">
 </span></code>
 This is an abstract superclass and should not be constructed.
 				</div>
 				
 					<div class="header">Subclasses</div>
-					<div class="subclass desc"><span class="class-name"><a href="../../Pages/Geometry/Complex Numbers/Complex.html#class Complex">Complex</a></span>, <span class="class-name"><a href="../../Pages/Superclasses/Operable.html#class Operable">Operable</a></span></div>
+					<div class="subclass desc"><span class="class-name"><a href="../Geometry/Complex Numbers/Complex.html#class Complex">Complex</a></span>, <span class="class-name"><a href="../Superclasses/Operable.html#class Operable">Operable</a></span></div>
 				
 				
 				
@@ -190,7 +191,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="MathObject.prototype.toFixed()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L100" target="_blank" class="function-name source-link">toFixed</a>(<span class="param">digits</span>)<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L100" target="_blank" class="function-name source-link">toFixed</a>(<span class="param">digits</span>)<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Returns a string representation of the object with a specified level of precision for included numbers.
@@ -203,7 +204,7 @@ This is an abstract superclass and should not be constructed.
 						<div class="param-wrapper" id="MathObject.prototype.toFixed():digits">
 							<div class="param-name">
 								<span class="param">digits</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The number of digits of precision
@@ -217,7 +218,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="MathObject.prototype.toMaxed()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L106" target="_blank" class="function-name source-link">toMaxed</a>(<span class="param">max</span>)<span class="type"><a href="../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Preload\Operable.js?#L106" target="_blank" class="function-name source-link">toMaxed</a>(<span class="param">max</span>)<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Returns a string representation of the object with a specified maximum level of precision for included numbers.
@@ -230,7 +231,7 @@ This is an abstract superclass and should not be constructed.
 						<div class="param-wrapper" id="MathObject.prototype.toMaxed():max">
 							<div class="param-name">
 								<span class="param">max</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The maximum number of digits of precision. The displayed amount of digits may be less, since trailing zeroes are discarded

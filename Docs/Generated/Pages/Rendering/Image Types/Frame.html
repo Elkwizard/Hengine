@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Frame">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L264" target="_blank" class="class-name source-link">Frame</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L264" target="_blank" class="class-name source-link">Frame</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
 				</div>
 				<div class="class desc">
 					Represents an offscreen drawing surface that can be rendered as an image.
@@ -17,8 +18,8 @@ It is based on the HTML5 Canvas API.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> frame</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> Frame</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">);
 
 </span><span class="highlight-COMMENT">// add shapes to the frame</span><span class="highlight-SYMBOL">
-</span><span class="highlight-IDENTIFIER">frame</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">stroke</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;blue&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">rect</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 20</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 20</span><span class="highlight-SYMBOL">);
-</span><span class="highlight-IDENTIFIER">frame</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">30</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 50</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">frame</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">stroke</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;blue&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">rect</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 20</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 20</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">frame</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">30</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 50</span><span class="highlight-SYMBOL">);
 
 </span><span class="highlight-COMMENT">// render the frame to the screen</span><span class="highlight-SYMBOL">
 </span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">image</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">frame</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">default</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">);
@@ -26,7 +27,7 @@ It is based on the HTML5 Canvas API.
 				</div>
 				
 					<div class="header">Subclasses</div>
-					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Rendering/Image Types/GraphPlane.html#class GraphPlane">GraphPlane</a></span>, <span class="class-name">FastFrame</span></div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Rendering/Image Types/GraphPlane.html#class GraphPlane">GraphPlane</a></span>, <span class="class-name">FastFrame</span></div>
 				
 				
 				
@@ -34,9 +35,9 @@ It is based on the HTML5 Canvas API.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Frame.renderer">
 					<div class="prop-header member">
-						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Renderer/Artists/CanvasArtist2D.html#class CanvasArtist2D">CanvasArtist2D</a></span>
+						<span class="prop-name">renderer</span><span class="type"><a href="../../Rendering/Renderer/2D/Artists/CanvasArtist2D.html#class CanvasArtist2D">CanvasArtist2D</a></span>
 					</div>
-					<div class="prop desc">The renderer local to the frame that can be used to modify its contents</div>
+					<div class="prop desc">The renderer local to the frame that can be used to modify its contents. This property is read-only</div>
 				</div>
 			</div>
 				
@@ -59,7 +60,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.constructor():width">
 							<div class="param-name">
 								<span class="param">width</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The natural width of the frame
@@ -69,7 +70,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.constructor():height">
 							<div class="param-name">
 								<span class="param">height</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The natural height of the frame
@@ -79,7 +80,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.constructor():pixelRatio?">
 							<div class="param-name">
 								<span class="param">pixelRatio</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The pixel ratio for the frame. The default is <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">window</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">devicePixelRatio</span></code>
@@ -106,7 +107,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.stretch():width">
 							<div class="param-name">
 								<span class="param">width</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The width of the stretched image
@@ -116,7 +117,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.stretch():height">
 							<div class="param-name">
 								<span class="param">height</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The height of the stretched image
@@ -143,7 +144,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.clip():region">
 							<div class="param-name">
 								<span class="param">region</span>
-								<span class="type"><a href="../../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
+								<span class="type"><a href="../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
 							</div>
 							<div class="param desc">
 								The region to extract
@@ -156,7 +157,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.clip():x">
 							<div class="param-name">
 								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The x coordinate of the upper-left corner of the region.
@@ -166,7 +167,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.clip():y">
 							<div class="param-name">
 								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The y coordinate of the upper-left corner of the region.
@@ -176,7 +177,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.clip():width">
 							<div class="param-name">
 								<span class="param">width</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The width of the region
@@ -186,7 +187,7 @@ It is based on the HTML5 Canvas API.
 						<div class="param-wrapper" id="Frame.prototype.clip():height">
 							<div class="param-name">
 								<span class="param">height</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The height of the region
@@ -215,7 +216,7 @@ The copy will have the same pixel ratio as the original image.
 						<div class="param-wrapper" id="Frame.fromImageType():image">
 							<div class="param-name">
 								<span class="param">image</span>
-								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+								<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 							</div>
 							<div class="param desc">
 								The image to copy data from
@@ -228,7 +229,7 @@ The copy will have the same pixel ratio as the original image.
 						<div class="param-wrapper" id="Frame.fromImageType():image">
 							<div class="param-name">
 								<span class="param">image</span>
-								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+								<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 							</div>
 							<div class="param desc">
 								The image to copy data from
@@ -238,7 +239,7 @@ The copy will have the same pixel ratio as the original image.
 						<div class="param-wrapper" id="Frame.fromImageType():region">
 							<div class="param-name">
 								<span class="param">region</span>
-								<span class="type"><a href="../../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
+								<span class="type"><a href="../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
 							</div>
 							<div class="param desc">
 								The region to extract
@@ -251,7 +252,7 @@ The copy will have the same pixel ratio as the original image.
 						<div class="param-wrapper" id="Frame.fromImageType():image">
 							<div class="param-name">
 								<span class="param">image</span>
-								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+								<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 							</div>
 							<div class="param desc">
 								The image to copy data from
@@ -261,7 +262,7 @@ The copy will have the same pixel ratio as the original image.
 						<div class="param-wrapper" id="Frame.fromImageType():x">
 							<div class="param-name">
 								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The x coordinate of the upper-left corner of the region.
@@ -271,7 +272,7 @@ The copy will have the same pixel ratio as the original image.
 						<div class="param-wrapper" id="Frame.fromImageType():y">
 							<div class="param-name">
 								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The y coordinate of the upper-left corner of the region.
@@ -281,7 +282,7 @@ The copy will have the same pixel ratio as the original image.
 						<div class="param-wrapper" id="Frame.fromImageType():width">
 							<div class="param-name">
 								<span class="param">width</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The width of the region
@@ -291,7 +292,7 @@ The copy will have the same pixel ratio as the original image.
 						<div class="param-wrapper" id="Frame.fromImageType():height">
 							<div class="param-name">
 								<span class="param">height</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The height of the region
@@ -308,7 +309,7 @@ The copy will have the same pixel ratio as the original image.
 		
 			<div class="class-wrapper" id="class FastFrame">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\WebGLRenderer.js?#L349" target="_blank" class="class-name source-link">FastFrame</a> <span class="keyword">extends</span> <span class="class-name">Frame</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\WebGLRenderer.js?#L350" target="_blank" class="class-name source-link">FastFrame</a> <span class="keyword">extends</span> <span class="class-name">Frame</span>
 				</div>
 				<div class="class desc">
 					Represents a WebGL-based implementation of Frame.
@@ -320,13 +321,94 @@ The copy will have the same pixel ratio as the original image.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="FastFrame.renderer">
 					<div class="prop-header member">
-						<span class="prop-name">renderer</span><span class="type"><a href="../../../Pages/Rendering/Renderer/Artists/WebGLArtist2D.html#class WebGLArtist2D">WebGLArtist2D</a></span>
+						<span class="prop-name">renderer</span><span class="type"><a href="../../Rendering/Renderer/2D/Artists/WebGLArtist2D.html#class WebGLArtist2D">WebGLArtist2D</a></span>
 					</div>
 					<div class="prop desc">The renderer for the frame</div>
 				</div>
 			</div>
 				
 				
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Frame3D">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame3D.js?#L6" target="_blank" class="class-name source-link">Frame3D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+				</div>
+				<div class="class desc">
+					Represents an offscreen image onto which 3D graphics can be drawn.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="Frame3D.renderer">
+					<div class="prop-header member">
+						<span class="prop-name">renderer</span><span class="type"><a href="../../Rendering/Renderer/3D/Artist3D.html#class Artist3D">Artist3D</a></span>
+					</div>
+					<div class="prop desc">The renderer which can be used to add meshes and lights to the frame. This property is read-only</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Frame3D.camera">
+					<div class="prop-header member">
+						<span class="prop-name">camera</span><span class="type"><a href="../../Rendering/Camera/Camera3D.html#class Camera3D">Camera3D</a></span>
+					</div>
+					<div class="prop desc">The view from which the objects will be rendered</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Frame3D.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame3D.js?#L13" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">pixelRatio?</span>)
+			</div>
+			<div class="function desc">
+				Creates a new Frame3D.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Frame3D.prototype.constructor():width">
+							<div class="param-name">
+								<span class="param">width</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The natural width of the canvas
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Frame3D.prototype.constructor():height">
+							<div class="param-name">
+								<span class="param">height</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The natural height of the canvas
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Frame3D.prototype.constructor():pixelRatio?">
+							<div class="param-name">
+								<span class="param">pixelRatio</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The width, in pixels, of a single unit of natural width in the image. Default is the pixel ratio for the user's monitor
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
 				
 			</div>
 		

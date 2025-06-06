@@ -200,7 +200,7 @@ class ImageType {
 	 * Downloads the image as a PNG, with a specified name.
 	 * Returns a promise that resolves when the image downloads.
 	 * @param String name | The name of the downloaded image, without the extension
-	 * @return Promise<void>
+	 * @return Promise
 	 */
 	download(name) {
 		const a = document.createElement("a");

@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Camera">
 				<div class="class-header">
-					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L9" target="_blank" class="class-name source-link">Camera</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Geometry/Matrices.html#class Matrix">Matrix</a></span>
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L13" target="_blank" class="class-name source-link">Camera</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Geometry/Matrices.html#class Matrix">Matrix</a></span>
 				</div>
 				<div class="class desc">
 					Represents a camera in a scene targeting a specific rendering surface.
@@ -17,7 +18,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 				</div>
 				
 					<div class="header">Implementers</div>
-					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Rendering/Camera/Camera2D.html#class Camera2D">Camera2D</a></span></div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Rendering/Camera/Camera2D.html#class Camera2D">Camera2D</a></span>, <span class="class-name"><a href="../../Rendering/Camera/Camera3D.html#class Camera3D">Camera3D</a></span></div>
 				
 				
 				
@@ -25,14 +26,14 @@ The transformation represented by this matrix is from world-space to screen-spac
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Camera.zoom">
 					<div class="prop-header member">
-						<span class="prop-name">zoom</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">zoom</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The magnification level of the camera</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Camera.rotation">
 					<div class="prop-header member">
-						<span class="prop-name">rotation</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">rotation</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The clockwise roll (in radians) of the camera. Starts at 0</div>
 				</div>
@@ -44,7 +45,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 					<div class="class-methods">
 		<div class="function-wrapper" id="get Camera.prototype.matrix()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L17" target="_blank" class="function-name source-link">matrix</a><span class="type"><a href="../../../Pages/Geometry/Matrices.html#class Matrix">Matrix</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L21" target="_blank" class="function-name source-link">matrix</a><span class="type"><a href="../../Geometry/Matrices.html#class Matrix">Matrix</a></span>
 			</div>
 			<div class="function desc">
 				Returns the caller.
@@ -54,7 +55,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 	
 		<div class="function-wrapper" id="Camera.prototype.restoreZoom()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L23" target="_blank" class="function-name source-link">restoreZoom</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L27" target="_blank" class="function-name source-link">restoreZoom</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the zoom to 1.
@@ -64,7 +65,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 	
 		<div class="function-wrapper" id="Camera.prototype.zoomIn()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L30" target="_blank" class="function-name source-link">zoomIn</a>(<span class="param">amount</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L34" target="_blank" class="function-name source-link">zoomIn</a>(<span class="param">amount</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Zooms in by a specified amount.
@@ -77,7 +78,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 						<div class="param-wrapper" id="Camera.prototype.zoomIn():amount">
 							<div class="param-name">
 								<span class="param">amount</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The amount to zoom in by
@@ -91,7 +92,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 	
 		<div class="function-wrapper" id="Camera.prototype.zoomOut()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L37" target="_blank" class="function-name source-link">zoomOut</a>(<span class="param">amount</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L41" target="_blank" class="function-name source-link">zoomOut</a>(<span class="param">amount</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Zooms out by a specified amount.
@@ -104,7 +105,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 						<div class="param-wrapper" id="Camera.prototype.zoomOut():amount">
 							<div class="param-name">
 								<span class="param">amount</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The amount to zoom out by
@@ -118,7 +119,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 	
 		<div class="function-wrapper" id="Camera.prototype.zoomBy()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L44" target="_blank" class="function-name source-link">zoomBy</a>(<span class="param">factor</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L48" target="_blank" class="function-name source-link">zoomBy</a>(<span class="param">factor</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Multiplies the current zoom value.
@@ -131,7 +132,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 						<div class="param-wrapper" id="Camera.prototype.zoomBy():factor">
 							<div class="param-name">
 								<span class="param">factor</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The amount to multiply the current zoom
@@ -145,7 +146,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 	
 		<div class="function-wrapper" id="Camera.prototype.screenToWorld()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L52" target="_blank" class="function-name source-link">screenToWorld</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L56" target="_blank" class="function-name source-link">screenToWorld</a>(<span class="param">point</span>)<span class="type"><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Maps a given point from screen-space to world-space.
@@ -158,7 +159,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 						<div class="param-wrapper" id="Camera.prototype.screenToWorld():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The point to transform
@@ -172,7 +173,7 @@ The transformation represented by this matrix is from world-space to screen-spac
 	
 		<div class="function-wrapper" id="Camera.prototype.worldToScreen()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L63" target="_blank" class="function-name source-link">worldToScreen</a>(<span class="param">point</span>)<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L67" target="_blank" class="function-name source-link">worldToScreen</a>(<span class="param">point</span>)<span class="type"><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
 				Maps a given point from world-space to screen-space.
@@ -185,10 +186,64 @@ The transformation represented by this matrix is from world-space to screen-spac
 						<div class="param-wrapper" id="Camera.prototype.worldToScreen():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The point to transform
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera.prototype.drawInWorldSpace()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L77" target="_blank" class="function-name source-link">drawInWorldSpace</a>(<span class="param">render</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera.prototype.drawInWorldSpace():render">
+							<div class="param-name">
+								<span class="param">render</span>
+								<span class="type">() =&gt; void</span>
+							</div>
+							<div class="param desc">
+								The function to call while in the world-space context
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera.prototype.drawInScreenSpace()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L86" target="_blank" class="function-name source-link">drawInScreenSpace</a>(<span class="param">render</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera.prototype.drawInScreenSpace():render">
+							<div class="param-name">
+								<span class="param">render</span>
+								<span class="type">() =&gt; void</span>
+							</div>
+							<div class="param desc">
+								The function to call while in the screen-space context
 							</div>
 						</div>
 					

@@ -390,13 +390,13 @@ class Artist3D extends Artist {
 	/**
 	 * Returns an object with various methods for queueing meshes to be rendered.
 	 * @param Mesh mesh | The mesh to be rendered
+	 * @return MeshRenderer
 	 */
 	mesh(mesh) {
 		this.meshObj.mesh = mesh;
 		return this.meshObj;
 	}
 	pass(camera, meshes, shadowPass, setupMaterial) {
-		/** @type {{ gl: WebGL2RenderingContext }} */
 		const { gl } = this;
 		
 		const transparent = [];

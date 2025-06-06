@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,25 +10,25 @@
 				
 			<div class="class-wrapper" id="class GPUArray">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L446" target="_blank" class="class-name source-link">GPUArray</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L458" target="_blank" class="class-name source-link">GPUArray</a>
 				</div>
 				<div class="class desc">
 					Represents an array of GLSL structs.
 These structs may be nested.
-These are used to represent GLSL dynamic-length array uniforms and the output of <a href="../../../Pages/Miscellaneous/GPUComputation.html#class GPUComputation">GPUComputations</a>, but should not be constructed directly.
+These are used to represent GLSL dynamic-length array uniforms and the output of <a href="../../Miscellaneous/GPUComputation.html#class GPUComputation">GPUComputations</a>, but should not be constructed directly.
 For a struct such as:
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">struct</span><span class="highlight-CLASS"> <a href="../../../Pages/Geometry/Shapes/Circle.html#class Circle">Circle</a></span><span class="highlight-SYMBOL"> {
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">struct</span><span class="highlight-CLASS"> <a href="../../Geometry/Shapes/2D/Circle.html#class Circle">Circle</a></span><span class="highlight-SYMBOL"> {
 </span><span class="highlight-KEYWORD">	vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">;
 </span><span class="highlight-KEYWORD">	float</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">;
 </span><span class="highlight-KEYWORD">	vec3</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">;
 };
 </span></code>
 A GPUArray could be used as follows:
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// gpu is a <a href="../../../Pages/Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a></span><span class="highlight-KEYWORD">
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// gpu is a <a href="../../Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a></span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> circle</span><span class="highlight-SYMBOL"> = {
-	</span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">),
+	</span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">),
 	</span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 22.5</span><span class="highlight-SYMBOL">,
-	</span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;magenta&quot;</span><span class="highlight-SYMBOL">)
+	</span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;magenta&quot;</span><span class="highlight-SYMBOL">)
 };
 </span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getUniform</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;circles&quot;</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">append</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circle</span><span class="highlight-SYMBOL">);
 </span></code>
@@ -39,7 +40,7 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 					<div class="class-properties">
 				<div class="prop-wrapper" id="GPUArray.buffer">
 					<div class="prop-header member">
-						<span class="prop-name">buffer</span><span class="type"><a href="../../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
+						<span class="prop-name">buffer</span><span class="type"><a href="../../Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
 					</div>
 					<div class="prop desc">A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to</div>
 				</div>
@@ -51,7 +52,7 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 					<div class="class-methods">
 		<div class="function-wrapper" id="get GPUArray.prototype.length()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L461" target="_blank" class="function-name source-link">length</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L473" target="_blank" class="function-name source-link">length</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Retrieves the number of structs in the array.
@@ -61,7 +62,7 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 	
 		<div class="function-wrapper" id="GPUArray.prototype.set()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L473" target="_blank" class="function-name source-link">set</a>(<span class="param">value</span><span class="aux"> | </span><span class="param">value</span>)<span class="type">GPUArray</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L485" target="_blank" class="function-name source-link">set</a>(<span class="param">value</span><span class="aux"> | </span><span class="param">value</span>)<span class="type">GPUArray</span>
 			</div>
 			<div class="function desc">
 				Sets the value of the array and returns the caller.
@@ -102,7 +103,7 @@ This will overwrite all previous data.
 	
 		<div class="function-wrapper" id="GPUArray.prototype.append()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L489" target="_blank" class="function-name source-link">append</a>(<span class="param">value</span>)<span class="type">GPUArray</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L501" target="_blank" class="function-name source-link">append</a>(<span class="param">value</span>)<span class="type">GPUArray</span>
 			</div>
 			<div class="function desc">
 				Appends a struct to the end of the array and returns the caller.
@@ -129,7 +130,7 @@ This will overwrite all previous data.
 	
 		<div class="function-wrapper" id="GPUArray.prototype.write()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L501" target="_blank" class="function-name source-link">write</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">srcOffset?</span>)<span class="type">GPUArray</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L513" target="_blank" class="function-name source-link">write</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">srcOffset?</span>)<span class="type">GPUArray</span>
 			</div>
 			<div class="function desc">
 				Writes to a specified location in the array and returns the caller.
@@ -153,7 +154,7 @@ This may increase the size of the array, but cannot be used to create holes.
 						<div class="param-wrapper" id="GPUArray.prototype.write():offset?">
 							<div class="param-name">
 								<span class="param">offset</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The first index to write to in the array. Default is 0
@@ -163,7 +164,7 @@ This may increase the size of the array, but cannot be used to create holes.
 						<div class="param-wrapper" id="GPUArray.prototype.write():length?">
 							<div class="param-name">
 								<span class="param">length</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The amount of elements to write. If not specified, this will be as many as possible
@@ -173,7 +174,7 @@ This may increase the size of the array, but cannot be used to create holes.
 						<div class="param-wrapper" id="GPUArray.prototype.write():srcOffset?">
 							<div class="param-name">
 								<span class="param">srcOffset</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The first index to read from the data argument. If not specified, this will be the same as the offset argument
@@ -187,7 +188,7 @@ This may increase the size of the array, but cannot be used to create holes.
 	
 		<div class="function-wrapper" id="GPUArray.prototype.read()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L525" target="_blank" class="function-name source-link">read</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">dstOffset?</span>)<span class="type">Object[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L537" target="_blank" class="function-name source-link">read</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">dstOffset?</span>)<span class="type">Object[]</span>
 			</div>
 			<div class="function desc">
 				Reads from a specified location in the array into a provided array of objects, and returns the destination array.
@@ -210,7 +211,7 @@ This may increase the size of the array, but cannot be used to create holes.
 						<div class="param-wrapper" id="GPUArray.prototype.read():offset?">
 							<div class="param-name">
 								<span class="param">offset</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The first index to read from in the array. Default is 0
@@ -220,7 +221,7 @@ This may increase the size of the array, but cannot be used to create holes.
 						<div class="param-wrapper" id="GPUArray.prototype.read():length?">
 							<div class="param-name">
 								<span class="param">length</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The amount of elements to read. If not specified, this will be as many as possible
@@ -230,7 +231,7 @@ This may increase the size of the array, but cannot be used to create holes.
 						<div class="param-wrapper" id="GPUArray.prototype.read():dstOffset?">
 							<div class="param-name">
 								<span class="param">dstOffset</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The first index to write to in the data argument. If not specified, this will be the same as the offset argument

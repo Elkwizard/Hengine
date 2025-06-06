@@ -93,7 +93,7 @@ function documentFunction(fn, wrapperClass) {
 	`;
 }
 
-function document(doc, topLevelIDs, file) {
+function document(doc, topLevelIDs, file, aliases) {
 	let result;
 	if (doc.name.isPage) {
 		const name = documentName(doc.name, doc);
@@ -175,6 +175,21 @@ function document(doc, topLevelIDs, file) {
 		return highlight(code, highlighters.js);
 	});
 	result = result.replace(/(?<=<span class=\"type\">)(.*?)(?=<\/span>)/g, escapeHTML);
+
+	// replace aliases (remarkably post-processed)
+	const aliasAlternation = Object.keys(aliases)
+		.sort((a, b) => b.length - a.length)
+		.join("|")
+	const aliasRegex = new RegExp(`\\b(${aliasAlternation})\\b`, "g");
+	result = result.replace(aliasRegex, match => {
+		const alias = aliases[match];
+		if (typeof alias === "string") return alias;
+		return `<span class="alias">
+			<span class="alias two">${alias[2]}</span>
+			<span class="alias three">${alias[3]}</span>
+			<span class="alias general">${match}</span>
+		</span>`;
+	});
 
 	// add automatic links to other doc pages
 	const toRoot = path.relative(path.dirname(file), ".");

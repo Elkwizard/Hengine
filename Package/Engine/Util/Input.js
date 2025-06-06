@@ -23,7 +23,7 @@ class InputHandler {
 
 	}
 	preprocess(name) {
-		return name;
+		return String(name);
 	}
 	/**
 	 * Returns the current state of specific key.
@@ -252,7 +252,7 @@ class KeyboardHandler extends InputHandler {
 		this.downQueue = [];
 	}
 	preprocess(name) {
-		name += "";
+		name = super.preprocess(name);
 		return name.length === 1 ? name.toLowerCase() : name;
 	}
 	addListeners() {
@@ -545,7 +545,7 @@ class TouchHandler extends InputHandler {
 	 * @group get allPressed, get allJustPressed, get allJustReleased
 	 * Returns the names of each touch meeting a specific requirement.
 	 * If none meet the requirement, this returns null.
-	 * @return Number[]/null
+	 * @return String[]/null
 	 */
 }
 

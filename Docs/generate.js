@@ -24,10 +24,12 @@ const populatePathMap = (structure, file = ".") => {
 	for (const key in structure) {
 		const value = structure[key];
 		const dst = path.join(file, key);
-		if (Array.isArray(value) || value === null)
-			for (const name of value ? value : [key])
+		if (Array.isArray(value) || value === null) {
+			for (const name of value ?? [key])
 				nameToPath[name] = dst + ".html";
-		else populatePathMap(value, dst);
+		} else {
+			populatePathMap(value, dst);
+		}
 	}
 };
 
@@ -45,9 +47,18 @@ const transformFiles = (transf, srcFile, srcRoot = srcFile) => {
 	)];
 };
 
-const docs = transformFiles(parse, sourcePath).flatMap(batch => batch);
+const aliases = { };
+const docs = transformFiles(parse, sourcePath).flatMap(file => {
+	Object.assign(aliases, file.aliases);
+	return file.topLevels;
+});
 addInheritance(docs);
-fs.writeFileSync(typeFile, createTypeSpecification(docs), "utf-8");
+
+for (const dimension of [2, 3]) {
+	const fileName = typeFile.replace(".d.ts", `${dimension}D.d.ts`);
+	const typeSpec = createTypeSpecification(docs, aliases, dimension);
+	fs.writeFileSync(fileName, typeSpec, "utf-8");
+}
 
 const nameToDoc = { };
 for (const doc of docs)
@@ -80,12 +91,15 @@ const pathToDocumentation = { };
 const completeness = { };
 
 for (const [doc, path] of docToPath) {
-	if (!(path in completeness))
-		completeness[path] = !!doc;
-	else completeness[path] &&= !!doc;
+	completeness[path] ??= true;
+	completeness[path] &&= !!doc;
 	if (!doc) continue;
-	pathToDocumentation[path] = (pathToDocumentation[path] ?? "") + document(doc, docToPath, path);
+	pathToDocumentation[path] ??= "";
+	pathToDocumentation[path] += document(doc, docToPath, path, aliases);
 }
+
+// clear documentation
+fs.rmSync(path.join(dstPath, "Pages"), { recursive: true });
 
 // write documentation files to disk
 for (const file in pathToDocumentation) {
@@ -95,15 +109,16 @@ for (const file in pathToDocumentation) {
 		<!DOCTYPE html>
 		<html>
 			<head>
-				<link href="${path.join(toRoot, "./vars.css")}" type="text/css" rel="stylesheet">
-				<link href="${path.join(toRoot, "./doc.css")}" type="text/css" rel="stylesheet">
+				<meta charset="UTF-8">
+				<link href="${path.join(toRoot, "../vars.css")}" type="text/css" rel="stylesheet">
+				<link href="${path.join(toRoot, "../doc.css")}" type="text/css" rel="stylesheet">
 			</head>
 			<body>
 				${pathToDocumentation[file]}
 			</body>
 		</html>
 	`;
-	writeFile(file, documentation);
+	writeFile(path.join("Pages", file), documentation);
 }
 
 writeFile("index.js", `

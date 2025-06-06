@@ -3,7 +3,7 @@
  */
 
 /**
- * @type class Transform<Vector, Angle>
+ * @type class Transform<Matrix, Vector, Angle>
  * @implements Copyable
  * Represents an affine transformation with no scaling.
  * It is composed of a rotation about the origin followed by a translation.
@@ -94,7 +94,7 @@ class Transform {
 	}
 	/**
 	 * Returns a unit vector in the direction of the x axis in local space.
-	 * @return VectorN
+	 * @return Vector
 	 */
 	get direction() {
 		return this.constructor.Vector.right.rotate(this.rotation);
@@ -175,7 +175,7 @@ class Transform {
 }
 
 /**
- * @type class Transform2D extends Transform<Vector2, Number>
+ * @type class Transform2D extends Transform<Matrix3, Vector2, Number>
  * Represents a 2D affine transformation, composed of a translation and a rotation.
  * @prop Vector2 position | The translation of the transform
  * @prop Number rotation | The angle of rotation
@@ -186,8 +186,8 @@ class Transform2D extends Transform {
 
 	/**
 	 * Creates a new 2D transform.
-	 * @prop Vector2 position | The translation of the transform
-	 * @prop Number rotation? | The angle of rotation. Default is 0
+	 * @param Vector2 position | The translation of the transform
+	 * @param Number rotation? | The angle of rotation. Default is 0
 	 */
 	constructor(position, rotation = 0) {
 		super(position, rotation);
@@ -208,7 +208,7 @@ class Transform2D extends Transform {
 }
 
 /**
- * @type class Transform3D extends Transform<Vector3, Vector3>
+ * @type class Transform3D extends Transform<Matrix4, Vector3, Vector3>
  * Represents a 3D affine transformation, composed of a translation and a rotation about an arbitrary axis.
  * @prop Vector3 position | The translation of the transform
  * @prop Vector3 rotation | The angle of rotation, represented as the unit axis of rotation multiplied by the angle of rotation
@@ -219,8 +219,8 @@ class Transform3D extends Transform {
 
 	/**
 	 * Creates a new 3D transform.
-	 * @prop Vector3 position | The translation of the transform
-	 * @prop Vector3 rotation? | The angle of rotation. Default is no rotation
+	 * @param Vector3 position | The translation of the transform
+	 * @param Vector3 rotation? | The angle of rotation. Default is no rotation
 	 */
 	constructor(position, rotation = Vector3.zero) {
 		super(position, rotation);

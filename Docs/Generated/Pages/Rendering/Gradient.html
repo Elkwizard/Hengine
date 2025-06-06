@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -13,15 +14,15 @@
 				</div>
 				<div class="class desc">
 					Represents a parameterized gradient between a series of different values.
-These values can be of any <a href="../../Pages/Superclasses/Operable.html#class Operable">Operable</a> type.
+These values can be of any <a href="../Superclasses/Operable.html#class Operable">Operable</a> type.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// color of daylight at different times</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> daylightGradient</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> Gradient</span><span class="highlight-SYMBOL">([
-	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">) },
-	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 7</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;purple&quot;</span><span class="highlight-SYMBOL">) },
-	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 8</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;orange&quot;</span><span class="highlight-SYMBOL">) },
-	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 12</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;yellow&quot;</span><span class="highlight-SYMBOL">) },
-	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 20</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">) },
-	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 24</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">) }
+	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">) },
+	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 7</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;purple&quot;</span><span class="highlight-SYMBOL">) },
+	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 8</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;orange&quot;</span><span class="highlight-SYMBOL">) },
+	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 12</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;yellow&quot;</span><span class="highlight-SYMBOL">) },
+	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 20</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">) },
+	{ </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 24</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">value</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">) }
 ]);
 
 </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
@@ -95,7 +96,7 @@ const</span><span class="highlight-CONSTANT"> daylightGradient</span><span class
 	
 		<div class="function-wrapper" id="Gradient.prototype.sample()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Gradient.js?#L57" target="_blank" class="function-name source-link">sample</a>(<span class="param">t</span>)<span class="type"><a href="../../Pages/Superclasses/Operable.html#class Operable">Operable</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Gradient.js?#L57" target="_blank" class="function-name source-link">sample</a>(<span class="param">t</span>)<span class="type"><a href="../Superclasses/Operable.html#class Operable">Operable</a></span>
 			</div>
 			<div class="function desc">
 				Samples the gradient at a specific value of the parameter
@@ -108,7 +109,7 @@ const</span><span class="highlight-CONSTANT"> daylightGradient</span><span class
 						<div class="param-wrapper" id="Gradient.prototype.sample():t">
 							<div class="param-name">
 								<span class="param">t</span>
-								<span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The parameter value to sample at
@@ -138,14 +139,14 @@ Represents a point along a gradient with a specific value.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="ValueStop.start">
 					<div class="prop-header member">
-						<span class="prop-name">start</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">start</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The parameter value at which this stop's value reaches full intensity</div>
 				</div>
 			
 				<div class="prop-wrapper" id="ValueStop.value">
 					<div class="prop-header member">
-						<span class="prop-name">value</span><span class="type"><a href="../../Pages/Superclasses/Operable.html#class Operable">Operable</a></span>
+						<span class="prop-name">value</span><span class="type"><a href="../Superclasses/Operable.html#class Operable">Operable</a></span>
 					</div>
 					<div class="prop desc">The gradient value at this stop</div>
 				</div>

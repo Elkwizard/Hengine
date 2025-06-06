@@ -16,7 +16,7 @@
  * 	);
  * ```
  * @prop ElementContainer main | The root of the element tree for the scene
- * @prop Camera2D camera | The camera used to render the scene
+ * @prop CameraN camera | The camera used to render the scene
  * @prop Boolean mouseEvents | Whether or not mouse events will ever be checked. If this is true, specific SceneObjects can opt out, but not vice-versa
  * @prop Boolean cullGraphics | Whether or not SceneObject graphics will ever be culled. If this is true, specific SceneObjects can still opt out, but not vice-versa
  * @prop Boolean collisionEvents | Whether or not collision events will be detected

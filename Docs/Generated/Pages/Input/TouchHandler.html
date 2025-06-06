@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,12 +10,12 @@
 				
 			<div class="class-wrapper" id="class TouchHandler">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L478" target="_blank" class="class-name source-link">TouchHandler</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/InputHandler.html#class InputHandler">InputHandler</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L480" target="_blank" class="class-name source-link">TouchHandler</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Input/InputHandler.html#class InputHandler">InputHandler</a></span>
 				</div>
 				<div class="class desc">
 					Represents the API for interacting with the user's touch screen.
-This class is available via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">touches</span></code> property of both the global object and <a href="../../Pages/Structure/Hengine.html#class Hengine">Hengine</a>.
-The names for keys in this API are arbitrary numbers, rather than <a href="../../Pages/Built-Ins/String.html#class String">Strings</a>.
+This class is available via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">touches</span></code> property of both the global object and <a href="../Structure/Hengine.html#class Hengine">Hengine</a>.
+The names for keys in this API are arbitrary numbers, rather than <a href="../Built-Ins/String.html#class String">Strings</a>.
 Getting these key names should be done with the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">allPressed</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">allJustPressed</span></code>, and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">allJustReleased</span></code> getters, rather than specifying them directly.
 All properties of this class are read-only.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
@@ -23,11 +24,11 @@ All properties of this class are read-only.
 		</span><span class="highlight-COMMENT">// retrieve the positions of the first two touches</span><span class="highlight-SYMBOL">
 	</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> a</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">touches</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">get</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">activeTouches</span><span class="highlight-SYMBOL">[</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">]).</span><span class="highlight-PROPERTY">screen</span><span class="highlight-SYMBOL">;
 	</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> b</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">touches</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">get</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">activeTouches</span><span class="highlight-SYMBOL">[</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">]).</span><span class="highlight-PROPERTY">screen</span><span class="highlight-SYMBOL">;
-	</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> dist</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">dist</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">);
+	</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> dist</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">dist</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">);
 		
 		</span><span class="highlight-COMMENT">// shows the distance between the them</span><span class="highlight-SYMBOL">
-		</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">stroke</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 3</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">measure</span><span class="highlight-SYMBOL">(
-			</span><span class="highlight-CLASS"><a href="../../Pages/Rendering/Font.html#class Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CLASS">Arial15</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&#96;Distance: </span><span class="highlight-SYMBOL">${</span><span class="highlight-CLASS">Math</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">round</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">dist</span><span class="highlight-SYMBOL">)}</span><span class="highlight-STRING"> px&#96;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">
+		</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">stroke</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">),</span><span class="highlight-NUMBER"> 3</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">measure</span><span class="highlight-SYMBOL">(
+			</span><span class="highlight-CLASS"><a href="../Rendering/Font.html#class Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CLASS">Arial15</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&#96;Distance: </span><span class="highlight-SYMBOL">${</span><span class="highlight-CLASS">Math</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">round</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">dist</span><span class="highlight-SYMBOL">)}</span><span class="highlight-STRING"> px&#96;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">
 		);
 	}
 });
@@ -40,14 +41,14 @@ All properties of this class are read-only.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="TouchHandler.maxTouches">
 					<div class="prop-header member">
-						<span class="prop-name">maxTouches</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">maxTouches</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The maximum number of simultaneous touch points supported by the touch screen</div>
 				</div>
 			
 				<div class="prop-wrapper" id="TouchHandler.count">
 					<div class="prop-header member">
-						<span class="prop-name">count</span><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">count</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The number of currently active touches</div>
 				</div>
@@ -59,7 +60,7 @@ All properties of this class are read-only.
 					<div class="class-methods">
 		<div class="function-wrapper" id="get TouchHandler.prototype.allPressed()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L548" target="_blank" class="function-name source-link">allPressed</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L548" target="_blank" class="function-name source-link">allJustPressed</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L548" target="_blank" class="function-name source-link">allJustReleased</a><span class="type"><a href="../../Pages/Built-Ins/Number.html#class Number">Number</a>[]/null</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L550" target="_blank" class="function-name source-link">allPressed</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L550" target="_blank" class="function-name source-link">allJustPressed</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L550" target="_blank" class="function-name source-link">allJustReleased</a><span class="type"><a href="../Built-Ins/String.html#class String">String</a>[]/null</span>
 			</div>
 			<div class="function desc">
 				Returns the names of each touch meeting a specific requirement.
@@ -73,7 +74,7 @@ If none meet the requirement, this returns null.
 		
 			<div class="class-wrapper" id="class TouchHandler.State">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L559" target="_blank" class="class-name source-link">TouchHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Pages/Input/MouseHandler.html#class MouseHandler.State">MouseHandler.State</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L561" target="_blank" class="class-name source-link">TouchHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Input/MouseHandler.html#class MouseHandler.State">MouseHandler.State</a></span>
 				</div>
 				<div class="class desc">
 					The state of a specific touch on the user's screen.
@@ -86,28 +87,28 @@ All properties of this class are read-only.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="TouchHandler.State.screen">
 					<div class="prop-header member">
-						<span class="prop-name">screen</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">screen</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The current position of the touch, in screen-space</div>
 				</div>
 			
 				<div class="prop-wrapper" id="TouchHandler.State.screenLast">
 					<div class="prop-header member">
-						<span class="prop-name">screenLast</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">screenLast</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The position of the touch last frame, in screen-space</div>
 				</div>
 			
 				<div class="prop-wrapper" id="TouchHandler.State.world">
 					<div class="prop-header member">
-						<span class="prop-name">world</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">world</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The current position of the touch, in world-space</div>
 				</div>
 			
 				<div class="prop-wrapper" id="TouchHandler.State.worldLast">
 					<div class="prop-header member">
-						<span class="prop-name">worldLast</span><span class="type"><a href="../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+						<span class="prop-name">worldLast</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
 					<div class="prop desc">The position of the touch last frame, in world-space</div>
 				</div>

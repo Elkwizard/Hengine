@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -17,7 +18,7 @@ This is an abstract superclass and should not be constructed.
 				</div>
 				
 					<div class="header">Subclasses</div>
-					<div class="subclass desc"><span class="class-name"><a href="../../../Pages/Rendering/Image Types/CanvasImage.html#class CanvasImage">CanvasImage</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/Animation.html#class Animation">Animation</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/AnimationStateMachine.html#class AnimationStateMachine">AnimationStateMachine</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/HImage.html#class HImage">HImage</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/Frame.html#class Frame">Frame</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/GPUShader.html#class GPUShader">GPUShader</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/StaticImage.html#class StaticImage">StaticImage</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/Texture.html#class Texture">Texture</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/VideoView.html#class VideoView">VideoView</a></span>, <span class="class-name"><a href="../../../Pages/Rendering/Image Types/WebcamCapture.html#class WebcamCapture">WebcamCapture</a></span></div>
+					<div class="subclass desc"><span class="class-name"><a href="../../Rendering/Image Types/CanvasImage.html#class CanvasImage">CanvasImage</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/Animation.html#class Animation">Animation</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/AnimationStateMachine.html#class AnimationStateMachine">AnimationStateMachine</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/HImage.html#class HImage">HImage</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/Frame.html#class Frame">Frame</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/GPUShader.html#class GPUShader">GPUShader</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/StaticImage.html#class StaticImage">StaticImage</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/Texture.html#class Texture">Texture</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/VideoView.html#class VideoView">VideoView</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/WebcamCapture.html#class WebcamCapture">WebcamCapture</a></span>, <span class="class-name"><a href="../../Rendering/Image Types/Frame.html#class Frame3D">Frame3D</a></span></div>
 				
 				
 				
@@ -25,14 +26,14 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-properties">
 				<div class="prop-wrapper" id="ImageType.width">
 					<div class="prop-header member">
-						<span class="prop-name">width</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">width</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The natural rendered width of the image</div>
 				</div>
 			
 				<div class="prop-wrapper" id="ImageType.height">
 					<div class="prop-header member">
-						<span class="prop-name">height</span><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+						<span class="prop-name">height</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 					</div>
 					<div class="prop desc">The natural rendered height of the image</div>
 				</div>
@@ -51,7 +52,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="get ImageType.prototype.pixelRatio()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L74" target="_blank" class="function-name source-link">pixelRatio</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L74" target="_blank" class="function-name source-link">pixelRatio</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the pixel density of the image, measured as the ratio of the number of pixels in a row of the image to the natural width of the image.
@@ -61,7 +62,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get ImageType.prototype.pixelWidth()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L81" target="_blank" class="function-name source-link">pixelWidth</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L81" target="_blank" class="function-name source-link">pixelWidth</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the width of the image in actual pixels, accounting for the pixel density of the image.
@@ -71,7 +72,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get ImageType.prototype.pixelHeight()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L88" target="_blank" class="function-name source-link">pixelHeight</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L88" target="_blank" class="function-name source-link">pixelHeight</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the height of the image in actual pixels, accounting for the pixel density of the image.
@@ -95,7 +96,7 @@ Updates that occur on image resizing will only happen once with a call to this m
 						<div class="param-wrapper" id="ImageType.prototype.resize():width">
 							<div class="param-name">
 								<span class="param">width</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The new natural width of the image
@@ -105,7 +106,7 @@ Updates that occur on image resizing will only happen once with a call to this m
 						<div class="param-wrapper" id="ImageType.prototype.resize():height">
 							<div class="param-name">
 								<span class="param">height</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The new natural height of the image
@@ -133,7 +134,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 						<div class="param-wrapper" id="ImageType.prototype.contains():point">
 							<div class="param-name">
 								<span class="param">point</span>
-								<span class="type"><a href="../../../Pages/Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+								<span class="type"><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 							</div>
 							<div class="param desc">
 								The point to check
@@ -146,7 +147,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 						<div class="param-wrapper" id="ImageType.prototype.contains():x">
 							<div class="param-name">
 								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The x coordinate of the point to check
@@ -156,7 +157,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 						<div class="param-wrapper" id="ImageType.prototype.contains():y">
 							<div class="param-name">
 								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The y coordinate of the point to check
@@ -170,7 +171,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper" id="ImageType.prototype.inferWidth()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L131" target="_blank" class="function-name source-link">inferWidth</a>(<span class="param">height</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L131" target="_blank" class="function-name source-link">inferWidth</a>(<span class="param">height</span>)<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the width of the image required for a given height to maintain the aspect ratio.
@@ -183,7 +184,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 						<div class="param-wrapper" id="ImageType.prototype.inferWidth():height">
 							<div class="param-name">
 								<span class="param">height</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The potential height of the image
@@ -197,7 +198,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper" id="ImageType.prototype.inferHeight()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L139" target="_blank" class="function-name source-link">inferHeight</a>(<span class="param">width</span>)<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L139" target="_blank" class="function-name source-link">inferHeight</a>(<span class="param">width</span>)<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the height of the image required for a given width to maintain the aspect ratio.
@@ -210,7 +211,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 						<div class="param-wrapper" id="ImageType.prototype.inferHeight():width">
 							<div class="param-name">
 								<span class="param">width</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The potential width of the image
@@ -224,7 +225,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper" id="ImageType.prototype.toDataURL()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L186" target="_blank" class="function-name source-link">toDataURL</a>()<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L186" target="_blank" class="function-name source-link">toDataURL</a>()<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Converts the content of the image to a data: url.
@@ -234,7 +235,7 @@ This operation is inclusive on the lower bound and exclusive on the upper bound.
 	
 		<div class="function-wrapper" id="ImageType.prototype.download()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L205" target="_blank" class="function-name source-link">download</a>(<span class="param">name</span>)<span class="type">Promise&lt;void&gt;</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L205" target="_blank" class="function-name source-link">download</a>(<span class="param">name</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Downloads the image as a PNG, with a specified name.
@@ -248,7 +249,7 @@ Returns a promise that resolves when the image downloads.
 						<div class="param-wrapper" id="ImageType.prototype.download():name">
 							<div class="param-name">
 								<span class="param">name</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The name of the downloaded image, without the extension

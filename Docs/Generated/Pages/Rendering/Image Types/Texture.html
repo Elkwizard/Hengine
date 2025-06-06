@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Texture">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L16" target="_blank" class="class-name source-link">Texture</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../../Pages/Miscellaneous/Copyable.html#class Copyable">Copyable</a>, <a href="../../../Pages/Miscellaneous/FileSystem.html#class Serializable">Serializable</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L16" target="_blank" class="class-name source-link">Texture</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Miscellaneous/Copyable.html#class Copyable">Copyable</a>, <a href="../../Miscellaneous/Files.html#class Serializable">Serializable</a></span>
 				</div>
 				<div class="class desc">
 					Represents a 2D grid of pixels which can be directly accessed and modified.
@@ -17,8 +18,8 @@
 
 </span><span class="highlight-COMMENT">// create a voronoi texture</span><span class="highlight-SYMBOL">
 </span><span class="highlight-IDENTIFIER">texture</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">shader</span><span class="highlight-SYMBOL">((</span><span class="highlight-IDENTIFIER">x</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">y</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">dest</span><span class="highlight-SYMBOL">)</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
-</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> intensity</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../../../Pages/Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">voronoi2D</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">x</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">y</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.1</span><span class="highlight-SYMBOL">);
-	</span><span class="highlight-IDENTIFIER">dest</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">set</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">grayScale</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">intensity</span><span class="highlight-SYMBOL">));
+</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> intensity</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../../Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">voronoi2D</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">x</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">y</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0.1</span><span class="highlight-SYMBOL">);
+	</span><span class="highlight-IDENTIFIER">dest</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">set</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">grayScale</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">intensity</span><span class="highlight-SYMBOL">));
 });
 </span></code>
 				</div>
@@ -29,7 +30,7 @@
 					<div class="class-properties">
 				<div class="prop-wrapper" id="Texture.data">
 					<div class="prop-header member">
-						<span class="prop-name">data</span><span class="type"><a href="../../../Pages/Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
+						<span class="prop-name">data</span><span class="type"><a href="../../Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
 					</div>
 					<div class="prop desc">The pixel data of the texture. Modifying this buffer will modify the texture</div>
 				</div>
@@ -48,7 +49,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="get Texture.prototype.pixels()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L38" target="_blank" class="function-name source-link">pixels</a><span class="type"><a href="../../../Pages/Rendering/Color.html#class Color">Color</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L38" target="_blank" class="function-name source-link">pixels</a><span class="type"><a href="../../Rendering/Color.html#class Color">Color</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the colors for all pixels in the texture.
@@ -59,7 +60,7 @@ The first index is the x coordinate, the second the y
 	
 		<div class="function-wrapper" id="get Texture.prototype.brightness()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L50" target="_blank" class="function-name source-link">brightness</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L50" target="_blank" class="function-name source-link">brightness</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the brightness values for all pixels in the texture.
@@ -70,7 +71,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="get Texture.prototype.red()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L62" target="_blank" class="function-name source-link">red</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L62" target="_blank" class="function-name source-link">red</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the red channel values for all pixels in the texture.
@@ -81,7 +82,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="get Texture.prototype.green()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L77" target="_blank" class="function-name source-link">green</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L77" target="_blank" class="function-name source-link">green</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the green channel values for all pixels in the texture.
@@ -92,7 +93,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="get Texture.prototype.blue()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L92" target="_blank" class="function-name source-link">blue</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L92" target="_blank" class="function-name source-link">blue</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the blue channel values for all pixels in the texture.
@@ -103,7 +104,7 @@ The first index is the x coordinate, the second the y.
 	
 		<div class="function-wrapper" id="get Texture.prototype.alpha()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L107" target="_blank" class="function-name source-link">alpha</a><span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L107" target="_blank" class="function-name source-link">alpha</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a>[][]</span>
 			</div>
 			<div class="function desc">
 				Returns a 2D array of the alpha channel values for all pixels in the texture.
@@ -138,7 +139,7 @@ This method ignores potential coordinate wrapping.
 						<div class="param-wrapper" id="Texture.prototype.validPixel():x">
 							<div class="param-name">
 								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The x coordinate to check
@@ -148,7 +149,7 @@ This method ignores potential coordinate wrapping.
 						<div class="param-wrapper" id="Texture.prototype.validPixel():y">
 							<div class="param-name">
 								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The y coordinate to check
@@ -162,7 +163,7 @@ This method ignores potential coordinate wrapping.
 	
 		<div class="function-wrapper" id="Texture.prototype.getPixel()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L147" target="_blank" class="function-name source-link">getPixel</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">valid?</span>)<span class="type"><a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L147" target="_blank" class="function-name source-link">getPixel</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">valid?</span>)<span class="type"><a href="../../Rendering/Color.html#class Color">Color</a></span>
 			</div>
 			<div class="function desc">
 				Returns a reference to the color of the pixel at a specific location.
@@ -177,7 +178,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.getPixel():x">
 							<div class="param-name">
 								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The x coordinate of the pixel
@@ -187,7 +188,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.getPixel():y">
 							<div class="param-name">
 								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The y coordinate of the pixel
@@ -224,7 +225,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.shader():mapping">
 							<div class="param-name">
 								<span class="param">mapping</span>
-								<span class="type">(<a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>, <a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>, <a href="../../../Pages/Rendering/Color.html#class Color">Color</a>) =&gt; void</span>
+								<span class="type">(<a href="../../Built-Ins/Number.html#class Number">Number</a>, <a href="../../Built-Ins/Number.html#class Number">Number</a>, <a href="../../Rendering/Color.html#class Color">Color</a>) =&gt; void</span>
 							</div>
 							<div class="param desc">
 								A shader function called for every pixel. The return value of this function, but it takes in three arguments: the x and y coordinates of the pixel, and the pixel color. Modifying the state of the pixel color argument will change the pixel color in the texture
@@ -251,7 +252,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.setPixel():x">
 							<div class="param-name">
 								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The x coordinate of the pixel
@@ -261,7 +262,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.setPixel():y">
 							<div class="param-name">
 								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The y coordinate of the pixel
@@ -271,7 +272,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.setPixel():color">
 							<div class="param-name">
 								<span class="param">color</span>
-								<span class="type"><a href="../../../Pages/Rendering/Color.html#class Color">Color</a></span>
+								<span class="type"><a href="../../Rendering/Color.html#class Color">Color</a></span>
 							</div>
 							<div class="param desc">
 								The new color of the pixel
@@ -308,7 +309,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.blur():radius">
 							<div class="param-name">
 								<span class="param">radius</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The radius of the box blur
@@ -335,7 +336,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.clip():region">
 							<div class="param-name">
 								<span class="param">region</span>
-								<span class="type"><a href="../../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
+								<span class="type"><a href="../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
 							</div>
 							<div class="param desc">
 								The region to extract
@@ -348,7 +349,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.clip():x">
 							<div class="param-name">
 								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The x coordinate of the upper-left corner of the region.
@@ -358,7 +359,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.clip():y">
 							<div class="param-name">
 								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The y coordinate of the upper-left corner of the region.
@@ -368,7 +369,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.clip():width">
 							<div class="param-name">
 								<span class="param">width</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The width of the region
@@ -378,7 +379,7 @@ If the color data is needed more permanently, create a copy of the return value.
 						<div class="param-wrapper" id="Texture.prototype.clip():height">
 							<div class="param-name">
 								<span class="param">height</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The height of the region
@@ -407,7 +408,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.fromImageType():image">
 							<div class="param-name">
 								<span class="param">image</span>
-								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+								<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 							</div>
 							<div class="param desc">
 								The image to copy data from
@@ -420,7 +421,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.fromImageType():image">
 							<div class="param-name">
 								<span class="param">image</span>
-								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+								<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 							</div>
 							<div class="param desc">
 								The image to copy data from
@@ -430,7 +431,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.fromImageType():region">
 							<div class="param-name">
 								<span class="param">region</span>
-								<span class="type"><a href="../../../Pages/Geometry/Shapes/Rect.html#class Rect">Rect</a></span>
+								<span class="type"><a href="../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
 							</div>
 							<div class="param desc">
 								The region to extract
@@ -443,7 +444,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.fromImageType():image">
 							<div class="param-name">
 								<span class="param">image</span>
-								<span class="type"><a href="../../../Pages/Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+								<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 							</div>
 							<div class="param desc">
 								The image to copy data from
@@ -453,7 +454,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.fromImageType():x">
 							<div class="param-name">
 								<span class="param">x</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The x coordinate of the upper-left corner of the region.
@@ -463,7 +464,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.fromImageType():y">
 							<div class="param-name">
 								<span class="param">y</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The y coordinate of the upper-left corner of the region.
@@ -473,7 +474,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.fromImageType():width">
 							<div class="param-name">
 								<span class="param">width</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The width of the region
@@ -483,7 +484,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.fromImageType():height">
 							<div class="param-name">
 								<span class="param">height</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a></span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
 								The height of the region
@@ -510,7 +511,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.grayScale():brightness">
 							<div class="param-name">
 								<span class="param">brightness</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>[][]</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a>[][]</span>
 							</div>
 							<div class="param desc">
 								The brightness values for each pixel in the texture. The first index is the x coordinate, the second the y
@@ -524,7 +525,7 @@ The copy will have the same dimensions as the original, so if the original has a
 	
 		<div class="function-wrapper" id="Texture.fromDataURI()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L358" target="_blank" class="function-name source-link">Texture.fromDataURI</a>(<span class="param">url</span>)<span class="type">Promise&lt;Texture&gt;</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L358" target="_blank" class="function-name source-link">Texture.fromDataURI</a>(<span class="param">url</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Returns a promise resolving to a new texture containing the image data from a data: url.
@@ -537,7 +538,7 @@ The copy will have the same dimensions as the original, so if the original has a
 						<div class="param-wrapper" id="Texture.fromDataURI():url">
 							<div class="param-name">
 								<span class="param">url</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The data: url

@@ -215,6 +215,51 @@ table {
 	margin-bottom: 1em;
 }
 
+.alias {
+	display: inline-flex;
+
+	&:not(:hover) {
+		.two, .three {
+			display: none;
+		}
+
+		.general {
+			&::before { content: "\""; }
+			&::after { content: "\""; }
+		}
+	}
+
+	&:hover {
+		flex-direction: row;
+		gap: 1em;
+
+		.general {
+			display: none;
+		}
+
+		.two::before { content: "2D:"; }
+		.three::before { content: "3D:"; }	
+
+		.two, .three {
+			display: block;
+
+			&::before {
+				padding-right: 0.2em;
+				color: var(--accent-3);
+			}
+		}
+	}
+}
+
+.three-toggle {
+	appearance: none;
+	background: red;
+
+	&:checked {
+		background: blue;
+	}
+}
+
 /* highlighting */
 .highlight-DEFAULT { color: #fff; }
 .highlight-SYMBOL { color: #faf; }

@@ -2,6 +2,7 @@
 		<!DOCTYPE html>
 		<html>
 			<head>
+				<meta charset="UTF-8">
 				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
 				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
 			</head>
@@ -9,10 +10,10 @@
 				
 			<div class="class-wrapper" id="class HengineLoadingStructure">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L485" target="_blank" class="class-name source-link">HengineLoadingStructure</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L668" target="_blank" class="class-name source-link">HengineLoadingStructure</a>
 				</div>
 				<div class="class desc">
-					Represents a batch of <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineResource">HengineResources</a> to be loaded in a row, and can be used as a more streamlined approach compared to constructing <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineResource">HengineResources</a> directly.
+					Represents a batch of <a href="../../Structure/HengineResource/HengineResource.html#class HengineResource">HengineResources</a> to be loaded in a row, and can be used as a more streamlined approach compared to constructing <a href="../../Structure/HengineResource/HengineResource.html#class HengineResource">HengineResources</a> directly.
 It contains an internal list of resources to load, and many of its methods simply add to this list, which can eventually be flushed and loaded, though only once per instance.
 These methods also return the caller, which allows for convenient chaining.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> HengineLoadingStructure</span><span class="highlight-SYMBOL">()
@@ -35,10 +36,10 @@ These methods also return the caller, which allows for convenient chaining.
 					<div class="class-methods">
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.load()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L495" target="_blank" class="function-name source-link">load</a>(<span class="param">done</span>)<span class="type"><a href="../../../Pages/Structure/HengineLoader.html#class HengineLoader">HengineLoader</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L678" target="_blank" class="function-name source-link">load</a>(<span class="param">done</span>)<span class="type"><a href="../../Structure/HengineLoader.html#class HengineLoader">HengineLoader</a></span>
 			</div>
 			<div class="function desc">
-				Loads all the queued resources, and returns the <a href="../../../Pages/Structure/HengineLoader.html#class HengineLoader">HengineLoader</a> instance that contains them.
+				Loads all the queued resources, and returns the <a href="../../Structure/HengineLoader.html#class HengineLoader">HengineLoader</a> instance that contains them.
 			</div>
 			
 				<div class="function-signature">
@@ -51,7 +52,7 @@ These methods also return the caller, which allows for convenient chaining.
 								<span class="type">Boolean</span>
 							</div>
 							<div class="param desc">
-								Whether or not the <a href="../../../Pages/Structure/HengineLoader.html#class HengineLoader">HengineLoader</a> should start the update loop after these resources finish loading
+								Whether or not the <a href="../../Structure/HengineLoader.html#class HengineLoader">HengineLoader</a> should start the update loop after these resources finish loading
 							</div>
 						</div>
 					
@@ -62,7 +63,7 @@ These methods also return the caller, which allows for convenient chaining.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.from()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L511" target="_blank" class="function-name source-link">from</a>(<span class="param">structure</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L694" target="_blank" class="function-name source-link">from</a>(<span class="param">structure</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
 				Adds all the queued resources from another HengineLoadingStructure to the caller's queue.
@@ -90,10 +91,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.folder()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L529" target="_blank" class="function-name source-link">folder</a>(<span class="param">path</span>, <span class="param">fn</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L712" target="_blank" class="function-name source-link">folder</a>(<span class="param">path</span>, <span class="param">fn</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Puts the loading structure in the context of a specified folder, calls a specific function, and then <a href="../../../Pages/Structure/Intervals/IntervalManager.html#function exit()">exits</a> the context.
+				Puts the loading structure in the context of a specified folder, calls a specific function, and then <a href="../../Structure/Intervals/IntervalManager.html#function exit()">exits</a> the context.
 Calls to this function while inside a call to this function will stack the contexts together, allowing nesting of folder scopes.
 Returns the caller.
 			</div>
@@ -105,7 +106,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.folder():path">
 							<div class="param-name">
 								<span class="param">path</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The relative path to the folder to add to the context stack
@@ -129,10 +130,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.script()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L540" target="_blank" class="function-name source-link">script</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L723" target="_blank" class="function-name source-link">script</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Adds a <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineScriptResource">HengineScriptResource</a> to the queue with a specified source.
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineScriptResource">HengineScriptResource</a> to the queue with a specified source.
 			</div>
 			
 				<div class="function-signature">
@@ -142,7 +143,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.script():src">
 							<div class="param-name">
 								<span class="param">src</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path to the resource
@@ -156,10 +157,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.binary()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L548" target="_blank" class="function-name source-link">binary</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L731" target="_blank" class="function-name source-link">binary</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Adds a <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineBinaryResource">HengineBinaryResource</a> to the queue with a specified source.
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineBinaryResource">HengineBinaryResource</a> to the queue with a specified source.
 			</div>
 			
 				<div class="function-signature">
@@ -169,7 +170,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.binary():src">
 							<div class="param-name">
 								<span class="param">src</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path to the resource
@@ -183,10 +184,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.webcam()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L556" target="_blank" class="function-name source-link">webcam</a>(<span class="param">name</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L739" target="_blank" class="function-name source-link">webcam</a>(<span class="param">name</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Adds a <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineWebcamResource">HengineWebcamResource</a> to the queue with a specified name.
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineWebcamResource">HengineWebcamResource</a> to the queue with a specified name.
 			</div>
 			
 				<div class="function-signature">
@@ -196,7 +197,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.webcam():name">
 							<div class="param-name">
 								<span class="param">name</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The name of the resource
@@ -210,10 +211,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.text()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L564" target="_blank" class="function-name source-link">text</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L747" target="_blank" class="function-name source-link">text</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Adds a <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineTextResource">HengineTextResource</a> to the queue with a specified source.
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineTextResource">HengineTextResource</a> to the queue with a specified source.
 			</div>
 			
 				<div class="function-signature">
@@ -223,7 +224,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.text():src">
 							<div class="param-name">
 								<span class="param">src</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path to the resource
@@ -237,10 +238,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.image()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L572" target="_blank" class="function-name source-link">image</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L755" target="_blank" class="function-name source-link">image</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Adds a <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineImageResource">HengineImageResource</a> to the queue with a specified source.
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineImageResource">HengineImageResource</a> to the queue with a specified source.
 			</div>
 			
 				<div class="function-signature">
@@ -250,7 +251,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.image():src">
 							<div class="param-name">
 								<span class="param">src</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path to the resource
@@ -264,10 +265,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.font()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L580" target="_blank" class="function-name source-link">font</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L763" target="_blank" class="function-name source-link">font</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Adds a <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineFontResource">HengineFontResource</a> to the queue with a specified source.
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineFontResource">HengineFontResource</a> to the queue with a specified source.
 			</div>
 			
 				<div class="function-signature">
@@ -277,7 +278,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.font():src">
 							<div class="param-name">
 								<span class="param">src</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path to the resource
@@ -291,10 +292,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.animation()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L589" target="_blank" class="function-name source-link">animation</a>(<span class="param">src</span>, <span class="param">options?</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L772" target="_blank" class="function-name source-link">animation</a>(<span class="param">src</span>, <span class="param">options?</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Adds a <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineAnimationResource">HengineAnimationResource</a> to the queue with a specified source.
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineAnimationResource">HengineAnimationResource</a> to the queue with a specified source.
 			</div>
 			
 				<div class="function-signature">
@@ -304,7 +305,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.animation():src">
 							<div class="param-name">
 								<span class="param">src</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path to the resource
@@ -314,10 +315,10 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.animation():options?">
 							<div class="param-name">
 								<span class="param">options</span>
-								<span class="type">{ frames?: <a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>, delay?: <a href="../../../Pages/Built-Ins/Number.html#class Number">Number</a>, loops?: Boolean }</span>
+								<span class="type">{ frames?: <a href="../../Built-Ins/Number.html#class Number">Number</a>, delay?: <a href="../../Built-Ins/Number.html#class Number">Number</a>, loops?: Boolean }</span>
 							</div>
 							<div class="param desc">
-								An object containing <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frames</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">delay</span></code>, and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">loops</span></code> properties that will be passed to the <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineAnimationResource">HengineAnimationResource</a> constructor. These values have defaults of 1, 1, and true, respectively
+								An object containing <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frames</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">delay</span></code>, and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">loops</span></code> properties that will be passed to the <a href="../../Structure/HengineResource/HengineResource.html#class HengineAnimationResource">HengineAnimationResource</a> constructor. These values have defaults of 1, 1, and true, respectively
 							</div>
 						</div>
 					
@@ -328,10 +329,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.video()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L602" target="_blank" class="function-name source-link">video</a>(<span class="param">src</span>, <span class="param">options?</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L785" target="_blank" class="function-name source-link">video</a>(<span class="param">src</span>, <span class="param">options?</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Adds a <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineVideoResource">HengineVideoResource</a> to the queue with a specified source.
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineVideoResource">HengineVideoResource</a> to the queue with a specified source.
 			</div>
 			
 				<div class="function-signature">
@@ -341,7 +342,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.video():src">
 							<div class="param-name">
 								<span class="param">src</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path to the resource
@@ -354,7 +355,7 @@ Returns the caller.
 								<span class="type">{ loops?: Boolean }</span>
 							</div>
 							<div class="param desc">
-								An object containing a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">loops</span></code> properties that will be passed to the <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineVideoResource">HengineVideoResource</a> constructor. The default value is false
+								An object containing a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">loops</span></code> properties that will be passed to the <a href="../../Structure/HengineResource/HengineResource.html#class HengineVideoResource">HengineVideoResource</a> constructor. The default value is false
 							</div>
 						</div>
 					
@@ -365,10 +366,10 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="HengineLoadingStructure.prototype.sound()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L613" target="_blank" class="function-name source-link">sound</a>(<span class="param">src</span>, <span class="param">options?</span>)<span class="type">HengineLoadingStructure</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L796" target="_blank" class="function-name source-link">sound</a>(<span class="param">src</span>, <span class="param">options?</span>)<span class="type">HengineLoadingStructure</span>
 			</div>
 			<div class="function desc">
-				Adds a <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineSoundResource">HengineSoundResource</a> to the queue with a specified source.
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineSoundResource">HengineSoundResource</a> to the queue with a specified source.
 			</div>
 			
 				<div class="function-signature">
@@ -378,7 +379,7 @@ Returns the caller.
 						<div class="param-wrapper" id="HengineLoadingStructure.prototype.sound():src">
 							<div class="param-name">
 								<span class="param">src</span>
-								<span class="type"><a href="../../../Pages/Built-Ins/String.html#class String">String</a></span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
 							</div>
 							<div class="param desc">
 								The path to the resource
@@ -391,7 +392,61 @@ Returns the caller.
 								<span class="type">{ loops?: Boolean }</span>
 							</div>
 							<div class="param desc">
-								An object containing a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">loops</span></code> properties that will be passed to the <a href="../../../Pages/Structure/HengineResource/HengineResource.html#class HengineSoundResource">HengineSoundResource</a> constructor. The default value is false
+								An object containing a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">loops</span></code> properties that will be passed to the <a href="../../Structure/HengineResource/HengineResource.html#class HengineSoundResource">HengineSoundResource</a> constructor. The default value is false
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="HengineLoadingStructure.prototype.mesh()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L806" target="_blank" class="function-name source-link">mesh</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
+			</div>
+			<div class="function desc">
+				Adds a <a href="../../Structure/HengineResource/HengineResource.html#class HengineMeshResource">HengineMeshResource</a> to the queue with a specified source.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="HengineLoadingStructure.prototype.mesh():src">
+							<div class="param-name">
+								<span class="param">src</span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
+							</div>
+							<div class="param desc">
+								The path to the resource
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="HengineLoadingStructure.prototype.material()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L814" target="_blank" class="function-name source-link">material</a>(<span class="param">src</span>)<span class="type">HengineLoadingStructure</span>
+			</div>
+			<div class="function desc">
+				Adds a HengineMaterialResource to the queue with a specified source.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="HengineLoadingStructure.prototype.material():src">
+							<div class="param-name">
+								<span class="param">src</span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
+							</div>
+							<div class="param desc">
+								The path to the resource
 							</div>
 						</div>
 					
