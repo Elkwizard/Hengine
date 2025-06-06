@@ -42,11 +42,10 @@ class Renderable {
  * Represents a 3D mesh composed of chunks with different materials. The following vertex attributes are supported:
  * <table>
  * 	<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
- * 	<tr><td>`vertexPosition`</td><td>The world-space location of the vertex</td><td>Vector3</td></tr>
+ * 	<tr><td>`vertexPosition`</td><td>The model-space location of the vertex</td><td>Vector3</td></tr>
  * 	<tr><td>`vertexUV`</td><td>The UV texture coordinates of the vertex</td><td>Vector2</td></tr>
  * 	<tr><td>`vertexNormal`</td><td>The normalized normal vector of the vertex</td><td>Vector3</td></tr>
  * </table>
- * `"vertexPosition"`, `"vertexUV"`, and `"vertexNormal"`
  * @prop String[] attributes | The vertex attributes present in the mesh's data. This value is read-only
  * @prop Float32Array data | The vertex data of the mesh, interleaved in the order specified by `.attributes`
  * @prop MeshChunk[] chunks | The chunks of the mesh, describing the layout of mesh's faces
@@ -69,13 +68,9 @@ class Mesh extends Renderable {
 
 		const { ATTRIBUTES } = Mesh;
 
-		this.stride = 0;
-		this.offsets = new Map();
-		for (let i = 0; i < attributes.length; i++) {
-			const attr = attributes[i];
-			this.offsets.set(attr, this.stride);
-			this.stride += ATTRIBUTES[attr].size;
-		}
+		const { stride, offsets } = Mesh.layoutAttributes(attributes);
+		this.stride = stride;
+		this.offsets = offsets;
 
 		// add proxy interface
 		objectUtils.proxyBuffer(this, "data", "vertices", this.stride, inx => {
@@ -100,6 +95,36 @@ class Mesh extends Renderable {
 		if (data.length && !this.data.length)
 			this.vertices = data;
 	}
+	/**
+	 * Creates a deep copy of the mesh.
+	 * @return Mesh
+	 */
+	get() {
+		return new Mesh(this.attributes, new Float32Array(this.data), this.chunks.map(chunk => chunk.get()));
+	}
+	/**
+	 * Transforms the `vertexPosition` of the mesh in-place by a given matrix and flushes the changes.
+	 * Returns the caller.
+	 * @param Matrix4 transform | The homogenous transformation to apply to each vertex position
+	 * @return Mesh
+	 */
+	transform(transform) {
+		const offset = this.offsets.get("vertexPosition");
+		const { data, stride } = this;
+		for (let i = offset; i < data.length; i += stride) {
+			const vec = new Vector3(data[i], data[i + 1], data[i + 2]);
+			transform.times(vec, vec);
+			data[i] = vec.x;
+			data[i + 1] = vec.y;
+			data[i + 2] = vec.z;
+		}
+		this.flush();
+		return this;
+	}
+	/**
+	 * Creates a Polyhedron that has the same shape as the mesh, using the `vertexPosition` attribute.
+	 * @return Polyhedron
+	 */
 	toPolyhedron() {
 		const { data, stride } = this;
 		const vertices = [];
@@ -114,7 +139,7 @@ class Mesh extends Renderable {
 		return new Polyhedron(vertices, indices);
 	}
 	/**
-	 * Creates a new mesh from a polyhedron.
+	 * Creates a new mesh from a Polyhedron.
 	 * @param Polyhedron polyhedron | The object to use for the mesh
 	 * @param Material material? | The material for the mesh. Default is `Material.DEFAULT` 
 	 * @return Mesh
@@ -155,9 +180,87 @@ class Mesh extends Renderable {
 			[new MeshChunk(material, indexData)]
 		);
 	}
+	/**
+	 * Creates a new mesh containing all the pieces of a collection of meshes
+	 * @param Mesh[] meshes | The meshes to combine
+	 * @return Mesh
+	 */
+	static merge(meshes) {
+		const { ATTRIBUTES } = Mesh;
+
+		const attributes = Object.keys(ATTRIBUTES)
+			.filter(attr => meshes.every(mesh => mesh.attributes.includes(attr)));
+		
+		const { stride, offsets } = Mesh.layoutAttributes(attributes);
+
+		const totalVertexData = meshes
+			.map(mesh => mesh.data.length / mesh.stride * stride)
+			.reduce((a, b) => a + b, 0);
+		
+		const vertexData = new Float32Array(totalVertexData);
+		
+		let startingVertexIndex = 0;
+
+		const materialMap = new Map();
+
+		for (let i = 0; i < meshes.length; i++) {
+			const mesh = meshes[i];
+
+			for (let j = 0; j < mesh.chunks.length; j++) {
+				const { material, indices } = mesh.chunks[j];
+
+				const currentChunks = materialMap.get(material) ?? [];
+				if (!materialMap.has(material))
+					materialMap.set(material, []);
+				
+				for (let k = 0; k < indices.length; k++)
+					currentChunks.push(indices[k] + startingVertexIndex);
+			}
+
+			const vertexCount = mesh.data.length / mesh.stride;
+			for (let j = 0; j < attributes.length; j++) {
+				const attr = attributes[j];
+				const { size } = ATTRIBUTES[attr];
+
+				let destinationIndex = startingVertexIndex * stride + offsets.get(attr);
+				let sourceIndex = mesh.offsets.get(attr);
+
+				for (let k = 0; k < vertexCount; k++) {
+					for (let l = 0; l < size; l++) {
+						vertexData[destinationIndex + l] = mesh.data[sourceIndex + l];
+					}
+
+					destinationIndex += stride;
+					sourceIndex += mesh.stride;
+				}
+			}
+
+			startingVertexIndex += vertexCount;
+		}
+
+		const chunks = [];
+		for (const [material, indices] of materialMap)
+			chunks.push(new MeshChunk(material, new Uint32Array(indices)));
+
+		return new Mesh(attributes, vertexData, chunks);
+	}
+	static layoutAttributes(attributes) {
+		let stride = 0;
+		const offsets = new Map();
+		for (let i = 0; i < attributes.length; i++) {
+			const attr = attributes[i];
+			offsets.set(attr, stride);
+			stride += Mesh.ATTRIBUTES[attr].size;
+		}
+		return { stride, offsets };
+	}
 }
 Mesh.ATTRIBUTES = {
 	vertexPosition: {
+		size: 3,
+		type: Vector3
+	},
+	vertexNormal: {
 		size: 3,
 		type: Vector3
 	},
@@ -165,10 +268,6 @@ Mesh.ATTRIBUTES = {
 		size: 2,
 		type: Vector2
 	},
-	vertexNormal: {
-		size: 3,
-		type: Vector3
-	}
 };
 
 /**
@@ -207,5 +306,12 @@ class MeshChunk extends Renderable {
 			this.faces = faces;
 
 		this.renderData = new WeakMap();
+	}
+	/**
+	 * Creates a deep copy of the mesh chunk.
+	 * @return MeshChunk
+	 */
+	get() {
+		return new MeshChunk(this.material, new Uint32Array(this.indices));
 	}
 }

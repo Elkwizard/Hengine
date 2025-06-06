@@ -6440,11 +6440,10 @@ declare class Renderable {
  * Represents a 3D mesh composed of chunks with different materials. The following vertex attributes are supported:
  * <table>
  * 	<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
- * 	<tr><td>`vertexPosition`</td><td>The world-space location of the vertex</td><td>Vector3</td></tr>
+ * 	<tr><td>`vertexPosition`</td><td>The model-space location of the vertex</td><td>Vector3</td></tr>
  * 	<tr><td>`vertexUV`</td><td>The UV texture coordinates of the vertex</td><td>Vector2</td></tr>
  * 	<tr><td>`vertexNormal`</td><td>The normalized normal vector of the vertex</td><td>Vector3</td></tr>
  * </table>
- * `"vertexPosition"`, `"vertexUV"`, and `"vertexNormal"`
  */
 declare class Mesh extends Renderable {
 	/**
@@ -6479,11 +6478,30 @@ declare class Mesh extends Renderable {
 	 */
 	constructor(attributes: string[], data: Float32Array | ArrayLike, chunks: MeshChunk[]);
 	/**
-	 * Creates a new mesh from a polyhedron.
+	 * Creates a deep copy of the mesh.
+	 */
+	get(): this;
+	/**
+	 * Transforms the `vertexPosition` of the mesh in-place by a given matrix and flushes the changes.
+	 * Returns the caller.
+	 * @param transform - The homogenous transformation to apply to each vertex position
+	 */
+	transform(transform: Matrix4): this;
+	/**
+	 * Creates a Polyhedron that has the same shape as the mesh, using the `vertexPosition` attribute.
+	 */
+	toPolyhedron(): Polyhedron;
+	/**
+	 * Creates a new mesh from a Polyhedron.
 	 * @param polyhedron - The object to use for the mesh
 	 * @param material - The material for the mesh. Default is `Material.DEFAULT`
 	 */
 	static fromPolyhedron(polyhedron: Polyhedron, material?: Material): Mesh;
+	/**
+	 * Creates a new mesh containing all the pieces of a collection of meshes
+	 * @param meshes - The meshes to combine
+	 */
+	static merge(meshes: Mesh[]): Mesh;
 }
 
 /**
@@ -6508,6 +6526,10 @@ declare class MeshChunk extends Renderable {
 	 * @param faces - A list of 3-length arrays of numbers or an int buffer, representing the triangles of the chunk
 	 */
 	constructor(material: Material, faces: Uint32Array | ArrayLike);
+	/**
+	 * Creates a deep copy of the mesh chunk.
+	 */
+	get(): this;
 }
 
 /**

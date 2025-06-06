@@ -862,7 +862,7 @@ Artist3D.LIGHTS = `
 	uniform ShadowInfo[MAX_SHADOWS * SHADOW_CASCADE] shadowInfo;
 	uniform sampler2DArray[MAX_SHADOWS] shadowTextures;
 
-	vec3 _implicitNormal(vec3 position) {
+	vec3 implicitNormal(vec3 position) {
 		return normalize(cross(dFdx(position), dFdy(position)));
 	}
 
@@ -897,7 +897,7 @@ Artist3D.LIGHTS = `
 		ShadowCamera camera = info.camera;
 
 		// normal bias
-		vec3 n = _implicitNormal(position);
+		vec3 n = implicitNormal(position);
 		float ldn = dot(getLightDirection(position, light), n);
 		float normalBias = info.pixelSize * 0.5 * sqrt(1.0 - ldn * ldn);
 		position += n * normalBias;
