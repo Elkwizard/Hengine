@@ -1,4 +1,5 @@
 /**
+ * @type class UIObject extends SceneObject<Vector2, Transform2D, Rect, Circle | Polygon>
  * Represents a permanently screen-space object in a Scene.
  * All rendering for this class takes place in screen-space rather than world-space.
  * UIObjects are rendered after WorldObjects, regardless of `.layer` settings.

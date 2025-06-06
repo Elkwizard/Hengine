@@ -10,12 +10,13 @@ class Controls {
 }
 
 /**
+ * @type class SceneObject<Vector = any, Transform = any, Box = any, Shape = any> extends SceneElement 
  * Represents an object in a Scene.
  * These can be created by the `.add...Element()` methods of ElementContainer.
  * Every scene object has a collection of local-space shapes that make up its presence.
  * These shapes are used for culling, rendering, and physics hitboxes.
  * Additionally, each scene object exists in N dimensions.
- * As such, within the documentation of this class, `Vector`, `Transform`, and `Matrix` refer to the appropriate constructs for those dimensions.
+ * As such, within the documentation of this class, `Vector`, `Transform`, and `Shape` refer to the appropriate constructs for those dimensions.
  * @abstract
  * 
  * @prop Transform transform | The location and orientation of the object in space
@@ -82,8 +83,9 @@ class SceneObject extends SceneElement {
 		this.__boundingBox = this.getBoundingBox();
 	}
 	/**
+	 * @type getBoundingBox(): Box;
 	 * Returns the world-space bounding rectangle that contains the all the shapes of the object.
-	 * @return Rect
+	 * @return Rect/Prism
 	 */
 	getBoundingBox() {
 		let shapes = this.getAllModels();
@@ -99,6 +101,7 @@ class SceneObject extends SceneElement {
 		return this.shapes.has(name);
 	}
 	/**
+	 * @type addShape(name: string, shape: Shape, convex?: boolean): void;
 	 * Adds a new shape with a specified name.
 	 * If a shape with that name already exists, it will be removed.
 	 * @param String name | The name corresponding to the new shape
@@ -254,7 +257,7 @@ class SceneObject extends SceneElement {
 	}
 	/**
 	 * Returns whether a specific world-space point is inside the shapes of the object.
-	 * @param VectorN point | The point to check
+	 * @param Vector point | The point to check
 	 * @return Boolean
 	 */
 	collidePoint(point) {

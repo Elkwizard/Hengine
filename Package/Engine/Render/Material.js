@@ -16,7 +16,7 @@ class ShaderMaterial extends Material {
 	/**
 	 * Creates a new custom material.
 	 * @prop String fragmentShader? | The source code for the fragment shader. The default produces an opaque white color under all circumstances
-	 * @prop String vertexShader? | The source code for the vertex shader. The default projects the vertex position and passes on no information to the fragment shader
+	 * @prop String vertexShader? | The source code for the vertex shader. The default projects the vertex position and passes no additional information to the fragment shader
 	 */
 	constructor(
 		fragmentShader = ShaderMaterial.DEFAULT_FRAGMENT_SHADER,

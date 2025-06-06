@@ -1,8 +1,4 @@
 /**
- * @3d VectorN = Vector2 -> Vector3
- */
-
-/**
  * Represents a multidimensional vector.
  * @abstract
  * @prop Number mag | The magnitude of the vector
@@ -886,6 +882,10 @@ class Vector4 extends Vector {
 		}
 	}
 })();
+
+/**
+ * @3d VectorN = Vector2 -> Vector3
+ */
 
 Vector.sizes = [,, Vector2, Vector3, Vector4];
 ND.Vector = Vector[DIM];

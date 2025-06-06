@@ -41,7 +41,7 @@ class LightRenderer {
 	 * Queues a directional light to be rendered.
 	 * This light emits parallel rays from an infinite distance in a given direction.
 	 * @param Vector3 direction | The direction of the light
-	 * @param Boolean shadow? | The light casts shadows. Default is true
+	 * @param Boolean shadow? | Whether the light casts shadows. Default is true
 	 */
 	directional(direction, shadow = true) {
 		const { transform } = this.renderer;
@@ -398,7 +398,7 @@ class Artist3D extends Artist {
 	}
 	pass(camera, meshes, shadowPass, setupMaterial) {
 		const { gl } = this;
-		
+
 		const transparent = [];
 		const chunks = [];
 
@@ -489,8 +489,9 @@ class Artist3D extends Artist {
 		const cached = this.getCache(mesh);
 
 		if (transforms.length >= Artist3D.INSTANCE_THRESHOLD) {
-			const instanceView = this.instanceData.getView(transforms.length * 12);
-			let instanceViewIndex = 0;
+			const ELEMENTS_PER_MATRIX = 12;
+			const instanceView = this.instanceData.getView(transforms.length * ELEMENTS_PER_MATRIX);
+			let instanceViewIndex = ELEMENTS_PER_MATRIX;
 
 			// technically... the first transform is read from a uniform, so we can skip it
 			for (let i = 1; i < transforms.length; i++) {
@@ -570,7 +571,7 @@ class Artist3D extends Artist {
 
 		const boundingSpheres = [];
 		const meshes = meshQueue.map(req => this.processMesh(req, boundingSpheres));
-		
+
 		gl.viewport(0, 0, SHADOW_RESOLUTION, SHADOW_RESOLUTION);
 
 		const cascadeProps = Array.dim(Artist3D.SHADOW_CASCADE).map((_, i) => 3 ** i);
@@ -589,9 +590,6 @@ class Artist3D extends Artist {
 				if (z < nearZ) nearZ = z;
 			}
 
-			window.testFrusta ??= [];
-			window.testBounds ??= [];
-
 			for (let j = 0; j < frusta.length; j++) {
 				const camera = new Camera3D({
 					width: SHADOW_RESOLUTION,
@@ -600,7 +598,6 @@ class Artist3D extends Artist {
 				camera.direction = light.direction;
 
 				const frustum = frusta[j];
-				window.testFrusta[j] ??= frustum.get();
 				const frustumBounds = Prism.bound(
 					frustum.vertices.map(vertex => camera.worldToScreen(vertex))
 				);
@@ -617,7 +614,6 @@ class Artist3D extends Artist {
 					xRange, yRange, zRange
 				));
 				if (!camera.cacheScreen()) continue;
-				window.testBounds[j] ??= camera.screen.get();
 				
 				const cascade = map.cascades[j];
 				cascade.camera = camera;
@@ -689,12 +685,10 @@ class Artist3D extends Artist {
 		const lightQueue = this.lightObj.lights;
 		const meshQueue = this.meshObj.meshes;
 
-		if (meshQueue.length) {
+		if (meshQueue.length)
 			this.renderQueues(camera, lightQueue, meshQueue);
-		}
 
-		this.meshObj.clear();
-		this.lightObj.clear();
+		this.emptyQueues();
 
 		if (this.overlay) {
 			this.compositeOverlay(this.overlay);
@@ -702,7 +696,13 @@ class Artist3D extends Artist {
 			this.overlay.renderer.clear();
 		}
 	}
+	emptyQueues() {
+		this.meshObj.clear();
+		this.lightObj.clear();
+	}
 	fill({ x, y, z, w }) {
+		this.emptyQueues();
+
 		const { gl } = this;
 		gl.depthMask(true);
 		gl.clearColor(x, y, z, w);
@@ -786,7 +786,7 @@ class Artist3D extends Artist {
 	static SHADOW_RESOLUTION = 2 ** 12;
 	static SHADOW_BIAS = 0.5;
 	static SHADOW_CASCADE = 4;
-	static INSTANCE_THRESHOLD = 10;
+	static INSTANCE_THRESHOLD = 100;
 	static KEPT_PROPERTIES = new Set([
 		"enterWorldSpace", "exitWorldSpace", "imageType",
 		"render", "clear", "fill"

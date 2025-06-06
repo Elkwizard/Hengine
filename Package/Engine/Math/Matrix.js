@@ -823,6 +823,11 @@ class Matrix4 extends Matrix {
 	}
 }
 
+/**
+ * @3d MatrixN = Matrix2 -> Matrix3
+ * @3d TransformMatrixN = Matrix3 -> Matrix4
+ */
+
 Matrix.sizes = [,, Matrix2, Matrix3, Matrix4];
 ND.Matrix = Matrix[DIM];
 ND.TransformMatrix = Matrix[DIM + 1];

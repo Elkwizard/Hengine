@@ -5,10 +5,15 @@ declare interface Class<T> extends Function {
 type RemainingParams<T> = T extends (first: any, ...remaining: infer P) => any ? P : never;
 
 type CanvasArtist = CanvasArtist2D;
+type MatrixN = Matrix2;
+type TransformMatrixN = Matrix3;
 type VectorN = Vector2;
 type CameraN = Camera2D;
 type ArtistN = Artist2D;
 type TransformN = Transform2D;
+type BoxN = Rect;
+type WorldObjectBallN = Circle;
+type WorldObjectPolytopeN = Polygon;
 type InertiaN = Number;
 type AngleN = Number;
 
@@ -6736,7 +6741,7 @@ declare class LightRenderer {
 	 * Queues a directional light to be rendered.
 	 * This light emits parallel rays from an infinite distance in a given direction.
 	 * @param direction - The direction of the light
-	 * @param shadow - The light casts shadows. Default is true
+	 * @param shadow - Whether the light casts shadows. Default is true
 	 */
 	directional(direction: Vector3, shadow?: boolean): void;
 }
@@ -6815,11 +6820,11 @@ declare class SceneElement {
  * Every scene object has a collection of local-space shapes that make up its presence.
  * These shapes are used for culling, rendering, and physics hitboxes.
  * Additionally, each scene object exists in N dimensions.
- * As such, within the documentation of this class, `Vector`, `Transform`, and `Matrix` refer to the appropriate constructs for those dimensions.
+ * As such, within the documentation of this class, `Vector`, `Transform`, and `Shape` refer to the appropriate constructs for those dimensions.
  * This is an abstract superclass and should not be constructed.
  * 
  */
-declare class SceneObject extends SceneElement {
+declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any> extends SceneElement {
 	/**
 	 * The location and orientation of the object in space
 	 */
@@ -6869,7 +6874,7 @@ declare class SceneObject extends SceneElement {
 	/**
 	 * Returns the world-space bounding rectangle that contains the all the shapes of the object.
 	 */
-	getBoundingBox(): Rect;
+	getBoundingBox(): Box;
 	/**
 	 * Checks whether there is a shape on the object with a specific name.
 	 * @param name - The name of the shape
@@ -6882,7 +6887,7 @@ declare class SceneObject extends SceneElement {
 	 * @param shape - The shape to add. The 3D shapes are only available for WorldObjects in 3D Mode
 	 * @param convex - Whether the shape is known to be convex. Default is false
 	 */
-	addShape(name: string, shape: Circle | Polygon | Sphere | Polyhedron, convex?: boolean): void;
+	addShape(name: string, shape: Shape, convex?: boolean): void;
 	/**
 	 * Removes a shape from the object with a specified name.
 	 * If no shape exists with the given name, null is returned.
@@ -6943,7 +6948,7 @@ declare class SceneObject extends SceneElement {
 	 * Returns whether a specific world-space point is inside the shapes of the object.
 	 * @param point - The point to check
 	 */
-	collidePoint(point: VectorN): boolean;
+	collidePoint(point: Vector): boolean;
 	/**
 	 * Hides the object.
 	 */
@@ -7246,7 +7251,7 @@ declare type ScriptContainer = {
  * UIObjects are rendered after WorldObjects, regardless of `.layer` settings.
  * Culling, point-collision checks, and other related operations will all use screen-space coordinates rather than world-space.
  */
-declare class UIObject extends SceneObject {
+declare class UIObject extends SceneObject<Vector2, Transform2D, Rect, Circle | Polygon> {
 	
 }
 
@@ -7255,11 +7260,11 @@ declare class UIObject extends SceneObject {
  * The dimensionality of this object depends on whether the engine is in 2D or 3D mode.
  * Only objects of this type can have PHYSICS, or be rendered in the space of a Camera.
  */
-declare class WorldObject extends SceneObject {
+declare class WorldObject extends SceneObject<VectorN, TransformN, BoxN, WorldObjectBallN | WorldObjectPolytopeN> {
 	/**
 	 * The world-space bounding box to use for graphical culling instead of the shapes of the object. Starts as null
 	 */
-	graphicalBoundingBox: Rect | null;
+	graphicalBoundingBox: Prism | Rect | null;
 	/**
 	 * Whether or not the graphics should ever be culled. This can be ignored if the scene has disabled graphics culling. Starts as true
 	 */
