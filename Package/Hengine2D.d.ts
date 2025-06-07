@@ -6940,8 +6940,9 @@ declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any>
 	getAllConvexModels(): Shape[];
 	/**
 	 * Adjusts the location of all of the object's shapes such that the geometric center of all the shapes is (0, 0) in local-space.
+	 * @param stay - Whether the global-space position of the shapes be maintained by changing the object's transform. Default is false
 	 */
-	centerShapes(): void;
+	centerShapes(stay?: boolean): void;
 	/**
 	 * Removes all the shapes from the object, and returns them in local-space.
 	 */

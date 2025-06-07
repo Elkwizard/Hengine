@@ -171,8 +171,9 @@ class SceneObject extends SceneElement {
 	}
 	/**
 	 * Adjusts the location of all of the object's shapes such that the geometric center of all the shapes is (0, 0) in local-space.
+	 * @param Boolean stay? | Whether the global-space position of the shapes be maintained by changing the object's transform. Default is false
 	 */
-	centerShapes() {
+	centerShapes(stay = false) {
 		let center = this.constructor.Vector.zero;
 		let totalArea = 0;
 		let names = [];
@@ -188,6 +189,7 @@ class SceneObject extends SceneElement {
 		const diff = center.inverse;
 		for (let i = 0; i < names.length; i++)
 			this.addShape(names[i], shapes[i].move(diff));
+		if (stay) this.transform.position.sub(diff.rotate(this.transform.rotation));
 	}
 	/**
 	 * Removes all the shapes from the object, and returns them in local-space.

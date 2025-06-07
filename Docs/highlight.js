@@ -1,4 +1,4 @@
-const highlight = (source, highlighter, copy = false, className = "") => {
+const highlightColors = (source, highlighter) => {
 	source = source.replaceAll("\r", "");
 	const colors = new Array(source.length).fill(null);
 	for (const [regex, color, antiregex = null] of highlighter) {
@@ -15,8 +15,13 @@ const highlight = (source, highlighter, copy = false, className = "") => {
 		for (let i = 0; i < local.length; i++)
 			if (local[i]) colors[i] = local[i];
 	}
-	let result = "";
-	let currentColor = null;
+	
+	return colors;
+};
+
+const highlight = (source, highlighter, copy = false, className = "") => {
+	source = source.replaceAll("\r", "");
+	const colors = highlightColors(source, highlighter);
 
 	const HTMLMapping = {
 		"<": "&lt;",
@@ -25,6 +30,9 @@ const highlight = (source, highlighter, copy = false, className = "") => {
 		"&": "&amp;",
 		"`": "&#96;"
 	};
+	
+	let result = "";
+	let currentColor = null;
 
 	for (let i = 0; i < source.length; i++) {
 		const color = colors[i];
@@ -125,6 +133,7 @@ highlighters.url = [
 
 module.exports = {
 	highlight,
+	highlightColors,
 	inferLanguage,
 	highlighters
 };
