@@ -6681,6 +6681,11 @@ declare class Prism extends Polyhedron {
 	 * @param points - The points to contain
 	 */
 	static bound(points: Vector3[]): Prism;
+	/**
+	 * Computes the smallest bounding rectangular prism the contains a set of other rectangular prisms.
+	 * @param boxes - The boxes to contain
+	 */
+	static composeBoundingBoxes(boxes: Prism[]): Prism;
 }
 
 /**
@@ -6740,7 +6745,7 @@ declare class Sphere extends Shape3D {
 	 * It is not guaranteed to be a newly allocated sphere, nor is it guaranteed to be the smallest possible bounding sphere.
 	 * @param spheres - The bounding spheres to compose together. This must include at least one sphere
 	 */
-	static composeBoundingSpheres(spheres: Sphere[]): Sphere;
+	static composeBoundingBalls(spheres: Sphere[]): Sphere;
 }
 
 /**

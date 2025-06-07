@@ -416,8 +416,16 @@ class Prism extends Polyhedron {
 		const { min, max } = Vector3.bound(points);
 		return new Prism(min, max);
 	}
+	/**
+	 * @name static composeBoundingBoxes
+	 * Computes the smallest bounding rectangular prism the contains a set of other rectangular prisms.
+	 * @param Prism[] boxes | The boxes to contain
+	 * @return Prism
+	 */
 }
 objectUtils.inherit(Prism, Rect, ["equalsSameType", "closestPointTo", "equalsSameType"]);
+Prism.composeBoundingBoxes = Rect.composeBoundingBoxes;
+ND.Box = Prism;
 
 /**
  * Represents an infinite plane in 3D space.
@@ -588,7 +596,7 @@ class Sphere extends Shape3D {
 	 * @param Sphere[] spheres | The bounding spheres to compose together. This must include at least one sphere
 	 * @return Sphere
 	 */
-	static composeBoundingSpheres(spheres) {
+	static composeBoundingBalls(spheres) {
 		if (spheres.length === 1) return spheres[0];
 
 		const center = Vector3.avg(spheres.map(sphere => sphere.position));

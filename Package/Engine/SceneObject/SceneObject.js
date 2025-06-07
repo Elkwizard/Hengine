@@ -73,12 +73,6 @@ class SceneObject extends SceneElement {
 	updatePreviousData() {
 		this.transform.get(this.lastTransform);
 	}
-	cacheDimensions() {
-		let shapes = this.getAllShapes();
-		let boxes = shapes.map(e => e.getBoundingBox());
-		let bounds = Rect.composeBoundingBoxes(boxes);
-		this.cacheBoundingBoxes();
-	}
 	cacheBoundingBoxes() {
 		this.__boundingBox = this.getBoundingBox();
 	}
@@ -88,9 +82,9 @@ class SceneObject extends SceneElement {
 	 * @return Rect/Prism
 	 */
 	getBoundingBox() {
-		let shapes = this.getAllModels();
-		let boxes = shapes.map(e => e.getBoundingBox());
-		return Rect.composeBoundingBoxes(boxes);
+		const shapes = this.getAllModels();
+		const boxes = shapes.map(e => e.getBoundingBox());
+		return this.constructor.Box.composeBoundingBoxes(boxes);
 	}
 	/**
 	 * Checks whether there is a shape on the object with a specific name.
@@ -117,7 +111,7 @@ class SceneObject extends SceneElement {
 			convex ||= shape instanceof Rect || shape instanceof Circle;
 		}
 		this.convexShapes.set(shape, convex ? [shape] : Geometry.subdividePolygon(shape));
-		this.cacheDimensions();
+		this.cacheBoundingBoxes();
 		this.scripts.run("addShape", name, shape);
 	}
 	/**
@@ -248,12 +242,12 @@ class SceneObject extends SceneElement {
 	 * @param Number factor | The scale factor
 	 */
 	scale(factor) {
-		const pos = Vector2.zero;
+		const pos = this.constructor.Vector.zero;
 		const entries = [];
 		for (let entry of this.shapes) entries.push(entry);
 		for (let i = 0; i < entries.length; i++)
 			this.addShape(entries[i][0], entries[i][1].scale(factor, pos));
-		this.cacheDimensions();
+		this.cacheBoundingBoxes();
 	}
 	/**
 	 * Returns whether a specific world-space point is inside the shapes of the object.

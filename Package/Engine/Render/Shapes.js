@@ -799,20 +799,12 @@ class Rect extends Polygon {
 	 */
 	static composeBoundingBoxes(boxes) {
 		if (boxes.length === 1) return boxes[0];
-		let minX = Infinity;
-		let minY = Infinity;
-		let maxX = -Infinity;
-		let maxY = -Infinity;
-		for (let i = 0; i < boxes.length; i++) {
-			let box = boxes[i];
-			if (box.x < minX) minX = box.x;
-			if (box.y < minY) minY = box.y;
-			if (box.x + box.width > maxX) maxX = box.x + box.width;
-			if (box.y + box.height > maxY) maxY = box.y + box.height;
-		}
-		return new Rect(minX, minY, maxX - minX, maxY - minY);
+		return this.bound(
+			boxes.flatMap(box => [box.min, box.max])
+		);
 	}
 }
+ND.Box = Rect;
 
 /**
  * Represents a circle.

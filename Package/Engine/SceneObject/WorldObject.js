@@ -14,6 +14,7 @@
  */
 class WorldObject extends SceneObject {
 	static Vector = ND.Vector;
+	static Box = ND.Box;
 
 	constructor(name, pos, container, engine) {
 		super(name, new ND.Transform(pos), container, engine);

@@ -519,7 +519,7 @@ class Artist3D extends Artist {
 			boundingSpheres.push(boundingSphere);
 		}
 
-		const boundingSphere = Sphere.composeBoundingSpheres(boundingSpheres);
+		const boundingSphere = Sphere.composeBoundingBalls(boundingSpheres);
 
 		const opaque = [];
 		const transparent = [];

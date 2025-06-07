@@ -7,6 +7,7 @@
  */
 class UIObject extends SceneObject {
 	static Vector = Vector2;
+	static Box = Rect;
 	
     constructor(name, pos, container, engine) {
         super(name, new Transform2D(pos), container, engine);
