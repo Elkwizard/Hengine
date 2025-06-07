@@ -735,7 +735,6 @@ class Matrix4 extends Matrix {
 	}
 	timesVector(vector, dst) {
 		if (vector.constructor === Vector3) {
-			intervals.count("timesVector3");
 			const x = this[0] * vector.x + this[4] * vector.y + this[8] * vector.z + this[12];
 			const y = this[1] * vector.x + this[5] * vector.y + this[9] * vector.z + this[13];
 			const z = this[2] * vector.x + this[6] * vector.y + this[10] * vector.z + this[14];

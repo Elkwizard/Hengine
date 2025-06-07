@@ -427,8 +427,6 @@ class Artist3D extends Artist {
 				gl.depthMask(false);
 			}
 
-			intervals.count("setupMaterial()");
-
 			const program = setupMaterial(chunk);
 			program.setUniforms(uniforms, false, true);
 			program.commitUniforms();
@@ -489,7 +487,7 @@ class Artist3D extends Artist {
 		const cached = this.getCache(mesh);
 
 		if (transforms.length >= Artist3D.INSTANCE_THRESHOLD) {
-			const ELEMENTS_PER_MATRIX = 12;
+			const ELEMENTS_PER_MATRIX = 4 * 3;
 			const instanceView = this.instanceData.getView(transforms.length * ELEMENTS_PER_MATRIX);
 			let instanceViewIndex = ELEMENTS_PER_MATRIX;
 
@@ -528,8 +526,6 @@ class Artist3D extends Artist {
 
 		for (let j = 0; j < mesh.chunks.length; j++) {
 			const chunk = mesh.chunks[j];
-
-			intervals.count("chunkLoop");
 
 			const representation = {
 				mesh, chunk,

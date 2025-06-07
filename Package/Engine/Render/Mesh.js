@@ -3,7 +3,6 @@
  * @abstract
  */
 class Renderable {
-	static MAX_RENDERERS = 4;
 	constructor() {
 		this.renderers = [];
 		this.rendererSet = new WeakSet();
@@ -36,6 +35,8 @@ class Renderable {
 		}
 		this.renderers = [];
 	}
+	
+	static MAX_RENDERERS = 4;
 }
 
 /**

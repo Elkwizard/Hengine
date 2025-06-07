@@ -1287,7 +1287,6 @@ class GLSLProgram {
 			this.uniformsSet = true;
 			child.set(value);
 			if (force) child.value = typeof value === "object" ? value.get?.() ?? value : value;
-			intervals.count("GLSLProgram.setUniform()");
 		} else {
 			const keys = child._keys;
 			for (let i = 0; i < keys.length; i++) {
