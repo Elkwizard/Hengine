@@ -521,8 +521,9 @@ class Frustum extends Polyhedron {
 	cullSphere(sphere) {
 		for (let i = 0; i < this.planes.length; i++) {
 			const plane = this.planes[i];
-			if (sphere.position.dot(plane.normal) - plane.distance > sphere.radius)
+			if (sphere.position.dot(plane.normal) - plane.distance > sphere.radius) {
 				return true;
+			}
 		}
 		return false;
 	}

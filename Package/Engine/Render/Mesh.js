@@ -146,8 +146,10 @@ class Mesh extends Renderable {
 	 */
 	static fromPolyhedron(polyhedron, material = Material.DEFAULT) {
 		const TRI_KEYS = ["a", "b", "c"];
-		const PER_VERTEX = 8;
-		const PER_TRIANGLE = PER_VERTEX * 3;
+
+		const attributes = ["vertexPosition", "vertexNormal", "vertexUV"];
+		const { stride } = Mesh.layoutAttributes(attributes);
+		const triangleStride = stride * 3;
 
 		const uvs = [
 			[0, 0],
@@ -156,14 +158,14 @@ class Mesh extends Renderable {
 		];
 		
 		const triangles = polyhedron.getFaces();
-		const vertexData = new Float32Array(triangles.length * PER_TRIANGLE);
+		const vertexData = new Float32Array(triangles.length * triangleStride);
 		for (let i = 0; i < triangles.length; i++) {
 			const triangle = triangles[i];
 			const { normal } = triangle;
-			const baseIndex = i * PER_TRIANGLE;
+			const baseIndex = i * triangleStride;
 			for (let j = 0; j < 3; j++) {
 				const vertex = triangle[TRI_KEYS[j]];
-				const inx = baseIndex + j * PER_VERTEX;
+				const inx = baseIndex + j * stride;
 				vertexData[inx + 0] = vertex.x;
 				vertexData[inx + 1] = vertex.y;
 				vertexData[inx + 2] = vertex.z;
@@ -175,10 +177,7 @@ class Mesh extends Renderable {
 			}
 		}
 		const indexData = new Uint32Array(triangles.length * 3).map((_, i) => i);
-		return new Mesh(
-			["vertexPosition", "vertexNormal", "vertexUV"], vertexData,
-			[new MeshChunk(material, indexData)]
-		);
+		return new Mesh(attributes, vertexData, [new MeshChunk(material, indexData)]);
 	}
 	/**
 	 * Creates a new mesh containing all the pieces of a collection of meshes

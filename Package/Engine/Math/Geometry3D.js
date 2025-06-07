@@ -34,7 +34,7 @@ class Geometry3D {
 			const t1 = t0 + portions[i] / total;
 			
 			const frustum = new Frustum(null);
-			frustum.planes = [...planes];
+			frustum.planes = planes.map(plane => plane.get());
 			frustum.planes[BACK].distance = getDistance(t0);
 			frustum.planes[FRONT].distance = getDistance(t1);
 			frustum.vertices = [
