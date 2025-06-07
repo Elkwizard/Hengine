@@ -28,6 +28,15 @@ class Vector extends Operable {
 	get normalized() {
 		return this.get().normalize();
 	}
+	get Matrix() {
+		return this.constructor.Matrix;
+	}
+	get TransformMatrix() {
+		return this.constructor.TransformMatrix;
+	}
+	get size() {
+		return this.constructor.size;
+	}
 	compare(v1, v2) {
 		return v1.dot(this) > v2.dot(this) ? v1 : v2;
 	}
@@ -886,6 +895,5 @@ class Vector4 extends Vector {
 /**
  * @3d VectorN = Vector2 -> Vector3
  */
-
-Vector.sizes = [,, Vector2, Vector3, Vector4];
+Object.assign(Vector, [,, Vector2, Vector3, Vector4]);
 ND.Vector = Vector[DIM];

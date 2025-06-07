@@ -90,6 +90,12 @@ class Matrix extends Float64Array {
 	get stretch() {
 		return Math.abs(this.determinant) ** (1 / this.constructor.size);
 	}
+	get Vector() {
+		return this.constructor.Vector;
+	}
+	get TransformVector() {
+		return this.constructor.TransformVector;
+	}
 	get(result = new this.constructor()) {
 		result.set(this);
 		return result;
@@ -826,7 +832,6 @@ class Matrix4 extends Matrix {
  * @3d MatrixN = Matrix2 -> Matrix3
  * @3d TransformMatrixN = Matrix3 -> Matrix4
  */
-
-Matrix.sizes = [,, Matrix2, Matrix3, Matrix4];
+Object.assign(Matrix, [,, Matrix2, Matrix3, Matrix4]);
 ND.Matrix = Matrix[DIM];
 ND.TransformMatrix = Matrix[DIM + 1];
