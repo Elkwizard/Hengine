@@ -152,9 +152,20 @@ It is stored as an RGB triple with an additional opacity component.
 			
 		</div>
 	
+		<div class="function-wrapper" id="get Color.prototype.hex()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L86" target="_blank" class="function-name source-link">hex</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="function desc">
+				Returns the hexadecimal representation of the color as a 32-bit integer.
+In most-to-least significant byte order, the format returned will be <code class=" highlight-BACKGROUND"><span class="highlight-CONSTANT">RRGGBBAA</span></code>.
+			</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="get Color.prototype.opaque()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L82" target="_blank" class="function-name source-link">opaque</a><span class="type">Color</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L93" target="_blank" class="function-name source-link">opaque</a><span class="type">Color</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of the color with an alpha of 1.
@@ -164,7 +175,7 @@ It is stored as an RGB triple with an additional opacity component.
 	
 		<div class="function-wrapper" id="get Color.prototype.inverse()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L90" target="_blank" class="function-name source-link">inverse</a><span class="type">Color</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L101" target="_blank" class="function-name source-link">inverse</a><span class="type">Color</span>
 			</div>
 			<div class="function desc">
 				Returns the inverse of the caller, with the same alpha as the caller.
@@ -175,7 +186,7 @@ The inverse is defined as white minus the caller.
 	
 		<div class="function-wrapper" id="Color.prototype.getRGBA()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L99" target="_blank" class="function-name source-link">getRGBA</a>()<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L110" target="_blank" class="function-name source-link">getRGBA</a>()<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Returns the CSS rgba color string representing the color. 
@@ -185,7 +196,7 @@ The inverse is defined as white minus the caller.
 	
 		<div class="function-wrapper" id="Color.prototype.getHex()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L106" target="_blank" class="function-name source-link">getHex</a>()<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L117" target="_blank" class="function-name source-link">getHex</a>()<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Returns the CSS hex color string representing the color. 
@@ -195,7 +206,7 @@ The inverse is defined as white minus the caller.
 	
 		<div class="function-wrapper" id="Color.prototype.getGLSL()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L113" target="_blank" class="function-name source-link">getGLSL</a>()<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L124" target="_blank" class="function-name source-link">getGLSL</a>()<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Returns the GLSL vec4 string representing the color. 
@@ -205,7 +216,7 @@ The inverse is defined as white minus the caller.
 	
 		<div class="function-wrapper" id="Color.prototype.toString()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L120" target="_blank" class="function-name source-link">toString</a>()<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L131" target="_blank" class="function-name source-link">toString</a>()<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
 				Returns a valid CSS string representation of the color.
@@ -215,7 +226,7 @@ The inverse is defined as white minus the caller.
 	
 		<div class="function-wrapper" id="Color.alpha()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L164" target="_blank" class="function-name source-link">Color.alpha</a>(<span class="param">color</span>, <span class="param">alpha</span>)<span class="type">Color</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L175" target="_blank" class="function-name source-link">Color.alpha</a>(<span class="param">color</span>, <span class="param">alpha</span>)<span class="type">Color</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of a specified color with a specified alpha.
@@ -252,7 +263,7 @@ The inverse is defined as white minus the caller.
 	
 		<div class="function-wrapper" id="Color.saturate()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L180" target="_blank" class="function-name source-link">Color.saturate</a>(<span class="param">color</span>, <span class="param">factor</span>)<span class="type">Color</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L191" target="_blank" class="function-name source-link">Color.saturate</a>(<span class="param">color</span>, <span class="param">factor</span>)<span class="type">Color</span>
 			</div>
 			<div class="function desc">
 				Returns a copy of a color with a specified change in saturation.
@@ -289,7 +300,7 @@ The inverse is defined as white minus the caller.
 	
 		<div class="function-wrapper" id="Color.grayScale()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L189" target="_blank" class="function-name source-link">Color.grayScale</a>(<span class="param">intensity</span>)<span class="type">Color</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L200" target="_blank" class="function-name source-link">Color.grayScale</a>(<span class="param">intensity</span>)<span class="type">Color</span>
 			</div>
 			<div class="function desc">
 				Returns a new grayscale color with a specified brightness.
@@ -316,7 +327,7 @@ The inverse is defined as white minus the caller.
 	
 		<div class="function-wrapper" id="Color.unlimited()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L203" target="_blank" class="function-name source-link">Color.unlimited</a>(<span class="param">red?</span>, <span class="param">green?</span>, <span class="param">blue?</span>, <span class="param">alpha?</span>)<span class="type">Color</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Color.js?#L217" target="_blank" class="function-name source-link">Color.unlimited</a>(<span class="param">color</span><span class="aux"> | </span><span class="param">red</span>, <span class="param">green</span>, <span class="param">blue</span>, <span class="param">alpha?</span>)<span class="type">Color</span>
 			</div>
 			<div class="function desc">
 				Creates a new color whose channels aren't clamped within the normal range (<code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">limited</span><span class="highlight-SYMBOL"> =</span><span class="highlight-LANG_VAR"> false</span></code>).
@@ -326,33 +337,46 @@ The inverse is defined as white minus the caller.
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Color.unlimited():red?">
+						<div class="param-wrapper" id="Color.unlimited():color">
+							<div class="param-name">
+								<span class="param">color</span>
+								<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
+							</div>
+							<div class="param desc">
+								Any valid CSS color representation
+							</div>
+						</div>
+					
+		
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Color.unlimited():red">
 							<div class="param-name">
 								<span class="param">red</span>
 								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The red channel of the color on [0, 255]. Default is 0
+								The red component of the color, on [0, 255]
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="Color.unlimited():green?">
+						<div class="param-wrapper" id="Color.unlimited():green">
 							<div class="param-name">
 								<span class="param">green</span>
 								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The green channel of the color on [0, 255]. Default is 0
+								The green component of the color, on [0, 255]
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="Color.unlimited():blue?">
+						<div class="param-wrapper" id="Color.unlimited():blue">
 							<div class="param-name">
 								<span class="param">blue</span>
 								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The blue channel of the color on [0, 255]. Default is 0
+								The blue component of the color, on [0, 255]
 							</div>
 						</div>
 					
@@ -362,7 +386,7 @@ The inverse is defined as white minus the caller.
 								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The alpha channel of the color on [0, 1]. Default is 1
+								The alpha (opacity) component of the color, on [0, 1]. Default is 1
 							</div>
 						</div>
 					

@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Artist3D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L178" target="_blank" class="class-name source-link">Artist3D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Rendering/Renderer/Artist.html#class Artist">Artist</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L269" target="_blank" class="class-name source-link">Artist3D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Rendering/Renderer/Artist.html#class Artist">Artist</a></span>
 				</div>
 				<div class="class desc">
 					Represents a 3D renderer for a graphical surface.
@@ -25,7 +25,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 					<div class="class-methods">
 		<div class="function-wrapper" id="Artist3D.prototype.light()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L359" target="_blank" class="function-name source-link">light</a>(<span class="param">color</span>)<span class="type"><a href="../../../Rendering/Renderer/3D/Renderers.html#class LightRenderer">LightRenderer</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L453" target="_blank" class="function-name source-link">light</a>(<span class="param">color</span>)<span class="type"><a href="../../../Rendering/Renderer/3D/Renderers.html#class LightRenderer">LightRenderer</a></span>
 			</div>
 			<div class="function desc">
 				Returns an object with various methods for queueing lights to be rendered.
@@ -52,7 +52,7 @@ All transformation-related matrices for this renderer are of type <a href="../..
 	
 		<div class="function-wrapper" id="Artist3D.prototype.mesh()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L368" target="_blank" class="function-name source-link">mesh</a>(<span class="param">mesh</span>)<span class="type"><a href="../../../Rendering/Renderer/3D/Renderers.html#class MeshRenderer">MeshRenderer</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L462" target="_blank" class="function-name source-link">mesh</a>(<span class="param">mesh</span>)<span class="type"><a href="../../../Rendering/Renderer/3D/Renderers.html#class MeshRenderer">MeshRenderer</a></span>
 			</div>
 			<div class="function desc">
 				Returns an object with various methods for queueing meshes to be rendered.
@@ -69,6 +69,43 @@ All transformation-related matrices for this renderer are of type <a href="../..
 							</div>
 							<div class="param desc">
 								The mesh to be rendered
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Artist3D.prototype.stroke()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L471" target="_blank" class="function-name source-link">stroke</a>(<span class="param">color</span>, <span class="param">lineWidth?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Returns an object with various methods for queueing lines and outlines to be rendered.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Artist3D.prototype.stroke():color">
+							<div class="param-name">
+								<span class="param">color</span>
+								<span class="type"><a href="../../../Rendering/Color.html#class Color">Color</a></span>
+							</div>
+							<div class="param desc">
+								The color of the lines to be drawn
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Artist3D.prototype.stroke():lineWidth?">
+							<div class="param-name">
+								<span class="param">lineWidth</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The width of the lines to be drawn. Default is 1
 							</div>
 						</div>
 					

@@ -26,6 +26,10 @@ class Color extends Operable {
 	constructor(r, g, b, a, constrained = false) {
 		super();
 		this.limited = true;
+		this.initialize(r, g, b, a);
+		if (!constrained) this.constrain();
+	}
+	initialize(r, g, b, a) {
 		if (g === undefined) {
 			if (typeof r === "string") {
 				if (r[0] === "#" || r[r.length - 1] === ")") {
@@ -55,7 +59,6 @@ class Color extends Operable {
 			this.blue = b ?? 0;
 			this.alpha = a ?? 1;
 		}
-		if (!constrained) this.constrain();
 	}
 	set x(a) { this.red = a * 255; }
 	get x() { return this.red / 255; }
@@ -202,19 +205,19 @@ class Color extends Operable {
 	}
 	/**
 	 * Creates a new color whose channels aren't clamped within the normal range (`.limited = false`).
-	 * @param Number red? | The red channel of the color on [0, 255]. Default is 0
-	 * @param Number green? | The green channel of the color on [0, 255]. Default is 0
-	 * @param Number blue? | The blue channel of the color on [0, 255]. Default is 0
-	 * @param Number alpha? | The alpha channel of the color on [0, 1]. Default is 1
+	 * @signature
+	 * @param String color | Any valid CSS color representation
+	 * @signature
+	 * @param Number red | The red component of the color, on [0, 255]
+	 * @param Number green | The green component of the color, on [0, 255]
+	 * @param Number blue | The blue component of the color, on [0, 255]
+	 * @param Number alpha? | The alpha (opacity) component of the color, on [0, 1]. Default is 1
 	 * @return Color
 	 */
-	static unlimited(red = 0, green = 0, blue = 0, alpha = 1) {
+	static unlimited(r, g, b, a) {
 		const result = new Color();
+		result.initialize(r, g, b, a);
 		result.limited = false;
-		result.red = red;
-		result.green = green;
-		result.blue = blue;
-		result.alpha = alpha;
 		return result;
 	}
 	static CSSColor(word, destination) {

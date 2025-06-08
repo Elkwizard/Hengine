@@ -2536,6 +2536,405 @@ declare class Vector4 extends Vector {
 }
 
 /**
+ * Represents an inclusive interval.
+ */
+declare class Range implements Copyable {
+	/**
+	 * The lower bound of the interval
+	 */
+	min: number;
+	/**
+	 * The upper bound of the interval
+	 */
+	max: number;
+	/**
+	 * Creates a new interval, optionally with a specific min and max.
+	 * If the arguments are not in ascending order, they will be reversed.
+	 * If no arguments are provided, the interval will be empty. 
+	 */
+	constructor();
+	/**
+	 * Creates a new interval, optionally with a specific min and max.
+	 * If the arguments are not in ascending order, they will be reversed.
+	 * If no arguments are provided, the interval will be empty. 
+	 * @param min - The lower bound
+	 * @param max - The upper bound
+	 */
+	constructor(min: number, max: number);
+	/**
+	 * Returns the mean value of the range.
+	 */
+	get middle(): number;
+	/**
+	 * Returns the size of the interval represented by the range.
+	 */
+	get length(): number;
+	/**
+	 * Returns the set intersection between the caller and another range.
+	 * @param range - The range to clip against
+	 */
+	clip(range: this): this;
+	/**
+	 * Returns the distance from a specified value to the closest bound of the range.
+	 * If the value is inside the range, the distance will be positive, otherwise, it will be negative.
+	 * @param value - The value to check the depth of
+	 */
+	getDepth(value: number): number;
+	/**
+	 * Checks whether a value is within the current bounds of the range.
+	 * @param value - The value to check
+	 */
+	includes(value: number): this;
+	/**
+	 * Expands the range to include a specified value.
+	 * @param value - The value to include
+	 */
+	include(value: number): void;
+	/**
+	 * Checks if there is any overlap between the caller and another range.
+	 * @param range - The range to check against
+	 */
+	intersect(range: this): boolean;
+	/**
+	 * Increases the size of the range by evenly moving both bounds away from the center.
+	 * @param padding - The amount to change each bound by. For example, a padding value of 10 will increase the length of the range by 20
+	 */
+	expand(padding: number): void;
+	/**
+	 * Returns the smallest range that contains every one of a collection of values.
+	 * @param values - The set of values to bound
+	 */
+	static fromValues(values: number[]): Range;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+}
+
+/**
+ * Represents a solid shape.
+ * Within the documentation of this class, `Vector` refers to either `Vector2` or `Vector3` depending on whether the 2D or 3D subclass is used.
+ * Similarly, `Matrix` refers to either `Matrix3` or `Matrix4`.
+ * This is an abstract superclass and should not be constructed.
+ * All properties of this class are read-only.
+ */
+declare class Shape<Matrix = any, Vector = any> {
+	/**
+	 * The geometric center of the shape
+	 */
+	middle: Vector;
+	/**
+	 * Returns a copy of the shape after a certain transformation is applied to all its points.
+	 * @param transform - The transformation to apply to the shape
+	 */
+	getModel(transform: Matrix): this;
+	/**
+	 * Returns a copy of the shape scaled about a specified point.
+	 * @param factor - The scale factor on each axis. If this is a number, it applies to all axes equally
+	 * @param position - The scaling center. Default is the middle of the shape
+	 */
+	scale(factor: Vector | number, position?: Vector): this;
+	/**
+	 * Returns a copy of the shape centered at a specified location.
+	 * @param newCenter - The location of the new center
+	 */
+	center(newCenter: Vector): this;
+	/**
+	 * Returns a copy of the shape translated by a specified amount.
+	 * @param displacement - The amount to displace the shape by
+	 */
+	move(displacement: Vector): this;
+	/**
+	 * Checks if two shapes are congruent.
+	 * @param other - The Shape to compare against
+	 */
+	equals(other: this): boolean;
+	/**
+	 * Checks if two shapes intersect.
+	 * @param shape - The Shape to check intersections with
+	 */
+	intersect(shape: this): boolean;
+	/**
+	 * Returns the closest point within the shape to a specified other point, including the boundary.
+	 * @param point - The target point
+	 */
+	closestPointTo(point: Vector): Vector;
+	/**
+	 * Returns the distance from a specified point to the shape.
+	 * If the point is inside the shape, this will return 0.
+	 * @param point - The target point
+	 */
+	distanceTo(point: Vector): number;
+	/**
+	 * Checks if a point is inside the shape, including points on the boundary.
+	 * @param point - The point to check
+	 */
+	containsPoint(point: Vector): boolean;
+	/**
+	 * Traces a ray until it intersects the caller.
+	 * If the ray misses the shape, returns Infinity.
+	 * If it hits, it returns the distance that the ray traveled prior to intersection.
+	 * @param origin - The starting point of the ray
+	 * @param direction - The unit vector in the direction of the ray
+	 */
+	rayCast(origin: Vector, direction: Vector): number;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+}
+
+/**
+ * Represents a 2D shape.
+ */
+declare class Shape2D extends Shape<Matrix3, Vector2> {
+	/**
+	 * The area of the shape at the time of construction
+	 */
+	area: number;
+	/**
+	 * Returns the smallest axis-aligned rectangle that contains the entire shape.
+	 */
+	getBoundingBox(): Rect;
+}
+
+/**
+ * Represents a line segment.
+ */
+declare class Line extends Shape2D {
+	/**
+	 * The start point of the line segment
+	 */
+	a: Vector2;
+	/**
+	 * The end point of the line segment
+	 */
+	b: Vector2;
+	/**
+	 * A vector from the start point of the line segment to the end point
+	 */
+	vector: Vector2;
+	/**
+	 * A unit normal vector to the line segment
+	 */
+	normal: Vector2;
+	/**
+	 * THe length of the line segment
+	 */
+	length: number;
+	/**
+	 * The slope of the line segment. If the line segment is vertical, this is infinite
+	 */
+	slope: number;
+	/**
+	 * The y-intercept of the line segment if it were extended into a line
+	 */
+	intercept: number;
+	/**
+	 * Creates a new Line.
+	 * @param x - The x coordinate of the start point of the line segment
+	 * @param y - The y coordinate of the start point of the line segment
+	 * @param x2 - The x coordinate of the end point of the line segment
+	 * @param y2 - The y coordinate of the end point of the line segment
+	 */
+	constructor(x: number, y: number, x2: number, y2: number);
+	/**
+	 * Creates a new Line.
+	 * @param start - The start point of the line segment
+	 * @param end - The end point of the line segment
+	 */
+	constructor(start: Vector2, end: Vector2);
+	/**
+	 * Computes the y coordinate on the line for a given x coordinate. This is calculated as if it were a line, rather than a line segment.
+	 * @param x - The x coordinate to calculate the y at.
+	 */
+	evaluate(x: number): number;
+	/**
+	 * Creates a new line segment with a specified slope and intercept.
+	 * The start point is at the y-intercept, and the end point is at x = 1.
+	 * @param m - The slope of the line segment
+	 * @param b - The y-intercept of the line segment
+	 */
+	static fromSlopeIntercept(m: number, b: number): Line;
+}
+
+/**
+ * Represents a contiguous 2D polygon with no holes.
+ */
+declare class Polygon extends Shape2D {
+	/**
+	 * The vertices of the border of the polygon, they are in a clockwise order.
+	 */
+	vertices: Vector2[];
+	/**
+	 * Creates a new Polygon.
+	 * @param vertices - The vertices for the new polygon. They can be ordered either clockwise or counter-clockwise
+	 */
+	constructor(vertices: Vector2[]);
+	/**
+	 * Returns the edges of the polygon.
+	 */
+	getEdges(): Line[];
+	/**
+	 * Returns the edges of the polygon.
+	 */
+	getFaces(): Line[];
+	/**
+	 * Returns a copy of the polygon rotated clockwise (in Screen-Space) by a specified angle.
+	 * @param angle - The angle to rotate by (in radians)
+	 */
+	rotate(angle: number): this;
+	/**
+	 * Checks whether a given point is inside the polygon (including the boundary).
+	 * The behavior of this method is undefined if the polygon is concave.
+	 * @param point - The point to check
+	 */
+	containsPoint(point: Vector2): boolean;
+	/**
+	 * Returns a new regular polygon centered at the origin with a specified amount of sides and radius.
+	 * @param sides - The number of sides of the polygon
+	 * @param radius - The distance from the center to each vertex
+	 */
+	static regular(sides: number, radius: number): Polygon;
+}
+
+/**
+ * Represents an axis-aligned rectangle.
+ */
+declare class Rect extends Polygon {
+	/**
+	 * The x coordinate of the upper-left corner of the rectangle
+	 */
+	x: number;
+	/**
+	 * The y coordinate of the upper-left corner of the rectangle
+	 */
+	y: number;
+	/**
+	 * The width of the rectangle
+	 */
+	width: number;
+	/**
+	 * The height of the rectangle
+	 */
+	height: number;
+	/**
+	 * The upper-left corner of the rectangle
+	 */
+	min: Vector2;
+	/**
+	 * The lower-right corner of the rectangle
+	 */
+	max: Vector2;
+	/**
+	 * The horizontal interval that contains the rectangle
+	 */
+	xRange: Range;
+	/**
+	 * The vertical interval that contains the rectangle
+	 */
+	yRange: Range;
+	/**
+	 * Creates a new Rect. The width and height can be negative and will extend the rectangle to the left and top respectively.
+	 * @param x - The x coordinate of the upper-left corner of the rectangle
+	 * @param y - The y coordinate of the upper-left corner of the rectangle
+	 * @param width - The width of the rectangle
+	 * @param height - The height of the rectangle
+	 */
+	constructor(x: number, y: number, width: number, height: number);
+	/**
+	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller. 
+	 * @param width - The width of the hypothetical rectangle from which to determine the aspect ratio
+	 * @param height - The height of the hypothetical rectangle from which to determine the aspect ratio
+	 */
+	largestWithin(width: number, height: number): this;
+	/**
+	 * Returns the region of intersection between the caller and another rectangle.
+	 * @param rect - The rectangle to intersect with
+	 */
+	clip(rect: this): this;
+	/**
+	 * Returns a new rectangle with the specified minimum and maximum coordinates.
+	 * @param min - The upper-left corner of the rectangle
+	 * @param max - The lower-right corner of the rectangle
+	 */
+	static fromMinMax(min: Vector2, max: Vector2): Rect;
+	/**
+	 * Returns a new rectangle with the specified vertical and horizontal spans.
+	 * @param xRange - The horizontal span of the rectangle
+	 * @param yRange - The vertical span of the rectangle
+	 */
+	static fromRanges(xRange: Range, yRange: Range): Rect;
+	/**
+	 * Returns the smallest bounding rectangle around a collection of points.
+	 * @param points - The points to create a bounding box for
+	 */
+	static bound(points: Vector2[]): Rect;
+	/**
+	 * Returns the smallest bounding rectangle around a collection of rectangles.
+	 * @param boxes - The rectangles to create a bounding box for
+	 */
+	static composeBoundingBoxes(boxes: Rect[]): Rect;
+}
+
+/**
+ * Represents a circle.
+ */
+declare class Circle extends Shape2D {
+	/**
+	 * The center of the circle
+	 */
+	position: Vector2;
+	/**
+	 * The radius of the circle
+	 */
+	radius: number;
+	/**
+	 * Creates a new Circle.
+	 * @param position - The center of the circle
+	 * @param radius - The radius of the circle
+	 */
+	constructor(position: Vector2, radius: number);
+}
+
+/**
+ * Represents a quartic spline with four control points.
+ */
+declare class Spline<Vector = any> {
+	/**
+	 * The first control point
+	 */
+	a: Vector;
+	/**
+	 * The second control point
+	 */
+	b: Vector;
+	/**
+	 * The third control point
+	 */
+	c: Vector;
+	/**
+	 * The fourth control point
+	 */
+	d: Vector;
+	/**
+	 * Creates a new Spline based on a set of control points.
+	 * @param a - The first control point
+	 * @param b - The second control point
+	 * @param c - The third control point
+	 * @param d - The fourth control point
+	 */
+	constructor(a: Vector, b: Vector, c: Vector, d: Vector);
+	/**
+	 * Evaluates the point on the spline at a specified parameter value t.
+	 * @param t - The parameter value
+	 */
+	evaluate(t: number): Vector;
+}
+
+/**
  * Represents a complex number of the form a + bi, where a and b are real numbers.
  * Multiplication and division (`times`, `over`, `mul`, `div`) are defined as they typically are for complex numbers, rather than the element-wise version provided by Operable.
  */
@@ -2803,6 +3202,311 @@ declare class Geometry3D {
 	 * @param portions - How to slice the frustum. If this is a number, the frustum will be sliced into that many pieces of equal size. If this is an array, each element provides a weight proportional to the size of each piece of the frustum. The weights may be scaled by any constant
 	 */
 	static subdivideFrustum(frustum: Frustum, portions: number[] | number): Frustum[];
+}
+
+/**
+ * Represents a 3D shape.
+ */
+declare class Shape3D extends Shape<Matrix4, Vector3> {
+	/**
+	 * The amount of space contained within the shape
+	 */
+	volume: number;
+	/**
+	 * Returns the smallest axis-aligned rectangular prism that contains the entire shape.
+	 */
+	getBoundingBox(): Prism;
+}
+
+/**
+ * Represents a line segment in 3D space.
+ */
+declare class Line3D extends Shape3D {
+	/**
+	 * The beginning of the line segment
+	 */
+	a: Vector3;
+	/**
+	 * The end of the line segment
+	 */
+	b: Vector3;
+	/**
+	 * The length of the line segment
+	 */
+	length: number;
+	/**
+	 * The vector from `.a` to `.b`
+	 */
+	vector: Vector3;
+}
+
+/**
+ * Represents a triangle in 3D space.
+ */
+declare class Triangle extends Shape3D {
+	/**
+	 * The first vertex of the triangle
+	 */
+	a: Vector3;
+	/**
+	 * The second vertex of the triangle
+	 */
+	b: Vector3;
+	/**
+	 * The third vertex of the triangle
+	 */
+	c: Vector3;
+	/**
+	 * The unit surface normal of the triangle
+	 */
+	normal: Vector3;
+	/**
+	 * The area of the triangle
+	 */
+	area: number;
+	/**
+	 * Creates a new triangle.
+	 * @param points - The points of the triangle
+	 */
+	constructor(...points: Vector3[]);
+	/**
+	 * Returns the plane in which the triangle resides.
+	 */
+	get plane(): Plane;
+}
+
+/**
+ * Represents a closed 3D polyhedron as a collection of contiguous triangles.
+ */
+declare class Polyhedron extends Shape3D {
+	/**
+	 * The vertices of the polyhedron
+	 */
+	vertices: Vector3[];
+	/**
+	 * An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the `.vertices` array which make up a triangle
+	 */
+	indices: number[];
+	/**
+	 * Returns a set of unique lines that represent the edges of the faces of the polyhedron.
+	 */
+	getEdges(): Line3D[];
+	/**
+	 * Returns a set of triangles making up the surface of the polyhedron.
+	 */
+	getFaces(): Triangle[];
+	/**
+	 * Subdivides each triangle in the polyhedron into a power of 4 number of additional triangles.
+	 * The subdivided mesh is a copy and is returned.
+	 * @param count - The power of 4 to multiply the triangle count by. Default is 1
+	 */
+	subdivide(count?: number): this;
+	/**
+	 * Creates a new polyhedron by transforming every vertex using a given function.
+	 * @param vertexTransform - The function to apply to each vertex
+	 */
+	map(vertexTransform: (arg0: Vector3) => Vector3): this;
+	/**
+	 * Creates a new polyhedron from a list of triangles which form a closed surface.
+	 * @param triangles - The triangles to use as the surface
+	 */
+	static fromTriangles(triangles: Triangle[]): Polyhedron;
+	/**
+	 * Creates a polyhedron that resembles a sphere to a given level of precision.
+	 * @param sphere - The sphere to approximate
+	 * @param subdivisions - The amount of times to apply `.subdivide()` to the sphere. Default is 2
+	 */
+	static fromSphere(sphere: Sphere, subdivisions?: number): Polyhedron;
+	/**
+	 * Creates a polyhedron that resembles a cylinder to a given level of precision.
+	 * @param cylinder - The cylinder to approximate
+	 * @param steps - The amount of vertices to use around the circular faces. Default is 8
+	 */
+	static fromCylinder(cylinder: Cylinder, steps?: number): Polyhedron;
+}
+
+/**
+ * Represents an axis-aligned rectangular prism.
+ */
+declare class Prism extends Polyhedron {
+	/**
+	 * The C coordinate of the left-upper-front corner
+	 */
+	x: number;
+	/**
+	 * The C coordinate of the left-upper-front corner
+	 */
+	y: number;
+	/**
+	 * The C coordinate of the left-upper-front corner
+	 */
+	z: number;
+	/**
+	 * The x axis size of the prism
+	 */
+	width: number;
+	/**
+	 * The y axis size of the prism
+	 */
+	height: number;
+	/**
+	 * The z axis size of the prism
+	 */
+	depth: number;
+	/**
+	 * The interval of the C axis occupied by the prism
+	 */
+	xRange: Range;
+	/**
+	 * The interval of the C axis occupied by the prism
+	 */
+	yRange: Range;
+	/**
+	 * The interval of the C axis occupied by the prism
+	 */
+	zRange: Range;
+	/**
+	 * The left-upper-front corner
+	 */
+	min: Vector3;
+	/**
+	 * The right-lower-back corner
+	 */
+	max: Vector3;
+	/**
+	 * Creates a new rectangular prism.
+	 * @param min - The left-upper-front corner of the prism
+	 * @param max - The right-lower-back corner of the prism
+	 */
+	constructor(min: Vector3, max: Vector3);
+	/**
+	 * Returns a prism representing the points in both the caller and another given prism.
+	 * @param prism - The prism to intersect with
+	 */
+	clip(prism: this): this;
+	/**
+	 * Creates a rectangular prism from a set of intervals.
+	 * @param xRange - The interval on the x axis occupied by the prism
+	 * @param yRange - The interval on the y axis occupied by the prism
+	 * @param zRange - The interval on the z axis occupied by the prism
+	 */
+	static fromRanges(xRange: Range, yRange: Range, zRange: Range): Prism;
+	/**
+	 * Creates a rectangular prism from a given minimum and maximum point.
+	 * @param min - The left-upper-front corner of the prism
+	 * @param max - The right-lower-back corner of the prism
+	 */
+	static fromMinMax(min: Vector3, max: Vector3): Prism;
+	/**
+	 * Computes the smallest rectangular prism that contains a set of points and returns it.
+	 * @param points - The points to contain
+	 */
+	static bound(points: Vector3[]): Prism;
+	/**
+	 * Computes the smallest bounding rectangular prism the contains a set of other rectangular prisms.
+	 * @param boxes - The boxes to contain
+	 */
+	static composeBoundingBoxes(boxes: Prism[]): Prism;
+}
+
+/**
+ * Represents an infinite plane in 3D space.
+ */
+declare class Plane extends Shape3D {
+	/**
+	 * The unit normal vector to the plane
+	 */
+	normal: Vector3;
+	/**
+	 * The distance from the plane to the origin
+	 */
+	distance: number;
+	/**
+	 * Creates a new plane.
+	 */
+	constructor();
+}
+
+/**
+ * Represents the frustum of a projection matrix.
+ * This is the space projected (via a perspective divide) by a given matrix into the region [-1, 1].
+ */
+declare class Frustum extends Polyhedron {
+	/**
+	 * The planes bounding the frustum
+	 */
+	planes: Plane[];
+	/**
+	 * Creates a frustum for a given projection matrix.
+	 * @param projection - The projection for which to create a frustum
+	 */
+	constructor(projection: Matrix4);
+}
+
+/**
+ * Represents a 3D sphere, the collection of points within a given distance of a center.
+ */
+declare class Sphere extends Shape3D {
+	/**
+	 * The center of the sphere
+	 */
+	position: Vector3;
+	/**
+	 * The maximum distance from the center of the sphere to its bounds
+	 */
+	radius: number;
+	/**
+	 * Creates a new sphere.
+	 * @param position - The center of the sphere
+	 * @param radius - The radius of the sphere
+	 */
+	constructor(position: Vector3, radius: number);
+	/**
+	 * Returns a sphere which contains all of the given spheres.
+	 * It is not guaranteed to be a newly allocated sphere, nor is it guaranteed to be the smallest possible bounding sphere.
+	 * @param spheres - The bounding spheres to compose together. This must include at least one sphere
+	 */
+	static composeBoundingBalls(spheres: Sphere[]): Sphere;
+}
+
+/**
+ * Represents an arbitrarily aligned circular cylinder.
+ */
+declare class Cylinder extends Shape3D {
+	/**
+	 * The position of the center of the cylinder
+	 */
+	position: Vector3;
+	/**
+	 * The unit vector pointing along the long axis of the cylinder
+	 */
+	axis: Vector3;
+	/**
+	 * The length of the long axis of the cylinder
+	 */
+	length: number;
+	/**
+	 * The radius of the cylinder
+	 */
+	radius: number;
+	/**
+	 * Creates a new cylinder.
+	 * @param position - The position of the center of the new cylinder
+	 * @param axis - The unit vector pointing along the long axis of the new cylinder
+	 * @param length - The length of the long axis of the new cylinder
+	 * @param radius - The radius of the new cylinder
+	 */
+	constructor(position: Vector3, axis: Vector3, length: number, radius: number);
+	/**
+	 * Returns a line segment from the center of one circular face to the other.
+	 */
+	get longAxis(): Line3D;
+	/**
+	 * Creates a new cylinder based on a line segment and a radius.
+	 * @param longAxis - A line segment from the center of one circular face to the other
+	 * @param radius - The radius of the cylinder
+	 */
+	static fromLongAxis(longAxis: Line3D, radius: number): void;
 }
 
 /**
@@ -3788,6 +4492,11 @@ declare class Color extends Operable {
 	 */
 	constructor(red: number, green: number, blue: number, alpha?: number);
 	/**
+	 * Returns the hexadecimal representation of the color as a 32-bit integer.
+	 * In most-to-least significant byte order, the format returned will be `RRGGBBAA`.
+	 */
+	get hex(): number;
+	/**
 	 * Returns a copy of the color with an alpha of 1.
 	 */
 	get opaque(): this;
@@ -3831,12 +4540,17 @@ declare class Color extends Operable {
 	static grayScale(intensity: number): Color;
 	/**
 	 * Creates a new color whose channels aren't clamped within the normal range (`.limited = false`).
-	 * @param red - The red channel of the color on [0, 255]. Default is 0
-	 * @param green - The green channel of the color on [0, 255]. Default is 0
-	 * @param blue - The blue channel of the color on [0, 255]. Default is 0
-	 * @param alpha - The alpha channel of the color on [0, 1]. Default is 1
+	 * @param color - Any valid CSS color representation
 	 */
-	static unlimited(red?: number, green?: number, blue?: number, alpha?: number): Color;
+	static unlimited(color: string): Color;
+	/**
+	 * Creates a new color whose channels aren't clamped within the normal range (`.limited = false`).
+	 * @param red - The red component of the color, on [0, 255]
+	 * @param green - The green component of the color, on [0, 255]
+	 * @param blue - The blue component of the color, on [0, 255]
+	 * @param alpha - The alpha (opacity) component of the color, on [0, 1]. Default is 1
+	 */
+	static unlimited(red: number, green: number, blue: number, alpha?: number): Color;
 }
 
 /**
@@ -5301,405 +6015,6 @@ declare class ImageRenderer extends PathRenderer {
 }
 
 /**
- * Represents an inclusive interval.
- */
-declare class Range implements Copyable {
-	/**
-	 * The lower bound of the interval
-	 */
-	min: number;
-	/**
-	 * The upper bound of the interval
-	 */
-	max: number;
-	/**
-	 * Creates a new interval, optionally with a specific min and max.
-	 * If the arguments are not in ascending order, they will be reversed.
-	 * If no arguments are provided, the interval will be empty. 
-	 */
-	constructor();
-	/**
-	 * Creates a new interval, optionally with a specific min and max.
-	 * If the arguments are not in ascending order, they will be reversed.
-	 * If no arguments are provided, the interval will be empty. 
-	 * @param min - The lower bound
-	 * @param max - The upper bound
-	 */
-	constructor(min: number, max: number);
-	/**
-	 * Returns the mean value of the range.
-	 */
-	get middle(): number;
-	/**
-	 * Returns the size of the interval represented by the range.
-	 */
-	get length(): number;
-	/**
-	 * Returns the set intersection between the caller and another range.
-	 * @param range - The range to clip against
-	 */
-	clip(range: this): this;
-	/**
-	 * Returns the distance from a specified value to the closest bound of the range.
-	 * If the value is inside the range, the distance will be positive, otherwise, it will be negative.
-	 * @param value - The value to check the depth of
-	 */
-	getDepth(value: number): number;
-	/**
-	 * Checks whether a value is within the current bounds of the range.
-	 * @param value - The value to check
-	 */
-	includes(value: number): this;
-	/**
-	 * Expands the range to include a specified value.
-	 * @param value - The value to include
-	 */
-	include(value: number): void;
-	/**
-	 * Checks if there is any overlap between the caller and another range.
-	 * @param range - The range to check against
-	 */
-	intersect(range: this): boolean;
-	/**
-	 * Increases the size of the range by evenly moving both bounds away from the center.
-	 * @param padding - The amount to change each bound by. For example, a padding value of 10 will increase the length of the range by 20
-	 */
-	expand(padding: number): void;
-	/**
-	 * Returns the smallest range that contains every one of a collection of values.
-	 * @param values - The set of values to bound
-	 */
-	static fromValues(values: number[]): Range;
-	/**
-	 * Creates a copy of the object and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the object into. This must be the same type as the caller
-	 */
-	get(destination?: this): this;
-}
-
-/**
- * Represents a solid shape.
- * Within the documentation of this class, `Vector` refers to either `Vector2` or `Vector3` depending on whether the 2D or 3D subclass is used.
- * Similarly, `Matrix` refers to either `Matrix3` or `Matrix4`.
- * This is an abstract superclass and should not be constructed.
- * All properties of this class are read-only.
- */
-declare class Shape<Matrix = any, Vector = any> {
-	/**
-	 * The geometric center of the shape
-	 */
-	middle: Vector;
-	/**
-	 * Returns a copy of the shape after a certain transformation is applied to all its points.
-	 * @param transform - The transformation to apply to the shape
-	 */
-	getModel(transform: Matrix): this;
-	/**
-	 * Returns a copy of the shape scaled about a specified point.
-	 * @param factor - The scale factor on each axis. If this is a number, it applies to all axes equally
-	 * @param position - The scaling center. Default is the middle of the shape
-	 */
-	scale(factor: Vector | number, position?: Vector): this;
-	/**
-	 * Returns a copy of the shape centered at a specified location.
-	 * @param newCenter - The location of the new center
-	 */
-	center(newCenter: Vector): this;
-	/**
-	 * Returns a copy of the shape translated by a specified amount.
-	 * @param displacement - The amount to displace the shape by
-	 */
-	move(displacement: Vector): this;
-	/**
-	 * Checks if two shapes are congruent.
-	 * @param other - The Shape to compare against
-	 */
-	equals(other: this): boolean;
-	/**
-	 * Checks if two shapes intersect.
-	 * @param shape - The Shape to check intersections with
-	 */
-	intersect(shape: this): boolean;
-	/**
-	 * Returns the closest point within the shape to a specified other point, including the boundary.
-	 * @param point - The target point
-	 */
-	closestPointTo(point: Vector): Vector;
-	/**
-	 * Returns the distance from a specified point to the shape.
-	 * If the point is inside the shape, this will return 0.
-	 * @param point - The target point
-	 */
-	distanceTo(point: Vector): number;
-	/**
-	 * Checks if a point is inside the shape, including points on the boundary.
-	 * @param point - The point to check
-	 */
-	containsPoint(point: Vector): boolean;
-	/**
-	 * Traces a ray until it intersects the caller.
-	 * If the ray misses the shape, returns Infinity.
-	 * If it hits, it returns the distance that the ray traveled prior to intersection.
-	 * @param origin - The starting point of the ray
-	 * @param direction - The unit vector in the direction of the ray
-	 */
-	rayCast(origin: Vector, direction: Vector): number;
-	/**
-	 * Creates a copy of the object and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the object into. This must be the same type as the caller
-	 */
-	get(destination?: this): this;
-}
-
-/**
- * Represents a 2D shape.
- */
-declare class Shape2D extends Shape<Matrix3, Vector2> {
-	/**
-	 * The area of the shape at the time of construction
-	 */
-	area: number;
-	/**
-	 * Returns the smallest axis-aligned rectangle that contains the entire shape.
-	 */
-	getBoundingBox(): Rect;
-}
-
-/**
- * Represents a line segment.
- */
-declare class Line extends Shape2D {
-	/**
-	 * The start point of the line segment
-	 */
-	a: Vector2;
-	/**
-	 * The end point of the line segment
-	 */
-	b: Vector2;
-	/**
-	 * A vector from the start point of the line segment to the end point
-	 */
-	vector: Vector2;
-	/**
-	 * A unit normal vector to the line segment
-	 */
-	normal: Vector2;
-	/**
-	 * THe length of the line segment
-	 */
-	length: number;
-	/**
-	 * The slope of the line segment. If the line segment is vertical, this is infinite
-	 */
-	slope: number;
-	/**
-	 * The y-intercept of the line segment if it were extended into a line
-	 */
-	intercept: number;
-	/**
-	 * Creates a new Line.
-	 * @param x - The x coordinate of the start point of the line segment
-	 * @param y - The y coordinate of the start point of the line segment
-	 * @param x2 - The x coordinate of the end point of the line segment
-	 * @param y2 - The y coordinate of the end point of the line segment
-	 */
-	constructor(x: number, y: number, x2: number, y2: number);
-	/**
-	 * Creates a new Line.
-	 * @param start - The start point of the line segment
-	 * @param end - The end point of the line segment
-	 */
-	constructor(start: Vector2, end: Vector2);
-	/**
-	 * Computes the y coordinate on the line for a given x coordinate. This is calculated as if it were a line, rather than a line segment.
-	 * @param x - The x coordinate to calculate the y at.
-	 */
-	evaluate(x: number): number;
-	/**
-	 * Creates a new line segment with a specified slope and intercept.
-	 * The start point is at the y-intercept, and the end point is at x = 1.
-	 * @param m - The slope of the line segment
-	 * @param b - The y-intercept of the line segment
-	 */
-	static fromSlopeIntercept(m: number, b: number): Line;
-}
-
-/**
- * Represents a contiguous 2D polygon with no holes.
- */
-declare class Polygon extends Shape2D {
-	/**
-	 * The vertices of the border of the polygon, they are in a clockwise order.
-	 */
-	vertices: Vector2[];
-	/**
-	 * Creates a new Polygon.
-	 * @param vertices - The vertices for the new polygon. They can be ordered either clockwise or counter-clockwise
-	 */
-	constructor(vertices: Vector2[]);
-	/**
-	 * Returns the edges of the polygon.
-	 */
-	getEdges(): Line[];
-	/**
-	 * Returns the edges of the polygon.
-	 */
-	getFaces(): Line[];
-	/**
-	 * Returns a copy of the polygon rotated clockwise (in Screen-Space) by a specified angle.
-	 * @param angle - The angle to rotate by (in radians)
-	 */
-	rotate(angle: number): this;
-	/**
-	 * Checks whether a given point is inside the polygon (including the boundary).
-	 * The behavior of this method is undefined if the polygon is concave.
-	 * @param point - The point to check
-	 */
-	containsPoint(point: Vector2): boolean;
-	/**
-	 * Returns a new regular polygon centered at the origin with a specified amount of sides and radius.
-	 * @param sides - The number of sides of the polygon
-	 * @param radius - The distance from the center to each vertex
-	 */
-	static regular(sides: number, radius: number): Polygon;
-}
-
-/**
- * Represents an axis-aligned rectangle.
- */
-declare class Rect extends Polygon {
-	/**
-	 * The x coordinate of the upper-left corner of the rectangle
-	 */
-	x: number;
-	/**
-	 * The y coordinate of the upper-left corner of the rectangle
-	 */
-	y: number;
-	/**
-	 * The width of the rectangle
-	 */
-	width: number;
-	/**
-	 * The height of the rectangle
-	 */
-	height: number;
-	/**
-	 * The upper-left corner of the rectangle
-	 */
-	min: Vector2;
-	/**
-	 * The lower-right corner of the rectangle
-	 */
-	max: Vector2;
-	/**
-	 * The horizontal interval that contains the rectangle
-	 */
-	xRange: Range;
-	/**
-	 * The vertical interval that contains the rectangle
-	 */
-	yRange: Range;
-	/**
-	 * Creates a new Rect. The width and height can be negative and will extend the rectangle to the left and top respectively.
-	 * @param x - The x coordinate of the upper-left corner of the rectangle
-	 * @param y - The y coordinate of the upper-left corner of the rectangle
-	 * @param width - The width of the rectangle
-	 * @param height - The height of the rectangle
-	 */
-	constructor(x: number, y: number, width: number, height: number);
-	/**
-	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller. 
-	 * @param width - The width of the hypothetical rectangle from which to determine the aspect ratio
-	 * @param height - The height of the hypothetical rectangle from which to determine the aspect ratio
-	 */
-	largestWithin(width: number, height: number): this;
-	/**
-	 * Returns the region of intersection between the caller and another rectangle.
-	 * @param rect - The rectangle to intersect with
-	 */
-	clip(rect: this): this;
-	/**
-	 * Returns a new rectangle with the specified minimum and maximum coordinates.
-	 * @param min - The upper-left corner of the rectangle
-	 * @param max - The lower-right corner of the rectangle
-	 */
-	static fromMinMax(min: Vector2, max: Vector2): Rect;
-	/**
-	 * Returns a new rectangle with the specified vertical and horizontal spans.
-	 * @param xRange - The horizontal span of the rectangle
-	 * @param yRange - The vertical span of the rectangle
-	 */
-	static fromRanges(xRange: Range, yRange: Range): Rect;
-	/**
-	 * Returns the smallest bounding rectangle around a collection of points.
-	 * @param points - The points to create a bounding box for
-	 */
-	static bound(points: Vector2[]): Rect;
-	/**
-	 * Returns the smallest bounding rectangle around a collection of rectangles.
-	 * @param boxes - The rectangles to create a bounding box for
-	 */
-	static composeBoundingBoxes(boxes: Rect[]): Rect;
-}
-
-/**
- * Represents a circle.
- */
-declare class Circle extends Shape2D {
-	/**
-	 * The center of the circle
-	 */
-	position: Vector2;
-	/**
-	 * The radius of the circle
-	 */
-	radius: number;
-	/**
-	 * Creates a new Circle.
-	 * @param position - The center of the circle
-	 * @param radius - The radius of the circle
-	 */
-	constructor(position: Vector2, radius: number);
-}
-
-/**
- * Represents a quartic spline with four control points.
- */
-declare class Spline<Vector = any> {
-	/**
-	 * The first control point
-	 */
-	a: Vector;
-	/**
-	 * The second control point
-	 */
-	b: Vector;
-	/**
-	 * The third control point
-	 */
-	c: Vector;
-	/**
-	 * The fourth control point
-	 */
-	d: Vector;
-	/**
-	 * Creates a new Spline based on a set of control points.
-	 * @param a - The first control point
-	 * @param b - The second control point
-	 * @param c - The third control point
-	 * @param d - The fourth control point
-	 */
-	constructor(a: Vector, b: Vector, c: Vector, d: Vector);
-	/**
-	 * Evaluates the point on the spline at a specified parameter value t.
-	 * @param t - The parameter value
-	 */
-	evaluate(t: number): Vector;
-}
-
-/**
  * Represents an image that will not change.
  * This image format is more efficient for rendering than other ImageTypes.
  */
@@ -6406,6 +6721,21 @@ declare class ShaderMaterial extends Material {
 }
 
 /**
+ * Represents a basic unlit solid-color material.
+ */
+declare class ColorMaterial extends Material {
+	/**
+	 * The solid opaque color used everywhere on the material
+	 */
+	color: Color;
+	/**
+	 * Creates a new solid-color material.
+	 * @param color - The color of the material. Must be opaque
+	 */
+	constructor(color: Color);
+}
+
+/**
  * Represents a basic parameterized material based on the Blinn-Phong Shading Model.
  */
 declare class SimpleMaterial extends Material {
@@ -6607,6 +6937,29 @@ declare class MeshRenderer {
 }
 
 /**
+ * Provides a set of methods for rendering lines and outlines in various ways in three dimensions.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.stroke`.
+ */
+declare class StrokeRenderer3D {
+	/**
+	 * Draws a line segment.
+	 * @param a - The start of the line segment to draw
+	 * @param b - The end of the line segment to draw
+	 */
+	line(a: Vector3, b: Vector3): void;
+	/**
+	 * Draws a line segment.
+	 * @param line - The line segment to draw
+	 */
+	line(line: Line3D): void;
+	/**
+	 * Draws a 3D wireframe of a given polyhedron
+	 * @param polyhedron - The polyhedron to draw a 3D wireframe of
+	 */
+	shape(polyhedron: Polyhedron): void;
+}
+
+/**
  * Represents a 3D renderer for a graphical surface.
  * All transformation-related matrices for this renderer are of type Matrix4.
  */
@@ -6621,311 +6974,12 @@ declare class Artist3D extends Artist {
 	 * @param mesh - The mesh to be rendered
 	 */
 	mesh(mesh: Mesh): MeshRenderer;
-}
-
-/**
- * Represents a 3D shape.
- */
-declare class Shape3D extends Shape<Matrix4, Vector3> {
 	/**
-	 * The amount of space contained within the shape
+	 * Returns an object with various methods for queueing lines and outlines to be rendered.
+	 * @param color - The color of the lines to be drawn
+	 * @param lineWidth - The width of the lines to be drawn. Default is 1
 	 */
-	volume: number;
-	/**
-	 * Returns the smallest axis-aligned rectangular prism that contains the entire shape.
-	 */
-	getBoundingBox(): Prism;
-}
-
-/**
- * Represents a line segment in 3D space.
- */
-declare class Line3D extends Shape3D {
-	/**
-	 * The beginning of the line segment
-	 */
-	a: Vector3;
-	/**
-	 * The end of the line segment
-	 */
-	b: Vector3;
-	/**
-	 * The length of the line segment
-	 */
-	length: number;
-	/**
-	 * The vector from `.a` to `.b`
-	 */
-	vector: Vector3;
-}
-
-/**
- * Represents a triangle in 3D space.
- */
-declare class Triangle extends Shape3D {
-	/**
-	 * The first vertex of the triangle
-	 */
-	a: Vector3;
-	/**
-	 * The second vertex of the triangle
-	 */
-	b: Vector3;
-	/**
-	 * The third vertex of the triangle
-	 */
-	c: Vector3;
-	/**
-	 * The unit surface normal of the triangle
-	 */
-	normal: Vector3;
-	/**
-	 * The area of the triangle
-	 */
-	area: number;
-	/**
-	 * Creates a new triangle.
-	 * @param points - The points of the triangle
-	 */
-	constructor(...points: Vector3[]);
-	/**
-	 * Returns the plane in which the triangle resides.
-	 */
-	get plane(): Plane;
-}
-
-/**
- * Represents a closed 3D polyhedron as a collection of contiguous triangles.
- */
-declare class Polyhedron extends Shape3D {
-	/**
-	 * The vertices of the polyhedron
-	 */
-	vertices: Vector3[];
-	/**
-	 * An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the `.vertices` array which make up a triangle
-	 */
-	indices: number[];
-	/**
-	 * Returns a set of unique lines that represent the edges of the faces of the polyhedron.
-	 */
-	getEdges(): Line3D[];
-	/**
-	 * Returns a set of triangles making up the surface of the polyhedron.
-	 */
-	getFaces(): Triangle[];
-	/**
-	 * Subdivides each triangle in the polyhedron into a power of 4 number of additional triangles.
-	 * The subdivided mesh is a copy and is returned.
-	 * @param count - The power of 4 to multiply the triangle count by. Default is 1
-	 */
-	subdivide(count?: number): this;
-	/**
-	 * Creates a new polyhedron by transforming every vertex using a given function.
-	 * @param vertexTransform - The function to apply to each vertex
-	 */
-	map(vertexTransform: (arg0: Vector3) => Vector3): this;
-	/**
-	 * Creates a new polyhedron from a list of triangles which form a closed surface.
-	 * @param triangles - The triangles to use as the surface
-	 */
-	static fromTriangles(triangles: Triangle[]): Polyhedron;
-	/**
-	 * Creates a polyhedron that resembles a sphere to a given level of precision.
-	 * @param sphere - The sphere to approximate
-	 * @param subdivisions - The amount of times to apply `.subdivide()` to the sphere. Default is 2
-	 */
-	static fromSphere(sphere: Sphere, subdivisions?: number): Polyhedron;
-	/**
-	 * Creates a polyhedron that resembles a cylinder to a given level of precision.
-	 * @param cylinder - The cylinder to approximate
-	 * @param steps - The amount of vertices to use around the circular faces. Default is 8
-	 */
-	static fromCylinder(cylinder: Cylinder, steps?: number): Polyhedron;
-}
-
-/**
- * Represents an axis-aligned rectangular prism.
- */
-declare class Prism extends Polyhedron {
-	/**
-	 * The C coordinate of the left-upper-front corner
-	 */
-	x: number;
-	/**
-	 * The C coordinate of the left-upper-front corner
-	 */
-	y: number;
-	/**
-	 * The C coordinate of the left-upper-front corner
-	 */
-	z: number;
-	/**
-	 * The x axis size of the prism
-	 */
-	width: number;
-	/**
-	 * The y axis size of the prism
-	 */
-	height: number;
-	/**
-	 * The z axis size of the prism
-	 */
-	depth: number;
-	/**
-	 * The interval of the C axis occupied by the prism
-	 */
-	xRange: Range;
-	/**
-	 * The interval of the C axis occupied by the prism
-	 */
-	yRange: Range;
-	/**
-	 * The interval of the C axis occupied by the prism
-	 */
-	zRange: Range;
-	/**
-	 * The left-upper-front corner
-	 */
-	min: Vector3;
-	/**
-	 * The right-lower-back corner
-	 */
-	max: Vector3;
-	/**
-	 * Creates a new rectangular prism.
-	 * @param min - The left-upper-front corner of the prism
-	 * @param max - The right-lower-back corner of the prism
-	 */
-	constructor(min: Vector3, max: Vector3);
-	/**
-	 * Returns a prism representing the points in both the caller and another given prism.
-	 * @param prism - The prism to intersect with
-	 */
-	clip(prism: this): this;
-	/**
-	 * Creates a rectangular prism from a set of intervals.
-	 * @param xRange - The interval on the x axis occupied by the prism
-	 * @param yRange - The interval on the y axis occupied by the prism
-	 * @param zRange - The interval on the z axis occupied by the prism
-	 */
-	static fromRanges(xRange: Range, yRange: Range, zRange: Range): Prism;
-	/**
-	 * Creates a rectangular prism from a given minimum and maximum point.
-	 * @param min - The left-upper-front corner of the prism
-	 * @param max - The right-lower-back corner of the prism
-	 */
-	static fromMinMax(min: Vector3, max: Vector3): Prism;
-	/**
-	 * Computes the smallest rectangular prism that contains a set of points and returns it.
-	 * @param points - The points to contain
-	 */
-	static bound(points: Vector3[]): Prism;
-	/**
-	 * Computes the smallest bounding rectangular prism the contains a set of other rectangular prisms.
-	 * @param boxes - The boxes to contain
-	 */
-	static composeBoundingBoxes(boxes: Prism[]): Prism;
-}
-
-/**
- * Represents an infinite plane in 3D space.
- */
-declare class Plane extends Shape3D {
-	/**
-	 * The unit normal vector to the plane
-	 */
-	normal: Vector3;
-	/**
-	 * The distance from the plane to the origin
-	 */
-	distance: number;
-	/**
-	 * Creates a new plane.
-	 */
-	constructor();
-}
-
-/**
- * Represents the frustum of a projection matrix.
- * This is the space projected (via a perspective divide) by a given matrix into the region [-1, 1].
- */
-declare class Frustum extends Polyhedron {
-	/**
-	 * The planes bounding the frustum
-	 */
-	planes: Plane[];
-	/**
-	 * Creates a frustum for a given projection matrix.
-	 * @param projection - The projection for which to create a frustum
-	 */
-	constructor(projection: Matrix4);
-}
-
-/**
- * Represents a 3D sphere, the collection of points within a given distance of a center.
- */
-declare class Sphere extends Shape3D {
-	/**
-	 * The center of the sphere
-	 */
-	position: Vector3;
-	/**
-	 * The maximum distance from the center of the sphere to its bounds
-	 */
-	radius: number;
-	/**
-	 * Creates a new sphere.
-	 * @param position - The center of the sphere
-	 * @param radius - The radius of the sphere
-	 */
-	constructor(position: Vector3, radius: number);
-	/**
-	 * Returns a sphere which contains all of the given spheres.
-	 * It is not guaranteed to be a newly allocated sphere, nor is it guaranteed to be the smallest possible bounding sphere.
-	 * @param spheres - The bounding spheres to compose together. This must include at least one sphere
-	 */
-	static composeBoundingBalls(spheres: Sphere[]): Sphere;
-}
-
-/**
- * Represents an arbitrarily aligned circular cylinder.
- */
-declare class Cylinder extends Shape3D {
-	/**
-	 * The position of the center of the cylinder
-	 */
-	position: Vector3;
-	/**
-	 * The unit vector pointing along the long axis of the cylinder
-	 */
-	axis: Vector3;
-	/**
-	 * The length of the long axis of the cylinder
-	 */
-	length: number;
-	/**
-	 * The radius of the cylinder
-	 */
-	radius: number;
-	/**
-	 * Creates a new cylinder.
-	 * @param position - The position of the center of the new cylinder
-	 * @param axis - The unit vector pointing along the long axis of the new cylinder
-	 * @param length - The length of the long axis of the new cylinder
-	 * @param radius - The radius of the new cylinder
-	 */
-	constructor(position: Vector3, axis: Vector3, length: number, radius: number);
-	/**
-	 * Returns a line segment from the center of one circular face to the other.
-	 */
-	get longAxis(): Line3D;
-	/**
-	 * Creates a new cylinder based on a line segment and a radius.
-	 * @param longAxis - A line segment from the center of one circular face to the other
-	 * @param radius - The radius of the cylinder
-	 */
-	static fromLongAxis(longAxis: Line3D, radius: number): void;
+	stroke(color: Color, lineWidth?: number): void;
 }
 
 /**
