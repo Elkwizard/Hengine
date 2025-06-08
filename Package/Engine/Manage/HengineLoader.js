@@ -1040,7 +1040,7 @@ class HengineLoader {
 
 			"Render/Frame.js",
 			"Render/Gradient.js",
-			"Render/Spline.js",
+			"Math/Spline.js",
 			"Render/WebGL2DContext.js",
 			"Render/GrayMap.js",
 			"Render/GPUInterface.js"
@@ -1063,9 +1063,9 @@ class HengineLoader {
 			"Math/Complex.js",
 			"Math/Geometry.js",
 			"Math/GPUComputation.js",
+			"Math/Shapes.js",
 
 			"Render/Font.js",
-			"Render/Shapes.js",
 			"Render/Animation.js",
 			"Render/Camera.js",
 			"Render/Webcam.js",
@@ -1081,7 +1081,7 @@ class HengineLoader {
 			// 3d
 			"Render/Camera3D.js",
 			"Render/Frame3D.js",
-			"Render/Shapes3D.js",
+			"Math/Shapes3D.js",
 			"Render/Mesh.js",
 			"Render/Material.js",
 			"Render/Renderer3D.js",
