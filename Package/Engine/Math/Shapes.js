@@ -427,12 +427,15 @@ class Polygon extends Shape2D {
 	 * @return Line[]
 	 */
 	getEdges() {
-		let edges = [];
-		const { vertices } = this;
-		for (let i = 0; i < vertices.length; i++)
-			edges.push(new Line(vertices[i], vertices[(i + 1) % vertices.length]));
+		if (this._edges === undefined) {
+			const edges = [];
+			const { vertices } = this;
+			for (let i = 0; i < vertices.length; i++)
+				edges.push(new Line(vertices[i], vertices[(i + 1) % vertices.length]));
+			this._edges = edges;
+		}
 
-		return edges;
+		return this._edges;
 	}
 	getFaces() {
 		return this.getEdges();

@@ -42,6 +42,35 @@ ShaderMaterial.DEFAULT_FRAGMENT_SHADER = `
 `;
 
 /**
+ * Represents a basic unlit solid-color material.
+ * @prop Color color | The solid opaque color used everywhere on the material
+ */
+class ColorMaterial extends Material {
+	/**
+	 * Creates a new solid-color material.
+	 * @param Color color | The color of the material. Must be opaque
+	 */
+	constructor(color) {
+		super();
+
+		this.color = color;
+		this.vertexShader = ColorMaterial.VERTEX_SHADER;
+		this.fragmentShader = ColorMaterial.FRAGMENT_SHADER;
+		this.uniforms = { color: this.color };
+		this.transparent = false;
+	}
+}
+
+ColorMaterial.VERTEX_SHADER = new GLSL(ShaderMaterial.DEFAULT_VERTEX_SHADER);
+ColorMaterial.FRAGMENT_SHADER = new GLSL(`
+	uniform vec3 color;
+
+	vec4 shader() {
+		return vec4(color, 1);
+	}
+`);
+
+/**
  * Represents a basic parameterized material based on the Blinn-Phong Shading Model.
  * @prop Color albedo | The base color of the material, against which ambient and diffuse lighting are calculated. Starts as white
  * @prop Color emission | The color of light emitted from the material. Starts as black

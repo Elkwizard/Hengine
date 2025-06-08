@@ -112,6 +112,7 @@
 		"Materials": {
 			"Material": null,
 			"SimpleMaterial": null,
+			"ColorMaterial": null,
 			"ShaderMaterial": null
 		}
 	},

@@ -5,11 +5,14 @@
 class LightRenderer {
 	constructor(renderer) {
 		this.renderer = renderer;
-		this.color = Color.WHITE;
+		this.color = null;
 		this.queue = [];
 	}
 	get lights() {
 		return this.queue;
+	}
+	setup(color = Color.WHITE) {
+		this.color = color.get();
 	}
 	clear() {
 		this.queue = [];
@@ -62,8 +65,6 @@ class MeshRenderer {
 	constructor(renderer) {
 		this.renderer = renderer;
 		this.mesh = null;
-		this.matrices = new StackAllocator(Matrix4);
-		this.matrices.push();
 		this.clear();
 	}
 	get meshes() {
@@ -72,9 +73,10 @@ class MeshRenderer {
 			result.push({ mesh, transforms, castShadows });
 		return result;
 	}
+	setup(mesh) {
+		this.mesh = mesh;
+	}
 	clear() {
-		this.matrices.pop();
-		this.matrices.push();
 		this.queue = new Map();
 	}
 	enqueue(transform, castShadows = true) {
@@ -92,7 +94,8 @@ class MeshRenderer {
 	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
 	 */
 	default(castShadows) {
-		this.enqueue(this.renderer.state.transform.get(this.matrices.alloc()), castShadows);
+		const matrix = this.renderer.matrix4Pool.alloc();
+		this.enqueue(this.renderer.state.transform.get(matrix), castShadows);
 	}
 	/**
 	 * Renders the current mesh at a given transform relative to the current transform.
@@ -100,7 +103,8 @@ class MeshRenderer {
 	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
 	 */
 	at(transform, castShadows) {
-		this.enqueue(this.renderer.state.transform.times(transform, this.matrices.alloc()), castShadows);
+		const matrix = this.renderer.matrix4Pool.alloc();
+		this.enqueue(this.renderer.state.transform.times(transform, matrix), castShadows);
 	}
 	/**
 	 * Renders the current mesh at a variety of different transforms relative to the current transform.
@@ -110,6 +114,93 @@ class MeshRenderer {
 	instance(transforms, castShadows) {
 		for (const transform of transforms)
 			this.at(transform, castShadows);
+	}
+}
+
+/**
+ * Provides a set of methods for rendering lines and outlines in various ways in three dimensions.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.stroke`.
+ */
+class StrokeRenderer3D {
+	static MeshCache = class MeshCache {
+		constructor(polyhedron) {
+			this.polyhedron = polyhedron;
+			this.meshes = [];
+			this.materialToIndex = new Map();
+			this.clear();
+		}
+		getMesh(material) {
+			if (!this.materialToIndex.has(material)) {
+				if (this.nextIndex >= this.meshes.length) {
+					this.meshes.push(Mesh.fromPolyhedron(this.polyhedron, material));	
+				} else {
+					this.meshes[this.nextIndex].chunks[0].material = material;
+				}
+				this.materialToIndex.set(material, this.nextIndex);
+				this.nextIndex++;
+			}
+		
+			return this.meshes[this.materialToIndex.get(material)];
+		}
+		clear() {
+			this.materialToIndex.clear();
+			this.nextIndex = 0;
+		}
+	};
+
+	constructor(renderer) {
+		this.renderer = renderer;
+		this.color = null;
+		this.lineRadius = null;
+
+		this.lineMeshCache = new StrokeRenderer3D.MeshCache(
+			Polyhedron.fromCylinder(Cylinder.fromLongAxis(
+				new Line3D(new Vector3(0, 0, 0), new Vector3(0, 0, 1)), 1
+			))
+		);
+		this.clear();
+	}
+	setup(color, lineWidth = 1) {
+		this.color = color;
+		this.lineRadius = lineWidth * 0.5;
+
+		const { hex } = color;
+		if (!this.materialCache.has(hex))
+			this.materialCache.set(hex, new ColorMaterial(color));
+		this.material = this.materialCache.get(hex);
+	}
+	clear() {
+		this.materialCache = new Map();
+		this.lineMeshCache.clear();
+	}
+	/**
+	 * Draws a line segment.
+	 * @signature
+	 * @param Vector3 a | The start of the line segment to draw
+	 * @param Vector3 b | The end of the line segment to draw
+	 * @signature
+	 * @param Line3D line | The line segment to draw
+	 */
+	line(a, b) {
+		if (a instanceof Line3D) ({ a, b } = a);
+
+		const lineMesh = this.lineMeshCache.getMesh(this.material);
+
+		const vector = b.minus(a);
+		const right = vector.normal.normalize().mul(this.lineRadius);
+		const up = vector.cross(right).normalize().mul(this.lineRadius);
+		const forward = vector;
+		const transform = new Matrix4(right, up, forward, a);
+		this.renderer.mesh(lineMesh).at(transform);
+	}
+	/**
+	 * Draws a 3D wireframe of a given polyhedron
+	 * @param Polyhedron polyhedron | The polyhedron to draw a 3D wireframe of
+	 */
+	shape(polyhedron) {
+		const edges = polyhedron.getEdges();
+		for (let i = 0; i < edges.length; i++)
+			this.line(edges[i]);
 	}
 }
 
@@ -195,7 +286,10 @@ class Artist3D extends Artist {
 		this.currentStateIndex = 0;
 		this.lightObj = new LightRenderer(this);
 		this.meshObj = new MeshRenderer(this);
+		this.strokeObj = new StrokeRenderer3D(this);
 		this.vector3Pool = new StackAllocator(Vector3);
+		this.matrix4Pool = new StackAllocator(Matrix4);
+		this.matrix4Pool.push();
 
 		this.compile();
 		
@@ -218,7 +312,7 @@ class Artist3D extends Artist {
 		this.shadowMaps = [];
 		
 		this.shaderCache = new WeakMap();
-		this.renderCache = new Map();
+		this.renderCache = new WeakMap();
 
 		this.instanceData = new GrowableTypedArray(Float32Array);
 
@@ -357,7 +451,7 @@ class Artist3D extends Artist {
 	 * @return LightRenderer
 	 */
 	light(color) {
-		this.lightObj.color = color;
+		this.lightObj.setup(color);
 		return this.lightObj;
 	}
 	/**
@@ -366,8 +460,17 @@ class Artist3D extends Artist {
 	 * @return MeshRenderer
 	 */
 	mesh(mesh) {
-		this.meshObj.mesh = mesh;
+		this.meshObj.setup(mesh);
 		return this.meshObj;
+	}
+	/**
+	 * Returns an object with various methods for queueing lines and outlines to be rendered.
+	 * @param Color color | The color of the lines to be drawn
+	 * @param Number lineWidth? | The width of the lines to be drawn. Default is 1
+	 */
+	stroke(color, lineWidth) {
+		this.strokeObj.setup(color, lineWidth);
+		return this.strokeObj;
 	}
 	pass(camera, meshes, shadowPass, setupMaterial) {
 		const { gl } = this;
@@ -663,6 +766,9 @@ class Artist3D extends Artist {
 	emptyQueues() {
 		this.meshObj.clear();
 		this.lightObj.clear();
+		this.strokeObj.clear();
+		this.matrix4Pool.pop();
+		this.matrix4Pool.push();
 	}
 	fill({ x, y, z, w }) {
 		this.emptyQueues();

@@ -76,6 +76,14 @@ class Color extends Operable {
 		return (this.red + this.blue + this.green) / (3 * 255);
 	}
 	/**
+	 * Returns the hexadecimal representation of the color as a 32-bit integer.
+	 * In most-to-least significant byte order, the format returned will be `RRGGBBAA`.
+	 * @return Number
+	 */
+	get hex() {
+		return this.red << 24 | this.green << 16 | this.blue << 8 | (this.alpha * 255);
+	}
+	/**
 	 * Returns a copy of the color with an alpha of 1.
 	 * @return Color
 	 */

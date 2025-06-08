@@ -173,51 +173,59 @@ class Polyhedron extends Shape3D {
 	 * @return Line3D[]
 	 */
 	getEdges() {
-		const edges = [];
-		
-		const { vertices, indices } = this;
-		
-		const found = vertices.map(() => new Set());
-		const addEdge = (i, j) => {
-			if (j < i) {
-				const temp = j;
-				j = i;
-				i = temp;
+		if (this._edges === undefined) {
+			const edges = [];
+			
+			const { vertices, indices } = this;
+			
+			const found = vertices.map(() => new Set());
+			const addEdge = (i, j) => {
+				if (j < i) {
+					const temp = j;
+					j = i;
+					i = temp;
+				}
+	
+				const set = found[i];
+				if (!set.has(j)) {
+					set.add(j);
+					edges.push(new Line3D(vertices[i], vertices[j]));
+				}
+			};
+	
+			for (let i = 0; i < indices.length; i += 3) {
+				const a = indices[i + 0];
+				const b = indices[i + 1];
+				const c = indices[i + 2];
+				addEdge(a, b);
+				addEdge(b, c);
+				addEdge(c, a);
 			}
-
-			const set = found[i];
-			if (!set.has(j)) {
-				set.add(j);
-				edges.push(new Line3D(vertices[i], vertices[j]));
-			}
-		};
-
-		for (let i = 0; i < indices.length; i += 3) {
-			const a = indices[i + 0];
-			const b = indices[i + 1];
-			const c = indices[i + 2];
-			addEdge(a, b);
-			addEdge(b, c);
-			addEdge(c, a);
+	
+			this._edges = edges;
 		}
 
-		return edges;
+		return this._edges;
 	}
 	/**
 	 * Returns a set of triangles making up the surface of the polyhedron.
 	 * @return Triangle[]
 	 */
 	getFaces() {
-		const triangles = [];
-		const { vertices, indices } = this;
-		for (let i = 0; i < indices.length; i += 3)
-			triangles.push(new Triangle(
-				vertices[indices[i + 0]],
-				vertices[indices[i + 1]],
-				vertices[indices[i + 2]]
-			));
+		if (this._faces === undefined) {
+			const triangles = [];
+			const { vertices, indices } = this;
+			for (let i = 0; i < indices.length; i += 3)
+				triangles.push(new Triangle(
+					vertices[indices[i + 0]],
+					vertices[indices[i + 1]],
+					vertices[indices[i + 2]]
+				));
+			
+			this._faces = triangles;
+		}
 
-		return triangles;
+		return this._faces;
 	}
 	getModel(transform) {
 		return new Polyhedron(
