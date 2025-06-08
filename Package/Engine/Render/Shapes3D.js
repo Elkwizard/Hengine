@@ -13,6 +13,34 @@ class Shape3D extends Shape {
 }
 
 /**
+ * Represents a line segment in 3D space.
+ * @prop Vector3 a | The beginning of the line segment
+ * @prop Vector3 b | The end of the line segment
+ * @prop Number length | The length of the line segment
+ * @prop Vector3 vector | The vector from `.a` to `.b`
+ */
+class Line3D extends Shape3D {
+	constructor(a, b) {
+		super();
+		this.a = a.get();
+		this.b = b.get();
+		this.volume = 0;
+	}
+	getBoundingBox() {
+		return Prism.bound([this.a, this.b]);
+	}
+	get(result = new Line3D(Vector3.zero, Vector3.zero)) {
+		result.a.set(this.a);
+		result.b.set(this.b);
+		return result;
+	}
+}
+objectUtils.inherit(Line3D, Line, [
+	"length", "middle", "vector",
+	"getModel", "equalsSameType"
+]);
+
+/**
  * Represents a triangle in 3D space.
  * @prop Vector3 a | The first vertex of the triangle
  * @prop Vector3 b | The second vertex of the triangle
@@ -141,6 +169,41 @@ class Polyhedron extends Shape3D {
 				v1.every((v, i) => v.equals(v2[i]));
 	}
 	/**
+	 * Returns a set of unique lines that represent the edges of the faces of the polyhedron.
+	 * @return Line3D[]
+	 */
+	getEdges() {
+		const edges = [];
+		
+		const { vertices, indices } = this;
+		
+		const found = vertices.map(() => new Set());
+		const addEdge = (i, j) => {
+			if (j < i) {
+				const temp = j;
+				j = i;
+				i = temp;
+			}
+
+			const set = found[i];
+			if (!set.has(j)) {
+				set.add(j);
+				edges.push(new Line3D(vertices[i], vertices[j]));
+			}
+		};
+
+		for (let i = 0; i < indices.length; i += 3) {
+			const a = indices[i + 0];
+			const b = indices[i + 1];
+			const c = indices[i + 2];
+			addEdge(a, b);
+			addEdge(b, c);
+			addEdge(c, a);
+		}
+
+		return edges;
+	}
+	/**
 	 * Returns a set of triangles making up the surface of the polyhedron.
 	 * @return Triangle[]
 	 */
@@ -228,6 +291,11 @@ class Polyhedron extends Shape3D {
 
 		return current;
 	}
+	/**
+	 * Creates a new polyhedron by transforming every vertex using a given function.
+	 * @param (Vector3) => Vector3 vertexTransform | The function to apply to each vertex
+	 * @return Polyhedron
+	 */
 	map(vertexTransform) {
 		return new Polyhedron(
 			this.vertices.map(vertexTransform),
@@ -243,6 +311,12 @@ class Polyhedron extends Shape3D {
 		const vertices = triangles.flatMap(tri => [tri.a, tri.b, tri.c]);
 		return new Polyhedron(vertices, vertices.map((_, i) => i));
 	}
+	/**
+	 * Creates a polyhedron that resembles a sphere to a given level of precision.
+	 * @param Sphere sphere | The sphere to approximate
+	 * @param Number subdivisions? | The amount of times to apply `.subdivide()` to the sphere. Default is 2
+	 * @return Polyhedron
+	 */
 	static fromSphere(sphere, subdivisions = 2) {
 		const { position, radius } = sphere;
 
@@ -253,25 +327,80 @@ class Polyhedron extends Shape3D {
 			return vertex.add(position);
 		});
 	}
+	/**
+	 * Creates a polyhedron that resembles a cylinder to a given level of precision.
+	 * @param Cylinder cylinder | The cylinder to approximate
+	 * @param Number steps? | The amount of vertices to use around the circular faces. Default is 8
+	 * @return Polyhedron
+	 */
+	static fromCylinder(cylinder, steps = 8) {
+		const { position, radius, axis, length } = cylinder;
+		const capVertices = Polygon.regular(steps, 1).vertices;
+
+		const bottomCap = capVertices
+			.map(vertex => new Vector3(vertex.x, vertex.y, -1));
+		const topCap = capVertices
+			.map(vertex => new Vector3(vertex.x, vertex.y, 1));
+
+		const vertices = [];
+		const indices = [];
+
+		const addVertices = (cap, reverse) => {
+			const start = vertices.length;
+			vertices.push(...cap);
+
+			for (let i = 2; i < cap.length; i++) {
+				const tri = [start, start + i - 1, start + i];
+				if (reverse) tri.reverse();
+				indices.push(...tri);
+			}
+		};
+
+		const bottomIndex = vertices.length;
+		addVertices(bottomCap, false);
+		const topIndex = vertices.length;
+		addVertices(topCap, true);
+
+		for (let i = 0; i < bottomCap.length; i++) {
+			const a = bottomIndex + i;
+			const b = bottomIndex + (i + 1) % bottomCap.length;
+			const c = topIndex + i;
+			const d = topIndex + (i + 1) % topCap.length;
+
+			indices.push(
+				c, b, a,
+				c, d, b
+			);
+		}
+
+		const right = axis.normal.normalize().mul(radius);
+		const up = right.cross(axis).normalize().mul(radius);
+		const forward = axis.times(length / 2);
+		const translation = position;
+		
+		const local = new Polyhedron(vertices, indices);
+		const transform = new Matrix4(right, up, forward, translation);
+		return local.getModel(transform);
+	}
 }
 objectUtils.inherit(Polyhedron, Polygon, ["closestPointTo", "rayCast"]);
 
 /**
  * Represents an axis-aligned rectangular prism.
  * @name_subs C: x, y, z
- * @prop Number [C] | The C coordinate of the back-upper-left corner
+ * @prop Number [C] | The C coordinate of the left-upper-front corner
  * @prop Number width | The x axis size of the prism
  * @prop Number height | The y axis size of the prism
  * @prop Number depth | The z axis size of the prism
  * @prop Range [C]Range | The interval of the C axis occupied by the prism
- * @prop Vector3 min | The back-upper-left corner
- * @prop Vector3 max | The front-lower-right corner
+ * @prop Vector3 min | The left-upper-front corner
+ * @prop Vector3 max | The right-lower-back corner
  */
 class Prism extends Polyhedron {
 	/**
 	 * Creates a new rectangular prism.
-	 * @param Vector3 min | The back-upper-left corner of the prism
-	 * @param Vector3 max | The front-lower-right corner of the prism
+	 * @param Vector3 min | The left-upper-front corner of the prism
+	 * @param Vector3 max | The right-lower-back corner of the prism
 	 */
 	constructor(min, max) {
 		super();
@@ -323,9 +452,6 @@ class Prism extends Polyhedron {
 			new Vector3(x.max, y.max, z.max)
 		];
 	}
-	// get volume() {
-	// 	return this.width * this.height * this.depth;
-	// }
 	get x() {
 		return this.xRange.min;
 	}
@@ -391,7 +517,7 @@ class Prism extends Polyhedron {
 	}
 	scale(scale, center = this.middle) {
 		const mat = Matrix4.scaleAbout(scale, center);
-		return Prism.fromMinMax(mat.times(this.min), mat.times(this.max));
+		return new Prism(mat.times(this.min), mat.times(this.max));
 	}
 	/**
 	 * Creates a rectangular prism from a set of intervals.
@@ -405,6 +531,15 @@ class Prism extends Polyhedron {
 			new Vector3(xRange.min, yRange.min, zRange.min),
 			new Vector3(xRange.max, yRange.max, zRange.max)
 		);
+	}
+	/**
+	 * Creates a rectangular prism from a given minimum and maximum point.
+	 * @param Vector3 min | The left-upper-front corner of the prism
+	 * @param Vector3 max | The right-lower-back corner of the prism
+	 * @return Prism
+	 */
+	static fromMinMax(min, max) {
+		return new Prism(min, max);
 	}
 	/**
 	 * Computes the smallest rectangular prism that contains a set of points and returns it.
@@ -624,3 +759,82 @@ objectUtils.inherit(Sphere, Circle, [
 	"intersectSameType", "equalsSameType",
 	"getModel", "rayCast"
 ]);
+
+/**
+ * Represents an arbitrarily aligned circular cylinder.
+ * @prop Vector3 position | The position of the center of the cylinder
+ * @prop Vector3 axis | The unit vector pointing along the long axis of the cylinder
+ * @prop Number length | The length of the long axis of the cylinder
+ * @prop Number radius | The radius of the cylinder
+ */
+class Cylinder extends Shape3D {
+	/**
+	 * Creates a new cylinder.
+	 * @param Vector3 position | The position of the center of the new cylinder
+	 * @param Vector3 axis | The unit vector pointing along the long axis of the new cylinder
+	 * @param Number length | The length of the long axis of the new cylinder
+	 * @param Number radius | The radius of the new cylinder
+	 */
+	constructor(position, axis, length, radius) {
+		super();
+		this.position = position;
+		this.axis = axis;
+		this.length = length;
+		this.radius = radius;
+		this.volume = Math.PI * this.radius ** 2 * this.length;
+	}
+	/**
+	 * Returns a line segment from the center of one circular face to the other.
+	 * @return Line3D
+	 */
+	get longAxis() {
+		const halfAxis = this.axis.times(this.length / 2);
+		return new Line3D(
+			this.position.minus(halfAxis),
+			this.position.plus(halfAxis)
+		);
+	}
+	get(result = new Cylinder(Vector3.zero, Vector3.up, 0, 0)) {
+		result.position = this.position.get();
+		result.axis = this.axis.get();
+		result.length = this.length;
+		result.radius = this.radius;
+		result.volume = this.volume;
+		return result;
+	}
+	getBoundingBox() {
+		const { min, max } = this.longAxis.getBoundingBox();
+		return new Prism(min.minus(this.radius), max.plus(this.radius));
+	}
+	getModel(matrix) {
+		return Cylinder.fromLongAxis(
+			this.longAxis.getModel(matrix),
+			matrix.maxHomogenousScaleFactor * this.radius
+		);
+	}
+	equalsSameType(other) {
+		return	other.longAxis.equals(this.longAxis) &&
+				other.radius.equals(this.radius);
+	}
+	closestPointTo(other) {
+		const toPoint = other.minus(this.position);
+		const alongAxis = toPoint.projectOnto(this.axis);
+		const alongCross = toPoint.minus(alongAxis);
+		alongCross.mag = Math.min(alongCross.mag, this.radius);
+		alongAxis.mag = Math.min(alongAxis.mag, this.length / 2);
+		return alongAxis.plus(alongCross);
+	}
+	/**
+	 * Creates a new cylinder based on a line segment and a radius.
+	 * @param Line3D longAxis | A line segment from the center of one circular face to the other
+	 * @param Number radius | The radius of the cylinder
+	 */
+	static fromLongAxis(longAxis, radius) {
+		const { vector } = longAxis;
+		const { mag } = vector;
+		return new Cylinder(
+			longAxis.middle, vector.over(mag),
+			mag, radius
+		)
+	}
+}

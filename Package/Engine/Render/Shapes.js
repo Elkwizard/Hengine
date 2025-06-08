@@ -276,8 +276,8 @@ class Line extends Shape2D {
 	constructor(x, y, x2, y2) {
 		super();
 		if (typeof x === "object") {
-			this.a = new Vector2(x.x, x.y);
-			this.b = new Vector2(y.x, y.y);
+			this.a = x.get();
+			this.b = y.get();
 		} else {
 			this.a = new Vector2(x, y);
 			this.b = new Vector2(x2, y2);
@@ -285,13 +285,13 @@ class Line extends Shape2D {
 		this.area = 0;
 	}
 	get length() {
-		return Vector2.dist(this.a, this.b);
+		return this.a.constructor.dist(this.a, this.b);
 	}
 	get middle() {
-		return this.a.Vplus(this.b).Nmul(0.5);
+		return this.a.plus(this.b).mul(0.5);
 	}
 	get vector() {
-		return this.b.Vminus(this.a);
+		return this.b.minus(this.a);
 	}
 	get normal() {
 		return this.vector.normal;
@@ -312,15 +312,10 @@ class Line extends Shape2D {
 		return this.slope * x + this.intercept;
 	}
 	getModel(transf) {
-		return new Line(transf.times(this.a), transf.times(this.b));
+		return new this.constructor(transf.times(this.a), transf.times(this.b));
 	}
 	getBoundingBox() {
-		const { a, b } = this;
-		const minX = Math.min(a.x, b.x);
-		const maxX = Math.max(a.x, b.x);
-		const minY = Math.min(a.y, b.y);
-		const maxY = Math.max(a.y, b.y);
-		return new Rect(minX, minY, maxX - minX, maxY - minY);
+		return Rect.bound([this.a, this.b]);
 	}
 	equalsSameType(line) {
 		if (!(line instanceof Line)) return false;

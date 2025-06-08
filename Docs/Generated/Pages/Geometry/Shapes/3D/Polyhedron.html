@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Polyhedron">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L107" target="_blank" class="class-name source-link">Polyhedron</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Geometry/Shapes/3D/Shape3D.html#class Shape3D">Shape3D</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L135" target="_blank" class="class-name source-link">Polyhedron</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Geometry/Shapes/3D/Shape3D.html#class Shape3D">Shape3D</a></span>
 				</div>
 				<div class="class desc">
 					Represents a closed 3D polyhedron as a collection of contiguous triangles.
@@ -42,9 +42,19 @@
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
+		<div class="function-wrapper" id="Polyhedron.prototype.getEdges()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L175" target="_blank" class="function-name source-link">getEdges</a>()<span class="type">Line3D[]</span>
+			</div>
+			<div class="function desc">
+				Returns a set of unique lines that represent the edges of the faces of the polyhedron.
+			</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Polyhedron.prototype.getFaces()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L147" target="_blank" class="function-name source-link">getFaces</a>()<span class="type"><a href="../../../Geometry/Shapes/3D/Triangle.html#class Triangle">Triangle</a>[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L210" target="_blank" class="function-name source-link">getFaces</a>()<span class="type"><a href="../../../Geometry/Shapes/3D/Triangle.html#class Triangle">Triangle</a>[]</span>
 			</div>
 			<div class="function desc">
 				Returns a set of triangles making up the surface of the polyhedron.
@@ -54,7 +64,7 @@
 	
 		<div class="function-wrapper" id="Polyhedron.prototype.subdivide()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L197" target="_blank" class="function-name source-link">subdivide</a>(<span class="param">count?</span>)<span class="type">Polyhedron</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L260" target="_blank" class="function-name source-link">subdivide</a>(<span class="param">count?</span>)<span class="type">Polyhedron</span>
 			</div>
 			<div class="function desc">
 				Subdivides each triangle in the polyhedron into a power of 4 number of additional triangles.
@@ -80,9 +90,36 @@ The subdivided mesh is a copy and is returned.
 			
 		</div>
 	
+		<div class="function-wrapper" id="Polyhedron.prototype.map()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L299" target="_blank" class="function-name source-link">map</a>(<span class="param">vertexTransform</span>)<span class="type">Polyhedron</span>
+			</div>
+			<div class="function desc">
+				Creates a new polyhedron by transforming every vertex using a given function.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polyhedron.prototype.map():vertexTransform">
+							<div class="param-name">
+								<span class="param">vertexTransform</span>
+								<span class="type">(<a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>) =&gt; <a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+							</div>
+							<div class="param desc">
+								The function to apply to each vertex
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Polyhedron.fromTriangles()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L242" target="_blank" class="function-name source-link">Polyhedron.fromTriangles</a>(<span class="param">triangles</span>)<span class="type">Polyhedron</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L310" target="_blank" class="function-name source-link">Polyhedron.fromTriangles</a>(<span class="param">triangles</span>)<span class="type">Polyhedron</span>
 			</div>
 			<div class="function desc">
 				Creates a new polyhedron from a list of triangles which form a closed surface.
@@ -99,6 +136,80 @@ The subdivided mesh is a copy and is returned.
 							</div>
 							<div class="param desc">
 								The triangles to use as the surface
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polyhedron.fromSphere()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L320" target="_blank" class="function-name source-link">Polyhedron.fromSphere</a>(<span class="param">sphere</span>, <span class="param">subdivisions?</span>)<span class="type">Polyhedron</span>
+			</div>
+			<div class="function desc">
+				Creates a polyhedron that resembles a sphere to a given level of precision.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polyhedron.fromSphere():sphere">
+							<div class="param-name">
+								<span class="param">sphere</span>
+								<span class="type"><a href="../../../Geometry/Shapes/3D/Sphere.html#class Sphere">Sphere</a></span>
+							</div>
+							<div class="param desc">
+								The sphere to approximate
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Polyhedron.fromSphere():subdivisions?">
+							<div class="param-name">
+								<span class="param">subdivisions</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount of times to apply <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">subdivide</span><span class="highlight-SYMBOL">()</span></code> to the sphere. Default is 2
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polyhedron.fromCylinder()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Shapes3D.js?#L336" target="_blank" class="function-name source-link">Polyhedron.fromCylinder</a>(<span class="param">cylinder</span>, <span class="param">steps?</span>)<span class="type">Polyhedron</span>
+			</div>
+			<div class="function desc">
+				Creates a polyhedron that resembles a cylinder to a given level of precision.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polyhedron.fromCylinder():cylinder">
+							<div class="param-name">
+								<span class="param">cylinder</span>
+								<span class="type"><a href="../../../Geometry/Shapes/3D/Cylinder.html#class Cylinder">Cylinder</a></span>
+							</div>
+							<div class="param desc">
+								The cylinder to approximate
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Polyhedron.fromCylinder():steps?">
+							<div class="param-name">
+								<span class="param">steps</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount of vertices to use around the circular faces. Default is 8
 							</div>
 						</div>
 					

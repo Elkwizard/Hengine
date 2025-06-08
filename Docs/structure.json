@@ -130,6 +130,7 @@
 				"Polyhedron": null,
 				"Prism": null,
 				"Sphere": null,
+				"Cylinder": null,
 				"Triangle": null,
 				"Plane": null
 			},

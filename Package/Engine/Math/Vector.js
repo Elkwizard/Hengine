@@ -549,6 +549,17 @@ class Vector3 extends Vector {
 		return this.x * other.x + this.y * other.y + this.z * other.z;
 	}
 	/**
+	 * Returns a vector which is perpendicular to the caller.
+	 * This is not guaranteed to have any other properties.
+	 * @return Vector3
+	 */
+	get normal() {
+		if (Math.max(this.x, this.y, this.z) === this.z)
+			return this.cross(Vector3.left);
+		
+		return this.cross(Vector3.forward);
+	}
+	/**
 	 * Returns the cross product between the caller and another vector.
 	 * @param Vector3 v | The second vector in the product 
 	 * @param Vector3 result? | The destination to store the resulting Vector in. If not specified, a new Vector will be created

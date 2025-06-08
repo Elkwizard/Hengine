@@ -2253,6 +2253,11 @@ declare class Vector3 extends Vector {
 	 */
 	constructor(x: number, y: number, z: number);
 	/**
+	 * Returns a vector which is perpendicular to the caller.
+	 * This is not guaranteed to have any other properties.
+	 */
+	get normal(): this;
+	/**
 	 * Returns the cross product between the caller and another vector.
 	 * @param v - The second vector in the product
 	 * @param result - The destination to store the resulting Vector in. If not specified, a new Vector will be created
@@ -6633,6 +6638,28 @@ declare class Shape3D extends Shape<Matrix4, Vector3> {
 }
 
 /**
+ * Represents a line segment in 3D space.
+ */
+declare class Line3D extends Shape3D {
+	/**
+	 * The beginning of the line segment
+	 */
+	a: Vector3;
+	/**
+	 * The end of the line segment
+	 */
+	b: Vector3;
+	/**
+	 * The length of the line segment
+	 */
+	length: number;
+	/**
+	 * The vector from `.a` to `.b`
+	 */
+	vector: Vector3;
+}
+
+/**
  * Represents a triangle in 3D space.
  */
 declare class Triangle extends Shape3D {
@@ -6680,6 +6707,10 @@ declare class Polyhedron extends Shape3D {
 	 */
 	indices: number[];
 	/**
+	 * Returns a set of unique lines that represent the edges of the faces of the polyhedron.
+	 */
+	getEdges(): Line3D[];
+	/**
 	 * Returns a set of triangles making up the surface of the polyhedron.
 	 */
 	getFaces(): Triangle[];
@@ -6690,10 +6721,27 @@ declare class Polyhedron extends Shape3D {
 	 */
 	subdivide(count?: number): this;
 	/**
+	 * Creates a new polyhedron by transforming every vertex using a given function.
+	 * @param vertexTransform - The function to apply to each vertex
+	 */
+	map(vertexTransform: (arg0: Vector3) => Vector3): this;
+	/**
 	 * Creates a new polyhedron from a list of triangles which form a closed surface.
 	 * @param triangles - The triangles to use as the surface
 	 */
 	static fromTriangles(triangles: Triangle[]): Polyhedron;
+	/**
+	 * Creates a polyhedron that resembles a sphere to a given level of precision.
+	 * @param sphere - The sphere to approximate
+	 * @param subdivisions - The amount of times to apply `.subdivide()` to the sphere. Default is 2
+	 */
+	static fromSphere(sphere: Sphere, subdivisions?: number): Polyhedron;
+	/**
+	 * Creates a polyhedron that resembles a cylinder to a given level of precision.
+	 * @param cylinder - The cylinder to approximate
+	 * @param steps - The amount of vertices to use around the circular faces. Default is 8
+	 */
+	static fromCylinder(cylinder: Cylinder, steps?: number): Polyhedron;
 }
 
 /**
@@ -6701,15 +6749,15 @@ declare class Polyhedron extends Shape3D {
  */
 declare class Prism extends Polyhedron {
 	/**
-	 * The C coordinate of the back-upper-left corner
+	 * The C coordinate of the left-upper-front corner
 	 */
 	x: number;
 	/**
-	 * The C coordinate of the back-upper-left corner
+	 * The C coordinate of the left-upper-front corner
 	 */
 	y: number;
 	/**
-	 * The C coordinate of the back-upper-left corner
+	 * The C coordinate of the left-upper-front corner
 	 */
 	z: number;
 	/**
@@ -6737,17 +6785,17 @@ declare class Prism extends Polyhedron {
 	 */
 	zRange: Range;
 	/**
-	 * The back-upper-left corner
+	 * The left-upper-front corner
 	 */
 	min: Vector3;
 	/**
-	 * The front-lower-right corner
+	 * The right-lower-back corner
 	 */
 	max: Vector3;
 	/**
 	 * Creates a new rectangular prism.
-	 * @param min - The back-upper-left corner of the prism
-	 * @param max - The front-lower-right corner of the prism
+	 * @param min - The left-upper-front corner of the prism
+	 * @param max - The right-lower-back corner of the prism
 	 */
 	constructor(min: Vector3, max: Vector3);
 	/**
@@ -6762,6 +6810,12 @@ declare class Prism extends Polyhedron {
 	 * @param zRange - The interval on the z axis occupied by the prism
 	 */
 	static fromRanges(xRange: Range, yRange: Range, zRange: Range): Prism;
+	/**
+	 * Creates a rectangular prism from a given minimum and maximum point.
+	 * @param min - The left-upper-front corner of the prism
+	 * @param max - The right-lower-back corner of the prism
+	 */
+	static fromMinMax(min: Vector3, max: Vector3): Prism;
 	/**
 	 * Computes the smallest rectangular prism that contains a set of points and returns it.
 	 * @param points - The points to contain
@@ -6832,6 +6886,46 @@ declare class Sphere extends Shape3D {
 	 * @param spheres - The bounding spheres to compose together. This must include at least one sphere
 	 */
 	static composeBoundingBalls(spheres: Sphere[]): Sphere;
+}
+
+/**
+ * Represents an arbitrarily aligned circular cylinder.
+ */
+declare class Cylinder extends Shape3D {
+	/**
+	 * The position of the center of the cylinder
+	 */
+	position: Vector3;
+	/**
+	 * The unit vector pointing along the long axis of the cylinder
+	 */
+	axis: Vector3;
+	/**
+	 * The length of the long axis of the cylinder
+	 */
+	length: number;
+	/**
+	 * The radius of the cylinder
+	 */
+	radius: number;
+	/**
+	 * Creates a new cylinder.
+	 * @param position - The position of the center of the new cylinder
+	 * @param axis - The unit vector pointing along the long axis of the new cylinder
+	 * @param length - The length of the long axis of the new cylinder
+	 * @param radius - The radius of the new cylinder
+	 */
+	constructor(position: Vector3, axis: Vector3, length: number, radius: number);
+	/**
+	 * Returns a line segment from the center of one circular face to the other.
+	 */
+	get longAxis(): Line3D;
+	/**
+	 * Creates a new cylinder based on a line segment and a radius.
+	 * @param longAxis - A line segment from the center of one circular face to the other
+	 * @param radius - The radius of the cylinder
+	 */
+	static fromLongAxis(longAxis: Line3D, radius: number): void;
 }
 
 /**
