@@ -7,8 +7,10 @@ const createTypeSpecification = require("./typeSpecification.js");
 
 const [_node, _this, sourcePath, dstPath, structurePath, typeFile] = process.argv;
 
-function writeFile(fileName, content) {
-	content = content.replaceAll("\n", "\r\n");
+const normalizeLineBreaks = content => content.replace(/(?<!\r)\n/g, "\r\n");
+
+const writeFile = (fileName, content) => {
+	content = normalizeLineBreaks(content);
 	fileName = path.join(dstPath, fileName);
 	const dir = path.dirname(fileName);
 	if (!fs.existsSync(dir))
@@ -57,7 +59,7 @@ addInheritance(docs);
 for (const dimension of [2, 3]) {
 	const fileName = typeFile.replace(".d.ts", `${dimension}D.d.ts`);
 	const typeSpec = createTypeSpecification(docs, aliases, dimension);
-	fs.writeFileSync(fileName, typeSpec, "utf-8");
+	fs.writeFileSync(fileName, normalizeLineBreaks(typeSpec), "utf-8");
 }
 
 const nameToDoc = { };

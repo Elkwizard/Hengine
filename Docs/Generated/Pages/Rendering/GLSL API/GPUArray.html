@@ -13,17 +13,17 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L458" target="_blank" class="class-name source-link">GPUArray</a>
 				</div>
 				<div class="class desc">
-					Represents an array of GLSL structs.
-These structs may be nested.
-These are used to represent GLSL dynamic-length array uniforms and the output of <a href="../../Miscellaneous/GPUComputation.html#class GPUComputation">GPUComputations</a>, but should not be constructed directly.
-For a struct such as:
+					Represents an array of GLSL structs.
+These structs may be nested.
+These are used to represent GLSL dynamic-length array uniforms and the output of <a href="../../Miscellaneous/GPUComputation.html#class GPUComputation">GPUComputations</a>, but should not be constructed directly.
+For a struct such as:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">struct</span><span class="highlight-CLASS"> <a href="../../Geometry/Shapes/2D/Circle.html#class Circle">Circle</a></span><span class="highlight-SYMBOL"> {
 </span><span class="highlight-KEYWORD">	vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">;
 </span><span class="highlight-KEYWORD">	float</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">;
 </span><span class="highlight-KEYWORD">	vec3</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">;
 };
-</span></code>
-A GPUArray could be used as follows:
+</span></code>
+A GPUArray could be used as follows:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// gpu is a <a href="../../Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a></span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> circle</span><span class="highlight-SYMBOL"> = {
 	</span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">),
@@ -31,7 +31,7 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 	</span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;magenta&quot;</span><span class="highlight-SYMBOL">)
 };
 </span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getUniform</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;circles&quot;</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">append</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circle</span><span class="highlight-SYMBOL">);
-</span></code>
+</span></code>
 				</div>
 				
 				
@@ -55,7 +55,7 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L473" target="_blank" class="function-name source-link">length</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Retrieves the number of structs in the array.
+				Retrieves the number of structs in the array.
 			</div>
 			
 		</div>
@@ -65,8 +65,8 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L485" target="_blank" class="function-name source-link">set</a>(<span class="param">value</span><span class="aux"> | </span><span class="param">value</span>)<span class="type">GPUArray</span>
 			</div>
 			<div class="function desc">
-				Sets the value of the array and returns the caller.
-This will overwrite all previous data.
+				Sets the value of the array and returns the caller.
+This will overwrite all previous data.
 			</div>
 			
 				<div class="function-signature">
@@ -106,7 +106,7 @@ This will overwrite all previous data.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L501" target="_blank" class="function-name source-link">append</a>(<span class="param">value</span>)<span class="type">GPUArray</span>
 			</div>
 			<div class="function desc">
-				Appends a struct to the end of the array and returns the caller.
+				Appends a struct to the end of the array and returns the caller.
 			</div>
 			
 				<div class="function-signature">
@@ -133,8 +133,8 @@ This will overwrite all previous data.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L513" target="_blank" class="function-name source-link">write</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">srcOffset?</span>)<span class="type">GPUArray</span>
 			</div>
 			<div class="function desc">
-				Writes to a specified location in the array and returns the caller.
-This may increase the size of the array, but cannot be used to create holes.
+				Writes to a specified location in the array and returns the caller.
+This may increase the size of the array, but cannot be used to create holes.
 			</div>
 			
 				<div class="function-signature">
@@ -191,7 +191,7 @@ This may increase the size of the array, but cannot be used to create holes.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L537" target="_blank" class="function-name source-link">read</a>(<span class="param">data</span>, <span class="param">offset?</span>, <span class="param">length?</span>, <span class="param">dstOffset?</span>)<span class="type">Object[]</span>
 			</div>
 			<div class="function desc">
-				Reads from a specified location in the array into a provided array of objects, and returns the destination array.
+				Reads from a specified location in the array into a provided array of objects, and returns the destination array.
 			</div>
 			
 				<div class="function-signature">

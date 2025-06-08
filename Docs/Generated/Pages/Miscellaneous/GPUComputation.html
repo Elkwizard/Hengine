@@ -13,15 +13,15 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L43" target="_blank" class="class-name source-link">GPUComputation</a> <span class="keyword">implements</span> <span class="class-name"><a href="../Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a></span>
 				</div>
 				<div class="class desc">
-					Represents a GLSL operation that can be run in parallel on the GPU.
-The entry point for the GLSL operation is the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">compute</span></code> function, which returns any struct type and takes no arguments.
+					Represents a GLSL operation that can be run in parallel on the GPU.
+The entry point for the GLSL operation is the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">compute</span></code> function, which returns any struct type and takes no arguments.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-CLASS">SomeStruct </span><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">() { ... }
-</span></code>
-The returned value is considered the output of the operation, and some global variables are provided as the input:
+</span></code>
+The returned value is considered the output of the operation, and some global variables are provided as the input:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">uniform int</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">problems</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// the total number of operations in the current batch</span><span class="highlight-KEYWORD">
 int</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">problemIndex</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// the index of the current operation in the batch</span><span class="highlight-SYMBOL">
-</span></code>
-Commonly, one or more dynamic array uniforms can be used to store complex input data, as shown in the following example.
+</span></code>
+Commonly, one or more dynamic array uniforms can be used to store complex input data, as shown in the following example.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// computation to move circles toward the middle of the screen</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> computation</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> GPUComputation</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&#96;
 	struct <a href="../Geometry/Shapes/2D/Circle.html#class Circle">Circle</a> {
@@ -47,7 +47,7 @@ const</span><span class="highlight-CONSTANT"> circles</span><span class="highlig
 </span><span class="highlight-IDENTIFIER">computation</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">setUniforms</span><span class="highlight-SYMBOL">({ </span><span class="highlight-IDENTIFIER">circles</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">middle</span><span class="highlight-SYMBOL"> });
 </span><span class="highlight-IDENTIFIER">computation</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">compute</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circles</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">length</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-IDENTIFIER">computation</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">output</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">read</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circles</span><span class="highlight-SYMBOL">);
-</span></code>
+</span></code>
 				</div>
 				
 				
@@ -71,7 +71,7 @@ const</span><span class="highlight-CONSTANT"> circles</span><span class="highlig
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\GPUComputation.js?#L166" target="_blank" class="function-name source-link">compute</a>(<span class="param">problems</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Runs a batch of operations.
+				Runs a batch of operations.
 			</div>
 			
 				<div class="function-signature">

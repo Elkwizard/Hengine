@@ -13,9 +13,9 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Complex.js?#L181" target="_blank" class="class-name source-link">Quaternion</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Geometry/Complex Numbers/Complex.html#class Complex">Complex</a></span>
 				</div>
 				<div class="class desc">
-					Represents a quaternion, a 4D extension of the imaginary numbers.
-Each quaternion is a number of the form a + bi + cj + dk.
-These can be used to represent 3D rotations via <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Quaternion</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromRotation</span><span class="highlight-SYMBOL">()</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Quaternion</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">rotate</span><span class="highlight-SYMBOL">()</span></code>.
+					Represents a quaternion, a 4D extension of the imaginary numbers.
+Each quaternion is a number of the form a + bi + cj + dk.
+These can be used to represent 3D rotations via <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Quaternion</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromRotation</span><span class="highlight-SYMBOL">()</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Quaternion</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">rotate</span><span class="highlight-SYMBOL">()</span></code>.
 				</div>
 				
 				
@@ -53,7 +53,7 @@ These can be used to represent 3D rotations via <code class=" highlight-BACKGROU
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Complex.js?#L187" target="_blank" class="function-name source-link">constructor</a>(<span class="param">real</span>, <span class="param">imaginary?</span>)
 			</div>
 			<div class="function desc">
-				Creates a new quaternion.
+				Creates a new quaternion.
 			</div>
 			
 				<div class="function-signature">
@@ -90,8 +90,8 @@ These can be used to represent 3D rotations via <code class=" highlight-BACKGROU
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Complex.js?#L220" target="_blank" class="function-name source-link">rotate</a>(<span class="param">vector</span>, <span class="param">dst?</span>)<span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
 			</div>
 			<div class="function desc">
-				Returns the imaginary components of the product of the caller, the provided vector, and the caller's conjugate (q(0, v)q*).
-For quaternions created with <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Quaternion</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromRotation</span><span class="highlight-SYMBOL">()</span></code>, this corresponds to a 3D rotation.
+				Returns the imaginary components of the product of the caller, the provided vector, and the caller's conjugate (q(0, v)q*).
+For quaternions created with <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Quaternion</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromRotation</span><span class="highlight-SYMBOL">()</span></code>, this corresponds to a 3D rotation.
 			</div>
 			
 				<div class="function-signature">
@@ -128,7 +128,7 @@ For quaternions created with <code class=" highlight-BACKGROUND"><span class="hi
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Complex.js?#L232" target="_blank" class="function-name source-link">toMatrix</a>(<span class="param">result?</span>)<span class="type"><a href="../../Geometry/Matrices.html#class Matrix3">Matrix3</a></span>
 			</div>
 			<div class="function desc">
-				Returns a matrix such that for a Quaternion <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span></code> and <a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a> <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">v</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">rotate</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">v</span><span class="highlight-SYMBOL">)</span></code> is the same as <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">toMatrix</span><span class="highlight-SYMBOL">().</span><span class="highlight-FUNCTION">times</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">v</span><span class="highlight-SYMBOL">)</span></code>.
+				Returns a matrix such that for a Quaternion <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span></code> and <a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a> <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">v</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">rotate</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">v</span><span class="highlight-SYMBOL">)</span></code> is the same as <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">toMatrix</span><span class="highlight-SYMBOL">().</span><span class="highlight-FUNCTION">times</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">v</span><span class="highlight-SYMBOL">)</span></code>.
 			</div>
 			
 				<div class="function-signature">
@@ -155,7 +155,7 @@ For quaternions created with <code class=" highlight-BACKGROUND"><span class="hi
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Complex.js?#L243" target="_blank" class="function-name source-link">Quaternion.i</a><span class="type">Quaternion</span>
 			</div>
 			<div class="function desc">
-				Returns the first quaternion unit, i.
+				Returns the first quaternion unit, i.
 			</div>
 			
 		</div>
@@ -165,7 +165,7 @@ For quaternions created with <code class=" highlight-BACKGROUND"><span class="hi
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Complex.js?#L250" target="_blank" class="function-name source-link">Quaternion.j</a><span class="type">Quaternion</span>
 			</div>
 			<div class="function desc">
-				Returns the second quaternion unit, j.
+				Returns the second quaternion unit, j.
 			</div>
 			
 		</div>
@@ -175,7 +175,7 @@ For quaternions created with <code class=" highlight-BACKGROUND"><span class="hi
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Complex.js?#L257" target="_blank" class="function-name source-link">Quaternion.k</a><span class="type">Quaternion</span>
 			</div>
 			<div class="function desc">
-				Returns the third quaternion unit, k.
+				Returns the third quaternion unit, k.
 			</div>
 			
 		</div>
@@ -185,7 +185,7 @@ For quaternions created with <code class=" highlight-BACKGROUND"><span class="hi
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Complex.js?#L269" target="_blank" class="function-name source-link">Quaternion.fromRotation</a>(<span class="param">axis</span>, <span class="param">angle</span><span class="aux"> | </span><span class="param">rotation</span>)<span class="type">Quaternion</span>
 			</div>
 			<div class="function desc">
-				Returns a unit quaternion <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span></code> such that for a <a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a> <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">v</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">rotate</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">v</span><span class="highlight-SYMBOL">)</span></code> refers to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">v</span></code> rotated counter-clockwise about the given axis by the given angle.
+				Returns a unit quaternion <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span></code> such that for a <a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a> <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">v</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">q</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">rotate</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">v</span><span class="highlight-SYMBOL">)</span></code> refers to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">v</span></code> rotated counter-clockwise about the given axis by the given angle.
 			</div>
 			
 				<div class="function-signature">

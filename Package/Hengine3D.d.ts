@@ -6553,6 +6553,72 @@ declare class MeshChunk extends Renderable {
 }
 
 /**
+ * Provides a set of methods for creating different types of lights in a 3D scene.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.light`.
+ */
+declare class LightRenderer {
+	/**
+	 * Queues an ambient light to be rendered.
+	 * This light will affect all objects from all sides equally.
+	 */
+	ambient(): void;
+	/**
+	 * Queues an ambient light to be rendered.
+	 * This light will affect all objects outwards from a specific source.
+	 * @param position - The location of the point light
+	 */
+	point(position: Vector3): void;
+	/**
+	 * Queues a directional light to be rendered.
+	 * This light emits parallel rays from an infinite distance in a given direction.
+	 * @param direction - The direction of the light
+	 * @param shadow - Whether the light casts shadows. Default is true
+	 */
+	directional(direction: Vector3, shadow?: boolean): void;
+}
+
+/**
+ * Provides a set of methods for rendering meshes in various ways in a scene.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.mesh`.
+ */
+declare class MeshRenderer {
+	/**
+	 * Renders the current mesh at the current transform origin.
+	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
+	 */
+	default(castShadows?: boolean): void;
+	/**
+	 * Renders the current mesh at a given transform relative to the current transform.
+	 * @param transform - The transform at which the mesh will be rendered
+	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
+	 */
+	at(transform: Matrix4, castShadows?: boolean): void;
+	/**
+	 * Renders the current mesh at a variety of different transforms relative to the current transform.
+	 * @param transforms - The transformations to use for each instance
+	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
+	 */
+	instance(transforms: Matrix4[], castShadows?: boolean): void;
+}
+
+/**
+ * Represents a 3D renderer for a graphical surface.
+ * All transformation-related matrices for this renderer are of type Matrix4.
+ */
+declare class Artist3D extends Artist {
+	/**
+	 * Returns an object with various methods for queueing lights to be rendered.
+	 * @param color - The color of the light
+	 */
+	light(color: Color): LightRenderer;
+	/**
+	 * Returns an object with various methods for queueing meshes to be rendered.
+	 * @param mesh - The mesh to be rendered
+	 */
+	mesh(mesh: Mesh): MeshRenderer;
+}
+
+/**
  * Represents a 3D shape.
  */
 declare class Shape3D extends Shape<Matrix4, Vector3> {
@@ -6766,72 +6832,6 @@ declare class Sphere extends Shape3D {
 	 * @param spheres - The bounding spheres to compose together. This must include at least one sphere
 	 */
 	static composeBoundingBalls(spheres: Sphere[]): Sphere;
-}
-
-/**
- * Provides a set of methods for creating different types of lights in a 3D scene.
- * This class should not be constructed, and should be accessed via `Artist3D.prototype.light`.
- */
-declare class LightRenderer {
-	/**
-	 * Queues an ambient light to be rendered.
-	 * This light will affect all objects from all sides equally.
-	 */
-	ambient(): void;
-	/**
-	 * Queues an ambient light to be rendered.
-	 * This light will affect all objects outwards from a specific source.
-	 * @param position - The location of the point light
-	 */
-	point(position: Vector3): void;
-	/**
-	 * Queues a directional light to be rendered.
-	 * This light emits parallel rays from an infinite distance in a given direction.
-	 * @param direction - The direction of the light
-	 * @param shadow - Whether the light casts shadows. Default is true
-	 */
-	directional(direction: Vector3, shadow?: boolean): void;
-}
-
-/**
- * Provides a set of methods for rendering meshes in various ways in a scene.
- * This class should not be constructed, and should be accessed via `Artist3D.prototype.mesh`.
- */
-declare class MeshRenderer {
-	/**
-	 * Renders the current mesh at the current transform origin.
-	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
-	 */
-	default(castShadows?: boolean): void;
-	/**
-	 * Renders the current mesh at a given transform relative to the current transform.
-	 * @param transform - The transform at which the mesh will be rendered
-	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
-	 */
-	at(transform: Matrix4, castShadows?: boolean): void;
-	/**
-	 * Renders the current mesh at a variety of different transforms relative to the current transform.
-	 * @param transforms - The transformations to use for each instance
-	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
-	 */
-	instance(transforms: Matrix4[], castShadows?: boolean): void;
-}
-
-/**
- * Represents a 3D renderer for a graphical surface.
- * All transformation-related matrices for this renderer are of type Matrix4.
- */
-declare class Artist3D extends Artist {
-	/**
-	 * Returns an object with various methods for queueing lights to be rendered.
-	 * @param color - The color of the light
-	 */
-	light(color: Color): LightRenderer;
-	/**
-	 * Returns an object with various methods for queueing meshes to be rendered.
-	 * @param mesh - The mesh to be rendered
-	 */
-	mesh(mesh: Mesh): MeshRenderer;
 }
 
 /**
@@ -8003,156 +8003,6 @@ declare interface Serializable {
 }
 
 /**
- * Represents a serializable file system that can be modified with a command-line-like interface.
- * File paths in this system are similar to those used in Windows, except that they use a forward slash "/" separator, and the base drive is `h:` rather than `C:`.
- * Various file types can be specified, such that complex classes can be written to the file system and retrieved.
- * All built-in Serializable objects can be written to the file system, with their extensions being the lowercase version of their names (e.g. `.string` for String).
- * This class is primarily used in the `.fileSystem` property of both the global object and Hengine.
- * ```js
- * // the file type class
- * class Triple {
- * 	constructor(a, b, c) {
- * 		this.a = a;
- * 		this.b = b;
- * 		this.c = c;
- * 	}
- * 
- * 	toByteBuffer(buffer = new ByteBuffer()) {
- * 		buffer.write.float64(this.a);
- * 		buffer.write.float64(this.b);
- * 		buffer.write.float64(this.c);
- * 		return buffer;
- * 	}
- * 
- * 	static fromByteBuffer(buffer) {
- * 		return new Triple(
- * 			buffer.read.float64(),
- * 			buffer.read.float64(),
- * 			buffer.read.float64()
- * 		);
- * 	}
- * }
- * 
- * // register file type
- * fileSystem.createFileType(Triple);
- * 
- * const value = new Triple(10, 20, 30.5);
- * fileSystem.writeFile("h:/tripleFile.triple", value);
- * 
- * const readValue = fileSystem.readFile("h:/tripleFile.triple");
- * console.log(readValue); // Triple { a: 10, b: 20, c: 30.5 }
- * ```
- */
-declare class Files {
-	/**
-	 * Creates a new Files.
-	 */
-	constructor();
-	/**
-	 * Returns the current active directory.
-	 */
-	get directory(): string;
-	/**
-	 * Registers a new file type.
-	 * The instance method `.toByteBuffer()` will be invoked when the type is written to the file system, and the static method `.fromByteBuffer()` will be invoked when reading.
-	 * @param type - The data type that can be written and read to and from the file system
-	 * @param extensions - A list of file name extensions that will have this type applied. Default is the name of the type
-	 */
-	createFileType<T extends Serializable>(type: Class<T>, extensions?: string[]): void;
-	/**
-	 * Returns the names of all the files in the current directory.
-	 * @param all - Whether or not files beginning with "." should be included. Default is false
-	 */
-	listFiles(all?: boolean): string[];
-	/**
-	 * Returns a human-readable file tree of the current directory.
-	 */
-	tree(): string;
-	/**
-	 * Checks whether or not a file exists.
-	 * @param path - The file path to check
-	 */
-	fileExists(path: string): boolean;
-	/**
-	 * Checks whether or not a directory exists.
-	 * @param path - The directory path to check
-	 */
-	directoryExists(path: string): boolean;
-	/**
-	 * Writes a file to a specified path.
-	 * Returns whether the it succeeded.
-	 * @param path - The file path to write to
-	 * @param contents - The data to write to the file
-	 * @param raw - Whether or not the contents parameter is a ByteBuffer to be written directly rather than being file-type-specific data to be converted. Default is false
-	 */
-	writeFile(path: string, contents: any, raw?: boolean): boolean;
-	/**
-	 * Deletes a file at a specified path.
-	 * Returns whether it succeeded.
-	 * @param path - The file path to delete
-	 */
-	deleteFile(path: string): boolean;
-	/**
-	 * Deletes a directory at a specified path.
-	 * Returns whether it succeeded.
-	 * @param path - The directory path to delete
-	 */
-	deleteDirectory(path: string): boolean;
-	/**
-	 * Creates a new directory at a specified path.
-	 * Returns whether it succeeded.
-	 * @param path - The path to create the directory at
-	 */
-	createDirectory(path: string): boolean;
-	/**
-	 * Reads a file from a specified path.
-	 * Returns null if it fails.
-	 * @param path - The file path to read
-	 * @param raw - Whether the data should be returned as a ByteBuffer, or as a file-type-specific converted type. Default is false
-	 */
-	readFile(path: string, raw?: boolean): any | null;
-	/**
-	 * Creates a new file if it doesn't exist.
-	 * Returns the content of the file.
-	 * @param path - The file to write to
-	 * @param create - The function used to initially create the file content
-	 */
-	createFile(path: string, create: () => any): any;
-	/**
-	 * Checks the file size of a specified file.
-	 * @param path - The file path to check
-	 */
-	getFileSize(path: string): number;
-	/**
-	 * Changes the current directory.
-	 * Returns whether it succeeded.
-	 * @param path - The path of the new directory
-	 */
-	changeDirectory(path: string): boolean;
-	/**
-	 * Downloads a file onto the user's computer.
-	 * Returns a promise which resolves when the download occurs.
-	 * @param path - The file to download
-	 */
-	downloadFile(path: string): Promise;
-	/**
-	 * Lets the user upload a file from their computer to a specified location.
-	 * Returns a promise which resolves when the file is uploaded.
-	 * @param path - The destination path for the file
-	 */
-	uploadFile(path: string): Promise;
-	/**
-	 * Serializes the file system to a data string.
-	 */
-	toString(): string;
-	/**
-	 * Deserializes a file system from a data string.
-	 * @param string - The data string to deserialize
-	 */
-	static fromString(string: string): Files;
-}
-
-/**
  * Provides an API for interacting with a key-based input device (mouse, keyboard).
  * This is an abstract superclass and should not be constructed.
  */
@@ -8624,4 +8474,154 @@ declare class Sound {
 	 * @param volume - The volume of the playback on [0, 1]
 	 */
 	play(volume: number): SoundInstance;
+}
+
+/**
+ * Represents a serializable file system that can be modified with a command-line-like interface.
+ * File paths in this system are similar to those used in Windows, except that they use a forward slash "/" separator, and the base drive is `h:` rather than `C:`.
+ * Various file types can be specified, such that complex classes can be written to the file system and retrieved.
+ * All built-in Serializable objects can be written to the file system, with their extensions being the lowercase version of their names (e.g. `.string` for String).
+ * This class is primarily used in the `.fileSystem` property of both the global object and Hengine.
+ * ```js
+ * // the file type class
+ * class Triple {
+ * 	constructor(a, b, c) {
+ * 		this.a = a;
+ * 		this.b = b;
+ * 		this.c = c;
+ * 	}
+ * 
+ * 	toByteBuffer(buffer = new ByteBuffer()) {
+ * 		buffer.write.float64(this.a);
+ * 		buffer.write.float64(this.b);
+ * 		buffer.write.float64(this.c);
+ * 		return buffer;
+ * 	}
+ * 
+ * 	static fromByteBuffer(buffer) {
+ * 		return new Triple(
+ * 			buffer.read.float64(),
+ * 			buffer.read.float64(),
+ * 			buffer.read.float64()
+ * 		);
+ * 	}
+ * }
+ * 
+ * // register file type
+ * fileSystem.createFileType(Triple);
+ * 
+ * const value = new Triple(10, 20, 30.5);
+ * fileSystem.writeFile("h:/tripleFile.triple", value);
+ * 
+ * const readValue = fileSystem.readFile("h:/tripleFile.triple");
+ * console.log(readValue); // Triple { a: 10, b: 20, c: 30.5 }
+ * ```
+ */
+declare class Files {
+	/**
+	 * Creates a new Files.
+	 */
+	constructor();
+	/**
+	 * Returns the current active directory.
+	 */
+	get directory(): string;
+	/**
+	 * Registers a new file type.
+	 * The instance method `.toByteBuffer()` will be invoked when the type is written to the file system, and the static method `.fromByteBuffer()` will be invoked when reading.
+	 * @param type - The data type that can be written and read to and from the file system
+	 * @param extensions - A list of file name extensions that will have this type applied. Default is the name of the type
+	 */
+	createFileType<T extends Serializable>(type: Class<T>, extensions?: string[]): void;
+	/**
+	 * Returns the names of all the files in the current directory.
+	 * @param all - Whether or not files beginning with "." should be included. Default is false
+	 */
+	listFiles(all?: boolean): string[];
+	/**
+	 * Returns a human-readable file tree of the current directory.
+	 */
+	tree(): string;
+	/**
+	 * Checks whether or not a file exists.
+	 * @param path - The file path to check
+	 */
+	fileExists(path: string): boolean;
+	/**
+	 * Checks whether or not a directory exists.
+	 * @param path - The directory path to check
+	 */
+	directoryExists(path: string): boolean;
+	/**
+	 * Writes a file to a specified path.
+	 * Returns whether the it succeeded.
+	 * @param path - The file path to write to
+	 * @param contents - The data to write to the file
+	 * @param raw - Whether or not the contents parameter is a ByteBuffer to be written directly rather than being file-type-specific data to be converted. Default is false
+	 */
+	writeFile(path: string, contents: any, raw?: boolean): boolean;
+	/**
+	 * Deletes a file at a specified path.
+	 * Returns whether it succeeded.
+	 * @param path - The file path to delete
+	 */
+	deleteFile(path: string): boolean;
+	/**
+	 * Deletes a directory at a specified path.
+	 * Returns whether it succeeded.
+	 * @param path - The directory path to delete
+	 */
+	deleteDirectory(path: string): boolean;
+	/**
+	 * Creates a new directory at a specified path.
+	 * Returns whether it succeeded.
+	 * @param path - The path to create the directory at
+	 */
+	createDirectory(path: string): boolean;
+	/**
+	 * Reads a file from a specified path.
+	 * Returns null if it fails.
+	 * @param path - The file path to read
+	 * @param raw - Whether the data should be returned as a ByteBuffer, or as a file-type-specific converted type. Default is false
+	 */
+	readFile(path: string, raw?: boolean): any | null;
+	/**
+	 * Creates a new file if it doesn't exist.
+	 * Returns the content of the file.
+	 * @param path - The file to write to
+	 * @param create - The function used to initially create the file content
+	 */
+	createFile(path: string, create: () => any): any;
+	/**
+	 * Checks the file size of a specified file.
+	 * @param path - The file path to check
+	 */
+	getFileSize(path: string): number;
+	/**
+	 * Changes the current directory.
+	 * Returns whether it succeeded.
+	 * @param path - The path of the new directory
+	 */
+	changeDirectory(path: string): boolean;
+	/**
+	 * Downloads a file onto the user's computer.
+	 * Returns a promise which resolves when the download occurs.
+	 * @param path - The file to download
+	 */
+	downloadFile(path: string): Promise;
+	/**
+	 * Lets the user upload a file from their computer to a specified location.
+	 * Returns a promise which resolves when the file is uploaded.
+	 * @param path - The destination path for the file
+	 */
+	uploadFile(path: string): Promise;
+	/**
+	 * Serializes the file system to a data string.
+	 */
+	toString(): string;
+	/**
+	 * Deserializes a file system from a data string.
+	 * @param string - The data string to deserialize
+	 */
+	static fromString(string: string): Files;
 }

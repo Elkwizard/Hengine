@@ -13,9 +13,9 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\TextArea.js?#L29" target="_blank" class="class-name source-link">TEXT_AREA</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span>
 				</div>
 				<div class="class desc">
-					Makes a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a> into a text editor.
-This only works on 2D <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a>, which includes only <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> in 2D Mode.
-Since the entire screen is a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">&lt;</span><span class="highlight-IDENTIFIER">canvas</span><span class="highlight-SYMBOL">&gt;</span></code> in the <a href="../Structure/Hengine.html#class Hengine">Hengine</a>, this serves as an alternative to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">&lt;</span><span class="highlight-IDENTIFIER">textarea</span><span class="highlight-SYMBOL">&gt;</span></code>.
+					Makes a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a> into a text editor.
+This only works on 2D <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a>, which includes only <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> in 2D Mode.
+Since the entire screen is a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">&lt;</span><span class="highlight-IDENTIFIER">canvas</span><span class="highlight-SYMBOL">&gt;</span></code> in the <a href="../Structure/Hengine.html#class Hengine">Hengine</a>, this serves as an alternative to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">&lt;</span><span class="highlight-IDENTIFIER">textarea</span><span class="highlight-SYMBOL">&gt;</span></code>.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// single line text-box</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> textbox</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addUIElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;textbox&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 500</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 50</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-IDENTIFIER">textbox</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">TEXT_AREA</span><span class="highlight-SYMBOL">, </span><span class="highlight-CLASS"><a href="../Rendering/Font.html#class Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CLASS">Arial40</span><span class="highlight-SYMBOL">,</span><span class="highlight-LANG_VAR"> false</span><span class="highlight-SYMBOL">);
@@ -25,7 +25,7 @@ const</span><span class="highlight-CONSTANT"> textbox</span><span class="highlig
 </span><span class="highlight-KEYWORD">	if</span><span class="highlight-SYMBOL"> (</span><span class="highlight-IDENTIFIER">keyboard</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">justPressed</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Enter&quot;</span><span class="highlight-SYMBOL">))
 		</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">textbox</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">TEXT_AREA</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">value</span><span class="highlight-SYMBOL">);
 });
-</span></code>
+</span></code>
 				</div>
 				
 				
@@ -126,7 +126,7 @@ const</span><span class="highlight-CONSTANT"> textbox</span><span class="highlig
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\TextArea.js?#L37" target="_blank" class="function-name source-link">init</a>(<span class="param">font</span>, <span class="param">paddingEM?</span>, <span class="param">multiline?</span>, <span class="param">renderText?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Adds a text editor to a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>.
+				Adds a text editor to a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>.
 			</div>
 			
 				<div class="function-signature">
@@ -183,7 +183,7 @@ const</span><span class="highlight-CONSTANT"> textbox</span><span class="highlig
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\TextArea.js?#L88" target="_blank" class="function-name source-link">alwaysIgnore</a>(<span class="param">key</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Forces the text area to ignore a specific key input.
+				Forces the text area to ignore a specific key input.
 			</div>
 			
 				<div class="function-signature">
@@ -210,7 +210,7 @@ const</span><span class="highlight-CONSTANT"> textbox</span><span class="highlig
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\TextArea.js?#L98" target="_blank" class="function-name source-link">setValue</a>(<span class="param">value</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Sets the content of the text area.
+				Sets the content of the text area.
 			</div>
 			
 				<div class="function-signature">

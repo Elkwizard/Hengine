@@ -13,8 +13,8 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L264" target="_blank" class="class-name source-link">Frame</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
 				</div>
 				<div class="class desc">
-					Represents an offscreen drawing surface that can be rendered as an image.
-It is based on the HTML5 Canvas API.
+					Represents an offscreen drawing surface that can be rendered as an image.
+It is based on the HTML5 Canvas API.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> frame</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> Frame</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">);
 
 </span><span class="highlight-COMMENT">// add shapes to the frame</span><span class="highlight-SYMBOL">
@@ -23,7 +23,7 @@ It is based on the HTML5 Canvas API.
 
 </span><span class="highlight-COMMENT">// render the frame to the screen</span><span class="highlight-SYMBOL">
 </span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">image</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">frame</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">default</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">);
-</span></code>
+</span></code>
 				</div>
 				
 					<div class="header">Subclasses</div>
@@ -50,7 +50,7 @@ It is based on the HTML5 Canvas API.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L271" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">pixelRatio?</span>)
 			</div>
 			<div class="function desc">
-				Creates a new Frame.
+				Creates a new Frame.
 			</div>
 			
 				<div class="function-signature">
@@ -97,7 +97,7 @@ It is based on the HTML5 Canvas API.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L285" target="_blank" class="function-name source-link">stretch</a>(<span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
 			</div>
 			<div class="function desc">
-				Returns a copy of the frame stretched to a new set of dimensions.
+				Returns a copy of the frame stretched to a new set of dimensions.
 			</div>
 			
 				<div class="function-signature">
@@ -134,7 +134,7 @@ It is based on the HTML5 Canvas API.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L302" target="_blank" class="function-name source-link">clip</a>(<span class="param">region</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
 			</div>
 			<div class="function desc">
-				Returns a frame containing a rectangular region of the caller. 
+				Returns a frame containing a rectangular region of the caller. 
 			</div>
 			
 				<div class="function-signature">
@@ -204,9 +204,9 @@ It is based on the HTML5 Canvas API.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L330" target="_blank" class="function-name source-link">Frame.fromImageType</a>(<span class="param">image</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">region</span><span class="aux"> | </span><span class="param">image</span>, <span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
 			</div>
 			<div class="function desc">
-				Returns a frame containing the (optionally clipped) contents of an image.
-If no clipping parameters are provided, the whole image will be copied.
-The copy will have the same pixel ratio as the original image.
+				Returns a frame containing the (optionally clipped) contents of an image.
+If no clipping parameters are provided, the whole image will be copied.
+The copy will have the same pixel ratio as the original image.
 			</div>
 			
 				<div class="function-signature">
@@ -312,7 +312,7 @@ The copy will have the same pixel ratio as the original image.
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\WebGLRenderer.js?#L350" target="_blank" class="class-name source-link">FastFrame</a> <span class="keyword">extends</span> <span class="class-name">Frame</span>
 				</div>
 				<div class="class desc">
-					Represents a WebGL-based implementation of Frame.
+					Represents a WebGL-based implementation of Frame.
 				</div>
 				
 				
@@ -336,8 +336,8 @@ The copy will have the same pixel ratio as the original image.
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame3D.js?#L7" target="_blank" class="class-name source-link">Frame3D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 				</div>
 				<div class="class desc">
-					Represents an offscreen image onto which 3D graphics can be drawn.
-By default, rendering will be done in the frame's <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>, though this can be changed via <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">camera</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">drawInCameraSpace</span><span class="highlight-SYMBOL">()</span></code>.
+					Represents an offscreen image onto which 3D graphics can be drawn.
+By default, rendering will be done in the frame's <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>, though this can be changed via <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">camera</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">drawInCameraSpace</span><span class="highlight-SYMBOL">()</span></code>.
 				</div>
 				
 				
@@ -368,7 +368,7 @@ By default, rendering will be done in the frame's <a href="../../Rendering/Coord
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame3D.js?#L14" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">pixelRatio?</span>)
 			</div>
 			<div class="function desc">
-				Creates a new Frame3D.
+				Creates a new Frame3D.
 			</div>
 			
 				<div class="function-signature">

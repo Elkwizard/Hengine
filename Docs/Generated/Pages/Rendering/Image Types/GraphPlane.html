@@ -13,9 +13,9 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Graph.js?#L98" target="_blank" class="class-name source-link">GraphPlane</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/Frame.html#class Frame">Frame</a></span>
 				</div>
 				<div class="class desc">
-					Represents a renderable, updating graph of one or more variables.
-This class is to be used for debugging or technical visualization purposes, rather than in games or tools.
-This class should not be constructed and should instead be created using <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../Structure/Intervals/IntervalManager.html#class IntervalManager">IntervalManager</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">makeGraphPlane</span><span class="highlight-SYMBOL">()</span></code>.
+					Represents a renderable, updating graph of one or more variables.
+This class is to be used for debugging or technical visualization purposes, rather than in games or tools.
+This class should not be constructed and should instead be created using <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../../Structure/Intervals/IntervalManager.html#class IntervalManager">IntervalManager</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">prototype</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">makeGraphPlane</span><span class="highlight-SYMBOL">()</span></code>.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// graph the value of perlin noise</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> graph</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">makeGraphPlane</span><span class="highlight-SYMBOL">([
 </span><span class="highlight-KEYWORD">	new</span><span class="highlight-CLASS"> Graph</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Perlin&quot;</span><span class="highlight-SYMBOL">, ()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
@@ -27,7 +27,7 @@ const</span><span class="highlight-CONSTANT"> graph</span><span class="highlight
 </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
 	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">image</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">graph</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">default</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
 });
-</span></code>
+</span></code>
 				</div>
 				
 				
@@ -58,7 +58,7 @@ const</span><span class="highlight-CONSTANT"> graph</span><span class="highlight
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Graph.js?#L11" target="_blank" class="class-name source-link">Graph</a>
 				</div>
 				<div class="class desc">
-					Represents a single variable that can be graphed on a GraphPlane.
+					Represents a single variable that can be graphed on a GraphPlane.
 				</div>
 				
 				
@@ -124,7 +124,7 @@ const</span><span class="highlight-CONSTANT"> graph</span><span class="highlight
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Graph.js?#L21" target="_blank" class="function-name source-link">constructor</a>(<span class="param">name</span>, <span class="param">y</span>, <span class="param">minY</span>, <span class="param">maxY</span>, <span class="param">color</span>, <span class="param">decimalPlaces?</span>)
 			</div>
 			<div class="function desc">
-				Creates a new Graph.
+				Creates a new Graph.
 			</div>
 			
 				<div class="function-signature">

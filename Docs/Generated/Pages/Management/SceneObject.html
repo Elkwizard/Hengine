@@ -13,14 +13,14 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L34" target="_blank" class="class-name source-link">SceneObject</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Superclasses/SceneElement.html#class SceneElement">SceneElement</a></span>
 				</div>
 				<div class="class desc">
-					Represents an object in a <a href="../Management/Scene.html#class Scene">Scene</a>.
-These can be created by the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">add</span><span class="highlight-SYMBOL">...</span><span class="highlight-CLASS">Element</span><span class="highlight-SYMBOL">()</span></code> methods of <a href="../Management/ElementContainer.html#class ElementContainer">ElementContainer</a>.
-Every scene object has a collection of local-space shapes that make up its presence.
-These shapes are used for culling, rendering, and physics hitboxes.
-Additionally, each scene object exists in N dimensions.
-As such, within the documentation of this class, <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Transform.html#class Transform">Transform</a></span></code>, and <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a></span></code> refer to the appropriate constructs for those dimensions.
+					Represents an object in a <a href="../Management/Scene.html#class Scene">Scene</a>.
+These can be created by the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">add</span><span class="highlight-SYMBOL">...</span><span class="highlight-CLASS">Element</span><span class="highlight-SYMBOL">()</span></code> methods of <a href="../Management/ElementContainer.html#class ElementContainer">ElementContainer</a>.
+Every scene object has a collection of local-space shapes that make up its presence.
+These shapes are used for culling, rendering, and physics hitboxes.
+Additionally, each scene object exists in N dimensions.
+As such, within the documentation of this class, <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Transform.html#class Transform">Transform</a></span></code>, and <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a></span></code> refer to the appropriate constructs for those dimensions.
 This is an abstract superclass and should not be constructed.
-
+
 				</div>
 				
 					<div class="header">Subclasses</div>
@@ -117,8 +117,8 @@ This is an abstract superclass and should not be constructed.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L71" target="_blank" class="function-name source-link">sync</a>(<span class="param">fn</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Schedules a function to be called immediately after additions and removals from the scene take effect.
-It will be passed the object when called.
+				Schedules a function to be called immediately after additions and removals from the scene take effect.
+It will be passed the object when called.
 			</div>
 			
 				<div class="function-signature">
@@ -145,7 +145,7 @@ It will be passed the object when called.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L85" target="_blank" class="function-name source-link">getBoundingBox</a>()<span class="type"><a href="../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a>/<a href="../Geometry/Shapes/3D/Prism.html#class Prism">Prism</a></span>
 			</div>
 			<div class="function desc">
-				Returns the <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> bounding rectangle that contains the all the shapes of the object.
+				Returns the <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> bounding rectangle that contains the all the shapes of the object.
 			</div>
 			
 		</div>
@@ -155,7 +155,7 @@ It will be passed the object when called.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L95" target="_blank" class="function-name source-link">hasShape</a>(<span class="param">name</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				Checks whether there is a shape on the object with a specific name.
+				Checks whether there is a shape on the object with a specific name.
 			</div>
 			
 				<div class="function-signature">
@@ -182,8 +182,8 @@ It will be passed the object when called.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L106" target="_blank" class="function-name source-link">addShape</a>(<span class="param">name</span>, <span class="param">shape</span>, <span class="param">convex?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Adds a new shape with a specified name.
-If a shape with that name already exists, it will be removed.
+				Adds a new shape with a specified name.
+If a shape with that name already exists, it will be removed.
 			</div>
 			
 				<div class="function-signature">
@@ -230,9 +230,9 @@ If a shape with that name already exists, it will be removed.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L125" target="_blank" class="function-name source-link">removeShape</a>(<span class="param">name</span>)<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a>/null</span>
 			</div>
 			<div class="function desc">
-				Removes a shape from the object with a specified name.
-If no shape exists with the given name, null is returned.
-Otherwise, the shape that is removed is returned in local-space.
+				Removes a shape from the object with a specified name.
+If no shape exists with the given name, null is returned.
+Otherwise, the shape that is removed is returned in local-space.
 			</div>
 			
 				<div class="function-signature">
@@ -259,7 +259,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L137" target="_blank" class="function-name source-link">getAllShapes</a>()<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a>[]</span>
 			</div>
 			<div class="function desc">
-				Returns all the shapes on the object, in local-space.
+				Returns all the shapes on the object, in local-space.
 			</div>
 			
 		</div>
@@ -269,7 +269,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L146" target="_blank" class="function-name source-link">getAllConvexShapes</a>()<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a>[]</span>
 			</div>
 			<div class="function desc">
-				Returns a collection of convex shapes that take up the same region as the shapes of the object, in local-space.
+				Returns a collection of convex shapes that take up the same region as the shapes of the object, in local-space.
 			</div>
 			
 		</div>
@@ -279,7 +279,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L156" target="_blank" class="function-name source-link">getAllModels</a>()<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a>[]</span>
 			</div>
 			<div class="function desc">
-				Returns all the shapes on the object, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.
+				Returns all the shapes on the object, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.
 			</div>
 			
 		</div>
@@ -289,7 +289,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L166" target="_blank" class="function-name source-link">getAllConvexModels</a>()<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a>[]</span>
 			</div>
 			<div class="function desc">
-				Returns a collection of convex shapes that take up the same region as the shapes of the object, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.
+				Returns a collection of convex shapes that take up the same region as the shapes of the object, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.
 			</div>
 			
 		</div>
@@ -299,7 +299,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L177" target="_blank" class="function-name source-link">centerShapes</a>(<span class="param">stay?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Adjusts the location of all of the object's shapes such that the geometric center of all the shapes is (0, 0) in local-space.
+				Adjusts the location of all of the object's shapes such that the geometric center of all the shapes is (0, 0) in local-space.
 			</div>
 			
 				<div class="function-signature">
@@ -326,7 +326,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L199" target="_blank" class="function-name source-link">removeAllShapes</a>()<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a>[]</span>
 			</div>
 			<div class="function desc">
-				Removes all the shapes from the object, and returns them in local-space.
+				Removes all the shapes from the object, and returns them in local-space.
 			</div>
 			
 		</div>
@@ -336,7 +336,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L212" target="_blank" class="function-name source-link">getShape</a>(<span class="param">name</span>)<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a></span>
 			</div>
 			<div class="function desc">
-				Retrieves a specific shape in local-space based on its name.
+				Retrieves a specific shape in local-space based on its name.
 			</div>
 			
 				<div class="function-signature">
@@ -363,7 +363,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L220" target="_blank" class="function-name source-link">getConvexShapes</a>(<span class="param">name</span>)<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a>[]</span>
 			</div>
 			<div class="function desc">
-				Returns a list of convex shapes in local-space that take up the same region as a specific shape.
+				Returns a list of convex shapes in local-space that take up the same region as a specific shape.
 			</div>
 			
 				<div class="function-signature">
@@ -390,7 +390,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L228" target="_blank" class="function-name source-link">getModel</a>(<span class="param">name</span>)<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a></span>
 			</div>
 			<div class="function desc">
-				Retrieves a specific shape in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> based on its name.
+				Retrieves a specific shape in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> based on its name.
 			</div>
 			
 				<div class="function-signature">
@@ -417,7 +417,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L236" target="_blank" class="function-name source-link">getConvexModels</a>(<span class="param">name</span>)<span class="type"><a href="../Geometry/Shapes/Shape.html#class Shape">Shape</a>[]</span>
 			</div>
 			<div class="function desc">
-				Returns a list of convex shapes in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> that take up the same region as a specific shape.
+				Returns a list of convex shapes in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> that take up the same region as a specific shape.
 			</div>
 			
 				<div class="function-signature">
@@ -444,7 +444,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L247" target="_blank" class="function-name source-link">scale</a>(<span class="param">factor</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Uniformly scales the shapes of the object about its center.
+				Uniformly scales the shapes of the object about its center.
 			</div>
 			
 				<div class="function-signature">
@@ -471,7 +471,7 @@ Otherwise, the shape that is removed is returned in local-space.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\SceneObject.js?#L260" target="_blank" class="function-name source-link">collidePoint</a>(<span class="param">point</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				Returns whether a specific <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> point is inside the shapes of the object.
+				Returns whether a specific <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> point is inside the shapes of the object.
 			</div>
 			
 				<div class="function-signature">
@@ -521,9 +521,9 @@ Otherwise, the shape that is removed is returned in local-space.
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\WorldObject.js?#L15" target="_blank" class="class-name source-link">WorldObject</a> <span class="keyword">extends</span> <span class="class-name">SceneObject</span>
 				</div>
 				<div class="class desc">
-					Represents an object in a <a href="../Management/Scene.html#class Scene">Scene</a> that exists in the space of the world.
-The dimensionality of this object depends on whether the engine is in 2D or 3D mode.
-Only objects of this type can have <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a>, or be rendered in the space of a <a href="../Rendering/Camera/Camera.html#class Camera">Camera</a>.
+					Represents an object in a <a href="../Management/Scene.html#class Scene">Scene</a> that exists in the space of the world.
+The dimensionality of this object depends on whether the engine is in 2D or 3D mode.
+Only objects of this type can have <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a>, or be rendered in the space of a <a href="../Rendering/Camera/Camera.html#class Camera">Camera</a>.
 				</div>
 				
 				
@@ -554,8 +554,8 @@ Only objects of this type can have <a href="../Physics/PHYSICS.html#class PHYSIC
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\UIObject.js?#L7" target="_blank" class="class-name source-link">UIObject</a> <span class="keyword">extends</span> <span class="class-name">SceneObject</span>
 				</div>
 				<div class="class desc">
-					Represents a permanently <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a> object in a <a href="../Management/Scene.html#class Scene">Scene</a>.
-All rendering for this class takes place in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a> rather than <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>, and should be targeted to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">ui</span></code> rather than <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">renderer</span></code>.
+					Represents a permanently <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a> object in a <a href="../Management/Scene.html#class Scene">Scene</a>.
+All rendering for this class takes place in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a> rather than <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>, and should be targeted to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">ui</span></code> rather than <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">renderer</span></code>.
 Culling, point-collision checks, and other related operations will all use <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a> coordinates rather than <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.
 				</div>
 				

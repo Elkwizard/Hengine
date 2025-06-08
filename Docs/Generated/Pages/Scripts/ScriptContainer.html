@@ -13,7 +13,7 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L267" target="_blank" class="class-name source-link">ScriptContainer</a>
 				</div>
 				<div class="class desc">
-					Represents the collection of behaviors on a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>.
+					Represents the collection of behaviors on a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// create a script which holds an action</span><span class="highlight-KEYWORD">
 class</span><span class="highlight-CLASS"> </span><span class="highlight-CONSTANT">ACTION</span><span class="highlight-KEYWORD"> extends</span><span class="highlight-CLASS"> <a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span><span class="highlight-SYMBOL"> {
 	</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">action</span><span class="highlight-SYMBOL">) {
@@ -28,7 +28,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 
 </span><span class="highlight-COMMENT">// call the function from the defined property</span><span class="highlight-SYMBOL">
 </span><span class="highlight-IDENTIFIER">object</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">scripts</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">ACTION</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">action</span><span class="highlight-SYMBOL">(); </span><span class="highlight-COMMENT">// Hello World!</span><span class="highlight-SYMBOL">
-</span></code>
+</span></code>
 				</div>
 				
 				
@@ -52,7 +52,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L282" target="_blank" class="function-name source-link">maxScriptNumber</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns the highest <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scriptNumber</span></code> of all scripts in the container.
+				Returns the highest <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scriptNumber</span></code> of all scripts in the container.
 			</div>
 			
 		</div>
@@ -62,7 +62,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L289" target="_blank" class="function-name source-link">minScriptNumber</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns the lowest <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scriptNumber</span></code> of all scripts in the container.
+				Returns the lowest <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scriptNumber</span></code> of all scripts in the container.
 			</div>
 			
 		</div>
@@ -72,7 +72,7 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L296" target="_blank" class="function-name source-link">defaultScript</a><span class="type">Class extends <a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span>
 			</div>
 			<div class="function desc">
-				Returns the default script (<code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Management/Scene.html#class Scene">Scene</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">defaultScript</span></code>) of the object's scene.
+				Returns the default script (<code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../Management/Scene.html#class Scene">Scene</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">defaultScript</span></code>) of the object's scene.
 			</div>
 			
 		</div>
@@ -92,10 +92,10 @@ const</span><span class="highlight-CONSTANT"> object</span><span class="highligh
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L320" target="_blank" class="function-name source-link">add</a>(<span class="param">script</span>, <span class="param">...args</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
-				Adds a new script to the object. Returns the result of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">()</span></code> listener.
-This also defines a property with the name of the script (e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">MY_SCRIPT</span></code> for a script defined as <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">class</span><span class="highlight-CLASS"> </span><span class="highlight-CONSTANT">MY_SCRIPT</span><span class="highlight-KEYWORD"> extends</span><span class="highlight-CLASS"> <a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span><span class="highlight-SYMBOL"> { ... }</span></code>) containing the script instance.
-None of the listeners on this script will be called until the next frame.
-If an instance of the script was already on the object, it will be removed.
+				Adds a new script to the object. Returns the result of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">()</span></code> listener.
+This also defines a property with the name of the script (e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">MY_SCRIPT</span></code> for a script defined as <code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">class</span><span class="highlight-CLASS"> </span><span class="highlight-CONSTANT">MY_SCRIPT</span><span class="highlight-KEYWORD"> extends</span><span class="highlight-CLASS"> <a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span><span class="highlight-SYMBOL"> { ... }</span></code>) containing the script instance.
+None of the listeners on this script will be called until the next frame.
+If an instance of the script was already on the object, it will be removed.
 			</div>
 			
 				<div class="function-signature">
@@ -142,9 +142,9 @@ If an instance of the script was already on the object, it will be removed.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L345" target="_blank" class="function-name source-link">remove</a>(<span class="param">script</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Removes a specific script from the object.
-This removal is synchronized, and will only take effect at the end of the frame.
-When the script is removed, the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">cleanUp</span><span class="highlight-SYMBOL">()</span></code> listener is called.
+				Removes a specific script from the object.
+This removal is synchronized, and will only take effect at the end of the frame.
+When the script is removed, the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">cleanUp</span><span class="highlight-SYMBOL">()</span></code> listener is called.
 			</div>
 			
 				<div class="function-signature">
@@ -171,7 +171,7 @@ When the script is removed, the <code class=" highlight-BACKGROUND"><span class=
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L380" target="_blank" class="function-name source-link">has</a>(<span class="param">script</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				Checks whether the object has a specific script.
+				Checks whether the object has a specific script.
 			</div>
 			
 				<div class="function-signature">
@@ -198,7 +198,7 @@ When the script is removed, the <code class=" highlight-BACKGROUND"><span class=
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L388" target="_blank" class="function-name source-link">implements</a>(<span class="param">method</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				Checks whether the object has any scripts listening for a specific event.
+				Checks whether the object has any scripts listening for a specific event.
 			</div>
 			
 				<div class="function-signature">
@@ -225,8 +225,8 @@ When the script is removed, the <code class=" highlight-BACKGROUND"><span class=
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L428" target="_blank" class="function-name source-link"></a>(<span class="param">script</span>)<span class="type">Class extends <a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a>/undefined</span>
 			</div>
 			<div class="function desc">
-				This function is called when the container is called as a function.
-It returns the instance of a given script, if present.
+				This function is called when the container is called as a function.
+It returns the instance of a given script, if present.
 			</div>
 			
 				<div class="function-signature">

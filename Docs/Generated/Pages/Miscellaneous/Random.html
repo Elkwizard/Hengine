@@ -13,11 +13,11 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L25" target="_blank" class="class-name source-link">Random</a>
 				</div>
 				<div class="class desc">
-					Represents a seeded random number generator.
-All instance methods of this class are available statically, so <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">)</span></code> is valid and uses statically stored state of the class itself.
-The random number generation functions of this class are organized into two categories: stable and unstable.
-Stable functions will produce the same value when called with the same arguments.
-Unstable functions don't take any seeding parameters and change their return value on each call.
+					Represents a seeded random number generator.
+All instance methods of this class are available statically, so <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">3</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">)</span></code> is valid and uses statically stored state of the class itself.
+The random number generation functions of this class are organized into two categories: stable and unstable.
+Stable functions will produce the same value when called with the same arguments.
+Unstable functions don't take any seeding parameters and change their return value on each call.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">;</span><span class="highlight-KEYWORD">
 let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">;
 
@@ -27,7 +27,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 </span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> mean</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> / </span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// compute the mean of the random values</span><span class="highlight-SYMBOL">
 	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">text</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../Rendering/Font.html#class Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CLASS">Arial20</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">mean</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
 });
-</span></code>
+</span></code>
 				</div>
 				
 				
@@ -79,7 +79,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L38" target="_blank" class="function-name source-link">constructor</a>(<span class="param">seed</span>, <span class="param">sampleSeed</span>, <span class="param">distribution?</span><span class="aux"> | </span><span class="param">seed</span>, <span class="param">distribution?</span><span class="aux"> | </span><span class="param">distribution</span>)
 			</div>
 			<div class="function desc">
-				Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to random numbers.
+				Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to random numbers.
 			</div>
 			
 				<div class="function-signature">
@@ -162,7 +162,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L58" target="_blank" class="function-name source-link">random</a>()<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random number on [0, 1). Unstable.
+				Returns a random number on [0, 1). Unstable.
 			</div>
 			
 		</div>
@@ -172,7 +172,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L67" target="_blank" class="function-name source-link">normalZ</a>(<span class="param">mu?</span>, <span class="param">sd?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random value in an unbounded normal distribution. Unstable
+				Returns a random value in an unbounded normal distribution. Unstable
 			</div>
 			
 				<div class="function-signature">
@@ -209,7 +209,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L77" target="_blank" class="function-name source-link">int</a>(<span class="param">min</span>, <span class="param">max</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random integer on [min, max]. Unstable.
+				Returns a random integer on [min, max]. Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -246,7 +246,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L85" target="_blank" class="function-name source-link">bool</a>(<span class="param">chance?</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				Returns a random boolean value. Unstable.
+				Returns a random boolean value. Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -273,7 +273,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L92" target="_blank" class="function-name source-link">sign</a>()<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random sign, with a 50/50 chance to be -1 or 1. Unstable.
+				Returns a random sign, with a 50/50 chance to be -1 or 1. Unstable.
 			</div>
 			
 		</div>
@@ -283,7 +283,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L101" target="_blank" class="function-name source-link">range</a>(<span class="param">min?</span>, <span class="param">max?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random floating-point value on [min, max). Unstable.
+				Returns a random floating-point value on [min, max). Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -320,7 +320,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L112" target="_blank" class="function-name source-link">index</a>(<span class="param">arr</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random valid index for a given array. Unstable.
+				Returns a random valid index for a given array. Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -347,7 +347,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L119" target="_blank" class="function-name source-link">angle</a>()<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random angle in radians on [0, 2π). Unstable.
+				Returns a random angle in radians on [0, 2π). Unstable.
 			</div>
 			
 		</div>
@@ -357,7 +357,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L126" target="_blank" class="function-name source-link">char</a>()<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random single character utf-16 string. Unstable.
+				Returns a random single character utf-16 string. Unstable.
 			</div>
 			
 		</div>
@@ -367,7 +367,7 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L134" target="_blank" class="function-name source-link">color</a>(<span class="param">result?</span>)<span class="type"><a href="../Rendering/Color.html#class Color">Color</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random opaque color. Unstable.
+				Returns a random opaque color. Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -394,9 +394,9 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L148" target="_blank" class="function-name source-link">inShape</a>(<span class="param">region</span>)<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
-				Returns a random point within a given convex shape.
-This method only works with <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">distribution</span></code> being <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>.
-Unstable.
+				Returns a random point within a given convex shape.
+This method only works with <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">distribution</span></code> being <code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>.
+Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -423,7 +423,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L182" target="_blank" class="function-name source-link">shuffle</a>(<span class="param">arr</span>)<span class="type">Any[]</span>
 			</div>
 			<div class="function desc">
-				Randomly orders an array in-place. Unstable.
+				Randomly orders an array in-place. Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -450,7 +450,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L201" target="_blank" class="function-name source-link">choice</a>(<span class="param">values</span><span class="aux"> | </span><span class="param">values</span>, <span class="param">percentages</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
-				Chooses an (optionally weighted) random element from an array. Unstable.
+				Chooses an (optionally weighted) random element from an array. Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -500,7 +500,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L227" target="_blank" class="function-name source-link">sample</a>(<span class="param">values</span>, <span class="param">quantity</span>)<span class="type">Any[]</span>
 			</div>
 			<div class="function desc">
-				Randomly selects a sample (with replacement) from a given collection of values. Unstable.
+				Randomly selects a sample (with replacement) from a given collection of values. Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -537,7 +537,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L241" target="_blank" class="function-name source-link">sampleWithoutReplacement</a>(<span class="param">values</span>, <span class="param">quantity</span>)<span class="type">Any[]</span>
 			</div>
 			<div class="function desc">
-				Randomly selects a sample (without replacement) from a given collection of values. Unstable.
+				Randomly selects a sample (without replacement) from a given collection of values. Unstable.
 			</div>
 			
 				<div class="function-signature">
@@ -574,7 +574,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L260" target="_blank" class="function-name source-link">octave</a>(<span class="param">octaves</span>, <span class="param">algorithm</span>, <span class="param">...noiseArgs</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Returns the sum of a specified number of octaves of a specified type of noise.
+				Returns the sum of a specified number of octaves of a specified type of noise.
 			</div>
 			
 				<div class="function-signature">
@@ -621,7 +621,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L283" target="_blank" class="function-name source-link">perlin</a>(<span class="param">x</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Samples 1D Perlin noise.
+				Samples 1D Perlin noise.
 			</div>
 			
 				<div class="function-signature">
@@ -668,7 +668,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L302" target="_blank" class="function-name source-link">perlin2D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Samples 2D Perlin noise.
+				Samples 2D Perlin noise.
 			</div>
 			
 				<div class="function-signature">
@@ -725,7 +725,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L325" target="_blank" class="function-name source-link">perlin3D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">z</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Samples 3D Perlin noise.
+				Samples 3D Perlin noise.
 			</div>
 			
 				<div class="function-signature">
@@ -792,7 +792,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L349" target="_blank" class="function-name source-link">voronoi</a>(<span class="param">x</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Samples 1D Voronoi noise.
+				Samples 1D Voronoi noise.
 			</div>
 			
 				<div class="function-signature">
@@ -839,7 +839,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L374" target="_blank" class="function-name source-link">voronoi2D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Samples 2D Voronoi noise.
+				Samples 2D Voronoi noise.
 			</div>
 			
 				<div class="function-signature">
@@ -896,7 +896,7 @@ Unstable.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Random.js?#L403" target="_blank" class="function-name source-link">voronoi3D</a>(<span class="param">x</span>, <span class="param">y</span>, <span class="param">z</span>, <span class="param">f?</span>, <span class="param">seed?</span>)<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Samples 3D Voronoi noise.
+				Samples 3D Voronoi noise.
 			</div>
 			
 				<div class="function-signature">

@@ -13,13 +13,13 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L57" target="_blank" class="class-name source-link">Mesh</a> <span class="keyword">extends</span> <span class="class-name">Renderable</span>
 				</div>
 				<div class="class desc">
-					Represents a 3D mesh composed of chunks with different materials. The following vertex attributes are supported:
-<table>
-	<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
-	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code></td><td>The model-space location of the vertex</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
-	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexUV</span></code></td><td>The UV texture coordinates of the vertex</td><td><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></td></tr>
-	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexNormal</span></code></td><td>The normalized normal vector of the vertex</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
-</table>
+					Represents a 3D mesh composed of chunks with different materials. The following vertex attributes are supported:
+<table>
+	<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
+	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code></td><td>The model-space location of the vertex</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
+	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexUV</span></code></td><td>The UV texture coordinates of the vertex</td><td><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></td></tr>
+	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexNormal</span></code></td><td>The normalized normal vector of the vertex</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
+</table>
 				</div>
 				
 				
@@ -78,7 +78,7 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L64" target="_blank" class="function-name source-link">constructor</a>(<span class="param">attributes</span>, <span class="param">data</span>, <span class="param">chunks</span>)
 			</div>
 			<div class="function desc">
-				Creates a new mesh.
+				Creates a new mesh.
 			</div>
 			
 				<div class="function-signature">
@@ -125,7 +125,7 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L103" target="_blank" class="function-name source-link">get</a>()<span class="type">Mesh</span>
 			</div>
 			<div class="function desc">
-				Creates a deep copy of the mesh.
+				Creates a deep copy of the mesh.
 			</div>
 			
 		</div>
@@ -135,8 +135,8 @@
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L112" target="_blank" class="function-name source-link">transform</a>(<span class="param">transform</span>)<span class="type">Mesh</span>
 			</div>
 			<div class="function desc">
-				<a href="../../Geometry/Transform.html#class Transform">Transforms</a> the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code> of the mesh in-place by a given matrix and flushes the changes.
-Returns the caller.
+				<a href="../../Geometry/Transform.html#class Transform">Transforms</a> the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code> of the mesh in-place by a given matrix and flushes the changes.
+Returns the caller.
 			</div>
 			
 				<div class="function-signature">
@@ -163,7 +163,7 @@ Returns the caller.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L129" target="_blank" class="function-name source-link">toPolyhedron</a>()<span class="type"><a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a></span>
 			</div>
 			<div class="function desc">
-				Creates a <a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a> that has the same shape as the mesh, using the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code> attribute.
+				Creates a <a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a> that has the same shape as the mesh, using the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code> attribute.
 			</div>
 			
 		</div>
@@ -173,7 +173,7 @@ Returns the caller.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L148" target="_blank" class="function-name source-link">Mesh.fromPolyhedron</a>(<span class="param">polyhedron</span>, <span class="param">material?</span>)<span class="type">Mesh</span>
 			</div>
 			<div class="function desc">
-				Creates a new mesh from a <a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a>.
+				Creates a new mesh from a <a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a>.
 			</div>
 			
 				<div class="function-signature">
@@ -210,7 +210,7 @@ Returns the caller.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L188" target="_blank" class="function-name source-link">Mesh.merge</a>(<span class="param">meshes</span>)<span class="type">Mesh</span>
 			</div>
 			<div class="function desc">
-				Creates a new mesh containing all the pieces of a collection of meshes
+				Creates a new mesh containing all the pieces of a collection of meshes
 			</div>
 			
 				<div class="function-signature">

@@ -13,7 +13,7 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L9" target="_blank" class="class-name source-link">Artist</a>
 				</div>
 				<div class="class desc">
-					Represents a renderer for a graphical surface.
+					Represents a renderer for a graphical surface.
 This is an abstract superclass and should not be constructed.
 				</div>
 				
@@ -31,7 +31,7 @@ This is an abstract superclass and should not be constructed.
 				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L46" target="_blank" class="function-name source-link">transform</a>(<span class="param">transform</span>)
 			</div>
 			<div class="function desc">
-				Sets the current coordinate transform of the renderer.
+				Sets the current coordinate transform of the renderer.
 			</div>
 			
 				<div class="function-signature">
@@ -58,7 +58,7 @@ This is an abstract superclass and should not be constructed.
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L51" target="_blank" class="function-name source-link">transform</a><span class="type"><a href="../../Geometry/Matrices.html#class Matrix">Matrix</a></span>
 			</div>
 			<div class="function desc">
-				Returns the current coordinate transform of the renderer.
+				Returns the current coordinate transform of the renderer.
 			</div>
 			
 		</div>
@@ -78,7 +78,7 @@ This is an abstract superclass and should not be constructed.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L19" target="_blank" class="function-name source-link">fill</a>(<span class="param">color</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Assuming that the current transform is the identity transformation, this fills the surface with a single color. If the color is transparent, it will simply layer on top of the current content.
+				Assuming that the current transform is the identity transformation, this fills the surface with a single color. If the color is transparent, it will simply layer on top of the current content.
 			</div>
 			
 				<div class="function-signature">
@@ -105,7 +105,7 @@ This is an abstract superclass and should not be constructed.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L24" target="_blank" class="function-name source-link">addTransform</a>(<span class="param">transform</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Manipulates the current coordinate transform. For an Artist <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span></code> and <a href="../../Geometry/Matrices.html#class Matrix">Matrix</a> <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">m</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addTransform</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">m</span><span class="highlight-SYMBOL">)</span></code> is equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">m</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">times</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL">)</span></code>.
+				Manipulates the current coordinate transform. For an Artist <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span></code> and <a href="../../Geometry/Matrices.html#class Matrix">Matrix</a> <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">m</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addTransform</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">m</span><span class="highlight-SYMBOL">)</span></code> is equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">m</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">times</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span><span class="highlight-SYMBOL">)</span></code>.
 			</div>
 			
 				<div class="function-signature">
@@ -132,7 +132,7 @@ This is an abstract superclass and should not be constructed.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L30" target="_blank" class="function-name source-link">drawThrough</a>(<span class="param">transform</span>, <span class="param">draw</span>, <span class="param">global?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Calls a function while using a specified coordinate transform
+				Calls a function while using a specified coordinate transform
 			</div>
 			
 				<div class="function-signature">
@@ -189,7 +189,7 @@ This is an abstract superclass and should not be constructed.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L56" target="_blank" class="function-name source-link">save</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Pushes the current rendering state onto the state stack.
+				Pushes the current rendering state onto the state stack.
 This state includes <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">transform</span></code>.
 			</div>
 			
@@ -210,7 +210,7 @@ This state includes <code class=" highlight-BACKGROUND"><span class="highlight-S
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer.js?#L65" target="_blank" class="function-name source-link">overlay</a>(<span class="param">overlay</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				Composites an image onto the entire surface of the renderer.
+				Composites an image onto the entire surface of the renderer.
 			</div>
 			
 				<div class="function-signature">

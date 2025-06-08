@@ -13,13 +13,13 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L844" target="_blank" class="class-name source-link">HengineLoader</a>
 				</div>
 				<div class="class desc">
-					Allows for the loading of both the rest of the <a href="../Structure/Hengine.html#class Hengine">Hengine</a> and additional external files.
-The file containing this class <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">HengineLoader</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">js</span></code> is the only file that needs to be loaded directly to use the <a href="../Structure/Hengine.html#class Hengine">Hengine</a>.
-Other files can be loaded via the HengineLoader's API.
-The web url for this file is:
+					Allows for the loading of both the rest of the <a href="../Structure/Hengine.html#class Hengine">Hengine</a> and additional external files.
+The file containing this class <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">HengineLoader</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">js</span></code> is the only file that needs to be loaded directly to use the <a href="../Structure/Hengine.html#class Hengine">Hengine</a>.
+Other files can be loaded via the HengineLoader's API.
+The web url for this file is:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-CLASS">https://</span><span class="highlight-PROPERTY">elkwizard.github.io/<a href="../Structure/Hengine.html#class Hengine">Hengine</a>/Package/Engine/Manage/HengineLoader.js
-</span></code>
-This class is a singleton, and the single instance can be accessed via a static property.
+</span></code>
+This class is a singleton, and the single instance can be accessed via a static property.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">async function</span><span class="highlight-SYMBOL"> </span><span class="highlight-FUNCTION">load</span><span class="highlight-SYMBOL">() {
 	</span><span class="highlight-COMMENT">// choose which file to load based on an external file</span><span class="highlight-SYMBOL">
 </span><span class="highlight-KEYWORD">	await</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">HengineLoader</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">load</span><span class="highlight-SYMBOL">([
@@ -32,7 +32,7 @@ This class is a singleton, and the single instance can be accessed via a static 
 	</span><span class="highlight-KEYWORD">	new</span><span class="highlight-CLASS"> <a href="../Structure/HengineResource/HengineResource.html#class HengineScriptResource">HengineScriptResource</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&#96;</span><span class="highlight-SYMBOL">${</span><span class="highlight-IDENTIFIER">fileName</span><span class="highlight-SYMBOL">}</span><span class="highlight-STRING">.js&#96;</span><span class="highlight-SYMBOL">)
 	]);
 }
-</span></code>
+</span></code>
 				</div>
 				
 				
@@ -56,10 +56,10 @@ This class is a singleton, and the single instance can be accessed via a static 
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L916" target="_blank" class="function-name source-link">loadResource</a>(<span class="param">src</span>)<span class="type">Any/null</span>
 			</div>
 			<div class="function desc">
-				Retrieves a specific resource.
-If the resource failed to load, this returns null.
-This method is also available on the global object.
-If the resource implements <a href="../Miscellaneous/Copyable.html#class Copyable">Copyable</a>, a copy of the resource will be returned.
+				Retrieves a specific resource.
+If the resource failed to load, this returns null.
+This method is also available on the global object.
+If the resource implements <a href="../Miscellaneous/Copyable.html#class Copyable">Copyable</a>, a copy of the resource will be returned.
 			</div>
 			
 				<div class="function-signature">
@@ -86,9 +86,9 @@ If the resource implements <a href="../Miscellaneous/Copyable.html#class Copyabl
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L935" target="_blank" class="function-name source-link">HengineLoader.load</a>(<span class="param">userResources</span>, <span class="param">done?</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
-				Loads a series of resources, and optionally starts the update loop after the loading completes.
-If the rest of the <a href="../Structure/Hengine.html#class Hengine">Hengine</a> has yet to be loaded, it will be loaded before any of the resources passed to this function.
-Returns a promise that resolves to the HengineLoader instance when all the resources are loaded.
+				Loads a series of resources, and optionally starts the update loop after the loading completes.
+If the rest of the <a href="../Structure/Hengine.html#class Hengine">Hengine</a> has yet to be loaded, it will be loaded before any of the resources passed to this function.
+Returns a promise that resolves to the HengineLoader instance when all the resources are loaded.
 			</div>
 			
 				<div class="function-signature">

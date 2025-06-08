@@ -13,12 +13,12 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L40" target="_blank" class="class-name source-link">ElementScript</a>
 				</div>
 				<div class="class desc">
-					Scripts in the <a href="../Structure/Hengine.html#class Hengine">Hengine</a> are subclasses of ElementScript.
-These scripts represent collections of behavior for <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a> and data related to that behavior.
-Extending scripts is not allowed.
-The way the behavior of scripts is specified is via specifying optional listeners for a series of events, which fire at different times over the course of the associated object's lifetime.
-All methods defined on a script are passed the associated sceneObject as an implicit parameter. This is also true of non-event-listener methods.
-The available events to listen for, and when they're fired, are specified in the methods section. However, the signatures in the methods section leave out the initial object parameter, which is required for all methods of a script.
+					Scripts in the <a href="../Structure/Hengine.html#class Hengine">Hengine</a> are subclasses of ElementScript.
+These scripts represent collections of behavior for <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a> and data related to that behavior.
+Extending scripts is not allowed.
+The way the behavior of scripts is specified is via specifying optional listeners for a series of events, which fire at different times over the course of the associated object's lifetime.
+All methods defined on a script are passed the associated sceneObject as an implicit parameter. This is also true of non-event-listener methods.
+The available events to listen for, and when they're fired, are specified in the methods section. However, the signatures in the methods section leave out the initial object parameter, which is required for all methods of a script.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">class</span><span class="highlight-CLASS"> </span><span class="highlight-CONSTANT">ORBIT_AROUND</span><span class="highlight-KEYWORD"> extends</span><span class="highlight-CLASS"> ElementScript</span><span class="highlight-SYMBOL"> {
 	</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">center</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">) {
 		</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">removeDefault</span><span class="highlight-SYMBOL">(); </span><span class="highlight-COMMENT">// remove normal drawing behavior</span><span class="highlight-SYMBOL">
@@ -45,7 +45,7 @@ The available events to listen for, and when they're fired, are specified in the
 </span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> orbiter</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addCircleElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;orbiter&quot;</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 30</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-IDENTIFIER">orbiter</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">ORBIT_AROUND</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">middle</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 300</span><span class="highlight-SYMBOL">);
-</span></code>
+</span></code>
 This is an abstract superclass and should not be constructed.
 				</div>
 				
@@ -80,9 +80,9 @@ This is an abstract superclass and should not be constructed.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L101" target="_blank" class="function-name source-link">init</a>(<span class="param">...args</span>)<span class="type">Any</span>
 			</div>
 			<div class="function desc">
-				This is called when the script is added to the object.
-The non-initial arguments to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../Scripts/ScriptContainer.html#class ScriptContainer">ScriptContainer</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">()</span></code> are passed to this listener.
-The return value of this function will be returned from <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../Scripts/ScriptContainer.html#class ScriptContainer">ScriptContainer</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">()</span></code>.
+				This is called when the script is added to the object.
+The non-initial arguments to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../Scripts/ScriptContainer.html#class ScriptContainer">ScriptContainer</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">()</span></code> are passed to this listener.
+The return value of this function will be returned from <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><a href="../Scripts/ScriptContainer.html#class ScriptContainer">ScriptContainer</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">()</span></code>.
 			</div>
 			
 				<div class="function-signature">
@@ -119,8 +119,8 @@ The return value of this function will be returned from <code class=" highlight-
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L112" target="_blank" class="function-name source-link">drawRule</a>(<span class="param">camera</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				This is called prior to rendering to determine whether an object should be rendered on a given camera.
-If this is not specified, the object will be rendered for all cameras.
+				This is called prior to rendering to determine whether an object should be rendered on a given camera.
+If this is not specified, the object will be rendered for all cameras.
 			</div>
 			
 				<div class="function-signature">
@@ -147,9 +147,9 @@ If this is not specified, the object will be rendered for all cameras.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L120" target="_blank" class="function-name source-link">draw</a>(<span class="param">name</span>, <span class="param">shape</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				This is called once per shape of the object each frame during rendering.
-When this is called, the renderer is in the local-space of the object.
-If the object is not on-screen or is hidden, this function will not be called.
+				This is called once per shape of the object each frame during rendering.
+When this is called, the renderer is in the local-space of the object.
+If the object is not on-screen or is hidden, this function will not be called.
 			</div>
 			
 				<div class="function-signature">
@@ -186,7 +186,7 @@ If the object is not on-screen or is hidden, this function will not be called.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L125" target="_blank" class="function-name source-link">escapeDraw</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				This is called once per frame during rendering, immediately after the last call to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">()</span></code> for the object, regardless of whether the object is visible.
+				This is called once per frame during rendering, immediately after the last call to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">()</span></code> for the object, regardless of whether the object is visible.
 When this called, the renderer is in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.
 			</div>
 			
@@ -197,7 +197,7 @@ When this called, the renderer is in <a href="../Rendering/Coordinate Spaces.htm
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L130" target="_blank" class="function-name source-link">cleanUp</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				This is called when the script is removed from the object.
+				This is called when the script is removed from the object.
 This will also occur when the object is removed, and thus this is often more useful than the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">remove</span><span class="highlight-SYMBOL">()</span></code> event.
 			</div>
 			
@@ -218,8 +218,8 @@ This will also occur when the object is removed, and thus this is often more use
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L141" target="_blank" class="function-name source-link">click</a>(<span class="param">key</span>, <span class="param">point</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				This is called when this object is clicked with the mouse.
-This will never be called for 3D objects.
+				This is called when this object is clicked with the mouse.
+This will never be called for 3D objects.
 			</div>
 			
 				<div class="function-signature">
@@ -256,8 +256,8 @@ This will never be called for 3D objects.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L147" target="_blank" class="function-name source-link">hover</a>(<span class="param">point</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				This is called when this object is initially hovered over by the mouse.
-This will never be called for 3D objects.
+				This is called when this object is initially hovered over by the mouse.
+This will never be called for 3D objects.
 			</div>
 			
 				<div class="function-signature">
@@ -284,8 +284,8 @@ This will never be called for 3D objects.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L153" target="_blank" class="function-name source-link">unhover</a>(<span class="param">point</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				This is called when this object stops being hovered over by the mouse.
-This will never be called for 3D objects.
+				This is called when this object stops being hovered over by the mouse.
+This will never be called for 3D objects.
 			</div>
 			
 				<div class="function-signature">
@@ -352,9 +352,9 @@ This will never be called for 3D objects.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L177" target="_blank" class="function-name source-link">collideRule</a>(<span class="param">other</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				This is called for potential collisions between the object and another object.
-If every <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">collideRule</span><span class="highlight-SYMBOL">()</span></code> implementation on the objects returns true, it will be detected and potentially resolved.
-If the object doesn't have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script, then this won't be called.
+				This is called for potential collisions between the object and another object.
+If every <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">collideRule</span><span class="highlight-SYMBOL">()</span></code> implementation on the objects returns true, it will be detected and potentially resolved.
+If the object doesn't have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script, then this won't be called.
 			</div>
 			
 				<div class="function-signature">
@@ -381,9 +381,9 @@ If the object doesn't have the <a href="../Physics/PHYSICS.html#class PHYSICS">P
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L185" target="_blank" class="function-name source-link">triggerRule</a>(<span class="param">other</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				This is called for potential collisions between the object and another object.
-If any <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">triggerRule</span><span class="highlight-SYMBOL">()</span></code> implementation returns true, then the collision will be detected but not resolved.
-If the object doesn't have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script, then this won't be called.
+				This is called for potential collisions between the object and another object.
+If any <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">triggerRule</span><span class="highlight-SYMBOL">()</span></code> implementation returns true, then the collision will be detected but not resolved.
+If the object doesn't have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script, then this won't be called.
 			</div>
 			
 				<div class="function-signature">
@@ -410,9 +410,9 @@ If the object doesn't have the <a href="../Physics/PHYSICS.html#class PHYSICS">P
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L192" target="_blank" class="function-name source-link">collideGeneral</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L192" target="_blank" class="function-name source-link">collideLeft</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L192" target="_blank" class="function-name source-link">collideRight</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L192" target="_blank" class="function-name source-link">collideTop</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L192" target="_blank" class="function-name source-link">collideBottom</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L192" target="_blank" class="function-name source-link">collideFront</a><span class="aux">/</span><a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L192" target="_blank" class="function-name source-link">collideBack</a>(<span class="param">collision</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				These are called when a collision occurs with the object in a specified direction (or for any direction, for <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">collideGeneral</span><span class="highlight-SYMBOL">()</span></code>).
-If the <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a> doesn't have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script, then this won't be called.
-The <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">...</span><span class="highlight-CLASS">Front</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">...</span><span class="highlight-CLASS">Back</span></code> variants won't be called in 2D Mode.
+				These are called when a collision occurs with the object in a specified direction (or for any direction, for <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">collideGeneral</span><span class="highlight-SYMBOL">()</span></code>).
+If the <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a> doesn't have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script, then this won't be called.
+The <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">...</span><span class="highlight-CLASS">Front</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">...</span><span class="highlight-CLASS">Back</span></code> variants won't be called in 2D Mode.
 			</div>
 			
 				<div class="function-signature">
@@ -439,7 +439,7 @@ The <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">...</span
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L198" target="_blank" class="function-name source-link">addShape</a>(<span class="param">name</span>, <span class="param">shape</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				This is called when a shape is added to the object.
+				This is called when a shape is added to the object.
 			</div>
 			
 				<div class="function-signature">
@@ -476,7 +476,7 @@ The <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">...</span
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L204" target="_blank" class="function-name source-link">removeShape</a>(<span class="param">name</span>, <span class="param">shape</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				This is called when a shape is removed from the object.
+				This is called when a shape is removed from the object.
 			</div>
 			
 				<div class="function-signature">
@@ -513,7 +513,7 @@ The <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">...</span
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L211" target="_blank" class="function-name source-link">addScript</a>(<span class="param">script</span>, <span class="param">...args</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
-				This is called when a script (including this one) is added to the object.
+				This is called when a script (including this one) is added to the object.
 			</div>
 			
 				<div class="function-signature">
@@ -550,7 +550,7 @@ The <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">...</span
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/SceneObject\Scripts.js?#L93" target="_blank" class="function-name source-link">ElementScript.implements</a>(<span class="param">eventName</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				Checks if a certain listener is defined in the script.
+				Checks if a certain listener is defined in the script.
 			</div>
 			
 				<div class="function-signature">

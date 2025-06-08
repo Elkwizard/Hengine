@@ -13,14 +13,14 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L33" target="_blank" class="class-name source-link">GPUShader</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a></span>
 				</div>
 				<div class="class desc">
-					Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region.
-The entry point for the shader is a function of the form:
+					Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region.
+The entry point for the shader is a function of the form:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">vec4</span><span class="highlight-CLASS"> </span><span class="highlight-FUNCTION">shader</span><span class="highlight-SYMBOL">() { ... }
-</span></code>
-Several engine-provided uniforms are given, specifically:
+</span></code>
+Several engine-provided uniforms are given, specifically:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">uniform vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// the pixel-space coordinates of the pixel, with (0, 0) in the top-left corner</span><span class="highlight-KEYWORD">
 uniform vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">resolution</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// the width and height of the image, in pixels</span><span class="highlight-SYMBOL">
-</span></code>
+</span></code>
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// grayscale shader</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> shader</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> GPUShader</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">300</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 300</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&#96;
 	uniform sampler2D image;
@@ -52,7 +52,7 @@ const</span><span class="highlight-CONSTANT"> cat</span><span class="highlight-S
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUShader.js?#L41" target="_blank" class="function-name source-link">constructor</a>(<span class="param">width</span>, <span class="param">height</span>, <span class="param">glsl</span>, <span class="param">pixelRatio?</span>)
 			</div>
 			<div class="function desc">
-				Creates a new GPUShader.
+				Creates a new GPUShader.
 			</div>
 			
 				<div class="function-signature">

@@ -13,15 +13,15 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L21" target="_blank" class="class-name source-link">Animation</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Miscellaneous/Copyable.html#class Copyable">Copyable</a></span>
 				</div>
 				<div class="class desc">
-					Represents a frame-by-frame animation.
-These should be loaded using <a href="../../Structure/HengineResource/HengineResource.html#class HengineAnimationResource">HengineAnimationResource</a> and should not be constructed directly.
-For the purposes of the animation, a frame elapses each time the animation is drawn.
+					Represents a frame-by-frame animation.
+These should be loaded using <a href="../../Structure/HengineResource/HengineResource.html#class HengineAnimationResource">HengineAnimationResource</a> and should not be constructed directly.
+For the purposes of the animation, a frame elapses each time the animation is drawn.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> catKnead</span><span class="highlight-SYMBOL"> = </span><span class="highlight-FUNCTION">loadResource</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;catKnead&quot;</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// load the Animation</span><span class="highlight-SYMBOL">
 
 </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
 	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">image</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">catKnead</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">default</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// the animation will advance</span><span class="highlight-SYMBOL">
 });
-</span></code>
+</span></code>
 				</div>
 				
 				
@@ -87,7 +87,7 @@ For the purposes of the animation, a frame elapses each time the animation is dr
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L29" target="_blank" class="function-name source-link">constructor</a>(<span class="param">frames</span>, <span class="param">delay</span>, <span class="param">loops</span>, <span class="param">onEnd?</span>)
 			</div>
 			<div class="function desc">
-				Creates a new animation from a given set of frames.
+				Creates a new animation from a given set of frames.
 			</div>
 			
 				<div class="function-signature">
@@ -144,8 +144,8 @@ For the purposes of the animation, a frame elapses each time the animation is dr
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L58" target="_blank" class="function-name source-link">done</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
-				Returns whether or not the animation has completed.
-If the animation loops, this will always return false.
+				Returns whether or not the animation has completed.
+If the animation loops, this will always return false.
 			</div>
 			
 		</div>
@@ -195,7 +195,7 @@ If the animation loops, this will always return false.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Animation.js?#L103" target="_blank" class="function-name source-link">Animation.fromImage</a>(<span class="param">spritesheet</span>, <span class="param">imgWidth</span>, <span class="param">imgHeight</span>, <span class="param">delay</span>, <span class="param">loops?</span>, <span class="param">onEnd?</span>)<span class="type">Animation</span>
 			</div>
 			<div class="function desc">
-				Creates a new animation based on a horizontal sprite sheet containing the frames directly next to each other.
+				Creates a new animation based on a horizontal sprite sheet containing the frames directly next to each other.
 			</div>
 			
 				<div class="function-signature">
