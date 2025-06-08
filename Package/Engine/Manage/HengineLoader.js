@@ -845,9 +845,13 @@ class HengineLoader {
 	static loader = null;
 	constructor() {
 		// window setup
-		document.body.style.width = "100vw";
-		document.body.style.height = "100vh";
-		document.body.style.backgroundColor = "#000";
+		Object.assign(document.body.style, {
+			width: "100vw",
+			height: "100vh",
+			backgroundColor: "#000",
+			margin: "0",
+			overflow: "hidden"
+		});
 
 		this.engine = new Hengine();
 

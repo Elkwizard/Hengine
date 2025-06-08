@@ -14,10 +14,6 @@
  */
 class Hengine {
 	constructor() {
-		const wrapper = document.body;
-		wrapper.style.overflow = "hidden";
-		wrapper.style.margin = 0;
-
 		// input / output
 		this.mouse = new MouseHandler(this);
 		this.touches = new TouchHandler(this);
@@ -25,7 +21,7 @@ class Hengine {
 		this.clipboard = new ClipboardHandler();
 
 		// rendering
-		this.canvas = new CanvasImage(wrapper, this);
+		this.canvas = new CanvasImage(document.body, this);
 		this.renderer = this.canvas.renderer;
 		this.ui = this.canvas.ui;
 		

@@ -90,11 +90,13 @@ class CanvasImage extends ImageType {
 	createCanvas() {
 		const canvas = document.createElement("canvas");
 
-		canvas.style.position = "absolute";
-		canvas.style.left = 0;
-		canvas.style.top = 0;
-		canvas.style.width = "100vw";
-		canvas.style.height = "100vh";
+		Object.assign(canvas.style, {
+			position: "absolute",
+			left: "0",
+			top: "0",
+			width: "100vw",
+			height: "100vh"
+		});
 
 		this.wrapper.appendChild(canvas);
 		
@@ -133,10 +135,12 @@ class CanvasImage extends ImageType {
 				}
 			}
 	
-			canvas.style.left = packed.x + "px";
-			canvas.style.top = packed.y + "px";
-			canvas.style.width = packed.width + "px";
-			canvas.style.height = packed.height + "px";
+			Object.assign(canvas.style, {
+				left: packed.x + "px",
+				top: packed.y + "px",
+				width: packed.width + "px",
+				height: packed.height + "px"
+			});
 		}
 	}
 	startRendering() {
