@@ -7,8 +7,8 @@
 			this.scriptNumber--;
 		}
 		draw(obj, name, shape) {
-			renderer.draw(Color.DARK_GRAY).rect(shape);
-			renderer.stroke(Color.WHITE).rect(shape);
+			ui.draw(Color.DARK_GRAY).rect(shape);
+			ui.stroke(Color.WHITE).rect(shape);
 		}
 	}
 	const codeInput = scene.main.addUIElement("codeInput", width * 0.75, height / 2, width / 2, height);
@@ -45,19 +45,19 @@ vec4 shader() {
 			let bounds = font.getTextBounds(text);
 			const position = pos.plus(l.renderTextOffset);
 			// renderer.stroke(Color.BLUE).rect(pos.plus(l.renderTextOffset).x, pos.plus(l.renderTextOffset).y, bounds.width, bounds.height);
-			renderer.draw(color).text(font, text, position);
+			ui.draw(color).text(font, text, position);
 		}
 	}
 	l.renderTextOffset = new Vector2(50, 0);
 	l.renderText = (text, font, pos, getLoc, lineIndex) => {
-		//renderer.draw(Color.LIGHT_GRAY).text(font, text, pos.plus(l.renderTextOffset)); 
-		renderer.draw(Color.WHITE).text(font, lineIndex + 1, pos);
+		//ui.draw(Color.LIGHT_GRAY).text(font, text, pos.plus(l.renderTextOffset)); 
+		ui.draw(Color.WHITE).text(font, lineIndex + 1, pos);
 		let startTabs = text.match(/^\t+/g);
 		if (startTabs) {
 			startTabs = startTabs[0].length;
 			let tabWidth = font.getTextWidth("\t");
 			for (let i = 0; i < startTabs; i++)
-				renderer.stroke(Color.GRAY).line(
+				ui.stroke(Color.GRAY).line(
 					i * tabWidth + pos.x + l.renderTextOffset.x,
 					pos.y + l.renderTextOffset.y,
 					i * tabWidth + pos.x + l.renderTextOffset.x,
