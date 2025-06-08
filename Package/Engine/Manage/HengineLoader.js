@@ -849,29 +849,30 @@ class HengineLoader {
 		document.body.style.height = "100vh";
 		document.body.style.backgroundColor = "#000";
 
-		this.hengine = new Hengine();
+		this.engine = new Hengine();
 
 		//window
-		window.hengine = this.hengine;
-		window.scene = this.hengine.scene;
-		window.renderer = this.hengine.renderer;
-		window.keyboard = this.hengine.keyboard;
-		window.mouse = this.hengine.mouse;
-		window.touches = this.hengine.touches;
-		window.clipboard = this.hengine.clipboard;
-		window.fileSystem = this.hengine.fileSystem;
-		window.intervals = this.hengine.intervals;
-		window.canvas = this.hengine.canvas;
+		window.hengine = this.engine;
+		window.scene = this.engine.scene;
+		window.renderer = this.engine.renderer;
+		window.ui = this.engine.ui;
+		window.keyboard = this.engine.keyboard;
+		window.mouse = this.engine.mouse;
+		window.touches = this.engine.touches;
+		window.clipboard = this.engine.clipboard;
+		window.fileSystem = this.engine.fileSystem;
+		window.intervals = this.engine.intervals;
+		window.canvas = this.engine.canvas;
 
 		const hengineLoader = this;
 		if (!(window.width || window.height || window.middle)) {
 			Object.defineProperty(window, "middle", {
 				get() {
-					return new Vector2(hengineLoader.hengine.canvas.width / 2, hengineLoader.hengine.canvas.height / 2);
+					return new Vector2(hengineLoader.engine.canvas.width / 2, hengineLoader.engine.canvas.height / 2);
 				}
 			});
-			objectUtils.shortcut(window, hengineLoader.hengine.canvas, "width");
-			objectUtils.shortcut(window, hengineLoader.hengine.canvas, "height");
+			objectUtils.shortcut(window, hengineLoader.engine.canvas, "width");
+			objectUtils.shortcut(window, hengineLoader.engine.canvas, "height");
 		}
 
 		window.loadResource = this.loadResource.bind(this);
@@ -1006,7 +1007,7 @@ class HengineLoader {
 
 			console.timeEnd("loading user resources");
 
-			if (done) hengineLoader.hengine.intervals.start();
+			if (done) hengineLoader.engine.intervals.start();
 
 			return hengineLoader;
 		}
@@ -1106,7 +1107,8 @@ class HengineLoader {
  * @prop TouchHandler touches | The touchscreen input API for the Hengine
  * @prop ClipboardHandler clipboard | The clipboard I/O API for the Hengine
  * @prop CanvasImage canvas | The canvas on which rendering occurs
- * @prop CanvasArtist renderer | The 2D (and 3D, in 3D Mode) renderer that affects the screen
+ * @prop CanvasArtist renderer | The 2D or 3D renderer that affects the screen
+ * @prop CanvasArtist2D ui | The 2D Screen-Space overlay renderer that affects the screen
  * @prop Scene scene | The scene that contains all SceneElements
  * @prop IntervalManager intervals | The timing and scheduling API for the Hengine
  * @prop Files fileSystem | The built-in, localStorage-based file system API

@@ -114,8 +114,8 @@ class Scene {
 		return { hitPoint: rd.times(bestDist).plus(ro), hitShape: bestShape };
 	}
 	/**
-	 * Returns a list of all the WorldObjects that contain a specific world-space point.
-	 * @param VectorN point | The world-space point to check
+	 * Returns a list of all the WorldObjects that contain a specific World-Space point.
+	 * @param VectorN point | The World-Space point to check
 	 * @return WorldObject[]
 	 */
 	collidePoint(point) {
@@ -209,26 +209,16 @@ class Scene {
 	render(camera) {
 		camera.cacheScreen();
 
-		camera.transformToWorld(camera.renderer);
-
 		this.renderOrder = [...this.main.sceneObjectArray]
-			.sort((a, b) => a.layer - b.layer)
-			.sort((a, b) => (a instanceof UIObject) - (b instanceof UIObject));
-		
-		let ui = false;
+			.sort((a, b) => a.layer - b.layer);
 
-		for (let i = 0; i < this.renderOrder.length; i++) {
-			const object = this.renderOrder[i];
-			if (!ui && object instanceof UIObject) {
-				ui = true;
-				camera.transformToScreen(camera.renderer);
+		camera.drawInWorldSpace(() => {
+			for (let i = 0; i < this.renderOrder.length; i++) {
+				const object = this.renderOrder[i];
+				object.engineDraw(camera);
+				object.lifeSpan++;
 			}
-			object.engineDraw(camera);
-			object.lifeSpan++;
-		}
-
-		if (!ui)
-			camera.transformToScreen(camera.renderer);
+		});
 	}
 	script(type, ...args) {
 		const objects = this.main.sceneObjectArray;

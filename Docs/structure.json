@@ -45,6 +45,7 @@
 		"ScriptContainer": null
 	},
 	"Rendering": {
+		"Coordinate Spaces": ["World-Space", "Camera-Space", "Screen-Space"],
 		"GLSL API": {
 			"Basics": ["GLSL API", "CubeMap", "Sampler", "SamplerSettings", "FilterMode"],
 			"GPUInterface": null,

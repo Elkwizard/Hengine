@@ -2,7 +2,7 @@
  * @name class Particle
  * Every instance of PARTICLE_SPAWNER has a `.Particle` member class with an identical structure.
  * This represents a single particle in a particle system.
- * @prop Vector2 position | The world-space position of the particle
+ * @prop Vector2 position | The World-Space position of the particle
  * @prop Vector2 velocity | The velocity per frame of the particle
  * @prop Number timer | The proportion of the particle's lifespan that has elapsed. Setting this to 1 will remove the particle
  * @prop Object data | This object is not used by the engine, and can be modified in any way to represent particle-specific data
@@ -42,7 +42,7 @@
  * @name draw?
  * The function that is called to render particles each frame.
  * This function should minimize side effects and, if possible, should be pure.
- * @param Artist2D renderer | The renderer to draw the particle to. Its transform will be in world-space, unless the spawner is a UIObject
+ * @param Artist2D renderer | The renderer to draw the particle to. Its transform will be in World-Space, unless the spawner is a UIObject
  * @param Particle particle | The particle to render
  */
 
@@ -82,8 +82,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		// built-in caches
 		this.scene = obj.engine.scene;
 		this.camera = this.scene.camera;
-		this.canvas = obj.engine.canvas;
-		this.renderer = this.canvas.renderer;
+		this.canvas = obj.renderer.imageType;
 		this.physicsEngine = this.scene.physicsEngine;
 
 		this.particles = [];
@@ -146,11 +145,18 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.delay = p.delay ?? this.delay ?? 1;
 		const imageType = p.imageType ?? this.frame?.constructor ?? FastFrame;
 		this.separateFrame = imageType !== CanvasImage;
-		if (this.separateFrame)
-			this.frame = PARTICLE_SPAWNER[imageType.name] ?? (PARTICLE_SPAWNER[imageType.name] = new imageType(obj.engine.canvas.width, obj.engine.canvas.height));
-		else this.frame = this.canvas;
+		if (this.separateFrame) {
+			PARTICLE_SPAWNER[imageType.name] ??= new imageType(
+				this.canvas.width, this.canvas.height,
+				this.canvas.pixelRatio
+			);
+			this.frame = PARTICLE_SPAWNER[imageType.name];
+			this.gl = this.frame.renderer;
+		} else {
+			this.frame = this.canvas;
+			this.gl = obj.renderer;
+		}
 		this.data = { ...this.data, ...p.data };
-		this.gl = this.frame.renderer;
 		
 		if ("update" in p) {
 			const { update } = p;
@@ -162,7 +168,9 @@ class PARTICLE_SPAWNER extends ElementScript {
 				this.computation.output = this.computation.getUniform("particles");
 				this.computation.setUniform("particles", this.particles);
 			}
-		} else this.particleUpdate ??= () => null;
+		} else {
+			this.particleUpdate ??= () => null;
+		}
 	}
 	addParticle(obj, position) {
 		const particle = new this.Particle(position, this);
@@ -246,7 +254,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		}
 	}
 	/**
-	 * Returns the smallest axis-aligned world-space rectangle that contains all of the particles in the system.
+	 * Returns the smallest axis-aligned World-Space rectangle that contains all of the particles in the system.
 	 * @return Rect
 	 */
 	getBoundingBox(obj) {
@@ -261,15 +269,24 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 		if (this.separateFrame) {
 			frame.resize(this.canvas.width, this.canvas.height);
-			gl.transform = this.renderer.transform;
+			gl.transform = obj.renderer.transform;
 		}
 
-		let { x, y, width, height } = this.camera.screen;
-		if (obj instanceof UIObject) x = y = 0;
-		const minX = x - radius;
-		const minY = y - radius;
-		const maxX = x + width + radius * 2;
-		const maxY = y + height + radius * 2;
+		let bounds;
+		if (obj instanceof UIObject) {
+			bounds = new Rect(
+				0, 0,
+				this.canvas.width,
+				this.canvas.height
+			);
+		} else {
+			bounds = this.camera.screen;
+		}
+
+		bounds = Rect.fromMinMax(
+			bounds.min.minus(radius),
+			bounds.max.plus(radius)
+		);
 
 		let anyParticlesRendered = false;
 
@@ -277,11 +294,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 		for (let i = 0; i < particles.length; i++) {
 			const p = particles[i];
-			const { x, y } = p.position;
-			if (
-				x >= minX && y >= minY &&
-				x <= maxX && y <= maxY
-			) {
+			if (bounds.containsPoint(p.position)) {
 				this.particleDraw(gl, p);
 				anyParticlesRendered = true;
 			}
@@ -300,14 +313,14 @@ class PARTICLE_SPAWNER extends ElementScript {
 			const next = elements[index + 1];
 
 			if (
-				next && !next.hidden && next.scripts.has(PARTICLE_SPAWNER) &&
-				next.scripts.PARTICLE_SPAWNER.frame.constructor === frame.constructor
-			) return;
-			
-			if (obj instanceof UIObject) this.renderer.image(frame).default(0, 0);
-			else this.camera.drawInScreenSpace(() => this.renderer.image(frame).default(0, 0));
-			gl.clear();
-			PARTICLE_SPAWNER.anyParticlesRendered = false;
+				!next || next.hidden || !next.scripts.has(PARTICLE_SPAWNER) ||
+				next.scripts.PARTICLE_SPAWNER.frame.constructor !== frame.constructor ||
+				obj.renderer !== next.renderer
+			) {
+				obj.renderer.overlay(frame);
+				gl.clear();
+				PARTICLE_SPAWNER.anyParticlesRendered = false;
+			}
 		}
 	}
 }

@@ -3,10 +3,44 @@
  */
 
 /**
+ * @page World-Space
+ * The location in which all WorldObjects exist.
+ * This space is fixed, and can only appear to move by virtue of the Camera moving.
+ * The dimensionality of this space depends on whether the engine is in 2D Mode or 3D Mode.
+ * Positions are represented by a VectorN, and transformations are represented by a TransformMatrixN.
+ * WorldObjects should be drawn in World-Space.
+ * All rendering targeted at `renderer` will be in this space by default when inside an ElementScript's `draw()`/`escapeDraw()` handler.
+ * However, when in `draw()`, the WorldObject's Transform will also be applied.
+ */
+
+/**
+ * @page Camera-Space
+ * A coordinate frame overlapping world-space which is completely relative to the camera.
+ * This has the same dimensionality as world-space, but moves as the camera moves and rotates.
+ * In 2D Mode, It is aligned in so that it is identical to screen-space, except insofar as it is in the same space as WorldObjects.
+ * Positions are represented by a VectorN and transformations are represented by a TransformMatrixN.
+ * UIObjects that are intended to be interspersed with world elements should be drawn in Camera-Space.
+ * All rendering targeted at `renderer` will be in this space by default when outside an ElementScript's `draw()`/`escapeDraw()` handler.
+ */
+
+/**
+ * @page Screen-Space
+ * A coordinate frame representing positions in the UI overlay, relative to the upper-left corner of the monitor.
+ * Coordinates are represented in units of CSS Pixels, and the frame is unrotated relative to the monitor.
+ * Positions are represented by a Vector2 and transformations are represented by a Matrix3.
+ * UIObjects should, in general, be drawn in Screen-Space.
+ * All rendering targeted at `ui` will be in this space by default.
+ */
+
+/**
  * @name class Camera extends Matrix
  * @interface
+ * @type interface Camera<Vector> extends Matrix
  * Represents a camera in a scene targeting a specific rendering surface.
- * The transformation represented by this matrix is from world-space to screen-space.
+ * The transformation represented by this matrix is from World-Space to Camera-Space.
+ * `Vector` in the context of this class refers to either `Vector2` or `Vector3` depending on whether Camera2D or Camera3D is used.
+ * Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
+ * @prop Vector position | The location of the camera in World-Space
  * @prop Number zoom | The magnification level of the camera
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
  */
@@ -49,57 +83,69 @@ class Camera {
 		this.zoom *= factor;
 	}
 	/**
-	 * Maps a given point from screen-space to world-space.
-	 * @param Vector2 point | The point to transform
-	 * @return Vector2
+	 * Maps a given point from Camera-Space to World-Space.
+	 * @param Vector point | The point to transform
+	 * @return Vector
 	 */
-	screenToWorld(point) {
+	cameraToWorld(point) {
 		return this.inverse.times(point);
+	}
+	screenToWorld(point) {
+		return this.cameraToWorld(point);
 	}
 	screenSpaceToWorldSpace(point) {
 		return this.screenToWorld(point);
 	}
 	/**
-	 * Maps a given point from world-space to screen-space.
-	 * @param Vector2 point | The point to transform
-	 * @return Vector2
+	 * Maps a given point from World-Space to Camera-Space.
+	 * @param Vector point | The point to transform
+	 * @return Vector
 	 */
-	worldToScreen(point) {
+	worldToCamera(point) {
 		return this.times(point);
+	}
+	worldToScreen(point) {
+		return this.worldToCamera(point);
 	}
 	worldSpaceToScreenSpace(point) {
 		return this.worldToScreen(point);
 	}
 	/**
-	 * Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
-	 * @param () => void render | The function to call while in the world-space context
+	 * Assuming the renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * @param () => void render | The function to call while in the World-Space context
 	 */
 	drawInWorldSpace(artist) {
 		this.transformToWorld();
 		artist();
-		this.transformToScreen();
+		this.transformToCamera();
 	}
 	/**
-	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
-	 * @param () => void render | The function to call while in the screen-space context
+	 * Assuming the renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * @param () => void render | The function to call while in the Camera-Space context
 	 */
-	drawInScreenSpace(artist) {
-		this.transformToScreen();
+	drawInCameraSpace(artist) {
+		this.transformToCamera();
 		artist();
 		this.transformToWorld();
+	}
+	drawInScreenSpace(artist) {
+		this.drawInCameraSpace(artist);
 	}
 	transformToWorld() {
 		this.renderer.enterWorldSpace(this);
 	}
-	transformToScreen() {
+	transformToCamera() {
 		this.renderer.exitWorldSpace(this);
+	}
+	transformToScreen() {
+		this.transformToCamera();
 	}
 }
 
 /**
  * @implements Camera
+ * @type class Camera2D extends Matrix3 implements Camera<Vector2>
  * Represents the camera in a 2D scene.
- * @prop Vector2 position | The current center of the camera's view.
  */
 class Camera2D extends Matrix3 {
 	/**
@@ -203,7 +249,7 @@ class Camera2D extends Matrix3 {
 		);
 	}
 	/**
-	 * Zooms in/out about a specific point (in world-space) by a specific factor.
+	 * Zooms in/out about a specific point (in World-Space) by a specific factor.
 	 * @param Vector2 center | The zoom center
 	 * @param Number factor | The zoom multiplier
 	 */

@@ -244,7 +244,7 @@ class PHYSICS extends ElementScript {
 	// custom methods
 	/**
 	 * Applies an impulse to a specific point on the object.
-	 * @param VectorN point | The world-space point at which the impulse should be applied
+	 * @param VectorN point | The World-Space point at which the impulse should be applied
 	 * @param VectorN impulse | The impulse to apply
 	 */
 	applyImpulse(obj, point, force) {
@@ -257,7 +257,7 @@ class PHYSICS extends ElementScript {
 	/**
 	 * Applies an impulse to a specific point on the object.
 	 * The impulse will be scaled by the mass of the object.
-	 * @param VectorN point | The world-space point at which the impulse should be applied
+	 * @param VectorN point | The World-Space point at which the impulse should be applied
 	 * @param VectorN impulse | The impulse to apply, which will be scaled
 	 */
 	applyImpulseMass(obj, point, force) {

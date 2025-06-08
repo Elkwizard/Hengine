@@ -234,8 +234,8 @@ class Vector extends Operable {
  * console.log(i.cross(j)); // 1
  * console.log(i.plus(j).normalize()); // (1/√2, 1/√2)
  * ```
- * @prop Number angle | The clockwise (in screen-space) angle of the vector from the horizontal
- * @prop Vector2 normal | The vector with the same magnitude but perpendicular direction. Right-handed (in screen-space)
+ * @prop Number angle | The clockwise (in Screen-Space) angle of the vector from the horizontal
+ * @prop Vector2 normal | The vector with the same magnitude but perpendicular direction. Right-handed (in Screen-Space)
  * @static_prop String[] modValues | The modifiable elements of the vector, `["x", "y"]`
  */
 class Vector2 extends Vector {
@@ -307,7 +307,7 @@ class Vector2 extends Vector {
 		return dst;
 	}
 	/**
-	 * Rotates the vector clockwise (in screen-space). This operation is in-place and returns the caller.
+	 * Rotates the vector clockwise (in Screen-Space). This operation is in-place and returns the caller.
 	 * @param Number angle | The amount (in radians) to rotate by
 	 * @return Vector2
 	 */
@@ -321,7 +321,7 @@ class Vector2 extends Vector {
 		return this;
 	}
 	/**
-	 * Returns a copy of the vector rotated clockwise (in screen-space) by a specified angle.
+	 * Returns a copy of the vector rotated clockwise (in Screen-Space) by a specified angle.
 	 * @param Number angle | The amount (in radians) to rotate by 
 	 * @return Vector2
 	 */
@@ -453,7 +453,7 @@ class Vector2 extends Vector {
 	}
 	/**
 	 * @group static get left, static get right, static get up, static get down
-	 * Returns a new unit vector pointing in a specified direction (in screen-space).
+	 * Returns a new unit vector pointing in a specified direction (in Screen-Space).
 	 * @return Vector2
 	 */
 	static get left() {
@@ -492,7 +492,7 @@ class Vector2 extends Vector {
 		return new Vector2(0, y);
 	}
 	/**
-	 * Creates a unit vector with a specified clockwise (in screen-space) angle from the horizontal.
+	 * Creates a unit vector with a specified clockwise (in Screen-Space) angle from the horizontal.
 	 * @param Number angle | The angle of the vector
 	 * @return Vector2
 	 */
@@ -501,7 +501,7 @@ class Vector2 extends Vector {
 	}
 	/**
 	 * Creates a cartesian vector from a given set of polar coordinates .
-	 * @param Number θ | The clockwise (in screen-space) angle from the horizontal
+	 * @param Number θ | The clockwise (in Screen-Space) angle from the horizontal
 	 * @param Number r? | The distance from the origin. Default is 1 
 	 * @return Vector2 
 	 */

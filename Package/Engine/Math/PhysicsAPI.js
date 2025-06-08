@@ -18,7 +18,7 @@ class Constraint {
 	}
 	
 	/**
-	 * Returns the world-space location of the constrained points.
+	 * Returns the World-Space location of the constrained points.
 	 * @return VectorN[2]
 	 */
 	get ends() {
@@ -143,7 +143,7 @@ class Constraint2 extends Constraint {
  * Represents a collision with another SceneObject.
  * @prop SceneObject element | The object that is being collided with
  * @prop VectorN direction | A unit vector along the collision normal pointing toward the other object
- * @prop VectorN[] contacts | A list of world-space contact points between the two objects
+ * @prop VectorN[] contacts | A list of World-Space contact points between the two objects
  * @prop Boolean isTrigger | Indicates whether the object being collided with requested that the collision be a trigger collision. A trigger collision is not resolved
  */
 class CollisionData {

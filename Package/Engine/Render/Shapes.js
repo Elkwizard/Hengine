@@ -443,7 +443,7 @@ class Polygon extends Shape2D {
 		return this.getEdges();
 	}
 	/**
-	 * Returns a copy of the polygon rotated clockwise (in screen-space) by a specified angle.
+	 * Returns a copy of the polygon rotated clockwise (in Screen-Space) by a specified angle.
 	 * @param Number angle | The angle to rotate by (in radians)
 	 * @return Polygon 
 	 */
@@ -591,18 +591,14 @@ class Rect extends Polygon {
 		this.width = width;
 		this.height = height;
 		this.area = this.width * this.height;
+		this.xRange = new Range(this.x, this.x + this.width);
+		this.yRange = new Range(this.y, this.y + this.height);
 	}
 	get min() {
 		return new Vector2(this.x, this.y);
 	}
 	get max() {
 		return new Vector2(this.x + this.width, this.y + this.height);
-	}
-	get xRange() {
-		return new Range(this.x, this.x + this.width);
-	}
-	get yRange() {
-		return new Range(this.y, this.y + this.height);
 	}
 	get middle() {
 		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
@@ -643,6 +639,9 @@ class Rect extends Polygon {
 	}
 	cullBox(box) {
 		return !this.intersectSameType(box);
+	}
+	cullPoint(point) {
+		return !this.containsPoint(point);
 	}
 	move(dir) {
 		return new Rect(

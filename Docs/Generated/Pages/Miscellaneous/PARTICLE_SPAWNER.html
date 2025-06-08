@@ -131,7 +131,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="set PARTICLE_SPAWNER.prototype.particleCount()">
 			<div class="function-header member">
-				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L115" target="_blank" class="function-name source-link">particleCount</a>(<span class="param">count</span>)
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L114" target="_blank" class="function-name source-link">particleCount</a>(<span class="param">count</span>)
 			</div>
 			<div class="function desc">
 				Sets the number of particles in the system.
@@ -158,7 +158,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="get PARTICLE_SPAWNER.prototype.particleCount()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L125" target="_blank" class="function-name source-link">particleCount</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L124" target="_blank" class="function-name source-link">particleCount</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the current number of particles in the system.
@@ -168,7 +168,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="PARTICLE_SPAWNER.prototype.removeAllParticles()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L131" target="_blank" class="function-name source-link">removeAllParticles</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L130" target="_blank" class="function-name source-link">removeAllParticles</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Removes all of the particles from the system
@@ -178,7 +178,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="PARTICLE_SPAWNER.prototype.setProperties()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L138" target="_blank" class="function-name source-link">setProperties</a>(<span class="param">properties</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L137" target="_blank" class="function-name source-link">setProperties</a>(<span class="param">properties</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets an inclusive subset of the properties of the system.
@@ -205,7 +205,7 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="PARTICLE_SPAWNER.prototype.explode()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L179" target="_blank" class="function-name source-link">explode</a>(<span class="param">count</span>, <span class="param">position?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L187" target="_blank" class="function-name source-link">explode</a>(<span class="param">count</span>, <span class="param">position?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Creates a collection of particles at once.
@@ -242,10 +242,10 @@ All properties of this class are read-only.
 	
 		<div class="function-wrapper" id="PARTICLE_SPAWNER.prototype.getBoundingBox()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L252" target="_blank" class="function-name source-link">getBoundingBox</a>()<span class="type"><a href="../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L260" target="_blank" class="function-name source-link">getBoundingBox</a>()<span class="type"><a href="../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
 			</div>
 			<div class="function desc">
-				Returns the smallest axis-aligned world-space rectangle that contains all of the particles in the system.
+				Returns the smallest axis-aligned <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> rectangle that contains all of the particles in the system.
 			</div>
 			
 		</div>
@@ -270,7 +270,7 @@ This represents a single particle in a particle system.
 					<div class="prop-header member">
 						<span class="prop-name">position</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 					</div>
-					<div class="prop desc">The world-space position of the particle</div>
+					<div class="prop desc">The <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> position of the particle</div>
 				</div>
 			
 				<div class="prop-wrapper" id="Particle.velocity">
@@ -449,7 +449,7 @@ This function should minimize side effects and, if possible, should be pure.
 								<span class="type"><a href="../Rendering/Renderer/2D/Artists/Artist2D.html#class Artist2D">Artist2D</a></span>
 							</div>
 							<div class="param desc">
-								The renderer to draw the particle to. Its transform will be in world-space, unless the spawner is a <a href="../Management/SceneObject.html#class UIObject">UIObject</a>
+								The renderer to draw the particle to. Its transform will be in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>, unless the spawner is a <a href="../Management/SceneObject.html#class UIObject">UIObject</a>
 							</div>
 						</div>
 					

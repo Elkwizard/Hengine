@@ -1,0 +1,77 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="page-wrapper">
+				<div class="page-header">
+					<span class="page-name">World-Space</span>
+				</div>
+
+				<div class="page desc">
+					The location in which all <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> exist.
+This space is fixed, and can only appear to move by virtue of the <a href="../Rendering/Camera/Camera.html#class Camera">Camera</a> moving.
+The dimensionality of this space depends on whether the engine is in 2D Mode or 3D Mode.
+Positions are represented by a <span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span>, and transformations are represented by a <span class="alias">
+			<span class="alias two"><a href="../Geometry/Matrices.html#class Matrix3">Matrix3</a></span>
+			<span class="alias three"><a href="../Geometry/Matrices.html#class Matrix4">Matrix4</a></span>
+			<span class="alias general">TransformMatrixN</span>
+		</span>.
+<a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> should be drawn in World-Space.
+All rendering targeted at <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">renderer</span></code> will be in this space by default when inside an <a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a>'s <code class=" highlight-BACKGROUND"><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">()</span></code>/<code class=" highlight-BACKGROUND"><span class="highlight-FUNCTION">escapeDraw</span><span class="highlight-SYMBOL">()</span></code> handler.
+However, when in <code class=" highlight-BACKGROUND"><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">()</span></code>, the <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>'s <a href="../Geometry/Transform.html#class Transform">Transform</a> will also be applied.
+				</div>
+
+			</div>
+		
+			<div class="page-wrapper">
+				<div class="page-header">
+					<span class="page-name"><a href="../Rendering/Camera/Camera.html#class Camera">Camera</a>-Space</span>
+				</div>
+
+				<div class="page desc">
+					A coordinate frame overlapping world-space which is completely relative to the camera.
+This has the same dimensionality as world-space, but moves as the camera moves and rotates.
+In 2D Mode, It is aligned in so that it is identical to screen-space, except insofar as it is in the same space as <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a>.
+Positions are represented by a <span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span> and transformations are represented by a <span class="alias">
+			<span class="alias two"><a href="../Geometry/Matrices.html#class Matrix3">Matrix3</a></span>
+			<span class="alias three"><a href="../Geometry/Matrices.html#class Matrix4">Matrix4</a></span>
+			<span class="alias general">TransformMatrixN</span>
+		</span>.
+<a href="../Management/SceneObject.html#class UIObject">UIObjects</a> that are intended to be interspersed with world elements should be drawn in <a href="../Rendering/Camera/Camera.html#class Camera">Camera</a>-Space.
+All rendering targeted at <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">renderer</span></code> will be in this space by default when outside an <a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a>'s <code class=" highlight-BACKGROUND"><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">()</span></code>/<code class=" highlight-BACKGROUND"><span class="highlight-FUNCTION">escapeDraw</span><span class="highlight-SYMBOL">()</span></code> handler.
+				</div>
+
+			</div>
+		
+			<div class="page-wrapper">
+				<div class="page-header">
+					<span class="page-name">Screen-Space</span>
+				</div>
+
+				<div class="page desc">
+					A coordinate frame representing positions in the UI overlay, relative to the upper-left corner of the monitor.
+Coordinates are represented in units of CSS Pixels, and the frame is unrotated relative to the monitor.
+Positions are represented by a <a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a> and transformations are represented by a <a href="../Geometry/Matrices.html#class Matrix3">Matrix3</a>.
+<a href="../Management/SceneObject.html#class UIObject">UIObjects</a> should, in general, be drawn in Screen-Space.
+All rendering targeted at <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">ui</span></code> will be in this space by default.
+				</div>
+
+			</div>
+		
+			</body>
+		</html>
+	

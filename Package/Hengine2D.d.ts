@@ -51,9 +51,13 @@ declare enum ScalingMode {
  */
 declare class CanvasImage extends ImageType {
 	/**
-	 * A 2D (and 3D, in 3D Mode) renderer which can draw to the screen. WorldObjects will be drawn to this surface's world-space. UIObjects will be rendered to this surface's screen-space
+	 * A 2D or 3D renderer which can draw to the screen. WorldObjects will be drawn to this surface's World-Space
 	 */
 	renderer: CanvasArtist;
+	/**
+	 * A 2D renderer which targets a Screen-Space overlay on top of the canvas. Content on this will not be considered when this object is used as an ImageType
+	 */
+	ui: CanvasArtist2D;
 	/**
 	 * The cursor icon. This can be either an image or a CSS cursor name
 	 */
@@ -225,9 +229,13 @@ declare class Hengine {
 	 */
 	canvas: CanvasImage;
 	/**
-	 * The 2D (and 3D, in 3D Mode) renderer associated with the canvas. Draws directly on the screen
+	 * The 2D or 3D renderer associated with the canvas. Draws directly on the screen
 	 */
 	renderer: CanvasArtist;
+	/**
+	 * The 2D Screen-Space overlay renderer associated with the canvas. Draws directly on the screen
+	 */
+	ui: CanvasArtist2D;
 	/**
 	 * The scene containing all the objects currently in the engine
 	 */
@@ -576,9 +584,14 @@ declare const clipboard: ClipboardHandler;
 declare const canvas: CanvasImage;
 
 /**
- * The 2D (and 3D, in 3D Mode) renderer that affects the screen
+ * The 2D or 3D renderer that affects the screen
  */
 declare const renderer: CanvasArtist;
+
+/**
+ * The 2D Screen-Space overlay renderer that affects the screen
+ */
+declare const ui: CanvasArtist2D;
 
 /**
  * The scene that contains all SceneElements
@@ -890,8 +903,8 @@ declare class Scene {
 	 */
 	rayCast(rayOrigin: VectorN, rayDirection: VectorN, mask?: (arg0: WorldObject) => boolean): { hitShape: WorldObject, hitPoint: VectorN } | null;
 	/**
-	 * Returns a list of all the WorldObjects that contain a specific world-space point.
-	 * @param point - The world-space point to check
+	 * Returns a list of all the WorldObjects that contain a specific World-Space point.
+	 * @param point - The World-Space point to check
 	 */
 	collidePoint(point: VectorN): WorldObject[];
 	/**
@@ -1518,7 +1531,7 @@ declare class Matrix3 extends Matrix {
 	toCSS(): string;
 	/**
 	 * Creates a 2D rotation matrix and optionally stores it in a provided destination.
-	 * @param theta - The clockwise (in screen-space) angle (in radians) to rotate by
+	 * @param theta - The clockwise (in Screen-Space) angle (in radians) to rotate by
 	 * @param result - The matrix to copy the rotation matrix into
 	 */
 	static rotation(theta: number, result?: Matrix3): Matrix3;
@@ -1567,7 +1580,7 @@ declare class Matrix4 extends Matrix {
  */
 declare class Constraint {
 	/**
-	 * Returns the world-space location of the constrained points.
+	 * Returns the World-Space location of the constrained points.
 	 */
 	get ends(): VectorN[];
 	/**
@@ -1645,7 +1658,7 @@ declare class CollisionData {
 	 */
 	direction: VectorN;
 	/**
-	 * A list of world-space contact points between the two objects
+	 * A list of World-Space contact points between the two objects
 	 */
 	contacts: VectorN[];
 	/**
@@ -2137,11 +2150,11 @@ declare class Vector extends Operable {
  */
 declare class Vector2 extends Vector {
 	/**
-	 * The clockwise (in screen-space) angle of the vector from the horizontal
+	 * The clockwise (in Screen-Space) angle of the vector from the horizontal
 	 */
 	angle: number;
 	/**
-	 * The vector with the same magnitude but perpendicular direction. Right-handed (in screen-space)
+	 * The vector with the same magnitude but perpendicular direction. Right-handed (in Screen-Space)
 	 */
 	normal: this;
 	/**
@@ -2155,12 +2168,12 @@ declare class Vector2 extends Vector {
 	 */
 	constructor(x: number, y: number);
 	/**
-	 * Rotates the vector clockwise (in screen-space). This operation is in-place and returns the caller.
+	 * Rotates the vector clockwise (in Screen-Space). This operation is in-place and returns the caller.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
 	rotate(angle: number): this;
 	/**
-	 * Returns a copy of the vector rotated clockwise (in screen-space) by a specified angle.
+	 * Returns a copy of the vector rotated clockwise (in Screen-Space) by a specified angle.
 	 * @param angle - The amount (in radians) to rotate by
 	 */
 	rotated(angle: number): this;
@@ -2170,19 +2183,19 @@ declare class Vector2 extends Vector {
 	 */
 	cross(v: this): number;
 	/**
-	 * Returns a new unit vector pointing in a specified direction (in screen-space).
+	 * Returns a new unit vector pointing in a specified direction (in Screen-Space).
 	 */
 	static left: Vector2;
 	/**
-	 * Returns a new unit vector pointing in a specified direction (in screen-space).
+	 * Returns a new unit vector pointing in a specified direction (in Screen-Space).
 	 */
 	static right: Vector2;
 	/**
-	 * Returns a new unit vector pointing in a specified direction (in screen-space).
+	 * Returns a new unit vector pointing in a specified direction (in Screen-Space).
 	 */
 	static up: Vector2;
 	/**
-	 * Returns a new unit vector pointing in a specified direction (in screen-space).
+	 * Returns a new unit vector pointing in a specified direction (in Screen-Space).
 	 */
 	static down: Vector2;
 	/**
@@ -2200,13 +2213,13 @@ declare class Vector2 extends Vector {
 	 */
 	static y(y: number): Vector2;
 	/**
-	 * Creates a unit vector with a specified clockwise (in screen-space) angle from the horizontal.
+	 * Creates a unit vector with a specified clockwise (in Screen-Space) angle from the horizontal.
 	 * @param angle - The angle of the vector
 	 */
 	static fromAngle(angle: number): Vector2;
 	/**
 	 * Creates a cartesian vector from a given set of polar coordinates .
-	 * @param  - The clockwise (in screen-space) angle from the horizontal
+	 * @param  - The clockwise (in Screen-Space) angle from the horizontal
 	 * @param r - The distance from the origin. Default is 1
 	 */
 	static polar(θ: number, r?: number): Vector2;
@@ -3554,9 +3567,15 @@ declare class AnimationStateMachine extends ImageType {
 
 /**
  * Represents a camera in a scene targeting a specific rendering surface.
- * The transformation represented by this matrix is from world-space to screen-space.
+ * The transformation represented by this matrix is from World-Space to Camera-Space.
+ * `Vector` in the context of this class refers to either `Vector2` or `Vector3` depending on whether Camera2D or Camera3D is used.
+ * Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
  */
-declare interface Camera extends Matrix {
+declare interface Camera<Vector> extends Matrix {
+	/**
+	 * The location of the camera in World-Space
+	 */
+	position: Vector;
 	/**
 	 * The magnification level of the camera
 	 */
@@ -3589,35 +3608,31 @@ declare interface Camera extends Matrix {
 	 */
 	zoomBy(factor: number): void;
 	/**
-	 * Maps a given point from screen-space to world-space.
+	 * Maps a given point from Camera-Space to World-Space.
 	 * @param point - The point to transform
 	 */
-	screenToWorld(point: Vector2): Vector2;
+	cameraToWorld(point: Vector): Vector;
 	/**
-	 * Maps a given point from world-space to screen-space.
+	 * Maps a given point from World-Space to Camera-Space.
 	 * @param point - The point to transform
 	 */
-	worldToScreen(point: Vector2): Vector2;
+	worldToCamera(point: Vector): Vector;
 	/**
-	 * Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
-	 * @param render - The function to call while in the world-space context
+	 * Assuming the renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * @param render - The function to call while in the World-Space context
 	 */
 	drawInWorldSpace(render: () => void): void;
 	/**
-	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
-	 * @param render - The function to call while in the screen-space context
+	 * Assuming the renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * @param render - The function to call while in the Camera-Space context
 	 */
-	drawInScreenSpace(render: () => void): void;
+	drawInCameraSpace(render: () => void): void;
 }
 
 /**
  * Represents the camera in a 2D scene.
  */
-declare class Camera2D extends Matrix3 implements Camera {
-	/**
-	 * The current center of the camera's view.
-	 */
-	position: Vector2;
+declare class Camera2D extends Matrix3 implements Camera<Vector2> {
 	/**
 	 * Creates a new camera pointing to the middle of the provided renderer.
 	 * @param canvas - The rendering surface to target
@@ -3651,7 +3666,7 @@ declare class Camera2D extends Matrix3 implements Camera {
 	 */
 	constrain(x: number, y: number, width: number, height: number): void;
 	/**
-	 * Zooms in/out about a specific point (in world-space) by a specific factor.
+	 * Zooms in/out about a specific point (in World-Space) by a specific factor.
 	 * @param center - The zoom center
 	 * @param factor - The zoom multiplier
 	 */
@@ -3660,6 +3675,10 @@ declare class Camera2D extends Matrix3 implements Camera {
 	 * Returns the axis-aligned bounding box of the current viewport.
 	 */
 	get screen(): Rect;
+	/**
+	 * The location of the camera in World-Space
+	 */
+	position: Vector;
 	/**
 	 * The magnification level of the camera
 	 */
@@ -3692,25 +3711,25 @@ declare class Camera2D extends Matrix3 implements Camera {
 	 */
 	zoomBy(factor: number): void;
 	/**
-	 * Maps a given point from screen-space to world-space.
+	 * Maps a given point from Camera-Space to World-Space.
 	 * @param point - The point to transform
 	 */
-	screenToWorld(point: Vector2): Vector2;
+	cameraToWorld(point: Vector): Vector;
 	/**
-	 * Maps a given point from world-space to screen-space.
+	 * Maps a given point from World-Space to Camera-Space.
 	 * @param point - The point to transform
 	 */
-	worldToScreen(point: Vector2): Vector2;
+	worldToCamera(point: Vector): Vector;
 	/**
-	 * Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
-	 * @param render - The function to call while in the world-space context
+	 * Assuming the renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * @param render - The function to call while in the World-Space context
 	 */
 	drawInWorldSpace(render: () => void): void;
 	/**
-	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
-	 * @param render - The function to call while in the screen-space context
+	 * Assuming the renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * @param render - The function to call while in the Camera-Space context
 	 */
-	drawInScreenSpace(render: () => void): void;
+	drawInCameraSpace(render: () => void): void;
 }
 
 /**
@@ -4624,13 +4643,8 @@ declare class GrayMap implements Serializable {
 /**
  * Represents a renderer for a graphical surface.
  * This is an abstract superclass and should not be constructed.
- * 
  */
 declare class Artist {
-	/**
-	 * Whether the renderer is currently in world-space coordinates
-	 */
-	inWorldSpace: boolean;
 	/**
 	 * Clears the rendering surface to transparent black.
 	 */
@@ -4674,6 +4688,11 @@ declare class Artist {
 	 * Puts the renderer into the state on top of the state stack, then removes it from the stack.
 	 */
 	restore(): void;
+	/**
+	 * Composites an image onto the entire surface of the renderer.
+	 * @param overlay - The image to overlay onto the surface
+	 */
+	overlay(overlay: ImageType): void;
 }
 
 /**
@@ -5523,7 +5542,7 @@ declare class Polygon extends Shape2D {
 	 */
 	getFaces(): Line[];
 	/**
-	 * Returns a copy of the polygon rotated clockwise (in screen-space) by a specified angle.
+	 * Returns a copy of the polygon rotated clockwise (in Screen-Space) by a specified angle.
 	 * @param angle - The angle to rotate by (in radians)
 	 */
 	rotate(angle: number): this;
@@ -5914,13 +5933,13 @@ declare class Transform<Matrix, Vector, Angle> {
 	get direction(): Vector;
 	/**
 	 * Transforms a given point by applying the inverse of the caller to it.
-	 * This translates the point by the inverse of the transform's position and then rotates it counter-clockwise (in screen-space) about the origin by the transform's rotation.
+	 * This translates the point by the inverse of the transform's position and then rotates it counter-clockwise (in Screen-Space) about the origin by the transform's rotation.
 	 * @param point - The point to transform
 	 */
 	globalToLocal(point: Vector): Vector;
 	/**
 	 * Transforms a given point by applying the caller to it.
-	 * This rotates the point clockwise (in screen-space) about the origin by the transform's rotation and then translates it by the transform's position.
+	 * This rotates the point clockwise (in Screen-Space) about the origin by the transform's rotation and then translates it by the transform's position.
 	 * @param point - The point to transform
 	 */
 	localToGlobal(point: Vector): Vector;
@@ -5956,7 +5975,7 @@ declare class Transform2D extends Transform<Matrix3, Vector2, Number> {
 	 */
 	constructor(position: Vector2, rotation?: number);
 	/**
-	 * Adds a clockwise (in screen-space) rotation in-place about a specific point to the existing transformation. 
+	 * Adds a clockwise (in Screen-Space) rotation in-place about a specific point to the existing transformation. 
 	 * @param point - The center to rotate about
 	 * @param rotation - The angle (in radians) to rotate by
 	 */
@@ -6234,11 +6253,7 @@ declare interface GPUInterface {
 /**
  * Represents the camera in a 3D scene.
  */
-declare class Camera3D extends Matrix4 implements Camera {
-	/**
-	 * The location of the camera, in world-space. Starts at (0, 0, 0)
-	 */
-	position: Vector3;
+declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	/**
 	 * The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
 	 */
@@ -6253,7 +6268,7 @@ declare class Camera3D extends Matrix4 implements Camera {
 	 */
 	constructor(canvas: ImageType);
 	/**
-	 * Returns the world-space frustum of the camera, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the camera. 
+	 * Returns the World-Space frustum of the camera, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the camera. 
 	 */
 	get screen(): Frustum;
 	/**
@@ -6287,6 +6302,10 @@ declare class Camera3D extends Matrix4 implements Camera {
 	 */
 	look(xAngle: number, yAngle: number): void;
 	/**
+	 * The location of the camera in World-Space
+	 */
+	position: Vector;
+	/**
 	 * The magnification level of the camera
 	 */
 	zoom: number;
@@ -6318,29 +6337,30 @@ declare class Camera3D extends Matrix4 implements Camera {
 	 */
 	zoomBy(factor: number): void;
 	/**
-	 * Maps a given point from screen-space to world-space.
+	 * Maps a given point from Camera-Space to World-Space.
 	 * @param point - The point to transform
 	 */
-	screenToWorld(point: Vector2): Vector2;
+	cameraToWorld(point: Vector): Vector;
 	/**
-	 * Maps a given point from world-space to screen-space.
+	 * Maps a given point from World-Space to Camera-Space.
 	 * @param point - The point to transform
 	 */
-	worldToScreen(point: Vector2): Vector2;
+	worldToCamera(point: Vector): Vector;
 	/**
-	 * Assuming the renderer is currently in screen-space, transforms to world-space, calls a rendering function, and then transforms back to screen-space.
-	 * @param render - The function to call while in the world-space context
+	 * Assuming the renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * @param render - The function to call while in the World-Space context
 	 */
 	drawInWorldSpace(render: () => void): void;
 	/**
-	 * Assuming the renderer is currently in world-space, transforms to screen-space, calls a rendering function, and then transforms back to world-space.
-	 * @param render - The function to call while in the screen-space context
+	 * Assuming the renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * @param render - The function to call while in the Camera-Space context
 	 */
-	drawInScreenSpace(render: () => void): void;
+	drawInCameraSpace(render: () => void): void;
 }
 
 /**
  * Represents an offscreen image onto which 3D graphics can be drawn.
+ * By default, rendering will be done in the frame's World-Space, though this can be changed via `.camera.drawInCameraSpace()`.
  */
 declare class Frame3D extends ImageType {
 	/**
@@ -6893,13 +6913,17 @@ declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any>
 	 */
 	lifeSpan: number;
 	/**
+	 * The renderer onto which the object will be drawn. This property is read-only
+	 */
+	renderer: Artist;
+	/**
 	 * Schedules a function to be called immediately after additions and removals from the scene take effect.
 	 * It will be passed the object when called.
 	 * @param fn - The function to be called
 	 */
 	sync(fn: (arg0: this) => void): void;
 	/**
-	 * Returns the world-space bounding rectangle that contains the all the shapes of the object.
+	 * Returns the World-Space bounding rectangle that contains the all the shapes of the object.
 	 */
 	getBoundingBox(): Box;
 	/**
@@ -6931,11 +6955,11 @@ declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any>
 	 */
 	getAllConvexShapes(): Shape[];
 	/**
-	 * Returns all the shapes on the object, in world-space.
+	 * Returns all the shapes on the object, in World-Space.
 	 */
 	getAllModels(): Shape[];
 	/**
-	 * Returns a collection of convex shapes that take up the same region as the shapes of the object, in world-space.
+	 * Returns a collection of convex shapes that take up the same region as the shapes of the object, in World-Space.
 	 */
 	getAllConvexModels(): Shape[];
 	/**
@@ -6958,12 +6982,12 @@ declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any>
 	 */
 	getConvexShapes(name: string): Shape[];
 	/**
-	 * Retrieves a specific shape in world-space based on its name.
+	 * Retrieves a specific shape in World-Space based on its name.
 	 * @param name - The name of the shape
 	 */
 	getModel(name: string): Shape;
 	/**
-	 * Returns a list of convex shapes in world-space that take up the same region as a specific shape.
+	 * Returns a list of convex shapes in World-Space that take up the same region as a specific shape.
 	 * @param name - The name of the shape
 	 */
 	getConvexModels(name: string): Shape[];
@@ -6973,7 +6997,7 @@ declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any>
 	 */
 	scale(factor: number): void;
 	/**
-	 * Returns whether a specific world-space point is inside the shapes of the object.
+	 * Returns whether a specific World-Space point is inside the shapes of the object.
 	 * @param point - The point to check
 	 */
 	collidePoint(point: Vector): boolean;
@@ -7065,7 +7089,7 @@ declare class ElementScript {
 	draw(name: string, shape: Shape): void;
 	/**
 	 * This is called once per frame during rendering, immediately after the last call to `.draw()` for the object, regardless of whether the object is visible.
-	 * When this called, the renderer is in world-space.
+	 * When this called, the renderer is in World-Space.
 	 */
 	escapeDraw(): void;
 	/**
@@ -7274,10 +7298,9 @@ declare type ScriptContainer = {
 }
 
 /**
- * Represents a permanently screen-space object in a Scene.
- * All rendering for this class takes place in screen-space rather than world-space.
- * UIObjects are rendered after WorldObjects, regardless of `.layer` settings.
- * Culling, point-collision checks, and other related operations will all use screen-space coordinates rather than world-space.
+ * Represents a permanently Screen-Space object in a Scene.
+ * All rendering for this class takes place in Screen-Space rather than World-Space, and should be targeted to `ui` rather than `renderer`.
+ * Culling, point-collision checks, and other related operations will all use Screen-Space coordinates rather than World-Space.
  */
 declare class UIObject extends SceneObject<Vector2, Transform2D, Rect, Circle | Polygon> {
 	
@@ -7290,7 +7313,7 @@ declare class UIObject extends SceneObject<Vector2, Transform2D, Rect, Circle | 
  */
 declare class WorldObject extends SceneObject<VectorN, TransformN, BoxN, WorldObjectBallN | WorldObjectPolytopeN> {
 	/**
-	 * The world-space bounding box to use for graphical culling instead of the shapes of the object. Starts as null
+	 * The World-Space bounding box to use for graphical culling instead of the shapes of the object. Starts as null
 	 */
 	graphicalBoundingBox: Prism | Rect | null;
 	/**
@@ -7337,7 +7360,7 @@ declare class DRAGGABLE extends ElementScript {
  */
 declare class Particle {
 	/**
-	 * The world-space position of the particle
+	 * The World-Space position of the particle
 	 */
 	position: Vector2;
 	/**
@@ -7407,7 +7430,7 @@ declare interface SpawnerProperties {
 	/**
 	 * The function that is called to render particles each frame.
 	 * This function should minimize side effects and, if possible, should be pure.
-	 * @param renderer - The renderer to draw the particle to. Its transform will be in world-space, unless the spawner is a UIObject
+	 * @param renderer - The renderer to draw the particle to. Its transform will be in World-Space, unless the spawner is a UIObject
 	 * @param particle - The particle to render
 	 */
 	draw?(renderer: Artist2D, particle: Particle): void;
@@ -7498,7 +7521,7 @@ declare class PARTICLE_SPAWNER extends ElementScript {
 	 */
 	explode(count: number, position?: Vector2): void;
 	/**
-	 * Returns the smallest axis-aligned world-space rectangle that contains all of the particles in the system.
+	 * Returns the smallest axis-aligned World-Space rectangle that contains all of the particles in the system.
 	 */
 	getBoundingBox(): Rect;
 }
@@ -7582,14 +7605,14 @@ declare class PHYSICS extends ElementScript {
 	get inertia(): InertiaN;
 	/**
 	 * Applies an impulse to a specific point on the object.
-	 * @param point - The world-space point at which the impulse should be applied
+	 * @param point - The World-Space point at which the impulse should be applied
 	 * @param impulse - The impulse to apply
 	 */
 	applyImpulse(point: VectorN, impulse: VectorN): void;
 	/**
 	 * Applies an impulse to a specific point on the object.
 	 * The impulse will be scaled by the mass of the object.
-	 * @param point - The world-space point at which the impulse should be applied
+	 * @param point - The World-Space point at which the impulse should be applied
 	 * @param impulse - The impulse to apply, which will be scaled
 	 */
 	applyImpulseMass(point: VectorN, impulse: VectorN): void;
@@ -8270,29 +8293,33 @@ declare class MouseHandler extends InputHandler {
 	 */
 	wheelDelta: number;
 	/**
-	 * The current cursor position, in screen-space
+	 * The current cursor position, in Screen-Space
 	 */
 	screen: Vector2;
 	/**
-	 * The cursor position last frame, in screen-space
+	 * The cursor position last frame, in Screen-Space
 	 */
 	screenLast: Vector2;
 	/**
-	 * The change in the cursor's screen-space position over the last frame
+	 * The change in the cursor's Screen-Space position over the last frame
 	 */
 	screenDelta: Vector2;
 	/**
-	 * The current cursor position, in world-space. This is only available in 2D Mode
+	 * The current cursor position, in World-Space. This is only available in 2D Mode
 	 */
 	world: Vector2;
 	/**
-	 * The cursor position last frame, in world-space.  This is only available in 2D Mode
+	 * The cursor position last frame, in World-Space.  This is only available in 2D Mode
 	 */
 	worldLast: Vector2;
 	/**
-	 * The change in the cursor's world-space position over the last frame. This is only available in 2D Mode
+	 * The change in the cursor's World-Space position over the last frame. This is only available in 2D Mode
 	 */
 	worldDelta: Vector2;
+	/**
+	 * Whether the mouse is currently locked and unable to move. This property is read-only
+	 */
+	locked: boolean;
 	/**
 	 * Locks the user's cursor in place and hides it.
 	 * This can only be called after a user gesture.
@@ -8345,19 +8372,19 @@ declare namespace MouseHandler {
 	 */
 	class State extends InputHandler.State {
 		/**
-		 * The beginning of the most recent click-and-drag motion with this key, in screen-space
+		 * The beginning of the most recent click-and-drag motion with this key, in Screen-Space
 		 */
 		screenDragStart: Vector2;
 		/**
-		 * The end of the most recent click-and-drag motion with this key, in screen-space. If such a gesture is ongoing, this will be the current cursor position
+		 * The end of the most recent click-and-drag motion with this key, in Screen-Space. If such a gesture is ongoing, this will be the current cursor position
 		 */
 		screenDragEnd: Vector2;
 		/**
-		 * The beginning of the most recent click-and-drag motion with this key, in world-space
+		 * The beginning of the most recent click-and-drag motion with this key, in World-Space
 		 */
 		worldDragStart: Vector2;
 		/**
-		 * The end of the most recent click-and-drag motion with this key, in world-space. If such a gesture is ongoing, this will be the current cursor position
+		 * The end of the most recent click-and-drag motion with this key, in World-Space. If such a gesture is ongoing, this will be the current cursor position
 		 */
 		worldDragEnd: Vector2;
 	}
@@ -8442,19 +8469,19 @@ declare namespace TouchHandler {
 	 */
 	class State extends MouseHandler.State {
 		/**
-		 * The current position of the touch, in screen-space
+		 * The current position of the touch, in Screen-Space
 		 */
 		screen: Vector2;
 		/**
-		 * The position of the touch last frame, in screen-space
+		 * The position of the touch last frame, in Screen-Space
 		 */
 		screenLast: Vector2;
 		/**
-		 * The current position of the touch, in world-space
+		 * The current position of the touch, in World-Space
 		 */
 		world: Vector2;
 		/**
-		 * The position of the touch last frame, in world-space
+		 * The position of the touch last frame, in World-Space
 		 */
 		worldLast: Vector2;
 	}

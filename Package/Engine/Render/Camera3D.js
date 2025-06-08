@@ -1,7 +1,7 @@
 /**
  * @implements Camera
+ * @type class Camera3D extends Matrix4 implements Camera<Vector3>
  * Represents the camera in a 3D scene.
- * @prop Vector3 position | The location of the camera, in world-space. Starts at (0, 0, 0)
  * @prop Vector3 direction | The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
  * @prop Matrix4 pcMatrix | The product of the camera's projection matrix and itself. This property is read-only and only updates when cacheScreen() is called
  */
@@ -33,7 +33,7 @@ class Camera3D extends Matrix4 {
 	}
 	/**
 	 * @name get screen
-	 * Returns the world-space frustum of the camera, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the camera. 
+	 * Returns the World-Space frustum of the camera, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the camera. 
 	 * @return Frustum
 	 */
 	cacheScreen() {

@@ -286,12 +286,13 @@ KeyboardHandler.State = class KeyState extends InputHandler.State { };
  * });
  * ```
  * @prop Number wheelDelta | The scroll displacement (in pixels) from the mouse wheel during the last frame.
- * @prop Vector2 screen | The current cursor position, in screen-space
- * @prop Vector2 screenLast | The cursor position last frame, in screen-space
- * @prop Vector2 screenDelta | The change in the cursor's screen-space position over the last frame
- * @prop Vector2 world | The current cursor position, in world-space. This is only available in 2D Mode
- * @prop Vector2 worldLast | The cursor position last frame, in world-space.  This is only available in 2D Mode
- * @prop Vector2 worldDelta | The change in the cursor's world-space position over the last frame. This is only available in 2D Mode
+ * @prop Vector2 screen | The current cursor position, in Screen-Space
+ * @prop Vector2 screenLast | The cursor position last frame, in Screen-Space
+ * @prop Vector2 screenDelta | The change in the cursor's Screen-Space position over the last frame
+ * @prop Vector2 world | The current cursor position, in World-Space. This is only available in 2D Mode
+ * @prop Vector2 worldLast | The cursor position last frame, in World-Space.  This is only available in 2D Mode
+ * @prop Vector2 worldDelta | The change in the cursor's World-Space position over the last frame. This is only available in 2D Mode
+ * @prop Boolean locked | Whether the mouse is currently locked and unable to move. This property is read-only
  */
 class MouseHandler extends InputHandler {
 	constructor(engine) {
@@ -309,6 +310,9 @@ class MouseHandler extends InputHandler {
 		Vector2.defineReference(this, "worldLast");
 		Vector2.defineReference(this, "worldDelta");
 		this.wheelDelta = 0;
+	}
+	get locked() {
+		return !!document.pointerLockElement;
 	}
 	preprocess(name) {
 		if (typeof name === "number") return this.mouseMap.get(name);
@@ -376,9 +380,10 @@ class MouseHandler extends InputHandler {
 	 * Changes in mouse position can still be read via the `.deltaScreen` and `.deltaWorld`.
 	 */
 	lock() {
-		this.engine.canvas.canvas.requestPointerLock({
-			unadjustedMovement: true
-		});
+		if (!this.locked)
+			this.engine.canvas.canvases.ui.requestPointerLock({
+				unadjustedMovement: true
+			});
 	}
 	/**
 	 * Unlocks the user's cursor.
@@ -429,10 +434,10 @@ class MouseHandler extends InputHandler {
  * @name class MouseHandler.State extends InputHandler.State
  * The state of a given key on a mouse.
  * @readonly
- * @prop Vector2 screenDragStart | The beginning of the most recent click-and-drag motion with this key, in screen-space
- * @prop Vector2 screenDragEnd | The end of the most recent click-and-drag motion with this key, in screen-space. If such a gesture is ongoing, this will be the current cursor position
- * @prop Vector2 worldDragStart | The beginning of the most recent click-and-drag motion with this key, in world-space
- * @prop Vector2 worldDragEnd | The end of the most recent click-and-drag motion with this key, in world-space. If such a gesture is ongoing, this will be the current cursor position
+ * @prop Vector2 screenDragStart | The beginning of the most recent click-and-drag motion with this key, in Screen-Space
+ * @prop Vector2 screenDragEnd | The end of the most recent click-and-drag motion with this key, in Screen-Space. If such a gesture is ongoing, this will be the current cursor position
+ * @prop Vector2 worldDragStart | The beginning of the most recent click-and-drag motion with this key, in World-Space
+ * @prop Vector2 worldDragEnd | The end of the most recent click-and-drag motion with this key, in World-Space. If such a gesture is ongoing, this will be the current cursor position
  */
 MouseHandler.State = class ButtonState extends InputHandler.State {
 	constructor(handler, name) {
@@ -553,10 +558,10 @@ class TouchHandler extends InputHandler {
  * @name class TouchHandler.State extends MouseHandler.State
  * The state of a specific touch on the user's screen.
  * @readonly
- * @prop Vector2 screen | The current position of the touch, in screen-space
- * @prop Vector2 screenLast | The position of the touch last frame, in screen-space
- * @prop Vector2 world | The current position of the touch, in world-space
- * @prop Vector2 worldLast | The position of the touch last frame, in world-space
+ * @prop Vector2 screen | The current position of the touch, in Screen-Space
+ * @prop Vector2 screenLast | The position of the touch last frame, in Screen-Space
+ * @prop Vector2 world | The current position of the touch, in World-Space
+ * @prop Vector2 worldLast | The position of the touch last frame, in World-Space
  */
 TouchHandler.State = class TouchState extends MouseHandler.State {
 	constructor(handler, name) {

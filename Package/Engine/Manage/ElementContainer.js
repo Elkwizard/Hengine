@@ -49,9 +49,10 @@ class ElementContainer extends SceneElement {
 						obj.engine.renderer.mesh(mesh).default();
 					};
 				} else {
+					const renderer = obj instanceof UIObject ? obj.engine.ui : obj.engine.renderer;
 					command = () => {
-						obj.engine.renderer.draw(this.fill).infer(shape);
-						obj.engine.renderer.stroke(this.outline, 1).infer(shape);
+						renderer.draw(this.fill).infer(shape);
+						renderer.stroke(this.outline, 1).infer(shape);
 					};
 				}
 				this.shapeDrawCommands.set(shape, command);

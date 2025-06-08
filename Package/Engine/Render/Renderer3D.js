@@ -200,23 +200,6 @@ class Artist3D extends Artist {
 		this.compile();
 		
 		this.resize(canvas.width, canvas.height);
-
-		return new Proxy(this, {
-			get: (target, key, receiver) => {
-				if (Artist3D.KEPT_PROPERTIES.has(key)) {
-					// console.log(key, target.constructor.name);
-					const result = Reflect.get(target, key, receiver);
-					if (typeof result === "function")
-						return result.bind(target);
-					return result;
-				}
-				// console.log(key, target.target.constructor.name);
-				return Reflect.get(target.target, key, receiver);
-			},
-			set: (target, key, value, receiver) => {
-				return Reflect.set(target.target, key, value, receiver);
-			}
-		});
 	}
 	get state() {
 		return this.stateStack[this.currentStateIndex];
@@ -240,7 +223,6 @@ class Artist3D extends Artist {
 		this.instanceData = new GrowableTypedArray(Float32Array);
 
 		{ // setup 2D VAO
-			
 			this.overlayShader = this.create2DProgram(Artist3D.OVERLAY_FRAGMENT);
 			
 			const quadVertices = new Float32Array([
@@ -262,13 +244,6 @@ class Artist3D extends Artist {
 			gl.bindVertexArray(null);
 		}
 	}
-	get target() {
-		return this.inWorldSpace ? this : this.overlayRenderer; 
-	}
-	get overlayRenderer() {
-		this.overlay ??= new Frame(this.imageType.width, this.imageType.height, this.imageType.pixelRatio);
-		return this.overlay.renderer;
-	}
 	hasCache(key) {
 		return this.renderCache.has(key);
 	}
@@ -282,8 +257,6 @@ class Artist3D extends Artist {
 	resize(width, height) {
 		this.canvas.width = this.imageType.pixelWidth;
 		this.canvas.height = this.imageType.pixelHeight;
-		if (this.overlay)
-			this.overlay.resize(this.imageType.width, this.imageType.height);
 	}
 	addTransform(transf) {
 		this.state.transform.mul(transf);
@@ -618,6 +591,7 @@ class Artist3D extends Artist {
 				cascade.zRange = zRange.length;
 
 				gl.bindFramebuffer(gl.FRAMEBUFFER, cascade.framebuffer);
+				gl.depthMask(true);
 				gl.clear(gl.DEPTH_BUFFER_BIT);
 
 				this.pass(camera, meshes, true, chunk => {
@@ -660,13 +634,13 @@ class Artist3D extends Artist {
 
 			return program;
 		});
-
+ 
 		this.vector3Pool.pop();
 	}
 	maximizeViewport() {
 		this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
 	}
-	compositeOverlay(overlay) {
+	overlay(overlay) {
 		const { gl } = this;
 			
 		this.overlayShader.focus();
@@ -685,12 +659,6 @@ class Artist3D extends Artist {
 			this.renderQueues(camera, lightQueue, meshQueue);
 
 		this.emptyQueues();
-
-		if (this.overlay) {
-			this.compositeOverlay(this.overlay);
-			this.overlay.renderer.clearTransformations();
-			this.overlay.renderer.clear();
-		}
 	}
 	emptyQueues() {
 		this.meshObj.clear();
@@ -703,7 +671,6 @@ class Artist3D extends Artist {
 		gl.depthMask(true);
 		gl.clearColor(x, y, z, w);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		if (this.overlay) this.overlayRenderer.clear();
 	}
 	clear() {
 		this.fill(Color.BLANK);
@@ -782,11 +749,7 @@ class Artist3D extends Artist {
 	static SHADOW_RESOLUTION = 2 ** 12;
 	static SHADOW_BIAS = 0.5;
 	static SHADOW_CASCADE = 4;
-	static INSTANCE_THRESHOLD = 100;
-	static KEPT_PROPERTIES = new Set([
-		"enterWorldSpace", "exitWorldSpace", "imageType",
-		"render", "clear", "fill"
-	]);
+	static INSTANCE_THRESHOLD = 10;
 }
 Artist3D.State = class State {
 	constructor() {

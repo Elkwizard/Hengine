@@ -23,18 +23,25 @@ const ScalingMode = Enum.define("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MUL
  * 	renderer.draw(new Color("blue")).circle(middle, 10);
  * });
  * ```
- * @prop CanvasArtist renderer | A 2D (and 3D, in 3D Mode) renderer which can draw to the screen. WorldObjects will be drawn to this surface's world-space. UIObjects will be rendered to this surface's screen-space 
+ * @prop CanvasArtist renderer | A 2D or 3D renderer which can draw to the screen. WorldObjects will be drawn to this surface's World-Space
+ * @prop CanvasArtist2D ui | A 2D renderer which targets a Screen-Space overlay on top of the canvas. Content on this will not be considered when this object is used as an ImageType 
  * @prop ImageType/String cursor | The cursor icon. This can be either an image or a CSS cursor name
  * @prop ScalingMode scalingMode | The way in which the canvas scales when the window is resized. Starts as `ScalingMode.PRESERVE_ASPECT_RATIO`
  * @prop () => void clearScreen | The function that will be called to clear the screen each frame. Starts as `() => renderer.fill(new Color(255, 255, 255))`
  */
-class CanvasImage extends ImageType {	
-	constructor(canvas, engine) {
-		super(canvas.width, canvas.height, __devicePixelRatio);
-		this.canvas = canvas;
+class CanvasImage extends ImageType {
+	constructor(wrapper, engine) {
+		super(innerWidth, innerHeight, __devicePixelRatio);
 		this.engine = engine;
 
-		this.renderer = new (IS_3D ? Artist3D : CanvasArtist2D)(this.canvas, this);
+		this.wrapper = wrapper;
+		this.canvases = {
+			renderer: this.createCanvas(),
+			ui: this.createCanvas()
+		};
+
+		this.renderer = new (IS_3D ? Artist3D : CanvasArtist2D)(this.canvases.renderer, this);
+		this.ui = new CanvasArtist2D(this.canvases.ui, this);
 		
 		this.scalingMode = ScalingMode.PRESERVE_ASPECT_RATIO;
 
@@ -42,7 +49,9 @@ class CanvasImage extends ImageType {
 			if (this.scalingMode === ScalingMode.STRETCH) {
 				this.width = innerWidth;
 				this.height = innerHeight;
-			} else this.updateSize();
+			} else {
+				this.updateSize();
+			}
 		});
 
 		this.clearScreen = () => this.renderer.fill(Color.WHITE);
@@ -63,18 +72,33 @@ class CanvasImage extends ImageType {
 	set cursor(a) {
 		this._cursor = a;
 		if (a instanceof ImageType) {
-			this.canvas.style.cursor = `url('${a.toDataURL()}') ${a.pixelWidth / 2} ${a.pixelHeight / 2}, auto`;
-		} else this.canvas.style.cursor = a;
+			this.canvases.ui.style.cursor = `url('${a.toDataURL()}') ${a.pixelWidth / 2} ${a.pixelHeight / 2}, auto`;
+		} else {
+			this.canvases.ui.style.cursor = a;
+		}
 	}
 	get cursor() {
 		return this._cursor;
 	}
 	get screenToCanvasOffset() {
-		const { x, y } = this.canvas.getBoundingClientRect();
+		const { x, y } = this.canvases.renderer.getBoundingClientRect();
 		return new Vector2(-x, -y);
 	}
 	get screenToCanvasScale() {
-		return this.width / this.canvas.getBoundingClientRect().width;
+		return this.width / this.canvases.renderer.getBoundingClientRect().width;
+	}
+	createCanvas() {
+		const canvas = document.createElement("canvas");
+
+		canvas.style.position = "absolute";
+		canvas.style.left = 0;
+		canvas.style.top = 0;
+		canvas.style.width = "100vw";
+		canvas.style.height = "100vh";
+
+		this.wrapper.appendChild(canvas);
+		
+		return canvas;
 	}
 	screenDeltaToCanvas(point) {
 		return point.mul(this.screenToCanvasScale);
@@ -86,38 +110,49 @@ class CanvasImage extends ImageType {
 	}
 	onresize(width, height) {
 		this.renderer.resize(width, height);
+		this.ui.resize(width, height);
 		if (!IS_3D && this.engine.scene)
 			this.engine.scene.camera.position = this.renderer.middle;
 		this.updateSize();
 	}
 	updateSize() {
-		let packed = new Rect(0, 0, innerWidth, innerHeight).largestWithin(this.width, this.height);
+		for (const name in this.canvases) {
+			const canvas = this.canvases[name];
 
-		if (this.scalingMode === ScalingMode.INTEGER_MULTIPLE) {
-			let scale = packed.width / this.width;
-			if (scale < 1) {
-				const newScale = 1 / Math.ceil(1 / scale);
-				packed = packed.scale(newScale / scale);
-			} else {
-				const newScale = Math.floor(scale);
-				packed = packed.scale(newScale / scale);
+			let packed = new Rect(0, 0, innerWidth, innerHeight)
+				.largestWithin(this.width, this.height);
+	
+			if (this.scalingMode === ScalingMode.INTEGER_MULTIPLE) {
+				let scale = packed.width / this.width;
+				if (scale < 1) {
+					const newScale = 1 / Math.ceil(1 / scale);
+					packed = packed.scale(newScale / scale);
+				} else {
+					const newScale = Math.floor(scale);
+					packed = packed.scale(newScale / scale);
+				}
 			}
+	
+			canvas.style.left = packed.x + "px";
+			canvas.style.top = packed.y + "px";
+			canvas.style.width = packed.width + "px";
+			canvas.style.height = packed.height + "px";
 		}
-
-		this.canvas.style.left = packed.x + "px";
-		this.canvas.style.top = packed.y + "px";
-		this.canvas.style.width = packed.width + "px";
-		this.canvas.style.height = packed.height + "px";
 	}
 	startRendering() {
+		this.ui.clearTransformations();
 		this.renderer.clearTransformations();
+		
+		if (IS_3D) this.renderer.exitWorldSpace(this.engine.scene.camera);
+		
+		this.ui.clear();
 		this.clearScreen();
 	}
 	endRendering() {
 		if (IS_3D) this.renderer.render(this.engine.scene.camera);
 	}
 	makeImage() {
-		this.endRendering();
-		return this.canvas;
+		this.endRendering(); 
+		return this.canvases.renderer;
 	}
 }

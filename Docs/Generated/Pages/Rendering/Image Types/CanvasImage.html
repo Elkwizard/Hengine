@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class CanvasImage">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Canvas.js?#L31" target="_blank" class="class-name source-link">CanvasImage</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Canvas.js?#L32" target="_blank" class="class-name source-link">CanvasImage</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
 				</div>
 				<div class="class desc">
 					Represents the canvas on which the <a href="../../Structure/Hengine.html#class Hengine">Hengine</a> is rendered.
@@ -38,7 +38,14 @@ This class is available via the <code class=" highlight-BACKGROUND"><span class=
 			<span class="alias general">CanvasArtist</span>
 		</span></span>
 					</div>
-					<div class="prop desc">A 2D (and 3D, in 3D Mode) renderer which can draw to the screen. <a href="../../Management/SceneObject.html#class WorldObject">WorldObjects</a> will be drawn to this surface's world-space. <a href="../../Management/SceneObject.html#class UIObject">UIObjects</a> will be rendered to this surface's screen-space</div>
+					<div class="prop desc">A 2D or 3D renderer which can draw to the screen. <a href="../../Management/SceneObject.html#class WorldObject">WorldObjects</a> will be drawn to this surface's <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a></div>
+				</div>
+			
+				<div class="prop-wrapper" id="CanvasImage.ui">
+					<div class="prop-header member">
+						<span class="prop-name">ui</span><span class="type"><a href="../../Rendering/Renderer/2D/Artists/CanvasArtist2D.html#class CanvasArtist2D">CanvasArtist2D</a></span>
+					</div>
+					<div class="prop desc">A 2D renderer which targets a <a href="../../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a> overlay on top of the canvas. Content on this will not be considered when this object is used as an <a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></div>
 				</div>
 			
 				<div class="prop-wrapper" id="CanvasImage.cursor">

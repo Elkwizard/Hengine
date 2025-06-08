@@ -120,7 +120,7 @@ class ElementScript {
 	/**
 	 * @name escapeDraw
 	 * This is called once per frame during rendering, immediately after the last call to `.draw()` for the object, regardless of whether the object is visible.
-	 * When this called, the renderer is in world-space.
+	 * When this called, the renderer is in World-Space.
 	 */
 	/**
 	 * @name cleanUp

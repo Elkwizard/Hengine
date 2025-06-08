@@ -29,6 +29,7 @@ class Controls {
  * @prop Shape/null defaultShape | A reference to the shape with the name `"default"`
  * @prop Number layer | The sorting layer for the object. Objects with higher sorting layers will be rendered after those with lower sorting layers
  * @prop Number lifeSpan | The amount of frames that the object has existed for
+ * @prop Artist renderer | The renderer onto which the object will be drawn. This property is read-only
  */
 class SceneObject extends SceneElement {
 	constructor(name, transform, container, engine) {
@@ -78,7 +79,7 @@ class SceneObject extends SceneElement {
 	}
 	/**
 	 * @type getBoundingBox(): Box;
-	 * Returns the world-space bounding rectangle that contains the all the shapes of the object.
+	 * Returns the World-Space bounding rectangle that contains the all the shapes of the object.
 	 * @return Rect/Prism
 	 */
 	getBoundingBox() {
@@ -149,7 +150,7 @@ class SceneObject extends SceneElement {
 		return shapes;
 	}
 	/**
-	 * Returns all the shapes on the object, in world-space.
+	 * Returns all the shapes on the object, in World-Space.
 	 * @return Shape[]
 	 */
 	getAllModels() {
@@ -159,7 +160,7 @@ class SceneObject extends SceneElement {
 		return models;
 	}
 	/**
-	 * Returns a collection of convex shapes that take up the same region as the shapes of the object, in world-space.
+	 * Returns a collection of convex shapes that take up the same region as the shapes of the object, in World-Space.
 	 * @return Shape[]
 	 */
 	getAllConvexModels() {
@@ -220,7 +221,7 @@ class SceneObject extends SceneElement {
 		return this.convexShapes.get(this.shapes.get(name));
 	}
 	/**
-	 * Retrieves a specific shape in world-space based on its name.
+	 * Retrieves a specific shape in World-Space based on its name.
 	 * @param String name | The name of the shape
 	 * @return Shape
 	 */
@@ -228,7 +229,7 @@ class SceneObject extends SceneElement {
 		return this.shapes.get(name).getModel(this.transform.matrix);
 	}
 	/**
-	 * Returns a list of convex shapes in world-space that take up the same region as a specific shape.
+	 * Returns a list of convex shapes in World-Space that take up the same region as a specific shape.
 	 * @param String name | The name of the shape
 	 * @return Shape[]
 	 */
@@ -252,7 +253,7 @@ class SceneObject extends SceneElement {
 		this.cacheBoundingBoxes();
 	}
 	/**
-	 * Returns whether a specific world-space point is inside the shapes of the object.
+	 * Returns whether a specific World-Space point is inside the shapes of the object.
 	 * @param Vector point | The point to check
 	 * @return Boolean
 	 */
@@ -278,7 +279,7 @@ class SceneObject extends SceneElement {
 		if (this.scripts.implements("draw")) this.transform.drawInLocalSpace(() => {
 			const entries = Array.from(this.shapes.entries());
 			for (const [name, shape] of entries) this.scripts.run("draw", name, shape);
-		}, this.engine.renderer);
+		}, this.renderer);
 	}
 	hasMoved() {
 		return this.transform.diff(this.lastTransform);

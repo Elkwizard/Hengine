@@ -1,5 +1,6 @@
 /**
  * Represents an offscreen image onto which 3D graphics can be drawn.
+ * By default, rendering will be done in the frame's World-Space, though this can be changed via `.camera.drawInCameraSpace()`.
  * @prop Artist3D renderer | The renderer which can be used to add meshes and lights to the frame. This property is read-only
  * @prop Camera3D camera | The view from which the objects will be rendered
  */

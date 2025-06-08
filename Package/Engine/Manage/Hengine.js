@@ -6,7 +6,8 @@
  * @prop TouchHandler touches | The touch screen API
  * @prop ClipboardHandler clipboard | The clipboard API
  * @prop CanvasImage canvas | The canvas associated with the engine
- * @prop CanvasArtist renderer | The 2D (and 3D, in 3D Mode) renderer associated with the canvas. Draws directly on the screen
+ * @prop CanvasArtist renderer | The 2D or 3D renderer associated with the canvas. Draws directly on the screen
+ * @prop CanvasArtist2D ui | The 2D Screen-Space overlay renderer associated with the canvas. Draws directly on the screen
  * @prop Scene scene | The scene containing all the objects currently in the engine
  * @prop IntervalManager intervals | The interval manager managing the update loop of the engine
  * @prop Files fileSystem | The file system for the engine. This property persists across reloads and different sessions via `localStorage`
@@ -14,21 +15,9 @@
 class Hengine {
 	constructor() {
 		const wrapper = document.body;
-
-		//setup canvas and scene
-		const canvas = document.createElement("canvas");
-
-		canvas.width = innerWidth;
-		canvas.height = innerHeight;
-
-		canvas.id = "hengineCanvas";
-		canvas.style.position = "absolute";
-
-		wrapper.style.margin = 0;
 		wrapper.style.overflow = "hidden";
-		
-		wrapper.appendChild(canvas);
-		
+		wrapper.style.margin = 0;
+
 		// input / output
 		this.mouse = new MouseHandler(this);
 		this.touches = new TouchHandler(this);
@@ -36,8 +25,9 @@ class Hengine {
 		this.clipboard = new ClipboardHandler();
 
 		// rendering
-		this.canvas = new CanvasImage(canvas, this);
+		this.canvas = new CanvasImage(wrapper, this);
 		this.renderer = this.canvas.renderer;
+		this.ui = this.canvas.ui;
 		
 		this.scene = new Scene(this);
 		this.canvas.updateSize(); // requires camera, created by scene
