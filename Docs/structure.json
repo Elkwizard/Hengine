@@ -106,7 +106,7 @@
 			"GraphPlane": ["GraphPlane", "Graph"]
 		},
 		"Meshes": {
-			"Mesh": null,
+			"Mesh": ["Mesh", "PolyhedronConversionSettings"],
 			"MeshChunk": null
 		},
 		"Materials": {

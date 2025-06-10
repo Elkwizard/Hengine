@@ -40,6 +40,14 @@ class Renderable {
 }
 
 /**
+ * @name class PolyhedronConversionSettings
+ * @interface
+ * This is an interface representing how a Polyhedron should be converted into a mesh.
+ * This is not a class, but rather describes the structure of an object that must be used in certain cases.
+ * @prop Boolean smooth? | Whether the normals should be smoothed across vertices. Default is false
+ */
+
+/**
  * Represents a 3D mesh composed of chunks with different materials. The following vertex attributes are supported:
  * <table>
  * 	<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
@@ -142,42 +150,78 @@ class Mesh extends Renderable {
 	/**
 	 * Creates a new mesh from a Polyhedron.
 	 * @param Polyhedron polyhedron | The object to use for the mesh
-	 * @param Material material? | The material for the mesh. Default is `Material.DEFAULT` 
+	 * @param Material material? | The material for the mesh. Default is `Material.DEFAULT`
+	 * @param PolyhedronConversionSettings settings? | Conversion settings. Default is an empty object
 	 * @return Mesh
 	 */
-	static fromPolyhedron(polyhedron, material = Material.DEFAULT) {
+	static fromPolyhedron(polyhedron, material = Material.DEFAULT, {
+		smooth = false
+	} = { }) {
 		const TRI_KEYS = ["a", "b", "c"];
 
 		const attributes = ["vertexPosition", "vertexNormal", "vertexUV"];
 		const { stride } = Mesh.layoutAttributes(attributes);
-		const triangleStride = stride * 3;
 
-		const uvs = [
-			[0, 0],
-			[1, 0],
-			[0, Math.sqrt(3) / 2]
-		];
-		
-		const triangles = polyhedron.getFaces();
-		const vertexData = new Float32Array(triangles.length * triangleStride);
-		for (let i = 0; i < triangles.length; i++) {
-			const triangle = triangles[i];
-			const { normal } = triangle;
-			const baseIndex = i * triangleStride;
-			for (let j = 0; j < 3; j++) {
-				const vertex = triangle[TRI_KEYS[j]];
-				const inx = baseIndex + j * stride;
-				vertexData[inx + 0] = vertex.x;
-				vertexData[inx + 1] = vertex.y;
-				vertexData[inx + 2] = vertex.z;
-				vertexData[inx + 3] = normal.x;
-				vertexData[inx + 4] = normal.y;
-				vertexData[inx + 5] = normal.z;
-				vertexData[inx + 6] = uvs[j][0];
-				vertexData[inx + 7] = uvs[j][1];
+		let vertexData, indexData;
+
+		const setVertex = (index, vertex, normal, uv) => {
+			index *= stride;
+			vertexData[index + 0] = vertex.x;
+			vertexData[index + 1] = vertex.y;
+			vertexData[index + 2] = vertex.z;
+			vertexData[index + 3] = normal.x;
+			vertexData[index + 4] = normal.y;
+			vertexData[index + 5] = normal.z;
+			vertexData[index + 6] = uv.x;
+			vertexData[index + 7] = uv.y;
+		};
+
+		if (smooth) {
+			const vertexToNormals = Array.dim(polyhedron.vertices.length).map(() => []);
+			for (let i = 0; i < polyhedron.faceCount; i++) {
+				const [a, b, c] = polyhedron.getFaceIndices(i);
+				const { normal } = new Triangle(
+					polyhedron.vertices[a],
+					polyhedron.vertices[b],
+					polyhedron.vertices[c]
+				);
+				vertexToNormals[a].push(normal);
+				vertexToNormals[b].push(normal);
+				vertexToNormals[c].push(normal);
+			}
+
+			vertexData = new Float32Array(polyhedron.vertices.length * stride);
+			indexData = new Uint32Array(polyhedron.indices);
+
+			for (let i = 0; i < polyhedron.vertices.length; i++) {
+				const vertex = polyhedron.vertices[i];
+				const normal = Vector3.avg(vertexToNormals[i]).normalize();
+				setVertex(i, vertex, normal, Vector2.zero);
+			}
+		} else {	
+			const uvs = [
+				new Vector2(0, 0),
+				new Vector2(1, 0),
+				new Vector2(0, Math.sqrt(3) / 2)
+			];
+			
+			const triangles = polyhedron.getFaces();
+			
+			vertexData = new Float32Array(triangles.length * stride * 3);
+			indexData = new Uint32Array(triangles.length * 3).map((_, i) => i);
+
+			for (let i = 0; i < triangles.length; i++) {
+				const triangle = triangles[i];
+				const { normal } = triangle;
+				const baseIndex = i * 3;
+				for (let j = 0; j < 3; j++) {
+					const vertex = triangle[TRI_KEYS[j]];
+					const index = baseIndex + j;
+					setVertex(index, vertex, normal, uvs[j])
+				}
 			}
 		}
-		const indexData = new Uint32Array(triangles.length * 3).map((_, i) => i);
+		
 		return new Mesh(attributes, vertexData, [new MeshChunk(material, indexData)]);
 	}
 	/**

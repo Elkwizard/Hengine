@@ -3348,6 +3348,10 @@ declare class Polyhedron extends Shape3D {
 	 */
 	indices: number[];
 	/**
+	 * The number of faces of the polyhedron. This property is equivalent to `indices.length / 3`
+	 */
+	faceCount: number;
+	/**
 	 * Creates a new polyhedron.
 	 * @param vertices - The vertices of the polyhedron
 	 * @param indices - The vertex indices for the triangular faces of the polyhedron
@@ -3357,6 +3361,14 @@ declare class Polyhedron extends Shape3D {
 	 * Returns a set of unique lines that represent the edges of the faces of the polyhedron.
 	 */
 	getEdges(): Line3D[];
+	/**
+	 * Returns the vertex indices of the nth face of the polyhedron.
+	 */
+	getFaceIndices(): number[];
+	/**
+	 * Returns the nth face in the polyhedron.
+	 */
+	getFace(): Triangle;
 	/**
 	 * Returns a set of triangles making up the surface of the polyhedron.
 	 */
@@ -6852,6 +6864,17 @@ declare class Renderable {
 }
 
 /**
+ * This is an interface representing how a Polyhedron should be converted into a mesh.
+ * This is not a class, but rather describes the structure of an object that must be used in certain cases.
+ */
+declare interface PolyhedronConversionSettings {
+	/**
+	 * Whether the normals should be smoothed across vertices. Default is false
+	 */
+	smooth?: boolean;
+}
+
+/**
  * Represents a 3D mesh composed of chunks with different materials. The following vertex attributes are supported:
  * <table>
  * 	<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
@@ -6910,8 +6933,9 @@ declare class Mesh extends Renderable {
 	 * Creates a new mesh from a Polyhedron.
 	 * @param polyhedron - The object to use for the mesh
 	 * @param material - The material for the mesh. Default is `Material.DEFAULT`
+	 * @param settings - Conversion settings. Default is an empty object
 	 */
-	static fromPolyhedron(polyhedron: Polyhedron, material?: Material): Mesh;
+	static fromPolyhedron(polyhedron: Polyhedron, material?: Material, settings?: PolyhedronConversionSettings): Mesh;
 	/**
 	 * Creates a new mesh containing all the pieces of a collection of meshes
 	 * @param meshes - The meshes to combine

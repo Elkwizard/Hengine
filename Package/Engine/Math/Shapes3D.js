@@ -263,6 +263,7 @@ class PolyhedronBuilder {
  * Represents a closed 3D polyhedron as a collection of contiguous triangles.
  * @prop Vector3[] vertices | The vertices of the polyhedron
  * @prop Number[] indices | An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the `.vertices` array which make up a triangle 
+ * @prop Number faceCount | The number of faces of the polyhedron. This property is equivalent to `indices.length / 3`
  */
 class Polyhedron extends Shape3D {
 	/**
@@ -284,7 +285,7 @@ class Polyhedron extends Shape3D {
 			
 			for (let i = 0; i < vertices.length; i++) {
 				const vertex = vertices[i];
-				const key = vertex.toString();
+				const key = vertex.toMaxed(4);
 				if (!vertexToIndex.has(key)) {
 					vertexToIndex.set(key, this.vertices.length);
 					this.vertices.push(vertex);
@@ -305,6 +306,7 @@ class Polyhedron extends Shape3D {
 				) this.indices.push(indexA, indexB, indexC);
 			}
 		}
+		this.faceCount = this.indices.length / 3;
 	}
 	get volume() {
 		if (this._volume === undefined) {
@@ -361,10 +363,8 @@ class Polyhedron extends Shape3D {
 				}
 			};
 	
-			for (let i = 0; i < indices.length; i += 3) {
-				const a = indices[i + 0];
-				const b = indices[i + 1];
-				const c = indices[i + 2];
+			for (let i = 0; i < this.faceCount; i++) {
+				const [a, b, c] = this.getFaceIndices(i);
 				addEdge(a, b);
 				addEdge(b, c);
 				addEdge(c, a);
@@ -376,24 +376,30 @@ class Polyhedron extends Shape3D {
 		return this._edges;
 	}
 	/**
+	 * Returns the vertex indices of the nth face of the polyhedron.
+	 * @return Number[] 
+	 */
+	getFaceIndices(index) {
+		const { indices } = this;
+		index *= 3;
+		return [indices[index + 0], indices[index + 1], indices[index + 2]];
+	}
+	/**
+	 * Returns the nth face in the polyhedron.
+	 * @return Triangle
+	 */
+	getFace(index) {
+		const { vertices } = this;
+		const [a, b, c] = this.getFaceIndices(index);
+		return new Triangle(vertices[a], vertices[b], vertices[c]);
+	}
+	/**
 	 * Returns a set of triangles making up the surface of the polyhedron.
 	 * @return Triangle[]
 	 */
 	getFaces() {
-		if (this._faces === undefined) {
-			const triangles = [];
-			const { vertices, indices } = this;
-			for (let i = 0; i < indices.length; i += 3)
-				triangles.push(new Triangle(
-					vertices[indices[i + 0]],
-					vertices[indices[i + 1]],
-					vertices[indices[i + 2]]
-				));
-			
-			this._faces = triangles;
-		}
-
-		return this._faces;
+		return this._faces ??= Array.dim(this.faceCount)
+				.map((_, i) => this.getFace(i));
 	}
 	getModel(transform) {
 		return new Polyhedron(
@@ -440,10 +446,8 @@ class Polyhedron extends Shape3D {
 		for (let i = 0; i < count; i++) {
 			const newVertices = [...current.vertices];
 			const newIndices = [];
-			for (let i = 0; i < current.indices.length; i += 3) {
-				const indexA = current.indices[i + 0];
-				const indexB = current.indices[i + 1];
-				const indexC = current.indices[i + 2];
+			for (let i = 0; i < current.faceCount; i++) {
+				const [indexA, indexB, indexC] = current.getFaceIndices(i);
 				const a = current.vertices[indexA];
 				const b = current.vertices[indexB];
 				const c = current.vertices[indexC];
