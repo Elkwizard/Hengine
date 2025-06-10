@@ -554,8 +554,11 @@ class Vector3 extends Vector {
 	 * @return Vector3
 	 */
 	get normal() {
-		if (Math.max(this.x, this.y, this.z) === this.z)
-			return this.cross(Vector3.left);
+		if (Math.abs(this.z) === Math.max(
+			Math.abs(this.x),
+			Math.abs(this.y),
+			Math.abs(this.z)
+		)) return this.cross(Vector3.left);
 		
 		return this.cross(Vector3.forward);
 	}

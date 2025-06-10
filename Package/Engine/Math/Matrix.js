@@ -20,10 +20,7 @@ class Matrix extends Float64Array {
 				for (let j = 0; j < size; j++)
 					this[i * size + j] = args[j * size + i];
 		} else if (args.length > 1) {
-			const { modValues } = args[0].constructor;
-			for (let i = 0; i < size; i++)
-				for (let j = 0; j < size; j++)
-					this[i * size + j] = args[i]?.[modValues[j]] ?? +(i === j);
+			this.setAxes(...args);
 		} else {
 			for (let i = 0; i < size; i++)
 				this[i + i * size] = 1;
@@ -99,6 +96,26 @@ class Matrix extends Float64Array {
 	get(result = new this.constructor()) {
 		result.set(this);
 		return result;
+	}
+	/**
+	 * Replaces the matrix's columns in-place with a series of vectors.
+	 * Any values not overwritten will be as if replaced by an identity matrix.
+	 * Returns the caller.
+	 * @param Vector ...axes | The new columns for the matrix 
+	 * @return Matrix
+	 */
+	setAxes(...axes) {
+		const { size } = this.constructor;
+		const { modValues } = axes[0].constructor;
+
+		this.constructor.identity(this);
+		for (let c = 0; c < axes.length; c++) {
+			const axis = axes[c];
+			for (let r = 0; r < modValues.length; r++)
+				this[c * size + r] = axis[modValues[r]];
+		}
+
+		return this;
 	}
 	/**
 	 * Transposes the matrix in-place (swapping rows with columns) and returns it.

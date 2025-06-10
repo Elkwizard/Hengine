@@ -117,11 +117,7 @@ class MeshRenderer {
 	}
 }
 
-/**
- * Provides a set of methods for rendering lines and outlines in various ways in three dimensions.
- * This class should not be constructed, and should be accessed via `Artist3D.prototype.stroke`.
- */
-class StrokeRenderer3D {
+class PathRenderer3D {
 	static MeshCache = class MeshCache {
 		constructor(polyhedron) {
 			this.polyhedron = polyhedron;
@@ -147,51 +143,108 @@ class StrokeRenderer3D {
 			this.nextIndex = 0;
 		}
 	};
-
 	constructor(renderer) {
 		this.renderer = renderer;
+		this.materialCache = new Map();
+		this.meshCaches = [];
+	}
+	setup(color) {
+		this.color = color.get();
+		const { hex } = color;
+		if (!this.materialCache.has(hex))
+			this.materialCache.set(hex, this.createMaterial(color));
+		this.material = this.materialCache.get(hex);
+	}
+	createMeshCache(polyhedron) {
+		const cache = new PathRenderer3D.MeshCache(polyhedron);
+		this.meshCaches.push(cache);
+		return cache;
+	}
+	clear() {
+		this.materialCache.clear();
+		for (let i = 0; i < this.meshCaches.length; i++)
+			this.meshCaches[i].clear();
+	}
+}
+
+/**
+ * @name class StrokeRenderer3D
+ * Provides a set of methods for rendering lines and outlines in various ways in three dimensions.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.stroke`.
+ */
+class StrokeRenderer3D extends PathRenderer3D {
+	constructor(renderer) {
+		super(renderer);
+
 		this.color = null;
 		this.lineRadius = null;
 
-		this.lineMeshCache = new StrokeRenderer3D.MeshCache(
-			Polyhedron.fromCylinder(Cylinder.fromLongAxis(
-				new Line3D(new Vector3(0, 0, 0), new Vector3(0, 0, 1)), 1
-			))
+		this.lineMeshCache = this.createMeshCache(
+			Polyhedron.fromCylinder(
+				new Line3D(
+					new Vector3(0, 0, 0),
+					new Vector3(0, 0, 1)
+				), 1
+			)
 		);
+		this.arrowHeadMeshCache = this.createMeshCache(
+			Polyhedron.fromCone(
+				new Line3D(
+					new Vector3(0, 0, 0),
+					new Vector3(0, 0, 1)
+				), 3
+			)
+		);
+
 		this.clear();
 	}
-	setup(color, lineWidth = 1) {
-		this.color = color;
-		this.lineRadius = lineWidth * 0.5;
-
-		const { hex } = color;
-		if (!this.materialCache.has(hex))
-			this.materialCache.set(hex, new ColorMaterial(color));
-		this.material = this.materialCache.get(hex);
+	createMaterial(color) {
+		return new SimpleMaterial({ albedo: color });
 	}
-	clear() {
-		this.materialCache = new Map();
-		this.lineMeshCache.clear();
+	setup(color, lineWidth = 1) {
+		super.setup(color);
+		this.lineRadius = lineWidth * 0.5;
 	}
 	/**
-	 * Draws a line segment.
+	 * @group line/arrow
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
 	 * @signature
 	 * @param Vector3 a | The start of the line segment to draw
 	 * @param Vector3 b | The end of the line segment to draw
 	 * @signature
 	 * @param Line3D line | The line segment to draw
 	 */
-	line(a, b) {
+	line(a, b, arrow = false) {
 		if (a instanceof Line3D) ({ a, b } = a);
-
-		const lineMesh = this.lineMeshCache.getMesh(this.material);
-
+		
+		const transform = this.renderer.matrix4Pool.alloc();
+		
 		const vector = b.minus(a);
 		const right = vector.normal.normalize().mul(this.lineRadius);
 		const up = vector.cross(right).normalize().mul(this.lineRadius);
 		const forward = vector;
-		const transform = new Matrix4(right, up, forward, a);
+		
+		if (arrow) {
+			const arrowVector = vector.normalized.times(this.lineRadius * 8);
+			transform.setAxes(right, up, arrowVector, b.minus(arrowVector));
+
+			const arrowHeadMesh = this.arrowHeadMeshCache.getMesh(this.material);
+			this.renderer.mesh(arrowHeadMesh).at(transform);
+			
+			// move line back to arrow start
+			forward.sub(arrowVector);
+		}
+
+		transform.setAxes(right, up, forward, a);
+
+		const lineMesh = this.lineMeshCache.getMesh(this.material);
 		this.renderer.mesh(lineMesh).at(transform);
+
+	}
+	arrow(a, b) {
+		if (a instanceof Line3D) ({ a, b } = a);
+
+		this.line(a, b, true);
 	}
 	/**
 	 * Draws a 3D wireframe of a given polyhedron

@@ -335,10 +335,10 @@ class Line extends Shape2D {
 		return check(this) && check(line);
 	}
 	closestPointTo(point) {
-		const v = this.b.Vminus(this.a);
+		const v = this.b.minus(this.a);
 		const { sqrMag } = v;
-		const t = point.Vminus(this.a).dot(v) / sqrMag;
-		return v.Ntimes(Number.clamp(t, 0, 1)).Vplus(this.a);
+		const t = point.minus(this.a).dot(v) / sqrMag;
+		return v.times(Number.clamp(t, 0, 1)).plus(this.a);
 	}
 	get(line = new Line(0, 0, 0, 0)) {
 		line.a.set(this.a);

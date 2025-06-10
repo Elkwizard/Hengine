@@ -1365,6 +1365,13 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 */
 	get determinant(): number;
 	/**
+	 * Replaces the matrix's columns in-place with a series of vectors.
+	 * Any values not overwritten will be as if replaced by an identity matrix.
+	 * Returns the caller.
+	 * @param axes - The new columns for the matrix
+	 */
+	setAxes(...axes: Vector): this;
+	/**
 	 * Transposes the matrix in-place (swapping rows with columns) and returns it.
 	 */
 	transpose(): this;
@@ -3238,6 +3245,13 @@ declare class Line3D extends Shape3D {
 	 * The vector from `.a` to `.b`
 	 */
 	vector: Vector3;
+	/**
+	 * Returns the points on the caller and a given line segment that with minimal distance.
+	 * The distance between these points gives the distance between the line segments.
+	 * The first element of the return value is the point on the caller, and the second is the point on the argument.
+	 * @param other - The line segment to compare with
+	 */
+	getClosestPoints(other: this): Vector3[];
 }
 
 /**
@@ -3276,6 +3290,52 @@ declare class Triangle extends Shape3D {
 }
 
 /**
+ * Represents an append-only structure for building procedural polyhedra.
+ * Vertices and triangles can be added through various means, and can at any point be converted into a Polyhedron.
+ */
+declare class PolyhedronBuilder {
+	/**
+	 * The vertices of the polyhedron. These can be added to directly, if desired
+	 */
+	vertices: Vector3[];
+	/**
+	 * The indices of the vertices of the triangular faces of the polyhedron. These can be added to directly, if desired
+	 */
+	indices: number[];
+	/**
+	 * Creates a new building structure, with no vertices or indices.
+	 */
+	constructor();
+	/**
+	 * Creates a new Polyhedron out of the current state of the builder.
+	 * The Polyhedron is disconnected, in the sense that future changes to the builder will not be reflected in the created Polyhedron.
+	 */
+	get polyhedron(): Polyhedron;
+	/**
+	 * Adds a new vertex, and returns its index.
+	 * @param vertex - The vertex to add
+	 */
+	addVertex(vertex: Vector3): number;
+	/**
+	 * Adds a new sequence of vertices, and returns the index of the first vertex in the sequence
+	 * @param vertices - The vertices to add
+	 */
+	addVertices(vertices: Vector3[]): number;
+	/**
+	 * Adds the entire contents of a Polyhedron to the builder, and returns the index of the first vertex added.
+	 * @param polyhedron - The Polyhedron to add
+	 * @param flip - Whether to flip all the faces in the added Polyhedron. This does not modify the first argument in-place. Default is false
+	 */
+	addPolyhedron(polyhedron: Polyhedron, flip?: boolean): number;
+	/**
+	 * Adds a list of vertices representing the edge of a convex polygon, and adds triangles in a "triangle fan" formation to connect them.
+	 * Returns the index of the first vertex added.
+	 * @param vertices - The vertices of the convex polygon
+	 */
+	addConvexVertices(vertices: Vector3[]): number;
+}
+
+/**
  * Represents a closed 3D polyhedron as a collection of contiguous triangles.
  */
 declare class Polyhedron extends Shape3D {
@@ -3287,6 +3347,12 @@ declare class Polyhedron extends Shape3D {
 	 * An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the `.vertices` array which make up a triangle
 	 */
 	indices: number[];
+	/**
+	 * Creates a new polyhedron.
+	 * @param vertices - The vertices of the polyhedron
+	 * @param indices - The vertex indices for the triangular faces of the polyhedron
+	 */
+	constructor(vertices: Vector3[], indices: number[]);
 	/**
 	 * Returns a set of unique lines that represent the edges of the faces of the polyhedron.
 	 */
@@ -3314,15 +3380,29 @@ declare class Polyhedron extends Shape3D {
 	/**
 	 * Creates a polyhedron that resembles a sphere to a given level of precision.
 	 * @param sphere - The sphere to approximate
-	 * @param subdivisions - The amount of times to apply `.subdivide()` to the sphere. Default is 2
+	 * @param steps - The amount of vertices to use around the great circles of the sphere. Default is 8
 	 */
-	static fromSphere(sphere: Sphere, subdivisions?: number): Polyhedron;
+	static fromSphere(sphere: Sphere, steps?: number): Polyhedron;
 	/**
-	 * Creates a polyhedron that resembles a cylinder to a given level of precision.
-	 * @param cylinder - The cylinder to approximate
+	 * Creates a polyhedron that resembles a capsule.
+	 * @param capsule - The capsule to approximate
+	 * @param steps - The amount of vertices to use around the circular cross-sections of the capsule. Default is 8
+	 */
+	static fromCapsule(capsule: Capsule, steps?: number): void;
+	/**
+	 * Creates a polyhedron that resembles a right circular cone to a given level of precision
+	 * @param axis - A line segment from the center of the cone's base to the peak
+	 * @param radius - The radius of the circular base
+	 * @param steps - The amount of vertices around the circular base. Default is 8
+	 */
+	static fromCone(axis: Line3D, radius: number, steps?: number): void;
+	/**
+	 * Creates a polyhedron that resembles a right circular cylinder to a given level of precision.
+	 * @param longAxis - A line segment between the centers of the two circular faces
+	 * @param radius - The radius of the cylinder
 	 * @param steps - The amount of vertices to use around the circular faces. Default is 8
 	 */
-	static fromCylinder(cylinder: Cylinder, steps?: number): Polyhedron;
+	static fromCylinder(longAxis: Line3D, radius: number, steps?: number): Polyhedron;
 }
 
 /**
@@ -3470,43 +3550,23 @@ declare class Sphere extends Shape3D {
 }
 
 /**
- * Represents an arbitrarily aligned circular cylinder.
+ * Represents an arbitrarily aligned capsule (the set of points which are a fixed radius away from a line segment).
  */
-declare class Cylinder extends Shape3D {
+declare class Capsule extends Shape3D {
 	/**
-	 * The position of the center of the cylinder
+	 * The core line segment which all points are equidistant to
 	 */
-	position: Vector3;
+	axis: Line3D;
 	/**
-	 * The unit vector pointing along the long axis of the cylinder
-	 */
-	axis: Vector3;
-	/**
-	 * The length of the long axis of the cylinder
-	 */
-	length: number;
-	/**
-	 * The radius of the cylinder
+	 * The radius of the capsule
 	 */
 	radius: number;
 	/**
-	 * Creates a new cylinder.
-	 * @param position - The position of the center of the new cylinder
-	 * @param axis - The unit vector pointing along the long axis of the new cylinder
-	 * @param length - The length of the long axis of the new cylinder
-	 * @param radius - The radius of the new cylinder
+	 * Creates a new capsule.
+	 * @param axis - The central line segment
+	 * @param radius - The radius of the capsule
 	 */
-	constructor(position: Vector3, axis: Vector3, length: number, radius: number);
-	/**
-	 * Returns a line segment from the center of one circular face to the other.
-	 */
-	get longAxis(): Line3D;
-	/**
-	 * Creates a new cylinder based on a line segment and a radius.
-	 * @param longAxis - A line segment from the center of one circular face to the other
-	 * @param radius - The radius of the cylinder
-	 */
-	static fromLongAxis(longAxis: Line3D, radius: number): void;
+	constructor(axis: Line3D, radius: number);
 }
 
 /**
@@ -6942,16 +7002,27 @@ declare class MeshRenderer {
  */
 declare class StrokeRenderer3D {
 	/**
-	 * Draws a line segment.
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
 	 * @param a - The start of the line segment to draw
 	 * @param b - The end of the line segment to draw
 	 */
 	line(a: Vector3, b: Vector3): void;
 	/**
-	 * Draws a line segment.
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
 	 * @param line - The line segment to draw
 	 */
 	line(line: Line3D): void;
+	/**
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
+	 * @param a - The start of the line segment to draw
+	 * @param b - The end of the line segment to draw
+	 */
+	arrow(a: Vector3, b: Vector3): void;
+	/**
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
+	 * @param line - The line segment to draw
+	 */
+	arrow(line: Line3D): void;
 	/**
 	 * Draws a 3D wireframe of a given polyhedron
 	 * @param polyhedron - The polyhedron to draw a 3D wireframe of

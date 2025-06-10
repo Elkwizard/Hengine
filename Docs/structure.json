@@ -128,10 +128,10 @@
 			},
 			"3D": {
 				"Shape3D": null,
-				"Polyhedron": null,
+				"Polyhedron": ["Polyhedron", "PolyhedronBuilder"],
 				"Prism": null,
 				"Sphere": null,
-				"Cylinder": null,
+				"Capsule": null,
 				"Triangle": null,
 				"Plane": null
 			},

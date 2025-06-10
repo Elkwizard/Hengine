@@ -29,6 +29,57 @@ class Line3D extends Shape3D {
 	getBoundingBox() {
 		return Prism.bound([this.a, this.b]);
 	}
+	intersectSameType() {
+		return false;
+	}
+	/**
+	 * Returns the points on the caller and a given line segment that with minimal distance.
+	 * The distance between these points gives the distance between the line segments.
+	 * The first element of the return value is the point on the caller, and the second is the point on the argument.
+	 * @param Line3D other | The line segment to compare with
+	 * @return Vector3[2]
+	 */
+	getClosestPoints(other) {
+		const a0 = this.a;
+		const av = this.vector;
+		const b0 = other.a;
+		const bv = other.vector;
+		const d0 = b0.minus(a0);
+		const dv = av.dot(bv);
+		const la = 1 / av.sqrMag;
+		const lb = 1 / bv.sqrMag;
+		const matrix = new Matrix2(
+			1, -la * dv,
+			-lb * dv, 1
+		);
+		if (!matrix.invert()) return [Vector3.zero, Vector3.zero];//a0.get(), b0.get()];
+		const vec = new Vector2(
+			la * d0.dot(av),
+			-lb * d0.dot(bv)
+		);
+		const { x: s, y: t } = matrix.times(vec);
+
+		const pa = av.times(s).add(a0);
+		const pb = bv.times(t).add(b0);
+
+		const sInRange = s > 0 && s < 1;
+		const tInRange = t > 0 && t < 1;
+		
+		if (sInRange) {
+			if (tInRange)
+				return [pa, pb];
+			
+			return [pa, other.closestPointTo(pa)];
+		}
+
+		if (tInRange)
+			return [this.closestPointTo(pb), pb];
+
+		return [this.closestPointTo(pb), other.closestPointTo(pa)];
+	}
+	rayCast() {
+		return Infinity;
+	}
 	get(result = new Line3D(Vector3.zero, Vector3.zero)) {
 		result.a.set(this.a);
 		result.b.set(this.b);
@@ -37,7 +88,8 @@ class Line3D extends Shape3D {
 }
 objectUtils.inherit(Line3D, Line, [
 	"length", "middle", "vector",
-	"getModel", "equalsSameType"
+	"getModel", "equalsSameType",
+	"closestPointTo"
 ]);
 
 /**
@@ -128,15 +180,131 @@ class Triangle extends Shape3D {
 }
 
 /**
+ * Represents an append-only structure for building procedural polyhedra.
+ * Vertices and triangles can be added through various means, and can at any point be converted into a Polyhedron.
+ * @prop Vector3[] vertices | The vertices of the polyhedron. These can be added to directly, if desired
+ * @prop Number[] indices | The indices of the vertices of the triangular faces of the polyhedron. These can be added to directly, if desired
+ */
+class PolyhedronBuilder {
+	/**
+	 * Creates a new building structure, with no vertices or indices.
+	 */
+	constructor() {
+		this.vertices = [];
+		this.indices = [];
+	}
+	/**
+	 * Creates a new Polyhedron out of the current state of the builder.
+	 * The Polyhedron is disconnected, in the sense that future changes to the builder will not be reflected in the created Polyhedron.
+	 * @return Polyhedron
+	 */
+	get polyhedron() {
+		return new Polyhedron(this.vertices, this.indices);
+	}
+	/**
+	 * Adds a new vertex, and returns its index.
+	 * @param Vector3 vertex | The vertex to add
+	 * @return Number 
+	 */
+	addVertex(vertex) {
+		return this.addVertices([vertex]);
+	}
+	/**
+	 * Adds a new sequence of vertices, and returns the index of the first vertex in the sequence
+	 * @param Vector3[] vertices | The vertices to add
+	 * @return Number
+	 */
+	addVertices(vertices) {
+		const start = this.vertices.length;
+		this.vertices.pushArray(vertices);
+		return start;
+	}
+	/**
+	 * Adds the entire contents of a Polyhedron to the builder, and returns the index of the first vertex added.
+	 * @param Polyhedron polyhedron | The Polyhedron to add
+	 * @param Boolean flip? | Whether to flip all the faces in the added Polyhedron. This does not modify the first argument in-place. Default is false
+	 * @return Number
+	 */
+	addPolyhedron(poly, flip = false) {
+		const start = this.vertices.length;
+		this.vertices.pushArray(poly.vertices);
+		
+		for (let i = 0; i < poly.indices.length; i += 3) {
+			const a = poly.indices[i + 0] + start;
+			const b = poly.indices[i + 1] + start;
+			const c = poly.indices[i + 2] + start;
+			if (flip) {
+				this.indices.push(c, b, a);
+			} else {
+				this.indices.push(a, b, c);
+			}
+		}
+
+		return start;
+	}
+	/**
+	 * Adds a list of vertices representing the edge of a convex polygon, and adds triangles in a "triangle fan" formation to connect them.
+	 * Returns the index of the first vertex added.
+	 * @param Vector3[] vertices | The vertices of the convex polygon
+	 * @return Number
+	 */
+	addConvexVertices(vertices) {
+		const start = this.addVertices(vertices);
+		for (let i = 2; i < vertices.length; i++)
+			this.indices.push(
+				start, start + i - 1, start + i
+			);
+		
+		return start;
+	}
+}
+
+/**
  * Represents a closed 3D polyhedron as a collection of contiguous triangles.
  * @prop Vector3[] vertices | The vertices of the polyhedron
  * @prop Number[] indices | An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the `.vertices` array which make up a triangle 
  */
 class Polyhedron extends Shape3D {
-	constructor(vertices, indices) {
+	/**
+	 * Creates a new polyhedron.
+	 * @param Vector3[] vertices | The vertices of the polyhedron
+	 * @param Number[] indices | The vertex indices for the triangular faces of the polyhedron
+	 */
+	constructor(vertices, indices, lazy = false) {
 		super();
-		this.vertices = vertices;
-		this.indices = indices;
+		if (lazy) {
+			this.vertices = vertices;
+			this.indices = indices;
+		} else {
+			// remove duplicate vertices
+			this.vertices = [];
+			
+			const vertexToIndex = new Map();
+			const indexRemap = new Map();
+			
+			for (let i = 0; i < vertices.length; i++) {
+				const vertex = vertices[i];
+				const key = vertex.toString();
+				if (!vertexToIndex.has(key)) {
+					vertexToIndex.set(key, this.vertices.length);
+					this.vertices.push(vertex);
+				}
+				indexRemap.set(i, vertexToIndex.get(key));
+			}
+
+			// remove degenerate triangles
+			this.indices = [];
+			for (let i = 0; i < indices.length; i += 3) {
+				const indexA = indexRemap.get(indices[i + 0]);
+				const indexB = indexRemap.get(indices[i + 1]);
+				const indexC = indexRemap.get(indices[i + 2]);
+				if (
+					indexA !== indexB &&
+					indexB !== indexC &&
+					indexC !== indexA
+				) this.indices.push(indexA, indexB, indexC);
+			}
+		}
 	}
 	get volume() {
 		if (this._volume === undefined) {
@@ -230,7 +398,8 @@ class Polyhedron extends Shape3D {
 	getModel(transform) {
 		return new Polyhedron(
 			this.vertices.map(vertex => transform.times(vertex)),
-			this.indices
+			this.indices,
+			true
 		);
 	}
 	rotate(axis, angle) {
@@ -322,27 +491,149 @@ class Polyhedron extends Shape3D {
 	/**
 	 * Creates a polyhedron that resembles a sphere to a given level of precision.
 	 * @param Sphere sphere | The sphere to approximate
-	 * @param Number subdivisions? | The amount of times to apply `.subdivide()` to the sphere. Default is 2
+	 * @param Number steps? | The amount of vertices to use around the great circles of the sphere. Default is 8
 	 * @return Polyhedron
 	 */
-	static fromSphere(sphere, subdivisions = 2) {
-		const { position, radius } = sphere;
-
-		const result = new Prism(new Vector3(-radius), new Vector3(radius));
-		const subdivided = result.subdivide(subdivisions);
-		return subdivided.map(vertex => {
-			vertex.mag = radius;
-			return vertex.add(position);
-		});
+	static fromSphere(sphere, steps = 8) {
+		return Polyhedron.fromCapsule(new Capsule(
+			new Line3D(sphere.position, sphere.position),
+			sphere.radius
+		), steps);
 	}
 	/**
-	 * Creates a polyhedron that resembles a cylinder to a given level of precision.
-	 * @param Cylinder cylinder | The cylinder to approximate
+	 * Creates a polyhedron that resembles a capsule.
+	 * @param Capsule capsule | The capsule to approximate
+	 * @param Number steps? | The amount of vertices to use around the circular cross-sections of the capsule. Default is 8 
+	 */
+	static fromCapsule(capsule, steps = 8) {
+		let cap;
+		{ // build cap
+			const capVertices2D = [];
+			const capIndices = [];
+
+			const rings = Math.floor(steps / 2);
+			for (let i = 0; i < rings; i++) {
+				const t = 1 - i / (rings - 0.5);
+				const radius = Math.sqrt(t * (2 - t));
+
+				// add ring
+				capVertices2D.pushArray(Polygon.regular(steps, radius).vertices);
+				
+				if (i > 0) { // add triangles between rings
+					const outerStart = capVertices2D.length - steps * 2;
+					const innerStart = capVertices2D.length - steps;
+					for (let i = 0; i < steps; i++) {
+						const current = i;
+						const next = (i + 1) % steps;
+						const a = outerStart + current;
+						const b = innerStart + current;
+						const c = outerStart + next;
+						const d = innerStart + next;
+						capIndices.push(c, b, a);
+						capIndices.push(c, d, b);
+					}
+				}
+
+				if (i === rings - 1) { // close final gap
+					const start = capVertices2D.length - steps;
+					const centerIndex = capVertices2D.length;
+					capVertices2D.push(Vector2.zero);
+					for (let i = 0; i < steps; i++) {
+						capIndices.push(
+							start + (i + 1) % steps,
+							centerIndex,
+							start + i
+						);
+					}
+				}
+			}
+			
+			// lift 2D mesh into 3D
+			const capVertices = capVertices2D
+				.map(({ x, y }) => {
+					const z = Math.sqrt(Math.max(0, 1 - x ** 2 - y ** 2));
+					return new Vector3(x, y, z);
+				});
+	
+			cap = new Polyhedron(capVertices, capIndices, true);
+		}
+		
+		const { axis, radius } = capsule;
+		let axisVector = axis.vector;
+		if (axisVector.sqrMag < 0.01) // spherical case
+			axisVector = Vector3.up;
+
+		// transform caps into capsule-space
+		const forward = axisVector.normalized.mul(radius);
+		const right = forward.normal.normalize().mul(radius);
+		const up = axisVector.cross(right).normalize().mul(radius);
+
+		const capA = cap.getModel(new Matrix4(right, up, forward.inverse, axis.a));
+		const capB = cap.getModel(new Matrix4(right, up, forward, axis.b));
+
+		const builder = new PolyhedronBuilder();
+
+		const capAStart = builder.addPolyhedron(capA, true);
+		const capBStart = builder.addPolyhedron(capB);
+		
+		for (let i = 0; i < steps; i++) {
+			const a = capAStart + i;
+			const b = capAStart + (i + 1) % steps;
+			const c = capBStart + i;
+			const d = capBStart + (i + 1) % steps;
+			builder.indices.push(
+				a, b, c,
+				d, c, b
+			);
+		}
+
+		return builder.polyhedron;
+	}
+	/**
+	 * Creates a polyhedron that resembles a right circular cone to a given level of precision
+	 * @param Line3D axis | A line segment from the center of the cone's base to the peak
+	 * @param Number radius | The radius of the circular base
+	 * @param Number steps? | The amount of vertices around the circular base. Default is 8
+	 */
+	static fromCone(axis, radius, steps = 8) {
+		const builder = new PolyhedronBuilder();
+		const baseVertices = Polygon.regular(steps, 1).vertices
+			.map(({ x, y }) => new Vector3(x, y, 0))
+			.reverse();
+		
+		const baseIndex = builder.addConvexVertices(baseVertices);
+		const tipIndex = builder.addVertex(new Vector3(0, 0, 1));
+
+		for (let i = 0; i < steps; i++) {
+			const a = baseIndex + i;
+			const b = baseIndex + (i + 1) % steps;
+			const c = tipIndex;
+			builder.indices.push(c, b, a);
+		}
+
+		const forward = axis.vector;
+		const right = forward.normal.normalize().mul(radius);
+		const up = forward.cross(right).normalize().mul(radius);
+
+		return builder.polyhedron.getModel(new Matrix4(right, up, forward, axis.a));
+	}
+	/**
+	 * Creates a polyhedron that resembles a right circular cylinder to a given level of precision.
+	 * @param Line3D longAxis | A line segment between the centers of the two circular faces
+	 * @param Number radius | The radius of the cylinder
 	 * @param Number steps? | The amount of vertices to use around the circular faces. Default is 8
 	 * @return Polyhedron
 	 */
-	static fromCylinder(cylinder, steps = 8) {
-		const { position, radius, axis, length } = cylinder;
+	static fromCylinder(longAxis, radius, steps = 8) {
+		// unpack cylinder
+		const {
+			vector: {
+				normalized: axis,
+				mag: length,
+			},
+			middle: position
+		} = longAxis;
+
 		const capVertices = Polygon.regular(steps, 1).vertices;
 
 		const bottomCap = capVertices
@@ -411,7 +702,7 @@ class Prism extends Polyhedron {
 	 * @param Vector3 max | The right-lower-back corner of the prism
 	 */
 	constructor(min, max) {
-		super();
+		super([], [], true);
 		this.xRange = new Range(min.x, max.x);
 		this.yRange = new Range(min.y, max.y);
 		this.zRange = new Range(min.z, max.z);
@@ -644,7 +935,7 @@ class Frustum extends Polyhedron {
 	 * @param Matrix4 projection | The projection for which to create a frustum
 	 */
 	constructor(projection) {
-		super([], Frustum.ndcPrism.indices);
+		super([], Frustum.ndcPrism.indices, true);
 		if (projection) {
 			const { transposed, inverse } = projection;
 
@@ -769,80 +1060,63 @@ objectUtils.inherit(Sphere, Circle, [
 ]);
 
 /**
- * Represents an arbitrarily aligned circular cylinder.
- * @prop Vector3 position | The position of the center of the cylinder
- * @prop Vector3 axis | The unit vector pointing along the long axis of the cylinder
- * @prop Number length | The length of the long axis of the cylinder
- * @prop Number radius | The radius of the cylinder
+ * Represents an arbitrarily aligned capsule (the set of points which are a fixed radius away from a line segment).
+ * @prop Line3D axis | The core line segment which all points are equidistant to
+ * @prop Number radius | The radius of the capsule
  */
-class Cylinder extends Shape3D {
+class Capsule extends Shape3D {
 	/**
-	 * Creates a new cylinder.
-	 * @param Vector3 position | The position of the center of the new cylinder
-	 * @param Vector3 axis | The unit vector pointing along the long axis of the new cylinder
-	 * @param Number length | The length of the long axis of the new cylinder
-	 * @param Number radius | The radius of the new cylinder
+	 * Creates a new capsule.
+	 * @param Line3D axis | The central line segment
+	 * @param Number radius | The radius of the capsule
 	 */
-	constructor(position, axis, length, radius) {
+	constructor(axis, radius) {
 		super();
-		this.position = position;
 		this.axis = axis;
-		this.length = length;
 		this.radius = radius;
-		this.volume = Math.PI * this.radius ** 2 * this.length;
-	}
-	/**
-	 * Returns a line segment from the center of one circular face to the other.
-	 * @return Line3D
-	 */
-	get longAxis() {
-		const halfAxis = this.axis.times(this.length / 2);
-		return new Line3D(
-			this.position.minus(halfAxis),
-			this.position.plus(halfAxis)
+		this.volume = (
+			Math.PI * this.radius ** 2 * this.axis.length + // cylinder core
+			4 / 3 * Math.PI * this.radius ** 3 // spherical caps
 		);
 	}
-	get(result = new Cylinder(Vector3.zero, Vector3.up, 0, 0)) {
-		result.position = this.position.get();
-		result.axis = this.axis.get();
-		result.length = this.length;
+	get(result = new Capsule(new Line3D(Vector3.zero, Vector3.up), 0)) {
+		this.axis.get(result.axis);
 		result.radius = this.radius;
 		result.volume = this.volume;
 		return result;
 	}
 	getBoundingBox() {
-		const { min, max } = this.longAxis.getBoundingBox();
+		const { min, max } = this.axis.getBoundingBox();
 		return new Prism(min.minus(this.radius), max.plus(this.radius));
 	}
 	getModel(matrix) {
-		return Cylinder.fromLongAxis(
-			this.longAxis.getModel(matrix),
+		return new Capsule(
+			this.axis.getModel(matrix),
 			matrix.maxHomogenousScaleFactor * this.radius
 		);
 	}
 	equalsSameType(other) {
-		return	other.longAxis.equals(this.longAxis) &&
+		return	other.axis.equals(this.axis) &&
 				other.radius.equals(this.radius);
 	}
-	closestPointTo(other) {
-		const toPoint = other.minus(this.position);
-		const alongAxis = toPoint.projectOnto(this.axis);
-		const alongCross = toPoint.minus(alongAxis);
-		alongCross.mag = Math.min(alongCross.mag, this.radius);
-		alongAxis.mag = Math.min(alongAxis.mag, this.length / 2);
-		return alongAxis.plus(alongCross);
+	closestPointTo(point) {
+		const closestPoint = this.axis.closestPointTo(point);
+		const toPoint = point.minus(closestPoint);
+		const { mag } = toPoint;
+		if (mag > this.radius)
+			toPoint.mul(this.radius / mag);
+		
+		return closestPoint.plus(toPoint);
 	}
-	/**
-	 * Creates a new cylinder based on a line segment and a radius.
-	 * @param Line3D longAxis | A line segment from the center of one circular face to the other
-	 * @param Number radius | The radius of the cylinder
-	 */
-	static fromLongAxis(longAxis, radius) {
-		const { vector } = longAxis;
-		const { mag } = vector;
-		return new Cylinder(
-			longAxis.middle, vector.over(mag),
-			mag, radius
-		)
+	intersectSameType(other) {
+		const [a, b] = this.axis.getClosestPoints(other.axis);
+		return Vector3.sqrDist(a, b) < (this.radius + other.radius) ** 2;
+	}
+	rayCast(ro, rd) {
+		const { axis: { a, b, vector }, radius } = this;
+		
+		// TODO: add Capsule ray casting
+
+		return Infinity;
 	}
 }

@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Polyhedron">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L135" target="_blank" class="class-name source-link">Polyhedron</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Geometry/Shapes/3D/Shape3D.html#class Shape3D">Shape3D</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L267" target="_blank" class="class-name source-link">Polyhedron</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Geometry/Shapes/3D/Shape3D.html#class Shape3D">Shape3D</a></span>
 				</div>
 				<div class="class desc">
 					Represents a closed 3D polyhedron as a collection of contiguous triangles.
@@ -42,9 +42,46 @@
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
+		<div class="function-wrapper" id="Polyhedron.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L273" target="_blank" class="function-name source-link">constructor</a>(<span class="param">vertices</span>, <span class="param">indices</span>)
+			</div>
+			<div class="function desc">
+				Creates a new polyhedron.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polyhedron.prototype.constructor():vertices">
+							<div class="param-name">
+								<span class="param">vertices</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
+							</div>
+							<div class="param desc">
+								The vertices of the polyhedron
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Polyhedron.prototype.constructor():indices">
+							<div class="param-name">
+								<span class="param">indices</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a>[]</span>
+							</div>
+							<div class="param desc">
+								The vertex indices for the triangular faces of the polyhedron
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Polyhedron.prototype.getEdges()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L175" target="_blank" class="function-name source-link">getEdges</a>()<span class="type">Line3D[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L343" target="_blank" class="function-name source-link">getEdges</a>()<span class="type">Line3D[]</span>
 			</div>
 			<div class="function desc">
 				Returns a set of unique lines that represent the edges of the faces of the polyhedron.
@@ -54,7 +91,7 @@
 	
 		<div class="function-wrapper" id="Polyhedron.prototype.getFaces()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L214" target="_blank" class="function-name source-link">getFaces</a>()<span class="type"><a href="../../../Geometry/Shapes/3D/Triangle.html#class Triangle">Triangle</a>[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L382" target="_blank" class="function-name source-link">getFaces</a>()<span class="type"><a href="../../../Geometry/Shapes/3D/Triangle.html#class Triangle">Triangle</a>[]</span>
 			</div>
 			<div class="function desc">
 				Returns a set of triangles making up the surface of the polyhedron.
@@ -64,7 +101,7 @@
 	
 		<div class="function-wrapper" id="Polyhedron.prototype.subdivide()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L268" target="_blank" class="function-name source-link">subdivide</a>(<span class="param">count?</span>)<span class="type">Polyhedron</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L437" target="_blank" class="function-name source-link">subdivide</a>(<span class="param">count?</span>)<span class="type">Polyhedron</span>
 			</div>
 			<div class="function desc">
 				Subdivides each triangle in the polyhedron into a power of 4 number of additional triangles.
@@ -92,7 +129,7 @@ The subdivided mesh is a copy and is returned.
 	
 		<div class="function-wrapper" id="Polyhedron.prototype.map()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L307" target="_blank" class="function-name source-link">map</a>(<span class="param">vertexTransform</span>)<span class="type">Polyhedron</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L476" target="_blank" class="function-name source-link">map</a>(<span class="param">vertexTransform</span>)<span class="type">Polyhedron</span>
 			</div>
 			<div class="function desc">
 				Creates a new polyhedron by transforming every vertex using a given function.
@@ -119,7 +156,7 @@ The subdivided mesh is a copy and is returned.
 	
 		<div class="function-wrapper" id="Polyhedron.fromTriangles()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L318" target="_blank" class="function-name source-link">Polyhedron.fromTriangles</a>(<span class="param">triangles</span>)<span class="type">Polyhedron</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L487" target="_blank" class="function-name source-link">Polyhedron.fromTriangles</a>(<span class="param">triangles</span>)<span class="type">Polyhedron</span>
 			</div>
 			<div class="function desc">
 				Creates a new polyhedron from a list of triangles which form a closed surface.
@@ -146,7 +183,7 @@ The subdivided mesh is a copy and is returned.
 	
 		<div class="function-wrapper" id="Polyhedron.fromSphere()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L328" target="_blank" class="function-name source-link">Polyhedron.fromSphere</a>(<span class="param">sphere</span>, <span class="param">subdivisions?</span>)<span class="type">Polyhedron</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L497" target="_blank" class="function-name source-link">Polyhedron.fromSphere</a>(<span class="param">sphere</span>, <span class="param">steps?</span>)<span class="type">Polyhedron</span>
 			</div>
 			<div class="function desc">
 				Creates a polyhedron that resembles a sphere to a given level of precision.
@@ -166,13 +203,97 @@ The subdivided mesh is a copy and is returned.
 							</div>
 						</div>
 					
-						<div class="param-wrapper" id="Polyhedron.fromSphere():subdivisions?">
+						<div class="param-wrapper" id="Polyhedron.fromSphere():steps?">
 							<div class="param-name">
-								<span class="param">subdivisions</span>
+								<span class="param">steps</span>
 								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The amount of times to apply <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">subdivide</span><span class="highlight-SYMBOL">()</span></code> to the sphere. Default is 2
+								The amount of vertices to use around the great circles of the sphere. Default is 8
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polyhedron.fromCapsule()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L508" target="_blank" class="function-name source-link">Polyhedron.fromCapsule</a>(<span class="param">capsule</span>, <span class="param">steps?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Creates a polyhedron that resembles a capsule.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polyhedron.fromCapsule():capsule">
+							<div class="param-name">
+								<span class="param">capsule</span>
+								<span class="type"><a href="../../../Geometry/Shapes/3D/Capsule.html#class Capsule">Capsule</a></span>
+							</div>
+							<div class="param desc">
+								The capsule to approximate
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Polyhedron.fromCapsule():steps?">
+							<div class="param-name">
+								<span class="param">steps</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount of vertices to use around the circular cross-sections of the capsule. Default is 8
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Polyhedron.fromCone()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L598" target="_blank" class="function-name source-link">Polyhedron.fromCone</a>(<span class="param">axis</span>, <span class="param">radius</span>, <span class="param">steps?</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Creates a polyhedron that resembles a right circular cone to a given level of precision
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Polyhedron.fromCone():axis">
+							<div class="param-name">
+								<span class="param">axis</span>
+								<span class="type">Line3D</span>
+							</div>
+							<div class="param desc">
+								A line segment from the center of the cone's base to the peak
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Polyhedron.fromCone():radius">
+							<div class="param-name">
+								<span class="param">radius</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The radius of the circular base
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Polyhedron.fromCone():steps?">
+							<div class="param-name">
+								<span class="param">steps</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount of vertices around the circular base. Default is 8
 							</div>
 						</div>
 					
@@ -183,23 +304,33 @@ The subdivided mesh is a copy and is returned.
 	
 		<div class="function-wrapper" id="Polyhedron.fromCylinder()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L344" target="_blank" class="function-name source-link">Polyhedron.fromCylinder</a>(<span class="param">cylinder</span>, <span class="param">steps?</span>)<span class="type">Polyhedron</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L627" target="_blank" class="function-name source-link">Polyhedron.fromCylinder</a>(<span class="param">longAxis</span>, <span class="param">radius</span>, <span class="param">steps?</span>)<span class="type">Polyhedron</span>
 			</div>
 			<div class="function desc">
-				Creates a polyhedron that resembles a cylinder to a given level of precision.
+				Creates a polyhedron that resembles a right circular cylinder to a given level of precision.
 			</div>
 			
 				<div class="function-signature">
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Polyhedron.fromCylinder():cylinder">
+						<div class="param-wrapper" id="Polyhedron.fromCylinder():longAxis">
 							<div class="param-name">
-								<span class="param">cylinder</span>
-								<span class="type"><a href="../../../Geometry/Shapes/3D/Cylinder.html#class Cylinder">Cylinder</a></span>
+								<span class="param">longAxis</span>
+								<span class="type">Line3D</span>
 							</div>
 							<div class="param desc">
-								The cylinder to approximate
+								A line segment between the centers of the two circular faces
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Polyhedron.fromCylinder():radius">
+							<div class="param-name">
+								<span class="param">radius</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The radius of the cylinder
 							</div>
 						</div>
 					
@@ -210,6 +341,181 @@ The subdivided mesh is a copy and is returned.
 							</div>
 							<div class="param desc">
 								The amount of vertices to use around the circular faces. Default is 8
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="class PolyhedronBuilder">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L188" target="_blank" class="class-name source-link">PolyhedronBuilder</a>
+				</div>
+				<div class="class desc">
+					Represents an append-only structure for building procedural polyhedra.
+Vertices and triangles can be added through various means, and can at any point be converted into a Polyhedron.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="PolyhedronBuilder.vertices">
+					<div class="prop-header member">
+						<span class="prop-name">vertices</span><span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
+					</div>
+					<div class="prop desc">The vertices of the polyhedron. These can be added to directly, if desired</div>
+				</div>
+			
+				<div class="prop-wrapper" id="PolyhedronBuilder.indices">
+					<div class="prop-header member">
+						<span class="prop-name">indices</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a>[]</span>
+					</div>
+					<div class="prop desc">The indices of the vertices of the triangular faces of the polyhedron. These can be added to directly, if desired</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="PolyhedronBuilder.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L192" target="_blank" class="function-name source-link">constructor</a>()
+			</div>
+			<div class="function desc">
+				Creates a new building structure, with no vertices or indices.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="get PolyhedronBuilder.prototype.polyhedron()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L201" target="_blank" class="function-name source-link">polyhedron</a><span class="type">Polyhedron</span>
+			</div>
+			<div class="function desc">
+				Creates a new Polyhedron out of the current state of the builder.
+The Polyhedron is disconnected, in the sense that future changes to the builder will not be reflected in the created Polyhedron.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="PolyhedronBuilder.prototype.addVertex()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L209" target="_blank" class="function-name source-link">addVertex</a>(<span class="param">vertex</span>)<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="function desc">
+				Adds a new vertex, and returns its index.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="PolyhedronBuilder.prototype.addVertex():vertex">
+							<div class="param-name">
+								<span class="param">vertex</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+							</div>
+							<div class="param desc">
+								The vertex to add
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="PolyhedronBuilder.prototype.addVertices()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L217" target="_blank" class="function-name source-link">addVertices</a>(<span class="param">vertices</span>)<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="function desc">
+				Adds a new sequence of vertices, and returns the index of the first vertex in the sequence
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="PolyhedronBuilder.prototype.addVertices():vertices">
+							<div class="param-name">
+								<span class="param">vertices</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
+							</div>
+							<div class="param desc">
+								The vertices to add
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="PolyhedronBuilder.prototype.addPolyhedron()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L228" target="_blank" class="function-name source-link">addPolyhedron</a>(<span class="param">polyhedron</span>, <span class="param">flip?</span>)<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="function desc">
+				Adds the entire contents of a Polyhedron to the builder, and returns the index of the first vertex added.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="PolyhedronBuilder.prototype.addPolyhedron():polyhedron">
+							<div class="param-name">
+								<span class="param">polyhedron</span>
+								<span class="type">Polyhedron</span>
+							</div>
+							<div class="param desc">
+								The Polyhedron to add
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PolyhedronBuilder.prototype.addPolyhedron():flip?">
+							<div class="param-name">
+								<span class="param">flip</span>
+								<span class="type">Boolean</span>
+							</div>
+							<div class="param desc">
+								Whether to flip all the faces in the added Polyhedron. This does not modify the first argument in-place. Default is false
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="PolyhedronBuilder.prototype.addConvexVertices()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L251" target="_blank" class="function-name source-link">addConvexVertices</a>(<span class="param">vertices</span>)<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="function desc">
+				Adds a list of vertices representing the edge of a convex polygon, and adds triangles in a "triangle fan" formation to connect them.
+Returns the index of the first vertex added.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="PolyhedronBuilder.prototype.addConvexVertices():vertices">
+							<div class="param-name">
+								<span class="param">vertices</span>
+								<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
+							</div>
+							<div class="param desc">
+								The vertices of the convex polygon
 							</div>
 						</div>
 					
