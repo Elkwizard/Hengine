@@ -783,6 +783,19 @@ class Rect extends Polygon {
 		return new Rect(xRange.min, yRange.min, xRange.length, yRange.length);
 	}
 	/**
+	 * Returns a new rectangle with specified dimensions centered at the origin.
+	 * @signature
+	 * @param Vector2 dimensions | A vector containing (width, height)
+	 * @signature
+	 * @param Number width | The width of the rectangle
+	 * @param Number height | The height of the rectangle
+	 * @return Rect
+	 */
+	static fromDimensions(x, y) {
+		if (typeof x === "object") ({ x, y } = x);
+		return new Rect(-x * 0.5, -y * 0.5, x, y);
+	}
+	/**
 	 * Returns the smallest bounding rectangle around a collection of points.
 	 * @param Vector2[] points | The points to create a bounding box for
 	 * @return Rect

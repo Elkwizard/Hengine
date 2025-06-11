@@ -41,9 +41,8 @@ class ElementContainer extends SceneElement {
 			addShape(obj, name, shape) {
 				let command;
 				if (IS_3D && obj instanceof WorldObject) {
-					const polyhedron = shape instanceof Sphere ? Polyhedron.fromSphere(shape, 3) : shape;
 					const material = new SimpleMaterial();
-					const mesh = Mesh.fromPolyhedron(polyhedron, material);
+					const mesh = Mesh.fromShape(shape, material);
 					command = () => {
 						material.albedo = this.fill;
 						obj.engine.renderer.mesh(mesh).default();

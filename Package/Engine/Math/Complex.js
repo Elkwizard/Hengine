@@ -165,6 +165,7 @@ class Complex extends MathObject {
 	for (let i = 0; i < methods.length; i++) {
 		const method = methods[i];
 		Complex.prototype[method] = function (arg) {
+			if (method === "toString") arg = undefined;
 			return `${this.real[method](arg)} + ${this.imaginary[method](arg)}i`;
 		};
 	}

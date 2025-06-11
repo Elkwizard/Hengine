@@ -1,4 +1,5 @@
 /**
+ * @implements Copyable
  * Represents a material applied to a MeshChunk.
  * @prop Boolean transparent | Whether or not light can pass through the material
  */
@@ -26,6 +27,13 @@ class ShaderMaterial extends Material {
 		this.fragmentShader = new GLSL(fragmentShader);
 		this.vertexShader = new GLSL(vertexShader);
 		this.transparent = false;
+	}
+	get() {
+		const result = new ShaderMaterial();
+		result.fragmentShader = this.fragmentShader;
+		result.vertexShader = this.vertexShader;
+		Object.assign(result.uniforms, this.uniforms);
+		return result;
 	}
 }
 ShaderMaterial.DEFAULT_VERTEX_SHADER = `
@@ -58,6 +66,9 @@ class ColorMaterial extends Material {
 		this.fragmentShader = ColorMaterial.FRAGMENT_SHADER;
 		this.uniforms = { color: this.color };
 		this.transparent = false;
+	}
+	get() {
+		return new ColorMaterial(this.color.get());
 	}
 }
 
@@ -127,6 +138,18 @@ class SimpleMaterial extends Material {
 	}
 	get transparent() {
 		return this.alpha < 1.0;
+	}
+	get() {
+		const result = new SimpleMaterial();
+		for (const key in this) {
+			const value = this[key];
+			if (value instanceof Color) {
+				result[key] = value.get();
+			} else {
+				result[key] = value;
+			}
+		}
+		return result;
 	}
 }
 SimpleMaterial.VERTEX_SHADER = new GLSL(ShaderMaterial.DEFAULT_VERTEX_SHADER);

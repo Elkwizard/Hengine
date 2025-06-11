@@ -408,6 +408,8 @@ class Matrix extends Float64Array {
 	for (let i = 0; i < methods.length; i++) {
 		const method = methods[i];
 		Matrix.prototype[method] = function (arg) {
+			if (method === "toString") arg = undefined;
+			
 			const { size } = this.constructor;
 			const strs = [...this].map(num => num[method](arg));
 			const columns = Array.dim(size)

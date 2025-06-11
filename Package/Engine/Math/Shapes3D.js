@@ -901,6 +901,22 @@ class Prism extends Polyhedron {
 		return new Prism(min, max);
 	}
 	/**
+	 * Creates a rectangular prism centered at the origin with given dimensions.
+	 * @signature
+	 * @param Vector3 dimensions | A vector containing (width, height, depth) of the prism
+	 * @signature
+	 * @param Number width | The width of the prism
+	 * @param Number height | The height of the prism
+	 * @param Number depth | The depth of the prism
+	 * @return Prism
+	 */
+	static fromDimensions(x, y, z) {
+		if (typeof x === "number") x = new Vector3(x, y, z);
+
+		const half = x.times(0.5);
+		return new Prism(half.inverse, half);
+	}
+	/**
 	 * Computes the smallest rectangular prism that contains a set of points and returns it.
 	 * @param Vector3[] points | The points to contain
 	 * @return Prism

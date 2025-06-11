@@ -148,6 +148,30 @@ class Mesh extends Renderable {
 		return new Polyhedron(vertices, indices);
 	}
 	/**
+	 * Creates a new mesh from a Shape3D, inferring many settings to produce generally acceptable results.
+	 * @param Shape3D shape | The shape to create a mesh for
+	 * @param Material material? | The material to use for the mesh. Default is `Material.DEFAULT`
+	 * @param Number resolution? | An relevant amount of vertices to use. Default is 8 
+	 * @return Mesh
+	 */
+	static fromShape(shape, material = Material.DEFAULT, resolution = 8) {
+		let smooth = false;
+		if (!(shape instanceof Polyhedron)) {
+			switch (shape.constructor) {
+				case Sphere: {
+					shape = Polyhedron.fromSphere(shape, resolution);
+					smooth = true;
+				} break;
+				case Capsule: {
+					shape = Polyhedron.fromCapsule(shape, resolution);
+					smooth = true;
+				} break;
+			}
+		}
+			
+		return Mesh.fromPolyhedron(shape, material, { smooth });
+	}
+	/**
 	 * Creates a new mesh from a Polyhedron.
 	 * @param Polyhedron polyhedron | The object to use for the mesh
 	 * @param Material material? | The material for the mesh. Default is `Material.DEFAULT`
@@ -253,9 +277,10 @@ class Mesh extends Renderable {
 			for (let j = 0; j < mesh.chunks.length; j++) {
 				const { material, indices } = mesh.chunks[j];
 
-				const currentChunks = materialMap.get(material) ?? [];
 				if (!materialMap.has(material))
 					materialMap.set(material, []);
+				
+				const currentChunks = materialMap.get(material);
 				
 				for (let k = 0; k < indices.length; k++)
 					currentChunks.push(indices[k] + startingVertexIndex);
