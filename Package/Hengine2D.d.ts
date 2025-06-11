@@ -6716,6 +6716,14 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 */
 	pcMatrix: Matrix4;
 	/**
+	 * The local right direction of the camera, in the XZ World-Space plane. This property is read-only
+	 */
+	right: Vector3;
+	/**
+	 * The local up direction of the camera, in World-Space. This property is read-only
+	 */
+	up: Vector3;
+	/**
 	 * Creates a new camera at (0, 0, 0) pointing toward the positive z axis.
 	 * @param canvas - The surface to target
 	 */
@@ -6747,6 +6755,21 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 * @param depth - The maximum depth included in the projection
 	 */
 	orthographic(span: number, depth: number): void;
+	/**
+	 * Moves the camera by a specified amount along its direction.
+	 * @param amount - The amount to move forward (in World-Space)
+	 */
+	advance(amount: number): void;
+	/**
+	 * Moves the camera in the X-Z World-Space plane perpendicular to its direction.
+	 * @param amount - The amount to strafe (in World-Space). Positive values will move right, and negative values will move left
+	 */
+	strafe(amount: number): void;
+	/**
+	 * Moves the camera along the y axis by a specified amount.
+	 * @param amount - The amount to move by. Positive values will move down, and negative values will move up
+	 */
+	lift(amount: number): void;
 	/**
 	 * Points the camera in a specific direction, with a specified angle from +z on the horizontal and vertical axes.
 	 * The vertical input is clamped to avoid gimbal lock.

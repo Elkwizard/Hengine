@@ -4,6 +4,8 @@
  * Represents the camera in a 3D scene.
  * @prop Vector3 direction | The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
  * @prop Matrix4 pcMatrix | The product of the camera's projection matrix and itself. This property is read-only and only updates when cacheScreen() is called
+ * @prop Vector3 right | The local right direction of the camera, in the XZ World-Space plane. This property is read-only
+ * @prop Vector3 up | The local up direction of the camera, in World-Space. This property is read-only
  */
 class Camera3D extends Matrix4 {
 	/**
@@ -91,6 +93,27 @@ class Camera3D extends Matrix4 {
 		).transpose();
 
 		new Matrix4(rotate).times(trans, this);
+	}
+	/**
+	 * Moves the camera by a specified amount along its direction.
+	 * @param Number amount | The amount to move forward (in World-Space)
+	 */
+	advance(amount) {
+		this.position.add(this.direction.times(amount));
+	}
+	/**
+	 * Moves the camera in the X-Z World-Space plane perpendicular to its direction.
+	 * @param Number amount | The amount to strafe (in World-Space). Positive values will move right, and negative values will move left
+	 */
+	strafe(amount) {
+		this.position.add(this.right.times(amount));
+	}
+	/**
+	 * Moves the camera along the y axis by a specified amount.
+	 * @param Number amount | The amount to move by. Positive values will move down, and negative values will move up
+	 */
+	lift(amount) {
+		this.position.y += amount;
 	}
 	/**
 	 * Points the camera in a specific direction, with a specified angle from +z on the horizontal and vertical axes.

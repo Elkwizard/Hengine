@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Camera3D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L8" target="_blank" class="class-name source-link">Camera3D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Geometry/Matrices.html#class Matrix4">Matrix4</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Rendering/Camera/Camera.html#class Camera">Camera</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L10" target="_blank" class="class-name source-link">Camera3D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Geometry/Matrices.html#class Matrix4">Matrix4</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Rendering/Camera/Camera.html#class Camera">Camera</a></span>
 				</div>
 				<div class="class desc">
 					Represents the camera in a 3D scene.
@@ -33,6 +33,20 @@
 					</div>
 					<div class="prop desc">The product of the camera's projection matrix and itself. This property is read-only and only updates when cacheScreen() is called</div>
 				</div>
+			
+				<div class="prop-wrapper" id="Camera3D.right">
+					<div class="prop-header member">
+						<span class="prop-name">right</span><span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+					</div>
+					<div class="prop desc">The local right direction of the camera, in the XZ <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> plane. This property is read-only</div>
+				</div>
+			
+				<div class="prop-wrapper" id="Camera3D.up">
+					<div class="prop-header member">
+						<span class="prop-name">up</span><span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+					</div>
+					<div class="prop desc">The local up direction of the camera, in <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>. This property is read-only</div>
+				</div>
 			</div>
 				
 				
@@ -41,7 +55,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="Camera3D.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L13" target="_blank" class="function-name source-link">constructor</a>(<span class="param">canvas</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L15" target="_blank" class="function-name source-link">constructor</a>(<span class="param">canvas</span>)
 			</div>
 			<div class="function desc">
 				Creates a new camera at (0, 0, 0) pointing toward the positive z axis.
@@ -68,7 +82,7 @@
 	
 		<div class="function-wrapper" id="get Camera3D.prototype.screen()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L39" target="_blank" class="function-name source-link">screen</a><span class="type">Frustum</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L41" target="_blank" class="function-name source-link">screen</a><span class="type">Frustum</span>
 			</div>
 			<div class="function desc">
 				Returns the <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> frustum of the camera, and synchronizes <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">pcMatrix</span></code> to match the location and orientation of the camera. 
@@ -78,7 +92,7 @@
 	
 		<div class="function-wrapper" id="get Camera3D.prototype.projection()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L49" target="_blank" class="function-name source-link">projection</a><span class="type"><a href="../../Geometry/Matrices.html#class Matrix4">Matrix4</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L51" target="_blank" class="function-name source-link">projection</a><span class="type"><a href="../../Geometry/Matrices.html#class Matrix4">Matrix4</a></span>
 			</div>
 			<div class="function desc">
 				Returns the projection matrix of the camera.
@@ -89,7 +103,7 @@ This may vary as the dimensions of the rendering surface change.
 	
 		<div class="function-wrapper" id="set Camera3D.prototype.projection()">
 			<div class="function-header member">
-				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L57" target="_blank" class="function-name source-link">projection</a>(<span class="param">projection</span>)
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L59" target="_blank" class="function-name source-link">projection</a>(<span class="param">projection</span>)
 			</div>
 			<div class="function desc">
 				Configures the camera to use a custom projection.
@@ -116,7 +130,7 @@ This may vary as the dimensions of the rendering surface change.
 	
 		<div class="function-wrapper" id="Camera3D.prototype.perspective()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L67" target="_blank" class="function-name source-link">perspective</a>(<span class="param">fov</span>, <span class="param">zNear</span>, <span class="param">zFar</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L69" target="_blank" class="function-name source-link">perspective</a>(<span class="param">fov</span>, <span class="param">zNear</span>, <span class="param">zFar</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Configures the camera to use a perspective projection.
@@ -163,7 +177,7 @@ This may vary as the dimensions of the rendering surface change.
 	
 		<div class="function-wrapper" id="Camera3D.prototype.orthographic()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L75" target="_blank" class="function-name source-link">orthographic</a>(<span class="param">span</span>, <span class="param">depth</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L77" target="_blank" class="function-name source-link">orthographic</a>(<span class="param">span</span>, <span class="param">depth</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Configures the camera to use a orthographic projection.
@@ -198,9 +212,90 @@ This may vary as the dimensions of the rendering surface change.
 			
 		</div>
 	
+		<div class="function-wrapper" id="Camera3D.prototype.advance()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L101" target="_blank" class="function-name source-link">advance</a>(<span class="param">amount</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Moves the camera by a specified amount along its direction.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera3D.prototype.advance():amount">
+							<div class="param-name">
+								<span class="param">amount</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount to move forward (in <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>)
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera3D.prototype.strafe()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L108" target="_blank" class="function-name source-link">strafe</a>(<span class="param">amount</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Moves the camera in the X-Z <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> plane perpendicular to its direction.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera3D.prototype.strafe():amount">
+							<div class="param-name">
+								<span class="param">amount</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount to strafe (in <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>). Positive values will move right, and negative values will move left
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Camera3D.prototype.lift()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L115" target="_blank" class="function-name source-link">lift</a>(<span class="param">amount</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Moves the camera along the y axis by a specified amount.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Camera3D.prototype.lift():amount">
+							<div class="param-name">
+								<span class="param">amount</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount to move by. Positive values will move down, and negative values will move up
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Camera3D.prototype.look()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L101" target="_blank" class="function-name source-link">look</a>(<span class="param">xAngle</span>, <span class="param">yAngle</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L124" target="_blank" class="function-name source-link">look</a>(<span class="param">xAngle</span>, <span class="param">yAngle</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Points the camera in a specific direction, with a specified angle from +z on the horizontal and vertical axes.
