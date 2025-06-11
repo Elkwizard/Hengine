@@ -139,6 +139,43 @@ class Random {
         return result;
     }
 	/**
+	 * Returns a random point on the edge of a circle centered at the origin.
+	 * @param Number radius? | The radius of the circle. Default is 1
+	 * @return Vector2
+	 */
+	circle(radius = 1) {
+		return Vector2.polar(this.angle(), radius);
+	}
+	/**
+	 * Returns a random point on the edge of a semicircle centered at the origin.
+	 * @param Vector2 normal | The direction the semicircle is facing
+	 * @param Number radius? | The radius of the semicircle. Default is 1
+	 */
+	semicircle(normal, radius) {
+		const result = this.circle(radius);
+		if (result.dot(normal) < 0) result.invert();
+		return result;
+	}
+	/**
+	 * Returns a random point on the surface of a sphere centered at the origin.
+	 * @param Number radius? | The radius of the sphere. Default is 1
+	 * @return Vector3
+	 */
+	sphere(radius = 1) {
+		const halfPi = Math.PI / 2;
+		return Vector3.polar(this.range(-halfPi, halfPi), this.angle(), radius);
+	}
+	/**
+	 * Returns a random point on the surface of a hemisphere centered at the origin and facing in a given direction.
+	 * @param Vector3 normal | The direction the hemisphere is facing
+	 * @param Number radius? | The radius of the hemisphere. Default is 1
+	 */
+	hemisphere(normal, radius) {
+		const result = this.sphere(radius);
+		if (result.dot(normal) < 0) result.invert();
+		return result;
+	}
+	/**
 	 * Returns a random point within a given convex shape.
 	 * This method only works with `.distribution` being `Random.uniform`.
 	 * Unstable.

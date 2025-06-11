@@ -1836,6 +1836,28 @@ declare class Random {
 	 */
 	color(result?: Color): Color;
 	/**
+	 * Returns a random point on the edge of a circle centered at the origin.
+	 * @param radius - The radius of the circle. Default is 1
+	 */
+	circle(radius?: number): Vector2;
+	/**
+	 * Returns a random point on the edge of a semicircle centered at the origin.
+	 * @param normal - The direction the semicircle is facing
+	 * @param radius - The radius of the semicircle. Default is 1
+	 */
+	semicircle(normal: Vector2, radius?: number): void;
+	/**
+	 * Returns a random point on the surface of a sphere centered at the origin.
+	 * @param radius - The radius of the sphere. Default is 1
+	 */
+	sphere(radius?: number): Vector3;
+	/**
+	 * Returns a random point on the surface of a hemisphere centered at the origin and facing in a given direction.
+	 * @param normal - The direction the hemisphere is facing
+	 * @param radius - The radius of the hemisphere. Default is 1
+	 */
+	hemisphere(normal: Vector3, radius?: number): void;
+	/**
 	 * Returns a random point within a given convex shape.
 	 * This method only works with `.distribution` being `Random.uniform`.
 	 * Unstable.
@@ -1986,6 +2008,28 @@ declare class Random {
 	 * @param result - The destination for the color. Default is a new color.
 	 */
 	static color(result?: Color): Color;
+	/**
+	 * Returns a random point on the edge of a circle centered at the origin.
+	 * @param radius - The radius of the circle. Default is 1
+	 */
+	static circle(radius?: number): Vector2;
+	/**
+	 * Returns a random point on the edge of a semicircle centered at the origin.
+	 * @param normal - The direction the semicircle is facing
+	 * @param radius - The radius of the semicircle. Default is 1
+	 */
+	static semicircle(normal: Vector2, radius?: number): void;
+	/**
+	 * Returns a random point on the surface of a sphere centered at the origin.
+	 * @param radius - The radius of the sphere. Default is 1
+	 */
+	static sphere(radius?: number): Vector3;
+	/**
+	 * Returns a random point on the surface of a hemisphere centered at the origin and facing in a given direction.
+	 * @param normal - The direction the hemisphere is facing
+	 * @param radius - The radius of the hemisphere. Default is 1
+	 */
+	static hemisphere(normal: Vector3, radius?: number): void;
 	/**
 	 * Returns a random point within a given convex shape.
 	 * This method only works with `.distribution` being `Random.uniform`.
@@ -2333,6 +2377,13 @@ declare class Vector3 extends Vector {
 	 * @param angle - The angle to rotate by
 	 */
 	rotatedAboutAxis(axis: this, angle: number): this;
+	/**
+	 * Returns the cartesian representation of a given point given its spherical coordinates.
+	 * @param  - The polar angle of the point
+	 * @param  - The azimuthal angle of the point
+	 * @param r - The radial distance of the point. Default is 1
+	 */
+	static polar(θ: number, φ: number, r?: number): Vector3;
 	/**
 	 * Returns a new unit vector pointing in the specified direction.
 	 */

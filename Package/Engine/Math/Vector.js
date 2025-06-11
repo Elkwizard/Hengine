@@ -654,6 +654,20 @@ class Vector3 extends Vector {
 		return result;
 	}
 	/**
+	 * Returns the cartesian representation of a given point given its spherical coordinates.
+	 * @param Number θ | The polar angle of the point
+	 * @param Number φ | The azimuthal angle of the point
+	 * @param Number r? | The radial distance of the point. Default is 1
+	 * @return Vector3
+	 */
+	static polar(θ, φ, r = 1) {
+		return new Vector3(
+			r * Math.sin(θ) * Math.cos(φ),
+			r * Math.sin(θ) * Math.sin(φ),
+			r * Math.cos(θ)
+		);
+	}
+	/**
 	 * @group static get left, static get right, static get up, static get down, static get forward, static get backward
 	 * Returns a new unit vector pointing in the specified direction.
 	 * @return Vector3
