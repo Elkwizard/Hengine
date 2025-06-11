@@ -75,15 +75,15 @@ class Geometry {
 	static inflate(polygon, distance) {
 		const edgeNormals = polygon
 			.getEdges()
-			.map(edge => edge.vector.normal.normalize());
+			.map(edge => edge.normal.normalize());
 		const vertices = [];
 		const { length } = polygon.vertices;
 		for (let i = 0; i < length; i++) {
 			const left = edgeNormals[(i + length) % length];
 			const right = edgeNormals[i];
-			const inset = left.plus(right);
-			if (inset.sqrMag) inset.mag = distance;
-			const v = polygon.vertices[i].minus(inset);
+			const extrude = left.plus(right);
+			if (extrude.sqrMag) extrude.mag = distance;
+			const v = polygon.vertices[i].plus(extrude);
 			vertices.push(v);
 		}
 		return new Polygon(vertices);

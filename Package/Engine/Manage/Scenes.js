@@ -92,19 +92,26 @@ class Scene {
 	 * @return { hitShape: WorldObject, hitPoint: VectorN }/null
 	 */
 	rayCast(ro, rd, mask = () => true) {
-		const elements = this.main.updateArray()
-			.filter(el => el instanceof WorldObject && mask(el));
+		const elements = this.main.sceneObjectArray;
 		
 		let bestDist = Infinity;
 		let bestShape = null;
 
 		for (let i = 0; i < elements.length; i++) {
 			const element = elements[i];
-			const models = element.getAllModels();
-			const t = Math.min(...models.map(model => model.rayCast(ro, rd, bestDist)));
-			if (t < bestDist) {
-				bestDist = t;
-				bestShape = element;
+
+			if (!(element instanceof WorldObject && mask(element)))
+				continue;
+
+			const shapes = element.getAllShapes();
+			const localOrigin = element.transform.globalToLocal(ro);
+			const localDirection = element.transform.globalDirectionToLocal(rd);
+			for (let j = 0; j < shapes.length; j++) {
+				const t = shapes[j].rayCast(localOrigin, localDirection, bestDist);
+				if (t < bestDist) {
+					bestDist = t;
+					bestShape = element;
+				}
 			}
 		}
 		

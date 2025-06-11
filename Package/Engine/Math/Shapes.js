@@ -256,7 +256,7 @@ class Shape2D extends Shape {
  * @prop Vector2 a | The start point of the line segment
  * @prop Vector2 b | The end point of the line segment
  * @prop Vector2 vector | A vector from the start point of the line segment to the end point
- * @prop Vector2 normal | A unit normal vector to the line segment
+ * @prop Vector2 normal | A normal vector to the line segment. Left-handed (in Screen-Space)
  * @prop Number length | THe length of the line segment
  * @prop Number slope | The slope of the line segment. If the line segment is vertical, this is infinite
  * @prop Number intercept | The y-intercept of the line segment if it were extended into a line
@@ -294,7 +294,7 @@ class Line extends Shape2D {
 		return this.b.minus(this.a);
 	}
 	get normal() {
-		return this.vector.normal;
+		return this._normal ??= this.vector.normal.invert();
 	}
 	get slope() {
 		const { a, b } = this;
@@ -501,10 +501,10 @@ class Polygon extends Shape2D {
 		return result;
 	}
 	toPhysicsShape() {
-		const vertices = new Physics.Array_VectorN_2__0(this.vertices.length);
+		const vertices = new Physics2.Array_VectorN_2__0(this.vertices.length);
 		for (let i = 0; i < this.vertices.length; i++)
 			this.vertices[i].toPhysicsVector(vertices.get(i));
-		const polytope = new Physics.Polytope(vertices);
+		const polytope = new Physics2.Polytope(vertices);
 		vertices.delete();
 
 		return polytope;
@@ -514,15 +514,18 @@ class Polygon extends Shape2D {
 		if (this.vertices.every(vertex => vertex.dot(rd) < originDot))
 			return Infinity;
 		
-		maxDist += originDot;
-		if (this.vertices.every(vertex => vertex.dot(rd) > maxDist))
+		const threshold = maxDist + originDot;
+		if (this.vertices.every(vertex => vertex.dot(rd) > threshold))
 			return Infinity;
 
-		let bestDist = Infinity;
+		let bestDist = maxDist;
 		const faces = this.getFaces();
 		for (let i = 0; i < faces.length; i++) {
-			const t = faces[i].rayCast(ro, rd);
-			if (t < bestDist) bestDist = t;
+			const face = faces[i];
+			if (face.normal.dot(rd) < 0) {
+				const t = face.rayCast(ro, rd, bestDist);
+				if (t < bestDist) bestDist = t;
+			}
 		}
 		return bestDist;
 	}
@@ -874,7 +877,7 @@ class Circle extends Shape2D {
 	}
 	toPhysicsShape() {
 		const center = this.position.toPhysicsVector();
-		const ball = new Physics.Ball(center, this.radius);
+		const ball = new Physics2.Ball(center, this.radius);
 		center.delete();
 		return ball;
 	}

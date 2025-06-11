@@ -154,19 +154,30 @@ class Triangle extends Shape3D {
 		result.c = this.c.get();
 		return result;
 	}
-	rayCast(ro, rd) {
+	rayCast(ro, rd, maxDist = Infinity) {
 		const t = this.plane.rayCast(ro, rd);
-		if (!isFinite(t)) return Infinity;
+		if (!isFinite(t) || t > maxDist) return Infinity;
 
-		const point = rd.times(t).add(ro);
+		if (this._cast === undefined) {
+			const right = this.b.minus(this.a);
+			const up = this.c.minus(this.a);
+			const toGlobal = new Matrix3(right, up, this.normal);
+			const toLocal = toGlobal.inverse;
+			
+			const uAxis = toLocal.row(0);
+			const vAxis = toLocal.row(1);
+			const baseU = uAxis.dot(this.a);
+			const baseV = vAxis.dot(this.a);
 
-		const fromA = point.minus(this.a);		
-		const fromB = point.minus(this.b);
-		const fromC = point.minus(this.c);
+			this._cast = { uAxis, vAxis, baseU, baseV };
+		}
 
-		if (fromA.cross(fromB).dot(this.normal) < -Vector3.EPSILON) return Infinity;
-		if (fromB.cross(fromC).dot(this.normal) < -Vector3.EPSILON) return Infinity;
-		if (fromC.cross(fromA).dot(this.normal) < -Vector3.EPSILON) return Infinity;
+		const { uAxis, vAxis, baseU, baseV } = this._cast;
+
+		const u = uAxis.dot(ro) + uAxis.dot(rd) * t - baseU;
+		const v = vAxis.dot(ro) + vAxis.dot(rd) * t - baseV;
+
+		if (u < 0 || v < 0 || u > 1 - v) return Infinity;
 
 		return t;
 	}
@@ -175,7 +186,7 @@ class Triangle extends Shape3D {
 	 * @return Plane
 	 */
 	get plane() {
-		return new Plane(this.normal, this.a.dot(this.normal));
+		return this._plane ??= new Plane(this.normal, this.a.dot(this.normal));
 	}
 }
 
@@ -420,14 +431,14 @@ class Polyhedron extends Shape3D {
 		return Prism.bound(this.vertices);
 	}
 	toPhysicsShape() {
-		const vertices = new Physics.Array_VectorN_3__0(this.vertices.length);
-		const indices = new Physics.Array_int_0(this.indices.length);
+		const vertices = new Physics3.Array_VectorN_3__0(this.vertices.length);
+		const indices = new Physics3.Array_int_0(this.indices.length);
 		for (let i = 0; i < this.vertices.length; i++)
 			this.vertices[i].toPhysicsVector(vertices.get(i));
 		for (let i = 0; i < this.indices.length; i++)
 			indices.set(i, this.indices[i]);
 
-		const result = new Physics.Polytope(vertices, indices);
+		const result = new Physics3.Polytope(vertices, indices);
 
 		vertices.delete();
 		indices.delete();
@@ -741,19 +752,23 @@ class Prism extends Polyhedron {
 	}
 	set vertices(a) { }
 	get vertices() {
-		const x = this.xRange;
-		const y = this.yRange;
-		const z = this.zRange;
-		return [
-			new Vector3(x.min, y.min, z.min),
-			new Vector3(x.max, y.min, z.min),
-			new Vector3(x.min, y.max, z.min),
-			new Vector3(x.max, y.max, z.min),
-			new Vector3(x.min, y.min, z.max),
-			new Vector3(x.max, y.min, z.max),
-			new Vector3(x.min, y.max, z.max),
-			new Vector3(x.max, y.max, z.max)
-		];
+		if (this._vertices === undefined) {
+			const x = this.xRange;
+			const y = this.yRange;
+			const z = this.zRange;
+			this._vertices = [
+				new Vector3(x.min, y.min, z.min),
+				new Vector3(x.max, y.min, z.min),
+				new Vector3(x.min, y.max, z.min),
+				new Vector3(x.max, y.max, z.min),
+				new Vector3(x.min, y.min, z.max),
+				new Vector3(x.max, y.min, z.max),
+				new Vector3(x.min, y.max, z.max),
+				new Vector3(x.max, y.max, z.max)
+			];
+		}
+
+		return this._vertices;
 	}
 	get x() {
 		return this.xRange.min;
@@ -821,6 +836,47 @@ class Prism extends Polyhedron {
 	scale(scale, center = this.middle) {
 		const mat = Matrix4.scaleAbout(scale, center);
 		return new Prism(mat.times(this.min), mat.times(this.max));
+	}
+	rayCast({ x: rox, y: roy, z: roz }, { x: rdx, y: rdy, z: rdz }, maxDist) {
+		const { min, max } = this;
+
+		const dimX = (max.x - min.x) * 0.5;
+		const dimY = (max.y - min.y) * 0.5;
+		const dimZ = (max.z - min.z) * 0.5;
+
+		rox -= (min.x + max.x) * 0.5;
+		roy -= (min.y + max.y) * 0.5;
+		roz -= (min.z + max.z) * 0.5;
+
+		if (rox < 0) {
+			rox = -rox;
+			rdx = -rdx;
+		}
+
+		if (roy < 0) {
+			roy = -roy;
+			rdy = -rdy;
+		}
+		
+		if (roz < 0) {
+			roz = -roz;
+			rdz = -rdz;
+		}
+
+		const xt = Math.min(0, dimX - rox) / rdx || 0;
+		const yt = Math.min(0, dimY - roy) / rdy || 0;
+		const zt = Math.min(0, dimZ - roz) / rdz || 0;
+
+		const t = Math.max(xt, yt, zt);
+
+		if (
+			t <= 0 || t > maxDist ||
+			Math.abs(rox + rdx * t) > dimX + Vector3.EPSILON ||
+			Math.abs(roy + rdy * t) > dimY + Vector3.EPSILON ||
+			Math.abs(roz + rdz * t) > dimZ + Vector3.EPSILON
+		) return Infinity;
+
+		return t;
 	}
 	/**
 	 * Creates a rectangular prism from a set of intervals.
@@ -921,7 +977,7 @@ class Plane extends Shape3D {
 		return new Plane(normal, distance);
 	}
 	rayCast(ro, rd) {
-		const side = ro.dot(this.normal) - this.distance;
+		const side = this.normal.dot(ro) - this.distance;
 		const dot = -this.normal.dot(rd);
 		const t = side / dot;
 		return t > Vector3.EPSILON ? t : Infinity;
@@ -1031,7 +1087,7 @@ class Sphere extends Shape3D {
 	}
 	toPhysicsShape() {
 		const center = this.position.toPhysicsVector();
-		const result = new Physics.Ball(center, this.radius);
+		const result = new Physics3.Ball(center, this.radius);
 		center.delete();
 		return result;
 	}

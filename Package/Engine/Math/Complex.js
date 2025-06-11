@@ -221,7 +221,7 @@ class Quaternion extends Complex {
 		const { real, imaginary } = this;
 		const scaled = vector.times(real * real - imaginary.sqrMag);
 		const imag = imaginary.times(2 * imaginary.dot(vector));
-		const cross = imaginary.cross(vector).times(2 * real);
+		const cross = imaginary.cross(vector).mul(2 * real);
 		return scaled.add(imag).plus(cross, dst);
 	}
 	/**

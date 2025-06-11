@@ -33,6 +33,8 @@ class Transform {
 		this.complex = Complex.zero;
 		this._matrix = new Vector.TransformMatrix();
 		this._invMatrix = new Vector.TransformMatrix();
+		this._dirMatrix = new Vector.Matrix();
+		this._invDirMatrix = new Vector.Matrix();
 	}
 	set position(a) {
 		this._position.set(a);
@@ -61,23 +63,7 @@ class Transform {
 	 * @return Matrix
 	 */
 	get matrix() {
-		if (this.matrixChanged) {
-			this.matrixChanged = false;
-
-			this.complex = this.constructor.Complex.fromRotation(this.rotation);
-			const rotationMatrix = this.complex.toMatrix();
-			const rotationSize = rotationMatrix.constructor.size;
-			const matSize = this._matrix.constructor.size;
-			
-			for (let c = 0; c < rotationSize; c++)
-			for (let r = 0; r < rotationSize; r++)
-				this._matrix[c * matSize + r] = rotationMatrix[c * rotationSize + r];
-			
-			const { modValues } = this.position.constructor;
-			const positionStart = this._matrix.length - matSize;
-			for (let r = 0; r < rotationSize; r++)
-				this._matrix[positionStart + r] = this.position[modValues[r]];
-		}
+		this.syncMatrix();
 		return this._matrix;
 	}
 	/**
@@ -87,7 +73,7 @@ class Transform {
 	get invMatrix() {
 		if (this.invMatrixChanged) {
 			this.invMatrixChanged = false;
-			this._invMatrix = this.matrix.inverse;
+			this.matrix.get(this._invMatrix).invert();
 		}
 		
 		return this._invMatrix;
@@ -97,11 +83,32 @@ class Transform {
 	 * @return Vector
 	 */
 	get direction() {
-		return this.constructor.Vector.right.rotate(this.rotation);
+		return this.localDirectionToGlobal(this.constructor.Vector.right);
 	}
 	change() {
 		this.matrixChanged = true;
 		this.invMatrixChanged = true;
+	}
+	syncMatrix() {
+		if (this.matrixChanged) {
+			this.matrixChanged = false;
+
+			this.complex = this.constructor.Complex.fromRotation(this.rotation);
+			this._dirMatrix = this.complex.toMatrix();
+			this._dirMatrix.get(this._invDirMatrix).invert();
+
+			const rotationSize = this._dirMatrix.constructor.size;
+			const matSize = this._matrix.constructor.size;
+			
+			for (let c = 0; c < rotationSize; c++)
+			for (let r = 0; r < rotationSize; r++)
+				this._matrix[c * matSize + r] = this._dirMatrix[c * rotationSize + r];
+			
+			const { modValues } = this.position.constructor;
+			const positionStart = this._matrix.length - matSize;
+			for (let r = 0; r < rotationSize; r++)
+				this._matrix[positionStart + r] = this.position[modValues[r]];
+		}
 	}
 	get(transf = new this.constructor(this.constructor.Vector.zero)) {
 		transf.position = this.position;
@@ -109,7 +116,17 @@ class Transform {
 		return transf;
 	}
 	diff(transf) {
-		return !this.position.equals(transf.position) || !this.rotation.equals(transf.rotation);
+		return	!this.position.equals(transf.position) ||
+				!this.rotation.equals(transf.rotation);
+	}
+	/**
+	 * Transforms a given direction in global-space into local-space.
+	 * @param Vector direction | The global-space direction to transform
+	 * @return Vector
+	 */
+	globalDirectionToLocal(direction) {
+		this.syncMatrix();
+		return this._invDirMatrix.times(direction);
 	}
 	/**
 	 * Transforms a given point by applying the inverse of the caller to it.
@@ -122,6 +139,15 @@ class Transform {
 	}
 	globalSpaceToLocalSpace(v) {
 		return this.globalToLocal(v);
+	}
+	/**
+	 * Transforms a given direction in local-space into global-space.
+	 * @param Vector direction | The local-space direction to transform
+	 * @return Vector 
+	 */
+	localDirectionToGlobal(direction) {
+		this.syncMatrix();
+		return this._dirMatrix.times(direction);
 	}
 	/**
 	 * Transforms a given point by applying the caller to it.

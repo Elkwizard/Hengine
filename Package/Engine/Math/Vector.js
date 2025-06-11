@@ -442,7 +442,7 @@ class Vector2 extends Vector {
 		this.y %= v;
 		return this;
 	}
-	toPhysicsVector(result = new Physics.VectorN_2_()) {
+	toPhysicsVector(result = new Physics2.VectorN_2_()) {
 		result.setAll(this.x, this.y);
 		return result;
 	}
@@ -643,7 +643,7 @@ class Vector3 extends Vector {
 	rotatedAboutAxis(axis, angle, result) {
 		return this.get(result).rotateAboutAxis(axis, angle);
 	}
-	toPhysicsVector(result = new Physics.VectorN_3_()) {
+	toPhysicsVector(result = new Physics3.VectorN_3_()) {
 		result.setAll(this.x, this.y, this.z);
 		return result;
 	}

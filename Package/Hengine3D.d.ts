@@ -2724,7 +2724,7 @@ declare class Line extends Shape2D {
 	 */
 	vector: Vector2;
 	/**
-	 * A unit normal vector to the line segment
+	 * A normal vector to the line segment. Left-handed (in Screen-Space)
 	 */
 	normal: Vector2;
 	/**
@@ -6324,11 +6324,21 @@ declare class Transform<Matrix, Vector, Angle> {
 	 */
 	get direction(): Vector;
 	/**
+	 * Transforms a given direction in global-space into local-space.
+	 * @param direction - The global-space direction to transform
+	 */
+	globalDirectionToLocal(direction: Vector): Vector;
+	/**
 	 * Transforms a given point by applying the inverse of the caller to it.
 	 * This translates the point by the inverse of the transform's position and then rotates it counter-clockwise (in Screen-Space) about the origin by the transform's rotation.
 	 * @param point - The point to transform
 	 */
 	globalToLocal(point: Vector): Vector;
+	/**
+	 * Transforms a given direction in local-space into global-space.
+	 * @param direction - The local-space direction to transform
+	 */
+	localDirectionToGlobal(direction: Vector): Vector;
 	/**
 	 * Transforms a given point by applying the caller to it.
 	 * This rotates the point clockwise (in Screen-Space) about the origin by the transform's rotation and then translates it by the transform's position.

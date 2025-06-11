@@ -54,7 +54,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="get Transform.prototype.inverse()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L55" target="_blank" class="function-name source-link">inverse</a><span class="type">Transform</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L57" target="_blank" class="function-name source-link">inverse</a><span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform that, when composed with the caller, will produce no offset and no rotation.
@@ -64,7 +64,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get Transform.prototype.matrix()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L63" target="_blank" class="function-name source-link">matrix</a><span class="type"><a href="../Geometry/Matrices.html#class Matrix">Matrix</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L65" target="_blank" class="function-name source-link">matrix</a><span class="type"><a href="../Geometry/Matrices.html#class Matrix">Matrix</a></span>
 			</div>
 			<div class="function desc">
 				Returns a matrix representing the current transformation from local to global space.
@@ -74,7 +74,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get Transform.prototype.invMatrix()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L87" target="_blank" class="function-name source-link">invMatrix</a><span class="type"><a href="../Geometry/Matrices.html#class Matrix">Matrix</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L73" target="_blank" class="function-name source-link">invMatrix</a><span class="type"><a href="../Geometry/Matrices.html#class Matrix">Matrix</a></span>
 			</div>
 			<div class="function desc">
 				Returns a matrix representing the current transformation from global to local space.
@@ -84,7 +84,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get Transform.prototype.direction()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L99" target="_blank" class="function-name source-link">direction</a><span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L85" target="_blank" class="function-name source-link">direction</a><span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 			</div>
 			<div class="function desc">
 				Returns a unit vector in the direction of the x axis in local space.
@@ -92,9 +92,36 @@ This is an abstract superclass and should not be constructed.
 			
 		</div>
 	
+		<div class="function-wrapper" id="Transform.prototype.globalDirectionToLocal()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L127" target="_blank" class="function-name source-link">globalDirectionToLocal</a>(<span class="param">direction</span>)<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+			</div>
+			<div class="function desc">
+				Transforms a given direction in global-space into local-space.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Transform.prototype.globalDirectionToLocal():direction">
+							<div class="param-name">
+								<span class="param">direction</span>
+								<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+							</div>
+							<div class="param desc">
+								The global-space direction to transform
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Transform.prototype.globalToLocal()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L120" target="_blank" class="function-name source-link">globalToLocal</a>(<span class="param">point</span>)<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L137" target="_blank" class="function-name source-link">globalToLocal</a>(<span class="param">point</span>)<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the inverse of the caller to it.
@@ -120,9 +147,36 @@ This translates the point by the inverse of the transform's position and then ro
 			
 		</div>
 	
+		<div class="function-wrapper" id="Transform.prototype.localDirectionToGlobal()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L148" target="_blank" class="function-name source-link">localDirectionToGlobal</a>(<span class="param">direction</span>)<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+			</div>
+			<div class="function desc">
+				Transforms a given direction in local-space into global-space.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Transform.prototype.localDirectionToGlobal():direction">
+							<div class="param-name">
+								<span class="param">direction</span>
+								<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+							</div>
+							<div class="param desc">
+								The local-space direction to transform
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Transform.prototype.localToGlobal()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L132" target="_blank" class="function-name source-link">localToGlobal</a>(<span class="param">point</span>)<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L158" target="_blank" class="function-name source-link">localToGlobal</a>(<span class="param">point</span>)<span class="type"><a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 			</div>
 			<div class="function desc">
 				Transforms a given point by applying the caller to it.
@@ -150,7 +204,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 	
 		<div class="function-wrapper" id="Transform.combine()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L170" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L196" target="_blank" class="function-name source-link">Transform.combine</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type">Transform</span>
 			</div>
 			<div class="function desc">
 				Returns a transform which has the same effect as applying two transformations in a row.
@@ -190,7 +244,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 		
 			<div class="class-wrapper" id="class Transform2D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L183" target="_blank" class="class-name source-link">Transform2D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L209" target="_blank" class="class-name source-link">Transform2D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
 				</div>
 				<div class="class desc">
 					Represents a 2D affine transformation, composed of a translation and a rotation.
@@ -221,7 +275,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 					<div class="class-methods">
 		<div class="function-wrapper" id="Transform2D.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L192" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L218" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new 2D transform.
@@ -258,7 +312,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 	
 		<div class="function-wrapper" id="Transform2D.prototype.rotateAround()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L201" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L227" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Adds a clockwise (in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a>) rotation in-place about a specific point to the existing transformation. 
@@ -298,7 +352,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 		
 			<div class="class-wrapper" id="class Transform3D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L216" target="_blank" class="class-name source-link">Transform3D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L242" target="_blank" class="class-name source-link">Transform3D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
 				</div>
 				<div class="class desc">
 					Represents a 3D affine transformation, composed of a translation and a rotation about an arbitrary axis.
@@ -329,7 +383,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 					<div class="class-methods">
 		<div class="function-wrapper" id="Transform3D.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L225" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L251" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new 3D transform.

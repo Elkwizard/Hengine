@@ -336,10 +336,10 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 	static buffers = {};
 	static bindings = {};
 	static imports = {};
-	constructor(src, exportName) {
+	constructor(src, exportNames) {
 		super(src);
 		this.moduleName = this.src.match(/(\w+)$/)[1];
-		this.exportName = exportName ?? this.moduleName;
+		this.exportNames = exportNames ?? [this.moduleName];
 	}
 	async load() {
 		const { moduleName } = this;
@@ -433,7 +433,8 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 			console.log(readString(pointer));
 		};
 
-		window[this.exportName] = module;
+		for (let i = 0; i < this.exportNames.length; i++)
+			window[this.exportNames[i]] = module;
 	}
 }
 
@@ -1037,7 +1038,14 @@ class HengineLoader {
 			"Util/Sound.js",
 
 			"Math/Matrix.js",
-			new HengineWASMResource(`C++/Physics/Physics${DIM}`, "Physics"),
+			new HengineWASMResource(
+				`C++/Physics/Physics2`,
+				IS_3D ? ["Physics2"] : ["Physics2", "Physics"]
+			),
+			new HengineWASMResource(
+				`C++/Physics/Physics3`,
+				IS_3D ? ["Physics3", "Physics"] : ["Physics3"]
+			),
 			"Math/PhysicsAPI.js",
 			"Math/Random.js",
 			"Math/Interpolation.js",

@@ -1,9 +1,10 @@
 function physicsAPICollideShapes(a, b) {
-    a = a.toPhysicsShape();
-	b = b.toPhysicsShape();
-	const result = Physics.Detector.testCollide(a, b);
-	a.delete();
-	b.delete();
+    const aPhys = a.toPhysicsShape();
+	const bPhys = b.toPhysicsShape();
+	const physics = a instanceof Shape2D ? Physics2 : Physics3;
+	const result = physics.Detector.testCollide(aPhys, bPhys);
+	aPhys.delete();
+	bPhys.delete();
 	return result;
 }
 

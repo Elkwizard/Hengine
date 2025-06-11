@@ -571,7 +571,7 @@ class Matrix3 extends Matrix {
 	toCSS() {
 		return `matrix(${this[0]}, ${this[1]}, ${this[3]}, ${this[4]}, ${this[6]}, ${this[7]})`;
 	}
-	toPhysicsMatrix(result = new Physics.MatrixRC_3_()) {
+	toPhysicsMatrix(result = new Physics3.MatrixRC_3_()) {
 		for (let r = 0; r < 3; r++)
 		for (let c = 0; c < 3; c++)
 			result.set(r, c, this[c * 3 + r]);
