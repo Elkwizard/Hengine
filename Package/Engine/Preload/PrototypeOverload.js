@@ -325,88 +325,98 @@ Object.defineProperty(window, "title", {
 		if (index in this) return this[index];
 		return null;
 	});
-	Array.makeBaseDimension = function (arr) {
-		proto(arr, "map", function (fn, ...coords) {
-			const result = Array.makeBaseDimension([]);
-			for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
-			return result;
-		});
-		proto(arr, "forEach", function (fn, ...coords) {
-			for (let i = 0; i < this.length; i++) fn(this[i], ...coords, i);
-		});
-		proto(arr, "some", function (fn, ...coords) {
-			for (let i = 0; i < this.length; i++)
-				if (fn(this[i], ...coords, i)) return true;
-			return false;
-		});
-		proto(arr, "every", function (fn, ...coords) {
-			for (let i = 0; i < this.length; i++)
-				if (!fn(this[i], ...coords, i)) return false;
-			return true;
-		});
-		return arr;
-	};
-	Array.makeMultidimensional = function (arr) {
-		proto(arr, "multiDimensional", true);
-		proto(arr, "sample", function (...indices) {
-			const index = indices[0];
-			indices.shift();
-			if (index in this) return this[index].sample(...indices);
-			return null;
-		}.bind(arr));
-		proto(arr, "flatten", function () {
-			const result = [];
-			for (let i = 0; i < this.length; i++) result.pushArray(this[i].flatten());
-			return result;
-		}.bind(arr));
-		proto(arr, Symbol.iterator, function* () {
-			const all = this.flatten();
-			for (let i = 0; i < all.length; i++) yield all[i];
-		}.bind(arr));
-		proto(arr, "forEach", function (fn, ...coords) {
-			for (let i = 0; i < this.length; i++) this[i].forEach(fn, ...coords, i);
-		}.bind(arr));
-		proto(arr, "map", function (fn, ...coords) {
-			const result = Array.makeMultidimensional([]);
-			for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...coords, i));
-			return result;
-		}.bind(arr));
-		proto(arr, "some", function (fn, ...coords) {
-			for (let i = 0; i < this.length; i++)
-				if (this[i].some(fn, ...coords, i)) return true;
-			return false;
-		}.bind(arr));
-		proto(arr, "every", function (fn, ...coords) {
-			for (let i = 0; i < this.length; i++)
-				if (!this[i].every(fn, ...coords, i)) return false;
-			return true;
-		}.bind(arr));
-		proto(arr, "fill", function (value) {
-			for (let i = 0; i < this.length; i++) this[i].fill(value);
-			return this;
-		}.bind(arr));
-		return arr;
-	};
-
-	/**
-	 * @name static dim
-	 * Creates a multidimensional array, on which standard array operations can be performed with additional arguments.
-	 * e.g. `arr.map((value, i, j) => ...)` for a 2D array.
-	 * @param Number[] ...dims | The sizes of the each dimension of the array.
-	 * @return Any[]
-	 */
-	Array.dim = function (...dims) {
-		const dim = dims.shift();
-
-		if (dims.length) {
-			const arr = [];
-			for (let i = 0; i < dim; i++) arr.push(Array.dim(...dims));
-			Array.makeMultidimensional(arr);
+	
+	{
+		const makeBaseDimension = arr => {
+			proto(arr, "map", function (fn, ...coords) {
+				const result = makeBaseDimension([]);
+				for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
+				return result;
+			});
+			proto(arr, "forEach", function (fn, ...coords) {
+				for (let i = 0; i < this.length; i++) fn(this[i], ...coords, i);
+			});
+			proto(arr, "some", function (fn, ...coords) {
+				for (let i = 0; i < this.length; i++)
+					if (fn(this[i], ...coords, i)) return true;
+				return false;
+			});
+			proto(arr, "every", function (fn, ...coords) {
+				for (let i = 0; i < this.length; i++)
+					if (!fn(this[i], ...coords, i)) return false;
+				return true;
+			});
 			return arr;
-		}
+		};
 
-		return Array.makeBaseDimension(new Array(Math.ceil(dim)).fill(null));
-	};
+		const makeMultidimensional = arr => {
+			proto(arr, "multiDimensional", true);
+			proto(arr, "sample", function (...indices) {
+				const index = indices[0];
+				indices.shift();
+				if (index in this) return this[index].sample(...indices);
+				return null;
+			}.bind(arr));
+			proto(arr, "flatten", function () {
+				const result = [];
+				for (let i = 0; i < this.length; i++) result.pushArray(this[i].flatten());
+				return result;
+			}.bind(arr));
+			proto(arr, Symbol.iterator, function* () {
+				const all = this.flatten();
+				for (let i = 0; i < all.length; i++) yield all[i];
+			}.bind(arr));
+			proto(arr, "forEach", function (fn, ...coords) {
+				for (let i = 0; i < this.length; i++) this[i].forEach(fn, ...coords, i);
+			}.bind(arr));
+			proto(arr, "map", function (fn, ...coords) {
+				const result = makeMultidimensional([]);
+				for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...coords, i));
+				return result;
+			}.bind(arr));
+			proto(arr, "some", function (fn, ...coords) {
+				for (let i = 0; i < this.length; i++)
+					if (this[i].some(fn, ...coords, i)) return true;
+				return false;
+			}.bind(arr));
+			proto(arr, "every", function (fn, ...coords) {
+				for (let i = 0; i < this.length; i++)
+					if (!this[i].every(fn, ...coords, i)) return false;
+				return true;
+			}.bind(arr));
+			proto(arr, "fill", function (value) {
+				for (let i = 0; i < this.length; i++) this[i].fill(value);
+				return this;
+			}.bind(arr));
+			return arr;
+		};
+
+		const recursiveDim = dims => {
+			const dim = dims[0];
+	
+			if (dims.length > 1) {
+				const arr = [];
+				for (let i = 0; i < dim; i++) arr.push(recursiveDim(dims.slice(1)));
+				makeMultidimensional(arr);
+				return arr;
+			}
+	
+			return makeBaseDimension(new Array(Math.ceil(dim)).fill(null));
+		};
+		/**
+		 * @name static dim
+		 * Creates a multidimensional array, on which standard array operations can be performed with additional arguments.
+		 * e.g. `arr.map((value, i, j) => ...)` for a 2D array.
+		 * @param Number[] ...dims | The sizes of the each dimension of the array.
+		 * @return Any[]
+		 */
+		Array.dim = function (...dims) {
+			if (dims.length === 1) return new Array(dims[0]).fill(null);
+
+			return recursiveDim(dims);
+		};
+	}
+
 	/**
 	 * @name class Number extends Vector
 	 * @type interface Number extends MathObject
