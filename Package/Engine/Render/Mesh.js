@@ -120,12 +120,20 @@ class Mesh extends Renderable {
 	transform(transform) {
 		const offset = this.offsets.get("vertexPosition");
 		const { data, stride } = this;
-		for (let i = offset; i < data.length; i += stride) {
-			const vec = new Vector3(data[i], data[i + 1], data[i + 2]);
-			transform.times(vec, vec);
-			data[i] = vec.x;
-			data[i + 1] = vec.y;
-			data[i + 2] = vec.z;
+		const [
+			a, d, g, _0,
+			b, e, h, _1,
+			c, f, i, _2,
+			tx, ty, tz
+		] = transform;
+
+		for (let n = offset; n < data.length; n += stride) {
+			const x = data[n + 0];
+			const y = data[n + 1];
+			const z = data[n + 2];
+			data[n + 0] = x * a + y * b + z * c + tx;
+			data[n + 1] = x * d + y * e + z * f + ty;
+			data[n + 2] = x * g + y * h + z * i + tz;
 		}
 		this.flush();
 		return this;
@@ -287,22 +295,31 @@ class Mesh extends Renderable {
 			}
 
 			const vertexCount = mesh.data.length / mesh.stride;
-			for (let j = 0; j < attributes.length; j++) {
-				const attr = attributes[j];
-				const { size } = ATTRIBUTES[attr];
+			
+			const sameLayout =	mesh.attributes.length === attributes.length &&
+								mesh.attributes.every((attr, i) => attr === attributes[i]);
 
-				let destinationIndex = startingVertexIndex * stride + offsets.get(attr);
-				let sourceIndex = mesh.offsets.get(attr);
-
-				for (let k = 0; k < vertexCount; k++) {
-					for (let l = 0; l < size; l++) {
-						vertexData[destinationIndex + l] = mesh.data[sourceIndex + l];
+			if (sameLayout) { // exact layout match
+				vertexData.set(mesh.data, startingVertexIndex * stride);
+			} else { // mismatch
+				for (let j = 0; j < attributes.length; j++) {
+					const attr = attributes[j];
+					const { size } = ATTRIBUTES[attr];
+	
+					let destinationIndex = startingVertexIndex * stride + offsets.get(attr);
+					let sourceIndex = mesh.offsets.get(attr);
+	
+					for (let k = 0; k < vertexCount; k++) {
+						for (let l = 0; l < size; l++) {
+							vertexData[destinationIndex + l] = mesh.data[sourceIndex + l];
+						}
+	
+						destinationIndex += stride;
+						sourceIndex += mesh.stride;
 					}
-
-					destinationIndex += stride;
-					sourceIndex += mesh.stride;
 				}
 			}
+
 
 			startingVertexIndex += vertexCount;
 		}

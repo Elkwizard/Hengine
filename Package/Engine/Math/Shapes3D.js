@@ -195,6 +195,7 @@ class Triangle extends Shape3D {
  * Vertices and triangles can be added through various means, and can at any point be converted into a Polyhedron.
  * @prop Vector3[] vertices | The vertices of the polyhedron. These can be added to directly, if desired
  * @prop Number[] indices | The indices of the vertices of the triangular faces of the polyhedron. These can be added to directly, if desired
+ * @prop Boolean lazy | Whether the polyhedron should be constructed lazily, i.e. whether it is guaranteed to not contain duplicate vertices or degenerate triangles. Starts as false
  */
 class PolyhedronBuilder {
 	/**
@@ -203,6 +204,7 @@ class PolyhedronBuilder {
 	constructor() {
 		this.vertices = [];
 		this.indices = [];
+		this.lazy = false;
 	}
 	/**
 	 * Creates a new Polyhedron out of the current state of the builder.
@@ -210,7 +212,7 @@ class PolyhedronBuilder {
 	 * @return Polyhedron
 	 */
 	get polyhedron() {
-		return new Polyhedron(this.vertices, this.indices);
+		return new Polyhedron(this.vertices, this.indices, this.lazy);
 	}
 	/**
 	 * Adds a new vertex, and returns its index.
@@ -491,7 +493,7 @@ class Polyhedron extends Shape3D {
 	map(vertexTransform) {
 		return new Polyhedron(
 			this.vertices.map(vertexTransform),
-			this.indices
+			this.indices, true
 		);
 	}
 	/**
@@ -692,7 +694,7 @@ class Polyhedron extends Shape3D {
 		const forward = axis.times(length / 2);
 		const translation = position;
 		
-		const local = new Polyhedron(vertices, indices);
+		const local = new Polyhedron(vertices, indices, true);
 		const transform = new Matrix4(right, up, forward, translation);
 		return local.getModel(transform);
 	}
