@@ -2926,6 +2926,17 @@ declare class Rect extends Polygon {
 	 */
 	static fromRanges(xRange: Range, yRange: Range): Rect;
 	/**
+	 * Returns a new rectangle with specified dimensions centered at the origin.
+	 * @param dimensions - A vector containing (width, height)
+	 */
+	static fromDimensions(dimensions: Vector2): Rect;
+	/**
+	 * Returns a new rectangle with specified dimensions centered at the origin.
+	 * @param width - The width of the rectangle
+	 * @param height - The height of the rectangle
+	 */
+	static fromDimensions(width: number, height: number): Rect;
+	/**
 	 * Returns the smallest bounding rectangle around a collection of points.
 	 * @param points - The points to create a bounding box for
 	 */
@@ -3247,6 +3258,13 @@ declare class Quaternion extends Complex {
 	 * @param rotation - A vector with length equal to the angle of rotation and direction equal to the axis of rotation
 	 */
 	static fromRotation(rotation: Vector3): Quaternion;
+	/**
+	 * Returns the result of applying a series of rotations in sequence.
+	 * The order is opposite that of matrix multiplication, in the sense that the array `[angle1, angle2, angle3]` represents rotating first by `angle1`, then by `angle2`, and finally by `angle3`.
+	 * Returns the final orientation after applying all the provided rotations to an identity orientation.
+	 * @param angles - The rotations to apply
+	 */
+	static compose(angles: Vector3[]): Vector3;
 }
 
 /**
@@ -3354,6 +3372,10 @@ declare class PolyhedronBuilder {
 	 */
 	indices: number[];
 	/**
+	 * Whether the polyhedron should be constructed lazily, i.e. whether it is guaranteed to not contain duplicate vertices or degenerate triangles. Starts as false
+	 */
+	lazy: boolean;
+	/**
 	 * Creates a new building structure, with no vertices or indices.
 	 */
 	constructor();
@@ -3362,6 +3384,10 @@ declare class PolyhedronBuilder {
 	 * The Polyhedron is disconnected, in the sense that future changes to the builder will not be reflected in the created Polyhedron.
 	 */
 	get polyhedron(): Polyhedron;
+	/**
+	 * Adds an additional triangle for every existing triangle, with the opposite winding direction.
+	 */
+	double(): void;
 	/**
 	 * Adds a new vertex, and returns its index.
 	 * @param vertex - The vertex to add
@@ -3540,6 +3566,18 @@ declare class Prism extends Polyhedron {
 	 * @param max - The right-lower-back corner of the prism
 	 */
 	static fromMinMax(min: Vector3, max: Vector3): Prism;
+	/**
+	 * Creates a rectangular prism centered at the origin with given dimensions.
+	 * @param dimensions - A vector containing (width, height, depth) of the prism
+	 */
+	static fromDimensions(dimensions: Vector3): Prism;
+	/**
+	 * Creates a rectangular prism centered at the origin with given dimensions.
+	 * @param width - The width of the prism
+	 * @param height - The height of the prism
+	 * @param depth - The depth of the prism
+	 */
+	static fromDimensions(width: number, height: number, depth: number): Prism;
 	/**
 	 * Computes the smallest rectangular prism that contains a set of points and returns it.
 	 * @param points - The points to contain
@@ -6859,11 +6897,16 @@ declare class Frame3D extends ImageType {
 /**
  * Represents a material applied to a MeshChunk.
  */
-declare class Material {
+declare class Material implements Copyable {
 	/**
 	 * Whether or not light can pass through the material
 	 */
 	transparent: boolean;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
 }
 
 /**
@@ -7013,6 +7056,13 @@ declare class Mesh extends Renderable {
 	 * Creates a Polyhedron that has the same shape as the mesh, using the `vertexPosition` attribute.
 	 */
 	toPolyhedron(): Polyhedron;
+	/**
+	 * Creates a new mesh from a Shape3D, inferring many settings to produce generally acceptable results.
+	 * @param shape - The shape to create a mesh for
+	 * @param material - The material to use for the mesh. Default is `Material.DEFAULT`
+	 * @param resolution - An relevant amount of vertices to use. Default is 8
+	 */
+	static fromShape(shape: Shape3D, material?: Material, resolution?: number): Mesh;
 	/**
 	 * Creates a new mesh from a Polyhedron.
 	 * @param polyhedron - The object to use for the mesh

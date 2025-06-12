@@ -215,6 +215,18 @@ class PolyhedronBuilder {
 		return new Polyhedron(this.vertices, this.indices, this.lazy);
 	}
 	/**
+	 * Adds an additional triangle for every existing triangle, with the opposite winding direction.
+	 */
+	double() {
+		const count = this.indices.length;
+		for (let i = 0; i < count; i++)
+			this.indices.push(
+				this.indices[i + 2],
+				this.indices[i + 1],
+				this.indices[i + 0]
+			);
+	}
+	/**
 	 * Adds a new vertex, and returns its index.
 	 * @param Vector3 vertex | The vertex to add
 	 * @return Number 
