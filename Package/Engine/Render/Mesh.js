@@ -118,23 +118,45 @@ class Mesh extends Renderable {
 	 * @return Mesh
 	 */
 	transform(transform) {
-		const offset = this.offsets.get("vertexPosition");
 		const { data, stride } = this;
-		const [
-			a, d, g, _0,
-			b, e, h, _1,
-			c, f, i, _2,
-			tx, ty, tz
-		] = transform;
-
-		for (let n = offset; n < data.length; n += stride) {
-			const x = data[n + 0];
-			const y = data[n + 1];
-			const z = data[n + 2];
-			data[n + 0] = x * a + y * b + z * c + tx;
-			data[n + 1] = x * d + y * e + z * f + ty;
-			data[n + 2] = x * g + y * h + z * i + tz;
+		
+		if (this.offsets.has("vertexPosition")) {
+			const offset = this.offsets.get("vertexPosition");
+			const [
+				a, d, g, _0,
+				b, e, h, _1,
+				c, f, i, _2,
+				tx, ty, tz
+			] = transform;
+	
+			for (let n = offset; n < data.length; n += stride) {
+				const x = data[n + 0];
+				const y = data[n + 1];
+				const z = data[n + 2];
+				data[n + 0] = x * a + y * b + z * c + tx;
+				data[n + 1] = x * d + y * e + z * f + ty;
+				data[n + 2] = x * g + y * h + z * i + tz;
+			}
 		}
+
+		if (this.offsets.has("vertexNormal")) {
+			const offset = this.offsets.get("vertexNormal");
+			const [
+				a, d, g,
+				b, e, h,
+				c, f, i
+			] = Matrix3.normal(transform);
+
+			for (let n = offset; n < data.length; n += stride) {
+				const x = data[n + 0];
+				const y = data[n + 1];
+				const z = data[n + 2];
+				data[n + 0] = x * a + y * b + z * c;
+				data[n + 1] = x * d + y * e + z * f;
+				data[n + 2] = x * g + y * h + z * i;
+			}
+		}
+
 		this.flush();
 		return this;
 	}
