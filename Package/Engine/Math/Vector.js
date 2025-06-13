@@ -643,6 +643,16 @@ class Vector3 extends Vector {
 	rotatedAboutAxis(axis, angle, result) {
 		return this.get(result).rotateAboutAxis(axis, angle);
 	}
+	/**
+	 * Returns the smallest rotation (in axis-angle form) that could rotate the caller to face in a given direction.
+	 * @param Vector3 target | The target direction to rotate toward
+	 * @return Vector3 
+	 */
+	angleTo(target) {
+		const axis = this.cross(target);
+		axis.mag = Math.asin(axis.mag / (this.mag * target.mag));
+		return axis;
+	}
 	toPhysicsVector(result = new Physics3.VectorN_3_()) {
 		result.setAll(this.x, this.y, this.z);
 		return result;
