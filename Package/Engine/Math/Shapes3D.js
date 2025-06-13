@@ -212,14 +212,14 @@ class PolyhedronBuilder {
 	 * @return Polyhedron
 	 */
 	get polyhedron() {
-		return new Polyhedron(this.vertices, this.indices, this.lazy);
+		return new Polyhedron([...this.vertices], [...this.indices], this.lazy);
 	}
 	/**
 	 * Adds an additional triangle for every existing triangle, with the opposite winding direction.
 	 */
 	double() {
 		const count = this.indices.length;
-		for (let i = 0; i < count; i++)
+		for (let i = 0; i < count; i += 3)
 			this.indices.push(
 				this.indices[i + 2],
 				this.indices[i + 1],
