@@ -664,6 +664,23 @@ class Vector3 extends Vector {
 		return result;
 	}
 	/**
+	 * Returns the result of applying a series of rotations in sequence.
+	 * The order is opposite that of matrix multiplication, in the sense that the array `[angle1, angle2, angle3]` represents rotating first by `angle1`, then by `angle2`, and finally by `angle3`.
+	 * Returns the final orientation after applying all the provided rotations to an identity orientation.
+	 * @param Vector3[] angles | The rotations to apply
+	 * @return Vector3
+	 */
+	static composeRotations(angles) {
+		if (!angles.length) return Vector3.zero;
+		if (angles.length === 1) return angles[0];
+
+		return angles
+			.map(angle => Quaternion.fromRotation(angle))
+			.reverse()
+			.reduce((a, b) => a.times(b))
+			.angle;
+	}
+	/**
 	 * Returns the cartesian representation of a given point given its spherical coordinates.
 	 * @param Number θ | The polar angle of the point
 	 * @param Number φ | The azimuthal angle of the point
