@@ -164,18 +164,6 @@ SimpleMaterial.FRAGMENT_SHADER = new GLSL(`
 		
 	uniform sampler2D albedoTexture;
 	uniform sampler2D specularTexture;
-	
-	vec2 fractal(vec2 uv) {
-		uv = mod(uv, 0.5) * 2.0;
-		uv = abs(uv - 0.5) + 0.5;
-		uv -= 0.5;
-		float t = time * 0.01;
-		float c = cos(t);
-		float s = sin(t);
-		uv = vec2(uv.x * c - uv.y * s, uv.x * s + uv.y * c);
-		uv += 0.5;
-		return uv;
-	}
 
 	#define MAYBE_TEXTURE(scalar, tex) (material.scalar.a > 0.0 ? material.scalar.rgb : texture(tex, uv).rgb)
 

@@ -1052,7 +1052,7 @@ Artist3D.LIGHTS = `
 		return frag.z > depth ? 1.0 : 0.0;
 	}
 
-	float getShadow(vec3 position, Light light) {
+	float getShadow(vec3 position, Light light, int S) {
 		if (light.shadowIndex == -1) return 0.0;
 		
 		vec3 tangent = normalize(dFdx(position));
@@ -1061,12 +1061,13 @@ Artist3D.LIGHTS = `
 
 		float sum = 0.0;
 		float total = 0.0;
-		int S = 1;
+
 		for (int i = -S; i <= S; i++)
 		for (int j = -S; j <= S; j++) {
 			vec2 off = vec2(i, j) / (0.0001 + float(S)) * 0.5;
 			float weight = exp(-2.0 * dot(off, off));
-			off += _random32(position + offToLocal * off + mod(time * 0.01, 10.0)) - 0.5;
+			if (S != 0)
+				off += _random32(position + offToLocal * off + mod(time * 0.01, 10.0)) - 0.5;
 			sum += sampleShadowMap(light, position, offToLocal * off) * weight;
 			total += weight;
 		}
@@ -1074,6 +1075,10 @@ Artist3D.LIGHTS = `
 		float shadow = sum / total;
 
 		return shadow;
+	}
+
+	float getShadow(vec3 position, Light light) {
+		return getShadow(position, light, 1);
 	}
 `;
 Artist3D.SHADOW_FRAGMENT = new GLSL(`
