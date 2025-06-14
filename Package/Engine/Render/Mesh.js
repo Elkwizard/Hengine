@@ -45,6 +45,7 @@ class Renderable {
  * This is an interface representing how a Polyhedron should be converted into a mesh.
  * This is not a class, but rather describes the structure of an object that must be used in certain cases.
  * @prop Boolean smooth? | Whether the normals should be smoothed across vertices. Default is false
+ * @prop Number smoothLimit? | The minimum dot product between normals of adjacent faces required for them to be smoothed together. This has no effect is `.smooth` is false. Default is 0 (faces beyond perpendicular aren't smoothed)
  */
 
 /**
@@ -209,7 +210,8 @@ class Mesh extends Renderable {
 	 * @return Mesh
 	 */
 	static fromPolyhedron(polyhedron, material = Material.DEFAULT, {
-		smooth = false
+		smooth = false,
+		smoothLimit = 0
 	} = { }) {
 		const TRI_KEYS = ["a", "b", "c"];
 
@@ -232,26 +234,51 @@ class Mesh extends Renderable {
 
 		if (smooth) {
 			const vertexToNormals = Array.dim(polyhedron.vertices.length).map(() => []);
-			for (let i = 0; i < polyhedron.faceCount; i++) {
+			const faceData = Array.dim(polyhedron.faceCount).map((_, i) => {
 				const [a, b, c] = polyhedron.getFaceIndices(i);
-				const { normal } = new Triangle(
-					polyhedron.vertices[a],
-					polyhedron.vertices[b],
-					polyhedron.vertices[c]
-				);
+				const { normal } = polyhedron.getFace(i);
+				return { a, b, c, normal };
+			});
+			for (let i = 0; i < faceData.length; i++) {
+				const { a, b, c, normal } = faceData[i];
 				vertexToNormals[a].push(normal);
 				vertexToNormals[b].push(normal);
 				vertexToNormals[c].push(normal);
 			}
 
-			vertexData = new Float32Array(polyhedron.vertices.length * stride);
+			const vertexToIndex = new Map();
+			vertexData = [];
+			let nextVertexIndex = 0;
+
+			const guaranteeVertex = (index, faceNormal) => {
+				const normals = vertexToNormals[index];
+				const matchingNormals = normals.filter(normal => normal.dot(faceNormal) > smoothLimit);
+				const vertexNormal = Vector3.avg(matchingNormals).normalized;
+
+				if (matchingNormals.length === normals.length) {
+					if (vertexToIndex.has(index)) return vertexToIndex.get(index);
+					vertexToIndex.set(index, nextVertexIndex);
+				}
+
+				const thisIndex = nextVertexIndex;
+				setVertex(thisIndex, polyhedron.vertices[index], vertexNormal, Vector2.zero);
+
+				nextVertexIndex++;
+
+				return thisIndex;
+			};
+
 			indexData = new Uint32Array(polyhedron.indices);
 
-			for (let i = 0; i < polyhedron.vertices.length; i++) {
-				const vertex = polyhedron.vertices[i];
-				const normal = Vector3.avg(vertexToNormals[i]).normalize();
-				setVertex(i, vertex, normal, Vector2.zero);
+			for (let i = 0; i < polyhedron.faceCount; i++) {
+				const { a, b, c, normal } = faceData[i];
+				const start = i * 3;
+				indexData[start + 0] = guaranteeVertex(a, normal);
+				indexData[start + 1] = guaranteeVertex(b, normal);
+				indexData[start + 2] = guaranteeVertex(c, normal);
 			}
+
+			vertexData = new Float32Array(vertexData);
 		} else {	
 			const uvs = [
 				new Vector2(0, 0),

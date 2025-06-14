@@ -846,9 +846,8 @@ class Artist3D extends Artist {
 		let outputBuffer = this.resultBuffer;
 		for (const key in this.postProcess) {
 			const effect = this.postProcess[key];
-			if (effect.active) {
+			if (effect.active)
 				outputBuffer = effect.draw(outputBuffer, camera);
-			}
 		}
 
 		// composite
