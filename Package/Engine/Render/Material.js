@@ -153,6 +153,42 @@ class SimpleMaterial extends Material {
 	}
 }
 SimpleMaterial.VERTEX_SHADER = new GLSL(ShaderMaterial.DEFAULT_VERTEX_SHADER);
+SimpleMaterial.LIGHTING = `
+	struct Surface {
+		vec3 albedo;
+		vec3 specular;
+		vec3 emission;
+		float specularExponent;
+	};
+
+	vec3 computeColor(vec3 position, vec3 normal, Surface surface) {
+		vec3 diffuse = vec3(0);
+		vec3 specular = vec3(0);
+		vec3 ambient = vec3(0);
+		
+		vec3 view = normalize(position - camera.position);
+		vec3 refl = reflect(view, normal);
+
+		for (int i = 0; i < lightCount; i++) {
+			Light light = lights[i];
+			if (light.type == AMBIENT) {
+				ambient += light.color;
+			} else {
+				vec3 lightDir = getLightDirection(position, light);
+				vec3 color = getLightColor(position, light);
+				color *= 1.0 - getShadow(position, light);
+				if (surface.specularExponent > 0.0)
+					specular += color * pow(max(-dot(refl, lightDir), 0.0), surface.specularExponent);
+				diffuse += color * max(-dot(lightDir, normal), 0.0);
+			}
+		}
+
+		return	surface.specular * specular +
+				surface.albedo * (diffuse + ambient) +
+				surface.emission;
+	}
+`;
+
 SimpleMaterial.FRAGMENT_SHADER = new GLSL(`
 	uniform Material {
 		vec4 albedo;
@@ -165,38 +201,16 @@ SimpleMaterial.FRAGMENT_SHADER = new GLSL(`
 	uniform sampler2D albedoTexture;
 	uniform sampler2D specularTexture;
 
+	${SimpleMaterial.LIGHTING}
+
 	#define MAYBE_TEXTURE(scalar, tex) (material.scalar.a > 0.0 ? material.scalar.rgb : texture(tex, uv).rgb)
 
 	vec4 shader() {
-		vec3 view = normalize(position - camera.position);
-		vec3 refl = reflect(view, normal);
-
-		// return vec4(implicitNormal(position) * 0.5 + 0.5, 1.0);
-		// return vec4((normal - implicitNormal(position)) * 0.5 + 0.5, 1.0);
-		// return vec4(normal * 0.5 + 0.5, 1.0);
-
-		vec3 specular = vec3(0);
-		vec3 diffuse = vec3(0);
-		vec3 ambient = vec3(0);
-		for (int i = 0; i < lightCount; i++) {
-			Light light = lights[i];
-			if (light.type == AMBIENT) {
-				ambient += light.color;
-			} else {
-				vec3 lightDir = getLightDirection(position, light);
-				vec3 color = getLightColor(position, light);
-				color *= 1.0 - getShadow(position, light);
-				if (material.specularExponent > 0.0)
-					specular += color * pow(max(-dot(refl, lightDir), 0.0), material.specularExponent);
-				diffuse += color * max(-dot(lightDir, normal), 0.0);
-			}
-		}
-		
 		vec3 albedoColor = MAYBE_TEXTURE(albedo, albedoTexture);
 		vec3 specularColor = MAYBE_TEXTURE(specular, specularTexture); 
-		vec3 light =	specularColor * specular +
-						albedoColor * (diffuse + ambient) +
-						material.emission;
+
+		Surface surface = Surface(albedoColor, specularColor, material.emission, material.specularExponent);
+		vec3 light = computeColor(position, normal, surface);
 
 		return vec4(light, material.alpha);
 	}
