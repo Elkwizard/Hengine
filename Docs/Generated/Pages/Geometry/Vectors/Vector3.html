@@ -347,9 +347,36 @@ Returns the caller.
 			
 		</div>
 	
+		<div class="function-wrapper" id="Vector3.prototype.angleTo()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L651" target="_blank" class="function-name source-link">angleTo</a>(<span class="param">target</span>)<span class="type">Vector3</span>
+			</div>
+			<div class="function desc">
+				Returns the smallest rotation (in axis-angle form) that could rotate the caller to face in a given direction.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Vector3.prototype.angleTo():target">
+							<div class="param-name">
+								<span class="param">target</span>
+								<span class="type">Vector3</span>
+							</div>
+							<div class="param desc">
+								The target direction to rotate toward
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="get Vector3.left()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L675" target="_blank" class="function-name source-link">Vector3.left</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L675" target="_blank" class="function-name source-link">Vector3.right</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L675" target="_blank" class="function-name source-link">Vector3.up</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L675" target="_blank" class="function-name source-link">Vector3.down</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L675" target="_blank" class="function-name source-link">Vector3.forward</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L675" target="_blank" class="function-name source-link">Vector3.backward</a><span class="type">Vector3</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L702" target="_blank" class="function-name source-link">Vector3.left</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L702" target="_blank" class="function-name source-link">Vector3.right</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L702" target="_blank" class="function-name source-link">Vector3.up</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L702" target="_blank" class="function-name source-link">Vector3.down</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L702" target="_blank" class="function-name source-link">Vector3.forward</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L702" target="_blank" class="function-name source-link">Vector3.backward</a><span class="type">Vector3</span>
 			</div>
 			<div class="function desc">
 				Returns a new unit vector pointing in the specified direction.
@@ -359,7 +386,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="get Vector3.origin()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L697" target="_blank" class="function-name source-link">Vector3.origin</a><span class="type">Vector3</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L724" target="_blank" class="function-name source-link">Vector3.origin</a><span class="type">Vector3</span>
 			</div>
 			<div class="function desc">
 				Returns a new vector with all components equal to 0.
@@ -367,9 +394,38 @@ Returns the caller.
 			
 		</div>
 	
+		<div class="function-wrapper" id="Vector3.composeRotations()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L673" target="_blank" class="function-name source-link">Vector3.composeRotations</a>(<span class="param">angles</span>)<span class="type">Vector3</span>
+			</div>
+			<div class="function desc">
+				Returns the result of applying a series of rotations in sequence.
+The order is opposite that of matrix multiplication, in the sense that the array <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">[</span><span class="highlight-IDENTIFIER">angle1</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">angle2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">angle3</span><span class="highlight-SYMBOL">]</span></code> represents rotating first by <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">angle1</span></code>, then by <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">angle2</span></code>, and finally by <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">angle3</span></code>.
+Returns the final orientation after applying all the provided rotations to an identity orientation.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Vector3.composeRotations():angles">
+							<div class="param-name">
+								<span class="param">angles</span>
+								<span class="type">Vector3[]</span>
+							</div>
+							<div class="param desc">
+								The rotations to apply
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Vector3.polar()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L663" target="_blank" class="function-name source-link">Vector3.polar</a>(<span class="param">θ</span>, <span class="param">φ</span>, <span class="param">r?</span>)<span class="type">Vector3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L690" target="_blank" class="function-name source-link">Vector3.polar</a>(<span class="param">θ</span>, <span class="param">φ</span>, <span class="param">r?</span>)<span class="type">Vector3</span>
 			</div>
 			<div class="function desc">
 				Returns the cartesian representation of a given point given its spherical coordinates.
@@ -416,7 +472,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="Vector3.x()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L705" target="_blank" class="function-name source-link">Vector3.x</a>(<span class="param">x</span>)<span class="type">Vector3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L732" target="_blank" class="function-name source-link">Vector3.x</a>(<span class="param">x</span>)<span class="type">Vector3</span>
 			</div>
 			<div class="function desc">
 				Creates a vector with a specified x component and a y and z component of 0.
@@ -443,7 +499,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="Vector3.y()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L713" target="_blank" class="function-name source-link">Vector3.y</a>(<span class="param">y</span>)<span class="type">Vector3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L740" target="_blank" class="function-name source-link">Vector3.y</a>(<span class="param">y</span>)<span class="type">Vector3</span>
 			</div>
 			<div class="function desc">
 				Creates a vector with a specified y component and an x and z component of 0.
@@ -470,7 +526,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="Vector3.z()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L721" target="_blank" class="function-name source-link">Vector3.z</a>(<span class="param">z</span>)<span class="type">Vector3</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L748" target="_blank" class="function-name source-link">Vector3.z</a>(<span class="param">z</span>)<span class="type">Vector3</span>
 			</div>
 			<div class="function desc">
 				Creates a vector with a specified z component and an x and z component of 0.

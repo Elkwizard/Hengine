@@ -1,0 +1,116 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class MovingAverage">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L112" target="_blank" class="class-name source-link">MovingAverage</a>
+				</div>
+				<div class="class desc">
+					Stores a moving average over a sequence of numeric samples.
+Samples can be added at any time, and current average can be retrieved for no cost.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+				<div class="prop-wrapper" id="MovingAverage.average">
+					<div class="prop-header member">
+						<span class="prop-name">average</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+					</div>
+					<div class="prop desc">The current average value. This will be 0 if no samples have been provided</div>
+				</div>
+			</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="MovingAverage.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L117" target="_blank" class="function-name source-link">constructor</a>(<span class="param">samples?</span>)
+			</div>
+			<div class="function desc">
+				Creates a new moving average.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MovingAverage.prototype.constructor():samples?">
+							<div class="param-name">
+								<span class="param">samples</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The number of samples (window size) of the average. Default is 10
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="get MovingAverage.prototype.last()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L126" target="_blank" class="function-name source-link">last</a><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="function desc">
+				Returns the value of the most recent sample.
+The behavior is undefined if no samples have been added.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MovingAverage.prototype.clear()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L132" target="_blank" class="function-name source-link">clear</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Clears the content of the averaging window, resetting the object.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="MovingAverage.prototype.add()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L142" target="_blank" class="function-name source-link">add</a>(<span class="param">sample</span>)<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="function desc">
+				Adds a new sample value. Returns the new average
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="MovingAverage.prototype.add():sample">
+							<div class="param-name">
+								<span class="param">sample</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The sample to add to the average
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

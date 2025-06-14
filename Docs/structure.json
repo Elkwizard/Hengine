@@ -26,7 +26,8 @@
 				"ContinuousFunction",
 				"WaitUntilFunction"
 			],
-			"IntervalManager": ["IntervalManager", "exit"]
+			"IntervalManager": ["IntervalManager", "exit"],
+			"MovingAverage": null
 		}
 	},
 	"Management": {

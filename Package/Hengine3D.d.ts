@@ -727,6 +727,36 @@ declare class WaitUntilFunction extends IntervalFunction {
 }
 
 /**
+ * Stores a moving average over a sequence of numeric samples.
+ * Samples can be added at any time, and current average can be retrieved for no cost.
+ */
+declare class MovingAverage {
+	/**
+	 * The current average value. This will be 0 if no samples have been provided
+	 */
+	average: number;
+	/**
+	 * Creates a new moving average.
+	 * @param samples - The number of samples (window size) of the average. Default is 10
+	 */
+	constructor(samples?: number);
+	/**
+	 * Returns the value of the most recent sample.
+	 * The behavior is undefined if no samples have been added.
+	 */
+	get last(): number;
+	/**
+	 * Clears the content of the averaging window, resetting the object.
+	 */
+	clear(): void;
+	/**
+	 * Adds a new sample value. Returns the new average
+	 * @param sample - The sample to add to the average
+	 */
+	add(sample: number): number;
+}
+
+/**
  * Manages the update loop of the Hengine.
  * This class is available via the `.intervals` property of the global object.
  * ```js
@@ -770,6 +800,30 @@ declare class IntervalManager {
 	 * Returns whether or not the update loop is currently paused.
 	 */
 	get paused(): boolean;
+	/**
+	 * Returns the current value of the moving average with a given name.
+	 * @param key - The name of the moving average
+	 */
+	getAverage(key: string): number;
+	/**
+	 * Adds a sample value to a given moving average.
+	 * If no moving average exists with the given name, a new one will be created with the given window size.
+	 * @param key - The name of the moving average
+	 * @param value - The new sample for the moving average
+	 * @param samples - The window size of the moving average. This will only be used if the key is new. Default is 10
+	 */
+	average(key: string, value: number, samples?: number): void;
+	/**
+	 * Returns the amount of times `.count()` has been called with the given key in the last frame.
+	 * @param key - The name of the counter
+	 */
+	getCount(key: string): number;
+	/**
+	 * Increments a counter with a given name.
+	 * If no counter exists with the given name, a new one will be created prior to incrementing.
+	 * @param key - The name of the counter
+	 */
+	count(key: string): void;
 	/**
 	 * Creates a new GraphPlane.
 	 * @param graphs - The graphs to display on the plane
@@ -2378,6 +2432,18 @@ declare class Vector3 extends Vector {
 	 */
 	rotatedAboutAxis(axis: this, angle: number): this;
 	/**
+	 * Returns the smallest rotation (in axis-angle form) that could rotate the caller to face in a given direction.
+	 * @param target - The target direction to rotate toward
+	 */
+	angleTo(target: this): this;
+	/**
+	 * Returns the result of applying a series of rotations in sequence.
+	 * The order is opposite that of matrix multiplication, in the sense that the array `[angle1, angle2, angle3]` represents rotating first by `angle1`, then by `angle2`, and finally by `angle3`.
+	 * Returns the final orientation after applying all the provided rotations to an identity orientation.
+	 * @param angles - The rotations to apply
+	 */
+	static composeRotations(angles: Vector3[]): Vector3;
+	/**
 	 * Returns the cartesian representation of a given point given its spherical coordinates.
 	 * @param  - The polar angle of the point
 	 * @param  - The azimuthal angle of the point
@@ -3258,13 +3324,6 @@ declare class Quaternion extends Complex {
 	 * @param rotation - A vector with length equal to the angle of rotation and direction equal to the axis of rotation
 	 */
 	static fromRotation(rotation: Vector3): Quaternion;
-	/**
-	 * Returns the result of applying a series of rotations in sequence.
-	 * The order is opposite that of matrix multiplication, in the sense that the array `[angle1, angle2, angle3]` represents rotating first by `angle1`, then by `angle2`, and finally by `angle3`.
-	 * Returns the final orientation after applying all the provided rotations to an identity orientation.
-	 * @param angles - The rotations to apply
-	 */
-	static compose(angles: Vector3[]): Vector3;
 }
 
 /**
@@ -3408,8 +3467,9 @@ declare class PolyhedronBuilder {
 	 * Adds a list of vertices representing the edge of a convex polygon, and adds triangles in a "triangle fan" formation to connect them.
 	 * Returns the index of the first vertex added.
 	 * @param vertices - The vertices of the convex polygon
+	 * @param flip - Whether to swap the winding direction of the faces to be opposite the order of the vertices. Default is false
 	 */
-	addConvexVertices(vertices: Vector3[]): number;
+	addConvexVertices(vertices: Vector3[], flip?: boolean): number;
 }
 
 /**
@@ -7193,6 +7253,10 @@ declare class StrokeRenderer3D {
  * All transformation-related matrices for this renderer are of type Matrix4.
  */
 declare class Artist3D extends Artist {
+	/**
+	 * 
+	 */
+	{WebGL2RenderingContext}
 	/**
 	 * Returns an object with various methods for queueing lights to be rendered.
 	 * @param color - The color of the light

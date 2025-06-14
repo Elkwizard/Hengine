@@ -105,6 +105,56 @@ class WaitUntilFunction extends IntervalFunction {
 }
 
 /**
+ * Stores a moving average over a sequence of numeric samples.
+ * Samples can be added at any time, and current average can be retrieved for no cost.
+ * @prop Number average | The current average value. This will be 0 if no samples have been provided
+ */
+class MovingAverage {
+	/**
+	 * Creates a new moving average.
+	 * @param Number samples? | The number of samples (window size) of the average. Default is 10
+	 */
+	constructor(sampleCount = 10) {
+		this.maxSamples = sampleCount;
+		this.clear();
+	}
+	/**
+	 * Returns the value of the most recent sample.
+	 * The behavior is undefined if no samples have been added.
+	 * @return Number
+	 */
+	get last() {
+		return this.samples[(this.nextSampleIndex + this.samples.length - 1) % this.samples.length];
+	}
+	/**
+	 * Clears the content of the averaging window, resetting the object.
+	 */
+	clear() {
+		this.samples = [];
+		this.nextSampleIndex = 0;
+		this.average = 0;
+	}
+	/**
+	 * Adds a new sample value. Returns the new average
+	 * @param Number sample | The sample to add to the average
+	 * @return Number 
+	 */
+	add(sample) {
+		let sum = this.average * this.samples.length;
+
+		if (this.samples.length === this.maxSamples)
+			sum -= this.samples[this.nextSampleIndex];
+		
+		sum += sample;
+		this.samples[this.nextSampleIndex] = sample;
+
+		this.nextSampleIndex = (this.nextSampleIndex + 1) % this.maxSamples;
+
+		return this.average = sum / this.samples.length;
+	}
+}
+
+/**
  * Manages the update loop of the Hengine.
  * This class is available via the `.intervals` property of the global object.
  * ```js
@@ -129,17 +179,19 @@ class IntervalManager {
 		this.performanceData = true;
 		this.frameCount = 0;
 		this.fps = 60;
-		this.averageFps = 60;
 		this.rawFps = 60;
 		this.lastTime = performance.now();
-		this.currentTime = performance.now();
-		this.frameLengths = [];
-		this.perFrameCounters = new Map();
+		this.averageFrameLength = new MovingAverage(IntervalManager.FPS_FRAMES_TO_COUNT);
+		this.counters = new Map();
+		this.averages = new Map();
 
 		this.graphs = [];
 		this.fpsGraph = this.makeGraphPlane([
 			new Graph("FPS", () => this.averageFps, 0, 60, Color.LIME, 1)
 		], 400);
+	}
+	get averageFps() {
+		return 1000 / this.averageFrameLength.average;
 	}
 	/**
 	 * Sets the target/maximum update cycles per second.
@@ -153,7 +205,7 @@ class IntervalManager {
 	 * @return Number 
 	 */
 	get fps() {
-		return this._fps;
+		return Number.clamp(Math.round(this.averageFps), 0, this.targetFPS);
 	}
 	set paused(a) {
 		this.pauseLevel = a ? 1 : 0;
@@ -188,27 +240,48 @@ class IntervalManager {
 	updatePerformanceData() {
 		if (!this.performanceData) return;
 
-		for (const key of this.perFrameCounters.keys())
-			this.perFrameCounters.set(key, 0);
+		for (const key of this.counters.keys())
+			this.counters.set(key, 0);
 
-		this.currentTime = performance.now();
-		//fps
-		this.frameLengths.push(this.currentTime - this.lastTime);
-		this.lastTime = this.currentTime;
-		if (this.frameLengths.length > IntervalManager.FPS_FRAMES_TO_COUNT) this.frameLengths.shift();
-		const getFPSRange = n => {
-			const arr = this.frameLengths.slice(Math.max(0, this.frameLengths.length - n));
-			return arr.length * 1000 / Number.sum(arr);
-		}
-		this.averageFps = getFPSRange(IntervalManager.FPS_FRAMES_TO_COUNT);
-		this.rawFps = getFPSRange(1);
-		this._fps = Math.floor(Number.clamp(this.averageFps, 0, this.targetFPS));
+		let now = performance.now();
+		this.averageFrameLength.add(now - this.lastTime);
+		this.lastTime = now;
 	}
+	/**
+	 * Returns the current value of the moving average with a given name.
+	 * @param String key | The name of the moving average
+	 * @return Number
+	 */
+	getAverage(key) {
+		return this.averages.get(key)?.average ?? 0;
+	}
+	/**
+	 * Adds a sample value to a given moving average.
+	 * If no moving average exists with the given name, a new one will be created with the given window size.
+	 * @param String key | The name of the moving average
+	 * @param Number value | The new sample for the moving average
+	 * @param Number samples? | The window size of the moving average. This will only be used if the key is new. Default is 10
+	 */
+	average(key, value, samples = 10) {
+		if (!this.averages.has(key))
+			this.averages.set(key, new MovingAverage(samples));
+		this.averages.get(key).add(value);
+	}
+	/**
+	 * Returns the amount of times `.count()` has been called with the given key in the last frame.
+	 * @param String key | The name of the counter
+	 * @return Number
+	 */
 	getCount(key) {
-		return this.perFrameCounters.get(key) ?? 0;
+		return this.counters.get(key) ?? 0;
 	}
+	/**
+	 * Increments a counter with a given name.
+	 * If no counter exists with the given name, a new one will be created prior to incrementing.
+	 * @param String key | The name of the counter
+	 */
 	count(key) {
-		this.perFrameCounters.set(key, (this.perFrameCounters.get(key) ?? 0) + 1);
+		this.counters.set(key, (this.counters.get(key) ?? 0) + 1);
 	}
 	update() {
 		this.updatePerformanceData();
