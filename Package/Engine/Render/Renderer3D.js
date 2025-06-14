@@ -1259,7 +1259,8 @@ class Artist3D extends Artist {
 				vec3 actualEndPosition = unproject(vec3(endUV, actualDepth));
 
 				float diff = actualEndPosition.z - endPosition.z;
-				return diff > 0.0 || abs(diff) > sampleRadius * 1.2 ? 1.0 : 0.0;
+
+				return diff > 0.0 || diff < -sampleRadius ? 1.0 : 0.0;
 			}
 
 			vec4 shader() {				
