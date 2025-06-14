@@ -1447,6 +1447,11 @@ class GLUtils {
 
 		return gl;
 	}
+	static decodeEnum(gl, enumValue) {
+		const proto = WebGL2RenderingContext.prototype;
+		return Reflect.ownKeys(proto)
+			.filter(key => gl[key] === enumValue);
+	}
 	static throwErrors(gl) {
 		const getError = gl.getError;
 		const constants = new Map();

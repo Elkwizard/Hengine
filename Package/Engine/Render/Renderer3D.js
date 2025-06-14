@@ -257,34 +257,6 @@ class StrokeRenderer3D extends PathRenderer3D {
 	}
 }
 
-class ShadowMap {
-	constructor(gl) {
-		const oldBinding = gl.getParameter(gl.TEXTURE_BINDING_2D_ARRAY);
-		
-		this.texture = GLUtils.createTexture(gl, {
-			target: gl.TEXTURE_2D_ARRAY,
-			filter: FilterMode.NEAREST,
-		});
-		gl.texStorage3D(
-			gl.TEXTURE_2D_ARRAY, 1, gl.DEPTH_COMPONENT32F,
-			Artist3D.SHADOW_RESOLUTION, Artist3D.SHADOW_RESOLUTION,
-			Artist3D.SHADOW_CASCADE
-		);
-
-		this.cascades = [];
-		for (let i = 0; i < Artist3D.SHADOW_CASCADE; i++) {
-			const framebuffer = gl.createFramebuffer();
-			
-			gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-			gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, this.texture, 0, i);
-
-			this.cascades.push({ framebuffer });
-		}
-		
-		gl.bindTexture(gl.TEXTURE_2D_ARRAY, oldBinding);
-	}
-}
-
 class StackAllocator {
 	constructor(Type) {
 		this.Type = Type;
@@ -320,12 +292,15 @@ class GrowableTypedArray {
  * All transformation-related matrices for this renderer are of type Matrix4.
  */
 class Artist3D extends Artist {
+	/** @type {WebGL2RenderingContext} */
+	gl;
 	constructor(canvas, imageType) {
 		super();
 		this.canvas = canvas;
 		this.imageType = imageType;
 		this.gl = GLUtils.createContext(canvas, {
 			depth: true,
+			antialias: false,
 			preserveDrawingBuffer: true,
 			restored: () => this.compile()
 		});
@@ -343,6 +318,13 @@ class Artist3D extends Artist {
 		this.vector3Pool = new StackAllocator(Vector3);
 		this.matrix4Pool = new StackAllocator(Matrix4);
 		this.matrix4Pool.push();
+		this.postProcess = {
+			ssao: new Artist3D.SSAO(this, true)
+		};
+		this.screenBuffers = [];
+
+		this.pingPong = [this.createScreenBuffer(), this.createScreenBuffer()];
+		this.pingPongIndex = 0;
 
 		this.compile();
 		
@@ -357,9 +339,45 @@ class Artist3D extends Artist {
 	get transform() {
 		return this.state.transform.get();
 	}
+	get dstPingPong() {
+		return this.pingPong[this.pingPongIndex].framebuffer;
+	}
+	get srcPingPong() {
+		return this.pingPong[1 - this.pingPongIndex];
+	}
+	swapPingPong() {
+		const { gl } = this;
+		this.pingPongIndex = 1 - this.pingPongIndex;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.dstPingPong);
+		return this.srcPingPong;
+	}
+	createScreenBuffer() {
+		const buffer = new Artist3D.ScreenBuffer(this.gl);
+		this.screenBuffers.push(buffer);
+		return buffer;
+	}
+	setupFramebuffer() {
+		const { gl } = this;
+
+		const width = gl.drawingBufferWidth;
+		const height = gl.drawingBufferHeight;
+
+		this.msFramebuffer = gl.createFramebuffer();
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
+
+		const color = gl.createRenderbuffer();
+		gl.bindRenderbuffer(gl.RENDERBUFFER, color);
+		gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 4, gl.RGBA8, width, height);
+
+		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, color);
+
+		const depth = gl.createRenderbuffer();
+		gl.bindRenderbuffer(gl.RENDERBUFFER, depth);
+		gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 4, gl.DEPTH_COMPONENT32F, width, height);
+		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depth);
+	}
 	compile() {
 		const { gl } = this;
-		gl.enable(gl.DEPTH_TEST);
 		gl.enable(gl.CULL_FACE);
 		gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 		this.shadowMaps = [];
@@ -371,6 +389,7 @@ class Artist3D extends Artist {
 
 		{ // setup 2D VAO
 			this.overlayShader = this.create2DProgram(Artist3D.OVERLAY_FRAGMENT);
+			this.copyShader = this.create2DProgram(Artist3D.COPY_FRAGMENT);
 			
 			const quadVertices = new Float32Array([
 				1, -1,
@@ -390,6 +409,14 @@ class Artist3D extends Artist {
 			this.overlayShader.setAttributes(buffer);
 			gl.bindVertexArray(null);
 		}
+		
+		for (const key in this.postProcess)
+			this.postProcess[key].compile();
+		
+		this.setupFramebuffer();
+
+		for (let i = 0; i < this.screenBuffers.length; i++)
+			this.screenBuffers[i].compile();
 	}
 	hasCache(key) {
 		return this.renderCache.has(key);
@@ -404,6 +431,11 @@ class Artist3D extends Artist {
 	resize(width, height) {
 		this.canvas.width = this.imageType.pixelWidth;
 		this.canvas.height = this.imageType.pixelHeight;
+
+		this.setupFramebuffer();
+		
+		for (let i = 0; i < this.screenBuffers.length; i++)
+			this.screenBuffers[i].resize();
 	}
 	addTransform(transf) {
 		this.state.transform.mul(transf);
@@ -545,7 +577,6 @@ class Artist3D extends Artist {
 		chunks.pushArray(transparent);
 
 		gl.useProgram(null);
-		gl.disable(gl.BLEND);
 		gl.depthMask(true);
 
 		for (let i = 0; i < chunks.length; i++) {
@@ -588,6 +619,8 @@ class Artist3D extends Artist {
 				gl.drawElementsInstanced(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0, transforms.length);
 			}
 		}
+
+		gl.disable(gl.BLEND);
 	}
 	processMesh({ mesh, transforms, castShadows }, spheres) {
 		const { gl } = this;
@@ -671,16 +704,16 @@ class Artist3D extends Artist {
 
 		return { boundingSphere, opaque, transparent, castShadows };
 	}
-	renderQueues(camera, lightQueue, meshQueue) {
-		this.vector3Pool.push();
-		
-		const gl = this.gl;
+	renderShadows(camera, meshes, lights, boundingSpheres) {
+		const { gl } = this;
 		const { SHADOW_RESOLUTION } = Artist3D;
-		const screen = camera.cacheScreen();
 
+		const screen = camera.cacheScreen();
+		
+		// process lights
 		const shadowLights = [];
-		for (let i = 0; i < lightQueue.length; i++) {
-			const light = lightQueue[i];
+		for (let i = 0; i < lights.length; i++) {
+			const light = lights[i];
 			if (light.shadow) {
 				light.shadowIndex = shadowLights.length;
 				shadowLights.push(light);
@@ -690,15 +723,12 @@ class Artist3D extends Artist {
 		}
 
 		while (this.shadowMaps.length < shadowLights.length)
-			this.shadowMaps.push(new ShadowMap(gl));
-	
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-		const boundingSpheres = [];
-		const meshes = meshQueue.map(req => this.processMesh(req, boundingSpheres));
-
+			this.shadowMaps.push(new Artist3D.ShadowMap(gl));
+		
+		gl.enable(gl.DEPTH_TEST);
 		gl.viewport(0, 0, SHADOW_RESOLUTION, SHADOW_RESOLUTION);
-
+		gl.depthMask(true);
+		
 		const cascadeProps = Array.dim(Artist3D.SHADOW_CASCADE).map((_, i) => 3 ** i);
 		const frusta = Geometry3D.subdivideFrustum(screen, cascadeProps);
 		const shadowCascadeDepths = frusta.map(frustum => Math.max(
@@ -747,7 +777,6 @@ class Artist3D extends Artist {
 				cascade.zRange = zRange.length;
 
 				gl.bindFramebuffer(gl.FRAMEBUFFER, cascade.framebuffer);
-				gl.depthMask(true);
 				gl.clear(gl.DEPTH_BUFFER_BIT);
 
 				this.pass(camera, meshes, true, chunk => {
@@ -768,19 +797,33 @@ class Artist3D extends Artist {
 			}
 		}
 
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		this.maximizeViewport();
-		
-		const passedLights = lightQueue.slice(0, Artist3D.MAX_LIGHTS);
+		return shadowCascadeDepths;
+	}
+	renderQueues(camera, lightQueue, meshQueue) {
+		const { gl } = this;
+		this.vector3Pool.push();
 
+		const lights = lightQueue.slice(0, Artist3D.MAX_LIGHTS);
+
+		const boundingSpheres = [];
+		const meshes = meshQueue.map(req => this.processMesh(req, boundingSpheres));
+		
+		// shadow passes
+		const shadowCascadeDepths = this.renderShadows(camera, meshes, lights, boundingSpheres);
+
+		// main render pass
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
+		gl.enable(gl.DEPTH_TEST);
+
+		this.maximizeViewport();
 		this.pass(camera, meshes, false, chunk => {
 			const program = this.getShaderProgram(chunk.material);
 			if (!program.inUse) {
 				program.use();
 				program.setUniforms({
 					camera: camera,
-					lights: passedLights,
-					lightCount: passedLights.length,
+					lights: lightQueue,
+					lightCount: lightQueue.length,
 					time: intervals.frameCount,
 					shadowTextures: this.shadowMaps.map(map => map.texture),
 					shadowInfo: this.shadowMaps.flatMap(map => map.cascades),
@@ -790,22 +833,55 @@ class Artist3D extends Artist {
 
 			return program;
 		});
- 
+		
+		// copy multisample framebuffer into ping-pong buffers
+		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.msFramebuffer);
+		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.dstPingPong);
+
+		gl.blitFramebuffer(
+			0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight,
+			0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight,
+			gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT, gl.NEAREST
+		);
+
+		// post processing
+		for (const key in this.postProcess) {
+			const effect = this.postProcess[key];
+			if (effect.active) effect.draw(camera);
+		}
+
+		// composite
+		{
+			const { color } = this.swapPingPong();
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+			gl.disable(gl.DEPTH_TEST);
+			this.drawQuad(this.copyShader, { source: color });
+		}
+
 		this.vector3Pool.pop();
+
+		gl.useProgram(null);
 	}
 	maximizeViewport() {
 		this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
 	}
-	overlay(overlay) {
+	drawQuad(shader, uniforms = { }) {
 		const { gl } = this;
-			
-		this.overlayShader.focus();
-		this.overlayShader.setUniform("overlay", overlay);
-		
-		this.maximizeViewport();
-		gl.enable(gl.BLEND);
+		shader.focus();
+		shader.setUniforms(uniforms);
+
 		gl.bindVertexArray(this.vertexArray2D);
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
+	}
+	overlay(overlay) {
+		const { gl } = this;
+		
+		this.maximizeViewport();
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
+		gl.enable(gl.BLEND);
+		gl.disable(gl.DEPTH_TEST);
+		this.drawQuad(this.overlayShader, { overlay });
+		gl.disable(gl.BLEND);
 	}
 	render(camera) {
 		const lightQueue = this.lightObj.lights;
@@ -827,6 +903,7 @@ class Artist3D extends Artist {
 		this.emptyQueues();
 
 		const { gl } = this;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
 		gl.depthMask(true);
 		gl.clearColor(x, y, z, w);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -903,6 +980,296 @@ class Artist3D extends Artist {
 		`;
 	}
 
+	static PostProcess = class {
+		constructor(artist, active) {
+			this.artist = artist;
+			this.active = active;
+		}
+		compile() { }
+		draw(camera) { }
+	};
+
+	static SSAO = class extends Artist3D.PostProcess {
+		constructor(...args) {
+			super(...args);
+			this.settings = {
+				samples: 8,
+				radius: 3,
+				blurRadius: 10,
+				intensity: 2
+			};
+		}
+		compile() {
+			this.occlusionShader = this.artist.create2DProgram(Artist3D.SSAO.OCCLUSION_FRAGMENT);
+			this.blurShader = this.artist.create2DProgram(Artist3D.SSAO.BLUR_FRAGMENT);
+			this.saveBuffer = this.artist.createScreenBuffer();
+		}
+		draw(camera) {
+			const { gl } = this.artist;
+
+			gl.enable(gl.DEPTH_TEST);
+			gl.depthFunc(gl.ALWAYS);
+			this.artist.maximizeViewport();
+
+			{
+				const { color, depth } = this.artist.swapPingPong();
+				
+				// compute occlusion
+				this.artist.drawQuad(this.occlusionShader, {
+					depthTexture: depth,
+					projection: camera.projection,
+					sampleRadius: this.settings.radius,
+					samples: this.settings.samples
+				});
+
+				// save original color
+				gl.bindFramebuffer(gl.FRAMEBUFFER, this.saveBuffer.framebuffer);
+				this.artist.drawQuad(this.artist.copyShader, { source: color });
+			}
+
+			{ // blur
+				const invRes = new Vector2(1 / gl.drawingBufferWidth, 1 / gl.drawingBufferHeight);
+				
+				const directions = [Vector2.right, Vector2.down];
+				for (let i = 0; i < directions.length; i++) {
+					const { color, depth } = this.artist.swapPingPong();
+					
+					const uniforms = {
+						depthTexture: depth,
+						occlusionTexture: color,
+						blurRadius: this.settings.blurRadius,
+						composite: i === directions.length - 1,
+						projection: camera.projection,
+						blurAxis: directions[i].times(invRes)
+					};
+
+					if (uniforms.composite) {
+						uniforms.colorTexture = this.saveBuffer.color;
+						uniforms.intensity = this.settings.intensity;
+					}
+					
+					this.artist.drawQuad(this.blurShader, uniforms);
+				}
+			}
+
+			gl.depthFunc(gl.LEQUAL);
+		}
+
+		static LINEAR_Z = `
+			float linearZ(float nlz) {
+				float zScale = projection[2][2];
+				float zOffset = projection[3][2];
+
+				// nlz = (zScale * z + zOffset) / z
+				float z = zOffset / (nlz - zScale);
+
+				return z;
+			}
+		`;
+		static OCCLUSION_FRAGMENT = new GLSL(`
+			uniform sampler2D depthTexture;
+			uniform mat4 projection;
+			uniform float sampleRadius;
+			uniform int samples;
+
+			#define PI ${Math.PI}
+
+			${this.LINEAR_Z}
+
+			vec3 unproject(vec3 screen) {
+				vec3 ndc = screen * 2.0 - 1.0;
+
+				float w = linearZ(ndc.z) / ndc.z;
+				vec4 fullNdc = vec4(ndc, 1) * w;
+				vec4 unprojected = inverse(projection) * fullNdc;
+				return unprojected.xyz;
+			}
+
+			vec3 project(vec3 world) {
+				vec4 proj = projection * vec4(world, 1);
+				vec3 ndc = proj.xyz / proj.w;
+				return ndc * 0.5 + 0.5;
+			}
+
+			float random(inout float seed) {
+				seed++;
+				float a = mod(seed * 6.12849, 8.7890975);
+				float b = mod(a * 256745.4758903, 232.567890);
+				return mod(abs(a * b), 1.0);
+			}
+
+			vec3 randomInSphere(inout float seed) {
+				float theta = (random(seed) - 0.5) * PI;
+				float phi = random(seed) * PI * 2.0;
+				float radius = random(seed);
+
+				return vec3(
+					cos(theta) * cos(phi),
+					cos(theta) * sin(phi),
+					sin(theta)
+				) * radius;
+			}
+
+			float getVisibility(vec3 ro, vec3 rd) {
+				vec3 endPosition = ro + rd * sampleRadius;
+				vec3 endScreenPosition = project(endPosition);
+
+				vec2 endUV = endScreenPosition.xy;
+				if (clamp(endUV, vec2(0), vec2(1)) != endUV)
+					return -1.0;
+
+				float actualDepth = texture(depthTexture, endUV).r;
+				vec3 actualEndPosition = unproject(vec3(endUV, actualDepth));
+
+				float diff = actualEndPosition.z - endPosition.z;
+				return diff > 0.0 || abs(diff) > sampleRadius * 1.2 ? 1.0 : 0.0;
+			}
+
+			vec4 shader() {				
+				float depth = texture(depthTexture, uv).r;
+				
+				gl_FragDepth = depth;
+
+				if (depth == 1.0) return vec4(0, 0, 0, 1);
+
+				vec3 ro = unproject(vec3(uv, depth));
+
+				vec3 normal = -normalize(cross(dFdx(ro), dFdy(ro)));
+
+				float seed = cos(gl_FragCoord.x * 5.2387) + sin(gl_FragCoord.y * 30.0);
+				
+				float occlusion = 0.0;
+				float totalWeight = 0.0;
+
+				for (int i = 0; i < samples; i++) {
+					vec3 rd = randomInSphere(seed);
+					if (dot(rd, normal) < 0.0) rd = -rd;
+					float visibility = getVisibility(ro, rd);
+					if (visibility >= 0.0) {
+						occlusion += 1.0 - visibility;
+						totalWeight++;
+					}
+				}
+
+				occlusion /= totalWeight;
+
+				return vec4(vec3(occlusion), 1);
+			}
+		`);
+		static BLUR_FRAGMENT = new GLSL(`
+			uniform sampler2D depthTexture;
+			uniform sampler2D occlusionTexture;
+			uniform mat4 projection;
+			uniform vec2 blurAxis;
+			uniform int blurRadius;
+
+			uniform bool composite;
+			uniform float intensity;
+			uniform sampler2D colorTexture;
+
+			${this.LINEAR_Z}
+
+			vec4 shader() {
+				float centerDepth = texture(depthTexture, uv).r;
+				float centerZ = linearZ(centerDepth);
+
+				float totalOcclusion = 0.0;
+				float totalWeight = 0.0;
+
+				for (int i = -blurRadius; i <= blurRadius; i++) {
+					vec2 samplePos = uv + blurAxis * float(i);
+					float sampleZ = linearZ(texture(depthTexture, samplePos).r);
+					float zDiff = sampleZ - centerZ;
+
+					float posT = float(i) / float(blurRadius);
+					float positionalNormalWeight = exp(-posT * posT);
+
+					float zT = zDiff;
+					float zNormalWeight = exp(-zT * zT);
+
+					float weight = positionalNormalWeight * zNormalWeight;
+					totalOcclusion += texture(occlusionTexture, samplePos).r * weight;
+					totalWeight += weight;
+				}
+
+				float occlusion = totalOcclusion / totalWeight;
+
+				gl_FragDepth = centerDepth;
+
+				if (composite) {
+					vec4 color = texture(colorTexture, uv);
+					color.rgb *= pow(1.0 - occlusion, intensity);
+					return color;
+				}
+
+				return vec4(vec3(occlusion), 1.0);
+			}
+		`);
+	};
+
+	static State = class {
+		constructor() {
+			this.transform = Matrix4.identity();
+		}
+		get(result = new Artist3D.State()) {
+			this.transform.get(result.transform);
+			return result;
+		}
+	};
+	
+	static ShadowMap = class {
+		constructor(gl) {
+			const oldBinding = gl.getParameter(gl.TEXTURE_BINDING_2D_ARRAY);
+			
+			this.texture = GLUtils.createTexture(gl, {
+				target: gl.TEXTURE_2D_ARRAY,
+				filter: FilterMode.NEAREST,
+			});
+			gl.texStorage3D(
+				gl.TEXTURE_2D_ARRAY, 1, gl.DEPTH_COMPONENT32F,
+				Artist3D.SHADOW_RESOLUTION, Artist3D.SHADOW_RESOLUTION,
+				Artist3D.SHADOW_CASCADE
+			);
+
+			this.cascades = [];
+			for (let i = 0; i < Artist3D.SHADOW_CASCADE; i++) {
+				const framebuffer = gl.createFramebuffer();
+				
+				gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+				gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, this.texture, 0, i);
+
+				this.cascades.push({ framebuffer });
+			}
+			
+			gl.bindTexture(gl.TEXTURE_2D_ARRAY, oldBinding);
+		}
+	};
+
+	static ScreenBuffer = class {
+		constructor(gl) {
+			this.gl = gl;
+		}
+		compile() {
+			const { gl } = this;
+			this.framebuffer = gl.createFramebuffer();
+			this.resize();
+		}
+		resize() {
+			const { gl } = this;
+			const { drawingBufferWidth: width, drawingBufferHeight: height } = gl;
+
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+			
+			this.color = GLUtils.createTexture(gl);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.color, 0);
+			
+			this.depth = GLUtils.createTexture(gl);
+			gl.texStorage2D(gl.TEXTURE_2D, 1, gl.DEPTH_COMPONENT32F, width, height);
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.depth, 0);
+		}
+	};
+
 	static MAX_LIGHTS = 50;
 	static MAX_SHADOWS = 8;
 	static SHADOW_RESOLUTION = 2 ** 12;
@@ -910,15 +1277,6 @@ class Artist3D extends Artist {
 	static SHADOW_CASCADE = 4;
 	static INSTANCE_THRESHOLD = 10;
 }
-Artist3D.State = class State {
-	constructor() {
-		this.transform = Matrix4.identity();
-	}
-	get(result = new Artist3D.State()) {
-		this.transform.get(result.transform);
-		return result;
-	}
-};
 Artist3D.CAMERA = `
 	struct Camera {
 		vec3 position;
@@ -1093,7 +1451,6 @@ Artist3D.SCREEN_VERTEX = new ShaderSource(new GLSL(`
 
 	void main() {
 		uv = position * 0.5 + 0.5;
-		uv.y = 1.0 - uv.y;
 		gl_Position = vec4(position, 0, 1);
 	}
 `));
@@ -1101,6 +1458,13 @@ Artist3D.OVERLAY_FRAGMENT = new GLSL(`
 	uniform sampler2D overlay;
 
 	vec4 shader() {
-		return texture(overlay, uv);
+		return texture(overlay, vec2(uv.x, 1.0 - uv.y));
+	}
+`);
+Artist3D.COPY_FRAGMENT = new GLSL(`
+	uniform sampler2D source;
+
+	vec4 shader() {
+		return texture(source, uv);
 	}
 `);
