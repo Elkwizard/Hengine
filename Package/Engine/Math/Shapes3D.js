@@ -271,14 +271,21 @@ class PolyhedronBuilder {
 	 * Adds a list of vertices representing the edge of a convex polygon, and adds triangles in a "triangle fan" formation to connect them.
 	 * Returns the index of the first vertex added.
 	 * @param Vector3[] vertices | The vertices of the convex polygon
+	 * @param Boolean flip? | Whether to swap the winding direction of the faces to be opposite the order of the vertices. Default is false
 	 * @return Number
 	 */
-	addConvexVertices(vertices) {
+	addConvexVertices(vertices, flip = false) {
 		const start = this.addVertices(vertices);
-		for (let i = 2; i < vertices.length; i++)
-			this.indices.push(
-				start, start + i - 1, start + i
-			);
+		for (let i = 2; i < vertices.length; i++) {
+			const a = start;
+			const b = start + i - 1;
+			const c = start + i;
+			if (flip) {
+				this.indices.push(c, b, a);
+			} else {
+				this.indices.push(a, b, c);
+			}
+		}
 		
 		return start;
 	}
