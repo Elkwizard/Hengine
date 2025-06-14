@@ -1372,13 +1372,15 @@ class Artist3D extends Artist {
 			
 			this.texture = GLUtils.createTexture(gl, {
 				target: gl.TEXTURE_2D_ARRAY,
-				filter: FilterMode.NEAREST,
+				filter: FilterMode.LINEAR
 			});
 			gl.texStorage3D(
 				gl.TEXTURE_2D_ARRAY, 1, gl.DEPTH_COMPONENT32F,
 				Artist3D.SHADOW_RESOLUTION, Artist3D.SHADOW_RESOLUTION,
 				Artist3D.SHADOW_CASCADE
 			);
+			gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
+			gl.texParameterf(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_COMPARE_FUNC, gl.GEQUAL);
 
 			this.cascades = [];
 			for (let i = 0; i < Artist3D.SHADOW_CASCADE; i++) {
@@ -1537,7 +1539,7 @@ Artist3D.LIGHTS = `
 		float zRange;
 	};
 	uniform ShadowInfo[MAX_SHADOWS * SHADOW_CASCADE] shadowInfo;
-	uniform sampler2DArray[MAX_SHADOWS] shadowTextures;
+	uniform highp sampler2DArrayShadow[MAX_SHADOWS] shadowTextures;
 
 	vec3 implicitNormal(vec3 position) {
 		return normalize(cross(dFdx(position), dFdy(position)));
@@ -1553,20 +1555,9 @@ Artist3D.LIGHTS = `
 		return -1;
 	}
 	
-	float _random11(float seed) {
-		float a = mod(seed * 6.12849, 8.7890975);
-		float b = mod(a * 256745.4758903, 232.567890);
-		return mod(abs(a * b), 1.0);
-	}
+	float getShadow(vec3 position, Light light) {
+		if (light.shadowIndex == -1) return 0.0;
 
-	vec2 _random32(vec3 seed) {
-		return vec2(
-			_random11(seed.x + seed.y * 9823.1235 + seed.z * 283.2391823),
-			_random11(873.21 * seed.x + seed.y + seed.z * 973.12357)
-		);
-	}
-
-	float sampleShadowMap(Light light, vec3 position, vec3 pixelOffset) {	
 		int cascadeRegion = _getCascadeRegion(position);
 		if (cascadeRegion == -1) return 0.0;
 
@@ -1578,8 +1569,6 @@ Artist3D.LIGHTS = `
 		float ldn = dot(getLightDirection(position, light), n);
 		float normalBias = info.pixelSize * 0.5 * sqrt(1.0 - ldn * ldn);
 		position += n * normalBias;
-		
-		position += pixelOffset * info.pixelSize;
 
 		vec4 proj = camera.pcMatrix * vec4(position, 1);
 		vec3 frag = proj.xyz / proj.w;
@@ -1596,48 +1585,20 @@ Artist3D.LIGHTS = `
 			cascadeRegion
 		);
 
+		float fragDepth = frag.z * 0.5 + 0.5;
+
+		vec4 testCoord = vec4(uv, cascadeRegion, fragDepth);
+
 		float depth;
 		switch (light.shadowIndex) {${
 			Array.dim(Artist3D.MAX_SHADOWS)
 				.map((_, i) => `
-					case ${i}: {
-						float sampled = texelFetch(shadowTextures[${i}], shadowPixel, 0).r;
-						depth = sampled * 2.0 - 1.0;
-					} break;
+					case ${i}: return texture(shadowTextures[${i}], testCoord);
 				`)
 				.join("\n")
 		}}
-
-		return frag.z > depth ? 1.0 : 0.0;
-	}
-
-	float getShadow(vec3 position, Light light, int S) {
-		if (light.shadowIndex == -1) return 0.0;
 		
-		vec3 tangent = normalize(dFdx(position));
-		vec3 bitangent = normalize(dFdy(position));
-		mat2x3 offToLocal = mat2x3(tangent, bitangent);
-
-		float sum = 0.0;
-		float total = 0.0;
-
-		for (int i = -S; i <= S; i++)
-		for (int j = -S; j <= S; j++) {
-			vec2 off = vec2(i, j) / (0.0001 + float(S)) * 0.5;
-			float weight = exp(-2.0 * dot(off, off));
-			if (S != 0)
-				off += _random32(position + offToLocal * off + mod(time * 0.01, 10.0)) - 0.5;
-			sum += sampleShadowMap(light, position, offToLocal * off) * weight;
-			total += weight;
-		}
-
-		float shadow = sum / total;
-
-		return shadow;
-	}
-
-	float getShadow(vec3 position, Light light) {
-		return getShadow(position, light, 1);
+		return 0.0;
 	}
 `;
 Artist3D.SHADOW_FRAGMENT = new GLSL(`

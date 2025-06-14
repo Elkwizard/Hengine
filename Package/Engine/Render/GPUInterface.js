@@ -1237,7 +1237,10 @@ class GLSLProgram {
 			case gl.INT_SAMPLER_2D: integer = true; texture = "image"; break;
 			case gl.UNSIGNED_INT_SAMPLER_2D: integer = true; texture = "image"; dynamicArray = true; break;
 
-			case gl.SAMPLER_2D_ARRAY: integer = true; texture = "array"; break;
+			case gl.SAMPLER_2D_ARRAY:
+			case gl.SAMPLER_2D_ARRAY_SHADOW: integer = true; texture = "array"; break;
+			
+			case gl.SAMPLER_CUBE_SHADOW:
 			case gl.SAMPLER_CUBE: integer = true; texture = "cube"; break;
 
 			case gl.UNSIGNED_INT: integer = true; signed = false; break;

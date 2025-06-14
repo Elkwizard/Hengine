@@ -107,7 +107,7 @@ class WaitUntilFunction extends IntervalFunction {
 /**
  * Stores a moving average over a sequence of numeric samples.
  * Samples can be added at any time, and current average can be retrieved for no cost.
- * @prop Number average | The current average value. This will be 0 if no samples have been provided
+ * @prop Number average | The current average value. This will be 0 if no samples have been provided. This value is read-only
  */
 class MovingAverage {
 	/**
