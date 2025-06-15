@@ -1260,7 +1260,9 @@ class Artist3D extends Artist {
 
 				float diff = actualEndPosition.z - endPosition.z;
 
-				return diff > 0.0 || diff < -sampleRadius ? 1.0 : 0.0;
+				if (diff < -sampleRadius) return -1.0;
+
+				return diff > 0.0 ? 1.0 : 0.0;
 			}
 
 			vec4 shader() {				
@@ -1274,7 +1276,7 @@ class Artist3D extends Artist {
 				
 				vec3 normal = -normalize(cross(dFdx(ro), dFdy(ro)));
 				
-				float seed = 23.123 * cos(gl_FragCoord.x * 5.2387) + sin(gl_FragCoord.y * 30.0) + gl_FragCoord.z * 10.0;
+				float seed = 23.123 * cos(gl_FragCoord.x * 5.2387) + sin(gl_FragCoord.y * 30.0);
 				
 				float occlusion = 0.0;
 				float totalWeight = 0.0;
@@ -1335,7 +1337,8 @@ class Artist3D extends Artist {
 
 					float positionalNormalWeight = exp(-t * t);
 
-					float zT = zDiff;
+					float nearFactor = abs(i) <= 1 ? 0.1 : 1.0;
+					float zT = zDiff * nearFactor;
 					float zNormalWeight = exp(-zT * zT);
 
 					float weight = positionalNormalWeight * zNormalWeight;
