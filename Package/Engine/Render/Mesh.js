@@ -113,6 +113,32 @@ class Mesh extends Renderable {
 		return new Mesh(this.attributes, new Float32Array(this.data), this.chunks.map(chunk => chunk.get()));
 	}
 	/**
+	 * Returns the smallest Prism that contains all the `vertexPosition`s of the mesh.
+	 * @return Prism
+	 */
+	getBoundingBox() {
+		const offset = this.offsets.get("vertexPosition");
+		const { stride, data } = this;
+
+		const min = Vector3.filled(Infinity);
+		const max = Vector3.filled(-Infinity);
+		
+		for (let i = offset; i < data.length; i += stride) {
+			const x = data[i + 0];
+			const y = data[i + 1];
+			const z = data[i + 2];
+			
+			if (x < min.x) min.x = x;
+			if (x > max.x) max.x = x;
+			if (y < min.y) min.y = y;
+			if (y > max.y) max.y = y;
+			if (z < min.z) min.z = z;
+			if (z > max.z) max.z = z;
+		}
+
+		return new Prism(min, max);
+	}
+	/**
 	 * Transforms the `vertexPosition` of the mesh in-place by a given matrix and flushes the changes.
 	 * Returns the caller.
 	 * @param Matrix4 transform | The homogenous transformation to apply to each vertex position

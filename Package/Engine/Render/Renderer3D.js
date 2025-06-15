@@ -504,30 +504,6 @@ class Artist3D extends Artist {
 
 		this.addTransform(new Matrix4(Quaternion.fromRotation(axis, angle).toMatrix()));
 	}
-	getBounds(mesh) {
-		const offset = mesh.offsets.get("vertexPosition");
-		const { stride, data } = mesh;
-		const { length } = mesh.vertices;
-
-		const min = Vector3.filled(Infinity);
-		const max = min.inverse;
-		
-		for (let i = 0; i < length; i++) {
-			const index = offset + i * stride;
-			const x = data[index + 0];
-			const y = data[index + 1];
-			const z = data[index + 2];
-			
-			if (x < min.x) min.x = x;
-			if (x > max.x) max.x = x;
-			if (y < min.y) min.y = y;
-			if (y > max.y) max.y = y;
-			if (z < min.z) min.z = z;
-			if (z > max.z) max.z = z;
-		}
-
-		return { min, max };
-	}
 	/**
 	 * Returns an object with various methods for queueing lights to be rendered.
 	 * @param Color color | The color of the light
@@ -630,7 +606,7 @@ class Artist3D extends Artist {
 
 			const instanceBuffer = gl.createBuffer();
 
-			const bounds = this.getBounds(mesh);
+			const bounds = mesh.getBoundingBox();
 			
 			const { min, max } = bounds;
 			const localBoundingSphere = new Sphere(
