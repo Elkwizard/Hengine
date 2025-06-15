@@ -35,15 +35,19 @@ const objectUtils = {
 		});
 	},
 	inherit(child, parent, include) {
+		if (include) include = new Set(include);
+
 		const copy = (src, dst) => {
 			if (!src) return;
 
-			const keys = include ?? Reflect.ownKeys(src).filter(key => !(key in dst));
+			const keys = include ?? new Set(Reflect.ownKeys(src).filter(key => !(key in dst)));
 
-			for (let i = 0; i < keys.length; i++) {
-				const key = keys[i];
+			for (const key of keys) {
 				const desc = Object.getOwnPropertyDescriptor(src, key);
-				if (desc) Object.defineProperty(dst, key, desc);
+				if (desc) {
+					keys.delete(key);
+					Object.defineProperty(dst, key, desc);
+				}
 			}
 
 			copy(Object.getPrototypeOf(src), dst);

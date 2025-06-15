@@ -1128,8 +1128,8 @@ class Artist3D extends Artist {
 				samples: 8,
 				radius: 3,
 				blurSamples: 12,
-				maxBlurRadius: 20,
-				minBlurRadius: 6,
+				maxBlurRadius: 10,
+				minBlurRadius: 4,
 				intensity: 2
 			};
 		}

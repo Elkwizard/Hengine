@@ -463,15 +463,15 @@ class Polygon extends Shape2D {
 
 		let inside = true;
 
-		const edges = this.getFaces();
-		for (let i = 0; i < edges.length; i++) {
-			const edge = edges[i];
-			const { normal } = edge;
+		const faces = this.getFaces();
+		for (let i = 0; i < faces.length; i++) {
+			const face = faces[i];
+			const { normal } = face;
 			
-			inside &&= normal.dot(point) > normal.dot(edge.a);
+			inside &&= normal.dot(point) < normal.dot(face.a);
 
-			const closest = edge.closestPointTo(point);
-			const dist = Vector2.sqrDist(point, closest);
+			const closest = face.closestPointTo(point);
+			const dist = point.constructor.sqrDist(point, closest);
 			if (dist < bestDist) {
 				bestDist = dist;
 				bestPoint = closest;
@@ -487,13 +487,12 @@ class Polygon extends Shape2D {
 	 * @return Boolean
 	 */
 	containsPoint(point) {
-		const edges = this.getFaces();
-		for (let i = 0; i < edges.length; i++) {
-			const { normal, a } = edges[i];
-			if (normal.dot(point) < normal.dot(a)) return false;
+		const faces = this.getFaces();
+		for (let i = 0; i < faces.length; i++) {
+			const { normal, a } = faces[i];
+			if (normal.dot(point) > normal.dot(a)) return false;
 		}
 		return true;
-	
 	}
 	get(result = new Polygon([])) {
 		result.vertices = this.vertices.map(vert => vert.get());

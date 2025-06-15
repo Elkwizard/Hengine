@@ -718,7 +718,7 @@ class Polyhedron extends Shape3D {
 		return local.getModel(transform);
 	}
 }
-objectUtils.inherit(Polyhedron, Polygon, ["closestPointTo", "rayCast"]);
+objectUtils.inherit(Polyhedron, Polygon, ["closestPointTo", "rayCast", "containsPoint"]);
 
 /**
  * Represents an axis-aligned rectangular prism.
