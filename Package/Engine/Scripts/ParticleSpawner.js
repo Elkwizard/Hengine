@@ -48,7 +48,7 @@
 
 /**
  * Adds particle emitting functionality to a SceneObject.
- * @readonly
+ * @props<immutable>
  * ```js
  * const particles = scene.main.addElement("particles", width / 2, height / 2);
  * particles.scripts.add(PARTICLE_SPAWNER, {

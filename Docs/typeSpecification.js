@@ -58,7 +58,7 @@ function applySubstitutions(name, subs) {
 }
 
 function createPropSpecification(className, name, prop, isWindow) {
-	const isStatic = prop.category === "static_prop";
+	const isStatic = prop.attributes.static;
 	let result = `${name}: ${formatType(prop.type, isStatic ? null : className)};`;
 	if (isStatic)
 		result = `static ${result.replace(/.*\./, "")}`;

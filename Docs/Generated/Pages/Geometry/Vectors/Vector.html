@@ -24,27 +24,33 @@ This is an abstract superclass and should not be constructed.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Vector.mag">
-					<div class="prop-header member">
-						<span class="prop-name">mag</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The magnitude of the vector</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Vector.sqrMag">
-					<div class="prop-header member">
-						<span class="prop-name">sqrMag</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The squared magnitude of the vector</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Vector.normalized">
-					<div class="prop-header member">
-						<span class="prop-name">normalized</span><span class="type">Vector</span>
-					</div>
-					<div class="prop desc">The unit vector in the same direction of the vector</div>
-				</div>
+		<div class="prop-wrapper" id="Vector.mag">
+			<div class="prop-header member">
+				<span class="prop-name">mag</span>
+				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
+			<div class="prop desc">The magnitude of the vector</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Vector.sqrMag">
+			<div class="prop-header member">
+				<span class="prop-name">sqrMag</span>
+				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The squared magnitude of the vector</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Vector.normalized">
+			<div class="prop-header member">
+				<span class="prop-name">normalized</span>
+				<span class="type">Vector</span>
+			</div>
+			<div class="prop desc">The unit vector in the same direction of the vector</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				
@@ -150,7 +156,7 @@ Doesn't mutate the caller.
 			<div class="function desc">
 				Computes a version of the caller with one coordinate axis replaced with 0.
 This is equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">minus</span><span class="highlight-SYMBOL">(</span><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">projectOnto</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">axis</span><span class="highlight-SYMBOL">))</span></code> for <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">axis</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">mag</span><span class="highlight-SYMBOL"> ===</span><span class="highlight-NUMBER"> 1</span></code>.
-Doesn't mutate the caller.  
+Doesn't mutate the caller.
 			</div>
 			
 				<div class="function-signature">
@@ -187,7 +193,7 @@ Doesn't mutate the caller.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L148" target="_blank" class="function-name source-link">Vector.dist</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Computes the distance between two vectors. 
+				Computes the distance between two vectors.
 			</div>
 			
 				<div class="function-signature">
@@ -224,7 +230,7 @@ Doesn't mutate the caller.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Vector.js?#L157" target="_blank" class="function-name source-link">Vector.sqrDist</a>(<span class="param">a</span>, <span class="param">b</span>)<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
-				Computes the squared distance between two vectors. 
+				Computes the squared distance between two vectors.
 			</div>
 			
 				<div class="function-signature">

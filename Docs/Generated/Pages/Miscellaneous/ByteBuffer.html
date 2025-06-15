@@ -13,55 +13,67 @@
 					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\ByteBuffer.js?#L11" target="_blank" class="class-name source-link">ByteBuffer</a> <span class="keyword">implements</span> <span class="class-name"><a href="../Miscellaneous/Copyable.html#class Copyable">Copyable</a>, <a href="../Miscellaneous/Files.html#class Serializable">Serializable</a></span>
 				</div>
 				<div class="class desc">
-					Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer. 
+					Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer.
 				</div>
 				
 				
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="ByteBuffer.write">
-					<div class="prop-header member">
-						<span class="prop-name">write</span><span class="type">ByteBuffer.Writer</span>
-					</div>
-					<div class="prop desc">The writing API of the buffer</div>
-				</div>
-			
-				<div class="prop-wrapper" id="ByteBuffer.read">
-					<div class="prop-header member">
-						<span class="prop-name">read</span><span class="type">ByteBuffer.Reader</span>
-					</div>
-					<div class="prop desc">The reading API of the buffer</div>
-				</div>
-			
-				<div class="prop-wrapper" id="ByteBuffer.measure">
-					<div class="prop-header member">
-						<span class="prop-name">measure</span><span class="type">ByteBuffer.Measurer</span>
-					</div>
-					<div class="prop desc">The measuring API of the buffer</div>
-				</div>
-			
-				<div class="prop-wrapper" id="ByteBuffer.pointer">
-					<div class="prop-header member">
-						<span class="prop-name">pointer</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The offset into the buffer where reading and writing occur</div>
-				</div>
-			
-				<div class="prop-wrapper" id="ByteBuffer.littleEndian">
-					<div class="prop-header member">
-						<span class="prop-name">littleEndian</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">The endianness of the buffer</div>
-				</div>
-			
-				<div class="prop-wrapper" id="ByteBuffer.byteLength">
-					<div class="prop-header member">
-						<span class="prop-name">byteLength</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The number of bytes in the buffer. This property is read-only</div>
-				</div>
+		<div class="prop-wrapper" id="ByteBuffer.write">
+			<div class="prop-header member">
+				<span class="prop-name">write</span>
+				<span class="type">ByteBuffer.Writer</span>
 			</div>
+			<div class="prop desc">The writing API of the buffer</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="ByteBuffer.read">
+			<div class="prop-header member">
+				<span class="prop-name">read</span>
+				<span class="type">ByteBuffer.Reader</span>
+			</div>
+			<div class="prop desc">The reading API of the buffer</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="ByteBuffer.measure">
+			<div class="prop-header member">
+				<span class="prop-name">measure</span>
+				<span class="type">ByteBuffer.Measurer</span>
+			</div>
+			<div class="prop desc">The measuring API of the buffer</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="ByteBuffer.pointer">
+			<div class="prop-header member">
+				<span class="prop-name">pointer</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The offset into the buffer where reading and writing occur</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="ByteBuffer.littleEndian">
+			<div class="prop-header member">
+				<span class="prop-name">littleEndian</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">The endianness of the buffer</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="ByteBuffer.byteLength">
+			<div class="prop-header member">
+				<span class="prop-name">byteLength</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The number of bytes in the buffer</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				
@@ -691,13 +703,15 @@ This can be used to measure the length of a sequence of writes or reads.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="ByteBuffer.Measurer.size">
-					<div class="prop-header member">
-						<span class="prop-name">size</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The number of bytes operated on since the last reset</div>
-				</div>
+		<div class="prop-wrapper" id="ByteBuffer.Measurer.size">
+			<div class="prop-header member">
+				<span class="prop-name">size</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
+			<div class="prop desc">The number of bytes operated on since the last reset</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				

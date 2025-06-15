@@ -13,7 +13,7 @@
  * 		console.log(textbox.scripts.TEXT_AREA.value);
  * });
  * ```
- * @prop String value | The current content of the text area. This value is read-only
+ * @prop<immutable> String value | The current content of the text area
  * @prop Number selectionStart | The initial index of the selected text
  * @prop Number selectionEnd | The first index not in the selected text. If nothing is selected, this will be equal to `.selectionStart`
  * @prop Boolean multiline | Whether the text area should allow new lines and scrolling

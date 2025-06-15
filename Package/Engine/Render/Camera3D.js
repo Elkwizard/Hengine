@@ -3,9 +3,9 @@
  * @type class Camera3D extends Matrix4 implements Camera<Vector3>
  * Represents the camera in a 3D scene.
  * @prop Vector3 direction | The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
- * @prop Matrix4 pcMatrix | The product of the camera's projection matrix and itself. This property is read-only and only updates when cacheScreen() is called
- * @prop Vector3 right | The local right direction of the camera, in the XZ World-Space plane. This property is read-only
- * @prop Vector3 up | The local up direction of the camera, in World-Space. This property is read-only
+ * @prop<immutable> Matrix4 pcMatrix | The product of the camera's projection matrix and itself. This only updates when cacheScreen() is called
+ * @prop<immutable> Vector3 right | The local right direction of the camera, in the XZ World-Space plane
+ * @prop<immutable> Vector3 up | The local up direction of the camera, in World-Space
  */
 class Camera3D extends Matrix4 {
 	/**

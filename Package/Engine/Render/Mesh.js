@@ -56,12 +56,12 @@ class Renderable {
  * 	<tr><td>`vertexUV`</td><td>The UV texture coordinates of the vertex</td><td>Vector2</td></tr>
  * 	<tr><td>`vertexNormal`</td><td>The normalized normal vector of the vertex</td><td>Vector3</td></tr>
  * </table>
- * @prop String[] attributes | The vertex attributes present in the mesh's data. This value is read-only
+ * @prop<immutable> String[] attributes | The vertex attributes present in the mesh's data
  * @prop Float32Array data | The vertex data of the mesh, interleaved in the order specified by `.attributes`
  * @prop MeshChunk[] chunks | The chunks of the mesh, describing the layout of mesh's faces
  * @prop ArrayLike vertices | A list of each vertex in the vertex data. Each element of this array has a property for each attribute of the mesh. This property is synchronized with `.data`
- * @prop Number stride | The number of elements each vertex takes up in the data array. This value is read-only
- * @prop Map offsets | A map from attribute names to their offset into each vertex in the data array. This value is read-only
+ * @prop<immutable> Number stride | The number of elements each vertex takes up in the data array
+ * @prop<immutable> Map offsets | A map from attribute names to their offset into each vertex in the data array
  */
 class Mesh extends Renderable {
 	/**

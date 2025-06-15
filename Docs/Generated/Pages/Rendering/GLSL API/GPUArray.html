@@ -17,18 +17,18 @@
 These structs may be nested.
 These are used to represent GLSL dynamic-length array uniforms and the output of <a href="../../Miscellaneous/GPUComputation.html#class GPUComputation">GPUComputations</a>, but should not be constructed directly.
 For a struct such as:
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">struct</span><span class="highlight-CLASS"> <a href="../../Geometry/Shapes/2D/Circle.html#class Circle">Circle</a></span><span class="highlight-SYMBOL"> {
-</span><span class="highlight-KEYWORD">	vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">;
-</span><span class="highlight-KEYWORD">	float</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">;
-</span><span class="highlight-KEYWORD">	vec3</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">;
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">struct</span><span class="highlight-CLASS"> <a href="../../Geometry/Shapes/2D/Circle.html#class Circle">Circle</a></span><span class="highlight-SYMBOL"> {</span><span class="highlight-KEYWORD">
+vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">;</span><span class="highlight-KEYWORD">
+float</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">;</span><span class="highlight-KEYWORD">
+vec3</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">;
 };
 </span></code>
 A GPUArray could be used as follows:
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// gpu is a <a href="../../Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a></span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> circle</span><span class="highlight-SYMBOL"> = {
-	</span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">),
-	</span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 22.5</span><span class="highlight-SYMBOL">,
-	</span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;magenta&quot;</span><span class="highlight-SYMBOL">)
+</span><span class="highlight-IDENTIFIER">position</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">100</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 200</span><span class="highlight-SYMBOL">),
+</span><span class="highlight-IDENTIFIER">radius</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 22.5</span><span class="highlight-SYMBOL">,
+</span><span class="highlight-IDENTIFIER">color</span><span class="highlight-SYMBOL">:</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;magenta&quot;</span><span class="highlight-SYMBOL">)
 };
 </span><span class="highlight-IDENTIFIER">gpu</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getUniform</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;circles&quot;</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">append</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">circle</span><span class="highlight-SYMBOL">);
 </span></code>
@@ -38,13 +38,15 @@ const</span><span class="highlight-CONSTANT"> circle</span><span class="highligh
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="GPUArray.buffer">
-					<div class="prop-header member">
-						<span class="prop-name">buffer</span><span class="type"><a href="../../Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
-					</div>
-					<div class="prop desc">A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to</div>
-				</div>
+		<div class="prop-wrapper" id="GPUArray.buffer">
+			<div class="prop-header member">
+				<span class="prop-name">buffer</span>
+				<span class="type"><a href="../../Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span>
 			</div>
+			<div class="prop desc">A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				

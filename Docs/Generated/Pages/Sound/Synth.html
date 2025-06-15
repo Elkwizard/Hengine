@@ -16,9 +16,9 @@
 					Represents a synthesizer which can create pure tones.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> synth</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> Synth</span><span class="highlight-SYMBOL">();
 </span><span class="highlight-IDENTIFIER">synth</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">playSequence</span><span class="highlight-SYMBOL">([
-	{ </span><span class="highlight-IDENTIFIER">frequency</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 440</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">duration</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 1000</span><span class="highlight-SYMBOL"> }, </span><span class="highlight-COMMENT">// one second A note</span><span class="highlight-SYMBOL">
-	{ </span><span class="highlight-IDENTIFIER">duration</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 500</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">volume</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL"> } </span><span class="highlight-COMMENT">// half second pause</span><span class="highlight-SYMBOL">
-	{ </span><span class="highlight-IDENTIFIER">note</span><span class="highlight-SYMBOL">: </span><span class="highlight-STRING">&quot;A&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">duration</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 1000</span><span class="highlight-SYMBOL"> } </span><span class="highlight-COMMENT">// one second A note</span><span class="highlight-SYMBOL">
+{ </span><span class="highlight-IDENTIFIER">frequency</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 440</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">duration</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 1000</span><span class="highlight-SYMBOL"> }, </span><span class="highlight-COMMENT">// one second A note</span><span class="highlight-SYMBOL">
+{ </span><span class="highlight-IDENTIFIER">duration</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 500</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">volume</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL"> } </span><span class="highlight-COMMENT">// half second pause</span><span class="highlight-SYMBOL">
+{ </span><span class="highlight-IDENTIFIER">note</span><span class="highlight-SYMBOL">: </span><span class="highlight-STRING">&quot;A&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">duration</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 1000</span><span class="highlight-SYMBOL"> } </span><span class="highlight-COMMENT">// one second A note</span><span class="highlight-SYMBOL">
 ]);
 </span></code>
 				</div>
@@ -118,48 +118,60 @@
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Tone.duration?">
-					<div class="prop-header member">
-						<span class="prop-name">duration?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The duration (in milliseconds) of the tone. If not specified, the tone can be stopped at will</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Tone.frequency?">
-					<div class="prop-header member">
-						<span class="prop-name">frequency?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The frequency of the tone in Hertz. If not specified, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">note</span></code> must be</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Tone.note?">
-					<div class="prop-header member">
-						<span class="prop-name">note?</span><span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
-					</div>
-					<div class="prop desc">The letter name of the the note, optionally with a "#" appended for sharp or a "b" for flat. If not specified, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frequency</span></code> must be</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Tone.octave?">
-					<div class="prop-header member">
-						<span class="prop-name">octave?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">Which octave on a piano the note would appear in. Default is 4. This is ignored if <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frequency</span></code> is specified</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Tone.volume?">
-					<div class="prop-header member">
-						<span class="prop-name">volume?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The volume of the tone on [0, 1]. Default is 1</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Tone.wave?">
-					<div class="prop-header member">
-						<span class="prop-name">wave?</span><span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
-					</div>
-					<div class="prop desc">The name of the waveform for the tone. This is one of (<code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;sine&quot;</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;sawtooth&quot;</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;triangle&quot;</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;square&quot;</span></code>). Default is <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;sine&quot;</span></code></div>
-				</div>
+		<div class="prop-wrapper" id="Tone.duration?">
+			<div class="prop-header member">
+				<span class="prop-name">duration?</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
+			<div class="prop desc">The duration (in milliseconds) of the tone. If not specified, the tone can be stopped at will</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Tone.frequency?">
+			<div class="prop-header member">
+				<span class="prop-name">frequency?</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The frequency of the tone in Hertz. If not specified, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">note</span></code> must be</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Tone.note?">
+			<div class="prop-header member">
+				<span class="prop-name">note?</span>
+				<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
+			</div>
+			<div class="prop desc">The letter name of the the note, optionally with a "#" appended for sharp or a "b" for flat. If not specified, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frequency</span></code> must be</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Tone.octave?">
+			<div class="prop-header member">
+				<span class="prop-name">octave?</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">Which octave on a piano the note would appear in. Default is 4. This is ignored if <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">frequency</span></code> is specified</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Tone.volume?">
+			<div class="prop-header member">
+				<span class="prop-name">volume?</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The volume of the tone on [0, 1]. Default is 1</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Tone.wave?">
+			<div class="prop-header member">
+				<span class="prop-name">wave?</span>
+				<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
+			</div>
+			<div class="prop desc">The name of the waveform for the tone. This is one of (<code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;sine&quot;</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;sawtooth&quot;</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;triangle&quot;</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;square&quot;</span></code>). Default is <code class=" highlight-BACKGROUND"><span class="highlight-STRING">&quot;sine&quot;</span></code></div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				

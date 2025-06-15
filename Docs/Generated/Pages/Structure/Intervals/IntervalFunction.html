@@ -16,11 +16,11 @@
 					A wrapper for operations that happen over time or after a time.
 These can generally be created by methods of <a href="../../Structure/Intervals/IntervalManager.html#class IntervalManager">IntervalManager</a>.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> transitionDone</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">transition</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">t</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
-	</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Progress: &quot;</span><span class="highlight-SYMBOL"> + </span><span class="highlight-IDENTIFIER">t</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Progress: &quot;</span><span class="highlight-SYMBOL"> + </span><span class="highlight-IDENTIFIER">t</span><span class="highlight-SYMBOL">);
 },</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">);
 
 </span><span class="highlight-IDENTIFIER">transitionDone</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">then</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
-	</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;The transition has completed&quot;</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;The transition has completed&quot;</span><span class="highlight-SYMBOL">);
 });
 
 </span><span class="highlight-COMMENT">// Progress: 0</span><span class="highlight-SYMBOL">
@@ -40,69 +40,87 @@ These can generally be created by methods of <a href="../../Structure/Intervals/
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="IntervalFunction.fn">
-					<div class="prop-header member">
-						<span class="prop-name">fn</span><span class="type">Function</span>
-					</div>
-					<div class="prop desc">The function to call during the operation</div>
-				</div>
-			
-				<div class="prop-wrapper" id="IntervalFunction.type">
-					<div class="prop-header member">
-						<span class="prop-name">type</span><span class="type">Symbol</span>
-					</div>
-					<div class="prop desc">When during the update cycle the function updates</div>
-				</div>
-			
-				<div class="prop-wrapper" id="IntervalFunction.promise">
-					<div class="prop-header member">
-						<span class="prop-name">promise</span><span class="type">Promise</span>
-					</div>
-					<div class="prop desc">A promise which resolves when the operation completes</div>
-				</div>
-			
-				<div class="prop-wrapper" id="IntervalFunction.done">
-					<div class="prop-header member">
-						<span class="prop-name">done</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Indicates whether the operation has completed</div>
-				</div>
-			
-				<div class="prop-wrapper" id="IntervalFunction.timer">
-					<div class="prop-header member">
-						<span class="prop-name">timer</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The amount of frames the IntervalFunction has existed for</div>
-				</div>
-			
-				<div class="prop-wrapper" id="IntervalFunction.interval">
-					<div class="prop-header member">
-						<span class="prop-name">interval</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The total duration of the operation. The operation will complete after the timer exceeds this value</div>
-				</div>
-			
-				<div class="prop-wrapper" id="static IntervalFunction.BEFORE_UPDATE">
-					<div class="prop-header member">
-						<span class="prop-name">IntervalFunction.BEFORE_UPDATE</span><span class="type">Symbol</span>
-					</div>
-					<div class="prop desc">This symbol indicates that the operation should take place before the screen is cleared</div>
-				</div>
-			
-				<div class="prop-wrapper" id="static IntervalFunction.UPDATE">
-					<div class="prop-header member">
-						<span class="prop-name">IntervalFunction.UPDATE</span><span class="type">Symbol</span>
-					</div>
-					<div class="prop desc">This symbol indicates that the operation should take place immediately before the main engine update</div>
-				</div>
-			
-				<div class="prop-wrapper" id="static IntervalFunction.AFTER_UPDATE">
-					<div class="prop-header member">
-						<span class="prop-name">IntervalFunction.AFTER_UPDATE</span><span class="type">Symbol</span>
-					</div>
-					<div class="prop desc">This symbol indicates that the operation should take place immediately after the main engine update</div>
-				</div>
+		<div class="prop-wrapper" id="IntervalFunction.fn">
+			<div class="prop-header member">
+				<span class="prop-name">fn</span>
+				<span class="type">Function</span>
 			</div>
+			<div class="prop desc">The function to call during the operation</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="IntervalFunction.type">
+			<div class="prop-header member">
+				<span class="prop-name">type</span>
+				<span class="type">Symbol</span>
+			</div>
+			<div class="prop desc">When during the update cycle the function updates</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="IntervalFunction.promise">
+			<div class="prop-header member">
+				<span class="prop-name">promise</span>
+				<span class="type">Promise</span>
+			</div>
+			<div class="prop desc">A promise which resolves when the operation completes</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="IntervalFunction.done">
+			<div class="prop-header member">
+				<span class="prop-name">done</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Indicates whether the operation has completed</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="IntervalFunction.timer">
+			<div class="prop-header member">
+				<span class="prop-name">timer</span>
+				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The amount of frames the IntervalFunction has existed for</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="IntervalFunction.interval">
+			<div class="prop-header member">
+				<span class="prop-name">interval</span>
+				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The total duration of the operation. The operation will complete after the timer exceeds this value</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="static IntervalFunction.BEFORE_UPDATE">
+			<div class="prop-header member">
+				<span class="prop-name">IntervalFunction.BEFORE_UPDATE</span>
+				<span class="type">Symbol</span>
+			</div>
+			<div class="prop desc">This symbol indicates that the operation should take place before the screen is cleared</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="static IntervalFunction.UPDATE">
+			<div class="prop-header member">
+				<span class="prop-name">IntervalFunction.UPDATE</span>
+				<span class="type">Symbol</span>
+			</div>
+			<div class="prop desc">This symbol indicates that the operation should take place immediately before the main engine update</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="static IntervalFunction.AFTER_UPDATE">
+			<div class="prop-header member">
+				<span class="prop-name">IntervalFunction.AFTER_UPDATE</span>
+				<span class="type">Symbol</span>
+			</div>
+			<div class="prop desc">This symbol indicates that the operation should take place immediately after the main engine update</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				

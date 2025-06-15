@@ -33,13 +33,15 @@ It is based on the HTML5 Canvas API.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Frame.renderer">
-					<div class="prop-header member">
-						<span class="prop-name">renderer</span><span class="type"><a href="../../Rendering/Renderer/2D/Artists/CanvasArtist2D.html#class CanvasArtist2D">CanvasArtist2D</a></span>
-					</div>
-					<div class="prop desc">The renderer local to the frame that can be used to modify its contents. This property is read-only</div>
-				</div>
+		<div class="prop-wrapper" id="Frame.renderer">
+			<div class="prop-header member">
+				<span class="prop-name">renderer</span>
+				<span class="type"><a href="../../Rendering/Renderer/2D/Artists/CanvasArtist2D.html#class CanvasArtist2D">CanvasArtist2D</a></span>
 			</div>
+			<div class="prop desc">The renderer local to the frame that can be used to modify its contents</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
+		</div>
+	</div>
 				
 				
 				
@@ -134,7 +136,7 @@ It is based on the HTML5 Canvas API.
 				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Frame.js?#L302" target="_blank" class="function-name source-link">clip</a>(<span class="param">region</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Frame</span>
 			</div>
 			<div class="function desc">
-				Returns a frame containing a rectangular region of the caller. 
+				Returns a frame containing a rectangular region of the caller.
 			</div>
 			
 				<div class="function-signature">
@@ -319,13 +321,15 @@ The copy will have the same pixel ratio as the original image.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="FastFrame.renderer">
-					<div class="prop-header member">
-						<span class="prop-name">renderer</span><span class="type"><a href="../../Rendering/Renderer/2D/Artists/WebGLArtist2D.html#class WebGLArtist2D">WebGLArtist2D</a></span>
-					</div>
-					<div class="prop desc">The renderer for the frame</div>
-				</div>
+		<div class="prop-wrapper" id="FastFrame.renderer">
+			<div class="prop-header member">
+				<span class="prop-name">renderer</span>
+				<span class="type"><a href="../../Rendering/Renderer/2D/Artists/WebGLArtist2D.html#class WebGLArtist2D">WebGLArtist2D</a></span>
 			</div>
+			<div class="prop desc">The renderer for the frame</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				
@@ -344,20 +348,24 @@ By default, rendering will be done in the frame's <a href="../../Rendering/Coord
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Frame3D.renderer">
-					<div class="prop-header member">
-						<span class="prop-name">renderer</span><span class="type"><a href="../../Rendering/Renderer/3D/Artist3D.html#class Artist3D">Artist3D</a></span>
-					</div>
-					<div class="prop desc">The renderer which can be used to add meshes and lights to the frame. This property is read-only</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Frame3D.camera">
-					<div class="prop-header member">
-						<span class="prop-name">camera</span><span class="type"><a href="../../Rendering/Camera/Camera3D.html#class Camera3D">Camera3D</a></span>
-					</div>
-					<div class="prop desc">The view from which the objects will be rendered</div>
-				</div>
+		<div class="prop-wrapper" id="Frame3D.renderer">
+			<div class="prop-header member">
+				<span class="prop-name">renderer</span>
+				<span class="type"><a href="../../Rendering/Renderer/3D/Artist3D.html#class Artist3D">Artist3D</a></span>
 			</div>
+			<div class="prop desc">The renderer which can be used to add meshes and lights to the frame</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Frame3D.camera">
+			<div class="prop-header member">
+				<span class="prop-name">camera</span>
+				<span class="type"><a href="../../Rendering/Camera/Camera3D.html#class Camera3D">Camera3D</a></span>
+			</div>
+			<div class="prop desc">The view from which the objects will be rendered</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				

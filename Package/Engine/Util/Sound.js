@@ -300,7 +300,7 @@ window.addEventListener("mousedown", () => {
 /**
  * Represents an external sound clip.
  * These should be loaded using HengineSoundResource and not constructed directly.
- * @prop Boolean loops | Whether or not the sound loops upon completion. This value is read-only
+ * @prop<immutable> Boolean loops | Whether or not the sound loops upon completion
  * @prop Number duration | The length, in milliseconds, of the sound
  */
 class Sound {

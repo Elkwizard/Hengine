@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class MeshChunk">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L387" target="_blank" class="class-name source-link">MeshChunk</a> <span class="keyword">extends</span> <span class="class-name">Renderable</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L414" target="_blank" class="class-name source-link">MeshChunk</a> <span class="keyword">extends</span> <span class="class-name">Renderable</span>
 				</div>
 				<div class="class desc">
 					Represents the faces of a piece of a 3D <a href="../../Rendering/Meshes/Mesh.html#class Mesh">Mesh</a> with a single material.
@@ -20,27 +20,33 @@
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="MeshChunk.material">
-					<div class="prop-header member">
-						<span class="prop-name">material</span><span class="type"><a href="../../Rendering/Materials/Material.html#class Material">Material</a></span>
-					</div>
-					<div class="prop desc">The material of the chunk</div>
-				</div>
-			
-				<div class="prop-wrapper" id="MeshChunk.indices">
-					<div class="prop-header member">
-						<span class="prop-name">indices</span><span class="type">Uint32Array</span>
-					</div>
-					<div class="prop desc">The index buffer for the chunk. Every 3 consecutive elements of this array represent a triangular face of the mesh, where the each element is an index into the vertices of the mesh</div>
-				</div>
-			
-				<div class="prop-wrapper" id="MeshChunk.faces">
-					<div class="prop-header member">
-						<span class="prop-name">faces</span><span class="type">ArrayLike</span>
-					</div>
-					<div class="prop desc">A list of the faces of the chunk, as 3-length arrays of numbers. This property is synchronized with <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">indices</span></code></div>
-				</div>
+		<div class="prop-wrapper" id="MeshChunk.material">
+			<div class="prop-header member">
+				<span class="prop-name">material</span>
+				<span class="type"><a href="../../Rendering/Materials/Material.html#class Material">Material</a></span>
 			</div>
+			<div class="prop desc">The material of the chunk</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MeshChunk.indices">
+			<div class="prop-header member">
+				<span class="prop-name">indices</span>
+				<span class="type">Uint32Array</span>
+			</div>
+			<div class="prop desc">The index buffer for the chunk. Every 3 consecutive elements of this array represent a triangular face of the mesh, where the each element is an index into the vertices of the mesh</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MeshChunk.faces">
+			<div class="prop-header member">
+				<span class="prop-name">faces</span>
+				<span class="type">ArrayLike</span>
+			</div>
+			<div class="prop desc">A list of the faces of the chunk, as 3-length arrays of numbers. This property is synchronized with <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">indices</span></code></div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				
@@ -48,7 +54,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="MeshChunk.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L393" target="_blank" class="function-name source-link">constructor</a>(<span class="param">material</span>, <span class="param">faces</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L420" target="_blank" class="function-name source-link">constructor</a>(<span class="param">material</span>, <span class="param">faces</span>)
 			</div>
 			<div class="function desc">
 				Creates a new mesh chunk.
@@ -85,7 +91,7 @@
 	
 		<div class="function-wrapper" id="MeshChunk.prototype.get()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L422" target="_blank" class="function-name source-link">get</a>()<span class="type">MeshChunk</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L449" target="_blank" class="function-name source-link">get</a>()<span class="type">MeshChunk</span>
 			</div>
 			<div class="function desc">
 				Creates a deep copy of the mesh chunk.

@@ -3,8 +3,8 @@
  * @abstract
  * @prop SceneElement/null container | The parent node of this element
  * @prop String name | The name of this element. This can be anything, but no two children of the same node may have the same name
- * @prop Boolean removed | Whether or not this element has been removed from the scene. Changes to this variable will only remove the object at the end of the update cycle, so it is possible for this to be true while the element still exists. This variable is read-only
- * @prop Boolean inScene | Whether this element is in the scene tree. This is only false if the object is not in the scene, and will still be true while the object is marked for removal but still present. This variable is read-only
+ * @prop<immutable> Boolean removed | Whether or not this element has been removed from the scene. Changes to this variable will only remove the object at the end of the update cycle, so it is possible for this to be true while the element still exists
+ * @prop<immutable> Boolean inScene | Whether this element is in the scene tree. This is only false if the object is not in the scene, and will still be true while the object is marked for removal but still present
  */
 class SceneElement {
 	constructor(name, container) {

@@ -45,7 +45,7 @@ declare enum ScalingMode {
  * canvas.scalingMode = ScalingMode.STRETCH;
  * 
  * intervals.continuous(() => { // render a circle to the middle of the screen
- * 	renderer.draw(new Color("blue")).circle(middle, 10);
+ * renderer.draw(new Color("blue")).circle(middle, 10);
  * });
  * ```
  */
@@ -184,7 +184,7 @@ declare class ElementContainer extends SceneElement {
 	 */
 	getAllElements(): SceneObject[];
 	/**
-	 * Returns a conditional subset of all the leaf nodes within the container. 
+	 * Returns a conditional subset of all the leaf nodes within the container.
 	 * @param mask - The function used to check which elements should be returned
 	 */
 	getElementsMatch(mask: (arg0: SceneObject) => boolean): SceneObject[];
@@ -205,7 +205,7 @@ declare class ElementContainer extends SceneElement {
 
 /**
  * Represents the engine itself. Contains all the main functionality in its properties.
- * All properties of this class are available as properties of the global object. 
+ * All properties of this class are available as properties of the global object.
  */
 declare class Hengine {
 	/**
@@ -258,11 +258,11 @@ declare class Hengine {
  * Represents an external resource to be loaded by the Hengine.
  * ```js
  * HengineLoader.load([
- * 	new HengineImageResource("cat.png"),
- * 	new HengineImageResource("dog.png"),
- * 	new HengineScriptResource("renderers/catRenderer.js"),
- * 	new HengineScriptResource("renderers/dogRenderer.js"),
- * 	new HengineScriptResource("index.js")
+ * new HengineImageResource("cat.png"),
+ * new HengineImageResource("dog.png"),
+ * new HengineScriptResource("renderers/catRenderer.js"),
+ * new HengineScriptResource("renderers/dogRenderer.js"),
+ * new HengineScriptResource("index.js")
  * ]);
  * ```
  */
@@ -421,14 +421,14 @@ declare class HengineMeshResource extends HengineResource {
  * These methods also return the caller, which allows for convenient chaining.
  * ```js
  * new HengineLoadingStructure()
- * 	.image("cat.png")
- * 	.image("dog.png")
- * 	.folder("renderers", structure => structure
- * 		.script("catRenderer.js")
- * 		.script("dogRenderer.js")
- * 	)
- * 	.script("index.js")
- * 	.load()
+ * .image("cat.png")
+ * .image("dog.png")
+ * .folder("renderers", structure => structure
+ * .script("catRenderer.js")
+ * .script("dogRenderer.js")
+ * )
+ * .script("index.js")
+ * .load()
  * ```
  */
 declare class HengineLoadingStructure {
@@ -522,16 +522,16 @@ declare class HengineLoadingStructure {
  * This class is a singleton, and the single instance can be accessed via a static property.
  * ```js
  * async function load() {
- * 	// choose which file to load based on an external file
- * 	await HengineLoader.load([
- * 		new HengineTextResource("whichToLoad.txt")
- * 	], false);
+ * // choose which file to load based on an external file
+ * await HengineLoader.load([
+ * new HengineTextResource("whichToLoad.txt")
+ * ], false);
  * 
- * 	// load the selected script
- * 	const fileName = loadResource("whichToLoad.txt");
- * 	await HengineLoader.load([
- * 		new HengineScriptResource(`${fileName}.js`)
- * 	]);
+ * // load the selected script
+ * const fileName = loadResource("whichToLoad.txt");
+ * await HengineLoader.load([
+ * new HengineScriptResource(`${fileName}.js`)
+ * ]);
  * }
  * ```
  */
@@ -642,11 +642,11 @@ declare function loadResource(src: string): any | null;
  * These can generally be created by methods of IntervalManager.
  * ```js
  * const transitionDone = intervals.transition(t => {
- * 	console.log("Progress: " + t);
+ * console.log("Progress: " + t);
  * }, 5);
  * 
  * transitionDone.then(() => {
- * 	console.log("The transition has completed");
+ * console.log("The transition has completed");
  * });
  * 
  * // Progress: 0
@@ -762,13 +762,13 @@ declare class MovingAverage {
  * ```js
  * // display FPS data
  * intervals.continuous(() => {
- * 	renderer.image(intervals.fpsGraph).default(10, 10);
+ * renderer.image(intervals.fpsGraph).default(10, 10);
  * });
  * ```
  */
 declare class IntervalManager {
 	/**
-	 * The FPS based only on the duration of the last frame. This value is read-only
+	 * The FPS based only on the duration of the last frame
 	 */
 	rawFps: number;
 	/**
@@ -776,11 +776,11 @@ declare class IntervalManager {
 	 */
 	targetFPS: number;
 	/**
-	 * A graph of the FPS for the last 400 frames. This value is read-only
+	 * A graph of the FPS for the last 400 frames
 	 */
 	fpsGraph: GraphPlane;
 	/**
-	 * The total number of frames that have elapsed thusfar. This value is read-only
+	 * The total number of frames that have elapsed thusfar
 	 */
 	frameCount: number;
 	/**
@@ -896,12 +896,12 @@ declare function exit(...messages: any[]): void;
  * 
  * const BLOCK_SIZE = 30;
  * for (let i = 0; i < 10; i++) // generate 10 slightly disorganized blocks that will fall
- * 	scene.main.addPhysicsRectElement(
- * 		"block",
- * 		width / 2 + Random.range(-10, 10),
- * 		floor.getBoundingBox().y - (i + 0.5) * BLOCK_SIZE,
- * 		BLOCK_SIZE, BLOCK_SIZE, true
- * 	);
+ * scene.main.addPhysicsRectElement(
+ * "block",
+ * width / 2 + Random.range(-10, 10),
+ * floor.getBoundingBox().y - (i + 0.5) * BLOCK_SIZE,
+ * BLOCK_SIZE, BLOCK_SIZE, true
+ * );
  * ```
  */
 declare class Scene {
@@ -930,7 +930,7 @@ declare class Scene {
 	 */
 	updating: boolean;
 	/**
-	 * A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame. This property is read-only.
+	 * A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame
 	 */
 	renderOrder: SceneObject[];
 	/**
@@ -1041,14 +1041,14 @@ declare class Geometry {
 	 */
 	static inflate(polygon: Polygon, distance: number): Polygon;
 	/**
-	 * Simplifies a polygon by combining adjacent edges that are nearly colinear. 
+	 * Simplifies a polygon by combining adjacent edges that are nearly colinear.
 	 * @param polygon - The polygon to simplify
 	 * @param dtheta - The maximum angular difference in direction between two consecutive edges where they will be combined
 	 */
 	static joinEdges(polygon: Polygon, dtheta: number): Polygon;
 	/**
 	 * Creates a triangular decomposition of the provided convex polygon.
-	 * The triangles are returned as arrays of three vectors. 
+	 * The triangles are returned as arrays of three vectors.
 	 * @param shape - The convex polygon to decompose
 	 */
 	static triangulate(shape: Polygon): Vector2[][];
@@ -1104,7 +1104,7 @@ declare class Geometry {
 	/**
 	 * Returns the closest intersection of a ray with a collection of shapes.
 	 * The return value is either null (if the ray-cast misses) or an object with two properties:
-	 * a `.hitPoint` property containing the location of the ray intersection, and a `.hitShape` property containing the shape that the ray intersected. 
+	 * a `.hitPoint` property containing the location of the ray intersection, and a `.hitShape` property containing the shape that the ray intersected.
 	 * The dimensionality of the ray specification and the shapes must match, but this function will work for both Vector2/Shape2D and Vector3/Shape3D configurations.
 	 * @param rayOrigin - The starting point of the ray
 	 * @param rayDirection - The direction of the ray
@@ -1152,23 +1152,23 @@ declare class Geometry {
  * ```js
  * // computation to move circles toward the middle of the screen
  * const computation = new GPUComputation(`
- * 	struct Circle {
- * 		vec2 position;
- * 		float radius;
- * 	};
+ * struct Circle {
+ * vec2 position;
+ * float radius;
+ * };
  * 
- * 	uniform Circle[] circles;
- * 	uniform vec2 middle;
+ * uniform Circle[] circles;
+ * uniform vec2 middle;
  * 
- * 	Circle compute() {
- * 		Circle circle = circles[problemIndex];
- * 		circle.position = mix(circle.position, middle, 0.01);
- * 		return circle;
- * 	}
+ * Circle compute() {
+ * Circle circle = circles[problemIndex];
+ * circle.position = mix(circle.position, middle, 0.01);
+ * return circle;
+ * }
  * `);
  * 
  * const circles = Array.dim(1000).map(() => {
- * 	return { position: Random.inShape(scene.camera.screen), radius: 10 };
+ * return { position: Random.inShape(scene.camera.screen), radius: 10 };
  * });
  * 
  * // write, compute, and readback circle data
@@ -1332,9 +1332,9 @@ declare class Interpolation {
  * const point = new Animatable(middle, 100, Interpolation.smooth);
  * 
  * intervals.continuous(() => {
- * 	if (mouse.justPressed("Left"))
- * 		point.target = mouse.screen;
- * 	renderer.draw(new Color("black")).circle(point.value, 10);
+ * if (mouse.justPressed("Left"))
+ * point.target = mouse.screen;
+ * renderer.draw(new Color("black")).circle(point.value, 10);
  * });
  * ```
  */
@@ -1572,8 +1572,8 @@ declare class Matrix2 extends Matrix {
  * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates or 3D vectors in standard coordinates.
  * ```js
  * const transformation = Matrix3.mul([
- * 	Matrix3.translation(10, 5),
- * 	Matrix3.rotation(Math.PI)
+ * Matrix3.translation(10, 5),
+ * Matrix3.rotation(Math.PI)
  * ]);
  * 
  * const initialPoint = new Vector2(10, 20);
@@ -1794,10 +1794,10 @@ declare class CollisionMonitor {
  * let count = 0;
  * 
  * intervals.continuous(() => {
- * 	total += Random.int(1, 10); // generate a random value each frame
- * 	count++;
- * 	const mean = total / count; // compute the mean of the random values
- * 	renderer.draw(new Color("black")).text(Font.Arial20, mean, 10, 10);
+ * total += Random.int(1, 10); // generate a random value each frame
+ * count++;
+ * const mean = total / count; // compute the mean of the random values
+ * renderer.draw(new Color("black")).text(Font.Arial20, mean, 10, 10);
  * });
  * ```
  */
@@ -2221,18 +2221,18 @@ declare class Vector extends Operable {
 	/**
 	 * Computes a version of the caller with one coordinate axis replaced with 0.
 	 * This is equivalent to `this.minus(this.projectOnto(axis))` for `axis.mag === 1`.
-	 * Doesn't mutate the caller.  
+	 * Doesn't mutate the caller.
 	 * @param axis - The unit vector axis to remove from the caller
 	 */
 	without(axis: this): this;
 	/**
-	 * Computes the distance between two vectors. 
+	 * Computes the distance between two vectors.
 	 * @param a - The first vector
 	 * @param b - The second vector
 	 */
 	static dist(a: Vector, b: Vector): number;
 	/**
-	 * Computes the squared distance between two vectors. 
+	 * Computes the squared distance between two vectors.
 	 * @param a - The first vector
 	 * @param b - The second vector
 	 */
@@ -2369,7 +2369,7 @@ declare class Vector3 extends Vector {
 	 */
 	cross(v: this, result?: this): number;
 	/**
-	 * Returns a matrix such that for Vector3s `u` and `v`, `u.crossMatrix().times(v)` is the same as `u.cross(v)`. 
+	 * Returns a matrix such that for Vector3s `u` and `v`, `u.crossMatrix().times(v)` is the same as `u.cross(v)`.
 	 * @param result - The destination to store the resulting matrix in. If this is not specified, a new matrix will be created
 	 */
 	crossMatrix(result?: Matrix3): Matrix3;
@@ -2674,13 +2674,13 @@ declare class Range implements Copyable {
 	/**
 	 * Creates a new interval, optionally with a specific min and max.
 	 * If the arguments are not in ascending order, they will be reversed.
-	 * If no arguments are provided, the interval will be empty. 
+	 * If no arguments are provided, the interval will be empty.
 	 */
 	constructor();
 	/**
 	 * Creates a new interval, optionally with a specific min and max.
 	 * If the arguments are not in ascending order, they will be reversed.
-	 * If no arguments are provided, the interval will be empty. 
+	 * If no arguments are provided, the interval will be empty.
 	 * @param min - The lower bound
 	 * @param max - The upper bound
 	 */
@@ -2741,7 +2741,6 @@ declare class Range implements Copyable {
  * Within the documentation of this class, `Vector` refers to either `Vector2` or `Vector3` depending on whether the 2D or 3D subclass is used.
  * Similarly, `Matrix` refers to either `Matrix3` or `Matrix4`.
  * This is an abstract superclass and should not be constructed.
- * All properties of this class are read-only.
  */
 declare class Shape<Matrix = any, Vector = any> {
 	/**
@@ -2969,7 +2968,7 @@ declare class Rect extends Polygon {
 	 */
 	constructor(x: number, y: number, width: number, height: number);
 	/**
-	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller. 
+	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller.
 	 * @param width - The width of the hypothetical rectangle from which to determine the aspect ratio
 	 * @param height - The height of the hypothetical rectangle from which to determine the aspect ratio
 	 */
@@ -3735,10 +3734,10 @@ declare class Capsule extends Shape3D {
  * ```js
  * const object = { };
  * Lazy.define(object, "lazy", () => { // an expensive operation
- * 	let result = 0;
- * 	for (let i = 0; i < 1e6; i++)
- * 		result += Random.random();
- * 	return result;
+ * let result = 0;
+ * for (let i = 0; i < 1e6; i++)
+ * result += Random.random();
+ * return result;
  * });
  * 
  * console.log(object.lazy); // takes a while
@@ -4219,7 +4218,7 @@ declare class Operable implements MathObject, Serializable {
  */
 declare class Enum {
 	/**
-	 * The name of the symbol. This property is read-only
+	 * The name of the symbol
 	 */
 	name: string;
 	/**
@@ -4381,7 +4380,7 @@ declare interface Storage {
  * const catKnead = loadResource("catKnead"); // load the Animation
  * 
  * intervals.continuous(() => {
- * 	renderer.image(catKnead).default(0, 0); // the animation will advance
+ * renderer.image(catKnead).default(0, 0); // the animation will advance
  * });
  * ```
  */
@@ -4727,15 +4726,15 @@ declare class Color extends Operable {
 	 */
 	get inverse(): this;
 	/**
-	 * Returns the CSS rgba color string representing the color. 
+	 * Returns the CSS rgba color string representing the color.
 	 */
 	getRGBA(): string;
 	/**
-	 * Returns the CSS hex color string representing the color. 
+	 * Returns the CSS hex color string representing the color.
 	 */
 	getHex(): string;
 	/**
-	 * Returns the GLSL vec4 string representing the color. 
+	 * Returns the GLSL vec4 string representing the color.
 	 */
 	getGLSL(): string;
 	/**
@@ -5276,7 +5275,7 @@ declare class HImage extends ImageType {
  */
 declare class Frame extends ImageType implements Copyable {
 	/**
-	 * The renderer local to the frame that can be used to modify its contents. This property is read-only
+	 * The renderer local to the frame that can be used to modify its contents
 	 */
 	renderer: CanvasArtist2D;
 	/**
@@ -5293,12 +5292,12 @@ declare class Frame extends ImageType implements Copyable {
 	 */
 	stretch(width: number, height: number): this;
 	/**
-	 * Returns a frame containing a rectangular region of the caller. 
+	 * Returns a frame containing a rectangular region of the caller.
 	 * @param region - The region to extract
 	 */
 	clip(region: Rect): this;
 	/**
-	 * Returns a frame containing a rectangular region of the caller. 
+	 * Returns a frame containing a rectangular region of the caller.
 	 * @param x - The x coordinate of the upper-left corner of the region.
 	 * @param y - The y coordinate of the upper-left corner of the region.
 	 * @param width - The width of the region
@@ -5352,14 +5351,14 @@ declare class Frame extends ImageType implements Copyable {
  * ```js
  * // grayscale shader
  * const shader = new GPUShader(300, 300, `
- * 	uniform sampler2D image;
+ * uniform sampler2D image;
  * 
- * 	vec4 shader() {
- * 		vec2 uv = position / resolution;
- * 		vec3 color = texture(image, uv);
- * 		float brightness = (color.r + color.g + color.b) / 3.0;
- * 		return vec4(vec3(brightness), 1.0);
- * 	}
+ * vec4 shader() {
+ * vec2 uv = position / resolution;
+ * vec3 color = texture(image, uv);
+ * float brightness = (color.r + color.g + color.b) / 3.0;
+ * return vec4(vec3(brightness), 1.0);
+ * }
  * `);
  * 
  * const cat = loadResource("cat.png");
@@ -5427,19 +5426,19 @@ declare interface ValueStop {
  * ```js
  * // color of daylight at different times
  * const daylightGradient = new Gradient([
- * 	{ start: 0, value: new Color("black") },
- * 	{ start: 7, value: new Color("purple") },
- * 	{ start: 8, value: new Color("orange") },
- * 	{ start: 12, value: new Color("yellow") },
- * 	{ start: 20, value: new Color("red") },
- * 	{ start: 24, value: new Color("black") }
+ * { start: 0, value: new Color("black") },
+ * { start: 7, value: new Color("purple") },
+ * { start: 8, value: new Color("orange") },
+ * { start: 12, value: new Color("yellow") },
+ * { start: 20, value: new Color("red") },
+ * { start: 24, value: new Color("black") }
  * ]);
  * 
  * intervals.continuous(() => {
- * 	const hourMS = 1000 * 60 * 60;
- * 	const hour = (Date.now() % (hourMS * 24)) / hourMS;
- * 	const color = daylightGradient.sample(hour);
- * 	renderer.fill(color);
+ * const hourMS = 1000 * 60 * 60;
+ * const hour = (Date.now() % (hourMS * 24)) / hourMS;
+ * const color = daylightGradient.sample(hour);
+ * renderer.fill(color);
  * });
  * ```
  */
@@ -5512,14 +5511,14 @@ declare class Graph {
  * ```js
  * // graph the value of perlin noise
  * const graph = intervals.makeGraphPlane([
- * 	new Graph("Perlin", () => {
- * 		const time = intervals.frameCount;
- * 		return Random.perlin(time, 0.01);
- * 	}, 0, 1, new Color("white"))
+ * new Graph("Perlin", () => {
+ * const time = intervals.frameCount;
+ * return Random.perlin(time, 0.01);
+ * }, 0, 1, new Color("white"))
  * ]);
  * 
  * intervals.continuous(() => {
- * 	renderer.image(graph).default(10, 10);
+ * renderer.image(graph).default(10, 10);
  * });
  * ```
  */
@@ -5538,7 +5537,7 @@ declare class GraphPlane extends Frame {
  * Represents a 2D grid of grayscale values.
  * ```js
  * const perlinMap = new GrayMap(100, 100, (x, y) => {
- * 	return Random.perlin2D(x, y, 0.1);
+ * return Random.perlin2D(x, y, 0.1);
  * });
  * ```
  */
@@ -5642,12 +5641,12 @@ declare class Artist {
  * ```js
  * renderer.draw(new Color("blue")).shape(Polygon.regular(5, 100).move(middle));
  * renderer.stroke(new Color("red"), 20, LineCap.SQUARE, LineJoin.ROUND).connector([
- * 	new Vector2(0, 0),
- * 	new Vector2(50, 100),
- * 	new Vector2(150, 200),
- * 	new Vector2(300, 100)
+ * new Vector2(0, 0),
+ * new Vector2(50, 100),
+ * new Vector2(150, 200),
+ * new Vector2(300, 100)
  * ]);
- *   
+ * 
  * renderer.clip().circle(0, 0, 100);
  * renderer.draw(new Color("lime")).rect(0, 0, 80, 80);
  * renderer.unclip();
@@ -5655,7 +5654,7 @@ declare class Artist {
  */
 declare class Artist2D extends Artist {
 	/**
-	 * The surface on which the renderer renders. This property is read-only
+	 * The surface on which the renderer renders
 	 */
 	imageType: ImageType;
 	/**
@@ -6192,7 +6191,7 @@ declare class ClipRenderer extends PathRenderer {
 
 /**
  * Represents the image drawing API of an Artist2D.
- * This draws images in various paths. 
+ * This draws images in various paths.
  * For non-rectangular shapes, the image is scaled to be the size of the shape's bounding box, and then only the portion of the image inside the shape is shown.
  */
 declare class ImageRenderer extends PathRenderer {
@@ -6254,8 +6253,8 @@ declare class StaticImage extends ImageType {
  * 
  * // create a voronoi texture
  * texture.shader((x, y, dest) => {
- * 	const intensity = Random.voronoi2D(x, y, 0.1);
- * 	dest.set(Color.grayScale(intensity));
+ * const intensity = Random.voronoi2D(x, y, 0.1);
+ * dest.set(Color.grayScale(intensity));
  * });
  * ```
  */
@@ -6304,7 +6303,7 @@ declare class Texture extends ImageType implements Copyable, Serializable {
 	clear(): void;
 	/**
 	 * Checks whether the given coordinates are valid pixel coordinates.
-	 * This method ignores potential coordinate wrapping. 
+	 * This method ignores potential coordinate wrapping.
 	 * @param x - The x coordinate to check
 	 * @param y - The y coordinate to check
 	 */
@@ -6337,12 +6336,12 @@ declare class Texture extends ImageType implements Copyable, Serializable {
 	 */
 	blur(radius: number): this;
 	/**
-	 * Returns a texture containing a rectangular region of the caller. 
+	 * Returns a texture containing a rectangular region of the caller.
 	 * @param region - The region to extract
 	 */
 	clip(region: Rect): this;
 	/**
-	 * Returns a texture containing a rectangular region of the caller. 
+	 * Returns a texture containing a rectangular region of the caller.
 	 * @param x - The x coordinate of the upper-left corner of the region.
 	 * @param y - The y coordinate of the upper-left corner of the region.
 	 * @param width - The width of the region
@@ -6526,7 +6525,7 @@ declare class Transform2D extends Transform<Matrix3, Vector2, Number> {
 	 */
 	constructor(position: Vector2, rotation?: number);
 	/**
-	 * Adds a clockwise (in Screen-Space) rotation in-place about a specific point to the existing transformation. 
+	 * Adds a clockwise (in Screen-Space) rotation in-place about a specific point to the existing transformation.
 	 * @param point - The center to rotate about
 	 * @param rotation - The angle (in radians) to rotate by
 	 */
@@ -6563,7 +6562,7 @@ declare class VideoView extends ImageType {
 	 */
 	loops: boolean;
 	/**
-	 * Whether or not the video is currently playing. This value is read-only
+	 * Whether or not the video is currently playing
 	 */
 	playing: boolean;
 	/**
@@ -6662,18 +6661,18 @@ declare interface CubeMap {
  * For a struct such as:
  * ```glsl
  * struct Circle {
- * 	vec2 position;
- * 	float radius;
- * 	vec3 color;
+ * vec2 position;
+ * float radius;
+ * vec3 color;
  * };
  * ```
  * A GPUArray could be used as follows:
  * ```js
  * // gpu is a GPUInterface
  * const circle = {
- * 	position: new Vector2(100, 200),
- * 	radius: 22.5,
- * 	color: new Color("magenta")
+ * position: new Vector2(100, 200),
+ * radius: 22.5,
+ * color: new Color("magenta")
  * };
  * gpu.getUniform("circles").append(circle);
  * ```
@@ -6810,15 +6809,15 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 */
 	direction: Vector3;
 	/**
-	 * The product of the camera's projection matrix and itself. This property is read-only and only updates when cacheScreen() is called
+	 * The product of the camera's projection matrix and itself. This only updates when cacheScreen() is called
 	 */
 	pcMatrix: Matrix4;
 	/**
-	 * The local right direction of the camera, in the XZ World-Space plane. This property is read-only
+	 * The local right direction of the camera, in the XZ World-Space plane
 	 */
 	right: Vector3;
 	/**
-	 * The local up direction of the camera, in World-Space. This property is read-only
+	 * The local up direction of the camera, in World-Space
 	 */
 	up: Vector3;
 	/**
@@ -6827,7 +6826,7 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 */
 	constructor(canvas: ImageType);
 	/**
-	 * Returns the World-Space frustum of the camera, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the camera. 
+	 * Returns the World-Space frustum of the camera, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the camera.
 	 */
 	get screen(): Frustum;
 	/**
@@ -6938,7 +6937,7 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
  */
 declare class Frame3D extends ImageType {
 	/**
-	 * The renderer which can be used to add meshes and lights to the frame. This property is read-only
+	 * The renderer which can be used to add meshes and lights to the frame
 	 */
 	renderer: Artist3D;
 	/**
@@ -7059,20 +7058,24 @@ declare interface PolyhedronConversionSettings {
 	 * Whether the normals should be smoothed across vertices. Default is false
 	 */
 	smooth?: boolean;
+	/**
+	 * The minimum dot product between normals of adjacent faces required for them to be smoothed together. This has no effect is `.smooth` is false. Default is 0 (faces beyond perpendicular aren't smoothed)
+	 */
+	smoothLimit?: number;
 }
 
 /**
  * Represents a 3D mesh composed of chunks with different materials. The following vertex attributes are supported:
  * <table>
- * 	<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
- * 	<tr><td>`vertexPosition`</td><td>The model-space location of the vertex</td><td>Vector3</td></tr>
- * 	<tr><td>`vertexUV`</td><td>The UV texture coordinates of the vertex</td><td>Vector2</td></tr>
- * 	<tr><td>`vertexNormal`</td><td>The normalized normal vector of the vertex</td><td>Vector3</td></tr>
+ * <tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
+ * <tr><td>`vertexPosition`</td><td>The model-space location of the vertex</td><td>Vector3</td></tr>
+ * <tr><td>`vertexUV`</td><td>The UV texture coordinates of the vertex</td><td>Vector2</td></tr>
+ * <tr><td>`vertexNormal`</td><td>The normalized normal vector of the vertex</td><td>Vector3</td></tr>
  * </table>
  */
 declare class Mesh extends Renderable {
 	/**
-	 * The vertex attributes present in the mesh's data. This value is read-only
+	 * The vertex attributes present in the mesh's data
 	 */
 	attributes: string[];
 	/**
@@ -7088,11 +7091,11 @@ declare class Mesh extends Renderable {
 	 */
 	vertices: ArrayLike;
 	/**
-	 * The number of elements each vertex takes up in the data array. This value is read-only
+	 * The number of elements each vertex takes up in the data array
 	 */
 	stride: number;
 	/**
-	 * A map from attribute names to their offset into each vertex in the data array. This value is read-only
+	 * A map from attribute names to their offset into each vertex in the data array
 	 */
 	offsets: Map;
 	/**
@@ -7289,11 +7292,11 @@ declare class SceneElement {
 	 */
 	name: string;
 	/**
-	 * Whether or not this element has been removed from the scene. Changes to this variable will only remove the object at the end of the update cycle, so it is possible for this to be true while the element still exists. This variable is read-only
+	 * Whether or not this element has been removed from the scene. Changes to this variable will only remove the object at the end of the update cycle, so it is possible for this to be true while the element still exists
 	 */
 	removed: boolean;
 	/**
-	 * Whether this element is in the scene tree. This is only false if the object is not in the scene, and will still be true while the object is marked for removal but still present. This variable is read-only
+	 * Whether this element is in the scene tree. This is only false if the object is not in the scene, and will still be true while the object is marked for removal but still present
 	 */
 	inScene: boolean;
 	/**
@@ -7330,7 +7333,7 @@ declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any>
 	 */
 	hidden: boolean;
 	/**
-	 * Whether or not the mouse cursor is hovering over the shapes of this object. This property is readonly, and won't be accurate if mouse events are disabled. This property is always false for 3D objects
+	 * Whether or not the mouse cursor is hovering over the shapes of this object. This property won't be accurate if mouse events are disabled. This property is always false for 3D objects
 	 */
 	hovered: boolean;
 	/**
@@ -7354,7 +7357,7 @@ declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any>
 	 */
 	lifeSpan: number;
 	/**
-	 * The renderer onto which the object will be drawn. This property is read-only
+	 * The renderer onto which the object will be drawn
 	 */
 	renderer: Artist;
 	/**
@@ -7461,27 +7464,27 @@ declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any>
  * The available events to listen for, and when they're fired, are specified in the methods section. However, the signatures in the methods section leave out the initial object parameter, which is required for all methods of a script.
  * ```js
  * class ORBIT_AROUND extends ElementScript {
- * 	init(obj, center, radius) {
- * 		obj.scripts.removeDefault(); // remove normal drawing behavior
- * 		this.center = center;
- * 		this.radius = radius;
- * 		this.angle = 0;
- * 	}
+ * init(obj, center, radius) {
+ * obj.scripts.removeDefault(); // remove normal drawing behavior
+ * this.center = center;
+ * this.radius = radius;
+ * this.angle = 0;
+ * }
  * 
- * 	getOrbitPosition(obj) {
- * 		return Vector2.fromAngle(this.angle)
- * 			.times(this.radius)
- * 			.plus(this.center);
- * 	}
+ * getOrbitPosition(obj) {
+ * return Vector2.fromAngle(this.angle)
+ * .times(this.radius)
+ * .plus(this.center);
+ * }
  * 
- * 	update(obj) {
- * 		this.angle += 0.01;
- * 		obj.transform.position = this.getOrbitPosition(); // implicitly passes obj
- * 	}
+ * update(obj) {
+ * this.angle += 0.01;
+ * obj.transform.position = this.getOrbitPosition(); // implicitly passes obj
+ * }
  * 
- * 	draw(obj, name, shape) {
- * 		renderer.draw(new Color("red")).infer(shape);
- * 	}
+ * draw(obj, name, shape) {
+ * renderer.draw(new Color("red")).infer(shape);
+ * }
  * }
  * 
  * const orbiter = scene.main.addCircleElement("orbiter", 0, 0, 30);
@@ -7665,14 +7668,14 @@ declare class ElementScript {
  * ```js
  * // create a script which holds an action
  * class ACTION extends ElementScript {
- * 	init(obj, action) {
- * 		this.action = action;
- * 	}
+ * init(obj, action) {
+ * this.action = action;
+ * }
  * }
  * 
  * const object = scene.main.addElement("hello", 0, 0);
  * object.scripts.add(ACTION, () => {
- * 	console.log("Hello World!");
+ * console.log("Hello World!");
  * });
  * 
  * // call the function from the defined property
@@ -7879,21 +7882,6 @@ declare interface SpawnerProperties {
 
 /**
  * Adds particle emitting functionality to a SceneObject.
- * All properties of this class are read-only.
- * ```js
- * const particles = scene.main.addElement("particles", width / 2, height / 2);
- * particles.scripts.add(PARTICLE_SPAWNER, {
- * 	delay: 1,
- * 	lifeSpan: 100,
- * 	init(particle) {
- * 		particle.velocity = Vector2.fromAngle(Random.angle()).times(Random.range(2, 5));
- * 		particle.data.size = Random.range(2, 5);
- * 	},
- * 	draw(renderer, particle) {
- * 		renderer.draw(new Color("black")).circle(particle.position, particle.data.size);
- * 	}
- * });
- * ```
  */
 declare class PARTICLE_SPAWNER extends ElementScript {
 	/**
@@ -8090,14 +8078,14 @@ declare class PHYSICS extends ElementScript {
  * textbox.scripts.TEXT_AREA.alwaysIgnore("Enter");
  * 
  * intervals.continuous(() => {
- * 	if (keyboard.justPressed("Enter"))
- * 		console.log(textbox.scripts.TEXT_AREA.value);
+ * if (keyboard.justPressed("Enter"))
+ * console.log(textbox.scripts.TEXT_AREA.value);
  * });
  * ```
  */
 declare class TEXT_AREA extends ElementScript {
 	/**
-	 * The current content of the text area. This value is read-only
+	 * The current content of the text area
 	 */
 	value: string;
 	/**
@@ -8173,7 +8161,7 @@ declare class TEXT_AREA extends ElementScript {
 }
 
 /**
- * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer. 
+ * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer.
  */
 declare class ByteBuffer implements Copyable, Serializable {
 	/**
@@ -8197,7 +8185,7 @@ declare class ByteBuffer implements Copyable, Serializable {
 	 */
 	littleEndian: boolean;
 	/**
-	 * The number of bytes in the buffer. This property is read-only
+	 * The number of bytes in the buffer
 	 */
 	byteLength: number;
 	/**
@@ -8263,7 +8251,7 @@ declare class ByteBuffer implements Copyable, Serializable {
 }
 
 /**
- * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer. 
+ * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer.
  */
 declare namespace ByteBuffer {
 	/**
@@ -8508,7 +8496,6 @@ declare namespace InputHandler {
 	/**
 	 * Represents the current state of a key on an input device.
 	 * This is an abstract superclass and should not be constructed.
-	 * All properties of this class are read-only.
 	 */
 	class State {
 		/**
@@ -8554,14 +8541,14 @@ declare namespace InputHandler {
  * This class is available via the `.keyboard` property of both the global object and Hengine.
  * ```js
  * intervals.continuous(() => { // change circle color based on whether the space bar is pressed
- * 	const color = keyboard.pressed(" ") ? new Color("red") : new Color("blue");
- * 	renderer.draw(color).circle(width / 2, height / 2, 50);
+ * const color = keyboard.pressed(" ") ? new Color("red") : new Color("blue");
+ * renderer.draw(color).circle(width / 2, height / 2, 50);
  * });
  * ```
  */
 declare class KeyboardHandler extends InputHandler {
 	/**
-	 * A list of all the key presses that in the last frame. Unlike the normal key identifiers, these will include capital letters if a capital letter was typed, and the order will match the order in which the keys were pressed
+	 * A list of all the key presses that began in the last frame. Unlike the normal key identifiers, these will include capital letters if a capital letter was typed, and the order will match the order in which the keys were pressed
 	 */
 	downQueue: string[];
 }
@@ -8570,11 +8557,10 @@ declare class KeyboardHandler extends InputHandler {
  * Represents the API for interacting with the user's mouse.
  * The names of keys for the mouse are Left, Middle, and Right, for the associated buttons.
  * This class is available via the `.mouse` property of both the global object and Hengine.
- * All properties of this class are read-only.
  * ```js
  * intervals.continuous(() => { // display a circle at the cursor position when pressing the left mouse button
- * 	if (mouse.pressed("Left"))
- * 		renderer.draw(new Color("red")).circle(mouse.screen, 10).
+ * if (mouse.pressed("Left"))
+ * renderer.draw(new Color("red")).circle(mouse.screen, 10).
  * });
  * ```
  */
@@ -8608,7 +8594,7 @@ declare class MouseHandler extends InputHandler {
 	 */
 	worldDelta: Vector2;
 	/**
-	 * Whether the mouse is currently locked and unable to move. This property is read-only
+	 * Whether the mouse is currently locked and unable to move
 	 */
 	locked: boolean;
 	/**
@@ -8648,18 +8634,16 @@ declare class MouseHandler extends InputHandler {
  * Represents the API for interacting with the user's mouse.
  * The names of keys for the mouse are Left, Middle, and Right, for the associated buttons.
  * This class is available via the `.mouse` property of both the global object and Hengine.
- * All properties of this class are read-only.
  * ```js
  * intervals.continuous(() => { // display a circle at the cursor position when pressing the left mouse button
- * 	if (mouse.pressed("Left"))
- * 		renderer.draw(new Color("red")).circle(mouse.screen, 10).
+ * if (mouse.pressed("Left"))
+ * renderer.draw(new Color("red")).circle(mouse.screen, 10).
  * });
  * ```
  */
 declare namespace MouseHandler {
 	/**
 	 * The state of a given key on a mouse.
-	 * All properties of this class are read-only.
 	 */
 	class State extends InputHandler.State {
 		/**
@@ -8686,21 +8670,20 @@ declare namespace MouseHandler {
  * This class is available via the `.touches` property of both the global object and Hengine.
  * The names for keys in this API are arbitrary numbers, rather than Strings.
  * Getting these key names should be done with the `.allPressed`, `.allJustPressed`, and `.allJustReleased` getters, rather than specifying them directly.
- * All properties of this class are read-only.
  * ```js
  * intervals.continuous(() => {
- * 	const activeTouches = touches.allPressed;
- * 	if (activeTouches.length >= 2) {
- * 		// retrieve the positions of the first two touches
- * 		const a = touches.get(activeTouches[0]).screen;
- * 		const b = touches.get(activeTouches[1]).screen;
- * 		const dist = Vector2.dist(a, b);
- * 		
- * 		// shows the distance between the them
- * 		renderer.stroke(new Color("black"), 3).measure(
- * 			Font.Arial15, `Distance: ${Math.round(dist)} px`, a, b
- * 		);
- * 	}
+ * const activeTouches = touches.allPressed;
+ * if (activeTouches.length >= 2) {
+ * // retrieve the positions of the first two touches
+ * const a = touches.get(activeTouches[0]).screen;
+ * const b = touches.get(activeTouches[1]).screen;
+ * const dist = Vector2.dist(a, b);
+ * 
+ * // shows the distance between the them
+ * renderer.stroke(new Color("black"), 3).measure(
+ * Font.Arial15, `Distance: ${Math.round(dist)} px`, a, b
+ * );
+ * }
  * });
  * ```
  */
@@ -8735,28 +8718,26 @@ declare class TouchHandler extends InputHandler {
  * This class is available via the `.touches` property of both the global object and Hengine.
  * The names for keys in this API are arbitrary numbers, rather than Strings.
  * Getting these key names should be done with the `.allPressed`, `.allJustPressed`, and `.allJustReleased` getters, rather than specifying them directly.
- * All properties of this class are read-only.
  * ```js
  * intervals.continuous(() => {
- * 	const activeTouches = touches.allPressed;
- * 	if (activeTouches.length >= 2) {
- * 		// retrieve the positions of the first two touches
- * 		const a = touches.get(activeTouches[0]).screen;
- * 		const b = touches.get(activeTouches[1]).screen;
- * 		const dist = Vector2.dist(a, b);
- * 		
- * 		// shows the distance between the them
- * 		renderer.stroke(new Color("black"), 3).measure(
- * 			Font.Arial15, `Distance: ${Math.round(dist)} px`, a, b
- * 		);
- * 	}
+ * const activeTouches = touches.allPressed;
+ * if (activeTouches.length >= 2) {
+ * // retrieve the positions of the first two touches
+ * const a = touches.get(activeTouches[0]).screen;
+ * const b = touches.get(activeTouches[1]).screen;
+ * const dist = Vector2.dist(a, b);
+ * 
+ * // shows the distance between the them
+ * renderer.stroke(new Color("black"), 3).measure(
+ * Font.Arial15, `Distance: ${Math.round(dist)} px`, a, b
+ * );
+ * }
  * });
  * ```
  */
 declare namespace TouchHandler {
 	/**
 	 * The state of a specific touch on the user's screen.
-	 * All properties of this class are read-only.
 	 */
 	class State extends MouseHandler.State {
 		/**
@@ -8783,9 +8764,9 @@ declare namespace TouchHandler {
  * This class should not be constructed directly, and can be accessed from the `.clipboard` property of both the global object and Hengine.
  * ```js
  * intervals.continuous(() => {
- * 	if (mouse.justPressed("Middle")) { // copies a message when middle clicking
- * 		clipboard.write("Hello World!");
- * 	}
+ * if (mouse.justPressed("Middle")) { // copies a message when middle clicking
+ * clipboard.write("Hello World!");
+ * }
  * });
  * ```
  */
@@ -8854,9 +8835,9 @@ declare interface Tone {
  * ```js
  * const synth = new Synth();
  * synth.playSequence([
- * 	{ frequency: 440, duration: 1000 }, // one second A note
- * 	{ duration: 500, volume: 0 } // half second pause
- * 	{ note: "A", duration: 1000 } // one second A note
+ * { frequency: 440, duration: 1000 }, // one second A note
+ * { duration: 500, volume: 0 } // half second pause
+ * { note: "A", duration: 1000 } // one second A note
  * ]);
  * ```
  */
@@ -8902,7 +8883,7 @@ declare class SoundInstance {
  */
 declare class Sound {
 	/**
-	 * Whether or not the sound loops upon completion. This value is read-only
+	 * Whether or not the sound loops upon completion
 	 */
 	loops: boolean;
 	/**
@@ -8926,26 +8907,26 @@ declare class Sound {
  * ```js
  * // the file type class
  * class Triple {
- * 	constructor(a, b, c) {
- * 		this.a = a;
- * 		this.b = b;
- * 		this.c = c;
- * 	}
+ * constructor(a, b, c) {
+ * this.a = a;
+ * this.b = b;
+ * this.c = c;
+ * }
  * 
- * 	toByteBuffer(buffer = new ByteBuffer()) {
- * 		buffer.write.float64(this.a);
- * 		buffer.write.float64(this.b);
- * 		buffer.write.float64(this.c);
- * 		return buffer;
- * 	}
+ * toByteBuffer(buffer = new ByteBuffer()) {
+ * buffer.write.float64(this.a);
+ * buffer.write.float64(this.b);
+ * buffer.write.float64(this.c);
+ * return buffer;
+ * }
  * 
- * 	static fromByteBuffer(buffer) {
- * 		return new Triple(
- * 			buffer.read.float64(),
- * 			buffer.read.float64(),
- * 			buffer.read.float64()
- * 		);
- * 	}
+ * static fromByteBuffer(buffer) {
+ * return new Triple(
+ * buffer.read.float64(),
+ * buffer.read.float64(),
+ * buffer.read.float64()
+ * );
+ * }
  * }
  * 
  * // register file type

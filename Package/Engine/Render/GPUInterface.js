@@ -619,8 +619,9 @@ class GPUInputArray extends GPUArray {
 
 /**
  * Represents the way in which samples of an image are interpolated in GLSL.
- * @static_prop FilterMode NEAREST | The exact value of the nearest texel is used as the sample
- * @static_prop FilterMode LINEAR | The values of the 4 nearest texels are linearly interpolated to produce the sample
+ * @props<static, immutable>
+ * @prop FilterMode NEAREST | The exact value of the nearest texel is used as the sample
+ * @prop FilterMode LINEAR | The values of the 4 nearest texels are linearly interpolated to produce the sample
  */
 const FilterMode = Enum.define("NEAREST", "LINEAR");
 
@@ -1239,7 +1240,7 @@ class GLSLProgram {
 
 			case gl.SAMPLER_2D_ARRAY:
 			case gl.SAMPLER_2D_ARRAY_SHADOW: integer = true; texture = "array"; break;
-			
+
 			case gl.SAMPLER_CUBE_SHADOW:
 			case gl.SAMPLER_CUBE: integer = true; texture = "cube"; break;
 

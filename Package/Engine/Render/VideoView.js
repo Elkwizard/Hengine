@@ -2,7 +2,7 @@
  * Represents a video that can have the current frame rendered.
  * These should be loaded using HengineVideoResource and not constructed directly.
  * @prop Boolean loops | Whether or not the video loops.
- * @prop Boolean playing | Whether or not the video is currently playing. This value is read-only
+ * @prop<immutable> Boolean playing | Whether or not the video is currently playing
  */
 class VideoView extends ImageType {
 	constructor(video, loops = false) {

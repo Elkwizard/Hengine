@@ -21,7 +21,7 @@
  * @prop Boolean cullGraphics | Whether or not SceneObject graphics will ever be culled. If this is true, specific SceneObjects can still opt out, but not vice-versa
  * @prop Boolean collisionEvents | Whether or not collision events will be detected
  * @prop Boolean updating | Whether the scene is in the process of updating the SceneObjects
- * @prop SceneObject[] renderOrder | A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame. This property is read-only.
+ * @prop<readonly> SceneObject[] renderOrder | A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame
  */
 class Scene {
 	constructor(engine) {

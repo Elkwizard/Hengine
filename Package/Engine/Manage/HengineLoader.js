@@ -840,7 +840,7 @@ class HengineLoadingStructure {
  * 	]);
  * }
  * ```
- * @static_prop HengineLoader loader | The singleton instance
+ * @prop<static, immutable> HengineLoader loader | The singleton instance
  */
 class HengineLoader {
 	static loader = null;

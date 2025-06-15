@@ -149,7 +149,7 @@ class Range {
  * Within the documentation of this class, `Vector` refers to either `Vector2` or `Vector3` depending on whether the 2D or 3D subclass is used.
  * Similarly, `Matrix` refers to either `Matrix3` or `Matrix4`.
  * @abstract
- * @readonly
+ * @props<immutable>
  * @prop Vector middle | The geometric center of the shape
  */
 class Shape {

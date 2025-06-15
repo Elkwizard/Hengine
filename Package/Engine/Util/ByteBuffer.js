@@ -6,7 +6,7 @@
  * @prop ByteBuffer.Measurer measure | The measuring API of the buffer
  * @prop Number pointer | The offset into the buffer where reading and writing occur
  * @prop Boolean littleEndian | The endianness of the buffer
- * @prop Number byteLength | The number of bytes in the buffer. This property is read-only
+ * @prop<immutable> Number byteLength | The number of bytes in the buffer
  */
 class ByteBuffer {
 	/**

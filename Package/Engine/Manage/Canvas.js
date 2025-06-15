@@ -1,8 +1,9 @@
 /**
  * Represents the way a canvas scales with changes to the window size.
- * @static_prop ScalingMode STRETCH | The canvas changes size to fill the entire window
- * @static_prop ScalingMode PRESERVE_ASPECT_RATIO | The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio
- * @static_prop ScalingMode INTEGER_MULTIPLE | Same as `ScalingMode.PRESERVE_ASPECT_RATIO`, except the scale factor on the size will always be in the form (n) or (1/n), where n is an integer
+ * @props<static, immutable>
+ * @prop ScalingMode STRETCH | The canvas changes size to fill the entire window
+ * @prop ScalingMode PRESERVE_ASPECT_RATIO | The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio
+ * @prop ScalingMode INTEGER_MULTIPLE | Same as `ScalingMode.PRESERVE_ASPECT_RATIO`, except the scale factor on the size will always be in the form (n) or (1/n), where n is an integer
  */
 const ScalingMode = Enum.define("STRETCH", "PRESERVE_ASPECT_RATIO", "INTEGER_MULTIPLE");
 

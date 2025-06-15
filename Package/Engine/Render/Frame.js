@@ -37,7 +37,7 @@ function new_OffscreenCanvas(width, height) {
  * @abstract
  * @prop Number width | The natural rendered width of the image
  * @prop Number height | The natural rendered height of the image
- * @static_prop Boolean dynamic | Whether the contents of the image can change over time
+ * @prop<static, immutable> Boolean dynamic | Whether the contents of the image can change over time
  */
 class ImageType {
 	static dynamic = true;
@@ -259,7 +259,7 @@ class HImage extends ImageType {
  * // render the frame to the screen
  * renderer.image(frame).default(0, 0);
  * ```
- * @prop CanvasArtist2D renderer | The renderer local to the frame that can be used to modify its contents. This property is read-only
+ * @prop<readonly> CanvasArtist2D renderer | The renderer local to the frame that can be used to modify its contents
  */
 class Frame extends ImageType {
 	/**

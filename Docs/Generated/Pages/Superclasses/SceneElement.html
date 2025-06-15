@@ -24,34 +24,42 @@ This is an abstract superclass and should not be constructed.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="SceneElement.container">
-					<div class="prop-header member">
-						<span class="prop-name">container</span><span class="type">SceneElement/null</span>
-					</div>
-					<div class="prop desc">The parent node of this element</div>
-				</div>
-			
-				<div class="prop-wrapper" id="SceneElement.name">
-					<div class="prop-header member">
-						<span class="prop-name">name</span><span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
-					</div>
-					<div class="prop desc">The name of this element. This can be anything, but no two children of the same node may have the same name</div>
-				</div>
-			
-				<div class="prop-wrapper" id="SceneElement.removed">
-					<div class="prop-header member">
-						<span class="prop-name">removed</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not this element has been removed from the scene. Changes to this variable will only remove the object at the end of the update cycle, so it is possible for this to be true while the element still exists. This variable is read-only</div>
-				</div>
-			
-				<div class="prop-wrapper" id="SceneElement.inScene">
-					<div class="prop-header member">
-						<span class="prop-name">inScene</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether this element is in the scene tree. This is only false if the object is not in the scene, and will still be true while the object is marked for removal but still present. This variable is read-only</div>
-				</div>
+		<div class="prop-wrapper" id="SceneElement.container">
+			<div class="prop-header member">
+				<span class="prop-name">container</span>
+				<span class="type">SceneElement/null</span>
 			</div>
+			<div class="prop desc">The parent node of this element</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SceneElement.name">
+			<div class="prop-header member">
+				<span class="prop-name">name</span>
+				<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
+			</div>
+			<div class="prop desc">The name of this element. This can be anything, but no two children of the same node may have the same name</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SceneElement.removed">
+			<div class="prop-header member">
+				<span class="prop-name">removed</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not this element has been removed from the scene. Changes to this variable will only remove the object at the end of the update cycle, so it is possible for this to be true while the element still exists</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SceneElement.inScene">
+			<div class="prop-header member">
+				<span class="prop-name">inScene</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether this element is in the scene tree. This is only false if the object is not in the scene, and will still be true while the object is marked for removal but still present</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				

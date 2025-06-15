@@ -50,6 +50,30 @@ a {
 	font-weight: bold;
 }
 
+.prop-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.prop-attrs {
+	display: flex;
+	flex-direction: row;
+	padding-top: 0.6em;
+	gap: 0.3em;
+
+	.prop-attr {
+		border: 1px var(--accent-1) solid;
+		color: var(--accent-1);
+		border-radius: 0.7em;
+		padding: 0.2em 0.6em;
+
+		&:hover::after {
+			content: ": " attr(data-desc);
+		}
+	}
+}
+
 .type {
 	color: var(--accent-2);
 }

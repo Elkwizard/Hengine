@@ -19,27 +19,27 @@ Various file types can be specified, such that complex classes can be written to
 All built-in Serializable objects can be written to the file system, with their extensions being the lowercase version of their names (e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">string</span></code> for <a href="../Built-Ins/String.html#class String">String</a>).
 This class is primarily used in the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">fileSystem</span></code> property of both the global object and <a href="../Structure/Hengine.html#class Hengine">Hengine</a>.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// the file type class</span><span class="highlight-KEYWORD">
-class</span><span class="highlight-SYMBOL"> </span><span class="highlight-CLASS">Triple</span><span class="highlight-SYMBOL"> {
-</span><span class="highlight-KEYWORD">	constructor</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">c</span><span class="highlight-SYMBOL">) {
-	</span><span class="highlight-LANG_VAR">	this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">a</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">;
-	</span><span class="highlight-LANG_VAR">	this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">b</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">;
-	</span><span class="highlight-LANG_VAR">	this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">c</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">c</span><span class="highlight-SYMBOL">;
-	}
+class</span><span class="highlight-SYMBOL"> </span><span class="highlight-CLASS">Triple</span><span class="highlight-SYMBOL"> {</span><span class="highlight-KEYWORD">
+constructor</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">c</span><span class="highlight-SYMBOL">) {</span><span class="highlight-LANG_VAR">
+this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">a</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">a</span><span class="highlight-SYMBOL">;</span><span class="highlight-LANG_VAR">
+this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">b</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">b</span><span class="highlight-SYMBOL">;</span><span class="highlight-LANG_VAR">
+this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">c</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">c</span><span class="highlight-SYMBOL">;
+}
 
-	</span><span class="highlight-FUNCTION">toByteBuffer</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span><span class="highlight-SYMBOL">()) {
-		</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">write</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(</span><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">a</span><span class="highlight-SYMBOL">);
-		</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">write</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(</span><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">b</span><span class="highlight-SYMBOL">);
-		</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">write</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(</span><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">c</span><span class="highlight-SYMBOL">);
-	</span><span class="highlight-KEYWORD">	return</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">;
-	}
-
-</span><span class="highlight-KEYWORD">	static</span><span class="highlight-SYMBOL"> </span><span class="highlight-FUNCTION">fromByteBuffer</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">) {
-	</span><span class="highlight-KEYWORD">	return new</span><span class="highlight-CLASS"> Triple</span><span class="highlight-SYMBOL">(
-			</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">read</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(),
-			</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">read</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(),
-			</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">read</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">()
-		);
-	}
+</span><span class="highlight-FUNCTION">toByteBuffer</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> <a href="../Miscellaneous/ByteBuffer.html#class ByteBuffer">ByteBuffer</a></span><span class="highlight-SYMBOL">()) {
+</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">write</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(</span><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">a</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">write</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(</span><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">b</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">write</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(</span><span class="highlight-LANG_VAR">this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">c</span><span class="highlight-SYMBOL">);</span><span class="highlight-KEYWORD">
+return</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">;
+}
+</span><span class="highlight-KEYWORD">
+static</span><span class="highlight-SYMBOL"> </span><span class="highlight-FUNCTION">fromByteBuffer</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">) {</span><span class="highlight-KEYWORD">
+return new</span><span class="highlight-CLASS"> Triple</span><span class="highlight-SYMBOL">(
+</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">read</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(),
+</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">read</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">(),
+</span><span class="highlight-IDENTIFIER">buffer</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">read</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">float64</span><span class="highlight-SYMBOL">()
+);
+}
 }
 
 </span><span class="highlight-COMMENT">// register file type</span><span class="highlight-SYMBOL">

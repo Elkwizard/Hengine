@@ -21,9 +21,9 @@ const</span><span class="highlight-CONSTANT"> textbox</span><span class="highlig
 </span><span class="highlight-IDENTIFIER">textbox</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">TEXT_AREA</span><span class="highlight-SYMBOL">, </span><span class="highlight-CLASS"><a href="../Rendering/Font.html#class Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CLASS">Arial40</span><span class="highlight-SYMBOL">,</span><span class="highlight-LANG_VAR"> false</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-IDENTIFIER">textbox</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">TEXT_AREA</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">alwaysIgnore</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Enter&quot;</span><span class="highlight-SYMBOL">);
 
-</span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
-</span><span class="highlight-KEYWORD">	if</span><span class="highlight-SYMBOL"> (</span><span class="highlight-IDENTIFIER">keyboard</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">justPressed</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Enter&quot;</span><span class="highlight-SYMBOL">))
-		</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">textbox</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">TEXT_AREA</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">value</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{</span><span class="highlight-KEYWORD">
+if</span><span class="highlight-SYMBOL"> (</span><span class="highlight-IDENTIFIER">keyboard</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">justPressed</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Enter&quot;</span><span class="highlight-SYMBOL">))
+</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">textbox</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-CONSTANT">TEXT_AREA</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">value</span><span class="highlight-SYMBOL">);
 });
 </span></code>
 				</div>
@@ -32,90 +32,114 @@ const</span><span class="highlight-CONSTANT"> textbox</span><span class="highlig
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="TEXT_AREA.value">
-					<div class="prop-header member">
-						<span class="prop-name">value</span><span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
-					</div>
-					<div class="prop desc">The current content of the text area. This value is read-only</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.selectionStart">
-					<div class="prop-header member">
-						<span class="prop-name">selectionStart</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The initial index of the selected text</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.selectionEnd">
-					<div class="prop-header member">
-						<span class="prop-name">selectionEnd</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The first index not in the selected text. If nothing is selected, this will be equal to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">selectionStart</span></code></div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.multiline">
-					<div class="prop-header member">
-						<span class="prop-name">multiline</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether the text area should allow new lines and scrolling</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.focused">
-					<div class="prop-header member">
-						<span class="prop-name">focused</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether this is the currently focused text area</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.font">
-					<div class="prop-header member">
-						<span class="prop-name">font</span><span class="type"><a href="../Rendering/Font.html#class Font">Font</a></span>
-					</div>
-					<div class="prop desc">The font used to display the text area</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.caretColor">
-					<div class="prop-header member">
-						<span class="prop-name">caretColor</span><span class="type"><a href="../Rendering/Color.html#class Color">Color</a></span>
-					</div>
-					<div class="prop desc">The color of the caret. Starts as black</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.highlightColor">
-					<div class="prop-header member">
-						<span class="prop-name">highlightColor</span><span class="type"><a href="../Rendering/Color.html#class Color">Color</a></span>
-					</div>
-					<div class="prop desc">The semi-transparent background color of selected text</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.padding">
-					<div class="prop-header member">
-						<span class="prop-name">padding</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The interior padding of the text area, measured as a proportion of the font size</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.scrollBarSize">
-					<div class="prop-header member">
-						<span class="prop-name">scrollBarSize</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The width of the scroll bars of a multiline text area</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.scrollSpeed">
-					<div class="prop-header member">
-						<span class="prop-name">scrollSpeed</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The speed (in pixels per frame) of the scroll bars of a multiline text area</div>
-				</div>
-			
-				<div class="prop-wrapper" id="TEXT_AREA.scrollOffset">
-					<div class="prop-header member">
-						<span class="prop-name">scrollOffset</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The translation of the visible area of the text area due to scrolling</div>
-				</div>
+		<div class="prop-wrapper" id="TEXT_AREA.value">
+			<div class="prop-header member">
+				<span class="prop-name">value</span>
+				<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
 			</div>
+			<div class="prop desc">The current content of the text area</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.selectionStart">
+			<div class="prop-header member">
+				<span class="prop-name">selectionStart</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The initial index of the selected text</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.selectionEnd">
+			<div class="prop-header member">
+				<span class="prop-name">selectionEnd</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The first index not in the selected text. If nothing is selected, this will be equal to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">selectionStart</span></code></div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.multiline">
+			<div class="prop-header member">
+				<span class="prop-name">multiline</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether the text area should allow new lines and scrolling</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.focused">
+			<div class="prop-header member">
+				<span class="prop-name">focused</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether this is the currently focused text area</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.font">
+			<div class="prop-header member">
+				<span class="prop-name">font</span>
+				<span class="type"><a href="../Rendering/Font.html#class Font">Font</a></span>
+			</div>
+			<div class="prop desc">The font used to display the text area</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.caretColor">
+			<div class="prop-header member">
+				<span class="prop-name">caretColor</span>
+				<span class="type"><a href="../Rendering/Color.html#class Color">Color</a></span>
+			</div>
+			<div class="prop desc">The color of the caret. Starts as black</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.highlightColor">
+			<div class="prop-header member">
+				<span class="prop-name">highlightColor</span>
+				<span class="type"><a href="../Rendering/Color.html#class Color">Color</a></span>
+			</div>
+			<div class="prop desc">The semi-transparent background color of selected text</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.padding">
+			<div class="prop-header member">
+				<span class="prop-name">padding</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The interior padding of the text area, measured as a proportion of the font size</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.scrollBarSize">
+			<div class="prop-header member">
+				<span class="prop-name">scrollBarSize</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The width of the scroll bars of a multiline text area</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.scrollSpeed">
+			<div class="prop-header member">
+				<span class="prop-name">scrollSpeed</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The speed (in pixels per frame) of the scroll bars of a multiline text area</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="TEXT_AREA.scrollOffset">
+			<div class="prop-header member">
+				<span class="prop-name">scrollOffset</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The translation of the visible area of the text area due to scrolling</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				

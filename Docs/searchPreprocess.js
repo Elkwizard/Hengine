@@ -69,7 +69,7 @@ function addSearchData(docs, idToDoc) {
 			addTextData(doc, id, doc);
 			for (const property of doc.properties) {
 				let id = property.name;
-				if (property.category === "static_prop") id = `static ${id}`;
+				if (property.attributes.static) id = `static ${id}`;
 				else id = `${doc.name.base}.${id}`;
 				addDescriptionData(property, id, doc);
 			}

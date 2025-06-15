@@ -16,10 +16,9 @@
 					Represents the API for interacting with the user's mouse.
 The names of keys for the mouse are Left, Middle, and Right, for the associated buttons.
 This class is available via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">mouse</span></code> property of both the global object and <a href="../Structure/Hengine.html#class Hengine">Hengine</a>.
-All properties of this class are read-only.
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{ </span><span class="highlight-COMMENT">// display a circle at the cursor position when pressing the left mouse button</span><span class="highlight-SYMBOL">
-</span><span class="highlight-KEYWORD">	if</span><span class="highlight-SYMBOL"> (</span><span class="highlight-IDENTIFIER">mouse</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">pressed</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Left&quot;</span><span class="highlight-SYMBOL">))
-		</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">mouse</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">).
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{ </span><span class="highlight-COMMENT">// display a circle at the cursor position when pressing the left mouse button</span><span class="highlight-KEYWORD">
+if</span><span class="highlight-SYMBOL"> (</span><span class="highlight-IDENTIFIER">mouse</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">pressed</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Left&quot;</span><span class="highlight-SYMBOL">))
+</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;red&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">mouse</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">).
 });
 </span></code>
 				</div>
@@ -28,62 +27,78 @@ All properties of this class are read-only.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="MouseHandler.wheelDelta">
-					<div class="prop-header member">
-						<span class="prop-name">wheelDelta</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The scroll displacement (in pixels) from the mouse wheel during the last frame.</div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.screen">
-					<div class="prop-header member">
-						<span class="prop-name">screen</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The current cursor position, in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a></div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.screenLast">
-					<div class="prop-header member">
-						<span class="prop-name">screenLast</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The cursor position last frame, in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a></div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.screenDelta">
-					<div class="prop-header member">
-						<span class="prop-name">screenDelta</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The change in the cursor's <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a> position over the last frame</div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.world">
-					<div class="prop-header member">
-						<span class="prop-name">world</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The current cursor position, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>. This is only available in 2D Mode</div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.worldLast">
-					<div class="prop-header member">
-						<span class="prop-name">worldLast</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The cursor position last frame, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.  This is only available in 2D Mode</div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.worldDelta">
-					<div class="prop-header member">
-						<span class="prop-name">worldDelta</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The change in the cursor's <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> position over the last frame. This is only available in 2D Mode</div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.locked">
-					<div class="prop-header member">
-						<span class="prop-name">locked</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether the mouse is currently locked and unable to move. This property is read-only</div>
-				</div>
+		<div class="prop-wrapper" id="MouseHandler.wheelDelta">
+			<div class="prop-header member">
+				<span class="prop-name">wheelDelta</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
+			<div class="prop desc">The scroll displacement (in pixels) from the mouse wheel during the last frame.</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.screen">
+			<div class="prop-header member">
+				<span class="prop-name">screen</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The current cursor position, in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a></div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.screenLast">
+			<div class="prop-header member">
+				<span class="prop-name">screenLast</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The cursor position last frame, in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a></div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.screenDelta">
+			<div class="prop-header member">
+				<span class="prop-name">screenDelta</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The change in the cursor's <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a> position over the last frame</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.world">
+			<div class="prop-header member">
+				<span class="prop-name">world</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The current cursor position, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>. This is only available in 2D Mode</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.worldLast">
+			<div class="prop-header member">
+				<span class="prop-name">worldLast</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The cursor position last frame, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.  This is only available in 2D Mode</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.worldDelta">
+			<div class="prop-header member">
+				<span class="prop-name">worldDelta</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The change in the cursor's <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> position over the last frame. This is only available in 2D Mode</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.locked">
+			<div class="prop-header member">
+				<span class="prop-name">locked</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether the mouse is currently locked and unable to move</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				
@@ -144,11 +159,10 @@ This can only be called after a successful call to <code class=" highlight-BACKG
 		
 			<div class="class-wrapper" id="class MouseHandler.State">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L442" target="_blank" class="class-name source-link">MouseHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Input/InputHandler.html#class InputHandler.State">InputHandler.State</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L441" target="_blank" class="class-name source-link">MouseHandler.State</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Input/InputHandler.html#class InputHandler.State">InputHandler.State</a></span>
 				</div>
 				<div class="class desc">
 					The state of a given key on a mouse.
-All properties of this class are read-only.
 				</div>
 				
 					<div class="header">Subclasses</div>
@@ -158,34 +172,42 @@ All properties of this class are read-only.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="MouseHandler.State.screenDragStart">
-					<div class="prop-header member">
-						<span class="prop-name">screenDragStart</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The beginning of the most recent click-and-drag motion with this key, in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a></div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.State.screenDragEnd">
-					<div class="prop-header member">
-						<span class="prop-name">screenDragEnd</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The end of the most recent click-and-drag motion with this key, in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a>. If such a gesture is ongoing, this will be the current cursor position</div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.State.worldDragStart">
-					<div class="prop-header member">
-						<span class="prop-name">worldDragStart</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The beginning of the most recent click-and-drag motion with this key, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a></div>
-				</div>
-			
-				<div class="prop-wrapper" id="MouseHandler.State.worldDragEnd">
-					<div class="prop-header member">
-						<span class="prop-name">worldDragEnd</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The end of the most recent click-and-drag motion with this key, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>. If such a gesture is ongoing, this will be the current cursor position</div>
-				</div>
+		<div class="prop-wrapper" id="MouseHandler.State.screenDragStart">
+			<div class="prop-header member">
+				<span class="prop-name">screenDragStart</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
+			<div class="prop desc">The beginning of the most recent click-and-drag motion with this key, in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a></div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.State.screenDragEnd">
+			<div class="prop-header member">
+				<span class="prop-name">screenDragEnd</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The end of the most recent click-and-drag motion with this key, in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a>. If such a gesture is ongoing, this will be the current cursor position</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.State.worldDragStart">
+			<div class="prop-header member">
+				<span class="prop-name">worldDragStart</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The beginning of the most recent click-and-drag motion with this key, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a></div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="MouseHandler.State.worldDragEnd">
+			<div class="prop-header member">
+				<span class="prop-name">worldDragEnd</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The end of the most recent click-and-drag motion with this key, in <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>. If such a gesture is ongoing, this will be the current cursor position</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				

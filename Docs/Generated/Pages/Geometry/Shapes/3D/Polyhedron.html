@@ -23,27 +23,33 @@
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Polyhedron.vertices">
-					<div class="prop-header member">
-						<span class="prop-name">vertices</span><span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
-					</div>
-					<div class="prop desc">The vertices of the polyhedron</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Polyhedron.indices">
-					<div class="prop-header member">
-						<span class="prop-name">indices</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a>[]</span>
-					</div>
-					<div class="prop desc">An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">vertices</span></code> array which make up a triangle</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Polyhedron.faceCount">
-					<div class="prop-header member">
-						<span class="prop-name">faceCount</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The number of faces of the polyhedron. This property is equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">indices</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">length</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 3</span></code></div>
-				</div>
+		<div class="prop-wrapper" id="Polyhedron.vertices">
+			<div class="prop-header member">
+				<span class="prop-name">vertices</span>
+				<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
 			</div>
+			<div class="prop desc">The vertices of the polyhedron</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Polyhedron.indices">
+			<div class="prop-header member">
+				<span class="prop-name">indices</span>
+				<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a>[]</span>
+			</div>
+			<div class="prop desc">An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">vertices</span></code> array which make up a triangle</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Polyhedron.faceCount">
+			<div class="prop-header member">
+				<span class="prop-name">faceCount</span>
+				<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The number of faces of the polyhedron. This property is equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">indices</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">length</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 3</span></code></div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				
@@ -392,27 +398,33 @@ Vertices and triangles can be added through various means, and can at any point 
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="PolyhedronBuilder.vertices">
-					<div class="prop-header member">
-						<span class="prop-name">vertices</span><span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
-					</div>
-					<div class="prop desc">The vertices of the polyhedron. These can be added to directly, if desired</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PolyhedronBuilder.indices">
-					<div class="prop-header member">
-						<span class="prop-name">indices</span><span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a>[]</span>
-					</div>
-					<div class="prop desc">The indices of the vertices of the triangular faces of the polyhedron. These can be added to directly, if desired</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PolyhedronBuilder.lazy">
-					<div class="prop-header member">
-						<span class="prop-name">lazy</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether the polyhedron should be constructed lazily, i.e. whether it is guaranteed to not contain duplicate vertices or degenerate triangles. Starts as false</div>
-				</div>
+		<div class="prop-wrapper" id="PolyhedronBuilder.vertices">
+			<div class="prop-header member">
+				<span class="prop-name">vertices</span>
+				<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
 			</div>
+			<div class="prop desc">The vertices of the polyhedron. These can be added to directly, if desired</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PolyhedronBuilder.indices">
+			<div class="prop-header member">
+				<span class="prop-name">indices</span>
+				<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a>[]</span>
+			</div>
+			<div class="prop desc">The indices of the vertices of the triangular faces of the polyhedron. These can be added to directly, if desired</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PolyhedronBuilder.lazy">
+			<div class="prop-header member">
+				<span class="prop-name">lazy</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether the polyhedron should be constructed lazily, i.e. whether it is guaranteed to not contain duplicate vertices or degenerate triangles. Starts as false</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				

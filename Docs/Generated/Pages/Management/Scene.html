@@ -21,12 +21,12 @@ const</span><span class="highlight-CONSTANT"> floor</span><span class="highlight
 </span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> BLOCK_SIZE</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 30</span><span class="highlight-SYMBOL">;</span><span class="highlight-KEYWORD">
 for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD">let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">; </span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL"> &lt;</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">; </span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL">++) </span><span class="highlight-COMMENT">// generate 10 slightly disorganized blocks that will fall</span><span class="highlight-SYMBOL">
-	</span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addPhysicsRectElement</span><span class="highlight-SYMBOL">(
-		</span><span class="highlight-STRING">&quot;block&quot;</span><span class="highlight-SYMBOL">,
-		</span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL"> + </span><span class="highlight-CLASS"><a href="../Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">-10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">),
-		</span><span class="highlight-IDENTIFIER">floor</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getBoundingBox</span><span class="highlight-SYMBOL">().</span><span class="highlight-PROPERTY">y</span><span class="highlight-SYMBOL"> - (</span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL"> +</span><span class="highlight-NUMBER"> 0.5</span><span class="highlight-SYMBOL">) * </span><span class="highlight-CONSTANT">BLOCK_SIZE</span><span class="highlight-SYMBOL">,
-		</span><span class="highlight-CONSTANT">BLOCK_SIZE</span><span class="highlight-SYMBOL">, </span><span class="highlight-CONSTANT">BLOCK_SIZE</span><span class="highlight-SYMBOL">,</span><span class="highlight-LANG_VAR"> true</span><span class="highlight-SYMBOL">
-	);
+</span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addPhysicsRectElement</span><span class="highlight-SYMBOL">(
+</span><span class="highlight-STRING">&quot;block&quot;</span><span class="highlight-SYMBOL">,
+</span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL"> + </span><span class="highlight-CLASS"><a href="../Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">-10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">),
+</span><span class="highlight-IDENTIFIER">floor</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">getBoundingBox</span><span class="highlight-SYMBOL">().</span><span class="highlight-PROPERTY">y</span><span class="highlight-SYMBOL"> - (</span><span class="highlight-IDENTIFIER">i</span><span class="highlight-SYMBOL"> +</span><span class="highlight-NUMBER"> 0.5</span><span class="highlight-SYMBOL">) * </span><span class="highlight-CONSTANT">BLOCK_SIZE</span><span class="highlight-SYMBOL">,
+</span><span class="highlight-CONSTANT">BLOCK_SIZE</span><span class="highlight-SYMBOL">, </span><span class="highlight-CONSTANT">BLOCK_SIZE</span><span class="highlight-SYMBOL">,</span><span class="highlight-LANG_VAR"> true</span><span class="highlight-SYMBOL">
+);
 </span></code>
 				</div>
 				
@@ -34,59 +34,73 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Scene.main">
-					<div class="prop-header member">
-						<span class="prop-name">main</span><span class="type"><a href="../Management/ElementContainer.html#class ElementContainer">ElementContainer</a></span>
-					</div>
-					<div class="prop desc">The root of the element tree for the scene</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Scene.camera">
-					<div class="prop-header member">
-						<span class="prop-name">camera</span><span class="type"><span class="alias">
+		<div class="prop-wrapper" id="Scene.main">
+			<div class="prop-header member">
+				<span class="prop-name">main</span>
+				<span class="type"><a href="../Management/ElementContainer.html#class ElementContainer">ElementContainer</a></span>
+			</div>
+			<div class="prop desc">The root of the element tree for the scene</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Scene.camera">
+			<div class="prop-header member">
+				<span class="prop-name">camera</span>
+				<span class="type"><span class="alias">
 			<span class="alias two"><a href="../Rendering/Camera/Camera2D.html#class Camera2D">Camera2D</a></span>
 			<span class="alias three"><a href="../Rendering/Camera/Camera3D.html#class Camera3D">Camera3D</a></span>
 			<span class="alias general">CameraN</span>
 		</span></span>
-					</div>
-					<div class="prop desc">The camera used to render the scene</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Scene.mouseEvents">
-					<div class="prop-header member">
-						<span class="prop-name">mouseEvents</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not mouse events will ever be checked. If this is true, specific <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a> can opt out, but not vice-versa</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Scene.cullGraphics">
-					<div class="prop-header member">
-						<span class="prop-name">cullGraphics</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a> graphics will ever be culled. If this is true, specific <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a> can still opt out, but not vice-versa</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Scene.collisionEvents">
-					<div class="prop-header member">
-						<span class="prop-name">collisionEvents</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not collision events will be detected</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Scene.updating">
-					<div class="prop-header member">
-						<span class="prop-name">updating</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether the scene is in the process of updating the <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a></div>
-				</div>
-			
-				<div class="prop-wrapper" id="Scene.renderOrder">
-					<div class="prop-header member">
-						<span class="prop-name">renderOrder</span><span class="type"><a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>[]</span>
-					</div>
-					<div class="prop desc">A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame. This property is read-only.</div>
-				</div>
 			</div>
+			<div class="prop desc">The camera used to render the scene</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Scene.mouseEvents">
+			<div class="prop-header member">
+				<span class="prop-name">mouseEvents</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not mouse events will ever be checked. If this is true, specific <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a> can opt out, but not vice-versa</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Scene.cullGraphics">
+			<div class="prop-header member">
+				<span class="prop-name">cullGraphics</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a> graphics will ever be culled. If this is true, specific <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a> can still opt out, but not vice-versa</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Scene.collisionEvents">
+			<div class="prop-header member">
+				<span class="prop-name">collisionEvents</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not collision events will be detected</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Scene.updating">
+			<div class="prop-header member">
+				<span class="prop-name">updating</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether the scene is in the process of updating the <a href="../Management/SceneObject.html#class SceneObject">SceneObjects</a></div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Scene.renderOrder">
+			<div class="prop-header member">
+				<span class="prop-name">renderOrder</span>
+				<span class="type"><a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>[]</span>
+			</div>
+			<div class="prop desc">A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
+		</div>
+	</div>
 				
 				
 				

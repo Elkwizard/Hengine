@@ -17,6 +17,7 @@
  * obj.transform.rotateAbout(new Vector2(0, 100), Math.PI);
  * console.log(obj.transform); // { position: (0, 200), rotation: Math.PI }
  * ```
+ * @props<stable>
  * @prop Vector position | The translation of the transform
  * @prop Angle rotation | The angle of rotation (in radians) of the transform
  */

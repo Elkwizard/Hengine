@@ -14,89 +14,93 @@
 				</div>
 				<div class="class desc">
 					Adds particle emitting functionality to a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>.
-All properties of this class are read-only.
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> particles</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;particles&quot;</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">width</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">height</span><span class="highlight-SYMBOL"> /</span><span class="highlight-NUMBER"> 2</span><span class="highlight-SYMBOL">);
-</span><span class="highlight-IDENTIFIER">particles</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">PARTICLE_SPAWNER</span><span class="highlight-SYMBOL">, {
-	</span><span class="highlight-IDENTIFIER">delay</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 1</span><span class="highlight-SYMBOL">,
-	</span><span class="highlight-IDENTIFIER">lifeSpan</span><span class="highlight-SYMBOL">:</span><span class="highlight-NUMBER"> 100</span><span class="highlight-SYMBOL">,
-	</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">) {
-		</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">velocity</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromAngle</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">angle</span><span class="highlight-SYMBOL">()).</span><span class="highlight-FUNCTION">times</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">));
-		</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">data</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">size</span><span class="highlight-SYMBOL"> = </span><span class="highlight-CLASS"><a href="../Miscellaneous/Random.html#class Random">Random</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">2</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 5</span><span class="highlight-SYMBOL">);
-	},
-	</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">) {
-		</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">circle</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">position</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">particle</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">data</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">size</span><span class="highlight-SYMBOL">);
-	}
-});
-</span></code>
 				</div>
 				
 				
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="PARTICLE_SPAWNER.particleInit">
-					<div class="prop-header member">
-						<span class="prop-name">particleInit</span><span class="type">(Particle) =&gt; void</span>
-					</div>
-					<div class="prop desc">The function that is called to initialize particles. This will be passed the particle object for each particle created. Default is a no-op</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PARTICLE_SPAWNER.particleUpdate">
-					<div class="prop-header member">
-						<span class="prop-name">particleUpdate</span><span class="type">(Particle) =&gt; void</span>
-					</div>
-					<div class="prop desc">The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This function will not run if the spawner has an active GPU computation. Default is a no-op.</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PARTICLE_SPAWNER.particleDraw">
-					<div class="prop-header member">
-						<span class="prop-name">particleDraw</span><span class="type">(<a href="../Rendering/Renderer/Artist.html#class Artist">Artist</a>, Particle) =&gt; void</span>
-					</div>
-					<div class="prop desc">The function that is called to render particles each frame. This will be passed an <a href="../Rendering/Renderer/Artist.html#class Artist">Artist</a> and a particle object for each particle object on-screen each frame. Default is a no-op</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PARTICLE_SPAWNER.slows">
-					<div class="prop-header member">
-						<span class="prop-name">slows</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not particles will have air resistance applied. Default is false</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PARTICLE_SPAWNER.falls">
-					<div class="prop-header member">
-						<span class="prop-name">falls</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not particles will have gravity applied. Default is false</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PARTICLE_SPAWNER.active">
-					<div class="prop-header member">
-						<span class="prop-name">active</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not particles will be spawned passively over time. Default is true</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PARTICLE_SPAWNER.delay">
-					<div class="prop-header member">
-						<span class="prop-name">delay</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The delay (in frames) between particle spawns. This can be less than 1. Default is 1</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PARTICLE_SPAWNER.lifeSpan">
-					<div class="prop-header member">
-						<span class="prop-name">lifeSpan</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The duration (in frames) of each particle's lifetime. Default is 100</div>
-				</div>
-			
-				<div class="prop-wrapper" id="PARTICLE_SPAWNER.radius">
-					<div class="prop-header member">
-						<span class="prop-name">radius</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10</div>
-				</div>
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.particleInit">
+			<div class="prop-header member">
+				<span class="prop-name">particleInit</span>
+				<span class="type">(Particle) =&gt; void</span>
 			</div>
+			<div class="prop desc">The function that is called to initialize particles. This will be passed the particle object for each particle created. Default is a no-op</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.particleUpdate">
+			<div class="prop-header member">
+				<span class="prop-name">particleUpdate</span>
+				<span class="type">(Particle) =&gt; void</span>
+			</div>
+			<div class="prop desc">The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This function will not run if the spawner has an active GPU computation. Default is a no-op.</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.particleDraw">
+			<div class="prop-header member">
+				<span class="prop-name">particleDraw</span>
+				<span class="type">(<a href="../Rendering/Renderer/Artist.html#class Artist">Artist</a>, Particle) =&gt; void</span>
+			</div>
+			<div class="prop desc">The function that is called to render particles each frame. This will be passed an <a href="../Rendering/Renderer/Artist.html#class Artist">Artist</a> and a particle object for each particle object on-screen each frame. Default is a no-op</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.slows">
+			<div class="prop-header member">
+				<span class="prop-name">slows</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not particles will have air resistance applied. Default is false</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.falls">
+			<div class="prop-header member">
+				<span class="prop-name">falls</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not particles will have gravity applied. Default is false</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.active">
+			<div class="prop-header member">
+				<span class="prop-name">active</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not particles will be spawned passively over time. Default is true</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.delay">
+			<div class="prop-header member">
+				<span class="prop-name">delay</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The delay (in frames) between particle spawns. This can be less than 1. Default is 1</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.lifeSpan">
+			<div class="prop-header member">
+				<span class="prop-name">lifeSpan</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The duration (in frames) of each particle's lifetime. Default is 100</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.radius">
+			<div class="prop-header member">
+				<span class="prop-name">radius</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				
@@ -266,41 +270,51 @@ This represents a single particle in a particle system.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Particle.position">
-					<div class="prop-header member">
-						<span class="prop-name">position</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> position of the particle</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Particle.velocity">
-					<div class="prop-header member">
-						<span class="prop-name">velocity</span><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-					</div>
-					<div class="prop desc">The velocity per frame of the particle</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Particle.timer">
-					<div class="prop-header member">
-						<span class="prop-name">timer</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The proportion of the particle's lifespan that has elapsed. Setting this to 1 will remove the particle</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Particle.data">
-					<div class="prop-header member">
-						<span class="prop-name">data</span><span class="type">Object</span>
-					</div>
-					<div class="prop desc">This object is not used by the engine, and can be modified in any way to represent particle-specific data</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Particle.spawner">
-					<div class="prop-header member">
-						<span class="prop-name">spawner</span><span class="type">PARTICLE_SPAWNER</span>
-					</div>
-					<div class="prop desc">The particle system that created the particle</div>
-				</div>
+		<div class="prop-wrapper" id="Particle.position">
+			<div class="prop-header member">
+				<span class="prop-name">position</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
+			<div class="prop desc">The <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> position of the particle</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Particle.velocity">
+			<div class="prop-header member">
+				<span class="prop-name">velocity</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">The velocity per frame of the particle</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Particle.timer">
+			<div class="prop-header member">
+				<span class="prop-name">timer</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The proportion of the particle's lifespan that has elapsed. Setting this to 1 will remove the particle</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Particle.data">
+			<div class="prop-header member">
+				<span class="prop-name">data</span>
+				<span class="type">Object</span>
+			</div>
+			<div class="prop desc">This object is not used by the engine, and can be modified in any way to represent particle-specific data</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Particle.spawner">
+			<div class="prop-header member">
+				<span class="prop-name">spawner</span>
+				<span class="type">PARTICLE_SPAWNER</span>
+			</div>
+			<div class="prop desc">The particle system that created the particle</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				
@@ -318,55 +332,69 @@ This represents a single particle in a particle system.
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="SpawnerProperties.slows?">
-					<div class="prop-header member">
-						<span class="prop-name">slows?</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not particles will have air resistance applied</div>
-				</div>
-			
-				<div class="prop-wrapper" id="SpawnerProperties.falls?">
-					<div class="prop-header member">
-						<span class="prop-name">falls?</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not particles will have gravity applied</div>
-				</div>
-			
-				<div class="prop-wrapper" id="SpawnerProperties.active?">
-					<div class="prop-header member">
-						<span class="prop-name">active?</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not particles will be spawned passively over time</div>
-				</div>
-			
-				<div class="prop-wrapper" id="SpawnerProperties.delay?">
-					<div class="prop-header member">
-						<span class="prop-name">delay?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The delay (in frames) between particle spawns. This can be less than 1</div>
-				</div>
-			
-				<div class="prop-wrapper" id="SpawnerProperties.lifeSpan?">
-					<div class="prop-header member">
-						<span class="prop-name">lifeSpan?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The duration (in frames) of each particle's lifetime</div>
-				</div>
-			
-				<div class="prop-wrapper" id="SpawnerProperties.radius?">
-					<div class="prop-header member">
-						<span class="prop-name">radius?</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The effective radius of each particle used to compute culling. This does not affect the appearance of the particles</div>
-				</div>
-			
-				<div class="prop-wrapper" id="SpawnerProperties.imageType?">
-					<div class="prop-header member">
-						<span class="prop-name">imageType?</span><span class="type">Class extends <a href="../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
-					</div>
-					<div class="prop desc">This specifies how particles should be rendered. If this is <a href="../Rendering/Image Types/Frame.html#class FastFrame">FastFrame</a>, they will be rendered on a separate surface and then be copied over. If this is <a href="../Rendering/Image Types/CanvasImage.html#class CanvasImage">CanvasImage</a>, they will be rendered directly to the screen</div>
-				</div>
+		<div class="prop-wrapper" id="SpawnerProperties.slows?">
+			<div class="prop-header member">
+				<span class="prop-name">slows?</span>
+				<span class="type">Boolean</span>
 			</div>
+			<div class="prop desc">Whether or not particles will have air resistance applied</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SpawnerProperties.falls?">
+			<div class="prop-header member">
+				<span class="prop-name">falls?</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not particles will have gravity applied</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SpawnerProperties.active?">
+			<div class="prop-header member">
+				<span class="prop-name">active?</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not particles will be spawned passively over time</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SpawnerProperties.delay?">
+			<div class="prop-header member">
+				<span class="prop-name">delay?</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The delay (in frames) between particle spawns. This can be less than 1</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SpawnerProperties.lifeSpan?">
+			<div class="prop-header member">
+				<span class="prop-name">lifeSpan?</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The duration (in frames) of each particle's lifetime</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SpawnerProperties.radius?">
+			<div class="prop-header member">
+				<span class="prop-name">radius?</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The effective radius of each particle used to compute culling. This does not affect the appearance of the particles</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SpawnerProperties.imageType?">
+			<div class="prop-header member">
+				<span class="prop-name">imageType?</span>
+				<span class="type">Class extends <a href="../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
+			</div>
+			<div class="prop desc">This specifies how particles should be rendered. If this is <a href="../Rendering/Image Types/Frame.html#class FastFrame">FastFrame</a>, they will be rendered on a separate surface and then be copied over. If this is <a href="../Rendering/Image Types/CanvasImage.html#class CanvasImage">CanvasImage</a>, they will be rendered directly to the screen</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				

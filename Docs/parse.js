@@ -20,14 +20,19 @@ function parse(content, file) {
 					.trim()
 					.split("\n")
 					.map(line => {
-						line = line.replace(/^\s*\* /g, "");
+						line = line.replace(/^\s*\* /g, "").trim();
 						if (line.startsWith("@")) {
-							const inx = line.indexOf(" ");
-							const category = line
-								.slice(1, inx > -1 ? inx : line.length)
-								.trim();
-							line = line.slice(category.length + 1).trim();
-							return { category, content: line };
+							const [, category, attributeString, content] = line
+								.match(/^@(\w+)(?:<([\w\s,]+)>)?(?: (.*))?$/);
+
+							const attributes = { };
+							if (attributeString) {
+								const names = attributeString.split(",").map(str => str.trim());
+								for (const attr of names)
+									attributes[attr] = true;
+							}
+
+							return { category, attributes, content: content ?? "" };
 						}
 
 						return { category: null, content: line };
@@ -137,7 +142,6 @@ function parse(content, file) {
 					);
 				} break;
 				case "prop":
-				case "static_prop":
 				case "param": {
 					const index = line.content.indexOf("|");
 					line.description = line.content.slice(index + 1).trim();
@@ -146,9 +150,6 @@ function parse(content, file) {
 					line.name = signature.slice(spaceIndex + 1);
 					line.type = signature.slice(0, spaceIndex);
 					line.baseName = line.name.match(/(\.\.\.)?(.*?)\??$/)[2];
-
-					if (line.category === "static_prop")
-						line.name = `${match.name.base}.${line.name}`;
 				} break;
 				case "params": {
 					line.names = line.content.split(",").map(name => name.trim());
@@ -196,7 +197,7 @@ function parse(content, file) {
 		match.description = match.lines.find(line => line.category === null)?.content ?? "";
 		
 		if (match.name.isClass) {
-			match.properties = match.lines.filter(line => line.category?.includes?.("prop"));
+			match.properties = match.lines.filter(line => line.category === "prop");
 		} else {
 			match.signatures = match.lines
 				.filter(line => line.category === "signature")
@@ -229,7 +230,11 @@ function parse(content, file) {
 }
 
 function addInheritance(classes) {
+	classes = classes.filter(cls => cls.name.isClass);
+
+	// find inheritance
 	for (const doc of classes) {
+
 		if (doc.settings.implements) {
 			const impl = doc.settings.implements;
 			impl.interfaces = classes.filter(cls => impl.interfaces.includes(cls.name.base));
@@ -241,9 +246,33 @@ function addInheritance(classes) {
 		if (baseClass || interfaces.length) {
 			for (const superDoc of classes) {
 				const name = superDoc.name.base;
-				if (baseClass === name || interfaces.includes(name))
+				if (baseClass === name || interfaces.includes(name)) {
 					(superDoc.subclasses ??= []).push(doc);
+					(doc.superclasses ??= []).push(superDoc);
+				}
 			}
+		}
+	}
+
+	function getAllSuperclasses(doc) {
+		if (!doc.superclasses) return [];
+		return doc.superclasses
+			.flatMap(sup => [sup, ...getAllSuperclasses(sup)]);
+	}
+
+	// propagate @props declarations
+	for (const doc of classes) {
+		doc.settings.props ??= { attributes: { } };
+		for (let sup of getAllSuperclasses(doc)) {
+			const supAttrs = sup.settings.props?.attributes ?? { };
+			Object.assign(doc.settings.props.attributes, supAttrs);
+		}
+
+		for (const prop of doc.properties) {
+			Object.assign(prop.attributes, doc.settings.props.attributes);
+
+			if (prop.attributes.static)
+				prop.name = `${doc.name.base}.${prop.name}`;
 		}
 	}
 }

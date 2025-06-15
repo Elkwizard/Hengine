@@ -1,8 +1,9 @@
 /**
  * Represents the way in which dimensions are prioritized in `Geometry.gridToRects()`.
- * @static_prop RectPriority SQUARE | The rectangles should be approximately square, with a difference in dimensions of at most one tile
- * @static_prop RectPriority HORIZONTAL | The rectangles should become as wide as possible, and then grow vertically
- * @static_prop RectPriority VERTICAL | The rectangles should become as tall as possible, and then grow horizontally
+ * @props<static, immutable>
+ * @prop RectPriority SQUARE | The rectangles should be approximately square, with a difference in dimensions of at most one tile
+ * @prop RectPriority HORIZONTAL | The rectangles should become as wide as possible, and then grow vertically
+ * @prop RectPriority VERTICAL | The rectangles should become as tall as possible, and then grow horizontally
  */
 const RectPriority = Enum.define("SQUARE", "HORIZONTAL", "VERTICAL");
 

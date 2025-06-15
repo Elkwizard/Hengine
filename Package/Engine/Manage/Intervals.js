@@ -24,9 +24,9 @@
  * @prop Boolean done | Indicates whether the operation has completed
  * @prop Number timer | The amount of frames the IntervalFunction has existed for
  * @prop Number interval | The total duration of the operation. The operation will complete after the timer exceeds this value
- * @static_prop Symbol BEFORE_UPDATE | This symbol indicates that the operation should take place before the screen is cleared
- * @static_prop Symbol UPDATE | This symbol indicates that the operation should take place immediately before the main engine update
- * @static_prop Symbol AFTER_UPDATE | This symbol indicates that the operation should take place immediately after the main engine update
+ * @prop<static, immutable> Symbol BEFORE_UPDATE | This symbol indicates that the operation should take place before the screen is cleared
+ * @prop<static, immutable> Symbol UPDATE | This symbol indicates that the operation should take place immediately before the main engine update
+ * @prop<static, immutable> Symbol AFTER_UPDATE | This symbol indicates that the operation should take place immediately after the main engine update
  */
 class IntervalFunction {
 	constructor(fn, len, type) {
@@ -107,7 +107,7 @@ class WaitUntilFunction extends IntervalFunction {
 /**
  * Stores a moving average over a sequence of numeric samples.
  * Samples can be added at any time, and current average can be retrieved for no cost.
- * @prop Number average | The current average value. This will be 0 if no samples have been provided. This value is read-only
+ * @prop<immutable> Number average | The current average value. This will be 0 if no samples have been provided
  */
 class MovingAverage {
 	/**
@@ -163,10 +163,10 @@ class MovingAverage {
  * 	renderer.image(intervals.fpsGraph).default(10, 10);
  * });
  * ```
- * @prop Number rawFps | The FPS based only on the duration of the last frame. This value is read-only
+ * @prop<immutable> Number rawFps | The FPS based only on the duration of the last frame
  * @prop Number targetFPS | The current target/maximum amount of update cycles per second
- * @prop GraphPlane fpsGraph | A graph of the FPS for the last 400 frames. This value is read-only
- * @prop Number frameCount | The total number of frames that have elapsed thusfar. This value is read-only
+ * @prop<immutable> GraphPlane fpsGraph | A graph of the FPS for the last 400 frames
+ * @prop<immutable> Number frameCount | The total number of frames that have elapsed thusfar
  * @prop Boolean performanceData | Whether or not the interval manager should collect performance data (`.fps`, `.fpsGraph`, etc.)
  */
 class IntervalManager {

@@ -1,6 +1,7 @@
 /**
  * Provides an API for interacting with a key-based input device (mouse, keyboard).
  * @abstract
+ * @props<immutable>
  */
 class InputHandler {
 	constructor(engine) {
@@ -130,7 +131,7 @@ InputHandler.addChecks({
  * @name class InputHandler.State
  * Represents the current state of a key on an input device.
  * @abstract
- * @readonly
+ * @props<immutable>
  * @prop InputHandler handler | The handler associated with the input device.
  * @prop String name | The name of the associated key.
  */
@@ -244,7 +245,7 @@ InputHandler.State = class State {
  * 	renderer.draw(color).circle(width / 2, height / 2, 50);
  * });
  * ```
- * @prop String[] downQueue | A list of all the key presses that in the last frame. Unlike the normal key identifiers, these will include capital letters if a capital letter was typed, and the order will match the order in which the keys were pressed
+ * @prop String[] downQueue | A list of all the key presses that began in the last frame. Unlike the normal key identifiers, these will include capital letters if a capital letter was typed, and the order will match the order in which the keys were pressed
  */
 class KeyboardHandler extends InputHandler {
 	constructor(engine) {
@@ -278,7 +279,6 @@ KeyboardHandler.State = class KeyState extends InputHandler.State { };
  * Represents the API for interacting with the user's mouse.
  * The names of keys for the mouse are Left, Middle, and Right, for the associated buttons.
  * This class is available via the `.mouse` property of both the global object and Hengine.
- * @readonly
  * ```js
  * intervals.continuous(() => { // display a circle at the cursor position when pressing the left mouse button
  * 	if (mouse.pressed("Left"))
@@ -292,7 +292,7 @@ KeyboardHandler.State = class KeyState extends InputHandler.State { };
  * @prop Vector2 world | The current cursor position, in World-Space. This is only available in 2D Mode
  * @prop Vector2 worldLast | The cursor position last frame, in World-Space.  This is only available in 2D Mode
  * @prop Vector2 worldDelta | The change in the cursor's World-Space position over the last frame. This is only available in 2D Mode
- * @prop Boolean locked | Whether the mouse is currently locked and unable to move. This property is read-only
+ * @prop Boolean locked | Whether the mouse is currently locked and unable to move
  */
 class MouseHandler extends InputHandler {
 	constructor(engine) {
@@ -433,7 +433,6 @@ class MouseHandler extends InputHandler {
 /**
  * @name class MouseHandler.State extends InputHandler.State
  * The state of a given key on a mouse.
- * @readonly
  * @prop Vector2 screenDragStart | The beginning of the most recent click-and-drag motion with this key, in Screen-Space
  * @prop Vector2 screenDragEnd | The end of the most recent click-and-drag motion with this key, in Screen-Space. If such a gesture is ongoing, this will be the current cursor position
  * @prop Vector2 worldDragStart | The beginning of the most recent click-and-drag motion with this key, in World-Space
@@ -462,7 +461,6 @@ MouseHandler.addChecks([
  * This class is available via the `.touches` property of both the global object and Hengine.
  * The names for keys in this API are arbitrary numbers, rather than Strings.
  * Getting these key names should be done with the `.allPressed`, `.allJustPressed`, and `.allJustReleased` getters, rather than specifying them directly.
- * @readonly
  * ```js
  * intervals.continuous(() => {
  * 	const activeTouches = touches.allPressed;
@@ -557,7 +555,6 @@ class TouchHandler extends InputHandler {
 /**
  * @name class TouchHandler.State extends MouseHandler.State
  * The state of a specific touch on the user's screen.
- * @readonly
  * @prop Vector2 screen | The current position of the touch, in Screen-Space
  * @prop Vector2 screenLast | The position of the touch last frame, in Screen-Space
  * @prop Vector2 world | The current position of the touch, in World-Space

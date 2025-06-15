@@ -119,7 +119,7 @@ const objectUtils = {
  * const Options = Enum.define("YES", "NO", "MAYBE");
  * const answer = Options.YES;
  * ```
- * @prop String name | The name of the symbol. This property is read-only
+ * @prop<immutable> String name | The name of the symbol
  */
 class Enum {
 	constructor(name) {

@@ -19,8 +19,8 @@
  * @prop Number seed | The current seed for the unstable random functions. e.g. `.random()`, `.angle()`, `.range()`, etc.
  * @prop Number sampleSeed | The seed for the stable random functions. e.g. `.perlin3D()`, `.voronoi()`, etc.
  * @prop Function distribution | The distribution of the numbers generated. This is one of the provided static distribution properties of the Random class (`.uniform`, `.normal`, etc.)
- * @static_prop Function uniform | A uniform distribution
- * @static_prop Function normal | A normal distribution
+ * @prop<static, immutable> Function uniform | A uniform distribution
+ * @prop<static, immutable> Function normal | A normal distribution
  */
 class Random {
 	/**

@@ -20,34 +20,42 @@
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Camera3D.direction">
-					<div class="prop-header member">
-						<span class="prop-name">direction</span><span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-					</div>
-					<div class="prop desc">The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Camera3D.pcMatrix">
-					<div class="prop-header member">
-						<span class="prop-name">pcMatrix</span><span class="type"><a href="../../Geometry/Matrices.html#class Matrix4">Matrix4</a></span>
-					</div>
-					<div class="prop desc">The product of the camera's projection matrix and itself. This property is read-only and only updates when cacheScreen() is called</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Camera3D.right">
-					<div class="prop-header member">
-						<span class="prop-name">right</span><span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-					</div>
-					<div class="prop desc">The local right direction of the camera, in the XZ <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> plane. This property is read-only</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Camera3D.up">
-					<div class="prop-header member">
-						<span class="prop-name">up</span><span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-					</div>
-					<div class="prop desc">The local up direction of the camera, in <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>. This property is read-only</div>
-				</div>
+		<div class="prop-wrapper" id="Camera3D.direction">
+			<div class="prop-header member">
+				<span class="prop-name">direction</span>
+				<span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
 			</div>
+			<div class="prop desc">The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Camera3D.pcMatrix">
+			<div class="prop-header member">
+				<span class="prop-name">pcMatrix</span>
+				<span class="type"><a href="../../Geometry/Matrices.html#class Matrix4">Matrix4</a></span>
+			</div>
+			<div class="prop desc">The product of the camera's projection matrix and itself. This only updates when cacheScreen() is called</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Camera3D.right">
+			<div class="prop-header member">
+				<span class="prop-name">right</span>
+				<span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			</div>
+			<div class="prop desc">The local right direction of the camera, in the XZ <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> plane</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Camera3D.up">
+			<div class="prop-header member">
+				<span class="prop-name">up</span>
+				<span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			</div>
+			<div class="prop desc">The local up direction of the camera, in <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a></div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				
@@ -85,7 +93,7 @@
 				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L41" target="_blank" class="function-name source-link">screen</a><span class="type">Frustum</span>
 			</div>
 			<div class="function desc">
-				Returns the <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> frustum of the camera, and synchronizes <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">pcMatrix</span></code> to match the location and orientation of the camera. 
+				Returns the <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> frustum of the camera, and synchronizes <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">pcMatrix</span></code> to match the location and orientation of the camera.
 			</div>
 			
 		</div>

@@ -19,7 +19,7 @@ For the purposes of the animation, a frame elapses each time the animation is dr
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">const</span><span class="highlight-CONSTANT"> catKnead</span><span class="highlight-SYMBOL"> = </span><span class="highlight-FUNCTION">loadResource</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;catKnead&quot;</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// load the Animation</span><span class="highlight-SYMBOL">
 
 </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
-	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">image</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">catKnead</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">default</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// the animation will advance</span><span class="highlight-SYMBOL">
+</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">image</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">catKnead</span><span class="highlight-SYMBOL">).</span><span class="highlight-FUNCTION">default</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// the animation will advance</span><span class="highlight-SYMBOL">
 });
 </span></code>
 				</div>
@@ -28,55 +28,69 @@ For the purposes of the animation, a frame elapses each time the animation is dr
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Animation.frames">
-					<div class="prop-header member">
-						<span class="prop-name">frames</span><span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>[]</span>
-					</div>
-					<div class="prop desc">The images that make up the animation</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Animation.autoAdvance">
-					<div class="prop-header member">
-						<span class="prop-name">autoAdvance</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not the animation will advance to the next frame when drawn. Starts as true</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Animation.loops">
-					<div class="prop-header member">
-						<span class="prop-name">loops</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether or not the animation will reset to the beginning after completing</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Animation.delay">
-					<div class="prop-header member">
-						<span class="prop-name">delay</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The number of frames each animation frame will be visible for</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Animation.timer">
-					<div class="prop-header member">
-						<span class="prop-name">timer</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The current progress (in frames) of the animation</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Animation.totalTime">
-					<div class="prop-header member">
-						<span class="prop-name">totalTime</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The total amount of frames it will take the animation to complete</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Animation.onEnd">
-					<div class="prop-header member">
-						<span class="prop-name">onEnd</span><span class="type">() =&gt; void</span>
-					</div>
-					<div class="prop desc">A function to be called when the animation completes (this will be called even if the animation loops)</div>
-				</div>
+		<div class="prop-wrapper" id="Animation.frames">
+			<div class="prop-header member">
+				<span class="prop-name">frames</span>
+				<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>[]</span>
 			</div>
+			<div class="prop desc">The images that make up the animation</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Animation.autoAdvance">
+			<div class="prop-header member">
+				<span class="prop-name">autoAdvance</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not the animation will advance to the next frame when drawn. Starts as true</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Animation.loops">
+			<div class="prop-header member">
+				<span class="prop-name">loops</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not the animation will reset to the beginning after completing</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Animation.delay">
+			<div class="prop-header member">
+				<span class="prop-name">delay</span>
+				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The number of frames each animation frame will be visible for</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Animation.timer">
+			<div class="prop-header member">
+				<span class="prop-name">timer</span>
+				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The current progress (in frames) of the animation</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Animation.totalTime">
+			<div class="prop-header member">
+				<span class="prop-name">totalTime</span>
+				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The total amount of frames it will take the animation to complete</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Animation.onEnd">
+			<div class="prop-header member">
+				<span class="prop-name">onEnd</span>
+				<span class="type">() =&gt; void</span>
+			</div>
+			<div class="prop desc">A function to be called when the animation completes (this will be called even if the animation loops)</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				

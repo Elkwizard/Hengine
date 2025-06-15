@@ -7,8 +7,8 @@
  * @prop Number alpha | The alpha (opacity) component of the color, on [0, 1]
  * @prop Boolean limited | Whether or not all the color's channels will be clamped within their respective bounds after all operations. This starts as true
  * @prop Number brightness | The grayscale intensity of the color, on [0, 1]
- * @static_prop String[] modValues | The numeric components of the color, `["red", "green", "blue", "alpha"]`
- * @static_prop Number EPSILON | The smallest visually meaningful change in alpha, 1/255.
+ * @prop<static, immutable> String[] modValues | The numeric components of the color, `["red", "green", "blue", "alpha"]`
+ * @prop<static, immutable> Number EPSILON | The smallest visually meaningful change in alpha, 1/255.
  */
 class Color extends Operable {
 	static modValues = ["red", "green", "blue", "alpha"];

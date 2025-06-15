@@ -96,7 +96,7 @@ Artist.Renderer = class {
  * renderer.draw(new Color("lime")).rect(0, 0, 80, 80);
  * renderer.unclip();
  * ```
- * @prop ImageType imageType | The surface on which the renderer renders. This property is read-only
+ * @prop<readonly> ImageType imageType | The surface on which the renderer renders
  * @prop TextMode textMode | The current text-alignment mode. Starts as `TextMode.TOP_LEFT`
  * @prop BlendMode blendMode | The current color-blending mode. Starts as `BlendMode.COMBINE`
  * @prop Number alpha | The current global alpha. This will multiply the alpha of all other drawing calls. This is included in the save state of `.save()` and `.restore()`. Starts as 1
@@ -396,8 +396,9 @@ const TextModeY = Enum.define("TOP", "CENTER", "BOTTOM");
 /**
  * @name const TextMode = Enum.define
  * Specifies where on a string of text should be considered its origin.
+ * @props<static, immutable>
  * @name_subs HORIZONTAL: LEFT, CENTER, RIGHT; VERTICAL: TOP, CENTER, BOTTOM
- * @static_prop TextMode [VERTICAL]_[HORIZONTAL] | Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
+ * @prop TextMode [VERTICAL]_[HORIZONTAL] | Specifies that text should be aligned vertically based on VERTICAL (`TOP`, `CENTER`, or `BOTTOM`), and should be aligned horizontally based on HORIZONTAL (`LEFT`, `CENTER`, `RIGHT`)
  */
 const TextMode = {};
 for (let x in TextModeX) for (let y in TextModeY) {
@@ -406,23 +407,26 @@ for (let x in TextModeX) for (let y in TextModeY) {
 
 /**
  * Represents the way in which colors being added to a surface should interact with those already there.
- * @static_prop BlendMode ADD | New colors should be component-wise added to the existing colors
- * @static_prop BlendMode COMBINE | New colors should be blended with old colors based on opacity
- * @static_prop BlendMode BEHIND | New colors are drawn behind old colors, as if new pixels were rendered first and then combined via `BlendMode.COMBINE`
+ * @props<static, immutable>
+ * @prop BlendMode ADD | New colors should be component-wise added to the existing colors
+ * @prop BlendMode COMBINE | New colors should be blended with old colors based on opacity
+ * @prop BlendMode BEHIND | New colors are drawn behind old colors, as if new pixels were rendered first and then combined via `BlendMode.COMBINE`
  */
 const BlendMode = Enum.define("ADD", "COMBINE", "BEHIND");
 /**
  * Represents the way in which consecutive line segments should connect.
- * @static_prop LineJoin MITER | The edges of the lines will be extended until they meet
- * @static_prop LineJoin BEVEL | The edges of the lines will be connected straight across
- * @static_prop LineJoin ROUND | The gap between the lines will be filled with an arc
+ * @props<static, immutable>
+ * @prop LineJoin MITER | The edges of the lines will be extended until they meet
+ * @prop LineJoin BEVEL | The edges of the lines will be connected straight across
+ * @prop LineJoin ROUND | The gap between the lines will be filled with an arc
  */
 const LineJoin = Enum.define("MITER", "BEVEL", "ROUND");
 /**
  * Represents the way the ends of line segments will be displayed.
- * @static_prop LineCap FLAT | The lines will have square ends that extend just to the end of the line
- * @static_prop LineCap SQUARE | The lines will have square ends that extend half their side length past the end of the line
- * @static_prop LineCap ROUND | The lines will end with half-circles
+ * @props<static, immutable>
+ * @prop LineCap FLAT | The lines will have square ends that extend just to the end of the line
+ * @prop LineCap SQUARE | The lines will have square ends that extend half their side length past the end of the line
+ * @prop LineCap ROUND | The lines will end with half-circles
  */
 const LineCap = Enum.define("FLAT", "SQUARE", "ROUND");
 

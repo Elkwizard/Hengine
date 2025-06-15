@@ -13,7 +13,7 @@
  * @prop Boolean italic | Whether the font is italic
  * @prop Number lineHeight | The height of a line of text in the font. This determines spacing between multiline strings
  * @prop Number tabSize | The number of spaces a tab is equivalent to for this font
- * @static_prop Font [FAMILY][SIZE] | These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+ * @prop<static, immutable> Font [FAMILY][SIZE] | These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
  * @name_subs FAMILY: Serif, Arial, Cursive, Monospace; SIZE: 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
  */
 class Font {

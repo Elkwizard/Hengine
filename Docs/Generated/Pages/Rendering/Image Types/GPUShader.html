@@ -23,14 +23,14 @@ uniform vec2</span><span class="highlight-CLASS"> </span><span class="highlight-
 </span></code>
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// grayscale shader</span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> shader</span><span class="highlight-SYMBOL"> =</span><span class="highlight-KEYWORD"> new</span><span class="highlight-CLASS"> GPUShader</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">300</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 300</span><span class="highlight-SYMBOL">, </span><span class="highlight-STRING">&#96;
-	uniform sampler2D image;
+uniform sampler2D image;
 
-	vec4 shader() {
-		vec2 uv = position / resolution;
-		vec3 color = texture(image, uv);
-		float brightness = (color.r + color.g + color.b) / 3.0;
-		return vec4(vec3(brightness), 1.0);
-	}
+vec4 shader() {
+vec2 uv = position / resolution;
+vec3 color = texture(image, uv);
+float brightness = (color.r + color.g + color.b) / 3.0;
+return vec4(vec3(brightness), 1.0);
+}
 &#96;</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> cat</span><span class="highlight-SYMBOL"> = </span><span class="highlight-FUNCTION">loadResource</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;cat.png&quot;</span><span class="highlight-SYMBOL">);

@@ -22,10 +22,10 @@ Unstable functions don't take any seeding parameters and change their return val
 let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL"> =</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">;
 
 </span><span class="highlight-IDENTIFIER">intervals</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">continuous</span><span class="highlight-SYMBOL">(()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
-	</span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> += </span><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// generate a random value each frame</span><span class="highlight-SYMBOL">
-	</span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL">++;
-</span><span class="highlight-KEYWORD">	const</span><span class="highlight-CONSTANT"> mean</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> / </span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// compute the mean of the random values</span><span class="highlight-SYMBOL">
-	</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">text</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../Rendering/Font.html#class Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CLASS">Arial20</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">mean</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
+</span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> += </span><span class="highlight-CLASS">Random</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">int</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">1</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">); </span><span class="highlight-COMMENT">// generate a random value each frame</span><span class="highlight-SYMBOL">
+</span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL">++;</span><span class="highlight-KEYWORD">
+const</span><span class="highlight-CONSTANT"> mean</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">total</span><span class="highlight-SYMBOL"> / </span><span class="highlight-IDENTIFIER">count</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// compute the mean of the random values</span><span class="highlight-SYMBOL">
+</span><span class="highlight-IDENTIFIER">renderer</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">draw</span><span class="highlight-SYMBOL">(</span><span class="highlight-KEYWORD">new</span><span class="highlight-CLASS"> <a href="../Rendering/Color.html#class Color">Color</a></span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;black&quot;</span><span class="highlight-SYMBOL">)).</span><span class="highlight-FUNCTION">text</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../Rendering/Font.html#class Font">Font</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-CLASS">Arial20</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">mean</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 10</span><span class="highlight-SYMBOL">);
 });
 </span></code>
 				</div>
@@ -34,41 +34,51 @@ let</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFI
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Random.seed">
-					<div class="prop-header member">
-						<span class="prop-name">seed</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The current seed for the unstable random functions. e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">random</span><span class="highlight-SYMBOL">()</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">angle</span><span class="highlight-SYMBOL">()</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">()</span></code>, etc.</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Random.sampleSeed">
-					<div class="prop-header member">
-						<span class="prop-name">sampleSeed</span><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The seed for the stable random functions. e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">perlin3D</span><span class="highlight-SYMBOL">()</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">voronoi</span><span class="highlight-SYMBOL">()</span></code>, etc.</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Random.distribution">
-					<div class="prop-header member">
-						<span class="prop-name">distribution</span><span class="type">Function</span>
-					</div>
-					<div class="prop desc">The distribution of the numbers generated. This is one of the provided static distribution properties of the Random class (<code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">normal</span></code>, etc.)</div>
-				</div>
-			
-				<div class="prop-wrapper" id="static Random.uniform">
-					<div class="prop-header member">
-						<span class="prop-name">Random.uniform</span><span class="type">Function</span>
-					</div>
-					<div class="prop desc">A uniform distribution</div>
-				</div>
-			
-				<div class="prop-wrapper" id="static Random.normal">
-					<div class="prop-header member">
-						<span class="prop-name">Random.normal</span><span class="type">Function</span>
-					</div>
-					<div class="prop desc">A normal distribution</div>
-				</div>
+		<div class="prop-wrapper" id="Random.seed">
+			<div class="prop-header member">
+				<span class="prop-name">seed</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
+			<div class="prop desc">The current seed for the unstable random functions. e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">random</span><span class="highlight-SYMBOL">()</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">angle</span><span class="highlight-SYMBOL">()</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">range</span><span class="highlight-SYMBOL">()</span></code>, etc.</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Random.sampleSeed">
+			<div class="prop-header member">
+				<span class="prop-name">sampleSeed</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The seed for the stable random functions. e.g. <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">perlin3D</span><span class="highlight-SYMBOL">()</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">voronoi</span><span class="highlight-SYMBOL">()</span></code>, etc.</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Random.distribution">
+			<div class="prop-header member">
+				<span class="prop-name">distribution</span>
+				<span class="type">Function</span>
+			</div>
+			<div class="prop desc">The distribution of the numbers generated. This is one of the provided static distribution properties of the Random class (<code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">uniform</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">normal</span></code>, etc.)</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="static Random.uniform">
+			<div class="prop-header member">
+				<span class="prop-name">Random.uniform</span>
+				<span class="type">Function</span>
+			</div>
+			<div class="prop desc">A uniform distribution</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="static Random.normal">
+			<div class="prop-header member">
+				<span class="prop-name">Random.normal</span>
+				<span class="type">Function</span>
+			</div>
+			<div class="prop desc">A normal distribution</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				

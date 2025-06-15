@@ -9,6 +9,12 @@ const stats = {
 	properties: 0
 };
 
+const ATTRIBUTE_DESCRIPTIONS = {
+	readonly: "This property shouldn't be re-assigned, but its internal properties may be modified",
+	stable: "Assigning to this property will simply change the value to match the assigned value, but will not change its identity or maintain a reference to the new value",
+	immutable: "This property and its various internal properties shouldn't be changed in any way"
+};
+
 function wordCount(text) {
 	stats.words += text.trim().replace(/\W+/, " ").split(" ").length;
 	return text;
@@ -93,6 +99,25 @@ function documentFunction(fn, wrapperClass) {
 	`;
 }
 
+function documentProperty(prop) {
+	stats.properties++;
+	const attrs = Object.entries(ATTRIBUTE_DESCRIPTIONS)
+		.filter(entry => prop.attributes[entry[0]])
+		.map(entry => {
+			return `<span class="prop-attr" data-desc="${entry[1]}">${entry[0]}</span>`;
+		});
+	return `
+		<div class="prop-wrapper" id="${prop.searchID}">
+			<div class="prop-header member">
+				<span class="prop-name">${prop.name}</span>
+				<span class="type">${prop.type}</span>
+			</div>
+			<div class="prop desc">${prop.description}</div>
+			<span class="prop-attrs">${attrs.join("")}</span>
+		</div>
+	`;
+}
+
 function document(doc, topLevelIDs, file, aliases) {
 	let result;
 	if (doc.name.isPage) {
@@ -109,12 +134,11 @@ function document(doc, topLevelIDs, file, aliases) {
 
 			</div>
 		`;
-
 	} else if (doc.name.isClass) {
 		const name = documentName(doc.name, doc);
 		const classQualifiers = [];
-		let keyword = name.isEnum ? "enum" : doc.settings.interface ? "interface" : "class";
-
+		let keyword = doc.name.isEnum ? "enum" : doc.settings.interface ? "interface" : "class";
+		
 		const subclass = (doc.subclasses ?? [])
 			.map(cls => `<span class="class-name">${cls.name.base}</span>`)
 			.join(", ");
@@ -127,14 +151,7 @@ function document(doc, topLevelIDs, file, aliases) {
 			.map(member => documentFunction(member, doc.name.base))
 			.join("");
 		const memberProperties = doc.properties
-			.map(line => (stats.properties++, `
-				<div class="prop-wrapper" id="${line.searchID}">
-					<div class="prop-header member">
-						<span class="prop-name">${line.name}</span><span class="type">${line.type}</span>
-					</div>
-					<div class="prop desc">${line.description}</div>
-				</div>
-			`))
+			.map(documentProperty)
 			.join("");
 		result = `
 			<div class="class-wrapper" id="${doc.searchID}">
@@ -160,7 +177,9 @@ function document(doc, topLevelIDs, file, aliases) {
 				` : ""}
 			</div>
 		`;
-	} else result = documentFunction(doc);
+	} else {
+		result = documentFunction(doc);
+	}
 
 	console.log(`documenting ${doc.name.base}`);
 

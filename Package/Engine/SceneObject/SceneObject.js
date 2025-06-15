@@ -23,13 +23,13 @@ class Controls {
  * @prop Transform lastTransform | The location and orientation of the object last frame
  * @prop Boolean mouseEvents | Whether or not mouse events (hover and click) should be checked for this object. This can be ignored if the scene has disabled mouse events
  * @prop Boolean hidden | Whether or not the object should be rendered
- * @prop Boolean hovered | Whether or not the mouse cursor is hovering over the shapes of this object. This property is readonly, and won't be accurate if mouse events are disabled. This property is always false for 3D objects
+ * @prop<immutable> Boolean hovered | Whether or not the mouse cursor is hovering over the shapes of this object. This property won't be accurate if mouse events are disabled. This property is always false for 3D objects
  * @prop Boolean onScreen | Whether or not the object passed the most recent render culling check
  * @prop ScriptContainer scripts | All of the ElementScripts on the object
  * @prop Shape/null defaultShape | A reference to the shape with the name `"default"`
  * @prop Number layer | The sorting layer for the object. Objects with higher sorting layers will be rendered after those with lower sorting layers
  * @prop Number lifeSpan | The amount of frames that the object has existed for
- * @prop Artist renderer | The renderer onto which the object will be drawn. This property is read-only
+ * @prop<readonly> Artist renderer | The renderer onto which the object will be drawn
  */
 class SceneObject extends SceneElement {
 	constructor(name, transform, container, engine) {

@@ -10,15 +10,15 @@
 				
 			<div class="class-wrapper" id="class Mesh">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L65" target="_blank" class="class-name source-link">Mesh</a> <span class="keyword">extends</span> <span class="class-name">Renderable</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L66" target="_blank" class="class-name source-link">Mesh</a> <span class="keyword">extends</span> <span class="class-name">Renderable</span>
 				</div>
 				<div class="class desc">
 					Represents a 3D mesh composed of chunks with different materials. The following vertex attributes are supported:
 <table>
-	<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
-	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code></td><td>The model-space location of the vertex</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
-	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexUV</span></code></td><td>The UV texture coordinates of the vertex</td><td><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></td></tr>
-	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexNormal</span></code></td><td>The normalized normal vector of the vertex</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
+<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
+<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code></td><td>The model-space location of the vertex</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
+<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexUV</span></code></td><td>The UV texture coordinates of the vertex</td><td><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></td></tr>
+<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexNormal</span></code></td><td>The normalized normal vector of the vertex</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
 </table>
 				</div>
 				
@@ -26,48 +26,60 @@
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="Mesh.attributes">
-					<div class="prop-header member">
-						<span class="prop-name">attributes</span><span class="type"><a href="../../Built-Ins/String.html#class String">String</a>[]</span>
-					</div>
-					<div class="prop desc">The vertex attributes present in the mesh's data. This value is read-only</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Mesh.data">
-					<div class="prop-header member">
-						<span class="prop-name">data</span><span class="type">Float32Array</span>
-					</div>
-					<div class="prop desc">The vertex data of the mesh, interleaved in the order specified by <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">attributes</span></code></div>
-				</div>
-			
-				<div class="prop-wrapper" id="Mesh.chunks">
-					<div class="prop-header member">
-						<span class="prop-name">chunks</span><span class="type"><a href="../../Rendering/Meshes/MeshChunk.html#class MeshChunk">MeshChunk</a>[]</span>
-					</div>
-					<div class="prop desc">The chunks of the mesh, describing the layout of mesh's faces</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Mesh.vertices">
-					<div class="prop-header member">
-						<span class="prop-name">vertices</span><span class="type">ArrayLike</span>
-					</div>
-					<div class="prop desc">A list of each vertex in the vertex data. Each element of this array has a property for each attribute of the mesh. This property is synchronized with <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">data</span></code></div>
-				</div>
-			
-				<div class="prop-wrapper" id="Mesh.stride">
-					<div class="prop-header member">
-						<span class="prop-name">stride</span><span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
-					</div>
-					<div class="prop desc">The number of elements each vertex takes up in the data array. This value is read-only</div>
-				</div>
-			
-				<div class="prop-wrapper" id="Mesh.offsets">
-					<div class="prop-header member">
-						<span class="prop-name">offsets</span><span class="type">Map</span>
-					</div>
-					<div class="prop desc">A map from attribute names to their offset into each vertex in the data array. This value is read-only</div>
-				</div>
+		<div class="prop-wrapper" id="Mesh.attributes">
+			<div class="prop-header member">
+				<span class="prop-name">attributes</span>
+				<span class="type"><a href="../../Built-Ins/String.html#class String">String</a>[]</span>
 			</div>
+			<div class="prop desc">The vertex attributes present in the mesh's data</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Mesh.data">
+			<div class="prop-header member">
+				<span class="prop-name">data</span>
+				<span class="type">Float32Array</span>
+			</div>
+			<div class="prop desc">The vertex data of the mesh, interleaved in the order specified by <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">attributes</span></code></div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Mesh.chunks">
+			<div class="prop-header member">
+				<span class="prop-name">chunks</span>
+				<span class="type"><a href="../../Rendering/Meshes/MeshChunk.html#class MeshChunk">MeshChunk</a>[]</span>
+			</div>
+			<div class="prop desc">The chunks of the mesh, describing the layout of mesh's faces</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Mesh.vertices">
+			<div class="prop-header member">
+				<span class="prop-name">vertices</span>
+				<span class="type">ArrayLike</span>
+			</div>
+			<div class="prop desc">A list of each vertex in the vertex data. Each element of this array has a property for each attribute of the mesh. This property is synchronized with <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">data</span></code></div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Mesh.stride">
+			<div class="prop-header member">
+				<span class="prop-name">stride</span>
+				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The number of elements each vertex takes up in the data array</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Mesh.offsets">
+			<div class="prop-header member">
+				<span class="prop-name">offsets</span>
+				<span class="type">Map</span>
+			</div>
+			<div class="prop desc">A map from attribute names to their offset into each vertex in the data array</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
 				
 				
 				
@@ -75,7 +87,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="Mesh.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L72" target="_blank" class="function-name source-link">constructor</a>(<span class="param">attributes</span>, <span class="param">data</span>, <span class="param">chunks</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L73" target="_blank" class="function-name source-link">constructor</a>(<span class="param">attributes</span>, <span class="param">data</span>, <span class="param">chunks</span>)
 			</div>
 			<div class="function desc">
 				Creates a new mesh.
@@ -122,7 +134,7 @@
 	
 		<div class="function-wrapper" id="Mesh.prototype.get()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L111" target="_blank" class="function-name source-link">get</a>()<span class="type">Mesh</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L112" target="_blank" class="function-name source-link">get</a>()<span class="type">Mesh</span>
 			</div>
 			<div class="function desc">
 				Creates a deep copy of the mesh.
@@ -132,7 +144,7 @@
 	
 		<div class="function-wrapper" id="Mesh.prototype.transform()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L120" target="_blank" class="function-name source-link">transform</a>(<span class="param">transform</span>)<span class="type">Mesh</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L121" target="_blank" class="function-name source-link">transform</a>(<span class="param">transform</span>)<span class="type">Mesh</span>
 			</div>
 			<div class="function desc">
 				<a href="../../Geometry/Transform.html#class Transform">Transforms</a> the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code> of the mesh in-place by a given matrix and flushes the changes.
@@ -160,7 +172,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="Mesh.prototype.toPolyhedron()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L167" target="_blank" class="function-name source-link">toPolyhedron</a>()<span class="type"><a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L168" target="_blank" class="function-name source-link">toPolyhedron</a>()<span class="type"><a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a></span>
 			</div>
 			<div class="function desc">
 				Creates a <a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a> that has the same shape as the mesh, using the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">vertexPosition</span></code> attribute.
@@ -170,7 +182,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="Mesh.fromShape()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L187" target="_blank" class="function-name source-link">Mesh.fromShape</a>(<span class="param">shape</span>, <span class="param">material?</span>, <span class="param">resolution?</span>)<span class="type">Mesh</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L188" target="_blank" class="function-name source-link">Mesh.fromShape</a>(<span class="param">shape</span>, <span class="param">material?</span>, <span class="param">resolution?</span>)<span class="type">Mesh</span>
 			</div>
 			<div class="function desc">
 				Creates a new mesh from a <a href="../../Geometry/Shapes/3D/Shape3D.html#class Shape3D">Shape3D</a>, inferring many settings to produce generally acceptable results.
@@ -217,7 +229,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="Mesh.fromPolyhedron()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L211" target="_blank" class="function-name source-link">Mesh.fromPolyhedron</a>(<span class="param">polyhedron</span>, <span class="param">material?</span>, <span class="param">settings?</span>)<span class="type">Mesh</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L212" target="_blank" class="function-name source-link">Mesh.fromPolyhedron</a>(<span class="param">polyhedron</span>, <span class="param">material?</span>, <span class="param">settings?</span>)<span class="type">Mesh</span>
 			</div>
 			<div class="function desc">
 				Creates a new mesh from a <a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a>.
@@ -264,7 +276,7 @@ Returns the caller.
 	
 		<div class="function-wrapper" id="Mesh.merge()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L286" target="_blank" class="function-name source-link">Mesh.merge</a>(<span class="param">meshes</span>)<span class="type">Mesh</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L313" target="_blank" class="function-name source-link">Mesh.merge</a>(<span class="param">meshes</span>)<span class="type">Mesh</span>
 			</div>
 			<div class="function desc">
 				Creates a new mesh containing all the pieces of a collection of meshes
@@ -294,7 +306,7 @@ Returns the caller.
 		
 			<div class="class-wrapper" id="class PolyhedronConversionSettings">
 				<div class="class-header">
-					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L49" target="_blank" class="class-name source-link">PolyhedronConversionSettings</a>
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Mesh.js?#L50" target="_blank" class="class-name source-link">PolyhedronConversionSettings</a>
 				</div>
 				<div class="class desc">
 					This is an interface representing how a <a href="../../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a> should be converted into a mesh.
@@ -305,13 +317,24 @@ This is not a class, but rather describes the structure of an object that must b
 				
 					<div class="header">Properties</div>
 					<div class="class-properties">
-				<div class="prop-wrapper" id="PolyhedronConversionSettings.smooth?">
-					<div class="prop-header member">
-						<span class="prop-name">smooth?</span><span class="type">Boolean</span>
-					</div>
-					<div class="prop desc">Whether the normals should be smoothed across vertices. Default is false</div>
-				</div>
+		<div class="prop-wrapper" id="PolyhedronConversionSettings.smooth?">
+			<div class="prop-header member">
+				<span class="prop-name">smooth?</span>
+				<span class="type">Boolean</span>
 			</div>
+			<div class="prop desc">Whether the normals should be smoothed across vertices. Default is false</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PolyhedronConversionSettings.smoothLimit?">
+			<div class="prop-header member">
+				<span class="prop-name">smoothLimit?</span>
+				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The minimum dot product between normals of adjacent faces required for them to be smoothed together. This has no effect is <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">smooth</span></code> is false. Default is 0 (faces beyond perpendicular aren't smoothed)</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
 				
 				
 				
