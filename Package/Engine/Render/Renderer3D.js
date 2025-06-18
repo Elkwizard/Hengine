@@ -292,8 +292,6 @@ class GrowableTypedArray {
  * All transformation-related matrices for this renderer are of type Matrix4.
  */
 class Artist3D extends Artist {
-	/** @type {WebGL2RenderingContext} */
-	gl;
 	constructor(canvas, imageType) {
 		super();
 		this.canvas = canvas;
@@ -325,7 +323,8 @@ class Artist3D extends Artist {
 		this.screenBuffers = [];
 
 		this.hdr = true;
-		this.resultBuffer = this.createScreenBuffer({ color: true, depth: true, hdr: true });
+		this.depthFormat = this.gl.DEPTH_COMPONENT32F;
+		this.resultBuffer = this.createScreenBuffer({ color: true, depth: true, hdr: true, depthFormat: this.depthFormat });
 
 		this.compile();
 		
@@ -371,7 +370,7 @@ class Artist3D extends Artist {
 
 		const depth = gl.createRenderbuffer();
 		gl.bindRenderbuffer(gl.RENDERBUFFER, depth);
-		gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 4, gl.DEPTH_COMPONENT32F, width, height);
+		gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 4, this.depthFormat, width, height);
 		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depth);
 	}
 	compile() {
@@ -531,18 +530,21 @@ class Artist3D extends Artist {
 		this.strokeObj.setup(color, lineWidth);
 		return this.strokeObj;
 	}
-	pass(camera, meshes, shadowPass, setupMaterial) {
+	pass(meshes, visibility, shadowPass, setupMaterial) {
 		const { gl } = this;
 
 		const transparent = [];
 		const chunks = [];
 
-		for (let i = 0; i < meshes.length; i++) {
+		meshLoop: for (let i = 0; i < meshes.length; i++) {
 			const mesh = meshes[i];
-
-			if (!camera.screen.cullSphere(mesh.boundingSphere) && !(shadowPass && !mesh.castShadows)) {
-				transparent.pushArray(mesh.transparent);
-				chunks.pushArray(mesh.opaque);
+			const { instances } = mesh;
+			for (let j = 0; j < instances.length; j++) {
+				if (visibility[instances[j].visibilityIndex]) {
+					chunks.pushArray(mesh.opaque);
+					transparent.pushArray(mesh.transparent);
+					continue meshLoop;
+				}
 			}
 		}
 
@@ -553,8 +555,11 @@ class Artist3D extends Artist {
 		gl.useProgram(null);
 		gl.depthMask(true);
 
+		const passIndex = intervals.getCount("pass");
+		intervals.count("pass");
+
 		for (let i = 0; i < chunks.length; i++) {
-			const { chunk, mesh, transforms, uniforms } = chunks[i];
+			const { chunk, mesh, instances, uniforms } = chunks[i];
 
 			if (!shadowPass && i === transparentIndex) {
 				gl.enable(gl.BLEND);
@@ -583,20 +588,29 @@ class Artist3D extends Artist {
 			
 			gl.bindVertexArray(this.getCache(chunk));
 
-			if (transforms.length < Artist3D.INSTANCE_THRESHOLD) {
-				for (let j = 0; j < transforms.length; j++) {
-					program.setUniform("transform", transforms[j], false, true);
-					gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
+			if (instances.length < Artist3D.INSTANCE_THRESHOLD) {
+				intervals.count("draw instance " + passIndex, instances.length);
+				for (let j = 0; j < instances.length; j++) {
+					const { transform, visibilityIndex } = instances[j];
+					if (visibility[visibilityIndex]) {
+						program.setUniform("transform", transform, false, true);
+						gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
+					}
 				}
 			} else {
-				program.setUniform("transform", transforms[0], false, true);
-				gl.drawElementsInstanced(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0, transforms.length);
+				let lastInstance = instances.length - 1;
+				while (lastInstance >= 0 && !visibility[instances[lastInstance].visibilityIndex])
+					lastInstance--;
+				program.setUniform("transform", instances[0].transform, false, true);
+				intervals.count("draw instance " + passIndex, lastInstance + 1);
+				intervals.count("instances skipped", instances.length - (lastInstance + 1));
+				gl.drawElementsInstanced(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0, lastInstance + 1);
 			}
 		}
 
 		gl.disable(gl.BLEND);
 	}
-	processMesh({ mesh, transforms, castShadows }, spheres) {
+	setupMesh({ mesh, transforms, castShadows }, bounds) {
 		const { gl } = this;
 
 		if (!this.hasCache(mesh)) {
@@ -606,13 +620,7 @@ class Artist3D extends Artist {
 
 			const instanceBuffer = gl.createBuffer();
 
-			const bounds = mesh.getBoundingBox();
-			
-			const { min, max } = bounds;
-			const localBoundingSphere = new Sphere(
-				min.plus(max).over(2),
-				max.minus(min).mag / 2
-			);
+			const localBoundingSphere = mesh.getBoundingBall();
 
 			this.setCache(mesh, {
 				vertexBuffer, instanceBuffer,
@@ -622,14 +630,56 @@ class Artist3D extends Artist {
 
 		const cached = this.getCache(mesh);
 
-		if (transforms.length >= Artist3D.INSTANCE_THRESHOLD) {
+		const instances = new Array(transforms.length);
+		for (let i = 0; i < transforms.length; i++) {
+			const transform = transforms[i];
+
+			const boundingSphere = new Sphere(
+				transform.times(cached.localBoundingSphere.position, this.vector3Pool.alloc()),
+				transform.maxHomogenousScaleFactor * cached.localBoundingSphere.radius
+			);
+			
+			instances[i] = { transform, visibilityIndex: bounds.length };
+			bounds.push(boundingSphere);
+		}
+
+		const opaque = [];
+		const transparent = [];
+
+		for (let j = 0; j < mesh.chunks.length; j++) {
+			const chunk = mesh.chunks[j];
+
+			const representation = {
+				mesh, chunk,
+				uniforms: chunk.material.uniforms,
+				instances
+			};
+
+			if (chunk.material.transparent) {
+				transparent.push(representation);
+			} else {
+				opaque.push(representation);
+			}
+		}
+
+		return { mesh, instances, opaque, transparent, castShadows };
+	}
+	setupMeshInstances(mesh, visibilityCounts) {
+		const { instances } = mesh;
+		if (instances.length >= Artist3D.INSTANCE_THRESHOLD) {
+			const { gl } = this;
+
+			const cached = this.getCache(mesh.mesh);
+
+			instances.sort((a, b) => visibilityCounts[b.visibilityIndex] - visibilityCounts[a.visibilityIndex]);
+			
 			const ELEMENTS_PER_MATRIX = 4 * 3;
-			const instanceView = this.instanceData.getView(transforms.length * ELEMENTS_PER_MATRIX);
+			const instanceView = this.instanceData.getView(instances.length * ELEMENTS_PER_MATRIX);
 			let instanceViewIndex = ELEMENTS_PER_MATRIX;
 
 			// technically... the first transform is read from a uniform, so we can skip it
-			for (let i = 1; i < transforms.length; i++) {
-				const transform = transforms[i];
+			for (let i = 1; i < instances.length; i++) {
+				const { transform } = instances[i];
 				for (let c = 0; c < 4; c++) {
 					const columnIndex = c * 4;
 					for (let r = 0; r < 3; r++) {
@@ -641,44 +691,8 @@ class Artist3D extends Artist {
 			gl.bindBuffer(gl.ARRAY_BUFFER, cached.instanceBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, instanceView, gl.DYNAMIC_DRAW);
 		}
-
-		const boundingSpheres = [];
-		for (let i = 0; i < transforms.length; i++) {
-			const transform = transforms[i];
-
-			const boundingSphere = new Sphere(
-				transform.times(cached.localBoundingSphere.position, this.vector3Pool.alloc()),
-				transform.maxHomogenousScaleFactor * cached.localBoundingSphere.radius
-			);
-			
-			spheres.push(boundingSphere);
-			boundingSpheres.push(boundingSphere);
-		}
-
-		const boundingSphere = Sphere.composeBoundingBalls(boundingSpheres);
-
-		const opaque = [];
-		const transparent = [];
-
-		for (let j = 0; j < mesh.chunks.length; j++) {
-			const chunk = mesh.chunks[j];
-
-			const representation = {
-				mesh, chunk,
-				uniforms: chunk.material.uniforms,
-				transforms
-			};
-
-			if (chunk.material.transparent) {
-				transparent.push(representation);
-			} else {
-				opaque.push(representation);
-			}
-		}
-
-		return { boundingSphere, opaque, transparent, castShadows };
 	}
-	renderShadows(camera, meshes, lights, boundingSpheres) {
+	setupShadows(camera, lights, bounds) {
 		const { gl } = this;
 		const { SHADOW_RESOLUTION } = Artist3D;
 
@@ -699,30 +713,29 @@ class Artist3D extends Artist {
 		while (this.shadowMaps.length < shadowLights.length)
 			this.shadowMaps.push(new Artist3D.ShadowMap(gl));
 		
-		gl.enable(gl.DEPTH_TEST);
-		gl.viewport(0, 0, SHADOW_RESOLUTION, SHADOW_RESOLUTION);
-		gl.depthMask(true);
-		
 		const cascadeProps = Array.dim(Artist3D.SHADOW_CASCADE).map((_, i) => 3 ** i);
 		const frusta = Geometry3D.subdivideFrustum(screen, cascadeProps);
 		const shadowCascadeDepths = frusta.map(frustum => Math.max(
 			...frustum.vertices.map(vertex => vertex.dot(camera.direction))
 		));
+
 		for (let i = 0; i < shadowLights.length; i++) {
 			const light = shadowLights[i];
 			const map = this.shadowMaps[i];
 			
 			let nearZ = Infinity;
-			for (let j = 0; j < boundingSpheres.length; j++) {
-				const sphere = boundingSpheres[j];
+			for (let j = 0; j < bounds.length; j++) {
+				const sphere = bounds[j];
 				const z = sphere.position.dot(light.direction) - sphere.radius;
 				if (z < nearZ) nearZ = z;
 			}
 
 			for (let j = 0; j < frusta.length; j++) {
+				const scale = j ? 0.5 : 1;
+				const resolution = SHADOW_RESOLUTION * scale;
 				const camera = new Camera3D({
-					width: SHADOW_RESOLUTION,
-					height: SHADOW_RESOLUTION
+					width: resolution,
+					height: resolution
 				});
 				camera.direction = light.direction;
 
@@ -732,9 +745,9 @@ class Artist3D extends Artist {
 				);
 				const { xRange, yRange, zRange } = Prism.fromRanges(
 					frustumBounds.xRange, frustumBounds.yRange,
-					new Range(nearZ, frustumBounds.max.z + 10)
+					new Range(nearZ, frustumBounds.max.z)
 				);
-				const padding = Math.SQRT2 * Math.hypot(xRange.length, yRange.length) / (SHADOW_RESOLUTION - Math.SQRT2);
+				const padding = Math.SQRT2 * Math.hypot(xRange.length, yRange.length) / (resolution - Math.SQRT2);
 				xRange.expand(padding);
 				yRange.expand(padding);
 				zRange.expand(padding);
@@ -743,17 +756,34 @@ class Artist3D extends Artist {
 					xRange, yRange, zRange
 				));
 				if (!camera.cacheScreen()) continue;
-				
+
 				const cascade = map.cascades[j];
 				cascade.camera = camera;
 				cascade.depthBias = Artist3D.SHADOW_BIAS / zRange.length;
-				cascade.pixelSize = Math.SQRT2 * Math.hypot(xRange.length, yRange.length) / SHADOW_RESOLUTION;
+				cascade.pixelSize = Math.SQRT2 * Math.hypot(xRange.length, yRange.length) / resolution;
 				cascade.zRange = zRange.length;
+				cascade.scale = scale;
+			}
+		}
 
+		return { shadowCascadeDepths, shadowLights };
+	}
+	renderShadows(meshes, shadowLights, visibilities) {
+		const { gl } = this;
+		const { SHADOW_RESOLUTION } = Artist3D;
+		
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthMask(true);
+		for (let i = 0; i < shadowLights.length; i++) {
+			const { cascades } = this.shadowMaps[i];
+			for (let j = 0; j < cascades.length; j++) {
+				const cascade = cascades[j];
+				
 				gl.bindFramebuffer(gl.FRAMEBUFFER, cascade.framebuffer);
+				gl.viewport(0, 0, SHADOW_RESOLUTION * cascade.scale, SHADOW_RESOLUTION * cascade.scale);
 				gl.clear(gl.DEPTH_BUFFER_BIT);
 
-				this.pass(camera, meshes, true, chunk => {
+				this.pass(meshes, visibilities.get(cascade.camera), true, chunk => {
 					const program = this.getShaderProgram({
 						vertexShader: chunk.material.vertexShader,
 						fragmentShader: Artist3D.SHADOW_FRAGMENT
@@ -761,36 +791,74 @@ class Artist3D extends Artist {
 
 					if (!program.inUse) {
 						program.use();
-						program.setUniforms({
-							camera
-						}, false);
+						program.setUniform("camera", cascade.camera, false, true);
 					}
 	
 					return program;
 				});
 			}
 		}
-
-		return shadowCascadeDepths;
 	}
-	renderQueues(camera, lightQueue, meshQueue) {
+	computeVisibility(camera, shadowLights, meshes, bounds) {
+		const allCameras = [];
+		for (let i = 0; i < shadowLights.length; i++) {
+			const { cascades } = this.shadowMaps[i];
+			for (let j = 0; j < cascades.length; j++)
+				allCameras.push(cascades[j].camera);
+		}
+		allCameras.push(camera);
+
+		const visibilities = new Map();
+		const visibilityCounts = new Array(bounds.length).fill(0);
+		for (let i = 0; i < allCameras.length; i++) {
+			const camera = allCameras[i];
+			const isShadowCamera = i < allCameras.length - 1;
+			const frustum = camera.screen;
+			const visibility = new Array(bounds.length).fill(false);
+			for (let j = 0; j < meshes.length; j++) {
+				const { instances, castShadows } = meshes[j];
+				if (!castShadows && isShadowCamera) continue;
+				for (let k = 0; k < instances.length; k++) {
+					const index = instances[k].visibilityIndex;
+					const bound = bounds[index];
+					const visible = !frustum.cullSphere(bound);
+					visibility[index] = visible;
+					visibilityCounts[index] += visible;
+				}
+			}
+			visibilities.set(camera, visibility);
+		}
+
+
+		return { visibilities, visibilityCounts };
+	}
+	renderQueues(camera, meshQueue, lightQueue) {
 		const { gl } = this;
 		this.vector3Pool.push();
 
 		const lights = lightQueue.slice(0, Artist3D.MAX_LIGHTS);
 
-		const boundingSpheres = [];
-		const meshes = meshQueue.map(req => this.processMesh(req, boundingSpheres));
+		const bounds = [];
+		const meshes = meshQueue.map(req => this.setupMesh(req, bounds));
 		
-		// shadow passes
-		const shadowCascadeDepths = this.renderShadows(camera, meshes, lights, boundingSpheres);
+		// setup shadow cameras
+		const { shadowCascadeDepths, shadowLights } = this.setupShadows(camera, lights, bounds);
+
+		// optimize culling
+		const { visibilities, visibilityCounts } = this.computeVisibility(camera, shadowLights, meshes, bounds);
+
+		for (let i = 0; i < meshes.length; i++)
+			this.setupMeshInstances(meshes[i], visibilityCounts);
+		
+		// shadow pass
+		this.renderShadows(meshes, shadowLights, visibilities);
 
 		// main render pass
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
 		gl.enable(gl.DEPTH_TEST);
 
 		this.maximizeViewport();
-		this.pass(camera, meshes, false, chunk => {
+		this.pass(meshes, visibilities.get(camera), false, chunk => {
 			const program = this.getShaderProgram(chunk.material);
 			if (!program.inUse) {
 				program.use();
@@ -827,12 +895,10 @@ class Artist3D extends Artist {
 		}
 
 		// composite
-		{
-			this.maximizeViewport();
-			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			gl.disable(gl.DEPTH_TEST);
-			this.drawQuad(this.copyShader, { source: outputBuffer.color });
-		}
+		this.maximizeViewport();
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		gl.disable(gl.DEPTH_TEST);
+		this.drawQuad(this.copyShader, { source: outputBuffer.color });
 
 		this.vector3Pool.pop();
 
@@ -864,7 +930,7 @@ class Artist3D extends Artist {
 		const meshQueue = this.meshObj.meshes;
 
 		if (meshQueue.length)
-			this.renderQueues(camera, lightQueue, meshQueue);
+			this.renderQueues(camera, meshQueue, lightQueue);
 
 		this.emptyQueues();
 	}
@@ -1379,12 +1445,14 @@ class Artist3D extends Artist {
 		constructor(gl, {
 			hdr = false,
 			color = true,
-			depth = false
+			depth = false,
+			depthFormat = gl.DEPTH_COMPONENT32F
 		} = { }) {
 			this.gl = gl;
 			this.hdr = hdr;
 			this.hasColor = color;
 			this.hasDepth = depth;
+			this.depthFormat = depthFormat;
 		}
 		compile() {
 			const { gl } = this;
@@ -1421,7 +1489,7 @@ class Artist3D extends Artist {
 			
 			if (this.hasDepth) {
 				this.depth = GLUtils.createTexture(gl);
-				gl.texStorage2D(gl.TEXTURE_2D, 1, gl.DEPTH_COMPONENT32F, width, height);
+				gl.texStorage2D(gl.TEXTURE_2D, 1, this.depthFormat, width, height);
 				gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.depth, 0);
 			}
 		}
@@ -1516,6 +1584,7 @@ Artist3D.LIGHTS = `
 		float depthBias;
 		float pixelSize;
 		float zRange;
+		float scale;
 	};
 	uniform ShadowInfo[MAX_SHADOWS * SHADOW_CASCADE] shadowInfo;
 	uniform highp sampler2DArrayShadow[MAX_SHADOWS] shadowTextures;
@@ -1559,14 +1628,9 @@ Artist3D.LIGHTS = `
 		// depth bias
 		frag.z -= 0.01 / info.zRange;
 
-		ivec3 shadowPixel = ivec3(
-			uv * vec2(SHADOW_RESOLUTION),
-			cascadeRegion
-		);
-
 		float fragDepth = frag.z * 0.5 + 0.5;
 
-		vec4 testCoord = vec4(uv, cascadeRegion, fragDepth);
+		vec4 testCoord = vec4(uv * info.scale, cascadeRegion, fragDepth);
 
 		float depth;
 		switch (light.shadowIndex) {${

@@ -279,9 +279,10 @@ class IntervalManager {
 	 * Increments a counter with a given name.
 	 * If no counter exists with the given name, a new one will be created prior to incrementing.
 	 * @param String key | The name of the counter
+	 * @param Number amount? | The amount to increment the counter by. Default is 1
 	 */
-	count(key) {
-		this.counters.set(key, (this.counters.get(key) ?? 0) + 1);
+	count(key, amount = 1) {
+		this.counters.set(key, (this.counters.get(key) ?? 0) + amount);
 	}
 	update() {
 		this.updatePerformanceData();

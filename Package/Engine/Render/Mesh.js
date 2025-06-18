@@ -139,6 +139,28 @@ class Mesh extends Renderable {
 		return new Prism(min, max);
 	}
 	/**
+	 * Returns a small Sphere that contains all the `vertexPosition`s of the mesh.
+	 * @return Sphere
+	 */
+	getBoundingBall() {
+		const { middle } = this.getBoundingBox();
+
+		const offset = this.offsets.get("vertexPosition");
+		const { stride, data } = this;
+
+		let maxRadius = 0;
+		for (let i = offset; i < data.length; i += stride) {
+			const x = data[i + 0] - middle.x;
+			const y = data[i + 1] - middle.y;
+			const z = data[i + 2] - middle.z;
+
+			const radius = x ** 2 + y ** 2 + z ** 2;
+			if (radius > maxRadius) maxRadius = radius;
+		}
+
+		return new Sphere(middle, Math.sqrt(maxRadius));
+	}
+	/**
 	 * Transforms the `vertexPosition` of the mesh in-place by a given matrix and flushes the changes.
 	 * Returns the caller.
 	 * @param Matrix4 transform | The homogenous transformation to apply to each vertex position
