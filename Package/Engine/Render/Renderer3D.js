@@ -555,9 +555,6 @@ class Artist3D extends Artist {
 		gl.useProgram(null);
 		gl.depthMask(true);
 
-		const passIndex = intervals.getCount("pass");
-		intervals.count("pass");
-
 		for (let i = 0; i < chunks.length; i++) {
 			const { chunk, mesh, instances, uniforms } = chunks[i];
 
@@ -589,7 +586,6 @@ class Artist3D extends Artist {
 			gl.bindVertexArray(this.getCache(chunk));
 
 			if (instances.length < Artist3D.INSTANCE_THRESHOLD) {
-				intervals.count("draw instance " + passIndex, instances.length);
 				for (let j = 0; j < instances.length; j++) {
 					const { transform, visibilityIndex } = instances[j];
 					if (visibility[visibilityIndex]) {
@@ -602,8 +598,6 @@ class Artist3D extends Artist {
 				while (lastInstance >= 0 && !visibility[instances[lastInstance].visibilityIndex])
 					lastInstance--;
 				program.setUniform("transform", instances[0].transform, false, true);
-				intervals.count("draw instance " + passIndex, lastInstance + 1);
-				intervals.count("instances skipped", instances.length - (lastInstance + 1));
 				gl.drawElementsInstanced(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0, lastInstance + 1);
 			}
 		}
