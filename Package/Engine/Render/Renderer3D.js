@@ -1518,7 +1518,7 @@ class Artist3D extends Artist {
 	static SHADOW_RESOLUTION = 2 ** 12;
 	static SHADOW_BIAS = 0.5;
 	static SHADOW_CASCADE = 4;
-	static SHADOW_CASCADE_SIZES = [1, 0.5, 0.375, 0.25];
+	static SHADOW_CASCADE_SIZES = [1, 0.5, 0.5, 0.25];
 	static INSTANCE_THRESHOLD = 10;
 }
 Artist3D.CAMERA = `
