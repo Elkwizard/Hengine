@@ -688,7 +688,6 @@ class Artist3D extends Artist {
 	}
 	setupShadows(camera, lights, bounds) {
 		const { gl } = this;
-		const { SHADOW_RESOLUTION } = Artist3D;
 
 		const screen = camera.cacheScreen();
 		
@@ -725,8 +724,8 @@ class Artist3D extends Artist {
 			}
 
 			for (let j = 0; j < frusta.length; j++) {
-				const scale = j ? 0.5 : 1;
-				const resolution = SHADOW_RESOLUTION * scale;
+				const scale = Artist3D.SHADOW_CASCADE_SIZES[j];
+				const resolution = Artist3D.SHADOW_RESOLUTION * scale;
 				const camera = new Camera3D({
 					width: resolution,
 					height: resolution
@@ -1519,6 +1518,7 @@ class Artist3D extends Artist {
 	static SHADOW_RESOLUTION = 2 ** 12;
 	static SHADOW_BIAS = 0.5;
 	static SHADOW_CASCADE = 4;
+	static SHADOW_CASCADE_SIZES = [1, 0.5, 0.375, 0.25];
 	static INSTANCE_THRESHOLD = 10;
 }
 Artist3D.CAMERA = `
