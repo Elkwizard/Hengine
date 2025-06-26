@@ -910,6 +910,11 @@ class GLSLProgram {
 					desc.setup = function () {
 						gpuArray.setup(self.program);
 						dataArray[0] = gpuArray.unit;
+						self.textures[gpuArray.unit] = {
+							unit: gpuArray.unit,
+							target: gl.TEXTURE_2D,
+							texture: gl.getParameter(gl.TEXTURE_BINDING_2D)
+						};
 						this.setUniform();
 					};
 
@@ -1257,7 +1262,8 @@ class GLSLProgram {
 		gl.useProgram(this.program);
 
 		// bind textures
-		for (const { unit, target, texture } of this.textures) {
+		for (let i = 0; i < this.textures.length; i++) {
+			const { unit, target, texture } = this.textures[i];
 			gl.activeTexture(gl.TEXTURE0 + unit);
 			gl.bindTexture(target, texture);
 		}
