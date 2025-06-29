@@ -869,30 +869,6 @@ class Artist3D extends Artist {
 
 			return program;
 		});
-		
-		// copy multisample framebuffer into post-processing buffers
-		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.msFramebuffer);
-		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.resultBuffer.framebuffer);
-
-		gl.blitFramebuffer(
-			0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight,
-			0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight,
-			gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT, gl.NEAREST
-		);
-
-		// post processing
-		let outputBuffer = this.resultBuffer;
-		for (const key in this.postProcess) {
-			const effect = this.postProcess[key];
-			if (effect.active)
-				outputBuffer = effect.draw(outputBuffer, camera);
-		}
-
-		// composite
-		this.maximizeViewport();
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		gl.disable(gl.DEPTH_TEST);
-		this.drawQuad(this.copyShader, { source: outputBuffer.color });
 
 		this.vector3Pool.pop();
 
@@ -919,6 +895,33 @@ class Artist3D extends Artist {
 		this.drawQuad(this.overlayShader, { overlay });
 		gl.disable(gl.BLEND);
 	}
+	afterRendering(camera) {
+		const { gl } = this;
+		
+		// copy multisample framebuffer into post-processing buffers
+		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.msFramebuffer);
+		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.resultBuffer.framebuffer);
+
+		gl.blitFramebuffer(
+			0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight,
+			0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight,
+			gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT, gl.NEAREST
+		);
+
+		// post processing
+		let outputBuffer = this.resultBuffer;
+		for (const key in this.postProcess) {
+			const effect = this.postProcess[key];
+			if (effect.active)
+				outputBuffer = effect.draw(outputBuffer, camera);
+		}
+
+		// composite
+		this.maximizeViewport();
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		gl.disable(gl.DEPTH_TEST);
+		this.drawQuad(this.copyShader, { source: outputBuffer.color });
+	}
 	render(camera) {
 		const lightQueue = this.lightObj.lights;
 		const meshQueue = this.meshObj.meshes;
@@ -927,6 +930,8 @@ class Artist3D extends Artist {
 			this.renderQueues(camera, meshQueue, lightQueue);
 
 		this.emptyQueues();
+
+		this.afterRendering(camera);
 	}
 	emptyQueues() {
 		this.meshObj.clear();
