@@ -227,7 +227,7 @@ If no moving average exists with the given name, a new one will be created with 
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.count()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L283" target="_blank" class="function-name source-link">count</a>(<span class="param">key</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L284" target="_blank" class="function-name source-link">count</a>(<span class="param">key</span>, <span class="param">amount?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Increments a counter with a given name.
@@ -248,6 +248,16 @@ If no counter exists with the given name, a new one will be created prior to inc
 							</div>
 						</div>
 					
+						<div class="param-wrapper" id="IntervalManager.prototype.count():amount?">
+							<div class="param-name">
+								<span class="param">amount</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The amount to increment the counter by. Default is 1
+							</div>
+						</div>
+					
 		
 				</div>
 			
@@ -255,7 +265,7 @@ If no counter exists with the given name, a new one will be created prior to inc
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.makeGraphPlane()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L316" target="_blank" class="function-name source-link">makeGraphPlane</a>(<span class="param">graphs</span>, <span class="param">frameLimit?</span>)<span class="type"><a href="../../Rendering/Image Types/GraphPlane.html#class GraphPlane">GraphPlane</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L317" target="_blank" class="function-name source-link">makeGraphPlane</a>(<span class="param">graphs</span>, <span class="param">frameLimit?</span>)<span class="type"><a href="../../Rendering/Image Types/GraphPlane.html#class GraphPlane">GraphPlane</a></span>
 			</div>
 			<div class="function desc">
 				Creates a new <a href="../../Rendering/Image Types/GraphPlane.html#class GraphPlane">GraphPlane</a>.
@@ -292,7 +302,7 @@ If no counter exists with the given name, a new one will be created prior to inc
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.pause()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L327" target="_blank" class="function-name source-link">pause</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L328" target="_blank" class="function-name source-link">pause</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Stops the update loop.
@@ -302,7 +312,7 @@ If no counter exists with the given name, a new one will be created prior to inc
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.play()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L333" target="_blank" class="function-name source-link">play</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L334" target="_blank" class="function-name source-link">play</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Resumes the update loop if this function has been called as many times as <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">pause</span><span class="highlight-SYMBOL">()</span></code>.
@@ -312,7 +322,7 @@ If no counter exists with the given name, a new one will be created prior to inc
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.continuous()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L342" target="_blank" class="function-name source-link">continuous</a>(<span class="param">fn</span>, <span class="param">type?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L343" target="_blank" class="function-name source-link">continuous</a>(<span class="param">fn</span>, <span class="param">type?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Creates a new <a href="../../Structure/Intervals/IntervalFunction.html#class ContinuousFunction">ContinuousFunction</a>.
@@ -349,7 +359,7 @@ If no counter exists with the given name, a new one will be created prior to inc
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.transition()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L352" target="_blank" class="function-name source-link">transition</a>(<span class="param">fn</span>, <span class="param">frames</span>, <span class="param">type</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L353" target="_blank" class="function-name source-link">transition</a>(<span class="param">fn</span>, <span class="param">frames</span>, <span class="param">type</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Creates a new <a href="../../Structure/Intervals/IntervalFunction.html#class TransitionFunction">TransitionFunction</a>. Returns a promise that resolves when the transition completes.
@@ -396,7 +406,7 @@ If no counter exists with the given name, a new one will be created prior to inc
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.animate()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L367" target="_blank" class="function-name source-link">animate</a>(<span class="param">object</span>, <span class="param">property</span>, <span class="param">finalValue</span>, <span class="param">duration</span>, <span class="param">curve?</span>, <span class="param">type?</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L368" target="_blank" class="function-name source-link">animate</a>(<span class="param">object</span>, <span class="param">property</span>, <span class="param">finalValue</span>, <span class="param">duration</span>, <span class="param">curve?</span>, <span class="param">type?</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Animates the value of a <a href="../../Superclasses/Operable.html#class Operable">Operable</a> or <a href="../../Built-Ins/Number.html#class Number">Number</a> property from its current value to another over a specified interval.
@@ -474,7 +484,7 @@ Returns a promise that resolves when the animation completes.
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.delay()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L381" target="_blank" class="function-name source-link">delay</a>(<span class="param">fn</span>, <span class="param">frames</span>, <span class="param">type</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L382" target="_blank" class="function-name source-link">delay</a>(<span class="param">fn</span>, <span class="param">frames</span>, <span class="param">type</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Creates a new <a href="../../Structure/Intervals/IntervalFunction.html#class DelayedFunction">DelayedFunction</a>.
@@ -522,7 +532,7 @@ Returns a promise that resolves when the function executes.
 	
 		<div class="function-wrapper" id="IntervalManager.prototype.waitUntil()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L393" target="_blank" class="function-name source-link">waitUntil</a>(<span class="param">fn</span>, <span class="param">event</span>, <span class="param">type</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L394" target="_blank" class="function-name source-link">waitUntil</a>(<span class="param">fn</span>, <span class="param">event</span>, <span class="param">type</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Creates a new <a href="../../Structure/Intervals/IntervalFunction.html#class WaitUntilFunction">WaitUntilFunction</a>.
@@ -573,7 +583,7 @@ Returns a promise that resolves when the function executes.
 		
 		<div class="function-wrapper" id="function exit()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L422" target="_blank" class="function-name source-link">exit</a>(<span class="param">...messages</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Intervals.js?#L423" target="_blank" class="function-name source-link">exit</a>(<span class="param">...messages</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Instantly crashes the engine and logs something to the console.

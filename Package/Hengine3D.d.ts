@@ -822,8 +822,9 @@ declare class IntervalManager {
 	 * Increments a counter with a given name.
 	 * If no counter exists with the given name, a new one will be created prior to incrementing.
 	 * @param key - The name of the counter
+	 * @param amount - The amount to increment the counter by. Default is 1
 	 */
-	count(key: string): void;
+	count(key: string, amount?: number): void;
 	/**
 	 * Creates a new GraphPlane.
 	 * @param graphs - The graphs to display on the plane
@@ -7110,6 +7111,14 @@ declare class Mesh extends Renderable {
 	 */
 	get(): this;
 	/**
+	 * Returns the smallest Prism that contains all the `vertexPosition`s of the mesh.
+	 */
+	getBoundingBox(): Prism;
+	/**
+	 * Returns a small Sphere that contains all the `vertexPosition`s of the mesh.
+	 */
+	getBoundingBall(): Sphere;
+	/**
 	 * Transforms the `vertexPosition` of the mesh in-place by a given matrix and flushes the changes.
 	 * Returns the caller.
 	 * @param transform - The homogenous transformation to apply to each vertex position
@@ -7257,9 +7266,9 @@ declare class StrokeRenderer3D {
  */
 declare class Artist3D extends Artist {
 	/**
-	 * 
+	 * The post-processing effects that are applied to the rendered image
 	 */
-	{WebGL2RenderingContext}
+	postProcess: Artist3D.PostProcessEffects;
 	/**
 	 * Returns an object with various methods for queueing lights to be rendered.
 	 * @param color - The color of the light
@@ -7276,6 +7285,82 @@ declare class Artist3D extends Artist {
 	 * @param lineWidth - The width of the lines to be drawn. Default is 1
 	 */
 	stroke(color: Color, lineWidth?: number): void;
+}
+
+/**
+ * Represents a 3D renderer for a graphical surface.
+ * All transformation-related matrices for this renderer are of type Matrix4.
+ */
+declare namespace Artist3D {
+	/**
+	 * Represents the complete collection of post-processing effects that are applied to a given Artist3D.
+	 * This class should not be constructed, and should be accessed via the `.postProcess` property of an Artist3D instance.
+	 */
+	class PostProcessEffects {
+		/**
+		 * Screen-space ambient occlusion. This is active by default
+		 */
+		ssao: Artist3D.SSAO;
+		/**
+		 * A light-bleeding effect. This is active by default
+		 */
+		bloom: Artist3D.Bloom;
+	}
+	
+	/**
+	 * Represents an optional post-processing effect that can be applied to an Artist3D's rendered result.
+	 * This class, along with its subclasses should not be constructed.
+	 */
+	class PostProcess {
+		/**
+		 * Whether the effect is currently active. The initial value of this property depends the effect
+		 */
+		active: boolean;
+	}
+	
+	/**
+	 * Represents an optional "bloom" post-processing effect. This will cause bright areas to bleed into adjacent areas, to give the impression of the light overwhelming the camera.
+	 */
+	class Bloom extends Artist3D.PostProcess {
+		/**
+		 * The intensity of the bloom effect, on [0, 1]. This starts as 0.3
+		 */
+		intensity: number;
+		/**
+		 * The integer number of scaling steps. Lower values will limit the maximum range of the bloom. This starts as 8
+		 */
+		steps: number;
+	}
+	
+	/**
+	 * Represents an optional ambient occlusion post-processing effect, which will darken enclosed areas and create contact shadows.
+	 */
+	class SSAO extends Artist3D.PostProcess {
+		/**
+		 * The number of rays to cast for each pixel. This starts as 8
+		 */
+		samples: number;
+		/**
+		 * The world-space radius of the occlusion sampling sphere. This starts as 3
+		 */
+		radius: number;
+		/**
+		 * The number of samples along the diameter of the blur. This starts as 12
+		 */
+		blurSamples: number;
+		/**
+		 * The maximum radius of the blur step in pixels. This starts as 10
+		 */
+		maxBlurRadius: number;
+		/**
+		 * The minimum radius of the blur step in pixels. This starts as 4
+		 */
+		minBlurRadius: number;
+		/**
+		 * An exponent to apply to the final occlusion value. This starts as 2
+		 */
+		intensity: number;
+	}
 }
 
 /**

@@ -290,6 +290,7 @@ class GrowableTypedArray {
 /**
  * Represents a 3D renderer for a graphical surface.
  * All transformation-related matrices for this renderer are of type Matrix4.
+ * @prop<readonly> Artist3D.PostProcessEffects postProcess | The post-processing effects that are applied to the rendered image
  */
 class Artist3D extends Artist {
 	constructor(canvas, imageType) {
@@ -1023,6 +1024,20 @@ class Artist3D extends Artist {
 	static INSTANCE_THRESHOLD = 10;
 }
 
+/**
+ * @name class Artist3D.PostProcessEffects
+ * Represents the complete collection of post-processing effects that are applied to a given Artist3D.
+ * This class should not be constructed, and should be accessed via the `.postProcess` property of an Artist3D instance.
+ * @prop<readonly> Artist3D.SSAO ssao | Screen-space ambient occlusion. This is active by default
+ * @prop<readonly> Artist3D.Bloom bloom | A light-bleeding effect. This is active by default
+ */
+
+/**
+ * @name class Artist3D.PostProcess
+ * Represents an optional post-processing effect that can be applied to an Artist3D's rendered result.
+ * This class, along with its subclasses should not be constructed.
+ * @prop Boolean active | Whether the effect is currently active. The initial value of this property depends the effect
+ */
 Artist3D.PostProcess = class {
 	constructor(artist, active) {
 		this.artist = artist;
@@ -1032,14 +1047,18 @@ Artist3D.PostProcess = class {
 	draw(camera) { }
 };
 
+/**
+ * @name class Artist3D.Bloom extends Artist3D.PostProcess
+ * Represents an optional "bloom" post-processing effect. This will cause bright areas to bleed into adjacent areas, to give the impression of the light overwhelming the camera.
+ * @prop Number intensity | The intensity of the bloom effect, on [0, 1]. This starts as 0.3
+ * @prop Number steps | The integer number of scaling steps. Lower values will limit the maximum range of the bloom. This starts as 8
+ */
 Artist3D.Bloom = class extends Artist3D.PostProcess {
 	constructor(...args) {
 		super(...args);
 
-		this.settings = {
-			intensity: 0.3,
-			steps: 8
-		};
+		this.intensity = 0.3;
+		this.steps = 8;
 	}
 	compile() {
 		this.extractShader = this.artist.create2DProgram(Artist3D.Bloom.EXTRACT_FRAGMENT);
@@ -1053,7 +1072,7 @@ Artist3D.Bloom = class extends Artist3D.PostProcess {
 		const width = gl.drawingBufferWidth;
 		const height = gl.drawingBufferHeight;
 
-		const { steps } = this.settings;
+		const { steps } = this;
 		
 		gl.disable(gl.DEPTH_TEST);
 
@@ -1111,7 +1130,7 @@ Artist3D.Bloom = class extends Artist3D.PostProcess {
 		inputBuffer.bind();
 		this.artist.drawQuad(this.upsampleShader, {
 			small: bloom, uvBox: bloomBox,
-			intensity: this.settings.intensity
+			intensity: this.intensity
 		});
 		
 		gl.depthMask(true);
@@ -1165,17 +1184,25 @@ Artist3D.Bloom = class extends Artist3D.PostProcess {
 	`);
 }
 
+/**
+ * @name class Artist3D.SSAO extends Artist3D.PostProcess
+ * Represents an optional ambient occlusion post-processing effect, which will darken enclosed areas and create contact shadows.
+ * @prop Number samples | The number of rays to cast for each pixel. This starts as 8
+ * @prop Number radius | The world-space radius of the occlusion sampling sphere. This starts as 3
+ * @prop Number blurSamples | The number of samples along the diameter of the blur. This starts as 12
+ * @prop Number maxBlurRadius | The maximum radius of the blur step in pixels. This starts as 10
+ * @prop Number minBlurRadius | The minimum radius of the blur step in pixels. This starts as 4
+ * @prop Number intensity | An exponent to apply to the final occlusion value. This starts as 2
+ */
 Artist3D.SSAO = class extends Artist3D.PostProcess {
 	constructor(...args) {
 		super(...args);
-		this.settings = {
-			samples: 8,
-			radius: 3,
-			blurSamples: 12,
-			maxBlurRadius: 10,
-			minBlurRadius: 4,
-			intensity: 2
-		};
+		this.samples = 8;
+		this.radius = 3;
+		this.blurSamples = 12;
+		this.maxBlurRadius = 10;
+		this.minBlurRadius = 4;
+		this.intensity = 2;
 	}
 	compile() {
 		this.occlusionShader = this.artist.create2DProgram(Artist3D.SSAO.OCCLUSION_FRAGMENT);
@@ -1198,8 +1225,8 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 			this.artist.drawQuad(this.occlusionShader, {
 				depthTexture: depth,
 				projection: camera.projection,
-				sampleRadius: this.settings.radius,
-				samples: this.settings.samples
+				sampleRadius: this.radius,
+				samples: this.samples
 			});
 		}
 
@@ -1212,9 +1239,9 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 				const uniforms = {
 					depthTexture: depth,
 					occlusionTexture: color,
-					minRadius: this.settings.minBlurRadius,
-					maxRadius: this.settings.maxBlurRadius,
-					samples: Math.floor(this.settings.blurSamples / 2),
+					minRadius: this.minBlurRadius,
+					maxRadius: this.maxBlurRadius,
+					samples: Math.floor(this.blurSamples / 2),
 					composite: i === directions.length - 1,
 					projection: camera.projection,
 					axis: directions[i].times(invRes)
@@ -1222,7 +1249,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 
 				if (uniforms.composite) {
 					uniforms.colorTexture = inputBuffer.color;
-					uniforms.intensity = this.settings.intensity;
+					uniforms.intensity = this.intensity;
 					this.outputBuffer.bind();
 				}
 				

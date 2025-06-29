@@ -216,7 +216,7 @@ function document(doc, topLevelIDs, file, aliases) {
 		.sort((a, b) => b[0].name.base.length - a[0].name.base.length);
 	for (const [doc, filePath] of entries) {
 		if (file === filePath) continue;
-		const regex = new RegExp(String.raw`(?<! href="([^"]*?))\b(${doc.name.base.replaceAll(".", "\\.")}(s|es)?)\b(?!([^<]*?)<\/a>)`, "g");
+		const regex = new RegExp(String.raw`(?<! (?:href|id)="([^"]*?))\b(${doc.name.base.replaceAll(".", "\\.")}(s|es)?)\b(?!([^<]*?)<\/a>)`, "g");
 		const link = `<a href=${JSON.stringify(
 			path.join(toRoot, filePath)
 				.replace(/\\/g, "/") + "#" + doc.searchID

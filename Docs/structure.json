@@ -86,6 +86,12 @@
 			},
 			"3D": {
 				"Artist3D": null,
+				"Post-Processing": [
+					"Artist3D.PostProcessEffects",
+					"Artist3D.PostProcess",
+					"Artist3D.Bloom",
+					"Artist3D.SSAO"
+				],
 				"Renderers": [
 					"MeshRenderer",
 					"LightRenderer"
