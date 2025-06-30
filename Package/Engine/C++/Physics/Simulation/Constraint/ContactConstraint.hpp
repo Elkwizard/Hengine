@@ -9,7 +9,6 @@
 class ContactConstraint : public Constraint {
 	private:
 		constexpr static int BLOCK = 2;
-		constexpr static double SLOP = 0.05;
 
 		std::vector<Interaction> interactions;
 		struct MatrixBlock {
@@ -107,7 +106,7 @@ class ContactConstraint : public Constraint {
 
 			staticFriction = bodyA.friction * bodyB.friction;
 			kineticFriction = 0.9 * staticFriction;
-			penetration = col.penetration - SLOP;
+			penetration = col.penetration;
 		}
 
 		void solvePosition(double dt) override {

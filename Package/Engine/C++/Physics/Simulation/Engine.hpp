@@ -21,12 +21,14 @@ API class Engine {
 		static constexpr int CONSTRAINT_BATCH_SIZE = 30;
 		static constexpr int CONSTRAINT_ITERATIONS_THRESHOLD = 100;
 		static constexpr double CONSTRAINT_ERROR_THRESHOLD = 1.0;
+		static constexpr double COLLISION_SLOP = 0.5;
 		
 		std::vector<std::unique_ptr<RigidBody>> bodies;
 		std::vector<RigidBody*> simBodies, dynBodies;
 		std::vector<std::unique_ptr<ConstraintDescriptor>> constraintDescriptors;
 		std::unordered_map<std::pair<RigidBody*, RigidBody*>, bool> triggerCache;
 		SpatialHash hash;
+		double collisionSlop;
 
 		void cacheBodies() {
 			dynBodies.clear();
@@ -167,8 +169,10 @@ API class Engine {
 			
 			if (!col || triggerCollision(&a, &b, *col)) return nullptr;
 
+			col->penetration -= collisionSlop;
+
 			bool dynamic = Constraint::propagateDynamic(a, b, b.getDynamic(), col->normal);
-			
+
 			ContactConstraint* constraint = new ContactConstraint(dynamic, a, b, *col);
 			constraint->solvePosition(dt);
 			return constraint;
@@ -240,6 +244,8 @@ API class Engine {
 
 		API void run(double deltaTime) {
 			cacheBodies();
+
+			collisionSlop = COLLISION_SLOP * gravity.mag();
 
 			triggerCache.clear();
 			
