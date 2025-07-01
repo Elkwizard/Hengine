@@ -88,6 +88,14 @@ API class Detector {
 
 			contacts.push_back(Line(a, b).midpoint());
 		}
+
+		static void clipVertex(std::vector<Vector>& contacts, const Vector& subject, const Polytope& clip) {
+			for (const Plane& face : clip.planes)
+				if (dot(face.normal, subject) < face.distance)
+					return;
+
+			contacts.push_back(subject);
+		}
 		
 		static std::optional<Collision> collidePolytopePolytope(const Shape& shapeA, const Shape& shapeB) {
 			const Polytope& a = (const Polytope&)shapeA;
@@ -142,12 +150,23 @@ API class Detector {
 
 			std::vector<Vector> contacts;
 
-			for (int i = 0; i < a.getEdgeCount(); i++)
-				clipEdge(contacts, a.getEdge(i), b);
+			for (int i = 0; i < a.vertices.size(); i++)
+				clipVertex(contacts, a.vertices[i], b);
+
+			if (contacts.empty()) {
+				for (int i = 0; i < b.vertices.size(); i++)
+				clipVertex(contacts, b.vertices[i], a);
 			
-			if (contacts.empty())
-				for (int i = 0; i < b.getEdgeCount(); i++)
-					clipEdge(contacts, b.getEdge(i), a);
+				if (contacts.empty()) {
+					for (int i = 0; i < a.getEdgeCount(); i++)
+						clipEdge(contacts, a.getEdge(i), b);
+					
+					if (contacts.empty()) {
+						for (int i = 0; i < b.getEdgeCount(); i++)
+							clipEdge(contacts, b.getEdge(i), a);
+					}
+				}
+			}
 
 			return Collision(normal, minOverlap, contacts);
 		}

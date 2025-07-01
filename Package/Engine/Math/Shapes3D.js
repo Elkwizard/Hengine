@@ -1120,7 +1120,7 @@ class Sphere extends Shape3D {
 		return result;
 	}
 	getBoundingBox() {
-		return new Prism(this.position.minus(radius), this.position.plus(radius));
+		return new Prism(this.position.minus(this.radius), this.position.plus(this.radius));
 	}
 	toPhysicsShape() {
 		const center = this.position.toPhysicsVector();
