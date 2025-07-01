@@ -495,13 +495,6 @@ class Artist3D extends Artist {
 		this.addTransform(Matrix4.scale(...args));
 	}
 	rotate(axis, angle) {
-		if (angle === undefined) {
-			angle = axis.mag;
-			if (angle.equals(0)) return;
-
-			axis = axis.over(angle);
-		}
-
 		this.addTransform(new Matrix4(Quaternion.fromRotation(axis, angle).toMatrix()));
 	}
 	/**
@@ -586,6 +579,7 @@ class Artist3D extends Artist {
 			
 			gl.bindVertexArray(this.getCache(chunk));
 
+			intervals.count("render chunk");
 			if (instances.length < Artist3D.INSTANCE_THRESHOLD) {
 				for (let j = 0; j < instances.length; j++) {
 					const { transform, visibilityIndex } = instances[j];
@@ -625,7 +619,7 @@ class Artist3D extends Artist {
 
 		const cached = this.getCache(mesh);
 
-		const instances = new Array(transforms.length);
+		const instances = [];
 		for (let i = 0; i < transforms.length; i++) {
 			const transform = transforms[i];
 
@@ -633,8 +627,10 @@ class Artist3D extends Artist {
 				transform.times(cached.localBoundingSphere.position, this.vector3Pool.alloc()),
 				transform.maxHomogenousScaleFactor * cached.localBoundingSphere.radius
 			);
+
+			if (isNaN(boundingSphere.position.x)) continue;
 			
-			instances[i] = { transform, visibilityIndex: bounds.length };
+			instances.push({ transform, visibilityIndex: bounds.length });
 			bounds.push(boundingSphere);
 		}
 
@@ -777,6 +773,8 @@ class Artist3D extends Artist {
 				gl.viewport(0, 0, SHADOW_RESOLUTION * cascade.scale, SHADOW_RESOLUTION * cascade.scale);
 				gl.clear(gl.DEPTH_BUFFER_BIT);
 
+				if (!cascade.camera) continue;
+
 				this.pass(meshes, visibilities.get(cascade.camera), true, chunk => {
 					const program = this.getShaderProgram({
 						vertexShader: chunk.material.vertexShader,
@@ -797,8 +795,10 @@ class Artist3D extends Artist {
 		const allCameras = [];
 		for (let i = 0; i < shadowLights.length; i++) {
 			const { cascades } = this.shadowMaps[i];
-			for (let j = 0; j < cascades.length; j++)
-				allCameras.push(cascades[j].camera);
+			for (let j = 0; j < cascades.length; j++) {
+				const { camera } = cascades[j];
+				if (camera) allCameras.push(camera);
+			}
 		}
 		allCameras.push(camera);
 
@@ -833,7 +833,9 @@ class Artist3D extends Artist {
 		const lights = lightQueue.slice(0, Artist3D.MAX_LIGHTS);
 
 		const bounds = [];
-		const meshes = meshQueue.map(req => this.setupMesh(req, bounds));
+		const meshes = meshQueue
+			.map(req => this.setupMesh(req, bounds))
+			.filter(mesh => mesh.instances.length);
 		
 		// setup shadow cameras
 		const { shadowCascadeDepths, shadowLights } = this.setupShadows(camera, lights, bounds);

@@ -162,32 +162,6 @@ class Transform {
 	localSpaceToGlobalSpace(v) {
 		return this.localToGlobal(v);
 	}
-	drawInLocalSpace(artist, renderer) {
-		const pos = this._position;
-		const angle = this._rotation;
-
-		renderer.translate(pos);
-		if (angle) renderer.rotate(angle);
-		artist();
-		if (angle) renderer.rotate(angle.inverse);
-		renderer.translate(pos.inverse);
-	}
-	drawInGlobalSpace(artist, renderer) {
-		const pos = this._position;
-		const angle = this._rotation;
-
-		if (angle) renderer.rotate(angle.inverse);
-		renderer.translate(pos.inverse);
-		artist();
-		renderer.translate(pos);
-		if (angle) renderer.rotate(angle);
-	}
-	drawWithoutRotation(artist, renderer) {
-		const angle = this._rotation;
-		if (angle) renderer.rotate(angle.inverse);
-		artist();
-		if (angle) renderer.rotate(angle);
-	}
 	/**
 	 * Returns a transform which has the same effect as applying two transformations in a row.
 	 * @param Transform a | The first transformation
@@ -232,6 +206,32 @@ class Transform2D extends Transform {
 		this.position = diff;
 		this.rotation += rotation;
 	}
+	drawInLocalSpace(artist, renderer) {
+		const pos = this._position;
+		const angle = this._rotation;
+
+		renderer.translate(pos);
+		if (angle) renderer.rotate(angle);
+		artist();
+		if (angle) renderer.rotate(angle.inverse);
+		renderer.translate(pos.inverse);
+	}
+	drawInGlobalSpace(artist, renderer) {
+		const pos = this._position;
+		const angle = this._rotation;
+
+		if (angle) renderer.rotate(angle.inverse);
+		renderer.translate(pos.inverse);
+		artist();
+		renderer.translate(pos);
+		if (angle) renderer.rotate(angle);
+	}
+	drawWithoutRotation(artist, renderer) {
+		const angle = this._rotation;
+		if (angle) renderer.rotate(angle.inverse);
+		artist();
+		if (angle) renderer.rotate(angle);
+	}
 }
 
 /**
@@ -251,6 +251,19 @@ class Transform3D extends Transform {
 	 */
 	constructor(position, rotation = Vector3.zero) {
 		super(position, rotation);
+	}
+	drawInLocalSpace(artist, renderer) {
+		renderer.drawThrough(this.matrix, artist, false);
+	}
+	drawInGlobalSpace(artist, renderer) {
+		renderer.drawThrough(this.invMatrix, artist, false);
+	}
+	drawWithoutRotation(artist, renderer) {
+		renderer.save();
+		const angle = this._rotation;
+		if (angle) renderer.rotate(angle.inverse);
+		artist();
+		renderer.restore();
 	}
 }
 
