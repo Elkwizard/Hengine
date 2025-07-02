@@ -579,7 +579,6 @@ class Artist3D extends Artist {
 			
 			gl.bindVertexArray(this.getCache(chunk));
 
-			intervals.count("render chunk");
 			if (instances.length < Artist3D.INSTANCE_THRESHOLD) {
 				for (let j = 0; j < instances.length; j++) {
 					const { transform, visibilityIndex } = instances[j];
