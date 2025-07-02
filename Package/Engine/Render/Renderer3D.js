@@ -1281,11 +1281,18 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 
 			return z;
 		}
+
+		float projectedZ(float nlz) {
+			float zScale = projection[2][2];
+			float zOffset = projection[3][2];
+
+			return zScale * linearZ(nlz) + zOffset;
+		}
 		
 		vec3 unproject(vec3 screen) {
 			vec3 ndc = screen * 2.0 - 1.0;
 
-			float w = linearZ(ndc.z) / ndc.z;
+			float w = projectedZ(ndc.z) / ndc.z;
 			vec4 fullNdc = vec4(ndc, 1) * w;
 			vec4 unprojected = inverse(projection) * fullNdc;
 			return unprojected.xyz;
@@ -1325,7 +1332,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 			) * radius;
 		}
 
-		float getVisibility(vec3 ro, vec3 rd) {
+		float getVisibility(vec3 ro, vec3 rd, float tolerance) {
 			vec3 endPosition = ro + rd * sampleRadius;
 			vec3 endScreenPosition = project(endPosition);
 
@@ -1340,7 +1347,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 
 			if (diff < -sampleRadius) return -1.0;
 
-			return diff > 0.0 ? 1.0 : 0.0;
+			return diff > -tolerance ? 1.0 : 0.0;
 		}
 
 		vec4 shader() {				
@@ -1350,11 +1357,14 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 
 			if (depth == 1.0) return vec4(0, 0, 0, 1);
 
-			vec3 ro = unproject(vec3(uv, depth));
+			vec3 screen = vec3(uv, depth);
+			vec3 ro = unproject(screen);
 			
-			vec3 normal = -normalize(cross(dFdx(ro), dFdy(ro)));
+			vec3 normal = normalize(cross(dFdy(ro), dFdx(ro)));
 			
 			float seed = 23.123 * cos(gl_FragCoord.x * 5.2387) + sin(gl_FragCoord.y * 30.0);
+
+			float tolerance = min(fwidth(ro.z), sampleRadius * 0.5);
 			
 			float occlusion = 0.0;
 			float totalWeight = 0.0;
@@ -1362,7 +1372,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 			for (int i = 0; i < samples; i++) {
 				vec3 rd = randomInSphere(seed);
 				if (dot(rd, normal) < 0.0) rd = -rd;
-				float visibility = getVisibility(ro, rd);
+				float visibility = getVisibility(ro, rd, tolerance);
 				if (visibility >= 0.0) {
 					occlusion += 1.0 - visibility;
 					totalWeight++;
