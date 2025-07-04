@@ -82,6 +82,10 @@ API class RigidBody {
 				void invalidate() {
 					valid = false;
 				}
+
+				void beforeSimulation() {
+					global->clearCache();
+				}
 		
 				void updateBounds(bool dynamic, const Transform& transf) {
 					global->sync(*local, transf);
@@ -312,11 +316,16 @@ API class RigidBody {
 			applyRelativeImpulse<&RigidBody::velocity>(pos - position.linear, imp);
 		}
 
-		void cache() {
+		void beforeSimulation() {
 			if (lastBoundedOrientation != position.orientation && !dynamic)
 				updateLocalBounds();
-			
+	
 			sync();
+
+			if (dynamic) {
+				for (Collider& collider : colliders)
+					collider.beforeSimulation();
+			}
 		}
 
 		void sync() {

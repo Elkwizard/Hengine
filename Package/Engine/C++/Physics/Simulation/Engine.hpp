@@ -30,12 +30,12 @@ API class Engine {
 		SpatialHash hash;
 		double collisionSlop;
 
-		void cacheBodies() {
+		void beforeSimulation() {
 			dynBodies.clear();
 			simBodies.clear();
 			for (const auto& body : bodies) {
 				if (!body->simulated) continue;
-				body->cache();
+				body->beforeSimulation();
 				simBodies.push_back(body.get());
 				if (body->getDynamic())
 					dynBodies.push_back(body.get());
@@ -243,7 +243,7 @@ API class Engine {
 		}
 
 		API void run(double deltaTime) {
-			cacheBodies();
+			beforeSimulation();
 
 			collisionSlop = COLLISION_SLOP * gravity.mag();
 

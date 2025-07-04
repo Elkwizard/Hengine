@@ -79,9 +79,25 @@ class Plane {
 			distance = _distance;
 		}
 
+		bool operator ==(const Plane& other) const {
+			return normal == other.normal && equals(distance, other.distance);
+		}
+
 		friend std::ostream& operator <<(std::ostream& out, const Plane& plane) {
 			out << "p * " << plane.normal << " = " >> plane.distance;
 			return out;
+		}
+};
+
+template <>
+class std::hash<Plane> {
+	private:
+		std::hash<double> doubleHash;
+		std::hash<Vector> vectorHash;
+
+	public:
+		size_t operator()(const Plane& plane) const {
+			return vectorHash(plane.normal) ^ doubleHash(round(plane.distance / EPSILON) * EPSILON);
 		}
 };
 

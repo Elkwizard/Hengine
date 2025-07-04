@@ -23,6 +23,7 @@ API class Shape {
 
 		virtual ~Shape() { }
 		virtual Shape* copy() const = 0;
+		virtual void clearCache() { }
 		virtual void sync(const Shape&, const Transform& transf) = 0;
 		virtual Matter getMatter() const = 0;
 		virtual AABB getBounds() const = 0;
@@ -177,17 +178,22 @@ API class Polytope : public Shape {
 
 			position = average(vertices);
 			
+			std::unordered_set<Plane> discoveredPlanes;
 			for (int i = 0; i < faces.size(); i++) {
 				Vector normal = getFace(i).normal();
-				planes.emplace_back(normal, dot(normal, vertices[faces[i][0]]));
+				Plane plane { normal, dot(normal, vertices[faces[i][0]]) };
+				if (!discoveredPlanes.count(plane)) {
+					discoveredPlanes.insert(plane);
+					planes.push_back(plane);
+				}
 			}
 
 #if IS_3D
-			std::unordered_set<std::pair<int, int>> discovered;
+			std::unordered_set<std::pair<int, int>> discoveredEdges;
 			auto addEdge = [&](int a, int b) {
 				std::pair<int, int> key = a < b ? std::make_pair(a, b) : std::make_pair(b, a);
-				if (!discovered.count(key)) {
-					discovered.insert(key);
+				if (!discoveredEdges.count(key)) {
+					discoveredEdges.insert(key);
 					edges.push_back({ a, b });
 				}
 			};
@@ -210,6 +216,7 @@ API class Polytope : public Shape {
 	public:
 		std::vector<Vector> vertices;
 		std::vector<Plane> planes;
+		mutable std::unordered_map<const Polytope*, Vector> collisionCache;
 		Vector position;
 
 #if IS_3D
@@ -237,6 +244,10 @@ API class Polytope : public Shape {
 
 		Shape* copy() const override {
 			return new Polytope(*this);
+		}
+
+		void clearCache() override {
+			collisionCache.clear();
 		}
 
 		void sync(const Shape& reference, const Transform& transf) override {

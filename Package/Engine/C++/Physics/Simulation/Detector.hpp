@@ -4,8 +4,52 @@
 #include "../../Math/Shadow.hpp"
 #include "RigidBody.hpp"
 
+#include <memory>
+
 API class Detector {
 	private:
+		template <typename T>	
+		class ReusableArray {
+			private:
+				T* elements;
+				int capacity, length;
+
+			public:
+				ReusableArray() {
+					capacity = 2;
+					elements = (T*)std::malloc(sizeof(T) * capacity);
+				}
+
+				~ReusableArray() {
+					std::free(elements);
+				}
+
+				bool empty() const {
+					return length == 0;
+				}
+
+				int size() const {
+					return length;
+				}
+
+				const T& operator [](int index) const {
+					return elements[index];
+				}
+
+				void clear() {
+					length = 0;
+				}
+
+				void push_back(const T& element) {
+					if (length >= capacity) {
+						capacity <<= 1;
+						elements = (T*)std::realloc(elements, sizeof(T) * capacity);
+					}
+					elements[length] = element;
+					length++;
+				}
+		};
+
 		static std::optional<Collision> collideBallBall(const Shape& shapeA, const Shape& shapeB) {
 			const Ball& a = (const Ball&)shapeA;
 			const Ball& b = (const Ball&)shapeB;
@@ -96,47 +140,60 @@ API class Detector {
 
 			contacts.push_back(subject);
 		}
+
+		static ReusableArray<Vector> satAxes;
 		
 		static std::optional<Collision> collidePolytopePolytope(const Shape& shapeA, const Shape& shapeB) {
 			const Polytope& a = (const Polytope&)shapeA;
 			const Polytope& b = (const Polytope&)shapeB;
+			
+			if (a.collisionCache.count(&b)) {
+				Vector axis = a.collisionCache.at(&b);
+				Shadow aRange = a.getShadow(axis);
+				Shadow bRange = b.getShadow(axis);
+				if (!aRange.intersects(bRange))
+					return { };
+			}
 
 			Vector toB = b.position - a.position;
 
-			std::vector<Vector> axes { };
+			satAxes.clear();
 			for (const Plane& p : a.planes)
-				if (dot(p.normal, toB) < 0.0) axes.push_back(p.normal);
+				if (dot(p.normal, toB) < 0.0) satAxes.push_back(p.normal);
 
-			ONLY_3D(int endA = axes.size();)
+			ONLY_3D(int endA = satAxes.size();)
 
 			for (const Plane& p : b.planes)
-				if (dot(p.normal, toB) >= 0.0) axes.push_back(p.normal);
+				if (dot(p.normal, toB) >= 0.0) satAxes.push_back(p.normal);
 
-			ONLY_3D(int endB = axes.size();)
+			ONLY_3D(int endB = satAxes.size();)
 
-			if (axes.empty()) return { };
+			if (satAxes.empty()) return { };
 
 #if IS_3D
 			for (int i = 0; i < endA; i++)
 			for (int j = endA; j < endB; j++) {
-				Vector axis = cross(axes[i], axes[j]);
-				if (axis) axes.push_back(axis.normalize());
+				Vector axis = cross(satAxes[i], satAxes[j]);
+				if (axis) satAxes.push_back(axis.normalize());
 			}
 #endif
 
 			double minOverlap = INFINITY;
 			const Vector* bestAxis = nullptr;
 
-			for (const Vector& axis : axes) {
+			for (int i = 0; i < satAxes.size(); i++) {
+				const Vector& axis = satAxes[i];
 				Shadow aRange = a.getShadow(axis);
 				Shadow bRange = b.getShadow(axis);
-
-				if (!aRange.intersects(bRange))
-					return { };
 				
 				double overlap = aRange.overlap(bRange);
 
 				if (overlap < minOverlap) {
+					if (overlap < 0) {
+						a.collisionCache.insert_or_assign(&b, axis);
+						return { };
+					}
+
 					minOverlap = overlap;
 					bestAxis = &axis;
 				}
@@ -244,3 +301,5 @@ API class Detector {
 			}
 		}
 };
+
+Detector::ReusableArray<Vector> Detector::satAxes { };

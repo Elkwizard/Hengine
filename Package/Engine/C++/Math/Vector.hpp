@@ -286,11 +286,15 @@ class std::hash<VectorN<S>> {
 	private:
 		std::hash<double> hash;
 
+		size_t hashOf(double value) const {
+			return hash(round(value / EPSILON) * EPSILON);
+		}
+
 	public:
 		size_t operator()(const VectorN<S>& vec) const {
-			size_t result = hash(vec[0]);
+			size_t result = hashOf(vec[0]);
 			for (int i = 1; i < S; i++)
-				result ^= hash(vec[i]);
+				result ^= hashOf(vec[i]);
 			return result;
 		}
 };
