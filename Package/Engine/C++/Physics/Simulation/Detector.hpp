@@ -114,17 +114,17 @@ API class Detector {
 			Vector b = subject.end;
 			Vector vec = subject.vector();
 			
-			for (const Plane& face : clip.planes) {
-				double dotA = dot(a, face.normal);
-				bool keepA = dotA > face.distance;
+			for (const Plane& plane : clip.planes) {
+				double dotA = dot(a, plane.normal);
+				bool keepA = dotA > plane.distance;
 				
-				double dotB = dot(b, face.normal);
-				bool keepB = dotB > face.distance;
+				double dotB = dot(b, plane.normal);
+				bool keepB = dotB > plane.distance;
 
 				if (keepA == keepB || equals(dotA, dotB)) {
 					if (!keepA) return;
 				} else {
-					double t = (face.distance - dotA) / dot(face.normal, vec);
+					double t = (plane.distance - dotA) / dot(plane.normal, vec);
 					Vector intersect = a + vec * t;
 					(keepA ? b : a) = intersect;
 				}
@@ -142,6 +142,12 @@ API class Detector {
 		}
 
 		static ReusableArray<Vector> satAxes;
+
+		static double getAxisOverlap(const Polytope& a, const Polytope& b, const Vector& axisToB) {
+			double aMax = a.getExtent(axisToB);
+			double bMin = -b.getExtent(-axisToB);
+			return aMax - bMin;
+		}
 		
 		static std::optional<Collision> collidePolytopePolytope(const Shape& shapeA, const Shape& shapeB) {
 			const Polytope& a = (const Polytope&)shapeA;
@@ -149,9 +155,7 @@ API class Detector {
 			
 			if (a.collisionCache.count(&b)) {
 				Vector axis = a.collisionCache.at(&b);
-				Shadow aRange = a.getShadow(axis);
-				Shadow bRange = b.getShadow(axis);
-				if (!aRange.intersects(bRange))
+				if (getAxisOverlap(a, b, axis) < 0.0)
 					return { };
 			}
 
@@ -159,7 +163,7 @@ API class Detector {
 
 			satAxes.clear();
 			for (const Plane& p : a.planes)
-				if (dot(p.normal, toB) < 0.0) satAxes.push_back(p.normal);
+				if (dot(p.normal, toB) < 0.0) satAxes.push_back(-p.normal);
 
 			ONLY_3D(int endA = satAxes.size();)
 
@@ -174,7 +178,10 @@ API class Detector {
 			for (int i = 0; i < endA; i++)
 			for (int j = endA; j < endB; j++) {
 				Vector axis = cross(satAxes[i], satAxes[j]);
-				if (axis) satAxes.push_back(axis.normalize());
+				if (axis) {
+					axis.normalize();
+					satAxes.push_back(dot(axis, toB) < 0 ? -axis : axis);
+				}
 			}
 #endif
 
@@ -183,10 +190,8 @@ API class Detector {
 
 			for (int i = 0; i < satAxes.size(); i++) {
 				const Vector& axis = satAxes[i];
-				Shadow aRange = a.getShadow(axis);
-				Shadow bRange = b.getShadow(axis);
 				
-				double overlap = aRange.overlap(bRange);
+				double overlap = getAxisOverlap(a, b, axis);
 
 				if (overlap < minOverlap) {
 					if (overlap < 0) {
@@ -215,11 +220,11 @@ API class Detector {
 				clipVertex(contacts, b.vertices[i], a);
 			
 				if (contacts.empty()) {
-					for (int i = 0; i < a.getEdgeCount(); i++)
+					for (int i = 0; i < a.getEdgeCount() && contacts.empty(); i++)
 						clipEdge(contacts, a.getEdge(i), b);
 					
 					if (contacts.empty()) {
-						for (int i = 0; i < b.getEdgeCount(); i++)
+						for (int i = 0; i < b.getEdgeCount() && contacts.empty(); i++)
 							clipEdge(contacts, b.getEdge(i), a);
 					}
 				}

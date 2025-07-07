@@ -319,6 +319,15 @@ API class Polytope : public Shape {
 			return result;
 		}
 
+		double getExtent(const Vector& axis) const {
+			double max = -INFINITY;
+
+			for (const Vector& vert : vertices)
+				max = std::max(max, dot(vert, axis));
+
+			return max;
+		}
+
 		double raycast(const Ray& ray) const override {
 			double distance = -1;
 
