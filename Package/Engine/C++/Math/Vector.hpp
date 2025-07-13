@@ -159,15 +159,23 @@ API_TEMPLATE class VectorN {
 			return *this - projectOnto(axis);
 		}
 
+		VectorN idemparallel() const {
+			double sum = 0;
+			for (int i = 0; i < S; i++)
+				sum += elements[i];
+			VectorN result = normalized();
+			return sum < 0 ? -result : result;
+		}
+
 		double sum() const {
-			double result = 0.0;
+			double result = 0;
 			for (int i = 0; i < S; i++)
 				result += elements[i];
 			return result;
 		}
 
 		double product() const {
-			double result = 1.0;
+			double result = 1;
 			for (int i = 0; i < S; i++)
 				result *= elements[i];
 			return result;

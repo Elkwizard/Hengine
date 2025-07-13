@@ -79,6 +79,10 @@ class Plane {
 			distance = _distance;
 		}
 
+		Plane operator -() const {
+			return { -normal, -distance };
+		}
+
 		bool operator ==(const Plane& other) const {
 			return normal == other.normal && equals(distance, other.distance);
 		}

@@ -80,3 +80,5 @@ void erase(std::vector<std::unique_ptr<T>>& list, T* item) {
 		return ptr.get() == item;
 	}));
 }
+
+#include "Util/Stats.hpp"

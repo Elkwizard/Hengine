@@ -396,7 +396,18 @@ class HengineWASMResource extends HengineResource { // emscripten-only, uses spe
 				fd_read: () => null,
 				environ_sizes_get: () => 0,
 				environ_get: () => null,
-				clock_time_get: () => Date.now()
+				
+				clock_time_get: (clockId, _, timePointer) => {
+					let ms = 0;
+					if (clockId === 0) ms = Date.now();
+					else if (clockId === 1) ms = performance.now();
+					else return 28; // invalid_clock
+					
+					const ns = BigInt(Math.round(ms * 1e6));
+					// console.log(timePointer)
+					memory.view.setBigUint64(timePointer, ns, true);
+					return 0; // success
+				}
 			}
 		});
 

@@ -243,6 +243,8 @@ API class Engine {
 		}
 
 		API void run(double deltaTime) {
+			stats.reset();
+
 			beforeSimulation();
 
 			collisionSlop = COLLISION_SLOP * gravity.mag();
@@ -259,6 +261,8 @@ API class Engine {
 				solveConstraints(constraintResolver, dt);
 				solveCollisions(collisionPairs, dt);
 			}
+
+			stats.js();
 		}
 
 		RayHit raycast(const Ray& ray) const {

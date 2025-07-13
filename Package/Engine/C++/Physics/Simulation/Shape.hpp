@@ -189,19 +189,34 @@ API class Polytope : public Shape {
 			}
 
 #if IS_3D
-			std::unordered_set<std::pair<int, int>> discoveredEdges;
-			auto addEdge = [&](int a, int b) {
+			std::unordered_map<std::pair<int, int>, Vector> discoveredEdges;
+			auto addEdge = [&](int a, int b, const Vector& normal) {
 				std::pair<int, int> key = a < b ? std::make_pair(a, b) : std::make_pair(b, a);
 				if (!discoveredEdges.count(key)) {
-					discoveredEdges.insert(key);
-					edges.push_back({ a, b });
+					discoveredEdges.insert_or_assign(key, normal);
+				} else if (discoveredEdges.at(key) == normal) {
+					discoveredEdges.erase(key);
 				}
 			};
 
-			for (auto [a, b, c] : faces) {
-				addEdge(a, b);
-				addEdge(b, c);
-				addEdge(a, c);
+			for (int i = 0; i < faces.size(); i++) {
+				Vector normal = getFace(i).normal();
+				auto [a, b, c] = faces[i];
+				addEdge(a, b, normal);
+				addEdge(b, c, normal);
+				addEdge(a, c, normal);
+			}
+
+			std::unordered_set<Vector> discoveredEdgeAxes;
+			for (const auto& [edge, normal] : discoveredEdges) {
+				Vector a = vertices[edge.first];
+				Vector b = vertices[edge.second];
+				Vector edgeAxis = (b - a).idemparallel();
+				if (!discoveredEdgeAxes.count(edgeAxis)) {
+					discoveredEdgeAxes.insert(edgeAxis);
+					edgeAxes.push_back(edgeAxis);
+				}
+				edges.push_back({ edge.first, edge.second });
 			}
 #else
 			edges = faces;
@@ -216,6 +231,7 @@ API class Polytope : public Shape {
 	public:
 		std::vector<Vector> vertices;
 		std::vector<Plane> planes;
+		std::vector<Vector> edgeAxes;
 		mutable std::unordered_map<const Polytope*, Vector> collisionCache;
 		Vector position;
 
@@ -254,6 +270,8 @@ API class Polytope : public Shape {
 			const Polytope& poly = (const Polytope&)reference;
 			for (int i = 0; i < vertices.size(); i++)
 				vertices[i] = transf * poly.vertices[i];
+			for (int i = 0; i < edgeAxes.size(); i++)
+				edgeAxes[i] = transf.orientation * poly.edgeAxes[i];
 			for (int i = 0; i < planes.size(); i++) {
 				const Plane& plane = poly.planes[i];
 				planes[i].normal = transf.orientation * plane.normal;
@@ -319,13 +337,18 @@ API class Polytope : public Shape {
 			return result;
 		}
 
-		double getExtent(const Vector& axis) const {
+		double getMaxExtent(const Vector& axis) const {
 			double max = -INFINITY;
-
 			for (const Vector& vert : vertices)
 				max = std::max(max, dot(vert, axis));
-
 			return max;
+		}
+
+		double getMinExtent(const Vector& axis) const {
+			double min = INFINITY;
+			for (const Vector& vert : vertices)
+				min = std::min(min, dot(vert, axis));
+			return min;
 		}
 
 		double raycast(const Ray& ray) const override {

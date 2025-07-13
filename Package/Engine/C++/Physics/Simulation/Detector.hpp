@@ -3,53 +3,12 @@
 #include "Collision.hpp"
 #include "../../Math/Shadow.hpp"
 #include "RigidBody.hpp"
+#include "../../Util/Timer.hpp"
 
 #include <memory>
 
 API class Detector {
 	private:
-		template <typename T>	
-		class ReusableArray {
-			private:
-				T* elements;
-				int capacity, length;
-
-			public:
-				ReusableArray() {
-					capacity = 2;
-					elements = (T*)std::malloc(sizeof(T) * capacity);
-				}
-
-				~ReusableArray() {
-					std::free(elements);
-				}
-
-				bool empty() const {
-					return length == 0;
-				}
-
-				int size() const {
-					return length;
-				}
-
-				const T& operator [](int index) const {
-					return elements[index];
-				}
-
-				void clear() {
-					length = 0;
-				}
-
-				void push_back(const T& element) {
-					if (length >= capacity) {
-						capacity <<= 1;
-						elements = (T*)std::realloc(elements, sizeof(T) * capacity);
-					}
-					elements[length] = element;
-					length++;
-				}
-		};
-
 		static std::optional<Collision> collideBallBall(const Shape& shapeA, const Shape& shapeB) {
 			const Ball& a = (const Ball&)shapeA;
 			const Ball& b = (const Ball&)shapeB;
@@ -109,10 +68,18 @@ API class Detector {
 			return { };
 		}
 
-		static void clipEdge(std::vector<Vector>& contacts, const Line& subject, const Polytope& clip) {
+		static void clipEdge(
+			std::vector<Vector>& contacts, const Line& subject,
+			const Polytope& clip, const Plane& separator
+		) {
 			Vector a = subject.start;
 			Vector b = subject.end;
 			Vector vec = subject.vector();
+
+			if (
+				dot(separator.normal, a) < separator.distance &&
+				dot(separator.normal, b) < separator.distance
+			) return;
 			
 			for (const Plane& plane : clip.planes) {
 				double dotA = dot(a, plane.normal);
@@ -133,7 +100,12 @@ API class Detector {
 			contacts.push_back(Line(a, b).midpoint());
 		}
 
-		static void clipVertex(std::vector<Vector>& contacts, const Vector& subject, const Polytope& clip) {
+		static void clipVertex(
+			std::vector<Vector>& contacts, const Vector& subject,
+			const Polytope& clip, const Plane& separator
+		) {
+			if (dot(separator.normal, subject) < separator.distance) return;
+
 			for (const Plane& face : clip.planes)
 				if (dot(face.normal, subject) < face.distance)
 					return;
@@ -141,93 +113,93 @@ API class Detector {
 			contacts.push_back(subject);
 		}
 
-		static ReusableArray<Vector> satAxes;
+		static bool checkAxis(
+			const Polytope& a, const Polytope& b,
+			const Vector& axis, double& minOverlap,
+			Vector& bestAxis
+		) {
+			double aMax = a.getMaxExtent(axis);
+			double bMin = b.getMinExtent(axis);
+			double overlap = aMax - bMin;
+			
+			if (overlap < minOverlap) {
+				if (overlap < 0) {
+					a.collisionCache.insert_or_assign(&b, axis);
+					return true;
+				}
 
-		static double getAxisOverlap(const Polytope& a, const Polytope& b, const Vector& axisToB) {
-			double aMax = a.getExtent(axisToB);
-			double bMin = -b.getExtent(-axisToB);
-			return aMax - bMin;
+				minOverlap = overlap;
+				bestAxis = axis;
+			}
+
+			return false;
 		}
 		
 		static std::optional<Collision> collidePolytopePolytope(const Shape& shapeA, const Shape& shapeB) {
 			const Polytope& a = (const Polytope&)shapeA;
 			const Polytope& b = (const Polytope&)shapeB;
-			
+
 			if (a.collisionCache.count(&b)) {
 				Vector axis = a.collisionCache.at(&b);
-				if (getAxisOverlap(a, b, axis) < 0.0)
+				if (a.getMaxExtent(axis) < b.getMinExtent(axis))
 					return { };
 			}
 
 			Vector toB = b.position - a.position;
 
-			satAxes.clear();
-			for (const Plane& p : a.planes)
-				if (dot(p.normal, toB) < 0.0) satAxes.push_back(-p.normal);
+			double minOverlap = INFINITY;
+			Vector bestAxis;
 
-			ONLY_3D(int endA = satAxes.size();)
+			for (const Plane& p : a.planes)
+				if (dot(p.normal, toB) < 0.0)
+					if (checkAxis(a, b, -p.normal, minOverlap, bestAxis))
+						return { };
 
 			for (const Plane& p : b.planes)
-				if (dot(p.normal, toB) >= 0.0) satAxes.push_back(p.normal);
-
-			ONLY_3D(int endB = satAxes.size();)
-
-			if (satAxes.empty()) return { };
+				if (dot(p.normal, toB) >= 0.0)
+					if (checkAxis(a, b, p.normal, minOverlap, bestAxis))
+						return { };
 
 #if IS_3D
-			for (int i = 0; i < endA; i++)
-			for (int j = endA; j < endB; j++) {
-				Vector axis = cross(satAxes[i], satAxes[j]);
-				if (axis) {
-					axis.normalize();
-					satAxes.push_back(dot(axis, toB) < 0 ? -axis : axis);
-				}
+			for (const Vector& axisA : a.edgeAxes)
+			for (const Vector& axisB : b.edgeAxes) {
+				Vector axis = cross(axisA, axisB);
+				if (!axis) continue;
+
+				axis.normalize();
+				if (dot(axis, toB) < 0) axis = -axis;
+				if (checkAxis(a, b, axis, minOverlap, bestAxis))
+					return { };
 			}
 #endif
 
-			double minOverlap = INFINITY;
-			const Vector* bestAxis = nullptr;
+			if (minOverlap == INFINITY) return { };
 
-			for (int i = 0; i < satAxes.size(); i++) {
-				const Vector& axis = satAxes[i];
-				
-				double overlap = getAxisOverlap(a, b, axis);
-
-				if (overlap < minOverlap) {
-					if (overlap < 0) {
-						a.collisionCache.insert_or_assign(&b, axis);
-						return { };
-					}
-
-					minOverlap = overlap;
-					bestAxis = &axis;
-				}
-			}
-
-			if (!bestAxis) return { };
-
-			Vector normal = *bestAxis;
-			if (dot(normal, toB) < 0)
-				normal = -normal;
+			Vector normal = bestAxis;
 
 			std::vector<Vector> contacts;
+			
+			Plane collisionPlaneA { -normal, -a.getMaxExtent(normal) };
+			Plane collisionPlaneB { normal, b.getMinExtent(normal) };
 
 			for (int i = 0; i < a.vertices.size(); i++)
-				clipVertex(contacts, a.vertices[i], b);
+				clipVertex(contacts, a.vertices[i], b, collisionPlaneB);
 
 			if (contacts.empty()) {
 				for (int i = 0; i < b.vertices.size(); i++)
-				clipVertex(contacts, b.vertices[i], a);
-			
+					clipVertex(contacts, b.vertices[i], a, collisionPlaneA);
+		
+#if IS_3D
 				if (contacts.empty()) {
 					for (int i = 0; i < a.getEdgeCount() && contacts.empty(); i++)
-						clipEdge(contacts, a.getEdge(i), b);
+						clipEdge(contacts, a.getEdge(i), b, collisionPlaneB);
 					
 					if (contacts.empty()) {
 						for (int i = 0; i < b.getEdgeCount() && contacts.empty(); i++)
-							clipEdge(contacts, b.getEdge(i), a);
+							clipEdge(contacts, b.getEdge(i), a, collisionPlaneA);
 					}
 				}
+#endif
 			}
 
 			return Collision(normal, minOverlap, contacts);
@@ -306,5 +278,3 @@ API class Detector {
 			}
 		}
 };
-
-Detector::ReusableArray<Vector> Detector::satAxes { };
