@@ -7270,6 +7270,18 @@ declare class Artist3D extends Artist {
 	 */
 	postProcess: Artist3D.PostProcessEffects;
 	/**
+	 * The side-length of the largest shadow map (in texels). Starts as 4096
+	 */
+	shadowResolution: number;
+	/**
+	 * The rate at which shadow map side-lengths decrease with distance. Modifying this will change `.shadowResolutions`. Starts as 0.8
+	 */
+	shadowFalloff: number;
+	/**
+	 * The side-lengths of all shadow map cascades (in texels), in order from near to far
+	 */
+	shadowResolutions: number[];
+	/**
 	 * Returns an object with various methods for queueing lights to be rendered.
 	 * @param color - The color of the light
 	 */

@@ -291,6 +291,9 @@ class GrowableTypedArray {
  * Represents a 3D renderer for a graphical surface.
  * All transformation-related matrices for this renderer are of type Matrix4.
  * @prop<readonly> Artist3D.PostProcessEffects postProcess | The post-processing effects that are applied to the rendered image
+ * @prop Number shadowResolution | The side-length of the largest shadow map (in texels). Starts as 4096
+ * @prop Number shadowFalloff | The rate at which shadow map side-lengths decrease with distance. Modifying this will change `.shadowResolutions`. Starts as 0.8
+ * @prop Number[4] shadowResolutions | The side-lengths of all shadow map cascades (in texels), in order from near to far
  */
 class Artist3D extends Artist {
 	constructor(canvas, imageType) {
@@ -330,6 +333,9 @@ class Artist3D extends Artist {
 		this.compile();
 		
 		this.resize(canvas.width, canvas.height);
+
+		this.shadowResolution = 4096;
+		this.shadowFalloff = 0.8;
 	}
 	get state() {
 		return this.stateStack[this.currentStateIndex];
@@ -339,6 +345,32 @@ class Artist3D extends Artist {
 	}
 	get transform() {
 		return this.state.transform.get();
+	}
+	set shadowResolution(a) {
+		this._shadowResolution = a;
+		this.invalidateShadowMaps();
+	}
+	get shadowResolution() {
+		return this._shadowResolution;
+	}
+	set shadowFalloff(a) {
+		this._shadowFalloff = a;
+		this.shadowCascadeSizes = Array.dim(Artist3D.SHADOW_CASCADE)
+			.map((_, i) => a ** i);
+	}
+	get shadowFalloff() {
+		return this._shadowFalloff;
+	}
+	set shadowResolutions(a) {
+		this.shadowResolution = a[0];
+		this.shadowCascadeSizes = a.map(x => x / this.shadowResolution);
+		this.invalidateShadowMaps();
+	}
+	get shadowResolutions() {
+		return this.shadowCascadeSizes.map(x => x * this.shadowResolution);
+	}
+	invalidateShadowMaps() {
+		this.shadowMaps = [];
 	}
 	createScreenBuffer(settings) {
 		settings.hdr &&= this.hdr;
@@ -378,8 +410,8 @@ class Artist3D extends Artist {
 		const { gl } = this;
 		gl.enable(gl.CULL_FACE);
 		gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-		this.shadowMaps = [];
-		
+		this.invalidateShadowMaps();
+
 		this.shaderCache = new WeakMap();
 		this.renderCache = new WeakMap();
 
@@ -683,8 +715,6 @@ class Artist3D extends Artist {
 		}
 	}
 	setupShadows(camera, lights, bounds) {
-		const { gl } = this;
-
 		const screen = camera.cacheScreen();
 		
 		// process lights
@@ -700,7 +730,7 @@ class Artist3D extends Artist {
 		}
 
 		while (this.shadowMaps.length < shadowLights.length)
-			this.shadowMaps.push(new Artist3D.ShadowMap(gl));
+			this.shadowMaps.push(new Artist3D.ShadowMap(this));
 		
 		const cascadeProps = Array.dim(Artist3D.SHADOW_CASCADE).map((_, i) => 3 ** i);
 		const frusta = Geometry3D.subdivideFrustum(screen, cascadeProps);
@@ -720,8 +750,8 @@ class Artist3D extends Artist {
 			}
 
 			for (let j = 0; j < frusta.length; j++) {
-				const scale = Artist3D.SHADOW_CASCADE_SIZES[j];
-				const resolution = Artist3D.SHADOW_RESOLUTION * scale;
+				const scale = this.shadowCascadeSizes[j];
+				const resolution = Math.ceil(this.shadowResolution * scale);
 				const camera = new Camera3D({
 					width: resolution,
 					height: resolution
@@ -751,15 +781,14 @@ class Artist3D extends Artist {
 				cascade.depthBias = Artist3D.SHADOW_BIAS / zRange.length;
 				cascade.pixelSize = Math.SQRT2 * Math.hypot(xRange.length, yRange.length) / resolution;
 				cascade.zRange = zRange.length;
-				cascade.scale = scale;
+				cascade.scale = resolution / this.shadowResolution;
 			}
 		}
 
 		return { shadowCascadeDepths, shadowLights };
 	}
 	renderShadows(meshes, shadowLights, visibilities) {
-		const { gl } = this;
-		const { SHADOW_RESOLUTION } = Artist3D;
+		const { gl, shadowResolution } = this;
 		
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthMask(true);
@@ -769,7 +798,7 @@ class Artist3D extends Artist {
 				const cascade = cascades[j];
 				
 				gl.bindFramebuffer(gl.FRAMEBUFFER, cascade.framebuffer);
-				gl.viewport(0, 0, SHADOW_RESOLUTION * cascade.scale, SHADOW_RESOLUTION * cascade.scale);
+				gl.viewport(0, 0, shadowResolution * cascade.scale, shadowResolution * cascade.scale);
 				gl.clear(gl.DEPTH_BUFFER_BIT);
 
 				if (!cascade.camera) continue;
@@ -1023,10 +1052,8 @@ class Artist3D extends Artist {
 
 	static MAX_LIGHTS = 50;
 	static MAX_SHADOWS = 8;
-	static SHADOW_RESOLUTION = 2 ** 12;
 	static SHADOW_BIAS = 0.5;
 	static SHADOW_CASCADE = 4;
-	static SHADOW_CASCADE_SIZES = [1, 0.5, 0.5, 0.25];
 	static INSTANCE_THRESHOLD = 10;
 }
 
@@ -1457,7 +1484,8 @@ Artist3D.State = class {
 };
 
 Artist3D.ShadowMap = class {
-	constructor(gl) {
+	constructor(artist) {
+		const { gl } = artist;
 		const oldBinding = gl.getParameter(gl.TEXTURE_BINDING_2D_ARRAY);
 		
 		this.texture = GLUtils.createTexture(gl, {
@@ -1466,7 +1494,7 @@ Artist3D.ShadowMap = class {
 		});
 		gl.texStorage3D(
 			gl.TEXTURE_2D_ARRAY, 1, gl.DEPTH_COMPONENT32F,
-			Artist3D.SHADOW_RESOLUTION, Artist3D.SHADOW_RESOLUTION,
+			artist.shadowResolution, artist.shadowResolution,
 			Artist3D.SHADOW_CASCADE
 		);
 		gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
@@ -1591,7 +1619,6 @@ Artist3D.LIGHTS = `
 	#define MAX_LIGHTS ${Artist3D.MAX_LIGHTS}
 	#define MAX_SHADOWS ${Artist3D.MAX_SHADOWS}
 	#define SHADOW_CASCADE ${Artist3D.SHADOW_CASCADE}
-	#define SHADOW_RESOLUTION ${Artist3D.SHADOW_RESOLUTION}
 
 	uniform int lightCount;
 	uniform Light[MAX_LIGHTS] lights;
