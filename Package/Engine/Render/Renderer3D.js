@@ -1102,8 +1102,13 @@ Artist3D.Bloom = class extends Artist3D.PostProcess {
 	draw(inputBuffer) {
 		const { gl } = this.artist;
 
-		const width = gl.drawingBufferWidth;
-		const height = gl.drawingBufferHeight;
+		const {
+			drawingBufferWidth: width,
+			drawingBufferHeight: height
+		} = gl;
+
+		const width2 = 2 ** Math.floor(Math.log2(width));
+		const height2 = 2 ** Math.floor(Math.log2(height));
 
 		const { steps } = this;
 		
@@ -1119,13 +1124,15 @@ Artist3D.Bloom = class extends Artist3D.PostProcess {
 		const getRect = index => {
 			if (!index) return new Rect(0, 0, 1, 1);
 			const size = 0.5 ** index;
+			const w = (width2 / width) * size;
+			const h = (height2 / height) * size;
 			const x = 0;
-			const y = 1 - size * 2;
+			const y = 1 - h * 2;
 			return new Rect(
 				x,
 				Math.ceil(y * height) / height,
-				Math.ceil(size * width) / width,
-				Math.ceil(size * height) / height
+				Math.ceil(w * width) / width,
+				Math.ceil(h * height) / height
 			);
 		};
 
