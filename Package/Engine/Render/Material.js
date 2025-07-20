@@ -161,6 +161,15 @@ SimpleMaterial.LIGHTING = `
 		float specularExponent;
 	};
 
+	vec3 bumpNormal(vec3 position, vec3 normal, float bump) {
+		vec3 tangent = dFdx(position);
+		vec3 bitangent = dFdy(position);
+		return normalize(normal + (
+			dFdx(bump) * tangent / dot(tangent, tangent) +
+			dFdy(bump) * bitangent / dot(bitangent, bitangent)
+		));
+	}
+
 	vec3 computeColor(vec3 position, vec3 normal, Surface surface) {
 		vec3 diffuse = vec3(0);
 		vec3 specular = vec3(0);
