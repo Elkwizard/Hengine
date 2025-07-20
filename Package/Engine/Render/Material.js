@@ -164,7 +164,7 @@ SimpleMaterial.LIGHTING = `
 	vec3 bumpNormal(vec3 position, vec3 normal, float bump) {
 		vec3 tangent = dFdx(position);
 		vec3 bitangent = dFdy(position);
-		return normalize(normal + (
+		return normalize(normal - (
 			dFdx(bump) * tangent / dot(tangent, tangent) +
 			dFdy(bump) * bitangent / dot(bitangent, bitangent)
 		));
