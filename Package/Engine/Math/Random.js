@@ -163,7 +163,7 @@ class Random {
 	 */
 	sphere(radius = 1) {
 		const halfPi = Math.PI / 2;
-		return Vector3.polar(this.range(-halfPi, halfPi), this.angle(), radius);
+		return Vector3.polar(this.angle(), this.range(-halfPi, halfPi), radius);
 	}
 	/**
 	 * Returns a random point on the surface of a hemisphere centered at the origin and facing in a given direction.
@@ -180,35 +180,48 @@ class Random {
 	 * This method only works with `.distribution` being `Random.uniform`.
 	 * Unstable.
 	 * @param Shape region | The region within which to generate the point
-	 * @return Vector2
+	 * @return Vector
 	 */
 	inShape(region) {
-		if (region instanceof Circle)
-			return Vector2.fromAngle(Random.angle())
-				.mul(region.radius * Math.sqrt(Random.range(0, 1)))
-				.add(region.middle);
-		if (region instanceof Rect)
-			return new Vector2(
-				Random.range(region.x, region.x + region.width),
-				Random.range(region.y, region.y + region.height)
-			);
-		if (region instanceof Polygon) {
-			const triangles = Geometry.triangulate(region);
-			const areas = triangles
-				.map(([a, b, c]) => Math.abs(
-					(b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
-				));
-			const [a, b, c] = Random.choice(triangles, areas);
-			let px = Random.range(0, 1);
-			let py = Random.range(0, 1);
-			if (py > 1 - px) {
-				px = 1 - px;
-				py = 1 - py;
+		if (region instanceof Shape2D) {
+			if (region instanceof Circle)
+				return this.circle(region.radius)
+					.mul(Math.sqrt(this.random()))
+					.add(region.middle);
+
+			if (region instanceof Rect)
+				return new Vector2(
+					Random.range(region.x, region.x + region.width),
+					Random.range(region.y, region.y + region.height)
+				);
+
+			if (region instanceof Polygon) {
+				const triangles = Geometry.triangulate(region);
+				const areas = triangles
+					.map(([a, b, c]) => Math.abs(
+						(b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
+					));
+				const [a, b, c] = Random.choice(triangles, areas);
+				let px = Random.range(0, 1);
+				let py = Random.range(0, 1);
+				if (py > 1 - px) {
+					px = 1 - px;
+					py = 1 - py;
+				}
+				return	c.Vminus(a).Nmul(px)
+						.Vadd(b.Vminus(a).Nmul(py))
+						.Vadd(a);
 			}
-			return	c.Vminus(a).Nmul(px)
-					.Vadd(b.Vminus(a).Nmul(py))
-					.Vadd(a);
+		} else {
+			if (region instanceof Sphere)
+				return this.sphere(region.radius)
+					.mul(Math.cbrt(this.random()))
+					.add(region.middle);
 		}
+
+		if (region instanceof Line || region instanceof Line3D)
+			return region.a.constructor.lerp(region.a, region.b, this.random());
+
 		return region.middle;
 	}
 	/**
