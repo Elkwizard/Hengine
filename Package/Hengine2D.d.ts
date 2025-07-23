@@ -1918,7 +1918,7 @@ declare class Random {
 	 * Unstable.
 	 * @param region - The region within which to generate the point
 	 */
-	inShape(region: Shape): Vector2;
+	inShape(region: Shape): Vector;
 	/**
 	 * Randomly orders an array in-place. Unstable.
 	 * @param arr - The array to reorder
@@ -2091,7 +2091,7 @@ declare class Random {
 	 * Unstable.
 	 * @param region - The region within which to generate the point
 	 */
-	static inShape(region: Shape): Vector2;
+	static inShape(region: Shape): Vector;
 	/**
 	 * Randomly orders an array in-place. Unstable.
 	 * @param arr - The array to reorder
@@ -7178,89 +7178,6 @@ declare class MeshChunk extends Renderable {
 }
 
 /**
- * Provides a set of methods for creating different types of lights in a 3D scene.
- * This class should not be constructed, and should be accessed via `Artist3D.prototype.light`.
- */
-declare class LightRenderer {
-	/**
-	 * Queues an ambient light to be rendered.
-	 * This light will affect all objects from all sides equally.
-	 */
-	ambient(): void;
-	/**
-	 * Queues an ambient light to be rendered.
-	 * This light will affect all objects outwards from a specific source.
-	 * @param position - The location of the point light
-	 */
-	point(position: Vector3): void;
-	/**
-	 * Queues a directional light to be rendered.
-	 * This light emits parallel rays from an infinite distance in a given direction.
-	 * @param direction - The direction of the light
-	 * @param shadow - Whether the light casts shadows. Default is true
-	 */
-	directional(direction: Vector3, shadow?: boolean): void;
-}
-
-/**
- * Provides a set of methods for rendering meshes in various ways in a scene.
- * This class should not be constructed, and should be accessed via `Artist3D.prototype.mesh`.
- */
-declare class MeshRenderer {
-	/**
-	 * Renders the current mesh at the current transform origin.
-	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
-	 */
-	default(castShadows?: boolean): void;
-	/**
-	 * Renders the current mesh at a given transform relative to the current transform.
-	 * @param transform - The transform at which the mesh will be rendered
-	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
-	 */
-	at(transform: Matrix4, castShadows?: boolean): void;
-	/**
-	 * Renders the current mesh at a variety of different transforms relative to the current transform.
-	 * @param transforms - The transformations to use for each instance
-	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
-	 */
-	instance(transforms: Matrix4[], castShadows?: boolean): void;
-}
-
-/**
- * Provides a set of methods for rendering lines and outlines in various ways in three dimensions.
- * This class should not be constructed, and should be accessed via `Artist3D.prototype.stroke`.
- */
-declare class StrokeRenderer3D {
-	/**
-	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
-	 * @param a - The start of the line segment to draw
-	 * @param b - The end of the line segment to draw
-	 */
-	line(a: Vector3, b: Vector3): void;
-	/**
-	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
-	 * @param line - The line segment to draw
-	 */
-	line(line: Line3D): void;
-	/**
-	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
-	 * @param a - The start of the line segment to draw
-	 * @param b - The end of the line segment to draw
-	 */
-	arrow(a: Vector3, b: Vector3): void;
-	/**
-	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
-	 * @param line - The line segment to draw
-	 */
-	arrow(line: Line3D): void;
-	/**
-	 * Draws a 3D wireframe of a given polyhedron
-	 * @param polyhedron - The polyhedron to draw a 3D wireframe of
-	 */
-	shape(polyhedron: Polyhedron): void;
-}
-
-/**
  * Represents a 3D renderer for a graphical surface.
  * All transformation-related matrices for this renderer are of type Matrix4.
  */
@@ -7296,7 +7213,12 @@ declare class Artist3D extends Artist {
 	 * @param color - The color of the lines to be drawn
 	 * @param lineWidth - The width of the lines to be drawn. Default is 1
 	 */
-	stroke(color: Color, lineWidth?: number): void;
+	stroke(color: Color, lineWidth?: number): StrokeRenderer3D;
+	/**
+	 * Returns an object with various methods for queuing solid shapes to be rendered.
+	 * @param color - The color of the shapes to be drawn
+	 */
+	draw(color: Color): DrawRenderer3D;
 }
 
 /**
@@ -7373,6 +7295,123 @@ declare namespace Artist3D {
 		 */
 		intensity: number;
 	}
+}
+
+/**
+ * Provides a set of methods for creating different types of lights in a 3D scene.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.light`.
+ */
+declare class LightRenderer {
+	/**
+	 * Queues an ambient light to be rendered.
+	 * This light will affect all objects from all sides equally.
+	 */
+	ambient(): void;
+	/**
+	 * Queues an ambient light to be rendered.
+	 * This light will affect all objects outwards from a specific source.
+	 * @param position - The location of the point light
+	 */
+	point(position: Vector3): void;
+	/**
+	 * Queues a directional light to be rendered.
+	 * This light emits parallel rays from an infinite distance in a given direction.
+	 * @param direction - The direction of the light
+	 * @param shadow - Whether the light casts shadows. Default is true
+	 */
+	directional(direction: Vector3, shadow?: boolean): void;
+}
+
+/**
+ * Provides a set of methods for rendering meshes in various ways in a scene.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.mesh`.
+ */
+declare class MeshRenderer {
+	/**
+	 * Renders the current mesh at the current transform origin.
+	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
+	 */
+	default(castShadows?: boolean): void;
+	/**
+	 * Renders the current mesh at a given transform relative to the current transform.
+	 * @param transform - The transform at which the mesh will be rendered
+	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
+	 */
+	at(transform: Matrix4, castShadows?: boolean): void;
+	/**
+	 * Renders the current mesh at a variety of different transforms relative to the current transform.
+	 * @param transforms - The transformations to use for each instance
+	 * @param castShadows - Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
+	 */
+	instance(transforms: Matrix4[], castShadows?: boolean): void;
+}
+
+/**
+ * Provides a set of methods for rendering solid shapes in three dimensions.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.draw`.
+ */
+declare class DrawRenderer3D {
+	/**
+	 * Renders a sphere in a solid color.
+	 * @param center - The center of the sphere
+	 * @param radius - The radius of the sphere
+	 */
+	sphere(center: Vector3, radius: number): void;
+	/**
+	 * Renders a sphere in a solid color.
+	 * @param sphere - The sphere to render
+	 */
+	sphere(sphere: Sphere): void;
+	/**
+	 * Renders a rectangular Prism in a solid color.
+	 * @param min - The back-top-left corner of the rectangular prism
+	 * @param max - The front-bottom-right corner of the rectangular prism
+	 */
+	prism(min: Vector3, max: Vector3): void;
+	/**
+	 * Renders a rectangular Prism in a solid color.
+	 * @param prism - The rectangular prism to render
+	 */
+	prism(prism: Prism): void;
+	/**
+	 * Renders an arbitrary Polyhedron in a solid color.
+	 * @param poly - The Polyhedron to render
+	 */
+	shape(poly: Polyhedron): void;
+}
+
+/**
+ * Provides a set of methods for rendering lines and outlines in various ways in three dimensions.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.stroke`.
+ */
+declare class StrokeRenderer3D {
+	/**
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
+	 * @param a - The start of the line segment to draw
+	 * @param b - The end of the line segment to draw
+	 */
+	line(a: Vector3, b: Vector3): void;
+	/**
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
+	 * @param line - The line segment to draw
+	 */
+	line(line: Line3D): void;
+	/**
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
+	 * @param a - The start of the line segment to draw
+	 * @param b - The end of the line segment to draw
+	 */
+	arrow(a: Vector3, b: Vector3): void;
+	/**
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
+	 * @param line - The line segment to draw
+	 */
+	arrow(line: Line3D): void;
+	/**
+	 * Draws a 3D wireframe of a given polyhedron
+	 * @param polyhedron - The polyhedron to draw a 3D wireframe of
+	 */
+	shape(polyhedron: Polyhedron): void;
 }
 
 /**

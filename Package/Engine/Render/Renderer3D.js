@@ -1,262 +1,3 @@
-/**
- * Provides a set of methods for creating different types of lights in a 3D scene.
- * This class should not be constructed, and should be accessed via `Artist3D.prototype.light`.
- */
-class LightRenderer {
-	constructor(renderer) {
-		this.renderer = renderer;
-		this.color = null;
-		this.queue = [];
-	}
-	get lights() {
-		return this.queue;
-	}
-	setup(color = Color.WHITE) {
-		this.color = color.get();
-	}
-	clear() {
-		this.queue = [];
-	}
-	/**
-	 * Queues an ambient light to be rendered.
-	 * This light will affect all objects from all sides equally.
-	 */
-	ambient() {
-		this.queue.push({
-			color: this.color,
-			type: LightRenderer.Types.AMBIENT
-		});
-	}
-	/**
-	 * Queues an ambient light to be rendered.
-	 * This light will affect all objects outwards from a specific source.
-	 * @param Vector3 position | The location of the point light
-	 */
-	point(position) {
-		const { transform } = this.renderer;
-		this.queue.push({
-			color: this.color,
-			type: LightRenderer.Types.POINT,
-			position: transform.times(position)
-		});
-	}
-	/**
-	 * Queues a directional light to be rendered.
-	 * This light emits parallel rays from an infinite distance in a given direction.
-	 * @param Vector3 direction | The direction of the light
-	 * @param Boolean shadow? | Whether the light casts shadows. Default is true
-	 */
-	directional(direction, shadow = true) {
-		const { transform } = this.renderer;
-		this.queue.push({
-			color: this.color, shadow,
-			type: LightRenderer.Types.DIRECTIONAL,
-			direction: Matrix3.normal(transform).times(direction)
-		});
-	}
-}
-LightRenderer.Types = Object.fromEntries(["AMBIENT", "DIRECTIONAL", "POINT"].map((n, i) => [n, i]));
-
-/**
- * Provides a set of methods for rendering meshes in various ways in a scene.
- * This class should not be constructed, and should be accessed via `Artist3D.prototype.mesh`.
- */
-class MeshRenderer {
-	constructor(renderer) {
-		this.renderer = renderer;
-		this.mesh = null;
-		this.clear();
-	}
-	get meshes() {
-		const result = [];
-		for (const [mesh, { transforms, castShadows }] of this.queue)
-			result.push({ mesh, transforms, castShadows });
-		return result;
-	}
-	setup(mesh) {
-		this.mesh = mesh;
-	}
-	clear() {
-		this.queue = new Map();
-	}
-	enqueue(transform, castShadows = true) {
-		const { mesh } = this;
-		let meshData = this.queue.get(mesh);
-		if (!meshData) {
-			meshData = { transforms: [], castShadows: false };
-			this.queue.set(mesh, meshData);
-		}
-		meshData.castShadows ||= castShadows;
-		meshData.transforms.push(transform);
-	}
-	/**
-	 * Renders the current mesh at the current transform origin.
-	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
-	 */
-	default(castShadows) {
-		const matrix = this.renderer.matrix4Pool.alloc();
-		this.enqueue(this.renderer.state.transform.get(matrix), castShadows);
-	}
-	/**
-	 * Renders the current mesh at a given transform relative to the current transform.
-	 * @param Matrix4 transform | The transform at which the mesh will be rendered
-	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
-	 */
-	at(transform, castShadows) {
-		const matrix = this.renderer.matrix4Pool.alloc();
-		this.enqueue(this.renderer.state.transform.times(transform, matrix), castShadows);
-	}
-	/**
-	 * Renders the current mesh at a variety of different transforms relative to the current transform.
-	 * @param Matrix4[] transforms | The transformations to use for each instance
-	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
-	 */
-	instance(transforms, castShadows) {
-		for (const transform of transforms)
-			this.at(transform, castShadows);
-	}
-}
-
-class PathRenderer3D {
-	static MeshCache = class MeshCache {
-		constructor(polyhedron) {
-			this.polyhedron = polyhedron;
-			this.meshes = [];
-			this.materialToIndex = new Map();
-			this.clear();
-		}
-		getMesh(material) {
-			if (!this.materialToIndex.has(material)) {
-				if (this.nextIndex >= this.meshes.length) {
-					this.meshes.push(Mesh.fromPolyhedron(this.polyhedron, material));	
-				} else {
-					this.meshes[this.nextIndex].chunks[0].material = material;
-				}
-				this.materialToIndex.set(material, this.nextIndex);
-				this.nextIndex++;
-			}
-		
-			return this.meshes[this.materialToIndex.get(material)];
-		}
-		clear() {
-			this.materialToIndex.clear();
-			this.nextIndex = 0;
-		}
-	};
-	constructor(renderer) {
-		this.renderer = renderer;
-		this.materialCache = new Map();
-		this.meshCaches = [];
-	}
-	setup(color) {
-		this.color = color.get();
-		const { hex } = color;
-		if (!this.materialCache.has(hex))
-			this.materialCache.set(hex, this.createMaterial(color));
-		this.material = this.materialCache.get(hex);
-	}
-	createMeshCache(polyhedron) {
-		const cache = new PathRenderer3D.MeshCache(polyhedron);
-		this.meshCaches.push(cache);
-		return cache;
-	}
-	clear() {
-		this.materialCache.clear();
-		for (let i = 0; i < this.meshCaches.length; i++)
-			this.meshCaches[i].clear();
-	}
-}
-
-/**
- * @name class StrokeRenderer3D
- * Provides a set of methods for rendering lines and outlines in various ways in three dimensions.
- * This class should not be constructed, and should be accessed via `Artist3D.prototype.stroke`.
- */
-class StrokeRenderer3D extends PathRenderer3D {
-	constructor(renderer) {
-		super(renderer);
-
-		this.color = null;
-		this.lineRadius = null;
-
-		this.lineMeshCache = this.createMeshCache(
-			Polyhedron.fromCylinder(
-				new Line3D(
-					new Vector3(0, 0, 0),
-					new Vector3(0, 0, 1)
-				), 1
-			)
-		);
-		this.arrowHeadMeshCache = this.createMeshCache(
-			Polyhedron.fromCone(
-				new Line3D(
-					new Vector3(0, 0, 0),
-					new Vector3(0, 0, 1)
-				), 3
-			)
-		);
-
-		this.clear();
-	}
-	createMaterial(color) {
-		return new SimpleMaterial({ albedo: color });
-	}
-	setup(color, lineWidth = 1) {
-		super.setup(color);
-		this.lineRadius = lineWidth * 0.5;
-	}
-	/**
-	 * @group line/arrow
-	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
-	 * @signature
-	 * @param Vector3 a | The start of the line segment to draw
-	 * @param Vector3 b | The end of the line segment to draw
-	 * @signature
-	 * @param Line3D line | The line segment to draw
-	 */
-	line(a, b, arrow = false) {
-		if (a instanceof Line3D) ({ a, b } = a);
-		
-		const transform = this.renderer.matrix4Pool.alloc();
-		
-		const vector = b.minus(a);
-		const right = vector.normal.normalize().mul(this.lineRadius);
-		const up = vector.cross(right).normalize().mul(this.lineRadius);
-		const forward = vector;
-		
-		if (arrow) {
-			const arrowVector = vector.normalized.times(this.lineRadius * 8);
-			transform.setAxes(right, up, arrowVector, b.minus(arrowVector));
-
-			const arrowHeadMesh = this.arrowHeadMeshCache.getMesh(this.material);
-			this.renderer.mesh(arrowHeadMesh).at(transform);
-			
-			// move line back to arrow start
-			forward.sub(arrowVector);
-		}
-
-		transform.setAxes(right, up, forward, a);
-
-		const lineMesh = this.lineMeshCache.getMesh(this.material);
-		this.renderer.mesh(lineMesh).at(transform);
-
-	}
-	arrow(a, b) {
-		if (a instanceof Line3D) ({ a, b } = a);
-
-		this.line(a, b, true);
-	}
-	/**
-	 * Draws a 3D wireframe of a given polyhedron
-	 * @param Polyhedron polyhedron | The polyhedron to draw a 3D wireframe of
-	 */
-	shape(polyhedron) {
-		const edges = polyhedron.getEdges();
-		for (let i = 0; i < edges.length; i++)
-			this.line(edges[i]);
-	}
-}
-
 class StackAllocator {
 	constructor(Type) {
 		this.Type = Type;
@@ -314,9 +55,10 @@ class Artist3D extends Artist {
 
 		this.stateStack = [new Artist3D.State()];
 		this.currentStateIndex = 0;
-		this.lightObj = new LightRenderer(this);
-		this.meshObj = new MeshRenderer(this);
-		this.strokeObj = new StrokeRenderer3D(this);
+		this.lightObj = new Artist3D.LightRenderer(this);
+		this.meshObj = new Artist3D.MeshRenderer(this);
+		this.strokeObj = new Artist3D.StrokeRenderer(this);
+		this.drawObj = new Artist3D.DrawRenderer(this);
 		this.vector3Pool = new StackAllocator(Vector3);
 		this.matrix4Pool = new StackAllocator(Matrix4);
 		this.matrix4Pool.push();
@@ -551,10 +293,20 @@ class Artist3D extends Artist {
 	 * Returns an object with various methods for queueing lines and outlines to be rendered.
 	 * @param Color color | The color of the lines to be drawn
 	 * @param Number lineWidth? | The width of the lines to be drawn. Default is 1
+	 * @return StrokeRenderer3D
 	 */
 	stroke(color, lineWidth) {
 		this.strokeObj.setup(color, lineWidth);
 		return this.strokeObj;
+	}
+	/**
+	 * Returns an object with various methods for queuing solid shapes to be rendered.
+	 * @param Color color | The color of the shapes to be drawn
+	 * @return DrawRenderer3D
+	 */
+	draw(color) {
+		this.drawObj.setup(color);
+		return this.drawObj;
 	}
 	pass(meshes, visibility, shadowPass, setupMaterial) {
 		const { gl } = this;
@@ -1600,6 +1352,364 @@ Artist3D.PingPong = class {
 	}
 };
 
+/**
+ * @name class LightRenderer
+ * Provides a set of methods for creating different types of lights in a 3D scene.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.light`.
+ */
+Artist3D.LightRenderer = class LightRenderer {
+	constructor(renderer) {
+		this.renderer = renderer;
+		this.color = null;
+		this.queue = [];
+	}
+	get lights() {
+		return this.queue;
+	}
+	setup(color = Color.WHITE) {
+		this.color = color.get();
+	}
+	clear() {
+		this.queue = [];
+	}
+	/**
+	 * Queues an ambient light to be rendered.
+	 * This light will affect all objects from all sides equally.
+	 */
+	ambient() {
+		this.queue.push({
+			color: this.color,
+			type: Artist3D.LightRenderer.Types.AMBIENT
+		});
+	}
+	/**
+	 * Queues an ambient light to be rendered.
+	 * This light will affect all objects outwards from a specific source.
+	 * @param Vector3 position | The location of the point light
+	 */
+	point(position) {
+		const { transform } = this.renderer;
+		this.queue.push({
+			color: this.color,
+			type: Artist3D.LightRenderer.Types.POINT,
+			position: transform.times(position)
+		});
+	}
+	/**
+	 * Queues a directional light to be rendered.
+	 * This light emits parallel rays from an infinite distance in a given direction.
+	 * @param Vector3 direction | The direction of the light
+	 * @param Boolean shadow? | Whether the light casts shadows. Default is true
+	 */
+	directional(direction, shadow = true) {
+		const { transform } = this.renderer;
+		this.queue.push({
+			color: this.color, shadow,
+			type: Artist3D.LightRenderer.Types.DIRECTIONAL,
+			direction: Matrix3.normal(transform).times(direction)
+		});
+	}
+
+	static Types = Object.fromEntries(["AMBIENT", "DIRECTIONAL", "POINT"].map((n, i) => [n, i]));
+};
+
+/**
+ * @name class MeshRenderer
+ * Provides a set of methods for rendering meshes in various ways in a scene.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.mesh`.
+ */
+Artist3D.MeshRenderer = class MeshRenderer {
+	constructor(renderer) {
+		this.renderer = renderer;
+		this.mesh = null;
+		this.clear();
+	}
+	get meshes() {
+		const result = [];
+		for (const [mesh, { transforms, castShadows }] of this.queue)
+			result.push({ mesh, transforms, castShadows });
+		return result;
+	}
+	setup(mesh) {
+		this.mesh = mesh;
+	}
+	clear() {
+		this.queue = new Map();
+	}
+	enqueue(transform, castShadows = true) {
+		const { mesh } = this;
+		let meshData = this.queue.get(mesh);
+		if (!meshData) {
+			meshData = { transforms: [], castShadows: false };
+			this.queue.set(mesh, meshData);
+		}
+		meshData.castShadows ||= castShadows;
+		meshData.transforms.push(transform);
+	}
+	/**
+	 * Renders the current mesh at the current transform origin.
+	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
+	 */
+	default(castShadows) {
+		const matrix = this.renderer.matrix4Pool.alloc();
+		this.enqueue(this.renderer.state.transform.get(matrix), castShadows);
+	}
+	/**
+	 * Renders the current mesh at a given transform relative to the current transform.
+	 * @param Matrix4 transform | The transform at which the mesh will be rendered
+	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
+	 */
+	at(transform, castShadows) {
+		const matrix = this.renderer.matrix4Pool.alloc();
+		this.enqueue(this.renderer.state.transform.times(transform, matrix), castShadows);
+	}
+	/**
+	 * Renders the current mesh at a variety of different transforms relative to the current transform.
+	 * @param Matrix4[] transforms | The transformations to use for each instance
+	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
+	 */
+	instance(transforms, castShadows) {
+		for (const transform of transforms)
+			this.at(transform, castShadows);
+	}
+};
+
+Artist3D.PathRenderer = class PathRenderer {
+	static MeshCache = class MeshCache {
+		constructor(polyhedron, config) {
+			this.polyhedron = polyhedron;
+			this.meshes = [];
+			this.materialToIndex = new Map();
+			this.config = config;
+			this.clear();
+		}
+		getMesh(material) {
+			if (!this.materialToIndex.has(material)) {
+				if (this.nextIndex >= this.meshes.length) {
+					this.meshes.push(Mesh.fromPolyhedron(this.polyhedron, material, this.config));	
+				} else {
+					this.meshes[this.nextIndex].chunks[0].material = material;
+				}
+				this.materialToIndex.set(material, this.nextIndex);
+				this.nextIndex++;
+			}
+		
+			return this.meshes[this.materialToIndex.get(material)];
+		}
+		clear() {
+			this.materialToIndex.clear();
+			this.nextIndex = 0;
+		}
+	};
+	constructor(renderer) {
+		this.renderer = renderer;
+		this.materialCache = new Map();
+		this.meshCaches = [];
+	}
+	setup(color) {
+		this.color = color.get();
+		const { hex } = color;
+		if (!this.materialCache.has(hex))
+			this.materialCache.set(hex, this.createMaterial(color));
+		this.material = this.materialCache.get(hex);
+	}
+	createMeshCache(polyhedron, config) {
+		const cache = new Artist3D.PathRenderer.MeshCache(polyhedron, config);
+		this.meshCaches.push(cache);
+		return cache;
+	}
+	clear() {
+		this.materialCache.clear();
+		for (let i = 0; i < this.meshCaches.length; i++)
+			this.meshCaches[i].clear();
+	}
+};
+
+/**
+ * @name class DrawRenderer3D
+ * Provides a set of methods for rendering solid shapes in three dimensions.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.draw`.
+ */
+Artist3D.DrawRenderer = class DrawRenderer extends Artist3D.PathRenderer {
+	static MAX_CACHED_POLYHEDRA = 128;
+	constructor(renderer) {
+		super(renderer);
+		
+		this.color = null;
+
+		this.sphereMeshCache = this.createMeshCache(
+			Polyhedron.fromSphere(new Sphere(Vector3.zero, 1), 16),
+			{ smooth: true }
+		);
+
+		this.prismMeshCache = this.createMeshCache(new Prism(
+			Vector3.zero, new Vector3(1)
+		));
+
+		this.polyhedronMeshCache = new Map();
+	}
+	createMaterial(color) {
+		return new SimpleMaterial({ albedo: color });
+	}
+	/**
+	 * Renders a sphere in a solid color.
+	 * @signature
+	 * @param Vector3 center | The center of the sphere
+	 * @param Number radius | The radius of the sphere
+	 * @signature
+	 * @param Sphere sphere | The sphere to render
+	 */
+	sphere(position, radius) {
+		if (position instanceof Sphere)
+			({ position, radius } = position);
+
+		const transform = this.renderer.matrix4Pool.alloc();
+		Matrix4.scale(radius, radius, radius, transform);
+		transform[12] = position.x;
+		transform[13] = position.y;
+		transform[14] = position.z;
+
+		const mesh = this.sphereMeshCache.getMesh(this.material);
+		this.renderer.mesh(mesh).at(transform);
+	}
+	/**
+	 * Renders a rectangular Prism in a solid color.
+	 * @signature
+	 * @param Vector3 min | The back-top-left corner of the rectangular prism
+	 * @param Vector3 max | The front-bottom-right corner of the rectangular prism
+	 * @signature
+	 * @param Prism prism | The rectangular prism to render
+	 */
+	prism(min, max) {
+		if (min instanceof Prism)
+			({ min, max } = min);
+
+		const transform = this.renderer.matrix4Pool.alloc();
+		Matrix4.scale(
+			max.x - min.x,
+			max.y - min.y,
+			max.z - min.z,
+			transform
+		);
+		transform[12] = min.x;
+		transform[13] = min.y;
+		transform[14] = min.z;
+
+		const mesh = this.prismMeshCache.getMesh(this.material);
+		this.renderer.mesh(mesh).at(transform);
+	}
+	/**
+	 * Renders an arbitrary Polyhedron in a solid color.
+	 * @param Polyhedron poly | The Polyhedron to render
+	 */
+	shape(polyhedron) {
+		if (!this.polyhedronMeshCache.has(polyhedron)) {
+			if (this.polyhedronMeshCache.size > Artist3D.MAX_CACHED_POLYHEDRA) {
+				const anyKey = this.polyhedronMeshCache[Symbol.iterator]().next().value[0];
+				this.polyhedronMeshCache.delete(anyKey);
+			}
+			this.polyhedronMeshCache.set(polyhedron, new Map());
+		}
+
+		const specificCache = this.polyhedronMeshCache.get(polyhedron);
+		const { hex } = this.color;
+		if (!specificCache.has(hex))
+			specificCache.set(hex, Mesh.fromPolyhedron(polyhedron, this.material));
+		
+		const mesh = specificCache.get(hex);
+		this.renderer.mesh(mesh).default();
+	}
+};
+
+/**
+ * @name class StrokeRenderer3D
+ * Provides a set of methods for rendering lines and outlines in various ways in three dimensions.
+ * This class should not be constructed, and should be accessed via `Artist3D.prototype.stroke`.
+ */
+Artist3D.StrokeRenderer = class StrokeRenderer extends Artist3D.PathRenderer {
+	constructor(renderer) {
+		super(renderer);
+
+		this.color = null;
+		this.lineRadius = null;
+
+		this.lineMeshCache = this.createMeshCache(
+			Polyhedron.fromCylinder(
+				new Line3D(
+					new Vector3(0, 0, 0),
+					new Vector3(0, 0, 1)
+				), 1
+			)
+		);
+		this.arrowHeadMeshCache = this.createMeshCache(
+			Polyhedron.fromCone(
+				new Line3D(
+					new Vector3(0, 0, 0),
+					new Vector3(0, 0, 1)
+				), 3
+			)
+		);
+
+		this.clear();
+	}
+	createMaterial(color) {
+		return new SimpleMaterial({ albedo: color });
+	}
+	setup(color, lineWidth = 1) {
+		super.setup(color);
+		this.lineRadius = lineWidth * 0.5;
+	}
+	/**
+	 * @group line/arrow
+	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
+	 * @signature
+	 * @param Vector3 a | The start of the line segment to draw
+	 * @param Vector3 b | The end of the line segment to draw
+	 * @signature
+	 * @param Line3D line | The line segment to draw
+	 */
+	line(a, b, arrow = false) {
+		if (a instanceof Line3D) ({ a, b } = a);
+		
+		const transform = this.renderer.matrix4Pool.alloc();
+		
+		const vector = b.minus(a);
+		const right = vector.normal.normalize().mul(this.lineRadius);
+		const up = vector.cross(right).normalize().mul(this.lineRadius);
+		const forward = vector;
+		
+		if (arrow) {
+			const arrowVector = vector.normalized.times(this.lineRadius * 8);
+			transform.setAxes(right, up, arrowVector, b.minus(arrowVector));
+
+			const arrowHeadMesh = this.arrowHeadMeshCache.getMesh(this.material);
+			this.renderer.mesh(arrowHeadMesh).at(transform);
+			
+			// move line back to arrow start
+			forward.sub(arrowVector);
+		}
+
+		transform.setAxes(right, up, forward, a);
+
+		const lineMesh = this.lineMeshCache.getMesh(this.material);
+		this.renderer.mesh(lineMesh).at(transform);
+	}
+	arrow(a, b) {
+		if (a instanceof Line3D) ({ a, b } = a);
+
+		this.line(a, b, true);
+	}
+	/**
+	 * Draws a 3D wireframe of a given polyhedron
+	 * @param Polyhedron polyhedron | The polyhedron to draw a 3D wireframe of
+	 */
+	shape(polyhedron) {
+		const edges = polyhedron.getEdges();
+		for (let i = 0; i < edges.length; i++)
+			this.line(edges[i]);
+	}
+};
+
 Artist3D.CAMERA = `
 	struct Camera {
 		vec3 position;
@@ -1622,7 +1732,7 @@ Artist3D.LIGHTS = `
 		int shadowIndex;
 	};
 
-	${Object.entries(LightRenderer.Types).map(([n, i]) => `#define ${n} ${i}`).join("\n")}
+	${Object.entries(Artist3D.LightRenderer.Types).map(([n, i]) => `#define ${n} ${i}`).join("\n")}
 	#define MAX_LIGHTS ${Artist3D.MAX_LIGHTS}
 	#define MAX_SHADOWS ${Artist3D.MAX_SHADOWS}
 	#define SHADOW_CASCADE ${Artist3D.SHADOW_CASCADE}

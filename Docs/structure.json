@@ -94,7 +94,9 @@
 				],
 				"Renderers": [
 					"MeshRenderer",
-					"LightRenderer"
+					"LightRenderer",
+					"StrokeRenderer3D",
+					"DrawRenderer3D"
 				]
 			}
 		},
