@@ -1182,7 +1182,7 @@ Artist3D.Bloom = class extends Artist3D.PostProcess {
 
 		vec4 shader() {
 			vec4 color = texture(colorTexture, uv);
-			if (color.r >= 1.0 || color.g >= 1.0 || color.b >= 1.0)
+			if (color.r > 1.0 || color.g > 1.0 || color.b > 1.0)
 				return color;
 			return vec4(0);
 		}
