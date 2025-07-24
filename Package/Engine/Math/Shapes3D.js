@@ -1002,15 +1002,13 @@ class Plane extends Shape3D {
 		return result;
 	}
 	closestPointTo(point) {
-		return point.minus(this.normal.times(
-			point.dot(this.normal) - this.distance
-		));
+		return point.minus(this.normal.times(this.signedDist(point)));
 	}
 	containsPoint(point) {
 		return point.dot(this.normal).equals(this.distance);
 	}
 	distanceTo(point) {
-		return Math.abs(point.dot(this.normal) - this.distance);
+		return Math.abs(this.signedDist(point));
 	}
 	intersectSameType(plane) {
 		return !plane.normal.equals(this.normal) || this.distance.equals(plane.distance);
@@ -1022,7 +1020,7 @@ class Plane extends Shape3D {
 		return new Plane(normal, distance);
 	}
 	rayCast(ro, rd) {
-		const side = this.normal.dot(ro) - this.distance;
+		const side = this.signedDist(ro);
 		const dot = -this.normal.dot(rd);
 		const t = side / dot;
 		return t > Vector3.EPSILON ? t : Infinity;
@@ -1092,7 +1090,7 @@ class Frustum extends Polyhedron {
 	cullSphere(sphere) {
 		for (let i = 0; i < this.planes.length; i++) {
 			const plane = this.planes[i];
-			if (sphere.position.dot(plane.normal) - plane.distance > sphere.radius)
+			if (plane.signedDist(sphere.position) > sphere.radius)
 				return true;
 		}
 		return false;
@@ -1100,7 +1098,7 @@ class Frustum extends Polyhedron {
 	cullPoint(point) {
 		for (let i = 0; i < this.planes.length; i++) {
 			const plane = this.planes[i];
-			if (point.dot(plane.normal) > plane.distance)
+			if (plane.signedDist(point) > 0)
 				return true;
 		}
 		return false;
