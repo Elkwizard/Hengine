@@ -118,10 +118,10 @@ class Geometry {
 	 * @return Vector2[][3]
 	 */
 	static triangulate(shape) {
-		let vertices = shape.vertices;
-		const result = [];
+		const { vertices } = shape;
 		if (vertices.length < 3) return [];
 		if (vertices.length === 3) return [[vertices[0], vertices[1], vertices[2]]];
+		const result = [];
 		for (let i = 0; i < vertices.length / 2; i++) {
 			let a = vertices[vertices.length - 1 - i];
 			let b = i ? vertices[vertices.length - i] : vertices[0];
@@ -145,7 +145,7 @@ class Geometry {
 			let b = vertices[(i + 1) % length];
 			signedArea += (b.x - a.x) * (a.y + b.y);
 		}
-		return signedArea < 0;;
+		return signedArea < 0;
 	}
 	/**
 	 * Combines a set of grid-aligned squares into the minimum number of rectangles occupying the same space.

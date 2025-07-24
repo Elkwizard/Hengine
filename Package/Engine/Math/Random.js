@@ -162,8 +162,13 @@ class Random {
 	 * @return Vector3
 	 */
 	sphere(radius = 1) {
-		const halfPi = Math.PI / 2;
-		return Vector3.polar(this.angle(), this.range(-halfPi, halfPi), radius);
+		const vec = new Vector3(
+			this.normalZ(),
+			this.normalZ(),
+			this.normalZ()
+		);
+		vec.mag = radius;
+		return vec;
 	}
 	/**
 	 * Returns a random point on the surface of a hemisphere centered at the origin and facing in a given direction.
@@ -185,14 +190,13 @@ class Random {
 	inShape(region) {
 		if (region instanceof Shape2D) {
 			if (region instanceof Circle)
-				return this.circle(region.radius)
-					.mul(Math.sqrt(this.random()))
-					.add(region.middle);
+				return this.circle(region.radius * Math.sqrt(this.random()))
+					.add(region.position);
 
 			if (region instanceof Rect)
 				return new Vector2(
-					Random.range(region.x, region.x + region.width),
-					Random.range(region.y, region.y + region.height)
+					this.range(region.x, region.x + region.width),
+					this.range(region.y, region.y + region.height)
 				);
 
 			if (region instanceof Polygon) {
@@ -201,9 +205,9 @@ class Random {
 					.map(([a, b, c]) => Math.abs(
 						(b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
 					));
-				const [a, b, c] = Random.choice(triangles, areas);
-				let px = Random.range(0, 1);
-				let py = Random.range(0, 1);
+				const [a, b, c] = this.choice(triangles, areas);
+				let px = this.random();
+				let py = this.random();
 				if (py > 1 - px) {
 					px = 1 - px;
 					py = 1 - py;
@@ -214,9 +218,48 @@ class Random {
 			}
 		} else {
 			if (region instanceof Sphere)
-				return this.sphere(region.radius)
-					.mul(Math.cbrt(this.random()))
-					.add(region.middle);
+				return this.sphere(region.radius * Math.cbrt(this.random()))
+					.add(region.position);
+
+			if (region instanceof Prism) {
+				const { min, max } = region;
+				return new Vector3(
+					this.range(min.x, max.x),
+					this.range(min.y, max.y),
+					this.range(min.z, max.z)
+				);
+			}
+
+			if (region instanceof Polyhedron) {
+				const bounds = region.getBoundingBox();
+				const planes = region.getPlanes();
+				pointLoop: while (true) {
+					const point = this.inShape(bounds);
+					for (let i = 0; i < planes.length; i++) {
+						const plane = planes[i];
+						if (plane.signedDist(point) > 0)
+							continue pointLoop;
+					}
+					return point;
+				}
+			}
+
+			if (region instanceof Capsule) {
+				const { axis: { length, vector, a, b } } = region;
+				const capVolume = 4/3 * region.radius;
+				const primaryVolume = length;
+				if (this.bool(capVolume / (capVolume + primaryVolume))) {
+					const point = this.sphere(region.radius * Math.cbrt(this.random()));
+					return point.add(point.dot(vector) < 0 ? a : b);
+				} else {
+					const xAxis = vector.normal.normalize();
+					const yAxis = vector.cross(xAxis).normalize();
+					const { x, y } = this.circle(region.radius * Math.sqrt(this.random()));
+					return this.inShape(region.axis)
+						.add(xAxis.times(x))
+						.add(yAxis.times(y));
+				}
+			}
 		}
 
 		if (region instanceof Line || region instanceof Line3D)

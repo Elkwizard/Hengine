@@ -52,8 +52,8 @@ const objectUtils = {
 
 			copy(Object.getPrototypeOf(src), dst);
 		}
-		copy(parent, child); // static
 		copy(parent.prototype, child.prototype); // instance
+		copy(parent, child); // static
 	},
 	onChange(object, key, handler) {
 		let value = object[key];

@@ -3511,6 +3511,11 @@ declare class Polyhedron extends Shape3D {
 	 */
 	getFaces(): Triangle[];
 	/**
+	 * Returns a set of planes whose negative half-spaces intersection form the polyhedron.
+	 * This method has undefined behavior for a concave polyhedron.
+	 */
+	getPlanes(): Plane[];
+	/**
 	 * Subdivides each triangle in the polyhedron into a power of 4 number of additional triangles.
 	 * The subdivided mesh is a copy and is returned.
 	 * @param count - The power of 4 to multiply the triangle count by. Default is 1
@@ -3666,6 +3671,21 @@ declare class Plane extends Shape3D {
 	 * Creates a new plane.
 	 */
 	constructor();
+	/**
+	 * Returns the signed distance from the caller to a given point.
+	 * @param point - The point to find the signed distance to
+	 */
+	signedDist(point: Vector3): number;
+	/**
+	 * Reflects a point in-place about the caller and returns it.
+	 * @param point - The point to reflect
+	 */
+	reflect(point: Vector3): Vector3;
+	/**
+	 * Returns a copy of a point reflected about the caller.
+	 * @param point - The point to reflect
+	 */
+	reflected(point: Vector3): Vector3;
 }
 
 /**

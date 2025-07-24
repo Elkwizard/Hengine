@@ -378,7 +378,7 @@ class Polyhedron extends Shape3D {
 		if (this._edges === undefined) {
 			const edges = [];
 			
-			const { vertices, indices } = this;
+			const { vertices } = this;
 			
 			const found = vertices.map(() => new Set());
 			const addEdge = (i, j) => {
@@ -432,6 +432,14 @@ class Polyhedron extends Shape3D {
 	getFaces() {
 		return this._faces ??= Array.dim(this.faceCount)
 				.map((_, i) => this.getFace(i));
+	}
+	/**
+	 * Returns a set of planes whose negative half-spaces intersection form the polyhedron.
+	 * This method has undefined behavior for a concave polyhedron.
+	 * @return Plane[]
+	 */
+	getPlanes() {
+		return this.getFaces().map(face => face.plane);
 	}
 	getModel(transform) {
 		return new Polyhedron(
@@ -1019,6 +1027,30 @@ class Plane extends Shape3D {
 		const t = side / dot;
 		return t > Vector3.EPSILON ? t : Infinity;
 	}
+	/**
+	 * Returns the signed distance from the caller to a given point.
+	 * @param Vector3 point | The point to find the signed distance to
+	 * @return Number
+	 */
+	signedDist(point) {
+		return this.normal.dot(point) - this.distance;
+	}
+	/**
+	 * Reflects a point in-place about the caller and returns it.
+	 * @param Vector3 point | The point to reflect
+	 * @return Vector3
+	 */
+	reflect(point) {
+		return point.sub(this.normal.times(this.signedDist(point) * 2));
+	}
+	/**
+	 * Returns a copy of a point reflected about the caller.
+	 * @param Vector3 point | The point to reflect
+	 * @return Vector3
+	 */
+	reflected(point) {
+		return this.reflect(point.get());
+	}
 }
 
 /**
@@ -1175,6 +1207,9 @@ class Capsule extends Shape3D {
 			Math.PI * this.radius ** 2 * this.axis.length + // cylinder core
 			4 / 3 * Math.PI * this.radius ** 3 // spherical caps
 		);
+	}
+	get middle() {
+		return this.axis.middle;
 	}
 	get(result = new Capsule(new Line3D(Vector3.zero, Vector3.up), 0)) {
 		this.axis.get(result.axis);
