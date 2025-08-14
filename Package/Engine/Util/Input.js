@@ -115,9 +115,10 @@ class InputHandler {
 			});
 		};
 	}
+
+	static OR = true;
+	static AND = false;
 }
-InputHandler.OR = true;
-InputHandler.AND = false;
 InputHandler.addChecks({
 	pressed: InputHandler.OR,
 	justPressed: InputHandler.OR,

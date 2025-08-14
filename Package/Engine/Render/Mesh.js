@@ -227,6 +227,58 @@ class Mesh extends Renderable {
 		return new Polyhedron(vertices, indices);
 	}
 	/**
+	 * Downloads the mesh as an `.obj` file, without materials.
+	 * @param String name | The pre-extension part of the downloaded file's name
+	 */
+	download(name) {
+		const lines = [];
+
+		const { data, stride } = this;
+
+		const exportAttribute = (name, objName) => {
+			const offset = this.offsets.get(name);
+			if (offset === null) return false;
+			const { size } = Mesh.ATTRIBUTES[name];
+
+			for (let i = offset; i < data.length; i += stride) {
+				let line = objName;
+				for (let j = 0; j < size; j++)
+					line += ` ${data[i + j]}`;
+				lines.push(line);
+			}
+
+			return true;
+		};
+		
+		const hasPosition = exportAttribute("vertexPosition", "v");
+		const hasNormal = exportAttribute("vertexNormal", "vn");
+		const hasUV = exportAttribute("vertexUV", "vt");
+
+		const vertexEncodings = Array.dim(data.length / stride).map((_, i) => {
+			i++;
+			let result = "";
+			if (hasPosition) result += i;
+			result += "/";
+			if (hasNormal) result += i;
+			result += "/";
+			if (hasUV) result += i;
+			return result;
+		});
+
+		for (let i = 0; i < this.chunks.length; i++) {
+			lines.push(`g chunk_${i}`);
+			const { indices } = this.chunks[i];
+			for (let j = 0; j < indices.length; j += 3) {
+				const a = vertexEncodings[indices[j + 0]];
+				const b = vertexEncodings[indices[j + 1]];
+				const c = vertexEncodings[indices[j + 2]];
+				lines.push(`f ${a} ${b} ${c}`);
+			}
+		}
+
+		return lines.join("\n").download(name, "obj");
+	}
+	/**
 	 * Creates a new mesh from a Shape3D, inferring many settings to produce generally acceptable results.
 	 * @param Shape3D shape | The shape to create a mesh for
 	 * @param Material material? | The material to use for the mesh. Default is `Material.DEFAULT`
@@ -437,21 +489,22 @@ class Mesh extends Renderable {
 		}
 		return { stride, offsets };
 	}
+
+	static ATTRIBUTES = {
+		vertexPosition: {
+			size: 3,
+			type: Vector3
+		},
+		vertexNormal: {
+			size: 3,
+			type: Vector3
+		},
+		vertexUV: {
+			size: 2,
+			type: Vector2
+		},
+	};
 }
-Mesh.ATTRIBUTES = {
-	vertexPosition: {
-		size: 3,
-		type: Vector3
-	},
-	vertexNormal: {
-		size: 3,
-		type: Vector3
-	},
-	vertexUV: {
-		size: 2,
-		type: Vector2
-	},
-};
 
 /**
  * Represents the faces of a piece of a 3D Mesh with a single material.

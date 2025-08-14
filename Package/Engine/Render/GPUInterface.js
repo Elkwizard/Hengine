@@ -422,14 +422,15 @@ class GPUDataTexture {
 
 		return this.texture;
 	}
+	
+	static TypedArray = Uint32Array;
+	static INTERNAL_FORMAT = "RGBA32UI";
+	static FORMAT = "RGBA_INTEGER";
+	static TYPE = "UNSIGNED_INT";
+	static CHANNEL_BYTES = GPUDataTexture.TypedArray.BYTES_PER_ELEMENT;
+	static PIXEL_BYTES = GPUDataTexture.CHANNEL_BYTES * 4;
+	static LITTLE_ENDIAN = !!new Uint8Array(new Uint32Array([1]).buffer)[0];
 }
-GPUDataTexture.TypedArray = Uint32Array;
-GPUDataTexture.INTERNAL_FORMAT = "RGBA32UI";
-GPUDataTexture.FORMAT = "RGBA_INTEGER";
-GPUDataTexture.TYPE = "UNSIGNED_INT";
-GPUDataTexture.CHANNEL_BYTES = GPUDataTexture.TypedArray.BYTES_PER_ELEMENT;
-GPUDataTexture.PIXEL_BYTES = GPUDataTexture.CHANNEL_BYTES * 4;
-GPUDataTexture.LITTLE_ENDIAN = !!new Uint8Array(new Uint32Array([1]).buffer)[0];
 
 /**
  * Represents an array of GLSL structs.
