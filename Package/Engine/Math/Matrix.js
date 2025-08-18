@@ -307,8 +307,24 @@ class Matrix extends Float64Array {
 		const scaling = this.scale(scale);
 		return translation.times(scaling, result);
 	}
+	static scaleSome(axes, unused) {
+		const result = axes.last instanceof this ? this.identity(axes.pop()) : new this();
+
+		const { size } = this;
+		const count = size - unused;
+
+		if (axes[0] instanceof Vector) axes = axes[0].values;
+
+		for (let i = 0; i < count; i++)
+			result[i * size + i] = axes[i] ?? axes[0];
+		
+		return result;
+	}
 	/**
-	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * @group scale, scaleAll
+	 * Creates a scaling matrix and optionally stores it in a provided destination.
+	 * If `scale()` is called, the matrix will be homogenous and will scale N - 1 dimensional vectors.
+	 * If `scaleAll()` is called, the matrix will be non-homogenous and will scale N dimensional vectors. 
 	 * @signature
 	 * @param Number scale | The scale factor along every axis
 	 * @param Matrix result? | The matrix to copy the scaling matrix into
@@ -321,22 +337,10 @@ class Matrix extends Float64Array {
 	 * @return Matrix
 	 */
 	static scale(...axes) {
-		const result = axes.last instanceof this ? this.identity(axes.pop()) : new this();
-
-		const { size } = this;
-		const count = size - 1;
-
-		const first = axes[0];
-		if (axes.length === 1) {
-			if (typeof first === "number")
-				axes = new Array(count).fill(first);
-			else if (first instanceof Vector)
-				axes = first.values;
-		}
-
-		for (let i = 0; i < count; i++)
-			result[i * size + i] = axes[i];
-		return result;
+		return this.scaleSome(axes, 1);
+	}
+	static scaleAll(...axes) {
+		return this.scaleSome(axes, 0);
 	}
 	/**
 	 * Creates a N - 1 dimensional homogenous translation matrix and optionally stores it in a provided destination.
