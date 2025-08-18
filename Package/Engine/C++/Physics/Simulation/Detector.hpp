@@ -185,10 +185,10 @@ API class Detector {
 			for (int i = 0; i < a.vertices.size(); i++)
 				clipVertex(contacts, a.vertices[i], b, collisionPlaneB);
 
+			for (int i = 0; i < b.vertices.size(); i++)
+				clipVertex(contacts, b.vertices[i], a, collisionPlaneA);
+			
 			if (contacts.empty()) {
-				for (int i = 0; i < b.vertices.size(); i++)
-					clipVertex(contacts, b.vertices[i], a, collisionPlaneA);
-		
 #if IS_3D
 				if (contacts.empty()) {
 					for (int i = 0; i < a.getEdgeCount() && contacts.empty(); i++)
