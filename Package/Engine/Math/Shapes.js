@@ -643,6 +643,15 @@ class Rect extends Polygon {
 	cullPoint(point) {
 		return !this.containsPoint(point);
 	}
+	cullBall(circle) {
+		const { radius } = circle;
+		const cx = circle.position.x - this.x;
+		const cy = circle.position.y - this.y;
+		return	cx < -radius ||
+				cy < -radius ||
+				cx > this.width + radius ||
+				cy > this.height + radius;
+	}
 	move(dir) {
 		return new Rect(
 			this.x + dir.x, this.y + dir.y,

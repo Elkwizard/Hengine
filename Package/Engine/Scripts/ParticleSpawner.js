@@ -2,8 +2,9 @@
  * @name class Particle
  * Every instance of PARTICLE_SPAWNER has a `.Particle` member class with an identical structure.
  * This represents a single particle in a particle system.
- * @prop Vector2 position | The World-Space position of the particle
- * @prop Vector2 velocity | The velocity per frame of the particle
+ * The Vector type used for `.position` and `.velocity` is of the same dimension as the particle spawner. 
+ * @prop Vector position | The World-Space position of the particle
+ * @prop Vector velocity | The velocity per frame of the particle
  * @prop Number timer | The proportion of the particle's lifespan that has elapsed. Setting this to 1 will remove the particle
  * @prop Object data | This object is not used by the engine, and can be modified in any way to represent particle-specific data
  * @prop PARTICLE_SPAWNER spawner | The particle system that created the particle
@@ -33,7 +34,7 @@
  * The function that is called to update particles each frame.
  * Since this function is not culled, all non-rendering logic should be here.
  * This property may instead be a String containing the source code for a GPUComputation that outputs a struct matching any inclusive subset of the structure of a Particle in the system. The source code also must include a `particles[]` uniform whose type is the same as the output of the computation. This uniform will reflect the state of the particles in the system.
- * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way.
+ * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way, including timer changes. For particles to disappear when using a custom update computation, the timer property must be manually changed by the provided `float timerIncrement` uniform.
  * Setting this property to a function will remove the computation.
  * @param Particle particle | The particle being updated
  */
@@ -74,6 +75,9 @@
  * @prop Number radius | The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10
  */
 class PARTICLE_SPAWNER extends ElementScript {
+	static images = { };
+	static anyParticlesRendered = false;
+
 	/**
 	 * Makes an object a particle system.
 	 * @param SpawnerProperties properties | The settings to specify on the spawner. Those not specified will retain their default values
@@ -84,22 +88,26 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.camera = this.scene.camera;
 		this.canvas = obj.renderer.imageType;
 		this.physicsEngine = this.scene.physicsEngine;
+		
+		// dimensionality
+		this.is3d = IS_3D && !(obj instanceof UIObject);
+		this.Vector = this.is3d ? Vector3 : Vector2;
 
 		this.particles = [];
 		this.setProperties(properties);
 		this.Particle = class Particle {
 			constructor(position, spawner) {
 				this.position = position;
-				this.velocity = Vector2.zero;
+				this.velocity = spawner.Vector.zero;
 				this.timer = 0;
 				this.data = {};
 				this.spawner = spawner;
 			}
 			update() {
 				const self = this.spawner;
-				if (self.falls) this.velocity.Vadd(self.physicsEngine.gravity);
-				if (self.slows) this.velocity.Nmul(1 - self.physicsEngine.drag);
-				this.position.Vadd(this.velocity);
+				if (self.falls) this.velocity.add(self.physicsEngine.gravity);
+				if (self.slows) this.velocity.mul(1 - self.physicsEngine.drag);
+				this.position.add(this.velocity);
 				self.particleUpdate(this);
 			}
 		};
@@ -113,9 +121,13 @@ class PARTICLE_SPAWNER extends ElementScript {
 	 */
 	set particleCount(count) {
 		if (count === this.particles.length) return;
-		if (count < this.particles.length)
+		if (count < this.particles.length) {
 			this.particles.length = count;
-		else this.explode(count - this.particles.length);
+			if (this.computation)
+				this.computation.getUniform("particles").set(this.particles);
+		} else {
+			this.explode(count - this.particles.length);
+		}
 	}
 	/**
 	 * Returns the current number of particles in the system.
@@ -144,13 +156,12 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.lifeSpan = p.lifeSpan ?? this.lifeSpan ?? 100;
 		this.delay = p.delay ?? this.delay ?? 1;
 		const imageType = p.imageType ?? this.frame?.constructor ?? FastFrame;
-		this.separateFrame = imageType !== CanvasImage;
+		this.separateFrame = imageType !== CanvasImage && !this.is3d;
 		if (this.separateFrame) {
-			PARTICLE_SPAWNER[imageType.name] ??= new imageType(
+			this.frame = PARTICLE_SPAWNER.images[imageType.name] ??= new imageType(
 				this.canvas.width, this.canvas.height,
 				this.canvas.pixelRatio
 			);
-			this.frame = PARTICLE_SPAWNER[imageType.name];
 			this.gl = this.frame.renderer;
 		} else {
 			this.frame = this.canvas;
@@ -164,7 +175,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 				this.particleUpdate = update;
 				this.computation = null;
 			} else {
-				this.computation = new GPUComputation(update);
+				this.computation = new GPUComputation(`uniform float timerIncrement;\n${update}`);
 				this.computation.output = this.computation.getUniform("particles");
 				this.computation.setUniform("particles", this.particles);
 			}
@@ -174,7 +185,6 @@ class PARTICLE_SPAWNER extends ElementScript {
 	}
 	addParticle(obj, position) {
 		const particle = new this.Particle(position, this);
-		particle.id = Math.random().toString(36).slice(2);
 		this.particleInit(particle);
 		if (particle.timer >= 1) return;
 		this.particles.push(particle);
@@ -182,7 +192,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 	/**
 	 * Creates a collection of particles at once.
 	 * @param Number count | The number of particles to create
-	 * @param Vector2 position? | The location to create the particles at. Default is the location of the spawner
+	 * @param Vector position? | The location to create the particles at. The dimension of this vector is the same as that of the spawner. Default is the location of the spawner
 	 */
 	explode(obj, count, position = obj.transform.position) {
 		const pos = position;
@@ -223,6 +233,8 @@ class PARTICLE_SPAWNER extends ElementScript {
 		const timerIncrement = 1 / this.lifeSpan;
 
 		let end = particles.length - 1;
+		if (this.computation)
+			this.computation.setUniform("timerIncrement", timerIncrement);
 
 		if (this.computation) {
 			const array = this.computation.getUniform("particles");
@@ -232,7 +244,6 @@ class PARTICLE_SPAWNER extends ElementScript {
 					array.write(particles, i, 1);
 					if (i > end) continue loop;
 				}
-				particles[i].timer += timerIncrement;
 			}
 		} else {
 			loop: for (let i = 0; i <= end; i++) {
@@ -255,17 +266,17 @@ class PARTICLE_SPAWNER extends ElementScript {
 	}
 	/**
 	 * Returns the smallest axis-aligned World-Space rectangle that contains all of the particles in the system.
-	 * @return Rect
+	 * @return Prism/Rect
 	 */
 	getBoundingBox(obj) {
 		const particlePositions = [];
 		for (const particle of this.particles) particlePositions.push(particle.position);
-		return Rect.bound(particlePositions);
+		return (this.is3d ? Prism : Rect).bound(particlePositions);
 	}
 	escapeDraw(obj) {
 		if (obj.hidden) return;
 
-		const { gl, frame, particles, radius } = this;
+		const { gl, frame, particles } = this;
 
 		if (this.separateFrame) {
 			frame.resize(this.canvas.width, this.canvas.height);
@@ -283,21 +294,19 @@ class PARTICLE_SPAWNER extends ElementScript {
 			bounds = this.camera.screen;
 		}
 
-		bounds = Rect.fromMinMax(
-			bounds.min.minus(radius),
-			bounds.max.plus(radius)
-		);
-
+		const particleBall = new  (this.is3d ? Sphere : Circle)(this.Vector.zero, this.radius);
+		
 		let anyParticlesRendered = false;
 
 		gl.save();
 
 		for (let i = 0; i < particles.length; i++) {
 			const p = particles[i];
-			if (bounds.containsPoint(p.position)) {
-				this.particleDraw(gl, p);
-				anyParticlesRendered = true;
-			}
+			p.position.get(particleBall.position);
+			if (bounds.cullBall(particleBall)) continue;
+			
+			this.particleDraw(gl, p);
+			anyParticlesRendered = true;
 		}
 
 		gl.restore();
@@ -324,6 +333,3 @@ class PARTICLE_SPAWNER extends ElementScript {
 		}
 	}
 }
-PARTICLE_SPAWNER.anyParticlesRendered = false;
-PARTICLE_SPAWNER.Frame = null;
-PARTICLE_SPAWNER.FastFrame = null;

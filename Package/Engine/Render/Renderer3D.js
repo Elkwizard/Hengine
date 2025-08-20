@@ -595,7 +595,7 @@ class Artist3D extends Artist {
 				for (let k = 0; k < instances.length; k++) {
 					const index = instances[k].visibilityIndex;
 					const bound = bounds[index];
-					const visible = !frustum.cullSphere(bound);
+					const visible = !frustum.cullBall(bound);
 					visibility[index] = visible;
 					visibilityCounts[index] += visible;
 				}

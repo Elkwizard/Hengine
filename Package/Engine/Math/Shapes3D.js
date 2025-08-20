@@ -1087,7 +1087,7 @@ class Frustum extends Polyhedron {
 		}
 		return false;
 	}
-	cullSphere(sphere) {
+	cullBall(sphere) {
 		for (let i = 0; i < this.planes.length; i++) {
 			const plane = this.planes[i];
 			if (plane.signedDist(sphere.position) > sphere.radius)

@@ -1505,23 +1505,53 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 */
 	static scaleAbout(scale: Vector | number, center: Vector, result?: Matrix): Matrix;
 	/**
-	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * Creates a scaling matrix and optionally stores it in a provided destination.
+	 * If `scale()` is called, the matrix will be homogenous and will scale N - 1 dimensional vectors.
+	 * If `scaleAll()` is called, the matrix will be non-homogenous and will scale N dimensional vectors.
 	 * @param scale - The scale factor along every axis
 	 * @param result - The matrix to copy the scaling matrix into
 	 */
-	static scale(scale: number, result?: Matrix): Matrix;
+	scale(scale: number, result?: this): this;
 	/**
-	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * Creates a scaling matrix and optionally stores it in a provided destination.
+	 * If `scale()` is called, the matrix will be homogenous and will scale N - 1 dimensional vectors.
+	 * If `scaleAll()` is called, the matrix will be non-homogenous and will scale N dimensional vectors.
 	 * @param axes - The scale factor along each of the axes
 	 * @param result - The matrix to copy the scaling matrix into
 	 */
-	static scale(...axes: number[], result?: Matrix): Matrix;
+	scale(...axes: number[], result?: this): this;
 	/**
-	 * Creates an N - 1 dimensional homogenous scaling matrix and optionally stores it in a provided destination.
+	 * Creates a scaling matrix and optionally stores it in a provided destination.
+	 * If `scale()` is called, the matrix will be homogenous and will scale N - 1 dimensional vectors.
+	 * If `scaleAll()` is called, the matrix will be non-homogenous and will scale N dimensional vectors.
 	 * @param vector - A vector where each component specifies the scale factor on its corresponding axis
 	 * @param result - The matrix to copy the scaling matrix into
 	 */
-	static scale(vector: Vector, result?: Matrix): Matrix;
+	scale(vector: Vector, result?: this): this;
+	/**
+	 * Creates a scaling matrix and optionally stores it in a provided destination.
+	 * If `scale()` is called, the matrix will be homogenous and will scale N - 1 dimensional vectors.
+	 * If `scaleAll()` is called, the matrix will be non-homogenous and will scale N dimensional vectors.
+	 * @param scale - The scale factor along every axis
+	 * @param result - The matrix to copy the scaling matrix into
+	 */
+	scaleAll(scale: number, result?: this): this;
+	/**
+	 * Creates a scaling matrix and optionally stores it in a provided destination.
+	 * If `scale()` is called, the matrix will be homogenous and will scale N - 1 dimensional vectors.
+	 * If `scaleAll()` is called, the matrix will be non-homogenous and will scale N dimensional vectors.
+	 * @param axes - The scale factor along each of the axes
+	 * @param result - The matrix to copy the scaling matrix into
+	 */
+	scaleAll(...axes: number[], result?: this): this;
+	/**
+	 * Creates a scaling matrix and optionally stores it in a provided destination.
+	 * If `scale()` is called, the matrix will be homogenous and will scale N - 1 dimensional vectors.
+	 * If `scaleAll()` is called, the matrix will be non-homogenous and will scale N dimensional vectors.
+	 * @param vector - A vector where each component specifies the scale factor on its corresponding axis
+	 * @param result - The matrix to copy the scaling matrix into
+	 */
+	scaleAll(vector: Vector, result?: this): this;
 	/**
 	 * Creates a N - 1 dimensional homogenous translation matrix and optionally stores it in a provided destination.
 	 * @param axes - The translation along each of the N - 1 axes
@@ -7149,6 +7179,11 @@ declare class Mesh extends Renderable {
 	 */
 	toPolyhedron(): Polyhedron;
 	/**
+	 * Downloads the mesh as an `.obj` file, without materials.
+	 * @param name - The pre-extension part of the downloaded file's name
+	 */
+	download(name: string): void;
+	/**
 	 * Creates a new mesh from a Shape3D, inferring many settings to produce generally acceptable results.
 	 * @param shape - The shape to create a mesh for
 	 * @param material - The material to use for the mesh. Default is `Material.DEFAULT`
@@ -7957,16 +7992,17 @@ declare class DRAGGABLE extends ElementScript {
 /**
  * Every instance of PARTICLE_SPAWNER has a `.Particle` member class with an identical structure.
  * This represents a single particle in a particle system.
+ * The Vector type used for `.position` and `.velocity` is of the same dimension as the particle spawner.
  */
 declare class Particle {
 	/**
 	 * The World-Space position of the particle
 	 */
-	position: Vector2;
+	position: Vector;
 	/**
 	 * The velocity per frame of the particle
 	 */
-	velocity: Vector2;
+	velocity: Vector;
 	/**
 	 * The proportion of the particle's lifespan that has elapsed. Setting this to 1 will remove the particle
 	 */
@@ -8022,7 +8058,7 @@ declare interface SpawnerProperties {
 	 * The function that is called to update particles each frame.
 	 * Since this function is not culled, all non-rendering logic should be here.
 	 * This property may instead be a String containing the source code for a GPUComputation that outputs a struct matching any inclusive subset of the structure of a Particle in the system. The source code also must include a `particles[]` uniform whose type is the same as the output of the computation. This uniform will reflect the state of the particles in the system.
-	 * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way.
+	 * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way, including timer changes. For particles to disappear when using a custom update computation, the timer property must be manually changed by the provided `float timerIncrement` uniform.
 	 * Setting this property to a function will remove the computation.
 	 * @param particle - The particle being updated
 	 */
@@ -8102,13 +8138,13 @@ declare class PARTICLE_SPAWNER extends ElementScript {
 	/**
 	 * Creates a collection of particles at once.
 	 * @param count - The number of particles to create
-	 * @param position - The location to create the particles at. Default is the location of the spawner
+	 * @param position - The location to create the particles at. The dimension of this vector is the same as that of the spawner. Default is the location of the spawner
 	 */
-	explode(count: number, position?: Vector2): void;
+	explode(count: number, position?: Vector): void;
 	/**
 	 * Returns the smallest axis-aligned World-Space rectangle that contains all of the particles in the system.
 	 */
-	getBoundingBox(): Rect;
+	getBoundingBox(): Prism | Rect;
 }
 
 /**
