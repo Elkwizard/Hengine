@@ -23,9 +23,9 @@ class Color extends Operable {
 	 * @param Number blue | The blue component of the color, on [0, 255]
 	 * @param Number alpha? | The alpha (opacity) component of the color, on [0, 1]. Default is 1
 	 */
-	constructor(r, g, b, a, constrained = false) {
+	constructor(r, g, b, a, constrained = true) {
 		super();
-		this.limited = true;
+		this.limited = constrained;
 		this.initialize(r, g, b, a);
 		if (!constrained) this.constrain();
 	}
@@ -91,7 +91,7 @@ class Color extends Operable {
 	 * @return Color
 	 */
 	get opaque() {
-		return new Color(this.red, this.green, this.blue, 1);
+		return new Color(this.red, this.green, this.blue, 1, this.limited);
 	}
 	/**
 	 * Returns the inverse of the caller, with the same alpha as the caller.
