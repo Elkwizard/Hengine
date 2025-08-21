@@ -47,7 +47,7 @@ API_TEMPLATE class VectorN {
 
 		explicit operator bool() const {
 			for (int i = 0; i < S; i++)
-				if (elements[i]) return true;
+				if (!equals(elements[i], 0)) return true;
 			return false;
 		}
 

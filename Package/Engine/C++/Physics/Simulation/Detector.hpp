@@ -165,7 +165,6 @@ API class Detector {
 			for (const Vector& axisB : b.edgeAxes) {
 				Vector axis = cross(axisA, axisB);
 				if (!axis) continue;
-
 				axis.normalize();
 				if (dot(axis, toB) < 0) axis = -axis;
 				if (checkAxis(a, b, axis, minOverlap, bestAxis))
