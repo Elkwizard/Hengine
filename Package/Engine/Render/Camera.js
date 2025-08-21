@@ -83,6 +83,16 @@ class Camera {
 		this.zoom *= factor;
 	}
 	/**
+	 * Smoothly moves the camera toward a new position value.
+	 * @param Vector point | The new position to move toward
+	 * @param Number ferocity | The degree to which the camera should move toward the new position, on [0, 1]
+	 */
+	moveTowards(point, ferocity = 0.1) {
+		const cameraPoint = this.position;
+		const diff = point.minus(cameraPoint).times(ferocity);
+		this.position = cameraPoint.plus(diff);
+	}
+	/**
 	 * Maps a given point from Camera-Space to World-Space.
 	 * @param Vector point | The point to transform
 	 * @return Vector
@@ -208,16 +218,6 @@ class Camera2D extends Matrix3 {
 	rotateTowards(rotation, ferocity = 0.1) {
 		const diff = Geometry.signedAngularDist(rotation, this.rotation);
 		this.rotation += diff * ferocity;
-	}
-	/**
-	 * Smoothly moves the camera toward a new position value.
-	 * @param Vector2 point | The new position to move toward
-	 * @param Number ferocity | The degree to which the camera should move toward the new position, on [0, 1]
-	 */
-	moveTowards(point, ferocity = 0.1) {
-		const cameraPoint = this.position;
-		const diff = point.Vminus(cameraPoint).Ntimes(ferocity);
-		this.position = cameraPoint.plus(diff);
 	}
 	/**
 	 * Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.

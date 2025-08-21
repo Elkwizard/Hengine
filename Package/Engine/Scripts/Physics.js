@@ -200,7 +200,7 @@ class PHYSICS extends ElementScript {
 		const { linear, orientation } = this.body.position;
 		obj.transform.position.toPhysicsVector(linear);
 		if (IS_3D) {
-			obj.transform.rotation.toPhysicsVector(orientation.rotation);
+			orientation.rotation = obj.transform.rotation.toPhysicsVector();
 		} else {
 			orientation.rotation = obj.transform.rotation;
 		}
