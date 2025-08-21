@@ -812,10 +812,10 @@ class Prism extends Polyhedron {
 		return this.xRange.length;
 	}
 	get height() {
-		return this.xRange.length;
+		return this.yRange.length;
 	}
 	get depth() {
-		return this.xRange.length;
+		return this.zRange.length;
 	}
 	get min() {
 		return new Vector3(this.xRange.min, this.yRange.min, this.zRange.min);
