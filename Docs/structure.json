@@ -175,6 +175,7 @@
 		"TEXT_AREA": null
 	},
 	"Physics": {
+		"PhysicsEngine": null,
 		"PHYSICS": null,
 		"Constraint": ["Constraint", "Constraint1", "Constraint2"],
 		"CollisionMonitor": ["CollisionMonitor", "CollisionData"]

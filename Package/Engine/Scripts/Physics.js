@@ -1,10 +1,10 @@
 Physics.onCollide = (a, b, direction, contacts, triggerA, triggerB) => {
 	a = PHYSICS.bodyToWorldObject.get(a.pointer);
 	
-	const { scene } = a.engine;
-	if (scene.collisionEvents) {
+	const { physics } = a.engine.scene;
+	if (physics.collisionEvents) {
 		b = PHYSICS.bodyToWorldObject.get(b.pointer);
-		scene.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
+		physics.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
 	}
 
 	contacts.delete();
@@ -57,7 +57,7 @@ class PHYSICS extends ElementScript {
 	init(obj, mobile) {
 		this.engine = obj.container.engine;
 		this.scene = this.engine.scene;
-		this.physicsEngine = this.scene.physicsEngine;
+		this.physicsEngine = this.scene.physics.physicsEngine;
 		
 		this.body = new Physics.RigidBody(mobile).solidify();
 		
@@ -77,14 +77,12 @@ class PHYSICS extends ElementScript {
 		if (IS_3D)
 			this._angularVelocity = ND.Vector.physicsProxy(body.velocity.orientation.rotation);
 		
-		objectUtils.shortcut(this, body, "simulated");
-		objectUtils.shortcut(this, body, "isTrigger");
-		objectUtils.shortcut(this, body, "canCollide");
-		objectUtils.shortcut(this, body, "canRotate");
-		objectUtils.shortcut(this, body, "gravity");
-		objectUtils.shortcut(this, body, "friction");
-		objectUtils.shortcut(this, body, "density");
 		objectUtils.shortcut(this, body, "airResistance", "drag");
+		objectUtils.proxyAccess(this, body, [
+			"simulated", "isTrigger", "canCollide",
+			"canRotate", "gravity", "friction",
+			"density"
+		]);
 		
 		this.beforePhysics();
 
@@ -103,11 +101,12 @@ class PHYSICS extends ElementScript {
 	 * @return Constraint[]
 	 */
 	get constraints() {
+		const { physics } = this.sceneObject.engine.scene;
 		const physicsConstraints = this.body.constraintDescriptors;
 		const constraints = [];
 		for (let i = 0; i < physicsConstraints.length; i++)
 			constraints.push(Constraint.fromPhysicsConstraint(
-				physicsConstraints.get(i), this.sceneObject.engine
+				physicsConstraints.get(i), physics
 			));
 
 		physicsConstraints.delete();

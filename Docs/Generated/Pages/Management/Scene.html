@@ -43,6 +43,15 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 			<span class="prop-attrs"></span>
 		</div>
 	
+		<div class="prop-wrapper" id="Scene.physics">
+			<div class="prop-header member">
+				<span class="prop-name">physics</span>
+				<span class="type"><a href="../Physics/PhysicsEngine.html#class PhysicsEngine">PhysicsEngine</a></span>
+			</div>
+			<div class="prop desc">The physics simulation used by <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a>-enabled <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> in the Scene</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
 		<div class="prop-wrapper" id="Scene.camera">
 			<div class="prop-header member">
 				<span class="prop-name">camera</span>
@@ -74,15 +83,6 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 			<span class="prop-attrs"></span>
 		</div>
 	
-		<div class="prop-wrapper" id="Scene.collisionEvents">
-			<div class="prop-header member">
-				<span class="prop-name">collisionEvents</span>
-				<span class="type">Boolean</span>
-			</div>
-			<div class="prop desc">Whether or not collision events will be detected</div>
-			<span class="prop-attrs"></span>
-		</div>
-	
 		<div class="prop-wrapper" id="Scene.updating">
 			<div class="prop-header member">
 				<span class="prop-name">updating</span>
@@ -106,69 +106,9 @@ for</span><span class="highlight-SYMBOL"> (</span><span class="highlight-KEYWORD
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="set Scene.prototype.gravity()">
-			<div class="function-header member">
-				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L46" target="_blank" class="function-name source-link">gravity</a>(<span class="param">gravity</span>)
-			</div>
-			<div class="function desc">
-				Sets the gravitational acceleration for the physics engine.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="set Scene.prototype.gravity():gravity">
-							<div class="param-name">
-								<span class="param">gravity</span>
-								<span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-							</div>
-							<div class="param desc">
-								The new gravitational acceleration
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="get Scene.prototype.gravity()">
-			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L54" target="_blank" class="function-name source-link">gravity</a><span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-			</div>
-			<div class="function desc">
-				Returns the current gravitational acceleration for the physics engine.
-This is initially <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">y</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0.4</span><span class="highlight-SYMBOL">)</span></code>.
-			</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="get Scene.prototype.constraints()">
-			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L61" target="_blank" class="function-name source-link">constraints</a><span class="type"><a href="../Physics/Constraint.html#class Constraint">Constraint</a>[]</span>
-			</div>
-			<div class="function desc">
-				Returns all the active constraints in the scene.
-			</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="Scene.prototype.rayCast()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L94" target="_blank" class="function-name source-link">rayCast</a>(<span class="param">rayOrigin</span>, <span class="param">rayDirection</span>, <span class="param">mask?</span>)<span class="type">{ hitShape: <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>, hitPoint: <span class="alias">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L56" target="_blank" class="function-name source-link">rayCast</a>(<span class="param">rayOrigin</span>, <span class="param">rayDirection</span>, <span class="param">mask?</span>)<span class="type">{ hitShape: <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>, hitPoint: <span class="alias">
 			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
 			<span class="alias general">VectorN</span>
@@ -229,7 +169,7 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 	
 		<div class="function-wrapper" id="Scene.prototype.collidePoint()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L128" target="_blank" class="function-name source-link">collidePoint</a>(<span class="param">point</span>)<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>[]</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L90" target="_blank" class="function-name source-link">collidePoint</a>(<span class="param">point</span>)<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>[]</span>
 			</div>
 			<div class="function desc">
 				Returns a list of all the <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> that contain a specific <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> point.
@@ -250,266 +190,6 @@ Otherwise returns an object with a <code class=" highlight-BACKGROUND"><span cla
 							</div>
 							<div class="param desc">
 								The <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> point to check
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Scene.prototype.constrainLength()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L148" target="_blank" class="function-name source-link">constrainLength</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">aOffset?</span>, <span class="param">bOffset?</span>, <span class="param">length?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint2">Constraint2</a></span>
-			</div>
-			<div class="function desc">
-				Creates a physical constraint that forces the distance between two points on two objects to remain constant.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Scene.prototype.constrainLength():a">
-							<div class="param-name">
-								<span class="param">a</span>
-								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
-							</div>
-							<div class="param desc">
-								The first object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainLength():b">
-							<div class="param-name">
-								<span class="param">b</span>
-								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
-							</div>
-							<div class="param desc">
-								The second object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainLength():aOffset?">
-							<div class="param-name">
-								<span class="param">aOffset</span>
-								<span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-							</div>
-							<div class="param desc">
-								The local a-space point where the constraint will attach to the first object. Default is no offset
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainLength():bOffset?">
-							<div class="param-name">
-								<span class="param">bOffset</span>
-								<span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-							</div>
-							<div class="param desc">
-								The local b-space point where the constraint will attach to the second object. Default is no offset
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainLength():length?">
-							<div class="param-name">
-								<span class="param">length</span>
-								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The distance to enforce between the two points. Default is the current distance between the constrained points
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Scene.prototype.constrainLengthToPoint()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L173" target="_blank" class="function-name source-link">constrainLengthToPoint</a>(<span class="param">object</span>, <span class="param">offset?</span>, <span class="param">point?</span>, <span class="param">length?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint1">Constraint1</a></span>
-			</div>
-			<div class="function desc">
-				Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():object">
-							<div class="param-name">
-								<span class="param">object</span>
-								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
-							</div>
-							<div class="param desc">
-								The object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():offset?">
-							<div class="param-name">
-								<span class="param">offset</span>
-								<span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-							</div>
-							<div class="param desc">
-								The local object-space point where the constraint will attach to the object. Default is no offset
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():point?">
-							<div class="param-name">
-								<span class="param">point</span>
-								<span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-							</div>
-							<div class="param desc">
-								The location to constrain the length to. Default is the current location of the constrained point
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainLengthToPoint():length?">
-							<div class="param-name">
-								<span class="param">length</span>
-								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
-							</div>
-							<div class="param desc">
-								The distance to enforce between the two points. Default is the current distance between the constrained points
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Scene.prototype.constrainPosition()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L186" target="_blank" class="function-name source-link">constrainPosition</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">aOffset?</span>, <span class="param">bOffset?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint2">Constraint2</a></span>
-			</div>
-			<div class="function desc">
-				Creates a physical constraint that forces two points on two objects to be in the same location.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Scene.prototype.constrainPosition():a">
-							<div class="param-name">
-								<span class="param">a</span>
-								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
-							</div>
-							<div class="param desc">
-								The first object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainPosition():b">
-							<div class="param-name">
-								<span class="param">b</span>
-								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
-							</div>
-							<div class="param desc">
-								The second object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainPosition():aOffset?">
-							<div class="param-name">
-								<span class="param">aOffset</span>
-								<span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-							</div>
-							<div class="param desc">
-								The local a-space point where the constraint will attach to the first object. Default is no offset
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainPosition():bOffset?">
-							<div class="param-name">
-								<span class="param">bOffset</span>
-								<span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-							</div>
-							<div class="param desc">
-								The local b-space point where the constraint will attach to the second object. Default is no offset
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
-		<div class="function-wrapper" id="Scene.prototype.constrainPositionToPoint()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\Scenes.js?#L205" target="_blank" class="function-name source-link">constrainPositionToPoint</a>(<span class="param">object</span>, <span class="param">offset?</span>, <span class="param">point?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint1">Constraint1</a></span>
-			</div>
-			<div class="function desc">
-				Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Scene.prototype.constrainPositionToPoint():object">
-							<div class="param-name">
-								<span class="param">object</span>
-								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
-							</div>
-							<div class="param desc">
-								The object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainPositionToPoint():offset?">
-							<div class="param-name">
-								<span class="param">offset</span>
-								<span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-							</div>
-							<div class="param desc">
-								The local object-space point where the constraint will attach to the object. Default is no offset
-							</div>
-						</div>
-					
-						<div class="param-wrapper" id="Scene.prototype.constrainPositionToPoint():point?">
-							<div class="param-name">
-								<span class="param">point</span>
-								<span class="type"><span class="alias">
-			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
-			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
-			<span class="alias general">VectorN</span>
-		</span></span>
-							</div>
-							<div class="param desc">
-								The location to constrain the length to. Default is the current location of the constrained point
 							</div>
 						</div>
 					

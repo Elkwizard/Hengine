@@ -16,10 +16,10 @@
  * 	);
  * ```
  * @prop ElementContainer main | The root of the element tree for the scene
+ * @prop PhysicsEngine physics | The physics simulation used by PHYSICS-enabled WorldObjects in the Scene
  * @prop CameraN camera | The camera used to render the scene
  * @prop Boolean mouseEvents | Whether or not mouse events will ever be checked. If this is true, specific SceneObjects can opt out, but not vice-versa
  * @prop Boolean cullGraphics | Whether or not SceneObject graphics will ever be culled. If this is true, specific SceneObjects can still opt out, but not vice-versa
- * @prop Boolean collisionEvents | Whether or not collision events will be detected
  * @prop Boolean updating | Whether the scene is in the process of updating the SceneObjects
  * @prop<readonly> SceneObject[] renderOrder | A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame
  */
@@ -28,9 +28,7 @@ class Scene {
 		this.engine = engine;
 		this.main = new ElementContainer("Main", null, this.engine);
 		
-		this.physicsEngine = new Physics.Engine().own();
-		this.gravity = ND.Vector.y(0.4);
-		this.physicsAnchor = new Physics.RigidBody(false).own();
+		this.physics = new PhysicsEngine();
 		
 		this.cullGraphics = true;
 		this.mouseEvents = true;
@@ -38,49 +36,14 @@ class Scene {
 		this.camera = new ND.Camera(engine.canvas.renderer.imageType);
 		this.updating = false;
 		this.renderOrder = [];
-	}
-	/**
-	 * Sets the gravitational acceleration for the physics engine.
-	 * @param VectorN gravity | The new gravitational acceleration
-	 */
-	set gravity(a) {
-		a.toPhysicsVector(this.physicsEngine.gravity);
-	}
-	/**
-	 * Returns the current gravitational acceleration for the physics engine.
-	 * This is initially `VectorN.y(0.4)`.
-	 * @return VectorN
-	 */
-	get gravity() {
-		return ND.Vector.physicsProxy(this.physicsEngine.gravity);
-	}
-	/**
-	 * Returns all the active constraints in the scene.
-	 * @return Constraint[]
-	 */
-	get constraints() {
-		const physicsConstraints = this.physicsEngine.constraintDescriptors;
-		const constraints = [];
-		for (let i = 0; i < physicsConstraints.length; i++)
-			constraints.push(Constraint.fromPhysicsConstraint(
-				physicsConstraints.get(i), this.engine
-			));
 
-		physicsConstraints.delete();
-		
-		return constraints;
-	}
-	handleCollisionEvent(a, b, direction, contacts, isTriggerA, isTriggerB) {
-		if (a && b) {
-			direction = ND.Vector.fromPhysicsVector(direction);
-	
-			const jsContacts = new Array(contacts.length);
-			for (let i = 0; i < jsContacts.length; i++)
-				jsContacts[i] = ND.Vector.fromPhysicsVector(contacts.get(i));
-			
-			a.scripts.PHYSICS.colliding.add(b, direction, jsContacts, isTriggerB);
-			b.scripts.PHYSICS.colliding.add(a, direction.inverse, jsContacts, isTriggerA);
-		}
+		// backwards compatibility
+		objectUtils.proxyAccess(this, this.physics, [
+			"gravity", "collisionEvents",
+			"constrainLength", "constrainLengthToPoint",
+			"constrainPosition", "constrainPositionToPoint",
+			"constraints"
+		]);
 	}
 	/**
 	 * Performs a ray-cast against some or all of the WorldObjects in the scene.
@@ -128,83 +91,6 @@ class Scene {
 	collidePoint(point) {
 		return this.main.updateArray()
 			.filter(e => e instanceof WorldObject && e.collidePoint(point));
-	}
-	makeConstrained(offset, body) {
-		const physicsOffset = offset.toPhysicsVector();
-		const physicsBody = body ? body.scripts.PHYSICS.body : this.physicsAnchor;
-		const constrained = new Physics.Constrained(physicsBody, physicsOffset);
-		physicsOffset.delete();
-		return constrained;
-	}
-	/**
-	 * Creates a physical constraint that forces the distance between two points on two objects to remain constant.
-	 * @param WorldObject a | The first object to constrain. Must have the PHYSICS script
-	 * @param WorldObject b | The second object to constrain. Must have the PHYSICS script
-	 * @param VectorN aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
-	 * @param VectorN bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
-	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
-	 * @return Constraint2
-	 */
-	constrainLength(bodyA, bodyB, aOffset = ND.Vector.zero, bOffset = ND.Vector.zero, length = null) {
-		const a = this.makeConstrained(aOffset, bodyA);
-		const b = this.makeConstrained(bOffset, bodyB);
-
-		length ??= ND.Vector.dist(
-			bodyA ? bodyA.transform.localSpaceToGlobalSpace(aOffset) : a.anchor,
-			bodyB.transform.localSpaceToGlobalSpace(bOffset)
-		);
-
-		const con = new Physics.LengthConstraintDescriptor(a, b, length);
-
-		a.delete();
-		b.delete();
-
-		this.physicsEngine.addConstraint(con);
-		return Constraint.fromPhysicsConstraint(con, this.engine);
-	}
-	/**
-	 * Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
-	 * @param WorldObject object | The object to constrain. Must have the PHYSICS script
-	 * @param VectorN offset? | The local object-space point where the constraint will attach to the object. Default is no offset
-	 * @param VectorN point? | The location to constrain the length to. Default is the current location of the constrained point
-	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
-	 * @return Constraint1
-	 */
-	constrainLengthToPoint(body, offset = ND.Vector.zero, point = null, length = null) {
-		point ??= body.transform.localToGlobal(offset);
-		const constraint = this.constrainLength(null, body, offset, point, length);
-		return new Constraint1(constraint.physicsConstraint, this.engine);
-	}
-	/**
-	 * Creates a physical constraint that forces two points on two objects to be in the same location.
-	 * @param WorldObject a | The first object to constrain. Must have the PHYSICS script
-	 * @param WorldObject b | The second object to constrain. Must have the PHYSICS script
-	 * @param VectorN aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
-	 * @param VectorN bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
-	 * @return Constraint2
-	 */
-	constrainPosition(bodyA, bodyB, aOffset = ND.Vector.zero, bOffset = ND.Vector.zero) {
-		const a = this.makeConstrained(aOffset, bodyA);
-		const b = this.makeConstrained(bOffset, bodyB);
-
-		const con = new Physics.PositionConstraintDescriptor(a, b);
-
-		a.delete();
-		b.delete();
-
-		this.physicsEngine.addConstraint(con);
-		return Constraint.fromPhysicsConstraint(con, this.engine);
-	}
-	/**
-	 * Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
-	 * @param WorldObject object | The object to constrain. Must have the PHYSICS script
-	 * @param VectorN offset? | The local object-space point where the constraint will attach to the object. Default is no offset
-	 * @param VectorN point? | The location to constrain the length to. Default is the current location of the constrained point
-	 * @return Constraint1
-	 */
-	constrainPositionToPoint(body, offset = ND.Vector.zero, point = null) {
-		point ??= body.transform.localToGlobal(offset);
-		return this.constrainPosition(null, body, point, offset);
 	}
 	updateCaches() {
 		for (const el of this.main.sceneObjectArray) el.updateCaches();
@@ -285,9 +171,7 @@ class Scene {
 
 		//physics
 		this.script("beforePhysics");
-		this.camera.drawInWorldSpace(() => {
-			this.physicsEngine.run(1);
-		});
+		this.camera.drawInWorldSpace(() => this.physics.run());
 		this.script("afterPhysics");
 
 		//draw

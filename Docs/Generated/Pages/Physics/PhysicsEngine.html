@@ -1,0 +1,408 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class PhysicsEngine">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L298" target="_blank" class="class-name source-link">PhysicsEngine</a>
+				</div>
+				<div class="class desc">
+					Represents a simulation in which <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> can interact in a "physically accurate" manner. This class should not be constructed, and should instead be accessed via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">physics</span></code> property of <a href="../Management/Scene.html#class Scene">Scene</a>.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+		<div class="prop-wrapper" id="PhysicsEngine.airResistance">
+			<div class="prop-header member">
+				<span class="prop-name">airResistance</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The proportion of velocity lost to air resistance every frame. Lower values will cause speed to decrease more gradually. Starts as 0.005</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PhysicsEngine.collisionEvents">
+			<div class="prop-header member">
+				<span class="prop-name">collisionEvents</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not collision events will be detected. If this is true, then the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">collide</span><span class="highlight-SYMBOL">*()</span></code> handlers on <a href="../Scripts/ElementScript.html#class ElementScript">ElementScripts</a> of colliding objects will be called when collisions begin. Starts as true</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PhysicsEngine.iterations">
+			<div class="prop-header member">
+				<span class="prop-name">iterations</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The number of solver iterations to run each frame. Starts as 10</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PhysicsEngine.contactIterations">
+			<div class="prop-header member">
+				<span class="prop-name">contactIterations</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The number of contact solver iterations to run per solver iterations. Starts as 4</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PhysicsEngine.constraintIterations">
+			<div class="prop-header member">
+				<span class="prop-name">constraintIterations</span>
+				<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The number of constraint solver iterations to run per solver iteration. Starts as 4</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="set PhysicsEngine.prototype.gravity()">
+			<div class="function-header member">
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L315" target="_blank" class="function-name source-link">gravity</a>(<span class="param">gravity</span>)
+			</div>
+			<div class="function desc">
+				Sets the gravitational acceleration for the physics engine.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="set PhysicsEngine.prototype.gravity():gravity">
+							<div class="param-name">
+								<span class="param">gravity</span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+							</div>
+							<div class="param desc">
+								The new gravitational acceleration
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="get PhysicsEngine.prototype.gravity()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L323" target="_blank" class="function-name source-link">gravity</a><span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+			</div>
+			<div class="function desc">
+				Returns the current gravitational acceleration for the physics engine.
+This is initially <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">y</span><span class="highlight-SYMBOL">(</span><span class="highlight-NUMBER">0.4</span><span class="highlight-SYMBOL">)</span></code>.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="get PhysicsEngine.prototype.constraints()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L330" target="_blank" class="function-name source-link">constraints</a><span class="type"><a href="../Physics/Constraint.html#class Constraint">Constraint</a>[]</span>
+			</div>
+			<div class="function desc">
+				Returns all the active constraints in the scene.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="get PhysicsEngine.prototype.bodies()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L346" target="_blank" class="function-name source-link">bodies</a><span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>[]</span>
+			</div>
+			<div class="function desc">
+				Returns all of the <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a> in the simulation.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="PhysicsEngine.prototype.constrainLength()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L382" target="_blank" class="function-name source-link">constrainLength</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">aOffset?</span>, <span class="param">bOffset?</span>, <span class="param">length?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint2">Constraint2</a></span>
+			</div>
+			<div class="function desc">
+				Creates a physical constraint that forces the distance between two points on two objects to remain constant.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainLength():a">
+							<div class="param-name">
+								<span class="param">a</span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
+							</div>
+							<div class="param desc">
+								The first object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainLength():b">
+							<div class="param-name">
+								<span class="param">b</span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
+							</div>
+							<div class="param desc">
+								The second object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainLength():aOffset?">
+							<div class="param-name">
+								<span class="param">aOffset</span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+							</div>
+							<div class="param desc">
+								The local a-space point where the constraint will attach to the first object. Default is no offset
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainLength():bOffset?">
+							<div class="param-name">
+								<span class="param">bOffset</span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+							</div>
+							<div class="param desc">
+								The local b-space point where the constraint will attach to the second object. Default is no offset
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainLength():length?">
+							<div class="param-name">
+								<span class="param">length</span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The distance to enforce between the two points. Default is the current distance between the constrained points
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="PhysicsEngine.prototype.constrainLengthToPoint()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L407" target="_blank" class="function-name source-link">constrainLengthToPoint</a>(<span class="param">object</span>, <span class="param">offset?</span>, <span class="param">point?</span>, <span class="param">length?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint1">Constraint1</a></span>
+			</div>
+			<div class="function desc">
+				Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainLengthToPoint():object">
+							<div class="param-name">
+								<span class="param">object</span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
+							</div>
+							<div class="param desc">
+								The object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainLengthToPoint():offset?">
+							<div class="param-name">
+								<span class="param">offset</span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+							</div>
+							<div class="param desc">
+								The local object-space point where the constraint will attach to the object. Default is no offset
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainLengthToPoint():point?">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+							</div>
+							<div class="param desc">
+								The location to constrain the length to. Default is the current location of the constrained point
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainLengthToPoint():length?">
+							<div class="param-name">
+								<span class="param">length</span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The distance to enforce between the two points. Default is the current distance between the constrained points
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="PhysicsEngine.prototype.constrainPosition()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L420" target="_blank" class="function-name source-link">constrainPosition</a>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">aOffset?</span>, <span class="param">bOffset?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint2">Constraint2</a></span>
+			</div>
+			<div class="function desc">
+				Creates a physical constraint that forces two points on two objects to be in the same location.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainPosition():a">
+							<div class="param-name">
+								<span class="param">a</span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
+							</div>
+							<div class="param desc">
+								The first object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainPosition():b">
+							<div class="param-name">
+								<span class="param">b</span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
+							</div>
+							<div class="param desc">
+								The second object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainPosition():aOffset?">
+							<div class="param-name">
+								<span class="param">aOffset</span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+							</div>
+							<div class="param desc">
+								The local a-space point where the constraint will attach to the first object. Default is no offset
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainPosition():bOffset?">
+							<div class="param-name">
+								<span class="param">bOffset</span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+							</div>
+							<div class="param desc">
+								The local b-space point where the constraint will attach to the second object. Default is no offset
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="PhysicsEngine.prototype.constrainPositionToPoint()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\PhysicsAPI.js?#L439" target="_blank" class="function-name source-link">constrainPositionToPoint</a>(<span class="param">object</span>, <span class="param">offset?</span>, <span class="param">point?</span>)<span class="type"><a href="../Physics/Constraint.html#class Constraint1">Constraint1</a></span>
+			</div>
+			<div class="function desc">
+				Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainPositionToPoint():object">
+							<div class="param-name">
+								<span class="param">object</span>
+								<span class="type"><a href="../Management/SceneObject.html#class WorldObject">WorldObject</a></span>
+							</div>
+							<div class="param desc">
+								The object to constrain. Must have the <a href="../Physics/PHYSICS.html#class PHYSICS">PHYSICS</a> script
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainPositionToPoint():offset?">
+							<div class="param-name">
+								<span class="param">offset</span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+							</div>
+							<div class="param desc">
+								The local object-space point where the constraint will attach to the object. Default is no offset
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="PhysicsEngine.prototype.constrainPositionToPoint():point?">
+							<div class="param-name">
+								<span class="param">point</span>
+								<span class="type"><span class="alias">
+			<span class="alias two"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			<span class="alias three"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			<span class="alias general">VectorN</span>
+		</span></span>
+							</div>
+							<div class="param desc">
+								The location to constrain the length to. Default is the current location of the constrained point
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

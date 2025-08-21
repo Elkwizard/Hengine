@@ -34,6 +34,26 @@ const objectUtils = {
 			get: () => objectB[keyB]
 		});
 	},
+	isAccessor(object, key) {
+		while (object) {
+			const desc = Object.getOwnPropertyDescriptor(object, key);
+			if (desc) return !!(desc.set ?? desc.get);
+			object = Object.getPrototypeOf(object);
+		}
+
+		return false;
+	},
+	proxyAccess(target, source, keys) {
+		for (let i = 0; i < keys.length; i++) {
+			const key = keys[i];
+
+			if (Object.hasOwn(source, key) || this.isAccessor(source, key)) {
+				this.shortcut(target, source, key);
+			} else {
+				target[key] = (...args) => source[key](...args);
+			}
+		}
+	},
 	inherit(child, parent, include) {
 		if (include) include = new Set(include);
 

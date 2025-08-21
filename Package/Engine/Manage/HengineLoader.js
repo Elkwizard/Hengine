@@ -887,8 +887,7 @@ class HengineLoader {
 					return new Vector2(hengineLoader.engine.canvas.width / 2, hengineLoader.engine.canvas.height / 2);
 				}
 			});
-			objectUtils.shortcut(window, hengineLoader.engine.canvas, "width");
-			objectUtils.shortcut(window, hengineLoader.engine.canvas, "height");
+			objectUtils.proxyAccess(window, hengineLoader.engine.canvas, ["width", "height"]);
 		}
 
 		window.loadResource = this.loadResource.bind(this);

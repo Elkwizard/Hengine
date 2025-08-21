@@ -911,6 +911,10 @@ declare class Scene {
 	 */
 	main: ElementContainer;
 	/**
+	 * The physics simulation used by PHYSICS-enabled WorldObjects in the Scene
+	 */
+	physics: PhysicsEngine;
+	/**
 	 * The camera used to render the scene
 	 */
 	camera: CameraN;
@@ -923,10 +927,6 @@ declare class Scene {
 	 */
 	cullGraphics: boolean;
 	/**
-	 * Whether or not collision events will be detected
-	 */
-	collisionEvents: boolean;
-	/**
 	 * Whether the scene is in the process of updating the SceneObjects
 	 */
 	updating: boolean;
@@ -934,20 +934,6 @@ declare class Scene {
 	 * A list of all of the objects most recently rendered, in the order they were rendered in. This updates prior to rendering each frame
 	 */
 	renderOrder: SceneObject[];
-	/**
-	 * Sets the gravitational acceleration for the physics engine.
-	 * @param gravity - The new gravitational acceleration
-	 */
-	set gravity(gravity: VectorN);
-	/**
-	 * Returns the current gravitational acceleration for the physics engine.
-	 * This is initially `VectorN.y(0.4)`.
-	 */
-	get gravity(): VectorN;
-	/**
-	 * Returns all the active constraints in the scene.
-	 */
-	get constraints(): Constraint[];
 	/**
 	 * Performs a ray-cast against some or all of the WorldObjects in the scene.
 	 * If the ray-cast fails, then null is returned.
@@ -962,38 +948,6 @@ declare class Scene {
 	 * @param point - The World-Space point to check
 	 */
 	collidePoint(point: VectorN): WorldObject[];
-	/**
-	 * Creates a physical constraint that forces the distance between two points on two objects to remain constant.
-	 * @param a - The first object to constrain. Must have the PHYSICS script
-	 * @param b - The second object to constrain. Must have the PHYSICS script
-	 * @param aOffset - The local a-space point where the constraint will attach to the first object. Default is no offset
-	 * @param bOffset - The local b-space point where the constraint will attach to the second object. Default is no offset
-	 * @param length - The distance to enforce between the two points. Default is the current distance between the constrained points
-	 */
-	constrainLength(a: WorldObject, b: WorldObject, aOffset?: VectorN, bOffset?: VectorN, length?: number): Constraint2;
-	/**
-	 * Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
-	 * @param object - The object to constrain. Must have the PHYSICS script
-	 * @param offset - The local object-space point where the constraint will attach to the object. Default is no offset
-	 * @param point - The location to constrain the length to. Default is the current location of the constrained point
-	 * @param length - The distance to enforce between the two points. Default is the current distance between the constrained points
-	 */
-	constrainLengthToPoint(object: WorldObject, offset?: VectorN, point?: VectorN, length?: number): Constraint1;
-	/**
-	 * Creates a physical constraint that forces two points on two objects to be in the same location.
-	 * @param a - The first object to constrain. Must have the PHYSICS script
-	 * @param b - The second object to constrain. Must have the PHYSICS script
-	 * @param aOffset - The local a-space point where the constraint will attach to the first object. Default is no offset
-	 * @param bOffset - The local b-space point where the constraint will attach to the second object. Default is no offset
-	 */
-	constrainPosition(a: WorldObject, b: WorldObject, aOffset?: VectorN, bOffset?: VectorN): Constraint2;
-	/**
-	 * Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
-	 * @param object - The object to constrain. Must have the PHYSICS script
-	 * @param offset - The local object-space point where the constraint will attach to the object. Default is no offset
-	 * @param point - The location to constrain the length to. Default is the current location of the constrained point
-	 */
-	constrainPositionToPoint(object: WorldObject, offset?: VectorN, point?: VectorN): Constraint1;
 }
 
 /**
@@ -1812,6 +1766,82 @@ declare class CollisionMonitor {
 	 * @param mask - The function that will be passed each collision to determine its eligibility
 	 */
 	test(mask: (arg0: CollisionData) => boolean): CollisionData[] | null;
+}
+
+/**
+ * Represents a simulation in which WorldObjects can interact in a "physically accurate" manner. This class should not be constructed, and should instead be accessed via the `.physics` property of Scene.
+ */
+declare class PhysicsEngine {
+	/**
+	 * The proportion of velocity lost to air resistance every frame. Lower values will cause speed to decrease more gradually. Starts as 0.005
+	 */
+	airResistance: number;
+	/**
+	 * Whether or not collision events will be detected. If this is true, then the `.collide*()` handlers on ElementScripts of colliding objects will be called when collisions begin. Starts as true
+	 */
+	collisionEvents: boolean;
+	/**
+	 * The number of solver iterations to run each frame. Starts as 10
+	 */
+	iterations: number;
+	/**
+	 * The number of contact solver iterations to run per solver iterations. Starts as 4
+	 */
+	contactIterations: number;
+	/**
+	 * The number of constraint solver iterations to run per solver iteration. Starts as 4
+	 */
+	constraintIterations: number;
+	/**
+	 * Sets the gravitational acceleration for the physics engine.
+	 * @param gravity - The new gravitational acceleration
+	 */
+	set gravity(gravity: VectorN);
+	/**
+	 * Returns the current gravitational acceleration for the physics engine.
+	 * This is initially `VectorN.y(0.4)`.
+	 */
+	get gravity(): VectorN;
+	/**
+	 * Returns all the active constraints in the scene.
+	 */
+	get constraints(): Constraint[];
+	/**
+	 * Returns all of the WorldObjects in the simulation.
+	 */
+	get bodies(): WorldObject[];
+	/**
+	 * Creates a physical constraint that forces the distance between two points on two objects to remain constant.
+	 * @param a - The first object to constrain. Must have the PHYSICS script
+	 * @param b - The second object to constrain. Must have the PHYSICS script
+	 * @param aOffset - The local a-space point where the constraint will attach to the first object. Default is no offset
+	 * @param bOffset - The local b-space point where the constraint will attach to the second object. Default is no offset
+	 * @param length - The distance to enforce between the two points. Default is the current distance between the constrained points
+	 */
+	constrainLength(a: WorldObject, b: WorldObject, aOffset?: VectorN, bOffset?: VectorN, length?: number): Constraint2;
+	/**
+	 * Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
+	 * @param object - The object to constrain. Must have the PHYSICS script
+	 * @param offset - The local object-space point where the constraint will attach to the object. Default is no offset
+	 * @param point - The location to constrain the length to. Default is the current location of the constrained point
+	 * @param length - The distance to enforce between the two points. Default is the current distance between the constrained points
+	 */
+	constrainLengthToPoint(object: WorldObject, offset?: VectorN, point?: VectorN, length?: number): Constraint1;
+	/**
+	 * Creates a physical constraint that forces two points on two objects to be in the same location.
+	 * @param a - The first object to constrain. Must have the PHYSICS script
+	 * @param b - The second object to constrain. Must have the PHYSICS script
+	 * @param aOffset - The local a-space point where the constraint will attach to the first object. Default is no offset
+	 * @param bOffset - The local b-space point where the constraint will attach to the second object. Default is no offset
+	 */
+	constrainPosition(a: WorldObject, b: WorldObject, aOffset?: VectorN, bOffset?: VectorN): Constraint2;
+	/**
+	 * Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
+	 * @param object - The object to constrain. Must have the PHYSICS script
+	 * @param offset - The local object-space point where the constraint will attach to the object. Default is no offset
+	 * @param point - The location to constrain the length to. Default is the current location of the constrained point
+	 */
+	constrainPositionToPoint(object: WorldObject, offset?: VectorN, point?: VectorN): Constraint1;
 }
 
 /**

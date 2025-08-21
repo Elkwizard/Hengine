@@ -87,7 +87,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.scene = obj.engine.scene;
 		this.camera = this.scene.camera;
 		this.canvas = obj.renderer.imageType;
-		this.physicsEngine = this.scene.physicsEngine;
+		this.physics = this.scene.physics;
 		
 		// dimensionality
 		this.is3d = IS_3D && !(obj instanceof UIObject);
@@ -105,8 +105,8 @@ class PARTICLE_SPAWNER extends ElementScript {
 			}
 			update() {
 				const self = this.spawner;
-				if (self.falls) this.velocity.add(self.physicsEngine.gravity);
-				if (self.slows) this.velocity.mul(1 - self.physicsEngine.drag);
+				if (self.falls) this.velocity.add(self.physics.gravity);
+				if (self.slows) this.velocity.mul(1 - self.physics.airResistance);
 				this.position.add(this.velocity);
 				self.particleUpdate(this);
 			}

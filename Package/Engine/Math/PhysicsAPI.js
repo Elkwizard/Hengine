@@ -13,9 +13,9 @@ function physicsAPICollideShapes(a, b) {
  * @abstract
  */
 class Constraint {
-	constructor(physicsConstraint, engine) {
+	constructor(physicsConstraint, physics) {
 		this.physicsConstraint = physicsConstraint;
-		this.engine = engine;
+		this.physics = physics;
 	}
 	
 	/**
@@ -34,14 +34,13 @@ class Constraint {
 	 * Removes the constraint from the simulation.
 	 */
     remove() {
-        const { physicsEngine } = this.engine.scene;
-        physicsEngine.removeConstraint(this.physicsConstraint);
+        this.physics.physicsEngine.removeConstraint(this.physicsConstraint);
     }
 
-	static fromPhysicsConstraint(constraint, engine) {
-		if (constraint.a.body.pointer === engine.scene.physicsAnchor.pointer)
-			return new Constraint1(constraint, engine);
-		return new Constraint2(constraint, engine);
+	static fromPhysicsConstraint(constraint, physics) {
+		if (constraint.a.body.pointer === physics.anchor.pointer)
+			return new Constraint1(constraint, physics);
+		return new Constraint2(constraint, physics);
 	}
 }
 
@@ -52,8 +51,8 @@ class Constraint {
  * @prop Number length | The desired distance between the two constrained points. This is only defined for length constraints
  */
 class Constraint1 extends Constraint {
-    constructor(physicsConstraint, engine) {
-		super(physicsConstraint, engine);
+    constructor(physicsConstraint, physics) {
+		super(physicsConstraint, physics);
     }
 	set length(a) {
 		this.physicsConstraint.length = a;
@@ -91,8 +90,8 @@ class Constraint1 extends Constraint {
  * @prop Number length | The desired distance between the two constrained points. This is only defined for length constraints
  */
 class Constraint2 extends Constraint {
-    constructor(physicsConstraint, engine) {
-		super(physicsConstraint, engine);
+    constructor(physicsConstraint, physics) {
+		super(physicsConstraint, physics);
     }
 	set staticA(a) {
 		this.physicsConstraint.a.isStatic = a;
@@ -286,4 +285,162 @@ class CollisionMonitor {
         for (const [element, data] of this.elements) if (test(data)) result.push(data);
         return result.length ? result : null;
     }
+}
+
+/**
+ * Represents a simulation in which WorldObjects can interact in a "physically accurate" manner. This class should not be constructed, and should instead be accessed via the `.physics` property of Scene.
+ * @prop Number airResistance | The proportion of velocity lost to air resistance every frame. Lower values will cause speed to decrease more gradually. Starts as 0.005
+ * @prop Boolean collisionEvents | Whether or not collision events will be detected. If this is true, then the `.collide*()` handlers on ElementScripts of colliding objects will be called when collisions begin. Starts as true
+ * @prop Number iterations | The number of solver iterations to run each frame. Starts as 10
+ * @prop Number contactIterations | The number of contact solver iterations to run per solver iterations. Starts as 4
+ * @prop Number constraintIterations | The number of constraint solver iterations to run per solver iteration. Starts as 4
+ */
+class PhysicsEngine {
+	constructor() {
+		this.physicsEngine = new Physics.Engine().own();
+		this.collisionEvents = true;
+		this.anchor = new Physics.RigidBody(false).own();
+		objectUtils.shortcut(this, this.physicsEngine, "airResistance", "drag");
+		objectUtils.proxyAccess(this, this.physicsEngine, [
+			"iterations", "constraintIterations", "contactIterations"
+		]);
+
+		this.airResistance = 0.005;
+		this.gravity = ND.Vector.y(0.4);
+	}
+	/**
+	 * Sets the gravitational acceleration for the physics engine.
+	 * @param VectorN gravity | The new gravitational acceleration
+	 */
+	set gravity(a) {
+		a.toPhysicsVector(this.physicsEngine.gravity);
+	}
+	/**
+	 * Returns the current gravitational acceleration for the physics engine.
+	 * This is initially `VectorN.y(0.4)`.
+	 * @return VectorN
+	 */
+	get gravity() {
+		return ND.Vector.physicsProxy(this.physicsEngine.gravity);
+	}
+	/**
+	 * Returns all the active constraints in the scene.
+	 * @return Constraint[]
+	 */
+	get constraints() {
+		const physicsConstraints = this.physicsEngine.constraintDescriptors;
+		const constraints = [];
+		for (let i = 0; i < physicsConstraints.length; i++)
+			constraints.push(Constraint.fromPhysicsConstraint(
+				physicsConstraints.get(i), this
+			));
+
+		physicsConstraints.delete();
+		
+		return constraints;
+	}
+	/**
+	 * Returns all of the WorldObjects in the simulation.
+	 * @return WorldObject[]
+	 */
+	get bodies() {
+		const physicsBodies = this.physicsEngine.bodies;
+		const bodies = [];
+		const map = PHYSICS.bodyToWorldObject;
+		for (let i = 0; i < physicsBodies.length; i++)
+			bodies.push(map.get(physicsBodies.get(i).pointer));
+		return bodies;
+	}
+	handleCollisionEvent(a, b, direction, contacts, isTriggerA, isTriggerB) {
+		if (a && b) {
+			direction = ND.Vector.fromPhysicsVector(direction);
+	
+			const jsContacts = new Array(contacts.length);
+			for (let i = 0; i < jsContacts.length; i++)
+				jsContacts[i] = ND.Vector.fromPhysicsVector(contacts.get(i));
+			
+			a.scripts.PHYSICS.colliding.add(b, direction, jsContacts, isTriggerB);
+			b.scripts.PHYSICS.colliding.add(a, direction.inverse, jsContacts, isTriggerA);
+		}
+	}
+	makeConstrained(offset, body) {
+		const physicsOffset = offset.toPhysicsVector();
+		const physicsBody = body ? body.scripts.PHYSICS.body : this.anchor;
+		const constrained = new Physics.Constrained(physicsBody, physicsOffset);
+		physicsOffset.delete();
+		return constrained;
+	}
+	/**
+	 * Creates a physical constraint that forces the distance between two points on two objects to remain constant.
+	 * @param WorldObject a | The first object to constrain. Must have the PHYSICS script
+	 * @param WorldObject b | The second object to constrain. Must have the PHYSICS script
+	 * @param VectorN aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
+	 * @param VectorN bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
+	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
+	 * @return Constraint2
+	 */
+	constrainLength(bodyA, bodyB, aOffset = ND.Vector.zero, bOffset = ND.Vector.zero, length = null) {
+		const a = this.makeConstrained(aOffset, bodyA);
+		const b = this.makeConstrained(bOffset, bodyB);
+
+		length ??= ND.Vector.dist(
+			bodyA ? bodyA.transform.localSpaceToGlobalSpace(aOffset) : a.anchor,
+			bodyB.transform.localSpaceToGlobalSpace(bOffset)
+		);
+
+		const con = new Physics.LengthConstraintDescriptor(a, b, length);
+
+		a.delete();
+		b.delete();
+
+		this.physicsEngine.addConstraint(con);
+		return Constraint.fromPhysicsConstraint(con, this);
+	}
+	/**
+	 * Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
+	 * @param WorldObject object | The object to constrain. Must have the PHYSICS script
+	 * @param VectorN offset? | The local object-space point where the constraint will attach to the object. Default is no offset
+	 * @param VectorN point? | The location to constrain the length to. Default is the current location of the constrained point
+	 * @param Number length? | The distance to enforce between the two points. Default is the current distance between the constrained points
+	 * @return Constraint1
+	 */
+	constrainLengthToPoint(body, offset = ND.Vector.zero, point = null, length = null) {
+		point ??= body.transform.localToGlobal(offset);
+		const constraint = this.constrainLength(null, body, offset, point, length);
+		return new Constraint1(constraint.physicsConstraint, this);
+	}
+	/**
+	 * Creates a physical constraint that forces two points on two objects to be in the same location.
+	 * @param WorldObject a | The first object to constrain. Must have the PHYSICS script
+	 * @param WorldObject b | The second object to constrain. Must have the PHYSICS script
+	 * @param VectorN aOffset? | The local a-space point where the constraint will attach to the first object. Default is no offset
+	 * @param VectorN bOffset? | The local b-space point where the constraint will attach to the second object. Default is no offset
+	 * @return Constraint2
+	 */
+	constrainPosition(bodyA, bodyB, aOffset = ND.Vector.zero, bOffset = ND.Vector.zero) {
+		const a = this.makeConstrained(aOffset, bodyA);
+		const b = this.makeConstrained(bOffset, bodyB);
+
+		const con = new Physics.PositionConstraintDescriptor(a, b);
+
+		a.delete();
+		b.delete();
+
+		this.physicsEngine.addConstraint(con);
+		return Constraint.fromPhysicsConstraint(con, this);
+	}
+	/**
+	 * Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
+	 * @param WorldObject object | The object to constrain. Must have the PHYSICS script
+	 * @param VectorN offset? | The local object-space point where the constraint will attach to the object. Default is no offset
+	 * @param VectorN point? | The location to constrain the length to. Default is the current location of the constrained point
+	 * @return Constraint1
+	 */
+	constrainPositionToPoint(body, offset = ND.Vector.zero, point = null) {
+		point ??= body.transform.localToGlobal(offset);
+		return this.constrainPosition(null, body, point, offset);
+	}
+	run() {
+		this.physicsEngine.run(1);
+	}
 }
