@@ -13,20 +13,22 @@ class Interpolation {
 	 * @param MathObject a | The initial value
 	 * @param MathObject b | The final value
 	 * @param Number t | The progress proportion from the initial value to the final value, on the interval [0, 1]
+	 * @prop (MathObject, MathObject) => MathObject difference? | The method for computing the difference between two values. Default is `(a, b) => a.minus(b)`, but for angular values it should be `Geometry.signedAngularDist`
 	 * @return MathObject
 	 */
-    static lerp(a, b, t) {
-        return a.times(1 - t).plus(b.times(t));
+    static lerp(a, b, t, diff = Interpolation.DIFFERENCE) {
+		return a.plus(diff(b, a).times(t));
     }
 	/**
 	 * Smoothly interpolates between two values. (Uses the Interpolation.smooth easing function)
 	 * @param MathObject a | The initial value
 	 * @param MathObject b | The final value
 	 * @param Number t | The progress proportion from the initial value to the final value, on the interval [0, 1]
+	 * @prop (MathObject, MathObject) => MathObject difference | The difference function. See `.lerp()`
 	 * @return MathObject
 	 */
-    static smoothLerp(a, b, t) {
-        return Interpolation.lerp(a, b, Interpolation.smooth(t));
+    static smoothLerp(a, b, t, diff) {
+        return Interpolation.lerp(a, b, Interpolation.smooth(t), diff);
     }
 	/**
 	 * Linearly interpolates between four values in a square formation.
@@ -149,6 +151,8 @@ class Interpolation {
     static decreasing(t) {
         return 1 - (1 - t) ** 2;
     }
+
+	static DIFFERENCE = (a, b) => a.minus(b);
 }
 
 /**
@@ -167,6 +171,7 @@ class Interpolation {
  * @prop Number duration | The length of each transition, in frames
  * @prop (Number) => Number easing | The easing function for the transitions
  * @prop Boolean copyTarget | Whether or not target values should be copied. If this value is false, changing the value passed into target will change the trajectory of the value, even if the value is not passed in again
+ * @prop (MathObject, MathObject) => MathObject difference | The difference function. See `Interpolation.lerp()`
  */
 class Animatable {
 	/**
@@ -181,6 +186,7 @@ class Animatable {
 		this.easing = easing;
 		this.copyTarget = copyTarget;
 		this.value = initial;
+		this.difference = Interpolation.DIFFERENCE;
 	}
 
 	set target(target) {
@@ -221,6 +227,6 @@ class Animatable {
 	 */
 	get current() {
 		const t = Number.clamp(this.timer / this.duration, 0, 1);
-		return Interpolation.lerp(this.start, this.target, this.easing(t));
+		return Interpolation.lerp(this.start, this.target, this.easing(t), this.difference);
 	}
 }
