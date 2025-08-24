@@ -171,8 +171,9 @@ API class Engine {
 
 			col->penetration -= collisionSlop;
 
-			bool dynamic = Constraint::propagateDynamic(a, b, b.getDynamic(), col->normal);
-
+			bool dynamic = b.getDynamic() && !b.prohibited.has(col->normal);
+			if (!dynamic) a.prohibited.add(col->normal);
+			
 			ContactConstraint* constraint = new ContactConstraint(dynamic, a, b, *col);
 			constraint->solvePosition(dt);
 			return constraint;

@@ -40,10 +40,6 @@ class ContactConstraint : public Constraint {
 		bool trySolve(const MatrixRC<N>& impulseMatrix, int index) {
 			VectorN<N> delta = getVelocityDelta<N>(&interactions[index]);
 
-			// std::stringstream debug;
-			// debug << "trySolve<" << N << ">(" << index << "): " << delta;
-			// printString(debug.str());
-
 			if (isWasteful(delta)) return true;
 
 			for (int i = 0; i < N; i++)

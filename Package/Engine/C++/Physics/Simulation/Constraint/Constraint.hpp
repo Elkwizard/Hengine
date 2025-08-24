@@ -135,17 +135,6 @@ class Constraint {
 
 			return result;
 		}
-
-		static bool propagateDynamic(
-			RigidBody& a, RigidBody& b, bool bDynamic, const Vector& normal
-		) {
-			if (!bDynamic || b.prohibited.has(normal)) {
-				a.prohibited.add(normal);
-				return false;
-			}
-			
-			return true;
-		}
 };
 
 class Constraint2 : public Constraint {
