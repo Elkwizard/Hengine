@@ -99,9 +99,19 @@ class Color extends Operable {
 	 * @return Color
 	 */
 	get inverse() {
-		let n = (new Color(255, 255, 255, 1)).sub(this);
+		const n = (new Color(255, 255, 255, 1)).sub(this);
 		n.alpha = this.alpha;
 		return n;
+	}
+	/**
+	 * Returns a copy of the color, now with `.limited = false`.
+	 * As such, the return value can be multiplied and added without getting clamped.
+	 * @return Color
+	 */
+	get unlimited() {
+		const result = this.get();
+		result.limited = false;
+		return result;
 	}
 	/**
 	 * Returns the CSS rgba color string representing the color. 

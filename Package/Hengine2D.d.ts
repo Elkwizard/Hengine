@@ -1311,6 +1311,10 @@ declare class Animatable {
 	 */
 	copyTarget: boolean;
 	/**
+	 * The difference function. See `Interpolation.lerp()`
+	 */
+	difference: (arg0: MathObject, arg1: MathObject) => MathObject;
+	/**
 	 * Creates a new Animatable.
 	 * @param initial - The initial value
 	 * @param duration - The length of each transition, in frames
@@ -4618,6 +4622,12 @@ declare interface Camera<Vector> extends Matrix {
 	 */
 	zoomBy(factor: number): void;
 	/**
+	 * Smoothly moves the camera toward a new position value.
+	 * @param point - The new position to move toward
+	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
+	 */
+	moveTowards(point: Vector, ferocity: number): void;
+	/**
 	 * Maps a given point from Camera-Space to World-Space.
 	 * @param point - The point to transform
 	 */
@@ -4654,12 +4664,6 @@ declare class Camera2D extends Matrix3 implements Camera<Vector2> {
 	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
 	 */
 	rotateTowards(angle: number, ferocity: number): void;
-	/**
-	 * Smoothly moves the camera toward a new position value.
-	 * @param point - The new position to move toward
-	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
-	 */
-	moveTowards(point: Vector2, ferocity: number): void;
 	/**
 	 * Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.
 	 * If the boundary is smaller than the viewport, the behavior is undefined.
@@ -4720,6 +4724,12 @@ declare class Camera2D extends Matrix3 implements Camera<Vector2> {
 	 * @param factor - The amount to multiply the current zoom
 	 */
 	zoomBy(factor: number): void;
+	/**
+	 * Smoothly moves the camera toward a new position value.
+	 * @param point - The new position to move toward
+	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
+	 */
+	moveTowards(point: Vector, ferocity: number): void;
 	/**
 	 * Maps a given point from Camera-Space to World-Space.
 	 * @param point - The point to transform
@@ -4806,6 +4816,11 @@ declare class Color extends Operable {
 	 * The inverse is defined as white minus the caller.
 	 */
 	get inverse(): this;
+	/**
+	 * Returns a copy of the color, now with `.limited = false`.
+	 * As such, the return value can be multiplied and added without getting clamped.
+	 */
+	get unlimited(): this;
 	/**
 	 * Returns the CSS rgba color string representing the color.
 	 */
@@ -6990,6 +7005,12 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 * @param factor - The amount to multiply the current zoom
 	 */
 	zoomBy(factor: number): void;
+	/**
+	 * Smoothly moves the camera toward a new position value.
+	 * @param point - The new position to move toward
+	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
+	 */
+	moveTowards(point: Vector, ferocity: number): void;
 	/**
 	 * Maps a given point from Camera-Space to World-Space.
 	 * @param point - The point to transform
