@@ -65,6 +65,8 @@ class LineN {
 			double t = dot(point - start, diff) / diff.sqrMag();
 			return start + std::clamp(t, 0.0, 1.0) * diff;
 		}
+
+		double raycast(const Ray& ray) const;
 };
 
 using Line = LineN<DIM>;
@@ -171,21 +173,24 @@ class Triangle {
 
 			return result;
 		}
+
+		double raycast(const Ray& ray) const;
 };
 #endif
 
 using Face = IF_3D(Triangle, Line);
 
-double raycastFace(const Face& face, const Ray& ray) {
-	Vector away = face.normal();
+ONLY_2D(template <>) // since Line is a specific template instance 
+double Face::raycast(const Ray& ray) const {
+	Vector away = normal();
 	double rate = dot(ray.direction, away);
 	if (equals(rate, 0)) return -1;
 
-	float t = dot(face.point() - ray.origin, away) / rate;
+	float t = dot(point() - ray.origin, away) / rate;
 	if (t < 0) return -1;
 
 	Vector projected = ray.atDistance(t);
-	if (face.closestPointTo(projected) != projected) return -1;
+	if (closestPointTo(projected) != projected) return -1;
 
 	return t;
 }

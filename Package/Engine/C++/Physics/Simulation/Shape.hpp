@@ -355,7 +355,7 @@ API class Polytope : public Shape {
 			double distance = -1;
 
 			for (int i = 0; i < getFaceCount(); i++) {
-				double dist = raycastFace(getFace(i), ray);
+				double dist = getFace(i).raycast(ray);
 				if (dist > 0) {
 					if (distance < 0 || dist < distance)
 						distance = dist;

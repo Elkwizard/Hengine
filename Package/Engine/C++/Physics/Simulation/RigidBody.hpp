@@ -108,10 +108,9 @@ API class RigidBody {
 		};
 		
 		class Prohibited {
-			private:
-			
 			public:
-			std::vector<Vector> prohibited;
+				std::vector<Vector> prohibited;
+				
 				Prohibited() { }
 		
 				void clear() {
