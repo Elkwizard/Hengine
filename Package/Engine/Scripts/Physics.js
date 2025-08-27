@@ -4,11 +4,10 @@ Physics.onCollide = (a, b, direction, contacts, triggerA, triggerB) => {
 	const { physics } = a.engine.scene;
 	if (physics.collisionEvents) {
 		b = PHYSICS.bodyToWorldObject.get(b.pointer);
-		physics.handleCollisionEvent(a, b, direction, contacts, triggerA, triggerB);
+		physics.onCollide(a, b, direction, contacts, triggerA, triggerB);
 	}
 
 	contacts.delete();
-	direction.delete();
 };
 
 Physics.collisionRule = (a, b) => {

@@ -152,6 +152,7 @@ class CollisionData {
         this.direction = direction;
         this.contacts = contacts;
 		this.isTrigger = isTrigger;
+		this.count = 1;
     }
 }
 
@@ -169,7 +170,7 @@ class CollisionMonitor {
     get general() {
         if (this.elements.size) {
             const elements = [];
-            for (const [element, data] of this.elements) elements.push(data);
+            for (const data of this.elements.values()) elements.push(data);
             return elements;
         }
         return null;
@@ -180,7 +181,7 @@ class CollisionMonitor {
 	 */
     get left() {
         const elements = [];
-        for (const [element, data] of this.elements)
+        for (const data of this.elements.values())
             if (data.direction.x < -0.2) elements.push(data);
         return elements.length ? elements : null;
     }
@@ -190,7 +191,7 @@ class CollisionMonitor {
 	 */
     get right() {
         const elements = [];
-        for (const [element, data] of this.elements)
+        for (const data of this.elements.values())
             if (data.direction.x > 0.2) elements.push(data);
         return elements.length ? elements : null;
     }
@@ -200,7 +201,7 @@ class CollisionMonitor {
 	 */
     get top() {
         const elements = [];
-        for (const [element, data] of this.elements)
+        for (const data of this.elements.values())
             if (data.direction.y < -0.2) elements.push(data);
         return elements.length ? elements : null;
     }
@@ -210,7 +211,7 @@ class CollisionMonitor {
 	 */
     get bottom() {
         const elements = [];
-        for (const [element, data] of this.elements)
+        for (const data of this.elements.values())
             if (data.direction.y > 0.2) elements.push(data);
         return elements.length ? elements : null;
     }
@@ -222,7 +223,7 @@ class CollisionMonitor {
 	 */
 	get front() {
 		const elements = [];
-		for (const [element, data] of this.elements)
+		for (const data of this.elements.values())
 			if (data.direction.z > 0.2) elements.push(data);
 		return elements.length ? elements : null;
 	}
@@ -234,7 +235,7 @@ class CollisionMonitor {
 	 */
 	get back() {
 		const elements = [];
-		for (const [element, data] of this.elements)
+		for (const data of this.elements.values())
 			if (data.direction.z < -0.2) elements.push(data);
 		return elements.length ? elements : null;
 	}
@@ -254,7 +255,16 @@ class CollisionMonitor {
         this.elements.clear();
     }
     add(element, dir, contacts, isTrigger) {
-        this.elements.set(element, new CollisionData(element, dir, contacts, isTrigger));
+		const data = this.elements.get(element);
+		if (data) {
+			data.contacts.pushArray(contacts);
+			data.direction
+				.mul(data.count++)
+				.add(dir)
+				.div(data.count);
+		} else {
+			this.elements.set(element, new CollisionData(element, dir, contacts, isTrigger));
+		}
     }
 	/**
 	 * Checks whether there is a collision with a specific object.
@@ -282,7 +292,7 @@ class CollisionMonitor {
 	 */
     test(test) {
         const result = [];
-        for (const [element, data] of this.elements) if (test(data)) result.push(data);
+        for (const data of this.elements.values()) if (test(data)) result.push(data);
         return result.length ? result : null;
     }
 }
@@ -351,7 +361,7 @@ class PhysicsEngine {
 			bodies.push(map.get(physicsBodies.get(i).pointer));
 		return bodies;
 	}
-	handleCollisionEvent(a, b, direction, contacts, isTriggerA, isTriggerB) {
+	onCollide(a, b, direction, contacts, isTriggerA, isTriggerB) {
 		if (a && b) {
 			direction = ND.Vector.fromPhysicsVector(direction);
 	

@@ -231,49 +231,49 @@ API class Detector {
 			return typePairTable[a.type][b.type](a, b);
 		}
 
-		static std::optional<Collision> collideBodies(const RigidBody& bodyA, const RigidBody& bodyB) {
-			if (!bodyA.bounds.intersects(bodyB.bounds))
-				return { };
+		// static std::optional<Collision> collideBodies(const RigidBody& bodyA, const RigidBody& bodyB) {
+		// 	if (!bodyA.bounds.intersects(bodyB.bounds))
+		// 		return { };
 			
-			int aShapes = bodyA.getShapeCount();
-			int bShapes = bodyB.getShapeCount();
-			if (aShapes == 1 && bShapes == 1) {
-				return collide(bodyA.getShape(0), bodyB.getShape(0));
-			} else {
-				std::vector<Collision> collisions { };
-				for (int i = 0; i < aShapes; i++)
-				for (int j = 0; j < bShapes; j++) {
-					std::optional<Collision> col = collide(bodyA.getShape(i), bodyB.getShape(j));
-					if (col) collisions.push_back(*col);
-				}
-				if (!collisions.size()) return { };
+		// 	int aShapes = bodyA.getShapeCount();
+		// 	int bShapes = bodyB.getShapeCount();
+		// 	if (aShapes == 1 && bShapes == 1) {
+		// 		return collide(bodyA.getShape(0), bodyB.getShape(0));
+		// 	} else {
+		// 		std::vector<Collision> collisions { };
+		// 		for (int i = 0; i < aShapes; i++)
+		// 		for (int j = 0; j < bShapes; j++) {
+		// 			std::optional<Collision> col = collide(bodyA.getShape(i), bodyB.getShape(j));
+		// 			if (col) collisions.push_back(*col);
+		// 		}
+		// 		if (!collisions.size()) return { };
 				
-				std::vector<Vector> contacts { };
-				Vector dir { };
-				double penetration = -INFINITY;
-				Collision* best;
+		// 		std::vector<Vector> contacts { };
+		// 		Vector dir { };
+		// 		double penetration = -INFINITY;
+		// 		Collision* best;
 
-				for (int i = 0; i < collisions.size(); i++)
-					dir += collisions[i].normal;
+		// 		for (int i = 0; i < collisions.size(); i++)
+		// 			dir += collisions[i].normal;
 
-				for (int i = 0; i < collisions.size(); i++) {
-					Collision& col = collisions[i];
-					if (dot(col.normal, dir) < 0.0) continue;
-					contacts.insert(contacts.end(), col.contacts.begin(), col.contacts.end());
-					if (col.penetration > penetration) {
-						penetration = col.penetration;
-						best = &col;
-					}
-				}
+		// 		for (int i = 0; i < collisions.size(); i++) {
+		// 			Collision& col = collisions[i];
+		// 			if (dot(col.normal, dir) < 0.0) continue;
+		// 			contacts.insert(contacts.end(), col.contacts.begin(), col.contacts.end());
+		// 			if (col.penetration > penetration) {
+		// 				penetration = col.penetration;
+		// 				best = &col;
+		// 			}
+		// 		}
 
-				if (!contacts.size()) return { };
+		// 		if (!contacts.size()) return { };
 
-				best->contacts = contacts;
-				dir.normalize();
-				best->penetration *= dot(best->normal, dir);
-				best->normal = dir;
+		// 		best->contacts = contacts;
+		// 		dir.normalize();
+		// 		best->penetration *= dot(best->normal, dir);
+		// 		best->normal = dir;
 
-				return *best;
-			}
-		}
+		// 		return *best;
+		// 	}
+		// }
 };

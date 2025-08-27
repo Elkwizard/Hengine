@@ -1355,7 +1355,7 @@ class GLSLProgram {
 			return;
 		}
 
-		for (const [_, attribute] of div.attributes)
+		for (const attribute of div.attributes.values())
 			attribute.enabled = false;
 		
 		let offset = 0;
@@ -1387,7 +1387,7 @@ class GLSLProgram {
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 		
-		for (const [_, attribute] of div.attributes) {
+		for (const attribute of div.attributes.values()) {
 			for (let j = 0; j < attribute.columns; j++) {
 				const pointer = attribute.location + j;
 				gl.vertexAttribPointer(

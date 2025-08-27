@@ -11,17 +11,18 @@
 class SpatialHash {
 	private:
 		static constexpr int CELLS_PER_ITEM = raiseTo(2, DIM);
-		std::unordered_map<Coord, std::vector<RigidBody*>> cells;
+		std::unordered_map<Coord, std::vector<RigidBody::Collider*>> cells;
 		double cellSize;
 		double dt;
 		size_t wave;
 
-		AABB boundsOf(RigidBody* body) const {
-			return body->bounds + body->velocity.linear * dt;
+		AABB boundsOf(const RigidBody::Collider& collider) const {
+			RigidBody* body = collider.body;
+			return collider.localBounds + (body->position.linear + body->velocity.linear * dt);
 		}
 		
-		static bool canCollide(const RigidBody& a, const RigidBody& b) {
-			return a.canCollideWith(b) && b.canCollideWith(a);
+		static bool canCollide(const RigidBody::Collider& a, const RigidBody::Collider& b) {
+			return a.body->canCollideWith(*b.body) && b.body->canCollideWith(*a.body);
 		}
 
 	public:
@@ -34,7 +35,7 @@ class SpatialHash {
 
 			double total = 0;
 			for (RigidBody* body : container) {
-				double volume = body->bounds.volume();
+				double volume = body->matter.mass / body->getDensity();
 				if (!isnan(volume)) total += volume;
 			}
 
@@ -44,29 +45,30 @@ class SpatialHash {
 			for (RigidBody* body : container) {
 				if (!body->canCollide) continue;
 
-				body->wave = 0;
-
-				AABB bounds = boundsOf(body);
-				Coord min (bounds.min / cellSize);
-				Coord max (bounds.max / cellSize);
-				ND_LOOP(cell, min, max) {
-					cells[cell].push_back(body);
+				for (RigidBody::Collider& collider : body->colliders) {
+					collider.wave = 0;
+					AABB bounds = boundsOf(collider);
+					Coord min (bounds.min / cellSize);
+					Coord max (bounds.max / cellSize);
+					ND_LOOP(cell, min, max) {
+						cells[cell].push_back(&collider);
+					}
 				}
 			}
 		}
 
-		std::vector<RigidBody*> query(RigidBody* body) {
+		std::vector<RigidBody::Collider*> query(const RigidBody::Collider& collider) {
 			wave++;
-			std::vector<RigidBody*> result;
+			std::vector<RigidBody::Collider*> result;
 			
-			AABB bounds = boundsOf(body);
+			AABB bounds = boundsOf(collider);
 			Coord min (bounds.min / cellSize);
 			Coord max (bounds.max / cellSize);
 			ND_LOOP(cell, min, max) {
-				for (RigidBody* contained : cells[cell]) {
+				for (RigidBody::Collider* contained : cells[cell]) {
 					if (contained->wave < wave) {
 						contained->wave = wave;
-						if (canCollide(*body, *contained))
+						if (canCollide(collider, *contained))
 							result.push_back(contained);
 					}
 				}

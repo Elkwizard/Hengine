@@ -71,14 +71,14 @@ class InputHandler {
 		} else return this.get(arg)[state];
 	}
 	targetAll(target) {
-		for (const [_, state] of this.states) state.targetState = target;
+		for (const state of this.states.values()) state.targetState = target;
 	}
 	beforeUpdate() {
 		this.totalCount++;
-		for (const [_, state] of this.states) state.beforeUpdate();
+		for (const state of this.states.values()) state.beforeUpdate();
 	}
 	afterUpdate() {
-		for (const [_, state] of this.states) state.afterUpdate();
+		for (const state of this.states.values()) state.afterUpdate();
 	}
 	/**
 	 * @group pressed, released, justPressed, justReleased
@@ -342,7 +342,7 @@ class MouseHandler extends InputHandler {
 				this.screenDelta.add(this.getEventMovement(event));
 
 				const wpos = this.getWorldPosition(pos);
-				for (const [_, state] of this.states) {
+				for (const state of this.states.values()) {
 					if (state.pressed) {
 						state.screenDragEnd = pos;
 						state.worldDragEnd = wpos;

@@ -14,7 +14,7 @@ class Engine;
 
 API class Engine {
 	private:
-		using CollisionPair = std::pair<RigidBody*, std::vector<RigidBody*>>;
+		using CollisionPair = std::pair<RigidBody::Collider*, std::vector<RigidBody::Collider*>>;
 
 		static constexpr double CONSTRAINT_IMPROVEMENT_THRESHOLD = 0.1;
 		static constexpr int CONSTRAINT_CONFUSION_THRESHOLD = 4;
@@ -26,7 +26,8 @@ API class Engine {
 		std::vector<std::unique_ptr<RigidBody>> bodies;
 		std::vector<RigidBody*> simBodies, dynBodies;
 		std::vector<std::unique_ptr<ConstraintDescriptor>> constraintDescriptors;
-		std::unordered_map<std::pair<RigidBody*, RigidBody*>, bool> triggerCache;
+		std::unordered_map<std::pair<RigidBody*, RigidBody*>, std::pair<bool, bool>> triggerCache;
+		std::unordered_set<std::pair<RigidBody::Collider*, RigidBody::Collider*>> eventsFired;
 		SpatialHash hash;
 		double collisionSlop;
 
@@ -141,40 +142,48 @@ API class Engine {
 			std::vector<CollisionPair> collisionPairs;
 			for (RigidBody* body : dynBodies)
 				if (body->canCollide)
-					collisionPairs.emplace_back(body, hash.query(body));
+					for (RigidBody::Collider& collider : body->colliders)
+						collisionPairs.emplace_back(&collider, hash.query(collider));
 			
 			return collisionPairs;
 		}
 
-		bool triggerCollision(RigidBody* a, RigidBody* b, const Collision& col) {
+		bool triggerCollision(RigidBody::Collider* a, RigidBody::Collider* b, const Collision& col) {
+			RigidBody* bodyA = a->body;
+			RigidBody* bodyB = b->body;
+
 			auto collisionKey = a < b ? std::make_pair(a, b) : std::make_pair(b, a);
+			auto triggerKey = std::make_pair(bodyA, bodyB);
 
-			if (!triggerCache.count(collisionKey)) {
-				bool isTriggerA = a->isTrigger || a->isTriggerWith(*b);
-				bool isTriggerB = b->isTrigger || b->isTriggerWith(*a);
+			if (!triggerCache.count(triggerKey)) {
+				bool isTriggerA = bodyA->isTrigger || bodyA->isTriggerWith(*bodyB);
+				bool isTriggerB = bodyB->isTrigger || bodyB->isTriggerWith(*bodyA);
 	
-				onCollide(*a, *b, col.normal, col.contacts, isTriggerA, isTriggerB);
-
-				bool isTrigger = isTriggerA || isTriggerB;
-				triggerCache.emplace(std::make_pair(collisionKey, isTrigger));
+				triggerCache[{ bodyA, bodyB }] = { isTriggerA, isTriggerB };
+				triggerCache[{ bodyB, bodyA }] = { isTriggerB, isTriggerA };
 			}
 
-			return triggerCache.at(collisionKey);
+			auto trigger = triggerCache.at(triggerKey);
+
+			if (!eventsFired.count(collisionKey))
+				onCollide(*bodyA, *bodyB, col.normal, col.contacts, trigger.first, trigger.second);
+
+			return trigger.first || trigger.second;
 		}
 		
-		ContactConstraint* tryCollision(RigidBody& a, RigidBody& b, double dt) {
+		ContactConstraint* tryCollision(RigidBody::Collider& a, RigidBody::Collider& b, double dt) {
 			if (&a == &b) return nullptr;
 
-			std::optional<Collision> col = Detector::collideBodies(a, b);
+			std::optional<Collision> col = Detector::collide(a.cache(), b.cache());
 			
 			if (!col || triggerCollision(&a, &b, *col)) return nullptr;
 
 			col->penetration -= collisionSlop;
 
-			bool dynamic = b.getDynamic() && !b.prohibited.has(col->normal);
-			if (!dynamic) a.prohibited.add(col->normal);
+			bool dynamic = b.body->getDynamic() && !b.body->prohibited.has(col->normal);
+			if (!dynamic) a.body->prohibited.add(col->normal);
 			
-			ContactConstraint* constraint = new ContactConstraint(dynamic, a, b, *col);
+			ContactConstraint* constraint = new ContactConstraint(dynamic, *a.body, *b.body, *col);
 			constraint->solvePosition(dt);
 			return constraint;
 		}
@@ -184,9 +193,9 @@ API class Engine {
 				body->prohibited.clear();
 			
 			Resolver<ContactConstraint> resolver;
-			for (const auto& [body, toCollide] : collisionPairs)
-				for (RigidBody* other : toCollide)
-					resolver.addConstraint(tryCollision(*body, *other, dt));
+			for (const auto& [collider, toCollide] : collisionPairs)
+				for (RigidBody::Collider* other : toCollide)
+					resolver.addConstraint(tryCollision(*collider, *other, dt));
 
 			resolver.solve<&ContactConstraint::solveVelocity>(dt, contactIterations);
 		}
@@ -251,6 +260,7 @@ API class Engine {
 			collisionSlop = COLLISION_SLOP * gravity.mag();
 
 			triggerCache.clear();
+			eventsFired.clear();
 			
 			Resolver<Constraint2> constraintResolver = getConstraintResolver(deltaTime);
 			std::vector<CollisionPair> collisionPairs = getCollisionPairs(deltaTime);

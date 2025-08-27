@@ -33,10 +33,10 @@ class std::hash<std::pair<L, R>> {
 
 class RayHit {
 	public:
-		RigidBody* body;
+		const RigidBody* body;
 		double distance;
 
-		RayHit(RigidBody* _body, double _distance) {
+		RayHit(const RigidBody* _body, double _distance) {
 			body = _body;
 			distance = _distance;
 		}
@@ -61,52 +61,6 @@ class ConstraintDescriptor;
 
 API class RigidBody {
 	private:
-		class Collider {
-			private:
-				std::unique_ptr<Shape> local;
-				mutable std::unique_ptr<Shape> global;
-				mutable bool valid = false;
-				
-			public:
-				AABB bounds;
-				
-				Collider(Shape* _local) {
-					local = std::unique_ptr<Shape>(_local);
-					global = std::unique_ptr<Shape>(local->copy());
-				}
-		
-				bool operator ==(Shape* other) const {
-					return local.get() == other;
-				}
-		
-				void invalidate() {
-					valid = false;
-				}
-
-				void beforeSimulation() {
-					global->clearCache();
-				}
-		
-				void updateBounds(bool dynamic, const Transform& transf) {
-					global->sync(*local, transf);
-					bounds = dynamic ? global->getBallBounds() : global->getBounds();
-					valid = false;
-				}
-		
-				Shape& cache(const Transform& transform) const {
-					if (!valid) {
-						valid = true;
-						global->sync(*local, transform);
-					}
-					return *global;
-				}
-
-				friend std::ostream& operator <<(std::ostream& out, const Collider& collider) {
-					out << *collider.local;
-					return out;
-				}
-		};
-		
 		class Prohibited {
 			public:
 				std::vector<Vector> prohibited;
@@ -135,7 +89,6 @@ API class RigidBody {
 	
 		bool dynamic;
 		double density = 1;
-		std::vector<Collider> colliders;
 		Transform lastPosition;
 		Orientation lastBoundedOrientation;
 
@@ -152,17 +105,12 @@ API class RigidBody {
 		void invalidateColliders() {
 			for (Collider& collider : colliders)
 				collider.invalidate();
-			bounds = localBounds + position.linear;
 		}
 
 		void updateLocalBounds() {
 			lastBoundedOrientation = position.orientation;
-			localBounds = { };
-			Transform orientationOnly = { { }, position.orientation };
-			for (Collider& collider : colliders) {
-				collider.updateBounds(dynamic, orientationOnly);
-				localBounds.add(collider.bounds);
-			}
+			for (Collider& collider : colliders)
+				collider.updateBounds();
 		}
 
 		void modifyShapes() {
@@ -171,14 +119,63 @@ API class RigidBody {
 		}
 
 	public:
+		class Collider {
+			private:
+				std::unique_ptr<Shape> local;
+				mutable std::unique_ptr<Shape> global;
+				mutable bool valid = false;
+				
+			public:
+				RigidBody* body;
+				AABB localBounds;
+				size_t wave;
+				
+				Collider(RigidBody* _body, Shape* _local) {
+					body = _body;
+					local = std::unique_ptr<Shape>(_local);
+					global = std::unique_ptr<Shape>(local->copy());
+				}
+
+				bool operator ==(Shape* other) const {
+					return local.get() == other;
+				}
+		
+				void invalidate() {
+					valid = false;
+				}
+
+				void beforeSimulation() {
+					global->clearCache();
+				}
+		
+				void updateBounds() {
+					global->sync(*local, { { }, body->position.orientation });
+					localBounds = body->dynamic ? global->getBallBounds() : global->getBounds();
+					valid = false;
+				}
+		
+				Shape& cache() const {
+					if (!valid) {
+						valid = true;
+						global->sync(*local, body->position);
+					}
+					return *global;
+				}
+
+				friend std::ostream& operator <<(std::ostream& out, const Collider& collider) {
+					out << *collider.local;
+					return out;
+				}
+		};
+
+		std::vector<Collider> colliders;
+
 		API_CONST Transform position;
 		API_CONST Transform velocity;
 
 		API int name;
-		size_t wave;
 		
 		Matter localMatter, matter;
-		AABB localBounds, bounds;
 		
 		Prohibited prohibited;
 		API_CONST std::vector<ConstraintDescriptor*> constraintDescriptors;
@@ -242,7 +239,7 @@ API class RigidBody {
 
 		API void addShape(Shape* shape) {
 			localMatter += shape->getMatter() * density;
-			colliders.emplace_back(shape);
+			colliders.emplace_back(this, shape);
 			modifyShapes();
 		}
 		
@@ -270,7 +267,7 @@ API class RigidBody {
 #endif
 			return K;
 		}
-
+		
 		bool isTriggerWith(const RigidBody& other) const {
 			return !trivialTriggerRule && triggerRule(*this, other);
 		}
@@ -279,14 +276,6 @@ API class RigidBody {
 			return trivialCollisionRule || collisionRule(*this, other);
 		}
 
-		int getShapeCount() const {
-			return colliders.size();
-		}
-
-		const Shape& getShape(int index) const {
-			return colliders[index].cache(position);
-		}
-		
 		Vector getPointVelocity(const Vector& offset) const {
 			return velocity.linear + IF_3D(
 				cross(velocity.orientation.getRotation(), offset),
@@ -321,10 +310,9 @@ API class RigidBody {
 	
 			sync();
 
-			if (dynamic) {
+			if (dynamic)
 				for (Collider& collider : colliders)
 					collider.beforeSimulation();
-			}
 		}
 
 		void sync() {
@@ -356,10 +344,8 @@ API class RigidBody {
 		RayHit raycast(const Ray& ray) const {
 			RayHit best;
 
-			for (int i = 0; i < getShapeCount(); i++) {
-				double dist = getShape(i).raycast(ray);
-				best.add({ (RigidBody*)this, dist });
-			}
+			for (const Collider& collider : colliders)
+				best.add({ this, collider.cache().raycast(ray) });
 
 			return best;
 		}
