@@ -115,6 +115,17 @@ class InputHandler {
 			});
 		};
 	}
+	
+	/**
+	 * Converts a collection of InputHandler.States into a single state which represents the union of all involved keys.
+	 * For example, if one were to call `InputHandler.merge(keyboard.get("a"), keyboard.get("LeftArrow"))`, the resulting state would permanently provide information about a theoretical key which is pressed when either "a" or "LeftArrow" are pressed.
+	 * The returned state doesn't have either of the `.*Length` properties.
+	 * @param InputHandler.State[] states | The states to OR together. Must contain at least one element
+	 * @return InputHandler.State
+	 */
+	static merge(states) {
+		return new InputHandler.MergedState(states);
+	}
 
 	static OR = true;
 	static AND = false;
@@ -145,6 +156,7 @@ InputHandler.State = class State {
 		this.turnOn = false;
 
 		this.pressed = false;
+		this.everPressed = false;
 		this.downCount = 0;
 		this.upCount = 0;
 
@@ -233,6 +245,45 @@ InputHandler.State = class State {
 			this.pressed = false;
 			this.upCount = 0;
 		}
+	}
+};
+
+InputHandler.MergedState = class MergedState extends InputHandler.State {
+	constructor(states) {
+		super(states[0].handler, states.map(state => state.name).join("/"));
+		this.states = states;
+	}
+	set pressed(_) { }
+	get pressed() {
+		return this.states.reduce((a, b) => a || b.pressed, false);
+	}
+	get justPressed() {
+		let success = false;
+
+		for (let i = 0; i < this.states.length; i++) {
+			const state = this.states[i];
+			if (state.justPressed) {
+				success = true;
+			} else if (state.pressed) {
+				return false;
+			}
+		}
+
+		return success;
+	}
+	get justReleased() {
+		let success = false;
+
+		for (let i = 0; i < this.states.length; i++) {
+			const state = this.states[i];
+			if (state.justReleased) {
+				success = true;
+			} else if (state.released) {
+				return false;
+			}
+		}
+
+		return success;
 	}
 };
 

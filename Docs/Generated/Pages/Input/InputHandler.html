@@ -117,13 +117,42 @@ If no keys meet the requirement, null is returned instead.
 				</div>
 			
 		</div>
+	
+		<div class="function-wrapper" id="InputHandler.merge()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L126" target="_blank" class="function-name source-link">InputHandler.merge</a>(<span class="param">states</span>)<span class="type">InputHandler.State</span>
+			</div>
+			<div class="function desc">
+				Converts a collection of InputHandler.States into a single state which represents the union of all involved keys.
+For example, if one were to call <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">InputHandler</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">merge</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">keyboard</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">get</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;a&quot;</span><span class="highlight-SYMBOL">), </span><span class="highlight-IDENTIFIER">keyboard</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">get</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;LeftArrow&quot;</span><span class="highlight-SYMBOL">))</span></code>, the resulting state would permanently provide information about a theoretical key which is pressed when either "a" or "LeftArrow" are pressed.
+The returned state doesn't have either of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.*</span><span class="highlight-CLASS">Length</span></code> properties.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="InputHandler.merge():states">
+							<div class="param-name">
+								<span class="param">states</span>
+								<span class="type">InputHandler.State[]</span>
+							</div>
+							<div class="param desc">
+								The states to OR together. Must contain at least one element
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
 	</div>
 				
 			</div>
 		
 			<div class="class-wrapper" id="class InputHandler.State">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L139" target="_blank" class="class-name source-link">InputHandler.State</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L150" target="_blank" class="class-name source-link">InputHandler.State</a>
 				</div>
 				<div class="class desc">
 					Represents the current state of a key on an input device.
@@ -162,7 +191,7 @@ This is an abstract superclass and should not be constructed.
 					<div class="class-methods">
 		<div class="function-wrapper" id="get InputHandler.State.prototype.pressed()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L174" target="_blank" class="function-name source-link">pressed</a><span class="type">Boolean</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L186" target="_blank" class="function-name source-link">pressed</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether the key is currently pressed.
@@ -172,7 +201,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get InputHandler.State.prototype.released()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L181" target="_blank" class="function-name source-link">released</a><span class="type">Boolean</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L193" target="_blank" class="function-name source-link">released</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether the key is not currently pressed.
@@ -182,7 +211,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get InputHandler.State.prototype.justPressed()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L188" target="_blank" class="function-name source-link">justPressed</a><span class="type">Boolean</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L200" target="_blank" class="function-name source-link">justPressed</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether the key became pressed within the last frame.
@@ -192,7 +221,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get InputHandler.State.prototype.justReleased()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L195" target="_blank" class="function-name source-link">justReleased</a><span class="type">Boolean</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L207" target="_blank" class="function-name source-link">justReleased</a><span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Returns whether the key stopped being pressed within the last frame.
@@ -202,7 +231,7 @@ This is an abstract superclass and should not be constructed.
 	
 		<div class="function-wrapper" id="get InputHandler.State.prototype.pressLength()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L203" target="_blank" class="function-name source-link">pressLength</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L215" target="_blank" class="function-name source-link">pressLength</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the duration of the most recent press of the key.
@@ -213,7 +242,7 @@ If the key is currently pressed, this returns the time since the key was pressed
 	
 		<div class="function-wrapper" id="get InputHandler.State.prototype.releaseLength()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L211" target="_blank" class="function-name source-link">releaseLength</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Util\Input.js?#L223" target="_blank" class="function-name source-link">releaseLength</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the duration of the most recent period in which the key was released.

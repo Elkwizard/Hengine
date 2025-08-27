@@ -8729,6 +8729,13 @@ declare class InputHandler {
 	 * If no keys meet the requirement, null is returned instead.
 	 */
 	get allJustReleased(): string[] | null;
+	/**
+	 * Converts a collection of InputHandler.States into a single state which represents the union of all involved keys.
+	 * For example, if one were to call `InputHandler.merge(keyboard.get("a"), keyboard.get("LeftArrow"))`, the resulting state would permanently provide information about a theoretical key which is pressed when either "a" or "LeftArrow" are pressed.
+	 * The returned state doesn't have either of the `.*Length` properties.
+	 * @param states - The states to OR together. Must contain at least one element
+	 */
+	static merge(states: InputHandler.State[]): InputHandler.State;
 }
 
 /**
