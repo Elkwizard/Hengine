@@ -810,7 +810,7 @@ ControllerHandler.State = class ControllerState extends InputHandler.State {
 		super(handler, name);
 	}
 	get amount() {
-		return this.handler.gamepad.buttons[this.name].value;
+		return this.handler.gamepad.buttons[this.name]?.value ?? 0;
 	}
 };
 
