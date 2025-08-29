@@ -744,8 +744,16 @@ class HengineLoadingStructure {
 		return this.add(new HengineBinaryResource(this.absSrc(src)));
 	}
 	/**
+	 * Adds a HengineControllerResource to the queue with a specified name.
+	 * @param String name | The name of the resource. Can be anything
+	 * @return HengineLoadingStructure
+	 */
+	controller(name) {
+		return this.add(new HengineControllerResource(name));
+	}
+	/**
 	 * Adds a HengineWebcamResource to the queue with a specified name.
-	 * @param String name | The name of the resource
+	 * @param String name | The name of the resource. Can be anything
 	 * @return HengineLoadingStructure
 	 */
 	webcam(name) {
@@ -875,6 +883,7 @@ class HengineLoader {
 		window.keyboard = this.engine.keyboard;
 		window.mouse = this.engine.mouse;
 		window.touches = this.engine.touches;
+		window.controllers = this.engine.controllers;
 		window.clipboard = this.engine.clipboard;
 		window.fileSystem = this.engine.fileSystem;
 		window.intervals = this.engine.intervals;
@@ -918,7 +927,10 @@ class HengineLoader {
 	}
 	copyResource(src) {
 		const resource = this.resources.get(src);
-		return resource?.get?.() ?? resource ?? null;
+		if (resource === null) return null;
+		if (typeof resource.get === "function" && resource.get.length === 0)
+			return resource.get();
+		return resource;
 	}
 	/**
 	 * Retrieves a specific resource.

@@ -48,6 +48,15 @@ class Vector extends Operable {
 		return this.div(this.mag || 1);
 	}
 	/**
+	 * Returns a copy of the vector clamped to zero if its magnitude is below a certain threshold.
+	 * Useful for combating stick drift in controller inputs.
+	 * @prop Number threshold? | The maximum magnitude which will be clamped to zero. Default is 0.1
+	 * @return Vector
+	 */
+	dead(threshold = 0.1) {
+		return this.sqrMag <= threshold ** 2 ? this.constructor.zero : this.get();
+	}
+	/**
 	 * Computes the dot product between the caller and another vector.
 	 * @param Vector other | The vector to take the dot product with 
 	 * @return Number

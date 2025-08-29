@@ -1,5 +1,5 @@
 /**
- * Provides an API for interacting with a key-based input device (mouse, keyboard).
+ * Provides an API for interacting with a key-based input device (mouse, keyboard, controller).
  * @abstract
  * @props<immutable>
  */
@@ -543,7 +543,8 @@ class TouchHandler extends InputHandler {
 	addListeners() {
 		const addHandler = (eventName, target) => {
 			document.addEventListener(eventName, event => {
-				if (eventName !== "pointerdown" && event.cancelable) event.preventDefault();
+				if (eventName !== "pointerdown" && event.cancelable)
+					event.preventDefault();
 				this.updateTouch(event, target);
 			}, { passive: false });
 		};
@@ -640,6 +641,180 @@ TouchHandler.addChecks([
 	"worldDragStart",
 	"worldDragEnd"
 ]);
+
+/**
+ * Allows access to any number of connected Gamepad controllers.
+ * This class should not be constructed directly, and should instead be acquired via the `.controllers` property of both the global object and Hengine.
+ * ```js
+ * let players = [];
+ * intervals.continuous(() => {
+ * 	// connect as many players as possible
+ * 	while (controllers.available) players.push(controllers.nextController());
+ * 	renderer.draw(new Color("black")).text(Font.Arial30, `${players.length} controllers connected`, 10, 10);
+ * });
+ * ```
+ */
+class Controllers {
+	constructor(engine) {
+		this.engine = engine;
+		this.gamepads = [];
+		this.handlers = [];
+		this.activeHandlers = new Map();
+
+		window.addEventListener("gamepadconnected", ({ gamepad }) => {
+			this.gamepads.push(gamepad.index);
+			this.tryResolve();
+		});
+
+		window.addEventListener("gamepaddisconnected", ({ gamepad: { index } }) => {
+			if (this.activeHandlers.has(index)) {
+				const handler = this.activeHandlers.get(index);
+				handler.disconnect();
+				this.activeHandlers.delete(index);
+			} else {
+				const index = this.gamepads.indexOf(index);
+				if (index > -1) this.gamepads.splice(index, 1);
+			}
+		});
+	}
+	/**
+	 * Returns the amount of currently connected controllers which are not associated with ControllerHandlers.
+	 * @return Number
+	 */
+	get available() {
+		return this.gamepads.length;
+	}
+	tryResolve() {
+		if (this.gamepads.length >= 1 && this.handlers.length >= 1) {
+			const index = this.gamepads.shift();
+			const handler = this.handlers.shift();
+			handler.connect(index);
+			this.activeHandlers.set(index, handler);
+		}
+	}
+	/**
+	 * Creates a ControllerHandler for the next connected Gamepad controller.
+	 * While a controller is not connected, the handler will not provide any inputs.
+	 * @return ControllerHandler
+	 */
+	nextController() {
+		const handler = new ControllerHandler(this.engine);
+		this.handlers.push(handler);
+		this.tryResolve();
+		return handler;
+	}
+	beforeUpdate() {
+		for (const handler of this.activeHandlers.values())
+			handler.beforeUpdate();
+	}
+	afterUpdate() {
+		for (const handler of this.activeHandlers.values())
+			handler.afterUpdate();
+	}
+}
+
+/**
+ * Represents the API for interacting with a specific Gamepad controller.
+ * This class should not be constructed directly, and should instead be acquired via a Controllers object.
+ * ```js
+ * const { XB } = ControllerHandler;
+ * const controller = await new HengineControllerResource("whatever").load();
+ * const position = middle;
+ * intervals.continuous(() => {
+ * 	position.add(controller.leftStick.times(7));
+ * 	const color = controller.pressed(XB.A) ? new Color("red") : new Color("blue");
+ * 	renderer.draw(color).circle(position, 50);
+ * });
+ * ```
+ * @prop Vector2 leftStick | The current displacement of the left controller stick from its equilibrium position
+ * @prop Vector2 rightStick | The current displacement of the right controller stick from its equilibrium position
+ * @prop Boolean connected | Whether the controller is currently connected to the computer. Reconnecting a disconnected controller will cause it to be seen as a new device, so this property can never change from false to true
+ * @prop Promise ready | A promise which resolves to the ControllerHandler when it is connects
+ * @prop<static, immutable> Object XB | A mapping from button names to API key names, based on the names used on XBox controllers. The keys are A, B, X, Y, LB, RB, LT, RT, Select, Start, LeftStick, RightStick, Up, Down, Left, and Right. The stick keys correspond to the act of pushing in the stick, and the directional keys refer to the D-pad.
+ */
+class ControllerHandler extends InputHandler {
+	constructor(engine) {
+		super(engine);
+		this.index = null;
+		this.ready = new Promise(resolve => {
+			this.connect = resolve;
+		}).then(index => {
+			this.connected = true;
+			this.index = index;
+			return this;
+		});
+		this.connected = false;
+	}
+	get gamepad() {
+		if (!this.connected) return {
+			buttons: [],
+			axes: [0, 0, 0, 0]
+		};
+		return navigator.getGamepads()[this.index];
+	}
+	get leftStick() {
+		const { axes } = this.gamepad;
+		return new Vector2(axes[0], axes[1]);
+	}
+	get rightStick() {
+		const { axes } = this.gamepad;
+		return new Vector2(axes[2], axes[3]);
+	}
+	disconnect() {
+		this.connected = false;
+	}
+	beforeUpdate() {
+		const { buttons } = this.gamepad;
+		for (let i = 0; i < buttons.length; i++) {
+			const button = buttons[i];
+			const state = this.get(i);
+			if (state.pressed === button.pressed) continue;
+			if (button.pressed) {
+				state.turnOn = true;
+			} else {
+				state.turnOff = true;
+			}
+		}
+		super.beforeUpdate();
+	}
+
+	static XB = {
+		A: 0,
+		B: 1,
+		X: 2,
+		Y: 3,
+		LB: 4,
+		RB: 5,
+		LT: 6,
+		RT: 7,
+		Select: 8,
+		Start: 9,
+		LeftStick: 10,
+		RightStick: 11,
+		Up: 12,
+		Down: 13,
+		Left: 14,
+		Right: 15,
+		Power: 16
+	};
+	static PS = { }; // TODO: fill in
+}
+
+/**
+ * @name class ControllerHandler.State extends InputHandler.State
+ * The state of a specific button on a Gamepad controller, as retrieved from a ControllerHandler.
+ * @prop Number amount | The extent to which the button is being pressed, on [0, 1]. For binary buttons, this will only ever take on the values 0 or 1, but for analog buttons (like "triggers"), it can take on a continuous value.
+ */
+ControllerHandler.State = class ControllerState extends InputHandler.State {
+	constructor(handler, name) {
+		super(handler, name);
+	}
+	get amount() {
+		return this.handler.gamepad.buttons[this.name].value;
+	}
+};
+
+ControllerHandler.addChecks(["amount"]);
 
 /**
  * Represents the API for interacting with the user's clipboard.

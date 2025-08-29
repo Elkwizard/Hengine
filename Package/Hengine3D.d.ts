@@ -462,8 +462,13 @@ declare class HengineLoadingStructure {
 	 */
 	binary(src: string): this;
 	/**
+	 * Adds a HengineControllerResource to the queue with a specified name.
+	 * @param name - The name of the resource. Can be anything
+	 */
+	controller(name: string): this;
+	/**
 	 * Adds a HengineWebcamResource to the queue with a specified name.
-	 * @param name - The name of the resource
+	 * @param name - The name of the resource. Can be anything
 	 */
 	webcam(name: string): this;
 	/**
@@ -2266,6 +2271,11 @@ declare class Vector extends Operable {
 	 * Normalizes the vector in-place and returns the caller.
 	 */
 	normalize(): this;
+	/**
+	 * Returns a copy of the vector clamped to zero if its magnitude is below a certain threshold.
+	 * Useful for combating stick drift in controller inputs.
+	 */
+	dead(): this;
 	/**
 	 * Computes the dot product between the caller and another vector.
 	 * @param other - The vector to take the dot product with
@@ -8675,7 +8685,7 @@ declare interface Serializable {
 }
 
 /**
- * Provides an API for interacting with a key-based input device (mouse, keyboard).
+ * Provides an API for interacting with a key-based input device (mouse, keyboard, controller).
  * This is an abstract superclass and should not be constructed.
  */
 declare class InputHandler {
@@ -8739,7 +8749,7 @@ declare class InputHandler {
 }
 
 /**
- * Provides an API for interacting with a key-based input device (mouse, keyboard).
+ * Provides an API for interacting with a key-based input device (mouse, keyboard, controller).
  * This is an abstract superclass and should not be constructed.
  */
 declare namespace InputHandler {
@@ -9006,6 +9016,93 @@ declare namespace TouchHandler {
 		 * The position of the touch last frame, in World-Space
 		 */
 		worldLast: Vector2;
+	}
+}
+
+/**
+ * Allows access to any number of connected Gamepad controllers.
+ * This class should not be constructed directly, and should instead be acquired via the `.controllers` property of both the global object and Hengine.
+ * ```js
+ * let players = [];
+ * intervals.continuous(() => {
+ * // connect as many players as possible
+ * while (controllers.available) players.push(controllers.nextController());
+ * renderer.draw(new Color("black")).text(Font.Arial30, `${players.length} controllers connected`, 10, 10);
+ * });
+ * ```
+ */
+declare class Controllers {
+	/**
+	 * Returns the amount of currently connected controllers which are not associated with ControllerHandlers.
+	 */
+	get available(): number;
+	/**
+	 * Creates a ControllerHandler for the next connected Gamepad controller.
+	 * While a controller is not connected, the handler will not provide any inputs.
+	 */
+	nextController(): ControllerHandler;
+}
+
+/**
+ * Represents the API for interacting with a specific Gamepad controller.
+ * This class should not be constructed directly, and should instead be acquired via a Controllers object.
+ * ```js
+ * const { XB } = ControllerHandler;
+ * const controller = await new HengineControllerResource("whatever").load();
+ * const position = middle;
+ * intervals.continuous(() => {
+ * position.add(controller.leftStick.times(7));
+ * const color = controller.pressed(XB.A) ? new Color("red") : new Color("blue");
+ * renderer.draw(color).circle(position, 50);
+ * });
+ * ```
+ */
+declare class ControllerHandler extends InputHandler {
+	/**
+	 * The current displacement of the left controller stick from its equilibrium position
+	 */
+	leftStick: Vector2;
+	/**
+	 * The current displacement of the right controller stick from its equilibrium position
+	 */
+	rightStick: Vector2;
+	/**
+	 * Whether the controller is currently connected to the computer. Reconnecting a disconnected controller will cause it to be seen as a new device, so this property can never change from false to true
+	 */
+	connected: boolean;
+	/**
+	 * A promise which resolves to the ControllerHandler when it is connects
+	 */
+	ready: Promise;
+	/**
+	 * A mapping from button names to API key names, based on the names used on XBox controllers. The keys are A, B, X, Y, LB, RB, LT, RT, Select, Start, LeftStick, RightStick, Up, Down, Left, and Right. The stick keys correspond to the act of pushing in the stick, and the directional keys refer to the D-pad.
+	 */
+	static XB: object;
+}
+
+/**
+ * Represents the API for interacting with a specific Gamepad controller.
+ * This class should not be constructed directly, and should instead be acquired via a Controllers object.
+ * ```js
+ * const { XB } = ControllerHandler;
+ * const controller = await new HengineControllerResource("whatever").load();
+ * const position = middle;
+ * intervals.continuous(() => {
+ * position.add(controller.leftStick.times(7));
+ * const color = controller.pressed(XB.A) ? new Color("red") : new Color("blue");
+ * renderer.draw(color).circle(position, 50);
+ * });
+ * ```
+ */
+declare namespace ControllerHandler {
+	/**
+	 * The state of a specific button on a Gamepad controller, as retrieved from a ControllerHandler.
+	 */
+	class State extends InputHandler.State {
+		/**
+		 * The extent to which the button is being pressed, on [0, 1]. For binary buttons, this will only ever take on the values 0 or 1, but for analog buttons (like "triggers"), it can take on a continuous value.
+		 */
+		amount: number;
 	}
 }
 

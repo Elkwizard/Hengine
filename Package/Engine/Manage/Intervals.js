@@ -291,6 +291,7 @@ class IntervalManager {
 		this.engine.keyboard.beforeUpdate();
 		this.engine.mouse.beforeUpdate();
 		this.engine.touches.beforeUpdate();
+		this.engine.controllers.beforeUpdate();
 		if (!this.paused) {
 			this.updateGraphs();
 			this.updateIntervalCalls(IntervalFunction.BEFORE_UPDATE);
@@ -305,6 +306,7 @@ class IntervalManager {
 		this.engine.keyboard.afterUpdate();
 		this.engine.mouse.afterUpdate();
 		this.engine.touches.afterUpdate();
+		this.engine.controllers.afterUpdate();
 		
 		if (!this.paused) this.frameCount++;
 	}

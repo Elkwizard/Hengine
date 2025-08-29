@@ -168,6 +168,7 @@
 		"KeyboardHandler": null,
 		"MouseHandler": ["MouseHandler", "MouseHandler.State"],
 		"TouchHandler": ["TouchHandler", "TouchHandler.State"],
+		"ControllerHandler": ["Controllers", "ControllerHandler", "ControllerHandler.State"],
 		"ClipboardHandler": null
 	},
 	"UI": {
