@@ -165,8 +165,10 @@ API class Engine {
 
 			auto trigger = triggerCache.at(triggerKey);
 
-			if (!eventsFired.count(collisionKey))
+			if (!eventsFired.count(collisionKey)) {
+				eventsFired.insert(collisionKey);
 				onCollide(*bodyA, *bodyB, col.normal, col.contacts, trigger.first, trigger.second);
+			}
 
 			return trigger.first || trigger.second;
 		}
@@ -174,7 +176,11 @@ API class Engine {
 		ContactConstraint* tryCollision(RigidBody::Collider& a, RigidBody::Collider& b, double dt) {
 			if (&a == &b) return nullptr;
 
-			std::optional<Collision> col = Detector::collide(a.cache(), b.cache());
+			if (!a.bounds.intersects(b.bounds)) return nullptr;
+			
+			const Shape& shapeA = a.cache();
+			const Shape& shapeB = b.cache();
+			std::optional<Collision> col = Detector::collide(shapeA, shapeB);
 			
 			if (!col || triggerCollision(&a, &b, *col)) return nullptr;
 

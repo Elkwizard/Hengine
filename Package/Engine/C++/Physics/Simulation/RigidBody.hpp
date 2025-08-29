@@ -127,7 +127,7 @@ API class RigidBody {
 				
 			public:
 				RigidBody* body;
-				AABB localBounds;
+				AABB localBounds, bounds;
 				size_t wave;
 				
 				Collider(RigidBody* _body, Shape* _local) {
@@ -142,6 +142,7 @@ API class RigidBody {
 		
 				void invalidate() {
 					valid = false;
+					bounds = localBounds + body->position.linear;
 				}
 
 				void beforeSimulation() {
