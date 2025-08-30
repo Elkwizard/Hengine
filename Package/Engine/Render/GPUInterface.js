@@ -1061,50 +1061,49 @@ class GLSLProgram {
 			} else {
 				gl.bindTexture(gl.TEXTURE_2D, this.staticTextureCache.get(image));
 			}
-			return;
+		} else {
+			gl.bindTexture(info.target, info.texture);
+	
+			switch (info.target) {
+				case gl.TEXTURE_2D: {
+					texImage2D(gl.TEXTURE_2D, image);
+					if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_2D);
+				} break;
+				case gl.TEXTURE_CUBE_MAP: {
+					let size;
+					for (const key in image) {
+						const face = image[key];
+						if (!size) size = face.width;
+						if (size !== face.width || size !== face.height)
+							this.error("CUBE_MAP", "Cube map faces are non-square or not equal in size");
+					}
+					texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, sampler.posX);
+					texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, sampler.negX);
+					texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, sampler.posY);
+					texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, sampler.negY);
+					texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, sampler.posZ);
+					texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, sampler.negZ);
+					if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+				} break;
+				case gl.TEXTURE_2D_ARRAY: {
+					const { pixelWidth, pixelHeight } = image[0];
+					if (!image.every(img => img.pixelWidth === pixelWidth && img.pixelHeight === pixelHeight))
+						this.error("ARRAY_TEXTURE", "Texture array elements are not of equal size");
+	
+					gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, internal, pixelWidth, pixelHeight, image.length, 0, format, type, null);
+					for (let i = 0; i < image.length; i++)
+						gl.texSubImage3D(
+							gl.TEXTURE_2D_ARRAY, 0,
+							0, 0, i,
+							pixelWidth, pixelHeight, 1,
+							format, type,
+							image[i].makeWebGLImage()
+						);
+					if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+				} break;
+			}
 		}
-		
-		gl.bindTexture(info.target, info.texture);
 
-		switch (info.target) {
-			case gl.TEXTURE_2D: {
-				texImage2D(gl.TEXTURE_2D, image);
-				if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_2D);
-			} break;
-			case gl.TEXTURE_CUBE_MAP: {
-				let size;
-				for (const key in image) {
-					const face = image[key];
-					if (!size) size = face.width;
-					if (size !== face.width || size !== face.height)
-						this.error("CUBE_MAP", "Cube map faces are non-square or not equal in size");
-				}
-				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, sampler.posX);
-				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, sampler.negX);
-				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, sampler.posY);
-				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, sampler.negY);
-				texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, sampler.posZ);
-				texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, sampler.negZ);
-				if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
-			} break;
-			case gl.TEXTURE_2D_ARRAY: {
-				const { pixelWidth, pixelHeight } = image[0];
-				if (!image.every(img => img.pixelWidth === pixelWidth && img.pixelHeight === pixelHeight))
-					this.error("ARRAY_TEXTURE", "Texture array elements are not of equal size");
-
-				gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, internal, pixelWidth, pixelHeight, image.length, 0, format, type, null);
-				for (let i = 0; i < image.length; i++)
-					gl.texSubImage3D(
-						gl.TEXTURE_2D_ARRAY, 0,
-						0, 0, i,
-						pixelWidth, pixelHeight, 1,
-						format, type,
-						image[i].makeWebGLImage()
-					);
-				if (sampler.mipmap) gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
-			} break;
-		}
-		
 		if (sampler.filter !== info.filter) {
 			info.filter = sampler.filter;
 			GLUtils.setTextureFilter(gl, info.target, sampler.filter);
@@ -1112,8 +1111,9 @@ class GLSLProgram {
 
 		if (sampler.wrap !== info.wrap) {
 			info.wrap = sampler.wrap;
-			GLUtils.setTextureFilter(gl, info.target, sampler.wrap);
+			GLUtils.setTextureWrap(gl, info.target, sampler.wrap);
 		}
+		
 	}
 	checkTextureUnit(unit) {
 		if (unit >= this.maxTextureUnits)
