@@ -386,11 +386,13 @@ class Artist3D extends Artist {
 		const { gl } = this;
 
 		if (!this.hasCache(mesh)) {
+			const instanceBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(12), gl.STATIC_DRAW);
+
 			const vertexBuffer = gl.createBuffer();
 			gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, mesh.data, gl.STATIC_DRAW);
-
-			const instanceBuffer = gl.createBuffer();
 
 			const localBoundingSphere = mesh.getBoundingBall();
 
