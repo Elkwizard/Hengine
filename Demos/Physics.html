@@ -44,7 +44,7 @@
 	scene.mouseEvents = true;
 
 	for (let i = 0; i < 50; i++) {
-		const block = scene.main.addPhysicsRectElement("block", width / 2, height - (i + 1) * 40, Random.range(40, 100), 40, true, new Controls("w", "s", "a", "d"), "No Tag");
+		const block = scene.main.addPhysicsRectElement("block", width / 2, height - 50 - (i + 0.5) * 40, Random.range(40, 100), 40, true, new Controls("w", "s", "a", "d"), "No Tag");
 		block.scripts.add(BLOCK);
 		block.scripts.add(THROWABLE);
 	}
@@ -55,5 +55,6 @@
 		renderer.draw(Color.BLACK).text(Font.Arial30, "Click and drag objects to throw them", 10, 10);
 	}, IntervalFunction.AFTER_UPDATE);
 
-	scene.physicsEngine.iterations = 5;
+	scene.physics.iterations = 5;
+
 </script>
