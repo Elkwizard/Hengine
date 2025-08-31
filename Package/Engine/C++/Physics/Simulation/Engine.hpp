@@ -174,10 +174,8 @@ API class Engine {
 		}
 		
 		ContactConstraint* tryCollision(RigidBody::Collider& a, RigidBody::Collider& b, double dt) {
-			if (&a == &b) return nullptr;
-
 			if (!a.bounds.intersects(b.bounds)) return nullptr;
-			
+
 			const Shape& shapeA = a.cache();
 			const Shape& shapeB = b.cache();
 			std::optional<Collision> col = Detector::collide(shapeA, shapeB);

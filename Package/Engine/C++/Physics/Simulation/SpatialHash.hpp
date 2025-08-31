@@ -22,6 +22,7 @@ class SpatialHash {
 		}
 		
 		static bool canCollide(const RigidBody::Collider& a, const RigidBody::Collider& b) {
+			if (a.body == b.body) return false;
 			return a.body->canCollideWith(*b.body) && b.body->canCollideWith(*a.body);
 		}
 
