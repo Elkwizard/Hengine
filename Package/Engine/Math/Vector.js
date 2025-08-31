@@ -521,6 +521,7 @@ class Vector2 extends Vector {
 		return new Vector2(p.x || 0, p.y || 0);
 	}
 }
+D2.Vector = Vector2;
 
 /**
  * Represents a 3D vector.
@@ -761,7 +762,7 @@ class Vector3 extends Vector {
 		return new Vector3(p.x || 0, p.y || 0, p.z || 0);
 	}
 }
-
+D3.Vector = Vector3;
 
 /**
  * Represents a 4D vector.
@@ -960,4 +961,3 @@ class Vector4 extends Vector {
  * @3d VectorN = Vector2 -> Vector3
  */
 Object.assign(Vector, [,, Vector2, Vector3, Vector4]);
-ND.Vector = Vector[DIM];

@@ -825,7 +825,7 @@ class Rect extends Polygon {
 		);
 	}
 }
-ND.Box = Rect;
+D2.Box = Rect;
 
 /**
  * Represents a circle.

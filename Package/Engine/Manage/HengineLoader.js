@@ -1,6 +1,7 @@
 const IS_3D = new URL(document.currentScript.src).searchParams.has("3d");
 const DIM = IS_3D ? 3 : 2;
-const ND = { };
+const D2 = { }, D3 = { };
+const ND = IS_3D ? D3 : D2;
 
 class PathManager {
 	static isRoot(path) {

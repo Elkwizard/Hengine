@@ -614,6 +614,8 @@ class Matrix3 extends Matrix {
 		);
 	}
 }
+D2.Matrix = Matrix2;
+D2.TransformMatrix = Matrix3;
 
 /**
  * Represents a 4 by 4 matrix for use with 3D vectors in homogenous coordinates or 4D vectors in standard coordinates.
@@ -850,11 +852,11 @@ class Matrix4 extends Matrix {
 		);
 	}
 }
+D3.Matrix = Matrix3;
+D3.TransformMatrix = Matrix4;
 
 /**
  * @3d MatrixN = Matrix2 -> Matrix3
  * @3d TransformMatrixN = Matrix3 -> Matrix4
  */
 Object.assign(Matrix, [,, Matrix2, Matrix3, Matrix4]);
-ND.Matrix = Matrix[DIM];
-ND.TransformMatrix = Matrix[DIM + 1];

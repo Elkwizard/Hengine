@@ -233,6 +233,7 @@ class Transform2D extends Transform {
 		if (angle) renderer.rotate(angle);
 	}
 }
+D2.Transform = Transform2D;
 
 /**
  * @type class Transform3D extends Transform<Matrix4, Vector3, Vector3>
@@ -266,5 +267,4 @@ class Transform3D extends Transform {
 		renderer.restore();
 	}
 }
-
-ND.Transform = IS_3D ? Transform3D : Transform2D;
+D3.Transform = Transform3D;

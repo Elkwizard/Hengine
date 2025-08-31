@@ -276,4 +276,4 @@ class Camera2D extends Matrix3 {
 }
 objectUtils.inherit(Camera2D, Camera);
 
-if (!IS_3D) ND.Camera = Camera2D;
+D2.Camera = Camera2D;

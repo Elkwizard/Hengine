@@ -964,7 +964,7 @@ class Prism extends Polyhedron {
 }
 objectUtils.inherit(Prism, Rect, ["equalsSameType", "closestPointTo", "equalsSameType"]);
 Prism.composeBoundingBoxes = Rect.composeBoundingBoxes;
-ND.Box = Prism;
+D3.Box = Prism;
 
 /**
  * Represents an infinite plane in 3D space.

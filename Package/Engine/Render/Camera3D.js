@@ -131,4 +131,4 @@ class Camera3D extends Matrix4 {
 }
 objectUtils.inherit(Camera3D, Camera);
 
-if (IS_3D) ND.Camera = Camera3D;
+D3.Camera = Camera3D;
