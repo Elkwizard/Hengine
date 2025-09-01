@@ -36,7 +36,7 @@ class SpatialHash {
 
 			double total = 0;
 			for (RigidBody* body : container) {
-				double volume = body->matter.mass / body->getDensity();
+				double volume = body->localMatter.mass / body->getDensity();
 				if (!isnan(volume)) total += volume;
 			}
 
