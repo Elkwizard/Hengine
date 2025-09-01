@@ -4590,7 +4590,7 @@ declare class AnimationStateMachine extends ImageType {
 }
 
 /**
- * Represents a camera in a scene targeting a specific rendering surface.
+ * Represents a camera in a scene targeting a specific portion of the screen.
  * The transformation represented by this matrix is from World-Space to Camera-Space.
  * `Vector` in the context of this class refers to either `Vector2` or `Vector3` depending on whether Camera2D or Camera3D is used.
  * Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
@@ -4608,6 +4608,10 @@ declare interface Camera<Vector> extends Matrix {
 	 * The clockwise roll (in radians) of the camera. Starts at 0
 	 */
 	rotation: number;
+	/**
+	 * Returns the portion of the screen which the camera's view will be rendered to.
+	 */
+	get viewport(): Rect;
 	/**
 	 * Returns the caller.
 	 */
@@ -4648,26 +4652,29 @@ declare interface Camera<Vector> extends Matrix {
 	 */
 	worldToCamera(point: Vector): Vector;
 	/**
-	 * Assuming the renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * Assuming a renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
 	 * @param render - The function to call while in the World-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
 	 */
-	drawInWorldSpace(render: () => void): void;
+	drawInWorldSpace(render: () => void, renderer?: Artist): void;
 	/**
-	 * Assuming the renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * Assuming a renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
 	 * @param render - The function to call while in the Camera-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
 	 */
-	drawInCameraSpace(render: () => void): void;
+	drawInCameraSpace(render: () => void, renderer: Artist): void;
+	/**
+	 * Creates an undisplaced camera for a provided rendering surface, targeting the entire surface.
+	 * In 2D, this camera is positioned at the center of the surface, and in 3D it is positioned at (0, 0, 0) and pointing forward.
+	 * @param surface - The rendering surface to target
+	 */
+	static forSurface(surface: CanvasImage | Frame): Camera;
 }
 
 /**
  * Represents the camera in a 2D scene.
  */
 declare class Camera2D extends Matrix3 implements Camera<Vector2> {
-	/**
-	 * Creates a new camera pointing to the middle of the provided renderer.
-	 * @param canvas - The rendering surface to target
-	 */
-	constructor(canvas: ImageType);
 	/**
 	 * Smoothly moves the camera toward a new rotation value.
 	 * @param angle - The new rotation to move toward (in radians)
@@ -4712,6 +4719,10 @@ declare class Camera2D extends Matrix3 implements Camera<Vector2> {
 	 */
 	rotation: number;
 	/**
+	 * Returns the portion of the screen which the camera's view will be rendered to.
+	 */
+	get viewport(): Rect;
+	/**
 	 * Returns the caller.
 	 */
 	get matrix(): Matrix;
@@ -4751,15 +4762,23 @@ declare class Camera2D extends Matrix3 implements Camera<Vector2> {
 	 */
 	worldToCamera(point: Vector): Vector;
 	/**
-	 * Assuming the renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * Assuming a renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
 	 * @param render - The function to call while in the World-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
 	 */
-	drawInWorldSpace(render: () => void): void;
+	drawInWorldSpace(render: () => void, renderer?: Artist): void;
 	/**
-	 * Assuming the renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * Assuming a renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
 	 * @param render - The function to call while in the Camera-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
 	 */
-	drawInCameraSpace(render: () => void): void;
+	drawInCameraSpace(render: () => void, renderer: Artist): void;
+	/**
+	 * Creates an undisplaced camera for a provided rendering surface, targeting the entire surface.
+	 * In 2D, this camera is positioned at the center of the surface, and in 3D it is positioned at (0, 0, 0) and pointing forward.
+	 * @param surface - The rendering surface to target
+	 */
+	static forSurface(surface: CanvasImage | Frame): Camera;
 }
 
 /**
@@ -6927,11 +6946,6 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 */
 	up: Vector3;
 	/**
-	 * Creates a new camera at (0, 0, 0) pointing toward the positive z axis.
-	 * @param canvas - The surface to target
-	 */
-	constructor(canvas: ImageType);
-	/**
 	 * Returns the World-Space frustum of the camera, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the camera.
 	 */
 	get screen(): Frustum;
@@ -6993,6 +7007,10 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 */
 	rotation: number;
 	/**
+	 * Returns the portion of the screen which the camera's view will be rendered to.
+	 */
+	get viewport(): Rect;
+	/**
 	 * Returns the caller.
 	 */
 	get matrix(): Matrix;
@@ -7032,15 +7050,23 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 */
 	worldToCamera(point: Vector): Vector;
 	/**
-	 * Assuming the renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * Assuming a renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
 	 * @param render - The function to call while in the World-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
 	 */
-	drawInWorldSpace(render: () => void): void;
+	drawInWorldSpace(render: () => void, renderer?: Artist): void;
 	/**
-	 * Assuming the renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * Assuming a renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
 	 * @param render - The function to call while in the Camera-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
 	 */
-	drawInCameraSpace(render: () => void): void;
+	drawInCameraSpace(render: () => void, renderer: Artist): void;
+	/**
+	 * Creates an undisplaced camera for a provided rendering surface, targeting the entire surface.
+	 * In 2D, this camera is positioned at the center of the surface, and in 3D it is positioned at (0, 0, 0) and pointing forward.
+	 * @param surface - The rendering surface to target
+	 */
+	static forSurface(surface: CanvasImage | Frame): Camera;
 }
 
 /**

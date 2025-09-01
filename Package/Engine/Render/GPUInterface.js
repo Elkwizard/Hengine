@@ -1440,6 +1440,9 @@ class GLUtils {
 		gl.texParameteri(target, gl.TEXTURE_WRAP_S, parameter);
 		gl.texParameteri(target, gl.TEXTURE_WRAP_T, parameter);
 	}
+	static setViewport(gl, rect) {
+		gl.viewport(rect.x, rect.y, rect.width, rect.height);
+	}
 	static createContext(canvas, options) {
 		const gl = canvas.getContext("webgl2", options);
 		if (!gl)

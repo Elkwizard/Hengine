@@ -8,15 +8,11 @@
  * @prop<immutable> Vector3 up | The local up direction of the camera, in World-Space
  */
 class Camera3D extends Matrix4 {
-	/**
-	 * Creates a new camera at (0, 0, 0) pointing toward the positive z axis.
-	 * @param ImageType canvas | The surface to target
-	 */
-	constructor(canvas) {
+	constructor(getViewport) {
 		super();
+		this.getViewport = getViewport;
 
 		// define parameters
-		this.canvas = canvas;
 		Vector3.defineReference(this, "position", new Vector3(0, 0, 0));
 		Vector3.defineReference(this, "direction", new Vector3(0, 0, 1));
 		this.rotation = 0;
@@ -49,8 +45,8 @@ class Camera3D extends Matrix4 {
 	 * @return Matrix4
 	 */
 	get projection() {
-		const img = this.canvas;
-		return this.createProjection(img.height / img.width);
+		const { width, height } = this.viewport;
+		return this.createProjection(height / width);
 	}
 	/**
 	 * Configures the camera to use a custom projection.

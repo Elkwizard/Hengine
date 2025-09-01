@@ -36,7 +36,7 @@
  * @name class Camera extends Matrix
  * @interface
  * @type interface Camera<Vector> extends Matrix
- * Represents a camera in a scene targeting a specific rendering surface.
+ * Represents a camera in a scene targeting a specific portion of the screen.
  * The transformation represented by this matrix is from World-Space to Camera-Space.
  * `Vector` in the context of this class refers to either `Vector2` or `Vector3` depending on whether Camera2D or Camera3D is used.
  * Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
@@ -45,8 +45,12 @@
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
  */
 class Camera {
-	get renderer() {
-		return this.canvas.renderer;
+	/**
+ 	 * Returns the portion of the screen which the camera's view will be rendered to.
+	 * @return Rect
+	 */
+	get viewport() {
+		return this.getViewport();
 	}
 	/**
 	 * Returns the caller.
@@ -121,34 +125,45 @@ class Camera {
 		return this.worldToScreen(point);
 	}
 	/**
-	 * Assuming the renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * Assuming a renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
 	 * @param () => void render | The function to call while in the World-Space context
+	 * @param Artist renderer? | The renderer which `render()` writes to, which should be transformed
 	 */
-	drawInWorldSpace(artist) {
-		this.transformToWorld();
+	drawInWorldSpace(artist, renderer) {
+		this.transformToWorld(renderer);
 		artist();
-		this.transformToCamera();
+		this.transformToCamera(renderer);
 	}
 	/**
-	 * Assuming the renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * Assuming a renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
 	 * @param () => void render | The function to call while in the Camera-Space context
+	 * @param Artist renderer | The renderer which `render()` writes to, which should be transformed
 	 */
-	drawInCameraSpace(artist) {
-		this.transformToCamera();
+	drawInCameraSpace(artist, renderer) {
+		this.transformToCamera(renderer);
 		artist();
-		this.transformToWorld();
+		this.transformToWorld(renderer);
 	}
 	drawInScreenSpace(artist) {
 		this.drawInCameraSpace(artist);
 	}
-	transformToWorld() {
-		this.renderer.enterWorldSpace(this);
+	transformToWorld(renderer = window.renderer /* compatibility */) {
+		renderer.enterWorldSpace(this);
 	}
-	transformToCamera() {
-		this.renderer.exitWorldSpace(this);
+	transformToCamera(renderer = window.renderer /* compatibility */) {
+		renderer.exitWorldSpace(this);
 	}
 	transformToScreen() {
 		this.transformToCamera();
+	}
+	/**
+	 * Creates an undisplaced camera for a provided rendering surface, targeting the entire surface.
+	 * In 2D, this camera is positioned at the center of the surface, and in 3D it is positioned at (0, 0, 0) and pointing forward.
+	 * @param CanvasImage/Frame surface | The rendering surface to target
+	 * @return Camera
+	 */
+	static forSurface(surface) {
+		return new this(() => new Rect(0, 0, surface.width, surface.height));
 	}
 }
 
@@ -158,14 +173,10 @@ class Camera {
  * Represents the camera in a 2D scene.
  */
 class Camera2D extends Matrix3 {
-	/**
-	 * Creates a new camera pointing to the middle of the provided renderer.
-	 * @param ImageType canvas | The rendering surface to target
-	 */
-	constructor(canvas) {
+	constructor(getViewport) {
 		super();
-		this.canvas = canvas;
-		const { width, height } = this.canvas;
+		this.getViewport = getViewport;
+		const { width, height } = this.viewport;
 		Vector2.defineReference(this, "position", new Vector2(width / 2, height / 2))
 			.onChange(() => this.updateTranslationMatrix());
 		this.zoom = 1;
@@ -191,14 +202,13 @@ class Camera2D extends Matrix3 {
 		return this._zoom;
 	}
 	updateTranslationMatrix() {
+		const { x: vx, y: vy, width: vw, height: vh } = this.viewport;
 		const { x, y } = this.position;
 		const c = this.cosRotation;
 		const s = this.sinRotation;
 		const z = this.zoom;
-		const w = this.canvas.width;
-		const h = this.canvas.height;
-		this[6] = w / 2 - x * c * z + y * s * z;
-		this[7] = h / 2 - x * s * z - y * c * z;
+		this[6] = vw / 2 - x * c * z + y * s * z + vx;
+		this[7] = vh / 2 - x * s * z - y * c * z + vy;
 	}
 	updateMatrix() {
 		const c = this.cosRotation;
@@ -265,13 +275,9 @@ class Camera2D extends Matrix3 {
 	 * @return Rect
 	 */
 	cacheScreen() {
-		const { width, height } = this.canvas;
-		return this.screen = Rect.bound([
-			new Vector2(width / 2, height / 2),
-			new Vector2(width / 2, -height / 2),
-			new Vector2(-width / 2, height / 2),
-			new Vector2(-width / 2, -height / 2)
-		].map(v => v.rotate(this.rotation).Ndiv(this.zoom).Vadd(this.position)));
+		const { width, height } = this.viewport;
+		const { vertices } = new Rect(0, 0, width, height);
+		return this.screen = Rect.bound(vertices.map(v => this.screenToWorld(v)));
 	}
 }
 objectUtils.inherit(Camera2D, Camera);

@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Camera2D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L160" target="_blank" class="class-name source-link">Camera2D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Geometry/Matrices.html#class Matrix3">Matrix3</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Rendering/Camera/Camera.html#class Camera">Camera</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L175" target="_blank" class="class-name source-link">Camera2D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Geometry/Matrices.html#class Matrix3">Matrix3</a></span> <span class="keyword">implements</span> <span class="class-name"><a href="../../Rendering/Camera/Camera.html#class Camera">Camera</a></span>
 				</div>
 				<div class="class desc">
 					Represents the camera in a 2D scene.
@@ -22,36 +22,9 @@
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="Camera2D.prototype.constructor()">
-			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L165" target="_blank" class="function-name source-link">constructor</a>(<span class="param">canvas</span>)
-			</div>
-			<div class="function desc">
-				Creates a new camera pointing to the middle of the provided renderer.
-			</div>
-			
-				<div class="function-signature">
-					
-			<div class="header">Parameters</div>
-			
-						<div class="param-wrapper" id="Camera2D.prototype.constructor():canvas">
-							<div class="param-name">
-								<span class="param">canvas</span>
-								<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a></span>
-							</div>
-							<div class="param desc">
-								The rendering surface to target
-							</div>
-						</div>
-					
-		
-				</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="get Camera2D.prototype.screen()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L267" target="_blank" class="function-name source-link">screen</a><span class="type"><a href="../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L277" target="_blank" class="function-name source-link">screen</a><span class="type"><a href="../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
 			</div>
 			<div class="function desc">
 				Returns the axis-aligned bounding box of the current viewport.
@@ -61,7 +34,7 @@
 	
 		<div class="function-wrapper" id="Camera2D.prototype.rotateTowards()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L218" target="_blank" class="function-name source-link">rotateTowards</a>(<span class="param">angle</span>, <span class="param">ferocity</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L228" target="_blank" class="function-name source-link">rotateTowards</a>(<span class="param">angle</span>, <span class="param">ferocity</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Smoothly moves the camera toward a new rotation value.
@@ -98,7 +71,7 @@
 	
 		<div class="function-wrapper" id="Camera2D.prototype.constrain()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L233" target="_blank" class="function-name source-link">constrain</a>(<span class="param">boundary</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L243" target="_blank" class="function-name source-link">constrain</a>(<span class="param">boundary</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.
@@ -169,7 +142,7 @@ If the boundary is smaller than the viewport, the behavior is undefined.
 	
 		<div class="function-wrapper" id="Camera2D.prototype.zoomAbout()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L256" target="_blank" class="function-name source-link">zoomAbout</a>(<span class="param">center</span>, <span class="param">factor</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L266" target="_blank" class="function-name source-link">zoomAbout</a>(<span class="param">center</span>, <span class="param">factor</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Zooms in/out about a specific point (in <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>) by a specific factor.

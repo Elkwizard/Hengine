@@ -33,7 +33,7 @@ class Scene {
 		this.cullGraphics = true;
 		this.mouseEvents = true;
 		this.collisionEvents = true;
-		this.camera = new ND.Camera(engine.canvas.renderer.imageType);
+		this.camera = ND.Camera.forSurface(engine.canvas.renderer.imageType);
 		this.updating = false;
 		this.renderOrder = [];
 
