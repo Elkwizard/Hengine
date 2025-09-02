@@ -841,10 +841,11 @@ class HengineLoadingStructure {
  * Allows for the loading of both the rest of the Hengine and additional external files.
  * The file containing this class `HengineLoader.js` is the only file that needs to be loaded directly to use the Hengine.
  * Other files can be loaded via the HengineLoader's API.
- * The web url for this file is:
+ * The web URL for this file is:
  * ```url
  * https://elkwizard.github.io/Hengine/Package/Engine/Manage/HengineLoader.js
  * ```
+ * The engine will be loaded in 3D Mode if the URL query parameter `?3d` is appended to the end of the `HengineLoader.js` path.
  * This class is a singleton, and the single instance can be accessed via a static property.
  * ```js
  * async function load() {
@@ -904,15 +905,10 @@ class HengineLoader {
 
 		this.resources = new Map();
 
-		//title
-		let t = location.toString();
-		let st = t.split("/");
-		let ti = st[st.length - 2];
-		if (ti) {
-			ti = unescape(ti);
-		} else ti = "Unknown";
-
-		window.title = ti;
+		{ // title
+			const folderName = location.href.split("/").at(-2);
+			window.title = folderName ? decodeURIComponent(folderName) : "Unknown Hengine Project";
+		}
 	}
 	addResourceSync(wrapper, resource) {
 		const { src } = wrapper;
