@@ -15,9 +15,9 @@
 
 /**
  * @page Camera-Space
- * A coordinate frame overlapping world-space which is completely relative to the camera.
- * This has the same dimensionality as world-space, but moves as the camera moves and rotates.
- * In 2D Mode, It is aligned in so that it is identical to screen-space, except insofar as it is in the same space as WorldObjects.
+ * A coordinate frame overlapping World-Space which is completely relative to the camera.
+ * This has the same dimensionality as World-Space, but moves as the camera moves and rotates.
+ * In 2D Mode, It is aligned in so that it is identical to Screen-Space, except insofar as it is in the same space as WorldObjects.
  * Positions are represented by a VectorN and transformations are represented by a TransformMatrixN.
  * UIObjects that are intended to be interspersed with world elements should be drawn in Camera-Space.
  * All rendering targeted at `renderer` will be in this space by default when outside an ElementScript's `draw()`/`escapeDraw()` handler.
@@ -36,7 +36,7 @@
  * @name class Camera extends Matrix
  * @interface
  * @type interface Camera<Vector> extends Matrix
- * Represents a camera in a scene targeting a specific portion of the screen.
+ * Represents a camera in a scene targeting a particular size of rendering surface.
  * The transformation represented by this matrix is from World-Space to Camera-Space.
  * `Vector` in the context of this class refers to either `Vector2` or `Vector3` depending on whether Camera2D or Camera3D is used.
  * Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
@@ -45,10 +45,6 @@
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
  */
 class Camera {
-	/**
- 	 * Returns the portion of the screen which the camera's view will be rendered to.
-	 * @return Rect
-	 */
 	get viewport() {
 		return this.getViewport();
 	}

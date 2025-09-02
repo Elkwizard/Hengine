@@ -13,7 +13,7 @@
 					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L47" target="_blank" class="class-name source-link">Camera</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Geometry/Matrices.html#class Matrix">Matrix</a></span>
 				</div>
 				<div class="class desc">
-					Represents a camera in a scene targeting a specific portion of the screen.
+					Represents a camera in a scene targeting a particular size of rendering surface.
 The transformation represented by this matrix is from <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> to <a href="../../Rendering/Coordinate Spaces.html#Camera-Space">Camera-Space</a>.
 <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../../Geometry/Vectors/Vector.html#class Vector">Vector</a></span></code> in the context of this class refers to either <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span></code> or <code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span></code> depending on whether <a href="../../Rendering/Camera/Camera2D.html#class Camera2D">Camera2D</a> or <a href="../../Rendering/Camera/Camera3D.html#class Camera3D">Camera3D</a> is used.
 Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
@@ -58,19 +58,9 @@ Changes to camera position and orientation should be made before the screen is c
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
-		<div class="function-wrapper" id="get Camera.prototype.viewport()">
-			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L52" target="_blank" class="function-name source-link">viewport</a><span class="type"><a href="../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
-			</div>
-			<div class="function desc">
-				Returns the portion of the screen which the camera's view will be rendered to.
-			</div>
-			
-		</div>
-	
 		<div class="function-wrapper" id="get Camera.prototype.matrix()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L59" target="_blank" class="function-name source-link">matrix</a><span class="type"><a href="../../Geometry/Matrices.html#class Matrix">Matrix</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L55" target="_blank" class="function-name source-link">matrix</a><span class="type"><a href="../../Geometry/Matrices.html#class Matrix">Matrix</a></span>
 			</div>
 			<div class="function desc">
 				Returns the caller.
@@ -80,7 +70,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.prototype.restoreZoom()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L65" target="_blank" class="function-name source-link">restoreZoom</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L61" target="_blank" class="function-name source-link">restoreZoom</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets the zoom to 1.
@@ -90,7 +80,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.prototype.zoomIn()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L72" target="_blank" class="function-name source-link">zoomIn</a>(<span class="param">amount</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L68" target="_blank" class="function-name source-link">zoomIn</a>(<span class="param">amount</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Zooms in by a specified amount.
@@ -117,7 +107,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.prototype.zoomOut()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L79" target="_blank" class="function-name source-link">zoomOut</a>(<span class="param">amount</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L75" target="_blank" class="function-name source-link">zoomOut</a>(<span class="param">amount</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Zooms out by a specified amount.
@@ -144,7 +134,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.prototype.zoomBy()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L86" target="_blank" class="function-name source-link">zoomBy</a>(<span class="param">factor</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L82" target="_blank" class="function-name source-link">zoomBy</a>(<span class="param">factor</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Multiplies the current zoom value.
@@ -171,7 +161,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.prototype.moveTowards()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L94" target="_blank" class="function-name source-link">moveTowards</a>(<span class="param">point</span>, <span class="param">ferocity</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L90" target="_blank" class="function-name source-link">moveTowards</a>(<span class="param">point</span>, <span class="param">ferocity</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Smoothly moves the camera toward a new position value.
@@ -208,7 +198,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.prototype.cameraToWorld()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L104" target="_blank" class="function-name source-link">cameraToWorld</a>(<span class="param">point</span>)<span class="type"><a href="../../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L100" target="_blank" class="function-name source-link">cameraToWorld</a>(<span class="param">point</span>)<span class="type"><a href="../../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 			</div>
 			<div class="function desc">
 				Maps a given point from <a href="../../Rendering/Coordinate Spaces.html#Camera-Space">Camera-Space</a> to <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.
@@ -235,7 +225,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.prototype.worldToCamera()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L118" target="_blank" class="function-name source-link">worldToCamera</a>(<span class="param">point</span>)<span class="type"><a href="../../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L114" target="_blank" class="function-name source-link">worldToCamera</a>(<span class="param">point</span>)<span class="type"><a href="../../Geometry/Vectors/Vector.html#class Vector">Vector</a></span>
 			</div>
 			<div class="function desc">
 				Maps a given point from <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> to <a href="../../Rendering/Coordinate Spaces.html#Camera-Space">Camera-Space</a>.
@@ -262,7 +252,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.prototype.drawInWorldSpace()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L132" target="_blank" class="function-name source-link">drawInWorldSpace</a>(<span class="param">render</span>, <span class="param">renderer?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L128" target="_blank" class="function-name source-link">drawInWorldSpace</a>(<span class="param">render</span>, <span class="param">renderer?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Assuming a renderer is currently in <a href="../../Rendering/Coordinate Spaces.html#Camera-Space">Camera-Space</a>, transforms to <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>, calls a rendering function, and then transforms back to <a href="../../Rendering/Coordinate Spaces.html#Camera-Space">Camera-Space</a>.
@@ -299,7 +289,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.prototype.drawInCameraSpace()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L142" target="_blank" class="function-name source-link">drawInCameraSpace</a>(<span class="param">render</span>, <span class="param">renderer</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L138" target="_blank" class="function-name source-link">drawInCameraSpace</a>(<span class="param">render</span>, <span class="param">renderer</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Assuming a renderer is currently in <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>, transforms to <a href="../../Rendering/Coordinate Spaces.html#Camera-Space">Camera-Space</a>, calls a rendering function, and then transforms back to <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a>.
@@ -336,7 +326,7 @@ Changes to camera position and orientation should be made before the screen is c
 	
 		<div class="function-wrapper" id="Camera.forSurface()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L165" target="_blank" class="function-name source-link">Camera.forSurface</a>(<span class="param">surface</span>)<span class="type">Camera</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera.js?#L161" target="_blank" class="function-name source-link">Camera.forSurface</a>(<span class="param">surface</span>)<span class="type">Camera</span>
 			</div>
 			<div class="function desc">
 				Creates an undisplaced camera for a provided rendering surface, targeting the entire surface.

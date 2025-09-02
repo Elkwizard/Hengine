@@ -944,6 +944,7 @@ Artist3D.Bloom = class extends Artist3D.PostProcess {
 		});
 		
 		gl.depthMask(true);
+		gl.disable(gl.BLEND);
 		
 		return inputBuffer;
 	}
@@ -989,7 +990,7 @@ Artist3D.Bloom = class extends Artist3D.PostProcess {
 /**
  * @name class Artist3D.SSAO extends Artist3D.PostProcess
  * Represents an optional ambient occlusion post-processing effect, which will darken enclosed areas and create contact shadows.
- * @prop Number samples | The number of rays to cast for each pixel. This starts as 8
+ * @prop Number samples | The number of rays to cast for each pixel, which cannot exceed 64. This starts as 8
  * @prop Number radius | The world-space radius of the occlusion sampling sphere. This starts as 3
  * @prop Number blurSamples | The number of samples along the diameter of the blur. This starts as 12
  * @prop Number maxBlurRadius | The maximum radius of the blur step in pixels. This starts as 10
@@ -1007,10 +1008,24 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 		this.intensity = 2;
 	}
 	compile() {
+		const { gl } = this.artist;
+		
 		this.occlusionShader = this.artist.create2DProgram(Artist3D.SSAO.OCCLUSION_FRAGMENT, false);
 		this.blurShader = this.artist.create2DProgram(Artist3D.SSAO.BLUR_FRAGMENT, false);
-		this.pingPong = this.artist.createPingPong({ color: true, depth: true });
+		this.pingPong = this.artist.createPingPong({
+			color: true,
+			colorFormat: {
+				type: gl.UNSIGNED_BYTE,
+				internalFormat: gl.R8,
+				format: gl.RED
+			}
+		});
 		this.outputBuffer = this.artist.createScreenBuffer({ color: true, depth: true, hdr: true });
+	
+		const rng = new Random(12345);
+		const normal = new Vector3(0, 0, 1);
+		const hemisphere = Array.dim(this.samples).map(() => rng.hemisphere(normal, rng.random() ** 2));
+		this.occlusionShader.setUniform("hemisphere", hemisphere);
 	}
 	draw(inputBuffer, camera, view) {
 		const { gl } = this.artist;
@@ -1021,16 +1036,18 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 
 		const uvBox = this.artist.getUVBox(view);
 
-		{
-			const { depth } = inputBuffer;
-			
-			// compute occlusion
+		const { projection } = camera;
+		const invProjection = projection.inverse;
+
+		const { depth } = inputBuffer;
+		
+		{ // compute occlusion	
 			this.pingPong.bind();
 			this.artist.drawQuad(this.occlusionShader, {
 				depthTexture: depth,
-				uvBox, projection: camera.projection,
-				sampleRadius: this.radius,
-				samples: this.samples
+				samples: this.samples,
+				uvBox, projection, invProjection,
+				sampleRadius: this.radius
 			});
 		}
 
@@ -1038,7 +1055,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 			const invRes = new Vector2(1 / gl.drawingBufferWidth, 1 / gl.drawingBufferHeight);
 			const directions = [Vector2.right, Vector2.down];
 			for (let i = 0; i < directions.length; i++) {
-				const { color, depth } = this.pingPong.swap();
+				const { color } = this.pingPong.swap();
 				
 				const uniforms = {
 					uvBox, depthTexture: depth,
@@ -1047,7 +1064,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 					maxRadius: this.maxBlurRadius,
 					samples: Math.floor(this.blurSamples / 2),
 					composite: i === directions.length - 1,
-					projection: camera.projection,
+					projection, invProjection,
 					axis: directions[i].times(invRes)
 				};
 
@@ -1066,8 +1083,13 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 		return this.outputBuffer;
 	}
 
+	static MAX_SAMPLES = 64;
+
 	static LINEAR_Z = `
+		#define PI ${Math.PI}
+
 		uniform mat4 projection;
+		uniform mat4 invProjection;
 
 		float linearZ(float nlz) {
 			float zScale = projection[2][2];
@@ -1091,7 +1113,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 
 			float w = projectedZ(ndc.z) / ndc.z;
 			vec4 fullNdc = vec4(ndc, 1) * w;
-			vec4 unprojected = inverse(projection) * fullNdc;
+			vec4 unprojected = invProjection * fullNdc;
 			return unprojected.xyz;
 		}
 
@@ -1101,15 +1123,15 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 			return ndc * 0.5 + 0.5;
 		}
 	`;
+	
 	static OCCLUSION_FRAGMENT = new GLSL(`
 		uniform sampler2D depthTexture;
 		uniform float sampleRadius;
+		uniform vec3 hemisphere[${this.MAX_SAMPLES}];
 		uniform int samples;
 
-		#define PI ${Math.PI}
-
 		${this.LINEAR_Z}
-
+		
 		float random(inout float seed) {
 			seed++;
 			float a = mod(seed * 6.12849, 8.7890975);
@@ -1126,10 +1148,10 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 				cos(theta) * cos(phi),
 				cos(theta) * sin(phi),
 				sin(theta)
-			) * radius;
+			) * (radius * radius);
 		}
 
-		float getVisibility(vec3 ro, vec3 rd, float tolerance) {
+		float getOcclusion(vec3 ro, vec3 rd, float tolerance) {
 			vec3 endPosition = ro + rd * sampleRadius;
 			vec3 endScreenPosition = project(endPosition);
 
@@ -1144,41 +1166,56 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 
 			if (diff < -sampleRadius) return -1.0;
 
-			return diff > -tolerance ? 1.0 : 0.0;
+			return diff > -tolerance ? 0.0 : 1.0;
 		}
 
 		vec4 shader() {
 			float depth = texture(depthTexture, uv).r;
 
-			gl_FragDepth = depth;
-
-			if (depth == 1.0) return vec4(0, 0, 0, 1);
+			if (depth == 1.0) return vec4(0);
 
 			vec3 screen = vec3(uv, depth);
 			vec3 ro = unproject(screen);
 			
-			vec3 normal = normalize(cross(dFdy(ro), dFdx(ro)));
+			// compute tangent space
+			vec3 tangent = dFdy(ro);
+			vec3 bitangent = dFdx(ro);
+			vec3 normal = normalize(cross(tangent, bitangent));
+			if (dot(normal, normal) < 0.99) return vec4(0);
+			tangent = normalize(tangent);
+			bitangent = normalize(cross(normal, tangent));
+			mat3 toSurface = mat3(tangent, bitangent, normal);
 			
+			// compute kernel rotation
 			float seed = 23.123 * cos(gl_FragCoord.x * 5.2387) + sin(gl_FragCoord.y * 30.0);
+			float angle = random(seed) * 2.0 * PI;
+			float c = cos(angle);
+			float s = sin(angle);
+			mat3 rotate = mat3(
+				c, s, 0,
+				-s, c, 0,
+				0, 0, 1
+			);
+
+			mat3 fromLocal = toSurface * rotate;
 
 			float tolerance = min(fwidth(ro.z), sampleRadius * 0.5);
 			
-			float occlusion = 0.0;
+			float totalOcclusion = 0.0;
 			float totalWeight = 0.0;
 
 			for (int i = 0; i < samples; i++) {
-				vec3 rd = randomInSphere(seed);
-				if (dot(rd, normal) < 0.0) rd = -rd;
-				float visibility = getVisibility(ro, rd, tolerance);
-				if (visibility >= 0.0) {
-					occlusion += 1.0 - visibility;
+				vec3 rd = fromLocal * hemisphere[i];
+				float occlusion = getOcclusion(ro, rd, tolerance);
+				if (occlusion >= 0.0) {
+					totalOcclusion += occlusion;
 					totalWeight++;
 				}
 			}
 
-			if (totalWeight > 0.0) occlusion /= totalWeight;
+			if (totalWeight > 0.0) totalOcclusion /= totalWeight;
 
-			return vec4(vec3(occlusion), 1);
+			return vec4(totalOcclusion);
 		}
 	`);
 	static BLUR_FRAGMENT = new GLSL(`
@@ -1234,6 +1271,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 			float occlusion = totalOcclusion / totalWeight;
 
 			if (composite) {
+				// return vec4(vec3(occlusion), 1.0);
 				vec4 color = texture(colorTexture, uv);
 				color.rgb *= pow(1.0 - occlusion, intensity);
 				return color;
@@ -1290,12 +1328,14 @@ Artist3D.ScreenBuffer = class {
 		hdr = false,
 		color = true,
 		depth = false,
+		colorFormat = null,
 		depthFormat = gl.DEPTH_COMPONENT32F
 	} = { }) {
 		this.gl = gl;
 		this.hdr = hdr;
 		this.hasColor = color;
 		this.hasDepth = depth;
+		this.colorFormat = colorFormat;
 		this.depthFormat = depthFormat;
 	}
 	compile() {
@@ -1325,9 +1365,12 @@ Artist3D.ScreenBuffer = class {
 		
 		if (this.hasColor) {
 			this.color = GLUtils.createTexture(gl, { filter: FilterMode.LINEAR });
-			const internalFormat = this.hdr ? gl.RGBA16F : gl.RGBA8;
-			const type = this.hdr ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE;
-			gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, gl.RGBA, type, null);
+			const {
+				internalFormat = this.hdr ? gl.RGBA16F : gl.RGBA8,
+				type = this.hdr ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE,
+				format = gl.RGBA
+			} = this.colorFormat ?? { };
+			gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, null);
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.color, 0);
 		}
 		

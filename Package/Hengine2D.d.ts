@@ -4590,7 +4590,7 @@ declare class AnimationStateMachine extends ImageType {
 }
 
 /**
- * Represents a camera in a scene targeting a specific portion of the screen.
+ * Represents a camera in a scene targeting a particular size of rendering surface.
  * The transformation represented by this matrix is from World-Space to Camera-Space.
  * `Vector` in the context of this class refers to either `Vector2` or `Vector3` depending on whether Camera2D or Camera3D is used.
  * Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
@@ -4608,10 +4608,6 @@ declare interface Camera<Vector> extends Matrix {
 	 * The clockwise roll (in radians) of the camera. Starts at 0
 	 */
 	rotation: number;
-	/**
-	 * Returns the portion of the screen which the camera's view will be rendered to.
-	 */
-	get viewport(): Rect;
 	/**
 	 * Returns the caller.
 	 */
@@ -4718,10 +4714,6 @@ declare class Camera2D extends Matrix3 implements Camera<Vector2> {
 	 * The clockwise roll (in radians) of the camera. Starts at 0
 	 */
 	rotation: number;
-	/**
-	 * Returns the portion of the screen which the camera's view will be rendered to.
-	 */
-	get viewport(): Rect;
 	/**
 	 * Returns the caller.
 	 */
@@ -7007,10 +6999,6 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 */
 	rotation: number;
 	/**
-	 * Returns the portion of the screen which the camera's view will be rendered to.
-	 */
-	get viewport(): Rect;
-	/**
 	 * Returns the caller.
 	 */
 	get matrix(): Matrix;
@@ -7413,7 +7401,7 @@ declare namespace Artist3D {
 	 */
 	class SSAO extends Artist3D.PostProcess {
 		/**
-		 * The number of rays to cast for each pixel. This starts as 8
+		 * The number of rays to cast for each pixel, which cannot exceed 64. This starts as 8
 		 */
 		samples: number;
 		/**
