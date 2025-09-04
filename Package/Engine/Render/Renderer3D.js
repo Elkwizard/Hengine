@@ -1024,7 +1024,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 	
 		const rng = new Random(12345);
 		const normal = new Vector3(0, 0, 1);
-		const hemisphere = Array.dim(this.samples).map(() => rng.hemisphere(normal, rng.random() ** 2));
+		const hemisphere = Array.dim(Artist3D.SSAO.MAX_SAMPLES).map(() => rng.hemisphere(normal, rng.random() ** 2));
 		this.occlusionShader.setUniform("hemisphere", hemisphere);
 	}
 	draw(inputBuffer, camera, view) {

@@ -825,7 +825,7 @@ class HengineLoadingStructure {
 	 * @return HengineLoadingStructure
 	 */
 	mesh(src) {
-		return this.add(new HengineMeshResource(src));
+		return this.add(new HengineMeshResource(this.absSrc(src)));
 	}
 	/**
 	 * Adds a HengineMaterialResource to the queue with a specified source.
@@ -833,7 +833,7 @@ class HengineLoadingStructure {
 	 * @return HengineLoadingStructure
 	 */
 	material(src) {
-		return this.add(new HengineMaterialResource(src));
+		return this.add(new HengineMaterialResource(this.absSrc(src)));
 	}
 }
 

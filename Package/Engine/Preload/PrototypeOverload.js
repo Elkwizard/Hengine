@@ -95,11 +95,17 @@ const objectUtils = {
 			object[key] = data;
 		};
 		const outOfBounds = index => isNaN(index) || index < 0 || index >= length();
+		const iterator = function* () {
+			const len = length();
+			for (let i = 0; i < len; i++)
+				yield proxy[i];
+		};
 		
 		const proxy = new Proxy({ }, {
 			get: (object, key) => {
 				if (key in object) return Reflect.get(object, key);
 				if (key === "length") return length();
+				if (key === Symbol.iterator) return iterator;
 				const inx = +key;
 				if (outOfBounds(inx)) return undefined;
 
