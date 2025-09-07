@@ -170,23 +170,23 @@
 	
 		<div class="function-wrapper" id="Line.prototype.evaluate()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L311" target="_blank" class="function-name source-link">evaluate</a>(<span class="param">x</span>)<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L311" target="_blank" class="function-name source-link">evaluate</a>(<span class="param">t</span>)<span class="type"><a href="../../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
 			</div>
 			<div class="function desc">
-				Computes the y coordinate on the line for a given x coordinate. This is calculated as if it were a line, rather than a line segment.
+				Computes the linear interpolation along the line segment (from <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">a</span></code> to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">b</span></code>) for a specific <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">t</span></code> value.
 			</div>
 			
 				<div class="function-signature">
 					
 			<div class="header">Parameters</div>
 			
-						<div class="param-wrapper" id="Line.prototype.evaluate():x">
+						<div class="param-wrapper" id="Line.prototype.evaluate():t">
 							<div class="param-name">
-								<span class="param">x</span>
+								<span class="param">t</span>
 								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
 							</div>
 							<div class="param desc">
-								The x coordinate to calculate the y at.
+								The parameter value for the interpolation on [0, 1]
 							</div>
 						</div>
 					

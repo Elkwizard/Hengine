@@ -520,10 +520,11 @@ declare class HengineLoadingStructure {
  * Allows for the loading of both the rest of the Hengine and additional external files.
  * The file containing this class `HengineLoader.js` is the only file that needs to be loaded directly to use the Hengine.
  * Other files can be loaded via the HengineLoader's API.
- * The web url for this file is:
+ * The web URL for this file is:
  * ```url
  * https://elkwizard.github.io/Hengine/Package/Engine/Manage/HengineLoader.js
  * ```
+ * The engine will be loaded in 3D Mode if the URL query parameter `?3d` is appended to the end of the `HengineLoader.js` path.
  * This class is a singleton, and the single instance can be accessed via a static property.
  * ```js
  * async function load() {
@@ -2945,10 +2946,10 @@ declare class Line extends Shape2D {
 	 */
 	constructor(start: Vector2, end: Vector2);
 	/**
-	 * Computes the y coordinate on the line for a given x coordinate. This is calculated as if it were a line, rather than a line segment.
-	 * @param x - The x coordinate to calculate the y at.
+	 * Computes the linear interpolation along the line segment (from `.a` to `.b`) for a specific `t` value.
+	 * @param t - The parameter value for the interpolation on [0, 1]
 	 */
-	evaluate(x: number): number;
+	evaluate(t: number): Vector2;
 	/**
 	 * Creates a new line segment with a specified slope and intercept.
 	 * The start point is at the y-intercept, and the end point is at x = 1.
@@ -3447,6 +3448,11 @@ declare class Line3D extends Shape3D {
 	 * The vector from `.a` to `.b`
 	 */
 	vector: Vector3;
+	/**
+	 * Computes the linear interpolation along the line segment (from `.a` to `.b`) for a specific `t` value.
+	 * @param t - The parameter value for the interpolation on [0, 1]
+	 */
+	evaluate(t: number): Vector3;
 	/**
 	 * Returns the points on the caller and a given line segment that with minimal distance.
 	 * The distance between these points gives the distance between the line segments.

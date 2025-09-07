@@ -33,6 +33,12 @@ class Line3D extends Shape3D {
 		return false;
 	}
 	/**
+	 * @name evaluate
+	 * Computes the linear interpolation along the line segment (from `.a` to `.b`) for a specific `t` value.
+	 * @param Number t | The parameter value for the interpolation on [0, 1]
+	 * @return Vector3
+	 */
+	/**
 	 * Returns the points on the caller and a given line segment that with minimal distance.
 	 * The distance between these points gives the distance between the line segments.
 	 * The first element of the return value is the point on the caller, and the second is the point on the argument.
@@ -89,7 +95,7 @@ class Line3D extends Shape3D {
 objectUtils.inherit(Line3D, Line, [
 	"length", "middle", "vector",
 	"getModel", "equalsSameType",
-	"closestPointTo"
+	"closestPointTo", "evaluate"
 ]);
 
 /**

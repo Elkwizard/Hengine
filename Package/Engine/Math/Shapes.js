@@ -304,12 +304,12 @@ class Line extends Shape2D {
 		return this.a.y - this.a.x * this.slope;
 	}
 	/**
-	 * Computes the y coordinate on the line for a given x coordinate. This is calculated as if it were a line, rather than a line segment.
-	 * @param Number x | The x coordinate to calculate the y at.
-	 * @return Number
+	 * Computes the linear interpolation along the line segment (from `.a` to `.b`) for a specific `t` value.
+	 * @param Number t | The parameter value for the interpolation on [0, 1]
+	 * @return Vector2
 	 */
-	evaluate(x) {
-		return this.slope * x + this.intercept;
+	evaluate(t) {
+		return Interpolation.lerp(this.a, this.b, t);
 	}
 	getModel(transf) {
 		return new this.constructor(transf.times(this.a), transf.times(this.b));
