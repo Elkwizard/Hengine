@@ -46,6 +46,8 @@ class Renderable {
  * This is not a class, but rather describes the structure of an object that must be used in certain cases.
  * @prop Boolean smooth? | Whether the normals should be smoothed across vertices. Default is false
  * @prop Number smoothLimit? | The minimum dot product between normals of adjacent faces required for them to be smoothed together. This has no effect is `.smooth` is false. Default is 0 (faces beyond perpendicular aren't smoothed)
+ * @prop Vector2[] uvs? | A list of texture coordinates in one-to-one correspondence with the vertices of the Polyhedron. Cannot be specified if `.computeUV` is specified. By default the same UVs will be given to each triangle
+ * @prop (Vector3, Vector3) => Vector2 computeUV? | A function to compute the UV coordinates for each vertex, which will recieve the vertex and normal vector as arguments. Cannot be specified if `.smooth` is true. If not specified, either `.uvs` or default UVs will be used
  */
 
 /**
@@ -311,7 +313,9 @@ class Mesh extends Renderable {
 	 */
 	static fromPolyhedron(polyhedron, material = Material.DEFAULT, {
 		smooth = false,
-		smoothLimit = 0
+		smoothLimit = 0,
+		uvs = null,
+		computeUV = null
 	} = { }) {
 		const TRI_KEYS = ["a", "b", "c"];
 
@@ -380,25 +384,36 @@ class Mesh extends Renderable {
 
 			vertexData = new Float32Array(vertexData);
 		} else {	
-			const uvs = [
+			const defaultUVs = [
 				new Vector2(0, 0),
 				new Vector2(1, 0),
 				new Vector2(0, Math.sqrt(3) / 2)
 			];
-			
-			const triangles = polyhedron.getFaces();
-			
-			vertexData = new Float32Array(triangles.length * stride * 3);
-			indexData = new Uint32Array(triangles.length * 3).map((_, i) => i);
 
-			for (let i = 0; i < triangles.length; i++) {
-				const triangle = triangles[i];
+			const { vertices, indices } = polyhedron;
+			
+			vertexData = new Float32Array(polyhedron.faceCount * stride * 3);
+			indexData = new Uint32Array(polyhedron.faceCount * 3).map((_, i) => i);
+
+			for (let i = 0; i < indices.length; i += 3) {
+				const triangleIndices = indices.slice(i, i + 3);
+				const triangle = new Triangle(
+					vertices[triangleIndices[0]],
+					vertices[triangleIndices[1]],
+					vertices[triangleIndices[2]]
+				);
 				const { normal } = triangle;
-				const baseIndex = i * 3;
 				for (let j = 0; j < 3; j++) {
 					const vertex = triangle[TRI_KEYS[j]];
-					const index = baseIndex + j;
-					setVertex(index, vertex, normal, uvs[j])
+					let uv;
+					if (computeUV) {
+						uv = computeUV(vertex, normal);
+					} else if (uvs) {
+						uv = uvs[triangleIndices[j]];
+					} else {
+						uv = defaultUVs[j];
+					}
+					setVertex(i + j, vertex, normal, uv);
 				}
 			}
 		}
@@ -502,7 +517,7 @@ class Mesh extends Renderable {
 		vertexUV: {
 			size: 2,
 			type: Vector2
-		},
+		}
 	};
 }
 

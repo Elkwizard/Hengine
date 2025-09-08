@@ -7194,6 +7194,14 @@ declare interface PolyhedronConversionSettings {
 	 * The minimum dot product between normals of adjacent faces required for them to be smoothed together. This has no effect is `.smooth` is false. Default is 0 (faces beyond perpendicular aren't smoothed)
 	 */
 	smoothLimit?: number;
+	/**
+	 * A list of texture coordinates in one-to-one correspondence with the vertices of the Polyhedron. Cannot be specified if `.computeUV` is specified. By default the same UVs will be given to each triangle
+	 */
+	uvs?: Vector2[];
+	/**
+	 * A function to compute the UV coordinates for each vertex, which will recieve the vertex and normal vector as arguments. Cannot be specified if `.smooth` is true. If not specified, either `.uvs` or default UVs will be used
+	 */
+	computeUV?: (arg0: Vector3, arg1: Vector3) => Vector2;
 }
 
 /**
