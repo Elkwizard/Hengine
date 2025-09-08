@@ -56,7 +56,7 @@ new</span><span class="highlight-CLASS"> <a href="../Structure/HengineResource/H
 					<div class="class-methods">
 		<div class="function-wrapper" id="HengineLoader.prototype.loadResource()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L940" target="_blank" class="function-name source-link">loadResource</a>(<span class="param">src</span>)<span class="type">Any/null</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L941" target="_blank" class="function-name source-link">loadResource</a>(<span class="param">src</span>)<span class="type">Any/null</span>
 			</div>
 			<div class="function desc">
 				Retrieves a specific resource.
@@ -84,9 +84,38 @@ If the resource implements <a href="../Miscellaneous/Copyable.html#class Copyabl
 			
 		</div>
 	
+		<div class="function-wrapper" id="HengineLoader.prototype.loadTexture()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L959" target="_blank" class="function-name source-link">loadTexture</a>(<span class="param">src</span>)<span class="type"><a href="../Rendering/GLSL API/Basics.html#class Sampler">Sampler</a>/null</span>
+			</div>
+			<div class="function desc">
+				Retrieves a specific image resource as a <a href="../Rendering/GLSL API/Basics.html#class Sampler">Sampler</a> for use in 3D rendering.
+If the resource failed to load, this returns null.
+This method is also available on the global object.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="HengineLoader.prototype.loadTexture():src">
+							<div class="param-name">
+								<span class="param">src</span>
+								<span class="type"><a href="../Built-Ins/String.html#class String">String</a></span>
+							</div>
+							<div class="param desc">
+								An identifying portion of the image's source. This behaves like the <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">src</span></code> parameter in <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">loadResource</span><span class="highlight-SYMBOL">()</span></code>
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="HengineLoader.load()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L959" target="_blank" class="function-name source-link">HengineLoader.load</a>(<span class="param">userResources</span>, <span class="param">done?</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Manage\HengineLoader.js?#L971" target="_blank" class="function-name source-link">HengineLoader.load</a>(<span class="param">userResources</span>, <span class="param">done?</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Loads a series of resources, and optionally starts the update loop after the loading completes.

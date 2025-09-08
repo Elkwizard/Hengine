@@ -902,6 +902,7 @@ class HengineLoader {
 		}
 
 		window.loadResource = this.loadResource.bind(this);
+		window.loadTexture = this.loadTexture.bind(this);
 
 		this.resources = new Map();
 
@@ -947,6 +948,17 @@ class HengineLoader {
 				return this.copyResource(path);
 
 		return null;
+	}
+	/**
+	 * Retrieves a specific image resource as a Sampler for use in 3D rendering.
+	 * If the resource failed to load, this returns null.
+	 * This method is also available on the global object.
+	 * @param String src | An identifying portion of the image's source. This behaves like the `src` parameter in `.loadResource()`
+	 * @return Sampler/null
+	 */
+	loadTexture(src) {
+		const resource = this.loadResource(src);
+		return resource ? new Sampler(resource, { mipmap: true, wrap: true }) : null;
 	}
 	/**
 	 * Loads a series of resources, and optionally starts the update loop after the loading completes.
@@ -1151,10 +1163,16 @@ class HengineLoader {
 
 /**
  * @name function loadResource
- * Retrieves a specific resource.
- * If the resource failed to load, this returns null.
- * This method is also available on the global object.
- * If the resource has internal mutable state, like an Animation, a new copy of the resource will be returned with each call to this function.
- * @param String src | An arbitrarily-lengthed tail end of the source of the resource. This can be as few characters as are needed to be unambiguous, or may be the entire path 
+ * Retrieves a specific resource from `HengineLoader.loader`.
+ * Behaves exactly like that object's `.loadResource()` method.
+ * @param String src | An identifying portion of the resource's source
  * @return Any/null
+ */
+
+/**
+ * @name function loadTexture
+ * Retrieves a specific image resource from `HengineLoader.loader` as a Sampler, for use in 3D rendering.
+ * Behaves exactly like that object's `.loadTexture()` method.
+ * @param String src | An identifying portion of the resource's source
+ * @return Sampler/null
  */

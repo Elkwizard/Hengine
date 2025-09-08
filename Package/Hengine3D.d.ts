@@ -555,6 +555,13 @@ declare class HengineLoader {
 	 */
 	loadResource(src: string): any | null;
 	/**
+	 * Retrieves a specific image resource as a Sampler for use in 3D rendering.
+	 * If the resource failed to load, this returns null.
+	 * This method is also available on the global object.
+	 * @param src - An identifying portion of the image's source. This behaves like the `src` parameter in `.loadResource()`
+	 */
+	loadTexture(src: string): Sampler | null;
+	/**
 	 * Loads a series of resources, and optionally starts the update loop after the loading completes.
 	 * If the rest of the Hengine has yet to be loaded, it will be loaded before any of the resources passed to this function.
 	 * Returns a promise that resolves to the HengineLoader instance when all the resources are loaded.
@@ -635,13 +642,18 @@ declare const height: number;
 declare const title: string;
 
 /**
- * Retrieves a specific resource.
- * If the resource failed to load, this returns null.
- * This method is also available on the global object.
- * If the resource has internal mutable state, like an Animation, a new copy of the resource will be returned with each call to this function.
- * @param src - An arbitrarily-lengthed tail end of the source of the resource. This can be as few characters as are needed to be unambiguous, or may be the entire path
+ * Retrieves a specific resource from `HengineLoader.loader`.
+ * Behaves exactly like that object's `.loadResource()` method.
+ * @param src - An identifying portion of the resource's source
  */
 declare function loadResource(src: string): any | null;
+
+/**
+ * Retrieves a specific image resource from `HengineLoader.loader` as a Sampler, for use in 3D rendering.
+ * Behaves exactly like that object's `.loadTexture()` method.
+ * @param src - An identifying portion of the resource's source
+ */
+declare function loadTexture(src: string): Sampler | null;
 
 /**
  * A wrapper for operations that happen over time or after a time.
