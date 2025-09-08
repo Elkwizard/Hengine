@@ -86,10 +86,11 @@ ColorMaterial.FRAGMENT_SHADER = new GLSL(`
  * @prop Color albedo | The base color of the material, against which ambient and diffuse lighting are calculated. Starts as white
  * @prop Color emission | The color of light emitted from the material. Starts as black
  * @prop Color specular | The color of specular highlights on the material. Starts as white
- * @prop ImageType/Sampler albedoTexture | The texture to use in in place of the `.albedo` color. It will sampled according to the mesh's UVs
- * @prop ImageType/Sampler specularTexture | The texture to use in in place of the `.specular` color. It will sampled according to the mesh's UVs
+ * @prop ImageType/Sampler albedoTexture | The texture to use in in place of the `.albedo` color. It will be sampled according to the mesh's UVs
+ * @prop ImageType/Sampler specularTexture | The texture to use in in place of the `.specular` color. It will be sampled according to the mesh's UVs
  * @prop Number specularExponent | The exponent applied during specular highlight calculation. Higher values correspond to sharper highlights. Starts as 0
- * @prop Number alpha | The opacity of the material. Starts as 1
+ * @prop Number alpha | The non-zero opacity of the material. Starts as 1
+ * @prop ImageType/Sampler alphaTexture | The texture whose alpha channel to use in place of the `.alpha` value. It will be sampled according to the mesh's UVs. Any material with a `.alphaTexture` is considered transparent
  */
 class SimpleMaterial extends Material {
 	/**
@@ -108,36 +109,48 @@ class SimpleMaterial extends Material {
 		this.vertexShader = SimpleMaterial.VERTEX_SHADER;
 		this.fragmentShader = SimpleMaterial.FRAGMENT_SHADER;
 		this.uniforms = { Material: this };
+		this.useTexture = Vector3.zero;
 		const textureSettings = ["albedoTexture", "specularTexture"];
 		for (let i = 0; i < textureSettings.length; i++) {
 			objectUtils.onChange(this, textureSettings[i], (key, value) => {
-				const scalar = key.replace("Texture", "");
-				this[scalar] = Color.BLACK;
 				if (value) {
-					this[scalar].alpha = 0;
 					this.uniforms[key] = value;
 				} else {
-					this[scalar].alpha = 1;
 					delete this.uniforms[key];
 				}
+				this.useTexture[SimpleMaterial.USE_TEXTURE[key]] = +!!value;
 			});
 		}
+
+		objectUtils.onChange(this, "alphaTexture", (_, value) => {
+			if (value) {
+				this.uniforms.alphaTexture = value;
+			} else {
+				delete this.uniforms.alphaTexture;
+			}
+			this.useTexture[SimpleMaterial.USE_TEXTURE.alphaTexture] = +!!value;
+		});
 
 		Object.assign(this, settings);
 	}
 	/**
-	 * Sets `.albedo`, `.specular`, and `.emission` to the same value.
+	 * Sets `.albedoTexture` and `.alphaTexture` to a given texture.
+	 * @param ImageType/Sampler | The new color and alpha texture
+	 */
+	set colorTexture(a) {
+		this.albedoTexture = this.alphaTexture = a;
+	}
+	/**
+	 * Sets `.albedo` and `.alpha` to match a given color, and disables the current `.albedoTexture` and `.alphaTexture`.
 	 * @param Color color | The new color value
 	 */
 	set color(a) {
-		this.albedo.set(a);
-		this.specular.set(a);
-		this.emission.set(a);
-		this.albedo.alpha = 1;
-		this.specular.alpha = 1;
+		this.albedo.set(a.opaque);
+		this.alpha = a.alpha;
+		this.albedoTexture = this.alphaTexture = null;
 	}
 	get transparent() {
-		return this.alpha < 1.0;
+		return this.alpha < 1.0 || !!this.alphaTexture;
 	}
 	get() {
 		const result = new SimpleMaterial();
@@ -151,6 +164,12 @@ class SimpleMaterial extends Material {
 		}
 		return result;
 	}
+
+	static USE_TEXTURE = {
+		albedoTexture: "x",
+		specularTexture: "y",
+		alphaTexture: "z"
+	};
 }
 SimpleMaterial.VERTEX_SHADER = new GLSL(ShaderMaterial.DEFAULT_VERTEX_SHADER);
 SimpleMaterial.LIGHTING = `
@@ -200,27 +219,31 @@ SimpleMaterial.LIGHTING = `
 
 SimpleMaterial.FRAGMENT_SHADER = new GLSL(`
 	uniform Material {
-		vec4 albedo;
-		vec4 specular;
+		vec3 albedo;
+		vec3 specular;
 		vec3 emission;
 		float specularExponent;
 		float alpha;
+		bvec3 useTexture;
 	} material;
 		
 	uniform sampler2D albedoTexture;
 	uniform sampler2D specularTexture;
+	uniform sampler2D alphaTexture;
 
 	${SimpleMaterial.LIGHTING}
 
 	#define MAYBE_TEXTURE(scalar, tex) (material.scalar.a > 0.0 ? material.scalar.rgb : texture(tex, uv).rgb)
 
 	vec4 shader() {
-		vec3 albedoColor = MAYBE_TEXTURE(albedo, albedoTexture);
-		vec3 specularColor = MAYBE_TEXTURE(specular, specularTexture); 
+		vec3 albedoColor = material.useTexture.${SimpleMaterial.USE_TEXTURE.albedoTexture} ? texture(albedoTexture, uv).rgb : material.albedo;
+		vec3 specularColor = material.useTexture.${SimpleMaterial.USE_TEXTURE.specularTexture} ? texture(specularTexture, uv).rgb : material.specular;
 
 		Surface surface = Surface(albedoColor, specularColor, material.emission, material.specularExponent);
 		vec3 light = computeColor(position, normal, surface);
 
-		return vec4(light, material.alpha);
+		float alpha = material.useTexture.${SimpleMaterial.USE_TEXTURE.alphaTexture} ? texture(alphaTexture, uv).a : material.alpha;
+
+		return vec4(light, alpha);
 	}
 `);

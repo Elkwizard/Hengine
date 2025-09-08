@@ -811,8 +811,11 @@ class GLSLProgram {
 			let setFunctionName = "uniform";
 			if (matrix) {
 				setFunctionName += "Matrix";
-				if (rows !== columns) setFunctionName += columns + "x" + rows;
-				else setFunctionName += rows;
+				if (rows !== columns) {
+					setFunctionName += columns + "x" + rows;
+				} else {
+					setFunctionName += rows;
+				}
 			} else setFunctionName += rows;
 
 			if (!signed) setFunctionName += "u";
@@ -889,16 +892,19 @@ class GLSLProgram {
 			if (array && (rows !== 1 || columns !== 1)) { // an array of non-scalars
 				const size = rows * columns;
 
-				if (matrix) desc.set = function (values) {
-					for (let i = 0; i < values.length; i++)
-						dataArray.set(values[i], i * size);
-					this.setUniform();
-				};
-				else desc.set = function (values) {
-					for (let i = 0; i < values.length; i++)
-						GLSLProgram.getVectorComponents(dataArray, values[i], i * size);
-					this.setUniform();
-				};
+				if (matrix) {
+					desc.set = function (values) {
+						for (let i = 0; i < values.length; i++)
+							dataArray.set(values[i], i * size);
+						this.setUniform();
+					};
+				} else {
+					desc.set = function (values) {
+						for (let i = 0; i < values.length; i++)
+							GLSLProgram.getVectorComponents(dataArray, values[i], i * size);
+						this.setUniform();
+					};
+				}
 			} else {
 				if (matrix) {
 					desc.set = function (value) {
@@ -944,30 +950,39 @@ class GLSLProgram {
 							self.textures[unit] = descriptor;
 						}
 
-						if (array) dataArray.set(textures.map(tex => tex.unit));
-						else dataArray[0] = textureUnit;
+						if (array) {
+							dataArray.set(textures.map(tex => tex.unit));
+						} else {
+							dataArray[0] = textureUnit;
+						}
 						this.setUniform();
 					};
 
-					if (array) desc.set = images => {
-						for (let i = 0; i < images.length; i++)
-							if (i < length) this.writeTexture(images[i], textures[i]);
-					};
-					else desc.set = image => this.writeTexture(image, textures[0]);
+					if (array) {
+						desc.set = images => {
+							for (let i = 0; i < images.length; i++)
+								if (i < length) this.writeTexture(images[i], textures[i]);
+						};
+					} else {
+						desc.set = image => this.writeTexture(image, textures[0]);
+					}
 				} else {
-					if (setWithArrayType) desc.set = function (value) {
-						dataArray.set(value);
-						this.setUniform();
-					};
-					else if (rows !== 1) {
+					if (setWithArrayType) {
+						desc.set = function (value) {
+							dataArray.set(value);
+							this.setUniform();
+						};
+					} else if (rows !== 1) {
 						desc.set = function (value) {
 							GLSLProgram.getVectorComponents(dataArray, value);
 							this.setUniform();
 						};
-					} else desc.set = function (value) {
-						dataArray[0] = value;
-						this.setUniform();
-					};
+					} else {
+						desc.set = function (value) {
+							dataArray[0] = value;
+							this.setUniform();
+						};
+					}
 				}
 			}
 
@@ -1225,9 +1240,9 @@ class GLSLProgram {
 			case gl.INT_VEC4: integer = true; rows = 4; break;
 
 			case gl.BOOL: integer = true; break;
-			case gl.BOOL_VEC2: integer = true; break;
-			case gl.BOOL_VEC3: integer = true; break;
-			case gl.BOOL_VEC4: integer = true; break;
+			case gl.BOOL_VEC2: integer = true; rows = 2; break;
+			case gl.BOOL_VEC3: integer = true; rows = 3; break;
+			case gl.BOOL_VEC4: integer = true; rows = 4; break;
 
 			case gl.FLOAT_MAT2: rows = 2; columns = 2; break;
 			case gl.FLOAT_MAT3: rows = 3; columns = 3; break;
