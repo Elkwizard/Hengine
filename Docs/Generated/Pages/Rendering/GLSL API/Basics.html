@@ -18,19 +18,19 @@
 Interactions between GLSL and javascript via <a href="../../Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterfaces</a> require associations between types in both the languages.
 These associations are laid out in the following table:
 <table>
-<tr><th>GLSL Type</th><th>JS Type</th></tr>
-<tr><td>int, uint, float</td><td><a href="../../Built-Ins/Number.html#class Number">Number</a></td></tr>
-<tr><td>bool</td><td>Boolean</td></tr>
-<tr><td>vec2, ivec2, uvec2</td><td><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></td></tr>
-<tr><td>vec3, ivec3, uvec3</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
-<tr><td>ivec4, uvec4</td><td><a href="../../Geometry/Vectors/Vector4.html#class Vector4">Vector4</a></td></tr>
-<tr><td>vec4</td><td><a href="../../Geometry/Vectors/Vector4.html#class Vector4">Vector4</a>, <a href="../../Rendering/Color.html#class Color">Color</a></td></tr>
-<tr><td>sampler2D</td><td><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/Sampler</td></tr>
-<tr><td>sampler2DArray</td><td><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>[]/Sampler</td></tr>
-<tr><td>samplerCube</td><td>CubeMap/Sampler</td></tr>
-<tr><td>struct</td><td>Object</td></tr>
-<tr><td>fixed-length array</td><td><a href="../../Built-Ins/Array.html#class Array">Array</a></td></tr>
-<tr><td>dynamic-length array</td><td><a href="../../Rendering/GLSL API/GPUArray.html#class GPUArray">GPUArray</a></td></tr>
+	<tr><th>GLSL Type</th><th>JS Type</th></tr>
+	<tr><td>int, uint, float</td><td><a href="../../Built-Ins/Number.html#class Number">Number</a></td></tr>
+	<tr><td>bool</td><td>Boolean</td></tr>
+	<tr><td>vec2, ivec2, uvec2</td><td><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></td></tr>
+	<tr><td>vec3, ivec3, uvec3</td><td><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></td></tr>
+	<tr><td>ivec4, uvec4</td><td><a href="../../Geometry/Vectors/Vector4.html#class Vector4">Vector4</a></td></tr>
+	<tr><td>vec4</td><td><a href="../../Geometry/Vectors/Vector4.html#class Vector4">Vector4</a>, <a href="../../Rendering/Color.html#class Color">Color</a></td></tr>
+	<tr><td>sampler2D</td><td><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/Sampler</td></tr>
+	<tr><td>sampler2DArray</td><td><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>[]/Sampler</td></tr>
+	<tr><td>samplerCube</td><td>CubeMap/Sampler</td></tr>
+	<tr><td>struct</td><td>Object</td></tr>
+	<tr><td>fixed-length array</td><td><a href="../../Built-Ins/Array.html#class Array">Array</a></td></tr>
+ <tr><td>dynamic-length array</td><td><a href="../../Rendering/GLSL API/GPUArray.html#class GPUArray">GPUArray</a></td></tr>
 </table>
 
 Though they are not present in any GLSL language standard, the <a href="../../Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a> supports dynamic-length, global, uniform struct arrays.
@@ -38,8 +38,8 @@ These are specified by omitting the length when declaring the array.
 Though they can be used like normal arrays (indexed with <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">array</span><span class="highlight-SYMBOL">[</span><span class="highlight-IDENTIFIER">index</span><span class="highlight-SYMBOL">]</span></code> and measured with <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">array</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">length</span><span class="highlight-SYMBOL">()</span></code>), they cannot be cast to normal arrays.
 Dynamic-length arrays' elements do not count toward the uniform limit, and can freely contain millions of elements on most platforms.
 
-<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">struct</span><span class="highlight-CLASS"> <a href="../../Geometry/Shapes/2D/Line.html#class Line">Line</a></span><span class="highlight-SYMBOL"> {</span><span class="highlight-KEYWORD">
-vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">end</span><span class="highlight-SYMBOL">;
+<code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-KEYWORD">struct</span><span class="highlight-CLASS"> <a href="../../Geometry/Shapes/2D/Line.html#class Line">Line</a></span><span class="highlight-SYMBOL"> {
+</span><span class="highlight-KEYWORD">	vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">start</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">end</span><span class="highlight-SYMBOL">;
 };
 </span><span class="highlight-KEYWORD">
 uniform</span><span class="highlight-CLASS"> <a href="../../Geometry/Shapes/2D/Line.html#class Line">Line</a></span><span class="highlight-SYMBOL">[] </span><span class="highlight-IDENTIFIER">linesA</span><span class="highlight-SYMBOL">; </span><span class="highlight-COMMENT">// dynamic length</span><span class="highlight-KEYWORD">

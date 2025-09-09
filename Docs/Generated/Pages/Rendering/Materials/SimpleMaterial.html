@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class SimpleMaterial">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L94" target="_blank" class="class-name source-link">SimpleMaterial</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Materials/Material.html#class Material">Material</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L95" target="_blank" class="class-name source-link">SimpleMaterial</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Materials/Material.html#class Material">Material</a></span>
 				</div>
 				<div class="class desc">
 					Represents a basic parameterized material based on the Blinn-Phong Shading Model.
@@ -52,7 +52,7 @@
 				<span class="prop-name">albedoTexture</span>
 				<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/<a href="../../Rendering/GLSL API/Basics.html#class Sampler">Sampler</a></span>
 			</div>
-			<div class="prop desc">The texture to use in in place of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">albedo</span></code> color. It will sampled according to the mesh's UVs</div>
+			<div class="prop desc">The texture to use in in place of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">albedo</span></code> color. It will be sampled according to the mesh's UVs</div>
 			<span class="prop-attrs"></span>
 		</div>
 	
@@ -61,7 +61,7 @@
 				<span class="prop-name">specularTexture</span>
 				<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/<a href="../../Rendering/GLSL API/Basics.html#class Sampler">Sampler</a></span>
 			</div>
-			<div class="prop desc">The texture to use in in place of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">specular</span></code> color. It will sampled according to the mesh's UVs</div>
+			<div class="prop desc">The texture to use in in place of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">specular</span></code> color. It will be sampled according to the mesh's UVs</div>
 			<span class="prop-attrs"></span>
 		</div>
 	
@@ -79,7 +79,16 @@
 				<span class="prop-name">alpha</span>
 				<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
-			<div class="prop desc">The opacity of the material. Starts as 1</div>
+			<div class="prop desc">The non-zero opacity of the material. Starts as 1</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="SimpleMaterial.alphaTexture">
+			<div class="prop-header member">
+				<span class="prop-name">alphaTexture</span>
+				<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/<a href="../../Rendering/GLSL API/Basics.html#class Sampler">Sampler</a></span>
+			</div>
+			<div class="prop desc">The texture whose alpha channel to use in place of the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">alpha</span></code> value. It will be sampled according to the mesh's UVs. Any material with a <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">alphaTexture</span></code> is considered transparent</div>
 			<span class="prop-attrs"></span>
 		</div>
 	</div>
@@ -90,7 +99,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="SimpleMaterial.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L99" target="_blank" class="function-name source-link">constructor</a>(<span class="param">settings</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L100" target="_blank" class="function-name source-link">constructor</a>(<span class="param">settings</span>)
 			</div>
 			<div class="function desc">
 				Creates a new material based on certain surface settings.
@@ -115,12 +124,39 @@
 			
 		</div>
 	
-		<div class="function-wrapper" id="set SimpleMaterial.prototype.color()">
+		<div class="function-wrapper" id="set SimpleMaterial.prototype.colorTexture()">
 			<div class="function-header member">
-				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L132" target="_blank" class="function-name source-link">color</a>(<span class="param">color</span>)
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L140" target="_blank" class="function-name source-link">colorTexture</a>(<span class="param"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/<a href="../../Rendering/GLSL API/Basics.html#class Sampler">Sampler</a></span>)
 			</div>
 			<div class="function desc">
-				Sets <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">albedo</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">specular</span></code>, and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">emission</span></code> to the same value.
+				Sets <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">albedoTexture</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">alphaTexture</span></code> to a given texture.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="set SimpleMaterial.prototype.colorTexture():ImageType/Sampler">
+							<div class="param-name">
+								<span class="param"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/<a href="../../Rendering/GLSL API/Basics.html#class Sampler">Sampler</a></span>
+								<span class="type"><a href="../../Rendering/Image Types/ImageType.html#class ImageType">ImageType</a>/Sample</span>
+							</div>
+							<div class="param desc">
+								The new color and alpha texture
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="set SimpleMaterial.prototype.color()">
+			<div class="function-header member">
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L147" target="_blank" class="function-name source-link">color</a>(<span class="param">color</span>)
+			</div>
+			<div class="function desc">
+				Sets <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">albedo</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">alpha</span></code> to match a given color, and disables the current <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">albedoTexture</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">alphaTexture</span></code>.
 			</div>
 			
 				<div class="function-signature">

@@ -20,7 +20,7 @@ function parse(content, file) {
 					.trim()
 					.split("\n")
 					.map(line => {
-						line = line.replace(/^\s*\* /g, "").trim();
+						line = line.replace(/(^\s*\* |\s*$)/g, "");
 						if (line.startsWith("@")) {
 							const [, category, attributeString, content] = line
 								.match(/^@(\w+)(?:<([\w\s,]+)>)?(?: (.*))?$/);

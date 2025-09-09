@@ -1,0 +1,97 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class Artist3D.PostProcessEffects">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1009" target="_blank" class="class-name source-link">Artist3D.PostProcessEffects</a>
+				</div>
+				<div class="class desc">
+					Represents the complete collection of post-processing effects that are applied to a given <a href="../../../../Rendering/Renderer/3D/Artist3D.html#class Artist3D">Artist3D</a>.
+This class should not be constructed, and should be accessed via the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">postProcess</span></code> property of an <a href="../../../../Rendering/Renderer/3D/Artist3D.html#class Artist3D">Artist3D</a> instance.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+		<div class="prop-wrapper" id="Artist3D.PostProcessEffects.before">
+			<div class="prop-header member">
+				<span class="prop-name">before</span>
+				<span class="type"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Custom.html#class Artist3D.CustomEffects">Artist3D.CustomEffects</a></span>
+			</div>
+			<div class="prop desc">A collection of user-defined post-processing effects which will be applied before built-in effects. This is active, but empty, by default</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Artist3D.PostProcessEffects.ssao">
+			<div class="prop-header member">
+				<span class="prop-name">ssao</span>
+				<span class="type"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Built-Ins.html#class Artist3D.SSAO">Artist3D.SSAO</a></span>
+			</div>
+			<div class="prop desc">Screen-space ambient occlusion. This is active by default</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Artist3D.PostProcessEffects.bloom">
+			<div class="prop-header member">
+				<span class="prop-name">bloom</span>
+				<span class="type"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Built-Ins.html#class Artist3D.Bloom">Artist3D.Bloom</a></span>
+			</div>
+			<div class="prop desc">A light-bleeding effect. This is active by default</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Artist3D.PostProcessEffects.after">
+			<div class="prop-header member">
+				<span class="prop-name">after</span>
+				<span class="type"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Custom.html#class Artist3D.CustomEffects">Artist3D.CustomEffects</a></span>
+			</div>
+			<div class="prop desc">A collection of user-defined post-processing effects which will be applied after built-in effects. This is active, but empty, by default</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
+		</div>
+	</div>
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Artist3D.PostProcess">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1016" target="_blank" class="class-name source-link">Artist3D.PostProcess</a>
+				</div>
+				<div class="class desc">
+					Represents an optional post-processing effect that can be applied to an <a href="../../../../Rendering/Renderer/3D/Artist3D.html#class Artist3D">Artist3D</a>'s rendered result.
+This class, along with its subclasses should not be constructed.
+				</div>
+				
+					<div class="header">Subclasses</div>
+					<div class="subclass desc"><span class="class-name"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Built-Ins.html#class Artist3D.Bloom">Artist3D.Bloom</a></span>, <span class="class-name"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Built-Ins.html#class Artist3D.SSAO">Artist3D.SSAO</a></span>, <span class="class-name"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Custom.html#class Artist3D.CustomEffects">Artist3D.CustomEffects</a></span></div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+		<div class="prop-wrapper" id="Artist3D.PostProcess.active">
+			<div class="prop-header member">
+				<span class="prop-name">active</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether the effect is currently active. The initial value of this property depends the effect</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
+				
+				
+				
+			</div>
+		
+			</body>
+		</html>
+	

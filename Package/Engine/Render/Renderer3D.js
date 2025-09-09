@@ -63,8 +63,10 @@ class Artist3D extends Artist {
 		this.matrix4Pool = new StackAllocator(Matrix4);
 		this.matrix4Pool.push();
 		this.postProcess = {
+			before: new Artist3D.CustomEffects(this, true),
 			bloom: new Artist3D.Bloom(this, true),
 			ssao: new Artist3D.SSAO(this, true),
+			after: new Artist3D.CustomEffects(this, true)
 		};
 		this.screenBuffers = [];
 
@@ -690,7 +692,7 @@ class Artist3D extends Artist {
 	drawQuad(shader, uniforms = { }) {
 		const { gl } = this;
 		shader.focus();
-		shader.setUniforms(uniforms);
+		shader.setUniforms(uniforms, false);
 
 		gl.bindVertexArray(this.vertexArray2D);
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -837,14 +839,172 @@ class Artist3D extends Artist {
 	static SHADOW_BIAS = 0.5;
 	static SHADOW_CASCADE = 4;
 	static INSTANCE_THRESHOLD = 10;
+	static LightTypes = Object.fromEntries(["AMBIENT", "DIRECTIONAL", "POINT"].map((n, i) => [n, i]));
 }
+Artist3D.CAMERA = `
+	struct Camera {
+		vec3 position;
+		vec3 direction;
+		vec3 right;
+		vec3 up;
+		mat4 pcMatrix;
+		mat4 projection;
+		mat4 inverse;
+	};
+
+	uniform Camera camera;
+`;
+Artist3D.LIGHTS = `
+	struct Light {
+		vec3 position;
+		vec3 direction;
+		vec3 color;
+		int type;
+		int shadowIndex;
+	};
+
+	${Object.entries(Artist3D.LightTypes).map(([n, i]) => `#define ${n} ${i}`).join("\n")}
+	#define MAX_LIGHTS ${Artist3D.MAX_LIGHTS}
+	#define MAX_SHADOWS ${Artist3D.MAX_SHADOWS}
+	#define SHADOW_CASCADE ${Artist3D.SHADOW_CASCADE}
+
+	uniform int lightCount;
+	uniform Light[MAX_LIGHTS] lights;
+	uniform float[${Artist3D.SHADOW_CASCADE}] shadowCascadeDepths;
+
+	vec3 getLightColor(vec3 position, Light light) {
+		if (light.type == POINT) {
+			float len = distance(position, light.position);
+			return light.color / (len * len);
+		}
+		
+		return light.color;
+	}
+
+	vec3 getLightDirection(vec3 position, Light light) {
+		if (light.type == POINT) {
+			return normalize(position - light.position);
+		}
+		return light.direction;
+	}
+
+	struct ShadowCamera {
+		mat4 projection;
+		mat4 pcMatrix;
+	};
+	struct ShadowInfo {
+		ShadowCamera camera;	
+		float depthBias;
+		float pixelSize;
+		float zRange;
+		float scale;
+	};
+	uniform ShadowInfo[MAX_SHADOWS * SHADOW_CASCADE] shadowInfo;
+	uniform highp sampler2DArrayShadow[MAX_SHADOWS] shadowTextures;
+
+	vec3 implicitNormal(vec3 position) {
+		return normalize(cross(dFdx(position), dFdy(position)));
+	}
+
+	int _getCascadeRegion(vec3 position) {
+		float depth = dot(position, camera.direction);
+		for (int i = 0; i < shadowCascadeDepths.length(); i++) {
+			if (depth < shadowCascadeDepths[i]) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	float getShadow(vec3 position, Light light) {
+		if (light.shadowIndex == -1) return 0.0;
+
+		int cascadeRegion = _getCascadeRegion(position);
+		if (cascadeRegion == -1) return 0.0;
+
+		ShadowInfo info = shadowInfo[light.shadowIndex * SHADOW_CASCADE + cascadeRegion];
+		ShadowCamera camera = info.camera;
+
+		// normal bias
+		vec3 n = implicitNormal(position);
+		float ldn = dot(getLightDirection(position, light), n);
+		float normalBias = info.pixelSize * 0.5 * sqrt(1.0 - ldn * ldn);
+		position += n * normalBias;
+
+		vec4 proj = camera.pcMatrix * vec4(position, 1);
+		vec3 frag = proj.xyz / proj.w;
+		vec2 uv = vec2(
+			0.5 + frag.x * 0.5,
+			0.5 - frag.y * 0.5
+		);
+
+		// depth bias
+		frag.z -= 0.01 / info.zRange;
+
+		float fragDepth = frag.z * 0.5 + 0.5;
+
+		vec4 testCoord = vec4(uv * info.scale, cascadeRegion, fragDepth);
+
+		float depth;
+		switch (light.shadowIndex) {${
+			Array.dim(Artist3D.MAX_SHADOWS)
+				.map((_, i) => `
+					case ${i}: return texture(shadowTextures[${i}], testCoord);
+				`)
+				.join("\n")
+		}}
+		
+		return 0.0;
+	}
+`;
+Artist3D.SHADOW_FRAGMENT = new GLSL(`
+	vec4 shader() {
+		return vec4(0.0);
+	}
+`);
+Artist3D.SCREEN_VERTEX = new ShaderSource(new GLSL(`
+	layout (location = 0) in vec2 position;
+
+	uniform struct {
+		vec2 min, max;
+	} uvBox;
+
+	out vec2 uv;
+
+	void main() {
+		uv = mix(uvBox.min, uvBox.max, position * 0.5 + 0.5);
+		gl_Position = vec4(position, 0, 1);
+	}
+`));
+Artist3D.OVERLAY_FRAGMENT = new GLSL(`
+	uniform sampler2D overlay;
+
+	vec4 shader() {
+		vec4 result = texture(overlay, vec2(uv.x, 1.0 - uv.y));
+		result.rgb *= result.a;
+		return result;
+	}
+`);
+Artist3D.COPY_FRAGMENT = new GLSL(`
+	uniform sampler2D source;
+	uniform struct {
+		vec2 min, max;
+	} region;	
+
+	vec4 shader() {
+		vec2 size = vec2(textureSize(source, 0));
+		return texture(source, mix(region.min, region.max, uv) / size);
+	}
+`);
 
 /**
  * @name class Artist3D.PostProcessEffects
  * Represents the complete collection of post-processing effects that are applied to a given Artist3D.
  * This class should not be constructed, and should be accessed via the `.postProcess` property of an Artist3D instance.
+ * @prop<readonly> Artist3D.CustomEffects before | A collection of user-defined post-processing effects which will be applied before built-in effects. This is active, but empty, by default
  * @prop<readonly> Artist3D.SSAO ssao | Screen-space ambient occlusion. This is active by default
  * @prop<readonly> Artist3D.Bloom bloom | A light-bleeding effect. This is active by default
+ * @prop<readonly> Artist3D.CustomEffects after | A collection of user-defined post-processing effects which will be applied after built-in effects. This is active, but empty, by default
  */
 
 /**
@@ -1282,6 +1442,124 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 	`);
 };
 
+/**
+ * @name class Artist3D.CustomEffects extends Artist3D.PostProcess
+ * Represents a collection of user-defined post-processing effects.
+ * Effects can be defined using a full-screen GLSL program, which will be provided with information about the current state of the rendering.
+ * This class should not be constructed, and should instead be accessed via the `.before` and `.after` properties of an Artist3D.PostProcessEffects.
+ * ```js
+ * // chromatic abberation effect
+ * renderer.postProcess.after.addEffect("abberation", `
+ * 	vec4 shader() {
+ * 		vec2 resolution = vec2(textureSize(colorTexture, 0));
+ * 		vec2 position = resolution * uv;
+ * 		
+ * 		return vec4(
+ * 			texture(colorTexture, (position + vec2(-3, 0)) / resolution).r,
+ * 			texture(colorTexture, (position + vec2(0, 3)) / resolution).g,
+ * 			texture(colorTexture, (position + vec2(3, 0)) / resolution).b,
+ * 			1
+ * 		);
+ * 	}
+ * `);
+ * ```
+ */
+Artist3D.CustomEffects = class extends Artist3D.PostProcess {
+	constructor(...args) {
+		super(...args);
+		this.effects = new Map();
+	}
+	/**
+	 * Re-orders the way in which the effects are applied.
+	 * @param String[] order | The names of the effects to be applied, in the order to apply them. Any names omitted will be removed from the list of effects
+	 */
+	reorder(order) {
+		const effects = new Map(this.effects);
+		this.effects.clear();
+		for (let i = 0; i < order.length; i++)
+			this.effects.set(order[i], effects.get(order[i]));
+	}
+	/**
+	 * Adds a new full-screen post-processing effect after the existing effects.
+	 * The shader program will be provided with several inputs, specifically the following:
+	 * <table>
+	 * 	<tr><th>Input</th><th>Description</th></tr>
+	 * 	<tr><td>`vec2 uv`</td><td>The UV coordinates of the current pixel in screen space</td></tr>
+	 * 	<tr><td>`sampler2D colorTexture`</td><td>The current color content of the screen</td></tr>
+	 * 	<tr><td>`sampler2D depthTexture`</td><td>The current depth content of the screen</td></tr>
+	 * 	<tr><td>`Camera camera`</td><td>The camera being used for rendering, with the properties of a JS Camera object</td></tr>
+	 * </table> 
+	 * @param String name | The name of the new effect
+	 * @param String glsl | The source code for the full-screen fragment shader effect. This must define a `vec4 shader()` entry-point function
+	 * @param Object uniforms? | An object containing uniform values to pass to this effect. Changes to the object will be reflected in the uniform values. Default is an empty object
+	 */
+	addEffect(name, glsl, uniforms = { }) {
+		glsl = new GLSL(Artist3D.CustomEffects.FRAGMENT_PREFIX + " " + glsl);
+		const { artist } = this;
+		const effect = {
+			uniforms,
+			compile() {
+				this.program = artist.create2DProgram(glsl, false);
+			}
+		};
+		effect.compile();
+		this.effects.set(name, effect);
+	}
+	/**
+	 * Removes the effect with a given name.
+	 * @param String name | The name of the effect to remove
+	 */
+	removeEffect(name) {
+		this.effects.delete(name);
+	}
+	compile() {
+		for (const effect of this.effects.values())
+			effect.compile();
+		this.pingPong = this.artist.createPingPong({ hdr: true, depth: true });
+	}
+	draw(inputBuffer, camera, view) {
+		if (!this.effects.size) return inputBuffer;
+
+		const { gl } = this.artist;
+
+		GLUtils.setViewport(gl, view);
+
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.ALWAYS);
+
+		const uvBox = this.artist.getUVBox(view);
+
+		let useInput = true;
+		for (const effect of this.effects.values()) {
+			let source;
+			if (useInput) {
+				useInput = false;
+				source = inputBuffer;
+			} else {
+				source = this.pingPong.swap();
+			}
+			this.pingPong.bind();
+
+			this.artist.drawQuad(effect.program, {
+				...effect.uniforms,
+				uvBox, camera,
+				colorTexture: source.color,
+				depthTexture: source.depth
+			});
+		}
+
+		gl.depthFunc(gl.LEQUAL);
+
+		return this.pingPong.dst;
+	}
+
+	static FRAGMENT_PREFIX = `
+		uniform sampler2D colorTexture;
+		uniform sampler2D depthTexture;
+		${Artist3D.CAMERA}
+	`.replaceAll(/\s+/g, " ").trim();
+};
+
 Artist3D.State = class {
 	constructor() {
 		this.transform = Matrix4.identity();
@@ -1434,7 +1712,7 @@ Artist3D.LightRenderer = class LightRenderer {
 	ambient() {
 		this.queue.push({
 			color: this.color,
-			type: Artist3D.LightRenderer.Types.AMBIENT
+			type: Artist3D.LightTypes.AMBIENT
 		});
 	}
 	/**
@@ -1446,7 +1724,7 @@ Artist3D.LightRenderer = class LightRenderer {
 		const { transform } = this.renderer;
 		this.queue.push({
 			color: this.color,
-			type: Artist3D.LightRenderer.Types.POINT,
+			type: Artist3D.LightTypes.POINT,
 			position: transform.times(position)
 		});
 	}
@@ -1460,12 +1738,10 @@ Artist3D.LightRenderer = class LightRenderer {
 		const { transform } = this.renderer;
 		this.queue.push({
 			color: this.color, shadow,
-			type: Artist3D.LightRenderer.Types.DIRECTIONAL,
+			type: Artist3D.LightTypes.DIRECTIONAL,
 			direction: Matrix3.normal(transform).times(direction)
 		});
 	}
-
-	static Types = Object.fromEntries(["AMBIENT", "DIRECTIONAL", "POINT"].map((n, i) => [n, i]));
 };
 
 /**
@@ -1764,159 +2040,3 @@ Artist3D.StrokeRenderer = class StrokeRenderer extends Artist3D.PathRenderer {
 			this.line(edges[i]);
 	}
 };
-
-Artist3D.CAMERA = `
-	struct Camera {
-		vec3 position;
-		vec3 direction;
-		vec3 right;
-		vec3 up;
-		mat4 pcMatrix;
-		mat4 projection;
-		mat4 inverse;
-	};
-
-	uniform Camera camera;
-`;
-Artist3D.LIGHTS = `
-	struct Light {
-		vec3 position;
-		vec3 direction;
-		vec3 color;
-		int type;
-		int shadowIndex;
-	};
-
-	${Object.entries(Artist3D.LightRenderer.Types).map(([n, i]) => `#define ${n} ${i}`).join("\n")}
-	#define MAX_LIGHTS ${Artist3D.MAX_LIGHTS}
-	#define MAX_SHADOWS ${Artist3D.MAX_SHADOWS}
-	#define SHADOW_CASCADE ${Artist3D.SHADOW_CASCADE}
-
-	uniform int lightCount;
-	uniform Light[MAX_LIGHTS] lights;
-	uniform float[${Artist3D.SHADOW_CASCADE}] shadowCascadeDepths;
-
-	vec3 getLightColor(vec3 position, Light light) {
-		if (light.type == POINT) {
-			float len = distance(position, light.position);
-			return light.color / (len * len);
-		}
-		
-		return light.color;
-	}
-
-	vec3 getLightDirection(vec3 position, Light light) {
-		if (light.type == POINT) {
-			return normalize(position - light.position);
-		}
-		return light.direction;
-	}
-
-	struct ShadowCamera {
-		mat4 projection;
-		mat4 pcMatrix;
-	};
-	struct ShadowInfo {
-		ShadowCamera camera;	
-		float depthBias;
-		float pixelSize;
-		float zRange;
-		float scale;
-	};
-	uniform ShadowInfo[MAX_SHADOWS * SHADOW_CASCADE] shadowInfo;
-	uniform highp sampler2DArrayShadow[MAX_SHADOWS] shadowTextures;
-
-	vec3 implicitNormal(vec3 position) {
-		return normalize(cross(dFdx(position), dFdy(position)));
-	}
-
-	int _getCascadeRegion(vec3 position) {
-		float depth = dot(position, camera.direction);
-		for (int i = 0; i < shadowCascadeDepths.length(); i++) {
-			if (depth < shadowCascadeDepths[i]) {
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	float getShadow(vec3 position, Light light) {
-		if (light.shadowIndex == -1) return 0.0;
-
-		int cascadeRegion = _getCascadeRegion(position);
-		if (cascadeRegion == -1) return 0.0;
-
-		ShadowInfo info = shadowInfo[light.shadowIndex * SHADOW_CASCADE + cascadeRegion];
-		ShadowCamera camera = info.camera;
-
-		// normal bias
-		vec3 n = implicitNormal(position);
-		float ldn = dot(getLightDirection(position, light), n);
-		float normalBias = info.pixelSize * 0.5 * sqrt(1.0 - ldn * ldn);
-		position += n * normalBias;
-
-		vec4 proj = camera.pcMatrix * vec4(position, 1);
-		vec3 frag = proj.xyz / proj.w;
-		vec2 uv = vec2(
-			0.5 + frag.x * 0.5,
-			0.5 - frag.y * 0.5
-		);
-
-		// depth bias
-		frag.z -= 0.01 / info.zRange;
-
-		float fragDepth = frag.z * 0.5 + 0.5;
-
-		vec4 testCoord = vec4(uv * info.scale, cascadeRegion, fragDepth);
-
-		float depth;
-		switch (light.shadowIndex) {${
-			Array.dim(Artist3D.MAX_SHADOWS)
-				.map((_, i) => `
-					case ${i}: return texture(shadowTextures[${i}], testCoord);
-				`)
-				.join("\n")
-		}}
-		
-		return 0.0;
-	}
-`;
-Artist3D.SHADOW_FRAGMENT = new GLSL(`
-	vec4 shader() {
-		return vec4(0.0);
-	}
-`);
-Artist3D.SCREEN_VERTEX = new ShaderSource(new GLSL(`
-	layout (location = 0) in vec2 position;
-
-	uniform struct {
-		vec2 min, max;
-	} uvBox;
-
-	out vec2 uv;
-
-	void main() {
-		uv = mix(uvBox.min, uvBox.max, position * 0.5 + 0.5);
-		gl_Position = vec4(position, 0, 1);
-	}
-`));
-Artist3D.OVERLAY_FRAGMENT = new GLSL(`
-	uniform sampler2D overlay;
-
-	vec4 shader() {
-		vec4 result = texture(overlay, vec2(uv.x, 1.0 - uv.y));
-		result.rgb *= result.a;
-		return result;
-	}
-`);
-Artist3D.COPY_FRAGMENT = new GLSL(`
-	uniform sampler2D source;
-	uniform struct {
-		vec2 min, max;
-	} region;	
-
-	vec4 shader() {
-		vec2 size = vec2(textureSize(source, 0));
-		return texture(source, mix(region.min, region.max, uv) / size);
-	}
-`);

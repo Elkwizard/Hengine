@@ -59,6 +59,7 @@ const highlight = (source, highlighter, copy = false, className = "") => {
 
 const inferLanguage = source => {
 	if (/^\s*\w+\:($|\/\/)/.test(source)) return "url";
+	if (/^([bui]?vec[234]?|\w*sampler)/.test(source)) return "glsl";
 	return "js";
 };
 

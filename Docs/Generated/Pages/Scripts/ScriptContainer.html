@@ -16,14 +16,14 @@
 					Represents the collection of behaviors on a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>.
 <code class="block highlight-BACKGROUND"><button onclick="navigator.clipboard.writeText(this.parentNode.innerText.slice(1))">⎘</button><span class="highlight-COMMENT">// create a script which holds an action</span><span class="highlight-KEYWORD">
 class</span><span class="highlight-CLASS"> </span><span class="highlight-CONSTANT">ACTION</span><span class="highlight-KEYWORD"> extends</span><span class="highlight-CLASS"> <a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span><span class="highlight-SYMBOL"> {
-</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">action</span><span class="highlight-SYMBOL">) {</span><span class="highlight-LANG_VAR">
-this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">action</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">action</span><span class="highlight-SYMBOL">;
-}
+	</span><span class="highlight-FUNCTION">init</span><span class="highlight-SYMBOL">(</span><span class="highlight-IDENTIFIER">obj</span><span class="highlight-SYMBOL">, </span><span class="highlight-IDENTIFIER">action</span><span class="highlight-SYMBOL">) {
+	</span><span class="highlight-LANG_VAR">	this</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">action</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">action</span><span class="highlight-SYMBOL">;
+	}
 }
 </span><span class="highlight-KEYWORD">
 const</span><span class="highlight-CONSTANT"> object</span><span class="highlight-SYMBOL"> = </span><span class="highlight-IDENTIFIER">scene</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">main</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">addElement</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;hello&quot;</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">,</span><span class="highlight-NUMBER"> 0</span><span class="highlight-SYMBOL">);
 </span><span class="highlight-IDENTIFIER">object</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">scripts</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">add</span><span class="highlight-SYMBOL">(</span><span class="highlight-CONSTANT">ACTION</span><span class="highlight-SYMBOL">, ()</span><span class="highlight-KEYWORD"> =&gt; </span><span class="highlight-SYMBOL">{
-</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Hello World!&quot;</span><span class="highlight-SYMBOL">);
+	</span><span class="highlight-IDENTIFIER">console</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">log</span><span class="highlight-SYMBOL">(</span><span class="highlight-STRING">&quot;Hello World!&quot;</span><span class="highlight-SYMBOL">);
 });
 
 </span><span class="highlight-COMMENT">// call the function from the defined property</span><span class="highlight-SYMBOL">

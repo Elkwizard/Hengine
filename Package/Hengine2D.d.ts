@@ -45,7 +45,7 @@ declare enum ScalingMode {
  * canvas.scalingMode = ScalingMode.STRETCH;
  * 
  * intervals.continuous(() => { // render a circle to the middle of the screen
- * renderer.draw(new Color("blue")).circle(middle, 10);
+ * 	renderer.draw(new Color("blue")).circle(middle, 10);
  * });
  * ```
  */
@@ -258,11 +258,11 @@ declare class Hengine {
  * Represents an external resource to be loaded by the Hengine.
  * ```js
  * HengineLoader.load([
- * new HengineImageResource("cat.png"),
- * new HengineImageResource("dog.png"),
- * new HengineScriptResource("renderers/catRenderer.js"),
- * new HengineScriptResource("renderers/dogRenderer.js"),
- * new HengineScriptResource("index.js")
+ * 	new HengineImageResource("cat.png"),
+ * 	new HengineImageResource("dog.png"),
+ * 	new HengineScriptResource("renderers/catRenderer.js"),
+ * 	new HengineScriptResource("renderers/dogRenderer.js"),
+ * 	new HengineScriptResource("index.js")
  * ]);
  * ```
  */
@@ -421,14 +421,14 @@ declare class HengineMeshResource extends HengineResource {
  * These methods also return the caller, which allows for convenient chaining.
  * ```js
  * new HengineLoadingStructure()
- * .image("cat.png")
- * .image("dog.png")
- * .folder("renderers", structure => structure
- * .script("catRenderer.js")
- * .script("dogRenderer.js")
- * )
- * .script("index.js")
- * .load()
+ * 	.image("cat.png")
+ * 	.image("dog.png")
+ * 	.folder("renderers", structure => structure
+ * 		.script("catRenderer.js")
+ * 		.script("dogRenderer.js")
+ * 	)
+ * 	.script("index.js")
+ * 	.load()
  * ```
  */
 declare class HengineLoadingStructure {
@@ -528,16 +528,16 @@ declare class HengineLoadingStructure {
  * This class is a singleton, and the single instance can be accessed via a static property.
  * ```js
  * async function load() {
- * // choose which file to load based on an external file
- * await HengineLoader.load([
- * new HengineTextResource("whichToLoad.txt")
- * ], false);
+ * 	// choose which file to load based on an external file
+ * 	await HengineLoader.load([
+ * 		new HengineTextResource("whichToLoad.txt")
+ * 	], false);
  * 
- * // load the selected script
- * const fileName = loadResource("whichToLoad.txt");
- * await HengineLoader.load([
- * new HengineScriptResource(`${fileName}.js`)
- * ]);
+ * 	// load the selected script
+ * 	const fileName = loadResource("whichToLoad.txt");
+ * 	await HengineLoader.load([
+ * 		new HengineScriptResource(`${fileName}.js`)
+ * 	]);
  * }
  * ```
  */
@@ -660,11 +660,11 @@ declare function loadTexture(src: string): Sampler | null;
  * These can generally be created by methods of IntervalManager.
  * ```js
  * const transitionDone = intervals.transition(t => {
- * console.log("Progress: " + t);
+ * 	console.log("Progress: " + t);
  * }, 5);
  * 
  * transitionDone.then(() => {
- * console.log("The transition has completed");
+ * 	console.log("The transition has completed");
  * });
  * 
  * // Progress: 0
@@ -780,7 +780,7 @@ declare class MovingAverage {
  * ```js
  * // display FPS data
  * intervals.continuous(() => {
- * renderer.image(intervals.fpsGraph).default(10, 10);
+ * 	renderer.image(intervals.fpsGraph).default(10, 10);
  * });
  * ```
  */
@@ -915,12 +915,12 @@ declare function exit(...messages: any[]): void;
  * 
  * const BLOCK_SIZE = 30;
  * for (let i = 0; i < 10; i++) // generate 10 slightly disorganized blocks that will fall
- * scene.main.addPhysicsRectElement(
- * "block",
- * width / 2 + Random.range(-10, 10),
- * floor.getBoundingBox().y - (i + 0.5) * BLOCK_SIZE,
- * BLOCK_SIZE, BLOCK_SIZE, true
- * );
+ * 	scene.main.addPhysicsRectElement(
+ * 		"block",
+ * 		width / 2 + Random.range(-10, 10),
+ * 		floor.getBoundingBox().y - (i + 0.5) * BLOCK_SIZE,
+ * 		BLOCK_SIZE, BLOCK_SIZE, true
+ * 	);
  * ```
  */
 declare class Scene {
@@ -1125,23 +1125,23 @@ declare class Geometry {
  * ```js
  * // computation to move circles toward the middle of the screen
  * const computation = new GPUComputation(`
- * struct Circle {
- * vec2 position;
- * float radius;
- * };
+ * 	struct Circle {
+ * 		vec2 position;
+ * 		float radius;
+ * 	};
  * 
- * uniform Circle[] circles;
- * uniform vec2 middle;
+ * 	uniform Circle[] circles;
+ * 	uniform vec2 middle;
  * 
- * Circle compute() {
- * Circle circle = circles[problemIndex];
- * circle.position = mix(circle.position, middle, 0.01);
- * return circle;
- * }
+ * 	Circle compute() {
+ * 		Circle circle = circles[problemIndex];
+ * 		circle.position = mix(circle.position, middle, 0.01);
+ * 		return circle;
+ * 	}
  * `);
  * 
  * const circles = Array.dim(1000).map(() => {
- * return { position: Random.inShape(scene.camera.screen), radius: 10 };
+ * 	return { position: Random.inShape(scene.camera.screen), radius: 10 };
  * });
  * 
  * // write, compute, and readback circle data
@@ -1305,9 +1305,9 @@ declare class Interpolation {
  * const point = new Animatable(middle, 100, Interpolation.smooth);
  * 
  * intervals.continuous(() => {
- * if (mouse.justPressed("Left"))
- * point.target = mouse.screen;
- * renderer.draw(new Color("black")).circle(point.value, 10);
+ * 	if (mouse.justPressed("Left"))
+ * 		point.target = mouse.screen;
+ * 	renderer.draw(new Color("black")).circle(point.value, 10);
  * });
  * ```
  */
@@ -1579,8 +1579,8 @@ declare class Matrix2 extends Matrix {
  * Represents a 3 by 3 matrix for use with 2D vectors in homogenous coordinates or 3D vectors in standard coordinates.
  * ```js
  * const transformation = Matrix3.mul([
- * Matrix3.translation(10, 5),
- * Matrix3.rotation(Math.PI)
+ * 	Matrix3.translation(10, 5),
+ * 	Matrix3.rotation(Math.PI)
  * ]);
  * 
  * const initialPoint = new Vector2(10, 20);
@@ -1877,10 +1877,10 @@ declare class PhysicsEngine {
  * let count = 0;
  * 
  * intervals.continuous(() => {
- * total += Random.int(1, 10); // generate a random value each frame
- * count++;
- * const mean = total / count; // compute the mean of the random values
- * renderer.draw(new Color("black")).text(Font.Arial20, mean, 10, 10);
+ * 	total += Random.int(1, 10); // generate a random value each frame
+ * 	count++;
+ * 	const mean = total / count; // compute the mean of the random values
+ * 	renderer.draw(new Color("black")).text(Font.Arial20, mean, 10, 10);
  * });
  * ```
  */
@@ -3847,10 +3847,10 @@ declare class Capsule extends Shape3D {
  * ```js
  * const object = { };
  * Lazy.define(object, "lazy", () => { // an expensive operation
- * let result = 0;
- * for (let i = 0; i < 1e6; i++)
- * result += Random.random();
- * return result;
+ * 	let result = 0;
+ * 	for (let i = 0; i < 1e6; i++)
+ * 		result += Random.random();
+ * 	return result;
  * });
  * 
  * console.log(object.lazy); // takes a while
@@ -4493,7 +4493,7 @@ declare interface Storage {
  * const catKnead = loadResource("catKnead"); // load the Animation
  * 
  * intervals.continuous(() => {
- * renderer.image(catKnead).default(0, 0); // the animation will advance
+ * 	renderer.image(catKnead).default(0, 0); // the animation will advance
  * });
  * ```
  */
@@ -5486,14 +5486,14 @@ declare class Frame extends ImageType implements Copyable {
  * ```js
  * // grayscale shader
  * const shader = new GPUShader(300, 300, `
- * uniform sampler2D image;
+ * 	uniform sampler2D image;
  * 
- * vec4 shader() {
- * vec2 uv = position / resolution;
- * vec3 color = texture(image, uv);
- * float brightness = (color.r + color.g + color.b) / 3.0;
- * return vec4(vec3(brightness), 1.0);
- * }
+ * 	vec4 shader() {
+ * 		vec2 uv = position / resolution;
+ * 		vec3 color = texture(image, uv);
+ * 		float brightness = (color.r + color.g + color.b) / 3.0;
+ * 		return vec4(vec3(brightness), 1.0);
+ * 	}
  * `);
  * 
  * const cat = loadResource("cat.png");
@@ -5561,19 +5561,19 @@ declare interface ValueStop {
  * ```js
  * // color of daylight at different times
  * const daylightGradient = new Gradient([
- * { start: 0, value: new Color("black") },
- * { start: 7, value: new Color("purple") },
- * { start: 8, value: new Color("orange") },
- * { start: 12, value: new Color("yellow") },
- * { start: 20, value: new Color("red") },
- * { start: 24, value: new Color("black") }
+ * 	{ start: 0, value: new Color("black") },
+ * 	{ start: 7, value: new Color("purple") },
+ * 	{ start: 8, value: new Color("orange") },
+ * 	{ start: 12, value: new Color("yellow") },
+ * 	{ start: 20, value: new Color("red") },
+ * 	{ start: 24, value: new Color("black") }
  * ]);
  * 
  * intervals.continuous(() => {
- * const hourMS = 1000 * 60 * 60;
- * const hour = (Date.now() % (hourMS * 24)) / hourMS;
- * const color = daylightGradient.sample(hour);
- * renderer.fill(color);
+ * 	const hourMS = 1000 * 60 * 60;
+ * 	const hour = (Date.now() % (hourMS * 24)) / hourMS;
+ * 	const color = daylightGradient.sample(hour);
+ * 	renderer.fill(color);
  * });
  * ```
  */
@@ -5646,14 +5646,14 @@ declare class Graph {
  * ```js
  * // graph the value of perlin noise
  * const graph = intervals.makeGraphPlane([
- * new Graph("Perlin", () => {
- * const time = intervals.frameCount;
- * return Random.perlin(time, 0.01);
- * }, 0, 1, new Color("white"))
+ * 	new Graph("Perlin", () => {
+ * 		const time = intervals.frameCount;
+ * 		return Random.perlin(time, 0.01);
+ * 	}, 0, 1, new Color("white"))
  * ]);
  * 
  * intervals.continuous(() => {
- * renderer.image(graph).default(10, 10);
+ * 	renderer.image(graph).default(10, 10);
  * });
  * ```
  */
@@ -5672,7 +5672,7 @@ declare class GraphPlane extends Frame {
  * Represents a 2D grid of grayscale values.
  * ```js
  * const perlinMap = new GrayMap(100, 100, (x, y) => {
- * return Random.perlin2D(x, y, 0.1);
+ * 	return Random.perlin2D(x, y, 0.1);
  * });
  * ```
  */
@@ -5776,10 +5776,10 @@ declare class Artist {
  * ```js
  * renderer.draw(new Color("blue")).shape(Polygon.regular(5, 100).move(middle));
  * renderer.stroke(new Color("red"), 20, LineCap.SQUARE, LineJoin.ROUND).connector([
- * new Vector2(0, 0),
- * new Vector2(50, 100),
- * new Vector2(150, 200),
- * new Vector2(300, 100)
+ * 	new Vector2(0, 0),
+ * 	new Vector2(50, 100),
+ * 	new Vector2(150, 200),
+ * 	new Vector2(300, 100)
  * ]);
  * 
  * renderer.clip().circle(0, 0, 100);
@@ -6388,8 +6388,8 @@ declare class StaticImage extends ImageType {
  * 
  * // create a voronoi texture
  * texture.shader((x, y, dest) => {
- * const intensity = Random.voronoi2D(x, y, 0.1);
- * dest.set(Color.grayScale(intensity));
+ * 	const intensity = Random.voronoi2D(x, y, 0.1);
+ * 	dest.set(Color.grayScale(intensity));
  * });
  * ```
  */
@@ -6796,18 +6796,18 @@ declare interface CubeMap {
  * For a struct such as:
  * ```glsl
  * struct Circle {
- * vec2 position;
- * float radius;
- * vec3 color;
+ * 	vec2 position;
+ * 	float radius;
+ * 	vec3 color;
  * };
  * ```
  * A GPUArray could be used as follows:
  * ```js
  * // gpu is a GPUInterface
  * const circle = {
- * position: new Vector2(100, 200),
- * radius: 22.5,
- * color: new Color("magenta")
+ * 	position: new Vector2(100, 200),
+ * 	radius: 22.5,
+ * 	color: new Color("magenta")
  * };
  * gpu.getUniform("circles").append(circle);
  * ```
@@ -7154,11 +7154,11 @@ declare class SimpleMaterial extends Material {
 	 */
 	specular: Color;
 	/**
-	 * The texture to use in in place of the `.albedo` color. It will sampled according to the mesh's UVs
+	 * The texture to use in in place of the `.albedo` color. It will be sampled according to the mesh's UVs
 	 */
 	albedoTexture: ImageType | Sampler;
 	/**
-	 * The texture to use in in place of the `.specular` color. It will sampled according to the mesh's UVs
+	 * The texture to use in in place of the `.specular` color. It will be sampled according to the mesh's UVs
 	 */
 	specularTexture: ImageType | Sampler;
 	/**
@@ -7166,16 +7166,25 @@ declare class SimpleMaterial extends Material {
 	 */
 	specularExponent: number;
 	/**
-	 * The opacity of the material. Starts as 1
+	 * The non-zero opacity of the material. Starts as 1
 	 */
 	alpha: number;
+	/**
+	 * The texture whose alpha channel to use in place of the `.alpha` value. It will be sampled according to the mesh's UVs. Any material with a `.alphaTexture` is considered transparent
+	 */
+	alphaTexture: ImageType | Sampler;
 	/**
 	 * Creates a new material based on certain surface settings.
 	 * @param settings - An object where each entry corresponds to a property of SimpleMaterial
 	 */
 	constructor(settings: object);
 	/**
-	 * Sets `.albedo`, `.specular`, and `.emission` to the same value.
+	 * Sets `.albedoTexture` and `.alphaTexture` to a given texture.
+	 * @param ImageTypeSampler - The new color and alpha texture
+	 */
+	set colorTexture(ImageType/Sampler: ImageType | Sample);
+	/**
+	 * Sets `.albedo` and `.alpha` to match a given color, and disables the current `.albedoTexture` and `.alphaTexture`.
 	 * @param color - The new color value
 	 */
 	set color(color: Color);
@@ -7219,10 +7228,10 @@ declare interface PolyhedronConversionSettings {
 /**
  * Represents a 3D mesh composed of chunks with different materials. The following vertex attributes are supported:
  * <table>
- * <tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
- * <tr><td>`vertexPosition`</td><td>The model-space location of the vertex</td><td>Vector3</td></tr>
- * <tr><td>`vertexUV`</td><td>The UV texture coordinates of the vertex</td><td>Vector2</td></tr>
- * <tr><td>`vertexNormal`</td><td>The normalized normal vector of the vertex</td><td>Vector3</td></tr>
+ * 	<tr><th>Attribute Name</th><th>Meaning</th><th>Type</th></tr>
+ * 	<tr><td>`vertexPosition`</td><td>The model-space location of the vertex</td><td>Vector3</td></tr>
+ * 	<tr><td>`vertexUV`</td><td>The UV texture coordinates of the vertex</td><td>Vector2</td></tr>
+ * 	<tr><td>`vertexNormal`</td><td>The normalized normal vector of the vertex</td><td>Vector3</td></tr>
  * </table>
  */
 declare class Mesh extends Renderable {
@@ -7388,6 +7397,10 @@ declare namespace Artist3D {
 	 */
 	class PostProcessEffects {
 		/**
+		 * A collection of user-defined post-processing effects which will be applied before built-in effects. This is active, but empty, by default
+		 */
+		before: Artist3D.CustomEffects;
+		/**
 		 * Screen-space ambient occlusion. This is active by default
 		 */
 		ssao: Artist3D.SSAO;
@@ -7395,6 +7408,10 @@ declare namespace Artist3D {
 		 * A light-bleeding effect. This is active by default
 		 */
 		bloom: Artist3D.Bloom;
+		/**
+		 * A collection of user-defined post-processing effects which will be applied after built-in effects. This is active, but empty, by default
+		 */
+		after: Artist3D.CustomEffects;
 	}
 	
 	/**
@@ -7450,6 +7467,55 @@ declare namespace Artist3D {
 		 * An exponent to apply to the final occlusion value. This starts as 2
 		 */
 		intensity: number;
+	}
+	
+	/**
+	 * Represents a collection of user-defined post-processing effects.
+	 * Effects can be defined using a full-screen GLSL program, which will be provided with information about the current state of the rendering.
+	 * This class should not be constructed, and should instead be accessed via the `.before` and `.after` properties of an Artist3D.PostProcessEffects.
+	 * ```js
+	 * // chromatic abberation effect
+	 * renderer.postProcess.after.addEffect("abberation", `
+	 * 	vec4 shader() {
+	 * 		vec2 resolution = vec2(textureSize(colorTexture, 0));
+	 * 		vec2 position = resolution * uv;
+	 * 
+	 * 		return vec4(
+	 * 			texture(colorTexture, (position + vec2(-3, 0)) / resolution).r,
+	 * 			texture(colorTexture, (position + vec2(0, 3)) / resolution).g,
+	 * 			texture(colorTexture, (position + vec2(3, 0)) / resolution).b,
+	 * 			1
+	 * 		);
+	 * 	}
+	 * `);
+	 * ```
+	 */
+	class CustomEffects extends Artist3D.PostProcess {
+		/**
+		 * Re-orders the way in which the effects are applied.
+		 * @param order - The names of the effects to be applied, in the order to apply them. Any names omitted will be removed from the list of effects
+		 */
+		reorder(order: string[]): void;
+		/**
+		 * Adds a new full-screen post-processing effect after the existing effects.
+		 * The shader program will be provided with several inputs, specifically the following:
+		 * <table>
+		 * 	<tr><th>Input</th><th>Description</th></tr>
+		 * 	<tr><td>`vec2 uv`</td><td>The UV coordinates of the current pixel in screen space</td></tr>
+		 * 	<tr><td>`sampler2D colorTexture`</td><td>The current color content of the screen</td></tr>
+		 * 	<tr><td>`sampler2D depthTexture`</td><td>The current depth content of the screen</td></tr>
+		 * 	<tr><td>`Camera camera`</td><td>The camera being used for rendering, with the properties of a JS Camera object</td></tr>
+		 * </table>
+		 * @param name - The name of the new effect
+		 * @param glsl - The source code for the full-screen fragment shader effect. This must define a `vec4 shader()` entry-point function
+		 * @param uniforms - An object containing uniform values to pass to this effect. Changes to the object will be reflected in the uniform values. Default is an empty object
+		 */
+		addEffect(name: string, glsl: string, uniforms?: object): void;
+		/**
+		 * Removes the effect with a given name.
+		 * @param name - The name of the effect to remove
+		 */
+		removeEffect(name: string): void;
 	}
 }
 
@@ -7756,27 +7822,27 @@ declare class SceneObject<Vector = any, Transform = any, Box = any, Shape = any>
  * The available events to listen for, and when they're fired, are specified in the methods section. However, the signatures in the methods section leave out the initial object parameter, which is required for all methods of a script.
  * ```js
  * class ORBIT_AROUND extends ElementScript {
- * init(obj, center, radius) {
- * obj.scripts.removeDefault(); // remove normal drawing behavior
- * this.center = center;
- * this.radius = radius;
- * this.angle = 0;
- * }
+ * 	init(obj, center, radius) {
+ * 		obj.scripts.removeDefault(); // remove normal drawing behavior
+ * 		this.center = center;
+ * 		this.radius = radius;
+ * 		this.angle = 0;
+ * 	}
  * 
- * getOrbitPosition(obj) {
- * return Vector2.fromAngle(this.angle)
- * .times(this.radius)
- * .plus(this.center);
- * }
+ * 	getOrbitPosition(obj) {
+ * 		return Vector2.fromAngle(this.angle)
+ * 			.times(this.radius)
+ * 			.plus(this.center);
+ * 	}
  * 
- * update(obj) {
- * this.angle += 0.01;
- * obj.transform.position = this.getOrbitPosition(); // implicitly passes obj
- * }
+ * 	update(obj) {
+ * 		this.angle += 0.01;
+ * 		obj.transform.position = this.getOrbitPosition(); // implicitly passes obj
+ * 	}
  * 
- * draw(obj, name, shape) {
- * renderer.draw(new Color("red")).infer(shape);
- * }
+ * 	draw(obj, name, shape) {
+ * 		renderer.draw(new Color("red")).infer(shape);
+ * 	}
  * }
  * 
  * const orbiter = scene.main.addCircleElement("orbiter", 0, 0, 30);
@@ -7960,14 +8026,14 @@ declare class ElementScript {
  * ```js
  * // create a script which holds an action
  * class ACTION extends ElementScript {
- * init(obj, action) {
- * this.action = action;
- * }
+ * 	init(obj, action) {
+ * 		this.action = action;
+ * 	}
  * }
  * 
  * const object = scene.main.addElement("hello", 0, 0);
  * object.scripts.add(ACTION, () => {
- * console.log("Hello World!");
+ * 	console.log("Hello World!");
  * });
  * 
  * // call the function from the defined property
@@ -8371,8 +8437,8 @@ declare class PHYSICS extends ElementScript {
  * textbox.scripts.TEXT_AREA.alwaysIgnore("Enter");
  * 
  * intervals.continuous(() => {
- * if (keyboard.justPressed("Enter"))
- * console.log(textbox.scripts.TEXT_AREA.value);
+ * 	if (keyboard.justPressed("Enter"))
+ * 		console.log(textbox.scripts.TEXT_AREA.value);
  * });
  * ```
  */
@@ -8841,8 +8907,8 @@ declare namespace InputHandler {
  * This class is available via the `.keyboard` property of both the global object and Hengine.
  * ```js
  * intervals.continuous(() => { // change circle color based on whether the space bar is pressed
- * const color = keyboard.pressed(" ") ? new Color("red") : new Color("blue");
- * renderer.draw(color).circle(width / 2, height / 2, 50);
+ * 	const color = keyboard.pressed(" ") ? new Color("red") : new Color("blue");
+ * 	renderer.draw(color).circle(width / 2, height / 2, 50);
  * });
  * ```
  */
@@ -8859,8 +8925,8 @@ declare class KeyboardHandler extends InputHandler {
  * This class is available via the `.mouse` property of both the global object and Hengine.
  * ```js
  * intervals.continuous(() => { // display a circle at the cursor position when pressing the left mouse button
- * if (mouse.pressed("Left"))
- * renderer.draw(new Color("red")).circle(mouse.screen, 10).
+ * 	if (mouse.pressed("Left"))
+ * 		renderer.draw(new Color("red")).circle(mouse.screen, 10).
  * });
  * ```
  */
@@ -8936,8 +9002,8 @@ declare class MouseHandler extends InputHandler {
  * This class is available via the `.mouse` property of both the global object and Hengine.
  * ```js
  * intervals.continuous(() => { // display a circle at the cursor position when pressing the left mouse button
- * if (mouse.pressed("Left"))
- * renderer.draw(new Color("red")).circle(mouse.screen, 10).
+ * 	if (mouse.pressed("Left"))
+ * 		renderer.draw(new Color("red")).circle(mouse.screen, 10).
  * });
  * ```
  */
@@ -8972,18 +9038,18 @@ declare namespace MouseHandler {
  * Getting these key names should be done with the `.allPressed`, `.allJustPressed`, and `.allJustReleased` getters, rather than specifying them directly.
  * ```js
  * intervals.continuous(() => {
- * const activeTouches = touches.allPressed;
- * if (activeTouches.length >= 2) {
- * // retrieve the positions of the first two touches
- * const a = touches.get(activeTouches[0]).screen;
- * const b = touches.get(activeTouches[1]).screen;
- * const dist = Vector2.dist(a, b);
+ * 	const activeTouches = touches.allPressed;
+ * 	if (activeTouches.length >= 2) {
+ * 		// retrieve the positions of the first two touches
+ * 		const a = touches.get(activeTouches[0]).screen;
+ * 		const b = touches.get(activeTouches[1]).screen;
+ * 		const dist = Vector2.dist(a, b);
  * 
- * // shows the distance between the them
- * renderer.stroke(new Color("black"), 3).measure(
- * Font.Arial15, `Distance: ${Math.round(dist)} px`, a, b
- * );
- * }
+ * 		// shows the distance between the them
+ * 		renderer.stroke(new Color("black"), 3).measure(
+ * 			Font.Arial15, `Distance: ${Math.round(dist)} px`, a, b
+ * 		);
+ * 	}
  * });
  * ```
  */
@@ -9020,18 +9086,18 @@ declare class TouchHandler extends InputHandler {
  * Getting these key names should be done with the `.allPressed`, `.allJustPressed`, and `.allJustReleased` getters, rather than specifying them directly.
  * ```js
  * intervals.continuous(() => {
- * const activeTouches = touches.allPressed;
- * if (activeTouches.length >= 2) {
- * // retrieve the positions of the first two touches
- * const a = touches.get(activeTouches[0]).screen;
- * const b = touches.get(activeTouches[1]).screen;
- * const dist = Vector2.dist(a, b);
+ * 	const activeTouches = touches.allPressed;
+ * 	if (activeTouches.length >= 2) {
+ * 		// retrieve the positions of the first two touches
+ * 		const a = touches.get(activeTouches[0]).screen;
+ * 		const b = touches.get(activeTouches[1]).screen;
+ * 		const dist = Vector2.dist(a, b);
  * 
- * // shows the distance between the them
- * renderer.stroke(new Color("black"), 3).measure(
- * Font.Arial15, `Distance: ${Math.round(dist)} px`, a, b
- * );
- * }
+ * 		// shows the distance between the them
+ * 		renderer.stroke(new Color("black"), 3).measure(
+ * 			Font.Arial15, `Distance: ${Math.round(dist)} px`, a, b
+ * 		);
+ * 	}
  * });
  * ```
  */
@@ -9065,9 +9131,9 @@ declare namespace TouchHandler {
  * ```js
  * let players = [];
  * intervals.continuous(() => {
- * // connect as many players as possible
- * while (controllers.available) players.push(controllers.nextController());
- * renderer.draw(new Color("black")).text(Font.Arial30, `${players.length} controllers connected`, 10, 10);
+ * 	// connect as many players as possible
+ * 	while (controllers.available) players.push(controllers.nextController());
+ * 	renderer.draw(new Color("black")).text(Font.Arial30, `${players.length} controllers connected`, 10, 10);
  * });
  * ```
  */
@@ -9091,9 +9157,9 @@ declare class Controllers {
  * const controller = await new HengineControllerResource("whatever").load();
  * const position = middle;
  * intervals.continuous(() => {
- * position.add(controller.leftStick.times(7));
- * const color = controller.pressed(XB.A) ? new Color("red") : new Color("blue");
- * renderer.draw(color).circle(position, 50);
+ * 	position.add(controller.leftStick.times(7));
+ * 	const color = controller.pressed(XB.A) ? new Color("red") : new Color("blue");
+ * 	renderer.draw(color).circle(position, 50);
  * });
  * ```
  */
@@ -9128,9 +9194,9 @@ declare class ControllerHandler extends InputHandler {
  * const controller = await new HengineControllerResource("whatever").load();
  * const position = middle;
  * intervals.continuous(() => {
- * position.add(controller.leftStick.times(7));
- * const color = controller.pressed(XB.A) ? new Color("red") : new Color("blue");
- * renderer.draw(color).circle(position, 50);
+ * 	position.add(controller.leftStick.times(7));
+ * 	const color = controller.pressed(XB.A) ? new Color("red") : new Color("blue");
+ * 	renderer.draw(color).circle(position, 50);
  * });
  * ```
  */
@@ -9151,9 +9217,9 @@ declare namespace ControllerHandler {
  * This class should not be constructed directly, and can be accessed from the `.clipboard` property of both the global object and Hengine.
  * ```js
  * intervals.continuous(() => {
- * if (mouse.justPressed("Middle")) { // copies a message when middle clicking
- * clipboard.write("Hello World!");
- * }
+ * 	if (mouse.justPressed("Middle")) { // copies a message when middle clicking
+ * 		clipboard.write("Hello World!");
+ * 	}
  * });
  * ```
  */
@@ -9222,9 +9288,9 @@ declare interface Tone {
  * ```js
  * const synth = new Synth();
  * synth.playSequence([
- * { frequency: 440, duration: 1000 }, // one second A note
- * { duration: 500, volume: 0 } // half second pause
- * { note: "A", duration: 1000 } // one second A note
+ * 	{ frequency: 440, duration: 1000 }, // one second A note
+ * 	{ duration: 500, volume: 0 } // half second pause
+ * 	{ note: "A", duration: 1000 } // one second A note
  * ]);
  * ```
  */
@@ -9294,26 +9360,26 @@ declare class Sound {
  * ```js
  * // the file type class
  * class Triple {
- * constructor(a, b, c) {
- * this.a = a;
- * this.b = b;
- * this.c = c;
- * }
+ * 	constructor(a, b, c) {
+ * 		this.a = a;
+ * 		this.b = b;
+ * 		this.c = c;
+ * 	}
  * 
- * toByteBuffer(buffer = new ByteBuffer()) {
- * buffer.write.float64(this.a);
- * buffer.write.float64(this.b);
- * buffer.write.float64(this.c);
- * return buffer;
- * }
+ * 	toByteBuffer(buffer = new ByteBuffer()) {
+ * 		buffer.write.float64(this.a);
+ * 		buffer.write.float64(this.b);
+ * 		buffer.write.float64(this.c);
+ * 		return buffer;
+ * 	}
  * 
- * static fromByteBuffer(buffer) {
- * return new Triple(
- * buffer.read.float64(),
- * buffer.read.float64(),
- * buffer.read.float64()
- * );
- * }
+ * 	static fromByteBuffer(buffer) {
+ * 		return new Triple(
+ * 			buffer.read.float64(),
+ * 			buffer.read.float64(),
+ * 			buffer.read.float64()
+ * 		);
+ * 	}
  * }
  * 
  * // register file type

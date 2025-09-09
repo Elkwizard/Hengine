@@ -1,0 +1,119 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class Artist3D.Bloom">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1031" target="_blank" class="class-name source-link">Artist3D.Bloom</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Basics.html#class Artist3D.PostProcess">Artist3D.PostProcess</a></span>
+				</div>
+				<div class="class desc">
+					Represents an optional "bloom" post-processing effect. This will cause bright areas to bleed into adjacent areas, to give the impression of the light overwhelming the camera.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+		<div class="prop-wrapper" id="Artist3D.Bloom.intensity">
+			<div class="prop-header member">
+				<span class="prop-name">intensity</span>
+				<span class="type"><a href="../../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The intensity of the bloom effect, on [0, 1]. This starts as 0.3</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Artist3D.Bloom.steps">
+			<div class="prop-header member">
+				<span class="prop-name">steps</span>
+				<span class="type"><a href="../../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The integer number of scaling steps. Lower values will limit the maximum range of the bloom. This starts as 8</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
+				
+				
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Artist3D.SSAO">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1160" target="_blank" class="class-name source-link">Artist3D.SSAO</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Basics.html#class Artist3D.PostProcess">Artist3D.PostProcess</a></span>
+				</div>
+				<div class="class desc">
+					Represents an optional ambient occlusion post-processing effect, which will darken enclosed areas and create contact shadows.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+		<div class="prop-wrapper" id="Artist3D.SSAO.samples">
+			<div class="prop-header member">
+				<span class="prop-name">samples</span>
+				<span class="type"><a href="../../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The number of rays to cast for each pixel, which cannot exceed 64. This starts as 8</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Artist3D.SSAO.radius">
+			<div class="prop-header member">
+				<span class="prop-name">radius</span>
+				<span class="type"><a href="../../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The world-space radius of the occlusion sampling sphere. This starts as 3</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Artist3D.SSAO.blurSamples">
+			<div class="prop-header member">
+				<span class="prop-name">blurSamples</span>
+				<span class="type"><a href="../../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The number of samples along the diameter of the blur. This starts as 12</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Artist3D.SSAO.maxBlurRadius">
+			<div class="prop-header member">
+				<span class="prop-name">maxBlurRadius</span>
+				<span class="type"><a href="../../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The maximum radius of the blur step in pixels. This starts as 10</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Artist3D.SSAO.minBlurRadius">
+			<div class="prop-header member">
+				<span class="prop-name">minBlurRadius</span>
+				<span class="type"><a href="../../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The minimum radius of the blur step in pixels. This starts as 4</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Artist3D.SSAO.intensity">
+			<div class="prop-header member">
+				<span class="prop-name">intensity</span>
+				<span class="type"><a href="../../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">An exponent to apply to the final occlusion value. This starts as 2</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
+				
+				
+				
+			</div>
+		
+			</body>
+		</html>
+	
