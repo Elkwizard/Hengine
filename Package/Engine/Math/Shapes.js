@@ -249,6 +249,9 @@ class Shape2D extends Shape {
 	 * Returns the smallest axis-aligned rectangle that contains the entire shape.
 	 * @return Rect
 	 */
+	get span() {
+		return this.area;
+	}
 }
 
 /**

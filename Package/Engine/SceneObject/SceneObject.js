@@ -20,15 +20,15 @@ class Controls {
  * @abstract
  * 
  * @prop Transform transform | The location and orientation of the object in space
- * @prop Transform lastTransform | The location and orientation of the object last frame
+ * @prop<immutable> Transform lastTransform | The location and orientation of the object last frame
  * @prop Boolean mouseEvents | Whether or not mouse events (hover and click) should be checked for this object. This can be ignored if the scene has disabled mouse events
  * @prop Boolean hidden | Whether or not the object should be rendered
  * @prop<immutable> Boolean hovered | Whether or not the mouse cursor is hovering over the shapes of this object. This property won't be accurate if mouse events are disabled. This property is always false for 3D objects
  * @prop Boolean onScreen | Whether or not the object passed the most recent render culling check
- * @prop ScriptContainer scripts | All of the ElementScripts on the object
+ * @prop<readonly> ScriptContainer scripts | All of the ElementScripts on the object
  * @prop Shape/null defaultShape | A reference to the shape with the name `"default"`
  * @prop Number layer | The sorting layer for the object. Objects with higher sorting layers will be rendered after those with lower sorting layers
- * @prop Number lifeSpan | The amount of frames that the object has existed for
+ * @prop<readonly> Number lifeSpan | The amount of frames that the object has existed for
  * @prop<readonly> Artist renderer | The renderer onto which the object will be drawn
  */
 class SceneObject extends SceneElement {
@@ -135,17 +135,15 @@ class SceneObject extends SceneElement {
 	 * @return Shape[]
 	 */
 	getAllShapes() {
-		let shapes = [];
-		for (let [name, shape] of this.shapes) shapes.push(shape);
-		return shapes;
+		return [...this.shapes.values()];
 	}
 	/**
 	 * Returns a collection of convex shapes that take up the same region as the shapes of the object, in local-space.
 	 * @return Shape[]
 	 */
 	getAllConvexShapes() {
-		let shapes = [];
-		for (let [shape, convexShapes] of this.convexShapes)
+		const shapes = [];
+		for (const convexShapes of this.convexShapes.values())
 			shapes.pushArray(convexShapes);
 		return shapes;
 	}
@@ -155,7 +153,7 @@ class SceneObject extends SceneElement {
 	 */
 	getAllModels() {
 		const models = [];
-		for (const [name, shape] of this.shapes)
+		for (const shape of this.shapes.values())
 			models.push(shape.getModel(this.transform.matrix));
 		return models;
 	}
@@ -165,7 +163,7 @@ class SceneObject extends SceneElement {
 	 */
 	getAllConvexModels() {
 		const models = [];
-		for (const [shape, shapes] of this.convexShapes)
+		for (const shapes of this.convexShapes.values())
 			for (let i = 0; i < shapes.length; i++)
 				models.push(shapes[i].getModel(this.transform.matrix));
 		return models;
@@ -175,14 +173,13 @@ class SceneObject extends SceneElement {
 	 * @param Boolean stay? | Whether the global-space position of the shapes be maintained by changing the object's transform. Default is false
 	 */
 	centerShapes(stay = false) {
-		let center = this.constructor.Vector.zero;
 		let totalArea = 0;
-		let names = [];
-		let shapes = [];
-		for (let [name, shape] of this.shapes) {
-			let area = shape.area;
-			totalArea += area;
-			center.add(shape.middle.times(area));
+		const center = this.constructor.Vector.zero;
+		const names = [];
+		const shapes = [];
+		for (const [name, shape] of this.shapes) {
+			totalArea += shape.span;
+			center.add(shape.middle.times(shape.span));
 			names.push(name);
 			shapes.push(shape);
 		}
@@ -197,9 +194,8 @@ class SceneObject extends SceneElement {
 	 * @return Shape[]
 	 */
 	removeAllShapes() {
-		let names = [];
-		for (let [name, shape] of this.shapes) names.push(name);
-		let shapes = [];
+		const names = [...this.shapes.key()];
+		const shapes = [];
 		for (let i = 0; i < names.length; i++)
 			shapes.push(this.removeShape(names[i]));
 		return shapes;
@@ -246,8 +242,7 @@ class SceneObject extends SceneElement {
 	 */
 	scale(factor) {
 		const pos = this.constructor.Vector.zero;
-		const entries = [];
-		for (let entry of this.shapes) entries.push(entry);
+		const entries = [...this.shapes];
 		for (let i = 0; i < entries.length; i++)
 			this.addShape(entries[i][0], entries[i][1].scale(factor, pos));
 		this.cacheBoundingBoxes();

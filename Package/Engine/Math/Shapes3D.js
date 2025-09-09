@@ -10,6 +10,9 @@ class Shape3D extends Shape {
 	 * Returns the smallest axis-aligned rectangular prism that contains the entire shape.
 	 * @return Prism
 	 */
+	get span() {
+		return this.volume;
+	}
 }
 
 /**
