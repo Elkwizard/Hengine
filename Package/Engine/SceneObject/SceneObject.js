@@ -107,7 +107,7 @@ class SceneObject extends SceneElement {
 		if (this.shapes.has(name)) this.removeShape(name);
 		this.shapes.set(name, shape);
 		if (IS_3D) {
-			convex ||= shape instanceof Prism || shape instanceof Sphere || shape instanceof Frustum;
+			convex ||= shape instanceof Prism || shape instanceof Sphere || shape instanceof Frustum || /* WIP */ shape instanceof Polyhedron;
 		} else {
 			convex ||= shape instanceof Rect || shape instanceof Circle;
 		}
@@ -272,8 +272,8 @@ class SceneObject extends SceneElement {
 	}
 	runDraw() {
 		if (this.scripts.implements("draw")) this.transform.drawInLocalSpace(() => {
-			const entries = Array.from(this.shapes.entries());
-			for (const [name, shape] of entries) this.scripts.run("draw", name, shape);
+			for (const [name, shape] of [...this.shapes])
+				this.scripts.run("draw", name, shape);
 		}, this.renderer);
 	}
 	hasMoved() {
