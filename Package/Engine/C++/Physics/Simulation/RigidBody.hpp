@@ -91,6 +91,7 @@ API class RigidBody {
 		double density = 1;
 		Transform lastPosition;
 		Orientation lastBoundedOrientation;
+		bool shapesModified = false;
 
 		void syncMatter() {
 			if (dynamic && canRotate) {
@@ -114,8 +115,15 @@ API class RigidBody {
 		}
 
 		void modifyShapes() {
-			updateLocalBounds();
-			syncMatter();
+			shapesModified = true;
+		}
+
+		void ensureShapes() { // lastBoundedOrientation, collider bounds, matter
+			if (shapesModified) {
+				shapesModified = false;
+				updateLocalBounds();
+				syncMatter();
+			}
 		}
 
 	public:
@@ -231,10 +239,12 @@ API class RigidBody {
 		}
 
 		API double getMass() {
+			ensureShapes();
 			return localMatter.mass;
 		}
 
 		API Inertia getInertia() {
+			ensureShapes();
 			return localMatter.rotate(position.orientation).inertia;
 		}
 
@@ -256,7 +266,8 @@ API class RigidBody {
 			modifyShapes();
 		}
 
-		API double getKineticEnergy() const {
+		API double getKineticEnergy() {
+			ensureShapes();
 			double K = 0.5 * localMatter.mass * velocity.linear.sqrMag();
 #if IS_3D
 			Vector rotation = velocity.orientation.getRotation();
@@ -306,6 +317,7 @@ API class RigidBody {
 		}
 
 		void beforeSimulation() {
+			ensureShapes();
 			if (lastBoundedOrientation != position.orientation && !dynamic)
 				updateLocalBounds();
 	

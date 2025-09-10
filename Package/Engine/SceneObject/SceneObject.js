@@ -48,6 +48,14 @@ class SceneObject extends SceneElement {
 		this.onScreen = true;
 		this.scripts = new ScriptContainer(this);
 	}
+	set __boundingBox(a) {
+		this._boundingBox = a;
+	}
+	get __boundingBox() {
+		return this._boundingBox ??= this.constructor.Box.composeBoundingBoxes(
+			this.getAllModels().map(model => model.getBoundingBox())
+		);
+	}
 	set defaultShape(a) {
 		this.addShape("default", a);
 	}
@@ -75,7 +83,7 @@ class SceneObject extends SceneElement {
 		this.transform.get(this.lastTransform);
 	}
 	cacheBoundingBoxes() {
-		this.__boundingBox = this.getBoundingBox();
+		this.__boundingBox = null;
 	}
 	/**
 	 * @type getBoundingBox(): Box;
