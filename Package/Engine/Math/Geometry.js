@@ -133,6 +133,68 @@ class Geometry {
 		return result;
 	}
 	/**
+	 * Returns the smallest convex Polygon which contains a given set of points.
+	 * The behavior is undefined if the points are all colinear.
+	 * @param Vector2[] points | The points to create a convex hull for. There must be at least 3
+	 * @return Polygon
+	 */
+	static convexHull(points) {
+		points = points
+			.map(p => p.get())
+			.sort((a, b) => a.x - b.x);
+
+		let minY = Infinity;
+		let maxY = -Infinity;
+		let min, max;
+		for (let i = 0; i < points.length; i++) {
+			const point = points[i];
+			if (point.y < minY) {
+				minY = point.y;
+				min = point;
+			}
+			if (point.y > maxY) {
+				maxY = point.y;
+				max = point;
+			}
+		}
+
+		const quadrant = (yFactor, end) => {
+			const section = [];
+			let maxY = -Infinity;
+			for (let i = 0; i < points.length; i++) {
+				const point = points[i];
+				const y = yFactor * point.y;
+				if (y > maxY) {
+					maxY = y;
+					while (section.length >= 2) {
+						const a = section.at(-2);
+						const b = section.at(-1);
+						const slope = (point.y - a.y) / (point.x - a.x);
+						const expectedY = (b.x - a.x) * slope + a.y;
+						if (b.y * yFactor >= yFactor * expectedY) break;
+						section.pop();
+					}
+					section.push(point);
+				}
+				if (point === end) break;
+			}
+			return section;
+		};
+
+		const tl = quadrant(1, max);
+		const bl = quadrant(-1, min);
+		points.reverse();
+		const tr = quadrant(1, max);
+		const br = quadrant(-1, min);
+
+		const vertices = [
+			...bl, ...br.reverse(),
+			...tr, ...tl.reverse()
+		];
+
+		return new Polygon(vertices);
+	}
+	/**
 	 * Checks whether a list of points are in clockwise order.
 	 * @param Vector2[] vertices | The points to check 
 	 * @return Boolean

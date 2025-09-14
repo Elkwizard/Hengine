@@ -1026,6 +1026,12 @@ declare class Geometry {
 	 */
 	static triangulate(shape: Polygon): Vector2[][];
 	/**
+	 * Returns the smallest convex Polygon which contains a given set of points.
+	 * The behavior is undefined if the points are all colinear.
+	 * @param points - The points to create a convex hull for. There must be at least 3
+	 */
+	static convexHull(points: Vector2[]): Polygon;
+	/**
 	 * Checks whether a list of points are in clockwise order.
 	 * @param vertices - The points to check
 	 */
