@@ -124,6 +124,9 @@ class Triangle extends Shape3D {
 		this.normal.div(mag);
 		this.area = 0.5 * Math.abs(mag);
 	}
+	get middle() {
+		return this.a.plus(this.b).add(this.c).div(3);
+	}
 	getModel(transf) {
 		return new Triangle(
 			transf.times(this.a),
@@ -132,30 +135,18 @@ class Triangle extends Shape3D {
 		);
 	}
 	closestPointTo(point) {
-		point = point.minus(this.a);
-		point.sub(point.dot(this.normal));
+		const u = this.b.minus(this.a).normalize();
+		const v = u.cross(this.normal).normalize();
+		const toLocal = point => new Vector2(point.dot(u), point.dot(v));
+		const vertices = [this.a, this.b, this.c].map(toLocal);
+		const polygon = new Polygon(vertices);
+			
+		const proj = toLocal(point);
+		const { x, y } = polygon.closestPointTo(proj);
 
-		const u = this.c.minus(this.a);
-		const v = this.b.minus(this.a);
-		const mat = new Matrix3(u, v, u.cross(v));
-		const t = mat.inverse.times(point);
-		t.x = Math.max(0, t.x);
-		t.y = Math.max(0, t.y);
-		t.z = 0;
-
-		mat.times(t, point);
-		point.add(this.a);
-
-		if (t.x > 1 || t.y > 1 || t.y > 1 - t.x) {
-			const a = this.b;
-			const b = this.c;
-			const vec = b.minus(a);
-			point.sub(b);
-			const t = Number.clamp(point.dot(vec) / vec.sqrMag, 0, 1);
-			return vec.times(t, point).add(a);
-		}
-
-		return point;
+		const closest = u.times(x).add(v.times(y));
+		closest.sub(this.normal.times(closest.dot(this.normal) - this.a.dot(this.normal)));
+		return closest;
 	}
 	get(result = new Triangle(Vector3.zero, Vector3.zero, Vector3.zero)) {
 		result.a = this.a.get();

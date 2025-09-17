@@ -348,6 +348,32 @@ Object.defineProperty(window, "title", {
 		const len = arr.length;
 		for (let i = 0; i < len; i++) this.push(arr[i]);
 	});
+	/**
+	 * @name argmax/argmin
+	 * Returns the index of the value which produces the highest/lowest value under a given metric function.
+	 * If multiple elements have the highest value, this returns the first.
+	 * If the array is empty, this returns -1.
+	 * @param (Any) => Number metric? | A function to compute a "score" to use for each element. This must be provided if the elements are not numbers. Default is the identity metric `x => x`
+	 * @return Number
+	 */
+	proto(Array.prototype, "argmax", function (metric = x => x) {
+		if (!this.length) return -1;
+
+		let max = 0;
+		let maxMetric = metric(this[0]);
+		for (let i = 1; i < this.length; i++) {
+			const itemMetric = metric(this[i]);
+			if (itemMetric > maxMetric) {
+				maxMetric = itemMetric;
+				max = i;
+			}
+		}
+		
+		return max;
+	});
+	proto(Array.prototype, "argmin", function (metric = x => x) {
+		return this.argmax(x => -metric(x));
+	});
 	proto(Array.prototype, "flatten", function () {
 		return this;
 	});

@@ -1935,7 +1935,7 @@ Artist3D.DrawRenderer = class DrawRenderer extends Artist3D.PathRenderer {
 	 */
 	shape(polyhedron) {
 		if (!this.polyhedronMeshCache.has(polyhedron)) {
-			if (this.polyhedronMeshCache.size > Artist3D.MAX_CACHED_POLYHEDRA) {
+			if (this.polyhedronMeshCache.size > Artist3D.DrawRenderer.MAX_CACHED_POLYHEDRA) {
 				const anyKey = this.polyhedronMeshCache[Symbol.iterator]().next().value[0];
 				this.polyhedronMeshCache.delete(anyKey);
 			}

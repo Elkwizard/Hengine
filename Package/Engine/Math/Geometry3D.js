@@ -3,6 +3,118 @@
  * This class cannot be constructed.
  */
 class Geometry3D {
+	static get random() {
+		this._random ??= new Random();
+		this._random.seed = 1234;
+		return this._random;
+	}
+	/**
+	 * Returns the smallest convex Polyhedron which contains a given set of points.
+	 * The behavior is undefined if the points are all coplanar.
+	 * @param Vector3[] points | The points to create a convex hull for. There must be at least 4
+	 * @return Polyhedron
+	 */
+	static convexHull(sourcePoints) {
+		sourcePoints = Geometry.unique(sourcePoints);
+		const { random } = this;
+		const points = sourcePoints.map(p => p.plus(new Vector3(
+			random.range(Geometry.EPSILON * 4),
+			random.range(Geometry.EPSILON * 4),
+			random.range(Geometry.EPSILON * 4)
+		)));
+
+		const makeEdgeKey = (a, b) => `${a},${b}`;
+		const getLeftNormal = (a, b) => {
+			const aToB = b.minus(a);
+			return aToB.cross(Vector3.left).cross(aToB).normalize();
+		}
+		const a = points.argmin(p => p.x);
+		const b = points.argmin(p => p === points[a] ? Infinity : getLeftNormal(points[a], p).x);
+		const normal = getLeftNormal(points[a], points[b]);
+		const open = new Map([
+			[makeEdgeKey(a, b), { edge: [a, b], normal }]
+		]);
+
+		const addEdge = (a, b, normal) => {
+			const reverseKey = makeEdgeKey(b, a);
+			const edgeKey = makeEdgeKey(a, b);
+			if (open.has(reverseKey)) {
+				open.delete(reverseKey);
+			} else {
+				open.set(edgeKey, { edge: [a, b], normal });
+			}
+		};
+
+		const closed = [];
+
+		let first = true;
+
+		while (open.size) {
+			// extract open edge
+			const [edgeKey] = open.keys();
+			const { edge, normal } = open.get(edgeKey);
+			open.delete(edgeKey);
+			
+			// solidify open edge
+			const [ia, ib] = edge;
+			const a = points[ia];
+			const b = points[ib];
+			const aToB = b.minus(a);
+
+			// find best cross product
+			let best = null;
+			let bestNormal = null;
+			let bestDot = -Infinity;
+
+			for (let i = 0; i < points.length; i++) {
+				if (i === ia || i === ib) continue;
+				const point = points[i];
+				const newNormal = aToB.cross(point.minus(a)).normalize();
+				const dot = newNormal.dot(normal);
+				if (dot > bestDot) {
+					bestDot = dot;
+					bestNormal = newNormal;
+					best = i;
+				}
+			}
+			
+			// close currently open edge
+			closed.push([best, ia, ib]);
+			addEdge(ia, best, bestNormal);
+			addEdge(best, ib, bestNormal);
+			if (first) {
+				first = false;
+				addEdge(ib, ia, bestNormal);
+			}
+		}
+
+		// const color = Color.unlimited(0, 0, 500);
+		// const arrowColor = Color.unlimited(500, 200, 100);
+		// for (let [, { edge: [a, b], normal }] of open) {
+		// 	a = points[a];
+		// 	b = points[b];
+		// 	renderer.stroke(color, 5).line(a, b);
+		// 	const mid = a.plus(b).over(2);
+		// 	renderer.stroke(arrowColor, 3).arrow(mid, mid.plus(normal.times(40)));
+		// }
+
+		const vertexToIndex = new Map();
+		const vertices = [];
+		const indices = [];
+		for (let i = 0; i < closed.length; i++) {
+			const tri = closed[i];
+			for (let j = 0; j < 3; j++) {
+				const vertex = tri[j];
+				if (!vertexToIndex.has(vertex)) {
+					vertexToIndex.set(vertex, vertices.length);
+					vertices.push(sourcePoints[vertex]);
+				}
+				indices.push(vertexToIndex.get(vertex));
+			}
+		}
+
+		return new Polyhedron(vertices, indices);
+	}
 	/**
 	 * Subdivides a frustum along the z axis.
 	 * @param Frustum frustum | The frustum to subdivide

@@ -133,13 +133,22 @@ class Geometry {
 		return result;
 	}
 	/**
+	 * Returns a new list of the unique vectors among a given list, with vectors within a certain tolerance being considered equal.
+	 * @param Vector[] vectors | A list of a single type of vector
+	 * @return Vector[]
+	 */
+	static unique(vectors) {
+		const digits = -Math.log10(Geometry.EPSILON);
+		return [...new Map(vectors.map(v => [v.toFixed(digits), v])).values()];
+	}
+	/**
 	 * Returns the smallest convex Polygon which contains a given set of points.
 	 * The behavior is undefined if the points are all colinear.
 	 * @param Vector2[] points | The points to create a convex hull for. There must be at least 3
 	 * @return Polygon
 	 */
 	static convexHull(points) {
-		points = points
+		points = Geometry.unique(points)
 			.map(p => p.get())
 			.sort((a, b) => a.x - b.x);
 
@@ -524,17 +533,8 @@ class Geometry {
 	 * @param Vector[] points | The points to compare
 	 * @return Vector
 	 */
-	static closest(p, points) {
-		let bestDist = Infinity;
-		let best = null;
-		for (let i = 0; i < points.length; i++) {
-			let dist = p.constructor.sqrDist(points[i], p);
-			if (dist < bestDist) {
-				bestDist = dist;
-				best = points[i];
-			}
-		}
-		return best;
+	static closest(target, points) {
+		return points[points.argmin(other => target.constructor.sqrDist(other, target))];
 	}
 	/**
 	 * Finds the farthest point from a list of points to a given point.
@@ -542,17 +542,8 @@ class Geometry {
 	 * @param Vector[] points | The points to compare
 	 * @return Vector
 	 */
-	static farthest(p, points) {
-		let bestDist = -Infinity;
-		let best = null;
-		for (let i = 0; i < points.length; i++) {
-			let dist = p.constructor.sqrDist(points[i], p);
-			if (dist > bestDist) {
-				bestDist = dist;
-				best = points[i];
-			}
-		}
-		return best;
+	static farthest(target, points) {
+		return points[points.argmax(other => target.constructor.sqrDist(other, target))];
 	}
 	/**
 	 * Normalizes an angle to be on the interval [0, 2π).
