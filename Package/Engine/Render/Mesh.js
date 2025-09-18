@@ -214,20 +214,30 @@ class Mesh extends Renderable {
 	/**
 	 * Creates a Polyhedron that has the same shape as the mesh, using the `vertexPosition` attribute.
 	 * @param MeshChunk[] chunks? | The chunks to create the polyhedron from. This must be a subset of the `.chunks` property. Default is all chunks
+	 * @param Boolean lazy? | Whether the Polyhedron should be constructed lazily. See the `lazy` parameter to the Polyhedron constructor. Default is false
 	 * @return Polyhedron
 	 */
-	toPolyhedron(chunks = this.chunks) {
+	toPolyhedron(chunks = this.chunks, lazy = false) {
 		const { data, stride } = this;
-		const vertices = [];
-		for (let i = this.offsets.get("vertexPosition"); i < data.length; i += stride)
-			vertices.push(new Vector3(
-				data[i + 0],
-				data[i + 1],
-				data[i + 2]
-			));
-		
 		const indices = chunks.flatMap(chunk => [...chunk.indices]);
-		return new Polyhedron(vertices, indices);
+		const indexSet = new Set(indices);
+		const vertices = [];
+		const indexMap = new Map();
+
+		for (let pointer = this.offsets.get("vertexPosition"), i = 0; pointer < data.length; pointer += stride, i++) {
+			if (indexSet.has(i)) {
+				indexMap.set(i, vertices.length);
+				vertices.push(new Vector3(
+					data[pointer + 0],
+					data[pointer + 1],
+					data[pointer + 2]
+				));
+			}
+		}
+		
+		const mappedIndices = indices.map(index => indexMap.get(index));
+
+		return new Polyhedron(vertices, mappedIndices, lazy);
 	}
 	/**
 	 * Downloads the mesh as an `.obj` file, without materials.

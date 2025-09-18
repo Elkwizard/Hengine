@@ -434,12 +434,64 @@ class Polyhedron extends Shape3D {
 				.map((_, i) => this.getFace(i));
 	}
 	/**
-	 * Returns a set of planes whose negative half-spaces intersection form the polyhedron.
+	 * Returns a set of planes whose negative half-spaces' intersection form the polyhedron.
 	 * This method has undefined behavior for a concave polyhedron.
 	 * @return Plane[]
 	 */
 	getPlanes() {
 		return this.getFaces().map(face => face.plane);
+	}
+	/**
+	 * @type getFaceAdjacency(): Map<number, number[]>
+	 * Returns an undirected adjacency map between the face indices of the polyhedron.
+	 * In the map, faces are represented by their index in the return value of `.getFaces()`, and all faces are included as keys.
+	 * @return Map
+	 */
+	getFaceAdjacency() {
+		const { indices } = this;
+
+		const startToEndToFaces = new Map();
+		const faceToEdges = new Map();
+		const addEdge = (a, b, faceIndex) => {
+			if (b < a) {
+				let temp = b;
+				b = a;
+				a = temp;
+			}
+
+			if (!startToEndToFaces.has(a)) startToEndToFaces.set(a, new Map());
+			const endToFaces = startToEndToFaces.get(a);
+			if (!endToFaces.has(b)) endToFaces.set(b, []);
+			endToFaces.get(b).push(faceIndex);
+			
+			if (!faceToEdges.has(faceIndex)) faceToEdges.set(faceIndex, []);
+			faceToEdges.get(faceIndex).push([a, b]);
+		};
+
+		for (let i = 0; i < this.faceCount; i++) {
+			const base = i * 3;
+			const a = indices[base + 0];
+			const b = indices[base + 1];
+			const c = indices[base + 2];
+			addEdge(a, b, i);
+			addEdge(b, c, i);
+			addEdge(c, a, i);
+		}
+
+		const adjacency = new Map();
+		for (const [face, edges] of faceToEdges) {
+			const adjacent = new Set();
+			for (let i = 0; i < edges.length; i++) {
+				const edge = edges[i];
+				const faces = startToEndToFaces.get(edge[0]).get(edge[1]);
+				for (let j = 0; j < faces.length; j++)
+					adjacent.add(faces[j]);
+			}
+			adjacent.delete(face);
+			adjacency.set(face, [...adjacent]);
+		}
+
+		return adjacency;
 	}
 	getModel(transform) {
 		return new Polyhedron(

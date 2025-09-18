@@ -1026,6 +1026,11 @@ declare class Geometry {
 	 */
 	static triangulate(shape: Polygon): Vector2[][];
 	/**
+	 * Returns a new list of the unique vectors among a given list, with vectors within a certain tolerance being considered equal.
+	 * @param vectors - A list of a single type of vector
+	 */
+	static unique(vectors: Vector[]): Vector[];
+	/**
 	 * Returns the smallest convex Polygon which contains a given set of points.
 	 * The behavior is undefined if the points are all colinear.
 	 * @param points - The points to create a convex hull for. There must be at least 3
@@ -3425,6 +3430,12 @@ declare class Quaternion extends Complex {
  */
 declare class Geometry3D {
 	/**
+	 * Returns the smallest convex Polyhedron which contains a given set of points.
+	 * The behavior is undefined if the points are all coplanar.
+	 * @param points - The points to create a convex hull for. There must be at least 4
+	 */
+	static convexHull(points: Vector3[]): Polyhedron;
+	/**
 	 * Subdivides a frustum along the z axis.
 	 * @param frustum - The frustum to subdivide
 	 * @param portions - How to slice the frustum. If this is a number, the frustum will be sliced into that many pieces of equal size. If this is an array, each element provides a weight proportional to the size of each piece of the frustum. The weights may be scaled by any constant
@@ -3609,10 +3620,15 @@ declare class Polyhedron extends Shape3D {
 	 */
 	getFaces(): Triangle[];
 	/**
-	 * Returns a set of planes whose negative half-spaces intersection form the polyhedron.
+	 * Returns a set of planes whose negative half-spaces' intersection form the polyhedron.
 	 * This method has undefined behavior for a concave polyhedron.
 	 */
 	getPlanes(): Plane[];
+	/**
+	 * Returns an undirected adjacency map between the face indices of the polyhedron.
+	 * In the map, faces are represented by their index in the return value of `.getFaces()`, and all faces are included as keys.
+	 */
+	getFaceAdjacency(): Map<number, number[]>
 	/**
 	 * Subdivides each triangle in the polyhedron into a power of 4 number of additional triangles.
 	 * The subdivided mesh is a copy and is returned.
@@ -4408,6 +4424,20 @@ declare interface Array<T> {
 	 * @param array - The array to add to the end
 	 */
 	pushArray(array: any[]): void;
+	/**
+	 * Returns the index of the value which produces the highest/lowest value under a given metric function.
+	 * If multiple elements have the highest value, this returns the first.
+	 * If the array is empty, this returns -1.
+	 * @param metric - A function to compute a "score" to use for each element. This must be provided if the elements are not numbers. Default is the identity metric `x => x`
+	 */
+	argmax(metric?: (arg0: any) => number): number;
+	/**
+	 * Returns the index of the value which produces the highest/lowest value under a given metric function.
+	 * If multiple elements have the highest value, this returns the first.
+	 * If the array is empty, this returns -1.
+	 * @param metric - A function to compute a "score" to use for each element. This must be provided if the elements are not numbers. Default is the identity metric `x => x`
+	 */
+	argmin(metric?: (arg0: any) => number): number;
 	/**
 	 * Creates a multidimensional array, on which standard array operations can be performed with additional arguments.
 	 * e.g. `arr.map((value, i, j) => ...)` for a 2D array.
@@ -7108,6 +7138,10 @@ declare class Frame3D extends ImageType {
  */
 declare class Material implements Copyable {
 	/**
+	 * A optional name for the material. Materials loaded from files will use their file-provided names. Starts as "anonymous"
+	 */
+	name: string;
+	/**
 	 * Whether or not light can pass through the material
 	 */
 	transparent: boolean;
@@ -7292,8 +7326,10 @@ declare class Mesh extends Renderable {
 	transform(transform: Matrix4): this;
 	/**
 	 * Creates a Polyhedron that has the same shape as the mesh, using the `vertexPosition` attribute.
+	 * @param chunks - The chunks to create the polyhedron from. This must be a subset of the `.chunks` property. Default is all chunks
+	 * @param lazy - Whether the Polyhedron should be constructed lazily. See the `lazy` parameter to the Polyhedron constructor. Default is false
 	 */
-	toPolyhedron(): Polyhedron;
+	toPolyhedron(chunks?: MeshChunk[], lazy?: boolean): Polyhedron;
 	/**
 	 * Downloads the mesh as an `.obj` file, without materials.
 	 * @param name - The pre-extension part of the downloaded file's name

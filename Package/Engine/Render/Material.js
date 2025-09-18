@@ -1,10 +1,12 @@
 /**
  * @implements Copyable
  * Represents a material applied to a MeshChunk.
+ * @prop String name | A optional name for the material. Materials loaded from files will use their file-provided names. Starts as "anonymous"
  * @prop Boolean transparent | Whether or not light can pass through the material
  */
 class Material {
 	constructor() {
+		this.name = "anonymous";
 		this.uniforms = { };
 	}
 }

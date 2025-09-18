@@ -499,7 +499,7 @@ class HengineMaterialResource extends HengineResource {
 		const lines = text.split(/\r?\n/g);
 		
 		const materials = new Map();
-		let mat = null;
+		let currentMaterial = null;
 
 		const ATTR_NAME = {
 			Kd: "albedo",
@@ -522,23 +522,25 @@ class HengineMaterialResource extends HengineResource {
 			const [cmd, ...args] = line.split(" ");
 			if (cmd === "newmtl") {
 				const material = new SimpleMaterial();
-				materials.set(args[0], mat = material);
+				currentMaterial = material;
+				currentMaterial.name = args.join(" ");
+				materials.set(args[0], currentMaterial);
 			} else if (cmd === "d") {
-				mat.alpha = +args[0];
+				currentMaterial.alpha = +args[0];
 			} else if (cmd === "Tr") {
-				mat.alpha = 1 - args[0];
+				currentMaterial.alpha = 1 - args[0];
 			} else {
 				const attr = ATTR_NAME[cmd];
 				if (!attr) continue;
 
 				if (cmd[0] === "K") {
-					mat[attr] = Color.unlimited(255 * args[0], 255 * args[1], 255 * args[2]);
+					currentMaterial[attr] = Color.unlimited(255 * args[0], 255 * args[1], 255 * args[2]);
 				} else if (cmd[0] === "N" || cmd === "illum") {
-					mat[attr] = +args[0];
+					currentMaterial[attr] = +args[0];
 				} else if (cmd.startsWith("map_")) {
 					const path = args.join(" ");
 					const image = await new HengineImageResource(path).load();
-					mat[attr] = new Sampler(image, { wrap: true, mipmap: true });
+					currentMaterial[attr] = new Sampler(image, { wrap: true, mipmap: true });
 				}
 			}
 		}
