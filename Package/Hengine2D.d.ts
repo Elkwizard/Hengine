@@ -8373,6 +8373,10 @@ declare class PHYSICS extends ElementScript {
 	 */
 	mobile: boolean;
 	/**
+	 * Whether or not the object may have its shapes or location changed. See `.finalize()`. Starts as false
+	 */
+	finalized: boolean;
+	/**
 	 * Whether or not the object should participate in the simulation at all
 	 */
 	simulated: boolean;
@@ -8433,6 +8437,13 @@ declare class PHYSICS extends ElementScript {
 	 * Retrieves the moment of inertia for the object.
 	 */
 	get inertia(): InertiaN;
+	/**
+	 * Hints to the physics engine that the WorldObject will never again change prior to being removed (either by removing the PHYSICS script or the WorldObject).
+	 * Attempting to modify the shapes or transform of the WorldObject in any way after finalizing will produce undefined behavior.
+	 * This can only be called on non-mobile WorldObjects.
+	 * An object cannot be un-finalized.
+	 */
+	finalize(): void;
 	/**
 	 * Applies an impulse to a specific point on the object.
 	 * @param point - The World-Space point at which the impulse should be applied

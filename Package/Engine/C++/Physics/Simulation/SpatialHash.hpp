@@ -34,18 +34,23 @@ class SpatialHash {
 			cells.clear();
 			wave = 0;
 
+			if (container.empty()) return;
+
 			double total = 0;
+			size_t itemCount = 0;
 			for (RigidBody* body : container) {
 				double volume = body->localMatter.mass / body->getDensity();
 				if (!isnan(volume)) total += volume;
+				itemCount += body->colliders.size();
 			}
 
-			size_t cellCount = container.size() * CELLS_PER_ITEM;
-			cellSize = std::pow(total / cellCount, 1.0 / DIM);
+			if (!itemCount) return;
 
+			cellSize = std::pow(total / (itemCount * CELLS_PER_ITEM), 1.0 / DIM);
+			
 			for (RigidBody* body : container) {
 				if (!body->canCollide) continue;
-
+	
 				for (RigidBody::Collider& collider : body->colliders) {
 					collider.wave = 0;
 					AABB bounds = boundsOf(collider);
@@ -58,9 +63,10 @@ class SpatialHash {
 			}
 		}
 
-		std::vector<RigidBody::Collider*> query(const RigidBody::Collider& collider) {
+		void query(const RigidBody::Collider& collider, std::vector<RigidBody::Collider*>& result) {
+			if (cells.empty()) return;
+
 			wave++;
-			std::vector<RigidBody::Collider*> result;
 			
 			AABB bounds = boundsOf(collider);
 			Coord min (bounds.min / cellSize);
@@ -74,7 +80,5 @@ class SpatialHash {
 					}
 				}
 			}
-
-			return result;
 		}
 };

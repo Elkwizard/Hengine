@@ -7,6 +7,7 @@ API class Transform {
 	public:
 		API_CONST Vector linear;
 		API_CONST Orientation orientation;
+		static const Transform DIFFERENT;
 
 		Transform(const Vector& _linear, const Orientation& _orientation) {
 			linear = _linear;
@@ -15,6 +16,10 @@ API class Transform {
 
 		API Transform()
 		: Transform({ }, { }) { }
+
+		bool operator ==(const Transform& other) const {
+			return linear == other.linear && orientation == other.orientation;
+		}
 
 		Transform& operator *=(const Transform& other) {
 			linear += orientation * other.linear;
@@ -72,3 +77,5 @@ API class Transform {
 			return out;
 		}
 };
+
+const Transform Transform::DIFFERENT { Vector(NAN), { } };

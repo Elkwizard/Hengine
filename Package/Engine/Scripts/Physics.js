@@ -34,6 +34,7 @@ Physics.triggerRule = (a, b) => {
  * @prop VectorN velocity | The velocity of the object per frame
  * @prop AngleN angularVelocity | The angular velocity of the object in radians per frame
  * @prop Boolean mobile | Whether or not the object can move or rotate
+ * @prop<readonly> Boolean finalized | Whether or not the object may have its shapes or location changed. See `.finalize()`. Starts as false
  * @prop Boolean simulated | Whether or not the object should participate in the simulation at all
  * @prop Boolean gravity | Whether or not gravity should be applied to the object
  * @prop Boolean airResistance | Whether or not air resistance should be applied to the object
@@ -44,8 +45,8 @@ Physics.triggerRule = (a, b) => {
  * @prop Number snuzzlement | The proportion of object's velocity lost in a collision
  * @prop Boolean canCollide | Whether the object can collide with any others
  * @prop Boolean isTrigger | Whether the object should cancel all collision resolution, but not detection
- * @prop CollisionMonitor colliding | All of the objects currently colliding with the object
- * @prop CollisionMonitor lastColliding | All of the objects that were colliding with the object last frame
+ * @prop<readonly> CollisionMonitor colliding | All of the objects currently colliding with the object
+ * @prop<readonly> CollisionMonitor lastColliding | All of the objects that were colliding with the object last frame
  */
 class PHYSICS extends ElementScript {
 	static bodyToWorldObject = new Map();
@@ -75,7 +76,8 @@ class PHYSICS extends ElementScript {
 		this._velocity = ND.Vector.physicsProxy(body.velocity.linear);
 		if (IS_3D)
 			this._angularVelocity = ND.Vector.physicsProxy(body.velocity.orientation.rotation);
-		
+		this.finalized = false;
+
 		objectUtils.shortcut(this, body, "airResistance", "drag");
 		objectUtils.proxyAccess(this, body, [
 			"simulated", "isTrigger", "canCollide",
@@ -158,6 +160,16 @@ class PHYSICS extends ElementScript {
 	}
 	get snuzzlement() {
 		return 1 - this.body.restitution;
+	}
+	/**
+	 * Hints to the physics engine that the WorldObject will never again change prior to being removed (either by removing the PHYSICS script or the WorldObject).
+	 * Attempting to modify the shapes or transform of the WorldObject in any way after finalizing will produce undefined behavior.
+	 * This can only be called on non-mobile WorldObjects.
+	 * An object cannot be un-finalized.
+	 */
+	finalize() {
+		this.finalized = true;
+		this.physicsEngine.finalizeBody(this.body);
 	}
 	addShape(obj, name, shape) {
 		const convex = obj.convexShapes.get(shape);

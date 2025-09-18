@@ -24,23 +24,32 @@ API class Engine {
 		static constexpr double COLLISION_SLOP = 0.5;
 		
 		std::vector<std::unique_ptr<RigidBody>> bodies;
-		std::vector<RigidBody*> simBodies, dynBodies;
+		std::vector<RigidBody*> simBodies, finalBodies, nonFinalBodies, dynBodies;
 		std::vector<std::unique_ptr<ConstraintDescriptor>> constraintDescriptors;
 		std::unordered_map<std::pair<RigidBody*, RigidBody*>, std::pair<bool, bool>> triggerCache;
 		std::unordered_set<std::pair<RigidBody::Collider*, RigidBody::Collider*>> eventsFired;
-		SpatialHash hash;
+		SpatialHash staticHash, dynamicHash;
+		bool staticHashBroken = true;
 		double collisionSlop;
 
 		void beforeSimulation() {
 			dynBodies.clear();
 			simBodies.clear();
+			finalBodies.clear();
+			nonFinalBodies.clear();
 			for (const auto& body : bodies) {
 				if (!body->simulated) continue;
 				body->beforeSimulation();
 				simBodies.push_back(body.get());
+				(body->finalized ? finalBodies : nonFinalBodies).push_back(body.get());
 				if (body->getDynamic())
 					dynBodies.push_back(body.get());
 			}
+		}
+
+		void afterSimulation() {
+			for (RigidBody* body : simBodies)
+				body->afterSimulation();
 		}
 
 		void applyForces(double dt) {
@@ -138,12 +147,22 @@ API class Engine {
 		std::vector<CollisionPair> getCollisionPairs(double dt) {
 			sortBodies(false);
 
-			hash.build(simBodies, dt);
+			if (staticHashBroken) {
+				staticHashBroken = false;
+				staticHash.build(finalBodies, dt);
+			}
+
+
+			dynamicHash.build(nonFinalBodies, dt);
 			std::vector<CollisionPair> collisionPairs;
 			for (RigidBody* body : dynBodies)
 				if (body->canCollide)
-					for (RigidBody::Collider& collider : body->colliders)
-						collisionPairs.emplace_back(&collider, hash.query(collider));
+					for (RigidBody::Collider& collider : body->colliders) {
+						std::vector<RigidBody::Collider*> others;
+						dynamicHash.query(collider, others);
+						staticHash.query(collider, others);
+						collisionPairs.emplace_back(&collider, others);
+					}
 			
 			return collisionPairs;
 		}
@@ -217,7 +236,13 @@ API class Engine {
 			bodies.emplace_back(body);
 		}
 
+		API void finalizeBody(RigidBody* body) {
+			body->finalized = true;
+			staticHashBroken = true;
+		}
+
 		API void removeBody(RigidBody* body) {
+			if (body->finalized) staticHashBroken = true;
 			std::vector<ConstraintDescriptor*> descriptors = body->constraintDescriptors;
 			for (ConstraintDescriptor* constraint : descriptors)
 				removeConstraint(constraint);
@@ -257,7 +282,7 @@ API class Engine {
 		}
 
 		API void run(double deltaTime) {
-			stats.reset();
+			// stats.reset();
 
 			beforeSimulation();
 
@@ -277,7 +302,9 @@ API class Engine {
 				solveCollisions(collisionPairs, dt);
 			}
 
-			stats.js();
+			afterSimulation();
+
+			// stats.js();
 		}
 
 		RayHit raycast(const Ray& ray) const {

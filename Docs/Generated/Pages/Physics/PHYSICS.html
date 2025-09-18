@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class PHYSICS">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L50" target="_blank" class="class-name source-link">PHYSICS</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L51" target="_blank" class="class-name source-link">PHYSICS</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span>
 				</div>
 				<div class="class desc">
 					Adds rigidbody physics to a <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>.
@@ -53,6 +53,15 @@
 			</div>
 			<div class="prop desc">Whether or not the object can move or rotate</div>
 			<span class="prop-attrs"></span>
+		</div>
+	
+		<div class="prop-wrapper" id="PHYSICS.finalized">
+			<div class="prop-header member">
+				<span class="prop-name">finalized</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not the object may have its shapes or location changed. See <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">finalize</span><span class="highlight-SYMBOL">()</span></code>. Starts as false</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
 		</div>
 	
 		<div class="prop-wrapper" id="PHYSICS.simulated">
@@ -151,7 +160,7 @@
 				<span class="type"><a href="../Physics/CollisionMonitor.html#class CollisionMonitor">CollisionMonitor</a></span>
 			</div>
 			<div class="prop desc">All of the objects currently colliding with the object</div>
-			<span class="prop-attrs"></span>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
 		</div>
 	
 		<div class="prop-wrapper" id="PHYSICS.lastColliding">
@@ -160,7 +169,7 @@
 				<span class="type"><a href="../Physics/CollisionMonitor.html#class CollisionMonitor">CollisionMonitor</a></span>
 			</div>
 			<div class="prop desc">All of the objects that were colliding with the object last frame</div>
-			<span class="prop-attrs"></span>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
 		</div>
 	</div>
 				
@@ -170,7 +179,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="PHYSICS.prototype.init()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L56" target="_blank" class="function-name source-link">init</a>(<span class="param">mobile</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L57" target="_blank" class="function-name source-link">init</a>(<span class="param">mobile</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Adds rigidbody physics to an object.
@@ -197,7 +206,7 @@
 	
 		<div class="function-wrapper" id="get PHYSICS.prototype.constraints()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L102" target="_blank" class="function-name source-link">constraints</a><span class="type"><a href="../Physics/Constraint.html#class Constraint">Constraint</a>[]</span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L104" target="_blank" class="function-name source-link">constraints</a><span class="type"><a href="../Physics/Constraint.html#class Constraint">Constraint</a>[]</span>
 			</div>
 			<div class="function desc">
 				Retrieves a list of copies of all the constraints on the object.
@@ -207,7 +216,7 @@
 	
 		<div class="function-wrapper" id="get PHYSICS.prototype.inertia()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L152" target="_blank" class="function-name source-link">inertia</a><span class="type"><span class="alias">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L154" target="_blank" class="function-name source-link">inertia</a><span class="type"><span class="alias">
 			<span class="alias two"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			<span class="alias three"><a href="../Geometry/Matrices.html#class Matrix3">Matrix3</a></span>
 			<span class="alias general">InertiaN</span>
@@ -219,9 +228,22 @@
 			
 		</div>
 	
+		<div class="function-wrapper" id="PHYSICS.prototype.finalize()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L170" target="_blank" class="function-name source-link">finalize</a>()<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Hints to the physics engine that the <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a> will never again change prior to being removed (either by removing the PHYSICS script or the <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a>).
+Attempting to modify the shapes or transform of the <a href="../Management/SceneObject.html#class WorldObject">WorldObject</a> in any way after finalizing will produce undefined behavior.
+This can only be called on non-mobile <a href="../Management/SceneObject.html#class WorldObject">WorldObjects</a>.
+An object cannot be un-finalized.
+			</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="PHYSICS.prototype.applyImpulse()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L248" target="_blank" class="function-name source-link">applyImpulse</a>(<span class="param">point</span>, <span class="param">impulse</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L260" target="_blank" class="function-name source-link">applyImpulse</a>(<span class="param">point</span>, <span class="param">impulse</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Applies an impulse to a specific point on the object.
@@ -266,7 +288,7 @@
 	
 		<div class="function-wrapper" id="PHYSICS.prototype.applyImpulseMass()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L261" target="_blank" class="function-name source-link">applyImpulseMass</a>(<span class="param">point</span>, <span class="param">impulse</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L273" target="_blank" class="function-name source-link">applyImpulseMass</a>(<span class="param">point</span>, <span class="param">impulse</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Applies an impulse to a specific point on the object.
@@ -312,7 +334,7 @@ The impulse will be scaled by the mass of the object.
 	
 		<div class="function-wrapper" id="PHYSICS.prototype.stop()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L267" target="_blank" class="function-name source-link">stop</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L279" target="_blank" class="function-name source-link">stop</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Stops the object in place. It remains mobile, though it loses all velocity.
@@ -322,7 +344,7 @@ The impulse will be scaled by the mass of the object.
 	
 		<div class="function-wrapper" id="PHYSICS.prototype.isTriggerWith()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L283" target="_blank" class="function-name source-link">isTriggerWith</a>(<span class="param">element</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L295" target="_blank" class="function-name source-link">isTriggerWith</a>(<span class="param">element</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether the object and another given object would have a trigger collision if they collided.
@@ -350,7 +372,7 @@ A trigger collision is not resolved, just detected.
 	
 		<div class="function-wrapper" id="PHYSICS.prototype.canCollideWith()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L292" target="_blank" class="function-name source-link">canCollideWith</a>(<span class="param">element</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L304" target="_blank" class="function-name source-link">canCollideWith</a>(<span class="param">element</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether the object and another given object could collide if they intersected.
@@ -377,7 +399,7 @@ A trigger collision is not resolved, just detected.
 	
 		<div class="function-wrapper" id="PHYSICS.prototype.constrainedTo()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L301" target="_blank" class="function-name source-link">constrainedTo</a>(<span class="param">other</span>)<span class="type">Boolean</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\Physics.js?#L313" target="_blank" class="function-name source-link">constrainedTo</a>(<span class="param">other</span>)<span class="type">Boolean</span>
 			</div>
 			<div class="function desc">
 				Checks whether there are any constraints between the object and another given object

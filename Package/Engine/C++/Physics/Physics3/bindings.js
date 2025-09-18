@@ -162,66 +162,67 @@ HengineWASMResource.bindings["Physics3"] = (module, imports, exports) => {
 		static create() { return exports._Engine_Engine57(); }
 		delete() { exports._delete_Engine_Engine57(this.pointer); }
 		addBody(body) { exports._Engine_addBody58(this.pointer, body.pointer); }
-		removeBody(body) { exports._Engine_removeBody59(this.pointer, body.pointer); }
-		get bodies() { return cast(module.Array_RigidBody_1, exports._Engine_getBodies60(this.pointer)); }
-		addConstraint(constraint) { exports._Engine_addConstraint61(this.pointer, constraint.pointer); }
-		removeConstraint(constraint) { exports._Engine_removeConstraint62(this.pointer, constraint.pointer); }
-		get constraintDescriptors() { return cast(module.Array_ConstraintDescriptor_1, exports._Engine_getConstraintDescriptors63(this.pointer)); }
-		get kineticEnergy() { return exports._Engine_getKineticEnergy64(this.pointer); }
-		run(deltaTime) { exports._Engine_run65(this.pointer, deltaTime); }
+		finalizeBody(body) { exports._Engine_finalizeBody59(this.pointer, body.pointer); }
+		removeBody(body) { exports._Engine_removeBody60(this.pointer, body.pointer); }
+		get bodies() { return cast(module.Array_RigidBody_1, exports._Engine_getBodies61(this.pointer)); }
+		addConstraint(constraint) { exports._Engine_addConstraint62(this.pointer, constraint.pointer); }
+		removeConstraint(constraint) { exports._Engine_removeConstraint63(this.pointer, constraint.pointer); }
+		get constraintDescriptors() { return cast(module.Array_ConstraintDescriptor_1, exports._Engine_getConstraintDescriptors64(this.pointer)); }
+		get kineticEnergy() { return exports._Engine_getKineticEnergy65(this.pointer); }
+		run(deltaTime) { exports._Engine_run66(this.pointer, deltaTime); }
 	};
 	
 	module.VectorN_3_ = class VectorN_3_ extends Binding {
 		static CONST_PROPERTIES = [];
-		static create() { return exports._VectorN_3__VectorN66(); }
-		delete() { exports._delete_VectorN_3__VectorN66(this.pointer); }
-		get(index) { return exports._VectorN_3__get67(this.pointer, index); }
-		set(index, value) { exports._VectorN_3__set68(this.pointer, index, value); }
-		setAll(x, y, z) { exports._VectorN_3__setAll69(this.pointer, x, y, z); }
-		static build(x, y, z) { return cast(module.VectorN_3_, exports._VectorN_3__build70(x, y, z)); }
+		static create() { return exports._VectorN_3__VectorN67(); }
+		delete() { exports._delete_VectorN_3__VectorN67(this.pointer); }
+		get(index) { return exports._VectorN_3__get68(this.pointer, index); }
+		set(index, value) { exports._VectorN_3__set69(this.pointer, index, value); }
+		setAll(x, y, z) { exports._VectorN_3__setAll70(this.pointer, x, y, z); }
+		static build(x, y, z) { return cast(module.VectorN_3_, exports._VectorN_3__build71(x, y, z)); }
 	};
 	
 	module.MatrixRC_3_ = class MatrixRC_3_ extends Binding {
 		static CONST_PROPERTIES = [];
-		static create() { return exports._MatrixRC_3__MatrixRC71(); }
-		delete() { exports._delete_MatrixRC_3__MatrixRC71(this.pointer); }
-		get(row, column) { return exports._MatrixRC_3__get72(this.pointer, row, column); }
-		set(row, column, value) { exports._MatrixRC_3__set73(this.pointer, row, column, value); }
+		static create() { return exports._MatrixRC_3__MatrixRC72(); }
+		delete() { exports._delete_MatrixRC_3__MatrixRC72(this.pointer); }
+		get(row, column) { return exports._MatrixRC_3__get73(this.pointer, row, column); }
+		set(row, column, value) { exports._MatrixRC_3__set74(this.pointer, row, column, value); }
 	};
 	
 	module.Array_VectorN_3__0 = class Array_VectorN_3__0 extends Binding {
 		static CONST_PROPERTIES = [];
-		get length() { return exports._get_Array_VectorN_3__0_length74(this.pointer); }
-		static create(_length) { return exports._Array_VectorN_3__0_Array_VectorN_3__075(_length); }
-		delete() { exports._delete_Array_VectorN_3__0_Array_VectorN_3__075(this.pointer); }
-		get(index) { return cast(module.VectorN_3_, exports._Array_VectorN_3__0_get76(this.pointer, index)); }
-		set(index, value) { exports._Array_VectorN_3__0_set77(this.pointer, index, value.pointer); }
+		get length() { return exports._get_Array_VectorN_3__0_length75(this.pointer); }
+		static create(_length) { return exports._Array_VectorN_3__0_Array_VectorN_3__076(_length); }
+		delete() { exports._delete_Array_VectorN_3__0_Array_VectorN_3__076(this.pointer); }
+		get(index) { return cast(module.VectorN_3_, exports._Array_VectorN_3__0_get77(this.pointer, index)); }
+		set(index, value) { exports._Array_VectorN_3__0_set78(this.pointer, index, value.pointer); }
 	};
 	
 	module.Array_int_0 = class Array_int_0 extends Binding {
 		static CONST_PROPERTIES = [];
-		get length() { return exports._get_Array_int_0_length78(this.pointer); }
-		static create(_length) { return exports._Array_int_0_Array_int_079(_length); }
-		delete() { exports._delete_Array_int_0_Array_int_079(this.pointer); }
-		get(index) { return exports._Array_int_0_get80(this.pointer, index); }
-		set(index, value) { exports._Array_int_0_set81(this.pointer, index, value); }
+		get length() { return exports._get_Array_int_0_length79(this.pointer); }
+		static create(_length) { return exports._Array_int_0_Array_int_080(_length); }
+		delete() { exports._delete_Array_int_0_Array_int_080(this.pointer); }
+		get(index) { return exports._Array_int_0_get81(this.pointer, index); }
+		set(index, value) { exports._Array_int_0_set82(this.pointer, index, value); }
 	};
 	
 	module.Array_ConstraintDescriptor_1 = class Array_ConstraintDescriptor_1 extends Binding {
 		static CONST_PROPERTIES = [];
-		get length() { return exports._get_Array_ConstraintDescriptor_1_length82(this.pointer); }
-		static create(_length) { return exports._Array_ConstraintDescriptor_1_Array_ConstraintDescriptor_183(_length); }
-		delete() { exports._delete_Array_ConstraintDescriptor_1_Array_ConstraintDescriptor_183(this.pointer); }
-		get(index) { return cast(module.ConstraintDescriptor, exports._Array_ConstraintDescriptor_1_get84(this.pointer, index)); }
-		set(index, value) { exports._Array_ConstraintDescriptor_1_set85(this.pointer, index, value.pointer); }
+		get length() { return exports._get_Array_ConstraintDescriptor_1_length83(this.pointer); }
+		static create(_length) { return exports._Array_ConstraintDescriptor_1_Array_ConstraintDescriptor_184(_length); }
+		delete() { exports._delete_Array_ConstraintDescriptor_1_Array_ConstraintDescriptor_184(this.pointer); }
+		get(index) { return cast(module.ConstraintDescriptor, exports._Array_ConstraintDescriptor_1_get85(this.pointer, index)); }
+		set(index, value) { exports._Array_ConstraintDescriptor_1_set86(this.pointer, index, value.pointer); }
 	};
 	
 	module.Array_RigidBody_1 = class Array_RigidBody_1 extends Binding {
 		static CONST_PROPERTIES = [];
-		get length() { return exports._get_Array_RigidBody_1_length86(this.pointer); }
-		static create(_length) { return exports._Array_RigidBody_1_Array_RigidBody_187(_length); }
-		delete() { exports._delete_Array_RigidBody_1_Array_RigidBody_187(this.pointer); }
-		get(index) { return cast(module.RigidBody, exports._Array_RigidBody_1_get88(this.pointer, index)); }
-		set(index, value) { exports._Array_RigidBody_1_set89(this.pointer, index, value.pointer); }
+		get length() { return exports._get_Array_RigidBody_1_length87(this.pointer); }
+		static create(_length) { return exports._Array_RigidBody_1_Array_RigidBody_188(_length); }
+		delete() { exports._delete_Array_RigidBody_1_Array_RigidBody_188(this.pointer); }
+		get(index) { return cast(module.RigidBody, exports._Array_RigidBody_1_get89(this.pointer, index)); }
+		set(index, value) { exports._Array_RigidBody_1_set90(this.pointer, index, value.pointer); }
 	};
 };

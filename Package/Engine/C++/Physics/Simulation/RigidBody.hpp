@@ -89,7 +89,7 @@ API class RigidBody {
 	
 		bool dynamic;
 		double density = 1;
-		Transform lastPosition;
+		Transform lastPosition = Transform::DIFFERENT;
 		Orientation lastBoundedOrientation;
 		bool shapesModified = false;
 
@@ -103,15 +103,10 @@ API class RigidBody {
 			}
 		}
 
-		void invalidateColliders() {
-			for (Collider& collider : colliders)
-				collider.invalidate();
-		}
-
 		void updateLocalBounds() {
 			lastBoundedOrientation = position.orientation;
 			for (Collider& collider : colliders)
-				collider.updateBounds();
+				collider.updateLocalBounds();
 		}
 
 		void modifyShapes() {
@@ -148,16 +143,16 @@ API class RigidBody {
 					return local.get() == other;
 				}
 		
-				void invalidate() {
-					valid = false;
+				void syncWithPosition() {
 					bounds = localBounds + body->position.linear;
+					valid = false;
 				}
 
 				void beforeSimulation() {
 					global->clearCache();
 				}
 		
-				void updateBounds() {
+				void updateLocalBounds() {
 					global->sync(*local, { { }, body->position.orientation });
 					localBounds = body->dynamic ? global->getBallBounds() : global->getBounds();
 					valid = false;
@@ -189,6 +184,8 @@ API class RigidBody {
 		Prohibited prohibited;
 		API_CONST std::vector<ConstraintDescriptor*> constraintDescriptors;
 		
+		bool finalized = false;
+		bool checkChanges = true;
 		API bool simulated = true;
 		API bool gravity = true;
 		API bool drag = true;
@@ -239,12 +236,10 @@ API class RigidBody {
 		}
 
 		API double getMass() {
-			ensureShapes();
 			return localMatter.mass;
 		}
 
 		API Inertia getInertia() {
-			ensureShapes();
 			return localMatter.rotate(position.orientation).inertia;
 		}
 
@@ -317,20 +312,29 @@ API class RigidBody {
 		}
 
 		void beforeSimulation() {
+			if (!checkChanges) return;
+
 			ensureShapes();
-			if (lastBoundedOrientation != position.orientation && !dynamic)
+			if (!dynamic && lastBoundedOrientation != position.orientation)
 				updateLocalBounds();
 	
-			sync();
+			syncWithPosition();
 
 			if (dynamic)
 				for (Collider& collider : colliders)
 					collider.beforeSimulation();
 		}
 
-		void sync() {
+		void afterSimulation() {
+			if (finalized && checkChanges)
+				checkChanges = false;
+		}
+
+		void syncWithPosition() {
 			syncMatter();
-			invalidateColliders();
+
+			for (Collider& collider : colliders)
+				collider.syncWithPosition();
 		}
 
 		void integrate(double dt) {
@@ -351,7 +355,7 @@ API class RigidBody {
 			}
 
 			position += velocity * dt;
-			sync();
+			syncWithPosition();
 		}
 
 		RayHit raycast(const Ray& ray) const {

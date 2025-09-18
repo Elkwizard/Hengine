@@ -119,12 +119,12 @@ class ContactConstraint : public Constraint {
 				double total = massA + massB;
 				bodyA.position.linear -= move * (massB / total);
 				bodyB.position.linear += move * (massA / total);
-				bodyB.sync();
+				bodyB.syncWithPosition();
 			} else {
 				bodyA.position.linear -= move;
 			}
 
-			bodyA.sync();
+			bodyA.syncWithPosition();
 		}
 		
 		void solveVelocity(double dt) override {

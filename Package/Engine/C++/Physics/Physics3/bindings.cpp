@@ -224,41 +224,42 @@ extern "C" {
 	EMSCRIPTEN_KEEPALIVE Engine* _Engine_Engine57() { return new Engine(); }
 	EMSCRIPTEN_KEEPALIVE void _delete_Engine_Engine57(Engine* _this) { delete _this; }
 	EMSCRIPTEN_KEEPALIVE void _Engine_addBody58(Engine* _this, RigidBody* body) { _this->addBody(body); }
-	EMSCRIPTEN_KEEPALIVE void _Engine_removeBody59(Engine* _this, RigidBody* body) { _this->removeBody(body); }
-	EMSCRIPTEN_KEEPALIVE Array_RigidBody_1* _Engine_getBodies60(Engine* _this) { return new Array_RigidBody_1(_this->getBodies()); }
-	EMSCRIPTEN_KEEPALIVE void _Engine_addConstraint61(Engine* _this, ConstraintDescriptor* constraint) { _this->addConstraint(constraint); }
-	EMSCRIPTEN_KEEPALIVE void _Engine_removeConstraint62(Engine* _this, ConstraintDescriptor* constraint) { _this->removeConstraint(constraint); }
-	EMSCRIPTEN_KEEPALIVE Array_ConstraintDescriptor_1* _Engine_getConstraintDescriptors63(Engine* _this) { return new Array_ConstraintDescriptor_1(_this->getConstraintDescriptors()); }
-	EMSCRIPTEN_KEEPALIVE double _Engine_getKineticEnergy64(Engine* _this) { return _this->getKineticEnergy(); }
-	EMSCRIPTEN_KEEPALIVE void _Engine_run65(Engine* _this, double deltaTime) { _this->run(deltaTime); }
-	EMSCRIPTEN_KEEPALIVE VectorN<3>* _VectorN_3__VectorN66() { return new VectorN<3>(); }
-	EMSCRIPTEN_KEEPALIVE void _delete_VectorN_3__VectorN66(VectorN<3>* _this) { delete _this; }
-	EMSCRIPTEN_KEEPALIVE double _VectorN_3__get67(VectorN<3>* _this, int index) { return _this->get(index); }
-	EMSCRIPTEN_KEEPALIVE void _VectorN_3__set68(VectorN<3>* _this, int index, double value) { _this->set(index, value); }
-	EMSCRIPTEN_KEEPALIVE void _VectorN_3__setAll69(VectorN<3>* _this, double x, double y, double z) { _this->setAll(x, y, z); }
-	EMSCRIPTEN_KEEPALIVE VectorN<3>* _VectorN_3__build70(double x, double y, double z) { return new VectorN<3>(VectorN<3>::build(x, y, z)); }
-	EMSCRIPTEN_KEEPALIVE MatrixRC<3>* _MatrixRC_3__MatrixRC71() { return new MatrixRC<3>(); }
-	EMSCRIPTEN_KEEPALIVE void _delete_MatrixRC_3__MatrixRC71(MatrixRC<3>* _this) { delete _this; }
-	EMSCRIPTEN_KEEPALIVE double _MatrixRC_3__get72(MatrixRC<3>* _this, int row, int column) { return _this->get(row, column); }
-	EMSCRIPTEN_KEEPALIVE void _MatrixRC_3__set73(MatrixRC<3>* _this, int row, int column, double value) { _this->set(row, column, value); }
-	EMSCRIPTEN_KEEPALIVE int _get_Array_VectorN_3__0_length74(Array_VectorN_3__0* _this) { return _this->length; }
-	EMSCRIPTEN_KEEPALIVE Array_VectorN_3__0* _Array_VectorN_3__0_Array_VectorN_3__075(int _length) { return new Array_VectorN_3__0(_length); }
-	EMSCRIPTEN_KEEPALIVE void _delete_Array_VectorN_3__0_Array_VectorN_3__075(Array_VectorN_3__0* _this) { delete _this; }
-	EMSCRIPTEN_KEEPALIVE VectorN<3>* _Array_VectorN_3__0_get76(Array_VectorN_3__0* _this, int index) { return &_this->get(index); }
-	EMSCRIPTEN_KEEPALIVE void _Array_VectorN_3__0_set77(Array_VectorN_3__0* _this, int index, VectorN<3>* value) { _this->set(index, *value); }
-	EMSCRIPTEN_KEEPALIVE int _get_Array_int_0_length78(Array_int_0* _this) { return _this->length; }
-	EMSCRIPTEN_KEEPALIVE Array_int_0* _Array_int_0_Array_int_079(int _length) { return new Array_int_0(_length); }
-	EMSCRIPTEN_KEEPALIVE void _delete_Array_int_0_Array_int_079(Array_int_0* _this) { delete _this; }
-	EMSCRIPTEN_KEEPALIVE int _Array_int_0_get80(Array_int_0* _this, int index) { return _this->get(index); }
-	EMSCRIPTEN_KEEPALIVE void _Array_int_0_set81(Array_int_0* _this, int index, int value) { _this->set(index, value); }
-	EMSCRIPTEN_KEEPALIVE int _get_Array_ConstraintDescriptor_1_length82(Array_ConstraintDescriptor_1* _this) { return _this->length; }
-	EMSCRIPTEN_KEEPALIVE Array_ConstraintDescriptor_1* _Array_ConstraintDescriptor_1_Array_ConstraintDescriptor_183(int _length) { return new Array_ConstraintDescriptor_1(_length); }
-	EMSCRIPTEN_KEEPALIVE void _delete_Array_ConstraintDescriptor_1_Array_ConstraintDescriptor_183(Array_ConstraintDescriptor_1* _this) { delete _this; }
-	EMSCRIPTEN_KEEPALIVE ConstraintDescriptor* _Array_ConstraintDescriptor_1_get84(Array_ConstraintDescriptor_1* _this, int index) { return _this->get(index); }
-	EMSCRIPTEN_KEEPALIVE void _Array_ConstraintDescriptor_1_set85(Array_ConstraintDescriptor_1* _this, int index, ConstraintDescriptor* value) { _this->set(index, value); }
-	EMSCRIPTEN_KEEPALIVE int _get_Array_RigidBody_1_length86(Array_RigidBody_1* _this) { return _this->length; }
-	EMSCRIPTEN_KEEPALIVE Array_RigidBody_1* _Array_RigidBody_1_Array_RigidBody_187(int _length) { return new Array_RigidBody_1(_length); }
-	EMSCRIPTEN_KEEPALIVE void _delete_Array_RigidBody_1_Array_RigidBody_187(Array_RigidBody_1* _this) { delete _this; }
-	EMSCRIPTEN_KEEPALIVE RigidBody* _Array_RigidBody_1_get88(Array_RigidBody_1* _this, int index) { return _this->get(index); }
-	EMSCRIPTEN_KEEPALIVE void _Array_RigidBody_1_set89(Array_RigidBody_1* _this, int index, RigidBody* value) { _this->set(index, value); }
+	EMSCRIPTEN_KEEPALIVE void _Engine_finalizeBody59(Engine* _this, RigidBody* body) { _this->finalizeBody(body); }
+	EMSCRIPTEN_KEEPALIVE void _Engine_removeBody60(Engine* _this, RigidBody* body) { _this->removeBody(body); }
+	EMSCRIPTEN_KEEPALIVE Array_RigidBody_1* _Engine_getBodies61(Engine* _this) { return new Array_RigidBody_1(_this->getBodies()); }
+	EMSCRIPTEN_KEEPALIVE void _Engine_addConstraint62(Engine* _this, ConstraintDescriptor* constraint) { _this->addConstraint(constraint); }
+	EMSCRIPTEN_KEEPALIVE void _Engine_removeConstraint63(Engine* _this, ConstraintDescriptor* constraint) { _this->removeConstraint(constraint); }
+	EMSCRIPTEN_KEEPALIVE Array_ConstraintDescriptor_1* _Engine_getConstraintDescriptors64(Engine* _this) { return new Array_ConstraintDescriptor_1(_this->getConstraintDescriptors()); }
+	EMSCRIPTEN_KEEPALIVE double _Engine_getKineticEnergy65(Engine* _this) { return _this->getKineticEnergy(); }
+	EMSCRIPTEN_KEEPALIVE void _Engine_run66(Engine* _this, double deltaTime) { _this->run(deltaTime); }
+	EMSCRIPTEN_KEEPALIVE VectorN<3>* _VectorN_3__VectorN67() { return new VectorN<3>(); }
+	EMSCRIPTEN_KEEPALIVE void _delete_VectorN_3__VectorN67(VectorN<3>* _this) { delete _this; }
+	EMSCRIPTEN_KEEPALIVE double _VectorN_3__get68(VectorN<3>* _this, int index) { return _this->get(index); }
+	EMSCRIPTEN_KEEPALIVE void _VectorN_3__set69(VectorN<3>* _this, int index, double value) { _this->set(index, value); }
+	EMSCRIPTEN_KEEPALIVE void _VectorN_3__setAll70(VectorN<3>* _this, double x, double y, double z) { _this->setAll(x, y, z); }
+	EMSCRIPTEN_KEEPALIVE VectorN<3>* _VectorN_3__build71(double x, double y, double z) { return new VectorN<3>(VectorN<3>::build(x, y, z)); }
+	EMSCRIPTEN_KEEPALIVE MatrixRC<3>* _MatrixRC_3__MatrixRC72() { return new MatrixRC<3>(); }
+	EMSCRIPTEN_KEEPALIVE void _delete_MatrixRC_3__MatrixRC72(MatrixRC<3>* _this) { delete _this; }
+	EMSCRIPTEN_KEEPALIVE double _MatrixRC_3__get73(MatrixRC<3>* _this, int row, int column) { return _this->get(row, column); }
+	EMSCRIPTEN_KEEPALIVE void _MatrixRC_3__set74(MatrixRC<3>* _this, int row, int column, double value) { _this->set(row, column, value); }
+	EMSCRIPTEN_KEEPALIVE int _get_Array_VectorN_3__0_length75(Array_VectorN_3__0* _this) { return _this->length; }
+	EMSCRIPTEN_KEEPALIVE Array_VectorN_3__0* _Array_VectorN_3__0_Array_VectorN_3__076(int _length) { return new Array_VectorN_3__0(_length); }
+	EMSCRIPTEN_KEEPALIVE void _delete_Array_VectorN_3__0_Array_VectorN_3__076(Array_VectorN_3__0* _this) { delete _this; }
+	EMSCRIPTEN_KEEPALIVE VectorN<3>* _Array_VectorN_3__0_get77(Array_VectorN_3__0* _this, int index) { return &_this->get(index); }
+	EMSCRIPTEN_KEEPALIVE void _Array_VectorN_3__0_set78(Array_VectorN_3__0* _this, int index, VectorN<3>* value) { _this->set(index, *value); }
+	EMSCRIPTEN_KEEPALIVE int _get_Array_int_0_length79(Array_int_0* _this) { return _this->length; }
+	EMSCRIPTEN_KEEPALIVE Array_int_0* _Array_int_0_Array_int_080(int _length) { return new Array_int_0(_length); }
+	EMSCRIPTEN_KEEPALIVE void _delete_Array_int_0_Array_int_080(Array_int_0* _this) { delete _this; }
+	EMSCRIPTEN_KEEPALIVE int _Array_int_0_get81(Array_int_0* _this, int index) { return _this->get(index); }
+	EMSCRIPTEN_KEEPALIVE void _Array_int_0_set82(Array_int_0* _this, int index, int value) { _this->set(index, value); }
+	EMSCRIPTEN_KEEPALIVE int _get_Array_ConstraintDescriptor_1_length83(Array_ConstraintDescriptor_1* _this) { return _this->length; }
+	EMSCRIPTEN_KEEPALIVE Array_ConstraintDescriptor_1* _Array_ConstraintDescriptor_1_Array_ConstraintDescriptor_184(int _length) { return new Array_ConstraintDescriptor_1(_length); }
+	EMSCRIPTEN_KEEPALIVE void _delete_Array_ConstraintDescriptor_1_Array_ConstraintDescriptor_184(Array_ConstraintDescriptor_1* _this) { delete _this; }
+	EMSCRIPTEN_KEEPALIVE ConstraintDescriptor* _Array_ConstraintDescriptor_1_get85(Array_ConstraintDescriptor_1* _this, int index) { return _this->get(index); }
+	EMSCRIPTEN_KEEPALIVE void _Array_ConstraintDescriptor_1_set86(Array_ConstraintDescriptor_1* _this, int index, ConstraintDescriptor* value) { _this->set(index, value); }
+	EMSCRIPTEN_KEEPALIVE int _get_Array_RigidBody_1_length87(Array_RigidBody_1* _this) { return _this->length; }
+	EMSCRIPTEN_KEEPALIVE Array_RigidBody_1* _Array_RigidBody_1_Array_RigidBody_188(int _length) { return new Array_RigidBody_1(_length); }
+	EMSCRIPTEN_KEEPALIVE void _delete_Array_RigidBody_1_Array_RigidBody_188(Array_RigidBody_1* _this) { delete _this; }
+	EMSCRIPTEN_KEEPALIVE RigidBody* _Array_RigidBody_1_get89(Array_RigidBody_1* _this, int index) { return _this->get(index); }
+	EMSCRIPTEN_KEEPALIVE void _Array_RigidBody_1_set90(Array_RigidBody_1* _this, int index, RigidBody* value) { _this->set(index, value); }
 }
