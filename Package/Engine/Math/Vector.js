@@ -101,19 +101,7 @@ class Vector extends Operable {
 		return this.minus(v.times(this.dot(v)));
 	}
 	bestFit(v) {
-		let d1 = this.dot(v);
-		let d2 = this.inverse.dot(v);
-		if (d2 < d1) return this.inverse;
-		else return this.get();
-	}
-	toString() {
-		return `\u27e8 ${this.values.join(", ")} \u27e9`;
-	}
-	toFixed(digits) {
-		return this.map(v => v.toFixed(digits)).toString();
-	}
-	toMaxed(digits) {
-		return this.map(v => v.toMaxed(digits)).toString();
+		return this.dot(v) < 0 ? this.inverse : this.get();
 	}
 	proxy(handler, outKeys) {
 		const mod = this.constructor.modValues;
@@ -181,6 +169,25 @@ class Vector extends Operable {
 	}
 }
 
+{ // toString
+	const methods = ["toString", "toFixed", "toMaxed"];
+	for (let i = 0; i < methods.length; i++) {
+		const method = methods[i];
+		Vector.prototype[method] = function (arg) {
+			if (method === "toString") arg = undefined;
+
+			const { modValues } = this.constructor;
+
+			let result = "\u27e8 " + this[modValues[0]][method](arg);
+			for (let j = 1; j < modValues.length; j++)
+				result += ", " + this[modValues[j]][method](arg);
+			result += " \u27e9";
+
+			return result;
+		}
+	}
+}
+
 {
 	const proto = (key, value) => Object.defineProperty(Number.prototype, key, { value, enumerable: false });
 
@@ -226,7 +233,8 @@ class Vector extends Operable {
 	proto("equals", function (n) { return this === n || Math.abs(this - n) < MathObject.EPSILON; });
 	proto("total", function () { return this; });
 	proto("toMaxed", function (digits) {
-		return String(Math.round(this * 10 ** digits) / 10 ** digits);
+		const factor = 10 ** digits;
+		return String(Math.round(this * factor) / factor);
 	});
 
 	Number.zero = 0;
