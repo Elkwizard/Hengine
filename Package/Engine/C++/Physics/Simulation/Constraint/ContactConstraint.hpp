@@ -9,6 +9,7 @@
 class ContactConstraint : public Constraint {
 	private:
 		constexpr static int BLOCK = 2;
+		constexpr static double IMPULSE_EPSILON = 1e-9;
 
 		std::vector<Interaction> interactions;
 		struct MatrixBlock {
@@ -48,7 +49,7 @@ class ContactConstraint : public Constraint {
 			VectorN<N> impulses = impulseMatrix * delta;
 
 			for (int i = 0; i < N; i++)
-				if (impulses[i] < EPSILON) return false;
+				if (impulses[i] < IMPULSE_EPSILON) return false;
 
 			applyImpulses<&RigidBody::velocity, N>(&interactions[index], impulses);
 
