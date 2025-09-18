@@ -213,9 +213,10 @@ class Mesh extends Renderable {
 	}
 	/**
 	 * Creates a Polyhedron that has the same shape as the mesh, using the `vertexPosition` attribute.
+	 * @param MeshChunk[] chunks? | The chunks to create the polyhedron from. This must be a subset of the `.chunks` property. Default is all chunks
 	 * @return Polyhedron
 	 */
-	toPolyhedron() {
+	toPolyhedron(chunks = this.chunks) {
 		const { data, stride } = this;
 		const vertices = [];
 		for (let i = this.offsets.get("vertexPosition"); i < data.length; i += stride)
@@ -225,7 +226,7 @@ class Mesh extends Renderable {
 				data[i + 2]
 			));
 		
-		const indices = this.chunks.flatMap(chunk => [...chunk.indices]);
+		const indices = chunks.flatMap(chunk => [...chunk.indices]);
 		return new Polyhedron(vertices, indices);
 	}
 	/**
