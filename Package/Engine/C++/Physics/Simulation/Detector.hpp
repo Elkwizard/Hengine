@@ -144,7 +144,7 @@ API class Detector {
 				if (a.getMaxExtent(axis) < b.getMinExtent(axis))
 					return { };
 			}
-
+			
 			Vector toB = b.position - a.position;
 
 			double minOverlap = INFINITY;
@@ -188,7 +188,6 @@ API class Detector {
 				clipVertex(contacts, b.vertices[i], a, collisionPlaneA);
 			
 			if (contacts.empty()) {
-				
 #if IS_3D
 				if (contacts.empty()) {
 					for (int i = 0; i < a.getEdgeCount() && contacts.empty(); i++)

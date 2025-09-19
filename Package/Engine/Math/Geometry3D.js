@@ -17,10 +17,11 @@ class Geometry3D {
 	static convexHull(sourcePoints) {
 		sourcePoints = Geometry.unique(sourcePoints);
 		const { random } = this;
+		const jitter = 1e-5;
 		const points = sourcePoints.map(p => p.plus(new Vector3(
-			random.range(Geometry.EPSILON * 4),
-			random.range(Geometry.EPSILON * 4),
-			random.range(Geometry.EPSILON * 4)
+			random.range(jitter),
+			random.range(jitter),
+			random.range(jitter)
 		)));
 
 		const makeEdgeKey = (a, b) => `${a},${b}`;

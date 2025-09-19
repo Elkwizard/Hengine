@@ -151,6 +151,10 @@ API_TEMPLATE class VectorN {
 			return VectorN(*this).normalize();
 		}
 
+		bool unit() const {
+			return equals(sqrMag(), 1);
+		}
+
 		VectorN projectOnto(const VectorN& axis) const {
 			return axis * dot(*this, axis) / axis.sqrMag();
 		}

@@ -164,13 +164,12 @@ API class Polytope : public Shape {
 				return indexMapping[vertices[index]];
 			};
 
-			for (const IndexFace& face : faces) {
+			for (const IndexFace& face : faces)
 				uniqueFaces.push_back({
 					mapIndex(face[0]),
 					mapIndex(face[1]),
 					mapIndex(face[2])
 				});
-			}
 
 			vertices = uniqueVertices;
 			faces = uniqueFaces;
@@ -184,7 +183,7 @@ API class Polytope : public Shape {
 				Plane plane { normal, dot(normal, vertices[faces[i][0]]) };
 				if (!discoveredPlanes.count(plane)) {
 					discoveredPlanes.insert(plane);
-					planes.push_back(plane);
+					if (normal.unit()) planes.push_back(plane);
 				}
 			}
 
@@ -214,7 +213,7 @@ API class Polytope : public Shape {
 				Vector edgeAxis = (b - a).idemparallel();
 				if (!discoveredEdgeAxes.count(edgeAxis)) {
 					discoveredEdgeAxes.insert(edgeAxis);
-					edgeAxes.push_back(edgeAxis);
+					if (edgeAxis.unit()) edgeAxes.push_back(edgeAxis);
 				}
 				edges.push_back({ edge.first, edge.second });
 			}

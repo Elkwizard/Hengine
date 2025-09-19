@@ -398,7 +398,7 @@ class Mesh extends Renderable {
 			const defaultUVs = [
 				new Vector2(0, 0),
 				new Vector2(1, 0),
-				new Vector2(0, Math.sqrt(3) / 2)
+				new Vector2(0, 1)
 			];
 
 			const { vertices, indices } = polyhedron;
