@@ -171,7 +171,7 @@ class Scene {
 
 		//physics
 		this.script("beforePhysics");
-		this.camera.drawInWorldSpace(() => this.physics.run());
+		this.camera.drawInWorldSpace(() => this.physics.run(), this.engine.renderer);
 		this.script("afterPhysics");
 
 		//draw

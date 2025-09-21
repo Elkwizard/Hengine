@@ -1742,6 +1742,18 @@ Artist3D.LightRenderer = class LightRenderer {
 			direction: Matrix3.normal(transform).times(direction)
 		});
 	}
+	/**
+	 * Applies a vaguely tasteful combination of directional and ambient lighting using the current color.
+	 * Useful for rapid debugging of 3D scenes. 
+	 * @param Number ambient? | The proportion of light which should be ambient. Default is 0.4 
+	 */
+	default(ambient = 0.4) {
+		const { color } = this;
+		this.setup(color.times(1 - ambient));
+		this.directional(new Vector3(-0.3, 1, 0.2).normalized);
+		this.setup(color.times(ambient));
+		this.ambient();
+	}
 };
 
 /**
@@ -1949,6 +1961,19 @@ Artist3D.DrawRenderer = class DrawRenderer extends Artist3D.PathRenderer {
 		
 		const mesh = specificCache.get(hex);
 		this.renderer.mesh(mesh).default();
+	}
+	/**
+	 * Renders a Shape3D appropriately based on its type.
+	 * @param Rect/Prism/Polyhedron shape | The Shape3D to draw
+	 */
+	infer(shape) {
+		if (shape instanceof Prism) {
+			this.prism(shape);
+		} else if (shape instanceof Polyhedron) {
+			this.shape(shape);
+		} else if (shape instanceof Sphere) {
+			this.sphere(shape);
+		}
 	}
 };
 

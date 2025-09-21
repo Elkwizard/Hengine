@@ -667,9 +667,13 @@ class Vector3 extends Vector {
 	 * @return Vector3 
 	 */
 	angleTo(target) {
-		const axis = this.cross(target);
-		axis.mag = Math.asin(axis.mag / (this.mag * target.mag));
-		return axis;
+		const cross = this.cross(target);
+		const dot = this.dot(target);
+		if (cross.sqrMag.equals(0))
+			return dot < 0 ? this.normal.normalize().mul(Math.PI) : Vector3.zero;
+		
+		cross.mag = Math.acos(dot / (this.mag * target.mag));
+		return cross;
 	}
 	toPhysicsVector(result = new Physics3.VectorN_3_()) {
 		result.setAll(this.x, this.y, this.z);

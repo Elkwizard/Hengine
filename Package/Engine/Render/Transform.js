@@ -173,6 +173,12 @@ class Transform {
 		const rotation = a.rotation + b.rotation;
 		return new Transform(position, rotation);
 	}
+	/**
+	 * @name static fromRigidMatrix
+	 * Returns a transform which represents the effect of a given homogenous rigid transformation matrix.
+	 * @param Matrix rigidMatrix | A homogenous matrix representing a proper rigid (distance preserving, non-reflective) transformation
+	 * @return Transform
+	 */
 }
 
 /**
@@ -232,6 +238,9 @@ class Transform2D extends Transform {
 		artist();
 		if (angle) renderer.rotate(angle);
 	}
+	static fromRigidMatrix(matrix) {
+		return new Transform2D(matrix.times(Vector2.zero), matrix.column(0).angleXY);
+	}
 }
 D2.Transform = Transform2D;
 
@@ -253,6 +262,13 @@ class Transform3D extends Transform {
 	constructor(position, rotation = Vector3.zero) {
 		super(position, rotation);
 	}
+	/**
+	 * Rotates the transform by a specific amount.
+	 * @param Vector3 angle | The rotation to apply, in axis-angle form
+	 */
+	rotate(angle) {
+		this.rotation = Quaternion.fromRotation(angle).times(Quaternion.fromRotation(this.rotation)).angle;
+	}
 	drawInLocalSpace(artist, renderer) {
 		renderer.drawThrough(this.matrix, artist, false);
 	}
@@ -265,6 +281,16 @@ class Transform3D extends Transform {
 		if (angle) renderer.rotate(angle.inverse);
 		artist();
 		renderer.restore();
+	}
+	static fromRigidMatrix(matrix) {
+		const { right, forward, zero } = Vector3;
+		const position = matrix.times(zero);
+		const globalRight = matrix.times(right).minus(position);
+		const globalForward = matrix.times(forward).minus(position);
+		const firstAngle = right.angleTo(globalRight);
+		const secondAngle = forward.rotated(firstAngle).angleTo(globalForward);
+		const rotation = Vector3.composeRotations([firstAngle, secondAngle]);
+		return new Transform3D(position, rotation);
 	}
 }
 D3.Transform = Transform3D;

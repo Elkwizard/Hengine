@@ -27,7 +27,9 @@ class Line3D extends Shape3D {
 		super();
 		this.a = a.get();
 		this.b = b.get();
-		this.volume = 0;
+	}
+	get volume() {
+		return 0;
 	}
 	getBoundingBox() {
 		return Prism.bound([this.a, this.b]);
@@ -123,6 +125,9 @@ class Triangle extends Shape3D {
 		const { mag } = this.normal;
 		this.normal.div(mag);
 		this.area = 0.5 * Math.abs(mag);
+	}
+	get volume() {
+		return 0;
 	}
 	get middle() {
 		return this.a.plus(this.b).add(this.c).div(3);
@@ -454,7 +459,7 @@ class Polyhedron extends Shape3D {
 		const faceToEdges = new Map();
 		const addEdge = (a, b, faceIndex) => {
 			if (b < a) {
-				let temp = b;
+				const temp = b;
 				b = a;
 				a = temp;
 			}
@@ -1161,18 +1166,15 @@ class Frustum extends Polyhedron {
 		return result;
 	}
 }
-Frustum.ndcPrism = new Prism(
-	new Vector3(-1, -1, -1),
-	new Vector3(1, 1, 1)
-);
+Frustum.ndcPrism = Prism.fromDimensions(2, 2, 2);
 Frustum.ndcPlanes = [
-	new Plane(Vector3.right, 1),
-	new Plane(Vector3.left, 1),
-	new Plane(Vector3.down, 1),
-	new Plane(Vector3.up, 1),
-	new Plane(Vector3.forward, 1),
-	new Plane(Vector3.backward, 1)
-];
+	Vector3.right,
+	Vector3.left,
+	Vector3.down,
+	Vector3.up,
+	Vector3.forward,
+	Vector3.backward
+].map(normal => new Plane(normal, 1));
 
 /**
  * Represents a 3D sphere, the collection of points within a given distance of a center.
