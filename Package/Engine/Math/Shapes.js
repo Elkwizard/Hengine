@@ -746,6 +746,32 @@ class Rect extends Polygon {
 			this.yRange.clip(rect.yRange)
 		);
 	}
+	/**
+	 * Given a rectangle in the same coordinate space as the caller, returns a representation of it a re-scaled and translated space where (0, 0) is the upper left corner of the caller, and (1, 1) is the lower right.
+	 * This method is the inverse of `.fromUV()`.
+	 * @param Rect rect | A rectangle in the same coordinate space as the caller
+	 * @return Rect
+	 */
+	toUV(rect) {
+		const { min, max } = this;
+		return new Rect(
+			Vector2.remap(rect.min, min, max, 0, 1),
+			Vector2.remap(rect.max, min, max, 0, 1)
+		)
+	}
+	/**
+	 * Given a rectangle in the normalized coordinate space of the caller (where (0, 0) is the upper left corner and (1, 1) is the lower right), produces a representation of it in the same coordinate space as the caller. 
+	 * This method is the inverse of `.toUV()`.
+	 * @param Rect uv | A rectangle in the normalized coordinate space of the caller
+	 * @return Rect
+	 */
+	fromUV(uv) {
+		const { min, max } = this;
+		return Rect.fromMinMax(
+			Vector2.remap(uv.min, 0, 1, min, max),
+			Vector2.remap(uv.max, 0, 1, min, max)
+		);
+	}
 	getBoundingBox() {
 		return this.get();
 	}

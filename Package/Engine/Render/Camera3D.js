@@ -1,18 +1,27 @@
 /**
  * Represents a viewpoint on a Camera3D, and handles the projection (but not positioning) of the camera.
  * This class should not be constructed, and should instead be accessed by the `.lenses` property of a Camera3D.
+ * @prop<readonly> Camera3D camera | The camera which the lens is attached to
  * @prop<immutable> Matrix4 pcMatrix | The product of the lens' projection matrix and the camera. This only updates when `.cacheScreen()` is called
  * @prop<immutable> Frustum screen | The World-Space frustum of the lens. This only updates when `.cacheScreen()` is called
+ * @prop<immutable> LensAlignment alignment | The area of the screen rendered to by the lens
+ * @prop<immutable> Rect uvRegion | The region of the screen that the lens renders to, in normalized UV coordinates (0-1 on both axes)
  */
 class Lens {
-	constructor(camera, getViewport) {
+	/**
+	 * Creates a new lens for a given Camera3D.
+	 * This does not automatically attach the lens to the camera.
+	 * @param Camera3D camera | The camera to attach the lens to
+	 * @param Rect uvRegion | The region of the screen that the lens renders to
+	 */
+	constructor(camera, uvRegion = new Rect(0, 0, 1, 1)) {
 		this.camera = camera;
-		this.getViewport = getViewport;
+		this.uvRegion = uvRegion;
 		this.perspective(Math.PI / 2, 0.1, 500);
 		this.cacheScreen();
 	}
 	get viewport() {
-		return this.getViewport();
+		return this.camera.viewport.fromUV(this.uvRegion);
 	}
 	/**
 	 * Returns the World-Space frustum of the lens, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the lens and camera. 
@@ -68,7 +77,7 @@ class Lens {
  * @prop<immutable> Vector3 right | The local right direction of the camera, in the XZ World-Space plane
  * @prop<immutable> Vector3 up | The local up direction of the camera, in World-Space
  * @prop<immutable> Frustum screen | A small World-Space Frustum containing the frusta of all the camera's lenses. This only updates when cacheScreen() is called
- * @prop<immutable> Lens[] lenses | A list of the lenses of the camera, defining how and what objects are projected to different parts of the screen
+ * @prop Lens[] lenses | A list of the lenses of the camera, defining how and what objects are projected to different parts of the screen
  */
 class Camera3D extends Matrix4 {
 	constructor(getViewport) {
@@ -92,6 +101,8 @@ class Camera3D extends Matrix4 {
 		this.updateMatrix();
 		this.perspective(Math.PI / 2, 0.1, 500);
 		this.cacheScreen();
+
+		this.lenses = [new Lens(this)];
 	}
 	/**
 	 * Sets the current pose of the camera to a given Transform3D, aligning local X, Y, and Z to their corresponding Camera-Space axes.
