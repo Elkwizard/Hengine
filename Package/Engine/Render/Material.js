@@ -196,7 +196,7 @@ SimpleMaterial.LIGHTING = `
 		vec3 specular = vec3(0);
 		vec3 ambient = vec3(0);
 		
-		vec3 view = normalize(position - camera.position);
+		vec3 view = normalize(position - lens.camera.position);
 		vec3 refl = reflect(view, normal);
 
 		for (int i = 0; i < lightCount; i++) {

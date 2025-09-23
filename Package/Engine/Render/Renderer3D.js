@@ -11,6 +11,10 @@ class StackAllocator {
 	pop() {
 		this.pointer = this.stack.pop();
 	}
+	next() {
+		this.pop();
+		this.push();
+	}
 	alloc() {
 		return this.objects[this.pointer++] ??= new this.Type();
 	}
@@ -62,6 +66,7 @@ class Artist3D extends Artist {
 		this.vector3Pool = new StackAllocator(Vector3);
 		this.matrix4Pool = new StackAllocator(Matrix4);
 		this.matrix4Pool.push();
+		this.vector3Pool.push();
 		this.postProcess = {
 			before: new Artist3D.CustomEffects(this, true),
 			bloom: new Artist3D.Bloom(this, true),
@@ -526,13 +531,14 @@ class Artist3D extends Artist {
 				yRange.expand(padding);
 				zRange.expand(padding);
 
-				camera.projection = Matrix4.orthographic(Prism.fromRanges(
+				camera.lens.projection = Matrix4.orthographic(Prism.fromRanges(
 					xRange, yRange, zRange
 				));
 				if (!camera.cacheScreen()) continue;
 
 				const cascade = map.cascades[j];
 				cascade.camera = camera;
+				cascade.lens = camera.lens;
 				cascade.depthBias = Artist3D.SHADOW_BIAS / zRange.length;
 				cascade.pixelSize = Math.SQRT2 * Math.hypot(xRange.length, yRange.length) / resolution;
 				cascade.zRange = zRange.length;
@@ -610,9 +616,8 @@ class Artist3D extends Artist {
 
 		return { visibilities, visibilityCounts };
 	}
-	renderQueues(camera, meshQueue, lightQueue) {
+	beforeRender(camera, meshQueue, lightQueue) {
 		const { gl } = this;
-		this.vector3Pool.push();
 
 		const lights = lightQueue.slice(0, Artist3D.MAX_LIGHTS);
 
@@ -633,19 +638,23 @@ class Artist3D extends Artist {
 		// shadow pass
 		this.renderShadows(meshes, shadowLights, visibilities);
 
+		return { meshes, lights, visibilities, shadowCascadeDepths };
+	}
+	renderMeshes(lens, { meshes, lights, visibilities, shadowCascadeDepths }) {
+		const { gl } = this;
+
 		// main render pass
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
 		gl.enable(gl.DEPTH_TEST);
 
-		this.setViewport(camera);
-		this.pass(meshes, visibilities.get(camera), false, chunk => {
+		this.setViewport(lens);
+		const visibility = visibilities.get(lens.camera);
+		this.pass(meshes, visibilities.get(lens.camera), false, chunk => {
 			const program = this.getShaderProgram(chunk.material);
 			if (!program.inUse) {
 				program.use();
 				program.setUniforms({
-					camera: camera,
-					lights: lightQueue,
-					lightCount: lightQueue.length,
+					lens, lights, lightCount: lights.length,
 					time: intervals.frameCount,
 					shadowTextures: this.shadowMaps.map(map => map.texture),
 					shadowInfo: this.shadowMaps.flatMap(map => map.cascades),
@@ -656,16 +665,14 @@ class Artist3D extends Artist {
 			return program;
 		});
 
-		this.vector3Pool.pop();
-
 		gl.useProgram(null);
 	}
 	maximizeViewport() {
 		this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
 	}
-	getCameraViewport(camera) {
+	getLensViewport(lens) {
 		const { pixelRatio } = this.imageType;
-		const { x, y, width, height } = camera.viewport;
+		const { x, y, width, height } = lens.viewport;
 		return new Rect(
 			Math.floor(x * pixelRatio),
 			Math.floor(y * pixelRatio),
@@ -673,8 +680,8 @@ class Artist3D extends Artist {
 			Math.ceil(height * pixelRatio)
 		);
 	}
-	setViewport(camera) {
-		GLUtils.setViewport(this.gl, this.getCameraViewport(camera));
+	setViewport(lens) {
+		GLUtils.setViewport(this.gl, this.getLensViewport(lens));
 	}
 	getUVBox(rect) {
 		const {
@@ -707,14 +714,14 @@ class Artist3D extends Artist {
 		this.drawQuad(this.overlayShader, { overlay });
 		gl.disable(gl.BLEND);
 	}
-	afterRendering(camera) {
+	afterRender(lens) {
 		const { gl } = this;
 		
 		// copy multisample framebuffer into post-processing buffers
 		gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.msFramebuffer);
 		gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.resultBuffer.framebuffer);
 
-		const view = this.getCameraViewport(camera);
+		const view = this.getLensViewport(lens);
 		const { min, max } = view;
 		gl.blitFramebuffer(
 			min.x, min.y, max.x, max.y,
@@ -727,7 +734,7 @@ class Artist3D extends Artist {
 		for (const key in this.postProcess) {
 			const effect = this.postProcess[key];
 			if (effect.active)
-				outputBuffer = effect.draw(outputBuffer, camera, view);
+				outputBuffer = effect.draw(outputBuffer, lens, view);
 		}
 
 		// composite
@@ -740,23 +747,29 @@ class Artist3D extends Artist {
 		const lightQueue = this.lightObj.lights;
 		const meshQueue = this.meshObj.meshes;
 
+		let renderInfo = null;
 		if (meshQueue.length)
-			this.renderQueues(camera, meshQueue, lightQueue);
+			renderInfo = this.beforeRender(camera, meshQueue, lightQueue);
+		
+		for (let i = 0; i < camera.lenses.length; i++) {
+			const lens = camera.lenses[i];
+			if (renderInfo) this.renderMeshes(lens, renderInfo);
+			this.afterRender(lens);
+		}
 
 		this.emptyQueues();
-
-		this.afterRendering(camera);
 	}
 	emptyQueues() {
 		this.meshObj.clear();
 		this.lightObj.clear();
 		this.strokeObj.clear();
-		this.matrix4Pool.pop();
-		this.matrix4Pool.push();
+		this.vector3Pool.next();
+		this.matrix4Pool.next();
 	}
 	fill({ x, y, z, w }) {
 		this.emptyQueues();
 
+		this.maximizeViewport();
 		const { gl } = this;
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
 		gl.depthMask(true);
@@ -773,7 +786,7 @@ class Artist3D extends Artist {
 			layout (location = 2) in vec2 vertexUV;
 			layout (location = 3) in mat4x3 instanceTransform;
 
-			${Artist3D.CAMERA}
+			${Artist3D.LENS}
 
 			uniform mat4 transform;
 
@@ -793,7 +806,7 @@ class Artist3D extends Artist {
 				vec3 objectPosition = shader();
 				position = objectPosition;
 				uv = vertexUV;
-				gl_Position = camera.pcMatrix * vec4(objectPosition, 1);
+				gl_Position = lens.pcMatrix * vec4(objectPosition, 1);
 				gl_Position.y *= -1.0;
 			}
 		`;
@@ -806,7 +819,7 @@ class Artist3D extends Artist {
 			vec3 normal;
 			
 			uniform float time;
-			${Artist3D.CAMERA}
+			${Artist3D.LENS}
 			${Artist3D.LIGHTS}
 
 			${glsl}
@@ -841,18 +854,22 @@ class Artist3D extends Artist {
 	static INSTANCE_THRESHOLD = 10;
 	static LightTypes = Object.fromEntries(["AMBIENT", "DIRECTIONAL", "POINT"].map((n, i) => [n, i]));
 }
-Artist3D.CAMERA = `
+Artist3D.LENS = `
 	struct Camera {
 		vec3 position;
 		vec3 direction;
 		vec3 right;
 		vec3 up;
-		mat4 pcMatrix;
-		mat4 projection;
 		mat4 inverse;
 	};
 
-	uniform Camera camera;
+	struct Lens {
+		mat4 projection;
+		mat4 pcMatrix;
+		Camera camera;	
+	};
+
+	uniform Lens lens;
 `;
 Artist3D.LIGHTS = `
 	struct Light {
@@ -888,12 +905,12 @@ Artist3D.LIGHTS = `
 		return light.direction;
 	}
 
-	struct ShadowCamera {
+	struct ShadowLens {
 		mat4 projection;
 		mat4 pcMatrix;
 	};
 	struct ShadowInfo {
-		ShadowCamera camera;	
+		ShadowLens lens;	
 		float depthBias;
 		float pixelSize;
 		float zRange;
@@ -907,7 +924,7 @@ Artist3D.LIGHTS = `
 	}
 
 	int _getCascadeRegion(vec3 position) {
-		float depth = dot(position, camera.direction);
+		float depth = dot(position, lens.camera.direction);
 		for (int i = 0; i < shadowCascadeDepths.length(); i++) {
 			if (depth < shadowCascadeDepths[i]) {
 				return i;
@@ -923,7 +940,7 @@ Artist3D.LIGHTS = `
 		if (cascadeRegion == -1) return 0.0;
 
 		ShadowInfo info = shadowInfo[light.shadowIndex * SHADOW_CASCADE + cascadeRegion];
-		ShadowCamera camera = info.camera;
+		ShadowLens lens = info.lens;
 
 		// normal bias
 		vec3 n = implicitNormal(position);
@@ -931,7 +948,7 @@ Artist3D.LIGHTS = `
 		float normalBias = info.pixelSize * 0.5 * sqrt(1.0 - ldn * ldn);
 		position += n * normalBias;
 
-		vec4 proj = camera.pcMatrix * vec4(position, 1);
+		vec4 proj = lens.pcMatrix * vec4(position, 1);
 		vec3 frag = proj.xyz / proj.w;
 		vec2 uv = vec2(
 			0.5 + frag.x * 0.5,
@@ -1019,7 +1036,7 @@ Artist3D.PostProcess = class {
 		this.active = active;
 	}
 	compile() { }
-	draw(inputBuffer, camera, view) { }
+	draw(inputBuffer, lens, view) { }
 };
 
 /**
@@ -1187,7 +1204,7 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 		const hemisphere = Array.dim(Artist3D.SSAO.MAX_SAMPLES).map(() => rng.hemisphere(normal, rng.random() ** 2));
 		this.occlusionShader.setUniform("hemisphere", hemisphere);
 	}
-	draw(inputBuffer, camera, view) {
+	draw(inputBuffer, lens, view) {
 		const { gl } = this.artist;
 
 		gl.enable(gl.DEPTH_TEST);
@@ -1196,12 +1213,12 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 
 		const uvBox = this.artist.getUVBox(view);
 
-		const { projection } = camera;
+		const { projection } = lens;
 		const invProjection = projection.inverse;
 
 		const { depth } = inputBuffer;
 		
-		{ // compute occlusion	
+		{ // compute occlusion
 			this.pingPong.bind();
 			this.artist.drawQuad(this.occlusionShader, {
 				depthTexture: depth,
@@ -1487,7 +1504,7 @@ Artist3D.CustomEffects = class extends Artist3D.PostProcess {
 	 * 	<tr><td>`vec2 uv`</td><td>The UV coordinates of the current pixel in screen space</td></tr>
 	 * 	<tr><td>`sampler2D colorTexture`</td><td>The current color content of the screen</td></tr>
 	 * 	<tr><td>`sampler2D depthTexture`</td><td>The current depth content of the screen</td></tr>
-	 * 	<tr><td>`Camera camera`</td><td>The camera being used for rendering, with the properties of a JS Camera object</td></tr>
+	 * 	<tr><td>`Lens lens`</td><td>The lens being used for rendering, with the properties of a JS Lens object, including `.camera`</td></tr>
 	 * </table> 
 	 * @param String name | The name of the new effect
 	 * @param String glsl | The source code for the full-screen fragment shader effect. This must define a `vec4 shader()` entry-point function
@@ -1517,7 +1534,7 @@ Artist3D.CustomEffects = class extends Artist3D.PostProcess {
 			effect.compile();
 		this.pingPong = this.artist.createPingPong({ hdr: true, depth: true });
 	}
-	draw(inputBuffer, camera, view) {
+	draw(inputBuffer, lens, view) {
 		if (!this.effects.size) return inputBuffer;
 
 		const { gl } = this.artist;
@@ -1542,7 +1559,7 @@ Artist3D.CustomEffects = class extends Artist3D.PostProcess {
 
 			this.artist.drawQuad(effect.program, {
 				...effect.uniforms,
-				uvBox, camera,
+				uvBox, lens,
 				colorTexture: source.color,
 				depthTexture: source.depth
 			});
@@ -1556,7 +1573,7 @@ Artist3D.CustomEffects = class extends Artist3D.PostProcess {
 	static FRAGMENT_PREFIX = `
 		uniform sampler2D colorTexture;
 		uniform sampler2D depthTexture;
-		${Artist3D.CAMERA}
+		${Artist3D.LENS}
 	`.replaceAll(/\s+/g, " ").trim();
 };
 

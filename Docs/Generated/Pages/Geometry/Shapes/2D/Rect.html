@@ -218,9 +218,65 @@
 			
 		</div>
 	
+		<div class="function-wrapper" id="Rect.prototype.toUV()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L755" target="_blank" class="function-name source-link">toUV</a>(<span class="param">rect</span>)<span class="type">Rect</span>
+			</div>
+			<div class="function desc">
+				Given a rectangle in the same coordinate space as the caller, returns a representation of it a re-scaled and translated space where (0, 0) is the upper left corner of the caller, and (1, 1) is the lower right.
+This method is the inverse of <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">fromUV</span><span class="highlight-SYMBOL">()</span></code>.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Rect.prototype.toUV():rect">
+							<div class="param-name">
+								<span class="param">rect</span>
+								<span class="type">Rect</span>
+							</div>
+							<div class="param desc">
+								A rectangle in the same coordinate space as the caller
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Rect.prototype.fromUV()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L768" target="_blank" class="function-name source-link">fromUV</a>(<span class="param">uv</span>)<span class="type">Rect</span>
+			</div>
+			<div class="function desc">
+				Given a rectangle in the normalized coordinate space of the caller (where (0, 0) is the upper left corner and (1, 1) is the lower right), produces a representation of it in the same coordinate space as the caller.
+This method is the inverse of <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">toUV</span><span class="highlight-SYMBOL">()</span></code>.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Rect.prototype.fromUV():uv">
+							<div class="param-name">
+								<span class="param">uv</span>
+								<span class="type">Rect</span>
+							</div>
+							<div class="param desc">
+								A rectangle in the normalized coordinate space of the caller
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Rect.fromMinMax()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L784" target="_blank" class="function-name source-link">Rect.fromMinMax</a>(<span class="param">min</span>, <span class="param">max</span>)<span class="type">Rect</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L810" target="_blank" class="function-name source-link">Rect.fromMinMax</a>(<span class="param">min</span>, <span class="param">max</span>)<span class="type">Rect</span>
 			</div>
 			<div class="function desc">
 				Returns a new rectangle with the specified minimum and maximum coordinates.
@@ -257,7 +313,7 @@
 	
 		<div class="function-wrapper" id="Rect.fromRanges()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L793" target="_blank" class="function-name source-link">Rect.fromRanges</a>(<span class="param">xRange</span>, <span class="param">yRange</span>)<span class="type">Rect</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L819" target="_blank" class="function-name source-link">Rect.fromRanges</a>(<span class="param">xRange</span>, <span class="param">yRange</span>)<span class="type">Rect</span>
 			</div>
 			<div class="function desc">
 				Returns a new rectangle with the specified vertical and horizontal spans.
@@ -294,7 +350,7 @@
 	
 		<div class="function-wrapper" id="Rect.fromDimensions()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L805" target="_blank" class="function-name source-link">Rect.fromDimensions</a>(<span class="param">dimensions</span><span class="aux"> | </span><span class="param">width</span>, <span class="param">height</span>)<span class="type">Rect</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L831" target="_blank" class="function-name source-link">Rect.fromDimensions</a>(<span class="param">dimensions</span><span class="aux"> | </span><span class="param">width</span>, <span class="param">height</span>)<span class="type">Rect</span>
 			</div>
 			<div class="function desc">
 				Returns a new rectangle with specified dimensions centered at the origin.
@@ -344,7 +400,7 @@
 	
 		<div class="function-wrapper" id="Rect.bound()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L814" target="_blank" class="function-name source-link">Rect.bound</a>(<span class="param">points</span>)<span class="type">Rect</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L840" target="_blank" class="function-name source-link">Rect.bound</a>(<span class="param">points</span>)<span class="type">Rect</span>
 			</div>
 			<div class="function desc">
 				Returns the smallest bounding rectangle around a collection of points.
@@ -371,7 +427,7 @@
 	
 		<div class="function-wrapper" id="Rect.composeBoundingBoxes()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L824" target="_blank" class="function-name source-link">Rect.composeBoundingBoxes</a>(<span class="param">boxes</span>)<span class="type">Rect</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes.js?#L850" target="_blank" class="function-name source-link">Rect.composeBoundingBoxes</a>(<span class="param">boxes</span>)<span class="type">Rect</span>
 			</div>
 			<div class="function desc">
 				Returns the smallest bounding rectangle around a collection of rectangles.

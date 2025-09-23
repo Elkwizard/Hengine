@@ -242,13 +242,40 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 				</div>
 			
 		</div>
+	
+		<div class="function-wrapper" id="Transform.fromRigidMatrix()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L182" target="_blank" class="function-name source-link">Transform.fromRigidMatrix</a>(<span class="param">rigidMatrix</span>)<span class="type">Transform</span>
+			</div>
+			<div class="function desc">
+				Returns a transform which represents the effect of a given homogenous rigid transformation matrix.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Transform.fromRigidMatrix():rigidMatrix">
+							<div class="param-name">
+								<span class="param">rigidMatrix</span>
+								<span class="type"><a href="../Geometry/Matrices.html#class Matrix">Matrix</a></span>
+							</div>
+							<div class="param desc">
+								A homogenous matrix representing a proper rigid (distance preserving, non-reflective) transformation
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
 	</div>
 				
 			</div>
 		
 			<div class="class-wrapper" id="class Transform2D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L184" target="_blank" class="class-name source-link">Transform2D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L190" target="_blank" class="class-name source-link">Transform2D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
 				</div>
 				<div class="class desc">
 					Represents a 2D affine transformation, composed of a translation and a rotation.
@@ -283,7 +310,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 					<div class="class-methods">
 		<div class="function-wrapper" id="Transform2D.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L193" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L199" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new 2D transform.
@@ -320,7 +347,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 	
 		<div class="function-wrapper" id="Transform2D.prototype.rotateAround()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L202" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L208" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Adds a clockwise (in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a>) rotation in-place about a specific point to the existing transformation.
@@ -360,7 +387,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 		
 			<div class="class-wrapper" id="class Transform3D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L244" target="_blank" class="class-name source-link">Transform3D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L253" target="_blank" class="class-name source-link">Transform3D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
 				</div>
 				<div class="class desc">
 					Represents a 3D affine transformation, composed of a translation and a rotation about an arbitrary axis.
@@ -395,7 +422,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 					<div class="class-methods">
 		<div class="function-wrapper" id="Transform3D.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L253" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L262" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new 3D transform.
@@ -422,6 +449,33 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 							</div>
 							<div class="param desc">
 								The angle of rotation. Default is no rotation
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Transform3D.prototype.rotate()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L269" target="_blank" class="function-name source-link">rotate</a>(<span class="param">angle</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Rotates the transform by a specific amount.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Transform3D.prototype.rotate():angle">
+							<div class="param-name">
+								<span class="param">angle</span>
+								<span class="type"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+							</div>
+							<div class="param desc">
+								The rotation to apply, in axis-angle form
 							</div>
 						</div>
 					

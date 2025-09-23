@@ -3078,6 +3078,18 @@ declare class Rect extends Polygon {
 	 */
 	clip(rect: this): this;
 	/**
+	 * Given a rectangle in the same coordinate space as the caller, returns a representation of it a re-scaled and translated space where (0, 0) is the upper left corner of the caller, and (1, 1) is the lower right.
+	 * This method is the inverse of `.fromUV()`.
+	 * @param rect - A rectangle in the same coordinate space as the caller
+	 */
+	toUV(rect: this): this;
+	/**
+	 * Given a rectangle in the normalized coordinate space of the caller (where (0, 0) is the upper left corner and (1, 1) is the lower right), produces a representation of it in the same coordinate space as the caller.
+	 * This method is the inverse of `.toUV()`.
+	 * @param uv - A rectangle in the normalized coordinate space of the caller
+	 */
+	fromUV(uv: this): this;
+	/**
 	 * Returns a new rectangle with the specified minimum and maximum coordinates.
 	 * @param min - The upper-left corner of the rectangle
 	 * @param max - The lower-right corner of the rectangle
@@ -6671,6 +6683,11 @@ declare class Transform<Matrix, Vector, Angle> {
 	 */
 	static combine(a: Transform, b: Transform): Transform;
 	/**
+	 * Returns a transform which represents the effect of a given homogenous rigid transformation matrix.
+	 * @param rigidMatrix - A homogenous matrix representing a proper rigid (distance preserving, non-reflective) transformation
+	 */
+	static fromRigidMatrix(rigidMatrix: Matrix): Transform;
+	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
 	 */
@@ -6721,6 +6738,11 @@ declare class Transform3D extends Transform<Matrix4, Vector3, Vector3> {
 	 * @param rotation - The angle of rotation. Default is no rotation
 	 */
 	constructor(position: Vector3, rotation?: Vector3);
+	/**
+	 * Rotates the transform by a specific amount.
+	 * @param angle - The rotation to apply, in axis-angle form
+	 */
+	rotate(angle: Vector3): void;
 }
 
 /**
@@ -6972,6 +6994,67 @@ declare interface GPUInterface {
 }
 
 /**
+ * Represents a viewpoint on a Camera3D, and handles the projection (but not positioning) of the camera.
+ * This class should not be constructed, and should instead be accessed by the `.lenses` property of a Camera3D.
+ */
+declare class Lens {
+	/**
+	 * The camera which the lens is attached to
+	 */
+	camera: Camera3D;
+	/**
+	 * The product of the lens' projection matrix and the camera. This only updates when `.cacheScreen()` is called
+	 */
+	pcMatrix: Matrix4;
+	/**
+	 * The World-Space frustum of the lens. This only updates when `.cacheScreen()` is called
+	 */
+	screen: Frustum;
+	/**
+	 * The area of the screen rendered to by the lens
+	 */
+	alignment: LensAlignment;
+	/**
+	 * The region of the screen that the lens renders to, in normalized UV coordinates (0-1 on both axes)
+	 */
+	uvRegion: Rect;
+	/**
+	 * Creates a new lens for a given Camera3D.
+	 * This does not automatically attach the lens to the camera.
+	 * @param camera - The camera to attach the lens to
+	 * @param uvRegion - The region of the screen that the lens renders to
+	 */
+	constructor(camera: Camera3D, uvRegion: Rect);
+	/**
+	 * Returns the World-Space frustum of the lens, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the lens and camera.
+	 */
+	cacheScreen(): Frustum;
+	/**
+	 * Configures the lens to use a custom projection.
+	 * @param projection - The homogenous projection matrix to use
+	 */
+	set projection(projection: Matrix4);
+	/**
+	 * Returns the projection matrix of the lens.
+	 * This may vary as the dimensions of the rendering surface change.
+	 */
+	get projection(): Matrix4;
+	/**
+	 * Configures the lens to use a perspective projection.
+	 * @param fov - The field of view of the lens in radians
+	 * @param zNear - The location of the near clipping plane
+	 * @param zFar - The location of the far clipping plane
+	 */
+	perspective(fov: number, zNear: number, zFar: number): void;
+	/**
+	 * Configures the lens to use an orthographic projection.
+	 * @param span - The size of the x and y spans included in the projection
+	 * @param depth - The maximum depth included in the projection
+	 */
+	orthographic(span: number, depth: number): void;
+}
+
+/**
  * Represents the camera in a 3D scene.
  */
 declare class Camera3D extends Matrix4 implements Camera<Vector3> {
@@ -6979,10 +7062,6 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 * The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
 	 */
 	direction: Vector3;
-	/**
-	 * The product of the camera's projection matrix and itself. This only updates when cacheScreen() is called
-	 */
-	pcMatrix: Matrix4;
 	/**
 	 * The local right direction of the camera, in the XZ World-Space plane
 	 */
@@ -6992,32 +7071,32 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 	 */
 	up: Vector3;
 	/**
-	 * Returns the World-Space frustum of the camera, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the camera.
+	 * A small World-Space Frustum containing the frusta of all the camera's lenses. This only updates when cacheScreen() is called
 	 */
-	get screen(): Frustum;
+	screen: Frustum;
 	/**
-	 * Returns the projection matrix of the camera.
-	 * This may vary as the dimensions of the rendering surface change.
+	 * A list of the Lenses of the camera, defining how and what objects are projected to different parts of the screen. This must contain at least one Lens
 	 */
-	get projection(): Matrix4;
+	lenses: Lens[];
 	/**
-	 * Configures the camera to use a custom projection.
-	 * @param projection - The homogenous projection matrix to use
+	 * Returns the first Lens of the camera.
+	 * Equivalent to `.lenses[0]`;
 	 */
-	set projection(projection: Matrix4);
+	get lens(): Lens;
 	/**
-	 * Configures the camera to use a perspective projection.
-	 * @param fov - The field of view of the camera in radians
-	 * @param zNear - The location of the near clipping plane
-	 * @param zFar - The location of the far clipping plane
+	 * Sets the current pose of the camera to a given Transform3D, aligning local X, Y, and Z to their corresponding Camera-Space axes.
+	 * @param transform - The new pose for the camera
 	 */
-	perspective(fov: number, zNear: number, zFar: number): void;
+	set transform(transform: Transform3D);
 	/**
-	 * Configures the camera to use a orthographic projection.
-	 * @param span - The size of the x and y spans included in the projection
-	 * @param depth - The maximum depth included in the projection
+	 * Retrieves the current pose of the camera as a Transform3D.
 	 */
-	orthographic(span: number, depth: number): void;
+	get transform(): Transform3D;
+	/**
+	 * Synchronizes `.screen` to match the location and orientation of the camera and returns it.
+	 * This also calls `.cacheScreen()` on all the camera's Lenses.
+	 */
+	cacheScreen(): Frustum;
 	/**
 	 * Moves the camera by a specified amount along its direction.
 	 * @param amount - The amount to move forward (in World-Space)
@@ -7546,7 +7625,7 @@ declare namespace Artist3D {
 		 * 	<tr><td>`vec2 uv`</td><td>The UV coordinates of the current pixel in screen space</td></tr>
 		 * 	<tr><td>`sampler2D colorTexture`</td><td>The current color content of the screen</td></tr>
 		 * 	<tr><td>`sampler2D depthTexture`</td><td>The current depth content of the screen</td></tr>
-		 * 	<tr><td>`Camera camera`</td><td>The camera being used for rendering, with the properties of a JS Camera object</td></tr>
+		 * 	<tr><td>`Lens lens`</td><td>The lens being used for rendering, with the properties of a JS Lens object, including `.camera`</td></tr>
 		 * </table>
 		 * @param name - The name of the new effect
 		 * @param glsl - The source code for the full-screen fragment shader effect. This must define a `vec4 shader()` entry-point function
@@ -7584,6 +7663,12 @@ declare class LightRenderer {
 	 * @param shadow - Whether the light casts shadows. Default is true
 	 */
 	directional(direction: Vector3, shadow?: boolean): void;
+	/**
+	 * Applies a vaguely tasteful combination of directional and ambient lighting using the current color.
+	 * Useful for rapid debugging of 3D scenes.
+	 * @param ambient - The proportion of light which should be ambient. Default is 0.4
+	 */
+	default(ambient?: number): void;
 }
 
 /**
@@ -7642,6 +7727,11 @@ declare class DrawRenderer3D {
 	 * @param poly - The Polyhedron to render
 	 */
 	shape(poly: Polyhedron): void;
+	/**
+	 * Renders a Shape3D appropriately based on its type.
+	 * @param shape - The Shape3D to draw
+	 */
+	infer(shape: Rect | Prism | Polyhedron): void;
 }
 
 /**

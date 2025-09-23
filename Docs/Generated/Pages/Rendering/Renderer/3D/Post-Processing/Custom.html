@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class Artist3D.CustomEffects">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1467" target="_blank" class="class-name source-link">Artist3D.CustomEffects</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Basics.html#class Artist3D.PostProcess">Artist3D.PostProcess</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1484" target="_blank" class="class-name source-link">Artist3D.CustomEffects</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../../Rendering/Renderer/3D/Post-Processing/Basics.html#class Artist3D.PostProcess">Artist3D.PostProcess</a></span>
 				</div>
 				<div class="class desc">
 					Represents a collection of user-defined post-processing effects.
@@ -41,7 +41,7 @@ This class should not be constructed, and should instead be accessed via the <co
 					<div class="class-methods">
 		<div class="function-wrapper" id="Artist3D.CustomEffects.prototype.reorder()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1476" target="_blank" class="function-name source-link">reorder</a>(<span class="param">order</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1493" target="_blank" class="function-name source-link">reorder</a>(<span class="param">order</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Re-orders the way in which the effects are applied.
@@ -68,7 +68,7 @@ This class should not be constructed, and should instead be accessed via the <co
 	
 		<div class="function-wrapper" id="Artist3D.CustomEffects.prototype.addEffect()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1496" target="_blank" class="function-name source-link">addEffect</a>(<span class="param">name</span>, <span class="param">glsl</span>, <span class="param">uniforms?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1513" target="_blank" class="function-name source-link">addEffect</a>(<span class="param">name</span>, <span class="param">glsl</span>, <span class="param">uniforms?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Adds a new full-screen post-processing effect after the existing effects.
@@ -78,7 +78,7 @@ The shader program will be provided with several inputs, specifically the follow
 	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">vec2</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">uv</span></code></td><td>The UV coordinates of the current pixel in screen space</td></tr>
 	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">sampler2D</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">colorTexture</span></code></td><td>The current color content of the screen</td></tr>
 	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-KEYWORD">sampler2D</span><span class="highlight-CLASS"> </span><span class="highlight-IDENTIFIER">depthTexture</span></code></td><td>The current depth content of the screen</td></tr>
-	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-CLASS"><a href="../../../../Rendering/Camera/Camera.html#class Camera">Camera</a></span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">camera</span></code></td><td>The camera being used for rendering, with the properties of a JS <a href="../../../../Rendering/Camera/Camera.html#class Camera">Camera</a> object</td></tr>
+	<tr><td><code class=" highlight-BACKGROUND"><span class="highlight-CLASS">Lens</span><span class="highlight-SYMBOL"> </span><span class="highlight-IDENTIFIER">lens</span></code></td><td>The lens being used for rendering, with the properties of a JS Lens object, including <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">camera</span></code></td></tr>
 </table>
 			</div>
 			
@@ -123,7 +123,7 @@ The shader program will be provided with several inputs, specifically the follow
 	
 		<div class="function-wrapper" id="Artist3D.CustomEffects.prototype.removeEffect()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1512" target="_blank" class="function-name source-link">removeEffect</a>(<span class="param">name</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Renderer3D.js?#L1529" target="_blank" class="function-name source-link">removeEffect</a>(<span class="param">name</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Removes the effect with a given name.

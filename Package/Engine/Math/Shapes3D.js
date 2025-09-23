@@ -1165,6 +1165,38 @@ class Frustum extends Polyhedron {
 		result.vertices = this.vertices.map(vertex => vertex.get());
 		return result;
 	}
+	static fuse(frusta) {
+		if (frusta.length === 1) return frusta[0];
+		
+		const near = frusta.flatMap(frustum => frustum.vertices.slice(0, 4));
+		const far = frusta.flatMap(frustum => frustum.vertices.slice(4));
+		
+		// compute axes
+		const forward = Vector3.avg(far).minus(Vector3.avg(near)).normalized;
+		const right = near[1].minus(near[0]).normalized;
+		const down = forward.cross(right).normalized;
+		
+		// compute matrices
+		const to = new Matrix3(right, down, forward);
+		const from = to.inverse;
+
+		const localNear = near.map(point => from.times(point));
+		const localFar = far.map(point => from.times(point));
+		const nearest = Prism.bound(localNear).vertices.slice(0, 4);
+		const farthest = Prism.bound(localFar).vertices.slice(4);
+		const vertices = [...nearest, ...farthest];
+
+		const result = new Frustum(null);
+		result.vertices = vertices.map(vertex => to.times(vertex));
+		const basePlanes = Prism.fromDimensions(1, 1, 1).getFaces();
+		const planeIndices = Frustum.ndcPlanes
+			.map(ndcPlane => basePlanes
+				.findIndex(basePlane => basePlane.normal.equals(ndcPlane.normal))
+			);
+		const resultPlanes = result.getPlanes();
+		result.planes = planeIndices.map(index => resultPlanes[index]);
+		return result;
+	}
 }
 Frustum.ndcPrism = Prism.fromDimensions(2, 2, 2);
 Frustum.ndcPlanes = [

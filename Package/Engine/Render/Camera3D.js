@@ -73,11 +73,10 @@ class Lens {
  * @type class Camera3D extends Matrix4 implements Camera<Vector3>
  * Represents the camera in a 3D scene.
  * @prop Vector3 direction | The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
- * @prop<immutable> Matrix4 pcMatrix | The product of the camera's projection matrix and itself. This only updates when cacheScreen() is called
  * @prop<immutable> Vector3 right | The local right direction of the camera, in the XZ World-Space plane
  * @prop<immutable> Vector3 up | The local up direction of the camera, in World-Space
  * @prop<immutable> Frustum screen | A small World-Space Frustum containing the frusta of all the camera's lenses. This only updates when cacheScreen() is called
- * @prop Lens[] lenses | A list of the lenses of the camera, defining how and what objects are projected to different parts of the screen
+ * @prop Lens[] lenses | A list of the Lenses of the camera, defining how and what objects are projected to different parts of the screen. This must contain at least one Lens
  */
 class Camera3D extends Matrix4 {
 	constructor(getViewport) {
@@ -99,10 +98,16 @@ class Camera3D extends Matrix4 {
 		
 		this.updateDirection();
 		this.updateMatrix();
-		this.perspective(Math.PI / 2, 0.1, 500);
-		this.cacheScreen();
-
 		this.lenses = [new Lens(this)];
+		this.cacheScreen();
+	}
+	/**
+	 * Returns the first Lens of the camera.
+	 * Equivalent to `.lenses[0]`;
+	 * @return Lens
+	 */
+	get lens() {
+		return this.lenses[0];
 	}
 	/**
 	 * Sets the current pose of the camera to a given Transform3D, aligning local X, Y, and Z to their corresponding Camera-Space axes.
@@ -134,48 +139,12 @@ class Camera3D extends Matrix4 {
 	 * @return Frustum
 	 */
 	cacheScreen() {
-		this.pcMatrix = this.projection.times(this);
-		this.screen = this.pcMatrix.determinant ? new Frustum(this.pcMatrix) : null;
-		return this.screen;
-	}
-	/**
-	 * Returns the projection matrix of the camera.
-	 * This may vary as the dimensions of the rendering surface change.
-	 * @return Matrix4
-	 */
-	get projection() {
-		const { width, height } = this.viewport;
-		return this.createProjection(height / width);
-	}
-	/**
-	 * Configures the camera to use a custom projection.
-	 * @param Matrix4 projection | The homogenous projection matrix to use
-	 */
-	set projection(a) {
-		a = a.get();
-		this.createProjection = () => a;
-	}
-	/**
-	 * Configures the camera to use a perspective projection.
-	 * @param Number fov | The field of view of the camera in radians
-	 * @param Number zNear | The location of the near clipping plane
-	 * @param Number zFar | The location of the far clipping plane
-	 */
-	perspective(fov, zNear, zFar) {
-		this.createProjection = ar => Matrix4.perspective(ar, fov, zNear, zFar);
-	}
-	/**
-	 * Configures the camera to use a orthographic projection.
-	 * @param Number span | The size of the x and y spans included in the projection
-	 * @param Number depth | The maximum depth included in the projection
-	 */
-	orthographic(span, depth) {
-		this.createProjection = () => Matrix4.orthographic(span, span, depth);
+		return this.screen = Frustum.fuse(this.lenses.map(lens => lens.cacheScreen()));
 	}
 	updateDirection() {
 		const { direction } = this;
 		const cross = direction.cross(Vector3.up);
-		const right = cross.sqrMag.equals(0) ? Vector3.right : cross.normalize();
+		const right = cross.sqrMag ? cross.normalize() : Vector3.right;
 		this.right = right.rotate(direction.times(-this.rotation));
 		this.updateMatrix();
 	}
