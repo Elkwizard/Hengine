@@ -27,7 +27,6 @@ class Hengine {
 		this.ui = this.canvas.ui;
 		
 		this.scene = new Scene(this);
-		this.canvas.updateSize(); // requires camera, created by scene
 
 		//update loops
 		this.intervals = new IntervalManager(this);

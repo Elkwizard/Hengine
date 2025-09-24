@@ -58,6 +58,8 @@ class CanvasImage extends ImageType {
 		this.clearScreen = () => this.renderer.fill(Color.WHITE);
 
 		this.cursor = "default";
+
+		this.updateSize();
 	}
 	set scalingMode(a) {
 		this._scalingMode = a;
@@ -122,11 +124,11 @@ class CanvasImage extends ImageType {
 		for (const name in this.canvases) {
 			const canvas = this.canvases[name];
 
-			let packed = new Rect(0, 0, innerWidth, innerHeight)
+			const packed = new Rect(0, 0, innerWidth, innerHeight)
 				.largestWithin(this.width, this.height);
 	
 			if (this.scalingMode === ScalingMode.INTEGER_MULTIPLE) {
-				let scale = packed.width / this.width;
+				const scale = packed.width / this.width;
 				if (scale < 1) {
 					const newScale = 1 / Math.ceil(1 / scale);
 					packed = packed.scale(newScale / scale);
