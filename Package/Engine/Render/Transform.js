@@ -186,6 +186,7 @@ class Transform {
  * Represents a 2D affine transformation, composed of a translation and a rotation.
  * @prop Vector2 position | The translation of the transform
  * @prop Number rotation | The angle of rotation
+ * @prop<readonly> Vector2 [DIRECTION] | A global-space representation of the given direction in local-space. Specifically, properties exist for `.up`, `.down`, `.left`, and `.right`
  */
 class Transform2D extends Transform {
 	static Complex = Complex;
@@ -199,7 +200,12 @@ class Transform2D extends Transform {
 	constructor(position, rotation = 0) {
 		super(position, rotation);
 	}
-	
+	/**
+	 * @group get left, get right, get up, get down
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform2D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector2.left)`.
+	 * @return Vector2
+	 */
 	/**
 	 * Adds a clockwise (in Screen-Space) rotation in-place about a specific point to the existing transformation. 
 	 * @param Vector2 point | The center to rotate about
@@ -243,6 +249,17 @@ class Transform2D extends Transform {
 	}
 }
 D2.Transform = Transform2D;
+{
+	const directions = ["left", "right", "up", "down"];
+	for (let i = 0; i < directions.length; i++) {
+		const direction = directions[i];
+		Object.defineProperty(Transform2D.prototype, direction, {
+			get: function () {
+				return this.localDirectionToGlobal(Vector2[direction]);
+			}
+		});
+	}
+}
 
 /**
  * @type class Transform3D extends Transform<Matrix4, Vector3, Vector3>
@@ -262,6 +279,12 @@ class Transform3D extends Transform {
 	constructor(position, rotation = Vector3.zero) {
 		super(position, rotation);
 	}
+	/**
+	 * @group get left, get right, get up, get down, get forward, get backward
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform3D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector3.left)`.
+	 * @return Vector3
+	 */
 	/**
 	 * Rotates the transform by a specific amount.
 	 * @param Vector3 angle | The rotation to apply, in axis-angle form
@@ -294,3 +317,14 @@ class Transform3D extends Transform {
 	}
 }
 D3.Transform = Transform3D;
+{
+	const directions = ["left", "right", "up", "down", "forward", "backward"];
+	for (let i = 0; i < directions.length; i++) {
+		const direction = directions[i];
+		Object.defineProperty(Transform3D.prototype, direction, {
+			get: function () {
+				return this.localDirectionToGlobal(Vector3[direction]);
+			}
+		});
+	}
+}

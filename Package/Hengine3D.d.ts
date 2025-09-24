@@ -6707,11 +6707,35 @@ declare class Transform2D extends Transform<Matrix3, Vector2, Number> {
 	 */
 	rotation: number;
 	/**
+	 * A global-space representation of the given direction in local-space. Specifically, properties exist for `.up`, `.down`, `.left`, and `.right`
+	 */
+	[DIRECTION]: Vector2;
+	/**
 	 * Creates a new 2D transform.
 	 * @param position - The translation of the transform
 	 * @param rotation - The angle of rotation. Default is 0
 	 */
 	constructor(position: Vector2, rotation?: number);
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform2D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector2.left)`.
+	 */
+	get left(): Vector2;
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform2D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector2.left)`.
+	 */
+	get right(): Vector2;
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform2D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector2.left)`.
+	 */
+	get up(): Vector2;
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform2D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector2.left)`.
+	 */
+	get down(): Vector2;
 	/**
 	 * Adds a clockwise (in Screen-Space) rotation in-place about a specific point to the existing transformation.
 	 * @param point - The center to rotate about
@@ -6738,6 +6762,36 @@ declare class Transform3D extends Transform<Matrix4, Vector3, Vector3> {
 	 * @param rotation - The angle of rotation. Default is no rotation
 	 */
 	constructor(position: Vector3, rotation?: Vector3);
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform3D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector3.left)`.
+	 */
+	get left(): Vector3;
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform3D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector3.left)`.
+	 */
+	get right(): Vector3;
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform3D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector3.left)`.
+	 */
+	get up(): Vector3;
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform3D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector3.left)`.
+	 */
+	get down(): Vector3;
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform3D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector3.left)`.
+	 */
+	get forward(): Vector3;
+	/**
+	 * Returns a global-space representation of a given direction in local-space.
+	 * For example, for a Transform3D `t`, `t.left` is equivalent to `t.localDirectionToGlobal(Vector3.left)`.
+	 */
+	get backward(): Vector3;
 	/**
 	 * Rotates the transform by a specific amount.
 	 * @param angle - The rotation to apply, in axis-angle form

@@ -192,7 +192,7 @@ class Matrix extends Float64Array {
 		return dst;
 	}
 	/**
-	 * @group plus/minus
+	 * @group plus, minus
 	 * Computes the sum or difference between the caller and a given object, and returns the result.
 	 * @param Matrix/Number other | The right-hand operand of the sum
 	 * @param Matrix result? | A matrix to optionally store the result in. If not specified, a new matrix will be created
@@ -205,7 +205,7 @@ class Matrix extends Float64Array {
 		return this.op(other, Operable.subFunc, dst);
 	}
 	/**
-	 * @group add/sub
+	 * @group add, sub
 	 * Adds or subtracts a given object from the caller in-place and returns it.
 	 * @param Matrix/Number other | The right-hand operand of the sum
 	 * @return Matrix

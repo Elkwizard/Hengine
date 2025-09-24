@@ -425,7 +425,7 @@ class Polygon extends Shape2D {
 		return new Polygon(this.vertices.map(v => transf.times(v)), true);
 	}
 	/**
-	 * @group getEdges/getFaces
+	 * @group getEdges, getFaces
 	 * Returns the edges of the polygon.
 	 * @return Line[]
 	 */

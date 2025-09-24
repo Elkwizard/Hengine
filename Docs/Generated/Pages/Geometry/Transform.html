@@ -275,7 +275,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 		
 			<div class="class-wrapper" id="class Transform2D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L190" target="_blank" class="class-name source-link">Transform2D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L191" target="_blank" class="class-name source-link">Transform2D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
 				</div>
 				<div class="class desc">
 					Represents a 2D affine transformation, composed of a translation and a rotation.
@@ -302,6 +302,15 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 			<div class="prop desc">The angle of rotation</div>
 			<span class="prop-attrs"><span class="prop-attr" data-desc="Assigning to this property will simply change the value to match the assigned value, but will not change its identity or maintain a reference to the new value">stable</span></span>
 		</div>
+	
+		<div class="prop-wrapper" id="Transform2D.[DIRECTION]">
+			<div class="prop-header member">
+				<span class="prop-name">[DIRECTION]</span>
+				<span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="prop desc">A global-space representation of the given direction in local-space. Specifically, properties exist for <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">up</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">down</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">left</span></code>, and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">right</span></code></div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span><span class="prop-attr" data-desc="Assigning to this property will simply change the value to match the assigned value, but will not change its identity or maintain a reference to the new value">stable</span></span>
+		</div>
 	</div>
 				
 				
@@ -310,7 +319,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 					<div class="class-methods">
 		<div class="function-wrapper" id="Transform2D.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L199" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L200" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new 2D transform.
@@ -345,9 +354,20 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 			
 		</div>
 	
+		<div class="function-wrapper" id="get Transform2D.prototype.left()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L209" target="_blank" class="function-name source-link">left</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L209" target="_blank" class="function-name source-link">right</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L209" target="_blank" class="function-name source-link">up</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L209" target="_blank" class="function-name source-link">down</a><span class="type"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+			</div>
+			<div class="function desc">
+				Returns a global-space representation of a given direction in local-space.
+For example, for a Transform2D <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">t</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">t</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">left</span></code> is equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">t</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">localDirectionToGlobal</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">left</span><span class="highlight-SYMBOL">)</span></code>.
+			</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Transform2D.prototype.rotateAround()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L208" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L214" target="_blank" class="function-name source-link">rotateAround</a>(<span class="param">point</span>, <span class="param">rotation</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Adds a clockwise (in <a href="../Rendering/Coordinate Spaces.html#Screen-Space">Screen-Space</a>) rotation in-place about a specific point to the existing transformation.
@@ -387,7 +407,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 		
 			<div class="class-wrapper" id="class Transform3D">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L253" target="_blank" class="class-name source-link">Transform3D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L270" target="_blank" class="class-name source-link">Transform3D</a> <span class="keyword">extends</span> <span class="class-name">Transform</span>
 				</div>
 				<div class="class desc">
 					Represents a 3D affine transformation, composed of a translation and a rotation about an arbitrary axis.
@@ -422,7 +442,7 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 					<div class="class-methods">
 		<div class="function-wrapper" id="Transform3D.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L262" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L279" target="_blank" class="function-name source-link">constructor</a>(<span class="param">position</span>, <span class="param">rotation?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new 3D transform.
@@ -457,9 +477,20 @@ This rotates the point clockwise (in <a href="../Rendering/Coordinate Spaces.htm
 			
 		</div>
 	
+		<div class="function-wrapper" id="get Transform3D.prototype.left()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L288" target="_blank" class="function-name source-link">left</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L288" target="_blank" class="function-name source-link">right</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L288" target="_blank" class="function-name source-link">up</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L288" target="_blank" class="function-name source-link">down</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L288" target="_blank" class="function-name source-link">forward</a><span class="aux">/</span><span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L288" target="_blank" class="function-name source-link">backward</a><span class="type"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			</div>
+			<div class="function desc">
+				Returns a global-space representation of a given direction in local-space.
+For example, for a Transform3D <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">t</span></code>, <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">t</span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">left</span></code> is equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">t</span><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">localDirectionToGlobal</span><span class="highlight-SYMBOL">(</span><span class="highlight-CLASS"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">left</span><span class="highlight-SYMBOL">)</span></code>.
+			</div>
+			
+		</div>
+	
 		<div class="function-wrapper" id="Transform3D.prototype.rotate()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L269" target="_blank" class="function-name source-link">rotate</a>(<span class="param">angle</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Transform.js?#L292" target="_blank" class="function-name source-link">rotate</a>(<span class="param">angle</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Rotates the transform by a specific amount.

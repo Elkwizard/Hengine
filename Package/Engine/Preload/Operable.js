@@ -27,7 +27,7 @@ class MathObject {
 		return this.get().invert();
 	}
 	/**
-	 * @group plus/minus/times/over/modBy/pow
+	 * @group plus, minus, times, over, modBy, pow
 	 * Performs an operation between the caller and another object, and returns it.
 	 * @param MathObject other | The right-hand side of the operation. This must be either the same type as the caller or a number
 	 * @param MathObject result? | The destination to store the resulting object in. If not specified, a new object will be created
@@ -40,7 +40,7 @@ class MathObject {
 		return this.times(other.reciprocal, dst);
 	}
 	/**
-	 * @group add/sub/mul/div/mod/exp
+	 * @group add, sub, mul, div, mod, exp
 	 * Peforms an operation between the caller and another object, stores the result in the caller, and returns it.
 	 * @param MathObject other | The right-hand side of the operation. This must be either the same type as the caller or a number
 	 * @return MathObject
