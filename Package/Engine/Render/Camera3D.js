@@ -129,7 +129,7 @@ class Camera3D extends Matrix4 {
 	get transform() {
 		const { zoom } = this;
 		this.zoom = 1;
-		const transform = Transform3D.fromRigidMatrix(this);
+		const transform = Transform3D.fromRigidMatrix(this.inverse);
 		this.zoom = zoom;
 		return transform;
 	}
