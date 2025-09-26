@@ -5,23 +5,23 @@
  * @prop<immutable> Matrix4 pcMatrix | The product of the lens' projection matrix and the camera. This only updates when `.cacheScreen()` is called
  * @prop<immutable> Frustum screen | The World-Space frustum of the lens. This only updates when `.cacheScreen()` is called
  * @prop<immutable> LensAlignment alignment | The area of the screen rendered to by the lens
- * @prop<immutable> Rect uvRegion | The region of the screen that the lens renders to, in normalized UV coordinates (0-1 on both axes)
+ * @prop<immutable> Rect uvBox | The region of the screen that the lens renders to, in normalized UV coordinates (0-1 on both axes)
  */
 class Lens {
 	/**
 	 * Creates a new lens for a given Camera3D.
 	 * This does not automatically attach the lens to the camera.
 	 * @param Camera3D camera | The camera to attach the lens to
-	 * @param Rect uvRegion | The region of the screen that the lens renders to
+	 * @param Rect uvBox | The region of the screen that the lens renders to
 	 */
-	constructor(camera, uvRegion = new Rect(0, 0, 1, 1)) {
+	constructor(camera, uvBox = new Rect(0, 0, 1, 1)) {
 		this.camera = camera;
-		this.uvRegion = uvRegion;
+		this.uvBox = uvBox;
 		this.perspective(Math.PI / 2, 0.1, 500);
 		this.cacheScreen();
 	}
 	get viewport() {
-		return this.camera.viewport.fromUV(this.uvRegion);
+		return this.camera.viewport.fromUV(this.uvBox);
 	}
 	/**
 	 * Returns the World-Space frustum of the lens, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the lens and camera. 

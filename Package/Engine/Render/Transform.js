@@ -254,7 +254,7 @@ D2.Transform = Transform2D;
 	for (let i = 0; i < directions.length; i++) {
 		const direction = directions[i];
 		Object.defineProperty(Transform2D.prototype, direction, {
-			get: function () {
+			get() {
 				return this.localDirectionToGlobal(Vector2[direction]);
 			}
 		});
@@ -322,7 +322,7 @@ D3.Transform = Transform3D;
 	for (let i = 0; i < directions.length; i++) {
 		const direction = directions[i];
 		Object.defineProperty(Transform3D.prototype, direction, {
-			get: function () {
+			get() {
 				return this.localDirectionToGlobal(Vector3[direction]);
 			}
 		});
