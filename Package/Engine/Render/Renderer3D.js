@@ -57,6 +57,7 @@ class Artist3D extends Artist {
 
 		// GLUtils.throwErrors(this.gl);
 
+		this.setNullDestination();
 		this.stateStack = [new Artist3D.State()];
 		this.currentStateIndex = 0;
 		this.lightObj = new Artist3D.LightRenderer(this);
@@ -118,12 +119,20 @@ class Artist3D extends Artist {
 	get shadowResolutions() {
 		return this.shadowCascadeSizes.map(x => x * this.shadowResolution);
 	}
+	setNullDestination() {
+		const { gl } = this;
+		this.destination = {
+			framebuffer: null,
+			get width() { return gl.drawingBufferWidth; },
+			get height() { return gl.drawingBufferHeight; }
+		};
+	}
 	invalidateShadowMaps() {
 		this.shadowMaps = [];
 	}
 	createScreenBuffer(settings) {
 		settings.hdr &&= this.hdr;
-		const buffer = new Artist3D.ScreenBuffer(this.gl, settings);
+		const buffer = new Artist3D.ScreenBuffer(this, settings);
 		this.screenBuffers.push(buffer);
 		return buffer;
 	}
@@ -136,8 +145,7 @@ class Artist3D extends Artist {
 	setupFramebuffer() {
 		const { gl } = this;
 
-		const width = gl.drawingBufferWidth;
-		const height = gl.drawingBufferHeight;
+		const { width, height } = this.destination;
 
 		this.msFramebuffer = gl.createFramebuffer();
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
@@ -668,7 +676,7 @@ class Artist3D extends Artist {
 		gl.useProgram(null);
 	}
 	maximizeViewport() {
-		this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
+		this.gl.viewport(0, 0, this.destination.width, this.destination.height);
 	}
 	getLensViewport(lens) {
 		const { pixelRatio } = this.imageType;
@@ -684,10 +692,7 @@ class Artist3D extends Artist {
 		GLUtils.setViewport(this.gl, this.getLensViewport(lens));
 	}
 	getUVBox(rect) {
-		const {
-			drawingBufferWidth: width,
-			drawingBufferHeight: height
-		} = this.gl;
+		const { width, height } = this.destination;
 
 		return new Rect(
 			rect.x / width,
@@ -739,7 +744,7 @@ class Artist3D extends Artist {
 
 		// composite
 		GLUtils.setViewport(gl, view);
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.destination.framebuffer);
 		gl.disable(gl.DEPTH_TEST);
 		this.drawQuad(this.copyShader, { source: outputBuffer.color, region: view });
 	}
@@ -1229,7 +1234,8 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 		}
 
 		{ // blur
-			const invRes = new Vector2(1 / gl.drawingBufferWidth, 1 / gl.drawingBufferHeight);
+			const { destination } = this.artist;
+			const invRes = new Vector2(1 / destination.width, 1 / destination.height);
 			const directions = [Vector2.right, Vector2.down];
 			for (let i = 0; i < directions.length; i++) {
 				const { color } = this.pingPong.swap();
@@ -1619,14 +1625,14 @@ Artist3D.ShadowMap = class {
 };
 
 Artist3D.ScreenBuffer = class {
-	constructor(gl, {
+	constructor(artist, {
 		hdr = false,
 		color = true,
 		depth = false,
 		colorFormat = null,
-		depthFormat = gl.DEPTH_COMPONENT32F
+		depthFormat = artist.gl.DEPTH_COMPONENT32F
 	} = { }) {
-		this.gl = gl;
+		this.artist = artist;
 		this.hdr = hdr;
 		this.hasColor = color;
 		this.hasDepth = depth;
@@ -1634,16 +1640,16 @@ Artist3D.ScreenBuffer = class {
 		this.depthFormat = depthFormat;
 	}
 	compile() {
-		const { gl } = this;
+		const { gl } = this.artist;
 		this.framebuffer = gl.createFramebuffer();
 		this.resize();
 	}
 	bind() {
-		const { gl } = this;
+		const { gl } = this.artist;
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
 	}
 	clear() {
-		const { gl } = this;
+		const { gl } = this.artist;
 
 		this.bind();
 		let flags = 0;
@@ -1653,8 +1659,8 @@ Artist3D.ScreenBuffer = class {
 		gl.clear(flags);
 	}
 	resize() {
-		const { gl } = this;
-		const { drawingBufferWidth: width, drawingBufferHeight: height } = gl;
+		const { gl } = this.artist;
+		const { width, height } = this.artist.destination;
 
 		this.bind();
 		
