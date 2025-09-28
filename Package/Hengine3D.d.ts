@@ -243,7 +243,7 @@ declare class Hengine {
 	/**
 	 * The interval manager managing the update loop of the engine
 	 */
-	intervals: IntervalManager;
+	intervals: Intervals;
 	/**
 	 * The file system for the engine. This property persists across reloads and different sessions via `localStorage`
 	 */
@@ -614,7 +614,7 @@ declare const scene: Scene;
 /**
  * The timing and scheduling API for the Hengine
  */
-declare const intervals: IntervalManager;
+declare const intervals: Intervals;
 
 /**
  * The built-in, localStorage-based file system API
@@ -657,7 +657,7 @@ declare function loadTexture(src: string): Sampler | null;
 
 /**
  * A wrapper for operations that happen over time or after a time.
- * These can generally be created by methods of IntervalManager.
+ * These can generally be created by methods of Intervals.
  * ```js
  * const transitionDone = intervals.transition(t => {
  * 	console.log("Progress: " + t);
@@ -776,7 +776,7 @@ declare class MovingAverage {
 
 /**
  * Manages the update loop of the Hengine.
- * This class is available via the `.intervals` property of the global object.
+ * This class is available via the `.intervals` property of both the global object and Hengine.
  * ```js
  * // display FPS data
  * intervals.continuous(() => {
@@ -784,7 +784,7 @@ declare class MovingAverage {
  * });
  * ```
  */
-declare class IntervalManager {
+declare class Intervals {
 	/**
 	 * The FPS based only on the duration of the last frame
 	 */
@@ -5690,7 +5690,7 @@ declare class Graph {
 /**
  * Represents a renderable, updating graph of one or more variables.
  * This class is to be used for debugging or technical visualization purposes, rather than in games or tools.
- * This class should not be constructed and should instead be created using `IntervalManager.prototype.makeGraphPlane()`.
+ * This class should not be constructed and should instead be created using `Intervals.prototype.makeGraphPlane()`.
  * ```js
  * // graph the value of perlin noise
  * const graph = intervals.makeGraphPlane([
@@ -7071,14 +7071,14 @@ declare class Lens {
 	/**
 	 * The region of the screen that the lens renders to, in normalized UV coordinates (0-1 on both axes)
 	 */
-	uvRegion: Rect;
+	uvBox: Rect;
 	/**
 	 * Creates a new lens for a given Camera3D.
 	 * This does not automatically attach the lens to the camera.
 	 * @param camera - The camera to attach the lens to
-	 * @param uvRegion - The region of the screen that the lens renders to
+	 * @param uvBox - The region of the screen that the lens renders to
 	 */
-	constructor(camera: Camera3D, uvRegion: Rect);
+	constructor(camera: Camera3D, uvBox: Rect);
 	/**
 	 * Returns the World-Space frustum of the lens, and synchronizes `.screen` and `.pcMatrix` to match the location and orientation of the lens and camera.
 	 */

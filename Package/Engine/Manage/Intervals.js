@@ -1,6 +1,6 @@
 /**
  * A wrapper for operations that happen over time or after a time.
- * These can generally be created by methods of IntervalManager.
+ * These can generally be created by methods of Intervals.
  * ```js
  * const transitionDone = intervals.transition(t => {
  * 	console.log("Progress: " + t);
@@ -156,7 +156,7 @@ class MovingAverage {
 
 /**
  * Manages the update loop of the Hengine.
- * This class is available via the `.intervals` property of the global object.
+ * This class is available via the `.intervals` property of both the global object and Hengine.
  * ```js
  * // display FPS data
  * intervals.continuous(() => {
@@ -169,7 +169,7 @@ class MovingAverage {
  * @prop<immutable> Number frameCount | The total number of frames that have elapsed thusfar
  * @prop Boolean performanceData | Whether or not the interval manager should collect performance data (`.fps`, `.fpsGraph`, etc.)
  */
-class IntervalManager {
+class Intervals {
 	static intervals = [];
 	static inInterval = false;
 	constructor(engine) {
@@ -181,7 +181,7 @@ class IntervalManager {
 		this.fps = 60;
 		this.rawFps = 60;
 		this.lastTime = performance.now();
-		this.averageFrameLength = new MovingAverage(IntervalManager.FPS_FRAMES_TO_COUNT);
+		this.averageFrameLength = new MovingAverage(Intervals.FPS_FRAMES_TO_COUNT);
 		this.counters = new Map();
 		this.averages = new Map();
 
@@ -221,7 +221,7 @@ class IntervalManager {
 		// deal with system frame length
 		let lastFrameTime = performance.now();
 		let timeSinceLastFrame = 0;
-		IntervalManager.intervals.push(() => {
+		Intervals.intervals.push(() => {
 			const targetFrameLength = 1000 / this.targetFPS;
 			const now = performance.now();
 
@@ -408,6 +408,37 @@ class IntervalManager {
 		}
 		this.functions = remaining;
 	}
+	static start() {
+		Intervals.requestTick(function animate() {
+			Intervals.tick();
+			Intervals.requestTick(animate);
+		});
+	}
+	static tick() {
+		Intervals.inInterval = true;
+		try {
+			for (let i = 0; i < Intervals.intervals.length; i++)
+				Intervals.intervals[i]();
+		} catch (err) {
+			if (err instanceof ExitError) {
+				err.print();
+			} else {
+				throw err;
+			}
+		}
+		Intervals.inInterval = false;
+	}
+	static exit(...msg) {
+		Intervals.intervals = [];
+		const error = new ExitError(msg);
+
+		if (Intervals.inInterval) {
+			throw error;
+		} else {
+			error.print();
+			throw "";
+		}
+	}
 	
 	static FPS_FRAMES_TO_COUNT = 30;
 }
@@ -416,6 +447,9 @@ class ExitError {
 	constructor(message) {
 		this.message = message;
 	}
+	print() {
+		console.warn("EXITED", ...this.message);
+	}
 }
 
 /**
@@ -423,24 +457,8 @@ class ExitError {
  * @param Any[] ...messages | Data to be logged
  */
 function exit(...msg) {
-	IntervalManager.intervals = [];
-	if (IntervalManager.inInterval) throw new ExitError(msg);
-	else {
-		console.warn("EXITED", ...msg);
-		throw "";
-	}
+	Intervals.exit(...msg);
 }
 
-requestAnimationFrame(function animate(now) {
-	IntervalManager.inInterval = true;
-	try {
-		for (let i = 0; i < IntervalManager.intervals.length; i++)
-			IntervalManager.intervals[i]();
-	} catch (err) {
-		if (err instanceof ExitError) console.warn("EXITED", ...err.message);
-		else throw err;
-	}
-	IntervalManager.inInterval = false;
-	
-	requestAnimationFrame(animate);
-});
+Intervals.requestTick = requestAnimationFrame.bind(window);
+Intervals.start();

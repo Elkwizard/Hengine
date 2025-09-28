@@ -9,7 +9,7 @@
  * @prop CanvasArtist renderer | The 2D or 3D renderer associated with the canvas. Draws directly on the screen
  * @prop CanvasArtist2D ui | The 2D Screen-Space overlay renderer associated with the canvas. Draws directly on the screen
  * @prop Scene scene | The scene containing all the objects currently in the engine
- * @prop IntervalManager intervals | The interval manager managing the update loop of the engine
+ * @prop Intervals intervals | The interval manager managing the update loop of the engine
  * @prop Files fileSystem | The file system for the engine. This property persists across reloads and different sessions via `localStorage`
  */
 class Hengine {
@@ -29,7 +29,7 @@ class Hengine {
 		this.scene = new Scene(this);
 
 		//update loops
-		this.intervals = new IntervalManager(this);
+		this.intervals = new Intervals(this);
 
 		// create file system
 		const segments = location.toString().split("/");

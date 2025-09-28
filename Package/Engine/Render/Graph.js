@@ -78,7 +78,7 @@ class Graph {
 /**
  * Represents a renderable, updating graph of one or more variables.
  * This class is to be used for debugging or technical visualization purposes, rather than in games or tools.
- * This class should not be constructed and should instead be created using `IntervalManager.prototype.makeGraphPlane()`.
+ * This class should not be constructed and should instead be created using `Intervals.prototype.makeGraphPlane()`.
  * ```js
  * // graph the value of perlin noise
  * const graph = intervals.makeGraphPlane([

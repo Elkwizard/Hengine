@@ -1155,7 +1155,7 @@ class HengineLoader {
  * @prop CanvasArtist renderer | The 2D or 3D renderer that affects the screen
  * @prop CanvasArtist2D ui | The 2D Screen-Space overlay renderer that affects the screen
  * @prop Scene scene | The scene that contains all SceneElements
- * @prop IntervalManager intervals | The timing and scheduling API for the Hengine
+ * @prop Intervals intervals | The timing and scheduling API for the Hengine
  * @prop Files fileSystem | The built-in, localStorage-based file system API
  * @prop Vector2 middle | The coordinates of the center of the screen, in screen space
  * @prop Number width | The width of the screen
