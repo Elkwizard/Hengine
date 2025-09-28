@@ -688,7 +688,7 @@ class Controllers {
 		if (this.gamepads.length >= 1 && this.handlers.length >= 1) {
 			const index = this.gamepads.shift();
 			const handler = this.handlers.shift();
-			handler.connect(index);
+			handler.connect(() => navigator.getGamepads()[index]);
 			this.activeHandlers.set(index, handler);
 		}
 	}
@@ -735,22 +735,15 @@ class Controllers {
 class ControllerHandler extends InputHandler {
 	constructor(engine) {
 		super(engine);
-		this.index = null;
-		this.ready = new Promise(resolve => {
-			this.connect = resolve;
-		}).then(index => {
-			this.connected = true;
-			this.index = index;
-			return this;
-		});
 		this.connected = false;
+		this.ready = new Promise(resolve => this.resolveReady = resolve);
 	}
 	get gamepad() {
 		if (!this.connected) return {
 			buttons: [],
 			axes: [0, 0, 0, 0]
 		};
-		return navigator.getGamepads()[this.index];
+		return this.getGamepad();
 	}
 	get leftStick() {
 		const { axes } = this.gamepad;
@@ -759,6 +752,11 @@ class ControllerHandler extends InputHandler {
 	get rightStick() {
 		const { axes } = this.gamepad;
 		return new Vector2(axes[2], axes[3]);
+	}
+	connect(getGamepad) {
+		this.getGamepad = getGamepad;
+		this.connected = true;
+		this.resolveReady(this);
 	}
 	disconnect() {
 		this.connected = false;
