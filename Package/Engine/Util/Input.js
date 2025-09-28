@@ -148,7 +148,7 @@ InputHandler.addChecks({
 		const old = window[name];
 		window[name] = function () {
 			InputHandler.leaveDocument();
-			old.apply(this, arguments);
+			return old.apply(this, arguments);
 		};
 	}
 
