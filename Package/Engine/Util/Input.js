@@ -4,14 +4,12 @@
  * @props<immutable>
  */
 class InputHandler {
+	static leaveHandlers = [];
+
 	constructor(engine) {
 		this.engine = engine;
 		this.totalCount = 0;
 		this.states = new Map();
-		document.addEventListener("visibilitychange", () => {
-			if (document.visibilityState === "hidden")
-				this.targetAll(false);
-		});
 		this.addListeners();
 	}
 	get length() {
@@ -21,7 +19,7 @@ class InputHandler {
 		return Array.from(this.states.keys());
 	}
 	addListeners() {
-
+		InputHandler.leaveHandlers.push(() => this.targetAll(false));
 	}
 	preprocess(name) {
 		return String(name);
@@ -126,6 +124,10 @@ class InputHandler {
 	static merge(states) {
 		return new InputHandler.MergedState(states);
 	}
+	static leaveDocument() {
+		for (let i = 0; i < InputHandler.leaveHandlers.length; i++)
+			InputHandler.leaveHandlers[i]();
+	}
 
 	static OR = true;
 	static AND = false;
@@ -138,6 +140,23 @@ InputHandler.addChecks({
 	pressLength: null,
 	releaseLength: null
 });
+
+{ // "leave" handlers
+	const alerts = ["alert", "prompt", "confirm"];
+	for (let i = 0; i < alerts.length; i++) {
+		const name = alerts[i];
+		const old = window[name];
+		window[name] = function () {
+			InputHandler.leaveDocument();
+			old.apply(this, arguments);
+		};
+	}
+
+	document.addEventListener("visibilitychange", () => {
+		if (document.visibilityState === "hidden")
+			InputHandler.leaveDocument();
+	});
+}
 
 /**
  * @name class InputHandler.State
@@ -309,6 +328,7 @@ class KeyboardHandler extends InputHandler {
 		return name.length === 1 ? name.toLowerCase() : name;
 	}
 	addListeners() {
+		super.addListeners();
 		document.body.addEventListener("blur", () => this.targetAll(false));
 		document.addEventListener("keydown", event => {
 			// don't cancel fancy keyboard shortcuts
@@ -371,6 +391,7 @@ class MouseHandler extends InputHandler {
 		return name;
 	}
 	addListeners() {
+		super.addListeners();
 		const handleDown = event => {
 			const state = this.target(event.button, true);
 			const pos = this.getEventPosition(event);
@@ -541,6 +562,7 @@ class TouchHandler extends InputHandler {
 		this.firstFree = 0;
 	}
 	addListeners() {
+		super.addListeners();
 		const addHandler = (eventName, target) => {
 			document.addEventListener(eventName, event => {
 				if (eventName !== "pointerdown" && event.cancelable)
