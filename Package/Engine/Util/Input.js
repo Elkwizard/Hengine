@@ -595,7 +595,8 @@ class TouchHandler extends InputHandler {
 		if (targetState === true) {
 			this.touchIndices.set(pointerId, this.firstFree);
 			const states = [...this.states.values()];
-			while (states[++this.firstFree]?.targetState);
+			const firstFreeFound = states.findIndex(state => !state.targetState);
+			this.firstFree = firstFreeFound >= 0 ? firstFreeFound : states.length;
 		}
 
 		const index = this.touchIndices.get(pointerId);
