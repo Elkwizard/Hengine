@@ -853,7 +853,7 @@ class Artist3D extends Artist {
 	}
 
 	static MAX_LIGHTS = 50;
-	static MAX_SHADOWS = 8;
+	static MAX_SHADOWS = 2;
 	static SHADOW_BIAS = 0.5;
 	static SHADOW_CASCADE = 4;
 	static INSTANCE_THRESHOLD = 10;

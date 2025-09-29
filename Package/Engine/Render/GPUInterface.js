@@ -59,6 +59,7 @@ class GLSL {
 		this.glsl = glsl;
 		this.removeComments();
 		this.parseStructs();
+		this.parseAttributes();
 		this.parseUniforms();
 		this.compileDynamicArrays();
 		this.parseMethods();
@@ -109,6 +110,15 @@ class GLSL {
 		}
 		
 		return decls;
+	}
+	parseAttributes() {
+		this.attributes = new Map(
+			[...this.glsl.matchAll(/\bin\s+(\w+)\s+((\w+)(,\s*\w+)*)\s*;/g)]
+				.flatMap(([, type, names]) => names
+					.split(",")
+					.map(name => [name.trim(), { type }])
+				)
+		);
 	}
 	parseUniforms() {
 		this.uniforms = [];
@@ -370,7 +380,6 @@ class GLSLError extends Error {
 class ShaderSource {
 	constructor(glsl, prefix = "", suffix = "") {
 		this.glsl = glsl;
-		
 		this.prefix = [
 			"#version 300 es",
 			...["int", "float", "sampler2D", "samplerCube", "sampler2DArray"]
@@ -379,7 +388,8 @@ class ShaderSource {
 		].join("\n");
 		this.prefixLines = this.prefix.match(/\n/g).length + 1;
 		this.suffix = suffix;
-		this.completeSource = this.prefix + this.glsl + this.suffix;
+		this.completeSource = this.prefix + glsl + this.suffix;
+		this.completeGLSL = new GLSL(this.completeSource);
 	}
 	toString() {
 		return this.completeSource;
@@ -1375,16 +1385,18 @@ class GLSLProgram {
 		
 		let offset = 0;
 		for (let i = 0; i < layout.length; i++) {
-			const name = layout[i];
-			if (typeof name === "number") {
-				offset += name;
+			const entry = layout[i];
+			if (typeof entry === "number") {
+				offset += entry;
 				continue;
 			}
 
-			const attribute = div.attributes.get(name);
-			attribute.offset = offset;
-			attribute.enabled = true;
-			offset += attribute.bytes;
+			const attribute = div.attributes.get(entry);
+			if (attribute) {
+				attribute.offset = offset;
+				attribute.enabled = true;
+			}
+			offset += GLSL.SIZE[this.vs.completeGLSL.attributes.get(entry).type];
 		}
 
 		div.stride = offset;
