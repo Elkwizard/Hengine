@@ -7,7 +7,7 @@ class Matrix extends Float64Array {
 	/**
 	 * Creates a new Matrix. Since this class is abstract, this constructor can only be used via its subclasses.
 	 * @signature
-	 * @param Number[] ...elements | The elements of the matrix, in row-major object
+	 * @param Number[] ...elements | The elements of the matrix, in row-major order
 	 * @signature
 	 * @param Vector[] ...columns | The columns of the matrix
 	 * @signature
@@ -392,6 +392,20 @@ class Matrix extends Float64Array {
 		for (let i = 1; i < matrices.length; i++)
 			result.mul(matrices[i]);
 		return result;
+	}
+	/**
+	 * @group static fromColumnMajor, static fromRowMajor
+	 * Creates a matrix from a list of elements in a specified order.
+	 * @param ArrayLike elements | The elements of the matrix, in the specified order
+	 * @return Matrix
+	 */
+	static fromColumnMajor(elements) {
+		const result = new this();
+		result.set(elements);
+		return result;
+	}
+	static fromRowMajor(elements) {
+		return new this(...elements);
 	}
 	static mulMatrices(matrices, result) {
 		return this.mul(matrices, result);
