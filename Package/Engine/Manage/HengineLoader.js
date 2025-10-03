@@ -905,6 +905,7 @@ class HengineLoader {
 
 		window.loadResource = this.loadResource.bind(this);
 		window.loadTexture = this.loadTexture.bind(this);
+		window.exit = this.engine.intervals.exit.bind(this.engine.intervals);
 
 		this.resources = new Map();
 
@@ -1045,7 +1046,7 @@ class HengineLoader {
 
 			console.timeEnd("loading user resources");
 
-			if (done) hengineLoader.engine.intervals.start();
+			if (done) hengineLoader.engine.intervals.setTickRAF();
 
 			return hengineLoader;
 		}

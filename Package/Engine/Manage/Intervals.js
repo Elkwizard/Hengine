@@ -170,8 +170,6 @@ class MovingAverage {
  * @prop Boolean performanceData | Whether or not the interval manager should collect performance data (`.fps`, `.fpsGraph`, etc.)
  */
 class Intervals {
-	static intervals = [];
-	static inInterval = false;
 	constructor(engine) {
 		this.engine = engine;
 		this.paused = false;
@@ -184,6 +182,7 @@ class Intervals {
 		this.averageFrameLength = new MovingAverage(Intervals.FPS_FRAMES_TO_COUNT);
 		this.counters = new Map();
 		this.averages = new Map();
+		this.inInterval = false;
 
 		this.graphs = [];
 		this.fpsGraph = this.makeGraphPlane([
@@ -216,26 +215,6 @@ class Intervals {
 	 */
 	get paused() {
 		return this.pauseLevel > 0;
-	}
-	start() {
-		// deal with system frame length
-		let lastFrameTime = performance.now();
-		let timeSinceLastFrame = 0;
-		Intervals.intervals.push(() => {
-			const targetFrameLength = 1000 / this.targetFPS;
-			const now = performance.now();
-
-			timeSinceLastFrame += now - lastFrameTime;
-			lastFrameTime = now;
-			
-			while (timeSinceLastFrame > targetFrameLength) {
-				timeSinceLastFrame -= targetFrameLength;
-				this.update();
-				if (performance.now() - now > targetFrameLength) break;
-			}
-
-			timeSinceLastFrame %= targetFrameLength * 2;
-		});
 	}
 	updatePerformanceData() {
 		if (!this.performanceData) return;
@@ -403,22 +382,35 @@ class Intervals {
 			const fn = this.functions[i];
 			if (fn.type === type)
 				fn.increment();
-			if (fn.done) fn.resolve();
-			else remaining.push(fn);
+
+			if (fn.done) {
+				fn.resolve();
+			} else {
+				remaining.push(fn);
+			}
 		}
 		this.functions = remaining;
 	}
-	static start() {
-		Intervals.requestTick(function animate() {
-			Intervals.tick();
-			Intervals.requestTick(animate);
-		});
+	robustUpdate() {
+		// deal with system frame length
+		const targetFrameLength = 1000 / this.targetFPS;
+		const now = performance.now();
+
+		this.freeTime += now - this.lastTickTime;
+		this.lastTickTime = now;
+		
+		while (this.freeTime > targetFrameLength) {
+			this.freeTime -= targetFrameLength;
+			this.update();
+			if (performance.now() - now > targetFrameLength) break;
+		}
+
+		this.freeTime %= targetFrameLength * 2;
 	}
-	static tick() {
-		Intervals.inInterval = true;
+	tick() {
+		this.inInterval = true;
 		try {
-			for (let i = 0; i < Intervals.intervals.length; i++)
-				Intervals.intervals[i]();
+			this.robustUpdate();
 		} catch (err) {
 			if (err instanceof ExitError) {
 				err.print();
@@ -426,13 +418,35 @@ class Intervals {
 				throw err;
 			}
 		}
-		Intervals.inInterval = false;
+		this.inInterval = false;
 	}
-	static exit(...msg) {
-		Intervals.intervals = [];
+	setTick(requestTick, cancelTick) {
+		this.cancelTick?.(this.tickId);
+
+		const animate = () => {
+			this.tickId = requestTick(animate);
+			this.tick();
+		};
+
+		// reset robust update
+		this.lastTickTime = performance.now();
+		this.freeTime = 0;
+
+		// start ticking
+		this.cancelTick = cancelTick;
+		this.tickId = requestTick(animate);
+	}
+	setTickRAF() {
+		this.setTick(
+			requestAnimationFrame.bind(window),
+			cancelAnimationFrame.bind(window)
+		);
+	}
+	exit(...msg) {
+		this.setTick(() => null, () => null);
 		const error = new ExitError(msg);
 
-		if (Intervals.inInterval) {
+		if (this.inInterval) {
 			throw error;
 		} else {
 			error.print();
@@ -453,12 +467,7 @@ class ExitError {
 }
 
 /**
+ * @name function exit
  * Instantly crashes the engine and logs something to the console.
  * @param Any[] ...messages | Data to be logged
  */
-function exit(...msg) {
-	Intervals.exit(...msg);
-}
-
-Intervals.requestTick = requestAnimationFrame.bind(window);
-Intervals.start();
