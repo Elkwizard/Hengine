@@ -1,5 +1,5 @@
 # Hengine
-The Hengine is a JavaScript game engine for both small scale creative coding projects and larger scale games.
+The Hengine is a JavaScript game engine for both small scale creative coding projects and larger scale games. It can be loaded in both a 2D and 3D mode, to create games with different dimensionality.
 
 ## Installation
 The Hengine doesn't need to be installed. However, if you want to run code with a local copy of the Hengine (to preserve compatibility), simply clone this repository.
@@ -11,7 +11,7 @@ git clone "https://www.github.com/Elkwizard/Hengine"
 ## Usage
 Before using the Hengine, it must be included in your HTML file in one of two possible ways.
 
-1. Including a script tag pointing to `Hengine/Package/Engine/Manage/HengineLoader.js`, and linking to an external main JavaScript file.
+1. Including a script tag pointing to `Hengine/Package/Engine/Manage/HengineLoader.js`, and linking to an external main JavaScript file. If you want to load the engine in 3D Mode, add the query parameter `?3d` to the end of the URL.
 
     ```html
     app.html:
@@ -34,24 +34,24 @@ Before using the Hengine, it must be included in your HTML file in one of two po
     index.js:
 
     // Hengine hello world
-    renderer.textMode = TextMode.CENTER_CENTER; // Text will be drawn relative to its center
+    ui.textMode = TextMode.CENTER_CENTER; // Text will be drawn relative to its center
 
     intervals.continuous(() => {
-        renderer.draw(Color.BLACK).text(Font.Arial50, "Hello World!", middle); // Draw "Hello World" to the middle of the screen
+        ui.draw(Color.BLACK).text(Font.Arial50, "Hello World!", middle); // Draw "Hello World" to the middle of the screen
     });
     ```
 
-2. Including a script tag pointing to `Hengine/Hengine.js` with the main JavaScript code embedded within.
+2. Including a script tag pointing to `Hengine/Hengine.js` with the main JavaScript code embedded within. Similar to the previous approach, appending `?3d` to the URL will load the engine in 3D Mode.
 
     ```html
     compactApp.html:
 
     <script src="https://elkwizard.github.io/Hengine/Hengine.js">
         // Hengine hello world
-        renderer.textMode = TextMode.CENTER_CENTER; // Text will be drawn relative to its center
+        ui.textMode = TextMode.CENTER_CENTER; // Text will be drawn relative to its center
 
         intervals.continuous(() => {
-            renderer.draw(Color.BLACK).text(Font.Arial50, "Hello World!", middle); // Draw "Hello World" to the middle of the screen
+            ui.draw(Color.BLACK).text(Font.Arial50, "Hello World!", middle); // Draw "Hello World" to the middle of the screen
         });
     </script>
     ```
