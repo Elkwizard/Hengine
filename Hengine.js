@@ -10,7 +10,7 @@
     const src = script.src.split("/");
     src.pop();
 	const searchParams = new URL(script.src).searchParams;
-    const hengineLoaderSrc = src.join("/") + "/Package/Engine/Manage/HengineLoader.js" + searchParams;
+    const hengineLoaderSrc = src.join("/") + "/Package/Engine/Manage/HengineLoader.js?" + searchParams;
  
     function load(src) {
         const script = document.createElement("script");
