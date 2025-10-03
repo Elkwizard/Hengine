@@ -31,30 +31,9 @@ class ElementContainer extends SceneElement {
 				this.outline = outline;
 				this.fill = fill;
 				this.shapeDrawCommands = new Map();
-
-				for (const [name, shape] of obj.shapes)
-					this.addShape(name, shape);
 			}
 			removeShape(obj, name, shape) {
 				this.shapeDrawCommands.delete(shape);
-			}
-			addShape(obj, name, shape) {
-				let command;
-				if (IS_3D && obj instanceof WorldObject) {
-					const material = new SimpleMaterial();
-					const mesh = Mesh.fromShape(shape, material);
-					command = () => {
-						material.albedo = this.fill;
-						obj.engine.renderer.mesh(mesh).default();
-					};
-				} else {
-					const renderer = obj instanceof UIObject ? obj.engine.ui : obj.engine.renderer;
-					command = () => {
-						renderer.draw(this.fill).infer(shape);
-						renderer.stroke(this.outline, 1).infer(shape);
-					};
-				}
-				this.shapeDrawCommands.set(shape, command);
 			}
 			addScript(obj, script) {
 				if (script === PHYSICS) {
@@ -63,6 +42,26 @@ class ElementContainer extends SceneElement {
 				}
 			}
 			draw(obj, name, shape) {
+				// create draw command if necessary
+				if (!this.shapeDrawCommands.has(shape)) {
+					let command;
+					if (IS_3D && obj instanceof WorldObject) {
+						const material = new SimpleMaterial();
+						const mesh = Mesh.fromShape(shape, material);
+						command = () => {
+							material.albedo = this.fill;
+							obj.engine.renderer.mesh(mesh).default();
+						};
+					} else {
+						const renderer = obj instanceof UIObject ? obj.engine.ui : obj.engine.renderer;
+						command = () => {
+							renderer.draw(this.fill).infer(shape);
+							renderer.stroke(this.outline, 1).infer(shape);
+						};
+					}
+					this.shapeDrawCommands.set(shape, command);
+				}
+				
 				this.shapeDrawCommands.get(shape)();
 			}
 		};
