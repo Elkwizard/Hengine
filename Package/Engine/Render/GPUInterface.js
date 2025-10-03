@@ -18,6 +18,7 @@
  * 	<tr><td>fixed-length array</td><td>Array</td></tr>
  *  <tr><td>dynamic-length array</td><td>GPUArray</td></tr>
  * </table>
+ * In addition, null can be used as a value for `sampler*` uniforms in order to explicitly unbind a sampler.
  * 
  * Though they are not present in any GLSL language standard, the GPUInterface supports dynamic-length, global, uniform struct arrays. 
  * These are specified by omitting the length when declaring the array.
@@ -59,7 +60,7 @@ class GLSL {
 		this.glsl = glsl;
 		this.removeComments();
 		this.parseStructs();
-		this.parseAttributes();
+		this.parseInputs();
 		this.parseUniforms();
 		this.compileDynamicArrays();
 		this.parseMethods();
@@ -111,14 +112,39 @@ class GLSL {
 		
 		return decls;
 	}
-	parseAttributes() {
-		this.attributes = new Map(
-			[...this.glsl.matchAll(/\bin\s+(\w+)\s+((\w+)(,\s*\w+)*)\s*;/g)]
-				.flatMap(([, type, names]) => names
+	parseInputs() {
+		this.inputs = new Map(
+			[...this.glsl.matchAll(/\b(?:layout\s*\(\s*location\s*=\s*(\d+)\s*\))?\s*in\s+(\w+)\s+((\w+)(,\s*\w+)*)\s*;/g)]
+				.flatMap(([, location, type, names]) => names
 					.split(",")
-					.map(name => [name.trim(), { type }])
+					.map(name => [name.trim(), { type, location: +location }])
 				)
 		);
+		const fullSlots = new Set();
+		const addInput = ({ location, type }) => {
+			const slots = GLSL.TYPES[type].columns;
+			for (let i = 0; i < slots; i++)
+				fullSlots.add(location + i);
+		};
+		
+		for (const input of this.inputs.values())
+			if (!isNaN(input.location))
+				addInput(input);
+
+		for (const input of this.inputs.values()) {
+			if (isNaN(input.location)) {
+				const slots = GLSL.TYPES[input.type].columns;
+				slotSearch: for (let location = 0;; location++) {
+					for (let i = 0; i < slots; i++)
+						if (fullSlots.has(location + i))
+							continue slotSearch;
+
+					input.location = location;
+					addInput(input);
+					break;
+				}
+			}
+		}
 	}
 	parseUniforms() {
 		this.uniforms = [];
@@ -286,8 +312,8 @@ class GLSL {
 			bool: [["bool", ""]]
 		};
 
-		for (const key in GLSL.VECTORS) {
-			const vecName = GLSL.VECTORS[key];
+		for (const key in GLSL.VECTOR_NAMES) {
+			const vecName = GLSL.VECTOR_NAMES[key];
 			const op = operations[key];
 			for (let n = 2; n <= 4; n++) {
 				const name = vecName + n;
@@ -295,12 +321,13 @@ class GLSL {
 			}
 		}
 
-		for (const matName in GLSL.MATRIX_DIMENSIONS) {
-			const { rows, columns } = GLSL.MATRIX_DIMENSIONS[matName];
+		for (const matName in GLSL.TYPES) {
+			const { rows, columns } = GLSL.TYPES[matName];
+			if (columns === 1) continue;
 			operations[matName] = Array.dim(rows * columns).map((_, i) => [operations.float[0][0], `[${i}]`]);
 		}
 
-		for (const [, struct] of this.structs) {
+		for (const struct of this.structs.values()) {
 			const { fields } = struct;
 			struct.write = new Function("value", "write", fields.flatMap(field => {
 				return operations[field.type].map(([op, suffix]) => {
@@ -312,35 +339,49 @@ class GLSL {
 					return `value.${field.name}${suffix} = read.${op}();`;
 				});
 			}).join("\n"));
-			struct.size = Number.sum(fields.map(field => GLSL.SIZE[field.type]));
+			struct.size = Number.sum(fields.map(field => GLSL.TYPES[field.type].size));
 		}
 	}
 	toString() {
 		return this.glsl;
 	}
-	static SIZE = {
+	static SCALAR_SIZES = {
 		float: 4,
 		int: 4,
 		bool: 1
 	};
-	static VECTORS = {
+	static VECTOR_NAMES = {
 		float: "vec",
 		int: "ivec",
 		bool: "bvec"
 	};
-	static MATRIX_DIMENSIONS = { };
+	static TYPES = { };
 }
-for (const key in GLSL.VECTORS) {
-	const vecName = GLSL.VECTORS[key];
-	const elSize = GLSL.SIZE[key];
-	for (let n = 2; n <= 4; n++)
-		GLSL.SIZE[vecName + n] = elSize * n;
+for (const key in GLSL.SCALAR_SIZES) {
+	GLSL.TYPES[key] = {
+		rows: 1, columns: 1,
+		size: GLSL.SCALAR_SIZES[key],
+		integer: key !== "float"
+	};
+}
+for (const key in GLSL.SCALAR_SIZES) {
+	const vecName = GLSL.VECTOR_NAMES[key];
+	const elSize = GLSL.SCALAR_SIZES[key];
+	for (let n = 2; n <= 4; n++) {
+		GLSL.TYPES[vecName + n] = {
+			rows: n, columns: 1,
+			size: elSize * n,
+			integer: GLSL.TYPES[key].integer
+		};
+	}
 }
 for (let r = 2; r <= 4; r++)
 for (let c = 2; c <= 4; c++) {
 	const name = `mat${r === c ? r : `${c}x${r}`}`;
-	GLSL.MATRIX_DIMENSIONS[name] = { rows: r, columns: c };
-	GLSL.SIZE[name] = r * c * GLSL.SIZE.float;
+	GLSL.TYPES[name] = {
+		rows: r, columns: c,
+		size: r * c * GLSL.SCALAR_SIZES.float
+	};
 }
 
 class GLSLError extends Error {
@@ -799,7 +840,7 @@ class GLSLProgram {
 
 		const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
 
-		this.uniforms = {};
+		this.uniforms = { };
 		this.uniformsSet = false;
 		this.allUniforms = [];
 		this.textures = [];
@@ -808,7 +849,7 @@ class GLSLProgram {
 			const { size: length, type, name } = gl.getActiveUniform(this.program, i);
 			const block = this.blocksByName[name];
 
-			const { integer, signed, rows, columns, texture } = this.getTypeInformation(type);
+			const { integer, signed, rows, columns, texture } = GLSLProgram.getTypeInformation(type);
 
 			const scopedName = block && !name.startsWith(block.name + ".") ? `${block.name}.${name}` : name;
 			const processedName = scopedName.replace(/\[(\d+)\]/g, ".$1");
@@ -1021,21 +1062,16 @@ class GLSLProgram {
 		const oldVertexArray = gl.getParameter(gl.VERTEX_ARRAY_BINDING);
 		gl.bindVertexArray(null);
 
-		this.attributes = {};
+		this.attributes = { };
 		this.divisors = new Map();
 
 		let offset = 0;
 
-		const attributeCount = gl.getProgramParameter(this.program, gl.ACTIVE_ATTRIBUTES);
-		for (let i = 0; i < attributeCount; i++) {
-			const { type, name } = gl.getActiveAttrib(this.program, i);
-			const { rows, columns } = this.getTypeInformation(type);
-			const location = gl.getAttribLocation(this.program, name);
+		for (const [name, { type, location }] of this.vs.completeGLSL.inputs) {
+			const { rows, columns } = GLSL.TYPES[type];
 			const columnBytes = rows * 4;
 			const bytes = columns * columnBytes;
 
-			if (location < 0) continue;
-		
 			this.attributes[name] = {
 				name, location, rows, columns,
 				enabled: true, divisor: -1,
@@ -1047,18 +1083,54 @@ class GLSLProgram {
 
 		gl.bindVertexArray(oldVertexArray);
 	}
+	getEmptyTexture(target) {
+		const { gl } = this;
+
+		if (!this.emptyTextures.has(target)) {
+			const texture = gl.createTexture();
+			gl.bindTexture(target, texture);
+			
+			const empty2D = target => gl.texImage2D(target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+			const empty3D = target => gl.texImage3D(target, 0, gl.RGBA, 1, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+			switch (target) {
+				case gl.TEXTURE_2D: {
+					empty2D(target);
+				} break;
+				case gl.TEXTURE_CUBE_MAP: {
+					const faces = [
+						gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+						gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+						gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+						gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+						gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
+						gl.TEXTURE_CUBE_MAP_NEGATIVE_Z
+					];
+					for (let i = 0; i < faces.length; i++)
+						empty2D(faces[i]);
+				} break;
+				case gl.TEXTURE_2D_ARRAY: {
+					empty3D(target);
+				} break;
+			}
+			this.emptyTextures.set(target, texture);
+		}
+		
+		return this.emptyTextures.get(target);
+	}
 	writeTexture(sampler, info) {
 		const { gl } = this;
 		
 		gl.activeTexture(gl.TEXTURE0 + info.unit);
-		if (sampler instanceof WebGLTexture) {
-			gl.bindTexture(info.target, sampler);
+		if (sampler instanceof WebGLTexture || sampler === null) {
+			gl.bindTexture(info.target, sampler ?? this.getEmptyTexture(info.target));
 			return;
 		}
 
-		if (!(sampler instanceof Sampler)) {
+		if (!(sampler instanceof Sampler)) { // retrieve default sampler
 			if (!this.defaultSamplerCache.has(sampler))
 				this.defaultSamplerCache.set(sampler, new Sampler(sampler));
+
 			sampler = this.defaultSamplerCache.get(sampler);
 		}
 
@@ -1161,6 +1233,9 @@ class GLSLProgram {
 		gl.compileShader(fragment);
 		gl.attachShader(this.program, fragment);
 
+		for (const [name, { location }] of this.vs.completeGLSL.inputs)
+			gl.bindAttribLocation(this.program, location, name);
+
 		// linking
 		gl.linkProgram(this.program);
 		gl.deleteShader(vertex);
@@ -1176,6 +1251,9 @@ class GLSLProgram {
 		const oldUniformBuffer = gl.getParameter(gl.UNIFORM_BUFFER_BINDING);
 		
 		this.focus();
+		
+		// textures
+		this.emptyTextures = new Map();
 
 		// uniforms
 		this.staticTextureCache = new WeakMap();
@@ -1224,64 +1302,11 @@ class GLSLProgram {
 			this.dynamicArrays[i].commit();
 	}
 	error(type, message) {
-		if (type.endsWith("_SHADER"))
+		if (type.endsWith("_SHADER")) {
 			GLSLError.process(message, type.startsWith("FRAGMENT") ? this.fs : this.vs);
-		else console.warn(message);
-	}
-	getTypeInformation(type) {
-		const { gl } = this;
-
-		let integer = false;
-		let signed = true;
-		let rows = 1;
-		let columns = 1;
-		let texture = false;
-		let dynamicArray = false;
-
-		switch (type) {
-			case gl.FLOAT: break;
-			case gl.FLOAT_VEC2: rows = 2; break;
-			case gl.FLOAT_VEC3: rows = 3; break;
-			case gl.FLOAT_VEC4: rows = 4; break;
-
-			case gl.INT: integer = true; break;
-			case gl.INT_VEC2: integer = true; rows = 2; break;
-			case gl.INT_VEC3: integer = true; rows = 3; break;
-			case gl.INT_VEC4: integer = true; rows = 4; break;
-
-			case gl.BOOL: integer = true; break;
-			case gl.BOOL_VEC2: integer = true; rows = 2; break;
-			case gl.BOOL_VEC3: integer = true; rows = 3; break;
-			case gl.BOOL_VEC4: integer = true; rows = 4; break;
-
-			case gl.FLOAT_MAT2: rows = 2; columns = 2; break;
-			case gl.FLOAT_MAT3: rows = 3; columns = 3; break;
-			case gl.FLOAT_MAT4: rows = 4; columns = 4; break;
-			
-			case gl.FLOAT_MAT2x3: rows = 3; columns = 2; break;
-			case gl.FLOAT_MAT2x4: rows = 4; columns = 2; break;
-			case gl.FLOAT_MAT3x2: rows = 2; columns = 3; break;
-			case gl.FLOAT_MAT3x4: rows = 4; columns = 3; break;
-			case gl.FLOAT_MAT4x2: rows = 2; columns = 4; break;
-			case gl.FLOAT_MAT4x3: rows = 3; columns = 4; break;
-
-			case gl.SAMPLER_2D: integer = true; texture = "image"; break;
-			case gl.INT_SAMPLER_2D: integer = true; texture = "image"; break;
-			case gl.UNSIGNED_INT_SAMPLER_2D: integer = true; texture = "image"; dynamicArray = true; break;
-
-			case gl.SAMPLER_2D_ARRAY:
-			case gl.SAMPLER_2D_ARRAY_SHADOW: integer = true; texture = "array"; break;
-
-			case gl.SAMPLER_CUBE_SHADOW:
-			case gl.SAMPLER_CUBE: integer = true; texture = "cube"; break;
-
-			case gl.UNSIGNED_INT: integer = true; signed = false; break;
-			case gl.UNSIGNED_INT_VEC2: integer = true; rows = 2; signed = false; break;
-			case gl.UNSIGNED_INT_VEC3: integer = true; rows = 3; signed = false; break;
-			case gl.UNSIGNED_INT_VEC4: integer = true; rows = 4; signed = false; break;
+		} else {
+			console.warn(message);
 		}
-
-		return { integer, signed, rows, columns, texture, dynamicArray };
 	}
 	use() {
 		const { gl } = this;
@@ -1342,8 +1367,10 @@ class GLSLProgram {
 		}
 	}
 	getUniform(name) {
-		if (this.hasUniform(name)) return this.uniformValues[name];
-		else this.error("UNIFORM_GET", `Uniform '${name}' doesn't exist`);
+		if (this.hasUniform(name))
+			return this.uniformValues[name];
+		
+		this.error("UNIFORM_GET", `Uniform '${name}' doesn't exist`);
 	}
 	hasUniform(name) {
 		return name in this.uniforms;
@@ -1366,6 +1393,7 @@ class GLSLProgram {
 		attribute.divisor = divisor;
 
 		this.focus();
+
 		for (let i = 0; i < attribute.columns; i++)
 			this.gl.vertexAttribDivisor(attribute.location + i, divisor);
 	}
@@ -1396,7 +1424,7 @@ class GLSLProgram {
 				attribute.offset = offset;
 				attribute.enabled = true;
 			}
-			offset += GLSL.SIZE[this.vs.completeGLSL.attributes.get(entry).type];
+			offset += GLSL.TYPES[this.vs.completeGLSL.inputs.get(entry).type].size;
 		}
 
 		div.stride = offset;
@@ -1409,9 +1437,9 @@ class GLSLProgram {
 		}
 		
 		const { gl } = this;
-			
+		
 		this.focus();
-
+ 
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 		
 		for (const attribute of div.attributes.values()) {
@@ -1421,8 +1449,11 @@ class GLSLProgram {
 					pointer, attribute.rows, gl.FLOAT, false,
 					div.stride, attribute.offset + attribute.columnBytes * j
 				);
-				if (attribute.enabled) gl.enableVertexAttribArray(pointer);
-				else gl.disableVertexAttribArray(pointer);
+				if (attribute.enabled) {
+					gl.enableVertexAttribArray(pointer);
+				} else {
+					gl.disableVertexAttribArray(pointer);
+				}
 			}
 		}
 	}
@@ -1436,6 +1467,61 @@ class GLSLProgram {
 				output[baseIndex + 3] = value.w;
 			}
 		}
+	}
+	static getTypeInformation(type) {
+		const gl = WebGL2RenderingContext.prototype;
+
+		let integer = false;
+		let signed = true;
+		let rows = 1;
+		let columns = 1;
+		let texture = false;
+		let dynamicArray = false;
+
+		switch (type) {
+			case gl.FLOAT: break;
+			case gl.FLOAT_VEC2: rows = 2; break;
+			case gl.FLOAT_VEC3: rows = 3; break;
+			case gl.FLOAT_VEC4: rows = 4; break;
+
+			case gl.INT: integer = true; break;
+			case gl.INT_VEC2: integer = true; rows = 2; break;
+			case gl.INT_VEC3: integer = true; rows = 3; break;
+			case gl.INT_VEC4: integer = true; rows = 4; break;
+
+			case gl.BOOL: integer = true; break;
+			case gl.BOOL_VEC2: integer = true; rows = 2; break;
+			case gl.BOOL_VEC3: integer = true; rows = 3; break;
+			case gl.BOOL_VEC4: integer = true; rows = 4; break;
+
+			case gl.FLOAT_MAT2: rows = 2; columns = 2; break;
+			case gl.FLOAT_MAT3: rows = 3; columns = 3; break;
+			case gl.FLOAT_MAT4: rows = 4; columns = 4; break;
+			
+			case gl.FLOAT_MAT2x3: rows = 3; columns = 2; break;
+			case gl.FLOAT_MAT2x4: rows = 4; columns = 2; break;
+			case gl.FLOAT_MAT3x2: rows = 2; columns = 3; break;
+			case gl.FLOAT_MAT3x4: rows = 4; columns = 3; break;
+			case gl.FLOAT_MAT4x2: rows = 2; columns = 4; break;
+			case gl.FLOAT_MAT4x3: rows = 3; columns = 4; break;
+
+			case gl.SAMPLER_2D: integer = true; texture = "image"; break;
+			case gl.INT_SAMPLER_2D: integer = true; texture = "image"; break;
+			case gl.UNSIGNED_INT_SAMPLER_2D: integer = true; texture = "image"; dynamicArray = true; break;
+
+			case gl.SAMPLER_2D_ARRAY:
+			case gl.SAMPLER_2D_ARRAY_SHADOW: integer = true; texture = "array"; break;
+
+			case gl.SAMPLER_CUBE_SHADOW:
+			case gl.SAMPLER_CUBE: integer = true; texture = "cube"; break;
+
+			case gl.UNSIGNED_INT: integer = true; signed = false; break;
+			case gl.UNSIGNED_INT_VEC2: integer = true; rows = 2; signed = false; break;
+			case gl.UNSIGNED_INT_VEC3: integer = true; rows = 3; signed = false; break;
+			case gl.UNSIGNED_INT_VEC4: integer = true; rows = 4; signed = false; break;
+		}
+
+		return { integer, signed, rows, columns, texture, dynamicArray };
 	}
 }
 

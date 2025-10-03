@@ -1248,7 +1248,8 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 					samples: Math.floor(this.blurSamples / 2),
 					composite: i === directions.length - 1,
 					projection, invProjection,
-					axis: directions[i].times(invRes)
+					axis: directions[i].times(invRes),
+					colorTexture: null
 				};
 
 				if (uniforms.composite) {

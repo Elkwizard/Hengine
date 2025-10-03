@@ -118,7 +118,7 @@ class SimpleMaterial extends Material {
 				if (value) {
 					this.uniforms[key] = value;
 				} else {
-					delete this.uniforms[key];
+					this.uniforms[key] = null;
 				}
 				this.useTexture[SimpleMaterial.USE_TEXTURE[key]] = +!!value;
 			});
@@ -128,10 +128,11 @@ class SimpleMaterial extends Material {
 			if (value) {
 				this.uniforms.alphaTexture = value;
 			} else {
-				delete this.uniforms.alphaTexture;
+				this.uniforms.alphaTexture = null;
 			}
 			this.useTexture[SimpleMaterial.USE_TEXTURE.alphaTexture] = +!!value;
 		});
+		this.albedoTexture = this.specularTexture = this.alphaTexture = null;
 
 		Object.assign(this, settings);
 	}
@@ -234,8 +235,6 @@ SimpleMaterial.FRAGMENT_SHADER = new GLSL(`
 	uniform sampler2D alphaTexture;
 
 	${SimpleMaterial.LIGHTING}
-
-	#define MAYBE_TEXTURE(scalar, tex) (material.scalar.a > 0.0 ? material.scalar.rgb : texture(tex, uv).rgb)
 
 	vec4 shader() {
 		vec3 albedoColor = material.useTexture.${SimpleMaterial.USE_TEXTURE.albedoTexture} ? texture(albedoTexture, uv).rgb : material.albedo;
