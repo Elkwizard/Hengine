@@ -58,7 +58,8 @@ Before using the Hengine, it must be included in your HTML file in one of two po
 
 ## Examples
 1. [Hello World Demo](https://elkwizard.github.io/Hengine/Demos/HelloWorld.html)
-2. [Physics Demo](https://elkwizard.github.io/Hengine/Demos/Physics.html)
+2. [2D Physics Demo](https://elkwizard.github.io/Hengine/Demos/Physics2D.html)
+2. [3D Physics Demo](https://elkwizard.github.io/Hengine/Demos/Physics3D.html)
 3. [Shader Demo](https://elkwizard.github.io/Hengine/Demos/Shader.html)
 
 ## Documentation

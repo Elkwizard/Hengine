@@ -1,0 +1,164 @@
+<script src="../Hengine/Hengine.js?3d" title="Hengine - 3D Physics Demo">
+	// set background
+	canvas.clearScreen = () => renderer.fill(Color.SKY_BLUE.unlimited.times(2));
+	
+	// position camera
+	scene.camera.position.z = -30;
+	scene.camera.direction.rotate(Vector3.x(-0.2));
+
+	// set scene gravity
+	scene.physics.gravity.y = 0.05;
+
+	// set SSAO quality
+	renderer.postProcess.ssao.samples = 32;
+
+	// create static floor object, with collider 
+	const floor = scene.main.addPhysicsElement("floor", Vector3.y(20));
+	floor.defaultShape = Prism.fromDimensions(120, 5, 100);
+
+	// find floor level
+	const minFloorY = floor.getBoundingBox().min.y;
+	
+	// define block coloring
+	class BLOCK extends ElementScript {
+		static WIDTH = 4;
+		static HEIGHT = 4;
+		static DEPTH = 3;
+
+		// called upon behavior initialization
+		init(obj) {
+			obj.scripts.removeDefault();
+			// create matching mesh with a random color 
+			this.mesh = Mesh.fromShape(
+				obj.defaultShape,
+				new SimpleMaterial({ albedo: Random.color() })
+			);
+		}
+		
+		// called each frame to render the object
+		draw(obj, name, shape) {
+			renderer.mesh(this.mesh).default();
+		}
+
+		// creates a new object with this behavior
+		static create(position) {
+			const block = scene.main.addPhysicsElement("block", position, true);
+			block.defaultShape = Prism.fromDimensions(
+				BLOCK.WIDTH, BLOCK.HEIGHT, BLOCK.DEPTH
+			);
+			block.scripts.add(BLOCK);
+			return block;
+		}
+	}
+
+	// create blocks
+	const BASE_SIZE = 20;
+	const LAYERS = 5;
+	const SPACING = 5;
+
+	const zCurve = relative => -0.005 * relative ** 2;
+
+	for (let i = 0; i < LAYERS; i++) {
+		const levelSize = BASE_SIZE - i * 3;
+		const offset = (BASE_SIZE - levelSize) / 2;
+
+		for (let j = 0; j < levelSize; j++) {
+			const relative = j - levelSize / 2;
+
+			const x = relative * SPACING;
+			const y = minFloorY - (i + 0.5) * BLOCK.HEIGHT;
+			const z = zCurve(x);
+
+			// create and position individual block
+			const block = BLOCK.create(new Vector3(x, y, z));
+
+			// make block match curve of tower
+			const DX = 0.01;
+			const dZdx = (zCurve(x + DX) - z) / DX;
+			const angle = Math.atan(dZdx);
+			block.transform.rotation = Vector3.y(-angle);
+		}
+	}
+	
+	// define sphere behavior
+	class SPHERE extends ElementScript {
+		static RADIUS = 2;
+		static LAUNCH_SPEED = 3;
+		static LIFESPAN = 100;
+		static MESH = Mesh.fromShape(
+			new Sphere(Vector3.zero, SPHERE.RADIUS),
+			new SimpleMaterial({
+				albedo: Color.WHITE,
+				specularExponent: 64
+			}),
+			32 // sphere resolution
+		);
+
+		// called upon behavior initialization
+		init(obj) {
+			obj.scripts.removeDefault();
+		}
+
+		// called each tick to update the sphere, prior to rendering
+		update(obj) {
+			// destroys the sphere after a delay
+			if (obj.lifeSpan > SPHERE.LIFESPAN)
+				obj.remove();
+		}
+		
+		// called each frame to render the sphere
+		draw(obj, name, shape) {
+			// parameterize lifespan
+			const t = obj.lifeSpan / SPHERE.LIFESPAN;
+			const scale = 1 - t ** 4;
+
+			// render the sphere smaller as it disappears
+			renderer.save();
+			renderer.scale(scale);
+			renderer.mesh(SPHERE.MESH).default();
+			renderer.restore();
+		}
+
+		// creates a new object with this behavior
+		static create(position, direction) {
+			const sphere = scene.main.addPhysicsElement("sphere", position, true);
+			sphere.defaultShape = new Sphere(Vector3.zero, SPHERE.RADIUS);
+			sphere.scripts.add(SPHERE);
+			
+			// slightly randomize the direction
+			const axis = Random.sphere();
+			const angle = Random.range(0.3); // a random number on [-0.1, 0.1]
+			direction = direction.rotated(axis.times(angle));
+
+			// launch the sphere in a particular direction
+			sphere.scripts.PHYSICS.velocity = direction.times(SPHERE.LAUNCH_SPEED);
+			
+			return sphere;
+		}
+	}
+
+	// add lighting
+	intervals.continuous(time => {
+		scene.camera.drawInWorldSpace(() => {
+			renderer.light(Color.WHITE).default();
+
+			// fire spheres when space pressed
+			if (mouse.justPressed("Left")) {
+				const COUNT = 3;
+				const ANGLE_SPACING = 0.4;
+
+				for (let i = 0; i < COUNT; i++) {
+					// compute rotated forward vector
+					const angle = (i - (COUNT - 1) / 2) * ANGLE_SPACING;
+					const axis = scene.camera.up;
+					const direction = scene.camera.direction.rotated(axis.times(angle));
+					
+					// create sphere
+					SPHERE.create(scene.camera.position, direction);
+				}
+			}
+
+			ui.draw(Color.BLACK).text(Font.Arial30, "Left Click to Fire", 10, 10);
+		}, renderer);
+	}, IntervalFunction.AFTER_UPDATE);
+</script>
