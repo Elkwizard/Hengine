@@ -28,6 +28,7 @@
 		// called upon behavior initialization
 		init(obj) {
 			obj.scripts.removeDefault();
+			obj.cullGraphics = false;
 			// create matching mesh with a random color 
 			this.mesh = Mesh.fromShape(
 				obj.defaultShape,

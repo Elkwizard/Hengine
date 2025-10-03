@@ -524,7 +524,7 @@ class Artist3D extends Artist {
 				const resolution = Math.ceil(this.shadowResolution * scale);
 				const viewport = new Rect(0, 0, resolution, resolution);
 				const camera = new Camera3D(() => viewport);
-				camera.direction = light.direction;
+				camera.direction = light.direction;	
 
 				const frustum = frusta[j];
 				const frustumBounds = Prism.bound(
