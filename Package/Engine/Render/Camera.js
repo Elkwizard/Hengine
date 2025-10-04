@@ -40,7 +40,7 @@
  * The transformation represented by this matrix is from World-Space to Camera-Space.
  * `Vector` in the context of this class refers to either `Vector2` or `Vector3` depending on whether Camera2D or Camera3D is used.
  * Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
- * @prop Vector position | The location of the camera in World-Space
+ * @prop<stable> Vector position | The location of the camera in World-Space
  * @prop Number zoom | The magnification level of the camera
  * @prop Number rotation | The clockwise roll (in radians) of the camera. Starts at 0
  */

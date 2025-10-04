@@ -50,6 +50,25 @@ class Lens {
 		return this.createProjection(height / width);
 	}
 	/**
+	 * Returns the World-Space direction of the ray under a given pixel.
+	 * The returned vector is normalized.
+	 * @param Vector2 position | The pixel coordinates
+	 * @return Vector3
+	 */
+	getViewDirection(position) {
+		const { viewport } = this;
+		
+		const tx = viewport.xRange.toIntervalValue(position.x);
+		const ty = viewport.yRange.toIntervalValue(position.y);
+		
+		const screen = this.cacheScreen();
+		const farQuad = screen.vertices.slice(4);
+		const farPosition = Interpolation.quadLerp(...farQuad, tx, ty);
+		const toFarPosition = farPosition.minus(this.camera.position);
+
+		return toFarPosition.normalize();
+	}
+	/**
 	 * Configures the lens to use a perspective projection.
 	 * @param Number fov | The field of view of the lens in radians
 	 * @param Number zNear | The location of the near clipping plane
@@ -72,7 +91,7 @@ class Lens {
  * @implements Camera
  * @type class Camera3D extends Matrix4 implements Camera<Vector3>
  * Represents the camera in a 3D scene.
- * @prop Vector3 direction | The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
+ * @prop<stable> Vector3 direction | The direction the camera is facing. This must be a unit vector, and starts as (0, 0, 1)
  * @prop<immutable> Vector3 right | The local right direction of the camera, in the XZ World-Space plane
  * @prop<immutable> Vector3 up | The local up direction of the camera, in World-Space
  * @prop<immutable> Frustum screen | A small World-Space Frustum containing the frusta of all the camera's lenses. This only updates when cacheScreen() is called

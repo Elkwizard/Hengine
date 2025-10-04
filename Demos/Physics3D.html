@@ -1,4 +1,4 @@
-<script src="../Hengine.js?3d" title="Hengine - 3D Physics Demo">
+<script src="../Hengine.js?3d" title="Hengine Demos - 3D Physics">
 	// set background
 	canvas.clearScreen = () => renderer.fill(Color.SKY_BLUE.unlimited.times(2));
 	
@@ -86,6 +86,8 @@
 		static RADIUS = 2;
 		static LAUNCH_SPEED = 3;
 		static LIFESPAN = 100;
+		static GHOST_DURATION = 2;
+
 		static MESH = Mesh.fromShape(
 			new Sphere(Vector3.zero, SPHERE.RADIUS),
 			new SimpleMaterial({
@@ -98,6 +100,12 @@
 		// called upon behavior initialization
 		init(obj) {
 			obj.scripts.removeDefault();
+		}
+
+		// called to determine whether a collision should be allowed
+		collideRule(obj, other) {
+			return	!other.scripts.has(SPHERE) ||
+					obj.lifeSpan > SPHERE.GHOST_DURATION;
 		}
 
 		// called each tick to update the sphere, prior to rendering
@@ -143,16 +151,16 @@
 		scene.camera.drawInWorldSpace(() => {
 			renderer.light(Color.WHITE).default();
 
-			// fire spheres when space pressed
+			// fire spheres when mouse clicked
 			if (mouse.justPressed("Left")) {
 				const COUNT = 3;
-				const ANGLE_SPACING = 0.4;
+				const ANGLE_SPACING = 0.1;
 
 				for (let i = 0; i < COUNT; i++) {
 					// compute rotated forward vector
 					const angle = (i - (COUNT - 1) / 2) * ANGLE_SPACING;
 					const axis = scene.camera.up;
-					const direction = scene.camera.direction.rotated(axis.times(angle));
+					const direction = mouse.direction.rotated(axis.times(angle));
 					
 					// create sphere
 					SPHERE.create(scene.camera.position, direction);

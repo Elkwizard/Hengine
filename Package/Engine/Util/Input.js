@@ -364,6 +364,7 @@ KeyboardHandler.State = class KeyState extends InputHandler.State { };
  * @prop Vector2 world | The current cursor position, in World-Space. This is only available in 2D Mode
  * @prop Vector2 worldLast | The cursor position last frame, in World-Space.  This is only available in 2D Mode
  * @prop Vector2 worldDelta | The change in the cursor's World-Space position over the last frame. This is only available in 2D Mode
+ * @prop Vector3 direction | The direction of the ray under the mouse, in World-Space. This is only available in 3D Mode
  * @prop Boolean locked | Whether the mouse is currently locked and unable to move
  */
 class MouseHandler extends InputHandler {
@@ -381,6 +382,7 @@ class MouseHandler extends InputHandler {
 		Vector2.defineReference(this, "world");
 		Vector2.defineReference(this, "worldLast");
 		Vector2.defineReference(this, "worldDelta");
+		if (IS_3D) Vector3.defineReference(this, "direction");
 		this.wheelDelta = 0;
 	}
 	get locked() {
@@ -465,6 +467,9 @@ class MouseHandler extends InputHandler {
 	unlock() {
 		document.exitPointerLock();
 	}
+	getWorldDirection(point) {
+		return this.engine.scene.camera.lens.getViewDirection(point);
+	}
 	getWorldPosition(point) {
 		if (IS_3D) return point;
 		return this.engine.scene.camera.screenToWorld(point);
@@ -485,6 +490,7 @@ class MouseHandler extends InputHandler {
 		this.world = this.getWorldPosition(this.screen);
 		this.worldLast = this.getWorldPosition(this.screenLast);
 		this.worldDelta = this.screenDelta.over(this.engine.scene.camera.zoom);
+		if (IS_3D) this.direction = this.getWorldDirection(this.screen);
 	}
 	afterUpdate() {
 		super.afterUpdate();
@@ -579,6 +585,9 @@ class TouchHandler extends InputHandler {
 		addHandler("pointermove", null);
 		addHandler("pointerup", false);
 	}
+	getWorldDirection(point) {
+		return this.engine.scene.camera.lens.getViewDirection(point);
+	}
 	getWorldPosition(point) {
 		return this.engine.scene.camera.screenToWorld(point);
 	}
@@ -633,8 +642,9 @@ class TouchHandler extends InputHandler {
  * The state of a specific touch on the user's screen.
  * @prop Vector2 screen | The current position of the touch, in Screen-Space
  * @prop Vector2 screenLast | The position of the touch last frame, in Screen-Space
- * @prop Vector2 world | The current position of the touch, in World-Space
- * @prop Vector2 worldLast | The position of the touch last frame, in World-Space
+ * @prop Vector2 world | The current position of the touch, in World-Space. This is only available in 2D Mode
+ * @prop Vector2 worldLast | The position of the touch last frame, in World-Space. This is only available in 2D Mode
+ * @prop Vector3 direction | The direction of the ray under the touch, in World-Space. This is only available in 3D Mode
  */
 TouchHandler.State = class TouchState extends MouseHandler.State {
 	constructor(handler, name) {
@@ -644,11 +654,16 @@ TouchHandler.State = class TouchState extends MouseHandler.State {
 		Vector2.defineReference(this, "screenLast");
 		Vector2.defineReference(this, "world");
 		Vector2.defineReference(this, "worldLast");
+		if (IS_3D) Vector3.defineReference(this, "direction");
 	}
 	beforeUpdate() {
 		super.beforeUpdate();
-		this.world = this.handler.getWorldPosition(this.screen);
-		this.worldLast = this.handler.getWorldPosition(this.screenLast);
+		if (IS_3D) {
+			this.direction = this.handler.getWorldDirection(this.screen);
+		} else {
+			this.world = this.handler.getWorldPosition(this.screen);
+			this.worldLast = this.handler.getWorldPosition(this.screenLast);
+		}
 	}
 	afterUpdate() {
 		super.afterUpdate();
