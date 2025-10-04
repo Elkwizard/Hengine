@@ -319,12 +319,26 @@ class TEXT_AREA extends ElementScript {
 	}
 	updateTextBoundingBox(obj) {
 		const { width, height } = this.getDimensions();
-		const relativeTextViewBox = new Rect(-width / 2 + this.padding, -height / 2 + this.padding, width - this.padding - this.scrollBarSize, height - this.padding - this.scrollBarSize);
-		const relativeTextBoundingBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, this.font.getTextWidth(this.value), this.font.getTextHeight(this.value));
+		const relativeTextViewBox = new Rect(
+			-width / 2 + this.padding, -height / 2 + this.padding,
+			width - this.padding - this.scrollBarSize, height - this.padding - this.scrollBarSize
+		);
+		const relativeTextBoundingBox = new Rect(
+			relativeTextViewBox.x, relativeTextViewBox.y,
+			this.font.getTextWidth(this.value), this.font.getTextHeight(this.value)
+		);
 		const rightOffset = this.multiline && relativeTextViewBox.height < relativeTextBoundingBox.height ? this.scrollBarSize : 0;
 		const bottomOffset = this.multiline && relativeTextViewBox.width < relativeTextBoundingBox.width ? this.scrollBarSize : 0;
-		this.relativeTextViewBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, width - this.padding * 2 - rightOffset, height - this.padding * 2 - bottomOffset);
-		this.relativeTextBoundingBox = new Rect(relativeTextViewBox.x, relativeTextViewBox.y, this.font.getTextWidth(this.value) + this.renderTextOffset.x, this.font.getTextHeight(this.value) + this.renderTextOffset.y);
+		this.relativeTextViewBox = new Rect(
+			relativeTextViewBox.x, relativeTextViewBox.y,
+			width - this.padding * 2 - rightOffset,
+			height - this.padding * 2 - bottomOffset
+		);
+		this.relativeTextBoundingBox = new Rect(
+			relativeTextViewBox.x, relativeTextViewBox.y,
+			this.font.getTextWidth(this.value) + this.renderTextOffset.x,
+			this.font.getTextHeight(this.value) + this.renderTextOffset.y
+		);
 		this.clampScrollOffset();
 	}
 	select(obj, p, type) {

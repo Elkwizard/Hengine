@@ -196,13 +196,14 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				#define boolean(b) (and(iBooleans, b) != 0)
 			`;
 
-			const textureSelector = webgl2 ? `						switch (iTextureIndex) {
-${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
-   `							case ${i}: pixelColor = texture(textures[${i}], tuv); break;`
-).join("\n")}
-						}` : new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
-			`						${i ? "else " : ""}if (iTextureIndex == ${i}) pixelColor = texture(textures[${i}], tuv);`
-).join("\n");
+			const textureSelector = webgl2 ? `
+				switch (iTextureIndex) {
+					${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
+						`case ${i}: pixelColor = texture(textures[${i}], tuv); break;`
+					).join("\n")}
+				}` : new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
+					`${i ? "else " : ""}if (iTextureIndex == ${i}) pixelColor = texture(textures[${i}], tuv);`
+				).join("\n");
 
 			const vs = `#version 300 es
 				precision highp float;
@@ -413,10 +414,9 @@ ${new Array(glState.MAX_TEXTURE_SLOTS).fill(0).map((_, i) =>
 						vec2 tuv = clamp(textureCoord, textureCoordMin, textureCoordMax);
 						if (boolean(${BOOLS.PIXELATED})) tuv = (floor(tuv / ${glState.TEXTURE_SLOT_PIXEL_SIZE}) + 0.5) * ${glState.TEXTURE_SLOT_PIXEL_SIZE};
  						int iTextureIndex = int(textureIndex);
-${textureSelector}
+						${textureSelector}
 					} else {
-${new Array(debugSlots).fill(0).map((_, i) =>
-				`						{
+						${new Array(debugSlots).fill(0).map((_, i) => `{
 							float minX = ${(i / debugSlots).toFixed(10)};
 							float maxX = ${((i + 1) / debugSlots).toFixed(10)};
 							if (uv.x > minX && uv.x < maxX) pixelColor = texture(
@@ -425,8 +425,7 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 									uv.y
 								)
 							);
-						};`
-			).join("\n")}
+						};`).join("\n")}
 					}
 
 					// pixelColor = vec4(1.0, 0.0, 0.0, 1.0);
@@ -448,10 +447,17 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 			gl.deleteShader(vShader);
 			gl.deleteShader(fShader);
 
-			if (!gl.getShaderParameter(vShader, gl.COMPILE_STATUS)) console.log(`vertex error: \n${gl.getShaderInfoLog(vShader)}`);
-			if (!gl.getShaderParameter(fShader, gl.COMPILE_STATUS)) console.log(`fragment error: \n${gl.getShaderInfoLog(fShader)}`);
-			if (!gl.getProgramParameter(glState.program, gl.LINK_STATUS)) console.log(`linking error: \n${gl.getShaderInfoLog(glState.program)}`);
-			else gl.useProgram(glState.program);
+			if (!gl.getShaderParameter(vShader, gl.COMPILE_STATUS))
+				console.log(`vertex error: \n${gl.getShaderInfoLog(vShader)}`);
+			
+			if (!gl.getShaderParameter(fShader, gl.COMPILE_STATUS))
+				console.log(`fragment error: \n${gl.getShaderInfoLog(fShader)}`);
+			
+			if (!gl.getProgramParameter(glState.program, gl.LINK_STATUS)) {
+				console.log(`linking error: \n${gl.getShaderInfoLog(glState.program)}`);
+			} else {
+				gl.useProgram(glState.program);
+			}
 		};
 		{ // uniforms
 			for (const name of ["resolution", "textures", "renderPass"]) uniforms[name] = gl.getUniformLocation(glState.program, name);
@@ -719,7 +725,14 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		vertexTextureYAxis.put(index, glState.transformScaleX, glState.transformScaleY);
 		vertexTransformRow1.put(index, M00 * m00 + M10 * m01, M00 * m10 + M10 * m11, M00 * m20 + M10 * m21 + M20);
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
-		vertexBooleans.put(index, BOOLS.LINE_SEGMENT | (leftCap ? BOOLS.LEFT_LINE_CAP : 0) | (rightCap ? BOOLS.RIGHT_LINE_CAP : 0) | lineCap << LINE_CAP_START_BIT | lineJoin << LINE_JOIN_START_BIT);
+		vertexBooleans.put(
+			index,
+			BOOLS.LINE_SEGMENT |
+				(leftCap ? BOOLS.LEFT_LINE_CAP : 0) |
+				(rightCap ? BOOLS.RIGHT_LINE_CAP : 0) |
+				lineCap << LINE_CAP_START_BIT |
+				lineJoin << LINE_JOIN_START_BIT
+		);
 
 		glState.instancePointer++;
 		if (glState.instancePointer === MAX_INSTANCES) render();
@@ -1084,9 +1097,6 @@ ${new Array(debugSlots).fill(0).map((_, i) =>
 		attributes.vertexTransformRow1.set(start, end, done);
 		attributes.vertexTransformRow2.set(start, end, done);
 		attributes.vertexBooleans.set(start, end, done);
-
-		// window.batchSizes.push(end - start);
-		// window.batchUnits.push([...glState.spriteSheets.activeSpriteSheets].sort((a, b) => a.textureUnit - b.textureUnit).map(sheet => sheet.id));
 
 		gl.uniform1i(uniforms.renderPass, glState.drawCalls);
 

@@ -40,7 +40,10 @@ function documentName(name, doc, wrapperClass) {
 	if (name.isGetter) result = `<span class="keyword">get</span> ${result}`;
 	if (name.isSetter) result = `<span class="keyword">set</span> ${result}`;
 	if (name.baseClass) result += ` <span class="keyword">extends</span> <span class="class-name">${name.baseClass}</span>`;
-	if (doc.settings.implements) result += ` <span class="keyword">implements</span> <span class="class-name">${doc.settings.implements.interfaces.map(int => int.name.base).join(", ")}</span>`;
+	if (doc.settings.implements)
+		result += ` <span class="keyword">implements</span> <span class="class-name">${
+			doc.settings.implements.interfaces.map(int => int.name.base).join(", ")
+		}</span>`;
 	return result;
 }
 
@@ -62,7 +65,9 @@ function documentFunction(fn, wrapperClass) {
 
 			return "";
 		}).join(`<span class="aux"> | </span>`);
-	const header = `${name}${fn.name.isGetter ? "" : `(${parameters})`}${fn.name.base === "constructor" || fn.name.isSetter ? "" : `<span class="type">${returnType}</span>`}`;
+	const header = `${name}${fn.name.isGetter ? "" : `(${parameters})`}${
+		fn.name.base === "constructor" || fn.name.isSetter ? "" : `<span class="type">${returnType}</span>`
+	}`;
 	const parameterDescriptions = signatures
 		.map(signature => `
 			<div class="header">Parameters</div>
@@ -216,7 +221,9 @@ function document(doc, topLevelIDs, file, aliases) {
 		.sort((a, b) => b[0].name.base.length - a[0].name.base.length);
 	for (const [doc, filePath] of entries) {
 		if (file === filePath) continue;
-		const regex = new RegExp(String.raw`(?<! (?:href|id)="([^"]*?))\b(${doc.name.base.replaceAll(".", "\\.")}(s|es)?)\b(?!([^<]*?)<\/a>)`, "g");
+		const regex = new RegExp(String.raw`(?<! (?:href|id)="([^"]*?))\b(${
+			doc.name.base.replaceAll(".", "\\.")
+		}(s|es)?)\b(?!([^<]*?)<\/a>)`, "g");
 		const link = `<a href=${JSON.stringify(
 			path.join(toRoot, filePath)
 				.replace(/\\/g, "/") + "#" + doc.searchID

@@ -104,7 +104,14 @@ highlighters.js = [
 	[/\b[A-Z][a-z0-9_]*\b/g, "CLASS"],
 	[/\b(const)\s+(\w+?)\b/g, "CONSTANT"],
 	[/\b([A-Z_]+?)\b/g, "CONSTANT"],
-	...WORD_MATCH("KEYWORD", "throw", "in", "of", "extends", "switch", "case", "delete", "typeof", "instanceof", "class", "const", "let", "var", "static", "return", "if", "else", "break", "continue", "for", "while", "do", "new", "constructor", "function\\*", "function", "=>", "async", "await", "yield\\*", "yield"),
+	...WORD_MATCH(
+		"KEYWORD",
+		"throw", "in", "of", "extends", "switch", "case", "delete", "typeof",
+		"instanceof", "class", "const", "let", "var", "static", "return",
+		"if", "else", "break", "continue", "for", "while", "do", "new",
+		"constructor", "function\\*", "function", "=>", "async", "await",
+		"yield\\*", "yield"
+	),
 	[/\b(get|set)\b(?!\s*?\()/g, "KEYWORD"],
 	...NUMBER_MATCH,
 	...WORD_MATCH("LANG_VAR", "this", "true", "false", "null", "undefined"),
@@ -119,7 +126,13 @@ highlighters.glsl = [
 	[/\b(struct|uniform|in|out)\s+(\w+?)\b/g, "CLASS"],
 	[/\b(\w+)\s+(?=(\w+?)\b)/g, "CLASS"],
 	[/\b([A-Z_]+?)\b/g, "CONSTANT"],
-	...WORD_MATCH("KEYWORD", "#define", "#version", "struct", "([ui]?sampler[23]D)", "bool", "float", "(u?int)", "highp", "lowp", "mediump", "return", "if", "else", "for", "while", "do", "case", "switch", "case", "break", "continue", "uniform", "in", "out", "inout", "([ui]?vec[234])", "(mat[234])", "(mat[234]x[234])"),
+	...WORD_MATCH(
+		"KEYWORD",
+		"#define", "#version", "struct", "([ui]?sampler[23]D(Array)?(Shadow)?)", "bool", "float",
+		"(u?int)", "highp", "lowp", "mediump", "return", "if", "else", "for",
+		"while", "do", "case", "switch", "case", "break", "continue", "uniform",
+		"in(out)?", "out", "([ui]?vec[234])", "mat[234](x[234])?"
+	),
 	...NUMBER_MATCH,
 	...WORD_MATCH("LANG_VAR", "true", "false"),
 	[/(?<=#define)\s+(\w+?)\b/g, "CONSTANT"],

@@ -64,7 +64,13 @@ class GPUComputation extends GPUInterface {
 
 		const WRITE = {
 			"bool": (expr, index) => `bytes[${index}] = int(${expr})`,
-			"int": (expr, index) => `{ int val = ${expr}; bytes[${index}] = val & 255; bytes[${index + 1}] = (val >> 8) & 255; bytes[${index + 2}] = (val >> 16) & 255; bytes[${index + 3}] = (val >> 24) & 255; }`,
+			"int": (expr, index) => `{
+				int val = ${expr};
+				bytes[${index}] = val & 255;
+				bytes[${index + 1}] = (val >> 8) & 255;
+				bytes[${index + 2}] = (val >> 16) & 255;
+				bytes[${index + 3}] = (val >> 24) & 255;
+			}`,
 			"float": (expr, index) => WRITE.int(`floatBitsToInt(${expr})`, index)
 		};
 
