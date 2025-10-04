@@ -22,16 +22,6 @@ class VideoView extends ImageType {
 		return this._loops;
 	}
 	/**
-	 * Returns a copy of the current frame of the video.
-	 * @return Frame
-	 */
-	getFrame() {
-		let image = this.makeImage();
-		let frame = new Frame(image.width, image.height);
-		frame.renderer.c.drawImage(image, 0, 0);
-		return frame;
-	}
-	/**
 	 * Pauses playback of the video.
 	 */
 	pause() {
@@ -46,9 +36,10 @@ class VideoView extends ImageType {
 		this.video.play();
 	}
 	makeImage() {
-		if ((this.playing && performance.now() - this.lastCaptureTime > 16)) {
+		const now = performance.now();
+		if ((this.playing && now - this.lastCaptureTime > 16)) {
 			this.c.drawImage(this.video, 0, 0, this.image.width, this.image.height);
-			this.lastCaptureTime = performance.now();
+			this.lastCaptureTime = now;
 		}
 		
 		return this.image;
