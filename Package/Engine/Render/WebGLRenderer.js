@@ -295,7 +295,7 @@ WebGLArtist2D.ImageRenderer = class extends WebGLArtist2D.Renderer {
 		this.image = image;
 		this.canvasImage = image.makeWebGLImage();
 		if (!this.image.renderable) return new Proxy({}, { get: () => () => null }); // throw away calls
-		if (changed) this.gl.updateTextureCache(this.currentImageCIS);
+		if (changed) this.gl.updateTextureCache(this.canvasImage);
 	}
 	circle(x, y, radius) {
 		this.gl.texturedEllipse(x, y, radius, radius, 0, 0, 1, 1, this.canvasImage);
