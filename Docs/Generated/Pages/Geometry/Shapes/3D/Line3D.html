@@ -1,0 +1,125 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class Line3D">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L25" target="_blank" class="class-name source-link">Line3D</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../../Geometry/Shapes/3D/Shape3D.html#class Shape3D">Shape3D</a></span>
+				</div>
+				<div class="class desc">
+					Represents a line segment in 3D space.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+		<div class="prop-wrapper" id="Line3D.a">
+			<div class="prop-header member">
+				<span class="prop-name">a</span>
+				<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			</div>
+			<div class="prop desc">The beginning of the line segment</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Line3D.b">
+			<div class="prop-header member">
+				<span class="prop-name">b</span>
+				<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			</div>
+			<div class="prop desc">The end of the line segment</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Line3D.length">
+			<div class="prop-header member">
+				<span class="prop-name">length</span>
+				<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+			</div>
+			<div class="prop desc">The length of the line segment</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Line3D.vector">
+			<div class="prop-header member">
+				<span class="prop-name">vector</span>
+				<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			</div>
+			<div class="prop desc">The vector from <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">a</span></code> to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">b</span></code></div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Line3D.prototype.evaluate()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L46" target="_blank" class="function-name source-link">evaluate</a>(<span class="param">t</span>)<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			</div>
+			<div class="function desc">
+				Computes the linear interpolation along the line segment (from <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">a</span></code> to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">b</span></code>) for a specific <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">t</span></code> value.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Line3D.prototype.evaluate():t">
+							<div class="param-name">
+								<span class="param">t</span>
+								<span class="type"><a href="../../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The parameter value for the interpolation on [0, 1]
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Line3D.prototype.getClosestPoints()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Shapes3D.js?#L53" target="_blank" class="function-name source-link">getClosestPoints</a>(<span class="param">other</span>)<span class="type"><a href="../../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[2]</span>
+			</div>
+			<div class="function desc">
+				Returns the points on the caller and a given line segment that with minimal distance.
+The distance between these points gives the distance between the line segments.
+The first element of the return value is the point on the caller, and the second is the point on the argument.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Line3D.prototype.getClosestPoints():other">
+							<div class="param-name">
+								<span class="param">other</span>
+								<span class="type">Line3D</span>
+							</div>
+							<div class="param desc">
+								The line segment to compare with
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	
