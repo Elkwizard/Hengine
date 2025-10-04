@@ -414,6 +414,7 @@ class Polyhedron extends Shape3D {
 	}
 	/**
 	 * Returns the vertex indices of the nth face of the polyhedron.
+	 * @param Number index | The index of the face
 	 * @return Number[] 
 	 */
 	getFaceIndices(index) {
@@ -423,6 +424,7 @@ class Polyhedron extends Shape3D {
 	}
 	/**
 	 * Returns the nth face in the polyhedron.
+	 * @param Number index | The index of the face
 	 * @return Triangle
 	 */
 	getFace(index) {

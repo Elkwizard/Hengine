@@ -141,7 +141,8 @@
 				"Sphere": null,
 				"Capsule": null,
 				"Triangle": null,
-				"Plane": null
+				"Plane": null,
+				"Line3D": null
 			},
 			"Spline": null
 		},

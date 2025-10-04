@@ -32,6 +32,7 @@ These associations are laid out in the following table:
 	<tr><td>fixed-length array</td><td><a href="../../Built-Ins/Array.html#class Array">Array</a></td></tr>
  <tr><td>dynamic-length array</td><td><a href="../../Rendering/GLSL API/GPUArray.html#class GPUArray">GPUArray</a></td></tr>
 </table>
+In addition, null can be used as a value for <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">sampler</span><span class="highlight-SYMBOL">*</span></code> uniforms in order to explicitly unbind a sampler.
 
 Though they are not present in any GLSL language standard, the <a href="../../Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a> supports dynamic-length, global, uniform struct arrays.
 These are specified by omitting the length when declaring the array.
@@ -56,7 +57,7 @@ Dynamic-length arrays are represented by <a href="../../Rendering/GLSL API/GPUAr
 		
 			<div class="class-wrapper" id="class CubeMap">
 				<div class="class-header">
-					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L56" target="_blank" class="class-name source-link">CubeMap</a>
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L57" target="_blank" class="class-name source-link">CubeMap</a>
 				</div>
 				<div class="class desc">
 					Represents a cube map usable in via a <a href="../../Rendering/GLSL API/GPUInterface.html#class GPUInterface">GPUInterface</a>.
@@ -128,7 +129,7 @@ All faces must be square and equal in size.
 		
 			<div class="class-wrapper" id="class Sampler">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L643" target="_blank" class="class-name source-link">Sampler</a>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L701" target="_blank" class="class-name source-link">Sampler</a>
 				</div>
 				<div class="class desc">
 					This describes the way in which a GLSL <code class=" highlight-BACKGROUND"><span class="highlight-IDENTIFIER">sampler</span><span class="highlight-SYMBOL">*</span></code> reads data from a texture.
@@ -143,7 +144,7 @@ This can be used in place of an <a href="../../Rendering/Image Types/ImageType.h
 					<div class="class-methods">
 		<div class="function-wrapper" id="Sampler.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L648" target="_blank" class="function-name source-link">constructor</a>(<span class="param">image</span>, <span class="param">settings?</span>)
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L706" target="_blank" class="function-name source-link">constructor</a>(<span class="param">image</span>, <span class="param">settings?</span>)
 			</div>
 			<div class="function desc">
 				
@@ -183,7 +184,7 @@ This can be used in place of an <a href="../../Rendering/Image Types/ImageType.h
 		
 			<div class="class-wrapper" id="class SamplerSettings">
 				<div class="class-header">
-					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L638" target="_blank" class="class-name source-link">SamplerSettings</a>
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L696" target="_blank" class="class-name source-link">SamplerSettings</a>
 				</div>
 				<div class="class desc">
 					Describes how a Sampler should be constructed.
@@ -228,7 +229,7 @@ All properties of this interface are optional.
 		
 			<div class="class-wrapper" id="enum FilterMode">
 				<div class="class-header">
-					<span class="keyword">enum</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L627" target="_blank" class="class-name source-link">FilterMode</a>
+					<span class="keyword">enum</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\GPUInterface.js?#L685" target="_blank" class="class-name source-link">FilterMode</a>
 				</div>
 				<div class="class desc">
 					Represents the way in which samples of an image are interpolated in GLSL.

@@ -78,7 +78,10 @@ class Artist3D extends Artist {
 
 		this.hdr = true;
 		this.depthFormat = this.gl.DEPTH_COMPONENT32F;
-		this.resultBuffer = this.createScreenBuffer({ color: true, depth: true, hdr: true, depthFormat: this.depthFormat });
+		this.resultBuffer = this.createScreenBuffer({
+			color: true, depth: true, hdr: true,
+			depthFormat: this.depthFormat
+		});
 
 		this.compile();
 		
@@ -713,6 +716,7 @@ class Artist3D extends Artist {
 		const { gl } = this;
 		
 		this.maximizeViewport();
+
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
 		gl.enable(gl.BLEND);
 		gl.disable(gl.DEPTH_TEST);
@@ -775,6 +779,7 @@ class Artist3D extends Artist {
 		this.emptyQueues();
 
 		this.maximizeViewport();
+		
 		const { gl } = this;
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
 		gl.depthMask(true);

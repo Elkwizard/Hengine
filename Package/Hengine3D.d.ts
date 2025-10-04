@@ -1373,7 +1373,7 @@ declare class Animatable {
 declare class Matrix extends Float64Array implements Copyable, Serializable {
 	/**
 	 * Creates a new Matrix. Since this class is abstract, this constructor can only be used via its subclasses.
-	 * @param elements - The elements of the matrix, in row-major object
+	 * @param elements - The elements of the matrix, in row-major order
 	 */
 	constructor(...elements: number[]);
 	/**
@@ -1562,6 +1562,16 @@ declare class Matrix extends Float64Array implements Copyable, Serializable {
 	 * @param result - The matrix to copy the result into
 	 */
 	static mul(matrices: Matrix[], result?: Matrix): Matrix;
+	/**
+	 * Creates a matrix from a list of elements in a specified order.
+	 * @param elements - The elements of the matrix, in the specified order
+	 */
+	static fromColumnMajor(elements: ArrayLike): Matrix;
+	/**
+	 * Creates a matrix from a list of elements in a specified order.
+	 * @param elements - The elements of the matrix, in the specified order
+	 */
+	static fromRowMajor(elements: ArrayLike): Matrix;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -3621,12 +3631,14 @@ declare class Polyhedron extends Shape3D {
 	getEdges(): Line3D[];
 	/**
 	 * Returns the vertex indices of the nth face of the polyhedron.
+	 * @param index - The index of the face
 	 */
-	getFaceIndices(): number[];
+	getFaceIndices(index: number): number[];
 	/**
 	 * Returns the nth face in the polyhedron.
+	 * @param index - The index of the face
 	 */
-	getFace(): Triangle;
+	getFace(index: number): Triangle;
 	/**
 	 * Returns a set of triangles making up the surface of the polyhedron.
 	 */
@@ -6813,10 +6825,6 @@ declare class VideoView extends ImageType {
 	 */
 	playing: boolean;
 	/**
-	 * Returns a copy of the current frame of the video.
-	 */
-	getFrame(): Frame;
-	/**
 	 * Pauses playback of the video.
 	 */
 	pause(): void;
@@ -7093,6 +7101,12 @@ declare class Lens {
 	 * This may vary as the dimensions of the rendering surface change.
 	 */
 	get projection(): Matrix4;
+	/**
+	 * Returns the World-Space direction of the ray under a given pixel.
+	 * The returned vector is normalized.
+	 * @param position - The pixel coordinates
+	 */
+	getViewDirection(position: Vector2): Vector3;
 	/**
 	 * Configures the lens to use a perspective projection.
 	 * @param fov - The field of view of the lens in radians
@@ -9157,6 +9171,10 @@ declare class MouseHandler extends InputHandler {
 	 */
 	worldDelta: Vector2;
 	/**
+	 * The direction of the ray under the mouse, in World-Space. This is only available in 3D Mode
+	 */
+	direction: Vector3;
+	/**
 	 * Whether the mouse is currently locked and unable to move
 	 */
 	locked: boolean;
@@ -9312,13 +9330,17 @@ declare namespace TouchHandler {
 		 */
 		screenLast: Vector2;
 		/**
-		 * The current position of the touch, in World-Space
+		 * The current position of the touch, in World-Space. This is only available in 2D Mode
 		 */
 		world: Vector2;
 		/**
-		 * The position of the touch last frame, in World-Space
+		 * The position of the touch last frame, in World-Space. This is only available in 2D Mode
 		 */
 		worldLast: Vector2;
+		/**
+		 * The direction of the ray under the touch, in World-Space. This is only available in 3D Mode
+		 */
+		direction: Vector3;
 	}
 }
 
