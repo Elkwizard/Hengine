@@ -56,7 +56,6 @@ class GPUComputation extends GPUInterface {
 		`;
 	}
 	fragmentShader(glsl) {
-		const { SIZE, VECTORS } = GLSL;
 		const { PIXEL_BYTES, CHANNEL_BYTES, LITTLE_ENDIAN } = GPUDataTexture;
 		const pixels = Math.ceil(this.struct.size / PIXEL_BYTES);
 		const outColors = Array.dim(pixels).map((_, i) => `_output${i}`);
@@ -75,8 +74,8 @@ class GPUComputation extends GPUInterface {
 		};
 
 		for (const key in WRITE) {
-			const vecName = VECTORS[key];
-			const elSize = SIZE[key];
+			const vecName = GLSL.VECTOR_NAMES[key];
+			const elSize = GLSL.TYPES[key].size;
 			const write = WRITE[key];
 			for (let i = 2; i <= 4; i++) {
 				const name = vecName + i;
@@ -91,7 +90,7 @@ class GPUComputation extends GPUInterface {
 		for (let i = 0; i < this.struct.fields.length; i++) {
 			const { name, type } = this.struct.fields[i];
 			writes.push(`${WRITE[type](`value.${name}`, offset)};`);
-			offset += SIZE[type];
+			offset += GLSL.TYPES[type].size;
 		}
 
 		return ShaderSource.template`

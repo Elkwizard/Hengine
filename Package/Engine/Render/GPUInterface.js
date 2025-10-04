@@ -114,7 +114,7 @@ class GLSL {
 	}
 	parseInputs() {
 		this.inputs = new Map(
-			[...this.glsl.matchAll(/\b(?:layout\s*\(\s*location\s*=\s*(\d+)\s*\))?\s*in\s+(\w+)\s+((\w+)(,\s*\w+)*)\s*;/g)]
+			[...this.glsl.matchAll(/\b(?:layout\s*\(\s*location\s*=\s*(\d+)\s*\))?\s*in\s+(?:[a-z]+p\s+)?(\w+)\s+((\w+)(,\s*\w+)*)\s*;/g)]
 				.flatMap(([, location, type, names]) => names
 					.split(",")
 					.map(name => [name.trim(), { type, location: +location }])
@@ -174,19 +174,23 @@ class GLSL {
 		const struct = this.structs.get(type);
 
 		const bytes = struct.size;
-		const { VECTORS, SIZE } = GLSL;
 		const { PIXEL_BYTES, CHANNEL_BYTES, LITTLE_ENDIAN } = GPUDataTexture;
 		const channels = Vector4.modValues;
 
 		const READ = {
 			"bool": index => `bool(bytes[${index}])`,
-			"int": index => `bytes[${index}] | bytes[${index + 1}] << 8 | bytes[${index + 2}] << 16 | bytes[${index + 3}] << 24`,
+			"int": index => `
+				bytes[${index}] |
+				bytes[${index + 1}] << 8 |
+				bytes[${index + 2}] << 16 |
+				bytes[${index + 3}] << 24
+			`,
 			"float": index => `intBitsToFloat(${READ.int(index)})`
 		};
 
 		for (const key in READ) {
-			const vecName = VECTORS[key];
-			const elSize = SIZE[key];
+			const vecName = GLSL.VECTOR_NAMES[key];
+			const elSize = GLSL.TYPES[key].size;
 			const read = READ[key];
 			for (let i = 2; i <= 4; i++) {
 				const name = vecName + i;
@@ -203,7 +207,7 @@ class GLSL {
 		for (let i = 0; i < struct.fields.length; i++) {
 			const { name, type } = struct.fields[i];
 			reads.push(`result.${name} = ${READ[type](offset)};`);
-			offset += SIZE[type];
+			offset += GLSL.TYPES[type].size;
 		}
 
 		const identifiers = GPUInputArray.getNames(name);
@@ -639,11 +643,14 @@ class GPUInputArray extends GPUArray {
 			const byteOffset = x * PIXEL_BYTES + y * ROW_BYTES;
 			const byteLength = width * height * PIXEL_BYTES;
 			const paddedByteLength = Math.ceil(byteLength / PIXEL_BYTES) * PIXEL_BYTES;
-			const data = new Uint8Array(this.buffer.data.buffer, byteOffset, paddedByteLength);
-			const typedArray = new TypedArray(
-				data.buffer, data.byteOffset,
-				data.byteLength / CHANNEL_BYTES
-			);
+			const channelLength = paddedByteLength / CHANNEL_BYTES;
+			let typedArray;
+			if (paddedByteLength > this.buffer.byteLength) {
+				typedArray = new TypedArray(channelLength);
+				new Uint8Array(typedArray.buffer).set(this.buffer.data, 0);
+			} else {
+				typedArray = new TypedArray(this.buffer.data.buffer, byteOffset, channelLength);
+			}
 			gl.texSubImage2D(
 				gl.TEXTURE_2D, 0,
 				x, y, width, height,
