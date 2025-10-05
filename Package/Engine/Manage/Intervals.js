@@ -177,7 +177,6 @@ class Intervals {
 		this.performanceData = true;
 		this.frameCount = 0;
 		this.fps = 60;
-		this.rawFps = 60;
 		this.lastTime = performance.now();
 		this.averageFrameLength = new MovingAverage(Intervals.FPS_FRAMES_TO_COUNT);
 		this.counters = new Map();
@@ -188,6 +187,9 @@ class Intervals {
 		this.fpsGraph = this.makeGraphPlane([
 			new Graph("FPS", () => this.averageFps, 0, 60, Color.LIME, 1)
 		], 400);
+	}
+	get rawFps() {
+		return 1000 / this.averageFrameLength.last;
 	}
 	get averageFps() {
 		return 1000 / this.averageFrameLength.average;
@@ -222,7 +224,7 @@ class Intervals {
 		for (const key of this.counters.keys())
 			this.counters.set(key, 0);
 
-		let now = performance.now();
+		const now = performance.now();
 		this.averageFrameLength.add(now - this.lastTime);
 		this.lastTime = now;
 	}
