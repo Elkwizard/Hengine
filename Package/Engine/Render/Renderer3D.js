@@ -1211,7 +1211,8 @@ Artist3D.SSAO = class extends Artist3D.PostProcess {
 	
 		const rng = new Random(12345);
 		const normal = new Vector3(0, 0, 1);
-		const hemisphere = Array.dim(Artist3D.SSAO.MAX_SAMPLES).map(() => rng.hemisphere(normal, rng.random() ** 2));
+		const hemisphere = Array.dim(Artist3D.SSAO.MAX_SAMPLES)
+			.map(() => rng.hemisphere(normal, rng.random() ** 2));
 		this.occlusionShader.setUniform("hemisphere", hemisphere);
 	}
 	draw(inputBuffer, lens, view) {
@@ -1774,12 +1775,13 @@ Artist3D.LightRenderer = class LightRenderer {
 	/**
 	 * Applies a vaguely tasteful combination of directional and ambient lighting using the current color.
 	 * Useful for rapid debugging of 3D scenes. 
-	 * @param Number ambient? | The proportion of light which should be ambient. Default is 0.4 
+	 * @param Number ambient? | The proportion of light which should be ambient. Default is 0.4
+	 * @param Boolean shadow? | Whether the directional portion of the lighting should cast shadows. Default is true
 	 */
-	default(ambient = 0.4) {
+	default(ambient = 0.4, shadow = true) {
 		const { color } = this;
 		this.setup(color.times(1 - ambient));
-		this.directional(new Vector3(-0.3, 1, 0.2).normalized);
+		this.directional(new Vector3(-0.3, 1, 0.2).normalized, shadow);
 		this.setup(color.times(ambient));
 		this.ambient();
 	}
