@@ -527,7 +527,7 @@ class Artist3D extends Artist {
 				const resolution = Math.ceil(this.shadowResolution * scale);
 				const viewport = new Rect(0, 0, resolution, resolution);
 				const camera = new Camera3D(() => viewport);
-				camera.direction = light.direction;	
+				camera.direction = light.direction;
 
 				const frustum = frusta[j];
 				const frustumBounds = Prism.bound(
@@ -584,7 +584,7 @@ class Artist3D extends Artist {
 
 					if (!program.inUse) {
 						program.use();
-						program.setUniform("camera", cascade.camera, false, true);
+						program.setUniform("lens", cascade.lens, false, true);
 					}
 	
 					return program;
@@ -920,7 +920,7 @@ Artist3D.LIGHTS = `
 		mat4 pcMatrix;
 	};
 	struct ShadowInfo {
-		ShadowLens lens;	
+		ShadowLens lens;
 		float depthBias;
 		float pixelSize;
 		float zRange;
@@ -955,7 +955,7 @@ Artist3D.LIGHTS = `
 		// normal bias
 		vec3 n = implicitNormal(position);
 		float ldn = dot(getLightDirection(position, light), n);
-		float normalBias = info.pixelSize * 0.5 * sqrt(1.0 - ldn * ldn);
+		float normalBias = info.pixelSize * 0.5 * sqrt(max(0.0, 1.0 - ldn * ldn));
 		position += n * normalBias;
 
 		vec4 proj = lens.pcMatrix * vec4(position, 1);

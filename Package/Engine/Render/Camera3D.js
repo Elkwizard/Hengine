@@ -158,7 +158,9 @@ class Camera3D extends Matrix4 {
 	 * @return Frustum
 	 */
 	cacheScreen() {
-		return this.screen = Frustum.fuse(this.lenses.map(lens => lens.cacheScreen()));
+		const screens = this.lenses.map(lens => lens.cacheScreen());
+		this.screen = screens.some(screen => screen === null) ? null : Frustum.fuse(screens);
+		return this.screen;
 	}
 	updateDirection() {
 		const { direction } = this;
