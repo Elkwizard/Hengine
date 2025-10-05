@@ -202,7 +202,7 @@ class SceneObject extends SceneElement {
 	 * @return Shape[]
 	 */
 	removeAllShapes() {
-		const names = [...this.shapes.key()];
+		const names = [...this.shapes.keys()];
 		const shapes = [];
 		for (let i = 0; i < names.length; i++)
 			shapes.push(this.removeShape(names[i]));
