@@ -56,6 +56,7 @@ class Artist3D extends Artist {
 		this.gl.getExtension("OES_texture_float_linear");
 
 		// GLUtils.throwErrors(this.gl);
+		// GLUtils.trackObjects(this.gl);
 
 		this.setNullDestination();
 		this.stateStack = [new Artist3D.State()];
@@ -659,7 +660,6 @@ class Artist3D extends Artist {
 		gl.enable(gl.DEPTH_TEST);
 
 		this.setViewport(lens);
-		const visibility = visibilities.get(lens.camera);
 		this.pass(meshes, visibilities.get(lens.camera), false, chunk => {
 			const program = this.getShaderProgram(chunk.material);
 			if (!program.inUse) {

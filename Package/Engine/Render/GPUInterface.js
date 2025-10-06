@@ -1586,6 +1586,35 @@ class GLUtils {
 		return Reflect.ownKeys(proto)
 			.filter(key => gl[key] === enumValue);
 	}
+	static trackObjects(gl) {
+		const objects = new Map(); 
+		const add = key => objects.set(key, (objects.get(key) ?? 0) + 1);
+		const remove = key => objects.set(key, (objects.get(key) ?? 0) - 1);
+
+		const registry = new FinalizationRegistry(remove);
+		for (const key of Reflect.ownKeys(WebGL2RenderingContext.prototype)) {
+			if (typeof key === "symbol") continue;
+
+			const fn = gl[key];
+			const name = key.match(/[A-Z].*/)?.[0];
+			if (key.startsWith("create")) {
+				gl[key] = function (...args) {
+					const object = fn.apply(this, args);
+					add(name);
+					registry.register(object, name);
+					return object;
+				};
+			} else if (key.startsWith("delete")) {
+				gl[key] = function (object) {
+					const result = fn.call(this, object);
+					registry.unregister(object);
+					remove(name);
+					return result;
+				};
+			}
+		}
+		gl._objects = objects;
+	}
 	static throwErrors(gl) {
 		const getError = gl.getError;
 		const constants = new Map();
