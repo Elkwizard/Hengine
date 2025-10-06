@@ -119,7 +119,7 @@ const Files = (() => {
 		return referenced;
 	}
 
-	function getDereferenced(fs) {
+	function freeDirectory(fs) {
 		const referenced = getReferenced(fs, 0);
 		const dereferenced = [];
 		for (let i = 0; i < fs.files.length; i++) {
@@ -135,16 +135,12 @@ const Files = (() => {
 		console.warn(...msg);
 	}
 
-	const reflect = _ => _;
+	const TREE_LINE_DOUBLE = false;
 
-	const treeLineDouble = false;
-
-	const specialChars = String.fromCharCode(9562, 9492, 9568, 9500, 9552, 9472, 9553, 9474);
-
-	const ch1100 = treeLineDouble ? specialChars[0] : specialChars[1];
-	const ch1110 = treeLineDouble ? specialChars[2] : specialChars[3];
-	const ch0101 = treeLineDouble ? specialChars[4] : specialChars[5];
-	const ch1010 = treeLineDouble ? specialChars[6] : specialChars[7];
+	const ch1100 = TREE_LINE_DOUBLE ? "╚" : "└";
+	const ch1110 = TREE_LINE_DOUBLE ? "╠" : "├";
+	const ch0101 = TREE_LINE_DOUBLE ? "═" : "─";
+	const ch1010 = TREE_LINE_DOUBLE ? "║" : "│";
 
 	/**
 	 * @name class Files
@@ -188,7 +184,7 @@ const Files = (() => {
 	 * console.log(readValue); // Triple { a: 10, b: 20, c: 30.5 }
 	 * ```
 	 */
-	return class {
+	return class Files {
 		/**
 		 * Creates a new Files.
 		 */
@@ -199,16 +195,10 @@ const Files = (() => {
 
 			this.fileTypes = { dir: class Directory { } };
 			this.createFileType(ByteBuffer, [""]);
-			this.createFileType(Number);
-			this.createFileType(String);
-			this.createFileType(Boolean);
-			this.createFileType(Object);
-			this.createFileType(GrayMap);
-			this.createFileType(Texture);
-			this.createFileType(Vector2);
-			this.createFileType(Vector3);
-			this.createFileType(Vector4);
-			this.createFileType(Color);
+			for (const Type of [
+				Number, String, Boolean, Object, GrayMap,
+				Texture, Vector2, Vector3, Vector4, Color
+			]) this.createFileType(Type);
 		}
 		/**
 		 * Returns the current active directory.
@@ -310,7 +300,7 @@ const Files = (() => {
 		writeFile(path, contents = new ByteBuffer(), raw = false) {
 			if (!raw) contents = contents.toByteBuffer();
 
-			const pieces = path.split("/").filter(reflect);
+			const pieces = path.split("/").filter(Boolean);
 			const pathPieces = pieces.slice(0, pieces.length - 1);
 			const name = pieces[pieces.length - 1];
 
@@ -335,10 +325,9 @@ const Files = (() => {
 		 * @return Boolean
 		 */
 		deleteFile(path) {
-			const pieces = path.split("/").filter(reflect);
+			const pieces = path.split("/").filter(Boolean);
 			const pathPieces = pieces.slice(0, pieces.length - 1);
 			const name = pieces[pieces.length - 1];
-			const ext = getFileExt(name);
 
 			const { directoryAddress } = this;
 			const directoryExists = this.changeDirectory(pathPieces.join("/"));
@@ -381,7 +370,7 @@ const Files = (() => {
 		 */
 		deleteDirectory(path) {
 			const result = this.deleteFile(`${path}.dir`);
-			this.free = getDereferenced(this);
+			this.free = freeDirectory(this);
 			return result;
 		}
 		/**
@@ -393,7 +382,7 @@ const Files = (() => {
 		createDirectory(path) {
 			path += ".dir";
 
-			const pieces = path.split("/").filter(reflect);
+			const pieces = path.split("/").filter(Boolean);
 			const pathPieces = pieces.slice(0, pieces.length - 1);
 			const name = pieces[pieces.length - 1];
 
@@ -427,7 +416,7 @@ const Files = (() => {
 		 * @return Any/null
 		 */
 		readFile(path, raw = false, existenceCheck = false) {
-			const pieces = path.split("/").filter(reflect);
+			const pieces = path.split("/").filter(Boolean);
 			const pathPieces = pieces.slice(0, pieces.length - 1);
 			const name = pieces[pieces.length - 1];
 			const { directoryAddress } = this;
@@ -499,7 +488,7 @@ const Files = (() => {
 				relativePieces = path.split("/");
 			}
 
-			relativePieces = relativePieces.filter(reflect);
+			relativePieces = relativePieces.filter(Boolean);
 
 			for (const piece of relativePieces) {
 				const directoryExists = changeDirectory(this, piece);

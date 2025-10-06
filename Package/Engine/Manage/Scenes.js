@@ -181,7 +181,7 @@ class Scene {
 
 		this.updating = false;
 	}
-	destroy() {
+	end() {
 		this.main.removeAllElements();
 	}
 }

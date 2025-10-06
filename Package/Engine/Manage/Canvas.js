@@ -158,6 +158,10 @@ class CanvasImage extends ImageType {
 	endRendering() {
 		if (IS_3D) this.renderer.render(this.engine.scene.camera);
 	}
+	end() {
+		for (const key in this.canvases)
+			this.canvases[key].remove();
+	}
 	makeImage() {
 		this.endRendering(); 
 		return this.canvases.renderer;

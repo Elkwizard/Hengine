@@ -28,24 +28,32 @@ class Hengine {
 		
 		this.scene = new Scene(this);
 
-		//update loops
+		// update loops
 		this.intervals = new Intervals(this);
 
-		// create file system
-		const segments = location.toString().split("/");
-		const storageKey = `HengineFiles://${segments[segments.length - 2] ?? segments[segments.length - 1]}`;
-		this.fileSystem = storageKey in localStorage ? Files.fromString(localStorage[storageKey]) : new Files();
-		addEventListener("beforeunload", () => {
-			this.scene.destroy();
-			localStorage[storageKey] = this.fileSystem;
-		});
+		// create file system (or not, where localStorage is forbidden)
+		try {
+			const segments = location.toString().split("/");
+			const storageKey = `HengineFiles://${segments.at(-2) ?? segments.at(-1)}`;
+			if (storageKey in localStorage) {
+				this.fileSystem = Files.fromString(localStorage[storageKey]);
+			} else {
+				this.fileSystem = new Files();
+			}
+			addEventListener("beforeunload", () => {
+				this.scene.end();
+				localStorage[storageKey] = this.fileSystem;
+			});
+		} catch (err) {
+			this.fileSystem = new Files();
+		}
 	}
 	/**
 	 * Destroys the engine instance and removes the canvas.
 	 */
 	end() {
-		exit("Hengine.end()");
-		let canvas = document.getElementById(this.renderer.canvas.id);
-		if (canvas) canvas.remove();
+		this.scene.end();
+		this.canvas.end();
+		this.intervals.exit("Hengine.end()");
 	}
 }
