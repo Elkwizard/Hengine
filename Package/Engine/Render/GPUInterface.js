@@ -717,6 +717,15 @@ class Sampler {
 		this.wrap = settings.wrap ?? false;
 		this.mipmap = settings.mipmap ?? false;
 	}
+	/**
+	 * Creates a sampler for a given image which is suitable for 3D rendering.
+	 * Any sampler can in theory be used for 3D rendering, but performance may be improved through the use of this factory.
+	 * @param ImageType image | The image to sample from
+	 * @return Sampler
+	 */
+	static for3D(image) {
+		return new Sampler(image, { mipmap: true, wrap: true });
+	}
 }
 
 class GLSLProgram {
