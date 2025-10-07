@@ -197,22 +197,8 @@ class Enum {
  */
 
 window.__devicePixelRatio = devicePixelRatio;
+objectUtils.shortcut(window, document, "title");
 
-Object.defineProperty(window, "title", {
-	get() {
-		const tag = document.querySelector("title");
-		if (!tag) return "";
-		return tag.innerText;
-	},
-	set(a) {
-		let tag = document.querySelector("title");
-		if (!tag) {
-			tag = document.createElement("title");
-			document.head.appendChild(tag);
-		}
-		tag.innerText = a;
-	}
-});
 (function () {
 	function proto(obj, name, value) {
 		Object.defineProperty(obj, name, { value, enumerable: false });
