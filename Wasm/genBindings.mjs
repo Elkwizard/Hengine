@@ -264,7 +264,7 @@ const arrayTypes = new Map();
 		arrayTypes.set(elementName, className);
 
 		const cls = typeClass(elementType);
-		const getType = cls === Type.PRIMITIVE ? elementName : `${exactType(elementType)}&`;
+		const getType = cls === Type.PRIMITIVE ? elementName : `${elementName}&`;
 
 		const instance = arrayTemplate
 			.replaceAll("@name", className)
