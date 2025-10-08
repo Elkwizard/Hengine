@@ -82,14 +82,14 @@
 	}
 	
 	// define sphere behavior
-	class SPHERE extends ElementScript {
+	class PROJECTILE extends ElementScript {
 		static RADIUS = 2;
 		static LAUNCH_SPEED = 3;
 		static LIFESPAN = 100;
 		static GHOST_DURATION = 2;
 
 		static MESH = Mesh.fromShape(
-			new Sphere(Vector3.zero, SPHERE.RADIUS),
+			new Sphere(Vector3.zero, PROJECTILE.RADIUS),
 			new SimpleMaterial({
 				albedo: Color.WHITE,
 				specularExponent: 64
@@ -104,35 +104,35 @@
 
 		// called to determine whether a collision should be allowed
 		collideRule(obj, other) {
-			return	!other.scripts.has(SPHERE) ||
-					obj.lifeSpan > SPHERE.GHOST_DURATION;
+			return	!other.scripts.has(PROJECTILE) ||
+					obj.lifeSpan > PROJECTILE.GHOST_DURATION;
 		}
 
 		// called each tick to update the sphere, prior to rendering
 		update(obj) {
 			// destroys the sphere after a delay
-			if (obj.lifeSpan > SPHERE.LIFESPAN)
+			if (obj.lifeSpan > PROJECTILE.LIFESPAN)
 				obj.remove();
 		}
 		
 		// called each frame to render the sphere
 		draw(obj, name, shape) {
 			// parameterize lifespan
-			const t = obj.lifeSpan / SPHERE.LIFESPAN;
+			const t = obj.lifeSpan / PROJECTILE.LIFESPAN;
 			const scale = 1 - t ** 4;
 
 			// render the sphere smaller as it disappears
 			renderer.save();
 			renderer.scale(scale);
-			renderer.mesh(SPHERE.MESH).default();
+			renderer.mesh(PROJECTILE.MESH).default();
 			renderer.restore();
 		}
 
 		// creates a new object with this behavior
 		static create(position, direction) {
 			const sphere = scene.main.addPhysicsElement("sphere", position, true);
-			sphere.defaultShape = new Sphere(Vector3.zero, SPHERE.RADIUS);
-			sphere.scripts.add(SPHERE);
+			sphere.defaultShape = new Sphere(Vector3.zero, PROJECTILE.RADIUS);
+			sphere.scripts.add(PROJECTILE);
 			
 			// slightly randomize the direction
 			const axis = Random.sphere();
@@ -140,7 +140,7 @@
 			direction = direction.rotated(axis.times(angle));
 
 			// launch the sphere in a particular direction
-			sphere.scripts.PHYSICS.velocity = direction.times(SPHERE.LAUNCH_SPEED);
+			sphere.scripts.PHYSICS.velocity = direction.times(PROJECTILE.LAUNCH_SPEED);
 			
 			return sphere;
 		}
@@ -163,8 +163,12 @@
 					const direction = mouse.direction.rotated(axis.times(angle));
 					
 					// create sphere
-					SPHERE.create(scene.camera.position, direction);
+					PROJECTILE.create(scene.camera.position, direction);
 				}
+			}
+
+			for (const constraint of scene.physics.constraints) {
+				renderer.stroke(Color.RED, 0.1).line(...constraint.ends);
 			}
 
 			ui.draw(Color.BLACK).text(Font.Arial30, "Left Click to Fire", 10, 10);
