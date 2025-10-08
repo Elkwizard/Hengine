@@ -23,3 +23,4 @@ emcc \
 	-std=c++20 \
 	${@:3}
 node Wasm/genBuffer "$dst"
+rm "$dst/program.wasm" "$dst/bindings.cpp"
