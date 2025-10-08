@@ -555,13 +555,6 @@ declare class HengineLoader {
 	 */
 	loadResource(src: string): any | null;
 	/**
-	 * Retrieves a specific image resource as a Sampler for use in 3D rendering.
-	 * If the resource failed to load, this returns null.
-	 * This method is also available on the global object.
-	 * @param src - An identifying portion of the image's source. This behaves like the `src` parameter in `.loadResource()`
-	 */
-	loadTexture(src: string): Sampler | null;
-	/**
 	 * Loads a series of resources, and optionally starts the update loop after the loading completes.
 	 * If the rest of the Hengine has yet to be loaded, it will be loaded before any of the resources passed to this function.
 	 * Returns a promise that resolves to the HengineLoader instance when all the resources are loaded.
@@ -647,13 +640,6 @@ declare const title: string;
  * @param src - An identifying portion of the resource's source
  */
 declare function loadResource(src: string): any | null;
-
-/**
- * Retrieves a specific image resource from `HengineLoader.loader` as a Sampler, for use in 3D rendering.
- * Behaves exactly like that object's `.loadTexture()` method.
- * @param src - An identifying portion of the resource's source
- */
-declare function loadTexture(src: string): Sampler | null;
 
 /**
  * A wrapper for operations that happen over time or after a time.
@@ -7021,6 +7007,12 @@ declare class Sampler {
 	 * @param settings - How the sampler should be configured. Default is an empty object
 	 */
 	constructor(image: ImageType | ImageType[] | CubeMap, settings?: SamplerSettings);
+	/**
+	 * Creates a sampler for a given image which is suitable for 3D rendering.
+	 * Any sampler can in theory be used for 3D rendering, but performance may be improved through the use of this factory.
+	 * @param image - The image to sample from
+	 */
+	static for3D(image: ImageType): Sampler;
 }
 
 /**
@@ -7367,9 +7359,9 @@ declare class SimpleMaterial extends Material {
 	constructor(settings: object);
 	/**
 	 * Sets `.albedoTexture` and `.alphaTexture` to a given texture.
-	 * @param ImageTypeSampler - The new color and alpha texture
+	 * @param texture - The new color and alpha texture
 	 */
-	set colorTexture(ImageType/Sampler: ImageType | Sample);
+	set colorTexture(texture: ImageType | Sampler);
 	/**
 	 * Sets `.albedo` and `.alpha` to match a given color, and disables the current `.albedoTexture` and `.alphaTexture`.
 	 * @param color - The new color value
@@ -7735,8 +7727,9 @@ declare class LightRenderer {
 	 * Applies a vaguely tasteful combination of directional and ambient lighting using the current color.
 	 * Useful for rapid debugging of 3D scenes.
 	 * @param ambient - The proportion of light which should be ambient. Default is 0.4
+	 * @param shadow - Whether the directional portion of the lighting should cast shadows. Default is true
 	 */
-	default(ambient?: number): void;
+	default(ambient?: number, shadow?: boolean): void;
 }
 
 /**

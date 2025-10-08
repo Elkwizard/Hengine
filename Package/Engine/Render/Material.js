@@ -138,7 +138,7 @@ class SimpleMaterial extends Material {
 	}
 	/**
 	 * Sets `.albedoTexture` and `.alphaTexture` to a given texture.
-	 * @param ImageType/Sampler | The new color and alpha texture
+	 * @param ImageType/Sampler texture | The new color and alpha texture
 	 */
 	set colorTexture(a) {
 		this.albedoTexture = this.alphaTexture = a;

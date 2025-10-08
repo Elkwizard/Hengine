@@ -179,6 +179,22 @@ class ByteBuffer {
 		buffer.shouldResize = true;
 		return buffer;
 	}
+	/**
+	 * Returns a new byte buffer containing the bytes associated with a given value.
+	 * The returned buffer will have its pointer past the end.
+	 * @param Serializable value | A value to put into the buffer
+	 * @param String type? | A method name on ByteBuffer.Writer to use to serialize the value (`"string"`, `"uint8"`, `"object"`, etc). If not provided, the `.toByteBuffer()` Serializable method of the value will be used instead
+	 * @return ByteBuffer
+	 */
+	static of(value, type) {
+		const result = new ByteBuffer();
+		if (type === undefined) {
+			value.toByteBuffer(result);
+		} else {
+			result.write[type](value);
+		}
+		return result;
+	}
 	static fromByteBuffer(buffer) {
 		return buffer.read.byteBuffer();
 	}
