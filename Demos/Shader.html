@@ -1,146 +1,216 @@
 <script src="../Hengine.js" title="Shader Editor">
-	canvas.scalingMode = ScalingMode.PRESERVE_ASPECT_RATIO;
+	const STARTER_CODE = `
+// === Fractal Shader Demo ===
+// This is the Hengine's GPUShader system, made interactive.
+// Simply edit the GLSL code here, and press Alt + Enter to
+// see your changes come to life!
+
+uniform float time;
+uniform vec2 mouse;
+
+// try changing these!
+#define ITERATIONS 5 // the level of detail
+#define OMEGA 0.01 // the rotation speed
+#define BAND 0.4 // something (:
+
+vec2 transform(vec2 uv) {
+	// repeat
+	uv = mod(uv, 0.5) * 2.0;
+
+	// reflect
+	uv = abs(uv - 0.5) + 0.5;
+
+	// rotate
+	uv -= 0.5;
+	float angle = time * OMEGA;
+	float c = cos(angle);
+	float s = sin(angle);
+	uv = vec2(uv.x * c - uv.y * s, uv.x * s + uv.y * c);
+	uv += 0.5;
+
+	return uv;
+}
+
+vec4 shader() {
+	vec2 uv = position / resolution.x;
+
+	for (int i = 0; i < ITERATIONS; i++)
+		uv = transform(uv);
+
+	if (abs(uv.x - 0.5) > BAND * 0.5) return vec4(0);
+
+	return vec4(uv, 1, 1);
+}`;
+
+	canvas.clearScreen = () => renderer.fill(Color.BLACK);
+
+	// define behavior for code input
 	class CODE_INPUT extends ElementScript {
-		init(obj) {
+		init(obj, initialValue, onCompile) {
 			obj.scripts.removeDefault();
-			obj.scripts.add(TEXT_AREA, Font.Monospace20);
 			this.scriptNumber--;
+			
+			this.font = Font.Monospace20;
+			this.boldFont = this.font.get();
+			this.boldFont.bold = true;
+			
+			obj.scripts.add(TEXT_AREA, this.font);
+
+			this.text = obj.scripts.TEXT_AREA;
+			this.text.alwaysIgnore("Alt");
+			this.text.caretColor = Color.WHITE;
+			this.text.highlightColor = new Color(255, 255, 255, 0.4);
+			this.text.setValue(initialValue);
+			this.onCompile = onCompile;
+
+			this.compile();
+
+			// setup syntax highlighting
+			this.text.renderTextOffset = new Vector2(50, 0);
+			this.text.renderText = (text, font, pos, getLoc, lineIndex) => {
+				// draw line number
+				ui.draw(Color.WHITE).text(font, lineIndex + 1, pos);
+
+				// draw tab stops
+				const tabs = text.match(/^\t+/g)?.[0]?.length ?? 0;
+				const tabWidth = font.getTextWidth("\t");
+				for (let i = 0; i < tabs; i++) {
+					const { x, y } = pos
+						.plus(this.text.renderTextOffset)
+						.plus(Vector2.x(i * tabWidth));
+					ui.draw(Color.GRAY).rect(x, y, 1, font.lineHeight);
+				}
+
+				// highlight code
+				const formats = Array.dim(text.length).map(() => ({
+					color: new Color("#ddd"),
+					font: this.font
+				}));
+
+				const highlight = (color, regex, font = this.font) => {
+					const format = { color, font };
+					for (const { [0]: matched, index } of text.matchAll(regex)) {
+						for (let i = 0; i < matched.length; i++) {
+							formats[index + i] = format;
+						}
+					}
+				};
+				
+				highlight(new Color("#a5a"), /\b((a?(sin|cos|tan))|length|dot|cross|texture|clamp|normalize|min|max|ceil|smoothstep|round|floor|mod|sqrt|mix|pow|abs|float|int|bool|sampler2D|mat[234]|([uib]?vec[234]))\b/g);
+				highlight(new Color("#88d"), /\b\w[\w\d_]*(?=\s*\()/g);
+				highlight(new Color("#faf"), /[^\w\s]+/g);
+				highlight(new Color("#c5c"), /\b(return|struct|void|in|out|(low|medium|high)p|uniform|position|resolution|shader|for|continue|break|if|else|define)\b/g);
+				highlight(new Color("#aad"), /(?<=\.)\w[\w\d_]*/g);
+				highlight(new Color("#fd1"), /\b((\d+(\.\d+)?([eE][+-]?\d+)?)|(true|false))\b/g);
+				highlight(new Color("#898"), /\/\/(.*)|\/\*(.*?)($|\*\/)|(^|\/\*)(.*?)\*\//g, this.boldFont);
+
+				// render highlighted code in chunks
+				let currentFormat = formats[0];
+				let acc = "";
+				for (let i = 0; i < formats.length; i++) {
+					const format = formats[i];
+					acc += text[i];
+					const nextFormat = formats[i + 1];
+					if (currentFormat !== nextFormat) {
+						const pos = getLoc(1 + i - acc.length).plus(this.text.renderTextOffset);
+						const { color, font } = currentFormat;
+						ui.draw(color).text(font, acc, pos);
+						currentFormat = nextFormat;
+						acc = "";
+					}
+				}
+			};
+		}
+		compile() {
+			this.onCompile(this.text.getValue());
+		}
+		update(obj) {
+			if (keyboard.pressed("Alt") && keyboard.justPressed("Enter")) {
+				this.text.ignore("Enter");
+				this.compile();
+			}
 		}
 		draw(obj, name, shape) {
 			ui.draw(Color.DARK_GRAY).rect(shape);
 			ui.stroke(Color.WHITE).rect(shape);
 		}
 	}
-	const codeInput = scene.main.addUIElement("codeInput", width * 0.75, height / 2, width / 2, height);
-	codeInput.scripts.add(CODE_INPUT);
-
-	codeInput.scripts.TEXT_AREA.setValue(`uniform float time;
-uniform vec2 mouse;
-
-vec4 shader() {
-	vec2 uv = position / resolution;
-	return vec4(uv, 1.0, 1.0);
-}`);
-	let lastValue = "";
-	const F = 1;
-	let shader = new GPUShader(width / 2 / F, height / F, codeInput.scripts.TEXT_AREA.getValue(), canvas.pixelRatio);
-	renderer.background = Color.BLACK;
-	codeInput.scripts.TEXT_AREA.alwaysIgnore("Alt");
-	let time = 0;
-	const l = codeInput.scripts.TEXT_AREA;
-	l.caretColor = Color.WHITE;
-	l.highlightColor = new Color(255, 255, 255, 0.4);
-	let webcam = null;
 	
-	let bold = codeInput.scripts.TEXT_AREA.font.family.toLowerCase() === "monospace";
-	let boldFont = codeInput.scripts.TEXT_AREA.font.get();
-	if (bold) boldFont.bold = true;
+	let error;
+	let time = 0;
+	let webcam = null;
 
-	function highlight(text, font, color, regex, inverse, getLoc) {	
-		let matches = text[inverse ? "inverseMatchAll" : "matchAll"](regex);
-		for (let match of matches) {
-			let text = match[0];
-			let inx = match.index;
-			let pos = getLoc(inx);
-			let bounds = font.getTextBounds(text);
-			const position = pos.plus(l.renderTextOffset);
-			// renderer.stroke(Color.BLUE).rect(pos.plus(l.renderTextOffset).x, pos.plus(l.renderTextOffset).y, bounds.width, bounds.height);
-			ui.draw(color).text(font, text, position);
+	const shader = new GPUShader(width / 2, height, `vec4 shader() { return vec4(0); }`, canvas.pixelRatio);
+	const codeInput = scene.main.addUIElement("codeInput", width * 0.75, height / 2, width / 2, height);
+	codeInput.scripts.add(CODE_INPUT, STARTER_CODE, code => {
+		try {
+			shader.glsl = code;
+			error = null;
+		} catch (err) {
+			error = err;
 		}
-	}
-	l.renderTextOffset = new Vector2(50, 0);
-	l.renderText = (text, font, pos, getLoc, lineIndex) => {
-		//ui.draw(Color.LIGHT_GRAY).text(font, text, pos.plus(l.renderTextOffset)); 
-		ui.draw(Color.WHITE).text(font, lineIndex + 1, pos);
-		let startTabs = text.match(/^\t+/g);
-		if (startTabs) {
-			startTabs = startTabs[0].length;
-			let tabWidth = font.getTextWidth("\t");
-			for (let i = 0; i < startTabs; i++)
-				ui.stroke(Color.GRAY).line(
-					i * tabWidth + pos.x + l.renderTextOffset.x,
-					pos.y + l.renderTextOffset.y,
-					i * tabWidth + pos.x + l.renderTextOffset.x,
-					pos.y + l.renderTextOffset.y + font.lineHeight
-				);
-		}
-		let functionRegex = String.raw`\b(?:(?:a?(?:sin|cos|tan))|length|dot|cross|texture|clamp|normalize|min|max|ceil|smoothstep|round|floor|mod|sqrt|mix|pow|abs|float|int|bool|sampler2D|mat[234]|(?:(?:i|b|)vec[234]))\b`;
-		let keywordRegex = String.raw`\b(?:return|struct|void|in|out|(?:low|medium|high)p|uniform|position|resolution|shader|for|continue|break|if|else|define)\b`;
-		let primitiveRegex = String.raw`\b((?:\d+(?:\.\d+)?)|(?:true|false))\b`;
-		let symbolRegex = String.raw`(?:[^\w\s]+)`;
-		let commentRegex = String.raw`(?:\/\/(?:.*))|(?:\/\*(?:.*?)(?:$|\*\/))|(?:(^|\/\*)(?:.*?)\*\/)`;
-		
-		highlight(text, font, Color.SKY_BLUE, new RegExp(functionRegex, "g"), false, getLoc);
-		highlight(text, font, Color.WHITE, new RegExp(symbolRegex, "g"), false, getLoc);
-		highlight(text, font, Color.PURPLE.plus(Color.LIGHT_GRAY.over(3)), new RegExp(keywordRegex, "g"), false, getLoc);
-		highlight(text, font, Color.MAGENTA, new RegExp(primitiveRegex, "g"), false, getLoc);
-		highlight(text, boldFont, Color.GREEN, new RegExp(commentRegex, "g"), false, getLoc);
-		highlight(text, font, Color.LIGHT_GRAY, new RegExp(`(${[commentRegex, symbolRegex, primitiveRegex, keywordRegex, functionRegex].join("|")})`, "g"), true, getLoc);
-	};
-	let error = null;
-	hengine.intervals.continuous(function () {
-		if (!shader.glsl || (keyboard.pressed("Alt") && keyboard.justPressed("Enter"))) {
-			if (keyboard.justPressed("Enter")) codeInput.scripts.TEXT_AREA.ignore("Enter");
+
+		time = 0;
+	});
+	
+	// main shader loop
+	intervals.continuous(() => {
+		if (keyboard.pressed("Alt") && keyboard.justPressed("Enter")) {
 			try {
-				shader.glsl = codeInput.scripts.TEXT_AREA.getValue();
+				shader.glsl = codeInput.scripts.CODE_INPUT.value;
 				error = null;
 			} catch (err) {
 				error = err;
 			}
+
 			time = 0;
 		}
-		if (shader.argumentExists("webcam") && !webcam) {
-			webcam = new Frame(1, 1, 1);
-			new HengineWebcamResource("wc").load().then(wc => webcam = wc);
+		
+		// set shader uniforms
+		const uniforms = {
+			time: time++,
+			mouse: mouse.screen
+		};
+
+		if (shader.hasUniform("webcam")) {
+			if (webcam) {
+				uniforms.webcam = webcam;
+			} else {
+				webcam = new Frame(1, 1);
+				new HengineWebcamResource("wc").load().then(wc => webcam = wc);
+			}
 		}
-		time++;
-		let args = { time, mouse: mouse.screen };
-		if (shader.argumentExists("webcam")) args.webcam = webcam;
-		for (const key in args) {
-			if (!shader.argumentExists(key)) delete args[key];
+
+		for (const name in uniforms) {
+			if (shader.hasUniform(name)) {
+				shader.setUniform(name, uniforms[name]);
+			}
 		}
-		shader.setUniforms(args);
-		renderer.image(shader).rect(0, 0, width / 2, height);
-		if (error) renderer.draw(Color.RED).text(Font.Monospace20, error, 10, 10);
-		renderer.textMode = TextMode.BOTTOM_LEFT;
-		renderer.draw(Color.RED).text(Font.Monospace40, hengine.intervals.fps, 10, height - 10);
-		renderer.textMode = TextMode.TOP_LEFT;
+
+		// run and render shader
+		renderer.image(shader).default(0, 0);
 	}, IntervalFunction.UPDATE);
+	
+	// top-layer UI loop
+	intervals.continuous(() => {
+		if (error) { // display error message
+			const PADDING = 10;
+			const FONT = Font.Monospace20;
+			const text = FONT.packText(error.toString().trim(), width / 2);
+			const bounds = FONT.getTextBounds(text);
+			const rect = new Rect(
+				0, 0,
+				bounds.width + PADDING * 2,
+				bounds.height + PADDING * 2
+			);
+
+			ui.textMode = TextMode.TOP_LEFT;
+			ui.draw(Color.BLACK).rect(rect);
+			ui.stroke(Color.WHITE).rect(rect);
+			ui.draw(Color.RED).text(FONT, text, PADDING, PADDING + FONT.lineHeight * 0.1);
+		}
+
+		ui.textMode = TextMode.BOTTOM_LEFT;
+		ui.draw(Color.RED).text(Font.Monospace40, `${intervals.fps} Hz`, 10, height - 10);
+	}, IntervalFunction.AFTER_UPDATE);
 </script>
-
-<!-- 
-#define LIMIT 200.0
-#define CELL_SIZE 300.0
-#define STEPS 4
-
-uniform highp float time;
-
-highp vec2 squareSpinUV(highp vec2 mid) {
-	if (mid.x < -1.0) return vec2(-10.0);
-	mid *= resolution;
-	mid = mod(mid, CELL_SIZE) - CELL_SIZE / 2.0;
-	highp float angle = time / 100.0;
-	highp float c = cos(angle);
-	highp float s = sin(angle);
-	mid = vec2(mid.x * c - mid.y * s, mid.x * s + mid.y * c);
-
-	highp float md = abs(mid.x) + abs(mid.y);
-	if (md < LIMIT) {
-		highp vec2 uv = mid / LIMIT;
-		uv = vec2(uv.x - uv.y, uv.x + uv.y) * 0.707;
-		return uv;
-	}
-	return vec2(-10.0);
-}
-
-highp vec4 shader() {
-	highp vec2 mid = (position - resolution / 2.0) / resolution;
-	mid *= sin(time / 100.0);
-	highp vec2 uv = mid;
-	for (int i = 0; i < STEPS; i++) {
-		uv = squareSpinUV(uv);
-	}
-	if (uv.x > -1.0) return vec4(1.0);
-	return vec4(0.0);
-}
- -->

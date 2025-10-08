@@ -403,7 +403,7 @@ class GLSLError extends Error {
 	static process(string, source) {
 		const sourceLines = source.completeSource.split("\n");
 		
-		let errors = string.split("ERROR: ");
+		let errors = string.replaceAll("\0", "").split("ERROR: ");
 		errors.shift();
 		for (let i = 0; i < errors.length; i++) {
 			// parse
@@ -417,7 +417,11 @@ class GLSLError extends Error {
 				line = 0;
 				desc = rawString;
 			}
-			throw new GLSLError(sourceLines[line - 1] ?? "", line - source.prefixLines, desc.trim());
+			throw new GLSLError(
+				sourceLines[line - 1] ?? "",
+				line - source.prefixLines,
+				desc.trim()
+			);
 		}
 	}
 }
@@ -1731,7 +1735,10 @@ class GPUInterface {
 	 * @param String name | The name of the uniform to check
 	 * @return Boolean
 	 */
-	argumentExists(name) {
+	hasUniform(name) {
 		return this.program.hasUniform(name);
+	}
+	argumentExists(name) {
+		return this.hasUniform(name);
 	}
 }
