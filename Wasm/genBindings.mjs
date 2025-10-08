@@ -2,12 +2,15 @@ import fs from "node:fs"
 import path from "node:path"
 import child_process from "node:child_process"
 
-const [, , modulePath] = process.argv;
-const moduleName = path.basename(modulePath);
+const [,, srcPath, dstPath, ...args] = process.argv;
+const srcName = path.basename(srcPath);
+const dstName = path.basename(dstPath);
 
 let content = await new Promise(resolve => {
 	const gpp = child_process.spawn("g++", [
-		`${modulePath}.cpp`, "-E", "-D __GEN_BINDINGS__"
+		`${srcPath}.cpp`, "-E",
+		"-D__GEN_BINDINGS__",
+		...args
 	]);
 	let preprocessed = "";
 	gpp.stdout.on("data", chunk => preprocessed += chunk);
@@ -472,7 +475,7 @@ const generateJS = bindings => {
 		})
 		.join("\n\n");
 
-	const module = name => `HengineWASMResource.${name}[${JSON.stringify(moduleName)}]`;
+	const module = name => `HengineWASMResource.${name}[${JSON.stringify(dstName)}]`;
 	return [
 		`${module("imports")} = ${JSON.stringify(imports)};`,
 		`${module("bindings")} = (module, imports, exports) => {\n${indent([
@@ -550,7 +553,7 @@ const generateCPP = bindings => {
 		.join("\n");
 
 	return [
-		`#include "../${moduleName}.cpp"`,
+		`#include "../${srcName}.cpp"`,
 		...recipeInstances,
 		"extern \"C\" {",
 		indent(source),
@@ -565,6 +568,6 @@ const bindings = [...classes]
 		return [generateBindings(name, parsed)];
 	});
 
-process.chdir(modulePath);
+process.chdir(dstPath);
 fs.writeFileSync("bindings.js", generateJS(bindings), "utf-8");
 fs.writeFileSync("bindings.cpp", generateCPP(bindings), "utf-8");

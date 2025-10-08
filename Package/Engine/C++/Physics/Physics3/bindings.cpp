@@ -1,4 +1,4 @@
-#include "../Physics3.cpp"
+#include "../Physics.cpp"
 API class Array_VectorN_3__0 {
 	private:
 		std::unique_ptr<VectorN<3>[]> elements;
