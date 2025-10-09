@@ -1701,9 +1701,10 @@ class GPUInterface {
 	 * Sets the value of a uniform in the program.
 	 * @param String name | The name of the uniform
 	 * @param Any value | The new value for the uniform. For the type of this argument, see the GLSL API
+	 * @param Boolean force? | Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	setUniform(name, value) {
-		this.program.setUniform(name, value);
+	setUniform(name, value, force = true) {
+		this.program.setUniform(name, value, force);
 	}
 	setArgument(name, value) {
 		this.setUniform(name, value);
@@ -1711,9 +1712,10 @@ class GPUInterface {
 	/**
 	 * Sets the value of many uniforms at once.
 	 * @param Object uniforms | A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
+	 * @param Boolean force? | Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	setUniforms(args) {
-		this.program.setUniforms(args);
+	setUniforms(args, force = true) {
+		this.program.setUniforms(args, force);
 	}
 	setArguments(args) {
 		return this.setUniforms(args);

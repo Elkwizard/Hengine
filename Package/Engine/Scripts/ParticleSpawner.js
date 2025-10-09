@@ -234,7 +234,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 		let end = particles.length - 1;
 		if (this.computation)
-			this.computation.setUniform("timerIncrement", timerIncrement);
+			this.computation.setUniform("timerIncrement", timerIncrement, false);
 
 		if (this.computation) {
 			const array = this.computation.getUniform("particles");

@@ -1,4 +1,6 @@
-<script src="../Hengine.js" title="Shader Editor">
+<script src="../Hengine.js">
+	title = "Hengine Demos - Shader Editor";
+
 	const STARTER_CODE = `
 // === Fractal Shader Demo ===
 // This is the Hengine's GPUShader system, made interactive.
@@ -166,26 +168,18 @@ vec4 shader() {
 			time = 0;
 		}
 		
+		// maybe setup webcam
+		if (shader.hasUniform("webcam") && !webcam) {
+			webcam = new Frame(1, 1);
+			new HengineWebcamResource("wc").load().then(wc => webcam = wc);
+		}
+
 		// set shader uniforms
-		const uniforms = {
+		shader.setUniforms({
+			webcam,
 			time: time++,
 			mouse: mouse.screen
-		};
-
-		if (shader.hasUniform("webcam")) {
-			if (webcam) {
-				uniforms.webcam = webcam;
-			} else {
-				webcam = new Frame(1, 1);
-				new HengineWebcamResource("wc").load().then(wc => webcam = wc);
-			}
-		}
-
-		for (const name in uniforms) {
-			if (shader.hasUniform(name)) {
-				shader.setUniform(name, uniforms[name]);
-			}
-		}
+		}, false /* don't warn on unused uniforms */);
 
 		// run and render shader
 		renderer.image(shader).default(0, 0);
