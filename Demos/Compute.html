@@ -13,27 +13,28 @@
 		delay: 0.01, // time between particle creation, in frames
 		lifeSpan: Infinity, // they don't need to go away
 		active: false, // we'll activate this manually
+		cullGraphics: false, // all the particles will be on screen
 		init(particle) { // called on particle creation
 			particle.position = Random.inShape(domain);
 			
 			// define custom data properties
-			particle.data.color = Random.color();
+			particle.data.color = new Color(0, 255, 255);
 			particle.data.color.red = 0;
-			particle.data.baseSize = Random.range(1, 4);
-			particle.data.size = particle.data.baseSize;
+			particle.data.size = Random.range(0.5, 1);
+			particle.data.proportion = 1;
 		},
 		// this is run for every particle, in parallel, on the GPU
 		update: ` 
 			// declare the data shape of our custom properties
 			struct Data {
-				vec2 color;
-				float size, baseSize;
+				vec2 color; // we only need the first component
+				float proportion;
 			};
 
 			// declare the data shape of the particle
 			struct Particle {
 				vec2 position, velocity;
-				Data data; // we only need the first component
+				Data data;
 			};
 
 			// declare computation inputs
@@ -44,7 +45,7 @@
 			Particle compute() {
 				Particle particle = particles[problemIndex];
 
-				particle.data.size = 4.0 * (0.3 * particle.data.color.r + 0.1) * particle.data.baseSize;
+				particle.data.proportion = 4.0 * (0.3 * particle.data.color.r + 0.1);
 
 				// move towards mouse, and redden color
 				if (mouseHeld) {
@@ -68,7 +69,10 @@
 			}
 		`,
 		draw(renderer, particle) { // called for particle rendering
-			renderer.draw(particle.data.color).circle(particle.position, particle.data.size);
+			renderer.draw(particle.data.color).circle(
+				particle.position,
+				particle.data.proportion * particle.data.size
+			);
 		}
 	});
 
@@ -96,7 +100,7 @@
 				mouse: mouse.screen,
 				mouseHeld: mouse.pressed("Left")
 			});
-		} else { // automatically move particles
+		} else if (time > 200) { // automatically move particles
 			const LOOP_LENGTH = 100;
 			const HOLD_LENGTH = LOOP_LENGTH * 0.5;
 			const DRAG_LENGTH = (LOOP_LENGTH - HOLD_LENGTH) * 0.4;

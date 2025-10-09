@@ -20,6 +20,7 @@
  * @prop Number delay? | The delay (in frames) between particle spawns. This can be less than 1
  * @prop Number lifeSpan? | The duration (in frames) of each particle's lifetime
  * @prop Number radius? | The effective radius of each particle used to compute culling. This does not affect the appearance of the particles
+ * @prop Boolean cullGraphics? | Whether or not particles should be checked for visibility before rendering
  * @prop Class extends ImageType imageType? | This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen
  */
 
@@ -73,6 +74,7 @@
  * @prop Number delay | The delay (in frames) between particle spawns. This can be less than 1. Default is 1
  * @prop Number lifeSpan | The duration (in frames) of each particle's lifetime. Default is 100
  * @prop Number radius | The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10
+ * @prop Boolean cullGraphics | Whether particles should be checked for visibility before rendering. Default is true
  */
 class PARTICLE_SPAWNER extends ElementScript {
 	static images = { };
@@ -155,6 +157,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		this.radius = p.radius ?? this.radius ?? 10;
 		this.lifeSpan = p.lifeSpan ?? this.lifeSpan ?? 100;
 		this.delay = p.delay ?? this.delay ?? 1;
+		this.cullGraphics = p.cullGraphics ?? this.cullGraphics ?? true;
 		const imageType = p.imageType ?? this.frame?.constructor ?? FastFrame;
 		this.separateFrame = imageType !== CanvasImage && !this.is3d;
 		if (this.separateFrame) {
@@ -276,7 +279,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 	escapeDraw(obj) {
 		if (obj.hidden) return;
 
-		const { gl, frame, particles } = this;
+		const { gl, frame, particles, cullGraphics } = this;
 
 		if (this.separateFrame) {
 			frame.resize(this.canvas.width, this.canvas.height);
@@ -294,7 +297,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 			bounds = this.camera.screen;
 		}
 
-		const particleBall = new  (this.is3d ? Sphere : Circle)(this.Vector.zero, this.radius);
+		const particleBall = new (this.is3d ? Sphere : Circle)(this.Vector.zero, this.radius);
 		
 		let anyParticlesRendered = false;
 
@@ -302,8 +305,11 @@ class PARTICLE_SPAWNER extends ElementScript {
 
 		for (let i = 0; i < particles.length; i++) {
 			const p = particles[i];
-			p.position.get(particleBall.position);
-			if (bounds.cullBall(particleBall)) continue;
+			
+			if (cullGraphics) {
+				p.position.get(particleBall.position);
+				if (bounds.cullBall(particleBall)) continue;
+			}
 			
 			this.particleDraw(gl, p);
 			anyParticlesRendered = true;
