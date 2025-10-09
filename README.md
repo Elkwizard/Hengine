@@ -1,11 +1,13 @@
 # Hengine
-The Hengine is a JavaScript game engine for both small scale creative coding projects and larger scale games. It can be loaded in both a 2D and 3D mode, to create games with different dimensionality.
+The Hengine is a JavaScript game engine for both small scale creative coding projects and larger scale games. It can be loaded in both a 2D and 3D mode, to create games with different dimensionality. It has a high-performance WebAssembly physics engine, compute shader support (without WebGPU!), and a robust library of geometric classes and algorithms. See [Usage](#usage) to create your first Hengine program in just 3 lines of HTML, and learn the rest from the [documentation](https://elkwizard.github.io/Hengine/Docs/Generated) and [examples](#examples)!
 
-## Installation
+<img alt="A wall of bricks being broken" src="Demos/Images/blocks3d.png">
+
+## Installation (Optional)
 The Hengine doesn't need to be installed. However, if you want to run code with a local copy of the Hengine (to preserve compatibility), simply clone this repository.
 
 ```bash
-git clone "https://www.github.com/Elkwizard/Hengine"
+git clone "https://www.github.com/Elkwizard/Hengine.git"
 ```
 
 ## Usage
@@ -61,6 +63,13 @@ Before using the Hengine, it must be included in your HTML file in one of two po
 2. [2D Physics Demo](https://elkwizard.github.io/Hengine/Demos/Physics2D.html)
 2. [3D Physics Demo](https://elkwizard.github.io/Hengine/Demos/Physics3D.html)
 3. [Shader Demo](https://elkwizard.github.io/Hengine/Demos/Shader.html)
+
+## Gallery
+
+<img alt="A forest of giant mushrooms" src="Demos/Images/mushrooms.png" width="350">
+<img alt="An infinitely repeating world of menger sponges made out of spheres" src="Demos/Images/raymarching.png" width="350">
+<img alt="A swirling mass of colors and angles" src="Demos/Images/fractalFlame.png" width="350">
+<img alt="A bench with a lamp in grayscale" src="Demos/Images/bench.png" width="350">
 
 ## Documentation
 
