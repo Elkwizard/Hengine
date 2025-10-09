@@ -1,5 +1,5 @@
 # Hengine
-The Hengine is a JavaScript game engine for both small scale creative coding projects and larger scale games. It can be loaded in both a 2D and 3D mode, to create games with different dimensionality. It has a high-performance WebAssembly physics engine, compute shader support (without WebGPU!), and a robust library of geometric classes and algorithms. See [Usage](#usage) to create your first Hengine program in just 3 lines of HTML, and learn the rest from the [documentation](https://elkwizard.github.io/Hengine/Docs/Generated) and [examples](#examples)!
+The Hengine (hεnʤɪn) is a JavaScript game engine for both small scale creative coding projects and larger scale games. It can be loaded in both a 2D and 3D mode, to create games with different dimensionality. It has a high-performance WebAssembly physics engine, compute shader support (without WebGPU!), and a robust library of geometric classes and algorithms. See [Usage](#usage) to create your first Hengine program in just 3 lines of HTML, and learn the rest from the [documentation](https://elkwizard.github.io/Hengine/Docs/Generated) and [examples](#examples)!
 
 <img alt="A wall of bricks being broken" src="Demos/Images/blocks3d.png">
 
