@@ -66,10 +66,8 @@ Before using the Hengine, it must be included in your HTML file in one of two po
 
 ## Gallery
 
-<img alt="A forest of giant mushrooms" src="Demos/Images/mushrooms.png" width="350">
-<img alt="An infinitely repeating world of menger sponges made out of spheres" src="Demos/Images/raymarching.png" width="350">
-<img alt="A swirling mass of colors and angles" src="Demos/Images/fractalFlame.png" width="350">
-<img alt="A bench with a lamp in grayscale" src="Demos/Images/bench.png" width="350">
+![A forest of giant mushrooms / An infinitely repeating world of menger sponges made out of spheres](Demos/Images/Gallery/row1.png)
+![A swirling mass of colors and angles / A bench with a lamp in grayscal](Demos/Images/Gallery/row2.png)
 
 ## Documentation
 
