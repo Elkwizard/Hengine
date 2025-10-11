@@ -107,16 +107,15 @@ class Camera3D extends Matrix4 {
 		Vector3.defineReference(this, "direction", new Vector3(0, 0, 1));
 		this.rotation = 0;
 		this.zoom = 1;
-
+		
 		// change handlers
-		const handle = () => this.updateMatrix();
-		this.position.onChange(handle);
+		this.shouldUpdate = true;
+		this.position.onChange(() => this.updateMatrix());
 		this.direction.onChange(() => this.updateDirection());
 		objectUtils.onChange(this, "rotation", () => this.updateDirection());
-		objectUtils.onChange(this, "zoom", handle);
+		objectUtils.onChange(this, "zoom", () => this.updateMatrix());
 		
 		this.updateDirection();
-		this.updateMatrix();
 		this.lenses = [new Lens(this)];
 		this.cacheScreen();
 	}
@@ -133,6 +132,8 @@ class Camera3D extends Matrix4 {
 	 * @param Transform3D transform | The new pose for the camera
 	 */
 	set transform(transform) {
+		this.shouldUpdate = false;
+		
 		const forward = transform.localDirectionToGlobal(Vector3.forward);
 		const right = transform.localDirectionToGlobal(Vector3.right);
 		this.direction = forward;
@@ -140,6 +141,9 @@ class Camera3D extends Matrix4 {
 		this.rotation = 0;
 		const roll = this.right.angleTo(right);
 		this.rotation = -roll.mag * Math.sign(roll.dot(forward));
+
+		this.shouldUpdate = true;
+		this.updateDirection();
 	}
 	/**
 	 * Retrieves the current pose of the camera as a Transform3D.
@@ -163,6 +167,8 @@ class Camera3D extends Matrix4 {
 		return this.screen;
 	}
 	updateDirection() {
+		if (!this.shouldUpdate) return;
+
 		const { direction } = this;
 		const cross = direction.cross(Vector3.up);
 		const right = cross.sqrMag ? cross.normalize() : Vector3.right;
@@ -170,6 +176,8 @@ class Camera3D extends Matrix4 {
 		this.updateMatrix();
 	}
 	updateMatrix() {
+		if (!this.shouldUpdate) return;
+
 		this.up = this.direction.cross(this.right);
 
 		const trans = Matrix4.translation(this.position.inverse);
