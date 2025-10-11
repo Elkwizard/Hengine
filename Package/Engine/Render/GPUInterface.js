@@ -1261,9 +1261,13 @@ class GLSLProgram {
 		gl.deleteShader(vertex);
 		gl.deleteShader(fragment);
 
-		if (!gl.getShaderParameter(vertex, gl.COMPILE_STATUS)) this.error("VERTEX_SHADER", gl.getShaderInfoLog(vertex));
-		if (!gl.getShaderParameter(fragment, gl.COMPILE_STATUS)) this.error("FRAGMENT_SHADER", gl.getShaderInfoLog(fragment));
-		if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) this.error("LINKING", gl.getProgramInfoLog(this.program));
+		if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+			if (!gl.getShaderParameter(vertex, gl.COMPILE_STATUS))
+				this.error("VERTEX_SHADER", gl.getShaderInfoLog(vertex));
+			if (!gl.getShaderParameter(fragment, gl.COMPILE_STATUS))
+				this.error("FRAGMENT_SHADER", gl.getShaderInfoLog(fragment));
+			this.error("LINKING", gl.getProgramInfoLog(this.program));
+		}
 	}
 	initialize() {
 		const { gl } = this;

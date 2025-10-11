@@ -212,9 +212,11 @@ class Random {
 					px = 1 - px;
 					py = 1 - py;
 				}
-				return	c.Vminus(a).Nmul(px)
-						.Vadd(b.Vminus(a).Nmul(py))
-						.Vadd(a);
+				return	c
+						.minus(a)
+						.mul(px)
+						.add(b.minus(a).mul(py))
+						.add(a);
 			}
 		} else {
 			if (region instanceof Sphere)

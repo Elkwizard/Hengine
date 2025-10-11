@@ -326,7 +326,7 @@ class Line extends Shape2D {
 	}
 	intersectSameType(line) {
 		const check = l => {
-			const dir = l.b.Vminus(l.a);
+			const dir = l.b.minus(l.a);
 			const a = this.a.cross(dir);
 			const b = this.b.cross(dir);
 			const a2 = line.a.cross(dir);

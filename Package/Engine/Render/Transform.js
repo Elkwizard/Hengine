@@ -212,7 +212,7 @@ class Transform2D extends Transform {
 	 * @param Number rotation | The angle (in radians) to rotate by
 	 */
 	rotateAround(point, rotation) {
-		const diff = this.position.Vminus(point);
+		const diff = this.position.minus(point);
 		diff.rotate(rotation);
 		diff.add(point);
 		this.position = diff;

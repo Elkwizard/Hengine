@@ -379,84 +379,79 @@ class Vector2 extends Vector {
 		this.y = -this.y;
 		return this;
 	}
-	Vplus(v) {
+	plus(v) {
+		if (typeof v === "number")
+			return new Vector2(this.x + v, this.y + v);
 		return new Vector2(this.x + v.x, this.y + v.y);
 	}
-	Vminus(v) {
+	minus(v) {
+		if (typeof v === "number")
+			return new Vector2(this.x - v, this.y - v);
 		return new Vector2(this.x - v.x, this.y - v.y);
 	}
-	Vtimes(v) {
+	times(v) {
+		if (typeof v === "number")
+			return new Vector2(this.x * v, this.y * v);
 		return new Vector2(this.x * v.x, this.y * v.y);
 	}
-	Vover(v) {
+	over(v) {
+		if (typeof v === "number")
+			return new Vector2(this.x / v, this.y / v);
 		return new Vector2(this.x / v.x, this.y / v.y);
 	}
-	VmodBy(v) {
+	modBy(v) {
+		if (typeof v === "number")
+			return new Vector2(this.x % v, this.y % v);
 		return new Vector2(this.x % v.x, this.y % v.y);
 	}
-	Nplus(v) {
-		return new Vector2(this.x + v, this.y + v);
-	}
-	Nminus(v) {
-		return new Vector2(this.x - v, this.y - v);
-	}
-	Ntimes(v) {
-		return new Vector2(this.x * v, this.y * v);
-	}
-	Nover(v) {
-		return new Vector2(this.x / v, this.y / v);
-	}
-	NmodBy(v) {
-		return new Vector2(this.x % v, this.y % v);
-	}
-	Vadd(v) {
-		this.x += v.x;
-		this.y += v.y;
+	add(v) {
+		if (typeof v === "number") {
+			this.x += v;
+			this.y += v;
+		} else {
+			this.x += v.x;
+			this.y += v.y;
+		}
 		return this;
 	}
-	Vsub(v) {
-		this.x -= v.x;
-		this.y -= v.y;
+	sub(v) {
+		if (typeof v === "number") {
+			this.x -= v;
+			this.y -= v;
+		} else {
+			this.x -= v.x;
+			this.y -= v.y;
+		}
 		return this;
 	}
-	Vmul(v) {
-		this.x *= v.x;
-		this.y *= v.y;
+	mul(v) {
+		if (typeof v === "number") {
+			this.x *= v;
+			this.y *= v;
+		} else {
+			this.x *= v.x;
+			this.y *= v.y;
+		}
 		return this;
 	}
-	Vdiv(v) {
-		this.x /= v.x;
-		this.y /= v.y;
+	div(v) {
+		if (typeof v === "number") {
+			this.x /= v;
+			this.y /= v;
+		} else {
+			this.x /= v.x;
+			this.y /= v.y;
+		}
 		return this;
 	}
-	Vmod(v) {
-		this.x %= v.x;
-		this.y %= v.y;
-		return this;
-	}
-	Nadd(v) {
-		this.x += v;
-		this.y += v;
-		return this;
-	}
-	Nsub(v) {
-		this.x -= v;
-		this.y -= v;
-		return this;
-	}
-	Nmul(v) {
-		this.x *= v;
-		this.y *= v;
-		return this;
-	}
-	Ndiv(v) {
-		this.x /= v;
-		this.y /= v;
-		return this;
-	}
-	Nmod(v) {
-		this.x %= v;
-		this.y %= v;
+	mod(v) {
+		if (typeof v === "number") {
+			this.x %= v;
+			this.y %= v;
+		} else {
+			this.x %= v.x;
+			this.y %= v.y;
+		}
 		return this;
 	}
 	toPhysicsVector(result = new Physics2.VectorN_2_()) {
