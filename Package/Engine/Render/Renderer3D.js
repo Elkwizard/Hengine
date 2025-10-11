@@ -78,7 +78,7 @@ class Artist3D extends Artist {
 		this.screenBuffers = [];
 
 		this.hdr = true;
-		this.depthFormat = this.gl.DEPTH_COMPONENT32F;
+		this.depthFormat = this.gl.DEPTH_COMPONENT24;
 		this.resultBuffer = this.createScreenBuffer({
 			color: true, depth: true, hdr: true,
 			depthFormat: this.depthFormat
@@ -135,7 +135,6 @@ class Artist3D extends Artist {
 		this.shadowMaps = [];
 	}
 	createScreenBuffer(settings) {
-		settings.hdr &&= this.hdr;
 		const buffer = new Artist3D.ScreenBuffer(this, settings);
 		this.screenBuffers.push(buffer);
 		return buffer;
@@ -148,24 +147,24 @@ class Artist3D extends Artist {
 	}
 	setupFramebuffer() {
 		const { gl } = this;
-
 		const { width, height } = this.destination;
+		const multisample = this.destination.framebuffer === null;
+
+		const createRenderbuffer = (attachment, format) => {
+			const buffer = gl.createRenderbuffer();
+			gl.bindRenderbuffer(gl.RENDERBUFFER, buffer);
+			if (multisample) {
+				gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 4, format, width, height);
+			} else {
+				gl.renderbufferStorage(gl.RENDERBUFFER, format, width, height);
+			}
+			gl.framebufferRenderbuffer(gl.FRAMEBUFFER, attachment, gl.RENDERBUFFER, buffer);
+		};
 
 		this.msFramebuffer = gl.createFramebuffer();
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.msFramebuffer);
-
-		const internalFormat = this.hdr ? gl.RGBA16F : gl.RGBA8;
-
-		const color = gl.createRenderbuffer();
-		gl.bindRenderbuffer(gl.RENDERBUFFER, color);
-		gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 4, internalFormat, width, height);
-
-		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, color);
-
-		const depth = gl.createRenderbuffer();
-		gl.bindRenderbuffer(gl.RENDERBUFFER, depth);
-		gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 4, this.depthFormat, width, height);
-		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depth);
+		createRenderbuffer(gl.COLOR_ATTACHMENT0, this.hdr ? gl.RGBA16F : gl.RGBA8);
+		createRenderbuffer(gl.DEPTH_ATTACHMENT, this.depthFormat);
 	}
 	compile() {
 		const { gl } = this;
@@ -629,8 +628,6 @@ class Artist3D extends Artist {
 		return { visibilities, visibilityCounts };
 	}
 	beforeRender(camera, meshQueue, lightQueue) {
-		const { gl } = this;
-
 		const lights = lightQueue.slice(0, Artist3D.MAX_LIGHTS);
 
 		const bounds = [];
@@ -1610,7 +1607,7 @@ Artist3D.ShadowMap = class {
 			filter: FilterMode.LINEAR
 		});
 		gl.texStorage3D(
-			gl.TEXTURE_2D_ARRAY, 1, gl.DEPTH_COMPONENT32F,
+			gl.TEXTURE_2D_ARRAY, 1, gl.DEPTH_COMPONENT24,
 			artist.shadowResolution, artist.shadowResolution,
 			Artist3D.SHADOW_CASCADE
 		);
@@ -1637,7 +1634,7 @@ Artist3D.ScreenBuffer = class {
 		color = true,
 		depth = false,
 		colorFormat = null,
-		depthFormat = artist.gl.DEPTH_COMPONENT32F
+		depthFormat = artist.gl.DEPTH_COMPONENT24
 	} = { }) {
 		this.artist = artist;
 		this.hdr = hdr;
@@ -1672,12 +1669,14 @@ Artist3D.ScreenBuffer = class {
 		this.bind();
 		
 		if (this.hasColor) {
-			this.color = GLUtils.createTexture(gl, { filter: FilterMode.LINEAR });
+			const hdr = this.hdr && this.artist.hdr;
 			const {
-				internalFormat = this.hdr ? gl.RGBA16F : gl.RGBA8,
-				type = this.hdr ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE,
+				internalFormat = hdr ? gl.RGBA16F : gl.RGBA8,
+				type = hdr ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE,
 				format = gl.RGBA
 			} = this.colorFormat ?? { };
+
+			this.color = GLUtils.createTexture(gl, { filter: FilterMode.LINEAR });
 			gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, null);
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.color, 0);
 		}
@@ -1843,8 +1842,8 @@ Artist3D.MeshRenderer = class MeshRenderer {
 	 * @param Boolean castShadows? | Whether the mesh should cast shadows. If the same mesh is rendered multiple times, any of them choosing to cast shadows will lead to all of them casting shadows. Default is true
 	 */
 	instance(transforms, castShadows) {
-		for (const transform of transforms)
-			this.at(transform, castShadows);
+		for (let i = 0; i < transforms.length; i++)
+			this.at(transforms[i], castShadows);
 	}
 };
 
