@@ -4991,323 +4991,323 @@ declare class Font {
 	 */
 	tabSize: number;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif5: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif10: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif15: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif20: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif25: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif30: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif35: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif40: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif45: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif50: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif55: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif60: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif65: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif70: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif75: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif80: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif85: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif90: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif95: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Serif100: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial5: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial10: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial15: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial20: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial25: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial30: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial35: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial40: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial45: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial50: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial55: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial60: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial65: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial70: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial75: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial80: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial85: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial90: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial95: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Arial100: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive5: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive10: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive15: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive20: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive25: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive30: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive35: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive40: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive45: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive50: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive55: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive60: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive65: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive70: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive75: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive80: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive85: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive90: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive95: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Cursive100: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace5: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace10: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace15: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace20: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace25: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace30: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace35: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace40: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace45: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace50: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace55: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace60: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace65: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace70: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace75: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace80: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace85: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace90: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace95: Font;
 	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
 	 */
 	static Monospace100: Font;
 	/**
@@ -5378,95 +5378,6 @@ declare class Font {
 	 * Converts the Font to a valid CSS font string.
 	 */
 	toString(): string;
-}
-
-/**
- * Represents an image that can be rendered.
- * This is an abstract superclass and should not be constructed.
- */
-declare class ImageType {
-	/**
-	 * The natural rendered width of the image
-	 */
-	width: number;
-	/**
-	 * The natural rendered height of the image
-	 */
-	height: number;
-	/**
-	 * Whether the contents of the image can change over time
-	 */
-	static dynamic: boolean;
-	/**
-	 * Returns the pixel density of the image, measured as the ratio of the number of pixels in a row of the image to the natural width of the image.
-	 */
-	get pixelRatio(): number;
-	/**
-	 * Returns the width of the image in actual pixels, accounting for the pixel density of the image.
-	 */
-	get pixelWidth(): number;
-	/**
-	 * Returns the height of the image in actual pixels, accounting for the pixel density of the image.
-	 */
-	get pixelHeight(): number;
-	/**
-	 * Simultaneously updates the width and height of the image.
-	 * Updates that occur on image resizing will only happen once with a call to this method, which can improve performance as opposed to simply assigning to `.width` and `.height` in a row.
-	 * @param width - The new natural width of the image
-	 * @param height - The new natural height of the image
-	 */
-	resize(width: number, height: number): void;
-	/**
-	 * Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
-	 * This operation is inclusive on the lower bound and exclusive on the upper bound.
-	 * @param point - The point to check
-	 */
-	contains(point: Vector2): boolean;
-	/**
-	 * Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
-	 * This operation is inclusive on the lower bound and exclusive on the upper bound.
-	 * @param x - The x coordinate of the point to check
-	 * @param y - The y coordinate of the point to check
-	 */
-	contains(x: number, y: number): boolean;
-	/**
-	 * Returns the width of the image required for a given height to maintain the aspect ratio.
-	 * @param height - The potential height of the image
-	 */
-	inferWidth(height: number): number;
-	/**
-	 * Returns the height of the image required for a given width to maintain the aspect ratio.
-	 * @param width - The potential width of the image
-	 */
-	inferHeight(width: number): number;
-	/**
-	 * Converts the content of the image to a data: url.
-	 */
-	toDataURL(): string;
-	/**
-	 * Downloads the image as a PNG, with a specified name.
-	 * Returns a promise that resolves when the image downloads.
-	 * @param name - The name of the downloaded image, without the extension
-	 */
-	download(name: string): Promise;
-}
-
-/**
- * Represents an externally loaded image file.
- * These should be loaded using HengineImageResource and not constructed directly.
- * ```js
- * const catImage = loadResource("cat.png"); // load the HImage
- * 
- * renderer.image(catImage).rect(0, 0, 100, 100);
- * ```
- */
-declare class HImage extends ImageType {
-	/**
-	 * Checks whether an image exists at a specified file path.
-	 * Returns a promise that resolves to whether the image exists.
-	 * @param src - The file path to check
-	 */
-	static imageExists(src: string): Promise<boolean>;
 }
 
 /**
@@ -7860,6 +7771,95 @@ declare class StrokeRenderer3D {
 	 * @param polyhedron - The polyhedron to draw a 3D wireframe of
 	 */
 	shape(polyhedron: Polyhedron): void;
+}
+
+/**
+ * Represents an image that can be rendered.
+ * This is an abstract superclass and should not be constructed.
+ */
+declare class ImageType {
+	/**
+	 * The natural rendered width of the image
+	 */
+	width: number;
+	/**
+	 * The natural rendered height of the image
+	 */
+	height: number;
+	/**
+	 * Whether the contents of the image can change over time
+	 */
+	static dynamic: boolean;
+	/**
+	 * Returns the pixel density of the image, measured as the ratio of the number of pixels in a row of the image to the natural width of the image.
+	 */
+	get pixelRatio(): number;
+	/**
+	 * Returns the width of the image in actual pixels, accounting for the pixel density of the image.
+	 */
+	get pixelWidth(): number;
+	/**
+	 * Returns the height of the image in actual pixels, accounting for the pixel density of the image.
+	 */
+	get pixelHeight(): number;
+	/**
+	 * Simultaneously updates the width and height of the image.
+	 * Updates that occur on image resizing will only happen once with a call to this method, which can improve performance as opposed to simply assigning to `.width` and `.height` in a row.
+	 * @param width - The new natural width of the image
+	 * @param height - The new natural height of the image
+	 */
+	resize(width: number, height: number): void;
+	/**
+	 * Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
+	 * This operation is inclusive on the lower bound and exclusive on the upper bound.
+	 * @param point - The point to check
+	 */
+	contains(point: Vector2): boolean;
+	/**
+	 * Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
+	 * This operation is inclusive on the lower bound and exclusive on the upper bound.
+	 * @param x - The x coordinate of the point to check
+	 * @param y - The y coordinate of the point to check
+	 */
+	contains(x: number, y: number): boolean;
+	/**
+	 * Returns the width of the image required for a given height to maintain the aspect ratio.
+	 * @param height - The potential height of the image
+	 */
+	inferWidth(height: number): number;
+	/**
+	 * Returns the height of the image required for a given width to maintain the aspect ratio.
+	 * @param width - The potential width of the image
+	 */
+	inferHeight(width: number): number;
+	/**
+	 * Converts the content of the image to a data: url.
+	 */
+	toDataURL(): string;
+	/**
+	 * Downloads the image as a PNG, with a specified name.
+	 * Returns a promise that resolves when the image downloads.
+	 * @param name - The name of the downloaded image, without the extension
+	 */
+	download(name: string): Promise;
+}
+
+/**
+ * Represents an externally loaded image file.
+ * These should be loaded using HengineImageResource and not constructed directly.
+ * ```js
+ * const catImage = loadResource("cat.png"); // load the HImage
+ * 
+ * renderer.image(catImage).rect(0, 0, 100, 100);
+ * ```
+ */
+declare class HImage extends ImageType {
+	/**
+	 * Checks whether an image exists at a specified file path.
+	 * Returns a promise that resolves to whether the image exists.
+	 * @param src - The file path to check
+	 */
+	static imageExists(src: string): Promise<boolean>;
 }
 
 /**

@@ -1072,7 +1072,7 @@ class HengineLoader {
 			"Math/Random.js",
 			"Math/Interpolation.js",
 
-			"Render/Frame.js",
+			"Render/ImageType.js",
 			"Render/Gradient.js",
 			"Math/Spline.js",
 			"Render/WebGL2DContext.js",
@@ -1100,6 +1100,8 @@ class HengineLoader {
 			"Math/Shapes.js",
 
 			"Render/Font.js",
+			"Render/Frame.js",
+			"Render/HImage.js",
 			"Render/Animation.js",
 			"Render/Camera.js",
 			"Render/Webcam.js",
