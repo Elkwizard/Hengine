@@ -11,7 +11,7 @@
  * });
  * ```
  * @prop ByteBuffer data | The pixel data of the texture. Modifying this buffer will modify the texture
- * @prop Boolean loops | Whether or not pixel coordinate parameters to methods will be wrapped around the edges of the texture space
+ * @prop Boolean loops | Whether or not pixel coordinate parameters to methods will be wrapped around the edges of the texture space. Starts as false
  */
 class Texture extends ImageType {
 	constructor(width, height) {
@@ -240,9 +240,6 @@ class Texture extends ImageType {
 			dest.set(r, g, b, a);
 		});
 	}
-	stretch(w, h) {
-		// TODO: reimplement
-	}
 	/**
 	 * Returns a texture containing a rectangular region of the caller. 
 	 * @signature
@@ -272,12 +269,15 @@ class Texture extends ImageType {
 		return this.imageData;
 	}
 	get(tex = new Texture(this.width, this.height)) {
-		if (tex.width !== this.width || tex.height !== this.height) return null;
+		tex.width = this.width;
+		tex.height = this.height;
+		tex.loops = this.loops;
 		tex.imageData = new ImageData(
 			new Uint8ClampedArray(this.imageData.data),
 			this.imageData.width,
 			this.imageData.height
 		);
+		tex.data = new ByteBuffer(tex.imageData.data.buffer);
 		tex.loaded = false;
 		return tex;
 	}
@@ -306,22 +306,25 @@ class Texture extends ImageType {
 		width ??= image.width;
 		height ??= image.height
 
+		const { pixelRatio } = image;
+
 		const img = image.makeImage();
 		const canvas = new_OffscreenCanvas(img.width, img.height);
 		const context = canvas.getContext("2d");
 		context.drawImage(img, 0, 0);
+		const imageData = context.getImageData(
+			x * pixelRatio, y * pixelRatio,
+			img.width, img.height
+		);
 
-		const ratio = image.pixelRatio;
-
-		x *= ratio;
-		y *= ratio;
-		const W = img.width;//Math.floor(w * __devicePixelRatio);
-		const H = img.height;//Math.floor(h * __devicePixelRatio);
-		const imageData = context.getImageData(x, y, W, H);
 		const tex = new Texture(width, height);
-		const data = imageData.data;
-		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) {
-			const inx = (Math.round(i * ratio) + Math.round(j * ratio) * W) * 4;
+		const { data } = imageData;
+
+		for (let i = 0; i < width; i++)
+		for (let j = 0; j < height; j++) {
+			const px = Math.floor(i * pixelRatio);
+			const py = Math.floor(j * pixelRatio);
+			const inx = (px + py * imageData.width) * 4;
 			const r = data[inx + 0];
 			const g = data[inx + 1];
 			const b = data[inx + 2];
@@ -329,6 +332,7 @@ class Texture extends ImageType {
 			tex.shaderSetPixel(i, j, new Color(r, g, b, a));
 		}
 		tex.loaded = false;
+
 		return tex;
 	}
 	/**
@@ -362,7 +366,7 @@ class Texture extends ImageType {
 			img.addEventListener("load", () => {
 				const w = width ?? img.width;
 				if (width && !height) height = Math.floor(width * img.height / img.width);
-				const h = height ?? style.height;
+				const h = height ?? img.height;
 				const tex = new Texture(w, h);
 				
 				const canvas = new_OffscreenCanvas(w, h);

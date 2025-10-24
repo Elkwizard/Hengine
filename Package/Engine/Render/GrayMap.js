@@ -23,7 +23,8 @@ class GrayMap {
 		this.width = w;
 		this.height = h;
 		this.data = Array.dim(w, h);
-		if (rule !== null) this.data = this.data.map((_, x, y) => rule(x, y));
+		if (rule !== null)
+			this.data = this.data.map((_, x, y) => rule(x, y));
 	}
 	/**
 	 * Returns the grayscale value at a specified point, or -1 if the point is out of bounds.
@@ -39,7 +40,9 @@ class GrayMap {
 		buffer.write.uint32(this.width);
 		buffer.write.uint32(this.height);
 
-		for (let i = 0; i < this.width; i++) for (let j = 0; j < this.height; j++) buffer.write.uint8(this.data[i][j] * 255);
+		for (let i = 0; i < this.width; i++)
+		for (let j = 0; j < this.height; j++)
+			buffer.write.uint8(this.data[i][j] * 255);
 		
 		return buffer;
 	}
@@ -49,7 +52,9 @@ class GrayMap {
 
 		const map = new GrayMap(width, height);
 
-		for (let i = 0; i < width; i++) for (let j = 0; j < height; j++) map.data[i][j] = buffer.read.uint8() / 255;
+		for (let i = 0; i < width; i++)
+		for (let j = 0; j < height; j++)
+			map.data[i][j] = buffer.read.uint8() / 255;
 
 		return map;
 	}

@@ -12,7 +12,7 @@
  * @prop Boolean bold | Whether the font is bold
  * @prop Boolean italic | Whether the font is italic
  * @prop Number lineHeight | The height of a line of text in the font. This determines spacing between multiline strings
- * @prop Number tabSize | The number of spaces a tab is equivalent to for this font
+ * @prop Number tabSize | The number of spaces a tab is equivalent to for this font. Starts as 4
  * @prop<static, immutable> Font [FAMILY][SIZE] | These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
  * @name_subs FAMILY: Serif, Arial, Cursive, Monospace; SIZE: 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
  */
@@ -111,6 +111,9 @@ class Font {
 	 */
 	packText(str, maxWidth) {
 		str = this.processString(str);
+		
+		if (!isFinite(maxWidth)) return str;
+		
 		return str
 			.split("\n")
 			.map(line => {
@@ -129,7 +132,7 @@ class Font {
 					lineStart = false;
 				}
 				if (acc) lines.push(acc);
-				return lines.join("\n");
+				return lines.join("\n").trim();
 			})
 			.join("\n");
 	}
@@ -140,21 +143,21 @@ class Font {
 	 * @param Number maxWidth? | The maximum allowed width of a single line before wrapping occurs. Default is Infinity
 	 * @return { width: Number, height: Number }
 	 */
-	getTextBounds(str, pack) {
-		str = this.processString(str);
-		if (pack) str = this.packText(str, pack);
-		let spl = str.split("\n");
-		let width = Math.max(...spl.map(l => this.getWidthCRC2D(l)));
-		let height = spl.length * this.lineHeight;
+	getTextBounds(str, packWidth = Infinity) {
+		str = this.packText(str, packWidth);
+		const lines = str.split("\n");
+		const width = Math.max(...lines.map(line => this.getWidthCRC2D(line)));
+		const height = lines.length * this.lineHeight;
 		return { width, height };
 	}
 	/**
 	 * Returns the width of a string of text.
 	 * @param String text | The text to measure 
+	 * @param Number maxWidth? | The maximum allowed width of a single line before wrapping occurs. Defaults is Infinity
 	 * @return Number
 	 */
-	getTextWidth(str) {
-		str = this.processString(str);
+	getTextWidth(str, packWidth = Infinity) {
+		str = this.packText(str, packWidth);
 		if (str.includes("\n")) {
 			const lines = str.split("\n");
 			return Math.max(...lines.map(l => this.getWidthCRC2D(l)));
@@ -168,11 +171,10 @@ class Font {
 	 * @param Number packWidth? | The maximum allowed width of a single line before wrapping occurs. Default is Infinity
 	 * @return Number
 	 */
-	getTextHeight(str, pack = false) {
+	getTextHeight(str, packWidth = Infinity) {
 		let innerLines = 0;
-		if (str.includes("\n") || pack) {
-			str = this.processString(str);
-			if (pack) str = this.packText(str, pack);
+		if (str.includes("\n") || isFinite(packWidth)) {
+			str = this.packText(str, packWidth);
 			innerLines = str.split("\n").length - 1;
 		}
 		return this.boundingAscent + this.boundingDescent + innerLines * this.lineHeight;
@@ -196,13 +198,11 @@ class Font {
 	static context = new_OffscreenCanvas(1, 1).getContext("2d");
 	static keywordFamilies = ["monospace", "sans-serif", "serif", "cursive", "fantasy", "system-ui"];
 	static defaultFamilies = ["Serif", "Arial", "Cursive", "Monospace"];
-	static defaultSizes = [];
 }
 // setup
-for (let i = 0; i < 20; i++) Font.defaultSizes.push((i + 1) * 5);
-for (let i = 0; i < Font.defaultSizes.length; i++) {
+for (let size = 5; size <= 100; size += 5) {
 	for (let j = 0; j < Font.defaultFamilies.length; j++) {
-		const NAME = Font.defaultFamilies[j] + Font.defaultSizes[i];
-		Lazy.define(Font, NAME, () => new Font(Font.defaultSizes[i], Font.defaultFamilies[j]));
+		const NAME = Font.defaultFamilies[j] + size;
+		Lazy.define(Font, NAME, () => new Font(size, Font.defaultFamilies[j]));
 	}
 }
