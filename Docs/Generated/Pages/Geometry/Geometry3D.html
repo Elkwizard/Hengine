@@ -1,0 +1,96 @@
+
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<link href="..\..\vars.css" type="text/css" rel="stylesheet">
+				<link href="..\..\doc.css" type="text/css" rel="stylesheet">
+			</head>
+			<body>
+				
+			<div class="class-wrapper" id="class Geometry3D">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Geometry3D.js?#L5" target="_blank" class="class-name source-link">Geometry3D</a>
+				</div>
+				<div class="class desc">
+					Contains a collection of useful static methods for manipulating 3D shapes and figures.
+This class cannot be constructed.
+				</div>
+				
+				
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Geometry3D.convexHull()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Geometry3D.js?#L17" target="_blank" class="function-name source-link">Geometry3D.convexHull</a>(<span class="param">points</span>)<span class="type"><a href="../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a></span>
+			</div>
+			<div class="function desc">
+				Returns the smallest convex <a href="../Geometry/Shapes/3D/Polyhedron.html#class Polyhedron">Polyhedron</a> which contains a given set of points.
+The behavior is undefined if the points are all coplanar.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Geometry3D.convexHull():points">
+							<div class="param-name">
+								<span class="param">points</span>
+								<span class="type"><a href="../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a>[]</span>
+							</div>
+							<div class="param desc">
+								The points to create a convex hull for. There must be at least 4
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Geometry3D.subdivideFrustum()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Math\Geometry3D.js?#L125" target="_blank" class="function-name source-link">Geometry3D.subdivideFrustum</a>(<span class="param">frustum</span>, <span class="param">portions</span>)<span class="type"><a href="../Geometry/Shapes/3D/Frustum.html#class Frustum">Frustum</a>[]</span>
+			</div>
+			<div class="function desc">
+				Subdivides a frustum along the z axis.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Geometry3D.subdivideFrustum():frustum">
+							<div class="param-name">
+								<span class="param">frustum</span>
+								<span class="type"><a href="../Geometry/Shapes/3D/Frustum.html#class Frustum">Frustum</a></span>
+							</div>
+							<div class="param desc">
+								The frustum to subdivide
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Geometry3D.subdivideFrustum():portions">
+							<div class="param-name">
+								<span class="param">portions</span>
+								<span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a>[]/<a href="../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								How to slice the frustum. If this is a number, the frustum will be sliced into that many pieces of equal size. If this is an array, each element provides a weight proportional to the size of each piece of the frustum. The weights may be scaled by any constant
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			</body>
+		</html>
+	

@@ -50,9 +50,9 @@
 		<div class="prop-wrapper" id="Camera3D.screen">
 			<div class="prop-header member">
 				<span class="prop-name">screen</span>
-				<span class="type">Frustum</span>
+				<span class="type"><a href="../../Geometry/Shapes/3D/Frustum.html#class Frustum">Frustum</a></span>
 			</div>
-			<div class="prop desc">A small <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> Frustum containing the frusta of all the camera's lenses. This only updates when cacheScreen() is called</div>
+			<div class="prop desc">A small <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> <a href="../../Geometry/Shapes/3D/Frustum.html#class Frustum">Frustum</a> containing the frusta of all the camera's lenses. This only updates when cacheScreen() is called</div>
 			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
 		</div>
 	
@@ -120,7 +120,7 @@ Equivalent to <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL"
 	
 		<div class="function-wrapper" id="Camera3D.prototype.cacheScreen()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L164" target="_blank" class="function-name source-link">cacheScreen</a>()<span class="type">Frustum</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L164" target="_blank" class="function-name source-link">cacheScreen</a>()<span class="type"><a href="../../Geometry/Shapes/3D/Frustum.html#class Frustum">Frustum</a></span>
 			</div>
 			<div class="function desc">
 				Synchronizes <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span></code> to match the location and orientation of the camera and returns it.
@@ -240,6 +240,270 @@ The vertical input is clamped to avoid gimbal lock.
 							</div>
 							<div class="param desc">
 								The angle in radians about the x axis from +z to the camera direction
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	</div>
+				
+			</div>
+		
+			<div class="class-wrapper" id="class Lens">
+				<div class="class-header">
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L10" target="_blank" class="class-name source-link">Lens</a>
+				</div>
+				<div class="class desc">
+					Represents a viewpoint on a Camera3D, and handles the projection (but not positioning) of the camera.
+This class should not be constructed, and should instead be accessed by the <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">lenses</span></code> property of a Camera3D.
+				</div>
+				
+				
+				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+		<div class="prop-wrapper" id="Lens.camera">
+			<div class="prop-header member">
+				<span class="prop-name">camera</span>
+				<span class="type">Camera3D</span>
+			</div>
+			<div class="prop desc">The camera which the lens is attached to</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property shouldn't be re-assigned, but its internal properties may be modified">readonly</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Lens.pcMatrix">
+			<div class="prop-header member">
+				<span class="prop-name">pcMatrix</span>
+				<span class="type"><a href="../../Geometry/Matrices.html#class Matrix4">Matrix4</a></span>
+			</div>
+			<div class="prop desc">The product of the lens' projection matrix and the camera. This only updates when <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">cacheScreen</span><span class="highlight-SYMBOL">()</span></code> is called</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Lens.screen">
+			<div class="prop-header member">
+				<span class="prop-name">screen</span>
+				<span class="type"><a href="../../Geometry/Shapes/3D/Frustum.html#class Frustum">Frustum</a></span>
+			</div>
+			<div class="prop desc">The <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> frustum of the lens. This only updates when <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-FUNCTION">cacheScreen</span><span class="highlight-SYMBOL">()</span></code> is called</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Lens.alignment">
+			<div class="prop-header member">
+				<span class="prop-name">alignment</span>
+				<span class="type">LensAlignment</span>
+			</div>
+			<div class="prop desc">The area of the screen rendered to by the lens</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	
+		<div class="prop-wrapper" id="Lens.uvBox">
+			<div class="prop-header member">
+				<span class="prop-name">uvBox</span>
+				<span class="type"><a href="../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
+			</div>
+			<div class="prop desc">The region of the screen that the lens renders to, in normalized UV coordinates (0-1 on both axes)</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
+	</div>
+				
+				
+				
+					<div class="header">Methods</div>
+					<div class="class-methods">
+		<div class="function-wrapper" id="Lens.prototype.constructor()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L17" target="_blank" class="function-name source-link">constructor</a>(<span class="param">camera</span>, <span class="param">uvBox</span>)
+			</div>
+			<div class="function desc">
+				Creates a new lens for a given Camera3D.
+This does not automatically attach the lens to the camera.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Lens.prototype.constructor():camera">
+							<div class="param-name">
+								<span class="param">camera</span>
+								<span class="type">Camera3D</span>
+							</div>
+							<div class="param desc">
+								The camera to attach the lens to
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Lens.prototype.constructor():uvBox">
+							<div class="param-name">
+								<span class="param">uvBox</span>
+								<span class="type"><a href="../../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
+							</div>
+							<div class="param desc">
+								The region of the screen that the lens renders to
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="set Lens.prototype.projection()">
+			<div class="function-header member">
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L39" target="_blank" class="function-name source-link">projection</a>(<span class="param">projection</span>)
+			</div>
+			<div class="function desc">
+				Configures the lens to use a custom projection.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="set Lens.prototype.projection():projection">
+							<div class="param-name">
+								<span class="param">projection</span>
+								<span class="type"><a href="../../Geometry/Matrices.html#class Matrix4">Matrix4</a></span>
+							</div>
+							<div class="param desc">
+								The homogenous projection matrix to use
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="get Lens.prototype.projection()">
+			<div class="function-header member">
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L48" target="_blank" class="function-name source-link">projection</a><span class="type"><a href="../../Geometry/Matrices.html#class Matrix4">Matrix4</a></span>
+			</div>
+			<div class="function desc">
+				Returns the projection matrix of the lens.
+This may vary as the dimensions of the rendering surface change.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Lens.prototype.cacheScreen()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L30" target="_blank" class="function-name source-link">cacheScreen</a>()<span class="type"><a href="../../Geometry/Shapes/3D/Frustum.html#class Frustum">Frustum</a></span>
+			</div>
+			<div class="function desc">
+				Returns the <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> frustum of the lens, and synchronizes <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">screen</span></code> and <code class=" highlight-BACKGROUND"><span class="highlight-SYMBOL">.</span><span class="highlight-PROPERTY">pcMatrix</span></code> to match the location and orientation of the lens and camera.
+			</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Lens.prototype.getViewDirection()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L58" target="_blank" class="function-name source-link">getViewDirection</a>(<span class="param">position</span>)<span class="type"><a href="../../Geometry/Vectors/Vector3.html#class Vector3">Vector3</a></span>
+			</div>
+			<div class="function desc">
+				Returns the <a href="../../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> direction of the ray under a given pixel.
+The returned vector is normalized.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Lens.prototype.getViewDirection():position">
+							<div class="param-name">
+								<span class="param">position</span>
+								<span class="type"><a href="../../Geometry/Vectors/Vector2.html#class Vector2">Vector2</a></span>
+							</div>
+							<div class="param desc">
+								The pixel coordinates
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Lens.prototype.perspective()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L77" target="_blank" class="function-name source-link">perspective</a>(<span class="param">fov</span>, <span class="param">zNear</span>, <span class="param">zFar</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Configures the lens to use a perspective projection.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Lens.prototype.perspective():fov">
+							<div class="param-name">
+								<span class="param">fov</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The field of view of the lens in radians
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Lens.prototype.perspective():zNear">
+							<div class="param-name">
+								<span class="param">zNear</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The location of the near clipping plane
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Lens.prototype.perspective():zFar">
+							<div class="param-name">
+								<span class="param">zFar</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The location of the far clipping plane
+							</div>
+						</div>
+					
+		
+				</div>
+			
+		</div>
+	
+		<div class="function-wrapper" id="Lens.prototype.orthographic()">
+			<div class="function-header member">
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Camera3D.js?#L85" target="_blank" class="function-name source-link">orthographic</a>(<span class="param">span</span>, <span class="param">depth</span>)<span class="type">void</span>
+			</div>
+			<div class="function desc">
+				Configures the lens to use an orthographic projection.
+			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="Lens.prototype.orthographic():span">
+							<div class="param-name">
+								<span class="param">span</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The size of the x and y spans included in the projection
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="Lens.prototype.orthographic():depth">
+							<div class="param-name">
+								<span class="param">depth</span>
+								<span class="type"><a href="../../Built-Ins/Number.html#class Number">Number</a></span>
+							</div>
+							<div class="param desc">
+								The maximum depth included in the projection
 							</div>
 						</div>
 					

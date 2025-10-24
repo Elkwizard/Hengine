@@ -56,7 +56,7 @@
 		"Camera": {
 			"Camera": null,
 			"Camera2D": null,
-			"Camera3D": null
+			"Camera3D": ["Camera3D", "Lens"]
 		},
 		"Color": null,
 		"Gradient": ["Gradient", "ValueStop"],
@@ -139,6 +139,7 @@
 				"Polyhedron": ["Polyhedron", "PolyhedronBuilder"],
 				"Prism": null,
 				"Sphere": null,
+				"Frustum": null,
 				"Capsule": null,
 				"Triangle": null,
 				"Plane": null,
@@ -160,6 +161,7 @@
 		"Matrices": ["Matrix", "Matrix2", "Matrix3", "Matrix4"],
 		"Transform": ["Transform", "Transform2D", "Transform3D"],
 		"Geometry": ["Geometry", "RectPriority"],
+		"Geometry3D": null,
 		"Interpolation": null,
 		"Animatable": null
 	},
