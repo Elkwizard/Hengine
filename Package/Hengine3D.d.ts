@@ -1165,13 +1165,15 @@ declare class GPUComputation implements GPUInterface {
 	 * Sets the value of a uniform in the program.
 	 * @param name - The name of the uniform
 	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	setUniform(name: string, value: any): void;
+	setUniform(name: string, value: any, force?: boolean): void;
 	/**
 	 * Sets the value of many uniforms at once.
 	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	setUniforms(uniforms: object): void;
+	setUniforms(uniforms: object, force?: boolean): void;
 	/**
 	 * Retrieves the current value of a given uniform.
 	 * For the return type of this function, see the GLSL API.
@@ -1182,7 +1184,7 @@ declare class GPUComputation implements GPUInterface {
 	 * Checks whether a given uniform exists.
 	 * @param name - The name of the uniform to check
 	 */
-	argumentExists(name: string): boolean;
+	hasUniform(name: string): boolean;
 }
 
 /**
@@ -4963,7 +4965,7 @@ declare class Color extends Operable {
  * renderer.draw(new Color("black")).text(font, "Hello World!", 0, 0);
  * ```
  */
-declare class Font implements Copyable {
+declare class Font {
 	/**
 	 * The size of the font in CSS pixels
 	 */
@@ -4975,13 +4977,13 @@ declare class Font implements Copyable {
 	/**
 	 * Whether the font is bold
 	 */
-	bold: boolean;
+	bolded: boolean;
 	/**
 	 * Whether the font is italic
 	 */
-	italic: boolean;
+	italicized: boolean;
 	/**
-	 * The height of a line of text in the font. This determines spacing between multiline strings
+	 * The height of a line of text in the font. This determines spacing between multi-line strings
 	 */
 	lineHeight: number;
 	/**
@@ -5309,13 +5311,44 @@ declare class Font implements Copyable {
 	 */
 	static Monospace100: Font;
 	/**
-	 * Creates a new font.
-	 * @param size - The size of the font
+	 * Creates a new font which is non-italic and non-bold.
+	 * The font will have a tab size of 4.
+	 * @param size - The size and line height of the font
 	 * @param family - The font family
-	 * @param bold - Whether the font is bold, default is false
-	 * @param italic - Whether the font is italic, default is false
 	 */
-	constructor(size: number, family: string, bold?: boolean, italic?: boolean);
+	constructor(size: number, family: string);
+	/**
+	 * Returns a copy of the caller with its `.family` property changed to a given value.
+	 * @param family - The new font family
+	 */
+	withFamily(family: string): this;
+	/**
+	 * Returns a copy of the caller with its `.size` property changed to a given value.
+	 * The ratio of `.lineHeight` to `.size` will remain constant.
+	 * @param size - The new font size, in CSS pixels
+	 */
+	withSize(size: number): this;
+	/**
+	 * Returns a copy of the caller with its `.lineHeight` property changed to a given value.
+	 * The line height represents the vertical distance between two subsequent lines.
+	 * @param lineHeight - The new font's line height, in CSS pixels
+	 */
+	withLineHeight(lineHeight: number): this;
+	/**
+	 * Returns a copy of the caller with its `.tabSize` property changed to a given value.
+	 * @param tabSize - The amount of spaces a tab will correspond to
+	 */
+	withTabSize(tabSize: number): this;
+	/**
+	 * Returns a copy of the caller with its `.bolded` property changed to a given value.
+	 * @param bold - Whether the new font should be bold. Default is true
+	 */
+	bold(bold?: boolean): this;
+	/**
+	 * Returns a copy of the caller with its `.italicized` property changed to a given value.
+	 * @param italic - Whether the new font should be italic. Default is true
+	 */
+	italic(italic?: boolean): this;
 	/**
 	 * Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
 	 * @param text - The text to pack
@@ -5332,8 +5365,9 @@ declare class Font implements Copyable {
 	/**
 	 * Returns the width of a string of text.
 	 * @param text - The text to measure
+	 * @param maxWidth - The maximum allowed width of a single line before wrapping occurs. Defaults is Infinity
 	 */
-	getTextWidth(text: string): number;
+	getTextWidth(text: string, maxWidth?: number): number;
 	/**
 	 * Returns the height of a string of text.
 	 * @param text - The text to measure
@@ -5344,11 +5378,6 @@ declare class Font implements Copyable {
 	 * Converts the Font to a valid CSS font string.
 	 */
 	toString(): string;
-	/**
-	 * Creates a copy of the object and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the object into. This must be the same type as the caller
-	 */
-	get(destination?: this): this;
 }
 
 /**
@@ -5566,13 +5595,15 @@ declare class GPUShader extends ImageType implements GPUInterface {
 	 * Sets the value of a uniform in the program.
 	 * @param name - The name of the uniform
 	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	setUniform(name: string, value: any): void;
+	setUniform(name: string, value: any, force?: boolean): void;
 	/**
 	 * Sets the value of many uniforms at once.
 	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	setUniforms(uniforms: object): void;
+	setUniforms(uniforms: object, force?: boolean): void;
 	/**
 	 * Retrieves the current value of a given uniform.
 	 * For the return type of this function, see the GLSL API.
@@ -5583,7 +5614,7 @@ declare class GPUShader extends ImageType implements GPUInterface {
 	 * Checks whether a given uniform exists.
 	 * @param name - The name of the uniform to check
 	 */
-	argumentExists(name: string): boolean;
+	hasUniform(name: string): boolean;
 }
 
 /**
@@ -6445,7 +6476,7 @@ declare class Texture extends ImageType implements Copyable, Serializable {
 	 */
 	data: ByteBuffer;
 	/**
-	 * Whether or not pixel coordinate parameters to methods will be wrapped around the edges of the texture space
+	 * Whether or not pixel coordinate parameters to methods will be wrapped around the edges of the texture space. Starts as false
 	 */
 	loops: boolean;
 	/**
@@ -7027,13 +7058,15 @@ declare interface GPUInterface {
 	 * Sets the value of a uniform in the program.
 	 * @param name - The name of the uniform
 	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	setUniform(name: string, value: any): void;
+	setUniform(name: string, value: any, force?: boolean): void;
 	/**
 	 * Sets the value of many uniforms at once.
 	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	setUniforms(uniforms: object): void;
+	setUniforms(uniforms: object, force?: boolean): void;
 	/**
 	 * Retrieves the current value of a given uniform.
 	 * For the return type of this function, see the GLSL API.
@@ -7044,7 +7077,7 @@ declare interface GPUInterface {
 	 * Checks whether a given uniform exists.
 	 * @param name - The name of the uniform to check
 	 */
-	argumentExists(name: string): boolean;
+	hasUniform(name: string): boolean;
 }
 
 /**
@@ -8406,6 +8439,10 @@ declare interface SpawnerProperties {
 	 */
 	radius?: number;
 	/**
+	 * Whether or not particles should be checked for visibility before rendering
+	 */
+	cullGraphics?: boolean;
+	/**
 	 * This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen
 	 */
 	imageType?: Class<ImageType>;
@@ -8472,6 +8509,10 @@ declare class PARTICLE_SPAWNER extends ElementScript {
 	 * The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10
 	 */
 	radius: number;
+	/**
+	 * Whether particles should be checked for visibility before rendering. Default is true
+	 */
+	cullGraphics: boolean;
 	/**
 	 * Makes an object a particle system.
 	 * @param properties - The settings to specify on the spawner. Those not specified will retain their default values
@@ -8796,6 +8837,13 @@ declare class ByteBuffer implements Copyable, Serializable {
 	 * @param string - The string of data
 	 */
 	static fromString(string: string): ByteBuffer;
+	/**
+	 * Returns a new byte buffer containing the bytes associated with a given value.
+	 * The returned buffer will have its pointer past the end.
+	 * @param value - A value to put into the buffer
+	 * @param type - A method name on ByteBuffer.Writer to use to serialize the value (`"string"`, `"uint8"`, `"object"`, etc). If not provided, the `.toByteBuffer()` Serializable method of the value will be used instead
+	 */
+	static of(value: Serializable, type?: string): ByteBuffer;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -9641,7 +9689,7 @@ declare class Files {
 	directoryExists(path: string): boolean;
 	/**
 	 * Writes a file to a specified path.
-	 * Returns whether the it succeeded.
+	 * Returns whether the file was successfully written.
 	 * @param path - The file path to write to
 	 * @param contents - The data to write to the file
 	 * @param raw - Whether or not the contents parameter is a ByteBuffer to be written directly rather than being file-type-specific data to be converted. Default is false
@@ -9649,19 +9697,19 @@ declare class Files {
 	writeFile(path: string, contents: any, raw?: boolean): boolean;
 	/**
 	 * Deletes a file at a specified path.
-	 * Returns whether it succeeded.
+	 * Returns whether the file was successfully deleted.
 	 * @param path - The file path to delete
 	 */
 	deleteFile(path: string): boolean;
 	/**
 	 * Deletes a directory at a specified path.
-	 * Returns whether it succeeded.
+	 * Returns whether the directory was successfully deleted.
 	 * @param path - The directory path to delete
 	 */
 	deleteDirectory(path: string): boolean;
 	/**
 	 * Creates a new directory at a specified path.
-	 * Returns whether it succeeded.
+	 * Returns whether the directory was successfully created.
 	 * @param path - The path to create the directory at
 	 */
 	createDirectory(path: string): boolean;
@@ -9686,7 +9734,7 @@ declare class Files {
 	getFileSize(path: string): number;
 	/**
 	 * Changes the current directory.
-	 * Returns whether it succeeded.
+	 * Returns whether the current directory was successfully changed.
 	 * @param path - The path of the new directory
 	 */
 	changeDirectory(path: string): boolean;

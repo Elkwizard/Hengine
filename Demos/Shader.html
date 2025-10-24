@@ -53,8 +53,7 @@ vec4 shader() {
 			this.scriptNumber--;
 			
 			this.font = Font.Monospace20;
-			this.boldFont = this.font.get();
-			this.boldFont.bold = true;
+			this.boldFont = this.font.bold();
 			
 			obj.scripts.add(TEXT_AREA, this.font);
 

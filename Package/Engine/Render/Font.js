@@ -1,5 +1,4 @@
 /**
- * @implements Copyable
  * Represents a font, including family, side, and styling.
  * Fonts can be used in the text rendering functions of Artist.
  * ```js
@@ -7,101 +6,130 @@
  * 
  * renderer.draw(new Color("black")).text(font, "Hello World!", 0, 0);
  * ```
+ * @props<immutable>
  * @prop Number size | The size of the font in CSS pixels
  * @prop String family | The string identifier for the font family
- * @prop Boolean bold | Whether the font is bold
- * @prop Boolean italic | Whether the font is italic
- * @prop Number lineHeight | The height of a line of text in the font. This determines spacing between multiline strings
- * @prop Number tabSize | The number of spaces a tab is equivalent to for this font. Starts as 4
+ * @prop Boolean bolded | Whether the font is bold
+ * @prop Boolean italicized | Whether the font is italic
+ * @prop Number lineHeight | The height of a line of text in the font. This determines spacing between multi-line strings
+ * @prop Number tabSize | The number of spaces a tab is equivalent to for this font
  * @prop<static, immutable> Font [FAMILY][SIZE] | These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and less than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
  * @name_subs FAMILY: Serif, Arial, Cursive, Monospace; SIZE: 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
  */
 class Font {
 	/**
-	 * Creates a new font.
-	 * @param Number size | The size of the font
+	 * Creates a new font which is non-italic and non-bold.
+	 * The font will have a tab size of 4.
+	 * @param Number size | The size and line height of the font
 	 * @param String family | The font family
-	 * @param Boolean bold? | Whether the font is bold, default is false
-	 * @param Boolean italic? | Whether the font is italic, default is false
 	 */
-	constructor(size = 15, family = "Arial", bold = false, italic = false) {
+	constructor(size, family) {
 		this.size = size;
 		this.family = family;
-		this.bold = bold;
-		this.italic = italic;
+		this.bolded = false;
+		this.italicized = false;
 		this.lineHeight = this.size;
-		this.refont();
 		this.tabSize = 4;
-		this.memorizedWidths = {};
+		this.calculateMetrics();
 	}
-	set family(a) {
-		this._family = a;
-		const l = a.toLowerCase();
-		this.keywordFamily = Font.keywordFamilies.includes(l);
-		this.refont();
-		if (a.match(/mono|consolas/g)) {
+	withProperty(key, value) {
+		const result = new Font(this.size, this.family);
+		result.bolded = this.bolded;
+		result.italicized = this.italicized;
+		result.lineHeight = this.lineHeight;
+		result.tabSize = this.tabSize;
+		result[key] = value;
+		result.calculateMetrics();
+		return result;
+	}
+	/**
+	 * Returns a copy of the caller with its `.family` property changed to a given value.
+	 * @param String family | The new font family
+	 * @return Font
+	 */
+	withFamily(family) {
+		return this.withProperty("family", family);
+	}
+	/**
+	 * Returns a copy of the caller with its `.size` property changed to a given value.
+	 * The ratio of `.lineHeight` to `.size` will remain constant.
+	 * @param Number size | The new font size, in CSS pixels
+	 * @return Font
+	 */
+	withSize(size) {
+		const lineHeight = size * this.lineHeight / this.size;
+		return this.withProperty("size", size).withLineHeight(lineHeight);
+	}
+	/**
+	 * Returns a copy of the caller with its `.lineHeight` property changed to a given value.
+	 * The line height represents the vertical distance between two subsequent lines.
+	 * @param Number lineHeight | The new font's line height, in CSS pixels
+	 * @return Font
+	 */
+	withLineHeight(lineHeight) {
+		return this.withProperty("lineHeight", lineHeight);
+	}
+	/**
+	 * Returns a copy of the caller with its `.tabSize` property changed to a given value.
+	 * @param Number tabSize | The amount of spaces a tab will correspond to
+	 * @return Font
+	 */
+	withTabSize(tabSize) {
+		return this.withProperty("tabSize", tabSize);
+	}
+	/**
+	 * Returns a copy of the caller with its `.bolded` property changed to a given value.
+	 * @param Boolean bold? | Whether the new font should be bold. Default is true
+	 * @return Font
+	 */
+	bold(bold = true) {
+		return this.withProperty("bolded", bold);
+	}
+	/**
+	 * Returns a copy of the caller with its `.italicized` property changed to a given value.
+	 * @param Boolean italic? | Whether the new font should be italic. Default is true
+	 * @return Font
+	 */
+	italic(italic = true) {
+		return this.withProperty("italicized", italic);
+	}
+	calculateMetrics() {
+		// compute CSS string
+		const lowerFamily = this.family.toLowerCase();
+		const isKeywordFamily = Font.KEYWORD_FAMILIES.includes(lowerFamily);
+		const family = isKeywordFamily ? this.family : JSON.stringify(this.family);
+		const italic = this.italicized ? "italic" : "normal";
+		const bold = this.bolded ? "bold" : "normal";
+		const height = this.lineHeight / this.size;
+		const size = this.size;
+		this.cssFont = `${italic} ${bold} ${size}px/${height} ${family}`;
+		
+		// measure font placement
+		Font.context.font = this.cssFont;
+		const metrics = Font.context.measureText("0");
+		this.boundingAscent = metrics.actualBoundingBoxAscent;
+		this.boundingDescent = metrics.actualBoundingBoxDescent;
+		this.widthCache = new Map();
+		this.tabReplacement = " ".repeat(this.tabSize);
+		
+		if (lowerFamily.match(/mono|consolas/g)) {
 			const charWidth = this.getWidthCRC2D("m");
 			this.getWidthCRC2D = text => text.length * charWidth;
 		}
 	}
-	get family() {
-		return this._family;
-	}
-	set bold(a) {
-		this._bold = a;
-		this.refont();
-	}
-	get bold() {
-		return this._bold;
-	}
-	set italic(a) {
-		this._italic = a;
-		this.refont();
-	}
-	get italic() {
-		return this._italic;
-	}
-	set tabSize(a) {
-		this.tabReplacement = " ".repeat(a);
-	}
-	set lineHeight(a) {
-		this._lineHeight = a;
-		this.refont();
-	}
-	get lineHeight() {
-		return this._lineHeight;
-	}
-	get tabSize() {
-		return this.tabReplacement.length;
-	}
-	set size(a) {
-		this.lineHeight = this.lineHeight / this.size * a;
-		this._size = a;
-		this.refont();
-	}
-	get size() {
-		return this._size;
-	}
-	refont() {
-		this.memorizedWidths = { };
-		const familyString = this.keywordFamily ? this.family : JSON.stringify(this.family);
-		this.fontString = `${this.italic ? "italic" : "normal"} ${this.bold ? "bold" : "normal"} ${this.size}px/${this.lineHeight / this.size} ${familyString}`;
-		
-		// measure font placement
-		Font.context.font = this.fontString;
-		const metrics = Font.context.measureText("0");
-		this.boundingAscent = metrics.actualBoundingBoxAscent;
-		this.boundingDescent = metrics.actualBoundingBoxDescent;
-	}
 	processString(str) {
-		return String(str).replace(/\r/g, "").replace(/\t/g, this.tabReplacement);
+		return String(str)
+			.replace(/\r/g, "")
+			.replace(/\t/g, this.tabReplacement);
 	}
 	getWidthCRC2D(str) {
-		if (str in this.memorizedWidths) return this.memorizedWidths[str];
-		Font.context.font = this.fontString;
-		const width = Font.context.measureText(str).width;
-		this.memorizedWidths[str] = width;
-		return width;
+		if (!this.widthCache.has(str)) {
+			Font.context.font = this.cssFont;
+			const width = Font.context.measureText(str).width;
+			this.widthCache.set(str, width);
+		}
+
+		return this.widthCache.get(str);
 	}
 	/**
 	 * Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
@@ -184,25 +212,18 @@ class Font {
 	 * @return String
 	 */
 	toString() {
-		return this.fontString;
-	}
-	get(font = new Font(0, "serif", false, false)) {
-		font.size = this.size;
-		font.family = this.family;
-		font.bold = this.bold;
-		font.italic = this.italic;
-		font.lineHeight = this.lineHeight;
-		return font;
+		return this.cssFont;
 	}
 	
 	static context = new_OffscreenCanvas(1, 1).getContext("2d");
-	static keywordFamilies = ["monospace", "sans-serif", "serif", "cursive", "fantasy", "system-ui"];
-	static defaultFamilies = ["Serif", "Arial", "Cursive", "Monospace"];
+	static KEYWORD_FAMILIES = ["monospace", "sans-serif", "serif", "cursive", "fantasy", "system-ui"];
+	static DEFAULT_FAMILIES = ["Serif", "Arial", "Cursive", "Monospace"];
 }
+
 // setup
 for (let size = 5; size <= 100; size += 5) {
-	for (let j = 0; j < Font.defaultFamilies.length; j++) {
-		const NAME = Font.defaultFamilies[j] + size;
-		Lazy.define(Font, NAME, () => new Font(size, Font.defaultFamilies[j]));
+	for (let j = 0; j < Font.DEFAULT_FAMILIES.length; j++) {
+		const NAME = Font.DEFAULT_FAMILIES[j] + size;
+		Lazy.define(Font, NAME, () => new Font(size, Font.DEFAULT_FAMILIES[j]));
 	}
 }

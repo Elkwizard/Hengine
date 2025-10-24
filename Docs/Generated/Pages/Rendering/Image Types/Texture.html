@@ -42,7 +42,7 @@
 				<span class="prop-name">loops</span>
 				<span class="type">Boolean</span>
 			</div>
-			<div class="prop desc">Whether or not pixel coordinate parameters to methods will be wrapped around the edges of the texture space</div>
+			<div class="prop desc">Whether or not pixel coordinate parameters to methods will be wrapped around the edges of the texture space. Starts as false</div>
 			<span class="prop-attrs"></span>
 		</div>
 	</div>
@@ -327,7 +327,7 @@ If the color data is needed more permanently, create a copy of the return value.
 	
 		<div class="function-wrapper" id="Texture.prototype.clip()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L257" target="_blank" class="function-name source-link">clip</a>(<span class="param">region</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Texture</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L254" target="_blank" class="function-name source-link">clip</a>(<span class="param">region</span><span class="aux"> | </span><span class="param">x</span>, <span class="param">y</span>, <span class="param">width</span>, <span class="param">height</span>)<span class="type">Texture</span>
 			</div>
 			<div class="function desc">
 				Returns a texture containing a rectangular region of the caller.
@@ -502,7 +502,7 @@ The copy will have the same dimensions as the original, so if the original has a
 	
 		<div class="function-wrapper" id="Texture.grayScale()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L339" target="_blank" class="function-name source-link">Texture.grayScale</a>(<span class="param">brightness</span>)<span class="type">Texture</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L343" target="_blank" class="function-name source-link">Texture.grayScale</a>(<span class="param">brightness</span>)<span class="type">Texture</span>
 			</div>
 			<div class="function desc">
 				Creates a new grayscale texture based on a 2D grid of brightness values.
@@ -529,7 +529,7 @@ The copy will have the same dimensions as the original, so if the original has a
 	
 		<div class="function-wrapper" id="Texture.fromDataURI()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L358" target="_blank" class="function-name source-link">Texture.fromDataURI</a>(<span class="param">url</span>)<span class="type">Promise</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Texture.js?#L362" target="_blank" class="function-name source-link">Texture.fromDataURI</a>(<span class="param">url</span>)<span class="type">Promise</span>
 			</div>
 			<div class="function desc">
 				Returns a promise resolving to a new texture containing the image data from a data: url.

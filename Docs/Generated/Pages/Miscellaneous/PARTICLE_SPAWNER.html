@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class PARTICLE_SPAWNER">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L77" target="_blank" class="class-name source-link">PARTICLE_SPAWNER</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L79" target="_blank" class="class-name source-link">PARTICLE_SPAWNER</a> <span class="keyword">extends</span> <span class="class-name"><a href="../Scripts/ElementScript.html#class ElementScript">ElementScript</a></span>
 				</div>
 				<div class="class desc">
 					Adds particle emitting functionality to a <a href="../Management/SceneObject.html#class SceneObject">SceneObject</a>.
@@ -100,6 +100,15 @@
 			<div class="prop desc">The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10</div>
 			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
 		</div>
+	
+		<div class="prop-wrapper" id="PARTICLE_SPAWNER.cullGraphics">
+			<div class="prop-header member">
+				<span class="prop-name">cullGraphics</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether particles should be checked for visibility before rendering. Default is true</div>
+			<span class="prop-attrs"><span class="prop-attr" data-desc="This property and its various internal properties shouldn't be changed in any way">immutable</span></span>
+		</div>
 	</div>
 				
 				
@@ -108,7 +117,7 @@
 					<div class="class-methods">
 		<div class="function-wrapper" id="PARTICLE_SPAWNER.prototype.init()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L85" target="_blank" class="function-name source-link">init</a>(<span class="param">properties</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L87" target="_blank" class="function-name source-link">init</a>(<span class="param">properties</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Makes an object a particle system.
@@ -135,7 +144,7 @@
 	
 		<div class="function-wrapper" id="set PARTICLE_SPAWNER.prototype.particleCount()">
 			<div class="function-header member">
-				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L122" target="_blank" class="function-name source-link">particleCount</a>(<span class="param">count</span>)
+				<span class="keyword">set</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L124" target="_blank" class="function-name source-link">particleCount</a>(<span class="param">count</span>)
 			</div>
 			<div class="function desc">
 				Sets the number of particles in the system.
@@ -162,7 +171,7 @@
 	
 		<div class="function-wrapper" id="get PARTICLE_SPAWNER.prototype.particleCount()">
 			<div class="function-header member">
-				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L136" target="_blank" class="function-name source-link">particleCount</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
+				<span class="keyword">get</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L138" target="_blank" class="function-name source-link">particleCount</a><span class="type"><a href="../Built-Ins/Number.html#class Number">Number</a></span>
 			</div>
 			<div class="function desc">
 				Returns the current number of particles in the system.
@@ -172,7 +181,7 @@
 	
 		<div class="function-wrapper" id="PARTICLE_SPAWNER.prototype.removeAllParticles()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L142" target="_blank" class="function-name source-link">removeAllParticles</a>()<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L144" target="_blank" class="function-name source-link">removeAllParticles</a>()<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Removes all of the particles from the system
@@ -182,7 +191,7 @@
 	
 		<div class="function-wrapper" id="PARTICLE_SPAWNER.prototype.setProperties()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L149" target="_blank" class="function-name source-link">setProperties</a>(<span class="param">properties</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L151" target="_blank" class="function-name source-link">setProperties</a>(<span class="param">properties</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Sets an inclusive subset of the properties of the system.
@@ -209,7 +218,7 @@
 	
 		<div class="function-wrapper" id="PARTICLE_SPAWNER.prototype.explode()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L197" target="_blank" class="function-name source-link">explode</a>(<span class="param">count</span>, <span class="param">position?</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L200" target="_blank" class="function-name source-link">explode</a>(<span class="param">count</span>, <span class="param">position?</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				Creates a collection of particles at once.
@@ -246,7 +255,7 @@
 	
 		<div class="function-wrapper" id="PARTICLE_SPAWNER.prototype.getBoundingBox()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L271" target="_blank" class="function-name source-link">getBoundingBox</a>()<span class="type"><a href="../Geometry/Shapes/3D/Prism.html#class Prism">Prism</a>/<a href="../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L274" target="_blank" class="function-name source-link">getBoundingBox</a>()<span class="type"><a href="../Geometry/Shapes/3D/Prism.html#class Prism">Prism</a>/<a href="../Geometry/Shapes/2D/Rect.html#class Rect">Rect</a></span>
 			</div>
 			<div class="function desc">
 				Returns the smallest axis-aligned <a href="../Rendering/Coordinate Spaces.html#World-Space">World-Space</a> rectangle that contains all of the particles in the system.
@@ -323,7 +332,7 @@ The <a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a> type used 
 		
 			<div class="class-wrapper" id="class SpawnerProperties">
 				<div class="class-header">
-					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L25" target="_blank" class="class-name source-link">SpawnerProperties</a>
+					<span class="keyword">interface</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L26" target="_blank" class="class-name source-link">SpawnerProperties</a>
 				</div>
 				<div class="class desc">
 					This is an interface for the parameters to various property-setting methods on PARTICLE_SPAWNER.
@@ -387,6 +396,15 @@ The <a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a> type used 
 			<span class="prop-attrs"></span>
 		</div>
 	
+		<div class="prop-wrapper" id="SpawnerProperties.cullGraphics?">
+			<div class="prop-header member">
+				<span class="prop-name">cullGraphics?</span>
+				<span class="type">Boolean</span>
+			</div>
+			<div class="prop desc">Whether or not particles should be checked for visibility before rendering</div>
+			<span class="prop-attrs"></span>
+		</div>
+	
 		<div class="prop-wrapper" id="SpawnerProperties.imageType?">
 			<div class="prop-header member">
 				<span class="prop-name">imageType?</span>
@@ -403,7 +421,7 @@ The <a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a> type used 
 					<div class="class-methods">
 		<div class="function-wrapper" id="SpawnerProperties.prototype.init?()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L31" target="_blank" class="function-name source-link">init?</a>(<span class="param">particle</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L32" target="_blank" class="function-name source-link">init?</a>(<span class="param">particle</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				The function that is called to initialize particles.
@@ -430,7 +448,7 @@ The <a href="../Geometry/Vectors/Vector.html#class Vector">Vector</a> type used 
 	
 		<div class="function-wrapper" id="SpawnerProperties.prototype.update?()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L41" target="_blank" class="function-name source-link">update?</a>(<span class="param">particle</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L42" target="_blank" class="function-name source-link">update?</a>(<span class="param">particle</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				The function that is called to update particles each frame.
@@ -461,7 +479,7 @@ Setting this property to a function will remove the computation.
 	
 		<div class="function-wrapper" id="SpawnerProperties.prototype.draw?()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L49" target="_blank" class="function-name source-link">draw?</a>(<span class="param">renderer</span>, <span class="param">particle</span>)<span class="type">void</span>
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Scripts\ParticleSpawner.js?#L50" target="_blank" class="function-name source-link">draw?</a>(<span class="param">renderer</span>, <span class="param">particle</span>)<span class="type">void</span>
 			</div>
 			<div class="function desc">
 				The function that is called to render particles each frame.
