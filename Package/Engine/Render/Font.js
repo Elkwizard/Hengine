@@ -2,7 +2,7 @@
  * Represents a font, including family, side, and styling.
  * Fonts can be used in the text rendering functions of Artist.
  * ```js
- * const font = new Font(15, "Consolas", false, true); // italic 15px Consolas
+ * const font = new Font(15, "Consolas").italic(); // italic 15px Consolas
  * 
  * renderer.draw(new Color("black")).text(font, "Hello World!", 0, 0);
  * ```
