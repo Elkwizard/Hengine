@@ -93,26 +93,10 @@ class ByteBuffer {
 	 * @return String
 	 */
 	toBase64() {
-		const binary = this.data;
-		const base64Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		if (Uint8Array.prototype.toBase64)
+			return this.data.toBase64();
 
-		let base64 = "";
-		for (let i = 0; i < binary.length; i += 3) {
-			let a = binary[i];
-			let b = binary[i + 1];
-			let c = binary[i + 2];
-
-			const b0 = a >> 2;
-			const b1 = ((a & 0b00000011) << 4) | (b >> 4);
-			const b2 = (b & 0b00001111) << 2 | (c >> 6);
-			const b3 = c & 0b00111111;
-			
-			base64 += base64Table[b0] + base64Table[b1];
-			base64 += b === undefined ? "=" : base64Table[b2];
-			base64 += c === undefined ? "=" : base64Table[b3];
-		}
-
-		return base64;
+		return btoa([...this.data].map(x => String.fromCharCode(x)).join(""));
 	}
 	get(buffer = new ByteBuffer()) {
 		if (buffer.data.length >= this.data.length) buffer.data.set(this.data, 0);
@@ -128,35 +112,10 @@ class ByteBuffer {
 	 * @return ByteBuffer
 	 */
 	static fromBase64(base64) {
-		const base64Table = Object.fromEntries(
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-				.split("")
-				.map((c, i) => [c, i])
-		);
-
-		const buffer = new ByteBuffer();
-
-		for (let i = 0; i < base64.length; i += 4) {
-			const b0 = base64Table[base64[i]];
-			const b1 = base64Table[base64[i + 1]];
-			const b2 = base64Table[base64[i + 2]];
-			const b3 = base64Table[base64[i + 3]];
-
-			buffer.write.uint8(b0 << 2 | b1 >> 4);
-
-			if (b2 !== undefined) {
-				buffer.write.uint8((b1 & 0b1111) << 4 | b2 >> 2);
-				
-				if (b3 !== undefined)
-					buffer.write.uint8((b2 & 0b11) << 6 | b3);
-			}
-		}
-
-		buffer.finalize();
-
-		buffer.pointer = 0;
-
-		return buffer;
+		if (Uint8Array.fromBase64)
+			return new ByteBuffer(Uint8Array.fromBase64(base64));
+		
+		return new ByteBuffer(atob(base64).split("").map(char => char.charCodeAt(0)));
 	}
 	/**
 	 * Converts a series of 16-bit unicode characters into a new buffer.
