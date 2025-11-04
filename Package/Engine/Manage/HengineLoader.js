@@ -1105,7 +1105,6 @@ class HengineLoader {
 			"Render/Animation.js",
 			"Render/Camera.js",
 			"Render/Webcam.js",
-			"Render/Graph.js",
 			"Render/Texture.js",
 			"Render/VideoView.js",
 			"Render/Renderer.js",
@@ -1126,6 +1125,7 @@ class HengineLoader {
 		] : [],
 		[ // high level dependencies
 			"Render/Color.js",
+			"Render/Graph.js",
 			"Render/Transform.js",
 			"SceneObject/UIObject.js",
 			"SceneObject/WorldObject.js",
