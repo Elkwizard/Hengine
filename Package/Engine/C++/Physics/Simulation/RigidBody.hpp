@@ -308,6 +308,7 @@ API class RigidBody {
 
 		API void applyImpulse(const Vector& pos, const Vector& imp) {
 			if (!dynamic) return;
+			ensureShapes();
 			applyRelativeImpulse<&RigidBody::velocity>(pos - position.linear, imp);
 		}
 
