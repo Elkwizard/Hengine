@@ -1046,6 +1046,7 @@ class HengineLoader {
 			"Preload/PrototypeOverload.js",
 			"Preload/Lazy.js",
 			"Preload/Operable.js",
+			"Preload/Enum.js"
 		],
 		[ // minimal dependencies
 			"SceneObject/SceneElement.js",

@@ -527,3 +527,19 @@ for (let i = 0; i < ByteBuffer.arrayTypes.length; i++) {
  * @param ByteBuffer buffer | A source buffer to read the data from
  * @return Serializable
  */
+
+// add serialization to built-in types
+(() => {
+	const makeSerializable = (Type, bufferType) => {
+		objectUtils.defineBuiltin(Type.prototype, "toByteBuffer", function (buffer = new ByteBuffer()) {
+			buffer.write[bufferType](this);
+			return buffer;
+		});
+		objectUtils.defineBuiltin(Type, "fromByteBuffer", buffer => buffer.read[bufferType]());
+	};
+	
+	makeSerializable(String, "string");
+	makeSerializable(Number, "float64");
+	makeSerializable(Boolean, "bool");
+	makeSerializable(Object, "object");
+})();
