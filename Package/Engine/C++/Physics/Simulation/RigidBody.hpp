@@ -263,16 +263,11 @@ API class RigidBody {
 
 		API double getKineticEnergy() {
 			ensureShapes();
-			double K = 0.5 * localMatter.mass * velocity.linear.sqrMag();
-#if IS_3D
-			Vector rotation = velocity.orientation.getRotation();
-			double omega = rotation.mag();
-			Vector axis = rotation / omega;
-			K += 0.5 * dot(axis, matter.inertia * axis) * std::pow(omega, 2);
-#else
-			K += 0.5 * matter.inertia * std::pow(velocity.orientation.getRotation(), 2);
-#endif
-			return K;
+			auto omega = velocity.orientation.getRotation();
+			return 0.5 * (
+				localMatter.mass * velocity.linear.sqrMag() +
+				dot(omega, matter.inertia * omega)
+			);
 		}
 		
 		bool isTriggerWith(const RigidBody& other) const {
