@@ -394,6 +394,7 @@ class Artist3D extends Artist {
 				let lastInstance = instances.length - 1;
 				while (lastInstance >= 0 && !visibility[instances[lastInstance].visibilityIndex])
 					lastInstance--;
+
 				program.setUniform("transform", instances[0].transform, false, true);
 				gl.drawElementsInstanced(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0, lastInstance + 1);
 			}
@@ -459,21 +460,23 @@ class Artist3D extends Artist {
 
 		return { mesh, instances, opaque, transparent, castShadows };
 	}
-	setupMeshInstances(mesh, visibilityCounts) {
+	setupMeshInstances(mesh, orderMetric) {
 		const { instances } = mesh;
 		if (instances.length >= Artist3D.INSTANCE_THRESHOLD) {
 			const { gl } = this;
 
 			const cached = this.getCache(mesh.mesh);
 
-			instances.sort((a, b) => visibilityCounts[b.visibilityIndex] - visibilityCounts[a.visibilityIndex]);
+			instances.sort((a, b) => orderMetric[a.visibilityIndex] - orderMetric[b.visibilityIndex]);
+
+			const totalVisibleInstances = instances.findLastIndex(instance => isFinite(orderMetric[instance.visibilityIndex])) + 1;
 			
 			const ELEMENTS_PER_MATRIX = 4 * 3;
 			const instanceView = this.instanceData.getView(instances.length * ELEMENTS_PER_MATRIX);
 			let instanceViewIndex = ELEMENTS_PER_MATRIX;
 
 			// technically... the first transform is read from a uniform, so we can skip it
-			for (let i = 1; i < instances.length; i++) {
+			for (let i = 1; i < totalVisibleInstances; i++) {
 				const { transform } = instances[i];
 				for (let c = 0; c < 4; c++) {
 					const columnIndex = c * 4;
@@ -603,12 +606,17 @@ class Artist3D extends Artist {
 		}
 		allCameras.push(camera);
 
+		// order metric for an instance is the minimum number of visible instances among cameras it is visible from
 		const visibilities = new Map();
-		const visibilityCounts = new Array(bounds.length).fill(0);
+		const visiblityOrderMetric = new Array(bounds.length).fill(Infinity);
+
 		for (let i = 0; i < allCameras.length; i++) {
 			const camera = allCameras[i];
 			const isShadowCamera = i < allCameras.length - 1;
 			const frustum = camera.screen;
+
+			// compute visibility for each instance
+			let totalVisible = 0;
 			const visibility = new Array(bounds.length).fill(false);
 			for (let j = 0; j < meshes.length; j++) {
 				const { instances, castShadows } = meshes[j];
@@ -618,14 +626,28 @@ class Artist3D extends Artist {
 					const bound = bounds[index];
 					const visible = !frustum.cullBall(bound);
 					visibility[index] = visible;
-					visibilityCounts[index] += visible;
+					totalVisible += visible;
 				}
 			}
+
+			// update order metrics
+			for (let j = 0; j < meshes.length; j++) {
+				const { instances, castShadows } = meshes[j];
+				if (!castShadows && isShadowCamera) continue;
+				for (let k = 0; k < instances.length; k++) {
+					const index = instances[k].visibilityIndex;
+					if (visibility[index] && totalVisible < visiblityOrderMetric[index]) {
+						visiblityOrderMetric[index] = totalVisible;
+					}
+				}
+			}
+
+			// store visibility information
 			visibilities.set(camera, visibility);
 		}
 
 
-		return { visibilities, visibilityCounts };
+		return { visibilities, visiblityOrderMetric };
 	}
 	beforeRender(camera, meshQueue, lightQueue) {
 		const lights = lightQueue.slice(0, Artist3D.MAX_LIGHTS);
@@ -639,10 +661,10 @@ class Artist3D extends Artist {
 		const { shadowCascadeDepths, shadowLights } = this.setupShadows(camera, lights, bounds);
 
 		// optimize culling
-		const { visibilities, visibilityCounts } = this.computeVisibility(camera, shadowLights, meshes, bounds);
+		const { visibilities, visiblityOrderMetric } = this.computeVisibility(camera, shadowLights, meshes, bounds);
 
 		for (let i = 0; i < meshes.length; i++)
-			this.setupMeshInstances(meshes[i], visibilityCounts);
+			this.setupMeshInstances(meshes[i], visiblityOrderMetric);
 		
 		// shadow pass
 		this.renderShadows(meshes, shadowLights, visibilities);
