@@ -204,7 +204,8 @@ class Geometry {
 		return new Polygon(vertices);
 	}
 	/**
-	 * Checks whether a list of points are in clockwise order.
+	 * Checks whether a list of points are in clockwise order (in Screen-Space).
+	 * Note that this requires there to be at least 3 points.
 	 * @param Vector2[] vertices | The points to check 
 	 * @return Boolean
 	 */
@@ -219,7 +220,7 @@ class Geometry {
 		return signedArea < 0;
 	}
 	/**
-	 * Combines a set of grid-aligned squares into the minimum number of rectangles occupying the same space.
+	 * Combines a set of grid-aligned squares into a small number of rectangles occupying the same space using a greedy algorithm.
 	 * These are then scaled by a certain factor about the origin of the grid.
 	 * @param Boolean[][] srcGrid | A grid of booleans representing the squares. The first index of the boolean is the x coordinate, the second index is the y, and the value of the boolean determines whether or not a square exists in that space
 	 * @param Number cellSize | The factor to scale the result by
