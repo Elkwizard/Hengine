@@ -95,11 +95,11 @@ class Geometry {
 	static inflate(polygon, distance) {
 		const edgeNormals = polygon
 			.getEdges()
-			.map(edge => edge.normal.normalize());
+			.map(edge => edge.normal.normalized);
 		const vertices = [];
 		const { length } = polygon.vertices;
 		for (let i = 0; i < length; i++) {
-			const left = edgeNormals[(i + length) % length];
+			const left = edgeNormals[(i - 1 + length) % length];
 			const right = edgeNormals[i];
 			const extrude = left.plus(right);
 			if (extrude.sqrMag) extrude.mag = distance;
