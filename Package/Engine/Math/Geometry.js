@@ -68,6 +68,25 @@ class Geometry {
 		return new Polygon(vertices);
 	}
 	/**
+	 * Simplifies a polygon by reducing all adjacent colinear edges into a single edge each.
+	 * @param Polygon polygon | The polygon to simplify
+	 * @return Polygon
+	 */
+	static reducePolygonEdges(polygon) {
+		const directions = polygon
+			.getEdges()
+			.map(edge => edge.vector.normalized);
+		
+		const smoothness = directions
+			.map((dir, i) => dir.dot(
+				directions[(i - 1 + directions.length) % directions.length]
+			));
+
+		return new Polygon(polygon.vertices.filter((_, i) => {
+			return !smoothness[i].equals(1);
+		}));
+	}
+	/**
 	 * Inflates a polygon along its normals by a specified distance.
 	 * @param Polygon polygon | The polygon to inflate
 	 * @param Number distance | The distance to extrude by
@@ -375,158 +394,26 @@ class Geometry {
 		const center = Vector2.zero;
 		return polygons
 			.filter(Geometry.isListClockwise)
-			.map(poly => new Polygon(poly).scale(cellSize, center));
+			.map(poly => Geometry.reducePolygonEdges(
+				new Polygon(poly).scale(cellSize, center)
+			));
 	}
 	/**
 	 * Same as `.gridToExactPolygons()`, except that the returned Polygons have their concave vertices removed. Note that this filtering step only happens once, so the result may have still have concave vertices.
-	 * @param Boolean[][] srcGrid | A boolean grid representing the squares
+	 * @param Boolean[][] grid | A boolean grid representing the squares
 	 * @param Number cellSize | The factor to scale the result by
 	 * @return Polygon[]
 	 */
-	static gridToPolygons(srcGrid, CELL_SIZE) {
-
-		let grid = srcGrid.map(v => v);
-
-
-		//methods
-		function sample(x, y) {
-			if (x in grid && y in grid[x]) return grid[x][y];
-			return false;
-		}
-
-		function set(arr, x, y, v) {
-			if (x in arr && y in arr[x]) arr[x][y] = v;
-		}
-		function point(x, y) {
-			return new Vector2(x, y);
-		}
-
-		//remove diagonals
-
-		let broken = true;
-		while (broken) {
-			broken = false;
-			for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
-				const V = sample(i, j);
-				if (V) {
-					const A = sample(i, j - 1);
-					const B = sample(i + 1, j);
-					const C = sample(i, j + 1);
-					const D = sample(i - 1, j);
-
-					const A2 = sample(i + 1, j - 1);
-					const B2 = sample(i + 1, j + 1);
-					const C2 = sample(i - 1, j + 1);
-					const D2 = sample(i - 1, j - 1);
-
-					if (A2) if (!A && !B) {
-						broken = true;
-						grid[i][j - 1] = true;
-					}
-					if (B2) if (!B && !C) {
-						broken = true;
-						grid[i + 1][j] = true;
-					}
-					if (C2) if (!C && !D) {
-						broken = true;
-						grid[i][j + 1] = true;
-					}
-					if (D2) if (!D && !A) {
-						broken = true;
-						grid[i - 1][j] = true;
-					}
-				}
-			}
-		}
-
-
-
-		let pathGrid = Array.dim(grid.length + 1, grid[0].length + 2);
-		let pointGrid = Array.dim(grid.length + 1, grid[0].length + 2);
-		let startingPoints = [];
-
-		for (let i = 0; i < grid.length; i++) for (let j = 0; j < grid[0].length; j++) {
-			const V = sample(i, j);
-			if (V) {
-				const A = sample(i, j - 1);
-				const B = sample(i + 1, j);
-				const C = sample(i, j + 1);
-				const D = sample(i - 1, j);
-
-
-				if (!A) set(pathGrid, i, j, Vector2.right);
-				if (!B) set(pathGrid, i + 1, j, Vector2.down);
-				if (!C) set(pathGrid, i + 1, j + 1, Vector2.left);
-				if (!D) set(pathGrid, i, j + 1, Vector2.up);
-
-
-				const A_p = point(i, j - 1);
-				const B_p = point(i + 1, j);
-				const C_p = point(i, j + 1);
-				const D_p = point(i - 1, j);
-				const V_p = point(i, j);
-
-
-				let ul = true;
-				let ur = true;
-				let ll = true;
-				let lr = true;
-
-				if (A) ul = false, ur = false;
-				if (B) ur = false, lr = false;
-				if (C) ll = false, lr = false;
-				if (D) ul = false, ll = false;
-
-				if (ul) set(pointGrid, i, j, true);
-				if (ur) set(pointGrid, i + 1, j, true);
-				if (ll) set(pointGrid, i, j + 1, true);
-				if (lr) set(pointGrid, i + 1, j + 1, true);
-
-				if (ul) startingPoints.push(V_p);
-				if (ur) startingPoints.push(B_p);
-				if (ll) startingPoints.push(C_p);
-				if (lr) startingPoints.push(point(i + 1, j + 1));
-			}
-		}
-		// for (let i = 0; i < pathGrid.length; i++) for (let j = 0; j < pathGrid[0].length; j++) {
-		//     let v = pathGrid[i][j];
-		//     if (v) {
-		//         renderer.stroke(Color.ORANGE, 2).arrow(point(i, j).times(CELL_SIZE), point(i, j).times(CELL_SIZE).plus(v.times(CELL_SIZE)));
-		//     }
-		// }
-		// for (let i = 0; i < pointGrid.length; i++) for (let j = 0; j < pointGrid[0].length; j++) {
-		//     let p = pointGrid[i][j];
-		//     if (p) {
-		//         // renderer.stroke(Color.LIME, 3).circle(point(i, j), 5);
-		//     }
-		// }
-		// for(let p of startingPoints) renderer.draw(Color.PURPLE).circle(p.times(CELL_SIZE), 5);
-		let polygons = [];
-		// startingPoints = [];
-		while (startingPoints.length) {
-			let start = startingPoints[0];
-			let current = start.get();
-			let points = [];
-			let lastArrow = null;
-			let counter = false;
-			do {
-				let v = pathGrid[~~current.x][~~current.y];
-				if (!v) break;
-				lastArrow = v;
-				current.add(v);
-				let found = startingPoints.find(vec => vec.equals(current));
-				if (found) {
-					points.push(found.times(CELL_SIZE));
-					startingPoints.splice(startingPoints.indexOf(found), 1);
-				}
-			} while (!current.equals(start));
-			if (points.length && !counter) polygons.push(points);
-		}
-
-		// for (let points of polygons) renderer.stroke(Color.PURPLE, 2).shape(...points);
-		return polygons
-			.filter(Geometry.isListClockwise)
-			.map(vertices => new Polygon(vertices));
+	static gridToPolygons(grid, cellSize) {
+		const polygons = Geometry.gridToExactPolygons(grid, cellSize);
+		return polygons.map(({ vertices }) => {
+			const concave = vertices.map((v, i) => {
+				const prev = vertices[(i - 1 + vertices.length) % vertices.length];
+				const next = vertices[(i + 1) % vertices.length];
+				return v.minus(prev).cross(next.minus(v)) < 0;
+			});
+			return new Polygon(vertices.filter((_, i) => !concave[i]));
+		});
 	}
 	/**
 	 * Finds the closest point from a list of points to a given point.
