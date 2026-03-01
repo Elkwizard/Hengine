@@ -1,37 +1,3 @@
-class StackAllocator {
-	constructor(Type) {
-		this.Type = Type;
-		this.pointer = 0;
-		this.stack = [];
-		this.objects = [];
-	}
-	push() {
-		this.stack.push(this.pointer);
-	}
-	pop() {
-		this.pointer = this.stack.pop();
-	}
-	next() {
-		this.pop();
-		this.push();
-	}
-	alloc() {
-		return this.objects[this.pointer++] ??= new this.Type();
-	}
-}
-
-class GrowableTypedArray {
-	constructor(TypedArray) {
-		this.TypedArray = TypedArray;
-		this.array = new TypedArray(0);
-	}
-	getView(length) {
-		if (length > this.array.length)
-			this.array = new this.TypedArray(length * 2);
-		return new this.TypedArray(this.array.buffer, 0, length);
-	}
-}
-
 /**
  * Represents a 3D renderer for a graphical surface.
  * All transformation-related matrices for this renderer are of type Matrix4.
@@ -172,7 +138,7 @@ class Artist3D extends Artist {
 		gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 		this.invalidateShadowMaps();
 
-		this.shaderCache = new WeakMap();
+		this.shaderCache = new WeakCache();
 		this.renderCache = new WeakMap();
 
 		this.instanceData = new GrowableTypedArray(Float32Array);
@@ -234,24 +200,19 @@ class Artist3D extends Artist {
 		vertexShader: vs,
 		fragmentShader: fs
 	}) {
-		const vsCache = this.shaderCache;
-		if (!vsCache.has(vs)) vsCache.set(vs, new WeakMap());
-
-		const fsCache = vsCache.get(vs);
-		if (!fsCache.has(fs)) {
-			try {
-				const program = new GLSLProgram(
-					this.gl,
-					Artist3D.vertexShader(vs),
-					Artist3D.fragmentShader(fs)
-				);
-				fsCache.set(fs, program);
-			} catch (err) {
-				exit(err);
-			}
-		}
-
-		return fsCache.get(fs);
+		return this.shaderCache
+			.get(vs, () => new WeakCache())
+			.get(fs, () => {
+				try {
+					return new GLSLProgram(
+						this.gl,
+						Artist3D.vertexShader(vs),
+						Artist3D.fragmentShader(fs)
+					);
+				} catch (err) {
+					exit(err);
+				}
+			});
 	}
 	create2DProgram(fragmentShader, fullScreen = true) {
 		const { gl } = this;
@@ -310,7 +271,7 @@ class Artist3D extends Artist {
 	}
 	/**
 	 * Returns an object with various methods for queueing lines and outlines to be rendered.
-	 * @param Color color | The color of the lines to be drawn
+	 * @param Color/Material color | The material or color of the lines to be drawn
 	 * @param Number lineWidth? | The width of the lines to be drawn. Default is 1
 	 * @return StrokeRenderer3D
 	 */
@@ -320,7 +281,7 @@ class Artist3D extends Artist {
 	}
 	/**
 	 * Returns an object with various methods for queuing solid shapes to be rendered.
-	 * @param Color color | The color of the shapes to be drawn
+	 * @param Color/Material color | The material or color of the shapes to be drawn
 	 * @return DrawRenderer3D
 	 */
 	draw(color) {
@@ -1898,15 +1859,17 @@ Artist3D.PathRenderer = class PathRenderer {
 	};
 	constructor(renderer) {
 		this.renderer = renderer;
-		this.materialCache = new Map();
+		this.materialCache = new WeakCache();
 		this.meshCaches = [];
 	}
 	setup(color) {
-		this.color = color.get();
-		const { hex } = color;
-		if (!this.materialCache.has(hex))
-			this.materialCache.set(hex, this.createMaterial(color));
-		this.material = this.materialCache.get(hex);
+		if (color instanceof Material) {
+			this.material = color;
+		} else {
+			this.material = this.materialCache.get(
+				color.hex, () => this.createMaterial(color)
+			);
+		}
 	}
 	createMeshCache(polyhedron, config) {
 		const cache = new Artist3D.PathRenderer.MeshCache(polyhedron, config);
@@ -1926,12 +1889,9 @@ Artist3D.PathRenderer = class PathRenderer {
  * This class should not be constructed, and should be accessed via `Artist3D.prototype.draw`.
  */
 Artist3D.DrawRenderer = class DrawRenderer extends Artist3D.PathRenderer {
-	static MAX_CACHED_POLYHEDRA = 128;
 	constructor(renderer) {
 		super(renderer);
 		
-		this.color = null;
-
 		this.sphereMeshCache = this.createMeshCache(
 			Polyhedron.fromSphere(new Sphere(Vector3.zero, 1), 16),
 			{ smooth: true }
@@ -1941,7 +1901,7 @@ Artist3D.DrawRenderer = class DrawRenderer extends Artist3D.PathRenderer {
 			Vector3.zero, new Vector3(1)
 		));
 
-		this.polyhedronMeshCache = new Map();
+		this.polyhedronMeshCache = new SizeCappedCache(128);
 	}
 	createMaterial(color) {
 		return new SimpleMaterial({ albedo: color });
@@ -1998,20 +1958,10 @@ Artist3D.DrawRenderer = class DrawRenderer extends Artist3D.PathRenderer {
 	 * @param Polyhedron poly | The Polyhedron to render
 	 */
 	shape(polyhedron) {
-		if (!this.polyhedronMeshCache.has(polyhedron)) {
-			if (this.polyhedronMeshCache.size > Artist3D.DrawRenderer.MAX_CACHED_POLYHEDRA) {
-				const anyKey = this.polyhedronMeshCache[Symbol.iterator]().next().value[0];
-				this.polyhedronMeshCache.delete(anyKey);
-			}
-			this.polyhedronMeshCache.set(polyhedron, new Map());
-		}
-
-		const specificCache = this.polyhedronMeshCache.get(polyhedron);
-		const { hex } = this.color;
-		if (!specificCache.has(hex))
-			specificCache.set(hex, Mesh.fromPolyhedron(polyhedron, this.material));
+		const mesh = this.polyhedronMeshCache
+			.get(polyhedron, () => new WeakCache())
+			.get(this.material, () => Mesh.fromPolyhedron(polyhedron, this.material));
 		
-		const mesh = specificCache.get(hex);
 		this.renderer.mesh(mesh).default();
 	}
 	/**
@@ -2038,7 +1988,6 @@ Artist3D.StrokeRenderer = class StrokeRenderer extends Artist3D.PathRenderer {
 	constructor(renderer) {
 		super(renderer);
 
-		this.color = null;
 		this.lineRadius = null;
 
 		this.lineMeshCache = this.createMeshCache(

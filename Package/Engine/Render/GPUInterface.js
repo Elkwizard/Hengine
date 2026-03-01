@@ -1148,10 +1148,7 @@ class GLSLProgram {
 		}
 
 		if (!(sampler instanceof Sampler)) { // retrieve default sampler
-			if (!this.defaultSamplerCache.has(sampler))
-				this.defaultSamplerCache.set(sampler, new Sampler(sampler));
-
-			sampler = this.defaultSamplerCache.get(sampler);
+			sampler = this.defaultSamplerCache.get(sampler, () => new Sampler(sampler));
 		}
 
 		const { image } = sampler;
@@ -1281,7 +1278,7 @@ class GLSLProgram {
 
 		// uniforms
 		this.staticTextureCache = new WeakMap();
-		this.defaultSamplerCache = new WeakMap();
+		this.defaultSamplerCache = new WeakCache();
 		this.uniformsSet = true;
 		for (let i = 0; i < this.allUniforms.length; i++) {
 			const desc = this.allUniforms[i];

@@ -566,8 +566,6 @@ class MeshChunk extends Renderable {
 
 		if (faces.length && !this.indices.length)
 			this.faces = faces;
-
-		this.renderData = new WeakMap();
 	}
 	/**
 	 * Creates a deep copy of the mesh chunk.
