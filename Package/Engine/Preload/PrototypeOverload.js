@@ -241,13 +241,13 @@ objectUtils.defineBuiltin(Array.prototype, "sample", function (index) {
 		});
 		objectUtils.defineBuiltin(arr, "some", function (fn, arr = this, ...coords) {
 			for (let i = 0; i < this.length; i++)
-				if (fn(this[i], arr, ...coords, i, arr))
+				if (fn(this[i], ...coords, i, arr))
 					return true;
 			return false;
 		});
-		objectUtils.defineBuiltin(arr, "every", function (fn, ...coords) {
+		objectUtils.defineBuiltin(arr, "every", function (fn, arr = this, ...coords) {
 			for (let i = 0; i < this.length; i++)
-				if (!fn(this[i], ...coords, i)) return false;
+				if (!fn(this[i], ...coords, i, arr)) return false;
 			return true;
 		});
 		return arr;
