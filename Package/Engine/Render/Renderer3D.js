@@ -752,6 +752,7 @@ class Artist3D extends Artist {
 		this.meshObj.clear();
 		this.lightObj.clear();
 		this.strokeObj.clear();
+		this.drawObj.clear();
 		this.vector3Pool.next();
 		this.matrix4Pool.next();
 	}
