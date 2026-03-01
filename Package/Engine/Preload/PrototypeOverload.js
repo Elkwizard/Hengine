@@ -230,17 +230,20 @@ objectUtils.defineBuiltin(Array.prototype, "sample", function (index) {
 
 { // multi-dimensional arrays
 	const makeBaseDimension = arr => {
-		objectUtils.defineBuiltin(arr, "map", function (fn, ...coords) {
+		objectUtils.defineBuiltin(arr, "map", function (fn, arr = this, ...coords) {
 			const result = makeBaseDimension([]);
-			for (let i = 0; i < this.length; i++) result.push(fn(this[i], ...coords, i));
+			for (let i = 0; i < this.length; i++)
+				result.push(fn(this[i], ...coords, i, arr));
 			return result;
 		});
-		objectUtils.defineBuiltin(arr, "forEach", function (fn, ...coords) {
-			for (let i = 0; i < this.length; i++) fn(this[i], ...coords, i);
-		});
-		objectUtils.defineBuiltin(arr, "some", function (fn, ...coords) {
+		objectUtils.defineBuiltin(arr, "forEach", function (fn, arr = this, ...coords) {
 			for (let i = 0; i < this.length; i++)
-				if (fn(this[i], ...coords, i)) return true;
+				fn(this[i], ...coords, i, arr);
+		});
+		objectUtils.defineBuiltin(arr, "some", function (fn, arr = this, ...coords) {
+			for (let i = 0; i < this.length; i++)
+				if (fn(this[i], arr, ...coords, i, arr))
+					return true;
 			return false;
 		});
 		objectUtils.defineBuiltin(arr, "every", function (fn, ...coords) {
@@ -268,22 +271,24 @@ objectUtils.defineBuiltin(Array.prototype, "sample", function (index) {
 			const all = this.flatten();
 			for (let i = 0; i < all.length; i++) yield all[i];
 		}.bind(arr));
-		objectUtils.defineBuiltin(arr, "forEach", function (fn, ...coords) {
-			for (let i = 0; i < this.length; i++) this[i].forEach(fn, ...coords, i);
+		objectUtils.defineBuiltin(arr, "forEach", function (fn, arr = this, ...coords) {
+			for (let i = 0; i < this.length; i++)
+				this[i].forEach(fn, arr, ...coords, i);
 		}.bind(arr));
-		objectUtils.defineBuiltin(arr, "map", function (fn, ...coords) {
+		objectUtils.defineBuiltin(arr, "map", function (fn, arr = this, ...coords) {
 			const result = makeMultidimensional([]);
-			for (let i = 0; i < this.length; i++) result.push(this[i].map(fn, ...coords, i));
+			for (let i = 0; i < this.length; i++)
+				result.push(this[i].map(fn, arr, ...coords, i));
 			return result;
 		}.bind(arr));
-		objectUtils.defineBuiltin(arr, "some", function (fn, ...coords) {
+		objectUtils.defineBuiltin(arr, "some", function (fn, arr = this, ...coords) {
 			for (let i = 0; i < this.length; i++)
-				if (this[i].some(fn, ...coords, i)) return true;
+				if (this[i].some(fn, arr, ...coords, i)) return true;
 			return false;
 		}.bind(arr));
-		objectUtils.defineBuiltin(arr, "every", function (fn, ...coords) {
+		objectUtils.defineBuiltin(arr, "every", function (fn, arr = this, ...coords) {
 			for (let i = 0; i < this.length; i++)
-				if (!this[i].every(fn, ...coords, i)) return false;
+				if (!this[i].every(fn, arr, ...coords, i)) return false;
 			return true;
 		}.bind(arr));
 		objectUtils.defineBuiltin(arr, "fill", function (value) {
