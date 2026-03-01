@@ -264,8 +264,7 @@ objectUtils.defineBuiltin(Array.prototype, "sample", function (index) {
 			return result;
 		}.bind(arr));
 		objectUtils.defineBuiltin(arr, Symbol.iterator, function* () {
-			const all = this.flatten();
-			for (let i = 0; i < all.length; i++) yield all[i];
+			yield* this.flatten();
 		}.bind(arr));
 		objectUtils.defineBuiltin(arr, "forEach", function (fn, arr = this, ...coords) {
 			for (let i = 0; i < this.length; i++)
