@@ -224,8 +224,7 @@ objectUtils.defineBuiltin(Array.prototype, "flatten", function () {
 	return this;
 });
 objectUtils.defineBuiltin(Array.prototype, "sample", function (index) {
-	if (index in this) return this[index];
-	return null;
+	return this[index] ?? null;
 });
 
 { // multi-dimensional arrays
@@ -256,11 +255,8 @@ objectUtils.defineBuiltin(Array.prototype, "sample", function (index) {
 
 	const makeMultidimensional = arr => {
 		objectUtils.defineBuiltin(arr, "multiDimensional", true);
-		objectUtils.defineBuiltin(arr, "sample", function (...indices) {
-			const index = indices[0];
-			indices.shift();
-			if (index in this) return this[index].sample(...indices);
-			return null;
+		objectUtils.defineBuiltin(arr, "sample", function (index, ...indices) {
+			return this[index]?.sample(...indices) ?? null;
 		}.bind(arr));
 		objectUtils.defineBuiltin(arr, "flatten", function () {
 			const result = [];
