@@ -278,25 +278,25 @@ class Geometry {
 	
 				switch (priority) {
 					case RectPriority.HORIZONTAL: {
-						while (validRect(i, j, maxX, maxY)) maxX++;
+						do {
+							maxX++;
+						} while (grid[maxX]?.[j]);
 						maxX--;
 	
-						while (
-							validRect(i, j, maxX, maxY) &&
-							!grid[i - 1]?.[maxY] &&
-							!grid[maxX + 1]?.[maxY]
-						) maxY++;
+						do {
+							maxY++;
+						} while (validRect(i, maxY, maxX, maxY));
 						maxY--;
 					} break;
 					case RectPriority.VERTICAL: {
-						while (validRect(i, j, maxX, maxY)) maxY++;
+						do {
+							maxY++;
+						} while (grid[i]?.[maxY]);
 						maxY--;
 						
-						while (
-							validRect(i, j, maxX, maxY) &&
-							!grid[maxX]?.[j - 1] &&
-							!grid[maxX]?.[maxY + 1]
-						) maxX++;
+						do {
+							maxX++;
+						} while (validRect(maxX, j, maxX, maxY));
 						maxX--;
 					} break;
 					case RectPriority.SQUARE: {
