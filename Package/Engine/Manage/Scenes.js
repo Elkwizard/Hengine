@@ -55,7 +55,7 @@ class Scene {
 	 * @return { hitShape: WorldObject, hitPoint: VectorN }/null
 	 */
 	rayCast(ro, rd, mask = () => true) {
-		const elements = this.main.sceneObjectArray;
+		const elements = this.main.updateArray();
 		
 		let bestDist = Infinity;
 		let bestShape = null;
