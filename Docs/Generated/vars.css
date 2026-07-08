@@ -1,9 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
-
-@font-face {
-	font-family: "Cascadia Code";
-	src: url(./CascadiaCode.ttf);
-}
+@import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
 
 :root {
 	--text-color: white;
@@ -37,12 +33,12 @@ html {
 	font-size: 1em;
 }
 
-::-webkit-scrollbar {
+::-webkit-scrollbar, ::-moz-range-track {
 	background: var(--background);
 	border: 1px var(--accent-3) solid;
 }
 
-::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb, ::-moz-range-thumb {
 	background: var(--accent-3);
 }
 
