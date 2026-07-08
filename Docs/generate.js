@@ -24,7 +24,7 @@ const nameToPath = { };
 const populatePathMap = (structure, file = ".") => {
 	for (const key in structure) {
 		const value = structure[key];
-		const dst = path.join(file, key);
+		const dst = `${file}/${key}`;
 		if (Array.isArray(value) || value === null) {
 			for (const name of value ?? [key])
 				nameToPath[name] = dst + ".html";

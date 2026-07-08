@@ -411,9 +411,10 @@
 		const generateNav = (structure, file = ".") => `<ul>${
 			Object.entries(structure)
 				.map(([name, value]) => {
-					const dst = file + "/" + name;
+					const dst = `${file}/${name}`;
 					if (Array.isArray(value) || value === null) {
-						const docPath = dst.slice(2).replaceAll("/", "\\") + ".html";
+						console.log(dst);
+						const docPath = `${dst}.html`;
 						const complete = COMPLETENESS[docPath];
 						return `
 							<li data-leaf="true">
