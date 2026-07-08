@@ -1,0 +1,43 @@
+name: Build GitHub Pages Documentation
+
+on:
+  push:
+    branches: ['master']
+  pull_request:
+    branches: ['master']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Latest Revision
+        uses: actions/checkout@v7
+        
+      - name: Use NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+      
+      - name: Build Documentation
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          bash ./Docs/generate.sh
+
+      - name: Upload Static Artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+          retention-days: 700
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

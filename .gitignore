@@ -1,3 +1,6 @@
 .env
 .vscode
 Tests
+Docs/Generated/Pages/*
+Docs/Generated/index.js
+Docs/Generated/searchCache.js
